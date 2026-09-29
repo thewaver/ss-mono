@@ -3,7 +3,7 @@ import type { AccessorProps, MaybeAccessor, SignalSource } from "../../../Utils/
 
 export type CurrencyInputProps = Omit<
     TextFieldProps,
-    | "valueSignal"
+    | "value"
     | "element"
     | "type"
     | "inputMode"
@@ -28,7 +28,7 @@ export type CurrencyInputProps = Omit<
         /** Whether negative amounts can be entered. */
         hasSign?: boolean;
         /** The amount. It is the only thing that changes it. */
-        valueSignal: SignalSource<number | undefined>;
+        value: SignalSource<number | undefined>;
     }> & {
         /** How the digits before the decimal point are grouped. Leave it out for the locale's own grouping. */
         groupSizes?: MaybeAccessor<number[] | undefined>;

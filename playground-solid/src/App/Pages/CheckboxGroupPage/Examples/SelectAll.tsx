@@ -24,7 +24,7 @@ export const SelectAllExample = (props: Props) => {
             <Label>
                 <Checkbox
                     id={"allToppings"}
-                    checkedSignal={[
+                    checked={[
                         () => getParentState() === true,
                         (isChecked: boolean) => {
                             getGroup()?.setIsEveryChecked(isChecked);
@@ -39,7 +39,7 @@ export const SelectAllExample = (props: Props) => {
 
             <div class={styles.members}>
                 <CheckboxGroup
-                    valueSignal={props.valueSignal}
+                    value={props.value}
                     ariaLabel={"Toppings"}
                     orientation={"vertical"}
                     gap={GROUP_GAP}

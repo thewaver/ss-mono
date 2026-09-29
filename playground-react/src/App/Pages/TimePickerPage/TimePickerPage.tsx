@@ -27,7 +27,7 @@ export const TimePickerPage = () => {
             readout: () =>
                 `value: ${describeTime(clockedState[0])} — one column per unit, so typing and picking cover the same times`,
             component: () => (
-                <ClockedExample valueState={clockedState} itemKey={"clocked"} ariaLabel={"Appointment time"} />
+                <ClockedExample value={clockedState} itemKey={"clocked"} ariaLabel={"Appointment time"} />
             ),
             path: `${EXAMPLES_ROOT}/Clocked.tsx`,
         },
@@ -38,7 +38,7 @@ export const TimePickerPage = () => {
                 `value: ${describeTime(clockedTwelveState[0])} — the am/pm control and the clock trigger share the trailing slot`,
             component: () => (
                 <ClockedExample
-                    valueState={clockedTwelveState}
+                    value={clockedTwelveState}
                     itemKey={"clockedTwelve"}
                     isTwelveHour={true}
                     ariaLabel={"Call time"}
@@ -53,7 +53,7 @@ export const TimePickerPage = () => {
                 `value: ${describeTime(bookingState[0])} — a coarser minute column, still inside ${TimeUtils.toIso(OPENING_TIME)} to ${TimeUtils.toIso(CLOSING_TIME)}`,
             component: () => (
                 <ClockedExample
-                    valueState={bookingState}
+                    value={bookingState}
                     itemKey={"booking"}
                     clockSteps={BOOKING_STEPS}
                     minValue={OPENING_TIME}

@@ -24,8 +24,8 @@ const FULL_WIDTH = 1;
 export const PatchBoard = <T,>(props: PatchBoardProps<T>) => {
     onMount(() => LiveAnnouncerUtils.reserve("polite"));
 
-    const nodesSignal = accessSignal(() => props.nodesSignal);
-    const linksSignal = accessSignal(() => props.linksSignal);
+    const nodesSignal = accessSignal(() => props.nodes);
+    const linksSignal = accessSignal(() => props.links);
 
     const boardId = createUniqueId();
     const nodeHintId = createUniqueId();

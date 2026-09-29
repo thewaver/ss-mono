@@ -7,7 +7,7 @@ type Props = FileInputExampleProps;
 
 export const DefaultExample = (props: Props) => (
     <FileInput
-        filesState={props.filesState}
+        files={props.files}
         ariaLabel={"Attachment"}
         renderContent={(renderProps) => <PageFileInputContent renderProps={renderProps} />}
     />

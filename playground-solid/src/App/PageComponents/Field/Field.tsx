@@ -80,7 +80,7 @@ export const PageNumberField = (props: PageNumberFieldProps) => {
 
     return (
         <NumberInput
-            valueSignal={valueSignal}
+            value={valueSignal}
             id={props.id}
             min={props.min}
             max={props.max}
@@ -109,7 +109,7 @@ export const PageTextField = (props: PageTextFieldProps) => {
 
     return (
         <TextInput
-            valueSignal={[() => access(props.value), props.onInput]}
+            value={[() => access(props.value), props.onInput]}
             isDisabled={props.isDisabled}
             ariaLabel={props.ariaLabel}
             padding={() => FIELD_PADDING}
@@ -142,7 +142,7 @@ export const PageSelectField = <T,>(props: PageSelectFieldProps<T>) => {
 
     return (
         <Select
-            valueSignal={[getValue, setValue]}
+            value={[getValue, setValue]}
             options={() => access(props.values).map((value) => ({ value }))}
             isDisabled={props.isDisabled}
             ariaLabel={props.ariaLabel}
@@ -176,7 +176,7 @@ export const PageGroupedSelectField = <T,>(props: PageGroupedSelectFieldProps<T>
 
     return (
         <Select
-            valueSignal={[getValue, setValue]}
+            value={[getValue, setValue]}
             options={() =>
                 access(props.groups).map(([label, values]) => ({ label, options: values.map((value) => ({ value })) }))
             }
@@ -208,7 +208,7 @@ export const PageCheckField = (props: PageCheckFieldProps) => {
 
     return (
         <Toggle
-            checkedSignal={[() => access(props.value), props.onChange]}
+            checked={[() => access(props.value), props.onChange]}
             isDisabled={props.isDisabled}
             ariaLabel={props.ariaLabel}
             renderContent={(getFlags) => <PageToggleContent flags={getFlags} />}
@@ -224,7 +224,7 @@ export const PageColorField = (props: PageColorFieldProps) => {
 
     return (
         <ColorInput
-            valueSignal={[() => access(props.value), props.onInput]}
+            value={[() => access(props.value), props.onInput]}
             {...COLOR_INPUT_LABELS}
             isDisabled={props.isDisabled}
             ariaLabel={props.ariaLabel}
@@ -239,7 +239,7 @@ export const PageFileField = (props: PageFileFieldProps) => {
 
     return (
         <FileInput
-            filesSignal={filesSignal}
+            files={filesSignal}
             accept={props.accept}
             isDisabled={props.isDisabled}
             ariaLabel={props.ariaLabel}

@@ -28,7 +28,7 @@ const PEEK_STEP = 1;
 type Props = FlipCardPressedExampleProps;
 
 export const PressedExample = (props: Props) => {
-    const [, setIsFlipped] = props.flippedSignal;
+    const [, setIsFlipped] = props.flipped;
 
     const [getTurnDirection, setTurnDirection] = createSignal<FlipCardTurnDirection>();
     const [getPeekRatio, setPeekRatio] = createSignal(NO_PEEK);
@@ -45,7 +45,7 @@ export const PressedExample = (props: Props) => {
     return (
         <PageFlipCardStack>
             <FlipCard
-                flippedSignal={props.flippedSignal}
+                flipped={props.flipped}
                 axis={props.axis}
                 size={() => CARD_SIZE}
                 transitionDurationMs={props.transitionDurationMs}
@@ -80,7 +80,7 @@ export const PressedExample = (props: Props) => {
                     min={() => NO_PEEK}
                     max={() => PERCENT}
                     step={() => PEEK_STEP}
-                    valueSignal={[
+                    value={[
                         () => Math.round(getPeekRatio() * PERCENT),
                         (value: number) => setPeekRatio(value / PERCENT),
                     ]}

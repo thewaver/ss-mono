@@ -7,7 +7,7 @@ type Props = ToggleExampleProps;
 
 export const DefaultExample = (props: Props) => (
     <Toggle
-        checkedState={props.checkedState}
+        checked={props.checked}
         ariaLabel={"Default toggle"}
         renderContent={(flags) => <PageToggleContent flags={flags} />}
     />

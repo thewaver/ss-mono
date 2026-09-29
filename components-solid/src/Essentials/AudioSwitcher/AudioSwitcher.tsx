@@ -7,7 +7,7 @@ import { access } from "../../Utils/propUtils";
 import type { AudioSwitcherProps } from "./AudioSwitcherSolid.types";
 
 export const AudioSwitcher = (props: AudioSwitcherProps) => {
-    const [getIsPlaying, setIsPlaying] = SignalMirrorSolidUtils.createOptional(() => props.playbackSignal, false);
+    const [getIsPlaying, setIsPlaying] = SignalMirrorSolidUtils.createOptional(() => props.playback, false);
 
     const getVolume = () => access(props.volume) ?? AUDIO_SWITCHER_DEFAULTS.volume;
 

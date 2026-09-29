@@ -18,7 +18,7 @@ export const GrowingExample = (props: Props) => {
     return (
         <Accordion
             items={() => ITEMS}
-            expandedSignal={props.expandedSignal}
+            expanded={props.expanded}
             transitionDurationMs={() => TRANSITION_DURATION_MS}
             renderHeader={(getItem, getFlags) => (
                 <PageAccordionHeader flags={getFlags}>{getItem().value}</PageAccordionHeader>

@@ -104,7 +104,7 @@ export namespace RotatorUtils {
      * @param defs.getStepCount How many steps the wheel has. Fewer than two and it cannot rotate.
      * @param defs.getSpinDurationMs How long a spin takes.
      * @param defs.getSettleDurationMs How long the drift back from an overshoot takes, and a consumer's own move.
-     * @param defs.targetIndexSignal The step the wheel is heading for, read and written.
+     * @param defs.targetIndex The step the wheel is heading for, read and written.
      * @param defs.computeSpinTarget Chooses the step to land on. May return a promise, in which case
      * the wheel waits for it before starting; a rejection abandons the spin and leaves the wheel where
      * it was.
@@ -119,7 +119,7 @@ export namespace RotatorUtils {
         LiveAnnouncerUtils.reserve("polite");
 
         const store = StoreUtils.create(RESTING_STATE, { isEqual: StoreUtils.getIsShallowEqual });
-        const [getTargetIndex, setTargetIndex] = defs.targetIndexSignal;
+        const [getTargetIndex, setTargetIndex] = defs.targetIndex;
 
         const write = (next: Partial<RotatorState>) => store.update((current) => ({ ...current, ...next }));
 

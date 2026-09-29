@@ -8,7 +8,7 @@ type Props = RangePairExampleProps;
 
 export const PairExample = (props: Props) => (
     <Range
-        rangeSignal={props.rangeSignal}
+        range={props.range}
         ariaLabel={"Price range"}
         thumbLabels={() => ["Lowest price", "Highest price"]}
         thumbSize={() => RANGE_THUMB_SIZE}

@@ -15,7 +15,7 @@ import type { AccessorProps, SignalSource } from "../../../Utils/typeUtils";
 
 export type DateInputProps = Omit<
     TextFieldProps,
-    | "valueSignal"
+    | "value"
     | "element"
     | "type"
     | "inputMode"
@@ -50,7 +50,7 @@ export type DateInputProps = Omit<
          */
         partHints: Record<DateInputPart, string>;
         /** The date. It is the only thing that changes it. */
-        valueSignal: SignalSource<DateValue | undefined>;
+        value: SignalSource<DateValue | undefined>;
         /** Draws whatever sits before the field's text, inside the field. */
         renderLeading?: (getFlags: () => InteractionFlags<TextFieldFlags>, era: DateInputEra) => JSX.Element;
     }>;

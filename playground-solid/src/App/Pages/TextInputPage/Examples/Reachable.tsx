@@ -15,7 +15,7 @@ type Props = TextInputExampleProps;
 
 export const ReachableExample = (props: Props) => (
     <TextInput
-        valueSignal={props.valueSignal}
+        value={props.value}
         padding={() => FIELD_PADDING}
         gap={() => FIELD_GAP}
         isDisabled={true}

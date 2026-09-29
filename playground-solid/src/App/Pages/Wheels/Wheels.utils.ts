@@ -39,16 +39,16 @@ export const createWheelsControls = (): WheelsControls => {
     }));
 
     return {
-        wedgeCountSignal,
-        spinDurationSignal,
-        turnsSignal,
-        settleDurationSignal,
-        doesResumeSignal,
-        restDurationSignal,
-        isIdlingAllowedSignal,
-        idleDelaySignal,
-        spinStyleSignal,
-        isDisabledSignal,
+        wedgeCount: wedgeCountSignal,
+        spinDuration: spinDurationSignal,
+        turns: turnsSignal,
+        settleDuration: settleDurationSignal,
+        doesResume: doesResumeSignal,
+        restDuration: restDurationSignal,
+        isIdlingAllowed: isIdlingAllowedSignal,
+        idleDelay: idleDelaySignal,
+        spinStyle: spinStyleSignal,
+        isDisabled: isDisabledSignal,
         getWedges,
         getSharedProps,
     };

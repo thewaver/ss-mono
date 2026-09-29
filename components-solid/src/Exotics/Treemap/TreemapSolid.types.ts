@@ -20,7 +20,7 @@ export type TreemapProps<T> = AccessorProps<{
      * is pressed, the consumer to move it from outside — which is how a way back up is drawn. Leave it out and the
      * treemap keeps it itself, starting at the root. A node that is not a branch of the current tree shows the root.
      */
-    branchSignal?: SignalSource<TreemapNode<T>>;
+    branch?: SignalSource<TreemapNode<T>>;
     /** Draws one tile, and is told where it sits and what it holds. */
     renderTile: (getNode: Accessor<TreemapNode<T>>, getState: Accessor<TreemapTileState>) => JSX.Element;
 };

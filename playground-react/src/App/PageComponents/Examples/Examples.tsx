@@ -122,7 +122,7 @@ export const PageExamples = (props: ExamplesProps) => {
 
             <Modal
                 margins={CSSUtils.spreadMargin(40)}
-                visibilityState={modalVisibility}
+                visibility={modalVisibility}
                 ariaLabel={`${props.items[activeIndex].name} source code`}
                 renderOverlay={(visibilityTarget, transitionDurationMs) => (
                     <PageModalOverlay visibilityTarget={visibilityTarget} transitionDurationMs={transitionDurationMs} />

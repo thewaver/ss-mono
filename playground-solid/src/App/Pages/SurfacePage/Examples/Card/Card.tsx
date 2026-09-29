@@ -46,7 +46,7 @@ export const CardExample = () => {
                     </div>
                     <div class={styles.surfaceCntent}>
                         <Preview
-                            expandedSignal={expandedSignal}
+                            expanded={expandedSignal}
                             collapsedHeight={() => COLLAPSED_HEIGHT}
                             renderContent={() => (
                                 <div class={styles.bios}>

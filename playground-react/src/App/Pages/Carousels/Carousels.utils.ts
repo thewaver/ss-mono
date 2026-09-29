@@ -24,10 +24,10 @@ export const useCarouselsControls = (): CarouselsControls => {
 
     return {
         slideCountState,
-        delayState,
-        orientationState,
-        isDisabledState,
-        isLoopingState,
+        delay: delayState,
+        orientation: orientationState,
+        isDisabled: isDisabledState,
+        isLooping: isLoopingState,
         slideCount,
         slides,
         sharedProps,

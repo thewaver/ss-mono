@@ -7,16 +7,16 @@ import { TimePicker } from "../TimePicker/TimePicker";
 import type { DateTimePickerProps } from "./DateTimePickerSolid.types";
 
 export const DateTimePicker = (props: DateTimePickerProps) => {
-    const { dateSignal, timeSignal } = DateTimeValueSolidUtils.createSplit(accessSignal(() => props.valueSignal));
+    const { date: dateSignal, time: timeSignal } = DateTimeValueSolidUtils.createSplit(accessSignal(() => props.value));
 
     return (
         <div class={styles.dateTimePickerRoot}>
             <DatePicker
                 {...props}
-                valueSignal={dateSignal}
+                value={dateSignal}
                 id={access(props.id) && `${access(props.id)}-date`}
                 name={access(props.name) && `${access(props.name)}-date`}
-                visibilitySignal={props.dateVisibilitySignal}
+                visibility={props.dateVisibility}
                 ariaLabel={props.dateLabel}
                 minValue={props.minValue === undefined ? undefined : () => access(props.minValue)!.date}
                 maxValue={props.maxValue === undefined ? undefined : () => access(props.maxValue)!.date}
@@ -26,10 +26,10 @@ export const DateTimePicker = (props: DateTimePickerProps) => {
 
             <TimePicker
                 {...props}
-                valueSignal={timeSignal}
+                value={timeSignal}
                 id={access(props.id) && `${access(props.id)}-time`}
                 name={access(props.name) && `${access(props.name)}-time`}
-                visibilitySignal={props.timeVisibilitySignal}
+                visibility={props.timeVisibility}
                 ariaLabel={props.timeLabel}
                 minValue={
                     props.minValue === undefined

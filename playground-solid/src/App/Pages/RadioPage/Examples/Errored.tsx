@@ -9,11 +9,11 @@ import type { RadioOptionalExampleProps } from "../RadioPage.types";
 type Props = RadioOptionalExampleProps;
 
 export const ErroredExample = (props: Props) => {
-    const getHasError = () => props.valueSignal[0]() === undefined;
+    const getHasError = () => props.value[0]() === undefined;
 
     return (
         <RadioGroup
-            valueSignal={props.valueSignal}
+            value={props.value}
             ariaLabel={"Required size"}
             gap={() => RADIO_GROUP_GAP}
             hasError={getHasError}

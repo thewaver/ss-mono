@@ -14,8 +14,8 @@ export const SingleSelectionExample = (props: TableExampleProps) => {
             <Table
                 columns={getColumns}
                 rows={() => PARTS}
-                sortSignal={props.sortSignal}
-                selectionSignal={props.selectionSignal}
+                sort={props.sort}
+                selection={props.selection}
                 selectionMode={"single"}
                 ariaLabel={"Parts, one at a time"}
             />

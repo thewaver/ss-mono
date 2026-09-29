@@ -19,8 +19,8 @@ export const VirtualizedExample = (props: Props) => {
             <Table
                 columns={getColumns}
                 rows={props.rows}
-                sortSignal={props.sortSignal}
-                selectionSignal={props.selectionSignal}
+                sort={props.sort}
+                selection={props.selection}
                 ariaLabel={"Every part"}
                 computeEstimatedRowHeight={() => ESTIMATED_ROW_HEIGHT}
             />

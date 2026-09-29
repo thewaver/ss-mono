@@ -27,7 +27,7 @@ const AccordionSection = <T,>(props: AccordionSectionProps<T>) => {
             transitionDurationMs={props.transitionDurationMs}
             panelRole={"region"}
             panelAriaAttributes={() => ({ "aria-labelledby": headerId })}
-            expandedSignal={expandedSignal}
+            expanded={expandedSignal}
             renderTrigger={(getFlags) => props.renderHeader(() => access(props.item), getFlags)}
             renderPanel={(getVisibilityTarget, getTransitionDurationMs) =>
                 props.renderPanel(() => access(props.item), getVisibilityTarget, getTransitionDurationMs)
@@ -37,7 +37,7 @@ const AccordionSection = <T,>(props: AccordionSectionProps<T>) => {
 };
 
 export const Accordion = <T,>(props: AccordionProps<T>) => {
-    const expandedSignal = SignalMirrorSolidUtils.createOptional<T[]>(() => props.expandedSignal, []);
+    const expandedSignal = SignalMirrorSolidUtils.createOptional<T[]>(() => props.expanded, []);
 
     const [getHeaderRefs, setHeaderRefs] = createSignal<(HTMLElement | undefined)[]>([]);
 

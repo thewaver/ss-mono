@@ -22,7 +22,7 @@ export const ModalPage = () => {
             key: "default",
             name: "Default",
             readout: () => `open: ${modalVisibility[0]} — Escape and an overlay click both dismiss it`,
-            component: () => <DefaultExample visibilityState={modalVisibility} />,
+            component: () => <DefaultExample visibility={modalVisibility} />,
             path: `${EXAMPLES_ROOT}/Default.tsx`,
         },
         {
@@ -31,7 +31,7 @@ export const ModalPage = () => {
             readout: () =>
                 `open: ${destructiveVisibility[0]} | outcome: ${outcome} — the alertdialog role, a required focus target, and neither overlay nor Escape dismissal`,
             component: () => (
-                <DestructiveConfirmationExample visibilityState={destructiveVisibility} onDecide={setOutcome} />
+                <DestructiveConfirmationExample visibility={destructiveVisibility} onDecide={setOutcome} />
             ),
             path: `${EXAMPLES_ROOT}/DestructiveConfirmation.tsx`,
         },
@@ -40,7 +40,7 @@ export const ModalPage = () => {
             name: "A popup inside it",
             readout: () =>
                 `open: ${layeredVisibility[0]} | country: ${layeredState[0] ?? "undefined"} — Escape closes the innermost layer only`,
-            component: () => <LayeredExample visibilityState={layeredVisibility} valueState={layeredState} />,
+            component: () => <LayeredExample visibility={layeredVisibility} value={layeredState} />,
             path: `${EXAMPLES_ROOT}/Layered.tsx`,
         },
         {
@@ -48,7 +48,7 @@ export const ModalPage = () => {
             name: "Nothing focusable inside",
             readout: () =>
                 `open: ${textOnlyVisibility[0]} — with nothing to focus inside, the dialog takes focus itself`,
-            component: () => <TextOnlyExample visibilityState={textOnlyVisibility} />,
+            component: () => <TextOnlyExample visibility={textOnlyVisibility} />,
             path: `${EXAMPLES_ROOT}/TextOnly.tsx`,
         },
     ];

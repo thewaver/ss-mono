@@ -10,7 +10,7 @@ const YEAR_OPTIONS: Intl.DateTimeFormatOptions = { year: "numeric" };
 const MONTH_TITLE_OPTIONS: Intl.DateTimeFormatOptions = { month: "long", year: "numeric" };
 
 export const PageCalendarPagedCaption = (props: PageCalendarPagedCaptionProps) => {
-    const getMonth = () => props.monthSignal[0]();
+    const getMonth = () => props.month[0]();
 
     const getTitle = () => {
         const precision = access(props.precision);
@@ -25,7 +25,7 @@ export const PageCalendarPagedCaption = (props: PageCalendarPagedCaptionProps) =
     };
 
     const page = (direction: 1 | -1) => {
-        props.monthSignal[1]((prev) => CalendarUtils.stepPage(prev, access(props.precision), direction * PAGE_STEP));
+        props.month[1]((prev) => CalendarUtils.stepPage(prev, access(props.precision), direction * PAGE_STEP));
     };
 
     return (

@@ -17,7 +17,7 @@ export const SpotlightPromptPage = () => {
             readout: () => `bought: ${getBought()} — nothing else on the page answers until you do`,
             component: () => (
                 <PromptExample
-                    visibilitySignal={visibilitySignal}
+                    visibility={visibilitySignal}
                     onBuy={() => {
                         setBought((previous) => previous + 1);
                     }}

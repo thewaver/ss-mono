@@ -11,7 +11,7 @@ import {
 } from "../../../StyledComponents/ClockContent/ClockContent";
 
 type Props = {
-    valueState: readonly [TimeValue | undefined, (value: TimeValue | undefined) => void];
+    value: readonly [TimeValue | undefined, (value: TimeValue | undefined) => void];
     ariaLabel: string;
     isTwelveHour?: boolean;
     hasSeconds?: boolean;
@@ -24,7 +24,7 @@ export const DefaultExample = (props: Props) => {
     return (
         <PageClockFrame>
             <Clock
-                valueState={props.valueState}
+                value={props.value}
                 locale={LOCALE}
                 ariaLabel={props.ariaLabel}
                 isTwelveHour={props.isTwelveHour}

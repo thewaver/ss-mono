@@ -6,7 +6,7 @@ type Props = RadioOptionalExampleProps;
 export const RightToLeftExample = (props: Props) => {
     return (
         <div dir={"rtl"}>
-            <DefaultExample valueState={props.valueState} />
+            <DefaultExample value={props.value} />
         </div>
     );
 };

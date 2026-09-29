@@ -90,9 +90,11 @@ const MenuItemView = (props: MenuItemViewProps) => {
     const getIsHighlighted = createMemo(() => access(props.flags).isHighlighted ?? false);
 
     createEffect(() => {
-        if (!getIsHighlighted()) return;
+        const element = getElementRef();
 
-        getElementRef()?.scrollIntoView({ block: "nearest" });
+        if (!getIsHighlighted() || !element) return;
+
+        MenuUtils.revealItem(element);
     });
 
     return (
@@ -500,7 +502,7 @@ export const Menu = <T,>(props: MenuProps<T>) => {
     const getPointerPoint = createPointerPointReader();
 
     const [getTriggerRef, setTriggerRef] = createSignal<HTMLElement>();
-    const [getIsOpen, setIsOpen] = SignalMirrorSolidUtils.createOptional(() => props.visibilitySignal, false);
+    const [getIsOpen, setIsOpen] = SignalMirrorSolidUtils.createOptional(() => props.visibility, false);
 
     const getDirection = NavigatorSolidUtils.createDirectionSignal(() => access(props.anchorRef) ?? getTriggerRef());
 
@@ -532,11 +534,11 @@ export const Menu = <T,>(props: MenuProps<T>) => {
         setFlickOrigin(() => undefined);
     };
 
-    const getCheckedValues = createMemo(() => props.checkedSignal?.[0]() ?? EMPTY_CHECKED);
+    const getCheckedValues = createMemo(() => props.checked?.[0]() ?? EMPTY_CHECKED);
 
     const pick = (item: MenuItem<T>, radioGroupValues: T[]) => {
         const kind = MenuUtils.getKind(item);
-        const checkedSignal = props.checkedSignal;
+        const checkedSignal = props.checked;
 
         if (kind !== "command" && checkedSignal) {
             checkedSignal[1](MenuUtils.computeNextChecked(checkedSignal[0](), item, radioGroupValues));
@@ -663,7 +665,7 @@ export const ContextMenu = <T,>(props: ContextMenuProps<T>) => {
 
     const [getRegionRef, setRegionRef] = createSignal<HTMLElement>();
     const [getAnchorRect, setAnchorRect] = createSignal<Rect | undefined>(undefined, { equals: Rect.isSame });
-    const [getIsOpen, setIsOpen] = SignalMirrorSolidUtils.createOptional(() => props.visibilitySignal, false);
+    const [getIsOpen, setIsOpen] = SignalMirrorSolidUtils.createOptional(() => props.visibility, false);
 
     const getDirection = NavigatorSolidUtils.createDirectionSignal(getRegionRef);
 
@@ -673,11 +675,11 @@ export const ContextMenu = <T,>(props: ContextMenuProps<T>) => {
         setIsOpen(false);
     };
 
-    const getCheckedValues = createMemo(() => props.checkedSignal?.[0]() ?? EMPTY_CHECKED);
+    const getCheckedValues = createMemo(() => props.checked?.[0]() ?? EMPTY_CHECKED);
 
     const pick = (item: MenuItem<T>, radioGroupValues: T[]) => {
         const kind = MenuUtils.getKind(item);
-        const checkedSignal = props.checkedSignal;
+        const checkedSignal = props.checked;
 
         if (kind !== "command" && checkedSignal) {
             checkedSignal[1](MenuUtils.computeNextChecked(checkedSignal[0](), item, radioGroupValues));

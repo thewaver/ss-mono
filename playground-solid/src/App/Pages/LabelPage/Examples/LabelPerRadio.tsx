@@ -16,7 +16,7 @@ const PLAN_OPTIONS: { value: PlanValue; label: string }[] = [
 type Props = LabelRadioExampleProps;
 
 export const LabelPerRadioExample = (props: Props) => (
-    <RadioGroup valueSignal={props.valueSignal} ariaLabel={"Plan"} gap={() => GAP}>
+    <RadioGroup value={props.value} ariaLabel={"Plan"} gap={() => GAP}>
         <For each={PLAN_OPTIONS}>
             {(option) => (
                 <Label>

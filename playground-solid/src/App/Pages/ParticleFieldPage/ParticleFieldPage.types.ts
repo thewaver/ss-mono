@@ -19,5 +19,5 @@ export type ParticleFieldExampleProps = AccessorProps<{
     animationType: CellAnimationKeyframes.AnimationType;
     holdShare: number;
     isScattered: boolean;
-    playbackSignal: Signal<boolean>;
+    playback: Signal<boolean>;
 }>;

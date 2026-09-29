@@ -10,9 +10,9 @@ type Props = CheckboxExampleProps;
 
 export const DecoratedExample = (props: Props) => (
     <Checkbox
-        checkedState={props.checkedState}
+        checked={props.checked}
         ariaLabel={"Decorated checkbox"}
-        isPressed={props.checkedState[0]}
+        isPressed={props.checked[0]}
         renderContent={(flags) => <PageCheckboxContent flags={flags} />}
         renderDecoration={(flags) => (
             <Corners

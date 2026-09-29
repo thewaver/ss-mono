@@ -52,7 +52,7 @@ const NavFlyout = (props: NavFlyoutProps) => {
     const [getPanelRef, setPanelRef] = createSignal<HTMLElement>();
     const [getIsPressOpened, setIsPressOpened] = createSignal(false);
 
-    const [getOpenKey, setOpenKey] = props.openKeySignal;
+    const [getOpenKey, setOpenKey] = props.openKey;
 
     const getIsOpen = () => getOpenKey() === access(props.entry).key;
 

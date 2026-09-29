@@ -27,7 +27,7 @@ export const DrumWheelPage = () => {
             component: () => (
                 <SidewaysExample
                     {...controls.sharedProps}
-                    targetIndexState={sidewaysIndexState}
+                    targetIndex={sidewaysIndexState}
                     onSelectedWedgeChange={setSidewaysMarkedIndex}
                 />
             ),
@@ -40,7 +40,7 @@ export const DrumWheelPage = () => {
             component: () => (
                 <OverExample
                     {...controls.sharedProps}
-                    targetIndexState={reelIndexState}
+                    targetIndex={reelIndexState}
                     onSelectedWedgeChange={setReelMarkedIndex}
                 />
             ),

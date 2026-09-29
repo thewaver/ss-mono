@@ -166,14 +166,14 @@ export const SelectPage = () => {
             key: "default",
             name: "Default",
             readout: () => `value: ${defaultSignal[0]() ?? "undefined"}`,
-            component: () => <CountriesExample valueSignal={defaultSignal} />,
+            component: () => <CountriesExample value={defaultSignal} />,
             path: `${EXAMPLES_ROOT}/Countries.tsx`,
         },
         {
             key: "preselected",
             name: "Preselected",
             readout: () => `value: ${preselectedSignal[0]() ?? "undefined"} — reopening highlights it`,
-            component: () => <CountriesExample valueSignal={preselectedSignal} />,
+            component: () => <CountriesExample value={preselectedSignal} />,
             path: `${EXAMPLES_ROOT}/Countries.tsx`,
         },
         {
@@ -183,7 +183,7 @@ export const SelectPage = () => {
                 `value: ${clearableSignal[0]() ?? "undefined"} | last change: ${getClearableChange()} — the clear control is its own tab stop after the field, drawn only while something is picked`,
             component: () => (
                 <ClearableExample
-                    valueSignal={clearableSignal}
+                    value={clearableSignal}
                     onSelectionChange={(value) => {
                         setClearableChange(value ?? "undefined");
                     }}
@@ -195,7 +195,7 @@ export const SelectPage = () => {
             key: "recordValues",
             name: "Record values",
             readout: () => `value: ${recordSignal[0]()?.code ?? "undefined"}`,
-            component: () => <AirportsExample valueSignal={recordSignal} />,
+            component: () => <AirportsExample value={recordSignal} />,
             path: `${EXAMPLES_ROOT}/Airports.tsx`,
         },
         {
@@ -203,7 +203,7 @@ export const SelectPage = () => {
             name: "Title and description",
             readout: () =>
                 `value: ${deliverySignal[0]()?.name ?? "undefined"} — the descriptions wrap, so no two rows are the same height`,
-            component: () => <DeliveriesExample valueSignal={deliverySignal} />,
+            component: () => <DeliveriesExample value={deliverySignal} />,
             path: `${EXAMPLES_ROOT}/Deliveries.tsx`,
         },
         {
@@ -212,7 +212,7 @@ export const SelectPage = () => {
             readout: () =>
                 `value: ${groupedSignal[0]() ?? "undefined"} — arrows cross group boundaries and skip Finland`,
             component: () => (
-                <CountriesExample valueSignal={groupedSignal} options={() => GROUPED_COUNTRIES} hasGroups={true} />
+                <CountriesExample value={groupedSignal} options={() => GROUPED_COUNTRIES} hasGroups={true} />
             ),
             path: `${EXAMPLES_ROOT}/Countries.tsx`,
         },
@@ -221,7 +221,7 @@ export const SelectPage = () => {
             name: "Disabled options",
             readout: () => `value: ${disabledOptionSignal[0]() ?? "undefined"} — arrows skip Denmark and Finland`,
             component: () => (
-                <CountriesExample valueSignal={disabledOptionSignal} options={() => COUNTRIES_WITH_DISABLED} />
+                <CountriesExample value={disabledOptionSignal} options={() => COUNTRIES_WITH_DISABLED} />
             ),
             path: `${EXAMPLES_ROOT}/Countries.tsx`,
         },
@@ -231,7 +231,7 @@ export const SelectPage = () => {
             readout: () =>
                 `value: ${reachableOptionSignal[0]() ?? "undefined"} — arrows stop on them, hover explains why`,
             component: () => (
-                <CountriesExample valueSignal={reachableOptionSignal} options={() => COUNTRIES_WITH_REACHABLE} />
+                <CountriesExample value={reachableOptionSignal} options={() => COUNTRIES_WITH_REACHABLE} />
             ),
             path: `${EXAMPLES_ROOT}/Countries.tsx`,
         },
@@ -239,7 +239,7 @@ export const SelectPage = () => {
             key: "scrollingList",
             name: "Scrolling list",
             readout: () => `value: ${longSignal[0]() ?? "undefined"} — Home and End reach both ends`,
-            component: () => <HoursExample valueSignal={longSignal} />,
+            component: () => <HoursExample value={longSignal} />,
             path: `${EXAMPLES_ROOT}/Hours.tsx`,
         },
         {
@@ -253,8 +253,8 @@ export const SelectPage = () => {
                 }, ${stressVisibility[0]() ? `${getFrameRate().current.toFixed(0)} fps while open` : "closed"}`,
             component: () => (
                 <VirtualizedExample
-                    valueSignal={stressSignal}
-                    visibilitySignal={stressVisibility}
+                    value={stressSignal}
+                    visibility={stressVisibility}
                     options={getStressDeliveries}
                     count={getStressCount}
                     measureOpen={measureOpen}
@@ -275,8 +275,8 @@ export const SelectPage = () => {
                 }`,
             component: () => (
                 <VirtualizedExample
-                    valueSignal={groupedStressSignal}
-                    visibilitySignal={groupedStressVisibility}
+                    value={groupedStressSignal}
+                    visibility={groupedStressVisibility}
                     options={getStressDeliveryGroups}
                     count={getStressCount}
                     measureOpen={(renderOptions) => renderOptions()}
@@ -294,7 +294,7 @@ export const SelectPage = () => {
                 } — reaching the end asks for ${PAGE_SIZE} more, and the arrows stop at the last one held`,
             component: () => (
                 <OnDemandExample
-                    valueSignal={pagedSignal}
+                    value={pagedSignal}
                     options={getPagedRoutes}
                     hasMore={getHasMoreRoutes}
                     isFetching={getIsFetching}
@@ -310,8 +310,8 @@ export const SelectPage = () => {
                 `value: ${filterSignal[0]()?.code ?? "undefined"} | query: "${filterQuerySignal[0]()}" — ${getFilteredAirports().length} of ${AIRPORTS.length} shown; the page matches on city or code, which only it knows about`,
             component: () => (
                 <AutocompleteExample
-                    valueSignal={filterSignal}
-                    querySignal={filterQuerySignal}
+                    value={filterSignal}
+                    query={filterQuerySignal}
                     options={getFilteredAirports}
                 />
             ),
@@ -326,8 +326,8 @@ export const SelectPage = () => {
                 }; typing starts a new search rather than filtering what arrived`,
             component: () => (
                 <AutocompleteOnDemandExample
-                    valueSignal={searchSignal}
-                    querySignal={searchQuerySignal}
+                    value={searchSignal}
+                    query={searchQuerySignal}
                     options={getSearchResults}
                     hasMore={getHasMoreResults}
                     isSearching={getIsSearching}
@@ -346,7 +346,7 @@ export const SelectPage = () => {
             name: "Error",
             readout: () => `value: ${erroredSignal[0]() ?? "undefined"} — required, nothing picked yet`,
             component: () => (
-                <CountriesExample valueSignal={erroredSignal} hasError={() => erroredSignal[0]() === undefined} />
+                <CountriesExample value={erroredSignal} hasError={() => erroredSignal[0]() === undefined} />
             ),
             path: `${EXAMPLES_ROOT}/Countries.tsx`,
         },
@@ -354,21 +354,21 @@ export const SelectPage = () => {
             key: "disabled",
             name: "Disabled",
             readout: () => `value: ${disabledSignal[0]() ?? "undefined"}`,
-            component: () => <CountriesExample valueSignal={disabledSignal} isDisabled={true} />,
+            component: () => <CountriesExample value={disabledSignal} isDisabled={true} />,
             path: `${EXAMPLES_ROOT}/Countries.tsx`,
         },
         {
             key: "reachable",
             name: "Disabled + reachable",
             readout: () => `value: ${reachableSignal[0]() ?? "undefined"}`,
-            component: () => <ReachableExample valueSignal={reachableSignal} />,
+            component: () => <ReachableExample value={reachableSignal} />,
             path: `${EXAMPLES_ROOT}/Reachable.tsx`,
         },
         {
             key: "label",
             name: "In a Label",
             readout: () => `value: ${labeledSignal[0]() ?? "undefined"} — the caption opens the list`,
-            component: () => <LabeledExample valueSignal={labeledSignal} />,
+            component: () => <LabeledExample value={labeledSignal} />,
             path: `${EXAMPLES_ROOT}/Labeled.tsx`,
         },
     ]);

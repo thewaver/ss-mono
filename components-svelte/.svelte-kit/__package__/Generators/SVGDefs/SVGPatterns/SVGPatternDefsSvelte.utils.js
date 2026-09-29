@@ -1,0 +1,21 @@
+import { markup } from "../../../Utils/markupUtils.js";
+import SVGPattern from "./SVGPattern.svelte";
+/** The Svelte side of `SVGPatternDefsUtils`: a repeating SVG `pattern` built from a grid of cells, held as markup. */
+export var SVGPatternDefsSvelteUtils;
+(function (SVGPatternDefsSvelteUtils) {
+    /**
+     * Builds a pattern whose tile holds a grid of cells.
+     *
+     * `SVGPatternDefsUtils.computeCells` places the cells; each is drawn by the caller inside a group moved to its
+     * position and keyed by the cell's own id.
+     *
+     * @param id The pattern's id, which the cells' own ids are built from.
+     * @param cellCount How many rows and columns one tile holds.
+     * @param patternSize The tile's size, in the same user units as whatever the pattern fills.
+     * @param computeCellPos Where each cell sits within the tile.
+     * @param renderCell Draws one cell. Receives an id of its own, so a cell may carry gradients or filters without
+     * colliding with its neighbors, along with its position in the grid and the grid's size.
+     * @returns The `pattern` element as markup, which a fill points at with `url(#…)`.
+     */
+    SVGPatternDefsSvelteUtils.computePattern = (id, cellCount, patternSize, computeCellPos, renderCell) => markup(SVGPattern, { id, cellCount, patternSize, computeCellPos, renderCell });
+})(SVGPatternDefsSvelteUtils || (SVGPatternDefsSvelteUtils = {}));

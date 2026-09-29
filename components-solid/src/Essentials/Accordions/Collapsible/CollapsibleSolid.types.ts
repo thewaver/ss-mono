@@ -68,7 +68,7 @@ export type CollapsibleProps = Omit<
          * Whether the panel is open. Both sides write it: the collapsible when its trigger is pressed, the consumer to
          * open or close it from outside. Leave it out and the collapsible keeps the state itself, starting closed.
          */
-        expandedSignal?: SignalSource<boolean>;
+        expanded?: SignalSource<boolean>;
         /**
          * Draws the trigger. It is handed the interaction state so the trigger can answer to being hovered, pressed or
          * open.

@@ -1,17 +1,17 @@
 export type CheckboxCheckedState = readonly [boolean, (isChecked: boolean) => void];
 
 export type CheckboxExampleProps = {
-    checkedState: CheckboxCheckedState;
+    checked: CheckboxCheckedState;
 };
 
 export type CheckboxMixedExampleProps = {
-    allState: CheckboxCheckedState;
-    firstChildState: CheckboxCheckedState;
-    secondChildState: CheckboxCheckedState;
+    all: CheckboxCheckedState;
+    firstChild: CheckboxCheckedState;
+    secondChild: CheckboxCheckedState;
     isMixed: boolean;
 };
 
 export type CheckboxRefusedWriteExampleProps = {
-    emailState: CheckboxCheckedState;
-    smsState: CheckboxCheckedState;
+    email: CheckboxCheckedState;
+    sms: CheckboxCheckedState;
 };

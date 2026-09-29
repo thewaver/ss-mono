@@ -1,5 +1,5 @@
 export type ModalExampleProps = {
-    visibilityState: readonly [boolean, (isVisible: boolean) => void];
+    visibility: readonly [boolean, (isVisible: boolean) => void];
 };
 
 export type ModalDestructiveExampleProps = ModalExampleProps & {
@@ -7,5 +7,5 @@ export type ModalDestructiveExampleProps = ModalExampleProps & {
 };
 
 export type ModalLayeredExampleProps = ModalExampleProps & {
-    valueState: readonly [string | undefined, (value: string | undefined) => void];
+    value: readonly [string | undefined, (value: string | undefined) => void];
 };

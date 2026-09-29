@@ -8,7 +8,7 @@ import { PARTS, createPartColumns } from "../TablePage.const";
 import type { TableExampleProps } from "../TablePage.types";
 
 type Props = TableExampleProps & {
-    widthsState: readonly [Record<string, number>, (widths: Record<string, number>) => void];
+    widths: readonly [Record<string, number>, (widths: Record<string, number>) => void];
 };
 
 export const ResizableExample = (props: Props) => {
@@ -19,9 +19,9 @@ export const ResizableExample = (props: Props) => {
             <Table
                 columns={columns}
                 rows={PARTS}
-                sortState={props.sortState}
-                selectionState={props.selectionState}
-                widthsState={props.widthsState}
+                sort={props.sort}
+                selection={props.selection}
+                widths={props.widths}
                 ariaLabel={"Parts with resizable columns"}
                 renderResizer={(renderProps) => <PageTableResizer renderProps={renderProps} />}
             />

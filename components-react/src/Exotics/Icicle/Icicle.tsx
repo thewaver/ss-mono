@@ -46,7 +46,7 @@ export const Icicle = <T,>(props: IcicleProps<T>) => {
     const allNodes = useMemo(() => IcicleUtils.listNodes(spans, weights), [spans, weights]);
     const nodeKeys = useMemo(() => new Map(allNodes.map((node, index) => [node, index])), [allNodes]);
 
-    const [heldFocus, setHeldFocus] = SignalMirrorReactUtils.useOptionalState(props.focusState, props.root);
+    const [heldFocus, setHeldFocus] = SignalMirrorReactUtils.useOptionalState(props.focus, props.root);
 
     const focus = allNodes.includes(heldFocus) ? heldFocus : props.root;
 

@@ -23,7 +23,7 @@ export type IcicleProps<T> = AccessorProps<{
      * when Escape is pressed; the consumer to move it from outside. Leave it out and the icicle keeps it itself,
      * starting at the root. A node that is not in the current tree shows the root.
      */
-    focusSignal?: SignalSource<IcicleNode<T>>;
+    focus?: SignalSource<IcicleNode<T>>;
     /** Draws one cell, and is told where it sits at this moment, which changes on every frame of a zoom. */
     renderCell: (getNode: Accessor<IcicleNode<T>>, getState: Accessor<IcicleCellState>) => JSX.Element;
 };

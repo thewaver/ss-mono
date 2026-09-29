@@ -13,7 +13,7 @@ export const DefaultExample = (props: Props) => {
             actions={WORDS}
             ariaLabel={"Editor"}
             overflowAriaLabel={"More menus"}
-            checkedState={props.checkedState}
+            checked={props.checked}
             submenuOffset={{ x: POPOVER_SURFACE_INSET, y: -POPOVER_SURFACE_INSET }}
             renderAction={(action, flags) => (
                 <PageMenuTriggerContent flags={flags}>{action.value.name}</PageMenuTriggerContent>

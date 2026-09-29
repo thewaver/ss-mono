@@ -29,9 +29,9 @@ export const PageCalendarCaption = (props: PageCalendarCaptionProps) => {
     const restorePointRef = useRef<DateValue>(undefined);
     const pendingYearRef = useRef<number>(undefined);
 
-    const [month, setMonth] = props.monthState;
+    const [month, setMonth] = props.month;
 
-    const latestMonthState = useLatest(props.monthState);
+    const latestMonthState = useLatest(props.month);
 
     const monthNames = useMemo(() => DateValueUtils.getMonthNames(month, props.locale), [month, props.locale]);
 

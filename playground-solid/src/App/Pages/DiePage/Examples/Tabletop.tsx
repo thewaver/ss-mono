@@ -22,7 +22,7 @@ export const TabletopExample = (props: Props) => {
                 size={props.size}
                 rollDurationMs={props.rollDurationMs}
                 tumbleCount={props.tumbleCount}
-                faceSignal={props.faceSignal}
+                face={props.face}
                 ariaLabel={"A die"}
                 computeFaceLabel={(index) => `${index + FIRST_NUMBER}`}
                 computeRollTarget={() => Math.floor(Math.random() * access(props.shape).faces.length)}

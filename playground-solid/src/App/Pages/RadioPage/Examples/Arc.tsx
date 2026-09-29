@@ -23,23 +23,23 @@ const ARC_WIDTH = "300px";
 
 export const ArcExample = (props: Props) => (
     <div style={{ width: ARC_WIDTH }}>
-        <RadioGroup valueSignal={props.valueSignal} ariaLabel={"Rating on an arc"} computeLayout={ARC_LAYOUT}>
+        <RadioGroup value={props.value} ariaLabel={"Rating on an arc"} computeLayout={ARC_LAYOUT}>
             <For each={RATING_OPTIONS}>
                 {(rating) => (
                     <Radio
                         value={() => rating}
                         ariaLabel={() => (rating === 1 ? "1 star" : `${rating} stars`)}
                         onMouseEnter={() => {
-                            props.hoveredSignal[1](rating);
+                            props.hovered[1](rating);
                         }}
                         onMouseLeave={() => {
-                            props.hoveredSignal[1](undefined);
+                            props.hovered[1](undefined);
                         }}
                         renderContent={(getFlags) => (
                             <PageRadioStarCell>
                                 <PageRadioStarContent
                                     flags={getFlags}
-                                    isFilled={() => rating <= (props.hoveredSignal[0]() ?? props.valueSignal[0]())}
+                                    isFilled={() => rating <= (props.hovered[0]() ?? props.value[0]())}
                                 />
                             </PageRadioStarCell>
                         )}

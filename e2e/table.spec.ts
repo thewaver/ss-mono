@@ -26,6 +26,13 @@ const header = (scope: string) => `${scope} [role="columnheader"]`;
 const sortControl = (scope: string) => `${header(scope)} button >> nth=0`;
 
 /**
+ * In a reorderable header the Playground draws the grip ahead of the title, so it is that header's first button
+ * and the sort control comes after it.
+ */
+const reorderGrip = (scope: string, columnIndex: number) =>
+    `${header(scope)} >> nth=${columnIndex} >> button >> nth=0`;
+
+/**
  * A cell is addressed by the pair of indices the grid publishes rather than by its text, because the text
  * is the point of the sorting tests: a locator built from a caption would move when the sort moves and
  * every assertion below would quietly follow it.
@@ -376,6 +383,47 @@ test("a column at the end of the row does not move past it", async ({ page }) =>
     await page.keyboard.press("Shift+ArrowLeft");
 
     await expect(page.locator(header(REORDERABLE)).nth(0)).toContainText("SKU");
+});
+
+/**
+ * Escape puts a picked-up column back, however it was picked up. A tap on a grip starts a carry that the next
+ * tap on a grip drops, so without the cancel the second tap below would land column 0 at column 2's place; with
+ * it, the second tap starts a carry of its own and nothing moves. A drag is the other route, and while it runs
+ * focus can be anywhere, which is why the key is listened for on the document rather than on the grid: the
+ * release after Escape must drop nothing.
+ */
+test("Escape cancels a column picked up by tapping its grip", async ({ page }) => {
+    await expect(page.locator(header(REORDERABLE)).nth(0)).toContainText("SKU");
+    await expect(page.locator(header(REORDERABLE)).nth(2)).toContainText("Category");
+
+    await page.locator(reorderGrip(REORDERABLE, 0)).click();
+    await page.keyboard.press("Escape");
+    await page.locator(reorderGrip(REORDERABLE, 2)).click();
+
+    await expect(page.locator(header(REORDERABLE)).nth(0)).toContainText("SKU");
+    await expect(page.locator(header(REORDERABLE)).nth(2)).toContainText("Category");
+});
+
+test("Escape during a drag cancels it, so the release moves nothing", async ({ page }) => {
+    const first = page.locator(header(REORDERABLE)).nth(0);
+    const second = page.locator(header(REORDERABLE)).nth(1);
+
+    await expect(first).toContainText("SKU");
+
+    const from = await first.boundingBox();
+    const to = await second.boundingBox();
+
+    if (!from || !to) throw new Error("the reorderable demo drew no header boxes");
+
+    await page.mouse.move(from.x + from.width * 0.5, from.y + from.height * 0.5);
+    await page.mouse.down();
+    await page.mouse.move(to.x + to.width * 0.75, to.y + to.height * 0.5, { steps: 12 });
+    await page.keyboard.press("Escape");
+    await page.mouse.up();
+
+    await expect(page.locator(header(REORDERABLE)).nth(0)).toContainText("SKU");
+    await expect(page.locator(header(REORDERABLE)).nth(1)).toContainText("Name");
+    await expect(page.locator(header(REORDERABLE)).nth(0)).toHaveAttribute("aria-sort", "none");
 });
 
 test("a table with no order signal ignores the reorder key entirely", async ({ page }) => {

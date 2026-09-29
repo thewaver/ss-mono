@@ -37,7 +37,7 @@ export const Spotlight = (props: SpotlightProps) => {
     const getPadding = createMemo(() => access(props.padding) ?? SPOTLIGHT_DEFAULTS.padding);
 
     const { getIsVisible, getTransitionTarget } = ElementFaderSolidUtils.createFader(
-        () => props.visibilitySignal[0](),
+        () => props.visibility[0](),
         {
             getTransitionDurationMs,
             getRef: getPortalRef,
@@ -90,7 +90,7 @@ export const Spotlight = (props: SpotlightProps) => {
     });
 
     const dismiss = () => {
-        props.visibilitySignal[1](false);
+        props.visibility[1](false);
     };
 
     createEffect(() => {

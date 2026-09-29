@@ -26,8 +26,8 @@ export const CellAnimation = (props: CellAnimationProps) => {
 
     const isPageHidden = InteractionTrackerReactUtils.usePageHidden();
 
-    const [isPlaying] = SignalMirrorReactUtils.useOptionalState(props.playbackState, true);
-    const [progress, setProgressState] = SignalMirrorReactUtils.useOptionalState(props.progressState, NO_PROGRESS);
+    const [isPlaying] = SignalMirrorReactUtils.useOptionalState(props.playback, true);
+    const [progress, setProgressState] = SignalMirrorReactUtils.useOptionalState(props.progress, NO_PROGRESS);
     const [currentIteration, setCurrentIterationState] = useState(FIRST_ITERATION);
 
     const rootSize = ElementObserverReactUtils.useBorderBoxSize(imgRef);

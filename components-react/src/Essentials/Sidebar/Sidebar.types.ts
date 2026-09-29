@@ -25,7 +25,7 @@ export type SidebarProps = {
     transitionDurationMs?: number;
     /**
      * Expands the sidebar while the pointer rests on it, and collapses it again when the pointer leaves or Escape is
-     * pressed. It never writes `expandedState`, so a sidebar the owner has expanded stays expanded, and one expanded
+     * pressed. It never writes `expanded`, so a sidebar the owner has expanded stays expanded, and one expanded
      * by hover reads as collapsed there. While something opened from inside it is still open elsewhere on the page —
      * a popup, a menu — leaving does not collapse it, so the pointer can reach that popup; the next move outside once
      * it has closed does.
@@ -40,7 +40,7 @@ export type SidebarProps = {
      * and the pointer to move away, so the popup is never left hanging off something no longer there. A sidebar that
      * starts expanded appears expanded, without growing into place.
      */
-    expandedState?: readonly [boolean, (isExpanded: boolean) => void];
+    expanded?: readonly [boolean, (isExpanded: boolean) => void];
     /**
      * Draws the sidebar's contents, handed which of the four phases it is in, so a collapsed layout and an expanded
      * one can be swapped at the moment that suits them. Everything drawn stays reachable in every phase, so a layout

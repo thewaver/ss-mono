@@ -9,5 +9,5 @@ export type ScanlineAnimationExampleProps = AccessorProps<{
     weightType: CellAnimationWeights.OriginFreeWeightType;
     animationDurationMs: number;
     animationIterationDelayMs: number;
-    playbackSignal: Signal<boolean>;
+    playback: Signal<boolean>;
 }>;

@@ -255,7 +255,7 @@ export const ToastsPage = () => {
             </div>
 
             <Toasts
-                toastsState={[toasts, setToasts]}
+                toasts={[toasts, setToasts]}
                 ariaLabel={"Notifications"}
                 computeAnnouncement={(toast) => toast.value.message}
                 alignment={alignment}

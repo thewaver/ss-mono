@@ -11,16 +11,16 @@ import { PLACEHOLDER, QUERY_PADDING } from "../SelectPage.const";
 import type { Airport } from "../SelectPage.types";
 
 type Props = {
-    valueSignal: Signal<Airport | undefined>;
-    querySignal: Signal<string>;
+    value: Signal<Airport | undefined>;
+    query: Signal<string>;
     options: MaybeAccessor<SelectOption<Airport>[]>;
 };
 
 export const AutocompleteExample = (props: Props) => {
     return (
         <Select
-            valueSignal={props.valueSignal}
-            querySignal={props.querySignal}
+            value={props.value}
+            query={props.query}
             options={props.options}
             ariaLabel={"Airport"}
             padding={() => QUERY_PADDING}

@@ -66,7 +66,7 @@ export const TreePage = () => {
             name: "Default",
             readout: () =>
                 `value: ${defaultState[0] ?? "undefined"} | expanded: ${JSON.stringify(defaultExpandedState[0])} — right opens a branch, left closes it or climbs to the parent`,
-            component: () => <FilesExample valueState={defaultState} expandedState={defaultExpandedState} />,
+            component: () => <FilesExample value={defaultState} expanded={defaultExpandedState} />,
             path: `${EXAMPLES_ROOT}/Files.tsx`,
         },
         {
@@ -74,7 +74,7 @@ export const TreePage = () => {
             name: "Everything collapsed",
             readout: () =>
                 `value: ${collapsedState[0] ?? "undefined"} | expanded: ${JSON.stringify(collapsedExpandedState[0])} — asterisk opens every branch at the level focus is on`,
-            component: () => <FilesExample valueState={collapsedState} expandedState={collapsedExpandedState} />,
+            component: () => <FilesExample value={collapsedState} expanded={collapsedExpandedState} />,
             path: `${EXAMPLES_ROOT}/Files.tsx`,
         },
         {
@@ -83,7 +83,7 @@ export const TreePage = () => {
             readout: () =>
                 `value: ${rightToLeftState[0] ?? "undefined"} | expanded: ${JSON.stringify(rightToLeftExpandedState[0])} — the box around the tree sets dir="rtl", so left opens a branch and right closes it or climbs to the parent`,
             component: () => (
-                <RightToLeftExample valueState={rightToLeftState} expandedState={rightToLeftExpandedState} />
+                <RightToLeftExample value={rightToLeftState} expanded={rightToLeftExpandedState} />
             ),
             path: `${EXAMPLES_ROOT}/RightToLeft.tsx`,
         },
@@ -102,8 +102,8 @@ export const TreePage = () => {
                 `value: ${disabledState[0] ?? "undefined"} — arrows skip index.ts and Lib, while what is inside Lib stays reachable`,
             component: () => (
                 <FilesExample
-                    valueState={disabledState}
-                    expandedState={disabledExpandedState}
+                    value={disabledState}
+                    expanded={disabledExpandedState}
                     nodes={FILES_WITH_DISABLED}
                 />
             ),
@@ -116,8 +116,8 @@ export const TreePage = () => {
                 `value: ${reachableState[0] ?? "undefined"} — arrows stop on node_modules, hover explains why, and nothing opens it`,
             component: () => (
                 <FilesExample
-                    valueState={reachableState}
-                    expandedState={reachableExpandedState}
+                    value={reachableState}
+                    expanded={reachableExpandedState}
                     nodes={FILES_WITH_REACHABLE}
                 />
             ),
@@ -128,7 +128,7 @@ export const TreePage = () => {
             name: "Collapsed from outside",
             readout: () =>
                 `expanded: ${JSON.stringify(outsideExpandedState[0])} — press the button, then focus a row inside Lib before the delay elapses; focus must land on Lib rather than on the page body`,
-            component: () => <OutsideExample valueState={outsideState} expandedState={outsideExpandedState} />,
+            component: () => <OutsideExample value={outsideState} expanded={outsideExpandedState} />,
             path: `${EXAMPLES_ROOT}/Outside.tsx`,
         },
         {
@@ -136,7 +136,7 @@ export const TreePage = () => {
             name: "Nodes that are links",
             readout: () =>
                 `value: ${linkState[0] ?? "undefined"} — every leaf carries an href, so each one is an anchor and the branches stay plain`,
-            component: () => <LinksExample valueState={linkState} expandedState={linkExpandedState} />,
+            component: () => <LinksExample value={linkState} expanded={linkExpandedState} />,
             path: `${EXAMPLES_ROOT}/Links.tsx`,
         },
         {
@@ -145,7 +145,7 @@ export const TreePage = () => {
             readout: () =>
                 `value: ${customLinkState[0] ?? "undefined"} — the same nodes rendered by a consumer's own link component`,
             component: () => (
-                <LinkComponentExample valueState={customLinkState} expandedState={customLinkExpandedState} />
+                <LinkComponentExample value={customLinkState} expanded={customLinkExpandedState} />
             ),
             path: `${EXAMPLES_ROOT}/LinkComponent.tsx`,
         },
@@ -154,7 +154,7 @@ export const TreePage = () => {
             name: "Branches that arrive later",
             readout: () =>
                 `expanded: ${JSON.stringify(lazyExpandedState[0])} — packages and docs say they have children before they have them`,
-            component: () => <LazyExample valueState={lazyState} expandedState={lazyExpandedState} />,
+            component: () => <LazyExample value={lazyState} expanded={lazyExpandedState} />,
             path: `${EXAMPLES_ROOT}/Lazy.tsx`,
         },
         {
@@ -163,7 +163,7 @@ export const TreePage = () => {
             readout: () =>
                 `${(STRESS_BRANCH_COUNT * (STRESS_LEAF_COUNT + 1)).toLocaleString("en-GB")} rows when everything is open — expanded: ${stressExpandedState[0].length} branches, value: ${stressState[0] ?? "undefined"}`,
             component: () => (
-                <VirtualizedExample nodes={stressFiles} valueState={stressState} expandedState={stressExpandedState} />
+                <VirtualizedExample nodes={stressFiles} value={stressState} expanded={stressExpandedState} />
             ),
             path: `${EXAMPLES_ROOT}/Virtualized.tsx`,
         },
@@ -173,7 +173,7 @@ export const TreePage = () => {
             name: "A tree drawn outward",
             readout: () =>
                 `value: ${radialState[0] ?? "undefined"} — the layout is told which node each node hangs from, so children share the slice their parent was given, and every rank sits a ring further out whoever it hangs from`,
-            component: () => <RadialExample valueState={radialState} expandedState={radialExpandedState} />,
+            component: () => <RadialExample value={radialState} expanded={radialExpandedState} />,
             path: `${EXAMPLES_ROOT}/Radial.tsx`,
         },
         {
@@ -181,7 +181,7 @@ export const TreePage = () => {
             name: "Record values",
             readout: () =>
                 `value: ${recordState[0]?.name ?? "undefined"} | expanded: ${recordExpandedState[0].length} branch(es) — the value is the record itself, not a name`,
-            component: () => <RecordValuesExample valueState={recordState} expandedState={recordExpandedState} />,
+            component: () => <RecordValuesExample value={recordState} expanded={recordExpandedState} />,
             path: `${EXAMPLES_ROOT}/RecordValues.tsx`,
         },
     ];

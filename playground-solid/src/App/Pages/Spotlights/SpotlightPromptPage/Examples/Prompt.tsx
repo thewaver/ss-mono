@@ -19,24 +19,24 @@ export const PromptExample = (props: Props) => {
                 ref={setAnchorRef}
                 renderContent={(getFlags) => <PageButtonContent flags={getFlags}>Buy the potato</PageButtonContent>}
                 onClick={async () => {
-                    if (!props.visibilitySignal[0]()) return;
+                    if (!props.visibility[0]()) return;
 
                     props.onBuy();
-                    props.visibilitySignal[1](false);
+                    props.visibility[1](false);
                 }}
             />
 
             <Button
                 renderContent={(getFlags) => <PageButtonContent flags={getFlags}>Insist</PageButtonContent>}
                 onClick={async () => {
-                    props.visibilitySignal[1](true);
+                    props.visibility[1](true);
                 }}
             />
 
             <SpotlightPrompt
                 elementRef={getAnchorRef}
                 padding={() => PADDING}
-                visibilitySignal={props.visibilitySignal}
+                visibility={props.visibility}
                 renderHighlight={renderHighlight}
                 renderOverlay={renderOverlay}
             />

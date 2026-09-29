@@ -50,7 +50,7 @@ export const StressTest = (props: StressTestProps) => {
 
             <Modal
                 margins={() => CSSUtils.spreadMargin(40)}
-                visibilitySignal={modalVisibility}
+                visibility={modalVisibility}
                 ariaLabel={"Stress test"}
                 onShow={props.onShowModal}
                 onHide={props.onHideModal}

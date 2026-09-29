@@ -1,16 +1,16 @@
 import type { Signal } from "solid-js";
 
 export type FormExampleProps = {
-    emailSignal: Signal<string>;
-    passwordSignal: Signal<string>;
-    termsSignal: Signal<boolean>;
+    email: Signal<string>;
+    password: Signal<string>;
+    terms: Signal<boolean>;
     onSubmit: () => void;
     onReset: () => void;
 };
 
 export type FormFocusExampleProps = {
-    planSignal: Signal<string | undefined>;
-    topicsSignal: Signal<string[]>;
+    plan: Signal<string | undefined>;
+    topics: Signal<string[]>;
     onSubmit: () => void;
     onReset: () => void;
 };

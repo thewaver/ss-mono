@@ -47,7 +47,7 @@ export type ModalProps = ModalNameProps & {
      * Whether the dialog is open, with its setter. It is the only thing that opens or closes it; the dialog writes
      * `false` through the setter when it is dismissed.
      */
-    visibilityState: readonly [boolean, (isVisible: boolean) => void];
+    visibility: readonly [boolean, (isVisible: boolean) => void];
     /** How long the dialog and its backdrop take to fade in and out. */
     transitionDurationMs?: number;
     /** How far the dialog is held off the edges of the screen. */

@@ -26,7 +26,7 @@ export const ClockPage = () => {
             name: "One column per unit",
             readout: () =>
                 `value: ${describeTime(defaultSignal[0]())} — picking an hour and picking a minute are two independent choices, so no column has to list every time of day`,
-            component: () => <DefaultExample valueSignal={defaultSignal} ariaLabel={"Appointment time"} />,
+            component: () => <DefaultExample value={defaultSignal} ariaLabel={"Appointment time"} />,
             path: `${EXAMPLES_ROOT}/Default.tsx`,
         },
         {
@@ -35,7 +35,7 @@ export const ClockPage = () => {
             readout: () =>
                 `value: ${describeTime(twelveHourSignal[0]())} — am and pm become a column of their own, and the value stays 24-hour`,
             component: () => (
-                <DefaultExample valueSignal={twelveHourSignal} isTwelveHour={true} ariaLabel={"Call time"} />
+                <DefaultExample value={twelveHourSignal} isTwelveHour={true} ariaLabel={"Call time"} />
             ),
             path: `${EXAMPLES_ROOT}/Default.tsx`,
         },
@@ -46,7 +46,7 @@ export const ClockPage = () => {
                 `value: ${describeTime(boundedSignal[0]())} — quarter hours only, inside ${TimeUtils.toIso(OPENING_TIME)} to ${TimeUtils.toIso(CLOSING_TIME)}`,
             component: () => (
                 <DefaultExample
-                    valueSignal={boundedSignal}
+                    value={boundedSignal}
                     steps={() => BOOKING_STEPS}
                     minValue={() => OPENING_TIME}
                     maxValue={() => CLOSING_TIME}

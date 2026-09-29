@@ -98,7 +98,7 @@ export const FileInput = (props: FileInputProps) => {
         const { accepted, rejections } = admission;
 
         if (FileInputUtils.getIsValueWritten(admission)) {
-            props.filesSignal[1](accepted);
+            props.files[1](accepted);
 
             void props.onChange?.(accepted);
         }
@@ -116,7 +116,7 @@ export const FileInput = (props: FileInputProps) => {
         <InteractionWrapper
             {...props}
             extraFlags={(): FileInputRenderProps => ({
-                files: props.filesSignal[0](),
+                files: props.files[0](),
                 isDragOver: getIsDragOver(),
             })}
             renderControl={(setElementRef, getRenderProps) => (
@@ -131,7 +131,7 @@ export const FileInput = (props: FileInputProps) => {
                     accept={props.accept}
                     isMultiple={props.isMultiple}
                     flags={getRenderProps}
-                    files={() => props.filesSignal[0]()}
+                    files={() => props.files[0]()}
                     renderContent={props.renderContent}
                     onChange={receive}
                     onMouseEnter={props.onMouseEnter}

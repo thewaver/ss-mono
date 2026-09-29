@@ -121,7 +121,7 @@ export namespace SignalMirrorSolidUtils {
             decompose: (whole: TWhole) => [TFirst, TSecond];
             getIsSame: (a: TWhole | undefined, b: TWhole | undefined) => boolean;
         },
-    ): { firstSignal: Signal<TFirst | undefined>; secondSignal: Signal<TSecond | undefined> } => {
+    ): { first: Signal<TFirst | undefined>; second: Signal<TSecond | undefined> } => {
         const splitter = SignalMirrorUtils.createSplitter<TWhole, TFirst, TSecond>(
             [() => untrack(() => signal[0]()), (value) => signal[1](() => value)],
             defs,
@@ -162,7 +162,7 @@ export namespace SignalMirrorSolidUtils {
             },
         ] as Signal<TSecond | undefined>;
 
-        return { firstSignal, secondSignal };
+        return { first: firstSignal, second: secondSignal };
     };
 
     /**

@@ -28,7 +28,7 @@ const toReactStyle = (style: Record<string, string>) =>
 export const Spotlight = (props: SpotlightProps) => {
     const viewportContext = useViewportContext();
 
-    const isShown = props.visibilityState[0];
+    const isShown = props.visibility[0];
 
     const elementRef = useLatest(props.elementRef ?? null);
     const portalRef = useRef<HTMLDivElement | null>(null);
@@ -73,7 +73,7 @@ export const Spotlight = (props: SpotlightProps) => {
     );
 
     const dismiss = () => {
-        latest.current.visibilityState[1](false);
+        latest.current.visibility[1](false);
     };
 
     useEffect(() => {
@@ -81,7 +81,7 @@ export const Spotlight = (props: SpotlightProps) => {
 
         return SpotlightUtils.observeDismissKeys(
             () => latest.current.mode,
-            () => latest.current.visibilityState[1](false),
+            () => latest.current.visibility[1](false),
         );
     }, [isVisible, latest]);
 

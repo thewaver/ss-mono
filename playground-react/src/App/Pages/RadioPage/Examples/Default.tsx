@@ -7,7 +7,7 @@ import type { RadioOptionalExampleProps } from "../RadioPage.types";
 type Props = RadioOptionalExampleProps;
 
 export const DefaultExample = (props: Props) => (
-    <RadioGroup valueState={props.valueState} ariaLabel={"Default size"} gap={RADIO_GROUP_GAP}>
+    <RadioGroup value={props.value} ariaLabel={"Default size"} gap={RADIO_GROUP_GAP}>
         {SIZE_OPTIONS.map((option) => (
             <Radio
                 key={option.value}

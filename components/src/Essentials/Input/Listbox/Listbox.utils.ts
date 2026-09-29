@@ -7,6 +7,7 @@ import type { NavigatorDirection } from "../../../Abstracts/Navigator/Navigator.
 import { NavigatorUtils } from "../../../Abstracts/Navigator/Navigator.utils";
 import { TypeaheadUtils } from "../../../Abstracts/Typeahead/Typeahead.utils";
 import type { VirtualizerRow } from "../../../Abstracts/Virtualizer/Virtualizer.types";
+import { PopoverUtils } from "../../../Primitives/Popover/Popover.utils";
 import type { SelectGroupFlags } from "../Select/Select.types";
 import type {
     SelectOptionRecord as SelectOption,
@@ -25,6 +26,9 @@ import type {
     ListboxReachEndGuard,
     ListboxWindowedRun,
 } from "./Listbox.types";
+
+/** The element a list of options is drawn in, which for a popup's list is the popup's own root. */
+const LISTBOX_SELECTOR = '[role="listbox"]';
 
 /** Jumps to the first option, and is not a step, so it never counts as wrapping round. */
 const FIRST_KEY = "Home";
@@ -192,6 +196,31 @@ export namespace ListboxUtils {
         if (!element || element === document.activeElement) return;
 
         element.focus({ preventScroll: true });
+    };
+
+    /**
+     * Scrolls the highlighted option into view, moving the page only when the option is what holds focus.
+     *
+     * Under `"activeDescendant"` focus stays in the field and the list is that field's popup, whose root carries
+     * `role="listbox"`. An option is highlighted the moment the popup opens, while it is still unplaced, so only the
+     * scrollers between the option and that root move, through {@link PopoverUtils.revealWithin}, and a page with no
+     * `Viewport` never jumps. Under `"roving"` the option is itself the focused element, drawn in the page among the
+     * consumer's own scrollers, and {@link focusOption} moves focus without scrolling — so the option is brought into
+     * view the way focus brings anything into view, through every scroller the page included.
+     *
+     * @param option The option's element.
+     * @param focusModel Where focus sits while the list is used, from the list's cursor.
+     */
+    export const revealOption = (option: HTMLElement, focusModel: ListboxFocusModel) => {
+        if (focusModel === "roving") {
+            option.scrollIntoView({ block: "nearest" });
+
+            return;
+        }
+
+        const list = option.closest<HTMLElement>(LISTBOX_SELECTOR);
+
+        if (list) PopoverUtils.revealWithin(option, list);
     };
 
     /**

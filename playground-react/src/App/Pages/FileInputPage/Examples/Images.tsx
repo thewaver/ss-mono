@@ -7,7 +7,7 @@ type Props = FileInputExampleProps;
 
 export const ImagesExample = (props: Props) => (
     <FileInput
-        filesState={props.filesState}
+        files={props.files}
         accept={"image/*"}
         ariaLabel={"Avatar"}
         renderContent={(renderProps) => <PageFileInputContent renderProps={renderProps} />}

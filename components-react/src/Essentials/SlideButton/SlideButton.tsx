@@ -111,7 +111,7 @@ const SlideButtonElement = (props: SlideButtonElementProps) => {
 };
 
 export const SlideButton = (props: SlideButtonProps) => {
-    const [progressRatio, setProgressRatio] = SignalMirrorReactUtils.useOptionalState(props.progressState, RATIO_MIN);
+    const [progressRatio, setProgressRatio] = SignalMirrorReactUtils.useOptionalState(props.progress, RATIO_MIN);
     const [isDragging, setIsDragging] = useState(false);
     const [isHolding, setIsHolding] = useState(false);
 

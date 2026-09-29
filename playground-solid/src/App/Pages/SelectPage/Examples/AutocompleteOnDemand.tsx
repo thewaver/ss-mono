@@ -12,8 +12,8 @@ import { PLACEHOLDER, QUERY_PADDING } from "../SelectPage.const";
 import type { Delivery } from "../SelectPage.types";
 
 type Props = {
-    valueSignal: Signal<Delivery | undefined>;
-    querySignal: Signal<string>;
+    value: Signal<Delivery | undefined>;
+    query: Signal<string>;
     options: MaybeAccessor<SelectOption<Delivery>[]>;
     hasMore: MaybeAccessor<boolean>;
     isSearching: MaybeAccessor<boolean>;
@@ -24,8 +24,8 @@ type Props = {
 export const AutocompleteOnDemandExample = (props: Props) => {
     return (
         <Select
-            valueSignal={props.valueSignal}
-            querySignal={props.querySignal}
+            value={props.value}
+            query={props.query}
             options={props.options}
             hasMoreOptions={props.hasMore}
             ariaLabel={"Route"}

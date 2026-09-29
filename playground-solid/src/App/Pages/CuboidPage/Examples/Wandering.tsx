@@ -20,8 +20,8 @@ const TURNS: [number, number][] = [
 type Props = CuboidWanderingExampleProps;
 
 export const WanderingExample = (props: Props) => {
-    const [getYaw, setYaw] = props.yawSignal;
-    const [getPitch, setPitch] = props.pitchSignal;
+    const [getYaw, setYaw] = props.yaw;
+    const [getPitch, setPitch] = props.pitch;
 
     let previousFacing: CuboidFace | undefined;
 
@@ -54,8 +54,8 @@ export const WanderingExample = (props: Props) => {
     return (
         <PageCuboidStack>
             <Cuboid
-                yawSignal={props.yawSignal}
-                pitchSignal={props.pitchSignal}
+                yaw={props.yaw}
+                pitch={props.pitch}
                 size={props.size}
                 transitionDurationMs={props.transitionDurationMs}
                 ariaLabel={"Six faces, turning by themselves"}

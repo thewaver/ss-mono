@@ -92,7 +92,7 @@ export const ToolbarPage = () => {
                 `pressed: ${pressedValues[0].join(", ") || "nothing"} — each action stays down until pressed again, and one that collapses is a checkbox in the menu, checked from the same list`,
             component: () => (
                 <ResizableBar width={barWidth} onResize={setBarWidth}>
-                    <PressedExample {...commonProps} pressedValuesState={pressedValues} />
+                    <PressedExample {...commonProps} pressedValues={pressedValues} />
                 </ResizableBar>
             ),
             path: `${EXAMPLES_ROOT}/Pressed.tsx`,

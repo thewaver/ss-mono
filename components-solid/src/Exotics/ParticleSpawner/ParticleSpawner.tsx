@@ -31,7 +31,7 @@ export const ParticleSpawner = (props: ParticleSpawnerProps) => {
 
     const [getRootRef, setRootRef] = createSignal<HTMLElement>();
     const [getIsWindowVisible, setIsWindowVisible] = createSignal(true);
-    const [getIsPlaying] = SignalMirrorSolidUtils.createOptional(() => props.playbackSignal, true);
+    const [getIsPlaying] = SignalMirrorSolidUtils.createOptional(() => props.playback, true);
     const [getStageIndex, setStageIndex] = createSignal(0, { equals: false });
     const [getRootRect, setRootRect] = createSignal<Rect | undefined>(undefined, {
         equals: (a, b) => (a === undefined || b === undefined ? a === b : Rect.isSame(a, b)),

@@ -58,21 +58,21 @@ const GROUPPED_ANIMATIONS = groupOptions(CellAnimationKeyframes.ANIMATION_TYPES)
 
 const DefaultExampleWrapper = (
     props: ParticleFieldExampleProps & {
-        progressState: readonly [number, (value: number) => void];
-        ownPlaybackState: readonly [boolean, (value: boolean) => void];
+        progress: readonly [number, (value: number) => void];
+        ownPlayback: readonly [boolean, (value: boolean) => void];
     },
 ) => {
     return (
         <div className={styles.stack}>
             <PageMeasureBox width={BOX_WIDTH} height={BOX_HEIGHT}>
-                <DefaultExample {...props} playbackState={props.ownPlaybackState} progressState={props.progressState} />
+                <DefaultExample {...props} playback={props.ownPlayback} progress={props.progress} />
             </PageMeasureBox>
 
             <PagePlaybackScrubber
                 id={"particleField"}
                 ariaLabel={"Position in the pass"}
-                playbackState={props.ownPlaybackState}
-                progressState={props.progressState}
+                playback={props.ownPlayback}
+                progress={props.progress}
             />
         </div>
     );
@@ -130,12 +130,12 @@ const StressTestWrapper = (props: ParticleFieldExampleProps) => {
 
             <StressTest
                 configs={STRESS_ITEMS}
-                onShowModal={() => props.playbackState[1](false)}
-                onHideModal={() => props.playbackState[1](true)}
+                onShowModal={() => props.playback[1](false)}
+                onHideModal={() => props.playback[1](true)}
                 renderLabel={(configIndex) => `Render ${STRESS_ITEMS[configIndex].count} fields`}
                 renderItem={(configIndex) => (
                     <PageMeasureBox width={STRESS_ITEMS[configIndex].size} height={STRESS_ITEMS[configIndex].size}>
-                        <DefaultExample {...props} playbackState={modalPlayback} cellCount={STRESS_CELL_COUNT} />
+                        <DefaultExample {...props} playback={modalPlayback} cellCount={STRESS_CELL_COUNT} />
                     </PageMeasureBox>
                 )}
             />
@@ -176,7 +176,7 @@ export const ParticleFieldPage = () => {
         animationType,
         holdShare,
         isScattered,
-        playbackState: playback,
+        playback,
     };
 
     const examples = [
@@ -186,7 +186,7 @@ export const ParticleFieldPage = () => {
             readout: () =>
                 `${Math.round(progress[0] * PERCENT)}% through the pass, ${defaultPlayback[0] ? "running" : "stopped"} — the progress signal is written by the field while it plays, and writing it moves the pass there`,
             component: () => (
-                <DefaultExampleWrapper {...commonProps} progressState={progress} ownPlaybackState={defaultPlayback} />
+                <DefaultExampleWrapper {...commonProps} progress={progress} ownPlayback={defaultPlayback} />
             ),
             path: `${EXAMPLES_ROOT}/Default.tsx`,
         },

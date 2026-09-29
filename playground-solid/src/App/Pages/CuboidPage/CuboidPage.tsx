@@ -120,8 +120,8 @@ export const CuboidPage = () => {
                 `${CuboidUtils.getFacingFromTurns(yawSignal[0](), pitchSignal[0]())} — across ${yawSignal[0]()}, up ${pitchSignal[0]()}; the two counts are quarter turns rather than a face, so the box always takes the way it was pushed`,
             component: () => (
                 <DefaultExample
-                    yawSignal={yawSignal}
-                    pitchSignal={pitchSignal}
+                    yaw={yawSignal}
+                    pitch={pitchSignal}
                     size={getSize}
                     transitionDurationMs={getTurnDurationMs}
                 />
@@ -135,8 +135,8 @@ export const CuboidPage = () => {
                 `${CuboidUtils.getFacingFromTurns(wanderingYawSignal[0](), wanderingPitchSignal[0]())} — every tick takes one quarter turn at random, discarding the ones that would leave the same face in view or turn back to the face it just left, so the box only ever moves on to a new face sharing an edge with this one`,
             component: () => (
                 <WanderingExampleWrapper
-                    yawSignal={wanderingYawSignal}
-                    pitchSignal={wanderingPitchSignal}
+                    yaw={wanderingYawSignal}
+                    pitch={wanderingPitchSignal}
                     size={getSize}
                     transitionDurationMs={getTurnDurationMs}
                 />
@@ -150,9 +150,9 @@ export const CuboidPage = () => {
                 `${uprightControllerSignal[0]()?.getFacing() ?? "front"} — across ${uprightYawSignal[0]()}, up ${uprightPitchSignal[0]()}; the counts only record the presses here, so the box keeps its own orientation and the face names ask it for the shortest way round`,
             component: () => (
                 <UprightExampleWrapper
-                    yawSignal={uprightYawSignal}
-                    pitchSignal={uprightPitchSignal}
-                    controllerSignal={uprightControllerSignal}
+                    yaw={uprightYawSignal}
+                    pitch={uprightPitchSignal}
+                    controller={uprightControllerSignal}
                     size={getSize}
                     transitionDurationMs={getTurnDurationMs}
                 />

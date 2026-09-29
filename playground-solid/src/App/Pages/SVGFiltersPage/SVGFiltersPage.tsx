@@ -77,7 +77,7 @@ export const SVGFiltersPage = () => {
                         ? `${names(appliedSignal[0]())} — chained, so each one is handed what the one before it produced and the order is the effect`
                         : `${names(appliedSignal[0]())} — isolated, so every one reads the original and the order only decides what sits on top`,
                 component: () => (
-                    <StackExample {...commonProps} appliedSignal={appliedSignal} unusedSignal={unusedSignal} />
+                    <StackExample {...commonProps} applied={appliedSignal} unused={unusedSignal} />
                 ),
                 path: `${EXAMPLES_ROOT}/Stack.tsx`,
             },

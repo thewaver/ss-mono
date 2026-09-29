@@ -16,7 +16,7 @@ export const RightToLeftExample = (props: Props) => {
             <PageSplitPaneFrame>
                 <SplitPane
                     panes={() => RIGHT_TO_LEFT}
-                    ratiosSignal={props.ratiosSignal}
+                    ratios={props.ratios}
                     gutterSize={props.gutterSize}
                     isDisabled={props.isDisabled}
                     ariaLabel={"Two panes in a right-to-left box"}

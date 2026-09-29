@@ -34,7 +34,7 @@ type Props = DateRangeExampleProps & {
 export const PickedExample = (props: Props) => {
     return (
         <DateRangePicker
-            valueState={props.valueState}
+            value={props.value}
             calendar={props.calendar}
             minValue={props.minValue}
             maxValue={props.maxValue}
@@ -58,7 +58,7 @@ export const PickedExample = (props: Props) => {
             renderWeekday={(name) => <PageCalendarWeekday>{name}</PageCalendarWeekday>}
             renderPopup={(renderCalendar, monthState) => (
                 <PageCalendarFrame>
-                    <PageCalendarCaption monthState={monthState} itemKey={props.itemKey} locale={LOCALE} />
+                    <PageCalendarCaption month={monthState} itemKey={props.itemKey} locale={LOCALE} />
 
                     {renderCalendar()}
                 </PageCalendarFrame>

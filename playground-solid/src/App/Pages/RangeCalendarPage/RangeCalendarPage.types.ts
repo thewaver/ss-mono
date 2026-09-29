@@ -4,6 +4,6 @@ import type { AccessorProps, DateValue, DateValueRange, DateValueWeekStart } fro
 
 export type RangeCalendarExampleProps = AccessorProps<{
     weekStartsOn: DateValueWeekStart;
-    valueSignal: Signal<DateValueRange | undefined>;
-    monthSignal: Signal<DateValue>;
+    value: Signal<DateValueRange | undefined>;
+    month: Signal<DateValue>;
 }>;

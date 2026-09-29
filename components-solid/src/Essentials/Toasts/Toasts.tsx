@@ -111,7 +111,7 @@ const ToastsItem = <T,>(props: ToastsItemProps<T>) => {
 };
 
 export const Toasts = <T,>(props: ToastsProps<T>) => {
-    const toastsSignal = accessSignal(() => props.toastsSignal);
+    const toastsSignal = accessSignal(() => props.toasts);
 
     const viewportContext = useViewportContext();
 

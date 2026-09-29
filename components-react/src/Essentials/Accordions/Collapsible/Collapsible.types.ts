@@ -60,7 +60,7 @@ export type CollapsibleProps = Omit<
      * consumer to open or close it from outside. Leave it out and the collapsible keeps the state itself, starting
      * closed.
      */
-    expandedState?: readonly [boolean, (isExpanded: boolean) => void];
+    expanded?: readonly [boolean, (isExpanded: boolean) => void];
     /**
      * Draws the trigger. It is handed the interaction state so the trigger can answer to being hovered, pressed or
      * open.

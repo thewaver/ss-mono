@@ -23,10 +23,10 @@ export const PageSVGGradientsProps = (props: Props) => {
                 hint={"Whether the gradient paints the inside of the sample shape or only its outline."}
             >
                 <PageSelectField
-                    value={controls.paintKindSignal[0]}
+                    value={controls.paintKind[0]}
                     values={() => SVGGradientKnobs.PAINT_KINDS}
                     ariaLabel={"Painted as"}
-                    onChange={(kind) => controls.paintKindSignal[1](() => kind)}
+                    onChange={(kind) => controls.paintKind[1](() => kind)}
                 />
             </PageProp>
 
@@ -54,12 +54,12 @@ export const PageSVGGradientsProps = (props: Props) => {
                 hint={"How far the paint is blurred outward, which is what gives it its glow."}
             >
                 <PageNumberField
-                    value={controls.blurWidthSignal[0]}
+                    value={controls.blurWidth[0]}
                     min={() => SVGGradientKnobs.MIN_BLUR_WIDTH}
                     max={() => SVGGradientKnobs.MAX_BLUR_WIDTH}
                     step={() => SVGGradientKnobs.BLUR_WIDTH_STEP}
                     ariaLabel={"Blur width"}
-                    onInput={controls.blurWidthSignal[1]}
+                    onInput={controls.blurWidth[1]}
                 />
             </PageProp>
         </>

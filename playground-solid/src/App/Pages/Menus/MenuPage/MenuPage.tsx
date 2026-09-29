@@ -66,7 +66,7 @@ export const MenuPage = () => {
                 `${getLastDrivenAction()} — the menu is ${drivenVisibility[0]() ? "open" : "closed"}, and it is anchored to the toggle rather than to its own trigger`,
             component: () => (
                 <DrivenExample
-                    visibilitySignal={drivenVisibility}
+                    visibility={drivenVisibility}
                     onActivate={(action) => setLastDrivenAction(action.name)}
                 />
             ),
@@ -124,7 +124,7 @@ export const MenuPage = () => {
             name: "Cascader",
             readout: () =>
                 `path: [${cascaderPathSignal[0]().join(", ")}] — the trigger shows the path picked so far, and only a leaf writes it; a branch just opens the next level`,
-            component: () => <CascaderExample pathSignal={cascaderPathSignal} />,
+            component: () => <CascaderExample path={cascaderPathSignal} />,
             path: `${EXAMPLES_ROOT}/Cascader.tsx`,
         },
         {
@@ -164,7 +164,7 @@ export const MenuPage = () => {
                     .join(", ")}]`,
             component: () => (
                 <StatefulExample
-                    checkedSignal={viewSignal}
+                    checked={viewSignal}
                     onActivate={(action) => setLastViewAction(`ran ${action.name}`)}
                 />
             ),

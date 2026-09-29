@@ -42,12 +42,12 @@ export type ColorInputProps = Omit<InteractionWrapperProps<ColorInputRenderProps
          * The color, and how to change it. It is the only thing that changes it, and the field writes back in the
          * notation it was handed — a hex stays a hex.
          */
-        valueState: readonly [string, (value: string) => void];
+        value: readonly [string, (value: string) => void];
         /**
          * Whether the picker is open, and how to change it. It is the only thing that opens or closes it. Leave it
          * out and the field holds its own, starting closed.
          */
-        visibilityState?: readonly [boolean, (isOpen: boolean) => void];
+        visibility?: readonly [boolean, (isOpen: boolean) => void];
         /** Draws the saturation and brightness square. */
         renderArea: (flags: InteractionFlags<ColorAreaRenderProps>) => ReactNode;
         /** Draws the hue slider. */
@@ -59,7 +59,7 @@ export type ColorInputProps = Omit<InteractionWrapperProps<ColorInputRenderProps
          */
         renderPopup: (
             renderSurface: () => ReactNode,
-            hsvState: readonly [Color.HSVA, (hsv: Color.HSVA) => void],
+            hsv: readonly [Color.HSVA, (hsv: Color.HSVA) => void],
             visibilityTarget: 0 | 1,
             transitionDurationMs: number,
         ) => ReactNode;

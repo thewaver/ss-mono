@@ -28,8 +28,8 @@ export const CircuitExample = (props: Props) => {
                     durationMs={props.durationMs}
                     isLooping={props.isLooping}
                     isTurning={props.isTurning}
-                    progressState={props.progressState}
-                    playbackState={props.playbackState}
+                    progress={props.progress}
+                    playback={props.playback}
                     renderTrack={(path) => <PageTrailTrack path={path} />}
                     renderTraveler={(place) => <PageTrailVehicle id={VEHICLE_ID} place={place} label={VEHICLE_LABEL} />}
                     onMount={setController}
@@ -41,7 +41,7 @@ export const CircuitExample = (props: Props) => {
                     id={"circuitPlay"}
                     renderContent={(flags) => <PageButtonContent flags={flags}>Play</PageButtonContent>}
                     onClick={() => {
-                        props.playbackState[1](true);
+                        props.playback[1](true);
                     }}
                 />
 
@@ -49,7 +49,7 @@ export const CircuitExample = (props: Props) => {
                     id={"circuitPause"}
                     renderContent={(flags) => <PageButtonContent flags={flags}>Pause</PageButtonContent>}
                     onClick={() => {
-                        props.playbackState[1](false);
+                        props.playback[1](false);
                     }}
                 />
 

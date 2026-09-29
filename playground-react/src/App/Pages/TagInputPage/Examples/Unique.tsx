@@ -18,7 +18,7 @@ type Props = TagInputExampleProps;
 export const UniqueExample = (props: Props) => {
     return (
         <TagInput
-            valueState={props.valueState}
+            value={props.value}
             ariaLabel={"Unique topics"}
             gap={FIELD_GAP}
             padding={FIELD_PADDING}
@@ -29,7 +29,7 @@ export const UniqueExample = (props: Props) => {
             computeTag={(text) => {
                 const tag = text.trim().toLowerCase();
 
-                return tag && !props.valueState[0].includes(tag) ? tag : undefined;
+                return tag && !props.value[0].includes(tag) ? tag : undefined;
             }}
             renderContent={(flags) => <PageTagInputContent flags={flags} />}
             renderPlaceholder={() => <PageTagInputPlaceholder>Type and press Enter</PageTagInputPlaceholder>}

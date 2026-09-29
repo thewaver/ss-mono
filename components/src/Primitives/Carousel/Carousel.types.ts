@@ -56,7 +56,7 @@ export type CarouselState = {
      * Whether stepping past the last slide comes round to the first, and back from the first to the last.
      * Defaults to `true`. When off, the Previous control on the first slide and the Next control on the last
      * are disabled and refuse, a swipe past either end springs back, and automatic rotation stops on the last
-     * slide by writing `false` to `playbackSignal`. A drum carousel is a closed ring whose last face sits
+     * slide by writing `false` to `playback`. A drum carousel is a closed ring whose last face sits
      * beside its first, so the default is the right one there: turned off, the drum stops against a seam
      * nothing on screen shows.
      */

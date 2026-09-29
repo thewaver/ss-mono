@@ -3,5 +3,5 @@ import type { AccessorProps, CirclePackingNode, SignalSource } from "@thewaver/s
 export type CirclePackingExampleProps = AccessorProps<{
     padding: number;
     zoomDurationMs: number;
-    branchSignal: SignalSource<CirclePackingNode<string>>;
+    branch: SignalSource<CirclePackingNode<string>>;
 }>;

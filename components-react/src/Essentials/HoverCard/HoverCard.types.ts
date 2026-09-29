@@ -49,7 +49,7 @@ export type HoverCardProps = ModalNameProps & {
      * the pointer and focus have left it and its anchor, on a press outside, and on Escape, which also puts focus back
      * on the anchor when it was inside the card.
      */
-    visibilityState?: readonly [boolean, (isVisible: boolean) => void];
+    visibility?: readonly [boolean, (isVisible: boolean) => void];
     /**
      * Draws the card body. The fade is handed in rather than applied, so the consumer decides what fading looks like;
      * the placement comes with it for a caller that wants to point an arrow at the anchor. The content may hold

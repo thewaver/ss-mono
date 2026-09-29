@@ -17,7 +17,7 @@ export type CheckboxGroupProps<T> = PropsWithChildren<{
      * is given a `value` is ticked when that value is in the list, and pressing it adds or removes it. Leave it out
      * and the group holds the list itself, starting empty.
      */
-    valueState?: readonly [T[], (values: T[]) => void];
+    value?: readonly [T[], (values: T[]) => void];
     /**
      * Hands over what a select-all box needs, once the group is mounted: the state it should show and the command
      * that ticks or clears every member. The box itself is the consumer's to draw, wherever it goes. It is handed over

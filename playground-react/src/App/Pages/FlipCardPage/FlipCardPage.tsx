@@ -41,7 +41,7 @@ export const FlipCardPage = () => {
             },
             component: () => (
                 <PressedExample
-                    flippedState={pressedFlippedState}
+                    flipped={pressedFlippedState}
                     axis={axis}
                     transitionDurationMs={transitionDurationMs}
                     onTurn={setLastTurn}

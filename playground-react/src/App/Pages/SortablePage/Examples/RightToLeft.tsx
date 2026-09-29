@@ -5,7 +5,7 @@ import { PageSortableRoom } from "../../../StyledComponents/SortableContent/Sort
 import { CardsExample } from "./Cards";
 
 type Props = {
-    itemsState: readonly [SortableItem<Card>[], (items: SortableItem<Card>[]) => void];
+    items: readonly [SortableItem<Card>[], (items: SortableItem<Card>[]) => void];
 };
 
 export const RightToLeftExample = (props: Props) => {
@@ -14,7 +14,7 @@ export const RightToLeftExample = (props: Props) => {
             <PageSortableRoom>
                 <CardsExample
                     groupId={"rightToLeft"}
-                    itemsState={props.itemsState}
+                    items={props.items}
                     ariaLabel={"Row in a right-to-left box"}
                     emptyText={"No cards"}
                     orientation={"horizontal"}

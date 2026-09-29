@@ -37,21 +37,21 @@ export const RangePage = () => {
             key: "default",
             name: "Default",
             readout: () => `value: ${volumeSignal[0]()}`,
-            component: () => <DefaultExample valueSignal={volumeSignal} />,
+            component: () => <DefaultExample value={volumeSignal} />,
             path: `${EXAMPLES_ROOT}/Default.tsx`,
         },
         {
             key: "stepped",
             name: "Stepped",
             readout: () => `value: ${stepsSignal[0]()} of ${STEP_COUNT}`,
-            component: () => <SteppedExample valueSignal={stepsSignal} />,
+            component: () => <SteppedExample value={stepsSignal} />,
             path: `${EXAMPLES_ROOT}/Stepped.tsx`,
         },
         {
             key: "pair",
             name: "Pair",
             readout: () => `start: ${priceSignal[0]().start} | end: ${priceSignal[0]().end}`,
-            component: () => <PairExample rangeSignal={priceSignal} />,
+            component: () => <PairExample range={priceSignal} />,
             path: `${EXAMPLES_ROOT}/Pair.tsx`,
         },
         {
@@ -61,7 +61,7 @@ export const RangePage = () => {
                 `start: ${budgetSignal[0]().start} | end: ${budgetSignal[0]().end} | settled: ${getSettledBudget()} — each thumb reads its value as a price, and "settled" changes only when a drag lets go or a key is pressed`,
             component: () => (
                 <PriceExample
-                    rangeSignal={budgetSignal}
+                    range={budgetSignal}
                     onChangeEnd={(values) => {
                         setSettledBudget(values.join("–"));
                     }}
@@ -74,7 +74,7 @@ export const RangePage = () => {
             name: "Vertical",
             readout: () =>
                 `single: ${verticalSignal[0]()} | pair: ${verticalPairSignal[0]().start}–${verticalPairSignal[0]().end}`,
-            component: () => <VerticalExample valueSignal={verticalSignal} rangeSignal={verticalPairSignal} />,
+            component: () => <VerticalExample value={verticalSignal} range={verticalPairSignal} />,
             path: `${EXAMPLES_ROOT}/Vertical.tsx`,
         },
         {
@@ -82,14 +82,14 @@ export const RangePage = () => {
             name: "Knob",
             readout: () =>
                 `value: ${knobSignal[0]()} — computeValueAtPoint reads the pointer by its angle round the center, so dragging turns it; the arrow keys still step it`,
-            component: () => <KnobExample valueSignal={knobSignal} />,
+            component: () => <KnobExample value={knobSignal} />,
             path: `${EXAMPLES_ROOT}/Knob.tsx`,
         },
         {
             key: "disabled",
             name: "Disabled",
             readout: () => `value: ${disabledSignal[0]()}`,
-            component: () => <DisabledExample valueSignal={disabledSignal} />,
+            component: () => <DisabledExample value={disabledSignal} />,
             path: `${EXAMPLES_ROOT}/Disabled.tsx`,
         },
         {
@@ -97,21 +97,21 @@ export const RangePage = () => {
             name: "Disabled pair",
             readout: () =>
                 `start: ${disabledPairSignal[0]().start} | end: ${disabledPairSignal[0]().end} — both thumbs must be out of the tab order`,
-            component: () => <DisabledPairExample rangeSignal={disabledPairSignal} />,
+            component: () => <DisabledPairExample range={disabledPairSignal} />,
             path: `${EXAMPLES_ROOT}/DisabledPair.tsx`,
         },
         {
             key: "reachable",
             name: "Disabled + reachable",
             readout: () => `value: ${reachableSignal[0]()}`,
-            component: () => <ReachableExample valueSignal={reachableSignal} />,
+            component: () => <ReachableExample value={reachableSignal} />,
             path: `${EXAMPLES_ROOT}/Reachable.tsx`,
         },
         {
             key: "errored",
             name: "Error",
             readout: () => `value: ${erroredSignal[0]()}`,
-            component: () => <ErroredExample valueSignal={erroredSignal} />,
+            component: () => <ErroredExample value={erroredSignal} />,
             path: `${EXAMPLES_ROOT}/Errored.tsx`,
         },
     ]);

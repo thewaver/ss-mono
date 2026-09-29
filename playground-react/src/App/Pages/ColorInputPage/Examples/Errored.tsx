@@ -11,8 +11,8 @@ type Props = ColorInputExampleProps;
 export const ErroredExample = (props: Props) => (
     <ColorInput
         {...pageColorPickerSlots}
-        valueState={props.valueState}
-        hasError={props.valueState[0] === NO_BRAND_COLOR}
+        value={props.value}
+        hasError={props.value[0] === NO_BRAND_COLOR}
         ariaLabel={"Validated color"}
         {...COLOR_INPUT_LABELS}
         renderContent={(renderProps) => <PageColorInputContent renderProps={renderProps} />}

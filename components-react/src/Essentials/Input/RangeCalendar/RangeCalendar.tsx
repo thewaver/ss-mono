@@ -6,7 +6,7 @@ import { CalendarComposite } from "../Calendar/Calendar";
 import type { RangeCalendarProps } from "../Calendar/Calendar.types";
 
 export const RangeCalendar = (props: RangeCalendarProps) => {
-    const [range, setRange] = props.valueState;
+    const [range, setRange] = props.value;
 
     const [pendingStart, setPendingStart] = useState<DateValue>();
     const [lastPicked, setLastPicked] = useState<DateValue>();

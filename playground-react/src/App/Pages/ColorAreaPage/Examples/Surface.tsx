@@ -11,7 +11,7 @@ type Props = ColorAreaExampleProps;
 export const SurfaceExample = (props: Props) => {
     return (
         <ColorArea
-            hsvState={props.hsvState}
+            hsv={props.hsv}
             sizing={"fill"}
             isDisabled={props.isDisabled ?? false}
             ariaLabel={"Saturation and brightness"}

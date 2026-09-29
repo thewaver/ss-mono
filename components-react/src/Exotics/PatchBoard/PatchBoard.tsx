@@ -27,8 +27,8 @@ const NOTHING = 0;
 const FULL_WIDTH = 1;
 
 export const PatchBoard = <T,>(props: PatchBoardProps<T>) => {
-    const [nodes] = props.nodesState;
-    const [links] = props.linksState;
+    const [nodes] = props.nodes;
+    const [links] = props.links;
 
     const boardId = useId();
     const nodeHintId = useId();
@@ -72,14 +72,14 @@ export const PatchBoard = <T,>(props: PatchBoardProps<T>) => {
             getStepSize: () => latest.current.props.stepSize ?? PATCH_BOARD_DEFAULTS.stepSize,
             getSnapSpot: () => latest.current.props.computeSnapSpot,
             getCanLink: () => latest.current.props.computeCanLink,
-            getNodes: () => latest.current.props.nodesState[0],
-            getLinks: () => latest.current.props.linksState[0],
+            getNodes: () => latest.current.props.nodes[0],
+            getLinks: () => latest.current.props.links[0],
             getPlacements: () => latest.current.placements,
             getPlacedSocketByEndKey: () => latest.current.placedByEndKey,
             computeNodeKey: (value) => latest.current.props.computeNodeKey(value),
             computeNodeLabel: (value) => latest.current.props.computeNodeLabel(value),
-            updateNodes: (update) => latest.current.props.nodesState[1](update(latest.current.props.nodesState[0])),
-            updateLinks: (update) => latest.current.props.linksState[1](update(latest.current.props.linksState[0])),
+            updateNodes: (update) => latest.current.props.nodes[1](update(latest.current.props.nodes[0])),
+            updateLinks: (update) => latest.current.props.links[1](update(latest.current.props.links[0])),
             focusStop: (stopKey) => latest.current.focusStop(stopKey),
             onLink: (link) => latest.current.props.onLink?.(link),
             onUnlink: (link) => latest.current.props.onUnlink?.(link),

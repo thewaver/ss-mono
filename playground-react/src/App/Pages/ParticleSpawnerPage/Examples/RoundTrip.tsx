@@ -39,7 +39,7 @@ export const RoundTripExample = (props: ParticleSpawnerExampleProps) => {
 
                 <ParticleSpawner
                     {...props}
-                    playbackState={relayPlayback}
+                    playback={relayPlayback}
                     targets={[outboundMarker ?? undefined]}
                     renderParticle={(_index, t) => renderParticle(t, styles.particleReturn)}
                     onMount={setRelay}

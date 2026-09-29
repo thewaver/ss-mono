@@ -17,7 +17,7 @@ type Props = NumberInputExampleProps;
 
 export const ReachableExample = (props: Props) => (
     <NumberInput
-        valueState={props.valueState}
+        value={props.value}
         isDisabled={true}
         isReachableWhenDisabled={true}
         padding={FIELD_STEPPER_PADDING}

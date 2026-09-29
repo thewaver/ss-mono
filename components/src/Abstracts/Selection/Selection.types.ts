@@ -10,7 +10,7 @@ export type SelectionGesture = {
 export type SelectionDefs<T> = {
     getMode: () => SelectionMode;
     getItems: () => T[];
-    selectionSignal: [get: () => T[], set: (value: T[]) => void];
+    selection: [get: () => T[], set: (value: T[]) => void];
 };
 
 export type SelectionController<T> = Store<T | undefined> & {

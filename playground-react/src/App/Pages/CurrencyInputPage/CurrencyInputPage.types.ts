@@ -3,5 +3,5 @@ export type CurrencyInputExampleProps = {
     decimals: number;
     hasSign: boolean;
     groupSizes: number[] | undefined;
-    valueState: readonly [number | undefined, (value: number | undefined) => void];
+    value: readonly [number | undefined, (value: number | undefined) => void];
 };

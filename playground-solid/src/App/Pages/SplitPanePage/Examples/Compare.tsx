@@ -22,7 +22,7 @@ export const CompareExample = (props: Props) => {
         <PageSplitPaneCompareFrame>
             <SplitPane
                 panes={() => COMPARE}
-                ratiosSignal={props.ratiosSignal}
+                ratios={props.ratios}
                 gutterSize={props.gutterSize}
                 isDisabled={props.isDisabled}
                 ariaLabel={"Compare two pictures"}

@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useLayoutEffect, useMemo, useState } from "react";
 
 import {
     DATE_INPUT_DEFAULTS,
@@ -13,7 +13,7 @@ import { TextField } from "../../../Primitives/TextField/TextField";
 import type { DateInputEra, DateInputProps } from "./DateInput.types";
 
 export const DateInput = (props: DateInputProps) => {
-    const [value, setValue] = props.valueState;
+    const [value, setValue] = props.value;
 
     const format = props.format ?? DATE_INPUT_DEFAULTS.format;
     const calendar = props.calendar ?? DATE_INPUT_DEFAULTS.calendar;
@@ -56,6 +56,10 @@ export const DateInput = (props: DateInputProps) => {
         if (fieldValue) setEra(fieldValue.era);
     }, [fieldValue]);
 
+    useLayoutEffect(() => {
+        field.refresh();
+    }, [format, calendar]);
+
     const eraControl: DateInputEra = {
         value: era,
         options: eraOptions,
@@ -73,7 +77,7 @@ export const DateInput = (props: DateInputProps) => {
     return (
         <TextField
             {...props}
-            valueState={field.textState}
+            value={field.text}
             element={"input"}
             inputMode={"numeric"}
             computeMaskedText={(previous, next, caret) => TextSyncUtils.applyMask(mask, previous, next, caret)}

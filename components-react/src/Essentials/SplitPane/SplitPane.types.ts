@@ -27,7 +27,7 @@ export type SplitPaneProps = {
      * How the room is shared between the panes, one ratio per pane, with its setter. It is the only thing that
      * resizes them; the split writes through the setter as a divider moves.
      */
-    ratiosState: readonly [number[], (ratios: number[]) => void];
+    ratios: readonly [number[], (ratios: number[]) => void];
     /** Draws one pane's contents. */
     renderPane: (pane: SplitPaneEntry, index: number) => ReactNode;
     /** Draws one divider. */

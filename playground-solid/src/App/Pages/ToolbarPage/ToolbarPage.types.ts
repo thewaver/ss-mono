@@ -9,5 +9,5 @@ export type ToolbarExampleProps = AccessorProps<{
 
 export type ToolbarPressedExampleProps = ToolbarExampleProps &
     AccessorProps<{
-        pressedValuesSignal: Signal<string[]>;
+        pressedValues: Signal<string[]>;
     }>;

@@ -45,16 +45,16 @@ export const useWheelsControls = (): WheelsControls => {
     };
 
     return {
-        wedgeCountState,
-        spinDurationState,
-        turnsState,
-        settleDurationState,
-        doesResumeState,
-        restDurationState,
-        isIdlingAllowedState,
-        idleDelayState,
-        spinStyleState,
-        isDisabledState,
+        wedgeCount: wedgeCountState,
+        spinDuration: spinDurationState,
+        turns: turnsState,
+        settleDuration: settleDurationState,
+        doesResume: doesResumeState,
+        restDuration: restDurationState,
+        isIdlingAllowed: isIdlingAllowedState,
+        idleDelay: idleDelayState,
+        spinStyle: spinStyleState,
+        isDisabled: isDisabledState,
         wedges,
         sharedProps,
     };

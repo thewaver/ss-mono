@@ -68,7 +68,7 @@ export const RichTextPage = () => {
             component: () => (
                 <>
                     <TextArea
-                        valueState={contentState}
+                        value={contentState}
                         isAutoSizing={true}
                         minRows={MIN_ROWS}
                         maxRows={MAX_ROWS}

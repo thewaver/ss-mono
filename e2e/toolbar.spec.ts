@@ -270,7 +270,7 @@ test("a ring keeps the single tab stop, and both pairs of arrows walk it", async
 });
 
 /**
- * With `pressedValuesSignal` every action is a toggle button, so the checks are the ones a toggle group
+ * With `pressedValues` every action is a toggle button, so the checks are the ones a toggle group
  * owes: `aria-pressed` written on every action (a `"false"` rather than no attribute, since a mixed row would
  * announce plain buttons as something they are not), a press that flips it and the owner's list together,
  * the same single tab stop, and a collapsed action that turns up as a checked checkbox in the menu. Which

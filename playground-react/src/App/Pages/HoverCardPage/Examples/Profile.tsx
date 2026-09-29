@@ -15,7 +15,7 @@ export const ProfileExample = (props: Props) => {
 
     const [anchorRef, setAnchorRef] = useState<HTMLElement>();
 
-    const [isFollowing, setIsFollowing] = props.followingState;
+    const [isFollowing, setIsFollowing] = props.following;
 
     return (
         <div className={styles.sentence}>
@@ -30,7 +30,7 @@ export const ProfileExample = (props: Props) => {
             <HoverCard
                 anchorRef={anchorRef}
                 ariaLabelledBy={nameId}
-                visibilityState={props.visibilityState}
+                visibility={props.visibility}
                 offset={props.offset}
                 transitionDurationMs={props.transitionDurationMs}
                 focusShowDelayMs={props.focusShowDelayMs}

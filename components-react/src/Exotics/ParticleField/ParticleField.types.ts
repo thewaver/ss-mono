@@ -24,12 +24,12 @@ export type ParticleFieldProps = {
     /** How long one particle lives, from appearing to being removed. It is cut to the pass if it is longer. */
     particleLifetimeMs?: number;
     /** Whether the field is running. It is the only thing that starts or pauses it, and a pause freezes every particle. */
-    playbackState?: readonly [boolean, (value: boolean) => void];
+    playback?: readonly [boolean, (value: boolean) => void];
     /**
      * How far through the current pass the field is, `0`–`1`. The component writes it as the pass runs, and writing it
      * moves the pass there: while playing it carries on from the new point, and with playback paused it scrubs.
      */
-    progressState?: readonly [number, (value: number) => void];
+    progress?: readonly [number, (value: number) => void];
     /**
      * The corners of the area particles may appear in, worked out from the field's size — the same input `Shape`
      * takes, so `ShapeConst.getDefaultShapePoints` is a ready answer. A cell spawns only when its center is inside.

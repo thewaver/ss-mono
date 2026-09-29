@@ -19,7 +19,7 @@ type Props = TagInputExampleProps & { ariaLabel?: MaybeAccessor<string> };
 export const DefaultExample = (props: Props) => {
     return (
         <TagInput
-            valueSignal={props.valueSignal}
+            value={props.value}
             ariaLabel={() => access(props.ariaLabel) ?? "Topics"}
             gap={() => FIELD_GAP}
             padding={() => FIELD_PADDING}

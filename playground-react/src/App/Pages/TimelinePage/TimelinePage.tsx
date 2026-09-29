@@ -49,7 +49,7 @@ export const TimelinePage = () => {
             ? "nothing trimmed yet"
             : `${trimmed.name} now runs ${formatStopwatch(trimmed.from)} to ${formatStopwatch(trimmed.to)}`;
 
-    const commonProps: Omit<TimelineExampleProps, "viewState"> = {
+    const commonProps: Omit<TimelineExampleProps, "view"> = {
         isPannable,
         isZoomable,
         isDisabled,
@@ -62,7 +62,7 @@ export const TimelinePage = () => {
             name: "A day of meetings",
             readout: () =>
                 `showing ${formatClock(dayState[0].start)} to ${formatClock(dayState[0].end)} — the lanes are the component's own answer to what overlaps, and it takes the gestures itself: the wheel zooms where the pointer is, a drag moves the window, and a press that never travels still picks the meeting under it. The red line is a marker at the time on this computer's clock, and it is only drawn while that time is inside the day shown`,
-            component: () => <MeetingsExample {...commonProps} viewState={dayState} />,
+            component: () => <MeetingsExample {...commonProps} view={dayState} />,
             path: `${EXAMPLES_ROOT}/Meetings.tsx`,
         },
         {
@@ -70,7 +70,7 @@ export const TimelinePage = () => {
             name: "Three tracks",
             readout: () =>
                 `showing ${formatStopwatch(reelState[0].start)} to ${formatStopwatch(reelState[0].end)} — here the page says which lane each clip belongs to, and the buttons are the route for anyone who cannot drag or pinch. The orange line is a marker the page moves while it plays`,
-            component: () => <TracksExample {...commonProps} viewState={reelState} />,
+            component: () => <TracksExample {...commonProps} view={reelState} />,
             path: `${EXAMPLES_ROOT}/Tracks.tsx`,
         },
         {
@@ -81,8 +81,8 @@ export const TimelinePage = () => {
             component: () => (
                 <TrimExample
                     {...commonProps}
-                    viewState={trimReelState}
-                    clipsState={trimClipsState}
+                    view={trimReelState}
+                    clips={trimClipsState}
                     onTrim={setTrimmed}
                 />
             ),

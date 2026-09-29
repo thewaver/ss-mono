@@ -10,7 +10,7 @@ type Props = ColorInputExampleProps;
 export const DisabledExample = (props: Props) => (
     <ColorInput
         {...pageColorPickerSlots}
-        valueSignal={props.valueSignal}
+        value={props.value}
         isDisabled={true}
         ariaLabel={"Disabled color"}
         {...COLOR_INPUT_LABELS}

@@ -68,8 +68,8 @@ export const ConsumerSortedExample = (props: TableExampleProps) => {
             <Table
                 columns={getColumns}
                 rows={getRows}
-                sortSignal={props.sortSignal}
-                selectionSignal={props.selectionSignal}
+                sort={props.sort}
+                selection={props.selection}
                 ariaLabel={"Parts sorted by the page"}
                 onSortChange={reorder}
             />

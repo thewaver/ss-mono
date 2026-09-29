@@ -51,7 +51,7 @@ export const PickedExample = (props: Props) => {
 
     return (
         <DatePicker
-            valueSignal={props.valueSignal}
+            value={props.value}
             calendar={props.calendar}
             minValue={props.minValue}
             maxValue={props.maxValue}
@@ -92,7 +92,7 @@ export const PickedExample = (props: Props) => {
                     <Show
                         when={getIsMonthPrecision()}
                         fallback={
-                            <PageCalendarCaption monthSignal={monthSignal} key={props.key} locale={() => LOCALE} />
+                            <PageCalendarCaption month={monthSignal} key={props.key} locale={() => LOCALE} />
                         }
                     >
                         <PageCalendarPagedCaption
@@ -101,7 +101,7 @@ export const PickedExample = (props: Props) => {
                             precision={"month"}
                             previousLabel={"Previous year"}
                             nextLabel={"Next year"}
-                            monthSignal={monthSignal}
+                            month={monthSignal}
                         />
                     </Show>
 

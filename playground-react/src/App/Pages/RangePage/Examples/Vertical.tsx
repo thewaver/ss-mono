@@ -12,7 +12,7 @@ type Props = RangeVerticalExampleProps;
 export const VerticalExample = (props: Props) => (
     <PageControlRow>
         <Range
-            valueState={props.valueState}
+            value={props.value}
             id={"verticalVolume"}
             ariaLabel={"Vertical volume"}
             orientation={"vertical"}
@@ -23,7 +23,7 @@ export const VerticalExample = (props: Props) => (
         <PageControlRowLabel>and a pair</PageControlRowLabel>
 
         <Range
-            rangeState={props.rangeState}
+            range={props.range}
             ariaLabel={"Vertical band"}
             thumbLabels={["Band floor", "Band ceiling"]}
             orientation={"vertical"}

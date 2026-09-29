@@ -42,7 +42,7 @@ export type ClockProps = {
     /** Whether one time can be picked, for rules a plain earliest and latest cannot express. */
     computeIsTimeDisabled?: (time: TimeValue) => boolean;
     /** Which time is picked, and how to change it. It is the only thing that picks one. */
-    valueState: readonly [TimeValue | undefined, (value: TimeValue | undefined) => void];
+    value: readonly [TimeValue | undefined, (value: TimeValue | undefined) => void];
     /** Draws one option. */
     renderOption: ClockOptionRenderer;
     /** Draws the heading for one unit's column. */

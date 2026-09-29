@@ -27,7 +27,7 @@ export const LibraryExample = (props: Props) => {
         <div className={styles.frame}>
             <Icicle<string>
                 root={LIBRARY}
-                focusState={props.focusState}
+                focus={props.focus}
                 columnCount={props.columnCount}
                 zoomDurationMs={props.zoomDurationMs}
                 ariaLabel={"The library's source, by lines of code"}

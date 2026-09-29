@@ -18,7 +18,7 @@ export const DestructiveConfirmationExample = (props: Props) => {
 
     const decide = (outcome: string) => {
         props.onDecide(outcome);
-        props.visibilitySignal[1](false);
+        props.visibility[1](false);
     };
 
     return (
@@ -27,12 +27,12 @@ export const DestructiveConfirmationExample = (props: Props) => {
                 renderContent={(getFlags) => <PageButtonContent flags={getFlags}>Delete the project</PageButtonContent>}
                 onClick={() => {
                     props.onDecide("nothing decided yet");
-                    props.visibilitySignal[1](true);
+                    props.visibility[1](true);
                 }}
             />
 
             <Modal
-                visibilitySignal={props.visibilitySignal}
+                visibility={props.visibility}
                 role={"alertdialog"}
                 initialFocusRef={getCancelRef}
                 isDismissableOnOverlayClick={false}

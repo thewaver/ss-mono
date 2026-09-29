@@ -83,7 +83,7 @@ export type SortableProps<T> = Omit<InteractionWrapperProps<SortableFlags>, "ren
     /** Draws the line showing where a carried item would land. */
     renderMarker?: (orientation: SortableOrientation) => ReactNode;
     /** The items, in their current order. It is the only thing that reorders them. */
-    itemsState: readonly [SortableItem<T>[], (items: SortableItem<T>[]) => void];
+    items: readonly [SortableItem<T>[], (items: SortableItem<T>[]) => void];
     /** Arranges the items, for a list that is something other than a straight run. */
     computeLayout?: PlacementLayoutFn;
     /** What the items do as the pointer nears them. */

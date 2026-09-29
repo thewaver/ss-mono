@@ -28,7 +28,7 @@ export const FormFieldPage = () => {
     const foreignState = useState("");
     const formState = useState("");
 
-    const commonProps: Omit<FormFieldExampleProps, "valueState"> = {
+    const commonProps: Omit<FormFieldExampleProps, "value"> = {
         orientation,
         gap,
         message,
@@ -43,7 +43,7 @@ export const FormFieldPage = () => {
                 message.length > 0
                     ? "the message has an id of its own and the control inside is pointed at it, without either of them being told the other's name"
                     : "with no message there is no element and no reference — an empty message is not an empty box",
-            component: () => <DefaultExample {...commonProps} valueState={defaultState} />,
+            component: () => <DefaultExample {...commonProps} value={defaultState} />,
             path: `${EXAMPLES_ROOT}/Default.tsx`,
         },
         {
@@ -51,7 +51,7 @@ export const FormFieldPage = () => {
             name: "Around a control it has never seen",
             readout: () =>
                 "a plain input, which knows nothing about any of this — one call to FormFieldReactUtils.useAriaDescribedBy gets it the same wiring the library's own controls get for free",
-            component: () => <ForeignExample {...commonProps} valueState={foreignState} />,
+            component: () => <ForeignExample {...commonProps} value={foreignState} />,
             path: `${EXAMPLES_ROOT}/Foreign.tsx`,
         },
         {
@@ -59,7 +59,7 @@ export const FormFieldPage = () => {
             name: "Inside a form",
             readout: () =>
                 "turn the error on — the field tells the form, and the form's own validity is what disables the button; nothing here reads the other's state directly",
-            component: () => <InFormExample {...commonProps} valueState={formState} />,
+            component: () => <InFormExample {...commonProps} value={formState} />,
             path: `${EXAMPLES_ROOT}/InForm.tsx`,
         },
     ];

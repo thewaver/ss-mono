@@ -28,7 +28,7 @@ const PEEK_STEP = 1;
 type Props = FlipCardPressedExampleProps;
 
 export const PressedExample = (props: Props) => {
-    const [isFlipped, setIsFlipped] = props.flippedState;
+    const [isFlipped, setIsFlipped] = props.flipped;
 
     const [turnDirection, setTurnDirection] = useState<FlipCardTurnDirection>();
     const [peekRatio, setPeekRatio] = useState(NO_PEEK);
@@ -45,7 +45,7 @@ export const PressedExample = (props: Props) => {
     return (
         <PageFlipCardStack>
             <FlipCard
-                flippedState={props.flippedState}
+                flipped={props.flipped}
                 axis={props.axis}
                 size={CARD_SIZE}
                 transitionDurationMs={props.transitionDurationMs}
@@ -79,7 +79,7 @@ export const PressedExample = (props: Props) => {
                     min={NO_PEEK}
                     max={PERCENT}
                     step={PEEK_STEP}
-                    valueState={[Math.round(peekRatio * PERCENT), (value: number) => setPeekRatio(value / PERCENT)]}
+                    value={[Math.round(peekRatio * PERCENT), (value: number) => setPeekRatio(value / PERCENT)]}
                     renderContent={(renderProps) => (
                         <PageRangeContent renderProps={renderProps} length={CARD_SIZE.width} />
                     )}

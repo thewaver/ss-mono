@@ -12,7 +12,7 @@ const PANEL_WIDTH = 220;
 
 export const SidewaysExample = (props: Props) => (
     <Collapsible
-        expandedSignal={props.expandedSignal}
+        expanded={props.expanded}
         sizing={"fit-content"}
         side={"right"}
         renderTrigger={(getFlags) => (

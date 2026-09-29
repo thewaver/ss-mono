@@ -12,7 +12,7 @@ type Props = SelectRoutesExampleProps;
 export const OnDemandExample = (props: Props) => {
     return (
         <Select
-            valueState={props.valueState}
+            value={props.value}
             options={props.options}
             hasMoreOptions={props.hasMore}
             ariaLabel={"Route"}

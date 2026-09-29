@@ -1,6 +1,6 @@
 import type { Signal } from "solid-js";
 
 export type MultiSelectClearableExampleProps = {
-    valuesSignal: Signal<string[]>;
+    values: Signal<string[]>;
     onSelectionChange: (values: string[]) => void;
 };

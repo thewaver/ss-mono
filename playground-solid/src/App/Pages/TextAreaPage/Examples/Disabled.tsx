@@ -15,7 +15,7 @@ type Props = TextAreaExampleProps;
 
 export const DisabledExample = (props: Props) => (
     <TextArea
-        valueSignal={props.valueSignal}
+        value={props.value}
         isDisabled={true}
         padding={() => FIELD_PADDING}
         gap={() => FIELD_GAP}

@@ -25,7 +25,7 @@ export const DrawerPage = () => {
         const commonProps: DrawerExampleProps = {
             edge,
             fillers: FILLERS,
-            visibilityState: [
+            visibility: [
                 isVisible,
                 (value) => setVisibilityByEdge((previous) => ({ ...previous, [edge]: value })),
             ],

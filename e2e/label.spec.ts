@@ -63,6 +63,48 @@ test("an aria-label inside a Label warns and is dropped @react", async ({ page }
     ).not.toHaveAttribute("aria-label");
 });
 
+/**
+ * The same warning in the Svelte Playground, which names the prop `ariaLabel` as React does.
+ */
+test("an aria-label inside a Label warns and is dropped @svelte", async ({ page }) => {
+    const messages: ConsoleMessage[] = [];
+
+    page.on("console", (message) => messages.push(message));
+
+    await page.goto("/label");
+    await expect(page.locator("[data-example]").first()).toBeVisible();
+
+    const warning = messages.find((message) => message.text().startsWith("Label: ariaLabel"));
+
+    expect(warning, "an aria-label inside a Label warns, rather than silently renaming the control").toBeTruthy();
+    expect(warning?.type(), "and it warns rather than logs").toBe("warning");
+    await expect(
+        page.locator(`${SUPPRESSED} input`),
+        "the aria-label is dropped, so the visible caption stays the accessible name",
+    ).not.toHaveAttribute("aria-label");
+});
+
+/**
+ * The same warning in the Vue Playground, which names the prop `ariaLabel` as React does.
+ */
+test("an aria-label inside a Label warns and is dropped @vue", async ({ page }) => {
+    const messages: ConsoleMessage[] = [];
+
+    page.on("console", (message) => messages.push(message));
+
+    await page.goto("/label");
+    await expect(page.locator("[data-example]").first()).toBeVisible();
+
+    const warning = messages.find((message) => message.text().startsWith("Label: ariaLabel"));
+
+    expect(warning, "an aria-label inside a Label warns, rather than silently renaming the control").toBeTruthy();
+    expect(warning?.type(), "and it warns rather than logs").toBe("warning");
+    await expect(
+        page.locator(`${SUPPRESSED} input`),
+        "the aria-label is dropped, so the visible caption stays the accessible name",
+    ).not.toHaveAttribute("aria-label");
+});
+
 test("a caption click on a disabled control is stopped", async ({ page }) => {
     await page.locator("#disabledCaption").click({ force: true });
 

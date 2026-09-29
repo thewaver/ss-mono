@@ -3,5 +3,5 @@ import type { AccessorProps, SignalSource, SunburstNode } from "@thewaver/ss-com
 export type SunburstExampleProps = AccessorProps<{
     ringCount: number;
     zoomDurationMs: number;
-    branchSignal: SignalSource<SunburstNode<string>>;
+    branch: SignalSource<SunburstNode<string>>;
 }>;

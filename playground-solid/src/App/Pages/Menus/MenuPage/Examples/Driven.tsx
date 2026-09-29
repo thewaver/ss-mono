@@ -15,7 +15,7 @@ export const DrivenExample = (props: Props) => {
     return (
         <>
             <Menu
-                visibilitySignal={props.visibilitySignal}
+                visibility={props.visibility}
                 anchorRef={getAnchorRef}
                 items={() => ACTIONS}
                 ariaLabel={"Edit actions"}
@@ -31,11 +31,11 @@ export const DrivenExample = (props: Props) => {
                 ariaLabel={"Toggle the menu from outside"}
                 renderContent={(getFlags) => (
                     <PageButtonContent flags={getFlags}>
-                        {props.visibilitySignal[0]() ? "Close it" : "Open it"}
+                        {props.visibility[0]() ? "Close it" : "Open it"}
                     </PageButtonContent>
                 )}
                 onClick={() => {
-                    props.visibilitySignal[1]((prev) => !prev);
+                    props.visibility[1]((prev) => !prev);
                 }}
             />
         </>

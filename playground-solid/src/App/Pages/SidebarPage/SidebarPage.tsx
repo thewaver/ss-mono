@@ -54,7 +54,7 @@ export const SidebarPage = () => {
                     edge={() => variant.edge}
                     layout={() => variant.layout}
                     isExpandedOnHover={() => variant.isExpandedOnHover}
-                    expandedSignal={expandedByKey.get(variant.key)!}
+                    expanded={expandedByKey.get(variant.key)!}
                 />
             ),
             path: `${EXAMPLES_ROOT}/Default.tsx`,

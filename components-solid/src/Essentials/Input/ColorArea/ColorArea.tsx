@@ -119,7 +119,7 @@ const ColorAreaElement = (props: ColorAreaElementProps) => {
 };
 
 export const ColorArea = (props: ColorAreaProps) => {
-    const hsvSignal = accessSignal(() => props.hsvSignal);
+    const hsvSignal = accessSignal(() => props.hsv);
 
     const [getFocusVisibleAxis, setFocusVisibleAxis] = createSignal<ColorAreaAxis>();
     const [getIsDragging, setIsDragging] = createSignal(false);

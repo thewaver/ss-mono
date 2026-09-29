@@ -32,7 +32,7 @@ export const SlideButtonPage = () => {
                 `activations: ${getSends()} — progress ${Math.round(progressSignal[0]() * PERCENT)}%, which the owner reads while the gesture is still running`,
             component: () => (
                 <DefaultExample
-                    progressSignal={progressSignal}
+                    progress={progressSignal}
                     onActivate={() => {
                         setSends((prev) => prev + 1);
                     }}

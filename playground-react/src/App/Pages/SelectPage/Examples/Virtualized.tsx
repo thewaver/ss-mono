@@ -17,8 +17,8 @@ const STRESS_OPTION_HEIGHT = 100;
 const STRESS_GROUP_HEIGHT = 32;
 
 type Props = {
-    valueState: readonly [Delivery | undefined, (value: Delivery | undefined) => void];
-    visibilityState: readonly [boolean, (isOpen: boolean) => void];
+    value: readonly [Delivery | undefined, (value: Delivery | undefined) => void];
+    visibility: readonly [boolean, (isOpen: boolean) => void];
     options: SelectItem<Delivery>[];
     count: number;
     onCountChange: (count: number) => void;
@@ -28,8 +28,8 @@ export const VirtualizedExample = (props: Props) => {
     return (
         <div className={styles.column}>
             <Select
-                valueState={props.valueState}
-                visibilityState={props.visibilityState}
+                value={props.value}
+                visibility={props.visibility}
                 options={props.options}
                 ariaLabel={"Route"}
                 computeEstimatedOptionHeight={() => STRESS_OPTION_HEIGHT}

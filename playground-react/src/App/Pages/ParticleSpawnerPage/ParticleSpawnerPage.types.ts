@@ -19,5 +19,5 @@ export type ParticleSpawnerExampleProps = {
     spawnIterationPatterns: ParticleSpawnIterationPattern[];
     computeParticlePos: ParticleTravelPatternFn;
     areTargetsHidden: boolean;
-    playbackState: readonly [boolean, (value: boolean) => void];
+    playback: readonly [boolean, (value: boolean) => void];
 };

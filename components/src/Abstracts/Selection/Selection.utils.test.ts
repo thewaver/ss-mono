@@ -40,7 +40,7 @@ const buildHandle = (mode: SelectionMode, opts?: { isDisabled?: boolean; items?:
     const handle = SelectionUtils.create(() => opts?.isDisabled ?? false, {
         getMode: () => mode,
         getItems,
-        selectionSignal: [
+        selection: [
             getSelection,
             (next) => {
                 writes++;

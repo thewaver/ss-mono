@@ -34,7 +34,7 @@ export const ParticleSpawner = (props: ParticleSpawnerProps) => {
     const elementsRef = useRef(new Map<number, HTMLDivElement>());
     const tsRef = useRef(new Map<number, number>());
 
-    const [isPlaying] = SignalMirrorReactUtils.useOptionalState(props.playbackState, true);
+    const [isPlaying] = SignalMirrorReactUtils.useOptionalState(props.playback, true);
     const [stage, setStage] = useState({ index: FIRST_STAGE });
     const [, setFrame] = useState(NOT_STARTED);
 

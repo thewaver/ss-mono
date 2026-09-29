@@ -101,8 +101,8 @@ export const TimedGradientsPage = () => {
                 <PagePropsPanel scope={"global"}>
                     <PageSVGGradientsProps
                         controls={{
-                            paintKindSignal,
-                            blurWidthSignal,
+                            paintKind: paintKindSignal,
+                            blurWidth: blurWidthSignal,
                             colors,
                             setColor: (key, value) => setColors(key, value),
                         }}

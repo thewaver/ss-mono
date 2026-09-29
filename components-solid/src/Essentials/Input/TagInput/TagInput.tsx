@@ -21,7 +21,7 @@ export const TagInput = (props: TagInputProps) => {
     );
     const getAriaDescribedBy = FormFieldSolidUtils.resolveAriaDescribedBy();
 
-    const valueSignal = accessSignal(() => props.valueSignal);
+    const valueSignal = accessSignal(() => props.value);
 
     const [getFieldRef, setFieldRef] = createSignal<HTMLInputElement>();
 
@@ -31,7 +31,7 @@ export const TagInput = (props: TagInputProps) => {
 
     let tagRefs: (HTMLElement | undefined)[] = [];
 
-    const textSignal = SignalMirrorSolidUtils.createOptional(() => props.textSignal, "");
+    const textSignal = SignalMirrorSolidUtils.createOptional(() => props.text, "");
 
     const getIsDisabled = createMemo(() => access(props.isDisabled) ?? false);
 

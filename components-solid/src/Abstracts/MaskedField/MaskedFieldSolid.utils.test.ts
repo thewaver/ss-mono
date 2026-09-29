@@ -1,4 +1,4 @@
-import { createRoot, createSignal } from "solid-js";
+import { createRoot, createSignal, untrack } from "solid-js";
 import { describe, expect, it } from "vitest";
 
 import type { MaskedFieldHandle } from "./MaskedFieldSolid.types";
@@ -10,14 +10,16 @@ const DIGIT_COUNT = 4;
 const SEGMENT_LENGTH = 2;
 const MAX_HOUR = 23;
 const MAX_MINUTE = 59;
+const HALF_DAY = 12;
 
 const pad = (value: number) => String(value).padStart(SEGMENT_LENGTH, "0");
 
 const readSegment = (digits: string, index: number) =>
     Number(digits.slice(index * SEGMENT_LENGTH, (index + 1) * SEGMENT_LENGTH));
 
-const buildField = (initial?: Time) => {
+const buildField = (initial?: Time, isRuleReadUntracked = false) => {
     const value = createSignal<Time | undefined>(initial);
+    const twelveHour = createSignal(false);
     const written: (Time | undefined)[] = [];
 
     let field!: MaskedFieldHandle<Time>;
@@ -30,16 +32,25 @@ const buildField = (initial?: Time) => {
                 value[1](next);
             },
             getDigitCount: () => DIGIT_COUNT,
-            toDigits: (time) => `${pad(time.hour)}${pad(time.minute)}`,
+            toDigits: (time) =>
+                `${pad(twelveHour[0]() ? time.hour % HALF_DAY || HALF_DAY : time.hour)}${pad(time.minute)}`,
             formatDigits: (digits) =>
                 digits.length <= SEGMENT_LENGTH
                     ? digits
                     : `${digits.slice(0, SEGMENT_LENGTH)}:${digits.slice(SEGMENT_LENGTH)}`,
             fromDigits: (digits) => {
+                const isTwelveHour = isRuleReadUntracked ? untrack(twelveHour[0]) : twelveHour[0]();
+
                 if (digits.length !== DIGIT_COUNT) return undefined;
 
                 const hour = readSegment(digits, 0);
                 const minute = readSegment(digits, 1);
+
+                if (isTwelveHour) {
+                    return hour < 1 || hour > HALF_DAY || minute > MAX_MINUTE
+                        ? undefined
+                        : { hour: (hour % HALF_DAY) + HALF_DAY, minute };
+                }
 
                 return hour > MAX_HOUR || minute > MAX_MINUTE ? undefined : { hour, minute };
             },
@@ -52,14 +63,14 @@ const buildField = (initial?: Time) => {
         return disposeRoot;
     });
 
-    return { value, field, written, type: (text: string) => field.textSignal[1](text), dispose };
+    return { value, twelveHour, field, written, type: (text: string) => field.text[1](text), dispose };
 };
 
 describe("createField", () => {
     it("opens spelled out from the value it was given", () => {
         const { field, dispose } = buildField({ hour: 9, minute: 30 });
 
-        expect(field.textSignal[0]()).toBe("09:30");
+        expect(field.text[0]()).toBe("09:30");
 
         dispose();
     });
@@ -67,7 +78,7 @@ describe("createField", () => {
     it("opens empty when there is no value yet", () => {
         const { field, dispose } = buildField();
 
-        expect(field.textSignal[0]()).toBe("");
+        expect(field.text[0]()).toBe("");
 
         dispose();
     });
@@ -175,7 +186,7 @@ describe("createField", () => {
         type("9:3");
         field.onBlur();
 
-        expect(field.textSignal[0]()).toBe("09:30");
+        expect(field.text[0]()).toBe("09:30");
 
         dispose();
     });
@@ -186,7 +197,7 @@ describe("createField", () => {
         type("9:3");
         field.onBlur();
 
-        expect(field.textSignal[0](), "wiping what somebody is midway through typing would lose their work").toBe(
+        expect(field.text[0](), "wiping what somebody is midway through typing would lose their work").toBe(
             "9:3",
         );
 
@@ -198,7 +209,7 @@ describe("createField", () => {
 
         value[1]({ hour: 17, minute: 45 });
 
-        expect(field.textSignal[0]()).toBe("17:45");
+        expect(field.text[0]()).toBe("17:45");
 
         dispose();
     });
@@ -231,6 +242,49 @@ describe("createField", () => {
         field.commit({ hour: 17, minute: 45 });
 
         expect(written).toEqual([{ hour: 17, minute: 45 }]);
+
+        dispose();
+    });
+
+    it("respells the text when the rules change", () => {
+        const { twelveHour, field, type, dispose } = buildField();
+
+        type("13:00");
+        twelveHour[1](true);
+
+        expect(field.text[0]()).toBe("01:00");
+
+        twelveHour[1](false);
+
+        expect(field.text[0]()).toBe("13:00");
+
+        dispose();
+    });
+
+    it("respells a field that started empty when the rules change, even where reading digits ignores them", () => {
+        const { twelveHour, field, type, dispose } = buildField(undefined, true);
+
+        type("13:00");
+        twelveHour[1](true);
+
+        expect(field.text[0](), "nothing but the spelling follows the rules here, so the spelling alone must").toBe(
+            "01:00",
+        );
+
+        dispose();
+    });
+
+    it("commits nothing when the rules change, even where the same digits now read as another value", () => {
+        const { value, twelveHour, written, type, dispose } = buildField();
+
+        type("01:00");
+        twelveHour[1](true);
+
+        expect(value[0](), "the digits on screen are not read again under the new rules").toEqual({
+            hour: 1,
+            minute: 0,
+        });
+        expect(written).toEqual([{ hour: 1, minute: 0 }]);
 
         dispose();
     });

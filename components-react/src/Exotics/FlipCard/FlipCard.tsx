@@ -12,7 +12,7 @@ import { Barrel } from "../../Primitives/Barrel/Barrel";
 import type { FlipCardProps } from "./FlipCard.types";
 
 export const FlipCard = (props: FlipCardProps) => {
-    const [isFlipped] = props.flippedState;
+    const [isFlipped] = props.flipped;
 
     const [rest, setRest] = useState(() => ({
         angle: FlipCardUtils.computeRestingAngle(undefined, isFlipped, props.turnDirection),

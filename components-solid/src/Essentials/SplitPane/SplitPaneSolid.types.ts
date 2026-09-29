@@ -23,7 +23,7 @@ export type SplitPaneProps = AccessorProps<{
     /** The panes, each able to state its own smallest and largest size. */
     panes: SplitPaneEntry[];
     /** How the room is shared between the panes. It is the only thing that resizes them. */
-    ratiosSignal: SignalSource<number[]>;
+    ratios: SignalSource<number[]>;
     /** Draws one pane's contents. */
     renderPane: (getPane: Accessor<SplitPaneEntry>, index: number) => JSX.Element;
     /** Draws one divider. */

@@ -8,7 +8,7 @@ import { PageTableResizer } from "../../../StyledComponents/TableContent/TableCo
 import { PARTS, createPartColumns } from "../TablePage.const";
 import type { TableExampleProps } from "../TablePage.types";
 
-type Props = TableExampleProps & { widthsSignal: Signal<Record<string, number>> };
+type Props = TableExampleProps & { widths: Signal<Record<string, number>> };
 
 export const ResizableExample = (props: Props) => {
     const getColumns = createMemo(() => createPartColumns({ isResizable: true }));
@@ -18,9 +18,9 @@ export const ResizableExample = (props: Props) => {
             <Table
                 columns={getColumns}
                 rows={() => PARTS}
-                sortSignal={props.sortSignal}
-                selectionSignal={props.selectionSignal}
-                widthsSignal={props.widthsSignal}
+                sort={props.sort}
+                selection={props.selection}
+                widths={props.widths}
                 ariaLabel={"Parts with resizable columns"}
                 renderResizer={(getRenderProps) => <PageTableResizer renderProps={getRenderProps} />}
             />

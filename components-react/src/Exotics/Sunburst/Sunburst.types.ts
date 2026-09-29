@@ -20,7 +20,7 @@ export type SunburstProps<T> = {
      * way back out is drawn, in the middle or anywhere else. Leave it out and the sunburst keeps it itself, starting
      * at the root. A node that is not a branch of the current tree puts the root at the center.
      */
-    branchState?: readonly [SunburstNode<T>, (value: SunburstNode<T>) => void];
+    branch?: readonly [SunburstNode<T>, (value: SunburstNode<T>) => void];
     /**
      * Draws one arc inside the sunburst's own drawing, whose origin is the center. It is handed where the arc sits at
      * this moment, which changes on every frame of a zoom; `SunburstUtils.computeArcPath` turns that into a path.

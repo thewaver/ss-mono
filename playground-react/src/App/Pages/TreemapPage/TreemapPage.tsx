@@ -34,7 +34,7 @@ export const TreemapPage = () => {
             component: () => (
                 <LibraryExample
                     zoomDurationMs={prefersReducedMotion ? NO_MOTION_DURATION_MS : zoomDurationMs}
-                    branchState={branchState}
+                    branch={branchState}
                 />
             ),
             path: `${EXAMPLES_ROOT}/Library.tsx`,

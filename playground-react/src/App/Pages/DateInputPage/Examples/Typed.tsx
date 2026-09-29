@@ -23,7 +23,7 @@ type Props = DateExampleProps & {
 export const TypedExample = (props: Props) => {
     return (
         <DateInput
-            valueState={props.valueState}
+            value={props.value}
             calendar={props.calendar}
             locale={LOCALE}
             format={props.format}

@@ -16,7 +16,7 @@ export const SpotlightHintPage = () => {
             name: "Hint",
             readout: () => `open: ${visibilitySignal[0]()} — a click anywhere or any real key puts it away`,
             component: () => (
-                <HintExample visibilitySignal={visibilitySignal} index={getIndex} onIndexChange={setIndex} />
+                <HintExample visibility={visibilitySignal} index={getIndex} onIndexChange={setIndex} />
             ),
             path: `${EXAMPLES_ROOT}/Hint.tsx`,
         },

@@ -59,8 +59,8 @@ const StressTestWrapper = (props: ParticleSpawnerExampleProps) => {
     return (
         <StressTest
             configs={() => STRESS_ITEMS}
-            onShowModal={() => props.playbackSignal[1](false)}
-            onHideModal={() => props.playbackSignal[1](true)}
+            onShowModal={() => props.playback[1](false)}
+            onHideModal={() => props.playback[1](true)}
             renderLabel={(getConfigIndex) => `Render ${STRESS_ITEMS[getConfigIndex()].count} spawners`}
             renderItem={(getConfigIndex) => (
                 <div
@@ -69,7 +69,7 @@ const StressTestWrapper = (props: ParticleSpawnerExampleProps) => {
                         height: `${STRESS_ITEMS[getConfigIndex()].height}px`,
                     }}
                 >
-                    <SingleTargetExample {...props} playbackSignal={modalPlayback} />
+                    <SingleTargetExample {...props} playback={modalPlayback} />
                 </div>
             )}
         />
@@ -124,7 +124,7 @@ export const ParticleSpawnerPage = () => {
             spawnIterationPatterns: () => ITERATION_PATTERNS[getIterationPatternKey()](),
             computeParticlePos: (defs, t) => getComputeParticlePos()(defs, t),
             areTargetsHidden: getAreTargetsHidden,
-            playbackSignal: playback,
+            playback,
         };
 
         return [

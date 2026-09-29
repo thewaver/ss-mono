@@ -34,7 +34,7 @@ export const DefaultExample = (props: Props) => {
                 renderMessage={(state) => <PageFormFieldMessage state={state}>{props.message}</PageFormFieldMessage>}
                 renderControl={(state) => (
                     <TextInput
-                        valueState={props.valueState}
+                        value={props.value}
                         hasError={state.hasError}
                         isRequired={state.isRequired}
                         padding={FIELD_PADDING}

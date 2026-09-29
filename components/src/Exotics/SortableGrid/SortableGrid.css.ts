@@ -51,7 +51,7 @@ export const sortableGridLanding = style({
 
 export const sortableGridCarried = style({
     display: "flex",
-    position: "absolute",
+    position: "fixed",
     top: 0,
     left: 0,
     pointerEvents: "none",

@@ -10,7 +10,7 @@ type Props = SelectExampleProps;
 export const HoursExample = (props: Props) => {
     return (
         <Select
-            valueSignal={props.valueSignal}
+            value={props.value}
             options={() => HOURS}
             ariaLabel={"Departure hour"}
             renderContent={(getSelectedOption, getFlags) => (

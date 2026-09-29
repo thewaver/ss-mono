@@ -37,21 +37,21 @@ export const RangePage = () => {
             key: "default",
             name: "Default",
             readout: () => `value: ${volumeState[0]}`,
-            component: () => <DefaultExample valueState={volumeState} />,
+            component: () => <DefaultExample value={volumeState} />,
             path: `${EXAMPLES_ROOT}/Default.tsx`,
         },
         {
             key: "stepped",
             name: "Stepped",
             readout: () => `value: ${stepsState[0]} of ${STEP_COUNT}`,
-            component: () => <SteppedExample valueState={stepsState} />,
+            component: () => <SteppedExample value={stepsState} />,
             path: `${EXAMPLES_ROOT}/Stepped.tsx`,
         },
         {
             key: "pair",
             name: "Pair",
             readout: () => `start: ${priceState[0].start} | end: ${priceState[0].end}`,
-            component: () => <PairExample rangeState={priceState} />,
+            component: () => <PairExample range={priceState} />,
             path: `${EXAMPLES_ROOT}/Pair.tsx`,
         },
         {
@@ -61,7 +61,7 @@ export const RangePage = () => {
                 `start: ${budgetState[0].start} | end: ${budgetState[0].end} | settled: ${settledBudget} — each thumb reads its value as a price, and "settled" changes only when a drag lets go or a key is pressed`,
             component: () => (
                 <PriceExample
-                    rangeState={budgetState}
+                    range={budgetState}
                     onChangeEnd={(values) => {
                         setSettledBudget(values.join("–"));
                     }}
@@ -74,7 +74,7 @@ export const RangePage = () => {
             name: "Vertical",
             readout: () =>
                 `single: ${verticalState[0]} | pair: ${verticalPairState[0].start}–${verticalPairState[0].end}`,
-            component: () => <VerticalExample valueState={verticalState} rangeState={verticalPairState} />,
+            component: () => <VerticalExample value={verticalState} range={verticalPairState} />,
             path: `${EXAMPLES_ROOT}/Vertical.tsx`,
         },
         {
@@ -82,14 +82,14 @@ export const RangePage = () => {
             name: "Knob",
             readout: () =>
                 `value: ${knobState[0]} — computeValueAtPoint reads the pointer by its angle round the center, so dragging turns it; the arrow keys still step it`,
-            component: () => <KnobExample valueState={knobState} />,
+            component: () => <KnobExample value={knobState} />,
             path: `${EXAMPLES_ROOT}/Knob.tsx`,
         },
         {
             key: "disabled",
             name: "Disabled",
             readout: () => `value: ${disabledState[0]}`,
-            component: () => <DisabledExample valueState={disabledState} />,
+            component: () => <DisabledExample value={disabledState} />,
             path: `${EXAMPLES_ROOT}/Disabled.tsx`,
         },
         {
@@ -97,21 +97,21 @@ export const RangePage = () => {
             name: "Disabled pair",
             readout: () =>
                 `start: ${disabledPairState[0].start} | end: ${disabledPairState[0].end} — both thumbs must be out of the tab order`,
-            component: () => <DisabledPairExample rangeState={disabledPairState} />,
+            component: () => <DisabledPairExample range={disabledPairState} />,
             path: `${EXAMPLES_ROOT}/DisabledPair.tsx`,
         },
         {
             key: "reachable",
             name: "Disabled + reachable",
             readout: () => `value: ${reachableState[0]}`,
-            component: () => <ReachableExample valueState={reachableState} />,
+            component: () => <ReachableExample value={reachableState} />,
             path: `${EXAMPLES_ROOT}/Reachable.tsx`,
         },
         {
             key: "errored",
             name: "Error",
             readout: () => `value: ${erroredState[0]}`,
-            component: () => <ErroredExample valueState={erroredState} />,
+            component: () => <ErroredExample value={erroredState} />,
             path: `${EXAMPLES_ROOT}/Errored.tsx`,
         },
     ];

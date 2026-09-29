@@ -21,7 +21,7 @@ export type WheelMenuCloserDefs = {
     renderContent: (flags: InteractionFlags<MenuItemFlags>) => ReactNode;
 };
 
-export type WheelMenuProps<T> = Omit<MenuProps<T>, "items" | "checkedState" | "computeLayout"> & {
+export type WheelMenuProps<T> = Omit<MenuProps<T>, "items" | "checked" | "computeLayout"> & {
     /** How much of the circle the items are spread over. */
     spreadDegrees?: number;
     /** How much of the middle is left empty, which is where the close control sits. */
@@ -33,7 +33,7 @@ export type WheelMenuProps<T> = Omit<MenuProps<T>, "items" | "checkedState" | "c
     /** The items, in the order they sit round the wheel. */
     items: WheelMenuItem<T>[];
     /** Which values are currently checked, with its setter, for the checkbox and radio items among them. */
-    checkedState?: readonly [T[], (checked: T[]) => void];
+    checked?: readonly [T[], (checked: T[]) => void];
     /** How the items sit on their band, for the parts of the arrangement the wheel does not decide itself. */
     layoutDefs?: Omit<BandDefs, "holeRatio" | "spreadDegrees" | "computeItemArcs">;
     /** The control in the hole that closes the menu. */

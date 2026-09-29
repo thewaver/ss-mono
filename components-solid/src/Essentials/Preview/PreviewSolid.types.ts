@@ -48,7 +48,7 @@ export type PreviewProps = Omit<
          * Whether the content is expanded. Both sides write it: the preview when its trigger is pressed, the consumer to
          * expand or collapse it from outside. Leave it out and the preview keeps the state itself, starting collapsed.
          */
-        expandedSignal?: SignalSource<boolean>;
+        expanded?: SignalSource<boolean>;
         /** Draws the content being previewed. */
         renderContent: () => JSX.Element;
         /** Draws the trigger. */

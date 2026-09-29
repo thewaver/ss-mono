@@ -21,7 +21,7 @@ import type { DateRangePickerProps } from "./DateRangePicker.types";
 const toMonth = (value: DateValue): DateValue => DateValueUtils.getStartOfMonth(value);
 
 export const DateRangePicker = (props: DateRangePickerProps) => {
-    const [range] = props.valueState;
+    const [range] = props.value;
 
     const popupId = useId();
     const fallbackFieldId = useId();
@@ -31,15 +31,15 @@ export const DateRangePicker = (props: DateRangePickerProps) => {
     const rootRef = useRef<HTMLDivElement | null>(null);
     const isFocusReturnedRef = useRef(false);
     const [root, setRoot] = useState<HTMLDivElement>();
-    const [isOpen, setIsOpen] = SignalMirrorReactUtils.useOptionalState(props.visibilityState, false);
+    const [isOpen, setIsOpen] = SignalMirrorReactUtils.useOptionalState(props.visibility, false);
     const monthState = useState(() => toMonth(range?.start ?? DateValueUtils.fromDate(new Date())));
     const [, setMonth] = monthState;
 
-    const { firstState: startState, secondState: endState } = SignalMirrorReactUtils.useSplit<
+    const { first: startState, second: endState } = SignalMirrorReactUtils.useSplit<
         DateValueRange,
         DateValue,
         DateValue
-    >(props.valueState, DateRangePickerUtils.SPLIT_DEFS);
+    >(props.value, DateRangePickerUtils.SPLIT_DEFS);
 
     const isDisabled = props.isDisabled ?? false;
 
@@ -78,8 +78,8 @@ export const DateRangePicker = (props: DateRangePickerProps) => {
 
     const renderCalendar = () => (
         <RangeCalendar
-            valueState={props.valueState}
-            monthState={monthState}
+            value={props.value}
+            month={monthState}
             minValue={props.minValue}
             maxValue={props.maxValue}
             isDisabled={props.isDisabled}
@@ -96,7 +96,7 @@ export const DateRangePicker = (props: DateRangePickerProps) => {
         <div ref={setRootRef} className={DateRangePickerStyles.dateRangePickerRoot}>
             <DateInput
                 {...props}
-                valueState={startState}
+                value={startState}
                 id={props.id && `${props.id}-start`}
                 name={props.name && `${props.name}-start`}
                 ariaLabel={props.startLabel}
@@ -106,7 +106,7 @@ export const DateRangePicker = (props: DateRangePickerProps) => {
 
             <DateInput
                 {...props}
-                valueState={endState}
+                value={endState}
                 id={endFieldId}
                 name={props.name && `${props.name}-end`}
                 ariaLabel={props.endLabel}

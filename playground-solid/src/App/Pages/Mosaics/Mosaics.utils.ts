@@ -18,5 +18,5 @@ export const createMosaicsControls = (): MosaicsControls => {
         transitionDurationMs: transitionDurationMsSignal[0],
     }));
 
-    return { itemCountSignal, gapSignal, sizeAnchorSignal, transitionDurationMsSignal, getSharedProps };
+    return { itemCount: itemCountSignal, gap: gapSignal, sizeAnchor: sizeAnchorSignal, transitionDurationMs: transitionDurationMsSignal, getSharedProps };
 };

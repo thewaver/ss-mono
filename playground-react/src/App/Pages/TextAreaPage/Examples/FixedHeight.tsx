@@ -16,7 +16,7 @@ type Props = TextAreaExampleProps;
 
 export const FixedHeightExample = (props: Props) => (
     <TextArea
-        valueState={props.valueState}
+        value={props.value}
         padding={FIELD_PADDING}
         gap={FIELD_GAP}
         ariaLabel={"Notes"}

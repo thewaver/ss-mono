@@ -86,7 +86,7 @@ export type TimelineProps<T> = AccessorProps<{
     /** Turns the timeline off, so it neither pans, zooms nor picks. */
     isDisabled?: boolean;
     /** The stretch of time currently in view. It is the only thing that pans or zooms it. */
-    viewSignal?: SignalSource<TimelineSpan>;
+    view?: SignalSource<TimelineSpan>;
     /** Where one item sits in time. */
     computeSpan: (item: T, index: number) => TimelineSpan;
     /**

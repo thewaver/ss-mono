@@ -41,7 +41,7 @@ export const Treemap = <T,>(props: TreemapProps<T>) => {
 
     const weights = useMemo(() => TreemapUtils.computeWeights(props.root), [props.root]);
 
-    const [heldBranch, setHeldBranch] = SignalMirrorReactUtils.useOptionalState(props.branchState, props.root);
+    const [heldBranch, setHeldBranch] = SignalMirrorReactUtils.useOptionalState(props.branch, props.root);
 
     const branch = TreemapUtils.resolveBranch(heldBranch, props.root, weights);
 

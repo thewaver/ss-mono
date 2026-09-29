@@ -8,6 +8,7 @@ import {
     type ClockSteps,
     type ClockUnit,
     ClockUtils,
+    PopoverUtils,
     ClockStyles as styles,
 } from "@thewaver/ss-components";
 import type { TimeValue } from "@thewaver/ss-utils";
@@ -44,7 +45,7 @@ const ClockOptionControl = (props: ClockOptionProps) => {
 };
 
 export const Clock = (props: ClockProps) => {
-    const valueSignal = accessSignal(() => props.valueSignal);
+    const valueSignal = accessSignal(() => props.value);
 
     const groupId = createUniqueId();
 
@@ -129,8 +130,12 @@ export const Clock = (props: ClockProps) => {
     });
 
     createEffect(() => {
+        const root = getRootRef();
+
         getColumns().forEach((column) => {
-            optionRefs.get(`${column.unit}:${getRovingIndex(column)}`)?.scrollIntoView({ block: "nearest" });
+            const element = optionRefs.get(`${column.unit}:${getRovingIndex(column)}`);
+
+            if (element && root) PopoverUtils.revealWithin(element, root);
         });
     });
 

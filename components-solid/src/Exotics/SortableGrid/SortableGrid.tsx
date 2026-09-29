@@ -82,7 +82,7 @@ const SortableGridItemSlot = (props: SortableGridItemSlotProps) => {
 };
 
 export const SortableGrid = <T,>(props: SortableGridProps<T>) => {
-    const itemsSignal = accessSignal(() => props.itemsSignal);
+    const itemsSignal = accessSignal(() => props.items);
 
     const gridId = createUniqueId();
     const hintId = createUniqueId();

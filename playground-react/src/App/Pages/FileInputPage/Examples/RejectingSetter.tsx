@@ -9,7 +9,7 @@ type Props = FileInputRejectingExampleProps;
 export const RejectingSetterExample = (props: Props) => {
     return (
         <FileInput
-            filesState={props.filesState}
+            files={props.files}
             hasError={props.rejection !== ""}
             ariaLabel={"Small attachment"}
             renderContent={(renderProps) => <PageFileInputContent renderProps={renderProps} />}
@@ -18,7 +18,7 @@ export const RejectingSetterExample = (props: Props) => {
 
                 props.onRejectionChange(tooBig.length ? `${tooBig[0].name} is too big, pick again` : "");
 
-                if (tooBig.length) props.filesState[1]([]);
+                if (tooBig.length) props.files[1]([]);
             }}
         />
     );

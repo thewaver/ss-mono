@@ -2,5 +2,5 @@ import type { AccessorProps, SignalSource, TreemapNode } from "@thewaver/ss-comp
 
 export type TreemapExampleProps = AccessorProps<{
     zoomDurationMs: number;
-    branchSignal: SignalSource<TreemapNode<string>>;
+    branch: SignalSource<TreemapNode<string>>;
 }>;

@@ -10,8 +10,8 @@ export type SVGGradientsSharedProps = {
 };
 
 export type SVGGradientsControls = {
-    paintKindState: readonly [SVGGradientsPaintKind, (paintKind: SVGGradientsPaintKind) => void];
-    blurWidthState: readonly [number, (blurWidth: number) => void];
+    paintKind: readonly [SVGGradientsPaintKind, (paintKind: SVGGradientsPaintKind) => void];
+    blurWidth: readonly [number, (blurWidth: number) => void];
     colors: SVGDefsColors;
     setColor: (key: keyof SVGDefsColors, value: string) => void;
 };

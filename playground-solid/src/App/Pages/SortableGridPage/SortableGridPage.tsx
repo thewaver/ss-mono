@@ -70,7 +70,7 @@ export const SortableGridPage = () => {
             component: () => (
                 <InventoryExample
                     groupId={"pack"}
-                    itemsSignal={packSignal}
+                    items={packSignal}
                     ariaLabel={"Pack"}
                     emptyText={"Empty pack"}
                     isTurnable={true}
@@ -87,7 +87,7 @@ export const SortableGridPage = () => {
             component: () => (
                 <InventoryExample
                     groupId={"turns"}
-                    itemsSignal={turnsSignal}
+                    items={turnsSignal}
                     ariaLabel={"Bench"}
                     emptyText={"Empty bench"}
                     columns={TURNS_COLUMNS}
@@ -106,7 +106,7 @@ export const SortableGridPage = () => {
             component: () => (
                 <InventoryExample
                     groupId={"cells"}
-                    itemsSignal={cellsPackSignal}
+                    items={cellsPackSignal}
                     ariaLabel={"Pack"}
                     emptyText={"Empty pack"}
                     paint={"cells"}
@@ -124,8 +124,8 @@ export const SortableGridPage = () => {
             component: () => (
                 <PairExample
                     groupId={"pair"}
-                    packSignal={pairPackSignal}
-                    sideSignal={stashSignal}
+                    pack={pairPackSignal}
+                    side={stashSignal}
                     sideLabel={"Stash"}
                     sideEmptyText={"Empty stash"}
                 />
@@ -140,8 +140,8 @@ export const SortableGridPage = () => {
             component: () => (
                 <PairExample
                     groupId={"picky"}
-                    packSignal={pickyPackSignal}
-                    sideSignal={quiverSignal}
+                    pack={pickyPackSignal}
+                    side={quiverSignal}
                     sideLabel={"Quiver"}
                     sideEmptyText={"Arrows only"}
                     isSideNarrow={true}
@@ -159,8 +159,8 @@ export const SortableGridPage = () => {
             component: () => (
                 <PairExample
                     groupId={"locked"}
-                    packSignal={lockedPackSignal}
-                    sideSignal={lockedStashSignal}
+                    pack={lockedPackSignal}
+                    side={lockedStashSignal}
                     sideLabel={"Stash"}
                     sideEmptyText={"Empty stash"}
                     isSideLocked={() => true}
@@ -178,7 +178,7 @@ export const SortableGridPage = () => {
                         .join(", ") || "empty"
                 } — a list and a grid share one group, so an item crosses between them`,
             span: 2,
-            component: () => <LootExample groupId={"loot"} lootSignal={lootSignal} packSignal={lootPackSignal} />,
+            component: () => <LootExample groupId={"loot"} loot={lootSignal} pack={lootPackSignal} />,
             path: `${EXAMPLES_ROOT}/Loot.tsx`,
         },
         {
@@ -189,7 +189,7 @@ export const SortableGridPage = () => {
             component: () => (
                 <InventoryExample
                     groupId={"walls"}
-                    itemsSignal={walledSignal}
+                    items={walledSignal}
                     ariaLabel={"Walled pack"}
                     emptyText={"Empty pack"}
                     isTurnable={true}
@@ -206,7 +206,7 @@ export const SortableGridPage = () => {
             component: () => (
                 <InventoryExample
                     groupId={"dashboard"}
-                    itemsSignal={dashboardSignal}
+                    items={dashboardSignal}
                     ariaLabel={"Packed pack"}
                     emptyText={"Empty pack"}
                     isTurnable={true}
@@ -222,7 +222,7 @@ export const SortableGridPage = () => {
             component: () => (
                 <InventoryExample
                     groupId={"disabled"}
-                    itemsSignal={disabledSignal}
+                    items={disabledSignal}
                     ariaLabel={"Disabled pack"}
                     emptyText={"Empty pack"}
                     isDisabled={true}

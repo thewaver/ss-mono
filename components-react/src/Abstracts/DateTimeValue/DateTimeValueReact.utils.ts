@@ -13,13 +13,13 @@ export namespace DateTimeValueReactUtils {
      * flapping.
      *
      * @param valueState The whole value, and how to change it.
-     * @returns `dateState` and `timeState`, each a `[value, setValue]`. Either can be set to `undefined`, which leaves
+     * @returns `date` and `time`, each a `[value, setValue]`. Either can be set to `undefined`, which leaves
      * the whole value `undefined` until both halves are filled in again.
      */
     export const useSplit = (
         valueState: readonly [DateTimeValue | undefined, (value: DateTimeValue | undefined) => void],
     ) => {
-        const { firstState, secondState } = SignalMirrorReactUtils.useSplit<DateTimeValue, DateValue, TimeValue>(
+        const { first: firstState, second: secondState } = SignalMirrorReactUtils.useSplit<DateTimeValue, DateValue, TimeValue>(
             valueState,
             {
                 compose: (date, time) => DateTimeValueUtils.of(date, time),
@@ -28,6 +28,6 @@ export namespace DateTimeValueReactUtils {
             },
         );
 
-        return { dateState: firstState, timeState: secondState };
+        return { date: firstState, time: secondState };
     };
 }

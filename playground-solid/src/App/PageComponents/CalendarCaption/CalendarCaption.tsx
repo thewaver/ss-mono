@@ -29,7 +29,7 @@ export const PageCalendarCaption = (props: PageCalendarCaptionProps) => {
     let restorePoint: DateValue | undefined;
     let pendingYear: number | undefined;
 
-    const getMonth = () => props.monthSignal[0]();
+    const getMonth = () => props.month[0]();
 
     const getMonthNames = createMemo(() => DateValueUtils.getMonthNames(getMonth(), access(props.locale)));
 
@@ -46,11 +46,11 @@ export const PageCalendarCaption = (props: PageCalendarCaptionProps) => {
     };
 
     const jumpTo = (value: { year?: number; month?: number }) => {
-        props.monthSignal[1]((prev) => prev.set({ ...value, day: 1 }));
+        props.month[1]((prev) => prev.set({ ...value, day: 1 }));
     };
 
     const page = (direction: 1 | -1) => {
-        props.monthSignal[1]((prev) => DateValueUtils.addMonths(prev, direction * MONTH_STEP));
+        props.month[1]((prev) => DateValueUtils.addMonths(prev, direction * MONTH_STEP));
     };
 
     const writeYear = FunctionUtils.debounce((year: number) => {
@@ -92,7 +92,7 @@ export const PageCalendarCaption = (props: PageCalendarCaptionProps) => {
         setIsRestoringFocus(true);
         setIsEditing(false);
 
-        if (restorePoint) props.monthSignal[1](() => restorePoint!);
+        if (restorePoint) props.month[1](() => restorePoint!);
     };
 
     createEffect(() => {

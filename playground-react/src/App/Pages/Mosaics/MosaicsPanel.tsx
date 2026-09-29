@@ -24,25 +24,25 @@ export const PageMosaicsPanel = (props: Props) => {
                 }
             >
                 <PageNumberField
-                    value={controls.itemCountState[0]}
+                    value={controls.itemCount[0]}
                     min={MosaicKnobs.MIN_ITEM_COUNT}
                     max={MosaicKnobs.MAX_ITEM_COUNT}
                     step={MosaicKnobs.ITEM_COUNT_STEP}
                     width={FIELD_WIDTH}
                     ariaLabel={"Items"}
-                    onInput={controls.itemCountState[1]}
+                    onInput={controls.itemCount[1]}
                 />
             </PageProp>
 
             <PageProp itemKey={"gap"} label={"Gap (px)"} hint={"The space left between tiles."}>
                 <PageNumberField
-                    value={controls.gapState[0]}
+                    value={controls.gap[0]}
                     min={MosaicKnobs.MIN_GAP}
                     max={MosaicKnobs.MAX_GAP}
                     step={MosaicKnobs.GAP_STEP}
                     width={FIELD_WIDTH}
                     ariaLabel={"Gap in pixels"}
-                    onInput={controls.gapState[1]}
+                    onInput={controls.gap[1]}
                 />
             </PageProp>
 
@@ -52,11 +52,11 @@ export const PageMosaicsPanel = (props: Props) => {
                 hint={"Which side the mosaic takes as given: it fills that one and works the other out from the tiles."}
             >
                 <PageSelectField
-                    value={controls.sizeAnchorState[0]}
+                    value={controls.sizeAnchor[0]}
                     values={MOSAIC_SIZE_ANCHORS}
                     width={FIELD_WIDTH}
                     ariaLabel={"Fixed side"}
-                    onChange={controls.sizeAnchorState[1]}
+                    onChange={controls.sizeAnchor[1]}
                 />
             </PageProp>
 
@@ -68,13 +68,13 @@ export const PageMosaicsPanel = (props: Props) => {
                 }
             >
                 <PageNumberField
-                    value={controls.transitionDurationMsState[0]}
+                    value={controls.transitionDurationMs[0]}
                     min={MosaicKnobs.MIN_DURATION_MS}
                     max={MosaicKnobs.MAX_DURATION_MS}
                     step={MosaicKnobs.DURATION_STEP_MS}
                     width={FIELD_WIDTH}
                     ariaLabel={"Glide duration in milliseconds"}
-                    onInput={controls.transitionDurationMsState[1]}
+                    onInput={controls.transitionDurationMs[1]}
                 />
             </PageProp>
         </PagePropsPanel>

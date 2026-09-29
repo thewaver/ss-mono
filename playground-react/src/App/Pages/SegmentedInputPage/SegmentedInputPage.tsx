@@ -21,7 +21,7 @@ export const SegmentedInputPage = () => {
             name: "One-time code",
             readout: () =>
                 `value: "${oneTimeCodeState[0]}" — ${ONE_TIME_CODE_LENGTH} digits in one field; press a cell to put the caret there`,
-            component: () => <OneTimeCodeExample valueState={oneTimeCodeState} />,
+            component: () => <OneTimeCodeExample value={oneTimeCodeState} />,
             path: `${EXAMPLES_ROOT}/OneTimeCode.tsx`,
         },
         {
@@ -29,7 +29,7 @@ export const SegmentedInputPage = () => {
             name: "Letters and digits",
             readout: () =>
                 `value: "${recoveryCodeState[0]}" — ${RECOVERY_CODE_LENGTH} cells taking letters and digits, anything else refused`,
-            component: () => <RecoveryCodeExample valueState={recoveryCodeState} />,
+            component: () => <RecoveryCodeExample value={recoveryCodeState} />,
             path: `${EXAMPLES_ROOT}/RecoveryCode.tsx`,
         },
     ];

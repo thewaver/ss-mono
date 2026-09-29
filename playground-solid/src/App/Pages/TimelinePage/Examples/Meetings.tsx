@@ -54,7 +54,7 @@ export const MeetingsExample = (props: Props) => {
                     isPannable={props.isPannable}
                     isZoomable={props.isZoomable}
                     isDisabled={props.isDisabled}
-                    viewSignal={props.viewSignal}
+                    view={props.view}
                     markers={() => [getNow()]}
                     ariaLabel={"Today's meetings"}
                     computeSpan={(meeting) => ({ start: meeting.from, end: meeting.to })}

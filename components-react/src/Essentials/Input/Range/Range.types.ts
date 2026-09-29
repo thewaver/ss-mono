@@ -49,12 +49,12 @@ export type RangeProps = Omit<InteractionWrapperProps<RangeRenderProps>, "render
     RangeCbs &
     Pick<InteractionControlProps<RangeRenderProps>, "id" | "renderContent"> &
     RangeState & {
-        /** The value, and how to change it. It is the only thing that moves the thumb. Give this or `rangeState`. */
-        valueState?: readonly [number, (value: number) => void];
+        /** The value, and how to change it. It is the only thing that moves the thumb. Give this or `range`. */
+        value?: readonly [number, (value: number) => void];
         /**
          * The two ends of the range, and how to change them. It is the only thing that moves them. A pair's thumbs
          * take `<id>-start` and `<id>-end` as their ids, so a label can name each one, where a single thumb keeps the
-         * id as given. Give this or `valueState`.
+         * id as given. Give this or `value`.
          */
-        rangeState?: readonly [RangeValues, (range: RangeValues) => void];
+        range?: readonly [RangeValues, (range: RangeValues) => void];
     };

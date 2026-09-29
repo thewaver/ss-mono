@@ -5,8 +5,8 @@ export type PatchBoardExampleProps = {
     socketSize: number;
     isLocked: boolean;
     isDisabled: boolean;
-    nodesState: readonly [PatchBoardNode<PatchDevice>[], (nodes: PatchBoardNode<PatchDevice>[]) => void];
-    linksState: readonly [PatchBoardLink[], (links: PatchBoardLink[]) => void];
+    nodes: readonly [PatchBoardNode<PatchDevice>[], (nodes: PatchBoardNode<PatchDevice>[]) => void];
+    links: readonly [PatchBoardLink[], (links: PatchBoardLink[]) => void];
     onLink: (link: PatchBoardLink) => void;
     onUnlink: (link: PatchBoardLink) => void;
     onMove: (nodeKey: string) => void;

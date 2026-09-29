@@ -19,6 +19,6 @@ export type FileInputProps = Omit<InteractionWrapperProps<FileInputRenderProps>,
             Pick<InteractionControlProps<FileInputRenderProps>, "id" | "renderContent"> &
             FileInputState & {
                 /** The chosen files. It is the only thing that changes them. */
-                filesSignal: SignalSource<File[]>;
+                files: SignalSource<File[]>;
             }
     >;

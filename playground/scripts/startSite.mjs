@@ -3,40 +3,32 @@ import { fileURLToPath } from "node:url";
 
 const REPO_ROOT = fileURLToPath(new URL("../..", import.meta.url));
 const VITE_BIN = fileURLToPath(new URL("../../node_modules/vite/bin/vite.js", import.meta.url));
-const SOLID_PORT = "8082";
-const REACT_PORT = "8083";
+const FRAMEWORK_PORTS = { solid: "8082", react: "8083", vue: "8084", svelte: "8085" };
+const PLAYGROUND_URLS = JSON.stringify(
+    Object.fromEntries(Object.keys(FRAMEWORK_PORTS).map((framework) => [framework, `/${framework}/`])),
+);
 
 const servers = [
-    {
-        name: "solid",
+    ...Object.entries(FRAMEWORK_PORTS).map(([framework, port]) => ({
         args: [
             "--config",
-            "playground-solid/vite.config.ts",
+            `playground-${framework}/vite.config.ts`,
             "--base",
-            "/solid/",
+            `/${framework}/`,
             "--port",
-            SOLID_PORT,
+            port,
             "--strictPort",
         ],
-        env: { VITE_OTHER_PLAYGROUND_URL: "/react/" },
-    },
+        env: { VITE_PLAYGROUND_URLS: PLAYGROUND_URLS },
+    })),
     {
-        name: "react",
-        args: [
-            "--config",
-            "playground-react/vite.config.ts",
-            "--base",
-            "/react/",
-            "--port",
-            REACT_PORT,
-            "--strictPort",
-        ],
-        env: { VITE_OTHER_PLAYGROUND_URL: "/solid/" },
-    },
-    {
-        name: "landing",
         args: ["--config", "playground/landing/vite.config.ts"],
-        env: { PLAYGROUND_SOLID_PORT: SOLID_PORT, PLAYGROUND_REACT_PORT: REACT_PORT },
+        env: {
+            PLAYGROUND_SOLID_PORT: FRAMEWORK_PORTS.solid,
+            PLAYGROUND_REACT_PORT: FRAMEWORK_PORTS.react,
+            PLAYGROUND_VUE_PORT: FRAMEWORK_PORTS.vue,
+            PLAYGROUND_SVELTE_PORT: FRAMEWORK_PORTS.svelte,
+        },
     },
 ];
 

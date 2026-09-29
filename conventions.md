@@ -221,6 +221,20 @@ header builtins, where the case to detect is a sortable or reorderable column wi
 
 ## API naming
 
+### A prop is named the same in every framework
+
+Stated by the user as the guideline for whenever a name is in doubt: props are kept as consistent and as
+framework-agnostic as they can be. A consumer moving between the Solid, React, Vue and Svelte packages, and a
+reader comparing one Playground with another, should meet one name for one thing. So a name never carries
+the framework's mechanism: two-way state is `value`, not `valueSignal` or `valueState`, and what differs is
+only how each framework hands it in — the signal pair in Solid, the `[value, setValue]` pair in React,
+`v-model:value` in Vue and `bind:value` in Svelte. A `render*` callback keeps its name as a Vue slot and as a
+Svelte snippet. `ref` stays `ref`.
+
+Where a framework makes the same name impossible, the fallback is the framework's own way of reaching the
+same name, rather than a new name — Vue reserves `ref`, so a Vue consumer reaches the element through the
+component's `$el` rather than through a prop called something else.
+
 ### When a function grows a sibling, both names get the distinguishing word
 
 Stated by the user when `trackSwipe` grew a second form that claims both axes: the cheap move is to add
@@ -302,7 +316,7 @@ something no consumer can satisfy. Both members are named, so both arms answer `
 key filter depends on `IsSkippable<T>`, which cannot resolve while `T` is unbound, so the key is
 silently dropped and every use site fails with "property does not exist". Declare generic props by hand
 beside the accessorized block — `RadioProps<T>` writes `getValue: Accessor<T>`, `RadioGroupProps<T>`
-keeps `valueSignal: Signal<T>` outside its `AccessorProps<{...}>`. The type compiles and the prop just
+keeps `value: SignalSource<T>` outside its `AccessorProps<{...}>`. The type compiles and the prop just
 vanishes, so check for it whenever a generic component is added.
 
 **It also cannot express an optional prop whose own value may be `undefined`, and a ref is exactly
@@ -662,7 +676,7 @@ was built before this rule; read them as `orientation` and `horizontal`/`vertica
 | Factories / predicates / transforms with args | `compute*`                    | `computePoints`, `computeFillDefs`, `computeIsDisabled`, `computeClassNames`, `computeSVGDefs` |
 | Events / lifecycle                            | `on*`                         | `onShow`, `onHide`, `onClick`; **`onMount` for controller handoff**                            |
 | JSX producers                                 | `render*`                     | `renderContent` / `renderTab`; nested defs use `renderDefsElement`                             |
-| Two-way state the component also writes       | `*Signal` (plain, unprefixed) | `visibilitySignal`, `checkedSignal`, `valueSignal`                                             |
+| Two-way state the component also writes       | none (the bare stem)          | `visibility`, `checked`, `value`                                                               |
 
 One `compute*` prefix for all factories — reactivity is carried by **argument shape** (`size` vs
 `getSize`), not by a second prefix.
@@ -670,25 +684,30 @@ One `compute*` prefix for all factories — reactivity is carried by **argument 
 ### Signal tuples for two-way state
 
 State the component both reads _and_ writes arrives as the whole `createSignal` pair, not an accessor
-plus a callback: `<Modal visibilitySignal={modalVisibility} />`. `AccessorProps` skips it like a
+plus a callback: `<Modal visibility={modalVisibility} />`. `AccessorProps` skips it like a
 function, so the prop keeps its plain name. One variable, both sides write, owner and component cannot
 disagree, and there is no handler to forget. Callers that only open the thing drop the getter:
 `const [, setModalOpen] = modalVisibility`.
 
+**The prop is the bare stem, with no `Signal` suffix** — `visibility`, `checked`, `value`, `hsv` — because
+a name never carries the framework's mechanism (_"A prop is named the same in every framework"_): React's
+`[value, setValue]` pair, Vue's `v-model:value` and Svelte's `bind:value` all arrive under the same name.
+The type says it is a pair; the name says what it holds.
+
 Use it only where the component genuinely writes. One-way data stays `get*`.
 
-**A `*Signal` prop takes a getter and a plain setter as readily as a `Signal`, and that removes the
+**A two-way prop takes a getter and a plain setter as readily as a `Signal`, and that removes the
 cost this entry used to accept.** The cost was that the owner had to _have_ a signal, so state living
 in a memo, a store field, a route param or a pair of callbacks had to be wrapped in a mirror before a
 control would take it — one indirection, written once per consumer wrapper. The prop type is
 `SignalSource<T>`, which is `Signal<T> | SignalPair<T>` where `SignalPair<T>` is
 `[get: () => T, set: (value: T) => void]`, so a consumer holding the two halves passes them straight in:
-`valueSignal={[() => access(props.value), props.onInput]}`.
+`value={[() => access(props.value), props.onInput]}`.
 
 **The two forms differ in exactly one way, and the control absorbs it.** A real `Setter<T>` also accepts
 an updater function and resolves it against the current value; a plain setter takes a value. So a control
 declaring `SignalSource<T>` cannot call `[1]` with an updater until it has normalized the prop, and
-`accessSignal(() => props.xSignal)` beside `access` in `propUtils` is that normalization: it returns a
+`accessSignal(() => props.x)` beside `access` in `propUtils` is that normalization: it returns a
 real `Signal<T>` that reads through the getter, resolves an updater against the untracked current value,
 skips a write that would not change anything, and calls the plain setter. **It takes an accessor of the
 prop rather than the prop**, so the returned pair stays correct if the consumer swaps the source, and it
@@ -702,7 +721,7 @@ inner signal is for. `createOptional` and `createPassThrough` are both `accessSi
 family has one definition of how a pair becomes a signal.
 
 **A signal handed _out_ stays a real `Signal`.** Where the library gives a consumer a signal to drive — a
-picker's `hsvSignal`, a calendar's `monthSignal` inside a render callback — widening it would take the
+picker's `hsv`, a calendar's `month` inside a render callback — widening it would take the
 updater form away from the consumer for nothing. The widening is on what a control _accepts_.
 
 ### Asking for a state a thing is already in does nothing
@@ -1379,10 +1398,10 @@ above is not read as absolute.
 
 Settled by the user, closing the `openSignal` question items 3, 4 and 11 of `backlog.md`
 were waiting on. `Select`, `MultiSelect`, `Menu`, `ColorInput` and `DatePicker` each take an optional
-`visibilitySignal`, which is `Modal`'s prop under `Modal`'s name and rules.
+`visibility`, which is `Modal`'s prop under `Modal`'s name and rules.
 
-**One variable, both sides write** — the `*Signal` convention rather than a new idea, and `Modal` already
-proved it on this kind of state: it reads `visibilitySignal` and writes `false` when it dismisses itself. A
+**One variable, both sides write** — the two-way signal convention rather than a new idea, and `Modal` already
+proved it on this kind of state: it reads `visibility` and writes `false` when it dismisses itself. A
 popup opens and closes for its own reasons, so a one-way "here is a boolean, obey it" prop would fight the
 component. A consumer with no signal uses `SignalMirror`.
 
@@ -1421,10 +1440,10 @@ means `Menu` accepting an anchor and an opener, which is what `backlog.md` item 
 Settled by the user, applying the argument that had already retired the controller shape for
 `Toasts` and `Calendar` to the components that still carried one.
 
-**Whether a thing is playing is state, so it arrives as `playbackSignal`.** `CellAnimation` and
+**Whether a thing is playing is state, so it arrives as `playback`.** `CellAnimation` and
 `ScanlineAnimation` had `start()` / `stop()` on a handle given out at mount, both literally
 `setIsPlaying(true/false)` over a private signal; `AudioSwitcher` had `play()` / `pause()`, the same state
-behind a pair of fades. All three now take an optional `playbackSignal` through `SignalMirrorUtils.createOptional`.
+behind a pair of fades. All three now take an optional `playback` through `SignalMirrorUtils.createOptional`.
 
 **What that buys is visible in the Playground rather than in the API.** Both animation pages used to collect a
 controller per mounted instance into an array and call `start()` on every one when the stress-test modal
@@ -1450,12 +1469,12 @@ intermittently rather than outright, which is worse. The frame discipline belong
 owns the animation.
 
 **So the boundary is: can a consumer meaningfully read it?** Playing, open, selected, expanded — state, and a
-`*Signal`. Restart, rewind, re-measure — commands, and an `onMount` handle. Two of the four components needed
+two-way signal. Restart, rewind, re-measure — commands, and an `onMount` handle. Two of the four components needed
 both, so the controller shape is not a legacy to be finished off.
 
 ### A popup's anchor is also its dismiss root, which is what lets a consumer's own button toggle it
 
-Settled, finishing what `visibilitySignal` started. `Menu` takes an optional `getAnchorRef` and
+Settled, finishing what `visibility` started. `Menu` takes an optional `getAnchorRef` and
 positions its popup against that element instead of its own trigger.
 
 **The positioning is the smaller half; the dismissal is the point.** `Popover` builds its dismiss roots as

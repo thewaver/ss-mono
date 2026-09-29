@@ -12,7 +12,7 @@ type Props = RangeExampleProps;
 
 export const SteppedExample = (props: Props) => (
     <Range
-        valueSignal={props.valueSignal}
+        value={props.value}
         ariaLabel={"Difficulty"}
         min={() => MIN}
         max={() => MAX}

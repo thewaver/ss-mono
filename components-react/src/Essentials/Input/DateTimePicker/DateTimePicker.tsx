@@ -6,7 +6,7 @@ import { TimePicker } from "../TimePicker/TimePicker";
 import type { DateTimePickerProps } from "./DateTimePicker.types";
 
 export const DateTimePicker = (props: DateTimePickerProps) => {
-    const { dateState, timeState } = DateTimeValueReactUtils.useSplit(props.valueState);
+    const { date: dateState, time: timeState } = DateTimeValueReactUtils.useSplit(props.value);
 
     const { minValue, maxValue } = props;
 
@@ -14,10 +14,10 @@ export const DateTimePicker = (props: DateTimePickerProps) => {
         <div className={DateTimePickerStyles.dateTimePickerRoot}>
             <DatePicker
                 {...props}
-                valueState={dateState}
+                value={dateState}
                 id={props.id && `${props.id}-date`}
                 name={props.name && `${props.name}-date`}
-                visibilityState={props.dateVisibilityState}
+                visibility={props.dateVisibility}
                 ariaLabel={props.dateLabel}
                 minValue={minValue?.date}
                 maxValue={maxValue?.date}
@@ -27,10 +27,10 @@ export const DateTimePicker = (props: DateTimePickerProps) => {
 
             <TimePicker
                 {...props}
-                valueState={timeState}
+                value={timeState}
                 id={props.id && `${props.id}-time`}
                 name={props.name && `${props.name}-time`}
-                visibilityState={props.timeVisibilityState}
+                visibility={props.timeVisibility}
                 ariaLabel={props.timeLabel}
                 minValue={minValue && DateTimePickerUtils.computeMinTime(dateState[0], minValue)}
                 maxValue={maxValue && DateTimePickerUtils.computeMaxTime(dateState[0], maxValue)}

@@ -103,8 +103,8 @@ export const TrackedGradientsPage = () => {
                 <PagePropsPanel scope={"global"}>
                     <PageSVGGradientsProps
                         controls={{
-                            paintKindState,
-                            blurWidthState,
+                            paintKind: paintKindState,
+                            blurWidth: blurWidthState,
                             colors,
                             setColor: (key, value) => setColors((previous) => ({ ...previous, [key]: value })),
                         }}

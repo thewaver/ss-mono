@@ -65,7 +65,7 @@ const SortableItemSlot = (props: SortableItemSlotProps) => {
 };
 
 export const Sortable = <T,>(props: SortableProps<T>) => {
-    const itemsSignal = accessSignal(() => props.itemsSignal);
+    const itemsSignal = accessSignal(() => props.items);
 
     const listId = createUniqueId();
     const hintId = createUniqueId();

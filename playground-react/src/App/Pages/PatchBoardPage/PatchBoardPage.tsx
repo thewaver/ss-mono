@@ -62,7 +62,7 @@ export const PatchBoardPage = () => {
     const zoomNodesState = useState(CHAIN_NODES);
     const zoomLinksState = useState(CHAIN_LINKS);
 
-    const commonProps: Omit<PatchBoardExampleProps, "nodesState" | "linksState" | "onLink" | "onUnlink" | "onMove"> = {
+    const commonProps: Omit<PatchBoardExampleProps, "nodes" | "links" | "onLink" | "onUnlink" | "onMove"> = {
         socketSize,
         isLocked,
         isDisabled,
@@ -79,8 +79,8 @@ export const PatchBoardPage = () => {
                 <PageMeasureBox width={BOARD_WIDTH}>
                     <ChainExample
                         {...commonProps}
-                        nodesState={chainNodesState}
-                        linksState={chainLinksState}
+                        nodes={chainNodesState}
+                        links={chainLinksState}
                         onLink={(link) => setChainAction(`connected ${getLinkWords(link)}`)}
                         onUnlink={(link) => setChainAction(`unplugged ${getLinkWords(link)}`)}
                         onMove={(nodeKey) => setChainAction(`moved ${nodeKey}`)}
@@ -99,8 +99,8 @@ export const PatchBoardPage = () => {
                 <PageMeasureBox width={BOARD_WIDTH}>
                     <MixerExample
                         {...commonProps}
-                        nodesState={mixerNodesState}
-                        linksState={mixerLinksState}
+                        nodes={mixerNodesState}
+                        links={mixerLinksState}
                         onLink={(link) => setMixerAction(`connected ${getLinkWords(link)}`)}
                         onUnlink={(link) => setMixerAction(`unplugged ${getLinkWords(link)}`)}
                         onMove={(nodeKey) => setMixerAction(`moved ${nodeKey}`)}
@@ -119,8 +119,8 @@ export const PatchBoardPage = () => {
                 <PageMeasureBox>
                     <RackExample
                         {...commonProps}
-                        nodesState={rackNodesState}
-                        linksState={rackLinksState}
+                        nodes={rackNodesState}
+                        links={rackLinksState}
                         onLink={(link) => setRackAction(`connected ${getLinkWords(link)}`)}
                         onUnlink={(link) => setRackAction(`unplugged ${getLinkWords(link)}`)}
                         onMove={(nodeKey) => setRackAction(`moved ${nodeKey}`)}
@@ -139,8 +139,8 @@ export const PatchBoardPage = () => {
                 <PageMeasureBox>
                     <PanExample
                         {...commonProps}
-                        nodesState={panNodesState}
-                        linksState={panLinksState}
+                        nodes={panNodesState}
+                        links={panLinksState}
                         onLink={(link) => setPanAction(`connected ${getLinkWords(link)}`)}
                         onUnlink={(link) => setPanAction(`unplugged ${getLinkWords(link)}`)}
                         onMove={(nodeKey) => setPanAction(`moved ${nodeKey}`)}
@@ -159,8 +159,8 @@ export const PatchBoardPage = () => {
                 <ZoomExample
                     {...commonProps}
                     zoom={zoom}
-                    nodesState={zoomNodesState}
-                    linksState={zoomLinksState}
+                    nodes={zoomNodesState}
+                    links={zoomLinksState}
                     onZoomChange={(next) => setZoom(MathUtils.clamp(next, MIN_ZOOM, MAX_ZOOM))}
                     onLink={(link) => setZoomAction(`connected ${getLinkWords(link)}`)}
                     onUnlink={(link) => setZoomAction(`unplugged ${getLinkWords(link)}`)}

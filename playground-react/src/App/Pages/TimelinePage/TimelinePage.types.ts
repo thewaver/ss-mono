@@ -7,11 +7,11 @@ export type TimelineExampleProps = {
     isPannable: boolean;
     isZoomable: boolean;
     isDisabled: boolean;
-    viewState: readonly [TimelineSpan, (view: TimelineSpan) => void];
+    view: readonly [TimelineSpan, (view: TimelineSpan) => void];
     onPick: (name: string) => void;
 };
 
 export type TimelineTrimExampleProps = TimelineExampleProps & {
-    clipsState: readonly [Clip[], Dispatch<SetStateAction<Clip[]>>];
+    clips: readonly [Clip[], Dispatch<SetStateAction<Clip[]>>];
     onTrim: (clip: Clip) => void;
 };

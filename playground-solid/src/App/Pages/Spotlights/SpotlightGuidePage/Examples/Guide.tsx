@@ -44,7 +44,7 @@ export const GuideExample = (props: Props) => {
                 renderContent={(getFlags) => <PageButtonContent flags={getFlags}>Take the tour</PageButtonContent>}
                 onClick={async () => {
                     props.onStart();
-                    props.visibilitySignal[1](true);
+                    props.visibility[1](true);
                 }}
             />
 
@@ -55,7 +55,7 @@ export const GuideExample = (props: Props) => {
                 announcement={() =>
                     `Step ${access(props.step) + 1} of ${TOUR_STEPS.length}. ${TOUR_STEPS[access(props.step)].title}.`
                 }
-                visibilitySignal={props.visibilitySignal}
+                visibility={props.visibility}
                 renderHighlight={renderHighlight}
                 renderOverlay={renderOverlay}
                 renderPopup={(getVisibilityTarget, getTransitionDurationMs) => (

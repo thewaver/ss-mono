@@ -14,8 +14,8 @@ export type TableSelectionMode = SelectionMode;
 
 export type TableAnnouncements = CarrierAnnouncements & {
     /**
-     * Describes every reorderable column header while nothing is picked up, telling a keyboard user that Enter picks
-     * it up. Nothing else says the header can be moved.
+     * Describes every reorderable column header while nothing is picked up, telling a keyboard user that Shift with
+     * the left or right arrow moves it. Nothing else says the header can be moved.
      */
     restingKeyHint: string;
     /** Tells a keyboard user which keys drop and cancel a column that has been picked up. */

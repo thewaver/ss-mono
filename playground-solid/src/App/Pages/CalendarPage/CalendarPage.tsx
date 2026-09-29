@@ -60,7 +60,7 @@ export const CalendarPage = () => {
             name: "Default",
             readout: () => `value: ${describe(defaultValue[0]())} — month: ${describe(defaultMonth[0]())}`,
             component: () => (
-                <DefaultExample valueSignal={defaultValue} monthSignal={defaultMonth} weekStartsOn={getWeekStartsOn} />
+                <DefaultExample value={defaultValue} month={defaultMonth} weekStartsOn={getWeekStartsOn} />
             ),
             path: `${EXAMPLES_ROOT}/Default.tsx`,
         },
@@ -70,7 +70,7 @@ export const CalendarPage = () => {
             readout: () =>
                 `min ${describe(MIN_DATE)}, max ${describe(MAX_DATE)} — value: ${describe(rangedValue[0]())}`,
             component: () => (
-                <BoundedExample valueSignal={rangedValue} monthSignal={rangedMonth} weekStartsOn={getWeekStartsOn} />
+                <BoundedExample value={rangedValue} month={rangedMonth} weekStartsOn={getWeekStartsOn} />
             ),
             path: `${EXAMPLES_ROOT}/Bounded.tsx`,
         },
@@ -81,8 +81,8 @@ export const CalendarPage = () => {
                 `week starts on ${WEEK_START_LABELS[getWeekStartsOn()]} — value: ${describe(weekdaysValue[0]())}`,
             component: () => (
                 <WeekdaysExample
-                    valueSignal={weekdaysValue}
-                    monthSignal={weekdaysMonth}
+                    value={weekdaysValue}
+                    month={weekdaysMonth}
                     weekStartsOn={getWeekStartsOn}
                 />
             ),
@@ -95,8 +95,8 @@ export const CalendarPage = () => {
                 `value: ${describe(rightToLeftValue[0]())} — the box around the calendar sets dir="rtl", so each week runs from the right and the right arrow moves to the day before`,
             component: () => (
                 <RightToLeftExample
-                    valueSignal={rightToLeftValue}
-                    monthSignal={rightToLeftMonth}
+                    value={rightToLeftValue}
+                    month={rightToLeftMonth}
                     weekStartsOn={getWeekStartsOn}
                 />
             ),
@@ -107,7 +107,7 @@ export const CalendarPage = () => {
             name: "Month picker",
             readout: () =>
                 `value: ${describe(monthPickerValue[0]())} — precision="month": the grid holds the year's months, a pick sets the first of the month, and the page keys step a year`,
-            component: () => <MonthPickerExample valueSignal={monthPickerValue} monthSignal={monthPickerPage} />,
+            component: () => <MonthPickerExample value={monthPickerValue} month={monthPickerPage} />,
             path: `${EXAMPLES_ROOT}/MonthPicker.tsx`,
         },
         {
@@ -115,7 +115,7 @@ export const CalendarPage = () => {
             name: "Year picker",
             readout: () =>
                 `value: ${describe(yearPickerValue[0]())} — precision="year": twelve years to a page, bounded to ${MIN_YEAR.year}–${MAX_YEAR.year}, and a pick sets the first day of the year`,
-            component: () => <YearPickerExample valueSignal={yearPickerValue} monthSignal={yearPickerPage} />,
+            component: () => <YearPickerExample value={yearPickerValue} month={yearPickerPage} />,
             path: `${EXAMPLES_ROOT}/YearPicker.tsx`,
         },
     ]);

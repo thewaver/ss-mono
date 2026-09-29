@@ -5,12 +5,12 @@ export type TimelineExampleProps = AccessorProps<{
     isPannable: boolean;
     isZoomable: boolean;
     isDisabled: boolean;
-    viewSignal: SignalSource<TimelineSpan>;
+    view: SignalSource<TimelineSpan>;
     onPick: (name: string) => void;
 }>;
 
 export type TimelineTrimExampleProps = TimelineExampleProps &
     AccessorProps<{
-        clipsSignal: SignalSource<Clip[]>;
+        clips: SignalSource<Clip[]>;
         onTrim: (clip: Clip) => void;
     }>;

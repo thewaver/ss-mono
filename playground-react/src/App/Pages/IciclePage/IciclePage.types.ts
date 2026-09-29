@@ -3,5 +3,5 @@ import type { IcicleNode } from "@thewaver/ss-components-react";
 export type IcicleExampleProps = {
     columnCount: number;
     zoomDurationMs: number;
-    focusState: readonly [IcicleNode<string>, (value: IcicleNode<string>) => void];
+    focus: readonly [IcicleNode<string>, (value: IcicleNode<string>) => void];
 };

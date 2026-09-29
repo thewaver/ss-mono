@@ -29,7 +29,7 @@ export const DateInputPage = () => {
             name: "Typed only",
             readout: () =>
                 `value: ${describe(typedState[0])} — a half-typed or impossible date leaves this value alone`,
-            component: () => <TypedExample valueState={typedState} calendar={calendarId} ariaLabel={"Start date"} />,
+            component: () => <TypedExample value={typedState} calendar={calendarId} ariaLabel={"Start date"} />,
             path: `${EXAMPLES_ROOT}/Typed.tsx`,
         },
         {
@@ -39,7 +39,7 @@ export const DateInputPage = () => {
                 `value: ${describe(localeState[0])} — dd/mm/yyyy, and the separators are the mask's rather than yours to type`,
             component: () => (
                 <TypedExample
-                    valueState={localeState}
+                    value={localeState}
                     calendar={calendarId}
                     format={"day-month-year"}
                     ariaLabel={"Day-first date"}
@@ -52,7 +52,7 @@ export const DateInputPage = () => {
             name: "Before the common era",
             readout: () =>
                 `value: ${describe(eraState[0])} — the era is a control in the leading slot, offering whatever the calendar reports`,
-            component: () => <TypedExample valueState={eraState} calendar={calendarId} ariaLabel={"Historical date"} />,
+            component: () => <TypedExample value={eraState} calendar={calendarId} ariaLabel={"Historical date"} />,
             path: `${EXAMPLES_ROOT}/Typed.tsx`,
         },
     ];

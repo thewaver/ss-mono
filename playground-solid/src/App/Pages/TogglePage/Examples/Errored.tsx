@@ -7,9 +7,9 @@ type Props = ToggleExampleProps;
 
 export const ErroredExample = (props: Props) => (
     <Toggle
-        checkedSignal={props.checkedSignal}
+        checked={props.checked}
         ariaLabel={"Errored toggle"}
-        hasError={() => !props.checkedSignal[0]()}
+        hasError={() => !props.checked[0]()}
         renderContent={(getFlags) => <PageToggleContent flags={getFlags} />}
     />
 );

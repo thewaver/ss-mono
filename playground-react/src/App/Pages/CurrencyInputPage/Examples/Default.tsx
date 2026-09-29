@@ -18,7 +18,7 @@ type Props = CurrencyInputExampleProps & { ariaLabel?: string };
 export const DefaultExample = (props: Props) => {
     return (
         <CurrencyInput
-            valueState={props.valueState}
+            value={props.value}
             ariaLabel={props.ariaLabel ?? "Price"}
             padding={FIELD_STEPPER_PADDING}
             gap={FIELD_GAP}

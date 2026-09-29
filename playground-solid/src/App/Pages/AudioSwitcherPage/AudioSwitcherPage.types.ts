@@ -6,5 +6,5 @@ export type AudioSwitcherExampleProps = AccessorProps<{
     src: string;
     crossfadeMs: number;
     volume: number;
-    playbackSignal: Signal<boolean>;
+    playback: Signal<boolean>;
 }>;

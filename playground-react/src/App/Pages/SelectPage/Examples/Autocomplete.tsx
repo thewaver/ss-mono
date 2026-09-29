@@ -9,16 +9,16 @@ import { PLACEHOLDER, QUERY_PADDING } from "../SelectPage.const";
 import type { Airport } from "../SelectPage.types";
 
 type Props = {
-    valueState: readonly [Airport | undefined, (value: Airport | undefined) => void];
-    queryState: readonly [string, (query: string) => void];
+    value: readonly [Airport | undefined, (value: Airport | undefined) => void];
+    query: readonly [string, (query: string) => void];
     options: SelectOption<Airport>[];
 };
 
 export const AutocompleteExample = (props: Props) => {
     return (
         <Select
-            valueState={props.valueState}
-            queryState={props.queryState}
+            value={props.value}
+            query={props.query}
             options={props.options}
             ariaLabel={"Airport"}
             padding={QUERY_PADDING}

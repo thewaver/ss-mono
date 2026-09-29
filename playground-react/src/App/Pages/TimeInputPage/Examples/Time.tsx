@@ -26,7 +26,7 @@ type Props = TimeExampleProps & {
 export const TimeExample = (props: Props) => {
     return (
         <TimeInput
-            valueState={props.valueState}
+            value={props.value}
             isTwelveHour={props.isTwelveHour}
             hasSeconds={props.hasSeconds}
             minValue={props.minValue}

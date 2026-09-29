@@ -10,9 +10,9 @@ type Props = ToggleExampleProps;
 
 export const DecoratedExample = (props: Props) => (
     <Toggle
-        checkedState={props.checkedState}
+        checked={props.checked}
         ariaLabel={"Decorated toggle"}
-        isPressed={props.checkedState[0]}
+        isPressed={props.checked[0]}
         renderContent={(flags) => <PageToggleContent flags={flags} />}
         renderDecoration={(flags) => (
             <Corners

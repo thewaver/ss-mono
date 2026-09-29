@@ -32,7 +32,7 @@ export type DatePickerProps = Omit<DateInputProps, "renderTrailing"> & {
     /** Whether one day can be picked, for rules a plain earliest and latest cannot express. */
     computeIsDayDisabled?: (day: DateValue) => boolean;
     /** Whether the calendar is open, and how to change it. It is the only thing that opens or closes it. */
-    visibilityState?: readonly [boolean, (isOpen: boolean) => void];
+    visibility?: readonly [boolean, (isOpen: boolean) => void];
     /**
      * The trigger's own element id, for a consumer that has to reach it from a label or a test.
      *
@@ -63,7 +63,7 @@ export type DatePickerProps = Omit<DateInputProps, "renderTrailing"> & {
      */
     renderPopup: (
         renderCalendar: () => ReactNode,
-        monthState: readonly [DateValue, (month: DateValue) => void],
+        month: readonly [DateValue, (month: DateValue) => void],
         visibilityTarget: 0 | 1,
         transitionDurationMs: number,
     ) => ReactNode;

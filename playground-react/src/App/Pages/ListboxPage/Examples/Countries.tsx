@@ -10,7 +10,7 @@ type Props = ListboxExampleProps;
 export const CountriesExample = (props: Props) => (
     <PageListboxSurface>
         <Listbox
-            valueState={props.valueState}
+            value={props.value}
             options={COUNTRIES_WITH_REACHABLE}
             ariaLabel={"Shipping country"}
             renderOption={(option, flags) => (

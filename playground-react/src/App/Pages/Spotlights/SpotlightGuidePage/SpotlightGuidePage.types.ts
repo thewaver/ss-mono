@@ -1,6 +1,6 @@
 export type SpotlightTourExampleProps = {
-    guideState: readonly [boolean, (isVisible: boolean) => void];
-    promptState: readonly [boolean, (isVisible: boolean) => void];
+    guide: readonly [boolean, (isVisible: boolean) => void];
+    prompt: readonly [boolean, (isVisible: boolean) => void];
     step: number;
     resumeStep: number | undefined;
     basketCount: number;

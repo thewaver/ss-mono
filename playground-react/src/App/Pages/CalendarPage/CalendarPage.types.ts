@@ -2,11 +2,11 @@ import type { DateValue, DateValueWeekStart } from "@thewaver/ss-components-reac
 
 export type CalendarExampleProps = {
     weekStartsOn: DateValueWeekStart;
-    valueState: readonly [DateValue | undefined, (value: DateValue | undefined) => void];
-    monthState: readonly [DateValue, (month: DateValue) => void];
+    value: readonly [DateValue | undefined, (value: DateValue | undefined) => void];
+    month: readonly [DateValue, (month: DateValue) => void];
 };
 
 export type CalendarPrecisionExampleProps = {
-    valueState: readonly [DateValue | undefined, (value: DateValue | undefined) => void];
-    monthState: readonly [DateValue, (month: DateValue) => void];
+    value: readonly [DateValue | undefined, (value: DateValue | undefined) => void];
+    month: readonly [DateValue, (month: DateValue) => void];
 };

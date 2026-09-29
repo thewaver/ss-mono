@@ -20,9 +20,9 @@ export const FormSectionPage = () => {
 
     const getExamples = createMemo(() => {
         const sectionsProps: FormSectionsExampleProps = {
-            emailSignal,
-            passwordSignal,
-            confirmSignal,
+            email: emailSignal,
+            password: passwordSignal,
+            confirm: confirmSignal,
             onSubmit: () => {
                 setOutcome(`submitted as ${emailSignal[0]()}`);
             },
@@ -47,8 +47,8 @@ export const FormSectionPage = () => {
                     `outcome: ${getNestedOutcome()} — the payment section answers to the delivery section, which answers to the form, so the verdict travels up two levels rather than one`,
                 component: () => (
                     <NestedExample
-                        streetSignal={streetSignal}
-                        cardSignal={cardSignal}
+                        street={streetSignal}
+                        card={cardSignal}
                         onSubmit={() => {
                             setNestedOutcome("submitted");
                         }}

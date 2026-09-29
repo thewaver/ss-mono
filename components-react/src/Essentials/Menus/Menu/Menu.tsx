@@ -135,9 +135,9 @@ const MenuEntry = <T,>(props: MenuEntryProps<T>) => {
     const path = useMemo(() => [...level.path, index], [level.path, index]);
 
     useEffect(() => {
-        if (!props.isHighlighted) return;
+        if (!props.isHighlighted || !itemElement) return;
 
-        itemElement?.scrollIntoView({ block: "nearest" });
+        MenuUtils.revealItem(itemElement);
     }, [props.isHighlighted, itemElement]);
 
     const extraFlags: MenuItemFlags = {
@@ -502,7 +502,7 @@ export const Menu = <T,>(props: MenuProps<T>) => {
     usePointerPointReader();
 
     const [triggerElement, setTriggerElement] = useState<HTMLElement>();
-    const [isOpen, setIsOpen] = SignalMirrorReactUtils.useOptionalState(props.visibilityState, false);
+    const [isOpen, setIsOpen] = SignalMirrorReactUtils.useOptionalState(props.visibility, false);
 
     const anchorElement = props.anchorRef ?? triggerElement;
     const anchorRef = useLatest(anchorElement ?? null);
@@ -536,10 +536,10 @@ export const Menu = <T,>(props: MenuProps<T>) => {
         setFlickOrigin(undefined);
     };
 
-    const checkedValues = props.checkedState?.[0] ?? EMPTY_CHECKED;
+    const checkedValues = props.checked?.[0] ?? EMPTY_CHECKED;
 
     const pick = (item: MenuItem<T>, radioGroupValues: T[]) => {
-        const checkedState = props.checkedState;
+        const checkedState = props.checked;
 
         if (MenuUtils.getIsStateful(item) && checkedState) {
             checkedState[1](MenuUtils.computeNextChecked(checkedState[0], item, radioGroupValues));
@@ -667,7 +667,7 @@ export const ContextMenu = <T,>(props: ContextMenuProps<T>) => {
     const regionElement = useElement(regionRef);
 
     const [anchorRect, setAnchorRect] = useState<Rect>();
-    const [isOpen, setIsOpen] = SignalMirrorReactUtils.useOptionalState(props.visibilityState, false);
+    const [isOpen, setIsOpen] = SignalMirrorReactUtils.useOptionalState(props.visibility, false);
 
     const direction = NavigatorReactUtils.useDirection(regionRef);
 
@@ -679,10 +679,10 @@ export const ContextMenu = <T,>(props: ContextMenuProps<T>) => {
         setIsOpen(false);
     };
 
-    const checkedValues = props.checkedState?.[0] ?? EMPTY_CHECKED;
+    const checkedValues = props.checked?.[0] ?? EMPTY_CHECKED;
 
     const pick = (item: MenuItem<T>, radioGroupValues: T[]) => {
-        const checkedState = props.checkedState;
+        const checkedState = props.checked;
 
         if (MenuUtils.getIsStateful(item) && checkedState) {
             checkedState[1](MenuUtils.computeNextChecked(checkedState[0], item, radioGroupValues));

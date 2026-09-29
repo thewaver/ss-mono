@@ -121,8 +121,8 @@ export namespace SignalMirrorReactUtils {
         const halves = useStore(splitter);
 
         return {
-            firstState: [halves.first, splitter.setFirst] as const,
-            secondState: [halves.second, splitter.setSecond] as const,
+            first: [halves.first, splitter.setFirst] as const,
+            second: [halves.second, splitter.setSecond] as const,
         };
     };
 }

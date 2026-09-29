@@ -43,7 +43,7 @@ export const GuideExample = (props: Props) => {
                 renderContent={(flags) => <PageButtonContent flags={flags}>Take the tour</PageButtonContent>}
                 onClick={async () => {
                     props.onStart();
-                    props.visibilityState[1](true);
+                    props.visibility[1](true);
                 }}
             />
 
@@ -52,7 +52,7 @@ export const GuideExample = (props: Props) => {
                 padding={PADDING}
                 ariaLabel={"Product tour"}
                 announcement={`Step ${props.step + 1} of ${TOUR_STEPS.length}. ${TOUR_STEPS[props.step].title}.`}
-                visibilityState={props.visibilityState}
+                visibility={props.visibility}
                 renderHighlight={renderHighlight}
                 renderOverlay={renderOverlay}
                 renderPopup={(visibilityTarget, transitionDurationMs) => (

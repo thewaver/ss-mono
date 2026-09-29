@@ -7,7 +7,7 @@ import type { AccessorProps, SignalSource } from "../../../Utils/typeUtils";
 
 export type NumberInputProps = Omit<
     TextFieldPresetProps,
-    "type" | "autoComplete" | "valueSignal" | "renderTrailing" | "onInput"
+    "type" | "autoComplete" | "value" | "renderTrailing" | "onInput"
 > &
     AccessorProps<{
         /**
@@ -27,7 +27,7 @@ export type NumberInputProps = Omit<
         /** How often it repeats once it has started. */
         repeatIntervalMs?: number;
         /** The number. It is the only thing that changes it. */
-        valueSignal: SignalSource<number | undefined>;
+        value: SignalSource<number | undefined>;
         /** Draws whatever sits after the field's text, inside the field — usually the stepper. */
         renderTrailing?: (getFlags: () => InteractionFlags<TextFieldFlags>, stepper: NumberInputStepper) => JSX.Element;
         /**

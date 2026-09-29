@@ -18,7 +18,7 @@ export const ListboxPage = () => {
             name: "One value",
             readout: () =>
                 `value: ${singleSignal[0]() ?? "undefined"} — one tab stop; the arrows move focus between options and stop on Denmark and Finland, which hover explains`,
-            component: () => <CountriesExample valueSignal={singleSignal} />,
+            component: () => <CountriesExample value={singleSignal} />,
             path: `${EXAMPLES_ROOT}/Countries.tsx`,
         },
         {
@@ -26,7 +26,7 @@ export const ListboxPage = () => {
             name: "Several values, in groups",
             readout: () =>
                 `values: [${multipleSignal[0]().join(", ")}] — Enter or Space picks and drops, the arrows skip Finland and cross groups`,
-            component: () => <GroupedExample valuesSignal={multipleSignal} />,
+            component: () => <GroupedExample values={multipleSignal} />,
             path: `${EXAMPLES_ROOT}/Grouped.tsx`,
         },
         {
@@ -34,7 +34,7 @@ export const ListboxPage = () => {
             name: "Horizontal, right to left",
             readout: () =>
                 `value: ${sizeSignal[0]() ?? "undefined"} — the left arrow moves forward in a right-to-left page, and L is skipped`,
-            component: () => <SizesExample valueSignal={sizeSignal} />,
+            component: () => <SizesExample value={sizeSignal} />,
             path: `${EXAMPLES_ROOT}/Sizes.tsx`,
         },
     ]);

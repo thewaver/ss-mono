@@ -27,7 +27,7 @@ type Props = FormExampleProps;
 
 const renderTextField = (signal: Signal<string>, getHasError: () => boolean) => (
     <TextInput
-        valueSignal={signal}
+        value={signal}
         hasError={getHasError}
         padding={() => FIELD_PADDING}
         gap={() => FIELD_GAP}
@@ -38,13 +38,13 @@ const renderTextField = (signal: Signal<string>, getHasError: () => boolean) => 
 
 export const SignUpExample = (props: Props) => {
     const getEmailMessage = () => {
-        if (props.emailSignal[0]().length < 1) return "We only use it to sign you in.";
+        if (props.email[0]().length < 1) return "We only use it to sign you in.";
 
-        return props.emailSignal[0]().includes("@") ? "" : "That does not look like an email address.";
+        return props.email[0]().includes("@") ? "" : "That does not look like an email address.";
     };
 
     const getPasswordMessage = () =>
-        props.passwordSignal[0]().length >= MIN_PASSWORD_LENGTH ? "" : `At least ${MIN_PASSWORD_LENGTH} characters.`;
+        props.password[0]().length >= MIN_PASSWORD_LENGTH ? "" : `At least ${MIN_PASSWORD_LENGTH} characters.`;
 
     return (
         <Form
@@ -61,7 +61,7 @@ export const SignUpExample = (props: Props) => {
                             <PageFormFieldMessage state={getFieldState}>{getEmailMessage()}</PageFormFieldMessage>
                         )}
                         renderControl={(getFieldState) =>
-                            renderTextField(props.emailSignal, () => getFieldState().hasError)
+                            renderTextField(props.email, () => getFieldState().hasError)
                         }
                     />
 
@@ -73,21 +73,21 @@ export const SignUpExample = (props: Props) => {
                             <PageFormFieldMessage state={getFieldState}>{getPasswordMessage()}</PageFormFieldMessage>
                         )}
                         renderControl={(getFieldState) =>
-                            renderTextField(props.passwordSignal, () => getFieldState().hasError)
+                            renderTextField(props.password, () => getFieldState().hasError)
                         }
                     />
 
                     <FormField
                         orientation={"horizontal"}
-                        hasError={() => !props.termsSignal[0]()}
-                        message={() => (props.termsSignal[0]() ? "" : "Required.")}
+                        hasError={() => !props.terms[0]()}
+                        message={() => (props.terms[0]() ? "" : "Required.")}
                         renderCaption={() => <PageFormFieldCaption>Accept the terms</PageFormFieldCaption>}
                         renderMessage={(getFieldState) => (
                             <PageFormFieldMessage state={getFieldState}>Required.</PageFormFieldMessage>
                         )}
                         renderControl={(getFieldState) => (
                             <Checkbox
-                                checkedSignal={props.termsSignal}
+                                checked={props.terms}
                                 hasError={() => getFieldState().hasError}
                                 renderContent={(getFlags) => <PageCheckboxContent flags={getFlags} />}
                             />

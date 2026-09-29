@@ -16,10 +16,10 @@ type Props = TextInputPasswordExampleProps;
 
 export const PasswordExample = (props: Props) => (
     <TextInput
-        valueState={props.valueState}
+        value={props.value}
         padding={FIELD_PADDING}
         gap={FIELD_GAP}
-        type={props.revealState[0] ? "text" : "password"}
+        type={props.reveal[0] ? "text" : "password"}
         ariaLabel={"Password"}
         autoComplete={"current-password"}
         computeTextStyle={computePageTextFieldTextStyle}
@@ -28,11 +28,11 @@ export const PasswordExample = (props: Props) => (
         renderTrailing={() => (
             <Button
                 onClick={() => {
-                    props.revealState[1](!props.revealState[0]);
+                    props.reveal[1](!props.reveal[0]);
                 }}
                 renderContent={(flags) => (
                     <PageTextFieldAdornment flags={flags}>
-                        {props.revealState[0] ? "Hide" : "Show"}
+                        {props.reveal[0] ? "Hide" : "Show"}
                     </PageTextFieldAdornment>
                 )}
             />

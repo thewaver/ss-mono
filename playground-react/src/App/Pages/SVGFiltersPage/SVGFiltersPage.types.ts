@@ -8,6 +8,6 @@ export type SVGFiltersExampleProps = {
 };
 
 export type SVGFiltersStackExampleProps = SVGFiltersExampleProps & {
-    appliedState: readonly [SortableItem<SVGFiltersStep>[], (items: SortableItem<SVGFiltersStep>[]) => void];
-    unusedState: readonly [SortableItem<SVGFiltersStep>[], (items: SortableItem<SVGFiltersStep>[]) => void];
+    applied: readonly [SortableItem<SVGFiltersStep>[], (items: SortableItem<SVGFiltersStep>[]) => void];
+    unused: readonly [SortableItem<SVGFiltersStep>[], (items: SortableItem<SVGFiltersStep>[]) => void];
 };

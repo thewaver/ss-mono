@@ -16,7 +16,7 @@ import type { CheckboxGroupReactContextType } from "./CheckboxGroup.context.type
 import type { CheckboxGroupProps } from "./CheckboxGroup.types";
 
 export const CheckboxGroup = <T,>(props: CheckboxGroupProps<T>) => {
-    const [values, setValues] = SignalMirrorReactUtils.useOptionalState<T[]>(props.valueState, []);
+    const [values, setValues] = SignalMirrorReactUtils.useOptionalState<T[]>(props.value, []);
 
     const latest = useLatest({ values, setValues, onMount: props.onMount });
     const handedStateRef = useRef<CheckedState | undefined>(undefined);

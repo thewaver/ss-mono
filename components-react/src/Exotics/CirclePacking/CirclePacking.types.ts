@@ -20,7 +20,7 @@ export type CirclePackingProps<T> = {
      * pressed, which goes up one level; the consumer to move it from outside. Leave it out and the component keeps it
      * itself, starting at the root. A node that is not a branch of the current tree shows the root.
      */
-    branchState?: readonly [CirclePackingNode<T>, (value: CirclePackingNode<T>) => void];
+    branch?: readonly [CirclePackingNode<T>, (value: CirclePackingNode<T>) => void];
     /**
      * Draws one circle inside the component's own drawing, whose origin is the center. It is handed where the circle
      * sits at this moment, which changes on every frame of a zoom.

@@ -49,7 +49,7 @@ export const TagInputPage = () => {
     };
 
     const getExamples = createMemo(() => {
-        const commonProps: Omit<TagInputExampleProps, "valueSignal"> = {
+        const commonProps: Omit<TagInputExampleProps, "value"> = {
             isDisabled: getIsDisabled,
             hasError: getHasError,
         };
@@ -59,7 +59,7 @@ export const TagInputPage = () => {
                 key: "default",
                 name: "Default",
                 readout: () => `tags: ${defaultSignal[0]().join(", ") || "none"}`,
-                component: () => <DefaultExample {...commonProps} valueSignal={defaultSignal} />,
+                component: () => <DefaultExample {...commonProps} value={defaultSignal} />,
                 path: `${EXAMPLES_ROOT}/Default.tsx`,
             },
             {
@@ -67,7 +67,7 @@ export const TagInputPage = () => {
                 name: "Empty",
                 readout: () => `tags: ${emptySignal[0]().join(", ") || "none"}`,
                 component: () => (
-                    <DefaultExample {...commonProps} valueSignal={emptySignal} ariaLabel={"Empty topics"} />
+                    <DefaultExample {...commonProps} value={emptySignal} ariaLabel={"Empty topics"} />
                 ),
                 path: `${EXAMPLES_ROOT}/Default.tsx`,
             },
@@ -75,7 +75,7 @@ export const TagInputPage = () => {
                 key: "unique",
                 name: "Refusing duplicates",
                 readout: () => `tags: ${uniqueSignal[0]().join(", ") || "none"} — the same word twice is refused`,
-                component: () => <UniqueExample {...commonProps} valueSignal={uniqueSignal} />,
+                component: () => <UniqueExample {...commonProps} value={uniqueSignal} />,
                 path: `${EXAMPLES_ROOT}/Unique.tsx`,
             },
             {
@@ -83,7 +83,7 @@ export const TagInputPage = () => {
                 name: "Crowded and narrow",
                 readout: () =>
                     `${crowdedSignal[0]().length} tags in ${NARROW_WIDTH}px — they wrap and the box grows with them`,
-                component: () => <CrowdedExample {...commonProps} valueSignal={crowdedSignal} />,
+                component: () => <CrowdedExample {...commonProps} value={crowdedSignal} />,
                 path: `${EXAMPLES_ROOT}/Crowded.tsx`,
             },
         ];

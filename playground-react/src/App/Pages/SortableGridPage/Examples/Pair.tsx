@@ -7,8 +7,8 @@ import { InventoryExample } from "./Inventory";
 
 type Props = {
     groupId: string;
-    packState: readonly [SortableGridItem<Gear>[], (items: SortableGridItem<Gear>[]) => void];
-    sideState: readonly [SortableGridItem<Gear>[], (items: SortableGridItem<Gear>[]) => void];
+    pack: readonly [SortableGridItem<Gear>[], (items: SortableGridItem<Gear>[]) => void];
+    side: readonly [SortableGridItem<Gear>[], (items: SortableGridItem<Gear>[]) => void];
     sideLabel: string;
     sideEmptyText: string;
     isSideNarrow?: boolean;
@@ -23,7 +23,7 @@ export const PairExample = (props: Props) => (
 
             <InventoryExample
                 groupId={props.groupId}
-                itemsState={props.packState}
+                items={props.pack}
                 ariaLabel={"Pack"}
                 emptyText={"Empty pack"}
                 isTurnable={true}
@@ -35,7 +35,7 @@ export const PairExample = (props: Props) => (
 
             <InventoryExample
                 groupId={props.groupId}
-                itemsState={props.sideState}
+                items={props.side}
                 ariaLabel={props.sideLabel}
                 emptyText={props.sideEmptyText}
                 columns={props.isSideNarrow ? QUIVER_COLUMNS : STASH_COLUMNS}

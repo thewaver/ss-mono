@@ -12,7 +12,7 @@ const SCROLLER_GAP = 10;
 
 type Props = ScrollerExampleProps & {
     buttonPlacement?: MaybeAccessor<ScrollerButtonPlacement>;
-    progressSignal?: Signal<number>;
+    progress?: Signal<number>;
 };
 
 export const ChipsExample = (props: Props) => {
@@ -22,7 +22,7 @@ export const ChipsExample = (props: Props) => {
                 gap={() => SCROLLER_GAP}
                 padding={() => FOCUS_RING_WIDTH}
                 buttonPlacement={props.buttonPlacement}
-                progressSignal={props.progressSignal}
+                progress={props.progress}
                 renderButton={(getStep, stepper) => <PageScrollerButton step={getStep} stepper={stepper} />}
             >
                 {access(props.labels).map((label) => (

@@ -8,7 +8,7 @@ type Props = FileInputExampleProps;
 
 export const ReachableExample = (props: Props) => (
     <FileInput
-        filesSignal={props.filesSignal}
+        files={props.files}
         isDisabled={true}
         isReachableWhenDisabled={true}
         ariaLabel={"Disabled but reachable attachment"}

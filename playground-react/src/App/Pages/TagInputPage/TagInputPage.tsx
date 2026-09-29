@@ -48,7 +48,7 @@ export const TagInputPage = () => {
         emptyState[1]([]);
     };
 
-    const commonProps: Omit<TagInputExampleProps, "valueState"> = {
+    const commonProps: Omit<TagInputExampleProps, "value"> = {
         isDisabled,
         hasError,
     };
@@ -58,21 +58,21 @@ export const TagInputPage = () => {
             key: "default",
             name: "Default",
             readout: () => `tags: ${defaultState[0].join(", ") || "none"}`,
-            component: () => <DefaultExample {...commonProps} valueState={defaultState} />,
+            component: () => <DefaultExample {...commonProps} value={defaultState} />,
             path: `${EXAMPLES_ROOT}/Default.tsx`,
         },
         {
             key: "empty",
             name: "Empty",
             readout: () => `tags: ${emptyState[0].join(", ") || "none"}`,
-            component: () => <DefaultExample {...commonProps} valueState={emptyState} ariaLabel={"Empty topics"} />,
+            component: () => <DefaultExample {...commonProps} value={emptyState} ariaLabel={"Empty topics"} />,
             path: `${EXAMPLES_ROOT}/Default.tsx`,
         },
         {
             key: "unique",
             name: "Refusing duplicates",
             readout: () => `tags: ${uniqueState[0].join(", ") || "none"} — the same word twice is refused`,
-            component: () => <UniqueExample {...commonProps} valueState={uniqueState} />,
+            component: () => <UniqueExample {...commonProps} value={uniqueState} />,
             path: `${EXAMPLES_ROOT}/Unique.tsx`,
         },
         {
@@ -80,7 +80,7 @@ export const TagInputPage = () => {
             name: "Crowded and narrow",
             readout: () =>
                 `${crowdedState[0].length} tags in ${NARROW_WIDTH}px — they wrap and the box grows with them`,
-            component: () => <CrowdedExample {...commonProps} valueState={crowdedState} />,
+            component: () => <CrowdedExample {...commonProps} value={crowdedState} />,
             path: `${EXAMPLES_ROOT}/Crowded.tsx`,
         },
     ];

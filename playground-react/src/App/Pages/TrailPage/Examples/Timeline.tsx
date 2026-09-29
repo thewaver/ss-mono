@@ -29,8 +29,8 @@ export const TimelineExample = (props: Props) => {
                     durationMs={props.durationMs}
                     isLooping={props.isLooping}
                     isTurning={props.isTurning}
-                    progressState={props.progressState}
-                    playbackState={props.playbackState}
+                    progress={props.progress}
+                    playback={props.playback}
                     renderTrack={(path) => <PageTrailTrack path={path} />}
                     renderTraveler={() => <PageTrailMarker id={MARKER_ID} />}
                     onMount={setController}
@@ -45,8 +45,8 @@ export const TimelineExample = (props: Props) => {
                     min={0}
                     max={PERCENT}
                     step={SLIDER_STEP}
-                    valueState={[
-                        Math.round(props.progressState[0] * PERCENT),
+                    value={[
+                        Math.round(props.progress[0] * PERCENT),
                         (value: number) => controller?.seek(value / PERCENT),
                     ]}
                     renderContent={(renderProps) => (

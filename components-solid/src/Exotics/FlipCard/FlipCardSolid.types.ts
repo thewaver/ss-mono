@@ -14,7 +14,7 @@ export type FlipCardProps = AccessorProps<{
     transitionDurationMs?: number;
     /**
      * How far the card leans toward its other side without turning over, from `0`, lying flat, to `1`, turned
-     * all the way. It never touches `flippedSignal`: the side that counts as showing, and the one a reader can
+     * all the way. It never touches `flipped`: the side that counts as showing, and the one a reader can
      * reach, stay where they were however far the card leans, so deciding that a lean has gone far enough to
      * become a turn is the caller's to do.
      *
@@ -35,7 +35,7 @@ export type FlipCardProps = AccessorProps<{
     /** What one face is called when it is announced, so a reader hears face rather than group. Defaults to "face". */
     faceRoleDescription?: string;
     /** Which side is showing. It is the only thing that turns the card. */
-    flippedSignal: SignalSource<boolean>;
+    flipped: SignalSource<boolean>;
     /** Draws the front. */
     renderFront: (getState: Accessor<FlipCardState>) => JSX.Element;
     /** Draws the back. */

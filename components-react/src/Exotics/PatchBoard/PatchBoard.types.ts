@@ -56,9 +56,9 @@ export type PatchBoardProps<T> = {
     /** Freezes the wiring as it stands: cables still show, but none can be made, moved or pulled out. */
     isLocked?: boolean;
     /** The nodes and where they sit. It is the only thing that moves them. */
-    nodesState: readonly [PatchBoardNode<T>[], (nodes: PatchBoardNode<T>[]) => void];
+    nodes: readonly [PatchBoardNode<T>[], (nodes: PatchBoardNode<T>[]) => void];
     /** The cables currently wired. It is the only thing that adds or removes one. */
-    linksState: readonly [PatchBoardLink[], (links: PatchBoardLink[]) => void];
+    links: readonly [PatchBoardLink[], (links: PatchBoardLink[]) => void];
     /** The key one node is told apart by, which is what lets a node keep its cables as it moves. */
     computeNodeKey: (value: T) => string;
     /** Names one node for assistive technology. */

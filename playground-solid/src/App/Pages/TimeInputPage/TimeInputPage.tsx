@@ -23,7 +23,7 @@ export const TimeInputPage = () => {
             name: "A time, typed or stepped",
             readout: () =>
                 `value: ${describeTime(timeSignal[0]())} — the arrows step whichever segment the caret is in`,
-            component: () => <TimeExample valueSignal={timeSignal} ariaLabel={"Start time"} />,
+            component: () => <TimeExample value={timeSignal} ariaLabel={"Start time"} />,
             path: `${EXAMPLES_ROOT}/Time.tsx`,
         },
         {
@@ -32,7 +32,7 @@ export const TimeInputPage = () => {
             readout: () =>
                 `value: ${describeTime(twelveHourSignal[0]())} — the value stays 24-hour, the field reads it as 12`,
             component: () => (
-                <TimeExample valueSignal={twelveHourSignal} isTwelveHour={true} ariaLabel={"Meeting time"} />
+                <TimeExample value={twelveHourSignal} isTwelveHour={true} ariaLabel={"Meeting time"} />
             ),
             path: `${EXAMPLES_ROOT}/Time.tsx`,
         },
@@ -40,7 +40,7 @@ export const TimeInputPage = () => {
             key: "precise",
             name: "To the second",
             readout: () => `value: ${describeTime(preciseSignal[0]())} — three segments instead of two`,
-            component: () => <TimeExample valueSignal={preciseSignal} hasSeconds={true} ariaLabel={"Exact time"} />,
+            component: () => <TimeExample value={preciseSignal} hasSeconds={true} ariaLabel={"Exact time"} />,
             path: `${EXAMPLES_ROOT}/Time.tsx`,
         },
         {
@@ -50,7 +50,7 @@ export const TimeInputPage = () => {
                 `value: ${describeTime(shiftSignal[0]())} — ${TimeUtils.toIso(OPENING_TIME)} to ${TimeUtils.toIso(CLOSING_TIME)}`,
             component: () => (
                 <TimeExample
-                    valueSignal={shiftSignal}
+                    value={shiftSignal}
                     minValue={() => OPENING_TIME}
                     maxValue={() => CLOSING_TIME}
                     ariaLabel={"Shift start"}

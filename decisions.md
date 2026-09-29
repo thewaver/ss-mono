@@ -434,9 +434,11 @@ while, then retired whole (_"The gallery is gone"_, above).
   files, and the commit hook runs it.
 - **A Playground case that only one framework can pass exists once per framework, tagged `@solid` or `@react`**,
   the user's call over teaching a spec to branch on the framework. Each Playground's projects leave out the other's
-  tag. The three so far: the docs table's type text (`JSX.Element` and "value or accessor" against `ReactNode` and a
-  plain value), `Label`'s warning (`getAriaLabel` against `ariaLabel`), and the no-frames placement, where a Solid
-  layer opens a frame behind its anchor and a React one, placed in a layout effect, opens on it.
+  tag. The two so far: the docs table's type text (`JSX.Element` and "value or accessor" against `ReactNode` and a
+  plain value), and `Label`'s warning (`getAriaLabel` against `ariaLabel`). The no-frames placement is not one of
+  them: every framework opens an anchored layer on its anchor with frames withheld, for the reason given under
+  _"`Anchor`: the positioning half of a floating layer, extracted"_, so `noAnimationFrames.spec.ts` asserts it once
+  for all four.
 - **The builds the tests run are served at the root**, so the specs keep navigating to `/tabs`; only the deployed
   builds carry the `/solid/` and `/react/` prefixes, and each app reads its own from the build.
 
@@ -530,8 +532,9 @@ it.
   duration takes effect without the object being made again. Where a core reads an optional function's presence
   at event time — `HoverIntent`'s focus delay, `TextSync`'s mask — the object passed in uses a getter, so the
   presence follows the prop too.
-- **Two-way state is a `[value, setValue]` pair named `*State`**, the React spelling of Solid's `*Signal`:
-  `selectionState`, `shownState`, `targetIndexState`, `valueState`. Where the consumer may leave it out, the hook
+- **Two-way state is a `[value, setValue]` pair under the bare stem**, the name Solid's signal pair carries too:
+  `selection`, `targetIndex`, `value` (_"A prop is named the same in every framework"_ in `conventions.md`). Where
+  the consumer may leave it out, the hook
   keeps its own, as `SignalMirrorReactUtils.useOptionalState` does.
 - **Lists of elements are compared entry by entry** through `useStableList`, so a list built inline each render
   does not re-run the effect that watches it.
@@ -572,7 +575,7 @@ Settled when `InteractionWrapper`, `Button`, `Tooltip` and `Label` were ported b
 Taken on Claude's judgment, since the user asked for the components to be ported without supervision.
 
 - **A React component keeps the Solid component's name and its props' names**, adapted the way the abstracts' hooks
-  are: plain values instead of accessors, `*State` pairs instead of `*Signal`, `render*` callbacks handed plain values
+  are: plain values instead of accessors, a `[value, setValue]` pair where Solid takes a signal pair, `render*` callbacks handed plain values
   and returning `ReactNode` (`renderContent(flags)` rather than `renderContent(getFlags)`), React's own event types,
   `className` for `class`. A prop that means the same thing is spelled the same in both, which is what the eventual
   Playground switch needs. `Tooltip`'s `anchorRef` is the case that shows the limit of it: it is an element value in
@@ -588,6 +591,608 @@ Taken on Claude's judgment, since the user asked for the components to be ported
   `.const.ts` and every `.types.ts` is exported whole, and holds nothing Solid since the split
   (_"The three packages"_). React never imports a Solid props type: each React component declares its own in its own
   `.types.ts`.
+
+### Porting: Vue and Svelte
+
+The user's calls, taken one at a time before any of it was built, and asked for as an unsupervised port on the
+pattern Solid and React set: `@thewaver/ss-components-vue` and `@thewaver/ss-components-svelte` beside the other
+two, each over the same core, and a Playground app for each, mirroring the other two path for path.
+
+- **Vue 3.5 and Svelte 5, with runes.** Svelte 4's syntax is legacy, and nothing argued for it.
+- **The Vue library is written in `.tsx`, with `defineComponent` and render functions**, the user's call over
+  `.vue` single-file components: it reads line for line like the React and Solid views, which keeps the four
+  frameworks behaving the same, and plain `tsc` checks it. Naive UI and Ant Design Vue ship this way.
+- **The Vue Playground is written in `.vue` files**, because its examples are the code a visitor copies, and a
+  Vue user writes templates. That is why `playground-vue` carries `@vitejs/plugin-vue` and `vue-tsc` and
+  `components-vue` does not. **Svelte has no such choice**: a Svelte component is a `.svelte` file, so the
+  Svelte package is checked by `svelte-check` and built by `svelte-package`, and it is the one of the four
+  where a port is a rewrite rather than a line-by-line copy. The specs run against every app are what catch
+  the drift that invites.
+- **A `render*` callback keeps its name in both.** In Vue it is a scoped slot of the same name —
+  `<template #renderContent="flags">` — since Vue restricts no slot name. A slot hands its consumer one value,
+  so a callback taking one argument passes it as it is, and one taking several passes a single object whose
+  fields are the React parameters' names: `renderFace(item, index, face)` is `#renderFace="{ item, index, face }"`.
+  In Svelte it is a `Snippet` prop of the same name, and a snippet takes several arguments, so the arguments stay
+  positional. Vue cannot make a slot required at typecheck; that was weighed and accepted.
+- **Two-way state is each framework's own binding under the stem name**: `v-model:value` in Vue (a `value` prop
+  plus `onUpdate:value`) and `bind:value` in Svelte (a `$bindable` prop). Where the prop is optional and the React
+  component keeps a value of its own, so does this one when none is bound, which both mechanisms do natively; where
+  React's only reports, an unbound write goes nowhere here too. A write the owner refuses leaves
+  the component showing the owner's value. The same stem is the prop's name in Solid and React, where it is a
+  signal pair and a `[value, setValue]` pair (_"A prop is named the same in every framework"_ in
+  `conventions.md`).
+- **`ref` stays `ref`.** Svelte takes it as a `$bindable` prop, so a consumer writes `bind:ref`, as Bits UI does.
+  Vue reserves the name, so a consumer's `ref` on a component reaches the component and its `$el` is the element
+  the other frameworks' `ref` points at, as Reka UI does.
+- **An `on*` callback stays a prop in Vue**, not an emitted event: it is the same name in all four, and Vue turns a
+  template's `@change` into an `onChange` prop, so a Vue consumer can write either.
+- **The Vue app routes with `vue-router`; the Svelte app with `sv-router`**, the user's call over a router written
+  in the app, over `svelte-spa-router`, whose addresses are hash-only and would break the specs and the switch, and
+  over SvelteKit, a whole app framework whose file-based pages would stop the app mirroring the others.
+- **The halves are named as React's are**: `<Subject>Vue.utils.ts` exporting `<Subject>VueUtils`, and
+  `<Subject>Svelte.utils.svelte.ts` exporting `<Subject>SvelteUtils` — the second `.svelte` in the name is what lets
+  a TypeScript module use runes.
+- **Each new app wears its own framework's theme**, `PLAYGROUND_THEMES.vue` and `PLAYGROUND_THEMES.svelte`, applied at
+  load as the other two apply theirs, and the landing page colors each link from that framework's theme. The Theme
+  select in the nav settings is in all four apps.
+- **The framework switch knows every app's address, not just one other's.** `VITE_PLAYGROUND_URLS` replaced
+  `VITE_OTHER_PLAYGROUND_URL`: one address per framework, `/solid/`, `/react/`, `/vue/` and `/svelte/` in the site,
+  and each app's standalone port by default (`playground/vite/playgroundUrls.ts`). `npm start` serves the four under
+  their prefixes on 8082 to 8085; `start:vue` and `start:svelte` serve one alone on 8086 and 8087.
+- **Every new app's Vite server refuses the other frameworks' packages** through
+  `playground/vite/refuseFrameworks.ts`, as the React one refuses Solid's.
+
+### Porting: how the Vue side reads
+
+Derived when `Utils/`, every abstract, `Primitives/`, `Composites/` and `Generators/` were ported, on Claude's judgment
+under the unsupervised port the user asked for; the rest of the components should keep to it. Everything named here is
+in `components-vue/src/Utils/` unless a folder is given.
+
+- **`setup` holds what React's hooks hold, and the render function holds React's body.** A component is
+  `defineComponent((props, ctx) => { …composables… ; return () => …JSX… }, { name, props, slots })`. Whatever React
+  works out afresh each render — defaults read with `??`, class lists, styles, the flags object — is worked out inside
+  the returned render function, which Vue runs again whenever anything it read changes, so it reads line for line like
+  the React body. What React keeps across renders is made once in `setup`: `shallowRef` for `useState`, `computed` for
+  `useMemo`, a `use*` composable for a hook. `props` is never destructured, since it is Vue's reactive proxy. Ids come
+  from Vue's own `useId`.
+- **Props are declared at runtime with `declareProps<XProps>({ … })`**, one entry per member of the props type:
+  `Boolean` for a member holding a boolean, `null` for anything else. The compiler refuses a missing, extra or wrongly
+  kinded entry, so the `.types.ts` stays the one description of a prop. A `Boolean` entry is
+  `{ type: Boolean, default: undefined }` underneath: a bare attribute in a template means `true`, and a prop left out
+  reads `undefined` as in React, so the default from `.const.ts` still applies. The helper's result is typed as the list
+  of names — the one form under which `defineComponent` keeps a generic component generic for its consumers — though at
+  runtime it is the object. A generic props type is declared with `unknown` for its parameter,
+  `declareProps<BarrelProps<unknown>>`. A key that has to be quoted (`"onUpdate:value"`) makes the house format quote
+  every key of that object, and every member of a type literal holding one. **A union props type is declared as it
+  is** — `ModalProps`, whose two arms ask for exactly one of `ariaLabel` and `ariaLabelledBy`, `ToolbarCompositeProps`,
+  whose arms carry different members: the declaration takes every member of every arm once (`PropName`), each kinded by
+  what the arms hold together (`PropValue`), so an arm's `?: undefined` does not ask for `Boolean`. No call site wraps
+  its type in `Omit<X, never>` or casts `props` to one arm to reach a member.
+- **A `render*` callback is a scoped slot of the same name, typed in `<Component>Slots` beside `<Component>Props`** in the
+  component's `.types.ts`, its members documented as props members are. `children` is the `default` slot. React props
+  types that mixed data and render callbacks under a `*Slots` name are split, because a Vue reader takes `*Slots` to
+  mean slots: the data half is `CarouselContentProps<T>` and `WheelContentProps<T>`, and a back face a preset requires
+  is a slot type of its own, `CarouselBackSlot<T>` and `WheelBackSlot<T>`.
+- **Inside the component, slots come through `SlotsContext<XSlots>`** as `setup`'s second argument, every slot read as
+  possibly missing, **and are always drawn through `callSlot(slots.x, value)`**, which draws nothing for a slot the
+  consumer left out. The options carry `slots: Object as SlotsType<XSlots>` so a consumer's template is typed; a generic
+  component writes `SlotsType<XSlots<any>>` there, since the options object cannot see the type parameter.
+- **A component hands slots to another as a children object, `{{ renderX: (value) => … } satisfies XSlots}`.** Vue's
+  JSX types do not check children, and the `satisfies` is what types the arrows' parameters and checks the names.
+  Passing a consumer's slot on is `renderContent: slots.renderContent`; one left out arrives as absent.
+- **A render function inside a defs prop is not a slot**, and takes one object in the shape of the slot it feeds:
+  `InteractionTooltipDefs.renderContent` is handed `{ visibilityTarget, transitionDurationMs, placement, flags }`.
+- **Two-way state is `useTwoWay(props, "value", initial)`**, over Vue's own `useModel`: one writable ref, reading the
+  consumer's value when they bound `v-model:value` and a value of the component's own, from `initial`, when they did
+  not. A write the owner refuses leaves the ref reading the owner's value. `value` and `onUpdate:value` are both members
+  of the props type and both declared; a pair React requires (`TextField`'s `value`, `Spotlight`'s `visibility`) is a
+  required prop. **A two-way prop is never spread onward**, because whether it is bound is read off the props a
+  component was handed: a component passing one on hands the inner one its own ref's value and a setter.
+- **The component keeps a value of its own only where the React one does.** React keeps one through
+  `SignalMirrorReactUtils.useOptionalState` or a `useState` fallback, and there `useTwoWay` keeps one too. Where React
+  only reports — reads `props.x?.[0]` and writes `props.x?.[1](next)`, so an unbound write goes nowhere — the call is
+  `useTwoWay(props, "x", undefined, { keepsOwnValue: false })`: the ref always reads the prop, and a write only reaches an
+  `onUpdate:x` if one was given, so a Vue consumer who binds nothing sees what a React one sees. That covers `Table`'s
+  `sort`, `widths`, `order` and `selection`, `Range`'s `value` and `range`, `Menu`'s and `ContextMenu`'s `checked` and
+  every preset handing it on (`FanMenu`, `WheelMenu`, `Menubar`, `Toolbar`), `Toolbar`'s `pressedValues`, and
+  `Select`'s and `MultiSelect`'s `query`. Whether the prop was bound is not decided by its value, which a bound
+  `v-model:sort` starting `undefined` would get wrong; a check written in the component against the prop's value is kept
+  only where React makes the same one (`Menu`'s write under `props.checked !== undefined`, `Toolbar`'s pressable buttons).
+- **`forwardProps(props, Inner)` stands for React's `{...props}` onto an inner component.** It picks the props `Inner`
+  declares and drops the ones left out, since anything else would land in `Inner`'s attributes and be written onto its
+  root element. Its result is typed as the whole outer set, so a required member stays required and a union props
+  type stays a union on the way in, and no call site casts it.
+- **Whatever the component sets on the inner one beside the forwarded set goes inside the same object literal, after
+  the spread**: `{...{ ...forwardProps(props, BinarySwitch), onChange: handleChange }}`, or a `menuProps` object built
+  the same way. Vue's JSX merges a spread and the attributes beside it with `mergeProps`, which joins two handlers of one
+  `on*` name into a list rather than letting the later one win as React does, so an `onChange` written as an attribute
+  beside a forwarded `onChange` ran the consumer's handler as well as the component's own — and a component calling
+  the prop directly was handed the list, and threw. Inside one literal the later key replaces the forwarded one. Two
+  spreads side by side merge the same way, so they are one literal too. The rule is written for every key that could
+  collide, two-way pairs included (`"value"` and `"onUpdate:value"` of the `TextField` presets), not only the ones that
+  do today.
+- **`on*` callbacks are props.** A template reaches `onChange` with `@change`, and a two-word one with a hyphen —
+  `onMouseEnter` is `@mouse-enter` — since `@mouseenter` compiles to `onMouseenter`, which is another name.
+- **Composables take `MaybeRefOrGetter` inputs and hand back refs.** `use*` inside `<Subject>VueUtils`, named as React's
+  hooks are; an input is a ref, a getter reading props (`() => props.isOpen`) or a constant, read with `toValue` where it
+  is needed, and every result is a `shallowRef` or `computed` under React's field name (`fader.isVisible.value`). **A
+  function is never a `MaybeRefOrGetter` input**, since `toValue` calls it: a callback is a plain function the composable
+  calls when the moment comes, written by the caller to read the prop then (`onShow: () => props.onShow?.()`), and a
+  function whose presence the core reads is handed as a getter of it (`getComputeMaskedText`, `getComputeSpinDefs`).
+  Two-way state a composable writes is a writable `Ref`, as in `HoverIntentVueUtils.useHoverIntent(anchorRef, shown,
+  …)`. `useLatest` and `useElement` have no counterpart: a prop read at call time is always current, and a template
+  ref is already reactive.
+- **A store is read through `useStore(store, select)`**: a `shallowRef` fed by the subscription and let go by
+  `onScopeDispose`, changing only when the selected part does.
+- **An element is a `shallowRef<HTMLElement>()` handed to `ref=`**, or set from a function ref through
+  `toElement(target)`, which answers the element whether the ref sat on an element or on a component (its `$el`). Vue
+  calls a function ref again on every render with the same element, which changes nothing a `shallowRef` holds; a ref
+  that does work guards itself, as `VirtualizerVueUtils.useRowWindow`'s `measureRow` measures an element once per
+  index. A list of elements is followed through `useStableList(getList)`, a `computed` that hands back the previous
+  array while its entries are the same.
+- **Every effect is `watchAfterRender(sources, effect)`, standing for both `useEffect` and `useLayoutEffect`.** The
+  sources are React's deps, as getters or refs compared entry by entry; the effect runs once the component has mounted
+  and again after any update in which a source changed, sees the document as that render left it, and may answer a
+  cleanup that runs before the next run and on unmount. Only the sources are tracked, so the body reads props and state
+  as they stand without subscribing to them, which is what `useLatest` did for React. Vue runs it after the DOM is
+  written and before the browser paints, so the split between the two React effects has nothing to map onto. Cleanups
+  run in the order their effects were declared, as React's do, so an ordering rule like `Modal`'s — unseal before focus
+  goes back — carries over as written.
+- **The other React shapes map one to one.** `useEffect(fn, [])` is `watchAfterRender([], fn)`; an effect that is only a
+  cleanup (`useEffect(() => x.stop, [x])`) is `onScopeDispose(x.stop)`; an effect with no deps list is `onMounted` plus
+  `onUpdated`. State adjusted during render when an input changes — React's `if (x !== previous) setState(…)` — is a
+  `watch` on the input at Vue's default timing, which runs before the render that reads it (`PlacementItem`'s glide,
+  `Mosaic`'s capture of the focused tile), or a `computed` reading its own previous value (`Carousel`'s accumulated
+  turn). A change that must not act at mount, like a wheel's target index, is `watch(…, { flush: "post" })`.
+- **`ref` reaches the element through `$el`.** A consumer's template ref on a component is handed the component, and
+  its `$el` is the element React's `ref` points at. Where that is not the component's root — `InteractionWrapper`'s
+  control, the inputs of `TextField` and `BinarySwitch`, a leaf rendering a fragment — `exposeElement(expose, () =>
+  element.value)` points `$el` at it, the approach of Reka UI's `useForwardExpose`. A leaf is therefore attached with
+  `ref={setElementRef}` whether it is an element or a component, and React's `ref` members are gone from the Vue props
+  types. Element-valued props (`anchorRef`, `elementRef`) stay plain props, as in React.
+- **A context is `provide` and `inject` under an `InjectionKey`**, in the same `.context.ts`: `provide<Name>Context(value)`
+  stands for React's `<Name>ContextProvider`, and `use<Name>Context()` answers the fallback when nothing is provided. The
+  provided object is made once in `setup` with getters over `computed`s, so what reads it follows it without being
+  handed a new object. The `Viewport` fallback is the window with its size in a module-level `shallowRef` kept current on
+  resize, as Solid's is, so `AnchorVueUtils.usePortalPosition` needs nothing standing for React's resize re-render.
+- **A portaled component renders `<Teleport to={viewportContext.getPortalRef() ?? document.body}>`** and declares
+  `inheritAttrs: false`, since a teleported root cannot take a consumer's fall-through attributes.
+- **`class` and `style` are Vue's.** A class list is an array with falsy entries, `class={[a, isX && b]}`; a style is an
+  object with camelCase keys and `assignInlineVars` spread in, or an array where objects combine. Vue adds no `px` to a
+  number, so every length is a string, as the core's style helpers already return them. Native attributes take Vue's
+  names — `tabindex`, `readonly`, `autocomplete`, `inputmode`, `onKeydown`, `onMouseenter`, `onCompositionstart` — and SVG
+  presentation attributes their hyphenated ones, `stop-color`, `flood-color`, `fill-rule`, which Vue's JSX types check.
+- **A controller handed through `onMount` has no `subscribe`.** Its getters read the component's `computed`s, so a
+  consumer's template or `computed` calling `controller.getIsSpinnable()` follows it, as a Solid consumer's accessor
+  does. `WheelController` is the model.
+- **A type identical to the core's is imported and re-exported rather than declared again** — `CarouselState`,
+  `BinarySwitchCbs`, `BinarySwitchState` — so the Vue barrel needs no explicit re-export to settle a clash.
+- **A render function handed to a slot in its value is made once in `setup`**, not inside the render function:
+  `Menu`'s `renderItems`, `SelectComposite`'s `renderOptions`, `TextInput`'s `renderSuggestions`, `Carousel`'s
+  `renderStep` and `renderPick`. A consumer passing it on as a prop to a component of their own then sees the same
+  function each time rather than a changed prop on every render. One made per entry is kept in a `Map` under the entry's
+  key, as `Clock`'s column renderers are.
+- **Focus moved back after something closes is deferred with `void nextTick(() => …)`.** A child's effects and their
+  cleanups run after its parent's in Vue, where React runs the child's first, so a picker focusing its field the moment
+  its popup closes would be undone by the popup's own focus return, which runs afterwards. `DatePicker`, `TimePicker`,
+  `DateRangePicker`, and `Toolbar` moving between a menubar's menus, defer the focus by one tick for that reason.
+- **Focus that must be heard from inside is `onFocusin` and `onFocusout`.** React's `onFocus` and `onBlur` bubble;
+  Vue's are the native, non-bubbling ones.
+- **A key pressed inside a teleported popup does not reach the elements it was teleported out of**, where React's
+  portal passes its events up the component tree. `Toolbar` as a menubar therefore listens on the document while one of
+  its menus is open, and acts only on keys from a layer it owns.
+- **A consumer's link component is a Vue `Component` drawn with `h(props.linkComponent, { href, …, onClick }, { default:
+  () => content })`** — `Tabs`, `Tree`, `Paginator`, `Breadcrumbs` — and is handed the same props React's is.
+
+**Where the Vue side departs from React, accepted:**
+
+- `MaskedFieldVueUtils.useMaskedField` takes the core's `MaskedFieldDefs` getters as they are, since Vue reads them
+  reactively, where React's hook takes this render's values. Like React's, it commits from the text's setter and does not
+  watch the format.
+- `TextSyncVueUtils.useValueSync` keeps React's hold on the text just typed until the owner's answer is applied, since
+  Vue applies it in its next update as React does in its next render. A refused write puts the owner's text back.
+- `SVGAnimationDefsVueUtils.useAnimateDefs` attaches each `animate` element through the element hooks `onVnodeMounted`
+  and `onVnodeBeforeUnmount`, since Vue has no ref cleanup, and writes `repeatCount` onto the attached elements itself
+  inside `setPatternIndex`, since Vue has nothing standing for `flushSync`.
+- The split composables answer writable refs named for the stem: `DateTimeValueVueUtils.useSplit` returns `date` and
+  `time`, `SignalMirrorVueUtils.useSplit` `first` and `second`. `SignalMirrorVueUtils.useOptional` reads its source once,
+  where React's re-reads its presence every render; a two-way prop uses `useTwoWay` instead.
+- `Popover`'s `onBlur` answers the native element-only `blur`, so React's check that the event started on the popup
+  itself is not needed.
+- A generic component's slots are typed at `any` for the parameter in a consumer's template, where its props keep it.
+
+### Porting: the Vue components
+
+What each Vue component does differently from its React counterpart, and why. Everything not named here behaves as
+React's does; the patterns every component shares are in _"Porting: how the Vue side reads"_.
+
+- **`RichText`'s `renderTag`**: a slot that draws nothing leaves the tag to the class map, where React's callback does
+  that only for `undefined` and draws nothing for `null`. A template slot cannot answer `undefined` — an empty one
+  answers a list of comments — so `undefined`, `null` and an empty result all mean "use the class map", and a tag the
+  consumer wants gone is answered with an empty fragment.
+- **`Odometer`'s `renderDigit` and `renderFixed`**: a slot that is given always draws, even when it draws nothing,
+  since a template slot never answers `undefined` for React's `??` to fall back from. The character stands in only when
+  the slot is left out.
+- **`Typewriter`'s `controller.update`** measures after `nextTick`, once Vue has written the new text, where React
+  queues the cause for its next layout effect.
+- **`Cuboid`, `Die` and `Trail`** hand controllers with no `subscribe`, their getters over `computed`s, as every Vue
+  controller is.
+- **The private animation components of `Samples/`** take the animated value's name as `valueName`, where React's take
+  `vName`: Vue's JSX reads an attribute starting `v` and a capital as a directive. The exported functions keep `vName`.
+  The pointer tracker there takes a getter of the element, since there is no `useElementRef`.
+- **`CheckboxGroup` and `RadioGroup`** provide a context of the Vue shape, made once, whose `register` answers its own
+  cleanup; a checkbox registers once, where React's re-registers whenever the context's `register` changes identity.
+  `CheckboxGroup`'s controller is handed once, with getters over its state.
+- **`Form`** has no `reportChange`: the Vue `FormField` and `FormSection` register entries whose errors the form reads
+  through getters, reactively, so nothing has to make it render again as React's version counter does. `FormField` and
+  `FormSection` provide their contexts from the private components `FormFieldControl` and `FormSectionContent`, which
+  wrap only what React's providers wrap: a Vue component's `provide` reaches everything it draws, caption and message
+  included.
+- **`ColorInput`'s `renderPopup`** is handed `hsv` as a writable `Ref`, where React's is handed the `[hsv, setHsv]` pair.
+  `ColorInput` and `TextInput` draw a fragment — the field and its popup — so they declare `inheritAttrs: false` and
+  point `$el` at the field.
+- **`TagInput`**'s field is an `<input>` drawn in place, so there is no `TagInputFieldElementProps`.
+- **`Table`'s `renderHeader` and `renderCell`** stay plain functions on the column records rather than slots, since each
+  column carries its own; `renderCell` is handed one object, `{ row, renderProps }`.
+- **`TileBoard`** attaches its hit layers through one function ref per tile, made once, and removes a layer when its
+  tile unmounts, since Vue calls a function ref on every render and has no ref cleanup.
+- **`Bracket`**'s nodes follow focus with Vue's native `onFocus` and `onBlur`, which do not bubble, so React's check
+  that the event started on the node itself is not needed.
+- **`Sidebar`** declares `onUpdate:expanded` and never calls it, as React's never writes `expanded`: only the owner
+  expands or collapses it, from a button of their own.
+- **`Collapsible`, `AccordionSection`, `Preview`, `Menu`, `FanMenu` and `WheelMenu`** point `$el` at their trigger, the
+  element React's `ref` points at.
+- **`Toolbar` as a menubar** listens for keys on the document while one of its menus is open, and acts only on a key
+  from a layer it owns, since a key pressed in a teleported menu does not reach the bar's element. Moving from one open
+  menu to the next is deferred one tick, so the closing menu's focus return does not undo it.
+
+### Porting: the Vue Playground
+
+How `playground-vue/` is written, derived while porting the frame, `PageComponents/` and `ButtonPage` as the pattern the
+other pages copy. Taken on Claude's judgment under the unsupervised port.
+
+- **A React file holding one component becomes one `.vue` file of the same name; a file holding several becomes one file
+  per component, named after the component**, as in the Svelte app. `Field.tsx` is `PageNumberField.vue`,
+  `PageTextField.vue` and the rest; `Examples.tsx` is `PageExamples.vue` and `PageExample.vue`; `App.tsx` is `App.vue`,
+  `AppContent.vue`, `PageDependencies.vue` and `EmptyPage.vue`. A value a React file exported beside its component is
+  exported from a plain `<script>` block of that `.vue` and imported by name beside the default
+  (`import PageTextFieldContent, { computePageTextFieldTextStyle } from ".../TextFieldContent.vue"`).
+  `pageColorPickerSlots` is the exception: a template cannot spread an object of slots onto a component, so its three
+  render functions are three components in `ColorPicker/` — `PageColorPickerArea`, `PageColorPickerHue` and
+  `PageColorPickerPanel` — each written into its own slot of `ColorInput`.
+- **The router is made in `src/index.ts`**, with `createWebHistory(import.meta.env.BASE_URL)`, since `app.use` is where a
+  Vue app is given one. `/` is `AppContent.vue`, whose `<RouterView>` draws the page; `App.vue` draws the root and hands
+  `AppContent` the viewport anchor through the outer `<RouterView>`'s slot. A page with no examples redirects to its
+  `/docs`, which is React's `<Navigate replace>`. `route.path` has the base taken off, as React's location does, so
+  nothing calls `toRoutePath`. The helpers and tables `App.tsx` kept at module scope, which several of its split
+  components and the route table need, are `AppUtils` in `App/App.utils.ts`, the one file with no React twin.
+- **`App.const.ts` registers a page as a component reference**, `component: ButtonPage`, imported from the page's `.vue`
+  at its real path. Every page React registers has a file there; one not yet ported is `<template></template>`.
+- **A page's demos are named slots of `<PageExamples>`, each named after its example's `key`.** `ExampleDefs` keeps
+  `key`, `name`, `span`, `path` and `readout` and drops `component`: the page writes
+  `<template #decorated><DecoratedExample :is-pressed="toggleOn" @click="toggleOn = !toggleOn" /></template>`, which
+  is how a Vue page draws markup for a child to place. `VariantDefs` and `<PageVariants>` work the same way. State is a
+  `shallowRef` in the page's `<script setup>`, `readout` is a closure reading `.value`, so it stays live, and
+  `EXAMPLES_ROOT` and `path` name the real `.vue` file. `ButtonPage` is the model.
+- **An example is `type Props = XExampleProps; const props = defineProps<Props>();`**, keeping React's props type from
+  the page's `.types.ts`. A callback stays a prop, reached from the page with `@click` or `@copy`; a render callback of
+  the library is a `<template #renderX="…">` slot; a render function inside a defs object, such as
+  `tooltipDefs.renderContent`, is written with `h()` in the script, since it is a value rather than a slot.
+- **The field adapters keep React's props**: `value` plus `onInput` or `onChange`, written `:value` and `@input`, so a
+  page's knobs read as React's do. **Where React takes a `[value, setValue]` pair, Vue takes `v-model:<name>`**, a
+  `<name>` and an `onUpdate:<name>` in the props type, read with Vue's `useModel`: `PageColorChannels`' `hsv`, the
+  calendar captions' `month`, `PagePlaybackScrubber`'s `playback` and `progress`, the nav settings' three.
+- **What React takes as `children` is the default slot**: `PageProp`, `PagePropsPanel`, `PageExampleKnobs`,
+  `PageMeasureBox`, `PageLayer`, `PageControlRow`. `PageExampleKnobsButton`'s `renderKnobs` is a slot. A slot drawn from
+  a template hands its consumer one object, so `StressTest`'s are `#renderLabel="{ configIndex }"` and
+  `#renderItem="{ configIndex, itemIndex }"`.
+- **Contexts are `provide<Name>Context` and `use<Name>Context`** over an `InjectionKey`: `Layer`, `PropsPanel`,
+  `ExampleKnobs` and `Field`'s two registries, the last read through `useFieldReset(value, apply)`, which registers on
+  mount as React's effect does.
+- **A library component's `ariaLabel` is written `ariaLabel` in a template, not `aria-label`.** Vue hands either to the
+  prop at runtime, but `vue-tsc` reads `aria-label` as the native attribute and refuses it where the prop is required
+  (`Modal`, `Tree`), so one spelling is kept everywhere. A native element keeps `aria-label`.
+- **Vue turns a line break between text and a tag into a space**, so a caption and the control beside it, or a name and
+  its `?`, are written with no gap (`{{ label }}<Button …>`). React's `onBlur` on a container is `@focusout`, since
+  React's bubbles and the native `blur` does not.
+- **`PageViewTabLink` does not pass `replace`.** A tab click runs the strip's `onSelectionChange`, which pushes, and then
+  the link's own navigation; `vue-router` cancels a navigation still pending when another starts, so a replace second
+  would leave the history one entry short of React's and Back would skip the page. Two pushes to one address end where
+  React's push-then-replace does.
+- **The docs plugins read the Vue package.** The Vue config passes `componentApi` `{ slotsSuffix: "Slots" }`, so a
+  `<Name>Slots` type is drawn in the props group straight after `<Name>Props` rather than among the types, and its
+  Passing column reads `slot`; and an export made with `defineComponent(setup, …)` is listed by its setup function,
+  `<T>(props: TabsProps<T>, slots: TabsSlots<T>) => VNode`, rather than by the type `defineComponent` returns. The
+  Solid and React output is byte for byte what it was. `componentDependencies` needed nothing, the package being `.tsx`.
+- **The source view globs `.vue` files and highlights them with shiki's `vue` language**, loaded into the shared
+  highlighter from the app's own `SourceView.utils.ts`, and keys a split `PageX.vue` inside folder `F` by the stem
+  `F/F`, as the Svelte app does, so it shares a tab with `F.types.ts` and `F.css.ts`.
+- **A case only the Vue app can pass is tagged `@vue`**, and the root config's other projects leave the tag out. The
+  first is the docs table's slots row beside the `@solid`, `@react` and `@svelte` cases.
+
+### Porting: how the Svelte side reads
+
+Derived while porting `Utils/`, every abstract, the primitives, the composites and the generators, and applied to all
+of them; the components ported after should keep to it. Taken on Claude's judgment, as the port was asked for
+unsupervised. The shapes are Solid's more often than React's, because runes are fine-grained the way signals are.
+
+- **A helper keeps the Solid helper's name, arguments and return shape: getters in, getters out.**
+  `ElementFaderSvelteUtils.createFader(getIsVisible, opts)` returns `getIsVisible`, `getTransitionTarget` and the rest,
+  as Solid's does, because a Svelte helper runs once while its component is being set up, and a plain value handed in
+  or out would be read that once. The file is `<Subject>Svelte.utils.svelte.ts` when it uses a rune and
+  `<Subject>Svelte.utils.ts` when it does not (`SelectionSvelteUtils`, `GlassSvelteUtils`, the gradients and patterns).
+  One helper was renamed rather than copied, because its Solid name carries the mechanism:
+  `NavigatorSvelteUtils.createDirection` for `createDirectionSignal`. A defs type that is Solid's `AccessorProps` block
+  becomes explicit getters in Svelte (`RotatorDefs.getStepCount`), the shape the core's own defs already use.
+- **A store is read through `readStore(store, select)`** in `Utils/storeUtils.ts`, over Svelte's `createSubscriber`. It
+  answers a getter that subscribes while an effect, a `$derived` or markup reads it and answers the current value
+  without subscribing anywhere else, and it compares the selected part with `Object.is` before waking anyone. It needs
+  no component, so the module-level state Solid mirrors into a signal — `Elevation`'s layers, `Carrier`'s carry, the
+  pointer's presence — is a module-level `readStore` in Svelte, with nothing subscribed until something reads it.
+- **An element is `$state` filled by `bind:this`, handed to a helper as `() => element`.** That is why the Svelte
+  `Utils/` has no `refUtils`: `useElement` exists because a React ref is not state, and `bind:this` already is;
+  `useLatest` exists because a React component's props are this render's, and a Svelte component's `props` object is
+  read lazily, so a closure made once always sees the current ones; `useStableList` exists because an effect's
+  dependency list compares arrays, and a Svelte effect tracks the state a list was built from instead. `bind:this`
+  writes `null` when the element goes, so helpers test for an element rather than for `undefined`.
+- **Where a helper or a wrapper needs the caller's element, it hands out an attachment rather than a ref setter.**
+  `AnchorSvelteUtils.createPortalPosition` returns `attachContent`, `VirtualizerSvelteUtils`' `measureRow(index)` is an
+  attachment, and `InteractionWrapper`'s `renderControl` snippet is handed `attachElement` as its first argument, to go
+  on the interactive element with `{@attach}`. So the Svelte `InteractionControlProps` carries `attachElement` where
+  React's carries `ref`: it is the wrapper's hold on its leaf, which a consumer never reads, and `ref` is kept for the
+  element a consumer does.
+- **`ref` is a `$bindable` element**, bound with `bind:ref`. A component that needs its root only as an element binds
+  `ref` straight to it and reads it from there (`PlacementBox`'s `bind:this={ref}`); a wrapper writes it from its
+  attachment, and a preset over a wrapper passes it through with `bind:ref`.
+- **Two-way state is a `$bindable` prop under the stem, and the fallback is the uncontrolled case.** Optional ones take
+  their initial value there — `Carousel`'s `index = $bindable(0)` and `playback = $bindable(true)`, `Wheel`'s
+  `targetIndex` and `autoSpin` — and required ones take none (`TextField`'s `value`, `Spotlight`'s `visibility`). Handed
+  on to a core or a helper, it is a `ValuePair<T>`, `[() => value, (next) => (value = next)]`, built where it is passed.
+  A bound prop reads through the owner's getter on every read, so a write the owner refuses — a function binding
+  `bind:value={get, set}` whose setter drops it — leaves the component reading the owner's value; a control holding a
+  native value still has to put the element back, which `BinarySwitchUtils.syncElement` and `TextSync` already do. A
+  prop with a fallback cannot be bound to `undefined` (Svelte throws), so a prop whose meaningful value may be
+  `undefined` takes no fallback.
+- **`SignalMirrorSvelteUtils` keeps only what `$bindable` does not cover**: `createMirror` and `createValueMirror` for
+  an inner copy, `createSplit` for one value edited as two, and `createOptional` for a helper whose pair may be missing.
+  `createPassThrough` has no Svelte half, since a `ValuePair` already is one.
+- **A `render*` prop is a `Snippet` taking React's plain arguments**, drawn with `{@render props.renderContent(flags)}`.
+  Svelte hands a snippet its arguments lazily, so a plain value stays live inside it, as Solid's getters do.
+  `children` is the `children` snippet. A snippet the component builds and hands to its consumer inside a record —
+  `CarouselControls.renderStep` — is a top-level snippet of the component, referenced from the script. A component that
+  adapts a snippet's arguments declares a snippet of its own inside the child's (`InteractionWrapper`'s tooltip,
+  `Carousel`'s controls).
+- **Markup held as a value is `SvelteMarkup`, drawn by the `Markup` component in `Utils/`.** Wherever React returns a
+  `ReactNode` from a function — the gradient, pattern and filter builders, `Glass`, a defs record's `renderDefsElement`
+  — Svelte returns `markup(Component, props)` or `{ snippet }`, a list of those, or nothing. It is never a function, so
+  a parameter taking markup or a function producing it (`computeLinearGradient`'s `custom`) still tells them apart. The
+  generator is a private component (`SVGLinearGradient.svelte`, `SVGFilterElement.svelte`) and the namespace keeps
+  React's name and arguments (`SVGGradientDefsSvelteUtils.computeLinearGradient(defs, custom)`, `SVGFilterDefsFactory`),
+  so a sample ported later reads line for line. Drawn again with the same component, markup updates in place rather than
+  mounting afresh. `SVGDefs` is `SVGDefsOf<SvelteMarkup>`. A component whose root is an SVG element outside an `<svg>`
+  of its own file declares `<svelte:options namespace="svg" />`.
+- **An SVG animation restarts by `{#key}`**: `SVGAnimationDefsSvelteUtils.createAnimateDefs(getDefs)` returns `getKey`,
+  the record's identity, and `getAttributes`, whose attachment key does the scheduling, as React's key and attributes
+  do. The pattern index is written inside `flushSync`, for the reason React's is.
+- **`useEffect` and `useLayoutEffect` both become `$effect`, which runs after the DOM is updated and before the browser
+  paints.** `$effect.pre` is for what must land in the same update as the change that caused it: what Solid does in
+  `createComputed` or `createRenderEffect` and React during render — `PlacementItem` starting its glide, `Spotlight`'s
+  placed flag, `TextSync`, the virtualizer's options, `Mosaic` noting where focus was before its tiles move. A cleanup
+  with no condition is `$effect(() => stop)`. Solid's `on(source, fn, { defer: true })` is `watchChange(getValue,
+  onChange)` in `Utils/effectUtils.svelte.ts`, with `isBeforeRender` for the `$effect.pre` form.
+- **An effect reads what it depends on, then calls the core inside `untrack`.** Svelte tracks every read made while an
+  effect runs, the core's own included — a getter over a prop, a store the call writes and reads back — and a call that
+  writes what the effect has read reruns it. So the shape is
+  `$effect(() => { const ref = getRef(); if (!ref) return; return untrack(() => core.observe(ref)); })`.
+- **A core object is made once in the component's script and reads the props through closures.** The script runs once,
+  so nothing stands in for `useState`'s initializer or `useLatest`. Where a core reads an optional function's presence
+  at event time, the defs object carries a getter for it (`get computeSpinDefs() { return props.computeSpinDefs; }`),
+  as React's does.
+- **Props are read as `props.x`, with the bindables destructured beside them**: `let { value = $bindable(), ...props } =
+  $props()`. Defaults are `$derived(props.x ?? DEFAULTS.x)`. A local is never named `state`, `effect` or `derived`,
+  because `$state` then reads as a store subscription to it and the file stops compiling.
+- **A generic component declares `<script lang="ts" generics="T">`**, or `generics="TExtra extends object = {}"`, and
+  the type is inferred from the props at the call site; a snippet's parameters may name it.
+- **A context is Svelte's `createContext`**, and each `.context.ts` exports `set<Name>Context` and `get<Name>Context`,
+  the getter answering the same fallback the React hook does (`hasContext() ? getContext() : fallback`). The window
+  fallback of `getViewportContext` reads `svelte/reactivity/window`, so its size is reactive where React re-renders on
+  resize. `ColorExtractor`'s context holds getters, as Solid's does; `createColorExtractor(context?)` and
+  `getColorExtractorContext()` are React's `useColorExtractor` and `useColorExtractorContext`. A context file that
+  uses a rune is `.context.svelte.ts`.
+- **A portaled layer is `attachPortal(target)` on its outermost element, and that element is the only node of its
+  `{#if}`**, since Svelte removes a block's nodes by walking from its first to its last, and a moved element's new
+  neighbors would otherwise be walked too. Svelte also listens on the document, so the element's own handlers fire
+  wherever it was moved to. **The move puts back every scroll position inside the element.** The attachment runs after
+  the effects of what the element holds, and taking an element out of the document resets the scroll of everything
+  in it, so a popup's highlighted row revealed the moment it mounted — a menu opened on its last item, `Clock`'s
+  selected hour — was shown and then scrolled away again as the popup moved. React, Solid and Vue build a portal's
+  content in its target and never meet this.
+- **Styles are strings.** `style:property` for what the markup names, and `toStyle(...)` in `Utils/styleUtils.ts` for a
+  record — what the core's style helpers and `assignInlineVars` return — hyphenating camelCase keys and leaving a
+  custom property's name alone. Classes are `class={[a, isB && b]}`.
+- **`useId` is `$props.id()`.**
+- **A controller's getters read runes, so they are live in an effect, a `$derived` or markup**, and it carries no
+  `subscribe`: that was React's addition for `useSyncExternalStore` (`WheelController`).
+- **Relative imports are fully specified** — `.js` for a `.ts` or `.svelte.ts` module, `.svelte` for a component —
+  because `svelte-package` emits the tree as it is rather than bundling it. **The commit hook formats no `.svelte`
+  file**, having no parser for one, so those are written in the house format by hand, import order included.
+- **An object or array written to a `$bindable` prop comes back as a copy, and `createHeldValue` in
+  `Utils/bindableUtils.svelte.ts` answers the value written.** Svelte wraps a plain object or array in a watched copy
+  when the component writes it to a prop nothing is bound to, and so does a consumer's `$state` bound to it, so a
+  component that later finds the value by identity — the option it picked, the node it zoomed into, the rows it selected
+  — finds nothing. Every component that writes such a value and then compares it holds the prop through
+  `createHeldValue([() => value, (next) => (value = next)])` and reads and writes the pair instead of the prop: the
+  hierarchy charts' branch or focus, `Table`'s selection, `Accordion`'s and `Tree`'s expanded lists and `Tree`'s value,
+  `Menu`'s and `ContextMenu`'s checked lists, `Toolbar`'s pressed values, `Listbox`, `MultiListbox`, `Select`,
+  `MultiSelect`, `RadioGroup` and `CheckboxGroup`. A value only read for its fields — `ColorArea`'s channels, `Range`'s
+  pair, a date range, `Table`'s sort and widths, the sortables' items, which are found by key — needs nothing. The
+  helper compares with `Object.is` rather than `===`, because a development build rewrites `===` in a Svelte module to
+  warn whenever a copy meets its original, and that meeting is the helper's whole job. It mends only what the component
+  reads: the consumer's own `$state` still holds the copy, which is why the charts' docs still ask for `$state.raw`.
+- **Where Svelte's accessibility checker objects only to where a handler sits, the handler is attached instead**, as
+  `{@attach (element) => on(element, "click", handleClick)}`, and the markup stays React's. The checker reads handler
+  attributes: a `click` on an element with no key handler, a `keydown` on an element with no role, an interactive role
+  holding a handler but no `tabindex` in the source (because a leaf's `tabindex` is written at mount by
+  `InteractionWrapper`). `on` from `svelte/events` runs in order with Svelte's delegated handlers, so the order of
+  events does not change. Only the handlers the checker names move; the rest of an element's handlers stay attributes,
+  as `Tree`'s `onfocusin` does. The checks that ask for different markup are left firing, since the markup is React's: a
+  non-negative `tabindex` on an element with a non-interactive role (`EdgeFader`, `ContextMenu`'s region, `Reveal`,
+  `CardStack`, and the tiles, arcs and circles of `Treemap`, `Sunburst` and `CirclePacking`), an `aria-*` attribute the
+  role does not list (`aria-disabled` on the sortables' lists and items, `aria-required` on `Range`'s slider,
+  `aria-invalid` on `ColorArea`'s group and `ColorInput`'s field button, `aria-haspopup` and `aria-expanded` on
+  `ContextMenu`'s group), a `<button>` with `role="separator"` in `SplitPane`, and `CellAnimation`'s hidden `<img>`,
+  which carries `aria-hidden="true"` and no `alt`. A literal `tabindex="-1"` is written as a string, which renders the
+  same, since the checker reads an expression as possibly non-negative.
+- **React's bubbling `onFocus` and `onBlur` are `onfocusin` and `onfocusout`**, since Svelte's `onfocus` and `onblur`
+  are the native events, which do not bubble. Where React's handler checked `e.target === e.currentTarget` to keep only
+  the element's own focus, the Svelte one is plain `onfocus` and needs no check.
+- **An id composed from a prefix is `$props.id()` plus a suffix**, so the generated text differs from React's while
+  every `aria-*` reference still points at the right element.
+- **Elements a component collects are held two ways.** A `Map` or a plain array filled from `bind:ref={getter, setter}`
+  when they are only read in handlers (`Sortable`, `TileBoard`, `Timeline`, `Accordion`); a `$state.raw` array or record
+  replaced by a setter wrapped in `untrack` when an effect has to follow them (`Tabs`' indicator, `Toolbar`'s overflow,
+  `Toasts`' measuring), since the setter runs inside the binding's own effect and would otherwise subscribe it to the
+  list it writes.
+- **A snippet cannot answer nothing, so a `render*` React falls back from when it returns nothing falls back only when
+  the prop is left out** (`Clock`'s `renderColumn`, `Odometer`'s `renderDigit` and `renderFixed`). Where the fallback is
+  what the consumer wants for some calls only, the snippet is handed it: `RichText`'s `renderTag` gets a fourth
+  argument, `renderDefault`, to render for a tag it leaves to the class map.
+- **A two-way value handed to a snippet is a `ValuePair`**, `[() => value, (next) => …]`, which a consumer passes to a
+  function binding as `bind:hsv={hsv[0], hsv[1]}`: `ColorInput`'s `renderPopup` channels and the date pickers'
+  `renderPopup` month.
+- **A context the React component provides around its children is set by a private component**, since a Svelte context
+  is set while a component is being set up and a snippet has no setup of its own: `FormFieldControl` and
+  `FormSectionContent`.
+- **Text beside an element is written with no whitespace between them where React's JSX has none**, since a Svelte
+  template keeps the space a line break leaves and JSX drops it.
+- **`readStore`'s listener wakes its readers untracked**, since a store can be written from inside an effect Svelte is
+  running — a field blurred as its block is torn down writes the focus store there.
+
+**Divergences from React that were accepted.**
+
+- **An event inside a portal does not reach the handlers of the components around where it was declared.** React's and
+  Solid's events follow the component tree through a portal; Svelte's follow the document. Nothing ported so far relies
+  on it; a component that does will need the handler on the portaled element itself.
+- **The private leaves are files of their own** — `BinarySwitchElement`, `TextFieldElement`, `CarouselControl`,
+  `MosaicTile`, `GlassSheenFilter` and the generators' components — because a `.svelte` file holds one component. Their
+  props types sit in the parent's `.types.ts` as React's `BinarySwitchElementProps` does, including the two React
+  declares inline (`MosaicTileProps`, `GlassSheenFilterProps`). `Surface`'s `SurfaceSVG` and `SurfaceDiv` became the two
+  branches of one component.
+- **`Tooltip`, `Shape`, and the `Label` and `FormField` contexts and helpers were ported ahead of the rest of
+  `Essentials/` and `Exotics/`**, because `InteractionWrapper`, `TextField`, `BinarySwitch`, `PopupTrigger` and the
+  surfaces are built on them.
+
+### Porting: the Svelte components
+
+Where a Svelte component behaves differently from the React one, and why. The mechanisms these rest on are in
+_"Porting: how the Svelte side reads"_; this is the list by component, for a reader comparing the two Playgrounds.
+
+- **An optional two-way prop that React only reports through keeps the Svelte component's own value.** `Table`'s `sort`,
+  `Range`'s `value` and `range`, the checked lists of `Menu`, `ContextMenu`, `FanMenu`, `WheelMenu` and `Menubar`, and
+  `Toolbar`'s `pressedValues`. Left out in React, the pair is missing, so the component shows nothing picked and the
+  reader's changes go nowhere: the rows never sort, a `Range` given neither prop does not move, a checkbox item never
+  checks. In Svelte a prop nobody bound and a prop bound to `undefined` read the same, so the component keeps what the
+  reader did. The only thing that tells them apart is the setter Svelte's compiled props object carries for a binding,
+  which is the compiler's internals and not an API, so the difference was accepted rather than built on it. `Table`'s
+  `widths`, `order` and `selection` are not affected: React already treats their absence as the feature being off, and
+  the Svelte table checks for `undefined` the same way and never writes them when they are left out. For the same
+  reason, a prop React requires as a pair and a Svelte consumer passes without `bind:` is read once and then kept by
+  the component.
+- **`DateInput` and `TimeInput` rewrite their text when their spelling changes**, as they do in every framework: a new
+  `format`, `calendar`, `isTwelveHour` or `hasSeconds` shows the same value in the new form. The React and Vue fields get
+  there by calling `refresh` themselves, since their masked field does not watch the format; the Svelte one watches it
+  inside `MaskedFieldSvelteUtils.createField`. That commits the value from the text's setter, as React's hook does,
+  rather than from an effect watching the text: an effect sees a change of rules before the text is rewritten, so it
+  read the old text under the new rules and committed a value nobody typed — `13:00` became `01:00` when a twelve-hour
+  field went to twenty-four hours, and `12.345` became `123.45` when a currency field lost a decimal. Solid keeps its
+  effect and reads the rules inside it untracked, which answers the same fault; see _"`MaskedField`: the half every
+  field over a typed value shares"_. The
+  rewrite follows the value, so a field that started empty picks up a change made after something was typed into it.
+  It is written through the same setter as typing, so `CurrencyInput` commits the value its new spelling shows, as
+  React's does, and needs no watcher of its own. With no value and a half-typed entry, React's `CurrencyInput` clears
+  the entry when its grouping changes and the Svelte one leaves it.
+- **`Form`'s `renderContent` is handed one state object for the form's life**, whose `isValid` and `hasSubmitted` read
+  the current state, where React's is a fresh snapshot each render.
+- **`Menubar` switches menus by closing the open one, flushing the update with `flushSync`, focusing the next item and
+  then opening it**, where React sets a pending switch that an effect carries out; the reader sees the same thing. While
+  a menu is open over a portal it listens for keys on the window, since a key pressed inside the portaled menu reaches
+  the document and not the menubar's element.
+- **A menu level stops Escape with `stopImmediatePropagation`**, as the Solid one does, where React calls
+  `stopPropagation`: Svelte, like Solid, delivers the key from the document, where the outer levels' dismissers listen
+  too, and only the immediate form keeps the key from closing them as well.
+- **The link a `Tabs`, `Breadcrumbs` or `Paginator` draws is a Svelte `Component`** of the same `*LinkProps`, and the
+  element reaches the navigator through an attachment in those props, which the consumer's link spreads onto its
+  anchor with the rest.
+- **`Reveal`'s and `ScratchCard`'s `renderCover` is handed the mask as a style string**, since styles are strings on
+  this side, where React hands a style object.
+- **A `Cuboid` drag settles on release by Solid's rule**, checking whether the owner accepted the new count, where the
+  React one settles back only when the drag rounded to no turn.
+- **`AudioSwitcher`'s controller is the core's, `reset` alone**, with no `subscribe`: the playback it would report is
+  the `bind:playback` prop, which a consumer already follows.
+- **In `Samples/`, a gradient or pattern that follows state is a `.svelte` component** whose module script exports the
+  builder and draws itself, and a timed one is a `.ts` builder returning markup. A pattern whose id changes is updated
+  in place rather than drawn afresh, and its rolls are keyed by cell id. `hand_1`, `spot_flare_2` and `spot_flare_3` are
+  one component each, told which part to draw by a `part` or `ghost` prop, where React draws two.
+
+### Porting: the Svelte Playground
+
+How `playground-svelte/` is written, derived while porting the frame, `PageComponents/` and `ButtonPage` as the pattern
+the other pages copy. Taken on Claude's judgment under the unsupervised port.
+
+- **A React file holding one component becomes one `.svelte` file of the same name; a file holding several becomes one
+  file per component, named after the component.** `SourceView.tsx` is `SourceView.svelte`; `Field.tsx` is
+  `PageNumberField.svelte`, `PageTextField.svelte` and the rest, `TabContent.tsx` is `PageTabContent.svelte`,
+  `PageTabFloater.svelte` and so on. `App.tsx` is `App.svelte`, `AppContent.svelte`, `PageDependencies.svelte` and
+  `EmptyPage.svelte`. A value a React file exported beside its component — `computePageTextFieldTextStyle`,
+  `computePageSelectTextStyle`, `STEP_GLYPHS`, `getPoints`/`getViewBox`, `INDENT_PER_DEPTH`/`LEAF_MARKER`,
+  `pageColorPickerSlots` — is exported from that component's `<script module>` and imported by name beside the default.
+- **The source view keys a split file by the React file it came from.** A `PageX.svelte` inside folder `F` belongs to the
+  stem `F/F`, so it shares a tab with `F.types.ts` and `F.css.ts` exactly as `F.tsx` did, while the sections list the
+  real file names. `.svelte` files are highlighted with shiki's `svelte` language, loaded into the shared highlighter
+  from the app's own `SourceView.utils.ts`, so the shared `shiki.ts` did not change.
+- **Routing is `sv-router`, created once in `App/App.router.ts`**, the one file with no React twin: `sv-router` hands
+  out `navigate` and `route` from `createRouter`, so the route table has to live in a module the frame imports. It is
+  built from `App.const`'s registry — each page's route maps `/` to its page and `/docs` to `DocsRoute.svelte`, and a
+  page with no examples maps `/` to `DocsRedirect.svelte`, which is React's `<Navigate replace>`. `route.pathname`
+  already has the base taken off, as React's location does, so nothing calls `toRoutePath`. `navigate` is typed for
+  literal paths, so a computed one is cast to `RoutePath` from `App.types.ts`.
+- **`index.ts` mounts the app in a microtask.** `sv-router` reads the address in a microtask of its own and again when
+  `<Router>` is created; the second read happens while the page column is being drawn, and Svelte does not re-run the
+  block that is drawing when it writes state that block read. So the first render showed no title or tabs on a page
+  reached by its address, and only a click fixed it. Mounting after the router's own microtask means the address is
+  right before anything reads it.
+- **`sv-router` answers every same-origin link click in the document, not only the frame's.** A page whose example
+  draws plain `<a href>` links — breadcrumbs, a mosaic, rich text — has them followed inside the app unless the example
+  prevents the default, where React leaves them to the browser. `PageRouterLink` navigates itself and prevents the
+  default, so `replace` needs no `data-` attribute on the anchor.
+- **A page is a `.svelte` file whose examples are snippets.** State is `$state` in the page's script; `examples` is an
+  `ExampleDefs[]` whose `component` is a top-level `{#snippet}` of the same file drawing the example, and whose
+  `readout` is a closure over the state, so it stays live. `EXAMPLES_ROOT` and `path` name the real `.svelte` file.
+  The page ends in `<PageExamples items={examples} />`. `ButtonPage` is the model.
+- **An example is a `.svelte` file reading `type Props = XExampleProps; let props: Props = $props();`**, keeping React's
+  props type from the page's `.types.ts`. A render prop is a child snippet of the component; a snippet inside a defs
+  object, such as `tooltipDefs.renderContent`, is a top-level snippet with typed parameters, referenced by name.
+- **The Playground's field adapters keep React's props**: `value` plus `onInput` or `onChange`, not `bind:value`, so a
+  page's knobs read as React's do. `PageExampleKnobs`, `PagePropsPanel`, `PageProp` and `PageMeasureBox` take
+  `children`. What takes a pair from a library snippet takes a `ValuePair`: `PageColorChannels`' `hsv`, the calendar
+  captions' `month`. `PagePlaybackScrubber` takes `bind:playback` and `bind:progress`, since both are the page's own
+  state and nothing arrives as a pair.
+- **Contexts are `set<Name>Context` and `get<Name>Context`**: `Layer`, `PropsPanel`, `ExampleKnobs` and `Field`'s two
+  registries, the last read through `useFieldReset(getValue, apply)`. `getLayerClass()` in
+  `StyledComponents/Layer/Layer.context.ts` returns a getter and is used as `$derived.by(getLayerClass())`.
+- **A record compared by identity is held in `$state.raw`.** `$state` wraps what it holds in a proxy, so a menu config
+  kept in expanded-node state would no longer be the object the `Tree` was handed and nothing would read as expanded.
+- **Svelte turns a line break between two tags into a space**, so inline siblings whose text must run together — a
+  prop name and its `?`, a styled label beside its badge — are written with no gap.
+- **Some styled components must sit inside an `<svg>`**: `PageSunburstArc`, `PageCirclePackingCircle`,
+  `PageCirclePackingLabel`, `PagePatchCable` and `PageTrailTrack`. `PageFilterStage.renderDefs` returns `SvelteMarkup`.
+- **The docs plugins read the Svelte package.** `componentApi` gives the TypeScript program a declaration for each
+  `.svelte` module, made from the `$props()` annotation of its instance script: `Component<Props>`, or a generic function
+  over the `generics` attribute, so the Components table lists each with its props type. `componentDependencies` also
+  collects `.svelte` files, reads indented imports and resolves a `.js` specifier to its `.ts` file. Neither changes what
+  the Solid and React apps produce.
+- **A case only the Svelte app can pass is tagged `@svelte`**, and the root config's other projects leave the tag out.
+  The first is the docs table's `Snippet` type text beside the `@solid` and `@react` cases.
 
 ### Porting: `PlacementBox`, `PlacementItem` and `Barrel`
 
@@ -621,7 +1226,7 @@ Taken on Claude's judgment, since the user asked for the components to be ported
 - **The React `Modal` declares its sealing effect before its auto-focus.** React runs effect cleanups in declaration
   order, so the page behind is unsealed before focus is put back — restoring first would reach for a trigger that is
   still inert.
-- **`initialFocusRef` is an element value, as `anchorRef` is**, and `visibilitySignal` is `visibilityState`.
+- **`initialFocusRef` is an element value, as `anchorRef` is**, and `visibility` is a `[value, setValue]` pair.
 - **A story that portals needs a full-window layer**, because a dialog portaled straight into `document.body` is only
   as tall as the body's content; each Playground's viewport supplies one.
 
@@ -671,7 +1276,7 @@ Taken on Claude's judgment, since the user asked for the components to be ported
   for**, and worked out again during render when those change, so the accumulating angle is never painted one frame
   stale.
 - **A core type is reused in React where its documentation reads true for both**; `CarouselState` is redeclared on
-  the React side only because its documentation names `playbackSignal`.
+  the React side only because its documentation names `playback`.
 
 ### Porting: the SVG generators, `Shape`, `Surface`, `GlassSurface`, `Corners` and `Glass`
 
@@ -950,7 +1555,7 @@ Taken on Claude's judgment, since the user asked for the components to be ported
   card's push and flight with its commands, holding the leave timer and the two-frame return.
 - **A React command sees its own writes before the re-render**: a React grid or stack hands the value it just gave the
   owner's setter back to its own core, since `compact()` called from `onTransfer` otherwise read the items from before
-  the drop and undid the move. PatchBoard's `nodesState`, `linksState` and CardStack's `topIndexState` do not yet, and
+  the drop and undid the move. PatchBoard's `nodes`, `links` and CardStack's `topIndex` do not yet, and
   nothing reads the new value in between today.
 - **A PatchBoard socket's wrapper is `sizing="fill"`**, in both frameworks. Its width used to come from
   `patchBoardSocketHolder > *` beating the wrapper's fit-content width only by stylesheet order, and through `core.ts`
@@ -1776,7 +2381,7 @@ here, because the two things a radio group needs are behavior, and behavior is t
 
 - A radio group is a **single tab stop**, arrows both moving and selecting — a roving tabindex, which
   `Tabs` already implements and is the model to follow.
-- The **group owns one value**, not one boolean per radio. `checkedSignal: Signal<boolean>` is the wrong
+- The **group owns one value**, not one boolean per radio. `checked: Signal<boolean>` is the wrong
   shape for a member of a set; a `RadioGroup` holding `Signal<T>` handing each radio a derived boolean is
   right. Native `name` grouping gets DOM mutual exclusion free but leaves the state model unowned.
 
@@ -1806,7 +2411,7 @@ opt-in when it is, or every control pays for a listener it ignores.
   descendants detect it rather than making every caller pass "I am already labeled". Incidentally
   `<label disabled>` was never valid HTML and did nothing.
 - _`hasOwnValue`._ A controlled-versus-uncontrolled mode flag: false force-wrote the DOM back to the prop
-  and reported the inverse; true reported the DOM's checkedness. `checkedSignal` replaces the flag with
+  and reported the inverse; true reported the DOM's checkedness. `checked` replaces the flag with
   one mechanism, so it should not come back. The force-write guards something real and became
   `syncElement` — see below.
 
@@ -1848,7 +2453,7 @@ awaited by nobody; an async accept would need the render effect to finish the jo
 **`checkedState` is a flag, so the painter stops being told twice.** The flag arrived on
 `ExternalInteractionFlags` and now sits on `BinarySwitchFlags`, with `InteractionWrapper` taking a matching
 `getCheckedState`, which the presets `Omit` — they own the value, and two sources for one state is what the omission prevents. `PageCheckboxContent` / `PageToggleContent` / `PageRadioContent` now read `getFlags().checkedState` and take nothing
-but flags. Before this, `CheckboxPage` passed `checkedSignal` to the component _and_ closed over the same signal for the
+but flags. Before this, `CheckboxPage` passed `checked` to the component _and_ closed over the same signal for the
 painter, with the component connecting neither: the faked linkage `renderDecoration(getFlags)` was
 introduced to kill. Three states rather than two is also why it had to be a flag: mixed is computed by
 the shell, so a painter inferring it from a boolean could not draw it.
@@ -1884,9 +2489,9 @@ anything is a checkbox.
 switch otherwise; the role flips on a state change, which readers re-announce anyway. The one place a
 requested feature and the spec disagree, resolved by a role swap rather than an approximation.
 
-**The group owns the value; each radio derives a boolean.** `RadioGroup` takes `valueSignal: Signal<T>`
+**The group owns the value; each radio derives a boolean.** `RadioGroup` takes `value: Signal<T>`
 and publishes a context; `Radio` takes `getValue` and reads `context.getValue() === props.getValue()`.
-Per-radio `checkedSignal` was never on the table: a member of a mutually exclusive set does not own its
+Per-radio `checked` was never on the table: a member of a mutually exclusive set does not own its
 truth, and N booleans can represent states the group cannot be in.
 
 Context rather than `Tabs`' count-plus-`renderOption` shape, because each radio keeps the whole
@@ -2184,8 +2789,8 @@ the re-sync finds nothing to write; a refusing or transforming owner still gets 
 later. Found by the first run of the interaction suite, which is the whole argument for having one — the
 ordering reads as correct and nothing about it is visible in markup.
 
-**Transforms compose through `onInput`, not through a derived signal.** `TextInput` writes `valueSignal`
-with the raw value then calls `onInput`, exactly as `Checkbox` writes `checkedSignal` before reporting, so
+**Transforms compose through `onInput`, not through a derived signal.** `TextInput` writes `value`
+with the raw value then calls `onInput`, exactly as `Checkbox` writes `checked` before reporting, so
 a consumer wanting upper-casing or digits-only writes the signal a second time from `onInput` and the sync
 corrects the DOM. Handing `TextInput` a hand-built `[getter, transformingSetter]` pair was abandoned:
 Solid's `Setter<T>` is an overloaded type a plain `(value: string) => void` cannot satisfy, so it needs a
@@ -2203,7 +2808,7 @@ control's private state.
 `NumberInput`, because writing `String(state)` back on every keystroke makes `"1."`, `"-"` and `"1e"`
 untypeable and `setSelectionRange` throws on `type="number"`. Both claims are true, and neither was a
 reason for a component._ The argument rested on an unstated assumption: that a number field means
-`valueSignal: Signal<number | undefined>`. It does not. **The DOM's value is a string for every input
+`value: Signal<number | undefined>`. It does not. **The DOM's value is a string for every input
 type**, and with `Signal<string>` the round-trip never happens — `syncElement` compares strings, finds
 them equal, writes nothing. The `setSelectionRange` hazard was already handled by the `null` guard written
 for `email` and `url`.
@@ -2306,7 +2911,7 @@ provides.
 `role="spinbutton"` and publishes `aria-valuenow` / `aria-valuemin` / `aria-valuemax` from the value and
 range it already holds. `aria-valuenow` is omitted while the text does not parse.
 
-**`valueSignal` is `Signal<number | undefined>`, and `undefined` means an empty field.** The one place the
+**`value` is `Signal<number | undefined>`, and `undefined` means an empty field.** The one place the
 `Signal<string>` rule is deliberately broken, because the codec is the feature. A private `Signal<string>`
 still runs the element, so the `"1."` hazard is untouched — the string signal is what `TextSync` compares
 and the number is never written back over it. `undefined` rather than `0`, because a `0` would be a value
@@ -2326,7 +2931,7 @@ a step is a complete gesture and typing is not.
 enough, because it only governs the text: the number still went out on every keystroke, so a duration field
 with a floor of 100 handed its consumer `5`, then `50`, and restarted the animation twice at durations nobody
 asked for. What holds the range now is silence — while the text parses to something the range refuses, the
-`valueSignal` and `onInput` are left alone and the owner keeps the last reading that was allowed. Leaving the
+`value` and `onInput` are left alone and the owner keeps the last reading that was allowed. Leaving the
 field clamps and reports, as before, so the value an owner sees is only ever one it could have been given.
 
 **`undefined` is still only "empty", and out-of-range is held rather than reported as `undefined`.** An owner
@@ -2342,9 +2947,9 @@ be left is what the separate `:user-invalid` is for, and a control that reports 
 person typing the reason straight away.
 
 **Stepping, `Home` / `End` and the stepper's end flags read the text, not the reported value.** They used to
-read `valueSignal`, which was the same thing while every keystroke was reported and is not any more: with
+read `value`, which was the same thing while every keystroke was reported and is not any more: with
 `999` typed into a field capped at 100 and the owner still holding `99`, an arrow would have stepped from the
-`99` nobody can see. The text is what the field holds; `valueSignal` is what the owner has accepted.
+`99` nobody can see. The text is what the field holds; `value` is what the owner has accepted.
 
 **The fault this came out of was one level out, in the Playground's own panel adapter.** `PageNumberField`
 brought every keystroke into range before storing it, and the mirror then wrote the stored number back over
@@ -2458,14 +3063,14 @@ It is also why the painter is handed `ratios` rather than percentages. A thumb's
 ends. The painter positions with `calc(ratio * (100% - thumbSize))`, which it can only write because it
 knows the thumb size.
 
-**One prop per mode, and giving neither or both warns.** `valueSignal: Signal<number>` drives one thumb;
-`rangeSignal: Signal<RangeValues>` drives a pair. A single `Signal<number | RangeValues>` would force
+**One prop per mode, and giving neither or both warns.** `value: Signal<number>` drives one thumb;
+`range: Signal<RangeValues>` drives a pair. A single `Signal<number | RangeValues>` would force
 every plain-slider consumer to narrow a union on every read, and a generic would hit the `AccessorProps`
 hole. Mode is structural rather than a `getMode` prop because the value's shape carries it.
 
 **The selection is `{ start, end }`, and the scale keeps `min` / `max`.** The pair's fields were `min` /
 `max` for one draft, which collided badly: `getMin` would be the floor of the track while
-`rangeSignal[0]().min` was the floor of the selected band. `getMin` / `getMax` match the native attributes
+`range[0]().min` was the floor of the selected band. `getMin` / `getMax` match the native attributes
 and `TextInputState` already uses them.
 
 `start` / `end` over `from` / `to` on published precedent rather than taste. Adobe's React Spectrum
@@ -2521,7 +3126,7 @@ wrapper, option groups or a painter rendering a `Button`. Each slot reports its 
 the `RadioGroup` sense is unnecessary: the group already owns the array.
 
 **Selection stays one-way, and this is where `Tabs` and `RadioGroup` legitimately differ.** `RadioGroup`
-takes `valueSignal` because it owns its value; a `Tabs` with `hrefs` does not — selection is derived from
+takes `value` because it owns its value; a `Tabs` with `hrefs` does not — selection is derived from
 the route, the case _"Signal tuples for two-way state"_ in `conventions.md` records as the shape's cost. `getSelectedValue`
 plus `onSelectionChange` keeps the router as owner.
 
@@ -3110,6 +3715,25 @@ content, resolves the collision-safe placement and returns `{ getPlacement, getP
 portal's space, which is what a consumer assigns to `top` / `left` on a portalled element. The anchor rect
 still comes from `createViewportRectObserver`, so the scale factor is divided out exactly once.
 
+**The anchor is read the moment the layer is shown, and that reading is the one it opens at.**
+`ElementObserverUtils.observeViewportRect` measures once as it starts, before it listens or polls, and every
+framework starts it from the effect that runs after the DOM is updated and laid out and before the browser
+paints: `createEffect` in Solid, `useLayoutEffect` in React, `watchAfterRender` in Vue, `$effect` in Svelte. The
+layer's own size comes from a `ResizeObserver`, which also reports before paint. So the first position at which
+`Popover` stops painting `visibility: hidden` is already the final one, and no frame is needed to supply it.
+
+The reading each framework also takes as the component mounts is not a substitute. It is taken when the
+consumer's page mounts, which can be long before the layer opens and before the page has finished laying out:
+on `ViewportWrapperPage` it catches the scrolled anchor with no height yet, and an anchor scrolled while its
+layer is closed makes it stale in every framework, React's included, whose mount reading only happens to repeat
+once the viewport context settles. Left to the poll, the correction arrives with the first frame, which is in
+time while frames arrive and never comes on a page that is not painting — the layer then opens off its anchor
+and stays there until some event moves it. Reading as the observer starts is also what `followScroll` and
+`observeBorderBoxSize` already did; the frame-driven observer was the one exception.
+
+This settles only the opening. What a layer paints while its anchor is moving is still open, under _"An
+anchored layer is always a frame behind"_ in `backlog.md`, and this does not touch it.
+
 **What stays duplicated is the dozen lines of `<Show><Portal><div>`, deliberately.** Both consumers portal
 into the same mount and position absolutely, but disagree about everything else — a tooltip is
 `role="tooltip"`, takes the pointer but never focus, and closes itself; a listbox is focusable, walkable and
@@ -3131,7 +3755,7 @@ showing, the skip window, the bridge across the offset, and the leave that reads
 
 **It takes the open state; it does not own it.** `HoverIntentUtils.create(getAnchorRef, visibilitySignal, defs)`
 reads and writes a signal the caller holds. `Tooltip` keeps a private one, a hover card has an optional
-`visibilitySignal`, and a consumer's flyout may keep one shared key for a whole menu. By the test in _"The 1D walk
+`visibility`, and a consumer's flyout may keep one shared key for a whole menu. By the test in _"The 1D walk
 is a pure function"_, the state it does own is the state nobody else has anywhere to keep: the pending timer,
 whether the pointer is over the anchor or the panel, and the pointer type last seen.
 
@@ -3291,7 +3915,7 @@ all. It is refused while disabled, like every other write.
 **The consumer's `id` is suffixed per thumb, as `name` already was.** A pair's thumbs are `<id>-start` and
 `<id>-end`, and a single thumb keeps the bare id, the two-field rule `DateRangePicker` and `ColorArea` follow.
 Before this the id went on the first thumb only, so a `<label for>` could name one end and never the other. The
-suffix is documented on `rangeSignal`, the prop that makes a pair, rather than by redeclaring `id` to document it.
+suffix is documented on `range`, the prop that makes a pair, rather than by redeclaring `id` to document it.
 
 ### Controls: `Select`, and who owns a floating list
 
@@ -3339,7 +3963,7 @@ Everything above the floor stays the painter's, exactly as `getMinWidth` draws t
 the transition and a click during those 200ms would select a second time from a list visually leaving. The
 inline style overrides the `pointer-events: all` the class needs while open.
 
-**Single-select first, and no shared private composite yet.** `valueSignal: Signal<T | undefined>` is what a
+**Single-select first, and no shared private composite yet.** `value: Signal<T | undefined>` is what a
 consumer already holds; `Signal<T[]>` for both cases would tax the common one and make "nothing selected"
 representable twice. Multi differs in behavior, so the `BinarySwitch` shape is the likely end state, but
 erecting it before a second consumer would be guessing at the seam.
@@ -3457,7 +4081,7 @@ and lands on the first suggestion, or on the last for the up arrow. Space types,
 because the cursor treats the field as filterable.
 
 **The value is never cleared or restored by the list.** Escape and focus leaving close the popup through
-`Popover`'s dismiss layer, and the text stays as typed. A pick writes into `valueSignal` and calls `onInput`, then
+`Popover`'s dismiss layer, and the text stays as typed. A pick writes into `value` and calls `onInput`, then
 `onSuggestionPick`. The text written is `computeCustomSuggestionText(suggestion)` when given, named after
 `Select`'s `computeCustomText`; otherwise it is the option's text as a screen reader reads it, taken from the
 element the library owns, which is the typeahead decision applied to the value.
@@ -3481,15 +4105,15 @@ a select whose matcher would filter the selected option away. The `Select` page 
 other end: it matches an airport on **either its city or its IATA code**, two fields the library cannot know
 exist. Ownership follows knowledge.
 
-**`Select` owns the query, because the query is the field's text.** `querySignal: Signal<string>` is a
-`*Signal` by the existing rule, since the component writes it on every keystroke and the consumer reads it
+**`Select` owns the query, because the query is the field's text.** `query: SignalSource<string>` is a
+two-way signal by the existing rule, since the component writes it on every keystroke and the consumer reads it
 to derive `getOptions`. The loop through the consumer is a plain memo, not a cycle.
 
 **"No matches" stopped being a flag.** The candidate `hasNoMatches` is gone rather than deferred: the consumer filtered, so it already knows the result is empty, and
 its empty state is its own JSX inside `renderPopup`. A flag would be the library telling the consumer
 something they just computed.
 
-**The mode is `querySignal`'s presence, and this is the one sanctioned use of that.** No `getIsAutoComplete` boolean beside it. _"Presence as a
+**The mode is `query`'s presence, and this is the one sanctioned use of that.** No `getIsAutoComplete` boolean beside it. _"Presence as a
 trigger fails invisibly"_ warns about a prop whose real purpose is something else quietly changing
 semantics; a query string has exactly one purpose, an editable field with nowhere to put its text is
 incoherent, and forgetting the prop yields a working non-editable select — so it fails toward the safe
@@ -3629,6 +4253,32 @@ If sticky headers are ever wanted they belong to both renderings at once.
 and the active-descendant id survive scrolling; converted to a row index it now also pulls that option's group
 box along, which is why a scrolled list can show two boxes — the group under the window and the one holding the
 pinned row.
+
+**An option keeps its element while the window slides, which is why ungrouped rows are not wrapped.** A wrapper
+round a run of ungrouped rows would need a key, and the only key such a run has is where it starts, which moves
+every time the window does — so every option in it, the focused one included, would be built again and focus
+would fall to the page. Each ungrouped row is therefore a direct child of the sizer keyed by its row index, and a
+group's box is keyed by its heading's row index, which does not move. Solid holds the same by identity: its loop
+runs over the rows themselves and over group indexes, never over run objects made afresh on each change.
+
+**An option is focusable from the moment it is drawn.** It carries `tabindex="-1"` in its own markup, which is
+what the interaction tracker writes for it anyway, because the tracker's write arrives a commit later. A
+highlight that jumps to an option drawn in that same commit — End, Home, or a step into a group whose heading
+took the one overscan row — has to be able to take focus then, before the option it left is taken out of the
+window.
+
+**Solid can still detach the focused option, and the list puts focus back when it does.** Its array diff
+replaces rather than moves a lone row when rows arrive in front of it — a pinned option whose group heading
+enters the window above it — and a detached element loses focus even though it is back a moment later. So the
+windowed list notes whether focus was inside it before each window change and, when the change left focus
+outside, focuses the highlighted option again.
+
+**Vue needs the same repair, for a different reason.** A window that has not yet heard about its own last scroll —
+arrows pressed faster than the scroller reports — can drop the row that holds focus when the highlight moves on, in
+React as well. React does not notice, because its `onBlur` is never delivered for a removed element, so the list still
+believes it has focus and the next highlight takes it. Vue's `focusout` is the native event and bubbles to the list
+while the row is being removed, so the list recorded focus as gone and the new option was never focused. The Vue list
+notes focus before each window change and puts it back, as Solid's does.
 
 **`computeEstimatedGroupHeight` is optional and falls back to the option estimate.** A header is usually
 shorter than an option, and an estimate that is wrong only shifts the scrollbar until the row is measured, so
@@ -5991,13 +6641,13 @@ is when to show the wide layout so the growth uncovers it, collapsed is when to 
 read from the intended state and `ElementFader`'s `getHasTransitionFinished`, not from the transition target,
 because the fader commits its target a frame late and the target would briefly say the opposite.
 
-**It draws no control; `expandedSignal` is the whole interface.** Expanded is state, so it is a signal, and
+**It draws no control; `expanded` is the whole interface.** Expanded is state, so it is a signal, and
 anyone holding it can open or close the sidebar from anywhere (_"Playback is a signal; a rewind is a
 command"_ in `conventions.md`). The accessibility of the button travels with it: the consumer's button carries
 `aria-expanded` and points `aria-controls` at the sidebar's `id`, which is why `id` is a prop.
 
 **Hover is a look, not a decision.** `isExpandedOnHover` goes through `HoverIntentUtils` into a private
-signal that is OR-ed with the owner's, so resting the pointer expands it without writing `expandedSignal`: a
+signal that is OR-ed with the owner's, so resting the pointer expands it without writing `expanded`: a
 sidebar the owner expanded stays expanded when the pointer leaves, and the owner's button keeps reporting
 collapsed while it is only being looked at. The hover-expanded state is a dismiss layer, so Escape and a press
 elsewhere put it back — WCAG 1.4.13 asks for content that appears on hover to be dismissable without moving the
@@ -6194,7 +6844,7 @@ writes a measured pixel height, the `Tabs` and `RadioGroup` floaters write a ful
 contents, and the library already owns wrapper elements around consumer content (`Breadcrumbs`' `<li>`,
 `Select`'s group box). The rule the objection appealed to does not exist in that form.
 
-**The value is ratios, and pixels are never stored.** `ratiosSignal` is `Signal<number[]>`, one share per
+**The value is ratios, and pixels are never stored.** `ratios` is `Signal<number[]>`, one share per
 pane. A container resize must not rewrite what the person chose: drag to 30/70 in a 1000px box, narrow the
 window, and the stored `0.3` stands while the rendered widths clamp. Same shape as `ColorArea` keeping HSV
 while emitting hex, and `DateValue` keeping the lossless form.
@@ -6290,7 +6940,7 @@ that was typed, with no identity apart from its characters. A consumer needing r
 `computeTag` is where text becomes the stored form — trimming, casing, refusing a duplicate — and returning
 nothing declines a word, leaving the text in the field to be edited rather than retyped.
 
-**The draft text is private unless asked for**: `textSignal` is optional through
+**The draft text is private unless asked for**: `text` is optional through
 `SignalMirrorUtils.createOptional`, the arrangement the popups use for their open state.
 
 **Owning the box means owning the pointer back, which the first build did not.** Fixed afterwards.
@@ -6444,7 +7094,7 @@ consumer tabs through changes.
 
 **The current section is reported, not held.** `onCurrentChange(value | undefined)` fires only when the value
 changes (_"Asking for a state a thing is already in does nothing"_ counts notifying as work), and not at mount.
-It is not a `currentSignal`: the scroll position owns it, and a consumer writing a value the page is not
+It is not a two-way `current`: the scroll position owns it, and a consumer writing a value the page is not
 scrolled to would contradict the observer on the next scroll event. A consumer wanting to move the reader
 scrolls the target element, which they already hold, and the mark follows.
 
@@ -6485,14 +7135,14 @@ the outline, and a `linkComponent`.
 ### Controls: `CheckboxGroup`, and `Checkbox`'s `value` opt-in
 
 `CheckboxGroup` is `RadioGroup`'s context shape with the walk taken out, on the user's call. It holds one list,
-`valueSignal: SignalSource<T[]>`, optional with a list of its own starting empty, and renders `role="group"` named
+`value: SignalSource<T[]>`, optional with a list of its own starting empty, and renders `role="group"` named
 by a required `ariaLabel`. There is no roving tab stop: each member is a separate choice rather than one spelling
 of a single value, so each is its own tab stop and Space toggles it, which is the one thing that separates this
 group from the radio one.
 
 **A `Checkbox` opts in by being given a `value`.** `value` is generic, so it is declared beside the
 `AccessorProps` block. Inside a group, a box with a value is ticked when the list holds it, and pressing it adds
-or removes it. Outside a group, or without a value, the box answers to `checkedSignal` as before. `checkedSignal`
+or removes it. Outside a group, or without a value, the box answers to `checked` as before. `checked`
 became optional with a private fallback, so a group member does not need a dummy signal; `BinarySwitchPresetProps`
 was not changed, so `Toggle` keeps its required signal.
 
@@ -6500,7 +7150,7 @@ was not changed, so `Toggle` keeps its required signal.
 `CheckboxGroupController` carries `getCheckedState()`, folded with `CheckedStateUtils.fromMembers`, and
 `setIsEveryChecked(isChecked)`, which answers whether anything changed. A render slot was rejected by _"A component
 hands out a controller and renders no controls of its own"_: the parent box is a control, and a slot would fix
-where it sits. The consumer passes `[() => state === true, setIsEveryChecked]` as the parent's `checkedSignal` and
+where it sits. The consumer passes `[() => state === true, setIsEveryChecked]` as the parent's `checked` and
 `state === "mixed"` as its `isMixed`.
 
 **Disabled members are left out of the count while any member is enabled, and select-all leaves them as they
@@ -6582,9 +7232,15 @@ than a numeric ramp, one animation duration rather than a set, `half` / `full` /
 none of it is a recommendation and none of it constrains the library, which paints nothing and reads no
 token. A consumer copying its shape is copying an example.
 
-This does **not** license changing it casually. It is the only theme the Playground has, so a token edit
-repaints every page at once; the values being arbitrary is a statement about their origin, not an invitation
-to churn them.
+This does **not** license changing it casually. A token edit repaints every page at once; the values being
+arbitrary is a statement about their origin, not an invitation to churn them.
+
+**The Playground carries several value sets on that one contract, and the nav settings pick between them.**
+`Theme.const.ts` holds Default, Solid, React, Svelte and Vue; `Theme.css.ts` builds each into a class and
+lists them in `PLAYGROUND_THEMES`. Each app's entry file applies its own framework's theme at load, and the
+_Theme_ select in the nav settings swaps the class on the root element from there. The user asked for it as a
+temporary way to compare the sets side by side, then kept it. The pick is not remembered across reloads, and
+it is not tied to the framework switch, which still picks the other app's own theme when it lands there.
 
 ### The Playground's field look is one surface, and every field-shaped control wears it
 
@@ -7218,7 +7874,7 @@ worse: a held final frame that replays itself whenever a window changes width is
 
 ### `CellAnimation`: the pass is a progress signal, and the grid is always drawn at it
 
-**Where the pass is lives in `progressSignal`, in Trail's shape.** The component writes it every frame while playing, and writing it from outside moves the pass there. While playing, the pass carries on from the written point. With playback paused, the grid is redrawn at whatever is written, which is what a scrub is. The frame loop adds elapsed time over duration to the current value, not time since the pass began, and that is what lets a written value be carried on from rather than overwritten. It goes back to `0` at the start of each pass and when `src` changes.
+**Where the pass is lives in `progress`, in Trail's shape.** The component writes it every frame while playing, and writing it from outside moves the pass there. While playing, the pass carries on from the written point. With playback paused, the grid is redrawn at whatever is written, which is what a scrub is. The frame loop adds elapsed time over duration to the current value, not time since the pass began, and that is what lets a written value be carried on from rather than overwritten. It goes back to `0` at the start of each pass and when `src` changes.
 
 **Drawing is its own effect, separate from the clock.** One effect draws every cell at the current progress, and it re-runs when the progress, the cell elements or their sizes change. The frame loop only advances the number. So a paused grid shows the frame at its progress (frame 0 before anything has run) rather than the uncut picture, and a finished run held on `"cells"` is redrawn at its last frame when the box resizes rather than keeping transforms worked out for the old size. The consumer's compute functions are called outside Solid's tracking (`untrack`). Tracked, every signal read in every cell's evaluation would have been recorded as a dependency on every frame, thousands of entries rebuilt at 60Hz. The cost is that a change to what the functions read, made while paused, shows at the next progress change rather than at once.
 
@@ -7246,12 +7902,12 @@ arbitrary code with no component in scope. What the note reached for is sugar �
 a layer for a consumer who has been met, and a library that has not met them should not pick their
 vocabulary.
 
-So the prop is `toastsSignal: Signal<Toast<T>[]>`, per _"Signal tuples for two-way state"_ in
+So the prop is `toasts: Signal<Toast<T>[]>`, per _"Signal tuples for two-way state"_ in
 `conventions.md`.
 
 **The division of writes is what makes the two-way signal correct rather than convenient.** The consumer is
 the only thing that adds; the component is the only thing that removes — a duration elapsing, and the limit
-being exceeded. `Modal`'s `visibilitySignal` argument with a list instead of a boolean.
+being exceeded. `Modal`'s `visibility` argument with a list instead of a boolean.
 
 It also settles an ownership question no other shape answers cleanly. If the consumer owned the list outright
 and the component only reported, "show at most three" would be enforced consumer-side, making queue policy
@@ -7341,7 +7997,7 @@ sends a toast off the side it sits against: a stack against the left or right ed
 sideways, which also leaves the page's vertical scroll to the browser; a stack centered along the top or bottom
 swipes up or down; `middle-center` has no edge to leave by and cannot be swiped, as a centered `Modal` cannot.
 
-**A committed swipe removes the toast from `toastsSignal`**, the same path the timer takes and the same thing a
+**A committed swipe removes the toast from `toasts`**, the same path the timer takes and the same thing a
 consumer's close control does, so the toast leaves through its ordinary exit. The toast's countdown is held while
 the swipe is under way, per toast, beside the stack-wide hold on hover and focus.
 
@@ -7428,7 +8084,7 @@ machinery `Accordion` had kept to itself. The split is **what each layer claims 
 how either one opens.
 
 **`Collapsible` owns the disclosure**: the trigger's `aria-expanded` and `aria-controls`, the panel, the
-measured height, the fader, and `inert` while closed. `expandedSignal: Signal<boolean>` is its state — a lone
+measured height, the fader, and `inert` while closed. `expanded: Signal<boolean>` is its state — a lone
 panel genuinely owns its own boolean.
 
 **`Accordion` adds the three things that make a panel part of a set**, each a statement rather than a
@@ -7471,7 +8127,7 @@ stays partly visible lives.
 
 ### `Accordion`, `Collapsible`, `Preview`, `Tree`: two-way state is optional
 
-**`expandedSignal` on all four, and `valueSignal` on `Tree`, follow the carousels' index and the popups'
+**`expanded` on all four, and `value` on `Tree`, follow the carousels' index and the popups'
 visibility**: `SignalMirrorUtils.createOptional` returns the consumer's signal when one is passed and the
 component's own when not. Nothing in these four needed the consumer to hold the state, and they were the only
 two-way props left required; a navigation tree nobody selects from still had to supply a selection signal. Left
@@ -7596,7 +8252,7 @@ They do not. `ElementFaderUtils.setTarget` already defers the flip of `transitio
 with the 100ms fallback recorded above, precisely so the browser paints a start value before a transition
 begins. **That deferral is a gap, and the measurement lands inside it.**
 
-In order: the press writes `expandedSignal`; in the same update the latch memo turns true and the content
+In order: the press writes `expanded`; in the same update the latch memo turns true and the content
 mounts inside a panel box still at `height: 0`; still in that update the height observer re-runs and reads
 `offsetHeight` synchronously; a frame later the fader flips the target and the height animates from zero to
 the number already published. Driven in `accordion.spec.ts`, which asserts that the height read immediately
@@ -7988,7 +8644,7 @@ a day.
 years), and a cell is named by its first day. `CalendarUtils` holds the arithmetic: page start, cells, grid shape,
 cell start and end, same-cell, bounds, page step and long step.
 
-**What keeps its kind.** `monthSignal` still says which page is shown. The two-axis walk is
+**What keeps its kind.** `month` still says which page is shown. The two-axis walk is
 `NavigatorUtils.computeNextCell` over the page's shape, and a step off either end carries into the neighbouring
 page, as the day grid already did through its outside-month days; only Home and End on a short last row clamp to
 the last cell. `minValue`/`maxValue` leave a cell pickable while any of its days is inside, and a pick is clamped
@@ -8098,7 +8754,7 @@ The helper is exported in its own right, because pairing a plain `DateInput` wit
 split without the two popups.
 
 **The control passes its shared props to both halves and overrides what cannot be shared.** The props type is
-`Omit<DatePickerProps, "valueSignal" | "ariaLabel" | "visibilitySignal">` plus the time-only knobs, so the
+`Omit<DatePickerProps, "value" | "ariaLabel" | "visibility">` plus the time-only knobs, so the
 field paint, the layer placement and the locale are written once. Three things collide and are named apart:
 `renderTimeTrailing`, `renderTimePopup`, and the two visibility signals. One collides silently and is
 overridden — `renderLeading` on the date side takes an era as its second argument, which the time field has
@@ -8196,7 +8852,7 @@ build rather than a guarantee, but it settles the shape of the answer: a three-m
 multi-month calendar expensive. The remaining per-cell cost worth caring about is a consumer's own disabled
 predicate, which is called once per cell and is theirs to make cheap.
 
-**The visible month is a `Signal` the consumer owns, and `Calendar` renders no header.** `monthSignal` is
+**The visible month is a `Signal` the consumer owns, and `Calendar` renders no header.** `month` is
 required, and the month title and paging buttons are the consumer's markup outside the component. The
 alternative — a private month plus a `renderHeader` slot handed paging callbacks — would invent a controller
 record for something the settled convention covers. `Calendar` writes the signal when the keyboard walk leaves
@@ -8206,7 +8862,7 @@ its popup opens without the component having an opinion.
 **That header being the consumer's is what made an interactive caption free.** Added: the
 Playground's caption is a month title that turns into a `Select` for the month and a `NumberInput` for the
 year when clicked, with the paging arrows either side throughout. `Calendar` was not touched — the caption
-writes `monthSignal` exactly as the arrows did. It lives in `PageComponents/CalendarCaption` and both
+writes `month` exactly as the arrows did. It lives in `PageComponents/CalendarCaption` and both
 `CalendarPage` and `DatePickerPage` use it, since the two had written the same header twice.
 
 **The fields are a mode, not the resting state**, so a calendar reads as a calendar until someone asks to
@@ -8249,7 +8905,7 @@ It also keeps the frame still across the mode switch: the edit-mode header is th
 the grid to it means the box does not resize under the pointer when the title is clicked — which it would
 have, by seventy pixels, at the old cell size.
 
-**Selection is by date, one tab stop, and the cell carries the whole date as its name.** `valueSignal` holds a
+**Selection is by date, one tab stop, and the cell carries the whole date as its name.** `value` holds a
 `DateValue | undefined`. The grid is a roving tab order over 42 `InteractionWrapper`s, following `Tabs` rather
 than `Select`'s `aria-activedescendant`, because each day is a real element that can hold focus. Since the
 painter draws a bare number, the cell sets `aria-label` to the full formatted date, or a reader announces
@@ -8497,7 +9153,7 @@ arithmetic under it.
 **A string is the storage form and HSV the working one, and they do not round-trip.** `Color` in
 `@thewaver/ss-utils` holds both plus the conversions. Eight bits per channel cannot carry hue at black or
 saturation at gray, so a surface re-reading the string on every drag frame would drift and then stick — drag
-brightness to zero and the hue is gone. `ColorArea` takes `hsvSignal: SignalSource<Color.HSVA>` and never
+brightness to zero and the hue is gone. `ColorArea` takes `hsv: SignalSource<Color.HSVA>` and never
 touches a string; converting at the boundary is the consumer's, and `Color.isSame` exists so a caller can tell
 whether the string it was handed still describes the HSV it holds, whatever notation either is spelled in.
 Same shape as the timezone decision under `Calendar`: keep the lossless form in the working state, convert
@@ -8526,7 +9182,7 @@ being a general string.
 `<input type="color">` behind a painter; it is now a field button plus a `Popover` with `ColorArea` and a hue
 `Range` inside. The three open ownership questions:
 
-- **The string boundary is the component's.** `valueSignal` stays `Signal<string>`, so no consumer changed,
+- **The string boundary is the component's.** `value` stays `Signal<string>`, so no consumer changed,
   and the HSV working state lives inside where a drag cannot lose hue at black. Both directions of that sync
   guard with `Color.isSame` and read the far side `untrack`ed — a mirror that tracks both sides writes its
   stale half over the new value. The emitted spelling is the notation the value arrived in, which is argued
@@ -8613,7 +9269,7 @@ or set a nonsense attribute; renaming is cheaper than an `Omit` plus a hand-writ
 **`DatePicker` is `DateInput` plus `Calendar` in a `Popover`, and the trigger lives in the field's trailing
 slot** — the slot that existed for `NumberInput`'s stepper, needing no widening. The visible month is the
 picker's own signal, snapped to the value each time the popup opens, which is what `Calendar`'s required
-`monthSignal` was left public for. Typing a date and picking one agree without either knowing about the other:
+`month` was left public for. Typing a date and picking one agree without either knowing about the other:
 both write the same value signal, and the calendar follows it.
 
 **Dismissal repeats `ColorInput`'s arrangement**, outside-`pointerdown` plus `Escape` — the third dismissal
@@ -9254,7 +9910,7 @@ and the one part of the arrangement the shell does not enforce.
 
 Settled, closing two unblocked items in one pass.
 
-**Every control here owns its value as a `*Signal`, and a consumer holding a getter plus a callback had to
+**Every control here owns its value as a two-way signal, and a consumer holding a getter plus a callback had to
 build the same mirror by hand.** `PageTextField`, `PageSelectField`, `PageCheckField`, `PageNumberField` and
 `PageColorField` were five copies, and the color picker's hue slider made a sixth.
 `SignalMirrorUtils.createMirror(getOuter, setOuter, opts)` is that mirror once, with `createValueMirror` for the
@@ -9265,7 +9921,7 @@ alternative to a signal-only surface. A consumer with a signal passes its two ha
 route param or callback passes those. The first attempt took a `Signal` and could not express any of the
 Playground's own wrappers.
 
-**Every control now takes that pair directly, so the mirror is no longer the way in.** A `*Signal` prop is
+**Every control now takes that pair directly, so the mirror is no longer the way in.** A two-way prop is
 typed `SignalSource<T>` and `accessSignal` normalizes it — see _"Signal tuples for two-way state"_ in
 `conventions.md`, which carries the rule and the reasoning. `createOptional` and `createPassThrough` are both
 `accessSignal` underneath. What `SignalMirror` still owns, and what the Playground's `PageNumberField` still
@@ -9397,6 +10053,41 @@ so nothing behind a nested viewport paints through it or can be pointed at. Toge
 `overflow: hidden` and each viewport portalling into itself, that is the whole of "a viewport is a black box".
 `viewport.spec.ts` drives all three.
 
+### A popup with no `Viewport` is fixed to the window, and its highlighted row scrolls only the popup
+
+Settled from a page with no `ViewportWrapper`, which is supported — _"a consumer with no `Viewport` still needs
+dismissal"_ — and where every popup portals into `document.body`.
+
+**`Popover`'s and `Tooltip`'s roots are `position: fixed`, inside a viewport or out of it.** The position they are
+given is in window pixels, and an absolute root on `document.body` is placed against the top of the document, so a
+popup opened on a scrolled page was drawn off by exactly the scroll. A fixed root is placed against the window, which
+is the space the numbers are in. Inside a `Viewport` nothing moves: `viewportRoot` always carries a `transform`, and a
+transformed element is the containing block of its fixed descendants, so the root is still placed against the same box
+as the portal it sits in, and the host's `overflow: hidden` still clips it. One rule for both cases, and no branch on
+whether a portal exists. A fixed root also stops a popup near the foot of a short page from lengthening the document.
+**`Spotlight`'s four layers and the carried items of `Sortable` and `SortableGrid` are fixed for the same reason**:
+each is portaled and placed from window pixels — the lit element's rect, the pointer — so on a scrolled page with no
+`Viewport` the cover, the highlight, the guide's popup and the carried item were all drawn off by the scroll. Inside a
+`Viewport` they measure the same to the pixel as before.
+
+**A highlighted row is revealed by `PopoverUtils.revealWithin`, never by `scrollIntoView`.** A menu highlights its first
+or last item the moment it opens, while the popup is still hidden at the portal's top-left corner waiting for its
+position; `scrollIntoView` moves every scrollable ancestor, the document included, so the page jumped to the top.
+`revealWithin(element, root)` moves only the scrollers from the element up to `root`, by the least that shows it, and
+works in each scroller's layout pixels so a scaled viewport does not throw it off. It needs no placement, so it runs as
+early as the highlight does, and nothing outside `root` can move — including a viewport's own `overflow: hidden` host,
+which `scrollIntoView` would scroll too. `MenuUtils.revealItem` finds the item's `role="menu"` popup and calls it;
+`Clock` calls it with its own root, since it is drawn both inline and inside `TimePicker`'s popup, and an inline clock
+below the fold scrolled the page to itself on mount in the same way. **A `Listbox` option goes through
+`ListboxUtils.revealOption`, which splits on where focus sits.** Under `"activeDescendant"` — the lists `Select` and
+`TextInput` open — focus stays in the field and the list is its popup, so only the scrollers up to the popup's
+`role="listbox"` root move. Under `"roving"` — an inline `Listbox` — the option is itself the focused element, drawn
+among the consumer's own scrollers, which sit outside the list's root, and it is only highlighted once the reader has
+put focus in the list; it keeps `scrollIntoView`, which is what the browser would have done had focus not been moved
+with `preventScroll`. Holding the scroll until the popup is placed, as focus waits, was
+the alternative; it needed the placement handed down to every item, and still let a placed popup that runs past an
+edge scroll whatever clipped it.
+
 ### The date value carries its calendar system, and every bound is asked of it
 
 Settled by the user, choosing to take `@internationalized/date` as a dependency rather than
@@ -9482,6 +10173,19 @@ catches a change of format on its own: switching an amount field's locale leaves
 exactly as they were, so the effect comparing them stays quiet and the field goes on showing the old
 punctuation. The text is rebuilt **from the value** rather than from the digits on screen, because the same six
 digits are `1,234.56` at two decimal places and `123,456` at none.
+
+**The value is committed when the digits change, never when the rules do.** Solid commits from an effect over the
+digits, and that effect used to read the codec tracked, so a change of format re-ran it over the digits still on
+screen: a `TimeInput` typed to `13:00` and switched to twelve hours and back came back as `01:00`, because the
+twelve-hour text `01:00` was read once more as twenty-four-hour digits before anything rewrote it. The effect now
+tracks the digits alone and runs the codec `untrack`ed. The re-spelling effect, for its part, tracks the value and
+remembers the value and spelling it last saw, rewriting only when the spelling moved under an unchanged value — so a
+field that started empty, and so read no rules on its first run, follows its format once something has been typed.
+
+**In React and Vue the control watches its own format.** Their masked field commits from the text's setter and has no
+effect that could re-read the text, so it has no such fault, and no watcher of the format either: `TimeInput` calls
+`refresh` when `isTwelveHour` or the segment count changes and `DateInput` when `format` or `calendar` does. React's
+call is a layout effect, so the new spelling is on screen in the frame the format changed rather than one after.
 
 **A control must not keep a second copy of something the value already carries.** `DateInput`'s era signal is
 state _only_ for the empty field, and `fromDigits` reads the era off the held value. Reading the signal instead
@@ -9815,7 +10519,11 @@ somebody else's popup.**
   in the document — so measuring from the `ref` reads an unnamed, unlaid-out element and silently keeps the
   estimate. Rows then tile on the estimate rather than their real heights, and a row taller than its slot
   paints over the one below. The index is written onto the element and the measurement deferred to mount.
-  React's adapter never meets this because React runs refs after commit; nothing warns about it.
+  React's adapter never meets this because React runs refs after commit; nothing warns about it. **Vue meets it
+  inside a group.** Vue calls a function ref as soon as the element is inserted into its parent, and the rows of a
+  group whose box is new are inserted into that box before the box is in the document, so they measured `0`: the list
+  took every row in the window to be empty, then scrolled itself by each real height as it arrived. The Vue half
+  measures a row straight away only when it is already in the document, and otherwise once the render is done.
 - **The rows' container does not start where the scrolling starts.** Row offsets are measured from the top of
   the container the library owns, a scroll position from the top of whatever is scrolling, and between them
   sits however much border and padding the consumer put on their popup. Unset, every scroll target lands short
@@ -9901,9 +10609,9 @@ field is also the way to put the demo back where it started.
 `pointer-events: none` and the control inside re-enables it — `Tabs` composes the same style for the same
 reason. A control that forgets it renders correctly, measures correctly, and cannot be clicked.
 
-### Controls: `Toolbar`'s `pressedValuesSignal`, and why a toggle group is a toolbar
+### Controls: `Toolbar`'s `pressedValues`, and why a toggle group is a toolbar
 
-**A toolbar holds actions that do something; with `pressedValuesSignal` its actions hold states that stay
+**A toolbar holds actions that do something; with `pressedValues` its actions hold states that stay
 pressed.** The reference libraries ship this as a separate toggle group (Radix, Kobalte, Ark, MUI's
 ToggleButtonGroup, Mantine's Chip.Group): several independent pressed buttons behind one tab stop. Every part of
 that already existed here. `Button` carries `isPressed` through the shared wrapper, `Navigator` walks the row, and
@@ -9919,7 +10627,7 @@ wants to hear about presses keeps the callback it already had. The painter sees 
 `InteractionWrapper`, as `Button`'s does.
 
 **A collapsed action becomes a checkbox item in the overflow menu, checked from the same list.** The overflow
-`Menu` is handed `pressedValuesSignal` as its `checkedSignal`, so an action pressed in the row is checked in the
+`Menu` is handed `pressedValues` as its `checked`, so an action pressed in the row is checked in the
 menu and the other way round, and the state survives the collapse. The row and the menu toggle through one rule,
 `MenuUtils.computeNextChecked`, rather than two copies of it.
 
@@ -9940,13 +10648,13 @@ shared half together with one of two role halves, and each preset is the shared 
 `role` omitted.
 
 **A collapsed word becomes a submenu of the overflow menu, which `Menu` already supported.** The overflow item
-carries the word's `items`. One `renderItem`, one `renderPopup` and one `checkedSignal` serve every menu the bar
+carries the word's `items`. One `renderItem`, one `renderPopup` and one `checked` serve every menu the bar
 opens, the overflow menu included, so a View checkbox keeps its state whether View is in the row or in the
 overflow.
 
 **The one rule `Menubar` adds: while a menu is open, the arrow that moves to the next or previous word closes
 that menu and opens the next one.** Which menu is open is one value in the composite, the stop that is open, and
-each `Menu` reads and writes it through its own `visibilitySignal`. That makes one-open-at-a-time a property of
+each `Menu` reads and writes it through its own `visibility`. That makes one-open-at-a-time a property of
 the state rather than something each menu has to arrange, with one side effect: a menu whose word drops out of
 the row while it is open closes. The switch happens in a fixed order: the old menu closes, which returns focus to
 its own word; focus moves to the next word; only then does the next menu open, so its popup records the new word
@@ -10018,7 +10726,7 @@ which row is focused, which is how a click and an arrow key end up on the same f
 **The focus rescue on a collapse is a guard over the visible rows, not a step inside `collapse`.** Corrected
 . It began as a check inside `collapse` — is focus on a descendant, and if so move it to the
 branch — and that check could never be true: `ArrowLeft` and a click both act on the branch, which is already
-focused and stays mounted. The case it was written for is a **consumer** writing `expandedSignal` themselves,
+focused and stays mounted. The case it was written for is a **consumer** writing `expanded` themselves,
 the only way a focused row can vanish, and which never enters `collapse`. So the guard watches the visible
 rows: it remembers the last row focused inside this tree from a `focusin` on the root, and when a collapse
 leaves that row out of the visible set **and** focus has fallen to the document body, it moves focus to the
@@ -10066,7 +10774,7 @@ name is `Select`'s — `getHasMoreOptions` says the same thing about a list, and
 children, so a consumer meeting the second has already met the first.
 
 **Nothing new tells the consumer to fetch, and that is deliberate.** No `loadChildren` prop and no
-`onExpandBranch`. Opening a branch writes its value into `expandedSignal`, which is the **consumer's** signal —
+`onExpandBranch`. Opening a branch writes its value into `expanded`, which is the **consumer's** signal —
 they already see every expansion, so a callback would report a change they were handed anyway. Ark UI takes
 `loadChildren` plus `onLoadChildrenComplete` and React Aria has a loading item, but both of those own the list;
 here the nodes are a prop, so the arrival is a new `nodes` value and nothing else. The library reports and the
@@ -10261,8 +10969,8 @@ _less_ gesture, not a described one, and a consumer who agrees already has the s
 `0` makes the first frame complete the hold, so a plain press activates. The library cannot make that choice
 itself, because detecting a screen reader is neither possible nor something to attempt.
 
-**The progress is a flag and a signal, and the signal is optional.** `progressSignal` is the ratio the fill
-is drawn from, taken through `SignalMirrorUtils.createOptional` exactly as a popup's `visibilitySignal` is: with no
+**The progress is a flag and a signal, and the signal is optional.** `progress` is the ratio the fill
+is drawn from, taken through `SignalMirrorUtils.createOptional` exactly as a popup's `visibility` is: with no
 prop the control keeps the number to itself, and with one the consumer holds the same variable the painter
 reads. It exists because a flag only reaches `renderContent` — a readout beside the control, a second control
 that reacts half-way, or a warning that appears at eighty per cent is outside that slot and had no route to
@@ -11523,6 +12231,13 @@ frames, where the first build requested about sixty. Restarting needs no help fr
 that the first frame of a new gesture is the one that establishes the direction, so the trail begins one
 frame late.
 
+**The React and Vue samples hold the stamps in an array written in place, not in state.** The effect that lays a
+stamp runs after the frame has rendered, so writing the stamp into state there rendered every frame twice, and
+React's development build reported the chain as "Maximum update depth exceeded". The array is made once per
+mounted sample, and the next frame's render — which the clock guarantees while the trail is fading — paints what
+was written. The stamps and their fade are unchanged; a new stamp shows one frame after it is laid. Svelte's
+samples update only the stamps' own markup when one is written, so they keep their state.
+
 **A stamp is the pool at a lower alpha, by the user's instruction, and `computePoolColors` is what makes
 that true by construction.** The first build gave the stamps their own scale, their own mid-stop and a
 shrink-with-age, so a stamp was a different shape from the head as well as a dimmer one. The user's call was
@@ -11947,7 +12662,7 @@ to avoid.
 
 **`onActivation`, not `onActivate`, because `Menu` already owns the shorter name** for the different event of
 an item being chosen. **`isActivationTracked` is gone**: tracking is on when a handler is given, the same
-presence-turns-it-on rule `Table` uses for `selectionSignal`. `InteractionTrackerUtils.trackActivation` no longer
+presence-turns-it-on rule `Table` uses for `selection`. `InteractionTrackerUtils.trackActivation` no longer
 holds a signal at all — it calls the handler and returns nothing.
 
 **Fourteen types then split off as `*RenderProps`** — `CarouselStep`, `CarouselPick`, `Calendar`, `Clock`,
@@ -12016,7 +12731,7 @@ the rows arrived in is unreachable once anything has been sorted, and that order
 
 **Whether the table sorts is decided by the comparator, not by a mode prop.** A column with `compare` is
 sorted by the component; a column marked `isSortable` without one has its sort _reported_ through
-`sortSignal` and `onSortChange` and its rows left alone, which is the server-side case. The alternative —
+`sort` and `onSortChange` and its rows left alone, which is the server-side case. The alternative —
 an `isServerSorted` switch — puts the same fact in two places and lets them disagree. `getSortedRows` returns
 **the very same array** when there is nothing to do, so an unsorted table hands no new reference downstream.
 
@@ -12029,7 +12744,7 @@ nothing paints from it.
 **One component for both selection modes, where `Select` and `MultiSelect` are two.** The split there exists
 because the _trigger_ paints differently — one option against a row of chips — so `renderContent` has a
 different signature in each. A table row's paint does not change with the mode; only which rows carry
-`aria-selected` changes. So `selectionMode` is a prop, defaulting to `"multiple"` when a `selectionSignal` is
+`aria-selected` changes. So `selectionMode` is a prop, defaulting to `"multiple"` when a `selection` is
 given and `"none"` when it is not — the presence of the signal is what turns selection on, so a consumer
 cannot hand over a selection and silently get nothing.
 
@@ -12101,8 +12816,15 @@ column one place immediately — no mode to enter or leave — which mirrors the
 announces itself through `LiveAnnouncer`**: order is what a reader navigates by, so moving a column silently
 would be a worse omission than resizing one silently.
 
-**Reordering turns on when an `orderSignal` is handed over, and a column opts in with `isReorderable`.**
-Same presence-turns-it-on rule as `selectionSignal`, so a consumer cannot hand over an order and silently
+**Escape puts a picked-up column back, and it is heard on the document.** A carry that began in the table, by a
+tap on a grip or by a drag, is canceled by Escape: the column returns and the zone's `computeReturned` announces
+it, as every other carrier's cancel is announced. `TableUtils.observeCarryCancel` listens on the document, and
+only while the table is the carry's source, because a drag leaves focus wherever the press found it and the grid
+has one tab stop and no item of its own to hear the key on. `Sortable`, `SortableGrid` and `PatchBoard` take
+Escape on their focused items instead and leave a drag to the pointer.
+
+**Reordering turns on when an `order` is handed over, and a column opts in with `isReorderable`.**
+Same presence-turns-it-on rule as `selection`, so a consumer cannot hand over an order and silently
 get nothing. The signal holds column ids rather than indices, which is what lets it survive a change to the
 column list — `TableUtils.getColumnOrder` ranks the declared columns by that list and leaves any column the
 order does not name in its declared place, after the ones it does.
@@ -12172,16 +12894,18 @@ each takes them per part now (`partHints`, `segmentHints`) and still owns the or
 the format's and not the language's. `ColorInput` gained `areaAxisLabels` for the `ColorArea` it draws itself.
 The library's remaining English is developer-facing: a console warning, an error message.
 
-**`Table`'s words are required exactly when its columns can move.** A table without an `orderSignal` never speaks
-any of them, so `TableOrderProps` is a union: `orderSignal` and `announcements` together, or neither. It is the
+**`Table`'s words are required exactly when its columns can move.** A table without an `order` never speaks
+any of them, so `TableOrderProps` is a union: `order` and `announcements` together, or neither. It is the
 same shape as `Modal`'s two names, chosen by the user over a prop that every read-only table would carry unused.
 
 **The three zones that had no resting hint now have one, in `Sortable`'s shape.** A hidden element inside the
-component carries the sentence, and every element that Enter picks up points at it with `aria-describedby`: a
-reorderable `Table` header, a `SortableGrid` item, and both a `PatchBoard` node and socket, which pick up
-different things and so say different sentences (`nodeRestingKeyHint`, `socketRestingKeyHint`). The user's call,
-for the reason the `Sortable` entry gives: a focusable thing with an Enter handler and no advertisement of it is
-a discovery gap on 4.1.2. `Table`'s hint lives inside the `orderSignal` union with the rest of its words.
+component carries the sentence, and every element the keyboard can move points at it with `aria-describedby`: a
+`SortableGrid` item and both a `PatchBoard` node and socket, which Enter picks up, and which pick up different
+things and so say different sentences (`nodeRestingKeyHint`, `socketRestingKeyHint`); and a reorderable `Table`
+header, which Enter does not pick up. Enter and Space sort there and Shift with an arrow moves the column
+directly, so the header's sentence names Shift with an arrow instead. The user's call, for
+the reason the `Sortable` entry gives: a focusable thing that moves and no advertisement of how is a discovery gap
+on 4.1.2. `Table`'s hint lives inside the `order` union with the rest of its words.
 
 ### `Abstracts/Selection`: the anchor is the abstract's, and the selection is the consumer's
 
@@ -12193,7 +12917,7 @@ with `getMerged` and `getRange` beside it, and it is the same kind of extraction
 **What is new is that this one owns state, and `conventions.md`'s walk entry is the reason that needed
 arguing.** The walk refused to be a factory because the cursor is already owned by each control and owned
 differently, and the selection is owned differently in exactly the same way: `Table` reads a consumer's
-`selectionSignal`, `Menu` holds a list of checked values, `MultiSelect` has a `valuesSignal`. So the
+`selection`, `Menu` holds a list of checked values, `MultiSelect` has a `values`. So the
 selection does not move — `SelectionUtils.create` is handed a getter and a setter for it and never holds one.
 **The anchor is the opposite case: no control has a home for it**, because it is not part of any consumer's
 data and nobody wants it back. It is the memory of where the last plain pick landed, and it exists only so
@@ -12271,8 +12995,8 @@ consumer composes with `Button` and inherits naming, the focus ring, tooltips an
 the library owns only what nobody else can know: how far a step goes and whether there is anywhere left to go.
 `getButtonPlacement` is `split`, `start` or `end`, since "together" cannot be placed without saying which side.
 
-**The position is reported as a ratio, and a written ratio scrolls the strip.** `progressSignal` is optional
-and goes through `SignalMirrorUtils.createOptional` like every other `*Signal`, and it carries `scrollLeft` divided
+**The position is reported as a ratio, and a written ratio scrolls the strip.** `progress` is optional
+and goes through `SignalMirrorUtils.createOptional` like every other two-way prop, and it carries `scrollLeft` divided
 by the distance there is to travel — zero when nothing overflows. Reporting it is what the stepper cannot do:
 page dots, a progress bar or a "3 of 12" readout all sit outside `renderButton`, and none of them could reach
 the number. Accepting a write is the other half of the same variable, and it is what makes those dots
@@ -12412,7 +13136,7 @@ where the consumer renders the button and `backlog.md` records the consequence: 
 button cannot promise one is reachable or named. Here the split is along the line that matters — the library
 owns what the control _is_, the consumer owns where it _sits_ and what it looks like. A consumer passing no
 `renderControls` gets a carousel with no controls at all, right for one driven from elsewhere through its
-`indexSignal`.
+`index`.
 
 **Slides are plain values, not records.** Every other collection here takes records — `Tab<T>`, `TreeNode<T>`,
 `Toast<T>` — because each has per-item capabilities the library acts on. A slide has none: its position is
@@ -12466,7 +13190,7 @@ disabled through the same `isDisabled` the shared wrapper already carries, so it
 like any other disabled control; its `targetIndex` reports the slide already showing. A swipe past an end is
 refused on release, and the track or drum springs back the way a short swipe does.
 
-**Rotation stopping on the last slide is written to `playbackSignal`, not held privately.** When looping is off and
+**Rotation stopping on the last slide is written to `playback`, not held privately.** When looping is off and
 rotation is live, reaching the last slide writes `false`, so the rotation control offers "start" rather than a
 pause that pauses nothing. The same effect refuses a `true` written while the last slide shows, which is the
 invariant-against-the-state rule `Select` and `Menu` follow for a disabled popup. Pressing play on the last slide
@@ -12774,14 +13498,14 @@ controls all call, so the flight, the callback and the advance happen once and i
 was pushed. It refuses while a card is already leaving, which is what stops a fast second press sending two
 cards on one transition.
 
-**`topIndexSignal` rather than a count of what has gone.** An index into `cards` says the same thing and says
+**`topIndex` rather than a count of what has gone.** An index into `cards` says the same thing and says
 it in the consumer's own terms, so dealing again is setting it to zero and an empty pile is it reaching the
 card count. `mountedCount` is what keeps a long deck cheap: only that many cards are in the document, so the
 cost of a stack does not grow with the deck behind it.
 
 ### `CardStack`: a recalled card comes back the way it went
 
-**`recall` returns the last card from the side it left by, and a card that never left by a side reappears in place.** The stack remembers which way each card went, by its index in `cards`, at the moment it leaves. A card that was moved past by setting `topIndexSignal` has no such record. Inventing a side for it would show a flight that never happened, so it simply reappears. `deal` forgets every record.
+**`recall` returns the last card from the side it left by, and a card that never left by a side reappears in place.** The stack remembers which way each card went, by its index in `cards`, at the moment it leaves. A card that was moved past by setting `topIndex` has no such record. Inventing a side for it would show a flight that never happened, so it simply reappears. `deal` forgets every record.
 
 **`returningFrom` is a pose, not a phase.** It is set only while the recalled card sits off to its side, for the two frames before it starts back, and it clears as the flight begins. So a painter treats it exactly as it treats `leavingTo`: whatever it draws while either is set is the "away" pose, and the stack's transition carries the card between that pose and the pile. A painter that fades a leaving card out therefore fades a returning one in for free. Setting it for the whole flight would have left a painter nothing to animate from.
 
@@ -12819,7 +13543,7 @@ card the way it came, which is what a hand does with a card. Setting `turnDirect
 way instead, and then the angle does accumulate, as the drum carousel's does — see _"`turnDirection` makes the
 angle accumulate"_ below.
 
-**`flippedSignal` is required, and the card renders no control at all.** Two reasons, and the first is the
+**`flipped` is required, and the card renders no control at all.** Two reasons, and the first is the
 hard one: a card's faces hold arbitrary content, which may itself be interactive, so the card cannot be a
 `<button>` without swallowing whatever is inside it. The second is `Carousel`'s recorded exposure — a library
 that renders no button cannot promise one is reachable or named — which means the page must own the control
@@ -12839,7 +13563,7 @@ turning components: a thing that rotates in space is an `Exotic` whatever else i
 
 ### `FlipCard`: `peekRatio` is a lean, not a turn
 
-**A lean never touches `flippedSignal`.** The side that counts as showing, and the one a reader can reach, stay put however far the card leans. Deciding that a lean has gone far enough to become a turn is the consumer's to do. The lean goes the way the next turn would, so it follows `turnDirection` when that is set. While the value is above `0` the transition is switched off, so the card follows a drag or a slider directly instead of lagging behind it. Back at `0`, it settles flat over `transitionDurationMs`. Reduced motion is the consumer's here too.
+**A lean never touches `flipped`.** The side that counts as showing, and the one a reader can reach, stay put however far the card leans. Deciding that a lean has gone far enough to become a turn is the consumer's to do. The lean goes the way the next turn would, so it follows `turnDirection` when that is set. While the value is above `0` the transition is switched off, so the card follows a drag or a slider directly instead of lagging behind it. Back at `0`, it settles flat over `transitionDurationMs`. Reduced motion is the consumer's here too.
 
 ### `Cuboid`: a box of six faces, and two counts that drive it
 
@@ -12872,7 +13596,7 @@ because each of its faces sits at its own angle around a single axis. This is wh
 markup rather than going through `Barrel`.
 
 **Two counts of quarter turns, not a named face.** This is the box with `isUpright` off; upright mode keeps
-the counts but reads them as a record of presses rather than a pose (below). `yawSignal` and `pitchSignal` are
+the counts but reads them as a record of presses rather than a pose (below). `yaw` and `pitch` are
 unbounded integers, and the angle is the count times ninety degrees. Three things fall out of that. The box always turns the way it was
 pushed, because a count of `+1` is a quarter turn in that direction whatever the count already was. There is no
 wrapping problem to solve — the drum carousel had to keep a running angle for exactly this reason, and here the
@@ -13693,7 +14417,7 @@ index names — the clamp exists to protect that correspondence, not to be taste
 no jitter, which makes the component deterministic and its e2e spec possible. The lively version — random
 turns, random jitter — is a Playground sample, the same line `CellAnimation` draws around its weights.
 
-**The target is published as soon as it is known; the landing is marked by `onSpinEnd`.** `targetIndexSignal`
+**The target is published as soon as it is known; the landing is marked by `onSpinEnd`.** `targetIndex`
 is written the moment `computeSpinTarget` resolves, so a consumer bound to it learns the outcome before the
 wheel arrives — the user chose that over protecting the surprise by default, argued under _"`Rotator`, and the
 difference between where a wheel is and where it is going"_. A consumer who wants to wait for the landing
@@ -13706,7 +14430,7 @@ spinnable and says so, or a second press would start a second fetch — the orig
 
 **A spin is a command, not a state.** `spin()` arrives through the `onMount` handle, per _"Playback is a signal; a
 rewind is a command"_ in `conventions.md`. Whether the wheel is turning by itself **is** state, so it is
-`autoSpinSignal`, and so is the target index.
+`autoSpin`, and so is the target index.
 
 **The abstract publishes no handle of its own.** `RotationController` existed and was passed straight
 through by `Wheel`; it is gone, and `WheelController` is the only one. An abstract with no DOM has no
@@ -13789,8 +14513,8 @@ two have different owners — the rest is the component saying "let them read th
 consumer saying "not now". Folding them into one flag meant a consumer's pause being canceled by a rest timer
 they never started. `DEFAULT_REST_DURATION_MS` is 3000 and is mine, not measured; change it freely.
 
-**A pause on hover is now the consumer's to build, and `autoSpinSignal` is the door.** This is the settled
-`playbackSignal` rule applied again — whether the passive turn is running is state a consumer can read and
+**A pause on hover is now the consumer's to build, and `autoSpin` is the door.** This is the settled
+`playback` rule applied again — whether the passive turn is running is state a consumer can read and
 write, so it is a two-way signal rather than a `pause()` on the mount handle. A consumer wanting the old
 behavior writes `false` on pointer enter and `true` on leave, over their own box, which is also the only way
 to cover a control that sits **on top of** the wheel rather than inside it. The library cannot do that for
@@ -13817,13 +14541,13 @@ recorded here — that the motion is essential to the control — was written wh
 and stopped under the pointer; an attract-mode turn that never ends is a harder thing to call essential, since
 the essential activity is the spin and this is what happens while nobody is spinning. What is left is
 `prefers-reduced-motion`, which is a real user-side control but is not among the criterion's sufficient
-techniques, and `autoSpinSignal`, which is a capability handed to the author rather than a mechanism offered to
+techniques, and `autoSpin`, which is a capability handed to the author rather than a mechanism offered to
 the visitor.
 
 **The user's position is that the criterion's own exemption applies: the motion is essential, because spinning
 is what a wheel is, and "essential" is a subjective qualifier the criterion leaves to judgement.** Put to them
 with the analysis above and answered directly; recorded as their reading, which is the standing the earlier
-version of this note had too. A consumer who wants a pause control still has `autoSpinSignal` to build one
+version of this note had too. A consumer who wants a pause control still has `autoSpin` to build one
 against.
 
 The user-initiated spin is outside the criterion in any case — it does not start automatically — and it is the
@@ -13832,7 +14556,7 @@ essential activity, which is what 2.3.3 Animation from Interactions exempts at A
 **The wheel no longer reads `prefers-reduced-motion` at all, and this is a deliberate reversal.** It used to be
 one of the five conditions on the idle turn, so a visitor asking for less motion got a wheel that waited to be
 spun. The user's call, taken when `PointerTracker` raised the same question: the library reports and the
-consumer decides, and the door is already open — `autoSpinSignal` and an absent `idleDelayMs` both stop the
+consumer decides, and the door is already open — `autoSpin` and an absent `idleDelayMs` both stop the
 idle turn, and either can be driven from the preference in a line at the call site. Nothing was resting on the
 internal check: the analysis above already records that `prefers-reduced-motion` is not among 2.2.2's
 sufficient techniques and that the user's answer to that criterion is the essential-activity exemption, so
@@ -13950,7 +14674,7 @@ knew.
 the wedge array is the consumer's own prop, so its length is theirs to read and the wheel repeating it back is
 a second source for one fact. The test for a member is whether the wheel is the only place it can be
 known — `getPhase`, its two derived spinning flags and `getCurrentIndex`, which is read off an angle only the
-wheel holds, are internal outright. The target is not on the handle, because `targetIndexSignal` already
+wheel holds, are internal outright. The target is not on the handle, because `targetIndex` already
 publishes it.
 
 **`Carousel`'s argument does not carry over, and it is worth being exact about why, since the two now sit on
@@ -13964,7 +14688,7 @@ can know.
 
 **The cost is stated rather than mitigated: a library that renders no button cannot promise one is reachable or
 named.** A consumer who wires up no control has a wheel that can only be driven from elsewhere through
-`targetIndexSignal`, exactly as `Carousel` with no `renderControls` has no keyboard route. That is the same exposure
+`targetIndex`, exactly as `Carousel` with no `renderControls` has no keyboard route. That is the same exposure
 item 16 records for `Scroller` and it is now the wheel's too.
 
 **No slot survives either, and the one that briefly did was kept for a bad reason.** A `renderHub` was left on
@@ -14054,7 +14778,7 @@ the edge without the check reading the overhang as a drum painting outside its r
 ### `DrumWheel` page: three reels take one result through `computeSpinTarget`
 
 **The example is gone; the user removed it because `Odometer`'s pull-to-spin reels already show a slot machine.**
-What it established still holds for anyone building one out of wheels. **One press fetches one result, and each wheel's `computeSpinTarget` returns its own part of it.** Writing `targetIndexSignal` instead would move a wheel without a spin's turns and easing. **The stop order comes from `spinDurationMs` alone**, 600ms more for each reel, because the settle that follows is the same length for all three. **"All stopped" is a countdown of `onSpinEnd` from the number of `spin()` calls that returned true**, so a wheel that declined is never waited for.
+What it established still holds for anyone building one out of wheels. **One press fetches one result, and each wheel's `computeSpinTarget` returns its own part of it.** Writing `targetIndex` instead would move a wheel without a spin's turns and easing. **The stop order comes from `spinDurationMs` alone**, 600ms more for each reel, because the settle that follows is the same length for all three. **"All stopped" is a countdown of `onSpinEnd` from the number of `spin()` calls that returned true**, so a wheel that declined is never waited for.
 
 ### `Barrel`: the drum, lifted out of the wheel so a second component can turn one
 
@@ -14155,7 +14879,7 @@ of it and replaces it with a peek and a scale, which lands every card of differi
 
 ### `ElementObserver`: progress through the viewport
 
-**`createViewportProgressObserver` gives 0 while an element's top is at or below the viewport's bottom edge, 1 once its bottom has passed the top, and a straight line between.** That is the whole passage across the screen, the same range a CSS view timeline calls "cover". It re-reads on any scroll and on resize, like the current-index observer, and measures in the viewport's coordinates. It is meant as the getter half of a `progressSignal` with playback off, and how CellAnimation's scrub can use it.
+**`createViewportProgressObserver` gives 0 while an element's top is at or below the viewport's bottom edge, 1 once its bottom has passed the top, and a straight line between.** That is the whole passage across the screen, the same range a CSS view timeline calls "cover". It re-reads on any scroll and on resize, like the current-index observer, and measures in the viewport's coordinates. It is meant as the getter half of a `progress` with playback off, and how CellAnimation's scrub can use it.
 
 **`createScrollContainerProgressObserver` is the same passage measured against a scrolling box.** The user's call,
 after Trail's scroll example did almost nothing: the page it sat on scrolled 211 pixels at most, so the marker crossed
@@ -15624,7 +16348,7 @@ keep in step with the order the rows are written in, and a group whose members a
 thing a menu can draw anyway. `MenuUtils.getRuns` is the walk; everything that is not a radio is a run of
 one, so the render is flat whatever the list holds.
 
-**One signal holds every checked value, radios included.** `checkedSignal: Signal<T[]>` is `MultiSelect`'s
+**One signal holds every checked value, radios included.** `checked: Signal<T[]>` is `MultiSelect`'s
 shape, and a radio pick is expressed as set arithmetic over it: drop whatever else in this row's own run is
 in the list, then add this one. So a consumer reads one array rather than one array plus a value per group,
 and the library needs no notion of a group identity to write it — the run it was handed is enough.
@@ -16278,9 +17002,9 @@ because a stroke sits half outside the shape and how thick it is belongs to the 
 
 **The drop announcement names the spot dropped on, not the spot compaction slides the item to.** The library speaks no English of its own, so saying the final spot is the consumer's job in a compacting grid.
 
-### Playback is `playbackSignal` everywhere, and `Trail` lost its `play` and `pause`
+### Playback is `playback` everywhere, and `Trail` lost its `play` and `pause`
 
-**The carousels' `playingSignal` and `Trail`'s `isPlayingSignal` are both `playbackSignal`**, matching
+**The carousels' `playingSignal` and `Trail`'s `isPlayingSignal` are both `playback`**, matching
 CellAnimation, ScanlineAnimation, AudioSwitcher and ParticleSpawner. **`Trail`'s `play()` and `pause()` commands are
 gone**, because each only wrote the playback state, and _"Playback is a signal; a rewind is a command"_ puts that
 in the signal. `seek` stays as the rewind-shaped command, and the controller keeps `getIsPlaying` for reading. The
@@ -16344,7 +17068,7 @@ surprising of the two.
 
 **A separate component, not a mode of `ParticleSpawner`.** The user's framing: particles with no path of travel, appearing inside a grid on a system of weights like `CellAnimation`'s. Nothing of the spawner's survives that — no source element, no targets, no travel — so what the two share is the word "particle" and a `renderParticle` slot.
 
-**One engine, passes, and a spawn chance — no modes.** The field runs `CellAnimation`'s timing: one pass over the grid lasting `animationDurationMs`, iterations, a pause between them, a `progressSignal` that scrubs, and the pass props named as `CellAnimation` names them. **A weight is a cell's turn in the pass and means nothing else.** `spawnChance` is the only other say in which cells spawn: at `1`, the default, every cell spawns every pass; below it, each cell spawns in a pass only if it wins a roll.
+**One engine, passes, and a spawn chance — no modes.** The field runs `CellAnimation`'s timing: one pass over the grid lasting `animationDurationMs`, iterations, a pause between them, a `progress` that scrubs, and the pass props named as `CellAnimation` names them. **A weight is a cell's turn in the pass and means nothing else.** `spawnChance` is the only other say in which cells spawn: at `1`, the default, every cell spawns every pass; below it, each cell spawns in a pass only if it wins a roll.
 
 The first build had two modes under a `spawnMode` union. `batch` was the above; `stream` never stopped, and there a weight was a cell's chance of spawning within one duration, with a per-cell wait after each spawn. The user then proposed keeping passes in both and letting the second mode differ only by chance. Once that was true, the second mode was the first with a number below 1, so the union was dropped for one prop — the user's go-ahead, on the argument that a weight meaning "when" in one mode and "how eager" in the other was the hardest part of the component to explain. It also gave the chance-driven field the scrub, the iterations and the pass callbacks for free, and deleted a second clock and the per-cell waits.
 
@@ -16481,7 +17205,7 @@ across, the mixing desk stands up with its three sources in a row above the desk
 ### `Timeline`: a window over a range, where the component owns the arithmetic and nothing else moves it
 
 **The window is the consumer's state and the component only computes against it.** `range` is the whole
-extent, `viewSignal` is the part on screen, and everything the component paints is derived from the pair: a
+extent, `view` is the part on screen, and everything the component paints is derived from the pair: a
 span's left and width are its share of the window written as percentages, so a resize needs no code here at
 all and the browser recomputes. The signal is optional through `SignalMirrorUtils.createOptional`, so a page that
 does not care gets an internal one and a page that wants a readout passes its own — the same arrangement
@@ -16653,7 +17377,7 @@ nothing gets no tile, because a zero-area button would be a tab stop nobody can 
 **The bar is the page's, not the component's.** The example draws a strip across the top showing the path and
 zooming out when pressed. `conventions.md`'s _"A component hands out a controller and renders no controls of
 its own"_ decides this over the example: the strip is a control, so the component publishes the branch in view
-as `branchSignal` and `TreemapUtils.findPath` for the path, and the Playground draws the strip as a `Button`
+as `branch` and `TreemapUtils.findPath` for the path, and the Playground draws the strip as a `Button`
 above the treemap — same place, same content, same behavior. Escape inside the treemap also goes up a level,
 because a keyboard user inside should not have to leave to come back out.
 
@@ -16739,7 +17463,7 @@ view, the space around it — goes to the root; that press is on the component's
 renders. `Icicle` keeps "press the cell in view to go up". Escape goes up one level in all four, because each
 example's way out is a pointer gesture and 2.1.1 Keyboard needs another.
 
-**`Icicle` takes a `focusSignal` rather than a `branchSignal`, because a leaf can be brought into view.** The
+**`Icicle` takes a `focus` rather than a `branch`, because a leaf can be brought into view.** The
 example zooms into any cell, and a leaf brought to the left at full height is how a sliver too thin to read gets
 read. The other three zoom only into branches, so their signal keeps the name that says so.
 
@@ -16798,12 +17522,12 @@ the frame it reserves — `Cuboid`'s formula with the radius as the depth — ho
 **A roll is the wheel's spin, not the cuboid's counts.** `Cuboid` is driven by two counts of quarter turns because
 it rests on six faces reachable by quarter turns; a twenty-sided die has no such lattice. What a die has is an
 outcome, which is the wheel's shape: `computeRollTarget` chooses the face, and may answer later; the controller's
-`roll()` starts a roll and declines while one is under way; `faceSignal` is written as soon as the target is known,
-the way `targetIndexSignal` is; `onRollEnd` reports the landing; and the landed face is announced, as `Rotator`
-announces a wedge. Writing `faceSignal` directly turns the die there with no tumbles.
+`roll()` starts a roll and declines while one is under way; `face` is written as soon as the target is known,
+the way `targetIndex` is; `onRollEnd` reports the landing; and the landed face is announced, as `Rotator`
+announces a wedge. Writing `face` directly turns the die there with no tumbles.
 
 **Rolling the face already showing still rolls.** Setting a state to the value it holds does nothing, by the library's
-rule, so a roll cannot be a write to `faceSignal` alone — a d6 that rolls a four while showing a four would sit still.
+rule, so a roll cannot be a write to `face` alone — a d6 that rolls a four while showing a four would sit still.
 The roll is a command that writes the signal and runs its own turn, and the turn a direct write would have started is
 suppressed for that one write.
 
@@ -16816,7 +17540,7 @@ still lands and still reports.
 **A face is showing only once the die is at rest.** The user's correction: the first build marked the target face as
 showing the moment a roll's result was known, so the painter lit it up while the die was still tumbling and the answer
 arrived before the roll did. `isShowing` now follows the face the die last came to rest on, and is false for every
-face while it turns. `faceSignal` still carries the target early, as the wheel's does, for a consumer that wants it.
+face while it turns. `face` still carries the target early, as the wheel's does, for a consumer that wants it.
 
 **Only the face showing is offered to a screen reader**, as `Cuboid` does: the rest are `aria-hidden` and `inert`, and
 while the die turns none is offered. The die reports `aria-busy` while it rolls.
@@ -16888,11 +17612,11 @@ Settled by the user, on a fault that read as a stale doc block and turned out to
 
 **A wheel has two "current wedge" numbers and only ever named one of them.** The wedge at the marker this
 instant is derived from the angle and moves continuously while the wheel turns; the wedge the wheel is heading
-for is decided once, when a spin's target is known. `indexSignal` held the second and was documented as the
+for is decided once, when a spin's target is known. `index` held the second and was documented as the
 first — "Which wedge is at the marker. It is the only thing that moves the wheel" — and writing it moved
 nothing.
 
-**The user's framing settled it: current and target.** So the signal is `targetIndexSignal`, and the ambiguity
+**The user's framing settled it: current and target.** So the signal is `targetIndex`, and the ambiguity
 existed only because the prop said "index" and left a consumer unable to tell which of the two they were
 holding. Their words: if the name explicitly announces "target", immediate reflection is the correct way.
 
@@ -16915,7 +17639,7 @@ that face really is the one at the marker once the wheel rests; and while the wh
 position is that nothing is selected, so exposing the last landing is stable where tracking the marker would
 churn the accessibility tree once per idle step. `wheel.spec.ts:401` pins that resting face.
 
-**`Carousel` was already target-driven** — you write `indexSignal` and an effect turns the drum to match — so
+**`Carousel` was already target-driven** — you write `index` and an effect turns the drum to match — so
 the two primitives run the same way round now. `Carousel`'s prop keeps the vaguer name; it has no separate
 current to be confused with.
 
@@ -17018,7 +17742,7 @@ which the review missed entirely and which is the useful one. All three are buil
 **A collapsed boundary remembers where it came from, and forgets on any other move, whatever made it.** The
 remembered position is stored beside the place the boundary collapsed to, and whenever the ratios change a
 boundary no longer sitting there is forgotten — so a drag, an arrow key, a press on the gutter and the consumer
-writing `ratiosSignal` from outside all count alike. `moveBoundary` also drops it, and `toggleCollapsed`
+writing `ratios` from outside all count alike. `moveBoundary` also drops it, and `toggleCollapsed`
 re-records it afterwards. A restore can therefore never put the divider back somewhere the boundary has since
 been moved away from, and the consumer's own write is the case that matters most, since the component never
 sees it happen and a check tied to its own handlers would miss it.
@@ -17163,7 +17887,7 @@ consumer does. It finds its column through a context the header cell provides, a
 that is not sortable or reorderable, so one header renderer serves every column. The resizer stays the library's:
 it is a drag surface measured against the column, and where it sits is not a matter of taste.
 
-**No raw `sort()` or `pickUp()` is exported.** `sortSignal` and `orderSignal` are already the programmatic route,
+**No raw `sort()` or `pickUp()` is exported.** `sort` and `order` are already the programmatic route,
 so a custom trigger — a menu item that sorts — writes the signal, and nothing that skips the rules is left
 around to be used by mistake.
 

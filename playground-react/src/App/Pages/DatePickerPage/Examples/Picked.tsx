@@ -48,7 +48,7 @@ export const PickedExample = (props: Props) => {
 
     return (
         <DatePicker
-            valueState={props.valueState}
+            value={props.value}
             calendar={props.calendar}
             minValue={props.minValue}
             maxValue={props.maxValue}
@@ -95,10 +95,10 @@ export const PickedExample = (props: Props) => {
                             precision={"month"}
                             previousLabel={"Previous year"}
                             nextLabel={"Next year"}
-                            monthState={monthState}
+                            month={monthState}
                         />
                     ) : (
-                        <PageCalendarCaption monthState={monthState} itemKey={props.itemKey} locale={LOCALE} />
+                        <PageCalendarCaption month={monthState} itemKey={props.itemKey} locale={LOCALE} />
                     )}
 
                     {renderCalendar()}

@@ -14,7 +14,7 @@ type Props = RangePriceExampleProps;
 
 export const PriceExample = (props: Props) => (
     <Range
-        rangeSignal={props.rangeSignal}
+        range={props.range}
         id={"price"}
         ariaLabel={"Price range"}
         thumbLabels={() => ["Lowest price", "Highest price"]}

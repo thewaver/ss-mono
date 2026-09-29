@@ -18,7 +18,7 @@ export type TreemapProps<T> = {
      * Leave it out and the treemap keeps it itself, starting at the root. A node that is not a branch of the current
      * tree shows the root.
      */
-    branchState?: readonly [TreemapNode<T>, (value: TreemapNode<T>) => void];
+    branch?: readonly [TreemapNode<T>, (value: TreemapNode<T>) => void];
     /** Draws one tile, and is told where it sits and what it holds. */
     renderTile: (node: TreemapNode<T>, state: TreemapTileState) => ReactNode;
 };

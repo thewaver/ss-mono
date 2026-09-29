@@ -8,8 +8,8 @@ import { CardsExample } from "./Cards";
 
 type Props = {
     groupId: string;
-    handSignal: Signal<SortableItem<Card>[]>;
-    boardSignal: Signal<SortableItem<Card>[]>;
+    hand: Signal<SortableItem<Card>[]>;
+    board: Signal<SortableItem<Card>[]>;
     isBoardLocked?: () => boolean;
     computeCanAccept?: (value: Card, fromLabel: string) => boolean;
 };
@@ -21,7 +21,7 @@ export const PairExample = (props: Props) => (
 
             <CardsExample
                 groupId={props.groupId}
-                itemsSignal={props.handSignal}
+                items={props.hand}
                 ariaLabel={"Hand"}
                 emptyText={"No cards"}
             />
@@ -32,7 +32,7 @@ export const PairExample = (props: Props) => (
 
             <CardsExample
                 groupId={props.groupId}
-                itemsSignal={props.boardSignal}
+                items={props.board}
                 ariaLabel={"Board"}
                 emptyText={"Play a card here"}
                 isLocked={() => props.isBoardLocked?.() ?? false}

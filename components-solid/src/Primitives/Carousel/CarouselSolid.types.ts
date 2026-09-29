@@ -41,9 +41,9 @@ export type CarouselSlots<T> = {
     /** The slides, in the order they are shown. */
     slides: MaybeAccessor<T[]>;
     /** Which slide is showing. It is the only thing that moves the carousel. */
-    indexSignal?: SignalSource<number>;
+    index?: SignalSource<number>;
     /** Whether the carousel is advancing by itself. It is the only thing that starts or stops it. */
-    playbackSignal?: SignalSource<boolean>;
+    playback?: SignalSource<boolean>;
     /** Draws one slide. It is handed where the slide stands relative to the one showing. */
     renderSlide: (getSlide: Accessor<T>, getState: Accessor<CarouselSlideState>) => JSX.Element;
     /** Draws one of the move controls. */

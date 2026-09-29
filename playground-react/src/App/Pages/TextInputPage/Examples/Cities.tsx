@@ -17,7 +17,7 @@ type Props = TextInputCitiesExampleProps;
 
 export const CitiesExample = (props: Props) => (
     <TextInput
-        valueState={props.valueState}
+        value={props.value}
         padding={FIELD_PADDING}
         gap={FIELD_GAP}
         ariaLabel={"City"}

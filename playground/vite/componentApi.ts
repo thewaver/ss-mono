@@ -1,3 +1,4 @@
+import { existsSync, readFileSync } from "node:fs";
 import path from "node:path";
 import ts from "typescript";
 import type { Plugin } from "vite";
@@ -8,9 +9,17 @@ const VIRTUAL_ID = "virtual:component-api";
 const RESOLVED_ID = `\0${VIRTUAL_ID}`;
 
 const PROPS_SUFFIX = "Props";
+const DEFINE_COMPONENT_NAME = "defineComponent";
+const SLOTS_CONTEXT_NAME = "SlotsContext";
+const COMPONENT_RETURN_TYPE = "VNode";
 const ACCESSOR_PREFIX = "MaybeAccessor<";
 const UNDEFINED_SUFFIX = " | undefined";
 const SOURCE_PATTERN = /\.tsx?$/;
+const SVELTE_DECLARATION_SUFFIX = ".svelte.d.ts";
+const SVELTE_SCRIPT_PATTERN = /<script\b([^>]*)>([\s\S]*?)<\/script>/g;
+const SVELTE_MODULE_PATTERN = /\bmodule\b|context\s*=\s*["']module["']/;
+const SVELTE_GENERICS_PATTERN = /\bgenerics\s*=\s*"([^"]*)"/;
+const PROPS_RUNE = "$props";
 const EXCLUDED_LAYERS = new Set(["Samples", "Utils"]);
 const EXCLUDED_FILE_KINDS = new Set(["const"]);
 const CONSTRUCTOR_NAME = "constructor";
@@ -44,6 +53,14 @@ type ApiTable = {
 type ApiGroup = {
     kind: ApiGroupKind;
     tables: ApiTable[];
+};
+
+export type ComponentApiOptions = {
+    /**
+     * The suffix of a type whose members are passed alongside a component's props, such as Vue's scoped slots. Such a
+     * type is listed with the props of the component its name leads with, straight after that component's props.
+     */
+    slotsSuffix?: string;
 };
 
 type ExportRecord = {
@@ -96,6 +113,12 @@ const byName = (a: { name: string }, b: { name: string }) => a.name.localeCompar
 const byPrimary = (primary: string) => (a: { name: string }, b: { name: string }) =>
     Number(b.name === primary) - Number(a.name === primary) || byName(a, b);
 
+const byPrimaries = (primaries: string[]) => (a: { name: string }, b: { name: string }) => {
+    const rank = (name: string) => (primaries.includes(name) ? primaries.indexOf(name) : primaries.length);
+
+    return rank(a.name) - rank(b.name) || byName(a, b);
+};
+
 const byAliasesFirst = (a: ApiTable, b: ApiTable) =>
     Number(b.kind === "aliases") - Number(a.kind === "aliases") || byName(a, b);
 
@@ -106,10 +129,76 @@ const getFileKind = (fileName: string) => {
     return dot === -1 ? "component" : base.slice(dot + 1);
 };
 
-const buildApiMap = (entryFile: string, coreEntry: string, utilsEntry: string) => {
+const findPropsType = (script: ts.SourceFile) => {
+    let found: string | undefined;
+
+    const visit = (node: ts.Node) => {
+        if (
+            ts.isVariableDeclaration(node) &&
+            node.type &&
+            node.initializer &&
+            ts.isCallExpression(node.initializer) &&
+            node.initializer.expression.getText(script) === PROPS_RUNE
+        ) {
+            found = node.type.getText(script);
+        }
+
+        if (found === undefined) ts.forEachChild(node, visit);
+    };
+
+    visit(script);
+
+    return found;
+};
+
+const toSvelteDeclaration = (componentFile: string) => {
+    const source = readFileSync(componentFile, "utf8");
+    const name = path.basename(componentFile, ".svelte");
+    const instance = [...source.matchAll(SVELTE_SCRIPT_PATTERN)].find(
+        (match) => !SVELTE_MODULE_PATTERN.test(match[1]),
+    );
+    const script = ts.createSourceFile(componentFile, instance?.[2] ?? "", ts.ScriptTarget.ESNext, true);
+    const imports = script.statements.filter(ts.isImportDeclaration).map((statement) => statement.getText(script));
+    const propsType = findPropsType(script) ?? "Record<string, never>";
+    const generics = instance ? SVELTE_GENERICS_PATTERN.exec(instance[1])?.[1] : undefined;
+    const signature = generics
+        ? `declare function ${name}<${generics}>(internals: ComponentInternals, props: ${propsType}): {};`
+        : `declare const ${name}: Component<${propsType}>;`;
+
+    return [
+        ...imports,
+        `import type { Component, ComponentInternals } from "svelte";`,
+        signature,
+        `export default ${name};`,
+    ].join("\n");
+};
+
+const createSvelteAwareHost = (options: ts.CompilerOptions) => {
+    const host = ts.createCompilerHost(options);
+    const toComponentFile = (fileName: string) =>
+        fileName.endsWith(SVELTE_DECLARATION_SUFFIX) ? fileName.slice(0, -".d.ts".length) : undefined;
+    const getIsSvelteDeclaration = (fileName: string) => {
+        const componentFile = toComponentFile(fileName);
+
+        return componentFile !== undefined && !existsSync(fileName) && existsSync(componentFile);
+    };
+
+    return {
+        ...host,
+        fileExists: (fileName: string) => getIsSvelteDeclaration(fileName) || host.fileExists(fileName),
+        readFile: (fileName: string) =>
+            getIsSvelteDeclaration(fileName) ? toSvelteDeclaration(toComponentFile(fileName)!) : host.readFile(fileName),
+        getSourceFile: (fileName: string, languageVersion: ts.ScriptTarget | ts.CreateSourceFileOptions, ...rest) =>
+            getIsSvelteDeclaration(fileName)
+                ? ts.createSourceFile(fileName, toSvelteDeclaration(toComponentFile(fileName)!), languageVersion, true)
+                : host.getSourceFile(fileName, languageVersion, ...rest),
+    } satisfies ts.CompilerHost;
+};
+
+const buildApiMap = (entryFile: string, coreEntry: string, utilsEntry: string, apiOptions: ComponentApiOptions) => {
     const sourceRoots = [toPosix(path.dirname(entryFile)), toPosix(path.dirname(coreEntry))];
     const getRoot = (fileName: string) => sourceRoots.find((root) => toPosix(fileName).startsWith(`${root}/`));
-    const program = ts.createProgram([entryFile], {
+    const options: ts.CompilerOptions = {
         target: ts.ScriptTarget.ESNext,
         module: ts.ModuleKind.ESNext,
         moduleResolution: ts.ModuleResolutionKind.Bundler,
@@ -120,7 +209,8 @@ const buildApiMap = (entryFile: string, coreEntry: string, utilsEntry: string) =
         noEmit: true,
         baseUrl: path.dirname(entryFile),
         paths: { "@thewaver/ss-components": [coreEntry], "@thewaver/ss-utils": [utilsEntry] },
-    });
+    };
+    const program = ts.createProgram([entryFile], options, createSvelteAwareHost(options));
 
     const checker = program.getTypeChecker();
     const source = program.getSourceFile(entryFile);
@@ -174,6 +264,32 @@ const buildApiMap = (entryFile: string, coreEntry: string, utilsEntry: string) =
         isOptional: false,
         isAccessor: false,
     });
+
+    /** A Vue component's row reads as its setup function's props and slots, not as the type `defineComponent` returns. */
+    const toDefinedComponentSignature = (declaration: ts.Declaration) => {
+        if (!ts.isVariableDeclaration(declaration) || !declaration.initializer) return undefined;
+
+        const call = declaration.initializer;
+
+        if (!ts.isCallExpression(call) || call.expression.getText() !== DEFINE_COMPONENT_NAME) return undefined;
+
+        const setup = call.arguments[0];
+
+        if (!setup || !(ts.isArrowFunction(setup) || ts.isFunctionExpression(setup))) return undefined;
+
+        const [propsParameter, contextParameter] = setup.parameters;
+        const contextType = contextParameter?.type;
+        const slotsType =
+            contextType && ts.isTypeReferenceNode(contextType) && contextType.typeName.getText() === SLOTS_CONTEXT_NAME
+                ? contextType.typeArguments?.[0]
+                : undefined;
+        const parameters = [
+            `props: ${propsParameter?.type ? normalize(propsParameter.type.getText()) : "object"}`,
+            ...(slotsType ? [`slots: ${normalize(slotsType.getText())}`] : []),
+        ];
+
+        return `${toTypeParameters(setup)}(${parameters.join(", ")}) => ${COMPONENT_RETURN_TYPE}`;
+    };
 
     const toTable = (kind: ApiTableKind, name: string, heading: string, description: string, entries: ApiEntry[]) => ({
         kind,
@@ -264,8 +380,10 @@ const buildApiMap = (entryFile: string, coreEntry: string, utilsEntry: string) =
         if (symbol.flags & (ts.SymbolFlags.TypeAlias | ts.SymbolFlags.Interface)) {
             const declared = checker.getDeclaredTypeOfSymbol(symbol);
 
-            if (name.endsWith(PROPS_SUFFIX)) {
-                const owner = units.get(name.slice(0, -PROPS_SUFFIX.length).toLowerCase()) ?? unit;
+            const ownerSuffix = [PROPS_SUFFIX, apiOptions.slotsSuffix].find((suffix) => suffix && name.endsWith(suffix));
+
+            if (ownerSuffix) {
+                const owner = units.get(name.slice(0, -ownerSuffix.length).toLowerCase()) ?? unit;
                 const entries = toEntries(declared, declaration);
 
                 if (entries.length)
@@ -298,7 +416,12 @@ const buildApiMap = (entryFile: string, coreEntry: string, utilsEntry: string) =
             continue;
         }
 
-        addValue(unit, fileKind === "context" ? "context" : "components", toValueEntry(symbol, declaration));
+        const entry = toValueEntry(symbol, declaration);
+
+        addValue(unit, fileKind === "context" ? "context" : "components", {
+            ...entry,
+            type: toDefinedComponentSignature(declaration) ?? entry.type,
+        });
     }
 
     for (const [unit, byKind] of values) {
@@ -318,7 +441,14 @@ const buildApiMap = (entryFile: string, coreEntry: string, utilsEntry: string) =
             if (!tables) return [];
 
             return [
-                { kind, tables: tables.sort(kind === "props" ? byPrimary(`${unit}${PROPS_SUFFIX}`) : byAliasesFirst) },
+                {
+                    kind,
+                    tables: tables.sort(
+                        kind === "props"
+                            ? byPrimaries([`${unit}${PROPS_SUFFIX}`, `${unit}${apiOptions.slotsSuffix ?? PROPS_SUFFIX}`])
+                            : byAliasesFirst,
+                    ),
+                },
             ];
         });
     }
@@ -326,7 +456,12 @@ const buildApiMap = (entryFile: string, coreEntry: string, utilsEntry: string) =
     return map;
 };
 
-export const componentApi = (componentsRoot: string, coreRoot: string, utilsEntry: string): Plugin => {
+export const componentApi = (
+    componentsRoot: string,
+    coreRoot: string,
+    utilsEntry: string,
+    options: ComponentApiOptions = {},
+): Plugin => {
     const entryFile = path.join(componentsRoot, "index.ts");
     const coreEntry = path.join(coreRoot, "index.ts");
     const roots = [componentsRoot, coreRoot];
@@ -339,7 +474,7 @@ export const componentApi = (componentsRoot: string, coreRoot: string, utilsEntr
         load(id) {
             if (id !== RESOLVED_ID) return undefined;
 
-            return `export default ${JSON.stringify(buildApiMap(entryFile, coreEntry, utilsEntry))};`;
+            return `export default ${JSON.stringify(buildApiMap(entryFile, coreEntry, utilsEntry, options))};`;
         },
         configureServer(server) {
             for (const root of roots) server.watcher.add(root);

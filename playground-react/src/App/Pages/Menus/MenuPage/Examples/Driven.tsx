@@ -12,12 +12,12 @@ type Props = MenuDrivenExampleProps;
 export const DrivenExample = (props: Props) => {
     const [anchorRef, setAnchorRef] = useState<HTMLElement>();
 
-    const [isOpen, setIsOpen] = props.visibilityState;
+    const [isOpen, setIsOpen] = props.visibility;
 
     return (
         <>
             <Menu
-                visibilityState={props.visibilityState}
+                visibility={props.visibility}
                 anchorRef={anchorRef}
                 items={ACTIONS}
                 ariaLabel={"Edit actions"}

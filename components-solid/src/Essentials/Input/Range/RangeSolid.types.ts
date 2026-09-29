@@ -36,12 +36,12 @@ export type RangeProps = Omit<InteractionWrapperProps<RangeRenderProps>, "render
             Pick<InteractionControlProps<RangeRenderProps>, "id" | "renderContent"> &
             RangeState & {
                 /** The value. It is the only thing that moves the thumb. */
-                valueSignal?: SignalSource<number>;
+                value?: SignalSource<number>;
                 /**
                  * The two ends of the range. It is the only thing that moves them. A pair's thumbs take `<id>-start`
                  * and `<id>-end` as their ids, so a label can name each one, where a single thumb keeps the id as
                  * given.
                  */
-                rangeSignal?: SignalSource<RangeValues>;
+                range?: SignalSource<RangeValues>;
             }
     >;

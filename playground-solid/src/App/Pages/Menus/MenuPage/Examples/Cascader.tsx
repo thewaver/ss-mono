@@ -12,7 +12,7 @@ type Props = MenuCascaderExampleProps;
 
 export const CascaderExample = (props: Props) => {
     const getPathText = () => {
-        const path = props.pathSignal[0]();
+        const path = props.path[0]();
 
         return path.length > 0 ? path.join(PATH_SEPARATOR) : NOTHING_CHOSEN;
     };
@@ -28,7 +28,7 @@ export const CascaderExample = (props: Props) => {
             renderItem={renderDestinationItem}
             renderPopup={renderMenuPopup}
             onActivate={(destination) => {
-                if (destination.isLeaf) props.pathSignal[1](destination.path);
+                if (destination.isLeaf) props.path[1](destination.path);
             }}
         />
     );

@@ -68,7 +68,7 @@ export const RichTextPage = () => {
             component: () => (
                 <>
                     <TextArea
-                        valueSignal={contentSignal}
+                        value={contentSignal}
                         isAutoSizing={true}
                         minRows={() => MIN_ROWS}
                         maxRows={() => MAX_ROWS}

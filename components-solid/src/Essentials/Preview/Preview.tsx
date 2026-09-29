@@ -39,7 +39,7 @@ const PreviewTrigger = (props: PreviewTriggerProps) => {
 };
 
 export const Preview = (props: PreviewProps) => {
-    const expandedSignal = SignalMirrorSolidUtils.createOptional(() => props.expandedSignal, false);
+    const expandedSignal = SignalMirrorSolidUtils.createOptional(() => props.expanded, false);
 
     const contentId = createUniqueId();
 

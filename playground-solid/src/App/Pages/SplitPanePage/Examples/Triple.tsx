@@ -15,7 +15,7 @@ export const TripleExample = (props: Props) => {
         <PageSplitPaneFrame>
             <SplitPane
                 panes={() => TRIPLE}
-                ratiosSignal={props.ratiosSignal}
+                ratios={props.ratios}
                 gutterSize={props.gutterSize}
                 isDisabled={props.isDisabled}
                 ariaLabel={"Three panes"}

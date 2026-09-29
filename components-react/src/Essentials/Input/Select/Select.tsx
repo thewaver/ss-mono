@@ -118,15 +118,15 @@ export const SelectComposite = <T,>(props: SelectCompositeProps<T>) => {
     const latestRef = useLatest(props.ref);
     const [fieldElement, setFieldElement] = useState<HTMLElement>();
 
-    const [isOpen, setIsOpen] = SignalMirrorReactUtils.useOptionalState(props.visibilityState, false);
+    const [isOpen, setIsOpen] = SignalMirrorReactUtils.useOptionalState(props.visibility, false);
     const [hasPopoverSettled, setHasPopoverSettled] = useState(true);
     const [wasOpen, setWasOpen] = useState(isOpen);
 
     const fieldId = props.id ?? fallbackFieldId;
     const isDisabled = props.isDisabled ?? false;
     const isMultiple = props.isMultiple ?? false;
-    const isFilterable = props.queryState !== undefined;
-    const query = props.queryState?.[0] ?? EMPTY_QUERY;
+    const isFilterable = props.query !== undefined;
+    const query = props.query?.[0] ?? EMPTY_QUERY;
     const isFiltering = query !== EMPTY_QUERY;
 
     if (wasOpen !== isOpen) {
@@ -183,7 +183,7 @@ export const SelectComposite = <T,>(props: SelectCompositeProps<T>) => {
 
     FormFieldReactUtils.useRegisterControl(fieldRef);
 
-    const latestQueryState = useLatest(props.queryState);
+    const latestQueryState = useLatest(props.query);
 
     useEffect(() => {
         if (!SelectUtils.getIsQueryClearDue(isOpen, hasPopoverSettled, query)) return;
@@ -246,7 +246,7 @@ export const SelectComposite = <T,>(props: SelectCompositeProps<T>) => {
                             open();
                             cursor.highlight(undefined);
 
-                            props.queryState?.[1](next);
+                            props.query?.[1](next);
                         }}
                     />
 
@@ -290,7 +290,7 @@ export const SelectComposite = <T,>(props: SelectCompositeProps<T>) => {
 };
 
 export const Select = <T,>(props: SelectProps<T>) => {
-    const [value, setValue] = props.valueState;
+    const [value, setValue] = props.value;
 
     const selectedOptions = useMemo(() => {
         const selectedOption = SelectUtils.getFlatOptions(props.options).find((option) => option.value === value);

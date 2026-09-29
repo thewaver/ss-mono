@@ -16,7 +16,7 @@ type Props = SelectExampleProps & {
 export const CountriesExample = (props: Props) => {
     return (
         <Select
-            valueSignal={props.valueSignal}
+            value={props.value}
             options={props.options ?? (() => COUNTRIES)}
             isDisabled={props.isDisabled}
             hasError={props.hasError}

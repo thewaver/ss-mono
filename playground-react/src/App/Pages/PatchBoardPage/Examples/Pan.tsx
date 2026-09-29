@@ -29,8 +29,8 @@ export const PanExample = (props: Props) => {
                     stepSize={PATCH_BOARD_DEFAULTS.stepSize * PAN_SCALE}
                     isLocked={props.isLocked}
                     isDisabled={props.isDisabled}
-                    nodesState={props.nodesState}
-                    linksState={props.linksState}
+                    nodes={props.nodes}
+                    links={props.links}
                     computeNodeKey={(device) => device.id}
                     computeNodeLabel={(device) => device.name}
                     renderNode={(node, flags) => (

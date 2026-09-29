@@ -31,7 +31,7 @@ const renderStep = (item: SortableItem<SVGFiltersStep>, flags: InteractionFlags<
 type Props = SVGFiltersStackExampleProps;
 
 const StepList = (props: {
-    itemsState: readonly [SortableItem<SVGFiltersStep>[], (items: SortableItem<SVGFiltersStep>[]) => void];
+    items: readonly [SortableItem<SVGFiltersStep>[], (items: SortableItem<SVGFiltersStep>[]) => void];
     caption: string;
     emptyText: string;
 }) => (
@@ -46,7 +46,7 @@ const StepList = (props: {
             sizing={"fill"}
             gap={STEP_LIST_GAP}
             minHeight={STEP_LIST_MIN_HEIGHT}
-            itemsState={props.itemsState}
+            items={props.items}
             computeItemKey={computeStepKey}
             computeItemLabel={computeStepLabel}
             renderItem={renderStep}
@@ -58,7 +58,7 @@ const StepList = (props: {
 );
 
 export const StackExample = (props: Props) => {
-    const [applied] = props.appliedState;
+    const [applied] = props.applied;
 
     return (
         <div className={styles.stack}>
@@ -78,9 +78,9 @@ export const StackExample = (props: Props) => {
             />
 
             <div className={styles.stepLists}>
-                <StepList itemsState={props.appliedState} caption={"Applied"} emptyText={"Nothing applied"} />
+                <StepList items={props.applied} caption={"Applied"} emptyText={"Nothing applied"} />
 
-                <StepList itemsState={props.unusedState} caption={"Left out"} emptyText={"Drop here"} />
+                <StepList items={props.unused} caption={"Left out"} emptyText={"Drop here"} />
             </div>
         </div>
     );

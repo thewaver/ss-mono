@@ -12,5 +12,5 @@ export type ParticleFieldExampleProps = {
     animationType: CellAnimationKeyframes.AnimationType;
     holdShare: number;
     isScattered: boolean;
-    playbackState: readonly [boolean, (value: boolean) => void];
+    playback: readonly [boolean, (value: boolean) => void];
 };

@@ -21,7 +21,7 @@ export const LabeledExample = (props: Props) => (
         <PageLabelCaption>Bio</PageLabelCaption>
 
         <TextArea
-            valueState={props.valueState}
+            value={props.value}
             isAutoSizing={true}
             minRows={MIN_ROWS}
             maxRows={MAX_ROWS}

@@ -43,7 +43,7 @@ export const Treemap = <T,>(props: TreemapProps<T>) => {
     const getZoomDurationMs = createMemo(() => access(props.zoomDurationMs) ?? TREEMAP_DEFAULTS.zoomDurationMs);
 
     const [getHeldBranch, setHeldBranch] = SignalMirrorSolidUtils.createOptional(
-        () => props.branchSignal,
+        () => props.branch,
         untrack(getRootNode),
     );
 

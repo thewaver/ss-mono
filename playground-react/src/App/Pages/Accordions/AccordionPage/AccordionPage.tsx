@@ -26,7 +26,7 @@ export const AccordionPage = () => {
             key: "multi",
             name: "Many open at once",
             readout: () => `expanded: ${JSON.stringify(multiState[0])}`,
-            component: () => <SectionsExample expandedState={multiState} />,
+            component: () => <SectionsExample expanded={multiState} />,
             path: `${EXAMPLES_ROOT}/Sections.tsx`,
         },
         {
@@ -41,7 +41,7 @@ export const AccordionPage = () => {
             key: "single",
             name: "One at a time",
             readout: () => `expanded: ${JSON.stringify(singleState[0])} — the component keeps at most one`,
-            component: () => <SectionsExample expandedState={singleState} isSingleExpand={true} />,
+            component: () => <SectionsExample expanded={singleState} isSingleExpand={true} />,
             path: `${EXAMPLES_ROOT}/Sections.tsx`,
         },
         {
@@ -50,7 +50,7 @@ export const AccordionPage = () => {
             readout: () =>
                 `expanded: ${JSON.stringify(requiredState[0])} — pressing the open header does nothing, because the only way out of a section is into another one`,
             component: () => (
-                <SectionsExample expandedState={requiredState} isSingleExpand={true} isExpandRequired={true} />
+                <SectionsExample expanded={requiredState} isSingleExpand={true} isExpandRequired={true} />
             ),
             path: `${EXAMPLES_ROOT}/Sections.tsx`,
         },
@@ -60,7 +60,7 @@ export const AccordionPage = () => {
             readout: () => `extra lines: ${extraLines} — the panel follows its content without reopening`,
             component: () => (
                 <GrowingExample
-                    expandedState={growingState}
+                    expanded={growingState}
                     extraLines={extraLines}
                     onAddLine={() => {
                         setExtraLines((prev) => prev + 1);
@@ -76,7 +76,7 @@ export const AccordionPage = () => {
                 `built: ${JSON.stringify(built)} — a section's content is not in the page until it is opened once, and stays there afterwards`,
             component: () => (
                 <DeferredExample
-                    expandedState={deferredState}
+                    expanded={deferredState}
                     onBuild={(value) => setBuilt((prev) => (prev.includes(value) ? prev : [...prev, value]))}
                 />
             ),
@@ -87,7 +87,7 @@ export const AccordionPage = () => {
             name: "Inside a box that scrolls",
             readout: () =>
                 `expanded: ${JSON.stringify(scrolledState[0])} — opening a section below the fold brings it up`,
-            component: () => <ScrolledExample expandedState={scrolledState} />,
+            component: () => <ScrolledExample expanded={scrolledState} />,
             path: `${EXAMPLES_ROOT}/Scrolled.tsx`,
         },
     ];

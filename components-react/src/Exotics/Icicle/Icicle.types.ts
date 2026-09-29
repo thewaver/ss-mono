@@ -20,7 +20,7 @@ export type IcicleProps<T> = {
      * goes up to its parent, or when Escape is pressed; the consumer to move it from outside. Leave it out and the
      * icicle keeps it itself, starting at the root. A node that is not in the current tree shows the root.
      */
-    focusState?: readonly [IcicleNode<T>, (value: IcicleNode<T>) => void];
+    focus?: readonly [IcicleNode<T>, (value: IcicleNode<T>) => void];
     /** Draws one cell, and is told where it sits at this moment, which changes on every frame of a zoom. */
     renderCell: (node: IcicleNode<T>, state: IcicleCellState) => ReactNode;
 };

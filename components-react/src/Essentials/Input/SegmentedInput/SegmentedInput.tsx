@@ -15,7 +15,7 @@ import type { SegmentedInputProps } from "./SegmentedInput.types";
 const NO_SELECTION: SegmentedInputSelection = { start: 0, end: 0 };
 
 export const SegmentedInput = (props: SegmentedInputProps) => {
-    const [value] = props.valueState;
+    const [value] = props.value;
 
     const elementRef = useRef<HTMLInputElement | null>(null);
     const element = useElement(elementRef);

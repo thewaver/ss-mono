@@ -6,5 +6,5 @@ export type SidebarExampleProps = AccessorProps<{
     edge: SidebarEdge;
     layout: SidebarLayout;
     isExpandedOnHover: boolean;
-    expandedSignal: Signal<boolean>;
+    expanded: Signal<boolean>;
 }>;

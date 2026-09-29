@@ -25,7 +25,7 @@ export const DeferredExample = (props: Props) => {
     return (
         <Accordion
             items={() => ITEMS}
-            expandedSignal={props.expandedSignal}
+            expanded={props.expanded}
             isPanelBuiltOnExpand={true}
             gap={() => GAP}
             renderHeader={(getItem, getFlags) => (

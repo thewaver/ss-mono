@@ -22,8 +22,8 @@ export namespace DateTimeValueSolidUtils {
      */
     export const createSplit = (
         signal: Signal<DateTimeValue | undefined>,
-    ): { dateSignal: Signal<DateValue | undefined>; timeSignal: Signal<TimeValue | undefined> } => {
-        const { firstSignal, secondSignal } = SignalMirrorSolidUtils.createSplit<DateTimeValue, DateValue, TimeValue>(
+    ): { date: Signal<DateValue | undefined>; time: Signal<TimeValue | undefined> } => {
+        const { first: firstSignal, second: secondSignal } = SignalMirrorSolidUtils.createSplit<DateTimeValue, DateValue, TimeValue>(
             signal,
             {
                 compose: (date, time) => DateTimeValueUtils.of(date, time),
@@ -32,6 +32,6 @@ export namespace DateTimeValueSolidUtils {
             },
         );
 
-        return { dateSignal: firstSignal, timeSignal: secondSignal };
+        return { date: firstSignal, time: secondSignal };
     };
 }

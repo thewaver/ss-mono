@@ -22,7 +22,7 @@ export const ModalPage = () => {
             key: "default",
             name: "Default",
             readout: () => `open: ${modalVisibility[0]()} — Escape and an overlay click both dismiss it`,
-            component: () => <DefaultExample visibilitySignal={modalVisibility} />,
+            component: () => <DefaultExample visibility={modalVisibility} />,
             path: `${EXAMPLES_ROOT}/Default.tsx`,
         },
         {
@@ -31,7 +31,7 @@ export const ModalPage = () => {
             readout: () =>
                 `open: ${destructiveVisibility[0]()} | outcome: ${getOutcome()} — the alertdialog role, a required focus target, and neither overlay nor Escape dismissal`,
             component: () => (
-                <DestructiveConfirmationExample visibilitySignal={destructiveVisibility} onDecide={setOutcome} />
+                <DestructiveConfirmationExample visibility={destructiveVisibility} onDecide={setOutcome} />
             ),
             path: `${EXAMPLES_ROOT}/DestructiveConfirmation.tsx`,
         },
@@ -40,7 +40,7 @@ export const ModalPage = () => {
             name: "A popup inside it",
             readout: () =>
                 `open: ${layeredVisibility[0]()} | country: ${layeredSignal[0]() ?? "undefined"} — Escape closes the innermost layer only`,
-            component: () => <LayeredExample visibilitySignal={layeredVisibility} valueSignal={layeredSignal} />,
+            component: () => <LayeredExample visibility={layeredVisibility} value={layeredSignal} />,
             path: `${EXAMPLES_ROOT}/Layered.tsx`,
         },
         {
@@ -48,7 +48,7 @@ export const ModalPage = () => {
             name: "Nothing focusable inside",
             readout: () =>
                 `open: ${textOnlyVisibility[0]()} — with nothing to focus inside, the dialog takes focus itself`,
-            component: () => <TextOnlyExample visibilitySignal={textOnlyVisibility} />,
+            component: () => <TextOnlyExample visibility={textOnlyVisibility} />,
             path: `${EXAMPLES_ROOT}/TextOnly.tsx`,
         },
     ]);

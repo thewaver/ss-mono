@@ -9,7 +9,7 @@ type Props = SegmentedInputExampleProps;
 
 export const OneTimeCodeExample = (props: Props) => (
     <SegmentedInput
-        valueState={props.valueState}
+        value={props.value}
         cellCount={ONE_TIME_CODE_LENGTH}
         gap={FIELD_GAP}
         ariaLabel={"One-time code"}

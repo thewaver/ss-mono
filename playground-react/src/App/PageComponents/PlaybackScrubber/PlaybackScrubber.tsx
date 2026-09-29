@@ -17,8 +17,8 @@ export const PagePlaybackScrubber = (props: PagePlaybackScrubberProps) => {
 
     const sliderSlotSize = ElementObserverReactUtils.useBorderBoxSize(sliderSlotRef);
 
-    const [isPlaying, setIsPlaying] = props.playbackState;
-    const [progress, setProgress] = props.progressState;
+    const [isPlaying, setIsPlaying] = props.playback;
+    const [progress, setProgress] = props.progress;
 
     return (
         <div className={styles.playbackRow}>
@@ -45,7 +45,7 @@ export const PagePlaybackScrubber = (props: PagePlaybackScrubberProps) => {
                     min={0}
                     max={PERCENT}
                     step={SLIDER_STEP}
-                    valueState={[Math.round(progress * PERCENT), (value: number) => setProgress(value / PERCENT)]}
+                    value={[Math.round(progress * PERCENT), (value: number) => setProgress(value / PERCENT)]}
                     renderContent={(renderProps) => (
                         <PageRangeContent renderProps={renderProps} length={sliderSlotSize.width} />
                     )}

@@ -23,7 +23,7 @@ export type DateInputEra = {
 
 export type DateInputProps = Omit<
     TextFieldProps,
-    | "valueState"
+    | "value"
     | "element"
     | "type"
     | "inputMode"
@@ -57,7 +57,7 @@ export type DateInputProps = Omit<
      */
     partHints: Record<DateInputPart, string>;
     /** The date, and how to change it. It is the only thing that changes it. */
-    valueState: readonly [DateValue | undefined, (value: DateValue | undefined) => void];
+    value: readonly [DateValue | undefined, (value: DateValue | undefined) => void];
     /** Draws whatever sits before the field's text, inside the field. */
     renderLeading?: (flags: InteractionFlags<TextFieldFlags>, era: DateInputEra) => ReactNode;
 };

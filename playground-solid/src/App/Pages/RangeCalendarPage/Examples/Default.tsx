@@ -14,11 +14,11 @@ type Props = RangeCalendarExampleProps;
 export const DefaultExample = (props: Props) => {
     return (
         <PageCalendarFrame>
-            <PageCalendarCaption monthSignal={props.monthSignal} key={"default"} locale={() => LOCALE} />
+            <PageCalendarCaption month={props.month} key={"default"} locale={() => LOCALE} />
 
             <RangeCalendar
-                valueSignal={props.valueSignal}
-                monthSignal={props.monthSignal}
+                value={props.value}
+                month={props.month}
                 today={() => TODAY}
                 locale={() => LOCALE}
                 weekStartsOn={props.weekStartsOn}

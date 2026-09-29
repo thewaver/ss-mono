@@ -23,7 +23,7 @@ export const DefaultExample = ({
     holdShare,
     isScattered,
     ...otherProps
-}: ParticleFieldExampleProps & Pick<ParticleFieldProps, "computeShapePoints" | "shapeJoinRadii" | "progressState">) => {
+}: ParticleFieldExampleProps & Pick<ParticleFieldProps, "computeShapePoints" | "shapeJoinRadii" | "progress">) => {
     const computeCellWeights = useCallback(
         (count: Index2d) =>
             CellAnimationWeights.computeCellWeights(

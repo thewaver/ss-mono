@@ -16,14 +16,14 @@ type Props = TextInputExampleProps;
 
 export const RefusingSetterExample = (props: Props) => (
     <TextInput
-        valueState={props.valueState}
+        value={props.value}
         padding={FIELD_PADDING}
         gap={FIELD_GAP}
         ariaLabel={"PIN"}
         inputMode={"numeric"}
-        hasError={props.valueState[0].length > 0 && props.valueState[0].length < PIN_LENGTH}
+        hasError={props.value[0].length > 0 && props.value[0].length < PIN_LENGTH}
         onInput={(value) => {
-            props.valueState[1](value.replace(/\D/g, "").slice(0, PIN_LENGTH));
+            props.value[1](value.replace(/\D/g, "").slice(0, PIN_LENGTH));
         }}
         computeTextStyle={computePageTextFieldTextStyle}
         renderContent={(flags) => <PageTextFieldContent flags={flags} />}

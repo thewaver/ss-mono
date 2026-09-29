@@ -19,7 +19,7 @@ type Props = CurrencyInputExampleProps;
 export const SymbolExample = (props: Props) => {
     return (
         <CurrencyInput
-            valueSignal={props.valueSignal}
+            value={props.value}
             ariaLabel={"Price with a symbol"}
             padding={() => FIELD_STEPPER_PADDING}
             gap={() => FIELD_GAP}

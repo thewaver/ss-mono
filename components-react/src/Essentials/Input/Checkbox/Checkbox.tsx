@@ -12,7 +12,7 @@ export const Checkbox = <T,>(props: CheckboxProps<T>) => {
     const groupContext = useCheckboxGroupContext();
     const group = props.value === undefined ? undefined : groupContext;
 
-    const [isOwnChecked, setIsOwnChecked] = SignalMirrorReactUtils.useOptionalState(props.checkedState, false);
+    const [isOwnChecked, setIsOwnChecked] = SignalMirrorReactUtils.useOptionalState(props.checked, false);
 
     const latest = useLatest({ value: props.value, isDisabled: props.isDisabled ?? false });
 

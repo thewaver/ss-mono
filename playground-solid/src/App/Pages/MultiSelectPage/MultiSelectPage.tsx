@@ -39,7 +39,7 @@ export const MultiSelectPage = () => {
             key: "multiSelect",
             name: "Many at once",
             readout: () => `values: [${countriesSignal[0]().join(", ")}] — picking keeps the list open`,
-            component: () => <MultiSelectCountriesExample valuesSignal={countriesSignal} />,
+            component: () => <MultiSelectCountriesExample values={countriesSignal} />,
             path: `${EXAMPLES_ROOT}/MultiSelectCountries.tsx`,
         },
         {
@@ -49,8 +49,8 @@ export const MultiSelectPage = () => {
                 `values: [${groupedSignal[0]().join(", ")}] | query: "${querySignal[0]()}" — the page drops groups it has emptied`,
             component: () => (
                 <MultiSelectGroupedExample
-                    valuesSignal={groupedSignal}
-                    querySignal={querySignal}
+                    values={groupedSignal}
+                    query={querySignal}
                     options={getFilteredGroups}
                 />
             ),
@@ -63,7 +63,7 @@ export const MultiSelectPage = () => {
                 `values: [${clearableSignal[0]().join(", ")}] | last change: ${getClearableChange()} — the clear control empties every pick at once`,
             component: () => (
                 <MultiSelectClearableExample
-                    valuesSignal={clearableSignal}
+                    values={clearableSignal}
                     onSelectionChange={(values) => {
                         setClearableChange(`[${values.join(", ")}]`);
                     }}

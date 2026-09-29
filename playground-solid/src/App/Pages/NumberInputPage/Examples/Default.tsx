@@ -17,7 +17,7 @@ type Props = NumberInputExampleProps;
 
 export const DefaultExample = (props: Props) => (
     <NumberInput
-        valueSignal={props.valueSignal}
+        value={props.value}
         padding={() => FIELD_STEPPER_PADDING}
         gap={() => FIELD_GAP}
         ariaLabel={"How many"}

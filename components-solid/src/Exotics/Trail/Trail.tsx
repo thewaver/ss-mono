@@ -13,8 +13,8 @@ const NO_PROGRESS = 0;
 const NO_OFFSET = 0;
 
 export const Trail = (props: TrailProps) => {
-    const [getProgress, setProgress] = SignalMirrorSolidUtils.createOptional(() => props.progressSignal, NO_PROGRESS);
-    const [getIsPlaying, setIsPlaying] = SignalMirrorSolidUtils.createOptional(() => props.playbackSignal, true);
+    const [getProgress, setProgress] = SignalMirrorSolidUtils.createOptional(() => props.progress, NO_PROGRESS);
+    const [getIsPlaying, setIsPlaying] = SignalMirrorSolidUtils.createOptional(() => props.playback, true);
 
     const [getPathRef, setPathRef] = createSignal<SVGPathElement>();
     const [getPathLength, setPathLength] = createSignal(NO_LENGTH);

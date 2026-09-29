@@ -24,7 +24,7 @@ export type CellAnimationExampleProps = AccessorProps<{
     animationIterationCount: number;
     animationIterationDelayMs: number;
     finalFrame: CellAnimationFinalFrame;
-    playbackSignal: Signal<boolean>;
+    playback: Signal<boolean>;
 }>;
 
 export type CellAnimationSourcedExampleProps = CellAnimationExampleProps & AccessorProps<{ src: string }>;

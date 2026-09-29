@@ -37,6 +37,12 @@ export type ListboxOptionItemProps = AccessorProps<
          * its options does for itself.
          */
         isSelfScrolling: boolean;
+        /**
+         * Where focus sits while the list is used, which decides how far revealing this option may scroll: only
+         * within the popup the list is drawn in when focus stays in a field, and through every scroller, the page
+         * included, when the option itself holds focus.
+         */
+        focusModel: ListboxFocusModel;
         /** Runs when this option takes focus, which is how a list whose options hold focus learns where the reader is. */
         onFocus?: () => void;
         /** Runs when this option is picked. */
@@ -139,7 +145,7 @@ export type ListboxPresetProps<T> = Omit<
 
 export type ListboxProps<T> = ListboxPresetProps<T> & {
     /** Which option is picked. It is the only thing that picks one. */
-    valueSignal: SignalSource<T | undefined>;
+    value: SignalSource<T | undefined>;
     /** Runs when a different option is picked. */
     onSelectionChange?: (value: T) => void;
 };

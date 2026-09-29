@@ -18,7 +18,7 @@ export const PressedExample = (props: Props) => {
             gap={props.gap}
             ariaLabel={"Text style"}
             overflowAriaLabel={"More text styles"}
-            pressedValuesSignal={props.pressedValuesSignal}
+            pressedValues={props.pressedValues}
             renderAction={(getAction, getFlags) => (
                 <PageButtonContent flags={getFlags}>
                     <span class={styles.pressedMark} classList={{ [styles.isPressed]: getFlags().isPressed }}>

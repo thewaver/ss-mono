@@ -1,4 +1,4 @@
-import { Fragment, type ReactNode, useCallback, useEffect, useId, useMemo, useRef, useState } from "react";
+import { type ReactNode, useCallback, useEffect, useId, useMemo, useRef, useState } from "react";
 
 import {
     LISTBOX_DEFAULTS,
@@ -30,8 +30,8 @@ const ListboxOptionItem = (props: ListboxOptionItemProps) => {
     useEffect(() => {
         if (!isHighlighted || !props.isSelfScrolling) return;
 
-        elementRef.current?.scrollIntoView({ block: "nearest" });
-    }, [isHighlighted, props.isSelfScrolling]);
+        if (elementRef.current) ListboxUtils.revealOption(elementRef.current, props.focusModel);
+    }, [isHighlighted, props.isSelfScrolling, props.focusModel]);
 
     const setRef = useCallback(
         (element: HTMLDivElement | null) => {
@@ -47,6 +47,7 @@ const ListboxOptionItem = (props: ListboxOptionItemProps) => {
             ref={setRef}
             className={ListboxStyles.listboxOption}
             role="option"
+            tabIndex={-1}
             aria-disabled={isDisabled || undefined}
             aria-selected={props.flags.isSelected}
             onFocus={(e) => {
@@ -148,6 +149,7 @@ export const ListboxOptions = <T,>(props: ListboxOptionsProps<T>) => {
                     ref={setElementRef}
                     id={cursor.getOptionId(flatIndex)}
                     isSelfScrolling={!isVirtualized}
+                    focusModel={cursor.focusModel}
                     flags={flags}
                     renderContent={(optionFlags) => props.renderOption(option, optionFlags)}
                     onFocus={isRoving ? () => cursor.highlight(option.value) : undefined}
@@ -193,13 +195,13 @@ export const ListboxOptions = <T,>(props: ListboxOptionsProps<T>) => {
 
     const renderWindowedOptions = () => (
         <div ref={sizerRef} className={ListboxStyles.listboxSizer} style={{ height: `${rowWindow.totalSize}px` }}>
-            {ListboxUtils.getWindowedRuns(rowWindow.rows, rows).map((run) =>
+            {ListboxUtils.getWindowedRuns(rowWindow.rows, rows).flatMap((run) =>
                 run.group ? (
                     <div key={`group-${run.groupIndex}`} role="group" aria-label={run.group.label}>
                         {run.rows.map(renderWindowedRow)}
                     </div>
                 ) : (
-                    <Fragment key={`rows-${run.rows[0].index}`}>{run.rows.map(renderWindowedRow)}</Fragment>
+                    run.rows.map(renderWindowedRow)
                 ),
             )}
         </div>
@@ -282,7 +284,7 @@ export const ListboxComposite = <T,>(props: ListboxCompositeProps<T>) => {
 };
 
 export const Listbox = <T,>(props: ListboxProps<T>) => {
-    const [value, setValue] = props.valueState;
+    const [value, setValue] = props.value;
 
     const selectedOptions = useMemo(() => {
         const selectedOption = SelectUtils.getFlatOptions(props.options).find((option) => option.value === value);

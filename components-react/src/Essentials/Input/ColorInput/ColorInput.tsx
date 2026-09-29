@@ -75,9 +75,9 @@ export const ColorInput = (props: ColorInputProps) => {
     const popupId = useId();
 
     const [fieldElement, setFieldElement] = useState<HTMLElement>();
-    const [isOpen, setIsOpen] = SignalMirrorReactUtils.useOptionalState(props.visibilityState, false);
+    const [isOpen, setIsOpen] = SignalMirrorReactUtils.useOptionalState(props.visibility, false);
 
-    const [value, setValue] = props.valueState;
+    const [value, setValue] = props.value;
 
     const [startingState] = useState(() => ColorInputUtils.computeStartingState(value));
     const [hsv, setHsv] = useState<Color.HSVA>(startingState.hsv);
@@ -139,7 +139,7 @@ export const ColorInput = (props: ColorInputProps) => {
     const renderSurface = () => (
         <>
             <ColorArea
-                hsvState={hsvState}
+                hsv={hsvState}
                 sizing={"fill"}
                 isDisabled={isDisabled}
                 ariaLabel={props.areaLabel}
@@ -148,7 +148,7 @@ export const ColorInput = (props: ColorInputProps) => {
             />
 
             <Range
-                valueState={[hsv.h, (hue) => setHsv((previous) => ({ ...previous, h: hue }))]}
+                value={[hsv.h, (hue) => setHsv((previous) => ({ ...previous, h: hue }))]}
                 sizing={"fill"}
                 isDisabled={isDisabled}
                 max={ColorInputUtils.HUE_MAX}

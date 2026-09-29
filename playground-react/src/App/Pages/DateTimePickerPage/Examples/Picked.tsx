@@ -43,7 +43,7 @@ type Props = DateTimeExampleProps & {
 export const PickedExample = (props: Props) => {
     return (
         <DateTimePicker
-            valueState={props.valueState}
+            value={props.value}
             isTwelveHour={props.isTwelveHour}
             hasSeconds={props.hasSeconds}
             dateLabel={"Date"}
@@ -68,7 +68,7 @@ export const PickedExample = (props: Props) => {
             renderWeekday={(name) => <PageCalendarWeekday>{name}</PageCalendarWeekday>}
             renderPopup={(renderCalendar, monthState) => (
                 <PageCalendarFrame>
-                    <PageCalendarCaption monthState={monthState} itemKey={props.itemKey} locale={LOCALE} />
+                    <PageCalendarCaption month={monthState} itemKey={props.itemKey} locale={LOCALE} />
 
                     {renderCalendar()}
                 </PageCalendarFrame>

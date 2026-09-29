@@ -17,7 +17,7 @@ const HALF_PERCENT = 50;
 type Props = SunburstExampleProps;
 
 export const LibraryExample = (props: Props) => {
-    const [getBranch, setBranch] = props.branchSignal;
+    const [getBranch, setBranch] = props.branch;
 
     const getWeights = createMemo(() => TreemapUtils.computeWeights(LIBRARY));
 
@@ -41,7 +41,7 @@ export const LibraryExample = (props: Props) => {
         <div class={styles.frame}>
             <Sunburst<string>
                 root={() => LIBRARY}
-                branchSignal={props.branchSignal}
+                branch={props.branch}
                 ringCount={props.ringCount}
                 zoomDurationMs={props.zoomDurationMs}
                 ariaLabel={"The library's source, by lines of code"}

@@ -59,7 +59,7 @@ export const SpotlightGuidePage = () => {
             readout: () => `step: ${getStep() + 1} of ${TOUR_STEPS.length} — ${getFinished()}`,
             component: () => (
                 <GuideExample
-                    visibilitySignal={visibilitySignal}
+                    visibility={visibilitySignal}
                     step={getStep}
                     onStepChange={setStep}
                     onStart={() => {
@@ -82,8 +82,8 @@ export const SpotlightGuidePage = () => {
                 `step: ${getTourStep() + 1} of ${RICH_TOUR_STEPS.length} — ${getTourStatus()} — basket: ${getBasketCount()}. The guide holds the whole page still, so on step 2 it closes and a prompt lights the button instead, and pressing it reopens the guide; the step is kept in sessionStorage, so reloading offers to resume`,
             component: () => (
                 <TourExample
-                    guideSignal={tourGuideSignal}
-                    promptSignal={tourPromptSignal}
+                    guide={tourGuideSignal}
+                    prompt={tourPromptSignal}
                     step={getTourStep}
                     resumeStep={getResumeStep}
                     basketCount={getBasketCount}

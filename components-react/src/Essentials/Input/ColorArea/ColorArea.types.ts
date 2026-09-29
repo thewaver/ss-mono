@@ -45,5 +45,5 @@ export type ColorAreaProps = Omit<InteractionWrapperProps<ColorAreaRenderProps>,
     Pick<InteractionControlProps<ColorAreaRenderProps>, "id" | "renderContent"> &
     ColorAreaState & {
         /** The color, and how to change it. It is the only thing that changes it. */
-        hsvState: readonly [Color.HSVA, (hsv: Color.HSVA) => void];
+        hsv: readonly [Color.HSVA, (hsv: Color.HSVA) => void];
     };

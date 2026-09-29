@@ -110,7 +110,7 @@ export const PageSourceView = (props: SourceViewProps) => {
                 <PageTabPanel id={getPanelId(selectedGroup.name)} tabId={getTabId(selectedGroup.name)}>
                     <Accordion
                         items={items}
-                        expandedState={expandedState}
+                        expanded={expandedState}
                         gap={SECTION_GAP}
                         renderHeader={(item, flags) => (
                             <PageAccordionHeader flags={flags}>{item.value}</PageAccordionHeader>

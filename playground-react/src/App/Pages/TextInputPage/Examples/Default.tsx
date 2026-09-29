@@ -15,7 +15,7 @@ type Props = TextInputExampleProps;
 
 export const DefaultExample = (props: Props) => (
     <TextInput
-        valueState={props.valueState}
+        value={props.value}
         padding={FIELD_PADDING}
         gap={FIELD_GAP}
         ariaLabel={"Your name"}

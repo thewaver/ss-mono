@@ -33,7 +33,7 @@ import {
 
 type Props = {
     groupId: string;
-    itemsState: readonly [SortableGridItem<Gear>[], (items: SortableGridItem<Gear>[]) => void];
+    items: readonly [SortableGridItem<Gear>[], (items: SortableGridItem<Gear>[]) => void];
     ariaLabel: string;
     emptyText: string;
     columns?: number;
@@ -167,7 +167,7 @@ export const InventoryExample = (props: Props) => {
                 isDisabled={props.isDisabled ?? false}
                 isLocked={props.isLocked ?? false}
                 isTurnable={isTurnable}
-                itemsState={props.itemsState}
+                items={props.items}
                 computeItemKey={computeGearKey}
                 computeItemLabel={computeGearLabel}
                 computeCanAccept={props.computeCanAccept}

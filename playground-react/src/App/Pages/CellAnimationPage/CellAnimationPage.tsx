@@ -99,7 +99,7 @@ const GROUPPED_WEIGHTS = groupOptions(CellAnimationWeights.WEIGHT_TYPES);
 const GROUPPED_ANIMATIONS = groupOptions(CellAnimationKeyframes.ANIMATION_TYPES);
 
 const ImageExampleWrapper = (
-    props: CellAnimationExampleProps & { progressState: readonly [number, (progress: number) => void] },
+    props: CellAnimationExampleProps & { progress: readonly [number, (progress: number) => void] },
 ) => {
     const [src, setSrc] = useState(knight_profile);
 
@@ -113,8 +113,8 @@ const ImageExampleWrapper = (
                 <PagePlaybackScrubber
                     id={"cellAnimation"}
                     ariaLabel={"Position in the pass"}
-                    playbackState={props.playbackState}
-                    progressState={props.progressState}
+                    playback={props.playback}
+                    progress={props.progress}
                 />
             </div>
 
@@ -261,15 +261,15 @@ const StressTestWrapper = (props: CellAnimationSourcedExampleProps) => {
             <StressTest
                 configs={STRESS_ITEMS}
                 onHideModal={() => {
-                    props.playbackState[1](true);
+                    props.playback[1](true);
                 }}
                 onShowModal={() => {
-                    props.playbackState[1](false);
+                    props.playback[1](false);
                 }}
                 renderLabel={(configIndex) => `Render ${STRESS_ITEMS[configIndex].count} items`}
                 renderItem={(configIndex) => (
                     <PageMeasureBox width={STRESS_ITEMS[configIndex].size} height={STRESS_ITEMS[configIndex].size}>
-                        <DefaultExample {...props} playbackState={modalPlayback} cellCount={STRESS_CELL_COUNT} />
+                        <DefaultExample {...props} playback={modalPlayback} cellCount={STRESS_CELL_COUNT} />
                     </PageMeasureBox>
                 )}
             />
@@ -307,7 +307,7 @@ export const CellAnimationPage = () => {
     }));
 
     const commonProps: CellAnimationExampleProps = {
-        playbackState: playback,
+        playback,
         cellCount,
         originType,
         weightType,
@@ -329,7 +329,7 @@ export const CellAnimationPage = () => {
             readout: () =>
                 `${Math.round(imageProgress[0] * PERCENT)}% through the pass, ${imagePlayback[0] ? "running" : "stopped"} — the progress signal is written by the component while it plays, and writing it moves the pass there`,
             component: () => (
-                <ImageExampleWrapper {...commonProps} playbackState={imagePlayback} progressState={imageProgress} />
+                <ImageExampleWrapper {...commonProps} playback={imagePlayback} progress={imageProgress} />
             ),
             path: DEFAULT_EXAMPLE_PATH,
         },

@@ -21,7 +21,7 @@ export const CrowdedExample = (props: Props) => {
     return (
         <div style={{ width: `${NARROW_WIDTH}px` }}>
             <TagInput
-                valueState={props.valueState}
+                value={props.value}
                 ariaLabel={"Crowded topics"}
                 gap={FIELD_GAP}
                 padding={FIELD_PADDING}

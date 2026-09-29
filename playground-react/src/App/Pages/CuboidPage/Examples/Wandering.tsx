@@ -29,8 +29,8 @@ export const WanderingExample = (props: Props) => {
         if (turnIntervalMs === undefined || turnIntervalMs <= 0) return;
 
         const turnToNeighbor = () => {
-            const [yaw, setYaw] = latestProps.current.yawState;
-            const [pitch, setPitch] = latestProps.current.pitchState;
+            const [yaw, setYaw] = latestProps.current.yaw;
+            const [pitch, setPitch] = latestProps.current.pitch;
 
             const facing = CuboidUtils.getFacingFromTurns(yaw, pitch);
             const neighbors = TURNS.map(
@@ -58,8 +58,8 @@ export const WanderingExample = (props: Props) => {
     return (
         <PageCuboidStack>
             <Cuboid
-                yawState={props.yawState}
-                pitchState={props.pitchState}
+                yaw={props.yaw}
+                pitch={props.pitch}
                 size={props.size}
                 transitionDurationMs={props.transitionDurationMs}
                 ariaLabel={"Six faces, turning by themselves"}

@@ -48,8 +48,8 @@ export const ZoomExample = (props: Props) => {
                             socketSize={props.socketSize}
                             isLocked={props.isLocked}
                             isDisabled={props.isDisabled}
-                            nodesSignal={props.nodesSignal}
-                            linksSignal={props.linksSignal}
+                            nodes={props.nodes}
+                            links={props.links}
                             computeNodeKey={(device) => device.id}
                             computeNodeLabel={(device) => device.name}
                             renderNode={(getNode, getFlags) => (

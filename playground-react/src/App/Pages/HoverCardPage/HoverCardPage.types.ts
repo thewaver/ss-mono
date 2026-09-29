@@ -6,14 +6,14 @@ export type HoverCardExampleProps = {
     focusShowDelayMs: number;
     hoverShowDelayMs: number;
     skipDelayWindowMs: number;
-    visibilityState: readonly [boolean, (isVisible: boolean) => void];
-    followingState: readonly [boolean, (isFollowing: boolean) => void];
+    visibility: readonly [boolean, (isVisible: boolean) => void];
+    following: readonly [boolean, (isFollowing: boolean) => void];
 };
 
 export type NavigationMenuExampleProps = {
     hoverShowDelayMs: number;
     skipDelayWindowMs: number;
-    openKeyState: readonly [string | undefined, (openKey: string | undefined) => void];
+    openKey: readonly [string | undefined, (openKey: string | undefined) => void];
 };
 
 export type NavMenuLink = { key: string; label: string };

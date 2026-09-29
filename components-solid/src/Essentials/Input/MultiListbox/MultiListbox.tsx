@@ -7,7 +7,7 @@ import { ListboxComposite } from "../Listbox/Listbox";
 import type { MultiListboxProps } from "./MultiListboxSolid.types";
 
 export const MultiListbox = <T,>(props: MultiListboxProps<T>) => {
-    const valuesSignal = accessSignal(() => props.valuesSignal);
+    const valuesSignal = accessSignal(() => props.values);
 
     const getSelectedOptions = createMemo(() => {
         const selectedValues = valuesSignal[0]();

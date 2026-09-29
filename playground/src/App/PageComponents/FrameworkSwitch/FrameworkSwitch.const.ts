@@ -1,8 +1,9 @@
 import type { PlaygroundFramework } from "./PlaygroundFramework.types";
 
-export const OTHER_PLAYGROUND_URL = import.meta.env.VITE_OTHER_PLAYGROUND_URL;
+export const PLAYGROUND_URLS = import.meta.env.VITE_PLAYGROUND_URLS as Readonly<Record<PlaygroundFramework, string>>;
 
-export const toOtherFrameworkHref = (routePath: string) => `${OTHER_PLAYGROUND_URL}${routePath.replace(/^\//, "")}`;
+export const toFrameworkHref = (framework: PlaygroundFramework, routePath: string) =>
+    `${PLAYGROUND_URLS[framework]}${routePath.replace(/^\//, "")}`;
 
 export const toRouterBase = (baseUrl: string) => baseUrl.replace(/\/$/, "");
 
@@ -15,9 +16,11 @@ export const toRoutePath = (pathname: string) => {
     return base && pathname.startsWith(base) ? pathname.slice(base.length) || "/" : pathname;
 };
 
-export const PLAYGROUND_FRAMEWORKS: PlaygroundFramework[] = ["solid", "react"];
+export const PLAYGROUND_FRAMEWORKS: PlaygroundFramework[] = ["solid", "react", "vue", "svelte"];
 
 export const PLAYGROUND_FRAMEWORK_LABELS: Record<PlaygroundFramework, string> = {
     solid: "Solid",
     react: "React",
+    vue: "Vue",
+    svelte: "Svelte",
 };

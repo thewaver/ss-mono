@@ -32,7 +32,7 @@ export const SteppedExample = (props: Props) => {
     return (
         <DrumCarousel
             slides={props.slides}
-            indexState={props.indexState}
+            index={props.index}
             isDisabled={props.isDisabled}
             axis={props.axis}
             slideSize={SLIDE_SIZE}

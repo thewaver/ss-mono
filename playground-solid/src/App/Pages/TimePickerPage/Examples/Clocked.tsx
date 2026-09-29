@@ -41,7 +41,7 @@ type Props = TimeExampleProps & {
 export const ClockedExample = (props: Props) => {
     return (
         <TimePicker
-            valueSignal={props.valueSignal}
+            value={props.value}
             isTwelveHour={props.isTwelveHour}
             hasSeconds={props.hasSeconds}
             clockSteps={props.clockSteps}

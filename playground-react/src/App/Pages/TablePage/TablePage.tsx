@@ -52,7 +52,7 @@ export const TablePage = () => {
             name: "Default",
             readout: () =>
                 `sort: ${spellSort(defaultSortState[0])} | selected: ${spellSelection(defaultSelectionState[0])} — one tab stop for the whole grid, then arrows walk cell to cell and Space picks a row`,
-            component: () => <PartsExample sortState={defaultSortState} selectionState={defaultSelectionState} />,
+            component: () => <PartsExample sort={defaultSortState} selection={defaultSelectionState} />,
             path: `${EXAMPLES_ROOT}/Parts.tsx`,
         },
         {
@@ -61,7 +61,7 @@ export const TablePage = () => {
             readout: () =>
                 `selected: ${spellSelection(singleSelectionState[0])} — the same grid with room for one row in the selection, so picking a second drops the first`,
             component: () => (
-                <SingleSelectionExample sortState={singleSortState} selectionState={singleSelectionState} />
+                <SingleSelectionExample sort={singleSortState} selection={singleSelectionState} />
             ),
             path: `${EXAMPLES_ROOT}/SingleSelection.tsx`,
         },
@@ -73,9 +73,9 @@ export const TablePage = () => {
                 `widths: ${JSON.stringify(resizableWidthsState[0])} — drag a column's right edge, or focus a header cell and hold Ctrl with the left and right arrows`,
             component: () => (
                 <ResizableExample
-                    sortState={resizableSortState}
-                    selectionState={resizableSelectionState}
-                    widthsState={resizableWidthsState}
+                    sort={resizableSortState}
+                    selection={resizableSelectionState}
+                    widths={resizableWidthsState}
                 />
             ),
             path: `${EXAMPLES_ROOT}/Resizable.tsx`,
@@ -88,9 +88,9 @@ export const TablePage = () => {
                 `order: ${reorderableOrderState[0].join(", ") || "as declared"} — drag a header sideways, or focus a header cell and hold Shift with the left and right arrows`,
             component: () => (
                 <ReorderableExample
-                    sortState={reorderableSortState}
-                    selectionState={reorderableSelectionState}
-                    orderState={reorderableOrderState}
+                    sort={reorderableSortState}
+                    selection={reorderableSelectionState}
+                    order={reorderableOrderState}
                 />
             ),
             path: `${EXAMPLES_ROOT}/Reorderable.tsx`,
@@ -101,7 +101,7 @@ export const TablePage = () => {
             readout: () =>
                 `sort: ${spellSort(consumerSortState[0])} — no column carries a comparator, so the table reports the sort and the page is what reorders the rows`,
             component: () => (
-                <ConsumerSortedExample sortState={consumerSortState} selectionState={consumerSelectionState} />
+                <ConsumerSortedExample sort={consumerSortState} selection={consumerSelectionState} />
             ),
             path: `${EXAMPLES_ROOT}/ConsumerSorted.tsx`,
         },
@@ -114,8 +114,8 @@ export const TablePage = () => {
             component: () => (
                 <VirtualizedExample
                     rows={stressParts}
-                    sortState={stressSortState}
-                    selectionState={stressSelectionState}
+                    sort={stressSortState}
+                    selection={stressSelectionState}
                 />
             ),
             path: `${EXAMPLES_ROOT}/Virtualized.tsx`,
@@ -125,7 +125,7 @@ export const TablePage = () => {
             name: "Disabled",
             readout: () =>
                 `sort: ${spellSort(disabledSortState[0])} — nothing sorts, nothing selects, and every cell still reads out to a screen reader`,
-            component: () => <DisabledExample sortState={disabledSortState} selectionState={disabledSelectionState} />,
+            component: () => <DisabledExample sort={disabledSortState} selection={disabledSelectionState} />,
             path: `${EXAMPLES_ROOT}/Disabled.tsx`,
         },
     ];

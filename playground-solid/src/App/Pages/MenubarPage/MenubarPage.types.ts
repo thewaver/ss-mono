@@ -6,6 +6,6 @@ import type { MenubarEntry } from "@thewaver/ss-playground/App/Pages/MenubarPage
 export type { MenubarEntry } from "@thewaver/ss-playground/App/Pages/MenubarPage/MenubarEntry.types";
 
 export type MenubarExampleProps = AccessorProps<{
-    checkedSignal: Signal<MenubarEntry[]>;
+    checked: Signal<MenubarEntry[]>;
     onActivate: (entry: MenubarEntry) => void;
 }>;

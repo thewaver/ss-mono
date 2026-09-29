@@ -65,13 +65,13 @@ export type TreeProps<T> = {
      * then is still selected, still announced as selected and still the tree's single tab stop, even though nobody
      * outside is told; `onSelectionChange` still runs.
      */
-    valueState?: readonly [T | undefined, (value: T | undefined) => void];
+    value?: readonly [T | undefined, (value: T | undefined) => void];
     /**
      * Which nodes are open, by value. Both sides write it: the tree when a branch is expanded or collapsed, the
      * consumer to open or close branches from outside. Leave it out and the tree keeps the state itself, starting with
      * every branch closed.
      */
-    expandedState?: readonly [T[], (value: T[]) => void];
+    expanded?: readonly [T[], (value: T[]) => void];
     /** The text a node is found by when the reader types, where that is not its visible text. */
     computeCustomText?: (node: TreeNode<T>) => string;
     /** Draws one node. It is handed the interaction state and where the node sits in the tree. */

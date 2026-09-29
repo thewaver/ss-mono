@@ -34,8 +34,8 @@ export const RotatingExample = (props: Props) => {
     return (
         <DrumCarousel
             slides={props.slides}
-            indexState={props.indexState}
-            playbackState={props.playbackState}
+            index={props.index}
+            playback={props.playback}
             isDisabled={props.isDisabled}
             axis={props.axis}
             autoplayDelayMs={props.autoplayDelayMs}

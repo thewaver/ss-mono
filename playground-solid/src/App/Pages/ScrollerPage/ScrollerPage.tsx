@@ -47,7 +47,7 @@ export const ScrollerPage = () => {
             name: "One button at each end",
             readout: () =>
                 `${getItemCount()} items, ${Math.round(progressSignal[0]() * PERCENT)}% along — the buttons stop at the ends rather than wrapping round, and leave altogether once everything fits`,
-            component: () => <ChipsExample labels={getLabels} progressSignal={progressSignal} />,
+            component: () => <ChipsExample labels={getLabels} progress={progressSignal} />,
             path: `${EXAMPLES_ROOT}/Chips.tsx`,
         },
         {

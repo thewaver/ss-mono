@@ -7,9 +7,9 @@ export type MenuExampleProps = {
 };
 
 export type MenuDrivenExampleProps = MenuExampleProps & {
-    visibilityState: readonly [boolean, (isOpen: boolean) => void];
+    visibility: readonly [boolean, (isOpen: boolean) => void];
 };
 
 export type MenuCascaderExampleProps = {
-    pathState: readonly [string[], (path: string[]) => void];
+    path: readonly [string[], (path: string[]) => void];
 };

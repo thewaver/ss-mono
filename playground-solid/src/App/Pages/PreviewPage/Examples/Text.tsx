@@ -12,7 +12,7 @@ export const TextExample = (props: Props) => {
     return (
         <div class={styles.panel}>
             <Preview
-                expandedSignal={props.expandedSignal}
+                expanded={props.expanded}
                 collapsedHeight={props.collapsedHeight}
                 isScrolledIntoViewOnCollapse={props.isScrolledIntoViewOnCollapse}
                 renderContent={() => (

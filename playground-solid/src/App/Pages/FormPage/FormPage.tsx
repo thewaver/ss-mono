@@ -21,9 +21,9 @@ export const FormPage = () => {
 
     const getExamples = createMemo(() => {
         const commonProps: FormExampleProps = {
-            emailSignal,
-            passwordSignal,
-            termsSignal,
+            email: emailSignal,
+            password: passwordSignal,
+            terms: termsSignal,
             onSubmit: () => {
                 setOutcome(`submitted as ${emailSignal[0]()}`);
             },
@@ -47,8 +47,8 @@ export const FormPage = () => {
                     `outcome: ${getFocusOutcome()} — the handler runs either way, and afterwards focus lands on the first field reporting an error`,
                 component: () => (
                     <FocusOnErrorExample
-                        planSignal={planSignal}
-                        topicsSignal={topicsSignal}
+                        plan={planSignal}
+                        topics={topicsSignal}
                         onSubmit={() => {
                             setFocusOutcome(
                                 `submitted as ${planSignal[0]() ?? "no plan"}, [${topicsSignal[0]().join(", ")}]`,

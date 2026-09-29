@@ -45,7 +45,7 @@ export type PreviewProps = Omit<
      * the consumer to expand or collapse it from outside. Leave it out and the preview keeps the state itself,
      * starting collapsed.
      */
-    expandedState?: readonly [boolean, (isExpanded: boolean) => void];
+    expanded?: readonly [boolean, (isExpanded: boolean) => void];
     /** Draws the content being previewed. */
     renderContent: () => ReactNode;
     /** Draws the trigger. */

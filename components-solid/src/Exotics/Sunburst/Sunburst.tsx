@@ -56,7 +56,7 @@ export const Sunburst = <T,>(props: SunburstProps<T>) => {
     const getAllNodes = createMemo(() => SunburstUtils.listNodes(getRootNode(), getWeights()));
 
     const [getHeldBranch, setHeldBranch] = SignalMirrorSolidUtils.createOptional(
-        () => props.branchSignal,
+        () => props.branch,
         untrack(getRootNode),
     );
 

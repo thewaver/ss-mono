@@ -9,16 +9,16 @@ import { PageSelectOptionContent } from "../../../StyledComponents/SelectOptionC
 import { PLACEHOLDER, QUERY_PADDING } from "../../SelectPage/SelectPage.const";
 
 type Props = {
-    valuesState: readonly [string[], (values: string[]) => void];
-    queryState: readonly [string, (query: string) => void];
+    values: readonly [string[], (values: string[]) => void];
+    query: readonly [string, (query: string) => void];
     options: SelectItem<string>[];
 };
 
 export const MultiSelectGroupedExample = (props: Props) => {
     return (
         <MultiSelect
-            valuesState={props.valuesState}
-            queryState={props.queryState}
+            values={props.values}
+            query={props.query}
             options={props.options}
             ariaLabel={"Countries"}
             padding={QUERY_PADDING}

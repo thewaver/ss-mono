@@ -21,8 +21,8 @@ import { InventoryExample } from "./Inventory";
 
 type Props = {
     groupId: string;
-    lootSignal: Signal<SortableItem<Gear>[]>;
-    packSignal: Signal<SortableGridItem<Gear>[]>;
+    loot: Signal<SortableItem<Gear>[]>;
+    pack: Signal<SortableGridItem<Gear>[]>;
 };
 
 const RESTING_FLAGS: InteractionFlags<SortableItemFlags> = { isCarried: false, isLandingBefore: false };
@@ -45,7 +45,7 @@ export const LootExample = (props: Props) => (
                     announcements={SORTABLE_ANNOUNCEMENTS}
                     gap={GRID_GAP}
                     minHeight={72}
-                    itemsSignal={props.lootSignal}
+                    items={props.loot}
                     computeItemKey={computeGearKey}
                     computeItemLabel={computeGearLabel}
                     renderItem={renderLoot}
@@ -61,7 +61,7 @@ export const LootExample = (props: Props) => (
 
             <InventoryExample
                 groupId={props.groupId}
-                itemsSignal={props.packSignal}
+                items={props.pack}
                 ariaLabel={"Pack"}
                 emptyText={"Empty pack"}
                 isTurnable={true}

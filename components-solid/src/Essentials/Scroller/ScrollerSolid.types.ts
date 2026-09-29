@@ -14,7 +14,7 @@ export type ScrollerProps = ParentProps<
         buttonPlacement?: ScrollerButtonPlacement;
     }> & {
         /** How far through its run the strip is scrolled. It is the only thing that scrolls it. */
-        progressSignal?: SignalSource<number>;
+        progress?: SignalSource<number>;
         /** Draws one scroll control, and is handed a stepper for holding it down to keep scrolling. */
         renderButton: (getStep: Accessor<ScrollerStep>, stepper: ScrollerStepper) => JSX.Element;
     }

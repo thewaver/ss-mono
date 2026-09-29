@@ -10,7 +10,7 @@ const REACHABLE_VALUE = "medium";
 type Props = RadioExampleProps;
 
 export const ReachableExample = (props: Props) => (
-    <RadioGroup valueState={props.valueState} ariaLabel={"Partly disabled size"} gap={RADIO_GROUP_GAP}>
+    <RadioGroup value={props.value} ariaLabel={"Partly disabled size"} gap={RADIO_GROUP_GAP}>
         {SIZE_OPTIONS.map((option) => (
             <Radio
                 key={option.value}

@@ -87,9 +87,9 @@ export type SelectCompositeProps<T> = Omit<InteractionWrapperProps<SelectFlags>,
     /** Styles the field's text against its current state. */
     computeTextStyle?: (flags: InteractionFlags<SelectFlags>) => TextFieldTextStyle;
     /** Whether the list is open, and how to change it. It is the only thing that opens or closes it. */
-    visibilityState?: readonly [boolean, (isOpen: boolean) => void];
+    visibility?: readonly [boolean, (isOpen: boolean) => void];
     /** What the reader has typed to narrow the list by, and how to change it. It is the only thing that changes it. */
-    queryState?: readonly [string, (query: string) => void];
+    query?: readonly [string, (query: string) => void];
     /**
      * Guesses how tall an option will be before it is drawn, which is what lets a long list render only what is on
      * screen.
@@ -146,7 +146,7 @@ export type SelectPresetProps<T> = Omit<
 
 export type SelectProps<T> = SelectPresetProps<T> & {
     /** Which option is picked, and how to change it. It is the only thing that picks one. */
-    valueState: readonly [T | undefined, (value: T | undefined) => void];
+    value: readonly [T | undefined, (value: T | undefined) => void];
     /** Draws the field, and is handed the one option that is picked. */
     renderContent: (selectedOption: SelectOption<T> | undefined, flags: InteractionFlags<SelectFlags>) => ReactNode;
     /** Runs when a different option is picked, and with `undefined` when the clear control empties the field. */

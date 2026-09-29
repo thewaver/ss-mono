@@ -7,7 +7,7 @@ import type { CheckboxProps } from "./CheckboxSolid.types";
 export const Checkbox = <T,>(props: CheckboxProps<T>) => {
     const group = props.value === undefined ? undefined : useCheckboxGroupContext();
 
-    const checkedSignal = SignalMirrorSolidUtils.createOptional(() => props.checkedSignal, false);
+    const checkedSignal = SignalMirrorSolidUtils.createOptional(() => props.checked, false);
 
     const getValue = () => access(props.value) as unknown;
 

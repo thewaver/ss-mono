@@ -43,9 +43,9 @@ export type WheelSlots<T> = {
      * a consumer reading it mid-spin learns the outcome early. Read `onSpinEnd` instead to find out only once
      * it arrives, and `onSelectedWedgeChange` for the wedge at the marker right now.
      */
-    targetIndexSignal?: SignalSource<number>;
+    targetIndex?: SignalSource<number>;
     /** Whether the wheel is turning on its own. It is the only thing that starts or stops it. */
-    autoSpinSignal?: SignalSource<boolean>;
+    autoSpin?: SignalSource<boolean>;
     /** Chooses which wedge a spin should land on. It may answer later, so the result can come from a server. */
     computeSpinTarget: () => number | Promise<number>;
     /** How a spin to a given wedge should run — how many turns, and on what curve. */

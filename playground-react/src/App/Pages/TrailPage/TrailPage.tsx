@@ -35,7 +35,7 @@ export const TrailPage = () => {
 
     const getPercent = (progress: number) => `${Math.round(progress * PERCENT)}%`;
 
-    const commonProps: Omit<TrailExampleProps, "progressState" | "playbackState"> = {
+    const commonProps: Omit<TrailExampleProps, "progress" | "playback"> = {
         durationMs,
         isLooping,
         isTurning,
@@ -50,8 +50,8 @@ export const TrailPage = () => {
             component: () => (
                 <CircuitExample
                     {...commonProps}
-                    progressState={circuitProgressState}
-                    playbackState={circuitPlayingState}
+                    progress={circuitProgressState}
+                    playback={circuitPlayingState}
                 />
             ),
             path: `${EXAMPLES_ROOT}/Circuit.tsx`,
@@ -64,8 +64,8 @@ export const TrailPage = () => {
             component: () => (
                 <TimelineExample
                     {...commonProps}
-                    progressState={timelineProgressState}
-                    playbackState={timelinePlayingState}
+                    progress={timelineProgressState}
+                    playback={timelinePlayingState}
                 />
             ),
             path: `${EXAMPLES_ROOT}/Timeline.tsx`,
@@ -78,8 +78,8 @@ export const TrailPage = () => {
             component: () => (
                 <ConvoyExample
                     {...commonProps}
-                    progressState={convoyProgressState}
-                    playbackState={convoyPlayingState}
+                    progress={convoyProgressState}
+                    playback={convoyPlayingState}
                 />
             ),
             path: `${EXAMPLES_ROOT}/Convoy.tsx`,

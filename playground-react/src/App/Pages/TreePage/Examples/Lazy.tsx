@@ -23,7 +23,7 @@ export const LazyExample = (props: Props) => {
 
     const loadedRef = useRef(new Set<string>());
 
-    const expanded = props.expandedState[0];
+    const expanded = props.expanded[0];
 
     useEffect(() => {
         const timers = expanded
@@ -41,8 +41,8 @@ export const LazyExample = (props: Props) => {
     return (
         <Tree
             nodes={nodes}
-            valueState={props.valueState}
-            expandedState={props.expandedState}
+            value={props.value}
+            expanded={props.expanded}
             ariaLabel={"Remote repository"}
             renderNode={(node, renderProps) => (
                 <PageTreeNodeContent renderProps={renderProps}>{node.value}</PageTreeNodeContent>

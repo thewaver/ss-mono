@@ -5,11 +5,11 @@ import type { Asset } from "@thewaver/ss-playground/App/Pages/TreePage/TreeRecor
 export type { Asset } from "@thewaver/ss-playground/App/Pages/TreePage/TreeRecords.types";
 
 export type TreeExampleProps = {
-    valueState: readonly [string | undefined, (value: string | undefined) => void];
-    expandedState: readonly [string[], Dispatch<SetStateAction<string[]>>];
+    value: readonly [string | undefined, (value: string | undefined) => void];
+    expanded: readonly [string[], Dispatch<SetStateAction<string[]>>];
 };
 
 export type TreeRecordExampleProps = {
-    valueState: readonly [Asset | undefined, (value: Asset | undefined) => void];
-    expandedState: readonly [Asset[], (value: Asset[]) => void];
+    value: readonly [Asset | undefined, (value: Asset | undefined) => void];
+    expanded: readonly [Asset[], (value: Asset[]) => void];
 };

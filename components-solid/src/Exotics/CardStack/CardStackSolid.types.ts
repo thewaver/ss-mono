@@ -21,7 +21,7 @@ export type CardStackControls = {
     /**
      * Brings the last card that left back onto the top of the pile, returning from the side it left by.
      *
-     * A card that was moved past by setting `topIndexSignal` rather than sent has no side to come back from,
+     * A card that was moved past by setting `topIndex` rather than sent has no side to come back from,
      * so it reappears in place.
      *
      * @returns `false` when no card has left yet, the stack is disabled, or a card is already on its way out or
@@ -96,7 +96,7 @@ export type CardStackProps<T> = AccessorProps<{
      * Which card is on top, as an index into `cards`. It is the only thing that moves the pile on, and setting
      * it to the card count empties the stack.
      */
-    topIndexSignal?: SignalSource<number>;
+    topIndex?: SignalSource<number>;
     /** Draws one card, and is told where it sits and what is being done to it. */
     renderCard: (getState: Accessor<CardStackCardState<T>>) => JSX.Element;
     /** Runs when a card leaves, whichever route sent it. */

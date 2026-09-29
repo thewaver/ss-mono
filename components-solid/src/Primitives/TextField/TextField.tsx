@@ -230,7 +230,7 @@ export const TextField = (props: TextFieldProps) => {
         () => !getIsAutoSizing(),
         getMinRows,
         getMaxRows,
-        () => props.valueSignal[0](),
+        () => props.value[0](),
     );
 
     const getSpreadPadding = createMemo(() =>
@@ -258,7 +258,7 @@ export const TextField = (props: TextFieldProps) => {
         <InteractionWrapper
             {...props}
             extraFlags={() => ({
-                isEmpty: props.valueSignal[0]() === "",
+                isEmpty: props.value[0]() === "",
                 isReadOnly: access(props.isReadOnly) ?? false,
             })}
             minWidth={() => getLeadingInset() + getTrailingInset()}
@@ -289,7 +289,7 @@ export const TextField = (props: TextFieldProps) => {
                     maxRows={props.maxRows}
                     isConcealed={props.isConcealed}
                     flags={getFlags}
-                    value={() => props.valueSignal[0]()}
+                    value={() => props.value[0]()}
                     textInset={getTextInset}
                     spreadPadding={getSpreadPadding}
                     setLeadingRef={setLeadingRef}
@@ -301,7 +301,7 @@ export const TextField = (props: TextFieldProps) => {
                     renderTrailing={props.renderTrailing}
                     ariaAttributes={props.ariaAttributes}
                     onInput={(value) => {
-                        props.valueSignal[1](value);
+                        props.value[1](value);
 
                         void props.onInput?.(value);
                     }}

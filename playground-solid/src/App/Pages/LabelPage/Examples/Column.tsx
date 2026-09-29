@@ -13,7 +13,7 @@ export const ColumnExample = (props: Props) => (
         <PageLabelCaption>Stacked</PageLabelCaption>
 
         <Checkbox
-            checkedSignal={props.checkedSignal}
+            checked={props.checked}
             renderContent={(getFlags) => <PageCheckboxContent flags={getFlags} />}
         />
     </Label>

@@ -10,7 +10,7 @@ import type { TimePickerProps } from "../TimePicker/TimePickerSolid.types";
 
 export type DateTimePickerProps = Omit<
     DatePickerProps,
-    "valueSignal" | "ariaLabel" | "visibilitySignal" | "minValue" | "maxValue" | "precision" | "id" | "name"
+    "value" | "ariaLabel" | "visibility" | "minValue" | "maxValue" | "precision" | "id" | "name"
 > &
     AccessorProps<{
         /**
@@ -49,11 +49,11 @@ export type DateTimePickerProps = Omit<
         /** Whether one time can be picked, for rules a plain earliest and latest cannot express. */
         computeIsTimeDisabled?: (time: TimeValue) => boolean;
         /** The date and time together. A pair with a half missing is not a value at all. */
-        valueSignal: SignalSource<DateTimeValue | undefined>;
+        value: SignalSource<DateTimeValue | undefined>;
         /** Whether the calendar is open. It is the only thing that opens or closes it. */
-        dateVisibilitySignal?: SignalSource<boolean>;
+        dateVisibility?: SignalSource<boolean>;
         /** Whether the clock is open. It is the only thing that opens or closes it. */
-        timeVisibilitySignal?: SignalSource<boolean>;
+        timeVisibility?: SignalSource<boolean>;
         /** Draws whatever sits between the two halves. */
         renderSeparator?: () => JSX.Element;
         /** The clock trigger's own element id. */

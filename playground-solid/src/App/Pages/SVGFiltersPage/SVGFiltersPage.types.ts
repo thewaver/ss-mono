@@ -10,6 +10,6 @@ export type SVGFiltersExampleProps = AccessorProps<{
 }>;
 
 export type SVGFiltersStackExampleProps = SVGFiltersExampleProps & {
-    appliedSignal: Signal<SortableItem<SVGFiltersStep>[]>;
-    unusedSignal: Signal<SortableItem<SVGFiltersStep>[]>;
+    applied: Signal<SortableItem<SVGFiltersStep>[]>;
+    unused: Signal<SortableItem<SVGFiltersStep>[]>;
 };

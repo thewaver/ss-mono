@@ -1,3 +1,3 @@
 export type NumberInputExampleProps = {
-    valueState: readonly [number | undefined, (value: number | undefined) => void];
+    value: readonly [number | undefined, (value: number | undefined) => void];
 };

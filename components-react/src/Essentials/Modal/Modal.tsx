@@ -23,7 +23,7 @@ export const Modal = (props: ModalProps) => {
     const initialFocusRef = useLatest(props.initialFocusRef ?? null);
     const latest = useLatest(props);
 
-    const [isOpen, setIsOpen] = props.visibilityState;
+    const [isOpen, setIsOpen] = props.visibility;
 
     const transitionDurationMs = props.transitionDurationMs ?? MODAL_DEFAULTS.transitionDurationMs;
     const alignment = props.alignment ?? MODAL_DEFAULTS.alignment;

@@ -16,7 +16,7 @@ export const PanelExample = (props: Props) => (
         </div>
 
         <Collapsible
-            expandedState={props.expandedState}
+            expanded={props.expanded}
             sizing={"fit-content"}
             renderTrigger={(flags) => (
                 <PageAccordionHeader flags={flags}>{flags.isExpanded ? "Show less" : "Show more"}</PageAccordionHeader>

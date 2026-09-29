@@ -87,7 +87,7 @@ export const Timeline = <T,>(props: TimelineProps<T>) => {
         () => access(props.minViewExtent) ?? TimelineUtils.getExtent(getRange()) * MIN_VIEW_SHARE,
     );
 
-    const viewSignal = SignalMirrorSolidUtils.createOptional(() => props.viewSignal, untrack(getRange));
+    const viewSignal = SignalMirrorSolidUtils.createOptional(() => props.view, untrack(getRange));
 
     const getView = createMemo(() => TimelineUtils.clampView(viewSignal[0](), getRange(), getMinViewExtent()));
 

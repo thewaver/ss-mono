@@ -28,14 +28,14 @@ export const DateTimePickerPage = () => {
             key: "paired",
             name: "Two fields, one value",
             readout: () => `value: ${describe(emptyValue[0]())}`,
-            component: () => <PairedExample valueSignal={emptyValue} />,
+            component: () => <PairedExample value={emptyValue} />,
             path: `${EXAMPLES_ROOT}/Paired.tsx`,
         },
         {
             key: "picked",
             name: "One control, both popups",
             readout: () => `value: ${describe(pickedValue[0]())}`,
-            component: () => <PickedExample valueSignal={pickedValue} key={"picked"} />,
+            component: () => <PickedExample value={pickedValue} key={"picked"} />,
             path: `${EXAMPLES_ROOT}/Picked.tsx`,
         },
         {
@@ -43,7 +43,7 @@ export const DateTimePickerPage = () => {
             name: "Twelve hour, with seconds",
             readout: () => `value: ${describe(twelveHourValue[0]())}`,
             component: () => (
-                <PickedExample valueSignal={twelveHourValue} key={"twelveHour"} isTwelveHour={true} hasSeconds={true} />
+                <PickedExample value={twelveHourValue} key={"twelveHour"} isTwelveHour={true} hasSeconds={true} />
             ),
             path: `${EXAMPLES_ROOT}/Picked.tsx`,
         },
@@ -54,7 +54,7 @@ export const DateTimePickerPage = () => {
                 `value: ${describe(seededValue[0]())} — seconds of day: ${
                     seededValue[0]() ? TimeUtils.getSecondOfDay(seededValue[0]()!.time) : 0
                 }`,
-            component: () => <PairedExample valueSignal={seededValue} />,
+            component: () => <PairedExample value={seededValue} />,
             path: `${EXAMPLES_ROOT}/Paired.tsx`,
         },
     ]);

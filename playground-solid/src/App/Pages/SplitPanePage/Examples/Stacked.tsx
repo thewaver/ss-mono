@@ -15,7 +15,7 @@ export const StackedExample = (props: Props) => {
         <PageSplitPaneFrame>
             <SplitPane
                 panes={() => PAIR}
-                ratiosSignal={props.ratiosSignal}
+                ratios={props.ratios}
                 orientation={"vertical"}
                 gutterSize={props.gutterSize}
                 isDisabled={props.isDisabled}

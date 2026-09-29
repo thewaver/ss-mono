@@ -18,5 +18,5 @@ export const useMosaicsControls = (): MosaicsControls => {
         transitionDurationMs: transitionDurationMsState[0],
     };
 
-    return { itemCountState, gapState, sizeAnchorState, transitionDurationMsState, sharedProps };
+    return { itemCount: itemCountState, gap: gapState, sizeAnchor: sizeAnchorState, transitionDurationMs: transitionDurationMsState, sharedProps };
 };

@@ -16,7 +16,7 @@ export const TimePicker = (props: TimePickerProps) => {
     const rootRef = useRef<HTMLDivElement | null>(null);
     const isFocusReturnedRef = useRef(false);
     const [root, setRoot] = useState<HTMLDivElement>();
-    const [isOpen, setIsOpen] = SignalMirrorReactUtils.useOptionalState(props.visibilityState, false);
+    const [isOpen, setIsOpen] = SignalMirrorReactUtils.useOptionalState(props.visibility, false);
 
     const isDisabled = props.isDisabled ?? false;
 
@@ -51,7 +51,7 @@ export const TimePicker = (props: TimePickerProps) => {
 
     const renderClock = () => (
         <Clock
-            valueState={props.valueState}
+            value={props.value}
             minValue={props.minValue}
             maxValue={props.maxValue}
             steps={props.clockSteps}

@@ -37,7 +37,7 @@ export const CirclePackingPage = () => {
                 <LibraryExample
                     padding={padding}
                     zoomDurationMs={prefersReducedMotion ? NO_MOTION_DURATION_MS : zoomDurationMs}
-                    branchState={branchState}
+                    branch={branchState}
                 />
             ),
             path: `${EXAMPLES_ROOT}/Library.tsx`,

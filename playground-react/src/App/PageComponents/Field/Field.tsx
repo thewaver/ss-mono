@@ -73,7 +73,7 @@ export const PageNumberField = (props: PageNumberFieldProps) => {
 
     return (
         <NumberInput
-            valueState={valueState}
+            value={valueState}
             id={props.id}
             min={props.min}
             max={props.max}
@@ -96,7 +96,7 @@ export const PageTextField = (props: PageTextFieldProps) => {
 
     return (
         <TextInput
-            valueState={[props.value, props.onInput]}
+            value={[props.value, props.onInput]}
             isDisabled={props.isDisabled}
             ariaLabel={props.ariaLabel}
             padding={FIELD_PADDING}
@@ -125,7 +125,7 @@ export const PageSelectField = <T,>(props: PageSelectFieldProps<T>) => {
 
     return (
         <Select
-            valueState={[props.value, setValue]}
+            value={[props.value, setValue]}
             options={options}
             isDisabled={props.isDisabled}
             ariaLabel={props.ariaLabel}
@@ -162,7 +162,7 @@ export const PageGroupedSelectField = <T,>(props: PageGroupedSelectFieldProps<T>
 
     return (
         <Select
-            valueState={[props.value, setValue]}
+            value={[props.value, setValue]}
             options={options}
             isDisabled={props.isDisabled}
             ariaLabel={props.ariaLabel}
@@ -189,7 +189,7 @@ export const PageCheckField = (props: PageCheckFieldProps) => {
 
     return (
         <Toggle
-            checkedState={[props.value, props.onChange]}
+            checked={[props.value, props.onChange]}
             isDisabled={props.isDisabled}
             ariaLabel={props.ariaLabel}
             renderContent={(flags) => <PageToggleContent flags={flags} />}
@@ -202,7 +202,7 @@ export const PageColorField = (props: PageColorFieldProps) => {
 
     return (
         <ColorInput
-            valueState={[props.value, props.onInput]}
+            value={[props.value, props.onInput]}
             {...COLOR_INPUT_LABELS}
             isDisabled={props.isDisabled}
             ariaLabel={props.ariaLabel}
@@ -217,7 +217,7 @@ export const PageFileField = (props: PageFileFieldProps) => {
 
     return (
         <FileInput
-            filesState={filesState}
+            files={filesState}
             accept={props.accept}
             isDisabled={props.isDisabled}
             ariaLabel={props.ariaLabel}

@@ -110,7 +110,7 @@ export const PageSourceView = (props: SourceViewProps) => {
                     >
                         <Accordion
                             items={getItems}
-                            expandedSignal={expandedSignal}
+                            expanded={expandedSignal}
                             gap={() => SECTION_GAP}
                             renderHeader={(getItem, getFlags) => (
                                 <PageAccordionHeader flags={getFlags}>{getItem().value}</PageAccordionHeader>

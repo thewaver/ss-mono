@@ -16,7 +16,7 @@ type Props = NumberInputExampleProps;
 
 export const ReadOnlyExample = (props: Props) => (
     <NumberInput
-        valueState={props.valueState}
+        value={props.value}
         isReadOnly={true}
         padding={FIELD_STEPPER_PADDING}
         gap={FIELD_GAP}

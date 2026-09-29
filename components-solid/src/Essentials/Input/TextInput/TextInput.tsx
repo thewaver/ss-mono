@@ -45,7 +45,7 @@ export const TextInput = <T = string,>(props: TextInputProps<T>) => {
         const index = cursor.getFlatOptions().findIndex((option) => option.value === suggestion);
         const text = ListboxUtils.computePickedText(listboxId, index, props.computeCustomSuggestionText?.(suggestion));
 
-        props.valueSignal[1](text);
+        props.value[1](text);
 
         void props.onInput?.(text);
         void props.onSuggestionPick?.(suggestion);

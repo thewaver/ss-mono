@@ -7,7 +7,7 @@ import { CalendarComposite } from "../Calendar/Calendar";
 import type { RangeCalendarProps } from "../Calendar/CalendarSolid.types";
 
 export const RangeCalendar = (props: RangeCalendarProps) => {
-    const valueSignal = accessSignal(() => props.valueSignal);
+    const valueSignal = accessSignal(() => props.value);
 
     const [getPendingStart, setPendingStart] = createSignal<DateValue | undefined>();
     const [getLastPicked, setLastPicked] = createSignal<DateValue | undefined>();

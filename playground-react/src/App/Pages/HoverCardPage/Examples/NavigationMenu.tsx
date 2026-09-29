@@ -53,7 +53,7 @@ const NavFlyout = (props: NavFlyoutProps) => {
     const [trigger, setTrigger] = useState<HTMLElement>();
     const [isPressOpened, setIsPressOpened] = useState(false);
 
-    const [openKey, setOpenKey] = props.openKeyState;
+    const [openKey, setOpenKey] = props.openKey;
 
     const isOpen = openKey === props.entry.key;
 

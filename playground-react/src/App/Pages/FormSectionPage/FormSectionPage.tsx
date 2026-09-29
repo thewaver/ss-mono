@@ -19,9 +19,9 @@ export const FormSectionPage = () => {
     const [nestedOutcome, setNestedOutcome] = useState("not submitted");
 
     const sectionsProps: FormSectionsExampleProps = {
-        emailState,
-        passwordState,
-        confirmState,
+        email: emailState,
+        password: passwordState,
+        confirm: confirmState,
         onSubmit: () => {
             setOutcome(`submitted as ${emailState[0]}`);
         },
@@ -46,8 +46,8 @@ export const FormSectionPage = () => {
                 `outcome: ${nestedOutcome} — the payment section answers to the delivery section, which answers to the form, so the verdict travels up two levels rather than one`,
             component: () => (
                 <NestedExample
-                    streetState={streetState}
-                    cardState={cardState}
+                    street={streetState}
+                    card={cardState}
                     onSubmit={() => {
                         setNestedOutcome("submitted");
                     }}

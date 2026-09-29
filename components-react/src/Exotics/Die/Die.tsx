@@ -12,7 +12,7 @@ const HALF = 0.5;
 const FIRST_FACE = 0;
 
 export const Die = (props: DieProps) => {
-    const [face, setFace] = SignalMirrorReactUtils.useOptionalState(props.faceState, FIRST_FACE);
+    const [face, setFace] = SignalMirrorReactUtils.useOptionalState(props.face, FIRST_FACE);
     const size = props.size;
 
     const reservedSize = DieUtils.getReservedSize(size);

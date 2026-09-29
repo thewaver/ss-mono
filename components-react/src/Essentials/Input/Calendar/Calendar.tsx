@@ -41,7 +41,7 @@ const CalendarDay = (props: CalendarDayProps) => {
 };
 
 export const CalendarComposite = (props: CalendarCompositeProps) => {
-    const [month, setMonth] = props.monthState;
+    const [month, setMonth] = props.month;
 
     const gridId = useId();
 
@@ -221,7 +221,7 @@ export const CalendarComposite = (props: CalendarCompositeProps) => {
 };
 
 export const Calendar = (props: CalendarProps) => {
-    const [value, setValue] = props.valueState;
+    const [value, setValue] = props.value;
 
     const precision = props.precision ?? CALENDAR_DEFAULTS.precision;
 

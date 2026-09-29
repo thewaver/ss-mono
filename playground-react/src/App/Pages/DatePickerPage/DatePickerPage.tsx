@@ -33,7 +33,7 @@ export const DatePickerPage = () => {
             key: "picked",
             name: "With a calendar",
             readout: () => `value: ${describe(pickedState[0])} — typing and picking write the same signal`,
-            component: () => <PickedExample valueState={pickedState} calendar={calendarId} itemKey={"picked"} />,
+            component: () => <PickedExample value={pickedState} calendar={calendarId} itemKey={"picked"} />,
             path: `${EXAMPLES_ROOT}/Picked.tsx`,
         },
         {
@@ -43,7 +43,7 @@ export const DatePickerPage = () => {
                 `value: ${describe(boundedState[0])} — ${DateValueUtils.toIso(MIN_DATE)} to ${DateValueUtils.toIso(MAX_DATE)}, typed or picked`,
             component: () => (
                 <PickedExample
-                    valueState={boundedState}
+                    value={boundedState}
                     calendar={calendarId}
                     itemKey={"bounded"}
                     minValue={MIN_DATE}
@@ -59,7 +59,7 @@ export const DatePickerPage = () => {
                 `value: ${describe(weekdayState[0])} — the calendar refuses a weekend, and typing one reports it as an error`,
             component: () => (
                 <PickedExample
-                    valueState={weekdayState}
+                    value={weekdayState}
                     calendar={calendarId}
                     itemKey={"weekdays"}
                     computeIsDayDisabled={getIsWeekend}
@@ -74,7 +74,7 @@ export const DatePickerPage = () => {
                 `value: ${describe(monthState[0])} — precision="month" is handed to the calendar, so a pick there sets the first of the month; the field still takes a whole date`,
             component: () => (
                 <PickedExample
-                    valueState={monthState}
+                    value={monthState}
                     calendar={calendarId}
                     itemKey={"monthPrecision"}
                     precision={"month"}

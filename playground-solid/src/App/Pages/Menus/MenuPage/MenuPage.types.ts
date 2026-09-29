@@ -9,9 +9,9 @@ export type MenuExampleProps = {
 };
 
 export type MenuDrivenExampleProps = MenuExampleProps & {
-    visibilitySignal: Signal<boolean>;
+    visibility: Signal<boolean>;
 };
 
 export type MenuCascaderExampleProps = {
-    pathSignal: Signal<string[]>;
+    path: Signal<string[]>;
 };

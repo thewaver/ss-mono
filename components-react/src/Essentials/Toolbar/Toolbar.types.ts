@@ -54,7 +54,7 @@ export type ToolbarButtonsProps<T> = {
      * there, checked from the same list, so its state survives the collapse. Left out, the actions are ordinary
      * buttons and nothing is announced as pressed.
      */
-    pressedValuesState?: readonly [T[], (values: T[]) => void];
+    pressedValues?: readonly [T[], (values: T[]) => void];
     /** Draws one action. */
     renderAction: (action: ToolbarAction<T>, flags: InteractionFlags) => ReactNode;
     /** Draws one item inside the overflow menu. */
@@ -78,7 +78,7 @@ export type ToolbarMenusProps<T> = {
      * Which values are currently checked, with its setter, for the checkbox and radio items in any of the menus. One
      * list serves every menu, so an item keeps its state when its word is collapsed into the overflow menu.
      */
-    checkedState?: readonly [T[], (checked: T[]) => void];
+    checked?: readonly [T[], (checked: T[]) => void];
     /** How far a submenu is held clear of the item that opens it, in every menu the bar opens. */
     submenuOffset?: Point2d;
     /** Draws one word. It is told whether that word's menu is open. */

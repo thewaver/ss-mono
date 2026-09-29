@@ -5,5 +5,5 @@ import type { AccessorProps, DrawerEdge } from "@thewaver/ss-components-solid";
 export type DrawerExampleProps = AccessorProps<{
     edge: DrawerEdge;
     fillers: string[];
-    visibilitySignal: Signal<boolean>;
+    visibility: Signal<boolean>;
 }>;

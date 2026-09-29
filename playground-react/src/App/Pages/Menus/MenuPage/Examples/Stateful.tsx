@@ -4,14 +4,14 @@ import { PageMenuTriggerContent } from "../../../../StyledComponents/MenuTrigger
 import { VIEW_OPTIONS, renderMenuItem, renderMenuPopup } from "../MenuPage.const";
 import type { Action, MenuExampleProps } from "../MenuPage.types";
 
-type Props = MenuExampleProps & { checkedState: readonly [Action[], (checked: Action[]) => void] };
+type Props = MenuExampleProps & { checked: readonly [Action[], (checked: Action[]) => void] };
 
 export const StatefulExample = (props: Props) => {
     return (
         <Menu
             items={VIEW_OPTIONS}
             ariaLabel={"View options"}
-            checkedState={props.checkedState}
+            checked={props.checked}
             renderContent={(flags) => <PageMenuTriggerContent flags={flags}>View</PageMenuTriggerContent>}
             renderItem={renderMenuItem}
             renderPopup={renderMenuPopup}

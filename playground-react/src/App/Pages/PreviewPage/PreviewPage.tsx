@@ -28,7 +28,7 @@ export const PreviewPage = () => {
             readout: () => `expanded: ${longState[0]} — the control appears because there is something behind it`,
             component: () => (
                 <TextExample
-                    expandedState={longState}
+                    expanded={longState}
                     collapsedHeight={COLLAPSED_HEIGHT}
                     paragraphs={LONG_PARAGRAPHS}
                 />
@@ -49,7 +49,7 @@ export const PreviewPage = () => {
             readout: () => `expanded: ${shortState[0]} — same component, same height, no control and no fade at all`,
             component: () => (
                 <TextExample
-                    expandedState={shortState}
+                    expanded={shortState}
                     collapsedHeight={COLLAPSED_HEIGHT}
                     paragraphs={SHORT_PARAGRAPHS}
                 />
@@ -63,7 +63,7 @@ export const PreviewPage = () => {
                 `expanded: ${scrolledState[0]} — closing it brings the control back rather than leaving you further down`,
             component: () => (
                 <ScrolledExample
-                    expandedState={scrolledState}
+                    expanded={scrolledState}
                     collapsedHeight={COLLAPSED_HEIGHT}
                     paragraphs={LONG_PARAGRAPHS}
                 />

@@ -27,7 +27,7 @@ export const DateRangePickerPage = () => {
             key: "picked",
             name: "Two fields, one value",
             readout: () => `value: ${describe(defaultValue[0]())}`,
-            component: () => <PickedExample valueSignal={defaultValue} calendar={getCalendarId} key={"picked"} />,
+            component: () => <PickedExample value={defaultValue} calendar={getCalendarId} key={"picked"} />,
             path: `${EXAMPLES_ROOT}/Picked.tsx`,
         },
         {
@@ -37,7 +37,7 @@ export const DateRangePickerPage = () => {
                 `min ${DateValueUtils.toIso(MIN_DATE)}, max ${DateValueUtils.toIso(MAX_DATE)} — value: ${describe(boundedValue[0]())}`,
             component: () => (
                 <PickedExample
-                    valueSignal={boundedValue}
+                    value={boundedValue}
                     calendar={getCalendarId}
                     key={"bounded"}
                     minValue={() => MIN_DATE}

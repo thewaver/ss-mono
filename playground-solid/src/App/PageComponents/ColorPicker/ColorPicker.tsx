@@ -25,7 +25,7 @@ export const pageColorPickerSlots = {
 
             {renderSurface()}
 
-            <PageColorChannels hsvSignal={hsvSignal} />
+            <PageColorChannels hsv={hsvSignal} />
         </PageColorPickerPopup>
     ),
 };

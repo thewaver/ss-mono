@@ -3,7 +3,7 @@ import type { Signal } from "solid-js";
 import type { AccessorProps, FileInputRejection } from "@thewaver/ss-components-solid";
 
 export type FileInputExampleProps = {
-    filesSignal: Signal<File[]>;
+    files: Signal<File[]>;
 };
 
 export type FileInputRejectingExampleProps = FileInputExampleProps &

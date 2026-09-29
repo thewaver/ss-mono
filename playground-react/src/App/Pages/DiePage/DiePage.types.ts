@@ -5,5 +5,5 @@ export type DieExampleProps = {
     size: number;
     rollDurationMs: number;
     tumbleCount: number;
-    faceState: readonly [number, (value: number) => void];
+    face: readonly [number, (value: number) => void];
 };

@@ -63,14 +63,14 @@ export type CuboidProps = {
     isDraggable?: boolean;
     /**
      * How many quarter turns across. Each change of one is a quarter turn that way: up by one brings the face
-     * on the right round to the front. It is one of the two things that turn the box, alongside `pitchState`.
+     * on the right round to the front. It is one of the two things that turn the box, alongside `pitch`.
      */
-    yawState: readonly [number, (value: number) => void];
+    yaw: readonly [number, (value: number) => void];
     /**
      * How many quarter turns up. Each change of one is a quarter turn that way: up by one brings the face
-     * above round to the front. It is one of the two things that turn the box, alongside `yawState`.
+     * above round to the front. It is one of the two things that turn the box, alongside `yaw`.
      */
-    pitchState: readonly [number, (value: number) => void];
+    pitch: readonly [number, (value: number) => void];
     /** Draws one face, and is told which face it is. */
     renderFace: (face: CuboidFace, state: CuboidFaceState) => ReactNode;
     /**

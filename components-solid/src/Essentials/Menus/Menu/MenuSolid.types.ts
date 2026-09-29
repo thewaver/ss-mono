@@ -230,7 +230,7 @@ export type MenuProps<T> = Omit<InteractionWrapperProps<MenuFlags>, "renderContr
         /** How long the menu takes to fade in and out. */
         transitionDurationMs?: number;
         /** Whether the menu is open. It is the only thing that opens or closes it. */
-        visibilitySignal?: SignalSource<boolean>;
+        visibility?: SignalSource<boolean>;
         /** Draws the trigger. It is handed the interaction state, including whether the menu it opens is showing. */
         renderContent: (getFlags: () => InteractionFlags<MenuFlags>) => JSX.Element;
         /** Draws the surface the items sit on. */
@@ -241,7 +241,7 @@ export type MenuProps<T> = Omit<InteractionWrapperProps<MenuFlags>, "renderContr
         /** The items, in the order they are shown. Items carrying children are what make submenus. */
         items: MaybeAccessor<MenuItem<T>[]>;
         /** Which values are currently checked, for the checkbox and radio items among them. */
-        checkedSignal?: SignalSource<T[]>;
+        checked?: SignalSource<T[]>;
         /** Arranges the items, for a menu that is something other than a vertical list. */
         computeLayout?: PlacementLayoutFn;
         /** What the items do as the pointer nears them. */
@@ -287,7 +287,7 @@ export type ContextMenuProps<T> = AccessorProps<{
     /** How long the menu takes to fade in and out. */
     transitionDurationMs?: number;
     /** Whether the menu is open. It is the only thing that opens or closes it. */
-    visibilitySignal?: SignalSource<boolean>;
+    visibility?: SignalSource<boolean>;
     /** Draws the surface the items sit on. */
     renderPopup: MenuRenderPopup;
 }> & {
@@ -303,7 +303,7 @@ export type ContextMenuProps<T> = AccessorProps<{
     /** The items, in the order they are shown. */
     items: MaybeAccessor<MenuItem<T>[]>;
     /** Which values are currently checked, for the checkbox and radio items among them. */
-    checkedSignal?: SignalSource<T[]>;
+    checked?: SignalSource<T[]>;
     /** Arranges the items, for a menu that is something other than a vertical list. */
     computeLayout?: PlacementLayoutFn;
     /** What the items do as the pointer nears them. */

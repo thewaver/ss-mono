@@ -51,7 +51,7 @@ export const TagInput = (props: TagInputProps) => {
     const ariaLabel = LabelReactUtils.useAriaLabel(props.ariaLabel);
     const ariaDescribedBy = FormFieldReactUtils.useAriaDescribedBy();
 
-    const [tags, setTagsState] = props.valueState;
+    const [tags, setTagsState] = props.value;
 
     const fieldRef = useRef<HTMLInputElement | null>(null);
     const tagRefs = useRef<(HTMLButtonElement | null)[]>([]);
@@ -60,7 +60,7 @@ export const TagInput = (props: TagInputProps) => {
 
     const direction = NavigatorReactUtils.useDirection(fieldRef);
 
-    const [text, setText] = SignalMirrorReactUtils.useOptionalState(props.textState, EMPTY_TEXT);
+    const [text, setText] = SignalMirrorReactUtils.useOptionalState(props.text, EMPTY_TEXT);
 
     const isDisabled = props.isDisabled ?? false;
     const isEmpty = text.length < 1;

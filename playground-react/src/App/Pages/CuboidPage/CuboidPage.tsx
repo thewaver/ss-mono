@@ -130,8 +130,8 @@ export const CuboidPage = () => {
                 `${CuboidUtils.getFacingFromTurns(yawState[0], pitchState[0])} — across ${yawState[0]}, up ${pitchState[0]}; the two counts are quarter turns rather than a face, so the box always takes the way it was pushed`,
             component: () => (
                 <DefaultExample
-                    yawState={yawState}
-                    pitchState={pitchState}
+                    yaw={yawState}
+                    pitch={pitchState}
                     size={size}
                     transitionDurationMs={turnDurationMs}
                 />
@@ -145,8 +145,8 @@ export const CuboidPage = () => {
                 `${CuboidUtils.getFacingFromTurns(wanderingYawState[0], wanderingPitchState[0])} — every tick takes one quarter turn at random, discarding the ones that would leave the same face in view or turn back to the face it just left, so the box only ever moves on to a new face sharing an edge with this one`,
             component: () => (
                 <WanderingExampleWrapper
-                    yawState={wanderingYawState}
-                    pitchState={wanderingPitchState}
+                    yaw={wanderingYawState}
+                    pitch={wanderingPitchState}
                     size={size}
                     transitionDurationMs={turnDurationMs}
                 />
@@ -160,9 +160,9 @@ export const CuboidPage = () => {
                 `${uprightFacing ?? "front"} — across ${uprightYawState[0]}, up ${uprightPitchState[0]}; the counts only record the presses here, so the box keeps its own orientation and the face names ask it for the shortest way round`,
             component: () => (
                 <UprightExampleWrapper
-                    yawState={uprightYawState}
-                    pitchState={uprightPitchState}
-                    controllerState={uprightControllerState}
+                    yaw={uprightYawState}
+                    pitch={uprightPitchState}
+                    controller={uprightControllerState}
                     size={size}
                     transitionDurationMs={turnDurationMs}
                 />

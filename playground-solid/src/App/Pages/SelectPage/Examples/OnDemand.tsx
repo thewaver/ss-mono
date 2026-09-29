@@ -14,7 +14,7 @@ type Props = SelectRoutesExampleProps;
 export const OnDemandExample = (props: Props) => {
     return (
         <Select
-            valueSignal={props.valueSignal}
+            value={props.value}
             options={props.options}
             hasMoreOptions={props.hasMore}
             ariaLabel={"Route"}

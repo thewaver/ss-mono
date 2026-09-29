@@ -17,7 +17,7 @@ import { RadioGroupContextProvider } from "./RadioGroup.context";
 import type { RadioGroupProps } from "./RadioGroupSolid.types";
 
 export const RadioGroup = <T,>(props: RadioGroupProps<T>) => {
-    const valueSignal = accessSignal(() => props.valueSignal);
+    const valueSignal = accessSignal(() => props.value);
 
     const fallbackName = createUniqueId();
 

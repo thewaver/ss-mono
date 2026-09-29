@@ -23,11 +23,11 @@ export const createCarouselsControls = (): CarouselsControls => {
     }));
 
     return {
-        slideCountSignal,
-        delaySignal,
-        orientationSignal,
-        isDisabledSignal,
-        isLoopingSignal,
+        slideCount: slideCountSignal,
+        delay: delaySignal,
+        orientation: orientationSignal,
+        isDisabled: isDisabledSignal,
+        isLooping: isLoopingSignal,
         getSlideCount: slideCountSignal[0],
         getSlides,
         getSharedProps,

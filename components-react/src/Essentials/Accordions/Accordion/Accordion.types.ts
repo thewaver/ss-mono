@@ -66,7 +66,7 @@ export type AccordionProps<T> = {
      * the consumer to open or close sections from outside. Leave it out and the accordion keeps the state itself,
      * starting with every section closed.
      */
-    expandedState?: readonly [T[], (expanded: T[]) => void];
+    expanded?: readonly [T[], (expanded: T[]) => void];
     /** Draws a section's header. */
     renderHeader: AccordionHeaderRenderer<T>;
     /** Draws a section's panel. */

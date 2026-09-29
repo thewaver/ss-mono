@@ -12,7 +12,7 @@ const NOTES = ["Signed for on arrival", "Left with a neighbor", "Returned to the
 
 export const FilledExample = (props: Props) => (
     <Collapsible
-        expandedState={props.expandedState}
+        expanded={props.expanded}
         sizing={"fill"}
         isPanelBuiltOnExpand={true}
         renderTrigger={(flags) => (

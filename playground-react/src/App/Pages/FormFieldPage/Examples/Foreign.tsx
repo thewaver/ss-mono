@@ -9,15 +9,15 @@ import type { FormFieldExampleProps } from "../FormFieldPage.types";
 
 type Props = FormFieldExampleProps;
 
-const ForeignInput = (props: { valueState: readonly [string, (value: string) => void] }) => {
+const ForeignInput = (props: { value: readonly [string, (value: string) => void] }) => {
     const ariaDescribedBy = FormFieldReactUtils.useAriaDescribedBy();
 
     return (
         <input
             className={styles.foreignInput}
-            value={props.valueState[0]}
+            value={props.value[0]}
             aria-describedby={ariaDescribedBy}
-            onChange={(event) => props.valueState[1](event.currentTarget.value)}
+            onChange={(event) => props.value[1](event.currentTarget.value)}
         />
     );
 };
@@ -32,7 +32,7 @@ export const ForeignExample = (props: Props) => {
                 message={props.message}
                 renderCaption={() => <PageFormFieldCaption>Display name</PageFormFieldCaption>}
                 renderMessage={(state) => <PageFormFieldMessage state={state}>{props.message}</PageFormFieldMessage>}
-                renderControl={() => <ForeignInput valueState={props.valueState} />}
+                renderControl={() => <ForeignInput value={props.value} />}
             />
         </div>
     );

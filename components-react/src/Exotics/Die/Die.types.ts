@@ -39,7 +39,7 @@ export type DieProps = {
      * roll lands, and the consumer to turn it to a face directly, which it does without tumbling. Leave it out and the
      * die keeps it itself, starting on the first face.
      */
-    faceState?: readonly [number, (value: number) => void];
+    face?: readonly [number, (value: number) => void];
     /** Chooses which face a roll lands on. It may answer later, so the result can come from a server. */
     computeRollTarget: () => number | Promise<number>;
     /** Runs once a roll has landed, with the face it landed on. */

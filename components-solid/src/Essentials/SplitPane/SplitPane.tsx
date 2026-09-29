@@ -16,7 +16,7 @@ const NO_GUTTER_DRAGGING = -1;
 const PERCENT = 100;
 
 export const SplitPane = (props: SplitPaneProps) => {
-    const ratiosSignal = accessSignal(() => props.ratiosSignal);
+    const ratiosSignal = accessSignal(() => props.ratios);
 
     const paneIdPrefix = createUniqueId();
 

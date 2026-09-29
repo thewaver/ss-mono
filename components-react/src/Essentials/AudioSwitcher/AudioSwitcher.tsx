@@ -8,7 +8,7 @@ import { useLatest } from "../../Utils/refUtils";
 import type { AudioSwitcherController, AudioSwitcherProps } from "./AudioSwitcher.types";
 
 export const AudioSwitcher = (props: AudioSwitcherProps) => {
-    const [isPlaying, setIsPlaying] = SignalMirrorReactUtils.useOptionalState(props.playbackState, false);
+    const [isPlaying, setIsPlaying] = SignalMirrorReactUtils.useOptionalState(props.playback, false);
 
     const volume = props.volume ?? AUDIO_SWITCHER_DEFAULTS.volume;
 

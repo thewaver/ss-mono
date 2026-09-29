@@ -29,8 +29,8 @@ export const ConvoyExample = (props: Props) => {
                     isLooping={props.isLooping}
                     isTurning={props.isTurning}
                     followerOffsets={CONVOY_OFFSETS}
-                    progressSignal={props.progressSignal}
-                    playbackSignal={props.playbackSignal}
+                    progress={props.progress}
+                    playback={props.playback}
                     renderTrack={(getPath) => <PageTrailTrack path={getPath} />}
                     renderTraveler={(getPlace, index) => (
                         <PageTrailVehicle
@@ -48,7 +48,7 @@ export const ConvoyExample = (props: Props) => {
                     id={"convoyPlay"}
                     renderContent={(getFlags) => <PageButtonContent flags={getFlags}>Play</PageButtonContent>}
                     onClick={() => {
-                        props.playbackSignal[1](true);
+                        props.playback[1](true);
                     }}
                 />
 
@@ -56,7 +56,7 @@ export const ConvoyExample = (props: Props) => {
                     id={"convoyPause"}
                     renderContent={(getFlags) => <PageButtonContent flags={getFlags}>Pause</PageButtonContent>}
                     onClick={() => {
-                        props.playbackSignal[1](false);
+                        props.playback[1](false);
                     }}
                 />
 

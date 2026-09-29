@@ -77,7 +77,7 @@ export type ToastsProps<T> = AccessorProps<{
      * Whether a toast can be swiped off screen. Defaults to `true`. The swipe runs towards the edge the stack
      * sits on — sideways for a stack against the left or right, up or down for one centered along the top or
      * bottom — and a stack in the middle of the screen cannot be swiped. A committed swipe removes the toast
-     * from `toastsSignal`, as its timer does, and its countdown is held while the swipe is under way. The
+     * from `toasts`, as its timer does, and its countdown is held while the swipe is under way. The
      * toast is not moved for you: `ToastState` hands the painter the direction and the distance to draw.
      *
      * A swipe is a drag, and WCAG 2.5.7 requires anything done by dragging to be possible with a single
@@ -89,7 +89,7 @@ export type ToastsProps<T> = AccessorProps<{
     /** How many toasts may be on screen at once. Leave it out and they all show. */
     limit?: MaybeAccessor<number | undefined>;
     /** The toasts on screen. It is the only thing that adds or removes one. */
-    toastsSignal: SignalSource<Toast<T>[]>;
+    toasts: SignalSource<Toast<T>[]>;
     /**
      * Builds the sentence a toast is announced with, for a toast whose visible text does not read well out of context.
      */

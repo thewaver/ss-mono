@@ -15,12 +15,12 @@ type Props = TextInputExampleProps;
 
 export const TransformingSetterExample = (props: Props) => (
     <TextInput
-        valueSignal={props.valueSignal}
+        value={props.value}
         padding={() => FIELD_PADDING}
         gap={() => FIELD_GAP}
         ariaLabel={"Coupon code"}
         onInput={(value) => {
-            props.valueSignal[1](value.toLocaleUpperCase());
+            props.value[1](value.toLocaleUpperCase());
         }}
         computeTextStyle={computePageTextFieldTextStyle}
         renderContent={(getFlags) => <PageTextFieldContent flags={getFlags} />}

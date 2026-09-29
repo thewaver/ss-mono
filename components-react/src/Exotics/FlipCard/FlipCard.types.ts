@@ -12,7 +12,7 @@ export type FlipCardProps = {
     transitionDurationMs?: number;
     /**
      * How far the card leans toward its other side without turning over, from `0`, lying flat, to `1`, turned
-     * all the way. It never touches `flippedState`: the side that counts as showing, and the one a reader can
+     * all the way. It never touches `flipped`: the side that counts as showing, and the one a reader can
      * reach, stay where they were however far the card leans, so deciding that a lean has gone far enough to
      * become a turn is the caller's to do.
      *
@@ -33,7 +33,7 @@ export type FlipCardProps = {
     /** What one face is called when it is announced, so a reader hears face rather than group. Defaults to "face". */
     faceRoleDescription?: string;
     /** Which side is showing. It is the only thing that turns the card. */
-    flippedState: readonly [boolean, (value: boolean) => void];
+    flipped: readonly [boolean, (value: boolean) => void];
     /**
      * Which way the card turns over, read afresh on every turn. `forward` is the way a card turns by default on
      * its first turn: the right edge goes away from the viewer on a row card, and the top edge on a column one.

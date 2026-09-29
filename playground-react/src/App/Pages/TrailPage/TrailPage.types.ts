@@ -2,11 +2,11 @@ export type TrailExampleProps = {
     durationMs: number;
     isLooping: boolean;
     isTurning: boolean;
-    progressState: readonly [number, (value: number) => void];
-    playbackState: readonly [boolean, (value: boolean) => void];
+    progress: readonly [number, (value: number) => void];
+    playback: readonly [boolean, (value: boolean) => void];
 };
 
-export type TrailScrollExampleProps = Omit<TrailExampleProps, "progressState" | "playbackState"> & {
+export type TrailScrollExampleProps = Omit<TrailExampleProps, "progress" | "playback"> & {
     isFollowing: boolean;
     onProgressChange: (progress: number) => void;
 };

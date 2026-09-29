@@ -13,7 +13,7 @@ const ROOT_ONLY = 1;
 type Props = TreemapExampleProps;
 
 export const LibraryExample = (props: Props) => {
-    const [getBranch, setBranch] = props.branchSignal;
+    const [getBranch, setBranch] = props.branch;
 
     const getWeights = createMemo(() => TreemapUtils.computeWeights(LIBRARY));
 
@@ -46,7 +46,7 @@ export const LibraryExample = (props: Props) => {
             <div class={styles.chart}>
                 <Treemap<string>
                     root={() => LIBRARY}
-                    branchSignal={props.branchSignal}
+                    branch={props.branch}
                     zoomDurationMs={props.zoomDurationMs}
                     ariaLabel={"The library's source, by lines of code"}
                     renderTile={(getNode, getState) => (

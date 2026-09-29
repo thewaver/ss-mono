@@ -53,7 +53,7 @@ export const SplitPanePage = () => {
         compareState[1](STARTING_COMPARE);
     };
 
-    const commonProps: Omit<SplitPaneExampleProps, "ratiosState"> = {
+    const commonProps: Omit<SplitPaneExampleProps, "ratios"> = {
         gutterSize,
         isDisabled,
     };
@@ -63,7 +63,7 @@ export const SplitPanePage = () => {
             key: "pair",
             name: "Two panes",
             readout: () => `ratios: ${percent(pairState[0])} — drag the gutter or arrow it with the keyboard`,
-            component: () => <PairExample {...commonProps} ratiosState={pairState} />,
+            component: () => <PairExample {...commonProps} ratios={pairState} />,
             path: `${EXAMPLES_ROOT}/Pair.tsx`,
         },
         {
@@ -71,7 +71,7 @@ export const SplitPanePage = () => {
             name: "In a right-to-left box",
             readout: () =>
                 `ratios: ${percent(rightToLeftState[0])} — the box around the panes sets dir="rtl", so the first pane sits on the right and the gutter follows the pointer and the arrow keys from that side`,
-            component: () => <RightToLeftExample {...commonProps} ratiosState={rightToLeftState} />,
+            component: () => <RightToLeftExample {...commonProps} ratios={rightToLeftState} />,
             path: `${EXAMPLES_ROOT}/RightToLeft.tsx`,
         },
         {
@@ -79,21 +79,21 @@ export const SplitPanePage = () => {
             name: "Bounded panes",
             readout: () =>
                 `ratios: ${percent(boundedState[0])} — the first pane is held between 120px and 220px whatever the ratio says`,
-            component: () => <BoundedExample {...commonProps} ratiosState={boundedState} />,
+            component: () => <BoundedExample {...commonProps} ratios={boundedState} />,
             path: `${EXAMPLES_ROOT}/Bounded.tsx`,
         },
         {
             key: "triple",
             name: "Three panes",
             readout: () => `ratios: ${percent(tripleState[0])} — a gutter moves its two neighbors and nothing else`,
-            component: () => <TripleExample {...commonProps} ratiosState={tripleState} />,
+            component: () => <TripleExample {...commonProps} ratios={tripleState} />,
             path: `${EXAMPLES_ROOT}/Triple.tsx`,
         },
         {
             key: "stacked",
             name: "Stacked",
             readout: () => `ratios: ${percent(columnState[0])} — the same control on the other axis`,
-            component: () => <StackedExample {...commonProps} ratiosState={columnState} />,
+            component: () => <StackedExample {...commonProps} ratios={columnState} />,
             path: `${EXAMPLES_ROOT}/Stacked.tsx`,
         },
         {
@@ -101,7 +101,7 @@ export const SplitPanePage = () => {
             name: "Two pictures",
             readout: () =>
                 `ratios: ${percent(compareState[0])} — both pictures are drawn at the full width of the frame, so the gutter wipes between them instead of squeezing them`,
-            component: () => <CompareExample {...commonProps} ratiosState={compareState} />,
+            component: () => <CompareExample {...commonProps} ratios={compareState} />,
             path: `${EXAMPLES_ROOT}/Compare.tsx`,
         },
         {
@@ -109,7 +109,7 @@ export const SplitPanePage = () => {
             name: "Minimums that do not fit",
             readout: () =>
                 `minimums of 250px and 400px in a box too narrow for both — grid honors the floors and lets the row overflow, which is the behavior this control inherits rather than fights`,
-            component: () => <CrampedExample {...commonProps} ratiosState={crampedState} />,
+            component: () => <CrampedExample {...commonProps} ratios={crampedState} />,
             path: `${EXAMPLES_ROOT}/Cramped.tsx`,
         },
     ];

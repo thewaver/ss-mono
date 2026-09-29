@@ -17,9 +17,9 @@ const QUARTER_TURN = 1;
 type Props = CuboidUprightExampleProps;
 
 export const UprightExample = (props: Props) => {
-    const [, setYaw] = props.yawSignal;
-    const [, setPitch] = props.pitchSignal;
-    const [getController, setController] = props.controllerSignal;
+    const [, setYaw] = props.yaw;
+    const [, setPitch] = props.pitch;
+    const [getController, setController] = props.controller;
 
     const renderTurn = (id: string, label: string, glyph: string, turn: () => void) => (
         <Button
@@ -33,8 +33,8 @@ export const UprightExample = (props: Props) => {
     return (
         <PageCuboidStack>
             <Cuboid
-                yawSignal={props.yawSignal}
-                pitchSignal={props.pitchSignal}
+                yaw={props.yaw}
+                pitch={props.pitch}
                 size={props.size}
                 transitionDurationMs={props.transitionDurationMs}
                 isUpright={props.isUpright}

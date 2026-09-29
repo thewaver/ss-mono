@@ -12,8 +12,8 @@ export const OutsideExample = (props: Props) => (
     <PageControlColumn>
         <Tree
             nodes={FILES}
-            valueState={props.valueState}
-            expandedState={props.expandedState}
+            value={props.value}
+            expanded={props.expanded}
             ariaLabel={"Repository, collapsed from outside"}
             renderNode={(node, renderProps) => (
                 <PageTreeNodeContent renderProps={renderProps}>{node.value}</PageTreeNodeContent>
@@ -26,7 +26,7 @@ export const OutsideExample = (props: Props) => (
             )}
             onClick={async () => {
                 setTimeout(() => {
-                    props.expandedState[1]((prev) => prev.filter((value) => value !== "Lib"));
+                    props.expanded[1]((prev) => prev.filter((value) => value !== "Lib"));
                 }, OUTSIDE_COLLAPSE_DELAY_MS);
             }}
         />

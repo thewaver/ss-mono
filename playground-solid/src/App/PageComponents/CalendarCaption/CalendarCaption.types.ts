@@ -5,5 +5,5 @@ import type { AccessorProps, DateValue } from "@thewaver/ss-components-solid";
 export type PageCalendarCaptionProps = AccessorProps<{
     key: string;
     locale?: string;
-    monthSignal: Signal<DateValue>;
+    month: Signal<DateValue>;
 }>;

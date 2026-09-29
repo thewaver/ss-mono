@@ -43,7 +43,7 @@ export const SegmentedInput = (props: SegmentedInputProps) => {
     });
 
     createEffect(() => {
-        props.valueSignal[0]();
+        props.value[0]();
 
         const element = getElement();
 
@@ -91,7 +91,7 @@ export const SegmentedInput = (props: SegmentedInputProps) => {
                                             cellCount: getCellCount(),
                                         }),
                                         index,
-                                        char: props.valueSignal[0]()[index],
+                                        char: props.value[0]()[index],
                                     };
                                 })}
                             </div>

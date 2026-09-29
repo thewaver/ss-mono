@@ -56,7 +56,7 @@ const CustomInputExampleWrapper = ({ width, ...props }: ExampleWrapperProps) => 
     return (
         <>
             <TextArea
-                valueState={textState}
+                value={textState}
                 isAutoSizing={true}
                 minRows={CUSTOM_TEXT_MIN_ROWS}
                 maxRows={CUSTOM_TEXT_MAX_ROWS}

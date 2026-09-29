@@ -11,7 +11,7 @@ type Props = SelectExampleProps;
 export const ReachableExample = (props: Props) => {
     return (
         <Select
-            valueSignal={props.valueSignal}
+            value={props.value}
             options={() => COUNTRIES}
             isDisabled={true}
             isReachableWhenDisabled={true}

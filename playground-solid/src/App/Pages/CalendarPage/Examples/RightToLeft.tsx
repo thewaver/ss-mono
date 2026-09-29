@@ -15,11 +15,11 @@ export const RightToLeftExample = (props: Props) => {
     return (
         <div dir={"rtl"}>
             <PageCalendarFrame>
-                <PageCalendarCaption monthSignal={props.monthSignal} key={"rightToLeft"} locale={() => LOCALE} />
+                <PageCalendarCaption month={props.month} key={"rightToLeft"} locale={() => LOCALE} />
 
                 <Calendar
-                    valueSignal={props.valueSignal}
-                    monthSignal={props.monthSignal}
+                    value={props.value}
+                    month={props.month}
                     today={() => TODAY}
                     locale={() => LOCALE}
                     weekStartsOn={props.weekStartsOn}

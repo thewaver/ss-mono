@@ -1,3 +1,3 @@
 export type ColorInputExampleProps = {
-    valueState: readonly [string, (value: string) => void];
+    value: readonly [string, (value: string) => void];
 };

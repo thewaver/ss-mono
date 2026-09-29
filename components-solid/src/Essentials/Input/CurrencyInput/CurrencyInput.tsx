@@ -22,8 +22,8 @@ export const CurrencyInput = (props: CurrencyInputProps) => {
     );
 
     const field = MaskedFieldSolidUtils.createField<number>({
-        getValue: () => props.valueSignal[0](),
-        setValue: (next) => props.valueSignal[1](next),
+        getValue: () => props.value[0](),
+        setValue: (next) => props.value[1](next),
         ...CurrencyInputUtils.createFieldRules({
             getGroupDefs,
             getDecimals,
@@ -36,7 +36,7 @@ export const CurrencyInput = (props: CurrencyInputProps) => {
     return (
         <TextField
             {...props}
-            valueSignal={field.textSignal}
+            value={field.text}
             element={"input"}
             inputMode={"decimal"}
             computeMaskedText={(previous, next, caret) =>

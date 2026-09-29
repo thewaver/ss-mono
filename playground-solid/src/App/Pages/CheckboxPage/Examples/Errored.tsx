@@ -7,9 +7,9 @@ type Props = CheckboxExampleProps;
 
 export const ErroredExample = (props: Props) => (
     <Checkbox
-        checkedSignal={props.checkedSignal}
+        checked={props.checked}
         ariaLabel={"Errored checkbox"}
-        hasError={() => !props.checkedSignal[0]()}
+        hasError={() => !props.checked[0]()}
         renderContent={(getFlags) => <PageCheckboxContent flags={getFlags} />}
     />
 );

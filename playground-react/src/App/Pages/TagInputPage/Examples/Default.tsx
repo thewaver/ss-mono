@@ -18,7 +18,7 @@ type Props = TagInputExampleProps & { ariaLabel?: string };
 export const DefaultExample = (props: Props) => {
     return (
         <TagInput
-            valueState={props.valueState}
+            value={props.value}
             ariaLabel={props.ariaLabel ?? "Topics"}
             gap={FIELD_GAP}
             padding={FIELD_PADDING}

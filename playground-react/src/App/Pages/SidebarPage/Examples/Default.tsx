@@ -21,7 +21,7 @@ const ENTRIES = ["Inbox", "Drafts", "Sent", "Archive", "Spam"];
 export const DefaultExample = (props: Props) => {
     const sidebarId = useId();
 
-    const [isExpanded, setIsExpanded] = props.expandedState;
+    const [isExpanded, setIsExpanded] = props.expanded;
 
     return (
         <PageSidebarFrame edge={props.edge}>
@@ -32,7 +32,7 @@ export const DefaultExample = (props: Props) => {
                 collapsedWidth={COLLAPSED_WIDTH}
                 expandedWidth={EXPANDED_WIDTH}
                 isExpandedOnHover={props.isExpandedOnHover}
-                expandedState={props.expandedState}
+                expanded={props.expanded}
                 renderContent={(phase, transitionDurationMs) => (
                     <PageSidebarSurface width={EXPANDED_WIDTH}>
                         <PageSidebarToggle

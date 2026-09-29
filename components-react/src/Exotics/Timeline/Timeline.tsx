@@ -91,7 +91,7 @@ export const Timeline = <T,>(props: TimelineProps<T>) => {
     const range = props.range;
     const minViewExtent = props.minViewExtent ?? TimelineUtils.getExtent(range) * MIN_VIEW_SHARE;
 
-    const [rawView, setRawView] = SignalMirrorReactUtils.useOptionalState(props.viewState, range);
+    const [rawView, setRawView] = SignalMirrorReactUtils.useOptionalState(props.view, range);
 
     const view = useMemo(
         () => TimelineUtils.clampView(rawView, range, minViewExtent),

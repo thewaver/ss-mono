@@ -39,7 +39,7 @@ const CollapsibleTrigger = (props: CollapsibleTriggerProps) => {
 };
 
 export const Collapsible = (props: CollapsibleProps) => {
-    const expandedSignal = SignalMirrorSolidUtils.createOptional(() => props.expandedSignal, false);
+    const expandedSignal = SignalMirrorSolidUtils.createOptional(() => props.expanded, false);
 
     const triggerId = createUniqueId();
     const panelId = createUniqueId();

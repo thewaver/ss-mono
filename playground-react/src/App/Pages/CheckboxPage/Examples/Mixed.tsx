@@ -11,7 +11,7 @@ export const MixedExample = (props: Props) => {
     return (
         <PageControlRow>
             <Checkbox
-                checkedState={props.allState}
+                checked={props.all}
                 isMixed={props.isMixed}
                 id={"selectAll"}
                 ariaLabel={"Select all"}
@@ -29,22 +29,22 @@ export const MixedExample = (props: Props) => {
                     ),
                 }}
                 onChange={(isChecked) => {
-                    props.firstChildState[1](isChecked);
-                    props.secondChildState[1](isChecked);
+                    props.firstChild[1](isChecked);
+                    props.secondChild[1](isChecked);
                 }}
             />
 
             <PageControlRowLabel>controls</PageControlRowLabel>
 
             <Checkbox
-                checkedState={props.firstChildState}
+                checked={props.firstChild}
                 id={"firstChild"}
                 ariaLabel={"First child"}
                 renderContent={(flags) => <PageCheckboxContent flags={flags} />}
             />
 
             <Checkbox
-                checkedState={props.secondChildState}
+                checked={props.secondChild}
                 ariaLabel={"Second child"}
                 renderContent={(flags) => <PageCheckboxContent flags={flags} />}
             />

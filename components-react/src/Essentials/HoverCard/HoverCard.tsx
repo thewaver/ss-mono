@@ -20,7 +20,7 @@ const HOVER_CARD_DELAY_GROUP = HoverIntentUtils.createDelayGroup();
 export const HoverCard = (props: HoverCardProps) => {
     const cardId = useId();
 
-    const openState = SignalMirrorReactUtils.useOptionalState(props.visibilityState, false);
+    const openState = SignalMirrorReactUtils.useOptionalState(props.visibility, false);
     const [isOpen, setIsOpen] = openState;
 
     const anchorRef = useLatest(props.anchorRef ?? null);

@@ -11,8 +11,8 @@ export const FilesExample = (props: Props) => {
     return (
         <Tree
             nodes={props.nodes ?? (() => FILES)}
-            valueSignal={props.valueSignal}
-            expandedSignal={props.expandedSignal}
+            value={props.value}
+            expanded={props.expanded}
             ariaLabel={"Repository"}
             renderNode={(getNode, getRenderProps) => (
                 <PageTreeNodeContent renderProps={getRenderProps}>{getNode().value}</PageTreeNodeContent>

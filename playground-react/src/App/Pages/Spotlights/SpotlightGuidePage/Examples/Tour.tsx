@@ -37,8 +37,8 @@ export const TourExample = (props: Props) => {
     const isLastStep = step >= RICH_TOUR_STEPS.length - 1;
 
     const handOverToUser = () => {
-        props.guideState[1](false);
-        props.promptState[1](true);
+        props.guide[1](false);
+        props.prompt[1](true);
     };
 
     const next = () => {
@@ -65,11 +65,11 @@ export const TourExample = (props: Props) => {
                     onClick={() => {
                         props.onAdd();
 
-                        if (!props.promptState[0]) return;
+                        if (!props.prompt[0]) return;
 
-                        props.promptState[1](false);
+                        props.prompt[1](false);
                         props.onStepChange(step + 1);
-                        props.guideState[1](true);
+                        props.guide[1](true);
                     }}
                 />
 
@@ -95,7 +95,7 @@ export const TourExample = (props: Props) => {
                 )}
                 onClick={() => {
                     props.onStart();
-                    props.guideState[1](true);
+                    props.guide[1](true);
                 }}
             />
 
@@ -104,7 +104,7 @@ export const TourExample = (props: Props) => {
                 padding={PADDING}
                 ariaLabel={"Shop tour"}
                 announcement={`Step ${step + 1} of ${RICH_TOUR_STEPS.length}. ${current.title}.`}
-                visibilityState={props.guideState}
+                visibility={props.guide}
                 renderHighlight={renderHighlight}
                 renderOverlay={renderOverlay}
                 renderPopup={(visibilityTarget, transitionDurationMs) => (
@@ -145,7 +145,7 @@ export const TourExample = (props: Props) => {
             <SpotlightPrompt
                 elementRef={addRef ?? undefined}
                 padding={PADDING}
-                visibilityState={props.promptState}
+                visibility={props.prompt}
                 renderHighlight={renderHighlight}
                 renderOverlay={renderOverlay}
             />

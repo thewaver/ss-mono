@@ -35,26 +35,26 @@ export const PageColorChannels = (props: PageColorChannelsProps) => {
     const spaceSignal = createSignal<Color.ValueSpace>("rgba");
     const hexSignal = createSignal("");
 
-    const getRgba = () => Color.HSVA.toRgba(props.hsvSignal[0]());
+    const getRgba = () => Color.HSVA.toRgba(props.hsv[0]());
 
-    const getHsla = () => Color.HSVA.toHsla(props.hsvSignal[0]());
+    const getHsla = () => Color.HSVA.toHsla(props.hsv[0]());
 
     const getHexa = () => Color.RGBA.toHexa(getRgba());
 
-    const getAlpha = () => Color.HSVA.getClampedAlpha(props.hsvSignal[0]());
+    const getAlpha = () => Color.HSVA.getClampedAlpha(props.hsv[0]());
 
     const setRgbaChannel = (channel: (typeof RGB_CHANNELS)[number], value: number) => {
-        props.hsvSignal[1](() => Color.RGBA.toHsva({ ...getRgba(), [channel]: value }));
+        props.hsv[1](() => Color.RGBA.toHsva({ ...getRgba(), [channel]: value }));
     };
 
     const setHslaChannel = (channel: "h" | (typeof HSL_CHANNELS)[number], value: number) => {
         const hsl = { ...getHsla(), [channel]: value };
 
-        props.hsvSignal[1](() => Color.HSLA.toHsva({ ...hsl, a: getAlpha() }));
+        props.hsv[1](() => Color.HSLA.toHsva({ ...hsl, a: getAlpha() }));
     };
 
     const setAlpha = (alpha: number) => {
-        props.hsvSignal[1]((prev) => ({ ...prev, a: alpha }));
+        props.hsv[1]((prev) => ({ ...prev, a: alpha }));
     };
 
     const refreshHexField = () => {
@@ -66,7 +66,7 @@ export const PageColorChannels = (props: PageColorChannelsProps) => {
 
         if (!Color.Hexa.isHexa(hexa)) return;
 
-        props.hsvSignal[1](() => Color.Hexa.toHsva(hexa));
+        props.hsv[1](() => Color.Hexa.toHsva(hexa));
     });
 
     createEffect(() => {
@@ -78,7 +78,7 @@ export const PageColorChannels = (props: PageColorChannelsProps) => {
     return (
         <>
             <PageColorPickerRow>
-                <RadioGroup valueSignal={spaceSignal} orientation={"horizontal"} gap={5} ariaLabel={"Color space"}>
+                <RadioGroup value={spaceSignal} orientation={"horizontal"} gap={5} ariaLabel={"Color space"}>
                     {SPACES.map((space) => (
                         <Radio
                             value={() => space}
@@ -169,7 +169,7 @@ export const PageColorChannels = (props: PageColorChannelsProps) => {
                 <div onFocusOut={refreshHexField}>
                     <PageColorChannel label="hexa">
                         <TextInput
-                            valueSignal={hexSignal}
+                            value={hexSignal}
                             id={"channelHexa"}
                             ariaLabel={"Hex with alpha"}
                             padding={() => FIELD_PADDING}

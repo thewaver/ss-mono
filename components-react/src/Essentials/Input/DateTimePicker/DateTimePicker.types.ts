@@ -9,7 +9,7 @@ import type { TimePickerProps } from "../TimePicker/TimePicker.types";
 
 export type DateTimePickerProps = Omit<
     DatePickerProps,
-    "valueState" | "ariaLabel" | "visibilityState" | "minValue" | "maxValue" | "precision" | "id" | "name"
+    "value" | "ariaLabel" | "visibility" | "minValue" | "maxValue" | "precision" | "id" | "name"
 > & {
     /**
      * The halves' element id. The date field takes `<id>-date` and the time field `<id>-time`, so a label can
@@ -47,11 +47,11 @@ export type DateTimePickerProps = Omit<
     /** Whether one time can be picked, for rules a plain earliest and latest cannot express. */
     computeIsTimeDisabled?: (time: TimeValue) => boolean;
     /** The date and time together, and how to change them. A pair with a half missing is not a value at all. */
-    valueState: readonly [DateTimeValue | undefined, (value: DateTimeValue | undefined) => void];
+    value: readonly [DateTimeValue | undefined, (value: DateTimeValue | undefined) => void];
     /** Whether the calendar is open, and how to change it. It is the only thing that opens or closes it. */
-    dateVisibilityState?: readonly [boolean, (isOpen: boolean) => void];
+    dateVisibility?: readonly [boolean, (isOpen: boolean) => void];
     /** Whether the clock is open, and how to change it. It is the only thing that opens or closes it. */
-    timeVisibilityState?: readonly [boolean, (isOpen: boolean) => void];
+    timeVisibility?: readonly [boolean, (isOpen: boolean) => void];
     /** Draws whatever sits between the two halves. */
     renderSeparator?: () => ReactNode;
     /** The clock trigger's own element id. */

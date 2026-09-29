@@ -10,7 +10,7 @@ type Props = ColorInputExampleProps;
 export const DefaultExample = (props: Props) => (
     <ColorInput
         {...pageColorPickerSlots}
-        valueState={props.valueState}
+        value={props.value}
         ariaLabel={"Brand color"}
         {...COLOR_INPUT_LABELS}
         renderContent={(renderProps) => <PageColorInputContent renderProps={renderProps} />}

@@ -23,11 +23,11 @@ type Props = ColorAreaDropdownExampleProps;
 export const DropdownExample = (props: Props) => {
     const [getTriggerRef, setTriggerRef] = createSignal<HTMLElement>();
 
-    const [getIsOpen, setIsOpen] = props.isOpenSignal;
+    const [getIsOpen, setIsOpen] = props.isOpen;
 
-    const getCss = () => Color.RGBA.toCss(Color.HSVA.toRgba(props.hsvSignal[0]()));
+    const getCss = () => Color.RGBA.toCss(Color.HSVA.toRgba(props.hsv[0]()));
 
-    const getHexa = () => Color.HSVA.toHexa(props.hsvSignal[0]());
+    const getHexa = () => Color.HSVA.toHexa(props.hsv[0]());
 
     createEffect(() => {
         if (!getIsOpen()) return;
@@ -50,19 +50,19 @@ export const DropdownExample = (props: Props) => {
     });
 
     createEffect(() => {
-        const hue = props.hsvSignal[0]().h;
+        const hue = props.hsv[0]().h;
 
-        if (untrack(props.hueSignal[0]) === hue) return;
+        if (untrack(props.hue[0]) === hue) return;
 
-        props.hueSignal[1](hue);
+        props.hue[1](hue);
     });
 
     createEffect(() => {
-        const hue = props.hueSignal[0]();
+        const hue = props.hue[0]();
 
-        if (untrack(() => props.hsvSignal[0]().h) === hue) return;
+        if (untrack(() => props.hsv[0]().h) === hue) return;
 
-        props.hsvSignal[1]((prev) => ({ ...prev, h: hue }));
+        props.hsv[1]((prev) => ({ ...prev, h: hue }));
     });
 
     return (
@@ -98,11 +98,11 @@ export const DropdownExample = (props: Props) => {
                     <PageColorPickerPopup>
                         <PageColorPreview value={getCss} />
 
-                        <SurfaceExample hsvSignal={props.hsvSignal} />
+                        <SurfaceExample hsv={props.hsv} />
 
                         <PageColorPickerRow>
                             <Range
-                                valueSignal={props.hueSignal}
+                                value={props.hue}
                                 sizing={"fill"}
                                 max={() => HUE_MAX}
                                 step={1}
@@ -113,7 +113,7 @@ export const DropdownExample = (props: Props) => {
                             />
                         </PageColorPickerRow>
 
-                        <PageColorChannels hsvSignal={props.hsvSignal} />
+                        <PageColorChannels hsv={props.hsv} />
                     </PageColorPickerPopup>
                 )}
             />

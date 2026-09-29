@@ -20,7 +20,7 @@ const HOVER_CARD_DELAY_GROUP = HoverIntentUtils.createDelayGroup();
 export const HoverCard = (props: HoverCardProps) => {
     const cardId = createUniqueId();
 
-    const [getIsOpen, setIsOpen] = SignalMirrorSolidUtils.createOptional(() => props.visibilitySignal, false);
+    const [getIsOpen, setIsOpen] = SignalMirrorSolidUtils.createOptional(() => props.visibility, false);
     const [getPanelRef, setPanelRef] = createSignal<HTMLElement>();
 
     const getCardRef = () => document.getElementById(cardId) ?? undefined;

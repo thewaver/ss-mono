@@ -1,3 +1,3 @@
 export type TextAreaExampleProps = {
-    valueState: readonly [string, (value: string) => void];
+    value: readonly [string, (value: string) => void];
 };

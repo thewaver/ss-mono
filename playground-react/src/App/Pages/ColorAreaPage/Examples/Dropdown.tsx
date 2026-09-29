@@ -23,9 +23,9 @@ type Props = ColorAreaDropdownExampleProps;
 export const DropdownExample = (props: Props) => {
     const [triggerRef, setTriggerRef] = useState<HTMLElement>();
 
-    const [isOpen, setIsOpen] = props.isOpenState;
-    const [hsv, setHsv] = props.hsvState;
-    const [hue, setHue] = props.hueState;
+    const [isOpen, setIsOpen] = props.isOpen;
+    const [hsv, setHsv] = props.hsv;
+    const [hue, setHue] = props.hue;
 
     const css = Color.RGBA.toCss(Color.HSVA.toRgba(hsv));
 
@@ -96,11 +96,11 @@ export const DropdownExample = (props: Props) => {
                     <PageColorPickerPopup>
                         <PageColorPreview value={css} />
 
-                        <SurfaceExample hsvState={props.hsvState} />
+                        <SurfaceExample hsv={props.hsv} />
 
                         <PageColorPickerRow>
                             <Range
-                                valueState={props.hueState}
+                                value={props.hue}
                                 sizing={"fill"}
                                 max={HUE_MAX}
                                 step={1}
@@ -111,7 +111,7 @@ export const DropdownExample = (props: Props) => {
                             />
                         </PageColorPickerRow>
 
-                        <PageColorChannels hsvState={props.hsvState} />
+                        <PageColorChannels hsv={props.hsv} />
                     </PageColorPickerPopup>
                 )}
             />

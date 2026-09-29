@@ -69,8 +69,8 @@ const TreeNodeItem = (props: TreeNodeItemProps) => {
 };
 
 export const Tree = <T,>(props: TreeProps<T>) => {
-    const [value, setValue] = SignalMirrorReactUtils.useOptionalState<T | undefined>(props.valueState, undefined);
-    const [expanded, setExpanded] = SignalMirrorReactUtils.useOptionalState<T[]>(props.expandedState, []);
+    const [value, setValue] = SignalMirrorReactUtils.useOptionalState<T | undefined>(props.value, undefined);
+    const [expanded, setExpanded] = SignalMirrorReactUtils.useOptionalState<T[]>(props.expanded, []);
 
     const treeId = useId();
 

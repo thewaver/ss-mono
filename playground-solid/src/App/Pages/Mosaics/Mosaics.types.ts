@@ -10,9 +10,9 @@ export type MosaicSharedProps = AccessorProps<{
 }>;
 
 export type MosaicsControls = {
-    itemCountSignal: Signal<number>;
-    gapSignal: Signal<number>;
-    sizeAnchorSignal: Signal<MosaicSizeAnchor>;
-    transitionDurationMsSignal: Signal<number>;
+    itemCount: Signal<number>;
+    gap: Signal<number>;
+    sizeAnchor: Signal<MosaicSizeAnchor>;
+    transitionDurationMs: Signal<number>;
     getSharedProps: Accessor<MosaicSharedProps>;
 };

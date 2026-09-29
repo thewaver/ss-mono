@@ -21,7 +21,7 @@ type Props = NumberInputExampleProps;
 
 export const SteppedClampedExample = (props: Props) => (
     <NumberInput
-        valueSignal={props.valueSignal}
+        value={props.value}
         min={() => QUANTITY_MIN}
         max={() => QUANTITY_MAX}
         step={() => QUANTITY_STEP}

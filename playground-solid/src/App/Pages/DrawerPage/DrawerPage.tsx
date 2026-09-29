@@ -23,7 +23,7 @@ export const DrawerPage = () => {
             const commonProps: DrawerExampleProps = {
                 edge: () => edge,
                 fillers: () => FILLERS,
-                visibilitySignal: visibilityByEdge.get(edge)!,
+                visibility: visibilityByEdge.get(edge)!,
             };
 
             return {

@@ -22,8 +22,8 @@ const DRAG_COMMIT_RATIO = 0.5;
 const NO_TURNS: CuboidTurns = { yaw: 0, pitch: 0 };
 
 export const Cuboid = (props: CuboidProps) => {
-    const [getYaw, setYaw] = accessSignal(() => props.yawSignal);
-    const [getPitch, setPitch] = accessSignal(() => props.pitchSignal);
+    const [getYaw, setYaw] = accessSignal(() => props.yaw);
+    const [getPitch, setPitch] = accessSignal(() => props.pitch);
 
     const [getPerspectiveRef, setPerspectiveRef] = createSignal<HTMLElement>();
     const [getBodyRef, setBodyRef] = createSignal<HTMLElement>();

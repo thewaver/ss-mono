@@ -31,7 +31,7 @@ export const Scroller = (props: ScrollerProps) => {
     const getIsScrollable = createMemo(() => ScrollerUtils.getIsScrollable(getMetrics()));
 
     const [getProgressRatio, setProgressRatio] = SignalMirrorSolidUtils.createOptional(
-        () => props.progressSignal,
+        () => props.progress,
         ScrollerUtils.RATIO_MIN,
     );
 

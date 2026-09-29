@@ -10,7 +10,7 @@ import type { CheckboxGroupExampleProps } from "../CheckboxGroupPage.types";
 type Props = CheckboxGroupExampleProps;
 
 export const DefaultExample = (props: Props) => (
-    <CheckboxGroup valueSignal={props.valueSignal} ariaLabel={"Toppings"} orientation={"vertical"} gap={GROUP_GAP}>
+    <CheckboxGroup value={props.value} ariaLabel={"Toppings"} orientation={"vertical"} gap={GROUP_GAP}>
         <For each={TOPPINGS}>
             {(topping) => (
                 <Label>

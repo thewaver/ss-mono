@@ -101,7 +101,7 @@ const groupOptions = <T extends string>(keys: readonly T[]) => {
 const GROUPPED_WEIGHTS = groupOptions(CellAnimationWeights.WEIGHT_TYPES);
 const GROUPPED_ANIMATIONS = groupOptions(CellAnimationKeyframes.ANIMATION_TYPES);
 
-const ImageExampleWrapper = (props: CellAnimationExampleProps & { progressSignal: Signal<number> }) => {
+const ImageExampleWrapper = (props: CellAnimationExampleProps & { progress: Signal<number> }) => {
     const [getSrc, setSrc] = createSignal(knight_profile);
 
     return (
@@ -114,8 +114,8 @@ const ImageExampleWrapper = (props: CellAnimationExampleProps & { progressSignal
                 <PagePlaybackScrubber
                     id={"cellAnimation"}
                     ariaLabel={"Position in the pass"}
-                    playbackSignal={props.playbackSignal}
-                    progressSignal={props.progressSignal}
+                    playback={props.playback}
+                    progress={props.progress}
                 />
             </div>
 
@@ -269,10 +269,10 @@ const StressTestWrapper = (props: CellAnimationSourcedExampleProps) => {
             <StressTest
                 configs={() => STRESS_ITEMS}
                 onHideModal={() => {
-                    props.playbackSignal[1](true);
+                    props.playback[1](true);
                 }}
                 onShowModal={() => {
-                    props.playbackSignal[1](false);
+                    props.playback[1](false);
                 }}
                 renderLabel={(getConfigIndex) => `Render ${STRESS_ITEMS[getConfigIndex()].count} items`}
                 renderItem={(getConfigIndex) => (
@@ -280,7 +280,7 @@ const StressTestWrapper = (props: CellAnimationSourcedExampleProps) => {
                         width={() => STRESS_ITEMS[getConfigIndex()].size}
                         height={() => STRESS_ITEMS[getConfigIndex()].size}
                     >
-                        <DefaultExample {...props} playbackSignal={modalPlayback} cellCount={() => STRESS_CELL_COUNT} />
+                        <DefaultExample {...props} playback={modalPlayback} cellCount={() => STRESS_CELL_COUNT} />
                     </PageMeasureBox>
                 )}
             />
@@ -321,7 +321,7 @@ export const CellAnimationPage = () => {
 
     const getExamples = createMemo(() => {
         const commonProps: CellAnimationExampleProps = {
-            playbackSignal: playback,
+            playback,
             cellCount: () => cellCount,
             originType: getOriginType,
             weightType: getWeightType,
@@ -347,8 +347,8 @@ export const CellAnimationPage = () => {
                 component: () => (
                     <ImageExampleWrapper
                         {...commonProps}
-                        playbackSignal={imagePlayback}
-                        progressSignal={imageProgress}
+                        playback={imagePlayback}
+                        progress={imageProgress}
                     />
                 ),
                 path: DEFAULT_EXAMPLE_PATH,

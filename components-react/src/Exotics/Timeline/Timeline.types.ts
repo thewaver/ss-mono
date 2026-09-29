@@ -94,7 +94,7 @@ export type TimelineProps<T> = {
      * The stretch of time currently in view, as a `[view, setView]` pair. It is the only thing that pans or zooms
      * it. Leave it out and the timeline keeps its own, starting on the whole range.
      */
-    viewState?: readonly [TimelineSpan, (view: TimelineSpan) => void];
+    view?: readonly [TimelineSpan, (view: TimelineSpan) => void];
     /** Where one item sits in time. */
     computeSpan: (item: T, index: number) => TimelineSpan;
     /**

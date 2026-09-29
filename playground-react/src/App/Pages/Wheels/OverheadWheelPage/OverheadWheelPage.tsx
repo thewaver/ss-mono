@@ -33,7 +33,7 @@ export const OverheadWheelPage = () => {
             component: () => (
                 <OverheadExampleWrapper
                     {...controls.sharedProps}
-                    targetIndexState={targetIndexState}
+                    targetIndex={targetIndexState}
                     onSelectedWedgeChange={setMarkedIndex}
                 />
             ),

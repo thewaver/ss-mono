@@ -23,7 +23,7 @@ import type { DateRangePickerProps } from "./DateRangePickerSolid.types";
 const toMonth = (value: DateValue): DateValue => DateValueUtils.getStartOfMonth(value);
 
 export const DateRangePicker = (props: DateRangePickerProps) => {
-    const valueSignal = accessSignal(() => props.valueSignal);
+    const valueSignal = accessSignal(() => props.value);
 
     const popupId = createUniqueId();
     const fallbackFieldId = createUniqueId();
@@ -31,9 +31,9 @@ export const DateRangePicker = (props: DateRangePickerProps) => {
     const getEndFieldId = () => `${access(props.id) ?? fallbackFieldId}-end`;
 
     const [getRootRef, setRootRef] = createSignal<HTMLElement>();
-    const [getIsOpen, setIsOpen] = SignalMirrorSolidUtils.createOptional(() => props.visibilitySignal, false);
+    const [getIsOpen, setIsOpen] = SignalMirrorSolidUtils.createOptional(() => props.visibility, false);
 
-    const { firstSignal: startSignal, secondSignal: endSignal } = SignalMirrorSolidUtils.createSplit<
+    const { first: startSignal, second: endSignal } = SignalMirrorSolidUtils.createSplit<
         DateValueRange,
         DateValue,
         DateValue
@@ -76,8 +76,8 @@ export const DateRangePicker = (props: DateRangePickerProps) => {
 
     const renderCalendar = () => (
         <RangeCalendar
-            valueSignal={valueSignal}
-            monthSignal={monthSignal}
+            value={valueSignal}
+            month={monthSignal}
             minValue={props.minValue}
             maxValue={props.maxValue}
             isDisabled={props.isDisabled}
@@ -94,7 +94,7 @@ export const DateRangePicker = (props: DateRangePickerProps) => {
         <div ref={setRootRef} class={styles.dateRangePickerRoot}>
             <DateInput
                 {...props}
-                valueSignal={startSignal}
+                value={startSignal}
                 id={access(props.id) && `${access(props.id)}-start`}
                 name={access(props.name) && `${access(props.name)}-start`}
                 ariaLabel={props.startLabel}
@@ -104,7 +104,7 @@ export const DateRangePicker = (props: DateRangePickerProps) => {
 
             <DateInput
                 {...props}
-                valueSignal={endSignal}
+                value={endSignal}
                 id={getEndFieldId}
                 name={access(props.name) && `${access(props.name)}-end`}
                 ariaLabel={props.endLabel}

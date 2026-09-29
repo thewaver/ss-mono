@@ -21,16 +21,16 @@ export const PagePlaybackScrubber = (props: PagePlaybackScrubberProps) => {
         <div class={styles.playbackRow}>
             <Button
                 id={`${props.id}Playback`}
-                ariaLabel={() => (props.playbackSignal[0]() ? "Pause" : "Play")}
+                ariaLabel={() => (props.playback[0]() ? "Pause" : "Play")}
                 renderContent={(getFlags) => (
                     <PageButtonContent flags={getFlags}>
                         <svg class={styles.playbackIcon} viewBox="0 0 24 24" aria-hidden="true">
-                            <path d={props.playbackSignal[0]() ? PAUSE_ICON_PATH : PLAY_ICON_PATH} />
+                            <path d={props.playback[0]() ? PAUSE_ICON_PATH : PLAY_ICON_PATH} />
                         </svg>
                     </PageButtonContent>
                 )}
                 onClick={() => {
-                    props.playbackSignal[1]((isPlaying) => !isPlaying);
+                    props.playback[1]((isPlaying) => !isPlaying);
                 }}
             />
 
@@ -42,9 +42,9 @@ export const PagePlaybackScrubber = (props: PagePlaybackScrubberProps) => {
                     min={() => 0}
                     max={() => PERCENT}
                     step={() => SLIDER_STEP}
-                    valueSignal={[
-                        () => Math.round(props.progressSignal[0]() * PERCENT),
-                        (value: number) => props.progressSignal[1](value / PERCENT),
+                    value={[
+                        () => Math.round(props.progress[0]() * PERCENT),
+                        (value: number) => props.progress[1](value / PERCENT),
                     ]}
                     renderContent={(getRenderProps) => (
                         <PageRangeContent renderProps={getRenderProps} length={() => getSliderSlotSize().width} />

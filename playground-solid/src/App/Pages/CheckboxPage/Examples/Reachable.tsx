@@ -8,7 +8,7 @@ type Props = CheckboxExampleProps;
 
 export const ReachableExample = (props: Props) => (
     <Checkbox
-        checkedSignal={props.checkedSignal}
+        checked={props.checked}
         ariaLabel={"Disabled but reachable checkbox"}
         isDisabled={true}
         isReachableWhenDisabled={true}

@@ -21,7 +21,7 @@ type Props = NumberInputExampleProps;
 
 export const FractionalStepExample = (props: Props) => (
     <NumberInput
-        valueState={props.valueState}
+        value={props.value}
         min={RATING_MIN}
         max={RATING_MAX}
         step={RATING_STEP}

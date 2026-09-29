@@ -15,9 +15,9 @@ export type TagInputProps = Omit<InteractionWrapperProps<TagInputFlags>, "render
             Pick<InteractionControlProps<TagInputFlags>, "id" | "renderContent"> &
             TagInputState & {
                 /** The tags. It is the only thing that adds or removes one. */
-                valueSignal: SignalSource<string[]>;
+                value: SignalSource<string[]>;
                 /** What is currently typed but not yet turned into a tag. */
-                textSignal?: SignalSource<string>;
+                text?: SignalSource<string>;
                 /** Styles the field's text against its current state. */
                 computeTextStyle?: (getFlags: () => InteractionFlags<TagInputFlags>) => TextFieldTextStyle;
                 /** Draws one tag. */

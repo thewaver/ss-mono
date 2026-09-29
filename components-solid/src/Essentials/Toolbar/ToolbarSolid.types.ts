@@ -59,7 +59,7 @@ export type ToolbarButtonsProps<T> = AccessorProps<{
      * there, checked from the same list, so its state survives the collapse. Left out, the actions are ordinary
      * buttons and nothing is announced as pressed.
      */
-    pressedValuesSignal?: SignalSource<T[]>;
+    pressedValues?: SignalSource<T[]>;
     /** Draws one action. */
     renderAction: (getAction: Accessor<ToolbarAction<T>>, getFlags: () => InteractionFlags) => JSX.Element;
     /** Draws one item inside the overflow menu. */
@@ -86,7 +86,7 @@ export type ToolbarMenusProps<T> = AccessorProps<{
      * Which values are currently checked, for the checkbox and radio items in any of the menus. One list serves every
      * menu, so an item keeps its state when its word is collapsed into the overflow menu.
      */
-    checkedSignal?: SignalSource<T[]>;
+    checked?: SignalSource<T[]>;
     /** Draws one word. It is told whether that word's menu is open. */
     renderAction: (getAction: Accessor<MenubarAction<T>>, getFlags: () => InteractionFlags<MenuFlags>) => JSX.Element;
     /** Draws one item, in every menu the bar opens, the overflow menu included. */

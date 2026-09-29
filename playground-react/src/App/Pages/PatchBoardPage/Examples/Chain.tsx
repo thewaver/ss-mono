@@ -21,8 +21,8 @@ export const ChainExample = (props: Props) => {
             socketSize={props.socketSize}
             isLocked={props.isLocked}
             isDisabled={props.isDisabled}
-            nodesState={props.nodesState}
-            linksState={props.linksState}
+            nodes={props.nodes}
+            links={props.links}
             computeNodeKey={(device) => device.id}
             computeNodeLabel={(device) => device.name}
             renderNode={(node, flags) => <PagePatchNode label={node.value.name} kind={node.value.kind} flags={flags} />}

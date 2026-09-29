@@ -37,7 +37,7 @@ export const MenubarPage = () => {
                 `last picked: ${lastPicked} — with a menu open, the left and right arrows close it and open the next one; narrow the bar and a word becomes a submenu of the overflow menu`,
             component: () => (
                 <MenubarFrame width={barWidth}>
-                    <DefaultExample checkedState={checkedState} onActivate={(entry) => setLastPicked(entry.name)} />
+                    <DefaultExample checked={checkedState} onActivate={(entry) => setLastPicked(entry.name)} />
                 </MenubarFrame>
             ),
             path: `${EXAMPLES_ROOT}/Default.tsx`,

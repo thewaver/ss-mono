@@ -14,8 +14,8 @@ export const PartsExample = (props: TableExampleProps) => {
             <Table
                 columns={getColumns}
                 rows={() => PARTS}
-                sortSignal={props.sortSignal}
-                selectionSignal={props.selectionSignal}
+                sort={props.sort}
+                selection={props.selection}
                 ariaLabel={"Parts"}
             />
         </div>

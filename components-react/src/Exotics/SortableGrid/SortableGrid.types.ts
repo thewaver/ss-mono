@@ -116,7 +116,7 @@ export type SortableGridProps<T> = Omit<InteractionWrapperProps<SortableGridFlag
      */
     computeIsSpotBlocked?: (spot: SortableGridSpot) => boolean;
     /** The items and where they sit. It is the only thing that moves them. */
-    itemsState: readonly [SortableGridItem<T>[], (items: SortableGridItem<T>[]) => void];
+    items: readonly [SortableGridItem<T>[], (items: SortableGridItem<T>[]) => void];
     /** The key one item is told apart by, which is what lets an item keep its identity as it moves. */
     computeItemKey: (value: T) => string;
     /** Names one item for assistive technology. */

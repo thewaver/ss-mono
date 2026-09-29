@@ -67,7 +67,7 @@ const SortableItemSlot = (props: SortableItemSlotProps) => {
 };
 
 export const Sortable = <T,>(props: SortableProps<T>) => {
-    const [items, setItems] = props.itemsState;
+    const [items, setItems] = props.items;
 
     const listId = useId();
     const hintId = useId();

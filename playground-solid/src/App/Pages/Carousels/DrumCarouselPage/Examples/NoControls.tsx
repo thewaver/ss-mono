@@ -16,7 +16,7 @@ export const NoControlsExample = (props: Props) => {
     return (
         <DrumCarousel
             slides={props.slides}
-            indexSignal={props.indexSignal}
+            index={props.index}
             isDisabled={props.isDisabled}
             axis={props.axis}
             slideSize={() => SLIDE_SIZE}

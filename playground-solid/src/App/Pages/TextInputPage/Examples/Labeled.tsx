@@ -20,7 +20,7 @@ export const LabeledExample = (props: Props) => (
         <PageLabelCaption>Display name</PageLabelCaption>
 
         <TextInput
-            valueSignal={props.valueSignal}
+            value={props.value}
             padding={() => FIELD_PADDING}
             gap={() => FIELD_GAP}
             computeTextStyle={computePageTextFieldTextStyle}

@@ -9,7 +9,7 @@ type Props = RangeExampleProps;
 
 export const ReachableExample = (props: Props) => (
     <Range
-        valueState={props.valueState}
+        value={props.value}
         ariaLabel={"Disabled but reachable range"}
         isDisabled={true}
         isReachableWhenDisabled={true}

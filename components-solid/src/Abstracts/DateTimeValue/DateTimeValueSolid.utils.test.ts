@@ -14,7 +14,7 @@ describe("createSplit", () => {
             const signal = createSignal<DateTimeValue | undefined>(
                 DateTimeValueUtils.of(day(2026, 3, 1), { hour: 9, minute: 30 }),
             );
-            const { dateSignal, timeSignal } = DateTimeValueSolidUtils.createSplit(signal);
+            const { date: dateSignal, time: timeSignal } = DateTimeValueSolidUtils.createSplit(signal);
 
             expect(dateSignal[0]()?.day).toBe(1);
             expect(timeSignal[0]()?.hour).toBe(9);
@@ -28,7 +28,7 @@ describe("createSplit", () => {
             const signal = createSignal<DateTimeValue | undefined>(
                 DateTimeValueUtils.of(day(2026, 3, 1), { hour: 9, minute: 30 }),
             );
-            const { dateSignal, timeSignal } = DateTimeValueSolidUtils.createSplit(signal);
+            const { date: dateSignal, time: timeSignal } = DateTimeValueSolidUtils.createSplit(signal);
 
             timeSignal[1](() => ({ hour: 17, minute: 45 }));
 
@@ -47,7 +47,7 @@ describe("createSplit", () => {
     it("reports nothing while only one half is set, the same way half a range is not a range", () => {
         createRoot((dispose) => {
             const signal = createSignal<DateTimeValue | undefined>(undefined);
-            const { dateSignal, timeSignal } = DateTimeValueSolidUtils.createSplit(signal);
+            const { date: dateSignal, time: timeSignal } = DateTimeValueSolidUtils.createSplit(signal);
 
             dateSignal[1](() => day(2026, 5, 9));
 
@@ -67,7 +67,7 @@ describe("createSplit", () => {
             const signal = createSignal<DateTimeValue | undefined>(
                 DateTimeValueUtils.of(day(2026, 3, 1), { hour: 9, minute: 30 }),
             );
-            const { dateSignal } = DateTimeValueSolidUtils.createSplit(signal);
+            const { date: dateSignal } = DateTimeValueSolidUtils.createSplit(signal);
 
             dateSignal[1](() => undefined);
 
@@ -87,7 +87,7 @@ describe("createSplit", () => {
             const signal = createSignal<DateTimeValue | undefined>(
                 DateTimeValueUtils.of(day(2026, 3, 1), { hour: 9, minute: 30 }),
             );
-            const { dateSignal } = DateTimeValueSolidUtils.createSplit(signal);
+            const { date: dateSignal } = DateTimeValueSolidUtils.createSplit(signal);
 
             dateSignal[1](() => undefined);
 

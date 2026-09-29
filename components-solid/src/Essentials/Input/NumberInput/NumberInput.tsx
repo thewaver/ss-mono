@@ -15,7 +15,7 @@ import type { NumberInputProps } from "./NumberInputSolid.types";
 export const NumberInput = (props: NumberInputProps) => {
     const getSeparators = createMemo(() => DecimalUtils.getSeparators(access(props.locale)));
 
-    const textSignal = createSignal(NumberInputUtils.formatValue(props.valueSignal[0](), getSeparators()));
+    const textSignal = createSignal(NumberInputUtils.formatValue(props.value[0](), getSeparators()));
 
     const getStepDefs = createMemo((): NumberInputStepDefs => ({
         min: access(props.min),
@@ -32,7 +32,7 @@ export const NumberInput = (props: NumberInputProps) => {
     const getHasRangeIssue = () => NumberInputUtils.getHasRangeIssue(getTypedValue(), getStepDefs());
 
     const reportValue = (value: number | undefined) => {
-        props.valueSignal[1](value);
+        props.value[1](value);
 
         void props.onInput?.(value);
     };
@@ -40,7 +40,7 @@ export const NumberInput = (props: NumberInputProps) => {
     const applyValue = (value: number | undefined) => {
         textSignal[1](NumberInputUtils.formatValue(value, getSeparators()));
 
-        if (untrack(() => props.valueSignal[0]()) === value) return;
+        if (untrack(() => props.value[0]()) === value) return;
 
         reportValue(value);
     };
@@ -78,7 +78,7 @@ export const NumberInput = (props: NumberInputProps) => {
     };
 
     createEffect(() => {
-        const value = props.valueSignal[0]();
+        const value = props.value[0]();
 
         const separators = getSeparators();
 
@@ -90,7 +90,7 @@ export const NumberInput = (props: NumberInputProps) => {
     return (
         <TextField
             {...props}
-            valueSignal={textSignal}
+            value={textSignal}
             element={"input"}
             type={"text"}
             inputMode={() => access(props.inputMode) ?? NUMBER_INPUT_DEFAULTS.inputMode}

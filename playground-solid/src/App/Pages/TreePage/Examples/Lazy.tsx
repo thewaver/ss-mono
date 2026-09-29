@@ -27,7 +27,7 @@ export const LazyExample = (props: Props) => {
     onCleanup(() => timers.forEach(clearTimeout));
 
     createEffect(() => {
-        const pending = props.expandedSignal[0]().filter((value) => !asked.has(value));
+        const pending = props.expanded[0]().filter((value) => !asked.has(value));
 
         for (const value of pending) {
             asked.add(value);
@@ -44,8 +44,8 @@ export const LazyExample = (props: Props) => {
     return (
         <Tree
             nodes={getNodes}
-            valueSignal={props.valueSignal}
-            expandedSignal={props.expandedSignal}
+            value={props.value}
+            expanded={props.expanded}
             ariaLabel={"Remote repository"}
             renderNode={(getNode, getRenderProps) => (
                 <PageTreeNodeContent renderProps={getRenderProps}>{getNode().value}</PageTreeNodeContent>

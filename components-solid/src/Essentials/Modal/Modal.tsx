@@ -33,7 +33,7 @@ export const Modal = (props: ModalProps) => {
     });
 
     const { getIsVisible, getTransitionTarget, getHasTransitionFinished } = ElementFaderSolidUtils.createFader(
-        () => props.visibilitySignal[0](),
+        () => props.visibility[0](),
         { getTransitionDurationMs, getRef: getRootRef, onShow: props.onShow, onHide: props.onHide },
     );
 
@@ -46,7 +46,7 @@ export const Modal = (props: ModalProps) => {
     );
 
     const handleDismiss = () => {
-        props.visibilitySignal[1](false);
+        props.visibility[1](false);
     };
 
     const handleOverlayClick = () => {

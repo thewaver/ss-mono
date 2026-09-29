@@ -16,7 +16,7 @@ export const PanelExample = (props: Props) => (
         </div>
 
         <Collapsible
-            expandedSignal={props.expandedSignal}
+            expanded={props.expanded}
             sizing={"fit-content"}
             renderTrigger={(getFlags) => (
                 <PageAccordionHeader flags={getFlags}>

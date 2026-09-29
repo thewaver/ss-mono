@@ -11,7 +11,7 @@ type Props = SelectClearableExampleProps;
 export const ClearableExample = (props: Props) => {
     return (
         <Select
-            valueSignal={props.valueSignal}
+            value={props.value}
             options={() => COUNTRIES}
             ariaLabel={"Country"}
             clearAriaLabel={"Clear country"}

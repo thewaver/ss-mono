@@ -8,5 +8,5 @@ export type PageCalendarPagedCaptionProps = AccessorProps<{
     precision: CalendarPrecision;
     previousLabel: string;
     nextLabel: string;
-    monthSignal: Signal<DateValue>;
+    month: Signal<DateValue>;
 }>;

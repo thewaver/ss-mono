@@ -9,7 +9,7 @@ type Props = LabelExampleProps;
 export const SuppressedExample = (props: Props) => (
     <Label>
         <Checkbox
-            checkedState={props.checkedState}
+            checked={props.checked}
             ariaLabel={"Announced as something else"}
             renderContent={(flags) => <PageCheckboxContent flags={flags} />}
         />

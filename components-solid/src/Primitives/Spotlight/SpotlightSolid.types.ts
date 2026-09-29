@@ -17,7 +17,7 @@ export type SpotlightOverlayRenderer = (
 
 export type SpotlightState = {
     /** Whether the spotlight is showing. It is the only thing that shows or hides it. */
-    visibilitySignal: SignalSource<boolean>;
+    visibility: SignalSource<boolean>;
     /** How much room is left around the element being lit, so the hole is not cut tight against it. */
     padding?: number;
     /** How long the spotlight takes to fade in and out, and to move from one element to the next. */

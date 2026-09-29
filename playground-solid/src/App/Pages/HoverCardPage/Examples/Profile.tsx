@@ -15,7 +15,7 @@ export const ProfileExample = (props: Props) => {
 
     const [getAnchorRef, setAnchorRef] = createSignal<HTMLElement>();
 
-    const [getIsFollowing, setIsFollowing] = props.followingSignal;
+    const [getIsFollowing, setIsFollowing] = props.following;
 
     return (
         <div class={styles.sentence}>
@@ -30,7 +30,7 @@ export const ProfileExample = (props: Props) => {
             <HoverCard
                 anchorRef={getAnchorRef}
                 ariaLabelledBy={() => nameId}
-                visibilitySignal={props.visibilitySignal}
+                visibility={props.visibility}
                 offset={props.offset}
                 transitionDurationMs={props.transitionDurationMs}
                 focusShowDelayMs={props.focusShowDelayMs}

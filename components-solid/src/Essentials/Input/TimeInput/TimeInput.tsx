@@ -10,7 +10,7 @@ import { access, accessSignal } from "../../../Utils/propUtils";
 import type { TimeInputProps } from "./TimeInputSolid.types";
 
 export const TimeInput = (props: TimeInputProps) => {
-    const valueSignal = accessSignal(() => props.valueSignal);
+    const valueSignal = accessSignal(() => props.value);
 
     const getIsTwelveHour = () => access(props.isTwelveHour) ?? false;
 
@@ -89,14 +89,14 @@ export const TimeInput = (props: TimeInputProps) => {
         e.preventDefault();
 
         valueSignal[1](() => step.time);
-        field.textSignal[1](field.formatValue(step.time));
+        field.text[1](field.formatValue(step.time));
         element.setSelectionRange(step.selectionStart, step.selectionEnd);
     };
 
     return (
         <TextField
             {...props}
-            valueSignal={field.textSignal}
+            value={field.text}
             element={"input"}
             inputMode={"numeric"}
             computeMaskedText={(previous, next, caret) => TextSyncUtils.applyMask(getMask(), previous, next, caret)}

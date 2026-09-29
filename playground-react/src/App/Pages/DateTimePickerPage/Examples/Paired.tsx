@@ -20,12 +20,12 @@ import type { DateTimeExampleProps } from "../DateTimePickerPage.types";
 type Props = DateTimeExampleProps;
 
 export const PairedExample = (props: Props) => {
-    const { dateState, timeState } = DateTimeValueReactUtils.useSplit(props.valueState);
+    const { date: dateState, time: timeState } = DateTimeValueReactUtils.useSplit(props.value);
 
     return (
         <div className={styles.dateTimeRow}>
             <DateInput
-                valueState={dateState}
+                value={dateState}
                 ariaLabel={"Date"}
                 partHints={DATE_PART_HINTS}
                 locale={LOCALE}
@@ -39,7 +39,7 @@ export const PairedExample = (props: Props) => {
             />
 
             <TimeInput
-                valueState={timeState}
+                value={timeState}
                 ariaLabel={"Time"}
                 segmentHints={TIME_SEGMENT_HINTS}
                 padding={FIELD_STEPPER_PADDING}

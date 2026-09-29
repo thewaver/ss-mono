@@ -38,6 +38,6 @@ export type ColorAreaProps = Omit<InteractionWrapperProps<ColorAreaRenderProps>,
             Pick<InteractionControlProps<ColorAreaRenderProps>, "id" | "renderContent"> &
             ColorAreaState & {
                 /** The color. It is the only thing that changes it. */
-                hsvSignal: SignalSource<Color.HSVA>;
+                hsv: SignalSource<Color.HSVA>;
             }
     >;

@@ -14,7 +14,7 @@ export const NoControlsExample = (props: Props) => {
     return (
         <TrackCarousel
             slides={props.slides}
-            indexSignal={props.indexSignal}
+            index={props.index}
             isDisabled={props.isDisabled}
             orientation={props.orientation}
             ariaLabel={"Bare sampler"}

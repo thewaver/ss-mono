@@ -147,7 +147,7 @@ const ColorAreaElement = (props: ColorAreaElementProps) => {
 };
 
 export const ColorArea = (props: ColorAreaProps) => {
-    const [hsv, setHsv] = props.hsvState;
+    const [hsv, setHsv] = props.hsv;
 
     const [focusVisibleAxis, setFocusVisibleAxis] = useState<ColorAreaAxis>();
     const [isDragging, setIsDragging] = useState(false);

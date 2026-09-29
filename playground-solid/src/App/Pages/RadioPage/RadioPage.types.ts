@@ -3,14 +3,14 @@ import type { Signal } from "solid-js";
 export type SizeValue = "small" | "medium" | "large";
 
 export type RadioExampleProps = {
-    valueSignal: Signal<SizeValue>;
+    value: Signal<SizeValue>;
 };
 
 export type RadioOptionalExampleProps = {
-    valueSignal: Signal<SizeValue | undefined>;
+    value: Signal<SizeValue | undefined>;
 };
 
 export type RadioRatingExampleProps = {
-    valueSignal: Signal<number>;
-    hoveredSignal: Signal<number | undefined>;
+    value: Signal<number>;
+    hovered: Signal<number | undefined>;
 };

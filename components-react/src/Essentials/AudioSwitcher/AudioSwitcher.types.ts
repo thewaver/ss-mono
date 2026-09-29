@@ -22,7 +22,7 @@ export type AudioSwitcherProps = {
      * Whether audio is playing, with its setter. It is the only thing that starts or stops it; the switcher writes
      * through the setter once the browser has actually started a track, or refused to.
      */
-    playbackState?: readonly [boolean, (isPlaying: boolean) => void];
+    playback?: readonly [boolean, (isPlaying: boolean) => void];
     /** Hands the consumer a controller once the switcher is up, for driving playback from outside. */
     onMount?: (controller: AudioSwitcherController) => void;
 };

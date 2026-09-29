@@ -21,7 +21,7 @@ export type ParticleSpawnerProps = {
     /** How the rounds follow each other — in bursts, one at a time, or without a pause. */
     spawnIterationPatterns?: ParticleSpawnIterationPattern[];
     /** Whether particles are being sent. It is the only thing that starts or stops them. */
-    playbackState?: readonly [boolean, (value: boolean) => void];
+    playback?: readonly [boolean, (value: boolean) => void];
     /** Which target one particle is aimed at. */
     computeTarget?: (index: number, targetCount: number) => number;
     /**

@@ -24,7 +24,7 @@ export const RadioGroup = <T,>(props: RadioGroupProps<T>) => {
     const [entries, setEntries] = useState<RadioGroupEntry[]>([]);
     const [measuredBounds, setMeasuredBounds] = useState<RadioGroupFloaterBounds>();
 
-    const [value, setValue] = props.valueState;
+    const [value, setValue] = props.value;
     const orientation = props.orientation ?? RADIO_GROUP_DEFAULTS.orientation;
     const transitionDurationMs = props.transitionDurationMs ?? RADIO_GROUP_DEFAULTS.transitionDurationMs;
     const name = props.name ?? fallbackName;

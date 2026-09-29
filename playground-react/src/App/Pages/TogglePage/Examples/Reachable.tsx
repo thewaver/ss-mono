@@ -8,7 +8,7 @@ type Props = ToggleExampleProps;
 
 export const ReachableExample = (props: Props) => (
     <Toggle
-        checkedState={props.checkedState}
+        checked={props.checked}
         ariaLabel={"Disabled but reachable toggle"}
         isDisabled={true}
         isReachableWhenDisabled={true}

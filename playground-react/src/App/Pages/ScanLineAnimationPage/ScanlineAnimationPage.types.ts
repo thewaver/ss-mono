@@ -7,5 +7,5 @@ export type ScanlineAnimationExampleProps = {
     weightType: CellAnimationWeights.OriginFreeWeightType;
     animationDurationMs: number;
     animationIterationDelayMs: number;
-    playbackState: readonly [boolean, (isPlaying: boolean) => void];
+    playback: readonly [boolean, (isPlaying: boolean) => void];
 };

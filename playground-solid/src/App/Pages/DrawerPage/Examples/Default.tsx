@@ -17,12 +17,12 @@ export const DefaultExample = (props: Props) => {
                     <PageButtonContent flags={getFlags}>Open {access(props.edge)}</PageButtonContent>
                 )}
                 onClick={() => {
-                    props.visibilitySignal[1](true);
+                    props.visibility[1](true);
                 }}
             />
 
             <Drawer
-                visibilitySignal={props.visibilitySignal}
+                visibility={props.visibility}
                 edge={props.edge}
                 ariaLabel={() => `${access(props.edge)} drawer`}
                 renderOverlay={(getVisibilityTarget, getTransitionDurationMs) => (
@@ -52,7 +52,7 @@ export const DefaultExample = (props: Props) => {
                         <Button
                             renderContent={(getFlags) => <PageButtonContent flags={getFlags}>Close</PageButtonContent>}
                             onClick={() => {
-                                props.visibilitySignal[1](false);
+                                props.visibility[1](false);
                             }}
                         />
 

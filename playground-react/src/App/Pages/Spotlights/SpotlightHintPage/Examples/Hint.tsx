@@ -26,7 +26,7 @@ export const HintExample = (props: Props) => {
         }),
     );
 
-    const [isVisible, setIsVisible] = props.visibilityState;
+    const [isVisible, setIsVisible] = props.visibility;
 
     return (
         <div className={styles.root}>
@@ -63,7 +63,7 @@ export const HintExample = (props: Props) => {
             <SpotlightHint
                 elementRef={anchorRefs[props.index]}
                 padding={PADDING}
-                visibilityState={props.visibilityState}
+                visibility={props.visibility}
                 renderHighlight={renderHighlight}
                 renderOverlay={renderOverlay}
             />

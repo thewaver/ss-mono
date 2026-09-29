@@ -53,7 +53,7 @@ export const TimelinePage = () => {
     };
 
     const getExamples = createMemo(() => {
-        const commonProps: Omit<TimelineExampleProps, "viewSignal"> = {
+        const commonProps: Omit<TimelineExampleProps, "view"> = {
             isPannable: getIsPannable,
             isZoomable: getIsZoomable,
             isDisabled: getIsDisabled,
@@ -66,7 +66,7 @@ export const TimelinePage = () => {
                 name: "A day of meetings",
                 readout: () =>
                     `showing ${formatClock(daySignal[0]().start)} to ${formatClock(daySignal[0]().end)} — the lanes are the component's own answer to what overlaps, and it takes the gestures itself: the wheel zooms where the pointer is, a drag moves the window, and a press that never travels still picks the meeting under it. The red line is a marker at the time on this computer's clock, and it is only drawn while that time is inside the day shown`,
-                component: () => <MeetingsExample {...commonProps} viewSignal={daySignal} />,
+                component: () => <MeetingsExample {...commonProps} view={daySignal} />,
                 path: `${EXAMPLES_ROOT}/Meetings.tsx`,
             },
             {
@@ -74,7 +74,7 @@ export const TimelinePage = () => {
                 name: "Three tracks",
                 readout: () =>
                     `showing ${formatStopwatch(reelSignal[0]().start)} to ${formatStopwatch(reelSignal[0]().end)} — here the page says which lane each clip belongs to, and the buttons are the route for anyone who cannot drag or pinch. The orange line is a marker the page moves while it plays`,
-                component: () => <TracksExample {...commonProps} viewSignal={reelSignal} />,
+                component: () => <TracksExample {...commonProps} view={reelSignal} />,
                 path: `${EXAMPLES_ROOT}/Tracks.tsx`,
             },
             {
@@ -85,8 +85,8 @@ export const TimelinePage = () => {
                 component: () => (
                     <TrimExample
                         {...commonProps}
-                        viewSignal={trimReelSignal}
-                        clipsSignal={trimClipsSignal}
+                        view={trimReelSignal}
+                        clips={trimClipsSignal}
                         onTrim={setTrimmed}
                     />
                 ),

@@ -38,7 +38,7 @@ export const DiePage = () => {
                     size={() => DIE_SIZE}
                     rollDurationMs={getShownRollDurationMs}
                     tumbleCount={getTumbleCount}
-                    faceSignal={dieFaceSignal}
+                    face={dieFaceSignal}
                 />
             ),
             path: `${EXAMPLES_ROOT}/Tabletop.tsx`,

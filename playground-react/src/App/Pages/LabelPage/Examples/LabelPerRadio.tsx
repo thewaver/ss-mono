@@ -14,7 +14,7 @@ const PLAN_OPTIONS: { value: PlanValue; label: string }[] = [
 type Props = LabelRadioExampleProps;
 
 export const LabelPerRadioExample = (props: Props) => (
-    <RadioGroup valueState={props.valueState} ariaLabel={"Plan"} gap={GAP}>
+    <RadioGroup value={props.value} ariaLabel={"Plan"} gap={GAP}>
         {PLAN_OPTIONS.map((option) => (
             <Label key={option.value}>
                 <Radio value={option.value} renderContent={(flags) => <PageRadioContent flags={flags} />} />

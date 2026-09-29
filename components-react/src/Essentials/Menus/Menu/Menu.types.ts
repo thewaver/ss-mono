@@ -262,13 +262,13 @@ export type MenuProps<T> = Omit<InteractionWrapperProps<MenuFlags>, "renderContr
      * Whether the menu is open, with its setter. It is the only thing that opens or closes it; the menu writes
      * `false` through the setter when it is dismissed or an item is picked. Left out, the menu keeps its own.
      */
-    visibilityState?: readonly [boolean, (isOpen: boolean) => void];
+    visibility?: readonly [boolean, (isOpen: boolean) => void];
     /** The element the menu is positioned against, where that is not the trigger itself. */
     anchorRef?: HTMLElement;
     /** The items, in the order they are shown. Items carrying children are what make submenus. */
     items: MenuItem<T>[];
     /** Which values are currently checked, with its setter, for the checkbox and radio items among them. */
-    checkedState?: readonly [T[], (checked: T[]) => void];
+    checked?: readonly [T[], (checked: T[]) => void];
     /** Arranges the items, for a menu that is something other than a vertical list. */
     computeLayout?: PlacementLayoutFn;
     /** What the items do as the pointer nears them. */
@@ -321,7 +321,7 @@ export type ContextMenuProps<T> = {
      * Whether the menu is open, with its setter. It is the only thing that opens or closes it. Left out, the menu
      * keeps its own.
      */
-    visibilityState?: readonly [boolean, (isOpen: boolean) => void];
+    visibility?: readonly [boolean, (isOpen: boolean) => void];
     /**
      * Draws the region a right-click opens the menu over.
      *
@@ -334,7 +334,7 @@ export type ContextMenuProps<T> = {
     /** The items, in the order they are shown. */
     items: MenuItem<T>[];
     /** Which values are currently checked, with its setter, for the checkbox and radio items among them. */
-    checkedState?: readonly [T[], (checked: T[]) => void];
+    checked?: readonly [T[], (checked: T[]) => void];
     /** Arranges the items, for a menu that is something other than a vertical list. */
     computeLayout?: PlacementLayoutFn;
     /** What the items do as the pointer nears them. */

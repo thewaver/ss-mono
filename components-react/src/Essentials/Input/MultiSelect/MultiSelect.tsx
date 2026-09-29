@@ -6,7 +6,7 @@ import { SelectComposite } from "../Select/Select";
 import type { MultiSelectProps } from "./MultiSelect.types";
 
 export const MultiSelect = <T,>(props: MultiSelectProps<T>) => {
-    const [values, setValues] = props.valuesState;
+    const [values, setValues] = props.values;
 
     const selectedOptions = useMemo(
         () => SelectUtils.getFlatOptions(props.options).filter((option) => values.includes(option.value)),

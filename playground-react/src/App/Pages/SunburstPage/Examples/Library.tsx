@@ -27,7 +27,7 @@ const getTitle = (node: SunburstNode<string>, weight: number) =>
     `${(TreemapUtils.findPath(LIBRARY, node) ?? [node]).map((step) => step.value).join("/")}\n${formatLines(weight)}`;
 
 export const LibraryExample = (props: Props) => {
-    const [branch, setBranch] = props.branchState;
+    const [branch, setBranch] = props.branch;
 
     const weights = useMemo(() => TreemapUtils.computeWeights(LIBRARY), []);
 
@@ -39,7 +39,7 @@ export const LibraryExample = (props: Props) => {
         <div className={styles.frame}>
             <Sunburst<string>
                 root={LIBRARY}
-                branchState={props.branchState}
+                branch={props.branch}
                 ringCount={props.ringCount}
                 zoomDurationMs={props.zoomDurationMs}
                 ariaLabel={"The library's source, by lines of code"}

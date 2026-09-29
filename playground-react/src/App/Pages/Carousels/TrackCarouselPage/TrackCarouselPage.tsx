@@ -18,7 +18,7 @@ export const TrackCarouselPage = () => {
     const rotatingPlayingState = useState(true);
     const barelessIndexState = useState(0);
 
-    const [isLooping] = controls.isLoopingState;
+    const [isLooping] = controls.isLooping;
 
     const examples = [
         {
@@ -28,7 +28,7 @@ export const TrackCarouselPage = () => {
                 `slide ${manualIndexState[0] + 1} of ${controls.slideCount} — ${isLooping ? "stepping past either end wraps round, which is what separates this from the scroller" : "looping is off, so Previous on the first slide and Next on the last are disabled, and a swipe past an end springs back"}; a column takes its height from the box the page puts round it`,
             component: () => (
                 <PageCarouselBox>
-                    <SteppedExample {...controls.sharedProps} isLooping={isLooping} indexState={manualIndexState} />
+                    <SteppedExample {...controls.sharedProps} isLooping={isLooping} index={manualIndexState} />
                 </PageCarouselBox>
             ),
             path: `${EXAMPLES_ROOT}/Stepped.tsx`,
@@ -43,9 +43,9 @@ export const TrackCarouselPage = () => {
                     <RotatingExample
                         {...controls.sharedProps}
                         isLooping={isLooping}
-                        indexState={rotatingIndexState}
-                        playbackState={rotatingPlayingState}
-                        autoplayDelayMs={controls.delayState[0]}
+                        index={rotatingIndexState}
+                        playback={rotatingPlayingState}
+                        autoplayDelayMs={controls.delay[0]}
                     />
                 </PageCarouselBox>
             ),
@@ -58,7 +58,7 @@ export const TrackCarouselPage = () => {
                 `slide ${barelessIndexState[0] + 1} of ${controls.slideCount} — nothing is drawn beside the slides, so the surrounding page owns the buttons through the signal it shares`,
             component: () => (
                 <PageCarouselBox>
-                    <NoControlsExample {...controls.sharedProps} indexState={barelessIndexState} />
+                    <NoControlsExample {...controls.sharedProps} index={barelessIndexState} />
                 </PageCarouselBox>
             ),
             path: `${EXAMPLES_ROOT}/NoControls.tsx`,

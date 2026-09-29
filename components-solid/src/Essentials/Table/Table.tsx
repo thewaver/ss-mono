@@ -1,5 +1,5 @@
 import type { Accessor } from "solid-js";
-import { For, Index, Show, createMemo, createSignal, createUniqueId, onMount } from "solid-js";
+import { For, Index, Show, createEffect, createMemo, createSignal, createUniqueId, onCleanup, onMount } from "solid-js";
 
 import {
     CarrierUtils,
@@ -56,7 +56,7 @@ export const Table = <T,>(props: TableProps<T>) => {
     const getDeclaredColumns = createMemo(() => access(props.columns));
 
     const getColumnOrder = createMemo(() =>
-        TableUtils.getColumnOrder(getDeclaredColumns(), props.orderSignal?.[0]() ?? EMPTY_ORDER),
+        TableUtils.getColumnOrder(getDeclaredColumns(), props.order?.[0]() ?? EMPTY_ORDER),
     );
 
     const getColumns = createMemo(() => TableUtils.getReordered(getDeclaredColumns(), getColumnOrder()));
@@ -65,16 +65,16 @@ export const Table = <T,>(props: TableProps<T>) => {
 
     const getIsDisabled = createMemo(() => access(props.isDisabled) ?? false);
 
-    const getWidths = createMemo(() => props.widthsSignal?.[0]() ?? EMPTY_WIDTHS);
+    const getWidths = createMemo(() => props.widths?.[0]() ?? EMPTY_WIDTHS);
 
-    const getSort = createMemo(() => props.sortSignal?.[0]());
+    const getSort = createMemo(() => props.sort?.[0]());
 
-    const getSelection = createMemo(() => props.selectionSignal?.[0]() ?? EMPTY_SELECTION);
+    const getSelection = createMemo(() => props.selection?.[0]() ?? EMPTY_SELECTION);
 
     const getSelectedRows = createMemo(() => new Set(getSelection()));
 
     const getSelectionMode = createMemo(() =>
-        TableUtils.getSelectionMode(access(props.selectionMode), props.selectionSignal !== undefined),
+        TableUtils.getSelectionMode(access(props.selectionMode), props.selection !== undefined),
     );
 
     const getSortedColumn = createMemo(() => {
@@ -128,7 +128,7 @@ export const Table = <T,>(props: TableProps<T>) => {
 
         const next = TableUtils.getNextSort(getSort(), column.id);
 
-        props.sortSignal?.[1](next);
+        props.sort?.[1](next);
 
         void props.onSortChange?.(next);
     };
@@ -136,10 +136,10 @@ export const Table = <T,>(props: TableProps<T>) => {
     const selection = SelectionSolidUtils.create(getIsDisabled, {
         getMode: getSelectionMode,
         getItems: getRows,
-        selectionSignal: [
+        selection: [
             getSelection,
             (rows) => {
-                props.selectionSignal?.[1](rows);
+                props.selection?.[1](rows);
 
                 void props.onSelectionChange?.(rows);
             },
@@ -158,14 +158,14 @@ export const Table = <T,>(props: TableProps<T>) => {
         0;
 
     const getIsResizable = (column: TableColumn<T>) =>
-        (column.isResizable ?? false) && props.widthsSignal !== undefined;
+        (column.isResizable ?? false) && props.widths !== undefined;
 
     const resizeColumn = (column: TableColumn<T>, width: number) => {
         if (!getIsResizable(column) || getIsDisabled()) return;
 
         const next = TableUtils.getResizedWidth(column, width);
 
-        props.widthsSignal?.[1]({ ...getWidths(), [column.id]: next });
+        props.widths?.[1]({ ...getWidths(), [column.id]: next });
     };
 
     let resizeStartX = 0;
@@ -227,7 +227,7 @@ export const Table = <T,>(props: TableProps<T>) => {
     };
 
     const getIsReorderable = (column: TableColumn<T> | undefined) =>
-        column !== undefined && (column.isReorderable ?? false) && props.orderSignal !== undefined;
+        column !== undefined && (column.isReorderable ?? false) && props.order !== undefined;
 
     const moveColumn = (fromIndex: number, toIndex: number) => {
         const columns = getColumns();
@@ -241,7 +241,7 @@ export const Table = <T,>(props: TableProps<T>) => {
             toIndex,
         );
 
-        props.orderSignal?.[1](next);
+        props.order?.[1](next);
 
         void props.onOrderChange?.(next);
 
@@ -269,10 +269,10 @@ export const Table = <T,>(props: TableProps<T>) => {
         getGroupId: () => tableId,
         getLabel: () => access(props.ariaLabel),
         getRootRef: getHeaderRef,
-        getIsDisabled: () => getIsDisabled() || props.orderSignal === undefined,
+        getIsDisabled: () => getIsDisabled() || props.order === undefined,
         getKeyHint: () => getAnnouncements().keyHint,
         getAnnouncements,
-        computeCanAccept: () => !getIsDisabled() && props.orderSignal !== undefined,
+        computeCanAccept: () => !getIsDisabled() && props.order !== undefined,
         computePlaceAtPoint: (point) =>
             TableUtils.computeColumnPlaceAtPoint(getHeaderRects(), point, getSourceColumnIndex() ?? 0, getDirection()),
         computeNudgedPlace: (place, nudge) => TableUtils.computeColumnNudgedPlace(place, nudge, getColumns().length),
@@ -286,6 +286,12 @@ export const Table = <T,>(props: TableProps<T>) => {
     };
 
     CarrierSolidUtils.registerZone(zone);
+
+    createEffect(() => {
+        if (CarrierSolidUtils.getSourceZone() !== zone) return;
+
+        onCleanup(TableUtils.observeCarryCancel(zone));
+    });
 
     const getCarriedColumnId = createMemo(() =>
         CarrierSolidUtils.getSourceZone() === zone ? CarrierSolidUtils.getCarry()?.key : undefined,
@@ -627,7 +633,7 @@ export const Table = <T,>(props: TableProps<T>) => {
                 </div>
             </div>
 
-            <Show when={props.orderSignal !== undefined}>
+            <Show when={props.order !== undefined}>
                 <div id={hintId} class={styles.tableHint}>
                     {getAnnouncements().restingKeyHint}
                 </div>

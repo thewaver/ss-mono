@@ -3,7 +3,7 @@ import type { Signal } from "solid-js";
 import type { AccessorProps } from "@thewaver/ss-components-solid";
 
 export type AccordionExampleProps = AccessorProps<{
-    expandedSignal?: Signal<string[]>;
+    expanded?: Signal<string[]>;
 }>;
 
 export type AccordionDeferredExampleProps = AccordionExampleProps & {
@@ -17,5 +17,5 @@ export type AccordionGrowingExampleProps = AccordionExampleProps &
     }>;
 
 export type AccordionSinglePanelExampleProps = AccessorProps<{
-    expandedSignal?: Signal<boolean>;
+    expanded?: Signal<boolean>;
 }>;

@@ -18,5 +18,5 @@ export type BinarySwitchProps = Omit<InteractionWrapperProps<BinarySwitchFlags>,
 export type BinarySwitchPresetProps = Omit<BinarySwitchProps, "type" | "isSwitch" | "isChecked"> &
     AccessorProps<{
         /** Whether the switch is on. It is the only thing that turns it. */
-        checkedSignal: SignalSource<boolean>;
+        checked: SignalSource<boolean>;
     }>;

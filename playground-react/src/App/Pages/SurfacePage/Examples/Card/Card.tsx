@@ -46,7 +46,7 @@ export const CardExample = () => {
                     </div>
                     <div className={styles.surfaceCntent}>
                         <Preview
-                            expandedState={expandedState}
+                            expanded={expandedState}
                             collapsedHeight={COLLAPSED_HEIGHT}
                             renderContent={() => (
                                 <div className={styles.bios}>

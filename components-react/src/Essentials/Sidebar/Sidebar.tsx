@@ -17,7 +17,7 @@ export const Sidebar = (props: SidebarProps) => {
     const noPanelRef = useRef<HTMLElement | null>(null);
     const root = useElement(rootRef);
 
-    const isOwnerExpanded = props.expandedState?.[0] ?? false;
+    const isOwnerExpanded = props.expanded?.[0] ?? false;
 
     const peekingState = useState(false);
     const [isPeeking, setIsPeeking] = peekingState;

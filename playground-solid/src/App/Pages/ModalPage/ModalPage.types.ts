@@ -1,7 +1,7 @@
 import type { Signal } from "solid-js";
 
 export type ModalExampleProps = {
-    visibilitySignal: Signal<boolean>;
+    visibility: Signal<boolean>;
 };
 
 export type ModalDestructiveExampleProps = ModalExampleProps & {
@@ -9,5 +9,5 @@ export type ModalDestructiveExampleProps = ModalExampleProps & {
 };
 
 export type ModalLayeredExampleProps = ModalExampleProps & {
-    valueSignal: Signal<string | undefined>;
+    value: Signal<string | undefined>;
 };

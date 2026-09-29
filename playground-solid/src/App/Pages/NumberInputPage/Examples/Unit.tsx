@@ -17,7 +17,7 @@ type Props = NumberInputExampleProps;
 
 export const UnitExample = (props: Props) => (
     <NumberInput
-        valueSignal={props.valueSignal}
+        value={props.value}
         min={0}
         padding={() => FIELD_STEPPER_PADDING}
         gap={() => FIELD_GAP}

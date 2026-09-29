@@ -19,8 +19,8 @@ const STRESS_OPTION_HEIGHT = 100;
 const STRESS_GROUP_HEIGHT = 32;
 
 type Props = {
-    valueSignal: Signal<Delivery | undefined>;
-    visibilitySignal: Signal<boolean>;
+    value: Signal<Delivery | undefined>;
+    visibility: Signal<boolean>;
     options: MaybeAccessor<SelectItem<Delivery>[]>;
     hasGroups?: MaybeAccessor<boolean>;
     count: MaybeAccessor<number>;
@@ -32,8 +32,8 @@ export const VirtualizedExample = (props: Props) => {
     return (
         <div class={styles.column}>
             <Select
-                valueSignal={props.valueSignal}
-                visibilitySignal={props.visibilitySignal}
+                value={props.value}
+                visibility={props.visibility}
                 options={props.options}
                 ariaLabel={"Route"}
                 computeEstimatedOptionHeight={() => STRESS_OPTION_HEIGHT}

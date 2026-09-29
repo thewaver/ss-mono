@@ -10,9 +10,9 @@ type Props = RangeExampleProps;
 
 export const ErroredExample = (props: Props) => (
     <Range
-        valueState={props.valueState}
+        value={props.value}
         ariaLabel={"Errored range"}
-        hasError={props.valueState[0] > ERROR_ABOVE}
+        hasError={props.value[0] > ERROR_ABOVE}
         thumbSize={RANGE_THUMB_SIZE}
         renderContent={(renderProps) => <PageRangeContent renderProps={renderProps} />}
     />

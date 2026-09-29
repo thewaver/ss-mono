@@ -15,7 +15,7 @@ const EXAMPLES_ROOT = "/src/App/Pages/Carousels/DrumCarouselPage/Examples";
 export const DrumCarouselPage = () => {
     const controls = createCarouselsControls();
 
-    const getAxis = (): CarouselAxis => (controls.orientationSignal[0]() === "horizontal" ? "row" : "column");
+    const getAxis = (): CarouselAxis => (controls.orientation[0]() === "horizontal" ? "row" : "column");
 
     const steppedIndexSignal = createSignal(0);
     const rotatingIndexSignal = createSignal(0);
@@ -30,7 +30,7 @@ export const DrumCarouselPage = () => {
                 `slide ${steppedIndexSignal[0]() + 1} of ${controls.getSlideCount()} — the slides sit on the faces of a drum, turning about the axis the direction names and swiped along it`,
             component: () => (
                 <PageCarouselBox>
-                    <SteppedExample {...controls.getSharedProps()} indexSignal={steppedIndexSignal} axis={getAxis} />
+                    <SteppedExample {...controls.getSharedProps()} index={steppedIndexSignal} axis={getAxis} />
                 </PageCarouselBox>
             ),
             path: `${EXAMPLES_ROOT}/Stepped.tsx`,
@@ -44,9 +44,9 @@ export const DrumCarouselPage = () => {
                 <PageCarouselBox>
                     <RotatingExample
                         {...controls.getSharedProps()}
-                        indexSignal={rotatingIndexSignal}
-                        playbackSignal={rotatingPlayingSignal}
-                        autoplayDelayMs={controls.delaySignal[0]}
+                        index={rotatingIndexSignal}
+                        playback={rotatingPlayingSignal}
+                        autoplayDelayMs={controls.delay[0]}
                         axis={getAxis}
                     />
                 </PageCarouselBox>
@@ -62,7 +62,7 @@ export const DrumCarouselPage = () => {
                 <PageCarouselBox>
                     <NoControlsExample
                         {...controls.getSharedProps()}
-                        indexSignal={barelessIndexSignal}
+                        index={barelessIndexSignal}
                         axis={getAxis}
                     />
                 </PageCarouselBox>

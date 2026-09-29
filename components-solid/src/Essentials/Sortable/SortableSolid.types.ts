@@ -86,7 +86,7 @@ export type SortableProps<T> = Omit<InteractionWrapperProps<SortableFlags>, "ren
         renderMarker?: (getOrientation: () => SortableOrientation) => JSX.Element;
     }> & {
         /** The items, in their current order. It is the only thing that reorders them. */
-        itemsSignal: SignalSource<SortableItem<T>[]>;
+        items: SignalSource<SortableItem<T>[]>;
         /** Arranges the items, for a list that is something other than a straight run. */
         computeLayout?: PlacementLayoutFn;
         /** What the items do as the pointer nears them. */

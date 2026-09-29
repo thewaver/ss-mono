@@ -16,7 +16,7 @@ export const LabeledExample = (props: Props) => {
             <PageLabelCaption>Country</PageLabelCaption>
 
             <Select
-                valueState={props.valueState}
+                value={props.value}
                 options={COUNTRIES}
                 listAriaLabel={"Country"}
                 renderContent={(selectedOption, flags) => (

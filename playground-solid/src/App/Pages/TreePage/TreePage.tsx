@@ -66,7 +66,7 @@ export const TreePage = () => {
             name: "Default",
             readout: () =>
                 `value: ${defaultSignal[0]() ?? "undefined"} | expanded: ${JSON.stringify(defaultExpandedSignal[0]())} — right opens a branch, left closes it or climbs to the parent`,
-            component: () => <FilesExample valueSignal={defaultSignal} expandedSignal={defaultExpandedSignal} />,
+            component: () => <FilesExample value={defaultSignal} expanded={defaultExpandedSignal} />,
             path: `${EXAMPLES_ROOT}/Files.tsx`,
         },
         {
@@ -74,7 +74,7 @@ export const TreePage = () => {
             name: "Everything collapsed",
             readout: () =>
                 `value: ${collapsedSignal[0]() ?? "undefined"} | expanded: ${JSON.stringify(collapsedExpandedSignal[0]())} — asterisk opens every branch at the level focus is on`,
-            component: () => <FilesExample valueSignal={collapsedSignal} expandedSignal={collapsedExpandedSignal} />,
+            component: () => <FilesExample value={collapsedSignal} expanded={collapsedExpandedSignal} />,
             path: `${EXAMPLES_ROOT}/Files.tsx`,
         },
         {
@@ -83,7 +83,7 @@ export const TreePage = () => {
             readout: () =>
                 `value: ${rightToLeftSignal[0]() ?? "undefined"} | expanded: ${JSON.stringify(rightToLeftExpandedSignal[0]())} — the box around the tree sets dir="rtl", so left opens a branch and right closes it or climbs to the parent`,
             component: () => (
-                <RightToLeftExample valueSignal={rightToLeftSignal} expandedSignal={rightToLeftExpandedSignal} />
+                <RightToLeftExample value={rightToLeftSignal} expanded={rightToLeftExpandedSignal} />
             ),
             path: `${EXAMPLES_ROOT}/RightToLeft.tsx`,
         },
@@ -102,8 +102,8 @@ export const TreePage = () => {
                 `value: ${disabledSignal[0]() ?? "undefined"} — arrows skip index.ts and Lib, while what is inside Lib stays reachable`,
             component: () => (
                 <FilesExample
-                    valueSignal={disabledSignal}
-                    expandedSignal={disabledExpandedSignal}
+                    value={disabledSignal}
+                    expanded={disabledExpandedSignal}
                     nodes={() => FILES_WITH_DISABLED}
                 />
             ),
@@ -116,8 +116,8 @@ export const TreePage = () => {
                 `value: ${reachableSignal[0]() ?? "undefined"} — arrows stop on node_modules, hover explains why, and nothing opens it`,
             component: () => (
                 <FilesExample
-                    valueSignal={reachableSignal}
-                    expandedSignal={reachableExpandedSignal}
+                    value={reachableSignal}
+                    expanded={reachableExpandedSignal}
                     nodes={() => FILES_WITH_REACHABLE}
                 />
             ),
@@ -128,7 +128,7 @@ export const TreePage = () => {
             name: "Collapsed from outside",
             readout: () =>
                 `expanded: ${JSON.stringify(outsideExpandedSignal[0]())} — press the button, then focus a row inside Lib before the delay elapses; focus must land on Lib rather than on the page body`,
-            component: () => <OutsideExample valueSignal={outsideSignal} expandedSignal={outsideExpandedSignal} />,
+            component: () => <OutsideExample value={outsideSignal} expanded={outsideExpandedSignal} />,
             path: `${EXAMPLES_ROOT}/Outside.tsx`,
         },
         {
@@ -136,7 +136,7 @@ export const TreePage = () => {
             name: "Nodes that are links",
             readout: () =>
                 `value: ${linkSignal[0]() ?? "undefined"} — every leaf carries an href, so each one is an anchor and the branches stay plain`,
-            component: () => <LinksExample valueSignal={linkSignal} expandedSignal={linkExpandedSignal} />,
+            component: () => <LinksExample value={linkSignal} expanded={linkExpandedSignal} />,
             path: `${EXAMPLES_ROOT}/Links.tsx`,
         },
         {
@@ -145,7 +145,7 @@ export const TreePage = () => {
             readout: () =>
                 `value: ${customLinkSignal[0]() ?? "undefined"} — the same nodes rendered by a consumer's own link component`,
             component: () => (
-                <LinkComponentExample valueSignal={customLinkSignal} expandedSignal={customLinkExpandedSignal} />
+                <LinkComponentExample value={customLinkSignal} expanded={customLinkExpandedSignal} />
             ),
             path: `${EXAMPLES_ROOT}/LinkComponent.tsx`,
         },
@@ -154,7 +154,7 @@ export const TreePage = () => {
             name: "Branches that arrive later",
             readout: () =>
                 `expanded: ${JSON.stringify(lazyExpandedSignal[0]())} — packages and docs say they have children before they have them`,
-            component: () => <LazyExample valueSignal={lazySignal} expandedSignal={lazyExpandedSignal} />,
+            component: () => <LazyExample value={lazySignal} expanded={lazyExpandedSignal} />,
             path: `${EXAMPLES_ROOT}/Lazy.tsx`,
         },
         {
@@ -165,8 +165,8 @@ export const TreePage = () => {
             component: () => (
                 <VirtualizedExample
                     nodes={() => stressFiles}
-                    valueSignal={stressSignal}
-                    expandedSignal={stressExpandedSignal}
+                    value={stressSignal}
+                    expanded={stressExpandedSignal}
                 />
             ),
             path: `${EXAMPLES_ROOT}/Virtualized.tsx`,
@@ -177,7 +177,7 @@ export const TreePage = () => {
             name: "A tree drawn outward",
             readout: () =>
                 `value: ${radialSignal[0]() ?? "undefined"} — the layout is told which node each node hangs from, so children share the slice their parent was given, and every rank sits a ring further out whoever it hangs from`,
-            component: () => <RadialExample valueSignal={radialSignal} expandedSignal={radialExpandedSignal} />,
+            component: () => <RadialExample value={radialSignal} expanded={radialExpandedSignal} />,
             path: `${EXAMPLES_ROOT}/Radial.tsx`,
         },
         {
@@ -185,7 +185,7 @@ export const TreePage = () => {
             name: "Record values",
             readout: () =>
                 `value: ${recordSignal[0]()?.name ?? "undefined"} | expanded: ${recordExpandedSignal[0]().length} branch(es) — the value is the record itself, not a name`,
-            component: () => <RecordValuesExample valueSignal={recordSignal} expandedSignal={recordExpandedSignal} />,
+            component: () => <RecordValuesExample value={recordSignal} expanded={recordExpandedSignal} />,
             path: `${EXAMPLES_ROOT}/RecordValues.tsx`,
         },
     ]);

@@ -22,14 +22,14 @@ export const ColorAreaPage = () => {
     const isOpenState = useState(false);
     const hueState = useState(STARTING_PICKER_HSV.h);
 
-    const bareProps: ColorAreaExampleProps = { hsvState: bareState };
+    const bareProps: ColorAreaExampleProps = { hsv: bareState };
 
-    const disabledProps: ColorAreaExampleProps = { hsvState: disabledState, isDisabled: true };
+    const disabledProps: ColorAreaExampleProps = { hsv: disabledState, isDisabled: true };
 
     const dropdownProps: ColorAreaDropdownExampleProps = {
-        hsvState: pickerState,
-        isOpenState,
-        hueState,
+        hsv: pickerState,
+        isOpen: isOpenState,
+        hue: hueState,
         popupId,
     };
 

@@ -91,7 +91,7 @@ const SpotSmear = (props: SpotSmearProps) => {
     const ref = SVGDefsReactUtils.useElementRef(props.element);
     const { reading, isPointerPresent } = PointerTrackerReactUtils.usePointerReading(ref);
     const frameMs = SVGDefsReactUtils.useFrameMs(clock);
-    const [stamps, setStamps] = useState(NO_STAMPS);
+    const [stamps] = useState(() => [...NO_STAMPS]);
     const motionRef = useRef<TrailMotion>({
         lastOrigin: undefined,
         lastMovedMs: undefined,
@@ -138,7 +138,7 @@ const SpotSmear = (props: SpotSmearProps) => {
             ),
         };
 
-        setStamps((previous) => previous.map((entry, index) => (index === tick % STAMP_COUNT ? stamp : entry)));
+        stamps[tick % STAMP_COUNT] = stamp;
     }, [frameMs, reading, isPointerPresent]);
 
     const elementSize = (props.opts?.circular ?? DEFAULTS.circular) ? props.defs.getSize() : undefined;

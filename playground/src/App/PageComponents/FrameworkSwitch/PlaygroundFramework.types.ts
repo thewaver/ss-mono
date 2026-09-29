@@ -1,1 +1,1 @@
-export type PlaygroundFramework = "solid" | "react";
+export type PlaygroundFramework = "solid" | "react" | "vue" | "svelte";

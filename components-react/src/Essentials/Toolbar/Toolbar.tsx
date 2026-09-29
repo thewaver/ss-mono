@@ -40,7 +40,7 @@ export const ToolbarComposite = <T,>(props: ToolbarCompositeProps<T>) => {
     const gap = props.gap ?? TOOLBAR_DEFAULTS.gap;
     const actions: ToolbarAction<T>[] = props.actions;
     const actionCount = actions.length;
-    const pressedValues = props.role === "toolbar" ? props.pressedValuesState?.[0] : undefined;
+    const pressedValues = props.role === "toolbar" ? props.pressedValues?.[0] : undefined;
     const isPressable = pressedValues !== undefined;
 
     const computeLayout = props.computeLayout;
@@ -166,7 +166,7 @@ export const ToolbarComposite = <T,>(props: ToolbarCompositeProps<T>) => {
     };
 
     const pressAction = (buttonProps: ToolbarButtonsProps<T>, value: T) => {
-        const pressedValuesState = buttonProps.pressedValuesState;
+        const pressedValuesState = buttonProps.pressedValues;
 
         if (pressedValuesState) {
             pressedValuesState[1](
@@ -212,8 +212,8 @@ export const ToolbarComposite = <T,>(props: ToolbarCompositeProps<T>) => {
                 isDisabled={word.isDisabled ?? false}
                 isFocusableWhenDisabled={word.isReachableWhenDisabled ?? false}
                 isTabbable={index === rovingStop}
-                visibilityState={createStopVisibility(index)}
-                checkedState={menuProps.checkedState}
+                visibility={createStopVisibility(index)}
+                checked={menuProps.checked}
                 submenuOffset={menuProps.submenuOffset}
                 triggerRole={WORD_ROLE}
                 ref={(element) => setItemRef(index, element)}
@@ -286,8 +286,8 @@ export const ToolbarComposite = <T,>(props: ToolbarCompositeProps<T>) => {
                     items={overflowItems}
                     ariaLabel={props.overflowAriaLabel}
                     isTabbable={rovingStop === OVERFLOW_STOP}
-                    visibilityState={createStopVisibility(OVERFLOW_STOP)}
-                    checkedState={props.role === "menubar" ? props.checkedState : props.pressedValuesState}
+                    visibility={createStopVisibility(OVERFLOW_STOP)}
+                    checked={props.role === "menubar" ? props.checked : props.pressedValues}
                     submenuOffset={props.role === "menubar" ? props.submenuOffset : undefined}
                     triggerRole={isMenubar ? WORD_ROLE : undefined}
                     ref={(element) => {

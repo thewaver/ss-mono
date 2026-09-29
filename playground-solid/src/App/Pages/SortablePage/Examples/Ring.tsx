@@ -37,7 +37,7 @@ const renderCard = (getItem: Accessor<SortableItem<Card>>, getFlags: () => Inter
 );
 
 type Props = {
-    itemsSignal: Signal<SortableItem<Card>[]>;
+    items: Signal<SortableItem<Card>[]>;
 };
 
 export const RingExample = (props: Props) => (
@@ -47,7 +47,7 @@ export const RingExample = (props: Props) => (
             ariaLabel={"Ring"}
             announcements={SORTABLE_ANNOUNCEMENTS}
             gap={LIST_GAP}
-            itemsSignal={props.itemsSignal}
+            items={props.items}
             computeLayout={RING_LAYOUT}
             computeItemKey={computeCardKey}
             computeItemLabel={computeCardLabel}

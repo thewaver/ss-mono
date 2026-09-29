@@ -22,7 +22,7 @@ export type RadioGroupProps<T> = ParentProps<
         transitionDurationMs?: number;
     }> & {
         /** Which option is picked. It is the only thing that picks one. */
-        valueSignal: SignalSource<T>;
+        value: SignalSource<T>;
         /** Arranges the options, for a group that is something other than a straight run. */
         computeLayout?: PlacementLayoutFn;
         /** What the options do as the pointer nears them. */

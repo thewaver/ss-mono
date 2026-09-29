@@ -110,7 +110,7 @@ const ToastsItem = <T,>(props: ToastsItemProps<T>) => {
 export const Toasts = <T,>(props: ToastsProps<T>) => {
     const viewportContext = useViewportContext();
 
-    const [toasts, setToasts] = props.toastsState;
+    const [toasts, setToasts] = props.toasts;
 
     const rootRef = useRef<HTMLDivElement | null>(null);
     const root = useElement(rootRef);
@@ -178,10 +178,10 @@ export const Toasts = <T,>(props: ToastsProps<T>) => {
     }, [toasts, props.limit, overflow]);
 
     const dismiss = (id: string) => {
-        const current = latest.current.toastsState[0];
+        const current = latest.current.toasts[0];
         const next = ToastUtils.withoutToast(current, id);
 
-        if (next !== current) latest.current.toastsState[1](next);
+        if (next !== current) latest.current.toasts[1](next);
     };
 
     const handleExitEnd = (id: string) => {

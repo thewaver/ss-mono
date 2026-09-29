@@ -23,7 +23,7 @@ export type ParticleSpawnerProps = AccessorProps<{
     /** How the rounds follow each other — in bursts, one at a time, or without a pause. */
     spawnIterationPatterns?: ParticleSpawnIterationPattern[];
     /** Whether particles are being sent. It is the only thing that starts or stops them. */
-    playbackSignal?: SignalSource<boolean>;
+    playback?: SignalSource<boolean>;
     /** Which target one particle is aimed at. */
     computeTarget?: (index: number, targetCount: number) => number;
     /**

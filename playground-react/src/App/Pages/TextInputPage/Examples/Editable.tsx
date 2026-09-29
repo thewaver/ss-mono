@@ -20,17 +20,17 @@ export const EditableExample = (props: Props) => {
 
     const buttonRef = useRef<HTMLElement>(null);
     const inputRef = useRef<HTMLElement>(null);
-    const isEditingRef = useRef(props.editingState[0]);
-    const focusedForRef = useRef(props.editingState[0]);
+    const isEditingRef = useRef(props.editing[0]);
+    const focusedForRef = useRef(props.editing[0]);
 
-    const isEditing = props.editingState[0];
+    const isEditing = props.editing[0];
 
     isEditingRef.current = isEditing;
 
     const startEditing = () => {
-        draftState[1](props.valueState[0]);
+        draftState[1](props.value[0]);
         isEditingRef.current = true;
-        props.editingState[1](true);
+        props.editing[1](true);
     };
 
     const finishEditing = (isCommitting: boolean) => {
@@ -38,9 +38,9 @@ export const EditableExample = (props: Props) => {
 
         isEditingRef.current = false;
 
-        if (isCommitting) props.valueState[1](draftState[0]);
+        if (isCommitting) props.value[1](draftState[0]);
 
-        props.editingState[1](false);
+        props.editing[1](false);
     };
 
     useEffect(() => {
@@ -57,10 +57,10 @@ export const EditableExample = (props: Props) => {
                 ref={(element) => {
                     buttonRef.current = element;
                 }}
-                ariaLabel={`Edit name, ${props.valueState[0]}`}
+                ariaLabel={`Edit name, ${props.value[0]}`}
                 onClick={startEditing}
                 renderContent={(flags) => (
-                    <PageInlineEditContent flags={flags}>{props.valueState[0]}</PageInlineEditContent>
+                    <PageInlineEditContent flags={flags}>{props.value[0]}</PageInlineEditContent>
                 )}
             />
         );
@@ -85,7 +85,7 @@ export const EditableExample = (props: Props) => {
                 ref={(element) => {
                     inputRef.current = element;
                 }}
-                valueState={draftState}
+                value={draftState}
                 padding={FIELD_PADDING}
                 gap={FIELD_GAP}
                 ariaLabel={"Name"}

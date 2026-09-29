@@ -9,8 +9,8 @@ import { InventoryExample } from "./Inventory";
 
 type Props = {
     groupId: string;
-    packSignal: Signal<SortableGridItem<Gear>[]>;
-    sideSignal: Signal<SortableGridItem<Gear>[]>;
+    pack: Signal<SortableGridItem<Gear>[]>;
+    side: Signal<SortableGridItem<Gear>[]>;
     sideLabel: string;
     sideEmptyText: string;
     isSideNarrow?: boolean;
@@ -25,7 +25,7 @@ export const PairExample = (props: Props) => (
 
             <InventoryExample
                 groupId={props.groupId}
-                itemsSignal={props.packSignal}
+                items={props.pack}
                 ariaLabel={"Pack"}
                 emptyText={"Empty pack"}
                 isTurnable={true}
@@ -37,7 +37,7 @@ export const PairExample = (props: Props) => (
 
             <InventoryExample
                 groupId={props.groupId}
-                itemsSignal={props.sideSignal}
+                items={props.side}
                 ariaLabel={props.sideLabel}
                 emptyText={props.sideEmptyText}
                 columns={props.isSideNarrow ? QUIVER_COLUMNS : STASH_COLUMNS}

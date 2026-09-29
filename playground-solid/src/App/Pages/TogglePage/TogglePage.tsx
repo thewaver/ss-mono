@@ -32,14 +32,14 @@ export const TogglePage = () => {
             key: "default",
             name: "Default",
             readout: () => `on: ${defaultSignal[0]()}`,
-            component: () => <DefaultExample checkedSignal={defaultSignal} />,
+            component: () => <DefaultExample checked={defaultSignal} />,
             path: `${EXAMPLES_ROOT}/Default.tsx`,
         },
         {
             key: "decorated",
             name: "Decorated",
             readout: () => `on: ${decoratedSignal[0]()}`,
-            component: () => <DecoratedExample checkedSignal={decoratedSignal} />,
+            component: () => <DecoratedExample checked={decoratedSignal} />,
             path: `${EXAMPLES_ROOT}/Decorated.tsx`,
         },
         {
@@ -49,9 +49,9 @@ export const TogglePage = () => {
                 `mixed: ${getIsAllMixed()} | all: ${allSignal[0]()} | children: ${firstChildSignal[0]()}, ${secondChildSignal[0]()}`,
             component: () => (
                 <MixedExample
-                    allSignal={allSignal}
-                    firstChildSignal={firstChildSignal}
-                    secondChildSignal={secondChildSignal}
+                    all={allSignal}
+                    firstChild={firstChildSignal}
+                    secondChild={secondChildSignal}
                     isMixed={getIsAllMixed}
                 />
             ),
@@ -61,21 +61,21 @@ export const TogglePage = () => {
             key: "disabled",
             name: "Disabled",
             readout: () => `on: ${disabledSignal[0]()}`,
-            component: () => <DisabledExample checkedSignal={disabledSignal} />,
+            component: () => <DisabledExample checked={disabledSignal} />,
             path: `${EXAMPLES_ROOT}/Disabled.tsx`,
         },
         {
             key: "reachable",
             name: "Disabled + reachable",
             readout: () => `on: ${reachableSignal[0]()}`,
-            component: () => <ReachableExample checkedSignal={reachableSignal} />,
+            component: () => <ReachableExample checked={reachableSignal} />,
             path: `${EXAMPLES_ROOT}/Reachable.tsx`,
         },
         {
             key: "errored",
             name: "Error",
             readout: () => `on: ${erroredSignal[0]()}`,
-            component: () => <ErroredExample checkedSignal={erroredSignal} />,
+            component: () => <ErroredExample checked={erroredSignal} />,
             path: `${EXAMPLES_ROOT}/Errored.tsx`,
         },
     ]);

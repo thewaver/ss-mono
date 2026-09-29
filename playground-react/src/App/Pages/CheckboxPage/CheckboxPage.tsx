@@ -40,14 +40,14 @@ export const CheckboxPage = () => {
             key: "default",
             name: "Default",
             readout: () => `checked: ${defaultState[0]}`,
-            component: () => <DefaultExample checkedState={defaultState} />,
+            component: () => <DefaultExample checked={defaultState} />,
             path: `${EXAMPLES_ROOT}/Default.tsx`,
         },
         {
             key: "decorated",
             name: "Decorated",
             readout: () => `checked: ${decoratedState[0]}`,
-            component: () => <DecoratedExample checkedState={decoratedState} />,
+            component: () => <DecoratedExample checked={decoratedState} />,
             path: `${EXAMPLES_ROOT}/Decorated.tsx`,
         },
         {
@@ -57,9 +57,9 @@ export const CheckboxPage = () => {
                 `mixed: ${isAllMixed} | all: ${allState[0]} | children: ${firstChildState[0]}, ${secondChildState[0]}`,
             component: () => (
                 <MixedExample
-                    allState={allState}
-                    firstChildState={firstChildState}
-                    secondChildState={secondChildState}
+                    all={allState}
+                    firstChild={firstChildState}
+                    secondChild={secondChildState}
                     isMixed={isAllMixed}
                 />
             ),
@@ -70,28 +70,28 @@ export const CheckboxPage = () => {
             name: "Refused write",
             readout: () =>
                 `email: ${emailState[0]} | sms: ${smsState[0]} — whichever is the last one on refuses to go off`,
-            component: () => <RefusedWriteExample emailState={emailState} smsState={smsState} />,
+            component: () => <RefusedWriteExample email={emailState} sms={smsState} />,
             path: `${EXAMPLES_ROOT}/RefusedWrite.tsx`,
         },
         {
             key: "disabled",
             name: "Disabled",
             readout: () => `checked: ${disabledState[0]}`,
-            component: () => <DisabledExample checkedState={disabledState} />,
+            component: () => <DisabledExample checked={disabledState} />,
             path: `${EXAMPLES_ROOT}/Disabled.tsx`,
         },
         {
             key: "reachable",
             name: "Disabled + reachable",
             readout: () => `checked: ${reachableState[0]}`,
-            component: () => <ReachableExample checkedState={reachableState} />,
+            component: () => <ReachableExample checked={reachableState} />,
             path: `${EXAMPLES_ROOT}/Reachable.tsx`,
         },
         {
             key: "errored",
             name: "Error",
             readout: () => `checked: ${erroredState[0]}`,
-            component: () => <ErroredExample checkedState={erroredState} />,
+            component: () => <ErroredExample checked={erroredState} />,
             path: `${EXAMPLES_ROOT}/Errored.tsx`,
         },
     ];

@@ -52,9 +52,9 @@ export type TrailProps = {
      * With a lone traveler it is that traveler's place along the path. With followers on a path that stops,
      * the run lasts until the last of them arrives, so `1` is everybody at the end.
      */
-    progressState?: readonly [number, (value: number) => void];
+    progress?: readonly [number, (value: number) => void];
     /** Whether the traveler is walking. It is the only thing that starts or stops it. */
-    playbackState?: readonly [boolean, (value: boolean) => void];
+    playback?: readonly [boolean, (value: boolean) => void];
     /** Draws the path itself, where it should be visible. */
     renderTrack?: (path: string) => ReactNode;
     /**

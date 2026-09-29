@@ -8,7 +8,7 @@ import type { AccessorProps, SignalSource } from "../../../Utils/typeUtils";
 
 export type TimeInputProps = Omit<
     TextFieldProps,
-    | "valueSignal"
+    | "value"
     | "element"
     | "type"
     | "inputMode"
@@ -42,7 +42,7 @@ export type TimeInputProps = Omit<
          */
         segmentHints: Record<TimeValueUnit, string>;
         /** The time. It is the only thing that changes it. */
-        valueSignal: SignalSource<TimeValue | undefined>;
+        value: SignalSource<TimeValue | undefined>;
         /** Draws whatever sits after the field's text, inside the field. */
         renderTrailing?: (getFlags: () => InteractionFlags<TextFieldFlags>, meridiem: TimeInputMeridiem) => JSX.Element;
     }>;

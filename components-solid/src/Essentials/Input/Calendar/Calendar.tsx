@@ -42,7 +42,7 @@ const CalendarDay = (props: CalendarDayProps) => {
 export const CalendarComposite = (props: CalendarCompositeProps) => {
     onMount(() => LiveAnnouncerUtils.reserve("polite"));
 
-    const monthSignal = accessSignal(() => props.monthSignal);
+    const monthSignal = accessSignal(() => props.month);
 
     const gridId = createUniqueId();
 
@@ -239,7 +239,7 @@ export const CalendarComposite = (props: CalendarCompositeProps) => {
 };
 
 export const Calendar = (props: CalendarProps) => {
-    const valueSignal = accessSignal(() => props.valueSignal);
+    const valueSignal = accessSignal(() => props.value);
 
     const getPrecision = () => access(props.precision) ?? CALENDAR_DEFAULTS.precision;
 

@@ -14,12 +14,12 @@ export const TextOnlyExample = (props: Props) => (
         <Button
             renderContent={(flags) => <PageButtonContent flags={flags}>Open notice</PageButtonContent>}
             onClick={() => {
-                props.visibilityState[1](true);
+                props.visibility[1](true);
             }}
         />
 
         <Modal
-            visibilityState={props.visibilityState}
+            visibility={props.visibility}
             ariaLabelledBy={TEXT_ONLY_TITLE_ID}
             renderOverlay={(visibilityTarget, transitionDurationMs) => (
                 <PageModalOverlay visibilityTarget={visibilityTarget} transitionDurationMs={transitionDurationMs} />

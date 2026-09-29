@@ -27,6 +27,6 @@ export type SlideButtonProps = Omit<InteractionWrapperProps<SlideButtonRenderPro
             Pick<InteractionControlProps<SlideButtonRenderProps>, "id" | "ariaLabel" | "renderContent"> &
             SlideButtonState & {
                 /** How far the thumb has been slid. It is the only thing that moves it. */
-                progressSignal?: SignalSource<number>;
+                progress?: SignalSource<number>;
             }
     >;

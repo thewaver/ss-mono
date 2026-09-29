@@ -24,7 +24,7 @@ export const LabeledExample = (props: Props) => (
         <PageLabelCaption>Guests</PageLabelCaption>
 
         <NumberInput
-            valueSignal={props.valueSignal}
+            value={props.value}
             min={() => GUEST_MIN}
             max={() => GUEST_MAX}
             padding={() => FIELD_STEPPER_PADDING}

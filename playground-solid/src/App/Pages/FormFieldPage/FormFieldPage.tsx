@@ -29,7 +29,7 @@ export const FormFieldPage = () => {
     const formSignal = createSignal("");
 
     const getExamples = createMemo(() => {
-        const commonProps: Omit<FormFieldExampleProps, "valueSignal"> = {
+        const commonProps: Omit<FormFieldExampleProps, "value"> = {
             orientation: getOrientation,
             gap: getGap,
             message: getMessage,
@@ -44,7 +44,7 @@ export const FormFieldPage = () => {
                     getMessage().length > 0
                         ? "the message has an id of its own and the control inside is pointed at it, without either of them being told the other's name"
                         : "with no message there is no element and no reference — an empty message is not an empty box",
-                component: () => <DefaultExample {...commonProps} valueSignal={defaultSignal} />,
+                component: () => <DefaultExample {...commonProps} value={defaultSignal} />,
                 path: `${EXAMPLES_ROOT}/Default.tsx`,
             },
             {
@@ -52,7 +52,7 @@ export const FormFieldPage = () => {
                 name: "Around a control it has never seen",
                 readout: () =>
                     "a plain input, which knows nothing about any of this — one call to FormFieldSolidUtils.resolveAriaDescribedBy gets it the same wiring the library's own controls get for free",
-                component: () => <ForeignExample {...commonProps} valueSignal={foreignSignal} />,
+                component: () => <ForeignExample {...commonProps} value={foreignSignal} />,
                 path: `${EXAMPLES_ROOT}/Foreign.tsx`,
             },
             {
@@ -60,7 +60,7 @@ export const FormFieldPage = () => {
                 name: "Inside a form",
                 readout: () =>
                     "turn the error on — the field tells the form, and the form's own validity is what disables the button; nothing here reads the other's state directly",
-                component: () => <InFormExample {...commonProps} valueSignal={formSignal} />,
+                component: () => <InFormExample {...commonProps} value={formSignal} />,
                 path: `${EXAMPLES_ROOT}/InForm.tsx`,
             },
         ];

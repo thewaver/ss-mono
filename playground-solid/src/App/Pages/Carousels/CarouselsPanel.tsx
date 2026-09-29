@@ -26,13 +26,13 @@ export const PageCarouselsPanel = (props: Props) => {
         <PagePropsPanel scope={"global"}>
             <PageProp key={"slideCount"} label={"Slide count"} hint={"How many slides the carousel holds."}>
                 <PageNumberField
-                    value={controls.slideCountSignal[0]}
+                    value={controls.slideCount[0]}
                     min={() => CarouselKnobs.MIN_SLIDE_COUNT}
                     max={() => CarouselKnobs.MAX_SLIDE_COUNT}
                     step={() => CarouselKnobs.SLIDE_COUNT_STEP}
                     width={() => FIELD_WIDTH}
                     ariaLabel={"Slide count"}
-                    onInput={controls.slideCountSignal[1]}
+                    onInput={controls.slideCount[1]}
                 />
             </PageProp>
 
@@ -43,13 +43,13 @@ export const PageCarouselsPanel = (props: Props) => {
                     hint={"How long a slide is held before the carousel moves to the next one on its own."}
                 >
                     <PageNumberField
-                        value={controls.delaySignal[0]}
+                        value={controls.delay[0]}
                         min={() => CarouselKnobs.MIN_DELAY_MS}
                         max={() => CarouselKnobs.MAX_DELAY_MS}
                         step={() => CarouselKnobs.DELAY_STEP_MS}
                         width={() => FIELD_WIDTH}
                         ariaLabel={"RotatorUtils delay in milliseconds"}
-                        onInput={controls.delaySignal[1]}
+                        onInput={controls.delay[1]}
                     />
                 </PageProp>
             </Show>
@@ -60,12 +60,12 @@ export const PageCarouselsPanel = (props: Props) => {
                 hint={"Which way the slides run, and so which way the arrows and the arrow keys move."}
             >
                 <PageSelectField
-                    value={controls.orientationSignal[0]}
+                    value={controls.orientation[0]}
                     values={() => CAROUSEL_ORIENTATIONS}
                     computeLabel={(orientation) => ORIENTATION_LABELS[orientation]}
                     width={() => ORIENTATION_FIELD_WIDTH}
                     ariaLabel={"Orientation"}
-                    onChange={(orientation) => controls.orientationSignal[1](() => orientation)}
+                    onChange={(orientation) => controls.orientation[1](() => orientation)}
                 />
             </PageProp>
 
@@ -78,9 +78,9 @@ export const PageCarouselsPanel = (props: Props) => {
                     }
                 >
                     <PageCheckField
-                        value={controls.isLoopingSignal[0]}
+                        value={controls.isLooping[0]}
                         ariaLabel={"Looping"}
-                        onChange={controls.isLoopingSignal[1]}
+                        onChange={controls.isLooping[1]}
                     />
                 </PageProp>
             </Show>
@@ -91,9 +91,9 @@ export const PageCarouselsPanel = (props: Props) => {
                 hint={"Turns the carousel off, so neither its controls nor its swipes do anything."}
             >
                 <PageCheckField
-                    value={controls.isDisabledSignal[0]}
+                    value={controls.isDisabled[0]}
                     ariaLabel={"Disabled"}
-                    onChange={controls.isDisabledSignal[1]}
+                    onChange={controls.isDisabled[1]}
                 />
             </PageProp>
         </PagePropsPanel>

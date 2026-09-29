@@ -96,9 +96,9 @@ export type SelectCompositeProps<T> = Omit<InteractionWrapperProps<SelectFlags>,
         /** Styles the field's text against its current state. */
         computeTextStyle?: (getFlags: () => InteractionFlags<SelectFlags>) => TextFieldTextStyle;
         /** Whether the list is open. It is the only thing that opens or closes it. */
-        visibilitySignal?: SignalSource<boolean>;
+        visibility?: SignalSource<boolean>;
         /** What the reader has typed to narrow the list by. It is the only thing that changes the query. */
-        querySignal?: SignalSource<string>;
+        query?: SignalSource<string>;
         /**
          * Guesses how tall an option will be before it is drawn, which is what lets a long list render only what is on
          * screen.
@@ -162,7 +162,7 @@ export type SelectPresetProps<T> = Omit<
 
 export type SelectProps<T> = SelectPresetProps<T> & {
     /** Which option is picked. It is the only thing that picks one. */
-    valueSignal: SignalSource<T | undefined>;
+    value: SignalSource<T | undefined>;
     /** Draws the field, and is handed the one option that is picked. */
     renderContent: (
         getSelectedOption: Accessor<SelectOption<T> | undefined>,

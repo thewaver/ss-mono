@@ -34,7 +34,7 @@ const renderStep = (
 type Props = SVGFiltersStackExampleProps;
 
 const StepList = (props: {
-    itemsSignal: Signal<SortableItem<SVGFiltersStep>[]>;
+    items: Signal<SortableItem<SVGFiltersStep>[]>;
     caption: string;
     emptyText: string;
 }) => (
@@ -49,7 +49,7 @@ const StepList = (props: {
             sizing={"fill"}
             gap={STEP_LIST_GAP}
             minHeight={STEP_LIST_MIN_HEIGHT}
-            itemsSignal={props.itemsSignal}
+            items={props.items}
             computeItemKey={computeStepKey}
             computeItemLabel={computeStepLabel}
             renderItem={renderStep}
@@ -61,7 +61,7 @@ const StepList = (props: {
 );
 
 export const StackExample = (props: Props) => {
-    const [getApplied] = props.appliedSignal;
+    const [getApplied] = props.applied;
 
     return (
         <div class={styles.stack}>
@@ -81,9 +81,9 @@ export const StackExample = (props: Props) => {
             />
 
             <div class={styles.stepLists}>
-                <StepList itemsSignal={props.appliedSignal} caption={"Applied"} emptyText={"Nothing applied"} />
+                <StepList items={props.applied} caption={"Applied"} emptyText={"Nothing applied"} />
 
-                <StepList itemsSignal={props.unusedSignal} caption={"Left out"} emptyText={"Drop here"} />
+                <StepList items={props.unused} caption={"Left out"} emptyText={"Drop here"} />
             </div>
         </div>
     );

@@ -25,18 +25,18 @@ export type TableOrderProps =
           /**
            * Everything the table says aloud while a column is reordered, and the key hints and place names those
            * announcements are built from. There is no default: every word a reader hears comes from here. It is
-           * required exactly when `orderState` is given, because that is the only table that speaks any of it.
+           * required exactly when `order` is given, because that is the only table that speaks any of it.
            */
           announcements: TableAnnouncements;
           /**
            * The order the columns are shown in, by column id, with its setter. It is the only thing that reorders
            * them.
            */
-          orderState: readonly [string[], (order: string[]) => void];
+          order: readonly [string[], (order: string[]) => void];
       }
     | {
           announcements?: undefined;
-          orderState?: undefined;
+          order?: undefined;
       };
 
 export type TableProps<T> = TableOrderProps & {
@@ -59,9 +59,9 @@ export type TableProps<T> = TableOrderProps & {
     /** Turns the table off, so nothing in it sorts, resizes, reorders or selects. */
     isDisabled?: boolean;
     /** Which column the table is sorted by and which way, with its setter. It is the only thing that sorts it. */
-    sortState?: readonly [TableSort | undefined, (sort: TableSort | undefined) => void];
+    sort?: readonly [TableSort | undefined, (sort: TableSort | undefined) => void];
     /** How wide each column is, by column id, with its setter. It is the only thing that resizes them. */
-    widthsState?: readonly [Record<string, number>, (widths: Record<string, number>) => void];
+    widths?: readonly [Record<string, number>, (widths: Record<string, number>) => void];
     /**
      * Guesses how tall a row will be before it is drawn, which is what lets a long table render only what is on screen.
      */
@@ -79,7 +79,7 @@ export type TableProps<T> = TableOrderProps & {
     /** The rows, in the order they are shown. */
     rows: T[];
     /** Which rows are selected, with its setter. It is the only thing that selects them. */
-    selectionState?: readonly [T[], (rows: T[]) => void];
+    selection?: readonly [T[], (rows: T[]) => void];
     /** Names one row for assistive technology, so a reader hears what the row is rather than its number. */
     computeRowAriaLabel?: (row: T, index: number) => string;
     /** Runs when a row is activated, by pointer or by key. */

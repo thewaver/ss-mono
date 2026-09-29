@@ -16,7 +16,7 @@ export type TimeInputMeridiem = {
 
 export type TimeInputProps = Omit<
     TextFieldProps,
-    | "valueState"
+    | "value"
     | "element"
     | "type"
     | "inputMode"
@@ -49,7 +49,7 @@ export type TimeInputProps = Omit<
      */
     segmentHints: Record<TimeValueUnit, string>;
     /** The time, and how to change it. It is the only thing that changes it. */
-    valueState: readonly [TimeValue | undefined, (value: TimeValue | undefined) => void];
+    value: readonly [TimeValue | undefined, (value: TimeValue | undefined) => void];
     /** Draws whatever sits after the field's text, inside the field. */
     renderTrailing?: (flags: InteractionFlags<TextFieldFlags>, meridiem: TimeInputMeridiem) => ReactNode;
 };

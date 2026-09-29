@@ -17,13 +17,13 @@ export const MonthPickerExample = (props: Props) => (
             precision={"month"}
             previousLabel={"Previous year"}
             nextLabel={"Next year"}
-            monthState={props.monthState}
+            month={props.month}
         />
 
         <Calendar
             precision={"month"}
-            valueState={props.valueState}
-            monthState={props.monthState}
+            value={props.value}
+            month={props.month}
             today={TODAY}
             locale={LOCALE}
             ariaLabel={"Choose a month"}

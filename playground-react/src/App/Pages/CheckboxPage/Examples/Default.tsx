@@ -7,7 +7,7 @@ type Props = CheckboxExampleProps;
 
 export const DefaultExample = (props: Props) => (
     <Checkbox
-        checkedState={props.checkedState}
+        checked={props.checked}
         ariaLabel={"Default checkbox"}
         renderContent={(flags) => <PageCheckboxContent flags={flags} />}
     />

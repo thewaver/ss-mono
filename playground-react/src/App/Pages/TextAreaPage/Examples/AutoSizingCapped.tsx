@@ -15,7 +15,7 @@ type Props = TextAreaExampleProps;
 
 export const AutoSizingCappedExample = (props: Props) => (
     <TextArea
-        valueState={props.valueState}
+        value={props.value}
         isAutoSizing={true}
         minRows={MIN_ROWS}
         maxRows={MAX_ROWS}

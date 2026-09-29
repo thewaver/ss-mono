@@ -9,7 +9,7 @@ type Props = LabelExampleProps;
 export const DisabledExample = (props: Props) => (
     <Label>
         <Checkbox
-            checkedState={props.checkedState}
+            checked={props.checked}
             isDisabled={true}
             renderContent={(flags) => <PageCheckboxContent flags={flags} />}
         />

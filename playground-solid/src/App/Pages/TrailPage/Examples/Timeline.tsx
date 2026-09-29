@@ -20,7 +20,7 @@ type Props = TrailExampleProps;
 export const TimelineExample = (props: Props) => {
     const [getController, setController] = createSignal<TrailController>();
 
-    const progressSignal = accessSignal(() => props.progressSignal);
+    const progressSignal = accessSignal(() => props.progress);
 
     return (
         <div class={styles.stack}>
@@ -31,8 +31,8 @@ export const TimelineExample = (props: Props) => {
                     durationMs={props.durationMs}
                     isLooping={props.isLooping}
                     isTurning={props.isTurning}
-                    progressSignal={props.progressSignal}
-                    playbackSignal={props.playbackSignal}
+                    progress={props.progress}
+                    playback={props.playback}
                     renderTrack={(getPath) => <PageTrailTrack path={getPath} />}
                     renderTraveler={() => <PageTrailMarker id={MARKER_ID} />}
                     onMount={setController}
@@ -47,7 +47,7 @@ export const TimelineExample = (props: Props) => {
                     min={() => 0}
                     max={() => PERCENT}
                     step={() => SLIDER_STEP}
-                    valueSignal={[
+                    value={[
                         () => Math.round(progressSignal[0]() * PERCENT),
                         (value: number) => getController()?.seek(value / PERCENT),
                     ]}

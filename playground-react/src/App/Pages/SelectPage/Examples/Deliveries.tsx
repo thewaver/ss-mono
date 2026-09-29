@@ -9,7 +9,7 @@ type Props = SelectDeliveryExampleProps;
 
 export const DeliveriesExample = (props: Props) => (
     <Select
-        valueState={props.valueState}
+        value={props.value}
         options={DELIVERIES}
         ariaLabel={"Delivery"}
         renderContent={(selectedOption, flags) => (

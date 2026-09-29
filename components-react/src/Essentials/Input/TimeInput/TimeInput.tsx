@@ -1,4 +1,4 @@
-import { type KeyboardEvent, useEffect, useState } from "react";
+import { type KeyboardEvent, useEffect, useLayoutEffect, useState } from "react";
 
 import { type TextSyncElement, TextSyncUtils, TimeInputUtils } from "@thewaver/ss-components";
 import { TimeUtils, type TimeValue, type TimeValueMeridiem } from "@thewaver/ss-utils";
@@ -8,7 +8,7 @@ import { TextField } from "../../../Primitives/TextField/TextField";
 import type { TimeInputMeridiem, TimeInputProps } from "./TimeInput.types";
 
 export const TimeInput = (props: TimeInputProps) => {
-    const [value, setValue] = props.valueState;
+    const [value, setValue] = props.value;
 
     const isTwelveHour = props.isTwelveHour ?? false;
     const segmentCount = TimeInputUtils.getSegmentCount(props.hasSeconds ?? false);
@@ -38,6 +38,10 @@ export const TimeInput = (props: TimeInputProps) => {
     useEffect(() => {
         if (value) setMeridiem(TimeUtils.getMeridiem(value));
     }, [value]);
+
+    useLayoutEffect(() => {
+        field.refresh();
+    }, [isTwelveHour, segmentCount]);
 
     const setFieldMeridiem = (next: TimeValueMeridiem) => {
         if (!isWritable) return;
@@ -80,7 +84,7 @@ export const TimeInput = (props: TimeInputProps) => {
     return (
         <TextField
             {...props}
-            valueState={field.textState}
+            value={field.text}
             element={"input"}
             inputMode={"numeric"}
             computeMaskedText={(previous, next, caret) => TextSyncUtils.applyMask(mask, previous, next, caret)}

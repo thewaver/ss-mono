@@ -11,7 +11,7 @@ const ALPHANUMERIC = /^[A-Za-z0-9]$/;
 
 export const RecoveryCodeExample = (props: Props) => (
     <SegmentedInput
-        valueSignal={props.valueSignal}
+        value={props.value}
         cellCount={RECOVERY_CODE_LENGTH}
         gap={FIELD_GAP}
         ariaLabel={"Recovery code"}

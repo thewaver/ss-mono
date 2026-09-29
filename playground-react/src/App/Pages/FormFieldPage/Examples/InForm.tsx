@@ -37,7 +37,7 @@ export const InFormExample = (props: Props) => {
                         )}
                         renderControl={(fieldState) => (
                             <TextInput
-                                valueState={props.valueState}
+                                value={props.value}
                                 hasError={fieldState.hasError}
                                 padding={FIELD_PADDING}
                                 gap={FIELD_GAP}

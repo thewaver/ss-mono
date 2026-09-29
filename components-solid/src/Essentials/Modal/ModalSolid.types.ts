@@ -47,7 +47,7 @@ export type ModalProps = ModalNameProps &
          */
         isDismissableOnEscape?: boolean;
         /** Whether the dialog is open. It is the only thing that opens or closes it. */
-        visibilitySignal: SignalSource<boolean>;
+        visibility: SignalSource<boolean>;
         /** How long the dialog and its backdrop take to fade in and out. */
         transitionDurationMs?: number;
         /** How far the dialog is held off the edges of the screen. */

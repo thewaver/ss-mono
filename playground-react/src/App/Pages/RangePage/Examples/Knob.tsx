@@ -13,7 +13,7 @@ type Props = RangeExampleProps;
 
 export const KnobExample = (props: Props) => (
     <Range
-        valueState={props.valueState}
+        value={props.value}
         min={MIN}
         max={MAX}
         ariaLabel={"Gain"}

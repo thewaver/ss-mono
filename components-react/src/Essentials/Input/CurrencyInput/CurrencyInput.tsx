@@ -9,7 +9,7 @@ import type { CurrencyInputProps } from "./CurrencyInput.types";
 const EMPTY_TEXT = "";
 
 export const CurrencyInput = (props: CurrencyInputProps) => {
-    const [value, setValue] = props.valueState;
+    const [value, setValue] = props.value;
 
     const decimals = props.decimals ?? CURRENCY_INPUT_DEFAULTS.decimals;
     const hasSign = props.hasSign ?? false;
@@ -39,7 +39,7 @@ export const CurrencyInput = (props: CurrencyInputProps) => {
         setValue,
     });
 
-    const [text, typeText] = field.textState;
+    const [text, typeText] = field.text;
     const spelling = value === undefined ? EMPTY_TEXT : field.formatValue(value);
 
     useEffect(() => {
@@ -51,7 +51,7 @@ export const CurrencyInput = (props: CurrencyInputProps) => {
     return (
         <TextField
             {...props}
-            valueState={field.textState}
+            value={field.text}
             element={"input"}
             inputMode={"decimal"}
             computeMaskedText={(previous, next, caret) =>

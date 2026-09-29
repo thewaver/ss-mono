@@ -72,8 +72,8 @@ export const ColorInput = (props: ColorInputProps) => {
     const popupId = createUniqueId();
 
     const [getFieldRef, setFieldRef] = createSignal<HTMLElement>();
-    const [getIsOpen, setIsOpen] = SignalMirrorSolidUtils.createOptional(() => props.visibilitySignal, false);
-    const startingState = ColorInputUtils.computeStartingState(props.valueSignal[0]());
+    const [getIsOpen, setIsOpen] = SignalMirrorSolidUtils.createOptional(() => props.visibility, false);
+    const startingState = ColorInputUtils.computeStartingState(props.value[0]());
 
     const [getHsv, setHsv] = createSignal<Color.HSVA>(startingState.hsv);
     const [getNotation, setNotation] = createSignal<Color.Notation>(startingState.notation);
@@ -112,7 +112,7 @@ export const ColorInput = (props: ColorInputProps) => {
     };
 
     createEffect(() => {
-        const incoming = ColorInputUtils.computeIncoming(props.valueSignal[0](), untrack(getHsv));
+        const incoming = ColorInputUtils.computeIncoming(props.value[0](), untrack(getHsv));
 
         setIsUnreadable(incoming.isUnreadable);
 
@@ -124,12 +124,12 @@ export const ColorInput = (props: ColorInputProps) => {
     createEffect(() => {
         const hsv = getHsv();
         const value = untrack(() =>
-            ColorInputUtils.computeOutgoing(hsv, getNotation(), props.valueSignal[0](), getIsUnreadable()),
+            ColorInputUtils.computeOutgoing(hsv, getNotation(), props.value[0](), getIsUnreadable()),
         );
 
         if (value === undefined) return;
 
-        props.valueSignal[1](value);
+        props.value[1](value);
 
         void props.onInput?.(value);
     });
@@ -137,7 +137,7 @@ export const ColorInput = (props: ColorInputProps) => {
     const renderSurface = () => (
         <>
             <ColorArea
-                hsvSignal={hsvSignal}
+                hsv={hsvSignal}
                 sizing={"fill"}
                 isDisabled={getIsDisabled}
                 ariaLabel={props.areaLabel}
@@ -146,7 +146,7 @@ export const ColorInput = (props: ColorInputProps) => {
             />
 
             <Range
-                valueSignal={hueSignal}
+                value={hueSignal}
                 sizing={"fill"}
                 isDisabled={getIsDisabled}
                 max={() => ColorInputUtils.HUE_MAX}
@@ -163,7 +163,7 @@ export const ColorInput = (props: ColorInputProps) => {
                 {...props}
                 hasError={() => (access(props.hasError) ?? false) || getIsUnreadable()}
                 extraFlags={(): ColorInputRenderProps => ({
-                    value: props.valueSignal[0](),
+                    value: props.value[0](),
                     hsv: getHsv(),
                     isOpen: getIsOpen(),
                     isUnreadable: getIsUnreadable(),

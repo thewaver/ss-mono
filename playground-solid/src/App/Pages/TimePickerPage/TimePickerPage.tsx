@@ -27,7 +27,7 @@ export const TimePickerPage = () => {
             readout: () =>
                 `value: ${describeTime(clockedSignal[0]())} — one column per unit, so typing and picking cover the same times`,
             component: () => (
-                <ClockedExample valueSignal={clockedSignal} key={"clocked"} ariaLabel={"Appointment time"} />
+                <ClockedExample value={clockedSignal} key={"clocked"} ariaLabel={"Appointment time"} />
             ),
             path: `${EXAMPLES_ROOT}/Clocked.tsx`,
         },
@@ -38,7 +38,7 @@ export const TimePickerPage = () => {
                 `value: ${describeTime(clockedTwelveSignal[0]())} — the am/pm control and the clock trigger share the trailing slot`,
             component: () => (
                 <ClockedExample
-                    valueSignal={clockedTwelveSignal}
+                    value={clockedTwelveSignal}
                     key={"clockedTwelve"}
                     isTwelveHour={true}
                     ariaLabel={"Call time"}
@@ -53,7 +53,7 @@ export const TimePickerPage = () => {
                 `value: ${describeTime(bookingSignal[0]())} — a coarser minute column, still inside ${TimeUtils.toIso(OPENING_TIME)} to ${TimeUtils.toIso(CLOSING_TIME)}`,
             component: () => (
                 <ClockedExample
-                    valueSignal={bookingSignal}
+                    value={bookingSignal}
                     key={"booking"}
                     clockSteps={() => BOOKING_STEPS}
                     minValue={() => OPENING_TIME}

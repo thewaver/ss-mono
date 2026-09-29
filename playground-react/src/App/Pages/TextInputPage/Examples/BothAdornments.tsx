@@ -16,7 +16,7 @@ type Props = TextInputExampleProps;
 
 export const BothAdornmentsExample = (props: Props) => (
     <TextInput
-        valueState={props.valueState}
+        value={props.value}
         padding={FIELD_PADDING}
         gap={FIELD_GAP}
         ariaLabel={"Amount"}
@@ -27,9 +27,9 @@ export const BothAdornmentsExample = (props: Props) => (
         renderLeading={(flags) => <PageTextFieldAdornment flags={flags}>USD</PageTextFieldAdornment>}
         renderTrailing={() => (
             <Button
-                isDisabled={props.valueState[0] === ""}
+                isDisabled={props.value[0] === ""}
                 onClick={() => {
-                    props.valueState[1]("");
+                    props.value[1]("");
                 }}
                 renderContent={(flags) => <PageTextFieldAdornment flags={flags}>Clear</PageTextFieldAdornment>}
             />

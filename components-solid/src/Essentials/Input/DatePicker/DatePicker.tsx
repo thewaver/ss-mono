@@ -18,10 +18,10 @@ export const DatePicker = (props: DatePickerProps) => {
     const popupId = createUniqueId();
 
     const [getRootRef, setRootRef] = createSignal<HTMLElement>();
-    const [getIsOpen, setIsOpen] = SignalMirrorSolidUtils.createOptional(() => props.visibilitySignal, false);
+    const [getIsOpen, setIsOpen] = SignalMirrorSolidUtils.createOptional(() => props.visibility, false);
 
     const monthSignal: Signal<DateValue> = createSignal(
-        toMonth(untrack(() => props.valueSignal[0]()) ?? DateValueUtils.fromDate(new Date())),
+        toMonth(untrack(() => props.value[0]()) ?? DateValueUtils.fromDate(new Date())),
     );
 
     const dismiss = () => {
@@ -48,15 +48,15 @@ export const DatePicker = (props: DatePickerProps) => {
     createEffect(() => {
         if (!getIsOpen()) return;
 
-        const value = untrack(() => props.valueSignal[0]());
+        const value = untrack(() => props.value[0]());
 
         if (value) monthSignal[1](() => toMonth(value));
     });
 
     const renderCalendar = () => (
         <Calendar
-            valueSignal={props.valueSignal}
-            monthSignal={monthSignal}
+            value={props.value}
+            month={monthSignal}
             minValue={props.minValue}
             maxValue={props.maxValue}
             isDisabled={props.isDisabled}

@@ -5,12 +5,12 @@ import { PageSelectOptionContent } from "../../../StyledComponents/SelectOptionC
 import { COUNTRIES, PLACEHOLDER, renderSelectPopup } from "../../SelectPage/SelectPage.const";
 
 type Props = {
-    valuesState: readonly [string[], (values: string[]) => void];
+    values: readonly [string[], (values: string[]) => void];
 };
 
 export const MultiSelectCountriesExample = (props: Props) => (
     <MultiSelect
-        valuesState={props.valuesState}
+        values={props.values}
         options={COUNTRIES}
         ariaLabel={"Countries"}
         renderContent={(selectedOptions, flags) => (

@@ -58,23 +58,23 @@ const GROUPPED_WEIGHTS = groupOptions(CellAnimationWeights.WEIGHT_TYPES);
 const GROUPPED_ANIMATIONS = groupOptions(CellAnimationKeyframes.ANIMATION_TYPES);
 
 const DefaultExampleWrapper = (
-    props: ParticleFieldExampleProps & { progressSignal: Signal<number>; ownPlaybackSignal: Signal<boolean> },
+    props: ParticleFieldExampleProps & { progress: Signal<number>; ownPlayback: Signal<boolean> },
 ) => {
     return (
         <div class={styles.stack}>
             <PageMeasureBox width={() => BOX_WIDTH} height={() => BOX_HEIGHT}>
                 <DefaultExample
                     {...props}
-                    playbackSignal={props.ownPlaybackSignal}
-                    progressSignal={props.progressSignal}
+                    playback={props.ownPlayback}
+                    progress={props.progress}
                 />
             </PageMeasureBox>
 
             <PagePlaybackScrubber
                 id={"particleField"}
                 ariaLabel={"Position in the pass"}
-                playbackSignal={props.ownPlaybackSignal}
-                progressSignal={props.progressSignal}
+                playback={props.ownPlayback}
+                progress={props.progress}
             />
         </div>
     );
@@ -132,15 +132,15 @@ const StressTestWrapper = (props: ParticleFieldExampleProps) => {
 
             <StressTest
                 configs={() => STRESS_ITEMS}
-                onShowModal={() => props.playbackSignal[1](false)}
-                onHideModal={() => props.playbackSignal[1](true)}
+                onShowModal={() => props.playback[1](false)}
+                onHideModal={() => props.playback[1](true)}
                 renderLabel={(getConfigIndex) => `Render ${STRESS_ITEMS[getConfigIndex()].count} fields`}
                 renderItem={(getConfigIndex) => (
                     <PageMeasureBox
                         width={() => STRESS_ITEMS[getConfigIndex()].size}
                         height={() => STRESS_ITEMS[getConfigIndex()].size}
                     >
-                        <DefaultExample {...props} playbackSignal={modalPlayback} cellCount={() => STRESS_CELL_COUNT} />
+                        <DefaultExample {...props} playback={modalPlayback} cellCount={() => STRESS_CELL_COUNT} />
                     </PageMeasureBox>
                 )}
             />
@@ -182,7 +182,7 @@ export const ParticleFieldPage = () => {
             animationType: getAnimationType,
             holdShare: getHoldShare,
             isScattered: getIsScattered,
-            playbackSignal: playback,
+            playback,
         };
 
         return [
@@ -194,8 +194,8 @@ export const ParticleFieldPage = () => {
                 component: () => (
                     <DefaultExampleWrapper
                         {...commonProps}
-                        progressSignal={progress}
-                        ownPlaybackSignal={defaultPlayback}
+                        progress={progress}
+                        ownPlayback={defaultPlayback}
                     />
                 ),
                 path: `${EXAMPLES_ROOT}/Default.tsx`,

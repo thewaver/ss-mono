@@ -7,7 +7,7 @@ import type { SelectOption, SelectPresetProps } from "../Select/SelectSolid.type
 
 export type MultiSelectProps<T> = SelectPresetProps<T> & {
     /** Which options are picked. It is the only thing that picks them. */
-    valuesSignal: SignalSource<T[]>;
+    values: SignalSource<T[]>;
     /** Draws the field, and is handed everything that is picked. */
     renderContent: (
         getSelectedOptions: Accessor<SelectOption<T>[]>,

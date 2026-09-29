@@ -36,7 +36,7 @@ export const PageColorChannels = (props: PageColorChannelsProps) => {
     const [space] = spaceState;
     const [hex, setHex] = useState("");
 
-    const [hsv, setHsv] = props.hsvState;
+    const [hsv, setHsv] = props.hsv;
 
     const rgba = Color.HSVA.toRgba(hsv);
 
@@ -79,7 +79,7 @@ export const PageColorChannels = (props: PageColorChannelsProps) => {
     return (
         <>
             <PageColorPickerRow>
-                <RadioGroup valueState={spaceState} orientation={"horizontal"} gap={5} ariaLabel={"Color space"}>
+                <RadioGroup value={spaceState} orientation={"horizontal"} gap={5} ariaLabel={"Color space"}>
                     {SPACES.map((option) => (
                         <Radio
                             key={option}
@@ -171,7 +171,7 @@ export const PageColorChannels = (props: PageColorChannelsProps) => {
                 <div onBlur={refreshHexField}>
                     <PageColorChannel label="hexa">
                         <TextInput
-                            valueState={[hex, setHex]}
+                            value={[hex, setHex]}
                             id={"channelHexa"}
                             ariaLabel={"Hex with alpha"}
                             padding={FIELD_PADDING}

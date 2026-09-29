@@ -7,9 +7,9 @@ export const Toggle = (props: ToggleProps) => {
             {...props}
             type={"checkbox"}
             isSwitch={true}
-            isChecked={() => props.checkedSignal[0]()}
+            isChecked={() => props.checked[0]()}
             onChange={(isChecked) => {
-                props.checkedSignal[1](isChecked);
+                props.checked[1](isChecked);
 
                 void props.onChange?.(isChecked);
             }}

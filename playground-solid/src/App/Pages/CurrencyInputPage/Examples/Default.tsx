@@ -19,7 +19,7 @@ type Props = CurrencyInputExampleProps & { ariaLabel?: MaybeAccessor<string> };
 export const DefaultExample = (props: Props) => {
     return (
         <CurrencyInput
-            valueSignal={props.valueSignal}
+            value={props.value}
             ariaLabel={() => access(props.ariaLabel) ?? "Price"}
             padding={() => FIELD_STEPPER_PADDING}
             gap={() => FIELD_GAP}

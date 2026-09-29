@@ -40,7 +40,7 @@ export const ScrolledExample = (props: Props) => (
     <div class={styles.scrollBox} data-scroll-box>
         <Accordion
             items={() => ITEMS}
-            expandedSignal={props.expandedSignal}
+            expanded={props.expanded}
             isScrolledIntoViewOnExpand={true}
             gap={() => GAP}
             renderHeader={(getItem, getFlags) => (

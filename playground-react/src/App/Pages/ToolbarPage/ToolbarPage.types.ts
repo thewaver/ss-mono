@@ -4,5 +4,5 @@ export type ToolbarExampleProps = {
 };
 
 export type ToolbarPressedExampleProps = ToolbarExampleProps & {
-    pressedValuesState: readonly [string[], (values: string[]) => void];
+    pressedValues: readonly [string[], (values: string[]) => void];
 };

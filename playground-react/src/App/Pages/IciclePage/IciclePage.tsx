@@ -37,7 +37,7 @@ export const IciclePage = () => {
                 <LibraryExample
                     columnCount={columnCount}
                     zoomDurationMs={prefersReducedMotion ? NO_MOTION_DURATION_MS : zoomDurationMs}
-                    focusState={focusState}
+                    focus={focusState}
                 />
             ),
             path: `${EXAMPLES_ROOT}/Library.tsx`,

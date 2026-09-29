@@ -1,5 +1,5 @@
 import type { Accessor } from "solid-js";
-import { For, Index, Show, createEffect, createMemo, createSignal, createUniqueId, untrack } from "solid-js";
+import { For, Index, Show, createComputed, createEffect, createMemo, createSignal, createUniqueId, untrack } from "solid-js";
 
 import {
     LISTBOX_DEFAULTS,
@@ -35,7 +35,9 @@ const ListboxOptionItem = (props: ListboxOptionItemProps) => {
     createEffect(() => {
         if (!getIsHighlighted() || !access(props.isSelfScrolling)) return;
 
-        getElementRef()?.scrollIntoView({ block: "nearest" });
+        const element = getElementRef();
+
+        if (element) ListboxUtils.revealOption(element, access(props.focusModel));
     });
 
     return (
@@ -47,6 +49,7 @@ const ListboxOptionItem = (props: ListboxOptionItemProps) => {
             }}
             class={styles.listboxOption}
             role="option"
+            tabIndex={-1}
             aria-disabled={getIsDisabled() || undefined}
             aria-selected={access(props.flags).isSelected}
             onFocus={() => props.onFocus?.()}
@@ -142,6 +145,7 @@ export const ListboxOptions = <T,>(props: ListboxOptionsProps<T>) => {
                     ref={setElementRef}
                     id={() => cursor.getOptionId(getFlatIndex())}
                     isSelfScrolling={() => !getIsVirtualized()}
+                    focusModel={cursor.focusModel}
                     flags={getFlags}
                     renderContent={(getOptionFlags) => props.renderOption(getOption, getOptionFlags)}
                     onFocus={isRoving ? () => cursor.highlight(getOption().value) : undefined}
@@ -205,18 +209,44 @@ export const ListboxOptions = <T,>(props: ListboxOptionsProps<T>) => {
 
     const getWindowedRuns = createMemo(() => ListboxUtils.getWindowedRuns(rowWindow.getRows(), cursor.getRows()));
 
+    const getWindowedEntries = createMemo(() =>
+        getWindowedRuns().flatMap<VirtualizerRow | number>((run) =>
+            run.groupIndex === undefined ? run.rows : [run.groupIndex],
+        ),
+    );
+
+    const getGroupRun = (groupIndex: number) => getWindowedRuns().find((run) => run.groupIndex === groupIndex);
+
+    let hadFocus = false;
+
+    createComputed(() => {
+        getWindowedEntries();
+
+        hadFocus = getSizerRef()?.contains(document.activeElement) ?? false;
+    });
+
+    createEffect(() => {
+        getWindowedEntries();
+
+        const index = untrack(cursor.getHighlightedIndex);
+
+        if (!hadFocus || index === undefined || getSizerRef()?.contains(document.activeElement)) return;
+
+        ListboxUtils.focusOption(untrack(cursor.getListboxId), index);
+    });
+
     const renderWindowedOptions = () => (
         <div ref={setSizerRef} class={styles.listboxSizer} style={{ height: `${rowWindow.getTotalSize()}px` }}>
-            <For each={getWindowedRuns()}>
-                {(run) => (
-                    <Show when={run.group} fallback={<For each={run.rows}>{renderWindowedRow}</For>} keyed>
-                        {(group: SelectOptionGroup<T>) => (
-                            <div role="group" aria-label={group.label}>
-                                <For each={run.rows}>{renderWindowedRow}</For>
-                            </div>
-                        )}
-                    </Show>
-                )}
+            <For each={getWindowedEntries()}>
+                {(entry) =>
+                    typeof entry === "number" ? (
+                        <div role="group" aria-label={getGroupRun(entry)?.group?.label}>
+                            <For each={getGroupRun(entry)?.rows}>{renderWindowedRow}</For>
+                        </div>
+                    ) : (
+                        renderWindowedRow(entry)
+                    )
+                }
             </For>
         </div>
     );
@@ -300,7 +330,7 @@ export const ListboxComposite = <T,>(props: ListboxCompositeProps<T>) => {
 };
 
 export const Listbox = <T,>(props: ListboxProps<T>) => {
-    const valueSignal = accessSignal(() => props.valueSignal);
+    const valueSignal = accessSignal(() => props.value);
 
     const getSelectedOptions = createMemo(() => {
         const selectedValue = valueSignal[0]();

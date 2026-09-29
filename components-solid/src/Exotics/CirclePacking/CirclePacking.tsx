@@ -55,7 +55,7 @@ export const CirclePacking = <T,>(props: CirclePackingProps<T>) => {
     const getNodes = createMemo(() => CirclePackingUtils.listNodes(getRootNode(), getLayout()));
 
     const [getHeldBranch, setHeldBranch] = SignalMirrorSolidUtils.createOptional(
-        () => props.branchSignal,
+        () => props.branch,
         untrack(getRootNode),
     );
 

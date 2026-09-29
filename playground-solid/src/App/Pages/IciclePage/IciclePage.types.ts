@@ -3,5 +3,5 @@ import type { AccessorProps, IcicleNode, SignalSource } from "@thewaver/ss-compo
 export type IcicleExampleProps = AccessorProps<{
     columnCount: number;
     zoomDurationMs: number;
-    focusSignal: SignalSource<IcicleNode<string>>;
+    focus: SignalSource<IcicleNode<string>>;
 }>;

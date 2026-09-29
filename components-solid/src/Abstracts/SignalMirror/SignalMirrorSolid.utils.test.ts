@@ -286,7 +286,7 @@ describe("createSplit", () => {
         });
 
     it("reports nothing until both halves are filled in", () => {
-        const { outer, firstSignal, secondSignal } = build();
+        const { outer, first: firstSignal, second: secondSignal } = build();
 
         firstSignal[1](1);
         expect(outer[0]()).toBe(undefined);
@@ -296,7 +296,7 @@ describe("createSplit", () => {
     });
 
     it("keeps the other half when one is cleared from inside", () => {
-        const { outer, firstSignal, secondSignal } = build({ first: 1, second: 2 });
+        const { outer, first: firstSignal, second: secondSignal } = build({ first: 1, second: 2 });
 
         secondSignal[1](undefined);
 
@@ -308,7 +308,7 @@ describe("createSplit", () => {
     });
 
     it("clears both halves when the clear comes from outside", () => {
-        const { outer, firstSignal, secondSignal } = build({ first: 1, second: 2 });
+        const { outer, first: firstSignal, second: secondSignal } = build({ first: 1, second: 2 });
 
         outer[1](undefined);
 
@@ -317,7 +317,7 @@ describe("createSplit", () => {
     });
 
     it("tells an outside clear from the echo of an inside one", () => {
-        const { outer, firstSignal, secondSignal } = build({ first: 1, second: 2 });
+        const { outer, first: firstSignal, second: secondSignal } = build({ first: 1, second: 2 });
 
         secondSignal[1](undefined);
 
@@ -330,7 +330,7 @@ describe("createSplit", () => {
     });
 
     it("cannot see a consumer clearing a value that is already cleared, which is a limit of signals", () => {
-        const { outer, firstSignal, secondSignal } = build({ first: 1, second: 2 });
+        const { outer, first: firstSignal, second: secondSignal } = build({ first: 1, second: 2 });
 
         secondSignal[1](undefined);
         outer[1](undefined);
@@ -339,7 +339,7 @@ describe("createSplit", () => {
     });
 
     it("pushes a whole value in from outside", () => {
-        const { outer, firstSignal, secondSignal } = build();
+        const { outer, first: firstSignal, second: secondSignal } = build();
 
         outer[1]({ first: 7, second: 8 });
 

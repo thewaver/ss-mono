@@ -26,8 +26,8 @@ export const MixerExample = (props: Props) => {
             socketSize={props.socketSize}
             isLocked={props.isLocked}
             isDisabled={props.isDisabled}
-            nodesSignal={props.nodesSignal}
-            linksSignal={props.linksSignal}
+            nodes={props.nodes}
+            links={props.links}
             computeNodeKey={(device) => device.id}
             computeNodeLabel={(device) => device.name}
             computeCanLink={(link) => link.to.nodeKey !== AMP_NODE_KEY || link.from.nodeKey === MIXER_NODE_KEY}

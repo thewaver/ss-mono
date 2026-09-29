@@ -28,14 +28,14 @@ export const DateTimePickerPage = () => {
             key: "paired",
             name: "Two fields, one value",
             readout: () => `value: ${describe(emptyValue[0])}`,
-            component: () => <PairedExample valueState={emptyValue} />,
+            component: () => <PairedExample value={emptyValue} />,
             path: `${EXAMPLES_ROOT}/Paired.tsx`,
         },
         {
             key: "picked",
             name: "One control, both popups",
             readout: () => `value: ${describe(pickedValue[0])}`,
-            component: () => <PickedExample valueState={pickedValue} itemKey={"picked"} />,
+            component: () => <PickedExample value={pickedValue} itemKey={"picked"} />,
             path: `${EXAMPLES_ROOT}/Picked.tsx`,
         },
         {
@@ -44,7 +44,7 @@ export const DateTimePickerPage = () => {
             readout: () => `value: ${describe(twelveHourValue[0])}`,
             component: () => (
                 <PickedExample
-                    valueState={twelveHourValue}
+                    value={twelveHourValue}
                     itemKey={"twelveHour"}
                     isTwelveHour={true}
                     hasSeconds={true}
@@ -59,7 +59,7 @@ export const DateTimePickerPage = () => {
                 `value: ${describe(seededValue[0])} — seconds of day: ${
                     seededValue[0] ? TimeUtils.getSecondOfDay(seededValue[0].time) : 0
                 }`,
-            component: () => <PairedExample valueState={seededValue} />,
+            component: () => <PairedExample value={seededValue} />,
             path: `${EXAMPLES_ROOT}/Paired.tsx`,
         },
     ];

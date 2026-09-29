@@ -8,7 +8,7 @@ type Props = RangePairExampleProps;
 
 export const DisabledPairExample = (props: Props) => (
     <Range
-        rangeSignal={props.rangeSignal}
+        range={props.range}
         ariaLabel={"Locked band"}
         thumbLabels={() => ["Locked floor", "Locked ceiling"]}
         isDisabled={true}

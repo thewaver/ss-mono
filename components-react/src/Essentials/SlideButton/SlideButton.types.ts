@@ -38,5 +38,5 @@ export type SlideButtonProps = Omit<InteractionWrapperProps<SlideButtonRenderPro
          * moves it, and it is written on every frame of a slide or a hold, so an owner can show the progress outside
          * the button. Leave it out and the button holds its own, starting at rest.
          */
-        progressState?: readonly [number, (ratio: number) => void];
+        progress?: readonly [number, (ratio: number) => void];
     };

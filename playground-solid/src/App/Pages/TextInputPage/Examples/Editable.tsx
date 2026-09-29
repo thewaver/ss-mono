@@ -22,21 +22,21 @@ export const EditableExample = (props: Props) => {
     let inputRef: HTMLElement | undefined;
 
     const startEditing = () => {
-        draftSignal[1](props.valueSignal[0]());
-        props.editingSignal[1](true);
+        draftSignal[1](props.value[0]());
+        props.editing[1](true);
     };
 
     const finishEditing = (isCommitting: boolean) => {
-        if (!props.editingSignal[0]()) return;
+        if (!props.editing[0]()) return;
 
-        if (isCommitting) props.valueSignal[1](draftSignal[0]());
+        if (isCommitting) props.value[1](draftSignal[0]());
 
-        props.editingSignal[1](false);
+        props.editing[1](false);
     };
 
     createEffect(
         on(
-            () => props.editingSignal[0](),
+            () => props.editing[0](),
             (isEditing) => {
                 (isEditing ? inputRef : buttonRef)?.focus();
             },
@@ -46,16 +46,16 @@ export const EditableExample = (props: Props) => {
 
     return (
         <Show
-            when={props.editingSignal[0]()}
+            when={props.editing[0]()}
             fallback={
                 <Button
                     ref={(element) => {
                         buttonRef = element;
                     }}
-                    ariaLabel={() => `Edit name, ${props.valueSignal[0]()}`}
+                    ariaLabel={() => `Edit name, ${props.value[0]()}`}
                     onClick={startEditing}
                     renderContent={(getFlags) => (
-                        <PageInlineEditContent flags={getFlags}>{props.valueSignal[0]()}</PageInlineEditContent>
+                        <PageInlineEditContent flags={getFlags}>{props.value[0]()}</PageInlineEditContent>
                     )}
                 />
             }
@@ -78,7 +78,7 @@ export const EditableExample = (props: Props) => {
                     ref={(element) => {
                         inputRef = element;
                     }}
-                    valueSignal={draftSignal}
+                    value={draftSignal}
                     padding={() => FIELD_PADDING}
                     gap={() => FIELD_GAP}
                     ariaLabel={"Name"}

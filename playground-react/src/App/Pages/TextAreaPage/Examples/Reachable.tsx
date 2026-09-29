@@ -16,7 +16,7 @@ type Props = TextAreaExampleProps;
 
 export const ReachableExample = (props: Props) => (
     <TextArea
-        valueState={props.valueState}
+        value={props.value}
         isDisabled={true}
         isReachableWhenDisabled={true}
         padding={FIELD_PADDING}

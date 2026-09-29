@@ -20,7 +20,7 @@ type Props = NumberInputExampleProps;
 
 export const GermanExample = (props: Props) => (
     <NumberInput
-        valueState={props.valueState}
+        value={props.value}
         locale={GERMAN_LOCALE}
         step={AMOUNT_STEP}
         padding={FIELD_STEPPER_PADDING}

@@ -12,7 +12,7 @@ export type AudioSwitcherProps = AccessorProps<{
     /** How loud the playback is. */
     volume?: number;
     /** Whether audio is playing. It is the only thing that starts or stops it. */
-    playbackSignal?: SignalSource<boolean>;
+    playback?: SignalSource<boolean>;
     /** Hands the consumer a controller once the switcher is up, for driving playback from outside. */
     onMount?: (controller: AudioSwitcherController) => void;
 }>;

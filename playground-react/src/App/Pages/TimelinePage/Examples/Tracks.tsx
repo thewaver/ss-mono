@@ -94,7 +94,7 @@ export const TracksExample = (props: Props) => {
                         isPannable={props.isPannable}
                         isZoomable={props.isZoomable}
                         isDisabled={props.isDisabled}
-                        viewState={props.viewState}
+                        view={props.view}
                         markers={[playhead]}
                         ariaLabel={"Cut of the episode"}
                         computeSpan={(clip) => ({ start: clip.from, end: clip.to })}
@@ -181,7 +181,7 @@ export const TracksExample = (props: Props) => {
                     isDisabled={props.isDisabled}
                     renderContent={(flags) => <PageButtonContent flags={flags}>Whole reel</PageButtonContent>}
                     onClick={async () => {
-                        props.viewState[1](REEL);
+                        props.view[1](REEL);
                     }}
                 />
             </PageTimelineControls>

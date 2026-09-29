@@ -14,11 +14,11 @@ type Props = CalendarExampleProps;
 export const WeekdaysExample = (props: Props) => {
     return (
         <PageCalendarFrame>
-            <PageCalendarCaption monthState={props.monthState} itemKey={"weekdays"} locale={LOCALE} />
+            <PageCalendarCaption month={props.month} itemKey={"weekdays"} locale={LOCALE} />
 
             <Calendar
-                valueState={props.valueState}
-                monthState={props.monthState}
+                value={props.value}
+                month={props.month}
                 today={TODAY}
                 locale={LOCALE}
                 weekStartsOn={props.weekStartsOn}

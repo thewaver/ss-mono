@@ -5,12 +5,12 @@ import type { Color } from "@thewaver/ss-utils";
 
 export type ColorAreaExampleProps = AccessorProps<{
     isDisabled?: boolean;
-    hsvSignal: Signal<Color.HSVA>;
+    hsv: Signal<Color.HSVA>;
 }>;
 
 export type ColorAreaDropdownExampleProps = ColorAreaExampleProps &
     AccessorProps<{
         popupId: string;
-        isOpenSignal: Signal<boolean>;
-        hueSignal: Signal<number>;
+        isOpen: Signal<boolean>;
+        hue: Signal<number>;
     }>;

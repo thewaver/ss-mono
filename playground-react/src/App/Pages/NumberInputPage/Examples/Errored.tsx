@@ -16,9 +16,9 @@ type Props = NumberInputExampleProps;
 
 export const ErroredExample = (props: Props) => (
     <NumberInput
-        valueState={props.valueState}
+        value={props.value}
         min={0}
-        hasError={(props.valueState[0] ?? 0) <= 0}
+        hasError={(props.value[0] ?? 0) <= 0}
         padding={FIELD_STEPPER_PADDING}
         gap={FIELD_GAP}
         ariaLabel={"Seats"}

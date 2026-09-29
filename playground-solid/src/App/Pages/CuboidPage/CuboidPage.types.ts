@@ -5,8 +5,8 @@ import type { AccessorProps, CuboidController, CuboidSize } from "@thewaver/ss-c
 export type CuboidExampleProps = AccessorProps<{
     size: CuboidSize;
     transitionDurationMs: number;
-    yawSignal: Signal<number>;
-    pitchSignal: Signal<number>;
+    yaw: Signal<number>;
+    pitch: Signal<number>;
 }>;
 
 export type CuboidWanderingExampleProps = CuboidExampleProps &
@@ -18,5 +18,5 @@ export type CuboidUprightExampleProps = CuboidExampleProps &
     AccessorProps<{
         isUpright: boolean;
         isDraggable: boolean;
-        controllerSignal: Signal<CuboidController | undefined>;
+        controller: Signal<CuboidController | undefined>;
     }>;

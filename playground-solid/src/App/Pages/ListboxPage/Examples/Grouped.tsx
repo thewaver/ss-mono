@@ -11,7 +11,7 @@ type Props = MultiListboxExampleProps;
 export const GroupedExample = (props: Props) => (
     <PageListboxSurface>
         <MultiListbox
-            valuesSignal={props.valuesSignal}
+            values={props.values}
             options={() => GROUPED_COUNTRIES}
             ariaLabel={"Countries to ship to"}
             renderGroup={(getGroup, getFlags) => (

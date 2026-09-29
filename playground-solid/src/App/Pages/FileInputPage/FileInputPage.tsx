@@ -45,21 +45,21 @@ export const FileInputPage = () => {
             key: "default",
             name: "Default",
             readout: () => `files: ${describe(defaultSignal[0]())}`,
-            component: () => <DefaultExample filesSignal={defaultSignal} />,
+            component: () => <DefaultExample files={defaultSignal} />,
             path: `${EXAMPLES_ROOT}/Default.tsx`,
         },
         {
             key: "multiple",
             name: "Multiple",
             readout: () => `files: ${describe(multipleSignal[0]())}`,
-            component: () => <MultipleExample filesSignal={multipleSignal} />,
+            component: () => <MultipleExample files={multipleSignal} />,
             path: `${EXAMPLES_ROOT}/Multiple.tsx`,
         },
         {
             key: "images",
             name: "Accepting images only",
             readout: () => `files: ${describe(imagesSignal[0]())} — accept is a filter, never a guarantee`,
-            component: () => <ImagesExample filesSignal={imagesSignal} />,
+            component: () => <ImagesExample files={imagesSignal} />,
             path: `${EXAMPLES_ROOT}/Images.tsx`,
         },
         {
@@ -69,7 +69,7 @@ export const FileInputPage = () => {
                 `files: ${describe(rejectingSignal[0]())}${getRejection() ? ` — ${getRejection()}` : ` — anything over ${MAX_ATTACHMENT_BYTES} bytes is refused`}`,
             component: () => (
                 <RejectingSetterExample
-                    filesSignal={rejectingSignal}
+                    files={rejectingSignal}
                     rejection={getRejection}
                     onRejectionChange={setRejection}
                 />
@@ -80,28 +80,28 @@ export const FileInputPage = () => {
             key: "disabled",
             name: "Disabled",
             readout: () => `files: ${describe(disabledSignal[0]())}`,
-            component: () => <DisabledExample filesSignal={disabledSignal} />,
+            component: () => <DisabledExample files={disabledSignal} />,
             path: `${EXAMPLES_ROOT}/Disabled.tsx`,
         },
         {
             key: "reachable",
             name: "Disabled + reachable",
             readout: () => `files: ${describe(reachableSignal[0]())}`,
-            component: () => <ReachableExample filesSignal={reachableSignal} />,
+            component: () => <ReachableExample files={reachableSignal} />,
             path: `${EXAMPLES_ROOT}/Reachable.tsx`,
         },
         {
             key: "errored",
             name: "Error",
             readout: () => `files: ${describe(erroredSignal[0]())} — required, nothing picked yet`,
-            component: () => <ErroredExample filesSignal={erroredSignal} />,
+            component: () => <ErroredExample files={erroredSignal} />,
             path: `${EXAMPLES_ROOT}/Errored.tsx`,
         },
         {
             key: "label",
             name: "In a Label",
             readout: () => `files: ${describe(labeledSignal[0]())} — the caption opens the dialog`,
-            component: () => <LabeledExample filesSignal={labeledSignal} />,
+            component: () => <LabeledExample files={labeledSignal} />,
             path: `${EXAMPLES_ROOT}/Labeled.tsx`,
         },
         {
@@ -110,7 +110,7 @@ export const FileInputPage = () => {
             readout: () =>
                 `files: ${describe(dropZoneSignal[0]())} — refused: ${describeRejections(getDropZoneRejections())}`,
             component: () => (
-                <DropZoneExample filesSignal={dropZoneSignal} onRejectionsChange={setDropZoneRejections} />
+                <DropZoneExample files={dropZoneSignal} onRejectionsChange={setDropZoneRejections} />
             ),
             path: `${EXAMPLES_ROOT}/DropZone.tsx`,
         },

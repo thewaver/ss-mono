@@ -38,7 +38,7 @@ const CollapsibleTrigger = (props: CollapsibleTriggerProps) => {
 };
 
 export const Collapsible = (props: CollapsibleProps) => {
-    const [isExpanded, setIsExpanded] = SignalMirrorReactUtils.useOptionalState(props.expandedState, false);
+    const [isExpanded, setIsExpanded] = SignalMirrorReactUtils.useOptionalState(props.expanded, false);
 
     const triggerId = useId();
     const panelId = useId();

@@ -14,8 +14,8 @@ export const DisabledExample = (props: TableExampleProps) => {
             <Table
                 columns={columns}
                 rows={PARTS}
-                sortState={props.sortState}
-                selectionState={props.selectionState}
+                sort={props.sort}
+                selection={props.selection}
                 isDisabled={true}
                 ariaLabel={"Parts, read only"}
             />

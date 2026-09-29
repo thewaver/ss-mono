@@ -15,12 +15,12 @@ export namespace MaskedFieldReactUtils {
      * Under React the typed value is committed from the text setter rather than from an effect watching the text,
      * so a keystroke and the value it makes arrive in one render. The hook does not watch the format itself: a caller
      * whose spelling can change — a locale, a decimal count — calls `refresh` when it does, or hands the new spelling
-     * to `textState`'s setter, and the text is rewritten in the new form.
+     * to `text`'s setter, and the text is rewritten in the new form.
      *
      * @param defs The field's own rules, with this render's `value` and `digitCount` in place of the getters:
      * how to write the value, how to turn it into digits and back, how to format digits for display, which digit
      * sequences are impossible outright, and how to compare two values.
-     * @returns `textState`, which the input binds to, `digits` currently entered, `hasIssue` for whether what is
+     * @returns `text`, which the input binds to, `digits` currently entered, `hasIssue` for whether what is
      * entered is wrong, `formatValue` to format a value for display, `commit` to set the value directly, `refresh`
      * to rewrite the text from the value, and `onInput` and `onBlur`, which must be called from the input's own
      * handlers for the leave-the-field rule to work.
@@ -65,7 +65,7 @@ export namespace MaskedFieldReactUtils {
         }, [defs.value]);
 
         return {
-            textState: [text, type] as const,
+            text: [text, type] as const,
             digits,
             hasIssue: MaskedFieldUtils.computeHasIssue(digits, hasLeft, ruleDefs),
             formatValue: (value: T) => MaskedFieldUtils.formatValue(value, defs),

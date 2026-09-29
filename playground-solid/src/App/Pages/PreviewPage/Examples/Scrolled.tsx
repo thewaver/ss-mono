@@ -17,7 +17,7 @@ export const ScrolledExample = (props: Props) => {
     return (
         <div class={styles.scrollBox} data-scroll-box>
             <TextExample
-                expandedSignal={props.expandedSignal}
+                expanded={props.expanded}
                 collapsedHeight={props.collapsedHeight}
                 isScrolledIntoViewOnCollapse={true}
                 paragraphs={props.paragraphs}

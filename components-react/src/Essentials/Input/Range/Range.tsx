@@ -175,11 +175,11 @@ const RangeElement = (props: RangeElementProps) => {
 };
 
 export const Range = (props: RangeProps) => {
-    const hasSingle = props.valueState !== undefined;
-    const hasPair = props.rangeState !== undefined;
+    const hasSingle = props.value !== undefined;
+    const hasPair = props.range !== undefined;
 
     useEffect(
-        () => RangeUtils.warnIfAmbiguous(hasSingle, hasPair, { single: "valueState", pair: "rangeState" }),
+        () => RangeUtils.warnIfAmbiguous(hasSingle, hasPair, { single: "value", pair: "range" }),
         [hasSingle, hasPair],
     );
 
@@ -191,8 +191,8 @@ export const Range = (props: RangeProps) => {
     const step = props.step ?? RANGE_DEFAULTS.step;
     const thumbSize = props.thumbSize ?? RANGE_DEFAULTS.thumbSize;
 
-    const range = props.rangeState?.[0];
-    const values = RangeUtils.computeValues(range, props.valueState?.[0], min);
+    const range = props.range?.[0];
+    const values = RangeUtils.computeValues(range, props.value?.[0], min);
     const ratios = RangeUtils.computeRatios(values, min, max);
 
     const extraFlags: RangeRenderProps = {
@@ -207,9 +207,9 @@ export const Range = (props: RangeProps) => {
         const next = values.map((held, at) => (at === index ? value : held));
 
         if (range) {
-            props.rangeState?.[1](RangeUtils.computeMovedRange(range, index, value));
+            props.range?.[1](RangeUtils.computeMovedRange(range, index, value));
         } else {
-            props.valueState?.[1](value);
+            props.value?.[1](value);
         }
 
         props.onInput?.(next);

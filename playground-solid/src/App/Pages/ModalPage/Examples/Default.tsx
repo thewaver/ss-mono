@@ -30,12 +30,12 @@ export const DefaultExample = (props: Props) => (
             id={"openModal"}
             renderContent={(getFlags) => <PageButtonContent flags={getFlags}>Open Modal</PageButtonContent>}
             onClick={() => {
-                props.visibilitySignal[1](true);
+                props.visibility[1](true);
             }}
         />
 
         <Modal
-            visibilitySignal={props.visibilitySignal}
+            visibility={props.visibility}
             ariaLabelledBy={() => MODAL_TITLE_ID}
             renderOverlay={(getVisibilityTarget, getTransitionDurationMs) => (
                 <PageModalOverlay

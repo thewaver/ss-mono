@@ -13,7 +13,7 @@ type Props = RadioExampleProps;
 export const SegmentedExample = (props: Props) => (
     <PageRadioSegmentGroup>
         <RadioGroup
-            valueState={props.valueState}
+            value={props.value}
             ariaLabel={"Segmented size"}
             orientation={"horizontal"}
             gap={0}

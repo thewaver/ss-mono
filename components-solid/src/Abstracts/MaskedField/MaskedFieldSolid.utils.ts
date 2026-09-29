@@ -14,12 +14,17 @@ export namespace MaskedFieldSolidUtils {
      * arriving from outside rewrites the text, unless the user is mid-edit with the value already cleared. And an
      * incomplete entry is not called an error until the user leaves the field.
      *
+     * The value is committed when the digits change and never when the rules do: a change of format rewrites the
+     * text from the value, and the digits that were on screen are not read again under the new rules, which would
+     * commit a value nobody typed. The rewrite follows the value as it is, so a field that started empty picks up a
+     * change of format made after something was typed into it.
+     *
      * Must run inside a component or another reactive owner.
      *
      * @param defs The field's own rules: how to read the value, how to turn it into digits and back,
      * how to format digits for display, how many digits a complete entry has, which digit sequences are
      * impossible outright, and how to compare two values.
-     * @returns A handle to attach to the input. `textSignal` is what the input binds to, `getDigits`
+     * @returns A handle to attach to the input. `text` is what the input binds to, `getDigits`
      * is the digits currently entered, `getHasIssue` says whether what is entered is wrong,
      * `formatValue` formats a value for display, `commit` sets the value directly, `refresh` rewrites
      * the text from the value, and `onInput` and `onBlur` must be called from the input's own handlers
@@ -51,11 +56,15 @@ export namespace MaskedFieldSolidUtils {
         };
 
         createEffect(() => {
-            const typed = MaskedFieldUtils.computeTypedValue(getDigits(), defs);
+            const digits = getDigits();
 
-            if (!typed) return;
+            untrack(() => {
+                const typed = MaskedFieldUtils.computeTypedValue(digits, defs);
 
-            commit(typed.value);
+                if (!typed) return;
+
+                commit(typed.value);
+            });
         });
 
         createEffect(() => {
@@ -66,16 +75,22 @@ export namespace MaskedFieldSolidUtils {
             refresh();
         });
 
-        createEffect(() => {
-            const spelling = MaskedFieldUtils.computeText(untrack(defs.getValue), defs);
+        createEffect<{ value: T | undefined; spelling: string }>(
+            (previous) => {
+                const value = defs.getValue();
+                const spelling = MaskedFieldUtils.computeText(value, defs);
 
-            if (spelling === untrack(textSignal[0])) return;
+                const isRespelled = spelling !== previous.spelling && defs.getIsSame(value, previous.value);
 
-            textSignal[1](spelling);
-        });
+                if (isRespelled && spelling !== untrack(textSignal[0])) textSignal[1](spelling);
+
+                return { value, spelling };
+            },
+            untrack(() => ({ value: defs.getValue(), spelling: getText() })),
+        );
 
         return {
-            textSignal,
+            text: textSignal,
             getDigits,
             getHasIssue,
             formatValue,

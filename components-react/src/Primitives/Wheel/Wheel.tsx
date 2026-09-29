@@ -44,8 +44,8 @@ export const Wheel = <T,>(props: WheelProps<T>) => {
 
     const rotation = RotatorReactUtils.useRotator(isDisabled, {
         stepCount: wedgeCount,
-        targetIndexState: props.targetIndexState,
-        isAutoSpinEnabled: props.autoSpinState?.[0],
+        targetIndex: props.targetIndex,
+        isAutoSpinEnabled: props.autoSpin?.[0],
         spinDurationMs: props.spinDurationMs,
         settleDurationMs: props.settleDurationMs,
         restDurationMs: props.restDurationMs,

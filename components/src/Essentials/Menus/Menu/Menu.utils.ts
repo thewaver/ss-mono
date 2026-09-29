@@ -8,6 +8,7 @@ import { PlacementUtils } from "../../../Abstracts/Placement/Placement.utils";
 import { SelectionUtils } from "../../../Abstracts/Selection/Selection.utils";
 import { TypeaheadUtils } from "../../../Abstracts/Typeahead/Typeahead.utils";
 import { ViewportUtils } from "../../../Abstracts/Viewport/Viewport.utils";
+import { PopoverUtils } from "../../../Primitives/Popover/Popover.utils";
 import type {
     MenuActivation,
     MenuContextRequestDefs,
@@ -23,6 +24,9 @@ import type {
     MenuRun,
     MenuSubmenuMode,
 } from "./Menu.types";
+
+/** What a menu level's popup root carries, and so how an item finds the popup it is drawn in. */
+const MENU_POPUP_SELECTOR = '[role="menu"]';
 
 /** An item that does not say otherwise is a plain command. */
 const DEFAULT_MENU_ITEM_KIND: MenuItemKind = "command";
@@ -116,6 +120,21 @@ export namespace MenuUtils {
      * @param kind The item's kind, from {@link MenuUtils.getKind}.
      */
     export const getItemRole = (kind: MenuItemKind): MenuItemRole => MENU_ITEM_ROLES[kind];
+
+    /**
+     * Scrolls a highlighted item into view inside its own menu, and never scrolls the page.
+     *
+     * An item is highlighted the moment its menu opens, while the popup is still unplaced, so the page's own scrolling
+     * must stay out of it; this moves only the scrollers inside the level's popup, through
+     * {@link PopoverUtils.revealWithin}. An item drawn outside a menu popup moves nothing.
+     *
+     * @param item The item's element.
+     */
+    export const revealItem = (item: HTMLElement) => {
+        const popup = item.closest<HTMLElement>(MENU_POPUP_SELECTOR);
+
+        if (popup) PopoverUtils.revealWithin(item, popup);
+    };
 
     /**
      * Whether picking an item leaves the menu open.

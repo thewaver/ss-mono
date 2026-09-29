@@ -6,8 +6,8 @@ import { CardsExample } from "./Cards";
 
 type Props = {
     groupId: string;
-    handState: readonly [SortableItem<Card>[], (items: SortableItem<Card>[]) => void];
-    boardState: readonly [SortableItem<Card>[], (items: SortableItem<Card>[]) => void];
+    hand: readonly [SortableItem<Card>[], (items: SortableItem<Card>[]) => void];
+    board: readonly [SortableItem<Card>[], (items: SortableItem<Card>[]) => void];
     isBoardLocked?: boolean;
     computeCanAccept?: (value: Card, fromLabel: string) => boolean;
 };
@@ -19,7 +19,7 @@ export const PairExample = (props: Props) => (
 
             <CardsExample
                 groupId={props.groupId}
-                itemsState={props.handState}
+                items={props.hand}
                 ariaLabel={"Hand"}
                 emptyText={"No cards"}
             />
@@ -30,7 +30,7 @@ export const PairExample = (props: Props) => (
 
             <CardsExample
                 groupId={props.groupId}
-                itemsState={props.boardState}
+                items={props.board}
                 ariaLabel={"Board"}
                 emptyText={"Play a card here"}
                 isLocked={props.isBoardLocked ?? false}

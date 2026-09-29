@@ -33,5 +33,5 @@ export type FileInputProps = Omit<InteractionWrapperProps<FileInputRenderProps>,
     Pick<InteractionControlProps<FileInputRenderProps>, "id" | "renderContent"> &
     FileInputState & {
         /** The chosen files, and how to change them. It is the only thing that changes them. */
-        filesState: readonly [File[], (files: File[]) => void];
+        files: readonly [File[], (files: File[]) => void];
     };

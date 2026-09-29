@@ -8,7 +8,7 @@ type Props = RangeExampleProps;
 
 export const DisabledExample = (props: Props) => (
     <Range
-        valueSignal={props.valueSignal}
+        value={props.value}
         ariaLabel={"Disabled range"}
         isDisabled={true}
         thumbSize={() => RANGE_THUMB_SIZE}

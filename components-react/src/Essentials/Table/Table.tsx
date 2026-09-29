@@ -145,16 +145,16 @@ export const Table = <T,>(props: TableProps<T>) => {
     const direction = NavigatorReactUtils.useDirection(headerRef);
 
     const isDisabled = props.isDisabled ?? false;
-    const widths = props.widthsState?.[0] ?? EMPTY_WIDTHS;
-    const sort = props.sortState?.[0];
-    const selected = props.selectionState?.[0] ?? EMPTY_SELECTION;
-    const selectionMode = TableUtils.getSelectionMode(props.selectionMode, props.selectionState !== undefined);
+    const widths = props.widths?.[0] ?? EMPTY_WIDTHS;
+    const sort = props.sort?.[0];
+    const selected = props.selection?.[0] ?? EMPTY_SELECTION;
+    const selectionMode = TableUtils.getSelectionMode(props.selectionMode, props.selection !== undefined);
     const isVirtualized = props.computeEstimatedRowHeight !== undefined;
     const resizeStepPx = props.resizeStepPx ?? TABLE_DEFAULTS.resizeStepPx;
 
     const columnOrder = useMemo(
-        () => TableUtils.getColumnOrder(props.columns, props.orderState?.[0] ?? EMPTY_ORDER),
-        [props.columns, props.orderState?.[0]],
+        () => TableUtils.getColumnOrder(props.columns, props.order?.[0] ?? EMPTY_ORDER),
+        [props.columns, props.order?.[0]],
     );
 
     const columns = useMemo(() => TableUtils.getReordered(props.columns, columnOrder), [props.columns, columnOrder]);
@@ -204,17 +204,17 @@ export const Table = <T,>(props: TableProps<T>) => {
 
         const next = TableUtils.getNextSort(sort, column.id);
 
-        props.sortState?.[1](next);
+        props.sort?.[1](next);
         props.onSortChange?.(next);
     };
 
     const selection = SelectionReactUtils.useSelection(isDisabled, {
         mode: selectionMode,
         items: rows,
-        selectionState: [
+        selection: [
             selected,
             (next) => {
-                props.selectionState?.[1](next);
+                props.selection?.[1](next);
                 props.onSelectionChange?.(next);
             },
         ],
@@ -231,12 +231,12 @@ export const Table = <T,>(props: TableProps<T>) => {
         document.getElementById(getCellId({ row: HEADER_ROW_INDEX, col: columnIndex }))?.offsetWidth ??
         0;
 
-    const getIsResizable = (column: TableColumn<T>) => (column.isResizable ?? false) && props.widthsState !== undefined;
+    const getIsResizable = (column: TableColumn<T>) => (column.isResizable ?? false) && props.widths !== undefined;
 
     const resizeColumn = (column: TableColumn<T>, width: number) => {
         if (!getIsResizable(column) || isDisabled) return;
 
-        props.widthsState?.[1]({ ...widths, [column.id]: TableUtils.getResizedWidth(column, width) });
+        props.widths?.[1]({ ...widths, [column.id]: TableUtils.getResizedWidth(column, width) });
     };
 
     const handleResizerPointerDown = (e: PointerEvent<HTMLDivElement>, column: TableColumn<T>, columnIndex: number) => {
@@ -284,7 +284,7 @@ export const Table = <T,>(props: TableProps<T>) => {
     };
 
     const getIsReorderable = (column: TableColumn<T> | undefined) =>
-        column !== undefined && (column.isReorderable ?? false) && props.orderState !== undefined;
+        column !== undefined && (column.isReorderable ?? false) && props.order !== undefined;
 
     const moveColumn = (fromIndex: number, toIndex: number) => {
         if (!getIsReorderable(columns[fromIndex]) || isDisabled) return false;
@@ -296,7 +296,7 @@ export const Table = <T,>(props: TableProps<T>) => {
             toIndex,
         );
 
-        props.orderState?.[1](next);
+        props.order?.[1](next);
         props.onOrderChange?.(next);
 
         return true;
@@ -325,10 +325,10 @@ export const Table = <T,>(props: TableProps<T>) => {
         getGroupId: () => tableId,
         getLabel: () => props.ariaLabel,
         getRootRef: () => headerRef.current ?? undefined,
-        getIsDisabled: () => isDisabled || props.orderState === undefined,
+        getIsDisabled: () => isDisabled || props.order === undefined,
         getKeyHint: () => props.announcements!.keyHint,
         getAnnouncements: () => props.announcements!,
-        computeCanAccept: () => !isDisabled && props.orderState !== undefined,
+        computeCanAccept: () => !isDisabled && props.order !== undefined,
         computePlaceAtPoint: (point) =>
             TableUtils.computeColumnPlaceAtPoint(getHeaderRects(), point, getSourceColumnIndex() ?? 0, direction),
         computeNudgedPlace: (place, nudge) => TableUtils.computeColumnNudgedPlace(place, nudge, columns.length),
@@ -342,6 +342,10 @@ export const Table = <T,>(props: TableProps<T>) => {
     });
 
     zoneRef.current = zone;
+
+    const isSource = carryState?.from === zone;
+
+    useEffect(() => (isSource ? TableUtils.observeCarryCancel(zone) : undefined), [isSource, zone]);
 
     const carriedColumnId = carryState?.from === zone ? carryState.carry.key : undefined;
 
@@ -586,7 +590,7 @@ export const Table = <T,>(props: TableProps<T>) => {
                                 isRoving={getIsRoving(cell)}
                                 isDisabled={isDisabled}
                                 isReorderable={getIsReorderable(column)}
-                                hintId={props.orderState !== undefined ? hintId : undefined}
+                                hintId={props.order !== undefined ? hintId : undefined}
                                 landingCol={landingCol}
                                 columnCount={columns.length}
                                 renderProps={renderProps}
@@ -627,7 +631,7 @@ export const Table = <T,>(props: TableProps<T>) => {
                 </div>
             </div>
 
-            {props.orderState !== undefined && (
+            {props.order !== undefined && (
                 <div id={hintId} className={TableStyles.tableHint}>
                     {props.announcements.restingKeyHint}
                 </div>

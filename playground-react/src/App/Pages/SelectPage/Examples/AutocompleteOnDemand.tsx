@@ -9,8 +9,8 @@ import { PLACEHOLDER, QUERY_PADDING } from "../SelectPage.const";
 import type { Delivery } from "../SelectPage.types";
 
 type Props = {
-    valueState: readonly [Delivery | undefined, (value: Delivery | undefined) => void];
-    queryState: readonly [string, (query: string) => void];
+    value: readonly [Delivery | undefined, (value: Delivery | undefined) => void];
+    query: readonly [string, (query: string) => void];
     options: SelectOption<Delivery>[];
     hasMore: boolean;
     isSearching: boolean;
@@ -21,8 +21,8 @@ type Props = {
 export const AutocompleteOnDemandExample = (props: Props) => {
     return (
         <Select
-            valueState={props.valueState}
-            queryState={props.queryState}
+            value={props.value}
+            query={props.query}
             options={props.options}
             hasMoreOptions={props.hasMore}
             ariaLabel={"Route"}

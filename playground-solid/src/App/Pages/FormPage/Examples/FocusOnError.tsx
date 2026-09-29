@@ -24,10 +24,10 @@ export const FocusOnErrorExample = (props: Props) => (
         onReset={props.onReset}
         renderContent={(getState) => {
             const getPlanMessage = () =>
-                getState().hasSubmitted && props.planSignal[0]() === undefined ? "Pick a plan." : "";
+                getState().hasSubmitted && props.plan[0]() === undefined ? "Pick a plan." : "";
 
             const getTopicsMessage = () =>
-                getState().hasSubmitted && props.topicsSignal[0]().length < 1 ? "Pick at least one topic." : "";
+                getState().hasSubmitted && props.topics[0]().length < 1 ? "Pick at least one topic." : "";
 
             return (
                 <PageFormStack>
@@ -40,7 +40,7 @@ export const FocusOnErrorExample = (props: Props) => (
                         )}
                         renderControl={(getFieldState) => (
                             <Select
-                                valueSignal={props.planSignal}
+                                value={props.plan}
                                 options={() => PLANS}
                                 ariaLabel={"Plan"}
                                 isRequired={true}
@@ -69,7 +69,7 @@ export const FocusOnErrorExample = (props: Props) => (
                         )}
                         renderControl={(getFieldState) => (
                             <MultiSelect
-                                valuesSignal={props.topicsSignal}
+                                values={props.topics}
                                 options={() => TOPICS}
                                 ariaLabel={"Topics"}
                                 isRequired={true}

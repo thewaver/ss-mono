@@ -12,9 +12,9 @@ type Props = AudioSwitcherExampleProps;
 export const DefaultExample = (props: Props) => {
     const [getController, setController] = createSignal<AudioSwitcherController>();
 
-    const getIsPlaying = () => access(props.playbackSignal)[0]();
+    const getIsPlaying = () => access(props.playback)[0]();
 
-    const setIsPlaying = (isPlaying: boolean) => access(props.playbackSignal)[1](isPlaying);
+    const setIsPlaying = (isPlaying: boolean) => access(props.playback)[1](isPlaying);
 
     return (
         <div class={styles.deck}>
@@ -41,7 +41,7 @@ export const DefaultExample = (props: Props) => {
                 src={props.src}
                 crossfadeMs={props.crossfadeMs}
                 volume={props.volume}
-                playbackSignal={access(props.playbackSignal)}
+                playback={access(props.playback)}
                 onMount={setController}
             />
         </div>

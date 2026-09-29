@@ -248,7 +248,7 @@ export const ToastsPage = () => {
             </div>
 
             <Toasts
-                toastsSignal={toastQueue}
+                toasts={toastQueue}
                 ariaLabel={"Notifications"}
                 computeAnnouncement={(toast) => toast.value.message}
                 alignment={getAlignment}

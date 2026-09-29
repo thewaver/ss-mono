@@ -7,7 +7,7 @@ import { PageSortableRoom } from "../../../StyledComponents/SortableContent/Sort
 import { CardsExample } from "./Cards";
 
 type Props = {
-    itemsSignal: Signal<SortableItem<Card>[]>;
+    items: Signal<SortableItem<Card>[]>;
 };
 
 export const RightToLeftExample = (props: Props) => {
@@ -16,7 +16,7 @@ export const RightToLeftExample = (props: Props) => {
             <PageSortableRoom>
                 <CardsExample
                     groupId={"rightToLeft"}
-                    itemsSignal={props.itemsSignal}
+                    items={props.items}
                     ariaLabel={"Row in a right-to-left box"}
                     emptyText={"No cards"}
                     orientation={"horizontal"}

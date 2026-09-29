@@ -36,7 +36,7 @@ export const DefaultExample = (props: Props) => {
                 )}
                 renderControl={(getState) => (
                     <TextInput
-                        valueSignal={props.valueSignal}
+                        value={props.value}
                         hasError={() => getState().hasError}
                         isRequired={() => getState().isRequired}
                         padding={() => FIELD_PADDING}

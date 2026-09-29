@@ -4,15 +4,15 @@ import type { Plugin } from "vite";
 
 const VIRTUAL_ID = "virtual:component-dependencies";
 const RESOLVED_ID = `\0${VIRTUAL_ID}`;
-const IMPORT_PATTERN = /^import\s+(?!type\s)[^;]*?["']([^"']+)["'];?\s*$/gm;
-const SOURCE_PATTERN = /\.tsx?$/;
+const IMPORT_PATTERN = /^\s*import\s+(?!type\s)[^;]*?["']([^"']+)["'];?\s*$/gm;
+const SOURCE_PATTERN = /\.(tsx?|svelte)$/;
 const TEST_PATTERN = /\.test\.tsx?$/;
 const ABSTRACTS_LAYER = "Abstracts";
 const GENERATORS_LAYER = "Generators";
 const PRIMITIVES_LAYER = "Primitives";
 const FOLDER_UNIT_LAYERS = new Set([ABSTRACTS_LAYER, GENERATORS_LAYER]);
 const COMPONENT_LAYERS = new Set(["Essentials", "Composites", "Exotics"]);
-const PACKAGE_IMPORT_PATTERN = /^import\s+(?!type\s)\{([^}]*)\}\s*from\s*["']@thewaver\/ss-components["'];?\s*$/gm;
+const PACKAGE_IMPORT_PATTERN = /^\s*import\s+(?!type\s)\{([^}]*)\}\s*from\s*["']@thewaver\/ss-components["'];?\s*$/gm;
 const EXPORT_PATTERN = /^export\s+(?:const|let|namespace|function|class)\s+(\w+)/gm;
 const STYLES_PATTERN = /\.css\.ts$/;
 
@@ -48,7 +48,9 @@ const resolveSpecifier = (fromFile: string, specifier: string, known: Set<string
 
     const base = path.posix.normalize(path.posix.join(path.posix.dirname(fromFile), specifier));
 
-    return [base, `${base}.ts`, `${base}.tsx`, `${base}/index.ts`].find((candidate) => known.has(candidate));
+    return [base, `${base}.ts`, `${base}.tsx`, `${base}/index.ts`, base.replace(/\.js$/, ".ts")].find((candidate) =>
+        known.has(candidate),
+    );
 };
 
 export const getUnitName = (relativeFile: string) => {

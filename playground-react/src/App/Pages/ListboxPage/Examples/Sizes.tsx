@@ -11,7 +11,7 @@ export const SizesExample = (props: Props) => (
     <div dir="rtl">
         <PageListboxSurface isWide={true}>
             <Listbox
-                valueState={props.valueState}
+                value={props.value}
                 options={SIZES}
                 orientation={"horizontal"}
                 ariaLabel={"Size"}

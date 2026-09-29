@@ -130,16 +130,16 @@ export const SelectComposite = <T,>(props: SelectCompositeProps<T>) => {
     const getListAriaLabel = () => access(props.listAriaLabel);
 
     const [getFieldRef, setFieldRef] = createSignal<HTMLElement>();
-    const [getIsOpen, setIsOpen] = SignalMirrorSolidUtils.createOptional(() => props.visibilitySignal, false);
+    const [getIsOpen, setIsOpen] = SignalMirrorSolidUtils.createOptional(() => props.visibility, false);
     const [getHasPopoverSettled, setHasPopoverSettled] = createSignal(true);
 
     const getIsDisabled = createMemo(() => access(props.isDisabled) ?? false);
 
     const getIsMultiple = createMemo(() => access(props.isMultiple) ?? false);
 
-    const getIsFilterable = createMemo(() => props.querySignal !== undefined);
+    const getIsFilterable = createMemo(() => props.query !== undefined);
 
-    const getQuery = createMemo(() => props.querySignal?.[0]() ?? EMPTY_QUERY);
+    const getQuery = createMemo(() => props.query?.[0]() ?? EMPTY_QUERY);
 
     const getIsFiltering = createMemo(() => getQuery() !== EMPTY_QUERY);
 
@@ -196,7 +196,7 @@ export const SelectComposite = <T,>(props: SelectCompositeProps<T>) => {
     createEffect(() => {
         if (!SelectUtils.getIsQueryClearDue(getIsOpen(), getHasPopoverSettled(), getQuery())) return;
 
-        props.querySignal?.[1](EMPTY_QUERY);
+        props.query?.[1](EMPTY_QUERY);
     });
 
     const renderOptions = () => (
@@ -248,7 +248,7 @@ export const SelectComposite = <T,>(props: SelectCompositeProps<T>) => {
                             open();
                             cursor.highlight(undefined);
 
-                            props.querySignal?.[1](query);
+                            props.query?.[1](query);
                         }}
                     />
 
@@ -300,7 +300,7 @@ export const SelectComposite = <T,>(props: SelectCompositeProps<T>) => {
 };
 
 export const Select = <T,>(props: SelectProps<T>) => {
-    const valueSignal = accessSignal(() => props.valueSignal);
+    const valueSignal = accessSignal(() => props.value);
 
     const getSelectedOptions = createMemo(() => {
         const selectedValue = valueSignal[0]();

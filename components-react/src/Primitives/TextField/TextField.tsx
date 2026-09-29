@@ -181,7 +181,7 @@ const TextFieldElement = (props: TextFieldElementProps) => {
 };
 
 export const TextField = (props: TextFieldProps) => {
-    const [value, setValue] = props.valueState;
+    const [value, setValue] = props.value;
 
     const controlRef = useRef<HTMLElement | null>(null);
     const leadingRef = useRef<HTMLDivElement | null>(null);

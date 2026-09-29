@@ -22,7 +22,7 @@ export const DefaultExample = ({
     isScattered,
     ...otherProps
 }: ParticleFieldExampleProps &
-    Pick<ParticleFieldProps, "computeShapePoints" | "shapeJoinRadii" | "progressSignal">) => (
+    Pick<ParticleFieldProps, "computeShapePoints" | "shapeJoinRadii" | "progress">) => (
     <ParticleField
         {...otherProps}
         computeCellWeights={(count) =>

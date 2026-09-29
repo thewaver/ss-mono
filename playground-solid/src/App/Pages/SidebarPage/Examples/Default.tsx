@@ -21,7 +21,7 @@ const ENTRIES = ["Inbox", "Drafts", "Sent", "Archive", "Spam"];
 export const DefaultExample = (props: Props) => {
     const sidebarId = createUniqueId();
 
-    const [getIsExpanded, setIsExpanded] = props.expandedSignal;
+    const [getIsExpanded, setIsExpanded] = props.expanded;
 
     return (
         <PageSidebarFrame edge={props.edge}>
@@ -32,7 +32,7 @@ export const DefaultExample = (props: Props) => {
                 collapsedWidth={() => COLLAPSED_WIDTH}
                 expandedWidth={() => EXPANDED_WIDTH}
                 isExpandedOnHover={props.isExpandedOnHover}
-                expandedSignal={props.expandedSignal}
+                expanded={props.expanded}
                 renderContent={(getPhase, getTransitionDurationMs) => (
                     <PageSidebarSurface width={() => EXPANDED_WIDTH}>
                         <PageSidebarToggle

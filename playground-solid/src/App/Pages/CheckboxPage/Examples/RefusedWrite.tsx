@@ -9,27 +9,27 @@ type Props = CheckboxRefusedWriteExampleProps;
 export const RefusedWriteExample = (props: Props) => (
     <PageControlRow>
         <Checkbox
-            checkedSignal={props.emailSignal}
+            checked={props.email}
             id={"email"}
             ariaLabel={"Email"}
             renderContent={(getFlags) => <PageCheckboxContent flags={getFlags} />}
             onChange={(isChecked) => {
-                if (isChecked || props.smsSignal[0]()) return;
+                if (isChecked || props.sms[0]()) return;
 
-                props.emailSignal[1](true);
+                props.email[1](true);
             }}
         />
 
         <PageControlRowLabel>or</PageControlRowLabel>
 
         <Checkbox
-            checkedSignal={props.smsSignal}
+            checked={props.sms}
             ariaLabel={"SMS"}
             renderContent={(getFlags) => <PageCheckboxContent flags={getFlags} />}
             onChange={(isChecked) => {
-                if (isChecked || props.emailSignal[0]()) return;
+                if (isChecked || props.email[0]()) return;
 
-                props.smsSignal[1](true);
+                props.sms[1](true);
             }}
         />
     </PageControlRow>

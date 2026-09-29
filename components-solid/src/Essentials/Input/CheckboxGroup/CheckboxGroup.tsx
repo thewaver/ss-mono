@@ -15,7 +15,7 @@ import { CheckboxGroupContextProvider } from "./CheckboxGroup.context";
 import type { CheckboxGroupProps } from "./CheckboxGroupSolid.types";
 
 export const CheckboxGroup = <T,>(props: CheckboxGroupProps<T>) => {
-    const [getValues, setValues] = SignalMirrorSolidUtils.createOptional<T[]>(() => props.valueSignal, []);
+    const [getValues, setValues] = SignalMirrorSolidUtils.createOptional<T[]>(() => props.value, []);
 
     const [getEntries, setEntries] = createSignal<CheckboxGroupEntry[]>([]);
 

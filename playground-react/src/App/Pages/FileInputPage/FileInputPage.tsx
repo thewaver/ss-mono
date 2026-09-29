@@ -45,21 +45,21 @@ export const FileInputPage = () => {
             key: "default",
             name: "Default",
             readout: () => `files: ${describe(defaultState[0])}`,
-            component: () => <DefaultExample filesState={defaultState} />,
+            component: () => <DefaultExample files={defaultState} />,
             path: `${EXAMPLES_ROOT}/Default.tsx`,
         },
         {
             key: "multiple",
             name: "Multiple",
             readout: () => `files: ${describe(multipleState[0])}`,
-            component: () => <MultipleExample filesState={multipleState} />,
+            component: () => <MultipleExample files={multipleState} />,
             path: `${EXAMPLES_ROOT}/Multiple.tsx`,
         },
         {
             key: "images",
             name: "Accepting images only",
             readout: () => `files: ${describe(imagesState[0])} — accept is a filter, never a guarantee`,
-            component: () => <ImagesExample filesState={imagesState} />,
+            component: () => <ImagesExample files={imagesState} />,
             path: `${EXAMPLES_ROOT}/Images.tsx`,
         },
         {
@@ -69,7 +69,7 @@ export const FileInputPage = () => {
                 `files: ${describe(rejectingState[0])}${rejection ? ` — ${rejection}` : ` — anything over ${MAX_ATTACHMENT_BYTES} bytes is refused`}`,
             component: () => (
                 <RejectingSetterExample
-                    filesState={rejectingState}
+                    files={rejectingState}
                     rejection={rejection}
                     onRejectionChange={setRejection}
                 />
@@ -80,35 +80,35 @@ export const FileInputPage = () => {
             key: "disabled",
             name: "Disabled",
             readout: () => `files: ${describe(disabledState[0])}`,
-            component: () => <DisabledExample filesState={disabledState} />,
+            component: () => <DisabledExample files={disabledState} />,
             path: `${EXAMPLES_ROOT}/Disabled.tsx`,
         },
         {
             key: "reachable",
             name: "Disabled + reachable",
             readout: () => `files: ${describe(reachableState[0])}`,
-            component: () => <ReachableExample filesState={reachableState} />,
+            component: () => <ReachableExample files={reachableState} />,
             path: `${EXAMPLES_ROOT}/Reachable.tsx`,
         },
         {
             key: "errored",
             name: "Error",
             readout: () => `files: ${describe(erroredState[0])} — required, nothing picked yet`,
-            component: () => <ErroredExample filesState={erroredState} />,
+            component: () => <ErroredExample files={erroredState} />,
             path: `${EXAMPLES_ROOT}/Errored.tsx`,
         },
         {
             key: "label",
             name: "In a Label",
             readout: () => `files: ${describe(labeledState[0])} — the caption opens the dialog`,
-            component: () => <LabeledExample filesState={labeledState} />,
+            component: () => <LabeledExample files={labeledState} />,
             path: `${EXAMPLES_ROOT}/Labeled.tsx`,
         },
         {
             key: "dropZone",
             name: "Drop area with limits",
             readout: () => `files: ${describe(dropZoneState[0])} — refused: ${describeRejections(dropZoneRejections)}`,
-            component: () => <DropZoneExample filesState={dropZoneState} onRejectionsChange={setDropZoneRejections} />,
+            component: () => <DropZoneExample files={dropZoneState} onRejectionsChange={setDropZoneRejections} />,
             path: `${EXAMPLES_ROOT}/DropZone.tsx`,
         },
     ];

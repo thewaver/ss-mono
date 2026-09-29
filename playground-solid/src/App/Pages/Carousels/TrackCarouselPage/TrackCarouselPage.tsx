@@ -23,13 +23,13 @@ export const TrackCarouselPage = () => {
             key: "manual",
             name: "Stepped by hand",
             readout: () =>
-                `slide ${manualIndexSignal[0]() + 1} of ${controls.getSlideCount()} — ${controls.isLoopingSignal[0]() ? "stepping past either end wraps round, which is what separates this from the scroller" : "looping is off, so Previous on the first slide and Next on the last are disabled, and a swipe past an end springs back"}; a column takes its height from the box the page puts round it`,
+                `slide ${manualIndexSignal[0]() + 1} of ${controls.getSlideCount()} — ${controls.isLooping[0]() ? "stepping past either end wraps round, which is what separates this from the scroller" : "looping is off, so Previous on the first slide and Next on the last are disabled, and a swipe past an end springs back"}; a column takes its height from the box the page puts round it`,
             component: () => (
                 <PageCarouselBox>
                     <SteppedExample
                         {...controls.getSharedProps()}
-                        isLooping={controls.isLoopingSignal[0]}
-                        indexSignal={manualIndexSignal}
+                        isLooping={controls.isLooping[0]}
+                        index={manualIndexSignal}
                     />
                 </PageCarouselBox>
             ),
@@ -39,15 +39,15 @@ export const TrackCarouselPage = () => {
             key: "rotating",
             name: "Rotating on its own",
             readout: () =>
-                `slide ${rotatingIndexSignal[0]() + 1} of ${controls.getSlideCount()} | ${rotatingPlayingSignal[0]() ? "playing" : "stopped"} — it holds while the pointer is over it, while anything inside it has focus, and while the tab is in the background${controls.isLoopingSignal[0]() ? "" : "; with looping off it stops for good on the last slide"}`,
+                `slide ${rotatingIndexSignal[0]() + 1} of ${controls.getSlideCount()} | ${rotatingPlayingSignal[0]() ? "playing" : "stopped"} — it holds while the pointer is over it, while anything inside it has focus, and while the tab is in the background${controls.isLooping[0]() ? "" : "; with looping off it stops for good on the last slide"}`,
             component: () => (
                 <PageCarouselBox>
                     <RotatingExample
                         {...controls.getSharedProps()}
-                        isLooping={controls.isLoopingSignal[0]}
-                        indexSignal={rotatingIndexSignal}
-                        playbackSignal={rotatingPlayingSignal}
-                        autoplayDelayMs={controls.delaySignal[0]}
+                        isLooping={controls.isLooping[0]}
+                        index={rotatingIndexSignal}
+                        playback={rotatingPlayingSignal}
+                        autoplayDelayMs={controls.delay[0]}
                     />
                 </PageCarouselBox>
             ),
@@ -60,7 +60,7 @@ export const TrackCarouselPage = () => {
                 `slide ${barelessIndexSignal[0]() + 1} of ${controls.getSlideCount()} — nothing is drawn beside the slides, so the surrounding page owns the buttons through the signal it shares`,
             component: () => (
                 <PageCarouselBox>
-                    <NoControlsExample {...controls.getSharedProps()} indexSignal={barelessIndexSignal} />
+                    <NoControlsExample {...controls.getSharedProps()} index={barelessIndexSignal} />
                 </PageCarouselBox>
             ),
             path: `${EXAMPLES_ROOT}/NoControls.tsx`,

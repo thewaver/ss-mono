@@ -80,8 +80,8 @@ const TreeNodeItem = (props: TreeNodeItemProps) => {
 };
 
 export const Tree = <T,>(props: TreeProps<T>) => {
-    const valueSignal = SignalMirrorSolidUtils.createOptional<T | undefined>(() => props.valueSignal, undefined);
-    const expandedSignal = SignalMirrorSolidUtils.createOptional<T[]>(() => props.expandedSignal, []);
+    const valueSignal = SignalMirrorSolidUtils.createOptional<T | undefined>(() => props.value, undefined);
+    const expandedSignal = SignalMirrorSolidUtils.createOptional<T[]>(() => props.expanded, []);
 
     const treeId = createUniqueId();
 

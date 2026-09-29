@@ -10,7 +10,7 @@ type Props = MultiSelectClearableExampleProps;
 
 export const MultiSelectClearableExample = (props: Props) => (
     <MultiSelect
-        valuesState={props.valuesState}
+        values={props.values}
         options={COUNTRIES}
         ariaLabel={"Countries"}
         clearAriaLabel={"Clear countries"}

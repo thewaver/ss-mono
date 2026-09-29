@@ -21,7 +21,7 @@ export type RadioGroupProps<T> = PropsWithChildren<{
      * Which option is picked, and how to change it. It is the only thing that picks one: each `Radio` inside is
      * checked when its `value` is this one, compared by identity.
      */
-    valueState: readonly [T, (value: T) => void];
+    value: readonly [T, (value: T) => void];
     /**
      * Arranges the options, for a group that is something other than a straight run. Each `Radio` is handed the
      * placement at its position in the document, so the options are placed in the order a reader meets them.

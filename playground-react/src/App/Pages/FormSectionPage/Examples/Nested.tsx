@@ -26,7 +26,7 @@ type Props = FormSectionNestedExampleProps;
 
 const renderTextField = (state: FormSectionTextState, hasError: boolean) => (
     <TextInput
-        valueState={state}
+        value={state}
         hasError={hasError}
         padding={FIELD_PADDING}
         gap={FIELD_GAP}
@@ -36,9 +36,9 @@ const renderTextField = (state: FormSectionTextState, hasError: boolean) => (
 );
 
 export const NestedExample = (props: Props) => {
-    const streetMessage = props.streetState[0].trim().length > 0 ? "" : "We need somewhere to send it.";
+    const streetMessage = props.street[0].trim().length > 0 ? "" : "We need somewhere to send it.";
 
-    const cardMessage = /^\d{4}$/.test(props.cardState[0]) ? "" : `The last ${CARD_DIGITS} digits, and nothing else.`;
+    const cardMessage = /^\d{4}$/.test(props.card[0]) ? "" : `The last ${CARD_DIGITS} digits, and nothing else.`;
 
     return (
         <Form
@@ -59,7 +59,7 @@ export const NestedExample = (props: Props) => {
                                         <PageFormFieldMessage state={fieldState}>{streetMessage}</PageFormFieldMessage>
                                     )}
                                     renderControl={(fieldState) =>
-                                        renderTextField(props.streetState, fieldState.hasError)
+                                        renderTextField(props.street, fieldState.hasError)
                                     }
                                 />
 
@@ -80,7 +80,7 @@ export const NestedExample = (props: Props) => {
                                                     </PageFormFieldMessage>
                                                 )}
                                                 renderControl={(fieldState) =>
-                                                    renderTextField(props.cardState, fieldState.hasError)
+                                                    renderTextField(props.card, fieldState.hasError)
                                                 }
                                             />
                                         </PageFormSectionBody>

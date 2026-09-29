@@ -7,7 +7,7 @@ import { SelectComposite } from "../Select/Select";
 import type { MultiSelectProps } from "./MultiSelectSolid.types";
 
 export const MultiSelect = <T,>(props: MultiSelectProps<T>) => {
-    const valuesSignal = accessSignal(() => props.valuesSignal);
+    const valuesSignal = accessSignal(() => props.values);
 
     const getSelectedOptions = createMemo(() => {
         const selectedValues = valuesSignal[0]();

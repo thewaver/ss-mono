@@ -70,7 +70,7 @@ export type AccordionProps<T> = AccessorProps<{
      * open or close sections from outside. Leave it out and the accordion keeps the state itself, starting with every
      * section closed.
      */
-    expandedSignal?: SignalSource<T[]>;
+    expanded?: SignalSource<T[]>;
     /** Draws a section's header. */
     renderHeader: AccordionHeaderRenderer<T>;
     /** Draws a section's panel. */

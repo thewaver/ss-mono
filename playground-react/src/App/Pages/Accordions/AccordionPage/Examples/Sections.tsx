@@ -32,7 +32,7 @@ export const SectionsExample = (props: Props) => {
     return (
         <Accordion
             items={ITEMS}
-            expandedState={props.expandedState}
+            expanded={props.expanded}
             isSingleExpand={props.isSingleExpand}
             isExpandRequired={props.isExpandRequired}
             gap={GAP}

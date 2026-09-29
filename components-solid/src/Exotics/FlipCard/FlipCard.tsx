@@ -13,7 +13,7 @@ import { access, accessSignal } from "../../Utils/propUtils";
 import type { FlipCardProps } from "./FlipCardSolid.types";
 
 export const FlipCard = (props: FlipCardProps) => {
-    const [getIsFlipped] = accessSignal(() => props.flippedSignal);
+    const [getIsFlipped] = accessSignal(() => props.flipped);
 
     const getShownFace = createMemo(() => FlipCardUtils.getShownFace(getIsFlipped()));
 

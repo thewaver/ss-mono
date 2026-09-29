@@ -36,14 +36,14 @@ export const CheckboxPage = () => {
             key: "default",
             name: "Default",
             readout: () => `checked: ${defaultSignal[0]()}`,
-            component: () => <DefaultExample checkedSignal={defaultSignal} />,
+            component: () => <DefaultExample checked={defaultSignal} />,
             path: `${EXAMPLES_ROOT}/Default.tsx`,
         },
         {
             key: "decorated",
             name: "Decorated",
             readout: () => `checked: ${decoratedSignal[0]()}`,
-            component: () => <DecoratedExample checkedSignal={decoratedSignal} />,
+            component: () => <DecoratedExample checked={decoratedSignal} />,
             path: `${EXAMPLES_ROOT}/Decorated.tsx`,
         },
         {
@@ -53,9 +53,9 @@ export const CheckboxPage = () => {
                 `mixed: ${getIsAllMixed()} | all: ${allSignal[0]()} | children: ${firstChildSignal[0]()}, ${secondChildSignal[0]()}`,
             component: () => (
                 <MixedExample
-                    allSignal={allSignal}
-                    firstChildSignal={firstChildSignal}
-                    secondChildSignal={secondChildSignal}
+                    all={allSignal}
+                    firstChild={firstChildSignal}
+                    secondChild={secondChildSignal}
                     isMixed={getIsAllMixed}
                 />
             ),
@@ -66,28 +66,28 @@ export const CheckboxPage = () => {
             name: "Refused write",
             readout: () =>
                 `email: ${emailSignal[0]()} | sms: ${smsSignal[0]()} — whichever is the last one on refuses to go off`,
-            component: () => <RefusedWriteExample emailSignal={emailSignal} smsSignal={smsSignal} />,
+            component: () => <RefusedWriteExample email={emailSignal} sms={smsSignal} />,
             path: `${EXAMPLES_ROOT}/RefusedWrite.tsx`,
         },
         {
             key: "disabled",
             name: "Disabled",
             readout: () => `checked: ${disabledSignal[0]()}`,
-            component: () => <DisabledExample checkedSignal={disabledSignal} />,
+            component: () => <DisabledExample checked={disabledSignal} />,
             path: `${EXAMPLES_ROOT}/Disabled.tsx`,
         },
         {
             key: "reachable",
             name: "Disabled + reachable",
             readout: () => `checked: ${reachableSignal[0]()}`,
-            component: () => <ReachableExample checkedSignal={reachableSignal} />,
+            component: () => <ReachableExample checked={reachableSignal} />,
             path: `${EXAMPLES_ROOT}/Reachable.tsx`,
         },
         {
             key: "errored",
             name: "Error",
             readout: () => `checked: ${erroredSignal[0]()}`,
-            component: () => <ErroredExample checkedSignal={erroredSignal} />,
+            component: () => <ErroredExample checked={erroredSignal} />,
             path: `${EXAMPLES_ROOT}/Errored.tsx`,
         },
     ]);

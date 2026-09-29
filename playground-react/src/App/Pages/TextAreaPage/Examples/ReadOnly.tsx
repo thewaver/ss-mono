@@ -15,7 +15,7 @@ type Props = TextAreaExampleProps;
 
 export const ReadOnlyExample = (props: Props) => (
     <TextArea
-        valueState={props.valueState}
+        value={props.value}
         isReadOnly={true}
         isAutoSizing={true}
         minRows={MIN_ROWS}

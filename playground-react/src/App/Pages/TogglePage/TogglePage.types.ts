@@ -1,10 +1,10 @@
 export type ToggleExampleProps = {
-    checkedState: readonly [boolean, (isChecked: boolean) => void];
+    checked: readonly [boolean, (isChecked: boolean) => void];
 };
 
 export type ToggleMixedExampleProps = {
-    allState: readonly [boolean, (isChecked: boolean) => void];
-    firstChildState: readonly [boolean, (isChecked: boolean) => void];
-    secondChildState: readonly [boolean, (isChecked: boolean) => void];
+    all: readonly [boolean, (isChecked: boolean) => void];
+    firstChild: readonly [boolean, (isChecked: boolean) => void];
+    secondChild: readonly [boolean, (isChecked: boolean) => void];
     isMixed: boolean;
 };

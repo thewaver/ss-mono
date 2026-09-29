@@ -1,0 +1,17 @@
+import type { Component } from "svelte";
+
+export type ComponentConfig = {
+    name: string;
+    description: string;
+    component?: Component;
+};
+
+export type MenuBranchConfig = {
+    name: string;
+    children: MenuNodeConfig[];
+    hidden?: boolean;
+};
+
+export type MenuNodeConfig = ComponentConfig | MenuBranchConfig;
+
+export type RoutePath = `/${string}`;

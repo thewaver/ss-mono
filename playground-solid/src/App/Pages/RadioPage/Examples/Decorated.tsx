@@ -12,7 +12,7 @@ const STROKE_THICKNESS = 2;
 type Props = RadioExampleProps;
 
 export const DecoratedExample = (props: Props) => (
-    <RadioGroup valueSignal={props.valueSignal} ariaLabel={"Decorated size"} gap={() => RADIO_GROUP_GAP}>
+    <RadioGroup value={props.value} ariaLabel={"Decorated size"} gap={() => RADIO_GROUP_GAP}>
         <For each={SIZE_OPTIONS}>
             {(option) => (
                 <Radio

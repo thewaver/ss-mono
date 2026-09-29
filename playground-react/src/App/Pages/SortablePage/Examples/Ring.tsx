@@ -35,7 +35,7 @@ const renderCard = (item: SortableItem<Card>, flags: InteractionFlags<SortableIt
 );
 
 type Props = {
-    itemsState: readonly [SortableItem<Card>[], (items: SortableItem<Card>[]) => void];
+    items: readonly [SortableItem<Card>[], (items: SortableItem<Card>[]) => void];
 };
 
 export const RingExample = (props: Props) => (
@@ -45,7 +45,7 @@ export const RingExample = (props: Props) => (
             ariaLabel={"Ring"}
             announcements={SORTABLE_ANNOUNCEMENTS}
             gap={LIST_GAP}
-            itemsState={props.itemsState}
+            items={props.items}
             computeLayout={RING_LAYOUT}
             computeItemKey={computeCardKey}
             computeItemLabel={computeCardLabel}

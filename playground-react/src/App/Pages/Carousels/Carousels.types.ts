@@ -8,22 +8,22 @@ export type CarouselExampleProps = {
     isLooping?: boolean;
     orientation: CarouselOrientation;
     autoplayDelayMs?: number;
-    indexState: ValueState<number>;
-    playbackState?: ValueState<boolean>;
+    index: ValueState<number>;
+    playback?: ValueState<boolean>;
 };
 
 export type DrumCarouselExampleProps = Omit<CarouselExampleProps, "orientation"> & {
     axis: CarouselAxis;
 };
 
-export type CarouselSharedProps = Omit<CarouselExampleProps, "indexState" | "autoplayDelayMs" | "playbackState">;
+export type CarouselSharedProps = Omit<CarouselExampleProps, "index" | "autoplayDelayMs" | "playback">;
 
 export type CarouselsControls = {
     slideCountState: ValueState<number>;
-    delayState: ValueState<number>;
-    orientationState: ValueState<CarouselOrientation>;
-    isDisabledState: ValueState<boolean>;
-    isLoopingState: ValueState<boolean>;
+    delay: ValueState<number>;
+    orientation: ValueState<CarouselOrientation>;
+    isDisabled: ValueState<boolean>;
+    isLooping: ValueState<boolean>;
     slideCount: number;
     slides: string[];
     sharedProps: CarouselSharedProps;

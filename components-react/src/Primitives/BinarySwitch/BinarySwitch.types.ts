@@ -42,5 +42,5 @@ export type BinarySwitchProps = Omit<InteractionWrapperProps<BinarySwitchFlags>,
 
 export type BinarySwitchPresetProps = Omit<BinarySwitchProps, "type" | "isSwitch" | "isChecked"> & {
     /** Whether the switch is on, and how to change it. It is the only thing that turns it. */
-    checkedState: readonly [boolean, (isChecked: boolean) => void];
+    checked: readonly [boolean, (isChecked: boolean) => void];
 };

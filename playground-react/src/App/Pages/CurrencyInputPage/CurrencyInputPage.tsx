@@ -38,7 +38,7 @@ export const CurrencyInputPage = () => {
     const bigState = useState<number | undefined>(STARTING_BIG);
     const negativeState = useState<number | undefined>(STARTING_ADJUSTMENT);
 
-    const commonProps: Omit<CurrencyInputExampleProps, "valueState"> = {
+    const commonProps: Omit<CurrencyInputExampleProps, "value"> = {
         locale,
         decimals,
         groupSizes: grouping,
@@ -51,14 +51,14 @@ export const CurrencyInputPage = () => {
             name: "Default",
             readout: () =>
                 `value: ${describe(priceState[0])} — digits fill from the right, and the separators are the field's rather than yours to type`,
-            component: () => <DefaultExample {...commonProps} valueState={priceState} />,
+            component: () => <DefaultExample {...commonProps} value={priceState} />,
             path: `${EXAMPLES_ROOT}/Default.tsx`,
         },
         {
             key: "empty",
             name: "Empty",
             readout: () => `value: ${describe(emptyState[0])} — an empty field has no value at all`,
-            component: () => <DefaultExample {...commonProps} valueState={emptyState} ariaLabel={"Amount"} />,
+            component: () => <DefaultExample {...commonProps} value={emptyState} ariaLabel={"Amount"} />,
             path: `${EXAMPLES_ROOT}/Default.tsx`,
         },
         {
@@ -66,7 +66,7 @@ export const CurrencyInputPage = () => {
             name: "With a symbol",
             readout: () =>
                 `value: ${describe(priceState[0])} — the currency is paint in a slot, since the library holds no currencies`,
-            component: () => <SymbolExample {...commonProps} valueState={priceState} />,
+            component: () => <SymbolExample {...commonProps} value={priceState} />,
             path: `${EXAMPLES_ROOT}/Symbol.tsx`,
         },
         {
@@ -74,7 +74,7 @@ export const CurrencyInputPage = () => {
             name: "Bounded",
             readout: () =>
                 `value: ${describe(budgetState[0])} — at most ${BUDGET_MAX}, and going over is refused as it is typed`,
-            component: () => <BoundedExample {...commonProps} valueState={budgetState} />,
+            component: () => <BoundedExample {...commonProps} value={budgetState} />,
             path: `${EXAMPLES_ROOT}/Bounded.tsx`,
         },
         {
@@ -83,7 +83,7 @@ export const CurrencyInputPage = () => {
             readout: () =>
                 `value: ${describe(negativeState[0])} — a minus is only accepted where the field was told to hold one`,
             component: () => (
-                <DefaultExample {...commonProps} valueState={negativeState} ariaLabel={"Adjustment"} hasSign={true} />
+                <DefaultExample {...commonProps} value={negativeState} ariaLabel={"Adjustment"} hasSign={true} />
             ),
             path: `${EXAMPLES_ROOT}/Default.tsx`,
         },
@@ -92,7 +92,7 @@ export const CurrencyInputPage = () => {
             name: "Many groups",
             readout: () =>
                 `value: ${describe(bigState[0])} — the group count grows with the value, which a fixed pattern cannot do`,
-            component: () => <DefaultExample {...commonProps} valueState={bigState} ariaLabel={"Large amount"} />,
+            component: () => <DefaultExample {...commonProps} value={bigState} ariaLabel={"Large amount"} />,
             path: `${EXAMPLES_ROOT}/Default.tsx`,
         },
     ];

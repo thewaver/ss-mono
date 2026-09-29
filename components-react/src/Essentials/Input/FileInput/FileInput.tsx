@@ -84,7 +84,7 @@ const FileInputElement = (props: FileInputElementProps) => {
 };
 
 export const FileInput = (props: FileInputProps) => {
-    const [files, setFiles] = props.filesState;
+    const [files, setFiles] = props.files;
 
     const controlRef = useRef<HTMLElement | null>(null);
     const control = useElement(controlRef);

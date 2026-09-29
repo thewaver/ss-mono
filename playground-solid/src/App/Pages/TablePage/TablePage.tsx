@@ -52,7 +52,7 @@ export const TablePage = () => {
             name: "Default",
             readout: () =>
                 `sort: ${spellSort(defaultSortSignal[0]())} | selected: ${spellSelection(defaultSelectionSignal[0]())} — one tab stop for the whole grid, then arrows walk cell to cell and Space picks a row`,
-            component: () => <PartsExample sortSignal={defaultSortSignal} selectionSignal={defaultSelectionSignal} />,
+            component: () => <PartsExample sort={defaultSortSignal} selection={defaultSelectionSignal} />,
             path: `${EXAMPLES_ROOT}/Parts.tsx`,
         },
         {
@@ -61,7 +61,7 @@ export const TablePage = () => {
             readout: () =>
                 `selected: ${spellSelection(singleSelectionSignal[0]())} — the same grid with room for one row in the selection, so picking a second drops the first`,
             component: () => (
-                <SingleSelectionExample sortSignal={singleSortSignal} selectionSignal={singleSelectionSignal} />
+                <SingleSelectionExample sort={singleSortSignal} selection={singleSelectionSignal} />
             ),
             path: `${EXAMPLES_ROOT}/SingleSelection.tsx`,
         },
@@ -73,9 +73,9 @@ export const TablePage = () => {
                 `widths: ${JSON.stringify(resizableWidthsSignal[0]())} — drag a column's right edge, or focus a header cell and hold Ctrl with the left and right arrows`,
             component: () => (
                 <ResizableExample
-                    sortSignal={resizableSortSignal}
-                    selectionSignal={resizableSelectionSignal}
-                    widthsSignal={resizableWidthsSignal}
+                    sort={resizableSortSignal}
+                    selection={resizableSelectionSignal}
+                    widths={resizableWidthsSignal}
                 />
             ),
             path: `${EXAMPLES_ROOT}/Resizable.tsx`,
@@ -88,9 +88,9 @@ export const TablePage = () => {
                 `order: ${reorderableOrderSignal[0]().join(", ") || "as declared"} — drag a header sideways, or focus a header cell and hold Shift with the left and right arrows`,
             component: () => (
                 <ReorderableExample
-                    sortSignal={reorderableSortSignal}
-                    selectionSignal={reorderableSelectionSignal}
-                    orderSignal={reorderableOrderSignal}
+                    sort={reorderableSortSignal}
+                    selection={reorderableSelectionSignal}
+                    order={reorderableOrderSignal}
                 />
             ),
             path: `${EXAMPLES_ROOT}/Reorderable.tsx`,
@@ -101,7 +101,7 @@ export const TablePage = () => {
             readout: () =>
                 `sort: ${spellSort(consumerSortSignal[0]())} — no column carries a comparator, so the table reports the sort and the page is what reorders the rows`,
             component: () => (
-                <ConsumerSortedExample sortSignal={consumerSortSignal} selectionSignal={consumerSelectionSignal} />
+                <ConsumerSortedExample sort={consumerSortSignal} selection={consumerSelectionSignal} />
             ),
             path: `${EXAMPLES_ROOT}/ConsumerSorted.tsx`,
         },
@@ -114,8 +114,8 @@ export const TablePage = () => {
             component: () => (
                 <VirtualizedExample
                     rows={() => stressParts}
-                    sortSignal={stressSortSignal}
-                    selectionSignal={stressSelectionSignal}
+                    sort={stressSortSignal}
+                    selection={stressSelectionSignal}
                 />
             ),
             path: `${EXAMPLES_ROOT}/Virtualized.tsx`,
@@ -126,7 +126,7 @@ export const TablePage = () => {
             readout: () =>
                 `sort: ${spellSort(disabledSortSignal[0]())} — nothing sorts, nothing selects, and every cell still reads out to a screen reader`,
             component: () => (
-                <DisabledExample sortSignal={disabledSortSignal} selectionSignal={disabledSelectionSignal} />
+                <DisabledExample sort={disabledSortSignal} selection={disabledSelectionSignal} />
             ),
             path: `${EXAMPLES_ROOT}/Disabled.tsx`,
         },

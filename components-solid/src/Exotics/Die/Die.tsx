@@ -11,7 +11,7 @@ const HALF = 0.5;
 const FIRST_FACE = 0;
 
 export const Die = (props: DieProps) => {
-    const [getFace, setFace] = SignalMirrorSolidUtils.createOptional(() => props.faceSignal, FIRST_FACE);
+    const [getFace, setFace] = SignalMirrorSolidUtils.createOptional(() => props.face, FIRST_FACE);
 
     const getShape = createMemo(() => access(props.shape));
 

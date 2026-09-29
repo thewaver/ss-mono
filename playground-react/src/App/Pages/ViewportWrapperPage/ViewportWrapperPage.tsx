@@ -110,7 +110,7 @@ export const ViewportWrapperPage = () => {
                             <div className={styles.controls}>
                                 <div>Across</div>
                                 <Range
-                                    valueState={[roamerX, setRoamerX]}
+                                    value={[roamerX, setRoamerX]}
                                     id={"roamerX"}
                                     ariaLabel={"Horizontal position"}
                                     thumbSize={RANGE_THUMB_SIZE}
@@ -119,7 +119,7 @@ export const ViewportWrapperPage = () => {
 
                                 <div>Down</div>
                                 <Range
-                                    valueState={[roamerY, setRoamerY]}
+                                    value={[roamerY, setRoamerY]}
                                     id={"roamerY"}
                                     ariaLabel={"Vertical position"}
                                     thumbSize={RANGE_THUMB_SIZE}
@@ -128,7 +128,7 @@ export const ViewportWrapperPage = () => {
 
                                 <div>Scale</div>
                                 <Range
-                                    valueState={[scalePercent, setScalePercent]}
+                                    value={[scalePercent, setScalePercent]}
                                     id={"viewportScale"}
                                     ariaLabel={"Viewport scale"}
                                     min={ViewportWrapperKnobs.SCALE_MIN}
@@ -154,7 +154,7 @@ export const ViewportWrapperPage = () => {
                                         }}
                                     >
                                         <Select
-                                            valueState={[roamingValue, setRoamingValue]}
+                                            value={[roamingValue, setRoamingValue]}
                                             options={COUNTRIES}
                                             id={"roamingCountry"}
                                             ariaLabel={"Roaming country"}
@@ -194,7 +194,7 @@ export const ViewportWrapperPage = () => {
                                     </div>
 
                                     <Toasts
-                                        toastsState={innerToasts}
+                                        toasts={innerToasts}
                                         ariaLabel={"Viewport notifications"}
                                         alignment={"bottom-center"}
                                         margins={{
@@ -245,7 +245,7 @@ export const ViewportWrapperPage = () => {
                                         <div className={styles.scrollFiller} />
 
                                         <Select
-                                            valueState={[scrolledValue, setScrolledValue]}
+                                            value={[scrolledValue, setScrolledValue]}
                                             options={COUNTRIES}
                                             id={"scrolledCountry"}
                                             ariaLabel={"Scrolled country"}

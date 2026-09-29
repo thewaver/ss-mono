@@ -18,7 +18,7 @@ export const CollapsiblePage = () => {
             name: "A single panel, no heading",
             readout: () =>
                 `expanded: ${panelSignal[0]()} — one trigger and one panel, with none of the group behavior an accordion adds`,
-            component: () => <PanelExample expandedSignal={panelSignal} />,
+            component: () => <PanelExample expanded={panelSignal} />,
             path: `${EXAMPLES_ROOT}/Panel.tsx`,
         },
         {
@@ -34,7 +34,7 @@ export const CollapsiblePage = () => {
             name: "Filling its container, built on first open",
             readout: () =>
                 `expanded: ${filledSignal[0]()} — the panel's contents are not built until it is opened, and are kept once they are`,
-            component: () => <FilledExample expandedSignal={filledSignal} />,
+            component: () => <FilledExample expanded={filledSignal} />,
             path: `${EXAMPLES_ROOT}/Filled.tsx`,
         },
         {
@@ -42,7 +42,7 @@ export const CollapsiblePage = () => {
             name: "Opening to the side",
             readout: () =>
                 `expanded: ${sidewaysSignal[0]()} — the panel grows its width instead of its height, and its contents keep theirs`,
-            component: () => <SidewaysExample expandedSignal={sidewaysSignal} />,
+            component: () => <SidewaysExample expanded={sidewaysSignal} />,
             path: `${EXAMPLES_ROOT}/Sideways.tsx`,
         },
     ]);

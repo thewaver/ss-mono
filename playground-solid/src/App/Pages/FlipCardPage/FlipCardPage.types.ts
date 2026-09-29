@@ -5,6 +5,6 @@ import type { AccessorProps, FlipCardAxis, FlipCardTurnDirection } from "@thewav
 export type FlipCardPressedExampleProps = AccessorProps<{
     axis: FlipCardAxis;
     transitionDurationMs: number;
-    flippedSignal: Signal<boolean>;
+    flipped: Signal<boolean>;
     onTurn: (direction: FlipCardTurnDirection) => void;
 }>;

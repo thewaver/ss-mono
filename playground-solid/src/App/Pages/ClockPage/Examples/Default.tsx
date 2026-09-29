@@ -13,7 +13,7 @@ import {
 } from "../../../StyledComponents/ClockContent/ClockContent";
 
 type Props = {
-    valueSignal: Signal<TimeValue | undefined>;
+    value: Signal<TimeValue | undefined>;
     ariaLabel: MaybeAccessor<string>;
     isTwelveHour?: MaybeAccessor<boolean>;
     hasSeconds?: MaybeAccessor<boolean>;
@@ -26,7 +26,7 @@ export const DefaultExample = (props: Props) => {
     return (
         <PageClockFrame>
             <Clock
-                valueSignal={props.valueSignal}
+                value={props.value}
                 locale={() => LOCALE}
                 ariaLabel={props.ariaLabel}
                 isTwelveHour={props.isTwelveHour}

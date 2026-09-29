@@ -21,7 +21,7 @@ const AccordionSection = <T,>(props: AccordionSectionProps<T>) => {
             transitionDurationMs={props.transitionDurationMs}
             panelRole={"region"}
             panelAriaAttributes={{ "aria-labelledby": headerId }}
-            expandedState={[props.isExpanded, () => props.onToggle()]}
+            expanded={[props.isExpanded, () => props.onToggle()]}
             renderTrigger={(flags) => props.renderHeader(props.item, flags)}
             renderPanel={(visibilityTarget, transitionDurationMs) =>
                 props.renderPanel(props.item, visibilityTarget, transitionDurationMs)
@@ -31,7 +31,7 @@ const AccordionSection = <T,>(props: AccordionSectionProps<T>) => {
 };
 
 export const Accordion = <T,>(props: AccordionProps<T>) => {
-    const [expanded, setExpanded] = SignalMirrorReactUtils.useOptionalState<T[]>(props.expandedState, []);
+    const [expanded, setExpanded] = SignalMirrorReactUtils.useOptionalState<T[]>(props.expanded, []);
 
     const headerRefs = useRef<(HTMLElement | null)[]>([]);
 

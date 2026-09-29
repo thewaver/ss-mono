@@ -7,7 +7,7 @@ type Props = FileInputExampleProps;
 
 export const DisabledExample = (props: Props) => (
     <FileInput
-        filesState={props.filesState}
+        files={props.files}
         isDisabled={true}
         ariaLabel={"Disabled attachment"}
         renderContent={(renderProps) => <PageFileInputContent renderProps={renderProps} />}

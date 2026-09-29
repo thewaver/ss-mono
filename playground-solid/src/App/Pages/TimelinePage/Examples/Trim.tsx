@@ -43,7 +43,7 @@ const EDGE_ANNOUNCEMENTS: TimelineEdgeAnnouncements = {
 };
 
 export const TrimExample = (props: Props) => {
-    const clipsSignal = accessSignal(() => props.clipsSignal);
+    const clipsSignal = accessSignal(() => props.clips);
 
     return (
         <PageTimelineFrame>
@@ -62,7 +62,7 @@ export const TrimExample = (props: Props) => {
                         isPannable={props.isPannable}
                         isZoomable={props.isZoomable}
                         isDisabled={props.isDisabled}
-                        viewSignal={props.viewSignal}
+                        view={props.view}
                         edgeAnnouncements={() => EDGE_ANNOUNCEMENTS}
                         ariaLabel={"Clips to trim"}
                         computeSpan={(clip) => ({ start: clip.from, end: clip.to })}

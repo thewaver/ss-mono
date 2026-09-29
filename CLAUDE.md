@@ -151,6 +151,14 @@ _"we settle work decisions, then sweep"_. So when a task carries several open de
 time, and do not touch the code until the last one is answered — an answer to one question is not a go-ahead
 while another is still open. The sweep then happens once, with every decision in hand.
 
+**A decision that comes up while agents are working is held, and asked once the work has stopped.** Stated by
+the user, after a question about popup placement was asked in the middle of a stream of agent reports and
+scrolled out of sight: while other agents are still reporting, each report pushes the question further up the
+history, and it gets lost. So while work is running, record the decision in the working notes and keep going on
+everything it does not block; when nothing is running any more, put the held decisions in the final reply, one at
+a time as _"Surface one decision at a time"_ asks, after the report of what was done. A decision that blocks all
+remaining work is the exception, and even then it goes last in the reply, never above a report.
+
 **When asked what work is outstanding, answer in their recorded order, not by size.** `backlog.md` carries the
 ordering already: item 8 says in its own text not to list it, and item 5's **_Bottom of the list_** section
 holds `Table` / data grid and the command palette, placed last by the user after each was argued. Both were
@@ -343,14 +351,16 @@ that needs recording goes in `decisions.md` — _"method X does Y rather than Z,
 that file is for — or in the reply. If a change seems to need an inline comment to be understood, that is a
 signal the code should be clearer instead.
 
-**`components-solid/src` and `components-react/src` are under every rule this section gives `components/src`.** The
+**`components-solid/src`, `components-react/src`, `components-vue/src` and `components-svelte/src` are under every rule
+this section gives `components/src`**, `.vue` and `.svelte` files included. The
 Solid views were in `components/src` when these rules were written and moved out with the package split, so the ban
 and both of its exceptions went with them; the React tree was written to the same rules from the start. Read
 `components/src` in what follows as all three.
 
-**The same goes for the Playground, which is now three folders, named to mirror `components/`.** `playground/`
-(the framework-free half both apps share, `@thewaver/ss-playground`), `playground-solid/` and `playground-react/`,
-and every rule here that names `playground/src` applies to all three `src` folders. An earlier session named the
+**The same goes for the Playground, which is now five folders, named to mirror `components/`.** `playground/`
+(the framework-free half every app shares, `@thewaver/ss-playground`), `playground-solid/`, `playground-react/`,
+`playground-vue/` and `playground-svelte/`, and every rule here that names `playground/src` applies to all five
+`src` folders. An earlier session named the
 shared half `playground-core/`; the user corrected it — the three must read the same way the three component
 packages do.
 

@@ -2,7 +2,7 @@ import type { TextFieldProps } from "../../../Primitives/TextField/TextField.typ
 
 export type CurrencyInputProps = Omit<
     TextFieldProps,
-    | "valueState"
+    | "value"
     | "element"
     | "type"
     | "inputMode"
@@ -28,5 +28,5 @@ export type CurrencyInputProps = Omit<
     /** How the digits before the decimal point are grouped. Leave it out for the locale's own grouping. */
     groupSizes?: number[];
     /** The amount, and how to change it. It is the only thing that changes it. */
-    valueState: readonly [number | undefined, (value: number | undefined) => void];
+    value: readonly [number | undefined, (value: number | undefined) => void];
 };

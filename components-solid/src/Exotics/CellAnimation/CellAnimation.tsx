@@ -31,8 +31,8 @@ export const CellAnimation = (props: CellAnimationProps) => {
     const [getImgRef, setImgRef] = createSignal<HTMLElement>();
     const [getContainerRef, setContainerRef] = createSignal<HTMLElement>();
     const [getIsWindowVisible, setIsWindowVisible] = createSignal(true);
-    const [getIsPlaying] = SignalMirrorSolidUtils.createOptional(() => props.playbackSignal, true);
-    const [getProgress, setProgress] = SignalMirrorSolidUtils.createOptional(() => props.progressSignal, NO_PROGRESS);
+    const [getIsPlaying] = SignalMirrorSolidUtils.createOptional(() => props.playback, true);
+    const [getProgress, setProgress] = SignalMirrorSolidUtils.createOptional(() => props.progress, NO_PROGRESS);
     const [getCellRefs, setCellRefs] = createSignal<HTMLElement[]>([], { equals: false });
     const [getCurrentIteration, setCurrentIteration] = createSignal(0);
     const [getRootSize, setRootSize] = createSignal<Size2d>({ width: 0, height: 0 }, { equals: Size2d.isSame });

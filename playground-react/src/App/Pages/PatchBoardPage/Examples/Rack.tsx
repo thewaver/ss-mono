@@ -31,12 +31,12 @@ export const RackExample = (props: Props) => {
                 socketSize={props.socketSize}
                 isLocked={props.isLocked}
                 isDisabled={props.isDisabled}
-                nodesState={props.nodesState}
-                linksState={props.linksState}
+                nodes={props.nodes}
+                links={props.links}
                 computeNodeKey={(device) => device.id}
                 computeNodeLabel={(device) => device.name}
                 computeSnapSpot={PatchBoardSnaps.grid}
-                computeCanLink={(link) => !PatchBoardUtils.getClosesLoop(props.linksState[0], link)}
+                computeCanLink={(link) => !PatchBoardUtils.getClosesLoop(props.links[0], link)}
                 renderNode={(node, flags) => (
                     <PagePatchNode label={node.value.name} kind={node.value.kind} flags={flags} />
                 )}

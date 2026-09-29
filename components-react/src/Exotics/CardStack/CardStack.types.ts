@@ -19,7 +19,7 @@ export type CardStackControls = {
     /**
      * Brings the last card that left back onto the top of the pile, returning from the side it left by.
      *
-     * A card that was moved past by setting `topIndexState` rather than sent has no side to come back from, so it
+     * A card that was moved past by setting `topIndex` rather than sent has no side to come back from, so it
      * reappears in place.
      *
      * @returns `false` when no card has left yet, the stack is disabled, or a card is already on its way out or back.
@@ -97,7 +97,7 @@ export type CardStackProps<T> = {
      * Which card is on top, as an index into `cards`. It is the only thing that moves the pile on, and setting it to
      * the card count empties the stack. Left out, the stack keeps its own.
      */
-    topIndexState?: readonly [number, (index: number) => void];
+    topIndex?: readonly [number, (index: number) => void];
     /** Draws one card, and is told where it sits and what is being done to it. */
     renderCard: (state: CardStackCardState<T>) => ReactNode;
     /** Runs when a card leaves, whichever route sent it. */

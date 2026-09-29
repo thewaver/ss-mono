@@ -4,6 +4,6 @@ import type { Part } from "@thewaver/ss-playground/App/Pages/TablePage/TablePart
 export type { Part, PartColumnDefs } from "@thewaver/ss-playground/App/Pages/TablePage/TableParts.types";
 
 export type TableExampleProps = {
-    sortState: readonly [TableSort | undefined, (sort: TableSort | undefined) => void];
-    selectionState: readonly [Part[], (rows: Part[]) => void];
+    sort: readonly [TableSort | undefined, (sort: TableSort | undefined) => void];
+    selection: readonly [Part[], (rows: Part[]) => void];
 };

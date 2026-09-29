@@ -19,8 +19,8 @@ import { InventoryExample } from "./Inventory";
 
 type Props = {
     groupId: string;
-    lootState: readonly [SortableItem<Gear>[], (items: SortableItem<Gear>[]) => void];
-    packState: readonly [SortableGridItem<Gear>[], (items: SortableGridItem<Gear>[]) => void];
+    loot: readonly [SortableItem<Gear>[], (items: SortableItem<Gear>[]) => void];
+    pack: readonly [SortableGridItem<Gear>[], (items: SortableGridItem<Gear>[]) => void];
 };
 
 const RESTING_FLAGS: InteractionFlags<SortableItemFlags> = { isCarried: false, isLandingBefore: false };
@@ -43,7 +43,7 @@ export const LootExample = (props: Props) => (
                     announcements={SORTABLE_ANNOUNCEMENTS}
                     gap={GRID_GAP}
                     minHeight={72}
-                    itemsState={props.lootState}
+                    items={props.loot}
                     computeItemKey={computeGearKey}
                     computeItemLabel={computeGearLabel}
                     renderItem={renderLoot}
@@ -59,7 +59,7 @@ export const LootExample = (props: Props) => (
 
             <InventoryExample
                 groupId={props.groupId}
-                itemsState={props.packState}
+                items={props.pack}
                 ariaLabel={"Pack"}
                 emptyText={"Empty pack"}
                 isTurnable={true}

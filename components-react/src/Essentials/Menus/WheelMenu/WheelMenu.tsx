@@ -47,7 +47,7 @@ export const WheelMenu = <T,>(props: WheelMenuProps<T>) => {
         <Menu<WheelValue<T>>
             {...props}
             items={menuItems}
-            checkedState={props.checkedState as WheelCheckedState<T> | undefined}
+            checked={props.checked as WheelCheckedState<T> | undefined}
             computeLayout={computeLayout}
             computeCustomText={props.computeCustomText || hasCloser ? computeCustomText : undefined}
             renderItem={renderItem}

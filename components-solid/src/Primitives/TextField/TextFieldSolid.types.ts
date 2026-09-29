@@ -140,7 +140,7 @@ export type TextFieldProps = Omit<
                 /** The space between the text and whatever sits before or after it. */
                 gap?: number;
                 /** The text in the field. It is the only thing that changes it. */
-                valueSignal: SignalSource<string>;
+                value: SignalSource<string>;
                 /**
                  * ARIA attributes for the field element, for a preset that gives the field a role of its own, such as a
                  * combobox. They are written after the field's own, so a role here replaces the one the field would

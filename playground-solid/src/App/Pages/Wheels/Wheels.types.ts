@@ -15,24 +15,24 @@ export type WheelExampleProps = AccessorProps<{
     settleDurationMs: number;
     restDurationMs: number;
     idleDelayMs: number | undefined;
-    targetIndexSignal: Signal<number>;
+    targetIndex: Signal<number>;
     computeSpinDefs: (index: number, wedgeCount: number) => RotatorSpinDefs;
     onSelectedWedgeChange: (index: number) => void;
 }>;
 
-export type WheelSharedProps = Omit<WheelExampleProps, "targetIndexSignal" | "onSelectedWedgeChange">;
+export type WheelSharedProps = Omit<WheelExampleProps, "targetIndex" | "onSelectedWedgeChange">;
 
 export type WheelsControls = {
-    wedgeCountSignal: Signal<number>;
-    spinDurationSignal: Signal<number>;
-    turnsSignal: Signal<number>;
-    settleDurationSignal: Signal<number>;
-    doesResumeSignal: Signal<boolean>;
-    restDurationSignal: Signal<number>;
-    isIdlingAllowedSignal: Signal<boolean>;
-    idleDelaySignal: Signal<number>;
-    spinStyleSignal: Signal<WheelSpinStyleKey>;
-    isDisabledSignal: Signal<boolean>;
+    wedgeCount: Signal<number>;
+    spinDuration: Signal<number>;
+    turns: Signal<number>;
+    settleDuration: Signal<number>;
+    doesResume: Signal<boolean>;
+    restDuration: Signal<number>;
+    isIdlingAllowed: Signal<boolean>;
+    idleDelay: Signal<number>;
+    spinStyle: Signal<WheelSpinStyleKey>;
+    isDisabled: Signal<boolean>;
     getWedges: Accessor<string[]>;
     getSharedProps: Accessor<WheelSharedProps>;
 };

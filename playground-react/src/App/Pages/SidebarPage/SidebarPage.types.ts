@@ -4,5 +4,5 @@ export type SidebarExampleProps = {
     edge: SidebarEdge;
     layout: SidebarLayout;
     isExpandedOnHover: boolean;
-    expandedState: readonly [boolean, (isExpanded: boolean) => void];
+    expanded: readonly [boolean, (isExpanded: boolean) => void];
 };

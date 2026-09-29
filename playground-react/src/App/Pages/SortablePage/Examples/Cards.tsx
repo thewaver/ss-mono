@@ -16,7 +16,7 @@ import {
 
 type Props = {
     groupId: string;
-    itemsState: readonly [SortableItem<Card>[], (items: SortableItem<Card>[]) => void];
+    items: readonly [SortableItem<Card>[], (items: SortableItem<Card>[]) => void];
     ariaLabel: string;
     emptyText: string;
     orientation?: "horizontal" | "vertical";
@@ -44,7 +44,7 @@ export const CardsExample = (props: Props) => (
         minHeight={72}
         isDisabled={props.isDisabled ?? false}
         isLocked={props.isLocked ?? false}
-        itemsState={props.itemsState}
+        items={props.items}
         computeItemKey={computeCardKey}
         computeItemLabel={computeCardLabel}
         computeCanAccept={props.computeCanAccept}

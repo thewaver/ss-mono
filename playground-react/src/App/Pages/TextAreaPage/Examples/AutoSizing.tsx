@@ -16,7 +16,7 @@ type Props = TextAreaExampleProps;
 
 export const AutoSizingExample = (props: Props) => (
     <TextArea
-        valueState={props.valueState}
+        value={props.value}
         isAutoSizing={true}
         minRows={MIN_ROWS}
         padding={FIELD_PADDING}

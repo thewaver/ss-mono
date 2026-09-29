@@ -35,7 +35,7 @@ import {
 
 type Props = {
     groupId: string;
-    itemsSignal: Signal<SortableGridItem<Gear>[]>;
+    items: Signal<SortableGridItem<Gear>[]>;
     ariaLabel: string;
     emptyText: string;
     columns?: number;
@@ -155,7 +155,7 @@ export const InventoryExample = (props: Props) => {
                 isDisabled={() => access(props.isDisabled) ?? false}
                 isLocked={() => access(props.isLocked) ?? false}
                 isTurnable={() => access(props.isTurnable) ?? false}
-                itemsSignal={props.itemsSignal}
+                items={props.items}
                 computeItemKey={computeGearKey}
                 computeItemLabel={computeGearLabel}
                 computeCanAccept={props.computeCanAccept}

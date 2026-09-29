@@ -35,14 +35,14 @@ export const HoverCardPage = () => {
             focusShowDelayMs: getFocusShowDelayMs,
             hoverShowDelayMs: getHoverShowDelayMs,
             skipDelayWindowMs: getSkipDelayWindowMs,
-            visibilitySignal,
-            followingSignal,
+            visibility: visibilitySignal,
+            following: followingSignal,
         };
 
         const navigationProps: NavigationMenuExampleProps = {
             hoverShowDelayMs: getHoverShowDelayMs,
             skipDelayWindowMs: getSkipDelayWindowMs,
-            openKeySignal,
+            openKey: openKeySignal,
         };
 
         return [

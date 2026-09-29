@@ -14,8 +14,8 @@ export const VirtualizedExample = (props: Props) => {
         <div class={styles.treeScroller}>
             <Tree
                 nodes={props.nodes}
-                valueSignal={props.valueSignal}
-                expandedSignal={props.expandedSignal}
+                value={props.value}
+                expanded={props.expanded}
                 ariaLabel={"Generated repository"}
                 computeEstimatedNodeHeight={() => STRESS_NODE_HEIGHT}
                 renderNode={(getNode, getRenderProps) => (

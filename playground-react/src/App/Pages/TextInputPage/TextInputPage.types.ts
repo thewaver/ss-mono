@@ -1,9 +1,9 @@
 export type TextInputExampleProps = {
-    valueState: readonly [string, (value: string) => void];
+    value: readonly [string, (value: string) => void];
 };
 
 export type TextInputPasswordExampleProps = TextInputExampleProps & {
-    revealState: readonly [boolean, (isRevealed: boolean) => void];
+    reveal: readonly [boolean, (isRevealed: boolean) => void];
 };
 
 export type City = {
@@ -16,5 +16,5 @@ export type TextInputCitiesExampleProps = TextInputExampleProps & {
 };
 
 export type TextInputEditableExampleProps = TextInputExampleProps & {
-    editingState: readonly [boolean, (isEditing: boolean) => void];
+    editing: readonly [boolean, (isEditing: boolean) => void];
 };

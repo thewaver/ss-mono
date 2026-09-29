@@ -23,14 +23,14 @@ export const ColorAreaPage = () => {
     const hueSignal = createSignal(pickerSignal[0]().h);
 
     const getExamples = createMemo(() => {
-        const bareProps: ColorAreaExampleProps = { hsvSignal: bareSignal };
+        const bareProps: ColorAreaExampleProps = { hsv: bareSignal };
 
-        const disabledProps: ColorAreaExampleProps = { hsvSignal: disabledSignal, isDisabled: () => true };
+        const disabledProps: ColorAreaExampleProps = { hsv: disabledSignal, isDisabled: () => true };
 
         const dropdownProps: ColorAreaDropdownExampleProps = {
-            hsvSignal: pickerSignal,
-            isOpenSignal,
-            hueSignal,
+            hsv: pickerSignal,
+            isOpen: isOpenSignal,
+            hue: hueSignal,
             popupId: () => popupId,
         };
 

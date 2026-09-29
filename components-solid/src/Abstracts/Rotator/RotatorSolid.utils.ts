@@ -24,11 +24,11 @@ export namespace RotatorSolidUtils {
      *
      * @param getIsDisabled Whether the wheel may rotate.
      * @param defs.stepCount How many steps the wheel has. Fewer than two and it cannot rotate.
-     * @param defs.targetIndexSignal The step the wheel is heading for, if the consumer wants to drive or
+     * @param defs.targetIndex The step the wheel is heading for, if the consumer wants to drive or
      * observe it. Writing it turns the wheel there, unless a spin is under way; the component writes it as
      * soon as a spin's target is known, rather than when the spin lands, and idle drift leaves it alone. An
      * internal signal is used when omitted.
-     * @param defs.autoSpinSignal Whether idle drift is allowed. On when omitted.
+     * @param defs.autoSpin Whether idle drift is allowed. On when omitted.
      * @param defs.spinDurationMs How long a spin takes.
      * @param defs.settleDurationMs How long the drift back from an overshoot takes.
      * @param defs.restDurationMs How long the wheel stays still after landing before idling resumes.
@@ -48,9 +48,9 @@ export namespace RotatorSolidUtils {
      * target, and `spin` to start one.
      */
     export const createRotator = (getIsDisabled: Accessor<boolean>, defs: RotatorDefs) => {
-        const targetIndexSignal = SignalMirrorSolidUtils.createOptional(() => defs.targetIndexSignal, 0);
+        const targetIndexSignal = SignalMirrorSolidUtils.createOptional(() => defs.targetIndex, 0);
         const [getTargetIndex] = targetIndexSignal;
-        const [getIsAutoSpinEnabled] = SignalMirrorSolidUtils.createOptional(() => defs.autoSpinSignal, true);
+        const [getIsAutoSpinEnabled] = SignalMirrorSolidUtils.createOptional(() => defs.autoSpin, true);
 
         const getStepCount = createMemo(() => Math.max(0, Math.trunc(access(defs.stepCount))));
 
@@ -75,7 +75,7 @@ export namespace RotatorSolidUtils {
             getStepCount,
             getSpinDurationMs,
             getSettleDurationMs,
-            targetIndexSignal,
+            targetIndex: targetIndexSignal,
             computeSpinTarget: () => defs.computeSpinTarget(),
             computeSpinDefs: defs.computeSpinDefs && ((index, stepCount) => defs.computeSpinDefs!(index, stepCount)),
             computeStepLabel: (index, stepCount) => defs.computeStepLabel(index, stepCount),

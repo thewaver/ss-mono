@@ -37,8 +37,8 @@ export const ScrollExample = (props: Props) => {
                         durationMs={props.durationMs}
                         isLooping={props.isLooping}
                         isTurning={props.isTurning}
-                        progressSignal={[getProgress, () => undefined]}
-                        playbackSignal={[() => false, () => undefined]}
+                        progress={[getProgress, () => undefined]}
+                        playback={[() => false, () => undefined]}
                         renderTrack={(getPath) => <PageTrailTrack path={getPath} />}
                         renderTraveler={() => <PageTrailMarker id={MARKER_ID} />}
                     />

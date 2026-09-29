@@ -17,13 +17,13 @@ export const YearPickerExample = (props: Props) => (
             precision={"year"}
             previousLabel={"Previous twelve years"}
             nextLabel={"Next twelve years"}
-            monthSignal={props.monthSignal}
+            month={props.month}
         />
 
         <Calendar
             precision={"year"}
-            valueSignal={props.valueSignal}
-            monthSignal={props.monthSignal}
+            value={props.value}
+            month={props.month}
             today={TODAY}
             minValue={MIN_YEAR}
             maxValue={MAX_YEAR}

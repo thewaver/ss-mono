@@ -21,5 +21,5 @@ export type ParticleSpawnerExampleProps = AccessorProps<{
     spawnIterationPatterns: ParticleSpawnIterationPattern[];
     computeParticlePos: ParticleTravelPatternFn;
     areTargetsHidden: boolean;
-    playbackSignal: Signal<boolean>;
+    playback: Signal<boolean>;
 }>;

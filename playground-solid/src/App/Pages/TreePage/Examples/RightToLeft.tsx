@@ -6,7 +6,7 @@ type Props = TreeExampleProps;
 export const RightToLeftExample = (props: Props) => {
     return (
         <div dir={"rtl"}>
-            <FilesExample valueSignal={props.valueSignal} expandedSignal={props.expandedSignal} />
+            <FilesExample value={props.value} expanded={props.expanded} />
         </div>
     );
 };

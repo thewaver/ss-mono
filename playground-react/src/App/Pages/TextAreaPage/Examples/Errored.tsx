@@ -20,11 +20,11 @@ type Props = TextAreaExampleProps;
 
 export const ErroredExample = (props: Props) => (
     <TextArea
-        valueState={props.valueState}
+        value={props.value}
         isAutoSizing={true}
         minRows={MIN_ROWS}
         maxRows={MAX_ROWS}
-        hasError={props.valueState[0].length < REVIEW_LIMIT}
+        hasError={props.value[0].length < REVIEW_LIMIT}
         padding={FIELD_PADDING}
         gap={FIELD_GAP}
         ariaLabel={"Review"}

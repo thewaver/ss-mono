@@ -58,7 +58,7 @@ export const BurstExample = (props: ParticleSpawnerExampleProps) => {
                 <div className={styles.spawnerOverlay}>
                     <ParticleSpawner
                         {...props}
-                        playbackState={playback}
+                        playback={playback}
                         spawnIterationPatterns={ONE_ROUND}
                         targets={targetRefs}
                         renderParticle={(_index, t) => {

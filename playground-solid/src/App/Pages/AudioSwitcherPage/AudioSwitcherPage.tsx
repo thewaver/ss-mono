@@ -37,7 +37,7 @@ export const AudioSwitcherPage = () => {
                     src={getSrc}
                     crossfadeMs={getCrossfadeMs}
                     volume={() => getVolumePercent() / PERCENT}
-                    playbackSignal={playbackSignal}
+                    playback={playbackSignal}
                 />
             ),
             path: `${EXAMPLES_ROOT}/Default.tsx`,

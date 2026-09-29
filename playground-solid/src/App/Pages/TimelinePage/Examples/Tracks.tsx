@@ -41,7 +41,7 @@ export const TracksExample = (props: Props) => {
     const [getPlayhead, setPlayhead] = createSignal(REEL.start);
     const [getIsPlaying, setIsPlaying] = createSignal(false);
 
-    const viewSignal = accessSignal(() => props.viewSignal);
+    const viewSignal = accessSignal(() => props.view);
 
     createEffect(() => {
         if (!getIsPlaying()) return;
@@ -90,7 +90,7 @@ export const TracksExample = (props: Props) => {
                         isPannable={props.isPannable}
                         isZoomable={props.isZoomable}
                         isDisabled={props.isDisabled}
-                        viewSignal={props.viewSignal}
+                        view={props.view}
                         markers={() => [getPlayhead()]}
                         ariaLabel={"Cut of the episode"}
                         computeSpan={(clip) => ({ start: clip.from, end: clip.to })}

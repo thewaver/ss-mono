@@ -1,5 +1,5 @@
 export type AccordionExampleProps = {
-    expandedState?: readonly [string[], (expanded: string[]) => void];
+    expanded?: readonly [string[], (expanded: string[]) => void];
 };
 
 export type AccordionDeferredExampleProps = AccordionExampleProps & {
@@ -12,5 +12,5 @@ export type AccordionGrowingExampleProps = AccordionExampleProps & {
 };
 
 export type AccordionSinglePanelExampleProps = {
-    expandedState?: readonly [boolean, (isExpanded: boolean) => void];
+    expanded?: readonly [boolean, (isExpanded: boolean) => void];
 };

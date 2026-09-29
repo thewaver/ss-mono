@@ -15,7 +15,7 @@ export type WheelMenuCloserDefs = {
     renderContent: (getFlags: () => InteractionFlags<MenuItemFlags>) => JSX.Element;
 };
 
-export type WheelMenuProps<T> = Omit<MenuProps<T>, "items" | "checkedSignal" | "computeLayout"> &
+export type WheelMenuProps<T> = Omit<MenuProps<T>, "items" | "checked" | "computeLayout"> &
     AccessorProps<{
         /** How much of the circle the items are spread over. */
         spreadDegrees?: number;
@@ -29,7 +29,7 @@ export type WheelMenuProps<T> = Omit<MenuProps<T>, "items" | "checkedSignal" | "
         /** The items, in the order they sit round the wheel. */
         items: MaybeAccessor<WheelMenuItem<T>[]>;
         /** Which values are currently checked, for the checkbox and radio items among them. */
-        checkedSignal?: SignalSource<T[]>;
+        checked?: SignalSource<T[]>;
         /** How the items sit on their band, for the parts of the arrangement the wheel does not decide itself. */
         layoutDefs?: Omit<BandDefs, "holeRatio" | "spreadDegrees" | "computeItemArcs">;
         /** The control in the hole that closes the menu. */

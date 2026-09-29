@@ -11,7 +11,7 @@ const NO_GUTTER_DRAGGING = -1;
 const PERCENT = 100;
 
 export const SplitPane = (props: SplitPaneProps) => {
-    const [storedRatios, setRatios] = props.ratiosState;
+    const [storedRatios, setRatios] = props.ratios;
 
     const paneIdPrefix = useId();
 

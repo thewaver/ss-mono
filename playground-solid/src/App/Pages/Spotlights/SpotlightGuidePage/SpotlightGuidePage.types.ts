@@ -3,8 +3,8 @@ import type { Signal } from "solid-js";
 import type { AccessorProps } from "@thewaver/ss-components-solid";
 
 export type SpotlightTourExampleProps = AccessorProps<{
-    guideSignal: Signal<boolean>;
-    promptSignal: Signal<boolean>;
+    guide: Signal<boolean>;
+    prompt: Signal<boolean>;
     step: number;
     resumeStep: number | undefined;
     basketCount: number;

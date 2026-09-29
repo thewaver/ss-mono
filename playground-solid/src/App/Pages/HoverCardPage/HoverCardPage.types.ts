@@ -9,14 +9,14 @@ export type HoverCardExampleProps = AccessorProps<{
     focusShowDelayMs: number;
     hoverShowDelayMs: number;
     skipDelayWindowMs: number;
-    visibilitySignal: Signal<boolean>;
-    followingSignal: Signal<boolean>;
+    visibility: Signal<boolean>;
+    following: Signal<boolean>;
 }>;
 
 export type NavigationMenuExampleProps = AccessorProps<{
     hoverShowDelayMs: number;
     skipDelayWindowMs: number;
-    openKeySignal: Signal<string | undefined>;
+    openKey: Signal<string | undefined>;
 }>;
 
 export type NavMenuLink = { key: string; label: string };

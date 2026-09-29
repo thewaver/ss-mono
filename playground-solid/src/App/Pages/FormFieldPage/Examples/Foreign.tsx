@@ -11,15 +11,15 @@ import type { FormFieldExampleProps } from "../FormFieldPage.types";
 
 type Props = FormFieldExampleProps;
 
-const ForeignInput = (props: { valueSignal: Signal<string> }) => {
+const ForeignInput = (props: { value: Signal<string> }) => {
     const getAriaDescribedBy = FormFieldSolidUtils.resolveAriaDescribedBy();
 
     return (
         <input
             class={styles.foreignInput}
-            value={props.valueSignal[0]()}
+            value={props.value[0]()}
             aria-describedby={getAriaDescribedBy()}
-            onInput={(event) => props.valueSignal[1](event.currentTarget.value)}
+            onInput={(event) => props.value[1](event.currentTarget.value)}
         />
     );
 };
@@ -36,7 +36,7 @@ export const ForeignExample = (props: Props) => {
                 renderMessage={(getState) => (
                     <PageFormFieldMessage state={getState}>{access(props.message)}</PageFormFieldMessage>
                 )}
-                renderControl={() => <ForeignInput valueSignal={props.valueSignal} />}
+                renderControl={() => <ForeignInput value={props.value} />}
             />
         </div>
     );

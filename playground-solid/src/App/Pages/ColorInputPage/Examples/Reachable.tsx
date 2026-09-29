@@ -11,7 +11,7 @@ type Props = ColorInputExampleProps;
 export const ReachableExample = (props: Props) => (
     <ColorInput
         {...pageColorPickerSlots}
-        valueSignal={props.valueSignal}
+        value={props.value}
         isDisabled={true}
         isReachableWhenDisabled={true}
         ariaLabel={"Disabled but reachable color"}

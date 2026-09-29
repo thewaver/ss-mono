@@ -147,7 +147,7 @@ export namespace SelectionUtils {
      * @param getIsDisabled Whether the control is off, in which case no gesture does anything.
      * @param defs.getMode Whether nothing can be picked, one thing can, or many can.
      * @param defs.getItems The list, in the order it is drawn. An item that is not in it is ignored.
-     * @param defs.selectionSignal What is selected now, and how to change it.
+     * @param defs.selection What is selected now, and how to change it.
      * @returns The controller: a store of the anchor, which is where a run would currently start, with `pick`
      * for a gesture on one item and `selectAll` and `clear` for the two wholesale moves.
      */
@@ -155,9 +155,9 @@ export namespace SelectionUtils {
         const anchor = StoreUtils.create<T | undefined>(undefined);
 
         const setSelection = (next: T[]) => {
-            if (getIsUnchanged(defs.selectionSignal[0](), next)) return;
+            if (getIsUnchanged(defs.selection[0](), next)) return;
 
-            defs.selectionSignal[1](next);
+            defs.selection[1](next);
         };
 
         return {
@@ -172,7 +172,7 @@ export namespace SelectionUtils {
 
                 if (!items.includes(item)) return;
 
-                const selection = defs.selectionSignal[0]();
+                const selection = defs.selection[0]();
 
                 if (mode === "single") {
                     anchor.set(item);

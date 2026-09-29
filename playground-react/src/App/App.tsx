@@ -165,7 +165,7 @@ const PageDependencies = (props: { name: string; view: PageViewKey }) => {
 
                         <div className={styles.dependencyDisclosure}>
                             <Collapsible
-                                expandedState={expandedState}
+                                expanded={expandedState}
                                 sizing={"fill"}
                                 isPanelBuiltOnExpand={true}
                                 renderTrigger={(flags) => (
@@ -229,7 +229,7 @@ const PageDependencies = (props: { name: string; view: PageViewKey }) => {
     );
 };
 
-export function AppContent(props: { viewportAnchorState: readonly [ViewportAnchor, (value: ViewportAnchor) => void] }) {
+export function AppContent(props: { viewportAnchor: readonly [ViewportAnchor, (value: ViewportAnchor) => void] }) {
     const location = useLocation();
 
     const [searchTerm, setSearchTerm] = useState("");
@@ -308,7 +308,7 @@ export function AppContent(props: { viewportAnchorState: readonly [ViewportAncho
                 collapsedWidth={MENU_COLLAPSED_WIDTH}
                 expandedWidth={MENU_EXPANDED_WIDTH}
                 isExpandedOnHover={isAutoHidden}
-                expandedState={menuExpandedState}
+                expanded={menuExpandedState}
                 renderContent={(phase, transitionDurationMs) => (
                     <nav className={styles.leftMenu} aria-label={"Library"}>
                         <PageLayer level={1}>
@@ -341,9 +341,9 @@ export function AppContent(props: { viewportAnchorState: readonly [ViewportAncho
                                         />
 
                                         <PageNavSettings
-                                            showsDescriptionOnlyState={showsDescriptionOnlyState}
-                                            pageViewState={pageViewState}
-                                            viewportAnchorState={props.viewportAnchorState}
+                                            showsDescriptionOnly={showsDescriptionOnlyState}
+                                            pageView={pageViewState}
+                                            viewportAnchor={props.viewportAnchor}
                                         />
                                     </div>
                                 </div>
@@ -360,8 +360,8 @@ export function AppContent(props: { viewportAnchorState: readonly [ViewportAncho
                                 >
                                     <Tree
                                         nodes={visibleNodes}
-                                        valueState={selectedState}
-                                        expandedState={expandedState}
+                                        value={selectedState}
+                                        expanded={expandedState}
                                         ariaLabel={"Library"}
                                         linkComponent={PageRouterLink}
                                         computeCustomText={(node) => node.value.name}
@@ -458,7 +458,7 @@ export function App() {
                         path="/"
                         element={
                             <ViewportWrapper size={viewportSize}>
-                                <AppContent viewportAnchorState={viewportAnchorState} />
+                                <AppContent viewportAnchor={viewportAnchorState} />
                             </ViewportWrapper>
                         }
                     >

@@ -87,6 +87,49 @@ test("the props table is the published type, not a transcription of it @react", 
 });
 
 /**
+ * The same table in the Svelte Playground, read off the Svelte package's type. A render callback there is a
+ * snippet, so its type is a `Snippet` of the arguments it is handed, and a prop carries its value as it is.
+ */
+test("the props table is the published type, not a transcription of it @svelte", async ({ page }) => {
+    await page.goto("/tabs/docs");
+    await expect(page.locator(TABS_PROPS)).toBeVisible();
+
+    const required = page.locator(TABS_PROPS).locator('[data-api-row="renderTab"]');
+    await expect(required, "a prop the type declares has a row").toHaveCount(1);
+    await expect(required, "carrying the snippet it takes").toContainText("Snippet");
+    await expect(required, "and marked required, since the type does not make it optional").toContainText("required");
+
+    const optional = page.locator(TABS_PROPS).locator('[data-api-row="tabGap"]');
+    await expect(optional, "an optional prop is marked by its name rather than in the type column").toContainText(
+        "tabGap?",
+    );
+    await expect(optional, "and its type is the value it carries").toContainText("number");
+    await expect(optional, "with no accessor wrapper, since a Svelte prop is its value").not.toContainText("accessor");
+});
+
+/**
+ * The same table in the Vue Playground, read off the Vue package's types. A render callback there is a scoped slot,
+ * so it is not a prop at all: it has a row in the slots table drawn straight after the props, returning `VNodeChild`,
+ * and a prop carries its value as it is.
+ */
+test("the props table is the published type, not a transcription of it @vue", async ({ page }) => {
+    await page.goto("/tabs/docs");
+    await expect(page.locator(TABS_PROPS)).toBeVisible();
+
+    const required = page.locator('[data-api-table="TabsSlots"]').locator('[data-api-row="renderTab"]');
+    await expect(required, "a slot the type declares has a row").toHaveCount(1);
+    await expect(required, "carrying what it returns").toContainText("VNodeChild");
+    await expect(required, "and marked required, since the type does not make it optional").toContainText("required");
+
+    const optional = page.locator(TABS_PROPS).locator('[data-api-row="tabGap"]');
+    await expect(optional, "an optional prop is marked by its name rather than in the type column").toContainText(
+        "tabGap?",
+    );
+    await expect(optional, "and its type is the value it carries").toContainText("number");
+    await expect(optional, "with no accessor wrapper, since a Vue prop is its value").not.toContainText("accessor");
+});
+
+/**
  * The tables are everything the unit exports, not only its props: the other components in its folder, its context,
  * its utility namespaces and its types each get a section. Both halves are asserted against something the source
  * declares rather than against a count, for the same reason as above.

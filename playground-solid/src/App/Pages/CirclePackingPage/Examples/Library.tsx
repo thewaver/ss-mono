@@ -21,7 +21,7 @@ export const LibraryExample = (props: Props) => {
             <PageCirclePackingFrame>
                 <CirclePacking<string>
                     root={() => LIBRARY}
-                    branchSignal={props.branchSignal}
+                    branch={props.branch}
                     padding={props.padding}
                     zoomDurationMs={props.zoomDurationMs}
                     ariaLabel={"The library's source, by lines of code"}

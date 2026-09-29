@@ -42,7 +42,7 @@ export const SortablePage = () => {
                 <PageSortableRoom>
                     <CardsExample
                         groupId={"queue"}
-                        itemsSignal={queueSignal}
+                        items={queueSignal}
                         ariaLabel={"Queue"}
                         emptyText={"No cards"}
                     />
@@ -59,7 +59,7 @@ export const SortablePage = () => {
                 <PageSortableRoom>
                     <CardsExample
                         groupId={"row"}
-                        itemsSignal={rowSignal}
+                        items={rowSignal}
                         ariaLabel={"Row"}
                         emptyText={"No cards"}
                         orientation={"horizontal"}
@@ -73,7 +73,7 @@ export const SortablePage = () => {
             name: "A row in a right-to-left box",
             readout: () =>
                 `order: ${names(rightToLeftSignal[0]())} — the box around the row sets dir="rtl", so the cards run from the right and a carried card moves on to a later place with the left arrow`,
-            component: () => <RightToLeftExample itemsSignal={rightToLeftSignal} />,
+            component: () => <RightToLeftExample items={rightToLeftSignal} />,
             path: `${EXAMPLES_ROOT}/RightToLeft.tsx`,
         },
         {
@@ -83,7 +83,7 @@ export const SortablePage = () => {
                 `order: ${names(ringSignal[0]())} — dropping picks the nearest place rather than comparing one axis, because a ring has no axis to compare`,
             component: () => (
                 <PageSortableRoom>
-                    <RingExample itemsSignal={ringSignal} />
+                    <RingExample items={ringSignal} />
                 </PageSortableRoom>
             ),
             path: `${EXAMPLES_ROOT}/Ring.tsx`,
@@ -92,7 +92,7 @@ export const SortablePage = () => {
             key: "pair",
             name: "Between two lists",
             readout: () => `hand: ${names(handSignal[0]())} | board: ${names(boardSignal[0]())}`,
-            component: () => <PairExample groupId={"pair"} handSignal={handSignal} boardSignal={boardSignal} />,
+            component: () => <PairExample groupId={"pair"} hand={handSignal} board={boardSignal} />,
             path: `${EXAMPLES_ROOT}/Pair.tsx`,
         },
         {
@@ -103,8 +103,8 @@ export const SortablePage = () => {
             component: () => (
                 <PairExample
                     groupId={"picky"}
-                    handSignal={pickyHandSignal}
-                    boardSignal={pickyBoardSignal}
+                    hand={pickyHandSignal}
+                    board={pickyBoardSignal}
                     computeCanAccept={(value) => value.cost <= CHEAP_ONLY}
                 />
             ),
@@ -118,8 +118,8 @@ export const SortablePage = () => {
             component: () => (
                 <PairExample
                     groupId={"locked"}
-                    handSignal={lockedHandSignal}
-                    boardSignal={lockedBoardSignal}
+                    hand={lockedHandSignal}
+                    board={lockedBoardSignal}
                     isBoardLocked={() => true}
                 />
             ),
@@ -133,7 +133,7 @@ export const SortablePage = () => {
                 <PageSortableRoom>
                     <CardsExample
                         groupId={"disabled"}
-                        itemsSignal={disabledSignal}
+                        items={disabledSignal}
                         ariaLabel={"Disabled list"}
                         emptyText={"No cards"}
                         isDisabled={true}

@@ -87,7 +87,7 @@ type Props = TreeExampleProps;
 
 export const RadialExample = (props: Props) => {
     const getRankRadii = createMemo(() =>
-        [...toShownDepths(RANKS, access(props.expandedSignal[0]), ROOT_DEPTH, new Set())]
+        [...toShownDepths(RANKS, access(props.expanded[0]), ROOT_DEPTH, new Set())]
             .filter((depth) => depth > ROOT_DEPTH)
             .map((depth) => RADIAL_DEFS.innerRadius + RADIAL_DEFS.ringGap * depth),
     );
@@ -109,8 +109,8 @@ export const RadialExample = (props: Props) => {
             <div style={{ width: getStageWidth() }}>
                 <Tree
                     nodes={() => RANKS}
-                    valueSignal={props.valueSignal}
-                    expandedSignal={props.expandedSignal}
+                    value={props.value}
+                    expanded={props.expanded}
                     ariaLabel={"Ranks"}
                     computeLayout={RADIAL_LAYOUT}
                     renderNode={(getNode, getRenderProps) => (

@@ -22,8 +22,8 @@ const NO_TURNS: CuboidTurns = { yaw: 0, pitch: 0 };
 type PendingSettle = { from: Matrix3d | undefined; to: Matrix3d; turns: CuboidTurns };
 
 export const Cuboid = (props: CuboidProps) => {
-    const [yaw, setYaw] = props.yawState;
-    const [pitch, setPitch] = props.pitchState;
+    const [yaw, setYaw] = props.yaw;
+    const [pitch, setPitch] = props.pitch;
     const size = props.size;
     const transitionDurationMs = props.transitionDurationMs ?? CUBOID_DEFAULTS.transitionDurationMs;
     const isUpright = props.isUpright ?? CUBOID_DEFAULTS.isUpright;

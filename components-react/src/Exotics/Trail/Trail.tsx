@@ -25,8 +25,8 @@ const getIsSameSnapshot = (a: TrailSnapshot, b: TrailSnapshot) =>
     a.place.point.y === b.place.point.y;
 
 export const Trail = (props: TrailProps) => {
-    const [progress, setProgressState] = SignalMirrorReactUtils.useOptionalState(props.progressState, NO_PROGRESS);
-    const [isPlaying, setIsPlaying] = SignalMirrorReactUtils.useOptionalState(props.playbackState, true);
+    const [progress, setProgressState] = SignalMirrorReactUtils.useOptionalState(props.progress, NO_PROGRESS);
+    const [isPlaying, setIsPlaying] = SignalMirrorReactUtils.useOptionalState(props.playback, true);
 
     const pathRef = useRef<SVGPathElement | null>(null);
     const [pathLength, setPathLength] = useState(NO_LENGTH);

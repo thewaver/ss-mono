@@ -30,7 +30,7 @@ export const SteppedExample = (props: Props) => {
     return (
         <TrackCarousel
             slides={props.slides}
-            indexState={props.indexState}
+            index={props.index}
             isDisabled={props.isDisabled}
             isLooping={props.isLooping}
             orientation={props.orientation}

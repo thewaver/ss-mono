@@ -8,7 +8,7 @@ import { PageTableMarker } from "../../../StyledComponents/TableContent/TableCon
 import { PARTS, createPartColumns } from "../TablePage.const";
 import type { TableExampleProps } from "../TablePage.types";
 
-type Props = TableExampleProps & { orderState: readonly [string[], (order: string[]) => void] };
+type Props = TableExampleProps & { order: readonly [string[], (order: string[]) => void] };
 
 export const ReorderableExample = (props: Props) => {
     const columns = useMemo(() => createPartColumns({ isReorderable: true }), []);
@@ -18,9 +18,9 @@ export const ReorderableExample = (props: Props) => {
             <Table
                 columns={columns}
                 rows={PARTS}
-                sortState={props.sortState}
-                selectionState={props.selectionState}
-                orderState={props.orderState}
+                sort={props.sort}
+                selection={props.selection}
+                order={props.order}
                 ariaLabel={"Parts with reorderable columns"}
                 announcements={TABLE_ANNOUNCEMENTS}
                 renderMarker={() => <PageTableMarker />}

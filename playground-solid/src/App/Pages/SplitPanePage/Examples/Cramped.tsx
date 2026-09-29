@@ -18,7 +18,7 @@ export const CrampedExample = (props: Props) => {
             <PageSplitPaneFrame>
                 <SplitPane
                     panes={() => CRAMPED}
-                    ratiosSignal={props.ratiosSignal}
+                    ratios={props.ratios}
                     gutterSize={props.gutterSize}
                     isDisabled={props.isDisabled}
                     ariaLabel={"Cramped panes"}

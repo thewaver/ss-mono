@@ -6,6 +6,6 @@ import type { Part } from "@thewaver/ss-playground/App/Pages/TablePage/TablePart
 export type { Part, PartColumnDefs } from "@thewaver/ss-playground/App/Pages/TablePage/TableParts.types";
 
 export type TableExampleProps = {
-    sortSignal: Signal<TableSort | undefined>;
-    selectionSignal: Signal<Part[]>;
+    sort: Signal<TableSort | undefined>;
+    selection: Signal<Part[]>;
 };

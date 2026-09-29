@@ -12,7 +12,7 @@ type Props = FileInputDropZoneExampleProps;
 
 export const DropZoneExample = (props: Props) => (
     <FileInput
-        filesSignal={props.filesSignal}
+        files={props.files}
         isMultiple={true}
         maxFiles={DROP_ZONE_MAX_FILES}
         maxSizeBytes={DROP_ZONE_MAX_SIZE_BYTES}

@@ -53,7 +53,7 @@ export type CalendarBaseProps = AccessorProps<{
     /** Whether one day can be picked, for rules a plain earliest and latest cannot express. */
     computeIsDayDisabled?: (day: DateValue) => boolean;
     /** Which month is shown. It is the only thing that pages the calendar. */
-    monthSignal: SignalSource<DateValue>;
+    month: SignalSource<DateValue>;
     /** Draws one day cell. */
     renderDay: CalendarDayRenderer;
     /** Draws one weekday heading. */
@@ -65,7 +65,7 @@ export type CalendarPrecisionProps = AccessorProps<{
      * What one cell of the grid holds, which is what a pick sets. `day` is a month of days under weekday headings;
      * `month` is the year's months three to a row, and a pick sets the first of that month; `year` is twelve years,
      * three to a row, and a pick sets the first day of that year. A pick is clamped into `minValue` and `maxValue`,
-     * and a cell is pickable while any of its days is. `monthSignal` still says which page is shown, the page keys
+     * and a cell is pickable while any of its days is. `month` still says which page is shown, the page keys
      * step a whole page — a month, a year, twelve years — and Shift with them a year under `day` and twelve pages
      * above it. The weekday props are read only by `day`.
      */
@@ -90,10 +90,10 @@ export type CalendarCompositeProps = CalendarBaseProps &
 export type CalendarProps = CalendarBaseProps &
     CalendarPrecisionProps & {
         /** Which day is picked. It is the only thing that picks one. */
-        valueSignal: SignalSource<DateValue | undefined>;
+        value: SignalSource<DateValue | undefined>;
     };
 
 export type RangeCalendarProps = CalendarBaseProps & {
     /** Which range is picked. It is the only thing that picks one. */
-    valueSignal: SignalSource<DateValueRange | undefined>;
+    value: SignalSource<DateValueRange | undefined>;
 };

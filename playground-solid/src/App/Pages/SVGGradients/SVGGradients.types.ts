@@ -12,8 +12,8 @@ export type SVGGradientsSharedProps = AccessorProps<{
 }>;
 
 export type SVGGradientsControls = {
-    paintKindSignal: Signal<SVGGradientsPaintKind>;
-    blurWidthSignal: Signal<number>;
+    paintKind: Signal<SVGGradientsPaintKind>;
+    blurWidth: Signal<number>;
     colors: SVGDefsColors;
     setColor: (key: keyof SVGDefsColors, value: string) => void;
 };

@@ -11,7 +11,7 @@ export const MixedExample = (props: Props) => {
     return (
         <PageControlRow>
             <Toggle
-                checkedState={props.allState}
+                checked={props.all}
                 isMixed={props.isMixed}
                 id={"allSettings"}
                 ariaLabel={"All settings"}
@@ -29,22 +29,22 @@ export const MixedExample = (props: Props) => {
                     ),
                 }}
                 onChange={(isChecked) => {
-                    props.firstChildState[1](isChecked);
-                    props.secondChildState[1](isChecked);
+                    props.firstChild[1](isChecked);
+                    props.secondChild[1](isChecked);
                 }}
             />
 
             <PageControlRowLabel>controls</PageControlRowLabel>
 
             <Toggle
-                checkedState={props.firstChildState}
+                checked={props.firstChild}
                 id={"firstSetting"}
                 ariaLabel={"First setting"}
                 renderContent={(flags) => <PageToggleContent flags={flags} />}
             />
 
             <Toggle
-                checkedState={props.secondChildState}
+                checked={props.secondChild}
                 ariaLabel={"Second setting"}
                 renderContent={(flags) => <PageToggleContent flags={flags} />}
             />

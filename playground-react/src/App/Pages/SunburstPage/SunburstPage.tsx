@@ -37,7 +37,7 @@ export const SunburstPage = () => {
                 <LibraryExample
                     ringCount={ringCount}
                     zoomDurationMs={prefersReducedMotion ? NO_MOTION_DURATION_MS : zoomDurationMs}
-                    branchState={branchState}
+                    branch={branchState}
                 />
             ),
             path: `${EXAMPLES_ROOT}/Library.tsx`,

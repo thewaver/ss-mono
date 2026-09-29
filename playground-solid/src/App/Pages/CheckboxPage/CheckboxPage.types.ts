@@ -3,17 +3,17 @@ import type { Signal } from "solid-js";
 import type { AccessorProps } from "@thewaver/ss-components-solid";
 
 export type CheckboxExampleProps = {
-    checkedSignal: Signal<boolean>;
+    checked: Signal<boolean>;
 };
 
 export type CheckboxMixedExampleProps = AccessorProps<{
-    allSignal: Signal<boolean>;
-    firstChildSignal: Signal<boolean>;
-    secondChildSignal: Signal<boolean>;
+    all: Signal<boolean>;
+    firstChild: Signal<boolean>;
+    secondChild: Signal<boolean>;
     isMixed: boolean;
 }>;
 
 export type CheckboxRefusedWriteExampleProps = {
-    emailSignal: Signal<boolean>;
-    smsSignal: Signal<boolean>;
+    email: Signal<boolean>;
+    sms: Signal<boolean>;
 };

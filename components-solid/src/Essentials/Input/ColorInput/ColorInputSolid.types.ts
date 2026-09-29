@@ -35,9 +35,9 @@ export type ColorInputProps = Omit<InteractionWrapperProps<ColorInputRenderProps
             Pick<InteractionControlProps<ColorInputRenderProps>, "id" | "renderContent"> &
             ColorInputState & {
                 /** The color. It is the only thing that changes it. */
-                valueSignal: SignalSource<string>;
+                value: SignalSource<string>;
                 /** Whether the picker is open. It is the only thing that opens or closes it. */
-                visibilitySignal?: SignalSource<boolean>;
+                visibility?: SignalSource<boolean>;
                 /** Draws the saturation and brightness square. */
                 renderArea: (getRenderProps: () => InteractionFlags<ColorAreaRenderProps>) => JSX.Element;
                 /** Draws the hue slider. */
@@ -48,7 +48,7 @@ export type ColorInputProps = Omit<InteractionWrapperProps<ColorInputRenderProps
                  */
                 renderPopup: (
                     renderSurface: () => JSX.Element,
-                    hsvSignal: Signal<Color.HSVA>,
+                    hsv: Signal<Color.HSVA>,
                     getVisibilityTarget: () => 0 | 1,
                     getTransitionDurationMs: () => number,
                 ) => JSX.Element;

@@ -21,12 +21,12 @@ export const LayeredExample = (props: Props) => (
             id={"openLayers"}
             renderContent={(getFlags) => <PageButtonContent flags={getFlags}>Open layers</PageButtonContent>}
             onClick={() => {
-                props.visibilitySignal[1](true);
+                props.visibility[1](true);
             }}
         />
 
         <Modal
-            visibilitySignal={props.visibilitySignal}
+            visibility={props.visibility}
             ariaLabelledBy={() => LAYERED_TITLE_ID}
             renderOverlay={(getVisibilityTarget, getTransitionDurationMs) => (
                 <PageModalOverlay
@@ -39,7 +39,7 @@ export const LayeredExample = (props: Props) => (
                     <div id={LAYERED_TITLE_ID}>Where are you flying from?</div>
 
                     <Select
-                        valueSignal={props.valueSignal}
+                        value={props.value}
                         options={() => COUNTRIES}
                         ariaLabel={"Country"}
                         renderContent={(getSelectedOption, getFlags) => (

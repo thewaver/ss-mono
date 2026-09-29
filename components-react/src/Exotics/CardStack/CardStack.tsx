@@ -20,7 +20,7 @@ const getIsSameSnapshot = (first: ControlsSnapshot, second: ControlsSnapshot) =>
     first.topIndex === second.topIndex && first.isEmpty === second.isEmpty;
 
 export const CardStack = <T,>(props: CardStackProps<T>) => {
-    const [topIndex, setTopIndex] = SignalMirrorReactUtils.useOptionalState(props.topIndexState, FIRST_INDEX);
+    const [topIndex, setTopIndex] = SignalMirrorReactUtils.useOptionalState(props.topIndex, FIRST_INDEX);
 
     const pileRef = useRef<HTMLDivElement | null>(null);
     const detachedRef = useRef<HTMLDivElement | null>(null);

@@ -49,8 +49,8 @@ export const Carousel = <T,>(props: CarouselProps<T>) => {
     const viewportRef = useRef<HTMLDivElement | null>(null);
     const [swipeRatio, setSwipeRatio] = useState(0);
 
-    const [index, setIndex] = SignalMirrorReactUtils.useOptionalState(props.indexState, 0);
-    const [isPlaying, setIsPlaying] = SignalMirrorReactUtils.useOptionalState(props.playbackState, true);
+    const [index, setIndex] = SignalMirrorReactUtils.useOptionalState(props.index, 0);
+    const [isPlaying, setIsPlaying] = SignalMirrorReactUtils.useOptionalState(props.playback, true);
 
     const count = props.slides.length;
     const currentIndex = CarouselUtils.wrapIndex(index, count);

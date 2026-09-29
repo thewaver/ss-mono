@@ -20,9 +20,9 @@ export const FormPage = () => {
     const [focusOutcome, setFocusOutcome] = useState("not submitted");
 
     const commonProps: FormExampleProps = {
-        emailState,
-        passwordState,
-        termsState,
+        email: emailState,
+        password: passwordState,
+        terms: termsState,
         onSubmit: () => {
             setOutcome(`submitted as ${emailState[0]}`);
         },
@@ -46,8 +46,8 @@ export const FormPage = () => {
                 `outcome: ${focusOutcome} — the handler runs either way, and afterwards focus lands on the first field reporting an error`,
             component: () => (
                 <FocusOnErrorExample
-                    planState={planState}
-                    topicsState={topicsState}
+                    plan={planState}
+                    topics={topicsState}
                     onSubmit={() => {
                         setFocusOutcome(`submitted as ${planState[0] ?? "no plan"}, [${topicsState[0].join(", ")}]`);
                     }}

@@ -46,9 +46,9 @@ export type TrailProps = AccessorProps<{
      * With a lone traveler it is that traveler's place along the path. With followers on a path that stops,
      * the run lasts until the last of them arrives, so `1` is everybody at the end.
      */
-    progressSignal?: SignalSource<number>;
+    progress?: SignalSource<number>;
     /** Whether the traveler is walking. It is the only thing that starts or stops it. */
-    playbackSignal?: SignalSource<boolean>;
+    playback?: SignalSource<boolean>;
     /** Draws the path itself, where it should be visible. */
     renderTrack?: (getPath: Accessor<string>) => JSX.Element;
     /**

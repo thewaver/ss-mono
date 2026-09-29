@@ -46,7 +46,7 @@ export const DeferredExample = (props: Props) => {
     return (
         <Accordion
             items={ITEMS}
-            expandedState={props.expandedState}
+            expanded={props.expanded}
             isPanelBuiltOnExpand={true}
             gap={GAP}
             renderHeader={(item, flags) => <PageAccordionHeader flags={flags}>{item.value}</PageAccordionHeader>}

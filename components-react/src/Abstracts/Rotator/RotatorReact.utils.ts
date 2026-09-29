@@ -19,7 +19,7 @@ export namespace RotatorReactUtils {
      *
      * @param isDisabled Whether the wheel may rotate.
      * @param defs.stepCount How many steps the wheel has. Fewer than two and it cannot rotate.
-     * @param defs.targetIndexState The step the wheel is heading for, if the consumer wants to drive or observe it.
+     * @param defs.targetIndex The step the wheel is heading for, if the consumer wants to drive or observe it.
      * Changing it turns the wheel there, unless a spin is under way; the hook writes it as soon as a spin's target
      * is known. The hook's own state is used when omitted.
      * @param defs.isAutoSpinEnabled Whether idle drift is allowed. On when omitted.
@@ -40,7 +40,7 @@ export namespace RotatorReactUtils {
         isDisabled: boolean,
         defs: {
             stepCount: number;
-            targetIndexState?: readonly [number, (value: number) => void];
+            targetIndex?: readonly [number, (value: number) => void];
             isAutoSpinEnabled?: boolean;
             spinDurationMs?: number;
             settleDurationMs?: number;
@@ -59,7 +59,7 @@ export namespace RotatorReactUtils {
 
         const [ownTarget] = useState(() => StoreUtils.create(0));
         const ownTargetIndex = useStore(ownTarget);
-        const targetIndex = defs.targetIndexState ? defs.targetIndexState[0] : ownTargetIndex;
+        const targetIndex = defs.targetIndex ? defs.targetIndex[0] : ownTargetIndex;
 
         const latest = useLatest({ ...defs, isDisabled, stepCount });
 
@@ -69,11 +69,11 @@ export namespace RotatorReactUtils {
                 getStepCount: () => latest.current.stepCount,
                 getSpinDurationMs: () => latest.current.spinDurationMs ?? RotatorUtils.DEFAULT_SPIN_DURATION_MS,
                 getSettleDurationMs: () => latest.current.settleDurationMs ?? RotatorUtils.DEFAULT_SETTLE_DURATION_MS,
-                targetIndexSignal: [
-                    () => (latest.current.targetIndexState ? latest.current.targetIndexState[0] : ownTarget.get()),
+                targetIndex: [
+                    () => (latest.current.targetIndex ? latest.current.targetIndex[0] : ownTarget.get()),
                     (value) => {
-                        if (latest.current.targetIndexState) {
-                            latest.current.targetIndexState[1](value);
+                        if (latest.current.targetIndex) {
+                            latest.current.targetIndex[1](value);
                         } else {
                             ownTarget.set(value);
                         }

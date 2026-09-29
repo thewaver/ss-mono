@@ -61,7 +61,7 @@ export const SidebarPage = () => {
                     edge={variant.edge}
                     layout={variant.layout}
                     isExpandedOnHover={variant.isExpandedOnHover}
-                    expandedState={[isExpanded, setIsExpanded]}
+                    expanded={[isExpanded, setIsExpanded]}
                 />
             ),
             path: `${EXAMPLES_ROOT}/Default.tsx`,

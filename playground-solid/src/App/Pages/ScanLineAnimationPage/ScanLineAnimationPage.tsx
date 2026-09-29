@@ -127,10 +127,10 @@ const StressTestWrapper = (props: ScanlineAnimationExampleProps) => {
             <StressTest
                 configs={() => STRESS_ITEMS}
                 onHideModal={() => {
-                    props.playbackSignal[1](true);
+                    props.playback[1](true);
                 }}
                 onShowModal={() => {
-                    props.playbackSignal[1](false);
+                    props.playback[1](false);
                 }}
                 renderLabel={(getConfigIndex) =>
                     `Render ${STRESS_ITEMS[getConfigIndex()].count} ${STRESS_ITEMS[getConfigIndex()].kind} items`
@@ -157,7 +157,7 @@ const StressTestWrapper = (props: ScanlineAnimationExampleProps) => {
                         >
                             <ScanlineAnimation
                                 {...props}
-                                playbackSignal={modalPlayback}
+                                playback={modalPlayback}
                                 lineCount={() => STRESS_LINE_COUNT}
                                 animationIterationDelayMs={0}
                                 computeCellWeights={(count) =>
@@ -643,7 +643,7 @@ export const ScanlineAnimationPage = () => {
 
     const getExamples = createMemo(() => {
         const commonProps: ScanlineAnimationExampleProps = {
-            playbackSignal: playback,
+            playback,
             src: getSrc,
             lineCount: getLineCount,
             orientation: getOrientation,

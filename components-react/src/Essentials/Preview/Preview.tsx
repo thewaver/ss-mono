@@ -39,7 +39,7 @@ const PreviewTrigger = (props: PreviewTriggerProps) => {
 };
 
 export const Preview = (props: PreviewProps) => {
-    const [isExpanded, setIsExpanded] = SignalMirrorReactUtils.useOptionalState(props.expandedState, false);
+    const [isExpanded, setIsExpanded] = SignalMirrorReactUtils.useOptionalState(props.expanded, false);
 
     const contentId = useId();
 

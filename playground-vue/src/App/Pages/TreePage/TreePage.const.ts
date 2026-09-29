@@ -1,0 +1,34 @@
+import { h } from "vue";
+
+import type { TreeNode } from "@thewaver/ss-components-vue";
+
+import PageTooltipContent from "../../StyledComponents/TooltipContent/TooltipContent.vue";
+
+export * from "@thewaver/ss-playground/App/Pages/TreePage/TreeNodes.const";
+
+export const FILES_WITH_REACHABLE: TreeNode<string>[] = [
+    {
+        value: "src",
+        children: [
+            { value: "index.ts" },
+            {
+                value: "node_modules",
+                isDisabled: true,
+                isReachableWhenDisabled: true,
+                tooltipDefs: {
+                    placement: { x: "right-out", y: "center" },
+                    offset: { x: 10, y: 0 },
+                    renderContent: ({ visibilityTarget, transitionDurationMs }) =>
+                        h(
+                            PageTooltipContent,
+                            { visibilityTarget, transitionDurationMs },
+                            () => "Not indexed, so this one cannot be opened.",
+                        ),
+                },
+                children: [{ value: "solid-js" }],
+            },
+            { value: "Playground", children: [{ value: "App.tsx" }] },
+        ],
+    },
+    { value: "package.json" },
+];

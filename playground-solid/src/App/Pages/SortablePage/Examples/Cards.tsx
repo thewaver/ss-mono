@@ -18,7 +18,7 @@ import {
 
 type Props = {
     groupId: string;
-    itemsSignal: Signal<SortableItem<Card>[]>;
+    items: Signal<SortableItem<Card>[]>;
     ariaLabel: string;
     emptyText: string;
     orientation?: MaybeAccessor<"horizontal" | "vertical">;
@@ -46,7 +46,7 @@ export const CardsExample = (props: Props) => (
         minHeight={72}
         isDisabled={() => access(props.isDisabled) ?? false}
         isLocked={() => access(props.isLocked) ?? false}
-        itemsSignal={props.itemsSignal}
+        items={props.items}
         computeItemKey={computeCardKey}
         computeItemLabel={computeCardLabel}
         computeCanAccept={props.computeCanAccept}

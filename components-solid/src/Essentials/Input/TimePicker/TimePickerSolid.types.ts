@@ -33,7 +33,7 @@ export type TimePickerProps = Omit<TimeInputProps, "renderTrailing"> &
         /** Whether one time can be picked, for rules a plain earliest and latest cannot express. */
         computeIsTimeDisabled?: (time: TimeValue) => boolean;
         /** Whether the clock is open. It is the only thing that opens or closes it. */
-        visibilitySignal?: SignalSource<boolean>;
+        visibility?: SignalSource<boolean>;
         /**
          * The trigger's own element id, for a consumer that has to reach it from a label or a test.
          *

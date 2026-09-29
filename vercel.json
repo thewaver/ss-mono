@@ -13,7 +13,17 @@
             "permanent": true
         },
         {
-            "source": "/:path((?!solid(?:/|$)|react(?:/|$)|index\\.html$).+)",
+            "source": "/vue",
+            "destination": "/vue/",
+            "permanent": true
+        },
+        {
+            "source": "/svelte",
+            "destination": "/svelte/",
+            "permanent": true
+        },
+        {
+            "source": "/:path((?!solid(?:/|$)|react(?:/|$)|vue(?:/|$)|svelte(?:/|$)|index\\.html$).+)",
             "destination": "/solid/:path",
             "permanent": true
         }
@@ -26,6 +36,14 @@
         {
             "source": "/react/(.*)",
             "destination": "/react/index.html"
+        },
+        {
+            "source": "/vue/(.*)",
+            "destination": "/vue/index.html"
+        },
+        {
+            "source": "/svelte/(.*)",
+            "destination": "/svelte/index.html"
         }
     ]
 }

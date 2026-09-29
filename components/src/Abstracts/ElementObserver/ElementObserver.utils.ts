@@ -49,8 +49,10 @@ const followScroll = (update: () => void) => {
     };
 };
 
-/** Runs `update` on every scroll and resize and on every animation frame, until the returned function is called. */
+/** Runs `update` now, then on every scroll, resize and animation frame, until the returned function is called. */
 const followFrames = (update: () => void) => {
+    update();
+
     document.addEventListener("scroll", update, { capture: true, passive: true });
     window.addEventListener("resize", update);
 
@@ -216,9 +218,9 @@ export namespace ElementObserverUtils {
      * stopped — stop it as soon as the element is hidden.
      *
      * The rectangle comes back in the enclosing viewport's coordinates rather than the screen's, so it
-     * is correct inside a zoomed or panned `Viewport`. It is reported on every frame, changed or not; the first
-     * report arrives on the first scroll, resize or frame, so measure once with {@link measureViewportRect} for a
-     * value straight away.
+     * is correct inside a zoomed or panned `Viewport`. It is reported once straight away, from a measurement taken
+     * as the call is made, and then on every frame, changed or not. So a caller that starts this as its content is
+     * shown has a current rectangle before the browser paints, with no frame needed to supply it.
      *
      * @param getElement The element to measure, read at each measurement. Nothing is reported while it is missing.
      * @param viewportContext The viewport it is drawn in.
@@ -274,7 +276,7 @@ export namespace ElementObserverUtils {
      * back. A missing entry is kept as `undefined` rather than dropped, so the result always lines up with the
      * input.
      * @param viewportContext The viewport they are drawn in.
-     * @param onRects Called with one rect per element whenever any of them changes.
+     * @param onRects Called with one rect per element: once straight away, and again whenever any of them changes.
      * @returns The function that stops measuring.
      */
     export const observeViewportRects = (

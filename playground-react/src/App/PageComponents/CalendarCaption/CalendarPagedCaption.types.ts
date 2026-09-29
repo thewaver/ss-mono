@@ -6,5 +6,5 @@ export type PageCalendarPagedCaptionProps = {
     precision: CalendarPrecision;
     previousLabel: string;
     nextLabel: string;
-    monthState: readonly [DateValue, (month: DateValue) => void];
+    month: readonly [DateValue, (month: DateValue) => void];
 };

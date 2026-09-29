@@ -2,5 +2,5 @@ import type { DateValueCalendarId, DateValueRange } from "@thewaver/ss-component
 
 export type DateRangeExampleProps = {
     calendar: DateValueCalendarId;
-    valueState: readonly [DateValueRange | undefined, (value: DateValueRange | undefined) => void];
+    value: readonly [DateValueRange | undefined, (value: DateValueRange | undefined) => void];
 };

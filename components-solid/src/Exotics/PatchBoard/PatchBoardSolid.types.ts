@@ -58,7 +58,7 @@ export type PatchBoardProps<T> = AccessorProps<{
     /** Freezes the wiring as it stands: cables still show, but none can be made, moved or pulled out. */
     isLocked?: boolean;
     /** The cables currently wired. It is the only thing that adds or removes one. */
-    linksSignal: SignalSource<PatchBoardLink[]>;
+    links: SignalSource<PatchBoardLink[]>;
     /**
      * Whether a cable between two given sockets is allowed, so a board can refuse a connection that makes no
      * sense. Asked only after the board's own refusals have passed. `PatchBoardUtils.getClosesLoop` answers
@@ -80,7 +80,7 @@ export type PatchBoardProps<T> = AccessorProps<{
     onMove?: (nodeKey: string, spot: Point2d) => void;
 }> & {
     /** The nodes and where they sit. It is the only thing that moves them. */
-    nodesSignal: SignalSource<PatchBoardNode<T>[]>;
+    nodes: SignalSource<PatchBoardNode<T>[]>;
     /** The key one node is told apart by, which is what lets a node keep its cables as it moves. */
     computeNodeKey: (value: T) => string;
     /** Names one node for assistive technology. */

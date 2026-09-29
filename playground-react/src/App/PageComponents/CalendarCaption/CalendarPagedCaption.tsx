@@ -10,7 +10,7 @@ const YEAR_OPTIONS: Intl.DateTimeFormatOptions = { year: "numeric" };
 const MONTH_TITLE_OPTIONS: Intl.DateTimeFormatOptions = { month: "long", year: "numeric" };
 
 export const PageCalendarPagedCaption = (props: PageCalendarPagedCaptionProps) => {
-    const [month, setMonth] = props.monthState;
+    const [month, setMonth] = props.month;
 
     const getTitle = () => {
         if (props.precision === "day") return DateValueUtils.format(month, MONTH_TITLE_OPTIONS, props.locale);

@@ -15,13 +15,13 @@ export namespace SelectionReactUtils {
      * @param isDisabled Whether the control is off, in which case no gesture does anything.
      * @param defs.mode Whether nothing can be picked, one thing can, or many can.
      * @param defs.items The list, in the order it is drawn. An item that is not in it is ignored.
-     * @param defs.selectionState What is selected now, and how to change it.
+     * @param defs.selection What is selected now, and how to change it.
      * @returns `pick` for a gesture on one item, `selectAll` and `clear` for the two wholesale moves, and `anchor`
      * for where a run would currently start.
      */
     export const useSelection = <T>(
         isDisabled: boolean,
-        defs: { mode: SelectionMode; items: T[]; selectionState: [T[], (next: T[]) => void] },
+        defs: { mode: SelectionMode; items: T[]; selection: [T[], (next: T[]) => void] },
     ) => {
         const latest = useLatest({ isDisabled, ...defs });
 
@@ -29,9 +29,9 @@ export namespace SelectionReactUtils {
             SelectionUtils.create<T>(() => latest.current.isDisabled, {
                 getMode: () => latest.current.mode,
                 getItems: () => latest.current.items,
-                selectionSignal: [
-                    () => latest.current.selectionState[0],
-                    (next) => latest.current.selectionState[1](next),
+                selection: [
+                    () => latest.current.selection[0],
+                    (next) => latest.current.selection[1](next),
                 ],
             }),
         );

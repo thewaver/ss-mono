@@ -15,7 +15,7 @@ import { access, accessSignal } from "../../../Utils/propUtils";
 import type { DateInputProps } from "./DateInputSolid.types";
 
 export const DateInput = (props: DateInputProps) => {
-    const valueSignal = accessSignal(() => props.valueSignal);
+    const valueSignal = accessSignal(() => props.value);
 
     const getFormat = createMemo(() => access(props.format) ?? DATE_INPUT_DEFAULTS.format);
 
@@ -86,7 +86,7 @@ export const DateInput = (props: DateInputProps) => {
     return (
         <TextField
             {...props}
-            valueSignal={field.textSignal}
+            value={field.text}
             element={"input"}
             inputMode={"numeric"}
             computeMaskedText={(previous, next, caret) => TextSyncUtils.applyMask(getMask(), previous, next, caret)}

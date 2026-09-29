@@ -7,7 +7,7 @@ type Props = ToggleExampleProps;
 
 export const DisabledExample = (props: Props) => (
     <Toggle
-        checkedState={props.checkedState}
+        checked={props.checked}
         ariaLabel={"Disabled toggle"}
         isDisabled={true}
         renderContent={(flags) => <PageToggleContent flags={flags} />}

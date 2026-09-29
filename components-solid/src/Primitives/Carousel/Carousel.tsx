@@ -51,8 +51,8 @@ export const Carousel = <T,>(props: CarouselProps<T>) => {
     const [getSwipeRatio, setSwipeRatio] = createSignal(0);
     const [getTurnAngle, setTurnAngle] = createSignal(0);
 
-    const [getIndex, setIndex] = SignalMirrorSolidUtils.createOptional(() => props.indexSignal, 0);
-    const [getIsPlaying, setIsPlaying] = SignalMirrorSolidUtils.createOptional(() => props.playbackSignal, true);
+    const [getIndex, setIndex] = SignalMirrorSolidUtils.createOptional(() => props.index, 0);
+    const [getIsPlaying, setIsPlaying] = SignalMirrorSolidUtils.createOptional(() => props.playback, true);
 
     const getCount = createMemo(() => access(props.slides).length);
 

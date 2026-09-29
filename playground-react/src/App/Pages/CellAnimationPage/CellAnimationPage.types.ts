@@ -21,10 +21,10 @@ export type CellAnimationExampleProps = {
     animationIterationCount: number;
     animationIterationDelayMs: number;
     finalFrame: CellAnimationFinalFrame;
-    playbackState: readonly [boolean, (isPlaying: boolean) => void];
+    playback: readonly [boolean, (isPlaying: boolean) => void];
 };
 
 export type CellAnimationSourcedExampleProps = CellAnimationExampleProps & {
     src: string;
-    progressState?: readonly [number, (progress: number) => void];
+    progress?: readonly [number, (progress: number) => void];
 };

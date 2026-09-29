@@ -50,7 +50,7 @@ export type ClockProps = AccessorProps<{
     /** Whether one time can be picked, for rules a plain earliest and latest cannot express. */
     computeIsTimeDisabled?: (time: TimeValue) => boolean;
     /** Which time is picked. It is the only thing that picks one. */
-    valueSignal: SignalSource<TimeValue | undefined>;
+    value: SignalSource<TimeValue | undefined>;
     /** Draws one option. */
     renderOption: ClockOptionRenderer;
     /** Draws the heading for one unit's column. */

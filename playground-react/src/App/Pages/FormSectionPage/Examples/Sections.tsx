@@ -27,7 +27,7 @@ type Props = FormSectionsExampleProps;
 
 const renderTextField = (state: FormSectionTextState, hasError?: boolean) => (
     <TextInput
-        valueState={state}
+        value={state}
         hasError={hasError}
         padding={FIELD_PADDING}
         gap={FIELD_GAP}
@@ -37,12 +37,12 @@ const renderTextField = (state: FormSectionTextState, hasError?: boolean) => (
 );
 
 export const SectionsExample = (props: Props) => {
-    const emailMessage = props.emailState[0].includes("@") ? "" : "That does not look like an email address.";
+    const emailMessage = props.email[0].includes("@") ? "" : "That does not look like an email address.";
 
     const passwordMessage =
-        props.passwordState[0].length >= MIN_PASSWORD_LENGTH ? "" : `At least ${MIN_PASSWORD_LENGTH} characters.`;
+        props.password[0].length >= MIN_PASSWORD_LENGTH ? "" : `At least ${MIN_PASSWORD_LENGTH} characters.`;
 
-    const hasMismatch = props.confirmState[0] !== props.passwordState[0];
+    const hasMismatch = props.confirm[0] !== props.password[0];
 
     return (
         <Form
@@ -63,7 +63,7 @@ export const SectionsExample = (props: Props) => {
                                         <PageFormFieldMessage state={fieldState}>{emailMessage}</PageFormFieldMessage>
                                     )}
                                     renderControl={(fieldState) =>
-                                        renderTextField(props.emailState, fieldState.hasError)
+                                        renderTextField(props.email, fieldState.hasError)
                                     }
                                 />
                             </PageFormSectionBody>
@@ -89,13 +89,13 @@ export const SectionsExample = (props: Props) => {
                                         </PageFormFieldMessage>
                                     )}
                                     renderControl={(fieldState) =>
-                                        renderTextField(props.passwordState, fieldState.hasError)
+                                        renderTextField(props.password, fieldState.hasError)
                                     }
                                 />
 
                                 <FormField
                                     renderCaption={() => <PageFormFieldCaption>Repeat it</PageFormFieldCaption>}
-                                    renderControl={() => renderTextField(props.confirmState)}
+                                    renderControl={() => renderTextField(props.confirm)}
                                 />
                             </PageFormSectionBody>
                         )}

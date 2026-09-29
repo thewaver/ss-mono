@@ -60,14 +60,14 @@ export type CuboidProps = AccessorProps<{
     /**
      * How many quarter turns across. Each change of one is a quarter turn that way: up by one brings the face
      * on the right round to the front. It is one of the two things that turn the box, alongside
-     * `pitchSignal`.
+     * `pitch`.
      */
-    yawSignal: SignalSource<number>;
+    yaw: SignalSource<number>;
     /**
      * How many quarter turns up. Each change of one is a quarter turn that way: up by one brings the face
-     * above round to the front. It is one of the two things that turn the box, alongside `yawSignal`.
+     * above round to the front. It is one of the two things that turn the box, alongside `yaw`.
      */
-    pitchSignal: SignalSource<number>;
+    pitch: SignalSource<number>;
     /** Draws one face, and is told which face it is. */
     renderFace: (getFace: Accessor<CuboidFace>, getState: Accessor<CuboidFaceState>) => JSX.Element;
     /**

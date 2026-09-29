@@ -171,7 +171,7 @@ const PageDependencies = (props: { name: string; view: PageViewKey }) => {
 
                             <div class={styles.dependencyDisclosure}>
                                 <Collapsible
-                                    expandedSignal={expandedSignal}
+                                    expanded={expandedSignal}
                                     sizing={"fill"}
                                     isPanelBuiltOnExpand={true}
                                     renderTrigger={(getFlags) => (
@@ -250,7 +250,7 @@ const PageDependencies = (props: { name: string; view: PageViewKey }) => {
     );
 };
 
-export function AppContent(props: RouteSectionProps & { viewportAnchorSignal: SignalPair<ViewportAnchor> }) {
+export function AppContent(props: RouteSectionProps & { viewportAnchor: SignalPair<ViewportAnchor> }) {
     const [getSelectedConfig, setSelectedConfig] = createSignal<ComponentConfig>();
     const [getSearchTerm, setSearchTerm] = createSignal("");
     const showsDescriptionOnlySignal = createSignal(false);
@@ -325,7 +325,7 @@ export function AppContent(props: RouteSectionProps & { viewportAnchorSignal: Si
                 collapsedWidth={() => MENU_COLLAPSED_WIDTH}
                 expandedWidth={() => MENU_EXPANDED_WIDTH}
                 isExpandedOnHover={isAutoHiddenSignal[0]}
-                expandedSignal={menuExpandedSignal}
+                expanded={menuExpandedSignal}
                 renderContent={(getPhase, getTransitionDurationMs) => (
                     <nav class={styles.leftMenu} aria-label={"Library"}>
                         <PageLayer level={1}>
@@ -358,9 +358,9 @@ export function AppContent(props: RouteSectionProps & { viewportAnchorSignal: Si
                                         />
 
                                         <PageNavSettings
-                                            showsDescriptionOnlySignal={showsDescriptionOnlySignal}
-                                            pageViewSignal={pageViewSignal}
-                                            viewportAnchorSignal={props.viewportAnchorSignal}
+                                            showsDescriptionOnly={showsDescriptionOnlySignal}
+                                            pageView={pageViewSignal}
+                                            viewportAnchor={props.viewportAnchor}
                                         />
                                     </div>
                                 </div>
@@ -375,8 +375,8 @@ export function AppContent(props: RouteSectionProps & { viewportAnchorSignal: Si
                                 >
                                     <Tree
                                         nodes={getVisibleNodes}
-                                        valueSignal={selectedSignal}
-                                        expandedSignal={expandedSignal}
+                                        value={selectedSignal}
+                                        expanded={expandedSignal}
                                         ariaLabel={"Library"}
                                         linkComponent={A}
                                         computeCustomText={(node) => node.value.name}
@@ -478,7 +478,7 @@ export function App() {
                     path="/"
                     component={(props: RouteSectionProps) => (
                         <ViewportWrapper size={getViewportSize}>
-                            <AppContent {...props} viewportAnchorSignal={viewportAnchorSignal} />
+                            <AppContent {...props} viewportAnchor={viewportAnchorSignal} />
                         </ViewportWrapper>
                     )}
                 >

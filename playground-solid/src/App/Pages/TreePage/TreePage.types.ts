@@ -5,11 +5,11 @@ import type { Asset } from "@thewaver/ss-playground/App/Pages/TreePage/TreeRecor
 export type { Asset } from "@thewaver/ss-playground/App/Pages/TreePage/TreeRecords.types";
 
 export type TreeExampleProps = {
-    valueSignal: Signal<string | undefined>;
-    expandedSignal: Signal<string[]>;
+    value: Signal<string | undefined>;
+    expanded: Signal<string[]>;
 };
 
 export type TreeRecordExampleProps = {
-    valueSignal: Signal<Asset | undefined>;
-    expandedSignal: Signal<Asset[]>;
+    value: Signal<Asset | undefined>;
+    expanded: Signal<Asset[]>;
 };

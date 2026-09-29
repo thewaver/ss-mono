@@ -13,7 +13,7 @@ export const LabeledExample = (props: Props) => (
         <PageLabelCaption>Contract</PageLabelCaption>
 
         <FileInput
-            filesState={props.filesState}
+            files={props.files}
             renderContent={(renderProps) => <PageFileInputContent renderProps={renderProps} />}
         />
     </Label>

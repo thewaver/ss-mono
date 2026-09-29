@@ -1,6 +1,6 @@
 import { type Index2d, MathUtils, type Point2d } from "@thewaver/ss-utils";
 
-import type { CarryNudge, CarryPlace } from "../../Abstracts/Carrier/Carrier.types";
+import type { CarrierZone, CarryNudge, CarryPlace } from "../../Abstracts/Carrier/Carrier.types";
 import { CarrierUtils } from "../../Abstracts/Carrier/Carrier.utils";
 import type { NavigatorDirection } from "../../Abstracts/Navigator/Navigator.types";
 import { NavigatorUtils } from "../../Abstracts/Navigator/Navigator.utils";
@@ -15,6 +15,8 @@ import type {
     TableSortDirection,
 } from "./Table.types";
 
+/** What puts a carried column back. */
+const CANCEL_KEY = "Escape";
 /** What a repeated press of a column header steps through: up, down, then unsorted. */
 const SORT_CYCLE: (TableSortDirection | undefined)[] = ["ascending", "descending", undefined];
 
@@ -259,6 +261,31 @@ export namespace TableUtils {
         const cell = clampCell(next, grid);
 
         return { kind: "focus", cell, isExtending: e.shiftKey && cell.row > HEADER_ROW_INDEX };
+    };
+
+    /**
+     * Puts a carried column back when Escape is pressed, wherever focus is, for as long as it listens.
+     *
+     * The grid's own keys never see a carry through: a column picked up by its grip leaves focus on its header
+     * cell, but one being dragged may have left focus anywhere, so the key is listened for on the document. Only a
+     * carry that began in `zone` is canceled, which returns the column to where it was and is announced in the
+     * zone's own words, as every other carrier's cancel is; any other Escape is left alone.
+     *
+     * @param zone The table's carry zone.
+     * @returns A function that stops listening. Listen while a carry from this table is in flight, and stop when it
+     * ends.
+     */
+    export const observeCarryCancel = (zone: CarrierZone) => {
+        const cancelOnEscape = (e: KeyboardEvent) => {
+            if (e.key !== CANCEL_KEY || CarrierUtils.getSourceZone() !== zone) return;
+
+            e.preventDefault();
+            CarrierUtils.end("cancel");
+        };
+
+        document.addEventListener("keydown", cancelOnEscape);
+
+        return () => document.removeEventListener("keydown", cancelOnEscape);
     };
 
     /**

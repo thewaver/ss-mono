@@ -147,7 +147,7 @@ export type TextFieldProps = Omit<
         /** The space between the text and whatever sits before or after it. */
         gap?: number;
         /** The text in the field, and how to change it. It is the only thing that changes it. */
-        valueState: readonly [string, (value: string) => void];
+        value: readonly [string, (value: string) => void];
         /**
          * ARIA attributes for the field element, for a preset that gives the field a role of its own, such as a
          * combobox. They are written after the field's own, so a role here replaces the one the field would have.

@@ -19,7 +19,7 @@ type Props = CurrencyInputExampleProps;
 export const BoundedExample = (props: Props) => {
     return (
         <CurrencyInput
-            valueState={props.valueState}
+            value={props.value}
             max={BUDGET_MAX}
             ariaLabel={"Budget"}
             padding={FIELD_STEPPER_PADDING}

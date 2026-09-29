@@ -115,7 +115,7 @@ export const PageExamples = (props: ExamplesProps) => {
 
             <Modal
                 margins={() => CSSUtils.spreadMargin(40)}
-                visibilitySignal={modalVisibility}
+                visibility={modalVisibility}
                 ariaLabel={() => `${access(props.items)[getActiveIndex()].name} source code`}
                 renderOverlay={(getVisibilityTarget, getTransitionDurationMs) => (
                     <PageModalOverlay

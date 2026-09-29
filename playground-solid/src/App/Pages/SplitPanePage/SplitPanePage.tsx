@@ -54,7 +54,7 @@ export const SplitPanePage = () => {
     };
 
     const getExamples = createMemo(() => {
-        const commonProps: Omit<SplitPaneExampleProps, "ratiosSignal"> = {
+        const commonProps: Omit<SplitPaneExampleProps, "ratios"> = {
             gutterSize: getGutterSize,
             isDisabled: getIsDisabled,
         };
@@ -64,7 +64,7 @@ export const SplitPanePage = () => {
                 key: "pair",
                 name: "Two panes",
                 readout: () => `ratios: ${percent(pairSignal[0]())} — drag the gutter or arrow it with the keyboard`,
-                component: () => <PairExample {...commonProps} ratiosSignal={pairSignal} />,
+                component: () => <PairExample {...commonProps} ratios={pairSignal} />,
                 path: `${EXAMPLES_ROOT}/Pair.tsx`,
             },
             {
@@ -72,7 +72,7 @@ export const SplitPanePage = () => {
                 name: "In a right-to-left box",
                 readout: () =>
                     `ratios: ${percent(rightToLeftSignal[0]())} — the box around the panes sets dir="rtl", so the first pane sits on the right and the gutter follows the pointer and the arrow keys from that side`,
-                component: () => <RightToLeftExample {...commonProps} ratiosSignal={rightToLeftSignal} />,
+                component: () => <RightToLeftExample {...commonProps} ratios={rightToLeftSignal} />,
                 path: `${EXAMPLES_ROOT}/RightToLeft.tsx`,
             },
             {
@@ -80,7 +80,7 @@ export const SplitPanePage = () => {
                 name: "Bounded panes",
                 readout: () =>
                     `ratios: ${percent(boundedSignal[0]())} — the first pane is held between 120px and 220px whatever the ratio says`,
-                component: () => <BoundedExample {...commonProps} ratiosSignal={boundedSignal} />,
+                component: () => <BoundedExample {...commonProps} ratios={boundedSignal} />,
                 path: `${EXAMPLES_ROOT}/Bounded.tsx`,
             },
             {
@@ -88,14 +88,14 @@ export const SplitPanePage = () => {
                 name: "Three panes",
                 readout: () =>
                     `ratios: ${percent(tripleSignal[0]())} — a gutter moves its two neighbors and nothing else`,
-                component: () => <TripleExample {...commonProps} ratiosSignal={tripleSignal} />,
+                component: () => <TripleExample {...commonProps} ratios={tripleSignal} />,
                 path: `${EXAMPLES_ROOT}/Triple.tsx`,
             },
             {
                 key: "stacked",
                 name: "Stacked",
                 readout: () => `ratios: ${percent(columnSignal[0]())} — the same control on the other axis`,
-                component: () => <StackedExample {...commonProps} ratiosSignal={columnSignal} />,
+                component: () => <StackedExample {...commonProps} ratios={columnSignal} />,
                 path: `${EXAMPLES_ROOT}/Stacked.tsx`,
             },
             {
@@ -103,7 +103,7 @@ export const SplitPanePage = () => {
                 name: "Two pictures",
                 readout: () =>
                     `ratios: ${percent(compareSignal[0]())} — both pictures are drawn at the full width of the frame, so the gutter wipes between them instead of squeezing them`,
-                component: () => <CompareExample {...commonProps} ratiosSignal={compareSignal} />,
+                component: () => <CompareExample {...commonProps} ratios={compareSignal} />,
                 path: `${EXAMPLES_ROOT}/Compare.tsx`,
             },
             {
@@ -111,7 +111,7 @@ export const SplitPanePage = () => {
                 name: "Minimums that do not fit",
                 readout: () =>
                     `minimums of 250px and 400px in a box too narrow for both — grid honors the floors and lets the row overflow, which is the behavior this control inherits rather than fights`,
-                component: () => <CrampedExample {...commonProps} ratiosSignal={crampedSignal} />,
+                component: () => <CrampedExample {...commonProps} ratios={crampedSignal} />,
                 path: `${EXAMPLES_ROOT}/Cramped.tsx`,
             },
         ];

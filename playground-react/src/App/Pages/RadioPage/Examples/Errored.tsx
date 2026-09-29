@@ -7,10 +7,10 @@ import type { RadioOptionalExampleProps } from "../RadioPage.types";
 type Props = RadioOptionalExampleProps;
 
 export const ErroredExample = (props: Props) => {
-    const hasError = props.valueState[0] === undefined;
+    const hasError = props.value[0] === undefined;
 
     return (
-        <RadioGroup valueState={props.valueState} ariaLabel={"Required size"} gap={RADIO_GROUP_GAP} hasError={hasError}>
+        <RadioGroup value={props.value} ariaLabel={"Required size"} gap={RADIO_GROUP_GAP} hasError={hasError}>
             {SIZE_OPTIONS.map((option) => (
                 <Radio
                     key={option.value}

@@ -6,7 +6,7 @@ import { ListboxComposite } from "../Listbox/Listbox";
 import type { MultiListboxProps } from "./MultiListbox.types";
 
 export const MultiListbox = <T,>(props: MultiListboxProps<T>) => {
-    const [values, setValues] = props.valuesState;
+    const [values, setValues] = props.values;
 
     const selectedOptions = useMemo(
         () => SelectUtils.getFlatOptions(props.options).filter((option) => values.includes(option.value)),

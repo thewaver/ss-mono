@@ -11,7 +11,7 @@ const NOTHING_CHOSEN = "Choose a destination";
 type Props = MenuCascaderExampleProps;
 
 export const CascaderExample = (props: Props) => {
-    const path = props.pathState[0];
+    const path = props.path[0];
 
     const pathText = path.length > 0 ? path.join(PATH_SEPARATOR) : NOTHING_CHOSEN;
 
@@ -24,7 +24,7 @@ export const CascaderExample = (props: Props) => {
             renderItem={renderDestinationItem}
             renderPopup={renderMenuPopup}
             onActivate={(destination) => {
-                if (destination.isLeaf) props.pathState[1](destination.path);
+                if (destination.isLeaf) props.path[1](destination.path);
             }}
         />
     );

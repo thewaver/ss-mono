@@ -15,7 +15,7 @@ export const TimePicker = (props: TimePickerProps) => {
     const popupId = createUniqueId();
 
     const [getRootRef, setRootRef] = createSignal<HTMLElement>();
-    const [getIsOpen, setIsOpen] = SignalMirrorSolidUtils.createOptional(() => props.visibilitySignal, false);
+    const [getIsOpen, setIsOpen] = SignalMirrorSolidUtils.createOptional(() => props.visibility, false);
 
     const getClockLabel = () => access(props.clockLabel);
 
@@ -42,7 +42,7 @@ export const TimePicker = (props: TimePickerProps) => {
 
     const renderClock = () => (
         <Clock
-            valueSignal={props.valueSignal}
+            value={props.value}
             minValue={props.minValue}
             maxValue={props.maxValue}
             steps={props.clockSteps}

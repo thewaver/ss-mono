@@ -18,7 +18,7 @@ export const PressedExample = (props: Props) => {
             gap={props.gap}
             ariaLabel={"Text style"}
             overflowAriaLabel={"More text styles"}
-            pressedValuesState={props.pressedValuesState}
+            pressedValues={props.pressedValues}
             renderAction={(action, flags) => (
                 <PageButtonContent flags={flags}>
                     <span

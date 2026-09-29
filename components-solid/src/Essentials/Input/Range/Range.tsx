@@ -135,10 +135,10 @@ const RangeElement = (props: RangeElementProps) => {
 };
 
 export const Range = (props: RangeProps) => {
-    const hasSingle = props.valueSignal !== undefined;
-    const hasPair = props.rangeSignal !== undefined;
+    const hasSingle = props.value !== undefined;
+    const hasPair = props.range !== undefined;
 
-    RangeUtils.warnIfAmbiguous(hasSingle, hasPair, { single: "valueSignal", pair: "rangeSignal" });
+    RangeUtils.warnIfAmbiguous(hasSingle, hasPair, { single: "value", pair: "range" });
 
     const [getFocusVisibleThumb, setFocusVisibleThumb] = createSignal<number>();
 
@@ -153,7 +153,7 @@ export const Range = (props: RangeProps) => {
     const getThumbSize = createMemo(() => access(props.thumbSize) ?? RANGE_DEFAULTS.thumbSize);
 
     const getValues = createMemo(() =>
-        RangeUtils.computeValues(props.rangeSignal?.[0](), props.valueSignal?.[0](), getMin()),
+        RangeUtils.computeValues(props.range?.[0](), props.value?.[0](), getMin()),
     );
 
     const getRatios = createMemo(() => RangeUtils.computeRatios(getValues(), getMin(), getMax()));
@@ -161,12 +161,12 @@ export const Range = (props: RangeProps) => {
     const getFill = createMemo(() => RangeUtils.computeFill(getRatios()));
 
     const setValue = (index: number, value: number) => {
-        const range = props.rangeSignal?.[0]();
+        const range = props.range?.[0]();
 
         if (range) {
-            props.rangeSignal?.[1](RangeUtils.computeMovedRange(range, index, value));
+            props.range?.[1](RangeUtils.computeMovedRange(range, index, value));
         } else {
-            props.valueSignal?.[1](value);
+            props.value?.[1](value);
         }
 
         void props.onInput?.(getValues());

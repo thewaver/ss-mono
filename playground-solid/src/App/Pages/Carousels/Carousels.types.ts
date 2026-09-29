@@ -8,8 +8,8 @@ export type CarouselExampleProps = AccessorProps<{
     isLooping?: boolean;
     orientation: CarouselOrientation;
     autoplayDelayMs?: number;
-    indexSignal: Signal<number>;
-    playbackSignal?: Signal<boolean>;
+    index: Signal<number>;
+    playback?: Signal<boolean>;
 }>;
 
 export type DrumCarouselExampleProps = Omit<CarouselExampleProps, "orientation"> &
@@ -17,14 +17,14 @@ export type DrumCarouselExampleProps = Omit<CarouselExampleProps, "orientation">
         axis: CarouselAxis;
     }>;
 
-export type CarouselSharedProps = Omit<CarouselExampleProps, "indexSignal" | "autoplayDelayMs" | "playbackSignal">;
+export type CarouselSharedProps = Omit<CarouselExampleProps, "index" | "autoplayDelayMs" | "playback">;
 
 export type CarouselsControls = {
-    slideCountSignal: Signal<number>;
-    delaySignal: Signal<number>;
-    orientationSignal: Signal<CarouselOrientation>;
-    isDisabledSignal: Signal<boolean>;
-    isLoopingSignal: Signal<boolean>;
+    slideCount: Signal<number>;
+    delay: Signal<number>;
+    orientation: Signal<CarouselOrientation>;
+    isDisabled: Signal<boolean>;
+    isLooping: Signal<boolean>;
     getSlideCount: Accessor<number>;
     getSlides: Accessor<string[]>;
     getSharedProps: Accessor<CarouselSharedProps>;

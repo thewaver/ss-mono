@@ -13,14 +13,14 @@ import type { DatePickerProps } from "./DatePicker.types";
 const toMonth = (value: DateValue): DateValue => DateValueUtils.getStartOfMonth(value);
 
 export const DatePicker = (props: DatePickerProps) => {
-    const [value] = props.valueState;
+    const [value] = props.value;
 
     const popupId = useId();
 
     const rootRef = useRef<HTMLDivElement | null>(null);
     const isFocusReturnedRef = useRef(false);
     const [root, setRoot] = useState<HTMLDivElement>();
-    const [isOpen, setIsOpen] = SignalMirrorReactUtils.useOptionalState(props.visibilityState, false);
+    const [isOpen, setIsOpen] = SignalMirrorReactUtils.useOptionalState(props.visibility, false);
     const monthState = useState(() => toMonth(value ?? DateValueUtils.fromDate(new Date())));
     const [, setMonth] = monthState;
 
@@ -61,8 +61,8 @@ export const DatePicker = (props: DatePickerProps) => {
 
     const renderCalendar = () => (
         <Calendar
-            valueState={props.valueState}
-            monthState={monthState}
+            value={props.value}
+            month={monthState}
             minValue={props.minValue}
             maxValue={props.maxValue}
             isDisabled={props.isDisabled}

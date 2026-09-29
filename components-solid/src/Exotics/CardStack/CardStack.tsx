@@ -19,7 +19,7 @@ const FIRST_INDEX = 0;
 const TOP_DEPTH = 0;
 
 export const CardStack = <T,>(props: CardStackProps<T>) => {
-    const [getTopIndex, setTopIndex] = SignalMirrorSolidUtils.createOptional(() => props.topIndexSignal, FIRST_INDEX);
+    const [getTopIndex, setTopIndex] = SignalMirrorSolidUtils.createOptional(() => props.topIndex, FIRST_INDEX);
 
     const [getPileRef, setPileRef] = createSignal<HTMLElement>();
 

@@ -14,11 +14,11 @@ type Props = CalendarExampleProps;
 export const BoundedExample = (props: Props) => {
     return (
         <PageCalendarFrame>
-            <PageCalendarCaption monthSignal={props.monthSignal} key={"bounded"} locale={() => LOCALE} />
+            <PageCalendarCaption month={props.month} key={"bounded"} locale={() => LOCALE} />
 
             <Calendar
-                valueSignal={props.valueSignal}
-                monthSignal={props.monthSignal}
+                value={props.value}
+                month={props.month}
                 today={() => TODAY}
                 locale={() => LOCALE}
                 weekStartsOn={props.weekStartsOn}

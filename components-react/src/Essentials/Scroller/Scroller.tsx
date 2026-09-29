@@ -16,7 +16,7 @@ export const Scroller = (props: ScrollerProps) => {
 
     const [metrics, setMetrics] = useState(ScrollerUtils.NO_METRICS);
     const [progressRatio, setProgressRatio] = SignalMirrorReactUtils.useOptionalState(
-        props.progressState,
+        props.progress,
         ScrollerUtils.RATIO_MIN,
     );
 

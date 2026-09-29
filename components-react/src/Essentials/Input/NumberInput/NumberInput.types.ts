@@ -6,7 +6,7 @@ import type { TextFieldPresetProps } from "../../../Primitives/TextField/TextFie
 
 export type NumberInputProps = Omit<
     TextFieldPresetProps,
-    "type" | "autoComplete" | "valueState" | "renderTrailing" | "onInput"
+    "type" | "autoComplete" | "value" | "renderTrailing" | "onInput"
 > & {
     /**
      * How far PageUp and PageDown move the number. Left out, ten times `step`. It is held to the bounds and lands on
@@ -25,7 +25,7 @@ export type NumberInputProps = Omit<
     /** How often it repeats once it has started. */
     repeatIntervalMs?: number;
     /** The number, and how to change it. It is the only thing that changes it. */
-    valueState: readonly [number | undefined, (value: number | undefined) => void];
+    value: readonly [number | undefined, (value: number | undefined) => void];
     /** Draws whatever sits after the field's text, inside the field — usually the stepper. */
     renderTrailing?: (flags: InteractionFlags<TextFieldFlags>, stepper: NumberInputStepper) => ReactNode;
     /**

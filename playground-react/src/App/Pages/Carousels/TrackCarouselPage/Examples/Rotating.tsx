@@ -32,8 +32,8 @@ export const RotatingExample = (props: Props) => {
     return (
         <TrackCarousel
             slides={props.slides}
-            indexState={props.indexState}
-            playbackState={props.playbackState}
+            index={props.index}
+            playback={props.playback}
             isDisabled={props.isDisabled}
             isLooping={props.isLooping}
             orientation={props.orientation}

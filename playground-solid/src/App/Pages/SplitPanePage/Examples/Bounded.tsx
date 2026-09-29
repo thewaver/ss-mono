@@ -15,7 +15,7 @@ export const BoundedExample = (props: Props) => {
         <PageSplitPaneFrame>
             <SplitPane
                 panes={() => BOUNDED}
-                ratiosSignal={props.ratiosSignal}
+                ratios={props.ratios}
                 gutterSize={props.gutterSize}
                 isDisabled={props.isDisabled}
                 ariaLabel={"Bounded panes"}

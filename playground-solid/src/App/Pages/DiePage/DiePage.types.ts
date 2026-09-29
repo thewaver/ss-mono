@@ -5,5 +5,5 @@ export type DieExampleProps = AccessorProps<{
     size: number;
     rollDurationMs: number;
     tumbleCount: number;
-    faceSignal: SignalSource<number>;
+    face: SignalSource<number>;
 }>;

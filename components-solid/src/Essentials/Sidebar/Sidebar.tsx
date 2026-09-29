@@ -19,7 +19,7 @@ import type { SidebarProps } from "./SidebarSolid.types";
 const NO_SKIP_WINDOW_MS = 0;
 
 export const Sidebar = (props: SidebarProps) => {
-    const expandedSignal = SignalMirrorSolidUtils.createOptional(() => props.expandedSignal, false);
+    const expandedSignal = SignalMirrorSolidUtils.createOptional(() => props.expanded, false);
 
     const [getRootRef, setRootRef] = createSignal<HTMLElement>();
     const [getPanelRef, setPanelRef] = createSignal<HTMLElement>();

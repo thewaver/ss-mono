@@ -8,6 +8,7 @@ import { vanillaExtractPlugin } from "@vanilla-extract/vite-plugin";
 import { componentApi } from "../playground/vite/componentApi.ts";
 import { componentDependencies } from "../playground/vite/componentDependencies.ts";
 import { playgroundSource } from "../playground/vite/playgroundSource.ts";
+import { definePlaygroundUrls } from "../playground/vite/playgroundUrls.ts";
 
 const fromRepo = (path: string) => fileURLToPath(new URL(path, import.meta.url));
 
@@ -38,11 +39,7 @@ export default defineConfig({
             "@thewaver/ss-playground": fromRepo("../playground/src"),
         },
     },
-    define: {
-        "import.meta.env.VITE_OTHER_PLAYGROUND_URL": JSON.stringify(
-            process.env.VITE_OTHER_PLAYGROUND_URL ?? "http://localhost:8081/",
-        ),
-    },
+    define: definePlaygroundUrls(),
     server: {
         port: 8080,
     },

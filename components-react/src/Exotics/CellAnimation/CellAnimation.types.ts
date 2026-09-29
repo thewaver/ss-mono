@@ -23,13 +23,13 @@ export type CellAnimationProps = {
     /** How long the grid waits between one pass and the next. */
     animationIterationDelayMs?: number;
     /** Whether the animation is running. It is the only thing that starts or pauses it. */
-    playbackState?: readonly [boolean, (value: boolean) => void];
+    playback?: readonly [boolean, (value: boolean) => void];
     /**
      * How far through the current pass the grid is, `0`–`1`. The component writes it as the pass runs, and writing it
      * moves the pass there: while playing it carries on from the new point, and with playback paused it scrubs, the
      * grid drawn at whatever is written. It goes back to `0` at the start of each pass and when `src` changes.
      */
-    progressState?: readonly [number, (value: number) => void];
+    progress?: readonly [number, (value: number) => void];
     /** What the grid is left showing once the passes are done. */
     finalFrame?: CellAnimationFinalFrame;
     /**

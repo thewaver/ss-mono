@@ -43,7 +43,7 @@ export const HintExample = (props: Props) => {
                                 })}
                                 onClick={async () => {
                                     props.onIndexChange(getIndex());
-                                    props.visibilitySignal[1]((prev) => !prev);
+                                    props.visibility[1]((prev) => !prev);
                                 }}
                                 renderContent={(getFlags) => (
                                     <PageButtonContent flags={getFlags}>Highlight Me</PageButtonContent>
@@ -57,7 +57,7 @@ export const HintExample = (props: Props) => {
             <SpotlightHint
                 elementRef={() => anchorRefs[access(props.index)]}
                 padding={() => PADDING}
-                visibilitySignal={props.visibilitySignal}
+                visibility={props.visibility}
                 renderHighlight={renderHighlight}
                 renderOverlay={renderOverlay}
             />

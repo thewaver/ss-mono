@@ -14,11 +14,11 @@ type Props = TextInputExampleProps;
 
 export const ErroredExample = (props: Props) => (
     <TextInput
-        valueSignal={props.valueSignal}
+        value={props.value}
         padding={() => FIELD_PADDING}
         gap={() => FIELD_GAP}
         type={"email"}
-        hasError={() => !props.valueSignal[0]().includes("@")}
+        hasError={() => !props.value[0]().includes("@")}
         ariaLabel={"Email"}
         autoComplete={"email"}
         computeTextStyle={computePageTextFieldTextStyle}

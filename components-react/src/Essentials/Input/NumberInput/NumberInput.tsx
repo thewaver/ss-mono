@@ -13,7 +13,7 @@ import { useLatest } from "../../../Utils/refUtils";
 import type { NumberInputProps } from "./NumberInput.types";
 
 export const NumberInput = (props: NumberInputProps) => {
-    const [value, setValue] = props.valueState;
+    const [value, setValue] = props.value;
 
     const separators = useMemo(() => DecimalUtils.getSeparators(props.locale), [props.locale]);
 
@@ -106,7 +106,7 @@ export const NumberInput = (props: NumberInputProps) => {
     return (
         <TextField
             {...props}
-            valueState={[text, writeText]}
+            value={[text, writeText]}
             element={"input"}
             type={"text"}
             inputMode={props.inputMode ?? NUMBER_INPUT_DEFAULTS.inputMode}

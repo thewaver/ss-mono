@@ -38,8 +38,8 @@ export const Wheel = <T,>(props: WheelProps<T>) => {
         computeSpinDefs: props.computeSpinDefs,
         computeStepLabel: props.computeWedgeLabel,
         onStepChange: props.onSelectedWedgeChange,
-        targetIndexSignal: props.targetIndexSignal,
-        autoSpinSignal: props.autoSpinSignal,
+        targetIndex: props.targetIndex,
+        autoSpin: props.autoSpin,
         onSpinEnd: props.onSpinEnd,
     });
 

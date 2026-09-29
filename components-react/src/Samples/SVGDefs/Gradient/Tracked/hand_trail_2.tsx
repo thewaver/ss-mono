@@ -131,7 +131,7 @@ const HandTrail = (props: HandTrailProps) => {
     const ref = SVGDefsReactUtils.useElementRef(props.element);
     const { reading, isPointerPresent } = PointerTrackerReactUtils.usePointerReading(ref);
     const frameMs = SVGDefsReactUtils.useFrameMs(clock);
-    const [stamps, setStamps] = useState(NO_STAMPS);
+    const [stamps] = useState(() => [...NO_STAMPS]);
     const motionRef = useRef<HandMotion>({ lastAngle: undefined, lastTurnedMs: undefined, bornTick: undefined });
 
     const isCycling = Boolean(props.opts?.cycles);
@@ -158,7 +158,7 @@ const HandTrail = (props: HandTrailProps) => {
 
         const stamp = { angle, fade, bornMs: frameMs };
 
-        setStamps((previous) => previous.map((entry, index) => (index === tick % STAMP_COUNT ? stamp : entry)));
+        stamps[tick % STAMP_COUNT] = stamp;
     }, [frameMs, reading, isPointerPresent, isCycling]);
 
     const sweepArc = props.opts?.sweepArc ?? DEFAULTS.sweepArc;
