@@ -104,33 +104,34 @@ const MenuTrigger = defineComponent(
 );
 
 const MenuItemView = defineComponent(
-    (props: MenuItemViewProps, { slots }: SlotsContext<InteractionControlSlots<MenuItemFlags>>) => () => {
-        const isDisabled = props.flags.isDisabled ?? false;
-        const hasSubmenu = props.flags.hasSubmenu;
-        const isOpen = props.flags.isOpen;
+    (props: MenuItemViewProps, { slots }: SlotsContext<InteractionControlSlots<MenuItemFlags>>) =>
+        () => {
+            const isDisabled = props.flags.isDisabled ?? false;
+            const hasSubmenu = props.flags.hasSubmenu;
+            const isOpen = props.flags.isOpen;
 
-        return (
-            <div
-                id={props.id}
-                class={[MenuStyles.menuItem, props.isRegion && MenuStyles.menuItemRegion]}
-                role={MenuUtils.getItemRole(props.kind)}
-                aria-label={props.ariaLabel || undefined}
-                aria-disabled={isDisabled || undefined}
-                aria-checked={props.kind === "command" ? undefined : props.flags.isChecked}
-                aria-haspopup={hasSubmenu ? "menu" : undefined}
-                aria-expanded={hasSubmenu ? isOpen : undefined}
-                aria-controls={isOpen ? props.submenuId : undefined}
-                onClick={() => {
-                    if (isDisabled) return;
+            return (
+                <div
+                    id={props.id}
+                    class={[MenuStyles.menuItem, props.isRegion && MenuStyles.menuItemRegion]}
+                    role={MenuUtils.getItemRole(props.kind)}
+                    aria-label={props.ariaLabel || undefined}
+                    aria-disabled={isDisabled || undefined}
+                    aria-checked={props.kind === "command" ? undefined : props.flags.isChecked}
+                    aria-haspopup={hasSubmenu ? "menu" : undefined}
+                    aria-expanded={hasSubmenu ? isOpen : undefined}
+                    aria-controls={isOpen ? props.submenuId : undefined}
+                    onClick={() => {
+                        if (isDisabled) return;
 
-                    props.onActivate();
-                }}
-                onMouseenter={(e) => props.onHover({ x: e.clientX, y: e.clientY })}
-            >
-                {callSlot(slots.renderContent, props.flags)}
-            </div>
-        );
-    },
+                        props.onActivate();
+                    }}
+                    onMouseenter={(e) => props.onHover({ x: e.clientX, y: e.clientY })}
+                >
+                    {callSlot(slots.renderContent, props.flags)}
+                </div>
+            );
+        },
     {
         name: "MenuItemView",
         props: declareProps<MenuItemViewProps>({
@@ -290,8 +291,7 @@ const MenuLevel = defineComponent(
         );
 
         const isCovered = computed(
-            () =>
-                props.submenuMode === "replace" && (openValue.value !== undefined || isCoveredWhileClosing.value),
+            () => props.submenuMode === "replace" && (openValue.value !== undefined || isCoveredWhileClosing.value),
         );
 
         watch(

@@ -6,7 +6,9 @@ const REPO_ROOT = fileURLToPath(new URL("../..", import.meta.url));
 const VITE_BIN = fileURLToPath(new URL("../../node_modules/vite/bin/vite.js", import.meta.url));
 const DIST = fileURLToPath(new URL("../../dist", import.meta.url));
 const FRAMEWORKS = ["solid", "react", "vue", "svelte"];
-const PLAYGROUND_URLS = JSON.stringify(Object.fromEntries(FRAMEWORKS.map((framework) => [framework, `/${framework}/`])));
+const PLAYGROUND_URLS = JSON.stringify(
+    Object.fromEntries(FRAMEWORKS.map((framework) => [framework, `/${framework}/`])),
+);
 
 const builds = [
     ...FRAMEWORKS.map((framework) => ({

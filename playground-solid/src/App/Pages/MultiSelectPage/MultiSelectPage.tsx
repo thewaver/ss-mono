@@ -48,11 +48,7 @@ export const MultiSelectPage = () => {
             readout: () =>
                 `values: [${groupedSignal[0]().join(", ")}] | query: "${querySignal[0]()}" — the page drops groups it has emptied`,
             component: () => (
-                <MultiSelectGroupedExample
-                    values={groupedSignal}
-                    query={querySignal}
-                    options={getFilteredGroups}
-                />
+                <MultiSelectGroupedExample values={groupedSignal} query={querySignal} options={getFilteredGroups} />
             ),
             path: `${EXAMPLES_ROOT}/MultiSelectGrouped.tsx`,
         },

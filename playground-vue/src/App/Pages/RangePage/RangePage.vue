@@ -3,8 +3,8 @@ import { shallowRef } from "vue";
 
 import type { RangeValues } from "@thewaver/ss-components-vue";
 
-import PageExamples from "../../PageComponents/Examples/PageExamples.vue";
 import type { ExampleDefs } from "../../PageComponents/Examples/Examples.types";
+import PageExamples from "../../PageComponents/Examples/PageExamples.vue";
 import DefaultExample from "./Examples/Default.vue";
 import DisabledExample from "./Examples/Disabled.vue";
 import DisabledPairExample from "./Examples/DisabledPair.vue";
@@ -62,8 +62,7 @@ const examples: ExampleDefs[] = [
     {
         key: "vertical",
         name: "Vertical",
-        readout: () =>
-            `single: ${vertical.value} | pair: ${verticalPair.value.start}–${verticalPair.value.end}`,
+        readout: () => `single: ${vertical.value} | pair: ${verticalPair.value.start}–${verticalPair.value.end}`,
         path: `${EXAMPLES_ROOT}/Vertical.vue`,
     },
     {

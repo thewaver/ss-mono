@@ -154,9 +154,7 @@ const findPropsType = (script: ts.SourceFile) => {
 const toSvelteDeclaration = (componentFile: string) => {
     const source = readFileSync(componentFile, "utf8");
     const name = path.basename(componentFile, ".svelte");
-    const instance = [...source.matchAll(SVELTE_SCRIPT_PATTERN)].find(
-        (match) => !SVELTE_MODULE_PATTERN.test(match[1]),
-    );
+    const instance = [...source.matchAll(SVELTE_SCRIPT_PATTERN)].find((match) => !SVELTE_MODULE_PATTERN.test(match[1]));
     const script = ts.createSourceFile(componentFile, instance?.[2] ?? "", ts.ScriptTarget.ESNext, true);
     const imports = script.statements.filter(ts.isImportDeclaration).map((statement) => statement.getText(script));
     const propsType = findPropsType(script) ?? "Record<string, never>";
@@ -187,7 +185,9 @@ const createSvelteAwareHost = (options: ts.CompilerOptions) => {
         ...host,
         fileExists: (fileName: string) => getIsSvelteDeclaration(fileName) || host.fileExists(fileName),
         readFile: (fileName: string) =>
-            getIsSvelteDeclaration(fileName) ? toSvelteDeclaration(toComponentFile(fileName)!) : host.readFile(fileName),
+            getIsSvelteDeclaration(fileName)
+                ? toSvelteDeclaration(toComponentFile(fileName)!)
+                : host.readFile(fileName),
         getSourceFile: (fileName: string, languageVersion: ts.ScriptTarget | ts.CreateSourceFileOptions, ...rest) =>
             getIsSvelteDeclaration(fileName)
                 ? ts.createSourceFile(fileName, toSvelteDeclaration(toComponentFile(fileName)!), languageVersion, true)
@@ -380,7 +380,9 @@ const buildApiMap = (entryFile: string, coreEntry: string, utilsEntry: string, a
         if (symbol.flags & (ts.SymbolFlags.TypeAlias | ts.SymbolFlags.Interface)) {
             const declared = checker.getDeclaredTypeOfSymbol(symbol);
 
-            const ownerSuffix = [PROPS_SUFFIX, apiOptions.slotsSuffix].find((suffix) => suffix && name.endsWith(suffix));
+            const ownerSuffix = [PROPS_SUFFIX, apiOptions.slotsSuffix].find(
+                (suffix) => suffix && name.endsWith(suffix),
+            );
 
             if (ownerSuffix) {
                 const owner = units.get(name.slice(0, -ownerSuffix.length).toLowerCase()) ?? unit;
@@ -445,7 +447,10 @@ const buildApiMap = (entryFile: string, coreEntry: string, utilsEntry: string, a
                     kind,
                     tables: tables.sort(
                         kind === "props"
-                            ? byPrimaries([`${unit}${PROPS_SUFFIX}`, `${unit}${apiOptions.slotsSuffix ?? PROPS_SUFFIX}`])
+                            ? byPrimaries([
+                                  `${unit}${PROPS_SUFFIX}`,
+                                  `${unit}${apiOptions.slotsSuffix ?? PROPS_SUFFIX}`,
+                              ])
                             : byAliasesFirst,
                     ),
                 },

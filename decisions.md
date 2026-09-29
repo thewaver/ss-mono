@@ -720,7 +720,7 @@ in `components-vue/src/Utils/` unless a folder is given.
   calls when the moment comes, written by the caller to read the prop then (`onShow: () => props.onShow?.()`), and a
   function whose presence the core reads is handed as a getter of it (`getComputeMaskedText`, `getComputeSpinDefs`).
   Two-way state a composable writes is a writable `Ref`, as in `HoverIntentVueUtils.useHoverIntent(anchorRef, shown,
-  …)`. `useLatest` and `useElement` have no counterpart: a prop read at call time is always current, and a template
+…)`. `useLatest` and `useElement` have no counterpart: a prop read at call time is always current, and a template
   ref is already reactive.
 - **A store is read through `useStore(store, select)`**: a `shallowRef` fed by the subscription and let go by
   `onScopeDispose`, changing only when the selected part does.
@@ -747,7 +747,7 @@ in `components-vue/src/Utils/` unless a folder is given.
 - **`ref` reaches the element through `$el`.** A consumer's template ref on a component is handed the component, and
   its `$el` is the element React's `ref` points at. Where that is not the component's root — `InteractionWrapper`'s
   control, the inputs of `TextField` and `BinarySwitch`, a leaf rendering a fragment — `exposeElement(expose, () =>
-  element.value)` points `$el` at it, the approach of Reka UI's `useForwardExpose`. A leaf is therefore attached with
+element.value)` points `$el` at it, the approach of Reka UI's `useForwardExpose`. A leaf is therefore attached with
   `ref={setElementRef}` whether it is an element or a component, and React's `ref` members are gone from the Vue props
   types. Element-valued props (`anchorRef`, `elementRef`) stay plain props, as in React.
 - **A context is `provide` and `inject` under an `InjectionKey`**, in the same `.context.ts`: `provide<Name>Context(value)`
@@ -782,7 +782,7 @@ in `components-vue/src/Utils/` unless a folder is given.
   portal passes its events up the component tree. `Toolbar` as a menubar therefore listens on the document while one of
   its menus is open, and acts only on keys from a layer it owns.
 - **A consumer's link component is a Vue `Component` drawn with `h(props.linkComponent, { href, …, onClick }, { default:
-  () => content })`** — `Tabs`, `Tree`, `Paginator`, `Breadcrumbs` — and is handed the same props React's is.
+() => content })`** — `Tabs`, `Tree`, `Paginator`, `Breadcrumbs` — and is handed the same props React's is.
 
 **Where the Vue side departs from React, accepted:**
 
@@ -979,7 +979,7 @@ unsupervised. The shapes are Solid's more often than React's, because runes are 
   `createComputed` or `createRenderEffect` and React during render — `PlacementItem` starting its glide, `Spotlight`'s
   placed flag, `TextSync`, the virtualizer's options, `Mosaic` noting where focus was before its tiles move. A cleanup
   with no condition is `$effect(() => stop)`. Solid's `on(source, fn, { defer: true })` is `watchChange(getValue,
-  onChange)` in `Utils/effectUtils.svelte.ts`, with `isBeforeRender` for the `$effect.pre` form.
+onChange)` in `Utils/effectUtils.svelte.ts`, with `isBeforeRender` for the `$effect.pre` form.
 - **An effect reads what it depends on, then calls the core inside `untrack`.** Svelte tracks every read made while an
   effect runs, the core's own included — a getter over a prop, a store the call writes and reads back — and a call that
   writes what the effect has read reruns it. So the shape is
@@ -989,7 +989,7 @@ unsupervised. The shapes are Solid's more often than React's, because runes are 
   at event time, the defs object carries a getter for it (`get computeSpinDefs() { return props.computeSpinDefs; }`),
   as React's does.
 - **Props are read as `props.x`, with the bindables destructured beside them**: `let { value = $bindable(), ...props } =
-  $props()`. Defaults are `$derived(props.x ?? DEFAULTS.x)`. A local is never named `state`, `effect` or `derived`,
+$props()`. Defaults are `$derived(props.x ?? DEFAULTS.x)`. A local is never named `state`, `effect` or `derived`,
   because `$state` then reads as a store subscription to it and the file stops compiling.
 - **A generic component declares `<script lang="ts" generics="T">`**, or `generics="TExtra extends object = {}"`, and
   the type is inferred from the props at the call site; a snippet's parameters may name it.

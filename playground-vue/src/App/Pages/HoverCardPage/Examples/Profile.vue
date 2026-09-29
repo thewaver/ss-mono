@@ -28,7 +28,8 @@ const toggleFollowing = () => {
 <template>
     <div :class="styles.sentence">
         {{ "Posted by " }}<button ref="anchorRef" type="button" :class="styles.handle">@sir.aldric</button
-        >{{ " to the masons' guild, two hours ago." }}<HoverCard
+        >{{ " to the masons' guild, two hours ago."
+        }}<HoverCard
             v-model:visibility="visibility"
             :anchor-ref="anchorRef"
             :ariaLabelledBy="nameId"

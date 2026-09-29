@@ -5,8 +5,8 @@ import { createRouter, createWebHistory } from "vue-router";
 import { toPageViewRoute } from "@thewaver/ss-playground/App/PageComponents/ViewTabs/ViewTabs.const";
 import { PLAYGROUND_THEMES } from "@thewaver/ss-playground/App/Theme.css";
 
-import App from "./App/App.vue";
 import { AppUtils } from "./App/App.utils";
+import App from "./App/App.vue";
 import AppContent from "./App/AppContent.vue";
 import EmptyPage from "./App/EmptyPage.vue";
 import PageDocsView from "./App/PageComponents/DocsView/PageDocsView.vue";

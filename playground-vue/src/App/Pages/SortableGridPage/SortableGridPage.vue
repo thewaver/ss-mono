@@ -120,8 +120,7 @@ const examples: ExampleDefs[] = [
     {
         key: "walls",
         name: "Walls, and a tidy-up",
-        readout: () =>
-            `${spots(walled.value)} — nothing lands on a hatched cell, and Tidy up pulls everything upward`,
+        readout: () => `${spots(walled.value)} — nothing lands on a hatched cell, and Tidy up pulls everything upward`,
         path: `${EXAMPLES_ROOT}/Inventory.vue`,
     },
     {

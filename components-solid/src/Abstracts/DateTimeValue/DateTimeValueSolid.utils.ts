@@ -23,14 +23,15 @@ export namespace DateTimeValueSolidUtils {
     export const createSplit = (
         signal: Signal<DateTimeValue | undefined>,
     ): { date: Signal<DateValue | undefined>; time: Signal<TimeValue | undefined> } => {
-        const { first: firstSignal, second: secondSignal } = SignalMirrorSolidUtils.createSplit<DateTimeValue, DateValue, TimeValue>(
-            signal,
-            {
-                compose: (date, time) => DateTimeValueUtils.of(date, time),
-                decompose: (value) => [value.date, value.time],
-                getIsSame: DateTimeValueUtils.isSame,
-            },
-        );
+        const { first: firstSignal, second: secondSignal } = SignalMirrorSolidUtils.createSplit<
+            DateTimeValue,
+            DateValue,
+            TimeValue
+        >(signal, {
+            compose: (date, time) => DateTimeValueUtils.of(date, time),
+            decompose: (value) => [value.date, value.time],
+            getIsSame: DateTimeValueUtils.isSame,
+        });
 
         return { date: firstSignal, time: secondSignal };
     };

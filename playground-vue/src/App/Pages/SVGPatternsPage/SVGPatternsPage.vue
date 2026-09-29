@@ -10,8 +10,8 @@ import type { WithNoSample } from "@thewaver/ss-playground/App/PageComponents/Sa
 import * as styles from "@thewaver/ss-playground/App/Pages/SVGPatternsPage/SVGPatternsPage.css";
 
 import { SVGPatternKnobs } from "../../Knobs/SVGPatterns.const";
-import PageExamples from "../../PageComponents/Examples/PageExamples.vue";
 import type { ExampleDefs } from "../../PageComponents/Examples/Examples.types";
+import PageExamples from "../../PageComponents/Examples/PageExamples.vue";
 import PageColorField from "../../PageComponents/Field/PageColorField.vue";
 import PageGroupedSelectField from "../../PageComponents/Field/PageGroupedSelectField.vue";
 import PageNumberField from "../../PageComponents/Field/PageNumberField.vue";

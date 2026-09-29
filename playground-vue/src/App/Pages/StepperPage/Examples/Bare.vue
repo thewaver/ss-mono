@@ -26,7 +26,8 @@ const props = defineProps<Props>();
                 :state="step.state"
                 :ordinal="ORDER.indexOf(step.value) + 1"
                 orientation="horizontal"
-            >{{ LABELS[step.value as StepValue] }}</PageStepContent>
+                >{{ LABELS[step.value as StepValue] }}</PageStepContent
+            >
         </template>
     </Stepper>
 </template>

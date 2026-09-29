@@ -13,8 +13,8 @@ import {
 } from "@thewaver/ss-playground/App/Pages/ParticleSpawnerPage/ParticleSpawnerPage.const";
 
 import { ParticleSpawnerKnobs } from "../../Knobs/ParticleSpawners.const";
-import PageExamples from "../../PageComponents/Examples/PageExamples.vue";
 import type { ExampleDefs } from "../../PageComponents/Examples/Examples.types";
+import PageExamples from "../../PageComponents/Examples/PageExamples.vue";
 import PageCheckField from "../../PageComponents/Field/PageCheckField.vue";
 import PageNumberField from "../../PageComponents/Field/PageNumberField.vue";
 import PageSelectField from "../../PageComponents/Field/PageSelectField.vue";
@@ -187,11 +187,7 @@ const examples: ExampleDefs[] = [
         <PagePropsDivider />
 
         <PagePropsPanel scope="global">
-            <PageProp
-                item-key="particleCount"
-                label="Particle count"
-                hint="How many particles are sent on each round."
-            >
+            <PageProp item-key="particleCount" label="Particle count" hint="How many particles are sent on each round.">
                 <PageNumberField
                     :value="particleCount"
                     :min="ParticleSpawnerKnobs.MIN_PARTICLE_COUNT"

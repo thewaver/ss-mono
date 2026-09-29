@@ -18,27 +18,28 @@ import type { SlotsContext } from "../../../Utils/typeUtils";
 import type { CollapsibleProps, CollapsibleSlots, CollapsibleTriggerProps } from "./Collapsible.types";
 
 const CollapsibleTrigger = defineComponent(
-    (props: CollapsibleTriggerProps, { slots }: SlotsContext<Pick<CollapsibleSlots, "renderTrigger">>) => () => {
-        const isDisabled = props.flags.isDisabled ?? false;
+    (props: CollapsibleTriggerProps, { slots }: SlotsContext<Pick<CollapsibleSlots, "renderTrigger">>) =>
+        () => {
+            const isDisabled = props.flags.isDisabled ?? false;
 
-        return (
-            <button
-                id={props.id}
-                type="button"
-                class={CollapsibleStyles.collapsibleTrigger}
-                aria-expanded={props.isExpanded}
-                aria-controls={props.panelId}
-                aria-disabled={isDisabled || undefined}
-                onClick={() => {
-                    if (isDisabled) return;
+            return (
+                <button
+                    id={props.id}
+                    type="button"
+                    class={CollapsibleStyles.collapsibleTrigger}
+                    aria-expanded={props.isExpanded}
+                    aria-controls={props.panelId}
+                    aria-disabled={isDisabled || undefined}
+                    onClick={() => {
+                        if (isDisabled) return;
 
-                    props.onToggle();
-                }}
-            >
-                {callSlot(slots.renderTrigger, props.flags)}
-            </button>
-        );
-    },
+                        props.onToggle();
+                    }}
+                >
+                    {callSlot(slots.renderTrigger, props.flags)}
+                </button>
+            );
+        },
     {
         name: "CollapsibleTrigger",
         props: declareProps<CollapsibleTriggerProps>({

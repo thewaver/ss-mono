@@ -40,8 +40,7 @@ const id = useId();
 
 const iterationConfig = computed(() => SVGDefsSamples.Iteration.SAMPLE_CONFIGS[props.iterationConfigKey]);
 
-const scale = (value: number, configIndex: number) =>
-    (value * STRESS_ITEMS[configIndex].size) / styles.exampleSize;
+const scale = (value: number, configIndex: number) => (value * STRESS_ITEMS[configIndex].size) / styles.exampleSize;
 
 const toClipPath = (clipPath: string) => `path("${clipPath}")`;
 
@@ -102,7 +101,9 @@ const computeFillDefs = (configIndex: number, size: Size2d, element: HTMLElement
                             height: `${STRESS_ITEMS[configIndex].size}px`,
                             clipPath: toClipPath(clipPath),
                         }"
-                    >{{ itemIndex }}</div>
+                    >
+                        {{ itemIndex }}
+                    </div>
                 </template>
             </Shape>
         </template>

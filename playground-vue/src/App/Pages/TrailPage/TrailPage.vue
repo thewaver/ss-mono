@@ -117,7 +117,11 @@ const examples: ExampleDefs[] = [
 
     <PageExamples :items="examples" layout="flow">
         <template #circuit>
-            <CircuitExample v-bind="commonProps" v-model:progress="circuitProgress" v-model:playback="isCircuitPlaying" />
+            <CircuitExample
+                v-bind="commonProps"
+                v-model:progress="circuitProgress"
+                v-model:playback="isCircuitPlaying"
+            />
         </template>
 
         <template #timeline>

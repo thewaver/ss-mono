@@ -2,12 +2,7 @@
 import { useModel } from "vue";
 
 import { Sortable } from "@thewaver/ss-components-vue";
-import type {
-    InteractionFlags,
-    SortableGridItem,
-    SortableItem,
-    SortableItemFlags,
-} from "@thewaver/ss-components-vue";
+import type { InteractionFlags, SortableGridItem, SortableItem, SortableItemFlags } from "@thewaver/ss-components-vue";
 import { SORTABLE_ANNOUNCEMENTS } from "@thewaver/ss-playground/App/PageComponents/Announcements/Announcements.const";
 import * as styles from "@thewaver/ss-playground/App/Pages/SortableGridPage/SortableGridPage.css";
 import type { Gear } from "@thewaver/ss-playground/App/Pages/SortableGridPage/SortableGridPage.types";

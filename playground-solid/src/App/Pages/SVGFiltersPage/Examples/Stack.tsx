@@ -33,11 +33,7 @@ const renderStep = (
 
 type Props = SVGFiltersStackExampleProps;
 
-const StepList = (props: {
-    items: Signal<SortableItem<SVGFiltersStep>[]>;
-    caption: string;
-    emptyText: string;
-}) => (
+const StepList = (props: { items: Signal<SortableItem<SVGFiltersStep>[]>; caption: string; emptyText: string }) => (
     <div class={styles.stepColumn}>
         <div class={styles.stepCaption}>{props.caption}</div>
 

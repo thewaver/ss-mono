@@ -6,8 +6,8 @@ import type { AnchorHPlacement, AnchorVPlacement } from "@thewaver/ss-components
 
 import { SatelliteKnobs } from "../../Knobs/Satellites.const";
 import PageExampleKnobs from "../../PageComponents/ExampleKnobs/PageExampleKnobs.vue";
-import PageExamples from "../../PageComponents/Examples/PageExamples.vue";
 import type { ExampleDefs } from "../../PageComponents/Examples/Examples.types";
+import PageExamples from "../../PageComponents/Examples/PageExamples.vue";
 import PageCheckField from "../../PageComponents/Field/PageCheckField.vue";
 import PageNumberField from "../../PageComponents/Field/PageNumberField.vue";
 import PageSelectField from "../../PageComponents/Field/PageSelectField.vue";

@@ -670,13 +670,13 @@ was built before this rule; read them as `orientation` and `horizontal`/`vertica
 
 ### Prop prefixes
 
-| Kind                                          | Prefix                        | Examples                                                                                       |
-| --------------------------------------------- | ----------------------------- | ---------------------------------------------------------------------------------------------- |
-| Reactive data (via `AccessorProps`)           | `get*`                        | `getIsVisible`, `getJoinRadii`, `getHrefs`, `getVisibleCorners`                                |
-| Factories / predicates / transforms with args | `compute*`                    | `computePoints`, `computeFillDefs`, `computeIsDisabled`, `computeClassNames`, `computeSVGDefs` |
-| Events / lifecycle                            | `on*`                         | `onShow`, `onHide`, `onClick`; **`onMount` for controller handoff**                            |
-| JSX producers                                 | `render*`                     | `renderContent` / `renderTab`; nested defs use `renderDefsElement`                             |
-| Two-way state the component also writes       | none (the bare stem)          | `visibility`, `checked`, `value`                                                               |
+| Kind                                          | Prefix               | Examples                                                                                       |
+| --------------------------------------------- | -------------------- | ---------------------------------------------------------------------------------------------- |
+| Reactive data (via `AccessorProps`)           | `get*`               | `getIsVisible`, `getJoinRadii`, `getHrefs`, `getVisibleCorners`                                |
+| Factories / predicates / transforms with args | `compute*`           | `computePoints`, `computeFillDefs`, `computeIsDisabled`, `computeClassNames`, `computeSVGDefs` |
+| Events / lifecycle                            | `on*`                | `onShow`, `onHide`, `onClick`; **`onMount` for controller handoff**                            |
+| JSX producers                                 | `render*`            | `renderContent` / `renderTab`; nested defs use `renderDefsElement`                             |
+| Two-way state the component also writes       | none (the bare stem) | `visibility`, `checked`, `value`                                                               |
 
 One `compute*` prefix for all factories — reactivity is carried by **argument shape** (`size` vs
 `getSize`), not by a second prefix.

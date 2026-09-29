@@ -4,8 +4,8 @@ import { computed, shallowRef } from "vue";
 import { SHADOW_CASTER_DEFAULTS } from "@thewaver/ss-components-vue";
 import { ShadowCasterKnobs } from "@thewaver/ss-playground/App/Knobs/ShadowCasters.const";
 
-import PageExamples from "../../../PageComponents/Examples/PageExamples.vue";
 import type { ExampleDefs } from "../../../PageComponents/Examples/Examples.types";
+import PageExamples from "../../../PageComponents/Examples/PageExamples.vue";
 import PageCheckField from "../../../PageComponents/Field/PageCheckField.vue";
 import PageColorField from "../../../PageComponents/Field/PageColorField.vue";
 import PageNumberField from "../../../PageComponents/Field/PageNumberField.vue";
@@ -49,8 +49,7 @@ const examples: ExampleDefs[] = [
     {
         key: "card",
         name: "Card",
-        readout: () =>
-            "the shadow is thrown away from the pointer, and lengthens and softens as the pointer retreats",
+        readout: () => "the shadow is thrown away from the pointer, and lengthens and softens as the pointer retreats",
         path: `${EXAMPLES_ROOT}/Card.vue`,
     },
     {

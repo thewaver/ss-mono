@@ -62,9 +62,7 @@ export const SectionsExample = (props: Props) => {
                                     renderMessage={(fieldState) => (
                                         <PageFormFieldMessage state={fieldState}>{emailMessage}</PageFormFieldMessage>
                                     )}
-                                    renderControl={(fieldState) =>
-                                        renderTextField(props.email, fieldState.hasError)
-                                    }
+                                    renderControl={(fieldState) => renderTextField(props.email, fieldState.hasError)}
                                 />
                             </PageFormSectionBody>
                         )}
@@ -88,9 +86,7 @@ export const SectionsExample = (props: Props) => {
                                             {passwordMessage}
                                         </PageFormFieldMessage>
                                     )}
-                                    renderControl={(fieldState) =>
-                                        renderTextField(props.password, fieldState.hasError)
-                                    }
+                                    renderControl={(fieldState) => renderTextField(props.password, fieldState.hasError)}
                                 />
 
                                 <FormField

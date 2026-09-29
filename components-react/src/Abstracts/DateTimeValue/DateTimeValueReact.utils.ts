@@ -19,14 +19,15 @@ export namespace DateTimeValueReactUtils {
     export const useSplit = (
         valueState: readonly [DateTimeValue | undefined, (value: DateTimeValue | undefined) => void],
     ) => {
-        const { first: firstState, second: secondState } = SignalMirrorReactUtils.useSplit<DateTimeValue, DateValue, TimeValue>(
-            valueState,
-            {
-                compose: (date, time) => DateTimeValueUtils.of(date, time),
-                decompose: (value) => [value.date, value.time],
-                getIsSame: DateTimeValueUtils.isSame,
-            },
-        );
+        const { first: firstState, second: secondState } = SignalMirrorReactUtils.useSplit<
+            DateTimeValue,
+            DateValue,
+            TimeValue
+        >(valueState, {
+            compose: (date, time) => DateTimeValueUtils.of(date, time),
+            decompose: (value) => [value.date, value.time],
+            getIsSame: DateTimeValueUtils.isSame,
+        });
 
         return { date: firstState, time: secondState };
     };

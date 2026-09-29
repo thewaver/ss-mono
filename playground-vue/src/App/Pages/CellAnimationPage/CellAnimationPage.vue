@@ -24,8 +24,8 @@ import knight_profile from "@thewaver/ss-playground/App/knight_profile.webp";
 import type { Index2d } from "@thewaver/ss-utils";
 
 import { CellAnimationKnobs } from "../../Knobs/CellAnimations.const";
-import PageExamples from "../../PageComponents/Examples/PageExamples.vue";
 import type { ExampleDefs } from "../../PageComponents/Examples/Examples.types";
+import PageExamples from "../../PageComponents/Examples/PageExamples.vue";
 import PageCheckField from "../../PageComponents/Field/PageCheckField.vue";
 import PageGroupedSelectField from "../../PageComponents/Field/PageGroupedSelectField.vue";
 import PageNumberField from "../../PageComponents/Field/PageNumberField.vue";

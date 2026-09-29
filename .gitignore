@@ -5,3 +5,4 @@ test-results
 playwright-report
 external/*
 !external/.gitkeep
+.svelte-kit

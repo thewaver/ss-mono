@@ -13,10 +13,7 @@ import type { Point2d } from "@thewaver/ss-utils";
 import type { CalendarDayRenderer, CalendarWeekdayRenderer } from "../Calendar/Calendar.types";
 import type { DateInputProps } from "../DateInput/DateInput.types";
 
-export type DateRangePickerProps = Omit<
-    DateInputProps,
-    "renderTrailing" | "value" | "ariaLabel" | "id" | "name"
-> & {
+export type DateRangePickerProps = Omit<DateInputProps, "renderTrailing" | "value" | "ariaLabel" | "id" | "name"> & {
     /**
      * The fields' element id. The start field takes `<id>-start` and the end field `<id>-end`, so a label can
      * name each one and no id lands on two elements.

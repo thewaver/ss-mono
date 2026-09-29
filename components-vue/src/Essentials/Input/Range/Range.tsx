@@ -85,11 +85,9 @@ const RangeElement = defineComponent(
 
         FormFieldVueUtils.useRegisterControl(firstElement);
 
-        InteractionTrackerVueUtils.useExtraControls(
-            () => elements.value.slice(1, props.values.length),
-            getIsDisabled,
-            { isTabbable: () => props.isTabbable },
-        );
+        InteractionTrackerVueUtils.useExtraControls(() => elements.value.slice(1, props.values.length), getIsDisabled, {
+            isTabbable: () => props.isTabbable,
+        });
 
         return () => {
             const isDisabled = getIsDisabled();
@@ -204,10 +202,8 @@ export const Range = defineComponent(
 
         exposeElement(expose, () => controlRef.value);
 
-        watchAfterRender(
-            [() => props.value !== undefined, () => props.range !== undefined],
-            ([hasSingle, hasPair]) =>
-                RangeUtils.warnIfAmbiguous(hasSingle, hasPair, { single: "value", pair: "range" }),
+        watchAfterRender([() => props.value !== undefined, () => props.range !== undefined], ([hasSingle, hasPair]) =>
+            RangeUtils.warnIfAmbiguous(hasSingle, hasPair, { single: "value", pair: "range" }),
         );
 
         const getMin = () => props.min ?? RANGE_DEFAULTS.min;

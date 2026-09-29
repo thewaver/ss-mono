@@ -108,13 +108,7 @@ export const Cuboid = defineComponent(
         const controller: CuboidController = {
             getFacing: () => facing.value,
             turnTo: (face) => {
-                const turns = CuboidUtils.findTurnsTo(
-                    face,
-                    getIsUpright(),
-                    orientation.value,
-                    yaw.value,
-                    pitch.value,
-                );
+                const turns = CuboidUtils.findTurnsTo(face, getIsUpright(), orientation.value, yaw.value, pitch.value);
 
                 if (!turns) return false;
 

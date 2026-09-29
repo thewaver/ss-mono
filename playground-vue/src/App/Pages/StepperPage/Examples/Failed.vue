@@ -21,9 +21,7 @@ type Props = StepperExampleProps;
 
 const props = defineProps<Props>();
 
-const computeTooltipDefs = (
-    step: Step<StepValue, PageStepState>,
-): InteractionTooltipDefs<StepperFlags> | undefined => {
+const computeTooltipDefs = (step: Step<StepValue, PageStepState>): InteractionTooltipDefs<StepperFlags> | undefined => {
     const reason = step.state === "failed" || step.state === "ahead" ? REASONS[step.state] : undefined;
 
     if (!reason) return undefined;
@@ -54,7 +52,8 @@ const computeTooltipDefs = (
                 :state="step.state"
                 :ordinal="ORDER.indexOf(step.value) + 1"
                 orientation="horizontal"
-            >{{ LABELS[step.value as StepValue] }}</PageStepContent>
+                >{{ LABELS[step.value as StepValue] }}</PageStepContent
+            >
         </template>
 
         <template #renderConnector>

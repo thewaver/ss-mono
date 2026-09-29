@@ -19,38 +19,34 @@ import type {
 import { watchAfterRender } from "../../../Utils/effectUtils";
 import { callSlot, declareProps, forwardProps, useTwoWay } from "../../../Utils/propUtils";
 import type { SlotsContext } from "../../../Utils/typeUtils";
-import type {
-    CalendarCompositeProps,
-    CalendarDayProps,
-    CalendarProps,
-    CalendarSlots,
-} from "./Calendar.types";
+import type { CalendarCompositeProps, CalendarDayProps, CalendarProps, CalendarSlots } from "./Calendar.types";
 
 const toCellId = (gridId: string, day: DateValue) => `${gridId}-day-${DateValueUtils.toIso(day)}`;
 
 const CalendarDay = defineComponent(
-    (props: CalendarDayProps, { slots }: SlotsContext<InteractionControlSlots<CalendarRenderProps>>) => () => {
-        const isDisabled = props.flags.isDisabled ?? false;
+    (props: CalendarDayProps, { slots }: SlotsContext<InteractionControlSlots<CalendarRenderProps>>) =>
+        () => {
+            const isDisabled = props.flags.isDisabled ?? false;
 
-        return (
-            <div
-                id={props.id}
-                class={CalendarStyles.calendarDay}
-                role="gridcell"
-                aria-label={props.ariaLabel}
-                aria-selected={props.flags.isSelected}
-                aria-current={props.flags.isToday ? "date" : undefined}
-                aria-disabled={isDisabled || undefined}
-                onClick={() => {
-                    if (isDisabled) return;
+            return (
+                <div
+                    id={props.id}
+                    class={CalendarStyles.calendarDay}
+                    role="gridcell"
+                    aria-label={props.ariaLabel}
+                    aria-selected={props.flags.isSelected}
+                    aria-current={props.flags.isToday ? "date" : undefined}
+                    aria-disabled={isDisabled || undefined}
+                    onClick={() => {
+                        if (isDisabled) return;
 
-                    props.onSelect();
-                }}
-            >
-                {callSlot(slots.renderContent, props.flags)}
-            </div>
-        );
-    },
+                        props.onSelect();
+                    }}
+                >
+                    {callSlot(slots.renderContent, props.flags)}
+                </div>
+            );
+        },
     {
         name: "CalendarDay",
         slots: Object as SlotsType<InteractionControlSlots<CalendarRenderProps>>,

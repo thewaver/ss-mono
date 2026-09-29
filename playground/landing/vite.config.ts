@@ -2,7 +2,12 @@ import { fileURLToPath } from "node:url";
 import type { Plugin } from "vite";
 import { defineConfig } from "vite";
 
-import { REACT_THEME_VALUES, SOLID_THEME_VALUES, SVELTE_THEME_VALUES, VUE_THEME_VALUES } from "../src/App/Theme.const.ts";
+import {
+    REACT_THEME_VALUES,
+    SOLID_THEME_VALUES,
+    SVELTE_THEME_VALUES,
+    VUE_THEME_VALUES,
+} from "../src/App/Theme.const.ts";
 
 const fromHere = (path: string) => fileURLToPath(new URL(path, import.meta.url));
 

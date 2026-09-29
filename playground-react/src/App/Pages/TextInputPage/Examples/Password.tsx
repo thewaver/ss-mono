@@ -31,9 +31,7 @@ export const PasswordExample = (props: Props) => (
                     props.reveal[1](!props.reveal[0]);
                 }}
                 renderContent={(flags) => (
-                    <PageTextFieldAdornment flags={flags}>
-                        {props.reveal[0] ? "Hide" : "Show"}
-                    </PageTextFieldAdornment>
+                    <PageTextFieldAdornment flags={flags}>{props.reveal[0] ? "Hide" : "Show"}</PageTextFieldAdornment>
                 )}
             />
         )}

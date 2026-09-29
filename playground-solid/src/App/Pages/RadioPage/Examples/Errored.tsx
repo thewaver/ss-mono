@@ -12,12 +12,7 @@ export const ErroredExample = (props: Props) => {
     const getHasError = () => props.value[0]() === undefined;
 
     return (
-        <RadioGroup
-            value={props.value}
-            ariaLabel={"Required size"}
-            gap={() => RADIO_GROUP_GAP}
-            hasError={getHasError}
-        >
+        <RadioGroup value={props.value} ariaLabel={"Required size"} gap={() => RADIO_GROUP_GAP} hasError={getHasError}>
             <For each={SIZE_OPTIONS}>
                 {(option) => (
                     <Radio

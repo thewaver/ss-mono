@@ -14,10 +14,7 @@ import type { AccessorProps, SignalSource } from "../../../Utils/typeUtils";
 import type { CalendarDayRenderer, CalendarWeekdayRenderer } from "../Calendar/CalendarSolid.types";
 import type { DateInputProps } from "../DateInput/DateInputSolid.types";
 
-export type DateRangePickerProps = Omit<
-    DateInputProps,
-    "renderTrailing" | "value" | "ariaLabel" | "id" | "name"
-> &
+export type DateRangePickerProps = Omit<DateInputProps, "renderTrailing" | "value" | "ariaLabel" | "id" | "name"> &
     AccessorProps<{
         /**
          * The fields' element id. The start field takes `<id>-start` and the end field `<id>-end`, so a label can

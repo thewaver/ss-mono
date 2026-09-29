@@ -6,8 +6,8 @@ import type { InteractionTooltipDefs } from "@thewaver/ss-components-vue";
 import * as styles from "@thewaver/ss-playground/App/PageComponents/Examples/Examples.css";
 
 import PageTooltipContent from "../../StyledComponents/TooltipContent/TooltipContent.vue";
-import PageExampleKnobsButton from "../ExampleKnobs/PageExampleKnobsButton.vue";
 import { provideExampleKnobsContext } from "../ExampleKnobs/ExampleKnobs.context";
+import PageExampleKnobsButton from "../ExampleKnobs/PageExampleKnobsButton.vue";
 import PageLayer from "../Layer/Layer.vue";
 import type { ExampleProps, ExampleSlots } from "./Examples.types";
 
@@ -43,7 +43,8 @@ const tooltipDefs: InteractionTooltipDefs = {
     >
         <PageLayer :level="1">
             <div :class="styles.exampleTitle">
-                {{ `${example.name}:` }}<div :class="styles.exampleActions">
+                {{ `${example.name}:` }}
+                <div :class="styles.exampleActions">
                     <Button
                         v-if="example.path"
                         :id="`${example.key}Source`"
@@ -53,11 +54,7 @@ const tooltipDefs: InteractionTooltipDefs = {
                         <template #renderContent>{{ SOURCE_MARK }}</template>
                     </Button>
 
-                    <PageExampleKnobsButton
-                        v-if="renderKnobs"
-                        :example-key="example.key"
-                        :example-name="example.name"
-                    >
+                    <PageExampleKnobsButton v-if="renderKnobs" :example-key="example.key" :example-name="example.name">
                         <template #renderKnobs><component :is="renderKnobs" /></template>
                     </PageExampleKnobsButton>
                 </div>

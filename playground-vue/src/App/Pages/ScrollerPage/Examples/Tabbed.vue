@@ -49,7 +49,8 @@ const props = defineProps<Props>();
                         :flags="flags"
                         orientation="horizontal"
                         :is-selected="tab.value === selectedValue"
-                    >{{ tab.value }}</PageTabContent>
+                        >{{ tab.value }}</PageTabContent
+                    >
                 </template>
             </Tabs>
         </Scroller>

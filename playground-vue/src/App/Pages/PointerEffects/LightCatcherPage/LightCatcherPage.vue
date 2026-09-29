@@ -4,8 +4,8 @@ import { computed, shallowRef } from "vue";
 import { LIGHT_CATCHER_DEFAULTS } from "@thewaver/ss-components-vue";
 import { LightCatcherKnobs } from "@thewaver/ss-playground/App/Knobs/LightCatchers.const";
 
-import PageExamples from "../../../PageComponents/Examples/PageExamples.vue";
 import type { ExampleDefs } from "../../../PageComponents/Examples/Examples.types";
+import PageExamples from "../../../PageComponents/Examples/PageExamples.vue";
 import PageCheckField from "../../../PageComponents/Field/PageCheckField.vue";
 import PageNumberField from "../../../PageComponents/Field/PageNumberField.vue";
 import PageMeasureBox from "../../../PageComponents/MeasureBox/MeasureBox.vue";

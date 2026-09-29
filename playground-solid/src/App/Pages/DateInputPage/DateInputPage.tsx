@@ -28,9 +28,7 @@ export const DateInputPage = () => {
             name: "Typed only",
             readout: () =>
                 `value: ${describe(typedSignal[0]())} — a half-typed or impossible date leaves this value alone`,
-            component: () => (
-                <TypedExample value={typedSignal} calendar={getCalendarId} ariaLabel={"Start date"} />
-            ),
+            component: () => <TypedExample value={typedSignal} calendar={getCalendarId} ariaLabel={"Start date"} />,
             path: `${EXAMPLES_ROOT}/Typed.tsx`,
         },
         {
@@ -53,9 +51,7 @@ export const DateInputPage = () => {
             name: "Before the common era",
             readout: () =>
                 `value: ${describe(eraSignal[0]())} — the era is a control in the leading slot, offering whatever the calendar reports`,
-            component: () => (
-                <TypedExample value={eraSignal} calendar={getCalendarId} ariaLabel={"Historical date"} />
-            ),
+            component: () => <TypedExample value={eraSignal} calendar={getCalendarId} ariaLabel={"Historical date"} />,
             path: `${EXAMPLES_ROOT}/Typed.tsx`,
         },
     ]);

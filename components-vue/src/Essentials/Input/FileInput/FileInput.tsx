@@ -22,10 +22,7 @@ import { LabelVueUtils } from "../Label/LabelVue.utils";
 import type { FileInputElementProps, FileInputProps, FileInputSlots } from "./FileInput.types";
 
 const FileInputElement = defineComponent(
-    (
-        props: FileInputElementProps,
-        { slots, expose }: SlotsContext<InteractionControlSlots<FileInputRenderProps>>,
-    ) => {
+    (props: FileInputElementProps, { slots, expose }: SlotsContext<InteractionControlSlots<FileInputRenderProps>>) => {
         const ariaLabel = LabelVueUtils.useAriaLabel(() => props.ariaLabel);
         const ariaDescribedBy = FormFieldVueUtils.useAriaDescribedBy();
 

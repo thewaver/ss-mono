@@ -8,8 +8,8 @@ import { APPLIED_STEPS } from "@thewaver/ss-playground/App/Pages/SVGFiltersPage/
 import type { SVGFiltersStep } from "@thewaver/ss-playground/App/Pages/SVGFiltersPage/SVGFilterSteps.types";
 import { SUBJECT_SIZE } from "@thewaver/ss-playground/App/StyledComponents/SVGFiltersContent/SVGFiltersContent.css";
 
-import PageExamples from "../../PageComponents/Examples/PageExamples.vue";
 import type { ExampleDefs } from "../../PageComponents/Examples/Examples.types";
+import PageExamples from "../../PageComponents/Examples/PageExamples.vue";
 import PageCheckField from "../../PageComponents/Field/PageCheckField.vue";
 import PageSelectField from "../../PageComponents/Field/PageSelectField.vue";
 import PageProp from "../../PageComponents/Prop/Prop.vue";

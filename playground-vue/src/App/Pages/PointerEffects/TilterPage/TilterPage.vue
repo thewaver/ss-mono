@@ -4,8 +4,8 @@ import { computed, shallowRef } from "vue";
 import { TILTER_DEFAULTS } from "@thewaver/ss-components-vue";
 import { TilterKnobs } from "@thewaver/ss-playground/App/Knobs/Tilters.const";
 
-import PageExamples from "../../../PageComponents/Examples/PageExamples.vue";
 import type { ExampleDefs } from "../../../PageComponents/Examples/Examples.types";
+import PageExamples from "../../../PageComponents/Examples/PageExamples.vue";
 import PageCheckField from "../../../PageComponents/Field/PageCheckField.vue";
 import PageNumberField from "../../../PageComponents/Field/PageNumberField.vue";
 import PageMeasureBox from "../../../PageComponents/MeasureBox/MeasureBox.vue";

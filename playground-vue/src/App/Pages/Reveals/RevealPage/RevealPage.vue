@@ -6,8 +6,8 @@ import { RevealKnobs } from "@thewaver/ss-playground/App/Knobs/Reveals.const";
 import type { RevealShape } from "@thewaver/ss-playground/App/Pages/Reveals/RevealPage/RevealPage.types";
 import { ShapeConst, type Size2d } from "@thewaver/ss-utils";
 
-import PageExamples from "../../../PageComponents/Examples/PageExamples.vue";
 import type { ExampleDefs } from "../../../PageComponents/Examples/Examples.types";
+import PageExamples from "../../../PageComponents/Examples/PageExamples.vue";
 import PageCheckField from "../../../PageComponents/Field/PageCheckField.vue";
 import PageNumberField from "../../../PageComponents/Field/PageNumberField.vue";
 import PageSelectField from "../../../PageComponents/Field/PageSelectField.vue";

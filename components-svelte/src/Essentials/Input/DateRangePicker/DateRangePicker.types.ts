@@ -14,10 +14,7 @@ import type { ValuePair } from "../../../Utils/typeUtils.js";
 import type { CalendarDayRenderer, CalendarWeekdayRenderer } from "../Calendar/Calendar.types.js";
 import type { DateInputProps } from "../DateInput/DateInput.types.js";
 
-export type DateRangePickerProps = Omit<
-    DateInputProps,
-    "renderTrailing" | "value" | "ariaLabel" | "id" | "name"
-> & {
+export type DateRangePickerProps = Omit<DateInputProps, "renderTrailing" | "value" | "ariaLabel" | "id" | "name"> & {
     /**
      * The fields' element id. The start field takes `<id>-start` and the end field `<id>-end`, so a label can
      * name each one and no id lands on two elements.
@@ -79,11 +76,6 @@ export type DateRangePickerProps = Omit<
      * handed in with it, with the way to change it, so the consumer can draw the title and paging buttons.
      */
     renderPopup: Snippet<
-        [
-            renderCalendar: Snippet,
-            month: ValuePair<DateValue>,
-            visibilityTarget: 0 | 1,
-            transitionDurationMs: number,
-        ]
+        [renderCalendar: Snippet, month: ValuePair<DateValue>, visibilityTarget: 0 | 1, transitionDurationMs: number]
     >;
 };

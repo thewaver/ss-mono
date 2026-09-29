@@ -79,12 +79,7 @@ export const TimelinePage = () => {
             readout: () =>
                 `${trimReadout} — drag either end of a clip, or press an end and then press where it should go; from the keyboard, Enter takes hold of a clip's end, Home and End switch ends, the arrows move it a second at a time, Enter drops it and Escape puts it back`,
             component: () => (
-                <TrimExample
-                    {...commonProps}
-                    view={trimReelState}
-                    clips={trimClipsState}
-                    onTrim={setTrimmed}
-                />
+                <TrimExample {...commonProps} view={trimReelState} clips={trimClipsState} onTrim={setTrimmed} />
             ),
             path: `${EXAMPLES_ROOT}/Trim.tsx`,
         },

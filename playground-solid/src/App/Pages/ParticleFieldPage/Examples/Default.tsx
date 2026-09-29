@@ -21,8 +21,7 @@ export const DefaultExample = ({
     holdShare,
     isScattered,
     ...otherProps
-}: ParticleFieldExampleProps &
-    Pick<ParticleFieldProps, "computeShapePoints" | "shapeJoinRadii" | "progress">) => (
+}: ParticleFieldExampleProps & Pick<ParticleFieldProps, "computeShapePoints" | "shapeJoinRadii" | "progress">) => (
     <ParticleField
         {...otherProps}
         computeCellWeights={(count) =>

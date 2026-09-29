@@ -37,56 +37,57 @@ import type { TreeNodeItemProps, TreeProps, TreeRow, TreeSlots } from "./Tree.ty
 const EMPTY_PINNED_ROWS: number[] = [];
 
 const TreeNodeItem = defineComponent(
-    (props: TreeNodeItemProps, { slots }: SlotsContext<InteractionControlSlots<TreeNodeRenderProps>>) => () => {
-        const isDisabled = props.flags.isDisabled ?? false;
+    (props: TreeNodeItemProps, { slots }: SlotsContext<InteractionControlSlots<TreeNodeRenderProps>>) =>
+        () => {
+            const isDisabled = props.flags.isDisabled ?? false;
 
-        const handleClick = (e: MouseEvent) => {
-            if (isDisabled) {
-                e.preventDefault();
+            const handleClick = (e: MouseEvent) => {
+                if (isDisabled) {
+                    e.preventDefault();
 
-                return;
+                    return;
+                }
+
+                props.onActivate();
+            };
+
+            const commonProps = {
+                "class": TreeStyles.treeNode,
+                "role": "treeitem",
+                "id": props.id,
+                "aria-disabled": isDisabled || undefined,
+                "aria-selected": props.flags.isSelected,
+                "aria-expanded": props.flags.isBranch ? props.flags.isExpanded : undefined,
+                "aria-busy": props.flags.isPending || undefined,
+                "aria-level": props.level,
+                "aria-posinset": props.position,
+                "aria-setsize": props.setSize,
+            };
+
+            const content = callSlot(slots.renderContent, props.flags);
+
+            if (props.href === undefined) {
+                return (
+                    <div {...commonProps} onClick={handleClick}>
+                        {content}
+                    </div>
+                );
             }
 
-            props.onActivate();
-        };
+            if (props.linkComponent === undefined) {
+                return (
+                    <a href={props.href} {...commonProps} onClick={handleClick}>
+                        {content}
+                    </a>
+                );
+            }
 
-        const commonProps = {
-            "class": TreeStyles.treeNode,
-            "role": "treeitem",
-            "id": props.id,
-            "aria-disabled": isDisabled || undefined,
-            "aria-selected": props.flags.isSelected,
-            "aria-expanded": props.flags.isBranch ? props.flags.isExpanded : undefined,
-            "aria-busy": props.flags.isPending || undefined,
-            "aria-level": props.level,
-            "aria-posinset": props.position,
-            "aria-setsize": props.setSize,
-        };
-
-        const content = callSlot(slots.renderContent, props.flags);
-
-        if (props.href === undefined) {
-            return (
-                <div {...commonProps} onClick={handleClick}>
-                    {content}
-                </div>
+            return h(
+                props.linkComponent,
+                { href: props.href, ...commonProps, onClick: handleClick },
+                { default: () => content },
             );
-        }
-
-        if (props.linkComponent === undefined) {
-            return (
-                <a href={props.href} {...commonProps} onClick={handleClick}>
-                    {content}
-                </a>
-            );
-        }
-
-        return h(
-            props.linkComponent,
-            { href: props.href, ...commonProps, onClick: handleClick },
-            { default: () => content },
-        );
-    },
+        },
     {
         name: "TreeNodeItem",
         props: declareProps<TreeNodeItemProps>({
@@ -357,11 +358,7 @@ export const Tree = defineComponent(
                 });
 
             const renderWindowedRows = () => (
-                <div
-                    ref={sizerRef}
-                    class={TreeStyles.treeSizer}
-                    style={{ height: `${rowWindow.totalSize.value}px` }}
-                >
+                <div ref={sizerRef} class={TreeStyles.treeSizer} style={{ height: `${rowWindow.totalSize.value}px` }}>
                     {rowWindow.rows.value.map((windowRow) => {
                         const row = flatRows.value[windowRow.index];
 

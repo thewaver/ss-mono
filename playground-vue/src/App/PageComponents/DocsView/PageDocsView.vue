@@ -1,7 +1,7 @@
 <script setup lang="ts">
-import { computed } from "vue";
 import type { ApiGroupKind } from "virtual:component-api";
 import COMPONENT_API from "virtual:component-api";
+import { computed } from "vue";
 
 import * as styles from "@thewaver/ss-playground/App/PageComponents/DocsView/DocsView.css";
 

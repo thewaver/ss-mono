@@ -40,7 +40,8 @@ const computeShapePoints = computed(
 const shapeJoinRadii = computed(() => [props.joinRadius]);
 
 const outlinePath = computed(
-    () => ShapeUtils.getPaths(computeShapePoints.value(size.value), NO_EDGE_THICKNESSES, shapeJoinRadii.value).outerPath,
+    () =>
+        ShapeUtils.getPaths(computeShapePoints.value(size.value), NO_EDGE_THICKNESSES, shapeJoinRadii.value).outerPath,
 );
 </script>
 

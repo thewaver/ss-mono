@@ -3,8 +3,8 @@ import { shallowRef } from "vue";
 
 import { PALETTE } from "@thewaver/ss-playground/App/Pages/ColorInputPage/ColorInputPage.const";
 
-import PageExamples from "../../PageComponents/Examples/PageExamples.vue";
 import type { ExampleDefs } from "../../PageComponents/Examples/Examples.types";
+import PageExamples from "../../PageComponents/Examples/PageExamples.vue";
 import CompactExample from "./Examples/Compact.vue";
 import DefaultExample from "./Examples/Default.vue";
 import DisabledExample from "./Examples/Disabled.vue";

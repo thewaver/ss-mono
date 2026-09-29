@@ -40,9 +40,7 @@ const cycleDurationMs = computed(() =>
     CellAnimationPlaybackUtils.computeCycleDurationMs(props.animationDurationMs, props.playbackOpts),
 );
 
-const src = computed(() =>
-    SVGDefsSources.computePatternSource(key.value, size.value, cycleDurationMs.value),
-);
+const src = computed(() => SVGDefsSources.computePatternSource(key.value, size.value, cycleDurationMs.value));
 </script>
 
 <template>

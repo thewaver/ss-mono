@@ -53,42 +53,43 @@ import type {
 const NO_BLOCKED_SPOTS: SortableGridSpot[] = [];
 
 const SortableGridItemSlot = defineComponent(
-    (props: SortableGridItemSlotProps, { slots }: SlotsContext<SortableGridItemSlotSlots>) => () => {
-        const isDisabled = props.flags.isDisabled ?? false;
+    (props: SortableGridItemSlotProps, { slots }: SlotsContext<SortableGridItemSlotSlots>) =>
+        () => {
+            const isDisabled = props.flags.isDisabled ?? false;
 
-        return (
-            <div
-                id={props.id}
-                class={SortableGridStyles.sortableGridItem}
-                role="listitem"
-                aria-label={props.label}
-                aria-posinset={props.position}
-                aria-setsize={props.setSize}
-                aria-disabled={isDisabled || undefined}
-                aria-describedby={props.hintId}
-                onPointerdown={props.onPointerDown}
-                onKeydown={props.onKeyDown}
-                onClick={props.onClick}
-                onFocusin={props.onFocus}
-            >
-                {props.cells.map((cell, index) => (
-                    <div
-                        key={index}
-                        class={SortableGridStyles.sortableGridHit}
-                        style={{
-                            left: `${cell.left}px`,
-                            top: `${cell.top}px`,
-                            width: `${cell.width}px`,
-                            height: `${cell.height}px`,
-                        }}
-                        aria-hidden="true"
-                    />
-                ))}
+            return (
+                <div
+                    id={props.id}
+                    class={SortableGridStyles.sortableGridItem}
+                    role="listitem"
+                    aria-label={props.label}
+                    aria-posinset={props.position}
+                    aria-setsize={props.setSize}
+                    aria-disabled={isDisabled || undefined}
+                    aria-describedby={props.hintId}
+                    onPointerdown={props.onPointerDown}
+                    onKeydown={props.onKeyDown}
+                    onClick={props.onClick}
+                    onFocusin={props.onFocus}
+                >
+                    {props.cells.map((cell, index) => (
+                        <div
+                            key={index}
+                            class={SortableGridStyles.sortableGridHit}
+                            style={{
+                                left: `${cell.left}px`,
+                                top: `${cell.top}px`,
+                                width: `${cell.width}px`,
+                                height: `${cell.height}px`,
+                            }}
+                            aria-hidden="true"
+                        />
+                    ))}
 
-                {callSlot(slots.renderContent, props.flags)}
-            </div>
-        );
-    },
+                    {callSlot(slots.renderContent, props.flags)}
+                </div>
+            );
+        },
     {
         name: "SortableGridItemSlot",
         slots: Object as SlotsType<SortableGridItemSlotSlots>,

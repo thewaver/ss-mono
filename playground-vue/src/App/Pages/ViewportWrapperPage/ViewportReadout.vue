@@ -6,7 +6,9 @@ const context = useViewportContext();
 </script>
 
 <template>
-    <div :class="[styles.readout, styles.cornerReadout]" data-inner-readout="">{{
-        `${context.getScale().toFixed(2)}× of ${Math.round(context.getSize().width)}×${Math.round(context.getSize().height)}`
-    }}</div>
+    <div :class="[styles.readout, styles.cornerReadout]" data-inner-readout="">
+        {{
+            `${context.getScale().toFixed(2)}× of ${Math.round(context.getSize().width)}×${Math.round(context.getSize().height)}`
+        }}
+    </div>
 </template>

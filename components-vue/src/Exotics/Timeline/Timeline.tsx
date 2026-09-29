@@ -52,28 +52,29 @@ const DEFAULT_EDGE: TimelineEdge = "end";
 const getIsSameSpan = (a: TimelineSpan, b: TimelineSpan) => a.start === b.start && a.end === b.end;
 
 const TimelineItem = defineComponent(
-    (props: TimelineItemProps, { slots }: SlotsContext<TimelineItemSlots>) => () => {
-        const isDisabled = props.flags.isDisabled ?? false;
+    (props: TimelineItemProps, { slots }: SlotsContext<TimelineItemSlots>) =>
+        () => {
+            const isDisabled = props.flags.isDisabled ?? false;
 
-        return (
-            <div
-                id={props.id}
-                class={TimelineStyles.timelineControl}
-                role="button"
-                aria-label={props.ariaLabel}
-                aria-describedby={props.ariaDescribedBy}
-                aria-disabled={isDisabled || undefined}
-                onFocusin={() => props.onFocused()}
-                onClick={() => {
-                    if (isDisabled) return;
+            return (
+                <div
+                    id={props.id}
+                    class={TimelineStyles.timelineControl}
+                    role="button"
+                    aria-label={props.ariaLabel}
+                    aria-describedby={props.ariaDescribedBy}
+                    aria-disabled={isDisabled || undefined}
+                    onFocusin={() => props.onFocused()}
+                    onClick={() => {
+                        if (isDisabled) return;
 
-                    props.onActivate();
-                }}
-            >
-                {callSlot(slots.renderContent, props.flags)}
-            </div>
-        );
-    },
+                        props.onActivate();
+                    }}
+                >
+                    {callSlot(slots.renderContent, props.flags)}
+                </div>
+            );
+        },
     {
         name: "TimelineItem",
         slots: Object as SlotsType<TimelineItemSlots>,

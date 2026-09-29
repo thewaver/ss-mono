@@ -43,12 +43,7 @@ export const DateTimePickerPage = () => {
             name: "Twelve hour, with seconds",
             readout: () => `value: ${describe(twelveHourValue[0])}`,
             component: () => (
-                <PickedExample
-                    value={twelveHourValue}
-                    itemKey={"twelveHour"}
-                    isTwelveHour={true}
-                    hasSeconds={true}
-                />
+                <PickedExample value={twelveHourValue} itemKey={"twelveHour"} isTwelveHour={true} hasSeconds={true} />
             ),
             path: `${EXAMPLES_ROOT}/Picked.tsx`,
         },

@@ -72,8 +72,5 @@ export type PaginatorSlots = {
     /** Draws the break standing in for the pages that were left out. */
     renderGap: (props: { entry: PaginatorGapEntry; placement: PlacementRect | undefined }) => VNodeChild;
     /** Draws one of the move controls. */
-    renderStep: (props: {
-        step: PaginatorStep;
-        renderProps: InteractionFlags<PaginatorStepRenderProps>;
-    }) => VNodeChild;
+    renderStep: (props: { step: PaginatorStep; renderProps: InteractionFlags<PaginatorStepRenderProps> }) => VNodeChild;
 };

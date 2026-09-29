@@ -1,4 +1,8 @@
-import type { CellAnimationKeyframes, CellAnimationOrigins, CellAnimationWeights } from "@thewaver/ss-components-svelte";
+import type {
+    CellAnimationKeyframes,
+    CellAnimationOrigins,
+    CellAnimationWeights,
+} from "@thewaver/ss-components-svelte";
 import type { Index2d } from "@thewaver/ss-utils";
 
 export type ParticleFieldExampleProps = {

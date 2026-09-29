@@ -16,8 +16,8 @@ import {
     ROUTE_TO_COLOR,
 } from "@thewaver/ss-playground/App/Pages/BracketPage/BracketPage.css";
 
-import PageExamples from "../../PageComponents/Examples/PageExamples.vue";
 import type { ExampleDefs } from "../../PageComponents/Examples/Examples.types";
+import PageExamples from "../../PageComponents/Examples/PageExamples.vue";
 import PageNumberField from "../../PageComponents/Field/PageNumberField.vue";
 import PageSelectField from "../../PageComponents/Field/PageSelectField.vue";
 import PageMeasureBox from "../../PageComponents/MeasureBox/MeasureBox.vue";
@@ -112,7 +112,11 @@ const examples: ExampleDefs[] = [
             />
         </PageProp>
 
-        <PageProp item-key="rootSide" label="Root side" hint="Which end the final holds, and so which way the rounds read.">
+        <PageProp
+            item-key="rootSide"
+            label="Root side"
+            hint="Which end the final holds, and so which way the rounds read."
+        >
             <PageSelectField
                 :value="rootSide"
                 :values="BRACKET_ROOT_SIDES"

@@ -44,7 +44,7 @@ const idPrefix = computed(() => props.idPrefix ?? DEFAULT_ID_PREFIX);
             <template #renderGutter>
                 <PageTabGutter orientation="horizontal" />
             </template>
-    
+
             <template #renderFloater="{ visibilityTarget, transitionDurationMs }">
                 <PageTabFloater
                     orientation="horizontal"
@@ -52,7 +52,7 @@ const idPrefix = computed(() => props.idPrefix ?? DEFAULT_ID_PREFIX);
                     :transition-duration-ms="transitionDurationMs"
                 />
             </template>
-    
+
             <template #renderTab="{ tab, flags }">
                 <PageTabContent :flags="flags" orientation="horizontal" :is-selected="tab.value === selectedValue">{{
                     tab.value

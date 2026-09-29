@@ -3,8 +3,8 @@ import { computed, shallowRef } from "vue";
 
 import type { CarouselAxis } from "@thewaver/ss-components-vue";
 
-import PageExamples from "../../../PageComponents/Examples/PageExamples.vue";
 import type { ExampleDefs } from "../../../PageComponents/Examples/Examples.types";
+import PageExamples from "../../../PageComponents/Examples/PageExamples.vue";
 import PageCarouselBox from "../../../StyledComponents/CarouselContent/PageCarouselBox.vue";
 import { useCarouselsControls } from "../Carousels.utils";
 import PageCarouselsPanel from "../PageCarouselsPanel.vue";
@@ -56,12 +56,7 @@ const examples: ExampleDefs[] = [
     <PageExamples :items="examples">
         <template #stepped>
             <PageCarouselBox>
-                <SteppedExample
-                    v-model:index="steppedIndex"
-                    :slides="slides"
-                    :is-disabled="isDisabled"
-                    :axis="axis"
-                />
+                <SteppedExample v-model:index="steppedIndex" :slides="slides" :is-disabled="isDisabled" :axis="axis" />
             </PageCarouselBox>
         </template>
 

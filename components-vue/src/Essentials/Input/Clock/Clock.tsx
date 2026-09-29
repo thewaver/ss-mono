@@ -29,28 +29,29 @@ const NO_CLOCK_STEPS: ClockSteps = {};
 const toOptionKey = (unit: ClockUnit, index: number) => `${unit}:${index}`;
 
 const ClockOptionControl = defineComponent(
-    (props: ClockOptionProps, { slots }: SlotsContext<InteractionControlSlots<ClockRenderProps>>) => () => {
-        const isDisabled = props.flags.isDisabled ?? false;
+    (props: ClockOptionProps, { slots }: SlotsContext<InteractionControlSlots<ClockRenderProps>>) =>
+        () => {
+            const isDisabled = props.flags.isDisabled ?? false;
 
-        return (
-            <div
-                id={props.id}
-                class={ClockStyles.clockOption}
-                role="option"
-                aria-label={props.ariaLabel}
-                aria-selected={props.flags.isSelected}
-                aria-current={props.flags.isNow ? "time" : undefined}
-                aria-disabled={isDisabled || undefined}
-                onClick={() => {
-                    if (isDisabled) return;
+            return (
+                <div
+                    id={props.id}
+                    class={ClockStyles.clockOption}
+                    role="option"
+                    aria-label={props.ariaLabel}
+                    aria-selected={props.flags.isSelected}
+                    aria-current={props.flags.isNow ? "time" : undefined}
+                    aria-disabled={isDisabled || undefined}
+                    onClick={() => {
+                        if (isDisabled) return;
 
-                    props.onSelect();
-                }}
-            >
-                {callSlot(slots.renderContent, props.flags)}
-            </div>
-        );
-    },
+                        props.onSelect();
+                    }}
+                >
+                    {callSlot(slots.renderContent, props.flags)}
+                </div>
+            );
+        },
     {
         name: "ClockOptionControl",
         slots: Object as SlotsType<InteractionControlSlots<ClockRenderProps>>,

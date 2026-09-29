@@ -42,12 +42,9 @@ const useSwipe = (
     isDisabled: MaybeRefOrGetter<boolean>,
     axis: MaybeRefOrGetter<SwipeAxis | undefined>,
 ) => {
-    watchAfterRender(
-        [() => toValue(ref), () => toValue(isDisabled), () => toValue(axis)],
-        ([element, isOff]) => {
-            if (element) tracker.applyTouchAction(element, isOff);
-        },
-    );
+    watchAfterRender([() => toValue(ref), () => toValue(isDisabled), () => toValue(axis)], ([element, isOff]) => {
+        if (element) tracker.applyTouchAction(element, isOff);
+    });
 
     useGesture(tracker, ref, isDisabled);
 

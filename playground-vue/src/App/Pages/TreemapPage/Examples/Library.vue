@@ -49,7 +49,11 @@ const goUp = () => {
                 ariaLabel="The library's source, by lines of code"
             >
                 <template #renderTile="{ node, state }">
-                    <PageTreemapTile :name="node.value" :weight="formatLines(state.weight)" :is-branch="state.isBranch" />
+                    <PageTreemapTile
+                        :name="node.value"
+                        :weight="formatLines(state.weight)"
+                        :is-branch="state.isBranch"
+                    />
                 </template>
             </Treemap>
         </div>

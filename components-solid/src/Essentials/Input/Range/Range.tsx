@@ -152,9 +152,7 @@ export const Range = (props: RangeProps) => {
 
     const getThumbSize = createMemo(() => access(props.thumbSize) ?? RANGE_DEFAULTS.thumbSize);
 
-    const getValues = createMemo(() =>
-        RangeUtils.computeValues(props.range?.[0](), props.value?.[0](), getMin()),
-    );
+    const getValues = createMemo(() => RangeUtils.computeValues(props.range?.[0](), props.value?.[0](), getMin()));
 
     const getRatios = createMemo(() => RangeUtils.computeRatios(getValues(), getMin(), getMax()));
 

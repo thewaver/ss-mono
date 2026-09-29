@@ -59,11 +59,6 @@ export type ColorInputProps = Omit<InteractionWrapperProps<ColorInputRenderProps
          * pair, so anything else put beside it — a preview, a field per channel — writes the same color.
          */
         renderPopup: Snippet<
-            [
-                renderSurface: Snippet,
-                hsv: ValuePair<Color.HSVA>,
-                visibilityTarget: 0 | 1,
-                transitionDurationMs: number,
-            ]
+            [renderSurface: Snippet, hsv: ValuePair<Color.HSVA>, visibilityTarget: 0 | 1, transitionDurationMs: number]
         >;
     };

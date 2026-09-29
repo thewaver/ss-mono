@@ -1,11 +1,7 @@
 import { type SlotsType, defineComponent } from "vue";
 
 import { Spotlight } from "../../../Primitives/Spotlight/Spotlight";
-import type {
-    SpotlightHintProps,
-    SpotlightProps,
-    SpotlightSlots,
-} from "../../../Primitives/Spotlight/Spotlight.types";
+import type { SpotlightHintProps, SpotlightProps, SpotlightSlots } from "../../../Primitives/Spotlight/Spotlight.types";
 import { declareProps, forwardProps, useTwoWay } from "../../../Utils/propUtils";
 import type { SlotsContext } from "../../../Utils/typeUtils";
 

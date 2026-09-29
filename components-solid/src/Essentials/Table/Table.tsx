@@ -157,8 +157,7 @@ export const Table = <T,>(props: TableProps<T>) => {
         document.getElementById(getCellId({ row: HEADER_ROW_INDEX, col: columnIndex }))?.offsetWidth ??
         0;
 
-    const getIsResizable = (column: TableColumn<T>) =>
-        (column.isResizable ?? false) && props.widths !== undefined;
+    const getIsResizable = (column: TableColumn<T>) => (column.isResizable ?? false) && props.widths !== undefined;
 
     const resizeColumn = (column: TableColumn<T>, width: number) => {
         if (!getIsResizable(column) || getIsDisabled()) return;

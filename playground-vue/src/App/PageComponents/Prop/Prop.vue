@@ -60,13 +60,10 @@ const tooltipDefs: InteractionTooltipDefs = {
 </script>
 
 <template>
-    <div
-        :class="styles.propScopeVariants[propsPanelScope?.scope ?? 'unknown']"
-        data-prop=""
-        :data-testid="itemKey"
-    >
+    <div :class="styles.propScopeVariants[propsPanelScope?.scope ?? 'unknown']" data-prop="" :data-testid="itemKey">
         <div :class="styles.propLabel">
-            {{ label }}<Button :ariaLabel="`About ${label}`" :tooltip-defs="tooltipDefs">
+            {{ label
+            }}<Button :ariaLabel="`About ${label}`" :tooltip-defs="tooltipDefs">
                 <template #renderContent="flags">
                     <PagePropHintBadge :flags="flags" />
                 </template>

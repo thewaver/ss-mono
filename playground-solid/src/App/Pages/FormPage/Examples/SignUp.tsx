@@ -60,9 +60,7 @@ export const SignUpExample = (props: Props) => {
                         renderMessage={(getFieldState) => (
                             <PageFormFieldMessage state={getFieldState}>{getEmailMessage()}</PageFormFieldMessage>
                         )}
-                        renderControl={(getFieldState) =>
-                            renderTextField(props.email, () => getFieldState().hasError)
-                        }
+                        renderControl={(getFieldState) => renderTextField(props.email, () => getFieldState().hasError)}
                     />
 
                     <FormField

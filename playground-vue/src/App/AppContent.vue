@@ -10,15 +10,15 @@ import { DEFAULT_PAGE_VIEW, toBaseRoute } from "@thewaver/ss-playground/App/Page
 import { MENU_COLLAPSED_WIDTH, MENU_EDGE, MENU_EXPANDED_WIDTH, MENU_ID, SEARCH_FIELD_WIDTH } from "./App.const";
 import type { ComponentConfig, MenuNodeConfig } from "./App.types";
 import { AppUtils } from "./App.utils";
-import PageDependencies from "./PageDependencies.vue";
 import PageTextField from "./PageComponents/Field/PageTextField.vue";
 import PageLayer from "./PageComponents/Layer/Layer.vue";
-import PageNavSettings from "./PageComponents/NavSettings/PageNavSettings.vue";
 import type { ViewportAnchor } from "./PageComponents/NavSettings/NavSettings.types";
+import PageNavSettings from "./PageComponents/NavSettings/PageNavSettings.vue";
 import PageRouterLink from "./PageComponents/RouterLink/RouterLink.vue";
 import PageSidebarToggle from "./PageComponents/SidebarToggle/SidebarToggle.vue";
 import PageViewTabs from "./PageComponents/ViewTabs/PageViewTabs.vue";
 import type { PageViewKey } from "./PageComponents/ViewTabs/ViewTabs.types";
+import PageDependencies from "./PageDependencies.vue";
 import PageTreeNodeContent from "./StyledComponents/TreeNodeContent/PageTreeNodeContent.vue";
 
 const viewportAnchor = defineModel<ViewportAnchor>("viewportAnchor", { required: true });

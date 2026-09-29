@@ -128,7 +128,11 @@ const examples: ExampleDefs[] = [
             />
         </PageProp>
 
-        <PageProp item-key="transitionDurationMs" label="Fade (ms)" hint="How long the tooltip takes to fade in and out.">
+        <PageProp
+            item-key="transitionDurationMs"
+            label="Fade (ms)"
+            hint="How long the tooltip takes to fade in and out."
+        >
             <PageNumberField
                 :value="transitionDurationMs"
                 :min="TooltipKnobs.MIN_DURATION"

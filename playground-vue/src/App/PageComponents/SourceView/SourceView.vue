@@ -40,17 +40,16 @@ const selectGroup = (group: SourceGroup | undefined) => {
     expandedNames.value = group?.expandedNames ?? [];
 };
 
-const tabs = computed(
-    (): Tab<SourceGroup>[] =>
-        groups.value.map((group) => ({
-            value: group,
-            id: getTabId(group.name),
-            panelId: getPanelId(group.name),
-        })),
+const tabs = computed((): Tab<SourceGroup>[] =>
+    groups.value.map((group) => ({
+        value: group,
+        id: getTabId(group.name),
+        panelId: getPanelId(group.name),
+    })),
 );
 
-const items = computed(
-    (): AccordionItem<string>[] => (selectedGroup.value?.files ?? []).map((file) => ({ value: file.name })),
+const items = computed((): AccordionItem<string>[] =>
+    (selectedGroup.value?.files ?? []).map((file) => ({ value: file.name })),
 );
 
 const getSource = (name: string) => selectedGroup.value?.files.find((file) => file.name === name)?.source ?? "";

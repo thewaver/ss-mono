@@ -58,9 +58,7 @@ export const NestedExample = (props: Props) => {
                                     renderMessage={(fieldState) => (
                                         <PageFormFieldMessage state={fieldState}>{streetMessage}</PageFormFieldMessage>
                                     )}
-                                    renderControl={(fieldState) =>
-                                        renderTextField(props.street, fieldState.hasError)
-                                    }
+                                    renderControl={(fieldState) => renderTextField(props.street, fieldState.hasError)}
                                 />
 
                                 <FormSection

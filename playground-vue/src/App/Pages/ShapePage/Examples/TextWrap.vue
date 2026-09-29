@@ -47,7 +47,7 @@ const computeStrokeDefs = (size: Size2d, element: HTMLElement | undefined) =>
         >
             <template #renderChildren>
                 <div :style="{ width: `${FLOAT_SIZE}px`, height: `${FLOAT_SIZE}px` }" />
-            </template>
-        </Shape>{{ WRAPPED_TEXT }}
+            </template> </Shape
+        >{{ WRAPPED_TEXT }}
     </div>
 </template>

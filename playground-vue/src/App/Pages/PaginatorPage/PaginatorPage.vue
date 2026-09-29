@@ -129,7 +129,11 @@ const examples: ExampleDefs[] = [
             label="Disabled"
             hint="Turns the paginator off, so none of its pages or arrows respond."
         >
-            <PageCheckField :value="isDisabled" ariaLabel="Disabled" @change="(value: boolean) => (isDisabled = value)" />
+            <PageCheckField
+                :value="isDisabled"
+                ariaLabel="Disabled"
+                @change="(value: boolean) => (isDisabled = value)"
+            />
         </PageProp>
     </PagePropsPanel>
 

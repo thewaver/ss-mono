@@ -34,9 +34,7 @@ export const ClockPage = () => {
             name: "Twelve hour",
             readout: () =>
                 `value: ${describeTime(twelveHourState[0])} — am and pm become a column of their own, and the value stays 24-hour`,
-            component: () => (
-                <DefaultExample value={twelveHourState} isTwelveHour={true} ariaLabel={"Call time"} />
-            ),
+            component: () => <DefaultExample value={twelveHourState} isTwelveHour={true} ariaLabel={"Call time"} />,
             path: `${EXAMPLES_ROOT}/Default.tsx`,
         },
         {

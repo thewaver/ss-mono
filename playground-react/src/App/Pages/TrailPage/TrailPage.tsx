@@ -48,11 +48,7 @@ export const TrailPage = () => {
             readout: () =>
                 `${getPercent(circuitProgressState[0])} round the loop, ${circuitPlayingState[0] ? "running" : "stopped"} — the playback signal starts and stops it, and the controller sends it back to the start`,
             component: () => (
-                <CircuitExample
-                    {...commonProps}
-                    progress={circuitProgressState}
-                    playback={circuitPlayingState}
-                />
+                <CircuitExample {...commonProps} progress={circuitProgressState} playback={circuitPlayingState} />
             ),
             path: `${EXAMPLES_ROOT}/Circuit.tsx`,
         },
@@ -62,11 +58,7 @@ export const TrailPage = () => {
             readout: () =>
                 `${getPercent(timelineProgressState[0])} along the path — nothing is running, the slider is what puts the marker there`,
             component: () => (
-                <TimelineExample
-                    {...commonProps}
-                    progress={timelineProgressState}
-                    playback={timelinePlayingState}
-                />
+                <TimelineExample {...commonProps} progress={timelineProgressState} playback={timelinePlayingState} />
             ),
             path: `${EXAMPLES_ROOT}/Timeline.tsx`,
         },
@@ -76,11 +68,7 @@ export const TrailPage = () => {
             readout: () =>
                 `${getPercent(convoyProgressState[0])} of the run, ${convoyPlayingState[0] ? "running" : "stopped"} — four travelers on one clock, each a share of the path behind the one in front; with looping off they wait at the start and the run ends when the last one arrives`,
             component: () => (
-                <ConvoyExample
-                    {...commonProps}
-                    progress={convoyProgressState}
-                    playback={convoyPlayingState}
-                />
+                <ConvoyExample {...commonProps} progress={convoyProgressState} playback={convoyPlayingState} />
             ),
             path: `${EXAMPLES_ROOT}/Convoy.tsx`,
         },

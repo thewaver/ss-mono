@@ -5,8 +5,8 @@ import type { CornerKey } from "@thewaver/ss-components-vue";
 import { CORNERS_DEFAULTS, CORNERS_KEYS } from "@thewaver/ss-components-vue";
 import { CornerKnobs } from "@thewaver/ss-playground/App/Knobs/Corners.const";
 
-import PageExamples from "../../PageComponents/Examples/PageExamples.vue";
 import type { ExampleDefs } from "../../PageComponents/Examples/Examples.types";
+import PageExamples from "../../PageComponents/Examples/PageExamples.vue";
 import PageCheckField from "../../PageComponents/Field/PageCheckField.vue";
 import PageColorField from "../../PageComponents/Field/PageColorField.vue";
 import PageNumberField from "../../PageComponents/Field/PageNumberField.vue";
@@ -35,9 +35,7 @@ const lengthAcross = shallowRef(CornerKnobs.STARTING_LENGTH);
 const lengthDown = shallowRef(CornerKnobs.STARTING_LENGTH);
 const strokeThickness = shallowRef(CORNERS_DEFAULTS.strokeThickness);
 const transitionDurationMs = shallowRef(CORNERS_DEFAULTS.transitionDurationMs);
-const hiddenCorners = shallowRef<CornerKey[]>(
-    CORNERS_KEYS.filter((key) => !CORNERS_DEFAULTS.visibleCorners.has(key)),
-);
+const hiddenCorners = shallowRef<CornerKey[]>(CORNERS_KEYS.filter((key) => !CORNERS_DEFAULTS.visibleCorners.has(key)));
 
 const cornerLength = computed(() => ({ width: lengthAcross.value, height: lengthDown.value }));
 

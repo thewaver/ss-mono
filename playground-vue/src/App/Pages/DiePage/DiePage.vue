@@ -4,8 +4,8 @@ import { computed, shallowRef } from "vue";
 import { DIE_DEFAULTS, DieShapes, MediaQueryMonitorVueUtils } from "@thewaver/ss-components-vue";
 import { DieKnobs } from "@thewaver/ss-playground/App/Knobs/Dice.const";
 
-import PageExamples from "../../PageComponents/Examples/PageExamples.vue";
 import type { ExampleDefs } from "../../PageComponents/Examples/Examples.types";
+import PageExamples from "../../PageComponents/Examples/PageExamples.vue";
 import PageNumberField from "../../PageComponents/Field/PageNumberField.vue";
 import PageSelectField from "../../PageComponents/Field/PageSelectField.vue";
 import PageProp from "../../PageComponents/Prop/Prop.vue";

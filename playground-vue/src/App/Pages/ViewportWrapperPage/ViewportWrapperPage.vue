@@ -7,15 +7,15 @@ import { ViewportWrapperKnobs } from "@thewaver/ss-playground/App/Knobs/Viewport
 import * as styles from "@thewaver/ss-playground/App/Pages/ViewportWrapperPage/ViewportWrapperPage.css";
 import { RANGE_THUMB_SIZE } from "@thewaver/ss-playground/App/StyledComponents/RangeContent/RangeContent.css";
 
-import PageVariants from "../../PageComponents/Variants/Variants.vue";
 import type { VariantDefs } from "../../PageComponents/Variants/Variants.types";
+import PageVariants from "../../PageComponents/Variants/Variants.vue";
 import PageButtonContent from "../../StyledComponents/ButtonContent/ButtonContent.vue";
 import PagePopoverSurface from "../../StyledComponents/PopoverSurface/PopoverSurface.vue";
 import PageRangeContent from "../../StyledComponents/RangeContent/RangeContent.vue";
 import PageSelectContent from "../../StyledComponents/SelectContent/SelectContent.vue";
 import PageSelectOptionContent from "../../StyledComponents/SelectOptionContent/SelectOptionContent.vue";
-import PageToastContent from "../../StyledComponents/ToastContent/ToastContent.vue";
 import type { ToastDefs } from "../../StyledComponents/ToastContent/ToastContent.types";
+import PageToastContent from "../../StyledComponents/ToastContent/ToastContent.vue";
 import PageTooltipContent from "../../StyledComponents/TooltipContent/TooltipContent.vue";
 import ViewportReadout from "./ViewportReadout.vue";
 
@@ -149,9 +149,9 @@ const dismissInnerToast = (id: string) => {
                     </Range>
                 </div>
 
-                <div :class="styles.readout" data-readout="">{{
-                    `x: ${roamerX}% | y: ${roamerY}% | scale: ${scalePercent}% of ${styles.HOST_SIZE}px`
-                }}</div>
+                <div :class="styles.readout" data-readout="">
+                    {{ `x: ${roamerX}% | y: ${roamerY}% | scale: ${scalePercent}% of ${styles.HOST_SIZE}px` }}
+                </div>
 
                 <div :class="styles.host" data-stage="">
                     <ViewportWrapper :size="stageSize">

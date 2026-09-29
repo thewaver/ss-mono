@@ -69,24 +69,21 @@ const ToastsItem = defineComponent(
             return countdown.run(durationMs, isHeld, () => props.onElapse());
         });
 
-        watchAfterRender(
-            [() => props.isExiting, fader.hasTransitionFinished],
-            ([isExiting, hasTransitionFinished]) => {
-                if (!isExiting) {
-                    isLeaving = false;
+        watchAfterRender([() => props.isExiting, fader.hasTransitionFinished], ([isExiting, hasTransitionFinished]) => {
+            if (!isExiting) {
+                isLeaving = false;
 
-                    return;
-                }
+                return;
+            }
 
-                if (!hasTransitionFinished) {
-                    isLeaving = true;
+            if (!hasTransitionFinished) {
+                isLeaving = true;
 
-                    return;
-                }
+                return;
+            }
 
-                if (isLeaving) props.onExitEnd();
-            },
-        );
+            if (isLeaving) props.onExitEnd();
+        });
 
         return () => {
             const state: ToastState = {

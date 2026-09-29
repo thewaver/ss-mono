@@ -47,9 +47,7 @@ export const RangeCalendarPage = () => {
             key: "default",
             name: "Default",
             readout: () => `value: ${describe(defaultValue[0])}`,
-            component: () => (
-                <DefaultExample value={defaultValue} month={defaultMonth} weekStartsOn={weekStartsOn} />
-            ),
+            component: () => <DefaultExample value={defaultValue} month={defaultMonth} weekStartsOn={weekStartsOn} />,
             path: `${EXAMPLES_ROOT}/Default.tsx`,
         },
         {
@@ -57,9 +55,7 @@ export const RangeCalendarPage = () => {
             name: "Bounded",
             readout: () =>
                 `min ${DateValueUtils.toIso(MIN_DATE)}, max ${DateValueUtils.toIso(MAX_DATE)} — value: ${describe(boundedValue[0])}`,
-            component: () => (
-                <BoundedExample value={boundedValue} month={boundedMonth} weekStartsOn={weekStartsOn} />
-            ),
+            component: () => <BoundedExample value={boundedValue} month={boundedMonth} weekStartsOn={weekStartsOn} />,
             path: `${EXAMPLES_ROOT}/Bounded.tsx`,
         },
     ];

@@ -1,11 +1,4 @@
-import {
-    type ComponentPublicInstance,
-    type SlotsType,
-    computed,
-    defineComponent,
-    nextTick,
-    shallowRef,
-} from "vue";
+import { type ComponentPublicInstance, type SlotsType, computed, defineComponent, nextTick, shallowRef } from "vue";
 
 import {
     DismisserUtils,

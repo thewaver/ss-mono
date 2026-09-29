@@ -30,10 +30,7 @@ export const Trail = defineComponent(
 
         const isRunning = computed(
             () =>
-                isPlaying.value &&
-                !(props.isDisabled ?? false) &&
-                !isPageHidden.value &&
-                pathLength.value > NO_LENGTH,
+                isPlaying.value && !(props.isDisabled ?? false) && !isPageHidden.value && pathLength.value > NO_LENGTH,
         );
 
         watchAfterRender([() => props.path], () => {

@@ -24,7 +24,10 @@ const anchorRef = shallowRef<HTMLElement>();
 
         <Tooltip :anchor-ref="anchorRef" :placement="TOOLTIP_PLACEMENT" :offset="TOOLTIP_OFFSET">
             <template #renderContent="{ visibilityTarget, transitionDurationMs }">
-                <PageTooltipContent :visibility-target="visibilityTarget" :transition-duration-ms="transitionDurationMs">
+                <PageTooltipContent
+                    :visibility-target="visibilityTarget"
+                    :transition-duration-ms="transitionDurationMs"
+                >
                     {{ tip }}
                 </PageTooltipContent>
             </template>

@@ -17,7 +17,9 @@ const props = defineProps<PageGroupedSelectFieldProps<T>>();
 
 useFieldReset(props.value, (value) => props.onChange(value));
 
-const options = computed(() => props.groups.map(([label, values]) => ({ label, options: values.map((value) => ({ value })) })));
+const options = computed(() =>
+    props.groups.map(([label, values]) => ({ label, options: values.map((value) => ({ value })) })),
+);
 
 const setValue = (value: T | undefined) => {
     if (value === undefined) return;
@@ -27,13 +29,7 @@ const setValue = (value: T | undefined) => {
 </script>
 
 <template>
-    <Select
-        :value="value"
-        :options="options"
-        :is-disabled="isDisabled"
-        :ariaLabel="ariaLabel"
-        @update:value="setValue"
-    >
+    <Select :value="value" :options="options" :is-disabled="isDisabled" :ariaLabel="ariaLabel" @update:value="setValue">
         <template #renderContent="{ selectedOption, flags }">
             <PageSelectContent :flags="flags" :width="width ?? DEFAULT_SELECT_FIELD_WIDTH">{{
                 selectedOption !== undefined

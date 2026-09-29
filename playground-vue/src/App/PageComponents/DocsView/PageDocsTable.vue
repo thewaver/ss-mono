@@ -1,6 +1,6 @@
 <script setup lang="ts">
-import { computed } from "vue";
 import type { ApiTableKind } from "virtual:component-api";
+import { computed } from "vue";
 
 import * as styles from "@thewaver/ss-playground/App/PageComponents/DocsView/DocsView.css";
 import { toHighlightedType } from "@thewaver/ss-playground/App/PageComponents/DocsView/DocsView.utils";
@@ -56,7 +56,10 @@ const passingFlag = computed(() => (props.table.name.endsWith(SLOTS_SUFFIX) ? SL
                         <td :class="styles.docsTypeCell" v-html="toHighlightedType(entry.type)" />
 
                         <td v-if="hasPassing" :class="styles.docsCell">
-                            <span>{{ passingFlag }}</span><template v-if="!entry.isOptional">{{ " " }}<span :class="styles.docsFlag">{{ REQUIRED_FLAG }}</span></template>
+                            <span>{{ passingFlag }}</span
+                            ><template v-if="!entry.isOptional"
+                                >{{ " " }}<span :class="styles.docsFlag">{{ REQUIRED_FLAG }}</span></template
+                            >
                         </td>
 
                         <td v-if="table.isDocumented" :class="styles.docsCell">

@@ -1,6 +1,12 @@
 import type { VNodeChild } from "vue";
 
-import type { AnchorPlacement, InteractionFlags, MenuFlags, MenuItem, MenuItemFlags } from "@thewaver/ss-components-vue";
+import type {
+    AnchorPlacement,
+    InteractionFlags,
+    MenuFlags,
+    MenuItem,
+    MenuItemFlags,
+} from "@thewaver/ss-components-vue";
 import type { MenubarEntry } from "@thewaver/ss-playground/App/Pages/MenubarPage/MenubarEntry.types";
 
 export type { MenubarEntry } from "@thewaver/ss-playground/App/Pages/MenubarPage/MenubarEntry.types";

@@ -60,9 +60,7 @@ export const TablePage = () => {
             name: "One row at a time",
             readout: () =>
                 `selected: ${spellSelection(singleSelectionState[0])} — the same grid with room for one row in the selection, so picking a second drops the first`,
-            component: () => (
-                <SingleSelectionExample sort={singleSortState} selection={singleSelectionState} />
-            ),
+            component: () => <SingleSelectionExample sort={singleSortState} selection={singleSelectionState} />,
             path: `${EXAMPLES_ROOT}/SingleSelection.tsx`,
         },
         {
@@ -100,9 +98,7 @@ export const TablePage = () => {
             name: "Sorted by the page",
             readout: () =>
                 `sort: ${spellSort(consumerSortState[0])} — no column carries a comparator, so the table reports the sort and the page is what reorders the rows`,
-            component: () => (
-                <ConsumerSortedExample sort={consumerSortState} selection={consumerSelectionState} />
-            ),
+            component: () => <ConsumerSortedExample sort={consumerSortState} selection={consumerSelectionState} />,
             path: `${EXAMPLES_ROOT}/ConsumerSorted.tsx`,
         },
         {
@@ -112,11 +108,7 @@ export const TablePage = () => {
             readout: () =>
                 `${STRESS_PART_COUNT.toLocaleString("en-GB")} rows, ${stressSelectionState[0].length} selected | sort: ${spellSort(stressSortState[0])} — the header stays put, and only the rows on screen exist`,
             component: () => (
-                <VirtualizedExample
-                    rows={stressParts}
-                    sort={stressSortState}
-                    selection={stressSelectionState}
-                />
+                <VirtualizedExample rows={stressParts} sort={stressSortState} selection={stressSelectionState} />
             ),
             path: `${EXAMPLES_ROOT}/Virtualized.tsx`,
         },

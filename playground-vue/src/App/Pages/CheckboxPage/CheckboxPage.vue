@@ -1,8 +1,8 @@
 <script setup lang="ts">
 import { computed, shallowRef, watch } from "vue";
 
-import PageExamples from "../../PageComponents/Examples/PageExamples.vue";
 import type { ExampleDefs } from "../../PageComponents/Examples/Examples.types";
+import PageExamples from "../../PageComponents/Examples/PageExamples.vue";
 import DecoratedExample from "./Examples/Decorated.vue";
 import DefaultExample from "./Examples/Default.vue";
 import DisabledExample from "./Examples/Disabled.vue";

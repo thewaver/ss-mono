@@ -15,10 +15,22 @@
                 font-family: system-ui, sans-serif;
                 background-color: black;
                 background-image:
-                    radial-gradient(circle at 12.5% center, rgb(from var(--solid-primary) r g b / 25%), transparent 35%),
-                    radial-gradient(circle at 37.5% center, rgb(from var(--react-primary) r g b / 25%), transparent 35%),
+                    radial-gradient(
+                        circle at 12.5% center,
+                        rgb(from var(--solid-primary) r g b / 25%),
+                        transparent 35%
+                    ),
+                    radial-gradient(
+                        circle at 37.5% center,
+                        rgb(from var(--react-primary) r g b / 25%),
+                        transparent 35%
+                    ),
                     radial-gradient(circle at 62.5% center, rgb(from var(--vue-primary) r g b / 25%), transparent 35%),
-                    radial-gradient(circle at 87.5% center, rgb(from var(--svelte-primary) r g b / 25%), transparent 35%);
+                    radial-gradient(
+                        circle at 87.5% center,
+                        rgb(from var(--svelte-primary) r g b / 25%),
+                        transparent 35%
+                    );
                 color: white;
                 color-scheme: "dark";
             }
@@ -80,7 +92,9 @@
         >
         <a class="vue" href="/vue/">
             <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
-                <path d="M24,1.61H14.06L12,5.16,9.94,1.61H0L12,22.39ZM12,14.08,5.16,2.23H9.59L12,6.41l2.41-4.18h4.43Z" /></svg
+                <path
+                    d="M24,1.61H14.06L12,5.16,9.94,1.61H0L12,22.39ZM12,14.08,5.16,2.23H9.59L12,6.41l2.41-4.18h4.43Z"
+                /></svg
             >Vue</a
         >
         <a class="svelte" href="/svelte/">

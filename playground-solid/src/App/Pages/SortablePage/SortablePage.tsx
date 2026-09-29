@@ -40,12 +40,7 @@ export const SortablePage = () => {
                 `order: ${names(queueSignal[0]())} — Second is disabled, so arrows skip it and it cannot be picked up`,
             component: () => (
                 <PageSortableRoom>
-                    <CardsExample
-                        groupId={"queue"}
-                        items={queueSignal}
-                        ariaLabel={"Queue"}
-                        emptyText={"No cards"}
-                    />
+                    <CardsExample groupId={"queue"} items={queueSignal} ariaLabel={"Queue"} emptyText={"No cards"} />
                 </PageSortableRoom>
             ),
             path: `${EXAMPLES_ROOT}/Cards.tsx`,

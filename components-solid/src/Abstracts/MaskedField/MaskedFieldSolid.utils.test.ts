@@ -197,9 +197,7 @@ describe("createField", () => {
         type("9:3");
         field.onBlur();
 
-        expect(field.text[0](), "wiping what somebody is midway through typing would lose their work").toBe(
-            "9:3",
-        );
+        expect(field.text[0](), "wiping what somebody is midway through typing would lose their work").toBe("9:3");
 
         dispose();
     });

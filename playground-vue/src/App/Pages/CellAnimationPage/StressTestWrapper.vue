@@ -69,11 +69,7 @@ const pause = () => {
 
         <template #renderItem="{ configIndex }">
             <PageMeasureBox :width="STRESS_ITEMS[configIndex].size" :height="STRESS_ITEMS[configIndex].size">
-                <DefaultExample
-                    v-bind="sharedProps"
-                    v-model:playback="modalPlayback"
-                    :cell-count="STRESS_CELL_COUNT"
-                />
+                <DefaultExample v-bind="sharedProps" v-model:playback="modalPlayback" :cell-count="STRESS_CELL_COUNT" />
             </PageMeasureBox>
         </template>
     </StressTest>

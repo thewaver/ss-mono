@@ -116,7 +116,11 @@ const examples: ExampleDefs[] = [
             label="Disabled"
             hint="Turns the timeline off, so it neither pans, zooms nor picks."
         >
-            <PageCheckField :value="isDisabled" ariaLabel="Disabled" @change="(value: boolean) => (isDisabled = value)" />
+            <PageCheckField
+                :value="isDisabled"
+                ariaLabel="Disabled"
+                @change="(value: boolean) => (isDisabled = value)"
+            />
         </PageProp>
 
         <PageProp

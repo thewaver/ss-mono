@@ -20,8 +20,8 @@ import {
 } from "@thewaver/ss-playground/App/Pages/PatchBoardPage/PatchBoardPage.const";
 import { MathUtils } from "@thewaver/ss-utils";
 
-import PageExamples from "../../PageComponents/Examples/PageExamples.vue";
 import type { ExampleDefs } from "../../PageComponents/Examples/Examples.types";
+import PageExamples from "../../PageComponents/Examples/PageExamples.vue";
 import PageCheckField from "../../PageComponents/Field/PageCheckField.vue";
 import PageNumberField from "../../PageComponents/Field/PageNumberField.vue";
 import PageMeasureBox from "../../PageComponents/MeasureBox/MeasureBox.vue";

@@ -16,8 +16,8 @@ import {
     FIELD_PADDING,
 } from "@thewaver/ss-playground/App/StyledComponents/TextFieldContent/TextFieldContent.css";
 
-import PageExamples from "../../PageComponents/Examples/PageExamples.vue";
 import type { ExampleDefs } from "../../PageComponents/Examples/Examples.types";
+import PageExamples from "../../PageComponents/Examples/PageExamples.vue";
 import PageCheckField from "../../PageComponents/Field/PageCheckField.vue";
 import PageMeasureBox from "../../PageComponents/MeasureBox/MeasureBox.vue";
 import PageProp from "../../PageComponents/Prop/Prop.vue";

@@ -60,9 +60,7 @@ export const TablePage = () => {
             name: "One row at a time",
             readout: () =>
                 `selected: ${spellSelection(singleSelectionSignal[0]())} — the same grid with room for one row in the selection, so picking a second drops the first`,
-            component: () => (
-                <SingleSelectionExample sort={singleSortSignal} selection={singleSelectionSignal} />
-            ),
+            component: () => <SingleSelectionExample sort={singleSortSignal} selection={singleSelectionSignal} />,
             path: `${EXAMPLES_ROOT}/SingleSelection.tsx`,
         },
         {
@@ -100,9 +98,7 @@ export const TablePage = () => {
             name: "Sorted by the page",
             readout: () =>
                 `sort: ${spellSort(consumerSortSignal[0]())} — no column carries a comparator, so the table reports the sort and the page is what reorders the rows`,
-            component: () => (
-                <ConsumerSortedExample sort={consumerSortSignal} selection={consumerSelectionSignal} />
-            ),
+            component: () => <ConsumerSortedExample sort={consumerSortSignal} selection={consumerSelectionSignal} />,
             path: `${EXAMPLES_ROOT}/ConsumerSorted.tsx`,
         },
         {
@@ -125,9 +121,7 @@ export const TablePage = () => {
             name: "Disabled",
             readout: () =>
                 `sort: ${spellSort(disabledSortSignal[0]())} — nothing sorts, nothing selects, and every cell still reads out to a screen reader`,
-            component: () => (
-                <DisabledExample sort={disabledSortSignal} selection={disabledSelectionSignal} />
-            ),
+            component: () => <DisabledExample sort={disabledSortSignal} selection={disabledSelectionSignal} />,
             path: `${EXAMPLES_ROOT}/Disabled.tsx`,
         },
     ]);

@@ -37,8 +37,7 @@ export namespace TextSyncVueUtils {
         opts: {
             onInput: (value: string) => void;
             getComputeMaskedText?: () =>
-                | ((previous: string, next: string, caret: number) => TextSyncMaskResult)
-                | undefined;
+                ((previous: string, next: string, caret: number) => TextSyncMaskResult) | undefined;
         },
     ) => {
         let reported: string | undefined;

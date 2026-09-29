@@ -32,11 +32,10 @@ export const TextInput = defineComponent(
         const getHasSuggestions = () => props.suggestions !== undefined;
         const getIsRefused = () => !getHasSuggestions() || (props.isDisabled ?? false) || (props.isReadOnly ?? false);
 
-        const options = computed(
-            (): SelectOption<T>[] =>
-                props.suggestions === undefined
-                    ? EMPTY_SELECTION
-                    : props.suggestions.map((suggestion) => ({ value: suggestion })),
+        const options = computed((): SelectOption<T>[] =>
+            props.suggestions === undefined
+                ? EMPTY_SELECTION
+                : props.suggestions.map((suggestion) => ({ value: suggestion })),
         );
 
         const isOpen = computed(() => isWanted.value && !getIsRefused() && options.value.length > 0);

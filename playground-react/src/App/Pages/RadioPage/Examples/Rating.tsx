@@ -21,10 +21,7 @@ export const RatingExample = (props: Props) => (
                     props.hovered[1](undefined);
                 }}
                 renderContent={(flags) => (
-                    <PageRadioStarContent
-                        flags={flags}
-                        isFilled={rating <= (props.hovered[0] ?? props.value[0])}
-                    />
+                    <PageRadioStarContent flags={flags} isFilled={rating <= (props.hovered[0] ?? props.value[0])} />
                 )}
             />
         ))}

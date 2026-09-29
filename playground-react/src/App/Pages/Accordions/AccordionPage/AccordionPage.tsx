@@ -49,9 +49,7 @@ export const AccordionPage = () => {
             name: "One at a time, and always one",
             readout: () =>
                 `expanded: ${JSON.stringify(requiredState[0])} — pressing the open header does nothing, because the only way out of a section is into another one`,
-            component: () => (
-                <SectionsExample expanded={requiredState} isSingleExpand={true} isExpandRequired={true} />
-            ),
+            component: () => <SectionsExample expanded={requiredState} isSingleExpand={true} isExpandRequired={true} />,
             path: `${EXAMPLES_ROOT}/Sections.tsx`,
         },
         {

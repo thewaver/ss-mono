@@ -38,7 +38,9 @@ const collapseLibLater = async () => {
 
         <Button @click="collapseLibLater">
             <template #renderContent="flags">
-                <PageButtonContent :flags="flags">{{ `Collapse Lib in ${OUTSIDE_COLLAPSE_DELAY_MS}ms` }}</PageButtonContent>
+                <PageButtonContent :flags="flags">{{
+                    `Collapse Lib in ${OUTSIDE_COLLAPSE_DELAY_MS}ms`
+                }}</PageButtonContent>
             </template>
         </Button>
     </PageControlColumn>

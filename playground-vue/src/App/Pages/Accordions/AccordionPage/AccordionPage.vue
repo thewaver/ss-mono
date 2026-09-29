@@ -1,8 +1,8 @@
 <script setup lang="ts">
 import { shallowRef } from "vue";
 
-import PageExamples from "../../../PageComponents/Examples/PageExamples.vue";
 import type { ExampleDefs } from "../../../PageComponents/Examples/Examples.types";
+import PageExamples from "../../../PageComponents/Examples/PageExamples.vue";
 import DeferredExample from "./Examples/Deferred.vue";
 import GrowingExample from "./Examples/Growing.vue";
 import ScrolledExample from "./Examples/Scrolled.vue";

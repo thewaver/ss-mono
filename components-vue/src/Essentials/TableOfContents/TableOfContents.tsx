@@ -27,10 +27,7 @@ const ROW_SIZING: InteractionSizing = "fit-content";
 const PLACED_SIZING: InteractionSizing = "fill";
 
 const TableOfContentsItem = defineComponent(
-    <T,>(
-        props: TableOfContentsItemProps<T>,
-        { slots }: SlotsContext<InteractionControlSlots<TableOfContentsFlags>>,
-    ) =>
+    <T,>(props: TableOfContentsItemProps<T>, { slots }: SlotsContext<InteractionControlSlots<TableOfContentsFlags>>) =>
         () => {
             const handleClick = (e: MouseEvent) => {
                 const target = props.link.target;

@@ -28,13 +28,11 @@ export const NumberInput = defineComponent(
 
         const text = shallowRef(NumberInputUtils.formatValue(value.value, separators.value));
 
-        const stepDefs = computed(
-            (): NumberInputStepDefs => ({
-                min: props.min,
-                max: props.max,
-                step: props.step ?? NUMBER_INPUT_DEFAULTS.step,
-            }),
-        );
+        const stepDefs = computed((): NumberInputStepDefs => ({
+            min: props.min,
+            max: props.max,
+            step: props.step ?? NUMBER_INPUT_DEFAULTS.step,
+        }));
 
         const typedValue = computed(() => NumberInputUtils.parseValue(text.value, separators.value));
 
@@ -143,8 +141,7 @@ export const NumberInput = defineComponent(
                         renderPlaceholder: slots.renderPlaceholder,
                         renderLeading: slots.renderLeading,
                         renderTrailing:
-                            slots.renderTrailing &&
-                            ((flags) => callSlot(slots.renderTrailing, { flags, stepper })),
+                            slots.renderTrailing && ((flags) => callSlot(slots.renderTrailing, { flags, stepper })),
                         renderDecoration: slots.renderDecoration,
                     } satisfies Partial<TextFieldSlots>
                 }

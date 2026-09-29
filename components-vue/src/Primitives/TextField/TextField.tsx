@@ -27,12 +27,7 @@ import { exposeElement, toElement } from "../../Utils/refUtils";
 import type { SlotsContext } from "../../Utils/typeUtils";
 import { InteractionWrapper } from "../InteractionWrapper/InteractionWrapper";
 import type { InteractionWrapperSlots } from "../InteractionWrapper/InteractionWrapper.types";
-import type {
-    TextFieldElementProps,
-    TextFieldElementSlots,
-    TextFieldProps,
-    TextFieldSlots,
-} from "./TextField.types";
+import type { TextFieldElementProps, TextFieldElementSlots, TextFieldProps, TextFieldSlots } from "./TextField.types";
 
 const useAutoHeight = (
     ref: MaybeRefOrGetter<HTMLElement | undefined>,
@@ -261,7 +256,13 @@ export const TextField = defineComponent(
         const getIsAutoSizing = () => TextFieldUtils.computeIsAutoSizing(props.element, props.isAutoSizing);
         const getMinRows = () => props.minRows ?? TEXT_FIELD_DEFAULTS.minRows;
 
-        const minHeight = useAutoHeight(controlRef, () => !getIsAutoSizing(), getMinRows, () => props.maxRows, value);
+        const minHeight = useAutoHeight(
+            controlRef,
+            () => !getIsAutoSizing(),
+            getMinRows,
+            () => props.maxRows,
+            value,
+        );
 
         const setLeadingRef = (element: HTMLElement | undefined) => {
             leadingRef.value = element;

@@ -55,12 +55,10 @@ const reset = () => {
     compare.value = STARTING_COMPARE;
 };
 
-const commonProps = computed(
-    (): Pick<SplitPaneExampleProps, "gutterSize" | "isDisabled"> => ({
-        gutterSize: gutterSize.value,
-        isDisabled: isDisabled.value,
-    }),
-);
+const commonProps = computed((): Pick<SplitPaneExampleProps, "gutterSize" | "isDisabled"> => ({
+    gutterSize: gutterSize.value,
+    isDisabled: isDisabled.value,
+}));
 
 const examples: ExampleDefs[] = [
     {

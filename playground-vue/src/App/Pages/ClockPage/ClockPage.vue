@@ -9,8 +9,8 @@ import {
 import { TimeUtils } from "@thewaver/ss-utils";
 import type { TimeValue } from "@thewaver/ss-utils";
 
-import PageExamples from "../../PageComponents/Examples/PageExamples.vue";
 import type { ExampleDefs } from "../../PageComponents/Examples/Examples.types";
+import PageExamples from "../../PageComponents/Examples/PageExamples.vue";
 import DefaultExample from "./Examples/Default.vue";
 
 const EXAMPLES_ROOT = "/src/App/Pages/ClockPage/Examples";

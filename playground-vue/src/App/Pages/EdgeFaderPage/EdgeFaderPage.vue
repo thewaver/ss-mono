@@ -49,7 +49,9 @@ const examples: ExampleDefs[] = [
         key: "card",
         name: "Something that does not scroll",
         readout: () =>
-            isScrollAware.value ? "nothing is out of view, so nothing fades" : "the fade does not need a scroll to be drawn",
+            isScrollAware.value
+                ? "nothing is out of view, so nothing fades"
+                : "the fade does not need a scroll to be drawn",
         path: `${EXAMPLES_ROOT}/Card.vue`,
     },
 ];

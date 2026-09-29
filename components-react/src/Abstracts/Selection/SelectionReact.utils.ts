@@ -29,10 +29,7 @@ export namespace SelectionReactUtils {
             SelectionUtils.create<T>(() => latest.current.isDisabled, {
                 getMode: () => latest.current.mode,
                 getItems: () => latest.current.items,
-                selection: [
-                    () => latest.current.selection[0],
-                    (next) => latest.current.selection[1](next),
-                ],
+                selection: [() => latest.current.selection[0], (next) => latest.current.selection[1](next)],
             }),
         );
 

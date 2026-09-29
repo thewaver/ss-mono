@@ -82,9 +82,7 @@ export const TreePage = () => {
             name: "In a right-to-left box",
             readout: () =>
                 `value: ${rightToLeftSignal[0]() ?? "undefined"} | expanded: ${JSON.stringify(rightToLeftExpandedSignal[0]())} — the box around the tree sets dir="rtl", so left opens a branch and right closes it or climbs to the parent`,
-            component: () => (
-                <RightToLeftExample value={rightToLeftSignal} expanded={rightToLeftExpandedSignal} />
-            ),
+            component: () => <RightToLeftExample value={rightToLeftSignal} expanded={rightToLeftExpandedSignal} />,
             path: `${EXAMPLES_ROOT}/RightToLeft.tsx`,
         },
         {
@@ -144,9 +142,7 @@ export const TreePage = () => {
             name: "Links through a component",
             readout: () =>
                 `value: ${customLinkSignal[0]() ?? "undefined"} — the same nodes rendered by a consumer's own link component`,
-            component: () => (
-                <LinkComponentExample value={customLinkSignal} expanded={customLinkExpandedSignal} />
-            ),
+            component: () => <LinkComponentExample value={customLinkSignal} expanded={customLinkExpandedSignal} />,
             path: `${EXAMPLES_ROOT}/LinkComponent.tsx`,
         },
         {
@@ -163,11 +159,7 @@ export const TreePage = () => {
             readout: () =>
                 `${(STRESS_BRANCH_COUNT * (STRESS_LEAF_COUNT + 1)).toLocaleString("en-GB")} rows when everything is open — expanded: ${stressExpandedSignal[0]().length} branches, value: ${stressSignal[0]() ?? "undefined"}`,
             component: () => (
-                <VirtualizedExample
-                    nodes={() => stressFiles}
-                    value={stressSignal}
-                    expanded={stressExpandedSignal}
-                />
+                <VirtualizedExample nodes={() => stressFiles} value={stressSignal} expanded={stressExpandedSignal} />
             ),
             path: `${EXAMPLES_ROOT}/Virtualized.tsx`,
         },

@@ -39,8 +39,7 @@ const renderTextField = (signal: Signal<string>, getHasError?: () => boolean) =>
 );
 
 export const SectionsExample = (props: Props) => {
-    const getEmailMessage = () =>
-        props.email[0]().includes("@") ? "" : "That does not look like an email address.";
+    const getEmailMessage = () => (props.email[0]().includes("@") ? "" : "That does not look like an email address.");
 
     const getPasswordMessage = () =>
         props.password[0]().length >= MIN_PASSWORD_LENGTH ? "" : `At least ${MIN_PASSWORD_LENGTH} characters.`;

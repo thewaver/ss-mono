@@ -96,10 +96,7 @@ export namespace RotatorVueUtils {
         onScopeDispose(rotator.stop);
 
         watchAfterRender(
-            [
-                () => state.value.isResting,
-                () => toValue(defs.restDurationMs) ?? RotatorUtils.DEFAULT_REST_DURATION_MS,
-            ],
+            [() => state.value.isResting, () => toValue(defs.restDurationMs) ?? RotatorUtils.DEFAULT_REST_DURATION_MS],
             ([isResting, restDurationMs]) => (isResting ? rotator.startRest(restDurationMs) : undefined),
         );
 

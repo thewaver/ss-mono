@@ -3,8 +3,8 @@ import { shallowRef, useId } from "vue";
 
 import { Color } from "@thewaver/ss-utils";
 
-import PageExamples from "../../PageComponents/Examples/PageExamples.vue";
 import type { ExampleDefs } from "../../PageComponents/Examples/Examples.types";
+import PageExamples from "../../PageComponents/Examples/PageExamples.vue";
 import DropdownExample from "./Examples/Dropdown.vue";
 import SurfaceExample from "./Examples/Surface.vue";
 

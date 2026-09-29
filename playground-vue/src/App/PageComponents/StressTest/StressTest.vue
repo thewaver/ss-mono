@@ -60,9 +60,9 @@ const setModalTransitionFinished = (hasTransitionFinished: boolean) => {
 
         <template #renderContent="{ visibilityTarget, transitionDurationMs }">
             <PageModalPanel :visibility-target="visibilityTarget" :transition-duration-ms="transitionDurationMs">
-                <div :class="[styles.fpsCounter, styles.fpsCounterVariants[fpsVariant]]">{{
-                    `FPS: ${frameRate.current.toFixed(1)}\nAVG: ${frameRate.average.toFixed(1)}`
-                }}</div>
+                <div :class="[styles.fpsCounter, styles.fpsCounterVariants[fpsVariant]]">
+                    {{ `FPS: ${frameRate.current.toFixed(1)}\nAVG: ${frameRate.average.toFixed(1)}` }}
+                </div>
                 <div
                     :class="styles.itemGrid"
                     :style="{

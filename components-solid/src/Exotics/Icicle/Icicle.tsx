@@ -54,10 +54,7 @@ export const Icicle = <T,>(props: IcicleProps<T>) => {
 
     const getAllNodes = createMemo(() => IcicleUtils.listNodes(getSpans(), getWeights()));
 
-    const [getHeldFocus, setHeldFocus] = SignalMirrorSolidUtils.createOptional(
-        () => props.focus,
-        untrack(getRootNode),
-    );
+    const [getHeldFocus, setHeldFocus] = SignalMirrorSolidUtils.createOptional(() => props.focus, untrack(getRootNode));
 
     const getFocus = createMemo(() => {
         const held = getHeldFocus();

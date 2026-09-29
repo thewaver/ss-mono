@@ -1,8 +1,8 @@
 <script setup lang="ts">
 import { shallowRef } from "vue";
 
-import PageExamples from "../../PageComponents/Examples/PageExamples.vue";
 import type { ExampleDefs } from "../../PageComponents/Examples/Examples.types";
+import PageExamples from "../../PageComponents/Examples/PageExamples.vue";
 import ScrolledExample from "./Examples/Scrolled.vue";
 import TextExample from "./Examples/Text.vue";
 
@@ -26,8 +26,7 @@ const examples: ExampleDefs[] = [
     {
         key: "long",
         name: "More than fits",
-        readout: () =>
-            `expanded: ${isLongExpanded.value} — the control appears because there is something behind it`,
+        readout: () => `expanded: ${isLongExpanded.value} — the control appears because there is something behind it`,
         path: `${EXAMPLES_ROOT}/Text.vue`,
     },
     {

@@ -5,8 +5,8 @@ import type { CuboidController } from "@thewaver/ss-components-vue";
 import { CUBOID_DEFAULTS, CuboidUtils, MediaQueryMonitorVueUtils } from "@thewaver/ss-components-vue";
 import { CuboidKnobs } from "@thewaver/ss-playground/App/Knobs/Cuboids.const";
 
-import PageExamples from "../../PageComponents/Examples/PageExamples.vue";
 import type { ExampleDefs } from "../../PageComponents/Examples/Examples.types";
+import PageExamples from "../../PageComponents/Examples/PageExamples.vue";
 import PageNumberField from "../../PageComponents/Field/PageNumberField.vue";
 import PageProp from "../../PageComponents/Prop/Prop.vue";
 import PagePropsPanel from "../../PageComponents/PropsPanel/PagePropsPanel.vue";

@@ -23,12 +23,7 @@ const handleChange = (picked: File[]) => {
 </script>
 
 <template>
-    <FileInput
-        v-model:files="files"
-        :has-error="rejection !== ''"
-        ariaLabel="Small attachment"
-        @change="handleChange"
-    >
+    <FileInput v-model:files="files" :has-error="rejection !== ''" ariaLabel="Small attachment" @change="handleChange">
         <template #renderContent="renderProps">
             <PageFileInputContent :render-props="renderProps" />
         </template>

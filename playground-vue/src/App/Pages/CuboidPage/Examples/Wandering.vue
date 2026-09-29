@@ -32,11 +32,7 @@ const turnToNeighbor = () => {
     const facing = CuboidUtils.getFacingFromTurns(yaw.value, pitch.value);
     const neighbors = TURNS.map(
         ([yawTurn, pitchTurn]) =>
-            [
-                CuboidUtils.getFacingFromTurns(yaw.value + yawTurn, pitch.value + pitchTurn),
-                yawTurn,
-                pitchTurn,
-            ] as const,
+            [CuboidUtils.getFacingFromTurns(yaw.value + yawTurn, pitch.value + pitchTurn), yawTurn, pitchTurn] as const,
     ).filter(([turned]) => turned !== facing);
     const unvisited = neighbors.filter(([turned]) => turned !== previousFacing);
     const [[, yawTurn, pitchTurn]] = ObjectUtils.getRandomArrayValues(unvisited.length > 0 ? unvisited : neighbors);

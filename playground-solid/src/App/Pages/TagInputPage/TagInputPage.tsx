@@ -66,9 +66,7 @@ export const TagInputPage = () => {
                 key: "empty",
                 name: "Empty",
                 readout: () => `tags: ${emptySignal[0]().join(", ") || "none"}`,
-                component: () => (
-                    <DefaultExample {...commonProps} value={emptySignal} ariaLabel={"Empty topics"} />
-                ),
+                component: () => <DefaultExample {...commonProps} value={emptySignal} ariaLabel={"Empty topics"} />,
                 path: `${EXAMPLES_ROOT}/Default.tsx`,
             },
             {

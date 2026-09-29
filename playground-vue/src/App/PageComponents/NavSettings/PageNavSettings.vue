@@ -86,7 +86,11 @@ const switchFramework = (framework: PlaygroundFramework) => {
                 hint="Which tab a page opens on when it is picked from the list. A page with no examples always opens on its docs."
                 default-value="Examples"
             >
-                <PageNavSettingsChoice v-model:value="pageView" ariaLabel="Open pages on" :options="PAGE_VIEW_OPTIONS" />
+                <PageNavSettingsChoice
+                    v-model:value="pageView"
+                    ariaLabel="Open pages on"
+                    :options="PAGE_VIEW_OPTIONS"
+                />
             </PageProp>
 
             <PageProp

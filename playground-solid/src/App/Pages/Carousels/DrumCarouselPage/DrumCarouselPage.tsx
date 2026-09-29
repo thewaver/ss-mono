@@ -60,11 +60,7 @@ export const DrumCarouselPage = () => {
                 `slide ${barelessIndexSignal[0]() + 1} of ${controls.getSlideCount()} — nothing is drawn beside the drum, so the surrounding page owns the buttons through the signal it shares`,
             component: () => (
                 <PageCarouselBox>
-                    <NoControlsExample
-                        {...controls.getSharedProps()}
-                        index={barelessIndexSignal}
-                        axis={getAxis}
-                    />
+                    <NoControlsExample {...controls.getSharedProps()} index={barelessIndexSignal} axis={getAxis} />
                 </PageCarouselBox>
             ),
             path: `${EXAMPLES_ROOT}/NoControls.tsx`,

@@ -63,10 +63,7 @@ export const PatchBoardPage = () => {
         `${link.from.nodeKey} ${link.from.socketId} to ${link.to.nodeKey} ${link.to.socketId}`;
 
     const getExamples = createMemo(() => {
-        const commonProps: Omit<
-            PatchBoardExampleProps,
-            "nodes" | "links" | "onLink" | "onUnlink" | "onMove"
-        > = {
+        const commonProps: Omit<PatchBoardExampleProps, "nodes" | "links" | "onLink" | "onUnlink" | "onMove"> = {
             socketSize: getSocketSize,
             isLocked: getIsLocked,
             isDisabled: getIsDisabled,

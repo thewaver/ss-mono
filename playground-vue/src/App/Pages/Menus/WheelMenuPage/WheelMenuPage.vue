@@ -102,8 +102,7 @@ const examples: ExampleDefs[] = [
     {
         key: "tuned",
         name: "Tuned",
-        readout: () =>
-            `${lastTunedAction.value} — the same wheel with a fatter band and wider gaps between the wedges`,
+        readout: () => `${lastTunedAction.value} — the same wheel with a fatter band and wider gaps between the wedges`,
         path: `${EXAMPLES_ROOT}/Wheel.vue`,
     },
 ];

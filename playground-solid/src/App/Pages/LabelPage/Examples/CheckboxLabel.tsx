@@ -8,10 +8,7 @@ type Props = LabelExampleProps;
 
 export const CheckboxLabelExample = (props: Props) => (
     <Label>
-        <Checkbox
-            checked={props.checked}
-            renderContent={(getFlags) => <PageCheckboxContent flags={getFlags} />}
-        />
+        <Checkbox checked={props.checked} renderContent={(getFlags) => <PageCheckboxContent flags={getFlags} />} />
 
         <PageLabelCaption id={"rememberCaption"}>Remember me</PageLabelCaption>
     </Label>

@@ -51,29 +51,30 @@ import type {
 const PLACED_SIZING: InteractionSizing = "fill";
 
 const SortableItemSlot = defineComponent(
-    (props: SortableItemSlotProps, { slots }: SlotsContext<SortableItemSlotSlots>) => () => {
-        const isDisabled = props.flags.isDisabled ?? false;
+    (props: SortableItemSlotProps, { slots }: SlotsContext<SortableItemSlotSlots>) =>
+        () => {
+            const isDisabled = props.flags.isDisabled ?? false;
 
-        return (
-            <div
-                id={props.id}
-                class={SortableStyles.sortableItem}
-                role="listitem"
-                aria-roledescription={props.roleDescription}
-                aria-label={props.label}
-                aria-describedby={props.hintId}
-                aria-posinset={props.position}
-                aria-setsize={props.setSize}
-                aria-disabled={isDisabled || undefined}
-                onPointerdown={props.onPointerDown}
-                onKeydown={props.onKeyDown}
-                onClick={props.onClick}
-                onFocusin={props.onFocus}
-            >
-                {callSlot(slots.renderContent, props.flags)}
-            </div>
-        );
-    },
+            return (
+                <div
+                    id={props.id}
+                    class={SortableStyles.sortableItem}
+                    role="listitem"
+                    aria-roledescription={props.roleDescription}
+                    aria-label={props.label}
+                    aria-describedby={props.hintId}
+                    aria-posinset={props.position}
+                    aria-setsize={props.setSize}
+                    aria-disabled={isDisabled || undefined}
+                    onPointerdown={props.onPointerDown}
+                    onKeydown={props.onKeyDown}
+                    onClick={props.onClick}
+                    onFocusin={props.onFocus}
+                >
+                    {callSlot(slots.renderContent, props.flags)}
+                </div>
+            );
+        },
     {
         name: "SortableItemSlot",
         slots: Object as SlotsType<SortableItemSlotSlots>,

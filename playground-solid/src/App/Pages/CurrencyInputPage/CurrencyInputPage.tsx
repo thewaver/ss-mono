@@ -84,12 +84,7 @@ export const CurrencyInputPage = () => {
                 readout: () =>
                     `value: ${describe(negativeSignal[0]())} — a minus is only accepted where the field was told to hold one`,
                 component: () => (
-                    <DefaultExample
-                        {...commonProps}
-                        value={negativeSignal}
-                        ariaLabel={"Adjustment"}
-                        hasSign={true}
-                    />
+                    <DefaultExample {...commonProps} value={negativeSignal} ariaLabel={"Adjustment"} hasSign={true} />
                 ),
                 path: `${EXAMPLES_ROOT}/Default.tsx`,
             },

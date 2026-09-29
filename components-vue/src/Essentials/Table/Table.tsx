@@ -21,13 +21,7 @@ import { watchAfterRender } from "../../Utils/effectUtils";
 import { callSlot, declareProps, useTwoWay } from "../../Utils/propUtils";
 import type { SlotsContext } from "../../Utils/typeUtils";
 import { provideTableHeaderContext, useTableHeaderContext } from "./Table.context";
-import type {
-    TableColumn,
-    TableHeaderReorderSlots,
-    TableHeaderSortSlots,
-    TableProps,
-    TableSlots,
-} from "./Table.types";
+import type { TableColumn, TableHeaderReorderSlots, TableHeaderSortSlots, TableProps, TableSlots } from "./Table.types";
 
 const HEADER_ROW_INDEX = TableUtils.HEADER_ROW_INDEX;
 const FIRST_ARIA_INDEX = TableUtils.FIRST_ARIA_INDEX;

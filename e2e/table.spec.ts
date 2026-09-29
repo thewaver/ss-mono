@@ -29,8 +29,7 @@ const sortControl = (scope: string) => `${header(scope)} button >> nth=0`;
  * In a reorderable header the Playground draws the grip ahead of the title, so it is that header's first button
  * and the sort control comes after it.
  */
-const reorderGrip = (scope: string, columnIndex: number) =>
-    `${header(scope)} >> nth=${columnIndex} >> button >> nth=0`;
+const reorderGrip = (scope: string, columnIndex: number) => `${header(scope)} >> nth=${columnIndex} >> button >> nth=0`;
 
 /**
  * A cell is addressed by the pair of indices the grid publishes rather than by its text, because the text

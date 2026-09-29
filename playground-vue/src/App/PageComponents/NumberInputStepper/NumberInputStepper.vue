@@ -17,7 +17,9 @@ defineProps<NumberInputStepperProps>();
             @mouse-leave="stepper.stopStepping"
         >
             <template #renderContent="buttonFlags">
-                <PageNumberInputStepperContent :flags="buttonFlags" direction="up">Increase</PageNumberInputStepperContent>
+                <PageNumberInputStepperContent :flags="buttonFlags" direction="up"
+                    >Increase</PageNumberInputStepperContent
+                >
             </template>
         </Button>
 
@@ -28,7 +30,9 @@ defineProps<NumberInputStepperProps>();
             @mouse-leave="stepper.stopStepping"
         >
             <template #renderContent="buttonFlags">
-                <PageNumberInputStepperContent :flags="buttonFlags" direction="down">Decrease</PageNumberInputStepperContent>
+                <PageNumberInputStepperContent :flags="buttonFlags" direction="down"
+                    >Decrease</PageNumberInputStepperContent
+                >
             </template>
         </Button>
     </PageNumberInputStepperFrame>

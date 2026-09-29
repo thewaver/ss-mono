@@ -40,9 +40,7 @@ export const ToolbarComposite = <T,>(props: ToolbarCompositeProps<T>) => {
 
     const getActions = createMemo((): ToolbarAction<T>[] => access(props.actions));
 
-    const getPressedValues = createMemo(() =>
-        props.role === "toolbar" ? props.pressedValues?.[0]() : undefined,
-    );
+    const getPressedValues = createMemo(() => (props.role === "toolbar" ? props.pressedValues?.[0]() : undefined));
 
     const getLayout = createMemo(() => props.computeLayout?.({ itemCount: getActions().length }));
 

@@ -224,9 +224,7 @@ export const SelectPage = () => {
             key: "optionGroups",
             name: "Option groups",
             readout: () => `value: ${groupedState[0] ?? "undefined"} — arrows cross group boundaries and skip Finland`,
-            component: () => (
-                <CountriesExample value={groupedState} options={GROUPED_COUNTRIES} hasGroups={true} />
-            ),
+            component: () => <CountriesExample value={groupedState} options={GROUPED_COUNTRIES} hasGroups={true} />,
             path: `${EXAMPLES_ROOT}/Countries.tsx`,
         },
         {
@@ -315,11 +313,7 @@ export const SelectPage = () => {
             readout: () =>
                 `value: ${filterState[0]?.code ?? "undefined"} | query: "${filterQuery}" — ${filteredAirports.length} of ${AIRPORTS.length} shown; the page matches on city or code, which only it knows about`,
             component: () => (
-                <AutocompleteExample
-                    value={filterState}
-                    query={filterQueryState}
-                    options={filteredAirports}
-                />
+                <AutocompleteExample value={filterState} query={filterQueryState} options={filteredAirports} />
             ),
             path: `${EXAMPLES_ROOT}/Autocomplete.tsx`,
         },

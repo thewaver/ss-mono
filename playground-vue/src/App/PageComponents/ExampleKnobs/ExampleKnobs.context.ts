@@ -6,7 +6,6 @@ export type ExampleKnobsContextType = {
 
 const EXAMPLE_KNOBS_CONTEXT_KEY: InjectionKey<ExampleKnobsContextType> = Symbol("ExampleKnobsContext");
 
-export const provideExampleKnobsContext = (value: ExampleKnobsContextType) =>
-    provide(EXAMPLE_KNOBS_CONTEXT_KEY, value);
+export const provideExampleKnobsContext = (value: ExampleKnobsContextType) => provide(EXAMPLE_KNOBS_CONTEXT_KEY, value);
 
 export const useExampleKnobsContext = () => inject(EXAMPLE_KNOBS_CONTEXT_KEY, undefined);

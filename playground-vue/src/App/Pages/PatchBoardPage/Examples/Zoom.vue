@@ -39,11 +39,7 @@ const links = useModel(props, "links");
                 </template>
             </Button>
 
-            <Button
-                id="patchBoardZoomIn"
-                :is-disabled="zoom >= MAX_ZOOM"
-                @click="props.onZoomChange(zoom + ZOOM_STEP)"
-            >
+            <Button id="patchBoardZoomIn" :is-disabled="zoom >= MAX_ZOOM" @click="props.onZoomChange(zoom + ZOOM_STEP)">
                 <template #renderContent="flags">
                     <PageButtonContent :flags="flags">Zoom in</PageButtonContent>
                 </template>

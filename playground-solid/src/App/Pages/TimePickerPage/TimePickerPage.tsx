@@ -26,9 +26,7 @@ export const TimePickerPage = () => {
             name: "With a clock",
             readout: () =>
                 `value: ${describeTime(clockedSignal[0]())} — one column per unit, so typing and picking cover the same times`,
-            component: () => (
-                <ClockedExample value={clockedSignal} key={"clocked"} ariaLabel={"Appointment time"} />
-            ),
+            component: () => <ClockedExample value={clockedSignal} key={"clocked"} ariaLabel={"Appointment time"} />,
             path: `${EXAMPLES_ROOT}/Clocked.tsx`,
         },
         {

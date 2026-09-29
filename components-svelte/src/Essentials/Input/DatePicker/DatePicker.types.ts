@@ -66,11 +66,6 @@ export type DatePickerProps = Omit<DateInputProps, "renderTrailing"> & {
      * handed in with it, with the way to change it, so the consumer can draw the title and paging buttons.
      */
     renderPopup: Snippet<
-        [
-            renderCalendar: Snippet,
-            month: ValuePair<DateValue>,
-            visibilityTarget: 0 | 1,
-            transitionDurationMs: number,
-        ]
+        [renderCalendar: Snippet, month: ValuePair<DateValue>, visibilityTarget: 0 | 1, transitionDurationMs: number]
     >;
 };

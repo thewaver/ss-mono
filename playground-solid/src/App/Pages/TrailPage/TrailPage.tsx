@@ -49,11 +49,7 @@ export const TrailPage = () => {
                 readout: () =>
                     `${getPercent(circuitProgressSignal[0]())} round the loop, ${circuitPlayingSignal[0]() ? "running" : "stopped"} — the playback signal starts and stops it, and the controller sends it back to the start`,
                 component: () => (
-                    <CircuitExample
-                        {...commonProps}
-                        progress={circuitProgressSignal}
-                        playback={circuitPlayingSignal}
-                    />
+                    <CircuitExample {...commonProps} progress={circuitProgressSignal} playback={circuitPlayingSignal} />
                 ),
                 path: `${EXAMPLES_ROOT}/Circuit.tsx`,
             },
@@ -77,11 +73,7 @@ export const TrailPage = () => {
                 readout: () =>
                     `${getPercent(convoyProgressSignal[0]())} of the run, ${convoyPlayingSignal[0]() ? "running" : "stopped"} — four travelers on one clock, each a share of the path behind the one in front; with looping off they wait at the start and the run ends when the last one arrives`,
                 component: () => (
-                    <ConvoyExample
-                        {...commonProps}
-                        progress={convoyProgressSignal}
-                        playback={convoyPlayingSignal}
-                    />
+                    <ConvoyExample {...commonProps} progress={convoyProgressSignal} playback={convoyPlayingSignal} />
                 ),
                 path: `${EXAMPLES_ROOT}/Convoy.tsx`,
             },

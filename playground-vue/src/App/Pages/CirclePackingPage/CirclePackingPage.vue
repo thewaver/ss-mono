@@ -6,8 +6,8 @@ import type { CirclePackingNode } from "@thewaver/ss-components-vue";
 import { CirclePackingKnobs } from "@thewaver/ss-playground/App/Knobs/CirclePackings.const";
 import { LIBRARY } from "@thewaver/ss-playground/App/Pages/TreemapPage/TreemapPage.const";
 
-import PageExamples from "../../PageComponents/Examples/PageExamples.vue";
 import type { ExampleDefs } from "../../PageComponents/Examples/Examples.types";
+import PageExamples from "../../PageComponents/Examples/PageExamples.vue";
 import PageNumberField from "../../PageComponents/Field/PageNumberField.vue";
 import PageProp from "../../PageComponents/Prop/Prop.vue";
 import PagePropsPanel from "../../PageComponents/PropsPanel/PagePropsPanel.vue";

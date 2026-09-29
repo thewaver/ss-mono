@@ -4,8 +4,8 @@ import { shallowRef } from "vue";
 import type { DrawerEdge } from "@thewaver/ss-components-vue";
 import { DRAWER_EDGES } from "@thewaver/ss-components-vue";
 
-import PageExamples from "../../PageComponents/Examples/PageExamples.vue";
 import type { ExampleDefs } from "../../PageComponents/Examples/Examples.types";
+import PageExamples from "../../PageComponents/Examples/PageExamples.vue";
 import type { DrawerExampleProps } from "./DrawerPage.types";
 import DefaultExample from "./Examples/Default.vue";
 

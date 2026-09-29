@@ -40,12 +40,7 @@ export const SortablePage = () => {
                 `order: ${names(queueState[0])} — Second is disabled, so arrows skip it and it cannot be picked up`,
             component: () => (
                 <PageSortableRoom>
-                    <CardsExample
-                        groupId={"queue"}
-                        items={queueState}
-                        ariaLabel={"Queue"}
-                        emptyText={"No cards"}
-                    />
+                    <CardsExample groupId={"queue"} items={queueState} ariaLabel={"Queue"} emptyText={"No cards"} />
                 </PageSortableRoom>
             ),
             path: `${EXAMPLES_ROOT}/Cards.tsx`,
@@ -116,12 +111,7 @@ export const SortablePage = () => {
             readout: () =>
                 `hand: ${names(lockedHandState[0])} | board: ${names(lockedBoardState[0])} — the board can be reordered but accepts nothing from outside`,
             component: () => (
-                <PairExample
-                    groupId={"locked"}
-                    hand={lockedHandState}
-                    board={lockedBoardState}
-                    isBoardLocked={true}
-                />
+                <PairExample groupId={"locked"} hand={lockedHandState} board={lockedBoardState} isBoardLocked={true} />
             ),
             path: `${EXAMPLES_ROOT}/Pair.tsx`,
         },

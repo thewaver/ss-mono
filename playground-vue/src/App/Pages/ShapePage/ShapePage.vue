@@ -20,8 +20,8 @@ import PageColorField from "../../PageComponents/Field/PageColorField.vue";
 import PageGroupedSelectField from "../../PageComponents/Field/PageGroupedSelectField.vue";
 import PageNumberField from "../../PageComponents/Field/PageNumberField.vue";
 import PageSelectField from "../../PageComponents/Field/PageSelectField.vue";
-import PageKnobs from "../../PageComponents/Knobs/Knobs.vue";
 import type { Knob } from "../../PageComponents/Knobs/Knobs.types";
+import PageKnobs from "../../PageComponents/Knobs/Knobs.vue";
 import PageProp from "../../PageComponents/Prop/Prop.vue";
 import PagePropsDivider from "../../PageComponents/PropsPanel/PagePropsDivider.vue";
 import PagePropsGroups from "../../PageComponents/PropsPanel/PagePropsGroups.vue";
@@ -68,24 +68,22 @@ const colors = shallowRef<SVGDefsColors>({ ...SVGDefsSamples.SAMPLE_COLORS });
 
 const colorKeys = computed(() => Object.keys(colors.value) as (keyof SVGDefsColors)[]);
 
-const commonProps = computed(
-    (): ShapeExampleProps => ({
-        shouldClipChildren: ShapeKnobs.STARTING_SHOULD_CLIP_CHILDREN,
-        shouldPadChildren: ShapeKnobs.STARTING_SHOULD_PAD_CHILDREN,
-        blurWidth: blurWidth.value,
-        animationDurationMs: animationDurationMs.value,
-        colors: colors.value,
-        shapeKind: ShapeKnobs.STARTING_SHAPE_KIND,
-        strokeConfigKey: strokeConfigKey.value,
-        strokeConfigDefs: strokeConfigDefs.value,
-        fillConfigKey: fillConfigKey.value,
-        iterationConfigKey: iterationConfigKey.value,
-        cellSize: { width: cellSize.value, height: cellSize.value },
-        edgeThicknesses: [edgeThickness.value],
-        joinRadii: ShapeKnobs.STARTING_JOIN_RADII,
-        lameExponents: ShapeKnobs.STARTING_LAME_EXPONENTS,
-    }),
-);
+const commonProps = computed((): ShapeExampleProps => ({
+    shouldClipChildren: ShapeKnobs.STARTING_SHOULD_CLIP_CHILDREN,
+    shouldPadChildren: ShapeKnobs.STARTING_SHOULD_PAD_CHILDREN,
+    blurWidth: blurWidth.value,
+    animationDurationMs: animationDurationMs.value,
+    colors: colors.value,
+    shapeKind: ShapeKnobs.STARTING_SHAPE_KIND,
+    strokeConfigKey: strokeConfigKey.value,
+    strokeConfigDefs: strokeConfigDefs.value,
+    fillConfigKey: fillConfigKey.value,
+    iterationConfigKey: iterationConfigKey.value,
+    cellSize: { width: cellSize.value, height: cellSize.value },
+    edgeThicknesses: [edgeThickness.value],
+    joinRadii: ShapeKnobs.STARTING_JOIN_RADII,
+    lameExponents: ShapeKnobs.STARTING_LAME_EXPONENTS,
+}));
 
 const setStrokeConfigDef = (key: string, value: number | boolean) => {
     const previous = strokeConfigDefsByKey.value;

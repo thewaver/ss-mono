@@ -19,8 +19,8 @@ import PageExamples from "../../PageComponents/Examples/PageExamples.vue";
 import PageColorField from "../../PageComponents/Field/PageColorField.vue";
 import PageGroupedSelectField from "../../PageComponents/Field/PageGroupedSelectField.vue";
 import PageNumberField from "../../PageComponents/Field/PageNumberField.vue";
-import PageKnobs from "../../PageComponents/Knobs/Knobs.vue";
 import type { Knob } from "../../PageComponents/Knobs/Knobs.types";
+import PageKnobs from "../../PageComponents/Knobs/Knobs.vue";
 import PageProp from "../../PageComponents/Prop/Prop.vue";
 import PagePropsDivider from "../../PageComponents/PropsPanel/PagePropsDivider.vue";
 import PagePropsGroups from "../../PageComponents/PropsPanel/PagePropsGroups.vue";
@@ -114,7 +114,9 @@ const examples: ExampleDefs[] = [
                     :value="strokeConfigKey"
                     :groups="STROKE_GROUPS"
                     ariaLabel="Border pattern"
-                    @change="(value: WithNoSample<SVGDefsSamples.Gradient.Tracked.SampleKey>) => (strokeConfigKey = value)"
+                    @change="
+                        (value: WithNoSample<SVGDefsSamples.Gradient.Tracked.SampleKey>) => (strokeConfigKey = value)
+                    "
                 />
             </PageProp>
 

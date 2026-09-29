@@ -27,11 +27,7 @@ export const PreviewPage = () => {
             name: "More than fits",
             readout: () => `expanded: ${longState[0]} — the control appears because there is something behind it`,
             component: () => (
-                <TextExample
-                    expanded={longState}
-                    collapsedHeight={COLLAPSED_HEIGHT}
-                    paragraphs={LONG_PARAGRAPHS}
-                />
+                <TextExample expanded={longState} collapsedHeight={COLLAPSED_HEIGHT} paragraphs={LONG_PARAGRAPHS} />
             ),
             path: `${EXAMPLES_ROOT}/Text.tsx`,
         },
@@ -48,11 +44,7 @@ export const PreviewPage = () => {
             name: "Less than fits",
             readout: () => `expanded: ${shortState[0]} — same component, same height, no control and no fade at all`,
             component: () => (
-                <TextExample
-                    expanded={shortState}
-                    collapsedHeight={COLLAPSED_HEIGHT}
-                    paragraphs={SHORT_PARAGRAPHS}
-                />
+                <TextExample expanded={shortState} collapsedHeight={COLLAPSED_HEIGHT} paragraphs={SHORT_PARAGRAPHS} />
             ),
             path: `${EXAMPLES_ROOT}/Text.tsx`,
         },

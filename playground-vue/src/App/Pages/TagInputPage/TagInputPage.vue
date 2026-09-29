@@ -89,7 +89,11 @@ const examples: ExampleDefs[] = [
             label="Disabled"
             hint="Turns the field off: no tag can be added, and none can be removed."
         >
-            <PageCheckField :value="isDisabled" ariaLabel="Disabled" @change="(value: boolean) => (isDisabled = value)" />
+            <PageCheckField
+                :value="isDisabled"
+                ariaLabel="Disabled"
+                @change="(value: boolean) => (isDisabled = value)"
+            />
         </PageProp>
 
         <PageProp

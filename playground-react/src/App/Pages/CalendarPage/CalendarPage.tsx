@@ -60,18 +60,14 @@ export const CalendarPage = () => {
             key: "default",
             name: "Default",
             readout: () => `value: ${describe(defaultValue[0])} — month: ${describe(defaultMonth[0])}`,
-            component: () => (
-                <DefaultExample value={defaultValue} month={defaultMonth} weekStartsOn={weekStartsOn} />
-            ),
+            component: () => <DefaultExample value={defaultValue} month={defaultMonth} weekStartsOn={weekStartsOn} />,
             path: `${EXAMPLES_ROOT}/Default.tsx`,
         },
         {
             key: "bounded",
             name: "Bounded",
             readout: () => `min ${describe(MIN_DATE)}, max ${describe(MAX_DATE)} — value: ${describe(rangedValue[0])}`,
-            component: () => (
-                <BoundedExample value={rangedValue} month={rangedMonth} weekStartsOn={weekStartsOn} />
-            ),
+            component: () => <BoundedExample value={rangedValue} month={rangedMonth} weekStartsOn={weekStartsOn} />,
             path: `${EXAMPLES_ROOT}/Bounded.tsx`,
         },
         {
@@ -89,11 +85,7 @@ export const CalendarPage = () => {
             readout: () =>
                 `value: ${describe(rightToLeftValue[0])} — the box around the calendar sets dir="rtl", so each week runs from the right and the right arrow moves to the day before`,
             component: () => (
-                <RightToLeftExample
-                    value={rightToLeftValue}
-                    month={rightToLeftMonth}
-                    weekStartsOn={weekStartsOn}
-                />
+                <RightToLeftExample value={rightToLeftValue} month={rightToLeftMonth} weekStartsOn={weekStartsOn} />
             ),
             path: `${EXAMPLES_ROOT}/RightToLeft.tsx`,
         },

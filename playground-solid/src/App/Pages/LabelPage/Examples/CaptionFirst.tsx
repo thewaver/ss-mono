@@ -10,9 +10,6 @@ export const CaptionFirstExample = (props: Props) => (
     <Label>
         <PageLabelCaption>Send notifications</PageLabelCaption>
 
-        <Toggle
-            checked={props.checked}
-            renderContent={(getFlags) => <PageToggleContent flags={getFlags} />}
-        />
+        <Toggle checked={props.checked} renderContent={(getFlags) => <PageToggleContent flags={getFlags} />} />
     </Label>
 );

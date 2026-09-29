@@ -29,10 +29,7 @@ export const MenubarPage = () => {
 
                 return (
                     <div class={[styles.bar, getLayerClass()].join(" ")} style={{ width: `${getBarWidth()}px` }}>
-                        <DefaultExample
-                            checked={checkedSignal}
-                            onActivate={(entry) => setLastPicked(entry.name)}
-                        />
+                        <DefaultExample checked={checkedSignal} onActivate={(entry) => setLastPicked(entry.name)} />
                     </div>
                 );
             },

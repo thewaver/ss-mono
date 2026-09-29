@@ -11,13 +11,7 @@ export const PartsExample = (props: TableExampleProps) => {
 
     return (
         <div className={styles.tableFrameShort}>
-            <Table
-                columns={columns}
-                rows={PARTS}
-                sort={props.sort}
-                selection={props.selection}
-                ariaLabel={"Parts"}
-            />
+            <Table columns={columns} rows={PARTS} sort={props.sort} selection={props.selection} ariaLabel={"Parts"} />
         </div>
     );
 };

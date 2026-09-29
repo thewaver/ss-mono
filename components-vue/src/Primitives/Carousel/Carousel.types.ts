@@ -65,10 +65,7 @@ export type CarouselSlots<T> = {
     /** Draws one slide. It is handed where the slide stands relative to the one showing. */
     renderSlide: (props: { slide: T; state: CarouselSlideState }) => VNodeChild;
     /** Draws one of the move controls. */
-    renderStep?: (props: {
-        step: CarouselStep;
-        renderProps: InteractionFlags<CarouselStepRenderProps>;
-    }) => VNodeChild;
+    renderStep?: (props: { step: CarouselStep; renderProps: InteractionFlags<CarouselStepRenderProps> }) => VNodeChild;
     /** Draws one of the pickers that jump straight to a slide. */
     renderPick?: (props: { index: number; renderProps: InteractionFlags<CarouselPickRenderProps> }) => VNodeChild;
     /** Draws the play and pause control. */

@@ -328,9 +328,7 @@ export const CellAnimationPage = () => {
             name: "A photograph, sliced",
             readout: () =>
                 `${Math.round(imageProgress[0] * PERCENT)}% through the pass, ${imagePlayback[0] ? "running" : "stopped"} — the progress signal is written by the component while it plays, and writing it moves the pass there`,
-            component: () => (
-                <ImageExampleWrapper {...commonProps} playback={imagePlayback} progress={imageProgress} />
-            ),
+            component: () => <ImageExampleWrapper {...commonProps} playback={imagePlayback} progress={imageProgress} />,
             path: DEFAULT_EXAMPLE_PATH,
         },
         {

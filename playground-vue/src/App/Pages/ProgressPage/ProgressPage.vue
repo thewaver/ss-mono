@@ -1,8 +1,8 @@
 <script setup lang="ts">
 import { onBeforeUnmount, onMounted, shallowRef } from "vue";
 
-import PageExamples from "../../PageComponents/Examples/PageExamples.vue";
 import type { ExampleDefs } from "../../PageComponents/Examples/Examples.types";
+import PageExamples from "../../PageComponents/Examples/PageExamples.vue";
 import DeterminateExample from "./Examples/Determinate.vue";
 import DiskMeterExample from "./Examples/DiskMeter.vue";
 import ErroredExample from "./Examples/Errored.vue";

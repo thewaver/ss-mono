@@ -18,11 +18,12 @@ import type { SlotsContext } from "../../Utils/typeUtils";
 import type { TabPanelProps, TabPanelSlots, TabsItemProps, TabsProps, TabsSlots } from "./Tabs.types";
 
 export const TabPanel = defineComponent(
-    (props: TabPanelProps, { slots }: SlotsContext<TabPanelSlots>) => () => (
-        <div id={props.id} role="tabpanel" aria-labelledby={props.tabId} tabindex={0}>
-            {slots.default?.()}
-        </div>
-    ),
+    (props: TabPanelProps, { slots }: SlotsContext<TabPanelSlots>) =>
+        () => (
+            <div id={props.id} role="tabpanel" aria-labelledby={props.tabId} tabindex={0}>
+                {slots.default?.()}
+            </div>
+        ),
     {
         name: "TabPanel",
         slots: Object as SlotsType<TabPanelSlots>,
@@ -31,52 +32,53 @@ export const TabPanel = defineComponent(
 );
 
 const TabsItem = defineComponent(
-    <T,>(props: TabsItemProps<T>, { slots }: SlotsContext<InteractionControlSlots>) => () => {
-        const isDisabled = props.flags.isDisabled ?? false;
+    <T,>(props: TabsItemProps<T>, { slots }: SlotsContext<InteractionControlSlots>) =>
+        () => {
+            const isDisabled = props.flags.isDisabled ?? false;
 
-        const handleClick = (e: MouseEvent) => {
-            if (isDisabled) {
-                e.preventDefault();
+            const handleClick = (e: MouseEvent) => {
+                if (isDisabled) {
+                    e.preventDefault();
 
-                return;
+                    return;
+                }
+
+                props.onSelect(props.tab.value);
+            };
+
+            const commonProps = {
+                "class": TabsStyles.tabsItem,
+                "role": "tab",
+                "id": props.tab.id,
+                "aria-controls": props.tab.panelId,
+                "aria-disabled": isDisabled || undefined,
+                "aria-selected": props.isSelected,
+            };
+
+            const content = callSlot(slots.renderContent, props.flags);
+
+            if (props.tab.href === undefined) {
+                return (
+                    <button type="button" {...commonProps} onClick={handleClick}>
+                        {content}
+                    </button>
+                );
             }
 
-            props.onSelect(props.tab.value);
-        };
+            if (props.linkComponent === undefined) {
+                return (
+                    <a href={props.tab.href} {...commonProps} onClick={handleClick}>
+                        {content}
+                    </a>
+                );
+            }
 
-        const commonProps = {
-            "class": TabsStyles.tabsItem,
-            "role": "tab",
-            "id": props.tab.id,
-            "aria-controls": props.tab.panelId,
-            "aria-disabled": isDisabled || undefined,
-            "aria-selected": props.isSelected,
-        };
-
-        const content = callSlot(slots.renderContent, props.flags);
-
-        if (props.tab.href === undefined) {
-            return (
-                <button type="button" {...commonProps} onClick={handleClick}>
-                    {content}
-                </button>
+            return h(
+                props.linkComponent,
+                { href: props.tab.href, ...commonProps, onClick: handleClick },
+                { default: () => content },
             );
-        }
-
-        if (props.linkComponent === undefined) {
-            return (
-                <a href={props.tab.href} {...commonProps} onClick={handleClick}>
-                    {content}
-                </a>
-            );
-        }
-
-        return h(
-            props.linkComponent,
-            { href: props.tab.href, ...commonProps, onClick: handleClick },
-            { default: () => content },
-        );
-    },
+        },
     {
         name: "TabsItem",
         props: declareProps<TabsItemProps<unknown>>({

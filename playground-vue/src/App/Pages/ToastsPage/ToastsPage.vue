@@ -20,13 +20,13 @@ import PageSelectField from "../../PageComponents/Field/PageSelectField.vue";
 import PageProp from "../../PageComponents/Prop/Prop.vue";
 import PagePropsPanel from "../../PageComponents/PropsPanel/PagePropsPanel.vue";
 import PageButtonContent from "../../StyledComponents/ButtonContent/ButtonContent.vue";
-import PageToastContent from "../../StyledComponents/ToastContent/ToastContent.vue";
 import type {
     ToastAnimation,
     ToastDefs,
     ToastKind,
     ToastStacking,
 } from "../../StyledComponents/ToastContent/ToastContent.types";
+import PageToastContent from "../../StyledComponents/ToastContent/ToastContent.vue";
 
 const NO_LIMIT = 0;
 const STICKY = 0;
@@ -104,7 +104,11 @@ const dismissToast = (id: string) => {
 <template>
     <div :class="styles.root">
         <PagePropsPanel scope="global">
-            <PageProp item-key="alignment" label="Alignment" hint="Which corner or edge of the screen the toasts gather at.">
+            <PageProp
+                item-key="alignment"
+                label="Alignment"
+                hint="Which corner or edge of the screen the toasts gather at."
+            >
                 <PageSelectField
                     :value="alignment"
                     :values="TOASTS_ALIGNMENTS"
@@ -199,7 +203,11 @@ const dismissToast = (id: string) => {
                 />
             </PageProp>
 
-            <PageProp item-key="margin" label="Margin (px)" hint="How far the stack is held off the edge of the screen.">
+            <PageProp
+                item-key="margin"
+                label="Margin (px)"
+                hint="How far the stack is held off the edge of the screen."
+            >
                 <PageNumberField
                     :value="margin"
                     :min="ToastKnobs.MIN_MARGIN"
@@ -254,11 +262,11 @@ const dismissToast = (id: string) => {
         </div>
 
         <div :class="styles.note" data-readout="">
-            queued: {{ toasts.length }}, shown: {{ boundaries.shown }}, hidden: {{ boundaries.hidden }} — the queue lives
-            at module scope, so raising a notification does not need the raiser to still be mounted. Hover the stack to
-            hold every countdown, or press F8 to put the keyboard in it. A toast against the left or right edge, or
-            centered along the top or bottom, can be swiped off that edge; Close is the route for anyone who cannot
-            drag.
+            queued: {{ toasts.length }}, shown: {{ boundaries.shown }}, hidden: {{ boundaries.hidden }} — the queue
+            lives at module scope, so raising a notification does not need the raiser to still be mounted. Hover the
+            stack to hold every countdown, or press F8 to put the keyboard in it. A toast against the left or right
+            edge, or centered along the top or bottom, can be swiped off that edge; Close is the route for anyone who
+            cannot drag.
         </div>
 
         <Toasts

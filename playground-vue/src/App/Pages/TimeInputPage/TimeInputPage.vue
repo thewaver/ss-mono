@@ -28,7 +28,8 @@ const examples: ExampleDefs[] = [
     {
         key: "twelve",
         name: "Twelve hour",
-        readout: () => `value: ${describeTime(twelveHourTime.value)} — the value stays 24-hour, the field reads it as 12`,
+        readout: () =>
+            `value: ${describeTime(twelveHourTime.value)} — the value stays 24-hour, the field reads it as 12`,
         path: `${EXAMPLES_ROOT}/Time.vue`,
     },
     {

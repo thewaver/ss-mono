@@ -19,27 +19,28 @@ import type { SlotsContext } from "../../Utils/typeUtils";
 import type { PreviewProps, PreviewSlots, PreviewTriggerProps } from "./Preview.types";
 
 const PreviewTrigger = defineComponent(
-    (props: PreviewTriggerProps, { slots }: SlotsContext<Pick<PreviewSlots, "renderTrigger">>) => () => {
-        const isDisabled = props.flags.isDisabled ?? false;
+    (props: PreviewTriggerProps, { slots }: SlotsContext<Pick<PreviewSlots, "renderTrigger">>) =>
+        () => {
+            const isDisabled = props.flags.isDisabled ?? false;
 
-        return (
-            <button
-                id={props.id}
-                type="button"
-                class={PreviewStyles.previewTrigger}
-                aria-expanded={props.isExpanded}
-                aria-controls={props.contentId}
-                aria-disabled={isDisabled || undefined}
-                onClick={() => {
-                    if (isDisabled) return;
+            return (
+                <button
+                    id={props.id}
+                    type="button"
+                    class={PreviewStyles.previewTrigger}
+                    aria-expanded={props.isExpanded}
+                    aria-controls={props.contentId}
+                    aria-disabled={isDisabled || undefined}
+                    onClick={() => {
+                        if (isDisabled) return;
 
-                    props.onToggle();
-                }}
-            >
-                {callSlot(slots.renderTrigger, props.flags)}
-            </button>
-        );
-    },
+                        props.onToggle();
+                    }}
+                >
+                    {callSlot(slots.renderTrigger, props.flags)}
+                </button>
+            );
+        },
     {
         name: "PreviewTrigger",
         props: declareProps<PreviewTriggerProps>({

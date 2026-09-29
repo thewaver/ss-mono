@@ -30,9 +30,7 @@ export const TimeInputPage = () => {
             name: "Twelve hour",
             readout: () =>
                 `value: ${describeTime(twelveHourState[0])} — the value stays 24-hour, the field reads it as 12`,
-            component: () => (
-                <TimeExample value={twelveHourState} isTwelveHour={true} ariaLabel={"Meeting time"} />
-            ),
+            component: () => <TimeExample value={twelveHourState} isTwelveHour={true} ariaLabel={"Meeting time"} />,
             path: `${EXAMPLES_ROOT}/Time.tsx`,
         },
         {

@@ -109,9 +109,7 @@ export const FileInputPage = () => {
             name: "Drop area with limits",
             readout: () =>
                 `files: ${describe(dropZoneSignal[0]())} — refused: ${describeRejections(getDropZoneRejections())}`,
-            component: () => (
-                <DropZoneExample files={dropZoneSignal} onRejectionsChange={setDropZoneRejections} />
-            ),
+            component: () => <DropZoneExample files={dropZoneSignal} onRejectionsChange={setDropZoneRejections} />,
             path: `${EXAMPLES_ROOT}/DropZone.tsx`,
         },
     ]);

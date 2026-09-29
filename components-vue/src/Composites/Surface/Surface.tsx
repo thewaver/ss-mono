@@ -69,14 +69,15 @@ const renderSurfaceDiv = (props: SurfaceProps, children: VNodeChild) => {
 };
 
 export const Surface = defineComponent(
-    (props: SurfaceProps, { slots }: SlotsContext<SurfaceSlots>) => () =>
-        SurfaceUtils.getIsComplex(
-            props.computeFillDefs?.(MOCK_SIZE, undefined),
-            props.computeStrokeDefs?.(MOCK_SIZE, undefined),
-            props.lameExponents,
-        )
-            ? renderSurfaceSVG(props, slots.default?.())
-            : renderSurfaceDiv(props, slots.default?.()),
+    (props: SurfaceProps, { slots }: SlotsContext<SurfaceSlots>) =>
+        () =>
+            SurfaceUtils.getIsComplex(
+                props.computeFillDefs?.(MOCK_SIZE, undefined),
+                props.computeStrokeDefs?.(MOCK_SIZE, undefined),
+                props.lameExponents,
+            )
+                ? renderSurfaceSVG(props, slots.default?.())
+                : renderSurfaceDiv(props, slots.default?.()),
     {
         name: "Surface",
         slots: Object as SlotsType<SurfaceSlots>,

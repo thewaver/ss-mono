@@ -50,11 +50,7 @@ export const MultiSelectPage = () => {
             readout: () =>
                 `values: [${groupedState[0].join(", ")}] | query: "${query}" — the page drops groups it has emptied`,
             component: () => (
-                <MultiSelectGroupedExample
-                    values={groupedState}
-                    query={queryState}
-                    options={filteredGroups}
-                />
+                <MultiSelectGroupedExample values={groupedState} query={queryState} options={filteredGroups} />
             ),
             path: `${EXAMPLES_ROOT}/MultiSelectGrouped.tsx`,
         },

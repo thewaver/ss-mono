@@ -1,8 +1,8 @@
 <script setup lang="ts">
 import { shallowRef } from "vue";
 
-import PageExamples from "../../../PageComponents/Examples/PageExamples.vue";
 import type { ExampleDefs } from "../../../PageComponents/Examples/Examples.types";
+import PageExamples from "../../../PageComponents/Examples/PageExamples.vue";
 import PageCarouselBox from "../../../StyledComponents/CarouselContent/PageCarouselBox.vue";
 import { useCarouselsControls } from "../Carousels.utils";
 import PageCarouselsPanel from "../PageCarouselsPanel.vue";

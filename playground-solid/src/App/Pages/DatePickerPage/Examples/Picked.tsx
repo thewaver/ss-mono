@@ -91,9 +91,7 @@ export const PickedExample = (props: Props) => {
                 <PageCalendarFrame>
                     <Show
                         when={getIsMonthPrecision()}
-                        fallback={
-                            <PageCalendarCaption month={monthSignal} key={props.key} locale={() => LOCALE} />
-                        }
+                        fallback={<PageCalendarCaption month={monthSignal} key={props.key} locale={() => LOCALE} />}
                     >
                         <PageCalendarPagedCaption
                             key={props.key}

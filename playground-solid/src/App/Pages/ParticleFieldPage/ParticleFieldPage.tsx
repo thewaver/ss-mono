@@ -63,11 +63,7 @@ const DefaultExampleWrapper = (
     return (
         <div class={styles.stack}>
             <PageMeasureBox width={() => BOX_WIDTH} height={() => BOX_HEIGHT}>
-                <DefaultExample
-                    {...props}
-                    playback={props.ownPlayback}
-                    progress={props.progress}
-                />
+                <DefaultExample {...props} playback={props.ownPlayback} progress={props.progress} />
             </PageMeasureBox>
 
             <PagePlaybackScrubber
@@ -192,11 +188,7 @@ export const ParticleFieldPage = () => {
                 readout: () =>
                     `${Math.round(progress[0]() * PERCENT)}% through the pass, ${defaultPlayback[0]() ? "running" : "stopped"} — the progress signal is written by the field while it plays, and writing it moves the pass there`,
                 component: () => (
-                    <DefaultExampleWrapper
-                        {...commonProps}
-                        progress={progress}
-                        ownPlayback={defaultPlayback}
-                    />
+                    <DefaultExampleWrapper {...commonProps} progress={progress} ownPlayback={defaultPlayback} />
                 ),
                 path: `${EXAMPLES_ROOT}/Default.tsx`,
             },

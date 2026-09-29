@@ -25,8 +25,7 @@ export const FocusOnErrorExample = (props: Props) => (
         renderContent={(state) => {
             const planMessage = state.hasSubmitted && props.plan[0] === undefined ? "Pick a plan." : "";
 
-            const topicsMessage =
-                state.hasSubmitted && props.topics[0].length < 1 ? "Pick at least one topic." : "";
+            const topicsMessage = state.hasSubmitted && props.topics[0].length < 1 ? "Pick at least one topic." : "";
 
             return (
                 <PageFormStack>

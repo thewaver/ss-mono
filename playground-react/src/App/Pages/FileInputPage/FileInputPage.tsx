@@ -68,11 +68,7 @@ export const FileInputPage = () => {
             readout: () =>
                 `files: ${describe(rejectingState[0])}${rejection ? ` — ${rejection}` : ` — anything over ${MAX_ATTACHMENT_BYTES} bytes is refused`}`,
             component: () => (
-                <RejectingSetterExample
-                    files={rejectingState}
-                    rejection={rejection}
-                    onRejectionChange={setRejection}
-                />
+                <RejectingSetterExample files={rejectingState} rejection={rejection} onRejectionChange={setRejection} />
             ),
             path: `${EXAMPLES_ROOT}/RejectingSetter.tsx`,
         },

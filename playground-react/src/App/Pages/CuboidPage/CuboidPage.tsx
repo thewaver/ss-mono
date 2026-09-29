@@ -129,12 +129,7 @@ export const CuboidPage = () => {
             readout: () =>
                 `${CuboidUtils.getFacingFromTurns(yawState[0], pitchState[0])} — across ${yawState[0]}, up ${pitchState[0]}; the two counts are quarter turns rather than a face, so the box always takes the way it was pushed`,
             component: () => (
-                <DefaultExample
-                    yaw={yawState}
-                    pitch={pitchState}
-                    size={size}
-                    transitionDurationMs={turnDurationMs}
-                />
+                <DefaultExample yaw={yawState} pitch={pitchState} size={size} transitionDurationMs={turnDurationMs} />
             ),
             path: `${EXAMPLES_ROOT}/Default.tsx`,
         },

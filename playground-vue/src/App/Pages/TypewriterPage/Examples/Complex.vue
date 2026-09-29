@@ -12,13 +12,15 @@ defineProps<Props>();
 
 <template>
     <Typewriter :animation-name="animationName" :compute-character-weights="computeCharacterWeights"
-        >{{ "This is a bit of " }}<b
-            >text that appears<div :class="styles.textHighlight" :style="{ color: 'red' }" title="ONE MEANS ONE!">
+        >{{ "This is a bit of "
+        }}<b
+            >text that appears
+            <div :class="styles.textHighlight" :style="{ color: 'red' }" title="ONE MEANS ONE!">
                 <i>one</i>
             </div></b
-        ><span>single</span>{{ " text character\tat a time," }}<br /><br /><div
-            :style="{ width: '100%', height: '0.5em', borderBottom: '2px solid currentColor' }"
-        />{{ "and has\nescaped " }}<img :src="knight" :height="24" :style="{ verticalAlign: 'middle' }" /><a
+        ><span>single</span>{{ " text character\tat a time," }}<br /><br />
+        <div :style="{ width: '100%', height: '0.5em', borderBottom: '2px solid currentColor' }" />
+        {{ "and has\nescaped " }}<img :src="knight" :height="24" :style="{ verticalAlign: 'middle' }" /><a
             href="http://www.google.com"
             >characters.</a
         ></Typewriter

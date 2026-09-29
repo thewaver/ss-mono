@@ -17,12 +17,7 @@ export const PairExample = (props: Props) => (
         <div className={styles.sortableColumn}>
             <div className={styles.sortableCaption}>Hand</div>
 
-            <CardsExample
-                groupId={props.groupId}
-                items={props.hand}
-                ariaLabel={"Hand"}
-                emptyText={"No cards"}
-            />
+            <CardsExample groupId={props.groupId} items={props.hand} ariaLabel={"Hand"} emptyText={"No cards"} />
         </div>
 
         <div className={styles.sortableColumn}>

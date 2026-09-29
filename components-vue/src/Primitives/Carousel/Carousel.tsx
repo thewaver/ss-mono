@@ -30,26 +30,27 @@ import type {
 } from "./Carousel.types";
 
 const CarouselControl = defineComponent(
-    (props: CarouselControlProps, { slots }: SlotsContext<InteractionControlSlots>) => () => {
-        const isDisabled = props.flags.isDisabled ?? false;
+    (props: CarouselControlProps, { slots }: SlotsContext<InteractionControlSlots>) =>
+        () => {
+            const isDisabled = props.flags.isDisabled ?? false;
 
-        return (
-            <button
-                type="button"
-                class={CarouselStyles.carouselControl}
-                aria-label={props.ariaLabel}
-                aria-disabled={isDisabled || undefined}
-                aria-current={props.isCurrent || undefined}
-                onClick={() => {
-                    if (isDisabled) return;
+            return (
+                <button
+                    type="button"
+                    class={CarouselStyles.carouselControl}
+                    aria-label={props.ariaLabel}
+                    aria-disabled={isDisabled || undefined}
+                    aria-current={props.isCurrent || undefined}
+                    onClick={() => {
+                        if (isDisabled) return;
 
-                    props.onActivate();
-                }}
-            >
-                {callSlot(slots.renderContent, props.flags)}
-            </button>
-        );
-    },
+                        props.onActivate();
+                    }}
+                >
+                    {callSlot(slots.renderContent, props.flags)}
+                </button>
+            );
+        },
     {
         name: "CarouselControl",
         props: declareProps<CarouselControlProps>({
@@ -232,8 +233,7 @@ export const Carousel = defineComponent(
                                 onActivate={() => goTo(pickIndex)}
                             >
                                 {{
-                                    renderContent: () =>
-                                        callSlot(slots.renderPick, { index: pickIndex, renderProps }),
+                                    renderContent: () => callSlot(slots.renderPick, { index: pickIndex, renderProps }),
                                 }}
                             </CarouselControl>
                         ),

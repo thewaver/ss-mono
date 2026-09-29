@@ -1,5 +1,15 @@
 import type { Accessor } from "solid-js";
-import { For, Index, Show, createComputed, createEffect, createMemo, createSignal, createUniqueId, untrack } from "solid-js";
+import {
+    For,
+    Index,
+    Show,
+    createComputed,
+    createEffect,
+    createMemo,
+    createSignal,
+    createUniqueId,
+    untrack,
+} from "solid-js";
 
 import {
     LISTBOX_DEFAULTS,

@@ -10,13 +10,13 @@ import type { WithNoSample } from "@thewaver/ss-playground/App/PageComponents/Sa
 
 import { SVGGradientKnobs } from "../../../Knobs/SVGGradients.const";
 import { TimedGradientKnobs } from "../../../Knobs/TimedGradients.const";
-import PageExamples from "../../../PageComponents/Examples/PageExamples.vue";
 import type { ExampleDefs } from "../../../PageComponents/Examples/Examples.types";
+import PageExamples from "../../../PageComponents/Examples/PageExamples.vue";
 import PageGroupedSelectField from "../../../PageComponents/Field/PageGroupedSelectField.vue";
 import PageNumberField from "../../../PageComponents/Field/PageNumberField.vue";
 import PageSelectField from "../../../PageComponents/Field/PageSelectField.vue";
-import PageKnobs from "../../../PageComponents/Knobs/Knobs.vue";
 import type { Knob } from "../../../PageComponents/Knobs/Knobs.types";
+import PageKnobs from "../../../PageComponents/Knobs/Knobs.vue";
 import PageProp from "../../../PageComponents/Prop/Prop.vue";
 import PagePropsDivider from "../../../PageComponents/PropsPanel/PagePropsDivider.vue";
 import PagePropsGroups from "../../../PageComponents/PropsPanel/PagePropsGroups.vue";

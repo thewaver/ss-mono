@@ -160,10 +160,7 @@ export const MenuPage = () => {
             name: "Rows that hold a state",
             readout: () => `${lastViewAction} — ticked: [${viewState[0].map((action) => action.name).join(", ")}]`,
             component: () => (
-                <StatefulExample
-                    checked={viewState}
-                    onActivate={(action) => setLastViewAction(`ran ${action.name}`)}
-                />
+                <StatefulExample checked={viewState} onActivate={(action) => setLastViewAction(`ran ${action.name}`)} />
             ),
             path: `${EXAMPLES_ROOT}/Stateful.tsx`,
         },

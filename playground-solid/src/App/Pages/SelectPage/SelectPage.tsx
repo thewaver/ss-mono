@@ -220,9 +220,7 @@ export const SelectPage = () => {
             key: "disabledOptions",
             name: "Disabled options",
             readout: () => `value: ${disabledOptionSignal[0]() ?? "undefined"} — arrows skip Denmark and Finland`,
-            component: () => (
-                <CountriesExample value={disabledOptionSignal} options={() => COUNTRIES_WITH_DISABLED} />
-            ),
+            component: () => <CountriesExample value={disabledOptionSignal} options={() => COUNTRIES_WITH_DISABLED} />,
             path: `${EXAMPLES_ROOT}/Countries.tsx`,
         },
         {
@@ -309,11 +307,7 @@ export const SelectPage = () => {
             readout: () =>
                 `value: ${filterSignal[0]()?.code ?? "undefined"} | query: "${filterQuerySignal[0]()}" — ${getFilteredAirports().length} of ${AIRPORTS.length} shown; the page matches on city or code, which only it knows about`,
             component: () => (
-                <AutocompleteExample
-                    value={filterSignal}
-                    query={filterQuerySignal}
-                    options={getFilteredAirports}
-                />
+                <AutocompleteExample value={filterSignal} query={filterQuerySignal} options={getFilteredAirports} />
             ),
             path: `${EXAMPLES_ROOT}/Autocomplete.tsx`,
         },

@@ -67,7 +67,12 @@ const examples: ExampleDefs[] = [
         </template>
 
         <template #focusOnError>
-            <FocusOnErrorExample v-model:plan="plan" v-model:topics="topics" @submit="submitFocus" @reset="resetFocus" />
+            <FocusOnErrorExample
+                v-model:plan="plan"
+                v-model:topics="topics"
+                @submit="submitFocus"
+                @reset="resetFocus"
+            />
         </template>
     </PageExamples>
 </template>

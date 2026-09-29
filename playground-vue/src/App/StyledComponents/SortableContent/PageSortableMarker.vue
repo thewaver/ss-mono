@@ -10,7 +10,5 @@ const layerClass = useLayerClass();
 </script>
 
 <template>
-    <div
-        :class="[orientation === 'horizontal' ? styles.sortableMarkerRow : styles.sortableMarkerColumn, layerClass]"
-    />
+    <div :class="[orientation === 'horizontal' ? styles.sortableMarkerRow : styles.sortableMarkerColumn, layerClass]" />
 </template>

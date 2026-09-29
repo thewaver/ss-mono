@@ -36,15 +36,12 @@ export const Spotlight = (props: SpotlightProps) => {
 
     const getPadding = createMemo(() => access(props.padding) ?? SPOTLIGHT_DEFAULTS.padding);
 
-    const { getIsVisible, getTransitionTarget } = ElementFaderSolidUtils.createFader(
-        () => props.visibility[0](),
-        {
-            getTransitionDurationMs,
-            getRef: getPortalRef,
-            onShow: props.onShow,
-            onHide: props.onHide,
-        },
-    );
+    const { getIsVisible, getTransitionTarget } = ElementFaderSolidUtils.createFader(() => props.visibility[0](), {
+        getTransitionDurationMs,
+        getRef: getPortalRef,
+        onShow: props.onShow,
+        onHide: props.onHide,
+    });
 
     const getHasPopup = createMemo(() => access(props.mode) === "guide" && props.renderPopup !== undefined);
 

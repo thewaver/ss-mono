@@ -43,7 +43,11 @@ const examples: ExampleDefs[] = [
 
 <template>
     <PagePropsPanel scope="global">
-        <PageProp item-key="columnCount" label="Columns" hint="How many levels fit across at once, counting the one in view.">
+        <PageProp
+            item-key="columnCount"
+            label="Columns"
+            hint="How many levels fit across at once, counting the one in view."
+        >
             <PageNumberField
                 :value="columnCount"
                 :min="IcicleKnobs.MIN_COLUMN_COUNT"

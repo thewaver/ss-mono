@@ -89,9 +89,7 @@ watch(hue, (next) => {
 <template>
     <Button :ref="setTriggerRef" @click="toggle">
         <template #renderContent="flags">
-            <PageColorFieldTrigger :flags="flags">
-                <PageColorSwatch :value="css" />{{ hexa }}
-            </PageColorFieldTrigger>
+            <PageColorFieldTrigger :flags="flags"> <PageColorSwatch :value="css" />{{ hexa }} </PageColorFieldTrigger>
         </template>
     </Button>
 

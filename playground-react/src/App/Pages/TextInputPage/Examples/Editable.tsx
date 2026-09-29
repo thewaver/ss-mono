@@ -59,9 +59,7 @@ export const EditableExample = (props: Props) => {
                 }}
                 ariaLabel={`Edit name, ${props.value[0]}`}
                 onClick={startEditing}
-                renderContent={(flags) => (
-                    <PageInlineEditContent flags={flags}>{props.value[0]}</PageInlineEditContent>
-                )}
+                renderContent={(flags) => <PageInlineEditContent flags={flags}>{props.value[0]}</PageInlineEditContent>}
             />
         );
     }

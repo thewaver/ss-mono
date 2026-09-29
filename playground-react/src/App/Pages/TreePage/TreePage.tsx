@@ -82,9 +82,7 @@ export const TreePage = () => {
             name: "In a right-to-left box",
             readout: () =>
                 `value: ${rightToLeftState[0] ?? "undefined"} | expanded: ${JSON.stringify(rightToLeftExpandedState[0])} — the box around the tree sets dir="rtl", so left opens a branch and right closes it or climbs to the parent`,
-            component: () => (
-                <RightToLeftExample value={rightToLeftState} expanded={rightToLeftExpandedState} />
-            ),
+            component: () => <RightToLeftExample value={rightToLeftState} expanded={rightToLeftExpandedState} />,
             path: `${EXAMPLES_ROOT}/RightToLeft.tsx`,
         },
         {
@@ -101,11 +99,7 @@ export const TreePage = () => {
             readout: () =>
                 `value: ${disabledState[0] ?? "undefined"} — arrows skip index.ts and Lib, while what is inside Lib stays reachable`,
             component: () => (
-                <FilesExample
-                    value={disabledState}
-                    expanded={disabledExpandedState}
-                    nodes={FILES_WITH_DISABLED}
-                />
+                <FilesExample value={disabledState} expanded={disabledExpandedState} nodes={FILES_WITH_DISABLED} />
             ),
             path: `${EXAMPLES_ROOT}/Files.tsx`,
         },
@@ -115,11 +109,7 @@ export const TreePage = () => {
             readout: () =>
                 `value: ${reachableState[0] ?? "undefined"} — arrows stop on node_modules, hover explains why, and nothing opens it`,
             component: () => (
-                <FilesExample
-                    value={reachableState}
-                    expanded={reachableExpandedState}
-                    nodes={FILES_WITH_REACHABLE}
-                />
+                <FilesExample value={reachableState} expanded={reachableExpandedState} nodes={FILES_WITH_REACHABLE} />
             ),
             path: `${EXAMPLES_ROOT}/Files.tsx`,
         },
@@ -144,9 +134,7 @@ export const TreePage = () => {
             name: "Links through a component",
             readout: () =>
                 `value: ${customLinkState[0] ?? "undefined"} — the same nodes rendered by a consumer's own link component`,
-            component: () => (
-                <LinkComponentExample value={customLinkState} expanded={customLinkExpandedState} />
-            ),
+            component: () => <LinkComponentExample value={customLinkState} expanded={customLinkExpandedState} />,
             path: `${EXAMPLES_ROOT}/LinkComponent.tsx`,
         },
         {

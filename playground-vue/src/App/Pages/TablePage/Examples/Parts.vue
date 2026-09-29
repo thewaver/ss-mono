@@ -17,12 +17,6 @@ const columns = createPartColumns({ isResizable: false });
 
 <template>
     <div :class="styles.tableFrameShort">
-        <Table
-            v-model:sort="sort"
-            v-model:selection="selection"
-            :columns="columns"
-            :rows="PARTS"
-            ariaLabel="Parts"
-        />
+        <Table v-model:sort="sort" v-model:selection="selection" :columns="columns" :rows="PARTS" ariaLabel="Parts" />
     </div>
 </template>
