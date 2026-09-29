@@ -30,8 +30,8 @@ const isExpanded = useModel(props, "expanded");
             :id="sidebarId"
             :edge="edge"
             :layout="layout"
-            :collapsed-width="COLLAPSED_WIDTH"
-            :expanded-width="EXPANDED_WIDTH"
+            :collapsed-size="COLLAPSED_WIDTH"
+            :expanded-size="EXPANDED_WIDTH"
             :is-expanded-on-hover="isExpandedOnHover"
             v-model:expanded="isExpanded"
         >

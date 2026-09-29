@@ -33,7 +33,7 @@ describe("the pile's geometry", () => {
     });
 
     it("sits the bottom card flush and lifts each one above it by a gap", () => {
-        const opts = { mountedLength: 3, pileExtentPx: 8, cardGap: 4, motion: REST };
+        const opts = { mountedLength: 3, pileExtentPx: 8, cardGap: 4, getMotion: () => REST };
 
         expect(CardStackUtils.getCardTransform(2, opts)).toBe("translateY(8px)");
         expect(CardStackUtils.getCardTransform(1, opts)).toBe("translateY(4px)");
@@ -45,17 +45,17 @@ describe("the pile's geometry", () => {
             mountedLength: 1,
             pileExtentPx: 0,
             cardGap: 4,
-            motion: { ...REST, leavingTo: "left" as const },
+            getMotion: () => ({ ...REST, leavingTo: "left" as const }),
         };
 
         expect(CardStackUtils.getCardTransform(0, leaving)).toBe("translate(-150%, 0%) translateY(0px)");
     });
 
     it("runs the top card's move with no transition while it is swiped or about to return", () => {
-        expect(CardStackUtils.getCardTransitionDurationMs(0, { isSwiping: true, motion: REST, durationMs: 250 })).toBe(
+        expect(CardStackUtils.getCardTransitionDurationMs(0, { getIsSwiping: () => true, getMotion: () => REST, durationMs: 250 })).toBe(
             0,
         );
-        expect(CardStackUtils.getCardTransitionDurationMs(1, { isSwiping: true, motion: REST, durationMs: 250 })).toBe(
+        expect(CardStackUtils.getCardTransitionDurationMs(1, { getIsSwiping: () => true, getMotion: () => REST, durationMs: 250 })).toBe(
             250,
         );
     });

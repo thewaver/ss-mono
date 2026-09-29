@@ -5,6 +5,7 @@
         AnchorUtils,
         HoverIntentUtils,
         SIDEBAR_DEFAULTS,
+        SIDEBAR_SIZE_PROPERTIES,
         SidebarUtils,
         SidebarStyles as styles,
     } from "@thewaver/ss-components";
@@ -110,19 +111,26 @@
         return Math.max(AnchorUtils.getStackingBase(element), ElevationSvelteUtils.getBase(element)) + 1;
     });
 
-    const panelWidth = $derived(fader.getTransitionTarget() === 1 ? props.expandedWidth : props.collapsedWidth);
+    const sizeProperty = $derived(SIDEBAR_SIZE_PROPERTIES[edge]);
+    const panelSize = $derived(fader.getTransitionTarget() === 1 ? props.expandedSize : props.collapsedSize);
 </script>
 
 <div
     bind:this={root}
     id={props.id}
-    class={styles.sidebarRoot}
-    style:width={isOverlay ? `${props.collapsedWidth}px` : undefined}
+    class={[styles.sidebarRoot, styles.sidebarRootEdgeVariants[edge]]}
+    style:width={sizeProperty === "width" && isOverlay ? `${props.collapsedSize}px` : undefined}
+    style:height={sizeProperty === "height" && isOverlay ? `${props.collapsedSize}px` : undefined}
 >
     <div
         bind:this={panel}
-        class={[styles.sidebarPanel, isOverlay && styles.sidebarPanelOverlayVariants[edge]]}
-        style:width={`${panelWidth}px`}
+        class={[
+            styles.sidebarPanel,
+            styles.sidebarPanelEdgeVariants[edge],
+            isOverlay && styles.sidebarPanelOverlayVariants[edge],
+        ]}
+        style:width={sizeProperty === "width" ? `${panelSize}px` : undefined}
+        style:height={sizeProperty === "height" ? `${panelSize}px` : undefined}
         style:z-index={zIndex}
         style:transition-duration={`${appliedDurationMs}ms`}
     >

@@ -1,9 +1,11 @@
-import { useMemo } from "react";
-import type { ApiGroupKind, ApiTableKind } from "virtual:component-api";
-import COMPONENT_API from "virtual:component-api";
+import { useEffect, useState } from "react";
+import type { ApiGroup, ApiGroupKind, ApiTableKind } from "virtual:component-api";
 
 import * as styles from "@thewaver/ss-playground/App/PageComponents/DocsView/DocsView.css";
-import { toHighlightedType } from "@thewaver/ss-playground/App/PageComponents/DocsView/DocsView.utils";
+import {
+    loadApiGroups,
+    toHighlightedType,
+} from "@thewaver/ss-playground/App/PageComponents/DocsView/DocsView.utils";
 
 import type { PageDocsTableProps, PageDocsViewProps } from "./DocsView.types";
 
@@ -100,13 +102,24 @@ const PageDocsTable = (props: PageDocsTableProps) => {
 };
 
 export const PageDocsView = (props: PageDocsViewProps) => {
-    const groups = useMemo(() => COMPONENT_API[props.name.toLowerCase()] ?? [], [props.name]);
+    const [groups, setGroups] = useState<ApiGroup[]>();
+
+    useEffect(() => {
+        let isCurrent = true;
+
+        setGroups(undefined);
+        loadApiGroups(props.name).then((loaded) => isCurrent && setGroups(loaded));
+
+        return () => {
+            isCurrent = false;
+        };
+    }, [props.name]);
 
     return (
         <div className={styles.docsView} data-view={"docs"}>
             <p className={styles.docsLead}>{props.description}</p>
 
-            {groups.length ? (
+            {groups === undefined ? null : groups.length ? (
                 groups.map((group) => (
                     <section key={group.kind} className={styles.docsGroup} data-api-group={group.kind}>
                         <h2 className={styles.docsGroupTitle}>{GROUP_TITLES[group.kind]}</h2>

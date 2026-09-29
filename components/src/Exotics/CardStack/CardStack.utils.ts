@@ -125,18 +125,20 @@ export namespace CardStackUtils {
      * @param opts.mountedLength How many cards are mounted right now.
      * @param opts.pileExtentPx From {@link getPileExtentPx}.
      * @param opts.cardGap How far apart the cards sit, in pixels.
-     * @param opts.motion The top card's push and flight.
+     * @param opts.getMotion Reads the top card's push and flight. Called only for the top card, so a view that follows
+     * what it reads leaves every card below the top out of the push, which changes on each pointer move.
      */
     export const getCardTransform = (
         depth: number,
-        opts: { mountedLength: number; pileExtentPx: number; cardGap: number; motion: CardStackMotion },
+        opts: { mountedLength: number; pileExtentPx: number; cardGap: number; getMotion: () => CardStackMotion },
     ) => {
         const stacked = `translateY(${opts.pileExtentPx - (opts.mountedLength - SINGLE - depth) * opts.cardGap}px)`;
 
         if (depth !== TOP_DEPTH) return stacked;
 
-        const away = opts.motion.leavingTo ?? opts.motion.returningFrom;
-        const offset = away === undefined ? opts.motion.travel : LEAVE_OFFSETS[away];
+        const motion = opts.getMotion();
+        const away = motion.leavingTo ?? motion.returningFrom;
+        const offset = away === undefined ? motion.travel : LEAVE_OFFSETS[away];
 
         return `translate(${offset.x * PERCENT}%, ${offset.y * PERCENT}%) ${stacked}`;
     };
@@ -146,15 +148,16 @@ export namespace CardStackUtils {
      * side before a recall; everything else eases over the stack's duration.
      *
      * @param depth How far down the pile the card is.
-     * @param opts.isSwiping Whether a swipe is under way.
-     * @param opts.motion The top card's push and flight.
+     * @param opts.getIsSwiping Reads whether a swipe is under way. Called only for the top card.
+     * @param opts.getMotion Reads the top card's push and flight. Called only for the top card, and only when no swipe
+     * is under way.
      * @param opts.durationMs The stack's transition duration.
      */
     export const getCardTransitionDurationMs = (
         depth: number,
-        opts: { isSwiping: boolean; motion: CardStackMotion; durationMs: number },
+        opts: { getIsSwiping: () => boolean; getMotion: () => CardStackMotion; durationMs: number },
     ) =>
-        depth === TOP_DEPTH && (opts.isSwiping || opts.motion.returningFrom !== undefined)
+        depth === TOP_DEPTH && (opts.getIsSwiping() || opts.getMotion().returningFrom !== undefined)
             ? NO_DURATION
             : opts.durationMs;
 
@@ -170,10 +173,10 @@ export namespace CardStackUtils {
      * What one card's painter is told about the push and the flight, which only the top card ever has.
      *
      * @param isTop Whether the card is on top.
-     * @param motion The top card's push and flight.
+     * @param getMotion Reads the top card's push and flight. Called only when the card is on top.
      */
-    export const getCardMotion = (isTop: boolean, motion: CardStackMotion): CardStackMotion =>
-        isTop ? motion : { travel: NO_TRAVEL, leavingTo: undefined, returningFrom: undefined };
+    export const getCardMotion = (isTop: boolean, getMotion: () => CardStackMotion): CardStackMotion =>
+        isTop ? getMotion() : { travel: NO_TRAVEL, leavingTo: undefined, returningFrom: undefined };
 
     /**
      * The pile: how far the top card is pushed and whether it is flying, and the commands that send, recall and deal.

@@ -10,17 +10,23 @@ export type SidebarProps = {
      * `aria-controls`.
      */
     "id"?: string;
-    /** Which side of whatever it sits beside the sidebar is docked to, and so which way it grows. */
+    /**
+     * Which side of whatever it sits beside the sidebar is docked to, and so which way it grows. Docked to the top
+     * or bottom it spans the full width and grows in height.
+     */
     "edge"?: SidebarEdge;
     /**
      * Whether growing moves the content beside it out of the way, or grows over that content and leaves it where it
-     * was. Overlaid, the sidebar only ever takes up its collapsed width in the layout.
+     * was. Overlaid, the sidebar only ever takes up its collapsed size in the layout.
      */
     "layout"?: SidebarLayout;
-    /** How wide the sidebar is while collapsed, in pixels. */
-    "collapsedWidth": number;
-    /** How wide the sidebar is while expanded, in pixels. */
-    "expandedWidth": number;
+    /**
+     * How far the sidebar reaches out from its edge while collapsed, in pixels: its width docked to the left or right,
+     * its height docked to the top or bottom.
+     */
+    "collapsedSize": number;
+    /** How far the sidebar reaches out from its edge while expanded, in pixels, measured as `collapsedSize` is. */
+    "expandedSize": number;
     /** How long the sidebar takes to grow and shrink. */
     "transitionDurationMs"?: number;
     /**
@@ -52,7 +58,7 @@ export type SidebarSlots = {
      * that is only meant to be seen expanded should be hidden while collapsed.
      *
      * Nothing drawn here is clipped, so a shadow or an outline can fall past the sidebar's edge. The box it is drawn
-     * into is always exactly as wide as the sidebar, mid-transition included; contents laid out at the expanded width
+     * into is always exactly the sidebar's size, mid-transition included; contents laid out at the expanded size
      * have to clip themselves to that box.
      */
     renderContent: SidebarContentRenderer;

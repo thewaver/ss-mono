@@ -1,9 +1,9 @@
 <script setup lang="ts">
-import type { ApiGroupKind } from "virtual:component-api";
-import COMPONENT_API from "virtual:component-api";
-import { computed } from "vue";
+import type { ApiGroup, ApiGroupKind } from "virtual:component-api";
+import { shallowRef, watch } from "vue";
 
 import * as styles from "@thewaver/ss-playground/App/PageComponents/DocsView/DocsView.css";
+import { loadApiGroups } from "@thewaver/ss-playground/App/PageComponents/DocsView/DocsView.utils";
 
 import type { PageDocsViewProps } from "./DocsView.types";
 import PageDocsTable from "./PageDocsTable.vue";
@@ -19,14 +19,33 @@ const GROUP_TITLES: Record<ApiGroupKind, string> = {
 
 const props = defineProps<PageDocsViewProps>();
 
-const groups = computed(() => COMPONENT_API[props.name.toLowerCase()] ?? []);
+const groups = shallowRef<ApiGroup[]>();
+
+watch(
+    () => props.name,
+    (name, _previous, onCleanup) => {
+        let isCurrent = true;
+
+        onCleanup(() => {
+            isCurrent = false;
+        });
+
+        groups.value = undefined;
+        loadApiGroups(name).then((loaded) => {
+            if (isCurrent) groups.value = loaded;
+        });
+    },
+    { immediate: true },
+);
 </script>
 
 <template>
     <div :class="styles.docsView" data-view="docs">
         <p :class="styles.docsLead">{{ description }}</p>
 
-        <template v-if="groups.length">
+        <template v-if="groups === undefined" />
+
+        <template v-else-if="groups.length">
             <section v-for="group in groups" :key="group.kind" :class="styles.docsGroup" :data-api-group="group.kind">
                 <h2 :class="styles.docsGroupTitle">{{ GROUP_TITLES[group.kind] }}</h2>
 

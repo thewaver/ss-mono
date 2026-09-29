@@ -25,8 +25,8 @@
         id={sidebarId}
         edge={props.edge}
         layout={props.layout}
-        collapsedWidth={COLLAPSED_WIDTH}
-        expandedWidth={EXPANDED_WIDTH}
+        collapsedSize={COLLAPSED_WIDTH}
+        expandedSize={EXPANDED_WIDTH}
         isExpandedOnHover={props.isExpandedOnHover}
         bind:expanded
     >

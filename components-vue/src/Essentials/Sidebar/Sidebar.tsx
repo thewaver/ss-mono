@@ -1,6 +1,13 @@
 import { type SlotsType, computed, defineComponent, shallowRef, watch } from "vue";
 
-import { AnchorUtils, HoverIntentUtils, SIDEBAR_DEFAULTS, SidebarStyles, SidebarUtils } from "@thewaver/ss-components";
+import {
+    AnchorUtils,
+    HoverIntentUtils,
+    SIDEBAR_DEFAULTS,
+    SIDEBAR_SIZE_PROPERTIES,
+    SidebarStyles,
+    SidebarUtils,
+} from "@thewaver/ss-components";
 
 import { DismisserVueUtils } from "../../Abstracts/Dismisser/DismisserVue.utils";
 import { ElementFaderVueUtils } from "../../Abstracts/ElementFader/ElementFaderVue.utils";
@@ -101,23 +108,25 @@ export const Sidebar = defineComponent(
             const isOverlay = (props.layout ?? SIDEBAR_DEFAULTS.layout) === "overlay";
             const isRaised = isOverlay && phase.value !== "collapsed";
             const zIndex = Math.max(AnchorUtils.getStackingBase(rootRef.value), elevationBase.value) + 1;
-            const panelWidth = fader.transitionTarget.value === 1 ? props.expandedWidth : props.collapsedWidth;
+            const sizeProperty = SIDEBAR_SIZE_PROPERTIES[edge];
+            const panelSize = fader.transitionTarget.value === 1 ? props.expandedSize : props.collapsedSize;
 
             return (
                 <div
                     ref={rootRef}
                     id={props.id}
-                    class={SidebarStyles.sidebarRoot}
-                    style={{ width: isOverlay ? `${props.collapsedWidth}px` : undefined }}
+                    class={[SidebarStyles.sidebarRoot, SidebarStyles.sidebarRootEdgeVariants[edge]]}
+                    style={{ [sizeProperty]: isOverlay ? `${props.collapsedSize}px` : undefined }}
                 >
                     <div
                         ref={panelRef}
                         class={[
                             SidebarStyles.sidebarPanel,
+                            SidebarStyles.sidebarPanelEdgeVariants[edge],
                             isOverlay && SidebarStyles.sidebarPanelOverlayVariants[edge],
                         ]}
                         style={{
-                            width: `${panelWidth}px`,
+                            [sizeProperty]: `${panelSize}px`,
                             zIndex: isRaised ? zIndex : undefined,
                             transitionDuration: `${appliedDurationMs.value}ms`,
                         }}
@@ -138,8 +147,8 @@ export const Sidebar = defineComponent(
             "id": null,
             "edge": null,
             "layout": null,
-            "collapsedWidth": null,
-            "expandedWidth": null,
+            "collapsedSize": null,
+            "expandedSize": null,
             "transitionDurationMs": null,
             "isExpandedOnHover": Boolean,
             "hoverShowDelayMs": null,

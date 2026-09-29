@@ -16,6 +16,7 @@ import {
     toBaseRoute,
     toPageViewRoute,
 } from "@thewaver/ss-playground/App/PageComponents/ViewTabs/ViewTabs.const";
+import { IS_BUILD_PROGRESS_SHOWN } from "@thewaver/ss-playground/App/PageComponents/BuildProgress/BuildProgress.utils";
 import { FunctionUtils, Size2d, StringUtils } from "@thewaver/ss-utils";
 
 import {
@@ -32,6 +33,7 @@ import {
     SEARCH_FIELD_WIDTH,
 } from "./App.const";
 import type { ComponentConfig, MenuBranchConfig, MenuNodeConfig } from "./App.types";
+import { PageBuildProgress } from "./PageComponents/BuildProgress/BuildProgress";
 import { PageTextField } from "./PageComponents/Field/Field";
 import { PageLayer } from "./PageComponents/Layer/Layer";
 import { PageNavSettings } from "./PageComponents/NavSettings/NavSettings";
@@ -321,115 +323,121 @@ export function AppContent(props: RouteSectionProps & { viewportAnchor: SignalPa
     ];
 
     return (
-        <div class={styles.appContent}>
-            <Sidebar
-                id={() => MENU_ID}
-                edge={() => MENU_EDGE}
-                collapsedWidth={() => MENU_COLLAPSED_WIDTH}
-                expandedWidth={() => MENU_EXPANDED_WIDTH}
-                isExpandedOnHover={isAutoHiddenSignal[0]}
-                expanded={menuExpandedSignal}
-                renderContent={(getPhase, getTransitionDurationMs) => (
-                    <nav class={styles.leftMenu} aria-label={"Library"}>
-                        <PageLayer level={1}>
-                            <div class={styles.leftMenuContent}>
-                                <div class={styles.searchContainer}>
-                                    <PageSidebarToggle
-                                        sidebarId={() => MENU_ID}
-                                        edge={() => MENU_EDGE}
-                                        isExpanded={menuExpandedSignal[0]}
-                                        ariaLabel={() =>
-                                            menuExpandedSignal[0]() ? "Auto-hide the menu" : "Keep the menu open"
-                                        }
-                                        onToggle={() => menuExpandedSignal[1](!menuExpandedSignal[0]())}
-                                    />
+        <div class={styles.appFrame}>
+            <Show when={IS_BUILD_PROGRESS_SHOWN}>
+                <PageBuildProgress />
+            </Show>
+
+            <div class={styles.appContent}>
+                <Sidebar
+                    id={() => MENU_ID}
+                    edge={() => MENU_EDGE}
+                    collapsedSize={() => MENU_COLLAPSED_WIDTH}
+                    expandedSize={() => MENU_EXPANDED_WIDTH}
+                    isExpandedOnHover={isAutoHiddenSignal[0]}
+                    expanded={menuExpandedSignal}
+                    renderContent={(getPhase, getTransitionDurationMs) => (
+                        <nav class={styles.leftMenu} aria-label={"Library"}>
+                            <PageLayer level={1}>
+                                <div class={styles.leftMenuContent}>
+                                    <div class={styles.searchContainer}>
+                                        <PageSidebarToggle
+                                            sidebarId={() => MENU_ID}
+                                            edge={() => MENU_EDGE}
+                                            isExpanded={menuExpandedSignal[0]}
+                                            ariaLabel={() =>
+                                                menuExpandedSignal[0]() ? "Auto-hide the menu" : "Keep the menu open"
+                                            }
+                                            onToggle={() => menuExpandedSignal[1](!menuExpandedSignal[0]())}
+                                        />
+
+                                        <div
+                                            class={styles.searchFields}
+                                            classList={{
+                                                [styles.isFaded]: getIsMenuFaded(getPhase()),
+                                                [styles.isHidden]: getPhase() === "collapsed",
+                                            }}
+                                            style={{ "transition-duration": `${getTransitionDurationMs()}ms` }}
+                                        >
+                                            <PageTextField
+                                                value={getSearchTerm}
+                                                width={() => SEARCH_FIELD_WIDTH}
+                                                placeholder={"Search"}
+                                                ariaLabel={"Search components"}
+                                                onInput={setSearchTerm}
+                                            />
+
+                                            <PageNavSettings
+                                                showsDescriptionOnly={showsDescriptionOnlySignal}
+                                                pageView={pageViewSignal}
+                                                viewportAnchor={props.viewportAnchor}
+                                            />
+                                        </div>
+                                    </div>
 
                                     <div
-                                        class={styles.searchFields}
+                                        class={styles.menuTree}
                                         classList={{
                                             [styles.isFaded]: getIsMenuFaded(getPhase()),
                                             [styles.isHidden]: getPhase() === "collapsed",
                                         }}
                                         style={{ "transition-duration": `${getTransitionDurationMs()}ms` }}
                                     >
-                                        <PageTextField
-                                            value={getSearchTerm}
-                                            width={() => SEARCH_FIELD_WIDTH}
-                                            placeholder={"Search"}
-                                            ariaLabel={"Search components"}
-                                            onInput={setSearchTerm}
-                                        />
+                                        <Tree
+                                            nodes={getVisibleNodes}
+                                            value={selectedSignal}
+                                            expanded={expandedSignal}
+                                            ariaLabel={"Library"}
+                                            linkComponent={A}
+                                            computeCustomText={(node) => node.value.name}
+                                            renderNode={(getNode, getRenderProps) => (
+                                                <PageTreeNodeContent
+                                                    renderProps={getRenderProps}
+                                                    hasExamples={() => {
+                                                        const node = getNode().value;
 
-                                        <PageNavSettings
-                                            showsDescriptionOnly={showsDescriptionOnlySignal}
-                                            pageView={pageViewSignal}
-                                            viewportAnchor={props.viewportAnchor}
+                                                        return getIsBranchConfig(node) || node.component !== undefined;
+                                                    }}
+                                                    detail={() => {
+                                                        const node = getNode().value;
+
+                                                        return getIsBranchConfig(node)
+                                                            ? `${flattenConfigs(node.children).length}`
+                                                            : "";
+                                                    }}
+                                                >
+                                                    {getNode().value.name}
+                                                </PageTreeNodeContent>
+                                            )}
                                         />
                                     </div>
                                 </div>
+                            </PageLayer>
+                        </nav>
+                    )}
+                />
 
-                                <div
-                                    class={styles.menuTree}
-                                    classList={{
-                                        [styles.isFaded]: getIsMenuFaded(getPhase()),
-                                        [styles.isHidden]: getPhase() === "collapsed",
-                                    }}
-                                    style={{ "transition-duration": `${getTransitionDurationMs()}ms` }}
-                                >
-                                    <Tree
-                                        nodes={getVisibleNodes}
-                                        value={selectedSignal}
-                                        expanded={expandedSignal}
-                                        ariaLabel={"Library"}
-                                        linkComponent={A}
-                                        computeCustomText={(node) => node.value.name}
-                                        renderNode={(getNode, getRenderProps) => (
-                                            <PageTreeNodeContent
-                                                renderProps={getRenderProps}
-                                                hasExamples={() => {
-                                                    const node = getNode().value;
+                <main class={styles.pageColumn}>
+                    <Show when={getSelectedConfig()} fallback={props.children}>
+                        {(getConfig) => (
+                            <div class={styles.pageBody}>
+                                <div class={styles.pageHeader}>
+                                    <h1 class={styles.pageTitle}>{getConfig().name}</h1>
 
-                                                    return getIsBranchConfig(node) || node.component !== undefined;
-                                                }}
-                                                detail={() => {
-                                                    const node = getNode().value;
+                                    <PageDependencies name={getConfig().name} view={pageViewSignal[0]()} />
 
-                                                    return getIsBranchConfig(node)
-                                                        ? `${flattenConfigs(node.children).length}`
-                                                        : "";
-                                                }}
-                                            >
-                                                {getNode().value.name}
-                                            </PageTreeNodeContent>
-                                        )}
+                                    <PageViewTabs
+                                        baseRoute={componentToRouteName(getConfig().name)}
+                                        hasExamples={getConfig().component !== undefined}
                                     />
                                 </div>
+
+                                {props.children}
                             </div>
-                        </PageLayer>
-                    </nav>
-                )}
-            />
-
-            <main class={styles.pageColumn}>
-                <Show when={getSelectedConfig()} fallback={props.children}>
-                    {(getConfig) => (
-                        <div class={styles.pageBody}>
-                            <div class={styles.pageHeader}>
-                                <h1 class={styles.pageTitle}>{getConfig().name}</h1>
-
-                                <PageDependencies name={getConfig().name} view={pageViewSignal[0]()} />
-
-                                <PageViewTabs
-                                    baseRoute={componentToRouteName(getConfig().name)}
-                                    hasExamples={getConfig().component !== undefined}
-                                />
-                            </div>
-
-                            {props.children}
-                        </div>
-                    )}
-                </Show>
-            </main>
+                        )}
+                    </Show>
+                </main>
+            </div>
         </div>
     );
 }

@@ -44,7 +44,7 @@ declare module "virtual:component-api" {
         tables: ApiTable[];
     };
 
-    const api: Record<string, ApiGroup[]>;
+    const api: Record<string, () => Promise<{ default: ApiGroup[] }>>;
 
     export default api;
 }

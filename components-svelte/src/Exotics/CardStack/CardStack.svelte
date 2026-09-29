@@ -112,11 +112,11 @@
                 mountedLength: mounted.length,
                 pileExtentPx,
                 cardGap,
-                motion: getMotion(),
+                getMotion,
             })}
             style:transition-duration={`${CardStackUtils.getCardTransitionDurationMs(depth, {
-                isSwiping,
-                motion: getMotion(),
+                getIsSwiping: () => isSwiping,
+                getMotion,
                 durationMs: transitionDurationMs,
             })}ms`}
             role="group"
@@ -130,7 +130,7 @@
                 index: entry.index,
                 depth,
                 isTop,
-                ...CardStackUtils.getCardMotion(isTop, getMotion()),
+                ...CardStackUtils.getCardMotion(isTop, getMotion),
             })}
         </div>
     {/each}

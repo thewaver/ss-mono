@@ -124,11 +124,11 @@ export const CardStack = defineComponent(
                                         mountedLength: mounted.length,
                                         pileExtentPx,
                                         cardGap,
-                                        motion: motion.value,
+                                        getMotion: () => motion.value,
                                     }),
                                     transitionDuration: `${CardStackUtils.getCardTransitionDurationMs(depth, {
-                                        isSwiping,
-                                        motion: motion.value,
+                                        getIsSwiping: () => isSwiping,
+                                        getMotion: () => motion.value,
                                         durationMs: transitionDurationMs,
                                     })}ms`,
                                 }}
@@ -145,7 +145,7 @@ export const CardStack = defineComponent(
                                     index: entry.index,
                                     depth,
                                     isTop,
-                                    ...CardStackUtils.getCardMotion(isTop, motion.value),
+                                    ...CardStackUtils.getCardMotion(isTop, () => motion.value),
                                 })}
                             </div>
                         );

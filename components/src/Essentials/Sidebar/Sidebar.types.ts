@@ -1,4 +1,4 @@
-export type SidebarEdge = "left" | "right";
+export type SidebarEdge = "left" | "right" | "top" | "bottom";
 
 export type SidebarLayout = "push" | "overlay";
 

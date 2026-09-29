@@ -13,6 +13,7 @@ import {
     toBaseRoute,
     toPageViewRoute,
 } from "@thewaver/ss-playground/App/PageComponents/ViewTabs/ViewTabs.const";
+import { IS_BUILD_PROGRESS_SHOWN } from "@thewaver/ss-playground/App/PageComponents/BuildProgress/BuildProgress.utils";
 import { FunctionUtils, Size2d, StringUtils } from "@thewaver/ss-utils";
 
 import {
@@ -29,6 +30,7 @@ import {
     SEARCH_FIELD_WIDTH,
 } from "./App.const";
 import type { ComponentConfig, MenuBranchConfig, MenuNodeConfig } from "./App.types";
+import { PageBuildProgress } from "./PageComponents/BuildProgress/BuildProgress";
 import { PageTextField } from "./PageComponents/Field/Field";
 import { PageLayer } from "./PageComponents/Layer/Layer";
 import { PageNavSettings } from "./PageComponents/NavSettings/NavSettings";
@@ -304,30 +306,59 @@ export function AppContent(props: { viewportAnchor: readonly [ViewportAnchor, (v
     const menuExpandedState = [isMenuExpanded, (isExpanded: boolean) => setIsAutoHidden(!isExpanded)] as const;
 
     return (
-        <div className={styles.appContent}>
-            <Sidebar
-                id={MENU_ID}
-                edge={MENU_EDGE}
-                collapsedWidth={MENU_COLLAPSED_WIDTH}
-                expandedWidth={MENU_EXPANDED_WIDTH}
-                isExpandedOnHover={isAutoHidden}
-                expanded={menuExpandedState}
-                renderContent={(phase, transitionDurationMs) => (
-                    <nav className={styles.leftMenu} aria-label={"Library"}>
-                        <PageLayer level={1}>
-                            <div className={styles.leftMenuContent}>
-                                <div className={styles.searchContainer}>
-                                    <PageSidebarToggle
-                                        sidebarId={MENU_ID}
-                                        edge={MENU_EDGE}
-                                        isExpanded={isMenuExpanded}
-                                        ariaLabel={isMenuExpanded ? "Auto-hide the menu" : "Keep the menu open"}
-                                        onToggle={() => menuExpandedState[1](!isMenuExpanded)}
-                                    />
+        <div className={styles.appFrame}>
+            {IS_BUILD_PROGRESS_SHOWN && <PageBuildProgress />}
+
+            <div className={styles.appContent}>
+                <Sidebar
+                    id={MENU_ID}
+                    edge={MENU_EDGE}
+                    collapsedSize={MENU_COLLAPSED_WIDTH}
+                    expandedSize={MENU_EXPANDED_WIDTH}
+                    isExpandedOnHover={isAutoHidden}
+                    expanded={menuExpandedState}
+                    renderContent={(phase, transitionDurationMs) => (
+                        <nav className={styles.leftMenu} aria-label={"Library"}>
+                            <PageLayer level={1}>
+                                <div className={styles.leftMenuContent}>
+                                    <div className={styles.searchContainer}>
+                                        <PageSidebarToggle
+                                            sidebarId={MENU_ID}
+                                            edge={MENU_EDGE}
+                                            isExpanded={isMenuExpanded}
+                                            ariaLabel={isMenuExpanded ? "Auto-hide the menu" : "Keep the menu open"}
+                                            onToggle={() => menuExpandedState[1](!isMenuExpanded)}
+                                        />
+
+                                        <div
+                                            className={[
+                                                styles.searchFields,
+                                                getIsMenuFaded(phase) && styles.isFaded,
+                                                phase === "collapsed" && styles.isHidden,
+                                            ]
+                                                .filter(Boolean)
+                                                .join(" ")}
+                                            style={{ transitionDuration: `${transitionDurationMs}ms` }}
+                                        >
+                                            <PageTextField
+                                                value={searchTerm}
+                                                width={SEARCH_FIELD_WIDTH}
+                                                placeholder={"Search"}
+                                                ariaLabel={"Search components"}
+                                                onInput={setSearchTerm}
+                                            />
+
+                                            <PageNavSettings
+                                                showsDescriptionOnly={showsDescriptionOnlyState}
+                                                pageView={pageViewState}
+                                                viewportAnchor={props.viewportAnchor}
+                                            />
+                                        </div>
+                                    </div>
 
                                     <div
                                         className={[
-                                            styles.searchFields,
+                                            styles.menuTree,
                                             getIsMenuFaded(phase) && styles.isFaded,
                                             phase === "collapsed" && styles.isHidden,
                                         ]
@@ -335,86 +366,61 @@ export function AppContent(props: { viewportAnchor: readonly [ViewportAnchor, (v
                                             .join(" ")}
                                         style={{ transitionDuration: `${transitionDurationMs}ms` }}
                                     >
-                                        <PageTextField
-                                            value={searchTerm}
-                                            width={SEARCH_FIELD_WIDTH}
-                                            placeholder={"Search"}
-                                            ariaLabel={"Search components"}
-                                            onInput={setSearchTerm}
-                                        />
-
-                                        <PageNavSettings
-                                            showsDescriptionOnly={showsDescriptionOnlyState}
-                                            pageView={pageViewState}
-                                            viewportAnchor={props.viewportAnchor}
+                                        <Tree
+                                            nodes={visibleNodes}
+                                            value={selectedState}
+                                            expanded={expandedState}
+                                            ariaLabel={"Library"}
+                                            linkComponent={PageRouterLink}
+                                            computeCustomText={(node) => node.value.name}
+                                            renderNode={(node, renderProps) => (
+                                                <PageTreeNodeContent
+                                                    renderProps={renderProps}
+                                                    hasExamples={
+                                                        getIsBranchConfig(node.value) || node.value.component !== undefined
+                                                    }
+                                                    detail={
+                                                        getIsBranchConfig(node.value)
+                                                            ? `${flattenConfigs(node.value.children).length}`
+                                                            : ""
+                                                    }
+                                                >
+                                                    {node.value.name}
+                                                </PageTreeNodeContent>
+                                            )}
                                         />
                                     </div>
                                 </div>
+                            </PageLayer>
+                        </nav>
+                    )}
+                />
 
-                                <div
-                                    className={[
-                                        styles.menuTree,
-                                        getIsMenuFaded(phase) && styles.isFaded,
-                                        phase === "collapsed" && styles.isHidden,
-                                    ]
-                                        .filter(Boolean)
-                                        .join(" ")}
-                                    style={{ transitionDuration: `${transitionDurationMs}ms` }}
-                                >
-                                    <Tree
-                                        nodes={visibleNodes}
-                                        value={selectedState}
-                                        expanded={expandedState}
-                                        ariaLabel={"Library"}
-                                        linkComponent={PageRouterLink}
-                                        computeCustomText={(node) => node.value.name}
-                                        renderNode={(node, renderProps) => (
-                                            <PageTreeNodeContent
-                                                renderProps={renderProps}
-                                                hasExamples={
-                                                    getIsBranchConfig(node.value) || node.value.component !== undefined
-                                                }
-                                                detail={
-                                                    getIsBranchConfig(node.value)
-                                                        ? `${flattenConfigs(node.value.children).length}`
-                                                        : ""
-                                                }
-                                            >
-                                                {node.value.name}
-                                            </PageTreeNodeContent>
-                                        )}
-                                    />
-                                </div>
+                <main className={styles.pageColumn}>
+                    {selectedConfig ? (
+                        <div className={styles.pageBody}>
+                            <div className={styles.pageHeader}>
+                                <h1 className={styles.pageTitle}>{selectedConfig.name}</h1>
+
+                                <PageDependencies name={selectedConfig.name} view={pageView} />
+
+                                <PageViewTabs
+                                    baseRoute={componentToRouteName(selectedConfig.name)}
+                                    hasExamples={selectedConfig.component !== undefined}
+                                />
                             </div>
-                        </PageLayer>
-                    </nav>
-                )}
-            />
 
-            <main className={styles.pageColumn}>
-                {selectedConfig ? (
-                    <div className={styles.pageBody}>
-                        <div className={styles.pageHeader}>
-                            <h1 className={styles.pageTitle}>{selectedConfig.name}</h1>
-
-                            <PageDependencies name={selectedConfig.name} view={pageView} />
-
-                            <PageViewTabs
-                                baseRoute={componentToRouteName(selectedConfig.name)}
-                                hasExamples={selectedConfig.component !== undefined}
-                            />
+                            <Suspense>
+                                <Outlet />
+                            </Suspense>
                         </div>
-
+                    ) : (
                         <Suspense>
                             <Outlet />
                         </Suspense>
-                    </div>
-                ) : (
-                    <Suspense>
-                        <Outlet />
-                    </Suspense>
-                )}
-            </main>
+                    )}
+                </main>
+            </div>
         </div>
     );
 }

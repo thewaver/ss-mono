@@ -1,10 +1,12 @@
-import { For, Show, createMemo } from "solid-js";
+import { For, Show, createResource } from "solid-js";
 import type { ApiGroupKind, ApiTableKind } from "virtual:component-api";
-import COMPONENT_API from "virtual:component-api";
 
 import { access } from "@thewaver/ss-components-solid";
 import * as styles from "@thewaver/ss-playground/App/PageComponents/DocsView/DocsView.css";
-import { toHighlightedType } from "@thewaver/ss-playground/App/PageComponents/DocsView/DocsView.utils";
+import {
+    loadApiGroups,
+    toHighlightedType,
+} from "@thewaver/ss-playground/App/PageComponents/DocsView/DocsView.utils";
 
 import type { PageDocsTableProps, PageDocsViewProps } from "./DocsView.types";
 
@@ -107,29 +109,33 @@ const PageDocsTable = (props: PageDocsTableProps) => {
 };
 
 export const PageDocsView = (props: PageDocsViewProps) => {
-    const getGroups = createMemo(() => COMPONENT_API[access(props.name).toLowerCase()] ?? []);
+    const [getGroups] = createResource(() => access(props.name), loadApiGroups);
 
     return (
         <div class={styles.docsView} data-view={"docs"}>
             <p class={styles.docsLead}>{access(props.description)}</p>
 
-            <Show
-                when={getGroups().length}
-                fallback={
-                    <p class={styles.docsEmpty}>
-                        {`${access(props.name)} exports nothing of its own, so there is nothing to list.`}
-                    </p>
-                }
-            >
-                <For each={getGroups()}>
-                    {(group) => (
-                        <section class={styles.docsGroup} data-api-group={group.kind}>
-                            <h2 class={styles.docsGroupTitle}>{GROUP_TITLES[group.kind]}</h2>
+            <Show when={getGroups()}>
+                {(getLoadedGroups) => (
+                    <Show
+                        when={getLoadedGroups().length}
+                        fallback={
+                            <p class={styles.docsEmpty}>
+                                {`${access(props.name)} exports nothing of its own, so there is nothing to list.`}
+                            </p>
+                        }
+                    >
+                        <For each={getLoadedGroups()}>
+                            {(group) => (
+                                <section class={styles.docsGroup} data-api-group={group.kind}>
+                                    <h2 class={styles.docsGroupTitle}>{GROUP_TITLES[group.kind]}</h2>
 
-                            <For each={group.tables}>{(table) => <PageDocsTable table={table} />}</For>
-                        </section>
-                    )}
-                </For>
+                                    <For each={group.tables}>{(table) => <PageDocsTable table={table} />}</For>
+                                </section>
+                            )}
+                        </For>
+                    </Show>
+                )}
             </Show>
         </div>
     );

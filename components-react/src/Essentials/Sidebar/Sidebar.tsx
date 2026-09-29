@@ -1,6 +1,13 @@
 import { useEffect, useRef, useState } from "react";
 
-import { AnchorUtils, HoverIntentUtils, SIDEBAR_DEFAULTS, SidebarStyles, SidebarUtils } from "@thewaver/ss-components";
+import {
+    AnchorUtils,
+    HoverIntentUtils,
+    SIDEBAR_DEFAULTS,
+    SIDEBAR_SIZE_PROPERTIES,
+    SidebarStyles,
+    SidebarUtils,
+} from "@thewaver/ss-components";
 
 import { DismisserReactUtils } from "../../Abstracts/Dismisser/DismisserReact.utils";
 import { ElementFaderReactUtils } from "../../Abstracts/ElementFader/ElementFaderReact.utils";
@@ -103,22 +110,27 @@ export const Sidebar = (props: SidebarProps) => {
     const isRaised = isOverlay && phase !== "collapsed";
     const zIndex = Math.max(AnchorUtils.getStackingBase(root), elevationBase) + 1;
 
-    const panelWidth = fader.transitionTarget === 1 ? props.expandedWidth : props.collapsedWidth;
+    const sizeProperty = SIDEBAR_SIZE_PROPERTIES[edge];
+    const panelSize = fader.transitionTarget === 1 ? props.expandedSize : props.collapsedSize;
 
     return (
         <div
             ref={rootRef}
             id={props.id}
-            className={SidebarStyles.sidebarRoot}
-            style={{ width: isOverlay ? `${props.collapsedWidth}px` : undefined }}
+            className={[SidebarStyles.sidebarRoot, SidebarStyles.sidebarRootEdgeVariants[edge]].join(" ")}
+            style={{ [sizeProperty]: isOverlay ? `${props.collapsedSize}px` : undefined }}
         >
             <div
                 ref={panelRef}
-                className={[SidebarStyles.sidebarPanel, isOverlay && SidebarStyles.sidebarPanelOverlayVariants[edge]]
+                className={[
+                    SidebarStyles.sidebarPanel,
+                    SidebarStyles.sidebarPanelEdgeVariants[edge],
+                    isOverlay && SidebarStyles.sidebarPanelOverlayVariants[edge],
+                ]
                     .filter(Boolean)
                     .join(" ")}
                 style={{
-                    width: `${panelWidth}px`,
+                    [sizeProperty]: `${panelSize}px`,
                     zIndex: isRaised ? zIndex : undefined,
                     transitionDuration: `${appliedDurationMs}ms`,
                 }}

@@ -4,6 +4,7 @@ import {
     AnchorUtils,
     HoverIntentUtils,
     SIDEBAR_DEFAULTS,
+    SIDEBAR_SIZE_PROPERTIES,
     SidebarUtils,
     SidebarStyles as styles,
 } from "@thewaver/ss-components";
@@ -115,22 +116,28 @@ export const Sidebar = (props: SidebarProps) => {
         return Math.max(AnchorUtils.getStackingBase(root), ElevationSolidUtils.getBase(root)) + 1;
     };
 
-    const getPanelWidth = () =>
-        getTransitionTarget() === 1 ? access(props.expandedWidth) : access(props.collapsedWidth);
+    const getSizeProperty = () => SIDEBAR_SIZE_PROPERTIES[getEdge()];
+
+    const getPanelSize = () => (getTransitionTarget() === 1 ? access(props.expandedSize) : access(props.collapsedSize));
 
     return (
         <div
             ref={setRootRef}
             id={access(props.id)}
-            class={styles.sidebarRoot}
-            style={{ width: getIsOverlay() ? `${access(props.collapsedWidth)}px` : undefined }}
+            class={[styles.sidebarRoot, styles.sidebarRootEdgeVariants[getEdge()]].join(" ")}
+            style={{ [getSizeProperty()]: getIsOverlay() ? `${access(props.collapsedSize)}px` : undefined }}
         >
             <div
                 ref={setPanelRef}
-                class={styles.sidebarPanel}
-                classList={{ [styles.sidebarPanelOverlayVariants[getEdge()]]: getIsOverlay() }}
+                class={[
+                    styles.sidebarPanel,
+                    styles.sidebarPanelEdgeVariants[getEdge()],
+                    getIsOverlay() && styles.sidebarPanelOverlayVariants[getEdge()],
+                ]
+                    .filter(Boolean)
+                    .join(" ")}
                 style={{
-                    "width": `${getPanelWidth()}px`,
+                    [getSizeProperty()]: `${getPanelSize()}px`,
                     "z-index": getIsRaised() ? getZIndex() : undefined,
                     "transition-duration": `${getAppliedDurationMs()}ms`,
                 }}

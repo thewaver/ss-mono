@@ -105,13 +105,13 @@ export const CardStack = <T,>(props: CardStackProps<T>) => {
             mountedLength: getMounted().length,
             pileExtentPx: getPileExtentPx(),
             cardGap: getCardGap(),
-            motion: getMotion(),
+            getMotion,
         });
 
     const getCardTransitionDurationMs = (depth: number) =>
         CardStackUtils.getCardTransitionDurationMs(depth, {
-            isSwiping: getIsSwiping(),
-            motion: getMotion(),
+            getIsSwiping,
+            getMotion,
             durationMs: getTransitionDurationMs(),
         });
 
@@ -147,7 +147,7 @@ export const CardStack = <T,>(props: CardStackProps<T>) => {
                         index,
                         depth: getDepth(),
                         isTop: getIsTop(),
-                        ...CardStackUtils.getCardMotion(getIsTop(), getMotion()),
+                        ...CardStackUtils.getCardMotion(getIsTop(), getMotion),
                     }));
 
                     return (

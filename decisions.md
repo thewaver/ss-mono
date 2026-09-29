@@ -3396,13 +3396,13 @@ into the property list a consumer actually has. Hand-writing the tables was reje
 and twenty components' worth of prop names and types, every one of them free to drift the moment a type
 changes and nothing to catch it.
 
-**The Docs view, and with it the props tables, loads only when the Docs tab is opened.** Building the tables
-means running the TypeScript compiler over the whole library: about six seconds on a fresh dev server, and a
-module of about 1.5 MB. Imported from the shell, every page paid for it on first load, the Examples view
-included, which never reads it. So the Docs route loads its view on demand in all four Playgrounds, and only
-that view imports `virtual:component-api`. The plugin also returns an empty source map for the module:
-without one, the dev server wrote a 6 MB map for 1.5 MB of generated data that points back at no file anyone
-could open.
+**The Docs view loads only when the Docs tab is opened, and it fetches only its own component's tables.**
+Imported from the shell, the tables made every page pay for them on first load, the Examples view included, which
+never reads them. So the Docs route loads its view on demand in all four Playgrounds, and that view asks
+`virtual:component-api` for a list of per-component loaders and calls the one it needs — about 8 KB for most
+components rather than 1.5 MB for all of them. Both kinds of module come back with an empty source map: without
+one, the dev server wrote a 6 MB map for 1.5 MB of generated data that points back at no file anyone could open.
+How the tables get built is under _"The props tables are built beside the dev server"_, below.
 
 **Every page loads on demand, through each framework's own router.** The route list is one static table, and
 when it imported every page, the first view of any address fetched all hundred-odd pages: about 2,000 files,
@@ -3481,6 +3481,53 @@ namespace and types are its API; a sample is an example and has none. **The `SVG
 two sample pages, `TimedGradients` and `TrackedGradients`, and a group is not a page, so the generator had an
 API with nowhere to show it. The user's call: a page of the group's own name goes first inside it, which is how
 they structure such a case generally, over flattening the two sample pages up beside it.
+
+### The props tables are built beside the dev server, while the Playground is already in use
+
+Asked for by the user, and every behavior below is theirs. Building the tables runs the TypeScript compiler over
+the whole library: reading and parsing about 1,200 files, setting up the type-checker, then writing out 163
+components' tables at about 40 milliseconds each. On a loaded machine that was 5 to 10 seconds of waiting on the
+first Docs visit, and again after every save. It now happens in the background, with a strip across the top of the
+page saying how far it has got.
+
+**It runs in a worker thread, not in the dev server's own thread.** The build is one long stretch of work, and run
+in the server's thread it would hold up every page request until it finished. `componentApiWorker.ts` holds the
+compiler; `componentApi.ts` is the plugin, which talks to it and to the page; `componentApiBuild.ts` is the
+compiler work itself, shared by both the worker and the production build. The worker is a `.ts` file started
+with `--experimental-strip-types`, which Node from 22.6 accepts and later versions treat as already on, so no
+compile step and no extra package was needed for it.
+
+**It starts when the first page of a framework has finished loading in the browser**, which the page reports over
+the live-reload connection the dev server already keeps open. Not when the server starts, so a framework nobody
+opens never builds, and the four servers `npm start` runs do not all compete for the processor at once. A request
+for the tables also starts it, which covers a first visit that lands straight on a Docs page.
+
+**It builds one component at a time, and a Docs page asking for one moves it to the front of the queue.** The
+reading and the type-checker setup have to finish first whatever is asked for; after that, the page's own
+component is next. The Docs view shows its description straight away and its tables when they arrive.
+
+**A save re-reads only the files that changed.** The worker keeps every parsed file between builds and hands the
+previous program back to the compiler, so a rebuild skips the reading and pays for the type-checker and the
+tables. Changes are gathered for 100 milliseconds before a rebuild starts, so a save that touches several files, or
+a branch switch, is one rebuild rather than many; that number is a guess, not a measurement. A save marks every
+component's tables as stale, so the next request for one waits for its fresh version rather than showing the old
+one, and a component whose tables actually changed is pushed to a page already showing it.
+
+**The strip is the library's own `Sidebar`, docked to the top edge**, which is what gave `Sidebar` its `top` and
+`bottom` edges. It pushes the page down while it shows rather than covering it, collapses to nothing when the build
+is done, and reads _"Building props tables: 84 of 163"_ over a fill that grows with the count, or _"reading the
+library"_ before the count is known. The count is a library `Progress`, so a screen reader hears a progress bar
+named for what it measures rather than a line of text changing 163 times. The X hides only the current build: the
+next save brings the strip back.
+
+**The deployed site has no strip**, because its tables are built during the production build and there is nothing
+to wait for. The strip's component still ships there but never renders, since what decides it is whether the page
+has a live-reload connection.
+
+**A union in a type column can print its members in a different order depending on which page was opened first.**
+The compiler prints a union in the order it first met each member, and which components get built first now
+depends on what was asked for. It changes nothing but that order, and the production build always builds in the
+same order.
 
 ### Primitives have a menu section, and a page with no examples has no Examples tab
 
@@ -6648,8 +6695,17 @@ clip leave room for one, but MDN lists it as limited availability rather than Ba
 nothing and is always exactly the sidebar's width, and contents laid out at the expanded width clip themselves
 inside an outer box that fills the panel — the outer box keeps its shadow because nothing above it clips.
 
-**Both widths are the consumer's.** Measuring the expanded width from the contents is circular, since the
-contents change layout with the width they are given.
+**Both sizes are the consumer's.** Measuring the expanded size from the contents is circular, since the
+contents change layout with the size they are given.
+
+**It docks to any of the four edges, and its two sizes are `collapsedSize` and `expandedSize`.** It started with
+left and right only, and grew top and bottom for the Playground's build progress strip. The props were
+`collapsedWidth` and `expandedWidth`, which would have named a height on a sidebar docked to the top, and
+_"`width` and `height` mean a length"_ in `conventions.md` reserves those words for what they say. A second pair,
+`collapsedHeight` and `expandedHeight`, was the other way out and was rejected: only one pair means anything for a
+given edge, so both would have to be optional, and leaving out the right pair would compile and draw a sidebar of
+no size. `Size` here is the length measured out from the docked edge, the way `gutterSize` and `laneSize` already
+are a length along whichever axis applies.
 
 **The contents are handed a phase — collapsed, expanding, expanded, collapsing — rather than a visibility
 target.** The user asked for it so a collapsed layout and an expanded one can be swapped smoothly: expanding
@@ -13551,6 +13607,17 @@ cost of a stack does not grow with the deck behind it.
 **A left-out direction is refused by every route.** A swipe that way springs back, its arrow key is not `preventDefault`ed so the page scrolls as usual, and `send` returns `false`. The card still follows the pointer toward a refused direction during a free swipe, then springs back on release, so the refusal is shown rather than hidden.
 
 **When the allowed directions share one axis the stack claims only that axis.** It uses `trackAxialSwipe` then, and `trackFreeSwipe` otherwise, so a left-and-right stack leaves the browser the vertical axis to scroll on a touch screen. The tracker is rebuilt whenever the shared axis changes, rather than both being attached with one disabled: both write `touch-action` to the same element, and whichever effect ran last would win. An empty list turns swiping off.
+
+### `CardStack`: the motion helpers take getters, so only the top card follows the push
+
+**`getCardTransform`, `getCardTransitionDurationMs` and `getCardMotion` are handed `getMotion` (and the duration
+helper `getIsSwiping`) rather than the values, and call them only once they know the card is on top.** The push
+changes on every pointer move, and only the top card moves with it. In a view that updates only what it read —
+Solid, Svelte, and Vue's computed values — reading the motion before checking the depth subscribed every mounted
+card to it. Each pointer move then re-ran every card's style and rebuilt every card's state, and the consumer's
+`renderCard` re-ran along with it, all to write the same values again. The rule went into the core rather than into each view. Checking the depth first in the Solid view alone would have
+repeated a rule the core already owns, and every fine-grained view would have had to remember it. React re-renders
+the whole stack on each push either way, so it passes `() => motion` and gains nothing, and loses nothing either.
 
 ### `FlipCard`: the smallest thing that can turn a barrel
 
