@@ -1,55 +1,38 @@
-import { type Accessor, createEffect, createSignal, onCleanup } from "solid-js";
+import { StoreUtils } from "@thewaver/ss-utils";
 
-import { InteractionTrackerUtils } from "../InteractionTracker/InteractionTracker.utils";
+import type { FrameRate, FrameRateMonitor } from "./FrameRateMonitor.types";
 
 /** How long each sample covers. A second is long enough to be steady and short enough to react. */
 const SAMPLE_INTERVAL_MS = 1000;
 
+/** Nothing counted yet. */
+const NO_FRAME_RATE: FrameRate = { current: 0, average: 0 };
+
 /** Measures how many frames the browser is actually painting. */
 export namespace FrameRateMonitorUtils {
     /**
-     * Counts frames and reports the rate, both recent and since the monitor started.
+     * Counts frames and reports the rate, both recent and since counting started.
      *
      * Two numbers, because they answer different questions: the current rate says whether the page is
-     * struggling right now, and the average says whether it has been struggling all along. Counting
-     * stops while the tab is in the background, where the browser throttles frames and any reading
-     * would be meaningless, and the rate is reset to zero rather than frozen at its last value so a
-     * consumer cannot mistake a stale number for a live one.
+     * struggling right now, and the average says whether it has been struggling all along. The monitor is a
+     * store of both, counted between `observe` and the function it returns; stopping resets them to zero rather
+     * than freezing them, so a consumer cannot mistake a stale number for a live one. Stop it while the tab is in
+     * the background, where the browser throttles frames and any reading would be meaningless.
      *
-     * @param getIsDisabled Pass `true` to stop counting.
-     * @param opts.startupTimeMs How long to wait before counting. Mounting and the first paint are
+     * @param opts.startupTimeMs How long each `observe` waits before counting. Mounting and the first paint are
      * expensive and would drag the average down for the rest of the session, so a monitor watching a
      * heavy component should let it settle first.
-     * @returns `getFrameRate`, giving `current` for the last sample and `average` since counting began.
-     * Both are zero until the first sample completes.
+     * @returns The monitor. Both numbers are zero until the first sample completes.
      */
-    export const create = (
-        getIsDisabled: Accessor<boolean>,
-        opts?: {
-            startupTimeMs?: number;
-        },
-    ) => {
-        const [getFrameRate, setFrameRate] = createSignal({ current: 0, average: 0 });
-        const getIsPageHidden = InteractionTrackerUtils.trackPageHidden();
+    export const create = (opts?: { startupTimeMs?: number }): FrameRateMonitor => {
+        const store = StoreUtils.create(NO_FRAME_RATE);
 
-        createEffect(() => {
+        const observe = () => {
             let cycleFrameCount = 0;
             let totalFrameCount = 0;
             let lastTime: number;
             let firstTime: number;
             let rafId: ReturnType<typeof requestAnimationFrame>;
-            let timeoutHandle: ReturnType<typeof setTimeout>;
-
-            onCleanup(() => {
-                clearTimeout(timeoutHandle);
-                cancelAnimationFrame(rafId);
-                setFrameRate({ current: 0, average: 0 });
-            });
-
-            const isPageHidden = getIsPageHidden();
-            const isDisabled = getIsDisabled();
-
-            if (isPageHidden || isDisabled) return;
 
             const updateFrameRate = () => {
                 const now = performance.now();
@@ -64,20 +47,26 @@ export namespace FrameRateMonitorUtils {
                     cycleFrameCount = 0;
                     lastTime = now;
 
-                    setFrameRate({ current, average });
+                    store.set({ current, average });
                 }
 
                 rafId = requestAnimationFrame(updateFrameRate);
             };
 
-            timeoutHandle = setTimeout(() => {
+            const timeoutHandle = setTimeout(() => {
                 lastTime = performance.now();
                 firstTime = lastTime;
 
                 rafId = requestAnimationFrame(updateFrameRate);
             }, opts?.startupTimeMs ?? 0);
-        });
 
-        return { getFrameRate };
+            return () => {
+                clearTimeout(timeoutHandle);
+                cancelAnimationFrame(rafId);
+                store.set(NO_FRAME_RATE);
+            };
+        };
+
+        return { get: store.get, subscribe: store.subscribe, observe };
     };
 }

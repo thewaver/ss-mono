@@ -1,4 +1,4 @@
-import { describe, expect, it } from "vitest";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
 import { NumberInputUtils } from "./NumberInput.utils";
 
@@ -172,5 +172,119 @@ describe("computeStep", () => {
     it("holds a distance to the range as a step is held", () => {
         expect(NumberInputUtils.computeStep(95, 1, { min: 0, max: 100, step: 1 }, 10)).toBe(100);
         expect(NumberInputUtils.computeStep(0.3, 1, { min: 0, step: 0.1 }, 0.1 * 10)).toBe(1.3);
+    });
+});
+
+describe("computePageStep", () => {
+    it("takes the distance it is given", () => {
+        expect(NumberInputUtils.computePageStep(25, 5)).toBe(25);
+    });
+
+    it("moves ten steps when it is given none", () => {
+        expect(NumberInputUtils.computePageStep(undefined, 5)).toBe(50);
+    });
+});
+
+describe("getHasRangeIssue", () => {
+    it("flags a number outside the bounds and not one inside", () => {
+        expect(NumberInputUtils.getHasRangeIssue(999, { min: 0, max: 100 })).toBe(true);
+        expect(NumberInputUtils.getHasRangeIssue(50, { min: 0, max: 100 })).toBe(false);
+    });
+
+    it("never flags a field holding no number", () => {
+        expect(NumberInputUtils.getHasRangeIssue(undefined, { min: 0, max: 100 })).toBe(false);
+    });
+});
+
+describe("getIsAtMin and getIsAtMax", () => {
+    it("count the bound itself and anything past it", () => {
+        expect(NumberInputUtils.getIsAtMin(0, { min: 0 })).toBe(true);
+        expect(NumberInputUtils.getIsAtMin(-5, { min: 0 })).toBe(true);
+        expect(NumberInputUtils.getIsAtMax(100, { max: 100 })).toBe(true);
+        expect(NumberInputUtils.getIsAtMax(99, { max: 100 })).toBe(false);
+    });
+
+    it("put an empty field and an open end at neither", () => {
+        expect(NumberInputUtils.getIsAtMin(undefined, { min: 0 })).toBe(false);
+        expect(NumberInputUtils.getIsAtMax(1e9, {})).toBe(false);
+    });
+});
+
+describe("computeKeyMove", () => {
+    it("steps once on the arrows and a page on PageUp and PageDown", () => {
+        expect(NumberInputUtils.computeKeyMove("ArrowUp", {}, 50)).toEqual({ direction: 1 });
+        expect(NumberInputUtils.computeKeyMove("ArrowDown", {}, 50)).toEqual({ direction: -1 });
+        expect(NumberInputUtils.computeKeyMove("PageUp", {}, 50)).toEqual({ direction: 1, distance: 50 });
+        expect(NumberInputUtils.computeKeyMove("PageDown", {}, 50)).toEqual({ direction: -1, distance: 50 });
+    });
+
+    it("jumps to a bound only where there is one", () => {
+        expect(NumberInputUtils.computeKeyMove("Home", { min: 0, max: 100 }, 10)).toEqual({ value: 0 });
+        expect(NumberInputUtils.computeKeyMove("End", { min: 0, max: 100 }, 10)).toEqual({ value: 100 });
+        expect(NumberInputUtils.computeKeyMove("Home", {}, 10)).toBeUndefined();
+        expect(NumberInputUtils.computeKeyMove("End", {}, 10)).toBeUndefined();
+    });
+
+    it("leaves every other key to the text", () => {
+        expect(NumberInputUtils.computeKeyMove("5", { min: 0 }, 10)).toBeUndefined();
+        expect(NumberInputUtils.computeKeyMove("ArrowLeft", { min: 0 }, 10)).toBeUndefined();
+    });
+});
+
+describe("computeSettledValue", () => {
+    it("pulls a number inside the bounds and leaves an empty field empty", () => {
+        expect(NumberInputUtils.computeSettledValue(999, { min: 0, max: 100 })).toBe(100);
+        expect(NumberInputUtils.computeSettledValue(50, { min: 0, max: 100 })).toBe(50);
+        expect(NumberInputUtils.computeSettledValue(undefined, { min: 0, max: 100 })).toBeUndefined();
+    });
+});
+
+describe("createStepRepeater", () => {
+    beforeEach(() => {
+        vi.useFakeTimers();
+    });
+
+    afterEach(() => {
+        vi.useRealTimers();
+    });
+
+    const makeRepeater = () => NumberInputUtils.createStepRepeater({ getDelayMs: () => 400, getIntervalMs: () => 60 });
+
+    it("steps once at once, and repeats only after the delay", () => {
+        const repeater = makeRepeater();
+        const step = vi.fn(() => true);
+
+        expect(repeater.start(step)).toBe(true);
+        expect(step).toHaveBeenCalledTimes(1);
+
+        vi.advanceTimersByTime(399);
+        expect(step).toHaveBeenCalledTimes(1);
+
+        vi.advanceTimersByTime(1 + 60 * 3);
+        expect(step).toHaveBeenCalledTimes(4);
+    });
+
+    it("stops repeating when stopped, and says whether anything was running", () => {
+        const repeater = makeRepeater();
+        const step = vi.fn(() => true);
+
+        repeater.start(step);
+
+        expect(repeater.stop()).toBe(true);
+        expect(repeater.stop()).toBe(false);
+
+        vi.advanceTimersByTime(2000);
+        expect(step).toHaveBeenCalledTimes(1);
+    });
+
+    it("starts nothing when the first step is refused", () => {
+        const repeater = makeRepeater();
+        const step = vi.fn(() => false);
+
+        expect(repeater.start(step)).toBe(false);
+
+        vi.advanceTimersByTime(2000);
+        expect(step).toHaveBeenCalledTimes(1);
+        expect(repeater.stop()).toBe(false);
     });
 });

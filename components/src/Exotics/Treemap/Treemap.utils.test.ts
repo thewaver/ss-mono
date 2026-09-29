@@ -1,4 +1,4 @@
-import { describe, expect, it } from "vitest";
+import { afterEach, describe, expect, it, vi } from "vitest";
 
 import type { Rect } from "@thewaver/ss-utils";
 
@@ -149,5 +149,192 @@ describe("computeDescendantRect", () => {
 
     it("answers the whole box for a path of one", () => {
         expect(TreemapUtils.computeDescendantRect([ROOT], weights, SIZE)).toEqual(FULL);
+    });
+});
+
+describe("toBox", () => {
+    it("rounds the edges rather than the size, so neighbors still meet", () => {
+        const first = TreemapUtils.toBox({ x: 0.4, y: 0, width: 10.2, height: 5 });
+        const second = TreemapUtils.toBox({ x: 10.6, y: 0, width: 10.2, height: 5 });
+
+        expect(first).toEqual({ left: "0px", top: "0px", width: "11px", height: "5px" });
+        expect(parseFloat(first.left) + parseFloat(first.width)).toBe(parseFloat(second.left));
+    });
+});
+
+describe("resolveBranch", () => {
+    const weights = TreemapUtils.computeWeights(ROOT);
+
+    it("keeps a branch of the tree", () => {
+        expect(TreemapUtils.resolveBranch(INNER, ROOT, weights)).toBe(INNER);
+    });
+
+    it("falls back to the root for a leaf or a node from another tree", () => {
+        expect(TreemapUtils.resolveBranch(DEEP, ROOT, weights)).toBe(ROOT);
+        expect(TreemapUtils.resolveBranch(branch("stranger", leaf("a", 1)), ROOT, weights)).toBe(ROOT);
+    });
+});
+
+describe("resolveStop", () => {
+    it("keeps a candidate that is still a stop and otherwise takes the first", () => {
+        expect(TreemapUtils.resolveStop("b", ["a", "b"])).toBe("b");
+        expect(TreemapUtils.resolveStop("c", ["a", "b"])).toBe("a");
+        expect(TreemapUtils.resolveStop(undefined, ["a", "b"])).toBe("a");
+        expect(TreemapUtils.resolveStop("a", [])).toBeUndefined();
+    });
+});
+
+describe("findParent", () => {
+    it("answers the node one level up, and nothing for the root", () => {
+        expect(TreemapUtils.findParent(ROOT, INNER)).toBe(OUTER);
+        expect(TreemapUtils.findParent(ROOT, ROOT)).toBeUndefined();
+    });
+});
+
+describe("computeKeyAction", () => {
+    const STOPS = ["a", "b", "c"];
+
+    it("zooms into the stop on an activation key", () => {
+        expect(TreemapUtils.computeKeyAction("Enter", "b", STOPS)).toEqual({ kind: "zoom", node: "b" });
+        expect(TreemapUtils.computeKeyAction(" ", "b", STOPS)).toEqual({ kind: "zoom", node: "b" });
+    });
+
+    it("moves along the stops both ways without wrapping", () => {
+        expect(TreemapUtils.computeKeyAction("ArrowRight", "a", STOPS)).toEqual({ kind: "move", node: "b" });
+        expect(TreemapUtils.computeKeyAction("ArrowUp", "b", STOPS)).toEqual({ kind: "move", node: "a" });
+        expect(TreemapUtils.computeKeyAction("End", "a", STOPS)).toEqual({ kind: "move", node: "c" });
+        expect(TreemapUtils.computeKeyAction("ArrowRight", "c", STOPS)).toBeUndefined();
+    });
+
+    it("leaves every other key alone", () => {
+        expect(TreemapUtils.computeKeyAction("x", "a", STOPS)).toBeUndefined();
+    });
+});
+
+describe("computeTransition", () => {
+    const weights = TreemapUtils.computeWeights(ROOT);
+
+    it("zooms in towards a descendant and out towards an ancestor", () => {
+        const inward = TreemapUtils.computeTransition(OUTER, ROOT, weights, SIZE, 100)!;
+        const outward = TreemapUtils.computeTransition(ROOT, OUTER, weights, SIZE, 100)!;
+
+        expect(inward.zoom).toBe("in");
+        expect(outward.zoom).toBe("out");
+        expect(inward.focusRect).toEqual(outward.focusRect);
+        expect(inward.leavingTiles.map((tile) => tile.node.value)).toEqual(["outer", "big"]);
+    });
+
+    it("draws nothing without time, without a box, or between unrelated branches", () => {
+        expect(TreemapUtils.computeTransition(OUTER, ROOT, weights, SIZE, 0)).toBeUndefined();
+        expect(TreemapUtils.computeTransition(OUTER, ROOT, weights, { width: 0, height: 0 }, 100)).toBeUndefined();
+        expect(
+            TreemapUtils.computeTransition(INNER, branch("other", leaf("x", 1)), weights, SIZE, 100),
+        ).toBeUndefined();
+    });
+
+    it("starts the entering tiles where the leaving ones end, in both directions", () => {
+        const inward = TreemapUtils.computeTransition(OUTER, ROOT, weights, SIZE, 100)!;
+        const tile: Rect = { x: 10, y: 20, width: 30, height: 40 };
+
+        expect(TreemapUtils.computeEnteringStart(FULL, SIZE, inward)).toEqual(inward.focusRect);
+        expect(TreemapUtils.computeLeavingEnd(inward.focusRect, SIZE, inward)).toEqual(FULL);
+
+        const outward = TreemapUtils.computeTransition(ROOT, OUTER, weights, SIZE, 100)!;
+        const there = TreemapUtils.computeLeavingEnd(tile, SIZE, outward);
+
+        expect(TreemapUtils.computeEnteringStart(there, SIZE, inward)).toEqual(
+            TreemapUtils.projectRect(there, FULL, inward.focusRect),
+        );
+    });
+});
+
+describe("easeZoom", () => {
+    it("runs from nothing to all of it, through the middle at the middle", () => {
+        expect(TreemapUtils.easeZoom(0)).toBe(0);
+        expect(TreemapUtils.easeZoom(0.5)).toBe(0.5);
+        expect(TreemapUtils.easeZoom(1)).toBe(1);
+        expect(TreemapUtils.easeZoom(0.25)).toBeLessThan(0.25);
+    });
+});
+
+describe("createZoomClock", () => {
+    afterEach(() => {
+        vi.useRealTimers();
+        vi.unstubAllGlobals();
+    });
+
+    const stubFrames = () => {
+        const frames = new Map<number, FrameRequestCallback>();
+
+        let next = 0;
+
+        vi.stubGlobal("requestAnimationFrame", (callback: FrameRequestCallback) => {
+            frames.set(++next, callback);
+
+            return next;
+        });
+        vi.stubGlobal("cancelAnimationFrame", (id: number) => frames.delete(id));
+
+        return (now: number) => {
+            const pending = [...frames.values()];
+
+            frames.clear();
+            pending.forEach((callback) => callback(now));
+        };
+    };
+
+    it("rests at the end, and jumps there when started with no time", () => {
+        const clock = TreemapUtils.createZoomClock();
+
+        expect(clock.get()).toBe(1);
+
+        clock.start(0);
+        expect(clock.get()).toBe(1);
+    });
+
+    it("runs from the start to the end a frame at a time", () => {
+        vi.useFakeTimers();
+
+        const tick = stubFrames();
+        const clock = TreemapUtils.createZoomClock();
+        const startedAt = performance.now();
+
+        clock.start(100);
+        expect(clock.get()).toBe(0);
+
+        tick(startedAt + 50);
+        expect(clock.get()).toBeCloseTo(0.5, 1);
+
+        tick(startedAt + 200);
+        expect(clock.get()).toBe(1);
+    });
+
+    it("settles on its own when no frames come", () => {
+        vi.useFakeTimers();
+        stubFrames();
+
+        const clock = TreemapUtils.createZoomClock();
+
+        clock.start(100);
+        vi.advanceTimersByTime(250);
+
+        expect(clock.get()).toBe(1);
+    });
+
+    it("stops where it stands, and can be started again", () => {
+        vi.useFakeTimers();
+
+        const tick = stubFrames();
+        const clock = TreemapUtils.createZoomClock();
+
+        clock.start(100);
+        clock.stop();
+        vi.advanceTimersByTime(250);
+
+        expect(clock.get(), "the stop cancelled the timer too").toBe(0);
+
+        clock.start(0);
+        tick(performance.now());
+        expect(clock.get()).toBe(1);
     });
 });

@@ -1,6 +1,6 @@
-import { createSignal, onCleanup } from "solid-js";
+import { StoreUtils } from "@thewaver/ss-utils";
 
-import type { TypeaheadDefs, TypeaheadHandle } from "./Typeahead.types";
+import type { TypeaheadBuffer, TypeaheadDefs } from "./Typeahead.types";
 
 /** How long typed characters accumulate before the search starts over. */
 const DEFAULT_TYPEAHEAD_TIMEOUT_MS = 1000;
@@ -115,36 +115,38 @@ export namespace TypeaheadUtils {
     /**
      * Accumulates typed characters into a query that expires.
      *
-     * @param defs.getTimeoutMs How long to wait after the last keystroke before starting over. A second
-     * by default, which is what native controls use.
-     * @returns `getQuery` for what has been typed, `clear` to start over, and `push` to offer a
-     * keystroke. `push` returns the new query when the keystroke was taken and nothing when it was not,
-     * so a caller can tell whether to search or to let the key through.
+     * The buffer is a store of what has been typed, empty when nothing is. `clear` also calls off the pending
+     * expiry, so calling it when the owner goes away leaves no timer behind; the buffer stays usable afterwards.
+     *
+     * @param defs.getTimeoutMs How long to wait after the last keystroke before starting over. A second by
+     * default, which is what native controls use. Read at each keystroke.
+     * @returns The buffer: `get` and `subscribe` for the query, `clear` to start over, and `push` to offer a
+     * keystroke. `push` returns the new query when the keystroke was taken and nothing when it was not, so a
+     * caller can tell whether to search or to let the key through.
      */
-    export const createBuffer = (defs?: TypeaheadDefs): TypeaheadHandle => {
-        const [getQuery, setQuery] = createSignal(EMPTY_QUERY);
+    export const createBuffer = (defs?: TypeaheadDefs): TypeaheadBuffer => {
+        const store = StoreUtils.create(EMPTY_QUERY);
 
         let timer: ReturnType<typeof setTimeout> | undefined;
 
         const clear = () => {
             clearTimeout(timer);
             timer = undefined;
-            setQuery(EMPTY_QUERY);
+            store.set(EMPTY_QUERY);
         };
 
-        onCleanup(clear);
-
         return {
-            getQuery,
+            get: store.get,
+            subscribe: store.subscribe,
             clear,
             push: (e) => {
-                if (!getIsQueryKey(e, getQuery() !== EMPTY_QUERY)) return;
+                if (!getIsQueryKey(e, store.get() !== EMPTY_QUERY)) return;
 
-                const next = getQuery() + e.key;
+                const next = store.get() + e.key;
 
                 clearTimeout(timer);
                 timer = setTimeout(clear, defs?.getTimeoutMs?.() ?? DEFAULT_TYPEAHEAD_TIMEOUT_MS);
-                setQuery(next);
+                store.set(next);
 
                 return next;
             },

@@ -7,7 +7,7 @@ import { inputValue, prop, readout } from "./helpers";
  * document, so there is no element to query and no attribute to read. What it does is therefore observed
  * two ways: `play` and `pause` are recorded on the prototype before any application code runs, which is the
  * same trick `noAnimationFrames.spec.ts` uses on `requestAnimationFrame`, and the control the page paints
- * from `playbackSignal` says what the component believes about itself.
+ * from `playback` says what the component believes about itself.
  *
  * That second reading is the one worth having. The signal used to be written only by the consumer, so a
  * switcher that started on its own left it saying stopped and the page painted "Play" over sound that was

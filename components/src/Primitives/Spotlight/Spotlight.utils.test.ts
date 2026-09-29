@@ -28,3 +28,30 @@ describe("getHoleClipPath", () => {
         );
     });
 });
+
+describe("getIsDismissedByKey", () => {
+    it("dismisses every mode on Escape", () => {
+        expect(SpotlightUtils.getIsDismissedByKey("Escape", "hint")).toBe(true);
+        expect(SpotlightUtils.getIsDismissedByKey("Escape", "prompt")).toBe(true);
+        expect(SpotlightUtils.getIsDismissedByKey("Escape", "guide")).toBe(true);
+    });
+
+    it("dismisses a hint on any real key, but not on a bare modifier", () => {
+        expect(SpotlightUtils.getIsDismissedByKey("a", "hint")).toBe(true);
+        expect(SpotlightUtils.getIsDismissedByKey("Shift", "hint")).toBe(false);
+    });
+
+    it("leaves the insistent modes alone on any other key", () => {
+        expect(SpotlightUtils.getIsDismissedByKey("a", "prompt")).toBe(false);
+        expect(SpotlightUtils.getIsDismissedByKey("a", "guide")).toBe(false);
+    });
+});
+
+describe("getIsAnnouncementDue", () => {
+    it("speaks a change, and not the first announcement or a repeat", () => {
+        expect(SpotlightUtils.getIsAnnouncementDue(undefined, "Step 1")).toBe(false);
+        expect(SpotlightUtils.getIsAnnouncementDue("Step 1", "Step 1")).toBe(false);
+        expect(SpotlightUtils.getIsAnnouncementDue("Step 1", "Step 2")).toBe(true);
+        expect(SpotlightUtils.getIsAnnouncementDue("Step 1", undefined)).toBe(false);
+    });
+});

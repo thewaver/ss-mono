@@ -185,3 +185,21 @@ describe("parseContent with attributes", () => {
         ]);
     });
 });
+
+describe("getTagTreatment", () => {
+    const classMap = { b: "bold", empty: "" };
+
+    it("wraps a mapped tag in its class", () => {
+        expect(RichTextUtils.getTagTreatment("b", classMap, false)).toEqual({ kind: "class", className: "bold" });
+    });
+
+    it("prints an unmapped tag as typed, or unwraps it when asked to", () => {
+        expect(RichTextUtils.getTagTreatment("x", classMap, false)).toEqual({ kind: "literal", closingMarkup: "[/x]" });
+        expect(RichTextUtils.getTagTreatment("x", classMap, true)).toEqual({ kind: "unwrap" });
+    });
+
+    it("never takes an inherited name or an empty class for a mapping", () => {
+        expect(RichTextUtils.getTagTreatment("constructor", classMap, true)).toEqual({ kind: "unwrap" });
+        expect(RichTextUtils.getTagTreatment("empty", classMap, true)).toEqual({ kind: "unwrap" });
+    });
+});

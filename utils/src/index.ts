@@ -19,6 +19,7 @@ export * from "./Abstracts/rect.js";
 export * from "./Abstracts/rotation.js";
 export * from "./Abstracts/shape.js";
 export * from "./Abstracts/size.js";
+export * from "./Abstracts/store.js";
 export * from "./Abstracts/string.js";
 export * from "./Abstracts/time.js";
 export * from "./Abstracts/vec2d.js";

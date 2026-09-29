@@ -1,10 +1,7 @@
-import type { Signal } from "solid-js";
-
 import { TimeUtils, type TimeValue } from "@thewaver/ss-utils";
 
 import type { DateValue } from "../DateValue/DateValue.types";
 import { DateValueUtils } from "../DateValue/DateValue.utils";
-import { SignalMirrorUtils } from "../SignalMirror/SignalMirror.utils";
 import type { DateTimeValue } from "./DateTimeValue.types";
 
 /** Milliseconds in a second. */
@@ -60,34 +57,6 @@ export namespace DateTimeValueUtils {
             ? { hour: date.getHours(), minute: date.getMinutes(), second: date.getSeconds() }
             : { hour: date.getHours(), minute: date.getMinutes() },
     });
-
-    /**
-     * Splits one date-and-time signal into a date signal and a time signal.
-     *
-     * Two controls both writing to one value have a problem: whichever writes first would clear the
-     * other half. So each half is held separately and the pair is written back only once both are
-     * filled in, which is what lets a user pick a time before picking a day without the value flapping.
-     * Writes in the other direction flow through as well, so setting the whole value updates both
-     * controls.
-     *
-     * @param signal The whole value's signal.
-     * @returns A signal per half, each usable as an ordinary Solid signal. Either can be set to
-     * `undefined`, which leaves the whole value `undefined` until both halves are filled in again.
-     */
-    export const createSplit = (
-        signal: Signal<DateTimeValue | undefined>,
-    ): { dateSignal: Signal<DateValue | undefined>; timeSignal: Signal<TimeValue | undefined> } => {
-        const { firstSignal, secondSignal } = SignalMirrorUtils.createSplit<DateTimeValue, DateValue, TimeValue>(
-            signal,
-            {
-                compose: (date, time) => of(date, time),
-                decompose: (value) => [value.date, value.time],
-                getIsSame: isSame,
-            },
-        );
-
-        return { dateSignal: firstSignal, timeSignal: secondSignal };
-    };
 
     /**
      * Joins the two halves back into one instant, in the local time zone.

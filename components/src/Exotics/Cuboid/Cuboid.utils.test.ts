@@ -276,3 +276,49 @@ describe("getSettleKeyframes", () => {
         expect(new Set(shapes).size).toBe(1);
     });
 });
+
+describe("getAcrossSign", () => {
+    it("flips a drag across only for a pose tipped over the top", () => {
+        expect(CuboidUtils.getAcrossSign(false, 0)).toBe(1);
+        expect(CuboidUtils.getAcrossSign(false, 2)).toBe(-1);
+        expect(CuboidUtils.getAcrossSign(false, -2)).toBe(-1);
+        expect(CuboidUtils.getAcrossSign(true, 2)).toBe(1);
+    });
+});
+
+describe("getReleaseTurns", () => {
+    it("rounds a committed drag to whole turns, halves away from nothing", () => {
+        expect(CuboidUtils.getReleaseTurns("left", { yaw: 0.5, pitch: -0.4 })).toEqual({ yaw: 1, pitch: 0 });
+        expect(CuboidUtils.getReleaseTurns("left", { yaw: -1.5, pitch: 0 })).toEqual({ yaw: -2, pitch: 0 });
+    });
+
+    it("records nothing for a drag that fell short", () => {
+        expect(CuboidUtils.getReleaseTurns(undefined, { yaw: 0.9, pitch: 0.9 })).toEqual({ yaw: 0, pitch: 0 });
+    });
+});
+
+describe("findTurnsTo", () => {
+    it("finds nothing to do for the face already showing", () => {
+        expect(CuboidUtils.findTurnsTo("front", false, CuboidUtils.getCountedOrientation(0, 0), 0, 0)).toBeUndefined();
+    });
+
+    it("turns across before tipping, for a face that is one turn away either way", () => {
+        expect(CuboidUtils.findTurnsTo("right", false, CuboidUtils.getCountedOrientation(0, 0), 0, 0)).toEqual({
+            yaw: 1,
+            pitch: 0,
+        });
+        expect(CuboidUtils.findTurnsTo("top", false, CuboidUtils.getCountedOrientation(0, 0), 0, 0)).toEqual({
+            yaw: 0,
+            pitch: 1,
+        });
+    });
+});
+
+describe("getFaceBox", () => {
+    it("centers each face inside the front's box", () => {
+        const box = CuboidUtils.getFaceBox("right", { width: 200, height: 100, depth: 60 });
+
+        expect(box.left).toBe((200 - box.width) * 0.5);
+        expect(box.top).toBe((100 - box.height) * 0.5);
+    });
+});

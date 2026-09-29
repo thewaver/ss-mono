@@ -1,0 +1,41 @@
+import { Button, TextInput } from "@thewaver/ss-components-solid";
+import {
+    FIELD_GAP,
+    FIELD_PADDING,
+} from "@thewaver/ss-playground/App/StyledComponents/TextFieldContent/TextFieldContent.css";
+
+import { PageTextFieldAdornment } from "../../../StyledComponents/TextFieldAdornment/TextFieldAdornment";
+import {
+    PageTextFieldContent,
+    computePageTextFieldTextStyle,
+} from "../../../StyledComponents/TextFieldContent/TextFieldContent";
+import { PageTextFieldPlaceholder } from "../../../StyledComponents/TextFieldPlaceholder/TextFieldPlaceholder";
+import type { TextInputPasswordExampleProps } from "../TextInputPage.types";
+
+type Props = TextInputPasswordExampleProps;
+
+export const PasswordExample = (props: Props) => (
+    <TextInput
+        value={props.value}
+        padding={() => FIELD_PADDING}
+        gap={() => FIELD_GAP}
+        type={() => (props.reveal[0]() ? "text" : "password")}
+        ariaLabel={"Password"}
+        autoComplete={"current-password"}
+        computeTextStyle={computePageTextFieldTextStyle}
+        renderContent={(getFlags) => <PageTextFieldContent flags={getFlags} />}
+        renderPlaceholder={(getFlags) => <PageTextFieldPlaceholder flags={getFlags}>Password</PageTextFieldPlaceholder>}
+        renderTrailing={() => (
+            <Button
+                onClick={() => {
+                    props.reveal[1]((prev) => !prev);
+                }}
+                renderContent={(getFlags) => (
+                    <PageTextFieldAdornment flags={getFlags}>
+                        {props.reveal[0]() ? "Hide" : "Show"}
+                    </PageTextFieldAdornment>
+                )}
+            />
+        )}
+    />
+);

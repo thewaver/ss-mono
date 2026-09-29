@@ -1,9 +1,16 @@
-import { MathUtils } from "@thewaver/ss-utils";
+import { MathUtils, StoreUtils } from "@thewaver/ss-utils";
+
+import type { InteractionDragEndReason } from "../../Abstracts/InteractionTracker/InteractionTracker.types";
+import type { SlideButtonGestureDefs, SlideButtonGestureState, SlideButtonPress } from "./SlideButton.types";
 
 /** The start of the track. */
 const RATIO_MIN = 0;
 /** The end of the track. */
 const RATIO_MAX = 1;
+/** How far a press on the thumb has to travel before it is a drag rather than a wobble, in pixels. */
+const DRAG_THRESHOLD_PX = 4;
+/** The keys a hold answers to, which are the keys that press a button. */
+const HOLD_KEYS = ["Enter", " "];
 
 /** Where the thumb's leading edge sits for a given progress. The thumb's own width is not travel, so the progress is scaled by what is left. */
 const computeThumbStart = (progressRatio: number, thumbRatio: number) => progressRatio * (RATIO_MAX - thumbRatio);
@@ -85,5 +92,152 @@ export namespace SlideButtonUtils {
         if (durationMs <= 0) return RATIO_MAX;
 
         return MathUtils.clamp01(elapsedMs / durationMs);
+    };
+
+    /**
+     * Runs a slide button's two routes to its action: carrying the thumb to the end of the track, and holding the
+     * button down until the hold fills.
+     *
+     * A press is judged once, where it lands. Under every mode but `"hold"` a press on the thumb that then travels
+     * past a few pixels picks the thumb up, and the thumb follows the pointer from the point it was grabbed; letting
+     * go at the end of the track activates, and letting go anywhere else, or the system cancelling the gesture,
+     * puts it back. Under every mode but `"slide"` a press also starts a hold, which fills over the hold duration and
+     * activates when it is full — and a grab cancels it, since the two cannot both be the gesture. A held Enter or
+     * Space runs the same hold under every mode, so no setting can leave the button without a keyboard route. The
+     * progress either route makes is written through `setProgressRatio`, and put back to nothing when the gesture
+     * ends.
+     *
+     * The store says whether a hold is running and whether the thumb has been picked up. The functions in `defs` are
+     * read when they are needed, so they may answer differently over time; `getProgressRatio` is read at release to
+     * decide whether the thumb reached the end, so it has to answer with what `setProgressRatio` last wrote.
+     *
+     * @param defs How to read the button and write its progress.
+     * @returns The store, and the commands to feed it: `drag` and `dragEnd` from a drag tracker over the track,
+     * `pressKey` and `releaseKey` from the button's key events, `stopHold` for focus leaving or the owner going
+     * away, and `reset` for the button becoming disabled, which drops everything under way.
+     */
+    export const createGesture = (defs: SlideButtonGestureDefs) => {
+        const store = StoreUtils.create<SlideButtonGestureState>(
+            { isHolding: false, isGrabbed: false },
+            { isEqual: StoreUtils.getIsShallowEqual },
+        );
+
+        let holdFrame: number | undefined;
+        let press: SlideButtonPress | undefined;
+        let grabRatio: number | undefined;
+
+        const setGrabRatio = (ratio: number | undefined) => {
+            grabRatio = ratio;
+
+            store.update((current) => ({ ...current, isGrabbed: ratio !== undefined }));
+        };
+
+        const getThumbRatio = () => computeWidthRatio(defs.getTrackWidth(), defs.getThumbSize());
+
+        const stopHold = () => {
+            if (holdFrame !== undefined) cancelAnimationFrame(holdFrame);
+
+            holdFrame = undefined;
+
+            if (!store.get().isHolding) return;
+
+            store.update((current) => ({ ...current, isHolding: false }));
+            defs.setProgressRatio(RATIO_MIN);
+        };
+
+        const startHold = () => {
+            if (store.get().isHolding || grabRatio !== undefined) return;
+
+            const startedAtMs = performance.now();
+
+            const step = () => {
+                const ratio = computeHoldRatio(performance.now() - startedAtMs, defs.getHoldDurationMs());
+
+                defs.setProgressRatio(ratio);
+
+                if (ratio < RATIO_MAX) {
+                    holdFrame = requestAnimationFrame(step);
+
+                    return;
+                }
+
+                holdFrame = undefined;
+
+                defs.onActivate();
+            };
+
+            store.update((current) => ({ ...current, isHolding: true }));
+            step();
+        };
+
+        const drag = (pointerRatio: number) => {
+            const thumbRatio = getThumbRatio();
+            const mode = defs.getMode();
+
+            if (!press) {
+                press = {
+                    ratio: pointerRatio,
+                    isOnThumb: computeIsOnThumb(pointerRatio, defs.getProgressRatio(), thumbRatio),
+                };
+
+                if (mode !== "slide") startHold();
+
+                return;
+            }
+
+            if (grabRatio !== undefined) {
+                defs.setProgressRatio(computeProgressRatio(pointerRatio, grabRatio, thumbRatio));
+
+                return;
+            }
+
+            if (mode === "hold" || !press.isOnThumb) return;
+            if (Math.abs(pointerRatio - press.ratio) < computeWidthRatio(defs.getTrackWidth(), DRAG_THRESHOLD_PX))
+                return;
+
+            const nextGrabRatio = computeGrabRatio(press.ratio, RATIO_MIN, thumbRatio);
+
+            stopHold();
+            setGrabRatio(nextGrabRatio);
+            defs.setProgressRatio(computeProgressRatio(pointerRatio, nextGrabRatio, thumbRatio));
+        };
+
+        const dragEnd = (reason: InteractionDragEndReason) => {
+            const wasGrabbed = grabRatio !== undefined;
+
+            stopHold();
+            press = undefined;
+
+            if (!wasGrabbed) return;
+
+            if (reason === "release" && defs.getProgressRatio() >= RATIO_MAX) defs.onActivate();
+
+            setGrabRatio(undefined);
+            defs.setProgressRatio(RATIO_MIN);
+        };
+
+        return {
+            get: store.get,
+            subscribe: store.subscribe,
+            drag,
+            dragEnd,
+            stopHold,
+            pressKey: (key: string, isRepeat: boolean) => {
+                if (isRepeat || !HOLD_KEYS.includes(key)) return;
+
+                startHold();
+            },
+            releaseKey: (key: string) => {
+                if (!HOLD_KEYS.includes(key)) return;
+
+                stopHold();
+            },
+            reset: () => {
+                stopHold();
+                press = undefined;
+                setGrabRatio(undefined);
+                defs.setProgressRatio(RATIO_MIN);
+            },
+        };
     };
 }

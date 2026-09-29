@@ -1,5 +1,6 @@
-import { describe, expect, it } from "vitest";
+import { afterEach, describe, expect, it, vi } from "vitest";
 
+import { PointerTrackerUtils } from "../../../Abstracts/PointerTracker/PointerTracker.utils";
 import { ScratchCardUtils } from "./ScratchCard.utils";
 
 const TRIANGLE = ({ width, height }: { width: number; height: number }) => [
@@ -140,5 +141,68 @@ describe("computeBrushBox", () => {
 
         expect(second.width).toBe(first.width);
         expect(second.x - first.x).toBe(1);
+    });
+});
+
+describe("createMeasureScheduler", () => {
+    afterEach(() => {
+        vi.useRealTimers();
+    });
+
+    it("measures the first request at once and holds the ones that follow to the end of the interval", () => {
+        vi.useFakeTimers();
+
+        const measure = vi.fn();
+        const scheduler = ScratchCardUtils.createMeasureScheduler(measure);
+
+        scheduler.schedule();
+        expect(measure).toHaveBeenCalledTimes(1);
+
+        scheduler.schedule();
+        scheduler.schedule();
+        expect(measure, "the requests made too soon wait").toHaveBeenCalledTimes(1);
+
+        vi.advanceTimersByTime(100);
+        expect(measure, "and are answered together, once").toHaveBeenCalledTimes(2);
+    });
+
+    it("forgets a request put off when canceled, and measures at once again after a reset", () => {
+        vi.useFakeTimers();
+
+        const measure = vi.fn();
+        const scheduler = ScratchCardUtils.createMeasureScheduler(measure);
+
+        scheduler.schedule();
+        scheduler.schedule();
+        scheduler.cancel();
+        vi.advanceTimersByTime(100);
+        expect(measure).toHaveBeenCalledTimes(1);
+
+        scheduler.reset();
+        scheduler.schedule();
+        expect(measure).toHaveBeenCalledTimes(2);
+    });
+});
+
+describe("computeBrushGeometry", () => {
+    const over = {
+        hasRenderer: true,
+        isClearing: false,
+        isPointerPresent: true,
+        reading: { ...PointerTrackerUtils.RESTING, edgeRatio: 0.5, boxRatio: { x: 0.5, y: 0.25 } },
+        size: { width: 200, height: 100 },
+        shape: { radius: 10 },
+    };
+
+    it("centers the preview on the pointer, in the card's own pixels", () => {
+        expect(ScratchCardUtils.computeBrushGeometry(over)?.box).toEqual({ x: 90, y: 15, width: 20, height: 20 });
+    });
+
+    it("draws nothing without a renderer, while clearing, or with the pointer off the card", () => {
+        expect(ScratchCardUtils.computeBrushGeometry({ ...over, hasRenderer: false })).toBeUndefined();
+        expect(ScratchCardUtils.computeBrushGeometry({ ...over, isClearing: true })).toBeUndefined();
+        expect(
+            ScratchCardUtils.computeBrushGeometry({ ...over, reading: { ...over.reading, edgeRatio: 1.5 } }),
+        ).toBeUndefined();
     });
 });

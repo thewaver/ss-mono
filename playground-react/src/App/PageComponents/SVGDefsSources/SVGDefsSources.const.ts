@@ -1,0 +1,131 @@
+import { Fragment, createElement } from "react";
+import { renderToStaticMarkup } from "react-dom/server";
+
+import type { SVGDefs } from "@thewaver/ss-components-react";
+import { SVGDefsSamples } from "@thewaver/ss-components-react";
+import { SVGDefsUri } from "@thewaver/ss-playground/App/PageComponents/SVGDefsSources/SVGDefsUri.const";
+import type { Size2d } from "@thewaver/ss-utils";
+
+const SVG_NAMESPACE = "http://www.w3.org/2000/svg";
+
+const SOURCE_ANIMATION_ID = "source-animation";
+
+const CONTINUOUS = 0;
+
+export const SOURCE_SIZE: Size2d = { width: 1200, height: 1200 };
+
+export const SOURCE_CELL_SIZE: Size2d = { width: 150, height: 150 };
+
+const SOURCE_RATIO_SIZES = {
+    "1:1": SOURCE_SIZE,
+    "2:1": { width: SOURCE_SIZE.width, height: SOURCE_SIZE.height * 0.5 },
+    "1:2": { width: SOURCE_SIZE.width * 0.5, height: SOURCE_SIZE.height },
+} satisfies Record<string, Size2d>;
+
+const appendRect = (svg: SVGElement, size: Size2d, defs: SVGDefs) => {
+    const rect = document.createElementNS(SVG_NAMESPACE, "rect");
+
+    rect.setAttribute("width", `${size.width}`);
+    rect.setAttribute("height", `${size.height}`);
+    rect.setAttribute("fill", defs.color ?? `url(#${defs.gradientOrPattern!.id})`);
+
+    if (defs.clipPath) rect.setAttribute("clip-path", `url(#${defs.clipPath.id})`);
+    if (defs.filter) rect.setAttribute("filter", `url(#${defs.filter.id})`);
+    if (defs.opacity !== undefined) rect.setAttribute("opacity", `${defs.opacity}`);
+
+    svg.appendChild(rect);
+};
+
+export namespace SVGDefsSources {
+    export type SourceRatio = keyof typeof SOURCE_RATIO_SIZES;
+
+    export const SOURCE_RATIOS = Object.keys(SOURCE_RATIO_SIZES) as SourceRatio[];
+
+    export const computeSourceSize = (ratio: SourceRatio): Size2d => SOURCE_RATIO_SIZES[ratio];
+
+    export const toSourceSvg = (size: Size2d, entries: SVGDefs[], iterationDelayMs: number) => {
+        const svg = document.createElementNS(SVG_NAMESPACE, "svg");
+        const defsNode = document.createElementNS(SVG_NAMESPACE, "defs");
+
+        svg.setAttribute("width", `${size.width}`);
+        svg.setAttribute("height", `${size.height}`);
+        svg.appendChild(defsNode);
+
+        const markup = renderToStaticMarkup(
+            createElement(
+                "svg",
+                null,
+                entries
+                    .flatMap((entry) => [entry.clipPath, entry.filter, entry.gradientOrPattern])
+                    .filter((slot) => slot !== undefined)
+                    .map((slot) => createElement(Fragment, { key: slot.id }, slot.renderDefsElement())),
+            ),
+        );
+
+        defsNode.innerHTML = markup.slice(markup.indexOf(">") + 1, markup.lastIndexOf("</svg>"));
+
+        for (const entry of entries) appendRect(svg, size, entry);
+
+        const animations = [...svg.querySelectorAll("animate, animateTransform, animateMotion, set")];
+
+        animations.forEach((animation, index) => {
+            if (iterationDelayMs <= 0) {
+                if (animation.getAttribute("begin") === "indefinite") animation.setAttribute("begin", "0s");
+
+                return;
+            }
+
+            const id = animation.getAttribute("id") ?? `${SOURCE_ANIMATION_ID}-${index}`;
+
+            animation.setAttribute("id", id);
+            animation.setAttribute("repeatCount", "1");
+            animation.setAttribute("begin", `0s;${id}.end+${iterationDelayMs}ms`);
+        });
+
+        return new XMLSerializer().serializeToString(svg);
+    };
+
+    export const computeGradientSource = (
+        key: SVGDefsSamples.Gradient.Timed.SampleKey,
+        size: Size2d,
+        animationDurationMs: number,
+        animationIterationDelayMs: number,
+    ) =>
+        SVGDefsUri.toDataUri(
+            toSourceSvg(
+                size,
+                SVGDefsSamples.Gradient.Timed.toConfig(
+                    SVGDefsSamples.Gradient.Timed.SAMPLE_ENTRIES[key],
+                ).computeSVGDefs(`cell-gradient`, undefined, undefined, {
+                    getSize: () => size,
+                    animationDurationMs,
+                    colors: SVGDefsSamples.SAMPLE_COLORS,
+                    ...SVGDefsSamples.Iteration.SAMPLE_CONFIGS.constant.computeDefs(animationDurationMs),
+                }),
+                animationIterationDelayMs,
+            ),
+        );
+
+    export const computePatternSource = (
+        key: SVGDefsSamples.Pattern.SampleKey,
+        size: Size2d,
+        animationDurationMs: number,
+    ) =>
+        SVGDefsUri.toDataUri(
+            toSourceSvg(
+                size,
+                SVGDefsSamples.Pattern.SAMPLE_CONFIGS[key].computeSVGDefs(`cell-pattern`, undefined, undefined, {
+                    getSize: () => size,
+                    cellSize: SOURCE_CELL_SIZE,
+                    animationDurationMs,
+                    colors: SVGDefsSamples.SAMPLE_COLORS,
+                    ...SVGDefsSamples.Iteration.SAMPLE_CONFIGS.constant.computeDefs(animationDurationMs),
+                }),
+                CONTINUOUS,
+            ),
+        );
+
+    export const GRADIENT_KEYS = SVGDefsSamples.Gradient.Timed.SAMPLE_KEYS;
+
+    export const PATTERN_KEYS = SVGDefsSamples.Pattern.SAMPLE_KEYS;
+}

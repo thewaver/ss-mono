@@ -1,4 +1,4 @@
-import type { PageMosaicTileDefs } from "./Mosaics.types";
+import type { PageMosaicTileDefs } from "./MosaicTile.types";
 
 export const PICKED_GROWTH = 1.5;
 export const FIELD_WIDTH = 130;

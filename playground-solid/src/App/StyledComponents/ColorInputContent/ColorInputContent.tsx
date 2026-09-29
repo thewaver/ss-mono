@@ -1,0 +1,30 @@
+import { Show } from "solid-js";
+
+import { access } from "@thewaver/ss-components-solid";
+import * as styles from "@thewaver/ss-playground/App/StyledComponents/ColorInputContent/ColorInputContent.css";
+
+import { useLayerClass } from "../Layer/Layer.context";
+import type { ColorInputContentProps } from "./ColorInputContent.types";
+
+export const PageColorInputContent = (props: ColorInputContentProps) => {
+    const getLayerClass = useLayerClass();
+
+    return (
+        <div
+            class={styles.colorInputContent}
+            classList={{
+                [getLayerClass()]: true,
+                [styles.isHovered]: access(props.renderProps).isHovered,
+                [styles.isDisabled]: access(props.renderProps).isDisabled,
+                [styles.hasError]: access(props.renderProps).hasError,
+            }}
+            aria-hidden="true"
+        >
+            <div class={styles.colorInputSwatch} style={{ "background-color": access(props.renderProps).value }} />
+
+            <Show when={!access(props.isCompact)}>
+                <div class={styles.colorInputValue}>{access(props.renderProps).value}</div>
+            </Show>
+        </div>
+    );
+};

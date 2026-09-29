@@ -118,3 +118,115 @@ describe("stepPage and stepLeap", () => {
         expect(iso(CalendarUtils.stepLeap(date("2026-08-12"), "month", 1))).toBe("2038-08-12");
     });
 });
+
+describe("computeKeyAction", () => {
+    const opts = (roving: string, direction: "ltr" | "rtl" = "ltr") => {
+        const page = date(roving);
+
+        return {
+            roving: page,
+            precision: "day" as const,
+            cells: CalendarUtils.getCells(page, "day", 1),
+            shape: CalendarUtils.getGridShape(page, "day"),
+            direction,
+        };
+    };
+
+    it("picks the roving day on Enter and Space", () => {
+        expect(CalendarUtils.computeKeyAction("Enter", false, opts("2026-08-12"))).toMatchObject({ kind: "pick" });
+        expect(iso(CalendarUtils.computeKeyAction(" ", false, opts("2026-08-12"))!.day)).toBe("2026-08-12");
+    });
+
+    it("carries an arrow off the end of the month into the next", () => {
+        const action = CalendarUtils.computeKeyAction("ArrowRight", false, opts("2026-08-31"));
+
+        expect(action?.kind).toBe("move");
+        expect(iso(action!.day)).toBe("2026-09-01");
+    });
+
+    it("flips the horizontal arrows under right-to-left and leaves the vertical ones", () => {
+        expect(iso(CalendarUtils.computeKeyAction("ArrowRight", false, opts("2026-08-12", "rtl"))!.day)).toBe(
+            "2026-08-11",
+        );
+        expect(iso(CalendarUtils.computeKeyAction("ArrowDown", false, opts("2026-08-12", "rtl"))!.day)).toBe(
+            "2026-08-19",
+        );
+    });
+
+    it("keeps Home and End to the week, and the page keys to a month, or a year with Shift", () => {
+        expect(iso(CalendarUtils.computeKeyAction("Home", false, opts("2026-08-12"))!.day)).toBe("2026-08-10");
+        expect(iso(CalendarUtils.computeKeyAction("End", false, opts("2026-08-12"))!.day)).toBe("2026-08-16");
+        expect(iso(CalendarUtils.computeKeyAction("PageDown", false, opts("2026-08-12"))!.day)).toBe("2026-09-12");
+        expect(iso(CalendarUtils.computeKeyAction("PageUp", true, opts("2026-08-12"))!.day)).toBe("2025-08-12");
+    });
+
+    it("leaves a key that is not the grid's alone", () => {
+        expect(CalendarUtils.computeKeyAction("a", false, opts("2026-08-12"))).toBeUndefined();
+    });
+});
+
+describe("computeMove and computePick", () => {
+    it("clamps a move into the bounds and says when it takes the page with it", () => {
+        const pageStart = date("2026-08-01");
+        const within = CalendarUtils.computeMove(date("2026-08-20"), "day", pageStart);
+        const across = CalendarUtils.computeMove(date("2026-09-03"), "day", pageStart);
+        const clamped = CalendarUtils.computeMove(date("2026-07-01"), "day", pageStart, date("2026-08-05"));
+
+        expect(within.month).toBeUndefined();
+        expect(iso(across.month!)).toBe("2026-09-01");
+        expect(iso(clamped.day)).toBe("2026-08-05");
+        expect(clamped.month).toBeUndefined();
+    });
+
+    it("picks the first day of a coarse cell, pulled inside the bounds", () => {
+        expect(iso(CalendarUtils.computePick(date("2026-03-20"), "month"))).toBe("2026-03-01");
+        expect(iso(CalendarUtils.computePick(date("2019-06-01"), "year", date("2019-03-15")))).toBe("2019-03-15");
+    });
+});
+
+describe("computeRovingDay", () => {
+    const cells = CalendarUtils.getCells(date("2026-08-10"), "day", 1);
+    const today = date("2026-08-10");
+    const pageStart = date("2026-08-01");
+
+    it("prefers the highlight, then the anchor, then today, while each is on the page", () => {
+        const highlighted = date("2026-08-20");
+        const anchor = date("2026-08-15");
+
+        expect(iso(CalendarUtils.computeRovingDay(cells, "day", { highlighted, anchor, today, pageStart }))).toBe(
+            "2026-08-20",
+        );
+        expect(iso(CalendarUtils.computeRovingDay(cells, "day", { anchor, today, pageStart }))).toBe("2026-08-15");
+        expect(
+            iso(CalendarUtils.computeRovingDay(cells, "day", { anchor: date("2027-01-01"), today, pageStart })),
+        ).toBe("2026-08-10");
+    });
+
+    it("falls back to the page's first day when nothing else is on it", () => {
+        expect(iso(CalendarUtils.computeRovingDay(cells, "day", { today: date("2030-01-01"), pageStart }))).toBe(
+            "2026-08-01",
+        );
+    });
+});
+
+describe("getRows and the labels", () => {
+    it("cuts the day grid into six weeks", () => {
+        const rows = CalendarUtils.getRows(CalendarUtils.getCells(date("2026-08-10"), "day", 1), 7);
+
+        expect(rows).toHaveLength(6);
+        expect(rows.every((row) => row.length === 7)).toBe(true);
+    });
+
+    it("names a day in full and a page by its month, or by its span of years", () => {
+        const page = date("2026-08-01");
+        const eraId = CalendarUtils.getCurrentEraId(page, "en-GB");
+        const label = CalendarUtils.createCellLabeler(page, "day", eraId, "en-GB");
+
+        expect(label(date("2026-08-10"))).toBe("10 August 2026");
+        expect(CalendarUtils.formatPage(page, [], "day", eraId, "en-GB")).toBe("August 2026");
+
+        const years = CalendarUtils.getCells(page, "year", 1);
+
+        expect(CalendarUtils.formatPage(years[0], years, "year", eraId, "en-GB")).toMatch(/2017\D+2028/);
+    });
+});

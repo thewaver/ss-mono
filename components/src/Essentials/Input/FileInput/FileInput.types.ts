@@ -1,8 +1,4 @@
-import type {
-    InteractionControlProps,
-    InteractionWrapperProps,
-} from "../../../Primitives/InteractionWrapper/InteractionWrapper.types";
-import type { AccessorProps, SignalSource } from "../../../Utils/typeUtils";
+import type { Store } from "@thewaver/ss-utils";
 
 export type FileInputRejectReason = "count" | "size" | "type";
 
@@ -20,6 +16,10 @@ export type FileInputRejection = {
 export type FileInputAdmission = {
     accepted: File[];
     rejections: FileInputRejection[];
+};
+
+export type FileInputDropTracker = Store<boolean> & {
+    observe: (element: HTMLElement) => () => void;
 };
 
 export type FileInputRenderProps = {
@@ -80,20 +80,3 @@ export type FileInputState = {
 };
 
 export type FileInputLimits = Pick<FileInputState, "accept" | "isMultiple" | "maxFiles" | "maxSizeBytes">;
-
-export type FileInputElementProps = AccessorProps<
-    Omit<FileInputCbs, "onReject"> &
-        InteractionControlProps<FileInputRenderProps> &
-        Omit<FileInputState, "maxFiles" | "maxSizeBytes"> &
-        Pick<FileInputRenderProps, "files">
->;
-
-export type FileInputProps = Omit<InteractionWrapperProps<FileInputRenderProps>, "renderControl" | "extraFlags"> &
-    AccessorProps<
-        FileInputCbs &
-            Pick<InteractionControlProps<FileInputRenderProps>, "id" | "renderContent"> &
-            FileInputState & {
-                /** The chosen files. It is the only thing that changes them. */
-                filesSignal: SignalSource<File[]>;
-            }
-    >;

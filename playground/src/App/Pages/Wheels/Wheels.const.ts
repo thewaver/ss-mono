@@ -1,6 +1,6 @@
 import { PlacementLayoutUtils } from "@thewaver/ss-components";
 
-import type { WheelSpinStyleFn, WheelSpinStyleKey } from "./Wheels.types";
+import type { WheelSpinStyleFn, WheelSpinStyleKey } from "./WheelSpinStyle.types";
 
 export const FIELD_WIDTH = 130;
 

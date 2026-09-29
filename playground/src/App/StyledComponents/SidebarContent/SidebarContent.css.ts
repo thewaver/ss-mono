@@ -13,6 +13,12 @@ export const sidebarFrameVariants = styleVariants({
     right: {
         flexDirection: "row-reverse",
     },
+    top: {
+        flexDirection: "column",
+    },
+    bottom: {
+        flexDirection: "column-reverse",
+    },
 });
 
 export const sidebarFrame = style({

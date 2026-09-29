@@ -1,0 +1,71 @@
+import type { Accessor, Signal } from "solid-js";
+
+import { Sortable } from "@thewaver/ss-components-solid";
+import type {
+    InteractionFlags,
+    SortableGridItem,
+    SortableItem,
+    SortableItemFlags,
+} from "@thewaver/ss-components-solid";
+import { SORTABLE_ANNOUNCEMENTS } from "@thewaver/ss-playground/App/PageComponents/Announcements/Announcements.const";
+import * as styles from "@thewaver/ss-playground/App/Pages/SortableGridPage/SortableGridPage.css";
+import type { Gear } from "@thewaver/ss-playground/App/Pages/SortableGridPage/SortableGridPage.types";
+
+import {
+    PageSortableItemContent,
+    PageSortableMarker,
+    PageSortableSurface,
+} from "../../../StyledComponents/SortableContent/SortableContent";
+import { GRID_GAP, computeGearKey, computeGearLabel } from "../SortableGridPage.const";
+import { InventoryExample } from "./Inventory";
+
+type Props = {
+    groupId: string;
+    loot: Signal<SortableItem<Gear>[]>;
+    pack: Signal<SortableGridItem<Gear>[]>;
+};
+
+const RESTING_FLAGS: InteractionFlags<SortableItemFlags> = { isCarried: false, isLandingBefore: false };
+
+const renderLoot = (getItem: Accessor<SortableItem<Gear>>, getFlags: () => InteractionFlags<SortableItemFlags>) => (
+    <PageSortableItemContent flags={getFlags} detail={() => getItem().value.glyph}>
+        {getItem().value.name}
+    </PageSortableItemContent>
+);
+
+export const LootExample = (props: Props) => (
+    <div class={styles.sortableGridPair}>
+        <div class={styles.sortableGridStack}>
+            <div class={styles.sortableGridCaption}>Ground</div>
+
+            <div class={styles.sortableGridLootStrip}>
+                <Sortable
+                    groupId={props.groupId}
+                    ariaLabel={"Ground"}
+                    announcements={SORTABLE_ANNOUNCEMENTS}
+                    gap={GRID_GAP}
+                    minHeight={72}
+                    items={props.loot}
+                    computeItemKey={computeGearKey}
+                    computeItemLabel={computeGearLabel}
+                    renderItem={renderLoot}
+                    renderCarried={(getItem) => renderLoot(getItem, () => RESTING_FLAGS)}
+                    renderMarker={(getOrientation) => <PageSortableMarker orientation={getOrientation} />}
+                    renderDecoration={(getFlags) => <PageSortableSurface flags={getFlags} emptyText={"Nothing left"} />}
+                />
+            </div>
+        </div>
+
+        <div class={styles.sortableGridStack}>
+            <div class={styles.sortableGridCaption}>Pack</div>
+
+            <InventoryExample
+                groupId={props.groupId}
+                items={props.pack}
+                ariaLabel={"Pack"}
+                emptyText={"Empty pack"}
+                isTurnable={true}
+            />
+        </div>
+    </div>
+);

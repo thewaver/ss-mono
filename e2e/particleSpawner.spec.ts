@@ -190,7 +190,7 @@ test.beforeEach(async ({ page }) => {
  * the end of the one round writes it off. So a press sends exactly one round, a press while that round is
  * still going finds the signal already on and does nothing, and once the round is over the button works again.
  */
-test("a press sends one round, and a press mid-burst sends nothing extra", async ({ page }) => {
+test("a press sends one round, and a press mid-burst sends nothing extra", { tag: "@solo" }, async ({ page }) => {
     await page.locator(BURST).scrollIntoViewIfNeeded();
 
     expect(await liveCount(page, "burst"), "nothing is sent until somebody presses").toBe(0);
@@ -235,7 +235,7 @@ test("a press sends one round, and a press mid-burst sends nothing extra", async
         .toBe(PARTICLE_COUNT * 2);
 });
 
-test("particles from every spawner arrive at the one shared target", async ({ page }) => {
+test("particles from every spawner arrive at the one shared target", { tag: "@solo" }, async ({ page }) => {
     await page.locator(MANY_TO_ONE).scrollIntoViewIfNeeded();
     await installLog(page, MANY_TO_ONE);
 
@@ -278,7 +278,7 @@ test("particles from every spawner arrive at the one shared target", async ({ pa
  * pairing is done in order with a generous window, and the arrivals too close to the end of the log to have
  * had their answer yet are left out, as are returns too close to its start to have had their arrival logged.
  */
-test("every particle that reaches the far spawner is sent back, one for one", async ({ page }) => {
+test("every particle that reaches the far spawner is sent back, one for one", { tag: "@solo" }, async ({ page }) => {
     await page.locator(ROUND_TRIP).scrollIntoViewIfNeeded();
     await installLog(page, ROUND_TRIP);
 

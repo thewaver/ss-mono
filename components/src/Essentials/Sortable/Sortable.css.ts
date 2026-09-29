@@ -45,7 +45,7 @@ export const sortableMarkerColumn = style([sortableMarker, { flexDirection: "col
 
 export const sortableCarried = style({
     display: "flex",
-    position: "absolute",
+    position: "fixed",
     top: 0,
     left: 0,
     pointerEvents: "none",

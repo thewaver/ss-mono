@@ -1,0 +1,33 @@
+<script setup lang="ts">
+import { useModel } from "vue";
+
+import { Select } from "@thewaver/ss-components-vue";
+
+import PageSelectContent from "../../../StyledComponents/SelectContent/SelectContent.vue";
+import PageSelectOptionContent from "../../../StyledComponents/SelectOptionContent/SelectOptionContent.vue";
+import { HOURS, PLACEHOLDER } from "../SelectPage.const";
+import type { SelectExampleProps } from "../SelectPage.types";
+import SelectPopup from "../SelectPopup.vue";
+
+type Props = SelectExampleProps;
+
+const props = defineProps<Props>();
+
+const value = useModel(props, "value");
+</script>
+
+<template>
+    <Select v-model:value="value" :options="HOURS" ariaLabel="Departure hour">
+        <template #renderContent="{ selectedOption, flags }">
+            <PageSelectContent :flags="flags">{{ selectedOption?.value ?? PLACEHOLDER }}</PageSelectContent>
+        </template>
+
+        <template #renderOption="{ option, flags }">
+            <PageSelectOptionContent :flags="flags">{{ option.value }}</PageSelectOptionContent>
+        </template>
+
+        <template #renderPopup="popup">
+            <SelectPopup v-bind="popup" />
+        </template>
+    </Select>
+</template>

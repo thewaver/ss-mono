@@ -1,4 +1,4 @@
-import type { Topping } from "./CheckboxGroupPage.types";
+import type { Topping } from "./CheckboxGroupTopping.types";
 
 export const GROUP_GAP = 10;
 

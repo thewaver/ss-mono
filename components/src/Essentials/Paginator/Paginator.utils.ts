@@ -9,6 +9,12 @@ const FIRST_PAGE = 1;
 const getRange = (from: number, to: number) =>
     from > to ? [] : Array.from({ length: to - from + 1 }, (_, index) => from + index);
 
+/** The move controls that sit before the pages, in the order they are drawn. */
+const LEADING_STEPS: PaginatorStep[] = ["first", "previous"];
+
+/** The move controls that sit after the pages, in the order they are drawn. */
+const TRAILING_STEPS: PaginatorStep[] = ["next", "last"];
+
 /** Page numbers as page entries. */
 const toPages = (pages: number[]): PaginatorEntry[] => pages.map((page) => ({ kind: "page", page }));
 
@@ -98,5 +104,45 @@ export namespace PaginatorUtils {
         if (step === "last") return last;
 
         return MathUtils.clamp(step === "previous" ? current - 1 : current + 1, FIRST_PAGE, last);
+    };
+
+    /**
+     * How many pages there really are, whatever was asked for.
+     *
+     * @param pageCount The count as given, which may be fractional or negative.
+     * @returns The whole number of pages, never below zero.
+     */
+    export const computePageCount = (pageCount: number) => Math.max(Math.trunc(pageCount), 0);
+
+    /**
+     * Sorts the requested move controls into the ones drawn before the pages and the ones drawn after.
+     *
+     * The order the caller listed them in does not matter: first always precedes previous, and next always precedes
+     * last, so a paginator reads the same way whichever order its steps were written in.
+     *
+     * @param steps The move controls asked for.
+     * @returns `leading`, the ones before the pages, and `trailing`, the ones after.
+     */
+    export const splitSteps = (steps: PaginatorStep[]) => ({
+        leading: LEADING_STEPS.filter((step) => steps.includes(step)),
+        trailing: TRAILING_STEPS.filter((step) => steps.includes(step)),
+    });
+
+    /**
+     * Where a move control goes, and whether it can go there at all.
+     *
+     * A step that would land on the page already shown is disabled rather than hidden, so previous goes quiet on the
+     * first page and next on the last, and the row keeps its shape.
+     *
+     * @param step Which move control.
+     * @param page The current page.
+     * @param pageCount How many pages there are.
+     * @param isDisabled Whether the whole paginator is turned off, which disables every step whatever its target.
+     * @returns `targetPage`, from {@link getStepTarget}, and `isDisabled`.
+     */
+    export const computeStepState = (step: PaginatorStep, page: number, pageCount: number, isDisabled: boolean) => {
+        const targetPage = getStepTarget(step, page, pageCount);
+
+        return { targetPage, isDisabled: isDisabled || targetPage === page };
     };
 }

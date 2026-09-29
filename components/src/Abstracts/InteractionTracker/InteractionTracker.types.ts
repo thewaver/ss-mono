@@ -1,3 +1,5 @@
+import type { Store } from "@thewaver/ss-utils";
+
 export type ExternalInteractionFlags = {
     /**
      * Turns the control off. It keeps its place in the layout and stays readable rather than being grayed
@@ -45,3 +47,48 @@ export type InteractionDragRatio = {
 };
 
 export type InteractionDragEndReason = "release" | "cancel";
+
+export type InteractionElementState = InternalInteractionFlags & {
+    isActiveByMouse: boolean;
+    isActiveByKey: boolean;
+};
+
+export type InteractionElementOpts = {
+    isDisabled: boolean;
+    isReachable: boolean;
+    isTabbable: boolean;
+    applyButtonSemantics?: boolean;
+};
+
+export type InteractionElementTracker = Store<InteractionElementState> & {
+    observe: (element: HTMLElement, opts: InteractionElementOpts) => () => void;
+};
+
+export type InteractionPageHiddenWatcher = Store<boolean> & {
+    observe: () => () => void;
+};
+
+export type InteractionHoldState = {
+    isHovered: boolean;
+    hasFocusWithin: boolean;
+};
+
+export type InteractionHoldTracker = Store<InteractionHoldState> & {
+    observe: (element: HTMLElement) => () => void;
+};
+
+export type InteractionActivationTracker = {
+    observe: (element: HTMLElement) => () => void;
+};
+
+export type InteractionDragTracker = Store<boolean> & {
+    observe: (element: HTMLElement) => () => void;
+    reset: () => void;
+};
+
+export type InteractionSwipeTracker = Store<boolean> & {
+    observe: (element: HTMLElement) => () => void;
+    reset: () => void;
+    observeClicks: (element: HTMLElement) => () => void;
+    applyTouchAction: (element: HTMLElement, isDisabled: boolean) => void;
+};

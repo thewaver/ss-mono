@@ -15,7 +15,7 @@ describe("getMaskStyle", () => {
             "subtract, add",
         );
         expect(
-            style["-webkit-mask-composite"],
+            (style as Record<string, string | undefined>)["-webkit-mask-composite"],
             "the prefixed spelling takes different keywords and would override this one where both are read",
         ).toBeUndefined();
     });

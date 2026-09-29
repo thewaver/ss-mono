@@ -1,0 +1,21 @@
+import type { SVGDefsColors, SVGDefsSamples } from "@thewaver/ss-components-svelte";
+import type { WithNoSample } from "@thewaver/ss-playground/App/PageComponents/SampleGroups/SampleGroups.types";
+
+export type GlassSurfaceExampleProps = {
+    borderRadius: number;
+    borderWidth: number;
+    strokeConfigKey: WithNoSample<SVGDefsSamples.Gradient.Tracked.SampleKey>;
+    strokeConfigDefs: Record<string, number | boolean>;
+    colors: SVGDefsColors;
+    blurWidth?: number;
+    blurRadius: number;
+    noiseFrequency: number;
+    noiseOctaves: number;
+    rippleScale: number;
+    tintColor: string;
+    tintOpacity: number;
+    lightHeight: number;
+    surfaceScale: number;
+    specularConstant: number;
+    specularExponent: number;
+};

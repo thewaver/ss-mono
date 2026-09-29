@@ -88,3 +88,33 @@ describe("quaternions", () => {
         [1, 0, 0, 0, 1, 0, 0, 0, 1].forEach((value, index) => expect(twoTurns[index]).toBeCloseTo(value, 9));
     });
 });
+
+describe("clampFace", () => {
+    it("truncates the owner's face and keeps it among the faces there are", () => {
+        expect(DieUtils.clampFace(2.7, 6)).toBe(2);
+        expect(DieUtils.clampFace(-3, 6)).toBe(0);
+        expect(DieUtils.clampFace(40, 6)).toBe(5);
+    });
+});
+
+describe("getFaceBox", () => {
+    it("centers a face's box inside the die and clips it to an outline written in the box's own space", () => {
+        const face = {
+            center: { x: 0, y: 0, z: 1 },
+            normal: { x: 0, y: 0, z: 1 },
+            right: { x: 1, y: 0, z: 0 },
+            down: { x: 0, y: 1, z: 0 },
+            size: { width: 40, height: 20 },
+            outline: [
+                { x: -20, y: -10 },
+                { x: 20, y: -10 },
+                { x: 0, y: 10 },
+            ],
+        };
+        const box = DieUtils.getFaceBox(face, 100);
+
+        expect(box.left).toBe(30);
+        expect(box.top).toBe(40);
+        expect(box.clipPath).toBe("polygon(0px 0px,40px 0px,20px 20px)");
+    });
+});

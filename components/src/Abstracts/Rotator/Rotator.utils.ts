@@ -1,21 +1,9 @@
-import type { Accessor } from "solid-js";
-import { createEffect, createMemo, createSignal, on, onCleanup, untrack } from "solid-js";
-
 import type { EasingFn } from "@thewaver/ss-utils";
-import { EasingUtils, MathUtils, RotationUtils } from "@thewaver/ss-utils";
+import { EasingUtils, MathUtils, RotationUtils, StoreUtils } from "@thewaver/ss-utils";
 
-import { access } from "../../Utils/propUtils";
-import { InteractionTrackerUtils } from "../InteractionTracker/InteractionTracker.utils";
 import { LiveAnnouncerUtils } from "../LiveAnnouncer/LiveAnnouncer.utils";
-import { SignalMirrorUtils } from "../SignalMirror/SignalMirror.utils";
-import type { RotatorDefs, RotatorPhase, RotatorSpinDefs } from "./Rotator.types";
+import type { RotatorController, RotatorCoreDefs, RotatorPhase, RotatorSpinDefs, RotatorState } from "./Rotator.types";
 
-/** How long a spin takes when the caller does not say. */
-const DEFAULT_SPIN_DURATION_MS = 3000;
-/** How long the drift back from an overshoot takes when the caller does not say. */
-const DEFAULT_SETTLE_DURATION_MS = 1500;
-/** How long the wheel stays still after a spin before idling resumes. */
-const DEFAULT_REST_DURATION_MS = 3000;
 /** Three whole turns and no overshoot, when the caller does not say. */
 const DEFAULT_SPIN_DEFS: RotatorSpinDefs = { turns: 3, jitterRatio: 0 };
 /** Fewer than two steps and there is nowhere to rotate to. */
@@ -26,6 +14,8 @@ const NO_TURNS = 0;
 const FRAME_STARVATION_SLACK_MS = 100;
 /** Eases in and out, so a spin starts and stops rather than snapping to speed. */
 const SPIN_EASING: EasingFn = EasingUtils.ease;
+/** At rest at nought degrees, with nothing under way. */
+const RESTING_STATE: RotatorState = { angle: 0, spinPhase: "still", isAwaitingTarget: false, isResting: false };
 
 /**
  * Spins a wheel of steps to a chosen one and reports where it is throughout.
@@ -36,6 +26,55 @@ const SPIN_EASING: EasingFn = EasingUtils.ease;
  * server can pick the outcome while the wheel is already turning.
  */
 export namespace RotatorUtils {
+    /** How long a spin takes when the caller does not say. */
+    export const DEFAULT_SPIN_DURATION_MS = 3000;
+
+    /** How long the drift back from an overshoot takes when the caller does not say. */
+    export const DEFAULT_SETTLE_DURATION_MS = 1500;
+
+    /** How long the wheel stays still after a spin before idling resumes, when the caller does not say. */
+    export const DEFAULT_REST_DURATION_MS = 3000;
+
+    /**
+     * Whether a wheel can rotate at all: it is enabled and has at least two steps to rotate between.
+     *
+     * @param isDisabled Whether the wheel is off.
+     * @param stepCount How many steps it has.
+     */
+    export const getIsRotatable = (isDisabled: boolean, stepCount: number) =>
+        !isDisabled && stepCount >= MIN_ROTATABLE_STEP_COUNT;
+
+    /**
+     * Whether a spin could start right now: the wheel can rotate, is standing still, and is not waiting on a target.
+     *
+     * @param state What the rotator holds.
+     * @param isRotatable The answer from {@link getIsRotatable}.
+     */
+    export const getIsSpinnable = (state: RotatorState, isRotatable: boolean) =>
+        isRotatable && state.spinPhase === "still" && !state.isAwaitingTarget;
+
+    /**
+     * What a wheel is doing, from what its rotator holds and whether idle drift is allowed.
+     *
+     * A spin or a settle under way is reported as itself. Otherwise the wheel is idling when drift has a delay, is
+     * allowed, the rest after a spin is over, and the wheel can rotate — and still when any of those fails.
+     *
+     * @param state What the rotator holds.
+     * @param opts.idleDelayMs How long one step of idle drift takes. `undefined` means no drift.
+     * @param opts.isIdleAllowed Whether drift is allowed at all — switched on, and the tab in the foreground.
+     * @param opts.isRotatable The answer from {@link getIsRotatable}.
+     */
+    export const computePhase = (
+        state: RotatorState,
+        opts: { idleDelayMs: number | undefined; isIdleAllowed: boolean; isRotatable: boolean },
+    ): RotatorPhase => {
+        if (state.spinPhase !== "still") return state.spinPhase;
+
+        const isIdling = opts.idleDelayMs !== undefined && opts.isIdleAllowed && !state.isResting && opts.isRotatable;
+
+        return isIdling ? "idling" : "still";
+    };
+
     /**
      * Drives one wheel.
      *
@@ -44,20 +83,28 @@ export namespace RotatorUtils {
      * by the consumer setting the index directly. The step that was landed on is announced, since a
      * screen reader user cannot see the wheel stop.
      *
-     * Idle drift is one step per delay, and it stops on its own while the tab is in the background,
-     * during the rest period after a spin, and whenever the wheel cannot rotate at all.
+     * The rotator is a store of the angle, the spin phase, whether a target is being waited on, and whether the
+     * wheel is resting after a spin. Its commands:
      *
-     * @param getIsDisabled Whether the wheel may rotate.
-     * @param defs.stepCount How many steps the wheel has. Fewer than two and it cannot rotate.
-     * @param defs.targetIndexSignal The step the wheel is heading for, if the consumer wants to drive or
-     * observe it. Writing it turns the wheel there, unless a spin is under way; the component writes it as
-     * soon as a spin's target is known, rather than when the spin lands, and idle drift leaves it alone. An
-     * internal signal is used when omitted.
-     * @param defs.autoSpinSignal Whether idle drift is allowed. On when omitted.
-     * @param defs.spinDurationMs How long a spin takes.
-     * @param defs.settleDurationMs How long the drift back from an overshoot takes.
-     * @param defs.restDurationMs How long the wheel stays still after landing before idling resumes.
-     * @param defs.idleDelayMs How long one step of idle drift takes. Omitted means no drift.
+     * - `spin` starts a spin if one could start, by {@link getIsSpinnable}, and says whether it did. The target is
+     *   asked for at once and written to the target index as soon as it is known.
+     * - `turnToTarget` turns the wheel to a step the consumer chose, unless a spin is under way or it is already
+     *   there. Call it when the target index changes from outside.
+     * - `startRest` holds the wheel still after landing, for the given time, and returns the function that calls
+     *   it off. It does nothing unless the wheel is resting; a negative time rests for good.
+     * - `drift` turns the wheel one step per `idleDelayMs` on animation frames, and returns the function that
+     *   stops it. It does nothing without a positive delay and step angle. Call it while {@link computePhase} says
+     *   `"idling"`.
+     * - `stop` abandons whatever is under way — a spin's frames, its backstop timer, a target still being waited
+     *   for — and leaves the wheel still where it is, usable again. Call it when the owner goes away.
+     *
+     * Every function in `defs` is read when it is needed.
+     *
+     * @param defs.getIsDisabled Whether the wheel may rotate.
+     * @param defs.getStepCount How many steps the wheel has. Fewer than two and it cannot rotate.
+     * @param defs.getSpinDurationMs How long a spin takes.
+     * @param defs.getSettleDurationMs How long the drift back from an overshoot takes, and a consumer's own move.
+     * @param defs.targetIndex The step the wheel is heading for, read and written.
      * @param defs.computeSpinTarget Chooses the step to land on. May return a promise, in which case
      * the wheel waits for it before starting; a rejection abandons the spin and leaves the wheel where
      * it was.
@@ -66,67 +113,22 @@ export namespace RotatorUtils {
      * @param defs.computeStepLabel How to announce the step landed on, given its zero-based index and
      * the step count.
      * @param defs.onSpinEnd Called with the step landed on.
-     * @param defs.onStepChange Called whenever the step under the marker changes, drift included.
-     * @returns `getAngle` for the transform to apply, `getTargetIndex` for the step the wheel is heading
-     * for, `getCurrentIndex` for whatever is under the marker right now, `getPhase` — `"still"`, `"idling"`, `"spinning"` or
-     * `"settling"` — `getStepAngle` and `getStepCount` for laying the steps out, `getIsRotatable`,
-     * `getIsSpinnable` for enabling the button, `getIsAwaitingTarget` for the wait on an asynchronous
-     * target, and `spin` to start one.
+     * @returns The rotator.
      */
-    export const createRotator = (getIsDisabled: Accessor<boolean>, defs: RotatorDefs) => {
+    export const createRotator = (defs: RotatorCoreDefs): RotatorController => {
         LiveAnnouncerUtils.reserve("polite");
 
-        const [getAngle, setAngle] = createSignal(0);
-        const [getSpinPhase, setSpinPhase] = createSignal<Exclude<RotatorPhase, "idling">>("still");
-        const [getIsAwaitingTarget, setIsAwaitingTarget] = createSignal(false);
-        const [getIsResting, setIsResting] = createSignal(false);
+        const store = StoreUtils.create(RESTING_STATE, { isEqual: StoreUtils.getIsShallowEqual });
+        const [getTargetIndex, setTargetIndex] = defs.targetIndex;
 
-        const [getTargetIndex, setTargetIndex] = SignalMirrorUtils.createOptional(() => defs.targetIndexSignal, 0);
-        const [getIsAutoSpinEnabled] = SignalMirrorUtils.createOptional(() => defs.autoSpinSignal, true);
+        const write = (next: Partial<RotatorState>) => store.update((current) => ({ ...current, ...next }));
 
         let targetIndex: number | undefined;
         let spinFrameId: number | undefined;
         let starvationHandle: ReturnType<typeof setTimeout> | undefined;
-        let isDisposed = false;
+        let generation = 0;
 
-        const getStepCount = createMemo(() => Math.max(0, Math.trunc(access(defs.stepCount))));
-
-        const getStepAngle = createMemo(() => RotationUtils.getStepAngle(getStepCount()));
-
-        const getSpinDurationMs = createMemo(() => access(defs.spinDurationMs) ?? DEFAULT_SPIN_DURATION_MS);
-
-        const getSettleDurationMs = createMemo(() => access(defs.settleDurationMs) ?? DEFAULT_SETTLE_DURATION_MS);
-
-        const getRestDurationMs = createMemo(() => access(defs.restDurationMs) ?? DEFAULT_REST_DURATION_MS);
-
-        const getIdleDelayMs = createMemo(() => access(defs.idleDelayMs));
-
-        const getIsRotatable = createMemo(() => !getIsDisabled() && getStepCount() >= MIN_ROTATABLE_STEP_COUNT);
-
-        const getIsPageHidden = InteractionTrackerUtils.trackPageHidden();
-
-        const getIsSpinnable = createMemo(
-            () => getIsRotatable() && getSpinPhase() === "still" && !getIsAwaitingTarget(),
-        );
-
-        const getPhase = createMemo((): RotatorPhase => {
-            const spinPhase = getSpinPhase();
-
-            if (spinPhase !== "still") return spinPhase;
-
-            const isIdling =
-                getIdleDelayMs() !== undefined &&
-                getIsAutoSpinEnabled() &&
-                !getIsResting() &&
-                !getIsPageHidden() &&
-                getIsRotatable();
-
-            return isIdling ? "idling" : "still";
-        });
-
-        const getCurrentIndex = createMemo(() => RotationUtils.getAngleIndex(getAngle(), getStepCount()));
-
-        const getStepLabel = (index: number) => defs.computeStepLabel(index, getStepCount());
+        const getStepLabel = (index: number) => defs.computeStepLabel(index, defs.getStepCount());
 
         const stopSpinFrames = () => {
             if (spinFrameId !== undefined) cancelAnimationFrame(spinFrameId);
@@ -139,11 +141,11 @@ export namespace RotatorUtils {
         const turnTo = (toAngle: number, durationMs: number, easing: EasingFn, onArrival: () => void) => {
             stopSpinFrames();
 
-            const fromAngle = untrack(getAngle);
+            const fromAngle = store.get().angle;
 
             const arrive = () => {
                 stopSpinFrames();
-                setAngle(toAngle);
+                write({ angle: toAngle });
                 onArrival();
             };
 
@@ -164,7 +166,7 @@ export namespace RotatorUtils {
                     return;
                 }
 
-                setAngle(MathUtils.lerp(fromAngle, toAngle, easing(ratio)));
+                write({ angle: MathUtils.lerp(fromAngle, toAngle, easing(ratio)) });
 
                 spinFrameId = requestAnimationFrame(advance);
             };
@@ -174,15 +176,14 @@ export namespace RotatorUtils {
         };
 
         const land = (index: number) => {
-            setSpinPhase("still");
-            setIsResting(true);
+            write({ spinPhase: "still", isResting: true });
             setTargetIndex(index);
 
             LiveAnnouncerUtils.announce(getStepLabel(index));
         };
 
         const settle = () => {
-            const index = MathUtils.wrapIndex(targetIndex ?? untrack(getTargetIndex), getStepCount());
+            const index = MathUtils.wrapIndex(targetIndex ?? getTargetIndex(), defs.getStepCount());
 
             targetIndex = undefined;
 
@@ -192,65 +193,79 @@ export namespace RotatorUtils {
         };
 
         const spin = () => {
-            if (!getIsSpinnable()) return false;
+            if (!getIsSpinnable(store.get(), getIsRotatable(defs.getIsDisabled(), defs.getStepCount()))) return false;
 
-            setIsResting(false);
-            setIsAwaitingTarget(true);
+            const current = generation;
+
+            write({ isResting: false, isAwaitingTarget: true });
 
             void Promise.resolve(defs.computeSpinTarget())
                 .then((index) => {
-                    if (isDisposed) return;
+                    if (current !== generation) return;
 
-                    const stepCount = getStepCount();
+                    const stepCount = defs.getStepCount();
                     const spinDefs = defs.computeSpinDefs?.(index, stepCount) ?? DEFAULT_SPIN_DEFS;
                     const jitterAngle = RotationUtils.getJitterAngle(spinDefs.jitterRatio, stepCount);
                     const spinAngle =
-                        RotationUtils.getSpinAngle(untrack(getAngle), index, stepCount, spinDefs.turns) + jitterAngle;
+                        RotationUtils.getSpinAngle(store.get().angle, index, stepCount, spinDefs.turns) + jitterAngle;
 
                     targetIndex = index;
 
-                    setSpinPhase("spinning");
-                    setIsAwaitingTarget(false);
+                    write({ spinPhase: "spinning", isAwaitingTarget: false });
                     setTargetIndex(MathUtils.wrapIndex(index, stepCount));
 
-                    turnTo(spinAngle, getSpinDurationMs(), SPIN_EASING, () => {
+                    turnTo(spinAngle, defs.getSpinDurationMs(), SPIN_EASING, () => {
                         if (jitterAngle === 0) {
                             settle();
 
                             return;
                         }
 
-                        setSpinPhase("settling");
+                        write({ spinPhase: "settling" });
 
-                        turnTo(spinAngle - jitterAngle, getSettleDurationMs(), SPIN_EASING, settle);
+                        turnTo(spinAngle - jitterAngle, defs.getSettleDurationMs(), SPIN_EASING, settle);
                     });
                 })
                 .catch(() => {
-                    if (isDisposed) return;
+                    if (current !== generation) return;
 
-                    setIsAwaitingTarget(false);
+                    write({ isAwaitingTarget: false });
                 });
 
             return true;
         };
 
-        createEffect(() => {
-            const restDurationMs = getRestDurationMs();
+        const turnToTarget = (index: number) => {
+            const state = store.get();
 
-            if (!getIsResting() || restDurationMs < 0) return;
+            if (state.spinPhase !== "still" || state.isAwaitingTarget) return;
 
-            const handle = setTimeout(() => setIsResting(false), restDurationMs);
+            const stepCount = defs.getStepCount();
+            const wrapped = MathUtils.wrapIndex(index, stepCount);
 
-            onCleanup(() => {
-                clearTimeout(handle);
-            });
-        });
+            if (stepCount < MIN_ROTATABLE_STEP_COUNT) return;
+            if (wrapped === RotationUtils.getAngleIndex(state.angle, stepCount)) return;
 
-        createEffect(() => {
-            const idleDelayMs = getIdleDelayMs();
-            const stepAngle = getStepAngle();
+            write({ spinPhase: "settling" });
 
-            if (getPhase() !== "idling" || idleDelayMs === undefined || idleDelayMs <= 0 || stepAngle <= 0) return;
+            turnTo(
+                RotationUtils.getSpinAngle(state.angle, wrapped, stepCount, NO_TURNS),
+                defs.getSettleDurationMs(),
+                SPIN_EASING,
+                () => land(wrapped),
+            );
+        };
+
+        const startRest = (restDurationMs: number) => {
+            if (!store.get().isResting || restDurationMs < 0) return () => {};
+
+            const handle = setTimeout(() => write({ isResting: false }), restDurationMs);
+
+            return () => clearTimeout(handle);
+        };
+
+        const drift = (idleDelayMs: number | undefined, stepAngle: number) => {
+            if (idleDelayMs === undefined || idleDelayMs <= 0 || stepAngle <= 0) return () => {};
 
             const degreesPerMs = stepAngle / idleDelayMs;
 
@@ -262,61 +277,24 @@ export namespace RotatorUtils {
 
                 previousTime = time;
 
-                setAngle((angle) => angle + elapsedMs * degreesPerMs);
+                store.update((current) => ({ ...current, angle: current.angle + elapsedMs * degreesPerMs }));
 
                 idleFrameId = requestAnimationFrame(advance);
             };
 
             idleFrameId = requestAnimationFrame(advance);
 
-            onCleanup(() => {
-                cancelAnimationFrame(idleFrameId);
-            });
-        });
+            return () => cancelAnimationFrame(idleFrameId);
+        };
 
-        createEffect(
-            on(
-                getTargetIndex,
-                (index) => {
-                    if (untrack(getSpinPhase) !== "still" || untrack(getIsAwaitingTarget)) return;
-
-                    const stepCount = untrack(getStepCount);
-                    const wrapped = MathUtils.wrapIndex(index, stepCount);
-
-                    if (stepCount < MIN_ROTATABLE_STEP_COUNT || wrapped === untrack(getCurrentIndex)) return;
-
-                    setSpinPhase("settling");
-
-                    turnTo(
-                        RotationUtils.getSpinAngle(untrack(getAngle), wrapped, stepCount, NO_TURNS),
-                        untrack(getSettleDurationMs),
-                        SPIN_EASING,
-                        () => land(wrapped),
-                    );
-                },
-                { defer: true },
-            ),
-        );
-
-        createEffect(on(getCurrentIndex, (index) => defs.onStepChange?.(index), { defer: true }));
-
-        onCleanup(() => {
-            isDisposed = true;
+        const stop = () => {
+            generation++;
+            targetIndex = undefined;
 
             stopSpinFrames();
-        });
-
-        return {
-            getAngle,
-            getTargetIndex,
-            getCurrentIndex,
-            getPhase,
-            getStepAngle,
-            getStepCount,
-            getIsRotatable,
-            getIsSpinnable,
-            getIsAwaitingTarget,
-            spin,
+            write({ spinPhase: "still", isAwaitingTarget: false });
         };
+
+        return { get: store.get, subscribe: store.subscribe, spin, turnToTarget, startRest, drift, stop };
     };
 }

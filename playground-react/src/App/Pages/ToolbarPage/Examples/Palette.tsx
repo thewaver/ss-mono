@@ -1,0 +1,50 @@
+import { PlacementLayoutUtils, Toolbar } from "@thewaver/ss-components-react";
+import type { ArcDefs, ToolbarAction } from "@thewaver/ss-components-react";
+
+import { PageButtonContent } from "../../../StyledComponents/ButtonContent/ButtonContent";
+import { PageMenuTriggerContent } from "../../../StyledComponents/MenuTriggerContent/MenuTriggerContent";
+import { renderToolbarOverflowItem, renderToolbarPopup } from "../ToolbarPage.const";
+import type { ToolbarExampleProps } from "../ToolbarPage.types";
+
+const ACTIONS: ToolbarAction<string>[] = [
+    { value: "Select" },
+    { value: "Brush" },
+    { value: "Erase" },
+    { value: "Fill" },
+    { value: "Text" },
+    { value: "Shape" },
+    { value: "Crop" },
+    { value: "Zoom" },
+];
+
+const PALETTE_DEFS: ArcDefs = {
+    curveHeightRatio: 1,
+    spreadDegrees: 360,
+    facingDegrees: 70,
+    itemWidthRatio: 0.3542,
+    itemHeightRatio: 0.4706,
+};
+
+const PALETTE_LAYOUT = PlacementLayoutUtils.createArc(PALETTE_DEFS);
+
+const PALETTE_WIDTH = "390px";
+
+type Props = ToolbarExampleProps;
+
+export const PaletteExample = (props: Props) => {
+    return (
+        <div style={{ width: PALETTE_WIDTH }}>
+            <Toolbar
+                actions={ACTIONS}
+                ariaLabel={"Tools"}
+                overflowAriaLabel={"More tools"}
+                computeLayout={PALETTE_LAYOUT}
+                renderAction={(action, flags) => <PageButtonContent flags={flags}>{action.value}</PageButtonContent>}
+                renderOverflowTrigger={(flags) => <PageMenuTriggerContent flags={flags}>More</PageMenuTriggerContent>}
+                renderOverflowItem={renderToolbarOverflowItem}
+                renderOverflowPopup={renderToolbarPopup}
+                onActivate={props.onActivate}
+            />
+        </div>
+    );
+};

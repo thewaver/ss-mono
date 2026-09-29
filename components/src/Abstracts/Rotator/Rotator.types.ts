@@ -1,4 +1,4 @@
-import type { AccessorProps, MaybeAccessor, SignalSource } from "../../Utils/typeUtils";
+import type { Store } from "@thewaver/ss-utils";
 
 export type RotatorPhase = "still" | "idling" | "spinning" | "settling";
 
@@ -7,18 +7,29 @@ export type RotatorSpinDefs = {
     jitterRatio: number;
 };
 
-export type RotatorDefs = AccessorProps<{
-    stepCount: number;
-    spinDurationMs?: number;
-    settleDurationMs?: number;
-    restDurationMs?: number;
+export type RotatorState = {
+    angle: number;
+    spinPhase: Exclude<RotatorPhase, "idling">;
+    isAwaitingTarget: boolean;
+    isResting: boolean;
+};
+
+export type RotatorCoreDefs = {
+    getIsDisabled: () => boolean;
+    getStepCount: () => number;
+    getSpinDurationMs: () => number;
+    getSettleDurationMs: () => number;
+    targetIndex: [get: () => number, set: (value: number) => void];
     computeSpinTarget: () => number | Promise<number>;
     computeSpinDefs?: (index: number, stepCount: number) => RotatorSpinDefs;
     computeStepLabel: (index: number, stepCount: number) => string;
-    targetIndexSignal?: SignalSource<number>;
-    autoSpinSignal?: SignalSource<boolean>;
-    onStepChange?: (index: number) => void;
     onSpinEnd?: (index: number) => void;
-}> & {
-    idleDelayMs?: MaybeAccessor<number | undefined>;
+};
+
+export type RotatorController = Store<RotatorState> & {
+    spin: () => boolean;
+    turnToTarget: (index: number) => void;
+    startRest: (restDurationMs: number) => () => void;
+    drift: (idleDelayMs: number | undefined, stepAngle: number) => () => void;
+    stop: () => void;
 };

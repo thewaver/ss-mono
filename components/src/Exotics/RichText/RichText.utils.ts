@@ -1,4 +1,4 @@
-import type { RichTextAllowedAttributes, RichTextNode } from "./RichText.types";
+import type { RichTextAllowedAttributes, RichTextNode, RichTextTagTreatment } from "./RichText.types";
 
 const TAG_RE = /\[(?:\/[a-z_][a-z0-9_]*|[a-z_][a-z0-9_]*(?: +[a-z_][a-z0-9_]*="(?:[^"\\]|\\[\s\S])*")*)\]/gi;
 const NAME_RE = /^\[\/?([a-z_][a-z0-9_]*)/i;
@@ -145,5 +145,34 @@ export namespace RichTextUtils {
         }
 
         return stack[0].children;
+    };
+
+    /**
+     * How a tag the consumer's `renderTag` declined is drawn.
+     *
+     * A tag the class map names a class for is wrapped in an element carrying it. One it does not is either
+     * unwrapped, leaving its children in place, or printed as typed, its brackets around its children, depending
+     * on `removeUnknownTags`. The map is looked up by its own keys only, so a tag named after something every
+     * object inherits, such as `constructor`, is not mistaken for a mapped one; a key mapped to an empty string
+     * counts as no class.
+     *
+     * @param tag The tag's name.
+     * @param classMap The classes each tag is drawn with.
+     * @param removeUnknownTags Whether a tag with no class is dropped rather than printed.
+     * @returns `class` with the class to wrap the children in, `unwrap` to draw the children bare, or `literal`
+     * with the closing markup to print after them, the opening markup being the node's own.
+     */
+    export const getTagTreatment = (
+        tag: string,
+        classMap: Record<string, string>,
+        removeUnknownTags: boolean,
+    ): RichTextTagTreatment => {
+        const className = Object.hasOwn(classMap, tag) ? classMap[tag] : undefined;
+
+        if (className) return { kind: "class", className };
+
+        if (removeUnknownTags) return { kind: "unwrap" };
+
+        return { kind: "literal", closingMarkup: `[/${tag}]` };
     };
 }

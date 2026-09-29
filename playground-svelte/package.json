@@ -1,0 +1,28 @@
+{
+    "name": "playground-svelte",
+    "private": true,
+    "type": "module",
+    "version": "0.0.0",
+    "scripts": {
+        "start": "vite --host",
+        "build": "vite build",
+        "preview": "vite preview",
+        "typecheck": "svelte-check --tsconfig ./tsconfig.json"
+    },
+    "dependencies": {
+        "@thewaver/ss-components": "*",
+        "@thewaver/ss-components-svelte": "*",
+        "@thewaver/ss-playground": "*",
+        "@thewaver/ss-utils": "*",
+        "svelte": "^5.57.1",
+        "sv-router": "^0.19.0"
+    },
+    "devDependencies": {
+        "@vanilla-extract/css": "^1.21.2",
+        "@vanilla-extract/dynamic": "^2.1.5",
+        "@vanilla-extract/vite-plugin": "^5.2.6",
+        "vite": "^8.3.0",
+        "@sveltejs/vite-plugin-svelte": "^7.3.1",
+        "svelte-check": "^4.7.6"
+    }
+}

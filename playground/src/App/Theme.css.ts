@@ -1,119 +1,22 @@
 import { createTheme, createThemeContract, globalStyle } from "@vanilla-extract/css";
 
-export const BORDER_RADIUS_HALF = 5;
-export const BORDER_RADIUS_FULL = 10;
-
-const SHADOW_SMALL = "0 2px 2px 0px rgba(0, 0, 0, 0.8)";
-const SHADOW_MEDIUM = "0 4px 8px 0px rgba(0, 0, 0, 0.65)";
-const SHADOW_LARGE = "0 16px 64px 0px rgba(0, 0, 0, 0.5)";
-
-const DEFAULT_THEME_VALUES = {
-    scheme: "dark",
-    color: {
-        primary: {
-            dark: "hsl(195, 75%, 50%)",
-            main: "hsl(180, 100%, 50%)",
-            light: "hsl(180, 75%, 60%)",
-            contrast: "hsl(180, 100%, 0%)",
-        },
-        secondary: {
-            dark: "hsl(30, 75%, 50%)",
-            main: "hsl(45, 100%, 50%)",
-            light: "hsl(45, 75%, 60%)",
-            contrast: "hsl(45, 100%, 0%)",
-        },
-        info: {
-            dark: "hsl(225, 50%, 40%)",
-            main: "hsl(225, 75%, 50%)",
-            light: "hsl(225, 50%, 50%)",
-            contrast: "hsl(225, 100%, 100%)",
-        },
-        success: {
-            dark: "hsl(90, 50%, 50%)",
-            main: "hsl(90, 75%, 50%)",
-            light: "hsl(90, 50%, 60%)",
-            contrast: "hsl(90, 100%, 0%)",
-        },
-        alert: {
-            dark: "hsl(45, 50%, 50%)",
-            main: "hsl(45, 75%, 50%)",
-            light: "hsl(45, 50%, 60%)",
-            contrast: "hsl(45, 100%, 0%)",
-        },
-        error: {
-            dark: "hsl(0, 50%, 40%)",
-            main: "hsl(0, 75%, 50%)",
-            light: "hsl(0, 50%, 50%)",
-            contrast: "hsl(0, 100%, 100%)",
-        },
-        background: {
-            dark: "hsl(0, 20%, 5%)",
-            light: "hsl(30, 20%, 15%)",
-            contrast: "hsl(30, 100%, 95%)",
-        },
-        surface: {
-            dark: "hsl(240, 10%, 10%)",
-            light: "hsl(210, 10%, 15%)",
-            contrast: "hsl(210, 100%, 95%)",
-        },
-        control: {
-            level0: {
-                main: "hsl(0, 10%, 5%)",
-                contrast: "hsl(30, 100%, 95%)",
-            },
-            level1: {
-                main: "hsl(240, 10%, 5%)",
-                contrast: "hsl(210, 100%, 95%)",
-            },
-            level2: {
-                main: "rgb(0, 0, 0)",
-                contrast: "rgb(255, 255, 255)",
-            },
-        },
-        outline: {
-            main: "rgb(255, 0, 255)",
-        },
-    },
-    spacing: {
-        half: "5px",
-        full: "10px",
-        double: "20px",
-        quad: "40px",
-    },
-    fontSize: {
-        xSmall: "0.75rem",
-        small: "0.875rem",
-        medium: "1rem",
-        large: "1.5rem",
-        xLarge: "2rem",
-    },
-    borderRadius: {
-        half: `${BORDER_RADIUS_HALF}px`,
-        full: `${BORDER_RADIUS_FULL}px`,
-    },
-    shadow: {
-        small: SHADOW_SMALL,
-        medium: `${SHADOW_SMALL}, ${SHADOW_MEDIUM}`,
-        large: `${SHADOW_SMALL}, ${SHADOW_MEDIUM}, ${SHADOW_LARGE}`,
-    },
-    hover: {
-        filter: "brightness(125%)",
-    },
-    active: {
-        filter: "brightness(75%)",
-    },
-    disabled: {
-        opacity: "0.5",
-        filter: "saturate(0.5)",
-    },
-    animation: {
-        duration: "100ms",
-    },
-} as const;
+import {
+    DEFAULT_THEME_VALUES,
+    REACT_THEME_VALUES,
+    SOLID_THEME_VALUES,
+    SVELTE_THEME_VALUES,
+    VUE_THEME_VALUES,
+} from "./Theme.const";
 
 export const themeVars = createThemeContract(DEFAULT_THEME_VALUES);
 
-export const defaultTheme = createTheme(themeVars, DEFAULT_THEME_VALUES);
+export const PLAYGROUND_THEMES = {
+    default: createTheme(themeVars, DEFAULT_THEME_VALUES),
+    react: createTheme(themeVars, REACT_THEME_VALUES),
+    solid: createTheme(themeVars, SOLID_THEME_VALUES),
+    svelte: createTheme(themeVars, SVELTE_THEME_VALUES),
+    vue: createTheme(themeVars, VUE_THEME_VALUES),
+};
 
 globalStyle("*", {
     boxSizing: "border-box",

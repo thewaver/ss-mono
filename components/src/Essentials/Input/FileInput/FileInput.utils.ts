@@ -1,7 +1,11 @@
-import type { Accessor } from "solid-js";
-import { createEffect, createMemo, createSignal, onCleanup } from "solid-js";
+import { StoreUtils } from "@thewaver/ss-utils";
 
-import type { FileInputAdmission, FileInputLimits, FileInputRejectReason } from "./FileInput.types";
+import type {
+    FileInputAdmission,
+    FileInputDropTracker,
+    FileInputLimits,
+    FileInputRejectReason,
+} from "./FileInput.types";
 
 const ACCEPT_SEPARATOR = ",";
 const EXTENSION_MARK = ".";
@@ -10,6 +14,7 @@ const MIME_PARAMETER_SEPARATOR = ";";
 const WILDCARD = "*";
 const FILE_DRAG_TYPE = "Files";
 const SINGLE_FILE_LIMIT = 1;
+const EMPTY_FILE_INPUT_VALUE = "";
 
 /** A MIME type lower-cased and without any parameters, so `Text/Plain; charset=utf-8` reads as `text/plain`. */
 const normalizeMime = (mime: string) => mime.split(MIME_PARAMETER_SEPARATOR)[0].trim().toLowerCase();
@@ -39,6 +44,13 @@ const matchesMimeToken = (token: string, type: string) => {
     const [typeMain, typeSub] = normalizeMime(type).split(MIME_SEPARATOR);
 
     return (tokenMain === WILDCARD || tokenMain === typeMain) && (tokenSub === WILDCARD || tokenSub === typeSub);
+};
+
+/** Whether a file input already holds exactly these files, in this order. */
+const holdsFiles = (element: HTMLInputElement, files: File[]) => {
+    const held = element.files ?? [];
+
+    return held.length === files.length && files.every((file, index) => held[index] === file);
 };
 
 /** Whether a drag is carrying files, as opposed to text, a link or an element from the page. */
@@ -118,85 +130,132 @@ export namespace FileInputUtils {
     };
 
     /**
-     * Makes an element a place files can be dropped, and reports whether a file drag is over it.
+     * Whether an arrival of files changes the value at all.
+     *
+     * An arrival in which every file was refused leaves the value as it was, so a reader who drops one wrong file
+     * onto a control already holding the right ones does not lose them. Any other arrival replaces the value with
+     * the files that passed — including an empty arrival, which is how a pick is cleared.
+     *
+     * @param admission What {@link admitFiles} made of the arrival.
+     * @returns `true` when the accepted files should become the value.
+     */
+    export const getIsValueWritten = (admission: FileInputAdmission) =>
+        admission.accepted.length > 0 || admission.rejections.length === 0;
+
+    /**
+     * Makes a native file input hold exactly the given files.
+     *
+     * A file input's own list is changed by the browser on every pick, but the value the control reports is the
+     * owner's, which may have refused or trimmed the pick. This writes the owner's files back so the element never
+     * disagrees with it: an empty list clears the element, which is also what lets the same file be picked again
+     * and still fire a change. An element already holding the very same files, in the same order, is left alone.
+     *
+     * @param element The file input.
+     * @param files The files it should hold.
+     */
+    export const syncElement = (element: HTMLInputElement, files: File[]) => {
+        if (holdsFiles(element, files)) return;
+
+        if (!files.length) {
+            element.value = EMPTY_FILE_INPUT_VALUE;
+            return;
+        }
+
+        const transfer = new DataTransfer();
+
+        for (const file of files) transfer.items.add(file);
+
+        element.files = transfer.files;
+    };
+
+    /**
+     * Makes elements places files can be dropped, and reports whether a file drag is over the one being observed.
      *
      * Only drags carrying files are taken; text, links and elements dragged from the page pass through
      * untouched. While one is over the element the browser shows a copy cursor, and dropping it hands the files
      * over instead of letting the browser open them. The drag is counted as it enters and leaves, so moving
      * across the element's children does not make the report flicker. A disabled element still stops the
-     * browser opening the files, shows a cursor saying the drop is refused, and reports nothing.
+     * browser opening the files and shows a cursor saying the drop is refused, and the drop is not handed over.
+     *
+     * The store says whether a file drag is over the element whatever `getIsDisabled` answers, since that is a
+     * value the caller already follows; a control shows the drag only while it is not disabled.
      *
      * The drop is a second way in, never the only one: a drag is not something every reader can make, and
      * WCAG 2.5.7 requires a single press to reach the same result. Pair it with a control that can be pressed,
      * and do not hide that control behind the drop area.
      *
-     * @param getRef The element to take drops on.
-     * @param getIsDisabled Whether to refuse drops.
-     * @param onDrop Called with the dropped files, in the order the browser lists them.
-     * @returns `getIsDragOver`, true while a file drag is over the element and it is not disabled.
+     * @param defs.getIsDisabled Whether to refuse drops, read as each drag event arrives.
+     * @param defs.onDrop Called with the dropped files, in the order the browser lists them.
+     * @returns A store of whether a file drag is over the element, and `observe(element)`, which starts listening
+     * on the element and returns the function that stops it. Stopping forgets any drag in progress, and the
+     * tracker can be observed again afterwards.
      */
-    export const trackDrop = (
-        getRef: Accessor<HTMLElement | undefined>,
-        getIsDisabled: Accessor<boolean>,
-        onDrop: (files: File[]) => void,
-    ) => {
-        const [getDepth, setDepth] = createSignal(0);
+    export const createDropTracker = (defs: {
+        getIsDisabled: () => boolean;
+        onDrop: (files: File[]) => void;
+    }): FileInputDropTracker => {
+        const store = StoreUtils.create(false);
 
-        createEffect(() => {
-            const ref = getRef();
+        let depth = 0;
 
-            if (!ref) return;
+        const setDepth = (next: number) => {
+            depth = next;
+            store.set(depth > 0);
+        };
 
-            const claim = (e: DragEvent) => {
-                e.preventDefault();
+        return {
+            get: store.get,
+            subscribe: store.subscribe,
+            observe: (element) => {
+                const claim = (e: DragEvent) => {
+                    e.preventDefault();
 
-                if (e.dataTransfer) e.dataTransfer.dropEffect = getIsDisabled() ? "none" : "copy";
-            };
+                    if (e.dataTransfer) e.dataTransfer.dropEffect = defs.getIsDisabled() ? "none" : "copy";
+                };
 
-            const onDragEnter = (e: DragEvent) => {
-                if (!isFileDrag(e)) return;
+                const onDragEnter = (e: DragEvent) => {
+                    if (!isFileDrag(e)) return;
 
-                claim(e);
-                setDepth((depth) => depth + 1);
-            };
+                    claim(e);
+                    setDepth(depth + 1);
+                };
 
-            const onDragOver = (e: DragEvent) => {
-                if (!isFileDrag(e)) return;
+                const onDragOver = (e: DragEvent) => {
+                    if (!isFileDrag(e)) return;
 
-                claim(e);
-            };
+                    claim(e);
+                };
 
-            const onDragLeave = (e: DragEvent) => {
-                if (!isFileDrag(e)) return;
+                const onDragLeave = (e: DragEvent) => {
+                    if (!isFileDrag(e)) return;
 
-                setDepth((depth) => Math.max(depth - 1, 0));
-            };
+                    setDepth(Math.max(depth - 1, 0));
+                };
 
-            const onDropped = (e: DragEvent) => {
-                if (!isFileDrag(e)) return;
+                const onDropped = (e: DragEvent) => {
+                    if (!isFileDrag(e)) return;
 
-                e.preventDefault();
-                setDepth(0);
+                    e.preventDefault();
+                    setDepth(0);
 
-                if (getIsDisabled()) return;
+                    if (defs.getIsDisabled()) return;
 
-                onDrop(Array.from(e.dataTransfer?.files ?? []));
-            };
+                    defs.onDrop(Array.from(e.dataTransfer?.files ?? []));
+                };
 
-            ref.addEventListener("dragenter", onDragEnter);
-            ref.addEventListener("dragover", onDragOver);
-            ref.addEventListener("dragleave", onDragLeave);
-            ref.addEventListener("drop", onDropped);
+                element.addEventListener("dragenter", onDragEnter);
+                element.addEventListener("dragover", onDragOver);
+                element.addEventListener("dragleave", onDragLeave);
+                element.addEventListener("drop", onDropped);
 
-            onCleanup(() => {
-                ref.removeEventListener("dragenter", onDragEnter);
-                ref.removeEventListener("dragover", onDragOver);
-                ref.removeEventListener("dragleave", onDragLeave);
-                ref.removeEventListener("drop", onDropped);
-                setDepth(0);
-            });
-        });
-
-        return { getIsDragOver: createMemo(() => getDepth() > 0 && !getIsDisabled()) };
+                return () => {
+                    element.removeEventListener("dragenter", onDragEnter);
+                    element.removeEventListener("dragover", onDragOver);
+                    element.removeEventListener("dragleave", onDragLeave);
+                    element.removeEventListener("drop", onDropped);
+                    setDepth(0);
+                };
+            },
+        };
     };
 }

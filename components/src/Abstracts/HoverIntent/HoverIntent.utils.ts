@@ -1,16 +1,13 @@
-import { createEffect, onCleanup } from "solid-js";
-
 import type { Point2d } from "@thewaver/ss-utils";
 
-import type { SignalPair } from "../../Utils/typeUtils";
 import type { AnchorPlacement } from "../Anchor/Anchor.types";
 import { AnchorUtils } from "../Anchor/Anchor.utils";
 import { FocusManagerUtils } from "../FocusManager/FocusManager.utils";
 import type {
     HoverIntentBridgeInsets,
-    HoverIntentDefs,
+    HoverIntentController,
+    HoverIntentControllerDefs,
     HoverIntentDelayGroup,
-    HoverIntentHandle,
     HoverIntentShowDelayDefs,
 } from "./HoverIntent.types";
 
@@ -34,7 +31,7 @@ const getIsMovingInto = (e: MouseEvent, element: HTMLElement | undefined) =>
  * It is the part of a tooltip that is not about being a tooltip: the wait before showing, a window after
  * one panel closes in which the next opens at once, the gap between anchor and panel bridged so the pointer
  * can cross it, and a leave that reads where the pointer went instead of starting a timer. Where the panel
- * sits is not its business — `AnchorUtils.createPortalPosition` answers that — and neither is what the panel
+ * sits is not its business — `AnchorUtils.computePortalPlacement` and its neighbors answer that — and neither is what the panel
  * is announced as.
  */
 export namespace HoverIntentUtils {
@@ -102,20 +99,20 @@ export namespace HoverIntentUtils {
      * Arriving on the panel opens it at once, so a pointer that crosses during a closing fade keeps it. Leaving
      * either closes it, unless the pointer left for the other, which is read from the event rather than
      * guessed with a grace period. With a focus delay, a keyboard focus on the anchor opens it after that delay
-     * too; a focus from a pointer press, or one that a closing layer is putting back, is ignored. The listeners
-     * follow the two refs, so either may arrive late or change.
+     * too; a focus from a pointer press, or one that a closing layer is putting back, is ignored.
      *
      * The open state stays the caller's: this writes `true` and `false` to it and never keeps a copy, so a
      * panel closed from elsewhere — by Escape, a press outside, a consumer's own button — is simply closed.
-     * Every close from open to shut is recorded in the delay group, whoever caused it, and so is an unmount
-     * while showing.
+     * Every close from open to shut is recorded in the delay group, whoever caused it, as long as the caller
+     * hands each change of the open state to `reportShown`; `stop` records one too if the panel is showing when
+     * its owner goes away.
      *
-     * Must run inside a component, since it creates effects and cleans up with its owner.
+     * Nothing is listened for until `observeAnchor` and `observePanel` are handed the two elements; each returns
+     * the function that stops listening to it, and a later call replaces an earlier one. Every function in `defs`
+     * is read when it is needed.
      *
-     * @param getAnchorRef The element the pointer rests on to open the panel.
      * @param visibilitySignal The panel's open state, read and written.
      * @param defs.delayGroup The family whose skip window this panel shares; see {@link createDelayGroup}.
-     * @param defs.getPanelRef The panel's own element, whose hover keeps it open.
      * @param defs.getHoverShowDelayMs How long the pointer has to rest on the anchor.
      * @param defs.getSkipDelayWindowMs How soon after a close in the group a hover skips the wait.
      * @param defs.getFocusShowDelayMs How long a keyboard focus has to rest on the anchor. Without it, focus
@@ -127,18 +124,23 @@ export namespace HoverIntentUtils {
      * @param defs.isTouchIgnored Treats a touch as no hover at all. A touch screen reports a tap as the pointer
      * arriving and staying, so without this a tap opens the panel after the delay; switch it on where a press
      * does something of its own.
-     * @returns Whether the pointer is over the anchor or the panel right now, and a way to drop a pending open.
+     * @returns The controller: `getIsPointerInside` for whether the pointer is over the anchor or the panel right
+     * now, `cancel` to drop a pending open, the two `observe*` functions, `reportShown` and `stop`.
      */
     export const create = (
-        getAnchorRef: () => HTMLElement | undefined,
-        visibilitySignal: SignalPair<boolean>,
-        defs: HoverIntentDefs,
-    ): HoverIntentHandle => {
+        visibilitySignal: [get: () => boolean, set: (value: boolean) => void],
+        defs: HoverIntentControllerDefs,
+    ): HoverIntentController => {
         const [getIsShown, setIsShown] = visibilitySignal;
 
         let showTimeout: ReturnType<typeof setTimeout> | undefined;
+        let anchorRef: HTMLElement | undefined;
+        let panelRef: HTMLElement | undefined;
+        let stopAnchor: (() => void) | undefined;
+        let stopPanel: (() => void) | undefined;
         let isOverAnchor = false;
         let isOverPanel = false;
+        let wasShown = false;
         let lastPointerType: string | undefined;
 
         const cancel = () => {
@@ -193,7 +195,7 @@ export namespace HoverIntentUtils {
 
             isOverAnchor = false;
 
-            if (getIsMovingInto(e, defs.getPanelRef())) return;
+            if (getIsMovingInto(e, panelRef)) return;
             if (defs.getIsHeld?.()) {
                 cancel();
 
@@ -208,7 +210,7 @@ export namespace HoverIntentUtils {
 
             isOverPanel = false;
 
-            if (getIsMovingInto(e, getAnchorRef())) return;
+            if (getIsMovingInto(e, anchorRef)) return;
             if (defs.getIsHeld?.()) {
                 cancel();
 
@@ -219,8 +221,6 @@ export namespace HoverIntentUtils {
         };
 
         const handleAnchorFocus = () => {
-            const anchorRef = getAnchorRef();
-
             if (!defs.getFocusShowDelayMs) return;
             if (FocusManagerUtils.getIsRestoringFocus()) return;
             if (anchorRef && !anchorRef.matches(":focus-visible")) return;
@@ -237,63 +237,77 @@ export namespace HoverIntentUtils {
             if (defs.isHiddenOnAnchorBlur) setIsShown(false);
         };
 
-        createEffect<boolean>((wasShown) => {
-            const isShown = getIsShown();
+        const observeAnchor = (element: HTMLElement) => {
+            stopAnchor?.();
 
-            if (wasShown && !isShown) defs.delayGroup.lastClosedAtMs = performance.now();
+            anchorRef = element;
 
-            return isShown;
-        }, false);
+            element.addEventListener("pointerover", handlePointerOver);
+            element.addEventListener("mouseenter", handleAnchorMouseEnter);
+            element.addEventListener("mouseleave", handleAnchorMouseLeave);
+            element.addEventListener("focus", handleAnchorFocus);
+            element.addEventListener("blur", handleAnchorBlur);
 
-        onCleanup(() => {
-            cancel();
+            const stop = () => {
+                if (stopAnchor !== stop) return;
 
-            if (getIsShown()) defs.delayGroup.lastClosedAtMs = performance.now();
-        });
-
-        createEffect(() => {
-            const anchorRef = getAnchorRef();
-
-            if (!anchorRef) return;
-
-            anchorRef.addEventListener("pointerover", handlePointerOver);
-            anchorRef.addEventListener("mouseenter", handleAnchorMouseEnter);
-            anchorRef.addEventListener("mouseleave", handleAnchorMouseLeave);
-            anchorRef.addEventListener("focus", handleAnchorFocus);
-            anchorRef.addEventListener("blur", handleAnchorBlur);
-
-            onCleanup(() => {
+                stopAnchor = undefined;
+                anchorRef = undefined;
                 isOverAnchor = false;
 
-                anchorRef.removeEventListener("pointerover", handlePointerOver);
-                anchorRef.removeEventListener("mouseenter", handleAnchorMouseEnter);
-                anchorRef.removeEventListener("mouseleave", handleAnchorMouseLeave);
-                anchorRef.removeEventListener("focus", handleAnchorFocus);
-                anchorRef.removeEventListener("blur", handleAnchorBlur);
-            });
-        });
+                element.removeEventListener("pointerover", handlePointerOver);
+                element.removeEventListener("mouseenter", handleAnchorMouseEnter);
+                element.removeEventListener("mouseleave", handleAnchorMouseLeave);
+                element.removeEventListener("focus", handleAnchorFocus);
+                element.removeEventListener("blur", handleAnchorBlur);
+            };
 
-        createEffect(() => {
-            const panelRef = defs.getPanelRef();
+            stopAnchor = stop;
 
-            if (!panelRef) return;
+            return stop;
+        };
 
-            panelRef.addEventListener("pointerover", handlePointerOver);
-            panelRef.addEventListener("mouseenter", handlePanelMouseEnter);
-            panelRef.addEventListener("mouseleave", handlePanelMouseLeave);
+        const observePanel = (element: HTMLElement) => {
+            stopPanel?.();
 
-            onCleanup(() => {
+            panelRef = element;
+
+            element.addEventListener("pointerover", handlePointerOver);
+            element.addEventListener("mouseenter", handlePanelMouseEnter);
+            element.addEventListener("mouseleave", handlePanelMouseLeave);
+
+            const stop = () => {
+                if (stopPanel !== stop) return;
+
+                stopPanel = undefined;
+                panelRef = undefined;
                 isOverPanel = false;
 
-                panelRef.removeEventListener("pointerover", handlePointerOver);
-                panelRef.removeEventListener("mouseenter", handlePanelMouseEnter);
-                panelRef.removeEventListener("mouseleave", handlePanelMouseLeave);
-            });
-        });
+                element.removeEventListener("pointerover", handlePointerOver);
+                element.removeEventListener("mouseenter", handlePanelMouseEnter);
+                element.removeEventListener("mouseleave", handlePanelMouseLeave);
+            };
+
+            stopPanel = stop;
+
+            return stop;
+        };
 
         return {
             getIsPointerInside: () => isOverAnchor || isOverPanel,
             cancel,
+            observeAnchor,
+            observePanel,
+            reportShown: (isShown) => {
+                if (wasShown && !isShown) defs.delayGroup.lastClosedAtMs = performance.now();
+
+                wasShown = isShown;
+            },
+            stop: () => {
+                cancel();
+
+                if (getIsShown()) defs.delayGroup.lastClosedAtMs = performance.now();
+            },
         };
     };
 }

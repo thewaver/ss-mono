@@ -3,7 +3,7 @@ import { style } from "@vanilla-extract/css";
 export const SPOTLIGHT_Z_INDEX = 10;
 
 export const spotlightOverlay = style({
-    position: "absolute",
+    position: "fixed",
     inset: 0,
     display: "grid",
     zIndex: SPOTLIGHT_Z_INDEX,
@@ -11,20 +11,20 @@ export const spotlightOverlay = style({
 });
 
 export const spotlightBlocker = style({
-    position: "absolute",
+    position: "fixed",
     inset: 0,
     zIndex: SPOTLIGHT_Z_INDEX,
     pointerEvents: "all",
 });
 
 export const spotlightDecoration = style({
-    position: "absolute",
+    position: "fixed",
     zIndex: SPOTLIGHT_Z_INDEX,
     pointerEvents: "none",
 });
 
 export const spotlightPopup = style({
-    position: "absolute",
+    position: "fixed",
     top: 0,
     left: 0,
     zIndex: SPOTLIGHT_Z_INDEX,

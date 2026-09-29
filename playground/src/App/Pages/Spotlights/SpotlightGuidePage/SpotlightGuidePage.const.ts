@@ -1,4 +1,4 @@
-import type { TourStep } from "./SpotlightGuidePage.types";
+import type { TourStep } from "./SpotlightTour.types";
 
 export const TOUR_STORAGE_KEY = "playground.spotlightTour.step";
 

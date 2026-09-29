@@ -327,7 +327,7 @@ test.describe("a windowed tree", () => {
  * only add — a node with real children is a branch whether it carries the flag or not — so there is no state
  * in which the two fields disagree.
  *
- * Nothing new tells the consumer to go and fetch. Opening a branch writes its value into `expandedSignal`,
+ * Nothing new tells the consumer to go and fetch. Opening a branch writes its value into `expanded`,
  * which is the consumer's own signal, so the request is theirs to start and the arrival is theirs to hand
  * back as new nodes. That is `Select`'s arrangement for a list that has not finished arriving, applied a
  * level down.

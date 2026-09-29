@@ -151,6 +151,14 @@ _"we settle work decisions, then sweep"_. So when a task carries several open de
 time, and do not touch the code until the last one is answered — an answer to one question is not a go-ahead
 while another is still open. The sweep then happens once, with every decision in hand.
 
+**A decision that comes up while agents are working is held, and asked once the work has stopped.** Stated by
+the user, after a question about popup placement was asked in the middle of a stream of agent reports and
+scrolled out of sight: while other agents are still reporting, each report pushes the question further up the
+history, and it gets lost. So while work is running, record the decision in the working notes and keep going on
+everything it does not block; when nothing is running any more, put the held decisions in the final reply, one at
+a time as _"Surface one decision at a time"_ asks, after the report of what was done. A decision that blocks all
+remaining work is the exception, and even then it goes last in the reply, never above a report.
+
 **When asked what work is outstanding, answer in their recorded order, not by size.** `backlog.md` carries the
 ordering already: item 8 says in its own text not to list it, and item 5's **_Bottom of the list_** section
 holds `Table` / data grid and the command palette, placed last by the user after each was argued. Both were
@@ -343,6 +351,19 @@ that needs recording goes in `decisions.md` — _"method X does Y rather than Z,
 that file is for — or in the reply. If a change seems to need an inline comment to be understood, that is a
 signal the code should be clearer instead.
 
+**`components-solid/src`, `components-react/src`, `components-vue/src` and `components-svelte/src` are under every rule
+this section gives `components/src`**, `.vue` and `.svelte` files included. The
+Solid views were in `components/src` when these rules were written and moved out with the package split, so the ban
+and both of its exceptions went with them; the React tree was written to the same rules from the start. Read
+`components/src` in what follows as all three.
+
+**The same goes for the Playground, which is now five folders, named to mirror `components/`.** `playground/`
+(the framework-free half every app shares, `@thewaver/ss-playground`), `playground-solid/`, `playground-react/`,
+`playground-vue/` and `playground-svelte/`, and every rule here that names `playground/src` applies to all five
+`src` folders. An earlier session named the
+shared half `playground-core/`; the user corrected it — the three must read the same way the three component
+packages do.
+
 **`utils/` is the opposite, and confusing the two is the mistake to avoid.** That is `@thewaver/ss-utils`,
 which now shares this repo rather than sitting in a clone next door — but sharing a repo did not merge the
 two sets of rules. There, every exported function is documented so that a consumer can read what it takes,
@@ -446,6 +467,11 @@ audience"_ above for what that changes.
 means editing both in the same change; a brief that disagrees with the full list is worse than no brief,
 because it is the one that gets read. `backlog.md` is the source of truth, so where the two differ the brief
 is what gets corrected.
+
+**Routine release steps are never backlog items.** Stated by the user, who had an item's last remaining line
+dropped for being "publish the packages": publishing, committing, merging, bumping a version are obvious steps, not
+tasks, and do not earn a place in `backlog.md` or `brief.md`. A fact such a step depends on — an order packages must
+be released in — goes in `decisions.md` instead.
 
 **When an item in `backlog.md` is done or dropped, delete it outright** and renumber the rest. Nothing is
 marked "resolved" in place. If closing it settled a decision that drives future work, that decision moves to

@@ -2,10 +2,11 @@
     "extends": "../tsconfig.base.json",
     "compilerOptions": {
         "allowImportingTsExtensions": true,
+        "types": ["node"],
         "paths": {
             "@thewaver/ss-components": ["../components/src/index.ts"],
             "@thewaver/ss-utils": ["../utils/src/index.ts"]
         }
     },
-    "include": ["src", "vite.config.ts", "vitest.config.ts"]
+    "include": ["src", "vite", "scripts", "landing", "vitest.config.ts"]
 }

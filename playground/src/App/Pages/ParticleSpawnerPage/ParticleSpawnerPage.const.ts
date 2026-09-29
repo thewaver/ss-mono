@@ -7,7 +7,7 @@ import type {
     ParticleTravelPattern,
     ParticleTravelPatternFactory,
     TravelEasingKey,
-} from "./ParticleSpawnerPage.types";
+} from "./ParticleSpawnerPatterns.types";
 
 export const TRAVEL_EASING_FNS: Record<TravelEasingKey, EasingFn> = {
     linear: EasingUtils.linear,

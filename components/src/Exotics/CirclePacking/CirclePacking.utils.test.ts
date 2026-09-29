@@ -138,3 +138,43 @@ describe("project", () => {
         });
     });
 });
+
+describe("toView", () => {
+    it("centers on the circle with its diameter across", () => {
+        expect(CirclePackingUtils.toView({ x: 3, y: 4, radius: 5 })).toEqual({ x: 3, y: 4, diameter: 10 });
+    });
+});
+
+describe("listNodes and computeDepths", () => {
+    const INNER = branch("inner", leaf("a", 1), leaf("b", 2));
+    const ROOT = branch("root", INNER, leaf("side", 3), leaf("empty", 0));
+    const layout = CirclePackingUtils.computeLayout(ROOT, TreemapUtils.computeWeights(ROOT), 100, 1);
+
+    it("lists the placed nodes but the root, outside in", () => {
+        expect(CirclePackingUtils.listNodes(ROOT, layout).map((node) => node.value)).toEqual([
+            "inner",
+            "side",
+            "a",
+            "b",
+        ]);
+    });
+
+    it("counts the root as nought", () => {
+        const depths = CirclePackingUtils.computeDepths(ROOT);
+
+        expect(depths.get(ROOT)).toBe(0);
+        expect(depths.get(INNER)).toBe(1);
+        expect(depths.get(INNER.children![0])).toBe(2);
+    });
+});
+
+describe("computeShownView", () => {
+    const target = { x: 10, y: 0, diameter: 20 };
+    const path = CirclePackingUtils.interpolateZoom({ x: 0, y: 0, diameter: 100 }, target);
+
+    it("is the target once settled or without a path, and the path's start at the start", () => {
+        expect(CirclePackingUtils.computeShownView(path, target, 1)).toEqual(target);
+        expect(CirclePackingUtils.computeShownView(undefined, target, 0.5)).toEqual(target);
+        expect(CirclePackingUtils.computeShownView(path, target, 0).diameter).toBeCloseTo(100, 6);
+    });
+});

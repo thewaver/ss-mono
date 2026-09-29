@@ -133,18 +133,34 @@ test("anchoring the height fills columns instead of rows", async ({ page }) => {
 
     await revealProp(page, "gap");
     const gap = Number(await page.locator(numberField("gap")).inputValue());
-    const root = await rootSize(page, MOSAIC);
-    const placed = await tiles(page, MOSAIC);
 
-    const columns = new Map<number, Tile[]>();
+    /**
+     * The width changing is what sets the tiles rearranging, so a single reading taken the moment it changes can
+     * catch them mid-way — which is how this case once failed now and then with a column 50 off. It reads until
+     * the columns settle.
+     */
+    await expect
+        .poll(
+            async () => {
+                const root = await rootSize(page, MOSAIC);
+                const columns = new Map<number, Tile[]>();
 
-    for (const tile of placed) columns.set(tile.left, [...(columns.get(tile.left) ?? []), tile]);
+                for (const tile of await tiles(page, MOSAIC)) {
+                    columns.set(tile.left, [...(columns.get(tile.left) ?? []), tile]);
+                }
 
-    for (const column of columns.values()) {
-        const span = column.reduce((total, tile) => total + tile.height, 0) + (column.length - 1) * gap;
-
-        expect(Math.abs(span - root.height)).toBeLessThanOrEqual(1);
-    }
+                return [...columns.values()].every(
+                    (column) =>
+                        Math.abs(
+                            column.reduce((total, tile) => total + tile.height, 0) +
+                                (column.length - 1) * gap -
+                                root.height,
+                        ) <= 1,
+                );
+            },
+            { message: "every column spans the anchored height, gaps included" },
+        )
+        .toBe(true);
 });
 
 test("whatever the consumer wraps the image in fills the cell, without being told a size", async ({ page }) => {

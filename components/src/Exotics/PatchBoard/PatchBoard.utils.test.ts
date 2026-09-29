@@ -293,3 +293,153 @@ describe("getClosesLoop", () => {
         expect(PatchBoardUtils.getClosesLoop(branched, link("mix", "output"))).toBe(false);
     });
 });
+
+describe("getBoardPoint", () => {
+    it("measures both axes against the board's width", () => {
+        const rect = { left: 10, top: 20, width: 200, height: 100 } as DOMRect;
+
+        expect(PatchBoardUtils.getBoardPoint(rect, { x: 110, y: 70 })).toEqual({ x: 0.5, y: 0.25 });
+    });
+
+    it("has no answer for a board with no width", () => {
+        expect(PatchBoardUtils.getBoardPoint({ left: 0, top: 0, width: 0, height: 0 } as DOMRect, { x: 1, y: 1 })).toBe(
+            undefined,
+        );
+    });
+});
+
+describe("getNudgedSpot", () => {
+    const opts = { stepSize: 0.02, boundsShare: { width: 1, height: 0.5 } };
+
+    it("moves by the step without a snap, held inside the board", () => {
+        expect(PatchBoardUtils.getNudgedSpot({ x: 0.1, y: 0.1 }, { x: 2 }, { width: 0.2, height: 0.1 }, opts)).toEqual({
+            x: 0.14,
+            y: 0.1,
+        });
+        expect(PatchBoardUtils.getNudgedSpot({ x: 0, y: 0 }, { x: -1 }, { width: 0.2, height: 0.1 }, opts).x).toBe(0);
+    });
+
+    it("goes to the next snapped spot with a snap", () => {
+        const computeSnapSpot = (spot: { x: number; y: number }) => ({
+            x: Math.round(spot.x * 10) / 10,
+            y: Math.round(spot.y * 10) / 10,
+        });
+
+        expect(
+            PatchBoardUtils.getNudgedSpot(
+                { x: 0.1, y: 0.1 },
+                { x: 1 },
+                { width: 0.2, height: 0.1 },
+                {
+                    ...opts,
+                    computeSnapSpot,
+                },
+            ).x,
+        ).toBeCloseTo(0.2);
+    });
+});
+
+describe("getPlacements", () => {
+    const nodes = [
+        { value: "clock", spot: { x: 0, y: 0 }, sizeShare: { width: 1, height: 1 }, sockets: [] },
+        { value: "gate", spot: { x: 5, y: 5 }, sizeShare: { width: 1, height: 1 }, sockets: [] },
+    ];
+
+    it("draws the carried node where it is aimed and leaves the rest alone", () => {
+        const placements = PatchBoardUtils.getPlacements(nodes, (value) => value, "gate", {
+            kind: "spot",
+            x: 9,
+            y: 8,
+        });
+
+        expect(placements.map((entry) => entry.spot)).toEqual([
+            { x: 0, y: 0 },
+            { x: 9, y: 8 },
+        ]);
+    });
+
+    it("keeps the node where it is while the aim is not a spot", () => {
+        const placements = PatchBoardUtils.getPlacements(nodes, (value) => value, "gate", {
+            kind: "free",
+            x: 9,
+            y: 8,
+        });
+
+        expect(placements[1].spot).toEqual({ x: 5, y: 5 });
+    });
+});
+
+describe("getIsEndAllowed", () => {
+    it("refuses on a locked board, and asks the consumer only after its own rules pass", () => {
+        const asked: PatchBoardLink[] = [];
+        const computeCanLink = (link: PatchBoardLink) => {
+            asked.push(link);
+
+            return false;
+        };
+
+        expect(PatchBoardUtils.getIsEndAllowed(CLOCK_TICK, LAMP_SIG, { links: [], isLocked: true })).toBe(false);
+        expect(
+            PatchBoardUtils.getIsEndAllowed(CLOCK_TICK, GATE_OUT, { links: [], isLocked: false, computeCanLink }),
+        ).toBe(false);
+        expect(asked).toHaveLength(0);
+        expect(
+            PatchBoardUtils.getIsEndAllowed(CLOCK_TICK, LAMP_SIG, { links: [], isLocked: false, computeCanLink }),
+        ).toBe(false);
+        expect(asked).toHaveLength(1);
+        expect(PatchBoardUtils.getIsEndAllowed(CLOCK_TICK, LAMP_SIG, { links: [], isLocked: false })).toBe(true);
+    });
+});
+
+describe("getCableDefs", () => {
+    const byKey = PatchBoardUtils.getPlacedSocketByEndKey(PLACED);
+
+    it("draws every link between its two sockets", () => {
+        const [cable] = PatchBoardUtils.getCableDefs([LINK], byKey, "horizontal");
+
+        expect(cable.from).toEqual(CLOCK_TICK.point);
+        expect(cable.to).toEqual(GATE_IN.point);
+        expect(cable.isPending).toBe(false);
+    });
+
+    it("adds the carried cable while it is aimed at a socket or a free point, and not at a spot", () => {
+        const pending = { key: "pending", from: CLOCK_TICK.end, isAllowed: false };
+
+        expect(
+            PatchBoardUtils.getCableDefs([], byKey, "horizontal", {
+                ...pending,
+                place: { kind: "free", x: 7, y: 8 },
+            })[0].to,
+        ).toEqual({ x: 7, y: 8 });
+        expect(
+            PatchBoardUtils.getCableDefs([], byKey, "horizontal", {
+                ...pending,
+                place: { kind: "socket", ...LAMP_SIG.end },
+            })[0],
+        ).toMatchObject({ to: LAMP_SIG.point, isPending: true, isAllowed: false });
+        expect(
+            PatchBoardUtils.getCableDefs([], byKey, "horizontal", { ...pending, place: { kind: "spot", x: 0, y: 0 } }),
+        ).toHaveLength(0);
+    });
+});
+
+describe("getSocketFlags", () => {
+    it("reads taken, full, source, aimed and allowed off the board", () => {
+        const flags = PatchBoardUtils.getSocketFlags(GATE_IN.end, "in", {
+            placed: GATE_IN,
+            links: [LINK],
+            aimedPlace: { kind: "socket", ...GATE_IN.end },
+            plugSource: LAMP_SIG.end,
+            getIsEndAllowed: () => true,
+        });
+
+        expect(flags).toEqual({
+            kind: "in",
+            isTaken: true,
+            isFull: true,
+            isSource: false,
+            isAimed: true,
+            isAllowed: true,
+        });
+    });
+});

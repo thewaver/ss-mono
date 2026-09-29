@@ -4,13 +4,24 @@ export const sidebarRoot = style({
     position: "relative",
     flexShrink: 0,
     boxSizing: "border-box",
-    height: "100%",
+});
+
+export const sidebarRootEdgeVariants = styleVariants({
+    left: { height: "100%" },
+    right: { height: "100%" },
+    top: { width: "100%" },
+    bottom: { width: "100%" },
 });
 
 export const sidebarPanel = style({
     boxSizing: "border-box",
-    height: "100%",
-    transitionProperty: "width",
+});
+
+export const sidebarPanelEdgeVariants = styleVariants({
+    left: { height: "100%", transitionProperty: "width" },
+    right: { height: "100%", transitionProperty: "width" },
+    top: { width: "100%", transitionProperty: "height" },
+    bottom: { width: "100%", transitionProperty: "height" },
 });
 
 export const sidebarPanelOverlayVariants = styleVariants({
@@ -23,5 +34,15 @@ export const sidebarPanelOverlayVariants = styleVariants({
         position: "absolute",
         top: 0,
         right: 0,
+    },
+    top: {
+        position: "absolute",
+        top: 0,
+        left: 0,
+    },
+    bottom: {
+        position: "absolute",
+        bottom: 0,
+        left: 0,
     },
 });

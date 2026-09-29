@@ -1,7 +1,9 @@
 import { TimeUtils } from "@thewaver/ss-utils";
 import type { TimeValue, TimeValueMeridiem } from "@thewaver/ss-utils";
 
-import type { ClockUnit } from "./Clock.types";
+import type { NavigatorDirection } from "../../../Abstracts/Navigator/Navigator.types";
+import { NavigatorUtils } from "../../../Abstracts/Navigator/Navigator.utils";
+import type { ClockColumn, ClockKeyAction, ClockSteps, ClockUnit } from "./Clock.types";
 
 /** What each column is called in `Intl`'s vocabulary. */
 const NAME_FIELDS: Record<ClockUnit, Intl.DateTimeFormatPartTypes> = {
@@ -13,6 +15,10 @@ const NAME_FIELDS: Record<ClockUnit, Intl.DateTimeFormatPartTypes> = {
 
 /** How many distinct readings each unit has. */
 const UNIT_LENGTHS: Record<ClockUnit, number> = { hour: 24, minute: 60, second: 60, meridiem: 2 };
+/** How far apart a column's values are when no step is given for it. */
+const DEFAULT_STEP = 1;
+/** How many digits a number option is written with. */
+const LABEL_DIGITS = 2;
 /** Hours in a twelve-hour column. */
 const TWELVE_HOUR_LENGTH = 12;
 
@@ -142,4 +148,211 @@ export namespace ClockUtils {
             (best, reading, index) => (Math.abs(reading - target) < Math.abs(readings[best] - target) ? index : best),
             0,
         );
+
+    /**
+     * A time of day read off a `Date`, to the second, in the local time zone.
+     *
+     * @param date The instant to read.
+     */
+    export const fromDate = (date: Date): TimeValue => ({
+        hour: date.getHours(),
+        minute: date.getMinutes(),
+        second: date.getSeconds(),
+    });
+
+    /**
+     * The time every column's options are built from: the value, or now when there is none.
+     *
+     * Now is pulled inside the bounds, so a bounded clock opened outside them does not offer a column of options
+     * that are all refused.
+     *
+     * @param value The picked time, if there is one.
+     * @param now The time counted as now.
+     * @param hasSeconds Whether the clock offers seconds, in which case the base always carries a second.
+     * @param minValue The earliest time allowed, if there is one.
+     * @param maxValue The latest time allowed, if there is one.
+     */
+    export const computeBase = (
+        value: TimeValue | undefined,
+        now: TimeValue,
+        hasSeconds: boolean,
+        minValue?: TimeValue,
+        maxValue?: TimeValue,
+    ): TimeValue => {
+        const base = value ?? TimeUtils.clamp(now, minValue, maxValue);
+
+        return hasSeconds ? { ...base, second: base.second ?? 0 } : base;
+    };
+
+    /**
+     * The columns a clock shows, in order.
+     *
+     * @returns Hour and minute, then second when offered, then the morning-or-afternoon column on a twelve-hour
+     * clock.
+     */
+    export const getUnits = (hasSeconds: boolean, isTwelveHour: boolean) => {
+        const units: ClockUnit[] = ["hour", "minute"];
+
+        if (hasSeconds) units.push("second");
+        if (isTwelveHour) units.push("meridiem");
+
+        return units;
+    };
+
+    /**
+     * Every column with its options.
+     *
+     * Each option carries the whole time it would produce — the base with that one column changed — so whether it
+     * is refused, whether it is picked and what a pick writes all fall out of it.
+     *
+     * @param units The columns, from {@link ClockUtils.getUnits}.
+     * @param base The time the options are built from, from {@link ClockUtils.computeBase}.
+     * @param isTwelveHour Whether the hour column runs one to twelve.
+     * @param steps How far apart each column's values are. A column not named steps by one.
+     * @param meridiemNames What the morning and afternoon are called, from {@link ClockUtils.getMeridiemNames}.
+     * @returns One entry per unit, with its readings and an option per reading, labeled with two digits or with
+     * the half of the day's name.
+     */
+    export const getColumns = (
+        units: ClockUnit[],
+        base: TimeValue,
+        isTwelveHour: boolean,
+        steps: ClockSteps,
+        meridiemNames: Record<TimeValueMeridiem, string>,
+    ): ClockColumn[] =>
+        units.map((unit) => {
+            const step = unit === "meridiem" ? DEFAULT_STEP : (steps[unit] ?? DEFAULT_STEP);
+            const readings = getReadings(unit, isTwelveHour, step);
+
+            return {
+                unit,
+                readings,
+                options: readings.map((reading) => ({
+                    unit,
+                    time: withReading(unit, reading, base, isTwelveHour),
+                    label:
+                        unit === "meridiem"
+                            ? meridiemNames[MERIDIEMS[reading]]
+                            : String(reading).padStart(LABEL_DIGITS, "0"),
+                })),
+            };
+        });
+
+    /**
+     * The column the clock's one tab stop is in.
+     *
+     * @param unit The column the keyboard last moved to, if any.
+     * @param units The columns shown.
+     * @returns That column while it is still shown, otherwise the first.
+     */
+    export const resolveRovingUnit = (unit: ClockUnit | undefined, units: ClockUnit[]) =>
+        unit && units.includes(unit) ? unit : units[0];
+
+    /**
+     * Which option of a column reads the roving time.
+     *
+     * @param column The column.
+     * @param time The time the keyboard is on.
+     * @param isTwelveHour Whether the hour column runs one to twelve.
+     * @returns The index of the nearest reading, since a stepped column cannot show every value.
+     */
+    export const getRovingIndex = (column: ClockColumn, time: TimeValue, isTwelveHour: boolean) =>
+        getNearestIndex(column.readings, getReading(column.unit, time, isTwelveHour));
+
+    /**
+     * Tests whether an option shows the reading a given time has in its column.
+     *
+     * @param column The option's column.
+     * @param index The option's index in it.
+     * @param time The time to test, if any.
+     * @returns `false` when there is no time.
+     */
+    export const getIsAt = (column: ClockColumn, index: number, time: TimeValue | undefined, isTwelveHour: boolean) =>
+        time !== undefined && getReading(column.unit, time, isTwelveHour) === column.readings[index];
+
+    /**
+     * Tests whether a time can be picked.
+     *
+     * @param time The time an option would produce.
+     * @param opts.isDisabled Whether the whole clock is off.
+     * @param opts.minValue The earliest time allowed, if there is one.
+     * @param opts.maxValue The latest time allowed, if there is one.
+     * @param opts.computeIsTimeDisabled The consumer's own rule.
+     */
+    export const getIsTimeDisabled = (
+        time: TimeValue,
+        opts: {
+            isDisabled?: boolean;
+            minValue?: TimeValue;
+            maxValue?: TimeValue;
+            computeIsTimeDisabled?: (time: TimeValue) => boolean;
+        },
+    ) =>
+        (opts.isDisabled ?? false) ||
+        !TimeUtils.getIsInRange(time, opts.minValue, opts.maxValue) ||
+        (opts.computeIsTimeDisabled?.(time) ?? false);
+
+    /**
+     * What a key pressed on the clock does.
+     *
+     * Enter and Space pick the roving option. Up and down move within the column and wrap, Home and End go to its
+     * ends, and moving the highlight does not pick anything. Left and right cross to the neighboring column,
+     * flipped under right-to-left, which then reads the same roving time its own way.
+     *
+     * @param key The `key` of the keyboard event.
+     * @param opts.columns The columns shown.
+     * @param opts.rovingUnit The column the tab stop is in.
+     * @param opts.rovingTime The time the keyboard is on.
+     * @param opts.isTwelveHour Whether the hour column runs one to twelve.
+     * @param opts.direction Which way the clock's text runs.
+     * @returns A time to pick, a time to move the highlight to, or a column to move into; `undefined` when the key
+     * is not the clock's.
+     */
+    export const computeKeyAction = (
+        key: string,
+        opts: {
+            columns: ClockColumn[];
+            rovingUnit: ClockUnit;
+            rovingTime: TimeValue;
+            isTwelveHour: boolean;
+            direction: NavigatorDirection;
+        },
+    ): ClockKeyAction | undefined => {
+        const { columns, rovingTime, isTwelveHour } = opts;
+        const unitIndex = columns.findIndex((column) => column.unit === opts.rovingUnit);
+        const column = columns[unitIndex];
+
+        if (!column) return undefined;
+
+        const index = getRovingIndex(column, rovingTime, isTwelveHour);
+
+        if (NavigatorUtils.getIsActivationKey(key)) {
+            return {
+                kind: "pick",
+                time: withReading(column.unit, column.readings[index], rovingTime, isTwelveHour),
+                unit: column.unit,
+            };
+        }
+
+        const nextIndex = NavigatorUtils.computeNextPosition(key, index, column.readings.length, {
+            orientation: "vertical",
+        });
+
+        if (nextIndex !== undefined) {
+            return {
+                kind: "highlight",
+                time: withReading(column.unit, column.readings[nextIndex], rovingTime, isTwelveHour),
+            };
+        }
+
+        const nextUnitIndex = NavigatorUtils.computeNextPosition(key, unitIndex, columns.length, {
+            orientation: "horizontal",
+            direction: opts.direction,
+            hasEdgeKeys: false,
+        });
+
+        if (nextUnitIndex === undefined) return undefined;
+
+        return { kind: "unit", unit: columns[nextUnitIndex].unit };
+    };
 }

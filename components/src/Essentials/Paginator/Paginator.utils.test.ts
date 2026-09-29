@@ -85,3 +85,34 @@ describe("getStepTarget", () => {
         expect(PaginatorUtils.getStepTarget("next", 10, 10)).toBe(10);
     });
 });
+
+describe("computePageCount", () => {
+    it("drops a fraction and never goes below zero", () => {
+        expect(PaginatorUtils.computePageCount(7.8)).toBe(7);
+        expect(PaginatorUtils.computePageCount(-3)).toBe(0);
+    });
+});
+
+describe("splitSteps", () => {
+    it("puts first and previous before the pages and next and last after, whatever order they were asked in", () => {
+        expect(PaginatorUtils.splitSteps(["last", "next", "previous", "first"])).toEqual({
+            leading: ["first", "previous"],
+            trailing: ["next", "last"],
+        });
+    });
+
+    it("leaves out the steps that were not asked for", () => {
+        expect(PaginatorUtils.splitSteps(["next"])).toEqual({ leading: [], trailing: ["next"] });
+    });
+});
+
+describe("computeStepState", () => {
+    it("disables a step that would stay on the page already shown", () => {
+        expect(PaginatorUtils.computeStepState("previous", 1, 10, false)).toEqual({ targetPage: 1, isDisabled: true });
+        expect(PaginatorUtils.computeStepState("next", 1, 10, false)).toEqual({ targetPage: 2, isDisabled: false });
+    });
+
+    it("disables every step when the whole paginator is off", () => {
+        expect(PaginatorUtils.computeStepState("next", 1, 10, true)).toEqual({ targetPage: 2, isDisabled: true });
+    });
+});

@@ -1,6 +1,6 @@
 import type { PatchBoardLink, PatchBoardNode } from "@thewaver/ss-components";
 
-import type { PatchDevice } from "./PatchBoardPage.types";
+import type { PatchDevice } from "./PatchDevice.types";
 
 export const BOARD_WIDTH = 460;
 export const BOARD_HEIGHT_RATIO = 0.5;

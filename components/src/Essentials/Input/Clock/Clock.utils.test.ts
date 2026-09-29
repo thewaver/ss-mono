@@ -63,3 +63,63 @@ describe("ClockUtils.getNearestIndex", () => {
         expect(ClockUtils.getNearestIndex([0, 15, 30, 45], 7)).toBe(0);
     });
 });
+
+describe("ClockUtils.computeBase and getColumns", () => {
+    it("pulls now inside the bounds when there is no value, and gives it a second when seconds are offered", () => {
+        const base = ClockUtils.computeBase(
+            undefined,
+            { hour: 22, minute: 5 },
+            true,
+            { hour: 9, minute: 0 },
+            {
+                hour: 17,
+                minute: 30,
+            },
+        );
+
+        expect(base).toEqual({ hour: 17, minute: 30, second: 0 });
+    });
+
+    it("builds an option per reading, each carrying the whole time it would produce", () => {
+        const columns = ClockUtils.getColumns(
+            ClockUtils.getUnits(false, true),
+            { hour: 14, minute: 30 },
+            true,
+            { minute: 15 },
+            { am: "am", pm: "pm" },
+        );
+
+        expect(columns.map((column) => column.unit)).toEqual(["hour", "minute", "meridiem"]);
+        expect(columns[1].options.map((option) => option.label)).toEqual(["00", "15", "30", "45"]);
+        expect(columns[0].options[1].time).toEqual({ hour: 13, minute: 30 });
+        expect(columns[2].options[0].time).toEqual({ hour: 2, minute: 30 });
+    });
+});
+
+describe("ClockUtils.computeKeyAction", () => {
+    const columns = ClockUtils.getColumns(["hour", "minute"], { hour: 9, minute: 30 }, false, {}, { am: "", pm: "" });
+    const opts = { columns, rovingUnit: "hour" as const, rovingTime: { hour: 9, minute: 30 }, isTwelveHour: false };
+
+    it("moves the highlight down a column without picking, and picks on Enter", () => {
+        expect(ClockUtils.computeKeyAction("ArrowDown", { ...opts, direction: "ltr" })).toEqual({
+            kind: "highlight",
+            time: { hour: 10, minute: 30 },
+        });
+        expect(ClockUtils.computeKeyAction("Enter", { ...opts, direction: "ltr" })).toEqual({
+            kind: "pick",
+            time: { hour: 9, minute: 30 },
+            unit: "hour",
+        });
+    });
+
+    it("crosses columns with the horizontal arrows, flipped under right-to-left", () => {
+        expect(ClockUtils.computeKeyAction("ArrowRight", { ...opts, direction: "ltr" })).toEqual({
+            kind: "unit",
+            unit: "minute",
+        });
+        expect(ClockUtils.computeKeyAction("ArrowLeft", { ...opts, direction: "rtl" })).toEqual({
+            kind: "unit",
+            unit: "minute",
+        });
+    });
+});

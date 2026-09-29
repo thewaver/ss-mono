@@ -12,3 +12,10 @@ export type TextSyncGroupDefs = {
     decimals: number;
     hasSign?: boolean;
 };
+
+export type TextSyncValueSync = {
+    sync: (element: TextSyncElement) => void;
+    handleInput: (element: TextSyncElement) => void;
+    handleCompositionStart: () => void;
+    handleCompositionEnd: (element: TextSyncElement) => void;
+};

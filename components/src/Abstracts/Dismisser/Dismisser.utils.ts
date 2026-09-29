@@ -1,5 +1,3 @@
-import { type Accessor, createEffect, onCleanup } from "solid-js";
-
 import type { DismisserLayerDefs } from "./Dismisser.types";
 
 /** Every open layer, oldest first, so the last entry is the topmost. */
@@ -123,28 +121,29 @@ export namespace DismisserUtils {
     export const getIsWithinOwnedLayer = computeIsWithinOwnedLayer;
 
     /**
-     * Registers a layer to be dismissed for as long as it is open.
+     * Registers an open layer, to be dismissed until the returned function is called.
      *
-     * @param getIsOpen Whether the layer is currently open. Registration follows it, so nothing is
-     * listened for while the layer is closed.
+     * The layer goes on top of the stack. Document listeners are attached with the first layer and removed with
+     * the last, so a page with nothing open listens for nothing. Removing the same layer twice is harmless.
+     *
      * @param defs The layer's own elements, and what to do when it is dismissed. The reason is passed
      * on, since a layer often wants to return focus to its trigger after Escape but not after a press
      * elsewhere.
+     * @returns The function that takes the layer off the stack again, for when it closes.
      */
-    export const createLayer = (getIsOpen: Accessor<boolean>, defs: DismisserLayerDefs) => {
-        createEffect(() => {
-            if (!getIsOpen()) return;
+    export const addLayer = (defs: DismisserLayerDefs) => {
+        layers.push(defs);
 
-            layers.push(defs);
+        if (layers.length === 1) attach();
 
-            if (layers.length === 1) attach();
+        return () => {
+            const index = layers.indexOf(defs);
 
-            onCleanup(() => {
-                const index = layers.indexOf(defs);
+            if (index < 0) return;
 
-                if (index >= 0) layers.splice(index, 1);
-                if (layers.length === 0) detach();
-            });
-        });
+            layers.splice(index, 1);
+
+            if (layers.length === 0) detach();
+        };
     };
 }

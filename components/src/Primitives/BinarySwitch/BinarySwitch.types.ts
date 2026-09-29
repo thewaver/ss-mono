@@ -1,6 +1,4 @@
 import type { CheckedState } from "../../Abstracts/CheckedState/CheckedState.types";
-import type { AccessorProps, SignalSource } from "../../Utils/typeUtils";
-import type { InteractionControlProps, InteractionWrapperProps } from "../InteractionWrapper/InteractionWrapper.types";
 
 export type BinarySwitchType = "checkbox" | "radio";
 
@@ -33,18 +31,3 @@ export type BinarySwitchState = {
     /** Whether the switch stands for a group whose members disagree, which is the third state between on and off. */
     isMixed?: boolean;
 };
-
-export type BinarySwitchElementProps = AccessorProps<
-    BinarySwitchCbs & InteractionControlProps<BinarySwitchFlags> & BinarySwitchState
->;
-
-export type BinarySwitchProps = Omit<InteractionWrapperProps<BinarySwitchFlags>, "renderControl" | "extraFlags"> &
-    AccessorProps<
-        BinarySwitchCbs & Pick<InteractionControlProps<BinarySwitchFlags>, "id" | "renderContent"> & BinarySwitchState
-    >;
-
-export type BinarySwitchPresetProps = Omit<BinarySwitchProps, "type" | "isSwitch" | "isChecked"> &
-    AccessorProps<{
-        /** Whether the switch is on. It is the only thing that turns it. */
-        checkedSignal: SignalSource<boolean>;
-    }>;

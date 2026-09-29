@@ -1,23 +1,17 @@
-import type { JSX } from "solid-js";
+export type SVGDefsElementDefs<TElement> = {
+    id: string;
+    renderDefsElement: () => TElement;
+};
 
-export type SVGDefs = {
-    clipPath?: {
-        id: string;
-        renderDefsElement: () => JSX.Element;
-    };
-    filter?: {
-        id: string;
-        renderDefsElement: () => JSX.Element;
-    };
+export type SVGDefsOf<TElement> = {
+    clipPath?: SVGDefsElementDefs<TElement>;
+    filter?: SVGDefsElementDefs<TElement>;
     blend?: boolean;
     opacity?: number;
 } & (
     | {
           color?: never;
-          gradientOrPattern: {
-              id: string;
-              renderDefsElement: () => JSX.Element;
-          };
+          gradientOrPattern: SVGDefsElementDefs<TElement>;
       }
     | {
           color: string;

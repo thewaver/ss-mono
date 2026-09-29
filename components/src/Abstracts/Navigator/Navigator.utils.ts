@@ -1,8 +1,11 @@
-import { type Accessor, createMemo, createSignal, onCleanup, onMount } from "solid-js";
+import { type Index2d, MathUtils, StoreUtils } from "@thewaver/ss-utils";
 
-import { type Index2d, MathUtils } from "@thewaver/ss-utils";
-
-import type { NavigatorDirection, NavigatorGrid, NavigatorOrientation } from "./Navigator.types";
+import type {
+    NavigatorDirection,
+    NavigatorDirectionWatcher,
+    NavigatorGrid,
+    NavigatorOrientation,
+} from "./Navigator.types";
 
 /** Lists run vertically unless told otherwise. */
 const DEFAULT_NAVIGATION_ORIENTATION: NavigatorOrientation = "vertical";
@@ -19,20 +22,24 @@ const MIRRORED_KEYS: Record<string, string> = {
 /** The attribute whose change anywhere in the document can flip a component's direction. */
 const DIRECTION_ATTRIBUTE = "dir";
 
-/** Bumped whenever a `dir` attribute changes, so every direction reader re-reads. */
-const [getDirectionVersion, setDirectionVersion] = createSignal(0);
+/** Every element being watched, each with the function that re-reads it. */
+const directionReaders = new Set<() => void>();
 
 /** The one observer every direction reader shares, while at least one is alive. */
 let directionObserver: MutationObserver | undefined;
-/** How many direction readers are alive, so the observer can be dropped when the last one goes. */
-let directionReaderCount = 0;
 
-/** Starts one direction reader's share of the observer, and ends it when the reader's owner is disposed. */
-const observeDirection = () => {
-    directionReaderCount += 1;
+/** Which way text runs at an element, from its computed style. */
+const readDirection = (element: HTMLElement): NavigatorDirection =>
+    getComputedStyle(element).direction === "rtl" ? "rtl" : DEFAULT_NAVIGATION_DIRECTION;
 
-    if (directionReaderCount === 1) {
-        directionObserver = new MutationObserver(() => setDirectionVersion((version) => version + 1));
+/** Adds a reader to the shared observer, starting it for the first; the returned function removes it again. */
+const addDirectionReader = (reread: () => void) => {
+    directionReaders.add(reread);
+
+    if (directionReaders.size === 1) {
+        directionObserver = new MutationObserver(() => {
+            for (const reader of [...directionReaders]) reader();
+        });
         directionObserver.observe(document.documentElement, {
             attributes: true,
             attributeFilter: [DIRECTION_ATTRIBUTE],
@@ -40,14 +47,14 @@ const observeDirection = () => {
         });
     }
 
-    onCleanup(() => {
-        directionReaderCount -= 1;
+    return () => {
+        directionReaders.delete(reread);
 
-        if (directionReaderCount > 0) return;
+        if (directionReaders.size > 0) return;
 
         directionObserver?.disconnect();
         directionObserver = undefined;
-    });
+    };
 };
 
 /** Which arrow keys move forward, per orientation. */
@@ -100,44 +107,56 @@ export namespace NavigatorUtils {
      * the key through this and keeps its left-to-right logic unchanged.
      *
      * @param key The `key` of the keyboard event.
-     * @param direction The direction the control is laid out in, from {@link NavigatorUtils.createDirectionSignal}.
+     * @param direction The direction the control is laid out in, from {@link NavigatorUtils.createDirectionWatcher}.
      * @returns The key to act on.
      */
     export const computeLogicalKey = (key: string, direction: NavigatorDirection | undefined) =>
         direction === "rtl" ? (MIRRORED_KEYS[key] ?? key) : key;
 
     /**
-     * Which way text runs at an element, kept current as the page changes.
+     * Keeps track of which way text runs at one element at a time, as the page changes.
      *
-     * Reads the computed `direction` of the element, so a `dir` set on the element itself, on any ancestor
-     * or through a stylesheet is all seen. It is read once the owner has mounted and again whenever a `dir`
-     * attribute changes anywhere in the document; a stylesheet that flips `direction` without any `dir`
-     * attribute changing is only picked up at the next such change. One observer serves every reader on the
-     * page and is dropped when the last reader is disposed.
+     * The watcher is a store: read it with `get`, hear about a change with `subscribe`. It says `"ltr"` until
+     * `observe` is handed an element, and again once that element stops being observed. While one is observed
+     * the value is the element's computed `direction`, so a `dir` set on the element itself, on any ancestor or
+     * through a stylesheet is all seen. It is read when observing starts and again whenever a `dir` attribute
+     * changes anywhere in the document; a stylesheet that flips `direction` without any `dir` attribute changing
+     * is only picked up at the next such change. One observer serves every watcher on the page and is dropped
+     * when the last one stops.
      *
-     * Must run inside a component or another reactive owner.
+     * Hand `observe` an element that is already in the document: a detached element has no computed direction,
+     * and reads as `"ltr"` until the next `dir` change anywhere prompts a re-read.
      *
-     * @param getRef The element to read, usually the component's own root. For a component whose popup is
-     * moved elsewhere in the document, pass the element that stays in place, such as its trigger.
-     * @returns `"rtl"` when the element's text runs right to left, and `"ltr"` otherwise — including before
-     * the element exists.
+     * @returns The watcher. `observe(element)` starts reading `element`, stops reading whatever was observed
+     * before, and returns the function that stops it again — which does nothing once a later `observe` has
+     * taken over.
      */
-    export const createDirectionSignal = (getRef: Accessor<HTMLElement | undefined>): Accessor<NavigatorDirection> => {
-        const [getIsMounted, setIsMounted] = createSignal(false);
+    export const createDirectionWatcher = (): NavigatorDirectionWatcher => {
+        const store = StoreUtils.create<NavigatorDirection>(DEFAULT_NAVIGATION_DIRECTION);
 
-        observeDirection();
+        let stopCurrent: (() => void) | undefined;
 
-        onMount(() => setIsMounted(true));
+        const observe = (element: HTMLElement) => {
+            stopCurrent?.();
 
-        return createMemo(() => {
-            getDirectionVersion();
+            const reread = () => store.set(readDirection(element));
+            const removeReader = addDirectionReader(reread);
 
-            const ref = getRef();
+            const stop = () => {
+                if (stopCurrent !== stop) return;
 
-            if (!getIsMounted() || !ref) return DEFAULT_NAVIGATION_DIRECTION;
+                stopCurrent = undefined;
+                removeReader();
+                store.set(DEFAULT_NAVIGATION_DIRECTION);
+            };
 
-            return getComputedStyle(ref).direction === "rtl" ? "rtl" : DEFAULT_NAVIGATION_DIRECTION;
-        });
+            stopCurrent = stop;
+            reread();
+
+            return stop;
+        };
+
+        return { get: store.get, subscribe: store.subscribe, observe };
     };
 
     /**

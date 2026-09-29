@@ -1,4 +1,3 @@
-import { createRoot, createSignal } from "solid-js";
 import { describe, expect, it } from "vitest";
 
 import { ElevationUtils } from "./Elevation.utils";
@@ -23,21 +22,7 @@ const box = (name: string, parent?: FakeElement): FakeElement => {
 
 const asElement = (element: FakeElement) => element as unknown as HTMLElement;
 
-const elevate = (element: FakeElement, zIndex: number, isActive = true) => {
-    let dispose!: () => void;
-
-    createRoot((disposeRoot) => {
-        ElevationUtils.createElevation(
-            () => asElement(element),
-            () => isActive,
-            () => zIndex,
-        );
-
-        dispose = disposeRoot;
-    });
-
-    return dispose;
-};
+const elevate = (element: FakeElement, zIndex: number) => ElevationUtils.addElevation(asElement(element), zIndex);
 
 describe("getBase", () => {
     it("reports no elevation for an element that sits under nothing", () => {
@@ -88,13 +73,32 @@ describe("getBase", () => {
         dispose();
     });
 
-    it("ignores a layer that is not active", () => {
+    it("forgets a layer removed twice only once, leaving the others alone", () => {
         const modal = box("modal");
-        const dispose = elevate(modal, 100, false);
+        const drawer = box("drawer", modal);
+        const button = asElement(box("button", drawer));
+        const disposeModal = elevate(modal, 100);
+        const disposeDrawer = elevate(drawer, 300);
 
-        expect(ElevationUtils.getBase(asElement(box("button", modal)))).toBe(0);
+        disposeDrawer();
+        disposeDrawer();
+
+        expect(ElevationUtils.getBase(button)).toBe(100);
+
+        disposeModal();
+    });
+
+    it("tells a follower of the registered layers about every change", () => {
+        const seen: number[] = [];
+        const stop = ElevationUtils.registeredLayers.subscribe(() =>
+            seen.push(ElevationUtils.registeredLayers.get().length),
+        );
+        const dispose = elevate(box("modal"), 100);
 
         dispose();
+        stop();
+
+        expect(seen).toEqual([1, 0]);
     });
 
     it("drops back once a layer is torn down, rather than leaving its number behind", () => {
@@ -123,33 +127,5 @@ describe("getBase", () => {
         expect(ElevationUtils.getBase(button)).toBe(100);
 
         disposeModal();
-    });
-
-    it("follows a layer whose depth is changed after it opened", () => {
-        const modal = box("modal");
-        const button = asElement(box("button", modal));
-
-        const [getZIndex, setZIndex] = createSignal(100);
-
-        const dispose = createRoot((disposeRoot) => {
-            ElevationUtils.createElevation(
-                () => asElement(modal),
-                () => true,
-                getZIndex,
-            );
-
-            return disposeRoot;
-        });
-
-        expect(ElevationUtils.getBase(button)).toBe(100);
-
-        setZIndex(500);
-
-        expect(
-            ElevationUtils.getBase(button),
-            "the layer kept its place in the stack and took the new depth with it",
-        ).toBe(500);
-
-        dispose();
     });
 });

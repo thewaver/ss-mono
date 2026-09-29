@@ -1,4 +1,4 @@
-import type { CrumbValue } from "./BreadcrumbsPage.types";
+import type { CrumbValue } from "./BreadcrumbTrail.types";
 
 export const BREADCRUMBS_GAP = 0;
 

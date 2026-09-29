@@ -1,0 +1,45 @@
+import { Bracket } from "@thewaver/ss-components-react";
+import type { BracketNode } from "@thewaver/ss-components-react";
+import * as styles from "@thewaver/ss-playground/App/Pages/BracketPage/BracketPage.css";
+
+import { branch, computeBracketLayerHeader, renderBracketNode, seed } from "../BracketPage.const";
+import type { BracketExampleProps } from "../BracketPage.types";
+
+const NODE_SIZE = { width: 96, height: 34 };
+const ROUND_NAMES = ["Final", "Semifinals", "Quarterfinals", "Entrants"];
+const ACROSS_HEADER_SIZE = 24;
+const DOWN_HEADER_SIZE = 96;
+const LAYER_HEADER = computeBracketLayerHeader(ROUND_NAMES);
+
+const DRAW: BracketNode<string> = branch(
+    "Final",
+    branch("Semi 1", branch("Quarter 1", seed("Ada"), seed("Bo")), branch("Quarter 2", seed("Cai"), seed("Dee"))),
+    branch(
+        "Semi 2",
+        branch("Quarter 3", seed("Eli"), seed("Fay")),
+        branch("Quarter 4", seed("Gus"), { value: "Withdrawn", isDisabled: true }),
+    ),
+);
+
+type Props = BracketExampleProps;
+
+export const KnockoutExample = (props: Props) => {
+    return (
+        <div className={styles.board}>
+            <Bracket
+                root={DRAW}
+                nodeSize={NODE_SIZE}
+                layerGap={props.layerGap}
+                crossGap={props.crossGap}
+                orientation={props.orientation}
+                rootSide={props.rootSide}
+                layerHeaderSize={props.orientation === "horizontal" ? ACROSS_HEADER_SIZE : DOWN_HEADER_SIZE}
+                ariaLabel={"Knockout draw"}
+                onActivate={props.onActivate}
+                renderConnector={props.renderConnector}
+                renderNode={renderBracketNode}
+                renderLayerHeader={LAYER_HEADER}
+            />
+        </div>
+    );
+};
