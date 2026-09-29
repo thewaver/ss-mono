@@ -1,6 +1,9 @@
 import type { SignalPair } from "@thewaver/ss-components-solid";
+import type { PLAYGROUND_THEMES } from "@thewaver/ss-playground/App/Theme.css";
 
 import type { PageViewKey } from "../ViewTabs/ViewTabs.types";
+
+export type PlaygroundTheme = keyof typeof PLAYGROUND_THEMES;
 
 export type ViewportAnchor = "none" | "auto" | 1080 | 1440;
 

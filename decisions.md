@@ -6582,9 +6582,15 @@ than a numeric ramp, one animation duration rather than a set, `half` / `full` /
 none of it is a recommendation and none of it constrains the library, which paints nothing and reads no
 token. A consumer copying its shape is copying an example.
 
-This does **not** license changing it casually. It is the only theme the Playground has, so a token edit
-repaints every page at once; the values being arbitrary is a statement about their origin, not an invitation
-to churn them.
+This does **not** license changing it casually. A token edit repaints every page at once; the values being
+arbitrary is a statement about their origin, not an invitation to churn them.
+
+**The Playground carries several value sets on that one contract, and the nav settings pick between them.**
+`Theme.const.ts` holds Default, Solid, React, Svelte and Vue; `Theme.css.ts` builds each into a class and
+lists them in `PLAYGROUND_THEMES`. Each app's `index.tsx` applies its own framework's theme at load, and the
+_Theme_ select in the nav settings swaps the class on the root element from there. The user asked for it as a
+temporary way to compare the sets side by side, then kept it. The pick is not remembered across reloads, and
+it is not tied to the framework switch, which still picks the other app's own theme when it lands there.
 
 ### The Playground's field look is one surface, and every field-shaped control wears it
 

@@ -1,12 +1,26 @@
 import { createTheme, createThemeContract, globalStyle } from "@vanilla-extract/css";
 
-import { DEFAULT_THEME_VALUES, REACT_THEME_VALUES, SOLID_THEME_VALUES } from "./Theme.const";
+import {
+    DEFAULT_THEME_VALUES,
+    REACT_THEME_VALUES,
+    SOLID_THEME_VALUES,
+    SVELTE_THEME_VALUES,
+    VUE_THEME_VALUES,
+} from "./Theme.const";
 
 export const themeVars = createThemeContract(DEFAULT_THEME_VALUES);
 
 export const solidTheme = createTheme(themeVars, SOLID_THEME_VALUES);
 
 export const reactTheme = createTheme(themeVars, REACT_THEME_VALUES);
+
+export const PLAYGROUND_THEMES = {
+    default: createTheme(themeVars, DEFAULT_THEME_VALUES),
+    solid: solidTheme,
+    react: reactTheme,
+    svelte: createTheme(themeVars, SVELTE_THEME_VALUES),
+    vue: createTheme(themeVars, VUE_THEME_VALUES),
+};
 
 globalStyle("*", {
     boxSizing: "border-box",

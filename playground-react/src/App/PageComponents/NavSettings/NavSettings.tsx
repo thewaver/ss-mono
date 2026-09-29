@@ -1,3 +1,4 @@
+import { useState } from "react";
 import { useLocation } from "react-router";
 
 import { Radio, RadioGroup, Toggle } from "@thewaver/ss-components-react";
@@ -7,6 +8,7 @@ import {
     toOtherFrameworkHref,
 } from "@thewaver/ss-playground/App/PageComponents/FrameworkSwitch/FrameworkSwitch.const";
 import type { PlaygroundFramework } from "@thewaver/ss-playground/App/PageComponents/FrameworkSwitch/PlaygroundFramework.types";
+import { PLAYGROUND_THEMES } from "@thewaver/ss-playground/App/Theme.css";
 
 import {
     PageRadioSegmentContent,
@@ -17,13 +19,30 @@ import { PageToggleContent } from "../../StyledComponents/ToggleContent/ToggleCo
 import { PageExampleKnobsButton } from "../ExampleKnobs/ExampleKnobs";
 import { PageSelectField } from "../Field/Field";
 import { PageProp } from "../Prop/Prop";
-import { PAGE_VIEW_OPTIONS, VIEWPORT_ANCHOR_OPTIONS } from "./NavSettings.const";
-import type { PageNavSettingsChoiceProps, PageNavSettingsProps, ViewportAnchor } from "./NavSettings.types";
+import { PAGE_VIEW_OPTIONS, THEME_OPTIONS, VIEWPORT_ANCHOR_OPTIONS } from "./NavSettings.const";
+import type {
+    PageNavSettingsChoiceProps,
+    PageNavSettingsProps,
+    PlaygroundTheme,
+    ViewportAnchor,
+} from "./NavSettings.types";
 
 const OWN_FRAMEWORK: PlaygroundFramework = "react";
 
 const computeViewportAnchorLabel = (anchor: ViewportAnchor) =>
     VIEWPORT_ANCHOR_OPTIONS.find((option) => option.value === anchor)?.label ?? String(anchor);
+
+const computeThemeLabel = (theme: PlaygroundTheme) =>
+    THEME_OPTIONS.find((option) => option.value === theme)?.label ?? theme;
+
+const findAppliedTheme = () =>
+    THEME_OPTIONS.find((option) => document.documentElement.classList.contains(PLAYGROUND_THEMES[option.value]))
+        ?.value ?? OWN_FRAMEWORK;
+
+const applyTheme = (theme: PlaygroundTheme) => {
+    document.documentElement.classList.remove(...Object.values(PLAYGROUND_THEMES));
+    document.documentElement.classList.add(PLAYGROUND_THEMES[theme]);
+};
 
 const PageNavSettingsChoice = <T,>(props: PageNavSettingsChoiceProps<T>) => (
     <PageRadioSegmentGroup>
@@ -55,6 +74,12 @@ const PageNavSettingsChoice = <T,>(props: PageNavSettingsChoiceProps<T>) => (
 
 export const PageNavSettings = (props: PageNavSettingsProps) => {
     const location = useLocation();
+    const [theme, setTheme] = useState(findAppliedTheme);
+
+    const pickTheme = (nextTheme: PlaygroundTheme) => {
+        applyTheme(nextTheme);
+        setTheme(nextTheme);
+    };
 
     return (
         <PageExampleKnobsButton
@@ -104,6 +129,21 @@ export const PageNavSettings = (props: PageNavSettingsProps) => {
                             computeLabel={computeViewportAnchorLabel}
                             ariaLabel={"Viewport anchor"}
                             onChange={props.viewportAnchorState[1]}
+                        />
+                    </PageProp>
+
+                    <PageProp
+                        itemKey={"theme"}
+                        label={"Theme"}
+                        hint={"Which color theme the playground is drawn in, independent of the framework it runs in."}
+                        defaultValue={computeThemeLabel(OWN_FRAMEWORK)}
+                    >
+                        <PageSelectField
+                            value={theme}
+                            values={THEME_OPTIONS.map((option) => option.value)}
+                            computeLabel={computeThemeLabel}
+                            ariaLabel={"Theme"}
+                            onChange={pickTheme}
                         />
                     </PageProp>
 
