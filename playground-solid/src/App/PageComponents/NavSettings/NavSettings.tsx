@@ -150,6 +150,21 @@ export const PageNavSettings = (props: PageNavSettingsProps) => {
                     </PageProp>
 
                     <PageProp
+                        key={"theme"}
+                        label={"Theme"}
+                        hint={"Which color theme the playground is drawn in, independent of the framework it runs in."}
+                        defaultValue={computeThemeLabel(OWN_FRAMEWORK)}
+                    >
+                        <PageSelectField
+                            value={getTheme}
+                            values={THEME_OPTIONS.map((option) => option.value)}
+                            computeLabel={computeThemeLabel}
+                            ariaLabel={"Theme"}
+                            onChange={pickTheme}
+                        />
+                    </PageProp>
+
+                    <PageProp
                         key={"framework"}
                         label={"Framework"}
                         hint={"Which framework the playground runs in. Picking another opens this same page there."}
