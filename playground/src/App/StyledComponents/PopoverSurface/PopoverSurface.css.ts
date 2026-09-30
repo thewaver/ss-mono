@@ -15,7 +15,6 @@ export const popoverSurfaceEmpty = style({
     padding: themeVars.spacing.full,
     color: `rgb(from ${layerVars.contrast} r g b / 50%)`,
     fontSize: themeVars.fontSize.medium,
-    lineHeight: 1.25,
     whiteSpace: "nowrap",
 });
 

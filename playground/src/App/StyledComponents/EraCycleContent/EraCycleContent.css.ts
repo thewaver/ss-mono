@@ -18,7 +18,6 @@ export const eraCycle = style({
     fontSize: themeVars.fontSize.xSmall,
     fontWeight: 600,
     letterSpacing: 0.5,
-    lineHeight: 1,
     whiteSpace: "nowrap",
     transition: `background-color ${themeVars.animation.duration}, color ${themeVars.animation.duration}, opacity ${themeVars.animation.duration}`,
 

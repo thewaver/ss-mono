@@ -11,7 +11,6 @@ export const computePageTextFieldTextStyle = (getFlags: () => InteractionFlags):
     "color": getFlags().isDisabled ? `rgb(from ${layerVars.contrast} r g b / 50%)` : layerVars.contrast,
     "caret-color": themeVars.color.primary.main,
     "font-size": styles.FIELD_FONT_SIZE,
-    "line-height": styles.FIELD_LINE_HEIGHT,
 });
 
 export const PageTextFieldContent = (props: TextFieldContentProps) => {

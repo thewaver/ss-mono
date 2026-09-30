@@ -43,7 +43,7 @@ export const previewText = style({
 
 export const diffText = style([previewText, { maxWidth: PREVIEW_WIDTH }]);
 
-export const proseText = style([previewText, { maxWidth: PREVIEW_WIDTH, lineHeight: 1.6 }]);
+export const proseText = style([previewText, { maxWidth: PREVIEW_WIDTH }]);
 
 export const addedText = style({
     color: themeVars.color.success.contrast,

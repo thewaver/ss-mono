@@ -15,7 +15,6 @@ export const treemapTile = style({
     backgroundColor: layerVars.main,
     color: layerVars.contrast,
     fontSize: themeVars.fontSize.xSmall,
-    lineHeight: 1.2,
     overflow: "hidden",
 });
 
@@ -32,7 +31,7 @@ export const treemapTileWeight = style({
 
 export const treemapBar = style({
     display: "flex",
-    alignItems: "baseline",
+    alignItems: "center",
     gap: themeVars.spacing.full,
     width: "100%",
     height: 30,
@@ -40,7 +39,6 @@ export const treemapBar = style({
     backgroundColor: layerVars.main,
     color: layerVars.contrast,
     fontSize: themeVars.fontSize.xSmall,
-    lineHeight: "30px",
     cursor: "pointer",
 });
 

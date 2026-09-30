@@ -1,16 +1,17 @@
 import { style } from "@vanilla-extract/css";
 
 import { themeVars } from "../../Theme.css";
+import { layerVars } from "../Layer/Layer.css";
 
 export const dieFace = style({
     display: "grid",
     placeItems: "center",
     width: "100%",
     height: "100%",
-    backgroundImage: `radial-gradient(circle at 70% 30%, ${themeVars.color.secondary.light}, ${themeVars.color.secondary.dark})`,
-    color: themeVars.color.secondary.contrast,
+    border: `1px solid ${themeVars.color.primary.main}`,
+    backgroundColor: layerVars.main,
+    color: layerVars.contrast,
     fontWeight: "bold",
-    lineHeight: 1,
     userSelect: "none",
 });
 

@@ -4,7 +4,6 @@ import { style } from "@vanilla-extract/css";
 import { themeVars } from "../../Theme.css";
 
 const STRIPE_WIDTH = 14;
-const STAGE_PADDING = 40;
 
 export const SUBJECT_SIZE: Size2d = { width: 260, height: 150 };
 
@@ -12,7 +11,7 @@ export const filterStageRoot = style({
     position: "relative",
     display: "grid",
     placeItems: "center",
-    padding: STAGE_PADDING,
+    padding: themeVars.spacing.quad,
 });
 
 export const filterStageDefs = style({

@@ -7,7 +7,6 @@ const FIELD_WIDTH = 200;
 const FIELD_HEIGHT = 40;
 const FIELD_BORDER = 2;
 const FIELD_FONT_SIZE = themeVars.fontSize.medium;
-const FIELD_LINE_HEIGHT = 1.25;
 
 export const isHovered = style({});
 export const isEmpty = style({});
@@ -27,7 +26,6 @@ export const fileInputContent = style({
     borderRadius: themeVars.borderRadius.half,
     backgroundColor: layerVars.main,
     fontSize: FIELD_FONT_SIZE,
-    lineHeight: FIELD_LINE_HEIGHT,
     transition: `filter ${themeVars.animation.duration}, opacity ${themeVars.animation.duration}, border-color ${themeVars.animation.duration}`,
 
     selectors: {

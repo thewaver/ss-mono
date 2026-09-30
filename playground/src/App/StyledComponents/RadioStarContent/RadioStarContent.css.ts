@@ -16,7 +16,6 @@ export const starContent = style({
     height: 40,
     color: `rgb(from ${layerVars.contrast} r g b / 25%)`,
     fontSize: themeVars.fontSize.large,
-    lineHeight: 1,
     transition: `color ${themeVars.animation.duration}, filter ${themeVars.animation.duration}, opacity ${themeVars.animation.duration}`,
 
     selectors: {

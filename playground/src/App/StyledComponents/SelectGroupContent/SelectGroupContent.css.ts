@@ -13,7 +13,6 @@ export const selectGroupContent = style({
     padding: `${themeVars.spacing.full} ${themeVars.spacing.full} ${themeVars.spacing.half}`,
     color: `rgb(from ${layerVars.contrast} r g b / 50%)`,
     fontSize: themeVars.fontSize.xSmall,
-    lineHeight: 1.25,
     letterSpacing: "0.05em",
     textTransform: "uppercase",
     whiteSpace: "nowrap",
@@ -29,7 +28,6 @@ export const selectGroupMark = style({
     borderRadius: themeVars.borderRadius.half,
     color: themeVars.color.primary.main,
     fontSize: themeVars.fontSize.small,
-    lineHeight: 1,
     transition: `border-color ${themeVars.animation.duration}`,
 
     selectors: {

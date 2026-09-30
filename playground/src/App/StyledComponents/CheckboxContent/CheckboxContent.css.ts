@@ -38,7 +38,6 @@ export const checkboxContent = style({
 export const checkboxMark = style({
     color: themeVars.color.primary.main,
     fontSize: themeVars.fontSize.medium,
-    lineHeight: 1,
     transform: "scale(0)",
     transition: `transform ${themeVars.animation.duration}`,
 

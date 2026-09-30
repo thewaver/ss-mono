@@ -7,7 +7,6 @@ import {
     FIELD_FONT_SIZE,
     FIELD_GAP,
     FIELD_HEIGHT,
-    FIELD_LINE_HEIGHT,
     FIELD_PADDING,
     FIELD_WIDTH,
 } from "../TextFieldContent/TextFieldContent.css";
@@ -27,7 +26,6 @@ export const inlineEditContent = style({
     border: `${FIELD_BORDER}px solid transparent`,
     borderRadius: themeVars.borderRadius.half,
     fontSize: FIELD_FONT_SIZE,
-    lineHeight: FIELD_LINE_HEIGHT,
     textAlign: "start",
     cursor: "text",
     transition: `border-color ${themeVars.animation.duration}, opacity ${themeVars.animation.duration}`,

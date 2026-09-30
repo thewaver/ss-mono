@@ -17,7 +17,6 @@ export const meridiemToggle = style({
     fontSize: themeVars.fontSize.xSmall,
     fontWeight: 600,
     letterSpacing: 0.5,
-    lineHeight: 1,
     transition: `background-color ${themeVars.animation.duration}, color ${themeVars.animation.duration}, opacity ${themeVars.animation.duration}`,
 
     selectors: {

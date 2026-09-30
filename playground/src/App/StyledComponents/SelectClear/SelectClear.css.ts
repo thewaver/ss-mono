@@ -18,7 +18,6 @@ export const selectClear = style({
     borderRadius: themeVars.borderRadius.half,
     color: `rgb(from ${layerVars.contrast} r g b / 65%)`,
     fontSize: themeVars.fontSize.medium,
-    lineHeight: 1,
     transition: `background-color ${themeVars.animation.duration}, color ${themeVars.animation.duration}, opacity ${themeVars.animation.duration}`,
 
     selectors: {

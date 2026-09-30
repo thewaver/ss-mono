@@ -16,7 +16,6 @@ export const FIELD_STEPPER_PADDING = {
 };
 export const FIELD_GAP = 5;
 export const FIELD_FONT_SIZE = themeVars.fontSize.medium;
-export const FIELD_LINE_HEIGHT = 1.25;
 
 export const isEmpty = style({});
 export const isStretched = style({});
@@ -71,7 +70,6 @@ export const textFieldPlaceholder = style({
     height: "100%",
     color: `rgb(from ${layerVars.contrast} r g b / 50%)`,
     fontSize: FIELD_FONT_SIZE,
-    lineHeight: FIELD_LINE_HEIGHT,
     opacity: 0,
     transition: `opacity ${themeVars.animation.duration}`,
 

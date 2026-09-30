@@ -16,7 +16,6 @@ export const anchorButton = style({
 
 export const sentence = style({
     padding: themeVars.spacing.double,
-    lineHeight: 1.6,
 });
 
 export const anchorWord = style({

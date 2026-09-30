@@ -20,7 +20,6 @@ export const propHintBadge = style({
     color: layerVars.contrast,
     fontSize: themeVars.fontSize.xSmall,
     fontWeight: "bold",
-    lineHeight: 1,
     cursor: "help",
     transition: `filter ${themeVars.animation.duration}`,
 

@@ -14,7 +14,6 @@ export const computePageSelectTextStyle = (getFlags: () => InteractionFlags<Sele
     "color": getFlags().isDisabled ? `rgb(from ${layerVars.contrast} r g b / 50%)` : layerVars.contrast,
     "caret-color": themeVars.color.primary.main,
     "font-size": styles.FIELD_FONT_SIZE,
-    "line-height": styles.FIELD_LINE_HEIGHT,
 });
 
 export const PageSelectContent = (props: ParentProps<SelectContentProps>) => {

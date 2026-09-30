@@ -16,7 +16,6 @@ export const selectOptionContent = style({
     padding: themeVars.spacing.full,
     borderRadius: themeVars.borderRadius.half,
     fontSize: themeVars.fontSize.medium,
-    lineHeight: 1.25,
     whiteSpace: "nowrap",
     transition: `background-color ${themeVars.animation.duration}, opacity ${themeVars.animation.duration}`,
 

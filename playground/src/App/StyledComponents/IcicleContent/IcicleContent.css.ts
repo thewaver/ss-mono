@@ -26,7 +26,6 @@ export const icicleCell = style({
     borderRight: `1px solid rgb(from ${layerVars.contrast} r g b / 25%)`,
     borderBottom: `1px solid rgb(from ${layerVars.contrast} r g b / 25%)`,
     fontSize: themeVars.fontSize.xSmall,
-    lineHeight: 1.3,
     whiteSpace: "nowrap",
     overflow: "hidden",
     cursor: "pointer",

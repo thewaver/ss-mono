@@ -8,7 +8,6 @@
         color: flags.isDisabled ? `rgb(from ${layerVars.contrast} r g b / 50%)` : layerVars.contrast,
         caretColor: themeVars.color.primary.main,
         fontSize: styles.FIELD_FONT_SIZE,
-        lineHeight: `${styles.FIELD_LINE_HEIGHT}`,
     });
 </script>
 

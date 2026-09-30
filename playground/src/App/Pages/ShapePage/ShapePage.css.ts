@@ -60,7 +60,6 @@ export const morphHost = style({
 
 export const wrapText = style({
     maxWidth: 520,
-    lineHeight: 1.6,
 });
 
 globalStyle(`${wrapText} > :first-child`, {

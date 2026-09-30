@@ -19,7 +19,6 @@ export const sidebarToggle = style({
     borderRadius: themeVars.borderRadius.half,
     font: "inherit",
     fontSize: themeVars.fontSize.large,
-    lineHeight: 1,
     color: layerVars.contrast,
     background: "none",
     cursor: "pointer",

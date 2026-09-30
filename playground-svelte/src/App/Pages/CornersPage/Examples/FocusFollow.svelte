@@ -16,7 +16,7 @@
     type Props = CornersExampleProps;
 
     const TRANSPARENT = "transparent";
-    const BOX_PADDING_PX = 8;
+    const BOX_PADDING_PX = 10;
     const CONTROLS = ["Open", "Save", "Share", "Delete"];
 
     let props: Props = $props();

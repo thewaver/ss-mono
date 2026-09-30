@@ -52,6 +52,5 @@ export const tagRemove = style({
 export const tagInputPlaceholder = style({
     color: `rgb(from ${layerVars.contrast} r g b / 50%)`,
     fontSize: FIELD_FONT_SIZE,
-    lineHeight: 1,
     pointerEvents: "none",
 });

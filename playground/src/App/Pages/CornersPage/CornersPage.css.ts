@@ -40,7 +40,6 @@ export const panelBody = style({
     height: "100%",
     padding: themeVars.spacing.double,
     boxSizing: "border-box",
-    lineHeight: 1.5,
 });
 
 export const stage = style({

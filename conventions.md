@@ -1645,7 +1645,28 @@ this library — so a number there is a layout fact rather than a missed token.
 `TextFieldContent.css.ts` is not a CSS declaration; it is a value handed to a component's `padding` prop,
 which takes numbers. A `var(--…)` string does not typecheck there and would not survive the arithmetic the
 neighboring `FIELD_PADDING` does either. A value crossing into a prop stays a number; only declarations
-inside a `style({})` take tokens.
+inside a `style({})` take tokens. A prop value is still rounded onto the scale when it is off it —
+`FocusFollow`'s box padding went from `8` to `10` — it just stays written as a number.
+
+**No `lineHeight` anywhere in the Playground except the `body` rule in `Theme.css.ts`, and the Typewriter
+sample's `textHighlight`.** That one's `2` is deliberate, the user's own call, restored after the sweep took it. Stated by the user as
+abolition, not alignment: the theme has no line-height scale, so every other value was a private choice and
+all of them went, down to the `1` on glyph buttons and the `FIELD_LINE_HEIGHT` handed to the text fields'
+text style. Those fields need nothing in its place, because the component's native input is styled
+`font: inherit` and picks the `1.5` up from the page. **Where a line height was doing vertical centering it
+was replaced by flex centering rather than dropped**, so the text did not move: the timeline's tick label is
+now a flex box `AXIS_HEIGHT` tall, and the treemap's breadcrumb bar aligns its items to `center` instead of
+`baseline` under a `30px` line.
+
+**The rounding rule's tolerance is 2 to 3 pixels; past that, ask.** The user's threshold. A value more than
+3 pixels from every token is theirs to place, and the answers so far:
+
+- **The Card sample's role line went from `20px` to `fontSize.medium`**, keeping it clearly under the `xLarge` name.
+- **`CodeBox`'s `calc(spacing.double - spacing.half)` stays.** The user's reason: the missing 5 pixels are made up
+  elsewhere on the page, so the sum lands on the scale even though this term does not. Do not round it.
+- **`playground/landing/index.html` stays as written.** It is plain HTML with no theme access, and its `15px`
+  left padding against `20px` on the right is deliberate — the icon on that side carries a different visual
+  weight from the text, and the smaller padding balances it.
 
 ## Testing
 

@@ -11,7 +11,6 @@ export const navLinkContent = style({
     borderRadius: themeVars.borderRadius.half,
     fontSize: themeVars.fontSize.medium,
     fontWeight: "bold",
-    lineHeight: 1.25,
     textTransform: "uppercase",
     whiteSpace: "nowrap",
     transition: `background-color ${themeVars.animation.duration}`,

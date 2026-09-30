@@ -8,9 +8,7 @@ export const bridgeRightVar = createVar();
 export const bridgeBottomVar = createVar();
 export const bridgeLeftVar = createVar();
 
-export const sentence = style({
-    lineHeight: 1.6,
-});
+export const sentence = style({});
 
 export const handle = style({
     padding: 0,
@@ -55,7 +53,6 @@ export const profileHandle = style({
 
 export const profileBio = style({
     fontSize: themeVars.fontSize.small,
-    lineHeight: 1.5,
 });
 
 export const profileActions = style({

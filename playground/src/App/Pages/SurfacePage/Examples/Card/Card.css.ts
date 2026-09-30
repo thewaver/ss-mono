@@ -53,12 +53,12 @@ export const surfaceCntent = style([
 ]);
 
 export const name = style({
-    fontSize: "2rem",
+    fontSize: themeVars.fontSize.xLarge,
     fontWeight: 700,
 });
 
 export const role = style({
-    fontSize: "1.25rem",
+    fontSize: themeVars.fontSize.medium,
     fontWeight: 500,
 });
 

@@ -18,7 +18,6 @@ export const sortableItemContent = style({
     borderRadius: themeVars.borderRadius.half,
     backgroundColor: layerVars.main,
     fontSize: themeVars.fontSize.medium,
-    lineHeight: 1.25,
     whiteSpace: "nowrap",
     cursor: "grab",
     transition: `opacity ${themeVars.animation.duration}, border-color ${themeVars.animation.duration}, background-color ${themeVars.animation.duration}`,

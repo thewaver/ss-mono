@@ -101,7 +101,6 @@ export const sortableGridItemGlyph = style({
     gap: 2,
     position: "absolute",
     fontSize: themeVars.fontSize.large,
-    lineHeight: 1,
     pointerEvents: "none",
     transition: `opacity ${themeVars.animation.duration}`,
 

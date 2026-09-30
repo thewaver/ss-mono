@@ -13,7 +13,6 @@ export const FIELD_PADDING = FIELD_BOX_PADDING + FIELD_BORDER;
 export const FIELD_CHEVRON_WIDTH = 10;
 export const FIELD_GAP = 10;
 export const FIELD_FONT_SIZE = themeVars.fontSize.medium;
-export const FIELD_LINE_HEIGHT = 1.25;
 
 export const isEmpty = style({});
 export const isFiltering = style({});
@@ -36,7 +35,6 @@ export const selectContent = style({
     borderRadius: themeVars.borderRadius.half,
     backgroundColor: layerVars.main,
     fontSize: FIELD_FONT_SIZE,
-    lineHeight: FIELD_LINE_HEIGHT,
     textAlign: "left",
     transition: `filter ${themeVars.animation.duration}, opacity ${themeVars.animation.duration}, border-color ${themeVars.animation.duration}`,
 

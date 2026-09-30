@@ -17,7 +17,6 @@ export const menuItemContent = style({
     padding: themeVars.spacing.full,
     borderRadius: themeVars.borderRadius.half,
     fontSize: themeVars.fontSize.medium,
-    lineHeight: 1.25,
     whiteSpace: "nowrap",
     transition: `background-color ${themeVars.animation.duration}, filter ${themeVars.animation.duration}, opacity ${themeVars.animation.duration}`,
 
@@ -49,14 +48,12 @@ export const menuItemShortcut = style({
 export const menuItemSubmenuMark = style({
     opacity: 0.75,
     fontSize: themeVars.fontSize.medium,
-    lineHeight: 1,
 });
 
 export const menuItemMark = style({
     width: "1ch",
     color: themeVars.color.primary.main,
     fontSize: themeVars.fontSize.small,
-    lineHeight: 1,
     textAlign: "center",
 });
 

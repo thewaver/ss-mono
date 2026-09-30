@@ -8,7 +8,7 @@ export const resizer = style({
     overflow: "hidden",
     minWidth: 80,
     maxWidth: "100%",
-    padding: 5,
+    padding: themeVars.spacing.half,
     border: `2px dashed ${themeVars.color.primary.dark}`,
     borderRadius: themeVars.borderRadius.full,
 });

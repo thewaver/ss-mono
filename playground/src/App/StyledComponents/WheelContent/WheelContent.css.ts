@@ -50,7 +50,6 @@ export const wheelWedgeLabel = style({
     alignItems: "center",
     gap: "0.5em",
     color: layerVars.contrast,
-    lineHeight: 1.2,
     textAlign: "center",
     textWrap: "balance",
 
