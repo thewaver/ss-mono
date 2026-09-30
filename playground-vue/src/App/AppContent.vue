@@ -13,7 +13,9 @@ import type { ComponentConfig, MenuNodeConfig } from "./App.types";
 import { AppUtils } from "./App.utils";
 import PageBuildProgress from "./PageComponents/BuildProgress/PageBuildProgress.vue";
 import PageTextField from "./PageComponents/Field/PageTextField.vue";
+import PageFrameworkMenu from "./PageComponents/FrameworkMenu/FrameworkMenu.vue";
 import PageLayer from "./PageComponents/Layer/Layer.vue";
+import PageNavLink from "./PageComponents/NavLink/NavLink.vue";
 import type { ViewportAnchor } from "./PageComponents/NavSettings/NavSettings.types";
 import PageNavSettings from "./PageComponents/NavSettings/PageNavSettings.vue";
 import PageRouterLink from "./PageComponents/RouterLink/RouterLink.vue";
@@ -35,6 +37,8 @@ const browseExpanded = shallowRef<MenuNodeConfig[]>(AppUtils.VISIBLE_MENU_CONFIG
 const searchExpanded = shallowRef<MenuNodeConfig[]>([]);
 
 const selectedConfig = computed(() => AppUtils.COMPONENT_CONFIGS_BY_ROUTE[toBaseRoute(route.path)]);
+
+const isAboutSelected = computed(() => route.path === "/");
 
 const isSearching = computed(() => searchTerm.value.trim().length > 0);
 
@@ -125,6 +129,29 @@ const computeNodeText = (node: TreeNode<unknown>) => (node.value as MenuNodeConf
 
                                     <div
                                         :class="[
+                                            styles.frameworkHeading,
+                                            AppUtils.getIsMenuFaded(phase) && styles.isFaded,
+                                            phase === 'collapsed' && styles.isHidden,
+                                        ]"
+                                        :style="{ transitionDuration: `${transitionDurationMs}ms` }"
+                                    >
+                                        <span :class="styles.frameworkHeadingLabel">ss-components for</span>
+
+                                        <PageFrameworkMenu />
+                                    </div>
+                                </div>
+
+                                <div :class="styles.searchContainer">
+                                    <div :class="styles.navSettingsBox">
+                                        <PageNavSettings
+                                            v-model:shows-description-only="showsDescriptionOnly"
+                                            v-model:page-view="pageView"
+                                            v-model:viewport-anchor="viewportAnchor"
+                                        />
+                                    </div>
+
+                                    <div
+                                        :class="[
                                             styles.searchFields,
                                             AppUtils.getIsMenuFaded(phase) && styles.isFaded,
                                             phase === 'collapsed' && styles.isHidden,
@@ -138,13 +165,18 @@ const computeNodeText = (node: TreeNode<unknown>) => (node.value as MenuNodeConf
                                             ariaLabel="Search components"
                                             @input="(value: string) => (searchTerm = value)"
                                         />
-
-                                        <PageNavSettings
-                                            v-model:shows-description-only="showsDescriptionOnly"
-                                            v-model:page-view="pageView"
-                                            v-model:viewport-anchor="viewportAnchor"
-                                        />
                                     </div>
+                                </div>
+
+                                <div
+                                    :class="[
+                                        styles.aboutLink,
+                                        AppUtils.getIsMenuFaded(phase) && styles.isFaded,
+                                        phase === 'collapsed' && styles.isHidden,
+                                    ]"
+                                    :style="{ transitionDuration: `${transitionDurationMs}ms` }"
+                                >
+                                    <PageNavLink href="/" :is-selected="isAboutSelected">About</PageNavLink>
                                 </div>
 
                                 <div

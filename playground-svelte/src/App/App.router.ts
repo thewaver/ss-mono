@@ -8,7 +8,6 @@ import { StringUtils } from "@thewaver/ss-utils";
 import { MENU_CONFIGS } from "./App.const";
 import type { ComponentConfig, MenuBranchConfig, MenuNodeConfig } from "./App.types";
 import DocsRedirect from "./DocsRedirect.svelte";
-import EmptyPage from "./EmptyPage.svelte";
 import type { PageViewKey } from "./PageComponents/ViewTabs/ViewTabs.types";
 
 export const getIsBranchConfig = (node: MenuNodeConfig): node is MenuBranchConfig => "children" in node;
@@ -28,7 +27,7 @@ export const COMPONENT_CONFIGS_BY_ROUTE: Record<string, ComponentConfig | undefi
 );
 
 const ROUTES: Routes = {
-    "/": EmptyPage,
+    "/": () => import("./Pages/AboutPage/AboutPage.svelte"),
     ...Object.fromEntries(
         COMPONENT_CONFIGS.map((config) => [
             componentToRouteName(config.name),

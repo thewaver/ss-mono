@@ -3,7 +3,7 @@ import { style } from "@vanilla-extract/css";
 import { themeVars } from "../../Theme.css";
 import { layerVars } from "../Layer/Layer.css";
 
-const TOGGLE_SIZE = 28;
+export const SIDEBAR_TOGGLE_SIZE = 28;
 
 export const isHovered = style({});
 
@@ -12,12 +12,14 @@ export const sidebarToggle = style({
     alignItems: "center",
     justifyContent: "center",
     pointerEvents: "all",
-    width: TOGGLE_SIZE,
-    height: TOGGLE_SIZE,
+    width: SIDEBAR_TOGGLE_SIZE,
+    height: SIDEBAR_TOGGLE_SIZE,
     padding: 0,
     border: "none",
     borderRadius: themeVars.borderRadius.half,
     font: "inherit",
+    fontSize: themeVars.fontSize.large,
+    lineHeight: 1,
     color: layerVars.contrast,
     background: "none",
     cursor: "pointer",

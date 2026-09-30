@@ -8,10 +8,7 @@ import { loadApiGroups, toHighlightedType } from "@thewaver/ss-playground/App/Pa
 import type { PageDocsTableProps, PageDocsViewProps } from "./DocsView.types";
 
 const NO_DESCRIPTION = "Not written yet.";
-const ACCESSOR_FLAG = "value or accessor";
-const REQUIRED_FLAG = "required";
 const USE_COLUMN = "Use";
-const PASSING_COLUMN = "Passing";
 
 const GROUP_TITLES: Record<ApiGroupKind, string> = {
     props: "Props",
@@ -32,8 +29,6 @@ const TABLE_COLUMNS: Record<ApiTableKind, [name: string, type: string]> = {
 const PageDocsTable = (props: PageDocsTableProps) => {
     const getTable = () => access(props.table);
 
-    const getHasPassing = () => getTable().kind === "props";
-
     return (
         <div class={styles.docsSection}>
             <Show when={getTable().heading}>
@@ -51,9 +46,6 @@ const PageDocsTable = (props: PageDocsTableProps) => {
                             <For each={TABLE_COLUMNS[getTable().kind]}>
                                 {(column) => <th class={styles.docsHeadCell}>{column}</th>}
                             </For>
-                            <Show when={getHasPassing()}>
-                                <th class={styles.docsHeadCell}>{PASSING_COLUMN}</th>
-                            </Show>
                             <Show when={getTable().isDocumented}>
                                 <th class={styles.docsHeadCell}>{USE_COLUMN}</th>
                             </Show>
@@ -72,18 +64,6 @@ const PageDocsTable = (props: PageDocsTableProps) => {
                                     </td>
 
                                     <td class={styles.docsTypeCell} innerHTML={toHighlightedType(entry.type)} />
-
-                                    <Show when={getHasPassing()}>
-                                        <td class={styles.docsCell}>
-                                            <Show when={entry.isAccessor} fallback={<span>{"value"}</span>}>
-                                                <span class={styles.docsFlag}>{ACCESSOR_FLAG}</span>
-                                            </Show>
-                                            <Show when={!entry.isOptional}>
-                                                {" "}
-                                                <span class={styles.docsFlag}>{REQUIRED_FLAG}</span>
-                                            </Show>
-                                        </td>
-                                    </Show>
 
                                     <Show when={getTable().isDocumented}>
                                         <td class={styles.docsCell}>

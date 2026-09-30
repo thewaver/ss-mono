@@ -22,14 +22,31 @@ const themeColors = (): Plugin => ({
         {
             tag: "style",
             injectTo: "head",
-            children: `:root { --solid-primary: ${SOLID_THEME_VALUES.color.primary.main}; --react-primary: ${REACT_THEME_VALUES.color.primary.main}; --vue-primary: ${VUE_THEME_VALUES.color.primary.main}; --svelte-primary: ${SVELTE_THEME_VALUES.color.primary.main}; }`,
+            children: `:root { --solid-primary: ${SOLID_THEME_VALUES.color.primary.main}; --solid-primary-light: ${SOLID_THEME_VALUES.color.primary.light}; --solid-primary-dark: ${SOLID_THEME_VALUES.color.primary.dark}; --react-primary: ${REACT_THEME_VALUES.color.primary.main}; --vue-primary: ${VUE_THEME_VALUES.color.primary.main}; --vue-primary-light: ${VUE_THEME_VALUES.color.primary.light}; --vue-primary-dark: ${VUE_THEME_VALUES.color.primary.dark}; --svelte-primary: ${SVELTE_THEME_VALUES.color.primary.main}; }`,
         },
     ],
 });
 
+const BARE_BASE_PATTERN = /^\/(solid|react|vue|svelte)(\?.*)?$/;
+
+const bareBaseRedirect = (): Plugin => ({
+    name: "bare-base-redirect",
+    configureServer: (server) => {
+        server.middlewares.use((req, res, next) => {
+            const match = req.url?.match(BARE_BASE_PATTERN);
+
+            if (!match) return next();
+
+            res.statusCode = 302;
+            res.setHeader("Location", `/${match[1]}/${match[2] ?? ""}`);
+            res.end();
+        });
+    },
+});
+
 export default defineConfig({
     root: fromHere("."),
-    plugins: [themeColors()],
+    plugins: [themeColors(), bareBaseRedirect()],
     server: {
         port: 8080,
         strictPort: true,

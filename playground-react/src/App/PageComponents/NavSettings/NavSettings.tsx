@@ -1,13 +1,6 @@
 import { useState } from "react";
-import { useLocation } from "react-router";
 
 import { Radio, RadioGroup, Toggle } from "@thewaver/ss-components-react";
-import {
-    PLAYGROUND_FRAMEWORKS,
-    PLAYGROUND_FRAMEWORK_LABELS,
-    toFrameworkHref,
-} from "@thewaver/ss-playground/App/PageComponents/FrameworkSwitch/FrameworkSwitch.const";
-import type { PlaygroundFramework } from "@thewaver/ss-playground/App/PageComponents/FrameworkSwitch/PlaygroundFramework.types";
 import { PLAYGROUND_THEMES } from "@thewaver/ss-playground/App/Theme.css";
 
 import {
@@ -18,6 +11,7 @@ import {
 import { PageToggleContent } from "../../StyledComponents/ToggleContent/ToggleContent";
 import { PageExampleKnobsButton } from "../ExampleKnobs/ExampleKnobs";
 import { PageSelectField } from "../Field/Field";
+import { OWN_FRAMEWORK } from "../FrameworkMenu/FrameworkMenu.const";
 import { PageProp } from "../Prop/Prop";
 import { PAGE_VIEW_OPTIONS, THEME_OPTIONS, VIEWPORT_ANCHOR_OPTIONS } from "./NavSettings.const";
 import type {
@@ -26,8 +20,6 @@ import type {
     PlaygroundTheme,
     ViewportAnchor,
 } from "./NavSettings.types";
-
-const OWN_FRAMEWORK: PlaygroundFramework = "react";
 
 const computeViewportAnchorLabel = (anchor: ViewportAnchor) =>
     VIEWPORT_ANCHOR_OPTIONS.find((option) => option.value === anchor)?.label ?? String(anchor);
@@ -73,7 +65,6 @@ const PageNavSettingsChoice = <T,>(props: PageNavSettingsChoiceProps<T>) => (
 );
 
 export const PageNavSettings = (props: PageNavSettingsProps) => {
-    const location = useLocation();
     const [theme, setTheme] = useState(findAppliedTheme);
 
     const pickTheme = (nextTheme: PlaygroundTheme) => {
@@ -144,25 +135,6 @@ export const PageNavSettings = (props: PageNavSettingsProps) => {
                             computeLabel={computeThemeLabel}
                             ariaLabel={"Theme"}
                             onChange={pickTheme}
-                        />
-                    </PageProp>
-
-                    <PageProp
-                        itemKey={"framework"}
-                        label={"Framework"}
-                        hint={"Which framework the playground runs in. Picking another opens this same page there."}
-                        defaultValue={PLAYGROUND_FRAMEWORK_LABELS[OWN_FRAMEWORK]}
-                    >
-                        <PageSelectField
-                            value={OWN_FRAMEWORK}
-                            values={PLAYGROUND_FRAMEWORKS}
-                            computeLabel={(framework) => PLAYGROUND_FRAMEWORK_LABELS[framework]}
-                            ariaLabel={"Framework"}
-                            onChange={(framework) => {
-                                if (framework === OWN_FRAMEWORK) return;
-
-                                window.location.assign(toFrameworkHref(framework, location.pathname));
-                            }}
                         />
                     </PageProp>
                 </>

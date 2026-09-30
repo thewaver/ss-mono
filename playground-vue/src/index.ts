@@ -8,7 +8,6 @@ import { PLAYGROUND_THEMES } from "@thewaver/ss-playground/App/Theme.css";
 import { AppUtils } from "./App/App.utils";
 import App from "./App/App.vue";
 import AppContent from "./App/AppContent.vue";
-import EmptyPage from "./App/EmptyPage.vue";
 
 const PAGE_ROUTES: RouteRecordRaw[] = AppUtils.COMPONENT_CONFIGS.flatMap((config) => {
     const route = AppUtils.componentToRouteName(config.name);
@@ -27,7 +26,7 @@ const PAGE_ROUTES: RouteRecordRaw[] = AppUtils.COMPONENT_CONFIGS.flatMap((config
 
 const router = createRouter({
     history: createWebHistory(import.meta.env.BASE_URL),
-    routes: [{ path: "/", component: AppContent, children: [{ path: "", component: EmptyPage }, ...PAGE_ROUTES] }],
+    routes: [{ path: "/", component: AppContent, children: [{ path: "", component: () => import("./App/Pages/AboutPage/AboutPage.vue") }, ...PAGE_ROUTES] }],
 });
 
 document.documentElement.classList.add(PLAYGROUND_THEMES.vue);

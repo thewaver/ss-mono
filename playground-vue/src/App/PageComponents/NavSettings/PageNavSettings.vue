@@ -1,25 +1,17 @@
 <script setup lang="ts">
 import { ref, useModel } from "vue";
-import { useRoute } from "vue-router";
 
 import { Toggle } from "@thewaver/ss-components-vue";
-import {
-    PLAYGROUND_FRAMEWORKS,
-    PLAYGROUND_FRAMEWORK_LABELS,
-    toFrameworkHref,
-} from "@thewaver/ss-playground/App/PageComponents/FrameworkSwitch/FrameworkSwitch.const";
-import type { PlaygroundFramework } from "@thewaver/ss-playground/App/PageComponents/FrameworkSwitch/PlaygroundFramework.types";
 import { PLAYGROUND_THEMES } from "@thewaver/ss-playground/App/Theme.css";
 
 import PageToggleContent from "../../StyledComponents/ToggleContent/ToggleContent.vue";
 import PageExampleKnobsButton from "../ExampleKnobs/PageExampleKnobsButton.vue";
 import PageSelectField from "../Field/PageSelectField.vue";
+import { OWN_FRAMEWORK } from "../FrameworkMenu/FrameworkMenu.const";
 import PageProp from "../Prop/Prop.vue";
 import { PAGE_VIEW_OPTIONS, THEME_OPTIONS, VIEWPORT_ANCHOR_OPTIONS } from "./NavSettings.const";
 import type { PageNavSettingsProps, PlaygroundTheme, ViewportAnchor } from "./NavSettings.types";
 import PageNavSettingsChoice from "./PageNavSettingsChoice.vue";
-
-const OWN_FRAMEWORK: PlaygroundFramework = "vue";
 
 const computeViewportAnchorLabel = (anchor: ViewportAnchor) =>
     VIEWPORT_ANCHOR_OPTIONS.find((option) => option.value === anchor)?.label ?? String(anchor);
@@ -36,11 +28,7 @@ const applyTheme = (theme: PlaygroundTheme) => {
     document.documentElement.classList.add(PLAYGROUND_THEMES[theme]);
 };
 
-const computeFrameworkLabel = (framework: PlaygroundFramework) => PLAYGROUND_FRAMEWORK_LABELS[framework];
-
 const props = defineProps<PageNavSettingsProps>();
-
-const route = useRoute();
 
 const showsDescriptionOnly = useModel(props, "showsDescriptionOnly");
 const pageView = useModel(props, "pageView");
@@ -55,12 +43,6 @@ const pickTheme = (nextTheme: PlaygroundTheme) => {
 
 const setViewportAnchor = (anchor: ViewportAnchor) => {
     viewportAnchor.value = anchor;
-};
-
-const switchFramework = (framework: PlaygroundFramework) => {
-    if (framework === OWN_FRAMEWORK) return;
-
-    window.location.assign(toFrameworkHref(framework, route.path));
 };
 </script>
 
@@ -120,21 +102,6 @@ const switchFramework = (framework: PlaygroundFramework) => {
                     :compute-label="computeThemeLabel"
                     ariaLabel="Theme"
                     @change="pickTheme"
-                />
-            </PageProp>
-
-            <PageProp
-                item-key="framework"
-                label="Framework"
-                hint="Which framework the playground runs in. Picking another opens this same page there."
-                :default-value="PLAYGROUND_FRAMEWORK_LABELS[OWN_FRAMEWORK]"
-            >
-                <PageSelectField
-                    :value="OWN_FRAMEWORK"
-                    :values="PLAYGROUND_FRAMEWORKS"
-                    :compute-label="computeFrameworkLabel"
-                    ariaLabel="Framework"
-                    @change="switchFramework"
                 />
             </PageProp>
         </template>

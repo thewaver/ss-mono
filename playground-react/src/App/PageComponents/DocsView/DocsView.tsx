@@ -7,10 +7,7 @@ import { loadApiGroups, toHighlightedType } from "@thewaver/ss-playground/App/Pa
 import type { PageDocsTableProps, PageDocsViewProps } from "./DocsView.types";
 
 const NO_DESCRIPTION = "Not written yet.";
-const ACCESSOR_FLAG = "value or accessor";
-const REQUIRED_FLAG = "required";
 const USE_COLUMN = "Use";
-const PASSING_COLUMN = "Passing";
 
 const GROUP_TITLES: Record<ApiGroupKind, string> = {
     props: "Props",
@@ -31,8 +28,6 @@ const TABLE_COLUMNS: Record<ApiTableKind, [name: string, type: string]> = {
 const PageDocsTable = (props: PageDocsTableProps) => {
     const table = props.table;
 
-    const hasPassing = table.kind === "props";
-
     return (
         <div className={styles.docsSection}>
             {table.heading && <h3 className={styles.docsTableTitle}>{table.heading}</h3>}
@@ -48,7 +43,6 @@ const PageDocsTable = (props: PageDocsTableProps) => {
                                     {column}
                                 </th>
                             ))}
-                            {hasPassing && <th className={styles.docsHeadCell}>{PASSING_COLUMN}</th>}
                             {table.isDocumented && <th className={styles.docsHeadCell}>{USE_COLUMN}</th>}
                         </tr>
                     </thead>
@@ -65,22 +59,6 @@ const PageDocsTable = (props: PageDocsTableProps) => {
                                     className={styles.docsTypeCell}
                                     dangerouslySetInnerHTML={{ __html: toHighlightedType(entry.type) }}
                                 />
-
-                                {hasPassing && (
-                                    <td className={styles.docsCell}>
-                                        {entry.isAccessor ? (
-                                            <span className={styles.docsFlag}>{ACCESSOR_FLAG}</span>
-                                        ) : (
-                                            <span>{"value"}</span>
-                                        )}
-                                        {!entry.isOptional && (
-                                            <>
-                                                {" "}
-                                                <span className={styles.docsFlag}>{REQUIRED_FLAG}</span>
-                                            </>
-                                        )}
-                                    </td>
-                                )}
 
                                 {table.isDocumented && (
                                     <td className={styles.docsCell}>

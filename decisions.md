@@ -404,10 +404,20 @@ while, then retired whole (_"The gallery is gone"_, above).
   `@solidjs/router`. It is a dependency of `playground-react` alone; no library package takes a router.
 - **Each app reads its own prefix from the build and is told the other's.** The router's base comes from
   `import.meta.env.BASE_URL`, and `VITE_OTHER_PLAYGROUND_URL` names the other app — `/react/` and `/solid/` in the
-  site build, the other preview's port in the test builds, the other dev server's port by default. The switch is a
-  "Framework" dropdown in the settings popover beside the sidebar's search, where the user asked for it, showing the
-  app's own framework; picking the other opens that address plus the current route. The viewport anchor beside it is
-  a dropdown too, also at the user's request. A root-relative link a page draws itself, such as the rich-text
+  site build, the other preview's port in the test builds, the other dev server's port by default. The switch is the
+  heading above the sidebar's search field, "ss-components for <Framework> ▾", painted as a link and built from the
+  library's `Menu` as a button with a radio item per framework; it moved there out of the settings popover at the
+  user's request. It marks the app's own framework, and picking another opens that address plus the current route.
+  The viewport anchor stays in the settings popover as a dropdown, also at the user's request.
+- **The left nav has an "About" link above the component tree, and "/" is the About page.** The root route used to
+  render nothing. The page's text and its per-framework differences (package name, peer dependencies, how two-way
+  state is handed in, the usage sample in that framework's syntax) are written once in
+  `playground/src/App/Pages/AboutPage/AboutPage.utils.ts` and each app only draws the blocks, so the four cannot
+  drift. It is lazy-loaded because it pulls in the highlighter. The link is a real link to "/" and is selected only
+  on the root route, so it takes an exact match rather than the prefix match a router link defaults to.
+- **A page's text, header, docs and About content are all capped at one width, `PAGE_CONTENT_WIDTH` in `App.css.ts`,
+  720px.** The user's call, after About wrapped at 720 and Docs at 960: one number for everything, with code boxes
+  scrolling sideways rather than widening the page, and the docs table losing its `Passing` column to fit. A root-relative link a page draws itself, such as the rich-text
   sample's, goes through `toOwnAppHref` so it stays inside its own app.
 - **The site is assembled by `npm run build:site`**: the Solid app built with base `/solid/` into `dist/solid`, the
   React app with `/react/` into `dist/react`, and `playground/landing/index.html` — plain HTML, two links, as
@@ -438,8 +448,7 @@ while, then retired whole (_"The gallery is gone"_, above).
   files, and the commit hook runs it.
 - **A Playground case that only one framework can pass exists once per framework, tagged `@solid` or `@react`**,
   the user's call over teaching a spec to branch on the framework. Each Playground's projects leave out the other's
-  tag. The two so far: the docs table's type text (`JSX.Element` and "value or accessor" against `ReactNode` and a
-  plain value), and `Label`'s warning (`getAriaLabel` against `ariaLabel`). The no-frames placement is not one of
+  tag. The two so far: the docs table's type text (`JSX.Element` against `ReactNode`), and `Label`'s warning (`getAriaLabel` against `ariaLabel`). The no-frames placement is not one of
   them: every framework opens an anchored layer on its anchor with frames withheld, for the reason given under
   _"`Anchor`: the positioning half of a floating layer, extracted"_, so `noAnimationFrames.spec.ts` asserts it once
   for all four.
@@ -904,8 +913,8 @@ other pages copy. Taken on Claude's judgment under the unsupervised port.
   would leave the history one entry short of React's and Back would skip the page. Two pushes to one address end where
   React's push-then-replace does.
 - **The docs plugins read the Vue package.** The Vue config passes `componentApi` `{ slotsSuffix: "Slots" }`, so a
-  `<Name>Slots` type is drawn in the props group straight after `<Name>Props` rather than among the types, and its
-  Passing column reads `slot`; and an export made with `defineComponent(setup, …)` is listed by its setup function,
+  `<Name>Slots` type is drawn in the props group straight after `<Name>Props` rather than among the types; and an
+  export made with `defineComponent(setup, …)` is listed by its setup function,
   `<T>(props: TabsProps<T>, slots: TabsSlots<T>) => VNode`, rather than by the type `defineComponent` returns. The
   Solid and React output is byte for byte what it was. `componentDependencies` needed nothing, the package being `.tsx`.
 - **The source view globs `.vue` files and highlights them with shiki's `vue` language**, loaded into the shared
@@ -3425,7 +3434,9 @@ readable: `role` resolves to the entire ARIA role union, some two thousand chara
 **The accessor wrapper is stated once, beside the type rather than inside it.** A prop declared outside the
 `AccessorProps` block carries its own `MaybeAccessor<…>` in the source, so taking the written text verbatim
 would have printed the wrapper on some rows and not others while all of them accept the same two things.
-The wrapper is unwrapped wherever it appears and the column beside says `value or accessor`.
+The wrapper is unwrapped wherever it appears. A `Passing` column beside the type used to say `value or accessor`
+and `required`; the user dropped it when the page was capped at 720px (_"The left nav has an "About" link"_), so
+the table no longer says which props take an accessor, and the `?` on the name is what marks an optional one.
 
 **Shiki highlights the type expression directly.** The first version wrapped each type in a throwaway
 `type X = …` on the assumption that a bare expression would come back uncoloured; it does not, and the

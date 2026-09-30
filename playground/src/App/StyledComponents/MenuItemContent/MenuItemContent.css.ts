@@ -1,4 +1,4 @@
-import { style } from "@vanilla-extract/css";
+import { globalStyle, style } from "@vanilla-extract/css";
 
 import { themeVars } from "../../Theme.css";
 import { layerVars } from "../Layer/Layer.css";
@@ -58,4 +58,8 @@ export const menuItemMark = style({
     fontSize: themeVars.fontSize.small,
     lineHeight: 1,
     textAlign: "center",
+});
+
+globalStyle(`${menuItemMark} + div`, {
+    flex: 1,
 });

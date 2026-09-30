@@ -264,7 +264,7 @@ export const VUE_THEME_VALUES = {
         background: {
             dark: "hsl(0, 20%, 5%)",
             light: "hsl(30, 20%, 15%)",
-            contrast: "hsl(0, 100%, 95%)",
+            contrast: "hsl(30, 100%, 95%)",
         },
         surface: {
             dark: "hsl(135, 10%, 10%)",

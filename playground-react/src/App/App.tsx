@@ -7,7 +7,10 @@ import { Collapsible, Sidebar, Tree, ViewportWrapper } from "@thewaver/ss-compon
 import type { SidebarPhase, TreeNode } from "@thewaver/ss-components-react";
 import * as styles from "@thewaver/ss-playground/App/App.css";
 import { IS_BUILD_PROGRESS_SHOWN } from "@thewaver/ss-playground/App/PageComponents/BuildProgress/BuildProgress.utils";
-import { toRouterBase } from "@thewaver/ss-playground/App/PageComponents/FrameworkSwitch/FrameworkSwitch.const";
+import {
+    restoreRootSlash,
+    toRouterBase,
+} from "@thewaver/ss-playground/App/PageComponents/FrameworkSwitch/FrameworkSwitch.const";
 import {
     DEFAULT_PAGE_VIEW,
     PAGE_VIEW_KEYS,
@@ -32,7 +35,9 @@ import {
 import type { ComponentConfig, MenuBranchConfig, MenuNodeConfig } from "./App.types";
 import { PageBuildProgress } from "./PageComponents/BuildProgress/BuildProgress";
 import { PageTextField } from "./PageComponents/Field/Field";
+import { PageFrameworkMenu } from "./PageComponents/FrameworkMenu/FrameworkMenu";
 import { PageLayer } from "./PageComponents/Layer/Layer";
+import { PageNavLink } from "./PageComponents/NavLink/NavLink";
 import { PageNavSettings } from "./PageComponents/NavSettings/NavSettings";
 import { DEFAULT_VIEWPORT_ANCHOR } from "./PageComponents/NavSettings/NavSettings.const";
 import type { ViewportAnchor } from "./PageComponents/NavSettings/NavSettings.types";
@@ -47,7 +52,9 @@ const PageDocsView = lazy(() =>
     import("./PageComponents/DocsView/DocsView").then((module) => ({ default: module.PageDocsView })),
 );
 
-const EmptyPage = () => null;
+const PageAboutPage = lazy(() =>
+    import("./Pages/AboutPage/AboutPage").then((module) => ({ default: module.AboutPage })),
+);
 
 const getIsBranchConfig = (node: MenuNodeConfig): node is MenuBranchConfig => "children" in node;
 
@@ -246,6 +253,10 @@ export function AppContent(props: { viewportAnchor: readonly [ViewportAnchor, (v
 
     const selectedConfig = COMPONENT_CONFIGS_BY_ROUTE[toBaseRoute(location.pathname)];
 
+    const isAboutSelected = location.pathname === "/";
+
+    useEffect(restoreRootSlash, [location.pathname]);
+
     const isSearching = searchTerm.trim().length > 0;
     const showsDescriptionOnly = showsDescriptionOnlyState[0];
     const pageView = pageViewState[0];
@@ -332,6 +343,31 @@ export function AppContent(props: { viewportAnchor: readonly [ViewportAnchor, (v
 
                                         <div
                                             className={[
+                                                styles.frameworkHeading,
+                                                getIsMenuFaded(phase) && styles.isFaded,
+                                                phase === "collapsed" && styles.isHidden,
+                                            ]
+                                                .filter(Boolean)
+                                                .join(" ")}
+                                            style={{ transitionDuration: `${transitionDurationMs}ms` }}
+                                        >
+                                            <span className={styles.frameworkHeadingLabel}>{"ss-components for"}</span>
+
+                                            <PageFrameworkMenu />
+                                        </div>
+                                    </div>
+
+                                    <div className={styles.searchContainer}>
+                                        <div className={styles.navSettingsBox}>
+                                            <PageNavSettings
+                                                showsDescriptionOnly={showsDescriptionOnlyState}
+                                                pageView={pageViewState}
+                                                viewportAnchor={props.viewportAnchor}
+                                            />
+                                        </div>
+
+                                        <div
+                                            className={[
                                                 styles.searchFields,
                                                 getIsMenuFaded(phase) && styles.isFaded,
                                                 phase === "collapsed" && styles.isHidden,
@@ -347,13 +383,22 @@ export function AppContent(props: { viewportAnchor: readonly [ViewportAnchor, (v
                                                 ariaLabel={"Search components"}
                                                 onInput={setSearchTerm}
                                             />
-
-                                            <PageNavSettings
-                                                showsDescriptionOnly={showsDescriptionOnlyState}
-                                                pageView={pageViewState}
-                                                viewportAnchor={props.viewportAnchor}
-                                            />
                                         </div>
+                                    </div>
+
+                                    <div
+                                        className={[
+                                            styles.aboutLink,
+                                            getIsMenuFaded(phase) && styles.isFaded,
+                                            phase === "collapsed" && styles.isHidden,
+                                        ]
+                                            .filter(Boolean)
+                                            .join(" ")}
+                                        style={{ transitionDuration: `${transitionDurationMs}ms` }}
+                                    >
+                                        <PageNavLink href={"/"} isSelected={isAboutSelected}>
+                                            {"About"}
+                                        </PageNavLink>
                                     </div>
 
                                     <div
@@ -476,7 +521,7 @@ export function App() {
                             </ViewportWrapper>
                         }
                     >
-                        <Route index={true} element={<EmptyPage />} />
+                        <Route index={true} element={<PageAboutPage />} />
                         {COMPONENT_CONFIGS.map((config) => (
                             <Route key={config.name} path={componentToRouteName(config.name)}>
                                 <Route

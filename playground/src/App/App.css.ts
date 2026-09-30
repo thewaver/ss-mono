@@ -1,8 +1,12 @@
 import { globalStyle, style } from "@vanilla-extract/css";
 
-import { layerVars } from "./StyledComponents/Layer/Layer.css";
-import { themeVars } from "./Theme.css";
 import { toBackdropGradient } from "./Theme.utils";
+
+import { layerVars } from "./StyledComponents/Layer/Layer.css";
+import { SIDEBAR_TOGGLE_SIZE } from "./StyledComponents/SidebarToggleButton/SidebarToggleButton.css";
+import { themeVars } from "./Theme.css";
+
+export const PAGE_CONTENT_WIDTH = 720;
 
 export const appRoot = style({
     position: "relative",
@@ -94,6 +98,35 @@ export const searchContainer = style({
     padding: `0 ${themeVars.spacing.double}`,
 });
 
+export const frameworkHeading = style({
+    transitionProperty: "opacity",
+    display: "flex",
+    alignItems: "center",
+    flex: 1,
+    minWidth: 0,
+});
+
+export const frameworkHeadingLabel = style({
+    fontSize: themeVars.fontSize.medium,
+    fontWeight: "bold",
+    whiteSpace: "nowrap",
+});
+
+export const navSettingsBox = style({
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "center",
+    flexShrink: 0,
+    width: SIDEBAR_TOGGLE_SIZE,
+    height: SIDEBAR_TOGGLE_SIZE,
+});
+
+export const aboutLink = style({
+    transitionProperty: "opacity",
+    flexShrink: 0,
+    padding: `0 ${themeVars.spacing.double}`,
+});
+
 export const pageColumn = style({
     display: "flex",
     flexDirection: "column",
@@ -113,17 +146,18 @@ export const pageHeader = style({
     display: "flex",
     flexDirection: "column",
     gap: themeVars.spacing.full,
+    maxWidth: PAGE_CONTENT_WIDTH,
 });
 
 export const pageTitle = style({
     margin: 0,
-    fontSize: themeVars.fontSize.large,
+    fontSize: themeVars.fontSize.xLarge,
     fontWeight: "normal",
 });
 
 export const pageDescription = style({
     fontSize: themeVars.fontSize.small,
-    maxWidth: 960,
+    maxWidth: PAGE_CONTENT_WIDTH,
     opacity: 0.75,
 });
 
@@ -132,7 +166,7 @@ export const pageDependencies = style({
     gridTemplateColumns: "auto minmax(0, 1fr)",
     alignItems: "baseline",
     gap: themeVars.spacing.full,
-    maxWidth: 960,
+    maxWidth: PAGE_CONTENT_WIDTH,
     fontSize: themeVars.fontSize.xSmall,
 });
 

@@ -5,6 +5,7 @@
     import { Sidebar, Tree } from "@thewaver/ss-components-svelte";
     import type { SidebarPhase, TreeNode } from "@thewaver/ss-components-svelte";
     import * as styles from "@thewaver/ss-playground/App/App.css";
+    import { restoreRootSlash } from "@thewaver/ss-playground/App/PageComponents/FrameworkSwitch/FrameworkSwitch.const";
     import { IS_BUILD_PROGRESS_SHOWN } from "@thewaver/ss-playground/App/PageComponents/BuildProgress/BuildProgress.utils";
     import {
         DEFAULT_PAGE_VIEW,
@@ -31,7 +32,9 @@
     import type { ComponentConfig, MenuBranchConfig, MenuNodeConfig } from "./App.types";
     import PageTextField from "./PageComponents/Field/PageTextField.svelte";
     import PageBuildProgress from "./PageComponents/BuildProgress/PageBuildProgress.svelte";
+    import PageFrameworkMenu from "./PageComponents/FrameworkMenu/FrameworkMenu.svelte";
     import PageLayer from "./PageComponents/Layer/Layer.svelte";
+    import PageNavLink from "./PageComponents/NavLink/NavLink.svelte";
     import type { ViewportAnchor } from "./PageComponents/NavSettings/NavSettings.types";
     import PageNavSettings from "./PageComponents/NavSettings/PageNavSettings.svelte";
     import PageRouterLink from "./PageComponents/RouterLink/RouterLink.svelte";
@@ -97,6 +100,14 @@
     let browseExpanded = $state.raw<MenuNodeConfig[]>(VISIBLE_MENU_CONFIGS);
 
     const selectedConfig = $derived(COMPONENT_CONFIGS_BY_ROUTE[toBaseRoute(route.pathname)]);
+
+    const isAboutSelected = $derived(route.pathname === "/");
+
+    $effect(() => {
+        void route.pathname;
+
+        restoreRootSlash();
+    });
 
     const isSearching = $derived(searchTerm.trim().length > 0);
 
@@ -173,6 +184,25 @@
 
                                 <div
                                     class={[
+                                        styles.frameworkHeading,
+                                        getIsMenuFaded(phase) && styles.isFaded,
+                                        phase === "collapsed" && styles.isHidden,
+                                    ]}
+                                    style:transition-duration={`${transitionDurationMs}ms`}
+                                >
+                                    <span class={styles.frameworkHeadingLabel}>ss-components for</span>
+
+                                    <PageFrameworkMenu />
+                                </div>
+                            </div>
+
+                            <div class={styles.searchContainer}>
+                                <div class={styles.navSettingsBox}>
+                                    <PageNavSettings bind:showsDescriptionOnly bind:pageView bind:viewportAnchor />
+                                </div>
+
+                                <div
+                                    class={[
                                         styles.searchFields,
                                         getIsMenuFaded(phase) && styles.isFaded,
                                         phase === "collapsed" && styles.isHidden,
@@ -188,9 +218,18 @@
                                             searchTerm = value;
                                         }}
                                     />
-
-                                    <PageNavSettings bind:showsDescriptionOnly bind:pageView bind:viewportAnchor />
                                 </div>
+                            </div>
+
+                            <div
+                                class={[
+                                    styles.aboutLink,
+                                    getIsMenuFaded(phase) && styles.isFaded,
+                                    phase === "collapsed" && styles.isHidden,
+                                ]}
+                                style:transition-duration={`${transitionDurationMs}ms`}
+                            >
+                                <PageNavLink href={"/"} isSelected={isAboutSelected}>About</PageNavLink>
                             </div>
 
                             <div

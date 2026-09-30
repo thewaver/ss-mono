@@ -7,10 +7,7 @@
     import type { PageDocsTableProps } from "./DocsView.types";
 
     const NO_DESCRIPTION = "Not written yet.";
-    const ACCESSOR_FLAG = "value or accessor";
-    const REQUIRED_FLAG = "required";
     const USE_COLUMN = "Use";
-    const PASSING_COLUMN = "Passing";
 
     const TABLE_COLUMNS: Record<ApiTableKind, [name: string, type: string]> = {
         props: ["Prop", "Type"],
@@ -22,8 +19,6 @@
     let props: PageDocsTableProps = $props();
 
     const table = $derived(props.table);
-
-    const hasPassing = $derived(table.kind === "props");
 </script>
 
 <div class={styles.docsSection}>
@@ -42,9 +37,6 @@
                     {#each TABLE_COLUMNS[table.kind] as column (column)}
                         <th class={styles.docsHeadCell}>{column}</th>
                     {/each}
-                    {#if hasPassing}
-                        <th class={styles.docsHeadCell}>{PASSING_COLUMN}</th>
-                    {/if}
                     {#if table.isDocumented}
                         <th class={styles.docsHeadCell}>{USE_COLUMN}</th>
                     {/if}
@@ -59,19 +51,6 @@
                         </td>
 
                         <td class={styles.docsTypeCell}>{@html toHighlightedType(entry.type)}</td>
-
-                        {#if hasPassing}
-                            <td class={styles.docsCell}>
-                                {#if entry.isAccessor}
-                                    <span class={styles.docsFlag}>{ACCESSOR_FLAG}</span>
-                                {:else}
-                                    <span>{"value"}</span>
-                                {/if}
-                                {#if !entry.isOptional}
-                                    <span class={styles.docsFlag}>{REQUIRED_FLAG}</span>
-                                {/if}
-                            </td>
-                        {/if}
 
                         {#if table.isDocumented}
                             <td class={styles.docsCell}>

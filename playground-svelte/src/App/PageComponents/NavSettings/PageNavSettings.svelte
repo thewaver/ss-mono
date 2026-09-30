@@ -1,23 +1,15 @@
 <script lang="ts">
     import { Toggle } from "@thewaver/ss-components-svelte";
-    import {
-        PLAYGROUND_FRAMEWORKS,
-        PLAYGROUND_FRAMEWORK_LABELS,
-        toFrameworkHref,
-    } from "@thewaver/ss-playground/App/PageComponents/FrameworkSwitch/FrameworkSwitch.const";
-    import type { PlaygroundFramework } from "@thewaver/ss-playground/App/PageComponents/FrameworkSwitch/PlaygroundFramework.types";
     import { PLAYGROUND_THEMES } from "@thewaver/ss-playground/App/Theme.css";
 
-    import { route } from "../../App.router";
     import PageToggleContent from "../../StyledComponents/ToggleContent/ToggleContent.svelte";
     import PageExampleKnobsButton from "../ExampleKnobs/PageExampleKnobsButton.svelte";
     import PageSelectField from "../Field/PageSelectField.svelte";
+    import { OWN_FRAMEWORK } from "../FrameworkMenu/FrameworkMenu.const";
     import PageProp from "../Prop/Prop.svelte";
     import { PAGE_VIEW_OPTIONS, THEME_OPTIONS, VIEWPORT_ANCHOR_OPTIONS } from "./NavSettings.const";
     import type { PageNavSettingsProps, PlaygroundTheme, ViewportAnchor } from "./NavSettings.types";
     import PageNavSettingsChoice from "./PageNavSettingsChoice.svelte";
-
-    const OWN_FRAMEWORK: PlaygroundFramework = "svelte";
 
     const computeViewportAnchorLabel = (anchor: ViewportAnchor) =>
         VIEWPORT_ANCHOR_OPTIONS.find((option) => option.value === anchor)?.label ?? String(anchor);
@@ -102,25 +94,6 @@
             computeLabel={computeThemeLabel}
             ariaLabel={"Theme"}
             onChange={pickTheme}
-        />
-    </PageProp>
-
-    <PageProp
-        itemKey={"framework"}
-        label={"Framework"}
-        hint={"Which framework the playground runs in. Picking another opens this same page there."}
-        defaultValue={PLAYGROUND_FRAMEWORK_LABELS[OWN_FRAMEWORK]}
-    >
-        <PageSelectField
-            value={OWN_FRAMEWORK}
-            values={PLAYGROUND_FRAMEWORKS}
-            computeLabel={(framework) => PLAYGROUND_FRAMEWORK_LABELS[framework]}
-            ariaLabel={"Framework"}
-            onChange={(framework) => {
-                if (framework === OWN_FRAMEWORK) return;
-
-                window.location.assign(toFrameworkHref(framework, route.pathname));
-            }}
         />
     </PageProp>
 {/snippet}

@@ -1,5 +1,6 @@
 import { style } from "@vanilla-extract/css";
 
+import { PAGE_CONTENT_WIDTH } from "../../App.css";
 import { layerVars } from "../../StyledComponents/Layer/Layer.css";
 import { themeVars } from "../../Theme.css";
 
@@ -8,12 +9,13 @@ export const docsView = style({
     flexDirection: "column",
     gap: themeVars.spacing.quad,
     width: "100%",
-    maxWidth: 960,
+    maxWidth: PAGE_CONTENT_WIDTH,
 });
 
 export const docsLead = style({
     margin: 0,
     fontSize: themeVars.fontSize.medium,
+    fontWeight: "normal",
 });
 
 export const docsGroup = style({
@@ -24,8 +26,8 @@ export const docsGroup = style({
 
 export const docsGroupTitle = style({
     margin: 0,
-    fontSize: themeVars.fontSize.medium,
-    fontWeight: "bold",
+    fontSize: themeVars.fontSize.large,
+    fontWeight: "normal",
 });
 
 export const docsSection = style({
@@ -88,15 +90,6 @@ export const docsTypeCell = style([docsCell, { fontFamily: "monospace" }]);
 
 export const docsOptional = style({
     opacity: 0.75,
-});
-
-export const docsFlag = style({
-    display: "inline-block",
-    borderRadius: themeVars.borderRadius.half,
-    padding: `2px ${themeVars.spacing.half}`,
-    backgroundColor: `rgb(from ${layerVars.contrast} r g b / 10%)`,
-    fontSize: themeVars.fontSize.xSmall,
-    whiteSpace: "nowrap",
 });
 
 export const docsPending = style({
