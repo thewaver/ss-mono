@@ -12,7 +12,7 @@ const layerClass = useLayerClass();
 <template>
     <div
         :class="[
-            `${styles.timelineBlock} ${styles.timelineBlockTones[tone]}`,
+            `${styles.timelineBlock} ${styles.timelineBlockFamily[family]}`,
             layerClass,
             flags.isHovered && styles.isHovered,
             flags.isFocusVisible && styles.isFocusVisible,

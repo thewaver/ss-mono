@@ -101,15 +101,15 @@ export const treeRadialNode = style({
             color: themeVars.color.primary.contrast,
         },
         [`&.${isRootRank}`]: {
-            backgroundImage: `radial-gradient(circle at 70% 30%, ${themeVars.color.secondary.light}, ${themeVars.color.secondary.dark})`,
-            color: themeVars.color.secondary.contrast,
+            backgroundImage: `radial-gradient(circle at 70% 30%, ${themeVars.color.primary.light}, ${themeVars.color.primary.dark})`,
+            color: themeVars.color.primary.contrast,
             fontWeight: "bold",
         },
         [`&.${isRootRank}.${isHovered}`]: {
             filter: themeVars.hover.filter,
         },
         [`&.${isRootRank}.${isSelected}`]: {
-            boxShadow: `0 0 0 3px ${themeVars.color.secondary.light}`,
+            boxShadow: `0 0 0 3px ${themeVars.color.primary.light}`,
         },
         [`&.${isDisabled}`]: {
             opacity: themeVars.disabled.opacity,

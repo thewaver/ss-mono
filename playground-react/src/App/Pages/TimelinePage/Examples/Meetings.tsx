@@ -9,7 +9,10 @@ import {
     MINUTE_STEPS,
     formatClock,
 } from "@thewaver/ss-playground/App/Pages/TimelinePage/TimelinePage.const";
-import { AXIS_HEIGHT } from "@thewaver/ss-playground/App/StyledComponents/TimelineContent/TimelineContent.css";
+import {
+    AXIS_HEIGHT,
+    PAGE_TIMELINE_FAMILIES,
+} from "@thewaver/ss-playground/App/StyledComponents/TimelineContent/TimelineContent.css";
 
 import {
     PageTimelineBlock,
@@ -69,7 +72,7 @@ export const MeetingsExample = (props: Props) => {
                     renderItem={(meeting, flags) => (
                         <PageTimelineBlock
                             flags={flags}
-                            tone={"info"}
+                            family={PAGE_TIMELINE_FAMILIES[0]}
                             name={meeting.name}
                             note={`${formatClock(meeting.from)} · ${meeting.room}`}
                         />

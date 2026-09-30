@@ -10,7 +10,6 @@
 <div
     class={[
         styles.node,
-        props.state.isFocused && styles.nodeFocused,
         props.state.isOnFocusedRoute && styles.nodeOnRoute,
         props.state.placement.layer === ROOT_LAYER && styles.nodeRoot,
         props.state.placement.isDisabled && styles.nodeDisabled,

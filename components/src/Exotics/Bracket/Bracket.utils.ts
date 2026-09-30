@@ -278,7 +278,8 @@ export namespace BracketUtils {
      * @param focusedId The match that holds focus, or `undefined` for none.
      * @returns One connector per match that feeds another, running from the middle of the parent's edge facing its
      * children to the middle of the child's edge facing the root, so no line passes under a box. Each says whether
-     * its child is on the route from the focused match to the final.
+     * its child is on the route from the focused match to the final, and those on the route come last, so a renderer
+     * that paints them in order draws the route over any line it crosses rather than under it.
      */
     export const computeConnectors = (
         layout: BracketLayout,
@@ -300,7 +301,7 @@ export namespace BracketUtils {
                 getCrossStart(geometry, placement) + geometry.crossExtent * HALF,
             );
 
-        return layout.placements
+        const connectors = layout.placements
             .filter((placement) => placement.childIds.length > NOTHING)
             .flatMap((placement) => {
                 const from = getAnchor(placement, false);
@@ -323,6 +324,11 @@ export namespace BracketUtils {
                     ];
                 });
             });
+
+        return [
+            ...connectors.filter((connector) => !connector.isOnFocusedRoute),
+            ...connectors.filter((connector) => connector.isOnFocusedRoute),
+        ];
     };
 
     /**

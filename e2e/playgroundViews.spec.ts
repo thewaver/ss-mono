@@ -61,7 +61,9 @@ test("the props table is the published type, not a transcription of it @solid", 
         "tabGap?",
     );
     await expect(optional, "and its type is the value it carries").toContainText("number");
-    await expect(optional, "with the accessor wrapper taken off rather than printed").not.toContainText("MaybeAccessor");
+    await expect(optional, "with the accessor wrapper taken off rather than printed").not.toContainText(
+        "MaybeAccessor",
+    );
 });
 
 /**

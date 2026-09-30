@@ -419,6 +419,65 @@ describe("Color.Hexa.interpolate", () => {
     });
 });
 
+describe("Color.getContrastRatio", () => {
+    it("spans one to twenty-one", () => {
+        expect(Color.getContrastRatio(BLACK, WHITE)).toBeCloseTo(21, 10);
+        expect(Color.getContrastRatio(NAVY, NAVY)).toBeCloseTo(1, 10);
+    });
+
+    it("reads the same either way round", () => {
+        expect(Color.getContrastRatio(NAVY, "#f0e68c")).toBe(Color.getContrastRatio("#f0e68c", NAVY));
+    });
+
+    it("agrees with the formula written out independently", () => {
+        BACKGROUNDS.forEach((background) =>
+            HUES.forEach((hue) => {
+                const hsl = { h: hue, s: 80, l: 45 };
+
+                expect(Color.getContrastRatio(Color.HSL.toRgb(hsl), background)).toBeCloseTo(
+                    contrastAgainst(hsl, background),
+                    10,
+                );
+            }),
+        );
+    });
+
+    it("takes a CSS string and a channel value alike", () => {
+        expect(Color.getContrastRatio("hsl(0 0% 100%)", { r: 0, g: 0, b: 0 })).toBeCloseTo(21, 10);
+    });
+
+    it("measures what getContrastingColor returns as reaching its target", () => {
+        LEVELS.forEach(([level, wanted]) => {
+            const got = Color.getContrastingColor(35, 90, NAVY, level);
+
+            expect(Color.getContrastRatio(got ? Color.HSL.toRgb(got) : WHITE, NAVY)).toBeGreaterThanOrEqual(wanted);
+        });
+    });
+
+    it("finds every level still reached once getContrastingColor's answer is painted in whole channels", () => {
+        LEVELS.forEach(([level, wanted]) =>
+            Array.from({ length: 24 }, (_, step) => step * 15).forEach((hue) =>
+                [WHITE, BLACK, NAVY].forEach((background) => {
+                    const got = Color.getContrastingColor(hue, 100, background, level, {
+                        mustMeetTargetContrast: true,
+                    });
+
+                    if (!got) return;
+
+                    expect(Color.getContrastRatio(round(Color.HSL.toRgb(got)), background)).toBeGreaterThanOrEqual(
+                        wanted,
+                    );
+                }),
+            ),
+        );
+    });
+
+    it("answers undefined for a string that is not a color", () => {
+        expect(Color.getContrastRatio("nonsense", WHITE)).toBeUndefined();
+        expect(Color.getContrastRatio(WHITE, "nonsense")).toBeUndefined();
+    });
+});
+
 describe("Color.getContrastingColor", () => {
     it("keeps the hue and the saturation it was handed", () => {
         const got = Color.getContrastingColor(210, 80, WHITE, "AA");

@@ -10,7 +10,14 @@ const layerClass = useLayerClass();
 </script>
 
 <template>
-    <div :class="[styles.mosaicTile, layerClass]" :style="{ width: `${width}px`, height: `${height}px` }">
+    <div
+        :class="[
+            styles.mosaicTile,
+            styles.mosaicTileFamily[styles.PAGE_MOSAIC_FAMILIES[state.index % styles.PAGE_MOSAIC_FAMILIES.length]],
+            layerClass,
+        ]"
+        :style="{ width: `${width}px`, height: `${height}px` }"
+    >
         <div :class="styles.mosaicTileName"><slot /></div>
 
         <div :class="styles.mosaicTileReading">

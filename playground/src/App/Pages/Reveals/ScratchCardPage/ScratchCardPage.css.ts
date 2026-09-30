@@ -40,7 +40,7 @@ export const prize = style({
 export const foil = style({
     width: "100%",
     height: "100%",
-    backgroundImage: `repeating-linear-gradient(115deg, ${themeVars.color.secondary.dark} 0 6px, ${themeVars.color.secondary.main} 6px 12px, ${themeVars.color.secondary.light} 12px 18px, ${themeVars.color.secondary.main} 18px 24px), ${panel(themeVars.color.secondary.dark, themeVars.color.secondary.light)}`,
+    backgroundImage: `repeating-linear-gradient(115deg, ${themeVars.color.primary.dark} 0 6px, ${themeVars.color.primary.main} 6px 12px, ${themeVars.color.primary.light} 12px 18px, ${themeVars.color.primary.main} 18px 24px), ${panel(themeVars.color.primary.dark, themeVars.color.primary.light)}`,
     backgroundBlendMode: "soft-light",
 });
 
@@ -71,13 +71,13 @@ export const coin = style({
     width: "100%",
     height: "100%",
     borderRadius: themeVars.borderRadius.half,
-    border: `2px dashed ${themeVars.color.secondary.contrast}`,
-    backgroundColor: `rgb(from ${themeVars.color.secondary.contrast} r g b / 15%)`,
+    border: `2px dashed ${themeVars.color.primary.contrast}`,
+    backgroundColor: `rgb(from ${themeVars.color.primary.contrast} r g b / 15%)`,
 });
 
 export const coinRubbing = style({
     borderStyle: "solid",
-    backgroundColor: `rgb(from ${themeVars.color.secondary.contrast} r g b / 35%)`,
+    backgroundColor: `rgb(from ${themeVars.color.primary.contrast} r g b / 35%)`,
 });
 
 export const windows = style({

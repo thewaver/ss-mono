@@ -15,7 +15,7 @@
 
 <div
     class={[
-        `${styles.icicleCell} ${props.family ? styles.icicleCellFamily[props.family] : styles.icicleCellRoot}`,
+        `${styles.icicleCell} ${props.family === undefined ? styles.icicleCellRoot : styles.icicleCellFamily[props.family]}`,
         layerClass,
     ]}
     title={props.title}

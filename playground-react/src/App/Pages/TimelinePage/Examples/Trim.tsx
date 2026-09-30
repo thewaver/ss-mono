@@ -8,7 +8,10 @@ import {
     TRIM_TRACKS,
     formatStopwatch,
 } from "@thewaver/ss-playground/App/Pages/TimelinePage/TimelinePage.const";
-import { AXIS_HEIGHT } from "@thewaver/ss-playground/App/StyledComponents/TimelineContent/TimelineContent.css";
+import {
+    AXIS_HEIGHT,
+    PAGE_TIMELINE_FAMILIES,
+} from "@thewaver/ss-playground/App/StyledComponents/TimelineContent/TimelineContent.css";
 
 import {
     PageTimelineBlock,
@@ -23,7 +26,6 @@ import type { TimelineTrimExampleProps } from "../TimelinePage.types";
 type Props = TimelineTrimExampleProps;
 
 const LANE_GAP = 6;
-const TONES = ["info", "alert"] as const;
 
 const EDGE_ANNOUNCEMENTS: TimelineEdgeAnnouncements = {
     restingKeyHint: "Press Enter to take hold of the end of this clip.",
@@ -75,7 +77,7 @@ export const TrimExample = (props: Props) => {
                         renderItem={(clip, flags) => (
                             <PageTimelineBlock
                                 flags={flags}
-                                tone={TONES[clip.track % TONES.length]}
+                                family={PAGE_TIMELINE_FAMILIES[clip.track % PAGE_TIMELINE_FAMILIES.length]}
                                 name={clip.name}
                                 note={formatStopwatch(flags.span.end - flags.span.start)}
                             />

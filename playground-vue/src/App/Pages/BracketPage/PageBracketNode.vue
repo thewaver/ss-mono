@@ -12,7 +12,6 @@ defineProps<PageBracketNodeProps>();
     <div
         :class="[
             styles.node,
-            state.isFocused && styles.nodeFocused,
             state.isOnFocusedRoute && styles.nodeOnRoute,
             state.placement.layer === ROOT_LAYER && styles.nodeRoot,
             state.placement.isDisabled && styles.nodeDisabled,

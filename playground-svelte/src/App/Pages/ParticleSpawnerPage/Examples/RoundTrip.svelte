@@ -38,7 +38,7 @@
     </div>
 
     <div class={styles.spawnerRoot} style:left={"85%"} style:top={"50%"}>
-        <div bind:this={returnMarker} class={styles.spawnerMarker}></div>
+        <div bind:this={returnMarker} class={styles.spawnerMarkerReturn}></div>
 
         <ParticleSpawner
             {...props}

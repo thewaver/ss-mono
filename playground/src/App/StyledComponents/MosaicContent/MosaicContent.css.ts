@@ -1,7 +1,9 @@
-import { style } from "@vanilla-extract/css";
+import { style, styleVariants } from "@vanilla-extract/css";
 
-import { themeVars } from "../../Theme.css";
+import { RAINBOW, RAINBOW_HUES, themeVars } from "../../Theme.css";
 import { layerVars } from "../Layer/Layer.css";
+
+export const PAGE_MOSAIC_FAMILIES = RAINBOW_HUES;
 
 export const mosaicTile = style({
     display: "flex",
@@ -11,12 +13,22 @@ export const mosaicTile = style({
     boxSizing: "border-box",
     padding: themeVars.spacing.half,
     borderRadius: themeVars.borderRadius.half,
-    backgroundImage: `linear-gradient(45deg, ${themeVars.color.secondary.dark}, ${themeVars.color.secondary.light})`,
-    color: themeVars.color.secondary.contrast,
     boxShadow: themeVars.shadow.small,
     fontSize: themeVars.fontSize.xSmall,
     overflow: "hidden",
 });
+
+export const mosaicTileFamily = styleVariants(
+    Object.fromEntries(
+        PAGE_MOSAIC_FAMILIES.map((family) => [
+            family,
+            {
+                backgroundImage: `linear-gradient(45deg, ${RAINBOW[family].dark}, ${RAINBOW[family].light})`,
+                color: RAINBOW[family].contrast,
+            },
+        ]),
+    ),
+);
 
 export const mosaicTileName = style({
     fontSize: themeVars.fontSize.small,

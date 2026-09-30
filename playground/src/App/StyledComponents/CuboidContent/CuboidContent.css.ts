@@ -1,7 +1,9 @@
 import { style, styleVariants } from "@vanilla-extract/css";
 
-import { themeVars } from "../../Theme.css";
+import { RAINBOW, themeVars } from "../../Theme.css";
 import { layerVars } from "../Layer/Layer.css";
+
+const rainbowFace = (hue: number) => ({ backgroundColor: RAINBOW[hue].main, color: RAINBOW[hue].contrast });
 
 const cuboidFaceBase = style({
     display: "flex",
@@ -18,19 +20,10 @@ const cuboidFaceBase = style({
 export const cuboidFace = styleVariants({
     front: [cuboidFaceBase, { backgroundColor: `rgb(from ${layerVars.main} r g b / 50%)`, color: layerVars.contrast }],
     back: [cuboidFaceBase, { backgroundColor: `rgb(from ${layerVars.main} r g b / 75%)`, color: layerVars.contrast }],
-    left: [cuboidFaceBase, { backgroundColor: themeVars.color.primary.dark, color: themeVars.color.primary.contrast }],
-    right: [
-        cuboidFaceBase,
-        { backgroundColor: themeVars.color.primary.light, color: themeVars.color.primary.contrast },
-    ],
-    top: [
-        cuboidFaceBase,
-        { backgroundColor: themeVars.color.secondary.light, color: themeVars.color.secondary.contrast },
-    ],
-    bottom: [
-        cuboidFaceBase,
-        { backgroundColor: themeVars.color.secondary.dark, color: themeVars.color.secondary.contrast },
-    ],
+    left: [cuboidFaceBase, rainbowFace(22.5)],
+    right: [cuboidFaceBase, rainbowFace(202.5)],
+    top: [cuboidFaceBase, rainbowFace(112.5)],
+    bottom: [cuboidFaceBase, rainbowFace(292.5)],
 });
 
 export const cuboidFaceTitle = style({

@@ -12,7 +12,10 @@ import {
     TRACKS,
     formatStopwatch,
 } from "@thewaver/ss-playground/App/Pages/TimelinePage/TimelinePage.const";
-import { AXIS_HEIGHT } from "@thewaver/ss-playground/App/StyledComponents/TimelineContent/TimelineContent.css";
+import {
+    AXIS_HEIGHT,
+    PAGE_TIMELINE_FAMILIES,
+} from "@thewaver/ss-playground/App/StyledComponents/TimelineContent/TimelineContent.css";
 
 import PageButtonContent from "../../../StyledComponents/ButtonContent/ButtonContent.vue";
 import PageTimelineBlock from "../../../StyledComponents/TimelineContent/PageTimelineBlock.vue";
@@ -31,7 +34,6 @@ const LANE_GAP = 6;
 const ZOOM_IN = 0.6;
 const ZOOM_OUT = 1 / ZOOM_IN;
 const PAN_STEP = 0.4;
-const TONES = ["info", "alert", "success", "error"] as const;
 const MS_PER_SECOND = 1000;
 
 const computeSpan = (clip: Clip) => ({ start: clip.from, end: clip.to });
@@ -144,7 +146,7 @@ const showWholeReel = async () => {
                     <template #renderItem="{ item, flags }">
                         <PageTimelineBlock
                             :flags="flags"
-                            :tone="TONES[item.track % TONES.length]"
+                            :family="PAGE_TIMELINE_FAMILIES[item.track % PAGE_TIMELINE_FAMILIES.length]"
                             :name="item.name"
                             :note="formatStopwatch(item.to - item.from)"
                         />

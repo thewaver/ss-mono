@@ -40,8 +40,8 @@ export const solidCover = style({
     placeItems: "center",
     width: "100%",
     height: "100%",
-    backgroundImage: panel(themeVars.color.secondary.dark, themeVars.color.secondary.light),
-    color: themeVars.color.secondary.contrast,
+    backgroundImage: panel(themeVars.color.primary.dark, themeVars.color.primary.light),
+    color: themeVars.color.primary.contrast,
     fontSize: themeVars.fontSize.small,
 });
 
@@ -57,8 +57,8 @@ export const promptCover = style({
     placeItems: "center",
     width: "100%",
     height: "100%",
-    backgroundImage: panel(themeVars.color.secondary.dark, themeVars.color.secondary.light),
-    color: themeVars.color.secondary.contrast,
+    backgroundImage: panel(themeVars.color.primary.dark, themeVars.color.primary.light),
+    color: themeVars.color.primary.contrast,
     fontFamily: "monospace",
     fontSize: themeVars.fontSize.small,
 });

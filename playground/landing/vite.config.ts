@@ -8,6 +8,7 @@ import {
     SVELTE_THEME_VALUES,
     VUE_THEME_VALUES,
 } from "../src/App/Theme.const.ts";
+import { toCssFamily } from "../src/App/Theme.utils.ts";
 
 const fromHere = (path: string) => fileURLToPath(new URL(path, import.meta.url));
 
@@ -16,13 +17,18 @@ const REACT_PORT = Number(process.env.PLAYGROUND_REACT_PORT ?? 8083);
 const VUE_PORT = Number(process.env.PLAYGROUND_VUE_PORT ?? 8084);
 const SVELTE_PORT = Number(process.env.PLAYGROUND_SVELTE_PORT ?? 8085);
 
+const SOLID_PRIMARY = toCssFamily(SOLID_THEME_VALUES.color.primary);
+const REACT_PRIMARY = toCssFamily(REACT_THEME_VALUES.color.primary);
+const VUE_PRIMARY = toCssFamily(VUE_THEME_VALUES.color.primary);
+const SVELTE_PRIMARY = toCssFamily(SVELTE_THEME_VALUES.color.primary);
+
 const themeColors = (): Plugin => ({
     name: "theme-colors",
     transformIndexHtml: () => [
         {
             tag: "style",
             injectTo: "head",
-            children: `:root { --solid-primary: ${SOLID_THEME_VALUES.color.primary.main}; --solid-primary-light: ${SOLID_THEME_VALUES.color.primary.light}; --solid-primary-dark: ${SOLID_THEME_VALUES.color.primary.dark}; --react-primary: ${REACT_THEME_VALUES.color.primary.main}; --vue-primary: ${VUE_THEME_VALUES.color.primary.main}; --vue-primary-light: ${VUE_THEME_VALUES.color.primary.light}; --vue-primary-dark: ${VUE_THEME_VALUES.color.primary.dark}; --svelte-primary: ${SVELTE_THEME_VALUES.color.primary.main}; }`,
+            children: `:root { --solid-primary: ${SOLID_PRIMARY.main}; --solid-primary-light: ${SOLID_PRIMARY.light}; --solid-primary-dark: ${SOLID_PRIMARY.dark}; --react-primary: ${REACT_PRIMARY.main}; --vue-primary: ${VUE_PRIMARY.main}; --vue-primary-light: ${VUE_PRIMARY.light}; --vue-primary-dark: ${VUE_PRIMARY.dark}; --svelte-primary: ${SVELTE_PRIMARY.main}; }`,
         },
     ],
 });

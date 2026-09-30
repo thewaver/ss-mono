@@ -63,7 +63,7 @@ export const tileBoardMeeple = style({
     borderRadius: "50%",
     backgroundImage: `radial-gradient(circle at 70% 30%, ${themeVars.color.secondary.light}, ${themeVars.color.secondary.dark})`,
     boxShadow: themeVars.shadow.medium,
-    filter: `drop-shadow(0 0 ${GLOW_NEAR} ${themeVars.color.primary.main}) drop-shadow(0 0 ${GLOW_FAR} ${themeVars.color.primary.main})`,
+    filter: `drop-shadow(0 0 ${GLOW_NEAR} ${themeVars.color.secondary.main}) drop-shadow(0 0 ${GLOW_FAR} ${themeVars.color.secondary.main})`,
     pointerEvents: "none",
     transition: `left ${themeVars.animation.duration}, top ${themeVars.animation.duration}, width ${themeVars.animation.duration}`,
 });

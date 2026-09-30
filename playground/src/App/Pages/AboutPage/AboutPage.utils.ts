@@ -11,7 +11,7 @@ const NPM_PACKAGE_ROOT = "https://www.npmjs.com/package/";
 const UTILS_PACKAGE = "@thewaver/ss-utils";
 const CORE_PACKAGE = "@thewaver/ss-components";
 const SOURCE_LINK: AboutLink = { text: "open-source", href: "https://github.com/thewaver/ss-mono" };
-const WCAG_LINK: AboutLink ={ text: "WCAG", href: "https://www.w3.org/WAI/standards-guidelines/wcag/" };
+const WCAG_LINK: AboutLink = { text: "WCAG", href: "https://www.w3.org/WAI/standards-guidelines/wcag/" };
 
 const FRAMEWORK_SITES: Record<PlaygroundFramework, string> = {
     solid: "https://www.solidjs.com",
@@ -150,16 +150,26 @@ export namespace AboutPageUtils {
                     {
                         kind: "list",
                         items: [
-                            ["The library owns behavior and you own looks. A component never decides its own paint, so there is nothing to override and nothing to fight."],
+                            [
+                                "The library owns behavior and you own looks. A component never decides its own paint, so there is nothing to override and nothing to fight.",
+                            ],
                             [
                                 "Accessible by default. Keyboard routes, focus handling and ARIA roles come built in and are checked against ",
                                 WCAG_LINK,
                                 ". Where a choice of yours would leave a control failing a criterion, the library says so loudly in development instead of quietly going along.",
                             ],
-                            ["Your words, not ours. Apart from the name of what a control is, the library ships no sentence a reader would hear or see. Labels and announcements arrive through props, so a page in another language is never read out in English."],
-                            ["Controls stay out of the way. A component hands you a controller and draws no buttons of its own, so where the buttons go, and how they look, is your decision."],
-                            ["Nothing is hidden. The pieces the components are built from are exported too, so you can build the control the library does not have."],
-                            ["One name for one thing. A prop is called the same in every framework; only the way you hand it in changes."],
+                            [
+                                "Your words, not ours. Apart from the name of what a control is, the library ships no sentence a reader would hear or see. Labels and announcements arrive through props, so a page in another language is never read out in English.",
+                            ],
+                            [
+                                "Controls stay out of the way. A component hands you a controller and draws no buttons of its own, so where the buttons go, and how they look, is your decision.",
+                            ],
+                            [
+                                "Nothing is hidden. The pieces the components are built from are exported too, so you can build the control the library does not have.",
+                            ],
+                            [
+                                "One name for one thing. A prop is called the same in every framework; only the way you hand it in changes.",
+                            ],
                         ],
                     },
                 ],
@@ -169,11 +179,15 @@ export namespace AboutPageUtils {
                 blocks: [
                     {
                         kind: "paragraph",
-                        text: ["A component is a box that behaves. You mount it, give it its data, and give it a render function for whatever it draws. The library calls that function with the control's current state, such as hovered, pressed, showing a focus ring, disabled or open, and you return the markup and styling for that state."],
+                        text: [
+                            "A component is a box that behaves. You mount it, give it its data, and give it a render function for whatever it draws. The library calls that function with the control's current state, such as hovered, pressed, showing a focus ring, disabled or open, and you return the markup and styling for that state.",
+                        ],
                     },
                     {
                         kind: "paragraph",
-                        text: [`State that both you and the component change, such as a field's value or whether a popup is open, is handed in as ${TWO_WAY_STATE[framework]}. Every example on this site is a live component, and every page has a Docs tab with the full list of its props.`],
+                        text: [
+                            `State that both you and the component change, such as a field's value or whether a popup is open, is handed in as ${TWO_WAY_STATE[framework]}. Every example on this site is a live component, and every page has a Docs tab with the full list of its props.`,
+                        ],
                     },
                 ],
             },

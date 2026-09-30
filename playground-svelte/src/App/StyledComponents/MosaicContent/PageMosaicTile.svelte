@@ -11,7 +11,13 @@
     const layerClass = $derived.by(getLayerClass());
 </script>
 
-<div class={[styles.mosaicTile, layerClass]} style:width={`${props.width}px`} style:height={`${props.height}px`}>
+<div
+    class={[
+        styles.mosaicTile,
+        styles.mosaicTileFamily[styles.PAGE_MOSAIC_FAMILIES[props.state.index % styles.PAGE_MOSAIC_FAMILIES.length]],
+        layerClass,
+    ]}
+    style:width={`${props.width}px`} style:height={`${props.height}px`}>
     <div class={styles.mosaicTileName}>{@render props.children?.()}</div>
 
     <div class={styles.mosaicTileReading}>

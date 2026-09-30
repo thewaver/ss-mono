@@ -58,13 +58,13 @@ export const sortableGridItemShape = style({
 
 export const sortableGridItemOutline = style({
     fill: layerVars.main,
-    stroke: `rgb(from ${themeVars.color.secondary.main} r g b / 50%)`,
+    stroke: `rgb(from ${themeVars.color.primary.main} r g b / 50%)`,
     strokeWidth: 2,
     transition: `fill ${themeVars.animation.duration}, stroke ${themeVars.animation.duration}`,
 
     selectors: {
         [`.${isHovered} &`]: {
-            stroke: themeVars.color.secondary.light,
+            stroke: themeVars.color.primary.light,
         },
         [`.${isCarried} &`]: {
             fill: "transparent",
@@ -76,14 +76,14 @@ export const sortableGridItemOutline = style({
 
 export const sortableGridItemTile = style({
     position: "absolute",
-    border: `1px solid hsl(${tileHue} 70% 65% / 65%)`,
+    border: `1px solid hsl(${tileHue} 100% 50% / 65%)`,
     borderRadius: themeVars.borderRadius.half,
-    backgroundColor: `hsl(${tileHue} 35% 25% / 90%)`,
+    backgroundColor: `hsl(${tileHue} 25% 25% / 90%)`,
     transition: `background-color ${themeVars.animation.duration}, border-color ${themeVars.animation.duration}`,
 
     selectors: {
         [`.${isHovered} &`]: {
-            borderColor: `hsl(${tileHue} 85% 75%)`,
+            borderColor: `hsl(${tileHue} 100% 75%)`,
         },
         [`.${isCarried} &`]: {
             borderStyle: "dashed",

@@ -186,6 +186,15 @@ describe("computeGeometry", () => {
         expect(toFinal.from.x, "leaves the final's edge facing its feeders").toBe(220);
         expect(toFinal.to.x, "arrives at the semi's edge facing the final").toBe(210);
     });
+
+    it("lists the focused route last, so painting in order draws it over the lines it crosses", () => {
+        const geometry = BracketUtils.computeGeometry(layout, opts);
+        const connectors = BracketUtils.computeConnectors(layout, geometry, "b", "0.0.1");
+        const firstOnRoute = connectors.findIndex((connector) => connector.isOnFocusedRoute);
+
+        expect(firstOnRoute).toBeGreaterThan(0);
+        expect(connectors.slice(firstOnRoute).every((connector) => connector.isOnFocusedRoute)).toBe(true);
+    });
 });
 
 describe("getKeyStep", () => {

@@ -73,6 +73,14 @@ const toLuminance = (rgb: Color.RGB) =>
     LUMINANCE_GREEN * toLinearChannel(rgb.g) +
     LUMINANCE_BLUE * toLinearChannel(rgb.b);
 
+const toSafeLuminance = (hsl: Color.HSL, side: Color.ContrastSide) => {
+    const rgb = Color.HSL.toRgb(hsl);
+    const exact = toLuminance(rgb);
+    const painted = toLuminance({ r: toChannel(rgb.r), g: toChannel(rgb.g), b: toChannel(rgb.b) });
+
+    return side === "darker" ? Math.max(exact, painted) : Math.min(exact, painted);
+};
+
 const toContrastRatio = (first: number, second: number) =>
     (Math.max(first, second) + CONTRAST_OFFSET) / (Math.min(first, second) + CONTRAST_OFFSET);
 
@@ -263,6 +271,31 @@ export namespace Color {
     };
 
     /**
+     * Measures how far apart two colors are in brightness, as WCAG's contrast ratio.
+     *
+     * The ratio runs from `1` for two colors of the same luminance to `21` for black against white, and it
+     * reads the same whichever way round the two are handed in, so a caller comparing candidates against
+     * one fixed color need not care which of the pair is the background. It is the measure
+     * {@link Color.getContrastingColor} aims at, so a color that function returns measures at least its
+     * target here.
+     *
+     * Opacity takes no part: a translucent color is measured as though it were opaque, because what a
+     * see-through color really contrasts with is whatever happens to be behind it.
+     *
+     * @param first One color, as a CSS color string or a {@link Color.RGB} value.
+     * @param second The other color, in either form.
+     * @returns The ratio, unrounded. `undefined` when either string is not a color.
+     */
+    export const getContrastRatio = (first: string | Color.RGB, second: string | Color.RGB): number | undefined => {
+        const a = toContrastRgb(first);
+        const b = toContrastRgb(second);
+
+        if (!a || !b) return undefined;
+
+        return toContrastRatio(toLuminance(a), toLuminance(b));
+    };
+
+    /**
      * Finds the lightness that makes a hue and a saturation contrast with another color.
      *
      * The hue and the saturation are kept and only the lightness moves, so a color kept for its character
@@ -273,6 +306,10 @@ export namespace Color {
      * lighter than it — and each answer is the nearest to the other color on its own side, so what comes
      * back is the smallest change that passes rather than the most extreme one. `options.prefer` picks
      * between the two.
+     *
+     * The answer meets the target both exactly and as it will be painted, with red, green and blue each
+     * rounded to a whole `0`–`255` step, so it still holds once the color is written out and drawn. A color
+     * measured only in exact arithmetic can sit right on the target and fall a hair short of it on screen.
      *
      * Opacity takes no part: a translucent color is measured as though it were opaque, because what a
      * see-through color really contrasts with is whatever happens to be behind it.
@@ -328,11 +365,11 @@ export namespace Color {
         for (let iteration = 0; iteration < LIGHTNESS_BISECTIONS; iteration++) {
             const lightness = (low + high) * HALF;
 
-            if (toLuminance(HSL.toRgb({ h, s, l: lightness })) <= limit) low = lightness;
+            if (toSafeLuminance({ h, s, l: lightness }, side) <= limit) low = lightness;
             else high = lightness;
         }
 
-        const scaled = low * LIGHTNESS_ROUNDING;
+        const scaled = (side === "darker" ? low : high) * LIGHTNESS_ROUNDING;
 
         return {
             h,

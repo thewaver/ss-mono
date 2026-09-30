@@ -7329,6 +7329,69 @@ _Theme_ select in the nav settings swaps the class on the root element from ther
 temporary way to compare the sets side by side, then kept it. The pick is not remembered across reloads, and
 it is not tied to the framework switch, which still picks the other app's own theme when it lands there.
 
+**`secondary` is not set per theme; it is `primary` turned round the hue circle.** `toSecondary` in
+`Theme.css.ts` rotates all four steps of `primary` — `contrast` included — by `90`, `180` and `270` degrees, and
+keeps whichever rotation gives the highest contrast between its own `main` and its own `contrast`. A theme names
+only its primary. The user removed `secondary` outright, then brought it back in this form once removing it left
+pairs of things painted the same — the bracket's route against its connectors, a muted satellite badge against a
+plain one, and so on.
+
+- **Best of three, not a guarantee.** The user's call, and a deliberate exception to their usual preference for
+  future-proofing: secondary is meant almost entirely as decoration, so the pick takes the best candidate without
+  promising that any candidate reaches a given ratio.
+- **The contrast step rotates too, even at `0%` or `100%` lightness**, where rotating it changes nothing on its own —
+  a consumer deriving a mid-tone from it with `hsl(from … h s calc(l * 0.5))` gets the hue back.
+- **That is why primaries are written as hue, saturation and lightness numbers rather than CSS strings.** Reading a
+  string back through a color parser loses the hue of pure black or white, and a relative CSS color loses it in the
+  browser for the same reason, so the rotation is done on the numbers and each step is written out with
+  `Color.HSL.toCss` afterwards.
+- **Secondary is kept off anything carrying text where the text matters most** — the radial tree's root and the
+  data charts went back to primary and the rainbow respectively. Bracket, Satellite, Patch board and Particle
+  spawner keep it.
+- In the grey Default theme there is no hue to rotate, so there the two are the same color.
+
+**`Theme.const.ts` holds data only, and must not import anything at runtime.** Every app's `vite.config.ts` imports
+it to paint the loading screen, and a config file is loaded before Vite's aliases exist, so a value import of
+`@thewaver/ss-utils` there resolves to the package's built `dist` — which is git-ignored, and which a fresh machine
+or the Vercel deploy has not built. The secondary pick and the rainbow, which need `Color` at runtime, therefore
+live in `Theme.css.ts`, which vanilla-extract compiles with the full Vite config, aliases included, so it reaches
+`utils/src`. `Theme.const.ts` imports `Color` as a type only, which is erased before it runs.
+
+**Turning a primary into CSS strings is `toCssFamily` in `Theme.utils.ts`, and it is written out by hand rather than
+calling `Color.HSL.toCss`.** The landing page's `vite.config.ts` needs each framework's primary as CSS to color its
+buttons, so the conversion has to load at config time too, under the same no-runtime-import rule. `Theme.css.ts`
+uses the same function, so there is one formatter, not two.
+
+**The multicolor samples draw from `RAINBOW`, a palette that ignores the theme.** Sunburst, Icicle, Cuboid, Mosaic
+and the Timeline's blocks used to cycle through `primary`, `secondary`, `info`, `success`, `alert` and `error`. The
+user replaced that with eight hues `45` degrees apart, `RAINBOW_HUES`, because six named colors ran out one short
+on the Sunburst's six top-level folders, and a chart slice painted `error` reads as a fault.
+
+- **`main` is chosen for text, and is AAA.** For each hue, `Color.getContrastingColor` is asked at `75%` saturation
+  for the fill that reaches `7:1` under white text and the one that reaches it under black, and the one whose
+  lightness moved less from `50%` wins, since that keeps the color most vivid. `contrast` is the matching white or
+  black, carrying the hue.
+- **`dark` and `light` are fixed, the way `primary`'s are, at `50%` saturation** — `50%` and `60%` lightness under
+  black text, `40%` and `50%` under white. The user chose fixed steps over deriving them from `main`, then dropped
+  them by ten points under white text once the fixed `50%`/`60%` left reds and blues under white text below AA. The
+  gradient ends make no AAA promise; only `main` does.
+- **The white-or-black pick looks at `main` alone, so a hue near the tie can land on the side whose edges read worse.**
+  At full `main` saturation with `50%` edges, hue `292.5` picked black by `0.19` points of lightness and left its
+  `dark` end at `4.31:1`, while white would have given `4.87:1`; dropping `main` to `75%` saturation tipped it to
+  white. The tie is nudged, not removed: a later change to these numbers can tip a hue back, and weighing the edges
+  in the pick is the way to close it for good.
+- **`45` degrees rather than `60`**, so a seventh category does not wrap back onto the first color.
+- **The hues start at `22.5`, not `0`**, so none of them sits on a pure red or green. The user's call on looks; it
+  costs nothing measurable in contrast, since the weakest gradient end only moves from `4.81` to `4.62`.
+- **The Timeline takes a family like every other sample, and its blocks no longer carry the theme's state names.**
+  Tracks and Trim pick by track number, Meetings takes the first family. The "now" and "playhead" markers keep
+  theme colors, because they are markers rather than categories. `SHARED_THEME_VALUES` — `info`, `success`, `alert`,
+  `error` — are the manually defined colors and are for states, never for telling categories apart.
+- **Mosaic colors a tile by its `index`, not its `readingIndex`**, because reading order changes when the layout
+  reflows and a tile's color should not.
+- **A family is a hue number, and `0` is one of them**, so a test for "has a family" compares against `undefined`
+  rather than testing truthiness, which would draw hue `0` as Icicle's root.
+
 ### The Playground's field look is one surface, and every field-shaped control wears it
 
 Extracted, after the user pointed out that `TagInput` did not look like the other inputs — it
@@ -15574,6 +15637,10 @@ nothing in the component does.
 **A node is on the route when its id is the focused id or a leading part of it that ends at a separator.** Ids are already paths through the tree, so the whole test is `BracketUtils.getIsOnRoute`: no walk, no map. The separator matters, because `0.1` is a prefix of `0.10` without being its parent. A connector is on the route when its child is, since the parent of anything on the route is on it too. With nothing focused there is no route, so a board nobody has touched lights nothing.
 
 **`isFocused` and the route both mean "holds focus", and the node Tab returns to is remembered apart from that.** One signal cannot do both jobs: set on click and on arrow keys and never cleared, it goes on reporting focus after the person has clicked away, and reports nothing when the board is tabbed into, because Tab sets no signal. So nodes report focus and blur for themselves. The remembered node survives blur so the roving tab stop still returns to it.
+
+**`computeConnectors` lists the route's connectors last.** Every connector is drawn into one SVG, and SVG has no stacking order — whatever is painted later sits on top — so a plain connector painted after a route connector covered it where they crossed, and a consumer styling the route could not fix that from outside. The order is otherwise meaningless, so the route goes to the end and every renderer that paints in order draws it on top.
+
+**In the Playground the focused node is styled as one more node on the route, and nothing else.** The user's call: stacking a `primary` "focused" border and text under the route's `secondary` ring gave a node with two borders in two colors. The keyboard focus ring still marks focus; after a click, the route starting there is the mark.
 
 ### `Bracket`: round headers make each layer its own list
 

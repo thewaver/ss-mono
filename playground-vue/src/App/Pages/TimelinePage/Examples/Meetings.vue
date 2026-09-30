@@ -10,7 +10,10 @@ import {
     MINUTE_STEPS,
     formatClock,
 } from "@thewaver/ss-playground/App/Pages/TimelinePage/TimelinePage.const";
-import { AXIS_HEIGHT } from "@thewaver/ss-playground/App/StyledComponents/TimelineContent/TimelineContent.css";
+import {
+    AXIS_HEIGHT,
+    PAGE_TIMELINE_FAMILIES,
+} from "@thewaver/ss-playground/App/StyledComponents/TimelineContent/TimelineContent.css";
 
 import PageTimelineBlock from "../../../StyledComponents/TimelineContent/PageTimelineBlock.vue";
 import PageTimelineFrame from "../../../StyledComponents/TimelineContent/PageTimelineFrame.vue";
@@ -87,7 +90,7 @@ onBeforeUnmount(() => {
                 <template #renderItem="{ item, flags }">
                     <PageTimelineBlock
                         :flags="flags"
-                        tone="info"
+                        :family="PAGE_TIMELINE_FAMILIES[0]"
                         :name="item.name"
                         :note="`${formatClock(item.from)} · ${item.room}`"
                     />

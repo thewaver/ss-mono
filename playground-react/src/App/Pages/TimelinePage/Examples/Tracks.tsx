@@ -11,7 +11,10 @@ import {
     TRACKS,
     formatStopwatch,
 } from "@thewaver/ss-playground/App/Pages/TimelinePage/TimelinePage.const";
-import { AXIS_HEIGHT } from "@thewaver/ss-playground/App/StyledComponents/TimelineContent/TimelineContent.css";
+import {
+    AXIS_HEIGHT,
+    PAGE_TIMELINE_FAMILIES,
+} from "@thewaver/ss-playground/App/StyledComponents/TimelineContent/TimelineContent.css";
 
 import { PageButtonContent } from "../../../StyledComponents/ButtonContent/ButtonContent";
 import {
@@ -32,7 +35,6 @@ const LANE_GAP = 6;
 const ZOOM_IN = 0.6;
 const ZOOM_OUT = 1 / ZOOM_IN;
 const PAN_STEP = 0.4;
-const TONES = ["info", "alert", "success", "error"] as const;
 const MS_PER_SECOND = 1000;
 
 export const TracksExample = (props: Props) => {
@@ -107,7 +109,7 @@ export const TracksExample = (props: Props) => {
                         renderItem={(clip, flags) => (
                             <PageTimelineBlock
                                 flags={flags}
-                                tone={TONES[clip.track % TONES.length]}
+                                family={PAGE_TIMELINE_FAMILIES[clip.track % PAGE_TIMELINE_FAMILIES.length]}
                                 name={clip.name}
                                 note={formatStopwatch(clip.to - clip.from)}
                             />

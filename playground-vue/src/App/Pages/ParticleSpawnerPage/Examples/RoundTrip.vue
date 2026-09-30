@@ -51,7 +51,7 @@ const computeParticleStyle = (t: number) => {
         </div>
 
         <div :class="styles.spawnerRoot" :style="{ left: '85%', top: '50%' }">
-            <div ref="returnMarker" :class="styles.spawnerMarker" />
+            <div ref="returnMarker" :class="styles.spawnerMarkerReturn" />
 
             <ParticleSpawner
                 v-model:playback="isRelayPlaying"

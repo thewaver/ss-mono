@@ -16,7 +16,7 @@ export const PageIcicleCell = (props: PageIcicleCellProps) => {
     return (
         <div
             class={[
-                `${styles.icicleCell} ${getFamily() ? styles.icicleCellFamily[getFamily()!] : styles.icicleCellRoot}`,
+                `${styles.icicleCell} ${getFamily() === undefined ? styles.icicleCellRoot : styles.icicleCellFamily[getFamily()!]}`,
                 getLayerClass(),
             ].join(" ")}
             title={access(props.title)}

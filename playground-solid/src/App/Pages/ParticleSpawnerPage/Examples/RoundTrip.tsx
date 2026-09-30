@@ -37,7 +37,7 @@ export const RoundTripExample = (props: ParticleSpawnerExampleProps) => {
             </div>
 
             <div class={styles.spawnerRoot} style={{ left: "85%", top: "50%" }}>
-                <div ref={setReturnMarker} class={styles.spawnerMarker} />
+                <div ref={setReturnMarker} class={styles.spawnerMarkerReturn} />
 
                 <ParticleSpawner
                     {...props}

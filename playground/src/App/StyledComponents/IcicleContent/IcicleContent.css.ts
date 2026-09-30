@@ -1,9 +1,9 @@
 import { style, styleVariants } from "@vanilla-extract/css";
 
-import { themeVars } from "../../Theme.css";
+import { RAINBOW, RAINBOW_HUES, themeVars } from "../../Theme.css";
 import { layerVars } from "../Layer/Layer.css";
 
-export const PAGE_ICICLE_FAMILIES = ["primary", "secondary", "info", "success", "alert", "error"] as const;
+export const PAGE_ICICLE_FAMILIES = RAINBOW_HUES;
 
 const panel = (from: string, to: string) => `linear-gradient(215deg, ${from}, ${to})`;
 
@@ -12,8 +12,8 @@ export const icicleCellFamily = styleVariants(
         PAGE_ICICLE_FAMILIES.map((family) => [
             family,
             {
-                backgroundImage: panel(themeVars.color[family].light, themeVars.color[family].dark),
-                color: themeVars.color[family].contrast,
+                backgroundImage: panel(RAINBOW[family].light, RAINBOW[family].dark),
+                color: RAINBOW[family].contrast,
             },
         ]),
     ),

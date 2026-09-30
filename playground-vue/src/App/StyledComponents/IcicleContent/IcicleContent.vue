@@ -16,7 +16,7 @@ const layerClass = useLayerClass();
 <template>
     <div
         :class="[
-            `${styles.icicleCell} ${family ? styles.icicleCellFamily[family] : styles.icicleCellRoot}`,
+            `${styles.icicleCell} ${family === undefined ? styles.icicleCellRoot : styles.icicleCellFamily[family]}`,
             layerClass,
         ]"
         :title="title"

@@ -114,7 +114,7 @@ export const LIBRARY: TreemapNode<string> = branch(
     ),
     branch(
         "Exotics",
-        leaf("Bracket", 772),
+        leaf("Bracket", 778),
         leaf("CardStack", 698),
         leaf("CellAnimation", 651),
         leaf("CirclePacking", 921),

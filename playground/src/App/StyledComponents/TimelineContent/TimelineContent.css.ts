@@ -1,9 +1,12 @@
 import { style, styleVariants } from "@vanilla-extract/css";
 
-import { FOCUS_RING_WIDTH, themeVars } from "../../Theme.css";
+import { FOCUS_RING_WIDTH, RAINBOW, RAINBOW_HUES, themeVars } from "../../Theme.css";
 import { layerVars } from "../Layer/Layer.css";
 
 export const AXIS_HEIGHT = 22;
+
+export const PAGE_TIMELINE_FAMILIES = RAINBOW_HUES;
+
 const FRAME_WIDTH = 520;
 
 export const isMajor = style({});
@@ -129,28 +132,18 @@ export const timelineBlock = style({
     },
 });
 
-export const timelineBlockTones = styleVariants({
-    success: {
-        color: themeVars.color.success.contrast,
-        border: `1px solid ${themeVars.color.success.dark}`,
-        background: `linear-gradient(180deg, ${themeVars.color.success.dark}, ${themeVars.color.success.light})`,
-    },
-    error: {
-        color: themeVars.color.error.contrast,
-        border: `1px solid ${themeVars.color.error.dark}`,
-        background: `linear-gradient(180deg, ${themeVars.color.error.dark}, ${themeVars.color.error.light})`,
-    },
-    alert: {
-        color: themeVars.color.alert.contrast,
-        border: `1px solid ${themeVars.color.alert.dark}`,
-        background: `linear-gradient(180deg, ${themeVars.color.alert.dark}, ${themeVars.color.alert.light})`,
-    },
-    info: {
-        color: themeVars.color.info.contrast,
-        border: `1px solid ${themeVars.color.info.dark}`,
-        background: `linear-gradient(180deg, ${themeVars.color.info.dark}, ${themeVars.color.info.light})`,
-    },
-});
+export const timelineBlockFamily = styleVariants(
+    Object.fromEntries(
+        PAGE_TIMELINE_FAMILIES.map((family) => [
+            family,
+            {
+                color: RAINBOW[family].contrast,
+                border: `1px solid ${RAINBOW[family].dark}`,
+                background: `linear-gradient(180deg, ${RAINBOW[family].dark}, ${RAINBOW[family].light})`,
+            },
+        ]),
+    ),
+);
 
 export const timelineBlockName = style({
     fontSize: themeVars.fontSize.xSmall,
@@ -201,6 +194,6 @@ export const timelineMarkerTones = styleVariants({
         backgroundColor: themeVars.color.error.main,
     },
     playhead: {
-        backgroundColor: themeVars.color.secondary.main,
+        backgroundColor: themeVars.color.primary.main,
     },
 });

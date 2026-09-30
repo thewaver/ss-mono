@@ -93,7 +93,7 @@ export const PageTimelineBlock = (props: PageTimelineBlockProps) => {
 
     return (
         <div
-            class={`${styles.timelineBlock} ${styles.timelineBlockTones[access(props.tone)]}`}
+            class={`${styles.timelineBlock} ${styles.timelineBlockFamily[access(props.family)]}`}
             classList={{
                 [getLayerClass()]: true,
                 [styles.isHovered]: getFlags().isHovered,

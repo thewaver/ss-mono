@@ -29,11 +29,6 @@ export const node = style({
     cursor: "pointer",
 });
 
-export const nodeFocused = style({
-    borderColor: themeVars.color.primary.main,
-    color: themeVars.color.primary.main,
-});
-
 export const nodeOnRoute = style({
     boxShadow: `0 0 0 2px ${themeVars.color.secondary.main}`,
 });

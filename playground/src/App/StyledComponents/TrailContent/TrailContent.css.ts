@@ -34,8 +34,8 @@ export const trailMarker = style({
     width: MARKER_SIZE,
     height: MARKER_SIZE,
     borderRadius: "50%",
-    border: `2px solid ${themeVars.color.secondary.main}`,
-    background: `radial-gradient(circle at 70% 30%, ${themeVars.color.secondary.light}, ${themeVars.color.secondary.dark})`,
+    border: `2px solid ${themeVars.color.primary.main}`,
+    background: `radial-gradient(circle at 70% 30%, ${themeVars.color.primary.light}, ${themeVars.color.primary.dark})`,
     boxShadow: themeVars.shadow.small,
 });
 

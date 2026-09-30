@@ -35,11 +35,11 @@ export const wheelWedgeShape = style({
 });
 
 export const wheelWedgeGradientFrom = style({
-    stopColor: themeVars.color.secondary.dark,
+    stopColor: themeVars.color.primary.dark,
 });
 
 export const wheelWedgeGradientTo = style({
-    stopColor: themeVars.color.secondary.light,
+    stopColor: themeVars.color.primary.light,
 });
 
 export const wheelWedgeLabel = style({
@@ -55,7 +55,7 @@ export const wheelWedgeLabel = style({
 
     selectors: {
         [`${isSelected} &`]: {
-            color: themeVars.color.secondary.contrast,
+            color: themeVars.color.primary.contrast,
         },
     },
 });
@@ -101,7 +101,7 @@ export const wheelPipShape = style({
     width: "100%",
     height: "100%",
     fill: layerVars.main,
-    stroke: themeVars.color.secondary.main,
+    stroke: themeVars.color.primary.main,
     strokeWidth: 2,
     strokeLinejoin: "round",
 });
@@ -175,9 +175,9 @@ export const wheelCard = style({
 
     selectors: {
         [`&.${isSelected}`]: {
-            backgroundImage: `linear-gradient(215deg, ${themeVars.color.secondary.light}, ${themeVars.color.secondary.dark})`,
+            backgroundImage: `linear-gradient(215deg, ${themeVars.color.primary.light}, ${themeVars.color.primary.dark})`,
             borderColor: themeVars.color.primary.light,
-            color: themeVars.color.secondary.contrast,
+            color: themeVars.color.primary.contrast,
         },
     },
 });
@@ -192,7 +192,7 @@ export const wheelCardRank = style({
 
     selectors: {
         [`${isSelected} &`]: {
-            color: themeVars.color.secondary.contrast,
+            color: themeVars.color.primary.contrast,
         },
     },
 });

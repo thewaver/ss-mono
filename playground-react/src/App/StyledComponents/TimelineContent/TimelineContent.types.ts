@@ -6,8 +6,9 @@ import type {
     TimelineMarker,
     TimelineTick,
 } from "@thewaver/ss-components-react";
+import type { PAGE_TIMELINE_FAMILIES } from "@thewaver/ss-playground/App/StyledComponents/TimelineContent/TimelineContent.css";
 
-export type TimelineBlockTone = "success" | "error" | "alert" | "info";
+export type PageTimelineFamily = (typeof PAGE_TIMELINE_FAMILIES)[number];
 
 export type TimelineMarkerTone = "now" | "playhead";
 
@@ -23,7 +24,7 @@ export type PageTimelineMarkerProps = {
 
 export type PageTimelineBlockProps = {
     flags: InteractionFlags<TimelineItemRenderProps>;
-    tone: TimelineBlockTone;
+    family: PageTimelineFamily;
     name: string;
     note: string;
 };

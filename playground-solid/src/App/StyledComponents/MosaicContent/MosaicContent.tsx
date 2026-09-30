@@ -11,7 +11,13 @@ export const PageMosaicTile = (props: ParentProps<PageMosaicTileProps>) => {
 
     return (
         <div
-            class={[styles.mosaicTile, getLayerClass()].join(" ")}
+            class={[
+                styles.mosaicTile,
+                styles.mosaicTileFamily[
+                    styles.PAGE_MOSAIC_FAMILIES[access(props.state).index % styles.PAGE_MOSAIC_FAMILIES.length]
+                ],
+                getLayerClass(),
+            ].join(" ")}
             style={{ width: `${access(props.width)}px`, height: `${access(props.height)}px` }}
         >
             <div class={styles.mosaicTileName}>{props.children}</div>

@@ -26,7 +26,13 @@ const PAGE_ROUTES: RouteRecordRaw[] = AppUtils.COMPONENT_CONFIGS.flatMap((config
 
 const router = createRouter({
     history: createWebHistory(import.meta.env.BASE_URL),
-    routes: [{ path: "/", component: AppContent, children: [{ path: "", component: () => import("./App/Pages/AboutPage/AboutPage.vue") }, ...PAGE_ROUTES] }],
+    routes: [
+        {
+            path: "/",
+            component: AppContent,
+            children: [{ path: "", component: () => import("./App/Pages/AboutPage/AboutPage.vue") }, ...PAGE_ROUTES],
+        },
+    ],
 });
 
 document.documentElement.classList.add(PLAYGROUND_THEMES.vue);

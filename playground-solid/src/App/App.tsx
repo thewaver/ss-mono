@@ -52,7 +52,9 @@ const PageDocsView = lazy(() =>
     import("./PageComponents/DocsView/DocsView").then((module) => ({ default: module.PageDocsView })),
 );
 
-const PageAboutPage = lazy(() => import("./Pages/AboutPage/AboutPage").then((module) => ({ default: module.AboutPage })));
+const PageAboutPage = lazy(() =>
+    import("./Pages/AboutPage/AboutPage").then((module) => ({ default: module.AboutPage })),
+);
 
 const PassThroughPage = (props: RouteSectionProps) => <>{props.children}</>;
 

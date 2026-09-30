@@ -5,7 +5,6 @@ import * as styles from "@thewaver/ss-playground/App/StyledComponents/FrameworkM
 import * as optionStyles from "@thewaver/ss-playground/App/StyledComponents/SelectOptionContent/SelectOptionContent.css";
 
 import { useLayerClass } from "../Layer/Layer.context";
-
 import type { FrameworkMenuItemProps, FrameworkMenuTriggerProps } from "./FrameworkMenuContent.types";
 
 export const PageFrameworkMenuTrigger = (props: ParentProps<FrameworkMenuTriggerProps>) => {

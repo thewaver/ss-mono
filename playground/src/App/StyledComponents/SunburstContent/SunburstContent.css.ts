@@ -1,11 +1,11 @@
 import { style, styleVariants } from "@vanilla-extract/css";
 
-import { themeVars } from "../../Theme.css";
+import { RAINBOW, RAINBOW_HUES, themeVars } from "../../Theme.css";
 import { layerVars } from "../Layer/Layer.css";
 
-export const PAGE_SUNBURST_FAMILIES = ["primary", "secondary", "info", "success", "alert", "error"] as const;
+export const PAGE_SUNBURST_FAMILIES = RAINBOW_HUES;
 
-const familyOf = (family: (typeof PAGE_SUNBURST_FAMILIES)[number]) => themeVars.color[family];
+const familyOf = (family: (typeof PAGE_SUNBURST_FAMILIES)[number]) => RAINBOW[family];
 
 export const sunburstStopLight = styleVariants(
     Object.fromEntries(PAGE_SUNBURST_FAMILIES.map((family) => [family, { stopColor: familyOf(family).light }])),

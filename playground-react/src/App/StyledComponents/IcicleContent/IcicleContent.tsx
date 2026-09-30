@@ -13,7 +13,7 @@ export const PageIcicleCell = (props: PageIcicleCellProps) => {
     return (
         <div
             className={[
-                `${styles.icicleCell} ${props.family ? styles.icicleCellFamily[props.family] : styles.icicleCellRoot}`,
+                `${styles.icicleCell} ${props.family === undefined ? styles.icicleCellRoot : styles.icicleCellFamily[props.family]}`,
                 layerClass,
             ].join(" ")}
             title={props.title}

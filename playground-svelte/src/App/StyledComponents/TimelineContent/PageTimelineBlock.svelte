@@ -13,7 +13,7 @@
 
 <div
     class={[
-        `${styles.timelineBlock} ${styles.timelineBlockTones[props.tone]}`,
+        `${styles.timelineBlock} ${styles.timelineBlockFamily[props.family]}`,
         layerClass,
         flags.isHovered && styles.isHovered,
         flags.isFocusVisible && styles.isFocusVisible,

@@ -11,7 +11,6 @@ export const renderBracketNode = (getNode: Accessor<BracketNode<string>>, getSta
     <div
         class={styles.node}
         classList={{
-            [styles.nodeFocused]: getState().isFocused,
             [styles.nodeOnRoute]: getState().isOnFocusedRoute,
             [styles.nodeRoot]: getState().placement.layer === ROOT_LAYER,
             [styles.nodeDisabled]: getState().placement.isDisabled,

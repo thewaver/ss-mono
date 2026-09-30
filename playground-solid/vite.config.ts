@@ -5,12 +5,12 @@ import solid from "vite-plugin-solid";
 
 import { vanillaExtractPlugin } from "@vanilla-extract/vite-plugin";
 
+import { SOLID_THEME_VALUES } from "../playground/src/App/Theme.const.ts";
 import { componentApi } from "../playground/vite/componentApi.ts";
 import { componentDependencies } from "../playground/vite/componentDependencies.ts";
 import { playgroundSource } from "../playground/vite/playgroundSource.ts";
 import { definePlaygroundUrls } from "../playground/vite/playgroundUrls.ts";
 import { themeLoading } from "../playground/vite/themeLoading.ts";
-import { SOLID_THEME_VALUES } from "../playground/src/App/Theme.const.ts";
 
 const fromRepo = (path: string) => fileURLToPath(new URL(path, import.meta.url));
 

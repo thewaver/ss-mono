@@ -6,12 +6,12 @@ import checker from "vite-plugin-checker";
 import { vanillaExtractPlugin } from "@vanilla-extract/vite-plugin";
 import react from "@vitejs/plugin-react";
 
+import { REACT_THEME_VALUES } from "../playground/src/App/Theme.const.ts";
 import { componentApi } from "../playground/vite/componentApi.ts";
 import { componentDependencies } from "../playground/vite/componentDependencies.ts";
 import { playgroundSource } from "../playground/vite/playgroundSource.ts";
 import { definePlaygroundUrls } from "../playground/vite/playgroundUrls.ts";
 import { themeLoading } from "../playground/vite/themeLoading.ts";
-import { REACT_THEME_VALUES } from "../playground/src/App/Theme.const.ts";
 
 const fromRepo = (path: string) => fileURLToPath(new URL(path, import.meta.url));
 
