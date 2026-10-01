@@ -1,6 +1,6 @@
 import { style } from "@vanilla-extract/css";
 
-import { buttonElement } from "../../Essentials/Button/Button.css";
+import { buttonElement } from "../../Essentials/Buttons/Button/Button.css";
 
 export const carouselRoot = style({
     display: "flex",

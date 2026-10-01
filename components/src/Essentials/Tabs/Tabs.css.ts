@@ -1,6 +1,6 @@
 import { style } from "@vanilla-extract/css";
 
-import { buttonElement } from "../Button/Button.css";
+import { buttonElement } from "../Buttons/Button/Button.css";
 
 export const tabsRoot = style({
     position: "relative",

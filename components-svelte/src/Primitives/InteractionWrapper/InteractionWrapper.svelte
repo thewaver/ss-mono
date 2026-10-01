@@ -9,7 +9,7 @@
     } from "@thewaver/ss-components";
 
     import { InteractionTrackerSvelteUtils } from "../../Abstracts/InteractionTracker/InteractionTrackerSvelte.utils.svelte.js";
-    import Tooltip from "../../Essentials/Tooltip/Tooltip.svelte";
+    import Tooltip from "../../Essentials/Overlays/Tooltip/Tooltip.svelte";
     import type { InteractionWrapperProps } from "./InteractionWrapper.types.js";
 
     const NO_EXTRA_FLAGS = {};

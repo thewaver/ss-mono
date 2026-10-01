@@ -1,6 +1,6 @@
 import type { Index2d } from "@thewaver/ss-utils";
 
-import type { CellAnimationEvaluationDefs } from "../../Exotics/CellAnimation/CellAnimation.types";
+import type { CellAnimationEvaluationDefs } from "../../Exotics/Animations/CellAnimation/CellAnimation.types";
 
 export type CellAnimationZoneType =
     | "all"

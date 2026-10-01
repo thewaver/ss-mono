@@ -3,7 +3,7 @@ import { type CSSAnimationKey, type Index2d, MathUtils, Matrix3dUtils, type Poin
 import type {
     CellAnimationEvaluationDefs,
     CellAnimationEvaluationResult,
-} from "../../Exotics/CellAnimation/CellAnimation.types";
+} from "../../Exotics/Animations/CellAnimation/CellAnimation.types";
 import type {
     CellAnimationBreakpointTriple,
     CellAnimationEasing,

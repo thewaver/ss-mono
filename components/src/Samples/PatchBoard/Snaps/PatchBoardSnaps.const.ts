@@ -1,4 +1,4 @@
-import type { PatchBoardSnapFn } from "../../../Exotics/PatchBoard/PatchBoard.types";
+import type { PatchBoardSnapFn } from "../../../Exotics/Diagrams/PatchBoard/PatchBoard.types";
 
 const GRID_COLUMNS = 32;
 const GRID_CELL = 0.03125;

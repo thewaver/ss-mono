@@ -1,7 +1,7 @@
 import type { Point3d } from "@thewaver/ss-utils";
 
-import type { DieShape } from "../../../Exotics/Die/Die.types";
-import { DieUtils } from "../../../Exotics/Die/Die.utils";
+import type { DieShape } from "../../../Exotics/Perspective/Die/Die.types";
+import { DieUtils } from "../../../Exotics/Perspective/Die/Die.utils";
 
 const PHI = (1 + Math.sqrt(5)) * 0.5;
 const INVERSE_PHI = 1 / PHI;

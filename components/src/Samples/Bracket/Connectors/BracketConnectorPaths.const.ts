@@ -1,6 +1,6 @@
 import type { Point2d } from "@thewaver/ss-utils";
 
-import type { BracketConnectorDefs } from "../../../Exotics/Bracket/Bracket.types";
+import type { BracketConnectorDefs } from "../../../Exotics/Diagrams/Bracket/Bracket.types";
 import type { BracketConnectorPathFn } from "./BracketConnectors.types";
 
 const HALF = 0.5;

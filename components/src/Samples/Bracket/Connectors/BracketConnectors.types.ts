@@ -1,4 +1,4 @@
-import type { BracketConnectorDefs } from "../../../Exotics/Bracket/Bracket.types";
+import type { BracketConnectorDefs } from "../../../Exotics/Diagrams/Bracket/Bracket.types";
 
 export type BracketConnectorPathFn = (defs: BracketConnectorDefs, radius: number) => string;
 

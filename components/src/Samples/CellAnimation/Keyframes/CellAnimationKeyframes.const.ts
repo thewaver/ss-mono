@@ -3,7 +3,7 @@ import type { Index2d } from "@thewaver/ss-utils";
 import type {
     CellAnimationEvaluationDefs,
     CellAnimationEvaluationResult,
-} from "../../../Exotics/CellAnimation/CellAnimation.types";
+} from "../../../Exotics/Animations/CellAnimation/CellAnimation.types";
 import type {
     CellAnimationBreakpointTriple,
     CellAnimationEasing,

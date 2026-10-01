@@ -314,22 +314,27 @@ export const MENU_CONFIGS: MenuBranchConfig[] = [
                 ],
             },
             {
-                name: "AudioSwitcher",
-                description:
-                    "Two audio elements taking it in turns, so changing the source crosses from one to the other rather than cutting. It renders nothing at all — the buttons on this page are the page's — and the fade is stepped in twenty-five parts over whatever duration it is given, which is also how it stops and starts. Every change of source plays what arrived, except the one that arrives at mount: that one waits to be asked, unless shouldAutoPlayOnMount says otherwise. Whether sound is actually coming out is written back into the playback signal, so a control painted from it is right even where a browser has refused to start.",
-                component: AudioSwitcherPage,
-            },
-            {
                 name: "Breadcrumbs",
                 description:
                     "A trail of links to where you are, as a navigation landmark holding an ordered list. The last crumb is the page itself, so it is not a link and says so.",
                 component: BreadcrumbsPage,
             },
             {
-                name: "Button",
-                description:
-                    "The plain button, plus the two things it owns that a native one does not: a name that wins over whatever the painter draws, and a pointer report a repeating control can hold.",
-                component: ButtonPage,
+                name: "Buttons",
+                children: [
+                    {
+                        name: "Button",
+                        description:
+                            "The plain button, plus the two things it owns that a native one does not: a name that wins over whatever the painter draws, and a pointer report a repeating control can hold.",
+                        component: ButtonPage,
+                    },
+                    {
+                        name: "SlideButton",
+                        description:
+                            "A confirmation you drag rather than press. Holding it is the single-pointer route the standard asks for, so the gesture is never the only way through.",
+                        component: SlideButtonPage,
+                    },
+                ],
             },
             {
                 name: "Carousels",
@@ -349,12 +354,6 @@ export const MENU_CONFIGS: MenuBranchConfig[] = [
                 ],
             },
             {
-                name: "Drawer",
-                description:
-                    "A modal that arrives from an edge. It is a preset rather than a mode, because a panel cannot become a centered dialog while it is open.",
-                component: DrawerPage,
-            },
-            {
                 name: "EdgeFader",
                 description:
                     "A box whose chosen sides fade to nothing, so content running past an edge trails off rather than being cut. The fade is a mask on the content itself, so it works over any background without being told what is behind it. Fixed, the sides are always faded; scroll-aware, a side fades only while there is more to scroll to that way, and the fade shrinks as that end arrives.",
@@ -365,18 +364,6 @@ export const MENU_CONFIGS: MenuBranchConfig[] = [
                 description:
                     "Association and announcement, and nothing else. The library generates the ids and wires a control to its message; whether a value is valid is the consumer's to decide and to report.",
                 component: FormPage,
-            },
-            {
-                name: "HoverCard",
-                description:
-                    "A card of content hung off another element, opened by resting the pointer on it or by keyboard focus, and by a press where nothing can hover. Unlike a tooltip it may hold links and controls, so it is a dialog of its own rather than the element's description: Tab moves focus from the anchor into it, it stays open while focus is inside it, and Escape puts focus back on the anchor. The waiting, the skip window and the bridge across the gap are the hover engine it shares with Tooltip.",
-                component: HoverCardPage,
-            },
-            {
-                name: "ImageSwitcher",
-                description:
-                    "Cross-fades between image sources, loading the next one out of sight first so a slow or missing file never leaves a hole where the old picture was.",
-                component: ImageSwitcherPage,
             },
             {
                 name: "Input",
@@ -558,6 +545,23 @@ export const MENU_CONFIGS: MenuBranchConfig[] = [
                 ],
             },
             {
+                name: "MediaSwitchers",
+                children: [
+                    {
+                        name: "AudioSwitcher",
+                        description:
+                            "Two audio elements taking it in turns, so changing the source crosses from one to the other rather than cutting. It renders nothing at all — the buttons on this page are the page's — and the fade is stepped in twenty-five parts over whatever duration it is given, which is also how it stops and starts. Every change of source plays what arrived, except the one that arrives at mount: that one waits to be asked, unless shouldAutoPlayOnMount says otherwise. Whether sound is actually coming out is written back into the playback signal, so a control painted from it is right even where a browser has refused to start.",
+                        component: AudioSwitcherPage,
+                    },
+                    {
+                        name: "ImageSwitcher",
+                        description:
+                            "Cross-fades between image sources, loading the next one out of sight first so a slow or missing file never leaves a hole where the old picture was.",
+                        component: ImageSwitcherPage,
+                    },
+                ],
+            },
+            {
                 name: "Menubar",
                 description:
                     "A row of words that each open a menu, built on the toolbar rather than beside it, so it measures itself, walks with the arrows as one tab stop and moves whatever does not fit into an overflow menu, where a word becomes a submenu. What it adds is one rule: while a menu is open, the arrow that moves to the next word closes that menu and opens the next one.",
@@ -587,10 +591,68 @@ export const MENU_CONFIGS: MenuBranchConfig[] = [
                 ],
             },
             {
-                name: "Modal",
-                description:
-                    "A dialog that traps focus, joins one dismissal stack, and hands the overlay to the consumer to paint. Escape always closes it, and that is a conformance requirement rather than a courtesy.",
-                component: ModalPage,
+                name: "Overlays",
+                children: [
+                    {
+                        name: "Drawer",
+                        description:
+                            "A modal that arrives from an edge. It is a preset rather than a mode, because a panel cannot become a centered dialog while it is open.",
+                        component: DrawerPage,
+                    },
+                    {
+                        name: "HoverCard",
+                        description:
+                            "A card of content hung off another element, opened by resting the pointer on it or by keyboard focus, and by a press where nothing can hover. Unlike a tooltip it may hold links and controls, so it is a dialog of its own rather than the element's description: Tab moves focus from the anchor into it, it stays open while focus is inside it, and Escape puts focus back on the anchor. The waiting, the skip window and the bridge across the gap are the hover engine it shares with Tooltip.",
+                        component: HoverCardPage,
+                    },
+                    {
+                        name: "Modal",
+                        description:
+                            "A dialog that traps focus, joins one dismissal stack, and hands the overlay to the consumer to paint. Escape always closes it, and that is a conformance requirement rather than a courtesy.",
+                        component: ModalPage,
+                    },
+                    {
+                        name: "Sidebar",
+                        description:
+                            "A panel docked to one side that grows and shrinks between two widths the consumer gives it, either pushing the content beside it aside or growing over it. It is not a modal: nothing is sealed off, focus is not held and the page stays usable, which is what separates it from Drawer. It draws no control of its own — anything holding its expanded signal opens and closes it — and it hands its contents one of four phases, so a collapsed layout and an expanded one can be swapped at the moment that suits them. It can also expand while the pointer rests on it, without touching the owner's state.",
+                        component: SidebarPage,
+                    },
+                    {
+                        name: "Spotlights",
+                        children: [
+                            {
+                                name: "SpotlightGuide",
+                                description:
+                                    "A tour: the hole moves from one element to the next as the steps advance, with a popup beside it carrying the step's own words and the controls for going on, going back, or leaving. Ending is reported with a reason, so a tour that was finished and one that was walked out of are not the same event.",
+                                component: SpotlightGuidePage,
+                            },
+                            {
+                                name: "SpotlightHint",
+                                description:
+                                    "The lightest of the three: a hole cut round one element with a note beside it, dismissed by a press anywhere or by any key that means anything. Nothing is blocked while it is up, because a hint is an aside rather than a question.",
+                                component: SpotlightHintPage,
+                            },
+                            {
+                                name: "SpotlightPrompt",
+                                description:
+                                    "The one that blocks: a hole round the element being asked about, and nothing else on the page answering until the question is. Focus is kept inside it, which is what separates it from a hint that merely sits there.",
+                                component: SpotlightPromptPage,
+                            },
+                        ],
+                    },
+                    {
+                        name: "Toasts",
+                        description:
+                            "A queue the consumer owns. The component shows what is in it and reports when one is finished; nothing is added or dropped behind the consumer's back.",
+                        component: ToastsPage,
+                    },
+                    {
+                        name: "Tooltip",
+                        description:
+                            "A description hung off another element, shown while the pointer is over it and, after a pause, while it holds keyboard focus. It is handed the element rather than wrapping it, so anything with a ref can carry one, and it points that element at the tooltip with aria-describedby only while the tooltip is on screen, which is what gets it read out without leaving a reference to something that has gone. It is portaled out to the top layer so nothing it grew out of can clip it, and it asks Anchor where to sit.",
+                        component: TooltipPage,
+                    },
+                ],
             },
             {
                 name: "Paginator",
@@ -617,18 +679,6 @@ export const MENU_CONFIGS: MenuBranchConfig[] = [
                 component: ScrollerPage,
             },
             {
-                name: "Sidebar",
-                description:
-                    "A panel docked to one side that grows and shrinks between two widths the consumer gives it, either pushing the content beside it aside or growing over it. It is not a modal: nothing is sealed off, focus is not held and the page stays usable, which is what separates it from Drawer. It draws no control of its own — anything holding its expanded signal opens and closes it — and it hands its contents one of four phases, so a collapsed layout and an expanded one can be swapped at the moment that suits them. It can also expand while the pointer rests on it, without touching the owner's state.",
-                component: SidebarPage,
-            },
-            {
-                name: "SlideButton",
-                description:
-                    "A confirmation you drag rather than press. Holding it is the single-pointer route the standard asks for, so the gesture is never the only way through.",
-                component: SlideButtonPage,
-            },
-            {
                 name: "Sortable",
                 description:
                     "Lists whose items can be picked up and put down, in place or in a sibling list. Three ways in — a drag, a tap to pick and a tap to place, and a keyboard pick-move-drop — because a control operated only by dragging is one a good many people cannot operate at all. The library owns the carry, the landing place and the announcements; the item, the list's surface and the insertion marker are all painted by the consumer.",
@@ -639,29 +689,6 @@ export const MENU_CONFIGS: MenuBranchConfig[] = [
                 description:
                     "Resizable panes over a CSS grid: the ratios are fr shares and a pane's bounds are a clamp, so a window resize is the browser's arithmetic rather than the component's. When the minimums cannot all fit, it overflows, exactly as grid does.",
                 component: SplitPanePage,
-            },
-            {
-                name: "Spotlights",
-                children: [
-                    {
-                        name: "SpotlightGuide",
-                        description:
-                            "A tour: the hole moves from one element to the next as the steps advance, with a popup beside it carrying the step's own words and the controls for going on, going back, or leaving. Ending is reported with a reason, so a tour that was finished and one that was walked out of are not the same event.",
-                        component: SpotlightGuidePage,
-                    },
-                    {
-                        name: "SpotlightHint",
-                        description:
-                            "The lightest of the three: a hole cut round one element with a note beside it, dismissed by a press anywhere or by any key that means anything. Nothing is blocked while it is up, because a hint is an aside rather than a question.",
-                        component: SpotlightHintPage,
-                    },
-                    {
-                        name: "SpotlightPrompt",
-                        description:
-                            "The one that blocks: a hole round the element being asked about, and nothing else on the page answering until the question is. Focus is kept inside it, which is what separates it from a hint that merely sits there.",
-                        component: SpotlightPromptPage,
-                    },
-                ],
             },
             {
                 name: "Stepper",
@@ -688,22 +715,10 @@ export const MENU_CONFIGS: MenuBranchConfig[] = [
                 component: TabsPage,
             },
             {
-                name: "Toasts",
-                description:
-                    "A queue the consumer owns. The component shows what is in it and reports when one is finished; nothing is added or dropped behind the consumer's back.",
-                component: ToastsPage,
-            },
-            {
                 name: "Toolbar",
                 description:
                     "A row of actions that measures itself and moves whatever does not fit into a menu at the end. The row is one tab stop with the arrows walking it, and an action that leaves the row leaves that walk with it. Each action is described once and painted twice — as a button in the row and as a row in the menu — and can refuse to collapse, or insist on it.",
                 component: ToolbarPage,
-            },
-            {
-                name: "Tooltip",
-                description:
-                    "A description hung off another element, shown while the pointer is over it and, after a pause, while it holds keyboard focus. It is handed the element rather than wrapping it, so anything with a ref can carry one, and it points that element at the tooltip with aria-describedby only while the tooltip is on screen, which is what gets it read out without leaving a reference to something that has gone. It is portaled out to the top layer so nothing it grew out of can clip it, and it asks Anchor where to sit.",
-                component: TooltipPage,
             },
             {
                 name: "Tree",
@@ -723,10 +738,44 @@ export const MENU_CONFIGS: MenuBranchConfig[] = [
         name: "Exotics",
         children: [
             {
-                name: "Bracket",
-                description:
-                    "A tree drawn in layers with elbow connectors between a node and the nodes that feed it — a knockout draw being the arrangement it was asked for, and an org chart or a skill tree the same component with a different tree. A node sits centered between the ones it feeds from, which propagates upward and is the whole of the layout; a node with one child sits level with it, which is what a bye looks like. The arrows walk a layer and step between layers, on one tab stop.",
-                component: BracketPage,
+                name: "Animations",
+                children: [
+                    {
+                        name: "CellAnimation",
+                        description:
+                            "Cuts an image into a grid and animates the cells on a stagger, where a cell's turn comes from a weight rather than from its index. The animations, weights and origins on this page are Playground samples — the component itself only asks for a function from timeline to result.",
+                        component: CellAnimationPage,
+                    },
+                    {
+                        name: "ScanlineAnimation",
+                        description:
+                            "The same staggering applied to horizontal lines instead of a grid, so an image can be swept, split or glitched a row at a time. The seven examples differ only in the function they hand it.",
+                        component: ScanlineAnimationPage,
+                    },
+                ],
+            },
+            {
+                name: "Arrangements",
+                children: [
+                    {
+                        name: "Formation",
+                        description:
+                            "Places a set of items into an arrangement — a cliff, a whorl of three, a zigzag — from a function that answers with a position per item. Every position is a fraction of the formation's own width, so the whole thing scales with the container and nothing is measured in JavaScript.",
+                        component: FormationPage,
+                    },
+                    {
+                        name: "Satellite",
+                        description:
+                            "Anchors one element to another and grows its own box to cover both, so a badge hanging off a corner still takes part in the parent's layout instead of spilling out of it. The placement vocabulary is the one Anchor already uses for floating layers.",
+                        component: SatellitePage,
+                    },
+                    {
+                        name: "Staircase",
+                        description:
+                            "Stacks rows and insets each one by a function of its index, which makes a funnel, a spindle or a zigzag depending on the function. The direction knob hands the steps back to front rather than asking the function to know about direction.",
+                        component: StaircasePage,
+                    },
+                ],
             },
             {
                 name: "CardStack",
@@ -735,16 +784,33 @@ export const MENU_CONFIGS: MenuBranchConfig[] = [
                 component: CardStackPage,
             },
             {
-                name: "CellAnimation",
-                description:
-                    "Cuts an image into a grid and animates the cells on a stagger, where a cell's turn comes from a weight rather than from its index. The animations, weights and origins on this page are Playground samples — the component itself only asks for a function from timeline to result.",
-                component: CellAnimationPage,
-            },
-            {
-                name: "CirclePacking",
-                description:
-                    "The same tree as Treemap and Sunburst, drawn as circles inside circles: a leaf's area is its weight, and a branch is the smallest circle around its children. Pressing a circle with circles inside it zooms into it, on a path that pulls back before traveling when the jump is far; a press anywhere else goes back to the top, and Escape goes up one level. The packing is D3's, seeded, so the same tree always packs the same way.",
-                component: CirclePackingPage,
+                name: "Charts",
+                children: [
+                    {
+                        name: "CirclePacking",
+                        description:
+                            "The same tree as Treemap and Sunburst, drawn as circles inside circles: a leaf's area is its weight, and a branch is the smallest circle around its children. Pressing a circle with circles inside it zooms into it, on a path that pulls back before traveling when the jump is far; a press anywhere else goes back to the top, and Escape goes up one level. The packing is D3's, seeded, so the same tree always packs the same way.",
+                        component: CirclePackingPage,
+                    },
+                    {
+                        name: "Icicle",
+                        description:
+                            "The same tree as Treemap, Sunburst and CirclePacking, drawn in columns: the node in view fills the first at full height, its children share the next in proportion to what they weigh, theirs the one after. Pressing any cell — a leaf too — brings it to the left at full height while the rest slides out of the way, and pressing the leftmost cell or Escape goes back up. The arrows walk up and down a column and across to a parent or its children.",
+                        component: IciclePage,
+                    },
+                    {
+                        name: "Sunburst",
+                        description:
+                            "Treemap's tree drawn as rings: the branch in the middle, its children in the first ring, theirs in the second, each arc's share of its ring in proportion to what it weighs. Pressing an arc with rings outside it zooms into it, its arc opening out to the whole circle while everything outside it squeezes away, and Escape zooms back out. The middle is the page's own button, driven through the signal the two share, so the way back out is drawn by whoever draws the rest.",
+                        component: SunburstPage,
+                    },
+                    {
+                        name: "Treemap",
+                        description:
+                            "A tree drawn as a box divided into rectangles, each one's area in proportion to what it weighs — a leaf its own weight, a branch everything under it. One level is shown at a time: pressing a branch zooms into it, its tile growing to fill the box while its children fade in, and Escape zooms back out. Every level is tiled as though it filled the whole box, so what is inside a tile before the zoom is exactly what fills the box after it. The way back up is the page's own button, driven through the signal the two share.",
+                        component: TreemapPage,
+                    },
+                ],
             },
             {
                 name: "Corners",
@@ -753,34 +819,27 @@ export const MENU_CONFIGS: MenuBranchConfig[] = [
                 component: CornersPage,
             },
             {
-                name: "Cuboid",
-                description:
-                    "Six faces on a box that is only a cube when you make it one: width, height and depth are given separately, and each face is sized from the two extents it spans. Two counts of quarter turns drive it, one across and one up, so it always turns the way it was pushed. Kept upright, it remembers how it actually lies instead: every press is a quarter turn about the screen's own axis, the face it lands on is spun to read the right way up, and its controller can turn it to a face by name. It can also be dragged, settling on the nearest face when let go.",
-                component: CuboidPage,
-            },
-            {
-                name: "Die",
-                description:
-                    "Any convex solid built from flat faces — the six tabletop dice and a hundred-sided one ship as samples — turned in 3D so one face is towards the viewer. A roll asks the page which face to land on, tumbles, and lands on it the right way up, then says which face came up; the face can also be set directly, and the die turns there without tumbling. Every face is a real element clipped to its outline, which is cheap for a die and does not scale to a sphere.",
-                component: DiePage,
-            },
-            {
-                name: "FlipCard",
-                description:
-                    "Two faces back to back on a barrel with no depth, turned by the side you ask it for. It renders no control of its own: what turns the card is the page's own button, driven through the signal the two share.",
-                component: FlipCardPage,
-            },
-            {
-                name: "Formation",
-                description:
-                    "Places a set of items into an arrangement — a cliff, a whorl of three, a zigzag — from a function that answers with a position per item. Every position is a fraction of the formation's own width, so the whole thing scales with the container and nothing is measured in JavaScript.",
-                component: FormationPage,
-            },
-            {
-                name: "Icicle",
-                description:
-                    "The same tree as Treemap, Sunburst and CirclePacking, drawn in columns: the node in view fills the first at full height, its children share the next in proportion to what they weigh, theirs the one after. Pressing any cell — a leaf too — brings it to the left at full height while the rest slides out of the way, and pressing the leftmost cell or Escape goes back up. The arrows walk up and down a column and across to a parent or its children.",
-                component: IciclePage,
+                name: "Diagrams",
+                children: [
+                    {
+                        name: "Bracket",
+                        description:
+                            "A tree drawn in layers with elbow connectors between a node and the nodes that feed it — a knockout draw being the arrangement it was asked for, and an org chart or a skill tree the same component with a different tree. A node sits centered between the ones it feeds from, which propagates upward and is the whole of the layout; a node with one child sits level with it, which is what a bye looks like. The arrows walk a layer and step between layers, on one tab stop.",
+                        component: BracketPage,
+                    },
+                    {
+                        name: "PatchBoard",
+                        description:
+                            "Boxes a person places by hand, sockets on their edges, and cables dragged from one socket to another. The board owns the geometry and the wiring rules: a cable stays fixed to its socket while the box it hangs off is dragged, an input already carrying a cable refuses a second, a node cannot be wired to itself, and the consumer can refuse a pair on top of that. Everything a pointer does is also a tap and a keystroke — pick up, aim, drop, Escape to put back — so a graph can be wired without a mouse.",
+                        component: PatchBoardPage,
+                    },
+                    {
+                        name: "Timeline",
+                        description:
+                            "Items with a start and an end, laid on a window over a range that can be zoomed and moved. The component owns the arithmetic — where a span lands as a share of the window, which lane it goes in when it overlaps its neighbors, and which round numbers the ticks fall on at the width it currently has — and the keyboard, where the arrows walk the items in time order and bring the window with them. It moves the window only when it is asked to: the wheel, the drag and the buttons that do the asking are the consumer's.",
+                        component: TimelinePage,
+                    },
+                ],
             },
             {
                 name: "Mosaics",
@@ -800,28 +859,44 @@ export const MENU_CONFIGS: MenuBranchConfig[] = [
                 ],
             },
             {
-                name: "Odometer",
-                description:
-                    "A number where each digit is a column that turns to its new value, so a change reads as travel rather than a swap. The columns turn the way the number is going, so nine to zero keeps going forward instead of rewinding, and a column waits for every column to its right that is also carrying. It takes the text rather than the number, so a separator is a slot that never turns and the component owns no locale.",
-                component: OdometerPage,
+                name: "Particles",
+                children: [
+                    {
+                        name: "ParticleField",
+                        description:
+                            "A grid of cells where particles appear and disappear in place rather than traveling. The field runs in passes, and each cell spawns at the moment its weight gives it, as CellAnimation staggers its cells. A spawn chance below 1 lets each cell into a pass only by a roll, decided once per pass so scrubbing back shows the same particles. How a particle appears is the same transform-and-filter result CellAnimation takes, and the area can be limited to a shape, a cell spawning only when its center is inside.",
+                        component: ParticleFieldPage,
+                    },
+                    {
+                        name: "ParticleSpawner",
+                        description:
+                            "A spawner element and a set of target elements: particles leave the spawner one after another, each aimed at a target its own evaluator picked, and are removed once they arrive. Where a particle sits at any moment is answered by a caller-supplied function rather than fixed to a straight line, and several spawners can aim at the same pool of targets without knowing about each other.",
+                        component: ParticleSpawnerPage,
+                    },
+                ],
             },
             {
-                name: "ParticleField",
-                description:
-                    "A grid of cells where particles appear and disappear in place rather than traveling. The field runs in passes, and each cell spawns at the moment its weight gives it, as CellAnimation staggers its cells. A spawn chance below 1 lets each cell into a pass only by a roll, decided once per pass so scrubbing back shows the same particles. How a particle appears is the same transform-and-filter result CellAnimation takes, and the area can be limited to a shape, a cell spawning only when its center is inside.",
-                component: ParticleFieldPage,
-            },
-            {
-                name: "ParticleSpawner",
-                description:
-                    "A spawner element and a set of target elements: particles leave the spawner one after another, each aimed at a target its own evaluator picked, and are removed once they arrive. Where a particle sits at any moment is answered by a caller-supplied function rather than fixed to a straight line, and several spawners can aim at the same pool of targets without knowing about each other.",
-                component: ParticleSpawnerPage,
-            },
-            {
-                name: "PatchBoard",
-                description:
-                    "Boxes a person places by hand, sockets on their edges, and cables dragged from one socket to another. The board owns the geometry and the wiring rules: a cable stays fixed to its socket while the box it hangs off is dragged, an input already carrying a cable refuses a second, a node cannot be wired to itself, and the consumer can refuse a pair on top of that. Everything a pointer does is also a tap and a keystroke — pick up, aim, drop, Escape to put back — so a graph can be wired without a mouse.",
-                component: PatchBoardPage,
+                name: "Perspective",
+                children: [
+                    {
+                        name: "Cuboid",
+                        description:
+                            "Six faces on a box that is only a cube when you make it one: width, height and depth are given separately, and each face is sized from the two extents it spans. Two counts of quarter turns drive it, one across and one up, so it always turns the way it was pushed. Kept upright, it remembers how it actually lies instead: every press is a quarter turn about the screen's own axis, the face it lands on is spun to read the right way up, and its controller can turn it to a face by name. It can also be dragged, settling on the nearest face when let go.",
+                        component: CuboidPage,
+                    },
+                    {
+                        name: "Die",
+                        description:
+                            "Any convex solid built from flat faces — the six tabletop dice and a hundred-sided one ship as samples — turned in 3D so one face is towards the viewer. A roll asks the page which face to land on, tumbles, and lands on it the right way up, then says which face came up; the face can also be set directly, and the die turns there without tumbling. Every face is a real element clipped to its outline, which is cheap for a die and does not scale to a sphere.",
+                        component: DiePage,
+                    },
+                    {
+                        name: "FlipCard",
+                        description:
+                            "Two faces back to back on a barrel with no depth, turned by the side you ask it for. It renders no control of its own: what turns the card is the page's own button, driven through the signal the two share.",
+                        component: FlipCardPage,
+                    },
+                ],
             },
             {
                 name: "PointerEffects",
@@ -864,30 +939,6 @@ export const MENU_CONFIGS: MenuBranchConfig[] = [
                 ],
             },
             {
-                name: "RichText",
-                description:
-                    "Paints a plain string that carries bracketed tags — [b], [i], [s], [u], [li] — so text arriving from a server or a file can say which of its words are emphasized without bringing markup along. Nothing is handed to the browser as HTML: the string is parsed into a tree of runs and painted with classes the consumer supplies, or with elements of the consumer's own such as a link or a tooltip, and a tag it does not recognize is either left on screen exactly as typed or dropped, whichever the consumer asks for. A tag carries attributes only where the consumer has allowed them, so a bracket in ordinary prose stays prose.",
-                component: RichTextPage,
-            },
-            {
-                name: "Satellite",
-                description:
-                    "Anchors one element to another and grows its own box to cover both, so a badge hanging off a corner still takes part in the parent's layout instead of spilling out of it. The placement vocabulary is the one Anchor already uses for floating layers.",
-                component: SatellitePage,
-            },
-            {
-                name: "ScanlineAnimation",
-                description:
-                    "The same staggering applied to horizontal lines instead of a grid, so an image can be swept, split or glitched a row at a time. The seven examples differ only in the function they hand it.",
-                component: ScanlineAnimationPage,
-            },
-            {
-                name: "ScrambleText",
-                description:
-                    "Text that arrives as noise and settles into itself, one position at a time. Each character sits over the one it is going to become, so nothing changes width and the line cannot rewrap while it churns; the spaces are left alone, which is what keeps the line breaks where they were. Which glyph the noise is drawn from and the order the positions settle in are both the consumer's, the second as a weight per character in the same 0..1 vocabulary the animation samples use.",
-                component: ScrambleTextPage,
-            },
-            {
                 name: "Shape",
                 description:
                     "Draws a border and a fill around arbitrary children, from a point list rather than a CSS box. It only reaches for SVG when the paint needs it and stays a plain div when it does not.",
@@ -900,16 +951,33 @@ export const MENU_CONFIGS: MenuBranchConfig[] = [
                 component: SortableGridPage,
             },
             {
-                name: "Staircase",
-                description:
-                    "Stacks rows and insets each one by a function of its index, which makes a funnel, a spindle or a zigzag depending on the function. The direction knob hands the steps back to front rather than asking the function to know about direction.",
-                component: StaircasePage,
-            },
-            {
-                name: "Sunburst",
-                description:
-                    "Treemap's tree drawn as rings: the branch in the middle, its children in the first ring, theirs in the second, each arc's share of its ring in proportion to what it weighs. Pressing an arc with rings outside it zooms into it, its arc opening out to the whole circle while everything outside it squeezes away, and Escape zooms back out. The middle is the page's own button, driven through the signal the two share, so the way back out is drawn by whoever draws the rest.",
-                component: SunburstPage,
+                name: "Text",
+                children: [
+                    {
+                        name: "Odometer",
+                        description:
+                            "A number where each digit is a column that turns to its new value, so a change reads as travel rather than a swap. The columns turn the way the number is going, so nine to zero keeps going forward instead of rewinding, and a column waits for every column to its right that is also carrying. It takes the text rather than the number, so a separator is a slot that never turns and the component owns no locale.",
+                        component: OdometerPage,
+                    },
+                    {
+                        name: "RichText",
+                        description:
+                            "Paints a plain string that carries bracketed tags — [b], [i], [s], [u], [li] — so text arriving from a server or a file can say which of its words are emphasized without bringing markup along. Nothing is handed to the browser as HTML: the string is parsed into a tree of runs and painted with classes the consumer supplies, or with elements of the consumer's own such as a link or a tooltip, and a tag it does not recognize is either left on screen exactly as typed or dropped, whichever the consumer asks for. A tag carries attributes only where the consumer has allowed them, so a bracket in ordinary prose stays prose.",
+                        component: RichTextPage,
+                    },
+                    {
+                        name: "ScrambleText",
+                        description:
+                            "Text that arrives as noise and settles into itself, one position at a time. Each character sits over the one it is going to become, so nothing changes width and the line cannot rewrap while it churns; the spaces are left alone, which is what keeps the line breaks where they were. Which glyph the noise is drawn from and the order the positions settle in are both the consumer's, the second as a weight per character in the same 0..1 vocabulary the animation samples use.",
+                        component: ScrambleTextPage,
+                    },
+                    {
+                        name: "Typewriter",
+                        description:
+                            "Reveals text one character at a time without flattening it first, so a bold run or a nested element still animates in place.",
+                        component: TypewriterPage,
+                    },
+                ],
             },
             {
                 name: "TileBoard",
@@ -918,28 +986,10 @@ export const MENU_CONFIGS: MenuBranchConfig[] = [
                 component: TileBoardPage,
             },
             {
-                name: "Timeline",
-                description:
-                    "Items with a start and an end, laid on a window over a range that can be zoomed and moved. The component owns the arithmetic — where a span lands as a share of the window, which lane it goes in when it overlaps its neighbors, and which round numbers the ticks fall on at the width it currently has — and the keyboard, where the arrows walk the items in time order and bring the window with them. It moves the window only when it is asked to: the wheel, the drag and the buttons that do the asking are the consumer's.",
-                component: TimelinePage,
-            },
-            {
                 name: "Trail",
                 description:
                     "One element traveling a path the consumer draws, on a frame loop rather than a CSS animation, so where it is right now is a value anything can read. It reports the point and the direction of travel at every frame and can turn the traveler to face along it; the controller plays, pauses and seeks, which is what lets a slider put it anywhere on the path.",
                 component: TrailPage,
-            },
-            {
-                name: "Treemap",
-                description:
-                    "A tree drawn as a box divided into rectangles, each one's area in proportion to what it weighs — a leaf its own weight, a branch everything under it. One level is shown at a time: pressing a branch zooms into it, its tile growing to fill the box while its children fade in, and Escape zooms back out. Every level is tiled as though it filled the whole box, so what is inside a tile before the zoom is exactly what fills the box after it. The way back up is the page's own button, driven through the signal the two share.",
-                component: TreemapPage,
-            },
-            {
-                name: "TypeWriter",
-                description:
-                    "Reveals text one character at a time without flattening it first, so a bold run or a nested element still animates in place.",
-                component: TypewriterPage,
             },
             {
                 name: "Wheels",

@@ -8,7 +8,7 @@ import {
 } from "@thewaver/ss-components";
 
 import { InteractionTrackerReactUtils } from "../../Abstracts/InteractionTracker/InteractionTrackerReact.utils";
-import { Tooltip } from "../../Essentials/Tooltip/Tooltip";
+import { Tooltip } from "../../Essentials/Overlays/Tooltip/Tooltip";
 import { useElement, useLatest } from "../../Utils/refUtils";
 import type { InteractionWrapperProps } from "./InteractionWrapper.types";
 

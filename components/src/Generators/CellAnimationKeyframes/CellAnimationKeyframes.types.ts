@@ -3,7 +3,7 @@ import type { CSSAnimationKey, Index2d } from "@thewaver/ss-utils";
 import type {
     CellAnimationEvaluationDefs,
     CellAnimationEvaluationResult,
-} from "../../Exotics/CellAnimation/CellAnimation.types";
+} from "../../Exotics/Animations/CellAnimation/CellAnimation.types";
 import type { CellAnimationZoneType } from "../CellAnimationZones/CellAnimationZones.types";
 
 export type CellStop = { at: number; originX?: number; originY?: number; depth?: number } & Partial<

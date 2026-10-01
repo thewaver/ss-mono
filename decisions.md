@@ -1642,7 +1642,8 @@ local file.
 `Abstracts/` renders no DOM (namespaced utils, hook-like factories). `Essentials/` renders DOM.
 `Primitives/` also renders DOM but holds only the shared bodies other components are built out of, which
 are not meaningful on their own. `Composites/` combines Essentials. `Essentials/Input/` groups controls
-carrying a user-editable value (see _"Folder layout"_ in `conventions.md`). `components/src/index.ts` enumerates every export path individually — not a
+carrying a user-editable value (see _"Folder layout"_ in `conventions.md`), and the other purpose groups are
+listed under _"A group is a folder named for what its members are for"_ below. `components/src/index.ts` enumerates every export path individually — not a
 barrel. **Its blocks run in order of what is built on what** — `Abstracts`, `Primitives`, `Essentials`,
 `Exotics`, `Composites`, then `Samples` and `Utils` — with the paths inside a block still sorted, and a
 `Generators` block straight after `Abstracts`. The
@@ -1783,6 +1784,49 @@ turned out to be exactly the `BinarySwitch` shape — unexported shells with pre
 only their types and utils — so `Carousels`, `Wheels`, `Mosaics` and `Spotlights` hold only the presets, and
 the shells sit beside `BinarySwitch`, `TextField` and `InteractionWrapper`. `Accordions` is the odd one out and keeps both its
 members, because `Accordion` composes `Collapsible` rather than extending it and both are exported whole.
+
+**A group is a folder named for what its members are for, and it is not a family.** `Input` was the first;
+the user chose the rest, member by member:
+
+- `Essentials/Buttons`: `Button`, `SlideButton`.
+- `Essentials/Overlays`: `Modal`, `Drawer`, `Tooltip`, `HoverCard`, `Toasts`, the `Spotlights` family whole,
+  and `Sidebar`.
+- `Essentials/MediaSwitchers`: `AudioSwitcher`, `ImageSwitcher`.
+- `Exotics/Particles`: `ParticleField`, `ParticleSpawner`.
+- `Exotics/Charts`: `Treemap`, `Sunburst`, `Icicle`, `CirclePacking`.
+- `Exotics/Diagrams`: `Bracket`, `PatchBoard`, `Timeline`.
+- `Exotics/Perspective`: `FlipCard`, `Die`, `Cuboid`.
+- `Exotics/Animations`: `CellAnimation`, `ScanlineAnimation`.
+- `Exotics/Text`: `ScrambleText`, `Typewriter`, `Odometer`, `RichText`.
+- `Exotics/Arrangements`: `Formation`, `Staircase`, `Satellite`.
+
+What separates a group from a family: a family's members share a page and a base, so
+`playground/src/App/Pages` mirrors the folder. A group's members have a page each, so the pages stay flat
+exactly as `Input`'s do. Only the left-hand nav mirrors the group, in all four apps. Routes are built from
+the page's own name, so no URL changed. A family can sit inside a group, the way `Spotlights` sits in
+`Overlays`, and the nav nests one level deeper for it.
+
+The reasoning behind each name and member list:
+
+- **`Charts`, not `Data`.** `Table` and `Tree` show data too, and a folder called `Data` would claim them
+  while holding neither. All four `Charts` members size an item by its value.
+- **`Bracket` is a diagram, not a chart.** It draws a tree like the four charts do, but it places nodes by
+  how they connect rather than by how large they are, which is what `PatchBoard` and `Timeline` share.
+- **`Text` takes `RichText`.** The user asked for a name wide enough to hold it beside the three animated
+  ones. Others could take `Text` for a component name, but no more than `Input`, and `Input` has caused no
+  confusion.
+- **`MediaSwitchers` over `Media`.** A bare `Switchers` could be read as a toggle. `Media` would leave room
+  for a later player, but the user chose the specific name, because widening a group later costs almost
+  nothing.
+- **`Sidebar` sits in `Overlays`.** It never comes and goes the way the rest do, and when it pushes content
+  aside it is plain layout. It went in anyway, because it can grow over the content and anyone looking for
+  it looks beside `Drawer`.
+- **`Perspective` names a technique, not a purpose.** It is the user's own word for the three. `Volumes`
+  would read as loudness next to `MediaSwitchers`, and `Solids` would read as SolidJS.
+
+**Left alone for now, by the user's choice.** The proposed `Navigation` and `Layout` groups were not taken: a
+menu is not necessarily navigation, and `EdgeFader` is not quite layout. A `Boards` group (`TileBoard`,
+`SortableGrid`) was not taken either.
 
 **A layer's name must be a category word that could never name a component.** Stated by the user, against
 `Staples`, which was the front-runner until they pointed out that a staple is an object and a component
@@ -3473,8 +3517,8 @@ shared primitive's types file away from the pages that show them; name ownership
 `TabPanelProps`, `CalendarCompositeProps` and every other secondary props type before, because they were keyed
 to units with no page. The fallback to the folder is what puts those on their siblings' pages.
 
-**The lookup is case-insensitive.** The `TypeWriter` page never found `TypewriterProps` and drew the empty
-message, for no reason but the capital W.
+**The lookup is case-insensitive.** A page whose display name differs from its props type only in case — the
+Typewriter page was once labelled `TypeWriter` — would otherwise find nothing and draw the empty message.
 
 **A type with an object shape gets a table of its fields; anything else is a row in one table of aliases.** A
 union, a literal set or a function type has no members to list, so its written definition is shown instead.
@@ -16299,7 +16343,7 @@ long list. Both fall out of one predicate over the existing filter, so the branc
 category with nothing left in it was already there.
 
 **A name links to its page when one exists.** The matching is case-insensitive, because the Playground's
-display names and the folder names disagree in a couple of places (`TypeWriter` against `Typewriter`), and a
+display names and the folder names are free to disagree in case, and a
 name with no page renders as plain text rather than a dead link.
 
 ### Color in the Playground: two rules, both the user's

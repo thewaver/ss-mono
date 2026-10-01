@@ -8,7 +8,7 @@ import type {
     InteractionSizing,
 } from "@thewaver/ss-components";
 
-import type { TooltipProps } from "../../Essentials/Tooltip/Tooltip.types";
+import type { TooltipProps } from "../../Essentials/Overlays/Tooltip/Tooltip.types";
 
 export type InteractionControlProps<TExtra extends object = {}> = {
     /**

@@ -15,7 +15,7 @@ import { TextSyncSolidUtils } from "../../../Abstracts/TextSync/TextSyncSolid.ut
 import { InteractionWrapper } from "../../../Primitives/InteractionWrapper/InteractionWrapper";
 import { Popover } from "../../../Primitives/Popover/Popover";
 import { access, accessSignal } from "../../../Utils/propUtils";
-import { Button } from "../../Button/Button";
+import { Button } from "../../Buttons/Button/Button";
 import { FormFieldSolidUtils } from "../FormField/FormFieldSolid.utils";
 import { useLabelContext } from "../Label/Label.context";
 import { LabelSolidUtils } from "../Label/LabelSolid.utils";

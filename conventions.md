@@ -1513,12 +1513,14 @@ to the reporting rather than to the gesture, and it should be measured on a cloc
 
 `Checkbox`, `Toggle`, `Radio`, `RadioGroup`, `TextInput` and `Label` live under `Essentials/Input/`.
 Grouped by what a component is _for_ — carrying a value the user edits — not by what it is built from.
-`Button` stays at the `Essentials` level, being an interaction with no value. The shared bodies those
+`Button` stays out of it, being an interaction with no value, and sits in `Essentials/Buttons/` instead. The
+other purpose groups are listed in `decisions.md`, under _"A group is a folder named for what its members are
+for"_. The shared bodies those
 controls are built out of — `BinarySwitch`, `TextField` and `InteractionWrapper` — are not in `Essentials`
 at all: they live in `Primitives/`, described in `decisions.md`.
 
 `index.ts` still enumerates every export path individually, so the group is a directory convention rather
-than a barrel — `Input` sorts between `ImageSwitcher` and `Menu`.
+than a barrel — `Input` sorts between `Form` and `MediaSwitchers`.
 
 ### The Playground's element selectors are scoped, and the library keeps its `!important`
 

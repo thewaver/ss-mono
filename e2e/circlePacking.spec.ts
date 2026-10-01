@@ -17,6 +17,38 @@ const BRANCH = `${LIBRARY} svg [role="button"]`;
 const branchAt = (page: Page, path: string) =>
     page.locator(BRANCH).filter({ has: page.locator("title", { hasText: new RegExp(`^${path}\\s`) }) });
 
+/**
+ * Presses a branch at a point its own circle owns. Its descendants are painted over it, and one may sit at its
+ * center, so a plain click there can land on a grandchild instead. The point is found by asking the page what is
+ * under each spot of a grid across the circle, which keeps the press independent of how the tree happens to pack.
+ */
+const pressBranch = async (page: Page, path: string) => {
+    const branch = branchAt(page, path);
+
+    await expect(branch).toHaveCount(1);
+
+    const point = await branch.evaluate((element) => {
+        const { x, y, width, height } = element.querySelector("circle")!.getBoundingClientRect();
+        const radius = width / 2;
+        const steps = 24;
+
+        for (let row = 1; row < steps; row++) {
+            for (let column = 1; column < steps; column++) {
+                const px = x + (width * column) / steps;
+                const py = y + (height * row) / steps;
+
+                if (Math.hypot(px - (x + radius), py - (y + height / 2)) > radius * 0.95) continue;
+                if (document.elementFromPoint(px, py)?.closest('[role="button"]') === element) return { x: px, y: py };
+            }
+        }
+
+        return undefined;
+    });
+
+    expect(point, `${path} has a spot no other circle covers`).toBeDefined();
+    await page.mouse.click(point!.x, point!.y);
+};
+
 const activeTitle = (page: Page) =>
     page.evaluate(() => document.activeElement?.querySelector("title")?.textContent?.split("\n")[0] ?? "");
 
@@ -36,7 +68,7 @@ test("only the circles directly inside the one in view are offered to a screen r
 });
 
 test("pressing a circle with circles inside it zooms into it", async ({ page }) => {
-    await branchAt(page, "src/Exotics").click();
+    await pressBranch(page, "src/Exotics");
 
     expect(await readout(page, "library")).toMatch(/^showing src\/Exotics /);
     await expect(branchAt(page, "src/Exotics/Mosaics"), "a circle one level down is now a button").toHaveCount(1);
@@ -45,7 +77,7 @@ test("pressing a circle with circles inside it zooms into it", async ({ page }) 
 test("a press that lands on no circle to zoom into — a leaf, or the circle in view — goes back to the top", async ({
     page,
 }) => {
-    await branchAt(page, "src/Exotics").click();
+    await pressBranch(page, "src/Exotics");
 
     expect(await readout(page, "library")).toMatch(/^showing src\/Exotics /);
 

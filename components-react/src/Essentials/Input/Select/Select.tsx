@@ -15,7 +15,7 @@ import { TextSyncReactUtils } from "../../../Abstracts/TextSync/TextSyncReact.ut
 import { InteractionWrapper } from "../../../Primitives/InteractionWrapper/InteractionWrapper";
 import { Popover } from "../../../Primitives/Popover/Popover";
 import { useLatest } from "../../../Utils/refUtils";
-import { Button } from "../../Button/Button";
+import { Button } from "../../Buttons/Button/Button";
 import { FormFieldReactUtils } from "../FormField/FormFieldReact.utils";
 import { useLabelContext } from "../Label/Label.context";
 import { LabelReactUtils } from "../Label/LabelReact.utils";

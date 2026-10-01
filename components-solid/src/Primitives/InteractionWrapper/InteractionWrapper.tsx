@@ -8,7 +8,7 @@ import {
 } from "@thewaver/ss-components";
 
 import { InteractionTrackerSolidUtils } from "../../Abstracts/InteractionTracker/InteractionTrackerSolid.utils";
-import { Tooltip } from "../../Essentials/Tooltip/Tooltip";
+import { Tooltip } from "../../Essentials/Overlays/Tooltip/Tooltip";
 import { access } from "../../Utils/propUtils";
 import type { InteractionWrapperProps } from "./InteractionWrapperSolid.types";
 

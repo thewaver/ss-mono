@@ -1,4 +1,4 @@
-import { CellAnimationUtils } from "../../../../Exotics/CellAnimation/CellAnimation.utils";
+import { CellAnimationUtils } from "../../../../Exotics/Animations/CellAnimation/CellAnimation.utils";
 import type { WeightFn } from "../../../../Generators/CellAnimationWeights/CellAnimationWeights.types";
 import { CellAnimationWeightUtils } from "../../../../Generators/CellAnimationWeights/CellAnimationWeights.utils";
 

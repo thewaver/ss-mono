@@ -14,7 +14,7 @@ const outputText = (selector: string) => (selector: string) => {
 };
 
 test.beforeEach(async ({ page }) => {
-    await page.goto("/type-writer");
+    await page.goto("/typewriter");
     await expect(page.locator(MEASURE_COPY)).toBeAttached();
 });
 

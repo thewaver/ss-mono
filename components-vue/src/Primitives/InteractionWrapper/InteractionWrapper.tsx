@@ -8,8 +8,8 @@ import {
 } from "@thewaver/ss-components";
 
 import { InteractionTrackerVueUtils } from "../../Abstracts/InteractionTracker/InteractionTrackerVue.utils";
-import { Tooltip } from "../../Essentials/Tooltip/Tooltip";
-import type { TooltipSlots } from "../../Essentials/Tooltip/Tooltip.types";
+import { Tooltip } from "../../Essentials/Overlays/Tooltip/Tooltip";
+import type { TooltipSlots } from "../../Essentials/Overlays/Tooltip/Tooltip.types";
 import { callSlot, declareProps } from "../../Utils/propUtils";
 import { exposeElement, toElement } from "../../Utils/refUtils";
 import type { SlotsContext } from "../../Utils/typeUtils";

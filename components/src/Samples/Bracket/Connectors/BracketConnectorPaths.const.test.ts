@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 
-import type { BracketConnectorDefs } from "../../../Exotics/Bracket/Bracket.types";
+import type { BracketConnectorDefs } from "../../../Exotics/Diagrams/Bracket/Bracket.types";
 import { BracketConnectorPaths } from "./BracketConnectorPaths.const";
 
 const across: BracketConnectorDefs = {

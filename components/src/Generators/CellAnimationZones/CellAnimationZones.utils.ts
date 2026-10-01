@@ -1,7 +1,7 @@
 import type { Index2d } from "@thewaver/ss-utils";
 
-import type { CellAnimationEvaluationDefs } from "../../Exotics/CellAnimation/CellAnimation.types";
-import { CellAnimationUtils } from "../../Exotics/CellAnimation/CellAnimation.utils";
+import type { CellAnimationEvaluationDefs } from "../../Exotics/Animations/CellAnimation/CellAnimation.types";
+import { CellAnimationUtils } from "../../Exotics/Animations/CellAnimation/CellAnimation.utils";
 import { CellAnimationWeightUtils } from "../CellAnimationWeights/CellAnimationWeights.utils";
 import type { CellAnimationZoneFn, CellAnimationZoneType } from "./CellAnimationZones.types";
 

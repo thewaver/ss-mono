@@ -1,6 +1,6 @@
 import { style } from "@vanilla-extract/css";
 
-import { buttonElement } from "../../Button/Button.css";
+import { buttonElement } from "../../Buttons/Button/Button.css";
 
 const TAG_INPUT_FIELD_MIN_WIDTH = 60;
 

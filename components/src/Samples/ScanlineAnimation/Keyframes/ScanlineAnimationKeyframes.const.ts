@@ -3,7 +3,7 @@ import { MathUtils } from "@thewaver/ss-utils";
 import type {
     ScanlineAnimationEvaluationDefs,
     ScanlineAnimationEvaluationResult,
-} from "../../../Exotics/ScanlineAnimation/ScanlineAnimation.types";
+} from "../../../Exotics/Animations/ScanlineAnimation/ScanlineAnimation.types";
 import type { CellAnimationBreakpointTriple } from "../../../Generators/CellAnimationBreakpoints/CellAnimationBreakpoints.types";
 import { CellAnimationWeightUtils } from "../../../Generators/CellAnimationWeights/CellAnimationWeights.utils";
 import type {
