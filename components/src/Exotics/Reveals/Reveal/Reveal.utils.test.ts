@@ -9,10 +9,10 @@ describe("buildHoleImage", () => {
         const image = RevealUtils.buildHoleImage(40, 0.5, undefined, undefined, undefined);
 
         expect(image.startsWith('url("data:image/svg+xml,')).toBe(true);
-        expect(decodeURIComponent(image), "a circle when no outline is given").toContain("<circle");
+        expect(decodeURIComponent(image), "a circle when no contour is given").toContain("<circle");
     });
 
-    it("traces the outline it is given", () => {
+    it("traces the contour it is given", () => {
         const image = RevealUtils.buildHoleImage(
             40,
             1,

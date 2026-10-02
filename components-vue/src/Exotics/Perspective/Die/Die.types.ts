@@ -49,6 +49,6 @@ export type DieProps = {
 };
 
 export type DieSlots = {
-    /** Draws one face. The face's box is clipped to its outline, so the painter can simply fill it. */
+    /** Draws one face. The face's box is clipped to its contour, so the painter can simply fill it. */
     renderFace: (props: { index: number; state: DieFaceState }) => VNodeChild;
 };

@@ -219,7 +219,7 @@ const examples: ExampleDefs[] = [
                 />
             </PageProp>
 
-            <PageProp item-key="shapeKind" label="Item shape" hint="The outline each item is cut to.">
+            <PageProp item-key="shapeKind" label="Item shape" hint="The contour each item is cut to.">
                 <PageSelectField
                     :value="shapeKind"
                     :values="ShapeConst.DEFAULT_SHAPES"

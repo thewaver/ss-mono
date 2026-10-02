@@ -12,13 +12,13 @@ const DODECAGON_SIDES = 12;
 const MIN_TANGENT_COS_GAP = 1e-9;
 const MAX_TANGENT_LENGTH_FACTOR = 1e6;
 
-/** The outer and inner outlines of a shape, as both SVG path text and raw points. */
+/** The outer and inner contours of a shape, as both SVG path text and raw points. */
 type ShapePaths = {
     innerPath: string;
     innerPoints: Point2d[];
     outerPath: string;
     outerPoints: Point2d[];
-    outerOutline: Point2d[];
+    outerContour: Point2d[];
 };
 
 /**
@@ -318,16 +318,16 @@ export namespace ShapeUtils {
      * This is the groundwork behind {@link getPaths}: it shrinks any corner radii that
      * would overrun their edge, finds the direction each edge runs in and which way is
      * "outwards", and offsets the corners to give the outer and inner walls of a thick
-     * outline. Most callers want {@link getPaths} instead.
+     * contour. Most callers want {@link getPaths} instead.
      *
      * @param vertices The shape's corners, in order.
-     * @param edgeThicknesses Outline thickness per edge. Short lists are padded by
+     * @param edgeThicknesses Stroke thickness per edge. Short lists are padded by
      * repeating the last entry, CSS-shorthand style.
      * @param joinRadii Corner radius per corner, padded the same way. Radii too large
      * for their edge are scaled down together so neighbors never overlap.
      * @param lameExponents Corner style per corner. See
      * {@link ShapeConst.CORNER_SHAPE_LAME_EXPONENTS}.
-     * @param offset Pushes the whole outline outwards. Negative pulls it in.
+     * @param offset Pushes the whole contour outwards. Negative pulls it in.
      * @returns The outer and inner walls, the padded inputs, and the per-edge
      * directions. Fewer than three corners gives a filled-in but empty result.
      */
@@ -500,8 +500,8 @@ export namespace ShapeUtils {
     };
 
     /**
-     * Builds the SVG outlines for a shape with rounded, beveled or scooped corners and
-     * an optional thick outline.
+     * Builds the SVG contours for a shape with rounded, beveled or scooped corners and
+     * an optional thick stroke.
      *
      * Corners are drawn as superellipse curves, the same family of curves CSS
      * `corner-shape` uses, so a shape here can be made to match a CSS-styled box.
@@ -512,16 +512,16 @@ export namespace ShapeUtils {
      * the memory needs reclaiming.
      *
      * @param vertices The shape's corners, in order.
-     * @param edgeThicknesses Outline thickness per edge. Short lists are padded by
-     * repeating the last entry, CSS-shorthand style. All zeroes means no outline, and
+     * @param edgeThicknesses Stroke thickness per edge. Short lists are padded by
+     * repeating the last entry, CSS-shorthand style. All zeroes means no stroke, and
      * the inner path then matches the outer one.
      * @param joinRadii Corner radius per corner, padded the same way.
      * @param lameExponents Corner style per corner. See
      * {@link ShapeConst.CORNER_SHAPE_LAME_EXPONENTS}.
-     * @param offset Pushes the whole outline outwards. Negative pulls it in.
-     * @returns Path text for the outer and inner outlines plus the points behind them.
+     * @param offset Pushes the whole contour outwards. Negative pulls it in.
+     * @returns Path text for the outer and inner contours plus the points behind them.
      * `outerPoints` and `innerPoints` hold only where each rounded corner starts and
-     * ends; `outerOutline` holds every point the outer path is drawn through, curves
+     * ends; `outerContour` holds every point the outer path is drawn through, curves
      * included, so a polygon built from it follows the painted edge. Fewer than three
      * corners gives empty strings and empty lists.
      */
@@ -536,7 +536,7 @@ export namespace ShapeUtils {
         const vertexCount = vertices.length;
 
         if (vertexCount < 3)
-            return { outerPath: "", innerPath: "", outerPoints: [], innerPoints: [], outerOutline: [] };
+            return { outerPath: "", innerPath: "", outerPoints: [], innerPoints: [], outerContour: [] };
 
         const cacheKey = JSON.stringify({ vertices, edgeThicknesses, joinRadii, lameExponents, offset });
         const cached = pathCache.get(cacheKey);
@@ -625,13 +625,13 @@ export namespace ShapeUtils {
                 innerPath,
                 outerPoints: outer.vertices,
                 innerPoints,
-                outerOutline: outer.vertices,
+                outerContour: outer.vertices,
             });
         }
 
         const { unitTangents, unitNormals, crossChecks } = vectors;
         const outerPathSegments: string[] = [];
-        const outerOutline: Point2d[] = [];
+        const outerContour: Point2d[] = [];
         const outerStartPoints: Point2d[] = [];
         const outerEndPoints: Point2d[] = [];
         const innerPathSegments: string[] = [];
@@ -687,9 +687,9 @@ export namespace ShapeUtils {
             );
 
             for (const point of outerPts) {
-                const last = outerOutline.at(-1);
+                const last = outerContour.at(-1);
 
-                if (!last || last.x !== point.x || last.y !== point.y) outerOutline.push(point);
+                if (!last || last.x !== point.x || last.y !== point.y) outerContour.push(point);
             }
 
             const outerStr = outerPts.map((p) => `L ${p.x.toFixed(3)} ${p.y.toFixed(3)}`).join(" ");
@@ -788,19 +788,19 @@ export namespace ShapeUtils {
             innerPath: `${innerPath} Z`,
             outerPoints,
             innerPoints,
-            outerOutline,
+            outerContour,
         });
     };
 
     /**
      * Works out how much padding a rectangle needs to keep its content clear of
-     * rounded corners and a thick outline.
+     * rounded corners and a thick stroke.
      *
      * A rounded corner eats into the box diagonally, so content pushed tight against
      * the edge would clip. This returns per-side padding that accounts for both the
-     * corner curve and the outline thickness.
+     * corner curve and the stroke thickness.
      *
-     * @param edgeThicknesses Outline thickness per side, in CSS order: top, right,
+     * @param edgeThicknesses Stroke thickness per side, in CSS order: top, right,
      * bottom, left. Short lists are padded by repeating the last entry.
      * @param joinRadii Corner radius per corner, padded the same way.
      * @param lameExponents Corner style per corner. See
@@ -850,7 +850,7 @@ export namespace ShapeUtils {
      * frame.
      *
      * @param size The box the shape is drawn in.
-     * @param innerPoints The shape's inner outline, as returned by {@link getPaths}.
+     * @param innerPoints The shape's inner contour, as returned by {@link getPaths}.
      * @returns CSS padding, ready to spread onto a style object.
      */
 

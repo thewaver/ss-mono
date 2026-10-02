@@ -35,10 +35,20 @@ type LineBreakSegment = {
     type: Extract<SegmentType, "linebreak">;
 };
 
-/** An element carried through whole, such as an image or icon, which cannot be split. */
+/**
+ * An element carried through whole, such as an image or icon, which cannot be split.
+ *
+ * `element` is a detached copy, which has no size of its own until it is put back in a page, so `width` and
+ * `height` are the original's, read while it was still laid out. They are layout pixels, the same units text is
+ * measured in, whatever scale an ancestor draws the page at. An inline copy is pinned to that size and to the
+ * original's vertical alignment, since a style that reached the original through its parent does not reach a copy
+ * placed somewhere else.
+ */
 type AtomicElementSegment = {
     type: Extract<SegmentType, "atomic">;
     element: HTMLElement;
+    width: number;
+    height: number;
     isBlockLike?: boolean;
 };
 
@@ -52,6 +62,28 @@ const lineBreakToken: LineBreakSegment = { type: "linebreak" };
  * identity, so the walk can tell a break the content asked for from one it inferred.
  */
 const structuralLineBreakToken: LineBreakSegment = { type: "linebreak" };
+
+/**
+ * Elements whose children are not text a reader would see as text, so the walk copies them whole instead of
+ * walking into them: an `<svg>`'s shapes mean nothing apart, and a `<video>`'s `<source>` or a `<select>`'s
+ * `<option>` would otherwise be spelled out as words.
+ */
+const WHOLE_ELEMENT_SELECTOR = "svg, video, audio, canvas, iframe, object, embed, select, textarea";
+
+/**
+ * Elements a copy cannot reproduce: a canvas loses what was drawn on it, media loses its playback, a frame
+ * reloads, and a form control loses its value and stops being one.
+ */
+const UNSUPPORTED_ELEMENT_SELECTOR = "canvas, video, audio, iframe, object, embed, input, select, textarea, button";
+
+const NO_SCALE = 1;
+
+/**
+ * How much larger an element is drawn on screen than it is laid out — not `1` inside a scaled ancestor. A client rect
+ * is on screen while a canvas measurement is in layout, so a rect is divided by this before the two are compared.
+ */
+const getScreenScale = (el: HTMLElement) =>
+    el.offsetWidth > 0 ? el.getBoundingClientRect().width / el.offsetWidth : NO_SCALE;
 
 /**
  * Splits text into words, built on first use.
@@ -130,7 +162,9 @@ export namespace JSXTextParserUtils {
      * the first piece or after the last, where there is nothing to separate, so the result
      * never ends on an empty line the source did not draw; `<br>` and newlines become
      * breaks in place, wherever they are; childless elements such as images are carried
-     * through whole as a copy.
+     * through whole as a copy, and so are an `<svg>`, media, frames, `<select>` and
+     * `<textarea>`, whose children are not text, along with the size the original
+     * was laid out at.
      *
      * Inherited properties are weighed against `el` itself rather than against each
      * piece's own parent, since `el` is the context the result will be redrawn in — so a
@@ -148,6 +182,7 @@ export namespace JSXTextParserUtils {
 
         const tokens: ElementSegment[] = [];
         const baselineStyle = el.nodeType === Node.ELEMENT_NODE ? getComputedStyle(el as Element) : undefined;
+        const scale = el instanceof HTMLElement ? getScreenScale(el) : NO_SCALE;
 
         const pushStructuralLineBreak = () => {
             if (tokens.at(-1)?.type === "linebreak") return;
@@ -199,10 +234,26 @@ export namespace JSXTextParserUtils {
             const computed = getComputedStyle(element);
             const isBlockLike = CSSUtils.isBlockLike(computed.display);
 
-            if (element.childNodes.length === 0 && computed.display !== "contents") {
+            if (
+                (element.childNodes.length === 0 && computed.display !== "contents") ||
+                element.matches(WHOLE_ELEMENT_SELECTOR)
+            ) {
+                const box = element.getBoundingClientRect();
+                const width = box.width / scale;
+                const height = box.height / scale;
+                const copy = node.cloneNode(true) as HTMLElement;
+
+                if (!isBlockLike) {
+                    copy.style.width = `${width}px`;
+                    copy.style.height = `${height}px`;
+                    copy.style.verticalAlign = computed.verticalAlign;
+                }
+
                 tokens.push({
                     type: "atomic",
-                    element: node.cloneNode(true) as HTMLElement,
+                    element: copy,
+                    width,
+                    height,
                     isBlockLike,
                 });
             } else {
@@ -246,6 +297,24 @@ export namespace JSXTextParserUtils {
         if (tokens.at(-1) === structuralLineBreakToken) tokens.pop();
 
         return tokens;
+    };
+
+    /**
+     * Finds the elements inside a rendered element that {@link getSegmentTokens} cannot carry faithfully.
+     *
+     * A canvas's copy is blank, a video or audio copy starts over, a frame's copy reloads, and a form control's
+     * copy has lost its value and is no longer the control the consumer is holding. A component redrawing the
+     * text can name these to the consumer, who otherwise sees the difference with no explanation.
+     *
+     * @param el The element the pieces are taken from.
+     * @returns The elements in document order, the element itself included, or an empty list if there is none.
+     */
+    export const findUnsupportedElements = (el: Element | undefined): readonly Element[] => {
+        if (!el) return EMPTY_ARRAY;
+
+        const found = Array.from(el.querySelectorAll(UNSUPPORTED_ELEMENT_SELECTOR));
+
+        return el.matches(UNSUPPORTED_ELEMENT_SELECTOR) ? [el, ...found] : found;
     };
 
     /**
@@ -349,9 +418,7 @@ export namespace JSXTextParserUtils {
                     for (const token of segment) {
                         addToken(
                             token,
-                            (token as AtomicElementSegment).isBlockLike
-                                ? width
-                                : (token as AtomicElementSegment).element.offsetWidth,
+                            (token as AtomicElementSegment).isBlockLike ? width : (token as AtomicElementSegment).width,
                         );
                     }
 

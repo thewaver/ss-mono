@@ -2,26 +2,19 @@
 import { computed, shallowRef } from "vue";
 
 import type { SVGDefsColors } from "@thewaver/ss-components-vue";
-import { SVGDefsSamples, TimedGradientDefaults } from "@thewaver/ss-components-vue";
-import {
-    NO_SAMPLE_KEY,
-    splitEntriesIntoGroups,
-    toGroupEntriesWithNoSample,
-} from "@thewaver/ss-playground/App/PageComponents/SampleGroups/SampleGroups.const";
-import type { WithNoSample } from "@thewaver/ss-playground/App/PageComponents/SampleGroups/SampleGroups.types";
+import { SVGDefsSamples } from "@thewaver/ss-components-vue";
 import * as styles from "@thewaver/ss-playground/App/Pages/ShapePage/ShapePage.css";
 import { assignInlineVars } from "@vanilla-extract/dynamic";
 
 import { ShapeKnobs } from "../../Knobs/Shapes.const";
-import { TimedGradientKnobs } from "../../Knobs/TimedGradients.const";
 import type { ExampleDefs } from "../../PageComponents/Examples/Examples.types";
 import PageExamples from "../../PageComponents/Examples/PageExamples.vue";
 import PageColorField from "../../PageComponents/Field/PageColorField.vue";
-import PageGroupedSelectField from "../../PageComponents/Field/PageGroupedSelectField.vue";
 import PageNumberField from "../../PageComponents/Field/PageNumberField.vue";
 import PageSelectField from "../../PageComponents/Field/PageSelectField.vue";
-import type { Knob } from "../../PageComponents/Knobs/Knobs.types";
-import PageKnobs from "../../PageComponents/Knobs/Knobs.vue";
+import PagePaintPicker from "../../PageComponents/PaintPicker/PagePaintPicker.vue";
+import { getIsUsingKind } from "../../PageComponents/PaintPicker/PaintPicker.const";
+import { usePaintSlot } from "../../PageComponents/PaintPicker/PaintPicker.utils";
 import PageProp from "../../PageComponents/Prop/Prop.vue";
 import PagePropsDivider from "../../PageComponents/PropsPanel/PagePropsDivider.vue";
 import PagePropsGroups from "../../PageComponents/PropsPanel/PagePropsGroups.vue";
@@ -32,41 +25,23 @@ import type { ShapeExampleProps } from "./ShapePage.types";
 import StressTestWrapper from "./StressTestWrapper.vue";
 import TextWrapExampleWrapper from "./TextWrapExampleWrapper.vue";
 
-const GROUPPED_GRADIENTS = splitEntriesIntoGroups(SVGDefsSamples.Gradient.Timed.SAMPLE_ENTRIES);
-const GROUPPED_PATTERNS = splitEntriesIntoGroups(SVGDefsSamples.Pattern.SAMPLE_CONFIGS);
-
-const STROKE_GROUPS = toGroupEntriesWithNoSample(GROUPPED_GRADIENTS);
-const FILL_GROUPS = toGroupEntriesWithNoSample(GROUPPED_PATTERNS);
-
 const EXAMPLES_ROOT = "/src/App/Pages/ShapePage/Examples";
 const DEFAULT_EXAMPLE_PATH = `${EXAMPLES_ROOT}/Default.vue`;
 
 const blurWidth = shallowRef(ShapeKnobs.STARTING_BLUR_WIDTH);
 const animationDurationMs = shallowRef(ShapeKnobs.STARTING_DURATION_MS);
 const edgeThickness = shallowRef(ShapeKnobs.STARTING_EDGE_THICKNESS);
-const strokeConfigKey = shallowRef<WithNoSample<SVGDefsSamples.Gradient.Timed.SampleKey>>(
-    ShapeKnobs.STARTING_GRADIENT_KEY,
-);
-const strokeConfigDefsByKey = shallowRef<Record<string, Record<string, number | boolean>>>({});
+const stroke = usePaintSlot(ShapeKnobs.STARTING_STROKE_PAINT_KIND);
+const fill = usePaintSlot(ShapeKnobs.STARTING_FILL_PAINT_KIND);
 
-const strokeKnobs = computed(() =>
-    strokeConfigKey.value === NO_SAMPLE_KEY
-        ? {}
-        : (TimedGradientKnobs.KNOBS_BY_FAMILY[strokeConfigKey.value] as Record<string, Knob>),
-);
-const strokeDefaults = computed(() =>
-    strokeConfigKey.value === NO_SAMPLE_KEY
-        ? {}
-        : (TimedGradientDefaults.DEFAULTS_BY_FAMILY[strokeConfigKey.value] as Record<string, unknown>),
-);
-const strokeConfigDefs = computed(() => strokeConfigDefsByKey.value[strokeConfigKey.value] ?? {});
-
-const fillConfigKey = shallowRef<WithNoSample<SVGDefsSamples.Pattern.SampleKey>>(NO_SAMPLE_KEY);
 const iterationConfigKey = shallowRef<SVGDefsSamples.Iteration.SampleKey>(ShapeKnobs.STARTING_ITERATION_KEY);
 const cellSize = shallowRef(ShapeKnobs.STARTING_CELL_SIZE);
 const colors = shallowRef<SVGDefsColors>({ ...SVGDefsSamples.SAMPLE_COLORS });
 
 const colorKeys = computed(() => Object.keys(colors.value) as (keyof SVGDefsColors)[]);
+
+const usesPattern = computed(() => getIsUsingKind([stroke.paint.value, fill.paint.value], ["pattern"]));
+const usesTiming = computed(() => getIsUsingKind([stroke.paint.value, fill.paint.value], ["pattern", "timed"]));
 
 const commonProps = computed((): ShapeExampleProps => ({
     shouldClipChildren: ShapeKnobs.STARTING_SHOULD_CLIP_CHILDREN,
@@ -75,24 +50,14 @@ const commonProps = computed((): ShapeExampleProps => ({
     animationDurationMs: animationDurationMs.value,
     colors: colors.value,
     shapeKind: ShapeKnobs.STARTING_SHAPE_KIND,
-    strokeConfigKey: strokeConfigKey.value,
-    strokeConfigDefs: strokeConfigDefs.value,
-    fillConfigKey: fillConfigKey.value,
+    strokePaint: stroke.paint.value,
+    fillPaint: fill.paint.value,
     iterationConfigKey: iterationConfigKey.value,
     cellSize: { width: cellSize.value, height: cellSize.value },
     edgeThicknesses: [edgeThickness.value],
     joinRadii: ShapeKnobs.STARTING_JOIN_RADII,
     lameExponents: ShapeKnobs.STARTING_LAME_EXPONENTS,
 }));
-
-const setStrokeConfigDef = (key: string, value: number | boolean) => {
-    const previous = strokeConfigDefsByKey.value;
-
-    strokeConfigDefsByKey.value = {
-        ...previous,
-        [strokeConfigKey.value]: { ...previous[strokeConfigKey.value], [key]: value },
-    };
-};
 
 const setColor = (key: keyof SVGDefsColors, value: string) => {
     colors.value = { ...colors.value, [key]: value };
@@ -108,14 +73,14 @@ const examples: ExampleDefs[] = [
         key: "morph",
         name: "Morph",
         readout: () =>
-            "one number from 0 to 1 is read inside computePoints and blends two outlines of twice the star-point count each, their corner radii and their exponents with them; under reduced motion the press jumps straight to the other shape",
+            "one number from 0 to 1 is read inside computePoints and blends two contours of twice the star-point count each, their corner radii and their exponents with them; under reduced motion the press jumps straight to the other shape",
         path: `${EXAMPLES_ROOT}/Morph.vue`,
     },
     {
         key: "textWrap",
         name: "Text Wrap",
         readout: () =>
-            "the shape writes its outline as shape-outside, so floating it is all the page does for the text to follow the edge",
+            "the shape writes its contour as shape-outside, so floating it is all the page does for the text to follow the edge",
         path: `${EXAMPLES_ROOT}/TextWrap.vue`,
     },
     {
@@ -128,62 +93,45 @@ const examples: ExampleDefs[] = [
 <template>
     <div :class="styles.root" :style="assignInlineVars({ [styles.backgroundColor]: colors.background })">
         <PagePropsGroups>
-            <PagePropsPanel scope="sample">
-                <PageProp
-                    item-key="strokeConfigKey"
-                    label="Stroke Pattern"
-                    hint="Which animated gradient paints the shape's outline. Choosing one brings its own knobs with it."
-                >
-                    <PageGroupedSelectField
-                        :value="strokeConfigKey"
-                        :groups="STROKE_GROUPS"
-                        ariaLabel="Stroke pattern"
-                        @change="(value) => (strokeConfigKey = value)"
-                    />
-                </PageProp>
+            <PagePaintPicker
+                :paint-slot="stroke"
+                name="stroke"
+                label="Stroke"
+                hint="What paints the shape's stroke: nothing but its flat color, a pattern, or a gradient that runs on a clock or follows the pointer."
+            />
 
-                <PageKnobs
-                    :knobs="strokeKnobs"
-                    :defaults="strokeDefaults"
-                    :values="strokeConfigDefs"
-                    @input="setStrokeConfigDef"
-                />
-            </PagePropsPanel>
+            <PagePropsDivider />
+
+            <PagePaintPicker
+                :paint-slot="fill"
+                name="fill"
+                label="Fill"
+                hint="What paints the shape's inside: nothing but its flat color, a pattern, or a gradient that runs on a clock or follows the pointer."
+            />
 
             <PagePropsDivider />
 
             <PagePropsPanel scope="global">
                 <PageProp
-                    item-key="fillConfigKey"
-                    label="Fill Pattern"
-                    hint="Which repeating pattern fills the shape's inside. Choosing one brings its own knobs with it."
-                >
-                    <PageGroupedSelectField
-                        :value="fillConfigKey"
-                        :groups="FILL_GROUPS"
-                        ariaLabel="Fill pattern"
-                        @change="(value) => (fillConfigKey = value)"
-                    />
-                </PageProp>
-
-                <PageProp
+                    v-if="usesPattern"
                     item-key="cellSize"
-                    label="Fill Cell Size (px)"
-                    hint="How large one tile of the fill pattern is before it repeats."
+                    label="Pattern Cell Size (px)"
+                    hint="How large one tile of a pattern is before it repeats."
                 >
                     <PageNumberField
                         :value="cellSize"
                         :min="ShapeKnobs.MIN_CELL_SIZE"
                         :max="ShapeKnobs.MAX_CELL_SIZE"
                         :step="ShapeKnobs.CELL_SIZE_STEP"
-                        ariaLabel="Fill cell size"
+                        ariaLabel="Pattern cell size"
                         @input="(value: number) => (cellSize = value)"
                     />
                 </PageProp>
+
                 <PageProp
                     item-key="colors"
                     label="Colors"
-                    hint="The colors the outline, the fill and the page's own background are painted from."
+                    hint="The colors the stroke, the fill and the page's own background are painted from."
                 >
                     <div :class="styles.colorList">
                         <PageColorField
@@ -196,7 +144,7 @@ const examples: ExampleDefs[] = [
                     </div>
                 </PageProp>
 
-                <PageProp item-key="edgeThicknessPx" label="Edge Thickness (px)" hint="How thick the outline is.">
+                <PageProp item-key="edgeThicknessPx" label="Edge Thickness (px)" hint="How thick the stroke is.">
                     <PageNumberField
                         :value="edgeThickness"
                         :min="ShapeKnobs.MIN_EDGE_THICKNESS"
@@ -210,7 +158,7 @@ const examples: ExampleDefs[] = [
                 <PageProp
                     item-key="blurWidth"
                     label="Blur (px)"
-                    hint="How far the outline is blurred outward, which is what gives it its glow."
+                    hint="How far the stroke is blurred outward, which is what gives it its glow."
                 >
                     <PageNumberField
                         :value="blurWidth"
@@ -223,6 +171,7 @@ const examples: ExampleDefs[] = [
                 </PageProp>
 
                 <PageProp
+                    v-if="usesTiming"
                     item-key="animationDurationMs"
                     label="Animation duration (ms)"
                     hint="How long one pass of the stroke or fill animation takes."
@@ -238,6 +187,7 @@ const examples: ExampleDefs[] = [
                 </PageProp>
 
                 <PageProp
+                    v-if="usesTiming"
                     item-key="iterationConfigKey"
                     label="Iteration Pattern"
                     hint="How the animation repeats: once, endlessly, or back and forth."

@@ -137,9 +137,10 @@ export const LIBRARY: TreemapNode<string> = branch(
         branch(
             "Text",
             leaf("Odometer", 750),
+            leaf("PaintedText", 622),
             leaf("RichText", 341),
             leaf("ScrambleText", 513),
-            leaf("Typewriter", 661),
+            leaf("Typewriter", 702),
         ),
         leaf("TileBoard", 1284),
         leaf("Trail", 437),
@@ -204,5 +205,5 @@ export const LIBRARY: TreemapNode<string> = branch(
         branch("Staircase", leaf("Indents", 49)),
     ),
     leaf("Utils", 112),
-    leaf("src files", 1018),
+    leaf("src files", 1024),
 );

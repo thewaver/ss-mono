@@ -6,12 +6,12 @@ import { useLayerClass } from "../Layer/Layer.context";
 import type { SortableGridLandingProps } from "./SortableGridContent.types";
 
 const getBox = (geometry: SortableGridGeometry) => ({
-    width: Math.max(...geometry.outline.map((point) => point.x)),
-    height: Math.max(...geometry.outline.map((point) => point.y)),
+    width: Math.max(...geometry.contour.map((point) => point.x)),
+    height: Math.max(...geometry.contour.map((point) => point.y)),
 });
 
 const getPoints = (geometry: SortableGridGeometry) =>
-    geometry.outline.map((point) => `${point.x},${point.y}`).join(" ");
+    geometry.contour.map((point) => `${point.x},${point.y}`).join(" ");
 
 const getViewBox = (geometry: SortableGridGeometry) => {
     const box = getBox(geometry);
@@ -30,6 +30,6 @@ const layerClass = useLayerClass();
         :viewBox="getViewBox(geometry)"
         aria-hidden="true"
     >
-        <polygon :class="styles.sortableGridLandingOutline" :points="getPoints(geometry)" />
+        <polygon :class="styles.sortableGridLandingContour" :points="getPoints(geometry)" />
     </svg>
 </template>

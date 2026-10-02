@@ -94,7 +94,7 @@ export const RevealPage = () => {
                 <PageProp
                     key={"computePoints"}
                     label={"Shape"}
-                    hint={"The outline of the window that follows the pointer."}
+                    hint={"The contour of the window that follows the pointer."}
                 >
                     <PageSelectField
                         value={getShape}

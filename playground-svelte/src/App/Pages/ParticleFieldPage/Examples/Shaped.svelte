@@ -23,14 +23,14 @@
 
     const shapeJoinRadii = $derived([joinRadius]);
 
-    const outlinePath = $derived(
+    const contourPath = $derived(
         ShapeUtils.getPaths(computeShapePoints(getSize()), NO_EDGE_THICKNESSES, shapeJoinRadii).outerPath,
     );
 </script>
 
 <div bind:this={root} class={styles.shapedRoot}>
-    <svg class={styles.shapeOutline} aria-hidden="true">
-        <path d={outlinePath} />
+    <svg class={styles.shapeContour} aria-hidden="true">
+        <path d={contourPath} />
     </svg>
 
     <DefaultExample {...otherProps} bind:playback {computeShapePoints} {shapeJoinRadii} />

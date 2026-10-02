@@ -25,15 +25,15 @@ export const ShapedExample = ({
 
     const shapeJoinRadii = useMemo(() => [joinRadius], [joinRadius]);
 
-    const outlinePath = useMemo(
+    const contourPath = useMemo(
         () => ShapeUtils.getPaths(computeShapePoints(size), NO_EDGE_THICKNESSES, shapeJoinRadii).outerPath,
         [computeShapePoints, size, shapeJoinRadii],
     );
 
     return (
         <div ref={rootRef} className={styles.shapedRoot}>
-            <svg className={styles.shapeOutline} aria-hidden="true">
-                <path d={outlinePath} />
+            <svg className={styles.shapeContour} aria-hidden="true">
+                <path d={contourPath} />
             </svg>
 
             <DefaultExample {...otherProps} computeShapePoints={computeShapePoints} shapeJoinRadii={shapeJoinRadii} />

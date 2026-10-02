@@ -5,7 +5,7 @@ import type { GlassDefs, PartialGlassDefs } from "./Glass.types";
 
 /** How far a blur spreads relative to its radius. Three standard deviations covers effectively all of it. */
 const BLUR_REACH_RATIO = 3;
-/** Asks the shape builder for an outline only, with no stroked edges. */
+/** Asks the shape builder for a contour only, with no stroked edges. */
 const NO_EDGE_THICKNESSES = [0];
 
 /** Builds the id of an instance's tint gradient. Published as {@link GlassUtils.getTintGradientId}. */
@@ -65,7 +65,7 @@ export namespace GlassUtils {
      * @param joinRadii The corner radii, clockwise from the top left.
      * @param lameExponents How square each corner is: `2` is a circular arc, higher is squarer, lower
      * is pointier.
-     * @returns The outline as an SVG path.
+     * @returns The contour as an SVG path.
      */
     export const computeMarginedClipPath = (
         size: Size2d,

@@ -1,6 +1,7 @@
 import type { SVGDefsSamples } from "@thewaver/ss-components-react";
-import type { WithNoSample } from "@thewaver/ss-playground/App/PageComponents/SampleGroups/SampleGroups.types";
 import type { ShapeConst } from "@thewaver/ss-utils";
+
+import type { PaintKind } from "../PageComponents/PaintPicker/PaintPicker.types";
 
 export namespace ShapeKnobs {
     export const MIN_EDGE_THICKNESS = 0;
@@ -36,7 +37,8 @@ export namespace ShapeKnobs {
     export const STARTING_STAR_POINTS = 4;
     export const STARTING_JOIN_RADII: number[] = [40, 40, 40, 40, 40, 40];
     export const STARTING_LAME_EXPONENTS: number[] = [1, 1, 1, 1, 1, 1];
-    export const STARTING_GRADIENT_KEY: WithNoSample<SVGDefsSamples.Gradient.Timed.SampleKey> = "sweep_diag_1v1";
+    export const STARTING_STROKE_PAINT_KIND: PaintKind = "timed";
+    export const STARTING_FILL_PAINT_KIND: PaintKind = "none";
     export const STARTING_ITERATION_KEY: SVGDefsSamples.Iteration.SampleKey = "constant";
     export const DURATION_STEP_MS = 100;
 }

@@ -71,6 +71,7 @@ const MultiSelectPage = lazyPage(() => import("./Pages/MultiSelectPage/MultiSele
 const NumberInputPage = lazyPage(() => import("./Pages/NumberInputPage/NumberInputPage"), "NumberInputPage");
 const OdometerPage = lazyPage(() => import("./Pages/OdometerPage/OdometerPage"), "OdometerPage");
 const PaginatorPage = lazyPage(() => import("./Pages/PaginatorPage/PaginatorPage"), "PaginatorPage");
+const PaintedTextPage = lazyPage(() => import("./Pages/PaintedTextPage/PaintedTextPage"), "PaintedTextPage");
 const ParticleFieldPage = lazyPage(() => import("./Pages/ParticleFieldPage/ParticleFieldPage"), "ParticleFieldPage");
 const ParticleSpawnerPage = lazyPage(
     () => import("./Pages/ParticleSpawnerPage/ParticleSpawnerPage"),
@@ -945,7 +946,7 @@ export const MENU_CONFIGS: MenuBranchConfig[] = [
                     {
                         name: "Die",
                         description:
-                            "Any convex solid built from flat faces — the six tabletop dice and a hundred-sided one ship as samples — turned in 3D so one face is towards the viewer. A roll asks the page which face to land on, tumbles, and lands on it the right way up, then says which face came up; the face can also be set directly, and the die turns there without tumbling. Every face is a real element clipped to its outline, which is cheap for a die and does not scale to a sphere.",
+                            "Any convex solid built from flat faces — the six tabletop dice and a hundred-sided one ship as samples — turned in 3D so one face is towards the viewer. A roll asks the page which face to land on, tumbles, and lands on it the right way up, then says which face came up; the face can also be set directly, and the die turns there without tumbling. Every face is a real element clipped to its contour, which is cheap for a die and does not scale to a sphere.",
                         component: () => <DiePage />,
                     },
                     {
@@ -1016,6 +1017,12 @@ export const MENU_CONFIGS: MenuBranchConfig[] = [
                         description:
                             "A number where each digit is a column that turns to its new value, so a change reads as travel rather than a swap. The columns turn the way the number is going, so nine to zero keeps going forward instead of rewinding, and a column waits for every column to its right that is also carrying. It takes the text rather than the number, so a separator is a slot that never turns and the component owns no locale.",
                         component: () => <OdometerPage />,
+                    },
+                    {
+                        name: "PaintedText",
+                        description:
+                            "Text painted with the same gradients, patterns and filters as Shape: as a fill, as a stroke, or both. It wraps where Typewriter would wrap it, and the paint is sized to the whole block, so one gradient runs across every line rather than restarting on each. The stroke sits outside the letters, inside them or across their edge, and its width is the width you see whichever is chosen. Images, icons and links in the text are carried into the drawing.",
+                        component: () => <PaintedTextPage />,
                     },
                     {
                         name: "RichText",

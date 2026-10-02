@@ -45,7 +45,7 @@ export const Shape = (props: ShapeProps) => {
         ),
     );
 
-    const getShapeOutside = createMemo(() => ShapeLayerUtils.computeShapeOutside(getPaths()[0].outerOutline));
+    const getShapeOutside = createMemo(() => ShapeLayerUtils.computeShapeOutside(getPaths()[0].outerContour));
 
     onMount(() => {
         let rootResizeObserver: ResizeObserver | undefined;

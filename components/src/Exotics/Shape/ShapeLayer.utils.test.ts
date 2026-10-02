@@ -7,14 +7,14 @@ import { ShapeLayerUtils } from "./ShapeLayer.utils";
 const SQUARE = ShapeConst.getDefaultShapePoints("square", { width: 100, height: 50 });
 
 describe("ShapeLayerUtils.computeLayerPaths", () => {
-    it("draws one outline, the shape's own, when there are no strokes", () => {
+    it("draws one contour, the shape's own, when there are no strokes", () => {
         const paths = ShapeLayerUtils.computeLayerPaths(SQUARE, undefined, undefined, undefined, undefined);
 
         expect(paths).toHaveLength(1);
         expect(paths[0].outerPath.startsWith("M ")).toBe(true);
     });
 
-    it("draws one outline per stroke, sharing it between strokes whose geometry agrees", () => {
+    it("draws one contour per stroke, sharing it between strokes whose geometry agrees", () => {
         const paths = ShapeLayerUtils.computeLayerPaths(
             SQUARE,
             ["a", "b", "c"],
@@ -39,7 +39,7 @@ describe("ShapeLayerUtils.computeLayerPaths", () => {
 });
 
 describe("ShapeLayerUtils.computeShapeOutside", () => {
-    it("wraps content around the outline, and around nothing when too few points enclose nothing", () => {
+    it("wraps content around the contour, and around nothing when too few points enclose nothing", () => {
         expect(
             ShapeLayerUtils.computeShapeOutside([
                 { x: 0, y: 0 },

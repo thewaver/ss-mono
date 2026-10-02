@@ -14,14 +14,14 @@ export type ShapeProps = AccessorProps<{
      * inward.
      */
     lameExponents?: number[];
-    /** How the outline is drawn along each edge. */
+    /** How the stroke is drawn along each edge. */
     strokeGeom?: ShapeStrokeGeom[];
-    /** The corners of the outline, worked out from the element's size. */
+    /** The corners of the contour, worked out from the element's size. */
     computePoints: (size: Size2d) => Point2d[];
-    /** The paint for the outline, which may build its own SVG definitions. */
+    /** The paint for the stroke, which may build its own SVG definitions. */
     computeStrokeDefs?: (getSize: () => Size2d, getRef: () => HTMLElement | undefined) => SVGDefs[];
     /** The paint for the inside, which may build its own SVG definitions. */
     computeFillDefs?: (getSize: () => Size2d, getRef: () => HTMLElement | undefined) => SVGDefs[];
-    /** Draws whatever sits inside the shape, and is handed the clip path so it can cut itself to the outline. */
+    /** Draws whatever sits inside the shape, and is handed the clip path so it can cut itself to the contour. */
     renderChildren: (getSize: () => Size2d, getClipPath: () => string, getClipPoints: () => Point2d[]) => JSX.Element;
 }>;

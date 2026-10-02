@@ -235,6 +235,22 @@ Where a framework makes the same name impossible, the fallback is the framework'
 same name, rather than a new name — Vue reserves `ref`, so a Vue consumer reaches the element through the
 component's `$el` rather than through a prop called something else.
 
+### "Outline" means the focus indicator; paint along an edge is a "stroke", and the edge itself is a "contour"
+
+Stated by the user, in those terms, after a new text component's controls and docs called its stroke an
+outline. CSS already owns the word: `outline` is the property a focus ring is drawn with, and the library's own
+`isFocusVisible` ring is one. Using it for anything else gives one word to things a reader has to keep apart on
+the same control. So:
+
+- **Stroke** is paint drawn along an edge — SVG's `stroke`, a sample painting a shape's border, a ring around a
+  carried item. The prop names (`computeStrokeDefs`, `strokeWidth`) already said so.
+- **Contour** is the edge as geometry — the closed path a shape, a tile, a die face or a particle area is cut to,
+  whether or not anything paints it. Not "edge", which already means one side of a polygon here
+  (`edgeThicknesses`, "along each edge").
+- **Outline** stays for the focus indicator and the CSS property, and for one more sense the user kept on purpose:
+  a **document outline**, the heading structure a table of contents walks and an accordion's heading level keeps
+  correct, since that is the term HTML itself uses.
+
 ### When a function grows a sibling, both names get the distinguishing word
 
 Stated by the user when `trackSwipe` grew a second form that claims both axes: the cheap move is to add

@@ -39,8 +39,8 @@ export namespace RevealUtils {
      *
      * @param radius Half the window's width and height.
      * @param softness `0` for a fade as wide as the window, `1` for a hard edge.
-     * @param computePoints The window's outline, worked out from its size. Left out, a circle.
-     * @param joinRadii How far each corner of the outline is rounded, as `Shape` takes it.
+     * @param computePoints The window's contour, worked out from its size. Left out, a circle.
+     * @param joinRadii How far each corner of the contour is rounded, as `Shape` takes it.
      * @param lameExponents How square or pinched each rounded corner is, as `Shape` takes it.
      * @returns A value ready for `mask-image`, quoted, since the data carries characters an unquoted `url()` refuses.
      */

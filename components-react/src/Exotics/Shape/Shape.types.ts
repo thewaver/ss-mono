@@ -13,12 +13,12 @@ export type ShapeProps = {
      * inward.
      */
     lameExponents?: number[];
-    /** How the outline is drawn along each edge. */
+    /** How the stroke is drawn along each edge. */
     strokeGeom?: ShapeStrokeGeom[];
-    /** The corners of the outline, worked out from the element's size. */
+    /** The corners of the contour, worked out from the element's size. */
     computePoints: (size: Size2d) => Point2d[];
     /**
-     * The paint for the outline, which may build its own SVG definitions. It is handed the element's size and the
+     * The paint for the stroke, which may build its own SVG definitions. It is handed the element's size and the
      * element itself, which is `undefined` until the shape has mounted.
      */
     computeStrokeDefs?: (size: Size2d, element: HTMLElement | undefined) => SVGDefs[];
@@ -27,6 +27,6 @@ export type ShapeProps = {
      * element itself, which is `undefined` until the shape has mounted.
      */
     computeFillDefs?: (size: Size2d, element: HTMLElement | undefined) => SVGDefs[];
-    /** Draws whatever sits inside the shape, and is handed the clip path so it can cut itself to the outline. */
+    /** Draws whatever sits inside the shape, and is handed the clip path so it can cut itself to the contour. */
     renderChildren: (size: Size2d, clipPath: string, clipPoints: Point2d[]) => ReactNode;
 };

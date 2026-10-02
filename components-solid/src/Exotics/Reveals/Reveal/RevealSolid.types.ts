@@ -29,7 +29,7 @@ export type RevealProps = AccessorProps<{
      * element with no name is announced as nothing at all.
      */
     ariaLabel: string;
-    /** The outline of the window, worked out from the element's size. */
+    /** The contour of the window, worked out from the element's size. */
     computePoints?: (size: Size2d) => Point2d[];
     /** Draws what is underneath, waiting to be revealed. */
     renderContent: () => JSX.Element;

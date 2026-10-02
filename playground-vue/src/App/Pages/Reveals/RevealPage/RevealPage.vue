@@ -89,7 +89,7 @@ const examples: ExampleDefs[] = [
             />
         </PageProp>
 
-        <PageProp item-key="computePoints" label="Shape" hint="The outline of the window that follows the pointer.">
+        <PageProp item-key="computePoints" label="Shape" hint="The contour of the window that follows the pointer.">
             <PageSelectField
                 :value="shape"
                 :values="RevealKnobs.SHAPES"

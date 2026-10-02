@@ -226,7 +226,7 @@
             />
         </PageProp>
 
-        <PageProp itemKey={"shapeKind"} label={"Item shape"} hint={"The outline each item is cut to."}>
+        <PageProp itemKey={"shapeKind"} label={"Item shape"} hint={"The contour each item is cut to."}>
             <PageSelectField
                 value={shapeKind}
                 values={ShapeConst.DEFAULT_SHAPES}

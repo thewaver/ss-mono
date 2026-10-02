@@ -15,7 +15,7 @@ export type TileBoardTileProps = AccessorProps<
     Omit<InteractionControlProps<TileBoardRenderProps>, "renderContent"> & {
         /** Which column this tile sits in. */
         colIndex: number;
-        /** The outline the tile is cut to. */
+        /** The contour the tile is cut to. */
         clipPath: string;
         /** How large the tile is. */
         size: Size2d;
@@ -35,7 +35,7 @@ export type TileBoardProps = AccessorProps<{
     tileCount: Index2d;
     /** How large one tile is. */
     tileSize: Size2d;
-    /** The outline each tile is cut to, which also decides whether rows are offset. */
+    /** The contour each tile is cut to, which also decides whether rows are offset. */
     tileShape?: ShapeConst.DefaultShape;
     /** The space between tiles. */
     gap?: number;

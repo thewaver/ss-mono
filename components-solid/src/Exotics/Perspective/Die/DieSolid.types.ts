@@ -41,7 +41,7 @@ export type DieProps = AccessorProps<{
     computeRollTarget: () => number | Promise<number>;
     /** Runs once a roll has landed, with the face it landed on. */
     onRollEnd?: (index: number) => void;
-    /** Draws one face. The face's box is clipped to its outline, so the painter can simply fill it. */
+    /** Draws one face. The face's box is clipped to its contour, so the painter can simply fill it. */
     renderFace: (getIndex: Accessor<number>, getState: Accessor<DieFaceState>) => JSX.Element;
     /** Hands the consumer a controller once the die is up, for rolling it from outside. */
     onMount?: (controller: DieController) => void;

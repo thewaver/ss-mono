@@ -84,7 +84,7 @@ const setLameExponent = (index: number, value: number) => {
     <PageProp
         item-key="shapeKind"
         label="Shape"
-        hint="The outline the shape is cut to, which also decides how many corners the corner fields offer."
+        hint="The contour the shape is cut to, which also decides how many corners the corner fields offer."
     >
         <PageSelectField
             :value="geometry.shapeKind.value"

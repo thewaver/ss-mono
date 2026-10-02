@@ -20,7 +20,7 @@ const starPoints = shallowRef(ShapeKnobs.STARTING_STAR_POINTS);
         <PageProp
             item-key="starPoints"
             label="Star points"
-            hint="How many tips the star has. The outline carries twice as many points: one per tip, one per notch between tips."
+            hint="How many tips the star has. The contour carries twice as many points: one per tip, one per notch between tips."
         >
             <PageNumberField
                 :value="starPoints"

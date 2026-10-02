@@ -32,6 +32,6 @@ export type GlassSurfaceProps = {
 );
 
 export type GlassSurfaceSlots = {
-    /** What sits behind the glass's surface and in front of what it blurs, cut to its outline. */
+    /** What sits behind the glass's surface and in front of what it blurs, cut to its contour. */
     default?: () => VNodeChild;
 };

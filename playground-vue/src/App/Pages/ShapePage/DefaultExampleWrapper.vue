@@ -30,7 +30,7 @@ const shouldPadChildren = shallowRef(ShapeKnobs.STARTING_SHOULD_PAD_CHILDREN);
         <PageProp
             item-key="shouldClipChildren"
             label="Clip children"
-            hint="Cuts whatever is inside the shape to the shape's own outline, instead of letting it spill past."
+            hint="Cuts whatever is inside the shape to the shape's own contour, instead of letting it spill past."
         >
             <PageCheckField
                 :value="shouldClipChildren"

@@ -73,7 +73,10 @@ export type TypewriterPlayer = {
     restart: (cause?: TypewriterUpdateCause) => void;
     /** Moves the caret to follow a character whose own animation has just started. */
     reportCharacterStart: (index: number) => void;
-    /** Re-measures whenever the container changes size, until the returned function is called. */
+    /**
+     * Re-measures whenever the container changes size or content, or a web font or an image in the text finishes
+     * loading, until the returned function is called.
+     */
     observe: (container: HTMLElement) => () => void;
     /** Stops the run under way, leaving it where it is. */
     stop: () => void;

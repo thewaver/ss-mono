@@ -11,12 +11,12 @@ import type { SortableGridItemContentProps } from "./SortableGridContent.types";
 const NAMED_WIDTH = 2;
 
 const getBox = (geometry: SortableGridGeometry) => ({
-    width: Math.max(...geometry.outline.map((point) => point.x)),
-    height: Math.max(...geometry.outline.map((point) => point.y)),
+    width: Math.max(...geometry.contour.map((point) => point.x)),
+    height: Math.max(...geometry.contour.map((point) => point.y)),
 });
 
 const getPoints = (geometry: SortableGridGeometry) =>
-    geometry.outline.map((point) => `${point.x},${point.y}`).join(" ");
+    geometry.contour.map((point) => `${point.x},${point.y}`).join(" ");
 
 const getViewBox = (geometry: SortableGridGeometry) => {
     const box = getBox(geometry);
@@ -44,12 +44,12 @@ const isNamed = computed(() => glyphRect.value.width >= props.geometry.cells[0].
         ]"
     >
         <svg
-            v-if="(paint ?? 'outline') === 'outline'"
+            v-if="(paint ?? 'contour') === 'contour'"
             :class="styles.sortableGridItemShape"
             :viewBox="getViewBox(geometry)"
             aria-hidden="true"
         >
-            <polygon :class="styles.sortableGridItemOutline" :points="getPoints(geometry)" />
+            <polygon :class="styles.sortableGridItemContour" :points="getPoints(geometry)" />
         </svg>
 
         <template v-else>

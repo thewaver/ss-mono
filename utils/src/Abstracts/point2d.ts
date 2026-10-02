@@ -125,7 +125,7 @@ export namespace Point2dUtils {
      *
      * Each axis is blended on its own with {@link MathUtils.lerp}, so it carries the same guarantees:
      * no clamping, so a ratio outside `0..1` carries on past either end, and a ratio of `0` answers
-     * `from` exactly. Blending two outlines point by point is one call per pair.
+     * `from` exactly. Blending two contours point by point is one call per pair.
      *
      * @param from The point at a ratio of `0`.
      * @param to The point at a ratio of `1`.
@@ -196,7 +196,7 @@ export namespace Point2dUtils {
     /**
      * Shifts a line segment sideways, at right angles to the way it runs.
      *
-     * Used to build the walls of a thick outline: offset each edge, then intersect the
+     * Used to build the walls of a thick stroke: offset each edge, then intersect the
      * neighbors to find the corners.
      *
      * @param a Start of the segment.

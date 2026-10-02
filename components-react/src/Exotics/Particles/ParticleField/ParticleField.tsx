@@ -53,9 +53,9 @@ export const ParticleField = (props: ParticleFieldProps) => {
 
     const cellCount = CellAnimationUtils.computeCellCount(props.cellCount, rootSize);
 
-    const outline = useMemo(
+    const contour = useMemo(
         () =>
-            ParticleFieldUtils.computeOutline(
+            ParticleFieldUtils.computeContour(
                 props.computeShapePoints?.(rootSize),
                 props.shapeJoinRadii,
                 props.shapeLameExponents,
@@ -69,9 +69,9 @@ export const ParticleField = (props: ParticleFieldProps) => {
                 cellCount,
                 rootSize,
                 props.computeCellWeights?.(cellCount) ?? NO_WEIGHTS,
-                outline,
+                contour,
             ),
-        [cellCount.col, cellCount.row, rootSize, props.computeCellWeights, outline],
+        [cellCount.col, cellCount.row, rootSize, props.computeCellWeights, contour],
     );
 
     const hasEnded = currentIteration >= iterationCount;

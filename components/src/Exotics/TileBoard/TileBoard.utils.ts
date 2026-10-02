@@ -22,9 +22,9 @@ const NO_TAPER = 1;
 /** The narrowest top row a taper may ask for, since a top row of no width would put the bottom one at infinity. */
 const MIN_TAPER = 0.01;
 
-/** The fewest corners an outline needs to enclose anything. */
+/** The fewest corners a contour needs to enclose anything. */
 const MIN_CLIP_POINTS = 3;
-/** The clip a tile wears when it has no outline to wear. */
+/** The clip a tile wears when it has no contour to wear. */
 const NO_CLIP = "none";
 /** The keys that, held with Ctrl or Cmd, jump to the first and last tile of the board. */
 const EDGE_KEYS = ["Home", "End"];
@@ -458,13 +458,13 @@ export namespace TileBoardUtils {
     export const getIsFlippedTile = computeIsFlippedTile;
 
     /**
-     * A tile's outline, in its own coordinates.
+     * A tile's contour, in its own coordinates.
      *
      * @param shape Which tile shape.
      * @param tileSize One tile's size.
      * @param isFlipped Whether this tile is mirrored, from
      * {@link TileBoardUtils.getIsFlippedTile}.
-     * @returns The corners. A mirrored tile's points are reversed as well as flipped, so the outline
+     * @returns The corners. A mirrored tile's points are reversed as well as flipped, so the contour
      * keeps its winding direction — otherwise a fill rule or a stroke would treat it as inside out.
      */
     export const getTilePoints = (shape: ShapeConst.DefaultShape, tileSize: Size2d, isFlipped: boolean): Point2d[] => {
@@ -687,7 +687,7 @@ export namespace TileBoardUtils {
     };
 
     /**
-     * The CSS clip that cuts a tile's hit layer to its outline.
+     * The CSS clip that cuts a tile's hit layer to its contour.
      *
      * @param points The tile's corners, in pixels from its top left.
      * @returns A `polygon()`, or `"none"` for fewer than three corners, which enclose nothing.

@@ -1,8 +1,9 @@
 import type { ShallowRef } from "vue";
 
 import type { SVGDefsColors, SVGDefsSamples, ShapeProps } from "@thewaver/ss-components-vue";
-import type { WithNoSample } from "@thewaver/ss-playground/App/PageComponents/SampleGroups/SampleGroups.types";
 import type { ShapeConst, Size2d } from "@thewaver/ss-utils";
+
+import type { Paint } from "../../PageComponents/PaintPicker/PaintPicker.types";
 
 export type ShapeExampleProps = Pick<ShapeProps, "lameExponents" | "joinRadii"> & {
     shouldClipChildren?: boolean;
@@ -11,9 +12,8 @@ export type ShapeExampleProps = Pick<ShapeProps, "lameExponents" | "joinRadii"> 
     animationDurationMs: number;
     colors: SVGDefsColors;
     shapeKind: ShapeConst.DefaultShape;
-    strokeConfigKey: WithNoSample<SVGDefsSamples.Gradient.Timed.SampleKey>;
-    strokeConfigDefs: Record<string, number | boolean>;
-    fillConfigKey: WithNoSample<SVGDefsSamples.Pattern.SampleKey>;
+    strokePaint: Paint;
+    fillPaint: Paint;
     iterationConfigKey: SVGDefsSamples.Iteration.SampleKey;
     cellSize: Size2d;
     edgeThicknesses: number[];

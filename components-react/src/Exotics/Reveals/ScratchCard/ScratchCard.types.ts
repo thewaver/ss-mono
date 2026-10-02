@@ -25,7 +25,7 @@ export type ScratchCardProps = {
     isDisabled?: boolean;
     /** Names the card for assistive technology. */
     ariaLabel: string;
-    /** The outline of the patch a stroke clears, worked out from the card's size. */
+    /** The contour of the patch a stroke clears, worked out from the card's size. */
     computePoints?: (size: Size2d) => Point2d[];
     /** Draws what is underneath, waiting to be revealed. */
     renderContent: () => ReactNode;

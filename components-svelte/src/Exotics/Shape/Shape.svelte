@@ -47,7 +47,7 @@
 <div
     bind:this={root}
     class={styles.shapeRoot}
-    style:shape-outside={ShapeLayerUtils.computeShapeOutside(paths[0].outerOutline)}
+    style:shape-outside={ShapeLayerUtils.computeShapeOutside(paths[0].outerContour)}
 >
     {#if fillDefs}
         <svg

@@ -1,18 +1,9 @@
 <script lang="ts">
-    import {
-        InteractionTrackerSvelteUtils,
-        SVGDefsSamples,
-        Shape,
-        type StyleRecord,
-        toStyle,
-    } from "@thewaver/ss-components-svelte";
-    import {
-        NO_SAMPLE_KEY,
-        computeNoSampleDefs,
-    } from "@thewaver/ss-playground/App/PageComponents/SampleGroups/SampleGroups.const";
+    import { InteractionTrackerSvelteUtils, Shape, type StyleRecord, toStyle } from "@thewaver/ss-components-svelte";
     import * as styles from "@thewaver/ss-playground/App/Pages/ShapePage/ShapePage.css";
     import { ShapeConst, ShapeUtils, type Size2d } from "@thewaver/ss-utils";
 
+    import { computeShapeFillDefs, computeShapeStrokeDefs } from "../ShapePage.const";
     import type { ShapeExampleProps } from "../ShapePage.types";
 
     type Props = ShapeExampleProps;
@@ -29,8 +20,6 @@
         { applyButtonSemantics: true },
     );
 
-    const iterationConfig = $derived(SVGDefsSamples.Iteration.SAMPLE_CONFIGS[props.iterationConfigKey]);
-
     const strokeGeom = $derived.by(() => {
         const geom = [{ thicknesses: props.edgeThicknesses }];
 
@@ -43,20 +32,7 @@
 
     const computeStrokeDefs = (size: Size2d, element: HTMLElement | undefined) => {
         const flags = getFlags();
-
-        const strokes =
-            props.strokeConfigKey === NO_SAMPLE_KEY
-                ? computeNoSampleDefs(props.colors, "stroke")
-                : SVGDefsSamples.Gradient.Timed.toConfig({
-                      family: props.strokeConfigKey,
-                      defs: props.strokeConfigDefs,
-                  } as SVGDefsSamples.Gradient.Timed.Entry).computeSVGDefs(`stroke-${id}`, flags, element, {
-                      getSize: () => size,
-                      animationDurationMs: props.animationDurationMs,
-                      colors: props.colors,
-                      blurWidth: props.blurWidth,
-                      ...iterationConfig.computeDefs(props.animationDurationMs),
-                  });
+        const strokes = computeShapeStrokeDefs(id, props, size, element, flags);
 
         if (flags.isFocusVisible) {
             strokes.push({ color: "#FF00FF" });
@@ -66,21 +42,7 @@
     };
 
     const computeFillDefs = (size: Size2d, element: HTMLElement | undefined) =>
-        props.fillConfigKey === NO_SAMPLE_KEY
-            ? computeNoSampleDefs(props.colors, "fill")
-            : SVGDefsSamples.Pattern.SAMPLE_CONFIGS[props.fillConfigKey].computeSVGDefs(
-                  `fill-${id}`,
-                  undefined,
-                  element,
-                  {
-                      getSize: () => size,
-                      cellSize: props.cellSize,
-                      animationDurationMs: props.animationDurationMs,
-                      colors: props.colors,
-                      blurWidth: props.blurWidth,
-                      ...iterationConfig.computeDefs(props.animationDurationMs),
-                  },
-              );
+        computeShapeFillDefs(id, props, size, element);
 </script>
 
 <div class={styles.exampleHost}>

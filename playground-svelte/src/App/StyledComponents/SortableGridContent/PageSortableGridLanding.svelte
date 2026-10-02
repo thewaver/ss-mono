@@ -15,5 +15,5 @@
     viewBox={getViewBox(props.geometry)}
     aria-hidden="true"
 >
-    <polygon class={styles.sortableGridLandingOutline} points={getPoints(props.geometry)} />
+    <polygon class={styles.sortableGridLandingContour} points={getPoints(props.geometry)} />
 </svg>

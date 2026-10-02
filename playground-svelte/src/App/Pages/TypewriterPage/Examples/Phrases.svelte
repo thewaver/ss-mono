@@ -1,6 +1,6 @@
 <script lang="ts">
     import { Button, MediaQueryMonitorSvelteUtils, Typewriter } from "@thewaver/ss-components-svelte";
-    import type { TypewriterController, TypewriterMode } from "@thewaver/ss-components-svelte";
+    import type { TypewriterMode } from "@thewaver/ss-components-svelte";
     import { MEASURE_BOX_PADDING } from "@thewaver/ss-playground/App/PageComponents/MeasureBox/MeasureBox.css";
     import * as styles from "@thewaver/ss-playground/App/Pages/TypewriterPage/TypewriterPage.css";
 
@@ -20,7 +20,6 @@
 
     let props: Props = $props();
 
-    let controller: TypewriterController | undefined;
     let phraseIndex = $state(FIRST_PHRASE);
     let mode = $state<TypewriterMode>("type");
     let isPaused = $state(false);
@@ -43,7 +42,6 @@
 
         phraseIndex = (phraseIndex + 1) % PHRASES.length;
         mode = "type";
-        controller?.update("content");
     };
 
     const requestStep = () => {
@@ -87,9 +85,6 @@
                     animationDelayMs={getPrefersReducedMotion() ? NO_MOTION_MS : CHARACTER_DELAY_MS}
                     animationDurationMs={getPrefersReducedMotion() ? NO_MOTION_MS : CHARACTER_DURATION_MS}
                     computeCharacterWeights={props.computeCharacterWeights}
-                    onMount={(next) => {
-                        controller = next;
-                    }}
                     onAnimationEnd={handleAnimationEnd}
                 >
                     {PHRASES[phraseIndex]}

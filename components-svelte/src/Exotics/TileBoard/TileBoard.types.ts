@@ -11,7 +11,7 @@ export type TileBoardTileRenderer = Snippet<[tile: Index2d, flags: InteractionFl
 export type TileBoardTileProps = Omit<InteractionControlProps<TileBoardRenderProps>, "renderContent"> & {
     /** Which column this tile sits in. */
     colIndex: number;
-    /** The outline the tile is cut to. */
+    /** The contour the tile is cut to. */
     clipPath: string;
     /** How large the tile is. */
     size: Size2d;
@@ -33,7 +33,7 @@ export type TileBoardProps = {
     tileCount: Index2d;
     /** How large one tile is. */
     tileSize: Size2d;
-    /** The outline each tile is cut to, which also decides whether rows are offset. */
+    /** The contour each tile is cut to, which also decides whether rows are offset. */
     tileShape?: ShapeConst.DefaultShape;
     /** The space between tiles. */
     gap?: number;
@@ -53,7 +53,7 @@ export type TileBoardProps = {
     computeIsTileDisabled?: (tile: Index2d) => boolean;
     /** Names one tile for assistive technology, so a reader hears where it is rather than its number. */
     computeTileAriaLabel?: (tile: Index2d) => string;
-    /** Draws one tile. It is handed the tile and its interaction state, with the outline the board worked out. */
+    /** Draws one tile. It is handed the tile and its interaction state, with the contour the board worked out. */
     renderTile: TileBoardTileRenderer;
     /** Runs when a tile is activated. */
     onTileActivate: (tile: Index2d) => void;

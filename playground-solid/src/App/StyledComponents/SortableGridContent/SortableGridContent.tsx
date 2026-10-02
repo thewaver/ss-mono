@@ -16,12 +16,12 @@ import type {
 const NAMED_WIDTH = 2;
 
 const getBox = (geometry: SortableGridGeometry) => ({
-    width: Math.max(...geometry.outline.map((point) => point.x)),
-    height: Math.max(...geometry.outline.map((point) => point.y)),
+    width: Math.max(...geometry.contour.map((point) => point.x)),
+    height: Math.max(...geometry.contour.map((point) => point.y)),
 });
 
 const getPoints = (geometry: SortableGridGeometry) =>
-    geometry.outline.map((point) => `${point.x},${point.y}`).join(" ");
+    geometry.contour.map((point) => `${point.x},${point.y}`).join(" ");
 
 const getViewBox = (geometry: SortableGridGeometry) => {
     const box = getBox(geometry);
@@ -49,7 +49,7 @@ export const PageSortableGridItemContent = (props: SortableGridItemContentProps)
             }}
         >
             <Show
-                when={(access(props.paint) ?? "outline") === "outline"}
+                when={(access(props.paint) ?? "contour") === "contour"}
                 fallback={
                     <For each={getGeometry().cells}>
                         {(cell) => (
@@ -69,7 +69,7 @@ export const PageSortableGridItemContent = (props: SortableGridItemContentProps)
                 }
             >
                 <svg class={styles.sortableGridItemShape} viewBox={getViewBox(getGeometry())} aria-hidden="true">
-                    <polygon class={styles.sortableGridItemOutline} points={getPoints(getGeometry())} />
+                    <polygon class={styles.sortableGridItemContour} points={getPoints(getGeometry())} />
                 </svg>
             </Show>
 
@@ -118,7 +118,7 @@ export const PageSortableGridLanding = (props: SortableGridLandingProps) => {
             viewBox={getViewBox(access(props.geometry))}
             aria-hidden="true"
         >
-            <polygon class={styles.sortableGridLandingOutline} points={getPoints(access(props.geometry))} />
+            <polygon class={styles.sortableGridLandingContour} points={getPoints(access(props.geometry))} />
         </svg>
     );
 };

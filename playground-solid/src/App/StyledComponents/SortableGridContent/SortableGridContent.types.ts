@@ -7,7 +7,7 @@ import type {
     SortableGridSpot,
 } from "@thewaver/ss-components-solid";
 
-export type SortableGridPaint = "outline" | "cells";
+export type SortableGridPaint = "contour" | "cells";
 
 export type SortableGridItemContentProps = AccessorProps<{
     flags: InteractionFlags<SortableGridItemFlags>;

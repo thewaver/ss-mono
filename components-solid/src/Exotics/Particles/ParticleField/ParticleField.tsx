@@ -48,8 +48,8 @@ export const ParticleField = (props: ParticleFieldProps) => {
         { equals: CellAnimationUtils.getIsSameCount },
     );
 
-    const getShapeOutline = createMemo(() =>
-        ParticleFieldUtils.computeOutline(
+    const getShapeContour = createMemo(() =>
+        ParticleFieldUtils.computeContour(
             props.computeShapePoints?.(getRootSize()),
             access(props.shapeJoinRadii),
             access(props.shapeLameExponents),
@@ -61,7 +61,7 @@ export const ParticleField = (props: ParticleFieldProps) => {
             getCellCount(),
             getRootSize(),
             props.computeCellWeights?.(getCellCount()) ?? [],
-            getShapeOutline(),
+            getShapeContour(),
         ),
     );
 

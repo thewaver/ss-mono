@@ -1,7 +1,6 @@
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useState } from "react";
 
 import { Typewriter } from "@thewaver/ss-components-react";
-import type { TypewriterController } from "@thewaver/ss-components-react";
 import { FunctionUtils } from "@thewaver/ss-utils";
 
 import type { TypewriterExampleProps } from "../TypewriterPage.types";
@@ -11,8 +10,6 @@ type Props = TypewriterExampleProps & {
 };
 
 export const CustomInputExample = (props: Props) => {
-    const hasMountedRef = useRef(false);
-    const controllerRef = useRef<TypewriterController>(undefined);
     const [text, setText] = useState(props.text);
     const [setTextDebounced] = useState(() => FunctionUtils.debounce(setText, 500));
 
@@ -20,24 +17,8 @@ export const CustomInputExample = (props: Props) => {
 
     useEffect(() => setTextDebounced(props.text), [props.text, setTextDebounced]);
 
-    useEffect(() => {
-        if (!hasMountedRef.current) {
-            hasMountedRef.current = true;
-
-            return;
-        }
-
-        controllerRef.current?.update("content");
-    }, [text]);
-
     return (
-        <Typewriter
-            animationName={props.animationName}
-            computeCharacterWeights={props.computeCharacterWeights}
-            onMount={(controller) => {
-                controllerRef.current = controller;
-            }}
-        >
+        <Typewriter animationName={props.animationName} computeCharacterWeights={props.computeCharacterWeights}>
             {text}
         </Typewriter>
     );

@@ -5,22 +5,22 @@ import type { ShapeStrokeGeom } from "./Shape.types";
 
 const DEFAULT_STROKE_GEOM: ShapeStrokeGeom = { thicknesses: [0] };
 const NO_EDGE_THICKNESSES = [0];
-const MIN_OUTLINE_POINTS = 3;
+const MIN_CONTOUR_POINTS = 3;
 const BLEND_MODE = "screen" as const;
 
 /**
- * The arithmetic behind `Shape`'s two SVG layers: which outline each stroke paints along, the float shape its
+ * The arithmetic behind `Shape`'s two SVG layers: which contour each stroke paints along, the float shape its
  * content wraps around, and the attributes a defs record paints a path with. The layers themselves are each
  * framework's markup.
  */
 export namespace ShapeLayerUtils {
     /**
-     * The outlines a shape's layers are drawn along, one per stroke.
+     * The contours a shape's layers are drawn along, one per stroke.
      *
-     * With no strokes there is one outline, the shape's own, which the fill and the content's clip path follow.
+     * With no strokes there is one contour, the shape's own, which the fill and the content's clip path follow.
      * With strokes, each stroke is paired with a geometry — the strokes and the geometries stretched to the
      * longer of the two, and a single zero-width geometry standing in when none is given — and two strokes whose
-     * geometries agree share one outline rather than building it twice. The first outline is always the one the
+     * geometries agree share one contour rather than building it twice. The first contour is always the one the
      * fill, the clip path and the float shape use.
      *
      * @param points The shape's corners, in the element's own pixels.
@@ -61,12 +61,12 @@ export namespace ShapeLayerUtils {
     /**
      * The `shape-outside` that lets text flow around the shape rather than around its box.
      *
-     * @param points The outline to wrap around, in the element's own pixels.
+     * @param points The contour to wrap around, in the element's own pixels.
      * @returns A `polygon()` against the border box, or `undefined` when there are too few points to enclose
      * anything.
      */
     export const computeShapeOutside = (points: Point2d[]) => {
-        if (points.length < MIN_OUTLINE_POINTS) return undefined;
+        if (points.length < MIN_CONTOUR_POINTS) return undefined;
 
         return `polygon(${points.map((point) => `${point.x}px ${point.y}px`).join(", ")}) border-box`;
     };

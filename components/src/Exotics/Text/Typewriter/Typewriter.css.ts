@@ -25,7 +25,9 @@ export const typewriterChildrenWrap = style({
     whiteSpace: "pre",
 });
 
-export const typewriterTextWrap = style({});
+export const typewriterTextWrap = style({
+    whiteSpace: "pre",
+});
 
 export const typewriterChar = style({
     display: "inline-block",

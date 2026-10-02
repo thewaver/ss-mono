@@ -232,7 +232,7 @@ describe("ShapeUtils.getPaths", () => {
             innerPath: "",
             outerPoints: [],
             innerPoints: [],
-            outerOutline: [],
+            outerContour: [],
         });
     });
 
@@ -256,7 +256,7 @@ describe("ShapeUtils.getPaths", () => {
         expect(paths.innerPath).not.toBe(paths.outerPath);
     });
 
-    it("pushes the whole outline out for a positive offset", () => {
+    it("pushes the whole contour out for a positive offset", () => {
         const paths = ShapeUtils.getPaths(SQUARE, [0], undefined, undefined, 1);
 
         expect(paths.outerPath).toBe(
@@ -324,7 +324,7 @@ describe("ShapeUtils.getPaths", () => {
 });
 
 describe("ShapeUtils.getRectPadding", () => {
-    it("needs no padding without a radius or an outline", () => {
+    it("needs no padding without a radius or a contour", () => {
         expect(ShapeUtils.getRectPadding([0], [0])).toEqual({
             "padding-top": "0px",
             "padding-right": "0px",
@@ -333,7 +333,7 @@ describe("ShapeUtils.getRectPadding", () => {
         });
     });
 
-    it("never pads less than the outline thickness", () => {
+    it("never pads less than the stroke thickness", () => {
         expect(ShapeUtils.getRectPadding([2], [0])).toEqual({
             "padding-top": "2px",
             "padding-right": "2px",

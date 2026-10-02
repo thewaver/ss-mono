@@ -108,7 +108,7 @@
         {geometry}
         glyph={item.value.glyph}
         name={item.value.name}
-        paint={props.paint ?? "outline"}
+        paint={props.paint ?? "contour"}
         hue={computeGearHue(item.value)}
     />
 {/snippet}

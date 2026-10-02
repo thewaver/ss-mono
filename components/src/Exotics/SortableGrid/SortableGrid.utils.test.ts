@@ -203,9 +203,9 @@ describe("getReadingOrder", () => {
     });
 });
 
-describe("getOutline", () => {
+describe("getContour", () => {
     it("draws a single cell as its own square", () => {
-        expect(SortableGridUtils.getOutline([at(0, 0)], CELL, GAP)).toEqual([
+        expect(SortableGridUtils.getContour([at(0, 0)], CELL, GAP)).toEqual([
             { x: 0, y: 0 },
             { x: CELL, y: 0 },
             { x: CELL, y: CELL },
@@ -214,7 +214,7 @@ describe("getOutline", () => {
     });
 
     it("bridges the gap between two cells of one item rather than drawing two squares", () => {
-        expect(SortableGridUtils.getOutline([at(0, 0), at(1, 0)], CELL, GAP)).toEqual([
+        expect(SortableGridUtils.getContour([at(0, 0), at(1, 0)], CELL, GAP)).toEqual([
             { x: 0, y: 0 },
             { x: CELL * 2 + GAP, y: 0 },
             { x: CELL * 2 + GAP, y: CELL },
@@ -223,9 +223,9 @@ describe("getOutline", () => {
     });
 
     it("turns the corner of an L, and every point of it is a corner of the shape", () => {
-        const outline = SortableGridUtils.getOutline([at(0, 0), at(0, 1), at(1, 1)], CELL, GAP);
+        const contour = SortableGridUtils.getContour([at(0, 0), at(0, 1), at(1, 1)], CELL, GAP);
 
-        expect(outline).toEqual([
+        expect(contour).toEqual([
             { x: 0, y: 0 },
             { x: CELL, y: 0 },
             { x: CELL, y: CELL + GAP },

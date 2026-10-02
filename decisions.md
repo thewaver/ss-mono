@@ -65,7 +65,7 @@ styled component picked its own fill and text color — `"black"`, `surface.dark
 alpha — on the assumption of what would be behind it, and the assumption was wrong as soon as the control
 appeared somewhere else (a calendar inside a popup, a field inside a modal). The theme now carries one pair
 per layer, `color.control.level0` to `level2`, each a `main` (the control's own fill) and a `contrast` (its
-text, icons and, at 25%, its outline).
+text, icons and, at 25%, its stroke).
 
 **Three fixed levels, not a running count.** Level 0 is on the page background. Level 1 is inside an
 example box, a variants box, the left menu, a modal, a drawer or a sidebar. Level 2 is inside a popover —
@@ -103,12 +103,12 @@ hover cards, spotlight popups, tooltips — takes the `surface` gradient. Anythi
 takes a solid fill of its level: a sample's frames and panels paint `layerVars.main`. The one exception is
 `PageSidebarSurface`, which paints exactly the left menu's gradient, since it is a sample of that same
 furniture; a solid fill was tried and reverted by the user. `color.background.*` is off-limits to all of it. Where a solid fill takes away the difference between neighboring tiles or cells, their
-separators become the 25% outline, since a separator painted in the fill itself disappears.
+separators become the 25% stroke, since a separator painted in the fill itself disappears.
 
-**A control's own outline is `contrast` at 25%.** The user's rule; 50% was tried first and read too strong.
-A state that strengthens the outline — a sortable item or grid cell picked up or blocked — goes to 50%. A
+**A control's own stroke is `contrast` at 25%.** The user's rule; 50% was tried first and read too strong.
+A state that strengthens the stroke — a sortable item or grid cell picked up or blocked — goes to 50%. A
 line that divides parts of something — table rows, a tab row's gutter, a docs table, a form section's rule,
-a grid's cell lines — is not an outline and keeps its own alpha. Alphas stay on 25, 50 and 75, with 10, 35
+a grid's cell lines — is not a stroke and keeps its own alpha. Alphas stay on 25, 50 and 75, with 10, 35
 and 65 where a step is needed.
 
 - **`e2e/`** — Playwright interaction suite. Imports from neither tree; drives the built Playground in
@@ -2125,10 +2125,10 @@ would otherwise produce `NaN` and take the whole path with it, and a path of `Na
 With the fallback only that one corner is wrong and the rest of the shape still draws.
 
 **`ShapeUtils` rounds a reflex corner from outside the shape.** A corner that turns outward — a star's notch —
-has its arc center on the far side of the outline, so the arc is centered at `offset + r` rather than
+has its arc center on the far side of the contour, so the arc is centered at `offset + r` rather than
 `offset - r` and its end points sit at `-r` along the normals; the inner path shares that center at radius
 `r + thickness`. Centering it inside, as every corner once was, puts both end points past the vertex on the
-edges' extensions, and the outline draws a small loop that crosses itself at every notch.
+edges' extensions, and the contour draws a small loop that crosses itself at every notch.
 
 **`setupPaths` shrinks radii by the length each arc takes from its edge, not by the radius itself.** An arc of
 radius `r` at a corner that turns by `φ` starts `r · tan(φ / 2)` from the vertex, which equals `r` only at a
@@ -5214,7 +5214,7 @@ the library's `<button>`. So `PlacementRect` gained `clipPath` and `PlacementIte
 says "pointer-events must not be dispatched on the clipped-out (non-visible) regions of a shape", so the hit
 area follows the drawing. This is `TileBoard`'s conclusion — _"the shape is worn by a hit layer, so the
 pointer follows the drawing"_ — reached again from the other end, and it is the same line `getSectorPath`
-already drew: the outline of the space an item occupies is geometry, and fill, stroke and transition remain
+already drew: the contour of the space an item occupies is geometry, and fill, stroke and transition remain
 paint. Only the honeycomb asks for one; a wedge's painter draws outside its box on purpose and must not be
 clipped.
 
@@ -11628,8 +11628,8 @@ is required outright; a glass pane usually has no edge, so requiring the widths 
 noise.
 
 **Everything else about the stroke is `Shape`'s already.** The widths become one `strokeGeom` entry, passed
-only when stroke defs exist, and `Shape` renders the band between its outer and inner outlines above the
-content. Thickness moves the inner outline only, so the fill, the clip handed to `renderChildren` and the
+only when stroke defs exist, and `Shape` renders the band between its outer and inner contours above the
+content. Thickness moves the inner contour only, so the fill, the clip handed to `renderChildren` and the
 margined backdrop clips are all unaffected by a border appearing.
 
 **The page's border knobs are `Shape`'s, not a color and an opacity.** The first build gave the pane a flat
@@ -11782,13 +11782,42 @@ contract is one file per key with the key as the filename and which the source v
 files, and this stopped being one. What remains in `Samples` are samples; the glass sheen is a builder with
 one home that two callers use.
 
-### `Shape`: the outline is also the float area
+### `Shape`: the contour is also the float area
 
-**Shape writes `shape-outside: polygon(…) border-box` on its root, from the same outer outline the fill is drawn along.** A consumer who floats the Shape gets text wrapping to the painted edge and has nothing else to compute. The property does nothing on an element that is not floated, so every other Shape user, `GlassSurface` included, is unaffected. `border-box` is chosen over the default `margin-box` because the points are measured in the root's own box: a margin on the root would otherwise shift the outline off the paint. `shape-margin` is left to the consumer, since how far text keeps clear is paint. Fewer than three points writes nothing. MDN checked: it applies to floats only, accepts a shape followed by a box keyword, and has been Baseline widely available since January 2020.
+**Shape writes `shape-outside: polygon(…) border-box` on its root, from the same outer contour the fill is drawn along.** A consumer who floats the Shape gets text wrapping to the painted edge and has nothing else to compute. The property does nothing on an element that is not floated, so every other Shape user, `GlassSurface` included, is unaffected. `border-box` is chosen over the default `margin-box` because the points are measured in the root's own box: a margin on the root would otherwise shift the contour off the paint. `shape-margin` is left to the consumer, since how far text keeps clear is paint. Fewer than three points writes nothing. MDN checked: it applies to floats only, accepts a shape followed by a box keyword, and has been Baseline widely available since January 2020.
 
 ### `Shape`: a morph is the consumer's signal read inside `computePoints`
 
-**No morph prop exists; the Playground example is the whole feature.** `computePoints` already runs inside the memo that builds the outline, so a signal it reads re-runs the outline, and `joinRadii` and `lameExponents` are accessors blended the same way. The two point sets must be the same length, since blending pairs one point with one point. `Point2dUtils.lerp` is the per-pair step, in ss-utils beside `MathUtils.lerp`. Under reduced motion the example jumps straight to the other shape. It also rounds its value to 1/64 steps, because `ShapeUtils.getPaths` keeps every result forever: a smooth value would add one entry per frame on every press, while a stepped one reuses the same 65 outlines.
+**No morph prop exists; the Playground example is the whole feature.** `computePoints` already runs inside the memo that builds the contour, so a signal it reads re-runs the contour, and `joinRadii` and `lameExponents` are accessors blended the same way. The two point sets must be the same length, since blending pairs one point with one point. `Point2dUtils.lerp` is the per-pair step, in ss-utils beside `MathUtils.lerp`. Under reduced motion the example jumps straight to the other shape. It also rounds its value to 1/64 steps, because `ShapeUtils.getPaths` keeps every result forever: a smooth value would add one entry per frame on every press, while a stepped one reuses the same 65 contours.
+
+### The Playground: a paint is chosen as a kind, then a sample
+
+**Every page that paints a slot with a defs sample offers it as two dropdowns: what kind of paint, then which
+sample of that kind.** The user's call. `Shape` used to give its stroke the timed gradients and its fill the
+patterns, and `PaintedText` gave both slots all three registries in one list grouped by a sample's first word — a
+grouping that never says the kind, so even the user, who designed the registries, did not see that tracked
+gradients and patterns were in it. One control, `PagePaintPicker`, now does it in all four Playgrounds: the kind
+is None, Pattern, Timed gradient or Tracked gradient, and the second dropdown lists that registry alone. Each slot
+remembers a sample per kind, so switching kind and back finds the last one picked. A page may override the sample a
+kind starts on — `PaintedText` starts its timed gradients on `flow_diag_3`, the user's pick, where `Shape` keeps
+`sweep_diag_1v1`.
+
+**A slot is one sample panel, and its Reset leaves the kind alone.** The panel's Reset skips the first field it
+registered, which is the kind, so it resets the sample and its knobs and keeps what the user chose to paint with.
+The sample dropdown is remounted when the kind changes, so the value Reset returns it to is that kind's own
+starting sample rather than one from another registry.
+
+**The settings only one kind reads appear only while a slot uses that kind.** Cell size is a pattern's; duration
+and iteration pattern are a timed gradient's and a pattern's; a tracked gradient reads none of them. The props
+spec that types into the cell size on the Shape page therefore picks a pattern for the fill first.
+
+**"None" keeps each page's own meaning.** On `Shape` it is the flat colors `computeNoSampleDefs` gives, as
+before; on `PaintedText` it is no paint at all, which leaves the letters hollow under a stroke or in the text
+color when nothing paints them. The shared helper answers `undefined` for none and each page decides.
+
+**`CellAnimation` has no tracked example, and that is deliberate.** Its source is a picture — a sample serialized
+into a data URI — and a picture runs no script, while a tracked gradient follows the pointer only through script.
+The example would sit frozen at its resting frame. The user's call: show only what works there.
 
 ### The defs registries are split by what drives a sample, not by what it looks like
 
@@ -12227,7 +12256,7 @@ the source was a broad haze rather than a light. All three are true of any flare
 strong circles, and the fix for all three is the same — more elements, each much fainter.
 
 **The photograph and the renderer's manual said the same thing, and the streak was tried and cut.** The user
-pointed at a real lens flare, where the ghosts alternate between small filled discs and larger outline-only
+pointed at a real lens flare, where the ghosts alternate between small filled discs and larger stroke-only
 rings, and then at Shade3D's lens flare reference, which exposes exactly three ingredients: **flare**,
 **ghost** and **streak**. The streak was built — a radial gradient squashed to a fortieth of its height about
 its own origin is a horizontal spike, and the abstract grew an `aspect` prop to express it — and the user cut
@@ -14140,8 +14169,8 @@ grid has not got.
 
 **Two pages had been getting their sizes from the old row, and both showed it.** A wrapping row sizes a card
 to its content, which had been hiding two things. `Shape`'s demo is a fixed, resizable 320px box with a `Shape`
-around it tracing its outline — and `Shape`'s own root has no width, so under a card that stretches its
-children it grew to the column while the box it traces stayed 320: the outline and the content came apart. The
+around it tracing its contour — and `Shape`'s own root has no width, so under a card that stretches its
+children it grew to the column while the box it traces stayed 320: the contour and the content came apart. The
 box is what the demo is about, so the page now wraps it in a `width: fit-content` host and the `Shape` hugs it
 again. `ViewportPage` builds its own cards rather than using `PageExamples`, and had capped them at the host's
 width; it now uses the same grid, with a floor of the host plus the card's padding, and its fixed-size hosts
@@ -14867,7 +14896,7 @@ from cannot drift apart.
 the silhouette is not there: the tangent points are **nearer the eye** than the axis, so they project wider. The
 error is the factor `(perspective + apothem) ÷ √((perspective + apothem)² − circumradius²)`, which is a fraction
 of a percent on a narrow drum and grows with the ring, reaching 2.6% at twelve faces 150px wide — twelve pixels,
-visible against a dashed outline, and worse at higher counts. **This is the second wrong answer here**, after the
+visible against a dashed border, and worse at higher counts. **This is the second wrong answer here**, after the
 original's flat percentage per wedge, and both failed the same way: right in the middle of the range they were
 checked in, increasingly short outside it. The user caught both by eye.
 
@@ -15172,17 +15201,17 @@ shape to copy: `return (<>…</>)`. `ShapePage` gets away with a root because it
 gap on it, which is the exception rather than the pattern.
 
 **A demo sits in `PageMeasureBox`, not in a box the page invented.** It draws the checkerboard and the dashed
-outline that say "this is the space the component asked for", which is exactly what a page hand-rolling a
+border that say "this is the space the component asked for", which is exactly what a page hand-rolling a
 bordered `host` div is trying to say and says less well. Three of the four pages had their own.
 
-**The outline paints behind the demo, not over it.** It was at `z-index: 1` and drew across whatever it
+**The border paints behind the demo, not over it.** It was at `z-index: 1` and drew across whatever it
 contained, which stayed invisible for as long as every demo left a margin inside its box — `ElementMosaic`
 is the first that fills one edge to edge, and the dashes ran straight over the tiles. A measurement drawn on
-top of the thing it measures is the wrong way round. The box now isolates itself and the outline sits at
+top of the thing it measures is the wrong way round. The box now isolates itself and the border sits at
 `z-index: -1`, which puts it above the checkerboard and below everything the page renders into it.
 
 **The box has no padding, and that is the whole point of it.** Stated by the user, twice: the content hugs the
-box, so the outline is a measurement rather than a frame. It was defaulting to 20px, which quietly made every
+box, so the border is a measurement rather than a frame. It was defaulting to 20px, which quietly made every
 demo on every page smaller than the thing being measured, and three pages had grown a
 `size + MEASURE_BOX_PADDING * 2` expression to cancel it back out. The default is now zero and those
 expressions are gone. **The components that draw text are the exception and opt in** — `Typewriter`,
@@ -15197,13 +15226,13 @@ draws text as its content; a board, a tree or a wheel with labels on it does not
 
 **Only the component goes inside the box; the page's own controls sit outside it.** Stated by the user alongside
 the padding rule, after `PatchBoard`'s zoom example put its zoom buttons in the same box as the board, so the
-outline measured a toolbar plus a board and the checkerboard showed behind both. An example that needs controls
+border measured a toolbar plus a board and the checkerboard showed behind both. An example that needs controls
 renders them beside a `PageMeasureBox` of its own that holds only the component, which is how the zoom example
 now reads.
 
 **A demo paints at the full size of its box, and a demo drawn smaller than the box is the same fault from the
 other end.** The `CardStack` sample was painted at 70% of the stack's own size, which put a ring of
-checkerboard inside the outline and made the box read as a frame again — the padding argument exactly, moved
+checkerboard inside the border and made the box read as a frame again — the padding argument exactly, moved
 from the box's style into the content's. The box measures what the component asked for, so the sample fills it.
 
 **`isFilling` is how a box takes the width it is given rather than a number.** A demo of something sized by its
@@ -15211,8 +15240,8 @@ container has no width of its own to state, and a number written into the page i
 overflows the example card as soon as the window is narrower than it was when the number was chosen.
 
 **The box hugs its content, and that is the same point from the other end.** It reports what the component asked for and
-nothing else, so the outline around a demo is a measurement rather than a frame. That was intent and not yet
-code: `measureBoxRoot` was a plain block, so a box given no `getWidth` stretched to its card and the outline
+nothing else, so the border around a demo is a measurement rather than a frame. That was intent and not yet
+code: `measureBoxRoot` was a plain block, so a box given no `getWidth` stretched to its card and the border
 was drawn wider than the thing it measured. `width: fit-content` on the class makes it true, and it reaches
 only the boxes that pass no width, since an inline `getWidth` overrides it. The consequence, stated by the
 user when this was written up the other way round: a component that asks for a share of its parent —
@@ -15746,7 +15775,7 @@ argument: rows and columns beside softness, shape and radius is an incoherent se
 drawing-model leak. **The props that remain are `brushRadius`, `softness`, the three shape props,
 `clearThreshold`, `precision` and the render callbacks.**
 
-**Two things improved for free.** The rubbed area now carries one soft outline round the whole of it rather
+**Two things improved for free.** The rubbed area now carries one soft contour round the whole of it rather
 than a feather per row-run, so the rule that each hole's solid core had to be drawn a feather wider than its
 cell — to stop two neighboring feathers meeting at three-quarter alpha and leaving a quarter of the foil
 behind — disappears entirely. And the edge is a real union rather than a staircase of axis-aligned boxes, at
@@ -15808,7 +15837,7 @@ element it was already returning — `renderCover`, `renderChildren` and `render
 handout. `clip-path: path()` was ruled out for `Spotlight` because it takes no percentages and the layer's size
 would have had to be observed; here the size is `2 × brushRadius` and known outright, so the objection does not
 apply. **A shape that only changed the preview would be a prop that lies**, so the stamp appended to the mask
-is the shape's own outline, and the circle is drawn as two arcs rather than as a polygon so that the default
+is the shape's own contour, and the circle is drawn as two arcs rather than as a polygon so that the default
 is exact.
 
 **Where the pointer is comes from `PointerTracker`, not from `trackDrag`.** A preview has to follow a pointer
@@ -15978,6 +16007,112 @@ beat early, which is invisible in review and obvious in a spec.
 ### `Typewriter`: arrival order is ScrambleText's weights over a run of `count × animationDelayMs`
 
 **`computeCharacterWeights(count)` goes through `ScrambleTextUtils.resolveWeights`**, so it has the same 0..1 contract, the same clamping and the same fill for missing entries. An image or a line break counts as one character. Each element starts at `initialAnimationDelayMs + weight × count × animationDelayMs`, so with the default in-order weights the last character starts at `count × delay`, which the end timeout allows for. The caret is documented as meant for in-order weights, because with a scatter "the most recent arrival" jumps around.
+
+### `PaintedText`: SVG text, wrapped by `Typewriter`'s utility and placed by the browser
+
+**The text is SVG `<text>`, because CSS can only paint HTML text with an image.** `background-clip: text` takes a
+`background-image`, so a def would have to be serialized first, the way `SVGDefsSources` does it: SMIL samples keep
+moving inside a data URI, but pointer-tracked samples freeze on their resting frame, and a hollow stroke cannot be
+had at all — the known trick paints the inside of the letters in the page's background color. `-moz-element()`
+would let a live element be a background, and it is Firefox only. Masking the paint by the text instead does not
+help either: the mask has to hold SVG `<text>` anyway. So the letters are SVG, painted by `fill` and `stroke`
+exactly as `Shape` paints its path, and every sample works, timed, tracked and patterned.
+
+**Line breaks come from `JSXTextParserUtils.getInlinedSegments`, which is `Typewriter`'s.** SVG 2's `inline-size`
+wraps in no browser, and Chromium's request for it has been open since 2014. The user named `Typewriter` the
+baseline: **where something can be improved for both, `Typewriter` moves to the better approach with it**, and that
+rule is why several changes below landed in `Typewriter` and in `ss-utils` as well.
+
+**Positions are read from the browser, not computed.** The core lays the wrapped segments out as HTML — the same
+spans and `<br>`s `Typewriter` draws — in a layout host that stays in the flow, invisible, and gives the component
+its height. Each run's left edge is its span's box, and its baseline is the top of a zero-sized inline block placed
+inside it, since such a block sits exactly on the line's baseline. Vertical alignment, line height and text
+alignment are therefore the browser's own, and none of it is reimplemented. The host is built by the core with
+plain DOM calls rather than by each framework, because it is invisible scaffolding and building it four times would
+only add places for the four to disagree.
+
+**Every rect is divided by the page's scale before it becomes a coordinate.** `getBoundingClientRect` answers in
+screen pixels, after any ancestor's transform, while an SVG coordinate is in layout pixels; inside the Playground's
+`Viewport` the two differ by the window's scale, so the first build placed every run at three quarters of its
+position on a window scaled to 75% and the words ran into each other. The scale is the host's on-screen width over
+its `offsetWidth`, and `ss-utils` divides an inline element's size by the same ratio, since it is compared with
+canvas widths that never saw the transform. The `offset*` family is in layout pixels already and was not used
+because SVG elements do not have it. It is _"A measured rect and a written offset are in different spaces inside a
+`Viewport`"_ in `conventions.md`, missed the first time.
+
+**Lines end only at the breaks the utility inserted.** The host, and `Typewriter`'s output, carry
+`white-space: pre`. Without it a line filled to the edge, trailing space included, measured a fraction of a pixel
+over the box once laid out, and the browser broke it a second time at the next inline block — the paragraph
+example showed every line ending near half the width.
+
+**`white-space: pre` sits on every `<text>` itself, not on the `<svg>`.** Chromium's own stylesheet gives `<text>`
+`white-space: nowrap`, so a value inherited from the `<svg>` never arrives, and a run's leading space was collapsed
+— the run after an image or an icon started flush against it while the space before it survived, which read as the
+icon sitting off-center. The class goes on the mask's `<text>` too, since a mask drawn without the space would
+cut a stroke one space-width off.
+
+**One `<text>` per def, strokes drawn over fills**, the same order `Shape` uses. Only one copy may reach a screen
+reader or the tab order: the first fill, or the first stroke when there is no fill
+(`PaintedTextUtils.getIsReadableLayer`). The others are `aria-hidden`, and only the readable one carries the links
+as SVG `<a>` and the titles as `<title>`. A run is drawn with its font properties alone; the colors and decorations
+the source carried are left behind, since paint is the defs' job and a `fill` or `color` would fight them.
+
+**Each run's `<a>` and `<title>` sit inside a `<tspan>` root, and that is a Solid constraint, not taste.** Solid
+builds JSX inside an `{expression}` as a template of its own, and a template whose root is `a` or `title` — both
+names HTML shares with SVG — is created in the HTML namespace and draws nothing inside an `<svg>`. With a `<tspan>`
+at the root the template is parsed inside SVG and both come out right.
+
+**`strokeAlignment` is a prop, the user's pick over a fixed default**, with `outside` as the default. SVG strokes
+are centered on the edge; `outside` and `inside` draw the stroke twice as wide and mask away the other half, so the
+width the consumer asked for is the width they see in all three (`PaintedTextUtils.computeStrokePaint`). One mask
+serves every stroke layer, since it depends only on the letters: a white rectangle with the letters in black for
+`outside`, the letters in white for `inside`. It is in user space and padded by the drawn width, because the default
+mask region is the text's box plus ten percent and a thick stroke on a short word reaches past it.
+
+**No paint at all draws the text in `currentColor`; a stroke alone draws hollow letters.** An empty fill list
+counts as none, so a consumer switching a fill off does not make the text vanish.
+
+**Whole elements keep their place: `<img>` becomes `<image>`, `<svg>` is copied in whole, anything else goes into a
+`<foreignObject>`.** The first and last are the user's calls — the `<foreignObject>` because it matches what
+`Typewriter` already renders, a copy of the element, with the same limit: a style that depended on where the
+original sat does not reach the copy. The two that decide its place in the line are carried over by hand — `ss-utils`
+pins an inline copy to the original's measured size and its `vertical-align` — because an icon sized by its
+parent's class otherwise came back at its own `800px` attributes, in both components. An `<image>` takes the original's `alt` as its name, or is hidden when there
+is none.
+
+**`ss-utils` copies an `<svg>`, media, frames, `<select>` and `<textarea>` whole.** Their children are not text a
+reader sees: the walk used to go into an inline icon and carry each `<path>` out on its own, where it drew nothing,
+and a `<select>` would have been spelled out as its options. The copy also carries the original's size now, read
+before it is cloned — a detached copy has no size, so every image used to count as zero wide when lines were broken.
+
+**Elements a copy cannot reproduce are warned about, in both components** — the user's call. A `<canvas>` copy is
+blank, media starts over, a frame reloads, and a form control loses its value and is no longer the control the
+consumer holds. `JSXTextParserUtils.findUnsupportedElements` finds them and each component names them in its own
+warning, on the first measurement and on every content change, never on a resize, so dragging a window does not
+repeat it.
+
+**Fonts and images loading lay the text out again, in both.** Either moves line breaks without moving the box, so
+neither the size observer nor anything else would notice: a `load` listener on the source, set to capture since the
+event does not bubble, and `document.fonts`' `loadingdone`.
+
+**The Heading example's font controls style a `<div>` inside the text, not the box around it.** The component
+re-lays its text out when the text changes, its box changes size, or a font or image finishes loading. A style
+change on an ancestor is none of those: a heavier weight on a one-line heading moves every glyph without changing a
+single box size, so nothing would tell the component to measure again. Styling an element inside the text is a
+change to the text, which the mutation observer below sees.
+
+**For a change from outside, the component hands out `update` on mount, as `Typewriter` does.** The user's call
+over leaving the gap documented or watching every ancestor's attributes, which would cost an observer per ancestor
+and still miss a stylesheet rule changing underneath. React, Vue and Svelte take the measurement once the
+framework has applied the update the call arrives in, so a consumer may change the style and ask in the same
+breath; each declares its own `PaintedTextController` for that wording and its barrel exports it by name, so it
+wins over the core's, which Solid uses as it is.
+
+**Content changes are followed by a `MutationObserver`, in both.** `Typewriter` used to wait for the consumer to
+call `update("content")`, on the grounds that every change restarts its typing and a consumer typing into the
+source would want to wait for a pause. The user's answer: a consumer who wants that debounces the value they pass
+in, as the Custom Input example now does, and nobody is left showing stale text for want of a call. The controller's
+`update` stays, for a change the component cannot see from inside its own copy — a class on an ancestor, say.
 
 ### `PointerTracker`: one reading of where the pointer is relative to one element
 
@@ -16229,12 +16364,12 @@ component's job and only the finished style crosses the boundary.
 **An arbitrary hole is `computePoints`, the same callback `Shape` takes**, and `joinRadii` and
 `lameExponents` come with it. The component passes the points to `ShapeUtils.getPaths` — which lives in
 `@thewaver/ss-utils` rather than inside `Shape`, so nothing had to be extracted to reach it — and drops the
-resulting outline into the mask image in place of the built-in shape. A consumer who wants a hexagon writes
+resulting contour into the mask image in place of the built-in shape. A consumer who wants a hexagon writes
 the callback every `Shape` consumer already writes, and rounded or bevelled or scooped corners are the same
 two props they would use there.
 
 **`roundness` was deleted rather than kept beside it.** It ran the hole from a square to a circle, which is
-a four-point outline with a join radius said a second way — and the second way only worked while no points
+a four-point contour with a join radius said a second way — and the second way only worked while no points
 were given, so a page carrying both would have shown a control that silently stopped mattering. A rounded
 square now comes from four points and a `joinRadii`, and the Playground's _Corner radius_ and _Corner style_
 fields are disabled while the shape is the default circle, which is the honest form of the same fact.
@@ -16243,7 +16378,7 @@ fields are disabled while the shape is the default circle, which is the honest f
 was a polygon standing in for one, which is worse at every count the component cares about: more points to
 blur, a visible facet count at large radii, and arithmetic in the common case that the SVG element does
 exactly. The points are computed in the image's inner box rather than its full square — the blur needs room
-inside the image or it clips at the edges — and the outline is then translated by that same inset.
+inside the image or it clips at the edges — and the contour is then translated by that same inset.
 
 **The mask is handed to `renderCover`, not applied by the component.** The signature is
 `renderCover(getIsRevealing, getMaskStyle)` and the consumer spreads that style onto its own cover element;
@@ -16261,7 +16396,7 @@ content grayed or blurred everywhere with color and detail restored inside the h
 on the cover and nothing else.
 
 **The cost, accepted rather than mitigated.** `Shape`'s handout is optional — ignore `getClipPath` and the
-shape still draws correctly, since the clip only matters to children that must sit inside the outline.
+shape still draws correctly, since the clip only matters to children that must sit inside the contour.
 `Reveal`'s is the entire product: a cover that never applies the style shows no hole at all, and nothing can
 detect the omission to warn about it. The alternative weighed against it was keeping the mask on the
 component's layer _and_ handing it out, which masks a filtering cover twice and makes one `softness` value
@@ -16474,7 +16609,7 @@ holding onto as the general shape: **any gesture built on pointer events owes th
 the browser will send one whether or not the gesture wanted it.
 
 **`renderCarried` is handed the item and nothing else.** The user's call, and the reasoning is theirs: a
-consumer may want the card under the cursor, or an outline, or a box, or a count, so what to draw cannot be
+consumer may want the card under the cursor, or a stroke, or a box, or a count, so what to draw cannot be
 the library's decision. It takes no flags — the first build passed some, and having to decide what
 `isCarried` should say to a slot that _is_ the carried thing was the sign the argument did not belong there.
 Nothing about the copy is interactive: it is not hovered, not focused, not a landing place, and whether it
@@ -16663,7 +16798,7 @@ the same tiling with the starting orientation inverted, which the unit tests pin
 relation to each other, with one wrinkle the test has to allow for: `getDefaultShapePoints` promises corners
 clockwise **starting from the top**, and mirroring a right-pointing triangle lands its top corner in the
 middle of the list rather than at the front. The corners are the same corners in the same order round the
-outline, so the test rotates both lists to start at the topmost corner before comparing them.
+contour, so the test rotates both lists to start at the topmost corner before comparing them.
 
 **`hasShortFirstRow` inverts which rows are short.** Asked for by the user. It has no effect on a shape whose
 rows are not offset; a triangle board that should start the other way round asks for `triangle-down` instead,
@@ -16736,7 +16871,7 @@ The consequence to know: **nothing a consumer paints inside a tile can take the 
 control inside a tile is not a thing this board supports. The tile is the control.
 
 **What the consumer clips is now the consumer's business, and the face is the case that shows it.** The
-Playground's tile paints a CSS gradient, which without a clip is a rectangle behind a hexagon outline —
+Playground's tile paints a CSS gradient, which without a clip is a rectangle behind a hexagon contour —
 `PageTileBoardTile` passes `Shape`'s own `getClipPath` to it, which is what `ShapePage` already does. The
 piece and the glow are outside that clip and hang over the row above.
 
@@ -16827,7 +16962,7 @@ fraction of the bottom edge's**, the user's definition, defaulting to `1` for fl
 
 **The whole board is transformed as one sheet, the user's choice over two others.** Drawing each row a little
 smaller than the one below breaks the tessellation — a narrower row of hexagons does not sit in the notches of
-a wider one, and the mismatch grows towards the edges. Working out each tile's tapered outline in script
+a wider one, and the mismatch grows towards the edges. Working out each tile's tapered contour in script
 leaves the painted content a rectangle, which would then need a 3D transform per tile anyway. One transform on
 the root keeps every tile meeting its neighbors exactly, and hit testing goes through it for free: the browser
 inverts the matrix when it finds what a press landed on, so the clipped hit layers still decide, and
@@ -16852,7 +16987,7 @@ the flat board's height, which is what maps the flat rows into the shorter box.
 
 **Thin lines break up in the far rows, and no CSS switch changes it.** The browser paints the board flat at
 full size and then squeezes the picture — to half its width and a quarter of its height at the top, for a
-taper of `0.5` — so a 1px outline there covers a fraction of a pixel and is sampled in and out, which draws it
+taper of `0.5` — so a 1px stroke there covers a fraction of a pixel and is sampled in and out, which draws it
 dashed. `will-change: transform`, `backface-visibility: hidden` and `shape-rendering: geometricPrecision`
 leave the pixels identical, and `transform-style: preserve-3d` changes a few without improving anything. What
 does work, checked on an isolated page, is a line drawn thicker by as much as its row is squeezed. **The
@@ -17154,13 +17289,13 @@ disabled — `WheelController.getIsSpinnable` is the same idea.
 
 **A painter is handed the geometry and picks its own way of drawing a shape.** The user asked for both
 routes and the answer is one slot with both in it: `renderItem` receives the item, its flags, and a geometry
-carrying the bounding size in cells, a pixel rectangle per occupied cell, and the outline of the whole shape
+carrying the bounding size in cells, a pixel rectangle per occupied cell, and the contour of the whole shape
 as a point list. A painter that wants tiles maps over the rectangles; one that wants a single continuous
-piece uses the outline as an SVG polygon or a clip path. Neither has to know the cell size or the gap, which
+piece uses the contour as an SVG polygon or a clip path. Neither has to know the cell size or the gap, which
 is the arithmetic that would otherwise be copied into every consumer. The Playground draws both: most
-examples use the outline, one uses the cells, and they are the same items either way.
+examples use the contour, one uses the cells, and they are the same items either way.
 
-**The outline bridges the gaps inside an item and stops short of them at its edges, which is the whole
+**The contour bridges the gaps inside an item and stops short of them at its edges, which is the whole
 difficulty.** Two cells of one item are one object, so the board's gap between them has to be filled; the
 item's outer edge, though, has to stop where the cell stops or the shape is a gap too wide. So the walk is
 done in cell units, where a shape is a union of unit squares and shared edges cancel, and only the finished
@@ -17179,7 +17314,7 @@ same problem without needing `TileBoard`'s clip path: a polyomino is squares, so
 consumer's own interactive child — which has to opt back into pointer events, as everything under an
 `interactionRoot` does — sits above them and still takes its own press. And the notch now falls through to
 the grid root, which is what makes a click in it a drop into that cell rather than nothing at all. Clipping
-the item element to the outline was the alternative and was rejected: it would clip the consumer's paint as
+the item element to the contour was the alternative and was rejected: it would clip the consumer's paint as
 well, so a glow, a badge or a shadow hanging past the shape would be cut off by a decision the library took
 for a hit-testing reason.
 
@@ -17193,7 +17328,7 @@ point, since a label needs a width to sit in. Ties are broken by whichever candi
 center of mass, which is what puts a Z's block on its middle pair rather than on an end.
 
 **The Playground's cell-by-cell example colors each item's squares by a hue derived from its key.** Also
-the user's: drawn as bare squares, two items side by side read as one field of tiles. The outline example
+the user's: drawn as bare squares, two items side by side read as one field of tiles. The contour example
 did not need it because the shape's own edge says where an item ends, so this is the one thing the per-cell
 route has to solve for itself — which is worth a demo showing it rather than a note saying it.
 
@@ -17201,7 +17336,7 @@ route has to solve for itself — which is worth a demo showing it rather than a
 Reported by the user, who noticed it worst on a one-by-three and a one-by-four and — the part that made it
 hard to name — not at all on the Z. The painter inset the viewBox by two units on every side so the stroke
 would have room, which changes the ratio of the box, not just its size. An SVG whose viewBox is a different
-shape from its element scales the drawing down uniformly to fit and centers what is left, so the outline
+shape from its element scales the drawing down uniformly to fit and centers what is left, so the contour
 came out short of the cells it was supposed to cover: a 44 by 140 sword was given a 48 by 144 viewBox and
 drawn at 91 per cent, while a 140 by 92 Z was given 144 by 96 and drawn at 96 — near enough to look right.
 The room for the stroke was never needed, since the element is `overflow: visible` and the half that falls
@@ -17308,7 +17443,7 @@ The first build had two modes under a `spawnMode` union. `batch` was the above; 
 
 **Where a particle sits is `computeParticlePos`, asked once per spawn, defaulting to the cell's center.** Scattering it inside the cell is a random answer to that callback, which the Playground offers, and is what makes the grid stop showing. The component owns no randomness except the spawn roll.
 
-**The area is `computeShapePoints`, the same input `Shape` takes, plus `shapeJoinRadii` and `shapeLameExponents`.** The user's intent, confirmed after an early "SVG path" turned out to mean this: the area is `Shape`'s own input, so the built-in shapes (`ShapeConst.getDefaultShapePoints`, corner lists that stretch to fill a box) work unchanged, and a path string with its own coordinates would have been a second vocabulary beside them. Rounded corners go through `ShapeUtils.getPaths`, whose `outerOutline` is the painted edge as a polygon, and each cell's center is tested against that by ray casting (`ParticleFieldUtils.isPointInPolygon`). No canvas, no DOM, so it is unit-tested. A shape stretches with the box, as `Shape`'s do: a consumer who wants proportions kept computes the points that way.
+**The area is `computeShapePoints`, the same input `Shape` takes, plus `shapeJoinRadii` and `shapeLameExponents`.** The user's intent, confirmed after an early "SVG path" turned out to mean this: the area is `Shape`'s own input, so the built-in shapes (`ShapeConst.getDefaultShapePoints`, corner lists that stretch to fill a box) work unchanged, and a path string with its own coordinates would have been a second vocabulary beside them. Rounded corners go through `ShapeUtils.getPaths`, whose `outerContour` is the painted edge as a polygon, and each cell's center is tested against that by ray casting (`ParticleFieldUtils.isPointInPolygon`). No canvas, no DOM, so it is unit-tested. A shape stretches with the box, as `Shape`'s do: a consumer who wants proportions kept computes the points that way.
 
 **Pausing freezes every particle.** Everything is drawn from the pass's progress, which only advances while the field runs, so a hidden tab or a pause does not age the particles.
 
@@ -17740,7 +17875,7 @@ land as a diamond, so a face that is the same turned half way round points its t
 instead. That one rule gives every tabletop die its conventional upright face without the shapes carrying a
 per-face orientation.
 
-**Every face is a real element, turned into place with one `matrix3d` and clipped to its outline.** The browser
+**Every face is a real element, turned into place with one `matrix3d` and clipped to its contour.** The browser
 does the depth, the perspective and the hiding of back faces, as it does for `Cuboid`; the body carries one more
 `matrix3d` for the whole die's rotation and is pushed back by its radius first, so it turns about its own center and
 the frame it reserves — `Cuboid`'s formula with the radius as the depth — holds at every angle.

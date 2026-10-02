@@ -8,6 +8,7 @@ export type { FileInputCbs } from "./Essentials/Input/FileInput/FileInput.types.
 export type { RangeCbs } from "./Essentials/Input/Range/Range.types.js";
 export type { TagInputCbs } from "./Essentials/Input/TagInput/TagInput.types.js";
 export type { TimeInputMeridiem } from "./Essentials/Input/TimeInput/TimeInput.types.js";
+export type { PaintedTextController } from "./Exotics/Text/PaintedText/PaintedText.types.js";
 export type { TypewriterController } from "./Exotics/Text/Typewriter/Typewriter.types.js";
 export type { BinarySwitchCbs, BinarySwitchState } from "./Primitives/BinarySwitch/BinarySwitch.types.js";
 export type { CarouselState } from "./Primitives/Carousel/Carousel.types.js";
@@ -287,6 +288,8 @@ export { default as Staircase } from "./Exotics/Arrangements/Staircase/Staircase
 export type * from "./Exotics/Arrangements/Staircase/Staircase.types.js";
 export { default as Odometer } from "./Exotics/Text/Odometer/Odometer.svelte";
 export type * from "./Exotics/Text/Odometer/Odometer.types.js";
+export { default as PaintedText } from "./Exotics/Text/PaintedText/PaintedText.svelte";
+export type * from "./Exotics/Text/PaintedText/PaintedText.types.js";
 export { default as Formation } from "./Exotics/Arrangements/Formation/Formation.svelte";
 export type * from "./Exotics/Arrangements/Formation/Formation.types.js";
 export { default as ParticleField } from "./Exotics/Particles/ParticleField/ParticleField.svelte";

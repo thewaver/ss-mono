@@ -79,7 +79,7 @@ export const InventoryExample = (props: Props) => {
             geometry={getGeometry}
             glyph={() => getItem().value.glyph}
             name={() => getItem().value.name}
-            paint={() => props.paint ?? "outline"}
+            paint={() => props.paint ?? "contour"}
             hue={() => computeGearHue(getItem().value)}
         />
     );

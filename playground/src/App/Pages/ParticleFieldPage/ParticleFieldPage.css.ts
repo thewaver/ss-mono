@@ -38,7 +38,7 @@ export const shapedRoot = style({
     height: "100%",
 });
 
-export const shapeOutline = style({
+export const shapeContour = style({
     position: "absolute",
     inset: 0,
     width: "100%",

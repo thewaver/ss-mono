@@ -4,12 +4,12 @@ const NEAR_GLOW_PX = 8;
 const FAR_GLOW_PX = 16;
 
 /**
- * The geometry and styling behind `Corners`' marks: the outline of one corner's arms and the glow the set is lit
+ * The geometry and styling behind `Corners`' marks: the contour of one corner's arms and the glow the set is lit
  * with. The marks' markup is each framework's.
  */
 export namespace CornerUtils {
     /**
-     * The outline of one corner's two arms, drawn for the top-left corner and mirrored into the others.
+     * The contour of one corner's two arms, drawn for the top-left corner and mirrored into the others.
      *
      * @param cornerLength How long the arms are, across and down.
      * @param strokeThickness How thick they are drawn.

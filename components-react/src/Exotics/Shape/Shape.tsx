@@ -73,7 +73,7 @@ export const Shape = (props: ShapeProps) => {
         <div
             ref={rootRef}
             className={ShapeStyles.shapeRoot}
-            style={{ shapeOutside: ShapeLayerUtils.computeShapeOutside(paths[0].outerOutline) }}
+            style={{ shapeOutside: ShapeLayerUtils.computeShapeOutside(paths[0].outerContour) }}
         >
             {fillDefs && (
                 <svg

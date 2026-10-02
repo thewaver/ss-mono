@@ -50,7 +50,7 @@ test("the consumer's stroke gradient lands in the stroke layer's own defs", asyn
 
     await expect(
         page.locator(`${LAYERS} >> nth=1 >> path`),
-        "and the stroke is painted as paths rather than as a stroked outline",
+        "and the stroke is painted as paths rather than as a stroked contour",
     ).not.toHaveCount(0);
 });
 

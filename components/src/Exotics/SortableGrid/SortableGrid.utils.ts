@@ -42,7 +42,7 @@ const getTurnedOnce = (cells: SortableGridSpot[], rowCount: number) =>
  * The outward-facing edges of a set of cells, each pointing clockwise.
  *
  * A cell contributes an edge only where it has no neighbor, so the edges collected are exactly the
- * outline. Directing them consistently is what lets them be threaded into a loop afterwards.
+ * contour. Directing them consistently is what lets them be threaded into a loop afterwards.
  */
 const getEdges = (cells: SortableGridSpot[]) => {
     const filled = new Set(cells.map(toKey));
@@ -63,7 +63,7 @@ const getEdges = (cells: SortableGridSpot[]) => {
  * Threads the edges into a single closed path of corner points.
  *
  * Starts from the topmost, leftmost corner so the same shape always produces the same path, which
- * matters for anything comparing or animating between outlines.
+ * matters for anything comparing or animating between contours.
  */
 const getLoop = (edges: SortableGridEdge[]) => {
     const byStart = new Map<string, SortableGridEdge[]>();
@@ -539,7 +539,7 @@ export namespace SortableGridUtils {
         }));
 
     /**
-     * The shape's outline as a pixel path.
+     * The shape's contour as a pixel path.
      *
      * Traces the edge of the painted cells rather than the grid lines, so the gaps between a shape's own
      * cells are enclosed rather than being cut into. Corners where the path carries straight on are
@@ -551,7 +551,7 @@ export namespace SortableGridUtils {
      * @returns The corners in clockwise order, starting from the topmost leftmost one — so the same
      * shape always gives the same path. Empty for a shape with no cells.
      */
-    export const getOutline = (cells: SortableGridSpot[], cellSize: number, gap: number): Point2d[] => {
+    export const getContour = (cells: SortableGridSpot[], cellSize: number, gap: number): Point2d[] => {
         if (cells.length < 1) return [];
 
         const loop = getWithoutCollinear(getLoop(getEdges(cells)));
@@ -612,7 +612,7 @@ export namespace SortableGridUtils {
 
     /**
      * What a painter is handed about a shape: its size in cells, a pixel rectangle per cell, the largest solid
-     * rectangle inside it and its outline.
+     * rectangle inside it and its contour.
      *
      * Everything is in pixels from the shape's own top-left corner, so a painter never needs the cell size or the
      * gap.
@@ -635,7 +635,7 @@ export namespace SortableGridUtils {
                 width: getSpan(block.size.colCount, cellSize, gap),
                 height: getSpan(block.size.rowCount, cellSize, gap),
             },
-            outline: getOutline(shape.cells, cellSize, gap),
+            contour: getContour(shape.cells, cellSize, gap),
         };
     };
 

@@ -15,12 +15,12 @@ import type {
 const NAMED_WIDTH = 2;
 
 const getBox = (geometry: SortableGridGeometry) => ({
-    width: Math.max(...geometry.outline.map((point) => point.x)),
-    height: Math.max(...geometry.outline.map((point) => point.y)),
+    width: Math.max(...geometry.contour.map((point) => point.x)),
+    height: Math.max(...geometry.contour.map((point) => point.y)),
 });
 
 const getPoints = (geometry: SortableGridGeometry) =>
-    geometry.outline.map((point) => `${point.x},${point.y}`).join(" ");
+    geometry.contour.map((point) => `${point.x},${point.y}`).join(" ");
 
 const getViewBox = (geometry: SortableGridGeometry) => {
     const box = getBox(geometry);
@@ -49,9 +49,9 @@ export const PageSortableGridItemContent = (props: SortableGridItemContentProps)
                 .filter(Boolean)
                 .join(" ")}
         >
-            {(props.paint ?? "outline") === "outline" ? (
+            {(props.paint ?? "contour") === "contour" ? (
                 <svg className={styles.sortableGridItemShape} viewBox={getViewBox(geometry)} aria-hidden="true">
-                    <polygon className={styles.sortableGridItemOutline} points={getPoints(geometry)} />
+                    <polygon className={styles.sortableGridItemContour} points={getPoints(geometry)} />
                 </svg>
             ) : (
                 geometry.cells.map((cell, index) => (
@@ -116,7 +116,7 @@ export const PageSortableGridLanding = (props: SortableGridLandingProps) => {
             viewBox={getViewBox(props.geometry)}
             aria-hidden="true"
         >
-            <polygon className={styles.sortableGridLandingOutline} points={getPoints(props.geometry)} />
+            <polygon className={styles.sortableGridLandingContour} points={getPoints(props.geometry)} />
         </svg>
     );
 };

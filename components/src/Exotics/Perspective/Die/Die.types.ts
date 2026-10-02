@@ -11,7 +11,7 @@ export type DieFaceGeometry = {
     right: Point3d;
     down: Point3d;
     size: Size2d;
-    outline: { x: number; y: number }[];
+    contour: { x: number; y: number }[];
 };
 
 export type DieQuaternion = {
@@ -28,7 +28,7 @@ export type DieFaceState = {
     isShowing: boolean;
     /** Which way the face points, out from the die's center, before the die is turned. A unit vector. */
     normal: Point3d;
-    /** How large the face's own box is, in pixels; the face's outline is centered in it. */
+    /** How large the face's own box is, in pixels; the face's contour is centered in it. */
     size: Size2d;
 };
 

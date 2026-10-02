@@ -49,7 +49,7 @@ handling) every component depends on.
   `SplitPane`, `Toasts`.
 - **Layout & data** — `Table`, `Tree`, `Scroller`, `Sortable`, `SortableGrid`, `ViewportWrapper`,
   `Surface`, `GlassSurface`, `TrackCarousel`, `DrumCarousel`, `Progress`, `Toolbar`.
-- **Visual & motion** — `Shape`, `RichText`, `CellAnimation`, `ScanlineAnimation`,
+- **Visual & motion** — `Shape`, `PaintedText`, `RichText`, `CellAnimation`, `ScanlineAnimation`,
   `Odometer`, `Typewriter`, `ScrambleText`, `FlipCard`, `Cuboid`, `Bracket`, `Formation`,
   `ParticleSpawner`, `PatchBoard`, `Reveal`, `ScratchCard`, `Satellite`, `Staircase`, `TileBoard`,
   `Timeline`, `Trail`, `DrumWheel`, `OverheadWheel`, `ElementMosaic`, `ImageMosaic`.

@@ -22,7 +22,7 @@ const colorKeys = () => Object.keys(props.controls.colors) as (keyof SVGDefsColo
     <PageProp
         item-key="paintKind"
         label="Painted as"
-        hint="Whether the gradient paints the inside of the sample shape or only its outline."
+        hint="Whether the gradient paints the inside of the sample shape or only its stroke."
     >
         <PageSelectField
             :value="controls.paintKind.value"

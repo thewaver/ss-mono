@@ -1,7 +1,7 @@
 import { createSignal, onCleanup } from "solid-js";
 
 import { Button, MediaQueryMonitorSolidUtils, Typewriter } from "@thewaver/ss-components-solid";
-import type { TypewriterController, TypewriterMode } from "@thewaver/ss-components-solid";
+import type { TypewriterMode } from "@thewaver/ss-components-solid";
 import { MEASURE_BOX_PADDING } from "@thewaver/ss-playground/App/PageComponents/MeasureBox/MeasureBox.css";
 import * as styles from "@thewaver/ss-playground/App/Pages/TypewriterPage/TypewriterPage.css";
 
@@ -20,7 +20,6 @@ const NO_MOTION_MS = 0;
 type Props = TypewriterPhrasesExampleProps;
 
 export const PhrasesExample = (props: Props) => {
-    const [getController, setController] = createSignal<TypewriterController>();
     const [getPhraseIndex, setPhraseIndex] = createSignal(FIRST_PHRASE);
     const [getMode, setMode] = createSignal<TypewriterMode>("type");
     const [getIsPaused, setIsPaused] = createSignal(false);
@@ -45,7 +44,6 @@ export const PhrasesExample = (props: Props) => {
 
         setPhraseIndex((index) => (index + 1) % PHRASES.length);
         setMode("type");
-        getController()?.update("content");
     };
 
     const requestStep = () => {
@@ -100,7 +98,6 @@ export const PhrasesExample = (props: Props) => {
                                     aria-hidden="true"
                                 />
                             )}
-                            onMount={setController}
                             onAnimationEnd={handleAnimationEnd}
                         >
                             {PHRASES[getPhraseIndex()]}

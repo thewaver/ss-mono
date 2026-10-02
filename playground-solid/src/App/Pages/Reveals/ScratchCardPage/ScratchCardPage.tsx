@@ -154,7 +154,7 @@ export const ScratchCardPage = () => {
                     />
                 </PageProp>
 
-                <PageProp key={"brushShape"} label={"Brush shape"} hint={"The outline of the patch a stroke clears."}>
+                <PageProp key={"brushShape"} label={"Brush shape"} hint={"The contour of the patch a stroke clears."}>
                     <PageSelectField
                         value={getBrushShape}
                         values={() => ScratchCardKnobs.BRUSH_SHAPES}

@@ -56,7 +56,7 @@ export const sortableGridItemShape = style({
     overflow: "visible",
 });
 
-export const sortableGridItemOutline = style({
+export const sortableGridItemContour = style({
     fill: layerVars.main,
     stroke: `rgb(from ${themeVars.color.primary.main} r g b / 50%)`,
     strokeWidth: 2,
@@ -124,7 +124,7 @@ export const sortableGridLanding = style({
     overflow: "visible",
 });
 
-export const sortableGridLandingOutline = style({
+export const sortableGridLandingContour = style({
     fill: `rgb(from ${themeVars.color.error.main} r g b / 25%)`,
     stroke: themeVars.color.error.main,
     strokeWidth: 2,

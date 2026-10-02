@@ -236,7 +236,7 @@ export const FormationPage = () => {
                         />
                     </PageProp>
 
-                    <PageProp key={"shapeKind"} label={"Item shape"} hint={"The outline each item is cut to."}>
+                    <PageProp key={"shapeKind"} label={"Item shape"} hint={"The contour each item is cut to."}>
                         <PageSelectField
                             value={getShapeKind}
                             values={() => ShapeConst.DEFAULT_SHAPES}

@@ -592,7 +592,7 @@ describe("computeKeyAction", () => {
 });
 
 describe("getClipPath", () => {
-    it("writes an outline as a polygon, and nothing for fewer than three corners", () => {
+    it("writes a contour as a polygon, and nothing for fewer than three corners", () => {
         expect(
             TileBoardUtils.getClipPath([
                 { x: 0, y: 0 },

@@ -98,14 +98,14 @@ describe("clampFace", () => {
 });
 
 describe("getFaceBox", () => {
-    it("centers a face's box inside the die and clips it to an outline written in the box's own space", () => {
+    it("centers a face's box inside the die and clips it to a contour written in the box's own space", () => {
         const face = {
             center: { x: 0, y: 0, z: 1 },
             normal: { x: 0, y: 0, z: 1 },
             right: { x: 1, y: 0, z: 0 },
             down: { x: 0, y: 1, z: 0 },
             size: { width: 40, height: 20 },
-            outline: [
+            contour: [
                 { x: -20, y: -10 },
                 { x: 20, y: -10 },
                 { x: 0, y: 10 },

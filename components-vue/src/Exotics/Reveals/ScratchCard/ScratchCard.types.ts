@@ -25,7 +25,7 @@ export type ScratchCardProps = {
     isDisabled?: boolean;
     /** Names the card for assistive technology. */
     ariaLabel: string;
-    /** The outline of the patch a stroke clears, worked out from the card's size. */
+    /** The contour of the patch a stroke clears, worked out from the card's size. */
     computePoints?: (size: Size2d) => Point2d[];
     /** Hands the consumer a controller once the card is up, for clearing or resetting it from outside. */
     onMount?: (controller: ScratchCardController) => void;

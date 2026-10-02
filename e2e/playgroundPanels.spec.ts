@@ -70,6 +70,9 @@ test("a migrated Select still drives the page state the raw one did", async ({ p
  * assertion is here as well as in `numberInput.spec.ts` because the panel is where the fault shipped.
  */
 test("a migrated NumberInput is not brought into range while it is still being typed", async ({ page }) => {
+    // The cell size only shows while a pattern is painting something, so the fill is switched to one first.
+    await page.getByRole("combobox", { name: "Fill", exact: true }).click();
+    await page.getByRole("option", { name: "Pattern", exact: true }).click();
     await revealProp(page, "cellSize");
     const field = page.locator(`${prop("cellSize")} input`);
 

@@ -55,7 +55,7 @@ happens, as a sequence — "the user presses Escape, the modal hides, the parent
 so clicking the button to reopen does nothing". Introduce a term only after describing the thing it names.
 
 **A fault is explained in plain prose, and never as a working sequence paired with a broken one.** Asked
-for by the user, after an outline appearing around `CellAnimation`'s cells was written up as "when it goes
+for by the user, after a line appearing around `CellAnimation`'s cells was written up as "when it goes
 right" in seven numbered steps followed by the same seven steps again with the fault in them: the prose that
 came after — what the thing does, why the two other samples do not show it — was enough on its own, and the
 paired walkthroughs were length without content. So describe what happens, concretely and in order if the
@@ -158,6 +158,13 @@ _"we settle work decisions, then sweep"_. So when a task carries several open de
 time, and do not touch the code until the last one is answered — an answer to one question is not a go-ahead
 while another is still open. The sweep then happens once, with every decision in hand.
 
+**While a decision is pending, no work starts — not even a fix on sight.** Corrected by the user, after a
+defect found in `JSXTextParserUtils` while preparing the questions for a new component was fixed on the spot
+between two of their questions. The fix itself was right; the timing was not. Their reason: while Claude works
+they do something else in parallel, and switching back to the editor only to find several minutes of work
+parked behind a question wastes both. So a defect found at that stage is reported alongside the questions, and
+fixed in the sweep with everything else. Questions first, every time, and only then the work.
+
 **A decision that comes up while agents are working is held, and asked once the work has stopped.** Stated by
 the user, after a question about popup placement was asked in the middle of a stream of agent reports and
 scrolled out of sight: while other agents are still reporting, each report pushes the question further up the
@@ -238,6 +245,13 @@ removed it deliberately and do not update specs when they change behavior. So a 
 the code regressed, or the spec is describing something they decided against — and the two are not
 distinguishable from the failure. Say which assertion fails and what it expects, and let them say which it is.
 This is the exception to _"fix on sight"_: a spec disagreeing with the code is not a defect on sight.
+
+**When the behavior changed this session at the user's request, the behavior wins and the spec is updated.**
+Stated by the user, after a source-view assertion went red because an example they had asked to be reworked now
+imported one more file, and the reply put it to them as a question. The rule above is for a red whose cause is
+unknown; here the cause is known, it is the work they asked for, and the spec is simply describing the code before
+it. So update the spec to match, preferring a relationship over a written-down value while there, and say in the
+report that it was done. Only a red that the session's changes cannot explain still goes to them.
 
 **A spec asks whether rendered content matches the class it was given, never whether it matches a value
 written down in the spec.** Stated by the user, in those terms, after a `richText.spec.ts` assertion pinned an

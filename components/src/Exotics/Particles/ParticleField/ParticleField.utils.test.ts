@@ -25,12 +25,12 @@ describe("ParticleFieldUtils", () => {
         expect(ParticleFieldUtils.toCenter({ x: 10, y: 20, width: 4, height: 6 })).toEqual({ x: 12, y: 23 });
     });
 
-    it("tells a point inside an outline from one outside it", () => {
+    it("tells a point inside a contour from one outside it", () => {
         expect(ParticleFieldUtils.isPointInPolygon({ x: 5, y: 5 }, SQUARE)).toBe(true);
         expect(ParticleFieldUtils.isPointInPolygon({ x: 15, y: 5 }, SQUARE)).toBe(false);
     });
 
-    it("leaves the notch of a concave outline outside", () => {
+    it("leaves the notch of a concave contour outside", () => {
         expect(ParticleFieldUtils.isPointInPolygon({ x: 5, y: 8 }, NOTCHED)).toBe(false);
         expect(ParticleFieldUtils.isPointInPolygon({ x: 1, y: 8 }, NOTCHED)).toBe(true);
     });
@@ -76,7 +76,7 @@ describe("ParticleFieldUtils", () => {
         expect(ParticleFieldUtils.computeLife(100, 100, 0)).toBe(1);
     });
 
-    it("keeps to the cells whose centers are inside the outline", () => {
+    it("keeps to the cells whose centers are inside the contour", () => {
         const cells = ParticleFieldUtils.computeCells({ col: 2, row: 1 }, { width: 20, height: 10 }, [[1]], SQUARE);
 
         expect(

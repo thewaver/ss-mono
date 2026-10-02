@@ -241,6 +241,8 @@ export * from "./Exotics/SortableGrid/SortableGrid";
 export type * from "./Exotics/SortableGrid/SortableGridSolid.types";
 export * from "./Exotics/Text/Odometer/Odometer";
 export type * from "./Exotics/Text/Odometer/OdometerSolid.types";
+export * from "./Exotics/Text/PaintedText/PaintedText";
+export type * from "./Exotics/Text/PaintedText/PaintedTextSolid.types";
 export * from "./Exotics/Text/RichText/RichText";
 export type * from "./Exotics/Text/RichText/RichTextSolid.types";
 export * from "./Exotics/Text/ScrambleText/ScrambleText";

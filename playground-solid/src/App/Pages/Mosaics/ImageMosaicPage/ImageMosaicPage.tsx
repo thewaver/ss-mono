@@ -40,7 +40,7 @@ const ImagesExampleWrapper = (props: MosaicSharedProps) => {
             </PageMeasureBox>
 
             <PageExampleKnobs>
-                <PageProp key={"shapeKey"} label={"Target shape"} hint={"The outline the tiles are packed into."}>
+                <PageProp key={"shapeKey"} label={"Target shape"} hint={"The contour the tiles are packed into."}>
                     <PageSelectField
                         value={getShapeKey}
                         values={() => MosaicImages.SAMPLE_SHAPE_KEYS}

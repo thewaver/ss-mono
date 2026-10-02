@@ -1360,7 +1360,7 @@ it is a rewrite of how the component renders.
 
 Worth knowing if this is ever reopened: the seams the pixel fixes come from the Playground drawing inside
 `Viewport`'s scale transform, where whole-pixel layout edges land on fractional device pixels — while the
-outline it causes reaches any consumer with translucent artwork, scaled or not.
+line it causes around each cell reaches any consumer with translucent artwork, scaled or not.
 
 ---
 

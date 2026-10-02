@@ -20,14 +20,14 @@ export const ShapedExample = ({
 
     const computeShapePoints = (size: Size2d) => ShapeConst.getDefaultShapePoints(shapeKind(), size);
 
-    const getOutlinePath = createMemo(
+    const getContourPath = createMemo(
         () => ShapeUtils.getPaths(computeShapePoints(getSize()), NO_EDGE_THICKNESSES, [joinRadius()]).outerPath,
     );
 
     return (
         <div ref={setRootRef} class={styles.shapedRoot}>
-            <svg class={styles.shapeOutline} aria-hidden="true">
-                <path d={getOutlinePath()} />
+            <svg class={styles.shapeContour} aria-hidden="true">
+                <path d={getContourPath()} />
             </svg>
 
             <DefaultExample

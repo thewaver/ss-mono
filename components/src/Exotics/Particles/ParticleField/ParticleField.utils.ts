@@ -41,24 +41,24 @@ export namespace ParticleFieldUtils {
     export const toCenter = (rect: Rect): Point2d => ({ x: rect.x + rect.width * 0.5, y: rect.y + rect.height * 0.5 });
 
     /**
-     * Whether a point lies inside a closed outline.
+     * Whether a point lies inside a closed contour.
      *
-     * Casts a ray to the right of the point and counts how many edges it crosses; an odd count is inside. The outline
-     * is closed from its last corner back to its first, and may be concave or cross itself — a crossing outline counts
+     * Casts a ray to the right of the point and counts how many edges it crosses; an odd count is inside. The contour
+     * is closed from its last corner back to its first, and may be concave or cross itself — a crossing contour counts
      * its overlaps as outside, as SVG's `evenodd` rule does. A point exactly on an edge may come out either way.
      *
      * @param point The point to test.
-     * @param outline The corners, in order.
-     * @returns `false` when the outline has fewer than three corners, since that encloses nothing.
+     * @param contour The corners, in order.
+     * @returns `false` when the contour has fewer than three corners, since that encloses nothing.
      */
-    export const isPointInPolygon = (point: Point2d, outline: Point2d[]): boolean => {
-        if (outline.length < 3) return false;
+    export const isPointInPolygon = (point: Point2d, contour: Point2d[]): boolean => {
+        if (contour.length < 3) return false;
 
         let isInside = false;
 
-        for (let i = 0, j = outline.length - 1; i < outline.length; j = i++) {
-            const a = outline[i];
-            const b = outline[j];
+        for (let i = 0, j = contour.length - 1; i < contour.length; j = i++) {
+            const a = contour[i];
+            const b = contour[j];
 
             if (a.y > point.y !== b.y > point.y && point.x < ((b.x - a.x) * (point.y - a.y)) / (b.y - a.y) + a.x) {
                 isInside = !isInside;
@@ -111,18 +111,18 @@ export namespace ParticleFieldUtils {
         lifetimeMs <= 0 ? 1 : MathUtils.clamp01((nowMs - spawnMs) / lifetimeMs);
 
     /**
-     * The outline particles are kept inside, from the corners the consumer worked out.
+     * The contour particles are kept inside, from the corners the consumer worked out.
      *
      * @param points The area's corners, or `undefined` for the whole field.
      * @param joinRadii How far each corner is rounded, as `Shape` takes it.
      * @param lameExponents How square or pinched each rounded corner is, as `Shape` takes it.
-     * @returns The rounded outline's points, or `undefined` when there is no area to keep to.
+     * @returns The rounded contour's points, or `undefined` when there is no area to keep to.
      */
-    export const computeOutline = (
+    export const computeContour = (
         points: Point2d[] | undefined,
         joinRadii: number[] | undefined,
         lameExponents: number[] | undefined,
-    ) => (points ? ShapeUtils.getPaths(points, NO_EDGE_THICKNESSES, joinRadii, lameExponents).outerOutline : undefined);
+    ) => (points ? ShapeUtils.getPaths(points, NO_EDGE_THICKNESSES, joinRadii, lameExponents).outerContour : undefined);
 
     /**
      * The cells that may spawn, in reading order.
@@ -130,13 +130,13 @@ export namespace ParticleFieldUtils {
      * @param count The grid's size in cells, from `CellAnimationUtils.computeCellCount`.
      * @param size The field's size.
      * @param weights A weight per cell, by row then column. A cell with none counts as `0`.
-     * @param outline From {@link computeOutline}. A cell whose center is outside it is left out.
+     * @param contour From {@link computeContour}. A cell whose center is outside it is left out.
      */
     export const computeCells = (
         count: Index2d,
         size: Size2d,
         weights: number[][],
-        outline: Point2d[] | undefined,
+        contour: Point2d[] | undefined,
     ): ParticleFieldCellDefs[] => {
         const cellSize = { width: size.width / count.col, height: size.height / count.row };
         const cells: ParticleFieldCellDefs[] = [];
@@ -145,7 +145,7 @@ export namespace ParticleFieldUtils {
             for (let col = 0; col < count.col; col++) {
                 const rect = { x: col * cellSize.width, y: row * cellSize.height, ...cellSize };
 
-                if (outline && !isPointInPolygon(toCenter(rect), outline)) continue;
+                if (contour && !isPointInPolygon(toCenter(rect), contour)) continue;
 
                 cells.push({
                     pos: { col, row },

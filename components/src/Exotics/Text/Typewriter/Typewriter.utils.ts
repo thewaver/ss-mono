@@ -16,6 +16,17 @@ const SINGLE_ELEMENT = 1;
 /** The weight of the last character to arrive, which erasing turns into the first. */
 const FULL_WEIGHT = 1;
 
+/** Names the elements in the text the typed copy cannot reproduce, so the difference is never a mystery. */
+const warnIfUnsupported = (container: HTMLElement) => {
+    const unsupported = JSXTextParserUtils.findUnsupportedElements(container);
+
+    if (!unsupported.length) return;
+
+    console.warn(
+        `Typewriter: ${unsupported.map((element) => `<${element.localName}>`).join(", ")} cannot be copied faithfully into the typed text, which loses a canvas's drawing, media playback, a frame's page and a form control's value.`,
+    );
+};
+
 /**
  * Plays text in a character at a time: measures what the consumer rendered, splits it into characters wrapped at the
  * width it was measured at, and runs the timer that says when a run has ended.
@@ -143,7 +154,13 @@ export namespace TypewriterUtils {
      * A run starts with the caret at {@link getFirstCaretIndex} and ends, after {@link getRunDurationMs}, with it at
      * {@link getLastCaretIndex} and the end reported. Starting a run throws away one under way. A layout cause that
      * finds the container the same width as last time is skipped outright, which is what keeps the size observer
-     * from restarting the text on every change that is not a change of width.
+     * from restarting the text on every change that is not a change of width. A web font or an image in the
+     * text finishing loading is measured again whatever the width, as a layout cause, since it moves line breaks
+     * without moving the box. Any change to what the container holds is a content cause, so a consumer who wants
+     * the typing to wait for a pause debounces the text they pass in.
+     *
+     * The first measurement and every content cause warn about elements the typed copy cannot reproduce — see
+     * `JSXTextParserUtils.findUnsupportedElements`.
      *
      * The measurement reads the live page, so the container must already hold the text it is to measure. The
      * functions in `opts` are read when they are needed, so they may answer differently over time.
@@ -207,14 +224,16 @@ export namespace TypewriterUtils {
             }, durationMs);
         };
 
-        const update = (cause: TypewriterUpdateCause) => {
+        const measure = (cause: TypewriterUpdateCause, isForced: boolean) => {
             const container = opts.getContainer();
 
             if (!container) return false;
 
             const width = container.clientWidth;
 
-            if (cause === "layout" && width === store.get().width) return false;
+            if (!isForced && cause === "layout" && width === store.get().width) return false;
+
+            if (store.get().width === undefined || cause === "content") warnIfUnsupported(container);
 
             write({ width });
             stop();
@@ -228,15 +247,32 @@ export namespace TypewriterUtils {
             return true;
         };
 
+        const update = (cause: TypewriterUpdateCause) => measure(cause, false);
+
         const reportCharacterStart = (index: number) =>
             write({ caretIndex: getCaretIndexOnStart(opts.getIsErasing(), index) });
 
         const observe = (container: HTMLElement) => {
-            const observer = new ResizeObserver(() => update("layout"));
+            const resizeObserver = new ResizeObserver(() => update("layout"));
+            const mutationObserver = new MutationObserver(() => update("content"));
+            const handleLoaded = () => measure("layout", true);
 
-            observer.observe(container);
+            resizeObserver.observe(container);
+            mutationObserver.observe(container, {
+                subtree: true,
+                childList: true,
+                characterData: true,
+                attributes: true,
+            });
+            container.addEventListener("load", handleLoaded, true);
+            document.fonts.addEventListener("loadingdone", handleLoaded);
 
-            return () => observer.disconnect();
+            return () => {
+                resizeObserver.disconnect();
+                mutationObserver.disconnect();
+                container.removeEventListener("load", handleLoaded, true);
+                document.fonts.removeEventListener("loadingdone", handleLoaded);
+            };
         };
 
         return { get: store.get, subscribe: store.subscribe, update, restart, reportCharacterStart, observe, stop };

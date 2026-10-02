@@ -49,7 +49,7 @@ export type SortableGridGeometry = {
     size: SortableGridSize;
     cells: SortableGridRect[];
     block: SortableGridRect;
-    outline: Point2d[];
+    contour: Point2d[];
 };
 
 export type SortableGridPlace = SortableGridSpot & {

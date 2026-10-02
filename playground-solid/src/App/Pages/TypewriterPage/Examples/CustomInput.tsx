@@ -1,7 +1,7 @@
 import { createEffect, createSignal, on, onCleanup } from "solid-js";
 
 import { Typewriter, access } from "@thewaver/ss-components-solid";
-import type { AccessorProps, TypewriterController } from "@thewaver/ss-components-solid";
+import type { AccessorProps } from "@thewaver/ss-components-solid";
 import { FunctionUtils } from "@thewaver/ss-utils";
 
 import type { TypewriterExampleProps } from "../TypewriterPage.types";
@@ -12,35 +12,16 @@ type Props = TypewriterExampleProps &
     }>;
 
 export const CustomInputExample = (props: Props) => {
-    let hasMounted = false;
+    const [getText, setText] = createSignal(access(props.text));
 
-    const [getController, setController] = createSignal<TypewriterController>();
-    const [getText, setText] = createSignal("");
+    const setTextDebounced = FunctionUtils.debounce((text: string) => setText(text), 500);
 
-    const updateContent = () => {
-        hasMounted = true;
+    onCleanup(setTextDebounced.cancel);
 
-        setText(access(props.text));
-        getController()?.update("content");
-    };
-
-    const updateContentDebounced = FunctionUtils.debounce(updateContent, 500);
-
-    onCleanup(updateContentDebounced.cancel);
-
-    createEffect(
-        on(
-            () => access(props.text),
-            () => (hasMounted ? updateContentDebounced() : updateContent()),
-        ),
-    );
+    createEffect(on(() => access(props.text), setTextDebounced, { defer: true }));
 
     return (
-        <Typewriter
-            animationName={props.animationName}
-            computeCharacterWeights={props.computeCharacterWeights}
-            onMount={setController}
-        >
+        <Typewriter animationName={props.animationName} computeCharacterWeights={props.computeCharacterWeights}>
             {getText()}
         </Typewriter>
     );

@@ -1,30 +1,13 @@
 import { createMemo, createSignal, createUniqueId } from "solid-js";
 
-import { InteractionTrackerSolidUtils, SVGDefsSamples, Shape, access } from "@thewaver/ss-components-solid";
-import {
-    NO_SAMPLE_KEY,
-    computeNoSampleDefs,
-} from "@thewaver/ss-playground/App/PageComponents/SampleGroups/SampleGroups.const";
+import { InteractionTrackerSolidUtils, Shape, access } from "@thewaver/ss-components-solid";
 import * as styles from "@thewaver/ss-playground/App/Pages/ShapePage/ShapePage.css";
 import { ShapeConst, ShapeUtils } from "@thewaver/ss-utils";
 
+import { computeShapeFillDefs, computeShapeStrokeDefs } from "../ShapePage.const";
 import type { ShapeExampleProps } from "../ShapePage.types";
 
-export const DefaultExample = ({
-    shouldClipChildren,
-    shouldPadChildren,
-    shapeKind,
-    strokeConfigKey,
-    strokeConfigDefs,
-    fillConfigKey,
-    iterationConfigKey,
-    cellSize,
-    animationDurationMs,
-    colors,
-    blurWidth,
-    edgeThicknesses,
-    ...otherProps
-}: ShapeExampleProps) => {
+export const DefaultExample = (props: ShapeExampleProps) => {
     const id = createUniqueId();
 
     const [getRootRef, setRootRef] = createSignal<HTMLElement>();
@@ -33,35 +16,14 @@ export const DefaultExample = ({
         applyButtonSemantics: true,
     });
 
-    const getStrokeKey = () => access(strokeConfigKey);
-    const getFillKey = () => access(fillConfigKey);
-    const getIterationConfig = () => SVGDefsSamples.Iteration.SAMPLE_CONFIGS[access(iterationConfigKey)];
-
     return (
         <div class={styles.exampleHost}>
             <Shape
-                {...otherProps}
-                computePoints={(size) => ShapeConst.getDefaultShapePoints(access(shapeKind), size)}
+                joinRadii={props.joinRadii}
+                lameExponents={props.lameExponents}
+                computePoints={(size) => ShapeConst.getDefaultShapePoints(access(props.shapeKind), size)}
                 computeStrokeDefs={(getSize, getRef) => {
-                    const strokeKey = getStrokeKey();
-                    const strokes =
-                        strokeKey === NO_SAMPLE_KEY
-                            ? computeNoSampleDefs(access(colors), "stroke")
-                            : SVGDefsSamples.Gradient.Timed.toConfig({
-                                  family: strokeKey,
-                                  defs: access(strokeConfigDefs),
-                              } as SVGDefsSamples.Gradient.Timed.Entry).computeSVGDefs(
-                                  `stroke-${id}`,
-                                  getFlags,
-                                  getRef,
-                                  {
-                                      getSize,
-                                      animationDurationMs: access(animationDurationMs),
-                                      colors: access(colors),
-                                      blurWidth: access(blurWidth),
-                                      ...getIterationConfig().computeDefs(access(animationDurationMs)),
-                                  },
-                              );
+                    const strokes = computeShapeStrokeDefs(id, props, getSize, getRef, getFlags);
 
                     if (getFlags().isFocusVisible) {
                         strokes.push({ color: "#FF00FF" });
@@ -70,7 +32,7 @@ export const DefaultExample = ({
                     return strokes;
                 }}
                 strokeGeom={() => {
-                    const result = [{ thicknesses: access(edgeThicknesses) }];
+                    const result = [{ thicknesses: access(props.edgeThicknesses) }];
 
                     if (getFlags().isFocusVisible) {
                         result.push({ thicknesses: [2] });
@@ -78,34 +40,23 @@ export const DefaultExample = ({
 
                     return result;
                 }}
-                computeFillDefs={(getSize, getRef) =>
-                    getFillKey() === NO_SAMPLE_KEY
-                        ? computeNoSampleDefs(access(colors), "fill")
-                        : SVGDefsSamples.Pattern.SAMPLE_CONFIGS[
-                              getFillKey() as SVGDefsSamples.Pattern.SampleKey
-                          ].computeSVGDefs(`fill-${id}`, undefined, getRef, {
-                              getSize,
-                              cellSize: access(cellSize),
-                              animationDurationMs: access(animationDurationMs),
-                              colors: access(colors),
-                              blurWidth: access(blurWidth),
-                              ...getIterationConfig().computeDefs(access(animationDurationMs)),
-                          })
-                }
+                computeFillDefs={(getSize, getRef) => computeShapeFillDefs(id, props, getSize, getRef)}
                 renderChildren={(getSize, getClipPath, getClipPoints) => {
                     const getStyle = createMemo(() => {
                         const size = getSize();
-                        const shape = access(shapeKind);
-                        const clipStyle = access(shouldClipChildren) ? { "clip-path": `path("${getClipPath()}")` } : {};
+                        const shape = access(props.shapeKind);
+                        const clipStyle = access(props.shouldClipChildren)
+                            ? { "clip-path": `path("${getClipPath()}")` }
+                            : {};
 
-                        if (!access(shouldPadChildren)) return clipStyle;
+                        if (!access(props.shouldPadChildren)) return clipStyle;
 
                         const paddingStyle =
                             shape === "square"
                                 ? ShapeUtils.getRectPadding(
-                                      access(edgeThicknesses),
-                                      access(otherProps.joinRadii),
-                                      access(otherProps.lameExponents),
+                                      access(props.edgeThicknesses),
+                                      access(props.joinRadii),
+                                      access(props.lameExponents),
                                   )
                                 : ShapeUtils.getPolygonPadding(size, getClipPoints());
 

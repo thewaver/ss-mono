@@ -18,7 +18,7 @@ export const PageSVGGradientsProps = (props: Props) => {
             <PageProp
                 itemKey={"paintKind"}
                 label={"Painted as"}
-                hint={"Whether the gradient paints the inside of the sample shape or only its outline."}
+                hint={"Whether the gradient paints the inside of the sample shape or only its stroke."}
             >
                 <PageSelectField
                     value={controls.paintKind[0]}

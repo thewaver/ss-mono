@@ -2,7 +2,7 @@
 import { onBeforeUnmount, shallowRef } from "vue";
 
 import { Button, MediaQueryMonitorVueUtils, Typewriter } from "@thewaver/ss-components-vue";
-import type { TypewriterController, TypewriterMode } from "@thewaver/ss-components-vue";
+import type { TypewriterMode } from "@thewaver/ss-components-vue";
 import { MEASURE_BOX_PADDING } from "@thewaver/ss-playground/App/PageComponents/MeasureBox/MeasureBox.css";
 import * as styles from "@thewaver/ss-playground/App/Pages/TypewriterPage/TypewriterPage.css";
 
@@ -28,7 +28,6 @@ const isPaused = shallowRef(false);
 
 const prefersReducedMotion = MediaQueryMonitorVueUtils.useReducedMotion();
 
-let controller: TypewriterController | undefined;
 let holdTimeout: ReturnType<typeof setTimeout> | undefined;
 let isStepWaiting = false;
 
@@ -45,7 +44,6 @@ const step = () => {
 
     phraseIndex.value = (phraseIndex.value + 1) % PHRASES.length;
     mode.value = "type";
-    controller?.update("content");
 };
 
 const requestStep = () => {
@@ -75,10 +73,6 @@ const togglePause = () => {
 
     if (!isPaused.value && isStepWaiting) step();
 };
-
-const setController = (next: TypewriterController) => {
-    controller = next;
-};
 </script>
 
 <template>
@@ -94,7 +88,6 @@ const setController = (next: TypewriterController) => {
                         :animation-delay-ms="prefersReducedMotion ? NO_MOTION_MS : CHARACTER_DELAY_MS"
                         :animation-duration-ms="prefersReducedMotion ? NO_MOTION_MS : CHARACTER_DURATION_MS"
                         :compute-character-weights="computeCharacterWeights"
-                        @mount="setController"
                         @animation-end="handleAnimationEnd"
                     >
                         <template #default>{{ PHRASES[phraseIndex] }}</template>

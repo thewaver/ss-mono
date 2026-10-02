@@ -1,31 +1,17 @@
-import { For, createMemo, createSignal, createUniqueId } from "solid-js";
+import { For, Show, createMemo, createSignal, createUniqueId } from "solid-js";
 import { createStore } from "solid-js/store";
 
-import { SVGDefsSamples, Shape, TimedGradientDefaults, access } from "@thewaver/ss-components-solid";
-import {
-    NO_SAMPLE_KEY,
-    computeNoSampleDefs,
-    splitEntriesIntoGroups,
-    toGroupEntriesWithNoSample,
-} from "@thewaver/ss-playground/App/PageComponents/SampleGroups/SampleGroups.const";
-import type { WithNoSample } from "@thewaver/ss-playground/App/PageComponents/SampleGroups/SampleGroups.types";
+import { SVGDefsSamples, Shape, access } from "@thewaver/ss-components-solid";
 import * as styles from "@thewaver/ss-playground/App/Pages/ShapePage/ShapePage.css";
 import { ShapeConst } from "@thewaver/ss-utils";
 import { assignInlineVars } from "@vanilla-extract/dynamic";
 
 import { ShapeKnobs } from "../../Knobs/Shapes.const";
-import { TimedGradientKnobs } from "../../Knobs/TimedGradients.const";
 import { PageExampleKnobs } from "../../PageComponents/ExampleKnobs/ExampleKnobs";
 import { PageExamples } from "../../PageComponents/Examples/Examples";
-import {
-    PageCheckField,
-    PageColorField,
-    PageGroupedSelectField,
-    PageNumberField,
-    PageSelectField,
-} from "../../PageComponents/Field/Field";
-import { PageKnobs } from "../../PageComponents/Knobs/Knobs";
-import type { Knob } from "../../PageComponents/Knobs/Knobs.types";
+import { PageCheckField, PageColorField, PageNumberField, PageSelectField } from "../../PageComponents/Field/Field";
+import { PagePaintPicker, createPaintSlot } from "../../PageComponents/PaintPicker/PaintPicker";
+import { getIsUsingKind } from "../../PageComponents/PaintPicker/PaintPicker.const";
 import { PageProp } from "../../PageComponents/Prop/Prop";
 import { PagePropsDivider, PagePropsGroups, PagePropsPanel } from "../../PageComponents/PropsPanel/PropsPanel";
 import { StressTest } from "../../PageComponents/StressTest/StressTest";
@@ -33,10 +19,8 @@ import type { StressTestDefs } from "../../PageComponents/StressTest/StressText.
 import { DefaultExample } from "./Examples/Default";
 import { MorphExample } from "./Examples/Morph";
 import { TextWrapExample } from "./Examples/TextWrap";
+import { computeShapeFillDefs, computeShapeStrokeDefs } from "./ShapePage.const";
 import type { ShapeExampleProps } from "./ShapePage.types";
-
-const GROUPPED_GRADIENTS = splitEntriesIntoGroups(SVGDefsSamples.Gradient.Timed.SAMPLE_ENTRIES);
-const GROUPPED_PATTERNS = splitEntriesIntoGroups(SVGDefsSamples.Pattern.SAMPLE_CONFIGS);
 
 const CORNER_FIELD_WIDTH = 80;
 const MAX_CORNER_COLUMNS = 6;
@@ -75,105 +59,45 @@ const STRESS_ITEMS: (StressTestDefs & { size: number })[] = [
 const EXAMPLES_ROOT = "/src/App/Pages/ShapePage/Examples";
 const DEFAULT_EXAMPLE_PATH = `${EXAMPLES_ROOT}/Default.tsx`;
 
-const StressTestWrapper = ({
-    shouldClipChildren,
-    shouldPadChildren,
-    shapeKind,
-    strokeConfigKey,
-    fillConfigKey,
-    iterationConfigKey,
-    cellSize,
-    animationDurationMs,
-    colors,
-    blurWidth,
-    edgeThicknesses,
-    strokeConfigDefs,
-    ...otherProps
-}: ShapeExampleProps) => {
+const StressTestWrapper = (props: ShapeExampleProps) => {
     const id = createUniqueId();
-
-    const getStrokeKey = () => access(strokeConfigKey);
-    const getFillKey = () => access(fillConfigKey);
-    const getIterationConfig = () => SVGDefsSamples.Iteration.SAMPLE_CONFIGS[access(iterationConfigKey)];
 
     return (
         <StressTest
             configs={() => STRESS_ITEMS}
             renderLabel={(getConfigIndex) => `Render ${STRESS_ITEMS[getConfigIndex()].count} items`}
-            renderItem={(getConfigIndex, getItemIndex) => (
-                <Shape
-                    {...otherProps}
-                    joinRadii={() =>
-                        access(otherProps.joinRadii)!.map(
-                            (n) => (n * STRESS_ITEMS[getConfigIndex()].size) / styles.exampleSize,
-                        )
-                    }
-                    computePoints={(size) => ShapeConst.getDefaultShapePoints(access(shapeKind), size)}
-                    computeStrokeDefs={(getSize, getRef) => {
-                        const strokeKey = getStrokeKey();
+            renderItem={(getConfigIndex, getItemIndex) => {
+                const getScale = () => STRESS_ITEMS[getConfigIndex()].size / styles.exampleSize;
 
-                        if (strokeKey === NO_SAMPLE_KEY) return computeNoSampleDefs(access(colors), "stroke");
-
-                        return SVGDefsSamples.Gradient.Timed.toConfig({
-                            family: strokeKey,
-                            defs: access(strokeConfigDefs),
-                        } as SVGDefsSamples.Gradient.Timed.Entry).computeSVGDefs(`stroke-${id}`, undefined, getRef, {
-                            getSize,
-                            animationDurationMs: access(animationDurationMs),
-                            colors: access(colors),
-                            blurWidth: access(blurWidth),
-                            ...getIterationConfig().computeDefs(access(animationDurationMs)),
-                        });
-                    }}
-                    strokeGeom={() => [
-                        {
-                            thicknesses: access(edgeThicknesses).map(
-                                (t) => (t * STRESS_ITEMS[getConfigIndex()].size) / styles.exampleSize,
-                            ),
-                        },
-                    ]}
-                    computeFillDefs={(getSize, getRef) => {
-                        const fillKey = getFillKey();
-
-                        if (fillKey === NO_SAMPLE_KEY) return computeNoSampleDefs(access(colors), "fill");
-
-                        return SVGDefsSamples.Pattern.SAMPLE_CONFIGS[fillKey].computeSVGDefs(
-                            `fill-${id}`,
-                            undefined,
-                            getRef,
-                            {
-                                getSize,
-                                cellSize: {
-                                    width:
-                                        (access(cellSize).width * STRESS_ITEMS[getConfigIndex()].size) /
-                                        styles.exampleSize,
-                                    height:
-                                        (access(cellSize).height * STRESS_ITEMS[getConfigIndex()].size) /
-                                        styles.exampleSize,
-                                },
-                                animationDurationMs: access(animationDurationMs),
-                                colors: access(colors),
-                                blurWidth: access(blurWidth),
-                                ...getIterationConfig().computeDefs(access(animationDurationMs)),
-                            },
-                        );
-                    }}
-                    renderChildren={(_, getClipPath) => {
-                        return (
-                            <div
-                                class={styles.stressExample}
-                                style={{
-                                    "width": `${STRESS_ITEMS[getConfigIndex()].size}px`,
-                                    "height": `${STRESS_ITEMS[getConfigIndex()].size}px`,
-                                    "clip-path": `path("${getClipPath()}")`,
-                                }}
-                            >
-                                {getItemIndex()}
-                            </div>
-                        );
-                    }}
-                />
-            )}
+                return (
+                    <Shape
+                        lameExponents={props.lameExponents}
+                        joinRadii={() => access(props.joinRadii)!.map((n) => n * getScale())}
+                        computePoints={(size) => ShapeConst.getDefaultShapePoints(access(props.shapeKind), size)}
+                        computeStrokeDefs={(getSize, getRef) =>
+                            computeShapeStrokeDefs(id, props, getSize, getRef, undefined, getScale())
+                        }
+                        strokeGeom={() => [{ thicknesses: access(props.edgeThicknesses).map((t) => t * getScale()) }]}
+                        computeFillDefs={(getSize, getRef) =>
+                            computeShapeFillDefs(id, props, getSize, getRef, getScale())
+                        }
+                        renderChildren={(_, getClipPath) => {
+                            return (
+                                <div
+                                    class={styles.stressExample}
+                                    style={{
+                                        "width": `${STRESS_ITEMS[getConfigIndex()].size}px`,
+                                        "height": `${STRESS_ITEMS[getConfigIndex()].size}px`,
+                                        "clip-path": `path("${getClipPath()}")`,
+                                    }}
+                                >
+                                    {getItemIndex()}
+                                </div>
+                            );
+                        }}
+                    />
+                );
+            }}
         />
     );
 };
@@ -209,7 +133,7 @@ const createShapeGeometry = (startingShapeKind: ShapeConst.DefaultShape = ShapeK
             <PageProp
                 key={"shapeKind"}
                 label={"Shape"}
-                hint={"The outline the shape is cut to, which also decides how many corners the corner fields offer."}
+                hint={"The contour the shape is cut to, which also decides how many corners the corner fields offer."}
             >
                 <PageSelectField
                     value={getShapeKind}
@@ -313,7 +237,7 @@ const DefaultExampleWrapper = (props: ShapeExampleProps) => {
                     key={"shouldClipChildren"}
                     label={"Clip children"}
                     hint={
-                        "Cuts whatever is inside the shape to the shape's own outline, instead of letting it spill past."
+                        "Cuts whatever is inside the shape to the shape's own contour, instead of letting it spill past."
                     }
                 >
                     <PageCheckField
@@ -353,7 +277,7 @@ const MorphExampleWrapper = (props: ShapeExampleProps) => {
                     key={"starPoints"}
                     label={"Star points"}
                     hint={
-                        "How many tips the star has. The outline carries twice as many points: one per tip, one per notch between tips."
+                        "How many tips the star has. The contour carries twice as many points: one per tip, one per notch between tips."
                     }
                 >
                     <PageNumberField
@@ -386,25 +310,8 @@ export const ShapePage = () => {
     const [getBlurWidth, setBlurWidth] = createSignal(ShapeKnobs.STARTING_BLUR_WIDTH);
     const [getAnimationDurationMs, setAnimationDurationMs] = createSignal(ShapeKnobs.STARTING_DURATION_MS);
     const [getEdgeThickness, setEdgeThickness] = createSignal(ShapeKnobs.STARTING_EDGE_THICKNESS);
-    const [getStrokeConfigKey, setStrokeConfigKey] = createSignal<
-        WithNoSample<SVGDefsSamples.Gradient.Timed.SampleKey>
-    >(ShapeKnobs.STARTING_GRADIENT_KEY);
-    const [strokeConfigDefs, setStrokeConfigDefs] = createStore<Record<string, Record<string, number | boolean>>>({});
-
-    const getStrokeKnobs = () => {
-        const key = getStrokeConfigKey();
-
-        return key === NO_SAMPLE_KEY ? {} : (TimedGradientKnobs.KNOBS_BY_FAMILY[key] as Record<string, Knob>);
-    };
-    const getStrokeDefaults = () => {
-        const key = getStrokeConfigKey();
-
-        return key === NO_SAMPLE_KEY ? {} : (TimedGradientDefaults.DEFAULTS_BY_FAMILY[key] as Record<string, unknown>);
-    };
-    const getStrokeConfigDefs = () => strokeConfigDefs[getStrokeConfigKey()] ?? {};
-
-    const [getFillConfigKey, setFillConfigKey] =
-        createSignal<WithNoSample<SVGDefsSamples.Pattern.SampleKey>>(NO_SAMPLE_KEY);
+    const stroke = createPaintSlot(ShapeKnobs.STARTING_STROKE_PAINT_KIND);
+    const fill = createPaintSlot(ShapeKnobs.STARTING_FILL_PAINT_KIND);
     const [getIterationConfigKey, setIterationConfigKey] = createSignal<SVGDefsSamples.Iteration.SampleKey>(
         ShapeKnobs.STARTING_ITERATION_KEY,
     );
@@ -419,9 +326,8 @@ export const ShapePage = () => {
             animationDurationMs: getAnimationDurationMs,
             colors: () => colors,
             shapeKind: () => ShapeKnobs.STARTING_SHAPE_KIND,
-            strokeConfigKey: getStrokeConfigKey,
-            strokeConfigDefs: getStrokeConfigDefs,
-            fillConfigKey: getFillConfigKey,
+            strokePaint: stroke.getPaint,
+            fillPaint: fill.getPaint,
             iterationConfigKey: getIterationConfigKey,
             cellSize: () => ({ width: getCellSize(), height: getCellSize() }),
             edgeThicknesses: () => [getEdgeThickness()],
@@ -440,7 +346,7 @@ export const ShapePage = () => {
                 key: "morph",
                 name: "Morph",
                 readout: () =>
-                    "one number from 0 to 1 is read inside computePoints and blends two outlines of twice the star-point count each, their corner radii and their exponents with them; under reduced motion the press jumps straight to the other shape",
+                    "one number from 0 to 1 is read inside computePoints and blends two contours of twice the star-point count each, their corner radii and their exponents with them; under reduced motion the press jumps straight to the other shape",
                 component: () => <MorphExampleWrapper {...commonProps} />,
                 path: `${EXAMPLES_ROOT}/Morph.tsx`,
             },
@@ -448,7 +354,7 @@ export const ShapePage = () => {
                 key: "textWrap",
                 name: "Text Wrap",
                 readout: () =>
-                    "the shape writes its outline as shape-outside, so floating it is all the page does for the text to follow the edge",
+                    "the shape writes its contour as shape-outside, so floating it is all the page does for the text to follow the edge",
                 component: () => <TextWrapExampleWrapper {...commonProps} />,
                 path: `${EXAMPLES_ROOT}/TextWrap.tsx`,
             },
@@ -463,68 +369,50 @@ export const ShapePage = () => {
     return (
         <div class={styles.root} style={assignInlineVars({ [styles.backgroundColor]: colors.background })}>
             <PagePropsGroups>
-                <PagePropsPanel scope={"sample"}>
-                    <PageProp
-                        key={"strokeConfigKey"}
-                        label={"Stroke Pattern"}
-                        hint={
-                            "Which animated gradient paints the shape's outline. Choosing one brings its own knobs with it."
-                        }
-                    >
-                        <PageGroupedSelectField
-                            value={getStrokeConfigKey}
-                            groups={() => toGroupEntriesWithNoSample(GROUPPED_GRADIENTS)}
-                            ariaLabel={"Stroke pattern"}
-                            onChange={(config) => setStrokeConfigKey(() => config)}
-                        />
-                    </PageProp>
+                <PagePaintPicker
+                    paintSlot={stroke}
+                    name={"stroke"}
+                    label={"Stroke"}
+                    hint={
+                        "What paints the shape's stroke: nothing but its flat color, a pattern, or a gradient that runs on a clock or follows the pointer."
+                    }
+                />
 
-                    <PageKnobs
-                        knobs={getStrokeKnobs}
-                        defaults={() => getStrokeDefaults()}
-                        values={getStrokeConfigDefs}
-                        onInput={(key, value) =>
-                            setStrokeConfigDefs(getStrokeConfigKey(), (previous) => ({ ...previous, [key]: value }))
-                        }
-                    />
-                </PagePropsPanel>
+                <PagePropsDivider />
+
+                <PagePaintPicker
+                    paintSlot={fill}
+                    name={"fill"}
+                    label={"Fill"}
+                    hint={
+                        "What paints the shape's inside: nothing but its flat color, a pattern, or a gradient that runs on a clock or follows the pointer."
+                    }
+                />
 
                 <PagePropsDivider />
 
                 <PagePropsPanel scope={"global"}>
-                    <PageProp
-                        key={"fillConfigKey"}
-                        label={"Fill Pattern"}
-                        hint={
-                            "Which repeating pattern fills the shape's inside. Choosing one brings its own knobs with it."
-                        }
-                    >
-                        <PageGroupedSelectField
-                            value={getFillConfigKey}
-                            groups={() => toGroupEntriesWithNoSample(GROUPPED_PATTERNS)}
-                            ariaLabel={"Fill pattern"}
-                            onChange={(config) => setFillConfigKey(() => config)}
-                        />
-                    </PageProp>
+                    <Show when={getIsUsingKind([stroke.getPaint(), fill.getPaint()], ["pattern"])}>
+                        <PageProp
+                            key={"cellSize"}
+                            label={"Pattern Cell Size (px)"}
+                            hint={"How large one tile of a pattern is before it repeats."}
+                        >
+                            <PageNumberField
+                                value={getCellSize}
+                                min={() => ShapeKnobs.MIN_CELL_SIZE}
+                                max={() => ShapeKnobs.MAX_CELL_SIZE}
+                                step={() => ShapeKnobs.CELL_SIZE_STEP}
+                                ariaLabel={"Pattern cell size"}
+                                onInput={setCellSize}
+                            />
+                        </PageProp>
+                    </Show>
 
-                    <PageProp
-                        key={"cellSize"}
-                        label={"Fill Cell Size (px)"}
-                        hint={"How large one tile of the fill pattern is before it repeats."}
-                    >
-                        <PageNumberField
-                            value={getCellSize}
-                            min={() => ShapeKnobs.MIN_CELL_SIZE}
-                            max={() => ShapeKnobs.MAX_CELL_SIZE}
-                            step={() => ShapeKnobs.CELL_SIZE_STEP}
-                            ariaLabel={"Fill cell size"}
-                            onInput={setCellSize}
-                        />
-                    </PageProp>
                     <PageProp
                         key={"colors"}
                         label={"Colors"}
-                        hint={"The colors the outline, the fill and the page's own background are painted from."}
+                        hint={"The colors the stroke, the fill and the page's own background are painted from."}
                     >
                         <div class={styles.colorList}>
                             <For each={Object.keys(colors)}>
@@ -539,7 +427,7 @@ export const ShapePage = () => {
                         </div>
                     </PageProp>
 
-                    <PageProp key={"edgeThicknessPx"} label={"Edge Thickness (px)"} hint={"How thick the outline is."}>
+                    <PageProp key={"edgeThicknessPx"} label={"Edge Thickness (px)"} hint={"How thick the stroke is."}>
                         <PageNumberField
                             value={getEdgeThickness}
                             min={() => ShapeKnobs.MIN_EDGE_THICKNESS}
@@ -553,7 +441,7 @@ export const ShapePage = () => {
                     <PageProp
                         key={"blurWidth"}
                         label={"Blur (px)"}
-                        hint={"How far the outline is blurred outward, which is what gives it its glow."}
+                        hint={"How far the stroke is blurred outward, which is what gives it its glow."}
                     >
                         <PageNumberField
                             value={getBlurWidth}
@@ -565,33 +453,35 @@ export const ShapePage = () => {
                         />
                     </PageProp>
 
-                    <PageProp
-                        key={"animationDurationMs"}
-                        label={"Animation duration (ms)"}
-                        hint={"How long one pass of the stroke or fill animation takes."}
-                    >
-                        <PageNumberField
-                            value={getAnimationDurationMs}
-                            min={() => ShapeKnobs.MIN_DURATION_MS}
-                            max={() => ShapeKnobs.MAX_DURATION_MS}
-                            step={() => ShapeKnobs.DURATION_STEP_MS}
-                            ariaLabel={"Animation duration"}
-                            onInput={setAnimationDurationMs}
-                        />
-                    </PageProp>
+                    <Show when={getIsUsingKind([stroke.getPaint(), fill.getPaint()], ["pattern", "timed"])}>
+                        <PageProp
+                            key={"animationDurationMs"}
+                            label={"Animation duration (ms)"}
+                            hint={"How long one pass of the stroke or fill animation takes."}
+                        >
+                            <PageNumberField
+                                value={getAnimationDurationMs}
+                                min={() => ShapeKnobs.MIN_DURATION_MS}
+                                max={() => ShapeKnobs.MAX_DURATION_MS}
+                                step={() => ShapeKnobs.DURATION_STEP_MS}
+                                ariaLabel={"Animation duration"}
+                                onInput={setAnimationDurationMs}
+                            />
+                        </PageProp>
 
-                    <PageProp
-                        key={"iterationConfigKey"}
-                        label={"Iteration Pattern"}
-                        hint={"How the animation repeats: once, endlessly, or back and forth."}
-                    >
-                        <PageSelectField
-                            value={getIterationConfigKey}
-                            values={() => SVGDefsSamples.Iteration.SAMPLE_KEYS}
-                            ariaLabel={"Iteration pattern"}
-                            onChange={(config) => setIterationConfigKey(() => config)}
-                        />
-                    </PageProp>
+                        <PageProp
+                            key={"iterationConfigKey"}
+                            label={"Iteration Pattern"}
+                            hint={"How the animation repeats: once, endlessly, or back and forth."}
+                        >
+                            <PageSelectField
+                                value={getIterationConfigKey}
+                                values={() => SVGDefsSamples.Iteration.SAMPLE_KEYS}
+                                ariaLabel={"Iteration pattern"}
+                                onChange={(config) => setIterationConfigKey(() => config)}
+                            />
+                        </PageProp>
+                    </Show>
                 </PagePropsPanel>
             </PagePropsGroups>
 

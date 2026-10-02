@@ -1,6 +1,7 @@
 export * from "@thewaver/ss-components";
 export type { DateInputEra } from "./Essentials/Input/DateInput/DateInput.types";
 export type { TimeInputMeridiem } from "./Essentials/Input/TimeInput/TimeInput.types";
+export type { PaintedTextController } from "./Exotics/Text/PaintedText/PaintedText.types";
 export type { TypewriterController } from "./Exotics/Text/Typewriter/Typewriter.types";
 
 export * from "./Abstracts/Anchor/AnchorVue.utils";
@@ -263,6 +264,8 @@ export * from "./Exotics/Arrangements/Staircase/Staircase";
 export type * from "./Exotics/Arrangements/Staircase/Staircase.types";
 export * from "./Exotics/Text/Odometer/Odometer";
 export type * from "./Exotics/Text/Odometer/Odometer.types";
+export * from "./Exotics/Text/PaintedText/PaintedText";
+export type * from "./Exotics/Text/PaintedText/PaintedText.types";
 export * from "./Exotics/Arrangements/Formation/Formation";
 export type * from "./Exotics/Arrangements/Formation/Formation.types";
 export * from "./Exotics/Particles/ParticleField/ParticleField";

@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 
 import { Button, MediaQueryMonitorReactUtils, Typewriter } from "@thewaver/ss-components-react";
-import type { TypewriterController, TypewriterMode } from "@thewaver/ss-components-react";
+import type { TypewriterMode } from "@thewaver/ss-components-react";
 import { MEASURE_BOX_PADDING } from "@thewaver/ss-playground/App/PageComponents/MeasureBox/MeasureBox.css";
 import * as styles from "@thewaver/ss-playground/App/Pages/TypewriterPage/TypewriterPage.css";
 
@@ -20,7 +20,6 @@ const NO_MOTION_MS = 0;
 type Props = TypewriterPhrasesExampleProps;
 
 export const PhrasesExample = (props: Props) => {
-    const controllerRef = useRef<TypewriterController>(undefined);
     const [phraseIndex, setPhraseIndex] = useState(FIRST_PHRASE);
     const [mode, setMode] = useState<TypewriterMode>("type");
     const [isPaused, setIsPaused] = useState(false);
@@ -50,7 +49,6 @@ export const PhrasesExample = (props: Props) => {
 
         setPhraseIndex((index) => (index + 1) % PHRASES.length);
         changeMode("type");
-        controllerRef.current?.update("content");
     };
 
     const requestStep = () => {
@@ -108,9 +106,6 @@ export const PhrasesExample = (props: Props) => {
                                     aria-hidden="true"
                                 />
                             )}
-                            onMount={(controller) => {
-                                controllerRef.current = controller;
-                            }}
                             onAnimationEnd={handleAnimationEnd}
                         >
                             {PHRASES[phraseIndex]}

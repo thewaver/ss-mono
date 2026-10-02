@@ -169,7 +169,7 @@ watch(
                     :geometry="geometry"
                     :glyph="item.value.glyph"
                     :name="item.value.name"
-                    :paint="paint ?? 'outline'"
+                    :paint="paint ?? 'contour'"
                     :hue="computeGearHue(item.value)"
                 />
             </template>
@@ -180,7 +180,7 @@ watch(
                     :geometry="geometry"
                     :glyph="item.value.glyph"
                     :name="item.value.name"
-                    :paint="paint ?? 'outline'"
+                    :paint="paint ?? 'contour'"
                     :hue="computeGearHue(item.value)"
                 />
             </template>

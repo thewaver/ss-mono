@@ -33,7 +33,7 @@ export type TileBoardRenderProps = {
     tile: Index2d;
     /** How large the tile is. */
     size: Size2d;
-    /** The corners of the tile's outline, for a consumer drawing something other than a rectangle. */
+    /** The corners of the tile's contour, for a consumer drawing something other than a rectangle. */
     points: Point2d[];
     /** Whether this tile sits on an offset row, which for a hexagon decides which way round it is drawn. */
     isFlipped: boolean;

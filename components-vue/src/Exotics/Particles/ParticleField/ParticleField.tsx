@@ -46,8 +46,8 @@ export const ParticleField = defineComponent(
             return previous && CellAnimationUtils.getIsSameCount(previous, next) ? previous : next;
         });
 
-        const outline = computed(() =>
-            ParticleFieldUtils.computeOutline(
+        const contour = computed(() =>
+            ParticleFieldUtils.computeContour(
                 props.computeShapePoints?.(rootSize.value),
                 props.shapeJoinRadii,
                 props.shapeLameExponents,
@@ -59,7 +59,7 @@ export const ParticleField = defineComponent(
                 cellCount.value,
                 rootSize.value,
                 props.computeCellWeights?.(cellCount.value) ?? NO_WEIGHTS,
-                outline.value,
+                contour.value,
             ),
         );
 

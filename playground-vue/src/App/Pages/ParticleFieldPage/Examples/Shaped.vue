@@ -39,7 +39,7 @@ const computeShapePoints = computed(
 
 const shapeJoinRadii = computed(() => [props.joinRadius]);
 
-const outlinePath = computed(
+const contourPath = computed(
     () =>
         ShapeUtils.getPaths(computeShapePoints.value(size.value), NO_EDGE_THICKNESSES, shapeJoinRadii.value).outerPath,
 );
@@ -47,8 +47,8 @@ const outlinePath = computed(
 
 <template>
     <div ref="rootRef" :class="styles.shapedRoot">
-        <svg :class="styles.shapeOutline" aria-hidden="true">
-            <path :d="outlinePath" />
+        <svg :class="styles.shapeContour" aria-hidden="true">
+            <path :d="contourPath" />
         </svg>
 
         <DefaultExample

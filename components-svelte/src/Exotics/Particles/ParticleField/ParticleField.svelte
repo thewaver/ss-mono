@@ -52,8 +52,8 @@
         return next;
     });
 
-    const outline = $derived(
-        ParticleFieldUtils.computeOutline(
+    const contour = $derived(
+        ParticleFieldUtils.computeContour(
             props.computeShapePoints?.(getRootSize()),
             props.shapeJoinRadii,
             props.shapeLameExponents,
@@ -65,7 +65,7 @@
             cellCount,
             getRootSize(),
             props.computeCellWeights?.(cellCount) ?? NO_WEIGHTS,
-            outline,
+            contour,
         ),
     );
 

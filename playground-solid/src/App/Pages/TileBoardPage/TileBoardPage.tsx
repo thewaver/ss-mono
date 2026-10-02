@@ -287,7 +287,7 @@ export const TileBoardPage = () => {
                 <PageProp
                     key={"shape"}
                     label={"Tile shape"}
-                    hint={"The outline each tile is cut to. A hexagon offsets alternate rows; a square does not."}
+                    hint={"The contour each tile is cut to. A hexagon offsets alternate rows; a square does not."}
                 >
                     <PageSelectField
                         value={getShape}

@@ -54,7 +54,7 @@
     <PageProp
         itemKey={"shapeKind"}
         label={"Shape"}
-        hint={"The outline the shape is cut to, which also decides how many corners the corner fields offer."}
+        hint={"The contour the shape is cut to, which also decides how many corners the corner fields offer."}
     >
         <PageSelectField
             value={shapeKind}

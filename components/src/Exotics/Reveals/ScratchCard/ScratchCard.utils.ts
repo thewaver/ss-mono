@@ -7,7 +7,7 @@ import type { ScratchCardBrushGeometry, ScratchCardBrushShape } from "./ScratchC
 const NOTHING = 0;
 /** Halfway, for taking a sample from the middle of its cell. */
 const HALF = 0.5;
-/** Asks the shape builder for an outline only, with no stroked edges. */
+/** Asks the shape builder for a contour only, with no stroked edges. */
 const NO_EDGE_THICKNESSES = [0];
 /** The brush shape when the caller has not described one. */
 const CIRCLE_CLIP_PATH = "circle(50%)";
@@ -32,10 +32,10 @@ const COORDINATE_DIGITS = 1;
  */
 export namespace ScratchCardUtils {
     /**
-     * The brush's outline, in its own coordinates.
+     * The brush's contour, in its own coordinates.
      *
-     * @param shape The brush: its radius, and a function describing its outline.
-     * @returns The points, or `undefined` for a brush that has no outline of its own and should be
+     * @param shape The brush: its radius, and a function describing its contour.
+     * @returns The points, or `undefined` for a brush that has no contour of its own and should be
      * drawn as a circle.
      */
     export const computeBrushPoints = (shape: ScratchCardBrushShape) =>
@@ -45,7 +45,7 @@ export namespace ScratchCardUtils {
      * The brush shape as a CSS clip path, for drawing the cursor.
      *
      * @param shape The brush.
-     * @returns A path, or a circle for a brush with no outline of its own.
+     * @returns A path, or a circle for a brush with no contour of its own.
      */
     export const computeBrushClipPath = (shape: ScratchCardBrushShape) => {
         const points = computeBrushPoints(shape);
@@ -86,7 +86,7 @@ export namespace ScratchCardUtils {
      *
      * @param point Where to stamp.
      * @param radius The brush's radius.
-     * @param points The brush's outline. Without one, two arcs are used to draw a circle — a single arc
+     * @param points The brush's contour. Without one, two arcs are used to draw a circle — a single arc
      * cannot describe a full circle, since its start and end would coincide.
      */
     export const computeStampPath = (point: Point2d, radius: number, points: Point2d[] | undefined) => {

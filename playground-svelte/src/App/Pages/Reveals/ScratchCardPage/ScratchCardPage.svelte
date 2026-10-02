@@ -165,7 +165,7 @@
     <PageProp
         itemKey={"brushShape"}
         label={"Brush shape"}
-        hint={"The outline of the patch a stroke clears."}
+        hint={"The contour of the patch a stroke clears."}
     >
         <PageSelectField
             value={brushShape}

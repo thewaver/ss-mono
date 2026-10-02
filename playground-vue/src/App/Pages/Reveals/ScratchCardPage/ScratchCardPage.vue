@@ -155,7 +155,7 @@ const examples: ExampleDefs[] = [
             />
         </PageProp>
 
-        <PageProp item-key="brushShape" label="Brush shape" hint="The outline of the patch a stroke clears.">
+        <PageProp item-key="brushShape" label="Brush shape" hint="The contour of the patch a stroke clears.">
             <PageSelectField
                 :value="brushShape"
                 :values="ScratchCardKnobs.BRUSH_SHAPES"

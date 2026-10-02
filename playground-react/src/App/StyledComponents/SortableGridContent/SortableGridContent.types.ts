@@ -6,7 +6,7 @@ import type {
     SortableGridSpot,
 } from "@thewaver/ss-components-react";
 
-export type SortableGridPaint = "outline" | "cells";
+export type SortableGridPaint = "contour" | "cells";
 
 export type SortableGridItemContentProps = {
     flags: InteractionFlags<SortableGridItemFlags>;

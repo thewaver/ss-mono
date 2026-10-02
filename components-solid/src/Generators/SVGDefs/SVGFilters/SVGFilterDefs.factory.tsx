@@ -160,7 +160,7 @@ export class SVGFilterDefsFactory {
      *
      * The noise defaults to one octave of `fractalNoise` at seed `0`, unstitched, driving the horizontal shift
      * from the red channel and the vertical from the green. An `edgeFade` above `0` calms the displacement to
-     * nothing within that many user units of the shape's edge, so the outline holds while the inside moves.
+     * nothing within that many user units of the shape's edge, so the contour holds while the inside moves.
      * Skipped when the scale is `0`.
      *
      * @param defs The noise, how far it shifts pixels, which channels drive each axis, and the edge fade.

@@ -2,12 +2,12 @@
     import type { SortableGridGeometry } from "@thewaver/ss-components-svelte";
 
     const getBox = (geometry: SortableGridGeometry) => ({
-        width: Math.max(...geometry.outline.map((point) => point.x)),
-        height: Math.max(...geometry.outline.map((point) => point.y)),
+        width: Math.max(...geometry.contour.map((point) => point.x)),
+        height: Math.max(...geometry.contour.map((point) => point.y)),
     });
 
     export const getPoints = (geometry: SortableGridGeometry) =>
-        geometry.outline.map((point) => `${point.x},${point.y}`).join(" ");
+        geometry.contour.map((point) => `${point.x},${point.y}`).join(" ");
 
     export const getViewBox = (geometry: SortableGridGeometry) => {
         const box = getBox(geometry);
@@ -46,9 +46,9 @@
         props.flags.isDisabled && styles.isDisabled,
     ]}
 >
-    {#if (props.paint ?? "outline") === "outline"}
+    {#if (props.paint ?? "contour") === "contour"}
         <svg class={styles.sortableGridItemShape} viewBox={getViewBox(geometry)} aria-hidden="true">
-            <polygon class={styles.sortableGridItemOutline} points={getPoints(geometry)} />
+            <polygon class={styles.sortableGridItemContour} points={getPoints(geometry)} />
         </svg>
     {:else}
         {#each geometry.cells as cell, index (index)}

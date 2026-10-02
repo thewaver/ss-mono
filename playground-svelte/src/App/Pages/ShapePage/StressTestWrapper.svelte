@@ -1,14 +1,11 @@
 <script lang="ts">
-    import { SVGDefsSamples, Shape } from "@thewaver/ss-components-svelte";
-    import {
-        NO_SAMPLE_KEY,
-        computeNoSampleDefs,
-    } from "@thewaver/ss-playground/App/PageComponents/SampleGroups/SampleGroups.const";
+    import { Shape } from "@thewaver/ss-components-svelte";
     import * as styles from "@thewaver/ss-playground/App/Pages/ShapePage/ShapePage.css";
     import { ShapeConst } from "@thewaver/ss-utils";
 
     import StressTest from "../../PageComponents/StressTest/StressTest.svelte";
     import type { StressTestDefs } from "../../PageComponents/StressTest/StressText.types";
+    import { computeShapeFillDefs, computeShapeStrokeDefs } from "./ShapePage.const";
     import type { ShapeExampleProps } from "./ShapePage.types";
 
     const STRESS_ITEMS: (StressTestDefs & { size: number })[] = [
@@ -36,7 +33,7 @@
 
     const id = $props.id();
 
-    const iterationConfig = $derived(SVGDefsSamples.Iteration.SAMPLE_CONFIGS[props.iterationConfigKey]);
+    const getScale = (configIndex: number) => STRESS_ITEMS[configIndex].size / styles.exampleSize;
 </script>
 
 <StressTest configs={STRESS_ITEMS}>
@@ -49,20 +46,8 @@
             joinRadii={props.joinRadii!.map((n) => (n * STRESS_ITEMS[configIndex].size) / styles.exampleSize)}
             lameExponents={props.lameExponents}
             computePoints={(size) => ShapeConst.getDefaultShapePoints(props.shapeKind, size)}
-            computeStrokeDefs={(size, element) => {
-                if (props.strokeConfigKey === NO_SAMPLE_KEY) return computeNoSampleDefs(props.colors, "stroke");
-
-                return SVGDefsSamples.Gradient.Timed.toConfig({
-                    family: props.strokeConfigKey,
-                    defs: props.strokeConfigDefs,
-                } as SVGDefsSamples.Gradient.Timed.Entry).computeSVGDefs(`stroke-${id}`, undefined, element, {
-                    getSize: () => size,
-                    animationDurationMs: props.animationDurationMs,
-                    colors: props.colors,
-                    blurWidth: props.blurWidth,
-                    ...iterationConfig.computeDefs(props.animationDurationMs),
-                });
-            }}
+            computeStrokeDefs={(size, element) =>
+                computeShapeStrokeDefs(id, props, size, element, undefined, getScale(configIndex))}
             strokeGeom={[
                 {
                     thicknesses: props.edgeThicknesses.map(
@@ -70,26 +55,8 @@
                     ),
                 },
             ]}
-            computeFillDefs={(size, element) => {
-                if (props.fillConfigKey === NO_SAMPLE_KEY) return computeNoSampleDefs(props.colors, "fill");
-
-                return SVGDefsSamples.Pattern.SAMPLE_CONFIGS[props.fillConfigKey].computeSVGDefs(
-                    `fill-${id}`,
-                    undefined,
-                    element,
-                    {
-                        getSize: () => size,
-                        cellSize: {
-                            width: (props.cellSize.width * STRESS_ITEMS[configIndex].size) / styles.exampleSize,
-                            height: (props.cellSize.height * STRESS_ITEMS[configIndex].size) / styles.exampleSize,
-                        },
-                        animationDurationMs: props.animationDurationMs,
-                        colors: props.colors,
-                        blurWidth: props.blurWidth,
-                        ...iterationConfig.computeDefs(props.animationDurationMs),
-                    },
-                );
-            }}
+            computeFillDefs={(size, element) =>
+                computeShapeFillDefs(id, props, size, element, getScale(configIndex))}
         >
             {#snippet renderChildren(_size, clipPath)}
                 <div

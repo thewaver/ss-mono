@@ -103,15 +103,29 @@ test("a sample gets no tab, and neither does the registry it lives in", async ({
     ).toEqual([]);
 });
 
+/**
+ * Which of the page's own files the example pulls in is the example's business and changes as it is reworked, so the
+ * folder tab is checked against the example's own source rather than against a list written down here: every
+ * `ShapePage.*` module the example imports is a section, and nothing else is.
+ */
 test("switching tabs replaces the sections and closing the modal needs no source button", async ({ page }) => {
     await page.goto("/shape");
     await openSource(page, "default");
+
+    const exampleSource = (await page.locator(CODE).first().textContent()) ?? "";
+    const imported = [
+        ...new Set([...exampleSource.matchAll(/ShapePage\.(\w+)["']/g)].map((match) => `ShapePage.${match[1]}.ts`)),
+    ];
+
+    expect(imported.length, "the example imports something of its page's own").toBeGreaterThan(0);
 
     await page.locator(TAB, { hasText: "ShapePage" }).first().click();
 
     const sections = (await page.locator(SECTION_HEADER).allTextContents()).map((text) => text.replace("▶", "").trim());
 
-    expect(sections, "the page's own folder is what is listed now").toEqual(["ShapePage.types.ts", "ShapePage.css.ts"]);
+    expect(sections.toSorted(), "the page's own folder is listed now, exactly the files the example imports").toEqual(
+        imported.toSorted(),
+    );
 
     await page.keyboard.press("Escape");
     await expect(page.locator(DIALOG), "and Escape still closes the modal").toHaveCount(0);

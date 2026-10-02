@@ -180,7 +180,7 @@ export namespace DieUtils {
      * @param shape The solid.
      * @param radius How far a corner at distance one from the center is drawn from it, in pixels.
      * @returns Per face: its center, the direction it points, the two directions across it — right and down as they
-     * read once the face is turned towards the viewer — its box, and its outline inside that box, measured from the
+     * read once the face is turned towards the viewer — its box, and its contour inside that box, measured from the
      * box's center. A face's top points at its first corner, except on a face that is the same turned half way round,
      * like a square, where it points at the middle of the first edge so the face shows square-on rather than as a
      * diamond. Every face is turned to point outward whatever order its corners were given in.
@@ -200,17 +200,17 @@ export namespace DieUtils {
             const up = normalize(toTop);
             const down = scale(up, -SINGLE);
             const right = cross(down, normal);
-            const outline = points.map((point) => {
+            const contour = points.map((point) => {
                 const offset = subtract(point, center);
 
                 return { x: dot(offset, right), y: dot(offset, down) };
             });
             const size: Size2d = {
-                width: Math.max(...outline.map((point) => Math.abs(point.x))) * DOUBLE,
-                height: Math.max(...outline.map((point) => Math.abs(point.y))) * DOUBLE,
+                width: Math.max(...contour.map((point) => Math.abs(point.x))) * DOUBLE,
+                height: Math.max(...contour.map((point) => Math.abs(point.y))) * DOUBLE,
             };
 
-            return { center, normal, right, down, size, outline };
+            return { center, normal, right, down, size, contour };
         });
 
     /**
@@ -448,16 +448,16 @@ export namespace DieUtils {
         `translateZ(${-size * HALF}px) ${toTransform(toRotation(orientation))}`;
 
     /**
-     * Where one face's box sits inside the die's box, and the outline it is clipped to.
+     * Where one face's box sits inside the die's box, and the contour it is clipped to.
      *
      * @param face The face.
      * @param size How far across the die is at its widest.
-     * @returns The box's offset from the top left, so it is centered, and the CSS `clip-path` polygon of its outline.
+     * @returns The box's offset from the top left, so it is centered, and the CSS `clip-path` polygon of its contour.
      */
     export const getFaceBox = (face: DieFaceGeometry, size: number) => ({
         left: (size - face.size.width) * HALF,
         top: (size - face.size.height) * HALF,
-        clipPath: `polygon(${face.outline
+        clipPath: `polygon(${face.contour
             .map((point) => `${point.x + face.size.width * HALF}px ${point.y + face.size.height * HALF}px`)
             .join(",")})`,
     });

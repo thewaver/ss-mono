@@ -125,7 +125,7 @@ export namespace SunburstUtils {
     });
 
     /**
-     * The outline of an arc, as an SVG path about the origin.
+     * The contour of an arc, as an SVG path about the origin.
      *
      * @param arc Where the arc sits.
      * @param opts.padLength A gap to leave between this arc and its neighbors in the ring. It is the same width in
