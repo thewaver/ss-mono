@@ -60,6 +60,11 @@ export type TypewriterPlayerOpts = {
     getResetAnimationOnLayout: () => boolean | undefined;
     /** Runs once every character has arrived. */
     onAnimationEnd?: () => void;
+    /**
+     * Whether a drawer inside the typewriter draws the letters, in which case the player measures nothing and is
+     * told its letter count instead.
+     */
+    getIsDriven?: () => boolean;
 };
 
 export type TypewriterPlayer = {
@@ -71,6 +76,11 @@ export type TypewriterPlayer = {
     update: (cause: TypewriterUpdateCause) => boolean;
     /** Starts a run from nothing, unless the cause's preference says not to. */
     restart: (cause?: TypewriterUpdateCause) => void;
+    /**
+     * Sets how many letters there are, as a drawer reports them, then starts a run unless the cause's preference
+     * says not to.
+     */
+    setCount: (count: number, cause: TypewriterUpdateCause) => void;
     /** Moves the caret to follow a character whose own animation has just started. */
     reportCharacterStart: (index: number) => void;
     /**

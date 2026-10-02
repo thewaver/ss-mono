@@ -38,7 +38,7 @@ export namespace ShapeKnobs {
     export const STARTING_JOIN_RADII: number[] = [40, 40, 40, 40, 40, 40];
     export const STARTING_LAME_EXPONENTS: number[] = [1, 1, 1, 1, 1, 1];
     export const STARTING_STROKE_PAINT_KIND: PaintKind = "timed";
-    export const STARTING_FILL_PAINT_KIND: PaintKind = "none";
+    export const STARTING_FILL_PAINT_KIND: PaintKind = "solid";
     export const STARTING_ITERATION_KEY: SVGDefsSamples.Iteration.SampleKey = "constant";
     export const DURATION_STEP_MS = 100;
 }

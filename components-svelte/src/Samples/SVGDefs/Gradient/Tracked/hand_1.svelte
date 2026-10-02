@@ -1,6 +1,7 @@
 <svelte:options namespace="svg" />
 
 <script module lang="ts">
+    import SVGClipPath from "../../../../Generators/SVGDefs/SVGClipPaths/SVGClipPath.svelte";
     import {
         type GradientHandOpts,
         SVGDefsUtils,
@@ -81,7 +82,7 @@
 {#if props.part === "gradient"}
     <Markup markup={gradient} />
 {:else}
-    <clipPath id={props.id} clipPathUnits="objectBoundingBox">
+    <SVGClipPath id={props.id}>
         <path d={SVGUtils.getArcPath(sweepArc, getReading().angle - HALF_TURN - sweepArc * 0.5)} />
-    </clipPath>
+    </SVGClipPath>
 {/if}

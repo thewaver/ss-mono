@@ -1,9 +1,11 @@
-import { SVGUtils } from "@thewaver/ss-utils";
+import { type Rect, SVGUtils } from "@thewaver/ss-utils";
 
+import { PaintAreaUtils } from "../PaintArea/PaintArea.utils";
 import type {
     SVGGradientColor,
     SVGGradientSpreadKind,
     SVGGradientStop,
+    SVGPaintAreaAttributes,
     SVGRadialGradientFields,
     SVGRadialGradientGeometry,
 } from "./SVGGradientDefs.types";
@@ -84,6 +86,35 @@ export namespace SVGGradientDefsUtils {
                       { id: `${id}-stop-${i}-start`, offset: `${stops[i]}%`, color: color.value },
                   ],
         );
+    };
+
+    /**
+     * Lays a gradient across a paint area rather than across the element it happens to paint.
+     *
+     * A gradient's positions are fractions of a box, and by default that box is whatever element the gradient
+     * paints — so several elements sharing one gradient each show all of it. Given an area, the fractions are
+     * stretched over that area instead, in the painted elements' own coordinates, and each element shows only the
+     * part of the gradient that falls where it sits. The fractions themselves, and any animation that moves them,
+     * are untouched.
+     *
+     * @param area The box the gradient is laid across, in the coordinates of the elements it paints. Without one,
+     * or with one that has no width or no height yet, the gradient follows each element's own box as before.
+     * @param gradientTransform The gradient's own transform, which is kept and applied inside the area.
+     * @returns The `gradientUnits` and `gradientTransform` attributes; both are `undefined` when there is no area
+     * and no transform, so the attributes can be left off.
+     */
+    export const computePaintAreaAttributes = (
+        area: Rect | undefined,
+        gradientTransform: string | undefined,
+    ): SVGPaintAreaAttributes => {
+        const areaTransform = PaintAreaUtils.computeTransform(area);
+
+        if (!areaTransform) return { gradientUnits: undefined, gradientTransform };
+
+        return {
+            gradientUnits: "userSpaceOnUse",
+            gradientTransform: gradientTransform ? `${areaTransform} ${gradientTransform}` : areaTransform,
+        };
     };
 
     /**

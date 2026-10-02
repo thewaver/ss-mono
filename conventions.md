@@ -247,6 +247,10 @@ the same control. So:
 - **Contour** is the edge as geometry — the closed path a shape, a tile, a die face or a particle area is cut to,
   whether or not anything paints it. Not "edge", which already means one side of a polygon here
   (`edgeThicknesses`, "along each edge").
+- **Border** is the paint round a box that takes no geometry of its own — `Surface` and `GlassSurface`, whose
+  `borderWidths` and `borderRadii` mirror CSS and whose shape is always four-cornered. The distinction is the
+  user's: a component that takes a geometry, as `Shape` and the SVG defs do, draws a stroke along it; a box has a
+  border.
 - **Outline** stays for the focus indicator and the CSS property, and for one more sense the user kept on purpose:
   a **document outline**, the heading structure a table of contents walks and an accordion's heading level keeps
   correct, since that is the term HTML itself uses.

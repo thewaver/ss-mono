@@ -1,6 +1,7 @@
 import { type GradientCycleOpts, SVGDefsUtils, TimedGradientDefaults } from "@thewaver/ss-components";
 import { MathUtils, ObjectUtils } from "@thewaver/ss-utils";
 
+import { SVGClipPath } from "../../../../Generators/SVGDefs/SVGClipPaths/SVGClipPath";
 import { SVGGradientDefsVueUtils } from "../../../../Generators/SVGDefs/SVGGradients/SVGGradientDefsVue.utils";
 import { SVGAnimations } from "../../SVGAnimations.const";
 import type { TimedGradientConfig } from "../../SVGDefsVue.types";
@@ -39,7 +40,7 @@ export const elastic_semicircle_1 = (opts?: GradientCycleOpts): TimedGradientCon
             clipPath: {
                 id: `clip1-${id}`,
                 renderDefsElement: () => (
-                    <clipPath id={`clip1-${id}`} clipPathUnits="objectBoundingBox">
+                    <SVGClipPath id={`clip1-${id}`}>
                         {SVGAnimations.Path.rotatingArc(
                             ObjectUtils.zipArray(
                                 "stretch",
@@ -100,7 +101,7 @@ export const elastic_semicircle_1 = (opts?: GradientCycleOpts): TimedGradientCon
                             ),
                             defs,
                         )}
-                    </clipPath>
+                    </SVGClipPath>
                 ),
             },
         },

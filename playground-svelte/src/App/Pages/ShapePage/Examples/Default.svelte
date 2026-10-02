@@ -61,8 +61,10 @@
                 : props.shapeKind === "square"
                   ? ShapeUtils.getRectPadding(props.edgeThicknesses, props.joinRadii, props.lameExponents)
                   : ShapeUtils.getPolygonPadding(size, clipPoints)}
-            <div bind:this={root} class={styles.example} style={toStyle(clipStyle, paddingStyle as StyleRecord)}>
-                <div class={styles.exampleInner}>I have a border</div>
+            <div bind:this={root} class={styles.example}>
+                <div class={styles.exampleSurface} style={toStyle(clipStyle, paddingStyle as StyleRecord)}>
+                    <div class={styles.exampleInner}>I have a border</div>
+                </div>
             </div>
         {/snippet}
     </Shape>

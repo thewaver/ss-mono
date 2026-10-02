@@ -16,7 +16,7 @@
     let props: PagePaintPickerProps = $props();
 
     const paint = $derived(props.paintSlot.paint);
-    const sampleKind = $derived(paint.kind === "none" ? undefined : paint.kind);
+    const sampleKind = $derived(paint.kind === "solid" ? undefined : paint.kind);
 </script>
 
 <PagePropsPanel scope={"sample"}>

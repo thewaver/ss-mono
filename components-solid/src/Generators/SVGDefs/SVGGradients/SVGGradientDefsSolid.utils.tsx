@@ -5,6 +5,7 @@ import { type SVGGradientColor, SVGGradientDefsUtils, type SVGGradientSpreadKind
 import { SVGUtils } from "@thewaver/ss-utils";
 
 import { access } from "../../../Utils/propUtils";
+import { usePaintAreaContext } from "./PaintArea.context";
 import type { SVGLinearGradientSolidDefs, SVGRadialGradientSolidDefs } from "./SVGGradientDefsSolid.types";
 
 /** The stops, kept in place and updated as the colors change. */
@@ -28,6 +29,9 @@ const renderStops = (
  *
  * Everything is read through accessors, so a gradient re-renders as its angle or its colors change
  * rather than being rebuilt.
+ *
+ * A gradient built inside a {@link PaintAreaContextProvider} is laid across the area it provides rather than
+ * across each element it paints — see {@link SVGGradientDefsUtils.computePaintAreaAttributes}.
  */
 export namespace SVGGradientDefsSolidUtils {
     /**
@@ -51,11 +55,16 @@ export namespace SVGGradientDefsSolidUtils {
         const getCoords = () =>
             SVGUtils.getLinearCoords({ angle: access(angle), offset: access(offset), scale: access(scale) });
         const initial = untrack(getCoords);
+        const paintArea = usePaintAreaContext();
+        const getAreaAttributes = () =>
+            SVGGradientDefsUtils.computePaintAreaAttributes(paintArea?.getPaintArea(), undefined);
 
         return (
             <linearGradient
                 {...baseProps}
                 id={id}
+                gradientUnits={getAreaAttributes().gradientUnits}
+                gradientTransform={getAreaAttributes().gradientTransform}
                 x1={getCoords().x1}
                 y1={getCoords().y1}
                 x2={getCoords().x2}
@@ -96,6 +105,9 @@ export namespace SVGGradientDefsSolidUtils {
                 elementSize: access(elementSize),
             });
         const initial = untrack(getGeometry);
+        const paintArea = usePaintAreaContext();
+        const getAreaAttributes = () =>
+            SVGGradientDefsUtils.computePaintAreaAttributes(paintArea?.getPaintArea(), getGeometry().gradientTransform);
 
         return (
             <radialGradient
@@ -104,7 +116,8 @@ export namespace SVGGradientDefsSolidUtils {
                 cx={getGeometry().cx}
                 cy={getGeometry().cy}
                 r={getGeometry().r}
-                gradientTransform={getGeometry().gradientTransform}
+                gradientUnits={getAreaAttributes().gradientUnits}
+                gradientTransform={getAreaAttributes().gradientTransform}
             >
                 {typeof custom === "function" ? custom(initial.cx, initial.cy, initial.r) : custom}
                 {renderStops(id, getColors, spreadKind)}

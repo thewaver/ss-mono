@@ -14,6 +14,8 @@ import type { TrackedGradientExampleProps } from "../../SVGGradients.types";
 
 type Props = TrackedGradientExampleProps & {
     boxClass?: string;
+    groupElement?: HTMLElement;
+    groupSize?: Size2d;
 };
 
 const props = defineProps<Props>();
@@ -28,11 +30,16 @@ const computeDefs = (size: Size2d, element: HTMLElement | undefined) => {
     return SVGDefsSamples.Gradient.Tracked.toConfig({
         family: props.configKey,
         defs: props.configDefs,
-    } as SVGDefsSamples.Gradient.Tracked.Entry).computeSVGDefs(`${props.paintKind}-${id}`, undefined, element, {
-        getSize: () => size,
-        colors: props.colors,
-        blurWidth: props.blurWidth,
-    });
+    } as SVGDefsSamples.Gradient.Tracked.Entry).computeSVGDefs(
+        `${props.paintKind}-${id}`,
+        undefined,
+        props.groupElement ?? element,
+        {
+            getSize: () => props.groupSize ?? size,
+            colors: props.colors,
+            blurWidth: props.blurWidth,
+        },
+    );
 };
 </script>
 

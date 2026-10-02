@@ -2,6 +2,7 @@ import { type GradientHandOpts, SVGDefsUtils, TrackedGradientDefaults } from "@t
 import { SVGUtils } from "@thewaver/ss-utils";
 
 import { PointerTrackerSolidUtils } from "../../../../Abstracts/PointerTracker/PointerTrackerSolid.utils";
+import { SVGClipPath } from "../../../../Generators/SVGDefs/SVGClipPaths/SVGClipPath";
 import { SVGGradientDefsSolidUtils } from "../../../../Generators/SVGDefs/SVGGradients/SVGGradientDefsSolid.utils";
 import type { TrackedGradientConfig } from "../../SVGDefsSolid.types";
 import { SVGDefsSolidUtils } from "../../SVGDefsSolid.utils";
@@ -48,14 +49,14 @@ export const hand_1 = (opts?: GradientHandOpts): TrackedGradientConfig => ({
                     const { getReading } = PointerTrackerSolidUtils.create(getRef ?? NO_REF);
 
                     return (
-                        <clipPath id={`clip1-${id}`} clipPathUnits="objectBoundingBox">
+                        <SVGClipPath id={`clip1-${id}`}>
                             <path
                                 d={SVGUtils.getArcPath(
                                     opts?.sweepArc ?? DEFAULTS.sweepArc,
                                     getReading().angle - HALF_TURN - (opts?.sweepArc ?? DEFAULTS.sweepArc) * 0.5,
                                 )}
                             />
-                        </clipPath>
+                        </SVGClipPath>
                     );
                 },
             },

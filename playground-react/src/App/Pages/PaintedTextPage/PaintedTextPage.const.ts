@@ -20,7 +20,8 @@ export const computeSampleDefs = (
             iterationConfigKey: props.iterationConfigKey,
             cellSize: props.cellSize,
         },
+        paintKind,
         `${paintKind}-${id}`,
         size,
         element,
-    ) ?? [];
+    );

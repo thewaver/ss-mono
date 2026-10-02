@@ -5,9 +5,12 @@
     import { SVGUtils } from "@thewaver/ss-utils";
 
     import Markup from "../../../Utils/Markup.svelte";
+    import { getPaintAreaContext } from "./PaintArea.context.js";
     import type { SVGLinearGradientProps } from "./SVGGradientDefsSvelte.types.js";
 
     let props: SVGLinearGradientProps = $props();
+
+    const paintArea = getPaintAreaContext();
 
     const baseProps = $derived.by(() => {
         const { id, angle, offset, scale, colors, spreadKind, ...rest } = props.defs;
@@ -23,10 +26,23 @@
         typeof props.custom === "function" ? props.custom(coords.x1, coords.y1, coords.x2, coords.y2) : props.custom,
     );
 
+    const areaAttributes = $derived(
+        SVGGradientDefsUtils.computePaintAreaAttributes(paintArea?.getPaintArea(), undefined),
+    );
+
     const stops = $derived(SVGGradientDefsUtils.computeStops(props.defs.id, props.defs.colors, props.defs.spreadKind));
 </script>
 
-<linearGradient {...baseProps} id={props.defs.id} x1={coords.x1} y1={coords.y1} x2={coords.x2} y2={coords.y2}>
+<linearGradient
+    {...baseProps}
+    id={props.defs.id}
+    x1={coords.x1}
+    y1={coords.y1}
+    x2={coords.x2}
+    y2={coords.y2}
+    gradientUnits={areaAttributes.gradientUnits}
+    gradientTransform={areaAttributes.gradientTransform}
+>
     <Markup markup={custom} />
 
     {#each stops as stop (stop.id)}

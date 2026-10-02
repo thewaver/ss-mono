@@ -11,6 +11,8 @@ import {
 } from "react";
 
 import {
+    LetterDriverUtils,
+    type LetterState,
     TYPEWRITER_DEFAULTS,
     type TypewriterSegment,
     TypewriterStyles,
@@ -19,6 +21,8 @@ import {
 } from "@thewaver/ss-components";
 import { StringUtils } from "@thewaver/ss-utils";
 
+import { LetterDriverContextProvider } from "../../../Abstracts/LetterDriver/LetterDriver.context";
+import type { LetterDriverContextType } from "../../../Abstracts/LetterDriver/LetterDriver.context.types";
 import { useLatest } from "../../../Utils/refUtils";
 import { useStore } from "../../../Utils/storeUtils";
 import type { TypewriterController, TypewriterProps } from "./Typewriter.types";
@@ -54,11 +58,23 @@ export const Typewriter = (props: TypewriterProps) => {
     const pendingCauseRef = useRef<TypewriterUpdateCause>(undefined);
     const [, requestMeasure] = useReducer((count: number) => count + 1, 0);
 
-    const latest = useLatest({ props, animationDurationMs, animationDelayMs, initialAnimationDelayMs, isErasing });
+    const [registry] = useState(LetterDriverUtils.createRegistry);
+    const registryState = useStore(registry);
+    const isDriven = registryState.entries.length > 0;
+
+    const latest = useLatest({
+        props,
+        animationDurationMs,
+        animationDelayMs,
+        initialAnimationDelayMs,
+        isErasing,
+        isDriven,
+    });
 
     const [player] = useState(() =>
         TypewriterUtils.createPlayer({
             getContainer: () => containerRef.current ?? undefined,
+            getIsDriven: () => latest.current.isDriven,
             getAnimationDurationMs: () => latest.current.animationDurationMs,
             getAnimationDelayMs: () => latest.current.animationDelayMs,
             getInitialAnimationDelayMs: () => latest.current.initialAnimationDelayMs,
@@ -115,6 +131,17 @@ export const Typewriter = (props: TypewriterProps) => {
 
         return container ? player.observe(container) : undefined;
     }, [controller]);
+
+    const previousDrivenCountRef = useRef(0);
+
+    useEffect(() => {
+        if (!isDriven) return;
+
+        const count = registryState.characters.length;
+
+        player.setCount(count, previousDrivenCountRef.current ? "content" : "other");
+        previousDrivenCountRef.current = count;
+    }, [registryState.characters, isDriven]);
 
     const isErased = !state.isAnimating && isErasing;
     const startTimesMs = TypewriterUtils.computeStartTimes(
@@ -226,23 +253,52 @@ export const Typewriter = (props: TypewriterProps) => {
         }
     };
 
+    const getLetterState = (index: number): LetterState => ({
+        isHidden: isErased,
+        animation: state.isAnimating
+            ? {
+                  name: animationName,
+                  durationMs: animationDurationMs,
+                  delayMs: startTimesMs[index],
+                  direction: isErasing ? "reverse" : "normal",
+              }
+            : undefined,
+    });
+
+    const driver: LetterDriverContextType = {
+        registry,
+        getLetterState,
+        isAnimating: state.isAnimating,
+        isHidden: isErased,
+        caretIndex: state.caretIndex,
+        renderCaret: props.renderCaret,
+        reportLetterStart: player.reportCharacterStart,
+    };
+
     return (
-        <div className={TypewriterStyles.typewriterRoot}>
-            <div ref={containerRef} className={TypewriterStyles.typewriterChildrenWrap} aria-hidden="true" inert>
-                {props.children}
-            </div>
-
-            {state.segments.length > 0 && (
-                <div className={TypewriterStyles.typewriterTextWrap} style={{ width: `${state.width ?? 0}px` }}>
-                    {state.caretIndex === BEFORE_FIRST && props.renderCaret?.()}
-
-                    {state.segments.map((segment, index) => (
-                        <Fragment key={index}>{renderSegment(segment)}</Fragment>
-                    ))}
-
-                    {!state.isAnimating && state.caretIndex !== BEFORE_FIRST && props.renderCaret?.()}
+        <LetterDriverContextProvider value={driver}>
+            <div className={TypewriterStyles.typewriterRoot}>
+                <div
+                    ref={containerRef}
+                    className={isDriven ? undefined : TypewriterStyles.typewriterChildrenWrap}
+                    aria-hidden={isDriven ? undefined : "true"}
+                    inert={!isDriven}
+                >
+                    {props.children}
                 </div>
-            )}
-        </div>
+
+                {!isDriven && state.segments.length > 0 && (
+                    <div className={TypewriterStyles.typewriterTextWrap} style={{ width: `${state.width ?? 0}px` }}>
+                        {state.caretIndex === BEFORE_FIRST && props.renderCaret?.()}
+
+                        {state.segments.map((segment, index) => (
+                            <Fragment key={index}>{renderSegment(segment)}</Fragment>
+                        ))}
+
+                        {!state.isAnimating && state.caretIndex !== BEFORE_FIRST && props.renderCaret?.()}
+                    </div>
+                )}
+            </div>
+        </LetterDriverContextProvider>
     );
 };

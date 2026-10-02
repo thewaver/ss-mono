@@ -13,7 +13,7 @@ export const usePaintSlot = (
     const keys = shallowRef<Record<PaintSampleKind, PaintSampleKey>>({ ...STARTING_KEYS, ...startingKeys });
     const configDefs = shallowRef<ConfigDefs>({});
 
-    const key = computed(() => (kind.value === "none" ? STARTING_KEYS.timed : keys.value[kind.value]));
+    const key = computed(() => (kind.value === "solid" ? STARTING_KEYS.timed : keys.value[kind.value]));
 
     return {
         paint: computed(() => ({ kind: kind.value, key: key.value, configDefs: configDefs.value[key.value] ?? {} })),
@@ -21,7 +21,7 @@ export const usePaintSlot = (
             kind.value = next;
         },
         setKey: (next) => {
-            if (kind.value !== "none") keys.value = { ...keys.value, [kind.value]: next };
+            if (kind.value !== "solid") keys.value = { ...keys.value, [kind.value]: next };
         },
         setConfigDef: (name, value) => {
             configDefs.value = {

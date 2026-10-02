@@ -35,14 +35,15 @@ export namespace PaintedTextKnobs {
 
     export const STARTING_WIDTH = 560;
     export const STARTING_FILL_PAINT_KIND: PaintKind = "timed";
-    export const STARTING_STROKE_PAINT_KIND: PaintKind = "none";
+    export const STARTING_STROKE_PAINT_KIND: PaintKind = "solid";
     export const STARTING_KEYS: Partial<Record<PaintSampleKind, PaintSampleKey>> = { timed: "flow_diag_3" };
     export const STARTING_BLUR_WIDTH = 0;
     export const STARTING_DURATION_MS = 2000;
     export const STARTING_CELL_SIZE = 24;
-    export const STARTING_FONT_SIZE = 96;
-    export const STARTING_LINE_HEIGHT = 1.5;
+    export const STARTING_FONT_SIZE = 80;
+    export const STARTING_LINE_HEIGHT = 1;
     export const STARTING_FONT_WEIGHT = 700;
-    export const STARTING_CUSTOM_TEXT = "Type here,\nand the paint follows.";
+    export const STARTING_ARRIVAL_EFFECT = "scale";
+    export const STARTING_CUSTOM_TEXT = "Type here,\n\nand the paint follows.";
     export const STARTING_ITERATION_KEY: SVGDefsSamples.Iteration.SampleKey = "constant";
 }

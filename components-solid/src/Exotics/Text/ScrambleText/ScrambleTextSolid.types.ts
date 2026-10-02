@@ -3,8 +3,11 @@ import type { ScrambleTextController } from "@thewaver/ss-components";
 import type { AccessorProps } from "../../../Utils/typeUtils";
 
 export type ScrambleTextProps = AccessorProps<{
-    /** The text to settle on. */
-    text: string;
+    /**
+     * The text to settle on. Leave it out when a drawer such as `PaintedText` sits inside, which supplies the text
+     * and draws the scramble itself.
+     */
+    text?: string;
     /** How long the whole run takes, from all scrambled to fully settled. */
     settleDurationMs?: number;
     /** How long one character churns before it settles. */

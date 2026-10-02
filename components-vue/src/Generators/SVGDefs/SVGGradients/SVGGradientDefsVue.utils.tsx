@@ -1,4 +1,4 @@
-import type { VNodeChild } from "vue";
+import { type VNodeChild, cloneVNode, defineComponent } from "vue";
 
 import {
     type SVGGradientColor,
@@ -9,11 +9,31 @@ import {
 } from "@thewaver/ss-components";
 import { SVGUtils } from "@thewaver/ss-utils";
 
+import { usePaintAreaContext } from "./PaintArea.context";
+
 /** The stops, one element each, keyed by their own ids. */
 const renderStops = (id: string, colors: SVGGradientColor[], spreadKind: SVGGradientSpreadKind | undefined) =>
     SVGGradientDefsUtils.computeStops(id, colors, spreadKind).map((stop) => (
         <stop key={stop.id} id={stop.id} offset={stop.offset} stop-color={stop.color} />
     ));
+
+/** Lays the gradient it wraps across the paint area it finds, keeping the gradient's own transform inside it. */
+const PaintAreaGradient = defineComponent(
+    (props: { gradientTransform: string | undefined }, { slots }) => {
+        const paintArea = usePaintAreaContext();
+
+        return () => {
+            const [gradient] = slots.default?.() ?? [];
+            const attributes = SVGGradientDefsUtils.computePaintAreaAttributes(
+                paintArea?.getPaintArea(),
+                props.gradientTransform,
+            );
+
+            return gradient && cloneVNode(gradient, attributes);
+        };
+    },
+    { name: "PaintAreaGradient", props: ["gradientTransform"] },
+);
 
 /**
  * The Vue side of `SVGGradientDefsUtils`: `linearGradient` and `radialGradient` elements, with the stops worked out
@@ -21,6 +41,9 @@ const renderStops = (id: string, colors: SVGGradientColor[], spreadKind: SVGGrad
  *
  * Each call answers the gradient as it stands, so a component that calls it while rendering keeps the element in
  * place and updates its attributes as its angle or its colors change.
+ *
+ * A gradient rendered inside a `PaintAreaProvider` is laid across the area it provides rather than across each
+ * element it paints — see `SVGGradientDefsUtils.computePaintAreaAttributes`.
  */
 export namespace SVGGradientDefsVueUtils {
     /**
@@ -41,10 +64,12 @@ export namespace SVGGradientDefsVueUtils {
         const coords = SVGUtils.getLinearCoords({ angle, offset, scale });
 
         return (
-            <linearGradient {...baseProps} id={id} x1={coords.x1} y1={coords.y1} x2={coords.x2} y2={coords.y2}>
-                {typeof custom === "function" ? custom(coords.x1, coords.y1, coords.x2, coords.y2) : custom}
-                {renderStops(id, colors, spreadKind)}
-            </linearGradient>
+            <PaintAreaGradient gradientTransform={undefined}>
+                <linearGradient {...baseProps} id={id} x1={coords.x1} y1={coords.y1} x2={coords.x2} y2={coords.y2}>
+                    {typeof custom === "function" ? custom(coords.x1, coords.y1, coords.x2, coords.y2) : custom}
+                    {renderStops(id, colors, spreadKind)}
+                </linearGradient>
+            </PaintAreaGradient>
         );
     };
 
@@ -67,17 +92,12 @@ export namespace SVGGradientDefsVueUtils {
         const geometry = SVGGradientDefsUtils.computeRadialGeometry({ origin, scale, aspect, angle, elementSize });
 
         return (
-            <radialGradient
-                {...baseProps}
-                id={id}
-                cx={geometry.cx}
-                cy={geometry.cy}
-                r={geometry.r}
-                gradientTransform={geometry.gradientTransform}
-            >
-                {typeof custom === "function" ? custom(geometry.cx, geometry.cy, geometry.r) : custom}
-                {renderStops(id, colors, spreadKind)}
-            </radialGradient>
+            <PaintAreaGradient gradientTransform={geometry.gradientTransform}>
+                <radialGradient {...baseProps} id={id} cx={geometry.cx} cy={geometry.cy} r={geometry.r}>
+                    {typeof custom === "function" ? custom(geometry.cx, geometry.cy, geometry.r) : custom}
+                    {renderStops(id, colors, spreadKind)}
+                </radialGradient>
+            </PaintAreaGradient>
         );
     };
 }

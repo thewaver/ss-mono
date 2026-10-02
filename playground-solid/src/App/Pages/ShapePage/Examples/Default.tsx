@@ -64,8 +64,10 @@ export const DefaultExample = (props: ShapeExampleProps) => {
                     });
 
                     return (
-                        <div ref={setRootRef} class={styles.example} style={getStyle()}>
-                            <div class={styles.exampleInner}>I have a border</div>
+                        <div ref={setRootRef} class={styles.example}>
+                            <div class={styles.exampleSurface} style={getStyle()}>
+                                <div class={styles.exampleInner}>I have a border</div>
+                            </div>
                         </div>
                     );
                 }}

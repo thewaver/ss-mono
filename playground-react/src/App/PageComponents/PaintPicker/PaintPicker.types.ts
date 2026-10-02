@@ -1,9 +1,9 @@
 import type { SVGDefsColors, SVGDefsSamples } from "@thewaver/ss-components-react";
 import type { Size2d } from "@thewaver/ss-utils";
 
-export type PaintKind = "none" | "pattern" | "timed" | "tracked";
+export type PaintKind = "solid" | "pattern" | "timed" | "tracked";
 
-export type PaintSampleKind = Exclude<PaintKind, "none">;
+export type PaintSampleKind = Exclude<PaintKind, "solid">;
 
 export type PaintSampleKey =
     | SVGDefsSamples.Pattern.SampleKey

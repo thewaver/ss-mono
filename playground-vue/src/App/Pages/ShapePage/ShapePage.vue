@@ -22,6 +22,7 @@ import PagePropsPanel from "../../PageComponents/PropsPanel/PagePropsPanel.vue";
 import DefaultExampleWrapper from "./DefaultExampleWrapper.vue";
 import MorphExampleWrapper from "./MorphExampleWrapper.vue";
 import type { ShapeExampleProps } from "./ShapePage.types";
+import SharedPaintExampleWrapper from "./SharedPaintExampleWrapper.vue";
 import StressTestWrapper from "./StressTestWrapper.vue";
 import TextWrapExampleWrapper from "./TextWrapExampleWrapper.vue";
 
@@ -77,6 +78,13 @@ const examples: ExampleDefs[] = [
         path: `${EXAMPLES_ROOT}/Morph.vue`,
     },
     {
+        key: "sharedPaint",
+        name: "Shared Paint",
+        readout: () =>
+            "four shapes painted by one fill and one stroke laid across the whole group, so each shows its own part of a single picture; resize any of them and the picture stretches to the new group",
+        path: `${EXAMPLES_ROOT}/SharedPaint.vue`,
+    },
+    {
         key: "textWrap",
         name: "Text Wrap",
         readout: () =>
@@ -97,7 +105,7 @@ const examples: ExampleDefs[] = [
                 :paint-slot="stroke"
                 name="stroke"
                 label="Stroke"
-                hint="What paints the shape's stroke: nothing but its flat color, a pattern, or a gradient that runs on a clock or follows the pointer."
+                hint="What paints the shape's stroke: a flat color, a pattern, or a gradient that runs on a clock or follows the pointer."
             />
 
             <PagePropsDivider />
@@ -106,7 +114,7 @@ const examples: ExampleDefs[] = [
                 :paint-slot="fill"
                 name="fill"
                 label="Fill"
-                hint="What paints the shape's inside: nothing but its flat color, a pattern, or a gradient that runs on a clock or follows the pointer."
+                hint="What paints the shape's inside: a flat color, a pattern, or a gradient that runs on a clock or follows the pointer."
             />
 
             <PagePropsDivider />
@@ -144,13 +152,13 @@ const examples: ExampleDefs[] = [
                     </div>
                 </PageProp>
 
-                <PageProp item-key="edgeThicknessPx" label="Edge Thickness (px)" hint="How thick the stroke is.">
+                <PageProp item-key="strokeThicknessPx" label="Stroke Thickness (px)" hint="How thick the stroke is.">
                     <PageNumberField
                         :value="edgeThickness"
                         :min="ShapeKnobs.MIN_EDGE_THICKNESS"
                         :max="ShapeKnobs.MAX_EDGE_THICKNESS"
                         :step="ShapeKnobs.EDGE_THICKNESS_STEP"
-                        ariaLabel="Edge thickness"
+                        ariaLabel="Stroke thickness"
                         @input="(value: number) => (edgeThickness = value)"
                     />
                 </PageProp>
@@ -209,6 +217,10 @@ const examples: ExampleDefs[] = [
 
             <template #morph>
                 <MorphExampleWrapper v-bind="commonProps" />
+            </template>
+
+            <template #sharedPaint>
+                <SharedPaintExampleWrapper v-bind="commonProps" />
             </template>
 
             <template #textWrap>

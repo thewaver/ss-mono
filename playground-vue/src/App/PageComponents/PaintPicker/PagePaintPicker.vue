@@ -12,7 +12,7 @@ import type { PagePaintPickerProps, PaintKind } from "./PaintPicker.types";
 const props = defineProps<PagePaintPickerProps>();
 
 const paint = computed(() => props.paintSlot.paint.value);
-const sampleKind = computed(() => (paint.value.kind === "none" ? undefined : paint.value.kind));
+const sampleKind = computed(() => (paint.value.kind === "solid" ? undefined : paint.value.kind));
 </script>
 
 <template>

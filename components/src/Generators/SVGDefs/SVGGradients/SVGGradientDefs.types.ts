@@ -39,6 +39,11 @@ export type SVGLinearGradientDefs = SVGBaseGradientDefs & SVGLinearGradientField
 
 export type SVGRadialGradientDefs = SVGBaseGradientDefs & SVGRadialGradientFields;
 
+export type SVGPaintAreaAttributes = {
+    gradientUnits: "userSpaceOnUse" | undefined;
+    gradientTransform: string | undefined;
+};
+
 export type SVGRadialGradientGeometry = {
     cx: number;
     cy: number;

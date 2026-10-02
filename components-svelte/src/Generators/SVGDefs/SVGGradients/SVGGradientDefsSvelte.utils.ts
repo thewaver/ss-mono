@@ -11,6 +11,9 @@ import SVGRadialGradient from "./SVGRadialGradient.svelte";
  *
  * Each call answers the gradient as it stands. Drawn again with a new answer — as a `Shape` does when its size
  * changes — the element stays in place and its attributes follow the new angle or colors.
+ *
+ * A gradient drawn inside a `PaintAreaProvider` is laid across the area it provides rather than across each element
+ * it paints — see `SVGGradientDefsUtils.computePaintAreaAttributes`.
  */
 export namespace SVGGradientDefsSvelteUtils {
     /**

@@ -10,6 +10,7 @@ import {
 import { MathUtils, SVGUtils, type Size2d } from "@thewaver/ss-utils";
 
 import { PointerTrackerVueUtils } from "../../../../Abstracts/PointerTracker/PointerTrackerVue.utils";
+import { SVGClipPath } from "../../../../Generators/SVGDefs/SVGClipPaths/SVGClipPath";
 import { SVGGradientDefsVueUtils } from "../../../../Generators/SVGDefs/SVGGradients/SVGGradientDefsVue.utils";
 import { watchAfterRender } from "../../../../Utils/effectUtils";
 import { declareProps } from "../../../../Utils/propUtils";
@@ -90,9 +91,9 @@ const renderSweep = (id: string, angle: number, colors: SVGGradientColor[], swee
             scale: SWEEP_SPAN,
             colors,
         })}
-        <clipPath id={`clip${id}`} clipPathUnits="objectBoundingBox">
+        <SVGClipPath id={`clip${id}`}>
             <path d={SVGUtils.getArcPath(sweepArc, getSweepRotation(angle, sweepArc))} />
-        </clipPath>
+        </SVGClipPath>
     </>
 );
 

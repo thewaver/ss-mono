@@ -12,6 +12,8 @@
 
     type Props = TrackedGradientExampleProps & {
         boxClass?: string;
+        groupElement?: HTMLElement;
+        groupSize?: Size2d;
     };
 
     let props: Props = $props();
@@ -24,8 +26,8 @@
         return SVGDefsSamples.Gradient.Tracked.toConfig({
             family: props.configKey,
             defs: props.configDefs,
-        } as SVGDefsSamples.Gradient.Tracked.Entry).computeSVGDefs(`${props.paintKind}-${id}`, undefined, element, {
-            getSize: () => size,
+        } as SVGDefsSamples.Gradient.Tracked.Entry).computeSVGDefs(`${props.paintKind}-${id}`, undefined, props.groupElement ?? element, {
+            getSize: () => props.groupSize ?? size,
             colors: props.colors,
             blurWidth: props.blurWidth,
         });

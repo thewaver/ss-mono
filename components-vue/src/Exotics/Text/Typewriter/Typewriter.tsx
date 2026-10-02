@@ -10,6 +10,8 @@ import {
 } from "vue";
 
 import {
+    LetterDriverUtils,
+    type LetterState,
     TYPEWRITER_DEFAULTS,
     type TypewriterSegment,
     TypewriterStyles,
@@ -17,6 +19,7 @@ import {
 } from "@thewaver/ss-components";
 import { StringUtils } from "@thewaver/ss-utils";
 
+import { provideLetterDriverContext } from "../../../Abstracts/LetterDriver/LetterDriver.context";
 import { watchAfterRender } from "../../../Utils/effectUtils";
 import { callSlot, declareProps } from "../../../Utils/propUtils";
 import { useStore } from "../../../Utils/storeUtils";
@@ -52,8 +55,13 @@ export const Typewriter = defineComponent(
 
         const containerRef = shallowRef<HTMLDivElement>();
 
+        const registry = LetterDriverUtils.createRegistry();
+        const registryState = useStore(registry);
+        const getIsDriven = () => registryState.value.entries.length > 0;
+
         const player = TypewriterUtils.createPlayer({
             getContainer: () => containerRef.value,
+            getIsDriven,
             getAnimationDurationMs,
             getAnimationDelayMs,
             getInitialAnimationDelayMs,
@@ -81,6 +89,49 @@ export const Typewriter = defineComponent(
                 return true;
             },
         };
+
+        let previousDrivenCount = 0;
+
+        watchAfterRender([() => registryState.value.characters], ([characters]) => {
+            if (!getIsDriven()) return;
+
+            player.setCount(characters.length, previousDrivenCount ? "content" : "other");
+            previousDrivenCount = characters.length;
+        });
+
+        const getIsErasedNow = () => !state.value.isAnimating && getIsErasing();
+
+        const getLetterState = (index: number): LetterState => {
+            const current = state.value;
+
+            return {
+                isHidden: getIsErasedNow(),
+                animation: current.isAnimating
+                    ? {
+                          name: getAnimationName(),
+                          durationMs: getAnimationDurationMs(),
+                          delayMs: TypewriterUtils.computeStartTimes(
+                              current.count,
+                              props.computeCharacterWeights?.(current.count),
+                              getIsErasing(),
+                              getInitialAnimationDelayMs(),
+                              getAnimationDelayMs(),
+                          )[index],
+                          direction: getIsErasing() ? "reverse" : "normal",
+                      }
+                    : undefined,
+            };
+        };
+
+        provideLetterDriverContext({
+            registry,
+            getLetterState,
+            getIsAnimating: () => state.value.isAnimating,
+            getIsHidden: getIsErasedNow,
+            getCaretIndex: () => state.value.caretIndex,
+            renderCaret: slots.renderCaret ? () => callSlot(slots.renderCaret, undefined) : undefined,
+            reportLetterStart: player.reportCharacterStart,
+        });
 
         let previousRun = { animationName: getAnimationName(), mode: getMode() };
 
@@ -217,11 +268,16 @@ export const Typewriter = defineComponent(
 
             return (
                 <div class={TypewriterStyles.typewriterRoot}>
-                    <div ref={containerRef} class={TypewriterStyles.typewriterChildrenWrap} aria-hidden="true" inert>
+                    <div
+                        ref={containerRef}
+                        class={getIsDriven() ? undefined : TypewriterStyles.typewriterChildrenWrap}
+                        aria-hidden={getIsDriven() ? undefined : "true"}
+                        inert={!getIsDriven()}
+                    >
                         {slots.default?.()}
                     </div>
 
-                    {current.segments.length > 0 && (
+                    {!getIsDriven() && current.segments.length > 0 && (
                         <div class={TypewriterStyles.typewriterTextWrap} style={{ width: `${current.width ?? 0}px` }}>
                             {current.caretIndex === BEFORE_FIRST && renderCaret()}
 

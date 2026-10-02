@@ -9,6 +9,7 @@ import {
 import { MathUtils, SVGUtils, type Size2d } from "@thewaver/ss-utils";
 
 import { PointerTrackerSolidUtils } from "../../../../Abstracts/PointerTracker/PointerTrackerSolid.utils";
+import { SVGClipPath } from "../../../../Generators/SVGDefs/SVGClipPaths/SVGClipPath";
 import { SVGGradientDefsSolidUtils } from "../../../../Generators/SVGDefs/SVGGradients/SVGGradientDefsSolid.utils";
 import type { TrackedGradientConfig } from "../../SVGDefsSolid.types";
 import { SVGDefsSolidUtils } from "../../SVGDefsSolid.utils";
@@ -142,14 +143,14 @@ export const hand_trail_1 = (opts?: GradientHandTrailOpts): TrackedGradientConfi
                     id: `clip1-${id}`,
                     renderDefsElement: () => {
                         return (
-                            <clipPath id={`clip1-${id}`} clipPathUnits="objectBoundingBox">
+                            <SVGClipPath id={`clip1-${id}`}>
                                 <path
                                     d={SVGUtils.getArcPath(
                                         opts?.sweepArc ?? DEFAULTS.sweepArc,
                                         getSweepRotation(getReading().angle, opts?.sweepArc ?? DEFAULTS.sweepArc),
                                     )}
                                 />
-                            </clipPath>
+                            </SVGClipPath>
                         );
                     },
                 },
@@ -182,14 +183,14 @@ export const hand_trail_1 = (opts?: GradientHandTrailOpts): TrackedGradientConfi
                             const stamp = useStamp();
 
                             return (
-                                <clipPath id={`clip${stampId}`} clipPathUnits="objectBoundingBox">
+                                <SVGClipPath id={`clip${stampId}`}>
                                     <path
                                         d={SVGUtils.getArcPath(
                                             opts?.sweepArc ?? DEFAULTS.sweepArc,
                                             getSweepRotation(stamp.getAngle(), opts?.sweepArc ?? DEFAULTS.sweepArc),
                                         )}
                                     />
-                                </clipPath>
+                                </SVGClipPath>
                             );
                         },
                     },

@@ -67,8 +67,10 @@ const computeChildStyle = (size: Size2d, clipPath: string, clipPoints: Point2d[]
             :compute-fill-defs="computeFillDefs"
         >
             <template #renderChildren="{ size, clipPath, clipPoints }">
-                <div ref="rootRef" :class="styles.example" :style="computeChildStyle(size, clipPath, clipPoints)">
-                    <div :class="styles.exampleInner">I have a border</div>
+                <div ref="rootRef" :class="styles.example">
+                    <div :class="styles.exampleSurface" :style="computeChildStyle(size, clipPath, clipPoints)">
+                        <div :class="styles.exampleInner">I have a border</div>
+                    </div>
                 </div>
             </template>
         </Shape>

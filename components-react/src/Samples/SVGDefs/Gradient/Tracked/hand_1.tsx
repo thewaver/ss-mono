@@ -7,6 +7,7 @@ import {
 import { SVGUtils } from "@thewaver/ss-utils";
 
 import { PointerTrackerReactUtils } from "../../../../Abstracts/PointerTracker/PointerTrackerReact.utils";
+import { SVGClipPath } from "../../../../Generators/SVGDefs/SVGClipPaths/SVGClipPath";
 import { SVGGradientDefsReactUtils } from "../../../../Generators/SVGDefs/SVGGradients/SVGGradientDefsReact.utils";
 import type { TrackedGradientConfig } from "../../SVGDefsReact.types";
 import { SVGDefsReactUtils } from "../../SVGDefsReact.utils";
@@ -50,9 +51,9 @@ const HandClip = (props: HandPartProps) => {
     const sweepArc = props.opts?.sweepArc ?? DEFAULTS.sweepArc;
 
     return (
-        <clipPath id={props.id} clipPathUnits="objectBoundingBox">
+        <SVGClipPath id={props.id}>
             <path d={SVGUtils.getArcPath(sweepArc, reading.angle - HALF_TURN - sweepArc * 0.5)} />
-        </clipPath>
+        </SVGClipPath>
     );
 };
 

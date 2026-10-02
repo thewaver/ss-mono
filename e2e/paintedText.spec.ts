@@ -117,27 +117,27 @@ test("one copy of the text reaches a screen reader, and it carries the link and 
     );
 });
 
-test("a stroke alone leaves the letters hollow", async ({ page }) => {
-    await pick(page, "Fill", "None");
-    await pick(page, "Stroke", "Timed gradient");
+/**
+ * "Solid" paints a slot in the flat color the samples are built from, the background's for a fill and the border's
+ * for a stroke, so the two are each a single color and never the same one.
+ */
+test("Solid paints the letters and the stroke each in one flat color of its own", async ({ page }) => {
+    await pick(page, "Fill", "Solid");
+    await pick(page, "Stroke", "Solid");
 
-    const fills = await page
-        .locator(`${demo("heading")} ${LAYERS}`)
-        .evaluateAll((layers) => layers.map((layer) => layer.getAttribute("fill")));
+    const layers = page.locator(`${demo("heading")} ${LAYERS}`);
+    const fills = await layers.evaluateAll((all) =>
+        all.filter((layer) => !layer.hasAttribute("stroke")).map((layer) => layer.getAttribute("fill")),
+    );
+    const strokes = await layers.evaluateAll((all) =>
+        all.filter((layer) => layer.hasAttribute("stroke")).map((layer) => layer.getAttribute("stroke")),
+    );
 
-    expect(fills.length, "the stroke is drawn").toBeGreaterThan(0);
-    expect(new Set(fills), "and nothing fills the letters").toEqual(new Set(["none"]));
-});
-
-test("no paint at all draws the text in its own color rather than not at all", async ({ page }) => {
-    await pick(page, "Fill", "None");
-    await pick(page, "Stroke", "None");
-
-    const fills = await page
-        .locator(`${demo("heading")} ${LAYERS}`)
-        .evaluateAll((layers) => layers.map((layer) => layer.getAttribute("fill")));
-
-    expect(fills).toEqual(["currentColor"]);
+    expect(fills.length, "the letters are filled").toBe(1);
+    expect(strokes.length, "and stroked").toBe(1);
+    expect(fills[0], "with a color rather than a sample's url").not.toMatch(/^url\(/);
+    expect(strokes[0], "and the stroke likewise").not.toMatch(/^url\(/);
+    expect(fills[0], "and the two are different colors").not.toBe(strokes[0]);
 });
 
 test("a stroke outside or inside the letters is masked, and one straddling the edge is not", async ({ page }) => {
@@ -191,4 +191,132 @@ test("a change to the text's own font lays it out again, so nothing overlaps", a
             .toBe(before.join(""));
         expectRunsToMeet(await readLines(page, "heading"));
     }
+});
+
+/**
+ * Inside a Typewriter or a ScrambleText, a painted text draws each letter as a `<text>` of its own while the run
+ * plays, gathered in one `<g>` per paint layer, and joins them back into runs once it ends. These read the state of
+ * every painted text in an example: whether it is drawing letters, what its readable layer says, what its hidden
+ * source says, and when each of its letters is due to start.
+ */
+const readDrawers = (page: Page, key: string) =>
+    page.locator(demo(key)).evaluate(
+        (root, svgSelector) =>
+            [...root.querySelectorAll(svgSelector)].map((svg) => {
+                const painted = svg.parentElement as HTMLElement;
+                const source = painted.querySelector(":scope > [inert]") as HTMLElement;
+                const readable = [...svg.querySelectorAll(":scope > text")].find(
+                    (text) => !text.hasAttribute("aria-hidden"),
+                );
+                const letters = [...svg.querySelectorAll(":scope > g[aria-hidden] > text")];
+                const firstLayer = letters.filter((letter) => letter.parentElement === letters[0]?.parentElement);
+
+                return {
+                    isPerLetter: letters.length > 0,
+                    readable: (readable?.textContent ?? "").replace(/\s+/g, " ").trim(),
+                    source: (source.textContent ?? "").replace(/\s+/g, " ").trim(),
+                    drawnLetters: firstLayer.map((letter) => letter.textContent ?? "").join(""),
+                    startsMs: firstLayer.map((letter) => parseFloat(getComputedStyle(letter).animationDelay) * 1000),
+                };
+            }),
+        `${PAINTED_SVG}, svg:has(> g > text)`,
+    );
+
+test("a Typewriter types two painted texts one after the other, then joins their letters back into lines", async ({
+    page,
+}) => {
+    await page.locator(`${demo("typed")} #typeAgain`).click();
+
+    await expect
+        .poll(async () => (await readDrawers(page, "typed")).every((drawer) => drawer.isPerLetter), "drawing letters")
+        .toBe(true);
+
+    const [heading, body] = await readDrawers(page, "typed");
+
+    expect(heading.startsMs.length).toBeGreaterThan(0);
+    expect(body.startsMs.length).toBeGreaterThan(0);
+    expect(Math.min(...body.startsMs), "the second text starts after the first has ended").toBeGreaterThan(
+        Math.max(...heading.startsMs),
+    );
+
+    await expect
+        .poll(async () => (await readDrawers(page, "typed")).some((drawer) => drawer.isPerLetter), {
+            message: "back to runs",
+            timeout: 15_000,
+        })
+        .toBe(false);
+
+    for (const drawer of await readDrawers(page, "typed")) {
+        expect(drawer.readable).toBe(drawer.source);
+    }
+});
+
+test("a ScrambleText paints noise in a painted text's letters, then settles on its own words", async ({ page }) => {
+    await page.locator(`${demo("scrambled")} #scrambleAgain`).click();
+
+    await expect
+        .poll(async () => {
+            const [drawer] = await readDrawers(page, "scrambled");
+
+            return drawer.isPerLetter && drawer.drawnLetters.replace(/\s/g, "") !== drawer.source.replace(/\s/g, "");
+        }, "a letter shows a glyph other than its own")
+        .toBe(true);
+
+    await expect
+        .poll(async () => (await readDrawers(page, "scrambled"))[0].isPerLetter, {
+            message: "back to runs",
+            timeout: 15_000,
+        })
+        .toBe(false);
+
+    const [drawer] = await readDrawers(page, "scrambled");
+
+    expect(drawer.readable).toBe(drawer.source);
+});
+
+/**
+ * A painted text lays every gradient it builds across its whole block, rather than across each element the gradient
+ * paints. That is what lets the separate letters of a run share one gradient, each showing the part where it sits.
+ * Asked as a relationship: the gradient's units are the drawing's own, and the area it is stretched over is exactly
+ * the size of the drawing it sits in, whatever that size is.
+ */
+test("a painted text's gradients are laid across its whole block", async ({ page }) => {
+    const gradients = await page.locator(`${demo("heading")} ${PAINTED_SVG}`).evaluate((svg) =>
+        [...svg.querySelectorAll("defs linearGradient, defs radialGradient")].map((gradient) => ({
+            units: gradient.getAttribute("gradientUnits"),
+            transform: gradient.getAttribute("gradientTransform") ?? "",
+            size: `${svg.getAttribute("width")} ${svg.getAttribute("height")}`,
+        })),
+    );
+
+    expect(gradients.length, "the starting fill is a gradient").toBeGreaterThan(0);
+
+    for (const gradient of gradients) {
+        expect(gradient.units).toBe("userSpaceOnUse");
+        expect(gradient.transform).toContain(`translate(0 0) scale(${gradient.size})`);
+    }
+});
+
+/**
+ * The Typed example's caret blinks for as long as it is on screen, the user's call, which WCAG 2.2.2 allows only
+ * because the example offers a way to stop it. So the two are checked together: the blink has no end, and the
+ * toggle beside it takes the blink away and gives it back. The caret is the wrapper's, placed by the painted text
+ * in a box after its drawing.
+ */
+test("the typed caret blinks without end, and the toggle stops it and starts it again", async ({ page }) => {
+    const caret = page.locator(`${demo("typed")} svg ~ div > span`);
+    const toggle = page.locator(`${demo("typed")} #toggleBlink`);
+    const readBlink = () =>
+        caret.evaluate((element) =>
+            element.getAnimations().map((animation) => animation.effect?.getComputedTiming().endTime),
+        );
+
+    await expect(caret).toBeAttached();
+    await expect.poll(readBlink, "one blink that never ends").toEqual([Infinity]);
+
+    await toggle.click();
+    await expect.poll(readBlink, "stopped").toEqual([]);
+
+    await toggle.click();
+    await expect.poll(readBlink, "started again").toEqual([Infinity]);
 });

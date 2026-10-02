@@ -18,6 +18,7 @@ import { StressTest } from "../../PageComponents/StressTest/StressTest";
 import type { StressTestDefs } from "../../PageComponents/StressTest/StressText.types";
 import { DefaultExample } from "./Examples/Default";
 import { MorphExample } from "./Examples/Morph";
+import { SharedPaintExample } from "./Examples/SharedPaint";
 import { TextWrapExample } from "./Examples/TextWrap";
 import { computeShapeFillDefs, computeShapeStrokeDefs } from "./ShapePage.const";
 import type { ShapeExampleProps } from "./ShapePage.types";
@@ -280,6 +281,18 @@ const MorphExampleWrapper = (props: ShapeExampleProps) => {
     );
 };
 
+const SharedPaintExampleWrapper = (props: ShapeExampleProps) => {
+    const { geometryProps, renderKnobs } = useShapeGeometry();
+
+    return (
+        <>
+            <SharedPaintExample {...props} {...geometryProps} />
+
+            <PageExampleKnobs>{renderKnobs()}</PageExampleKnobs>
+        </>
+    );
+};
+
 const TextWrapExampleWrapper = (props: ShapeExampleProps) => {
     const { geometryProps, renderKnobs } = useShapeGeometry(ShapeKnobs.STARTING_TEXT_WRAP_SHAPE_KIND);
 
@@ -339,6 +352,14 @@ export const ShapePage = () => {
             path: `${EXAMPLES_ROOT}/Morph.tsx`,
         },
         {
+            key: "sharedPaint",
+            name: "Shared Paint",
+            readout: () =>
+                "four shapes painted by one fill and one stroke laid across the whole group, so each shows its own part of a single picture; resize any of them and the picture stretches to the new group",
+            component: () => <SharedPaintExampleWrapper {...commonProps} />,
+            path: `${EXAMPLES_ROOT}/SharedPaint.tsx`,
+        },
+        {
             key: "textWrap",
             name: "Text Wrap",
             readout: () =>
@@ -361,7 +382,7 @@ export const ShapePage = () => {
                     name={"stroke"}
                     label={"Stroke"}
                     hint={
-                        "What paints the shape's stroke: nothing but its flat color, a pattern, or a gradient that runs on a clock or follows the pointer."
+                        "What paints the shape's stroke: a flat color, a pattern, or a gradient that runs on a clock or follows the pointer."
                     }
                 />
 
@@ -372,7 +393,7 @@ export const ShapePage = () => {
                     name={"fill"}
                     label={"Fill"}
                     hint={
-                        "What paints the shape's inside: nothing but its flat color, a pattern, or a gradient that runs on a clock or follows the pointer."
+                        "What paints the shape's inside: a flat color, a pattern, or a gradient that runs on a clock or follows the pointer."
                     }
                 />
 
@@ -414,8 +435,8 @@ export const ShapePage = () => {
                     </PageProp>
 
                     <PageProp
-                        itemKey={"edgeThicknessPx"}
-                        label={"Edge Thickness (px)"}
+                        itemKey={"strokeThicknessPx"}
+                        label={"Stroke Thickness (px)"}
                         hint={"How thick the stroke is."}
                     >
                         <PageNumberField
@@ -423,7 +444,7 @@ export const ShapePage = () => {
                             min={ShapeKnobs.MIN_EDGE_THICKNESS}
                             max={ShapeKnobs.MAX_EDGE_THICKNESS}
                             step={ShapeKnobs.EDGE_THICKNESS_STEP}
-                            ariaLabel={"Edge thickness"}
+                            ariaLabel={"Stroke thickness"}
                             onInput={setEdgeThickness}
                         />
                     </PageProp>

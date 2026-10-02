@@ -1,9 +1,16 @@
 <script lang="ts">
     import { tick, untrack } from "svelte";
 
-    import { TYPEWRITER_DEFAULTS, TypewriterUtils, TypewriterStyles as styles } from "@thewaver/ss-components";
+    import {
+        LetterDriverUtils,
+        type LetterState,
+        TYPEWRITER_DEFAULTS,
+        TypewriterUtils,
+        TypewriterStyles as styles,
+    } from "@thewaver/ss-components";
     import { StringUtils } from "@thewaver/ss-utils";
 
+    import { setLetterDriverContext } from "../../../Abstracts/LetterDriver/LetterDriver.context.js";
     import { readStore } from "../../../Utils/storeUtils.js";
     import { toStyle } from "../../../Utils/styleUtils.js";
     import type { TypewriterController, TypewriterProps } from "./Typewriter.types.js";
@@ -32,8 +39,13 @@
 
     let container = $state<HTMLDivElement>();
 
+    const registry = LetterDriverUtils.createRegistry();
+    const getRegistryState = readStore(registry);
+    const isDriven = $derived(getRegistryState().entries.length > 0);
+
     const player = TypewriterUtils.createPlayer({
         getContainer: () => container ?? undefined,
+        getIsDriven: () => isDriven,
         getAnimationDurationMs: () => animationDurationMs,
         getAnimationDelayMs: () => animationDelayMs,
         getInitialAnimationDelayMs: () => initialAnimationDelayMs,
@@ -99,6 +111,44 @@
         ),
     );
 
+    let previousDrivenCount = 0;
+
+    $effect(() => {
+        const characters = getRegistryState().characters;
+        const driven = isDriven;
+
+        untrack(() => {
+            if (!driven) return;
+
+            player.setCount(characters.length, previousDrivenCount ? "content" : "other");
+            previousDrivenCount = characters.length;
+        });
+    });
+
+    const getLetterState = (index: number): LetterState => ({
+        isHidden: isErased,
+        animation: isAnimating
+            ? {
+                  name: animationName,
+                  durationMs: animationDurationMs,
+                  delayMs: startTimesMs[index],
+                  direction: isErasing ? "reverse" : "normal",
+              }
+            : undefined,
+    });
+
+    setLetterDriverContext({
+        registry,
+        getLetterState,
+        getIsAnimating: () => isAnimating,
+        getIsHidden: () => isErased,
+        getCaretIndex: () => caretIndex,
+        get renderCaret() {
+            return props.renderCaret;
+        },
+        reportLetterStart: player.reportCharacterStart,
+    });
+
     const getAnimationStyle = (startIndex: number) =>
         isAnimating
             ? toStyle({
@@ -127,11 +177,16 @@
 {/snippet}
 
 <div class={styles.typewriterRoot}>
-    <div bind:this={container} class={styles.typewriterChildrenWrap} aria-hidden="true" inert>
+    <div
+        bind:this={container}
+        class={isDriven ? undefined : styles.typewriterChildrenWrap}
+        aria-hidden={isDriven ? undefined : "true"}
+        inert={!isDriven}
+    >
         {@render props.children?.()}
     </div>
 
-    {#if getPlayerState().segments.length > 0}
+    {#if !isDriven && getPlayerState().segments.length > 0}
         <div class={styles.typewriterTextWrap} style:width={`${getPlayerState().width ?? 0}px`}>
             {#if caretIndex === BEFORE_FIRST}
                 {@render props.renderCaret?.()}

@@ -53,4 +53,24 @@ describe("SVGGradientDefsUtils", () => {
             r: 1.5,
         });
     });
+
+    it("leaves a gradient on its element's own box when there is no paint area, or one with no size yet", () => {
+        expect(SVGGradientDefsUtils.computePaintAreaAttributes(undefined, "rotate(45)")).toEqual({
+            gradientUnits: undefined,
+            gradientTransform: "rotate(45)",
+        });
+        expect(
+            SVGGradientDefsUtils.computePaintAreaAttributes({ x: 0, y: 0, width: 0, height: 80 }, undefined),
+        ).toEqual({ gradientUnits: undefined, gradientTransform: undefined });
+    });
+
+    it("lays a gradient across the paint area, keeping its own transform inside the area's", () => {
+        expect(
+            SVGGradientDefsUtils.computePaintAreaAttributes({ x: -30, y: 10, width: 200, height: 80 }, undefined),
+        ).toEqual({ gradientUnits: "userSpaceOnUse", gradientTransform: "translate(-30 10) scale(200 80)" });
+        expect(
+            SVGGradientDefsUtils.computePaintAreaAttributes({ x: 0, y: 0, width: 200, height: 80 }, "rotate(45)")
+                .gradientTransform,
+        ).toBe("translate(0 0) scale(200 80) rotate(45)");
+    });
 });

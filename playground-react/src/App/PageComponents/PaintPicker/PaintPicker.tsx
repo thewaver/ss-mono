@@ -24,13 +24,13 @@ export const usePaintSlot = (
     const [keys, setKeys] = useState<Record<PaintSampleKind, PaintSampleKey>>({ ...STARTING_KEYS, ...startingKeys });
     const [configDefs, setConfigDefs] = useState<ConfigDefs>({});
 
-    const key = kind === "none" ? STARTING_KEYS.timed : keys[kind];
+    const key = kind === "solid" ? STARTING_KEYS.timed : keys[kind];
 
     return {
         paint: { kind, key, configDefs: configDefs[key] ?? {} },
         setKind,
         setKey: (next) => {
-            if (kind !== "none") setKeys((previous) => ({ ...previous, [kind]: next }));
+            if (kind !== "solid") setKeys((previous) => ({ ...previous, [kind]: next }));
         },
         setConfigDef: (name, value) =>
             setConfigDefs((previous) => ({ ...previous, [key]: { ...previous[key], [name]: value } })),
@@ -52,7 +52,7 @@ export const PagePaintPicker = (props: PagePaintPickerProps) => {
                 />
             </PageProp>
 
-            {kind !== "none" && (
+            {kind !== "solid" && (
                 <PageProp
                     key={kind}
                     itemKey={`${props.name}Key`}

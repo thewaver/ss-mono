@@ -1,8 +1,15 @@
 <script lang="ts">
     import { untrack } from "svelte";
 
-    import { SCRAMBLE_TEXT_DEFAULTS, ScrambleTextUtils, ScrambleTextStyles as styles } from "@thewaver/ss-components";
+    import {
+        LetterDriverUtils,
+        type LetterState,
+        SCRAMBLE_TEXT_DEFAULTS,
+        ScrambleTextUtils,
+        ScrambleTextStyles as styles,
+    } from "@thewaver/ss-components";
 
+    import { setLetterDriverContext } from "../../../Abstracts/LetterDriver/LetterDriver.context.js";
     import { readStore } from "../../../Utils/storeUtils.js";
     import type { ScrambleTextController, ScrambleTextProps } from "./ScrambleText.types.js";
 
@@ -10,7 +17,11 @@
 
     let props: ScrambleTextProps = $props();
 
-    const characters = $derived(Array.from(props.text));
+    const registry = LetterDriverUtils.createRegistry();
+    const getRegistryState = readStore(registry);
+    const isDriven = $derived(getRegistryState().entries.length > 0);
+
+    const characters = $derived(isDriven ? getRegistryState().characters : Array.from(props.text ?? ""));
     const segments = $derived(ScrambleTextUtils.getSegments(characters));
 
     const computeGlyphs = $derived(props.computeGlyphs ?? SCRAMBLE_TEXT_DEFAULTS.computeGlyphs);
@@ -74,8 +85,25 @@
     $effect(() => {
         untrack(() => props.onMount?.(controller));
     });
+
+    const getLetterState = (index: number): LetterState => {
+        const isPending = ScrambleTextUtils.getIsPending(timing, startTimes[index]);
+        const isSettled = ScrambleTextUtils.getIsSettled(timing, settleTimes[index], index);
+
+        return { isHidden: isPending, glyph: isSettled || isPending ? undefined : getNoise()[index] };
+    };
+
+    setLetterDriverContext({
+        registry,
+        getLetterState,
+        getIsAnimating: () => getIsScrambling(),
+        getIsHidden: () => false,
+    });
 </script>
 
+{@render props.children?.()}
+
+{#if !isDriven}
 {#each segments as segment, segmentIndex (segmentIndex)}
     {#if segment.isWhitespace}
         {segment.characters.join("")}
@@ -95,3 +123,4 @@
         </span>
     {/if}
 {/each}
+{/if}

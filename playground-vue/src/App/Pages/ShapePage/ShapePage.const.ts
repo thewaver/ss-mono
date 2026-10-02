@@ -1,5 +1,4 @@
 import type { InteractionFlags, SVGDefs } from "@thewaver/ss-components-vue";
-import { computeNoSampleDefs } from "@thewaver/ss-playground/App/PageComponents/SampleGroups/SampleGroups.const";
 import type { Size2d } from "@thewaver/ss-utils";
 
 import { computePaintDefs } from "../../PageComponents/PaintPicker/PaintPicker.const";
@@ -22,8 +21,15 @@ export const computeShapeStrokeDefs = (
     flags?: InteractionFlags,
     cellScale = 1,
 ): SVGDefs[] =>
-    computePaintDefs(props.strokePaint, computeSettings(props, cellScale), `stroke-${id}`, size, element, flags) ??
-    computeNoSampleDefs(props.colors, "stroke");
+    computePaintDefs(
+        props.strokePaint,
+        computeSettings(props, cellScale),
+        "stroke",
+        `stroke-${id}`,
+        size,
+        element,
+        flags,
+    );
 
 export const computeShapeFillDefs = (
     id: string,
@@ -32,5 +38,4 @@ export const computeShapeFillDefs = (
     element: HTMLElement | undefined,
     cellScale = 1,
 ): SVGDefs[] =>
-    computePaintDefs(props.fillPaint, computeSettings(props, cellScale), `fill-${id}`, size, element) ??
-    computeNoSampleDefs(props.colors, "fill");
+    computePaintDefs(props.fillPaint, computeSettings(props, cellScale), "fill", `fill-${id}`, size, element);

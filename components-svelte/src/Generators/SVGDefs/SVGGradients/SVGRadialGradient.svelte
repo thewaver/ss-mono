@@ -4,9 +4,12 @@
     import { SVGGradientDefsUtils } from "@thewaver/ss-components";
 
     import Markup from "../../../Utils/Markup.svelte";
+    import { getPaintAreaContext } from "./PaintArea.context.js";
     import type { SVGRadialGradientProps } from "./SVGGradientDefsSvelte.types.js";
 
     let props: SVGRadialGradientProps = $props();
+
+    const paintArea = getPaintAreaContext();
 
     const baseProps = $derived.by(() => {
         const { id, colors, origin, scale, aspect, angle, elementSize, spreadKind, ...rest } = props.defs;
@@ -28,6 +31,10 @@
         typeof props.custom === "function" ? props.custom(geometry.cx, geometry.cy, geometry.r) : props.custom,
     );
 
+    const areaAttributes = $derived(
+        SVGGradientDefsUtils.computePaintAreaAttributes(paintArea?.getPaintArea(), geometry.gradientTransform),
+    );
+
     const stops = $derived(SVGGradientDefsUtils.computeStops(props.defs.id, props.defs.colors, props.defs.spreadKind));
 </script>
 
@@ -37,7 +44,8 @@
     cx={geometry.cx}
     cy={geometry.cy}
     r={geometry.r}
-    gradientTransform={geometry.gradientTransform}
+    gradientUnits={areaAttributes.gradientUnits}
+    gradientTransform={areaAttributes.gradientTransform}
 >
     <Markup markup={custom} />
 

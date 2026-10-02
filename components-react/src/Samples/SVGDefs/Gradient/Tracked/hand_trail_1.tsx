@@ -10,6 +10,7 @@ import {
 import { MathUtils, SVGUtils, type Size2d } from "@thewaver/ss-utils";
 
 import { PointerTrackerReactUtils } from "../../../../Abstracts/PointerTracker/PointerTrackerReact.utils";
+import { SVGClipPath } from "../../../../Generators/SVGDefs/SVGClipPaths/SVGClipPath";
 import { SVGGradientDefsReactUtils } from "../../../../Generators/SVGDefs/SVGGradients/SVGGradientDefsReact.utils";
 import type { TrackedGradientConfig } from "../../SVGDefsReact.types";
 import { SVGDefsReactUtils } from "../../SVGDefsReact.utils";
@@ -88,9 +89,9 @@ const renderSweep = (id: string, angle: number, colors: SVGGradientColor[], swee
             scale: SWEEP_SPAN,
             colors,
         })}
-        <clipPath id={`clip${id}`} clipPathUnits="objectBoundingBox">
+        <SVGClipPath id={`clip${id}`}>
             <path d={SVGUtils.getArcPath(sweepArc, getSweepRotation(angle, sweepArc))} />
-        </clipPath>
+        </SVGClipPath>
     </>
 );
 

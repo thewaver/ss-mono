@@ -11797,7 +11797,7 @@ sample of that kind.** The user's call. `Shape` used to give its stroke the time
 patterns, and `PaintedText` gave both slots all three registries in one list grouped by a sample's first word — a
 grouping that never says the kind, so even the user, who designed the registries, did not see that tracked
 gradients and patterns were in it. One control, `PagePaintPicker`, now does it in all four Playgrounds: the kind
-is None, Pattern, Timed gradient or Tracked gradient, and the second dropdown lists that registry alone. Each slot
+is Solid, Pattern, Timed gradient or Tracked gradient, and the second dropdown lists that registry alone. Each slot
 remembers a sample per kind, so switching kind and back finds the last one picked. A page may override the sample a
 kind starts on — `PaintedText` starts its timed gradients on `flow_diag_3`, the user's pick, where `Shape` keeps
 `sweep_diag_1v1`.
@@ -11811,9 +11811,12 @@ starting sample rather than one from another registry.
 and iteration pattern are a timed gradient's and a pattern's; a tracked gradient reads none of them. The props
 spec that types into the cell size on the Shape page therefore picks a pattern for the fill first.
 
-**"None" keeps each page's own meaning.** On `Shape` it is the flat colors `computeNoSampleDefs` gives, as
-before; on `PaintedText` it is no paint at all, which leaves the letters hollow under a stroke or in the text
-color when nothing paints them. The shared helper answers `undefined` for none and each page decides.
+**"Solid" is the flat color the samples are built from, on every page.** The first build called it "None" and let
+each page decide: `Shape` painted `computeNoSampleDefs`' colors and `PaintedText` painted nothing, falling back to
+the text color when both slots were empty. The user's call was one meaning under a name that says what it does, so
+the shared helper paints `computeNoSampleDefs` for the slot it is told it is painting, background-derived for a
+fill and border-derived for a stroke. Nothing is lost: hollow letters are a solid fill with the background color
+made transparent, which the color field allows.
 
 **`CellAnimation` has no tracked example, and that is deliberate.** Its source is a picture — a sample serialized
 into a data URI — and a picture runs no script, while a tracked gradient follows the pointer only through script.
@@ -16113,6 +16116,113 @@ call `update("content")`, on the grounds that every change restarts its typing a
 source would want to wait for a pause. The user's answer: a consumer who wants that debounces the value they pass
 in, as the Custom Input example now does, and nobody is left showing stale text for want of a call. The controller's
 `update` stays, for a change the component cannot see from inside its own copy — a class on an ancestor, say.
+
+### Text wrappers drive a drawer: `<Typewriter><PaintedText/></Typewriter>`
+
+**The wrapper owns time and the drawer owns space.** The user's shape, asked for so that animating text and painting
+it compose rather than each component growing the other's feature. `Typewriter` and `ScrambleText` decide what each
+letter is doing — when it arrives and with which keyframes, which noise glyph it shows — and `PaintedText` decides
+where it sits and what paints it. They meet through `LetterDriverUtils.createRegistry` in the core and a
+`LetterDriverContext` per framework: the drawer registers its root and reports its letters, the wrapper reads every
+drawer's letters as one text and answers `getLetterState(index)` per letter. It is the controls' rule — the wrapper
+owns behavior, the leaf owns the element — applied to text.
+
+**Letters are counted as `Typewriter` counts them**: a character by code point, a line break, and a whole element
+such as an image are one each. That keeps arrival weights and delays meaning the same thing with or without a
+drawer. A break is reported as a line feed and a whole element as the object replacement character, so a wrapper
+that reads characters, as `ScrambleText` does, gets a text of the right length.
+
+**A wrapper with a drawer inside draws nothing of its own and measures nothing.** `Typewriter` renders its children
+in the flow instead of in its hidden measuring copy, its player is told the count through `setCount` rather than
+measuring, and its HTML output is not rendered. Without a drawer, both components behave exactly as before.
+`ScrambleText`'s `text` became optional for this: with a drawer inside, the drawer supplies the text.
+
+**Several drawers in one wrapper share one run in page order** — the user's call over one-drawer-only and every
+drawer running on its own. The registry sorts drawers by `compareDocumentPosition` whenever one joins or changes,
+and each drawer reads its offset from it, so a heading types and then the paragraph after it carries on.
+
+**The caret stays the wrapper's; the drawer only places it** — the user's call, so `Typewriter` keeps its caret and
+`PaintedText` does not grow one. `PaintedText` puts the wrapper's `renderCaret` in an absolutely placed box over the
+letter the caret follows, sized to that letter's line.
+
+**The Typed example's caret blinks without end, beside a "Stop blinking" toggle.** The user wanted it to blink like
+an editor's caret rather than stop after five blinks. An editor's caret is drawn by the browser or the system and
+follows the system's own blink setting; this one is page content, so WCAG 2.2.2 (Pause, Stop, Hide) requires a way to
+stop anything that blinks on its own for over five seconds — the toggle is that way, the same pattern as the Pause
+button on `Typewriter`'s Phrases example. Reduced motion stops it as well, but does not count as the mechanism.
+
+**Letters are separate only while a run plays.** During a run each letter is its own `<text>`, because only a whole
+`<text>` can be transformed — a `<tspan>` takes opacity and filters but ignores `transform` in Chromium, measured —
+and `Typewriter`'s keyframes scale and slide. Each letter is placed at the box the browser laid it out in, and
+`PaintedTextUtils.computeLetterStyle` makes it transform about its own center. When the run ends the letters join back
+into one piece per line, as `Typewriter`'s do. During the run the usual per-line copy stays in the page at zero
+opacity, and it is the one a screen reader gets; the letters are hidden from it.
+
+**The gradient is laid across the whole block, so separate letters share it.** A gradient fits itself to the box of
+the element it paints by default, so separate letters would each show a whole gradient and the paint would jump when
+they join back up. `PaintedText` therefore provides a **paint area** — its own block, at `0,0` — and every gradient
+built inside it is laid across that area instead (see the paint area entry below). Each letter shows the part of
+the gradient where it sits, the run and the joined lines look identical, and a letter scaling in carries its patch
+of color with it. The masked-rectangle alternative was rejected because it loses any arrival effect that changes
+color, such as the glow.
+
+### Paint area: a gradient laid across a box other than the element it paints
+
+**The drawer owns the area, not the sample** — the user's pick (option A) over an explicit field forwarded by every
+sample. A gradient's positions are fractions of a box, and by default the box is whatever element it paints. A
+drawer that splits one picture over several elements — `PaintedText`'s letters during a run, and the user's
+example of a `TileBoard` whose tiles should read as one contiguous gradient — knows the area those elements share;
+the 56 sample files that build gradients cannot. So the drawer provides it and each framework's two gradient
+builders read it: Solid through `PaintAreaContextProvider`, React through the same name with a `paintArea` value,
+Vue through a `PaintAreaProvider` component and Svelte through a `PaintAreaProvider` component. React's and Vue's
+builders are plain functions that cannot read context, so each wraps its element in a small internal component that
+reads the area and adds the two attributes; Svelte's gradients were components already. Vue and Svelte need a
+provider component rather than providing from `PaintedText` itself, because providing there would also reach the
+consumer's own content inside the painted text. The cost accepted with it: the link is invisible, and a gradient lays out
+differently depending on where it is drawn. Outside a provider nothing changes, so `Shape`, `Glass` and every page
+built before this are untouched.
+
+**The area is applied as a transform, never by rewriting the fractions.** `SVGGradientDefsUtils.computePaintAreaAttributes`
+sets `gradientUnits="userSpaceOnUse"` and puts `translate(x y) scale(width height)` in front of the gradient's own
+`gradientTransform`. The fractions stay fractions, so the timed samples' `<animate>` tags, which move `x1`/`x2` as
+fractions, keep working untouched, and a radial gradient's own transform still applies inside the area. An area with
+no width or height yet is ignored rather than collapsing the gradient to nothing before the first layout.
+
+**A tile would pass the board, offset by itself.** Each tile is its own drawing with its own copy of the gradient,
+so its area is the whole board at `-tileX, -tileY`; that is why the area is a `Rect` and not a size. Not built yet,
+and one thing is unchecked: each tile's timed gradient runs on its own clock, so a tile mounted later may run out of
+step with its neighbors.
+
+**A group of separate drawings shares paint through `PagePaintAreaGroup`, in the Playground.** Shape's _Shared
+Paint_ example and the Tracked page's _Shared_ example lay four cells out in a grid; the helper measures each cell
+against the group (corrected for the `Viewport` scale, since it reads screen rectangles) and gives each cell the
+group's box shifted back by its own position. Each cell still renders **its own copy** of the gradient, under an id
+of its own: one literal gradient referenced by all four would be laid out in each drawing's own coordinates and show
+the same slice in every cell. The copies agree because they are built from the same settings and handed the
+group's size and the group's element as `getSize` and `getRef`. That last part is also what makes pointer-tracked
+paint work across the group without touching the tracked samples: the pointer is read against the group, the
+paint is laid across the group, and the two agree.
+
+**Clip paths read the area too, through `SVGClipPath`.** The hand samples showed the gap: their gradient was shared
+across the group but their wedge-shaped clip was not, because the samples wrote `<clipPath clipPathUnits=
+"objectBoundingBox">` by hand and nothing told it about the area. All sixteen such samples in Solid now write
+`<SVGClipPath id>` instead, which reads the same context as the gradient builders and, given an area, switches to
+`clipPathUnits="userSpaceOnUse"` with the area's transform (`PaintAreaUtils.computeClipPathAttributes`). Without an
+area it is exactly the old element. All four frameworks have it; in Svelte the samples share one
+`SVGSampleClipPath`, which is what goes through it there, plus the four hand samples that write their own.
+
+**The Shape page's Default example resizes one box and clips another.** The "Clip children" knob cuts the child to
+the shape's contour, and it used to cut the same box that carries `resize: both` — so the rounded corner of the
+contour cut away the browser's resize grip, which was invisible and, since a clip also stops clicks, partly
+ungrabbable. The resizable box is now unclipped and holds an `exampleSurface` that takes the clip, the padding and
+the background. Shared Paint never clipped its boxes, which is why its grips were always fine.
+
+**Only gradients and clip paths read the area.** Patterns were observed not to show the per-letter problem when the run was first
+built, so they were left alone.
+
+**A wrapper nested in a wrapper stays undefined, as it is today.** `Typewriter` inside `Typewriter` already
+misbehaves — the outer one reads the inner one's hidden copy as well as its output — so the composition neither
+causes nor fixes it.
 
 ### `PointerTracker`: one reading of where the pointer is relative to one element
 

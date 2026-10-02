@@ -1,15 +1,34 @@
 import { Index, Show, createEffect, createMemo, on, onCleanup, onMount } from "solid-js";
+import type { ParentProps } from "solid-js";
 
-import { SCRAMBLE_TEXT_DEFAULTS, ScrambleTextUtils, ScrambleTextStyles as styles } from "@thewaver/ss-components";
+import {
+    LetterDriverUtils,
+    type LetterState,
+    SCRAMBLE_TEXT_DEFAULTS,
+    ScrambleTextUtils,
+    ScrambleTextStyles as styles,
+} from "@thewaver/ss-components";
 
+import { LetterDriverContextProvider } from "../../../Abstracts/LetterDriver/LetterDriver.context";
+import type { LetterDriverContextType } from "../../../Abstracts/LetterDriver/LetterDriverSolid.context.types";
 import { access } from "../../../Utils/propUtils";
 import { accessStore } from "../../../Utils/storeUtils";
 import type { ScrambleTextProps } from "./ScrambleTextSolid.types";
 
 const NO_DELAY = 0;
 
-export const ScrambleText = (props: ScrambleTextProps) => {
-    const getCharacters = createMemo(() => Array.from(access(props.text)));
+export const ScrambleText = (props: ParentProps<ScrambleTextProps>) => {
+    const registry = LetterDriverUtils.createRegistry();
+
+    const getIsDriven = accessStore(registry, (state) => state.entries.length > 0);
+
+    const getDrivenCharacters = accessStore(registry, (state) => state.characters);
+
+    const getCharacters = createMemo(
+        () => (getIsDriven() ? getDrivenCharacters() : Array.from(access(props.text) ?? "")),
+        undefined,
+        { equals: (a, b) => a.join("") === b.join("") },
+    );
 
     const getSegments = createMemo(() => ScrambleTextUtils.getSegments(getCharacters()));
 
@@ -86,37 +105,59 @@ export const ScrambleText = (props: ScrambleTextProps) => {
         props.onMount?.(controller());
     });
 
+    const getLetterState = (index: number): LetterState => {
+        const isPending = getIsPending(index);
+
+        return {
+            isHidden: isPending,
+            glyph: getIsSettled(index) || isPending ? undefined : getNoise()[index],
+        };
+    };
+
+    const driver: LetterDriverContextType = {
+        registry,
+        getLetterState,
+        getIsAnimating: getIsScrambling,
+        getIsHidden: () => false,
+    };
+
     return (
-        <Index each={getSegments()}>
-            {(getSegment) => (
-                <Show when={!getSegment().isWhitespace} fallback={<>{getSegment().characters.join("")}</>}>
-                    <span class={styles.scrambleTextWord}>
-                        <Index each={getSegment().characters}>
-                            {(getCharacter, offset) => {
-                                const getIndex = () => getSegment().startIndex + offset;
+        <LetterDriverContextProvider value={driver}>
+            {props.children}
 
-                                return (
-                                    <span class={styles.scrambleTextCharacter}>
-                                        <span
-                                            classList={{
-                                                [styles.scrambleTextSettling]: !getIsSettled(getIndex()),
-                                            }}
-                                        >
-                                            {getCharacter()}
-                                        </span>
+            <Show when={!getIsDriven()}>
+                <Index each={getSegments()}>
+                    {(getSegment) => (
+                        <Show when={!getSegment().isWhitespace} fallback={<>{getSegment().characters.join("")}</>}>
+                            <span class={styles.scrambleTextWord}>
+                                <Index each={getSegment().characters}>
+                                    {(getCharacter, offset) => {
+                                        const getIndex = () => getSegment().startIndex + offset;
 
-                                        {!getIsSettled(getIndex()) && !getIsPending(getIndex()) && (
-                                            <span class={styles.scrambleTextNoise} aria-hidden="true">
-                                                {getNoise()[getIndex()]}
+                                        return (
+                                            <span class={styles.scrambleTextCharacter}>
+                                                <span
+                                                    classList={{
+                                                        [styles.scrambleTextSettling]: !getIsSettled(getIndex()),
+                                                    }}
+                                                >
+                                                    {getCharacter()}
+                                                </span>
+
+                                                {!getIsSettled(getIndex()) && !getIsPending(getIndex()) && (
+                                                    <span class={styles.scrambleTextNoise} aria-hidden="true">
+                                                        {getNoise()[getIndex()]}
+                                                    </span>
+                                                )}
                                             </span>
-                                        )}
-                                    </span>
-                                );
-                            }}
-                        </Index>
-                    </span>
-                </Show>
-            )}
-        </Index>
+                                        );
+                                    }}
+                                </Index>
+                            </span>
+                        </Show>
+                    )}
+                </Index>
+            </Show>
+        </LetterDriverContextProvider>
     );
 };

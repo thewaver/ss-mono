@@ -1,6 +1,7 @@
 import { SVGDefsUtils } from "@thewaver/ss-components";
 import { MathUtils } from "@thewaver/ss-utils";
 
+import { SVGClipPath } from "../../../Generators/SVGDefs/SVGClipPaths/SVGClipPath";
 import { SVGGradientDefsReactUtils } from "../../../Generators/SVGDefs/SVGGradients/SVGGradientDefsReact.utils";
 import { SVGAnimations } from "../SVGAnimations.const";
 import type { PatternConfig } from "../SVGDefsReact.types";
@@ -33,7 +34,7 @@ export const whirl_2: PatternConfig = {
             clipPath: {
                 id: `clip1-${id}`,
                 renderDefsElement: () => (
-                    <clipPath id={`clip1-${id}`} clipPathUnits="objectBoundingBox">
+                    <SVGClipPath id={`clip1-${id}`}>
                         {SVGAnimations.Path.rotatingWedges(
                             Math.max(defs.cellSize.width, defs.cellSize.height),
                             0.75,
@@ -41,7 +42,7 @@ export const whirl_2: PatternConfig = {
                             MathUtils.getIntermediateValues(0, 360, 12),
                             defs,
                         )}
-                    </clipPath>
+                    </SVGClipPath>
                 ),
             },
         },

@@ -1,7 +1,15 @@
 import { Fragment, useEffect, useMemo, useRef, useState } from "react";
 
-import { SCRAMBLE_TEXT_DEFAULTS, ScrambleTextStyles, ScrambleTextUtils } from "@thewaver/ss-components";
+import {
+    LetterDriverUtils,
+    type LetterState,
+    SCRAMBLE_TEXT_DEFAULTS,
+    ScrambleTextStyles,
+    ScrambleTextUtils,
+} from "@thewaver/ss-components";
 
+import { LetterDriverContextProvider } from "../../../Abstracts/LetterDriver/LetterDriver.context";
+import type { LetterDriverContextType } from "../../../Abstracts/LetterDriver/LetterDriver.context.types";
 import { useLatest } from "../../../Utils/refUtils";
 import { useStore } from "../../../Utils/storeUtils";
 import type { ScrambleTextController, ScrambleTextProps } from "./ScrambleText.types";
@@ -9,7 +17,14 @@ import type { ScrambleTextController, ScrambleTextProps } from "./ScrambleText.t
 const NO_DELAY = 0;
 
 export const ScrambleText = (props: ScrambleTextProps) => {
-    const characters = useMemo(() => Array.from(props.text), [props.text]);
+    const [registry] = useState(LetterDriverUtils.createRegistry);
+    const registryState = useStore(registry);
+    const isDriven = registryState.entries.length > 0;
+
+    const characters = useMemo(
+        () => (isDriven ? registryState.characters : Array.from(props.text ?? "")),
+        [isDriven, registryState.characters, props.text],
+    );
     const segments = useMemo(() => ScrambleTextUtils.getSegments(characters), [characters]);
 
     const computeGlyphs = props.computeGlyphs ?? SCRAMBLE_TEXT_DEFAULTS.computeGlyphs;
@@ -83,7 +98,21 @@ export const ScrambleText = (props: ScrambleTextProps) => {
         props.onMount?.(controller);
     }, [controller]);
 
-    return segments.map((segment, segmentIndex) =>
+    const getLetterState = (index: number): LetterState => {
+        const isPending = ScrambleTextUtils.getIsPending(timing, startTimes[index]);
+        const isSettled = ScrambleTextUtils.getIsSettled(timing, settleTimes[index], index);
+
+        return { isHidden: isPending, glyph: isSettled || isPending ? undefined : noise[index] };
+    };
+
+    const driver: LetterDriverContextType = {
+        registry,
+        getLetterState,
+        isAnimating: isScrambling,
+        isHidden: false,
+    };
+
+    const ownText = segments.map((segment, segmentIndex) =>
         segment.isWhitespace ? (
             <Fragment key={segmentIndex}>{segment.characters.join("")}</Fragment>
         ) : (
@@ -109,5 +138,12 @@ export const ScrambleText = (props: ScrambleTextProps) => {
                 })}
             </span>
         ),
+    );
+
+    return (
+        <LetterDriverContextProvider value={driver}>
+            {props.children}
+            {!isDriven && ownText}
+        </LetterDriverContextProvider>
     );
 };

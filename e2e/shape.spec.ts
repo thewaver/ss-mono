@@ -1,6 +1,6 @@
 import { expect, test } from "@playwright/test";
 
-import { example, prop, revealProp } from "./helpers";
+import { demo, example, prop, readPaintAreas, revealProp } from "./helpers";
 
 const DEFAULT = example("default");
 const LAYERS = `${DEFAULT} svg`;
@@ -173,4 +173,22 @@ test("switching iteration pattern mid-run leaves the animation running", async (
     });
 
     expect(distinct, "the gradient moved through its sweep rather than sitting on one value").toBeGreaterThan(3);
+});
+
+/**
+ * Shared Paint lays the page's fill and stroke across a group of four shapes. Each shape draws its own copy of the
+ * paint, so the thing worth asserting is that every copy is laid across the same group and shifted back by exactly
+ * where its own shape sits — that is what makes four copies read as one picture.
+ */
+test("every shape in Shared Paint lays its paint across the whole group, from its own place in it", async ({
+    page,
+}) => {
+    const areas = await readPaintAreas(page.locator(demo("sharedPaint")));
+
+    expect(areas.length, "the paint is built from gradients").toBeGreaterThan(0);
+
+    for (const area of areas) {
+        expect(area.units).toBe("userSpaceOnUse");
+        area.actual.forEach((value, index) => expect(value).toBeCloseTo(area.expected[index], 0));
+    }
 });

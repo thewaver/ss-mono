@@ -1,10 +1,12 @@
 import { type ElementSegment, JSXTextParserUtils, StoreUtils } from "@thewaver/ss-utils";
 
+import type { LetterState } from "../../../Abstracts/LetterDriver/LetterDriver.types";
 import type { SVGDefsOf } from "../../../Generators/SVGDefs/SVGDefs.types";
 import type {
     PaintedTextLayout,
     PaintedTextLayoutOpts,
     PaintedTextLayoutState,
+    PaintedTextLetter,
     PaintedTextRun,
     PaintedTextStrokeAlignment,
     PaintedTextStrokePaint,
@@ -14,6 +16,8 @@ const SVG_NAMESPACE = "http://www.w3.org/2000/svg";
 const MASKED_STROKE_SCALE = 2;
 const CURRENT_COLOR = "currentColor";
 const NO_SCALE = 1;
+const LINE_BREAK_CHARACTER = "\n";
+const WHOLE_ELEMENT_CHARACTER = "￼";
 
 /** What a whole element is drawn as once it is in the SVG. */
 type AtomicKind = "image" | "svg" | "foreign";
@@ -175,6 +179,31 @@ export namespace PaintedTextUtils {
         index === 0 && (kind === "fill" || fillCount === 0);
 
     /**
+     * The style one drawn letter wears for what a wrapper says it is doing: hidden or not, and the keyframes it plays.
+     *
+     * The keyframes are a wrapper's own, written for HTML, so the letter is made to transform about its own center
+     * — an SVG element otherwise scales and turns about the corner of the whole drawing — and holds its first and
+     * last frames before and after it plays, as `Typewriter`'s letters do.
+     *
+     * @param state What the letter is doing.
+     * @returns Dashed CSS properties, empty for a letter doing nothing.
+     */
+    export const computeLetterStyle = (state: LetterState): Record<string, string> => ({
+        ...(state.isHidden ? { visibility: "hidden" } : {}),
+        ...(state.animation
+            ? {
+                  "animation-name": state.animation.name,
+                  "animation-duration": `${state.animation.durationMs}ms`,
+                  "animation-delay": `${state.animation.delayMs}ms`,
+                  "animation-direction": state.animation.direction,
+                  "animation-fill-mode": "both",
+                  "transform-box": "fill-box",
+                  "transform-origin": "center",
+              }
+            : {}),
+    });
+
+    /**
      * Lays the consumer's text out and keeps the result: where every run's baseline starts, and every image and
      * other whole element built as SVG and placed.
      *
@@ -191,7 +220,7 @@ export namespace PaintedTextUtils {
      */
     export const createLayout = (opts: PaintedTextLayoutOpts): PaintedTextLayout => {
         const store = StoreUtils.create<PaintedTextLayoutState>(
-            { width: undefined, height: 0, runs: [], atomics: [] },
+            { width: undefined, height: 0, runs: [], atomics: [], letters: [] },
             { isEqual: StoreUtils.getIsShallowEqual },
         );
 
@@ -213,13 +242,56 @@ export namespace PaintedTextUtils {
             const scale = getScreenScale(host, hostBox);
             const runs: PaintedTextRun[] = [];
             const atomics: SVGElement[] = [];
+            const letters: PaintedTextLetter[] = [];
+            const isMeasuringLetters = !!opts.getIsMeasuringLetters?.();
+
+            const toBox = (rect: DOMRect) => ({
+                x: (rect.left - hostBox.left) / scale,
+                top: (rect.top - hostBox.top) / scale,
+                width: rect.width / scale,
+                height: rect.height / scale,
+            });
 
             segments.forEach((segment, index) => {
                 const node = nodes[index];
 
-                if (segment.type === "text") {
+                if (segment.type === "linebreak") {
+                    const previous = letters.at(-1);
+
+                    if (isMeasuringLetters) {
+                        letters.push({
+                            kind: "break",
+                            character: LINE_BREAK_CHARACTER,
+                            x: previous ? previous.x + previous.width : 0,
+                            top: previous?.top ?? 0,
+                            width: 0,
+                            height: previous?.height ?? 0,
+                            baseline: previous?.baseline ?? 0,
+                        });
+                    }
+                } else if (segment.type === "text") {
                     const box = node.getBoundingClientRect();
                     const baseline = (node.lastChild as HTMLElement).getBoundingClientRect().top;
+
+                    if (isMeasuringLetters) {
+                        const textNode = node.firstChild as Text;
+                        const range = document.createRange();
+                        let offset = 0;
+
+                        for (const character of Array.from(segment.text)) {
+                            range.setStart(textNode, offset);
+                            range.setEnd(textNode, offset + character.length);
+                            offset += character.length;
+
+                            letters.push({
+                                kind: "text",
+                                character,
+                                ...toBox(range.getBoundingClientRect()),
+                                baseline: (baseline - hostBox.top) / scale,
+                                runIndex: runs.length,
+                            });
+                        }
+                    }
 
                     runs.push({
                         text: segment.text,
@@ -233,6 +305,16 @@ export namespace PaintedTextUtils {
                     const element = node.firstChild as Element;
                     const box = element.getBoundingClientRect();
 
+                    if (isMeasuringLetters) {
+                        letters.push({
+                            kind: "atomic",
+                            character: WHOLE_ELEMENT_CHARACTER,
+                            ...toBox(box),
+                            baseline: (box.bottom - hostBox.top) / scale,
+                            atomicIndex: atomics.length,
+                        });
+                    }
+
                     atomics.push(
                         createAtomicNode(segment.element, {
                             x: (box.left - hostBox.left) / scale,
@@ -244,7 +326,7 @@ export namespace PaintedTextUtils {
                 }
             });
 
-            store.set({ width, height: host.offsetHeight, runs, atomics });
+            store.set({ width, height: host.offsetHeight, runs, atomics, letters });
 
             return true;
         };

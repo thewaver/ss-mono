@@ -1,10 +1,15 @@
+import type { VNodeChild } from "vue";
+
 import type { ScrambleTextController } from "@thewaver/ss-components";
 
 export type { ScrambleTextController };
 
 export type ScrambleTextProps = {
-    /** The text to settle on. */
-    text: string;
+    /**
+     * The text to settle on. Leave it out when a drawer such as `PaintedText` sits inside, which supplies the text
+     * and draws the scramble itself.
+     */
+    text?: string;
     /** How long the whole run takes, from all scrambled to fully settled. */
     settleDurationMs?: number;
     /** How long one character churns before it settles. */
@@ -31,4 +36,9 @@ export type ScrambleTextProps = {
     onMount?: (controller: ScrambleTextController) => void;
     /** Runs once the text has fully settled. */
     onAnimationEnd?: () => void;
+};
+
+export type ScrambleTextSlots = {
+    /** A drawer such as `PaintedText`, which draws the scramble in place of the component's own text. */
+    default?: () => VNodeChild;
 };

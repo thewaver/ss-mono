@@ -1,8 +1,10 @@
-import { For, Show, createMemo, createSignal, createUniqueId, onCleanup, onMount } from "solid-js";
+import { For, Show, createEffect, createMemo, createSignal, createUniqueId, onCleanup, onMount } from "solid-js";
 import type { ParentProps } from "solid-js";
 
 import {
+    type LetterRegistration,
     PAINTED_TEXT_DEFAULTS,
+    type PaintedTextLetter,
     type PaintedTextRun,
     PaintedTextUtils,
     ShapeLayerUtils,
@@ -10,23 +12,41 @@ import {
 } from "@thewaver/ss-components";
 import { Size2d } from "@thewaver/ss-utils";
 
+import { useLetterDriverContext } from "../../../Abstracts/LetterDriver/LetterDriver.context";
 import type { SVGDefs } from "../../../Generators/SVGDefs/SVGDefsSolid.types";
+import { PaintAreaContextProvider } from "../../../Generators/SVGDefs/SVGGradients/PaintArea.context";
 import { access } from "../../../Utils/propUtils";
 import { accessStore } from "../../../Utils/storeUtils";
 import type { PaintedTextProps } from "./PaintedTextSolid.types";
 
+const NO_OFFSET = 0;
+const BEFORE_FIRST = -1;
+const MASK_PADDING_SIDES = 2;
+const EMPTY_STYLE = {};
+
+type LayerAttributes = Record<string, unknown>;
+
 export const PaintedText = (props: ParentProps<PaintedTextProps>) => {
     const maskId = `painted-text-mask-${createUniqueId()}`;
+
+    const driver = useLetterDriverContext();
 
     const [getRootRef, setRootRef] = createSignal<HTMLElement>();
     const [getSourceRef, setSourceRef] = createSignal<HTMLElement>();
     const [getLayoutRef, setLayoutRef] = createSignal<HTMLElement>();
+    const [getRegistration, setRegistration] = createSignal<LetterRegistration>();
 
-    const layout = PaintedTextUtils.createLayout({ getSource: getSourceRef, getLayoutHost: getLayoutRef });
+    const layout = PaintedTextUtils.createLayout({
+        getSource: getSourceRef,
+        getLayoutHost: getLayoutRef,
+        getIsMeasuringLetters: () => !!driver,
+    });
 
     const getRuns = accessStore(layout, (state) => state.runs);
 
     const getAtomics = accessStore(layout, (state) => state.atomics);
+
+    const getLetters = accessStore(layout, (state) => state.letters);
 
     const getWidth = accessStore(layout, (state) => state.width ?? 0);
 
@@ -35,6 +55,28 @@ export const PaintedText = (props: ParentProps<PaintedTextProps>) => {
     const getSize = createMemo(() => ({ width: getWidth(), height: getHeight() }), undefined, {
         equals: Size2d.isSame,
     });
+
+    const getPaintArea = () => ({ x: 0, y: 0, ...getSize() });
+
+    const getRegistryEntries = driver ? accessStore(driver.registry, (state) => state.entries) : () => [];
+
+    const getOffset = () => {
+        const root = getRootRef();
+
+        getRegistryEntries();
+
+        return driver && root ? driver.registry.getOffset(root) : NO_OFFSET;
+    };
+
+    const getIsPerLetter = () => !!driver?.getIsAnimating();
+
+    const getAtomicLetterIndices = createMemo(() =>
+        getLetters().reduce<number[]>((indices, letter, index) => {
+            if (letter.atomicIndex !== undefined) indices[letter.atomicIndex] = index;
+
+            return indices;
+        }, []),
+    );
 
     const getStrokePaint = createMemo(() =>
         PaintedTextUtils.computeStrokePaint(
@@ -50,6 +92,30 @@ export const PaintedText = (props: ParentProps<PaintedTextProps>) => {
     );
 
     const getMaskPadding = () => getStrokePaint().drawnWidth;
+
+    const getLetterStyle = (localIndex: number) =>
+        driver && getIsPerLetter()
+            ? PaintedTextUtils.computeLetterStyle(driver.getLetterState(getOffset() + localIndex))
+            : EMPTY_STYLE;
+
+    const getCaretBox = createMemo(() => {
+        if (!driver?.renderCaret || !driver.getCaretIndex) return undefined;
+
+        const caretIndex = driver.getCaretIndex();
+
+        const letters = getLetters();
+        const offset = getOffset();
+
+        if (caretIndex === BEFORE_FIRST) {
+            const first = letters[0];
+
+            return offset === NO_OFFSET && first ? { x: first.x, top: first.top, height: first.height } : undefined;
+        }
+
+        const letter = letters[caretIndex - offset];
+
+        return letter ? { x: letter.x + letter.width, top: letter.top, height: letter.height } : undefined;
+    });
 
     const renderRun = (run: PaintedTextRun, isReadable: boolean) => {
         if (isReadable && run.anchor) {
@@ -81,6 +147,57 @@ export const PaintedText = (props: ParentProps<PaintedTextProps>) => {
 
     const renderRuns = (isReadable: boolean) => <For each={getRuns()}>{(run) => renderRun(run, isReadable)}</For>;
 
+    const renderLetter = (letter: PaintedTextLetter, localIndex: number, isReporting: boolean) => {
+        const getState = () => driver?.getLetterState(getOffset() + localIndex);
+        const getGlyph = () => getState()?.glyph;
+
+        return (
+            <text
+                class={styles.paintedTextLayer}
+                x={getGlyph() ? letter.x + letter.width * 0.5 : letter.x}
+                y={letter.baseline}
+                text-anchor={getGlyph() ? "middle" : undefined}
+                style={{ ...getRuns()[letter.runIndex ?? 0]?.style, ...getLetterStyle(localIndex) }}
+                onAnimationStart={
+                    isReporting
+                        ? (event) => {
+                              if (event.target === event.currentTarget) {
+                                  driver?.reportLetterStart?.(getOffset() + localIndex);
+                              }
+                          }
+                        : undefined
+                }
+            >
+                {getGlyph() ?? letter.character}
+            </text>
+        );
+    };
+
+    const renderLetters = (isReporting: boolean) => (
+        <For each={getLetters()}>
+            {(letter, getIndex) => letter.kind === "text" && renderLetter(letter, getIndex(), isReporting)}
+        </For>
+    );
+
+    const renderLayer = (getAttributes: () => LayerAttributes, isReadable: boolean) => (
+        <Show
+            when={getIsPerLetter()}
+            fallback={
+                <text
+                    class={styles.paintedTextLayer}
+                    {...getAttributes()}
+                    aria-hidden={isReadable ? undefined : "true"}
+                >
+                    {renderRuns(isReadable)}
+                </text>
+            }
+        >
+            <g {...getAttributes()} aria-hidden="true">
+                {renderLetters(isReadable)}
+            </g>
+        </Show>
+    );
+
     const renderDefsElements = (defs: SVGDefs[]) => (
         <For each={defs}>
             {(def) => (
@@ -96,12 +213,23 @@ export const PaintedText = (props: ParentProps<PaintedTextProps>) => {
     onMount(() => {
         props.onMount?.({ update: layout.update });
 
+        const rootRef = getRootRef();
+
+        if (driver && rootRef) {
+            const registration = driver.registry.register(rootRef);
+
+            setRegistration(registration);
+            onCleanup(registration.unregister);
+        }
+
         const sourceRef = getSourceRef();
 
         if (!sourceRef) return;
 
         onCleanup(layout.observe(sourceRef));
     });
+
+    createEffect(() => getRegistration()?.setCharacters(getLetters().map((letter) => letter.character)));
 
     return (
         <div ref={setRootRef} class={styles.paintedTextRoot}>
@@ -116,10 +244,13 @@ export const PaintedText = (props: ParentProps<PaintedTextProps>) => {
                 width={getWidth()}
                 height={getHeight()}
                 viewBox={`0 0 ${getWidth()} ${getHeight()}`}
+                style={driver?.getIsHidden() ? { visibility: "hidden" } : undefined}
             >
                 <defs>
-                    {renderDefsElements(getFillDefs())}
-                    {renderDefsElements(getStrokeDefs())}
+                    <PaintAreaContextProvider value={{ getPaintArea }}>
+                        {renderDefsElements(getFillDefs())}
+                        {renderDefsElements(getStrokeDefs())}
+                    </PaintAreaContextProvider>
 
                     <Show when={getStrokePaint().maskKind}>
                         {(getMaskKind) => (
@@ -128,29 +259,30 @@ export const PaintedText = (props: ParentProps<PaintedTextProps>) => {
                                 maskUnits="userSpaceOnUse"
                                 x={-getMaskPadding()}
                                 y={-getMaskPadding()}
-                                width={getWidth() + getMaskPadding() * 2}
-                                height={getHeight() + getMaskPadding() * 2}
+                                width={getWidth() + getMaskPadding() * MASK_PADDING_SIDES}
+                                height={getHeight() + getMaskPadding() * MASK_PADDING_SIDES}
                             >
                                 {getMaskKind() === "outside" && (
                                     <rect
                                         x={-getMaskPadding()}
                                         y={-getMaskPadding()}
-                                        width={getWidth() + getMaskPadding() * 2}
-                                        height={getHeight() + getMaskPadding() * 2}
+                                        width={getWidth() + getMaskPadding() * MASK_PADDING_SIDES}
+                                        height={getHeight() + getMaskPadding() * MASK_PADDING_SIDES}
                                         fill="white"
                                     />
                                 )}
 
-                                <text
-                                    class={styles.paintedTextLayer}
-                                    fill={getMaskKind() === "outside" ? "black" : "white"}
-                                >
-                                    {renderRuns(false)}
-                                </text>
+                                {renderLayer(() => ({ fill: getMaskKind() === "outside" ? "black" : "white" }), false)}
                             </mask>
                         )}
                     </Show>
                 </defs>
+
+                <Show when={getIsPerLetter()}>
+                    <text class={styles.paintedTextLayer} opacity={0}>
+                        {renderRuns(true)}
+                    </text>
+                </Show>
 
                 <For each={getFillDefs()}>
                     {(def, getIndex) => {
@@ -161,18 +293,15 @@ export const PaintedText = (props: ParentProps<PaintedTextProps>) => {
                             getFillDefs().length,
                         );
 
-                        return (
-                            <text
-                                class={styles.paintedTextLayer}
-                                fill={paint.fill}
-                                fill-opacity={paint.fillOpacity}
-                                filter={paint.filter}
-                                clip-path={paint.clipPath}
-                                style={paint.mixBlendMode ? { "mix-blend-mode": paint.mixBlendMode } : undefined}
-                                aria-hidden={isReadable ? undefined : "true"}
-                            >
-                                {renderRuns(isReadable)}
-                            </text>
+                        return renderLayer(
+                            () => ({
+                                "fill": paint.fill,
+                                "fill-opacity": paint.fillOpacity,
+                                "filter": paint.filter,
+                                "clip-path": paint.clipPath,
+                                "style": paint.mixBlendMode ? { "mix-blend-mode": paint.mixBlendMode } : undefined,
+                            }),
+                            isReadable,
                         );
                     }}
                 </For>
@@ -186,28 +315,38 @@ export const PaintedText = (props: ParentProps<PaintedTextProps>) => {
                             getFillDefs().length,
                         );
 
-                        return (
-                            <text
-                                class={styles.paintedTextLayer}
-                                fill="none"
-                                stroke={paint.fill}
-                                stroke-opacity={paint.fillOpacity}
-                                stroke-width={getStrokePaint().drawnWidth}
-                                stroke-linejoin="round"
-                                mask={getStrokePaint().maskKind ? `url(#${maskId})` : undefined}
-                                filter={paint.filter}
-                                clip-path={paint.clipPath}
-                                style={paint.mixBlendMode ? { "mix-blend-mode": paint.mixBlendMode } : undefined}
-                                aria-hidden={isReadable ? undefined : "true"}
-                            >
-                                {renderRuns(isReadable)}
-                            </text>
+                        return renderLayer(
+                            () => ({
+                                "fill": "none",
+                                "stroke": paint.fill,
+                                "stroke-opacity": paint.fillOpacity,
+                                "stroke-width": getStrokePaint().drawnWidth,
+                                "stroke-linejoin": "round",
+                                "mask": getStrokePaint().maskKind ? `url(#${maskId})` : undefined,
+                                "filter": paint.filter,
+                                "clip-path": paint.clipPath,
+                                "style": paint.mixBlendMode ? { "mix-blend-mode": paint.mixBlendMode } : undefined,
+                            }),
+                            isReadable,
                         );
                     }}
                 </For>
 
-                <For each={getAtomics()}>{(node) => node}</For>
+                <For each={getAtomics()}>
+                    {(node, getIndex) => <g style={getLetterStyle(getAtomicLetterIndices()[getIndex()])}>{node}</g>}
+                </For>
             </svg>
+
+            <Show when={getCaretBox()} keyed>
+                {(box) => (
+                    <div
+                        class={styles.paintedTextCaret}
+                        style={{ left: `${box.x}px`, top: `${box.top}px`, height: `${box.height}px` }}
+                    >
+                        {driver?.renderCaret?.()}
+                    </div>
+                )}
+            </Show>
         </div>
     );
 };

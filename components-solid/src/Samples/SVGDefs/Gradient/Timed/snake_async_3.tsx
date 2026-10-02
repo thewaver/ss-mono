@@ -1,6 +1,7 @@
 import { type GradientStepsOpts, SVGDefsUtils, TimedGradientDefaults } from "@thewaver/ss-components";
 import { MathUtils, ObjectUtils } from "@thewaver/ss-utils";
 
+import { SVGClipPath } from "../../../../Generators/SVGDefs/SVGClipPaths/SVGClipPath";
 import { SVGGradientDefsSolidUtils } from "../../../../Generators/SVGDefs/SVGGradients/SVGGradientDefsSolid.utils";
 import { SVGAnimations } from "../../SVGAnimations.const";
 import type { TimedGradientConfig } from "../../SVGDefsSolid.types";
@@ -36,7 +37,7 @@ export const snake_async_3 = (opts?: GradientStepsOpts): TimedGradientConfig => 
             clipPath: {
                 id: `clip1-${id}`,
                 renderDefsElement: () => (
-                    <clipPath id={`clip1-${id}`} clipPathUnits="objectBoundingBox">
+                    <SVGClipPath id={`clip1-${id}`}>
                         {SVGAnimations.Path.rotatingArc(
                             ObjectUtils.zipArray(
                                 "stretch",
@@ -49,7 +50,7 @@ export const snake_async_3 = (opts?: GradientStepsOpts): TimedGradientConfig => 
                             ),
                             defs,
                         )}
-                    </clipPath>
+                    </SVGClipPath>
                 ),
             },
         },
@@ -86,7 +87,7 @@ export const snake_async_3 = (opts?: GradientStepsOpts): TimedGradientConfig => 
             clipPath: {
                 id: `clip2-${id}`,
                 renderDefsElement: () => (
-                    <clipPath id={`clip2-${id}`} clipPathUnits="objectBoundingBox">
+                    <SVGClipPath id={`clip2-${id}`}>
                         {SVGAnimations.Path.rotatingArc(
                             ObjectUtils.zipArray(
                                 "stretch",
@@ -106,7 +107,7 @@ export const snake_async_3 = (opts?: GradientStepsOpts): TimedGradientConfig => 
                             ),
                             defs,
                         )}
-                    </clipPath>
+                    </SVGClipPath>
                 ),
             },
         },
@@ -148,7 +149,7 @@ export const snake_async_3 = (opts?: GradientStepsOpts): TimedGradientConfig => 
             clipPath: {
                 id: `clip3-${id}`,
                 renderDefsElement: () => (
-                    <clipPath id={`clip3-${id}`} clipPathUnits="objectBoundingBox">
+                    <SVGClipPath id={`clip3-${id}`}>
                         {SVGAnimations.Path.rotatingArc(
                             ObjectUtils.zipArray(
                                 "stretch",
@@ -173,7 +174,7 @@ export const snake_async_3 = (opts?: GradientStepsOpts): TimedGradientConfig => 
                             ),
                             defs,
                         )}
-                    </clipPath>
+                    </SVGClipPath>
                 ),
             },
         },

@@ -25,6 +25,7 @@ import PageSVGGradientsProps from "../SVGGradientsProps.vue";
 import ContinuityExample from "./Examples/Continuity.vue";
 import DefaultExample from "./Examples/Default.vue";
 import ScreenOverlayExample from "./Examples/ScreenOverlay.vue";
+import SharedExample from "./Examples/Shared.vue";
 
 const EXAMPLES_ROOT = "/src/App/Pages/SVGGradients/TrackedGradientsPage/Examples";
 
@@ -87,6 +88,13 @@ const examples: ExampleDefs[] = [
         path: `${EXAMPLES_ROOT}/Continuity.vue`,
     },
     {
+        key: "shared",
+        name: "Shared",
+        readout: () =>
+            "the same four boxes, now reading the pointer against the group and painting one gradient laid across all of it, so each box shows its own part of a single picture",
+        path: `${EXAMPLES_ROOT}/Shared.vue`,
+    },
+    {
         key: "screenOverlay",
         name: "A screen overlay",
         readout: () =>
@@ -129,6 +137,10 @@ const examples: ExampleDefs[] = [
 
         <template #continuity>
             <ContinuityExample v-bind="commonProps" />
+        </template>
+
+        <template #shared>
+            <SharedExample v-bind="commonProps" />
         </template>
 
         <template #screenOverlay>

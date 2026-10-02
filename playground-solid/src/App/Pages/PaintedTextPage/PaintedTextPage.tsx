@@ -10,6 +10,7 @@ import {
 import type { AccessorProps } from "@thewaver/ss-components-solid";
 import { MEASURE_BOX_PADDING } from "@thewaver/ss-playground/App/PageComponents/MeasureBox/MeasureBox.css";
 import * as styles from "@thewaver/ss-playground/App/Pages/PaintedTextPage/PaintedTextPage.css";
+import * as typewriterStyles from "@thewaver/ss-playground/App/Pages/TypewriterPage/TypewriterPage.css";
 import {
     FIELD_GAP,
     FIELD_PADDING,
@@ -32,9 +33,23 @@ import { PageTextFieldPlaceholder } from "../../StyledComponents/TextFieldPlaceh
 import { CustomInputExample } from "./Examples/CustomInput";
 import { HeadingExample } from "./Examples/Heading";
 import { ParagraphExample } from "./Examples/Paragraph";
+import { ScrambledExample } from "./Examples/Scrambled";
+import { TypedExample } from "./Examples/Typed";
 import type { PaintedTextExampleProps } from "./PaintedTextPage.types";
 
 const EXAMPLES_ROOT = "/src/App/Pages/PaintedTextPage/Examples";
+
+const ARRIVAL_EFFECTS = ["fade", "scale", "glow", "drop", "slide"] as const;
+
+type ArrivalEffect = (typeof ARRIVAL_EFFECTS)[number];
+
+const ARRIVAL_EFFECT_NAMES: Record<ArrivalEffect, string> = {
+    fade: typewriterStyles.typewriterFade,
+    scale: typewriterStyles.typewriterScale,
+    glow: typewriterStyles.typewriterGlow,
+    drop: typewriterStyles.typewriterDrop,
+    slide: typewriterStyles.typewriterSlide,
+};
 
 type ExampleWrapperProps = PaintedTextExampleProps &
     AccessorProps<{
@@ -142,6 +157,41 @@ const CustomInputExampleWrapper = ({ width, ...props }: ExampleWrapperProps) => 
     );
 };
 
+const TypedExampleWrapper = ({ width, ...props }: ExampleWrapperProps) => {
+    const [getArrivalEffect, setArrivalEffect] = createSignal<ArrivalEffect>(PaintedTextKnobs.STARTING_ARRIVAL_EFFECT);
+
+    return (
+        <>
+            <PageMeasureBox width={width} padding={() => MEASURE_BOX_PADDING}>
+                <TypedExample {...props} animationName={() => ARRIVAL_EFFECT_NAMES[getArrivalEffect()]} />
+            </PageMeasureBox>
+
+            <PageExampleKnobs>
+                <PageProp
+                    key={"arrivalEffect"}
+                    label={"Arrival effect"}
+                    hint={
+                        "How each letter arrives. The keyframes are the Typewriter page's own, played by the painted letters."
+                    }
+                >
+                    <PageSelectField
+                        value={getArrivalEffect}
+                        values={() => ARRIVAL_EFFECTS}
+                        ariaLabel={"Arrival effect"}
+                        onChange={(effect) => setArrivalEffect(() => effect)}
+                    />
+                </PageProp>
+            </PageExampleKnobs>
+        </>
+    );
+};
+
+const ScrambledExampleWrapper = ({ width, ...props }: ExampleWrapperProps) => (
+    <PageMeasureBox width={width} padding={() => MEASURE_BOX_PADDING}>
+        <ScrambledExample {...props} />
+    </PageMeasureBox>
+);
+
 export const PaintedTextPage = () => {
     const fill = createPaintSlot(PaintedTextKnobs.STARTING_FILL_PAINT_KIND, PaintedTextKnobs.STARTING_KEYS);
     const stroke = createPaintSlot(PaintedTextKnobs.STARTING_STROKE_PAINT_KIND, PaintedTextKnobs.STARTING_KEYS);
@@ -196,6 +246,22 @@ export const PaintedTextPage = () => {
                 component: () => <CustomInputExampleWrapper {...commonProps} />,
                 path: `${EXAMPLES_ROOT}/CustomInput.tsx`,
             },
+            {
+                key: "typed",
+                name: "Typed",
+                readout: () =>
+                    "a Typewriter around two painted texts: it decides when each letter arrives and how, the painted texts decide where the letters sit and what paints them, and the two share one run in reading order",
+                component: () => <TypedExampleWrapper {...commonProps} />,
+                path: `${EXAMPLES_ROOT}/Typed.tsx`,
+            },
+            {
+                key: "scrambled",
+                name: "Scrambled",
+                readout: () =>
+                    "a ScrambleText around a painted text: it decides which glyph each letter shows while it churns, and the painted text draws that glyph, painted, in the letter's place",
+                component: () => <ScrambledExampleWrapper {...commonProps} />,
+                path: `${EXAMPLES_ROOT}/Scrambled.tsx`,
+            },
         ];
     });
 
@@ -207,7 +273,7 @@ export const PaintedTextPage = () => {
                     name={"fill"}
                     label={"Fill"}
                     hint={
-                        "What paints the letters: a pattern, or a gradient that runs on a clock or follows the pointer. With none, the letters are hollow when there is a stroke, and the text's own color when there is not."
+                        "What paints the letters: a flat color, a pattern, or a gradient that runs on a clock or follows the pointer. For hollow letters, paint them solid and make the background color transparent."
                     }
                 />
 
@@ -218,7 +284,7 @@ export const PaintedTextPage = () => {
                     name={"stroke"}
                     label={"Stroke"}
                     hint={
-                        "What paints the stroke around the letters: a pattern, or a gradient that runs on a clock or follows the pointer."
+                        "What paints the stroke around the letters: a flat color, a pattern, or a gradient that runs on a clock or follows the pointer."
                     }
                 />
 

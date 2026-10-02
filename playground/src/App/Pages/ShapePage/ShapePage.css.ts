@@ -38,11 +38,32 @@ export const exampleHost = style({
 });
 
 export const example = style({
-    backgroundImage: "linear-gradient(#000000C0, #00000040)",
     resize: "both",
     overflow: "auto",
     width: exampleSize,
     height: exampleSize,
+});
+
+export const exampleSurface = style({
+    backgroundImage: "linear-gradient(#000000C0, #00000040)",
+    boxSizing: "border-box",
+    width: "100%",
+    height: "100%",
+});
+
+export const sharedGrid = style({
+    display: "grid",
+    gridTemplateColumns: "auto auto",
+    justifyContent: "start",
+    alignItems: "start",
+    gap: themeVars.spacing.full,
+});
+
+export const sharedCell = style({
+    resize: "both",
+    overflow: "auto",
+    width: exampleSize * 0.5,
+    height: exampleSize * 0.5,
 });
 
 export const exampleInner = style({

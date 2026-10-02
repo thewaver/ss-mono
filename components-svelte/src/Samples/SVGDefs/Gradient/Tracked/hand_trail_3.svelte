@@ -1,6 +1,7 @@
 <svelte:options namespace="svg" />
 
 <script module lang="ts">
+    import SVGClipPath from "../../../../Generators/SVGDefs/SVGClipPaths/SVGClipPath.svelte";
     import { untrack } from "svelte";
 
     import {
@@ -211,9 +212,9 @@
         })}
     />
 
-    <clipPath id={`clip${id}`} clipPathUnits="objectBoundingBox">
+    <SVGClipPath id={`clip${id}`}>
         <path d={SVGUtils.getArcPath(sweepArc, getSweepRotation(angle, sweepArc))} />
-    </clipPath>
+    </SVGClipPath>
 {/snippet}
 
 {@render sweep(

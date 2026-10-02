@@ -265,3 +265,41 @@ export const waitUntilStill = (locator: Locator, timeoutMs = 5_000) =>
             }),
         timeoutMs,
     );
+
+/**
+ * For a demo that lays one paint across a group of separate drawings, where each cell's gradients and clip paths
+ * actually sit and where they ought to: across the whole group, shifted back by the cell's own place in it. Both are
+ * measured in the group's own pixels, so the `Viewport` scale cancels out. A cell is a child of the group that holds
+ * a drawing; the group is the first element whose children all do.
+ */
+export const readPaintAreas = (locator: Locator) =>
+    locator.evaluate((root) => {
+        const group = [...root.querySelectorAll("div")].find(
+            (element) =>
+                element.children.length > 1 && [...element.children].every((cell) => cell.querySelector("svg")),
+        )!;
+        const groupRect = group.getBoundingClientRect();
+        const scale = group.offsetWidth / groupRect.width;
+
+        return [...group.children].flatMap((cell) => {
+            const cellRect = cell.getBoundingClientRect();
+            const expected = [
+                -(cellRect.left - groupRect.left) * scale,
+                -(cellRect.top - groupRect.top) * scale,
+                group.offsetWidth,
+                group.offsetHeight,
+            ];
+
+            return [...cell.querySelectorAll("linearGradient, radialGradient, clipPath")].map((paint) => {
+                const transform = paint.getAttribute(paint.tagName === "clipPath" ? "transform" : "gradientTransform");
+                const match = transform?.match(/^translate\((\S+) (\S+)\) scale\((\S+) (\S+)\)/);
+
+                return {
+                    kind: paint.tagName,
+                    units: paint.getAttribute(paint.tagName === "clipPath" ? "clipPathUnits" : "gradientUnits"),
+                    actual: match ? match.slice(1).map(Number) : [],
+                    expected,
+                };
+            });
+        });
+    });

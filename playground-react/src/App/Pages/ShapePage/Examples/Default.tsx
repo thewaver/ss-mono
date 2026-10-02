@@ -57,8 +57,10 @@ export const DefaultExample = (props: ShapeExampleProps) => {
                           );
 
                     return (
-                        <div ref={rootRef} className={styles.example} style={{ ...clipStyle, ...paddingStyle }}>
-                            <div className={styles.exampleInner}>I have a border</div>
+                        <div ref={rootRef} className={styles.example}>
+                            <div className={styles.exampleSurface} style={{ ...clipStyle, ...paddingStyle }}>
+                                <div className={styles.exampleInner}>I have a border</div>
+                            </div>
                         </div>
                     );
                 }}

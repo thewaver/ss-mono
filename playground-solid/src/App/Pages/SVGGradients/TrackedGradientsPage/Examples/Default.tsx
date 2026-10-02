@@ -13,9 +13,20 @@ import type { TrackedGradientExampleProps } from "../../SVGGradients.types";
 
 type Props = TrackedGradientExampleProps & {
     boxClass?: string;
+    getGroupRef?: () => HTMLElement | undefined;
+    getGroupSize?: () => Size2d;
 };
 
-export const TrackedShape = ({ configKey, configDefs, paintKind, colors, blurWidth, boxClass }: Props) => {
+export const TrackedShape = ({
+    configKey,
+    configDefs,
+    paintKind,
+    colors,
+    blurWidth,
+    boxClass,
+    getGroupRef,
+    getGroupSize,
+}: Props) => {
     const id = createUniqueId();
 
     const computeDefs = (getSize: () => Size2d, getRef: () => HTMLElement | undefined) => {
@@ -26,11 +37,16 @@ export const TrackedShape = ({ configKey, configDefs, paintKind, colors, blurWid
         return SVGDefsSamples.Gradient.Tracked.toConfig({
             family: key,
             defs: access(configDefs),
-        } as SVGDefsSamples.Gradient.Tracked.Entry).computeSVGDefs(`${access(paintKind)}-${id}`, undefined, getRef, {
-            getSize,
-            colors: access(colors),
-            blurWidth: access(blurWidth),
-        });
+        } as SVGDefsSamples.Gradient.Tracked.Entry).computeSVGDefs(
+            `${access(paintKind)}-${id}`,
+            undefined,
+            getGroupRef ?? getRef,
+            {
+                getSize: getGroupSize ?? getSize,
+                colors: access(colors),
+                blurWidth: access(blurWidth),
+            },
+        );
     };
 
     return (

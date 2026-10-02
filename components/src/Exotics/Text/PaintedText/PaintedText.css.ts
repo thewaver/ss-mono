@@ -26,6 +26,12 @@ export const paintedTextSVG = style({
     overflow: "visible",
 });
 
+export const paintedTextCaret = style({
+    position: "absolute",
+    display: "flex",
+    pointerEvents: "none",
+});
+
 export const paintedTextLayer = style({
     whiteSpace: "pre",
 });

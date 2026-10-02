@@ -3,6 +3,7 @@ import { Show } from "solid-js";
 import { type GradientCycleStepsOpts, SVGDefsUtils, TimedGradientDefaults } from "@thewaver/ss-components";
 import { MathUtils, ObjectUtils } from "@thewaver/ss-utils";
 
+import { SVGClipPath } from "../../../../Generators/SVGDefs/SVGClipPaths/SVGClipPath";
 import { SVGGradientDefsSolidUtils } from "../../../../Generators/SVGDefs/SVGGradients/SVGGradientDefsSolid.utils";
 import { SVGAnimations } from "../../SVGAnimations.const";
 import type { TimedGradientConfig } from "../../SVGDefsSolid.types";
@@ -91,7 +92,7 @@ export const snake_inter_2 = (opts?: GradientCycleStepsOpts): TimedGradientConfi
             clipPath: {
                 id: `clip1-${id}`,
                 renderDefsElement: () => (
-                    <clipPath id={`clip1-${id}`} clipPathUnits="objectBoundingBox">
+                    <SVGClipPath id={`clip1-${id}`}>
                         {SVGAnimations.Path.rotatingArc(
                             ObjectUtils.zipArray(
                                 "stretch",
@@ -141,7 +142,7 @@ export const snake_inter_2 = (opts?: GradientCycleStepsOpts): TimedGradientConfi
                             ),
                             defs,
                         )}
-                    </clipPath>
+                    </SVGClipPath>
                 ),
             },
         },
@@ -224,7 +225,7 @@ export const snake_inter_2 = (opts?: GradientCycleStepsOpts): TimedGradientConfi
             clipPath: {
                 id: `clip2-${id}`,
                 renderDefsElement: () => (
-                    <clipPath id={`clip2-${id}`} clipPathUnits="objectBoundingBox">
+                    <SVGClipPath id={`clip2-${id}`}>
                         {SVGAnimations.Path.rotatingArc(
                             ObjectUtils.zipArray(
                                 "stretch",
@@ -274,7 +275,7 @@ export const snake_inter_2 = (opts?: GradientCycleStepsOpts): TimedGradientConfi
                             ),
                             defs,
                         )}
-                    </clipPath>
+                    </SVGClipPath>
                 ),
             },
         },

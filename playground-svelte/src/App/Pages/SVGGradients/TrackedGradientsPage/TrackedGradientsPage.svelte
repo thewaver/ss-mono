@@ -23,6 +23,7 @@
     import ContinuityExample from "./Examples/Continuity.svelte";
     import DefaultExample from "./Examples/Default.svelte";
     import ScreenOverlayExample from "./Examples/ScreenOverlay.svelte";
+    import SharedExample from "./Examples/Shared.svelte";
 
     const EXAMPLES_ROOT = "/src/App/Pages/SVGGradients/TrackedGradientsPage/Examples";
 
@@ -71,6 +72,14 @@
             path: `${EXAMPLES_ROOT}/Continuity.svelte`,
         },
         {
+            key: "shared",
+            name: "Shared",
+            readout: () =>
+                "the same four boxes, now reading the pointer against the group and painting one gradient laid across all of it, so each box shows its own part of a single picture",
+            component: sharedExample,
+            path: `${EXAMPLES_ROOT}/Shared.svelte`,
+        },
+        {
             key: "screenOverlay",
             name: "A screen overlay",
             readout: () =>
@@ -87,6 +96,10 @@
 
 {#snippet continuityExample()}
     <ContinuityExample {...commonProps} />
+{/snippet}
+
+{#snippet sharedExample()}
+    <SharedExample {...commonProps} />
 {/snippet}
 
 {#snippet screenOverlayExample()}

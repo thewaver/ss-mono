@@ -162,6 +162,9 @@ export namespace TypewriterUtils {
      * The first measurement and every content cause warn about elements the typed copy cannot reproduce — see
      * `JSXTextParserUtils.findUnsupportedElements`.
      *
+     * While `opts.getIsDriven` says a drawer such as `PaintedText` is drawing the letters, the player measures
+     * nothing and takes its letter count from {@link TypewriterPlayer.setCount} instead.
+     *
      * The measurement reads the live page, so the container must already hold the text it is to measure. The
      * functions in `opts` are read when they are needed, so they may answer differently over time.
      *
@@ -227,7 +230,7 @@ export namespace TypewriterUtils {
         const measure = (cause: TypewriterUpdateCause, isForced: boolean) => {
             const container = opts.getContainer();
 
-            if (!container) return false;
+            if (!container || opts.getIsDriven?.()) return false;
 
             const width = container.clientWidth;
 
@@ -248,6 +251,11 @@ export namespace TypewriterUtils {
         };
 
         const update = (cause: TypewriterUpdateCause) => measure(cause, false);
+
+        const setCount = (count: number, cause: TypewriterUpdateCause) => {
+            write({ segments: [], count });
+            restart(cause);
+        };
 
         const reportCharacterStart = (index: number) =>
             write({ caretIndex: getCaretIndexOnStart(opts.getIsErasing(), index) });
@@ -275,6 +283,15 @@ export namespace TypewriterUtils {
             };
         };
 
-        return { get: store.get, subscribe: store.subscribe, update, restart, reportCharacterStart, observe, stop };
+        return {
+            get: store.get,
+            subscribe: store.subscribe,
+            update,
+            restart,
+            setCount,
+            reportCharacterStart,
+            observe,
+            stop,
+        };
     };
 }

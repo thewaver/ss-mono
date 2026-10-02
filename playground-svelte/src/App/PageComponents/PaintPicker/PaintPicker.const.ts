@@ -6,6 +6,7 @@ import {
     TrackedGradientDefaults,
 } from "@thewaver/ss-components-svelte";
 import {
+    computeNoSampleDefs,
     splitEntriesIntoGroups,
     toGroupEntries,
 } from "@thewaver/ss-playground/App/PageComponents/SampleGroups/SampleGroups.const";
@@ -18,10 +19,10 @@ import type { Paint, PaintKind, PaintSampleKey, PaintSampleKind, PaintSettings }
 
 const NO_KNOBS = {};
 
-export const PAINT_KINDS: PaintKind[] = ["none", "pattern", "timed", "tracked"];
+export const PAINT_KINDS: PaintKind[] = ["solid", "pattern", "timed", "tracked"];
 
 export const PAINT_KIND_LABELS: Record<PaintKind, string> = {
-    none: "None",
+    solid: "Solid",
     pattern: "Pattern",
     timed: "Timed gradient",
     tracked: "Tracked gradient",
@@ -81,11 +82,12 @@ export const getPaintDefaults = (kind: PaintKind, key: PaintSampleKey): Record<s
 export const computePaintDefs = (
     paint: Paint,
     settings: PaintSettings,
+    paintKind: "fill" | "stroke",
     id: string,
     size: Size2d,
     element: HTMLElement | undefined,
     flags?: InteractionFlags,
-): SVGDefs[] | undefined => {
+): SVGDefs[] => {
     const elementDefs = { getSize: () => size, colors: settings.colors, blurWidth: settings.blurWidth };
     const animationDefs = {
         animationDurationMs: settings.animationDurationMs,
@@ -95,8 +97,8 @@ export const computePaintDefs = (
     };
 
     switch (paint.kind) {
-        case "none":
-            return undefined;
+        case "solid":
+            return computeNoSampleDefs(settings.colors, paintKind);
         case "pattern":
             return SVGDefsSamples.Pattern.SAMPLE_CONFIGS[paint.key as SVGDefsSamples.Pattern.SampleKey].computeSVGDefs(
                 id,

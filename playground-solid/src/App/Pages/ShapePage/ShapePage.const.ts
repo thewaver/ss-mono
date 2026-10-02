@@ -1,6 +1,5 @@
 import { type InteractionFlags, access } from "@thewaver/ss-components-solid";
 import type { SVGDefs } from "@thewaver/ss-components-solid";
-import { computeNoSampleDefs } from "@thewaver/ss-playground/App/PageComponents/SampleGroups/SampleGroups.const";
 import type { Size2d } from "@thewaver/ss-utils";
 
 import { computePaintDefs } from "../../PageComponents/PaintPicker/PaintPicker.const";
@@ -30,11 +29,12 @@ export const computeShapeStrokeDefs = (
     computePaintDefs(
         access(props.strokePaint),
         computeSettings(props, cellScale),
+        "stroke",
         `stroke-${id}`,
         getSize,
         getRef,
         getFlags,
-    ) ?? computeNoSampleDefs(access(props.colors), "stroke");
+    );
 
 export const computeShapeFillDefs = (
     id: string,
@@ -43,5 +43,4 @@ export const computeShapeFillDefs = (
     getRef: () => HTMLElement | undefined,
     cellScale = 1,
 ): SVGDefs[] =>
-    computePaintDefs(access(props.fillPaint), computeSettings(props, cellScale), `fill-${id}`, getSize, getRef) ??
-    computeNoSampleDefs(access(props.colors), "fill");
+    computePaintDefs(access(props.fillPaint), computeSettings(props, cellScale), "fill", `fill-${id}`, getSize, getRef);

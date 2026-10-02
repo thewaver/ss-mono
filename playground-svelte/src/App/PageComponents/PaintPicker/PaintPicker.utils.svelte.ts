@@ -11,7 +11,7 @@ export const createPaintSlot = (
     let keys = $state.raw<Record<PaintSampleKind, PaintSampleKey>>({ ...STARTING_KEYS, ...startingKeys });
     let configDefs = $state.raw<ConfigDefs>({});
 
-    const key = $derived(kind === "none" ? STARTING_KEYS.timed : keys[kind]);
+    const key = $derived(kind === "solid" ? STARTING_KEYS.timed : keys[kind]);
     const paint = $derived({ kind, key, configDefs: configDefs[key] ?? {} });
 
     return {
@@ -22,7 +22,7 @@ export const createPaintSlot = (
             kind = next;
         },
         setKey: (next) => {
-            if (kind !== "none") keys = { ...keys, [kind]: next };
+            if (kind !== "solid") keys = { ...keys, [kind]: next };
         },
         setConfigDef: (name, value) => {
             configDefs = { ...configDefs, [key]: { ...configDefs[key], [name]: value } };

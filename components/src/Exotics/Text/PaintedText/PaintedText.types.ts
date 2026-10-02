@@ -31,6 +31,27 @@ export type PaintedTextRun = {
     };
 };
 
+export type PaintedTextLetter = {
+    /** A character of a run, a line break, or a whole element such as an image. */
+    kind: "text" | "break" | "atomic";
+    /** The character, a line feed for a break, or the object replacement character for a whole element. */
+    character: string;
+    /** Where the letter's box starts, from the left of the text block. */
+    x: number;
+    /** Where the letter's box starts, from the top of the text block. */
+    top: number;
+    /** How wide the letter's box is; nothing for a break. */
+    width: number;
+    /** How tall the letter's box is, which is the line's for a character. */
+    height: number;
+    /** Where the letter's baseline sits, from the top of the text block. */
+    baseline: number;
+    /** The run a character belongs to, which carries its font. */
+    runIndex?: number;
+    /** The whole element a letter stands for, as its place among the layout's atomics. */
+    atomicIndex?: number;
+};
+
 export type PaintedTextStrokePaint = {
     /** The stroke's width as drawn, which is twice the visible width when half of it is masked away. */
     drawnWidth: number;
@@ -47,6 +68,11 @@ export type PaintedTextLayoutState = {
     runs: PaintedTextRun[];
     /** The images and other whole elements, already built as SVG and placed where they sit in the text. */
     atomics: SVGElement[];
+    /**
+     * Every letter on its own, counted as `Typewriter` counts them — a character, a line break or a whole element
+     * each — and measured only while a wrapper is driving the letters.
+     */
+    letters: PaintedTextLetter[];
 };
 
 export type PaintedTextLayoutOpts = {
@@ -54,6 +80,8 @@ export type PaintedTextLayoutOpts = {
     getSource: () => HTMLElement | undefined;
     /** An empty element in the flow, which the text is laid out in, invisibly, to find where every run lands. */
     getLayoutHost: () => HTMLElement | undefined;
+    /** Whether a wrapper is driving the letters, and so needs each one measured on its own. */
+    getIsMeasuringLetters?: () => boolean;
 };
 
 export type PaintedTextLayout = {

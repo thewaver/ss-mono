@@ -28,7 +28,7 @@ export const createPaintSlot = (
     const getKey = () => {
         const kind = getKind();
 
-        return kind === "none" ? STARTING_KEYS.timed : keys[kind];
+        return kind === "solid" ? STARTING_KEYS.timed : keys[kind];
     };
 
     const getPaint = createMemo(() => ({ kind: getKind(), key: getKey(), configDefs: configDefs[getKey()] ?? {} }));
@@ -41,7 +41,7 @@ export const createPaintSlot = (
         setKey: (key) => {
             const kind = getKind();
 
-            if (kind !== "none") setKeys(kind, key);
+            if (kind !== "solid") setKeys(kind, key);
         },
         setConfigDef: (name, value) => setConfigDefs(getKey(), (previous) => ({ ...previous, [name]: value })),
     };
@@ -51,7 +51,7 @@ export const PagePaintPicker = (props: PagePaintPickerProps) => {
     const getSampleKind = () => {
         const kind = props.paintSlot.getKind();
 
-        return kind === "none" ? undefined : kind;
+        return kind === "solid" ? undefined : kind;
     };
 
     return (

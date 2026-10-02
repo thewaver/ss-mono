@@ -26,6 +26,8 @@ import CustomInputExampleWrapper from "./CustomInputExampleWrapper.vue";
 import HeadingExampleWrapper from "./HeadingExampleWrapper.vue";
 import type { PaintedTextExampleWrapperProps } from "./PaintedTextPage.types";
 import ParagraphExampleWrapper from "./ParagraphExampleWrapper.vue";
+import ScrambledExampleWrapper from "./ScrambledExampleWrapper.vue";
+import TypedExampleWrapper from "./TypedExampleWrapper.vue";
 
 const EXAMPLES_ROOT = "/src/App/Pages/PaintedTextPage/Examples";
 
@@ -83,6 +85,20 @@ const examples: ExampleDefs[] = [
             "the text box drives the painted text directly: every change to what it holds is laid out and painted again, line breaks included",
         path: `${EXAMPLES_ROOT}/CustomInput.vue`,
     },
+    {
+        key: "typed",
+        name: "Typed",
+        readout: () =>
+            "a Typewriter around two painted texts: it decides when each letter arrives and how, the painted texts decide where the letters sit and what paints them, and the two share one run in reading order",
+        path: `${EXAMPLES_ROOT}/Typed.vue`,
+    },
+    {
+        key: "scrambled",
+        name: "Scrambled",
+        readout: () =>
+            "a ScrambleText around a painted text: it decides which glyph each letter shows while it churns, and the painted text draws that glyph, painted, in the letter's place",
+        path: `${EXAMPLES_ROOT}/Scrambled.vue`,
+    },
 ];
 </script>
 
@@ -93,7 +109,7 @@ const examples: ExampleDefs[] = [
                 :paint-slot="fill"
                 name="fill"
                 label="Fill"
-                hint="What paints the letters: a pattern, or a gradient that runs on a clock or follows the pointer. With none, the letters are hollow when there is a stroke, and the text's own color when there is not."
+                hint="What paints the letters: a flat color, a pattern, or a gradient that runs on a clock or follows the pointer. For hollow letters, paint them solid and make the background color transparent."
             />
 
             <PagePropsDivider />
@@ -102,7 +118,7 @@ const examples: ExampleDefs[] = [
                 :paint-slot="stroke"
                 name="stroke"
                 label="Stroke"
-                hint="What paints the stroke around the letters: a pattern, or a gradient that runs on a clock or follows the pointer."
+                hint="What paints the stroke around the letters: a flat color, a pattern, or a gradient that runs on a clock or follows the pointer."
             />
 
             <PagePropsDivider />
@@ -241,6 +257,14 @@ const examples: ExampleDefs[] = [
 
             <template #customInput>
                 <CustomInputExampleWrapper v-bind="commonProps" />
+            </template>
+
+            <template #typed>
+                <TypedExampleWrapper v-bind="commonProps" />
+            </template>
+
+            <template #scrambled>
+                <ScrambledExampleWrapper v-bind="commonProps" />
             </template>
         </PageExamples>
     </div>

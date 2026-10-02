@@ -19,6 +19,7 @@
     import PagePropsPanel from "../../PageComponents/PropsPanel/PagePropsPanel.svelte";
     import DefaultExampleWrapper from "./DefaultExampleWrapper.svelte";
     import MorphExampleWrapper from "./MorphExampleWrapper.svelte";
+    import SharedPaintExampleWrapper from "./SharedPaintExampleWrapper.svelte";
     import type { ShapeExampleProps } from "./ShapePage.types";
     import StressTestWrapper from "./StressTestWrapper.svelte";
     import TextWrapExampleWrapper from "./TextWrapExampleWrapper.svelte";
@@ -73,6 +74,14 @@
             path: `${EXAMPLES_ROOT}/Morph.svelte`,
         },
         {
+            key: "sharedPaint",
+            name: "Shared Paint",
+            readout: () =>
+                "four shapes painted by one fill and one stroke laid across the whole group, so each shows its own part of a single picture; resize any of them and the picture stretches to the new group",
+            component: sharedPaintExample,
+            path: `${EXAMPLES_ROOT}/SharedPaint.svelte`,
+        },
+        {
             key: "textWrap",
             name: "Text Wrap",
             readout: () =>
@@ -96,6 +105,10 @@
     <MorphExampleWrapper {...commonProps} />
 {/snippet}
 
+{#snippet sharedPaintExample()}
+    <SharedPaintExampleWrapper {...commonProps} />
+{/snippet}
+
 {#snippet textWrapExample()}
     <TextWrapExampleWrapper {...commonProps} />
 {/snippet}
@@ -110,7 +123,7 @@
             paintSlot={stroke}
             name={"stroke"}
             label={"Stroke"}
-            hint={"What paints the shape's stroke: nothing but its flat color, a pattern, or a gradient that runs on a clock or follows the pointer."}
+            hint={"What paints the shape's stroke: a flat color, a pattern, or a gradient that runs on a clock or follows the pointer."}
         />
 
         <PagePropsDivider />
@@ -119,7 +132,7 @@
             paintSlot={fill}
             name={"fill"}
             label={"Fill"}
-            hint={"What paints the shape's inside: nothing but its flat color, a pattern, or a gradient that runs on a clock or follows the pointer."}
+            hint={"What paints the shape's inside: a flat color, a pattern, or a gradient that runs on a clock or follows the pointer."}
         />
 
         <PagePropsDivider />
@@ -162,13 +175,13 @@
                 </div>
             </PageProp>
 
-            <PageProp itemKey={"edgeThicknessPx"} label={"Edge Thickness (px)"} hint={"How thick the stroke is."}>
+            <PageProp itemKey={"strokeThicknessPx"} label={"Stroke Thickness (px)"} hint={"How thick the stroke is."}>
                 <PageNumberField
                     value={edgeThickness}
                     min={ShapeKnobs.MIN_EDGE_THICKNESS}
                     max={ShapeKnobs.MAX_EDGE_THICKNESS}
                     step={ShapeKnobs.EDGE_THICKNESS_STEP}
-                    ariaLabel={"Edge thickness"}
+                    ariaLabel={"Stroke thickness"}
                     onInput={(value) => {
                         edgeThickness = value;
                     }}
