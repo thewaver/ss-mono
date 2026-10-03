@@ -1,0 +1,137 @@
+import { MathUtils, type Point2d, type Size2d } from "@thewaver/ss-utils";
+
+import type { PointerReading } from "../../../Abstracts/PointerTracker/PointerTracker.types";
+import type { PatternProximityOpts } from "../SVGDefs.types";
+import { SVGPatternLayouts } from "../SVGPatternLayouts.const";
+import type { SVGPatternCellCount, SVGPatternCellIndex, SVGPatternKind } from "../SVGPatternLayouts.types";
+
+const TILE_CELL_COUNT: SVGPatternCellCount = { rows: 8, cols: 8 };
+const MIN_COUNT = 1;
+const FULL_LEVEL = 1;
+
+/**
+ * The arithmetic behind a pattern whose cells answer to the pointer rather than to a clock: how many cells to draw,
+ * where the pointer is in the pattern's own units, and how strongly each cell reacts. Drawing the cells, and what a
+ * cell does with its level, are each framework's and each sample's.
+ */
+export namespace TrackedPatternUtils {
+    /**
+     * A sample's options with its own defaults filled in, in the shape {@link computeLevel} reads.
+     *
+     * @param opts What the consumer passed, if anything.
+     * @param defaults The sample's defaults, from `TrackedPatternDefaults`.
+     * @returns Every option resolved, with `tiled` renamed `isTiled`.
+     */
+    export const resolveOpts = (opts: PatternProximityOpts | undefined, defaults: Required<PatternProximityOpts>) => ({
+        isTiled: opts?.tiled ?? defaults.tiled,
+        reach: opts?.reach ?? defaults.reach,
+        restLevel: opts?.restLevel ?? defaults.restLevel,
+    });
+
+    /**
+     * The fewest cells of a layout whose single tile reaches across a whole area.
+     *
+     * A pattern drawn this way never repeats inside the area it paints, so a cell lit by the pointer is lit once. The
+     * price is that the count follows the area: small cells over a large area mean many cells.
+     *
+     * @param kind The layout the cells are placed by. Its own rounding is taken into account, so a layout that
+     * only repeats on an even count is asked for one that still reaches.
+     * @param cellSize One cell's size.
+     * @param areaSize The area the tile has to cover.
+     * @returns The request to hand the layout, in cells across and down, at least one either way. The layout turns
+     * it into the count it draws.
+     */
+    export const computeCoveringCellCount = (
+        kind: SVGPatternKind,
+        cellSize: Size2d,
+        areaSize: Size2d,
+    ): SVGPatternCellCount => {
+        const layout = SVGPatternLayouts.ALL[kind];
+        const computeTileSize = (count: SVGPatternCellCount) =>
+            layout.computePatternSize(layout.computeCellCount(count), cellSize);
+
+        let cols = cellSize.width > 0 ? Math.max(MIN_COUNT, Math.floor(areaSize.width / cellSize.width)) : MIN_COUNT;
+        let rows = cellSize.height > 0 ? Math.max(MIN_COUNT, Math.floor(areaSize.height / cellSize.height)) : MIN_COUNT;
+
+        while (cellSize.width > 0 && computeTileSize({ rows: MIN_COUNT, cols }).width < areaSize.width) cols += 1;
+        while (cellSize.height > 0 && computeTileSize({ rows, cols: MIN_COUNT }).height < areaSize.height) rows += 1;
+
+        return { rows, cols };
+    };
+
+    /**
+     * How many cells a tracked pattern draws.
+     *
+     * @param kind The layout the cells are placed by.
+     * @param isTiled `true` to draw the same fixed tile the timed patterns draw and let it repeat, so every copy
+     * reacts to the pointer at once; `false` to draw one tile covering the whole area, see
+     * {@link computeCoveringCellCount}.
+     * @param cellSize One cell's size.
+     * @param areaSize The area being painted.
+     * @returns The request to hand the layout, in cells across and down.
+     */
+    export const computeCellCount = (
+        kind: SVGPatternKind,
+        isTiled: boolean,
+        cellSize: Size2d,
+        areaSize: Size2d,
+    ): SVGPatternCellCount => (isTiled ? TILE_CELL_COUNT : computeCoveringCellCount(kind, cellSize, areaSize));
+
+    /**
+     * Where the pointer is, in the units a pattern filling the area is drawn in.
+     *
+     * @param reading The pointer's reading against the painted element.
+     * @param isPointerPresent Whether the pointer is over the window at all.
+     * @param areaSize The painted element's size.
+     * @returns The point, measured from the element's top-left corner, or `undefined` while the pointer is away, so
+     * every cell falls back to rest.
+     */
+    export const computePointerPoint = (
+        reading: PointerReading,
+        isPointerPresent: boolean,
+        areaSize: Size2d,
+    ): Point2d | undefined =>
+        isPointerPresent
+            ? { x: reading.boxRatio.x * areaSize.width, y: reading.boxRatio.y * areaSize.height }
+            : undefined;
+
+    /**
+     * How strongly one cell reacts to the pointer, from its rest level up to `1`.
+     *
+     * Distance is measured from the cell's center in cells rather than in pixels, so the reach keeps its meaning as
+     * the cell size changes and stays round on cells that are not square. The level eases in rather than rising in a
+     * straight line, so the edge of the lit area is soft. On a repeating tile the distance is taken to the nearest copy
+     * of the pointer, which is what makes the cells at one edge of a tile answer to a pointer just past the other.
+     *
+     * @param kind The layout the cell is placed by.
+     * @param index The cell's place in the grid.
+     * @param cellCount The grid's size, which sets the tile's size on a repeating tile.
+     * @param cellSize One cell's size.
+     * @param pointer The pointer, from {@link computePointerPoint}.
+     * @param opts.isTiled Whether the tile repeats.
+     * @param opts.reach How many cells away from the pointer a cell still reacts.
+     * @param opts.restLevel The level of a cell out of reach, `0`–`1`.
+     * @returns `opts.restLevel` out of reach or with no pointer, `1` with the pointer on the cell's center.
+     */
+    export const computeLevel = (
+        kind: SVGPatternKind,
+        index: SVGPatternCellIndex,
+        cellCount: SVGPatternCellCount,
+        cellSize: Size2d,
+        pointer: Point2d | undefined,
+        opts: { isTiled: boolean; reach: number; restLevel: number },
+    ) => {
+        if (!pointer || opts.reach <= 0 || cellSize.width <= 0 || cellSize.height <= 0) return opts.restLevel;
+
+        const layout = SVGPatternLayouts.ALL[kind];
+        const pos = layout.computeCellPos(index, cellSize);
+        const tileSize = layout.computePatternSize(cellCount, cellSize);
+        const wrap = (delta: number, period: number) =>
+            opts.isTiled && period > 0 ? delta - Math.round(delta / period) * period : delta;
+        const dx = wrap(pos.x + cellSize.width * 0.5 - pointer.x, tileSize.width) / cellSize.width;
+        const dy = wrap(pos.y + cellSize.height * 0.5 - pointer.y, tileSize.height) / cellSize.height;
+        const nearness = MathUtils.clamp01(1 - Math.hypot(dx, dy) / opts.reach);
+
+        return MathUtils.lerp(opts.restLevel, FULL_LEVEL, nearness * nearness * (3 - 2 * nearness));
+    };
+}

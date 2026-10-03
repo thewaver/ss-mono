@@ -32,7 +32,7 @@ export namespace SVGPatternLayouts {
             computeIsSplit: () => false,
         },
         diagonal: {
-            computeCellCount: (requested) => ({ rows: toOdd(requested.rows), cols: toOdd(requested.cols) }),
+            computeCellCount: (requested) => ({ rows: toOdd(requested.rows * 2), cols: toOdd(requested.cols) }),
             computePatternSize: (cellCount, cellSize) => ({
                 width: cellSize.width * (cellCount.cols - 1),
                 height: cellSize.height * (cellCount.rows * 0.5 - 0.5),
@@ -70,7 +70,7 @@ export namespace SVGPatternLayouts {
             computeIsSplit: (index, cellCount) => MathUtils.isEven(index.col) && isFirstOrLastRow(index, cellCount),
         },
         triangle: {
-            computeCellCount: (requested) => ({ rows: toEven(requested.rows), cols: toOdd(requested.cols) }),
+            computeCellCount: (requested) => ({ rows: toEven(requested.rows), cols: toOdd(requested.cols * 2) }),
             computePatternSize: (cellCount, cellSize) => ({
                 width: cellSize.width * Math.round((cellCount.cols - 1) * 0.5),
                 height: cellSize.height * cellCount.rows,
@@ -82,7 +82,7 @@ export namespace SVGPatternLayouts {
             computeIsSplit: (index, cellCount) => isFirstOrLastCol(index, cellCount),
         },
         triangleSideways: {
-            computeCellCount: (requested) => ({ rows: toOdd(requested.rows), cols: toEven(requested.cols) }),
+            computeCellCount: (requested) => ({ rows: toOdd(requested.rows * 2), cols: toEven(requested.cols) }),
             computePatternSize: (cellCount, cellSize) => ({
                 width: cellSize.width * cellCount.cols,
                 height: cellSize.height * Math.round((cellCount.rows - 1) * 0.5),

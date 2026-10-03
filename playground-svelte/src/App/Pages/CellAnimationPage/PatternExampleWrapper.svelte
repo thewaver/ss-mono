@@ -22,7 +22,7 @@
 
     let { playback = $bindable(), ...props }: Props = $props();
 
-    let key = $state<SVGDefsSamples.Pattern.SampleKey>(CellAnimationKnobs.STARTING_PATTERN_KEY);
+    let key = $state<SVGDefsSamples.Pattern.Timed.SampleKey>(CellAnimationKnobs.STARTING_PATTERN_KEY);
     let ratio = $state<SVGDefsSources.SourceRatio>(CellAnimationKnobs.DEFAULT_SOURCE_RATIO);
 
     const size = $derived(SVGDefsSources.computeSourceSize(ratio));

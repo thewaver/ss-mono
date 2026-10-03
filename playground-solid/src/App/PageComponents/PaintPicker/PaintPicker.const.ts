@@ -4,6 +4,7 @@ import {
     SVGDefsSamples,
     TimedGradientDefaults,
     TrackedGradientDefaults,
+    TrackedPatternDefaults,
 } from "@thewaver/ss-components-solid";
 import {
     computeNoSampleDefs,
@@ -14,28 +15,32 @@ import type { Size2d } from "@thewaver/ss-utils";
 
 import { TimedGradientKnobs } from "../../Knobs/TimedGradients.const";
 import { TrackedGradientKnobs } from "../../Knobs/TrackedGradients.const";
+import { TrackedPatternKnobs } from "../../Knobs/TrackedPatterns.const";
 import type { Knob } from "../Knobs/Knobs.types";
 import type { Paint, PaintKind, PaintSampleKey, PaintSampleKind, PaintSettings } from "./PaintPicker.types";
 
 const NO_KNOBS = {};
 
-export const PAINT_KINDS: PaintKind[] = ["solid", "pattern", "timed", "tracked"];
+export const PAINT_KINDS: PaintKind[] = ["solid", "pattern", "trackedPattern", "timed", "tracked"];
 
 export const PAINT_KIND_LABELS: Record<PaintKind, string> = {
     solid: "Solid",
-    pattern: "Pattern",
+    pattern: "Timed pattern",
+    trackedPattern: "Tracked pattern",
     timed: "Timed gradient",
     tracked: "Tracked gradient",
 };
 
 export const STARTING_KEYS: Record<PaintSampleKind, PaintSampleKey> = {
     pattern: "hexagon_pt_2",
+    trackedPattern: "hexagon_pt_fade_2",
     timed: "sweep_diag_1v1",
     tracked: "spot_1",
 };
 
 export const SAMPLE_GROUPS: Record<PaintSampleKind, [string, PaintSampleKey[]][]> = {
-    pattern: toGroupEntries(splitEntriesIntoGroups(SVGDefsSamples.Pattern.SAMPLE_CONFIGS)),
+    pattern: toGroupEntries(splitEntriesIntoGroups(SVGDefsSamples.Pattern.Timed.SAMPLE_CONFIGS)),
+    trackedPattern: toGroupEntries(splitEntriesIntoGroups(SVGDefsSamples.Pattern.Tracked.SAMPLE_ENTRIES)),
     timed: toGroupEntries(splitEntriesIntoGroups(SVGDefsSamples.Gradient.Timed.SAMPLE_ENTRIES)),
     tracked: toGroupEntries(splitEntriesIntoGroups(SVGDefsSamples.Gradient.Tracked.SAMPLE_ENTRIES)),
 };
@@ -44,6 +49,13 @@ export const getIsUsingKind = (paints: Paint[], kinds: PaintKind[]) =>
     paints.some((paint) => kinds.includes(paint.kind));
 
 export const getPaintKnobs = (kind: PaintKind, key: PaintSampleKey): Record<string, Knob> => {
+    if (kind === "trackedPattern") {
+        return TrackedPatternKnobs.KNOBS_BY_FAMILY[key as SVGDefsSamples.Pattern.Tracked.SampleKey] as Record<
+            string,
+            Knob
+        >;
+    }
+
     if (kind === "timed") {
         return TimedGradientKnobs.KNOBS_BY_FAMILY[key as SVGDefsSamples.Gradient.Timed.SampleKey] as Record<
             string,
@@ -62,6 +74,13 @@ export const getPaintKnobs = (kind: PaintKind, key: PaintSampleKey): Record<stri
 };
 
 export const getPaintDefaults = (kind: PaintKind, key: PaintSampleKey): Record<string, unknown> => {
+    if (kind === "trackedPattern") {
+        return TrackedPatternDefaults.DEFAULTS_BY_FAMILY[key as SVGDefsSamples.Pattern.Tracked.SampleKey] as Record<
+            string,
+            unknown
+        >;
+    }
+
     if (kind === "timed") {
         return TimedGradientDefaults.DEFAULTS_BY_FAMILY[key as SVGDefsSamples.Gradient.Timed.SampleKey] as Record<
             string,
@@ -100,12 +119,17 @@ export const computePaintDefs = (
         case "solid":
             return computeNoSampleDefs(settings.colors, paintKind);
         case "pattern":
-            return SVGDefsSamples.Pattern.SAMPLE_CONFIGS[paint.key as SVGDefsSamples.Pattern.SampleKey].computeSVGDefs(
-                id,
-                getFlags,
-                getRef,
-                { ...elementDefs, ...animationDefs, cellSize: settings.cellSize },
-            );
+            return SVGDefsSamples.Pattern.Timed.SAMPLE_CONFIGS[
+                paint.key as SVGDefsSamples.Pattern.Timed.SampleKey
+            ].computeSVGDefs(id, getFlags, getRef, { ...elementDefs, ...animationDefs, cellSize: settings.cellSize });
+        case "trackedPattern":
+            return SVGDefsSamples.Pattern.Tracked.toConfig({
+                family: paint.key,
+                defs: paint.configDefs,
+            } as SVGDefsSamples.Pattern.Tracked.Entry).computeSVGDefs(id, getFlags, getRef, {
+                ...elementDefs,
+                cellSize: settings.cellSize,
+            });
         case "timed":
             return SVGDefsSamples.Gradient.Timed.toConfig({
                 family: paint.key,

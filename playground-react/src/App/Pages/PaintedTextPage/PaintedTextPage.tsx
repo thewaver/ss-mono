@@ -202,7 +202,7 @@ export const PaintedTextPage = () => {
     const [cellSize, setCellSize] = useState(PaintedTextKnobs.STARTING_CELL_SIZE);
     const [colors, setColors] = useState<SVGDefsColors>({ ...SVGDefsSamples.SAMPLE_COLORS });
 
-    const usesPattern = getIsUsingKind([fill.paint, stroke.paint], ["pattern"]);
+    const usesPattern = getIsUsingKind([fill.paint, stroke.paint], ["pattern", "trackedPattern"]);
     const usesTiming = getIsUsingKind([fill.paint, stroke.paint], ["pattern", "timed"]);
 
     const commonProps: ExampleWrapperProps = {

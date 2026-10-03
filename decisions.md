@@ -5884,6 +5884,57 @@ it, which the sample expressed by defining one constant as the other. Both now r
 no-sample sentinel, so a precise object type would push a cast into each of them. The shared objects carry
 the precise types the samples need, and the map is the loose page-facing view of the same values.
 
+### Patterns split into timed and tracked, the way the gradients are
+
+Asked for by the user: the timed patterns' cells grow (the circles) or fade (the polygons) on a clock, and the
+tracked ones do the same thing by how near each cell is to the pointer. **The layout mirrors the gradients
+throughout**, the user's pick over a separate `TrackedPattern` registry beside `Pattern` and over a pointer switch
+on each existing sample: `SVGDefsSamples.Pattern.Timed` holds the old registry unchanged, `Pattern.Tracked` holds
+factories with entries and `toConfig`, the files sit under `Pattern/Timed/` and `Pattern/Tracked/`, the menu has an
+`SVGPatterns` group whose first page is the generator's, and the paint picker offers both as two kinds. Every
+consumer of the old `Pattern` namespace — the shape page, painted text, cell animation, the drawn sources — moved
+to `Pattern.Timed`. The cell animation and the drawn sources stay timed-only: they serialize a pattern into an image,
+and an image has no pointer.
+
+**The two whirls have no tracked form.** They are a clipped radial gradient rather than a grid of cells, so there is
+nothing for a per-cell level to drive.
+
+**A tracked key adds what the cells do** — `circle_g_grow_2`, `hexagon_pt_fade_2` — between the layout and the color
+count. The bare timed names are exported at the package's top level, so the tracked ones need names of their own.
+
+**What a tiling repeats is the decision the samples hand to the consumer, as `tiled`.** A pattern is one tile the
+browser repeats, and every copy is drawn from the same single set of cells, so a cell lit by the pointer is lit in
+every copy. Two answers, each with a real cost, and the user's call was to make it a prop rather than pick:
+`tiled: false`, the default, draws one tile reaching across the whole painted area
+(`TrackedPatternUtils.computeCoveringCellCount`), so only the cells near the pointer react, but the cell count follows
+the area — 441 cells at a 20-pixel cell in the 420-pixel example box; `tiled: true` draws the timed patterns' fixed
+8 × 8 tile and lets it repeat, which stays cheap but lights the same spot in every copy. Coverage grows the **count**,
+never the cell: the cell size is the consumer's knob, and growing it would turn a resize into a change of look.
+
+**Distance is measured in cells, and on a repeating tile to the nearest copy of the pointer.** Cells, not pixels, so
+`reach` keeps its meaning as the cell size changes and stays round on cells that are not square. The nearest copy is
+what makes a cell at one edge of a tile answer to a pointer just past the other edge, so the lit spot crosses a seam
+without a cut. The level eases from `restLevel` to `1` rather than in a straight line, so the lit area has a soft edge.
+
+**A layout's requested count is the tile's size in whole cells, which the lozenge and the triangles did not honor.**
+Their rows (the lozenge, the sideways triangle) or columns (the upright triangle) step half a cell, so the samples'
+8 × 8 request drew a tile 8 cells one way and 4 the other, and square cells repeated at twice the distance across as
+down. The user saw it on a tiled lozenge; the timed samples had always had it. Fixed in the layouts rather than in
+each sample's request, the user's pick: `diagonal`, `triangle` and `triangleSideways` double the request along their
+half-step axis, so an even request now gives a tile exactly that many cells each way, as `grid`, `halfShift` and
+`halfDrop` already did. **The hexagons are left as they are**, the user's call: their rows overlap by a quarter of a
+cell, so their tile is 8 by 6 at the same request, and the user accepts that as the shape's, since a hexagon is not
+square to begin with. An exactly square hexagon tile exists only at multiples of six cells. `TrackedPatternUtils`
+hands the layouts a request in these same units and leaves the converting to them.
+
+**Each framework draws the cells its own way, over one shared piece of arithmetic.** `TrackedPatternUtils` works out
+the count, the pointer in pattern units and each cell's level; `SVGPatterns.computeTrackedLayoutPattern` in each
+package feeds those into the existing layout builder. Solid rebuilds the pattern only when the cell count changes and
+lets each cell's attribute follow the pointer on its own; React, Vue and Svelte redraw the pattern on every pointer
+move, as their tracked gradients already do. Svelte has two cell components of its own,
+`SVGPatternTrackedCircleCell` and `SVGPatternTrackedUseCell`, because its timed cell components carry the
+`animate` element.
+
 ### A sample knob is labeled after the prop it sets, not after what the effect does
 
 The Playground is read by people who will write against these props, so a label has to tell them which prop

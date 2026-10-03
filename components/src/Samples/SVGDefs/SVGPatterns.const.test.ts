@@ -48,8 +48,8 @@ describe("SVGPatternLayouts.ALL", () => {
     });
 
     it("steps sideways triangles down by half a cell, which is the same overlap turned", () => {
-        const rows = positions("triangleSideways", 3, 2).map((row) => row[0].y);
-        const cols = positions("triangleSideways", 3, 2)[0].map((cell) => cell.x);
+        const rows = positions("triangleSideways", 1, 2).map((row) => row[0].y);
+        const cols = positions("triangleSideways", 1, 2)[0].map((cell) => cell.x);
 
         expect(rows, "half a cell apart, starting half a cell above the tile").toEqual([-15, 0, 15]);
         expect(cols, "and a whole cell apart across, where the upright one is a half").toEqual([0, 30]);
@@ -60,10 +60,10 @@ describe("SVGPatternLayouts.ALL", () => {
             SVGPatternLayouts.ALL.grid.computeCellCount({ rows: 4, cols: 4 }),
             "a grid takes what it is given",
         ).toEqual({ rows: 4, cols: 4 });
-        expect(SVGPatternLayouts.ALL.diagonal.computeCellCount({ rows: 4, cols: 4 }), "a diagonal wants odd").toEqual({
-            rows: 5,
-            cols: 5,
-        });
+        expect(
+            SVGPatternLayouts.ALL.diagonal.computeCellCount({ rows: 4, cols: 4 }),
+            "a diagonal wants odd, and two rows for every cell down, since its rows are half a cell apart",
+        ).toEqual({ rows: 9, cols: 5 });
         expect(
             SVGPatternLayouts.ALL.halfShift.computeCellCount({ rows: 5, cols: 4 }),
             "a half shift wants even rows and odd columns",
@@ -74,13 +74,23 @@ describe("SVGPatternLayouts.ALL", () => {
         ).toEqual({ rows: 5, cols: 6 });
         expect(
             SVGPatternLayouts.ALL.triangle.computeCellCount({ rows: 5, cols: 4 }),
-            "a triangle wants even rows and odd columns",
-        ).toEqual({ rows: 6, cols: 5 });
+            "a triangle wants even rows and odd columns, two for every cell across",
+        ).toEqual({ rows: 6, cols: 9 });
         expect(
             SVGPatternLayouts.ALL.triangleSideways.computeCellCount({ rows: 4, cols: 5 }),
             "and a sideways triangle wants the opposite",
-        ).toEqual({ rows: 5, cols: 6 });
+        ).toEqual({ rows: 9, cols: 6 });
     });
+
+    it.each(["grid", "diagonal", "halfShift", "halfDrop", "triangle", "triangleSideways"] as const)(
+        "gives %s a tile as many cells across and down as were asked for, so square cells repeat squarely",
+        (kind) => {
+            const layout = SVGPatternLayouts.ALL[kind];
+            const tile = layout.computePatternSize(layout.computeCellCount({ rows: 4, cols: 6 }), CELL);
+
+            expect(tile).toEqual({ width: CELL.width * 6, height: CELL.height * 4 });
+        },
+    );
 
     it("sizes the tile so that the repeat lands on the seam", () => {
         expect(SVGPatternLayouts.ALL.grid.computePatternSize({ rows: 2, cols: 3 }, CELL)).toEqual({

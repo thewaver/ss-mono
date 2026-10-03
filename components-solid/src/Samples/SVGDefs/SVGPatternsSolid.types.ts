@@ -8,3 +8,10 @@ export type SVGPatternCellRenderer = (
     cellCount: SVGPatternCellCount,
     isSplit: boolean,
 ) => JSX.Element;
+
+export type SVGPatternTrackedCellRenderer = (
+    id: string,
+    index: SVGPatternCellIndex,
+    isSplit: boolean,
+    getLevel: () => number,
+) => JSX.Element;

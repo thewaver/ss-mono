@@ -104,7 +104,14 @@ const TrackedGradientsPage = lazyPage(
     () => import("./Pages/SVGGradients/TrackedGradientsPage/TrackedGradientsPage"),
     "TrackedGradientsPage",
 );
-const SVGPatternsPage = lazyPage(() => import("./Pages/SVGPatternsPage/SVGPatternsPage"), "SVGPatternsPage");
+const TimedPatternsPage = lazyPage(
+    () => import("./Pages/SVGPatterns/TimedPatternsPage/TimedPatternsPage"),
+    "TimedPatternsPage",
+);
+const TrackedPatternsPage = lazyPage(
+    () => import("./Pages/SVGPatterns/TrackedPatternsPage/TrackedPatternsPage"),
+    "TrackedPatternsPage",
+);
 const SatellitePage = lazyPage(() => import("./Pages/SatellitePage/SatellitePage"), "SatellitePage");
 const ScanlineAnimationPage = lazyPage(
     () => import("./Pages/ScanLineAnimationPage/ScanLineAnimationPage"),
@@ -1151,9 +1158,25 @@ export const MENU_CONFIGS: MenuBranchConfig[] = [
                     },
                     {
                         name: "SVGPatterns",
-                        description:
-                            "Places a number of cells inside one tile and repeats the tile, which is the whole of what turns a shape and a count into a tiling. Where a cell sits and what it draws are the consumer's two functions; the named tilings — hexagons, triangles, lozenges — are built on the same placement and repeat any tiling of one's own would be.",
-                        component: () => <SVGPatternsPage />,
+                        children: [
+                            {
+                                name: "SVGPatterns",
+                                description:
+                                    "Places a number of cells inside one tile and repeats the tile, which is the whole of what turns a shape and a count into a tiling. Where a cell sits and what it draws are the consumer's two functions; the named tilings — hexagons, triangles, lozenges — are built on the same placement and repeat any tiling of one's own would be. The two pages beside this one fill it with samples, one on a clock and one from the pointer.",
+                            },
+                            {
+                                name: "TimedPatterns",
+                                description:
+                                    "The named tilings — circles in a grid or in offset rows, hexagons, lozenges, triangles and two whirls — with every cell animated on a clock. A key names the shape, then the layout it is tiled in, then how many of the shared colors it uses. Each cell runs its own random sequence, so a duration and an iteration pattern are what they answer to.",
+                                component: () => <TimedPatternsPage />,
+                            },
+                            {
+                                name: "TrackedPatterns",
+                                description:
+                                    "The same tilings, driven by the pointer rather than by a clock. Each cell is measured from the pointer in cells, and the nearer it is the more it reacts: circles grow and polygons fade in, easing off to a rest level at the edge of the reach. A key names the shape, the layout, what the cells do, then how many of the shared colors it uses. The tiled option decides what happens on a shape larger than one tile. Left off, the pattern is drawn as one tile reaching across the whole shape, so only the cells near the pointer react, at the cost of a cell count that grows with the shape. Turned on, the timed patterns' fixed tile repeats, which stays cheap, but the browser draws every copy from the same cells, so the pointer lights the same spot in each copy.",
+                                component: () => <TrackedPatternsPage />,
+                            },
+                        ],
                     },
                 ],
             },

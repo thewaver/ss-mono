@@ -386,7 +386,7 @@ export const PaintedTextPage = () => {
                         </PageProp>
                     </Show>
 
-                    <Show when={getIsUsingKind([fill.getPaint(), stroke.getPaint()], ["pattern"])}>
+                    <Show when={getIsUsingKind([fill.getPaint(), stroke.getPaint()], ["pattern", "trackedPattern"])}>
                         <PageProp
                             key={"cellSize"}
                             label={"Pattern Cell Size (px)"}

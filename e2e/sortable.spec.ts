@@ -12,6 +12,11 @@ const item = (key: string, label: string) => `${demo(key)} [role="listitem"][ari
  * third and 2.1.1 for the second, so a spec that only covered the drag would be checking the easy third.
  */
 const dragBetween = async (page: Page, source: string, target: string, offsetFromBottom = 4) => {
+    // A mouse moved to a point outside the window reaches nothing, and the page has grown long enough that an
+    // example lower down starts below the fold. Both ends are brought into view before either box is read.
+    await page.locator(target).scrollIntoViewIfNeeded();
+    await page.locator(source).scrollIntoViewIfNeeded();
+
     const from = await page.locator(source).boundingBox();
     const to = await page.locator(target).boundingBox();
 

@@ -36,7 +36,7 @@ export namespace CellAnimationKnobs {
     export const STARTING_WEIGHT_KEY: CellAnimationWeights.WeightType = "diamondDefault";
     export const STARTING_ANIMATION_KEY: CellAnimationKeyframes.AnimationType = "zoomIn";
     export const STARTING_GRADIENT_KEY: SVGDefsSamples.Gradient.Timed.SampleKey = "orbit_async_2v1";
-    export const STARTING_PATTERN_KEY: SVGDefsSamples.Pattern.SampleKey = "hexagon_pt_2";
+    export const STARTING_PATTERN_KEY: SVGDefsSamples.Pattern.Timed.SampleKey = "hexagon_pt_2";
     export const STARTING_WEIGHT_OPTS: WeightOpts = {
         shouldMakeUnique: false,
         shouldNormalize: false,

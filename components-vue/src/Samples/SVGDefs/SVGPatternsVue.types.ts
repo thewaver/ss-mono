@@ -8,3 +8,10 @@ export type SVGPatternCellRenderer = (
     cellCount: SVGPatternCellCount,
     isSplit: boolean,
 ) => VNodeChild;
+
+export type SVGPatternTrackedCellRenderer = (
+    id: string,
+    index: SVGPatternCellIndex,
+    isSplit: boolean,
+    level: number,
+) => VNodeChild;

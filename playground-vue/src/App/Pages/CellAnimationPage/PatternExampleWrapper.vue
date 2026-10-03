@@ -25,7 +25,7 @@ const props = defineProps<Props>();
 
 const playback = useModel(props, "playback");
 
-const key = shallowRef<SVGDefsSamples.Pattern.SampleKey>(CellAnimationKnobs.STARTING_PATTERN_KEY);
+const key = shallowRef<SVGDefsSamples.Pattern.Timed.SampleKey>(CellAnimationKnobs.STARTING_PATTERN_KEY);
 const ratio = shallowRef<SVGDefsSources.SourceRatio>(CellAnimationKnobs.DEFAULT_SOURCE_RATIO);
 
 const sharedProps = computed(() => {
@@ -60,7 +60,7 @@ const src = computed(() => SVGDefsSources.computePatternSource(key.value, size.v
                 :value="key"
                 :values="SVGDefsSources.PATTERN_KEYS"
                 ariaLabel="Pattern"
-                @change="(next: SVGDefsSamples.Pattern.SampleKey) => (key = next)"
+                @change="(next: SVGDefsSamples.Pattern.Timed.SampleKey) => (key = next)"
             />
         </PageProp>
 

@@ -1,8 +1,9 @@
 import { type RefObject, useEffect, useRef, useState } from "react";
 
-import { SVGDefsUtils } from "@thewaver/ss-components";
+import { SVGDefsUtils, TrackedPatternUtils } from "@thewaver/ss-components";
 import type { Index2d, Size2d } from "@thewaver/ss-utils";
 
+import { PointerTrackerReactUtils } from "../../Abstracts/PointerTracker/PointerTrackerReact.utils";
 import { SVGFilterDefsFactory } from "../../Generators/SVGDefs/SVGFilters/SVGFilterDefs.factory";
 import { useStore } from "../../Utils/storeUtils";
 
@@ -68,6 +69,23 @@ export namespace SVGDefsReactUtils {
         ref.current = element ?? null;
 
         return ref;
+    };
+
+    /**
+     * Where the pointer is over a painted element, in the units a pattern filling it is drawn in.
+     *
+     * Re-renders the component as the pointer moves, which is what a pattern whose cells answer to the pointer
+     * needs: the cells are drawn afresh on each move with their levels from {@link TrackedPatternUtils.computeLevel}.
+     *
+     * @param element The painted element, or `undefined` before it exists.
+     * @param areaSize The element's size.
+     * @returns {@link TrackedPatternUtils.computePointerPoint} for the current reading, so `undefined` while the
+     * pointer is away.
+     */
+    export const usePatternPointer = (element: HTMLElement | undefined, areaSize: Size2d) => {
+        const { reading, isPointerPresent } = PointerTrackerReactUtils.usePointerReading(useElementRef(element));
+
+        return TrackedPatternUtils.computePointerPoint(reading, isPointerPresent, areaSize);
     };
 
     /**

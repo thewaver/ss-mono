@@ -1,8 +1,13 @@
-import { type SVGPatternCellCount, type SVGPatternKind, SVGPatternLayouts } from "@thewaver/ss-components";
-import type { Size2d } from "@thewaver/ss-utils";
+import {
+    type SVGPatternCellCount,
+    type SVGPatternKind,
+    SVGPatternLayouts,
+    TrackedPatternUtils,
+} from "@thewaver/ss-components";
+import type { Point2d, Size2d } from "@thewaver/ss-utils";
 
 import { SVGPatternDefsSvelteUtils } from "../../Generators/SVGDefs/SVGPatterns/SVGPatternDefsSvelte.utils.js";
-import type { SVGPatternCellRenderer } from "./SVGPatternsSvelte.types.js";
+import type { SVGPatternCellRenderer, SVGPatternTrackedCellRenderer } from "./SVGPatternsSvelte.types.js";
 
 export namespace SVGPatterns {
     export const computeLayoutPattern = (
@@ -79,4 +84,27 @@ export namespace SVGPatterns {
         cellSize: Size2d,
         renderCell: SVGPatternCellRenderer,
     ) => computeLayoutPattern("hexFlatTop", id, cellCount, cellSize, renderCell);
+
+    export const computeTrackedLayoutPattern = (
+        kind: SVGPatternKind,
+        id: string,
+        cellSize: Size2d,
+        areaSize: Size2d,
+        pointer: Point2d | undefined,
+        opts: ReturnType<typeof TrackedPatternUtils.resolveOpts>,
+        renderCell: SVGPatternTrackedCellRenderer,
+    ) =>
+        computeLayoutPattern(
+            kind,
+            id,
+            TrackedPatternUtils.computeCellCount(kind, opts.isTiled, cellSize, areaSize),
+            cellSize,
+            (cellId, index, count, isSplit) =>
+                renderCell(
+                    cellId,
+                    index,
+                    isSplit,
+                    TrackedPatternUtils.computeLevel(kind, index, count, cellSize, pointer, opts),
+                ),
+        );
 }

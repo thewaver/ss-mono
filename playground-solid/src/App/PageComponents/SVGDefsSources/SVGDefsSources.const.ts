@@ -106,14 +106,14 @@ export namespace SVGDefsSources {
         );
 
     export const computePatternSource = (
-        key: SVGDefsSamples.Pattern.SampleKey,
+        key: SVGDefsSamples.Pattern.Timed.SampleKey,
         size: Size2d,
         animationDurationMs: number,
     ) =>
         SVGDefsUri.toDataUri(
             toSourceSvg(
                 size,
-                SVGDefsSamples.Pattern.SAMPLE_CONFIGS[key].computeSVGDefs(`cell-pattern`, undefined, undefined, {
+                SVGDefsSamples.Pattern.Timed.SAMPLE_CONFIGS[key].computeSVGDefs(`cell-pattern`, undefined, undefined, {
                     getSize: () => size,
                     cellSize: SOURCE_CELL_SIZE,
                     animationDurationMs,
@@ -126,5 +126,5 @@ export namespace SVGDefsSources {
 
     export const GRADIENT_KEYS = SVGDefsSamples.Gradient.Timed.SAMPLE_KEYS;
 
-    export const PATTERN_KEYS = SVGDefsSamples.Pattern.SAMPLE_KEYS;
+    export const PATTERN_KEYS = SVGDefsSamples.Pattern.Timed.SAMPLE_KEYS;
 }

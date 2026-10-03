@@ -45,7 +45,9 @@ const colors = shallowRef<SVGDefsColors>({ ...SVGDefsSamples.SAMPLE_COLORS });
 
 const colorKeys = computed(() => Object.keys(colors.value) as (keyof SVGDefsColors)[]);
 
-const usesPattern = computed(() => getIsUsingKind([fill.paint.value, stroke.paint.value], ["pattern"]));
+const usesPattern = computed(() =>
+    getIsUsingKind([fill.paint.value, stroke.paint.value], ["pattern", "trackedPattern"]),
+);
 const usesTiming = computed(() => getIsUsingKind([fill.paint.value, stroke.paint.value], ["pattern", "timed"]));
 
 const commonProps = computed((): PaintedTextExampleWrapperProps => ({

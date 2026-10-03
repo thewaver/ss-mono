@@ -315,8 +315,13 @@ test("the end marker sits inside the last option rather than past it", async ({ 
  * rounded to a whole pixel puts every row after it half a pixel out — and the slot ends up taller than the
  * row inside it, leaving a hairline the moment a consumer gives their options a background. The measurement
  * comes from a `ResizeObserver`, which reports fractions; only the rounding was ours to drop.
+ *
+ * Whether the example's own rows come out fractional depends on how the machine's fonts measure, and on some
+ * they are whole pixels, which leaves the defect unreachable. So the spec gives every option a fraction of a
+ * pixel of padding itself, the way a consumer's styling might, rather than hoping the font does it.
  */
 test("a windowed row's slot is exactly the height of the row inside it", async ({ page }) => {
+    await page.addStyleTag({ content: `${OPTION} { padding-block: 0.3px; }` });
     await page.locator(field("virtualized")).click();
     await expect(page.locator(OPTION).first()).toBeVisible();
 

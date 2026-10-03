@@ -201,7 +201,9 @@ const GradientExampleWrapper = (props: CellAnimationExampleProps) => {
 };
 
 const PatternExampleWrapper = (props: CellAnimationExampleProps) => {
-    const [getKey, setKey] = createSignal<SVGDefsSamples.Pattern.SampleKey>(CellAnimationKnobs.STARTING_PATTERN_KEY);
+    const [getKey, setKey] = createSignal<SVGDefsSamples.Pattern.Timed.SampleKey>(
+        CellAnimationKnobs.STARTING_PATTERN_KEY,
+    );
     const [getRatio, setRatio] = createSignal<SVGDefsSources.SourceRatio>(CellAnimationKnobs.DEFAULT_SOURCE_RATIO);
 
     const getSize = createMemo(() => SVGDefsSources.computeSourceSize(getRatio()));

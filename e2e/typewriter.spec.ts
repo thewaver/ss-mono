@@ -5,12 +5,47 @@ import { example, prop } from "./helpers";
 const COMPLEX = example("complex");
 const MEASURE_COPY = `${COMPLEX} [inert]`;
 
-const SOURCE_TEXT = "This is a bit of text that appearsonesingle text character at a time,and hasescaped characters.";
-
-const outputText = (selector: string) => (selector: string) => {
+/**
+ * The output is checked against the measuring copy beside it rather than against a sentence written down here.
+ * The measuring copy is the source exactly as this framework rendered it, so the comparison asks only whether the
+ * split lost or repeated anything. A written-down sentence also asked how each framework turns the example's
+ * markup into text, and they differ: Vue keeps a space where a line break meets a block element and the JSX
+ * frameworks drop it, and Prettier puts that line break back on every commit, so the Vue page could never match.
+ *
+ * Each side is read as its words in order, with every line break counted as a space. The two copies break their
+ * lines differently: the source by its own block elements (the `div` around "one" starts a line of its own), the
+ * output by a `<br>` wherever the text wrapped or the source had a `\n`. Raw text sees neither, so it would
+ * report "appearsone" on one side and "appears one" on the other for the same picture. The measuring copy is
+ * hidden, so `innerText`, which would do this reading for us, returns nothing for it.
+ */
+const readText = (selector: string) => (selector: string) => {
     const measured = document.querySelector(selector);
+    const read = (root: Element | null | undefined) => {
+        const parts: string[] = [];
+        const walk = (node: Node) => {
+            if (node.nodeType === Node.TEXT_NODE) {
+                parts.push(node.textContent ?? "");
 
-    return (measured?.nextElementSibling?.textContent ?? "").replace(/\s+/g, " ").trim();
+                return;
+            }
+
+            if (!(node instanceof Element)) return;
+
+            const isBreak = node.tagName === "BR" || !getComputedStyle(node).display.startsWith("inline");
+
+            if (isBreak) parts.push(" ");
+
+            node.childNodes.forEach(walk);
+
+            if (isBreak) parts.push(" ");
+        };
+
+        if (root) root.childNodes.forEach(walk);
+
+        return parts.join("").replace(/\s+/g, " ").trim();
+    };
+
+    return { source: read(measured), output: read(measured?.nextElementSibling) };
 };
 
 test.beforeEach(async ({ page }) => {
@@ -36,10 +71,11 @@ test("the measuring copy is hidden from assistive technology and from the tab or
 });
 
 test("the typed output carries the source text exactly", async ({ page }) => {
-    const text = await page.evaluate(outputText(MEASURE_COPY), MEASURE_COPY);
+    const { source, output } = await page.evaluate(readText(MEASURE_COPY), MEASURE_COPY);
 
-    expect(text, "a splitter that drops or repeats a character is invisible on the page and obvious here").toBe(
-        SOURCE_TEXT,
+    expect(source.length, "the measuring copy holds text, so the comparison is not of two blanks").toBeGreaterThan(0);
+    expect(output, "a splitter that drops or repeats a character is invisible on the page and obvious here").toBe(
+        source,
     );
 });
 
@@ -81,10 +117,15 @@ test("re-laying out the container leaves the text intact", async ({ page }) => {
     await width.blur();
 
     await expect
-        .poll(() => page.evaluate(outputText(MEASURE_COPY), MEASURE_COPY), {
-            message: "a re-measure re-splits the text, and must not lose any of it on the way",
-        })
-        .toBe(SOURCE_TEXT);
+        .poll(
+            async () => {
+                const { source, output } = await page.evaluate(readText(MEASURE_COPY), MEASURE_COPY);
+
+                return output === source && source.length > 0;
+            },
+            { message: "a re-measure re-splits the text, and must not lose any of it on the way" },
+        )
+        .toBe(true);
 });
 
 /**

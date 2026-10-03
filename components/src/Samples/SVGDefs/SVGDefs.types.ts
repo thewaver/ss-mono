@@ -16,10 +16,16 @@ export type IterationConfig = {
     computeDefs: (animationDurationMs: number) => Pick<SVGAnimationDefs, "animationIterationPatterns">;
 };
 
-export type PatternElementDefs = SVGAnimationDefs &
+export type TimedPatternElementDefs = SVGAnimationDefs &
     SVGDefsBaseElementDefs & {
         cellSize: Size2d;
     };
+
+export type TrackedPatternElementDefs = SVGDefsBaseElementDefs & {
+    cellSize: Size2d;
+};
+
+export type PatternProximityOpts = { tiled?: boolean; reach?: number; restLevel?: number };
 
 export type TimedGradientElementDefs = SVGAnimationDefs & SVGDefsBaseElementDefs;
 
@@ -173,6 +179,18 @@ export type TrackedGradientEntry =
 
 export type TrackedGradientFamily = TrackedGradientEntry["family"];
 
+export type TrackedPatternEntry =
+    | { family: "circle_g_grow_2"; defs?: PatternProximityOpts }
+    | { family: "circle_hd_grow_2"; defs?: PatternProximityOpts }
+    | { family: "circle_hs_grow_2"; defs?: PatternProximityOpts }
+    | { family: "hexagon_ft_fade_2"; defs?: PatternProximityOpts }
+    | { family: "hexagon_pt_fade_2"; defs?: PatternProximityOpts }
+    | { family: "lozenge_d_fade_2"; defs?: PatternProximityOpts }
+    | { family: "triangle_s_fade_2"; defs?: PatternProximityOpts }
+    | { family: "triangle_t_fade_2"; defs?: PatternProximityOpts };
+
+export type TrackedPatternFamily = TrackedPatternEntry["family"];
+
 export type TimedGradientDefsOf<F extends TimedGradientFamily> =
     Extract<TimedGradientEntry, { family: F }> extends { defs?: infer TDefs } ? NonNullable<TDefs> : object;
 
@@ -182,3 +200,8 @@ export type TrackedGradientDefsOf<F extends TrackedGradientFamily> =
     Extract<TrackedGradientEntry, { family: F }> extends { defs?: infer TDefs } ? NonNullable<TDefs> : object;
 
 export type TrackedGradientDefaultsByFamily = { [F in TrackedGradientFamily]: Partial<TrackedGradientDefsOf<F>> };
+
+export type TrackedPatternDefsOf<F extends TrackedPatternFamily> =
+    Extract<TrackedPatternEntry, { family: F }> extends { defs?: infer TDefs } ? NonNullable<TDefs> : object;
+
+export type TrackedPatternDefaultsByFamily = { [F in TrackedPatternFamily]: Partial<TrackedPatternDefsOf<F>> };

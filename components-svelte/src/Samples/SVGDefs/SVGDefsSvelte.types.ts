@@ -1,19 +1,20 @@
 import type {
     InteractionFlags,
-    PatternElementDefs,
     TimedGradientElementDefs,
+    TimedPatternElementDefs,
     TrackedGradientElementDefs,
+    TrackedPatternElementDefs,
 } from "@thewaver/ss-components";
 
 import type { SVGDefs } from "../../Generators/SVGDefs/SVGDefs.types.js";
 import type { SvelteMarkup } from "../../Utils/typeUtils.js";
 
-export type PatternConfig = {
+export type TimedPatternConfig = {
     computeSVGDefs: (
         id: string,
         interactionFlags: InteractionFlags | undefined,
         element: HTMLElement | undefined,
-        defs: PatternElementDefs,
+        defs: TimedPatternElementDefs,
     ) => SVGDefs[];
 };
 
@@ -35,6 +36,15 @@ export type TrackedGradientConfig = {
     ) => SVGDefs[];
 };
 
+export type TrackedPatternConfig = {
+    computeSVGDefs: (
+        id: string,
+        interactionFlags: InteractionFlags | undefined,
+        element: HTMLElement | undefined,
+        defs: TrackedPatternElementDefs,
+    ) => SVGDefs[];
+};
+
 export type TimedGradientFactory<T = void> = T extends void
     ? () => TimedGradientConfig
     : (opts?: T) => TimedGradientConfig;
@@ -52,3 +62,7 @@ export type SVGSampleClipPathProps = {
      */
     content: SvelteMarkup;
 };
+
+export type TrackedPatternFactory<T = void> = T extends void
+    ? () => TrackedPatternConfig
+    : (opts?: T) => TrackedPatternConfig;

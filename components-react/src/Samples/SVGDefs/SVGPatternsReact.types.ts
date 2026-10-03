@@ -8,3 +8,10 @@ export type SVGPatternCellRenderer = (
     cellCount: SVGPatternCellCount,
     isSplit: boolean,
 ) => ReactNode;
+
+export type SVGPatternTrackedCellRenderer = (
+    id: string,
+    index: SVGPatternCellIndex,
+    isSplit: boolean,
+    level: number,
+) => ReactNode;

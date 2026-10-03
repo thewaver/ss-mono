@@ -39,7 +39,7 @@
 
     const colorKeys = $derived(Object.keys(colors) as (keyof SVGDefsColors)[]);
 
-    const usesPattern = $derived(getIsUsingKind([stroke.paint, fill.paint], ["pattern"]));
+    const usesPattern = $derived(getIsUsingKind([stroke.paint, fill.paint], ["pattern", "trackedPattern"]));
     const usesTiming = $derived(getIsUsingKind([stroke.paint, fill.paint], ["pattern", "timed"]));
 
     const commonProps: ShapeExampleProps = $derived({

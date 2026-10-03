@@ -14,7 +14,9 @@ export namespace SVGPatternKnobs {
     export const STARTING_DURATION_MS = 2000;
     export const STARTING_CELL_SIZE = 60;
     export const STARTING_BLUR_WIDTH = 0;
-    export const STARTING_PATTERN_KEY: WithNoSample<SVGDefsSamples.Pattern.SampleKey> = "hexagon_pt_2";
+    export const STARTING_TIMED_PATTERN_KEY: WithNoSample<SVGDefsSamples.Pattern.Timed.SampleKey> = "hexagon_pt_2";
+    export const STARTING_TRACKED_PATTERN_KEY: WithNoSample<SVGDefsSamples.Pattern.Tracked.SampleKey> =
+        "hexagon_pt_fade_2";
     export const STARTING_ITERATION_KEY: SVGDefsSamples.Iteration.SampleKey = "constant";
     export const DURATION_STEP_MS = 100;
 }

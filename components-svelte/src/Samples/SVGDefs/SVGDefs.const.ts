@@ -3,6 +3,7 @@ import {
     type SVGDefsColors,
     type TimedGradientEntry,
     type TrackedGradientEntry,
+    type TrackedPatternEntry,
     constant,
     repeat1_1,
     repeat2_1,
@@ -61,17 +62,30 @@ import { spot_smear_3 } from "./Gradient/Tracked/spot_smear_3.svelte";
 import { spot_trail_1 } from "./Gradient/Tracked/spot_trail_1.svelte";
 import { spot_trail_2 } from "./Gradient/Tracked/spot_trail_2.svelte";
 import { spot_trail_3 } from "./Gradient/Tracked/spot_trail_3.svelte";
-import { circle_g_2 } from "./Pattern/circle_g_2.svelte";
-import { circle_hd_2 } from "./Pattern/circle_hd_2.svelte";
-import { circle_hs_2 } from "./Pattern/circle_hs_2.svelte";
-import { hexagon_ft_2 } from "./Pattern/hexagon_ft_2.svelte";
-import { hexagon_pt_2 } from "./Pattern/hexagon_pt_2.svelte";
-import { lozenge_d_2 } from "./Pattern/lozenge_d_2.svelte";
-import { triangle_s_2 } from "./Pattern/triangle_s_2.svelte";
-import { triangle_t_2 } from "./Pattern/triangle_t_2.svelte";
-import { whirl_2 } from "./Pattern/whirl_2.js";
-import { whirl_curved_2 } from "./Pattern/whirl_curved_2.js";
-import type { PatternConfig, TimedGradientConfig, TrackedGradientConfig } from "./SVGDefsSvelte.types.js";
+import { circle_g_2 } from "./Pattern/Timed/circle_g_2.svelte";
+import { circle_hd_2 } from "./Pattern/Timed/circle_hd_2.svelte";
+import { circle_hs_2 } from "./Pattern/Timed/circle_hs_2.svelte";
+import { hexagon_ft_2 } from "./Pattern/Timed/hexagon_ft_2.svelte";
+import { hexagon_pt_2 } from "./Pattern/Timed/hexagon_pt_2.svelte";
+import { lozenge_d_2 } from "./Pattern/Timed/lozenge_d_2.svelte";
+import { triangle_s_2 } from "./Pattern/Timed/triangle_s_2.svelte";
+import { triangle_t_2 } from "./Pattern/Timed/triangle_t_2.svelte";
+import { whirl_2 } from "./Pattern/Timed/whirl_2.js";
+import { whirl_curved_2 } from "./Pattern/Timed/whirl_curved_2.js";
+import { circle_g_grow_2 } from "./Pattern/Tracked/circle_g_grow_2.svelte";
+import { circle_hd_grow_2 } from "./Pattern/Tracked/circle_hd_grow_2.svelte";
+import { circle_hs_grow_2 } from "./Pattern/Tracked/circle_hs_grow_2.svelte";
+import { hexagon_ft_fade_2 } from "./Pattern/Tracked/hexagon_ft_fade_2.svelte";
+import { hexagon_pt_fade_2 } from "./Pattern/Tracked/hexagon_pt_fade_2.svelte";
+import { lozenge_d_fade_2 } from "./Pattern/Tracked/lozenge_d_fade_2.svelte";
+import { triangle_s_fade_2 } from "./Pattern/Tracked/triangle_s_fade_2.svelte";
+import { triangle_t_fade_2 } from "./Pattern/Tracked/triangle_t_fade_2.svelte";
+import type {
+    TimedGradientConfig,
+    TimedPatternConfig,
+    TrackedGradientConfig,
+    TrackedPatternConfig,
+} from "./SVGDefsSvelte.types.js";
 
 export namespace SVGDefsSamples {
     export const SAMPLE_COLORS: SVGDefsColors = {
@@ -102,22 +116,59 @@ export namespace SVGDefsSamples {
     }
 
     export namespace Pattern {
-        export const SAMPLE_CONFIGS = {
-            circle_g_2,
-            circle_hd_2,
-            circle_hs_2,
-            hexagon_ft_2,
-            hexagon_pt_2,
-            lozenge_d_2,
-            triangle_s_2,
-            triangle_t_2,
-            whirl_2,
-            whirl_curved_2,
-        } as const satisfies Record<string, PatternConfig>;
+        export namespace Timed {
+            export const SAMPLE_CONFIGS = {
+                circle_g_2,
+                circle_hd_2,
+                circle_hs_2,
+                hexagon_ft_2,
+                hexagon_pt_2,
+                lozenge_d_2,
+                triangle_s_2,
+                triangle_t_2,
+                whirl_2,
+                whirl_curved_2,
+            } as const satisfies Record<string, TimedPatternConfig>;
 
-        export type SampleKey = keyof typeof SAMPLE_CONFIGS;
+            export type SampleKey = keyof typeof SAMPLE_CONFIGS;
 
-        export const SAMPLE_KEYS = Object.keys(SAMPLE_CONFIGS) as SampleKey[];
+            export const SAMPLE_KEYS = Object.keys(SAMPLE_CONFIGS) as SampleKey[];
+        }
+
+        export namespace Tracked {
+            export const SAMPLE_FACTORIES = {
+                circle_g_grow_2,
+                circle_hd_grow_2,
+                circle_hs_grow_2,
+                hexagon_ft_fade_2,
+                hexagon_pt_fade_2,
+                lozenge_d_fade_2,
+                triangle_s_fade_2,
+                triangle_t_fade_2,
+            } as const;
+
+            export const SAMPLE_ENTRIES = {
+                circle_g_grow_2: { family: "circle_g_grow_2" },
+                circle_hd_grow_2: { family: "circle_hd_grow_2" },
+                circle_hs_grow_2: { family: "circle_hs_grow_2" },
+                hexagon_ft_fade_2: { family: "hexagon_ft_fade_2" },
+                hexagon_pt_fade_2: { family: "hexagon_pt_fade_2" },
+                lozenge_d_fade_2: { family: "lozenge_d_fade_2" },
+                triangle_s_fade_2: { family: "triangle_s_fade_2" },
+                triangle_t_fade_2: { family: "triangle_t_fade_2" },
+            } as const satisfies Record<string, TrackedPatternEntry>;
+
+            export type Entry = TrackedPatternEntry;
+
+            export type SampleKey = keyof typeof SAMPLE_ENTRIES;
+
+            export const SAMPLE_KEYS = Object.keys(SAMPLE_ENTRIES) as SampleKey[];
+
+            export const toConfig = (entry: TrackedPatternEntry): TrackedPatternConfig =>
+                (SAMPLE_FACTORIES[entry.family] as (opts?: unknown) => TrackedPatternConfig)(
+                    "defs" in entry ? entry.defs : undefined,
+                );
+        }
     }
 
     export namespace Gradient {

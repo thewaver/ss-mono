@@ -1,6 +1,9 @@
-import { SVGDefsUtils } from "@thewaver/ss-components";
+import { type MaybeRefOrGetter, toValue } from "vue";
+
+import { SVGDefsUtils, TrackedPatternUtils } from "@thewaver/ss-components";
 import type { Index2d, Size2d } from "@thewaver/ss-utils";
 
+import { PointerTrackerVueUtils } from "../../Abstracts/PointerTracker/PointerTrackerVue.utils";
 import { SVGFilterDefsFactory } from "../../Generators/SVGDefs/SVGFilters/SVGFilterDefs.factory";
 import { watchAfterRender } from "../../Utils/effectUtils";
 import { useStore } from "../../Utils/storeUtils";
@@ -75,5 +78,27 @@ export namespace SVGDefsVueUtils {
                 cellCount,
                 isSplit,
             ));
+    };
+
+    /**
+     * Where the pointer is over a painted element, in the units a pattern filling it is drawn in.
+     *
+     * Read inside a render function, so the pattern is drawn afresh as the pointer moves, with each cell's level from
+     * {@link TrackedPatternUtils.computeLevel}.
+     *
+     * Must run inside a component's `setup`.
+     *
+     * @param element The painted element, or `undefined` before it exists.
+     * @param areaSize The element's size.
+     * @returns A getter for {@link TrackedPatternUtils.computePointerPoint} at the current reading, so `undefined`
+     * while the pointer is away.
+     */
+    export const usePatternPointer = (
+        element: MaybeRefOrGetter<HTMLElement | undefined>,
+        areaSize: MaybeRefOrGetter<Size2d>,
+    ) => {
+        const { reading, isPointerPresent } = PointerTrackerVueUtils.usePointerReading(element);
+
+        return () => TrackedPatternUtils.computePointerPoint(reading.value, isPointerPresent.value, toValue(areaSize));
     };
 }

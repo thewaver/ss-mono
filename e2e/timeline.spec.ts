@@ -390,9 +390,6 @@ const playFor = async (page: Page, seconds: number) => {
  */
 const shareOfBlock = (marker: Marker, block: Block) => (marker.left - block.left) / block.width;
 
-const markerClientX = (page: Page, scope: string) =>
-    page.evaluate((selector) => document.querySelector(selector)!.getBoundingClientRect().left, MARKER(scope));
-
 test("the playhead moves while the page plays and stands still when it pauses", async ({ page }) => {
     const start = await playhead(page);
 
@@ -411,9 +408,15 @@ test("the playhead moves while the page plays and stands still when it pauses", 
 });
 
 /**
- * The thing a marker promises is that it means a time, not a spot on the screen: zoom in about it and move
- * the window, and it has to stay at the same point inside the clip it is crossing while its own position
- * across the box changes.
+ * The thing a marker promises is that it means a time, not a spot on the screen: zoom in and move the window,
+ * and it has to stay at the same point inside the clip it is crossing while its own position across the box
+ * changes.
+ *
+ * The zoom is centered just inside the box's left edge, short of the playhead, so the playhead is pushed
+ * further across and stays on screen. Centering it on the playhead itself would leave the playhead where it
+ * was, since that is what a zoom about the pointer does; it only moved at all because the browser rounds a
+ * wheel event's position to a whole pixel, so how far it went depended on where between two pixels the
+ * playhead happened to stop.
  */
 test("the playhead keeps its place among the clips when the window is zoomed and moved", async ({ page }) => {
     await playFor(page, 3);
@@ -423,7 +426,7 @@ test("the playhead keeps its place among the clips when the window is zoomed and
     const share = shareOfBlock(before, await coldOpen());
     const box = (await page.locator(surface(TRACKS)).first().boundingBox())!;
 
-    await page.mouse.move(await markerClientX(page, TRACKS), box.y + box.height - 4);
+    await page.mouse.move(box.x + 1, box.y + box.height - 4);
 
     for (let notch = 0; notch < 10; notch++) await page.mouse.wheel(0, -100);
 
@@ -431,7 +434,7 @@ test("the playhead keeps its place among the clips when the window is zoomed and
 
     const zoomed = await playhead(page);
 
-    expect(zoomed.isPainted, "it is still on screen after zooming in about it").toBe(true);
+    expect(zoomed.isPainted, "it is still on screen after zooming in").toBe(true);
     expect(zoomed.left, "its place across the box has changed").not.toBeCloseTo(before.left, 1);
     expect(shareOfBlock(zoomed, await coldOpen()), "but not its place in the clip").toBeCloseTo(share, 3);
 
