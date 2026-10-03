@@ -41,7 +41,7 @@ reading.
 7. `Toasts` — one thing deliberately not built — _open_
 8. `Calendar` — two things deliberately not built — _open_
 9. `ColorInput` — two things deliberately not built — _open_
-10. `Accordion` — one thing deliberately not built — _open_
+10. `Accordion` in a row — _decided, not yet built_
 11. `Tabs` — a pairing the consumer can still skip — _open_
 12. `Viewport` as a region: what is settled and what is not — _open_
 13. `Tree` — two things deliberately not built — _open_
@@ -62,6 +62,17 @@ reading.
 28. The submit story — what a native submit carries, and what `Form` hands `onSubmit` — _pending decision_
 29. Work that has never been watched running — _open_
 30. Choices the add-ons round made on the user's behalf — _pending decision_
+31. `Typewriter` driven from outside, and an animation per letter — _decided, not yet built_
+32. `ProximityText` — _decided, not yet built_
+33. A point source for everything that follows the pointer — _decided, not yet built_
+34. `Carousel`: one component, with how a slide sits as a sample — _decided, not yet built_
+35. `Wraparound` — _decided, not yet built_
+36. A pixel trail for the tracked patterns — _decided, not yet built_
+37. A pixelate filter — _decided, not yet built_
+38. The Tooltip page: a picker for how it appears — _decided, not yet built_
+39. Floaters become an `Abstract`, and follow the highlight as well as the selection — _decided, not yet built_
+40. Two new families of tracked gradients: ribbons and a swarm — _decided, not yet built_
+41. Two Playground examples from React Bits — _decided, not yet built_
 
 ### Build order
 
@@ -566,14 +577,26 @@ every other layer and takes a `visibility` prop like every other popup; both are
 
 ---
 
-## 10. `Accordion` — one thing deliberately not built
+## 10. `Accordion` in a row — _decided, not yet built_
 
 The decisions behind what exists are in `decisions.md` under _"Controls: `Accordion`, and where
 auto-height measurement lives"_ and _"A panel built on first expansion"_.
 
-- **The height animates, and nothing else can.** A consumer wanting the panel to slide in from the side
-  gets it from `renderPanel`'s visibility target, but the panel box itself only ever animates `height`.
-  Animating width instead — a horizontal accordion — would need the observer's twin and a direction prop.
+Asked for by the user from Made With GSAP's two-way accordion panels
+([tutorial 109](https://madewithgsap.com/effects/tutorial109)): a row of panels, one open and the others
+collapsed into narrow strips carrying a rotated label, with the opening panel's content sliding in from the
+side the person came from. It arrived among a set of carousels and was placed here instead, because everything
+it needs except the direction is already `Accordion`'s: one open at a time, the headers and the keyboard.
+
+- **A direction for the whole accordion**, so the panels sit in a row and the panel box animates its width
+  rather than its height. Today the box only ever animates `height`; the row needs the height observer's twin
+  for width, and a direction prop. The arrow keys that move between headers follow the direction.
+- **Which side the change came from is handed to the consumer** beside the visibility target `renderPanel`
+  already receives, so the content can slide in from the left when the person moved left and from the right
+  when they moved right. The motion stays the consumer's, as it already is.
+- **"Always one open" is `isSingleExpand` with `isExpandRequired`**, both of which exist; the example sets both.
+- **The rotated label in a collapsed strip is the consumer's painting**, shown in the Accordion page's example
+  rather than built into the component.
 
 **_Elsewhere._**
 
@@ -1261,6 +1284,229 @@ is the user's to confirm or change.
 - **Odometer reels under reduced motion drop only their extra turns.** Each reel keeps its own duration, so a
   slow reel still turns its one step slowly. Falling back to `turnDurationMs` there is the alternative.
 
+## 31. `Typewriter` driven from outside, and an animation per letter — _decided, not yet built_
+
+Two changes, both settled with the user while going through Made With GSAP's text effects and a scroll-lit
+paragraph on CodePen. Item 32 builds on both.
+
+**Driven from outside.** `Typewriter` gains `progress` and `playback`, in the shape `CellAnimation` and `Trail`
+already have. With playback on it runs as it does today and writes `progress` as it goes; with playback off,
+writing `progress` draws that moment of the run. Every letter's keyframes are held at the matching point, so a
+stop can fall partway through one letter's own animation.
+
+- **A paragraph whose words light up as it scrolls past** is `Typewriter` with playback off and its `progress`
+  taken from `ElementObserverSolidUtils.createViewportProgressObserver`. Seen at
+  [CodePen, iPhone 13 text highlight on scroll](https://codepen.io/stevenlei/pen/vYJyJyR).
+- **Karaoke** is the consumer turning a song's current time into progress; the timings are theirs. Because a
+  stop can fall inside a letter, a letter's own keyframes can sweep a fill across it.
+- **Letters not yet reached already show their animation's first frame**, since they carry
+  `animation-fill-mode: both`. A first frame at low opacity is the dimmed paragraph, so no second look for
+  waiting letters is needed.
+- **Two of Made With GSAP's text effects are this plus the per-letter animations below**: lines whose letters
+  fly outward as they reach the middle of the screen ([tutorial 112](https://madewithgsap.com/effects/tutorial112))
+  and letters settling into place as a sentence slides past
+  ([tutorial 011](https://madewithgsap.com/effects/tutorial011)). Lines tightening one at a time
+  ([tutorial 097](https://madewithgsap.com/effects/tutorial097)) is not covered: it works on whole lines, and
+  `Typewriter` has no notion of a line.
+
+**An animation per letter.** `animationName` is replaced by `computeAnimationName(character, index, count)`.
+The user's pick over keeping both props: a single animation is still written once, as a function returning
+the same name. It allows "every A plays this one", "odd letters rise from below", and with the count, "fly
+outward from the middle". Every letter already carries its own name underneath (`LetterAnimation.name`), so
+this only widens the prop. What an image or a line break passes as its character is to be settled against what
+the letter registry already holds for that slot.
+
+**What moves into `LetterDriver`.** Held keyframes, `computeAnimationName` and sizing each line for the widest
+frame (item 32) are needed by both drivers, so they are written once in the shared layer. The line sizing
+applies to `Typewriter` as soon as someone types with a keyframe that changes a letter's width.
+
+## 32. `ProximityText` — _decided, not yet built_
+
+Letters that react to how near a point is, the way `Typewriter`'s react to time. Seen at
+[Fancy Components, Variable Font Cursor Proximity](https://www.fancycomponents.dev/docs/components/text/variable-font-cursor-proximity),
+where a variable font thickens near the pointer; the user called that a "cool example" rather than the
+feature. Its moving-point form is Made With GSAP's weight wave
+([tutorial 079](https://madewithgsap.com/effects/tutorial079)), which needs item 33.
+
+- **A second driver over `LetterDriver`, not a mode of `Typewriter`.** The user's pick. The mechanism is shared —
+  every letter plays keyframes held at some point — and only what decides the point differs: time and order
+  for `Typewriter`, nearness here. Each one's own props mean nothing to the other (caret, erasing, arrival order
+  and the end-of-run callback against source, reach and falloff), which is why the wheels and the carousels are
+  presets over one base. The shared parts are lifted into `LetterDriver` (item 31).
+- **The effect is keyframes held at the strength.** The user's pick over two font-axis settings (Fancy
+  Components' `from` and `to`) and over a function from strength to styles. Each letter plays
+  `computeAnimationName`'s keyframes paused between 0, far away, and 1, under the point, and the browser blends
+  any property, font axes included. **The contract is that the last frame is the widest**: a keyframe widest
+  partway through would re-wrap lines, and the props documentation says so.
+- **Every line is sized for all its letters at the last frame**, so hovering never moves a line break. At rest
+  the spare room sits at the end of each line, and a growing letter really pushes the rest of its line along.
+  The user's design, over reserving room per letter (loose spacing at rest) or per word.
+- **Nearness is measured from where the letters sit at rest**, taken once and again on a layout change. A
+  letter pushed away by its neighbor's growth therefore does not weaken because of the push, and the effect
+  cannot feed back on itself — the rule `Proximity` already follows for the dock. The falloff is `Proximity`'s.
+- **The point comes from a source (item 33)**, the pointer by default.
+- **`PaintedText` inside works by the route `Typewriter` uses.** One part to check: `PaintedText` places each run
+  of text from an invisible HTML copy, so for a growing letter's push to carry past an image or a link into the
+  next run, the copy has to grow too and be measured again. Weigh that cost when building.
+- **Named by the user**, over `SwellText` and `NearText`: it is the one that stays true whatever the keyframes do.
+
+## 33. A point source for everything that follows the pointer — _decided, not yet built_
+
+Parked in _Open discussion_ until `ProximityText` needed it; the user then chose to settle it for every
+component that reads the pointer tracker at once.
+
+- **A source is a point given as a fraction across a box, `{ ratio, element? }`.** Without an element the
+  fraction is of each component's own box; with one, it is of that element, so a sun moving across a banner is
+  "this fraction of the banner", handed to every card under it. The tracker already re-measures on scroll, on
+  resize and inside a zoomed `Viewport`, so a supplied point keeps up with all three. The user's pick over screen
+  pixels, which would leave the conversion and every scroll to the consumer, and over each component's own box
+  only, which cannot share one point between several.
+- **The pointer stays the default**, converted inside the tracker. A source with no point is absent, which is
+  what the pointer's presence already means, and the component rests.
+- **Every reader of the tracker takes one except `ScratchCard`**: `ShadowCaster`, `LightCatcher`, `Tilter`,
+  `Reveal`, `ProximityText`, the proximity arrangements (`PlacementBox` and the wheels) and the tracked gradient
+  and pattern samples. The user's pick — "go big from the get-go" — over the followers alone and over leaving
+  the samples out, knowing the samples take their wiring through their own interface, which widens. Scratching
+  needs a press, and a supplied point has none.
+- **Sharing needs nothing new.** Every tracker already shares one set of document listeners and one pass per
+  frame, so several components share a source by being handed the same one.
+- **`smoothingMs` stays on each component**, for the reason _Open discussion_ recorded: smoothing what is drawn
+  rather than the reading is what lets the pointer leaving the window glide too.
+
+## 34. `Carousel`: one component, with how a slide sits as a sample — _decided, not yet built_
+
+From Made With GSAP's carousels, which the user judged to need one more abstraction before they could be
+expressed the way the rest of the library is. Published examples of the arrangements it has to reach: cover
+flow ([tutorial 114](https://madewithgsap.com/effects/tutorial114)), a depth wave
+([103](https://madewithgsap.com/effects/tutorial103)), cards bending along a cylinder
+([068](https://madewithgsap.com/effects/tutorial068)), a stack of folders whose front card goes to the back
+([045](https://madewithgsap.com/effects/tutorial045)), cards flipping down about their bottom edge
+([074](https://madewithgsap.com/effects/tutorial074)), and a ring that turns by itself and leans toward the
+pointer ([091](https://madewithgsap.com/effects/tutorial091), [061](https://madewithgsap.com/effects/tutorial061)).
+
+- **What was missing is a slide placed by its distance from the current one**, counted in slides, fractional
+  while moving, and measured the short way round when looping. A placement rule takes that distance and
+  answers in `Proximity` effects' vocabulary: transforms and filters, opacity among them.
+- **The shared base becomes public as `Carousel`, with the rule as a required prop.** `TrackCarousel` and
+  `DrumCarousel` go; track, drum, cover flow, depth wave, cylinder, folders and hinge become ready-made rules,
+  shipped the way `ProximityEffects` ships its effects. The user's pick, under the 0.0.x rule that a better API
+  needs no migration path.
+- **`renderSlideBack` becomes everyone's**, since the hinge and the folders turn cards over too.
+- **The drum's `slideSize` becomes a measurement** of the carousel's box handed to the rule, which works out the
+  ring's depth from it. If the drum turns out to need it as an input, that goes back to the user.
+- **The track's visible rewind at the wrap goes away**: a distance measured the short way round puts the first
+  slide beside the last. `decisions.md` records the track and the drum disagreeing at the wrap; this ends it.
+- **`progress`, 0 to 1, drives it from outside**, the library's existing shape. Scrolling is the viewport
+  progress observer; cover flow's pointer is the reading's horizontal `boxRatio`. On a looping carousel 0 to 1
+  is one whole lap, which the props documentation says. The index stays, and follows the nearest slide. A
+  carousel driven from outside is one given no controls, as already documented.
+- **A click on a visible side slide picks it.** The user's pick. Slides other than the current one stay `inert`
+  and hidden from screen readers, and the pick controls remain the keyboard's route to the same action. Because
+  an `inert` slide receives no clicks, the carousel works out from the click's position which slide was hit —
+  and the slide aimed at is not always the topmost one under the pointer, which is what `CardFan` showed
+  (_Open discussion_).
+- **The ring that turns by itself and leans toward the pointer is an example, not a feature**: the drum rule
+  inside `Tilter`, stepping on its own or with `progress` written on a clock for a continuous turn. A turn the
+  consumer writes still owes WCAG 2.2.2 a way to stop it, and the example has one.
+- **Item 18 changes once this lands.** A rule that changes opacity with distance is a dissolve, so its bullet
+  "the motion is the library's; a fade is not expressible" goes, and its "one slide at a time" bullet wants
+  rereading, since several slides now show while one is still current.
+
+## 35. `Wraparound` — _decided, not yet built_
+
+An `Exotic` that repeats whatever arrangement it holds in every direction, so it can be moved forever. Seen at
+[Made With GSAP, infinite 2D grid](https://madewithgsap.com/effects/tutorial026), which does it for a fixed grid
+of equal cells.
+
+- **A wrapper around any arrangement, not a grid of its own.** The user's pick: a `Mosaic`, a `Formation` or a
+  plain grid goes inside, moved by dragging with momentum, by the wheel and by the keyboard. A tile leaving one
+  edge comes back in at the opposite one. `Mosaic` is the showcase.
+- **A gap at the arrangement's edge shows at every join.** That is the arrangement's look, which the wrapper
+  cannot hide. `Mosaic`'s anchored side is exactly the size it was given; whether its free side comes out flat is
+  to be checked when building.
+- **Content smaller than the window is filled with copies.** The user's pick over not wrapping along an axis that
+  is too small, which would switch the effect on and off as the window is resized. The copies are hidden from
+  screen readers and cannot be tabbed into; only the original can be reached. Anything with its own state — a
+  playing video, a half-filled field — runs separately in each copy, and the props documentation says so.
+- **The keyboard route is to be designed while building**, starting from focus: tabbing to an item brings its
+  original into view.
+- **Named by the user**, over `EndlessPlane` and `InfiniteCanvas`.
+
+## 36. A pixel trail for the tracked patterns — _decided, not yet built_
+
+Seen at [Fancy Components, Pixel Trail](https://www.fancycomponents.dev/docs/components/background/pixel-trail).
+A new thing a tracked pattern's cells do, beside growing and fading: a cell lights when the pointer passes and
+fades on its own afterwards. Every pattern layout gets it, hexagons and triangles as well as squares. The clock
+runs only while a cell is still fading, the way the gradient trails wake theirs, and with `tiled: true` the
+trail repeats in every copy of the tile, as everything tracked already does.
+
+## 37. A pixelate filter — _decided, not yet built_
+
+Seen at [Fancy Components, Pixelate SVG Filter](https://www.fancycomponents.dev/docs/components/filter/pixelate-svg-filter),
+built from `feFlood`, `feComposite`, `feTile` and `feColorMatrix`. It joins the SVG filter generators beside
+brightness, contrast and turbulence.
+
+Their page says Safari is not supported, and what was found points at Safari ignoring the filter region settings
+it depends on. **Before that limit is written down, check in Safari what it actually draws**: content left plain
+is a harmless limit, nothing at all is not. The user's call. The check is run on a machine that already has
+Safari; nothing is installed for it.
+
+## 38. The Tooltip page: a picker for how it appears — _decided, not yet built_
+
+`Tooltip` hands its drawing function "showing or hiding" and a duration, and leaves the look to the consumer, so
+the page gains a knob choosing the reveal — a fade, a zoom, a clip and so on — modelled on how the Typewriter page
+offers its reveal animations. Playground only; nothing changes in the library. It came from Codrops' image reveal
+hover effects ([Codrops](https://tympanus.net/codrops/2018/11/27/image-reveal-hover-effects/)), which the user
+judged already covered by `Tooltip`.
+
+## 39. Floaters become an `Abstract`, and follow the highlight as well as the selection — _decided, not yet built_
+
+Seen at [React Bits, Glide Select](https://reactbits.dev/micro/glide-select): a list whose highlight is one shared
+shape gliding to whichever option the pointer or the arrow keys are on, the way `Tabs`' marker glides to the
+selected tab.
+
+- **`Menu` is the floater's third consumer, so it is extracted now.** `decisions.md` already set the rule under
+  _"`RadioGroup` takes a floater"_: two consumers is not yet an `Abstract`, a third is when to extract. `Tabs` and
+  `RadioGroup` move onto it rather than keeping their copies.
+- **Two floaters, one for the selection and one for the highlight.** The user's call: where the selected item and
+  the highlighted item are different things, each gets its own. `renderFloater` is renamed
+  `renderSelectionFloater`, and `renderHighlightFloater` is added beside it — the user's pick over keeping the old
+  name, so that each name says what its floater follows. Under the 0.0.x rule, no migration path.
+- **Who takes which.** `Select`, `Listbox`, `Tree`, `Tabs` and `RadioGroup` take both; `Menu`, which has no
+  selection, takes the highlight one only. `Tree` was the user's addition, since the Playground's left nav selects
+  through one; the highlight one on `Tabs` and `RadioGroup` is the hover pill gliding along a tab strip, and comes
+  from the extraction at no extra cost.
+- **A list that only draws what is visible can scroll the highlight away.** The floater then has nothing to sit on
+  and fades out, and back in when the item returns; `ElementFader` already does both.
+
+## 40. Two new families of tracked gradients: ribbons and a swarm — _decided, not yet built_
+
+From React Bits, where both are drawn with WebGL. The user's ruling: they are no different from `spot_smear`, so
+each is a new family in the tracked gradients rather than a new component or a new kind of sample.
+
+- **Ribbons** ([React Bits, Ribbons](https://reactbits.dev/animations/ribbons)): a few colored ribbons whose heads
+  chase the pointer on a spring while their bodies follow behind, thickest at the head. Here, a chain of stamps
+  along a springy path — the trails' machinery with the path given a spring.
+- **A swarm** ([React Bits, Swarm Cursor](https://reactbits.dev/animations/swarm-cursor)): about ten blobs
+  wandering around the pointer, merging where they touch and scattering on a click. Here, a few spots wandering
+  around the point. Overlapping soft spots glow into each other rather than merging with a liquid edge; the edge
+  needs the blur-then-sharpen filter on top, which is to be checked in Safari alongside item 37.
+- Both follow a supplied point as well as the pointer, through item 33.
+
+## 41. Two Playground examples from React Bits — _decided, not yet built_
+
+- **A list that leans toward the pointer, on the `Tree` page.** Seen at
+  [React Bits, Line Sidebar](https://reactbits.dev/components/line-sidebar): each item shifts sideways and
+  brightens by how near the pointer is, with a choice of falloff, eased over time. Here, a column layout with a
+  proximity effect, which `Tree` already takes. The user's pick of page, over `TableOfContents`, for being closest
+  to the Playground's own left nav. Their version keeps the current item fully lit; a proximity effect is not told
+  which item is current, so the example's painter does that instead.
+- **One tooltip shared by a row of items, on the `Toolbar` page.** Seen at
+  [React Bits, Warm Tooltip](https://reactbits.dev/micro/warm-tooltip). A single `Tooltip` whose anchor is
+  whichever item is hovered or focused, gliding from one to the next instead of hiding and reappearing. `Tooltip`
+  already points `aria-describedby` at its anchor, so the description moves with it. **If `Tooltip` does not yet
+  move smoothly when its anchor changes while it is showing, that is added to `Tooltip`**, the user's call.
+
 ## Accepted limits
 
 Faults that have been looked at and consciously left alone. Not outstanding work, not numbered, and not part
@@ -1385,32 +1631,18 @@ advanced layout features in Essentials, so "Exotics" would not mean "everything 
 Worth reopening if someone actually asks to install the Exotics alone, or if the type definitions a consumer
 installs grow large enough to slow their editor.
 
-### A pointer tracker the pointer effects can share, and where else a reading can come from
+### Ready-made point sources: the phone's tilt, and a point that wanders by itself
 
-Raised by the user during the Exotics add-ons review, and parked here for further discussion. `ShadowCaster`,
-`LightCatcher` and `Tilter` each read the pointer on their own, through `PointerTrackerUtils.create`, so five
-cards on a page run five trackers and cannot be told to follow anything but the pointer.
+How a point other than the pointer plugs in is settled and is item 33: a fraction across a box, taken by every
+component that reads the pointer tracker. What is left here are two sources nobody has committed to shipping
+ready-made, each of which would be a helper producing that same shape:
 
-What the user wants is one tracker that several effects can be handed and share, with each effect creating its
-own when none is handed in. Two ideas from the same review were folded into this rather than built separately,
-because both are a different source for the same reading:
-
-- **A light point the consumer supplies**, so a sun moving across a banner lights every card under it with no
-  pointer involved. A point driven by a path, the scroll position or anything else would be the same thing.
 - **The phone's tilt**, so the effects do something on a device with no pointer. The browser reports it through
   `deviceorientation` events. Per MDN, `DeviceOrientationEvent.requestPermission()` (Safari) needs a secure
   (HTTPS) page and has to be called from a user action such as a button press, so the page's own button asks.
   WCAG 2.5.4 Motion Actuation was checked: it covers functionality operated by moving the device, and a
   decorative tilt operates nothing.
-
-`Reveal`'s idea of a hole that wanders by itself as a demo is the same kind of source and belongs here too.
-`smoothingMs`, which makes an effect trail the pointer, was built on each effect straight away because the user
-wanted to see it first. It is expected to move into the shared tracker if one is built. One thing to settle
-when it does: it smooths what each effect draws rather than the pointer reading, so that the moments the
-pointer leaves the window or goes out of range glide too. Smoothing a shared reading instead would lose that.
-
-Nothing has been argued yet about the tracker's shape: what it hands out, how an effect accepts one, or how a
-source that is not the pointer plugs into it.
+- **A point that wanders by itself**, which was `Reveal`'s idea of a hole moving on its own as a demo.
 
 ### A tracked sample that rewards holding still
 
@@ -1487,7 +1719,9 @@ different kind of change from a new dropdown entry and wants deciding on its own
 - **Weights read off the source image** — reveal dark before light, or detail before flat, so the order comes
   from the picture and changes with every one. Singled out as the most code for the narrowest payoff: it needs
   a canvas pass over the source before the grid can be weighted at all. The component already allows it, since
-  the weights callback belongs to the consumer, who holds the source.
+  the weights callback belongs to the consumer, who holds the source. The ASCII picture deferred in the fifth
+  round of Exotics candidates starts with the same step — the picture shrunk to a grid and each cell's
+  brightness read — so whichever is built first gives the other that step.
 - **Cells starting in each other's slots and sliding home**, so the picture arrives scrambled and resolves
   rather than assembling out of nothing. Needs each cell to know its partner's slot, which the defs carry.
 - **The weight treated as height**, tilting the grid as one object in the perspective the container already
@@ -1514,6 +1748,51 @@ surfaces are flat pieces the browser can turn in 3D; a sphere has none, so "a sp
   a hundred-sided die, which is as many faces as a die needs.
 
 Whether the first two are wanted is the open question.
+
+### A fifth round of Exotics candidates, and what became of each
+
+Seven were put to the user from portfolio showcases, each with a published example. The user then went through
+three whole catalogues, [Fancy Components](https://www.fancycomponents.dev),
+[Made With GSAP](https://madewithgsap.com/effects) and [React Bits](https://reactbits.dev), which yielded more
+than the single picks did. What was taken up is numbered: items 10 and 31 to 41. The rest:
+
+**Taken up through something else.** The scroll-lit paragraph is `Typewriter` driven from outside (item 31).
+Codrops' list whose rows bring up a picture that follows the pointer
+([Image Reveal Hover Effects](https://tympanus.net/codrops/2018/11/27/image-reveal-hover-effects/)) is already
+`Tooltip`, in the user's judgment; only the page's reveal picker came of it (item 38).
+
+**Turned down. Do not re-propose any of these without a new argument.**
+
+- **A sticker that peels** when a corner is dragged ([GSAP Vault](https://gsapvault.com/effects/sticker-peel)).
+  "Not interested."
+- **A morphing pill**, a box changing size and rounding to fit what it holds, as the iPhone's Dynamic Island
+  does ([Amelie Schlueter](https://www.amelieschlueter.com/interactions/dynamic-island)). "Just iOS' thingie."
+- **A pluckable line**, a divider that bends under the pointer and wobbles back
+  ([Fancy Components, Elastic Line](https://www.fancycomponents.dev/docs/components/physics/elastic-line)).
+  Never wanted; it reached the list through a misunderstanding.
+- **`Cuboid` turning freely**, staying at whatever angle it is let go at rather than settling on a face
+  ([Fancy Components, 3D CSS Box](https://www.fancycomponents.dev/docs/components/blocks/css-box)). Left alone by
+  the user.
+
+**Deferred, not turned down: an ASCII picture**, an image redrawn live as text characters
+([Codrops](https://tympanus.net/codrops/2026/09/04/beyond-the-luminance-ramp-a-shape-aware-ascii-renderer-in-three-js/)).
+It shares its first step with _"Weights read off the source image"_ under the animation sample collections.
+
+**Deferred, not turned down: backgrounds drawn by the graphics card.** React Bits' Ghost Fibers
+([link](https://reactbits.dev/backgrounds/ghost-fibers)), Strands ([link](https://reactbits.dev/animations/strands))
+and Aero Shards ([link](https://reactbits.dev/backgrounds/aero-shards)) are pictures computed pixel by pixel by
+small programs run on the graphics card, called shaders — the first two through the OGL package, the third through
+WebGPU and about two thousand lines. Nothing in this library draws that way. The user's call: "stick to what we
+already have the foundation for". If it is reopened, the shape that was put to them was one component running a
+shader across a box with the backgrounds as shader samples, in plain WebGL without a package, and with `playback`
+from the start, since anything moving for more than five seconds owes WCAG 2.2.2 a way to stop it.
+
+**What the comparison showed.** Most of Fancy Components is one of this library's components with a different
+setting — about twenty of its text components are what `Typewriter` does — and the user's verdict on the whole
+was that this library comes out well ahead. React Bits is large and leans on WebGL; what it had beyond that was
+mostly reachable with what exists. Catalogues not yet gone through for the next round:
+[Magic UI](https://magicui.design), [Animata](https://animata.design), [Aceternity UI](https://ui.aceternity.com),
+[Motion Primitives](https://motion-primitives.com) and [Skiper UI](https://skiper-ui.com).
 
 ### A fourth round of Exotics candidates, and what became of each
 

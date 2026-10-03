@@ -200,7 +200,7 @@ export const LIBRARY: TreemapNode<string> = branch(
             "SVGDefs",
             branch("Gradient", leaf("Timed", 3427), leaf("Tracked", 2955), leaf("Gradient files", 138)),
             leaf("Iteration", 56),
-            branch("Pattern", leaf("Timed", 647), leaf("Tracked", 459), leaf("Pattern files", 156)),
+            branch("Pattern", leaf("Timed", 647), leaf("Tracked", 459), leaf("Pattern files", 155)),
             leaf("SVGDefs files", 1365),
         ),
         branch("ScanlineAnimation", leaf("Keyframes", 259)),
