@@ -13,6 +13,7 @@ import DefaultExample from "./Examples/Default.vue";
 import PaletteExample from "./Examples/Palette.vue";
 import PressedExample from "./Examples/Pressed.vue";
 import RefusingExample from "./Examples/Refusing.vue";
+import SharedTooltipExample from "./Examples/SharedTooltip.vue";
 import ResizableBar from "./ResizableBar.vue";
 import { NOTHING_RUN } from "./ToolbarPage.const";
 import type { ToolbarExampleProps } from "./ToolbarPage.types";
@@ -68,6 +69,14 @@ const examples: ExampleDefs[] = [
             `last run: ${lastRun.value} — a layout sizes the bar itself, so nothing runs out of room and the overflow menu has nothing to hold`,
         path: `${EXAMPLES_ROOT}/Palette.vue`,
     },
+    {
+        key: "sharedTooltip",
+        name: "One tooltip for the row",
+        span: WIDE_SPAN,
+        readout: () =>
+            "a single tooltip whose anchor is whichever action is under the pointer or holds focus; moving along the row carries the tooltip with it instead of hiding one and showing the next, and its description moves with it",
+        path: `${EXAMPLES_ROOT}/SharedTooltip.vue`,
+    },
 ];
 </script>
 
@@ -121,6 +130,12 @@ const examples: ExampleDefs[] = [
 
         <template #palette>
             <PaletteExample v-bind="commonProps" />
+        </template>
+
+        <template #sharedTooltip>
+            <ResizableBar :width="barWidth" @resize="resizeBar">
+                <SharedTooltipExample v-bind="commonProps" />
+            </ResizableBar>
         </template>
     </PageExamples>
 </template>

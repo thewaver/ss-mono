@@ -84,7 +84,7 @@ const togglePause = () => {
                 <div :class="styles.phraseSlot">
                     <Typewriter
                         :mode="mode"
-                        :animation-name="animationName"
+                        :compute-animation-name="computeAnimationName"
                         :animation-delay-ms="prefersReducedMotion ? NO_MOTION_MS : CHARACTER_DELAY_MS"
                         :animation-duration-ms="prefersReducedMotion ? NO_MOTION_MS : CHARACTER_DURATION_MS"
                         :compute-character-weights="computeCharacterWeights"

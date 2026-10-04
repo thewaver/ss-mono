@@ -1,4 +1,4 @@
-import { Show, createEffect, createMemo, createSignal, createUniqueId, onCleanup } from "solid-js";
+import { Show, createEffect, createMemo, createSignal, createUniqueId, on, onCleanup, untrack } from "solid-js";
 import { Portal } from "solid-js/web";
 
 import { HoverIntentUtils, TOOLTIP_DEFAULTS, TooltipUtils, TooltipStyles as styles } from "@thewaver/ss-components";
@@ -62,6 +62,24 @@ export const Tooltip = (props: TooltipProps) => {
         },
     });
 
+    const [getIsGliding, setIsGliding] = createSignal(false);
+
+    createEffect(
+        on(
+            () => access(props.anchorRef),
+            (anchorRef, previous) => {
+                if (!anchorRef || !previous || !untrack(getIsVisible)) return;
+
+                setIsGliding(true);
+
+                const settle = setTimeout(() => setIsGliding(false), untrack(getTransitionDurationMs));
+
+                onCleanup(() => clearTimeout(settle));
+            },
+            { defer: true },
+        ),
+    );
+
     createEffect(() => {
         const anchorRef = access(props.anchorRef);
 
@@ -83,6 +101,9 @@ export const Tooltip = (props: TooltipProps) => {
                     style={{
                         "visibility": getPosition() ? "visible" : "hidden",
                         "transform": `translate(${getPosition()?.x ?? 0}px, ${getPosition()?.y ?? 0}px)`,
+                        "transition": getIsGliding()
+                            ? TooltipUtils.getGlideTransition(getTransitionDurationMs())
+                            : undefined,
                         "z-index": getZIndex(),
                         "pointer-events": getShouldShow() ? "auto" : "none",
                         ...assignInlineVars({

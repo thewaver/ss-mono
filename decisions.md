@@ -1423,8 +1423,8 @@ the other pages copy. Taken on Claude's judgment under the unsupervised port.
   `createThumbs`, which holds all of the old element's change-start and change-end bookkeeping, the nearest-thumb raise
   and the write-back onto each input; `SlideButtonUtils.createGesture` is a store of holding and grabbed with the drag,
   key and hold commands, replacing the Solid element's hold loop.
-- **`RadioGroupUtils`' floater functions are copies of `TabsUtils`', not shared with them**, keeping the recorded rule
-  that the floater was copied deliberately and a third consumer is when to extract it.
+- **`RadioGroup`'s floater was a copy of `Tabs`'** until a third consumer arrived; both now use the `Floater`
+  abstract.
 - **A React radio registers again whenever its value, disabled state or reachability changes**, and the group's
   `register` returns its own cleanup (`RadioGroupReactContextType`), since the group reads those through the entry's
   getters and would not otherwise re-render to see them.
@@ -4004,6 +4004,22 @@ timer only when it is about to start its own, a `:focus-visible` focus. Otherwis
 delay would have cancelled the tooltip for as long as the pointer stayed on the button. Playground demos that a spec
 hovers set `hoverShowDelayMs` to 0; the Tooltip page keeps the defaults and exposes both as knobs.
 
+### `Tooltip`: handed a new anchor while showing, it glides there
+
+Asked for by the user with React Bits' shared tooltip: one tooltip whose anchor is whichever control in a row is
+hovered or focused, gliding from one to the next instead of hiding and reappearing. **The hover engine already kept
+it up across the change** — leaving one control and entering the next inside the same tooltip lands in the skip
+window, so it never faded — but the position jumped. So a change of anchor while the tooltip is visible now turns on a
+`transform` transition (`TooltipUtils.getGlideTransition`) for one fade duration, and nothing else that moves it — a
+scroll, a resize — is eased. The description moves with it for free, since `aria-describedby` already follows the
+anchor through `TooltipUtils.describe`. The Toolbar page's shared-tooltip example picks the anchor from the row's own
+`pointerover` and `focusin`, in a wrapper with `display: contents` so the toolbar measures its room as before.
+
+**The reveal is the drawing's, and the Tooltip page now offers six.** From Codrops' image reveal effects, which the
+user judged covered already: `Tooltip` hands its drawing whether it is showing and for how long the change takes, so
+a fade, a zoom, a slide, a wipe, an unblur or a flip down are classes on the Playground's own tooltip painter, chosen
+by a `reveal` knob. Nothing changed in the library for it.
+
 ### `Tooltip`: showing it drops a placeholder where it sits, and that is left as it is
 
 **When a Tooltip shows, its `Show` puts the `Portal`'s placeholder node into the spot the Tooltip occupies.**
@@ -4568,7 +4584,7 @@ explicit restore). Two identical siblings and one that does not fit is not the s
 
 ### Arbitrary item placement: `Abstracts/Placement`, and `Menu` as the first consumer
 
-The first half of `backlog.md` item 24. A control's items can be placed anywhere rather than along a line, and
+The first half of `backlog.md` item 23. A control's items can be placed anywhere rather than along a line, and
 the vocabulary for saying where lives in an abstract so the next control can use the same one.
 
 **A placement is a center, a size, an optional turn and an optional depth, all in fractions of the container's
@@ -4642,7 +4658,7 @@ its own chrome, or gets neither.
 
 ### Concentric submenus: `computeLayout` learns where it is, and a submenu borrows its parent's anchor
 
-The second piece of `backlog.md` item 24. A submenu of a laid-out menu is drawn as a wider ring round the
+The second piece of `backlog.md` item 23. A submenu of a laid-out menu is drawn as a wider ring round the
 same center rather than hanging off the item that opened it, so a wheel stays one wheel however deep it goes.
 
 **`computeLayout` takes one object rather than a run of arguments, and the reason is the third one.**
@@ -5075,7 +5091,7 @@ all eleven, which is what lets a consumer offer the whole set by key.
 
 ### `Paginator` takes a layout, and the placed box moves into the abstract
 
-The proving pass of `backlog.md` item 24, against the control the item named as the strongest candidate. A
+The proving pass of `backlog.md` item 23, against the control the item named as the strongest candidate. A
 paginator is arithmetic over a flat list, so a layout is the only thing that changes: the steps, the pages and
 the ellipses go round a dial in the order they already had, and nothing about the counting, the addresses or
 the labels is touched.
@@ -5127,7 +5143,7 @@ the box. So the sector is vocabulary a layout offers and a painter may decline, 
 control has to understand.
 
 **What the pass did not strain, which is worth knowing before the next consumer.** `PlacementUtils.pickIndex`
-still has no caller — a paginator has no gesture that picks by direction, so the loose end item 24 records is
+still has no caller — a paginator has no gesture that picks by direction, so the loose end item 23 records is
 untouched. Nor did anything about levels move: a paginator is one level and always will be, so the concentric
 machinery went unexercised.
 
@@ -5227,7 +5243,7 @@ arrangement is drawn from it — and both suites assert the walk rather than any
 
 ### Every layout sample lives in one place, and none of them is a menu's
 
-The user's call, taken while `backlog.md` item 24's proving pass was still open. `Samples/Menu/Layouts` was
+The user's call, taken while `backlog.md` item 23's proving pass was still open. `Samples/Menu/Layouts` was
 named when a menu was the only thing that had ever asked for a layout; by the end of the pass it held a
 honeycomb and a radial tree, and eleven consumers imported it of which three were menus. It is now
 `Samples/Placement/Layouts`, and the arrangements that came in with `Formation` are in it too.
@@ -5884,6 +5900,33 @@ it, which the sample expressed by defining one constant as the other. Both now r
 no-sample sentinel, so a precise object type would push a cast into each of them. The shared objects carry
 the precise types the samples need, and the map is the loose page-facing view of the same values.
 
+### A trail for the tracked patterns, and two more tracked gradient families
+
+**A tracked pattern's cells can leave a trail**: a cell lights as the pointer passes and fades on its own afterwards,
+from Fancy Components' pixel trail. It is one option, `trailMs`, on every tracked pattern rather than a new kind of
+sample, so every layout has it — hexagons and triangles as well as squares — and the Playground gives every family a
+trail knob. `TrackedPatternUtils.createTrail` remembers each cell's brightest recent level by the key the framework
+gives it, `row_col`, and a cell shows the higher of its live level and what is left of that memory, eased back to
+rest. Keyed by place in the tile, the copies of a repeating tile share one trail, so with `tiled: true` the trail
+repeats in every copy. The clock is the samples' shared one, woken by the pointer moving, so it stops once the last
+cell has faded. Three samples default to it: `square_g_trail_2`, `hexagon_pt_trail_2` and `triangle_t_trail_2`.
+
+**Ribbons and a swarm are tracked gradients, not components** — the user's ruling, since React Bits draws both with
+WebGL and they are no different from `spot_smear`. `ribbon_3` is three chains of soft stamps whose heads chase the
+point on a spring, each at its own pace, with each body stamp easing toward the one ahead, thickest at the head;
+`swarm_3` is a handful of spots each springing toward a place of its own circling the point
+(`SVGDefsUtils.stepSpring`, `computeSwarmTarget`). Both run on the shared clock only while the point is near, and both
+follow a supplied point through `getPointSource`.
+
+**The swarm's spots merge into one liquid shape**, built once Safari had been checked to draw the filter it needs.
+Separate gradient layers cannot merge, since a filter on one layer never sees another, so the swarm is one layer whose
+paint is a pattern the element's size holding every spot as a solid ellipse (`computeSwarmRadii`). The ellipses sit in
+a group under a blur-then-sharpen filter — a Gaussian blur of a share of the radius (`computeSwarmMergeBlur`), then
+`SWARM_MERGE_MATRIX`, which keeps the colors and steepens opacity into a hard edge — so two spots near each other
+join along a smooth neck and their colors blend across it. The filter is inside the paint, so the outline of
+whatever the swarm paints stays exactly as it was. The fade as the point leaves is an opacity on a group outside the
+filter: fading the spots themselves would have the sharpening snap them off at its threshold instead of fading.
+
 ### Patterns split into timed and tracked, the way the gradients are
 
 Asked for by the user: the timed patterns' cells grow (the circles) or fade (the polygons) on a clock, and the
@@ -6241,7 +6284,7 @@ answer.
 
 ### Five more controls take a layout, and each one broke something different
 
-The rest of `backlog.md` item 24's proving pass, run against `Stepper`, `Toolbar`, `Sortable` and `Tree` after
+The rest of `backlog.md` item 23's proving pass, run against `Stepper`, `Toolbar`, `Sortable` and `Tree` after
 `Paginator`, `RadioGroup` and `Tabs`. The reason to keep going past the first was that each control was
 expected to strain a different part of the abstract, and each did.
 
@@ -7349,10 +7392,11 @@ knows its own.
 `gap` — it already decides where its children sit, so handing that measurement back out exposes something it
 owns rather than teaching it something new.
 
-**The mechanism is `Tabs`', copied deliberately rather than generalized**: a root ref, a `ResizeObserver`
+**The mechanism was `Tabs`', copied deliberately rather than generalized**: a root ref, a `ResizeObserver`
 watching the root and the selected item's `offsetParent`, the box written as inline `top` / `left` / `width` /
-`height`, and `ElementFader` for entry and exit. Two consumers is not yet an `Abstract`; a third is when to
-extract.
+`height`, and `ElementFader` for entry and exit. Two consumers was not yet an `Abstract`; `Menu` was the third,
+and the copies are now the `Floater` abstract — see _"Floaters are an `Abstract`, and follow the highlight as
+well as the selection"_ below.
 
 **The observer is now guarded on the prop, in both controls.** It previously ran for every `Tabs` on the
 page, measuring for a floater nobody asked to render, and copying it unguarded into `RadioGroup` would have
@@ -7375,6 +7419,52 @@ measured box, which was right the whole time.
 **The preset route was considered and rejected.** A segmented preset over `RadioGroup` owning the floater
 privately resurrects as a component the thing just decided to be paint, for one optional prop's worth of
 surface — and a preset existing to hide a prop the base already needs is a worse trade than the prop.
+
+### Floaters are an `Abstract`, and follow the highlight as well as the selection
+
+`Menu` was the third control to want a floater, which is the point the rule above set for extracting it. The
+copies in `Tabs` and `RadioGroup` are gone; every consumer goes through `FloaterUtils` in the core and one
+framework helper per package (`FloaterSolidUtils.create` and its siblings).
+
+**What the abstract owns.** The marker's box, in the container's own coordinates: measured from the item
+(`FloaterUtils.observeBounds`, a `ResizeObserver` on the container and the item plus the `offsetParent` hop
+described above) in a plain row or column, or derived from the item's placement in container-query units
+(`computePlacedBounds`) under a layout, where nothing is measured. The fade through `ElementFader`, with the
+last box kept while the marker fades out, so the exit plays where it was, and dropped once it has gone, so the
+next entrance starts at the new item instead of sliding in from the old one. The `floater` class
+(`position: absolute`, `z-index: -1`, no pointer events, transitions on the four box properties), so each
+control's container only has to be positioned and `isolation: isolate`.
+
+**Two floaters, two names.** `renderFloater` became `renderSelectionFloater`, and `renderHighlightFloater` sits
+beside it; both take the visibility target and the duration every appearing painter takes. Where the selected
+item and the highlighted item are different things each gets its own marker, and the name says which one it
+follows. `Select`, `Listbox`, `Tree`, `Tabs` and `RadioGroup` take both; `Menu`, which has no selection, takes
+the highlight one only. One `floaterTransitionDurationMs` drives both, defaulting to 150 in each control's
+defaults.
+
+**The highlight is the hovered item first, then the focused or keyboard-highlighted one.** In `Tabs`,
+`RadioGroup` and `Tree` the controls read the pointer through `pointerover` and `pointerleave` on their container
+and the focus through `focusin` and `focusout`, because none of them moves its own highlight on hover. `Listbox`
+is the same: its options hold the focus, and moving the focus on hover would steal it from wherever the user
+left it, so the marker reads the pointer on its own and falls back to the list's highlight while the pointer is
+elsewhere. `Select`'s popup moves its highlight on hover anyway, so for it the two agree. `Menu` moves its
+highlight on hover already, so its marker follows the highlight alone.
+
+**Each control wraps its items in one presentational container, because a floater needs a positioned box to
+sit in.** `Listbox`'s mounted options sit in a `role="presentation"` wrapper (`listboxOptions`) which takes the
+horizontal flex too; the end marker that asks for more options moved inside it, so it still overlaps the last
+option rather than following the wrapper. A windowed list draws its floaters in the sizer instead, which is
+already positioned and which carries the rows. `Menu`'s non-laid-out items sit in `menuItems`; under a layout
+the floater sits inside the `PlacementBox` with the items. `Tree` draws them in its root (now positioned and
+isolated) or in the windowed sizer.
+
+**A windowed list can scroll the highlighted item away**, and then there is nothing to measure: the floater
+fades out and back in when the row returns. That is `ElementFader`'s ordinary job, and the reason the item refs
+are kept in a map that drops an element when its row unmounts.
+
+**An option's ref is keyed by its element, not by its index.** `Listbox` records each mounted option with the
+accessor for its flat index, and looks an index up by reading those accessors. Keying by index meant the cleanup
+had to ask a removed option for its index, which reads a row that filtering has already taken away and throws.
 
 ### A segmented control is `RadioGroup` paint, and the Radio page proves it
 
@@ -8494,6 +8584,30 @@ growth are still to paint; scrolling on that frame alone lands a few pixels shor
 frame corrects it. It is not a frame **instead** of the immediate call: a frame may be a long time coming on a
 loaded machine, and the suite failed exactly that way while the whole of it ran at once.
 
+### `Accordion` in a row: `orientation`, and which way the open section moved
+
+Asked for by the user from Made With GSAP's two-way accordion panels: a row of panels, one open and the rest narrow
+strips with a rotated label, the opening panel's content sliding in from the side the person came from.
+
+**`orientation` is the library's axis word** (`conventions.md`), defaulting to `vertical`. A row lays the sections
+out with `flex-direction: row` and gives every section's `Collapsible` `side: "right"`, so the panel opens beside its
+header and animates its width. The backlog expected the height observer to need a twin for width; it did not,
+because `Collapsible` already measured the content's border box on both axes and animated whichever its side named,
+for its own sideways example — so the row is a layout and a side, not new measuring. The arrows that walk the
+headers follow the orientation through `NavigatorUtils.computeNextPosition`, and a row reads the text's direction so
+right-to-left reverses left and right, as `Tabs` does.
+
+**Which way the open section moved is handed to `renderPanel` as a fourth argument, `getMoveDirection`**, beside the
+visibility target it already took: `forward` when a section later in the list opened than the one left, `backward`
+when earlier, `undefined` before anything has moved. Order rather than screen side, so it means the same in a column,
+in a row, and under right-to-left text. It is worked out from the open set changing — `AccordionUtils.computeMoveDirection`
+compares the section that opened with the one that closed, or with the nearest open one when nothing closed — in an
+effect on the state, so a consumer opening a section from outside gets the same answer as a click. The motion stays
+the consumer's; the Playground's row example slides the entering content in from that side.
+
+**"Always one open" is `isSingleExpand` with `isExpandRequired`**, both already there, and the rotated strip label is
+the example's own painting rather than anything the component draws.
+
 ### A panel built on first expansion, and why the animation survives it
 
 Settled with the user, on their call between keeping a lazily built panel afterwards and unmounting it again
@@ -8684,6 +8798,34 @@ single number stays the common case and is written straight through.
 
 **`custom` goes to the `feTurbulence`, not the displacement.** It is the animation slot every other method
 carries, and the attributes worth animating on this pair — `baseFrequency` and `seed` — are the noise's.
+
+### A pixelate filter, built from an image of dots
+
+From Fancy Components' pixelate filter. `addPixelateFilter({ size })` samples the picture once at the middle of every
+square and grows each sample back out to fill its square: an `feImage` holding one dot per cell, made opaque wherever
+it is drawn (`feComponentTransfer`), the source kept only where a dot lands (`feComposite in`), and `feMorphology`
+dilating by half a cell. A size of one pixel or less changes nothing and is not kept, like the other no-op effects.
+
+**The widely published construction draws nothing at all in Safari, and this one was found by checking.** That one
+floods a single dot with `feFlood` and the primitives' own `x`/`y`/`width`/`height`, then repeats it with `feTile`.
+Checked in Safari against the same box in Chromium, piece by piece: the flood-and-tile grid is empty in Safari
+whatever the region; and with the region given in pixels (`filterUnits="userSpaceOnUse"`, which the registry writes
+whenever it knows the element's size) Safari also refuses `feMorphology` and `feImage` on their own. With the region
+given as shares of the element's box, the image of dots, the composite and the dilation all draw. So:
+
+- **The dots are an image**, built by `SVGFilterDefsUtils.resolvePixelate` as a data URI of the region's exact size,
+  with the cells counted from the element's corner. It must be that size: an image with no size is drawn by Safari at
+  a default size and stretched, which drifts the columns, and an image placed with its own `x`/`y`/`width`/`height`
+  makes Safari lay the filtered box out at the wrong width.
+- **The dots are made opaque before sampling**, because Safari smooths the image and leaves every dot partly
+  transparent, which drew the squares visibly dimmer than Chromium.
+- **A filter holding a pixelation writes its region as shares of the box** — the same region, in the units Safari
+  honors. Other filters keep the region in pixels; whether they should all switch has not been checked or argued.
+- **A pixelation needs the element's size.** Without it the image cannot be sized, so the registry leaves the effect
+  out and assembles the rest as if it had never been added; the graphic shows unpixelated rather than blank.
+
+The blur-then-sharpen filter a liquid edge needs (`feGaussianBlur`, then an `feColorMatrix` that steepens alpha) was
+checked in the same pass and draws in Safari as it does in Chromium.
 
 ### The `SVGFilters` page is the factory's
 
@@ -11133,7 +11275,7 @@ the document so they paint behind it.
 layout's formula and the example now spells it a second time, along with a walk of its own data to work out
 which depths are showing — because a ring must disappear when its generation collapses, and only the layout
 knows that today. So the escape hatch is real and the duplication is real with it, which is the argument for
-the slot recorded against item 24 rather than a reason to think nothing is missing.
+the slot recorded against item 23 rather than a reason to think nothing is missing.
 
 **The user's stated position on where this should land**, taken as their framing rather than as a rule
 anything has been changed to follow: a thing that belongs in a particular place should have a render slot of
@@ -11639,7 +11781,7 @@ page behind is then outside what the layer can see. It is the same trap as `isol
 is why each layer carries its own clip rather than sharing one.
 
 **The fringe this section used to blame on a disagreement between the two backdrop layers is postponed, not
-fixed — see item 23 in `backlog.md` for the current standing.** The margin explanation did not survive a
+fixed — see item 22 in `backlog.md` for the current standing.** The margin explanation did not survive a
 direct test: pushing the margin far past what either layer needs changes nothing, and shrinking it to nearly
 zero changes nothing either. Folding the blur into the ripple filter was tried, looked clean, and was reverted
 anyway — not because it cost Firefox and Safari their blur, though it does, but because "clean" turned out to
@@ -11648,7 +11790,7 @@ building a `feImage` / `feComposite` mask into the filter, so the pane never nee
 ancestor `overflow: hidden` at all, also looked clean under that same software path and also failed once
 checked against a real GPU-accelerated window. Neither fix is in the tree. What each attempt actually ruled
 out is real and kept below; what it did not do is find a fix that survives real rendering, and nothing further
-should be attempted here without a way to check against GPU rendering from the start — see item 23.
+should be attempted here without a way to check against GPU rendering from the start — see item 22.
 
 **The Playground's pane is dragged with `left` and `top`, never with `transform`.** A transform on an
 ancestor creates a stacking context and changes the containing block, and given how readily this arrangement
@@ -11743,7 +11885,7 @@ nothing" trap the backdrop layers above are already written to avoid. Skipping t
 nothing for one.
 
 **The ripple layer's edge is postponed, not fixed, and the investigation is recorded here so it is not repeated
-blind — see item 23 in `backlog.md` for what this means for now.** Found on the Playground's tooltip once
+blind — see item 22 in `backlog.md` for what this means for now.** Found on the Playground's tooltip once
 moved onto `GlassSurface`: a patch of whatever sat behind it rendered sharp and barely warped instead of
 frosted. Chased with a standalone sandbox — raw `feTurbulence` / `feDisplacementMap`, no library code — every
 test run in the browser this session had, which turned out to be headless Chromium and headless Edge, both of
@@ -13236,7 +13378,7 @@ members before writing, which is _"Asking for a state a thing is already in does
 it, and a press that moves the folder and every descendant together. Two rules are fixed here rather than in
 whatever consumes it first: **a branch's own place in the selection is not read** when deciding what its box
 shows, because a folder follows its contents rather than competing with them, and **a half-ticked box fills
-rather than empties** on the first press. `backlog.md` #13 is the consumer this is waiting for, and building
+rather than empties** on the first press. `backlog.md` #12 is the consumer this is waiting for, and building
 it ahead of that was the user's call, taken on the grounds that the tri-state parent is the one part of a
 multi-select `Tree` with nothing left to argue about.
 
@@ -13493,55 +13635,61 @@ of a non-looping carousel is therefore undone at once; there is nowhere to rotat
 **The drum takes the flag only so both presets take the same props.** It is a closed ring whose last face sits
 beside its first, so looping is the right default there, and its doc block says so.
 
-### `TrackCarousel` and `DrumCarousel`: one behavior, two ways of showing it
+### `Carousel`: one component, and how a slide sits is a placement rule
 
-A carousel and a drum wheel are the same picture driven by different arithmetic, which is what `Barrel` was
-lifted out to make usable twice. The wheel spins to a wedge nobody chose; a carousel steps to a slide somebody
-did. So the barrel is now shown by two components — one turned by `Rotator`, one turned by an index — and the
-carousel's own behavior, all of it, is shared between its two presentations.
+From Made With GSAP's carousels — cover flow, a depth wave, cards bending along a cylinder, a stack of folders, cards
+flipping down on a hinge, a ring that turns and leans — which the user judged to need one more abstraction before they
+could be expressed the way the rest of the library is. The first build had two presets over a private shell,
+`TrackCarousel` and `DrumCarousel`, the track sliding a strip and the drum turning a `Barrel`; both are gone.
 
-**The shell is `Carousel` and it is not exported; the presets are.** Same arrangement as `Spotlight` and as
-`OverheadWheel` / `DrumWheel`, and for the same reason: `slideSize` is required on the drum and meaningless on
-the track, `renderSlideBack` likewise, and a single component with a variant prop could state neither. The
-public names are `TrackCarousel` and `DrumCarousel`.
+**What was missing is a slide placed by its distance from the current one.** Counted in slides, fractional while
+moving, and measured the short way round when looping (`CarouselUtils.getDistance`). A placement rule,
+`computePlacement`, takes that distance with the carousel's box and answers in `Proximity` effects' vocabulary —
+transform and filter values, opacity among them — plus an `origin` to turn about, a `layer` to stack by and the `axis`
+a turned slide shows its back about. **The shell is public as `Carousel`, with the rule required**, and the seven
+arrangements are ready-made rules in `CarouselPlacementUtils`, shipped and tuned the way `ProximityEffectUtils`
+ships its effects, with a sample registry for pickers. The user's pick, under the 0.0.x rule that a better API needs
+no migration path.
 
-**The user took this knowing it reads worse than the sets it copies.** `Spotlight` and `Wheel` were shells from
-the start, so no name was taken away when their presets arrived; here the plain `Carousel` was already the
-component people rendered, and it is now the family name instead. `Track` was chosen over `Slide` because both
-kinds have slides — naming a preset after the half they share is the fault `Flat` had, recorded above.
+**Every slide fills the carousel's box and sits in the same grid cell before its rule moves it.** That makes the box
+the one length a rule needs — a track moves a slide by whole boxes, the drum's depth is worked out from the box so its
+faces meet — and it puts every slide's untransformed center at the same point, so slides given the same `perspective`
+share one vanishing point without a 3D context across them. Stacking is therefore by `z-index`, from the rule's
+`layer` (or nearer-is-higher by default), inside a box made its own stacking context with `isolation: isolate`;
+without it, a slide with a negative layer was drawn behind the page around the carousel. **`slideSize` became that
+measurement**, as the backlog asked: the box is measured, not given. The drum did not turn out to need it as an input;
+a consumer wanting a narrower slide sizes the carousel or the slide's own content. The column carousel's
+height-from-the-page rule went with the track: a column now takes the tallest slide's height like a row does.
 
-**`dir` belongs to the track and `axis` to the drum, and they are not the same word for the same thing.**
-`dir` is a flex direction: it says whether the slides sit in a row or a column, exactly as it does on `Tabs` and
-`Stepper`. `axis` is the line the barrel turns about, which is `DrumWheel`'s word for the same idea and takes
-the same `"row" | "column"` values for the same reason — a row of faces turns about the upright axis. One prop
-each, on the preset that has the concept, rather than one prop meaning two things.
+**The position is continuous and is what `progress` describes.** `progress`, 0 to 1, is the library's existing shape
+for driving from outside; on a looping carousel it is one whole lap (`getLapLength`). An index change glides the
+position there on a frame loop (`CarouselUtils.glide`, CSS's `ease`), the short way round, writing `progress` as it
+goes; a write to `progress` from outside stops a glide and makes the index follow the nearest slide. A swipe offsets
+the drawn position and either steps or glides back on release. **The track's visible rewind at the wrap is gone**:
+with distances taken the short way, the first slide sits beside the last, which ends the old disagreement between
+the track and the drum.
 
-**The drum keeps a running angle and turns the short way; the track slides straight to the index.** A face's
-transform is derived from an angle, and an angle taken as `index × step` jumps from `0°` to `270°` on the first
-forward step of a four-slide drum — a quarter turn that animates as three quarters backwards. So the shell
-holds the angle itself, moves it by the signed shorter number of steps on each index change
-(`CarouselUtils.getTurnSteps`), and resets it when the slide count changes underneath it. The track has no such
-choice to make: its transform is `index × 100%` along one axis, which is already continuous, and it rewinds
-visibly when a step wraps from the last slide to the first. **The two therefore disagree at the wrap**, and the
-disagreement is not resolved here: making the track wrap the short way means moving a slide before it is shown,
-which is a different mechanism rather than a different constant.
+**A press on a visible side slide picks it.** The user's pick. Slides other than the current one stay `inert` and
+hidden from screen readers, and the pickers remain the keyboard's route to the same action. Because an inert slide
+receives no clicks, the press lands on the box and `computeHitIndex` works out which slide was aimed at: of the
+slides whose drawn box holds the point, the one whose middle is nearest — not the topmost, which is what `CardFan`
+showed is wrong for overlapping slides. It is gated as the swipe is, so a carousel with no controls leaves presses to
+the page, and the click that ends a swipe is already swallowed by the swipe tracker.
 
-**A partial swipe turns the barrel by that fraction of a step**, the same way it drags the track by that
-fraction of a slide, and it is written once: the swipe ratio times the step angle for the drum, times a slide
-width for the track. What commits, what is thrown away, and what a hold does are all the shared shell's.
+**`renderSlideBack` is everyone's**, drawn on a second face turned half round the placement's axis with
+`backface-visibility: hidden` on both, since the hinge and the folders turn cards over as the drum does.
 
-**`CarouselSlideState` gained a `face`, and the track's is always `"front"`.** A drum face can be the back of a
-slide, which the consumer renders through `renderSlideBack`; the field is on the shared state rather than on a
-drum-only one, exactly as `WheelWedgeState.face` is shared by a wheel that never has a back.
+**One `orientation` replaces the track's direction and the drum's `axis`.** It decides the swipe and is handed to the
+rule, which lays its slides across or up and down; what a slide turns over about is the rule's own `axis`, defaulting
+from the orientation, so the hinge can flip cards about the level axis on a carousel that runs across.
 
-**The two Playground pages carry the same three demos, because the shell they share is the thing being shown.**
-The drum page began with one demo against the track page's three, which read as the drum having less to it —
-but every behavior the track page demonstrates lives in the shared shell, so the drum has all of it. Both pages
-now show the same trio under the same names: stepped by hand, rotating on its own, and no controls at all. The
-knob panel is the same on both, delay knob included, and the only thing that differs between the pages is which
-preset the examples render. **Where a family's presets are two views of one shell, a demo that exists on one
-page and not the other is a claim that the behavior is missing**, and that claim should be true or the demo
-should be there.
+**The ring that turns by itself and leans toward the pointer is an example, not a feature**: the drum rule inside
+`Tilter`, with `progress` written on a clock for a continuous turn and a Stop button, since a turn running on its own
+owes WCAG 2.2.2 a way to stop it.
+
+**`Carousel` lives in `Essentials/`.** With no presets built on it, the layering rule puts it there rather than in
+`Primitives/`; the two presets and their Playground pages were deleted, and its page-less entry in the Playground's
+`Primitives` section went, since it has a page of its own and the two collided on one route.
 
 ### `Exotics/PointerEffects`: three wrappers that restyle their content by where the pointer is
 
@@ -14994,7 +15142,7 @@ can know.
 **The cost is stated rather than mitigated: a library that renders no button cannot promise one is reachable or
 named.** A consumer who wires up no control has a wheel that can only be driven from elsewhere through
 `targetIndex`, exactly as `Carousel` with no `renderControls` has no keyboard route. That is the same exposure
-item 16 records for `Scroller` and it is now the wheel's too.
+item 15 records for `Scroller` and it is now the wheel's too.
 
 **No slot survives either, and the one that briefly did was kept for a bad reason.** A `renderHub` was left on
 the overhead wheel out of deference to an earlier choice — that an overhead wheel has one control slot and it is the
@@ -16054,13 +16202,101 @@ beat early, which is invisible in review and obvious in a spec.
 
 **`mode: "erase"` reverses each character's animation and reverses the weights**, so the last character goes first and whatever keyframes the consumer wrote run backwards. It needs no keyframes of its own. **Once an erase ends the text rests hidden**, with `visibility: hidden` on each element, whatever the animation's first frame drew. A hidden link leaves the tab order and the accessibility tree, which is right for text that has been erased. **Changing `mode` starts a run**, so a phrase loop is only `onAnimationEnd` switching the mode. The phrase list, the hold and the loop stay with the consumer, and the Phrases example owns them. Reduced motion is the consumer's call, as it is for typing: the example sets the delay and duration to zero. The example has a Pause button, because a loop and a blinking caret that start on their own and run past five seconds need one under WCAG 2.2.2 Pause, Stop, Hide.
 
-### `Typewriter`: the caret is moved by the characters, never by a clock
+### `Typewriter`: one progress draws every moment, whether it plays or is driven from outside
 
-**The caret index advances on each character's own `animationstart`**, the owner's design, so it cannot drift from the text however the browser schedules frames. Events bubbling up from inside an image or other element are ignored. **Exactly one `<Show>` holds it at a time**: before the first element, after the most recent arrival, or after the whole text at rest. While erasing it sits after the character before the one leaving. Moving means remounting, so a consumer's blink restarts on every character and reads as solid while typing. That is intended. It sits inline, so it follows the text onto the next line and takes inline space; the prop's doc block asks for a narrow, `aria-hidden` caret.
+Settled with the user while going through Made With GSAP's text effects and a scroll-lit paragraph on CodePen.
+**`Typewriter` takes `progress` and `playback`, in the shape `CellAnimation` and `Trail` already have.** With playback
+on it runs and writes `progress` as it goes; with playback off, writing `progress` draws that moment of the run. A
+paragraph lit by scrolling is playback off with the progress taken from a progress observer; karaoke is the consumer
+turning a song's time into progress.
+
+**Every letter's keyframes are held, not played.** Each letter's CSS animation is paused, and its delay is its own
+start less the run's time, `calc(<start>ms - var(--time))`, with the time one custom property on the driver's root
+(`LetterDriverStyles.letterDriverTimeVar`, applied through `LetterDriverUtils.computeAnimationStyle`). A paused
+animation's frame is its held time minus its delay, so moving the variable moves every letter at once to the frame
+that moment calls for — partway through one letter's own keyframes if the moment falls there, the first frame for a
+letter not yet reached (it fills backwards), the last for one that has finished. The playing case is the same
+mechanism with the progress walked forward each frame by `TypewriterUtils.run`, so there is one way of drawing, not a
+playing path and a scrubbing path. The cost is a frame loop while playing, where the old run started its CSS
+animations and set one timeout; the loop writes one number and the variable is one style write, so nothing is per
+letter. The rejected alternative kept running CSS animations while playing and re-anchored their delays on a seek,
+which needs the moment each animation actually started — a frame the binding does not control.
+
+**The caret is placed from the same progress, which replaces moving it on each letter's `animationstart`.** The old
+rule existed so the caret could not drift from a clock running beside the animations; with one clock driving both,
+there is nothing to drift from. `TypewriterUtils.computeCaretIndex` gives the place after the letter that most
+recently started (before it while erasing), so a scatter of weights still jumps to the latest arrival. The drawers no
+longer report letter starts, and `reportLetterStart` left the driver context.
+
+**`playback` stays on once a played run ends.** `Trail` writes its playback off at the end; `Typewriter` cannot,
+because a change of text replays the typing — `resetAnimationOnContent` and `resetAnimationOnLayout` — and that has to
+keep working after the first run. So a played run that reaches `1` comes to rest, drawing the text plainly again, and
+waits there. **A change rewinds the run only while it is playing**: a consumer driving the progress owns the moment,
+and a content change only re-measures. **A driven run never comes to rest**, even at `1`, so keyframes that end
+somewhere other than the text at rest — letters flying away — stay where they ended. `onAnimationEnd` fires only when a
+playing run reaches the end. `restartAnimation` turns playback on and rewinds.
+
+**An animation per letter is `computeAnimationName(character, index, count)`**, replacing `animationName`. The user's
+pick over keeping both props: one animation is a function returning the same name. A whole element is passed as the
+object replacement character and a break the text holds as a line feed — what the letter registry already reported for
+those slots, now `LetterDriverUtils.WHOLE_ELEMENT_CHARACTER` and `LINE_BREAK_CHARACTER` — so an animation chosen by
+character picks the same letters with or without a drawer. A change in the names it returns for the same characters
+restarts the typing, which is how a function reading a signal behaves like the old accessor did.
+
+**A break the wrapping inserted is not a letter.** `getInlinedSegments` used to emit one token for every break, so a
+reflow added or removed letters, renumbered everything after each wrap and changed the run's length. For an animation
+chosen by index that flipped "odd letters rise" at every line. `JSXTextParserUtils.getIsWrapBreak` now tells an
+inserted break from one the content holds; neither `Typewriter` nor `PaintedText` counts it, so the letters are the
+same at any width.
 
 ### `Typewriter`: arrival order is ScrambleText's weights over a run of `count × animationDelayMs`
 
-**`computeCharacterWeights(count)` goes through `ScrambleTextUtils.resolveWeights`**, so it has the same 0..1 contract, the same clamping and the same fill for missing entries. An image or a line break counts as one character. Each element starts at `initialAnimationDelayMs + weight × count × animationDelayMs`, so with the default in-order weights the last character starts at `count × delay`, which the end timeout allows for. The caret is documented as meant for in-order weights, because with a scatter "the most recent arrival" jumps around.
+**`computeCharacterWeights(count)` goes through `ScrambleTextUtils.resolveWeights`**, so it has the same 0..1 contract, the same clamping and the same fill for missing entries. An image or a line break counts as one character. Each element starts at `initialAnimationDelayMs + weight × count × animationDelayMs`, so with the default in-order weights the last character starts at `count × delay`, which the run's length allows for. The caret is documented as meant for in-order weights, because with a scatter "the most recent arrival" jumps around.
+
+### `ProximityText`: letters held at how near a point is
+
+Seen at Fancy Components' variable-font proximity text, which the user called a "cool example" rather than the
+feature, and at Made With GSAP's weight wave. **A second driver over `LetterDriver`, not a mode of `Typewriter`** —
+the user's pick. The mechanism is shared — every letter plays keyframes held at some point — and only what decides the
+point differs; each one's own props mean nothing to the other (caret, erasing, arrival order and the end-of-run
+callback against source and reach), which is why the wheels and the carousels are presets over one base. Named by the
+user, over `SwellText` and `NearText`: it stays true whatever the keyframes do.
+
+**The effect is keyframes held at the strength.** The user's pick over two font-axis settings and over a function
+from strength to styles. Each letter's `computeAnimationName` keyframes are paused at `strength × duration`, through
+the same `LetterDriverUtils.computeAnimationStyle` `Typewriter` uses, with the driver's time variable at `0` and the
+strength carried in each letter's own delay — so the browser blends any property, font axes included. The strength is
+`Proximity`'s falloff of a plain distance (`ProximityUtils.getDistanceFalloff`): one under the point, falling as the
+square of the distance to nothing at `reachPx`.
+
+**Every line is sized for all its letters at the last frame, and that is written once in the shared layer.**
+`LetterDriverUtils.wrapAtLastFrame` reads each animation's last keyframe from the page's style sheets and, when any
+of them changes a letter's width, measures the words with every letter at that frame in a hidden box, through a
+`measureTextWidths` override `JSXTextParserUtils.getInlinedSegments` now accepts; otherwise it wraps exactly as before,
+so `Typewriter` changes only for a keyframe that widens letters. The user's design over reserving room per letter or
+per word: at rest the spare room sits at the end of each line, and a growing letter really pushes the rest of its line
+along. **The contract is that the last frame is the widest**, and the props documentation says so.
+
+**Nearness is measured from where the letters sit at rest**, so a letter pushed along by its neighbor does not weaken
+because of the push and the effect cannot feed back on itself — `Proximity`'s rule for the dock. A second copy of the
+lines, hidden, holds every letter at its first frame, and its letters' layout boxes are read on every re-layout. Links
+in the text stay links: their letters are drawn inside the anchor.
+
+**The point comes from a source**, the pointer by default (`PointSource`, under _"`PointerTracker`: one reading of where the pointer is relative to one element"_).
+
+**With `PaintedText` inside, letters push their neighbors along, as they do without it.** The user's call, over
+letters swelling where they were laid out, which cost nothing but made the two versions behave differently.
+`PaintedText` normally places every letter once, at a fixed position read from its invisible HTML copy. While
+`ProximityText` drives it (`getComputePushingAnimationName` on the driver context), it wraps its text with every
+letter at its last frame, lays each letter out in an inline block of its own, and on every change of strength
+styles those blocks and reads them back (`PaintedTextUtils`' layout `relayout`), so a letter is drawn as far along
+as the growth of the ones before it on its line carries it. That is a layout of the hidden copy per frame the
+point moves, per drawer — the price of matching plain `ProximityText`. Line breaks never move, because the text
+was wrapped for every letter at its widest. Drawers report where their letters sit at rest (`restLetters`) through
+the registry's `setBoxes`, and `ProximityText` measures nearness from those boxes offset by each drawer's position,
+so the push cannot feed back into what is measured. `Typewriter` gives no pushing name, so its letters still
+animate where they were laid out. The registry keeps its run of letters as the same array while the letters are unchanged, so a drawer reporting boxes is
+not read by `Typewriter` as the text changing.
 
 ### `PaintedText`: SVG text, wrapped by `Typewriter`'s utility and placed by the browser
 
@@ -16178,8 +16414,8 @@ where it sits and what paints it. They meet through `LetterDriverUtils.createReg
 drawer's letters as one text and answers `getLetterState(index)` per letter. It is the controls' rule — the wrapper
 owns behavior, the leaf owns the element — applied to text.
 
-**Letters are counted as `Typewriter` counts them**: a character by code point, a line break, and a whole element
-such as an image are one each. That keeps arrival weights and delays meaning the same thing with or without a
+**Letters are counted as `Typewriter` counts them**: a character by code point, a line break the text holds, and a
+whole element such as an image are one each; a break the wrapping inserted is not counted. That keeps arrival weights and delays meaning the same thing with or without a
 drawer. A break is reported as a line feed and a whole element as the object replacement character, so a wrapper
 that reads characters, as `ScrambleText` does, gets a text of the right length.
 
@@ -16392,6 +16628,38 @@ abstract being the one to hand it out.
 
 **The Playground gained an `Abstracts` category for it**, ahead of `Exotics`. Nothing that renders no DOM had
 a page before; the alternative was filing it under `Exotics`, which is the folder for things that do render.
+
+#### A point source: following something other than the pointer
+
+Settled with the user for every reader of the tracker at once, after `ProximityText` needed it. **A source is a point
+given as a fraction across a box, `PointSource = { ratio, element? }`.** Without an element the fraction is of each
+follower's own box; with one, of that element — so a light moving across a banner is "this fraction of the banner",
+handed to every card under it. Screen pixels were rejected because the consumer would then own the conversion and
+every scroll; each component's own box only was rejected because it cannot share one point between several.
+
+**The conversion happens inside `PointerTrackerUtils.observe`, on the same pass as the pointer's.** `observe` takes a
+getter for the source and asks it on every pass, so a source is measured with the same `getAdjustedBoundingClientRect`
+the follower is, in the same space, and keeps up with a scroll, a resize and a zoomed `Viewport` for free. A moving
+source raises no event the tracker can hear, so the bindings call `PointerTrackerUtils.refresh()` whenever the source
+they were handed changes; several in one frame cost one pass. Scroll and resize now invalidate unconditionally, since
+a supplied point needs re-measuring under them even before any pointer has been seen.
+
+**A source with no point is absent, and absent is what the pointer leaving the window already meant.**
+`getIsPresent(source, isPointerPresent)` answers with the source's `ratio !== undefined` when there is a source and
+with the shared presence otherwise, and the bindings hand that out as `getIsPointerPresent` — the name kept, because
+the abstract calls whatever it follows "the pointer" throughout (`PointerTracker`, `PointerReading`), and a supplied
+point is a stand-in for it. While a source has no point no reading is reported and the last one stands, which is the
+pointer's own resting rule.
+
+**Every reader takes one except `ScratchCard`**: the three pointer effects, `Reveal`, `GlassSurface`'s sheen,
+`PlacementBox`, the wheels through the `Wheel` primitive, `ProximityText`, and every tracked gradient and pattern
+sample. The user's call — "go big from the get-go". Scratching needs a press, and a supplied point has none.
+`GlassSurface` was not named in the backlog's list but is a reader, so it follows the rule rather than the list. The
+samples take theirs through their own interface: `TrackedElementDefs.getPointSource`, folded into the tracked
+gradient and pattern defs, which the host passes beside `getSize` and the colors.
+
+**`smoothingMs` stays on each component**, because smoothing what is drawn rather than the reading is what lets the
+pointer leaving the window glide too.
 
 #### The dock, the card stack and the tilt's sheen: three findings that outlived the examples
 
@@ -17139,7 +17407,7 @@ size, every row is pulled towards the vertical middle line, and the board is dra
 height with its top at the top of its box.
 
 **The root's box is the drawn size**, full width and `taper` times the height, so a tapered board reserves no
-empty band above itself — unlike backlog item 26, the drawing does not move, so the box can be exact. **The
+empty band above itself — unlike backlog item 25, the drawing does not move, so the box can be exact. **The
 transform sits on `tileBoardPlane`, a sizeless layer between the root and the rows, not on the root.** On the
 root it bent the root's own box as well: the box the board reported to the page was that shorter box pushed
 through the lean, 400 by 80 for a board drawn 600 by 240, so anything anchoring to the board or scrolling it
@@ -17523,6 +17791,56 @@ because a stroke sits half outside the shape and how thick it is belongs to the 
 **It fires no `onTransfer`, and it declines while a carry is going into or out of the grid.** The first is what makes calling it from `onTransfer` safe: the callback would otherwise call itself. The second keeps the aim and the landing from moving under a person mid-carry. By the time `onTransfer` runs, `CarrierUtils.end` has already cleared the carry, so the dashboard route is never declined. `getCompacted` returns unmoved items as the same objects, which is how the controller tells whether anything changed.
 
 **The drop announcement names the spot dropped on, not the spot compaction slides the item to.** The library speaks no English of its own, so saying the final spot is the consumer's job in a compacting grid.
+
+### `Wraparound`: one real copy that moves to wherever it is needed
+
+Built from `backlog.md`'s decided item. The core is `WraparoundUtils` (`createPlane` plus the pure geometry it
+uses); each framework draws the tiles from the plane's store.
+
+**The content is drawn once for real and as inert copies everywhere else.** The grid's cell is the content's own
+border box, measured; the window is the region. One offset moves a plane holding every tile, and the cells drawn
+are whichever intersect the window, plus the original's wherever it is — so the original is never unmounted, and
+whatever state it holds survives any amount of movement. Copies carry `inert` and `aria-hidden`, which is what
+keeps them out of Tab and out of a screen reader, and they are keyed by their cell so a copy is only built when its
+cell comes into view.
+
+**The original is not tied to a cell, and that is the whole keyboard and pointer story.** Every cell looks the
+same, so handing the original to another cell changes nothing on screen. Three things use that:
+
+- **Hover.** While a mouse moves over the window, the original moves to the cell under it, so hover styling and
+  clicks land on real elements. It does not do this while something inside the original shows a focus ring, since
+  that would carry the ring off screen under a keyboard user's eyes.
+- **A tap on a copy.** A press always moves the original under the pointer first; a tap that began on a copy
+  (which, being inert, was never the event's target) then clicks the element now under the pointer, which is the
+  matching real one. This is what makes touch work, where there is no hover.
+- **Focus.** Tabbing to an item, or an inner control walking its own focus (a `Mosaic` does), brings the item into
+  view: the original moves to whichever neighboring cell needs the least movement, then the plane glides just far
+  enough. An item already wholly in view keeps its cell, so a focus ring never jumps from one tile to another. A
+  focus that arrives from a press does not glide, since the pointer is already where the user is looking.
+
+**The window is a region the keys move.** `role="region"` with a required `ariaLabel` and `tabindex="0"`, because
+a moving area that only the pointer can move fails 2.1.1. With the window itself focused, the arrows move it the
+way a scrolled page moves (the right arrow shows more of what is to the right), the page keys by most of its
+height, and `Home` back to a tile's corner on the window's. Keys inside the content are left to the content.
+
+**Motion.** A drag past four pixels captures the pointer and suppresses the click it would end in; on release the
+plane coasts on the last 100ms of speed, decaying exponentially with `momentumMs` as the time constant, summed
+exactly rather than per frame so the coast is the same on any frame rate. The wheel moves it without easing and
+takes the scroll with it, which is the cost of a wheel route on something with no end. Keys and focus glide over
+`glideDurationMs`. Both durations at `0` are the reduced-motion route, as elsewhere in the library: the component
+reads no preference itself.
+
+**Text entry is left alone.** A press on an input, textarea, select or editable element does not start a drag,
+since dragging from one would take away selecting its text.
+
+**Copies are capped (`maxCopies`, 400).** Content tiny next to its window would otherwise ask for thousands; past
+the cap the far side is left uncovered.
+
+**The content has to have a size of its own.** Each tile is `width: max-content`, so an arrangement that takes its
+width from its parent — a `Mosaic` anchored by width — is given one by the consumer, as the Playground does. The
+gap the arrangement leaves at its edges shows at every join; the Playground's mosaic pads its tile by half the
+mosaic's gap so the joins match the gaps inside. `ImageMosaic`'s free side comes out flat, since every row is
+scaled to fill the width exactly, which is why it is the showcase.
 
 ### Playback is `playback` everywhere, and `Trail` lost its `play` and `pause`
 

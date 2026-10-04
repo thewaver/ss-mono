@@ -24,7 +24,7 @@ const DEFAULTS = TrackedGradientDefaults.BAND_DIAGONAL_DEFAULTS;
 
 const DiagonalBandGradient = (props: DiagonalBandGradientProps) => {
     const ref = SVGDefsReactUtils.useElementRef(props.element);
-    const { reading } = PointerTrackerReactUtils.usePointerReading(ref);
+    const { reading } = PointerTrackerReactUtils.usePointerReading(ref, false, props.defs.getPointSource?.());
 
     const angle = props.opts?.bandAngle ?? DEFAULTS.bandAngle;
     const travel =

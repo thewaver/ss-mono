@@ -21,7 +21,11 @@ export const band_diag_1 = (opts?: GradientBandOpts): TrackedGradientConfig => (
             gradientOrPattern: {
                 id: `gradient1-${id}`,
                 renderDefsElement: () => {
-                    const { getReading } = PointerTrackerSolidUtils.create(getRef ?? NO_REF);
+                    const { getReading } = PointerTrackerSolidUtils.create(
+                        getRef ?? NO_REF,
+                        undefined,
+                        defs.getPointSource,
+                    );
 
                     const angle = opts?.bandAngle ?? DEFAULTS.bandAngle;
 

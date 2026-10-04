@@ -77,23 +77,3 @@ describe("computeKeyStep", () => {
         });
     });
 });
-
-describe("computePlacedBounds", () => {
-    it("starts the box half its size back from the placement's center, in shares of the width", () => {
-        expect(
-            TabsUtils.computePlacedBounds({
-                leftShare: 0.5,
-                topShare: 0.25,
-                widthShare: 0.2,
-                heightShare: 0.1,
-                angle: 30,
-            }),
-        ).toEqual({
-            top: "20cqw",
-            left: "40cqw",
-            width: "20cqw",
-            height: "10cqw",
-            transform: "rotate(30deg)",
-        });
-    });
-});

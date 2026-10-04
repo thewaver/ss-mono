@@ -44,7 +44,11 @@
 <script lang="ts">
     let props: SpotGradientProps = $props();
 
-    const { getReading } = PointerTrackerSvelteUtils.create(() => props.element);
+    const { getReading } = PointerTrackerSvelteUtils.create(
+        () => props.element,
+        undefined,
+        () => props.defs.getPointSource?.(),
+    );
 
     const color = $derived(props.defs.colors.primary);
 

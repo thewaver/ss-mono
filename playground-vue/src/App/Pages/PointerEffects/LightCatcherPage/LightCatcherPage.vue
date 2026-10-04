@@ -12,6 +12,7 @@ import PageMeasureBox from "../../../PageComponents/MeasureBox/MeasureBox.vue";
 import PageProp from "../../../PageComponents/Prop/Prop.vue";
 import PagePropsPanel from "../../../PageComponents/PropsPanel/PagePropsPanel.vue";
 import PanelExample from "./Examples/Panel.vue";
+import PlacedLightExample from "./Examples/PlacedLight.vue";
 import RowExample from "./Examples/Row.vue";
 import type { LightCatcherExampleProps } from "./LightCatcherPageVue.types";
 
@@ -55,6 +56,14 @@ const examples: ExampleDefs[] = [
         readout: () =>
             "five of them side by side, each reading the pointer against its own box — drop the resting brightness below 1 and the row becomes a spotlight",
         path: `${EXAMPLES_ROOT}/Row.vue`,
+    },
+    {
+        key: "placed",
+        name: "A light placed by hand",
+        span: ROW_SPAN,
+        readout: () =>
+            "the slider puts one light across the whole row and every lamp answers to that same spot — the pointer is ignored, since a supplied point replaces it",
+        path: `${EXAMPLES_ROOT}/PlacedLight.vue`,
     },
 ];
 </script>
@@ -196,6 +205,12 @@ const examples: ExampleDefs[] = [
         <template #row>
             <PageMeasureBox is-filling :height="BOX_HEIGHT">
                 <RowExample v-bind="commonProps" />
+            </PageMeasureBox>
+        </template>
+
+        <template #placed>
+            <PageMeasureBox is-filling :height="BOX_HEIGHT">
+                <PlacedLightExample v-bind="commonProps" />
             </PageMeasureBox>
         </template>
     </PageExamples>

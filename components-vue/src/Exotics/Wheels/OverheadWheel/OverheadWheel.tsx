@@ -53,6 +53,7 @@ export const OverheadWheel = defineComponent(
             "onSpinEnd": null,
             "onMount": null,
             "markerDegrees": null,
+            "pointSource": null,
             "computeLayout": null,
             "computeEffect": null,
         }),

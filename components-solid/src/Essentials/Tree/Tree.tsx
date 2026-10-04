@@ -1,9 +1,17 @@
 import type { Accessor, JSX } from "solid-js";
-import { For, Index, Show, createEffect, createMemo, createSignal, createUniqueId } from "solid-js";
+import { For, Index, Show, createEffect, createMemo, createSignal, createUniqueId, onCleanup } from "solid-js";
 import { Dynamic } from "solid-js/web";
 
-import { FlattenerUtils, TreeUtils, TypeaheadUtils, TreeStyles as styles } from "@thewaver/ss-components";
+import {
+    FlattenerUtils,
+    TREE_DEFAULTS,
+    TreeUtils,
+    TypeaheadUtils,
+    FloaterStyles as floaterStyles,
+    TreeStyles as styles,
+} from "@thewaver/ss-components";
 
+import { FloaterSolidUtils } from "../../Abstracts/Floater/FloaterSolid.utils";
 import { NavigatorSolidUtils } from "../../Abstracts/Navigator/NavigatorSolid.utils";
 import { SignalMirrorSolidUtils } from "../../Abstracts/SignalMirror/SignalMirrorSolid.utils";
 import { TypeaheadSolidUtils } from "../../Abstracts/Typeahead/TypeaheadSolid.utils";
@@ -246,6 +254,86 @@ export const Tree = <T,>(props: TreeProps<T>) => {
 
     const getPlacementAt = (index: number) => getLayout()?.placements[index];
 
+    const [getNodeRefs, setNodeRefs] = createSignal<Map<T, HTMLElement>>(new Map(), { equals: false });
+    const [getHoveredValue, setHoveredValue] = createSignal<T>();
+    const [getFocusInValue, setFocusInValue] = createSignal<T>();
+
+    const recordNodeRef = (value: T, element: HTMLElement) => {
+        setNodeRefs((refs) => refs.set(value, element));
+
+        onCleanup(() =>
+            setNodeRefs((refs) => {
+                if (refs.get(value) === element) refs.delete(value);
+
+                return refs;
+            }),
+        );
+    };
+
+    const getFloaterTransitionDurationMs = createMemo(
+        () => access(props.floaterTransitionDurationMs) ?? TREE_DEFAULTS.floaterTransitionDurationMs,
+    );
+
+    const createFloater = (getIsEnabled: () => boolean, getValue: () => T | undefined) => {
+        const getRow = () => {
+            const value = getValue();
+
+            return value === undefined ? undefined : getFlatRows().find((row) => row.node.value === value);
+        };
+
+        return FloaterSolidUtils.create({
+            getIsEnabled,
+            getContainer: () => (getIsVirtualized() ? getSizerRef() : getRootRef()),
+            getTarget: () => {
+                const row = getRow();
+
+                return row === undefined ? undefined : getNodeRefs().get(row.node.value);
+            },
+            getLayout,
+            getPlacement: () => {
+                const row = getRow();
+
+                return row === undefined ? undefined : getPlacementAt(row.index);
+            },
+            getTransitionDurationMs: getFloaterTransitionDurationMs,
+        });
+    };
+
+    const selectionFloater = createFloater(
+        () => props.renderSelectionFloater !== undefined,
+        () => valueSignal[0](),
+    );
+
+    const highlightFloater = createFloater(
+        () => props.renderHighlightFloater !== undefined,
+        () => getHoveredValue() ?? getFocusInValue(),
+    );
+
+    const renderFloater = (
+        floater: ReturnType<typeof createFloater>,
+        renderContent: TreeProps<T>["renderSelectionFloater"],
+    ) => (
+        <Show when={floater.getIsRendered()}>
+            <div
+                ref={floater.setRef}
+                class={floaterStyles.floater}
+                style={{ ...floater.getBounds(), "transition-duration": `${getFloaterTransitionDurationMs()}ms` }}
+            >
+                {renderContent?.(floater.getVisibilityTarget, getFloaterTransitionDurationMs)}
+            </div>
+        </Show>
+    );
+
+    const renderFloaters = () => (
+        <>
+            {renderFloater(highlightFloater, props.renderHighlightFloater)}
+            {renderFloater(selectionFloater, props.renderSelectionFloater)}
+        </>
+    );
+
+    const findRowByTarget = (target: EventTarget | null) =>
+        target instanceof Element ? findRowById(target.closest('[role="treeitem"]')?.id) : undefined;
+
     const renderPlaced = (getRow: Accessor<TreeRow<T>>, element: JSX.Element) => (
         <Show when={getPlacementAt(getRow().index)} fallback={element}>
             {(getRect) => <PlacementItem placement={getRect}>{element}</PlacementItem>}
@@ -270,7 +358,10 @@ export const Tree = <T,>(props: TreeProps<T>) => {
                 })}
                 renderControl={(setElementRef, getRenderProps) => (
                     <TreeNodeItem
-                        ref={setElementRef}
+                        ref={(element) => {
+                            setElementRef(element);
+                            recordNodeRef(getRow().node.value, element);
+                        }}
                         id={() => getRowId(getRow())}
                         href={() => getRow().node.href}
                         level={() => getRow().depth + 1}
@@ -310,13 +401,23 @@ export const Tree = <T,>(props: TreeProps<T>) => {
     );
 
     const renderTiers = () => (
-        <Show when={getIsVirtualized()} fallback={renderRows(getRows)}>
+        <Show
+            when={getIsVirtualized()}
+            fallback={
+                <>
+                    {renderFloaters()}
+                    {renderRows(getRows)}
+                </>
+            }
+        >
             {renderWindowedRows()}
         </Show>
     );
 
     const renderWindowedRows = () => (
         <div ref={setSizerRef} class={styles.treeSizer} style={{ height: `${rowWindow.getTotalSize()}px` }}>
+            {renderFloaters()}
+
             <For each={rowWindow.getRows()}>
                 {(row) => (
                     <div
@@ -341,12 +442,18 @@ export const Tree = <T,>(props: TreeProps<T>) => {
     return (
         <div
             ref={setRootRef}
+            class={styles.treeRoot}
             role="tree"
             aria-label={access(props.ariaLabel)}
             onKeyDown={handleKeyDown}
             onFocusIn={(e) => {
                 lastFocusedValue = findRowById((e.target as HTMLElement).id)?.node.value;
+
+                setFocusInValue(() => findRowByTarget(e.target)?.node.value);
             }}
+            onFocusOut={() => setFocusInValue(undefined)}
+            onPointerOver={(e) => setHoveredValue(() => findRowByTarget(e.target)?.node.value)}
+            onPointerLeave={() => setHoveredValue(undefined)}
         >
             <Show when={getLayout()} fallback={renderTiers()}>
                 {(getResolved) => (

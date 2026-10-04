@@ -108,6 +108,8 @@ export type SelectCompositeProps<T> = Omit<InteractionWrapperProps<SelectFlags>,
     "computeEstimatedOptionHeight"?: (index: number) => number;
     /** Guesses how tall a group heading will be before it is drawn, for the same reason. */
     "computeEstimatedGroupHeight"?: (index: number) => number;
+    /** How long either marker takes to slide from one option to the next, and to fade. */
+    "floaterTransitionDurationMs"?: number;
     /** Runs when the reader reaches the end of the list, for a consumer fetching more options as they scroll. */
     "onReachEnd"?: () => void;
     /** Names the clear control for assistive technology, where what it draws has no text of its own. */
@@ -149,6 +151,20 @@ export type SelectPresetSlots<T> = Pick<InteractionWrapperSlots<SelectFlags>, "r
     renderOption: (props: { option: SelectOption<T>; flags: InteractionFlags<SelectOptionFlags> }) => VNodeChild;
     /** Draws one group heading. */
     renderGroup?: (props: { group: SelectOptionGroup<T>; flags: SelectGroupFlags }) => VNodeChild;
+    /**
+     * Draws the marker that slides to the selected option in the open list, behind it. The fade is handed in rather
+     * than applied: the marker fades out when nothing is selected, and in a list that only draws what is on screen
+     * it fades out while the selected option is scrolled away and back in when it returns. Where several options
+     * are selected, it follows the first of them.
+     */
+    renderSelectionFloater?: (props: { visibilityTarget: 0 | 1; transitionDurationMs: number }) => VNodeChild;
+    /**
+     * Draws the marker that slides to the highlighted option in the open list — the one the pointer or the arrow
+     * keys are on — behind it, drawn under the selection's marker where both are given. It fades out while nothing
+     * is highlighted, and in a list that only draws what is on screen, while the highlighted option is scrolled
+     * away.
+     */
+    renderHighlightFloater?: (props: { visibilityTarget: 0 | 1; transitionDurationMs: number }) => VNodeChild;
 };
 
 export type SelectCompositeSlots<T> = SelectPresetSlots<T> & {

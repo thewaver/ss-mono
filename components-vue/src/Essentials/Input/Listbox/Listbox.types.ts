@@ -66,6 +66,13 @@ export type ListboxOptionItemProps = InteractionControlProps<SelectOptionFlags> 
     onFocus?: () => void;
     /** Runs when this option is picked. */
     onSelect: () => void;
+    /** Where this option falls among every option in the list, groups flattened, counting from zero. */
+    flatIndex?: number;
+    /**
+     * Records this option's element with a way to read its place in the list, for the markers that slide to it, until
+     * the returned function is called as the option unmounts.
+     */
+    onRegister?: (element: HTMLElement, getFlatIndex: () => number) => () => void;
 };
 
 export type ListboxOptionsProps<T> = {
@@ -87,6 +94,8 @@ export type ListboxOptionsProps<T> = {
     computeEstimatedOptionHeight?: (index: number) => number;
     /** Guesses how tall a group heading will be before it is drawn, for the same reason. */
     computeEstimatedGroupHeight?: (index: number) => number;
+    /** How long either marker takes to slide from one option to the next, and to fade. */
+    floaterTransitionDurationMs?: number;
     /** The list's state, from `ListboxVueUtils.useCursor`: what is highlighted, and how the keyboard walks it. */
     cursor: ListboxCursor<T>;
     /** Whether a given value counts as picked, for a consumer whose values are not compared by identity. */
@@ -98,6 +107,19 @@ export type ListboxOptionsSlots<T> = {
     renderOption: (props: { option: SelectOption<T>; flags: InteractionFlags<SelectOptionFlags> }) => VNodeChild;
     /** Draws one group heading. */
     renderGroup?: (props: { group: SelectOptionGroup<T>; flags: SelectGroupFlags }) => VNodeChild;
+    /**
+     * Draws the marker that slides to the selected option, behind it. The fade is handed in rather than applied: the
+     * marker fades out when nothing is selected, and in a list that only draws what is on screen it fades out while
+     * the selected option is scrolled away and back in when it returns. Where several options are selected, it follows
+     * the first of them.
+     */
+    renderSelectionFloater?: (props: { visibilityTarget: 0 | 1; transitionDurationMs: number }) => VNodeChild;
+    /**
+     * Draws the marker that slides to the highlighted option — the one the pointer or the arrow keys are on — behind
+     * it, drawn under the selection's marker where both are given. It fades out while nothing is highlighted, and in
+     * a list that only draws what is on screen, while the highlighted option is scrolled away.
+     */
+    renderHighlightFloater?: (props: { visibilityTarget: 0 | 1; transitionDurationMs: number }) => VNodeChild;
 };
 
 export type ListboxCompositeProps<T> = {
@@ -128,6 +150,8 @@ export type ListboxCompositeProps<T> = {
     computeEstimatedOptionHeight?: (index: number) => number;
     /** Guesses how tall a group heading will be before it is drawn, for the same reason. */
     computeEstimatedGroupHeight?: (index: number) => number;
+    /** How long either marker takes to slide from one option to the next, and to fade. */
+    floaterTransitionDurationMs?: number;
     /** The options, in the order they are shown. An entry carrying children becomes a group. */
     options: SelectItem<T>[];
     /** Which options are currently picked. */
@@ -152,6 +176,19 @@ export type ListboxCompositeSlots<T> = {
     renderOption: (props: { option: SelectOption<T>; flags: InteractionFlags<SelectOptionFlags> }) => VNodeChild;
     /** Draws one group heading. */
     renderGroup?: (props: { group: SelectOptionGroup<T>; flags: SelectGroupFlags }) => VNodeChild;
+    /**
+     * Draws the marker that slides to the selected option, behind it. The fade is handed in rather than applied: the
+     * marker fades out when nothing is selected, and in a list that only draws what is on screen it fades out while
+     * the selected option is scrolled away and back in when it returns. Where several options are selected, it follows
+     * the first of them.
+     */
+    renderSelectionFloater?: (props: { visibilityTarget: 0 | 1; transitionDurationMs: number }) => VNodeChild;
+    /**
+     * Draws the marker that slides to the highlighted option — the one the pointer or the arrow keys are on — behind
+     * it, drawn under the selection's marker where both are given. It fades out while nothing is highlighted, and in
+     * a list that only draws what is on screen, while the highlighted option is scrolled away.
+     */
+    renderHighlightFloater?: (props: { visibilityTarget: 0 | 1; transitionDurationMs: number }) => VNodeChild;
 };
 
 export type ListboxPresetProps<T> = Omit<

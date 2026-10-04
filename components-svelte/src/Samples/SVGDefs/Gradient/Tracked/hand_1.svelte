@@ -61,7 +61,11 @@
 <script lang="ts">
     let props: HandPartProps = $props();
 
-    const { getReading, getIsPointerPresent } = PointerTrackerSvelteUtils.create(() => props.element);
+    const { getReading, getIsPointerPresent } = PointerTrackerSvelteUtils.create(
+        () => props.element,
+        undefined,
+        () => props.defs.getPointSource?.(),
+    );
 
     const sweepArc = $derived(props.opts?.sweepArc ?? DEFAULTS.sweepArc);
 

@@ -28,7 +28,7 @@
 </script>
 
 <PageMeasureBox {width} padding={MEASURE_BOX_PADDING}>
-    <TypedExample {...props} animationName={ARRIVAL_EFFECT_NAMES[arrivalEffect]} />
+    <TypedExample {...props} computeAnimationName={() => ARRIVAL_EFFECT_NAMES[arrivalEffect]} />
 </PageMeasureBox>
 
 <PageExampleKnobs>

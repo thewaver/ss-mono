@@ -1,0 +1,100 @@
+<script lang="ts">
+    import { PROXIMITY_TEXT_DEFAULTS } from "@thewaver/ss-components-svelte";
+    import { ProximityTextKnobs } from "@thewaver/ss-playground/App/Knobs/ProximityTexts.const";
+
+    import type { ExampleDefs } from "../../PageComponents/Examples/Examples.types";
+    import PageExamples from "../../PageComponents/Examples/PageExamples.svelte";
+    import PageCheckField from "../../PageComponents/Field/PageCheckField.svelte";
+    import PageNumberField from "../../PageComponents/Field/PageNumberField.svelte";
+    import PageMeasureBox from "../../PageComponents/MeasureBox/MeasureBox.svelte";
+    import PageProp from "../../PageComponents/Prop/Prop.svelte";
+    import PagePropsPanel from "../../PageComponents/PropsPanel/PagePropsPanel.svelte";
+    import PaintedExample from "./Examples/Painted.svelte";
+    import PointerExample from "./Examples/Pointer.svelte";
+    import WaveExample from "./Examples/Wave.svelte";
+    import type { ProximityTextExampleProps } from "./ProximityTextPageSvelte.types";
+
+    const EXAMPLES_ROOT = "/src/App/Pages/ProximityTextPage/Examples";
+    const BOX_WIDTH = 360;
+    const WIDE_SPAN = 2;
+
+    let reachPx = $state(PROXIMITY_TEXT_DEFAULTS.reachPx);
+    let isDisabled = $state(ProximityTextKnobs.STARTING_IS_DISABLED);
+
+    const commonProps: ProximityTextExampleProps = $derived({ reachPx, isDisabled });
+
+    const examples: ExampleDefs[] = [
+        {
+            key: "pointer",
+            name: "Following the pointer",
+            span: WIDE_SPAN,
+            readout: () =>
+                "each letter plays its keyframes held at how near the pointer is; the lines were wrapped for every letter at its heaviest, so the spare room sits at the end of each line while they rest",
+            component: pointerExample,
+            path: `${EXAMPLES_ROOT}/Pointer.svelte`,
+        },
+        {
+            key: "wave",
+            name: "A weight wave",
+            span: WIDE_SPAN,
+            readout: () =>
+                "a point supplied in place of the pointer, moved across the line on a clock; Stop is the way to halt it that a motion running on its own owes the reader",
+            component: waveExample,
+            path: `${EXAMPLES_ROOT}/Wave.svelte`,
+        },
+        {
+            key: "painted",
+            name: "Painted",
+            span: WIDE_SPAN,
+            readout: () =>
+                "PaintedText inside draws the letters; each grows and pushes the rest of its line along, as plain text does, while the line breaks stay put",
+            component: paintedExample,
+            path: `${EXAMPLES_ROOT}/Painted.svelte`,
+        },
+    ];
+</script>
+
+{#snippet pointerExample()}
+    <PageMeasureBox width={BOX_WIDTH}>
+        <PointerExample {...commonProps} />
+    </PageMeasureBox>
+{/snippet}
+
+{#snippet waveExample()}
+    <PageMeasureBox width={BOX_WIDTH}>
+        <WaveExample {...commonProps} />
+    </PageMeasureBox>
+{/snippet}
+
+{#snippet paintedExample()}
+    <PageMeasureBox width={BOX_WIDTH}>
+        <PaintedExample {...commonProps} />
+    </PageMeasureBox>
+{/snippet}
+
+<PagePropsPanel scope={"global"}>
+    <PageProp
+        itemKey={"reachPx"}
+        label={"Reach (px)"}
+        hint={"How far from a letter's middle the point still reaches it. Past it, the letter rests."}
+    >
+        <PageNumberField
+            value={reachPx}
+            min={ProximityTextKnobs.MIN_REACH_PX}
+            max={ProximityTextKnobs.MAX_REACH_PX}
+            step={ProximityTextKnobs.REACH_STEP_PX}
+            ariaLabel={"Reach in pixels"}
+            onInput={(value) => (reachPx = value)}
+        />
+    </PageProp>
+
+    <PageProp
+        itemKey={"isDisabled"}
+        label={"Disabled"}
+        hint={"Rests every letter and stops following the point. It is what a page honoring a reduced-motion preference passes."}
+    >
+        <PageCheckField value={isDisabled} ariaLabel={"Disabled"} onChange={(value) => (isDisabled = value)} />
+    </PageProp>
+</PagePropsPanel>
+
+<PageExamples items={examples} />

@@ -55,8 +55,17 @@ export type TabsProps<T> = AccessorProps<{
     linkComponent?: Component<TabLinkProps>;
     /** Draws the rail the tabs sit against. */
     renderGutter?: () => JSX.Element;
-    /** Draws the marker that follows the selected tab. The fade is handed in rather than applied. */
-    renderFloater?: (getVisibilityTarget: () => 0 | 1, getTransitionDurationMs: () => number) => JSX.Element;
+    /**
+     * Draws the marker that slides to the selected tab, behind it. The fade is handed in rather than applied: the
+     * marker fades out when nothing is selected and in when something is.
+     */
+    renderSelectionFloater?: (getVisibilityTarget: () => 0 | 1, getTransitionDurationMs: () => number) => JSX.Element;
+    /**
+     * Draws the marker that slides to the tab under the pointer, or the one holding focus, behind it — a hover pill
+     * gliding along the strip. It fades out when neither is on a tab. Drawn under the selection's marker where both
+     * are given.
+     */
+    renderHighlightFloater?: (getVisibilityTarget: () => 0 | 1, getTransitionDurationMs: () => number) => JSX.Element;
 }> & {
     /** The tabs, in the order they are shown. */
     tabs: MaybeAccessor<Tab<T>[]>;

@@ -1,22 +1,13 @@
-import {
-    Fragment,
-    type KeyboardEvent,
-    type MouseEvent,
-    useCallback,
-    useEffect,
-    useLayoutEffect,
-    useMemo,
-    useRef,
-    useState,
-} from "react";
+import { Fragment, type KeyboardEvent, type MouseEvent, useCallback, useMemo, useRef, useState } from "react";
 
-import { TABS_DEFAULTS, type TabsFloaterBounds, TabsStyles, TabsUtils } from "@thewaver/ss-components";
+import { FloaterStyles, TABS_DEFAULTS, TabsStyles, TabsUtils } from "@thewaver/ss-components";
 
-import { ElementFaderReactUtils } from "../../Abstracts/ElementFader/ElementFaderReact.utils";
+import { FloaterReactUtils } from "../../Abstracts/Floater/FloaterReact.utils";
 import { NavigatorReactUtils } from "../../Abstracts/Navigator/NavigatorReact.utils";
 import { InteractionWrapper } from "../../Primitives/InteractionWrapper/InteractionWrapper";
 import { PlacementBox } from "../../Primitives/PlacementBox/PlacementBox";
 import { PlacementItem } from "../../Primitives/PlacementItem/PlacementItem";
+import { useElement } from "../../Utils/refUtils";
 import type { TabPanelProps, TabsItemProps, TabsProps } from "./Tabs.types";
 
 export const TabPanel = (props: TabPanelProps) => (
@@ -66,11 +57,11 @@ const TabsItem = <T,>(props: TabsItemProps<T>) => {
 
 export const Tabs = <T,>(props: TabsProps<T>) => {
     const rootRef = useRef<HTMLDivElement | null>(null);
-    const floaterRef = useRef<HTMLDivElement | null>(null);
 
     const [itemElements, setItemElements] = useState<(HTMLElement | undefined)[]>([]);
     const [focusedValue, setFocusedValue] = useState<T | undefined>();
-    const [measuredBounds, setMeasuredBounds] = useState<TabsFloaterBounds>();
+    const [hoveredIndex, setHoveredIndex] = useState<number>();
+    const [focusedIndex, setFocusedIndex] = useState<number>();
     const [previousSelectedValue, setPreviousSelectedValue] = useState(props.selectedValue);
 
     if (previousSelectedValue !== props.selectedValue) {
@@ -91,35 +82,31 @@ export const Tabs = <T,>(props: TabsProps<T>) => {
 
     const selectedIndex = TabsUtils.computeSelectedIndex(tabs, props.selectedValue);
     const rovingIndex = TabsUtils.computeRovingIndex(tabs, props.selectedValue, focusedValue);
-    const selectedPlacement = layout?.placements[selectedIndex];
+    const highlightIndex = hoveredIndex ?? focusedIndex;
 
-    const floaterBounds =
-        layout === undefined
-            ? measuredBounds
-            : selectedPlacement === undefined
-              ? undefined
-              : TabsUtils.computePlacedBounds(selectedPlacement);
+    const root = useElement(rootRef);
 
-    const isFloaterShown = selectedIndex >= 0 && floaterBounds !== undefined;
+    const useTabFloater = (isEnabled: boolean, index: number | undefined) => {
+        const isItem = index !== undefined && index >= 0;
 
-    const floaterFader = ElementFaderReactUtils.useFader(isFloaterShown, { transitionDurationMs, ref: floaterRef });
+        return FloaterReactUtils.useFloater({
+            isEnabled,
+            container: layout === undefined ? root : undefined,
+            target: isItem ? itemElements[index] : undefined,
+            layout,
+            placement: isItem ? layout?.placements[index] : undefined,
+            transitionDurationMs,
+        });
+    };
 
-    useEffect(() => {
-        if (floaterFader.isVisible) return;
+    const selectionFloater = useTabFloater(props.renderSelectionFloater !== undefined, selectedIndex);
 
-        setMeasuredBounds(undefined);
-    }, [floaterFader.isVisible]);
+    const highlightFloater = useTabFloater(props.renderHighlightFloater !== undefined, highlightIndex);
 
-    const hasFloater = props.renderFloater !== undefined;
-    const selectedItem = itemElements[selectedIndex];
+    const findItemIndex = (target: EventTarget | null) =>
+        target instanceof Node ? itemElements.findIndex((item) => item?.contains(target) ?? false) : -1;
 
-    useLayoutEffect(() => {
-        const root = rootRef.current;
-
-        if (!hasFloater || layout !== undefined || !root || !selectedItem) return;
-
-        return TabsUtils.observeSelectedBounds(root, selectedItem, setMeasuredBounds);
-    }, [hasFloater, layout, selectedItem]);
+    const toIndex = (index: number) => (index < 0 ? undefined : index);
 
     const latestItemElementsRef = useRef<(HTMLElement | undefined)[]>([]);
 
@@ -190,21 +177,24 @@ export const Tabs = <T,>(props: TabsProps<T>) => {
         );
     };
 
-    const isFloaterRendered = hasFloater && floaterFader.isVisible && floaterBounds !== undefined;
-
-    const floater = isFloaterRendered && (
-        <div
-            ref={floaterRef}
-            className={TabsStyles.tabsFloater}
-            style={{ ...floaterBounds, transitionDuration: `${transitionDurationMs}ms` }}
-        >
-            {props.renderFloater!(floaterFader.transitionTarget, transitionDurationMs)}
-        </div>
-    );
+    const renderFloater = (
+        floater: ReturnType<typeof useTabFloater>,
+        renderContent: TabsProps<T>["renderSelectionFloater"],
+    ) =>
+        floater.isRendered && (
+            <div
+                ref={floater.ref}
+                className={FloaterStyles.floater}
+                style={{ ...floater.bounds, transitionDuration: `${transitionDurationMs}ms` }}
+            >
+                {renderContent?.(floater.visibilityTarget, transitionDurationMs)}
+            </div>
+        );
 
     const content = (
         <>
-            {floater}
+            {renderFloater(highlightFloater, props.renderHighlightFloater)}
+            {renderFloater(selectionFloater, props.renderSelectionFloater)}
             {tabs.map(renderTabAt)}
         </>
     );
@@ -218,6 +208,10 @@ export const Tabs = <T,>(props: TabsProps<T>) => {
             aria-label={props.ariaLabel}
             aria-orientation={orientation}
             onKeyDown={handleKeyDown}
+            onPointerOver={(e) => setHoveredIndex(toIndex(findItemIndex(e.target)))}
+            onPointerLeave={() => setHoveredIndex(undefined)}
+            onFocus={(e) => setFocusedIndex(toIndex(findItemIndex(e.target)))}
+            onBlur={() => setFocusedIndex(undefined)}
         >
             {props.renderGutter && <div className={TabsStyles.tabsGutter}>{props.renderGutter()}</div>}
 

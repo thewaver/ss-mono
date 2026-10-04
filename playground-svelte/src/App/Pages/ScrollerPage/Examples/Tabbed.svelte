@@ -35,7 +35,7 @@
                 <PageTabGutter orientation={"horizontal"} />
             {/snippet}
 
-            {#snippet renderFloater(visibilityTarget, transitionDurationMs)}
+            {#snippet renderSelectionFloater(visibilityTarget, transitionDurationMs)}
                 <PageTabFloater orientation={"horizontal"} {visibilityTarget} {transitionDurationMs} />
             {/snippet}
 

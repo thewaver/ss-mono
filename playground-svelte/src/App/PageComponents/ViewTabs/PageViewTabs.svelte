@@ -46,7 +46,7 @@
             <PageTabGutter orientation={TAB_ORIENTATION} />
         {/snippet}
 
-        {#snippet renderFloater(visibilityTarget, transitionDurationMs)}
+        {#snippet renderSelectionFloater(visibilityTarget, transitionDurationMs)}
             <PageTabFloater orientation={TAB_ORIENTATION} {visibilityTarget} {transitionDurationMs} />
         {/snippet}
 

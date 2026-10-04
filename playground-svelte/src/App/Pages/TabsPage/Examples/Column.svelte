@@ -26,7 +26,7 @@
         selectedValue={props.selectedValue}
         onSelectionChange={props.onSelectionChange}
     >
-        {#snippet renderFloater(visibilityTarget, transitionDurationMs)}
+        {#snippet renderSelectionFloater(visibilityTarget, transitionDurationMs)}
             <PageTabFloater orientation={"vertical"} {visibilityTarget} {transitionDurationMs} />
         {/snippet}
 

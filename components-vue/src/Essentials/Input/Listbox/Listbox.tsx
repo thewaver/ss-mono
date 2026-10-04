@@ -1,6 +1,7 @@
 import { type SlotsType, type VNodeChild, computed, defineComponent, shallowRef, useId, watch } from "vue";
 
 import {
+    FloaterStyles,
     LISTBOX_DEFAULTS,
     ListboxStyles,
     ListboxUtils,
@@ -10,6 +11,7 @@ import {
 } from "@thewaver/ss-components";
 
 import { ElementObserverVueUtils } from "../../../Abstracts/ElementObserver/ElementObserverVue.utils";
+import { FloaterVueUtils } from "../../../Abstracts/Floater/FloaterVue.utils";
 import { NavigatorVueUtils } from "../../../Abstracts/Navigator/NavigatorVue.utils";
 import { VirtualizerVueUtils } from "../../../Abstracts/Virtualizer/VirtualizerVue.utils";
 import { InteractionWrapper } from "../../../Primitives/InteractionWrapper/InteractionWrapper";
@@ -37,6 +39,10 @@ const EMPTY_SELECTION: never[] = [];
 const ListboxOptionItem = defineComponent(
     (props: ListboxOptionItemProps, { slots }: SlotsContext<InteractionControlSlots<SelectOptionFlags>>) => {
         const elementRef = shallowRef<HTMLDivElement>();
+
+        watchAfterRender([elementRef], ([element]) =>
+            element ? props.onRegister?.(element, () => props.flatIndex ?? -1) : undefined,
+        );
 
         watchAfterRender(
             [() => props.flags.isHighlighted ?? false, () => props.isSelfScrolling, () => props.focusModel],
@@ -82,6 +88,8 @@ const ListboxOptionItem = defineComponent(
             focusModel: null,
             onFocus: null,
             onSelect: null,
+            flatIndex: null,
+            onRegister: null,
         }),
     },
 );
@@ -90,7 +98,34 @@ export const ListboxOptions = defineComponent(
     <T,>(props: ListboxOptionsProps<T>, { slots }: SlotsContext<ListboxOptionsSlots<T>>) => {
         const endMarkerRef = shallowRef<HTMLDivElement>();
         const sizerRef = shallowRef<HTMLDivElement>();
+        const optionsRef = shallowRef<HTMLDivElement>();
         const optionsGeneration = shallowRef(0);
+        const optionRefsVersion = shallowRef(0);
+        const hoveredIndex = shallowRef<number>();
+
+        const optionRefs = new Map<HTMLElement, () => number>();
+
+        const registerOption = (element: HTMLElement, getFlatIndex: () => number) => {
+            optionRefs.set(element, getFlatIndex);
+            optionRefsVersion.value += 1;
+
+            return () => {
+                optionRefs.delete(element);
+                optionRefsVersion.value += 1;
+            };
+        };
+
+        const findOptionRef = (index: number) => {
+            void optionRefsVersion.value;
+
+            return [...optionRefs].find(([, getFlatIndex]) => getFlatIndex() === index)?.[0];
+        };
+
+        const findOptionIndex = (target: EventTarget | null) =>
+            target instanceof Node ? [...optionRefs].find(([element]) => element.contains(target))?.[1]() : undefined;
+
+        const getFloaterTransitionDurationMs = () =>
+            props.floaterTransitionDurationMs ?? LISTBOX_DEFAULTS.floaterTransitionDurationMs;
 
         const reachEndGuard = ListboxUtils.createReachEndGuard<SelectItem<T>[]>();
 
@@ -144,6 +179,46 @@ export const ListboxOptions = defineComponent(
             },
         );
 
+        const selectedIndex = computed(() => {
+            const index = SelectUtils.getFlatOptions(props.cursor.options.value).findIndex((option) =>
+                props.computeIsSelected(option.value),
+            );
+
+            return index < 0 ? undefined : index;
+        });
+
+        const useOptionFloater = (isEnabled: () => boolean, getIndex: () => number | undefined) =>
+            FloaterVueUtils.useFloater({
+                isEnabled,
+                container: () => (getIsVirtualized() ? sizerRef.value : optionsRef.value),
+                target: () => {
+                    const index = getIndex();
+
+                    return index === undefined ? undefined : findOptionRef(index);
+                },
+                transitionDurationMs: getFloaterTransitionDurationMs,
+            });
+
+        const selectionFloater = useOptionFloater(
+            () => slots.renderSelectionFloater !== undefined,
+            () => selectedIndex.value,
+        );
+
+        const highlightFloater = useOptionFloater(
+            () => slots.renderHighlightFloater !== undefined,
+            () =>
+                hoveredIndex.value ??
+                (props.cursor.isHighlightShown.value ? props.cursor.highlightedIndex.value : undefined),
+        );
+
+        const handleOptionsPointerOver = (e: PointerEvent) => {
+            hoveredIndex.value = findOptionIndex(e.target);
+        };
+
+        const handleOptionsPointerLeave = () => {
+            hoveredIndex.value = undefined;
+        };
+
         let hadFocus = false;
 
         watch(
@@ -171,6 +246,39 @@ export const ListboxOptions = defineComponent(
             const isVirtualized = getIsVirtualized();
             const rows = cursor.rows.value;
             const highlightedIndex = cursor.highlightedIndex.value;
+            const floaterTransitionDurationMs = getFloaterTransitionDurationMs();
+
+            const renderFloater = (
+                floater: typeof selectionFloater,
+                renderContent: ListboxOptionsSlots<T>["renderSelectionFloater"],
+            ) =>
+                floater.isRendered.value && (
+                    <div
+                        ref={floater.setRef}
+                        class={FloaterStyles.floater}
+                        style={{ ...floater.bounds.value, transitionDuration: `${floaterTransitionDurationMs}ms` }}
+                    >
+                        {callSlot(renderContent, {
+                            visibilityTarget: floater.visibilityTarget.value,
+                            transitionDurationMs: floaterTransitionDurationMs,
+                        })}
+                    </div>
+                );
+
+            const renderFloaters = () => [
+                renderFloater(highlightFloater, slots.renderHighlightFloater),
+                renderFloater(selectionFloater, slots.renderSelectionFloater),
+            ];
+
+            const renderEndMarker = () =>
+                hasMoreOptions && (
+                    <div
+                        key={optionsGeneration.value}
+                        ref={endMarkerRef}
+                        class={ListboxStyles.listboxEndMarker}
+                        aria-hidden="true"
+                    />
+                );
 
             const renderGroupHeading = (group: SelectOptionGroup<T>) =>
                 callSlot(slots.renderGroup, {
@@ -205,6 +313,8 @@ export const ListboxOptions = defineComponent(
                                     flags={flags}
                                     onFocus={isRoving ? () => cursor.highlight(option.value) : undefined}
                                     onSelect={() => cursor.pick(option.value)}
+                                    flatIndex={flatIndex}
+                                    onRegister={registerOption}
                                 >
                                     {
                                         {
@@ -219,22 +329,35 @@ export const ListboxOptions = defineComponent(
                 </InteractionWrapper>
             );
 
-            const renderMountedOptions = () =>
-                cursor.options.value.map((item, index) => {
-                    const offset = cursor.itemRows.value[index].entryOffset;
+            const renderMountedOptions = () => (
+                <div
+                    ref={optionsRef}
+                    class={[ListboxStyles.listboxOptions, isHorizontal && ListboxStyles.listboxHorizontal]}
+                    role="presentation"
+                    onPointerover={handleOptionsPointerOver}
+                    onPointerleave={handleOptionsPointerLeave}
+                >
+                    {renderFloaters()}
 
-                    if (!SelectUtils.getIsGroup(item)) return renderOptionSlot(item, offset, index);
+                    {cursor.options.value.map((item, index) => {
+                        const offset = cursor.itemRows.value[index].entryOffset;
 
-                    return (
-                        <div key={index} role="group" aria-label={item.label}>
-                            {renderGroupHeading(item)}
+                        if (!SelectUtils.getIsGroup(item)) return renderOptionSlot(item, offset, index);
 
-                            {item.options.map((option, groupIndex) =>
-                                renderOptionSlot(option, offset + groupIndex, groupIndex),
-                            )}
-                        </div>
-                    );
-                });
+                        return (
+                            <div key={index} role="group" aria-label={item.label}>
+                                {renderGroupHeading(item)}
+
+                                {item.options.map((option, groupIndex) =>
+                                    renderOptionSlot(option, offset + groupIndex, groupIndex),
+                                )}
+                            </div>
+                        );
+                    })}
+
+                    {renderEndMarker()}
+                </div>
+            );
 
             const renderWindowedRow = (row: VirtualizerRow): VNodeChild => {
                 const source = rows[row.index];
@@ -258,7 +381,11 @@ export const ListboxOptions = defineComponent(
                     ref={sizerRef}
                     class={ListboxStyles.listboxSizer}
                     style={{ height: `${rowWindow.totalSize.value}px` }}
+                    onPointerover={handleOptionsPointerOver}
+                    onPointerleave={handleOptionsPointerLeave}
                 >
+                    {renderFloaters()}
+
                     {ListboxUtils.getWindowedRuns(rowWindow.rows.value, rows).flatMap((run) =>
                         run.group ? (
                             <div key={`group-${run.groupIndex}`} role="group" aria-label={run.group.label}>
@@ -271,19 +398,14 @@ export const ListboxOptions = defineComponent(
                 </div>
             );
 
-            return (
+            return isVirtualized ? (
                 <>
-                    {isVirtualized ? renderWindowedOptions() : renderMountedOptions()}
+                    {renderWindowedOptions()}
 
-                    {hasMoreOptions && (
-                        <div
-                            key={optionsGeneration.value}
-                            ref={endMarkerRef}
-                            class={ListboxStyles.listboxEndMarker}
-                            aria-hidden="true"
-                        />
-                    )}
+                    {renderEndMarker()}
                 </>
+            ) : (
+                renderMountedOptions()
             );
         };
     },
@@ -297,6 +419,7 @@ export const ListboxOptions = defineComponent(
             onReachEnd: null,
             computeEstimatedOptionHeight: null,
             computeEstimatedGroupHeight: null,
+            floaterTransitionDurationMs: null,
             cursor: null,
             computeIsSelected: null,
         }),
@@ -334,7 +457,6 @@ export const ListboxComposite = defineComponent(
                 <div
                     ref={rootRef}
                     id={cursor.listboxId.value}
-                    class={orientation === "horizontal" ? ListboxStyles.listboxHorizontal : undefined}
                     role="listbox"
                     aria-label={props.ariaLabel}
                     aria-multiselectable={isMultiple || undefined}
@@ -356,12 +478,15 @@ export const ListboxComposite = defineComponent(
                         computeEstimatedOptionHeight={props.computeEstimatedOptionHeight}
                         computeEstimatedGroupHeight={props.computeEstimatedGroupHeight}
                         computeIsSelected={props.computeIsSelected}
+                        floaterTransitionDurationMs={props.floaterTransitionDurationMs}
                         onReachEnd={props.onReachEnd}
                     >
                         {
                             {
                                 renderOption: slots.renderOption,
                                 renderGroup: slots.renderGroup,
+                                renderSelectionFloater: slots.renderSelectionFloater,
+                                renderHighlightFloater: slots.renderHighlightFloater,
                             } satisfies Partial<ListboxOptionsSlots<T>>
                         }
                     </ListboxOptions>
@@ -382,6 +507,7 @@ export const ListboxComposite = defineComponent(
             onReachEnd: null,
             computeEstimatedOptionHeight: null,
             computeEstimatedGroupHeight: null,
+            floaterTransitionDurationMs: null,
             options: null,
             selectedOptions: null,
             computeIsSelected: null,
@@ -422,6 +548,8 @@ export const Listbox = defineComponent(
                     {
                         renderOption: slots.renderOption,
                         renderGroup: slots.renderGroup,
+                        renderSelectionFloater: slots.renderSelectionFloater,
+                        renderHighlightFloater: slots.renderHighlightFloater,
                     } satisfies Partial<ListboxCompositeSlots<T>>
                 }
             </ListboxComposite>
@@ -439,6 +567,7 @@ export const Listbox = defineComponent(
             "onReachEnd": null,
             "computeEstimatedOptionHeight": null,
             "computeEstimatedGroupHeight": null,
+            "floaterTransitionDurationMs": null,
             "options": null,
             "computeCustomText": null,
             "value": null,

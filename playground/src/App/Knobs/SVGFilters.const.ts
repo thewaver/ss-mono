@@ -65,6 +65,14 @@ export namespace SVGFilterKnobs {
         export const STARTING_CHANNEL = 1;
     }
 
+    export namespace Pixelate {
+        export const MIN_SIZE = 1;
+        export const MAX_SIZE = 40;
+        export const SIZE_STEP = 1;
+
+        export const STARTING_SIZE = 10;
+    }
+
     export namespace Tone {
         export const MIN_AMOUNT = 0;
         export const MAX_AMOUNT = 3;

@@ -1,0 +1,67 @@
+import { createSignal } from "solid-js";
+
+import { Button, Range, Typewriter } from "@thewaver/ss-components-solid";
+import * as styles from "@thewaver/ss-playground/App/Pages/TypewriterPage/TypewriterPage.css";
+
+import { PageButtonContent } from "../../../StyledComponents/ButtonContent/ButtonContent";
+import { PageRangeContent } from "../../../StyledComponents/RangeContent/RangeContent";
+
+const LYRIC = "Twinkle, twinkle, little star";
+const PERCENT = 100;
+const SLIDER_STEP = 1;
+const SLIDER_LENGTH = 110;
+const CHARACTER_DELAY_MS = 120;
+const CHARACTER_DURATION_MS = 600;
+const RUN_START = 0;
+const RUN_END = 1;
+
+export const KaraokeExample = () => {
+    const [getProgress, setProgress] = createSignal(RUN_START);
+    const [getIsPlaying, setIsPlaying] = createSignal(false);
+
+    const togglePlaying = () => {
+        if (!getIsPlaying() && getProgress() >= RUN_END) setProgress(RUN_START);
+
+        setIsPlaying((isPlaying) => !isPlaying);
+    };
+
+    return (
+        <div class={styles.karaokeStack}>
+            <div class={styles.karaokeLine}>
+                <Typewriter
+                    progress={[getProgress, setProgress]}
+                    playback={[getIsPlaying, setIsPlaying]}
+                    computeAnimationName={() => styles.typewriterSweep}
+                    animationDelayMs={() => CHARACTER_DELAY_MS}
+                    animationDurationMs={() => CHARACTER_DURATION_MS}
+                    onAnimationEnd={() => setIsPlaying(false)}
+                >
+                    {LYRIC}
+                </Typewriter>
+            </div>
+
+            <div class={styles.karaokeControls}>
+                <Button
+                    id={"karaokePlay"}
+                    renderContent={(getFlags) => (
+                        <PageButtonContent flags={getFlags}>{getIsPlaying() ? "Pause" : "Sing"}</PageButtonContent>
+                    )}
+                    onClick={togglePlaying}
+                />
+
+                <Range
+                    id={"karaokeScrubber"}
+                    sizing={"fill"}
+                    ariaLabel={"How far the line has been sung"}
+                    min={() => 0}
+                    max={() => PERCENT}
+                    step={() => SLIDER_STEP}
+                    value={[() => Math.round(getProgress() * PERCENT), (value: number) => setProgress(value / PERCENT)]}
+                    renderContent={(getRenderProps) => (
+                        <PageRangeContent renderProps={getRenderProps} length={() => SLIDER_LENGTH} />
+                    )}
+                />
+            </div>
+        </div>
+    );
+};

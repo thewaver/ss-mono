@@ -32,7 +32,7 @@ export const HoneycombExample = (props: Props) => {
                     selectedValue={props.selectedValue}
                     computeLayout={HONEYCOMB_LAYOUT}
                     onSelectionChange={props.onSelectionChange}
-                    renderFloater={(getVisibilityTarget, getTransitionDurationMs) => (
+                    renderSelectionFloater={(getVisibilityTarget, getTransitionDurationMs) => (
                         <PageTabHexFloater
                             orientation={"horizontal"}
                             visibilityTarget={getVisibilityTarget}

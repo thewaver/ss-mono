@@ -16,7 +16,11 @@ export const LightCatcher = defineComponent(
 
         const getIsDisabled = () => props.isDisabled ?? false;
 
-        const { reading, isPointerPresent } = PointerTrackerVueUtils.usePointerReading(ref, getIsDisabled);
+        const { reading, isPointerPresent } = PointerTrackerVueUtils.usePointerReading(
+            ref,
+            getIsDisabled,
+            () => props.pointSource,
+        );
 
         const eased = SmootherVueUtils.useSmoothed(
             () => {
@@ -61,6 +65,7 @@ export const LightCatcher = defineComponent(
             restingLightness: null,
             smoothingMs: null,
             isDisabled: Boolean,
+            pointSource: null,
         }),
     },
 );

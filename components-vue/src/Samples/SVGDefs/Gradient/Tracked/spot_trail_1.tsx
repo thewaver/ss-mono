@@ -78,7 +78,11 @@ const getStampAlpha = (stamp: TrailStamp | undefined, frameMs: number, opts?: Gr
 
 const SpotTrail = defineComponent(
     (props: SpotTrailProps) => {
-        const { reading, isPointerPresent } = PointerTrackerVueUtils.usePointerReading(() => props.element);
+        const { reading, isPointerPresent } = PointerTrackerVueUtils.usePointerReading(
+            () => props.element,
+            false,
+            () => props.defs.getPointSource?.(),
+        );
         const frameMs = SVGDefsVueUtils.useFrameMs(clock);
         const stamps = [...NO_STAMPS];
         const motion: TrailMotion = { lastOrigin: undefined, lastMovedMs: undefined, bornTick: undefined };

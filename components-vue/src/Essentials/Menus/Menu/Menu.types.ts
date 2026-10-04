@@ -106,6 +106,12 @@ export type MenuItemsSlots<T> = {
     renderItem: MenuRenderItem<T>;
     /** Draws the surface the items sit on. Its `renderItems` draws the items, wherever the surface puts them. */
     renderPopup: MenuRenderPopup;
+    /**
+     * Draws the marker that slides to the highlighted item — the one the pointer or the arrow keys are on — behind it,
+     * in this menu and in every submenu. The fade is handed in rather than applied: the marker fades out while nothing
+     * is highlighted.
+     */
+    renderHighlightFloater?: (props: { visibilityTarget: 0 | 1; transitionDurationMs: number }) => VNodeChild;
 };
 
 export type MenuLevelProps<T> = {
@@ -158,6 +164,8 @@ export type MenuLevelProps<T> = {
     reservedScreenSize?: Size2d;
     /** How long this level takes to fade in and out. */
     transitionDurationMs?: number;
+    /** How long the highlight's marker takes to slide from one item to the next, and to fade. */
+    floaterTransitionDurationMs?: number;
     /** The interaction state of the item that opened this level, so the level can answer to it. */
     openerFlags: InteractionFlags<MenuFlags>;
     /** Where the item that opened this level was placed, which a nested layout needs in order to grow out of it. */
@@ -225,6 +233,11 @@ export type MenuEntryProps<T> = {
     onHover: (index: number, point: Point2d) => void;
     /** Runs when the entry's submenu closes in the ordinary way. */
     onSubmenuClose: () => void;
+    /**
+     * Records the entry's element under its index, for the marker that slides to the highlighted item, until the
+     * returned function is called as the entry unmounts.
+     */
+    onRegister?: (index: number, element: HTMLElement) => () => void;
 };
 
 export type MenuProps<T> = Omit<InteractionWrapperProps<MenuFlags>, "extraFlags"> & {
@@ -262,6 +275,8 @@ export type MenuProps<T> = Omit<InteractionWrapperProps<MenuFlags>, "extraFlags"
     "reservedScreenSize"?: Size2d;
     /** How long the menu takes to fade in and out. */
     "transitionDurationMs"?: number;
+    /** How long the highlight's marker takes to slide from one item to the next, and to fade. */
+    "floaterTransitionDurationMs"?: number;
     /**
      * Whether the menu is open. It is the only thing that opens or closes it; the menu writes `false` when it is
      * dismissed or an item is picked. Left out, the menu keeps its own.
@@ -328,6 +343,8 @@ export type ContextMenuProps<T> = {
     "reservedScreenSize"?: Size2d;
     /** How long the menu takes to fade in and out. */
     "transitionDurationMs"?: number;
+    /** How long the highlight's marker takes to slide from one item to the next, and to fade. */
+    "floaterTransitionDurationMs"?: number;
     /** Whether the menu is open. It is the only thing that opens or closes it. Left out, the menu keeps its own. */
     "visibility"?: boolean;
     /** Receives the menu opening or closing itself, which is what `v-model:visibility` binds. */

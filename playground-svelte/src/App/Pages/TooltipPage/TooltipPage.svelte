@@ -2,6 +2,11 @@
     import type { AnchorHPlacement, AnchorVPlacement } from "@thewaver/ss-components-svelte";
     import { ANCHOR_H_PLACEMENTS, ANCHOR_V_PLACEMENTS, TOOLTIP_DEFAULTS } from "@thewaver/ss-components-svelte";
     import { TooltipKnobs } from "@thewaver/ss-playground/App/Knobs/Tooltips.const";
+    import {
+        TOOLTIP_REVEALS,
+        TOOLTIP_REVEAL_LABELS,
+        type TooltipReveal,
+    } from "@thewaver/ss-playground/App/StyledComponents/TooltipContent/TooltipContent.const";
 
     import type { ExampleDefs } from "../../PageComponents/Examples/Examples.types";
     import PageExamples from "../../PageComponents/Examples/PageExamples.svelte";
@@ -26,6 +31,7 @@
     let focusShowDelayMs = $state(TOOLTIP_DEFAULTS.focusShowDelayMs);
     let hoverShowDelayMs = $state(TOOLTIP_DEFAULTS.hoverShowDelayMs);
     let skipDelayWindowMs = $state(TOOLTIP_DEFAULTS.skipDelayWindowMs);
+    let reveal = $state<TooltipReveal>(TooltipKnobs.STARTING_REVEAL);
 
     const placement = $derived({ x: hPlacement, y: vPlacement });
 
@@ -38,6 +44,7 @@
         focusShowDelayMs,
         hoverShowDelayMs,
         skipDelayWindowMs,
+        reveal,
     });
 
     const examples: ExampleDefs[] = [
@@ -80,6 +87,23 @@
 {/snippet}
 
 <PagePropsPanel scope={"global"}>
+    <PageProp
+        itemKey={"reveal"}
+        label={"Reveal"}
+        hint={"How the tooltip appears and goes, which is the drawing's own: the tooltip only says whether it is showing and for how long the change takes."}
+    >
+        <PageSelectField
+            value={reveal}
+            values={TOOLTIP_REVEALS}
+            computeLabel={(next) => TOOLTIP_REVEAL_LABELS[next]}
+            width={FIELD_WIDTH}
+            ariaLabel={"Reveal"}
+            onChange={(next) => {
+                reveal = next;
+            }}
+        />
+    </PageProp>
+
     <PageProp
         itemKey={"hPlacement"}
         label={"Placement across"}
@@ -150,8 +174,8 @@
 
     <PageProp
         itemKey={"transitionDurationMs"}
-        label={"Fade (ms)"}
-        hint={"How long the tooltip takes to fade in and out."}
+        label={"Reveal (ms)"}
+        hint={"How long the tooltip takes to appear and to go."}
     >
         <PageNumberField
             value={transitionDurationMs}
@@ -159,7 +183,7 @@
             max={TooltipKnobs.MAX_DURATION}
             step={TooltipKnobs.DURATION_STEP}
             width={FIELD_WIDTH}
-            ariaLabel={"Fade in milliseconds"}
+            ariaLabel={"Reveal in milliseconds"}
             onInput={(value) => {
                 transitionDurationMs = value;
             }}

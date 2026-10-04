@@ -8,7 +8,11 @@
 
     let props: GlassSheenFilterProps = $props();
 
-    const { getReading } = PointerTrackerSvelteUtils.create(() => props.element);
+    const { getReading } = PointerTrackerSvelteUtils.create(
+        () => props.element,
+        undefined,
+        () => props.getPointSource?.(),
+    );
 
     const filter = $derived(
         new SVGFilterDefsFactory(props.filterId)

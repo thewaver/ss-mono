@@ -1,5 +1,9 @@
 export type AccordionSizing = "fit-content" | "fill";
 
+export type AccordionOrientation = "horizontal" | "vertical";
+
+export type AccordionMoveDirection = "backward" | "forward";
+
 export type AccordionItem<T> = {
     value: T;
     isDisabled?: boolean;

@@ -1,4 +1,9 @@
-import { type GradientBandOpts, SVGDefsUtils, TrackedGradientDefaults } from "@thewaver/ss-components";
+import {
+    type GradientBandOpts,
+    type PointSource,
+    SVGDefsUtils,
+    TrackedGradientDefaults,
+} from "@thewaver/ss-components";
 import type { Size2d } from "@thewaver/ss-utils";
 
 import { PointerTrackerReactUtils } from "../../../../Abstracts/PointerTracker/PointerTrackerReact.utils";
@@ -13,6 +18,7 @@ type BandGradientProps = {
     element: HTMLElement | undefined;
     color: string;
     axis: BandAxis;
+    source: PointSource | undefined;
     opts?: GradientBandOpts;
 };
 
@@ -30,7 +36,7 @@ const getBandColors = (color: string, opts?: GradientBandOpts) =>
 
 const BandGradient = (props: BandGradientProps) => {
     const ref = SVGDefsReactUtils.useElementRef(props.element);
-    const { reading } = PointerTrackerReactUtils.usePointerReading(ref);
+    const { reading } = PointerTrackerReactUtils.usePointerReading(ref, false, props.source);
 
     const travel = (reading.boxRatio[props.axis] - 0.5) * (props.opts?.bandTravel ?? DEFAULTS.bandTravel);
 
@@ -61,6 +67,7 @@ export const band_1v1 = (opts?: GradientBandOpts): TrackedGradientConfig => ({
                             element={element}
                             color={defs.colors.primary}
                             axis="x"
+                            source={defs.getPointSource?.()}
                             opts={opts}
                         />
                     ),
@@ -77,6 +84,7 @@ export const band_1v1 = (opts?: GradientBandOpts): TrackedGradientConfig => ({
                             element={element}
                             color={defs.colors.secondary}
                             axis="y"
+                            source={defs.getPointSource?.()}
                             opts={opts}
                         />
                     ),

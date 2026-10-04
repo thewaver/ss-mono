@@ -133,7 +133,11 @@ export const spot_trail_3 = (opts?: GradientSpotTrailOpts): TrackedGradientConfi
         const sharedBlur = SVGDefsSolidUtils.getBaseBlur(id, defs);
         const sharedBlurRef = SVGDefsUtils.getSharedFilter(sharedBlur);
 
-        const { getReading, getIsPointerPresent } = PointerTrackerSolidUtils.create(getRef ?? NO_REF);
+        const { getReading, getIsPointerPresent } = PointerTrackerSolidUtils.create(
+            getRef ?? NO_REF,
+            undefined,
+            defs.getPointSource,
+        );
 
         return [
             {

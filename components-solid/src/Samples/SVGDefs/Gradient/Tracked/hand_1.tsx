@@ -29,7 +29,11 @@ export const hand_1 = (opts?: GradientHandOpts): TrackedGradientConfig => ({
             gradientOrPattern: {
                 id: `gradient1-${id}`,
                 renderDefsElement: () => {
-                    const { getReading, getIsPointerPresent } = PointerTrackerSolidUtils.create(getRef ?? NO_REF);
+                    const { getReading, getIsPointerPresent } = PointerTrackerSolidUtils.create(
+                        getRef ?? NO_REF,
+                        undefined,
+                        defs.getPointSource,
+                    );
 
                     return SVGGradientDefsSolidUtils.computeLinearGradient({
                         id: `gradient1-${id}`,
@@ -46,7 +50,11 @@ export const hand_1 = (opts?: GradientHandOpts): TrackedGradientConfig => ({
             clipPath: {
                 id: `clip1-${id}`,
                 renderDefsElement: () => {
-                    const { getReading } = PointerTrackerSolidUtils.create(getRef ?? NO_REF);
+                    const { getReading } = PointerTrackerSolidUtils.create(
+                        getRef ?? NO_REF,
+                        undefined,
+                        defs.getPointSource,
+                    );
 
                     return (
                         <SVGClipPath id={`clip1-${id}`}>

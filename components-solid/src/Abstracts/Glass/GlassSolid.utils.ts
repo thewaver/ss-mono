@@ -1,4 +1,4 @@
-import { type GlassDefs, type GlassTintDefs, GlassUtils } from "@thewaver/ss-components";
+import { type GlassDefs, type GlassTintDefs, GlassUtils, type PointSource } from "@thewaver/ss-components";
 import type { Size2d } from "@thewaver/ss-utils";
 
 import type { SVGDefs } from "../../Generators/SVGDefs/SVGDefsSolid.types";
@@ -59,6 +59,8 @@ export namespace GlassSolidUtils {
      * the tracker's resting position is.
      * @param getSize The element's current size, which the pointer's position is scaled against.
      * @param defs The glass description, filled out.
+     * @param getSource The point the light follows in place of the pointer. Left out, or answering `undefined`, the
+     * pointer.
      * @returns One definition, carrying the tint's fill and opacity along with the filter. The filter
      * is left off entirely at a `specularConstant` of zero, rather than pointed at one that builds
      * nothing — the same trap `computeBackdropFilterElement`'s callers have to account for.
@@ -68,6 +70,7 @@ export namespace GlassSolidUtils {
         getRef: (() => HTMLElement | undefined) | undefined,
         getSize: () => Size2d,
         defs: GlassDefs,
+        getSource?: () => PointSource | undefined,
     ): SVGDefs[] => {
         const tintDef = { ...computeTintFill(id, getSize, defs.tint), opacity: defs.tint.opacity };
 
@@ -81,7 +84,7 @@ export namespace GlassSolidUtils {
                 filter: {
                     id: filterId,
                     renderDefsElement: () => {
-                        const { getReading } = PointerTrackerSolidUtils.create(getRef ?? NO_REF);
+                        const { getReading } = PointerTrackerSolidUtils.create(getRef ?? NO_REF, undefined, getSource);
 
                         const getSpot = () => {
                             const size = getSize();

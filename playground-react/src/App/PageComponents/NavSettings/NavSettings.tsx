@@ -43,7 +43,7 @@ const PageNavSettingsChoice = <T,>(props: PageNavSettingsChoiceProps<T>) => (
             ariaLabel={props.ariaLabel}
             orientation={"horizontal"}
             gap={0}
-            renderFloater={(visibilityTarget, transitionDurationMs) => (
+            renderSelectionFloater={(visibilityTarget, transitionDurationMs) => (
                 <PageRadioSegmentFloater
                     visibilityTarget={visibilityTarget}
                     transitionDurationMs={transitionDurationMs}

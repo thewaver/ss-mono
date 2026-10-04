@@ -1,6 +1,6 @@
 import { type Page, expect, test } from "@playwright/test";
 
-import { activeText, computedStyle, demo, inlineStyle, readout, tabIndex, tagName } from "./helpers";
+import { activeText, centerDistance, computedStyle, demo, inlineStyle, readout, tabIndex, tagName } from "./helpers";
 
 /**
  * The page carries one tab list per variant, so every locator is scoped to its own variant box. Each
@@ -14,6 +14,7 @@ const LINK_COMPONENT = demo("linkComponent");
 const CLEARABLE = demo("clearable");
 const DISABLED = demo("disabled");
 const AUTOMATIC = demo("automatic");
+const HOVER_PILL = demo("hoverPill");
 
 const list = (scope: string) => `${scope} [role="tablist"]`;
 const tab = (scope: string) => `${scope} [role="tab"]`;
@@ -363,4 +364,34 @@ test("a press in the notch between two cells lands on the one it looks like", as
         await readout(page, "honeycomb"),
         "the bottom-left corner of the first cell's rectangle is outside its hexagon, so nothing there selects it",
     ).toContain(`selected: ${await elsewhere.textContent()}`);
+});
+
+/**
+ * The highlight marker is a second floater beside the selection's: it follows the tab under the pointer, or the
+ * focused tab while the pointer is elsewhere, and leaves the selection's marker where it was. With neither, it
+ * plays out and goes.
+ */
+test("a second marker glides to the hovered or focused tab and leaves the selection's alone", async ({ page }) => {
+    const highlight = page.locator(`${HOVER_PILL} [data-floater="highlight"]`);
+    const highlightBox = highlight.locator("..");
+    const tabs = page.locator(tab(HOVER_PILL));
+    const selectionBox = page.locator(`${HOVER_PILL} [data-floater=""]`).locator("..");
+    const selectionLeft = await inlineStyle(selectionBox, "left");
+
+    await expect(highlight, "nothing is hovered or focused yet").toHaveCount(0);
+
+    await tabs.nth(3).hover();
+    await expect.poll(() => centerDistance(highlightBox, tabs.nth(3)), { timeout: FLOATER_TIMEOUT_MS }).toBeLessThan(2);
+
+    await tabs.nth(1).hover();
+    await expect.poll(() => centerDistance(highlightBox, tabs.nth(1)), { timeout: FLOATER_TIMEOUT_MS }).toBeLessThan(2);
+    expect(await inlineStyle(selectionBox, "left"), "the selection's marker has not moved").toBe(selectionLeft);
+
+    await page.mouse.move(0, 0);
+    await expect(highlight, "with the pointer gone and nothing focused, the marker plays out and goes").toHaveCount(0, {
+        timeout: FLOATER_TIMEOUT_MS,
+    });
+
+    await tabs.nth(0).focus();
+    await expect.poll(() => centerDistance(highlightBox, tabs.nth(0)), { timeout: FLOATER_TIMEOUT_MS }).toBeLessThan(2);
 });

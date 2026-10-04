@@ -29,6 +29,7 @@ export const DefaultExample = (props: Props) => {
                     <PageTooltipContent
                         visibilityTarget={getVisibilityTarget}
                         transitionDurationMs={getTransitionDurationMs}
+                        reveal={props.reveal}
                     >
                         Moves the thread out of the inbox.
                     </PageTooltipContent>

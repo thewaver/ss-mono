@@ -17,7 +17,11 @@ export const Reveal = (props: RevealProps) => {
 
     const isDisabled = props.isDisabled === true;
 
-    const { reading, isPointerPresent } = PointerTrackerReactUtils.usePointerReading(rootRef, isDisabled);
+    const { reading, isPointerPresent } = PointerTrackerReactUtils.usePointerReading(
+        rootRef,
+        isDisabled,
+        props.pointSource,
+    );
 
     const size = ElementObserverReactUtils.useBorderBoxSize(rootRef, isDisabled);
 

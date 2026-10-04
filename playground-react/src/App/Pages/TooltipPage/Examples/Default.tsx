@@ -26,7 +26,11 @@ export const DefaultExample = (props: Props) => {
                 hoverShowDelayMs={props.hoverShowDelayMs}
                 skipDelayWindowMs={props.skipDelayWindowMs}
                 renderContent={(visibilityTarget, transitionDurationMs) => (
-                    <PageTooltipContent visibilityTarget={visibilityTarget} transitionDurationMs={transitionDurationMs}>
+                    <PageTooltipContent
+                        visibilityTarget={visibilityTarget}
+                        transitionDurationMs={transitionDurationMs}
+                        reveal={props.reveal}
+                    >
                         Moves the thread out of the inbox.
                     </PageTooltipContent>
                 )}

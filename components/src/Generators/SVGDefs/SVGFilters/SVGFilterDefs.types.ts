@@ -44,6 +44,10 @@ export type SVGContrastFilterDefs = {
     amount: number;
 };
 
+export type SVGPixelateFilterDefs = {
+    size: number;
+};
+
 export type SVGInversionFilterDefs = {
     amount: number;
 };
@@ -103,6 +107,7 @@ export type SVGFilterPrimitiveKind =
     | "contrast"
     | "inversion"
     | "color"
+    | "pixelate"
     | "specularLighting"
     | "diffuseLighting";
 
@@ -119,8 +124,15 @@ export type SVGFilterRegion = {
     height: string;
 };
 
+export type SVGFilterFrame = {
+    width: number;
+    height: number;
+    offset: number;
+};
+
 export type SVGFilterAssembly = {
     region: SVGFilterRegion | undefined;
+    frame: SVGFilterFrame | undefined;
     inputs: { key: string; srcIn: string }[];
     mergeKeys: string[] | undefined;
 };

@@ -77,7 +77,7 @@ export const Wheel = <T,>(props: WheelProps<T>) => {
     const wheelRef = useRef<HTMLDivElement | null>(null);
     const isEffectless = props.computeEffect === undefined;
 
-    const pointer = PointerTrackerReactUtils.usePointerReading(wheelRef, isEffectless);
+    const pointer = PointerTrackerReactUtils.usePointerReading(wheelRef, isEffectless, props.pointSource);
 
     const prefersReducedMotion = MediaQueryMonitorReactUtils.useReducedMotion(isEffectless);
 

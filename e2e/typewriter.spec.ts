@@ -159,8 +159,8 @@ const phraseState = (page: Page): Promise<PhraseState> =>
     }, PHRASES_COPY);
 
 /**
- * One frame's reading of a run in progress, taken inside an animation frame so that every character's own
- * `animationstart` for that frame has already been handled: which characters have begun arriving, which way
+ * One frame's reading of a run in progress, taken inside an animation frame so that the frame's progress has been
+ * written and every character is held at it: which characters have begun arriving, which way
  * the run is playing, where the caret sits among the characters, and the caret's box beside the box of the
  * character it follows.
  */
@@ -308,8 +308,8 @@ test("Pause holds the loop where it is, an erased phrase rests hidden, and resum
 });
 
 /**
- * The caret is moved by each character's own `animationstart`, so at any frame of a typing run it sits right
- * after the last character to have begun arriving: everything before it has started and nothing after it has.
+ * The caret is placed from the same progress the characters are held at, so at any frame of a typing run it sits
+ * right after the last character to have begun arriving: everything before it has started and nothing after it has.
  * It is placed inline, after that character, so it shares that character's line and sits to its right —
  * wherever the text has wrapped to.
  */
@@ -415,4 +415,63 @@ test("the arrival order decides which characters arrive first, and erasing runs 
     const erasing = await typingFrame(page, "reverse");
 
     expect(isIncreasing(erasing.delays), "and erasing takes them away in the opposite order").toBe(true);
+});
+
+/**
+ * The karaoke example shares one progress between its line and a slider, with playback off until Sing is pressed.
+ * Every character is a CSS animation of its own, held at the moment the progress names, so what each one is doing
+ * is read off its animation's own timing — `0` not yet begun, `1` finished, anything between partway through —
+ * and never off what it looks like.
+ */
+const KARAOKE = example("karaoke");
+const KARAOKE_SCRUBBER = "#karaokeScrubber";
+const KARAOKE_PLAY = "#karaokePlay";
+const HALFWAY_STEPS = 50;
+
+const letterProgresses = (page: Page) =>
+    page.evaluate((copySelector) => {
+        const output = document.querySelector(copySelector)!.nextElementSibling;
+        const letters = output ? [...output.querySelectorAll(":scope > span > span:not([aria-hidden])")] : [];
+
+        return letters.map((letter) => Number(letter.getAnimations()[0]?.effect?.getComputedTiming().progress ?? -1));
+    }, `${KARAOKE} [inert]`);
+
+test("a progress written from outside holds every letter at that moment, one of them partway through", async ({
+    page,
+}) => {
+    await page.locator(KARAOKE_SCRUBBER).focus();
+    await page.keyboard.press("Home");
+
+    for (let step = 0; step < HALFWAY_STEPS; step++) await page.keyboard.press("ArrowRight");
+
+    await expect
+        .poll(
+            async () => {
+                const progresses = await letterProgresses(page);
+
+                return (
+                    progresses.length > 1 &&
+                    progresses[0] === 1 &&
+                    progresses.at(-1) === 0 &&
+                    progresses.some((progress) => progress > 0 && progress < 1)
+                );
+            },
+            { message: "halfway, the first letter is done, the last not begun, and one is caught in its own sweep" },
+        )
+        .toBe(true);
+});
+
+test("playing writes the progress as it goes, so the slider sharing it moves on its own", async ({ page }) => {
+    const scrubber = page.locator(KARAOKE_SCRUBBER);
+
+    await scrubber.focus();
+    await page.keyboard.press("Home");
+
+    const before = Number(await scrubber.inputValue());
+
+    await page.locator(KARAOKE_PLAY).click();
+
+    await expect
+        .poll(async () => Number(await scrubber.inputValue()), { message: "the shared progress climbs while it plays" })
+        .toBeGreaterThan(before);
 });

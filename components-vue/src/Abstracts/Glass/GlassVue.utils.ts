@@ -1,6 +1,6 @@
 import { defineComponent, h } from "vue";
 
-import { type GlassDefs, type GlassTintDefs, GlassUtils } from "@thewaver/ss-components";
+import { type GlassDefs, type GlassTintDefs, GlassUtils, type PointSource } from "@thewaver/ss-components";
 import type { Size2d } from "@thewaver/ss-utils";
 
 import type { SVGDefs } from "../../Generators/SVGDefs/SVGDefs.types";
@@ -14,12 +14,17 @@ type GlassSheenFilterProps = {
     element: HTMLElement | undefined;
     size: Size2d;
     defs: GlassDefs;
+    pointSource?: PointSource;
 };
 
 /** The sheen filter, lit from wherever the pointer is over the element; it re-renders alone as the pointer moves. */
 const GlassSheenFilter = defineComponent(
     (props: GlassSheenFilterProps) => {
-        const { reading } = PointerTrackerVueUtils.usePointerReading(() => props.element);
+        const { reading } = PointerTrackerVueUtils.usePointerReading(
+            () => props.element,
+            false,
+            () => props.pointSource,
+        );
 
         return () =>
             new SVGFilterDefsFactory(props.filterId)
@@ -44,7 +49,13 @@ const GlassSheenFilter = defineComponent(
     },
     {
         name: "GlassSheenFilter",
-        props: declareProps<GlassSheenFilterProps>({ filterId: null, element: null, size: null, defs: null }),
+        props: declareProps<GlassSheenFilterProps>({
+            filterId: null,
+            element: null,
+            size: null,
+            defs: null,
+            pointSource: null,
+        }),
     },
 );
 
@@ -89,6 +100,7 @@ export namespace GlassVueUtils {
      * resting position is.
      * @param size The element's current size, which the pointer's position is scaled against.
      * @param defs The glass description, filled out.
+     * @param pointSource The point the light follows in place of the pointer. Left out, or `undefined`, the pointer.
      * @returns One definition, carrying the tint's fill and opacity along with the filter. The filter is left off
      * entirely at a `specularConstant` of zero, rather than pointed at one that builds nothing.
      */
@@ -97,6 +109,7 @@ export namespace GlassVueUtils {
         element: HTMLElement | undefined,
         size: Size2d,
         defs: GlassDefs,
+        pointSource?: PointSource,
     ): SVGDefs[] => {
         const tintDef = { ...computeTintFill(id, size, defs.tint), opacity: defs.tint.opacity };
 
@@ -109,7 +122,7 @@ export namespace GlassVueUtils {
                 ...tintDef,
                 filter: {
                     id: filterId,
-                    renderDefsElement: () => h(GlassSheenFilter, { filterId, element, size, defs }),
+                    renderDefsElement: () => h(GlassSheenFilter, { filterId, element, size, defs, pointSource }),
                 },
             },
         ];

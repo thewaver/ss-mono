@@ -94,7 +94,7 @@ watch(
                         <PageTabGutter orientation="horizontal" />
                     </template>
 
-                    <template #renderFloater="{ visibilityTarget, transitionDurationMs }">
+                    <template #renderSelectionFloater="{ visibilityTarget, transitionDurationMs }">
                         <PageTabFloater
                             orientation="horizontal"
                             :visibility-target="visibilityTarget"

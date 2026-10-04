@@ -60,7 +60,7 @@ export const Wheel = defineComponent(
 
         const wheelRef = shallowRef<HTMLDivElement>();
 
-        const pointer = PointerTrackerVueUtils.usePointerReading(wheelRef, getIsEffectless);
+        const pointer = PointerTrackerVueUtils.usePointerReading(wheelRef, getIsEffectless, () => props.pointSource);
 
         const prefersReducedMotion = MediaQueryMonitorVueUtils.useReducedMotion(getIsEffectless);
 
@@ -210,6 +210,7 @@ export const Wheel = defineComponent(
             "axis": null,
             "wedgeSize": null,
             "markerDegrees": null,
+            "pointSource": null,
             "computeLayout": null,
             "computeEffect": null,
         }),

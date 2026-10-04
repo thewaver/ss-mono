@@ -8,6 +8,10 @@ import type { SVGPatternCellCount, SVGPatternCellIndex, SVGPatternKind } from ".
 const TILE_CELL_COUNT: SVGPatternCellCount = { rows: 8, cols: 8 };
 const MIN_COUNT = 1;
 const FULL_LEVEL = 1;
+const NO_TRAIL_MS = 0;
+
+/** A cell's brightest recent level and when it was reached, which its trail fades from. */
+type TrailMark = { level: number; litMs: number };
 
 /**
  * The arithmetic behind a pattern whose cells answer to the pointer rather than to a clock: how many cells to draw,
@@ -26,7 +30,48 @@ export namespace TrackedPatternUtils {
         isTiled: opts?.tiled ?? defaults.tiled,
         reach: opts?.reach ?? defaults.reach,
         restLevel: opts?.restLevel ?? defaults.restLevel,
+        trailMs: opts?.trailMs ?? defaults.trailMs,
     });
+
+    /**
+     * Whether a sample's cells leave a trail, lighting as the pointer passes and fading on their own afterwards.
+     *
+     * @param opts The resolved options, from {@link resolveOpts}.
+     */
+    export const getHasTrail = (opts: { trailMs: number }) => opts.trailMs > NO_TRAIL_MS;
+
+    /**
+     * Remembers how brightly each cell was lit, so a cell the pointer has left keeps a fading glow.
+     *
+     * A cell's shown level is the higher of its live level, from {@link computeLevel}, and what is left of the
+     * brightest level it reached recently, which falls back to rest over `trailMs`, easing out. The memory is kept by
+     * the key the caller gives each cell, so a repeating tile's copies share one trail.
+     *
+     * @returns `computeLevel`, which takes a cell's key, its live level, the frame time, how long a trail lasts and
+     * the rest level, records the live level when it is the brighter, and answers the level to draw.
+     */
+    export const createTrail = () => {
+        const marks = new Map<string, TrailMark>();
+
+        const computeTrailLevel = (
+            key: string,
+            liveLevel: number,
+            nowMs: number,
+            trailMs: number,
+            restLevel: number,
+        ) => {
+            const mark = marks.get(key);
+            const fading = mark
+                ? MathUtils.lerp(restLevel, mark.level, (1 - MathUtils.clamp01((nowMs - mark.litMs) / trailMs)) ** 2)
+                : restLevel;
+
+            if (liveLevel >= fading && liveLevel > restLevel) marks.set(key, { level: liveLevel, litMs: nowMs });
+
+            return Math.max(liveLevel, fading);
+        };
+
+        return { computeLevel: computeTrailLevel };
+    };
 
     /**
      * The fewest cells of a layout whose single tile reaches across a whole area.

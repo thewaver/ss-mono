@@ -163,7 +163,7 @@ const TypedExampleWrapper = ({ width, ...props }: ExampleWrapperProps) => {
     return (
         <>
             <PageMeasureBox width={width} padding={() => MEASURE_BOX_PADDING}>
-                <TypedExample {...props} animationName={() => ARRIVAL_EFFECT_NAMES[getArrivalEffect()]} />
+                <TypedExample {...props} computeAnimationName={() => ARRIVAL_EFFECT_NAMES[getArrivalEffect()]} />
             </PageMeasureBox>
 
             <PageExampleKnobs>

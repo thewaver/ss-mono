@@ -69,6 +69,7 @@
     const pointer = PointerTrackerSvelteUtils.create(
         () => wheel,
         () => isEffectless,
+        () => props.pointSource,
     );
 
     const getPrefersReducedMotion = MediaQueryMonitorSvelteUtils.createReducedMotion(() => isEffectless);

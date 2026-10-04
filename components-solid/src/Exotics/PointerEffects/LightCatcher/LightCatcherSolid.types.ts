@@ -1,3 +1,5 @@
+import type { PointSource } from "@thewaver/ss-components";
+
 import type { AccessorProps } from "../../../Utils/typeUtils";
 
 export type LightCatcherProps = AccessorProps<{
@@ -58,4 +60,13 @@ export type LightCatcherProps = AccessorProps<{
      * preference itself — only the consumer knows whether a brightening surface is motion worth suppressing.
      */
     isDisabled?: boolean;
+    /**
+     * The point to follow instead of the pointer.
+     *
+     * A fraction across a box — this component's own, or the element named in the source — so a light moving
+     * across a banner can be handed to every card under it and each answers to the same spot. While the source has
+     * no point the component rests, as it does when the pointer leaves the window. Left out, the pointer is
+     * followed.
+     */
+    pointSource?: PointSource;
 }>;

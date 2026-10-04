@@ -2,6 +2,7 @@ import { useState } from "react";
 
 import { PageExamples } from "../../PageComponents/Examples/Examples";
 import { CountriesExample } from "./Examples/Countries";
+import { GlideExample } from "./Examples/Glide";
 import { GroupedExample } from "./Examples/Grouped";
 import { SizesExample } from "./Examples/Sizes";
 
@@ -11,6 +12,7 @@ export const ListboxPage = () => {
     const singleState = useState<string | undefined>("Portugal");
     const multipleState = useState<string[]>(["Denmark"]);
     const sizeState = useState<string | undefined>();
+    const glideState = useState<string | undefined>("Portugal");
 
     const examples = [
         {
@@ -36,6 +38,14 @@ export const ListboxPage = () => {
                 `value: ${sizeState[0] ?? "undefined"} — the left arrow moves forward in a right-to-left page, and L is skipped`,
             component: () => <SizesExample value={sizeState} />,
             path: `${EXAMPLES_ROOT}/Sizes.tsx`,
+        },
+        {
+            key: "glide",
+            name: "Gliding markers",
+            readout: () =>
+                `value: ${glideState[0] ?? "undefined"} — one outlined marker sits on the picked option and a second glides to whichever option the pointer or the arrows are on`,
+            component: () => <GlideExample value={glideState} />,
+            path: `${EXAMPLES_ROOT}/Glide.tsx`,
         },
     ];
 

@@ -32,7 +32,11 @@ const computeSweepColors = (color: string, alpha: number) => [
 
 const HandGradient = (props: HandPartProps) => {
     const ref = SVGDefsReactUtils.useElementRef(props.element);
-    const { reading, isPointerPresent } = PointerTrackerReactUtils.usePointerReading(ref);
+    const { reading, isPointerPresent } = PointerTrackerReactUtils.usePointerReading(
+        ref,
+        false,
+        props.defs.getPointSource?.(),
+    );
 
     return SVGGradientDefsReactUtils.computeLinearGradient({
         id: props.id,
@@ -46,7 +50,7 @@ const HandGradient = (props: HandPartProps) => {
 
 const HandClip = (props: HandPartProps) => {
     const ref = SVGDefsReactUtils.useElementRef(props.element);
-    const { reading } = PointerTrackerReactUtils.usePointerReading(ref);
+    const { reading } = PointerTrackerReactUtils.usePointerReading(ref, false, props.defs.getPointSource?.());
 
     const sweepArc = props.opts?.sweepArc ?? DEFAULTS.sweepArc;
 

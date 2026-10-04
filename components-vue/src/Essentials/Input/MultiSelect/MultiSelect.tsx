@@ -57,6 +57,8 @@ export const MultiSelect = defineComponent(
                         renderClear: slots.renderClear,
                         renderOption: slots.renderOption,
                         renderGroup: slots.renderGroup,
+                        renderSelectionFloater: slots.renderSelectionFloater,
+                        renderHighlightFloater: slots.renderHighlightFloater,
                         renderDecoration: slots.renderDecoration,
                     } satisfies Partial<SelectCompositeSlots<T>>
                 }
@@ -96,6 +98,7 @@ export const MultiSelect = defineComponent(
             "onUpdate:query": null,
             "computeEstimatedOptionHeight": null,
             "computeEstimatedGroupHeight": null,
+            "floaterTransitionDurationMs": null,
             "onReachEnd": null,
             "clearAriaLabel": null,
             "options": null,

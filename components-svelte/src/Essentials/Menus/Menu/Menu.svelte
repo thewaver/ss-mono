@@ -172,6 +172,8 @@
             {flickOrigin}
             renderItem={props.renderItem}
             renderPopup={props.renderPopup}
+            floaterTransitionDurationMs={props.floaterTransitionDurationMs}
+            renderHighlightFloater={props.renderHighlightFloater}
             onPick={pick}
             onFlickEnd={(releasedOn) => {
                 flickOrigin = undefined;

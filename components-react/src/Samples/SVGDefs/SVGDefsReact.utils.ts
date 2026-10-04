@@ -1,7 +1,7 @@
-import { type RefObject, useEffect, useRef, useState } from "react";
+import { type RefObject, useEffect, useMemo, useRef, useState } from "react";
 
-import { SVGDefsUtils, TrackedPatternUtils } from "@thewaver/ss-components";
-import type { Index2d, Size2d } from "@thewaver/ss-utils";
+import { type PointSource, SVGDefsUtils, TrackedPatternUtils } from "@thewaver/ss-components";
+import type { Index2d, Point2d, Size2d } from "@thewaver/ss-utils";
 
 import { PointerTrackerReactUtils } from "../../Abstracts/PointerTracker/PointerTrackerReact.utils";
 import { SVGFilterDefsFactory } from "../../Generators/SVGDefs/SVGFilters/SVGFilterDefs.factory";
@@ -79,13 +79,47 @@ export namespace SVGDefsReactUtils {
      *
      * @param element The painted element, or `undefined` before it exists.
      * @param areaSize The element's size.
+     * @param source The point to follow in place of the pointer, from the sample's `defs.getPointSource`. Left out,
+     * or `undefined`, the pointer is followed.
      * @returns {@link TrackedPatternUtils.computePointerPoint} for the current reading, so `undefined` while the
-     * pointer is away.
+     * pointer is away, or the source has no point.
      */
-    export const usePatternPointer = (element: HTMLElement | undefined, areaSize: Size2d) => {
-        const { reading, isPointerPresent } = PointerTrackerReactUtils.usePointerReading(useElementRef(element));
+    export const usePatternPointer = (element: HTMLElement | undefined, areaSize: Size2d, source?: PointSource) => {
+        const { reading, isPointerPresent } = PointerTrackerReactUtils.usePointerReading(
+            useElementRef(element),
+            false,
+            source,
+        );
 
         return TrackedPatternUtils.computePointerPoint(reading, isPointerPresent, areaSize);
+    };
+
+    /**
+     * The level each cell of a pattern with a trail is drawn at, so a cell the pointer has left keeps a fading glow.
+     *
+     * Holds the pattern's {@link TrackedPatternUtils.createTrail} memory and a clock made by
+     * {@link SVGDefsUtils.createClock} that runs for `trailMs` after the pointer last moved over it, so the component
+     * re-renders while a trail is fading and stops once every cell has come to rest. A pattern without a trail is
+     * handed its live levels back unchanged and runs no clock.
+     *
+     * @param opts The pattern's resolved options, from `TrackedPatternUtils.resolveOpts`.
+     * @param pointer Where the pointer is over the pattern, from {@link usePatternPointer}.
+     * @returns The level to draw a cell at, from the cell's key — its row and column — and its live level.
+     */
+    export const usePatternTrail = (opts: { trailMs: number; restLevel: number }, pointer: Point2d | undefined) => {
+        const hasTrail = TrackedPatternUtils.getHasTrail(opts);
+        const [trail] = useState(TrackedPatternUtils.createTrail);
+        const clock = useMemo(() => SVGDefsUtils.createClock(opts.trailMs), [opts.trailMs]);
+        const frameMs = useStore(clock.frameMs);
+
+        useEffect(() => (hasTrail ? clock.retain() : undefined), [clock, hasTrail]);
+
+        useEffect(() => {
+            if (hasTrail && pointer) clock.keepAwake();
+        }, [clock, hasTrail, pointer?.x, pointer?.y]);
+
+        return (key: string, liveLevel: number) =>
+            hasTrail ? trail.computeLevel(key, liveLevel, frameMs, opts.trailMs, opts.restLevel) : liveLevel;
     };
 
     /**

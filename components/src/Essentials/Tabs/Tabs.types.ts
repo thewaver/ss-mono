@@ -27,14 +27,6 @@ export type Tab<T> = {
     panelId?: string;
 };
 
-export type TabsFloaterBounds = {
-    top: string;
-    left: string;
-    width: string;
-    height: string;
-    transform?: string;
-};
-
 export type TabsKeyStep<T> = {
     index: number;
     value: T;

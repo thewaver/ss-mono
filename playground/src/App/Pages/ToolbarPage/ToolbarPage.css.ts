@@ -36,3 +36,7 @@ export const pressedMark = style({
         },
     },
 });
+
+export const hoverWatch = style({
+    display: "contents",
+});

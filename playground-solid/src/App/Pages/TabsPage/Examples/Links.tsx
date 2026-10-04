@@ -16,7 +16,7 @@ export const LinksExample = (props: Props) => {
             selectedValue={props.selectedValue}
             onSelectionChange={props.onSelectionChange}
             renderGutter={() => <PageTabGutter orientation={"horizontal"} />}
-            renderFloater={(getVisibilityTarget, getTransitionDurationMs) => (
+            renderSelectionFloater={(getVisibilityTarget, getTransitionDurationMs) => (
                 <PageTabFloater
                     orientation={"horizontal"}
                     visibilityTarget={getVisibilityTarget}

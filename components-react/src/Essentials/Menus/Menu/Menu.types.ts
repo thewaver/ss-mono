@@ -172,6 +172,14 @@ export type MenuLevelProps<T> = {
     renderItem: MenuRenderItem<T>;
     /** Draws the surface this level's items sit on. */
     renderPopup: MenuRenderPopup;
+    /** How long the highlight's marker takes to slide from one item to the next, and to fade. */
+    floaterTransitionDurationMs?: number;
+    /**
+     * Draws the marker that slides to the highlighted item — the one the pointer or the arrow keys are on — behind it,
+     * in this menu and in every submenu. The fade is handed in rather than applied: the marker fades out while nothing
+     * is highlighted.
+     */
+    renderHighlightFloater?: (visibilityTarget: 0 | 1, transitionDurationMs: number) => ReactNode;
     /**
      * Runs when an item on this level is picked, and is told the radio group's values so a consumer can keep them in
      * step.
@@ -279,6 +287,14 @@ export type MenuProps<T> = Omit<InteractionWrapperProps<MenuFlags>, "renderContr
     renderContent: (flags: InteractionFlags<MenuFlags>) => ReactNode;
     /** Draws the surface the items sit on. */
     renderPopup: MenuRenderPopup;
+    /** How long the highlight's marker takes to slide from one item to the next, and to fade. */
+    floaterTransitionDurationMs?: number;
+    /**
+     * Draws the marker that slides to the highlighted item — the one the pointer or the arrow keys are on — behind it,
+     * in this menu and in every submenu. The fade is handed in rather than applied: the marker fades out while nothing
+     * is highlighted.
+     */
+    renderHighlightFloater?: (visibilityTarget: 0 | 1, transitionDurationMs: number) => ReactNode;
     /** Draws one item. */
     renderItem: MenuRenderItem<T>;
     /** Runs when an item is picked. */
@@ -343,6 +359,14 @@ export type ContextMenuProps<T> = {
     computeCustomText?: (item: MenuItem<T>) => string;
     /** Draws the surface the items sit on. */
     renderPopup: MenuRenderPopup;
+    /** How long the highlight's marker takes to slide from one item to the next, and to fade. */
+    floaterTransitionDurationMs?: number;
+    /**
+     * Draws the marker that slides to the highlighted item — the one the pointer or the arrow keys are on — behind it,
+     * in this menu and in every submenu. The fade is handed in rather than applied: the marker fades out while nothing
+     * is highlighted.
+     */
+    renderHighlightFloater?: (visibilityTarget: 0 | 1, transitionDurationMs: number) => ReactNode;
     /** Draws one item. */
     renderItem: MenuRenderItem<T>;
     /** Runs when an item is picked. */

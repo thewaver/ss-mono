@@ -1,9 +1,15 @@
-import { type SlotsType, defineComponent, shallowRef, useId } from "vue";
+import { type SlotsType, defineComponent, shallowRef, useId, watch } from "vue";
 
-import { ACCORDION_DEFAULTS, AccordionStyles, AccordionUtils } from "@thewaver/ss-components";
+import {
+    ACCORDION_DEFAULTS,
+    type AccordionMoveDirection,
+    AccordionStyles,
+    AccordionUtils,
+} from "@thewaver/ss-components";
 
+import { NavigatorVueUtils } from "../../../Abstracts/Navigator/NavigatorVue.utils";
 import { callSlot, declareProps, useTwoWay } from "../../../Utils/propUtils";
-import { exposeElement, toElement } from "../../../Utils/refUtils";
+import { exposeElement, toElement, useStableList } from "../../../Utils/refUtils";
 import type { SlotsContext } from "../../../Utils/typeUtils";
 import { Collapsible } from "../Collapsible/Collapsible";
 import type { CollapsibleSlots } from "../Collapsible/Collapsible.types";
@@ -26,6 +32,7 @@ const AccordionSection = defineComponent(
                 isDisabled={props.item.isDisabled ?? false}
                 isFocusableWhenDisabled={props.item.isReachableWhenDisabled ?? false}
                 headingLevel={props.headingLevel}
+                side={props.side}
                 isScrolledIntoViewOnExpand={props.isScrolledIntoViewOnExpand}
                 isPanelBuiltOnExpand={props.isPanelBuiltOnExpand}
                 transitionDurationMs={props.transitionDurationMs}
@@ -38,7 +45,12 @@ const AccordionSection = defineComponent(
                     {
                         renderTrigger: (flags) => callSlot(slots.renderHeader, { item: props.item, flags }),
                         renderPanel: ({ visibilityTarget, transitionDurationMs }) =>
-                            callSlot(slots.renderPanel, { item: props.item, visibilityTarget, transitionDurationMs }),
+                            callSlot(slots.renderPanel, {
+                                item: props.item,
+                                visibilityTarget,
+                                transitionDurationMs,
+                                moveDirection: props.moveDirection,
+                            }),
                     } satisfies Partial<CollapsibleSlots>
                 }
             </Collapsible>
@@ -50,10 +62,12 @@ const AccordionSection = defineComponent(
         props: declareProps<AccordionSectionProps<unknown>>({
             item: null,
             headingLevel: null,
+            side: null,
             isExpanded: Boolean,
             isScrolledIntoViewOnExpand: Boolean,
             isPanelBuiltOnExpand: Boolean,
             transitionDurationMs: null,
+            moveDirection: null,
             onToggle: null,
         }),
     },
@@ -63,7 +77,28 @@ export const Accordion = defineComponent(
     <T,>(props: AccordionProps<T>, { slots }: SlotsContext<AccordionSlots<T>>) => {
         const expanded = useTwoWay(props, "expanded", []);
 
+        const rootRef = shallowRef<HTMLDivElement>();
+        const moveDirection = shallowRef<AccordionMoveDirection>();
+
         const headerRefs: (HTMLElement | undefined)[] = [];
+
+        const direction = NavigatorVueUtils.useDirection(rootRef);
+
+        const getOrientation = () => props.orientation ?? ACCORDION_DEFAULTS.orientation;
+
+        const expandedIndexes = useStableList(() =>
+            props.items.reduce<number[]>((acc, item, index) => {
+                if (expanded.value.includes(item.value)) acc.push(index);
+
+                return acc;
+            }, []),
+        );
+
+        watch(expandedIndexes, (next, previous) => {
+            const moved = AccordionUtils.computeMoveDirection(previous, next);
+
+            if (moved) moveDirection.value = moved;
+        });
 
         const handleToggle = (value: T) => {
             const next = AccordionUtils.computeToggled(expanded.value, value, {
@@ -80,6 +115,7 @@ export const Accordion = defineComponent(
                 headerRefs,
                 AccordionUtils.computeNavigableIndexes(props.items),
                 document.activeElement,
+                { orientation: getOrientation(), direction: direction.value },
             );
 
             if (target === undefined) return;
@@ -92,10 +128,17 @@ export const Accordion = defineComponent(
         return () => {
             const headingLevel = props.headingLevel ?? ACCORDION_DEFAULTS.headingLevel;
             const sizing = props.sizing ?? ACCORDION_DEFAULTS.sizing;
+            const orientation = getOrientation();
+            const side = AccordionUtils.getPanelSide(orientation);
 
             return (
                 <div
-                    class={[AccordionStyles.accordionRoot, AccordionStyles.accordionSizingVariants[sizing]]}
+                    ref={rootRef}
+                    class={[
+                        AccordionStyles.accordionRoot,
+                        AccordionStyles.accordionSizingVariants[sizing],
+                        AccordionStyles.accordionOrientationVariants[orientation],
+                    ]}
                     style={{ gap: `${props.gap ?? ACCORDION_DEFAULTS.gap}px` }}
                     onKeydown={handleKeyDown}
                 >
@@ -107,10 +150,12 @@ export const Accordion = defineComponent(
                             }}
                             item={item}
                             headingLevel={headingLevel}
+                            side={side}
                             isExpanded={expanded.value.includes(item.value)}
                             isScrolledIntoViewOnExpand={props.isScrolledIntoViewOnExpand}
                             isPanelBuiltOnExpand={props.isPanelBuiltOnExpand}
                             transitionDurationMs={props.transitionDurationMs}
+                            moveDirection={moveDirection.value}
                             onToggle={() => handleToggle(item.value)}
                         >
                             {{ renderHeader: slots.renderHeader, renderPanel: slots.renderPanel }}
@@ -126,6 +171,7 @@ export const Accordion = defineComponent(
         props: declareProps<AccordionProps<unknown>>({
             "gap": null,
             "sizing": null,
+            "orientation": null,
             "headingLevel": null,
             "isSingleExpand": Boolean,
             "isExpandRequired": Boolean,

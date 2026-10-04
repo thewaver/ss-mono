@@ -26,7 +26,9 @@ export const GlassSurface = (props: PropsWithChildren<GlassSurfaceProps>) => {
                 lameExponents={lameExponents}
                 computeStrokeDefs={props.computeStrokeDefs}
                 strokeGeom={props.computeStrokeDefs ? [{ thicknesses: borderWidths }] : undefined}
-                computeFillDefs={(size, element) => GlassReactUtils.computeSheenDefs(id, element, size, defs)}
+                computeFillDefs={(size, element) =>
+                    GlassReactUtils.computeSheenDefs(id, element, size, defs, props.pointSource)
+                }
                 renderChildren={(size, clipPath) => {
                     const backdropStyle: CSSProperties = {
                         clipPath: `path("${GlassUtils.computeMarginedClipPath(

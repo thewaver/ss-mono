@@ -414,3 +414,46 @@ test.describe("a toolbar of pressed actions", () => {
         await expect(page.locator(PRESSED_ACTION).filter({ hasText: name })).toHaveAttribute("aria-pressed", "true");
     });
 });
+
+/**
+ * One tooltip serves the whole row: its anchor is whichever action is under the pointer. Moving from one action to
+ * the next hands the tooltip a new anchor while it is showing, so it must stay up the whole way — never hiding and
+ * reappearing — and the description must move with it, since `aria-describedby` is how the tooltip is announced.
+ */
+const SHARED = demo("sharedTooltip");
+
+test("a tooltip shared along the row stays up as the pointer moves on, and describes the action it reached", async ({
+    page,
+}) => {
+    await page.goto("/toolbar");
+
+    const actions = page.locator(`${SHARED} ${TOOLBAR} button:visible:has([data-hint])`);
+    const tooltip = page.locator('[role="tooltip"]');
+
+    await actions.nth(0).hover();
+    await expect(tooltip).toBeVisible();
+
+    const tooltipId = await tooltip.getAttribute("id");
+
+    await expect(actions.nth(0)).toHaveAttribute("aria-describedby", new RegExp(tooltipId!));
+
+    const next = (await actions.nth(1).boundingBox())!;
+    const samples: boolean[] = [];
+
+    await page.mouse.move(next.x + next.width * 0.5, next.y + next.height * 0.5, { steps: 8 });
+
+    for (let sample = 0; sample < 6; sample++) {
+        samples.push(await tooltip.isVisible());
+        await page.waitForTimeout(40);
+    }
+
+    expect(samples, "the tooltip never went away on the way across").not.toContain(false);
+    await expect(actions.nth(1), "the description moved to the new action").toHaveAttribute(
+        "aria-describedby",
+        new RegExp(tooltipId!),
+    );
+    await expect(actions.nth(0), "and left the old one").not.toHaveAttribute(
+        "aria-describedby",
+        new RegExp(tooltipId!),
+    );
+});

@@ -20,6 +20,8 @@ export namespace SVGFilterDefs {
     export const NEUTRAL_DISPLACEMENT_COLOR = "#808080";
 
     export const OPAQUE_ALPHA_MATRIX = "1 0 0 0 0 0 1 0 0 0 0 0 1 0 0 0 0 0 0 1";
+
+    export const OPAQUE_WHEREVER_DRAWN = "0 1 1 1 1 1 1 1";
 }
 
 export const SVG_FILTER_DEFAULTS = {

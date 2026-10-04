@@ -8,6 +8,7 @@ import {
     createMemo,
     createSignal,
     createUniqueId,
+    onCleanup,
     untrack,
 } from "solid-js";
 
@@ -16,10 +17,12 @@ import {
     ListboxUtils,
     SelectUtils,
     type VirtualizerRow,
+    FloaterStyles as floaterStyles,
     ListboxStyles as styles,
 } from "@thewaver/ss-components";
 
 import { ElementObserverSolidUtils } from "../../../Abstracts/ElementObserver/ElementObserverSolid.utils";
+import { FloaterSolidUtils } from "../../../Abstracts/Floater/FloaterSolid.utils";
 import { NavigatorSolidUtils } from "../../../Abstracts/Navigator/NavigatorSolid.utils";
 import { VirtualizerSolidUtils } from "../../../Abstracts/Virtualizer/VirtualizerSolid.utils";
 import { InteractionWrapper } from "../../../Primitives/InteractionWrapper/InteractionWrapper";
@@ -80,6 +83,27 @@ export const ListboxOptions = <T,>(props: ListboxOptionsProps<T>) => {
 
     const [getEndMarkerRef, setEndMarkerRef] = createSignal<HTMLElement>();
     const [getSizerRef, setSizerRef] = createSignal<HTMLElement>();
+    const [getOptionsRef, setOptionsRef] = createSignal<HTMLElement>();
+    const [getOptionRefs, setOptionRefs] = createSignal<Map<HTMLElement, Accessor<number>>>(new Map(), {
+        equals: false,
+    });
+
+    const setOptionRef = (element: HTMLElement, getFlatIndex: Accessor<number>) =>
+        setOptionRefs((refs) => refs.set(element, getFlatIndex));
+
+    const dropOptionRef = (element: HTMLElement) =>
+        setOptionRefs((refs) => {
+            refs.delete(element);
+
+            return refs;
+        });
+
+    const findOptionRef = (index: number) =>
+        [...getOptionRefs()].find(([, getFlatIndex]) => getFlatIndex() === index)?.[0];
+
+    const getFloaterTransitionDurationMs = createMemo(
+        () => access(props.floaterTransitionDurationMs) ?? LISTBOX_DEFAULTS.floaterTransitionDurationMs,
+    );
 
     const getIsLive = createMemo(() => access(props.isLive));
 
@@ -133,6 +157,63 @@ export const ListboxOptions = <T,>(props: ListboxOptionsProps<T>) => {
         rowWindow.scrollToRow(rowIndex);
     });
 
+    const getSelectedIndex = createMemo(() => {
+        const index = SelectUtils.getFlatOptions(cursor.getOptions()).findIndex((option) =>
+            props.computeIsSelected(option.value),
+        );
+
+        return index < 0 ? undefined : index;
+    });
+
+    const [getHoveredIndex, setHoveredIndex] = createSignal<number>();
+
+    const findOptionIndex = (target: EventTarget | null) =>
+        target instanceof Node ? [...getOptionRefs()].find(([element]) => element.contains(target))?.[1]() : undefined;
+
+    const handleOptionsPointerOver = (e: PointerEvent) => setHoveredIndex(findOptionIndex(e.target));
+
+    const handleOptionsPointerLeave = () => setHoveredIndex(undefined);
+
+    const createFloater = (getIsEnabled: () => boolean, getIndex: () => number | undefined) =>
+        FloaterSolidUtils.create({
+            getIsEnabled,
+            getContainer: () => (getIsVirtualized() ? getSizerRef() : getOptionsRef()),
+            getTarget: () => {
+                const index = getIndex();
+                return index === undefined ? undefined : findOptionRef(index);
+            },
+            getTransitionDurationMs: getFloaterTransitionDurationMs,
+        });
+
+    const selectionFloater = createFloater(() => props.renderSelectionFloater !== undefined, getSelectedIndex);
+
+    const highlightFloater = createFloater(
+        () => props.renderHighlightFloater !== undefined,
+        () => getHoveredIndex() ?? (cursor.getIsHighlightShown() ? cursor.getHighlightedIndex() : undefined),
+    );
+
+    const renderFloater = (
+        floater: ReturnType<typeof createFloater>,
+        renderContent: ListboxOptionsProps<T>["renderSelectionFloater"],
+    ) => (
+        <Show when={floater.getIsRendered()}>
+            <div
+                ref={floater.setRef}
+                class={floaterStyles.floater}
+                style={{ ...floater.getBounds(), "transition-duration": `${getFloaterTransitionDurationMs()}ms` }}
+            >
+                {renderContent?.(floater.getVisibilityTarget, getFloaterTransitionDurationMs)}
+            </div>
+        </Show>
+    );
+
+    const renderFloaters = () => (
+        <>
+            {renderFloater(highlightFloater, props.renderHighlightFloater)}
+            {renderFloater(selectionFloater, props.renderSelectionFloater)}
+        </>
+    );
+
     const computeGroupFlags = (group: SelectOptionGroup<T>) =>
         ListboxUtils.computeGroupFlags(group, props.computeIsSelected);
 
@@ -152,7 +233,12 @@ export const ListboxOptions = <T,>(props: ListboxOptionsProps<T>) => {
             })}
             renderControl={(setElementRef, getFlags) => (
                 <ListboxOptionItem
-                    ref={setElementRef}
+                    ref={(element) => {
+                        setElementRef(element);
+                        setOptionRef(element, getFlatIndex);
+
+                        onCleanup(() => dropOptionRef(element));
+                    }}
                     id={() => cursor.getOptionId(getFlatIndex())}
                     isSelfScrolling={() => !getIsVirtualized()}
                     focusModel={cursor.focusModel}
@@ -165,31 +251,54 @@ export const ListboxOptions = <T,>(props: ListboxOptionsProps<T>) => {
         />
     );
 
-    const renderMountedOptions = () => (
-        <Index each={cursor.getOptions()}>
-            {(getItem, index) => (
-                <Show
-                    when={SelectUtils.getIsGroup(getItem())}
-                    fallback={renderOptionSlot(
-                        () => getItem() as SelectOption<T>,
-                        () => cursor.getItemRows()[index].entryOffset,
-                    )}
-                >
-                    <div role="group" aria-label={(getItem() as SelectOptionGroup<T>).label}>
-                        {props.renderGroup?.(
-                            () => getItem() as SelectOptionGroup<T>,
-                            () => computeGroupFlags(getItem() as SelectOptionGroup<T>),
-                        )}
-
-                        <Index each={(getItem() as SelectOptionGroup<T>).options}>
-                            {(getOption, groupIndex) =>
-                                renderOptionSlot(getOption, () => cursor.getItemRows()[index].entryOffset + groupIndex)
-                            }
-                        </Index>
-                    </div>
-                </Show>
+    const renderEndMarker = () => (
+        <Show when={getHasMoreOptions() && cursor.getOptions()} keyed>
+            {(_items: SelectItem<T>[]) => (
+                <div ref={setEndMarkerRef} class={styles.listboxEndMarker} aria-hidden="true" />
             )}
-        </Index>
+        </Show>
+    );
+
+    const renderMountedOptions = () => (
+        <div
+            ref={setOptionsRef}
+            class={[styles.listboxOptions, getIsHorizontal() ? styles.listboxHorizontal : ""].join(" ")}
+            role="presentation"
+            onPointerOver={handleOptionsPointerOver}
+            onPointerLeave={handleOptionsPointerLeave}
+        >
+            {renderFloaters()}
+
+            <Index each={cursor.getOptions()}>
+                {(getItem, index) => (
+                    <Show
+                        when={SelectUtils.getIsGroup(getItem())}
+                        fallback={renderOptionSlot(
+                            () => getItem() as SelectOption<T>,
+                            () => cursor.getItemRows()[index].entryOffset,
+                        )}
+                    >
+                        <div role="group" aria-label={(getItem() as SelectOptionGroup<T>).label}>
+                            {props.renderGroup?.(
+                                () => getItem() as SelectOptionGroup<T>,
+                                () => computeGroupFlags(getItem() as SelectOptionGroup<T>),
+                            )}
+
+                            <Index each={(getItem() as SelectOptionGroup<T>).options}>
+                                {(getOption, groupIndex) =>
+                                    renderOptionSlot(
+                                        getOption,
+                                        () => cursor.getItemRows()[index].entryOffset + groupIndex,
+                                    )
+                                }
+                            </Index>
+                        </div>
+                    </Show>
+                )}
+            </Index>
+
+            {renderEndMarker()}
+        </div>
     );
 
     const renderWindowedRow = (row: VirtualizerRow) => {
@@ -246,7 +355,15 @@ export const ListboxOptions = <T,>(props: ListboxOptionsProps<T>) => {
     });
 
     const renderWindowedOptions = () => (
-        <div ref={setSizerRef} class={styles.listboxSizer} style={{ height: `${rowWindow.getTotalSize()}px` }}>
+        <div
+            ref={setSizerRef}
+            class={styles.listboxSizer}
+            style={{ height: `${rowWindow.getTotalSize()}px` }}
+            onPointerOver={handleOptionsPointerOver}
+            onPointerLeave={handleOptionsPointerLeave}
+        >
+            {renderFloaters()}
+
             <For each={getWindowedEntries()}>
                 {(entry) =>
                     typeof entry === "number" ? (
@@ -262,17 +379,11 @@ export const ListboxOptions = <T,>(props: ListboxOptionsProps<T>) => {
     );
 
     return (
-        <>
-            <Show when={getIsVirtualized()} fallback={renderMountedOptions()}>
-                {renderWindowedOptions()}
-            </Show>
+        <Show when={getIsVirtualized()} fallback={renderMountedOptions()}>
+            {renderWindowedOptions()}
 
-            <Show when={getHasMoreOptions() && cursor.getOptions()} keyed>
-                {(_items: SelectItem<T>[]) => (
-                    <div ref={setEndMarkerRef} class={styles.listboxEndMarker} aria-hidden="true" />
-                )}
-            </Show>
-        </>
+            {renderEndMarker()}
+        </Show>
     );
 };
 
@@ -309,7 +420,6 @@ export const ListboxComposite = <T,>(props: ListboxCompositeProps<T>) => {
         <div
             ref={setRootRef}
             id={getListboxId()}
-            classList={{ [styles.listboxHorizontal]: getOrientation() === "horizontal" }}
             role="listbox"
             aria-label={access(props.ariaLabel)}
             aria-multiselectable={getIsMultiple() || undefined}
@@ -333,6 +443,9 @@ export const ListboxComposite = <T,>(props: ListboxCompositeProps<T>) => {
                 computeIsSelected={props.computeIsSelected}
                 renderOption={props.renderOption}
                 renderGroup={props.renderGroup}
+                floaterTransitionDurationMs={props.floaterTransitionDurationMs}
+                renderSelectionFloater={props.renderSelectionFloater}
+                renderHighlightFloater={props.renderHighlightFloater}
                 onReachEnd={props.onReachEnd}
             />
         </div>

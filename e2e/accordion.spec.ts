@@ -159,6 +159,53 @@ test("a disabled header carries no native attribute and cannot open its panel", 
 });
 
 /**
+ * The row is the same accordion with its sections side by side: each panel opens beside its header and grows in
+ * width rather than height, and the arrows that walk the headers are the ones along the row. It holds one section
+ * open at all times, so the only way out of a section is into another.
+ */
+const ROW = demo("row");
+
+const offsetWidthOf = (page: Page, selector: string, index: number) =>
+    page
+        .locator(selector)
+        .nth(index)
+        .evaluate((element) => (element as HTMLElement).offsetWidth);
+
+test("a row walks its headers with the left and right arrows, and not with up and down", async ({ page }) => {
+    await page.locator(header(ROW)).first().focus();
+    await page.keyboard.press("ArrowRight");
+
+    await expect(page.locator(header(ROW)).nth(1), "the right arrow moves to the next header").toBeFocused();
+
+    await page.keyboard.press("ArrowDown");
+
+    await expect(page.locator(header(ROW)).nth(1), "the down arrow is not the row's to answer").toBeFocused();
+
+    await page.keyboard.press("ArrowLeft");
+
+    await expect(page.locator(header(ROW)).first(), "and the left arrow moves back").toBeFocused();
+});
+
+test("a row opens a panel in width, and pressing the open header leaves it open", async ({ page }) => {
+    await page.locator(header(ROW)).nth(2).click();
+
+    await expect.poll(() => offsetWidthOf(page, panel(ROW), 2), { timeout: TRANSITION_TIMEOUT_MS }).toBeGreaterThan(0);
+    await expect
+        .poll(() => offsetWidthOf(page, panel(ROW), 0), {
+            message: "opening another closes the one that was open",
+            timeout: TRANSITION_TIMEOUT_MS,
+        })
+        .toBe(0);
+
+    await page.locator(header(ROW)).nth(2).click();
+
+    await expect(page.locator(header(ROW)).nth(2), "the only way out of a section is into another").toHaveAttribute(
+        "aria-expanded",
+        "true",
+    );
+});
+
+/**
  * `Accordion` is a set of `Collapsible`s, and the split is what each layer states about the page rather than
  * how either opens: the disclosure owns `aria-expanded`, `aria-controls` and the measured height, while the
  * heading element, the panel's `region` role and the arrow-key walk are the accordion's, because those are

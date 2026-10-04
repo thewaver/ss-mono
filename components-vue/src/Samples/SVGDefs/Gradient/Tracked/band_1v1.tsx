@@ -1,6 +1,11 @@
 import { defineComponent } from "vue";
 
-import { type GradientBandOpts, SVGDefsUtils, TrackedGradientDefaults } from "@thewaver/ss-components";
+import {
+    type GradientBandOpts,
+    type PointSource,
+    SVGDefsUtils,
+    TrackedGradientDefaults,
+} from "@thewaver/ss-components";
 import type { Size2d } from "@thewaver/ss-utils";
 
 import { PointerTrackerVueUtils } from "../../../../Abstracts/PointerTracker/PointerTrackerVue.utils";
@@ -17,6 +22,7 @@ type BandGradientProps = {
     color: string;
     axis: BandAxis;
     opts?: GradientBandOpts;
+    getPointSource?: () => PointSource | undefined;
 };
 
 const BAND_SPAN: Size2d = { width: 0.7, height: 0.7 };
@@ -33,7 +39,11 @@ const getBandColors = (color: string, opts?: GradientBandOpts) =>
 
 const BandGradient = defineComponent(
     (props: BandGradientProps) => {
-        const { reading } = PointerTrackerVueUtils.usePointerReading(() => props.element);
+        const { reading } = PointerTrackerVueUtils.usePointerReading(
+            () => props.element,
+            false,
+            () => props.getPointSource?.(),
+        );
 
         return () => {
             const travel = (reading.value.boxRatio[props.axis] - 0.5) * (props.opts?.bandTravel ?? DEFAULTS.bandTravel);
@@ -49,7 +59,14 @@ const BandGradient = defineComponent(
     },
     {
         name: "BandGradient",
-        props: declareProps<BandGradientProps>({ id: null, element: null, color: null, axis: null, opts: null }),
+        props: declareProps<BandGradientProps>({
+            id: null,
+            element: null,
+            color: null,
+            axis: null,
+            opts: null,
+            getPointSource: null,
+        }),
     },
 );
 
@@ -72,6 +89,7 @@ export const band_1v1 = (opts?: GradientBandOpts): TrackedGradientConfig => ({
                             color={defs.colors.primary}
                             axis="x"
                             opts={opts}
+                            getPointSource={defs.getPointSource}
                         />
                     ),
                 },
@@ -88,6 +106,7 @@ export const band_1v1 = (opts?: GradientBandOpts): TrackedGradientConfig => ({
                             color={defs.colors.secondary}
                             axis="y"
                             opts={opts}
+                            getPointSource={defs.getPointSource}
                         />
                     ),
                 },

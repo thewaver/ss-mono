@@ -83,7 +83,7 @@ export const PhrasesExample = (props: Props) => {
                     <div class={styles.phraseSlot}>
                         <Typewriter
                             mode={getMode}
-                            animationName={props.animationName}
+                            computeAnimationName={props.computeAnimationName}
                             animationDelayMs={() => (getPrefersReducedMotion() ? NO_MOTION_MS : CHARACTER_DELAY_MS)}
                             animationDurationMs={() =>
                                 getPrefersReducedMotion() ? NO_MOTION_MS : CHARACTER_DURATION_MS

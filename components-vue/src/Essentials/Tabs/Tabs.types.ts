@@ -76,8 +76,17 @@ export type TabsProps<T> = {
 export type TabsSlots<T> = {
     /** Draws the rail the tabs sit against. */
     renderGutter?: () => VNodeChild;
-    /** Draws the marker that follows the selected tab. The fade is handed in rather than applied. */
-    renderFloater?: (props: { visibilityTarget: 0 | 1; transitionDurationMs: number }) => VNodeChild;
+    /**
+     * Draws the marker that slides to the selected tab, behind it. The fade is handed in rather than applied: the
+     * marker fades out when nothing is selected and in when something is.
+     */
+    renderSelectionFloater?: (props: { visibilityTarget: 0 | 1; transitionDurationMs: number }) => VNodeChild;
+    /**
+     * Draws the marker that slides to the tab under the pointer, or the one holding focus, behind it — a hover pill
+     * gliding along the strip. It fades out when neither is on a tab. Drawn under the selection's marker where both
+     * are given.
+     */
+    renderHighlightFloater?: (props: { visibilityTarget: 0 | 1; transitionDurationMs: number }) => VNodeChild;
     /**
      * Draws one tab. It is handed the interaction state, and the placement for a layout that put it somewhere other
      * than in a row.

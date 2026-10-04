@@ -10,6 +10,7 @@
     import PageProp from "../../../PageComponents/Prop/Prop.svelte";
     import PagePropsPanel from "../../../PageComponents/PropsPanel/PagePropsPanel.svelte";
     import PanelExample from "./Examples/Panel.svelte";
+    import PlacedLightExample from "./Examples/PlacedLight.svelte";
     import RowExample from "./Examples/Row.svelte";
     import type { LightCatcherExampleProps } from "./LightCatcherPageSvelte.types";
 
@@ -56,6 +57,15 @@
             component: rowExample,
             path: `${EXAMPLES_ROOT}/Row.svelte`,
         },
+        {
+            key: "placed",
+            name: "A light placed by hand",
+            span: ROW_SPAN,
+            readout: () =>
+                "the slider puts one light across the whole row and every lamp answers to that same spot — the pointer is ignored, since a supplied point replaces it",
+            component: placedExample,
+            path: `${EXAMPLES_ROOT}/PlacedLight.svelte`,
+        },
     ];
 </script>
 
@@ -68,6 +78,12 @@
 {#snippet rowExample()}
     <PageMeasureBox isFilling height={BOX_HEIGHT}>
         <RowExample {...commonProps} />
+    </PageMeasureBox>
+{/snippet}
+
+{#snippet placedExample()}
+    <PageMeasureBox isFilling height={BOX_HEIGHT}>
+        <PlacedLightExample {...commonProps} />
     </PageMeasureBox>
 {/snippet}
 

@@ -28,7 +28,9 @@ export const GlassSurface = (props: ParentProps<GlassSurfaceProps>) => {
                 lameExponents={getLameExponents}
                 computeStrokeDefs={props.computeStrokeDefs}
                 strokeGeom={props.computeStrokeDefs ? () => [{ thicknesses: getBorderWidths() }] : undefined}
-                computeFillDefs={(getSize, getRef) => GlassSolidUtils.computeSheenDefs(id, getRef, getSize, getDefs())}
+                computeFillDefs={(getSize, getRef) =>
+                    GlassSolidUtils.computeSheenDefs(id, getRef, getSize, getDefs(), () => access(props.pointSource))
+                }
                 renderChildren={(getSize, getClipPath) => {
                     const getClip = () => ({ "clip-path": `path("${getClipPath()}")` });
                     const getRippleFilter = createMemo(() =>

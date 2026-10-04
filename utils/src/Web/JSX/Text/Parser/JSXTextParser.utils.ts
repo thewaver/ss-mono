@@ -58,6 +58,12 @@ export type ElementSegment = StyledTextSegment | LineBreakSegment | AtomicElemen
 const lineBreakToken: LineBreakSegment = { type: "linebreak" };
 
 /**
+ * The break {@link JSXTextParserUtils.getInlinedSegments} inserts where a line runs out of room, kept apart from
+ * {@link lineBreakToken} only by identity, so a caller can tell a break the content holds from one the width made.
+ */
+const wrapLineBreakToken: LineBreakSegment = { type: "linebreak" };
+
+/**
  * The break standing for the edge of a block element, kept apart from {@link lineBreakToken} only by
  * identity, so the walk can tell a break the content asked for from one it inferred.
  */
@@ -151,6 +157,15 @@ export namespace JSXTextParserUtils {
 
     /** Tests whether two runs of text came from the same surroundings — same link, title and data attributes. */
     export const isSameMeta = (a: StyledTextSegment, b: StyledTextSegment) => deepEqual(a.meta, b.meta);
+
+    /**
+     * Tests whether a piece is a break {@link getInlinedSegments} inserted because a line ran out of room, rather
+     * than one the content itself holds.
+     *
+     * A caller counting the pieces of a text — one per character, image and break — can leave these out, so the
+     * count and every position in it stay the same at any width.
+     */
+    export const getIsWrapBreak = (segment: ElementSegment) => segment === wrapLineBreakToken;
 
     /**
      * Walks a rendered element and flattens it into a list of text runs, line breaks
@@ -368,15 +383,27 @@ export namespace JSXTextParserUtils {
      * will not fit. Words that end up next to each other with identical styling are
      * glued back into a single run, so the result holds as few pieces as possible.
      * Unsplittable elements take their own width, or the full line if they are
-     * block-like.
+     * block-like. A break inserted for want of room is told apart from one the content
+     * held by {@link getIsWrapBreak}.
      *
      * Browser only, since measuring reads from a canvas.
      *
      * @param segments The pieces to lay out, from {@link getSegmentTokens}.
      * @param width The line width to wrap at, in pixels.
+     * @param opts.measureTextWidths Measures a run of words in place of the canvas, for text that will be drawn
+     * wider or narrower than its own style says — letters that grow under an animation, say. It is handed the
+     * words of one run in order, the run's measuring style, and where the run's first character falls among
+     * every character, whole element and break the content holds, counted from `0`, so it can tell which
+     * letters it is measuring. It answers one width per word, in pixels.
      * @returns A new list with breaks inserted. The input is not modified.
      */
-    export const getInlinedSegments = (segments: readonly ElementSegment[], width: number) => {
+    export const getInlinedSegments = (
+        segments: readonly ElementSegment[],
+        width: number,
+        opts?: {
+            measureTextWidths?: (texts: readonly string[], metrics: TextMetricsStyle, startIndex: number) => number[];
+        },
+    ) => {
         const result: ElementSegment[] = [];
         const identicalSegmentGroups = groupIdenticalTextSegments(
             segments,
@@ -386,15 +413,16 @@ export namespace JSXTextParserUtils {
         let remainingWidth = width;
         let segmentId = 0;
         let lastTextSegmentId = 0;
+        let characterIndex = 0;
 
-        const addLineBreak = () => {
-            result.push(lineBreakToken);
+        const addLineBreak = (token: LineBreakSegment) => {
+            result.push(token);
             remainingWidth = width;
         };
 
         const addToken = (token: ElementSegment, tokenWidth: number) => {
             if (tokenWidth > remainingWidth && !(token.type === "text" && StringUtils.isWhitespace(token.text))) {
-                addLineBreak();
+                addLineBreak(wrapLineBreakToken);
             }
 
             const prevToken = result.at(-1);
@@ -420,12 +448,14 @@ export namespace JSXTextParserUtils {
                             token,
                             (token as AtomicElementSegment).isBlockLike ? width : (token as AtomicElementSegment).width,
                         );
+                        characterIndex++;
                     }
 
                     break;
                 }
                 case "linebreak": {
-                    addLineBreak();
+                    addLineBreak(lineBreakToken);
+                    characterIndex += segment.length;
 
                     break;
                 }
@@ -435,10 +465,13 @@ export namespace JSXTextParserUtils {
                         getWordSegmenter().segment((s as StyledTextSegment).text),
                     );
                     const texts = StringUtils.mergePunctuation(StringUtils.intlSegmentsArrayToStrings(intlSegments));
-                    const widths = JSXTextMetricsUtils.measureTextWidths(texts, metrics);
+                    const widths = opts?.measureTextWidths
+                        ? opts.measureTextWidths(texts, metrics, characterIndex)
+                        : JSXTextMetricsUtils.measureTextWidths(texts, metrics);
 
                     for (let idx = 0; idx < texts.length; idx++) {
                         addToken({ ...segment[0], text: texts[idx] }, widths[idx]);
+                        characterIndex += Array.from(texts[idx]).length;
                     }
 
                     break;

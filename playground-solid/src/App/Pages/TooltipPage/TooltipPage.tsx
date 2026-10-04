@@ -3,6 +3,11 @@ import { createMemo, createSignal } from "solid-js";
 import type { AnchorHPlacement, AnchorVPlacement } from "@thewaver/ss-components-solid";
 import { ANCHOR_H_PLACEMENTS, ANCHOR_V_PLACEMENTS, TOOLTIP_DEFAULTS } from "@thewaver/ss-components-solid";
 import { TooltipKnobs } from "@thewaver/ss-playground/App/Knobs/Tooltips.const";
+import {
+    TOOLTIP_REVEALS,
+    TOOLTIP_REVEAL_LABELS,
+    type TooltipReveal,
+} from "@thewaver/ss-playground/App/StyledComponents/TooltipContent/TooltipContent.const";
 
 import { PageExamples } from "../../PageComponents/Examples/Examples";
 import { PageNumberField, PageSelectField } from "../../PageComponents/Field/Field";
@@ -26,6 +31,7 @@ export const TooltipPage = () => {
     const [getFocusShowDelayMs, setFocusShowDelayMs] = createSignal(TOOLTIP_DEFAULTS.focusShowDelayMs);
     const [getHoverShowDelayMs, setHoverShowDelayMs] = createSignal(TOOLTIP_DEFAULTS.hoverShowDelayMs);
     const [getSkipDelayWindowMs, setSkipDelayWindowMs] = createSignal(TOOLTIP_DEFAULTS.skipDelayWindowMs);
+    const [getReveal, setReveal] = createSignal<TooltipReveal>(TooltipKnobs.STARTING_REVEAL);
 
     const getPlacement = createMemo(() => ({ x: getHPlacement(), y: getVPlacement() }));
 
@@ -39,6 +45,7 @@ export const TooltipPage = () => {
             focusShowDelayMs: getFocusShowDelayMs,
             hoverShowDelayMs: getHoverShowDelayMs,
             skipDelayWindowMs: getSkipDelayWindowMs,
+            reveal: getReveal,
         };
 
         return [
@@ -71,6 +78,23 @@ export const TooltipPage = () => {
     return (
         <>
             <PagePropsPanel scope={"global"}>
+                <PageProp
+                    key={"reveal"}
+                    label={"Reveal"}
+                    hint={
+                        "How the tooltip appears and goes, which is the drawing's own: the tooltip only says whether it is showing and for how long the change takes."
+                    }
+                >
+                    <PageSelectField
+                        value={getReveal}
+                        values={() => TOOLTIP_REVEALS}
+                        computeLabel={(reveal) => TOOLTIP_REVEAL_LABELS[reveal]}
+                        width={() => FIELD_WIDTH}
+                        ariaLabel={"Reveal"}
+                        onChange={(reveal) => setReveal(() => reveal)}
+                    />
+                </PageProp>
+
                 <PageProp
                     key={"hPlacement"}
                     label={"Placement across"}
@@ -137,8 +161,8 @@ export const TooltipPage = () => {
 
                 <PageProp
                     key={"transitionDurationMs"}
-                    label={"Fade (ms)"}
-                    hint={"How long the tooltip takes to fade in and out."}
+                    label={"Reveal (ms)"}
+                    hint={"How long the tooltip takes to appear and to go."}
                 >
                     <PageNumberField
                         value={getTransitionDurationMs}
@@ -146,7 +170,7 @@ export const TooltipPage = () => {
                         max={() => TooltipKnobs.MAX_DURATION}
                         step={() => TooltipKnobs.DURATION_STEP}
                         width={() => FIELD_WIDTH}
-                        ariaLabel={"Fade in milliseconds"}
+                        ariaLabel={"Reveal in milliseconds"}
                         onInput={setTransitionDurationMs}
                     />
                 </PageProp>

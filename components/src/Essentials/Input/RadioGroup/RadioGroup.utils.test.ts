@@ -79,12 +79,4 @@ describe("computePlacement and computeFloaterBounds", () => {
         expect(RadioGroupUtils.computePlacement([SMALL, LARGE], layout, MEDIUM)).toBeUndefined();
         expect(RadioGroupUtils.computePlacement([SMALL, LARGE], undefined, SMALL)).toBeUndefined();
     });
-
-    it("uses the measurement for a plain group and the placement for a laid-out one", () => {
-        const measured = { top: "1px", left: "2px", width: "3px", height: "4px" };
-
-        expect(RadioGroupUtils.computeFloaterBounds(undefined, measured, undefined)).toBe(measured);
-        expect(RadioGroupUtils.computeFloaterBounds(layout, measured, undefined)).toBeUndefined();
-        expect(RadioGroupUtils.computeFloaterBounds(layout, measured, placement)?.transform).toBe("rotate(30deg)");
-    });
 });

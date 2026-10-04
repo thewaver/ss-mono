@@ -13,6 +13,7 @@ import {
 import * as styles from "@thewaver/ss-playground/App/Pages/TabsPage/TabsPage.css";
 
 import PageTabPanel from "../../../PageComponents/TabPanel/TabPanel.vue";
+import PageGlideFloater from "../../../StyledComponents/GlideFloater/PageGlideFloater.vue";
 import PageTabContent from "../../../StyledComponents/TabContent/PageTabContent.vue";
 import PageTabFloater from "../../../StyledComponents/TabContent/PageTabFloater.vue";
 import PageTabGutter from "../../../StyledComponents/TabContent/PageTabGutter.vue";
@@ -23,6 +24,7 @@ const DEFAULT_ID_PREFIX = "row";
 type Props = TabsExampleProps & {
     tabs?: Tab<string>[];
     idPrefix?: string;
+    hasHoverPill?: boolean;
 };
 
 const props = defineProps<Props>();
@@ -45,9 +47,17 @@ const idPrefix = computed(() => props.idPrefix ?? DEFAULT_ID_PREFIX);
                 <PageTabGutter orientation="horizontal" />
             </template>
 
-            <template #renderFloater="{ visibilityTarget, transitionDurationMs }">
+            <template #renderSelectionFloater="{ visibilityTarget, transitionDurationMs }">
                 <PageTabFloater
                     orientation="horizontal"
+                    :visibility-target="visibilityTarget"
+                    :transition-duration-ms="transitionDurationMs"
+                />
+            </template>
+
+            <template v-if="hasHoverPill" #renderHighlightFloater="{ visibilityTarget, transitionDurationMs }">
+                <PageGlideFloater
+                    kind="highlight"
                     :visibility-target="visibilityTarget"
                     :transition-duration-ms="transitionDurationMs"
                 />

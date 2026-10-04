@@ -28,6 +28,7 @@ export const PlacementBox = (props: PlacementBoxProps) => {
     const { getReading, getIsPointerPresent } = PointerTrackerSolidUtils.create(
         getBoxRef,
         () => getComputeEffect() === undefined,
+        () => access(props.pointSource),
     );
 
     const getPrefersReducedMotion = MediaQueryMonitorSolidUtils.createReducedMotion(

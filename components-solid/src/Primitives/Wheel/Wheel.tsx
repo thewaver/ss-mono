@@ -66,7 +66,11 @@ export const Wheel = <T,>(props: WheelProps<T>) => {
 
     const getComputeEffect = () => props.computeEffect;
 
-    const pointer = PointerTrackerSolidUtils.create(getWheelRef, () => getComputeEffect() === undefined);
+    const pointer = PointerTrackerSolidUtils.create(
+        getWheelRef,
+        () => getComputeEffect() === undefined,
+        () => access(props.pointSource),
+    );
 
     const getPrefersReducedMotion = MediaQueryMonitorSolidUtils.createReducedMotion(
         () => getComputeEffect() === undefined,

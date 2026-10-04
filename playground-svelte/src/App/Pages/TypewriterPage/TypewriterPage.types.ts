@@ -1,7 +1,7 @@
 export type TypewriterTextEffect = "fade" | "scale" | "glow" | "drop" | "slide";
 
 export type TypewriterExampleProps = {
-    animationName: string;
+    computeAnimationName: (character: string, index: number, count: number) => string;
     computeCharacterWeights?: (count: number) => number[];
 };
 

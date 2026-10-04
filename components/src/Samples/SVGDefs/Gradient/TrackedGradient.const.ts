@@ -69,6 +69,28 @@ export namespace TrackedGradientDefaults {
 
     export const SPOT_SMEAR_CYCLING_DEFAULTS = { ...SPOT_SMEAR_DEFAULTS, ageColorSpan: 0.5, cycleMs: 1000 };
 
+    export const RIBBON_DEFAULTS = {
+        circular: true,
+        ribbonLength: 14,
+        headScale: 0.32,
+        tailScale: 0.06,
+        headAlpha: 0.9,
+        stiffness: 0.12,
+        damping: 0.72,
+        followStiffness: 0.45,
+    };
+
+    export const SWARM_DEFAULTS = {
+        circular: true,
+        spotCount: 9,
+        spotScale: 0.22,
+        spotAlpha: 0.8,
+        wanderRatio: 0.12,
+        wanderMs: 3000,
+        stiffness: 0.08,
+        damping: 0.78,
+    };
+
     export const DEFAULTS_BY_FAMILY: TrackedGradientDefaultsByFamily = {
         band_1: BAND_DEFAULTS,
         band_1v1: BAND_BLEND_DEFAULTS,
@@ -89,5 +111,7 @@ export namespace TrackedGradientDefaults {
         spot_trail_1: SPOT_TRAIL_DEFAULTS,
         spot_trail_2: SPOT_TRAIL_CYCLING_DEFAULTS,
         spot_trail_3: SPOT_TRAIL_CYCLING_DEFAULTS,
+        ribbon_3: RIBBON_DEFAULTS,
+        swarm_3: SWARM_DEFAULTS,
     };
 }

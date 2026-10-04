@@ -1,10 +1,11 @@
 import { type Page, expect, test } from "@playwright/test";
 
-import { accessibleText, activeMatches, attributesOf, demo } from "./helpers";
+import { accessibleText, activeMatches, attributesOf, centerDistance, demo } from "./helpers";
 
 const SINGLE = demo("single");
 const MULTIPLE = demo("multiple");
 const HORIZONTAL = demo("horizontalRightToLeft");
+const GLIDE = demo("glide");
 
 const LISTBOX = '[role="listbox"]';
 const GROUP_HEADER = '[role="group"] [data-checked-state]';
@@ -312,4 +313,32 @@ test("a horizontal list in a right-to-left page walks forward with the left arro
     expect(await activeMatches(page, `${HORIZONTAL} [role="option"][aria-selected="true"]`), "Enter picks it").toBe(
         true,
     );
+});
+
+/**
+ * Two markers, each following its own thing: one the selected option, the other whichever option the pointer is
+ * on, or the focus when the pointer is elsewhere. In a list that holds the focus itself, hovering must not move the
+ * focus, so the highlight marker has to read the pointer on its own rather than wait for the focus to follow it.
+ * The marker boxes are the library's; the painters inside are the consumer's and carry `data-floater`.
+ */
+test("one marker sits on the selected option and another glides to the hovered or focused one", async ({ page }) => {
+    const selection = page.locator(`${GLIDE} [data-floater="selection"]`).locator("..");
+    const highlight = page.locator(`${GLIDE} [data-floater="highlight"]`).locator("..");
+    const selectedIndex = (await selectedFlags(page, GLIDE)).indexOf(true);
+
+    await expect.poll(() => centerDistance(selection, option(page, GLIDE, selectedIndex))).toBeLessThan(2);
+    await expect(highlight, "nothing is hovered or focused yet, so there is no highlight to mark").toHaveCount(0);
+
+    await option(page, GLIDE, 1).hover();
+    await expect.poll(() => centerDistance(highlight, option(page, GLIDE, 1))).toBeLessThan(2);
+
+    await option(page, GLIDE, 0).hover();
+    await expect.poll(() => centerDistance(highlight, option(page, GLIDE, 0))).toBeLessThan(2);
+    expect(await focusedIndex(page, GLIDE), "hovering marks an option without taking the focus to it").toBe(-1);
+
+    await page.mouse.move(0, 0);
+    await option(page, GLIDE, selectedIndex).focus();
+    await page.keyboard.press("ArrowUp");
+    await expect.poll(() => centerDistance(highlight, option(page, GLIDE, selectedIndex - 1))).toBeLessThan(2);
+    await expect.poll(() => centerDistance(selection, option(page, GLIDE, selectedIndex))).toBeLessThan(2);
 });

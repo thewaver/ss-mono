@@ -1,14 +1,6 @@
 import type { NavigatorDirection } from "../../Abstracts/Navigator/Navigator.types";
 import { NavigatorUtils } from "../../Abstracts/Navigator/Navigator.utils";
-import type { PlacementRect } from "../../Abstracts/Placement/Placement.types";
-import { PlacementUtils } from "../../Abstracts/Placement/Placement.utils";
-import type { Tab, TabsFloaterBounds, TabsKeyStep, TabsOrientation } from "./Tabs.types";
-
-/** A placement's position is its center, so the box starts half its size back from it. */
-const HALF = 0.5;
-
-/** A placement with no angle is drawn upright. */
-const NO_ANGLE = 0;
+import type { Tab, TabsKeyStep, TabsOrientation } from "./Tabs.types";
 
 /**
  * The part of a tab strip that is not about drawing it: which tab is selected, which one holds the tab stop, where
@@ -119,56 +111,5 @@ export namespace TabsUtils {
             value: tab.value,
             isSelecting: opts.hasAutoActivation && !tab.isDisabled && tab.value !== opts.selectedValue,
         };
-    };
-
-    /**
-     * Where the selected marker's box goes for a tab a layout placed.
-     *
-     * @param placement The placement the layout gave the selected tab.
-     * @returns The box, in shares of the strip's width so it scales with it, turned the way the tab was.
-     */
-    export const computePlacedBounds = (placement: PlacementRect): TabsFloaterBounds => ({
-        top: PlacementUtils.toContainerWidth(placement.topShare - placement.heightShare * HALF),
-        left: PlacementUtils.toContainerWidth(placement.leftShare - placement.widthShare * HALF),
-        width: PlacementUtils.toContainerWidth(placement.widthShare),
-        height: PlacementUtils.toContainerWidth(placement.heightShare),
-        transform: `rotate(${placement.angle ?? NO_ANGLE}deg)`,
-    });
-
-    /**
-     * Where the selected marker's box goes, and keeps going, for a strip laid out as a plain row or column.
-     *
-     * The box is the one around the selected tab, measured against the strip, and it is measured again whenever
-     * either of the two changes size — so a label that grows, or a strip that is squeezed, carries the marker with
-     * it. The first reading arrives as soon as observing starts.
-     *
-     * @param root The strip itself.
-     * @param item The selected tab's element. Its offset parent, the box the tab is wrapped in, is what is measured.
-     * @param onBounds Called with each reading.
-     * @returns The function that stops measuring. Nothing is measured, and stopping does nothing, when the tab has no
-     * box around it yet.
-     */
-    export const observeSelectedBounds = (
-        root: HTMLElement,
-        item: HTMLElement,
-        onBounds: (bounds: TabsFloaterBounds) => void,
-    ) => {
-        const wrapper = item.offsetParent as HTMLElement | null;
-
-        if (!wrapper) return () => {};
-
-        const observer = new ResizeObserver(() => {
-            onBounds({
-                top: `${wrapper.offsetTop}px`,
-                left: `${wrapper.offsetLeft}px`,
-                width: `${wrapper.offsetWidth}px`,
-                height: `${wrapper.offsetHeight}px`,
-            });
-        });
-
-        observer.observe(root);
-        observer.observe(wrapper);
-
-        return () => observer.disconnect();
     };
 }

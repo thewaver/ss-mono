@@ -12,6 +12,7 @@ import {
 } from "react";
 
 import {
+    LetterDriverStyles,
     LetterDriverUtils,
     type LetterRegistration,
     PAINTED_TEXT_DEFAULTS,
@@ -78,17 +79,32 @@ export const PaintedText = (props: PaintedTextProps) => {
 
     isDrivenRef.current = !!driver;
 
+    const computePushingName = driver?.computePushingAnimationName;
+    const computePushingNameRef = useRef<((character: string, index: number) => string) | undefined>(undefined);
+
+    computePushingNameRef.current =
+        computePushingName && driver
+            ? (character, index) =>
+                  computePushingName(
+                      character,
+                      (rootRef.current ? driver.registry.getOffset(rootRef.current) : NO_OFFSET) + index,
+                      driver.registry.get().characters.length,
+                  )
+            : undefined;
+
     const [layout] = useState(() =>
         PaintedTextUtils.createLayout({
             getSource: () => sourceRef.current ?? undefined,
             getLayoutHost: () => layoutRef.current ?? undefined,
             getIsMeasuringLetters: () => isDrivenRef.current,
+            getComputePushingAnimationName: () => computePushingNameRef.current,
         }),
     );
 
     const runs = useStore(layout, (state) => state.runs);
     const atomics = useStore(layout, (state) => state.atomics);
     const letters = useStore(layout, (state) => state.letters);
+    const restLetters = useStore(layout, (state) => state.restLetters);
     const width = useStore(layout, (state) => state.width ?? 0);
     const height = useStore(layout, (state) => state.height);
 
@@ -141,6 +157,12 @@ export const PaintedText = (props: PaintedTextProps) => {
     }, [letters]);
 
     useEffect(() => {
+        registrationRef.current?.setBoxes(
+            restLetters.map((letter) => ({ x: letter.x, y: letter.top, width: letter.width, height: letter.height })),
+        );
+    }, [restLetters]);
+
+    useEffect(() => {
         props.onMount?.(controller);
     }, [controller]);
 
@@ -157,9 +179,27 @@ export const PaintedText = (props: PaintedTextProps) => {
     const offset = driver && rootRef.current ? driver.registry.getOffset(rootRef.current) : NO_OFFSET;
     const isPerLetter = !!driver?.isAnimating;
 
+    const pushingStyles = computePushingName
+        ? restLetters.map((_, index) => {
+              const animation = driver?.getLetterState(offset + index).animation;
+
+              return animation
+                  ? LetterDriverUtils.computeAnimationStyle(animation, LetterDriverStyles.letterDriverTimeVar)
+                  : undefined;
+          })
+        : undefined;
+    const pushingKey = pushingStyles && JSON.stringify(pushingStyles);
+
+    useLayoutEffect(() => {
+        if (pushingStyles) layout.relayout(pushingStyles);
+    }, [restLetters, pushingKey]);
+
     const getLetterStyle = (localIndex: number) =>
         driver && isPerLetter
-            ? PaintedTextUtils.computeLetterStyle(driver.getLetterState(offset + localIndex))
+            ? PaintedTextUtils.computeLetterStyle(
+                  driver.getLetterState(offset + localIndex),
+                  LetterDriverStyles.letterDriverTimeVar,
+              )
             : undefined;
 
     const atomicLetterIndices = letters.reduce<number[]>((indices, letter, index) => {
@@ -186,7 +226,7 @@ export const PaintedText = (props: PaintedTextProps) => {
 
     const renderRuns = (isReadable: boolean) => runs.map((run, index) => renderRun(run, index, isReadable));
 
-    const renderLetter = (letter: PaintedTextLetter, localIndex: number, isReporting: boolean) => {
+    const renderLetter = (letter: PaintedTextLetter, localIndex: number) => {
         const state = driver?.getLetterState(offset + localIndex);
         const letterStyle = getLetterStyle(localIndex);
 
@@ -198,28 +238,18 @@ export const PaintedText = (props: PaintedTextProps) => {
                 y={letter.baseline}
                 textAnchor={state?.glyph ? "middle" : undefined}
                 style={toReactStyle({ ...runs[letter.runIndex ?? 0]?.style, ...letterStyle })}
-                onAnimationStart={
-                    isReporting
-                        ? (event) => {
-                              if (event.target === event.currentTarget) {
-                                  driver?.reportLetterStart?.(offset + localIndex);
-                              }
-                          }
-                        : undefined
-                }
             >
                 {state?.glyph ?? letter.character}
             </text>
         );
     };
 
-    const renderLetters = (isReporting: boolean) =>
-        letters.map((letter, index) => letter.kind === "text" && renderLetter(letter, index, isReporting));
+    const renderLetters = () => letters.map((letter, index) => letter.kind === "text" && renderLetter(letter, index));
 
     const renderLayer = (key: string, attributes: LayerAttributes, isReadable: boolean) =>
         isPerLetter ? (
             <g key={key} {...(attributes as SVGProps<SVGGElement>)} aria-hidden="true">
-                {renderLetters(isReadable)}
+                {renderLetters()}
             </g>
         ) : (
             <text

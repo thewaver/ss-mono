@@ -1,4 +1,4 @@
-import { type SlotsType, Teleport, defineComponent, shallowRef, useId } from "vue";
+import { type SlotsType, Teleport, defineComponent, shallowRef, useId, watch } from "vue";
 
 import { HoverIntentUtils, TOOLTIP_DEFAULTS, TooltipStyles, TooltipUtils } from "@thewaver/ss-components";
 import { assignInlineVars } from "@vanilla-extract/dynamic";
@@ -58,6 +58,23 @@ export const Tooltip = defineComponent(
             },
         });
 
+        const isGliding = shallowRef(false);
+
+        watch(
+            () => props.anchorRef,
+            (anchor, previous, onCleanup) => {
+                if (!anchor || !previous || !fader.isVisible.value) return;
+
+                isGliding.value = true;
+
+                const settle = setTimeout(() => {
+                    isGliding.value = false;
+                }, getTransitionDurationMs());
+
+                onCleanup(() => clearTimeout(settle));
+            },
+        );
+
         watchAfterRender([() => props.anchorRef, fader.isVisible], ([anchor, isVisible]) =>
             anchor && isVisible ? TooltipUtils.describe(anchor, tooltipId) : undefined,
         );
@@ -79,6 +96,9 @@ export const Tooltip = defineComponent(
                         style={{
                             visibility: position.value ? "visible" : "hidden",
                             transform: `translate(${position.value?.x ?? 0}px, ${position.value?.y ?? 0}px)`,
+                            transition: isGliding.value
+                                ? TooltipUtils.getGlideTransition(getTransitionDurationMs())
+                                : undefined,
                             zIndex: zIndex.value,
                             pointerEvents: isShown.value ? "auto" : "none",
                             ...assignInlineVars({

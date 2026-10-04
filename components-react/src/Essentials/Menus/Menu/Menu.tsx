@@ -5,12 +5,14 @@ import {
     type ReactNode,
     useEffect,
     useId,
+    useLayoutEffect,
     useMemo,
     useRef,
     useState,
 } from "react";
 
 import {
+    FloaterStyles,
     MENU_DEFAULTS,
     type MenuFlags,
     type MenuHighlightPosition,
@@ -21,6 +23,7 @@ import {
 } from "@thewaver/ss-components";
 import { type Point2d, Rect } from "@thewaver/ss-utils";
 
+import { FloaterReactUtils } from "../../../Abstracts/Floater/FloaterReact.utils";
 import { NavigatorReactUtils } from "../../../Abstracts/Navigator/NavigatorReact.utils";
 import { SignalMirrorReactUtils } from "../../../Abstracts/SignalMirror/SignalMirrorReact.utils";
 import { TypeaheadReactUtils } from "../../../Abstracts/Typeahead/TypeaheadReact.utils";
@@ -202,6 +205,8 @@ const MenuEntry = <T,>(props: MenuEntryProps<T>) => {
                             computeCustomText={level.computeCustomText}
                             renderItem={level.renderItem}
                             renderPopup={level.renderPopup}
+                            floaterTransitionDurationMs={level.floaterTransitionDurationMs}
+                            renderHighlightFloater={level.renderHighlightFloater}
                             onPick={level.onPick}
                             onClose={props.onSubmenuClose}
                             onDismiss={level.onDismiss}
@@ -274,6 +279,38 @@ const MenuLevel = <T,>(props: MenuLevelProps<T>) => {
     const getItemId = (index: number) => `${props.id}-item-${index}`;
 
     const activeItemId = highlightedIndex === undefined ? undefined : getItemId(highlightedIndex);
+
+    const [itemsElement, setItemsElement] = useState<HTMLDivElement | null>(null);
+    const [highlightTarget, setHighlightTarget] = useState<HTMLElement>();
+
+    useLayoutEffect(() => {
+        const element = highlightedIndex === undefined ? null : document.getElementById(getItemId(highlightedIndex));
+        const target = element ?? undefined;
+
+        setHighlightTarget((previous) => (previous === target ? previous : target));
+    });
+
+    const floaterTransitionDurationMs = props.floaterTransitionDurationMs ?? MENU_DEFAULTS.floaterTransitionDurationMs;
+
+    const highlightFloater = FloaterReactUtils.useFloater({
+        isEnabled: props.renderHighlightFloater !== undefined,
+        container: itemsElement ?? undefined,
+        target: highlightTarget,
+        layout,
+        placement: highlightedIndex === undefined ? undefined : layout?.placements[highlightedIndex],
+        transitionDurationMs: floaterTransitionDurationMs,
+    });
+
+    const renderHighlightFloater = () =>
+        highlightFloater.isRendered && (
+            <div
+                ref={highlightFloater.ref}
+                className={FloaterStyles.floater}
+                style={{ ...highlightFloater.bounds, transitionDuration: `${floaterTransitionDurationMs}ms` }}
+            >
+                {props.renderHighlightFloater?.(highlightFloater.visibilityTarget, floaterTransitionDurationMs)}
+            </div>
+        );
 
     const computeItemText = (index: number) =>
         props.computeCustomText?.(entries[index]) ??
@@ -459,11 +496,15 @@ const MenuLevel = <T,>(props: MenuLevelProps<T>) => {
                     }}
                     computeEffect={props.computeEffect}
                 >
+                    {renderHighlightFloater()}
                     {renderRuns()}
                 </PlacementBox>
             </div>
         ) : (
-            renderRuns()
+            <div ref={setItemsElement} className={MenuStyles.menuItems} role="presentation">
+                {renderHighlightFloater()}
+                {renderRuns()}
+            </div>
         );
 
     return (
@@ -640,6 +681,8 @@ export const Menu = <T,>(props: MenuProps<T>) => {
                         flickOrigin={flickOrigin}
                         renderItem={props.renderItem}
                         renderPopup={props.renderPopup}
+                        floaterTransitionDurationMs={props.floaterTransitionDurationMs}
+                        renderHighlightFloater={props.renderHighlightFloater}
                         onPick={pick}
                         onFlickEnd={(releasedOn) => {
                             setFlickOrigin(undefined);
@@ -756,6 +799,8 @@ export const ContextMenu = <T,>(props: ContextMenuProps<T>) => {
                 computeCustomText={props.computeCustomText}
                 renderItem={props.renderItem}
                 renderPopup={props.renderPopup}
+                floaterTransitionDurationMs={props.floaterTransitionDurationMs}
+                renderHighlightFloater={props.renderHighlightFloater}
                 onPick={pick}
                 onClose={close}
                 onDismiss={close}

@@ -6,6 +6,7 @@ import { ContextAreaExample } from "./Examples/ContextArea";
 import { DefaultExample } from "./Examples/Default";
 import { DisabledExample } from "./Examples/Disabled";
 import { DrivenExample } from "./Examples/Driven";
+import { GlideExample } from "./Examples/Glide";
 import { PlacedAboveExample } from "./Examples/PlacedAbove";
 import { ReachableExample } from "./Examples/Reachable";
 import { RightToLeftExample } from "./Examples/RightToLeft";
@@ -36,6 +37,7 @@ export const MenuPage = () => {
     const [getLastLayerAction, setLastLayerAction] = createSignal(NOTHING_RUN);
     const [getLastDrivenAction, setLastDrivenAction] = createSignal(NOTHING_RUN);
     const [getLastContextAction, setLastContextAction] = createSignal(NOTHING_RUN);
+    const [getLastGlideAction, setLastGlideAction] = createSignal(NOTHING_RUN);
 
     const [getZoomPercent, setZoomPercent] = createSignal(ZOOM_RESET_PERCENT);
 
@@ -58,6 +60,14 @@ export const MenuPage = () => {
             readout: () => `${getLastAction()} — activating an item closes the menu`,
             component: () => <DefaultExample onActivate={(action) => setLastAction(action.name)} />,
             path: `${EXAMPLES_ROOT}/Default.tsx`,
+        },
+        {
+            key: "glide",
+            name: "A gliding highlight",
+            readout: () =>
+                `${getLastGlideAction()} — the items paint no highlight of their own; one marker glides to whichever item the pointer or the arrows are on`,
+            component: () => <GlideExample onActivate={(action) => setLastGlideAction(action.name)} />,
+            path: `${EXAMPLES_ROOT}/Glide.tsx`,
         },
         {
             key: "driven",

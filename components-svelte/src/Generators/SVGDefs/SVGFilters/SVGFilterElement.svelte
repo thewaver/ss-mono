@@ -118,6 +118,30 @@
             <feColorMatrix in={input.srcIn} type={primitive.type} values={primitive.values} result={primitive.key}>
                 <Markup markup={primitive.custom} />
             </feColorMatrix>
+        {:else if primitive.kind === "pixelate"}
+            {#if props.assembly.frame}
+                {@const resolved = SVGFilterDefsUtils.resolvePixelate(
+                    primitive.key,
+                    primitive.defs,
+                    props.assembly.frame,
+                )}
+                <feImage href={resolved.gridHref} preserveAspectRatio="none" result={resolved.keys.dots}>
+                    <Markup markup={primitive.custom} />
+                </feImage>
+
+                <feComponentTransfer in={resolved.keys.dots} result={resolved.keys.grid}>
+                    <feFuncA type="discrete" tableValues={SVGFilterDefs.OPAQUE_WHEREVER_DRAWN} />
+                </feComponentTransfer>
+
+                <feComposite in={input.srcIn} in2={resolved.keys.grid} operator="in" result={resolved.keys.sampled} />
+
+                <feMorphology
+                    in={resolved.keys.sampled}
+                    operator="dilate"
+                    radius={resolved.radius}
+                    result={primitive.key}
+                />
+            {/if}
         {:else if primitive.kind === "specularLighting"}
             {@render lightSurface(primitive.defs.surface, `${primitive.key}_surface`)}
 

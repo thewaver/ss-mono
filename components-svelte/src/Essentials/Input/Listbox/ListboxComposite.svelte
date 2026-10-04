@@ -1,7 +1,7 @@
 <script lang="ts" generics="T">
     import { on } from "svelte/events";
 
-    import { LISTBOX_DEFAULTS, ListboxStyles as styles } from "@thewaver/ss-components";
+    import { LISTBOX_DEFAULTS } from "@thewaver/ss-components";
 
     import { NavigatorSvelteUtils } from "../../../Abstracts/Navigator/NavigatorSvelte.utils.svelte.js";
     import type { ListboxCompositeProps } from "./Listbox.types.js";
@@ -42,7 +42,6 @@
     bind:this={root}
     {@attach (element) => on(element, "keydown", (e) => cursor.handleKeyDown(e))}
     id={listboxId}
-    class={orientation === "horizontal" ? styles.listboxHorizontal : undefined}
     role="listbox"
     aria-label={props.ariaLabel}
     aria-multiselectable={isMultiple || undefined}
@@ -65,6 +64,9 @@
         computeIsSelected={props.computeIsSelected}
         renderOption={props.renderOption}
         renderGroup={props.renderGroup}
+        floaterTransitionDurationMs={props.floaterTransitionDurationMs}
+        renderSelectionFloater={props.renderSelectionFloater}
+        renderHighlightFloater={props.renderHighlightFloater}
         onReachEnd={props.onReachEnd}
     />
 </div>

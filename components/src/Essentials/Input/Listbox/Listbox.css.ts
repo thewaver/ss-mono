@@ -1,5 +1,10 @@
 import { style } from "@vanilla-extract/css";
 
+export const listboxOptions = style({
+    position: "relative",
+    isolation: "isolate",
+});
+
 export const listboxHorizontal = style({
     display: "flex",
     flexWrap: "wrap",
@@ -13,6 +18,7 @@ export const listboxEndMarker = style({
 
 export const listboxSizer = style({
     position: "relative",
+    isolation: "isolate",
     width: "100%",
 });
 

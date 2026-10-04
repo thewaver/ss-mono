@@ -35,7 +35,9 @@ export type TooltipProps = {
     skipDelayWindowMs?: number;
     /**
      * The element the tooltip is anchored to and watches. It is also what gets `aria-describedby` while the
-     * tooltip is up, which is how the tooltip is announced at all.
+     * tooltip is up, which is how the tooltip is announced at all. Handed a different element while it is
+     * showing, the tooltip stays up and glides across to it over `transitionDurationMs`, and the description moves
+     * with it — which is how one tooltip serves a whole row of controls.
      */
     anchorRef: HTMLElement | undefined;
 };

@@ -1,15 +1,15 @@
-import { type Accessor, Index, type JSX, Show, createEffect, createMemo, createSignal, onCleanup } from "solid-js";
+import { type Accessor, Index, type JSX, Show, createEffect, createMemo, createSignal } from "solid-js";
 import { Dynamic } from "solid-js/web";
 
 import {
     TABS_DEFAULTS,
     type Tab,
-    type TabsFloaterBounds,
     TabsUtils,
+    FloaterStyles as floaterStyles,
     TabsStyles as styles,
 } from "@thewaver/ss-components";
 
-import { ElementFaderSolidUtils } from "../../Abstracts/ElementFader/ElementFaderSolid.utils";
+import { FloaterSolidUtils } from "../../Abstracts/Floater/FloaterSolid.utils";
 import { NavigatorSolidUtils } from "../../Abstracts/Navigator/NavigatorSolid.utils";
 import { InteractionWrapper } from "../../Primitives/InteractionWrapper/InteractionWrapper";
 import { PlacementBox } from "../../Primitives/PlacementBox/PlacementBox";
@@ -80,7 +80,6 @@ export const Tabs = <T,>(props: TabsProps<T>) => {
     const [getRootRef, setRootRef] = createSignal<HTMLElement>();
     const [getItemRefs, setItemRefs] = createSignal<(HTMLElement | undefined)[]>([]);
     const [getFocusedValue, setFocusedValue] = createSignal<T | undefined>();
-    const [getMeasuredBounds, setMeasuredBounds] = createSignal<TabsFloaterBounds | undefined>();
 
     const getTransitionDurationMs = createMemo(
         () => access(props.transitionDurationMs) ?? TABS_DEFAULTS.transitionDurationMs,
@@ -110,30 +109,35 @@ export const Tabs = <T,>(props: TabsProps<T>) => {
         TabsUtils.computeSelectedIndex(access(props.tabs), access(props.selectedValue)),
     );
 
-    const getFloaterBounds = createMemo(() => {
-        const layout = getLayout();
-        const placement = getPlacementAt(getSelectedIndex());
+    const [getHoveredIndex, setHoveredIndex] = createSignal<number>();
+    const [getFocusedIndex, setFocusedIndex] = createSignal<number>();
 
-        if (layout === undefined) return getMeasuredBounds();
-        if (placement === undefined) return undefined;
+    const getHighlightIndex = createMemo(() => getHoveredIndex() ?? getFocusedIndex());
 
-        return TabsUtils.computePlacedBounds(placement);
-    });
+    const findItemIndex = (target: EventTarget | null) =>
+        target instanceof Node ? getItemRefs().findIndex((item) => item?.contains(target) ?? false) : -1;
 
-    const getIsFloaterShown = createMemo(() => getSelectedIndex() >= 0 && getFloaterBounds() !== undefined);
+    const createFloater = (getIsEnabled: () => boolean, getIndex: () => number | undefined) =>
+        FloaterSolidUtils.create({
+            getIsEnabled,
+            getContainer: () => (getLayout() === undefined ? getRootRef() : undefined),
+            getTarget: () => {
+                const index = getIndex();
 
-    const [getFloaterRef, setFloaterRef] = createSignal<HTMLElement>();
+                return index === undefined || index < 0 ? undefined : getItemRefs()[index];
+            },
+            getLayout,
+            getPlacement: () => {
+                const index = getIndex();
 
-    const floaterFader = ElementFaderSolidUtils.createFader(getIsFloaterShown, {
-        getTransitionDurationMs,
-        getRef: getFloaterRef,
-    });
+                return index === undefined || index < 0 ? undefined : getPlacementAt(index);
+            },
+            getTransitionDurationMs,
+        });
 
-    createEffect(() => {
-        if (floaterFader.getIsVisible()) return;
+    const selectionFloater = createFloater(() => props.renderSelectionFloater !== undefined, getSelectedIndex);
 
-        setMeasuredBounds(undefined);
-    });
+    const highlightFloater = createFloater(() => props.renderHighlightFloater !== undefined, getHighlightIndex);
 
     const getRovingIndex = createMemo(() =>
         TabsUtils.computeRovingIndex(access(props.tabs), access(props.selectedValue), getFocusedValue()),
@@ -143,17 +147,6 @@ export const Tabs = <T,>(props: TabsProps<T>) => {
         access(props.selectedValue);
 
         setFocusedValue(() => undefined);
-    });
-
-    createEffect(() => {
-        if (!props.renderFloater || getLayout() !== undefined) return;
-
-        const rootRef = getRootRef();
-        const selectedItem = getItemRefs()[getSelectedIndex()];
-
-        if (!rootRef || !selectedItem) return;
-
-        onCleanup(TabsUtils.observeSelectedBounds(rootRef, selectedItem, setMeasuredBounds));
     });
 
     const handleKeyDown = (e: KeyboardEvent) => {
@@ -212,20 +205,26 @@ export const Tabs = <T,>(props: TabsProps<T>) => {
 
     const renderTabs = () => <Index each={access(props.tabs)}>{renderTabAt}</Index>;
 
-    const getIsFloaterRendered = createMemo(
-        () => props.renderFloater !== undefined && floaterFader.getIsVisible() && getFloaterBounds() !== undefined,
-    );
-
-    const renderFloater = () => (
-        <Show when={getIsFloaterRendered()}>
+    const renderFloater = (
+        floater: ReturnType<typeof createFloater>,
+        renderContent: TabsProps<T>["renderSelectionFloater"],
+    ) => (
+        <Show when={floater.getIsRendered()}>
             <div
-                ref={setFloaterRef}
-                class={styles.tabsFloater}
-                style={{ ...getFloaterBounds(), "transition-duration": `${getTransitionDurationMs()}ms` }}
+                ref={floater.setRef}
+                class={floaterStyles.floater}
+                style={{ ...floater.getBounds(), "transition-duration": `${getTransitionDurationMs()}ms` }}
             >
-                {props.renderFloater!(floaterFader.getTransitionTarget, getTransitionDurationMs)}
+                {renderContent?.(floater.getVisibilityTarget, getTransitionDurationMs)}
             </div>
         </Show>
+    );
+
+    const renderFloaters = () => (
+        <>
+            {renderFloater(highlightFloater, props.renderHighlightFloater)}
+            {renderFloater(selectionFloater, props.renderSelectionFloater)}
+        </>
     );
 
     return (
@@ -240,6 +239,18 @@ export const Tabs = <T,>(props: TabsProps<T>) => {
             aria-label={access(props.ariaLabel)}
             aria-orientation={getOrientation()}
             onKeyDown={handleKeyDown}
+            onPointerOver={(e) => {
+                const index = findItemIndex(e.target);
+
+                setHoveredIndex(index < 0 ? undefined : index);
+            }}
+            onPointerLeave={() => setHoveredIndex(undefined)}
+            onFocusIn={(e) => {
+                const index = findItemIndex(e.target);
+
+                setFocusedIndex(index < 0 ? undefined : index);
+            }}
+            onFocusOut={() => setFocusedIndex(undefined)}
         >
             {props.renderGutter && <div class={styles.tabsGutter}>{props.renderGutter()}</div>}
 
@@ -247,14 +258,14 @@ export const Tabs = <T,>(props: TabsProps<T>) => {
                 when={getLayout()}
                 fallback={
                     <>
-                        {renderFloater()}
+                        {renderFloaters()}
                         {renderTabs()}
                     </>
                 }
             >
                 {(getResolved) => (
                     <PlacementBox layout={getResolved} computeEffect={props.computeEffect}>
-                        {renderFloater()}
+                        {renderFloaters()}
                         {renderTabs()}
                     </PlacementBox>
                 )}

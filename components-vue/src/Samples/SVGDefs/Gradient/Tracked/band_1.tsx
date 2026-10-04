@@ -27,7 +27,11 @@ const DEFAULTS = TrackedGradientDefaults.BAND_DEFAULTS;
 
 const BandGradient = defineComponent(
     (props: BandGradientProps) => {
-        const { reading } = PointerTrackerVueUtils.usePointerReading(() => props.element);
+        const { reading } = PointerTrackerVueUtils.usePointerReading(
+            () => props.element,
+            false,
+            () => props.defs.getPointSource?.(),
+        );
 
         return () =>
             SVGGradientDefsVueUtils.computeLinearGradient({

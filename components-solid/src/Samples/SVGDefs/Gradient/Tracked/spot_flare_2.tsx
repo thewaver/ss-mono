@@ -72,7 +72,11 @@ export const spot_flare_2 = (opts?: GradientFlareOpts): TrackedGradientConfig =>
                 gradientOrPattern: {
                     id: `gradient1-${id}`,
                     renderDefsElement: () => {
-                        const { getReading } = PointerTrackerSolidUtils.create(getRef ?? NO_REF);
+                        const { getReading } = PointerTrackerSolidUtils.create(
+                            getRef ?? NO_REF,
+                            undefined,
+                            defs.getPointSource,
+                        );
 
                         return SVGGradientDefsSolidUtils.computeRadialGradient({
                             id: `gradient1-${id}`,
@@ -100,7 +104,11 @@ export const spot_flare_2 = (opts?: GradientFlareOpts): TrackedGradientConfig =>
                 gradientOrPattern: {
                     id: `gradient${index + 2}-${id}`,
                     renderDefsElement: () => {
-                        const { getReading, getIsPointerPresent } = PointerTrackerSolidUtils.create(getRef ?? NO_REF);
+                        const { getReading, getIsPointerPresent } = PointerTrackerSolidUtils.create(
+                            getRef ?? NO_REF,
+                            undefined,
+                            defs.getPointSource,
+                        );
 
                         const getGrowth = () => {
                             const ratio = getReading().boxRatio;

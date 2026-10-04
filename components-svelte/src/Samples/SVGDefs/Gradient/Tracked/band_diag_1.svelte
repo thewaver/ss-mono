@@ -48,7 +48,11 @@
 <script lang="ts">
     let props: DiagonalBandGradientProps = $props();
 
-    const { getReading } = PointerTrackerSvelteUtils.create(() => props.element);
+    const { getReading } = PointerTrackerSvelteUtils.create(
+        () => props.element,
+        undefined,
+        () => props.defs.getPointSource?.(),
+    );
 
     const angle = $derived(props.opts?.bandAngle ?? DEFAULTS.bandAngle);
 

@@ -15,6 +15,7 @@
     import { ElementFaderSvelteUtils } from "../../../Abstracts/ElementFader/ElementFaderSvelte.utils.svelte.js";
     import { HoverIntentSvelteUtils } from "../../../Abstracts/HoverIntent/HoverIntentSvelte.utils.svelte.js";
     import { getViewportContext } from "../../../Abstracts/Viewport/Viewport.context.js";
+    import { watchChange } from "../../../Utils/effectUtils.svelte.js";
     import { attachPortal } from "../../../Utils/portalUtils.js";
     import { toStyle } from "../../../Utils/styleUtils.js";
     import type { TooltipProps } from "./Tooltip.types.js";
@@ -58,6 +59,25 @@
         getReservedScreenSize: () => props.reservedScreenSize,
     });
 
+    let isGliding = $state(false);
+    let settleGlide: ReturnType<typeof setTimeout> | undefined;
+
+    watchChange(
+        () => props.anchorRef,
+        (anchorRef, previous) => {
+            clearTimeout(settleGlide);
+
+            if (!anchorRef || !previous || !fader.getIsVisible()) return;
+
+            isGliding = true;
+            settleGlide = setTimeout(() => {
+                isGliding = false;
+            }, transitionDurationMs);
+        },
+    );
+
+    $effect(() => () => clearTimeout(settleGlide));
+
     const bridge = $derived(HoverIntentUtils.computeBridgeInsets(position.getPlacement(), props.offset));
 
     DismisserSvelteUtils.createLayer(
@@ -84,6 +104,7 @@
             {
                 visibility: position.getPosition() ? "visible" : "hidden",
                 transform: `translate(${position.getPosition()?.x ?? 0}px, ${position.getPosition()?.y ?? 0}px)`,
+                transition: isGliding ? TooltipUtils.getGlideTransition(transitionDurationMs) : undefined,
                 zIndex: position.getZIndex(),
                 pointerEvents: isShown ? "auto" : "none",
             },

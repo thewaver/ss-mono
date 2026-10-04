@@ -2,6 +2,7 @@
     import type { ExampleDefs } from "../../PageComponents/Examples/Examples.types";
     import PageExamples from "../../PageComponents/Examples/PageExamples.svelte";
     import CountriesExample from "./Examples/Countries.svelte";
+    import GlideExample from "./Examples/Glide.svelte";
     import GroupedExample from "./Examples/Grouped.svelte";
     import SizesExample from "./Examples/Sizes.svelte";
 
@@ -10,6 +11,7 @@
     let single = $state<string | undefined>("Portugal");
     let multiple = $state.raw<string[]>(["Denmark"]);
     let size = $state<string | undefined>();
+    let glide = $state<string | undefined>("Portugal");
 
     const examples: ExampleDefs[] = [
         {
@@ -36,6 +38,14 @@
             component: sizesExample,
             path: `${EXAMPLES_ROOT}/Sizes.svelte`,
         },
+        {
+            key: "glide",
+            name: "Gliding markers",
+            readout: () =>
+                `value: ${glide ?? "undefined"} — one outlined marker sits on the picked option and a second glides to whichever option the pointer or the arrows are on`,
+            component: glideExample,
+            path: `${EXAMPLES_ROOT}/Glide.svelte`,
+        },
     ];
 </script>
 
@@ -49,6 +59,10 @@
 
 {#snippet sizesExample()}
     <SizesExample bind:value={size} />
+{/snippet}
+
+{#snippet glideExample()}
+    <GlideExample bind:value={glide} />
 {/snippet}
 
 <PageExamples items={examples} />

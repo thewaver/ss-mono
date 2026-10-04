@@ -3,6 +3,7 @@
     import PageExamples from "../../PageComponents/Examples/PageExamples.svelte";
     import FilesExample from "./Examples/Files.svelte";
     import LazyExample from "./Examples/Lazy.svelte";
+    import LeaningExample from "./Examples/Leaning.svelte";
     import LinkComponentExample from "./Examples/LinkComponent.svelte";
     import LinksExample from "./Examples/Links.svelte";
     import OutsideExample from "./Examples/Outside.svelte";
@@ -52,6 +53,9 @@
     let stressValue = $state<string>();
     let stressExpanded = $state.raw<string[]>(["package-1", "package-2", "package-3"]);
     const stressFiles = createStressFiles();
+
+    let leaningValue = $state<string>();
+    let leaningExpanded = $state.raw<string[]>(["src"]);
 
     let radialValue = $state<string>();
     let radialExpanded = $state.raw<string[]>(RANK_ROOTS);
@@ -149,6 +153,14 @@
             path: `${EXAMPLES_ROOT}/Virtualized.svelte`,
         },
         {
+            key: "leaning",
+            name: "Leaning toward the pointer",
+            readout: () =>
+                `selected: ${leaningValue ?? "nothing"} — a column layout with a proximity effect: each node shifts and brightens by how near the pointer is, and the painter keeps the selected one lit, since an effect is not told which node is current`,
+            component: leaningExample,
+            path: `${EXAMPLES_ROOT}/Leaning.svelte`,
+        },
+        {
             key: "radial",
             span: 2,
             name: "A tree drawn outward",
@@ -210,6 +222,10 @@
 
 {#snippet virtualizedExample()}
     <VirtualizedExample nodes={stressFiles} bind:value={stressValue} bind:expanded={stressExpanded} />
+{/snippet}
+
+{#snippet leaningExample()}
+    <LeaningExample bind:value={leaningValue} bind:expanded={leaningExpanded} />
 {/snippet}
 
 {#snippet radialExample()}

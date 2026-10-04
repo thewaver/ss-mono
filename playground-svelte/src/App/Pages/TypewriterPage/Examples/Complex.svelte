@@ -10,7 +10,7 @@
     let props: Props = $props();
 </script>
 
-<Typewriter animationName={props.animationName} computeCharacterWeights={props.computeCharacterWeights}>
+<Typewriter computeAnimationName={props.computeAnimationName} computeCharacterWeights={props.computeCharacterWeights}>
     This is a bit of <b
         >text that appears<div class={styles.textHighlight} style:color={"red"} title="ONE MEANS ONE!"><i>one</i></div
         ></b

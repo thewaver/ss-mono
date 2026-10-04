@@ -277,6 +277,103 @@ const SMEAR_FULL_STEP_KNOB: NumberKnob = {
     step: 0.005,
 };
 
+const RIBBON_LENGTH_KNOB: NumberKnob = {
+    kind: "number",
+    label: "Ribbon length",
+    hint: "How many glows make up each ribbon, head to tail.",
+    min: 2,
+    max: 30,
+    step: 1,
+};
+const HEAD_SCALE_KNOB: NumberKnob = {
+    kind: "number",
+    label: "Head size",
+    hint: "How large the glow at the head of a ribbon is against the box. The ribbon narrows from here to its tail.",
+    min: 0.05,
+    max: 1,
+    step: 0.01,
+};
+const TAIL_SCALE_KNOB: NumberKnob = {
+    kind: "number",
+    label: "Tail size",
+    hint: "How large the glow at the tail of a ribbon is against the box.",
+    min: 0.01,
+    max: 1,
+    step: 0.01,
+};
+const HEAD_ALPHA_KNOB: NumberKnob = {
+    kind: "number",
+    label: "Head alpha",
+    hint: "How strong the head of each ribbon is. The ribbon fades from here to nothing at its tail.",
+    min: 0.05,
+    max: 1,
+    step: 0.05,
+};
+const STIFFNESS_KNOB: NumberKnob = {
+    kind: "number",
+    label: "Pull",
+    hint: "How hard the pointer pulls on what chases it. Higher catches up sooner.",
+    min: 0.01,
+    max: 0.5,
+    step: 0.01,
+};
+const DAMPING_KNOB: NumberKnob = {
+    kind: "number",
+    label: "Glide",
+    hint: "How much speed carries over from one moment to the next. Higher overshoots and swings; lower settles at once.",
+    min: 0,
+    max: 0.98,
+    step: 0.02,
+};
+const FOLLOW_STIFFNESS_KNOB: NumberKnob = {
+    kind: "number",
+    label: "Body follow",
+    hint: "How closely each part of a ribbon follows the part ahead of it. Lower drags a longer tail.",
+    min: 0.05,
+    max: 1,
+    step: 0.05,
+};
+const SPOT_COUNT_KNOB: NumberKnob = {
+    kind: "number",
+    label: "Spots",
+    hint: "How many spots wander round the pointer.",
+    min: 1,
+    max: 20,
+    step: 1,
+};
+const SPOT_SCALE_KNOB: NumberKnob = {
+    kind: "number",
+    label: "Spot size",
+    hint: "How large each spot is against the box.",
+    min: 0.05,
+    max: 1,
+    step: 0.01,
+};
+const SPOT_ALPHA_KNOB: NumberKnob = {
+    kind: "number",
+    label: "Spot alpha",
+    hint: "How strong each spot is at its middle.",
+    min: 0.05,
+    max: 1,
+    step: 0.05,
+};
+const WANDER_RATIO_KNOB: NumberKnob = {
+    kind: "number",
+    label: "Wander",
+    hint: "How far the spots stray from the pointer, against the box.",
+    min: 0,
+    max: 0.5,
+    step: 0.01,
+};
+const WANDER_MS_KNOB: NumberKnob = {
+    kind: "number",
+    label: "Wander time (ms)",
+    hint: "How long the slowest spot takes to go round the pointer once.",
+    min: 500,
+    max: 10000,
+    step: 250,
+};
+
 export namespace TrackedGradientKnobs {
     export const OVERLAY_SCALE_FACTOR = 0.25;
     export const OVERLAY_SCALED_KEYS = [
@@ -496,6 +593,26 @@ export namespace TrackedGradientKnobs {
             falloffStop: FALLOFF_STOP_KNOB,
             falloffAlpha: FALLOFF_ALPHA_KNOB,
             ageColorSpan: AGE_COLOR_SPAN_KNOB,
+        },
+        ribbon_3: {
+            circular: CIRCULAR_KNOB,
+            ribbonLength: RIBBON_LENGTH_KNOB,
+            headScale: HEAD_SCALE_KNOB,
+            tailScale: TAIL_SCALE_KNOB,
+            headAlpha: HEAD_ALPHA_KNOB,
+            stiffness: STIFFNESS_KNOB,
+            damping: DAMPING_KNOB,
+            followStiffness: FOLLOW_STIFFNESS_KNOB,
+        },
+        swarm_3: {
+            circular: CIRCULAR_KNOB,
+            spotCount: SPOT_COUNT_KNOB,
+            spotScale: SPOT_SCALE_KNOB,
+            spotAlpha: SPOT_ALPHA_KNOB,
+            wanderRatio: WANDER_RATIO_KNOB,
+            wanderMs: WANDER_MS_KNOB,
+            stiffness: STIFFNESS_KNOB,
+            damping: DAMPING_KNOB,
         },
     };
 }

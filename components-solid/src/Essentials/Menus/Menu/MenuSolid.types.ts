@@ -147,6 +147,14 @@ export type MenuLevelProps<T> = AccessorProps<{
     openerFlags: InteractionFlags<MenuFlags>;
     /** Draws the surface this level's items sit on. */
     renderPopup: MenuRenderPopup;
+    /** How long the highlight's marker takes to slide from one item to the next, and to fade. */
+    floaterTransitionDurationMs?: number;
+    /**
+     * Draws the marker that slides to the highlighted item — the one the pointer or the arrow keys are on — behind it,
+     * in this menu and in every submenu. The fade is handed in rather than applied: the marker fades out while nothing
+     * is highlighted.
+     */
+    renderHighlightFloater?: (getVisibilityTarget: () => 0 | 1, getTransitionDurationMs: () => number) => JSX.Element;
     /** Runs when this level closes in the ordinary way, with the menu carrying on above it. */
     onClose: () => void;
     /** Runs when this level is dismissed from outside — a press elsewhere, focus leaving, or Escape. */
@@ -235,6 +243,17 @@ export type MenuProps<T> = Omit<InteractionWrapperProps<MenuFlags>, "renderContr
         renderContent: (getFlags: () => InteractionFlags<MenuFlags>) => JSX.Element;
         /** Draws the surface the items sit on. */
         renderPopup: MenuRenderPopup;
+        /** How long the highlight's marker takes to slide from one item to the next, and to fade. */
+        floaterTransitionDurationMs?: number;
+        /**
+         * Draws the marker that slides to the highlighted item — the one the pointer or the arrow keys are on — behind it,
+         * in this menu and in every submenu. The fade is handed in rather than applied: the marker fades out while nothing
+         * is highlighted.
+         */
+        renderHighlightFloater?: (
+            getVisibilityTarget: () => 0 | 1,
+            getTransitionDurationMs: () => number,
+        ) => JSX.Element;
     }> & {
         /** The element the menu is positioned against, where that is not the trigger itself. */
         anchorRef?: MaybeAccessor<HTMLElement | undefined>;
@@ -290,6 +309,14 @@ export type ContextMenuProps<T> = AccessorProps<{
     visibility?: SignalSource<boolean>;
     /** Draws the surface the items sit on. */
     renderPopup: MenuRenderPopup;
+    /** How long the highlight's marker takes to slide from one item to the next, and to fade. */
+    floaterTransitionDurationMs?: number;
+    /**
+     * Draws the marker that slides to the highlighted item — the one the pointer or the arrow keys are on — behind it,
+     * in this menu and in every submenu. The fade is handed in rather than applied: the marker fades out while nothing
+     * is highlighted.
+     */
+    renderHighlightFloater?: (getVisibilityTarget: () => 0 | 1, getTransitionDurationMs: () => number) => JSX.Element;
 }> & {
     /**
      * Draws the region a right-click opens the menu over.

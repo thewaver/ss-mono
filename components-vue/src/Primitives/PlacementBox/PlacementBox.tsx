@@ -16,7 +16,11 @@ export const PlacementBox = defineComponent(
         const getHasEffect = () => props.computeEffect !== undefined;
         const getTransitionDurationMs = () => props.transitionDurationMs ?? PLACEMENT_BOX_DEFAULTS.transitionDurationMs;
 
-        const { reading, isPointerPresent } = PointerTrackerVueUtils.usePointerReading(boxRef, () => !getHasEffect());
+        const { reading, isPointerPresent } = PointerTrackerVueUtils.usePointerReading(
+            boxRef,
+            () => !getHasEffect(),
+            () => props.pointSource,
+        );
 
         const prefersReducedMotion = MediaQueryMonitorVueUtils.useReducedMotion(
             () => !PlacementBoxUtils.getIsMotionQueryNeeded(getHasEffect(), getTransitionDurationMs()),
@@ -63,6 +67,11 @@ export const PlacementBox = defineComponent(
     {
         name: "PlacementBox",
         slots: Object as SlotsType<PlacementBoxSlots>,
-        props: declareProps<PlacementBoxProps>({ layout: null, transitionDurationMs: null, computeEffect: null }),
+        props: declareProps<PlacementBoxProps>({
+            layout: null,
+            transitionDurationMs: null,
+            pointSource: null,
+            computeEffect: null,
+        }),
     },
 );

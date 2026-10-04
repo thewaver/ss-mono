@@ -14,7 +14,7 @@
 
 <PageRadioSegmentGroup>
     <RadioGroup bind:value ariaLabel={"Segmented size"} orientation={"horizontal"} gap={0}>
-        {#snippet renderFloater(visibilityTarget, transitionDurationMs)}
+        {#snippet renderSelectionFloater(visibilityTarget, transitionDurationMs)}
             <PageRadioSegmentFloater {visibilityTarget} {transitionDurationMs} />
         {/snippet}
 

@@ -71,7 +71,7 @@ const computeGhostColors = (ghost: FlareGhost, color: string, fade: number, opts
 
 const FlareSpot = (props: FlarePartProps) => {
     const ref = SVGDefsReactUtils.useElementRef(props.element);
-    const { reading } = PointerTrackerReactUtils.usePointerReading(ref);
+    const { reading } = PointerTrackerReactUtils.usePointerReading(ref, false, props.defs.getPointSource?.());
 
     const color = props.defs.colors.primary;
 
@@ -97,7 +97,11 @@ const FlareSpot = (props: FlarePartProps) => {
 
 const FlareGhostGradient = (props: FlareGhostProps) => {
     const ref = SVGDefsReactUtils.useElementRef(props.element);
-    const { reading, isPointerPresent } = PointerTrackerReactUtils.usePointerReading(ref);
+    const { reading, isPointerPresent } = PointerTrackerReactUtils.usePointerReading(
+        ref,
+        false,
+        props.defs.getPointSource?.(),
+    );
 
     const ratio = reading.boxRatio;
     const growth = MathUtils.lerp(

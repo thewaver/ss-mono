@@ -6,10 +6,12 @@ import {
     type MenuHighlightPosition,
     MenuUtils,
     TypeaheadUtils,
+    FloaterStyles as floaterStyles,
     MenuStyles as styles,
 } from "@thewaver/ss-components";
 import { Point2d, Rect } from "@thewaver/ss-utils";
 
+import { FloaterSolidUtils } from "../../../Abstracts/Floater/FloaterSolid.utils";
 import { NavigatorSolidUtils } from "../../../Abstracts/Navigator/NavigatorSolid.utils";
 import { SignalMirrorSolidUtils } from "../../../Abstracts/SignalMirror/SignalMirrorSolid.utils";
 import { TypeaheadSolidUtils } from "../../../Abstracts/Typeahead/TypeaheadSolid.utils";
@@ -165,6 +167,21 @@ const MenuLevel = <T,>(props: MenuLevelProps<T>): JSX.Element => {
 
     const getItemId = (index: number) => `${access(props.id)}-item-${index}`;
 
+    const [getItemsRef, setItemsRef] = createSignal<HTMLElement>();
+    const [getItemRefs, setItemRefs] = createSignal<Map<number, HTMLElement>>(new Map(), { equals: false });
+
+    const recordItemRef = (index: number, element: HTMLElement) => {
+        setItemRefs((refs) => refs.set(index, element));
+
+        onCleanup(() =>
+            setItemRefs((refs) => {
+                if (refs.get(index) === element) refs.delete(index);
+
+                return refs;
+            }),
+        );
+    };
+
     const computeItemText = (index: number) =>
         props.computeCustomText?.(getEntries()[index]) ??
         TypeaheadUtils.getElementText(document.getElementById(getItemId(index)));
@@ -195,6 +212,42 @@ const MenuLevel = <T,>(props: MenuLevelProps<T>): JSX.Element => {
         access(props.submenuMode) === "replace" && (getOpenValue() !== undefined || getIsCoveredWhileClosing());
 
     const getPlacementAt = (index: number) => getLayout()?.placements[index];
+
+    const getFloaterTransitionDurationMs = createMemo(
+        () => access(props.floaterTransitionDurationMs) ?? MENU_DEFAULTS.floaterTransitionDurationMs,
+    );
+
+    const highlightFloater = FloaterSolidUtils.create({
+        getIsEnabled: () => props.renderHighlightFloater !== undefined,
+        getContainer: getItemsRef,
+        getTarget: () => {
+            const index = getHighlightedIndex();
+
+            return index === undefined ? undefined : getItemRefs().get(index);
+        },
+        getLayout,
+        getPlacement: () => {
+            const index = getHighlightedIndex();
+
+            return index === undefined ? undefined : getPlacementAt(index);
+        },
+        getTransitionDurationMs: getFloaterTransitionDurationMs,
+    });
+
+    const renderHighlightFloater = () => (
+        <Show when={highlightFloater.getIsRendered()}>
+            <div
+                ref={highlightFloater.setRef}
+                class={floaterStyles.floater}
+                style={{
+                    ...highlightFloater.getBounds(),
+                    "transition-duration": `${getFloaterTransitionDurationMs()}ms`,
+                }}
+            >
+                {props.renderHighlightFloater?.(highlightFloater.getVisibilityTarget, getFloaterTransitionDurationMs)}
+            </div>
+        </Show>
+    );
 
     const highlightIndex = (index: number | undefined) => {
         if (index === undefined) return;
@@ -360,6 +413,7 @@ const MenuLevel = <T,>(props: MenuLevelProps<T>): JSX.Element => {
                             ref={(element) => {
                                 setElementRef(element);
                                 setItemRef(element);
+                                recordItemRef(index, element);
                             }}
                             id={() => getItemId(index)}
                             ariaLabel={() => getItem().ariaLabel ?? ""}
@@ -403,6 +457,8 @@ const MenuLevel = <T,>(props: MenuLevelProps<T>): JSX.Element => {
                                 getPointerPoint={props.getPointerPoint}
                                 renderItem={props.renderItem}
                                 renderPopup={props.renderPopup}
+                                floaterTransitionDurationMs={props.floaterTransitionDurationMs}
+                                renderHighlightFloater={props.renderHighlightFloater}
                                 onPick={props.onPick}
                                 onClose={() => setOpenValue(() => undefined)}
                                 onDismiss={props.onDismiss}
@@ -454,10 +510,19 @@ const MenuLevel = <T,>(props: MenuLevelProps<T>): JSX.Element => {
     );
 
     const renderItems = () => (
-        <Show when={getLayout()} fallback={renderRuns()}>
+        <Show
+            when={getLayout()}
+            fallback={
+                <div ref={setItemsRef} class={styles.menuItems} role="presentation">
+                    {renderHighlightFloater()}
+                    {renderRuns()}
+                </div>
+            }
+        >
             {(getResolved) => (
                 <div style={{ width: getLayoutWidth(), transform: getLayoutShift() }}>
                     <PlacementBox layout={getResolved} ref={setLayoutRootRef} computeEffect={props.computeEffect}>
+                        {renderHighlightFloater()}
                         {renderRuns()}
                     </PlacementBox>
                 </div>
@@ -643,6 +708,8 @@ export const Menu = <T,>(props: MenuProps<T>) => {
                         flickOrigin={getFlickOrigin}
                         renderItem={props.renderItem}
                         renderPopup={props.renderPopup}
+                        floaterTransitionDurationMs={props.floaterTransitionDurationMs}
+                        renderHighlightFloater={props.renderHighlightFloater}
                         onPick={pick}
                         onFlickEnd={(releasedOn) => {
                             setFlickOrigin(() => undefined);
@@ -760,6 +827,8 @@ export const ContextMenu = <T,>(props: ContextMenuProps<T>) => {
                 getPointerPoint={getPointerPoint}
                 renderItem={props.renderItem}
                 renderPopup={props.renderPopup}
+                floaterTransitionDurationMs={props.floaterTransitionDurationMs}
+                renderHighlightFloater={props.renderHighlightFloater}
                 onPick={pick}
                 onClose={close}
                 onDismiss={close}

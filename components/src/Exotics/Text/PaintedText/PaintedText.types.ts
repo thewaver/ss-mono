@@ -69,10 +69,16 @@ export type PaintedTextLayoutState = {
     /** The images and other whole elements, already built as SVG and placed where they sit in the text. */
     atomics: SVGElement[];
     /**
-     * Every letter on its own, counted as `Typewriter` counts them — a character, a line break or a whole element
-     * each — and measured only while a wrapper is driving the letters.
+     * Every letter on its own, counted as `Typewriter` counts them — a character, a line break the text holds or a
+     * whole element each, but not a break the wrapping inserted — and measured only while a wrapper is driving the
+     * letters.
      */
     letters: PaintedTextLetter[];
+    /**
+     * The same letters where they sit at rest. While letters push each other along, `letters` is where they are
+     * drawn and this is where they started, which is what nearness is measured from; otherwise the two are the same.
+     */
+    restLetters: PaintedTextLetter[];
 };
 
 export type PaintedTextLayoutOpts = {
@@ -82,6 +88,12 @@ export type PaintedTextLayoutOpts = {
     getLayoutHost: () => HTMLElement | undefined;
     /** Whether a wrapper is driving the letters, and so needs each one measured on its own. */
     getIsMeasuringLetters?: () => boolean;
+    /**
+     * Names each letter's keyframes, for a wrapper whose letters take room as they animate. Given, the text is
+     * wrapped with every letter at its last frame and each letter is laid out in a box of its own, so
+     * {@link PaintedTextLayout.relayout} can move the letters along as they grow without moving a line break.
+     */
+    getComputePushingAnimationName?: () => ((character: string, index: number, count: number) => string) | undefined;
 };
 
 export type PaintedTextLayout = {
@@ -91,6 +103,12 @@ export type PaintedTextLayout = {
     subscribe: (listener: () => void) => () => void;
     /** Measures the text and lays it out again. */
     update: () => boolean;
+    /**
+     * Lays the letters out again with each one styled as given, and measures where they land, without wrapping the
+     * text again. Only letters laid out in boxes of their own move, which is while
+     * {@link PaintedTextLayoutOpts.getComputePushingAnimationName} names keyframes.
+     */
+    relayout: (styles: readonly (Record<string, string> | undefined)[]) => void;
     /**
      * Lays the text out again whenever its size or content changes or a web font or an image in it finishes
      * loading, until the returned function is called.

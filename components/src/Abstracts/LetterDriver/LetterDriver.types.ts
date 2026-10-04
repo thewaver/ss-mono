@@ -1,11 +1,14 @@
-import type { Store } from "@thewaver/ss-utils";
+import type { ElementSegment, Rect, Store } from "@thewaver/ss-utils";
 
 export type LetterAnimation = {
     /** The keyframes the letter plays. */
     name: string;
     /** How long the letter takes to play them. */
     durationMs: number;
-    /** How long after the run starts the letter begins. */
+    /**
+     * How far into the run the letter begins. Where the run is now is not part of this: it is one CSS variable on
+     * the driver's root, so moving the whole run is one write rather than one per letter.
+     */
     delayMs: number;
     /** Whether the keyframes play forwards, as letters arrive, or backwards, as they leave. */
     direction: "normal" | "reverse";
@@ -23,8 +26,16 @@ export type LetterState = {
 export type LetterRegistryEntry = {
     /** The renderer's own root, which decides where it falls in reading order. */
     element: Element;
-    /** The renderer's letters, one per character, image or line break, in reading order. */
+    /**
+     * The renderer's letters, one per character, image or line break the text holds, in reading order. A break the
+     * wrapping inserted is not one, so the letters are the same at any width.
+     */
     characters: string[];
+    /**
+     * Where the renderer drew each letter at rest, in its root's own layout pixels and in the same order as
+     * `characters`, for a wrapper that measures nearness to them. Empty until the renderer reports them.
+     */
+    boxes: Rect[];
 };
 
 export type LetterRegistryState = {
@@ -37,6 +48,8 @@ export type LetterRegistryState = {
 export type LetterRegistration = {
     /** Replaces this renderer's letters, as it lays its text out again. */
     setCharacters: (characters: string[]) => void;
+    /** Replaces where this renderer drew its letters at rest, as it lays its text out again. */
+    setBoxes: (boxes: Rect[]) => void;
     /** Removes this renderer, as it unmounts. */
     unregister: () => void;
 };
@@ -46,4 +59,12 @@ export type LetterRegistry = Store<LetterRegistryState> & {
     register: (element: Element) => LetterRegistration;
     /** Where a renderer's first letter falls among all of them, or `0` for one that is not registered. */
     getOffset: (element: Element) => number;
+};
+
+export type LetterSegment = ElementSegment & {
+    /**
+     * Where the segment's first character sits among every letter, an image or a break the text holds counting as
+     * one. A break the wrapping inserted takes the index of whatever follows it and is not a letter.
+     */
+    startIndex: number;
 };

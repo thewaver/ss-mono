@@ -47,7 +47,7 @@ const text = shallowRef("Line one\n\nline two");
 
     <PageMeasureBox :width="width" :padding="MEASURE_BOX_PADDING">
         <CustomInputExample
-            :animation-name="animationName"
+            :compute-animation-name="computeAnimationName"
             :compute-character-weights="computeCharacterWeights"
             :text="text"
         />

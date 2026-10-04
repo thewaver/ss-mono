@@ -1,4 +1,4 @@
-import { Color, MathUtils, type Point2d, RandomUtils, type Store, StoreUtils } from "@thewaver/ss-utils";
+import { Color, MathUtils, type Point2d, RandomUtils, type Size2d, type Store, StoreUtils } from "@thewaver/ss-utils";
 
 import type { PointerReading } from "../../Abstracts/PointerTracker/PointerTracker.types";
 import type { CycleColorKey, SVGDefsColors } from "./SVGDefs.types";
@@ -9,6 +9,12 @@ const FULL_STOP = 100;
 const POINTER_FADE_START_RATIO = 1;
 const POINTER_FADE_END_RATIO = 2;
 const CYCLE_COLOR_KEYS: CycleColorKey[] = ["primary", "secondary", "tertiary"];
+const FRAME_MS = 1000 / 60;
+const MAX_FRAMES_PER_STEP = 4;
+const SWARM_MIN_RADIUS = 0.35;
+const SWARM_MIN_PERIOD = 0.45;
+const SWARM_SPOT_RADIUS_SHARE = 0.5;
+const SWARM_MERGE_BLUR_SHARE = 0.45;
 
 export namespace SVGDefsUtils {
     export const DEBUG_SEAMS = false;
@@ -93,6 +99,104 @@ export namespace SVGDefsUtils {
                   MathUtils.normalize(reading.edgeRatio, POINTER_FADE_END_RATIO, POINTER_FADE_START_RATIO),
               )
             : 0;
+
+    /**
+     * Moves a point one frame along a damped spring towards a target, for a sample whose shape chases the pointer.
+     *
+     * The step is written per frame at sixty frames a second and scaled by the frame's real length, so a slow screen
+     * chases at the same speed in time rather than in frames.
+     *
+     * @param position Where the point is.
+     * @param velocity How far it moved last frame.
+     * @param target Where it is pulled.
+     * @param frameMs How long the frame was.
+     * @param stiffness How strongly it is pulled, as a share of the distance per frame.
+     * @param damping How much of its speed it keeps from one frame to the next, `0` to `1`.
+     * @returns The new position and velocity.
+     */
+    export const stepSpring = (
+        position: Point2d,
+        velocity: Point2d,
+        target: Point2d,
+        frameMs: number,
+        stiffness: number,
+        damping: number,
+    ) => {
+        const frames = Math.min(frameMs / FRAME_MS, MAX_FRAMES_PER_STEP);
+        const keep = damping ** frames;
+        const next = {
+            x: (velocity.x + (target.x - position.x) * stiffness * frames) * keep,
+            y: (velocity.y + (target.y - position.y) * stiffness * frames) * keep,
+        };
+
+        return { position: { x: position.x + next.x * frames, y: position.y + next.y * frames }, velocity: next };
+    };
+
+    /**
+     * Where one spot of a swarm wants to be, wandering round the point on a path of its own.
+     *
+     * Each spot circles at its own radius and speed, set by its place in the swarm, so the spots never line up and
+     * never all cross the point at once. The circle is squashed to the box's proportions, since a position is a share
+     * of the box.
+     *
+     * @param point Where the swarm gathers, as a share of the box.
+     * @param index Which spot, from `0`.
+     * @param count How many spots there are.
+     * @param timeMs The frame time.
+     * @param wanderRatio How far a spot strays, as a share of the box.
+     * @param wanderMs How long the slowest spot takes to go round once.
+     */
+    export const computeSwarmTarget = (
+        point: Point2d,
+        index: number,
+        count: number,
+        timeMs: number,
+        wanderRatio: number,
+        wanderMs: number,
+    ): Point2d => {
+        const share = count > 1 ? index / (count - 1) : 0;
+        const radius = wanderRatio * (SWARM_MIN_RADIUS + (1 - SWARM_MIN_RADIUS) * share);
+        const turns = timeMs / (wanderMs * (SWARM_MIN_PERIOD + (1 - SWARM_MIN_PERIOD) * (1 - share)));
+        const angle = (turns + index / Math.max(count, 1)) * Math.PI * 2 * (index % 2 === 0 ? 1 : -1);
+
+        return { x: point.x + Math.cos(angle) * radius, y: point.y + Math.sin(angle) * radius };
+    };
+
+    /**
+     * The color matrix that turns a swarm's blurred spots into one liquid shape: colors kept, opacity steepened so
+     * the soft blur becomes a hard edge, and two spots blurred into each other join along a smooth neck instead of
+     * glowing through one another. Paired with {@link computeSwarmMergeBlur}.
+     */
+    export const SWARM_MERGE_MATRIX = "1 0 0 0 0 0 1 0 0 0 0 0 1 0 0 0 0 0 18 -7";
+
+    /**
+     * How big each spot of a swarm is drawn, in pixels.
+     *
+     * @param size The painted element's size.
+     * @param spotScale How big a spot is, as a share of the element's smaller side, or of each side when it is not
+     * circular.
+     * @param isCircular Whether spots stay round in a box that is not square, rather than stretching with it.
+     * @returns The spot's radius across and down.
+     */
+    export const computeSwarmRadii = (size: Size2d, spotScale: number, isCircular: boolean): Point2d => {
+        const side = Math.min(size.width, size.height);
+
+        return isCircular
+            ? { x: side * spotScale * SWARM_SPOT_RADIUS_SHARE, y: side * spotScale * SWARM_SPOT_RADIUS_SHARE }
+            : {
+                  x: size.width * spotScale * SWARM_SPOT_RADIUS_SHARE,
+                  y: size.height * spotScale * SWARM_SPOT_RADIUS_SHARE,
+              };
+    };
+
+    /**
+     * How far a swarm's spots are blurred before {@link SWARM_MERGE_MATRIX} sharpens them again, which decides how
+     * near two spots have to come before they join: a share of the smaller radius, so the neck between them scales
+     * with the spots.
+     *
+     * @param radii The spot's radius across and down, from {@link computeSwarmRadii}.
+     */
+    export const computeSwarmMergeBlur = (radii: Point2d) => Math.min(radii.x, radii.y) * SWARM_MERGE_BLUR_SHARE;
 
     export const offsetDiagonally = (v: number, angle: number) => {
         const rad = (angle * Math.PI) / 180;

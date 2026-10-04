@@ -35,7 +35,11 @@ const computeSweepColors = (color: string, alpha: number) => [
 
 const HandGradient = defineComponent(
     (props: HandPartProps) => {
-        const { reading, isPointerPresent } = PointerTrackerVueUtils.usePointerReading(() => props.element);
+        const { reading, isPointerPresent } = PointerTrackerVueUtils.usePointerReading(
+            () => props.element,
+            false,
+            () => props.defs.getPointSource?.(),
+        );
 
         return () =>
             SVGGradientDefsVueUtils.computeLinearGradient({
@@ -53,7 +57,11 @@ const HandGradient = defineComponent(
 
 const HandClip = defineComponent(
     (props: HandPartProps) => {
-        const { reading } = PointerTrackerVueUtils.usePointerReading(() => props.element);
+        const { reading } = PointerTrackerVueUtils.usePointerReading(
+            () => props.element,
+            false,
+            () => props.defs.getPointSource?.(),
+        );
 
         return () => {
             const sweepArc = props.opts?.sweepArc ?? DEFAULTS.sweepArc;

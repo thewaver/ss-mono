@@ -28,7 +28,10 @@ const PatternElement = defineComponent(
         const getPointer = SVGDefsVueUtils.usePatternPointer(
             () => props.element,
             () => props.defs.getSize(),
+            () => props.defs.getPointSource?.(),
         );
+        const getOpts = () => TrackedPatternUtils.resolveOpts(props.opts, DEFAULTS);
+        const computeTrailLevel = SVGDefsVueUtils.usePatternTrail(getPointer, getOpts);
 
         return () => {
             const cellSize = props.defs.cellSize;
@@ -51,7 +54,7 @@ const PatternElement = defineComponent(
                         cellSize,
                         areaSize,
                         pointer,
-                        TrackedPatternUtils.resolveOpts(props.opts, DEFAULTS),
+                        getOpts(),
                         (cellId, index, isSplit, level) => {
                             const isEven = MathUtils.isEven(index.col + index.row);
 
@@ -70,6 +73,7 @@ const PatternElement = defineComponent(
                                 />
                             );
                         },
+                        computeTrailLevel,
                     )}
                 </>
             );

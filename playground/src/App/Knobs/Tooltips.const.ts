@@ -1,5 +1,7 @@
 import type { AnchorHPlacement, AnchorVPlacement } from "@thewaver/ss-components";
 
+import type { TooltipReveal } from "../StyledComponents/TooltipContent/TooltipContent.const";
+
 export namespace TooltipKnobs {
     export const MIN_OFFSET = -40;
     export const MAX_OFFSET = 40;
@@ -12,4 +14,5 @@ export namespace TooltipKnobs {
     export const STARTING_V_PLACEMENT: AnchorVPlacement = "top-out";
     export const STARTING_OFFSET_Y = 10;
     export const STARTING_OFFSET_X = 0;
+    export const STARTING_REVEAL: TooltipReveal = "fade";
 }

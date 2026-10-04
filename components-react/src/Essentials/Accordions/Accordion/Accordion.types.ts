@@ -1,6 +1,14 @@
 import type { ReactNode } from "react";
 
-import type { AccordionItem, AccordionSizing, CollapsibleFlags, InteractionFlags } from "@thewaver/ss-components";
+import type {
+    AccordionItem,
+    AccordionMoveDirection,
+    AccordionOrientation,
+    AccordionSizing,
+    CollapsibleFlags,
+    CollapsibleSide,
+    InteractionFlags,
+} from "@thewaver/ss-components";
 
 export type AccordionHeaderRenderer<T> = (
     item: AccordionItem<T>,
@@ -11,6 +19,7 @@ export type AccordionPanelRenderer<T> = (
     item: AccordionItem<T>,
     visibilityTarget: 0 | 1,
     transitionDurationMs: number,
+    moveDirection: AccordionMoveDirection | undefined,
 ) => ReactNode;
 
 export type AccordionSectionProps<T> = {
@@ -18,6 +27,8 @@ export type AccordionSectionProps<T> = {
     item: AccordionItem<T>;
     /** Which heading level this section's header sits at, so the page's outline stays correct. */
     headingLevel: number;
+    /** Which side of its header this section's panel opens toward. */
+    side: CollapsibleSide;
     /** Whether this section is open. */
     isExpanded: boolean;
     /** Scrolls this section into view once it has finished opening. */
@@ -34,6 +45,8 @@ export type AccordionSectionProps<T> = {
     renderHeader: AccordionHeaderRenderer<T>;
     /** Draws this section's panel. */
     renderPanel: AccordionPanelRenderer<T>;
+    /** Which way the open section last moved, handed on to the panel. */
+    moveDirection: AccordionMoveDirection | undefined;
 };
 
 export type AccordionProps<T> = {
@@ -41,6 +54,13 @@ export type AccordionProps<T> = {
     gap?: number;
     /** Whether the accordion takes only the room its content needs, or fills the width it is given. */
     sizing?: AccordionSizing;
+    /**
+     * Which way the sections run. `vertical`, the default, stacks them and each panel opens below its header,
+     * growing in height. `horizontal` sets them side by side and each panel opens beside its header, growing in
+     * width, so a closed section is a strip its header fills. The arrow keys that move between headers follow it:
+     * up and down for a column, left and right for a row, reversed under right-to-left text.
+     */
+    orientation?: AccordionOrientation;
     /**
      * Which heading level the section headers sit at, so the page's outline stays correct wherever the accordion is
      * used.
@@ -69,6 +89,11 @@ export type AccordionProps<T> = {
     expanded?: readonly [T[], (expanded: T[]) => void];
     /** Draws a section's header. */
     renderHeader: AccordionHeaderRenderer<T>;
-    /** Draws a section's panel. */
+    /**
+     * Draws a section's panel. Beside the visibility target and the duration it is told which way the open section
+     * last moved — `forward` when the person opened one later in the list than the one they left, `backward` when
+     * earlier, and `undefined` before anything has moved — so content can slide in from the side the person came
+     * from. The motion is the consumer's.
+     */
     renderPanel: AccordionPanelRenderer<T>;
 };

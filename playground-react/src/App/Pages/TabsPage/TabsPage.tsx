@@ -1,6 +1,10 @@
 import { useState } from "react";
 
-import { AUTOMATIC_TABS, REACHABLE_TABS } from "@thewaver/ss-playground/App/Pages/TabsPage/TabsPage.const";
+import {
+    AUTOMATIC_TABS,
+    HOVER_PILL_TABS,
+    REACHABLE_TABS,
+} from "@thewaver/ss-playground/App/Pages/TabsPage/TabsPage.const";
 
 import { PageExamples } from "../../PageComponents/Examples/Examples";
 import { AllDisabledExample } from "./Examples/AllDisabled";
@@ -21,6 +25,7 @@ export const TabsPage = () => {
     const [customLinkValue, setCustomLinkValue] = useState("Docs");
     const [autoValue, setAutoValue] = useState("Render");
     const [reachableValue, setReachableValue] = useState("Render");
+    const [hoverPillValue, setHoverPillValue] = useState("Render");
     const [rightToLeftValue, setRightToLeftValue] = useState("Render");
     const [disabledValue, setDisabledValue] = useState("Draft");
     const [clearableValue, setClearableValue] = useState<string | undefined>("One");
@@ -56,6 +61,23 @@ export const TabsPage = () => {
                     idPrefix={"automatic"}
                     hasAutoActivation={true}
                     onSelectionChange={setAutoValue}
+                />
+            ),
+            path: `${EXAMPLES_ROOT}/Row.tsx`,
+        },
+        {
+            key: "hoverPill",
+            span: 2,
+            name: "A pill that follows the pointer",
+            readout: () =>
+                `selected: ${hoverPillValue} — the underline stays on the selected tab while a second marker glides to whichever tab the pointer or the focus is on`,
+            component: () => (
+                <RowExample
+                    selectedValue={hoverPillValue}
+                    tabs={HOVER_PILL_TABS}
+                    idPrefix={"hoverPill"}
+                    hasHoverPill={true}
+                    onSelectionChange={setHoverPillValue}
                 />
             ),
             path: `${EXAMPLES_ROOT}/Row.tsx`,

@@ -10,6 +10,7 @@ import {
 import * as styles from "@thewaver/ss-playground/App/Pages/TabsPage/TabsPage.css";
 
 import { PageTabPanel } from "../../../PageComponents/TabPanel/TabPanel";
+import { PageGlideFloater } from "../../../StyledComponents/GlideFloater/GlideFloater";
 import { PageTabContent, PageTabFloater, PageTabGutter } from "../../../StyledComponents/TabContent/TabContent";
 import type { TabsExampleProps } from "../TabsPage.types";
 
@@ -18,6 +19,7 @@ const DEFAULT_ID_PREFIX = "row";
 type Props = TabsExampleProps & {
     tabs?: MaybeAccessor<Tab<string>[]>;
     idPrefix?: MaybeAccessor<string>;
+    hasHoverPill?: boolean;
 };
 
 export const RowExample = (props: Props) => {
@@ -34,13 +36,24 @@ export const RowExample = (props: Props) => {
                 selectedValue={props.selectedValue}
                 onSelectionChange={props.onSelectionChange}
                 renderGutter={() => <PageTabGutter orientation={"horizontal"} />}
-                renderFloater={(getVisibilityTarget, getTransitionDurationMs) => (
+                renderSelectionFloater={(getVisibilityTarget, getTransitionDurationMs) => (
                     <PageTabFloater
                         orientation={"horizontal"}
                         visibilityTarget={getVisibilityTarget}
                         transitionDurationMs={getTransitionDurationMs}
                     />
                 )}
+                renderHighlightFloater={
+                    props.hasHoverPill
+                        ? (getVisibilityTarget, getTransitionDurationMs) => (
+                              <PageGlideFloater
+                                  kind={"highlight"}
+                                  visibilityTarget={getVisibilityTarget}
+                                  transitionDurationMs={getTransitionDurationMs}
+                              />
+                          )
+                        : undefined
+                }
                 renderTab={(getTab, getFlags) => (
                     <PageTabContent
                         flags={getFlags}

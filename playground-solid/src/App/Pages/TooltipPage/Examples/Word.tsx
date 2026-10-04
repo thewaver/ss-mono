@@ -33,6 +33,7 @@ export const WordExample = (props: Props) => {
                     <PageTooltipContent
                         visibilityTarget={getVisibilityTarget}
                         transitionDurationMs={getTransitionDurationMs}
+                        reveal={props.reveal}
                     >
                         A weight of silver, not a coin — eight ounces, counted rather than struck.
                     </PageTooltipContent>

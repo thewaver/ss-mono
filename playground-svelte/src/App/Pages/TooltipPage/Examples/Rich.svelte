@@ -25,7 +25,7 @@
         skipDelayWindowMs={props.skipDelayWindowMs}
     >
         {#snippet renderContent(visibilityTarget, transitionDurationMs)}
-            <PageTooltipContent {visibilityTarget} {transitionDurationMs}>
+            <PageTooltipContent {visibilityTarget} {transitionDurationMs} reveal={props.reveal}>
                 <div class={styles.richTitle}>Everyone with the link</div>
 
                 <div class={styles.richBody}>

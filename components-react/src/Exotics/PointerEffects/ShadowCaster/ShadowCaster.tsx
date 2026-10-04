@@ -11,7 +11,11 @@ export const ShadowCaster = (props: ShadowCasterProps) => {
 
     const isDisabled = props.isDisabled ?? false;
 
-    const { reading, isPointerPresent } = PointerTrackerReactUtils.usePointerReading(ref, isDisabled);
+    const { reading, isPointerPresent } = PointerTrackerReactUtils.usePointerReading(
+        ref,
+        isDisabled,
+        props.pointSource,
+    );
 
     const isResting = PointerEffectsUtils.getIsResting(isDisabled, isPointerPresent, reading, props.activeRangePx);
 

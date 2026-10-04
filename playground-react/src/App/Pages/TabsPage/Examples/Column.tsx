@@ -22,7 +22,7 @@ export const ColumnExample = (props: Props) => {
                 tabs={COLUMN_TABS}
                 selectedValue={props.selectedValue}
                 onSelectionChange={props.onSelectionChange}
-                renderFloater={(visibilityTarget, transitionDurationMs) => (
+                renderSelectionFloater={(visibilityTarget, transitionDurationMs) => (
                     <PageTabFloater
                         orientation={"vertical"}
                         visibilityTarget={visibilityTarget}

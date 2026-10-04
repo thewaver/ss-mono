@@ -1,15 +1,15 @@
-import { Show, createEffect, createMemo, createSignal, createUniqueId, onCleanup } from "solid-js";
+import { Show, createMemo, createSignal, createUniqueId, onCleanup } from "solid-js";
 
 import {
     RADIO_GROUP_DEFAULTS,
     type RadioGroupContextType,
     type RadioGroupEntry,
-    type RadioGroupFloaterBounds,
     RadioGroupUtils,
+    FloaterStyles as floaterStyles,
     RadioGroupStyles as styles,
 } from "@thewaver/ss-components";
 
-import { ElementFaderSolidUtils } from "../../../Abstracts/ElementFader/ElementFaderSolid.utils";
+import { FloaterSolidUtils } from "../../../Abstracts/Floater/FloaterSolid.utils";
 import { NavigatorSolidUtils } from "../../../Abstracts/Navigator/NavigatorSolid.utils";
 import { PlacementBox } from "../../../Primitives/PlacementBox/PlacementBox";
 import { access, accessSignal } from "../../../Utils/propUtils";
@@ -23,7 +23,6 @@ export const RadioGroup = <T,>(props: RadioGroupProps<T>) => {
 
     const [getEntries, setEntries] = createSignal<RadioGroupEntry[]>([]);
     const [getRootRef, setRootRef] = createSignal<HTMLElement>();
-    const [getMeasuredBounds, setMeasuredBounds] = createSignal<RadioGroupFloaterBounds>();
 
     const getOrientation = createMemo(() => access(props.orientation) ?? RADIO_GROUP_DEFAULTS.orientation);
 
@@ -50,41 +49,34 @@ export const RadioGroup = <T,>(props: RadioGroupProps<T>) => {
     const computePlacement = (entry: RadioGroupEntry) =>
         RadioGroupUtils.computePlacement(getOrderedEntries(), getLayout(), entry);
 
-    const getFloaterBounds = createMemo(() => {
-        const selected = getSelectedEntry();
+    const [getHoveredEntry, setHoveredEntry] = createSignal<RadioGroupEntry>();
+    const [getFocusedEntry, setFocusedEntry] = createSignal<RadioGroupEntry>();
 
-        return RadioGroupUtils.computeFloaterBounds(
-            getLayout(),
-            getMeasuredBounds(),
-            selected === undefined ? undefined : computePlacement(selected),
-        );
-    });
+    const findEntry = (target: EventTarget | null) =>
+        target instanceof Node
+            ? getOrderedEntries().find((entry) => entry.getElementRef()?.parentElement?.contains(target) ?? false)
+            : undefined;
 
-    const getIsFloaterShown = createMemo(() => getSelectedEntry() !== undefined && getFloaterBounds() !== undefined);
+    const createFloater = (getIsEnabled: () => boolean, getEntry: () => RadioGroupEntry | undefined) =>
+        FloaterSolidUtils.create({
+            getIsEnabled,
+            getContainer: () => (getLayout() === undefined ? getRootRef() : undefined),
+            getTarget: () => getEntry()?.getElementRef()?.offsetParent as HTMLElement | undefined,
+            getLayout,
+            getPlacement: () => {
+                const entry = getEntry();
 
-    const [getFloaterRef, setFloaterRef] = createSignal<HTMLElement>();
+                return entry === undefined ? undefined : computePlacement(entry);
+            },
+            getTransitionDurationMs,
+        });
 
-    const floaterFader = ElementFaderSolidUtils.createFader(getIsFloaterShown, {
-        getTransitionDurationMs,
-        getRef: getFloaterRef,
-    });
+    const selectionFloater = createFloater(() => props.renderSelectionFloater !== undefined, getSelectedEntry);
 
-    createEffect(() => {
-        if (floaterFader.getIsVisible()) return;
-
-        setMeasuredBounds(undefined);
-    });
-
-    createEffect(() => {
-        if (!props.renderFloater || getLayout() !== undefined) return;
-
-        const rootRef = getRootRef();
-        const selectedItem = getSelectedEntry()?.getElementRef();
-
-        if (!rootRef || !selectedItem) return;
-
-        onCleanup(RadioGroupUtils.observeSelectedBounds(rootRef, selectedItem, setMeasuredBounds));
-    });
+    const highlightFloater = createFloater(
+        () => props.renderHighlightFloater !== undefined,
+        () => getHoveredEntry() ?? getFocusedEntry(),
+    );
 
     const context: RadioGroupContextType = {
         getName: () => access(props.name) ?? fallbackName,
@@ -119,18 +111,27 @@ export const RadioGroup = <T,>(props: RadioGroupProps<T>) => {
 
     const renderItems = () => <RadioGroupContextProvider value={context}>{props.children}</RadioGroupContextProvider>;
 
-    const renderFloater = () =>
-        props.renderFloater &&
-        floaterFader.getIsVisible() &&
-        getFloaterBounds() && (
+    const renderFloater = (
+        floater: ReturnType<typeof createFloater>,
+        renderContent: RadioGroupProps<T>["renderSelectionFloater"],
+    ) => (
+        <Show when={floater.getIsRendered()}>
             <div
-                ref={setFloaterRef}
-                class={styles.radioGroupFloater}
-                style={{ ...getFloaterBounds(), "transition-duration": `${getTransitionDurationMs()}ms` }}
+                ref={floater.setRef}
+                class={floaterStyles.floater}
+                style={{ ...floater.getBounds(), "transition-duration": `${getTransitionDurationMs()}ms` }}
             >
-                {props.renderFloater(floaterFader.getTransitionTarget, getTransitionDurationMs)}
+                {renderContent?.(floater.getVisibilityTarget, getTransitionDurationMs)}
             </div>
-        );
+        </Show>
+    );
+
+    const renderFloaters = () => (
+        <>
+            {renderFloater(highlightFloater, props.renderHighlightFloater)}
+            {renderFloater(selectionFloater, props.renderSelectionFloater)}
+        </>
+    );
 
     return (
         <div
@@ -145,19 +146,23 @@ export const RadioGroup = <T,>(props: RadioGroupProps<T>) => {
             aria-required={access(props.isRequired) || undefined}
             aria-invalid={access(props.hasError) || undefined}
             onKeyDown={handleKeyDown}
+            onPointerOver={(e) => setHoveredEntry(findEntry(e.target))}
+            onPointerLeave={() => setHoveredEntry(undefined)}
+            onFocusIn={(e) => setFocusedEntry(findEntry(e.target))}
+            onFocusOut={() => setFocusedEntry(undefined)}
         >
             <Show
                 when={getLayout()}
                 fallback={
                     <>
-                        {renderFloater()}
+                        {renderFloaters()}
                         {renderItems()}
                     </>
                 }
             >
                 {(getResolved) => (
                     <PlacementBox layout={getResolved} computeEffect={props.computeEffect}>
-                        {renderFloater()}
+                        {renderFloaters()}
                         {renderItems()}
                     </PlacementBox>
                 )}

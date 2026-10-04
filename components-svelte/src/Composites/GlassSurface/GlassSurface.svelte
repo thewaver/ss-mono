@@ -30,7 +30,8 @@
         {lameExponents}
         computeStrokeDefs={props.computeStrokeDefs}
         strokeGeom={props.computeStrokeDefs ? [{ thicknesses: borderWidths }] : undefined}
-        computeFillDefs={(size, element) => GlassSvelteUtils.computeSheenDefs(id, element, size, defs)}
+        computeFillDefs={(size, element) =>
+            GlassSvelteUtils.computeSheenDefs(id, element, size, defs, () => props.pointSource)}
     >
         {#snippet renderChildren(size, clipPath)}
             {@const backdropStyle = toStyle(

@@ -9,7 +9,7 @@ import { computeSampleDefs } from "../PaintedTextPage.const";
 import type { PaintedTextExampleProps } from "../PaintedTextPage.types";
 
 type Props = PaintedTextExampleProps & {
-    animationName: string;
+    computeAnimationName: (character: string, index: number, count: number) => string;
 };
 
 export const TypedExample = (props: Props) => {
@@ -25,7 +25,7 @@ export const TypedExample = (props: Props) => {
         <div className={styles.stack}>
             <div className={styles.fill}>
                 <Typewriter
-                    animationName={props.animationName}
+                    computeAnimationName={props.computeAnimationName}
                     animationDelayMs={40}
                     animationDurationMs={400}
                     renderCaret={() => (

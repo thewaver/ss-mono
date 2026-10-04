@@ -4,7 +4,7 @@ import {
     SVGPatternLayouts,
     TrackedPatternUtils,
 } from "@thewaver/ss-components";
-import type { Point2d, Size2d } from "@thewaver/ss-utils";
+import type { Index2d, Point2d, Size2d } from "@thewaver/ss-utils";
 
 import { SVGPatternDefsSvelteUtils } from "../../Generators/SVGDefs/SVGPatterns/SVGPatternDefsSvelte.utils.js";
 import type { SVGPatternCellRenderer, SVGPatternTrackedCellRenderer } from "./SVGPatternsSvelte.types.js";
@@ -93,18 +93,22 @@ export namespace SVGPatterns {
         pointer: Point2d | undefined,
         opts: ReturnType<typeof TrackedPatternUtils.resolveOpts>,
         renderCell: SVGPatternTrackedCellRenderer,
+        computeCellLevel?: (index: Index2d, liveLevel: number) => number,
     ) =>
         computeLayoutPattern(
             kind,
             id,
             TrackedPatternUtils.computeCellCount(kind, opts.isTiled, cellSize, areaSize),
             cellSize,
-            (cellId, index, count, isSplit) =>
-                renderCell(
+            (cellId, index, count, isSplit) => {
+                const liveLevel = TrackedPatternUtils.computeLevel(kind, index, count, cellSize, pointer, opts);
+
+                return renderCell(
                     cellId,
                     index,
                     isSplit,
-                    TrackedPatternUtils.computeLevel(kind, index, count, cellSize, pointer, opts),
-                ),
+                    computeCellLevel ? computeCellLevel(index, liveLevel) : liveLevel,
+                );
+            },
         );
 }

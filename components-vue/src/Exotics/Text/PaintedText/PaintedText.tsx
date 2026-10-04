@@ -1,6 +1,7 @@
 import { type CSSProperties, Fragment, type SlotsType, defineComponent, nextTick, shallowRef, useId } from "vue";
 
 import {
+    LetterDriverStyles,
     LetterDriverUtils,
     type LetterRegistration,
     PAINTED_TEXT_DEFAULTS,
@@ -63,13 +64,26 @@ export const PaintedText = defineComponent(
         const sourceRef = shallowRef<HTMLDivElement>();
         const layoutRef = shallowRef<HTMLDivElement>();
 
+        const getOffset = () => (driver && rootRef.value ? driver.registry.getOffset(rootRef.value) : NO_OFFSET);
+
+        const getComputePushingAnimationName = () => {
+            const computeName = driver?.getComputePushingAnimationName?.();
+
+            if (!computeName || !driver) return undefined;
+
+            return (character: string, index: number) =>
+                computeName(character, getOffset() + index, driver.registry.get().characters.length);
+        };
+
         const layout = PaintedTextUtils.createLayout({
             getSource: () => sourceRef.value,
             getLayoutHost: () => layoutRef.value,
             getIsMeasuringLetters: () => !!driver,
+            getComputePushingAnimationName,
         });
 
         const state = useStore(layout);
+        const restLetters = useStore(layout, (value) => value.restLetters);
         const registryState = useStore(driver?.registry ?? NO_REGISTRY);
 
         let registration: LetterRegistration | undefined;
@@ -103,8 +117,39 @@ export const PaintedText = defineComponent(
 
         const getPaintArea = () => ({ x: 0, y: 0, width: state.value.width ?? 0, height: state.value.height });
 
-        watchAfterRender([() => state.value.letters], ([letters]) => {
-            registration?.setCharacters(letters.map((letter) => letter.character));
+        watchAfterRender([() => state.value.letters], ([letters]) =>
+            registration?.setCharacters(letters.map((letter) => letter.character)),
+        );
+
+        watchAfterRender([restLetters], ([letters]) =>
+            registration?.setBoxes(
+                letters.map((letter) => ({
+                    x: letter.x,
+                    y: letter.top,
+                    width: letter.width,
+                    height: letter.height,
+                })),
+            ),
+        );
+
+        const computePushingStyles = () => {
+            if (!driver?.getComputePushingAnimationName) return undefined;
+
+            void registryState.value;
+
+            const offset = getOffset();
+
+            return restLetters.value.map((_, index) => {
+                const animation = driver.getLetterState(offset + index).animation;
+
+                return animation
+                    ? LetterDriverUtils.computeAnimationStyle(animation, LetterDriverStyles.letterDriverTimeVar)
+                    : undefined;
+            });
+        };
+
+        watchAfterRender([computePushingStyles], ([styles]) => {
+            if (styles) layout.relayout(styles);
         });
 
         return () => {
@@ -121,12 +166,15 @@ export const PaintedText = defineComponent(
 
             void registryState.value;
 
-            const offset = driver && rootRef.value ? driver.registry.getOffset(rootRef.value) : NO_OFFSET;
+            const offset = getOffset();
             const isPerLetter = !!driver?.getIsAnimating();
 
             const getLetterStyle = (localIndex: number) =>
                 driver && isPerLetter
-                    ? PaintedTextUtils.computeLetterStyle(driver.getLetterState(offset + localIndex))
+                    ? PaintedTextUtils.computeLetterStyle(
+                          driver.getLetterState(offset + localIndex),
+                          LetterDriverStyles.letterDriverTimeVar,
+                      )
                     : undefined;
 
             const atomicLetterIndices = letters.reduce<number[]>((indices, letter, index) => {
@@ -157,7 +205,7 @@ export const PaintedText = defineComponent(
 
             const renderRuns = (isReadable: boolean) => runs.map((run, index) => renderRun(run, index, isReadable));
 
-            const renderLetter = (letter: PaintedTextLetter, localIndex: number, isReporting: boolean) => {
+            const renderLetter = (letter: PaintedTextLetter, localIndex: number) => {
                 const letterState = driver?.getLetterState(offset + localIndex);
                 const letterStyle = getLetterStyle(localIndex);
 
@@ -169,28 +217,19 @@ export const PaintedText = defineComponent(
                         y={letter.baseline}
                         text-anchor={letterState?.glyph ? "middle" : undefined}
                         style={toVueStyle({ ...runs[letter.runIndex ?? 0]?.style, ...letterStyle })}
-                        onAnimationstart={
-                            isReporting
-                                ? (event: AnimationEvent) => {
-                                      if (event.target === event.currentTarget) {
-                                          driver?.reportLetterStart?.(offset + localIndex);
-                                      }
-                                  }
-                                : undefined
-                        }
                     >
                         {letterState?.glyph ?? letter.character}
                     </text>
                 );
             };
 
-            const renderLetters = (isReporting: boolean) =>
-                letters.map((letter, index) => letter.kind === "text" && renderLetter(letter, index, isReporting));
+            const renderLetters = () =>
+                letters.map((letter, index) => letter.kind === "text" && renderLetter(letter, index));
 
             const renderLayer = (key: string, attributes: Record<string, unknown>, isReadable: boolean) =>
                 isPerLetter ? (
                     <g key={key} {...attributes} aria-hidden="true">
-                        {renderLetters(isReadable)}
+                        {renderLetters()}
                     </g>
                 ) : (
                     <text

@@ -126,7 +126,11 @@
 <script lang="ts">
     let props: HandTrailProps = $props();
 
-    const { getReading, getIsPointerPresent } = PointerTrackerSvelteUtils.create(() => props.element);
+    const { getReading, getIsPointerPresent } = PointerTrackerSvelteUtils.create(
+        () => props.element,
+        undefined,
+        () => props.defs.getPointSource?.(),
+    );
 
     const motion: HandMotion = { lastAngle: undefined, lastTurnedMs: undefined, bornTick: undefined };
 

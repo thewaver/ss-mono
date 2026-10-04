@@ -16,6 +16,7 @@
     const pointer = PointerTrackerSvelteUtils.create(
         () => element ?? undefined,
         () => isDisabled,
+        () => props.pointSource,
     );
 
     const isResting = $derived(

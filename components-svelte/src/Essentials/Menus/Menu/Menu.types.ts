@@ -172,6 +172,14 @@ export type MenuLevelProps<T> = {
     renderItem: MenuRenderItem<T>;
     /** Draws the surface this level's items sit on. */
     renderPopup: MenuRenderPopup;
+    /** How long the highlight's marker takes to slide from one item to the next, and to fade. */
+    floaterTransitionDurationMs?: number;
+    /**
+     * Draws the marker that slides to the highlighted item — the one the pointer or the arrow keys are on — behind it,
+     * in this menu and in every submenu. The fade is handed in rather than applied: the marker fades out while nothing
+     * is highlighted.
+     */
+    renderHighlightFloater?: Snippet<[visibilityTarget: 0 | 1, transitionDurationMs: number]>;
     /**
      * Runs when an item on this level is picked, and is told the radio group's values so a consumer can keep them in
      * step.
@@ -221,6 +229,11 @@ export type MenuEntryProps<T> = {
     onHover: (index: number, point: Point2d) => void;
     /** Runs when the entry's submenu closes in the ordinary way. */
     onSubmenuClose: () => void;
+    /**
+     * Hands the level the entry's element as it mounts, so the highlight's marker can find it, and returns the call
+     * that forgets it again.
+     */
+    recordItemRef: (index: number, element: HTMLElement) => () => void;
 };
 
 export type MenuProps<T> = Omit<InteractionWrapperProps<MenuFlags>, "renderControl" | "extraFlags"> & {
@@ -282,6 +295,14 @@ export type MenuProps<T> = Omit<InteractionWrapperProps<MenuFlags>, "renderContr
     renderContent: Snippet<[flags: InteractionFlags<MenuFlags>]>;
     /** Draws the surface the items sit on. */
     renderPopup: MenuRenderPopup;
+    /** How long the highlight's marker takes to slide from one item to the next, and to fade. */
+    floaterTransitionDurationMs?: number;
+    /**
+     * Draws the marker that slides to the highlighted item — the one the pointer or the arrow keys are on — behind it,
+     * in this menu and in every submenu. The fade is handed in rather than applied: the marker fades out while nothing
+     * is highlighted.
+     */
+    renderHighlightFloater?: Snippet<[visibilityTarget: 0 | 1, transitionDurationMs: number]>;
     /** Draws one item. */
     renderItem: MenuRenderItem<T>;
     /** Runs when an item is picked. */
@@ -349,6 +370,14 @@ export type ContextMenuProps<T> = {
     computeCustomText?: (item: MenuItem<T>) => string;
     /** Draws the surface the items sit on. */
     renderPopup: MenuRenderPopup;
+    /** How long the highlight's marker takes to slide from one item to the next, and to fade. */
+    floaterTransitionDurationMs?: number;
+    /**
+     * Draws the marker that slides to the highlighted item — the one the pointer or the arrow keys are on — behind it,
+     * in this menu and in every submenu. The fade is handed in rather than applied: the marker fades out while nothing
+     * is highlighted.
+     */
+    renderHighlightFloater?: Snippet<[visibilityTarget: 0 | 1, transitionDurationMs: number]>;
     /** Draws one item. */
     renderItem: MenuRenderItem<T>;
     /** Runs when an item is picked. */

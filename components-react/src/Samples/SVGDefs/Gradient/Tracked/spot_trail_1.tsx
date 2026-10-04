@@ -76,7 +76,11 @@ const getStampAlpha = (stamp: TrailStamp | undefined, frameMs: number, opts?: Gr
 
 const SpotTrail = (props: SpotTrailProps) => {
     const ref = SVGDefsReactUtils.useElementRef(props.element);
-    const { reading, isPointerPresent } = PointerTrackerReactUtils.usePointerReading(ref);
+    const { reading, isPointerPresent } = PointerTrackerReactUtils.usePointerReading(
+        ref,
+        false,
+        props.defs.getPointSource?.(),
+    );
     const frameMs = SVGDefsReactUtils.useFrameMs(clock);
     const [stamps] = useState(() => [...NO_STAMPS]);
     const motionRef = useRef<TrailMotion>({ lastOrigin: undefined, lastMovedMs: undefined, bornTick: undefined });

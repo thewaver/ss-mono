@@ -91,7 +91,7 @@ export const PhrasesExample = (props: Props) => {
                     <div className={styles.phraseSlot}>
                         <Typewriter
                             mode={mode}
-                            animationName={props.animationName}
+                            computeAnimationName={props.computeAnimationName}
                             animationDelayMs={prefersReducedMotion ? NO_MOTION_MS : CHARACTER_DELAY_MS}
                             animationDurationMs={prefersReducedMotion ? NO_MOTION_MS : CHARACTER_DURATION_MS}
                             computeCharacterWeights={props.computeCharacterWeights}

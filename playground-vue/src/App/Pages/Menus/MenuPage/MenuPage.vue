@@ -8,6 +8,7 @@ import ContextAreaExample from "./Examples/ContextArea.vue";
 import DefaultExample from "./Examples/Default.vue";
 import DisabledExample from "./Examples/Disabled.vue";
 import DrivenExample from "./Examples/Driven.vue";
+import GlideExample from "./Examples/Glide.vue";
 import PlacedAboveExample from "./Examples/PlacedAbove.vue";
 import ReachableExample from "./Examples/Reachable.vue";
 import RightToLeftExample from "./Examples/RightToLeft.vue";
@@ -37,6 +38,7 @@ const lastFlippedAction = shallowRef(NOTHING_RUN);
 const lastLayerAction = shallowRef(NOTHING_RUN);
 const lastDrivenAction = shallowRef(NOTHING_RUN);
 const lastContextAction = shallowRef(NOTHING_RUN);
+const lastGlideAction = shallowRef(NOTHING_RUN);
 
 const zoomPercent = shallowRef(ZOOM_RESET_PERCENT);
 
@@ -58,6 +60,13 @@ const examples: ExampleDefs[] = [
         name: "Default",
         readout: () => `${lastAction.value} — activating an item closes the menu`,
         path: `${EXAMPLES_ROOT}/Default.vue`,
+    },
+    {
+        key: "glide",
+        name: "A gliding highlight",
+        readout: () =>
+            `${lastGlideAction.value} — the items paint no highlight of their own; one marker glides to whichever item the pointer or the arrows are on`,
+        path: `${EXAMPLES_ROOT}/Glide.vue`,
     },
     {
         key: "driven",
@@ -149,6 +158,10 @@ const examples: ExampleDefs[] = [
     <PageExamples :items="examples">
         <template #default>
             <DefaultExample @activate="(action: Action) => (lastAction = action.name)" />
+        </template>
+
+        <template #glide>
+            <GlideExample @activate="(action: Action) => (lastGlideAction = action.name)" />
         </template>
 
         <template #driven>

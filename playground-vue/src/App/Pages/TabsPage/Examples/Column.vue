@@ -27,7 +27,7 @@ const props = defineProps<Props>();
             :selected-value="selectedValue"
             @selection-change="props.onSelectionChange"
         >
-            <template #renderFloater="{ visibilityTarget, transitionDurationMs }">
+            <template #renderSelectionFloater="{ visibilityTarget, transitionDurationMs }">
                 <PageTabFloater
                     orientation="vertical"
                     :visibility-target="visibilityTarget"

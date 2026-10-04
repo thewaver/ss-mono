@@ -81,6 +81,7 @@ export const WheelMenu = defineComponent(
                             renderDecoration: slots.renderDecoration,
                             renderItem,
                             renderPopup: slots.renderPopup,
+                            renderHighlightFloater: slots.renderHighlightFloater,
                         } satisfies Partial<MenuSlots<WheelValue<T>>>
                     }
                 </Menu>
@@ -116,6 +117,7 @@ export const WheelMenu = defineComponent(
             "triggerRole": null,
             "reservedScreenSize": null,
             "transitionDurationMs": null,
+            "floaterTransitionDurationMs": null,
             "visibility": Boolean,
             "onUpdate:visibility": null,
             "anchorRef": null,

@@ -9,11 +9,13 @@ import {
     type SVGFilterAssemblyDefs,
     SVGFilterDefs,
     SVGFilterDefsUtils,
+    type SVGFilterFrame,
     type SVGGaussianBlurFilterDefs,
     type SVGHueRotationFilterDefs,
     type SVGInversionFilterDefs,
     type SVGLightSourceDefs,
     type SVGLightSurfaceDefs,
+    type SVGPixelateFilterDefs,
     type SVGSaturationFilterDefs,
     type SVGSpecularLightingFilterDefs,
     type SVGTurbulenceFilterDefs,
@@ -54,7 +56,7 @@ const renderLightSurface = (surface: SVGLightSurfaceDefs, resultKey: string) => 
  */
 export class SVGFilterDefsFactory {
     private readonly registry: ReturnType<typeof SVGFilterDefsUtils.createRegistry>;
-    private filterPrimitives: Record<string, (srcIn: string) => VNodeChild> = {};
+    private filterPrimitives: Record<string, (srcIn: string, frame: SVGFilterFrame | undefined) => VNodeChild> = {};
 
     /**
      * @param filterId The id the rendered `filter` carries, which an element points at with `filter: url(#…)`.
@@ -72,7 +74,8 @@ export class SVGFilterDefsFactory {
      *
      * The filter region is grown to fit effects that reach past the element — a blur's spread, a shadow's offset,
      * a displacement's shift. Given the element's size, it is grown by exactly that reach on every side; without
-     * it, any reach at all doubles the region about the element; with no reach, the browser's default stands.
+     * it, any reach at all doubles the region about the element; with no reach, the browser's default stands. A
+     * pixelation needs the element's size, and is left out without it.
      *
      * @param defs The method, and the element's size in pixels when it is known.
      * @returns The `filter` element, or `undefined` when nothing was added.
@@ -85,7 +88,7 @@ export class SVGFilterDefsFactory {
         return (
             <filter id={this.filterId} {...assembly.region}>
                 {assembly.inputs.map(({ key, srcIn }) => (
-                    <Fragment key={key}>{this.filterPrimitives[key](srcIn)}</Fragment>
+                    <Fragment key={key}>{this.filterPrimitives[key](srcIn, assembly.frame)}</Fragment>
                 ))}
 
                 {assembly.mergeKeys && (
@@ -374,6 +377,48 @@ export class SVGFilterDefsFactory {
                 {custom}
             </feColorMatrix>
         );
+
+        return this;
+    };
+
+    /**
+     * Breaks the graphic into squares of one color each, the color at each square's middle.
+     *
+     * Use it with the `"chain"` method, or over a graphic that fills its box, since under `"isolate"` the original is
+     * laid underneath. It needs the element's size, passed to {@link SVGFilterDefsFactory.computeFilterPrimitives}:
+     * without it the squares cannot be laid out and the effect is left out. Skipped for a size of one pixel or less.
+     *
+     * @param defs How wide each square is, in user units.
+     * @param custom Content placed inside the dot image, for animating it.
+     * @returns The factory, for the next call.
+     */
+    public addPixelateFilter = (defs: SVGPixelateFilterDefs, custom?: VNodeChild) => {
+        const key = this.registry.addPixelate(defs);
+
+        if (key === undefined) return this;
+
+        this.filterPrimitives[key] = (srcIn, frame) => {
+            if (!frame) return undefined;
+
+            const resolved = SVGFilterDefsUtils.resolvePixelate(key, defs, frame);
+            const keys = resolved.keys;
+
+            return (
+                <>
+                    <feImage href={resolved.gridHref} preserveAspectRatio="none" result={keys.dots}>
+                        {custom}
+                    </feImage>
+
+                    <feComponentTransfer in={keys.dots} result={keys.grid}>
+                        <feFuncA type="discrete" tableValues={SVGFilterDefs.OPAQUE_WHEREVER_DRAWN} />
+                    </feComponentTransfer>
+
+                    <feComposite in={srcIn} in2={keys.grid} operator="in" result={keys.sampled} />
+
+                    <feMorphology in={keys.sampled} operator="dilate" radius={resolved.radius} result={key} />
+                </>
+            );
+        };
 
         return this;
     };

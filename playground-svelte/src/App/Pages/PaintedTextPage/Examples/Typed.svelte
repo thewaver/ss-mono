@@ -8,7 +8,7 @@
     import type { PaintedTextExampleProps } from "../PaintedTextPage.types";
 
     type Props = PaintedTextExampleProps & {
-        animationName: string;
+        computeAnimationName: (character: string, index: number, count: number) => string;
     };
 
     let props: Props = $props();
@@ -25,7 +25,7 @@
 <div class={styles.stack}>
     <div class={styles.fill}>
         <Typewriter
-            animationName={props.animationName}
+            computeAnimationName={props.computeAnimationName}
             animationDelayMs={40}
             animationDurationMs={400}
             onMount={(next) => {

@@ -1,10 +1,12 @@
 <script lang="ts">
-    import { CAROUSEL_ORIENTATIONS } from "@thewaver/ss-components-svelte";
+    import { CAROUSEL_ORIENTATIONS, CarouselPlacements } from "@thewaver/ss-components-svelte";
     import { CarouselKnobs } from "@thewaver/ss-playground/App/Knobs/Carousels.const";
     import {
         FIELD_WIDTH,
         ORIENTATION_FIELD_WIDTH,
         ORIENTATION_LABELS,
+        PLACEMENT_FIELD_WIDTH,
+        PLACEMENT_LABELS,
     } from "@thewaver/ss-playground/App/Pages/Carousels/Carousels.const";
 
     import PageCheckField from "../../PageComponents/Field/PageCheckField.svelte";
@@ -18,6 +20,7 @@
         controls: CarouselsControls;
         hasDelay?: boolean;
         hasLooping?: boolean;
+        hasPlacement?: boolean;
     };
 
     let props: Props = $props();
@@ -26,6 +29,25 @@
 </script>
 
 <PagePropsPanel scope={"global"}>
+    {#if props.hasPlacement}
+        <PageProp
+            itemKey={"placement"}
+            label={"Placement"}
+            hint={"The rule that says where each slide is drawn from how far it is from the one showing: a strip, a drum, cover flow and the rest."}
+        >
+            <PageSelectField
+                value={controls.placement}
+                values={CarouselPlacements.SAMPLE_KEYS}
+                computeLabel={(placement) => PLACEMENT_LABELS[placement]}
+                width={PLACEMENT_FIELD_WIDTH}
+                ariaLabel={"Placement"}
+                onChange={(placement) => {
+                    controls.placement = placement;
+                }}
+            />
+        </PageProp>
+    {/if}
+
     <PageProp itemKey={"slideCount"} label={"Slide count"} hint={"How many slides the carousel holds."}>
         <PageNumberField
             value={controls.slideCount}

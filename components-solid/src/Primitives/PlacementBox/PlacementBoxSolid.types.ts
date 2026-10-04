@@ -1,6 +1,6 @@
 import type { ParentProps } from "solid-js";
 
-import type { PlacementLayout, ProximityEffectFn } from "@thewaver/ss-components";
+import type { PlacementLayout, PointSource, ProximityEffectFn } from "@thewaver/ss-components";
 
 import type { AccessorProps } from "../../Utils/typeUtils";
 
@@ -14,6 +14,15 @@ export type PlacementBoxProps = ParentProps<
          * user asks for reduced motion: every item jumps.
          */
         transitionDurationMs?: number;
+        /**
+         * The point to follow instead of the pointer.
+         *
+         * A fraction across a box — the box's own, or the element named in the source — so a light moving
+         * across a banner can be handed to every card under it and each answers to the same spot. While the source has
+         * no point every item rests, as it does when the pointer leaves the window. Left out, the pointer is
+         * followed.
+         */
+        pointSource?: PointSource;
     }> & {
         /** What the items do as the pointer nears them. */
         computeEffect?: ProximityEffectFn;

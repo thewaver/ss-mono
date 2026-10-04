@@ -1,6 +1,7 @@
-import { type ReactNode, useCallback, useEffect, useId, useMemo, useRef, useState } from "react";
+import { type ReactNode, useCallback, useEffect, useId, useLayoutEffect, useMemo, useRef, useState } from "react";
 
 import {
+    FloaterStyles,
     LISTBOX_DEFAULTS,
     ListboxStyles,
     ListboxUtils,
@@ -10,15 +11,23 @@ import {
 } from "@thewaver/ss-components";
 
 import { ElementObserverReactUtils } from "../../../Abstracts/ElementObserver/ElementObserverReact.utils";
+import { FloaterReactUtils } from "../../../Abstracts/Floater/FloaterReact.utils";
 import { NavigatorReactUtils } from "../../../Abstracts/Navigator/NavigatorReact.utils";
 import { VirtualizerReactUtils } from "../../../Abstracts/Virtualizer/VirtualizerReact.utils";
 import { InteractionWrapper } from "../../../Primitives/InteractionWrapper/InteractionWrapper";
-import { useLatest } from "../../../Utils/refUtils";
+import { useElement, useLatest } from "../../../Utils/refUtils";
 import type { SelectItem, SelectOption, SelectOptionGroup } from "../Select/Select.types";
 import type { ListboxCompositeProps, ListboxOptionItemProps, ListboxOptionsProps, ListboxProps } from "./Listbox.types";
 import { ListboxReactUtils } from "./ListboxReact.utils";
 
 const EMPTY_SELECTION: never[] = [];
+
+const OPTION_SELECTOR = '[role="option"]';
+
+type FloaterTargets = {
+    selection: HTMLElement | undefined;
+    highlight: HTMLElement | undefined;
+};
 
 const ListboxOptionItem = (props: ListboxOptionItemProps) => {
     const elementRef = useRef<HTMLDivElement | null>(null);
@@ -80,7 +89,15 @@ export const ListboxOptions = <T,>(props: ListboxOptionsProps<T>) => {
 
     const endMarkerRef = useRef<HTMLDivElement | null>(null);
     const sizerRef = useRef<HTMLDivElement | null>(null);
+    const optionsRef = useRef<HTMLDivElement | null>(null);
+    const optionIndicesRef = useRef(new Map<string, number>());
     const latest = useLatest(props);
+
+    const [hoveredIndex, setHoveredIndex] = useState<number>();
+    const [floaterTargets, setFloaterTargets] = useState<FloaterTargets>({
+        selection: undefined,
+        highlight: undefined,
+    });
 
     const isLive = props.isLive;
     const isListDisabled = props.isDisabled ?? false;
@@ -128,53 +145,155 @@ export const ListboxOptions = <T,>(props: ListboxOptionsProps<T>) => {
         latestRowWindow.current.scrollToRow(highlightedRowIndex);
     }, [rowWindow.isLive, highlightedRowIndex, rows, latestRowWindow]);
 
+    const floaterTransitionDurationMs =
+        props.floaterTransitionDurationMs ?? LISTBOX_DEFAULTS.floaterTransitionDurationMs;
+
+    const selectedFlatIndex = SelectUtils.getFlatOptions(cursor.options).findIndex((option) =>
+        props.computeIsSelected(option.value),
+    );
+    const selectedIndex = selectedFlatIndex < 0 ? undefined : selectedFlatIndex;
+    const highlightIndex = hoveredIndex ?? (cursor.isHighlightShown ? cursor.highlightedIndex : undefined);
+
+    const sizer = useElement(sizerRef);
+    const optionsWrapper = useElement(optionsRef);
+    const container = isVirtualized ? sizer : optionsWrapper;
+
+    const findOptionElement = (index: number | undefined) => {
+        if (index === undefined || !container) return undefined;
+
+        const element = document.getElementById(cursor.getOptionId(index)) ?? undefined;
+
+        return element && container.contains(element) ? element : undefined;
+    };
+
+    useLayoutEffect(() => {
+        const selection = findOptionElement(selectedIndex);
+        const highlight = findOptionElement(highlightIndex);
+
+        setFloaterTargets((previous) =>
+            previous.selection === selection && previous.highlight === highlight ? previous : { selection, highlight },
+        );
+    });
+
+    const useOptionFloater = (isEnabled: boolean, target: HTMLElement | undefined) =>
+        FloaterReactUtils.useFloater({
+            isEnabled,
+            container,
+            target,
+            transitionDurationMs: floaterTransitionDurationMs,
+        });
+
+    const selectionFloater = useOptionFloater(props.renderSelectionFloater !== undefined, floaterTargets.selection);
+
+    const highlightFloater = useOptionFloater(props.renderHighlightFloater !== undefined, floaterTargets.highlight);
+
+    const handleOptionsPointerOver = (target: EventTarget) => {
+        const option = target instanceof Element ? target.closest(OPTION_SELECTOR) : null;
+
+        setHoveredIndex(option ? optionIndicesRef.current.get(option.id) : undefined);
+    };
+
+    const handleOptionsPointerLeave = () => setHoveredIndex(undefined);
+
+    const renderFloater = (
+        floater: ReturnType<typeof useOptionFloater>,
+        renderContent: ListboxOptionsProps<T>["renderSelectionFloater"],
+    ) =>
+        floater.isRendered && (
+            <div
+                ref={floater.ref}
+                className={FloaterStyles.floater}
+                style={{ ...floater.bounds, transitionDuration: `${floaterTransitionDurationMs}ms` }}
+            >
+                {renderContent?.(floater.visibilityTarget, floaterTransitionDurationMs)}
+            </div>
+        );
+
+    const renderFloaters = () => (
+        <>
+            {renderFloater(highlightFloater, props.renderHighlightFloater)}
+            {renderFloater(selectionFloater, props.renderSelectionFloater)}
+        </>
+    );
+
+    optionIndicesRef.current = new Map();
+
     const renderGroupHeading = (group: SelectOptionGroup<T>) =>
         props.renderGroup?.(group, ListboxUtils.computeGroupFlags(group, props.computeIsSelected));
 
-    const renderOptionSlot = (option: SelectOption<T>, flatIndex: number, key: string | number) => (
-        <InteractionWrapper<SelectOptionFlags>
-            key={key}
-            sizing={isHorizontal ? "fit-content" : "fill"}
-            isDisabled={(option.isDisabled ?? false) || isListDisabled}
-            isReachableWhenDisabled={option.isReachableWhenDisabled ?? false}
-            isFocusableWhenDisabled={isRoving && !isListDisabled && (option.isReachableWhenDisabled ?? false)}
-            isTabbable={isRoving && flatIndex === cursor.highlightedIndex}
-            tooltipDefs={option.tooltipDefs}
-            extraFlags={{
-                isHighlighted: cursor.isHighlightShown && flatIndex === cursor.highlightedIndex,
-                isSelected: props.computeIsSelected(option.value),
-            }}
-            renderControl={(setElementRef, flags) => (
-                <ListboxOptionItem
-                    ref={setElementRef}
-                    id={cursor.getOptionId(flatIndex)}
-                    isSelfScrolling={!isVirtualized}
-                    focusModel={cursor.focusModel}
-                    flags={flags}
-                    renderContent={(optionFlags) => props.renderOption(option, optionFlags)}
-                    onFocus={isRoving ? () => cursor.highlight(option.value) : undefined}
-                    onSelect={() => cursor.pick(option.value)}
-                />
-            )}
-        />
+    const renderOptionSlot = (option: SelectOption<T>, flatIndex: number, key: string | number) => {
+        optionIndicesRef.current.set(cursor.getOptionId(flatIndex), flatIndex);
+
+        return (
+            <InteractionWrapper<SelectOptionFlags>
+                key={key}
+                sizing={isHorizontal ? "fit-content" : "fill"}
+                isDisabled={(option.isDisabled ?? false) || isListDisabled}
+                isReachableWhenDisabled={option.isReachableWhenDisabled ?? false}
+                isFocusableWhenDisabled={isRoving && !isListDisabled && (option.isReachableWhenDisabled ?? false)}
+                isTabbable={isRoving && flatIndex === cursor.highlightedIndex}
+                tooltipDefs={option.tooltipDefs}
+                extraFlags={{
+                    isHighlighted: cursor.isHighlightShown && flatIndex === cursor.highlightedIndex,
+                    isSelected: props.computeIsSelected(option.value),
+                }}
+                renderControl={(setElementRef, flags) => (
+                    <ListboxOptionItem
+                        ref={setElementRef}
+                        id={cursor.getOptionId(flatIndex)}
+                        isSelfScrolling={!isVirtualized}
+                        focusModel={cursor.focusModel}
+                        flags={flags}
+                        renderContent={(optionFlags) => props.renderOption(option, optionFlags)}
+                        onFocus={isRoving ? () => cursor.highlight(option.value) : undefined}
+                        onSelect={() => cursor.pick(option.value)}
+                    />
+                )}
+            />
+        );
+    };
+
+    const renderEndMarker = () =>
+        hasMoreOptions && (
+            <div
+                key={optionsGeneration}
+                ref={endMarkerRef}
+                className={ListboxStyles.listboxEndMarker}
+                aria-hidden="true"
+            />
+        );
+
+    const renderMountedOptions = () => (
+        <div
+            ref={optionsRef}
+            className={[ListboxStyles.listboxOptions, isHorizontal && ListboxStyles.listboxHorizontal]
+                .filter(Boolean)
+                .join(" ")}
+            role="presentation"
+            onPointerOver={(e) => handleOptionsPointerOver(e.target)}
+            onPointerLeave={handleOptionsPointerLeave}
+        >
+            {renderFloaters()}
+
+            {cursor.options.map((item, index) => {
+                const offset = cursor.itemRows[index].entryOffset;
+
+                if (!SelectUtils.getIsGroup(item)) return renderOptionSlot(item, offset, index);
+
+                return (
+                    <div key={index} role="group" aria-label={item.label}>
+                        {renderGroupHeading(item)}
+
+                        {item.options.map((option, groupIndex) =>
+                            renderOptionSlot(option, offset + groupIndex, groupIndex),
+                        )}
+                    </div>
+                );
+            })}
+
+            {renderEndMarker()}
+        </div>
     );
-
-    const renderMountedOptions = () =>
-        cursor.options.map((item, index) => {
-            const offset = cursor.itemRows[index].entryOffset;
-
-            if (!SelectUtils.getIsGroup(item)) return renderOptionSlot(item, offset, index);
-
-            return (
-                <div key={index} role="group" aria-label={item.label}>
-                    {renderGroupHeading(item)}
-
-                    {item.options.map((option, groupIndex) =>
-                        renderOptionSlot(option, offset + groupIndex, groupIndex),
-                    )}
-                </div>
-            );
-        });
 
     const renderWindowedRow = (row: VirtualizerRow): ReactNode => {
         const source = rows[row.index];
@@ -194,7 +313,15 @@ export const ListboxOptions = <T,>(props: ListboxOptionsProps<T>) => {
     };
 
     const renderWindowedOptions = () => (
-        <div ref={sizerRef} className={ListboxStyles.listboxSizer} style={{ height: `${rowWindow.totalSize}px` }}>
+        <div
+            ref={sizerRef}
+            className={ListboxStyles.listboxSizer}
+            style={{ height: `${rowWindow.totalSize}px` }}
+            onPointerOver={(e) => handleOptionsPointerOver(e.target)}
+            onPointerLeave={handleOptionsPointerLeave}
+        >
+            {renderFloaters()}
+
             {ListboxUtils.getWindowedRuns(rowWindow.rows, rows).flatMap((run) =>
                 run.group ? (
                     <div key={`group-${run.groupIndex}`} role="group" aria-label={run.group.label}>
@@ -207,19 +334,14 @@ export const ListboxOptions = <T,>(props: ListboxOptionsProps<T>) => {
         </div>
     );
 
-    return (
+    return isVirtualized ? (
         <>
-            {isVirtualized ? renderWindowedOptions() : renderMountedOptions()}
+            {renderWindowedOptions()}
 
-            {hasMoreOptions && (
-                <div
-                    key={optionsGeneration}
-                    ref={endMarkerRef}
-                    className={ListboxStyles.listboxEndMarker}
-                    aria-hidden="true"
-                />
-            )}
+            {renderEndMarker()}
         </>
+    ) : (
+        renderMountedOptions()
     );
 };
 
@@ -253,7 +375,6 @@ export const ListboxComposite = <T,>(props: ListboxCompositeProps<T>) => {
         <div
             ref={rootRef}
             id={listboxId}
-            className={orientation === "horizontal" ? ListboxStyles.listboxHorizontal : undefined}
             role="listbox"
             aria-label={props.ariaLabel}
             aria-multiselectable={isMultiple || undefined}
@@ -277,6 +398,9 @@ export const ListboxComposite = <T,>(props: ListboxCompositeProps<T>) => {
                 computeIsSelected={props.computeIsSelected}
                 renderOption={props.renderOption}
                 renderGroup={props.renderGroup}
+                floaterTransitionDurationMs={props.floaterTransitionDurationMs}
+                renderSelectionFloater={props.renderSelectionFloater}
+                renderHighlightFloater={props.renderHighlightFloater}
                 onReachEnd={props.onReachEnd}
             />
         </div>

@@ -3,6 +3,7 @@ import { useState } from "react";
 import { PageExamples } from "../../../PageComponents/Examples/Examples";
 import { DeferredExample } from "./Examples/Deferred";
 import { GrowingExample } from "./Examples/Growing";
+import { RowExample } from "./Examples/Row";
 import { ScrolledExample } from "./Examples/Scrolled";
 import { SectionsExample } from "./Examples/Sections";
 
@@ -17,6 +18,7 @@ export const AccordionPage = () => {
     const growingState = useState<string[]>(["Shipping"]);
     const scrolledState = useState<string[]>([]);
     const deferredState = useState<string[]>([]);
+    const rowState = useState<string[]>(["Mountains"]);
 
     const [extraLines, setExtraLines] = useState(STARTING_EXTRA_LINES);
     const [built, setBuilt] = useState<string[]>([]);
@@ -87,6 +89,15 @@ export const AccordionPage = () => {
                 `expanded: ${JSON.stringify(scrolledState[0])} — opening a section below the fold brings it up`,
             component: () => <ScrolledExample expanded={scrolledState} />,
             path: `${EXAMPLES_ROOT}/Scrolled.tsx`,
+        },
+        {
+            key: "row",
+            name: "Side by side",
+            span: 2,
+            readout: () =>
+                `expanded: ${JSON.stringify(rowState[0])} — the panels sit in a row and open in width; the left and right arrows walk the headers, and the new panel's content slides in from the side the person moved toward`,
+            component: () => <RowExample expanded={rowState} />,
+            path: `${EXAMPLES_ROOT}/Row.tsx`,
         },
     ];
 

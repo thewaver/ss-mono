@@ -29,6 +29,7 @@ export const RichExample = (props: Props) => {
                     <PageTooltipContent
                         visibilityTarget={getVisibilityTarget}
                         transitionDurationMs={getTransitionDurationMs}
+                        reveal={props.reveal}
                     >
                         <div class={styles.richTitle}>Everyone with the link</div>
 

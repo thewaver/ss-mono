@@ -31,6 +31,7 @@ const anchorRef = shallowRef<HTMLElement>();
                 <PageTooltipContent
                     :visibility-target="content.visibilityTarget"
                     :transition-duration-ms="content.transitionDurationMs"
+                    :reveal="reveal"
                 >
                     <div :class="styles.richTitle">Everyone with the link</div>
 

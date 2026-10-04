@@ -36,7 +36,7 @@
             computeLayout={HONEYCOMB_LAYOUT}
             onSelectionChange={props.onSelectionChange}
         >
-            {#snippet renderFloater(visibilityTarget, transitionDurationMs)}
+            {#snippet renderSelectionFloater(visibilityTarget, transitionDurationMs)}
                 <PageTabHexFloater orientation={"horizontal"} {visibilityTarget} {transitionDurationMs} />
             {/snippet}
 

@@ -30,8 +30,12 @@ defineProps<TooltipContentProps>();
 
 <template>
     <div
-        :class="[styles.tooltipVisibility, visibilityTarget === 1 && styles.isVisible]"
-        :style="{ transition: `opacity ${transitionDurationMs}ms` }"
+        :class="[
+            styles.tooltipVisibility,
+            styles.tooltipRevealVariants[reveal ?? 'fade'],
+            visibilityTarget === 1 && styles.isVisible,
+        ]"
+        :style="{ transitionDuration: `${transitionDurationMs}ms` }"
     >
         <GlassSurface :border-radii="BORDER_RADII" :glass-defs="GLASS_DEFS">
             <div :class="styles.tooltipBody">

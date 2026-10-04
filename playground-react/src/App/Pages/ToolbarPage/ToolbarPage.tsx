@@ -14,6 +14,7 @@ import { DefaultExample } from "./Examples/Default";
 import { PaletteExample } from "./Examples/Palette";
 import { PressedExample } from "./Examples/Pressed";
 import { RefusingExample } from "./Examples/Refusing";
+import { SharedTooltipExample } from "./Examples/SharedTooltip";
 import { NOTHING_RUN } from "./ToolbarPage.const";
 import type { ToolbarExampleProps } from "./ToolbarPage.types";
 
@@ -104,6 +105,19 @@ export const ToolbarPage = () => {
                 `last run: ${lastRun} — a layout sizes the bar itself, so nothing runs out of room and the overflow menu has nothing to hold`,
             component: () => <PaletteExample {...commonProps} />,
             path: `${EXAMPLES_ROOT}/Palette.tsx`,
+        },
+        {
+            key: "sharedTooltip",
+            name: "One tooltip for the row",
+            span: WIDE_SPAN,
+            readout: () =>
+                "a single tooltip whose anchor is whichever action is under the pointer or holds focus; moving along the row carries the tooltip with it instead of hiding one and showing the next, and its description moves with it",
+            component: () => (
+                <ResizableBar width={barWidth} onResize={setBarWidth}>
+                    <SharedTooltipExample {...commonProps} />
+                </ResizableBar>
+            ),
+            path: `${EXAMPLES_ROOT}/SharedTooltip.tsx`,
         },
     ];
 

@@ -124,7 +124,11 @@
 <script lang="ts">
     let props: SpotSmearProps = $props();
 
-    const { getReading, getIsPointerPresent } = PointerTrackerSvelteUtils.create(() => props.element);
+    const { getReading, getIsPointerPresent } = PointerTrackerSvelteUtils.create(
+        () => props.element,
+        undefined,
+        () => props.defs.getPointSource?.(),
+    );
 
     const motion: TrailMotion = {
         lastOrigin: undefined,

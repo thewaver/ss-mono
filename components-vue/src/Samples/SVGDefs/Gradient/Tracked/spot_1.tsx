@@ -24,7 +24,11 @@ const DEFAULTS = TrackedGradientDefaults.SPOT_DEFAULTS;
 
 const SpotGradient = defineComponent(
     (props: SpotGradientProps) => {
-        const { reading } = PointerTrackerVueUtils.usePointerReading(() => props.element);
+        const { reading } = PointerTrackerVueUtils.usePointerReading(
+            () => props.element,
+            false,
+            () => props.defs.getPointSource?.(),
+        );
 
         return () => {
             const color = props.defs.colors.primary;

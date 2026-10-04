@@ -9,11 +9,3 @@ export const radioGroupRoot = style({
 });
 
 export const radioGroupPlacedRoot = style([radioGroupRoot, { width: "100%" }]);
-
-export const radioGroupFloater = style({
-    position: "absolute",
-    zIndex: -1,
-
-    display: "grid",
-    transition: "width, height, left, top",
-});

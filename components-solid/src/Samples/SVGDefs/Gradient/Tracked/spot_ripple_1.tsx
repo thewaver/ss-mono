@@ -122,7 +122,11 @@ export const spot_ripple_1 = (opts?: GradientRippleSampleOpts): TrackedGradientC
         const sharedBlur = SVGDefsSolidUtils.getBaseBlur(id, defs);
         const sharedBlurRef = SVGDefsUtils.getSharedFilter(sharedBlur);
 
-        const { getReading, getIsPointerPresent } = PointerTrackerSolidUtils.create(getRef ?? NO_REF);
+        const { getReading, getIsPointerPresent } = PointerTrackerSolidUtils.create(
+            getRef ?? NO_REF,
+            undefined,
+            defs.getPointSource,
+        );
 
         return [
             {

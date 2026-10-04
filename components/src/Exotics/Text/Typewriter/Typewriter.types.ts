@@ -1,4 +1,4 @@
-import type { ElementSegment } from "@thewaver/ss-utils";
+import type { LetterSegment } from "../../../Abstracts/LetterDriver/LetterDriver.types";
 
 export type TypewriterUpdateCause = "content" | "layout" | "other";
 
@@ -23,43 +23,30 @@ export type TypewriterController = {
     update: (cause: TypewriterUpdateCause) => boolean;
 };
 
-export type TypewriterSegment = ElementSegment & {
-    /** Where the segment's first character sits among every animated character, an image or a break counting as one. */
-    startIndex: number;
-};
-
 export type TypewriterState = {
     /** The measured text, split and wrapped at the width it was measured at. */
-    segments: TypewriterSegment[];
-    /** How many characters arrive, an image or a break counting as one. */
+    segments: LetterSegment[];
+    /** How many characters arrive, an image or a break the text holds counting as one. */
     count: number;
     /** The width the text was wrapped at, or `undefined` before it was first measured. */
     width: number | undefined;
-    /** Whether a run is playing. */
-    isAnimating: boolean;
     /** Whether a run has ever started, which is what lets the reset preferences skip the ones after. */
     hasAnimatedOnce: boolean;
-    /** The character the caret follows, or `-1` for before the first. */
-    caretIndex: number;
 };
 
 export type TypewriterPlayerOpts = {
     /** The element holding the text to measure: the hidden copy the consumer's children are rendered into. */
     getContainer: () => HTMLElement | undefined;
-    /** How long one character takes to arrive. */
-    getAnimationDurationMs: () => number;
-    /** How long each character waits after the one before it. */
-    getAnimationDelayMs: () => number;
-    /** How long to wait before the first character arrives. */
-    getInitialAnimationDelayMs: () => number;
-    /** Whether the characters are leaving rather than arriving. */
-    getIsErasing: () => boolean;
+    /** Names each letter's keyframes, which the text is wrapped for — see `LetterDriverUtils.wrapAtLastFrame`. */
+    getComputeAnimationName: () => (character: string, index: number, count: number) => string;
+    /** Whether the run is playing, which is the only time a change starts it again from the beginning. */
+    getIsPlaying: () => boolean;
+    /** Moves the run, `0` for its beginning and `1` for its end. */
+    setProgress: (progress: number) => void;
     /** Whether a change to the text itself starts the typing again. Only `false` stops it. */
     getResetAnimationOnContent: () => boolean | undefined;
     /** Whether a re-layout starts the typing again. Only `false` stops it. */
     getResetAnimationOnLayout: () => boolean | undefined;
-    /** Runs once every character has arrived. */
-    onAnimationEnd?: () => void;
     /**
      * Whether a drawer inside the typewriter draws the letters, in which case the player measures nothing and is
      * told its letter count instead.
@@ -72,22 +59,18 @@ export type TypewriterPlayer = {
     get: () => TypewriterState;
     /** Calls `listener` whenever the state changes, until the returned function is called. */
     subscribe: (listener: () => void) => () => void;
-    /** Re-measures and re-splits the text, then starts a run unless the cause's preference says not to. */
+    /** Re-measures and re-splits the text, then starts the run again unless the cause's preference says not to. */
     update: (cause: TypewriterUpdateCause) => boolean;
-    /** Starts a run from nothing, unless the cause's preference says not to. */
+    /** Starts the run again from the beginning while it is playing, unless the cause's preference says not to. */
     restart: (cause?: TypewriterUpdateCause) => void;
     /**
-     * Sets how many letters there are, as a drawer reports them, then starts a run unless the cause's preference
-     * says not to.
+     * Sets how many letters there are, as a drawer reports them, then starts the run again unless the cause's
+     * preference says not to.
      */
     setCount: (count: number, cause: TypewriterUpdateCause) => void;
-    /** Moves the caret to follow a character whose own animation has just started. */
-    reportCharacterStart: (index: number) => void;
     /**
      * Re-measures whenever the container changes size or content, or a web font or an image in the text finishes
      * loading, until the returned function is called.
      */
     observe: (container: HTMLElement) => () => void;
-    /** Stops the run under way, leaving it where it is. */
-    stop: () => void;
 };

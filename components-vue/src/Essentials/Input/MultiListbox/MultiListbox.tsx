@@ -36,6 +36,8 @@ export const MultiListbox = defineComponent(
                     {
                         renderOption: slots.renderOption,
                         renderGroup: slots.renderGroup,
+                        renderSelectionFloater: slots.renderSelectionFloater,
+                        renderHighlightFloater: slots.renderHighlightFloater,
                     } satisfies Partial<ListboxCompositeSlots<T>>
                 }
             </ListboxComposite>
@@ -53,6 +55,7 @@ export const MultiListbox = defineComponent(
             "onReachEnd": null,
             "computeEstimatedOptionHeight": null,
             "computeEstimatedGroupHeight": null,
+            "floaterTransitionDurationMs": null,
             "options": null,
             "computeCustomText": null,
             "values": null,

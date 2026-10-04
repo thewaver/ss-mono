@@ -37,7 +37,7 @@ const exampleProps = computed((): PaintedTextExampleProps => {
 
 <template>
     <PageMeasureBox :width="width" :padding="MEASURE_BOX_PADDING">
-        <TypedExample v-bind="exampleProps" :animation-name="ARRIVAL_EFFECT_NAMES[arrivalEffect]" />
+        <TypedExample v-bind="exampleProps" :compute-animation-name="() => ARRIVAL_EFFECT_NAMES[arrivalEffect]" />
     </PageMeasureBox>
 
     <PageExampleKnobs>

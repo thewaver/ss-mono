@@ -10,6 +10,9 @@ defineProps<TypewriterExampleWrapperProps>();
 
 <template>
     <PageMeasureBox :width="width" :padding="MEASURE_BOX_PADDING">
-        <ComplexExample :animation-name="animationName" :compute-character-weights="computeCharacterWeights" />
+        <ComplexExample
+            :compute-animation-name="computeAnimationName"
+            :compute-character-weights="computeCharacterWeights"
+        />
     </PageMeasureBox>
 </template>

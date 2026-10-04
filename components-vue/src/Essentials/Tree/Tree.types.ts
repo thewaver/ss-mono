@@ -54,6 +54,8 @@ export type TreeProps<T> = {
      * screen.
      */
     "computeEstimatedNodeHeight"?: (index: number) => number;
+    /** How long either marker takes to slide from one node to the next, and to fade. */
+    "floaterTransitionDurationMs"?: number;
     /** The nodes, as a tree rather than a flat list. */
     "nodes": TreeNode<T>[];
     /** Arranges the nodes, for a tree drawn as something other than an indented run. */
@@ -88,4 +90,15 @@ export type TreeSlots<T> = {
     renderNode: (props: { node: TreeNode<T>; renderProps: InteractionFlags<TreeNodeRenderProps> }) => VNodeChild;
     /** Draws what stands in for a branch's children while they are still being fetched. */
     renderPendingChildren?: (props: { node: TreeNode<T>; depth: number }) => VNodeChild;
+    /**
+     * Draws the marker that slides to the selected node, behind it. The fade is handed in rather than applied: the
+     * marker fades out while nothing is selected or the selected node is hidden inside a closed branch, and in a tree
+     * that only draws what is on screen, while the selected node is scrolled away.
+     */
+    renderSelectionFloater?: (props: { visibilityTarget: 0 | 1; transitionDurationMs: number }) => VNodeChild;
+    /**
+     * Draws the marker that slides to the node under the pointer, or the one holding focus, behind it — drawn under the
+     * selection's marker where both are given. It fades out while neither is on a node.
+     */
+    renderHighlightFloater?: (props: { visibilityTarget: 0 | 1; transitionDurationMs: number }) => VNodeChild;
 };

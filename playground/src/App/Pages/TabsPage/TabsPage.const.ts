@@ -27,6 +27,13 @@ export const AUTOMATIC_TABS = withIds("automatic", [
     { value: "Export" },
 ]);
 
+export const HOVER_PILL_TABS = withIds("hoverPill", [
+    { value: "Render" },
+    { value: "Source" },
+    { value: "Metrics", isDisabled: true },
+    { value: "Export" },
+]);
+
 export const REACHABLE_TABS = withIds("reachable", [
     { value: "Render" },
     { value: "Source" },

@@ -15,6 +15,10 @@ export type LetterDriverContextType = {
     getCaretIndex?: () => number;
     /** Draws the wrapper's caret, which the drawer only places. */
     renderCaret?: () => JSX.Element;
-    /** Tells the wrapper a letter's own animation has just started. */
-    reportLetterStart?: (index: number) => void;
+    /**
+     * Names each letter's keyframes, for a wrapper whose letters take room as they animate, counted across every
+     * drawer. Given, a drawer wraps its text with every letter at its last frame and moves each letter along as the
+     * ones before it grow, as `ProximityText` does on its own. Left out, letters animate where they were laid out.
+     */
+    getComputePushingAnimationName?: () => (character: string, index: number, count: number) => string;
 };

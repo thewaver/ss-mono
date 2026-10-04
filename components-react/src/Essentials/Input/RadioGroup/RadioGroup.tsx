@@ -1,28 +1,29 @@
-import { type KeyboardEvent, useCallback, useEffect, useId, useLayoutEffect, useMemo, useRef, useState } from "react";
+import { type KeyboardEvent, useCallback, useId, useMemo, useRef, useState } from "react";
 
 import {
+    FloaterStyles,
     RADIO_GROUP_DEFAULTS,
     type RadioGroupEntry,
-    type RadioGroupFloaterBounds,
     RadioGroupStyles,
     RadioGroupUtils,
 } from "@thewaver/ss-components";
 
-import { ElementFaderReactUtils } from "../../../Abstracts/ElementFader/ElementFaderReact.utils";
+import { FloaterReactUtils } from "../../../Abstracts/Floater/FloaterReact.utils";
 import { NavigatorReactUtils } from "../../../Abstracts/Navigator/NavigatorReact.utils";
 import { PlacementBox } from "../../../Primitives/PlacementBox/PlacementBox";
+import { useElement } from "../../../Utils/refUtils";
 import { RadioGroupContextProvider } from "./RadioGroup.context";
 import type { RadioGroupReactContextType } from "./RadioGroup.context.types";
 import type { RadioGroupProps } from "./RadioGroup.types";
 
 export const RadioGroup = <T,>(props: RadioGroupProps<T>) => {
     const rootRef = useRef<HTMLDivElement | null>(null);
-    const floaterRef = useRef<HTMLDivElement | null>(null);
 
     const fallbackName = useId();
 
     const [entries, setEntries] = useState<RadioGroupEntry[]>([]);
-    const [measuredBounds, setMeasuredBounds] = useState<RadioGroupFloaterBounds>();
+    const [hoveredEntry, setHoveredEntry] = useState<RadioGroupEntry>();
+    const [focusedEntry, setFocusedEntry] = useState<RadioGroupEntry>();
 
     const [value, setValue] = props.value;
     const orientation = props.orientation ?? RADIO_GROUP_DEFAULTS.orientation;
@@ -40,34 +41,27 @@ export const RadioGroup = <T,>(props: RadioGroupProps<T>) => {
     const rovingEntry = RadioGroupUtils.computeRovingEntry(navigableEntries, value);
     const selectedEntry = RadioGroupUtils.computeSelectedEntry(orderedEntries, value);
 
-    const floaterBounds = RadioGroupUtils.computeFloaterBounds(
-        layout,
-        measuredBounds,
-        selectedEntry === undefined
-            ? undefined
-            : RadioGroupUtils.computePlacement(orderedEntries, layout, selectedEntry),
-    );
+    const root = useElement(rootRef);
 
-    const isFloaterShown = selectedEntry !== undefined && floaterBounds !== undefined;
+    const findEntry = (target: EventTarget | null) =>
+        target instanceof Node
+            ? orderedEntries.find((entry) => entry.getElementRef()?.parentElement?.contains(target) ?? false)
+            : undefined;
 
-    const floaterFader = ElementFaderReactUtils.useFader(isFloaterShown, { transitionDurationMs, ref: floaterRef });
+    const useEntryFloater = (isEnabled: boolean, entry: RadioGroupEntry | undefined) =>
+        FloaterReactUtils.useFloater({
+            isEnabled,
+            container: layout === undefined ? root : undefined,
+            target: (entry?.getElementRef()?.offsetParent as HTMLElement | null) ?? undefined,
+            layout,
+            placement:
+                entry === undefined ? undefined : RadioGroupUtils.computePlacement(orderedEntries, layout, entry),
+            transitionDurationMs,
+        });
 
-    useEffect(() => {
-        if (floaterFader.isVisible) return;
+    const selectionFloater = useEntryFloater(props.renderSelectionFloater !== undefined, selectedEntry);
 
-        setMeasuredBounds(undefined);
-    }, [floaterFader.isVisible]);
-
-    const hasFloater = props.renderFloater !== undefined;
-    const selectedElement = selectedEntry?.getElementRef();
-
-    useLayoutEffect(() => {
-        const root = rootRef.current;
-
-        if (!hasFloater || layout !== undefined || !root || !selectedElement) return;
-
-        return RadioGroupUtils.observeSelectedBounds(root, selectedElement, setMeasuredBounds);
-    }, [hasFloater, layout, selectedElement]);
+    const highlightFloater = useEntryFloater(props.renderHighlightFloater !== undefined, hoveredEntry ?? focusedEntry);
 
     const register = useCallback((entry: RadioGroupEntry) => {
         setEntries((previous) => [...previous, entry]);
@@ -103,19 +97,24 @@ export const RadioGroup = <T,>(props: RadioGroupProps<T>) => {
         if (!next.getIsDisabled()) setValue(next.getValue() as T);
     };
 
-    const floater = hasFloater && floaterFader.isVisible && floaterBounds && (
-        <div
-            ref={floaterRef}
-            className={RadioGroupStyles.radioGroupFloater}
-            style={{ ...floaterBounds, transitionDuration: `${transitionDurationMs}ms` }}
-        >
-            {props.renderFloater!(floaterFader.transitionTarget, transitionDurationMs)}
-        </div>
-    );
+    const renderFloater = (
+        floater: ReturnType<typeof useEntryFloater>,
+        renderContent: RadioGroupProps<T>["renderSelectionFloater"],
+    ) =>
+        floater.isRendered && (
+            <div
+                ref={floater.ref}
+                className={FloaterStyles.floater}
+                style={{ ...floater.bounds, transitionDuration: `${transitionDurationMs}ms` }}
+            >
+                {renderContent?.(floater.visibilityTarget, transitionDurationMs)}
+            </div>
+        );
 
     const content = (
         <>
-            {floater}
+            {renderFloater(highlightFloater, props.renderHighlightFloater)}
+            {renderFloater(selectionFloater, props.renderSelectionFloater)}
             <RadioGroupContextProvider value={context}>{props.children}</RadioGroupContextProvider>
         </>
     );
@@ -133,6 +132,10 @@ export const RadioGroup = <T,>(props: RadioGroupProps<T>) => {
             aria-required={props.isRequired || undefined}
             aria-invalid={props.hasError || undefined}
             onKeyDown={handleKeyDown}
+            onPointerOver={(e) => setHoveredEntry(findEntry(e.target))}
+            onPointerLeave={() => setHoveredEntry(undefined)}
+            onFocus={(e) => setFocusedEntry(findEntry(e.target))}
+            onBlur={() => setFocusedEntry(undefined)}
         >
             {layout ? (
                 <PlacementBox layout={layout} computeEffect={props.computeEffect}>

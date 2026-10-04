@@ -19,7 +19,7 @@ export const SegmentedExample = (props: Props) => (
             ariaLabel={"Segmented size"}
             orientation={"horizontal"}
             gap={0}
-            renderFloater={(getVisibilityTarget, getTransitionDurationMs) => (
+            renderSelectionFloater={(getVisibilityTarget, getTransitionDurationMs) => (
                 <PageRadioSegmentFloater
                     visibilityTarget={getVisibilityTarget}
                     transitionDurationMs={getTransitionDurationMs}

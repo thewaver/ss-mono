@@ -1,4 +1,4 @@
-import type { CarouselAxis, CarouselOrientation } from "@thewaver/ss-components-react";
+import type { CarouselOrientation, CarouselPlacementFn, CarouselPlacements } from "@thewaver/ss-components-react";
 
 type ValueState<T> = readonly [T, (value: T) => void];
 
@@ -10,10 +10,8 @@ export type CarouselExampleProps = {
     autoplayDelayMs?: number;
     index: ValueState<number>;
     playback?: ValueState<boolean>;
-};
-
-export type DrumCarouselExampleProps = Omit<CarouselExampleProps, "orientation"> & {
-    axis: CarouselAxis;
+    computePlacement: CarouselPlacementFn;
+    isNarrow: boolean;
 };
 
 export type CarouselSharedProps = Omit<CarouselExampleProps, "index" | "autoplayDelayMs" | "playback">;
@@ -24,6 +22,7 @@ export type CarouselsControls = {
     orientation: ValueState<CarouselOrientation>;
     isDisabled: ValueState<boolean>;
     isLooping: ValueState<boolean>;
+    placement: ValueState<CarouselPlacements.SampleKey>;
     slideCount: number;
     slides: string[];
     sharedProps: CarouselSharedProps;

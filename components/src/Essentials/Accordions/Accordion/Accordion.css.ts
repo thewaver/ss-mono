@@ -11,5 +11,14 @@ export const accordionSizingVariants = styleVariants({
 
 export const accordionRoot = style({
     display: "flex",
-    flexDirection: "column",
+});
+
+export const accordionOrientationVariants = styleVariants({
+    horizontal: {
+        flexDirection: "row",
+        alignItems: "stretch",
+    },
+    vertical: {
+        flexDirection: "column",
+    },
 });

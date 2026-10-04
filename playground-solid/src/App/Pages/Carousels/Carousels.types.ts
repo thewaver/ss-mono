@@ -1,6 +1,11 @@
 import type { Accessor, Signal } from "solid-js";
 
-import type { AccessorProps, CarouselAxis, CarouselOrientation } from "@thewaver/ss-components-solid";
+import type {
+    AccessorProps,
+    CarouselOrientation,
+    CarouselPlacementFn,
+    CarouselPlacements,
+} from "@thewaver/ss-components-solid";
 
 export type CarouselExampleProps = AccessorProps<{
     slides: string[];
@@ -10,12 +15,9 @@ export type CarouselExampleProps = AccessorProps<{
     autoplayDelayMs?: number;
     index: Signal<number>;
     playback?: Signal<boolean>;
+    computePlacement: CarouselPlacementFn;
+    isNarrow: boolean;
 }>;
-
-export type DrumCarouselExampleProps = Omit<CarouselExampleProps, "orientation"> &
-    AccessorProps<{
-        axis: CarouselAxis;
-    }>;
 
 export type CarouselSharedProps = Omit<CarouselExampleProps, "index" | "autoplayDelayMs" | "playback">;
 
@@ -25,6 +27,7 @@ export type CarouselsControls = {
     orientation: Signal<CarouselOrientation>;
     isDisabled: Signal<boolean>;
     isLooping: Signal<boolean>;
+    placement: Signal<CarouselPlacements.SampleKey>;
     getSlideCount: Accessor<number>;
     getSlides: Accessor<string[]>;
     getSharedProps: Accessor<CarouselSharedProps>;

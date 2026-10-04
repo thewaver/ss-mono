@@ -9,6 +9,7 @@ import { PageMeasureBox } from "../../../PageComponents/MeasureBox/MeasureBox";
 import { PageProp } from "../../../PageComponents/Prop/Prop";
 import { PagePropsPanel } from "../../../PageComponents/PropsPanel/PropsPanel";
 import { PanelExample } from "./Examples/Panel";
+import { PlacedLightExample } from "./Examples/PlacedLight";
 import { RowExample } from "./Examples/Row";
 import type { LightCatcherExampleProps } from "./LightCatcherPageReact.types";
 
@@ -63,6 +64,19 @@ export const LightCatcherPage = () => {
                 </PageMeasureBox>
             ),
             path: `${EXAMPLES_ROOT}/Row.tsx`,
+        },
+        {
+            key: "placed",
+            name: "A light placed by hand",
+            span: ROW_SPAN,
+            readout: () =>
+                "the slider puts one light across the whole row and every lamp answers to that same spot — the pointer is ignored, since a supplied point replaces it",
+            component: () => (
+                <PageMeasureBox isFilling height={BOX_HEIGHT}>
+                    <PlacedLightExample {...commonProps} />
+                </PageMeasureBox>
+            ),
+            path: `${EXAMPLES_ROOT}/PlacedLight.tsx`,
         },
     ];
 

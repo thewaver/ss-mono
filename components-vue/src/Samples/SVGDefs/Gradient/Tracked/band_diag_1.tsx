@@ -27,7 +27,11 @@ const DEFAULTS = TrackedGradientDefaults.BAND_DIAGONAL_DEFAULTS;
 
 const DiagonalBandGradient = defineComponent(
     (props: DiagonalBandGradientProps) => {
-        const { reading } = PointerTrackerVueUtils.usePointerReading(() => props.element);
+        const { reading } = PointerTrackerVueUtils.usePointerReading(
+            () => props.element,
+            false,
+            () => props.defs.getPointSource?.(),
+        );
 
         return () => {
             const angle = props.opts?.bandAngle ?? DEFAULTS.bandAngle;

@@ -31,6 +31,7 @@ const anchorRef = shallowRef<HTMLElement>();
                 <PageTooltipContent
                     :visibility-target="content.visibilityTarget"
                     :transition-duration-ms="content.transitionDurationMs"
+                    :reveal="reveal"
                     >Moves the thread out of the inbox.</PageTooltipContent
                 >
             </template>

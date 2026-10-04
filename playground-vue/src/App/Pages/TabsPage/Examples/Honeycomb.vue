@@ -37,7 +37,7 @@ const props = defineProps<Props>();
                 :compute-layout="HONEYCOMB_LAYOUT"
                 @selection-change="props.onSelectionChange"
             >
-                <template #renderFloater="{ visibilityTarget, transitionDurationMs }">
+                <template #renderSelectionFloater="{ visibilityTarget, transitionDurationMs }">
                     <PageTabHexFloater
                         orientation="horizontal"
                         :visibility-target="visibilityTarget"

@@ -119,6 +119,8 @@
     computeCustomText={props.computeCustomText}
     renderItem={props.renderItem}
     renderPopup={props.renderPopup}
+    floaterTransitionDurationMs={props.floaterTransitionDurationMs}
+    renderHighlightFloater={props.renderHighlightFloater}
     onPick={pick}
     onClose={close}
     onDismiss={close}

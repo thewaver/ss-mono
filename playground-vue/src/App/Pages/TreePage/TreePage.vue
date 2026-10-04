@@ -5,6 +5,7 @@ import type { ExampleDefs } from "../../PageComponents/Examples/Examples.types";
 import PageExamples from "../../PageComponents/Examples/PageExamples.vue";
 import FilesExample from "./Examples/Files.vue";
 import LazyExample from "./Examples/Lazy.vue";
+import LeaningExample from "./Examples/Leaning.vue";
 import LinkComponentExample from "./Examples/LinkComponent.vue";
 import LinksExample from "./Examples/Links.vue";
 import OutsideExample from "./Examples/Outside.vue";
@@ -54,6 +55,9 @@ const lazyExpanded = shallowRef<string[]>([]);
 const stressValue = shallowRef<string | undefined>();
 const stressExpanded = shallowRef<string[]>(["package-1", "package-2", "package-3"]);
 const stressFiles = createStressFiles();
+
+const leaningValue = shallowRef<string | undefined>();
+const leaningExpanded = shallowRef<string[]>(["src"]);
 
 const radialValue = shallowRef<string | undefined>();
 const radialExpanded = shallowRef<string[]>(RANK_ROOTS);
@@ -140,6 +144,13 @@ const examples: ExampleDefs[] = [
         path: `${EXAMPLES_ROOT}/Virtualized.vue`,
     },
     {
+        key: "leaning",
+        name: "Leaning toward the pointer",
+        readout: () =>
+            `selected: ${leaningValue.value ?? "nothing"} — a column layout with a proximity effect: each node shifts and brightens by how near the pointer is, and the painter keeps the selected one lit, since an effect is not told which node is current`,
+        path: `${EXAMPLES_ROOT}/Leaning.vue`,
+    },
+    {
         key: "radial",
         span: 2,
         name: "A tree drawn outward",
@@ -209,6 +220,10 @@ const examples: ExampleDefs[] = [
 
         <template #virtualized>
             <VirtualizedExample v-model:value="stressValue" v-model:expanded="stressExpanded" :nodes="stressFiles" />
+        </template>
+
+        <template #leaning>
+            <LeaningExample v-model:value="leaningValue" v-model:expanded="leaningExpanded" />
         </template>
 
         <template #radial>

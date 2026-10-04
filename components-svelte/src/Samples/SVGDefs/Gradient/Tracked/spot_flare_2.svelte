@@ -147,7 +147,11 @@
 <script lang="ts">
     let props: FlarePartProps = $props();
 
-    const { getReading, getIsPointerPresent } = PointerTrackerSvelteUtils.create(() => props.element);
+    const { getReading, getIsPointerPresent } = PointerTrackerSvelteUtils.create(
+        () => props.element,
+        undefined,
+        () => props.defs.getPointSource?.(),
+    );
 
     const gradient = $derived(
         props.ghost

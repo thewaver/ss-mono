@@ -6,6 +6,7 @@
     import DefaultExample from "./Examples/Default.svelte";
     import DisabledExample from "./Examples/Disabled.svelte";
     import DrivenExample from "./Examples/Driven.svelte";
+    import GlideExample from "./Examples/Glide.svelte";
     import PlacedAboveExample from "./Examples/PlacedAbove.svelte";
     import ReachableExample from "./Examples/Reachable.svelte";
     import RightToLeftExample from "./Examples/RightToLeft.svelte";
@@ -35,6 +36,7 @@
     let lastLayerAction = $state(NOTHING_RUN);
     let lastDrivenAction = $state(NOTHING_RUN);
     let lastContextAction = $state(NOTHING_RUN);
+    let lastGlideAction = $state(NOTHING_RUN);
 
     let zoomPercent = $state(ZOOM_RESET_PERCENT);
 
@@ -57,6 +59,14 @@
             readout: () => `${lastAction} — activating an item closes the menu`,
             component: defaultExample,
             path: `${EXAMPLES_ROOT}/Default.svelte`,
+        },
+        {
+            key: "glide",
+            name: "A gliding highlight",
+            readout: () =>
+                `${lastGlideAction} — the items paint no highlight of their own; one marker glides to whichever item the pointer or the arrows are on`,
+            component: glideExample,
+            path: `${EXAMPLES_ROOT}/Glide.svelte`,
         },
         {
             key: "driven",
@@ -156,6 +166,14 @@
         },
     ];
 </script>
+
+{#snippet glideExample()}
+    <GlideExample
+        onActivate={(action) => {
+            lastGlideAction = action.name;
+        }}
+    />
+{/snippet}
 
 {#snippet defaultExample()}
     <DefaultExample

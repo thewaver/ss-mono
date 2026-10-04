@@ -1,6 +1,7 @@
 import { type ElementSegment, JSXTextParserUtils, StoreUtils } from "@thewaver/ss-utils";
 
 import type { LetterState } from "../../../Abstracts/LetterDriver/LetterDriver.types";
+import { LetterDriverUtils } from "../../../Abstracts/LetterDriver/LetterDriver.utils";
 import type { SVGDefsOf } from "../../../Generators/SVGDefs/SVGDefs.types";
 import type {
     PaintedTextLayout,
@@ -16,8 +17,6 @@ const SVG_NAMESPACE = "http://www.w3.org/2000/svg";
 const MASKED_STROKE_SCALE = 2;
 const CURRENT_COLOR = "currentColor";
 const NO_SCALE = 1;
-const LINE_BREAK_CHARACTER = "\n";
-const WHOLE_ELEMENT_CHARACTER = "￼";
 
 /** What a whole element is drawn as once it is in the SVG. */
 type AtomicKind = "image" | "svg" | "foreign";
@@ -87,6 +86,51 @@ const createLayoutNode = (segment: ElementSegment) => {
             return span;
         }
     }
+};
+
+/** A letter laid out in a box of its own, so it can be styled and measured again while it pushes its neighbors. */
+type PushedLetter =
+    | { kind: "break" }
+    | { kind: "text"; element: HTMLElement; probe: HTMLElement; style?: Record<string, string> }
+    | { kind: "atomic"; element: HTMLElement; atomic: SVGElement; style?: Record<string, string> };
+
+/**
+ * The HTML one segment is laid out as when its letters push each other along: every character in an inline block of
+ * its own, so a letter's keyframes can be applied to it alone and its box read back.
+ */
+const createPushingLayoutNode = (segment: ElementSegment) => {
+    if (segment.type !== "text") return createLayoutNode(segment);
+
+    const span = document.createElement("span");
+
+    for (const [key, value] of Object.entries({ ...segment.nonMetrics, ...segment.metrics })) {
+        span.style.setProperty(key, String(value));
+    }
+
+    for (const character of Array.from(segment.text)) {
+        const letter = document.createElement("span");
+
+        letter.style.display = "inline-block";
+        letter.textContent = character;
+        span.append(letter);
+    }
+
+    span.append(createBaselineProbe());
+
+    return span;
+};
+
+/** Swaps one inline style set for another on an element, leaving every other property alone. */
+const applyStyle = (
+    element: HTMLElement,
+    previous: Record<string, string> | undefined,
+    next: Record<string, string> | undefined,
+) => {
+    for (const key of Object.keys(previous ?? {})) {
+        if (!next || !(key in next)) element.style.removeProperty(key);
+    }
+
+    for (const [key, value] of Object.entries(next ?? {})) element.style.setProperty(key, value);
 };
 
 /** Builds the SVG element a whole element is drawn as, placed over the box its copy took in the layout. */
@@ -182,21 +226,18 @@ export namespace PaintedTextUtils {
      * The style one drawn letter wears for what a wrapper says it is doing: hidden or not, and the keyframes it plays.
      *
      * The keyframes are a wrapper's own, written for HTML, so the letter is made to transform about its own center
-     * — an SVG element otherwise scales and turns about the corner of the whole drawing — and holds its first and
-     * last frames before and after it plays, as `Typewriter`'s letters do.
+     * — an SVG element otherwise scales and turns about the corner of the whole drawing — and is held at the moment
+     * the wrapper's run has reached, as {@link LetterDriverUtils.computeAnimationStyle} describes.
      *
      * @param state What the letter is doing.
+     * @param timeVar `LetterDriverStyles.letterDriverTimeVar`, which the wrapper sets on its root.
      * @returns Dashed CSS properties, empty for a letter doing nothing.
      */
-    export const computeLetterStyle = (state: LetterState): Record<string, string> => ({
+    export const computeLetterStyle = (state: LetterState, timeVar: string): Record<string, string> => ({
         ...(state.isHidden ? { visibility: "hidden" } : {}),
         ...(state.animation
             ? {
-                  "animation-name": state.animation.name,
-                  "animation-duration": `${state.animation.durationMs}ms`,
-                  "animation-delay": `${state.animation.delayMs}ms`,
-                  "animation-direction": state.animation.direction,
-                  "animation-fill-mode": "both",
+                  ...LetterDriverUtils.computeAnimationStyle(state.animation, timeVar),
                   "transform-box": "fill-box",
                   "transform-origin": "center",
               }
@@ -212,17 +253,24 @@ export namespace PaintedTextUtils {
      * back from there, so vertical alignment, line height and text alignment are the browser's own. An `<img>`
      * becomes an SVG `<image>`, an `<svg>` is copied in whole, and anything else is copied into a `<foreignObject>`.
      *
+     * While a wrapper's letters push each other along as they grow (`getComputePushingAnimationName`), the text is
+     * wrapped with every letter at its last frame, as `ProximityText` wraps it, and each letter is laid out in a box
+     * of its own; `relayout` then styles those boxes and reads them back, moving each letter by as much as the ones
+     * before it on its line grew, while the line breaks and `restLetters` stay where the text was first laid out.
+     *
      * The first measurement, and every one after the content changes, warns about elements the copy cannot
      * reproduce — see `JSXTextParserUtils.findUnsupportedElements`.
      *
-     * @param opts The two elements the layout reads and writes.
+     * @param opts The two elements the layout reads and writes, and how the letters are driven.
      * @returns The layout.
      */
     export const createLayout = (opts: PaintedTextLayoutOpts): PaintedTextLayout => {
         const store = StoreUtils.create<PaintedTextLayoutState>(
-            { width: undefined, height: 0, runs: [], atomics: [], letters: [] },
+            { width: undefined, height: 0, runs: [], atomics: [], letters: [], restLetters: [] },
             { isEqual: StoreUtils.getIsShallowEqual },
         );
+
+        let pushed: PushedLetter[] = [];
 
         const measure = (isContentChange: boolean) => {
             const source = opts.getSource();
@@ -233,8 +281,14 @@ export namespace PaintedTextUtils {
             if (isContentChange || store.get().width === undefined) warnIfUnsupported(source);
 
             const width = source.clientWidth;
-            const segments = JSXTextParserUtils.getInlinedSegments(JSXTextParserUtils.getSegmentTokens(source), width);
-            const nodes = segments.map(createLayoutNode);
+            const computePushingName = opts.getComputePushingAnimationName?.();
+            const tokens = JSXTextParserUtils.getSegmentTokens(source);
+            const segments = computePushingName
+                ? LetterDriverUtils.wrapAtLastFrame(tokens, width, host.parentElement ?? host, computePushingName)
+                : JSXTextParserUtils.getInlinedSegments(tokens, width);
+            const nodes = segments.map((segment) =>
+                computePushingName ? createPushingLayoutNode(segment) : createLayoutNode(segment),
+            );
 
             host.replaceChildren(...nodes);
 
@@ -244,6 +298,8 @@ export namespace PaintedTextUtils {
             const atomics: SVGElement[] = [];
             const letters: PaintedTextLetter[] = [];
             const isMeasuringLetters = !!opts.getIsMeasuringLetters?.();
+
+            pushed = [];
 
             const toBox = (rect: DOMRect) => ({
                 x: (rect.left - hostBox.left) / scale,
@@ -258,22 +314,38 @@ export namespace PaintedTextUtils {
                 if (segment.type === "linebreak") {
                     const previous = letters.at(-1);
 
-                    if (isMeasuringLetters) {
+                    if (isMeasuringLetters && !JSXTextParserUtils.getIsWrapBreak(segment)) {
                         letters.push({
                             kind: "break",
-                            character: LINE_BREAK_CHARACTER,
+                            character: LetterDriverUtils.LINE_BREAK_CHARACTER,
                             x: previous ? previous.x + previous.width : 0,
                             top: previous?.top ?? 0,
                             width: 0,
                             height: previous?.height ?? 0,
                             baseline: previous?.baseline ?? 0,
                         });
+
+                        if (computePushingName) pushed.push({ kind: "break" });
                     }
                 } else if (segment.type === "text") {
                     const box = node.getBoundingClientRect();
-                    const baseline = (node.lastChild as HTMLElement).getBoundingClientRect().top;
+                    const probe = node.lastChild as HTMLElement;
+                    const baseline = probe.getBoundingClientRect().top;
 
-                    if (isMeasuringLetters) {
+                    if (computePushingName) {
+                        Array.from(segment.text).forEach((character, charIndex) => {
+                            const element = node.childNodes[charIndex] as HTMLElement;
+
+                            letters.push({
+                                kind: "text",
+                                character,
+                                ...toBox(element.getBoundingClientRect()),
+                                baseline: (baseline - hostBox.top) / scale,
+                                runIndex: runs.length,
+                            });
+                            pushed.push({ kind: "text", element, probe });
+                        });
+                    } else if (isMeasuringLetters) {
                         const textNode = node.firstChild as Text;
                         const range = document.createRange();
                         let offset = 0;
@@ -304,31 +376,92 @@ export namespace PaintedTextUtils {
                 } else if (segment.type === "atomic") {
                     const element = node.firstChild as Element;
                     const box = element.getBoundingClientRect();
+                    const atomic = createAtomicNode(segment.element, {
+                        x: (box.left - hostBox.left) / scale,
+                        y: (box.top - hostBox.top) / scale,
+                        width: box.width / scale,
+                        height: box.height / scale,
+                    });
 
                     if (isMeasuringLetters) {
                         letters.push({
                             kind: "atomic",
-                            character: WHOLE_ELEMENT_CHARACTER,
+                            character: LetterDriverUtils.WHOLE_ELEMENT_CHARACTER,
                             ...toBox(box),
                             baseline: (box.bottom - hostBox.top) / scale,
                             atomicIndex: atomics.length,
                         });
+
+                        if (computePushingName) pushed.push({ kind: "atomic", element: node, atomic });
                     }
 
-                    atomics.push(
-                        createAtomicNode(segment.element, {
-                            x: (box.left - hostBox.left) / scale,
-                            y: (box.top - hostBox.top) / scale,
-                            width: box.width / scale,
-                            height: box.height / scale,
-                        }),
-                    );
+                    atomics.push(atomic);
                 }
             });
 
-            store.set({ width, height: host.offsetHeight, runs, atomics, letters });
+            store.set({ width, height: host.offsetHeight, runs, atomics, letters, restLetters: letters });
 
             return true;
+        };
+
+        const relayout = (styles: readonly (Record<string, string> | undefined)[]) => {
+            const host = opts.getLayoutHost();
+            const state = store.get();
+
+            if (!host || !pushed.length || pushed.length !== state.restLetters.length) return;
+
+            pushed.forEach((letter, index) => {
+                if (letter.kind === "break") return;
+
+                const next = styles[index];
+
+                applyStyle(letter.element, letter.style, next);
+                letter.style = next;
+            });
+
+            const hostBox = host.getBoundingClientRect();
+            const scale = getScreenScale(host, hostBox);
+            const letters: PaintedTextLetter[] = [];
+
+            pushed.forEach((letter, index) => {
+                const rest = state.restLetters[index];
+                const previous = letters.at(-1);
+
+                if (letter.kind === "break") {
+                    letters.push({
+                        ...rest,
+                        x: previous ? previous.x + previous.width : 0,
+                        top: previous?.top ?? 0,
+                        height: previous?.height ?? 0,
+                        baseline: previous?.baseline ?? 0,
+                    });
+
+                    return;
+                }
+
+                const measured = letter.kind === "atomic" ? (letter.element.firstChild as Element) : letter.element;
+                const rect = measured.getBoundingClientRect();
+                const box = {
+                    x: (rect.left - hostBox.left) / scale,
+                    top: (rect.top - hostBox.top) / scale,
+                    width: rect.width / scale,
+                    height: rect.height / scale,
+                };
+
+                if (letter.kind === "atomic") {
+                    letter.atomic.setAttribute("x", `${box.x}`);
+                    letter.atomic.setAttribute("y", `${box.top}`);
+                    letters.push({ ...rest, ...box, baseline: (rect.bottom - hostBox.top) / scale });
+                } else {
+                    letters.push({
+                        ...rest,
+                        ...box,
+                        baseline: (letter.probe.getBoundingClientRect().top - hostBox.top) / scale,
+                    });
+                }
+            });
+
+            store.set({ ...state, height: host.offsetHeight, letters });
         };
 
         const update = () => measure(false);
@@ -351,6 +484,6 @@ export namespace PaintedTextUtils {
             };
         };
 
-        return { get: store.get, subscribe: store.subscribe, update, observe };
+        return { get: store.get, subscribe: store.subscribe, update, relayout, observe };
     };
 }

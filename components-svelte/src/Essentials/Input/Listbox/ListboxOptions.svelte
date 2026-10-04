@@ -1,8 +1,12 @@
 <script lang="ts" generics="T">
-    import { untrack } from "svelte";
+    import { type Snippet, untrack } from "svelte";
+    import { on } from "svelte/events";
+    import { SvelteMap } from "svelte/reactivity";
 
     import {
+        FloaterStyles as floaterStyles,
         type InteractionFlags,
+        LISTBOX_DEFAULTS,
         ListboxUtils,
         type ListboxWindowedRun,
         type SelectOptionFlags,
@@ -12,8 +16,10 @@
     } from "@thewaver/ss-components";
 
     import { ElementObserverSvelteUtils } from "../../../Abstracts/ElementObserver/ElementObserverSvelte.utils.svelte.js";
+    import { FloaterSvelteUtils } from "../../../Abstracts/Floater/FloaterSvelte.utils.svelte.js";
     import { VirtualizerSvelteUtils } from "../../../Abstracts/Virtualizer/VirtualizerSvelte.utils.svelte.js";
     import InteractionWrapper from "../../../Primitives/InteractionWrapper/InteractionWrapper.svelte";
+    import { toStyle } from "../../../Utils/styleUtils.js";
     import type {
         SelectItem,
         SelectOption,
@@ -27,6 +33,10 @@
 
     let endMarker = $state<HTMLDivElement>();
     let sizer = $state<HTMLDivElement>();
+    let optionsWrapper = $state<HTMLDivElement>();
+    let hoveredIndex = $state<number>();
+
+    const optionRefs = new SvelteMap<HTMLElement, () => number>();
 
     const cursor = $derived(props.cursor);
     const isRoving = $derived(cursor.focusModel === "roving");
@@ -83,6 +93,68 @@
         untrack(() => rowWindow.scrollToRow(rowIndex));
     });
 
+    const floaterTransitionDurationMs = $derived(
+        props.floaterTransitionDurationMs ?? LISTBOX_DEFAULTS.floaterTransitionDurationMs,
+    );
+
+    const recordOptionRef = (element: HTMLElement, getFlatIndex: () => number) => {
+        untrack(() => optionRefs.set(element, getFlatIndex));
+
+        return () => {
+            optionRefs.delete(element);
+        };
+    };
+
+    const findOptionRef = (index: number) =>
+        [...optionRefs].find(([, getFlatIndex]) => getFlatIndex() === index)?.[0];
+
+    const findOptionIndex = (target: EventTarget | null) =>
+        target instanceof Node ? [...optionRefs].find(([element]) => element.contains(target))?.[1]() : undefined;
+
+    const selectedIndex = $derived.by(() => {
+        const index = SelectUtils.getFlatOptions(cursor.getOptions()).findIndex((option) =>
+            props.computeIsSelected(option.value),
+        );
+
+        return index < 0 ? undefined : index;
+    });
+
+    const createFloater = (getIsEnabled: () => boolean, getIndex: () => number | undefined) =>
+        FloaterSvelteUtils.create({
+            getIsEnabled,
+            getContainer: () => (isVirtualized ? (sizer ?? undefined) : (optionsWrapper ?? undefined)),
+            getTarget: () => {
+                const index = getIndex();
+
+                return index === undefined ? undefined : findOptionRef(index);
+            },
+            getTransitionDurationMs: () => floaterTransitionDurationMs,
+        });
+
+    const selectionFloater = createFloater(
+        () => props.renderSelectionFloater !== undefined,
+        () => selectedIndex,
+    );
+
+    const highlightFloater = createFloater(
+        () => props.renderHighlightFloater !== undefined,
+        () => hoveredIndex ?? (cursor.getIsHighlightShown() ? cursor.getHighlightedIndex() : undefined),
+    );
+
+    const attachHoverWatch = (element: HTMLElement) => {
+        const stopOver = on(element, "pointerover", (e) => {
+            hoveredIndex = findOptionIndex(e.target);
+        });
+        const stopLeave = on(element, "pointerleave", () => {
+            hoveredIndex = undefined;
+        });
+
+        return () => {
+            stopOver();
+            stopLeave();
+        };
+    };
+
     const windowedEntries = $derived(
         ListboxUtils.getWindowedRuns(rowWindow.getRows(), cursor.getRows()).flatMap<
             VirtualizerRow | ListboxWindowedRun<T, SelectOptionTooltipDefs>
@@ -112,7 +184,15 @@
                 {@render props.renderOption(option, optionFlags)}
             {/snippet}
             <ListboxOptionItem
-                {attachElement}
+                attachElement={(element) => {
+                    const detach = attachElement(element);
+                    const forget = recordOptionRef(element, () => flatIndex);
+
+                    return () => {
+                        detach?.();
+                        forget();
+                    };
+                }}
                 id={cursor.getOptionId(flatIndex)}
                 isSelfScrolling={!isVirtualized}
                 focusModel={cursor.focusModel}
@@ -140,8 +220,43 @@
     </div>
 {/snippet}
 
+{#snippet floaterView(
+    floater: ReturnType<typeof createFloater>,
+    renderContent: Snippet<[visibilityTarget: 0 | 1, transitionDurationMs: number]> | undefined,
+)}
+    {#if floater.getIsRendered()}
+        <div
+            {@attach floater.attachRef}
+            class={floaterStyles.floater}
+            style={toStyle(floater.getBounds(), { transitionDuration: `${floaterTransitionDurationMs}ms` })}
+        >
+            {@render renderContent?.(floater.getVisibilityTarget(), floaterTransitionDurationMs)}
+        </div>
+    {/if}
+{/snippet}
+
+{#snippet floaters()}
+    {@render floaterView(highlightFloater, props.renderHighlightFloater)}
+    {@render floaterView(selectionFloater, props.renderSelectionFloater)}
+{/snippet}
+
+{#snippet endMarkerView()}
+    {#if hasMoreOptions}
+        {#key cursor.getOptions()}
+            <div bind:this={endMarker} class={styles.listboxEndMarker} aria-hidden="true"></div>
+        {/key}
+    {/if}
+{/snippet}
+
 {#if isVirtualized}
-    <div bind:this={sizer} class={styles.listboxSizer} style:height={`${rowWindow.getTotalSize()}px`}>
+    <div
+        bind:this={sizer}
+        {@attach attachHoverWatch}
+        class={styles.listboxSizer}
+        style:height={`${rowWindow.getTotalSize()}px`}
+    >
+        {@render floaters()}
+
         {#each windowedEntries as entry ("rows" in entry ? `group-${entry.groupIndex}` : entry.index)}
             {#if "rows" in entry}
                 <div role="group" aria-label={entry.group?.label}>
@@ -154,24 +269,31 @@
             {/if}
         {/each}
     </div>
+
+    {@render endMarkerView()}
 {:else}
-    {#each cursor.getOptions() as item, index (index)}
-        {#if SelectUtils.getIsGroup(item)}
-            <div role="group" aria-label={item.label}>
-                {@render groupHeading(item)}
+    <div
+        bind:this={optionsWrapper}
+        {@attach attachHoverWatch}
+        class={[styles.listboxOptions, isHorizontal && styles.listboxHorizontal]}
+        role="presentation"
+    >
+        {@render floaters()}
 
-                {#each item.options as option, groupIndex (groupIndex)}
-                    {@render optionSlot(option, cursor.getItemRows()[index].entryOffset + groupIndex)}
-                {/each}
-            </div>
-        {:else}
-            {@render optionSlot(item, cursor.getItemRows()[index].entryOffset)}
-        {/if}
-    {/each}
-{/if}
+        {#each cursor.getOptions() as item, index (index)}
+            {#if SelectUtils.getIsGroup(item)}
+                <div role="group" aria-label={item.label}>
+                    {@render groupHeading(item)}
 
-{#if hasMoreOptions}
-    {#key cursor.getOptions()}
-        <div bind:this={endMarker} class={styles.listboxEndMarker} aria-hidden="true"></div>
-    {/key}
+                    {#each item.options as option, groupIndex (groupIndex)}
+                        {@render optionSlot(option, cursor.getItemRows()[index].entryOffset + groupIndex)}
+                    {/each}
+                </div>
+            {:else}
+                {@render optionSlot(item, cursor.getItemRows()[index].entryOffset)}
+            {/if}
+        {/each}
+
+        {@render endMarkerView()}
+    </div>
 {/if}

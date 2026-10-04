@@ -23,7 +23,9 @@ const DEFAULTS = TrackedPatternDefaults.FADE_DEFAULTS;
 const PatternElement = (props: PatternElementProps) => {
     const cellSize = props.defs.cellSize;
     const areaSize = props.defs.getSize();
-    const pointer = SVGDefsReactUtils.usePatternPointer(props.element, areaSize);
+    const opts = TrackedPatternUtils.resolveOpts(props.opts, DEFAULTS);
+    const pointer = SVGDefsReactUtils.usePatternPointer(props.element, areaSize, props.defs.getPointSource?.());
+    const computeTrailLevel = SVGDefsReactUtils.usePatternTrail(opts, pointer);
 
     return (
         <>
@@ -41,7 +43,8 @@ const PatternElement = (props: PatternElementProps) => {
                 cellSize,
                 areaSize,
                 pointer,
-                TrackedPatternUtils.resolveOpts(props.opts, DEFAULTS),
+                opts,
+                computeTrailLevel,
                 (cellId, index, isSplit, level) => {
                     const isEven = MathUtils.isEven(index.col + index.row);
 

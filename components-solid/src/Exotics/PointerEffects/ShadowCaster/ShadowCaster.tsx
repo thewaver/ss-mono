@@ -13,7 +13,9 @@ export const ShadowCaster = (props: ParentProps<ShadowCasterProps>) => {
 
     const getIsDisabled = createMemo(() => access(props.isDisabled) ?? false);
 
-    const { getReading, getIsPointerPresent } = PointerTrackerSolidUtils.create(getRef, getIsDisabled);
+    const { getReading, getIsPointerPresent } = PointerTrackerSolidUtils.create(getRef, getIsDisabled, () =>
+        access(props.pointSource),
+    );
 
     const getIsResting = createMemo(() =>
         PointerEffectsUtils.getIsResting(

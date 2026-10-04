@@ -31,7 +31,9 @@ export const GlassSurface = defineComponent(
                         lameExponents={lameExponents}
                         computeStrokeDefs={props.computeStrokeDefs}
                         strokeGeom={props.computeStrokeDefs ? [{ thicknesses: borderWidths }] : undefined}
-                        computeFillDefs={(size, element) => GlassVueUtils.computeSheenDefs(id, element, size, defs)}
+                        computeFillDefs={(size, element) =>
+                            GlassVueUtils.computeSheenDefs(id, element, size, defs, props.pointSource)
+                        }
                     >
                         {
                             {
@@ -92,6 +94,7 @@ export const GlassSurface = defineComponent(
             borderRadii: null,
             lameExponents: null,
             glassDefs: null,
+            pointSource: null,
             borderWidths: null,
             computeStrokeDefs: null,
         }),

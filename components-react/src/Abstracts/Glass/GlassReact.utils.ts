@@ -1,6 +1,6 @@
 import { createElement } from "react";
 
-import { type GlassDefs, type GlassTintDefs, GlassUtils } from "@thewaver/ss-components";
+import { type GlassDefs, type GlassTintDefs, GlassUtils, type PointSource } from "@thewaver/ss-components";
 import type { Size2d } from "@thewaver/ss-utils";
 
 import type { SVGDefs } from "../../Generators/SVGDefs/SVGDefs.types";
@@ -14,12 +14,13 @@ type GlassSheenFilterProps = {
     element: HTMLElement | undefined;
     size: Size2d;
     defs: GlassDefs;
+    source: PointSource | undefined;
 };
 
 /** The sheen filter, lit from wherever the pointer is over the element; it re-renders alone as the pointer moves. */
 const GlassSheenFilter = (props: GlassSheenFilterProps) => {
     const ref = useLatest(props.element ?? null);
-    const { reading } = PointerTrackerReactUtils.usePointerReading(ref);
+    const { reading } = PointerTrackerReactUtils.usePointerReading(ref, false, props.source);
 
     return new SVGFilterDefsFactory(props.filterId)
         .addSpecularLightingFilter({
@@ -83,6 +84,7 @@ export namespace GlassReactUtils {
      * resting position is.
      * @param size The element's current size, which the pointer's position is scaled against.
      * @param defs The glass description, filled out.
+     * @param source The point the light follows in place of the pointer. Left out, or `undefined`, the pointer.
      * @returns One definition, carrying the tint's fill and opacity along with the filter. The filter is left off
      * entirely at a `specularConstant` of zero, rather than pointed at one that builds nothing.
      */
@@ -91,6 +93,7 @@ export namespace GlassReactUtils {
         element: HTMLElement | undefined,
         size: Size2d,
         defs: GlassDefs,
+        source?: PointSource,
     ): SVGDefs[] => {
         const tintDef = { ...computeTintFill(id, size, defs.tint), opacity: defs.tint.opacity };
 
@@ -103,7 +106,7 @@ export namespace GlassReactUtils {
                 ...tintDef,
                 filter: {
                     id: filterId,
-                    renderDefsElement: () => createElement(GlassSheenFilter, { filterId, element, size, defs }),
+                    renderDefsElement: () => createElement(GlassSheenFilter, { filterId, element, size, defs, source }),
                 },
             },
         ];

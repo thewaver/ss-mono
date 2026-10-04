@@ -17,6 +17,7 @@ import PagePropsPanel from "../../PageComponents/PropsPanel/PagePropsPanel.vue";
 import BlurExample from "./Examples/Blur.vue";
 import DropShadowExample from "./Examples/DropShadow.vue";
 import HueExample from "./Examples/Hue.vue";
+import PixelateExample from "./Examples/Pixelate.vue";
 import StackExample from "./Examples/Stack.vue";
 import ToneExample from "./Examples/Tone.vue";
 import TurbulenceExample from "./Examples/Turbulence.vue";
@@ -64,6 +65,11 @@ const examples: ExampleDefs[] = [
         key: "tone",
         name: "Tone",
         path: `${EXAMPLES_ROOT}/Tone.vue`,
+    },
+    {
+        key: "pixelate",
+        name: "Pixelate",
+        path: `${EXAMPLES_ROOT}/Pixelate.vue`,
     },
     {
         key: "stack",
@@ -124,6 +130,10 @@ const examples: ExampleDefs[] = [
 
         <template #tone>
             <ToneExample v-bind="commonProps" />
+        </template>
+
+        <template #pixelate>
+            <PixelateExample v-bind="commonProps" />
         </template>
 
         <template #stack>

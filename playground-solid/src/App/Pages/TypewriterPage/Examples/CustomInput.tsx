@@ -21,7 +21,10 @@ export const CustomInputExample = (props: Props) => {
     createEffect(on(() => access(props.text), setTextDebounced, { defer: true }));
 
     return (
-        <Typewriter animationName={props.animationName} computeCharacterWeights={props.computeCharacterWeights}>
+        <Typewriter
+            computeAnimationName={props.computeAnimationName}
+            computeCharacterWeights={props.computeCharacterWeights}
+        >
             {getText()}
         </Typewriter>
     );

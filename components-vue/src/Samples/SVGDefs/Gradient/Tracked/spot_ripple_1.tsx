@@ -92,7 +92,11 @@ const getNoRipples = (count: number): (Ripple | undefined)[] => Array.from({ len
 
 const SpotRipples = defineComponent(
     (props: SpotRipplesProps) => {
-        const { reading, isPointerPresent } = PointerTrackerVueUtils.usePointerReading(() => props.element);
+        const { reading, isPointerPresent } = PointerTrackerVueUtils.usePointerReading(
+            () => props.element,
+            false,
+            () => props.defs.getPointSource?.(),
+        );
         const frameMs = SVGDefsVueUtils.useFrameMs(clock);
         const rippleCount = props.opts?.rippleCount ?? DEFAULTS.rippleCount;
         const ripples = shallowRef(getNoRipples(rippleCount));

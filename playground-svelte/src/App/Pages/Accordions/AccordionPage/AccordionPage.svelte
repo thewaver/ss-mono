@@ -3,6 +3,7 @@
     import PageExamples from "../../../PageComponents/Examples/PageExamples.svelte";
     import DeferredExample from "./Examples/Deferred.svelte";
     import GrowingExample from "./Examples/Growing.svelte";
+    import RowExample from "./Examples/Row.svelte";
     import ScrolledExample from "./Examples/Scrolled.svelte";
     import SectionsExample from "./Examples/Sections.svelte";
 
@@ -16,6 +17,7 @@
     let growingExpanded = $state.raw<string[]>(["Shipping"]);
     let scrolledExpanded = $state.raw<string[]>([]);
     let deferredExpanded = $state.raw<string[]>([]);
+    let rowExpanded = $state.raw<string[]>(["Mountains"]);
 
     let extraLines = $state(STARTING_EXTRA_LINES);
     let built = $state.raw<string[]>([]);
@@ -74,6 +76,15 @@
             component: scrolledExample,
             path: `${EXAMPLES_ROOT}/Scrolled.svelte`,
         },
+        {
+            key: "row",
+            name: "Side by side",
+            span: 2,
+            readout: () =>
+                `expanded: ${JSON.stringify(rowExpanded)} — the panels sit in a row and open in width; the left and right arrows walk the headers, and the new panel's content slides in from the side the person moved toward`,
+            component: rowExample,
+            path: `${EXAMPLES_ROOT}/Row.svelte`,
+        },
     ];
 </script>
 
@@ -114,6 +125,10 @@
 
 {#snippet scrolledExample()}
     <ScrolledExample bind:expanded={scrolledExpanded} />
+{/snippet}
+
+{#snippet rowExample()}
+    <RowExample bind:expanded={rowExpanded} />
 {/snippet}
 
 <PageExamples items={examples} />

@@ -25,7 +25,7 @@
         skipDelayWindowMs={props.skipDelayWindowMs}
     >
         {#snippet renderContent(visibilityTarget, transitionDurationMs)}
-            <PageTooltipContent {visibilityTarget} {transitionDurationMs}>
+            <PageTooltipContent {visibilityTarget} {transitionDurationMs} reveal={props.reveal}>
                 A weight of silver, not a coin — eight ounces, counted rather than struck.
             </PageTooltipContent>
         {/snippet}

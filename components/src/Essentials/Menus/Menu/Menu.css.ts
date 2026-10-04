@@ -21,6 +21,11 @@ export const menuItem = style({
     },
 });
 
+export const menuItems = style({
+    position: "relative",
+    isolation: "isolate",
+});
+
 export const menuLayoutGroup = style({
     position: "absolute",
     inset: 0,

@@ -33,6 +33,7 @@ const anchorRef = shallowRef<HTMLElement>();
                 <PageTooltipContent
                     :visibility-target="content.visibilityTarget"
                     :transition-duration-ms="content.transitionDurationMs"
+                    :reveal="reveal"
                     >A weight of silver, not a coin — eight ounces, counted rather than struck.</PageTooltipContent
                 >
             </template>

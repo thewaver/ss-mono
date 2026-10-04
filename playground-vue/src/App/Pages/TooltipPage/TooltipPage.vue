@@ -4,6 +4,11 @@ import { computed, shallowRef } from "vue";
 import type { AnchorHPlacement, AnchorVPlacement } from "@thewaver/ss-components-vue";
 import { ANCHOR_H_PLACEMENTS, ANCHOR_V_PLACEMENTS, TOOLTIP_DEFAULTS } from "@thewaver/ss-components-vue";
 import { TooltipKnobs } from "@thewaver/ss-playground/App/Knobs/Tooltips.const";
+import {
+    TOOLTIP_REVEALS,
+    TOOLTIP_REVEAL_LABELS,
+    type TooltipReveal,
+} from "@thewaver/ss-playground/App/StyledComponents/TooltipContent/TooltipContent.const";
 
 import type { ExampleDefs } from "../../PageComponents/Examples/Examples.types";
 import PageExamples from "../../PageComponents/Examples/PageExamples.vue";
@@ -28,6 +33,7 @@ const transitionDurationMs = shallowRef(TOOLTIP_DEFAULTS.transitionDurationMs);
 const focusShowDelayMs = shallowRef(TOOLTIP_DEFAULTS.focusShowDelayMs);
 const hoverShowDelayMs = shallowRef(TOOLTIP_DEFAULTS.hoverShowDelayMs);
 const skipDelayWindowMs = shallowRef(TOOLTIP_DEFAULTS.skipDelayWindowMs);
+const reveal = shallowRef<TooltipReveal>(TooltipKnobs.STARTING_REVEAL);
 
 const placement = computed(() => ({ x: hPlacement.value, y: vPlacement.value }));
 
@@ -40,6 +46,7 @@ const commonProps = computed<TooltipExampleProps>(() => ({
     focusShowDelayMs: focusShowDelayMs.value,
     hoverShowDelayMs: hoverShowDelayMs.value,
     skipDelayWindowMs: skipDelayWindowMs.value,
+    reveal: reveal.value,
 }));
 
 const examples: ExampleDefs[] = [
@@ -68,6 +75,21 @@ const examples: ExampleDefs[] = [
 
 <template>
     <PagePropsPanel scope="global">
+        <PageProp
+            item-key="reveal"
+            label="Reveal"
+            hint="How the tooltip appears and goes, which is the drawing's own: the tooltip only says whether it is showing and for how long the change takes."
+        >
+            <PageSelectField
+                :value="reveal"
+                :values="TOOLTIP_REVEALS"
+                :compute-label="(next: TooltipReveal) => TOOLTIP_REVEAL_LABELS[next]"
+                :width="FIELD_WIDTH"
+                ariaLabel="Reveal"
+                @change="(next: TooltipReveal) => (reveal = next)"
+            />
+        </PageProp>
+
         <PageProp
             item-key="hPlacement"
             label="Placement across"
@@ -130,8 +152,8 @@ const examples: ExampleDefs[] = [
 
         <PageProp
             item-key="transitionDurationMs"
-            label="Fade (ms)"
-            hint="How long the tooltip takes to fade in and out."
+            label="Reveal (ms)"
+            hint="How long the tooltip takes to appear and to go."
         >
             <PageNumberField
                 :value="transitionDurationMs"
@@ -139,7 +161,7 @@ const examples: ExampleDefs[] = [
                 :max="TooltipKnobs.MAX_DURATION"
                 :step="TooltipKnobs.DURATION_STEP"
                 :width="FIELD_WIDTH"
-                ariaLabel="Fade in milliseconds"
+                ariaLabel="Reveal in milliseconds"
                 @input="(value: number) => (transitionDurationMs = value)"
             />
         </PageProp>

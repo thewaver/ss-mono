@@ -47,7 +47,11 @@
 <script lang="ts">
     let props: BandGradientProps = $props();
 
-    const { getReading } = PointerTrackerSvelteUtils.create(() => props.element);
+    const { getReading } = PointerTrackerSvelteUtils.create(
+        () => props.element,
+        undefined,
+        () => props.defs.getPointSource?.(),
+    );
 
     const gradient = $derived(
         SVGGradientDefsSvelteUtils.computeLinearGradient({

@@ -2,7 +2,7 @@ import { MathUtils, Point2d, Point2dUtils, RectUtils, type Store, StoreUtils } f
 
 import type { ViewportContextType } from "../Viewport/Viewport.context.types";
 import { ViewportUtils } from "../Viewport/Viewport.utils";
-import type { PointerReading } from "./PointerTracker.types";
+import type { PointSource, PointerReading } from "./PointerTracker.types";
 
 /** What is reported before the pointer has been seen: centered, and infinitely far away, so a distance test reads as "not near". */
 const RESTING_READING: PointerReading = {
@@ -58,9 +58,9 @@ const handleWindowBlur = () => {
     pointerPresence.set(false);
 };
 
-/** A scroll or a resize moves elements under a stationary pointer, so the readings need redoing. */
+/** A scroll or a resize moves elements under a stationary point, so the readings need redoing. */
 const handleLayoutChange = () => {
-    if (clientPoint) invalidate();
+    invalidate();
 };
 
 /** Starts listening. Called when the first element is tracked. */
@@ -88,6 +88,19 @@ const detach = () => {
 /** Whether two readings are close enough to be treated as unchanged. Comparing the two offsets is enough, since everything else is derived from them. */
 const getIsSameReading = (a: PointerReading, b: PointerReading) =>
     Point2d.isSame(a.offset, b.offset) && Point2d.isSame(a.edgeOffset, b.edgeOffset);
+
+/** Where a supplied point is on screen, in the viewport's coordinates, or `undefined` while it has no point. */
+const computeSourcePoint = (
+    source: PointSource,
+    element: HTMLElement,
+    viewportContext: ViewportContextType,
+): Point2d | undefined => {
+    if (!source.ratio) return undefined;
+
+    const rect = ViewportUtils.getAdjustedBoundingClientRect(source.element ?? element, viewportContext);
+
+    return { x: rect.x + rect.width * source.ratio.x, y: rect.y + rect.height * source.ratio.y };
+};
 
 /**
  * Works out one element's reading from its rectangle and the pointer's position.
@@ -125,6 +138,9 @@ const computeReading = (rect: DOMRect, point: Point2d): PointerReading => {
  * animation frame rather than per event, so a page full of pointer-reactive components costs one
  * pass per frame. Scroll and resize are watched too, since either moves an element out from under a
  * pointer that has not itself moved.
+ *
+ * The point followed need not be the pointer: a {@link PointSource} places one as a fraction across a box, and
+ * every reading is then taken against that point instead, through the same listeners and the same frame.
  */
 export namespace PointerTrackerUtils {
     /** What is reported before the pointer has been seen: centered, and infinitely far away, so a distance test reads as "not near". */
@@ -147,6 +163,24 @@ export namespace PointerTrackerUtils {
     export const getIsSame = getIsSameReading;
 
     /**
+     * Whether there is a point to follow.
+     *
+     * @param source The point supplied in place of the pointer, if any.
+     * @param isPointerPresent {@link presence}'s current value.
+     * @returns With no source, whether the pointer is over the window; with one, whether it has a point.
+     */
+    export const getIsPresent = (source: PointSource | undefined, isPointerPresent: boolean) =>
+        source ? source.ratio !== undefined : isPointerPresent;
+
+    /**
+     * Asks every tracked element for a new reading on the next frame.
+     *
+     * A supplied point that moves raises no event the tracker can hear, so whoever moves it calls this. Several
+     * calls in one frame cost one pass, and an element whose reading did not change reports nothing.
+     */
+    export const refresh = invalidate;
+
+    /**
      * Tracks one element until the returned function is called.
      *
      * Readings are reported once per animation frame at most, and only when they change. The first arrives on
@@ -160,6 +194,9 @@ export namespace PointerTrackerUtils {
      * that same direction, `edgeRatio` — below `1` inside the element, `1` on its border, `2` a further
      * element-radius away — and `boxRatio`, the pointer's position across the element from `0` to `1`, which
      * reads outside that range when the pointer is outside.
+     * @param getSource Asked on every pass for the point to follow in place of the pointer. Left out, or
+     * answering `undefined`, the pointer is followed. While the source has no point, no reading is reported and
+     * the last one stands. Call {@link refresh} when it moves.
      * @returns The function that stops tracking; the element then stops contributing to the shared listeners
      * entirely.
      */
@@ -167,15 +204,21 @@ export namespace PointerTrackerUtils {
         element: HTMLElement,
         viewportContext: ViewportContextType,
         onReading: (reading: PointerReading) => void,
+        getSource?: () => PointSource | undefined,
     ) => {
         let last: PointerReading | undefined;
 
         const update = () => {
-            if (!clientPoint) return;
+            const source = getSource?.();
+            const point = source
+                ? computeSourcePoint(source, element, viewportContext)
+                : clientPoint && ViewportUtils.getAdjustedClientPoint(clientPoint, viewportContext);
+
+            if (!point) return;
 
             const reading = computeReading(
                 ViewportUtils.getAdjustedBoundingClientRect(element, viewportContext),
-                ViewportUtils.getAdjustedClientPoint(clientPoint, viewportContext),
+                point,
             );
 
             if (last && getIsSameReading(last, reading)) return;

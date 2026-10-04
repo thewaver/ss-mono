@@ -21,7 +21,10 @@ import {
 import { PageTextFieldPlaceholder } from "../../StyledComponents/TextFieldPlaceholder/TextFieldPlaceholder";
 import { ComplexExample } from "./Examples/Complex";
 import { CustomInputExample } from "./Examples/CustomInput";
+import { KaraokeExample } from "./Examples/Karaoke";
+import { OutwardExample } from "./Examples/Outward";
 import { PhrasesExample } from "./Examples/Phrases";
+import { ScrollLitExample } from "./Examples/ScrollLit";
 import type { TypewriterExampleProps, TypewriterTextEffect } from "./TypewriterPage.types";
 
 const TEXT_EFFECTS: TypewriterTextEffect[] = ["fade", "scale", "glow", "drop", "slide"];
@@ -90,7 +93,7 @@ export const TypewriterPage = () => {
 
     const commonProps: ExampleWrapperProps = {
         width: textContainerWidth,
-        animationName: TEXT_EFFECT_MAP[textEffect],
+        computeAnimationName: () => TEXT_EFFECT_MAP[textEffect],
         computeCharacterWeights: (count) =>
             arrivalOrder === "leftToRight" ? [] : ScrambleTextWeights.SAMPLE_WEIGHTS[arrivalOrder](count),
     };
@@ -112,9 +115,45 @@ export const TypewriterPage = () => {
             key: "phrases",
             name: "Phrases",
             readout: () =>
-                "the example owns the loop: each run's end either holds the phrase and switches to erasing, or moves to the next phrase and types it, and the caret is moved by each character's own animation starting",
+                "the example owns the loop: each run's end either holds the phrase and switches to erasing, or moves to the next phrase and types it, and the caret is placed from the same progress the characters are drawn from",
             component: () => <PhrasesExample {...commonProps} />,
             path: `${EXAMPLES_ROOT}/Phrases.tsx`,
+        },
+        {
+            key: "karaoke",
+            name: "Karaoke",
+            readout: () =>
+                "the line and the slider share one progress: singing writes it as it goes, and dragging the slider draws that moment — a stop can fall partway through a letter's own sweep",
+            component: () => (
+                <PageMeasureBox width={textContainerWidth} padding={MEASURE_BOX_PADDING}>
+                    <KaraokeExample />
+                </PageMeasureBox>
+            ),
+            path: `${EXAMPLES_ROOT}/Karaoke.tsx`,
+        },
+        {
+            key: "scrollLit",
+            name: "Lit by scrolling",
+            readout: () =>
+                "playback is off and the progress is how far the paragraph has traveled up its box; the letters not yet reached show their animation's first frame, which is the dimmed text",
+            component: () => (
+                <PageMeasureBox width={textContainerWidth} padding={MEASURE_BOX_PADDING}>
+                    <ScrollLitExample />
+                </PageMeasureBox>
+            ),
+            path: `${EXAMPLES_ROOT}/ScrollLit.tsx`,
+        },
+        {
+            key: "outward",
+            name: "Flying outward",
+            readout: () =>
+                "an animation per letter: the left half flies off to the left and the right half to the right, from the middle out, as the line crosses the middle of its box",
+            component: () => (
+                <PageMeasureBox width={textContainerWidth} padding={MEASURE_BOX_PADDING}>
+                    <OutwardExample />
+                </PageMeasureBox>
+            ),
+            path: `${EXAMPLES_ROOT}/Outward.tsx`,
         },
     ];
 

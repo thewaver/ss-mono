@@ -16,12 +16,4 @@ export const tabsGutter = style({
     display: "grid",
 });
 
-export const tabsFloater = style({
-    position: "absolute",
-    zIndex: -1,
-
-    display: "grid",
-    transition: "width, height, left, top",
-});
-
 export const tabsItem = style([buttonElement, {}]);

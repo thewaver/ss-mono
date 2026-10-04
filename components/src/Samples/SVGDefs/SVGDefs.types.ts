@@ -1,5 +1,6 @@
 import type { Size2d } from "@thewaver/ss-utils";
 
+import type { PointSource } from "../../Abstracts/PointerTracker/PointerTracker.types";
 import type { SVGAnimationDefs } from "../../Generators/SVGDefs/SVGAnimations/SVGAnimationDefs.types";
 
 export type SVGDefsColors = { [K in "primary" | "secondary" | "tertiary" | "background"]: string };
@@ -21,11 +22,16 @@ export type TimedPatternElementDefs = SVGAnimationDefs &
         cellSize: Size2d;
     };
 
-export type TrackedPatternElementDefs = SVGDefsBaseElementDefs & {
-    cellSize: Size2d;
+export type TrackedElementDefs = {
+    getPointSource?: () => PointSource | undefined;
 };
 
-export type PatternProximityOpts = { tiled?: boolean; reach?: number; restLevel?: number };
+export type TrackedPatternElementDefs = SVGDefsBaseElementDefs &
+    TrackedElementDefs & {
+        cellSize: Size2d;
+    };
+
+export type PatternProximityOpts = { tiled?: boolean; reach?: number; restLevel?: number; trailMs?: number };
 
 export type TimedGradientElementDefs = SVGAnimationDefs & SVGDefsBaseElementDefs;
 
@@ -111,13 +117,33 @@ export type GradientSmearSampleOpts = GradientCircularOpts &
     GradientColorAgeOpts &
     GradientSmearOpts;
 
+export type GradientRibbonSampleOpts = GradientCircularOpts & {
+    ribbonLength?: number;
+    headScale?: number;
+    tailScale?: number;
+    headAlpha?: number;
+    stiffness?: number;
+    damping?: number;
+    followStiffness?: number;
+};
+
+export type GradientSwarmSampleOpts = GradientCircularOpts & {
+    spotCount?: number;
+    spotScale?: number;
+    spotAlpha?: number;
+    wanderRatio?: number;
+    wanderMs?: number;
+    stiffness?: number;
+    damping?: number;
+};
+
 export type GradientCycleGlowOpts = GradientCycleOpts & GradientGlowOpts;
 
 export type GradientCycleStepsOpts = GradientCycleOpts & GradientStepsOpts;
 
 export type GradientBandedCycleOpts = GradientCycleOpts & { banded?: boolean; bands?: number };
 
-export type TrackedGradientElementDefs = SVGDefsBaseElementDefs;
+export type TrackedGradientElementDefs = SVGDefsBaseElementDefs & TrackedElementDefs;
 
 export type TimedGradientEntry =
     | { family: "elastic_circle_1"; defs?: GradientCycleOpts }
@@ -175,7 +201,9 @@ export type TrackedGradientEntry =
     | { family: "spot_smear_3"; defs?: GradientSmearSampleOpts }
     | { family: "spot_trail_1"; defs?: GradientSpotTrailOpts }
     | { family: "spot_trail_2"; defs?: GradientSpotTrailOpts }
-    | { family: "spot_trail_3"; defs?: GradientSpotTrailOpts };
+    | { family: "spot_trail_3"; defs?: GradientSpotTrailOpts }
+    | { family: "ribbon_3"; defs?: GradientRibbonSampleOpts }
+    | { family: "swarm_3"; defs?: GradientSwarmSampleOpts };
 
 export type TrackedGradientFamily = TrackedGradientEntry["family"];
 
@@ -187,7 +215,10 @@ export type TrackedPatternEntry =
     | { family: "hexagon_pt_fade_2"; defs?: PatternProximityOpts }
     | { family: "lozenge_d_fade_2"; defs?: PatternProximityOpts }
     | { family: "triangle_s_fade_2"; defs?: PatternProximityOpts }
-    | { family: "triangle_t_fade_2"; defs?: PatternProximityOpts };
+    | { family: "triangle_t_fade_2"; defs?: PatternProximityOpts }
+    | { family: "square_g_trail_2"; defs?: PatternProximityOpts }
+    | { family: "hexagon_pt_trail_2"; defs?: PatternProximityOpts }
+    | { family: "triangle_t_trail_2"; defs?: PatternProximityOpts };
 
 export type TrackedPatternFamily = TrackedPatternEntry["family"];
 

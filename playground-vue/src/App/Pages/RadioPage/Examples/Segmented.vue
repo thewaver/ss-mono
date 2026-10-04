@@ -19,7 +19,7 @@ const value = useModel(props, "value");
 <template>
     <PageRadioSegmentGroup>
         <RadioGroup v-model:value="value" ariaLabel="Segmented size" orientation="horizontal" :gap="0">
-            <template #renderFloater="{ visibilityTarget, transitionDurationMs }">
+            <template #renderSelectionFloater="{ visibilityTarget, transitionDurationMs }">
                 <PageRadioSegmentFloater
                     :visibility-target="visibilityTarget"
                     :transition-duration-ms="transitionDurationMs"

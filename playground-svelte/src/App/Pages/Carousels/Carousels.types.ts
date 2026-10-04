@@ -1,4 +1,4 @@
-import type { CarouselAxis, CarouselOrientation } from "@thewaver/ss-components-svelte";
+import type { CarouselOrientation, CarouselPlacementFn, CarouselPlacements } from "@thewaver/ss-components-svelte";
 
 export type CarouselExampleProps = {
     slides: string[];
@@ -8,10 +8,8 @@ export type CarouselExampleProps = {
     autoplayDelayMs?: number;
     index: number;
     playback?: boolean;
-};
-
-export type DrumCarouselExampleProps = Omit<CarouselExampleProps, "orientation"> & {
-    axis: CarouselAxis;
+    computePlacement: CarouselPlacementFn;
+    isNarrow: boolean;
 };
 
 export type CarouselSharedProps = Omit<CarouselExampleProps, "index" | "autoplayDelayMs" | "playback">;
@@ -22,6 +20,7 @@ export type CarouselsControls = {
     orientation: CarouselOrientation;
     isDisabled: boolean;
     isLooping: boolean;
+    placement: CarouselPlacements.SampleKey;
     readonly slides: string[];
     readonly sharedProps: CarouselSharedProps;
 };

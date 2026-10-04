@@ -52,3 +52,27 @@ export const lamp = style({
     fontSize: themeVars.fontSize.small,
     userSelect: "none",
 });
+
+export const placedStage = style({
+    display: "flex",
+    flexDirection: "column",
+    gap: themeVars.spacing.double,
+    alignItems: "center",
+    justifyContent: "center",
+    width: "100%",
+    height: "100%",
+});
+
+export const placedRow = style({
+    display: "flex",
+    gap: themeVars.spacing.full,
+    alignItems: "center",
+    justifyContent: "center",
+    width: "100%",
+});
+
+export const slider = style({
+    display: "flex",
+    width: "100%",
+    maxWidth: 360,
+});

@@ -15,6 +15,7 @@
     import BlurExample from "./Examples/Blur.svelte";
     import DropShadowExample from "./Examples/DropShadow.svelte";
     import HueExample from "./Examples/Hue.svelte";
+    import PixelateExample from "./Examples/Pixelate.svelte";
     import StackExample from "./Examples/Stack.svelte";
     import ToneExample from "./Examples/Tone.svelte";
     import TurbulenceExample from "./Examples/Turbulence.svelte";
@@ -70,6 +71,12 @@
             path: `${EXAMPLES_ROOT}/Tone.svelte`,
         },
         {
+            key: "pixelate",
+            name: "Pixelate",
+            component: pixelateExample,
+            path: `${EXAMPLES_ROOT}/Pixelate.svelte`,
+        },
+        {
             key: "stack",
             name: "Four at once",
             readout: () =>
@@ -100,6 +107,10 @@
 
 {#snippet toneExample()}
     <ToneExample {...commonProps} />
+{/snippet}
+
+{#snippet pixelateExample()}
+    <PixelateExample {...commonProps} />
 {/snippet}
 
 {#snippet stackExample()}

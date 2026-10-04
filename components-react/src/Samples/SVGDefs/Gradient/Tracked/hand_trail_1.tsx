@@ -97,7 +97,11 @@ const renderSweep = (id: string, angle: number, colors: SVGGradientColor[], swee
 
 const HandTrail = (props: HandTrailProps) => {
     const ref = SVGDefsReactUtils.useElementRef(props.element);
-    const { reading, isPointerPresent } = PointerTrackerReactUtils.usePointerReading(ref);
+    const { reading, isPointerPresent } = PointerTrackerReactUtils.usePointerReading(
+        ref,
+        false,
+        props.defs.getPointSource?.(),
+    );
     const frameMs = SVGDefsReactUtils.useFrameMs(clock);
     const [stamps] = useState(() => [...NO_STAMPS]);
     const motionRef = useRef<HandMotion>({ lastAngle: undefined, lastTurnedMs: undefined, bornTick: undefined });

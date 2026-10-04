@@ -1,7 +1,12 @@
 <svelte:options namespace="svg" />
 
 <script module lang="ts">
-    import { type GradientBandOpts, SVGDefsUtils, TrackedGradientDefaults } from "@thewaver/ss-components";
+    import {
+        type GradientBandOpts,
+        type PointSource,
+        SVGDefsUtils,
+        TrackedGradientDefaults,
+    } from "@thewaver/ss-components";
     import type { Size2d } from "@thewaver/ss-utils";
 
     import { PointerTrackerSvelteUtils } from "../../../../Abstracts/PointerTracker/PointerTrackerSvelte.utils.svelte.js";
@@ -19,6 +24,7 @@
         element: HTMLElement | undefined;
         color: string;
         axis: BandAxis;
+        getPointSource?: () => PointSource | undefined;
         opts?: GradientBandOpts;
     };
 
@@ -52,6 +58,7 @@
                                 element,
                                 color: defs.colors.primary,
                                 axis: "x",
+                                getPointSource: defs.getPointSource,
                                 opts,
                             }),
                     },
@@ -67,6 +74,7 @@
                                 element,
                                 color: defs.colors.secondary,
                                 axis: "y",
+                                getPointSource: defs.getPointSource,
                                 opts,
                             }),
                     },
@@ -81,7 +89,11 @@
 <script lang="ts">
     let props: BandGradientProps = $props();
 
-    const { getReading } = PointerTrackerSvelteUtils.create(() => props.element);
+    const { getReading } = PointerTrackerSvelteUtils.create(
+        () => props.element,
+        undefined,
+        () => props.getPointSource?.(),
+    );
 
     const travel = $derived(
         (getReading().boxRatio[props.axis] - 0.5) * (props.opts?.bandTravel ?? DEFAULTS.bandTravel),

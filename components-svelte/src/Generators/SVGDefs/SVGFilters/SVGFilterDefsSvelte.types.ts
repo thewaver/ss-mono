@@ -3,6 +3,7 @@ import type {
     SVGDropShadowFilterDefs,
     SVGFilterAssembly,
     SVGGaussianBlurFilterDefs,
+    SVGPixelateFilterDefs,
     SVGSpecularLightingFilterDefs,
     SVGTurbulenceFilterDefs,
 } from "@thewaver/ss-components";
@@ -14,6 +15,7 @@ export type SVGFilterPrimitive = { key: string; custom?: SvelteMarkup } & (
     | { kind: "gaussianBlur"; defs: SVGGaussianBlurFilterDefs }
     | { kind: "turbulence"; defs: SVGTurbulenceFilterDefs }
     | { kind: "colorMatrix"; type: "hueRotate" | "saturate" | "matrix"; values: string }
+    | { kind: "pixelate"; defs: SVGPixelateFilterDefs }
     | { kind: "specularLighting"; defs: SVGSpecularLightingFilterDefs }
     | { kind: "diffuseLighting"; defs: SVGDiffuseLightingFilterDefs }
 );

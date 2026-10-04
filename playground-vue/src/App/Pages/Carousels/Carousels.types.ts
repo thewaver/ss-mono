@@ -1,6 +1,6 @@
 import type { ComputedRef, Ref } from "vue";
 
-import type { CarouselAxis, CarouselOrientation } from "@thewaver/ss-components-vue";
+import type { CarouselOrientation, CarouselPlacementFn, CarouselPlacements } from "@thewaver/ss-components-vue";
 
 export type CarouselExampleProps = {
     "slides": string[];
@@ -12,10 +12,8 @@ export type CarouselExampleProps = {
     "onUpdate:index"?: (value: number) => void;
     "playback"?: boolean;
     "onUpdate:playback"?: (value: boolean) => void;
-};
-
-export type DrumCarouselExampleProps = Omit<CarouselExampleProps, "orientation"> & {
-    axis: CarouselAxis;
+    "computePlacement": CarouselPlacementFn;
+    "isNarrow": boolean;
 };
 
 export type CarouselSharedProps = Omit<
@@ -29,6 +27,7 @@ export type CarouselsControls = {
     orientation: Ref<CarouselOrientation>;
     isDisabled: Ref<boolean>;
     isLooping: Ref<boolean>;
+    placement: Ref<CarouselPlacements.SampleKey>;
     slides: ComputedRef<string[]>;
     sharedProps: ComputedRef<CarouselSharedProps>;
 };
@@ -37,4 +36,5 @@ export type PageCarouselsPanelProps = {
     controls: CarouselsControls;
     hasDelay?: boolean;
     hasLooping?: boolean;
+    hasPlacement?: boolean;
 };

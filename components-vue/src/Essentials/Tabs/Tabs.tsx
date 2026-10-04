@@ -1,8 +1,8 @@
 import { type ComponentPublicInstance, type SlotsType, computed, defineComponent, h, shallowRef, watch } from "vue";
 
-import { TABS_DEFAULTS, type TabsFloaterBounds, TabsStyles, TabsUtils } from "@thewaver/ss-components";
+import { FloaterStyles, TABS_DEFAULTS, TabsStyles, TabsUtils } from "@thewaver/ss-components";
 
-import { ElementFaderVueUtils } from "../../Abstracts/ElementFader/ElementFaderVue.utils";
+import { FloaterVueUtils } from "../../Abstracts/Floater/FloaterVue.utils";
 import { NavigatorVueUtils } from "../../Abstracts/Navigator/NavigatorVue.utils";
 import { InteractionWrapper } from "../../Primitives/InteractionWrapper/InteractionWrapper";
 import type {
@@ -11,7 +11,6 @@ import type {
 } from "../../Primitives/InteractionWrapper/InteractionWrapper.types";
 import { PlacementBox } from "../../Primitives/PlacementBox/PlacementBox";
 import { PlacementItem } from "../../Primitives/PlacementItem/PlacementItem";
-import { watchAfterRender } from "../../Utils/effectUtils";
 import { callSlot, declareProps } from "../../Utils/propUtils";
 import { toElement } from "../../Utils/refUtils";
 import type { SlotsContext } from "../../Utils/typeUtils";
@@ -95,11 +94,11 @@ const TabsItem = defineComponent(
 export const Tabs = defineComponent(
     <T,>(props: TabsProps<T>, { slots }: SlotsContext<TabsSlots<T>>) => {
         const rootRef = shallowRef<HTMLDivElement>();
-        const floaterRef = shallowRef<HTMLDivElement>();
 
         const itemElements = shallowRef<(HTMLElement | undefined)[]>([]);
         const focusedValue = shallowRef<T>();
-        const measuredBounds = shallowRef<TabsFloaterBounds>();
+        const hoveredIndex = shallowRef<number>();
+        const focusedIndex = shallowRef<number>();
 
         watch(
             () => props.selectedValue,
@@ -118,38 +117,39 @@ export const Tabs = defineComponent(
 
         const selectedIndex = computed(() => TabsUtils.computeSelectedIndex(props.tabs, props.selectedValue));
 
-        const floaterBounds = computed(() => {
-            if (layout.value === undefined) return measuredBounds.value;
+        const highlightIndex = computed(() => hoveredIndex.value ?? focusedIndex.value);
 
-            const selectedPlacement = layout.value.placements[selectedIndex.value];
+        const findItemIndex = (target: EventTarget | null) =>
+            target instanceof Node ? itemElements.value.findIndex((item) => item?.contains(target) ?? false) : -1;
 
-            return selectedPlacement === undefined ? undefined : TabsUtils.computePlacedBounds(selectedPlacement);
-        });
+        const toIndex = (index: number) => (index < 0 ? undefined : index);
 
-        const floaterFader = ElementFaderVueUtils.useFader(
-            () => selectedIndex.value >= 0 && floaterBounds.value !== undefined,
-            { transitionDurationMs: getTransitionDurationMs, ref: floaterRef },
+        const useItemFloater = (isEnabled: () => boolean, getIndex: () => number | undefined) =>
+            FloaterVueUtils.useFloater({
+                isEnabled,
+                container: () => (layout.value === undefined ? rootRef.value : undefined),
+                target: () => {
+                    const index = getIndex();
+
+                    return index === undefined || index < 0 ? undefined : itemElements.value[index];
+                },
+                layout,
+                placement: () => {
+                    const index = getIndex();
+
+                    return index === undefined || index < 0 ? undefined : layout.value?.placements[index];
+                },
+                transitionDurationMs: getTransitionDurationMs,
+            });
+
+        const selectionFloater = useItemFloater(
+            () => slots.renderSelectionFloater !== undefined,
+            () => selectedIndex.value,
         );
 
-        watchAfterRender([floaterFader.isVisible], ([isVisible]) => {
-            if (isVisible) return;
-
-            measuredBounds.value = undefined;
-        });
-
-        const getHasFloater = () => slots.renderFloater !== undefined;
-
-        watchAfterRender(
-            [getHasFloater, layout, () => itemElements.value[selectedIndex.value]],
-            ([hasFloater, currentLayout, selectedItem]) => {
-                const root = rootRef.value;
-
-                if (!hasFloater || currentLayout !== undefined || !root || !selectedItem) return;
-
-                return TabsUtils.observeSelectedBounds(root, selectedItem, (bounds) => {
-                    measuredBounds.value = bounds;
-                });
-            },
+        const highlightFloater = useItemFloater(
+            () => slots.renderHighlightFloater !== undefined,
+            () => highlightIndex.value,
         );
 
         const setItemRef = (index: number, target: Element | ComponentPublicInstance | null) => {
@@ -188,7 +188,6 @@ export const Tabs = defineComponent(
             const tabGap = props.tabGap ?? TABS_DEFAULTS.tabGap;
             const currentLayout = layout.value;
             const rovingIndex = TabsUtils.computeRovingIndex(props.tabs, props.selectedValue, focusedValue.value);
-            const bounds = floaterBounds.value;
 
             const renderTabAt = (tab: (typeof props.tabs)[number], index: number) => {
                 const placement = currentLayout?.placements[index];
@@ -239,21 +238,26 @@ export const Tabs = defineComponent(
                 );
             };
 
-            const isFloaterRendered = getHasFloater() && floaterFader.isVisible.value && bounds !== undefined;
-
-            const content = [
-                isFloaterRendered && (
+            const renderFloater = (
+                floater: typeof selectionFloater,
+                renderContent: TabsSlots<T>["renderSelectionFloater"],
+            ) =>
+                floater.isRendered.value && (
                     <div
-                        ref={floaterRef}
-                        class={TabsStyles.tabsFloater}
-                        style={{ ...bounds, transitionDuration: `${transitionDurationMs}ms` }}
+                        ref={floater.setRef}
+                        class={FloaterStyles.floater}
+                        style={{ ...floater.bounds.value, transitionDuration: `${transitionDurationMs}ms` }}
                     >
-                        {callSlot(slots.renderFloater, {
-                            visibilityTarget: floaterFader.transitionTarget.value,
+                        {callSlot(renderContent, {
+                            visibilityTarget: floater.visibilityTarget.value,
                             transitionDurationMs,
                         })}
                     </div>
-                ),
+                );
+
+            const content = [
+                renderFloater(highlightFloater, slots.renderHighlightFloater),
+                renderFloater(selectionFloater, slots.renderSelectionFloater),
                 ...props.tabs.map(renderTabAt),
             ];
 
@@ -266,6 +270,18 @@ export const Tabs = defineComponent(
                     aria-label={props.ariaLabel}
                     aria-orientation={orientation}
                     onKeydown={handleKeyDown}
+                    onPointerover={(e) => {
+                        hoveredIndex.value = toIndex(findItemIndex(e.target));
+                    }}
+                    onPointerleave={() => {
+                        hoveredIndex.value = undefined;
+                    }}
+                    onFocusin={(e) => {
+                        focusedIndex.value = toIndex(findItemIndex(e.target));
+                    }}
+                    onFocusout={() => {
+                        focusedIndex.value = undefined;
+                    }}
                 >
                     {slots.renderGutter && <div class={TabsStyles.tabsGutter}>{slots.renderGutter()}</div>}
 

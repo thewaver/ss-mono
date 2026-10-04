@@ -1,11 +1,13 @@
 <script setup lang="ts">
 import type { CarouselOrientation } from "@thewaver/ss-components-vue";
-import { CAROUSEL_ORIENTATIONS } from "@thewaver/ss-components-vue";
+import { CAROUSEL_ORIENTATIONS, CarouselPlacements } from "@thewaver/ss-components-vue";
 import { CarouselKnobs } from "@thewaver/ss-playground/App/Knobs/Carousels.const";
 import {
     FIELD_WIDTH,
     ORIENTATION_FIELD_WIDTH,
     ORIENTATION_LABELS,
+    PLACEMENT_FIELD_WIDTH,
+    PLACEMENT_LABELS,
 } from "@thewaver/ss-playground/App/Pages/Carousels/Carousels.const";
 
 import PageCheckField from "../../PageComponents/Field/PageCheckField.vue";
@@ -22,6 +24,22 @@ const controls = props.controls;
 
 <template>
     <PagePropsPanel scope="global">
+        <PageProp
+            v-if="hasPlacement"
+            item-key="placement"
+            label="Placement"
+            hint="The rule that says where each slide is drawn from how far it is from the one showing: a strip, a drum, cover flow and the rest."
+        >
+            <PageSelectField
+                :value="controls.placement.value"
+                :values="CarouselPlacements.SAMPLE_KEYS"
+                :compute-label="(placement: CarouselPlacements.SampleKey) => PLACEMENT_LABELS[placement]"
+                :width="PLACEMENT_FIELD_WIDTH"
+                ariaLabel="Placement"
+                @change="(placement: CarouselPlacements.SampleKey) => (controls.placement.value = placement)"
+            />
+        </PageProp>
+
         <PageProp item-key="slideCount" label="Slide count" hint="How many slides the carousel holds.">
             <PageNumberField
                 :value="controls.slideCount.value"

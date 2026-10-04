@@ -49,6 +49,7 @@ export const FanMenu = defineComponent(
                             renderDecoration: slots.renderDecoration,
                             renderItem: slots.renderItem,
                             renderPopup: slots.renderPopup,
+                            renderHighlightFloater: slots.renderHighlightFloater,
                         } satisfies Partial<MenuSlots<T>>
                     }
                 </Menu>
@@ -82,6 +83,7 @@ export const FanMenu = defineComponent(
             "triggerRole": null,
             "reservedScreenSize": null,
             "transitionDurationMs": null,
+            "floaterTransitionDurationMs": null,
             "visibility": Boolean,
             "onUpdate:visibility": null,
             "anchorRef": null,

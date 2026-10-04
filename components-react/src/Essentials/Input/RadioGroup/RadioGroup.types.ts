@@ -30,8 +30,13 @@ export type RadioGroupProps<T> = PropsWithChildren<{
     /** What the options do as the pointer nears them. Only a group with `computeLayout` has anything to move. */
     computeEffect?: ProximityEffectFn;
     /**
-     * Draws the marker that follows the picked option. The group measures the picked option's box and puts the
-     * marker behind it, and the marker slides when the pick changes. The fade is handed in rather than applied.
+     * Draws the marker that slides to the picked option, behind it. The fade is handed in rather than applied: the
+     * marker fades out when nothing is picked and in when something is.
      */
-    renderFloater?: (visibilityTarget: 0 | 1, transitionDurationMs: number) => ReactNode;
+    renderSelectionFloater?: (visibilityTarget: 0 | 1, transitionDurationMs: number) => ReactNode;
+    /**
+     * Draws the marker that slides to the option under the pointer, or the one holding focus, behind it. It fades
+     * out when neither is on an option, and is drawn under the picked option's marker where both are given.
+     */
+    renderHighlightFloater?: (visibilityTarget: 0 | 1, transitionDurationMs: number) => ReactNode;
 }>;

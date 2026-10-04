@@ -24,7 +24,7 @@ const DEFAULTS = TrackedGradientDefaults.BAND_DEFAULTS;
 
 const BandGradient = (props: BandGradientProps) => {
     const ref = SVGDefsReactUtils.useElementRef(props.element);
-    const { reading } = PointerTrackerReactUtils.usePointerReading(ref);
+    const { reading } = PointerTrackerReactUtils.usePointerReading(ref, false, props.defs.getPointSource?.());
 
     return SVGGradientDefsReactUtils.computeLinearGradient({
         id: props.id,

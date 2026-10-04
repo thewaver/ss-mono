@@ -29,10 +29,14 @@ const GLASS_DEFS: PartialGlassDefs = {
 export const PageTooltipContent = (props: PropsWithChildren<TooltipContentProps>) => {
     return (
         <div
-            className={[styles.tooltipVisibility, props.visibilityTarget === 1 && styles.isVisible]
+            className={[
+                styles.tooltipVisibility,
+                styles.tooltipRevealVariants[props.reveal ?? "fade"],
+                props.visibilityTarget === 1 && styles.isVisible,
+            ]
                 .filter(Boolean)
                 .join(" ")}
-            style={{ transition: `opacity ${props.transitionDurationMs}ms` }}
+            style={{ transitionDuration: `${props.transitionDurationMs}ms` }}
         >
             <GlassSurface borderRadii={BORDER_RADII} glassDefs={GLASS_DEFS}>
                 <div className={styles.tooltipBody}>

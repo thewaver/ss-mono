@@ -9,6 +9,7 @@ import {
     type SVGGaussianBlurFilterDefs,
     type SVGHueRotationFilterDefs,
     type SVGInversionFilterDefs,
+    type SVGPixelateFilterDefs,
     type SVGSaturationFilterDefs,
     type SVGSpecularLightingFilterDefs,
     type SVGTurbulenceFilterDefs,
@@ -49,7 +50,8 @@ export class SVGFilterDefsFactory {
      *
      * The filter region is grown to fit effects that reach past the element — a blur's spread, a shadow's offset, a
      * displacement's shift. Given the element's size, it is grown by exactly that reach on every side; without it,
-     * any reach at all doubles the region about the element; with no reach, the browser's default stands.
+     * any reach at all doubles the region about the element; with no reach, the browser's default stands. A
+     * pixelation needs the element's size, and is left out without it.
      *
      * @param defs The method, and the element's size in pixels when it is known.
      * @returns The `filter` element as markup, for the `Markup` component or a defs record, or `undefined` when
@@ -251,6 +253,25 @@ export class SVGFilterDefsFactory {
                 custom,
             };
         }
+
+        return this;
+    };
+
+    /**
+     * Breaks the graphic into squares of one color each, the color at each square's middle.
+     *
+     * Use it with the `"chain"` method, or over a graphic that fills its box, since under `"isolate"` the original is
+     * laid underneath. It needs the element's size, passed to {@link SVGFilterDefsFactory.computeFilterPrimitives}:
+     * without it the squares cannot be laid out and the effect is left out. Skipped for a size of one pixel or less.
+     *
+     * @param defs How wide each square is, in user units.
+     * @param custom Content placed inside the dot image, for animating it.
+     * @returns The factory, for the next call.
+     */
+    public addPixelateFilter = (defs: SVGPixelateFilterDefs, custom?: SvelteMarkup) => {
+        const key = this.registry.addPixelate(defs);
+
+        if (key !== undefined) this.primitives[key] = { kind: "pixelate", key, defs, custom };
 
         return this;
     };

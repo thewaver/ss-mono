@@ -2,6 +2,7 @@ import type { Accessor, JSX } from "solid-js";
 
 import type {
     PlacementLayoutFn,
+    PointSource,
     ProximityEffectFn,
     RotatorPhase,
     RotatorSpinDefs,
@@ -71,6 +72,15 @@ export type WheelProps<T> = AccessorProps<
             wedgeSize?: Size2d;
             /** Where the marker sits, in degrees, which is the point a spin lands a wedge on. */
             markerDegrees?: number;
+            /**
+             * The point to follow instead of the pointer.
+             *
+             * A fraction across a box — the wheel's own, or the element named in the source — so a light moving
+             * across a banner can be handed to every card under it and each answers to the same spot. While the source has
+             * no point every wedge rests, as it does when the pointer leaves the window. Left out, the pointer is
+             * followed.
+             */
+            pointSource?: PointSource;
         }
 > &
     WheelSlots<T> & {
@@ -87,6 +97,15 @@ export type OverheadWheelProps<T> = AccessorProps<
         WheelLabels & {
             /** Where the marker sits, in degrees, which is the point a spin lands a wedge on. */
             markerDegrees?: number;
+            /**
+             * The point to follow instead of the pointer.
+             *
+             * A fraction across a box — the wheel's own, or the element named in the source — so a light moving
+             * across a banner can be handed to every card under it and each answers to the same spot. While the source has
+             * no point every wedge rests, as it does when the pointer leaves the window. Left out, the pointer is
+             * followed.
+             */
+            pointSource?: PointSource;
         }
 > &
     WheelSlots<T> & {

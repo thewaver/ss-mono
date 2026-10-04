@@ -210,6 +210,11 @@ export const SelectComposite = <T,>(props: SelectCompositeProps<T>) => {
             computeIsSelected={props.computeIsSelected}
             renderOption={props.renderOption}
             renderGroup={props.renderGroup}
+            floaterTransitionDurationMs={
+                props.floaterTransitionDurationMs ?? SELECT_DEFAULTS.floaterTransitionDurationMs
+            }
+            renderSelectionFloater={props.renderSelectionFloater}
+            renderHighlightFloater={props.renderHighlightFloater}
             onReachEnd={props.onReachEnd}
         />
     );

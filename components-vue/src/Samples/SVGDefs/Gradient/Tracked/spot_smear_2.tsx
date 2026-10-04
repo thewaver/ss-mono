@@ -125,7 +125,11 @@ const computeStampColors = (
 
 const SpotSmear = defineComponent(
     (props: SpotSmearProps) => {
-        const { reading, isPointerPresent } = PointerTrackerVueUtils.usePointerReading(() => props.element);
+        const { reading, isPointerPresent } = PointerTrackerVueUtils.usePointerReading(
+            () => props.element,
+            false,
+            () => props.defs.getPointSource?.(),
+        );
         const frameMs = SVGDefsVueUtils.useFrameMs(clock);
         const stamps = [...NO_STAMPS];
         const motion: TrailMotion = {

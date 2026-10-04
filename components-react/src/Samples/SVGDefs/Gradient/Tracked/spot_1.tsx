@@ -21,7 +21,7 @@ const DEFAULTS = TrackedGradientDefaults.SPOT_DEFAULTS;
 
 const SpotGradient = (props: SpotGradientProps) => {
     const ref = SVGDefsReactUtils.useElementRef(props.element);
-    const { reading } = PointerTrackerReactUtils.usePointerReading(ref);
+    const { reading } = PointerTrackerReactUtils.usePointerReading(ref, false, props.defs.getPointSource?.());
 
     const color = props.defs.colors.primary;
 

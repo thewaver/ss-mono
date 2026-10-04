@@ -23,7 +23,11 @@ export const PlacementBox = (props: PlacementBoxProps) => {
     const hasEffect = computeEffect !== undefined;
     const transitionDurationMs = props.transitionDurationMs ?? PLACEMENT_BOX_DEFAULTS.transitionDurationMs;
 
-    const { reading, isPointerPresent } = PointerTrackerReactUtils.usePointerReading(boxRef, !hasEffect);
+    const { reading, isPointerPresent } = PointerTrackerReactUtils.usePointerReading(
+        boxRef,
+        !hasEffect,
+        props.pointSource,
+    );
 
     const prefersReducedMotion = MediaQueryMonitorReactUtils.useReducedMotion(
         !PlacementBoxUtils.getIsMotionQueryNeeded(hasEffect, transitionDurationMs),

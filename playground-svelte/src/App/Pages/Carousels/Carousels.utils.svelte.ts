@@ -1,7 +1,7 @@
-import { CAROUSEL_DEFAULTS } from "@thewaver/ss-components-svelte";
+import { CAROUSEL_DEFAULTS, CarouselPlacementUtils, CarouselPlacements } from "@thewaver/ss-components-svelte";
 import type { CarouselOrientation } from "@thewaver/ss-components-svelte";
 import { CarouselKnobs } from "@thewaver/ss-playground/App/Knobs/Carousels.const";
-import { TITLES } from "@thewaver/ss-playground/App/Pages/Carousels/Carousels.const";
+import { NARROW_PLACEMENTS, TITLES } from "@thewaver/ss-playground/App/Pages/Carousels/Carousels.const";
 
 import type { CarouselsControls } from "./Carousels.types";
 
@@ -11,10 +11,21 @@ export const createCarouselsControls = (): CarouselsControls => {
     let orientation = $state<CarouselOrientation>(CAROUSEL_DEFAULTS.orientation);
     let isDisabled = $state(CarouselKnobs.STARTING_IS_DISABLED);
     let isLooping = $state(CAROUSEL_DEFAULTS.isLooping);
+    let placement = $state<CarouselPlacements.SampleKey>(CarouselKnobs.STARTING_PLACEMENT);
+
+    const computePlacement = $derived(
+        CarouselPlacementUtils.toPlacementFn(CarouselPlacements.SAMPLE_PLACEMENTS[placement]),
+    );
 
     const slides = $derived(TITLES.slice(0, slideCount));
 
-    const sharedProps = $derived({ slides, isDisabled, orientation });
+    const sharedProps = $derived({
+        slides,
+        isDisabled,
+        orientation,
+        isNarrow: NARROW_PLACEMENTS.includes(placement),
+        computePlacement,
+    });
 
     return {
         get slideCount() {
@@ -46,6 +57,12 @@ export const createCarouselsControls = (): CarouselsControls => {
         },
         set isLooping(value) {
             isLooping = value;
+        },
+        get placement() {
+            return placement;
+        },
+        set placement(value) {
+            placement = value;
         },
         get slides() {
             return slides;

@@ -104,7 +104,11 @@ const getNoRipples = (count: number): (Ripple | undefined)[] => Array.from({ len
 
 const SpotRipples = (props: SpotRipplesProps) => {
     const ref = SVGDefsReactUtils.useElementRef(props.element);
-    const { reading, isPointerPresent } = PointerTrackerReactUtils.usePointerReading(ref);
+    const { reading, isPointerPresent } = PointerTrackerReactUtils.usePointerReading(
+        ref,
+        false,
+        props.defs.getPointSource?.(),
+    );
     const frameMs = SVGDefsReactUtils.useFrameMs(clock);
     const rippleCount = props.opts?.rippleCount ?? DEFAULTS.rippleCount;
     const [ripples, setRipples] = useState(() => getNoRipples(rippleCount));

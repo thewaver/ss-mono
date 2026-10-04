@@ -1,5 +1,7 @@
+import type { NavigatorDirection } from "../../../Abstracts/Navigator/Navigator.types";
 import { NavigatorUtils } from "../../../Abstracts/Navigator/Navigator.utils";
-import type { AccordionItem } from "./Accordion.types";
+import type { CollapsibleSide } from "../Collapsible/Collapsible.types";
+import type { AccordionItem, AccordionMoveDirection, AccordionOrientation } from "./Accordion.types";
 
 /** The part of an accordion that is not about drawing it: which sections open, and how the arrow keys walk them. */
 export namespace AccordionUtils {
@@ -53,10 +55,15 @@ export namespace AccordionUtils {
      * last of them. It answers nothing when focus is not on a header, so a key pressed inside an open panel is left
      * to the panel.
      *
+     * The arrows that walk are the ones along the accordion: up and down for a column, left and right for a row,
+     * where the text's direction decides which of the two goes forward.
+     *
      * @param key The key that was pressed.
      * @param headers Each section's header element, by section index.
      * @param navigable What {@link computeNavigableIndexes} answered.
      * @param active The element focus is on now.
+     * @param opts.orientation Which way the sections run. Left out, a column.
+     * @param opts.direction Which way the page's text runs, which only a row reads.
      * @returns The index of the header to focus, or `undefined` when the key is not the accordion's to answer.
      */
     export const computeFocusTarget = (
@@ -64,13 +71,60 @@ export namespace AccordionUtils {
         headers: readonly (HTMLElement | null | undefined)[],
         navigable: number[],
         active: Element | null,
+        opts?: { orientation?: AccordionOrientation; direction?: NavigatorDirection },
     ) => {
         const focused = headers.findIndex((header) => active !== null && header === active);
 
         if (navigable.length < 1 || focused < 0) return undefined;
 
-        const position = NavigatorUtils.computeNextPosition(key, navigable.indexOf(focused), navigable.length);
+        const orientation = opts?.orientation ?? "vertical";
+        const position = NavigatorUtils.computeNextPosition(key, navigable.indexOf(focused), navigable.length, {
+            orientation,
+            direction: orientation === "horizontal" ? opts?.direction : undefined,
+        });
 
         return position === undefined ? undefined : navigable[position];
+    };
+
+    /**
+     * Which side each section's panel opens toward: below its header in a column, beside it in a row.
+     *
+     * @param orientation Which way the sections run.
+     */
+    export const getPanelSide = (orientation: AccordionOrientation): CollapsibleSide =>
+        orientation === "horizontal" ? "right" : "bottom";
+
+    /**
+     * Which way the open sections moved when the open set changed, so a panel's content can slide in from the side
+     * the person came from.
+     *
+     * A section that opened is compared with one that closed in the same change, or, when nothing closed, with the
+     * nearest section that was already open. Later in the list is forward and earlier is backward, whichever way the
+     * list runs on screen.
+     *
+     * @param previous The positions of the sections open before.
+     * @param next The positions of the sections open now.
+     * @returns The direction, or `undefined` when nothing opened or nothing was open to move from.
+     */
+    export const computeMoveDirection = (
+        previous: readonly number[],
+        next: readonly number[],
+    ): AccordionMoveDirection | undefined => {
+        const opened = next.find((index) => !previous.includes(index));
+
+        if (opened === undefined) return undefined;
+
+        const closed = previous.find((index) => !next.includes(index));
+        const from =
+            closed ??
+            previous.reduce<number | undefined>(
+                (nearest, index) =>
+                    nearest === undefined || Math.abs(index - opened) < Math.abs(nearest - opened) ? index : nearest,
+                undefined,
+            );
+
+        if (from === undefined) return undefined;
+
+        return opened > from ? "forward" : "backward";
     };
 }

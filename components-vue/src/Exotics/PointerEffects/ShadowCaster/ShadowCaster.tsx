@@ -14,7 +14,11 @@ export const ShadowCaster = defineComponent(
 
         const getIsDisabled = () => props.isDisabled ?? false;
 
-        const { reading, isPointerPresent } = PointerTrackerVueUtils.usePointerReading(ref, getIsDisabled);
+        const { reading, isPointerPresent } = PointerTrackerVueUtils.usePointerReading(
+            ref,
+            getIsDisabled,
+            () => props.pointSource,
+        );
 
         const shadow = SmootherVueUtils.useSmoothed(
             () =>
@@ -59,6 +63,7 @@ export const ShadowCaster = defineComponent(
             color: null,
             smoothingMs: null,
             isDisabled: Boolean,
+            pointSource: null,
         }),
     },
 );

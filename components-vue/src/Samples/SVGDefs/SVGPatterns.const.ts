@@ -93,6 +93,7 @@ export namespace SVGPatterns {
         pointer: Point2d | undefined,
         opts: ReturnType<typeof TrackedPatternUtils.resolveOpts>,
         renderCell: SVGPatternTrackedCellRenderer,
+        computeTrailLevel: (key: string, liveLevel: number) => number = (_key, liveLevel) => liveLevel,
     ) =>
         computeLayoutPattern(
             kind,
@@ -104,7 +105,10 @@ export namespace SVGPatterns {
                     cellId,
                     index,
                     isSplit,
-                    TrackedPatternUtils.computeLevel(kind, index, count, cellSize, pointer, opts),
+                    computeTrailLevel(
+                        `${index.row}_${index.col}`,
+                        TrackedPatternUtils.computeLevel(kind, index, count, cellSize, pointer, opts),
+                    ),
                 ),
         );
 }

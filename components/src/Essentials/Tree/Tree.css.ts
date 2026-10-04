@@ -1,5 +1,10 @@
 import { style } from "@vanilla-extract/css";
 
+export const treeRoot = style({
+    position: "relative",
+    isolation: "isolate",
+});
+
 export const treeNode = style({
     width: "100%",
     cursor: "pointer",
@@ -14,6 +19,7 @@ export const treeNode = style({
 
 export const treeSizer = style({
     position: "relative",
+    isolation: "isolate",
     width: "100%",
 });
 

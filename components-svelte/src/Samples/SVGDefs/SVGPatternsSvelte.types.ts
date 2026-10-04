@@ -69,3 +69,16 @@ export type SVGPatternTrackedUseCellProps = {
     /** How opaque the shape is, `0`–`1`, from how near the pointer is. */
     fillOpacity: number;
 };
+
+export type SVGPatternTrackedRectCellProps = {
+    /** The square's id, which a cell takes from the pattern so it never collides with a neighbor. */
+    id: string;
+    /** How wide the square is, in the pattern's user units. */
+    width: number;
+    /** How tall the square is, in the pattern's user units. */
+    height: number;
+    /** The square's color. */
+    fill: string;
+    /** How opaque the square is, `0`–`1`, from how near the pointer is and how recently it passed. */
+    fillOpacity: number;
+};

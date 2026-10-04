@@ -1,15 +1,7 @@
 import type { NavigatorDirection } from "../../../Abstracts/Navigator/Navigator.types";
 import { NavigatorUtils } from "../../../Abstracts/Navigator/Navigator.utils";
 import type { PlacementLayout, PlacementRect } from "../../../Abstracts/Placement/Placement.types";
-import { PlacementUtils } from "../../../Abstracts/Placement/Placement.utils";
 import type { RadioGroupEntry } from "./RadioGroup.context.types";
-import type { RadioGroupFloaterBounds } from "./RadioGroup.types";
-
-/** A placement's position is its center, so the box starts half its size back from it. */
-const HALF = 0.5;
-
-/** A placement with no angle is drawn upright. */
-const NO_ANGLE = 0;
 
 /** What `indexOf` answers for an entry that is not in the list. */
 const MISSING_ENTRY = -1;
@@ -156,80 +148,5 @@ export namespace RadioGroupUtils {
         );
 
         return position === undefined ? undefined : navigable[position];
-    };
-
-    /**
-     * Where the marker's box goes for a radio a layout placed.
-     *
-     * @param placement The placement the layout gave the picked radio.
-     * @returns The box, in shares of the group's width so it scales with it, turned the way the radio was.
-     */
-    export const computePlacedBounds = (placement: PlacementRect): RadioGroupFloaterBounds => ({
-        top: PlacementUtils.toContainerWidth(placement.topShare - placement.heightShare * HALF),
-        left: PlacementUtils.toContainerWidth(placement.leftShare - placement.widthShare * HALF),
-        width: PlacementUtils.toContainerWidth(placement.widthShare),
-        height: PlacementUtils.toContainerWidth(placement.heightShare),
-        transform: `rotate(${placement.angle ?? NO_ANGLE}deg)`,
-    });
-
-    /**
-     * Where the marker's box goes, whichever kind of group it is.
-     *
-     * A laid-out group computes the box from the picked radio's placement; a plain row or column measures it, and
-     * the measurement is handed in.
-     *
-     * @param layout The group's layout, if it has one.
-     * @param measuredBounds The last measurement, for a group with no layout.
-     * @param placement The picked radio's placement, from {@link computePlacement}.
-     * @returns The box, or `undefined` when there is nothing to put it round yet.
-     */
-    export const computeFloaterBounds = (
-        layout: PlacementLayout | undefined,
-        measuredBounds: RadioGroupFloaterBounds | undefined,
-        placement: PlacementRect | undefined,
-    ) => {
-        if (layout === undefined) return measuredBounds;
-        if (placement === undefined) return undefined;
-
-        return computePlacedBounds(placement);
-    };
-
-    /**
-     * Where the marker's box goes, and keeps going, for a group laid out as a plain row or column.
-     *
-     * The box is the one around the picked radio, measured against the group, and it is measured again whenever
-     * either of the two changes size — so a label that grows, or a group that is squeezed, carries the marker with
-     * it. The first reading arrives as soon as observing starts. `Tabs` measures its marker the same way, copied
-     * rather than shared while there are two of them.
-     *
-     * @param root The group itself.
-     * @param item The picked radio's element. Its offset parent, the box the radio is wrapped in, is what is
-     * measured.
-     * @param onBounds Called with each reading.
-     * @returns The function that stops measuring. Nothing is measured, and stopping does nothing, when the radio has
-     * no box around it yet.
-     */
-    export const observeSelectedBounds = (
-        root: HTMLElement,
-        item: HTMLElement,
-        onBounds: (bounds: RadioGroupFloaterBounds) => void,
-    ) => {
-        const wrapper = item.offsetParent as HTMLElement | null;
-
-        if (!wrapper) return () => {};
-
-        const observer = new ResizeObserver(() => {
-            onBounds({
-                top: `${wrapper.offsetTop}px`,
-                left: `${wrapper.offsetLeft}px`,
-                width: `${wrapper.offsetWidth}px`,
-                height: `${wrapper.offsetHeight}px`,
-            });
-        });
-
-        observer.observe(root);
-        observer.observe(wrapper);
-
-        return () => observer.disconnect();
     };
 }

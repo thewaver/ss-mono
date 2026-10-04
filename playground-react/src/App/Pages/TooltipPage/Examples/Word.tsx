@@ -30,7 +30,11 @@ export const WordExample = (props: Props) => {
                 hoverShowDelayMs={props.hoverShowDelayMs}
                 skipDelayWindowMs={props.skipDelayWindowMs}
                 renderContent={(visibilityTarget, transitionDurationMs) => (
-                    <PageTooltipContent visibilityTarget={visibilityTarget} transitionDurationMs={transitionDurationMs}>
+                    <PageTooltipContent
+                        visibilityTarget={visibilityTarget}
+                        transitionDurationMs={transitionDurationMs}
+                        reveal={props.reveal}
+                    >
                         A weight of silver, not a coin — eight ounces, counted rather than struck.
                     </PageTooltipContent>
                 )}

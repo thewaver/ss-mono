@@ -1,3 +1,5 @@
+import type { CarouselPlacements } from "@thewaver/ss-components";
+
 export namespace CarouselKnobs {
     export const MIN_SLIDE_COUNT = 1;
     export const MAX_SLIDE_COUNT = 8;
@@ -8,4 +10,6 @@ export namespace CarouselKnobs {
     export const DELAY_STEP_MS = 500;
     export const STARTING_DELAY_MS = 2000;
     export const STARTING_IS_DISABLED = false;
+    export const STARTING_PLACEMENT: CarouselPlacements.SampleKey = "coverFlow";
+    export const RING_LAP_MS = 12_000;
 }

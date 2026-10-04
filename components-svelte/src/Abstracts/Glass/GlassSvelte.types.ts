@@ -1,4 +1,4 @@
-import type { GlassDefs } from "@thewaver/ss-components";
+import type { GlassDefs, PointSource } from "@thewaver/ss-components";
 import type { Size2d } from "@thewaver/ss-utils";
 
 export type GlassSheenFilterProps = {
@@ -10,4 +10,6 @@ export type GlassSheenFilterProps = {
     size: Size2d;
     /** The glass description, filled out. */
     defs: GlassDefs;
+    /** The point the light follows in place of the pointer. Left out, or answering `undefined`, the pointer. */
+    getPointSource?: () => PointSource | undefined;
 };

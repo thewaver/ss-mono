@@ -1,17 +1,16 @@
 import { type SlotsType, computed, defineComponent, shallowRef, useId } from "vue";
 
 import {
+    FloaterStyles,
     RADIO_GROUP_DEFAULTS,
     type RadioGroupEntry,
-    type RadioGroupFloaterBounds,
     RadioGroupStyles,
     RadioGroupUtils,
 } from "@thewaver/ss-components";
 
-import { ElementFaderVueUtils } from "../../../Abstracts/ElementFader/ElementFaderVue.utils";
+import { FloaterVueUtils } from "../../../Abstracts/Floater/FloaterVue.utils";
 import { NavigatorVueUtils } from "../../../Abstracts/Navigator/NavigatorVue.utils";
 import { PlacementBox } from "../../../Primitives/PlacementBox/PlacementBox";
-import { watchAfterRender } from "../../../Utils/effectUtils";
 import { callSlot, declareProps, useTwoWay } from "../../../Utils/propUtils";
 import type { SlotsContext } from "../../../Utils/typeUtils";
 import { provideRadioGroupContext } from "./RadioGroup.context";
@@ -20,14 +19,14 @@ import type { RadioGroupProps, RadioGroupSlots } from "./RadioGroup.types";
 export const RadioGroup = defineComponent(
     <T,>(props: RadioGroupProps<T>, { slots }: SlotsContext<RadioGroupSlots>) => {
         const rootRef = shallowRef<HTMLDivElement>();
-        const floaterRef = shallowRef<HTMLDivElement>();
 
         const fallbackName = useId();
 
         const value = useTwoWay(props, "value");
 
         const entries = shallowRef<RadioGroupEntry[]>([]);
-        const measuredBounds = shallowRef<RadioGroupFloaterBounds>();
+        const hoveredEntry = shallowRef<RadioGroupEntry>();
+        const focusedEntry = shallowRef<RadioGroupEntry>();
 
         const getTransitionDurationMs = () => props.transitionDurationMs ?? RADIO_GROUP_DEFAULTS.transitionDurationMs;
 
@@ -40,38 +39,35 @@ export const RadioGroup = defineComponent(
         const rovingEntry = computed(() => RadioGroupUtils.computeRovingEntry(navigableEntries.value, value.value));
         const selectedEntry = computed(() => RadioGroupUtils.computeSelectedEntry(orderedEntries.value, value.value));
 
-        const floaterBounds = computed(() =>
-            RadioGroupUtils.computeFloaterBounds(
-                layout.value,
-                measuredBounds.value,
-                selectedEntry.value === undefined
-                    ? undefined
-                    : RadioGroupUtils.computePlacement(orderedEntries.value, layout.value, selectedEntry.value),
-            ),
+        const findEntry = (target: EventTarget | null) =>
+            target instanceof Node
+                ? orderedEntries.value.find((entry) => entry.getElementRef()?.parentElement?.contains(target) ?? false)
+                : undefined;
+
+        const useEntryFloater = (isEnabled: () => boolean, getEntry: () => RadioGroupEntry | undefined) =>
+            FloaterVueUtils.useFloater({
+                isEnabled,
+                container: () => (layout.value === undefined ? rootRef.value : undefined),
+                target: () => getEntry()?.getElementRef()?.offsetParent as HTMLElement | undefined,
+                layout,
+                placement: () => {
+                    const entry = getEntry();
+
+                    return entry === undefined
+                        ? undefined
+                        : RadioGroupUtils.computePlacement(orderedEntries.value, layout.value, entry);
+                },
+                transitionDurationMs: getTransitionDurationMs,
+            });
+
+        const selectionFloater = useEntryFloater(
+            () => slots.renderSelectionFloater !== undefined,
+            () => selectedEntry.value,
         );
 
-        const floaterFader = ElementFaderVueUtils.useFader(
-            () => selectedEntry.value !== undefined && floaterBounds.value !== undefined,
-            { transitionDurationMs: getTransitionDurationMs, ref: floaterRef },
-        );
-
-        watchAfterRender([floaterFader.isVisible], ([isVisible]) => {
-            if (isVisible) return;
-
-            measuredBounds.value = undefined;
-        });
-
-        watchAfterRender(
-            [() => slots.renderFloater !== undefined, layout, () => selectedEntry.value?.getElementRef()],
-            ([hasFloater, placedLayout, selectedElement]) => {
-                const root = rootRef.value;
-
-                if (!hasFloater || placedLayout !== undefined || !root || !selectedElement) return;
-
-                return RadioGroupUtils.observeSelectedBounds(root, selectedElement, (bounds) => {
-                    measuredBounds.value = bounds;
-                });
-            },
+        const highlightFloater = useEntryFloater(
+            () => slots.renderHighlightFloater !== undefined,
+            () => hoveredEntry.value ?? focusedEntry.value,
         );
 
         provideRadioGroupContext({
@@ -110,21 +106,27 @@ export const RadioGroup = defineComponent(
         return () => {
             const orientation = props.orientation ?? RADIO_GROUP_DEFAULTS.orientation;
             const transitionDurationMs = getTransitionDurationMs();
-            const bounds = floaterBounds.value;
 
-            const content = [
-                slots.renderFloater && floaterFader.isVisible.value && bounds && (
+            const renderFloater = (
+                floater: typeof selectionFloater,
+                renderContent: RadioGroupSlots["renderSelectionFloater"],
+            ) =>
+                floater.isRendered.value && (
                     <div
-                        ref={floaterRef}
-                        class={RadioGroupStyles.radioGroupFloater}
-                        style={{ ...bounds, transitionDuration: `${transitionDurationMs}ms` }}
+                        ref={floater.setRef}
+                        class={FloaterStyles.floater}
+                        style={{ ...floater.bounds.value, transitionDuration: `${transitionDurationMs}ms` }}
                     >
-                        {callSlot(slots.renderFloater, {
-                            visibilityTarget: floaterFader.transitionTarget.value,
+                        {callSlot(renderContent, {
+                            visibilityTarget: floater.visibilityTarget.value,
                             transitionDurationMs,
                         })}
                     </div>
-                ),
+                );
+
+            const content = [
+                renderFloater(highlightFloater, slots.renderHighlightFloater),
+                renderFloater(selectionFloater, slots.renderSelectionFloater),
                 slots.default?.(),
             ];
 
@@ -145,6 +147,18 @@ export const RadioGroup = defineComponent(
                     aria-required={props.isRequired || undefined}
                     aria-invalid={props.hasError || undefined}
                     onKeydown={handleKeyDown}
+                    onPointerover={(e) => {
+                        hoveredEntry.value = findEntry(e.target);
+                    }}
+                    onPointerleave={() => {
+                        hoveredEntry.value = undefined;
+                    }}
+                    onFocusin={(e) => {
+                        focusedEntry.value = findEntry(e.target);
+                    }}
+                    onFocusout={() => {
+                        focusedEntry.value = undefined;
+                    }}
                 >
                     {layout.value ? (
                         <PlacementBox layout={layout.value} computeEffect={props.computeEffect}>

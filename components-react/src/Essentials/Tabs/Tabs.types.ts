@@ -54,8 +54,17 @@ export type TabsProps<T> = {
     linkComponent?: ComponentType<TabLinkProps>;
     /** Draws the rail the tabs sit against. */
     renderGutter?: () => ReactNode;
-    /** Draws the marker that follows the selected tab. The fade is handed in rather than applied. */
-    renderFloater?: (visibilityTarget: 0 | 1, transitionDurationMs: number) => ReactNode;
+    /**
+     * Draws the marker that slides to the selected tab, behind it. The fade is handed in rather than applied: the
+     * marker fades out when nothing is selected and in when something is.
+     */
+    renderSelectionFloater?: (visibilityTarget: 0 | 1, transitionDurationMs: number) => ReactNode;
+    /**
+     * Draws the marker that slides to the tab under the pointer, or the one holding focus, behind it — a hover pill
+     * gliding along the strip. It fades out when neither is on a tab. Drawn under the selection's marker where both
+     * are given.
+     */
+    renderHighlightFloater?: (visibilityTarget: 0 | 1, transitionDurationMs: number) => ReactNode;
     /** The tabs, in the order they are shown. */
     tabs: Tab<T>[];
     /** Which tab is selected. It is the only thing that selects one; the strip never decides that for itself. */

@@ -99,7 +99,11 @@ const renderSweep = (id: string, angle: number, colors: SVGGradientColor[], swee
 
 const HandTrail = defineComponent(
     (props: HandTrailProps) => {
-        const { reading, isPointerPresent } = PointerTrackerVueUtils.usePointerReading(() => props.element);
+        const { reading, isPointerPresent } = PointerTrackerVueUtils.usePointerReading(
+            () => props.element,
+            false,
+            () => props.defs.getPointSource?.(),
+        );
         const frameMs = SVGDefsVueUtils.useFrameMs(clock);
         const stamps = [...NO_STAMPS];
         const motion: HandMotion = { lastAngle: undefined, lastTurnedMs: undefined, bornTick: undefined };

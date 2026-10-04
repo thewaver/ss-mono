@@ -57,6 +57,24 @@ export const Tooltip = (props: TooltipProps) => {
         },
     });
 
+    const [isGliding, setIsGliding] = useState(false);
+    const previousAnchorRef = useRef(props.anchorRef);
+    const glideRef = useLatest({ isVisible: fader.isVisible, transitionDurationMs });
+
+    useEffect(() => {
+        const previous = previousAnchorRef.current;
+
+        previousAnchorRef.current = props.anchorRef;
+
+        if (!props.anchorRef || !previous || previous === props.anchorRef || !glideRef.current.isVisible) return;
+
+        setIsGliding(true);
+
+        const settle = setTimeout(() => setIsGliding(false), glideRef.current.transitionDurationMs);
+
+        return () => clearTimeout(settle);
+    }, [props.anchorRef]);
+
     useEffect(
         () => (props.anchorRef && fader.isVisible ? TooltipUtils.describe(props.anchorRef, tooltipId) : undefined),
         [props.anchorRef, fader.isVisible, tooltipId],
@@ -67,6 +85,7 @@ export const Tooltip = (props: TooltipProps) => {
     const style: CSSProperties = {
         visibility: position ? "visible" : "hidden",
         transform: `translate(${position?.x ?? 0}px, ${position?.y ?? 0}px)`,
+        transition: isGliding ? TooltipUtils.getGlideTransition(transitionDurationMs) : undefined,
         zIndex,
         pointerEvents: isShown ? "auto" : "none",
         ...(assignInlineVars({

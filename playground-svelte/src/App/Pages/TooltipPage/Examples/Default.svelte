@@ -25,7 +25,7 @@
         skipDelayWindowMs={props.skipDelayWindowMs}
     >
         {#snippet renderContent(visibilityTarget, transitionDurationMs)}
-            <PageTooltipContent {visibilityTarget} {transitionDurationMs}>
+            <PageTooltipContent {visibilityTarget} {transitionDurationMs} reveal={props.reveal}>
                 Moves the thread out of the inbox.
             </PageTooltipContent>
         {/snippet}

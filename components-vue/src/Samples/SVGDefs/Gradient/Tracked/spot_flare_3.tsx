@@ -79,7 +79,11 @@ const computeGhostColors = (ghost: FlareGhost, color: string, fade: number, opts
 
 const FlareSpot = defineComponent(
     (props: FlarePartProps) => {
-        const { reading } = PointerTrackerVueUtils.usePointerReading(() => props.element);
+        const { reading } = PointerTrackerVueUtils.usePointerReading(
+            () => props.element,
+            false,
+            () => props.defs.getPointSource?.(),
+        );
 
         return () => {
             const color = props.defs.colors.primary;
@@ -109,7 +113,11 @@ const FlareSpot = defineComponent(
 
 const FlareGhostGradient = defineComponent(
     (props: FlareGhostProps) => {
-        const { reading, isPointerPresent } = PointerTrackerVueUtils.usePointerReading(() => props.element);
+        const { reading, isPointerPresent } = PointerTrackerVueUtils.usePointerReading(
+            () => props.element,
+            false,
+            () => props.defs.getPointSource?.(),
+        );
 
         return () => {
             const ratio = reading.value.boxRatio;

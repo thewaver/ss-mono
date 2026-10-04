@@ -1,7 +1,19 @@
-import { For, Show, createEffect, createMemo, createSignal, createUniqueId, onCleanup, onMount } from "solid-js";
+import {
+    For,
+    Show,
+    createEffect,
+    createMemo,
+    createSignal,
+    createUniqueId,
+    onCleanup,
+    onMount,
+    untrack,
+} from "solid-js";
 import type { ParentProps } from "solid-js";
 
 import {
+    LetterDriverStyles,
+    LetterDriverUtils,
     type LetterRegistration,
     PAINTED_TEXT_DEFAULTS,
     type PaintedTextLetter,
@@ -36,10 +48,20 @@ export const PaintedText = (props: ParentProps<PaintedTextProps>) => {
     const [getLayoutRef, setLayoutRef] = createSignal<HTMLElement>();
     const [getRegistration, setRegistration] = createSignal<LetterRegistration>();
 
+    const getComputePushingAnimationName = () => {
+        const computeName = driver?.getComputePushingAnimationName?.();
+
+        if (!computeName || !driver) return undefined;
+
+        return (character: string, index: number) =>
+            computeName(character, getOffset() + index, driver.registry.get().characters.length);
+    };
+
     const layout = PaintedTextUtils.createLayout({
         getSource: getSourceRef,
         getLayoutHost: getLayoutRef,
         getIsMeasuringLetters: () => !!driver,
+        getComputePushingAnimationName: () => untrack(getComputePushingAnimationName),
     });
 
     const getRuns = accessStore(layout, (state) => state.runs);
@@ -47,6 +69,8 @@ export const PaintedText = (props: ParentProps<PaintedTextProps>) => {
     const getAtomics = accessStore(layout, (state) => state.atomics);
 
     const getLetters = accessStore(layout, (state) => state.letters);
+
+    const getRestLetters = accessStore(layout, (state) => state.restLetters);
 
     const getWidth = accessStore(layout, (state) => state.width ?? 0);
 
@@ -95,7 +119,10 @@ export const PaintedText = (props: ParentProps<PaintedTextProps>) => {
 
     const getLetterStyle = (localIndex: number) =>
         driver && getIsPerLetter()
-            ? PaintedTextUtils.computeLetterStyle(driver.getLetterState(getOffset() + localIndex))
+            ? PaintedTextUtils.computeLetterStyle(
+                  driver.getLetterState(getOffset() + localIndex),
+                  LetterDriverStyles.letterDriverTimeVar,
+              )
             : EMPTY_STYLE;
 
     const getCaretBox = createMemo(() => {
@@ -147,7 +174,7 @@ export const PaintedText = (props: ParentProps<PaintedTextProps>) => {
 
     const renderRuns = (isReadable: boolean) => <For each={getRuns()}>{(run) => renderRun(run, isReadable)}</For>;
 
-    const renderLetter = (letter: PaintedTextLetter, localIndex: number, isReporting: boolean) => {
+    const renderLetter = (letter: PaintedTextLetter, localIndex: number) => {
         const getState = () => driver?.getLetterState(getOffset() + localIndex);
         const getGlyph = () => getState()?.glyph;
 
@@ -158,24 +185,15 @@ export const PaintedText = (props: ParentProps<PaintedTextProps>) => {
                 y={letter.baseline}
                 text-anchor={getGlyph() ? "middle" : undefined}
                 style={{ ...getRuns()[letter.runIndex ?? 0]?.style, ...getLetterStyle(localIndex) }}
-                onAnimationStart={
-                    isReporting
-                        ? (event) => {
-                              if (event.target === event.currentTarget) {
-                                  driver?.reportLetterStart?.(getOffset() + localIndex);
-                              }
-                          }
-                        : undefined
-                }
             >
                 {getGlyph() ?? letter.character}
             </text>
         );
     };
 
-    const renderLetters = (isReporting: boolean) => (
+    const renderLetters = () => (
         <For each={getLetters()}>
-            {(letter, getIndex) => letter.kind === "text" && renderLetter(letter, getIndex(), isReporting)}
+            {(letter, getIndex) => letter.kind === "text" && renderLetter(letter, getIndex())}
         </For>
     );
 
@@ -193,7 +211,7 @@ export const PaintedText = (props: ParentProps<PaintedTextProps>) => {
             }
         >
             <g {...getAttributes()} aria-hidden="true">
-                {renderLetters(isReadable)}
+                {renderLetters()}
             </g>
         </Show>
     );
@@ -230,6 +248,32 @@ export const PaintedText = (props: ParentProps<PaintedTextProps>) => {
     });
 
     createEffect(() => getRegistration()?.setCharacters(getLetters().map((letter) => letter.character)));
+
+    createEffect(() =>
+        getRegistration()?.setBoxes(
+            getRestLetters().map((letter) => ({
+                x: letter.x,
+                y: letter.top,
+                width: letter.width,
+                height: letter.height,
+            })),
+        ),
+    );
+
+    createEffect(() => {
+        if (!driver?.getComputePushingAnimationName) return;
+
+        const offset = getOffset();
+        const styles = getRestLetters().map((_, index) => {
+            const animation = driver.getLetterState(offset + index).animation;
+
+            return animation
+                ? LetterDriverUtils.computeAnimationStyle(animation, LetterDriverStyles.letterDriverTimeVar)
+                : undefined;
+        });
+
+        layout.relayout(styles);
+    });
 
     return (
         <div ref={setRootRef} class={styles.paintedTextRoot}>

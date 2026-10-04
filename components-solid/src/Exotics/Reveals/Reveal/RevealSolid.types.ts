@@ -1,5 +1,6 @@
 import type { JSX } from "solid-js";
 
+import type { PointSource } from "@thewaver/ss-components";
 import type { Point2d, Size2d } from "@thewaver/ss-utils";
 
 import type { AccessorProps } from "../../../Utils/typeUtils";
@@ -24,6 +25,15 @@ export type RevealProps = AccessorProps<{
     stepSize?: number;
     /** Stops the window following the pointer or the keyboard, leaving what is underneath covered. */
     isDisabled?: boolean;
+    /**
+     * The point to follow instead of the pointer.
+     *
+     * A fraction across a box — the reveal's own, or the element named in the source — so a light moving
+     * across a banner can be handed to every card under it and each answers to the same spot. While the source has
+     * no point the window closes, as it does when the pointer leaves the window. Left out, the pointer is
+     * followed.
+     */
+    pointSource?: PointSource;
     /**
      * Names the reveal for assistive technology. It is required because the reveal is focusable, and a focusable
      * element with no name is announced as nothing at all.

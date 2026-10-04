@@ -14,9 +14,9 @@ const TINT_GRADIENT_ANGLE = 45;
 export const PageTooltipContent = (props: ParentProps<TooltipContentProps>) => {
     return (
         <div
-            class={styles.tooltipVisibility}
+            class={[styles.tooltipVisibility, styles.tooltipRevealVariants[access(props.reveal) ?? "fade"]].join(" ")}
             classList={{ [styles.isVisible]: access(props.visibilityTarget) === 1 }}
-            style={{ transition: `opacity ${access(props.transitionDurationMs)}ms` }}
+            style={{ "transition-duration": `${access(props.transitionDurationMs)}ms` }}
         >
             <GlassSurface
                 borderRadii={() => CSSUtils.spreadRadius(BORDER_RADIUS_FULL)}

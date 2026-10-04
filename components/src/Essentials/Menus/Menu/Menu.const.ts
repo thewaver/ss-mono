@@ -10,4 +10,5 @@ export const MENU_DEFAULTS = {
     submenuMode: "cascade" as MenuSubmenuMode,
     submenuOpensOn: "hover" as MenuSubmenuTrigger,
     triggerRole: "button" as MenuTriggerRole,
+    floaterTransitionDurationMs: 150,
 };

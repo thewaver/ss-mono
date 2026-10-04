@@ -1,16 +1,20 @@
 <script lang="ts" generics="T">
-    import { untrack } from "svelte";
+    import { type Snippet, untrack } from "svelte";
     import { on } from "svelte/events";
+    import { SvelteMap } from "svelte/reactivity";
 
     import {
         FlattenerUtils,
+        FloaterStyles as floaterStyles,
         type InteractionFlags,
+        TREE_DEFAULTS,
         type TreeNodeRenderProps,
         TreeUtils,
         TypeaheadUtils,
         TreeStyles as styles,
     } from "@thewaver/ss-components";
 
+    import { FloaterSvelteUtils } from "../../Abstracts/Floater/FloaterSvelte.utils.svelte.js";
     import { NavigatorSvelteUtils } from "../../Abstracts/Navigator/NavigatorSvelte.utils.svelte.js";
     import { TypeaheadSvelteUtils } from "../../Abstracts/Typeahead/TypeaheadSvelte.utils.svelte.js";
     import { VirtualizerSvelteUtils } from "../../Abstracts/Virtualizer/VirtualizerSvelte.utils.svelte.js";
@@ -19,6 +23,7 @@
     import PlacementItem from "../../Primitives/PlacementItem/PlacementItem.svelte";
     import { createHeldValue } from "../../Utils/bindableUtils.svelte.js";
     import { watchChange } from "../../Utils/effectUtils.svelte.js";
+    import { toStyle } from "../../Utils/styleUtils.js";
     import type { TreeProps, TreeRow } from "./Tree.types.js";
     import TreeNodeItem from "./TreeNodeItem.svelte";
 
@@ -207,8 +212,64 @@
         if (action.kind === "click") document.getElementById(getRowId(action.row))?.click();
     };
 
+    const nodeRefs = new SvelteMap<T, HTMLElement>();
+
+    let hoveredValue = $state.raw<T>();
+    let focusInValue = $state.raw<T>();
+
+    const recordNodeRef = (nodeValue: T, element: HTMLElement) => {
+        untrack(() => nodeRefs.set(nodeValue, element));
+
+        return () => {
+            if (untrack(() => nodeRefs.get(nodeValue)) === element) nodeRefs.delete(nodeValue);
+        };
+    };
+
+    const floaterTransitionDurationMs = $derived(
+        props.floaterTransitionDurationMs ?? TREE_DEFAULTS.floaterTransitionDurationMs,
+    );
+
+    const createFloater = (getIsEnabled: () => boolean, getFloaterValue: () => T | undefined) => {
+        const getRow = () => {
+            const floaterValue = getFloaterValue();
+
+            return floaterValue === undefined ? undefined : flatRows.find((row) => row.node.value === floaterValue);
+        };
+
+        return FloaterSvelteUtils.create({
+            getIsEnabled,
+            getContainer: () => (isVirtualized ? (sizer ?? undefined) : (root ?? undefined)),
+            getTarget: () => {
+                const row = getRow();
+
+                return row === undefined ? undefined : nodeRefs.get(row.node.value);
+            },
+            getLayout: () => layout,
+            getPlacement: () => {
+                const row = getRow();
+
+                return row === undefined ? undefined : layout?.placements[row.index];
+            },
+            getTransitionDurationMs: () => floaterTransitionDurationMs,
+        });
+    };
+
+    const selectionFloater = createFloater(
+        () => props.renderSelectionFloater !== undefined,
+        () => getValue(),
+    );
+
+    const highlightFloater = createFloater(
+        () => props.renderHighlightFloater !== undefined,
+        () => hoveredValue ?? focusInValue,
+    );
+
+    const findRowByTarget = (target: EventTarget | null) =>
+        target instanceof Element ? findRowById(target.closest('[role="treeitem"]')?.id) : undefined;
+
     const handleFocusIn = (e: FocusEvent) => {
         lastFocusedValue = findRowById((e.target as HTMLElement).id)?.node.value;
+        focusInValue = findRowByTarget(e.target)?.node.value;
     };
 
     const hasPendingPaint = (row: TreeRow<T>) =>
@@ -238,7 +299,15 @@
                 {/snippet}
 
                 <TreeNodeItem
-                    {attachElement}
+                    attachElement={(element) => {
+                        const detach = attachElement(element);
+                        const forget = recordNodeRef(row.node.value, element);
+
+                        return () => {
+                            detach?.();
+                            forget();
+                        };
+                    }}
                     id={getRowId(row)}
                     href={row.node.href}
                     level={row.depth + 1}
@@ -276,9 +345,31 @@
     {/each}
 {/snippet}
 
+{#snippet floaterView(
+    floater: ReturnType<typeof createFloater>,
+    renderContent: Snippet<[visibilityTarget: 0 | 1, transitionDurationMs: number]> | undefined,
+)}
+    {#if floater.getIsRendered()}
+        <div
+            {@attach floater.attachRef}
+            class={floaterStyles.floater}
+            style={toStyle(floater.getBounds(), { transitionDuration: `${floaterTransitionDurationMs}ms` })}
+        >
+            {@render renderContent?.(floater.getVisibilityTarget(), floaterTransitionDurationMs)}
+        </div>
+    {/if}
+{/snippet}
+
+{#snippet floaters()}
+    {@render floaterView(highlightFloater, props.renderHighlightFloater)}
+    {@render floaterView(selectionFloater, props.renderSelectionFloater)}
+{/snippet}
+
 {#snippet tiers()}
     {#if isVirtualized}
         <div bind:this={sizer} class={styles.treeSizer} style:height={`${rowWindow.getTotalSize()}px`}>
+            {@render floaters()}
+
             {#each rowWindow.getRows() as windowRow (windowRow.index)}
                 {@const row = flatRows[windowRow.index]}
                 {#if row}
@@ -297,6 +388,10 @@
             {/each}
         </div>
     {:else}
+        {#if !layout}
+            {@render floaters()}
+        {/if}
+
         {@render renderRows(rows)}
     {/if}
 {/snippet}
@@ -304,9 +399,21 @@
 <div
     bind:this={root}
     {@attach (element) => on(element, "keydown", handleKeyDown)}
+    {@attach (element) =>
+        on(element, "pointerover", (e) => {
+            hoveredValue = findRowByTarget(e.target)?.node.value;
+        })}
+    {@attach (element) =>
+        on(element, "pointerleave", () => {
+            hoveredValue = undefined;
+        })}
+    class={styles.treeRoot}
     role="tree"
     aria-label={props.ariaLabel}
     onfocusin={handleFocusIn}
+    onfocusout={() => {
+        focusInValue = undefined;
+    }}
 >
     {#if layout}
         <PlacementBox {layout} computeEffect={props.computeEffect}>

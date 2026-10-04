@@ -41,38 +41,26 @@ reading.
 7. `Toasts` — one thing deliberately not built — _open_
 8. `Calendar` — two things deliberately not built — _open_
 9. `ColorInput` — two things deliberately not built — _open_
-10. `Accordion` in a row — _decided, not yet built_
-11. `Tabs` — a pairing the consumer can still skip — _open_
-12. `Viewport` as a region: what is settled and what is not — _open_
-13. `Tree` — two things deliberately not built — _open_
-14. `SlideButton` — three things deliberately not built — _open_
-15. `Spotlight` — one thing deliberately not built — _open_
-16. `Scroller` — four things deliberately not built — _open_
-17. `Paginator` — four things deliberately not built — _open_
-18. The carousels — four things deliberately not built — _open_
-19. The four components ported from React — what did not settle — _open_
-20. An anchored layer trails its anchor during a scroll — _postponed until the platform catches up_
-21. `Table` — six things deliberately not built — _open_
-22. `Timeline` — the pointer routes the library cannot promise — _open_
-23. `GlassSurface` — what is built and what is not — _open, one item postponed until the platform catches up_
-24. Arbitrary placement across controls, and the picking that has to come with it — _open_
-25. The scanline page is twelve examples of one example — _open_
-26. Components that turn under perspective reserve room they do not need at rest — _open_
-27. `CardStack` — the pointer route the library cannot promise — _open_
-28. The submit story — what a native submit carries, and what `Form` hands `onSubmit` — _pending decision_
-29. Work that has never been watched running — _open_
-30. Choices the add-ons round made on the user's behalf — _pending decision_
-31. `Typewriter` driven from outside, and an animation per letter — _decided, not yet built_
-32. `ProximityText` — _decided, not yet built_
-33. A point source for everything that follows the pointer — _decided, not yet built_
-34. `Carousel`: one component, with how a slide sits as a sample — _decided, not yet built_
-35. `Wraparound` — _decided, not yet built_
-36. A pixel trail for the tracked patterns — _decided, not yet built_
-37. A pixelate filter — _decided, not yet built_
-38. The Tooltip page: a picker for how it appears — _decided, not yet built_
-39. Floaters become an `Abstract`, and follow the highlight as well as the selection — _decided, not yet built_
-40. Two new families of tracked gradients: ribbons and a swarm — _decided, not yet built_
-41. Two Playground examples from React Bits — _decided, not yet built_
+10. `Tabs` — a pairing the consumer can still skip — _open_
+11. `Viewport` as a region: what is settled and what is not — _open_
+12. `Tree` — two things deliberately not built — _open_
+13. `SlideButton` — three things deliberately not built — _open_
+14. `Spotlight` — one thing deliberately not built — _open_
+15. `Scroller` — four things deliberately not built — _open_
+16. `Paginator` — four things deliberately not built — _open_
+17. `Carousel` — three things deliberately not built — _open_
+18. The four components ported from React — what did not settle — _open_
+19. An anchored layer trails its anchor during a scroll — _postponed until the platform catches up_
+20. `Table` — six things deliberately not built — _open_
+21. `Timeline` — the pointer routes the library cannot promise — _open_
+22. `GlassSurface` — what is built and what is not — _open, one item postponed until the platform catches up_
+23. Arbitrary placement across controls, and the picking that has to come with it — _open_
+24. The scanline page is twelve examples of one example — _open_
+25. Components that turn under perspective reserve room they do not need at rest — _open_
+26. `CardStack` — the pointer route the library cannot promise — _open_
+27. The submit story — what a native submit carries, and what `Form` hands `onSubmit` — _pending decision_
+28. Work that has never been watched running — _open_
+29. Choices the add-ons round made on the user's behalf — _pending decision_
 
 ### Build order
 
@@ -219,7 +207,7 @@ gaps, each with the reason it is still a gap.
 `Essentials/Input` covers `TextInput`, `TextArea`, `NumberInput`, `CurrencyInput`, `Checkbox`, `Toggle`, `Radio`,
 `RadioGroup`, `Select`, `MultiSelect`, `FileInput`, `ColorInput`, `Label`, `Calendar`, `DateInput`,
 `DatePicker`, `TagInput` and `TimeInput`; `Essentials` adds `Accordion`, `Breadcrumbs`, `Button`,
-`TrackCarousel`, `DrumCarousel`, `FlipCard`,
+`Carousel`, `FlipCard`,
 `SlideButton`, `Scroller`, `Paginator`, `Sortable`, `SplitPane`, `Stepper`, `Tabs`, `Toolbar`, `Tooltip`, `Popover`, `Menu`, `Modal`, `Drawer`, `Progress`,
 `Range`, `Toasts` and `Tree`.
 Beyond the date and time family, this is what is missing. **The order below is the user's, taken on 2026-08-15 after reading a
@@ -577,44 +565,7 @@ every other layer and takes a `visibility` prop like every other popup; both are
 
 ---
 
-## 10. `Accordion` in a row — _decided, not yet built_
-
-The decisions behind what exists are in `decisions.md` under _"Controls: `Accordion`, and where
-auto-height measurement lives"_ and _"A panel built on first expansion"_.
-
-Asked for by the user from Made With GSAP's two-way accordion panels
-([tutorial 109](https://madewithgsap.com/effects/tutorial109)): a row of panels, one open and the others
-collapsed into narrow strips carrying a rotated label, with the opening panel's content sliding in from the
-side the person came from. It arrived among a set of carousels and was placed here instead, because everything
-it needs except the direction is already `Accordion`'s: one open at a time, the headers and the keyboard.
-
-- **A direction for the whole accordion**, so the panels sit in a row and the panel box animates its width
-  rather than its height. Today the box only ever animates `height`; the row needs the height observer's twin
-  for width, and a direction prop. The arrow keys that move between headers follow the direction.
-- **Which side the change came from is handed to the consumer** beside the visibility target `renderPanel`
-  already receives, so the content can slide in from the left when the person moved left and from the right
-  when they moved right. The motion stays the consumer's, as it already is.
-- **"Always one open" is `isSingleExpand` with `isExpandRequired`**, both of which exist; the example sets both.
-- **The rotated label in a collapsed strip is the consumer's painting**, shown in the Accordion page's example
-  rather than built into the component.
-
-**_Elsewhere._**
-
-- **React Aria's `DisclosureGroup` keeps the panel in the DOM** but uses `hidden="until-found"` where
-  supported, so find-in-page can reveal a collapsed section. That is the one thing the built panel does not
-  do, and it is orthogonal to whether the content is there — worth knowing if a collapsed section ever needs
-  to be findable.
-- **A horizontal accordion is an `orientation` prop plus a second CSS variable.** Radix's
-  `orientation="horizontal"` swaps the arrow-key axis and exposes the content _width_ beside the height,
-  which is the direction prop this bullet describes, with the measurement doubled rather than generalized.
-- **"Always exactly one open" is the default elsewhere, and the second state is a second boolean.**
-  Radix's `type="single"` _requires_ one item to stay expanded; `collapsible`, default `false`, is what
-  permits zero. Built here as `isExpandRequired` beside `isSingleExpand` — two booleans, as there, rather
-  than a third state on the first prop.
-
----
-
-## 11. `Tabs` — a pairing the consumer can still skip
+## 10. `Tabs` — a pairing the consumer can still skip
 
 The decisions behind what exists are in `decisions.md` under _"Controls: `Tabs` as records"_ and
 _"`TabPanel`: the pairing is written on the record"_.
@@ -641,7 +592,7 @@ _"`TabPanel`: the pairing is written on the record"_.
 
 ---
 
-## 12. `Viewport` as a region: what is settled and what is not
+## 11. `Viewport` as a region: what is settled and what is not
 
 A viewport now fits its design size into the box the page gives it, clips everything inside it, and keeps
 its own layers within its own bounds; see `decisions.md`. `ViewportWrapperPage` is two 400px squares — a control
@@ -653,14 +604,14 @@ inside a nested viewport stays inside it. What is left:
   box, so a container with no height gives it a zero-sized region and it renders nothing visible. A warning
   would be the obvious kindness; whether the library should warn at all is the same question `Label` already
   answered for itself, and it went the other way.
-- **A fast scroll can still show a frame of drift — see item 20**, which now holds it. It is not a
+- **A fast scroll can still show a frame of drift — see item 19**, which now holds it. It is not a
   `Viewport` fault: the same frame is lost by every anchored layer on the page, and the scrolled anchor here
   is only where it is easiest to see. `viewport.spec.ts` asserts the layer lands exactly on its anchor once
   the scroll settles, which is what a spec can see.
 
 ---
 
-## 13. `Tree` — two things deliberately not built
+## 12. `Tree` — two things deliberately not built
 
 The decisions behind what exists are in `decisions.md` under _"Controls: `Tree`, and the group box that
 could not be a child"_. These are the gaps, each with the reason it is still one.
@@ -716,7 +667,7 @@ that collapsed on the spot would be holding focus itself.
 
 ---
 
-## 14. `SlideButton` — three things deliberately not built
+## 13. `SlideButton` — three things deliberately not built
 
 The decisions behind what exists are in `decisions.md` under _"Controls: `SlideButton`, and why the gesture
 is the only thing it owns"_, including which WCAG criteria were read and what they decided. These are the
@@ -759,7 +710,7 @@ gaps, each with the reason it is still one.
 
 ---
 
-## 15. `Spotlight` — one thing deliberately not built
+## 14. `Spotlight` — one thing deliberately not built
 
 The decisions behind what exists are in `decisions.md` under _"Controls: `Spotlight`, and three presets
 because a mode cannot move at runtime"_. These are the gaps, each with the reason it is still one.
@@ -772,7 +723,7 @@ because a mode cannot move at runtime"_. These are the gaps, each with the reaso
 
 ---
 
-## 16. `Scroller` — four things deliberately not built
+## 15. `Scroller` — four things deliberately not built
 
 The decisions behind what exists are in `decisions.md` under _"Controls: `Scroller`, and why it renders no
 button of its own"_. These are the gaps, each with the reason it is still one.
@@ -798,7 +749,7 @@ button of its own"_. These are the gaps, each with the reason it is still one.
 
 ---
 
-## 17. `Paginator` — four things deliberately not built
+## 16. `Paginator` — four things deliberately not built
 
 The decisions behind what exists are in `decisions.md` under _"Controls: `Paginator`, where the arithmetic
 is the component"_. These are the gaps, each with the reason it is still one.
@@ -821,37 +772,30 @@ is the component"_. These are the gaps, each with the reason it is still one.
 
 ---
 
-## 18. The carousels — four things deliberately not built
+## 17. `Carousel` — three things deliberately not built
 
 The decisions behind what exists are in `decisions.md` under _"Controls: `Carousel`, and the first component
-that acts without being asked"_ and _"`TrackCarousel` and `DrumCarousel`: one behavior, two ways of showing
-it"_. These are the gaps, each with the reason it is still one. They are the shared shell's, so both presets
-have them unless the entry says otherwise.
+that acts without being asked"_ and _"`Carousel`: one component, and how a slide sits is a placement rule"_. These
+are the gaps, each with the reason it is still one.
 
-- **One slide at a time; a page of several is not built.** The description this came from allowed either, and
-  one slide is the reading with a published pattern behind it. A page of several needs the arithmetic to start
-  asking how many fit, which is `Scroller`'s question and the boundary the two were separated along. Building
-  it would also make the picker ambiguous — a dot per slide or a dot per page — and that is a design question
-  rather than a missing line.
+- **One slide is current at a time; a page of several is not built.** A placement can show several slides at once,
+  but only one is ever the current one — the one the controls step from, the one announced, the one not `inert`. A
+  page of several current slides needs the arithmetic to start asking how many fit, which is `Scroller`'s question
+  and the boundary the two were separated along. Building it would also make the picker ambiguous — a dot per slide
+  or a dot per page — and that is a design question rather than a missing line.
 - **The keyboard is whatever the controls are.** There is no arrow-key handling on the region, so a carousel
   rendered with no `renderControls` has no keyboard route at all. The published pattern puts the arrows on the
   buttons rather than on the region, so this matches it — but a consumer who skips the controls gets a control
   a keyboard cannot move, which is worth knowing before it is called a bug.
-- **The motion is the library's; a fade is not expressible.** A track slides and a drum turns, and neither
-  can be swapped for anything else — the library owns the transform, so a consumer cannot
-  make one slide dissolve into the next. `ImageSwitcher` is the component that already does that for a single
-  image, and the two would be one only if the motion became the consumer's — which would mean handing out a
-  visibility target per slide, the way `Tabs`' floater now does. That is a real design, not an oversight, and
-  nothing has asked for it.
 - **Every slide is built, always.** All of them are in the document from the first render, `inert` and hidden
-  when away. This is `Accordion`'s trade rather than `Tree`'s, and here it is forced rather than chosen: the
-  track has to be as wide as the slides to translate across them, and a drum has a face for each. A carousel of
-  a hundred expensive slides builds all hundred — two hundred elements on a drum, which prints a back for each
-  face — and windowing it is the same boundary `Select` and `Tree` already record.
+  when away, and every one is placed by the rule on every frame the carousel moves. This is `Accordion`'s trade
+  rather than `Tree`'s: a placement can show any slide at any distance, so none can be left out without asking the
+  rule first. A carousel of a hundred expensive slides builds all hundred, two hundred elements with backs, and
+  windowing it is the same boundary `Select` and `Tree` already record.
 
 ---
 
-## 19. The four components ported from React — what did not settle
+## 18. The four components ported from React — what did not settle
 
 `Satellite`, `Staircase`, `Formation`, `OverheadWheel` and `DrumWheel` came in from a React codebase; what the port
 settled is in `decisions.md`. What did not settle is below, and both entries are decisions taken rather than
@@ -894,7 +838,7 @@ pressable until it opts back in with `pointer-events: auto`.
 
 **An overhead wheel has one slot for its controls and it is the hub, chosen by the user over two alternatives.** A
 drum's controls sit under the barrel; an overhead wheel's sit in the middle of it, and there is no second slot. The
-cost is the one item 16 already records for `Scroller`: a consumer who wants the control somewhere else renders
+cost is the one item 15 already records for `Scroller`: a consumer who wants the control somewhere else renders
 their own button, and a library that renders no button cannot promise it is named or reachable. The two
 alternatives were a second slot beneath the wheel, rejected because the overhead wheel is a square and anything
 under it changes the box it reserves, and a slot with a position prop, rejected because `Toasts` had already
@@ -902,7 +846,7 @@ settled that a component does not fully delegate position. Recorded so it is not
 
 ---
 
-## 20. An anchored layer trails its anchor during a scroll — _postponed until the platform catches up_
+## 19. An anchored layer trails its anchor during a scroll — _postponed until the platform catches up_
 
 **While something is moving, the position an anchored layer paints at is the position its anchor was in one
 frame ago.** At rest the last frame catches up, so it looks settled and only moves when something else does.
@@ -988,7 +932,7 @@ neither was tried.
 
 ---
 
-## 21. `Table` — six things deliberately not built
+## 20. `Table` — six things deliberately not built
 
 The decisions behind what exists are in `decisions.md` under _"Controls: `Table`, a grid rather than a
 table, and why the markup could not be `<table>`"_. These are the gaps, each with the reason it is still one.
@@ -1014,7 +958,7 @@ _Accepted limits_ instead.
 
 ---
 
-## 22. `Timeline` — the pointer routes the library cannot promise
+## 21. `Timeline` — the pointer routes the library cannot promise
 
 The component takes the gestures itself: a drag moves the window, the wheel and a pinch zoom it, and both can
 be switched off. The reasoning, the evidence for the wheel behaving as it does and the press-versus-drag rule
@@ -1039,7 +983,7 @@ are in `decisions.md` under _"`Timeline`: a window over a range"_. What is outst
 
 ---
 
-## 23. `GlassSurface` — what is built and what is not
+## 22. `GlassSurface` — what is built and what is not
 
 The component is built and works: two backdrop layers, the tint, and a specular sheen that follows the
 pointer, with a draggable pane on its page. `GlassDefs` names the four groups of settings, and the ripple and
@@ -1073,7 +1017,7 @@ what decides visibility by design, so the page not being in the menu is not a ga
 
 ---
 
-## 24. Arbitrary placement across controls, and the picking that has to come with it
+## 23. Arbitrary placement across controls, and the picking that has to come with it
 
 **The user's proposal, and the direction the library is going next.** A control's items should be placeable
 anywhere rather than only along a line: a `Menu` as a closed ring or a wide fan; a `Paginator` drawn
@@ -1163,7 +1107,7 @@ is what turned up the origin-placed item it scored as pointing due east.
 
 ---
 
-## 25. The scanline page is twelve examples of one example
+## 24. The scanline page is twelve examples of one example
 
 **The user's aside when the per-sample defs work was proposed, promoted to an item by them once that work
 closed.** The page should stop being a gallery of entries and become a single example with knobs that follow
@@ -1185,7 +1129,7 @@ actually need designing.
 
 **Nothing is blocked on it** and the shape of the picker has not been argued.
 
-## 26. Components that turn under perspective reserve room they do not need at rest
+## 25. Components that turn under perspective reserve room they do not need at rest
 
 **The user's rule, given while settling how `CardStack` is sized.** A component that turns a face towards the
 viewer is drawn larger on its near side than it really is, so it spills past its own box part-way through a
@@ -1208,7 +1152,7 @@ does not ask for the reservation has not been argued.
 **Which other components are affected has not been checked.** The pass is to go through everything that
 animates a perspective transform and take out the adjustments that only motion needs.
 
-## 27. `CardStack` — the pointer route the library cannot promise
+## 26. `CardStack` — the pointer route the library cannot promise
 
 **The same gap `Timeline` and `Scroller` already carry, and it arrived with the component.** A card is sent by
 a swipe, which is both a path-based gesture and a drag, so **2.5.1 Pointer Gestures** (Level A) and **2.5.7
@@ -1227,7 +1171,7 @@ a consumer cannot ask for the gesture without also supplying the route. That tri
 that draws the controls itself, which the user ruled this one must not. The Playground's deck is what
 discharging it looks like: four buttons beside the pile, each calling `send`.
 
-## 28. The submit story — what a native submit carries, and what `Form` hands `onSubmit`
+## 27. The submit story — what a native submit carries, and what `Form` hands `onSubmit`
 
 Three findings from the survey against the reference libraries were lofted here rather than settled one by one,
 because they are one question. **The user's word: lofted, not discarded.**
@@ -1247,7 +1191,7 @@ who wants values takes. _"The form story"_ in `decisions.md` says the library ne
 that entry is what this item would revisit. Focus moving to the first field in error on submit was built
 separately and does not depend on this.
 
-## 29. Work that has never been watched running
+## 28. Work that has never been watched running
 
 Nothing here is known to be broken. Each of these was built and passes its checks, but has not been looked at
 the way the user asked for, or cannot be reached by a spec yet.
@@ -1266,7 +1210,7 @@ the way the user asked for, or cannot be reached by a spec yet.
   choose which edge, the arrows move it, Enter or Space drops it, and Escape puts it back. The glide settings on
   Formation and the mosaics start at 0, so nothing moves until the "Glide (ms)" knob is raised.
 
-## 30. Choices the add-ons round made on the user's behalf
+## 29. Choices the add-ons round made on the user's behalf
 
 The agents building the Exotics add-ons had to pick these to finish the work. Each is a working answer, and each
 is the user's to confirm or change.
@@ -1283,229 +1227,6 @@ is the user's to confirm or change.
   pass over. Both follow from making the pass scrubbable.
 - **Odometer reels under reduced motion drop only their extra turns.** Each reel keeps its own duration, so a
   slow reel still turns its one step slowly. Falling back to `turnDurationMs` there is the alternative.
-
-## 31. `Typewriter` driven from outside, and an animation per letter — _decided, not yet built_
-
-Two changes, both settled with the user while going through Made With GSAP's text effects and a scroll-lit
-paragraph on CodePen. Item 32 builds on both.
-
-**Driven from outside.** `Typewriter` gains `progress` and `playback`, in the shape `CellAnimation` and `Trail`
-already have. With playback on it runs as it does today and writes `progress` as it goes; with playback off,
-writing `progress` draws that moment of the run. Every letter's keyframes are held at the matching point, so a
-stop can fall partway through one letter's own animation.
-
-- **A paragraph whose words light up as it scrolls past** is `Typewriter` with playback off and its `progress`
-  taken from `ElementObserverSolidUtils.createViewportProgressObserver`. Seen at
-  [CodePen, iPhone 13 text highlight on scroll](https://codepen.io/stevenlei/pen/vYJyJyR).
-- **Karaoke** is the consumer turning a song's current time into progress; the timings are theirs. Because a
-  stop can fall inside a letter, a letter's own keyframes can sweep a fill across it.
-- **Letters not yet reached already show their animation's first frame**, since they carry
-  `animation-fill-mode: both`. A first frame at low opacity is the dimmed paragraph, so no second look for
-  waiting letters is needed.
-- **Two of Made With GSAP's text effects are this plus the per-letter animations below**: lines whose letters
-  fly outward as they reach the middle of the screen ([tutorial 112](https://madewithgsap.com/effects/tutorial112))
-  and letters settling into place as a sentence slides past
-  ([tutorial 011](https://madewithgsap.com/effects/tutorial011)). Lines tightening one at a time
-  ([tutorial 097](https://madewithgsap.com/effects/tutorial097)) is not covered: it works on whole lines, and
-  `Typewriter` has no notion of a line.
-
-**An animation per letter.** `animationName` is replaced by `computeAnimationName(character, index, count)`.
-The user's pick over keeping both props: a single animation is still written once, as a function returning
-the same name. It allows "every A plays this one", "odd letters rise from below", and with the count, "fly
-outward from the middle". Every letter already carries its own name underneath (`LetterAnimation.name`), so
-this only widens the prop. What an image or a line break passes as its character is to be settled against what
-the letter registry already holds for that slot.
-
-**What moves into `LetterDriver`.** Held keyframes, `computeAnimationName` and sizing each line for the widest
-frame (item 32) are needed by both drivers, so they are written once in the shared layer. The line sizing
-applies to `Typewriter` as soon as someone types with a keyframe that changes a letter's width.
-
-## 32. `ProximityText` — _decided, not yet built_
-
-Letters that react to how near a point is, the way `Typewriter`'s react to time. Seen at
-[Fancy Components, Variable Font Cursor Proximity](https://www.fancycomponents.dev/docs/components/text/variable-font-cursor-proximity),
-where a variable font thickens near the pointer; the user called that a "cool example" rather than the
-feature. Its moving-point form is Made With GSAP's weight wave
-([tutorial 079](https://madewithgsap.com/effects/tutorial079)), which needs item 33.
-
-- **A second driver over `LetterDriver`, not a mode of `Typewriter`.** The user's pick. The mechanism is shared —
-  every letter plays keyframes held at some point — and only what decides the point differs: time and order
-  for `Typewriter`, nearness here. Each one's own props mean nothing to the other (caret, erasing, arrival order
-  and the end-of-run callback against source, reach and falloff), which is why the wheels and the carousels are
-  presets over one base. The shared parts are lifted into `LetterDriver` (item 31).
-- **The effect is keyframes held at the strength.** The user's pick over two font-axis settings (Fancy
-  Components' `from` and `to`) and over a function from strength to styles. Each letter plays
-  `computeAnimationName`'s keyframes paused between 0, far away, and 1, under the point, and the browser blends
-  any property, font axes included. **The contract is that the last frame is the widest**: a keyframe widest
-  partway through would re-wrap lines, and the props documentation says so.
-- **Every line is sized for all its letters at the last frame**, so hovering never moves a line break. At rest
-  the spare room sits at the end of each line, and a growing letter really pushes the rest of its line along.
-  The user's design, over reserving room per letter (loose spacing at rest) or per word.
-- **Nearness is measured from where the letters sit at rest**, taken once and again on a layout change. A
-  letter pushed away by its neighbor's growth therefore does not weaken because of the push, and the effect
-  cannot feed back on itself — the rule `Proximity` already follows for the dock. The falloff is `Proximity`'s.
-- **The point comes from a source (item 33)**, the pointer by default.
-- **`PaintedText` inside works by the route `Typewriter` uses.** One part to check: `PaintedText` places each run
-  of text from an invisible HTML copy, so for a growing letter's push to carry past an image or a link into the
-  next run, the copy has to grow too and be measured again. Weigh that cost when building.
-- **Named by the user**, over `SwellText` and `NearText`: it is the one that stays true whatever the keyframes do.
-
-## 33. A point source for everything that follows the pointer — _decided, not yet built_
-
-Parked in _Open discussion_ until `ProximityText` needed it; the user then chose to settle it for every
-component that reads the pointer tracker at once.
-
-- **A source is a point given as a fraction across a box, `{ ratio, element? }`.** Without an element the
-  fraction is of each component's own box; with one, it is of that element, so a sun moving across a banner is
-  "this fraction of the banner", handed to every card under it. The tracker already re-measures on scroll, on
-  resize and inside a zoomed `Viewport`, so a supplied point keeps up with all three. The user's pick over screen
-  pixels, which would leave the conversion and every scroll to the consumer, and over each component's own box
-  only, which cannot share one point between several.
-- **The pointer stays the default**, converted inside the tracker. A source with no point is absent, which is
-  what the pointer's presence already means, and the component rests.
-- **Every reader of the tracker takes one except `ScratchCard`**: `ShadowCaster`, `LightCatcher`, `Tilter`,
-  `Reveal`, `ProximityText`, the proximity arrangements (`PlacementBox` and the wheels) and the tracked gradient
-  and pattern samples. The user's pick — "go big from the get-go" — over the followers alone and over leaving
-  the samples out, knowing the samples take their wiring through their own interface, which widens. Scratching
-  needs a press, and a supplied point has none.
-- **Sharing needs nothing new.** Every tracker already shares one set of document listeners and one pass per
-  frame, so several components share a source by being handed the same one.
-- **`smoothingMs` stays on each component**, for the reason _Open discussion_ recorded: smoothing what is drawn
-  rather than the reading is what lets the pointer leaving the window glide too.
-
-## 34. `Carousel`: one component, with how a slide sits as a sample — _decided, not yet built_
-
-From Made With GSAP's carousels, which the user judged to need one more abstraction before they could be
-expressed the way the rest of the library is. Published examples of the arrangements it has to reach: cover
-flow ([tutorial 114](https://madewithgsap.com/effects/tutorial114)), a depth wave
-([103](https://madewithgsap.com/effects/tutorial103)), cards bending along a cylinder
-([068](https://madewithgsap.com/effects/tutorial068)), a stack of folders whose front card goes to the back
-([045](https://madewithgsap.com/effects/tutorial045)), cards flipping down about their bottom edge
-([074](https://madewithgsap.com/effects/tutorial074)), and a ring that turns by itself and leans toward the
-pointer ([091](https://madewithgsap.com/effects/tutorial091), [061](https://madewithgsap.com/effects/tutorial061)).
-
-- **What was missing is a slide placed by its distance from the current one**, counted in slides, fractional
-  while moving, and measured the short way round when looping. A placement rule takes that distance and
-  answers in `Proximity` effects' vocabulary: transforms and filters, opacity among them.
-- **The shared base becomes public as `Carousel`, with the rule as a required prop.** `TrackCarousel` and
-  `DrumCarousel` go; track, drum, cover flow, depth wave, cylinder, folders and hinge become ready-made rules,
-  shipped the way `ProximityEffects` ships its effects. The user's pick, under the 0.0.x rule that a better API
-  needs no migration path.
-- **`renderSlideBack` becomes everyone's**, since the hinge and the folders turn cards over too.
-- **The drum's `slideSize` becomes a measurement** of the carousel's box handed to the rule, which works out the
-  ring's depth from it. If the drum turns out to need it as an input, that goes back to the user.
-- **The track's visible rewind at the wrap goes away**: a distance measured the short way round puts the first
-  slide beside the last. `decisions.md` records the track and the drum disagreeing at the wrap; this ends it.
-- **`progress`, 0 to 1, drives it from outside**, the library's existing shape. Scrolling is the viewport
-  progress observer; cover flow's pointer is the reading's horizontal `boxRatio`. On a looping carousel 0 to 1
-  is one whole lap, which the props documentation says. The index stays, and follows the nearest slide. A
-  carousel driven from outside is one given no controls, as already documented.
-- **A click on a visible side slide picks it.** The user's pick. Slides other than the current one stay `inert`
-  and hidden from screen readers, and the pick controls remain the keyboard's route to the same action. Because
-  an `inert` slide receives no clicks, the carousel works out from the click's position which slide was hit —
-  and the slide aimed at is not always the topmost one under the pointer, which is what `CardFan` showed
-  (_Open discussion_).
-- **The ring that turns by itself and leans toward the pointer is an example, not a feature**: the drum rule
-  inside `Tilter`, stepping on its own or with `progress` written on a clock for a continuous turn. A turn the
-  consumer writes still owes WCAG 2.2.2 a way to stop it, and the example has one.
-- **Item 18 changes once this lands.** A rule that changes opacity with distance is a dissolve, so its bullet
-  "the motion is the library's; a fade is not expressible" goes, and its "one slide at a time" bullet wants
-  rereading, since several slides now show while one is still current.
-
-## 35. `Wraparound` — _decided, not yet built_
-
-An `Exotic` that repeats whatever arrangement it holds in every direction, so it can be moved forever. Seen at
-[Made With GSAP, infinite 2D grid](https://madewithgsap.com/effects/tutorial026), which does it for a fixed grid
-of equal cells.
-
-- **A wrapper around any arrangement, not a grid of its own.** The user's pick: a `Mosaic`, a `Formation` or a
-  plain grid goes inside, moved by dragging with momentum, by the wheel and by the keyboard. A tile leaving one
-  edge comes back in at the opposite one. `Mosaic` is the showcase.
-- **A gap at the arrangement's edge shows at every join.** That is the arrangement's look, which the wrapper
-  cannot hide. `Mosaic`'s anchored side is exactly the size it was given; whether its free side comes out flat is
-  to be checked when building.
-- **Content smaller than the window is filled with copies.** The user's pick over not wrapping along an axis that
-  is too small, which would switch the effect on and off as the window is resized. The copies are hidden from
-  screen readers and cannot be tabbed into; only the original can be reached. Anything with its own state — a
-  playing video, a half-filled field — runs separately in each copy, and the props documentation says so.
-- **The keyboard route is to be designed while building**, starting from focus: tabbing to an item brings its
-  original into view.
-- **Named by the user**, over `EndlessPlane` and `InfiniteCanvas`.
-
-## 36. A pixel trail for the tracked patterns — _decided, not yet built_
-
-Seen at [Fancy Components, Pixel Trail](https://www.fancycomponents.dev/docs/components/background/pixel-trail).
-A new thing a tracked pattern's cells do, beside growing and fading: a cell lights when the pointer passes and
-fades on its own afterwards. Every pattern layout gets it, hexagons and triangles as well as squares. The clock
-runs only while a cell is still fading, the way the gradient trails wake theirs, and with `tiled: true` the
-trail repeats in every copy of the tile, as everything tracked already does.
-
-## 37. A pixelate filter — _decided, not yet built_
-
-Seen at [Fancy Components, Pixelate SVG Filter](https://www.fancycomponents.dev/docs/components/filter/pixelate-svg-filter),
-built from `feFlood`, `feComposite`, `feTile` and `feColorMatrix`. It joins the SVG filter generators beside
-brightness, contrast and turbulence.
-
-Their page says Safari is not supported, and what was found points at Safari ignoring the filter region settings
-it depends on. **Before that limit is written down, check in Safari what it actually draws**: content left plain
-is a harmless limit, nothing at all is not. The user's call. The check is run on a machine that already has
-Safari; nothing is installed for it.
-
-## 38. The Tooltip page: a picker for how it appears — _decided, not yet built_
-
-`Tooltip` hands its drawing function "showing or hiding" and a duration, and leaves the look to the consumer, so
-the page gains a knob choosing the reveal — a fade, a zoom, a clip and so on — modelled on how the Typewriter page
-offers its reveal animations. Playground only; nothing changes in the library. It came from Codrops' image reveal
-hover effects ([Codrops](https://tympanus.net/codrops/2018/11/27/image-reveal-hover-effects/)), which the user
-judged already covered by `Tooltip`.
-
-## 39. Floaters become an `Abstract`, and follow the highlight as well as the selection — _decided, not yet built_
-
-Seen at [React Bits, Glide Select](https://reactbits.dev/micro/glide-select): a list whose highlight is one shared
-shape gliding to whichever option the pointer or the arrow keys are on, the way `Tabs`' marker glides to the
-selected tab.
-
-- **`Menu` is the floater's third consumer, so it is extracted now.** `decisions.md` already set the rule under
-  _"`RadioGroup` takes a floater"_: two consumers is not yet an `Abstract`, a third is when to extract. `Tabs` and
-  `RadioGroup` move onto it rather than keeping their copies.
-- **Two floaters, one for the selection and one for the highlight.** The user's call: where the selected item and
-  the highlighted item are different things, each gets its own. `renderFloater` is renamed
-  `renderSelectionFloater`, and `renderHighlightFloater` is added beside it — the user's pick over keeping the old
-  name, so that each name says what its floater follows. Under the 0.0.x rule, no migration path.
-- **Who takes which.** `Select`, `Listbox`, `Tree`, `Tabs` and `RadioGroup` take both; `Menu`, which has no
-  selection, takes the highlight one only. `Tree` was the user's addition, since the Playground's left nav selects
-  through one; the highlight one on `Tabs` and `RadioGroup` is the hover pill gliding along a tab strip, and comes
-  from the extraction at no extra cost.
-- **A list that only draws what is visible can scroll the highlight away.** The floater then has nothing to sit on
-  and fades out, and back in when the item returns; `ElementFader` already does both.
-
-## 40. Two new families of tracked gradients: ribbons and a swarm — _decided, not yet built_
-
-From React Bits, where both are drawn with WebGL. The user's ruling: they are no different from `spot_smear`, so
-each is a new family in the tracked gradients rather than a new component or a new kind of sample.
-
-- **Ribbons** ([React Bits, Ribbons](https://reactbits.dev/animations/ribbons)): a few colored ribbons whose heads
-  chase the pointer on a spring while their bodies follow behind, thickest at the head. Here, a chain of stamps
-  along a springy path — the trails' machinery with the path given a spring.
-- **A swarm** ([React Bits, Swarm Cursor](https://reactbits.dev/animations/swarm-cursor)): about ten blobs
-  wandering around the pointer, merging where they touch and scattering on a click. Here, a few spots wandering
-  around the point. Overlapping soft spots glow into each other rather than merging with a liquid edge; the edge
-  needs the blur-then-sharpen filter on top, which is to be checked in Safari alongside item 37.
-- Both follow a supplied point as well as the pointer, through item 33.
-
-## 41. Two Playground examples from React Bits — _decided, not yet built_
-
-- **A list that leans toward the pointer, on the `Tree` page.** Seen at
-  [React Bits, Line Sidebar](https://reactbits.dev/components/line-sidebar): each item shifts sideways and
-  brightens by how near the pointer is, with a choice of falloff, eased over time. Here, a column layout with a
-  proximity effect, which `Tree` already takes. The user's pick of page, over `TableOfContents`, for being closest
-  to the Playground's own left nav. Their version keeps the current item fully lit; a proximity effect is not told
-  which item is current, so the example's painter does that instead.
-- **One tooltip shared by a row of items, on the `Toolbar` page.** Seen at
-  [React Bits, Warm Tooltip](https://reactbits.dev/micro/warm-tooltip). A single `Tooltip` whose anchor is
-  whichever item is hovered or focused, gliding from one to the next instead of hiding and reappearing. `Tooltip`
-  already points `aria-describedby` at its anchor, so the description moves with it. **If `Tooltip` does not yet
-  move smoothly when its anchor changes while it is showing, that is added to `Tooltip`**, the user's call.
 
 ## Accepted limits
 
@@ -1575,7 +1296,7 @@ package's contract.
 What this permanently gives up is worth naming so nobody re-proposes it as a gap: the `aria-disabled`-parity
 rule — that disabled and disabled-but-reachable look identical — is checked by eye and only by eye, and
 `CellAnimation` and `ScanlineAnimation` will keep their Playground pages and no specs, because
-motion over time is the one thing a DOM-reading suite cannot see. Item 10 records the blind spot; this is the
+motion over time is the one thing a DOM-reading suite cannot see. Item 5 records the blind spot; this is the
 decision not to close it.
 
 For the record, since it was researched and would otherwise be re-researched: there are two published
@@ -1633,7 +1354,7 @@ installs grow large enough to slow their editor.
 
 ### Ready-made point sources: the phone's tilt, and a point that wanders by itself
 
-How a point other than the pointer plugs in is settled and is item 33: a fraction across a box, taken by every
+How a point other than the pointer plugs in is settled, in `decisions.md` under _"`PointerTracker`: one reading of where the pointer is relative to one element"_: a fraction across a box, taken by every
 component that reads the pointer tracker. What is left here are two sources nobody has committed to shipping
 ready-made, each of which would be a helper producing that same shape:
 
@@ -1754,12 +1475,12 @@ Whether the first two are wanted is the open question.
 Seven were put to the user from portfolio showcases, each with a published example. The user then went through
 three whole catalogues, [Fancy Components](https://www.fancycomponents.dev),
 [Made With GSAP](https://madewithgsap.com/effects) and [React Bits](https://reactbits.dev), which yielded more
-than the single picks did. What was taken up is numbered: items 10 and 31 to 41. The rest:
+than the single picks did. What was taken up has been built. The rest:
 
-**Taken up through something else.** The scroll-lit paragraph is `Typewriter` driven from outside (item 31).
+**Taken up through something else.** The scroll-lit paragraph is `Typewriter` driven from outside.
 Codrops' list whose rows bring up a picture that follows the pointer
 ([Image Reveal Hover Effects](https://tympanus.net/codrops/2018/11/27/image-reveal-hover-effects/)) is already
-`Tooltip`, in the user's judgment; only the page's reveal picker came of it (item 38).
+`Tooltip`, in the user's judgment; only the page's reveal picker came of it.
 
 **Turned down. Do not re-propose any of these without a new argument.**
 

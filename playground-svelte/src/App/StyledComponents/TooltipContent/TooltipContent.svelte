@@ -30,8 +30,12 @@
 </script>
 
 <div
-    class={[styles.tooltipVisibility, props.visibilityTarget === 1 && styles.isVisible]}
-    style:transition={`opacity ${props.transitionDurationMs}ms`}
+    class={[
+        styles.tooltipVisibility,
+        styles.tooltipRevealVariants[props.reveal ?? "fade"],
+        props.visibilityTarget === 1 && styles.isVisible,
+    ]}
+    style:transition-duration={`${props.transitionDurationMs}ms`}
 >
     <GlassSurface borderRadii={BORDER_RADII} glassDefs={GLASS_DEFS}>
         <div class={styles.tooltipBody}>

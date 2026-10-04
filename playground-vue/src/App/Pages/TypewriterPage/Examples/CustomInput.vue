@@ -30,7 +30,7 @@ watch(
 </script>
 
 <template>
-    <Typewriter :animation-name="animationName" :compute-character-weights="computeCharacterWeights">{{
+    <Typewriter :compute-animation-name="computeAnimationName" :compute-character-weights="computeCharacterWeights">{{
         text
     }}</Typewriter>
 </template>

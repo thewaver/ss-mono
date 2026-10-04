@@ -50,6 +50,7 @@ import { hand_1 } from "./Gradient/Tracked/hand_1";
 import { hand_trail_1 } from "./Gradient/Tracked/hand_trail_1";
 import { hand_trail_2 } from "./Gradient/Tracked/hand_trail_2";
 import { hand_trail_3 } from "./Gradient/Tracked/hand_trail_3";
+import { ribbon_3 } from "./Gradient/Tracked/ribbon_3";
 import { spot_1 } from "./Gradient/Tracked/spot_1";
 import { spot_flare_2 } from "./Gradient/Tracked/spot_flare_2";
 import { spot_flare_3 } from "./Gradient/Tracked/spot_flare_3";
@@ -62,6 +63,7 @@ import { spot_smear_3 } from "./Gradient/Tracked/spot_smear_3";
 import { spot_trail_1 } from "./Gradient/Tracked/spot_trail_1";
 import { spot_trail_2 } from "./Gradient/Tracked/spot_trail_2";
 import { spot_trail_3 } from "./Gradient/Tracked/spot_trail_3";
+import { swarm_3 } from "./Gradient/Tracked/swarm_3";
 import { circle_g_2 } from "./Pattern/Timed/circle_g_2";
 import { circle_hd_2 } from "./Pattern/Timed/circle_hd_2";
 import { circle_hs_2 } from "./Pattern/Timed/circle_hs_2";
@@ -77,9 +79,12 @@ import { circle_hd_grow_2 } from "./Pattern/Tracked/circle_hd_grow_2";
 import { circle_hs_grow_2 } from "./Pattern/Tracked/circle_hs_grow_2";
 import { hexagon_ft_fade_2 } from "./Pattern/Tracked/hexagon_ft_fade_2";
 import { hexagon_pt_fade_2 } from "./Pattern/Tracked/hexagon_pt_fade_2";
+import { hexagon_pt_trail_2 } from "./Pattern/Tracked/hexagon_pt_trail_2";
 import { lozenge_d_fade_2 } from "./Pattern/Tracked/lozenge_d_fade_2";
+import { square_g_trail_2 } from "./Pattern/Tracked/square_g_trail_2";
 import { triangle_s_fade_2 } from "./Pattern/Tracked/triangle_s_fade_2";
 import { triangle_t_fade_2 } from "./Pattern/Tracked/triangle_t_fade_2";
+import { triangle_t_trail_2 } from "./Pattern/Tracked/triangle_t_trail_2";
 import type {
     TimedGradientConfig,
     TimedPatternConfig,
@@ -145,6 +150,9 @@ export namespace SVGDefsSamples {
                 lozenge_d_fade_2,
                 triangle_s_fade_2,
                 triangle_t_fade_2,
+                square_g_trail_2,
+                hexagon_pt_trail_2,
+                triangle_t_trail_2,
             } as const;
 
             export const SAMPLE_ENTRIES = {
@@ -156,6 +164,9 @@ export namespace SVGDefsSamples {
                 lozenge_d_fade_2: { family: "lozenge_d_fade_2" },
                 triangle_s_fade_2: { family: "triangle_s_fade_2" },
                 triangle_t_fade_2: { family: "triangle_t_fade_2" },
+                square_g_trail_2: { family: "square_g_trail_2" },
+                hexagon_pt_trail_2: { family: "hexagon_pt_trail_2" },
+                triangle_t_trail_2: { family: "triangle_t_trail_2" },
             } as const satisfies Record<string, TrackedPatternEntry>;
 
             export type Entry = TrackedPatternEntry;
@@ -278,6 +289,8 @@ export namespace SVGDefsSamples {
                 spot_trail_1,
                 spot_trail_2,
                 spot_trail_3,
+                ribbon_3,
+                swarm_3,
             } as const;
 
             export const SAMPLE_ENTRIES = {
@@ -300,6 +313,8 @@ export namespace SVGDefsSamples {
                 spot_trail_1: { family: "spot_trail_1" },
                 spot_trail_2: { family: "spot_trail_2" },
                 spot_trail_3: { family: "spot_trail_3" },
+                ribbon_3: { family: "ribbon_3" },
+                swarm_3: { family: "swarm_3" },
             } as const satisfies Record<string, TrackedGradientEntry>;
 
             export type Entry = TrackedGradientEntry;

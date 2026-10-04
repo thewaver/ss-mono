@@ -3,30 +3,34 @@ import {
     Fragment,
     type SlotsType,
     type VNodeChild,
+    computed,
     defineComponent,
     nextTick,
-    onScopeDispose,
     shallowRef,
 } from "vue";
 
 import {
+    LetterDriverStyles,
     LetterDriverUtils,
+    type LetterSegment,
     type LetterState,
     TYPEWRITER_DEFAULTS,
-    type TypewriterSegment,
     TypewriterStyles,
     TypewriterUtils,
 } from "@thewaver/ss-components";
 import { StringUtils } from "@thewaver/ss-utils";
+import { setElementVars } from "@vanilla-extract/dynamic";
 
 import { provideLetterDriverContext } from "../../../Abstracts/LetterDriver/LetterDriver.context";
 import { watchAfterRender } from "../../../Utils/effectUtils";
-import { callSlot, declareProps } from "../../../Utils/propUtils";
+import { callSlot, declareProps, useTwoWay } from "../../../Utils/propUtils";
+import { useStableList } from "../../../Utils/refUtils";
 import { useStore } from "../../../Utils/storeUtils";
 import type { SlotsContext } from "../../../Utils/typeUtils";
 import type { TypewriterController, TypewriterProps, TypewriterSlots } from "./Typewriter.types";
 
 const BEFORE_FIRST = TypewriterUtils.CARET_BEFORE_FIRST;
+const NO_PROGRESS = 0;
 const CUSTOM_PROPERTY_PREFIX = "--";
 const DATA_PREFIX = "data-";
 
@@ -45,7 +49,10 @@ const toDataAttributes = (dataset: DOMStringMap) =>
 
 export const Typewriter = defineComponent(
     (props: TypewriterProps, { slots }: SlotsContext<TypewriterSlots>) => {
-        const getAnimationName = () => props.animationName ?? TYPEWRITER_DEFAULTS.animationName;
+        const progress = useTwoWay(props, "progress", NO_PROGRESS);
+        const isPlaying = useTwoWay(props, "playback", true);
+
+        const getComputeAnimationName = () => props.computeAnimationName ?? TYPEWRITER_DEFAULTS.computeAnimationName;
         const getAnimationDurationMs = () => props.animationDurationMs ?? TYPEWRITER_DEFAULTS.animationDurationMs;
         const getAnimationDelayMs = () => props.animationDelayMs ?? TYPEWRITER_DEFAULTS.animationDelayMs;
         const getInitialAnimationDelayMs = () =>
@@ -53,31 +60,78 @@ export const Typewriter = defineComponent(
         const getMode = () => props.mode ?? TYPEWRITER_DEFAULTS.mode;
         const getIsErasing = () => getMode() === "erase";
 
+        const rootRef = shallowRef<HTMLDivElement>();
         const containerRef = shallowRef<HTMLDivElement>();
 
         const registry = LetterDriverUtils.createRegistry();
         const registryState = useStore(registry);
+        const drivenCharacters = useStore(registry, (state) => state.characters);
         const getIsDriven = () => registryState.value.entries.length > 0;
 
         const player = TypewriterUtils.createPlayer({
             getContainer: () => containerRef.value,
             getIsDriven,
-            getAnimationDurationMs,
-            getAnimationDelayMs,
-            getInitialAnimationDelayMs,
-            getIsErasing,
+            getComputeAnimationName,
+            getIsPlaying: () => isPlaying.value,
+            setProgress: (next) => {
+                progress.value = next;
+            },
             getResetAnimationOnContent: () => props.resetAnimationOnContent,
             getResetAnimationOnLayout: () => props.resetAnimationOnLayout,
-            onAnimationEnd: () => props.onAnimationEnd?.(),
         });
 
-        onScopeDispose(() => player.stop());
-
         const state = useStore(player);
+        const segments = useStore(player, (current) => current.segments);
+
+        const runDurationMs = computed(() =>
+            TypewriterUtils.getRunDurationMs(
+                state.value.count,
+                getAnimationDelayMs(),
+                getInitialAnimationDelayMs(),
+                getAnimationDurationMs(),
+            ),
+        );
+
+        const timeMs = computed(() => progress.value * runDurationMs.value);
+
+        const isAnimating = computed(() =>
+            TypewriterUtils.getIsRunning(state.value.count, progress.value, isPlaying.value),
+        );
+
+        const getIsErasedNow = () => !isAnimating.value && getIsErasing();
+
+        const startTimesMs = computed(() => {
+            const count = state.value.count;
+
+            return TypewriterUtils.computeStartTimes(
+                count,
+                props.computeCharacterWeights?.(count),
+                getIsErasing(),
+                getInitialAnimationDelayMs(),
+                getAnimationDelayMs(),
+            );
+        });
+
+        const characters = useStableList(() =>
+            getIsDriven() ? drivenCharacters.value : LetterDriverUtils.getCharacters(segments.value),
+        );
+
+        const animationNames = useStableList(() => {
+            const computeAnimationName = getComputeAnimationName();
+
+            return characters.value.map((character, index) =>
+                computeAnimationName(character, index, characters.value.length),
+            );
+        });
+
+        const caretIndex = computed(() =>
+            TypewriterUtils.computeCaretIndex(startTimesMs.value, timeMs.value, getIsErasing(), !isAnimating.value),
+        );
 
         const controller: TypewriterController = {
             restartAnimation: () => {
-                player.restart();
+                isPlaying.value = true;
+                void nextTick(() => player.restart());
 
                 return true;
             },
@@ -92,55 +146,68 @@ export const Typewriter = defineComponent(
 
         let previousDrivenCount = 0;
 
-        watchAfterRender([() => registryState.value.characters], ([characters]) => {
+        watchAfterRender([() => drivenCharacters.value], ([driven]) => {
             if (!getIsDriven()) return;
 
-            player.setCount(characters.length, previousDrivenCount ? "content" : "other");
-            previousDrivenCount = characters.length;
+            player.setCount(driven.length, previousDrivenCount ? "content" : "other");
+            previousDrivenCount = driven.length;
         });
 
-        const getIsErasedNow = () => !state.value.isAnimating && getIsErasing();
+        let previousRun = { names: animationNames.value, characters: characters.value, mode: getMode() };
 
-        const getLetterState = (index: number): LetterState => {
-            const current = state.value;
+        watchAfterRender([() => animationNames.value, getMode], ([names, mode]) => {
+            const previous = previousRun;
 
-            return {
-                isHidden: getIsErasedNow(),
-                animation: current.isAnimating
-                    ? {
-                          name: getAnimationName(),
-                          durationMs: getAnimationDurationMs(),
-                          delayMs: TypewriterUtils.computeStartTimes(
-                              current.count,
-                              props.computeCharacterWeights?.(current.count),
-                              getIsErasing(),
-                              getInitialAnimationDelayMs(),
-                              getAnimationDelayMs(),
-                          )[index],
-                          direction: getIsErasing() ? "reverse" : "normal",
-                      }
-                    : undefined,
-            };
-        };
+            previousRun = { names, characters: characters.value, mode };
+
+            if (
+                previous.mode !== mode ||
+                (previous.names !== names && previous.characters === previousRun.characters)
+            ) {
+                player.restart();
+            }
+        });
+
+        watchAfterRender([() => isPlaying.value, () => isAnimating.value], ([isOn, isRunning]) => {
+            if (!isOn || !isRunning) return;
+
+            return TypewriterUtils.run({
+                getProgress: () => progress.value,
+                setProgress: (next) => {
+                    progress.value = next;
+                },
+                getRunDurationMs: () => runDurationMs.value,
+                onEnd: () => props.onAnimationEnd?.(),
+            });
+        });
+
+        watchAfterRender([rootRef, () => timeMs.value], ([root, time]) => {
+            if (!root) return;
+
+            setElementVars(root, {
+                [LetterDriverStyles.letterDriverTimeVar]: LetterDriverUtils.getTimeValue(time),
+            });
+        });
+
+        const computeLetterAnimation = (index: number) => ({
+            name: animationNames.value[index],
+            durationMs: getAnimationDurationMs(),
+            delayMs: startTimesMs.value[index],
+            direction: getIsErasing() ? ("reverse" as const) : ("normal" as const),
+        });
+
+        const getLetterState = (index: number): LetterState =>
+            isAnimating.value
+                ? { isHidden: false, animation: computeLetterAnimation(index) }
+                : { isHidden: getIsErasedNow() };
 
         provideLetterDriverContext({
             registry,
             getLetterState,
-            getIsAnimating: () => state.value.isAnimating,
+            getIsAnimating: () => isAnimating.value,
             getIsHidden: getIsErasedNow,
-            getCaretIndex: () => state.value.caretIndex,
+            getCaretIndex: () => caretIndex.value,
             renderCaret: slots.renderCaret ? () => callSlot(slots.renderCaret, undefined) : undefined,
-            reportLetterStart: player.reportCharacterStart,
-        });
-
-        let previousRun = { animationName: getAnimationName(), mode: getMode() };
-
-        watchAfterRender([getAnimationName, getMode], ([animationName, mode]) => {
-            const previous = previousRun;
-
-            previousRun = { animationName, mode };
-
-            if (previous.animationName !== animationName || previous.mode !== mode) player.restart();
         });
 
         watchAfterRender([], () => {
@@ -153,38 +220,25 @@ export const Typewriter = defineComponent(
 
         return () => {
             const current = state.value;
-            const isErasing = getIsErasing();
-            const isErased = !current.isAnimating && isErasing;
-            const startTimesMs = TypewriterUtils.computeStartTimes(
-                current.count,
-                props.computeCharacterWeights?.(current.count),
-                isErasing,
-                getInitialAnimationDelayMs(),
-                getAnimationDelayMs(),
-            );
+            const isRunning = isAnimating.value;
+            const isErased = !isRunning && getIsErasing();
+            const caret = caretIndex.value;
 
-            const getAnimationStyle = (startIndex: number): CSSProperties | undefined =>
-                current.isAnimating
-                    ? {
-                          animationName: getAnimationName(),
-                          animationDuration: `${getAnimationDurationMs()}ms`,
-                          animationDelay: `${startTimesMs[startIndex]}ms`,
-                          animationDirection: isErasing ? "reverse" : "normal",
-                      }
+            const getAnimationStyle = (index: number): CSSProperties | undefined =>
+                isRunning
+                    ? toVueStyle(
+                          LetterDriverUtils.computeAnimationStyle(
+                              computeLetterAnimation(index),
+                              LetterDriverStyles.letterDriverTimeVar,
+                          ),
+                      )
                     : undefined;
-
-            const handleAnimationStart = (event: AnimationEvent, index: number) => {
-                if (event.target !== event.currentTarget) return;
-
-                player.reportCharacterStart(index);
-            };
 
             const renderCaret = () => callSlot(slots.renderCaret, undefined);
 
-            const renderCaretAfter = (index: number) =>
-                current.isAnimating && current.caretIndex === index && renderCaret();
+            const renderCaretAfter = (index: number) => isRunning && caret === index && renderCaret();
 
-            const renderSegment = (segment: TypewriterSegment): VNodeChild => {
+            const renderSegment = (segment: LetterSegment): VNodeChild => {
                 switch (segment.type) {
                     case "atomic":
                         return (
@@ -202,22 +256,20 @@ export const Typewriter = defineComponent(
                                         isErased && TypewriterStyles.typewriterErased,
                                     ]}
                                     style={getAnimationStyle(segment.startIndex)}
-                                    onAnimationstart={(event) => handleAnimationStart(event, segment.startIndex)}
                                 />
 
                                 {renderCaretAfter(segment.startIndex)}
                             </>
                         );
                     case "linebreak":
-                        return (
+                        return LetterDriverUtils.getIsAnimated(segment) ? (
                             <>
-                                <br
-                                    style={getAnimationStyle(segment.startIndex)}
-                                    onAnimationstart={(event) => handleAnimationStart(event, segment.startIndex)}
-                                />
+                                <br style={getAnimationStyle(segment.startIndex)} />
 
                                 {renderCaretAfter(segment.startIndex)}
                             </>
+                        ) : (
+                            <br />
                         );
                     case "text": {
                         const style = toVueStyle({ ...segment.nonMetrics, ...segment.metrics });
@@ -226,7 +278,7 @@ export const Typewriter = defineComponent(
                             ...toDataAttributes(segment.meta?.common.dataset ?? {}),
                         };
 
-                        if (current.isAnimating) {
+                        if (isRunning) {
                             return (
                                 <span style={style}>
                                     {Array.from(segment.text).map((character, offset) => (
@@ -234,9 +286,6 @@ export const Typewriter = defineComponent(
                                             <span
                                                 class={TypewriterStyles.typewriterChar}
                                                 style={getAnimationStyle(segment.startIndex + offset)}
-                                                onAnimationstart={(event) =>
-                                                    handleAnimationStart(event, segment.startIndex + offset)
-                                                }
                                             >
                                                 {character}
                                             </span>
@@ -267,7 +316,7 @@ export const Typewriter = defineComponent(
             };
 
             return (
-                <div class={TypewriterStyles.typewriterRoot}>
+                <div ref={rootRef} class={TypewriterStyles.typewriterRoot}>
                     <div
                         ref={containerRef}
                         class={getIsDriven() ? undefined : TypewriterStyles.typewriterChildrenWrap}
@@ -279,13 +328,13 @@ export const Typewriter = defineComponent(
 
                     {!getIsDriven() && current.segments.length > 0 && (
                         <div class={TypewriterStyles.typewriterTextWrap} style={{ width: `${current.width ?? 0}px` }}>
-                            {current.caretIndex === BEFORE_FIRST && renderCaret()}
+                            {caret === BEFORE_FIRST && renderCaret()}
 
                             {current.segments.map((segment, index) => (
                                 <Fragment key={index}>{renderSegment(segment)}</Fragment>
                             ))}
 
-                            {!current.isAnimating && current.caretIndex !== BEFORE_FIRST && renderCaret()}
+                            {!isRunning && caret !== BEFORE_FIRST && renderCaret()}
                         </div>
                     )}
                 </div>
@@ -296,16 +345,20 @@ export const Typewriter = defineComponent(
         name: "Typewriter",
         slots: Object as SlotsType<TypewriterSlots>,
         props: declareProps<TypewriterProps>({
-            animationName: null,
-            animationDurationMs: null,
-            animationDelayMs: null,
-            initialAnimationDelayMs: null,
-            mode: null,
-            computeCharacterWeights: null,
-            resetAnimationOnLayout: Boolean,
-            resetAnimationOnContent: Boolean,
-            onMount: null,
-            onAnimationEnd: null,
+            "computeAnimationName": null,
+            "animationDurationMs": null,
+            "animationDelayMs": null,
+            "initialAnimationDelayMs": null,
+            "mode": null,
+            "computeCharacterWeights": null,
+            "resetAnimationOnLayout": Boolean,
+            "resetAnimationOnContent": Boolean,
+            "progress": null,
+            "onUpdate:progress": null,
+            "playback": Boolean,
+            "onUpdate:playback": null,
+            "onMount": null,
+            "onAnimationEnd": null,
         }),
     },
 );

@@ -13,12 +13,15 @@ import {
 
 import {
     FlattenerUtils,
+    FloaterStyles,
+    TREE_DEFAULTS,
     type TreeNodeRenderProps,
     TreeStyles,
     TreeUtils,
     TypeaheadUtils,
 } from "@thewaver/ss-components";
 
+import { FloaterVueUtils } from "../../Abstracts/Floater/FloaterVue.utils";
 import { NavigatorVueUtils } from "../../Abstracts/Navigator/NavigatorVue.utils";
 import { TypeaheadVueUtils } from "../../Abstracts/Typeahead/TypeaheadVue.utils";
 import { VirtualizerVueUtils } from "../../Abstracts/Virtualizer/VirtualizerVue.utils";
@@ -31,6 +34,7 @@ import { PlacementBox } from "../../Primitives/PlacementBox/PlacementBox";
 import { PlacementItem } from "../../Primitives/PlacementItem/PlacementItem";
 import { watchAfterRender } from "../../Utils/effectUtils";
 import { callSlot, declareProps, useTwoWay } from "../../Utils/propUtils";
+import { toElement } from "../../Utils/refUtils";
 import type { SlotsContext } from "../../Utils/typeUtils";
 import type { TreeNodeItemProps, TreeProps, TreeRow, TreeSlots } from "./Tree.types";
 
@@ -271,8 +275,75 @@ export const Tree = defineComponent(
             if (action.kind === "click") document.getElementById(getRowId(action.row))?.click();
         };
 
+        const nodeRefs = new Map<T, HTMLElement>();
+        const nodeRefsVersion = shallowRef(0);
+        const hoveredValue = shallowRef<T>();
+        const focusInValue = shallowRef<T>();
+
+        const recordNodeRef = (nodeValue: T, element: HTMLElement | undefined, recorded: HTMLElement | undefined) => {
+            if (element) {
+                if (nodeRefs.get(nodeValue) === element) return element;
+
+                nodeRefs.set(nodeValue, element);
+                nodeRefsVersion.value += 1;
+
+                return element;
+            }
+
+            if (recorded && nodeRefs.get(nodeValue) === recorded) {
+                nodeRefs.delete(nodeValue);
+                nodeRefsVersion.value += 1;
+            }
+
+            return undefined;
+        };
+
+        const getFloaterTransitionDurationMs = () =>
+            props.floaterTransitionDurationMs ?? TREE_DEFAULTS.floaterTransitionDurationMs;
+
+        const useNodeFloater = (isEnabled: () => boolean, getValue: () => T | undefined) => {
+            const getRow = () => {
+                const nodeValue = getValue();
+
+                return nodeValue === undefined ? undefined : flatRows.value.find((row) => row.node.value === nodeValue);
+            };
+
+            return FloaterVueUtils.useFloater({
+                isEnabled,
+                container: () => (getIsVirtualized() ? sizerRef.value : rootRef.value),
+                target: () => {
+                    const row = getRow();
+
+                    void nodeRefsVersion.value;
+
+                    return row === undefined ? undefined : nodeRefs.get(row.node.value);
+                },
+                layout,
+                placement: () => {
+                    const row = getRow();
+
+                    return row === undefined ? undefined : layout.value?.placements[row.index];
+                },
+                transitionDurationMs: getFloaterTransitionDurationMs,
+            });
+        };
+
+        const selectionFloater = useNodeFloater(
+            () => slots.renderSelectionFloater !== undefined,
+            () => value.value,
+        );
+
+        const highlightFloater = useNodeFloater(
+            () => slots.renderHighlightFloater !== undefined,
+            () => hoveredValue.value ?? focusInValue.value,
+        );
+
+        const findRowByTarget = (target: EventTarget | null) =>
+            target instanceof Element ? findRowById(target.closest('[role="treeitem"]')?.id) : undefined;
+
         const handleFocus = (e: FocusEvent) => {
             lastFocusedValue = findRowById((e.target as HTMLElement).id)?.node.value;
+            focusInValue.value = findRowByTarget(e.target)?.node.value;
         };
 
         const hasPendingPaint = (row: TreeRow<T>) =>
@@ -282,9 +353,34 @@ export const Tree = defineComponent(
             const currentLayout = layout.value;
             const currentValue = value.value;
             const rovingValue = rovingRow.value?.node.value;
+            const floaterTransitionDurationMs = getFloaterTransitionDurationMs();
+
+            const renderFloater = (
+                floater: typeof selectionFloater,
+                renderContent: TreeSlots<T>["renderSelectionFloater"],
+            ) =>
+                floater.isRendered.value && (
+                    <div
+                        ref={floater.setRef}
+                        class={FloaterStyles.floater}
+                        style={{ ...floater.bounds.value, transitionDuration: `${floaterTransitionDurationMs}ms` }}
+                    >
+                        {callSlot(renderContent, {
+                            visibilityTarget: floater.visibilityTarget.value,
+                            transitionDurationMs: floaterTransitionDurationMs,
+                        })}
+                    </div>
+                );
+
+            const renderFloaters = () => [
+                renderFloater(highlightFloater, slots.renderHighlightFloater),
+                renderFloater(selectionFloater, slots.renderSelectionFloater),
+            ];
 
             const renderRow = (row: TreeRow<T>, key: string | number) => {
                 const placement = currentLayout?.placements[row.index];
+
+                let recorded: HTMLElement | undefined;
 
                 const element = (
                     <InteractionWrapper
@@ -306,7 +402,10 @@ export const Tree = defineComponent(
                             {
                                 renderControl: ({ setElementRef, flags: renderProps }) => (
                                     <TreeNodeItem
-                                        ref={setElementRef}
+                                        ref={(target) => {
+                                            setElementRef(target);
+                                            recorded = recordNodeRef(row.node.value, toElement(target), recorded);
+                                        }}
                                         id={getRowId(row)}
                                         href={row.node.href}
                                         level={row.depth + 1}
@@ -359,6 +458,8 @@ export const Tree = defineComponent(
 
             const renderWindowedRows = () => (
                 <div ref={sizerRef} class={TreeStyles.treeSizer} style={{ height: `${rowWindow.totalSize.value}px` }}>
+                    {renderFloaters()}
+
                     {rowWindow.rows.value.map((windowRow) => {
                         const row = flatRows.value[windowRow.index];
 
@@ -381,15 +482,25 @@ export const Tree = defineComponent(
                 </div>
             );
 
-            const tiers = getIsVirtualized() ? renderWindowedRows() : renderRows(rows.value);
+            const tiers = getIsVirtualized() ? renderWindowedRows() : [...renderFloaters(), ...renderRows(rows.value)];
 
             return (
                 <div
                     ref={rootRef}
+                    class={TreeStyles.treeRoot}
                     role="tree"
                     aria-label={props.ariaLabel}
                     onKeydown={handleKeyDown}
                     onFocusin={handleFocus}
+                    onFocusout={() => {
+                        focusInValue.value = undefined;
+                    }}
+                    onPointerover={(e) => {
+                        hoveredValue.value = findRowByTarget(e.target)?.node.value;
+                    }}
+                    onPointerleave={() => {
+                        hoveredValue.value = undefined;
+                    }}
                 >
                     {currentLayout ? (
                         <PlacementBox layout={currentLayout} computeEffect={props.computeEffect}>
@@ -409,6 +520,7 @@ export const Tree = defineComponent(
             "ariaLabel": null,
             "linkComponent": null,
             "computeEstimatedNodeHeight": null,
+            "floaterTransitionDurationMs": null,
             "nodes": null,
             "computeLayout": null,
             "computeEffect": null,

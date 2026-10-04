@@ -1,4 +1,5 @@
 import type { AnchorPlacement } from "@thewaver/ss-components-vue";
+import type { TooltipReveal } from "@thewaver/ss-playground/App/StyledComponents/TooltipContent/TooltipContent.const";
 import type { Point2d } from "@thewaver/ss-utils";
 
 export type TooltipExampleProps = {
@@ -8,4 +9,5 @@ export type TooltipExampleProps = {
     focusShowDelayMs: number;
     hoverShowDelayMs: number;
     skipDelayWindowMs: number;
+    reveal: TooltipReveal;
 };

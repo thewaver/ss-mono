@@ -1,4 +1,4 @@
-import { createMemo, untrack } from "solid-js";
+import { createEffect, createMemo, on, untrack } from "solid-js";
 
 import {
     type SVGPatternCellCount,
@@ -11,6 +11,7 @@ import type { Size2d } from "@thewaver/ss-utils";
 
 import { PointerTrackerSolidUtils } from "../../Abstracts/PointerTracker/PointerTrackerSolid.utils";
 import { SVGPatternDefsSolidUtils } from "../../Generators/SVGDefs/SVGPatterns/SVGPatternDefsSolid.utils";
+import { SVGDefsSolidUtils } from "./SVGDefsSolid.utils";
 import type { SVGPatternCellRenderer, SVGPatternTrackedCellRenderer } from "./SVGPatternsSolid.types";
 
 const NO_REF = () => undefined;
@@ -101,7 +102,11 @@ export namespace SVGPatterns {
         opts: ReturnType<typeof TrackedPatternUtils.resolveOpts>,
         renderCell: SVGPatternTrackedCellRenderer,
     ) => {
-        const { getReading, getIsPointerPresent } = PointerTrackerSolidUtils.create(getRef ?? NO_REF);
+        const { getReading, getIsPointerPresent } = PointerTrackerSolidUtils.create(
+            getRef ?? NO_REF,
+            undefined,
+            defs.getPointSource,
+        );
         const getCellCount = createMemo(
             () => TrackedPatternUtils.computeCellCount(kind, opts.isTiled, defs.cellSize, defs.getSize()),
             undefined,
@@ -111,15 +116,42 @@ export namespace SVGPatterns {
             TrackedPatternUtils.computePointerPoint(getReading(), getIsPointerPresent(), defs.getSize()),
         );
 
+        const trail = TrackedPatternUtils.createTrail();
+        const hasTrail = TrackedPatternUtils.getHasTrail(opts);
+        const clock = hasTrail ? SVGDefsSolidUtils.createClock(opts.trailMs) : undefined;
+
+        if (clock) {
+            clock.subscribe();
+
+            createEffect(
+                on(getPointer, (pointer) => {
+                    if (pointer) clock.keepAwake();
+                }),
+            );
+        }
+
         const getPattern = createMemo(() => {
             const cellCount = getCellCount();
 
             return untrack(() =>
-                computeLayoutPattern(kind, id, cellCount, defs.cellSize, (cellId, index, count, isSplit) =>
-                    renderCell(cellId, index, isSplit, () =>
-                        TrackedPatternUtils.computeLevel(kind, index, count, defs.cellSize, getPointer(), opts),
-                    ),
-                ),
+                computeLayoutPattern(kind, id, cellCount, defs.cellSize, (cellId, index, count, isSplit) => {
+                    const getLiveLevel = () =>
+                        TrackedPatternUtils.computeLevel(kind, index, count, defs.cellSize, getPointer(), opts);
+
+                    if (!clock) return renderCell(cellId, index, isSplit, getLiveLevel);
+
+                    const getLevel = createMemo(() =>
+                        trail.computeLevel(
+                            `${index.row}_${index.col}`,
+                            getLiveLevel(),
+                            clock.getFrameMs(),
+                            opts.trailMs,
+                            opts.restLevel,
+                        ),
+                    );
+
+                    return renderCell(cellId, index, isSplit, getLevel);
+                }),
             );
         });
 

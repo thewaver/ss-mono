@@ -14,7 +14,9 @@ export const Reveal = (props: RevealProps) => {
 
     const getIsDisabled = createMemo(() => access(props.isDisabled) === true);
 
-    const { getReading, getIsPointerPresent } = PointerTrackerSolidUtils.create(getRootRef, getIsDisabled);
+    const { getReading, getIsPointerPresent } = PointerTrackerSolidUtils.create(getRootRef, getIsDisabled, () =>
+        access(props.pointSource),
+    );
 
     const getSize = ElementObserverSolidUtils.createBorderBoxSizeObserver(getRootRef, getIsDisabled);
 

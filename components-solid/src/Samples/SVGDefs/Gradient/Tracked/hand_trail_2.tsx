@@ -139,7 +139,11 @@ export const hand_trail_2 = (opts?: GradientHandTrailOpts): TrackedGradientConfi
         const sharedBlur = SVGDefsSolidUtils.getBaseBlur(id, defs);
         const sharedBlurRef = SVGDefsUtils.getSharedFilter(sharedBlur);
 
-        const { getReading, getIsPointerPresent } = PointerTrackerSolidUtils.create(getRef ?? NO_REF);
+        const { getReading, getIsPointerPresent } = PointerTrackerSolidUtils.create(
+            getRef ?? NO_REF,
+            undefined,
+            defs.getPointSource,
+        );
 
         return [
             {

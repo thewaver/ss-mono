@@ -83,7 +83,7 @@ export const PageSourceView = (props: SourceViewProps) => {
                             selectedValue={getSelectedGroup}
                             onSelectionChange={selectGroup}
                             renderGutter={() => <PageTabGutter orientation={"horizontal"} />}
-                            renderFloater={(getVisibilityTarget, getTransitionDurationMs) => (
+                            renderSelectionFloater={(getVisibilityTarget, getTransitionDurationMs) => (
                                 <PageTabFloater
                                     orientation={"horizontal"}
                                     visibilityTarget={getVisibilityTarget}

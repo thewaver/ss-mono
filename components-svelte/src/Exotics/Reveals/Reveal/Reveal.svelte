@@ -19,6 +19,7 @@
     const pointer = PointerTrackerSvelteUtils.create(
         () => root ?? undefined,
         () => isDisabled,
+        () => props.pointSource,
     );
 
     const getSize = ElementObserverSvelteUtils.createBorderBoxSizeObserver(

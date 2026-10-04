@@ -14,14 +14,7 @@ const BreadcrumbsPage = lazyPage(() => import("./Pages/BreadcrumbsPage/Breadcrum
 const ButtonPage = lazyPage(() => import("./Pages/ButtonPage/ButtonPage"), "ButtonPage");
 const CalendarPage = lazyPage(() => import("./Pages/CalendarPage/CalendarPage"), "CalendarPage");
 const CardStackPage = lazyPage(() => import("./Pages/CardStackPage/CardStackPage"), "CardStackPage");
-const DrumCarouselPage = lazyPage(
-    () => import("./Pages/Carousels/DrumCarouselPage/DrumCarouselPage"),
-    "DrumCarouselPage",
-);
-const TrackCarouselPage = lazyPage(
-    () => import("./Pages/Carousels/TrackCarouselPage/TrackCarouselPage"),
-    "TrackCarouselPage",
-);
+const CarouselPage = lazyPage(() => import("./Pages/Carousels/CarouselPage/CarouselPage"), "CarouselPage");
 const CellAnimationPage = lazyPage(() => import("./Pages/CellAnimationPage/CellAnimationPage"), "CellAnimationPage");
 const CheckboxGroupPage = lazyPage(() => import("./Pages/CheckboxGroupPage/CheckboxGroupPage"), "CheckboxGroupPage");
 const CheckboxPage = lazyPage(() => import("./Pages/CheckboxPage/CheckboxPage"), "CheckboxPage");
@@ -72,6 +65,7 @@ const NumberInputPage = lazyPage(() => import("./Pages/NumberInputPage/NumberInp
 const OdometerPage = lazyPage(() => import("./Pages/OdometerPage/OdometerPage"), "OdometerPage");
 const PaginatorPage = lazyPage(() => import("./Pages/PaginatorPage/PaginatorPage"), "PaginatorPage");
 const PaintedTextPage = lazyPage(() => import("./Pages/PaintedTextPage/PaintedTextPage"), "PaintedTextPage");
+const ProximityTextPage = lazyPage(() => import("./Pages/ProximityTextPage/ProximityTextPage"), "ProximityTextPage");
 const ParticleFieldPage = lazyPage(() => import("./Pages/ParticleFieldPage/ParticleFieldPage"), "ParticleFieldPage");
 const ParticleSpawnerPage = lazyPage(
     () => import("./Pages/ParticleSpawnerPage/ParticleSpawnerPage"),
@@ -164,6 +158,7 @@ const TogglePage = lazyPage(() => import("./Pages/TogglePage/TogglePage"), "Togg
 const ToolbarPage = lazyPage(() => import("./Pages/ToolbarPage/ToolbarPage"), "ToolbarPage");
 const TooltipPage = lazyPage(() => import("./Pages/TooltipPage/TooltipPage"), "TooltipPage");
 const TrailPage = lazyPage(() => import("./Pages/TrailPage/TrailPage"), "TrailPage");
+const WraparoundPage = lazyPage(() => import("./Pages/WraparoundPage/WraparoundPage"), "WraparoundPage");
 const TreePage = lazyPage(() => import("./Pages/TreePage/TreePage"), "TreePage");
 const TreemapPage = lazyPage(() => import("./Pages/TreemapPage/TreemapPage"), "TreemapPage");
 const TypewriterPage = lazyPage(() => import("./Pages/TypewriterPage/TypewriterPage"), "TypewriterPage");
@@ -403,21 +398,10 @@ export const MENU_CONFIGS: MenuBranchConfig[] = [
                 ],
             },
             {
-                name: "Carousels",
-                children: [
-                    {
-                        name: "DrumCarousel",
-                        description:
-                            "The slides on the faces of a drum rather than in a strip: turning about the axis the direction names, swiped along it, and with the faces that have turned away hidden rather than merely obscured, so a screen reader is never read the back of a slide nobody can see. The stepping, the wrap and the keyboard are the shared carousel's; only the geometry differs.",
-                        component: () => <DrumCarouselPage />,
-                    },
-                    {
-                        name: "TrackCarousel",
-                        description:
-                            "Slides in a strip, stepped one at a time, across or up and down. Stepping past either end wraps round, which is what separates it from a scroller, and it can rotate on its own — holding while the pointer is over it, while anything inside it has focus, and while the tab is in the background. Every control it draws is optional, so a page that wants its own buttons drives it through the shared index instead.",
-                        component: () => <TrackCarouselPage />,
-                    },
-                ],
+                name: "Carousel",
+                description:
+                    "Slides stepped one at a time, each drawn by a placement rule from how far it is from the slide showing: in a strip, on a drum, in cover flow, as a depth wave, round a cylinder, as a stack of folders or flipping down on a hinge. Stepping past either end comes round the short way, it can rotate on its own — holding while the pointer is over it, while anything inside it has focus, and while the tab is in the background — and a progress from outside can drive it, from a scroll or a clock. Every control it draws is optional, so a page that wants its own buttons drives it through the shared index instead.",
+                component: () => <CarouselPage />,
             },
             {
                 name: "EdgeFader",
@@ -1032,6 +1016,12 @@ export const MENU_CONFIGS: MenuBranchConfig[] = [
                         component: () => <PaintedTextPage />,
                     },
                     {
+                        name: "ProximityText",
+                        description:
+                            "Letters that answer to how near a point is, the way Typewriter's answer to time: each one plays keyframes of the consumer's held between the first frame, far away, and the last, under the point, so a variable font's weight, a color or a spacing can swell where the pointer goes. The lines are wrapped for every letter at its last frame, so a growing letter pushes the rest of its line along without ever moving a line break, and nearness is measured from where the letters rest. The point is the pointer, or one the consumer moves.",
+                        component: () => <ProximityTextPage />,
+                    },
+                    {
                         name: "RichText",
                         description:
                             "Paints a plain string that carries bracketed tags — [b], [i], [s], [u], [li] — so text arriving from a server or a file can say which of its words are emphasized without bringing markup along. Nothing is handed to the browser as HTML: the string is parsed into a tree of runs and painted with classes the consumer supplies, or with elements of the consumer's own such as a link or a tooltip, and a tag it does not recognize is either left on screen exactly as typed or dropped, whichever the consumer asks for. A tag carries attributes only where the consumer has allowed them, so a bracket in ordinary prose stays prose.",
@@ -1079,6 +1069,12 @@ export const MENU_CONFIGS: MenuBranchConfig[] = [
                         component: () => <OverheadWheelPage />,
                     },
                 ],
+            },
+            {
+                name: "Wraparound",
+                description:
+                    "Repeats whatever arrangement it holds in every direction, so it can be moved forever — a mosaic, a formation, a plain grid. It is dragged with momentum, scrolled with the wheel and moved by the keys, and a tile leaving one edge comes back in at the other. Only one copy is real: the rest are inert and hidden from screen readers, the real one moves under the pointer so hovering and clicking reach it, and tabbing to an item brings the item itself into view.",
+                component: () => <WraparoundPage />,
             },
         ],
     },
@@ -1194,11 +1190,6 @@ export const MENU_CONFIGS: MenuBranchConfig[] = [
                 name: "BinarySwitch",
                 description:
                     "The shared body of `Checkbox`, `Radio` and `Toggle`: a hidden native input under a control the consumer paints, told whether it is a checkbox or a radio and whether it announces itself as a switch. What it owns that the three must not each copy is how the input's ticked state is written — from state, in one place, and again straight after a change is reported — so a change the owner refuses never leaves the box showing ticked. It is not exported; only its types are, because the three controls' props are built from them.",
-            },
-            {
-                name: "Carousel",
-                description:
-                    "The shell both carousels are built on: stepping, wrapping, autoplay that can be stopped and held, the swipe and the keyboard, and the controls that step, pick a slide and stop the rotation. `TrackCarousel` lays the slides out in a strip and `DrumCarousel` sets them round a barrel; the geometry is the only thing that differs. It is not exported, since a consumer reaches for one of the two.",
             },
             {
                 name: "InteractionWrapper",

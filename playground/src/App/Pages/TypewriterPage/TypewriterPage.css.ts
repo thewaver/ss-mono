@@ -1,5 +1,6 @@
-import { keyframes, style } from "@vanilla-extract/css";
+import { globalStyle, keyframes, style } from "@vanilla-extract/css";
 
+import { layerVars } from "../../StyledComponents/Layer/Layer.css";
 import { themeVars } from "../../Theme.css";
 
 export const typewriterFade = keyframes({
@@ -129,4 +130,91 @@ export const phraseCaretBlinking = style({
     animationDuration: "1s",
     animationTimingFunction: "steps(1)",
     animationIterationCount: "infinite",
+});
+
+export const typewriterLight = keyframes({
+    "0%": {
+        opacity: 0.25,
+    },
+    "100%": {
+        opacity: 1,
+    },
+});
+
+export const typewriterSweep = keyframes({
+    "0%": {
+        backgroundPosition: "100% 0",
+    },
+    "100%": {
+        backgroundPosition: "0% 0",
+    },
+});
+
+export const typewriterFlyLeft = keyframes({
+    "0%": {
+        opacity: 1,
+        transform: "none",
+    },
+    "100%": {
+        opacity: 0,
+        transform: "translate(-80px, -20px) rotate(-30deg)",
+    },
+});
+
+export const typewriterFlyRight = keyframes({
+    "0%": {
+        opacity: 1,
+        transform: "none",
+    },
+    "100%": {
+        opacity: 0,
+        transform: "translate(80px, -20px) rotate(30deg)",
+    },
+});
+
+export const typewriterFadeOut = keyframes({
+    "0%": {
+        opacity: 1,
+    },
+    "100%": {
+        opacity: 0,
+    },
+});
+
+export const SCROLL_BOX_HEIGHT = 220;
+
+export const scrollBox = style({
+    height: SCROLL_BOX_HEIGHT,
+    overflowY: "scroll",
+    overscrollBehavior: "contain",
+});
+
+export const scrollParagraph = style({
+    marginBlock: SCROLL_BOX_HEIGHT,
+    fontSize: themeVars.fontSize.large,
+});
+
+export const karaokeStack = style({
+    display: "flex",
+    flexDirection: "column",
+    gap: themeVars.spacing.full,
+    alignItems: "stretch",
+});
+
+export const karaokeLine = style({
+    fontSize: themeVars.fontSize.xLarge,
+});
+
+globalStyle(`${karaokeLine} span`, {
+    backgroundImage: `linear-gradient(90deg, ${themeVars.color.primary.main} 50%, ${layerVars.contrast} 50%)`,
+    backgroundSize: "200% 100%",
+    backgroundClip: "text",
+    WebkitBackgroundClip: "text",
+    color: "transparent",
+});
+
+export const karaokeControls = style({
+    display: "flex",
+    gap: themeVars.spacing.full,
+    alignItems: "center",
 });

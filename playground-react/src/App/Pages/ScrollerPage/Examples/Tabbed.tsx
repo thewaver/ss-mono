@@ -27,7 +27,7 @@ export const TabbedExample = (props: Props) => {
                     selectedValue={props.selectedValue}
                     onSelectionChange={props.onSelectionChange}
                     renderGutter={() => <PageTabGutter orientation={"horizontal"} />}
-                    renderFloater={(visibilityTarget, transitionDurationMs) => (
+                    renderSelectionFloater={(visibilityTarget, transitionDurationMs) => (
                         <PageTabFloater
                             orientation={"horizontal"}
                             visibilityTarget={visibilityTarget}

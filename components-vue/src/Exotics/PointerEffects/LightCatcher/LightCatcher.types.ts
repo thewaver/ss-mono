@@ -1,5 +1,7 @@
 import type { VNodeChild } from "vue";
 
+import type { PointSource } from "@thewaver/ss-components";
+
 export type LightCatcherProps = {
     /**
      * How near the pointer has to be before the surface answers it at all, in pixels from its center.
@@ -58,6 +60,14 @@ export type LightCatcherProps = {
      * preference itself — only the consumer knows whether a brightening surface is motion worth suppressing.
      */
     isDisabled?: boolean;
+    /**
+     * The point to follow instead of the pointer.
+     *
+     * A fraction across a box — this component's own, or the element named in the source — so a light moving across a
+     * banner can be handed to every card under it and each answers to the same spot. While the source has no point the
+     * component rests, as it does when the pointer leaves the window. Left out, the pointer is followed.
+     */
+    pointSource?: PointSource;
 };
 
 export type LightCatcherSlots = {

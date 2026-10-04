@@ -13,6 +13,7 @@
     isDisabled={props.item.isDisabled ?? false}
     isFocusableWhenDisabled={props.item.isReachableWhenDisabled ?? false}
     headingLevel={props.headingLevel}
+    side={props.side}
     isScrolledIntoViewOnExpand={props.isScrolledIntoViewOnExpand}
     isPanelBuiltOnExpand={props.isPanelBuiltOnExpand}
     transitionDurationMs={props.transitionDurationMs}
@@ -25,6 +26,6 @@
     {/snippet}
 
     {#snippet renderPanel(visibilityTarget, transitionDurationMs)}
-        {@render props.renderPanel(props.item, visibilityTarget, transitionDurationMs)}
+        {@render props.renderPanel(props.item, visibilityTarget, transitionDurationMs, props.moveDirection)}
     {/snippet}
 </Collapsible>

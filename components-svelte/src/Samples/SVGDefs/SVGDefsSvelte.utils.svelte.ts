@@ -1,5 +1,5 @@
-import { SVGDefsUtils } from "@thewaver/ss-components";
-import type { Index2d, Size2d } from "@thewaver/ss-utils";
+import { SVGDefsUtils, TrackedPatternUtils } from "@thewaver/ss-components";
+import type { Index2d, Point2d, Size2d } from "@thewaver/ss-utils";
 
 import { SVGFilterDefsFactory } from "../../Generators/SVGDefs/SVGFilters/SVGFilterDefs.factory.js";
 import { readStore } from "../../Utils/storeUtils.js";
@@ -79,5 +79,59 @@ export namespace SVGDefsSvelteUtils {
                 cellCount,
                 isSplit,
             ));
+    };
+
+    /**
+     * The fading trail a tracked pattern's cells leave behind the pointer, for a sample whose options ask for one.
+     *
+     * {@link TrackedPatternUtils.createTrail} tied to a clock of its own. The clock exists only while the resolved
+     * options give a trail, is made again when its length changes, and is counted as consumed for as long as the
+     * component is mounted; every move of a point that is present wakes it, so the trail fades on frames rather than
+     * on pointer events and stops ticking once the last glow has gone.
+     *
+     * Must run while a component is being set up.
+     *
+     * @param getOpts The pattern's resolved options, from {@link TrackedPatternUtils.resolveOpts}.
+     * @param getPointer The pointer's position in the pattern, or `undefined` while it is absent.
+     * @returns The level to draw a cell at, from its index and its live level. It reads the clock while a trail is
+     * on, so a `$derived` calling it is worked out again on every tick, and answers the live level when there is no
+     * trail.
+     */
+    export const createPatternTrail = (
+        getOpts: () => ReturnType<typeof TrackedPatternUtils.resolveOpts>,
+        getPointer: () => Point2d | undefined,
+    ) => {
+        const trail = TrackedPatternUtils.createTrail();
+        const trailMs = $derived(getOpts().trailMs);
+
+        let clock = $state.raw<ReturnType<typeof SVGDefsUtils.createClock>>();
+
+        const getFrameMs = $derived(clock ? readStore(clock.frameMs) : undefined);
+
+        $effect(() => {
+            if (!TrackedPatternUtils.getHasTrail({ trailMs })) return;
+
+            const next = SVGDefsUtils.createClock(trailMs);
+            const release = next.retain();
+
+            clock = next;
+
+            return () => {
+                release();
+                clock = undefined;
+            };
+        });
+
+        $effect(() => {
+            if (getPointer()) clock?.keepAwake();
+        });
+
+        return (index: Index2d, liveLevel: number) => {
+            const opts = getOpts();
+
+            return getFrameMs && TrackedPatternUtils.getHasTrail(opts)
+                ? trail.computeLevel(`${index.row}_${index.col}`, liveLevel, getFrameMs(), opts.trailMs, opts.restLevel)
+                : liveLevel;
+        };
     };
 }

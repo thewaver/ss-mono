@@ -11,6 +11,7 @@
     import PaletteExample from "./Examples/Palette.svelte";
     import PressedExample from "./Examples/Pressed.svelte";
     import RefusingExample from "./Examples/Refusing.svelte";
+    import SharedTooltipExample from "./Examples/SharedTooltip.svelte";
     import ResizableBar from "./ResizableBar.svelte";
     import { NOTHING_RUN } from "./ToolbarPage.const.svelte";
     import type { ToolbarExampleProps } from "./ToolbarPage.types";
@@ -70,6 +71,15 @@
             component: paletteExample,
             path: `${EXAMPLES_ROOT}/Palette.svelte`,
         },
+        {
+            key: "sharedTooltip",
+            name: "One tooltip for the row",
+            span: WIDE_SPAN,
+            readout: () =>
+                "a single tooltip whose anchor is whichever action is under the pointer or holds focus; moving along the row carries the tooltip with it instead of hiding one and showing the next, and its description moves with it",
+            component: sharedTooltipExample,
+            path: `${EXAMPLES_ROOT}/SharedTooltip.svelte`,
+        },
     ];
 </script>
 
@@ -93,6 +103,12 @@
 
 {#snippet paletteExample()}
     <PaletteExample {...commonProps} />
+{/snippet}
+
+{#snippet sharedTooltipExample()}
+    <ResizableBar width={barWidth} onResize={setBarWidth}>
+        <SharedTooltipExample {...commonProps} />
+    </ResizableBar>
 {/snippet}
 
 <PagePropsPanel scope={"global"}>

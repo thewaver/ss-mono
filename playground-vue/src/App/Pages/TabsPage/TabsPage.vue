@@ -1,7 +1,11 @@
 <script setup lang="ts">
 import { shallowRef } from "vue";
 
-import { AUTOMATIC_TABS, REACHABLE_TABS } from "@thewaver/ss-playground/App/Pages/TabsPage/TabsPage.const";
+import {
+    AUTOMATIC_TABS,
+    HOVER_PILL_TABS,
+    REACHABLE_TABS,
+} from "@thewaver/ss-playground/App/Pages/TabsPage/TabsPage.const";
 
 import type { ExampleDefs } from "../../PageComponents/Examples/Examples.types";
 import PageExamples from "../../PageComponents/Examples/PageExamples.vue";
@@ -22,6 +26,7 @@ const linkValue = shallowRef("Docs");
 const customLinkValue = shallowRef("Docs");
 const autoValue = shallowRef("Render");
 const reachableValue = shallowRef("Render");
+const hoverPillValue = shallowRef("Render");
 const rightToLeftValue = shallowRef("Render");
 const disabledValue = shallowRef("Draft");
 const clearableValue = shallowRef<string | undefined>("One");
@@ -48,6 +53,14 @@ const examples: ExampleDefs[] = [
         name: "Arrows that select as they move",
         readout: () =>
             `selected: ${autoValue.value} — an arrow both moves the focus and takes the selection with it, which suits a panel that is already loaded`,
+        path: `${EXAMPLES_ROOT}/Row.vue`,
+    },
+    {
+        key: "hoverPill",
+        span: 2,
+        name: "A pill that follows the pointer",
+        readout: () =>
+            `selected: ${hoverPillValue.value} — the underline stays on the selected tab while a second marker glides to whichever tab the pointer or the focus is on`,
         path: `${EXAMPLES_ROOT}/Row.vue`,
     },
     {
@@ -119,6 +132,16 @@ const examples: ExampleDefs[] = [
                 id-prefix="automatic"
                 has-auto-activation
                 @selection-change="(value: string) => (autoValue = value)"
+            />
+        </template>
+
+        <template #hoverPill>
+            <RowExample
+                :selected-value="hoverPillValue"
+                :tabs="HOVER_PILL_TABS"
+                id-prefix="hoverPill"
+                has-hover-pill
+                @selection-change="(value: string) => (hoverPillValue = value)"
             />
         </template>
 

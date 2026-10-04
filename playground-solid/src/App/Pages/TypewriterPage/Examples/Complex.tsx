@@ -8,7 +8,10 @@ type Props = TypewriterExampleProps;
 
 export const ComplexExample = (props: Props) => {
     return (
-        <Typewriter animationName={props.animationName} computeCharacterWeights={props.computeCharacterWeights}>
+        <Typewriter
+            computeAnimationName={props.computeAnimationName}
+            computeCharacterWeights={props.computeCharacterWeights}
+        >
             This is a bit of{" "}
             <b>
                 text that appears

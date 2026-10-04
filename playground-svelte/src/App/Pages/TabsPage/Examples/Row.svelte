@@ -11,6 +11,7 @@
     import * as styles from "@thewaver/ss-playground/App/Pages/TabsPage/TabsPage.css";
 
     import PageTabPanel from "../../../PageComponents/TabPanel/TabPanel.svelte";
+    import PageGlideFloater from "../../../StyledComponents/GlideFloater/PageGlideFloater.svelte";
     import PageTabContent from "../../../StyledComponents/TabContent/PageTabContent.svelte";
     import PageTabFloater from "../../../StyledComponents/TabContent/PageTabFloater.svelte";
     import PageTabGutter from "../../../StyledComponents/TabContent/PageTabGutter.svelte";
@@ -21,12 +22,17 @@
     type Props = TabsExampleProps & {
         tabs?: Tab<string>[];
         idPrefix?: string;
+        hasHoverPill?: boolean;
     };
 
     let props: Props = $props();
 
     const idPrefix = $derived(props.idPrefix ?? DEFAULT_ID_PREFIX);
 </script>
+
+{#snippet hoverPill(visibilityTarget: 0 | 1, transitionDurationMs: number)}
+    <PageGlideFloater kind={"highlight"} {visibilityTarget} {transitionDurationMs} />
+{/snippet}
 
 <div class={styles.rowDemo}>
     <Tabs
@@ -37,12 +43,13 @@
         tabs={props.tabs ?? ROW_TABS}
         selectedValue={props.selectedValue}
         onSelectionChange={props.onSelectionChange}
+        renderHighlightFloater={props.hasHoverPill ? hoverPill : undefined}
     >
         {#snippet renderGutter()}
             <PageTabGutter orientation={"horizontal"} />
         {/snippet}
 
-        {#snippet renderFloater(visibilityTarget, transitionDurationMs)}
+        {#snippet renderSelectionFloater(visibilityTarget, transitionDurationMs)}
             <PageTabFloater orientation={"horizontal"} {visibilityTarget} {transitionDurationMs} />
         {/snippet}
 

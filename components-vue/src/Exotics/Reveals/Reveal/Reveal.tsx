@@ -20,7 +20,11 @@ export const Reveal = defineComponent(
 
         const getIsDisabled = () => props.isDisabled === true;
 
-        const { reading, isPointerPresent } = PointerTrackerVueUtils.usePointerReading(rootRef, getIsDisabled);
+        const { reading, isPointerPresent } = PointerTrackerVueUtils.usePointerReading(
+            rootRef,
+            getIsDisabled,
+            () => props.pointSource,
+        );
 
         const size = ElementObserverVueUtils.useBorderBoxSize(rootRef, getIsDisabled);
 
@@ -118,6 +122,7 @@ export const Reveal = defineComponent(
             softness: null,
             stepSize: null,
             isDisabled: Boolean,
+            pointSource: null,
             ariaLabel: null,
             computePoints: null,
         }),

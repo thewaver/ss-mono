@@ -1,6 +1,7 @@
 import { type SlotsType, type VNodeChild, computed, defineComponent, shallowRef, useId, watch } from "vue";
 
 import {
+    FloaterStyles,
     MENU_DEFAULTS,
     type MenuFlags,
     type MenuHighlightPosition,
@@ -11,6 +12,7 @@ import {
 } from "@thewaver/ss-components";
 import { type Point2d, Rect } from "@thewaver/ss-utils";
 
+import { FloaterVueUtils } from "../../../Abstracts/Floater/FloaterVue.utils";
 import { NavigatorVueUtils } from "../../../Abstracts/Navigator/NavigatorVue.utils";
 import { TypeaheadVueUtils } from "../../../Abstracts/Typeahead/TypeaheadVue.utils";
 import { useViewportContext } from "../../../Abstracts/Viewport/Viewport.context";
@@ -156,6 +158,10 @@ const MenuEntry = defineComponent(
 
         const path = computed(() => [...props.level.path, props.index]);
 
+        watchAfterRender([itemElement], ([element]) =>
+            element ? props.onRegister?.(props.index, element) : undefined,
+        );
+
         watchAfterRender([() => props.isHighlighted, itemElement], ([isHighlighted, element]) => {
             if (!isHighlighted || !element) return;
 
@@ -236,6 +242,7 @@ const MenuEntry = defineComponent(
                                         openerItem={item}
                                         reservedScreenSize={level.reservedScreenSize}
                                         transitionDurationMs={level.transitionDurationMs}
+                                        floaterTransitionDurationMs={level.floaterTransitionDurationMs}
                                         openerFlags={flags}
                                         checkedValues={level.checkedValues}
                                         computeLayout={level.computeLayout}
@@ -245,7 +252,11 @@ const MenuEntry = defineComponent(
                                         onClose={props.onSubmenuClose}
                                         onDismiss={level.onDismiss}
                                     >
-                                        {{ renderItem: slots.renderItem, renderPopup: slots.renderPopup }}
+                                        {{
+                                            renderItem: slots.renderItem,
+                                            renderPopup: slots.renderPopup,
+                                            renderHighlightFloater: slots.renderHighlightFloater,
+                                        }}
                                     </MenuLevel>
                                 ),
                             ],
@@ -273,6 +284,7 @@ const MenuEntry = defineComponent(
             onActivate: null,
             onHover: null,
             onSubmenuClose: null,
+            onRegister: null,
         }),
     },
 );
@@ -334,6 +346,67 @@ const MenuLevel = defineComponent(
         );
 
         const rootExtent = computed(() => MenuUtils.computeRootExtent(props.rootExtent, layout.value));
+
+        const itemsRef = shallowRef<HTMLElement>();
+        const itemRefsVersion = shallowRef(0);
+
+        const itemRefs = new Map<number, HTMLElement>();
+
+        const registerItem = (index: number, element: HTMLElement) => {
+            itemRefs.set(index, element);
+            itemRefsVersion.value += 1;
+
+            return () => {
+                if (itemRefs.get(index) !== element) return;
+
+                itemRefs.delete(index);
+                itemRefsVersion.value += 1;
+            };
+        };
+
+        const getFloaterTransitionDurationMs = () =>
+            props.floaterTransitionDurationMs ?? MENU_DEFAULTS.floaterTransitionDurationMs;
+
+        const highlightFloater = FloaterVueUtils.useFloater({
+            isEnabled: () => slots.renderHighlightFloater !== undefined,
+            container: itemsRef,
+            target: () => {
+                const index = highlightedIndex.value;
+
+                void itemRefsVersion.value;
+
+                return index === undefined ? undefined : itemRefs.get(index);
+            },
+            layout,
+            placement: () => {
+                const index = highlightedIndex.value;
+
+                return index === undefined ? undefined : layout.value?.placements[index];
+            },
+            transitionDurationMs: getFloaterTransitionDurationMs,
+        });
+
+        const renderHighlightFloater = () => {
+            const floaterTransitionDurationMs = getFloaterTransitionDurationMs();
+
+            return (
+                highlightFloater.isRendered.value && (
+                    <div
+                        ref={highlightFloater.setRef}
+                        class={FloaterStyles.floater}
+                        style={{
+                            ...highlightFloater.bounds.value,
+                            transitionDuration: `${floaterTransitionDurationMs}ms`,
+                        }}
+                    >
+                        {callSlot(slots.renderHighlightFloater, {
+                            visibilityTarget: highlightFloater.visibilityTarget.value,
+                            transitionDurationMs: floaterTransitionDurationMs,
+                        })}
+                    </div>
+                )
+            );
+        };
 
         const getItemId = (index: number) => `${props.id}-item-${index}`;
 
@@ -483,8 +556,13 @@ const MenuLevel = defineComponent(
                     onSubmenuClose={() => {
                         openValue.value = undefined;
                     }}
+                    onRegister={registerItem}
                 >
-                    {{ renderItem: slots.renderItem, renderPopup: slots.renderPopup }}
+                    {{
+                        renderItem: slots.renderItem,
+                        renderPopup: slots.renderPopup,
+                        renderHighlightFloater: slots.renderHighlightFloater,
+                    }}
                 </MenuEntry>
             );
 
@@ -517,7 +595,20 @@ const MenuLevel = defineComponent(
         const renderItems = (): VNodeChild => {
             const currentLayout = layout.value;
 
-            if (!currentLayout) return renderRuns();
+            if (!currentLayout) {
+                return (
+                    <div
+                        ref={(target) => {
+                            itemsRef.value = toElement(target);
+                        }}
+                        class={MenuStyles.menuItems}
+                        role="presentation"
+                    >
+                        {renderHighlightFloater()}
+                        {renderRuns()}
+                    </div>
+                );
+            }
 
             return (
                 <div
@@ -533,7 +624,7 @@ const MenuLevel = defineComponent(
                         }}
                         computeEffect={props.computeEffect}
                     >
-                        {{ default: () => renderRuns() }}
+                        {{ default: () => [renderHighlightFloater(), ...renderRuns()] }}
                     </PlacementBox>
                 </div>
             );
@@ -606,6 +697,7 @@ const MenuLevel = defineComponent(
             submenuOpensOn: null,
             reservedScreenSize: null,
             transitionDurationMs: null,
+            floaterTransitionDurationMs: null,
             openerFlags: null,
             parentPlacement: null,
             openerItem: null,
@@ -764,6 +856,7 @@ export const Menu = defineComponent(
                                     submenuOpensOn={props.submenuOpensOn ?? MENU_DEFAULTS.submenuOpensOn}
                                     reservedScreenSize={props.reservedScreenSize}
                                     transitionDurationMs={props.transitionDurationMs}
+                                    floaterTransitionDurationMs={props.floaterTransitionDurationMs}
                                     openerFlags={flags}
                                     checkedValues={checked.value ?? EMPTY_CHECKED}
                                     computeLayout={props.computeLayout}
@@ -781,7 +874,11 @@ export const Menu = defineComponent(
                                     onClose={close}
                                     onDismiss={close}
                                 >
-                                    {{ renderItem: slots.renderItem, renderPopup: slots.renderPopup }}
+                                    {{
+                                        renderItem: slots.renderItem,
+                                        renderPopup: slots.renderPopup,
+                                        renderHighlightFloater: slots.renderHighlightFloater,
+                                    }}
                                 </MenuLevel>,
                             ],
                             renderDecoration: slots.renderDecoration,
@@ -820,6 +917,7 @@ export const Menu = defineComponent(
             "triggerRole": null,
             "reservedScreenSize": null,
             "transitionDurationMs": null,
+            "floaterTransitionDurationMs": null,
             "visibility": Boolean,
             "onUpdate:visibility": null,
             "anchorRef": null,
@@ -924,6 +1022,7 @@ export const ContextMenu = defineComponent(
                         submenuOpensOn={props.submenuOpensOn ?? MENU_DEFAULTS.submenuOpensOn}
                         reservedScreenSize={props.reservedScreenSize}
                         transitionDurationMs={props.transitionDurationMs}
+                        floaterTransitionDurationMs={props.floaterTransitionDurationMs}
                         openerFlags={{ isOpen: isOpen.value }}
                         checkedValues={checked.value ?? EMPTY_CHECKED}
                         computeLayout={props.computeLayout}
@@ -933,7 +1032,11 @@ export const ContextMenu = defineComponent(
                         onClose={close}
                         onDismiss={close}
                     >
-                        {{ renderItem: slots.renderItem, renderPopup: slots.renderPopup }}
+                        {{
+                            renderItem: slots.renderItem,
+                            renderPopup: slots.renderPopup,
+                            renderHighlightFloater: slots.renderHighlightFloater,
+                        }}
                     </MenuLevel>
                 </>
             );
@@ -954,6 +1057,7 @@ export const ContextMenu = defineComponent(
             "submenuOpensOn": null,
             "reservedScreenSize": null,
             "transitionDurationMs": null,
+            "floaterTransitionDurationMs": null,
             "visibility": Boolean,
             "onUpdate:visibility": null,
             "items": null,

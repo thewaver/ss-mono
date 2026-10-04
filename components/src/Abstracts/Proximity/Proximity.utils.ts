@@ -77,6 +77,21 @@ export namespace ProximityUtils {
     };
 
     /**
+     * {@link getFalloff}'s curve for a plain distance, with no run to be off.
+     *
+     * @param distance How far the thing is from the point.
+     * @param reach How far the effect carries, in the same units.
+     * @returns `1` at the point, falling as the square of the distance to `0` at the reach and beyond.
+     */
+    export const getDistanceFalloff = (distance: number, reach: number) => {
+        if (reach < NO_DIRECTION) return NOTHING;
+
+        const nearness = MathUtils.clamp01(distance / reach);
+
+        return WHOLE - nearness * nearness;
+    };
+
+    /**
      * Everything about an arrangement that an effect measures itself against.
      *
      * Taken once per layout rather than per item, since none of it varies between the items in one run.

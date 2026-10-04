@@ -2,6 +2,7 @@
     import { tick, untrack } from "svelte";
 
     import {
+        LetterDriverStyles,
         LetterDriverUtils,
         PAINTED_TEXT_DEFAULTS,
         PaintedTextUtils,
@@ -31,13 +32,24 @@
     let source = $state<HTMLDivElement>();
     let layoutHost = $state<HTMLDivElement>();
 
+    const getComputePushingAnimationName = () => {
+        const computeName = driver?.getComputePushingAnimationName?.();
+
+        if (!computeName || !driver) return undefined;
+
+        return (character: string, index: number) =>
+            computeName(character, offset + index, driver.registry.get().characters.length);
+    };
+
     const layout = PaintedTextUtils.createLayout({
         getSource: () => source ?? undefined,
         getLayoutHost: () => layoutHost ?? undefined,
         getIsMeasuringLetters: () => !!driver,
+        getComputePushingAnimationName: () => untrack(getComputePushingAnimationName),
     });
 
     const getLayoutState = readStore(layout);
+    const getRestLetters = readStore(layout, (state) => state.restLetters);
     const getRegistryState = readStore(driver?.registry ?? LetterDriverUtils.createRegistry());
 
     const controller: PaintedTextController = {
@@ -85,6 +97,14 @@
         registration?.setCharacters(letters.map((letter) => letter.character));
     });
 
+    $effect(() => {
+        const letters = getRestLetters();
+
+        registration?.setBoxes(
+            letters.map((letter) => ({ x: letter.x, y: letter.top, width: letter.width, height: letter.height })),
+        );
+    });
+
     const width = $derived(getLayoutState().width ?? 0);
     const height = $derived(getLayoutState().height);
     const size = $derived({ width, height });
@@ -108,9 +128,27 @@
 
     const isPerLetter = $derived(!!driver?.getIsAnimating());
 
+    $effect(() => {
+        if (!driver?.getComputePushingAnimationName) return;
+
+        const letterOffset = offset;
+        const letterStyles = getRestLetters().map((_, index) => {
+            const animation = driver.getLetterState(letterOffset + index).animation;
+
+            return animation
+                ? LetterDriverUtils.computeAnimationStyle(animation, LetterDriverStyles.letterDriverTimeVar)
+                : undefined;
+        });
+
+        layout.relayout(letterStyles);
+    });
+
     const getLetterStyle = (localIndex: number) =>
         driver && isPerLetter
-            ? PaintedTextUtils.computeLetterStyle(driver.getLetterState(offset + localIndex))
+            ? PaintedTextUtils.computeLetterStyle(
+                  driver.getLetterState(offset + localIndex),
+                  LetterDriverStyles.letterDriverTimeVar,
+              )
             : undefined;
 
     const atomicLetterIndices = $derived(
@@ -138,10 +176,6 @@
         return letter ? { x: letter.x + letter.width, top: letter.top, height: letter.height } : undefined;
     });
 
-    const reportStart = (event: AnimationEvent, localIndex: number) => {
-        if (event.target === event.currentTarget) driver?.reportLetterStart?.(offset + localIndex);
-    };
-
     const attachAtomic = (element: SVGElement) => (node: SVGGElement) => {
         if (node.firstChild !== element) node.replaceChildren(element);
     };
@@ -159,7 +193,7 @@
     {/each}
 {/snippet}
 
-{#snippet letters(isReporting: boolean)}
+{#snippet letters()}
     {#each getLayoutState().letters as letter, index (index)}
         {#if letter.kind === "text"}
             {@const letterState = driver?.getLetterState(offset + index)}
@@ -169,7 +203,6 @@
                 y={letter.baseline}
                 text-anchor={letterState?.glyph ? "middle" : undefined}
                 style={toStyle({ ...getLayoutState().runs[letter.runIndex ?? 0]?.style, ...getLetterStyle(index) })}
-                onanimationstart={isReporting ? (event) => reportStart(event, index) : undefined}
                 >{letterState?.glyph ?? letter.character}</text
             >
         {/if}
@@ -179,7 +212,7 @@
 {#snippet layer(attributes: Record<string, unknown>, isReadable: boolean)}
     {#if isPerLetter}
         <g {...attributes} aria-hidden="true">
-            {@render letters(isReadable)}
+            {@render letters()}
         </g>
     {:else}
         <text class={styles.paintedTextLayer} {...attributes} aria-hidden={isReadable ? undefined : "true"}>

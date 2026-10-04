@@ -4,6 +4,7 @@ import { shallowRef } from "vue";
 import type { ExampleDefs } from "../../PageComponents/Examples/Examples.types";
 import PageExamples from "../../PageComponents/Examples/PageExamples.vue";
 import CountriesExample from "./Examples/Countries.vue";
+import GlideExample from "./Examples/Glide.vue";
 import GroupedExample from "./Examples/Grouped.vue";
 import SizesExample from "./Examples/Sizes.vue";
 
@@ -12,6 +13,7 @@ const EXAMPLES_ROOT = "/src/App/Pages/ListboxPage/Examples";
 const single = shallowRef<string | undefined>("Portugal");
 const multiple = shallowRef<string[]>(["Denmark"]);
 const size = shallowRef<string | undefined>();
+const glide = shallowRef<string | undefined>("Portugal");
 
 const examples: ExampleDefs[] = [
     {
@@ -35,6 +37,13 @@ const examples: ExampleDefs[] = [
             `value: ${size.value ?? "undefined"} — the left arrow moves forward in a right-to-left page, and L is skipped`,
         path: `${EXAMPLES_ROOT}/Sizes.vue`,
     },
+    {
+        key: "glide",
+        name: "Gliding markers",
+        readout: () =>
+            `value: ${glide.value ?? "undefined"} — one outlined marker sits on the picked option and a second glides to whichever option the pointer or the arrows are on`,
+        path: `${EXAMPLES_ROOT}/Glide.vue`,
+    },
 ];
 </script>
 
@@ -50,6 +59,10 @@ const examples: ExampleDefs[] = [
 
         <template #horizontalRightToLeft>
             <SizesExample v-model:value="size" />
+        </template>
+
+        <template #glide>
+            <GlideExample v-model:value="glide" />
         </template>
     </PageExamples>
 </template>

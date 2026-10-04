@@ -13,7 +13,11 @@ export const Tilter = (props: TilterProps) => {
 
     const isDisabled = props.isDisabled ?? false;
 
-    const { reading, isPointerPresent } = PointerTrackerReactUtils.usePointerReading(ref, isDisabled);
+    const { reading, isPointerPresent } = PointerTrackerReactUtils.usePointerReading(
+        ref,
+        isDisabled,
+        props.pointSource,
+    );
 
     const isResting = PointerEffectsUtils.getIsResting(isDisabled, isPointerPresent, reading, props.activeRangePx);
 

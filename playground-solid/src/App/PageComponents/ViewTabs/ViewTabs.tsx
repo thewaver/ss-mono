@@ -46,7 +46,7 @@ export const PageViewTabs = (props: PageViewTabsProps) => {
                 selectedValue={getSelected}
                 linkComponent={PageViewTabLink}
                 renderGutter={() => <PageTabGutter orientation={TAB_ORIENTATION} />}
-                renderFloater={(getVisibilityTarget, getTransitionDurationMs) => (
+                renderSelectionFloater={(getVisibilityTarget, getTransitionDurationMs) => (
                     <PageTabFloater
                         orientation={TAB_ORIENTATION}
                         visibilityTarget={getVisibilityTarget}

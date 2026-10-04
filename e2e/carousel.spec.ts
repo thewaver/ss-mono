@@ -7,13 +7,19 @@ import { demo, prop, readout } from "./helpers";
  * page's own default. Everything timed here is then measured against `DELAY_MS` with a margin, and the
  * assertions are about whether the slide moved at all rather than about landing on a particular frame.
  *
- * Four carousels sit on the page and only one of them rotates, which is what makes the holds testable:
- * a hold that leaked would show up as the others behaving differently from the one under the pointer.
+ * Several carousels sit on the page and only one of them rotates by its own delay, which is what makes the
+ * holds testable: a hold that leaked would show up as the others behaving differently from the one under the
+ * pointer.
+ *
+ * Every carousel on the page is drawn by the placement the panel's knob names. The behaviors asked about here —
+ * labels, wrapping, holds, picks, swipes — belong to the carousel whatever the placement, so they are asked once,
+ * under the page's starting placement; the placement-specific questions switch the knob.
  */
 const MANUAL = demo("manual");
 const ROTATING = demo("rotating");
-const DRUM = demo("stepped");
 const NO_CONTROLS = demo("noControls");
+const SCROLLED = demo("scrolled");
+const RING = demo("ring");
 
 const region = (scope: string) => `${scope} [aria-roledescription="carousel"]`;
 const slide = (scope: string) => `${scope} [aria-roledescription="slide"]`;
@@ -23,7 +29,6 @@ const viewport = (scope: string) => `${region(scope)} > div:first-child`;
 const field = (key: string) => `${prop(key)} input`;
 
 const DELAY_MS = 500;
-const MIN_COLUMN_HEIGHT = 150;
 const SETTLE_MS = 900;
 const DRAG_STEPS = 10;
 
@@ -31,21 +36,16 @@ const currentSlide = (page: import("@playwright/test").Page, scope: string) =>
     page.locator(`${slide(scope)}:not([aria-hidden="true"])`).getAttribute("aria-label");
 
 test.beforeEach(async ({ page }) => {
-    await page.goto("/track-carousel");
+    await page.goto("/carousel");
     await expect(page.locator(region(MANUAL))).toBeVisible();
     await page.locator(field("delayMs")).fill(String(DELAY_MS));
     await page.locator(field("delayMs")).blur();
     await page.mouse.move(0, 0);
 });
 
-/**
- * The drum sits on a page of its own, carrying the same three demos and the same knobs, so the tests about
- * turning open that page over the top of the track page this file starts on.
- */
-const openDrum = async (page: import("@playwright/test").Page) => {
-    await page.goto("/drum-carousel");
-    await expect(page.locator(region(DRUM))).toBeVisible();
-    await page.mouse.move(0, 0);
+const pickOption = async (page: import("@playwright/test").Page, key: string, name: string) => {
+    await page.locator(`${prop(key)} [role="combobox"]`).click();
+    await page.locator('[role="listbox"] [role="option"]', { hasText: name }).click();
 };
 
 test("the region and every slide say what they are, beyond what their roles alone convey", async ({ page }) => {
@@ -62,7 +62,9 @@ test("the region and every slide say what they are, beyond what their roles alon
 test("the slides that are off screen are out of reach rather than merely out of sight", async ({ page }) => {
     const offScreen = page.locator(`${slide(MANUAL)}[aria-hidden="true"]`);
 
-    await expect(offScreen, "three of the four are away").toHaveCount(3);
+    await expect(offScreen, "three of the four are away, however much of them the placement still shows").toHaveCount(
+        3,
+    );
     await expect(offScreen.first()).toHaveAttribute("inert", "");
     await expect(
         page.locator(slide(MANUAL)).first(),
@@ -247,29 +249,98 @@ test("a column carousel claims the other axis and steps the way the finger went"
 });
 
 /**
- * A row carousel gets its width from the page and needs nothing said about it; a column carousel has no
- * height of its own, so it takes the one the surrounding box was given. A viewport that collapsed to nothing
- * is the failure this watches for, and it is measured in layout space rather than from a client rect.
+ * Every slide fills the carousel's box before its placement moves it, which is what lets a placement count its
+ * lengths in shares of the box. A box that collapsed to nothing is the failure this watches for, and it is
+ * measured in layout space rather than from a client rect.
  */
-test("a column carousel takes its height from the box around it and gives all of it to one slide", async ({ page }) => {
-    await pickOption(page, "orientation", "Up and down");
+test("the slide showing fills the carousel's box exactly, across or up and down", async ({ page }) => {
+    for (const orientation of ["Across", "Up and down"]) {
+        await pickOption(page, "orientation", orientation);
 
-    const viewportHeight = await page.locator(viewport(MANUAL)).evaluate((element) => element.clientHeight);
-    const slideHeight = await page
-        .locator(`${slide(MANUAL)}:not([aria-hidden="true"])`)
-        .evaluate((element) => (element as HTMLElement).offsetHeight);
+        const box = await page.locator(viewport(MANUAL)).evaluate((element) => ({
+            width: element.clientWidth,
+            height: element.clientHeight,
+        }));
+        const shown = await page.locator(`${slide(MANUAL)}:not([aria-hidden="true"])`).evaluate((element) => ({
+            width: (element as HTMLElement).offsetWidth,
+            height: (element as HTMLElement).offsetHeight,
+        }));
 
-    expect(viewportHeight, "the window the slides move through is as tall as the page made it").toBeGreaterThan(
-        MIN_COLUMN_HEIGHT,
-    );
-    expect(slideHeight, "and the slide on screen fills it exactly, so only one is ever in view").toBe(viewportHeight);
+        expect(box.height, "the box has a size of its own").toBeGreaterThan(0);
+        expect(shown, "and the slide on screen fills it").toEqual(box);
+    }
 });
 
 /**
- * The drum is the same carousel with its slides on the faces of a barrel, so everything asked above about
- * labels, wrapping, holds and picks holds here for the same reasons and is not asked twice. What is checked
- * here is the part that genuinely differs: a step turns the barrel rather than sliding a track, and the faces
- * that have turned away are as far out of reach as the slides that have scrolled off the side.
+ * A slide drawn beside the one showing can be pressed to bring it up. It is inert, so the press lands on the
+ * carousel's box, and the carousel works out from where it landed which slide was aimed at. Cover flow, the
+ * page's starting placement, draws the next slide turned and overlapping on the right of the one showing.
+ */
+test("pressing a slide drawn beside the one showing brings it up", async ({ page }) => {
+    const box = (await page.locator(viewport(MANUAL)).boundingBox())!;
+
+    await page.mouse.click(box.x + box.width * 0.92, box.y + box.height * 0.5);
+
+    await expect.poll(() => currentSlide(page, MANUAL), { message: "the slide on the right came up" }).toBe("2 of 4");
+});
+
+test("a press on the slide showing does not move the carousel", async ({ page }) => {
+    const box = (await page.locator(viewport(MANUAL)).boundingBox())!;
+
+    await page.mouse.click(box.x + box.width * 0.5, box.y + box.height * 0.5);
+
+    expect(await currentSlide(page, MANUAL)).toBe("1 of 4");
+});
+
+/**
+ * The scrolled example writes the carousel's progress from how far a runway has traveled through a scrolling box,
+ * so the slides move with the scroll, and the slide counted as showing follows whichever is nearest.
+ */
+test("a progress driven by a scroll moves the slides, and the slide showing follows the nearest one", async ({
+    page,
+}) => {
+    expect(await currentSlide(page, SCROLLED)).toBe("1 of 4");
+
+    await page.locator("#carouselScrollBox").evaluate((element) => {
+        element.scrollTop = element.scrollHeight;
+    });
+
+    await expect
+        .poll(() => currentSlide(page, SCROLLED), { message: "scrolled to the end, the last slide is showing" })
+        .toBe("4 of 4");
+});
+
+/**
+ * The ring turns on its own, with its progress written on a clock, so WCAG 2.2.2 asks for a way to stop it. The
+ * example's own button is that way, and once pressed the turn holds still.
+ */
+test("the turning ring stops when its stop control is pressed, and stays stopped", async ({ page }) => {
+    const ringTransform = () =>
+        page
+            .locator(slide(RING))
+            .first()
+            .evaluate((element) => (element as HTMLElement).style.transform);
+
+    const turning = page.locator("#ringTurn");
+
+    if ((await turning.textContent())?.includes("Turn")) await turning.click();
+
+    await expect.poll(ringTransform, { message: "it is turning" }).not.toBe(await ringTransform());
+
+    await turning.click();
+
+    const stopped = await ringTransform();
+
+    await page.waitForTimeout(SETTLE_MS);
+
+    expect(await ringTransform(), "nothing turns once it is stopped").toBe(stopped);
+});
+
+/**
+ * The drum is the same carousel under another placement, so everything asked above about labels, wrapping,
+ * holds and picks holds here for the same reasons and is not asked twice. What is checked here is the part that
+ * genuinely differs: a step turns the slides round a ring rather than sliding them, and the faces that have
+ * turned away are as far out of reach as the slides that have gone off the side.
  */
 const faceTransform = (page: import("@playwright/test").Page, scope: string) =>
     page
@@ -277,60 +348,63 @@ const faceTransform = (page: import("@playwright/test").Page, scope: string) =>
         .first()
         .evaluate((element) => (element as HTMLElement).style.transform);
 
+const openDrum = async (page: import("@playwright/test").Page) => {
+    await pickOption(page, "placement", "Drum");
+    await page.mouse.move(0, 0);
+};
+
 test("a drum steps by turning, and its slides ride the faces round", async ({ page }) => {
     await openDrum(page);
-    const before = await faceTransform(page, DRUM);
+    const before = await faceTransform(page, MANUAL);
 
-    expect(before, "a face carries its angle and its distance from the axis in one transform").toContain("translateZ(");
+    expect(before, "a face carries its place round the ring and its turn in one transform").toContain("translate3d(");
 
-    await page.locator(control(DRUM, "Next slide")).click();
+    await page.locator(control(MANUAL, "Next slide")).click();
 
-    expect(await currentSlide(page, DRUM), "the step lands on the next slide, exactly as on the track").toBe("2 of 4");
-    expect(await faceTransform(page, DRUM), "and the faces turned to bring it to the front").not.toBe(before);
+    expect(await currentSlide(page, MANUAL), "the step lands on the next slide, exactly as on the track").toBe(
+        "2 of 4",
+    );
+    expect(await faceTransform(page, MANUAL), "and the faces turned to bring it to the front").not.toBe(before);
 });
 
 test("a swipe turns the drum the way the finger went", async ({ page }) => {
     await openDrum(page);
-    await swipeAcross(page, DRUM, 0.8, 0.3);
+    await swipeAcross(page, MANUAL, 0.8, 0.3);
 
-    expect(await currentSlide(page, DRUM), "pushing the faces leftwards turns the next one round").toBe("2 of 4");
+    expect(await currentSlide(page, MANUAL), "pushing the faces leftwards turns the next one round").toBe("2 of 4");
 });
 
 test("the faces of a drum that have turned away are out of reach, not merely out of sight", async ({ page }) => {
     await openDrum(page);
-    const away = page.locator(`${slide(DRUM)}[aria-hidden="true"]`);
+    const away = page.locator(`${slide(MANUAL)}[aria-hidden="true"]`);
 
     await expect(away.first()).toHaveAttribute("inert", "");
     await expect(
-        page.locator(`${slide(DRUM)}:not([aria-hidden="true"])`),
+        page.locator(`${slide(MANUAL)}:not([aria-hidden="true"])`),
         "exactly one face is the current one, backs and far faces included",
     ).toHaveCount(1);
 });
 
 /**
- * The drum turns about one of two axes, and the swipe follows whichever it is — across for a barrel on the
- * upright axis, up and down for one lying on its side. Direction is one knob for the whole page, so switching
- * it turns the drum and turns the tracks with it; this reads the face's own transform, where the choice shows.
+ * The drum turns about one of two axes, and the swipe follows whichever it is — across for a ring on the
+ * upright axis, up and down for one lying on its side. Orientation is one knob for the whole page; this reads
+ * the face's own transform, where the choice shows.
  */
-const pickOption = async (page: import("@playwright/test").Page, key: string, name: string) => {
-    await page.locator(`${prop(key)} [role="combobox"]`).click();
-    await page.locator('[role="listbox"] [role="option"]', { hasText: name }).click();
-};
 
 test("a drum on the other axis turns end over end, and takes its swipe the same way", async ({ page }) => {
     await openDrum(page);
-    expect(await faceTransform(page, DRUM), "on the upright axis by default").toContain("rotateY(");
+    expect(await faceTransform(page, MANUAL), "on the upright axis by default").toContain("rotateY(");
 
     await pickOption(page, "orientation", "Up and down");
 
-    expect(await faceTransform(page, DRUM), "and end over end once it is laid on its side").toContain("rotateX(");
+    expect(await faceTransform(page, MANUAL), "and end over end once it is laid on its side").toContain("rotateX(");
 
-    await expect(page.locator(viewport(DRUM)), "the browser keeps the axis the barrel no longer travels on").toHaveCSS(
-        "touch-action",
-        "pan-x",
-    );
+    await expect(
+        page.locator(viewport(MANUAL)),
+        "the browser keeps the axis the barrel no longer travels on",
+    ).toHaveCSS("touch-action", "pan-x");
 
-    await swipeDown(page, DRUM, 0.8, 0.3);
+    await swipeDown(page, MANUAL, 0.8, 0.3);
 
-    expect(await currentSlide(page, DRUM), "pushing the faces upwards brings the next one round").toBe("2 of 4");
+    expect(await currentSlide(page, MANUAL), "pushing the faces upwards brings the next one round").toBe("2 of 4");
 });

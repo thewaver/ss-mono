@@ -14,6 +14,7 @@
     import Markup from "../../../../Utils/Markup.svelte";
     import { markup } from "../../../../Utils/markupUtils.js";
     import type { TrackedPatternConfig } from "../../SVGDefsSvelte.types.js";
+    import { SVGDefsSvelteUtils } from "../../SVGDefsSvelte.utils.svelte.js";
     import SVGPatternTrackedCircleCell from "../../SVGPatternTrackedCircleCell.svelte";
     import { SVGPatterns } from "../../SVGPatterns.const.js";
     import PatternElement from "./circle_hd_grow_2.svelte";
@@ -42,7 +43,21 @@
 <script lang="ts">
     let props: PatternElementProps = $props();
 
-    const { getReading, getIsPointerPresent } = PointerTrackerSvelteUtils.create(() => props.element);
+    const { getReading, getIsPointerPresent } = PointerTrackerSvelteUtils.create(
+        () => props.element,
+        undefined,
+        () => props.defs.getPointSource?.(),
+    );
+
+    const opts = $derived(TrackedPatternUtils.resolveOpts(props.opts, DEFAULTS));
+    const pointer = $derived(
+        TrackedPatternUtils.computePointerPoint(getReading(), getIsPointerPresent(), props.defs.getSize()),
+    );
+
+    const computeCellLevel = SVGDefsSvelteUtils.createPatternTrail(
+        () => opts,
+        () => pointer,
+    );
 
     const r = $derived(Math.min(props.defs.cellSize.width, props.defs.cellSize.height) * 0.5);
 
@@ -52,8 +67,8 @@
             `pattern1-${props.id}`,
             props.defs.cellSize,
             props.defs.getSize(),
-            TrackedPatternUtils.computePointerPoint(getReading(), getIsPointerPresent(), props.defs.getSize()),
-            TrackedPatternUtils.resolveOpts(props.opts, DEFAULTS),
+            pointer,
+            opts,
             (cellId, index, isSplit, level) =>
                 markup(SVGPatternTrackedCircleCell, {
                     id: cellId,
@@ -67,6 +82,7 @@
                               ? props.defs.colors.primary
                               : props.defs.colors.secondary,
                 }),
+            computeCellLevel,
         ),
     );
 </script>

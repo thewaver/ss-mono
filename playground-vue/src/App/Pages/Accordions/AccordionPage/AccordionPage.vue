@@ -5,6 +5,7 @@ import type { ExampleDefs } from "../../../PageComponents/Examples/Examples.type
 import PageExamples from "../../../PageComponents/Examples/PageExamples.vue";
 import DeferredExample from "./Examples/Deferred.vue";
 import GrowingExample from "./Examples/Growing.vue";
+import RowExample from "./Examples/Row.vue";
 import ScrolledExample from "./Examples/Scrolled.vue";
 import SectionsExample from "./Examples/Sections.vue";
 
@@ -18,6 +19,7 @@ const required = shallowRef<string[]>(["Shipping"]);
 const growing = shallowRef<string[]>(["Shipping"]);
 const scrolled = shallowRef<string[]>([]);
 const deferred = shallowRef<string[]>([]);
+const row = shallowRef<string[]>(["Mountains"]);
 
 const extraLines = shallowRef(STARTING_EXTRA_LINES);
 const built = shallowRef<string[]>([]);
@@ -74,6 +76,14 @@ const examples: ExampleDefs[] = [
         readout: () => `expanded: ${JSON.stringify(scrolled.value)} — opening a section below the fold brings it up`,
         path: `${EXAMPLES_ROOT}/Scrolled.vue`,
     },
+    {
+        key: "row",
+        name: "Side by side",
+        span: 2,
+        readout: () =>
+            `expanded: ${JSON.stringify(row.value)} — the panels sit in a row and open in width; the left and right arrows walk the headers, and the new panel's content slides in from the side the person moved toward`,
+        path: `${EXAMPLES_ROOT}/Row.vue`,
+    },
 ];
 </script>
 
@@ -105,6 +115,10 @@ const examples: ExampleDefs[] = [
 
         <template #scrolled>
             <ScrolledExample v-model:expanded="scrolled" />
+        </template>
+
+        <template #row>
+            <RowExample v-model:expanded="row" />
         </template>
     </PageExamples>
 </template>

@@ -14,6 +14,7 @@ import { PagePropsPanel } from "../../PageComponents/PropsPanel/PropsPanel";
 import { BlurExample } from "./Examples/Blur";
 import { DropShadowExample } from "./Examples/DropShadow";
 import { HueExample } from "./Examples/Hue";
+import { PixelateExample } from "./Examples/Pixelate";
 import { StackExample } from "./Examples/Stack";
 import { ToneExample } from "./Examples/Tone";
 import { TurbulenceExample } from "./Examples/Turbulence";
@@ -68,6 +69,12 @@ export const SVGFiltersPage = () => {
                 name: "Tone",
                 component: () => <ToneExample {...commonProps} />,
                 path: `${EXAMPLES_ROOT}/Tone.tsx`,
+            },
+            {
+                key: "pixelate",
+                name: "Pixelate",
+                component: () => <PixelateExample {...commonProps} />,
+                path: `${EXAMPLES_ROOT}/Pixelate.tsx`,
             },
             {
                 key: "stack",

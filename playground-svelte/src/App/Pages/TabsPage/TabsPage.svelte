@@ -1,5 +1,9 @@
 <script lang="ts">
-    import { AUTOMATIC_TABS, REACHABLE_TABS } from "@thewaver/ss-playground/App/Pages/TabsPage/TabsPage.const";
+    import {
+        AUTOMATIC_TABS,
+        HOVER_PILL_TABS,
+        REACHABLE_TABS,
+    } from "@thewaver/ss-playground/App/Pages/TabsPage/TabsPage.const";
 
     import type { ExampleDefs } from "../../PageComponents/Examples/Examples.types";
     import PageExamples from "../../PageComponents/Examples/PageExamples.svelte";
@@ -18,6 +22,7 @@
     let columnValue = $state("Overview");
     let linkValue = $state("Docs");
     let customLinkValue = $state("Docs");
+    let hoverPillValue = $state("Render");
     let autoValue = $state("Render");
     let reachableValue = $state("Render");
     let rightToLeftValue = $state("Render");
@@ -49,6 +54,15 @@
             readout: () =>
                 `selected: ${autoValue} — an arrow both moves the focus and takes the selection with it, which suits a panel that is already loaded`,
             component: automaticExample,
+            path: `${EXAMPLES_ROOT}/Row.svelte`,
+        },
+        {
+            key: "hoverPill",
+            span: 2,
+            name: "A pill that follows the pointer",
+            readout: () =>
+                `selected: ${hoverPillValue} — the underline stays on the selected tab while a second marker glides to whichever tab the pointer or the focus is on`,
+            component: hoverPillExample,
             path: `${EXAMPLES_ROOT}/Row.svelte`,
         },
         {
@@ -136,6 +150,18 @@
         hasAutoActivation={true}
         onSelectionChange={(value) => {
             autoValue = value;
+        }}
+    />
+{/snippet}
+
+{#snippet hoverPillExample()}
+    <RowExample
+        selectedValue={hoverPillValue}
+        tabs={HOVER_PILL_TABS}
+        idPrefix={"hoverPill"}
+        hasHoverPill={true}
+        onSelectionChange={(value) => {
+            hoverPillValue = value;
         }}
     />
 {/snippet}

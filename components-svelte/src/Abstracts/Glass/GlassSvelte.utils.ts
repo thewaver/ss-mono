@@ -1,4 +1,4 @@
-import { type GlassDefs, type GlassTintDefs, GlassUtils } from "@thewaver/ss-components";
+import { type GlassDefs, type GlassTintDefs, GlassUtils, type PointSource } from "@thewaver/ss-components";
 import type { Size2d } from "@thewaver/ss-utils";
 
 import type { SVGDefs } from "../../Generators/SVGDefs/SVGDefs.types.js";
@@ -48,6 +48,8 @@ export namespace GlassSvelteUtils {
      * resting position is.
      * @param size The element's current size, which the pointer's position is scaled against.
      * @param defs The glass description, filled out.
+     * @param getSource The point the light follows in place of the pointer. Left out, or answering `undefined`, the
+     * pointer.
      * @returns One definition, carrying the tint's fill and opacity along with the filter. The filter is left off
      * entirely at a `specularConstant` of zero, rather than pointed at one that builds nothing.
      */
@@ -56,6 +58,7 @@ export namespace GlassSvelteUtils {
         element: HTMLElement | undefined,
         size: Size2d,
         defs: GlassDefs,
+        getSource?: () => PointSource | undefined,
     ): SVGDefs[] => {
         const tintDef = { ...computeTintFill(id, size, defs.tint), opacity: defs.tint.opacity };
 
@@ -68,7 +71,8 @@ export namespace GlassSvelteUtils {
                 ...tintDef,
                 filter: {
                     id: filterId,
-                    renderDefsElement: () => markup(GlassSheenFilter, { filterId, element, size, defs }),
+                    renderDefsElement: () =>
+                        markup(GlassSheenFilter, { filterId, element, size, defs, getPointSource: getSource }),
                 },
             },
         ];

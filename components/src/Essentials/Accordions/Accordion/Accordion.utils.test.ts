@@ -53,3 +53,48 @@ describe("computeFocusTarget", () => {
         expect(AccordionUtils.computeFocusTarget("ArrowDown", [null, null], [0, 1], null)).toBeUndefined();
     });
 });
+
+describe("computeMoveDirection", () => {
+    it("compares the section that opened with the one that closed", () => {
+        expect(AccordionUtils.computeMoveDirection([1], [3])).toBe("forward");
+        expect(AccordionUtils.computeMoveDirection([3], [1])).toBe("backward");
+    });
+
+    it("compares with the nearest open section when nothing closed", () => {
+        expect(AccordionUtils.computeMoveDirection([0, 4], [0, 3, 4])).toBe("backward");
+        expect(AccordionUtils.computeMoveDirection([0, 4], [0, 1, 4])).toBe("forward");
+    });
+
+    it("says nothing when nothing opened, or nothing was open to move from", () => {
+        expect(AccordionUtils.computeMoveDirection([2], [])).toBeUndefined();
+        expect(AccordionUtils.computeMoveDirection([], [2])).toBeUndefined();
+    });
+});
+
+describe("computeFocusTarget", () => {
+    const headers = [{}, {}, {}] as HTMLElement[];
+
+    it("walks a row with the left and right arrows, reversed for right-to-left text", () => {
+        expect(
+            AccordionUtils.computeFocusTarget("ArrowRight", headers, [0, 1, 2], headers[0], {
+                orientation: "horizontal",
+            }),
+        ).toBe(1);
+        expect(
+            AccordionUtils.computeFocusTarget("ArrowDown", headers, [0, 1, 2], headers[0], {
+                orientation: "horizontal",
+            }),
+        ).toBeUndefined();
+        expect(
+            AccordionUtils.computeFocusTarget("ArrowRight", headers, [0, 1, 2], headers[1], {
+                orientation: "horizontal",
+                direction: "rtl",
+            }),
+        ).toBe(0);
+    });
+
+    it("walks a column with the up and down arrows", () => {
+        expect(AccordionUtils.computeFocusTarget("ArrowDown", headers, [0, 1, 2], headers[0])).toBe(1);
+        expect(AccordionUtils.computeFocusTarget("ArrowRight", headers, [0, 1, 2], headers[0])).toBeUndefined();
+    });
+});

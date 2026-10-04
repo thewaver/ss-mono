@@ -8,11 +8,13 @@ import type {
     SVGDropShadowFilterDefs,
     SVGFilterAssembly,
     SVGFilterAssemblyDefs,
+    SVGFilterFrame,
     SVGFilterPrimitiveKind,
     SVGFilterRegion,
     SVGGaussianBlurFilterDefs,
     SVGHueRotationFilterDefs,
     SVGInversionFilterDefs,
+    SVGPixelateFilterDefs,
     SVGSaturationFilterDefs,
     SVGTurbulenceFilterDefs,
 } from "./SVGFilterDefs.types";
@@ -50,17 +52,21 @@ export namespace SVGFilterDefsUtils {
      * always kept. A kept effect is given a result name built from the filter's id and counted per kind, so two
      * filters on one page never read each other's results, and its reach past the element's box is remembered for
      * the region: three deviations for a blur, plus the longer offset for a shadow, and half the scale either way
-     * for a displacement.
+     * for a displacement. A pixelation of one pixel or less changes nothing and is not kept.
      *
      * `computeAssembly` says how the kept effects are put together. The method decides what each effect is
      * applied to. `"isolate"`, the default, applies every effect to the original graphic and lays all the results
      * over it, so each effect is seen on its own. `"chain"` feeds each effect the previous one's result, so they
      * compound and the last one is what shows. The region is grown to fit effects that reach past the element:
      * given the element's size, by exactly that reach on every side; without it, any reach at all doubles the
-     * region about the element; with no reach, the browser's default stands. It answers the region's attributes,
-     * what each effect reads in the order they were added, and — under `"isolate"` — the results to merge over the
-     * original, or `undefined` when nothing was kept, since a `filter` with no primitives takes the element it is
-     * applied to off the screen.
+     * region about the element; with no reach, the browser's default stands. A known size is written in pixels,
+     * except when a pixelation is kept: then the same region is written as shares of the element's box, because
+     * Safari draws nothing at all for some primitives under a region given in pixels. A pixelation needs the size,
+     * so without one it is left out and the others are assembled as if it had never been added. It answers the
+     * region's attributes, the region's size in pixels when the element's is known (the `frame` a pixelation draws
+     * its grid to), what each effect reads in the order they were added, and — under `"isolate"` — the results to
+     * merge over the original, or `undefined` when nothing was kept, since a `filter` with no primitives takes the
+     * element it is applied to off the screen.
      *
      * @param filterId The id the rendered `filter` carries.
      * @returns The `add…` calls, each answering the kept effect's result name or `undefined`, and
@@ -69,6 +75,7 @@ export namespace SVGFilterDefsUtils {
     export const createRegistry = (filterId: string) => {
         const counts: Partial<Record<SVGFilterPrimitiveKind, number>> = {};
         const keys: string[] = [];
+        const kinds: Record<string, SVGFilterPrimitiveKind> = {};
 
         let maxOffset = 0;
 
@@ -78,6 +85,7 @@ export namespace SVGFilterDefsUtils {
 
             counts[kind] = count + 1;
             keys.push(key);
+            kinds[key] = kind;
             maxOffset = Math.max(maxOffset, reach);
 
             return key;
@@ -102,33 +110,52 @@ export namespace SVGFilterDefsUtils {
             addInversion: (defs: SVGInversionFilterDefs) => (defs.amount === 0 ? undefined : add("inversion")),
             addColorChannel: (defs: SVGColorFilterDefs) =>
                 defs.r === 1 && defs.g === 1 && defs.b === 1 ? undefined : add("color"),
+            addPixelate: (defs: SVGPixelateFilterDefs) => (defs.size <= 1 ? undefined : add("pixelate")),
             addSpecularLighting: (specularConstant: number | undefined) =>
                 (specularConstant ?? SVG_FILTER_DEFAULTS.specularConstant) <= 0 ? undefined : add("specularLighting"),
             addDiffuseLighting: () => add("diffuseLighting"),
             computeAssembly: (defs?: SVGFilterAssemblyDefs): SVGFilterAssembly | undefined => {
-                if (keys.length < 1) return undefined;
+                const size = defs?.elementSize;
+                const hasSize = size !== undefined && size.width > 0 && size.height > 0;
+                const kept = hasSize ? keys : keys.filter((key) => kinds[key] !== "pixelate");
+
+                if (kept.length < 1) return undefined;
 
                 const method = defs?.method ?? SVG_FILTER_DEFAULTS.method;
+                const hasPixelate = kept.some((key) => kinds[key] === "pixelate");
 
-                const region: SVGFilterRegion | undefined = defs?.elementSize
-                    ? {
-                          filterUnits: "userSpaceOnUse",
-                          x: `${-maxOffset}px`,
-                          y: `${-maxOffset}px`,
-                          width: `${defs.elementSize.width + maxOffset * 2}px`,
-                          height: `${defs.elementSize.height + maxOffset * 2}px`,
-                      }
-                    : maxOffset > 0
-                      ? FALLBACK_FILTER_REGION
-                      : undefined;
+                const frame: SVGFilterFrame | undefined = hasSize
+                    ? { width: size.width + maxOffset * 2, height: size.height + maxOffset * 2, offset: maxOffset }
+                    : undefined;
+
+                const region: SVGFilterRegion | undefined =
+                    frame && size && hasPixelate
+                        ? {
+                              x: `${-maxOffset / size.width}`,
+                              y: `${-maxOffset / size.height}`,
+                              width: `${frame.width / size.width}`,
+                              height: `${frame.height / size.height}`,
+                          }
+                        : frame
+                          ? {
+                                filterUnits: "userSpaceOnUse",
+                                x: `${-maxOffset}px`,
+                                y: `${-maxOffset}px`,
+                                width: `${frame.width}px`,
+                                height: `${frame.height}px`,
+                            }
+                          : maxOffset > 0
+                            ? FALLBACK_FILTER_REGION
+                            : undefined;
 
                 return {
                     region,
-                    inputs: keys.map((key, index) => ({
+                    frame,
+                    inputs: kept.map((key, index) => ({
                         key,
-                        srcIn: method === "chain" && index > 0 ? keys[index - 1] : SOURCE_GRAPHIC,
+                        srcIn: method === "chain" && index > 0 ? kept[index - 1] : SOURCE_GRAPHIC,
                     })),
-                    mergeKeys: method === "isolate" ? [SOURCE_GRAPHIC, ...keys] : undefined,
+                    mergeKeys: method === "isolate" ? [SOURCE_GRAPHIC, ...kept] : undefined,
                 };
             },
         };
@@ -214,6 +241,45 @@ export namespace SVGFilterDefsUtils {
                 mask: maskKey,
                 maskedNoise: `${maskKey}_in`,
                 map: `${key}_map`,
+            },
+        };
+    };
+
+    /**
+     * Everything the pixelation's chain of primitives carries.
+     *
+     * The picture is sampled once at the middle of every square cell and each sample is grown back out to fill its
+     * cell. The samples are taken through an image of the region's own size holding one dot per cell, made opaque
+     * wherever it is not empty, since Safari smooths the image and leaves each dot part transparent; the graphic is
+     * kept only where a dot lands, and every kept pixel is dilated by half a cell. The image is used rather than one
+     * flooded dot tiled across the region, the construction usually published, because Safari draws nothing at all
+     * for that one.
+     *
+     * @param key The result name {@link createRegistry}'s `addPixelate` answered, which every intermediate result is
+     * named from.
+     * @param defs How wide each square is, in user units.
+     * @param frame The region's size in pixels and how far it reaches past the element on each side, from the
+     * assembly. The cells are counted from the element's corner, not the region's.
+     * @returns The dot image as a data URI, the dilation radius, and the name of every intermediate result.
+     */
+    export const resolvePixelate = (key: string, defs: SVGPixelateFilterDefs, frame: SVGFilterFrame) => {
+        const size = Math.max(defs.size, 1);
+        const half = size * 0.5;
+        const dot = Math.floor(half);
+        const svg = [
+            `<svg xmlns="http://www.w3.org/2000/svg" width="${frame.width}" height="${frame.height}">`,
+            `<defs><pattern id="d" x="${frame.offset}" y="${frame.offset}" width="${size}" height="${size}" patternUnits="userSpaceOnUse">`,
+            `<rect x="${dot}" y="${dot}" width="1" height="1"/></pattern></defs>`,
+            `<rect width="100%" height="100%" fill="url(#d)"/></svg>`,
+        ].join("");
+
+        return {
+            gridHref: `data:image/svg+xml,${encodeURIComponent(svg)}`,
+            radius: half,
+            keys: {
+                dots: `${key}_dots`,
+                grid: `${key}_grid`,
+                sampled: `${key}_sampled`,
             },
         };
     };

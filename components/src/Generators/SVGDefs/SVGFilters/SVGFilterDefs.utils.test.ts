@@ -76,6 +76,40 @@ describe("SVGFilterDefsUtils.createRegistry", () => {
         expect(registry.computeAssembly()?.region).toEqual({ x: "-50%", y: "-50%", width: "200%", height: "200%" });
     });
 
+    it("writes the region as shares of the box when a pixelation is kept", () => {
+        const registry = SVGFilterDefsUtils.createRegistry("f");
+
+        registry.addGaussianBlur({ stdDeviation: 2 });
+        registry.addPixelate({ size: 10 });
+
+        const assembly = registry.computeAssembly({ elementSize: { width: 100, height: 50 } });
+
+        expect(assembly?.region).toEqual({ x: "-0.06", y: "-0.12", width: "1.12", height: "1.24" });
+        expect(assembly?.frame).toEqual({ width: 112, height: 62, offset: 6 });
+    });
+
+    it("leaves a pixelation out when the element's size is not known, and chains past it", () => {
+        const registry = SVGFilterDefsUtils.createRegistry("f");
+
+        registry.addHueRotation({ deg: 90 });
+        registry.addPixelate({ size: 10 });
+        registry.addSaturation({ amount: 2 });
+
+        const assembly = registry.computeAssembly({ method: "chain" });
+
+        expect(assembly?.inputs).toEqual([
+            { key: "f_hueRotation_0", srcIn: "SourceGraphic" },
+            { key: "f_saturation_0", srcIn: "f_hueRotation_0" },
+        ]);
+        expect(assembly?.frame).toBeUndefined();
+
+        const alone = SVGFilterDefsUtils.createRegistry("g");
+
+        alone.addPixelate({ size: 10 });
+
+        expect(alone.computeAssembly(), "a pixelation alone leaves no filter at all").toBeUndefined();
+    });
+
     it("leaves the browser's region alone when nothing reaches past the box", () => {
         const registry = SVGFilterDefsUtils.createRegistry("f");
 
@@ -127,5 +161,33 @@ describe("SVGFilterDefsUtils.resolveTurbulence", () => {
 
     it("keeps a default where a field is present but undefined", () => {
         expect(SVGFilterDefsUtils.resolveTurbulence("k", { baseFrequency: 1, scale: 1, seed: undefined }).seed).toBe(0);
+    });
+});
+
+describe("pixelate", () => {
+    it("is not kept at a size of one pixel or less, which would change nothing", () => {
+        const registry = SVGFilterDefsUtils.createRegistry("f");
+
+        expect(registry.addPixelate({ size: 1 })).toBeUndefined();
+        expect(registry.addPixelate({ size: 8 })).toBe("f_pixelate_0");
+    });
+
+    it("samples each cell at its middle and grows the sample back out to fill it", () => {
+        const resolved = SVGFilterDefsUtils.resolvePixelate(
+            "f_pixelate_0",
+            { size: 10 },
+            {
+                width: 120,
+                height: 70,
+                offset: 10,
+            },
+        );
+        const svg = decodeURIComponent(resolved.gridHref.replace("data:image/svg+xml,", ""));
+
+        expect(resolved.radius).toBe(5);
+        expect(svg, "the image is the region's size, so it is never stretched").toContain('width="120" height="70"');
+        expect(svg, "the cells start at the element's corner").toContain('x="10" y="10" width="10" height="10"');
+        expect(svg, "one dot at each cell's middle").toContain('<rect x="5" y="5" width="1" height="1"/>');
+        expect(new Set(Object.values(resolved.keys)).size).toBe(Object.keys(resolved.keys).length);
     });
 });

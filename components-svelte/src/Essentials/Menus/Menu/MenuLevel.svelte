@@ -1,14 +1,23 @@
 <script lang="ts" generics="T">
     import { untrack } from "svelte";
+    import { SvelteMap } from "svelte/reactivity";
 
-    import { MenuUtils, TypeaheadUtils, MenuStyles as styles } from "@thewaver/ss-components";
+    import {
+        FloaterStyles as floaterStyles,
+        MENU_DEFAULTS,
+        MenuUtils,
+        TypeaheadUtils,
+        MenuStyles as styles,
+    } from "@thewaver/ss-components";
     import type { Point2d } from "@thewaver/ss-utils";
 
+    import { FloaterSvelteUtils } from "../../../Abstracts/Floater/FloaterSvelte.utils.svelte.js";
     import { TypeaheadSvelteUtils } from "../../../Abstracts/Typeahead/TypeaheadSvelte.utils.svelte.js";
     import PlacementBox from "../../../Primitives/PlacementBox/PlacementBox.svelte";
     import PlacementItem from "../../../Primitives/PlacementItem/PlacementItem.svelte";
     import Popover from "../../../Primitives/Popover/Popover.svelte";
     import { watchChange } from "../../../Utils/effectUtils.svelte.js";
+    import { toStyle } from "../../../Utils/styleUtils.js";
     import type { MenuItem, MenuLevelProps } from "./Menu.types.js";
     import MenuEntry from "./MenuEntry.svelte";
 
@@ -20,6 +29,9 @@
     let openValue = $state.raw<T>();
     let isCoveredWhileClosing = $state(false);
     let layoutRoot = $state<HTMLElement>();
+    let itemsWrapper = $state<HTMLDivElement>();
+
+    const itemRefs = new SvelteMap<number, HTMLElement>();
 
     const typeahead = TypeaheadSvelteUtils.createBuffer();
 
@@ -200,6 +212,27 @@
     };
 
     const runs = $derived(MenuUtils.getRuns<T, MenuItem<T>>(entries));
+
+    const recordItemRef = (index: number, element: HTMLElement) => {
+        untrack(() => itemRefs.set(index, element));
+
+        return () => {
+            if (untrack(() => itemRefs.get(index)) === element) itemRefs.delete(index);
+        };
+    };
+
+    const floaterTransitionDurationMs = $derived(
+        props.floaterTransitionDurationMs ?? MENU_DEFAULTS.floaterTransitionDurationMs,
+    );
+
+    const highlightFloater = FloaterSvelteUtils.create({
+        getIsEnabled: () => props.renderHighlightFloater !== undefined,
+        getContainer: () => itemsWrapper ?? undefined,
+        getTarget: () => (highlightedIndex === undefined ? undefined : itemRefs.get(highlightedIndex)),
+        getLayout: () => layout,
+        getPlacement: () => (highlightedIndex === undefined ? undefined : layout?.placements[highlightedIndex]),
+        getTransitionDurationMs: () => floaterTransitionDurationMs,
+    });
 </script>
 
 {#snippet entry(item: MenuItem<T>, index: number)}
@@ -223,6 +256,7 @@
             onSubmenuClose={() => {
                 openValue = undefined;
             }}
+            {recordItemRef}
         />
     {/snippet}
 
@@ -251,6 +285,21 @@
     {/each}
 {/snippet}
 
+{#snippet highlightFloaterView()}
+    {#if highlightFloater.getIsRendered()}
+        <div
+            {@attach highlightFloater.attachRef}
+            class={floaterStyles.floater}
+            style={toStyle(highlightFloater.getBounds(), { transitionDuration: `${floaterTransitionDurationMs}ms` })}
+        >
+            {@render props.renderHighlightFloater?.(
+                highlightFloater.getVisibilityTarget(),
+                floaterTransitionDurationMs,
+            )}
+        </div>
+    {/if}
+{/snippet}
+
 {#snippet renderItems()}
     {#if layout}
         <div
@@ -258,11 +307,15 @@
             style:transform={MenuUtils.computeLayoutShift(layout)}
         >
             <PlacementBox {layout} bind:ref={layoutRoot} computeEffect={props.computeEffect}>
+                {@render highlightFloaterView()}
                 {@render renderRuns()}
             </PlacementBox>
         </div>
     {:else}
-        {@render renderRuns()}
+        <div bind:this={itemsWrapper} class={styles.menuItems} role="presentation">
+            {@render highlightFloaterView()}
+            {@render renderRuns()}
+        </div>
     {/if}
 {/snippet}
 

@@ -55,7 +55,7 @@ const navigateTo = (key: PageViewKey) => {
                 <PageTabGutter :orientation="TAB_ORIENTATION" />
             </template>
 
-            <template #renderFloater="{ visibilityTarget, transitionDurationMs }">
+            <template #renderSelectionFloater="{ visibilityTarget, transitionDurationMs }">
                 <PageTabFloater
                     :orientation="TAB_ORIENTATION"
                     :visibility-target="visibilityTarget"

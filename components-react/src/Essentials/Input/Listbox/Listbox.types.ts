@@ -87,6 +87,21 @@ export type ListboxOptionsProps<T> = {
     computeEstimatedOptionHeight?: (index: number) => number;
     /** Guesses how tall a group heading will be before it is drawn, for the same reason. */
     computeEstimatedGroupHeight?: (index: number) => number;
+    /** How long either marker takes to slide from one option to the next, and to fade. */
+    floaterTransitionDurationMs?: number;
+    /**
+     * Draws the marker that slides to the selected option, behind it. The fade is handed in rather than applied: the
+     * marker fades out when nothing is selected, and in a list that only draws what is on screen it fades out while
+     * the selected option is scrolled away and back in when it returns. Where several options are selected, it follows
+     * the first of them.
+     */
+    renderSelectionFloater?: (visibilityTarget: 0 | 1, transitionDurationMs: number) => ReactNode;
+    /**
+     * Draws the marker that slides to the highlighted option — the one the pointer or the arrow keys are on — behind
+     * it, drawn under the selection's marker where both are given. It fades out while nothing is highlighted, and in
+     * a list that only draws what is on screen, while the highlighted option is scrolled away.
+     */
+    renderHighlightFloater?: (visibilityTarget: 0 | 1, transitionDurationMs: number) => ReactNode;
     /** The list's state, from `ListboxReactUtils.useCursor`: what is highlighted, and how the keyboard walks it. */
     cursor: ListboxCursor<T>;
     /** Whether a given value counts as picked, for a consumer whose values are not compared by identity. */
@@ -125,6 +140,21 @@ export type ListboxCompositeProps<T> = {
     computeEstimatedOptionHeight?: (index: number) => number;
     /** Guesses how tall a group heading will be before it is drawn, for the same reason. */
     computeEstimatedGroupHeight?: (index: number) => number;
+    /** How long either marker takes to slide from one option to the next, and to fade. */
+    floaterTransitionDurationMs?: number;
+    /**
+     * Draws the marker that slides to the selected option, behind it. The fade is handed in rather than applied: the
+     * marker fades out when nothing is selected, and in a list that only draws what is on screen it fades out while
+     * the selected option is scrolled away and back in when it returns. Where several options are selected, it follows
+     * the first of them.
+     */
+    renderSelectionFloater?: (visibilityTarget: 0 | 1, transitionDurationMs: number) => ReactNode;
+    /**
+     * Draws the marker that slides to the highlighted option — the one the pointer or the arrow keys are on — behind
+     * it, drawn under the selection's marker where both are given. It fades out while nothing is highlighted, and in
+     * a list that only draws what is on screen, while the highlighted option is scrolled away.
+     */
+    renderHighlightFloater?: (visibilityTarget: 0 | 1, transitionDurationMs: number) => ReactNode;
     /** The options, in the order they are shown. An entry carrying children becomes a group. */
     options: SelectItem<T>[];
     /** Which options are currently picked. */

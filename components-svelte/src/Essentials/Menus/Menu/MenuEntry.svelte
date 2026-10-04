@@ -1,4 +1,6 @@
 <script lang="ts" generics="T">
+    import { untrack } from "svelte";
+
     import { type InteractionFlags, type MenuItemFlags, MenuUtils } from "@thewaver/ss-components";
 
     import InteractionWrapper from "../../../Primitives/InteractionWrapper/InteractionWrapper.svelte";
@@ -14,6 +16,15 @@
     const itemId = $derived(`${level.id}-item-${props.index}`);
     const submenuId = $derived(`${level.id}-submenu-${props.index}`);
     const path = $derived([...level.path, props.index]);
+
+    $effect(() => {
+        const element = itemElement;
+        const index = props.index;
+
+        if (!element) return;
+
+        return untrack(() => props.recordItemRef(index, element));
+    });
 
     $effect(() => {
         if (!props.isHighlighted || !itemElement) return;
@@ -87,6 +98,8 @@
                 computeCustomText={level.computeCustomText}
                 renderItem={level.renderItem}
                 renderPopup={level.renderPopup}
+                floaterTransitionDurationMs={level.floaterTransitionDurationMs}
+                renderHighlightFloater={level.renderHighlightFloater}
                 onPick={level.onPick}
                 onClose={props.onSubmenuClose}
                 onDismiss={level.onDismiss}

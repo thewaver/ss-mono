@@ -26,7 +26,11 @@ export const RichExample = (props: Props) => {
                 hoverShowDelayMs={props.hoverShowDelayMs}
                 skipDelayWindowMs={props.skipDelayWindowMs}
                 renderContent={(visibilityTarget, transitionDurationMs) => (
-                    <PageTooltipContent visibilityTarget={visibilityTarget} transitionDurationMs={transitionDurationMs}>
+                    <PageTooltipContent
+                        visibilityTarget={visibilityTarget}
+                        transitionDurationMs={transitionDurationMs}
+                        reveal={props.reveal}
+                    >
                         <div className={styles.richTitle}>Everyone with the link</div>
 
                         <div className={styles.richBody}>

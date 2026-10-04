@@ -16,7 +16,11 @@ export const Tilter = defineComponent(
 
         const getIsDisabled = () => props.isDisabled ?? false;
 
-        const { reading, isPointerPresent } = PointerTrackerVueUtils.usePointerReading(ref, getIsDisabled);
+        const { reading, isPointerPresent } = PointerTrackerVueUtils.usePointerReading(
+            ref,
+            getIsDisabled,
+            () => props.pointSource,
+        );
 
         const isResting = computed(() =>
             PointerEffectsUtils.getIsResting(
@@ -81,6 +85,7 @@ export const Tilter = defineComponent(
             perspectivePx: null,
             smoothingMs: null,
             isDisabled: Boolean,
+            pointSource: null,
         }),
     },
 );

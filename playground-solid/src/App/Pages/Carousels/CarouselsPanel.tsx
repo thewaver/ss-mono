@@ -1,11 +1,13 @@
 import { Show } from "solid-js";
 
-import { CAROUSEL_ORIENTATIONS } from "@thewaver/ss-components-solid";
+import { CAROUSEL_ORIENTATIONS, CarouselPlacements } from "@thewaver/ss-components-solid";
 import { CarouselKnobs } from "@thewaver/ss-playground/App/Knobs/Carousels.const";
 import {
     FIELD_WIDTH,
     ORIENTATION_FIELD_WIDTH,
     ORIENTATION_LABELS,
+    PLACEMENT_FIELD_WIDTH,
+    PLACEMENT_LABELS,
 } from "@thewaver/ss-playground/App/Pages/Carousels/Carousels.const";
 
 import { PageCheckField, PageNumberField, PageSelectField } from "../../PageComponents/Field/Field";
@@ -17,6 +19,7 @@ type Props = {
     controls: CarouselsControls;
     hasDelay?: boolean;
     hasLooping?: boolean;
+    hasPlacement?: boolean;
 };
 
 export const PageCarouselsPanel = (props: Props) => {
@@ -24,6 +27,25 @@ export const PageCarouselsPanel = (props: Props) => {
 
     return (
         <PagePropsPanel scope={"global"}>
+            <Show when={props.hasPlacement}>
+                <PageProp
+                    key={"placement"}
+                    label={"Placement"}
+                    hint={
+                        "The rule that says where each slide is drawn from how far it is from the one showing: a strip, a drum, cover flow and the rest."
+                    }
+                >
+                    <PageSelectField
+                        value={controls.placement[0]}
+                        values={() => CarouselPlacements.SAMPLE_KEYS}
+                        computeLabel={(placement) => PLACEMENT_LABELS[placement]}
+                        width={() => PLACEMENT_FIELD_WIDTH}
+                        ariaLabel={"Placement"}
+                        onChange={(placement) => controls.placement[1](() => placement)}
+                    />
+                </PageProp>
+            </Show>
+
             <PageProp key={"slideCount"} label={"Slide count"} hint={"How many slides the carousel holds."}>
                 <PageNumberField
                     value={controls.slideCount[0]}

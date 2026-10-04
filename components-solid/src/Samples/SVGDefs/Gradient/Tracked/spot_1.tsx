@@ -18,7 +18,11 @@ export const spot_1 = (opts?: GradientSpotOpts): TrackedGradientConfig => ({
             gradientOrPattern: {
                 id: `gradient1-${id}`,
                 renderDefsElement: () => {
-                    const { getReading } = PointerTrackerSolidUtils.create(getRef ?? NO_REF);
+                    const { getReading } = PointerTrackerSolidUtils.create(
+                        getRef ?? NO_REF,
+                        undefined,
+                        defs.getPointSource,
+                    );
 
                     return SVGGradientDefsSolidUtils.computeRadialGradient({
                         id: `gradient1-${id}`,

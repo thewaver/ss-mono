@@ -11,7 +11,7 @@ import { computeSampleDefs } from "../PaintedTextPage.const";
 import type { PaintedTextExampleProps } from "../PaintedTextPage.types";
 
 type Props = PaintedTextExampleProps & {
-    animationName: string;
+    computeAnimationName: (character: string, index: number, count: number) => string;
 };
 
 const props = defineProps<Props>();
@@ -53,7 +53,7 @@ const computeBodyStrokeDefs = (size: Size2d, element: HTMLElement | undefined) =
     <div :class="styles.stack">
         <div :class="styles.fill">
             <Typewriter
-                :animation-name="animationName"
+                :compute-animation-name="computeAnimationName"
                 :animation-delay-ms="40"
                 :animation-duration-ms="400"
                 @mount="setController"

@@ -220,12 +220,17 @@ export const SelectComposite = defineComponent(
                 computeEstimatedOptionHeight={props.computeEstimatedOptionHeight}
                 computeEstimatedGroupHeight={props.computeEstimatedGroupHeight}
                 computeIsSelected={props.computeIsSelected}
+                floaterTransitionDurationMs={
+                    props.floaterTransitionDurationMs ?? SELECT_DEFAULTS.floaterTransitionDurationMs
+                }
                 onReachEnd={props.onReachEnd}
             >
                 {
                     {
                         renderOption: slots.renderOption,
                         renderGroup: slots.renderGroup,
+                        renderSelectionFloater: slots.renderSelectionFloater,
+                        renderHighlightFloater: slots.renderHighlightFloater,
                     } satisfies Partial<ListboxOptionsSlots<T>>
                 }
             </ListboxOptions>
@@ -378,6 +383,7 @@ export const SelectComposite = defineComponent(
             "onUpdate:query": null,
             "computeEstimatedOptionHeight": null,
             "computeEstimatedGroupHeight": null,
+            "floaterTransitionDurationMs": null,
             "onReachEnd": null,
             "clearAriaLabel": null,
             "options": null,
@@ -443,6 +449,8 @@ export const Select = defineComponent(
                         renderClear: slots.renderClear,
                         renderOption: slots.renderOption,
                         renderGroup: slots.renderGroup,
+                        renderSelectionFloater: slots.renderSelectionFloater,
+                        renderHighlightFloater: slots.renderHighlightFloater,
                         renderDecoration: slots.renderDecoration,
                     } satisfies Partial<SelectCompositeSlots<T>>
                 }
@@ -482,6 +490,7 @@ export const Select = defineComponent(
             "onUpdate:query": null,
             "computeEstimatedOptionHeight": null,
             "computeEstimatedGroupHeight": null,
+            "floaterTransitionDurationMs": null,
             "onReachEnd": null,
             "clearAriaLabel": null,
             "options": null,

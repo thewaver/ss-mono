@@ -303,3 +303,17 @@ export const readPaintAreas = (locator: Locator) =>
             });
         });
     });
+
+/**
+ * How far apart the middles of two elements' boxes are, in pixels.
+ *
+ * Used to ask whether a marker sits on an item without pinning where either of them is, or how big: a marker
+ * that has glided onto its item shares its middle whatever padding or inset the painter gives it.
+ */
+export const centerDistance = async (first: Locator, second: Locator) => {
+    const [a, b] = await Promise.all([first.boundingBox(), second.boundingBox()]);
+
+    if (!a || !b) return Number.POSITIVE_INFINITY;
+
+    return Math.hypot(a.x + a.width * 0.5 - (b.x + b.width * 0.5), a.y + a.height * 0.5 - (b.y + b.height * 0.5));
+};

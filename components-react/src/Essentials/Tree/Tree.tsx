@@ -12,8 +12,16 @@ import {
     useState,
 } from "react";
 
-import { FlattenerUtils, TreeStyles, TreeUtils, TypeaheadUtils } from "@thewaver/ss-components";
+import {
+    FlattenerUtils,
+    FloaterStyles,
+    TREE_DEFAULTS,
+    TreeStyles,
+    TreeUtils,
+    TypeaheadUtils,
+} from "@thewaver/ss-components";
 
+import { FloaterReactUtils } from "../../Abstracts/Floater/FloaterReact.utils";
 import { NavigatorReactUtils } from "../../Abstracts/Navigator/NavigatorReact.utils";
 import { SignalMirrorReactUtils } from "../../Abstracts/SignalMirror/SignalMirrorReact.utils";
 import { TypeaheadReactUtils } from "../../Abstracts/Typeahead/TypeaheadReact.utils";
@@ -21,9 +29,17 @@ import { VirtualizerReactUtils } from "../../Abstracts/Virtualizer/VirtualizerRe
 import { InteractionWrapper } from "../../Primitives/InteractionWrapper/InteractionWrapper";
 import { PlacementBox } from "../../Primitives/PlacementBox/PlacementBox";
 import { PlacementItem } from "../../Primitives/PlacementItem/PlacementItem";
+import { useElement } from "../../Utils/refUtils";
 import type { TreeNodeItemProps, TreeProps, TreeRow } from "./Tree.types";
 
 const EMPTY_PINNED_ROWS: number[] = [];
+
+const TREE_ITEM_SELECTOR = '[role="treeitem"]';
+
+type FloaterTargets = {
+    selection: HTMLElement | undefined;
+    highlight: HTMLElement | undefined;
+};
 
 const TreeNodeItem = (props: TreeNodeItemProps) => {
     const isDisabled = props.flags.isDisabled ?? false;
@@ -231,8 +247,92 @@ export const Tree = <T,>(props: TreeProps<T>) => {
         if (action.kind === "click") document.getElementById(getRowId(action.row))?.click();
     };
 
+    const [hoveredValue, setHoveredValue] = useState<T>();
+    const [focusInValue, setFocusInValue] = useState<T>();
+    const [floaterTargets, setFloaterTargets] = useState<FloaterTargets>({
+        selection: undefined,
+        highlight: undefined,
+    });
+
+    const floaterTransitionDurationMs = props.floaterTransitionDurationMs ?? TREE_DEFAULTS.floaterTransitionDurationMs;
+
+    const root = useElement(rootRef);
+    const sizer = useElement(sizerRef);
+    const container = isVirtualized ? sizer : root;
+
+    const findRow = (rowValue: T | undefined) =>
+        rowValue === undefined ? undefined : flatRows.find((row) => row.node.value === rowValue);
+
+    const findNodeElement = (row: TreeRow<T> | undefined) => {
+        if (row === undefined || !container) return undefined;
+
+        const element = document.getElementById(getRowId(row)) ?? undefined;
+
+        return element && container.contains(element) ? element : undefined;
+    };
+
+    const selectedRow = findRow(value);
+    const highlightRow = findRow(hoveredValue ?? focusInValue);
+
+    useLayoutEffect(() => {
+        const selection = findNodeElement(selectedRow);
+        const highlight = findNodeElement(highlightRow);
+
+        setFloaterTargets((previous) =>
+            previous.selection === selection && previous.highlight === highlight ? previous : { selection, highlight },
+        );
+    });
+
+    const useNodeFloater = (isEnabled: boolean, target: HTMLElement | undefined, row: TreeRow<T> | undefined) =>
+        FloaterReactUtils.useFloater({
+            isEnabled,
+            container,
+            target,
+            layout,
+            placement: row === undefined ? undefined : layout?.placements[row.index],
+            transitionDurationMs: floaterTransitionDurationMs,
+        });
+
+    const selectionFloater = useNodeFloater(
+        props.renderSelectionFloater !== undefined,
+        floaterTargets.selection,
+        selectedRow,
+    );
+
+    const highlightFloater = useNodeFloater(
+        props.renderHighlightFloater !== undefined,
+        floaterTargets.highlight,
+        highlightRow,
+    );
+
+    const renderFloater = (
+        floater: ReturnType<typeof useNodeFloater>,
+        renderContent: TreeProps<T>["renderSelectionFloater"],
+    ) =>
+        floater.isRendered && (
+            <div
+                ref={floater.ref}
+                className={FloaterStyles.floater}
+                style={{ ...floater.bounds, transitionDuration: `${floaterTransitionDurationMs}ms` }}
+            >
+                {renderContent?.(floater.visibilityTarget, floaterTransitionDurationMs)}
+            </div>
+        );
+
+    const renderFloaters = () => (
+        <>
+            {renderFloater(highlightFloater, props.renderHighlightFloater)}
+            {renderFloater(selectionFloater, props.renderSelectionFloater)}
+        </>
+    );
+
+    const findRowByTarget = (target: EventTarget | null) =>
+        target instanceof Element ? findRowById(target.closest(TREE_ITEM_SELECTOR)?.id) : undefined;
+
     const handleFocus = (e: FocusEvent<HTMLDivElement>) => {
         lastFocusedValueRef.current = findRowById((e.target as HTMLElement).id)?.node.value;
+
+        setFocusInValue(() => findRowByTarget(e.target)?.node.value);
     };
 
     const hasPendingPaint = (row: TreeRow<T>) =>
@@ -292,6 +392,8 @@ export const Tree = <T,>(props: TreeProps<T>) => {
 
     const renderWindowedRows = () => (
         <div ref={sizerRef} className={TreeStyles.treeSizer} style={{ height: `${rowWindow.totalSize}px` }}>
+            {renderFloaters()}
+
             {rowWindow.rows.map((windowRow) => {
                 const row = flatRows[windowRow.index];
 
@@ -313,10 +415,27 @@ export const Tree = <T,>(props: TreeProps<T>) => {
         </div>
     );
 
-    const tiers = isVirtualized ? renderWindowedRows() : renderRows(rows);
+    const tiers = isVirtualized ? (
+        renderWindowedRows()
+    ) : (
+        <>
+            {renderFloaters()}
+            {renderRows(rows)}
+        </>
+    );
 
     return (
-        <div ref={rootRef} role="tree" aria-label={props.ariaLabel} onKeyDown={handleKeyDown} onFocus={handleFocus}>
+        <div
+            ref={rootRef}
+            className={TreeStyles.treeRoot}
+            role="tree"
+            aria-label={props.ariaLabel}
+            onKeyDown={handleKeyDown}
+            onFocus={handleFocus}
+            onBlur={() => setFocusInValue(undefined)}
+            onPointerOver={(e) => setHoveredValue(() => findRowByTarget(e.target)?.node.value)}
+            onPointerLeave={() => setHoveredValue(undefined)}
+        >
             {layout ? (
                 <PlacementBox layout={layout} computeEffect={props.computeEffect}>
                     {tiers}

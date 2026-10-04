@@ -140,7 +140,11 @@
 <script lang="ts">
     let props: SpotRipplesProps = $props();
 
-    const { getReading, getIsPointerPresent } = PointerTrackerSvelteUtils.create(() => props.element);
+    const { getReading, getIsPointerPresent } = PointerTrackerSvelteUtils.create(
+        () => props.element,
+        undefined,
+        () => props.defs.getPointSource?.(),
+    );
 
     const motion: RippleMotion = { lastOrigin: undefined, travel: NO_TRAVEL, bornMilestone: FIRST_MILESTONE };
 

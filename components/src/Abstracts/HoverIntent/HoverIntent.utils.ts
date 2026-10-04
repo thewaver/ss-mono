@@ -108,7 +108,9 @@ export namespace HoverIntentUtils {
      * its owner goes away.
      *
      * Nothing is listened for until `observeAnchor` and `observePanel` are handed the two elements; each returns
-     * the function that stops listening to it, and a later call replaces an earlier one. Every function in `defs`
+     * the function that stops listening to it, and a later call replaces an earlier one. An anchor handed over while
+     * the pointer is already on it counts as the pointer arriving, so a panel whose anchor is chosen by the very
+     * movement that reached it — one tooltip shared along a row — still opens. Every function in `defs`
      * is read when it is needed.
      *
      * @param visibilitySignal The panel's open state, read and written.
@@ -263,6 +265,8 @@ export namespace HoverIntentUtils {
             };
 
             stopAnchor = stop;
+
+            if (element.matches(":hover")) handleAnchorMouseEnter();
 
             return stop;
         };

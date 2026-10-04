@@ -1,6 +1,6 @@
 import { type Locator, type Page, expect, test } from "@playwright/test";
 
-import { activeDescendantText, activeMatches, demo, readout, tabIndex, tagName } from "./helpers";
+import { activeDescendantText, activeMatches, centerDistance, demo, readout, tabIndex, tagName } from "./helpers";
 
 const MENU = '[role="menu"]';
 const ITEM_ROLE = '[role="menuitem"]';
@@ -564,4 +564,28 @@ test.describe("a cascader built on nested items", () => {
         await expect(page.locator(MENU)).toHaveCount(0);
         expect(await pathReadout(page), "and a new leaf replaces the whole route").toBe("South America, Peru, Lima");
     });
+});
+
+/**
+ * A menu has no selection, so it takes the highlight marker only. The items in this example paint no highlight of
+ * their own, which makes the marker the one thing showing where the arrows are, so it has to land on the item the
+ * menu names as its active descendant, and follow the pointer there too.
+ */
+test("a gliding marker sits on whichever item is highlighted, by arrow or by pointer", async ({ page }) => {
+    await openedWithHighlight(page, "glide");
+
+    const menu = page.locator(MENU);
+    const marker = menu.locator('[data-floater="highlight"]').locator("..");
+    const highlighted = async () => page.locator(`#${await menu.getAttribute("aria-activedescendant")}`);
+
+    await expect.poll(async () => centerDistance(marker, await highlighted())).toBeLessThan(2);
+
+    await page.keyboard.press("ArrowDown");
+    await page.keyboard.press("ArrowDown");
+    await expect.poll(async () => centerDistance(marker, await highlighted())).toBeLessThan(2);
+
+    const last = menu.locator(ITEM_ROLE).last();
+
+    await last.hover();
+    await expect.poll(() => centerDistance(marker, last)).toBeLessThan(2);
 });
