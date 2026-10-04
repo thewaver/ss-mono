@@ -1,4 +1,4 @@
-import { Color, MathUtils, type Point2d, RandomUtils, type Size2d, type Store, StoreUtils } from "@thewaver/ss-utils";
+import { Color, type Index2d, MathUtils, type Point2d, RandomUtils, type Store, StoreUtils } from "@thewaver/ss-utils";
 
 import type { PointerReading } from "../../Abstracts/PointerTracker/PointerTracker.types";
 import type { CycleColorKey, SVGDefsColors } from "./SVGDefs.types";
@@ -13,8 +13,7 @@ const FRAME_MS = 1000 / 60;
 const MAX_FRAMES_PER_STEP = 4;
 const SWARM_MIN_RADIUS = 0.35;
 const SWARM_MIN_PERIOD = 0.45;
-const SWARM_SPOT_RADIUS_SHARE = 0.5;
-const SWARM_MERGE_BLUR_SHARE = 0.45;
+const MIN_PIXEL_TRAIL_SQUARE = 1;
 
 export namespace SVGDefsUtils {
     export const DEBUG_SEAMS = false;
@@ -163,40 +162,147 @@ export namespace SVGDefsUtils {
     };
 
     /**
-     * The color matrix that turns a swarm's blurred spots into one liquid shape: colors kept, opacity steepened so
-     * the soft blur becomes a hard edge, and two spots blurred into each other join along a smooth neck instead of
-     * glowing through one another. Paired with {@link computeSwarmMergeBlur}.
-     */
-    export const SWARM_MERGE_MATRIX = "1 0 0 0 0 0 1 0 0 0 0 0 1 0 0 0 0 0 18 -7";
-
-    /**
-     * How big each spot of a swarm is drawn, in pixels.
+     * Moves a chain of points one frame behind its head, for a sample drawn as a tracer with a tail.
      *
-     * @param size The painted element's size.
-     * @param spotScale How big a spot is, as a share of the element's smaller side, or of each side when it is not
-     * circular.
-     * @param isCircular Whether spots stay round in a box that is not square, rather than stretching with it.
-     * @returns The spot's radius across and down.
+     * Each point eases a fixed share of the way toward the one ahead of it, so the tail bends after the head and
+     * gathers up behind it when the head stops. The share is per frame, as the comets have always used it.
+     *
+     * @param chain The points as they were, head first.
+     * @param head Where the head is now.
+     * @param follow How far each point closes on the one ahead per frame, `0` to `1`.
+     * @returns The new chain, head first, as long as the old one.
      */
-    export const computeSwarmRadii = (size: Size2d, spotScale: number, isCircular: boolean): Point2d => {
-        const side = Math.min(size.width, size.height);
+    export const followChain = (chain: Point2d[], head: Point2d, follow: number) => {
+        const next = [head];
 
-        return isCircular
-            ? { x: side * spotScale * SWARM_SPOT_RADIUS_SHARE, y: side * spotScale * SWARM_SPOT_RADIUS_SHARE }
-            : {
-                  x: size.width * spotScale * SWARM_SPOT_RADIUS_SHARE,
-                  y: size.height * spotScale * SWARM_SPOT_RADIUS_SHARE,
-              };
+        for (let index = 1; index < chain.length; index++) {
+            const ahead = next[index - 1];
+
+            next.push({
+                x: MathUtils.lerp(chain[index].x, ahead.x, follow),
+                y: MathUtils.lerp(chain[index].y, ahead.y, follow),
+            });
+        }
+
+        return next;
     };
 
     /**
-     * How far a swarm's spots are blurred before {@link SWARM_MERGE_MATRIX} sharpens them again, which decides how
-     * near two spots have to come before they join: a share of the smaller radius, so the neck between them scales
-     * with the spots.
+     * The color a cycling sample shows at a moment, blending through its run of colors and back to the first.
      *
-     * @param radii The spot's radius across and down, from {@link computeSwarmRadii}.
+     * @param colors The sample's palette.
+     * @param keys The run of colors to cycle through, in order.
+     * @param atMs The moment, on any clock that only moves forward.
+     * @param cycleMs How long one pass through the whole run takes.
+     * @returns A blend between two neighboring colors of the run. When either is not a hex color it cannot be
+     * blended here, and the earlier of the two is returned as it is.
      */
-    export const computeSwarmMergeBlur = (radii: Point2d) => Math.min(radii.x, radii.y) * SWARM_MERGE_BLUR_SHARE;
+    export const computeCycleColor = (colors: SVGDefsColors, keys: CycleColorKey[], atMs: number, cycleMs: number) => {
+        const phase = ((((atMs % cycleMs) + cycleMs) % cycleMs) / cycleMs) * keys.length;
+        const index = Math.floor(phase);
+        const from = colors[keys[index % keys.length]];
+        const to = colors[keys[(index + 1) % keys.length]];
+
+        if (!Color.Hex.isHex(from) || !Color.Hex.isHex(to)) return from;
+
+        return Color.Hex.interpolate(from, to, phase - index);
+    };
+
+    /**
+     * The color of one tracer in a sample that draws several, such as the comets or a swarm.
+     *
+     * Still, the tracers take the run's colors in turn. Cycling, every tracer moves through the whole run over time,
+     * each starting from its own place in it, so neighbors stay apart in color as they change.
+     *
+     * @param colors The sample's palette.
+     * @param keys The run of colors the sample uses.
+     * @param index Which tracer, from `0`.
+     * @param count How many tracers there are.
+     * @param atMs The moment, used only while cycling.
+     * @param cycleMs How long one pass through the run takes, or `undefined` for tracers that keep their color.
+     */
+    export const computeTracerColor = (
+        colors: SVGDefsColors,
+        keys: CycleColorKey[],
+        index: number,
+        count: number,
+        atMs: number,
+        cycleMs: number | undefined,
+    ) =>
+        cycleMs
+            ? computeCycleColor(colors, keys, atMs + (index / Math.max(count, 1)) * cycleMs, cycleMs)
+            : colors[keys[index % keys.length]];
+
+    /**
+     * The squares a pixel trail lays down as the pointer moves from one point to the next.
+     *
+     * The squares sit on an imaginary grid whose cells are the square's own size, counted from the element's top-left
+     * corner, so every square's top-left corner lands on a grid line. Every cell the straight line between the two
+     * points passes through is returned, in the order the pointer reached them, so a fast movement leaves an unbroken
+     * run of squares rather than squares a frame apart.
+     *
+     * @param from Where the pointer was, in pixels from the element's top-left corner, or `undefined` for a first
+     * reading, which lays down only the square under `to`.
+     * @param to Where the pointer is now, in the same space.
+     * @param squareSize The side of one square, in pixels. Anything below one pixel lays down nothing.
+     * @returns The cells reached, as row and column. The cell `from` lies in is left out, since it was laid down by the
+     * reading before.
+     */
+    export const computePixelTrailCells = (from: Point2d | undefined, to: Point2d, squareSize: number): Index2d[] => {
+        if (!(squareSize >= MIN_PIXEL_TRAIL_SQUARE)) return [];
+
+        const toCell = (point: Point2d): Index2d => ({
+            row: Math.floor(point.y / squareSize),
+            col: Math.floor(point.x / squareSize),
+        });
+
+        const end = toCell(to);
+
+        if (!from) return [end];
+
+        const cell = toCell(from);
+        const dx = to.x - from.x;
+        const dy = to.y - from.y;
+        const stepCount = Math.abs(end.col - cell.col) + Math.abs(end.row - cell.row);
+        const deltaX = dx === 0 ? Infinity : squareSize / Math.abs(dx);
+        const deltaY = dy === 0 ? Infinity : squareSize / Math.abs(dy);
+
+        const getFirstCrossing = (start: number, index: number, delta: number) => {
+            if (delta === 0) return Infinity;
+
+            return ((delta > 0 ? index + 1 : index) * squareSize - start) / delta;
+        };
+
+        let nextX = getFirstCrossing(from.x, cell.col, dx);
+        let nextY = getFirstCrossing(from.y, cell.row, dy);
+
+        const cells: Index2d[] = [];
+
+        for (let step = 0; step < stepCount; step++) {
+            if (nextX < nextY) {
+                cell.col += Math.sign(dx);
+                nextX += deltaX;
+            } else {
+                cell.row += Math.sign(dy);
+                nextY += deltaY;
+            }
+
+            cells.push({ ...cell });
+        }
+
+        return cells;
+    };
+
+    /**
+     * How strongly a pixel trail's square still shows, from its age.
+     *
+     * @param ageMs How long ago the square was laid down.
+     * @param trailMs How long a square takes to fade away entirely.
+     * @returns `1` when new, falling in a straight line to `0` at `trailMs` and staying there; `0` throughout when
+     * `trailMs` is not above zero.
+     */
+    export const computePixelTrailAlpha = (ageMs: number, trailMs: number) =>
+        trailMs > 0 ? 1 - MathUtils.clamp01(ageMs / trailMs) : 0;
 
     export const offsetDiagonally = (v: number, angle: number) => {
         const rad = (angle * Math.PI) / 180;

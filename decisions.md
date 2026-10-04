@@ -5900,7 +5900,7 @@ it, which the sample expressed by defining one constant as the other. Both now r
 no-sample sentinel, so a precise object type would push a cast into each of them. The shared objects carry
 the precise types the samples need, and the map is the loose page-facing view of the same values.
 
-### A trail for the tracked patterns, and two more tracked gradient families
+### A trail for the tracked patterns, and three more tracked gradient families
 
 **A tracked pattern's cells can leave a trail**: a cell lights as the pointer passes and fades on its own afterwards,
 from Fancy Components' pixel trail. It is one option, `trailMs`, on every tracked pattern rather than a new kind of
@@ -5911,21 +5911,65 @@ rest. Keyed by place in the tile, the copies of a repeating tile share one trail
 repeats in every copy. The clock is the samples' shared one, woken by the pointer moving, so it stops once the last
 cell has faded. Three samples default to it: `square_g_trail_2`, `hexagon_pt_trail_2` and `triangle_t_trail_2`.
 
-**Ribbons and a swarm are tracked gradients, not components** — the user's ruling, since React Bits draws both with
-WebGL and they are no different from `spot_smear`. `ribbon_3` is three chains of soft stamps whose heads chase the
-point on a spring, each at its own pace, with each body stamp easing toward the one ahead, thickest at the head;
-`swarm_3` is a handful of spots each springing toward a place of its own circling the point
-(`SVGDefsUtils.stepSpring`, `computeSwarmTarget`). Both run on the shared clock only while the point is near, and both
-follow a supplied point through `getPointSource`.
+**Comets, a swarm and a pixel trail are tracked gradients, not components** — the user's ruling, since React Bits
+draws the first two with WebGL and they are no different from `spot_smear`. Each is a family of three, `_1` to `_3`
+by how many colors it uses, the way every other family is numbered.
 
-**The swarm's spots merge into one liquid shape**, built once Safari had been checked to draw the filter it needs.
-Separate gradient layers cannot merge, since a filter on one layer never sees another, so the swarm is one layer whose
-paint is a pattern the element's size holding every spot as a solid ellipse (`computeSwarmRadii`). The ellipses sit in
-a group under a blur-then-sharpen filter — a Gaussian blur of a share of the radius (`computeSwarmMergeBlur`), then
-`SWARM_MERGE_MATRIX`, which keeps the colors and steepens opacity into a hard edge — so two spots near each other
-join along a smooth neck and their colors blend across it. The filter is inside the paint, so the outline of
-whatever the swarm paints stays exactly as it was. The fade as the point leaves is an opacity on a group outside the
-filter: fading the spots themselves would have the sharpening snap them off at its threshold instead of fading.
+- **`comet`** is three chains of soft stamps whose heads chase the point on a spring, each at its own pace, every
+  body stamp easing toward the one ahead (`SVGDefsUtils.followChain`), thickest at the head. It was built as
+  `ribbon_3` and renamed by the user, over `streamer` and `tendril`: a bright head with a fading tail is a comet. The
+  first color's comet is drawn on top, the user's correction to the first build, which stacked the last on top.
+- **`swarm`** is a handful of separate tracers, each a springy head wandering round the point on a path of its own
+  (`computeSwarmTarget`, `stepSpring`) with a tail following it the way a comet's does. **The first build merged the
+  spots into one liquid shape** — a blur-then-sharpen filter over spots painted into a pattern — and the user's
+  verdict on seeing it was "flubber", not tracers; it was removed entirely rather than kept as an option, the user's
+  pick over a knob defaulting to off.
+- **`pixel_trail`** leaves squares where the pointer passed; it has an entry of its own below.
+
+**On `_2` and `_3`, a comet or a tracer has a color of its own**, the user's pick over coloring each tail by age
+the way the trails do. The tracers take the run of colors in turn; with `cycles` on, each moves through the whole
+run over `cycleMs`, starting from its own place in it so neighbors stay apart (`computeTracerColor`). That leaves
+two meanings of cycling side by side, and the user accepted it: on a trail the color follows age along the tail, on
+a tracer it follows time.
+
+**Every one of them is drawn as gradient stamps, never as a pattern.** Gradients and clip paths read the paint area
+and patterns do not (_"Paint area"_ below), so a sample painted through a pattern draws the group's top-left corner
+in every cell of a shared group — which is how the first pixel trail and the first swarm behaved on the tracked
+page's _Shared_ example, where only the top-left box followed the pointer.
+
+**A family is one builder and three named files.** `comet.tsx` exports `createCometSample(colorKeys, defaults)`
+and `comet_1` to `comet_3` are one line each, so a key still has a file of its own, as the registry and the
+package exports expect, while the three do not drift apart; the builder is not exported from the package. In
+Svelte the builder is a `.svelte` file, since it draws, and the three named samples are plain `.ts` files, as the
+timed samples there already are. The older
+families repeat the whole sample per color count, and were left as they are.
+
+### `pixel_trail`: squares snapped to a grid, which is not a pattern's `trailMs`
+
+From Fancy Components' pixel trail, and what the user meant by that name: the pointer leaves squares behind it, the
+way `spot_trail` leaves soft stamps, and each square's top-left corner snaps to an imaginary grid whose cells are the
+square's own size. **It is a tracked gradient, not a tracked pattern option.** The pattern's `trailMs` above lights
+many cells of a fixed grid at once by nearness and lets them fade; this lights only the squares the pointer actually
+passed through. The user's distinction: on a pattern several cells are expected to be lit together, so the two are
+different effects and both stay.
+
+- **It is built the way `spot_trail` is, as the user asked**: a fixed set of stamp slots, here forty-eight, each a
+  layer painted one flat color and clipped to its square. A new square takes the next slot, so the oldest square
+  gives way first. The first build drew every square into one pattern instead, on the reasoning that a gradient
+  alone draws no square; the user had asked for stamps, and a clip draws the square.
+- **A fast movement leaves an unbroken run.** `SVGDefsUtils.computePixelTrailCells` walks the straight line from the
+  last reading to this one through every cell it crosses, in order, rather than stamping only where each frame
+  landed — otherwise a quick flick would leave squares a frame apart.
+- **A square is laid only while the pointer is inside the box.** A reading from outside would draw a line from far
+  away across the element; leaving and coming back starts a fresh run instead.
+- **A square fades in a straight line over `trailMs`** (`computePixelTrailAlpha`); passing over it again lays it down
+  anew. On `_2` and `_3` it takes its color from its age, or with `cycles` on, from the moment it was laid, as
+  `spot_trail_2` and `_3` do.
+- **The clock runs only while a square is still fading.** Each frame with a live square keeps it awake, and its own
+  grace is one short beat, so it stops as the last square goes.
+- **`squareSize` is in pixels**, as a tracked pattern's cell size is: it is the consumer's knob, and a square that
+  grew with the box would turn a resize into a change of look. The defaults, 20 pixels and 500ms, are Fancy
+  Components' own.
 
 ### Patterns split into timed and tracked, the way the gradients are
 

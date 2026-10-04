@@ -277,10 +277,10 @@ const SMEAR_FULL_STEP_KNOB: NumberKnob = {
     step: 0.005,
 };
 
-const RIBBON_LENGTH_KNOB: NumberKnob = {
+const COMET_LENGTH_KNOB: NumberKnob = {
     kind: "number",
-    label: "Ribbon length",
-    hint: "How many glows make up each ribbon, head to tail.",
+    label: "Tail length",
+    hint: "How many glows make up each comet, head to tail.",
     min: 2,
     max: 30,
     step: 1,
@@ -288,7 +288,7 @@ const RIBBON_LENGTH_KNOB: NumberKnob = {
 const HEAD_SCALE_KNOB: NumberKnob = {
     kind: "number",
     label: "Head size",
-    hint: "How large the glow at the head of a ribbon is against the box. The ribbon narrows from here to its tail.",
+    hint: "How large the glow at the head of a comet is against the box. The comet narrows from here to its tail.",
     min: 0.05,
     max: 1,
     step: 0.01,
@@ -296,7 +296,7 @@ const HEAD_SCALE_KNOB: NumberKnob = {
 const TAIL_SCALE_KNOB: NumberKnob = {
     kind: "number",
     label: "Tail size",
-    hint: "How large the glow at the tail of a ribbon is against the box.",
+    hint: "How large the glow at the tail of a comet is against the box.",
     min: 0.01,
     max: 1,
     step: 0.01,
@@ -304,7 +304,7 @@ const TAIL_SCALE_KNOB: NumberKnob = {
 const HEAD_ALPHA_KNOB: NumberKnob = {
     kind: "number",
     label: "Head alpha",
-    hint: "How strong the head of each ribbon is. The ribbon fades from here to nothing at its tail.",
+    hint: "How strong the head of each comet is. The comet fades from here to nothing at its tail.",
     min: 0.05,
     max: 1,
     step: 0.05,
@@ -328,7 +328,7 @@ const DAMPING_KNOB: NumberKnob = {
 const FOLLOW_STIFFNESS_KNOB: NumberKnob = {
     kind: "number",
     label: "Body follow",
-    hint: "How closely each part of a ribbon follows the part ahead of it. Lower drags a longer tail.",
+    hint: "How closely each part of a comet follows the part ahead of it. Lower drags a longer tail.",
     min: 0.05,
     max: 1,
     step: 0.05,
@@ -372,6 +372,54 @@ const WANDER_MS_KNOB: NumberKnob = {
     min: 500,
     max: 10000,
     step: 250,
+};
+const TRACER_TAIL_LENGTH_KNOB: NumberKnob = {
+    kind: "number",
+    label: "Tail length",
+    hint: "How many glows make up each tracer's tail, head included.",
+    min: 1,
+    max: 20,
+    step: 1,
+};
+const TRACER_TAIL_SCALE_KNOB: NumberKnob = {
+    kind: "number",
+    label: "Tail size",
+    hint: "How large the end of a tracer's tail is, as a share of its head.",
+    min: 0.05,
+    max: 1,
+    step: 0.05,
+};
+const TRACER_FOLLOW_KNOB: NumberKnob = {
+    kind: "number",
+    label: "Tail follow",
+    hint: "How closely each part of a tail follows the part ahead of it. Lower drags a longer tail.",
+    min: 0.05,
+    max: 1,
+    step: 0.05,
+};
+const SQUARE_SIZE_KNOB: NumberKnob = {
+    kind: "number",
+    label: "Square size (px)",
+    hint: "How big each square of the trail is, which is also the size of the grid the squares snap to.",
+    min: 4,
+    max: 80,
+    step: 2,
+};
+const SQUARE_ALPHA_KNOB: NumberKnob = {
+    kind: "number",
+    label: "Square alpha",
+    hint: "How strong a square is when it is laid down.",
+    min: 0.05,
+    max: 1,
+    step: 0.05,
+};
+const PIXEL_TRAIL_MS_KNOB: NumberKnob = {
+    kind: "number",
+    label: "Trail time (ms)",
+    hint: "How long a square takes to fade away once the pointer has left it.",
+    min: 100,
+    max: 3000,
+    step: 50,
 };
 
 export namespace TrackedGradientKnobs {
@@ -594,9 +642,9 @@ export namespace TrackedGradientKnobs {
             falloffAlpha: FALLOFF_ALPHA_KNOB,
             ageColorSpan: AGE_COLOR_SPAN_KNOB,
         },
-        ribbon_3: {
+        comet_1: {
             circular: CIRCULAR_KNOB,
-            ribbonLength: RIBBON_LENGTH_KNOB,
+            tailLength: COMET_LENGTH_KNOB,
             headScale: HEAD_SCALE_KNOB,
             tailScale: TAIL_SCALE_KNOB,
             headAlpha: HEAD_ALPHA_KNOB,
@@ -604,15 +652,93 @@ export namespace TrackedGradientKnobs {
             damping: DAMPING_KNOB,
             followStiffness: FOLLOW_STIFFNESS_KNOB,
         },
-        swarm_3: {
+        comet_2: {
+            circular: CIRCULAR_KNOB,
+            cycles: CYCLES_KNOB,
+            cycleMs: CYCLE_MS_KNOB,
+            tailLength: COMET_LENGTH_KNOB,
+            headScale: HEAD_SCALE_KNOB,
+            tailScale: TAIL_SCALE_KNOB,
+            headAlpha: HEAD_ALPHA_KNOB,
+            stiffness: STIFFNESS_KNOB,
+            damping: DAMPING_KNOB,
+            followStiffness: FOLLOW_STIFFNESS_KNOB,
+        },
+        comet_3: {
+            circular: CIRCULAR_KNOB,
+            cycles: CYCLES_KNOB,
+            cycleMs: CYCLE_MS_KNOB,
+            tailLength: COMET_LENGTH_KNOB,
+            headScale: HEAD_SCALE_KNOB,
+            tailScale: TAIL_SCALE_KNOB,
+            headAlpha: HEAD_ALPHA_KNOB,
+            stiffness: STIFFNESS_KNOB,
+            damping: DAMPING_KNOB,
+            followStiffness: FOLLOW_STIFFNESS_KNOB,
+        },
+        swarm_1: {
             circular: CIRCULAR_KNOB,
             spotCount: SPOT_COUNT_KNOB,
             spotScale: SPOT_SCALE_KNOB,
             spotAlpha: SPOT_ALPHA_KNOB,
+            tailLength: TRACER_TAIL_LENGTH_KNOB,
+            tailScale: TRACER_TAIL_SCALE_KNOB,
+            followStiffness: TRACER_FOLLOW_KNOB,
             wanderRatio: WANDER_RATIO_KNOB,
             wanderMs: WANDER_MS_KNOB,
             stiffness: STIFFNESS_KNOB,
             damping: DAMPING_KNOB,
+        },
+        swarm_2: {
+            circular: CIRCULAR_KNOB,
+            cycles: CYCLES_KNOB,
+            cycleMs: CYCLE_MS_KNOB,
+            spotCount: SPOT_COUNT_KNOB,
+            spotScale: SPOT_SCALE_KNOB,
+            spotAlpha: SPOT_ALPHA_KNOB,
+            tailLength: TRACER_TAIL_LENGTH_KNOB,
+            tailScale: TRACER_TAIL_SCALE_KNOB,
+            followStiffness: TRACER_FOLLOW_KNOB,
+            wanderRatio: WANDER_RATIO_KNOB,
+            wanderMs: WANDER_MS_KNOB,
+            stiffness: STIFFNESS_KNOB,
+            damping: DAMPING_KNOB,
+        },
+        swarm_3: {
+            circular: CIRCULAR_KNOB,
+            cycles: CYCLES_KNOB,
+            cycleMs: CYCLE_MS_KNOB,
+            spotCount: SPOT_COUNT_KNOB,
+            spotScale: SPOT_SCALE_KNOB,
+            spotAlpha: SPOT_ALPHA_KNOB,
+            tailLength: TRACER_TAIL_LENGTH_KNOB,
+            tailScale: TRACER_TAIL_SCALE_KNOB,
+            followStiffness: TRACER_FOLLOW_KNOB,
+            wanderRatio: WANDER_RATIO_KNOB,
+            wanderMs: WANDER_MS_KNOB,
+            stiffness: STIFFNESS_KNOB,
+            damping: DAMPING_KNOB,
+        },
+        pixel_trail_1: {
+            squareSize: SQUARE_SIZE_KNOB,
+            squareAlpha: SQUARE_ALPHA_KNOB,
+            trailMs: PIXEL_TRAIL_MS_KNOB,
+        },
+        pixel_trail_2: {
+            cycles: CYCLES_KNOB,
+            cycleMs: CYCLE_MS_KNOB,
+            ageColorSpan: AGE_COLOR_SPAN_KNOB,
+            squareSize: SQUARE_SIZE_KNOB,
+            squareAlpha: SQUARE_ALPHA_KNOB,
+            trailMs: PIXEL_TRAIL_MS_KNOB,
+        },
+        pixel_trail_3: {
+            cycles: CYCLES_KNOB,
+            cycleMs: CYCLE_MS_KNOB,
+            ageColorSpan: AGE_COLOR_SPAN_KNOB,
+            squareSize: SQUARE_SIZE_KNOB,
+            squareAlpha: SQUARE_ALPHA_KNOB,
+            trailMs: PIXEL_TRAIL_MS_KNOB,
         },
     };
 }

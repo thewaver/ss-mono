@@ -46,11 +46,16 @@ import { sweep_diag_async_4 } from "./Gradient/Timed/sweep_diag_async_4";
 import { band_1 } from "./Gradient/Tracked/band_1";
 import { band_1v1 } from "./Gradient/Tracked/band_1v1";
 import { band_diag_1 } from "./Gradient/Tracked/band_diag_1";
+import { comet_1 } from "./Gradient/Tracked/comet_1";
+import { comet_2 } from "./Gradient/Tracked/comet_2";
+import { comet_3 } from "./Gradient/Tracked/comet_3";
 import { hand_1 } from "./Gradient/Tracked/hand_1";
 import { hand_trail_1 } from "./Gradient/Tracked/hand_trail_1";
 import { hand_trail_2 } from "./Gradient/Tracked/hand_trail_2";
 import { hand_trail_3 } from "./Gradient/Tracked/hand_trail_3";
-import { ribbon_3 } from "./Gradient/Tracked/ribbon_3";
+import { pixel_trail_1 } from "./Gradient/Tracked/pixel_trail_1";
+import { pixel_trail_2 } from "./Gradient/Tracked/pixel_trail_2";
+import { pixel_trail_3 } from "./Gradient/Tracked/pixel_trail_3";
 import { spot_1 } from "./Gradient/Tracked/spot_1";
 import { spot_flare_2 } from "./Gradient/Tracked/spot_flare_2";
 import { spot_flare_3 } from "./Gradient/Tracked/spot_flare_3";
@@ -63,6 +68,8 @@ import { spot_smear_3 } from "./Gradient/Tracked/spot_smear_3";
 import { spot_trail_1 } from "./Gradient/Tracked/spot_trail_1";
 import { spot_trail_2 } from "./Gradient/Tracked/spot_trail_2";
 import { spot_trail_3 } from "./Gradient/Tracked/spot_trail_3";
+import { swarm_1 } from "./Gradient/Tracked/swarm_1";
+import { swarm_2 } from "./Gradient/Tracked/swarm_2";
 import { swarm_3 } from "./Gradient/Tracked/swarm_3";
 import { circle_g_2 } from "./Pattern/Timed/circle_g_2";
 import { circle_hd_2 } from "./Pattern/Timed/circle_hd_2";
@@ -289,8 +296,15 @@ export namespace SVGDefsSamples {
                 spot_trail_1,
                 spot_trail_2,
                 spot_trail_3,
-                ribbon_3,
+                comet_1,
+                comet_2,
+                comet_3,
+                swarm_1,
+                swarm_2,
                 swarm_3,
+                pixel_trail_1,
+                pixel_trail_2,
+                pixel_trail_3,
             } as const;
 
             export const SAMPLE_ENTRIES = {
@@ -313,8 +327,15 @@ export namespace SVGDefsSamples {
                 spot_trail_1: { family: "spot_trail_1" },
                 spot_trail_2: { family: "spot_trail_2" },
                 spot_trail_3: { family: "spot_trail_3" },
-                ribbon_3: { family: "ribbon_3" },
+                comet_1: { family: "comet_1" },
+                comet_2: { family: "comet_2" },
+                comet_3: { family: "comet_3" },
+                swarm_1: { family: "swarm_1" },
+                swarm_2: { family: "swarm_2" },
                 swarm_3: { family: "swarm_3" },
+                pixel_trail_1: { family: "pixel_trail_1" },
+                pixel_trail_2: { family: "pixel_trail_2" },
+                pixel_trail_3: { family: "pixel_trail_3" },
             } as const satisfies Record<string, TrackedGradientEntry>;
 
             export type Entry = TrackedGradientEntry;

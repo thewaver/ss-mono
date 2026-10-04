@@ -117,25 +117,39 @@ export type GradientSmearSampleOpts = GradientCircularOpts &
     GradientColorAgeOpts &
     GradientSmearOpts;
 
-export type GradientRibbonSampleOpts = GradientCircularOpts & {
-    ribbonLength?: number;
-    headScale?: number;
-    tailScale?: number;
-    headAlpha?: number;
-    stiffness?: number;
-    damping?: number;
-    followStiffness?: number;
-};
+export type GradientCometSampleOpts = GradientCircularOpts &
+    GradientCycleOpts &
+    GradientCyclePeriodOpts & {
+        tailLength?: number;
+        headScale?: number;
+        tailScale?: number;
+        headAlpha?: number;
+        stiffness?: number;
+        damping?: number;
+        followStiffness?: number;
+    };
 
-export type GradientSwarmSampleOpts = GradientCircularOpts & {
-    spotCount?: number;
-    spotScale?: number;
-    spotAlpha?: number;
-    wanderRatio?: number;
-    wanderMs?: number;
-    stiffness?: number;
-    damping?: number;
-};
+export type GradientSwarmSampleOpts = GradientCircularOpts &
+    GradientCycleOpts &
+    GradientCyclePeriodOpts & {
+        spotCount?: number;
+        spotScale?: number;
+        spotAlpha?: number;
+        tailLength?: number;
+        tailScale?: number;
+        followStiffness?: number;
+        wanderRatio?: number;
+        wanderMs?: number;
+        stiffness?: number;
+        damping?: number;
+    };
+
+export type GradientPixelTrailSampleOpts = GradientCycleOpts &
+    GradientColorAgeOpts & {
+        squareSize?: number;
+        squareAlpha?: number;
+        trailMs?: number;
+    };
 
 export type GradientCycleGlowOpts = GradientCycleOpts & GradientGlowOpts;
 
@@ -202,8 +216,15 @@ export type TrackedGradientEntry =
     | { family: "spot_trail_1"; defs?: GradientSpotTrailOpts }
     | { family: "spot_trail_2"; defs?: GradientSpotTrailOpts }
     | { family: "spot_trail_3"; defs?: GradientSpotTrailOpts }
-    | { family: "ribbon_3"; defs?: GradientRibbonSampleOpts }
-    | { family: "swarm_3"; defs?: GradientSwarmSampleOpts };
+    | { family: "comet_1"; defs?: GradientCometSampleOpts }
+    | { family: "comet_2"; defs?: GradientCometSampleOpts }
+    | { family: "comet_3"; defs?: GradientCometSampleOpts }
+    | { family: "swarm_1"; defs?: GradientSwarmSampleOpts }
+    | { family: "swarm_2"; defs?: GradientSwarmSampleOpts }
+    | { family: "swarm_3"; defs?: GradientSwarmSampleOpts }
+    | { family: "pixel_trail_1"; defs?: GradientPixelTrailSampleOpts }
+    | { family: "pixel_trail_2"; defs?: GradientPixelTrailSampleOpts }
+    | { family: "pixel_trail_3"; defs?: GradientPixelTrailSampleOpts };
 
 export type TrackedGradientFamily = TrackedGradientEntry["family"];
 

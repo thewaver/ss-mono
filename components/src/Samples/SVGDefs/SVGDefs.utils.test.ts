@@ -53,3 +53,85 @@ describe("computeSwarmTarget", () => {
         expect(new Set(targets.map((target) => `${target.x.toFixed(4)},${target.y.toFixed(4)}`)).size).toBe(6);
     });
 });
+
+describe("computePixelTrailCells", () => {
+    it("lays down only the square under the pointer on a first reading", () => {
+        expect(SVGDefsUtils.computePixelTrailCells(undefined, { x: 45, y: 12 }, 20)).toEqual([{ row: 0, col: 2 }]);
+    });
+
+    it("lays down nothing while the pointer stays inside one square", () => {
+        expect(SVGDefsUtils.computePixelTrailCells({ x: 41, y: 1 }, { x: 59, y: 19 }, 20)).toEqual([]);
+    });
+
+    it("leaves an unbroken run of neighboring squares across a fast movement", () => {
+        const cells = SVGDefsUtils.computePixelTrailCells({ x: 5, y: 5 }, { x: 95, y: 47 }, 20);
+
+        expect(cells.at(-1)).toEqual({ row: 2, col: 4 });
+
+        [{ row: 0, col: 0 }, ...cells].reduce((previous, cell) => {
+            expect(Math.abs(cell.row - previous.row) + Math.abs(cell.col - previous.col)).toBe(1);
+
+            return cell;
+        });
+    });
+
+    it("walks backwards as well as forwards", () => {
+        expect(SVGDefsUtils.computePixelTrailCells({ x: 65, y: 10 }, { x: 5, y: 10 }, 20)).toEqual([
+            { row: 0, col: 2 },
+            { row: 0, col: 1 },
+            { row: 0, col: 0 },
+        ]);
+    });
+
+    it("lays down nothing for a square smaller than a pixel", () => {
+        expect(SVGDefsUtils.computePixelTrailCells(undefined, { x: 5, y: 5 }, 0)).toEqual([]);
+    });
+});
+
+describe("computePixelTrailAlpha", () => {
+    it("fades in a straight line from new to gone", () => {
+        expect(SVGDefsUtils.computePixelTrailAlpha(0, 500)).toBe(1);
+        expect(SVGDefsUtils.computePixelTrailAlpha(250, 500)).toBe(0.5);
+        expect(SVGDefsUtils.computePixelTrailAlpha(800, 500)).toBe(0);
+        expect(SVGDefsUtils.computePixelTrailAlpha(0, 0)).toBe(0);
+    });
+});
+
+describe("followChain", () => {
+    it("puts the head where it is told and eases every point toward the one ahead", () => {
+        const chain = [
+            { x: 0, y: 0 },
+            { x: 0, y: 0 },
+            { x: 0, y: 0 },
+        ];
+        const next = SVGDefsUtils.followChain(chain, { x: 1, y: 0 }, 0.5);
+
+        expect(next).toEqual([
+            { x: 1, y: 0 },
+            { x: 0.5, y: 0 },
+            { x: 0.25, y: 0 },
+        ]);
+    });
+});
+
+describe("computeTracerColor", () => {
+    const colors = { primary: "#ff0000", secondary: "#00ff00", tertiary: "#0000ff", background: "#000000" };
+
+    it("hands the run's colors out in turn while the tracers keep their color", () => {
+        expect(
+            [0, 1, 2, 3].map((index) =>
+                SVGDefsUtils.computeTracerColor(colors, ["primary", "secondary"], index, 4, 0, undefined),
+            ),
+        ).toEqual(["#ff0000", "#00ff00", "#ff0000", "#00ff00"]);
+    });
+
+    it("moves every tracer through the run over time, each from its own place in it", () => {
+        const first = SVGDefsUtils.computeTracerColor(colors, ["primary", "secondary", "tertiary"], 0, 3, 0, 3000);
+        const second = SVGDefsUtils.computeTracerColor(colors, ["primary", "secondary", "tertiary"], 1, 3, 0, 3000);
+        const later = SVGDefsUtils.computeTracerColor(colors, ["primary", "secondary", "tertiary"], 0, 3, 1000, 3000);
+
+        expect(first.toLowerCase()).toBe("#ff0000");
+        expect(second.toLowerCase()).toBe("#00ff00");
+        expect(later.toLowerCase()).toBe("#00ff00");
+    });
+});

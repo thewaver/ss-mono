@@ -32,12 +32,12 @@ reading.
 
 ### Index
 
-1. Neither animation component can reveal its own children — _open_
+1. Neither animation component can reveal its own children — _postponed until the platform catches up_
 2. `Select` — four things deliberately not built — _open_
 3. `Menu` — two things deliberately not built — _open_
 4. Other core controls the library does not have — _open, ordered by the user_
 5. What the verification suite still cannot see — _open_
-6. Planned: a consumer-facing layer of controls above the library — _planned, not a focus_
+6. Planned: a consumer-facing layer of controls above the library — _deferred to a session of its own_
 7. `Toasts` — one thing deliberately not built — _open_
 8. `Calendar` — two things deliberately not built — _open_
 9. `ColorInput` — two things deliberately not built — _open_
@@ -61,6 +61,20 @@ reading.
 27. The submit story — what a native submit carries, and what `Form` hands `onSubmit` — _pending decision_
 28. Work that has never been watched running — _open_
 29. Choices the add-ons round made on the user's behalf — _pending decision_
+30. `Wraparound` drifts by itself, and a marquee is its example — _decided, not yet built_
+31. `Die` turns freely, and rolling becomes a helper — _decided, not yet built_
+32. `Lens` — _decided, not yet built_
+33. Travelling beams on `Bracket` and `PatchBoard` — _decided, not yet built_
+34. A page change revealed through a growing shape — _decided, not yet built_
+35. `MorphText` — _decided, not yet built_
+36. `PaintedText` along a path — _decided, not yet built_
+37. `CardStack` can pile toward the bottom — _decided, not yet built_
+38. A gallery page, and a preview of each page from the nav — _decided, not yet built_
+39. `FittedText` — _decided, not yet built_
+40. `Bracket` shows one family at a time, following focus — _decided, not yet built_
+41. The row `Accordion`: an open width per item — _decided, not yet built_
+42. Tracked patterns hold a cell warm before it fades — _decided, not yet built_
+43. A drum of words turned by scrolling — _decided, not yet built_
 
 ### Build order
 
@@ -109,6 +123,18 @@ and cannot be placed in forty-two boxes at once; the content is built once per c
 default grid and a hundred and twenty-one in the stress case; and nothing inside can be interactive, because
 every copy is a duplicate. **The user called that too costly.** A single copy with per-cell windows is not an
 alternative — transforming a window moves the window over static content, which is a different effect.
+
+**A single picture of the content would avoid that cost, and it is postponed until browser support exists.** Cut
+one image of the element into cells and nothing has to be built per cell — a button vanishing into smoke, a card
+wiped away. The platform's answer is HTML-in-Canvas, which draws a live element into a canvas; it is a trial in
+Chrome alone and no other browser has committed to it
+([Chrome's announcement](https://developer.chrome.com/blog/html-in-canvas-origin-trial)). Copying the element into
+an SVG works everywhere today and was turned down by the user, because web fonts, images from other sites and some
+effects do not travel with the copy and the picture comes out wrong without saying so. View Transitions can
+photograph a single element but cannot hand the picture out as an image. Text alone can already be drawn into an
+image exactly, since its string and font are known — Skiper UI's
+[disintegrating text](https://skiper-ui.com/v1/skiper56) does that — but that does not reach a button with an
+icon, which is the case that was asked for.
 
 **_Elsewhere._** There is nothing to compare against, and that is the finding: no headless library
 ships anything in this family. Ark UI's set is the widest of them at forty-seven components and has no
@@ -372,19 +398,22 @@ stub above rather than a fake clock — the two look interchangeable and are not
 
 ---
 
-## 6. Planned: a consumer-facing layer of controls above the library — _not a focus_
+## 6. Planned: a consumer-facing layer of controls above the library — _deferred to a session of its own_
 
-**Deferred indefinitely by the user on 2026-08-15, and it is the lowest-priority item in this file.** Nothing
-is blocked on it, nothing is missing because of it, and it is very doubtful it becomes a focus any time soon.
-It stays numbered rather than moving to _Accepted limits_ because the packaging question inside it is a real
-decision nobody has taken — not because the work is queued. **Do not propose starting it, do not weigh it
-against anything else, and do not list it when asked what is next.**
+**Deferred to a near-future session of its own**, by the user, because bundling it with the components then in
+progress would have been awkward. It is no longer deferred indefinitely. The packaging question inside it is a
+real decision nobody has taken yet.
 
 The reason it survived a review that nearly dropped it: every control is fully consumable today and the
 Playground proves it, so what this layer would buy is **less repetition, not more capability**. A page pairs a
 control with its painter at every call site — `ButtonPage` imports `Button` and `PageButtonContent` and writes
 the same threading closure five times — and about forty painters across thirty pages do the same. That is the
 entire cost, and in a repo with one author it is small.
+
+**Magic UI sells exactly this, as templates**, and that is an argument the paragraph above did not weigh: for a
+consumer, a painted set is the difference between an afternoon of painting and a page that works on install. Most
+of the cost is packaging rather than drawing, since about forty painters already exist in the Playground and are in
+use there.
 
 Recorded **2026-08-07** as advance notice in three parts. Two of them are built and are no longer
 outstanding: there is no `style.css` anywhere in `src/`, and `App/Theme.css.ts` is the theme — a
@@ -1228,6 +1257,172 @@ is the user's to confirm or change.
 - **Odometer reels under reduced motion drop only their extra turns.** Each reel keeps its own duration, so a
   slow reel still turns its one step slowly. Falling back to `turnDurationMs` there is the alternative.
 
+## 30. `Wraparound` drifts by itself, and a marquee is its example — _decided, not yet built_
+
+A strip of content looping past on its own, which libraries ship as a "marquee". It was turned down once as a
+ticker, on the grounds that the carousels cover it; `Wraparound` is the new argument, since a marquee is
+`Wraparound` held to one axis and moving by itself.
+
+- **`Wraparound` gains a drift**: a speed, a direction and `playback`, pausing under the pointer or keyboard focus
+  through the same hold the carousels and the wheels use. The user's pick over a `Marquee` preset, whose only
+  difference would have been its defaults.
+- **Dragging can be turned off**, since a marquee usually is not draggable.
+- **The `Wraparound` page carries an example called "Marquee"**, so someone looking for the word finds it.
+- Anything drifting for more than five seconds owes WCAG 2.2.2 a way to stop it; `playback` and the hold are that
+  way, and the example shows the control.
+
+## 31. `Die` turns freely, and rolling becomes a helper — _decided, not yet built_
+
+From Magic UI's [Icon Cloud](https://magicui.design/docs/components/icon-cloud): icons spread over a sphere that
+turns by itself, can be dragged, and pauses. The user's reading is `Die` with transparent faces and content painted
+on each, which `renderFace` already allows standing still; tilting content and content seen mirrored through the
+front are wanted.
+
+- **`Die` follows `Wheel`'s arrangement, in three dimensions.** The user's design. `Rotator` keeps a free angle,
+  drifts by itself while idle, and has a spin that lands on a chosen wedge, all in one component. `Die` does the
+  same: its turn becomes a free value rather than "which face is showing", it drifts while idle and turns when
+  dragged, and rolling is the helper that lands it on a chosen face — so `computeRollTarget` is needed only by a
+  die that rolls.
+- **The turn is stored as one rotation in three dimensions, not as two angles.** Two angles applied one after the
+  other is what makes a freely dragged box feel wrong after a few drags (Fancy Components' 3D CSS Box says as much
+  of its own).
+- **The icon cloud is an example on the `Die` page**: drifting, draggable, each face painted transparent with an
+  icon. The number of items is the solid's — 4, 6, 8, 12, 20 or 100 — and a set that does not fill one leaves
+  faces empty, which the user accepted.
+
+## 32. `Lens` — _decided, not yet built_
+
+From Magic UI's [Lens](https://magicui.design/docs/components/lens): a magnified copy of the content, visible only
+inside a circle that follows the pointer. It is `Reveal`'s mechanism the other way round — `Reveal` cuts a hole in
+a cover, `Lens` shows a scaled copy only inside the hole — so it joins `Reveal` and `ScratchCard` in
+`Exotics/Reveals`.
+
+- **The copy is hidden from screen readers and cannot be reached by Tab**; only the content underneath is real.
+- **The keyboard works as `Reveal`'s does**: focus opens the lens, the arrows move it.
+- **The zoom and the size are props**, and the point it follows can be supplied rather than the pointer, like every
+  other component that follows the pointer.
+
+## 33. Travelling beams on `Bracket` and `PatchBoard` — _decided, not yet built_
+
+From Magic UI's [Animated Beam](https://magicui.design/docs/components/animated-beam), where a pulse of light runs
+along the line between two elements. Both components already hand the line to the consumer to draw, so this is a
+Playground example on each page and no library change: a dash travelling along the path, with `pathLength="1"` so
+it keeps the same pace on long and short lines. On `Bracket` the beam runs only along the focused node's route to
+the root, which `isOnFocusedRoute` already reports. It moves for more than five seconds, so each example has a
+pause.
+
+## 34. A page change revealed through a growing shape — _decided, not yet built_
+
+From Magic UI's [Animated Theme Toggler](https://magicui.design/docs/components/animated-theme-toggler) and Skiper
+UI's [theme transitions](https://skiper-ui.com/v1/skiper26). The browser takes a picture of the page, applies a
+change underneath, and shows the new page through a shape growing from a point — the View Transitions feature,
+supported in Chrome and Edge 111, Safari 18 and Firefox 144 ([caniuse](https://caniuse.com/view-transitions)).
+
+- **A helper in the library**: "make this change, and reveal the result through a shape growing from a point". The
+  user's pick over leaving it in the Playground's theme switcher. It is not tied to themes; a route change or a
+  large filter can use it as well.
+- **The shapes are samples**: a circle, a blurred circle, a rectangle, a polygon and a star from `Shape`'s outlines,
+  and an animated GIF as the mask, each growing from a chosen point, a corner or the center.
+- **Where the browser lacks View Transitions, the change simply happens.** Reduced motion is the consumer's call, as
+  everywhere else in the library.
+- **The Playground's theme switcher is the first consumer.**
+
+## 35. `MorphText` — _decided, not yet built_
+
+From Magic UI's [Morphing Text](https://magicui.design/docs/components/morphing-text): when the text changes, the
+old and new copies cross-fade while blurring, under a filter that makes anything half-transparent either solid or
+clear, so the blur melts from one word into the next.
+
+- **It sits in `Exotics/Text` beside `ScrambleText`**, whose contract it shares: text that changes with an effect.
+  The user's pick over a text switcher in `MediaSwitchers`, whose components own a list of values and step through
+  it. Cycling through words is the consumer's timer, as with `Typewriter`'s phrases.
+- **The content arrives as a function of the text, not as children**, because the outgoing text is drawn beside the
+  incoming one.
+- **The filter sits on the container**, so plain text and `PaintedText` both work inside, gradient and pattern paint
+  included. The blur-then-sharpen filter it needs was checked in Safari with the swarm's, and draws there.
+
+## 36. `PaintedText` along a path — _decided, not yet built_
+
+From Magic UI's [Spinning Text](https://magicui.design/docs/components/spinning-text), text set round a circle and
+turning. SVG lays text along any path itself (`<textPath>`), and `PaintedText` is SVG.
+
+- **`PaintedText` takes a path**, the user's pick over letters riding `Trail`. A circle is one helper away. The
+  browser places every letter, so the spacing between pairs of letters stays right and every kind of paint works.
+- **Turning is the text sliding along the path**, through `progress` and `playback` in the library's usual shape.
+  SVG can also stretch the spacing so the text goes round a circle exactly once.
+- **`Typewriter` and `ProximityText` still drive the letters**, since they are the same SVG letters.
+- On a path there is one line and nothing wraps, so `PaintedText`'s line machinery stands idle in that mode.
+
+## 37. `CardStack` can pile toward the bottom — _decided, not yet built_
+
+Most published card stacks show the cards behind peeking out below the front one; `CardStack` shows them above.
+`pileSide`, after `Bracket`'s `rootSide`, names the edge the pile peeks out of: `"top"`, today's behavior and the
+default, or `"bottom"`, where the front card sits flush with the top of the box instead. Top and bottom only, the
+user's pick: a sideways pile turns the whole geometry, and widening the choice later breaks nobody.
+
+## 38. A gallery page, and a preview of each page from the nav — _decided, not yet built_
+
+From Magic UI, whose documentation shows every component on one page and previews each from the side menu. The
+Playground gains both.
+
+- **The preview is the first example of each page**, live, drawn at full size and shrunk, the way the Playground
+  already draws inside `Viewport`. Nothing new is written per component; the order of a page's examples decides
+  what it previews, and the user reorders where a first example is a poor picture — a modal's is just a button.
+- **The gallery shows every preview as a tile**, each coming to life only once scrolled into view.
+- **Tiles stand still until hovered or focused, then play.** The user's pick, and what the libraries browsed do.
+  It is also how the page meets WCAG 2.2.2 with dozens of moving examples on it.
+- **The nav shows the same preview in a `HoverCard`** on its items.
+
+## 39. `FittedText` — _decided, not yet built_
+
+A component around `JSXTextMetricsUtils.getNormalizedFontSizes` in `ss-utils`, which nothing calls yet. The consumer
+gives the lines, already split; every line is scaled to the full width, then all of them shrink together until the
+stack fits the height, so a short line comes out larger than a long one. It sits in `Exotics/Text`, and measures
+again whenever its box changes size or a web font finishes loading, the two events `Typewriter` already watches.
+Splitting text into lines automatically is not part of it, by the user's call.
+
+## 40. `Bracket` shows one family at a time, following focus — _decided, not yet built_
+
+From Skiper UI's [knockout bracket](https://skiper-ui.com/v1/skiper107), which shows a window of the tree and pages
+through it, folding what leaves onto the node it fed and gliding into the new layout. `Bracket` draws org charts and
+perk trees as well as brackets, so the window is defined by the tree rather than by rounds.
+
+- **A section is one node and its direct children** — a match and the two that fed it, a manager and their reports,
+  a perk and what it unlocks. The user's definition.
+- **The section follows the focused node.** Focusing a child shows that child's section, focusing the parent shows
+  the parent's. `Bracket` already moves focus between nodes from the keyboard, so the keyboard route needs nothing
+  new and no paging buttons are needed.
+- **The rest of the tree folds away onto the node it hangs from**, and everything glides between sections. `Bracket`
+  learns to animate between arrangements here, which it does not do today.
+
+## 41. The row `Accordion`: an open width per item — _decided, not yet built_
+
+From Skiper UI's [expanding panels](https://skiper-ui.com/v1/skiper76), where each panel opens to a width of its own.
+A panel's content cannot give the width, since text wraps to whatever width it is handed; the user's point. So
+**each item can carry an open width**, as a share of the row so that it holds when the window is resized, and an
+item without one fills what the collapsed strips leave. It is a property of one panel, beside `isDisabled` on the
+item record, and does not overlap `sizing`, which decides whether the whole accordion fills its container.
+
+## 42. Tracked patterns hold a cell warm before it fades — _decided, not yet built_
+
+A tracked pattern's cell answers the pointer at once, and with `trailMs` set it fades back to rest over that time
+once the pointer has passed (`decisions.md`, _"A trail for the tracked patterns, and three more tracked gradient
+families"_). The user's idea adds a hold before the fade.
+
+- **`retentionMs`, the user's name, is how long a cell stays at the level the pointer left it** — fully grown, fully
+  visible, whatever the sample's warm end is — before the `trailMs` fade begins.
+- **It defaults to `0`, which is today's behavior**, and joins `trailMs`, `tiled`, `reach` and `restLevel` among
+  the tracked patterns' options.
+- **Only the cooling waits; warming is still immediate.** A cell already shows the higher of its live level and
+  what it remembers, so moving back over a held or fading cell warms it at once.
+- **`TrackedPatternUtils.createTrail` already remembers each cell's level**; it gains the moment that level was set,
+  and the clock stays awake while any cell is holding as well as while one is fading.
+
+## 43. A drum of words turned by scrolling — _decided, not yet built_
+
+From Skiper UI's [3D rolling text](https://skiper-ui.com/v1/skiper88). A Playground example on the `Carousel` page:
+the drum rule with words for slides, its `progress` driven by the scroll observer. No new code.
+
 ## Accepted limits
 
 Faults that have been looked at and consciously left alone. Not outstanding work, not numbered, and not part
@@ -1470,6 +1665,10 @@ surfaces are flat pieces the browser can turn in 3D; a sphere has none, so "a sp
 
 Whether the first two are wanted is the open question.
 
+**The icon cloud took the solid rather than the sphere.** Magic UI's Icon Cloud is the first reading — items at
+points on a sphere — and the user chose instead `Die` with transparent faces and an icon on each, turning freely
+(item 31), accepting that the number of items is the solid's. The first two readings are still unasked for.
+
 ### A fifth round of Exotics candidates, and what became of each
 
 Seven were put to the user from portfolio showcases, each with a published example. The user then went through
@@ -1511,9 +1710,15 @@ from the start, since anything moving for more than five seconds owes WCAG 2.2.2
 **What the comparison showed.** Most of Fancy Components is one of this library's components with a different
 setting — about twenty of its text components are what `Typewriter` does — and the user's verdict on the whole
 was that this library comes out well ahead. React Bits is large and leans on WebGL; what it had beyond that was
-mostly reachable with what exists. Catalogues not yet gone through for the next round:
-[Magic UI](https://magicui.design), [Animata](https://animata.design), [Aceternity UI](https://ui.aceternity.com),
-[Motion Primitives](https://motion-primitives.com) and [Skiper UI](https://skiper-ui.com).
+mostly reachable with what exists.
+
+**The round went on through [Magic UI](https://magicui.design), [Animata](https://animata.design),
+[Aceternity UI](https://ui.aceternity.com), [Motion Primitives](https://motion-primitives.com) and
+[Skiper UI](https://skiper-ui.com)**, which is every catalogue it set out to browse. What was taken up from Magic UI
+and Skiper UI is numbered. Animata, Aceternity UI and Motion Primitives gave nothing to take: the first had nothing
+past what exists, the second is mostly graphics-card spectacle, and the third's dock is kept only as a reference for
+how arrangements move. Element pictures, for cutting a live button into pieces, are postponed under item 1 until
+browser support exists.
 
 ### A fourth round of Exotics candidates, and what became of each
 
@@ -1564,7 +1769,8 @@ example, so nothing is pending there either.
   Playground example, so a component would be a second way to spell it. **That example has since gone with the
   `PointerTracker` page**, so the reason as recorded no longer holds — the verdict is still theirs, but it now
   rests on nothing a reader can go and look at.
-- **A ticker**, a strip of content looping seamlessly past. Their verdict: the carousels cover it.
+- **A ticker**, a strip of content looping seamlessly past. Turned down at first because the carousels cover it,
+  and reopened by the user once `Wraparound` existed: a marquee is `Wraparound` drifting along one axis (item 30).
 - **A marquee selection layer**, dragging a rectangle across a board to pick up everything it touches.
   **This one was not turned down on its merits** — "interesting but can't think of a use" — so what it lacks
   is a use rather than an argument, and a real one would reopen it.

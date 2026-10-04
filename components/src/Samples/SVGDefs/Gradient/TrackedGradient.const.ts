@@ -69,9 +69,9 @@ export namespace TrackedGradientDefaults {
 
     export const SPOT_SMEAR_CYCLING_DEFAULTS = { ...SPOT_SMEAR_DEFAULTS, ageColorSpan: 0.5, cycleMs: 1000 };
 
-    export const RIBBON_DEFAULTS = {
+    export const COMET_DEFAULTS = {
         circular: true,
-        ribbonLength: 14,
+        tailLength: 14,
         headScale: 0.32,
         tailScale: 0.06,
         headAlpha: 0.9,
@@ -80,16 +80,31 @@ export namespace TrackedGradientDefaults {
         followStiffness: 0.45,
     };
 
+    export const COMET_CYCLING_DEFAULTS = { ...COMET_DEFAULTS, cycleMs: 3000 };
+
     export const SWARM_DEFAULTS = {
         circular: true,
-        spotCount: 9,
-        spotScale: 0.22,
+        spotCount: 7,
+        spotScale: 0.12,
         spotAlpha: 0.8,
+        tailLength: 8,
+        tailScale: 0.25,
+        followStiffness: 0.35,
         wanderRatio: 0.12,
         wanderMs: 3000,
         stiffness: 0.08,
         damping: 0.78,
     };
+
+    export const SWARM_CYCLING_DEFAULTS = { ...SWARM_DEFAULTS, cycleMs: 3000 };
+
+    export const PIXEL_TRAIL_DEFAULTS = {
+        squareSize: 20,
+        squareAlpha: 0.9,
+        trailMs: 500,
+    };
+
+    export const PIXEL_TRAIL_CYCLING_DEFAULTS = { ...PIXEL_TRAIL_DEFAULTS, ageColorSpan: 0.5, cycleMs: 1000 };
 
     export const DEFAULTS_BY_FAMILY: TrackedGradientDefaultsByFamily = {
         band_1: BAND_DEFAULTS,
@@ -111,7 +126,14 @@ export namespace TrackedGradientDefaults {
         spot_trail_1: SPOT_TRAIL_DEFAULTS,
         spot_trail_2: SPOT_TRAIL_CYCLING_DEFAULTS,
         spot_trail_3: SPOT_TRAIL_CYCLING_DEFAULTS,
-        ribbon_3: RIBBON_DEFAULTS,
-        swarm_3: SWARM_DEFAULTS,
+        comet_1: COMET_DEFAULTS,
+        comet_2: COMET_CYCLING_DEFAULTS,
+        comet_3: COMET_CYCLING_DEFAULTS,
+        swarm_1: SWARM_DEFAULTS,
+        swarm_2: SWARM_CYCLING_DEFAULTS,
+        swarm_3: SWARM_CYCLING_DEFAULTS,
+        pixel_trail_1: PIXEL_TRAIL_DEFAULTS,
+        pixel_trail_2: PIXEL_TRAIL_CYCLING_DEFAULTS,
+        pixel_trail_3: PIXEL_TRAIL_CYCLING_DEFAULTS,
     };
 }
