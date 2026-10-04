@@ -41,8 +41,29 @@ const TRAIL_KNOB: NumberKnob = {
     step: 100,
 };
 
-const GROW_KNOBS = { tiled: TILED_KNOB, reach: REACH_KNOB, restLevel: GROW_REST_LEVEL_KNOB, trailMs: TRAIL_KNOB };
-const FADE_KNOBS = { tiled: TILED_KNOB, reach: REACH_KNOB, restLevel: FADE_REST_LEVEL_KNOB, trailMs: TRAIL_KNOB };
+const RETENTION_KNOB: NumberKnob = {
+    kind: "number",
+    label: "Retention (ms)",
+    hint: "How long a cell stays where the pointer left it before its trail starts to fade. Moving back over it lights it again at once.",
+    min: 0,
+    max: 3000,
+    step: 100,
+};
+
+const GROW_KNOBS = {
+    tiled: TILED_KNOB,
+    reach: REACH_KNOB,
+    restLevel: GROW_REST_LEVEL_KNOB,
+    trailMs: TRAIL_KNOB,
+    retentionMs: RETENTION_KNOB,
+};
+const FADE_KNOBS = {
+    tiled: TILED_KNOB,
+    reach: REACH_KNOB,
+    restLevel: FADE_REST_LEVEL_KNOB,
+    trailMs: TRAIL_KNOB,
+    retentionMs: RETENTION_KNOB,
+};
 
 export namespace TrackedPatternKnobs {
     export const KNOBS_BY_FAMILY: { [F in TrackedPatternFamily]: Knobs<TrackedPatternDefsOf<F>> } = {

@@ -126,6 +126,7 @@ export const PageSelectField = <T,>(props: PageSelectFieldProps<T>) => {
 
     return (
         <Select
+            id={props.id}
             renderHighlightFloater={renderPageHighlightFloater}
             value={[props.value, setValue]}
             options={options}
@@ -164,6 +165,7 @@ export const PageGroupedSelectField = <T,>(props: PageGroupedSelectFieldProps<T>
 
     return (
         <Select
+            id={props.id}
             renderHighlightFloater={renderPageHighlightFloater}
             value={[props.value, setValue]}
             options={options}

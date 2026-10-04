@@ -1,3 +1,4 @@
+import type { CardStackPileSide } from "@thewaver/ss-components";
 import type { SwipeDirection } from "@thewaver/ss-utils";
 
 export type CardStackDeckExampleProps = {
@@ -7,6 +8,7 @@ export type CardStackDeckExampleProps = {
     mountedCount: number;
     cardGap: number;
     funnelRatio: number;
+    pileSide: CardStackPileSide;
     onSend: (direction: SwipeDirection, card: string) => void;
     onEmpty: () => void;
     onDeal: () => void;

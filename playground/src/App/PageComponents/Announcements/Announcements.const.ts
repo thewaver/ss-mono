@@ -5,6 +5,7 @@ import type {
     CuboidFace,
     DateInputPart,
     FlipCardFace,
+    FlipbookStep,
     PaginatorStep,
     PatchBoardAnnouncements,
     SortableAnnouncements,
@@ -98,6 +99,20 @@ export const computePaginatorPageLabel = (page: number) => `Page ${page}`;
 export const computeCuboidFaceLabel = (face: CuboidFace) => startSentence(face);
 
 export const computeFlipCardFaceLabel = (face: FlipCardFace) => startSentence(face);
+
+const FLIPBOOK_STEP_LABELS: Record<FlipbookStep, string> = {
+    previous: "Previous page",
+    next: "Next page",
+};
+
+export const computeFlipbookStepLabel = (step: FlipbookStep) => FLIPBOOK_STEP_LABELS[step];
+
+export const computeFlipbookPageLabel = (index: number, count: number) => `page ${index + 1} of ${count}`;
+
+export const computeFlipbookSpreadAnnouncement = (pages: number[], count: number) =>
+    pages.length > SINGLE
+        ? `pages ${pages.map((page) => page + 1).join(" and ")} of ${count}`
+        : `page ${pages.map((page) => page + 1).join("")} of ${count}`;
 
 export const DATE_PART_HINTS: Record<DateInputPart, string> = {
     year: "yyyy",

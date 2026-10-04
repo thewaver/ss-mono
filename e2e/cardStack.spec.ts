@@ -112,6 +112,48 @@ test("the stack and its cards say what they are, and only the top card is in rea
     await expect(behind.first(), "and out of reach rather than merely out of sight").toHaveAttribute("inert", "");
 });
 
+/**
+ * Which edge the pile peeks out of is read off the painted boxes: the top card against the stack's own box, and
+ * the card straight behind it against the top card. Only the order and the flush edge are asserted, which hold at
+ * any gap and any scale.
+ */
+const pileEdges = (page: Page, scope: string) =>
+    page.evaluate(
+        ({ stackSelector, cardSelector }) => {
+            const stackBox = document.querySelector(stackSelector)!.getBoundingClientRect();
+            const [front, behind] = [...document.querySelectorAll(cardSelector)].map((card) =>
+                card.getBoundingClientRect(),
+            );
+
+            return {
+                frontTopGap: front.top - stackBox.top,
+                frontBottomGap: stackBox.bottom - front.bottom,
+                behindAbove: behind.top < front.top,
+                behindBelow: behind.bottom > front.bottom,
+            };
+        },
+        { stackSelector: stack(scope), cardSelector: cards(scope) },
+    );
+
+const pickPileSide = async (page: Page, side: string) => {
+    await page.locator(`${prop("pileSide")} [role="combobox"]`).click();
+    await page.getByRole("option", { name: side, exact: true }).click();
+};
+
+test("the pile peeks out below the top card by default, and above it once its side is top", async ({ page }) => {
+    await expect
+        .poll(() => pileEdges(page, DECK), "the top card sits flush with the top, the pile showing beneath it")
+        .toMatchObject({ behindAbove: false, behindBelow: true });
+    expect(Math.abs((await pileEdges(page, DECK)).frontTopGap)).toBeLessThan(1);
+
+    await pickPileSide(page, "top");
+
+    await expect
+        .poll(() => pileEdges(page, DECK), "the top card sits flush with the bottom, the pile showing above it")
+        .toMatchObject({ behindAbove: true, behindBelow: false });
+    await expect.poll(async () => Math.abs((await pileEdges(page, DECK)).frontBottomGap)).toBeLessThan(1);
+});
+
 test("a send button sends the top card that way, and the card behind it comes up", async ({ page }) => {
     for (const direction of ["left", "right", "up", "down"] as const) {
         const sent = await topLabel(page, DECK);

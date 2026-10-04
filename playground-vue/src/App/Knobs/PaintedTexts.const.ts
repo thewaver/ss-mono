@@ -32,6 +32,12 @@ export namespace PaintedTextKnobs {
     export const CUSTOM_TEXT_WIDTH = 320;
     export const CUSTOM_TEXT_MIN_ROWS = 4;
     export const CUSTOM_TEXT_MAX_ROWS = 10;
+    export const MIN_LAP_DURATION_MS = 2000;
+    export const MAX_LAP_DURATION_MS = 30000;
+    export const LAP_DURATION_STEP_MS = 500;
+    export const MIN_CIRCLE_RADIUS = 40;
+    export const MAX_CIRCLE_RADIUS = 200;
+    export const CIRCLE_RADIUS_STEP = 5;
 
     export const STARTING_WIDTH = 560;
     export const STARTING_FILL_PAINT_KIND: PaintKind = "timed";
@@ -45,5 +51,7 @@ export namespace PaintedTextKnobs {
     export const STARTING_FONT_WEIGHT = 700;
     export const STARTING_ARRIVAL_EFFECT = "scale";
     export const STARTING_CUSTOM_TEXT = "Type here,\n\nand the paint follows.";
+    export const STARTING_CIRCLE_RADIUS = 90;
+    export const STARTING_IS_FITTED_TO_PATH = true;
     export const STARTING_ITERATION_KEY: SVGDefsSamples.Iteration.SampleKey = "constant";
 }

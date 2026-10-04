@@ -5,6 +5,7 @@ import type {
     CarouselPlacementDefs,
     CarouselPlacementFn,
 } from "../../Essentials/Carousel/Carousel.types";
+import { SpineUtils } from "../../Primitives/Spine/Spine.utils";
 import { CarouselPlacementDefaults } from "./CarouselPlacements.const";
 import type {
     CarouselPlacementEntry,
@@ -14,6 +15,7 @@ import type {
     DrumPlacementDefs,
     FoldersPlacementDefs,
     HingePlacementDefs,
+    PaddleWheelPlacementDefs,
     TrackPlacementDefs,
 } from "./CarouselPlacements.types";
 
@@ -23,6 +25,7 @@ const HALF = 0.5;
 const FULL_TURN_DEGREES = 360;
 const HALF_TURN_DEGREES = 180;
 const QUARTER_TURN_DEGREES = 90;
+const LEVEL_SPINE = "column";
 const SMALLEST_RING = 3;
 const BOTTOM_EDGE = { x: 0.5, y: 1 };
 const LEAVING_DROP_RATIO = 0.6;
@@ -274,6 +277,9 @@ export namespace CarouselPlacementUtils {
      * Cards that flip down about their bottom edge: the one showing stands upright, the ones to come wait behind it,
      * and the one left behind turns over towards the viewer and lies face down, showing its back.
      *
+     * The card turning over is a leaf on a level spine, as a wall calendar's page is: it turns by
+     * `SpineUtils.leaves` about its bottom edge.
+     *
      * @param defs `offsetRatio`, how far each waiting card peeks above the one in front as a share of the box;
      * `depthPx` how far back each stands; `perspectivePx` how far away the viewer sits; `visibleDistance` how many
      * stay drawn behind.
@@ -286,12 +292,12 @@ export namespace CarouselPlacementUtils {
         const perspectivePx = defs?.perspectivePx ?? base.perspectivePx;
         const visibleDistance = defs?.visibleDistance ?? base.visibleDistance;
 
-        return ({ distance }): CarouselPlacement => {
+        return ({ distance, index, count }): CarouselPlacement => {
             if (distance < 0) {
                 return {
                     effect: {
                         perspective: perspectivePx,
-                        rotateX: MathUtils.clamp(distance, -WHOLE, 0) * HALF_TURN_DEGREES,
+                        ...SpineUtils.getTurn(LEVEL_SPINE, SpineUtils.leaves({ distance, index, count })),
                         opacity: MathUtils.clamp01(FLIPPED_FADE_DISTANCE + distance) * PERCENT,
                     },
                     origin: BOTTOM_EDGE,
@@ -317,6 +323,40 @@ export namespace CarouselPlacementUtils {
     export const hinge = createHinge();
 
     /**
+     * A paddle wheel: slides standing round a spine through the middle of the carousel's box, spaced evenly, each
+     * swung out to its own angle the way `Spine` swings its faces.
+     *
+     * Every slide is the whole box turned about its middle line, so the slide has to paint only its leading half — the
+     * right half on a carousel running across, the top half on one running up and down — with a gap at the spine for
+     * the wheel's hollow core, and its back the other half. The slides lying flat on either side face the viewer
+     * widest, the ones pointing at the viewer are seen edge-on, and the perspective draws the far ones smaller. The
+     * painted halves never cross, so the nearer one is stacked over the further.
+     *
+     * @param defs `spanDegrees`, how far round the wheel the slides reach between them; `perspectivePx` how far away the
+     * viewer sits.
+     * @returns The rule, ready to hand to `computePlacement`.
+     */
+    export const createPaddleWheel = (defs?: PaddleWheelPlacementDefs): CarouselPlacementFn => {
+        const base = CarouselPlacementDefaults.PADDLE_WHEEL_DEFAULTS;
+        const perspectivePx = defs?.perspectivePx ?? base.perspectivePx;
+        const computeAngle = SpineUtils.createRadial({ spanDegrees: defs?.spanDegrees ?? base.spanDegrees });
+
+        return ({ distance, index, count, orientation }): CarouselPlacement => {
+            const axis = orientation === "horizontal" ? "row" : "column";
+            const angle = computeAngle({ distance, index, count });
+
+            return {
+                effect: { perspective: perspectivePx, ...SpineUtils.getTurn(axis, angle) },
+                layer: SpineUtils.getLeadDepth(angle),
+                axis,
+            };
+        };
+    };
+
+    /** {@link createPaddleWheel} with its defaults. */
+    export const paddleWheel = createPaddleWheel();
+
+    /**
      * The rule a sample entry names, built with the entry's own tuning.
      *
      * @param entry One of the samples, or any entry of the same shape.
@@ -338,6 +378,8 @@ export namespace CarouselPlacementUtils {
                 return createFolders(entry.defs);
             case "hinge":
                 return createHinge(entry.defs);
+            case "paddleWheel":
+                return createPaddleWheel(entry.defs);
         }
     };
 }

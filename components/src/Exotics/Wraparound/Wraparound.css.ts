@@ -14,6 +14,10 @@ export const isDragging = style({
     userSelect: "none",
 });
 
+export const isImmovable = style({
+    touchAction: "auto",
+});
+
 export const wraparoundPlane = style({
     position: "absolute",
     top: 0,

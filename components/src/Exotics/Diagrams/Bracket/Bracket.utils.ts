@@ -1,8 +1,11 @@
-import type { Point2d } from "@thewaver/ss-utils";
+import { EasingUtils, MathUtils, type Point2d } from "@thewaver/ss-utils";
 
 import type {
+    BracketArrangement,
     BracketBox,
     BracketConnectorDefs,
+    BracketExtent,
+    BracketFrame,
     BracketGeometry,
     BracketGeometryOpts,
     BracketLayout,
@@ -25,6 +28,10 @@ const SINGLE = 1;
 const HALF = 0.5;
 /** What separates a child's position from its parent's id. */
 const ID_SEPARATOR = ".";
+/** What `lastIndexOf` answers when the root's id has no separator in it. */
+const NOT_FOUND = -1;
+/** Fully drawn, as an opacity and as a glide's progress. */
+const SHOWN = 1;
 
 /**
  * Places the matches of a knockout bracket, and moves a cursor around it.
@@ -188,14 +195,15 @@ export namespace BracketUtils {
     /**
      * Turns a layout's layers and places into lengths on the board.
      *
-     * @param layout What {@link computeLayout} answered.
+     * @param layout What {@link computeLayout} answered, or any count of layers and rows to size the board for —
+     * the family view passes {@link computeFamilyExtent}'s, so the board holds its largest family.
      * @param opts The node size, the two gaps, which way the board runs, which end holds the final, and how thick the
      * strip of layer headers is — `0` when there are none.
      * @returns Everything {@link computeInset}, {@link computeHeaderBox} and {@link computeConnectors} need, and the
      * board's own size: as long as the layers with their gaps between, and as wide as the first round's matches with
      * theirs, plus the header strip.
      */
-    export const computeGeometry = (layout: BracketLayout, opts: BracketGeometryOpts): BracketGeometry => {
+    export const computeGeometry = (layout: BracketExtent, opts: BracketGeometryOpts): BracketGeometry => {
         const isHorizontal = opts.orientation === "horizontal";
         const layerExtent = isHorizontal ? opts.nodeSize.width : opts.nodeSize.height;
         const crossExtent = isHorizontal ? opts.nodeSize.height : opts.nodeSize.width;
@@ -276,6 +284,9 @@ export namespace BracketUtils {
      * @param geometry What {@link computeGeometry} answered for it.
      * @param boardId Unique to this board in the document, so the connector ids it prefixes are too.
      * @param focusedId The match that holds focus, or `undefined` for none.
+     * @param frames Where each match is drawn right now, when that is not where the layout puts it — the family
+     * view's {@link computeShownArrangement}, mid-glide or settled. Left out, every match is where
+     * {@link computeInset} puts it.
      * @returns One connector per match that feeds another, running from the middle of the parent's edge facing its
      * children to the middle of the child's edge facing the root, so no line passes under a box. Each says whether
      * its child is on the route from the focused match to the final, and those on the route come last, so a renderer
@@ -286,20 +297,21 @@ export namespace BracketUtils {
         geometry: BracketGeometry,
         boardId: string,
         focusedId: string | undefined,
+        frames?: Record<string, BracketFrame>,
     ): BracketConnectorDefs[] => {
         const toPoint = (along: number, across: number): Point2d =>
             geometry.isHorizontal ? { x: along, y: across } : { x: across, y: along };
 
-        const getAnchor = (placement: BracketPlacement, isTowardRoot: boolean) =>
-            toPoint(
-                getFacingEdge(
-                    getLayerStart(geometry, placement.layer),
-                    geometry.layerExtent,
-                    geometry.rootSide,
-                    isTowardRoot,
-                ),
-                getCrossStart(geometry, placement) + geometry.crossExtent * HALF,
+        const getAnchor = (placement: BracketPlacement, isTowardRoot: boolean) => {
+            const inset = frames?.[placement.id] ?? computeInset(geometry, placement);
+            const along = geometry.isHorizontal ? inset.left : inset.top;
+            const across = geometry.isHorizontal ? inset.top : inset.left;
+
+            return toPoint(
+                getFacingEdge(along, geometry.layerExtent, geometry.rootSide, isTowardRoot),
+                across + geometry.crossExtent * HALF,
             );
+        };
 
         const connectors = layout.placements
             .filter((placement) => placement.childIds.length > NOTHING)
@@ -375,4 +387,252 @@ export namespace BracketUtils {
         lastFocusedId !== undefined && stops.some((placement) => placement.id === lastFocusedId)
             ? lastFocusedId
             : stops[NOTHING]?.id;
+
+    /**
+     * The id of the node one step nearer the root.
+     *
+     * Ids are paths through the tree, so this is the id with its last position taken off, and nothing has to be
+     * looked up.
+     *
+     * @param id A placement's id.
+     * @returns The parent's id, or `undefined` for the root, which has none.
+     */
+    export const getParentId = (id: string) => {
+        const at = id.lastIndexOf(ID_SEPARATOR);
+
+        return at === NOT_FOUND ? undefined : id.slice(NOTHING, at);
+    };
+
+    /**
+     * Which family the family view shows while a node holds focus, named by the node that family's middle row feeds.
+     *
+     * The family is three rows: the node the focused one feeds, the focused node with every sibling it has, and every
+     * node that feeds any of those siblings. So the node it is named by is the focused node's parent. This is the one
+     * place that rule lives; the rest of the family view reads it from here.
+     *
+     * @param focusedId The node that holds focus, or `undefined` for none.
+     * @returns The focused node's parent. `undefined` when nothing is focused or the root is, and both show the
+     * root's own family: the root and the nodes that feed it, with no row above, because nothing is.
+     */
+    export const getFamilyAnchorId = (focusedId: string | undefined) =>
+        focusedId === undefined ? undefined : getParentId(focusedId);
+
+    /**
+     * Whether a node belongs to the family the family view is showing.
+     *
+     * @param id The node being asked about.
+     * @param anchorId What {@link getFamilyAnchorId} answered.
+     * @returns `true` for the anchor itself, for its children, and for their children — and, with no anchor, for the
+     * root and its children. A row that does not exist simply has no members, so a family whose middle row are all
+     * leaves is two rows, and so is the root's.
+     */
+    export const getIsInFamily = (id: string, anchorId: string | undefined) => {
+        const parentId = getParentId(id);
+
+        return (
+            id === anchorId || parentId === anchorId || (parentId !== undefined && getParentId(parentId) === anchorId)
+        );
+    };
+
+    /**
+     * The family member a node outside the family is folded onto.
+     *
+     * A node folds onto the nearest member on its way to the root, so whatever hangs below the family's last row
+     * gathers on the node it feeds. A node with no member on its way to the root — the anchor's own parent, or a
+     * cousin's branch — gathers on the anchor, the top of the family.
+     *
+     * @param id The node to fold.
+     * @param anchorId What {@link getFamilyAnchorId} answered.
+     * @returns The node's own id when it is a member, which is where it stays.
+     */
+    export const getFoldId = (id: string, anchorId: string | undefined) => {
+        for (let current: string | undefined = id; current !== undefined; current = getParentId(current)) {
+            if (getIsInFamily(current, anchorId)) return current;
+        }
+
+        return anchorId ?? ROOT_ID;
+    };
+
+    /**
+     * Places one family on its own, as though it were the whole tree.
+     *
+     * @param layout What {@link computeLayout} answered for the whole tree.
+     * @param anchorId What {@link getFamilyAnchorId} answered.
+     * @returns The family's members only, with the top row at layer `0` and each node centered between the outermost
+     * of the members that feed it, exactly as {@link computeLayout} would place a tree that ended at the family's
+     * last row. Ids, parent ids and child ids are the whole tree's, so a member can still be matched to its node.
+     */
+    export const computeFamilyLayout = (layout: BracketLayout, anchorId: string | undefined): BracketLayout => {
+        const byId = new Map(layout.placements.map((placement) => [placement.id, placement]));
+        const top = byId.get(anchorId ?? ROOT_ID);
+        const placements: BracketPlacement[] = [];
+
+        let leafCount = NOTHING;
+        let layerCount = NOTHING;
+
+        const walk = (placement: BracketPlacement, layer: number): number => {
+            layerCount = Math.max(layerCount, layer + SINGLE);
+
+            const members = placement.childIds.flatMap((childId) => {
+                const child = byId.get(childId);
+
+                return child && getIsInFamily(childId, anchorId) ? [child] : [];
+            });
+            const crosses = members.map((child) => walk(child, layer + SINGLE));
+            const cross = crosses.length ? (crosses[NOTHING] + crosses[crosses.length - SINGLE]) * HALF : leafCount++;
+
+            placements.push({ ...placement, layer, cross });
+
+            return cross;
+        };
+
+        if (top) walk(top, FIRST_LAYER);
+
+        return { placements: placements.sort(compareByPlace), layerCount, leafCount };
+    };
+
+    /**
+     * How many layers and rows the family view's board needs to hold every family the tree has.
+     *
+     * Sizing the board for the largest family rather than the one showing keeps it the same size while focus moves,
+     * so nothing on the page around it shifts.
+     *
+     * @param layout What {@link computeLayout} answered.
+     * @returns The most layers and the most rows of any family, to hand to {@link computeGeometry}.
+     */
+    export const computeFamilyExtent = (layout: BracketLayout): BracketExtent => {
+        const anchors = [
+            undefined,
+            ...layout.placements
+                .filter((placement) => placement.childIds.length > NOTHING)
+                .map((placement) => placement.id),
+        ];
+
+        return anchors.reduce<BracketExtent>(
+            (extent, anchorId) => {
+                const family = computeFamilyLayout(layout, anchorId);
+
+                return {
+                    layerCount: Math.max(extent.layerCount, family.layerCount),
+                    leafCount: Math.max(extent.leafCount, family.leafCount),
+                };
+            },
+            { layerCount: NOTHING, leafCount: NOTHING },
+        );
+    };
+
+    /**
+     * Where every node and every layer header sits while one family shows.
+     *
+     * @param layout What {@link computeLayout} answered for the whole tree.
+     * @param geometry What {@link computeGeometry} answered for {@link computeFamilyExtent}'s extent.
+     * @param extent What {@link computeFamilyExtent} answered.
+     * @param anchorId What {@link getFamilyAnchorId} answered.
+     * @returns A frame per node id and one per layer of the whole tree. Members are drawn where
+     * {@link computeFamilyLayout} puts them, centered across the board when the family is narrower than it, and every
+     * other node sits on the member {@link getFoldId} names with nothing drawn. A header shows when its layer is one
+     * of the family's rows and sits over it; any other header sits over the nearest row, with nothing drawn.
+     */
+    export const computeFamilyArrangement = (
+        layout: BracketLayout,
+        geometry: BracketGeometry,
+        extent: BracketExtent,
+        anchorId: string | undefined,
+    ): BracketArrangement => {
+        const family = computeFamilyLayout(layout, anchorId);
+        const baseLayer = findPlacement(layout.placements, anchorId ?? ROOT_ID)?.layer ?? FIRST_LAYER;
+        const shift = (extent.leafCount - family.leafCount) * HALF;
+        const insets = new Map(
+            family.placements.map((placement) => [
+                placement.id,
+                computeInset(geometry, { ...placement, cross: placement.cross + shift }),
+            ]),
+        );
+        const lastSlot = Math.max(FIRST_LAYER, extent.layerCount - SINGLE);
+
+        const nodes = Object.fromEntries(
+            layout.placements.map((placement): [string, BracketFrame] => {
+                const inset = insets.get(placement.id);
+
+                if (inset) return [placement.id, { ...inset, opacity: SHOWN, isFolded: false }];
+
+                const fold = insets.get(getFoldId(placement.id, anchorId)) ?? { left: NOTHING, top: NOTHING };
+
+                return [placement.id, { ...fold, opacity: NOTHING, isFolded: true }];
+            }),
+        );
+
+        const headers = Array.from({ length: layout.layerCount }, (_unused, layer): BracketFrame => {
+            const slot = layer - baseLayer;
+            const isShown = slot >= FIRST_LAYER && slot < family.layerCount;
+            const box = computeHeaderBox(geometry, MathUtils.clamp(slot, FIRST_LAYER, lastSlot));
+
+            return { left: box.left, top: box.top, opacity: isShown ? SHOWN : NOTHING, isFolded: !isShown };
+        });
+
+        return { nodes, headers };
+    };
+
+    /**
+     * Where everything is drawn partway through a glide from one arrangement to another.
+     *
+     * @param from Where the glide began — what was on screen at that moment, even if that was itself partway through
+     * another glide. `undefined` before the first glide.
+     * @param to What {@link computeFamilyArrangement} answered for the family now showing.
+     * @param progress How far through the glide's time, `0` to `1`.
+     * @returns Every frame moved and faded along the way between its two ends, slow at the start and the finish and
+     * fastest in the middle. Whether a frame is folded takes its new value as the glide starts, whatever its opacity
+     * is doing, so focus and a screen reader never wait for the picture. A frame `from` does not have appears where
+     * it is going. `to` itself once the glide has finished.
+     */
+    export const computeShownArrangement = (
+        from: BracketArrangement | undefined,
+        to: BracketArrangement,
+        progress: number,
+    ): BracketArrangement => {
+        if (from === undefined || progress >= SHOWN) return to;
+
+        const ratio = EasingUtils.easeInOutCubic(progress);
+
+        const blend = (start: BracketFrame | undefined, end: BracketFrame): BracketFrame =>
+            start === undefined
+                ? end
+                : {
+                      left: MathUtils.lerp(start.left, end.left, ratio),
+                      top: MathUtils.lerp(start.top, end.top, ratio),
+                      opacity: MathUtils.lerp(start.opacity, end.opacity, ratio),
+                      isFolded: end.isFolded,
+                  };
+
+        return {
+            nodes: Object.fromEntries(
+                Object.entries(to.nodes).map(([id, frame]) => [id, blend(from.nodes[id], frame)]),
+            ),
+            headers: to.headers.map((frame, layer) => blend(from.headers[layer], frame)),
+        };
+    };
+
+    /**
+     * Whether a node or a header is taken out of the picture altogether, rather than merely faded.
+     *
+     * A frame unfolding starts its glide fully faded, and the moment the glide starts is the moment the keyboard
+     * moves focus onto it, so hiding everything faded would leave focus with nowhere to land. Only a frame that
+     * is folded and has finished fading out is hidden.
+     *
+     * @param frame Where it is drawn right now, or `undefined` outside the family view.
+     * @returns `true` only for a folded frame drawn at no opacity at all.
+     */
+    export const getIsFrameHidden = (frame: BracketFrame | undefined) =>
+        frame !== undefined && frame.isFolded && frame.opacity <= NOTHING;
+
+    /**
+     * How much of a connector to draw while the family view folds and unfolds.
+     *
+     * @param frames Where each node is drawn right now.
+     * @param connector The connector.
+     * @returns The fainter of its two ends' opacities, so a line is only fully drawn between two members, and is
+     * gone whenever either end is folded away. A node with no frame counts as fully drawn.
+     */
+    export const computeConnectorOpacity = (frames: Record<string, BracketFrame>, connector: BracketConnectorDefs) =>
+        Math.min(frames[connector.parentId]?.opacity ?? SHOWN, frames[connector.childId]?.opacity ?? SHOWN);
 }

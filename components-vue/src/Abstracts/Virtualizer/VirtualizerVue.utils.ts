@@ -4,6 +4,7 @@ import {
     type Ref,
     computed,
     nextTick,
+    onUpdated,
     shallowRef,
     toValue,
     watchEffect,
@@ -17,7 +18,6 @@ import {
     elementScroll,
     measureElement,
     observeElementOffset,
-    observeElementRect,
 } from "@tanstack/virtual-core";
 import { type VirtualizerRow, VirtualizerUtils } from "@thewaver/ss-components";
 
@@ -69,6 +69,11 @@ export namespace VirtualizerVueUtils {
      * taken off every position — through the scroller's own scale, so it holds under a CSS transform. With no
      * scrolling ancestor or with virtualizing switched off, `isLive` is `false` and the caller should draw the whole
      * list.
+     *
+     * The window takes up its scroller, and reads the scroller's height, only once a render has been written, as
+     * React's row window does in a layout effect: read any earlier and the height is the one from before the spacer
+     * was given its size, and a scroll to a row is aligned against a box a few pixels tall. `isLive` turns `true`
+     * at that moment rather than when the scroller is found, so a scroll asked for as soon as it does lands.
      *
      * Must run inside a component's `setup`.
      *
@@ -130,7 +135,7 @@ export namespace VirtualizerVueUtils {
 
                     return instance.options.horizontal ? box.inlineSize : box.blockSize;
                 },
-                observeElementRect,
+                observeElementRect: VirtualizerUtils.observeClientRect,
                 observeElementOffset,
                 scrollToFn: elementScroll,
                 onChange: () => publish(),
@@ -146,22 +151,30 @@ export namespace VirtualizerVueUtils {
             totalSize.value = virtualizer.getTotalSize();
         };
 
+        const isFollowing = shallowRef(false);
+
+        const followScroller = () => {
+            virtualizer._willUpdate();
+            isFollowing.value = virtualizer.scrollElement !== null;
+        };
+
         watchEffect(() => {
             virtualizer.setOptions(computeOptions());
-            virtualizer._willUpdate();
             publish();
         });
 
         watchAfterRender([], () => {
             const cleanup = virtualizer._didMount();
 
-            virtualizer._willUpdate();
+            followScroller();
 
             return cleanup;
         });
 
+        onUpdated(followScroller);
+
         return {
-            isLive: computed(() => !getIsDisabled() && scrollParent.value !== undefined),
+            isLive: computed(() => !getIsDisabled() && isFollowing.value),
             rows: computed(() => (getIsDisabled() ? NO_ROWS : rows.value)),
             totalSize: computed(() => (getIsDisabled() ? 0 : totalSize.value)),
             getRowStart: (row: VirtualizerRow) => row.start - scrollMargin.value,

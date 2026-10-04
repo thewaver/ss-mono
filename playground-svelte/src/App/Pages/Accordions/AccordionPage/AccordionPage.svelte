@@ -6,6 +6,7 @@
     import RowExample from "./Examples/Row.svelte";
     import ScrolledExample from "./Examples/Scrolled.svelte";
     import SectionsExample from "./Examples/Sections.svelte";
+    import WidthsExample from "./Examples/Widths.svelte";
 
     const EXAMPLES_ROOT = "/src/App/Pages/Accordions/AccordionPage/Examples";
 
@@ -18,6 +19,7 @@
     let scrolledExpanded = $state.raw<string[]>([]);
     let deferredExpanded = $state.raw<string[]>([]);
     let rowExpanded = $state.raw<string[]>(["Mountains"]);
+    let widthsExpanded = $state.raw<string[]>(["Mountains"]);
 
     let extraLines = $state(STARTING_EXTRA_LINES);
     let built = $state.raw<string[]>([]);
@@ -85,6 +87,15 @@
             component: rowExample,
             path: `${EXAMPLES_ROOT}/Row.svelte`,
         },
+        {
+            key: "widths",
+            name: "A width for each panel",
+            span: 2,
+            readout: () =>
+                `expanded: ${JSON.stringify(widthsExpanded)} — the row fills the box, and each panel opens to its own share of it; the one without a share takes what is left, and resizing the window keeps the shares`,
+            component: widthsExample,
+            path: `${EXAMPLES_ROOT}/Widths.svelte`,
+        },
     ];
 </script>
 
@@ -129,6 +140,10 @@
 
 {#snippet rowExample()}
     <RowExample bind:expanded={rowExpanded} />
+{/snippet}
+
+{#snippet widthsExample()}
+    <WidthsExample bind:expanded={widthsExpanded} />
 {/snippet}
 
 <PageExamples items={examples} />

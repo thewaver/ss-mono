@@ -1,20 +1,19 @@
 <script setup lang="ts">
 import type { CarouselSlideState } from "@thewaver/ss-components-vue";
-import * as styles from "@thewaver/ss-playground/App/Pages/Carousels/Carousels.css";
 
 import PageCarouselSlide from "../../../../StyledComponents/CarouselContent/PageCarouselSlide.vue";
 
 type Props = {
     title: string;
     state: CarouselSlideState;
-    isNarrow: boolean;
+    frameClass: string;
 };
 
 defineProps<Props>();
 </script>
 
 <template>
-    <div :class="[styles.slideFrame, isNarrow && styles.slideFrameNarrow]">
+    <div :class="frameClass">
         <PageCarouselSlide :state="state">{{ title }}</PageCarouselSlide>
     </div>
 </template>

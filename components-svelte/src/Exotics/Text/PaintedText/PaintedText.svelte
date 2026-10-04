@@ -7,9 +7,11 @@
         PAINTED_TEXT_DEFAULTS,
         PaintedTextUtils,
         ShapeLayerUtils,
+        TrailUtils,
         PaintedTextStyles as styles,
     } from "@thewaver/ss-components";
 
+    import { InteractionTrackerSvelteUtils } from "../../../Abstracts/InteractionTracker/InteractionTrackerSvelte.utils.svelte.js";
     import { getLetterDriverContext } from "../../../Abstracts/LetterDriver/LetterDriver.context.js";
     import PaintAreaProvider from "../../../Generators/SVGDefs/SVGGradients/PaintAreaProvider.svelte";
     import Markup from "../../../Utils/Markup.svelte";
@@ -19,12 +21,24 @@
 
     const MASK_PADDING_SIDES = 2;
     const NO_OFFSET = 0;
-    const BEFORE_FIRST = -1;
+    const NO_LENGTH = 0;
+    const NO_PROGRESS = 0;
 
-    let props: PaintedTextProps = $props();
+    let {
+        progress = $bindable(NO_PROGRESS),
+        playback = $bindable(PAINTED_TEXT_DEFAULTS.playback),
+        ...props
+    }: PaintedTextProps = $props();
 
     const uid = $props.id();
     const maskId = `painted-text-mask-${uid}`;
+    const pathId = `painted-text-path-${uid}`;
+
+    const getIsPageHidden = InteractionTrackerSvelteUtils.trackPageHidden();
+
+    const isOnPath = $derived(props.path !== undefined);
+    const isFittedToPath = $derived(props.isFittedToPath ?? PAINTED_TEXT_DEFAULTS.isFittedToPath);
+    const lapDurationMs = $derived(props.lapDurationMs ?? PAINTED_TEXT_DEFAULTS.lapDurationMs);
 
     const driver = getLetterDriverContext();
 
@@ -46,10 +60,13 @@
         getLayoutHost: () => layoutHost ?? undefined,
         getIsMeasuringLetters: () => !!driver,
         getComputePushingAnimationName: () => untrack(getComputePushingAnimationName),
+        getPath: () => untrack(() => props.path),
+        getIsFittedToPath: () => untrack(() => isFittedToPath),
     });
 
     const getLayoutState = readStore(layout);
     const getRestLetters = readStore(layout, (state) => state.restLetters);
+    const getOrigin = readStore(layout, (state) => state.origin);
     const getRegistryState = readStore(driver?.registry ?? LetterDriverUtils.createRegistry());
 
     const controller: PaintedTextController = {
@@ -99,14 +116,53 @@
 
     $effect(() => {
         const letters = getRestLetters();
+        const letterOrigin = getOrigin();
 
         registration?.setBoxes(
-            letters.map((letter) => ({ x: letter.x, y: letter.top, width: letter.width, height: letter.height })),
+            letters.map((letter) => ({
+                x: letter.x - letterOrigin.x,
+                y: letter.top - letterOrigin.y,
+                width: letter.width,
+                height: letter.height,
+            })),
         );
     });
 
     const width = $derived(getLayoutState().width ?? 0);
     const height = $derived(getLayoutState().height);
+    const origin = $derived(getOrigin());
+    const pathLength = $derived(getLayoutState().pathLength);
+    const startOffset = $derived(progress * pathLength);
+    const isSliding = $derived(isOnPath && playback && !getIsPageHidden() && pathLength > NO_LENGTH);
+
+    $effect(() => {
+        void props.path;
+        void isFittedToPath;
+
+        untrack(() => layout.update());
+    });
+
+    $effect(() => {
+        const slideOffset = startOffset;
+
+        untrack(() => layout.placeAlongPath(slideOffset));
+    });
+
+    $effect(() => {
+        if (!isSliding) return;
+
+        return untrack(() =>
+            TrailUtils.run({
+                getProgress: () => progress,
+                setProgress: (value) => {
+                    progress = value;
+                },
+                getRunDurationMs: () => lapDurationMs,
+                getIsLooping: () => true,
+                onEnd: () => undefined,
+            }),
+        );
+    });
     const size = $derived({ width, height });
     const strokePaint = $derived(
         PaintedTextUtils.computeStrokePaint(
@@ -161,19 +217,16 @@
 
     const caretBox = $derived.by(() => {
         const caretIndex = driver?.getCaretIndex?.();
-        const letters = getLayoutState().letters;
+        const layoutState = getLayoutState();
 
         if (!driver?.renderCaret || caretIndex === undefined) return undefined;
 
-        if (caretIndex === BEFORE_FIRST) {
-            const first = letters[0];
-
-            return offset === NO_OFFSET && first ? { x: first.x, top: first.top, height: first.height } : undefined;
-        }
-
-        const letter = letters[caretIndex - offset];
-
-        return letter ? { x: letter.x + letter.width, top: letter.top, height: letter.height } : undefined;
+        return PaintedTextUtils.computeCaretBox(
+            layoutState.letters,
+            caretIndex,
+            offset,
+            isOnPath ? { ascent: layoutState.ascent, descent: layoutState.descent } : undefined,
+        );
     });
 
     const attachAtomic = (element: SVGElement) => (node: SVGGElement) => {
@@ -183,7 +236,7 @@
 
 {#snippet runs(isReadable: boolean)}
     {#each getLayoutState().runs as run, index (index)}
-        <tspan x={run.x} y={run.y} style={toStyle(run.style)}
+        <tspan x={isOnPath ? undefined : run.x} y={isOnPath ? undefined : run.y} style={toStyle(run.style)}
             >{#if isReadable && run.title}<title>{run.title}</title>{/if}{#if isReadable && run.anchor}<a
                     href={run.anchor.href}
                     target={run.anchor.target}
@@ -209,11 +262,51 @@
     {/each}
 {/snippet}
 
+{#snippet pathLetters()}
+    {#each getLayoutState().letters as letter, index (index)}
+        {#if letter.placement}
+            {@const placement = letter.placement}
+            {@const letterState = driver?.getLetterState(offset + index)}
+            <g transform={`translate(${placement.point.x} ${placement.point.y}) rotate(${placement.angle})`}>
+                <text
+                    class={styles.paintedTextLayer}
+                    x={letterState?.glyph ? 0 : -placement.advance * 0.5}
+                    y={0}
+                    text-anchor={letterState?.glyph ? "middle" : undefined}
+                    style={toStyle({
+                        ...getLayoutState().runs[letter.runIndex ?? 0]?.style,
+                        ...getLetterStyle(index),
+                    })}>{letterState?.glyph ?? letter.character}</text
+                >
+            </g>
+        {/if}
+    {/each}
+{/snippet}
+
+{#snippet pathText(attributes: Record<string, unknown>, isReadable: boolean, textOffset: number)}
+    <text
+        class={styles.paintedTextLayer}
+        {...attributes}
+        textLength={isFittedToPath ? pathLength : undefined}
+        lengthAdjust={isFittedToPath ? "spacing" : undefined}
+        aria-hidden={isReadable ? undefined : "true"}
+    >
+        <textPath href={`#${pathId}`} startOffset={textOffset}>{@render runs(isReadable)}</textPath>
+    </text>
+{/snippet}
+
 {#snippet layer(attributes: Record<string, unknown>, isReadable: boolean)}
     {#if isPerLetter}
         <g {...attributes} aria-hidden="true">
-            {@render letters()}
+            {#if isOnPath}
+                {@render pathLetters()}
+            {:else}
+                {@render letters()}
+            {/if}
         </g>
+    {:else if isOnPath}
+        {@render pathText(attributes, isReadable, startOffset)}
+        {@render pathText(attributes, false, startOffset - pathLength)}
     {:else}
         <text class={styles.paintedTextLayer} {...attributes} aria-hidden={isReadable ? undefined : "true"}>
             {@render runs(isReadable)}
@@ -221,22 +314,32 @@
     {/if}
 {/snippet}
 
-<div bind:this={root} class={styles.paintedTextRoot}>
+<div
+    bind:this={root}
+    class={styles.paintedTextRoot}
+    style:width={isOnPath ? `${width}px` : undefined}
+    style:height={isOnPath ? `${height}px` : undefined}
+>
     <div bind:this={source} class={styles.paintedTextSourceWrap} aria-hidden="true" inert>
         {@render props.children?.()}
     </div>
 
-    <div bind:this={layoutHost} class={styles.paintedTextLayoutWrap} aria-hidden="true" inert></div>
+    <div
+        bind:this={layoutHost}
+        class={[styles.paintedTextLayoutWrap, isOnPath && styles.paintedTextLayoutWrapOnPath]}
+        aria-hidden="true"
+        inert
+    ></div>
 
     <svg
         class={styles.paintedTextSVG}
         {width}
         {height}
-        viewBox={`0 0 ${width} ${height}`}
+        viewBox={`${origin.x} ${origin.y} ${width} ${height}`}
         style:visibility={driver?.getIsHidden() ? "hidden" : undefined}
     >
         <defs>
-            <PaintAreaProvider getPaintArea={() => ({ x: 0, y: 0, width, height })}>
+            <PaintAreaProvider getPaintArea={() => ({ ...origin, width, height })}>
                 {#each [...fillDefs, ...strokeDefs] as def, index (index)}
                     <Markup markup={def.gradientOrPattern?.renderDefsElement()} />
                     <Markup markup={def.filter?.renderDefsElement()} />
@@ -244,19 +347,23 @@
                 {/each}
             </PaintAreaProvider>
 
+            {#if isOnPath}
+                <path id={pathId} d={props.path} />
+            {/if}
+
             {#if strokePaint.maskKind}
                 <mask
                     id={maskId}
                     maskUnits="userSpaceOnUse"
-                    x={-maskPadding}
-                    y={-maskPadding}
+                    x={origin.x - maskPadding}
+                    y={origin.y - maskPadding}
                     width={width + maskPadding * MASK_PADDING_SIDES}
                     height={height + maskPadding * MASK_PADDING_SIDES}
                 >
                     {#if strokePaint.maskKind === "outside"}
                         <rect
-                            x={-maskPadding}
-                            y={-maskPadding}
+                            x={origin.x - maskPadding}
+                            y={origin.y - maskPadding}
                             width={width + maskPadding * MASK_PADDING_SIDES}
                             height={height + maskPadding * MASK_PADDING_SIDES}
                             fill="white"
@@ -269,9 +376,13 @@
         </defs>
 
         {#if isPerLetter}
-            <text class={styles.paintedTextLayer} opacity={0}>
-                {@render runs(true)}
-            </text>
+            {#if isOnPath}
+                {@render pathText({ opacity: 0 }, true, startOffset)}
+            {:else}
+                <text class={styles.paintedTextLayer} opacity={0}>
+                    {@render runs(true)}
+                </text>
+            {/if}
         {/if}
 
         {#each fillDefs as def, index (index)}
@@ -313,12 +424,7 @@
 
     {#if caretBox}
         {#key caretBox}
-            <div
-                class={styles.paintedTextCaret}
-                style:left={`${caretBox.x}px`}
-                style:top={`${caretBox.top}px`}
-                style:height={`${caretBox.height}px`}
-            >
+            <div class={styles.paintedTextCaret} style={toStyle(PaintedTextUtils.computeCaretStyle(caretBox, origin))}>
                 {@render driver?.renderCaret?.()}
             </div>
         {/key}

@@ -13,6 +13,7 @@
     import Barrel from "../../../Primitives/Barrel/Barrel.svelte";
     import { watchChange } from "../../../Utils/effectUtils.svelte.js";
     import type { OdometerProps } from "./Odometer.types.js";
+    import OdometerFlapColumn from "./OdometerFlapColumn.svelte";
     import OdometerSlot from "./OdometerSlot.svelte";
 
     const RESTING_ANGLE = 0;
@@ -27,6 +28,7 @@
     const digitSize = $derived(props.digitSize);
     const cascadeDelayMs = $derived(props.cascadeDelayMs ?? ODOMETER_DEFAULTS.cascadeDelayMs);
     const turnDurationMs = $derived(props.turnDurationMs ?? ODOMETER_DEFAULTS.turnDurationMs);
+    const mechanism = $derived(props.mechanism ?? ODOMETER_DEFAULTS.mechanism);
 
     const createBoard = (initialSlots: ReturnType<typeof OdometerUtils.getSlots>) => {
         const initialDigits = OdometerUtils.getDigits(initialSlots);
@@ -158,29 +160,46 @@
             onGrown={() => settleDigit(index)}
             onShrunk={() => dropDigitColumn(index)}
         >
-            <div class={styles.odometerBarrel}>
-                <Barrel
-                    faces={OdometerUtils.DIGITS}
-                    axis="column"
-                    hasBacks={false}
-                    faceSize={digitSize}
-                    angle={board.angles[digitIndex] ?? RESTING_ANGLE}
-                    transitionDurationMs={board.durations[digitIndex] ?? turnDurationMs}
-                    transitionDelayMs={board.delays[digitIndex] ?? NO_DELAY}
-                    faceRoleDescription=""
-                    computeFaceDefs={() => ({ ariaLabel: "", isHidden: true })}
-                >
-                    {#snippet renderFace(face: string)}
-                        <div class={styles.odometerDigitFace}>
-                            {#if props.renderDigit}
-                                {@render props.renderDigit(face, flags)}
-                            {:else}
-                                {face}
-                            {/if}
-                        </div>
-                    {/snippet}
-                </Barrel>
-            </div>
+            {#if mechanism === "splitFlap"}
+                {#snippet flapCharacter(character: string)}
+                    {#if props.renderDigit}
+                        {@render props.renderDigit(character, flags)}
+                    {:else}
+                        {character}
+                    {/if}
+                {/snippet}
+                <OdometerFlapColumn
+                    target={OdometerUtils.getFlapPosition(board.angles[digitIndex] ?? RESTING_ANGLE)}
+                    delayMs={board.delays[digitIndex] ?? NO_DELAY}
+                    durationMs={board.durations[digitIndex] ?? turnDurationMs}
+                    {digitSize}
+                    renderCharacter={flapCharacter}
+                />
+            {:else}
+                <div class={styles.odometerBarrel}>
+                    <Barrel
+                        faces={OdometerUtils.DIGITS}
+                        axis="column"
+                        hasBacks={false}
+                        faceSize={digitSize}
+                        angle={board.angles[digitIndex] ?? RESTING_ANGLE}
+                        transitionDurationMs={board.durations[digitIndex] ?? turnDurationMs}
+                        transitionDelayMs={board.delays[digitIndex] ?? NO_DELAY}
+                        faceRoleDescription=""
+                        computeFaceDefs={() => ({ ariaLabel: "", isHidden: true })}
+                    >
+                        {#snippet renderFace(face: string)}
+                            <div class={styles.odometerDigitFace}>
+                                {#if props.renderDigit}
+                                    {@render props.renderDigit(face, flags)}
+                                {:else}
+                                    {face}
+                                {/if}
+                            </div>
+                        {/snippet}
+                    </Barrel>
+                </div>
+            {/if}
         </OdometerSlot>
     {/each}
 </div>

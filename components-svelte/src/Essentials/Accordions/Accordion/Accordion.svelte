@@ -1,4 +1,5 @@
 <script lang="ts" generics="T">
+    import { untrack } from "svelte";
     import { on } from "svelte/events";
 
     import {
@@ -8,6 +9,7 @@
         AccordionStyles as styles,
     } from "@thewaver/ss-components";
 
+    import { ElementObserverSvelteUtils } from "../../../Abstracts/ElementObserver/ElementObserverSvelte.utils.svelte.js";
     import { NavigatorSvelteUtils } from "../../../Abstracts/Navigator/NavigatorSvelte.utils.svelte.js";
     import { createHeldValue } from "../../../Utils/bindableUtils.svelte.js";
     import { watchChange } from "../../../Utils/effectUtils.svelte.js";
@@ -25,6 +27,8 @@
 
     const headerRefs: (HTMLElement | undefined)[] = [];
 
+    let headerElements = $state.raw<(HTMLElement | undefined)[]>([]);
+
     let root = $state<HTMLDivElement>();
     let moveDirection = $state<AccordionMoveDirection>();
 
@@ -34,6 +38,8 @@
     const sizing = $derived(props.sizing ?? ACCORDION_DEFAULTS.sizing);
     const orientation = $derived(props.orientation ?? ACCORDION_DEFAULTS.orientation);
     const side = $derived(AccordionUtils.getPanelSide(orientation));
+    const gap = $derived(props.gap ?? ACCORDION_DEFAULTS.gap);
+    const hasRowWidths = $derived(AccordionUtils.getHasRowWidths(orientation, sizing));
     const expandedIndexes = $derived.by(() => {
         const current = getExpanded() ?? [];
 
@@ -43,6 +49,45 @@
             return acc;
         }, []);
     });
+
+    const getRowSize = ElementObserverSvelteUtils.createBorderBoxSizeObserver(
+        () => root ?? undefined,
+        () => !hasRowWidths,
+    );
+    const getStripSizes = ElementObserverSvelteUtils.createBorderBoxSizeListObserver(
+        () => headerElements.slice(0, props.items.length),
+        () => !hasRowWidths,
+    );
+
+    let previousWidths: (number | undefined)[] = [];
+
+    const openWidths = $derived.by(() => {
+        if (!hasRowWidths) return [];
+
+        const next = AccordionUtils.computeOpenWidths(
+            props.items,
+            expandedIndexes,
+            { rowWidth: getRowSize().width, stripWidths: getStripSizes().map((size) => size.width), gap },
+            previousWidths,
+        );
+
+        previousWidths = next;
+
+        return next;
+    });
+
+    const setHeaderRef = (index: number, element: HTMLElement | undefined) => {
+        headerRefs[index] = element;
+
+        untrack(() => {
+            if (headerElements[index] === element) return;
+
+            const next = [...headerElements];
+
+            next[index] = element;
+            headerElements = next;
+        });
+    };
 
     watchChange(
         () => expandedIndexes,
@@ -88,15 +133,17 @@
         styles.accordionSizingVariants[sizing],
         styles.accordionOrientationVariants[orientation],
     ]}
-    style:gap={`${props.gap ?? ACCORDION_DEFAULTS.gap}px`}
+    style:gap={`${gap}px`}
 >
     {#each props.items as item, index (index)}
         <AccordionSection
-            bind:ref={() => headerRefs[index], (element) => (headerRefs[index] = element)}
+            bind:ref={() => headerRefs[index], (element) => setHeaderRef(index, element)}
             {item}
             {headingLevel}
             {side}
             isExpanded={getExpanded()?.includes(item.value) ?? false}
+            isSideways={orientation === "horizontal"}
+            openWidth={openWidths[index]}
             isScrolledIntoViewOnExpand={props.isScrolledIntoViewOnExpand}
             isPanelBuiltOnExpand={props.isPanelBuiltOnExpand}
             transitionDurationMs={props.transitionDurationMs}

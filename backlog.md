@@ -61,21 +61,8 @@ reading.
 27. The submit story — what a native submit carries, and what `Form` hands `onSubmit` — _pending decision_
 28. Work that has never been watched running — _open_
 29. Choices the add-ons round made on the user's behalf — _pending decision_
-30. `Wraparound` drifts by itself, and a marquee is its example — _decided, not yet built_
-31. `Die` turns freely, and rolling becomes a helper — _decided, not yet built_
-32. `Lens` — _decided, not yet built_
-33. Travelling beams on `Bracket` and `PatchBoard` — _decided, not yet built_
-34. A page change revealed through a growing shape — _decided, not yet built_
-35. `MorphText` — _decided, not yet built_
-36. `PaintedText` along a path — _decided, not yet built_
-37. `CardStack` can pile toward the bottom — _decided, not yet built_
-38. A gallery page, and a preview of each page from the nav — _decided, not yet built_
-39. `FittedText` — _decided, not yet built_
-40. `Bracket` shows one family at a time, following focus — _decided, not yet built_
-41. The row `Accordion`: an open width per item — _decided, not yet built_
-42. Tracked patterns hold a cell warm before it fades — _decided, not yet built_
-43. A drum of words turned by scrolling — _decided, not yet built_
-44. `Spine`, a hinge counterpart to `Barrel` — _decided, not yet built_
+30. A gallery page, and a preview of each page from the nav — _deferred to a session of its own_
+31. A long list reopened onto a far-down selection settles a frame or two late in Solid and Svelte — _open_
 
 ### Build order
 
@@ -1258,113 +1245,12 @@ is the user's to confirm or change.
 - **Odometer reels under reduced motion drop only their extra turns.** Each reel keeps its own duration, so a
   slow reel still turns its one step slowly. Falling back to `turnDurationMs` there is the alternative.
 
-## 30. `Wraparound` drifts by itself, and a marquee is its example — _decided, not yet built_
-
-A strip of content looping past on its own, which libraries ship as a "marquee". It was turned down once as a
-ticker, on the grounds that the carousels cover it; `Wraparound` is the new argument, since a marquee is
-`Wraparound` held to one axis and moving by itself.
-
-- **`Wraparound` gains a drift**: a speed, a direction and `playback`, pausing under the pointer or keyboard focus
-  through the same hold the carousels and the wheels use. The user's pick over a `Marquee` preset, whose only
-  difference would have been its defaults.
-- **Dragging can be turned off**, since a marquee usually is not draggable.
-- **The `Wraparound` page carries an example called "Marquee"**, so someone looking for the word finds it.
-- Anything drifting for more than five seconds owes WCAG 2.2.2 a way to stop it; `playback` and the hold are that
-  way, and the example shows the control.
-
-## 31. `Die` turns freely, and rolling becomes a helper — _decided, not yet built_
-
-From Magic UI's [Icon Cloud](https://magicui.design/docs/components/icon-cloud): icons spread over a sphere that
-turns by itself, can be dragged, and pauses. The user's reading is `Die` with transparent faces and content painted
-on each, which `renderFace` already allows standing still; tilting content and content seen mirrored through the
-front are wanted.
-
-- **`Die` follows `Wheel`'s arrangement, in three dimensions.** The user's design. `Rotator` keeps a free angle,
-  drifts by itself while idle, and has a spin that lands on a chosen wedge, all in one component. `Die` does the
-  same: its turn becomes a free value rather than "which face is showing", it drifts while idle and turns when
-  dragged, and rolling is the helper that lands it on a chosen face — so `computeRollTarget` is needed only by a
-  die that rolls.
-- **The turn is stored as one rotation in three dimensions, not as two angles.** Two angles applied one after the
-  other is what makes a freely dragged box feel wrong after a few drags (Fancy Components' 3D CSS Box says as much
-  of its own).
-- **The icon cloud is an example on the `Die` page**: drifting, draggable, each face painted transparent with an
-  icon. The number of items is the solid's — 4, 6, 8, 12, 20 or 100 — and a set that does not fill one leaves
-  faces empty, which the user accepted.
-
-## 32. `Lens` — _decided, not yet built_
-
-From Magic UI's [Lens](https://magicui.design/docs/components/lens): a magnified copy of the content, visible only
-inside a circle that follows the pointer. It is `Reveal`'s mechanism the other way round — `Reveal` cuts a hole in
-a cover, `Lens` shows a scaled copy only inside the hole — so it joins `Reveal` and `ScratchCard` in
-`Exotics/Reveals`.
-
-- **The copy is hidden from screen readers and cannot be reached by Tab**; only the content underneath is real.
-- **The keyboard works as `Reveal`'s does**: focus opens the lens, the arrows move it.
-- **The zoom and the size are props**, and the point it follows can be supplied rather than the pointer, like every
-  other component that follows the pointer.
-
-## 33. Travelling beams on `Bracket` and `PatchBoard` — _decided, not yet built_
-
-From Magic UI's [Animated Beam](https://magicui.design/docs/components/animated-beam), where a pulse of light runs
-along the line between two elements. Both components already hand the line to the consumer to draw, so this is a
-Playground example on each page and no library change: a dash travelling along the path, with `pathLength="1"` so
-it keeps the same pace on long and short lines. On `Bracket` the beam runs only along the focused node's route to
-the root, which `isOnFocusedRoute` already reports. It moves for more than five seconds, so each example has a
-pause.
-
-## 34. A page change revealed through a growing shape — _decided, not yet built_
-
-From Magic UI's [Animated Theme Toggler](https://magicui.design/docs/components/animated-theme-toggler) and Skiper
-UI's [theme transitions](https://skiper-ui.com/v1/skiper26). The browser takes a picture of the page, applies a
-change underneath, and shows the new page through a shape growing from a point — the View Transitions feature,
-supported in Chrome and Edge 111, Safari 18 and Firefox 144 ([caniuse](https://caniuse.com/view-transitions)).
-
-- **A helper in the library**: "make this change, and reveal the result through a shape growing from a point". The
-  user's pick over leaving it in the Playground's theme switcher. It is not tied to themes; a route change or a
-  large filter can use it as well.
-- **The shapes are samples**: a circle, a blurred circle, a rectangle, a polygon and a star from `Shape`'s outlines,
-  and an animated GIF as the mask, each growing from a chosen point, a corner or the center.
-- **Where the browser lacks View Transitions, the change simply happens.** Reduced motion is the consumer's call, as
-  everywhere else in the library.
-- **The Playground's theme switcher is the first consumer.**
-
-## 35. `MorphText` — _decided, not yet built_
-
-From Magic UI's [Morphing Text](https://magicui.design/docs/components/morphing-text): when the text changes, the
-old and new copies cross-fade while blurring, under a filter that makes anything half-transparent either solid or
-clear, so the blur melts from one word into the next.
-
-- **It sits in `Exotics/Text` beside `ScrambleText`**, whose contract it shares: text that changes with an effect.
-  The user's pick over a text switcher in `MediaSwitchers`, whose components own a list of values and step through
-  it. Cycling through words is the consumer's timer, as with `Typewriter`'s phrases.
-- **The content arrives as a function of the text, not as children**, because the outgoing text is drawn beside the
-  incoming one.
-- **The filter sits on the container**, so plain text and `PaintedText` both work inside, gradient and pattern paint
-  included. The blur-then-sharpen filter it needs was checked in Safari with the swarm's, and draws there.
-
-## 36. `PaintedText` along a path — _decided, not yet built_
-
-From Magic UI's [Spinning Text](https://magicui.design/docs/components/spinning-text), text set round a circle and
-turning. SVG lays text along any path itself (`<textPath>`), and `PaintedText` is SVG.
-
-- **`PaintedText` takes a path**, the user's pick over letters riding `Trail`. A circle is one helper away. The
-  browser places every letter, so the spacing between pairs of letters stays right and every kind of paint works.
-- **Turning is the text sliding along the path**, through `progress` and `playback` in the library's usual shape.
-  SVG can also stretch the spacing so the text goes round a circle exactly once.
-- **`Typewriter` and `ProximityText` still drive the letters**, since they are the same SVG letters.
-- On a path there is one line and nothing wraps, so `PaintedText`'s line machinery stands idle in that mode.
-
-## 37. `CardStack` can pile toward the bottom — _decided, not yet built_
-
-Most published card stacks show the cards behind peeking out below the front one; `CardStack` shows them above.
-`pileSide`, after `Bracket`'s `rootSide`, names the edge the pile peeks out of: `"top"`, today's behavior and the
-default, or `"bottom"`, where the front card sits flush with the top of the box instead. Top and bottom only, the
-user's pick: a sideways pile turns the whole geometry, and widening the choice later breaks nobody.
-
-## 38. A gallery page, and a preview of each page from the nav — _decided, not yet built_
+## 30. A gallery page, and a preview of each page from the nav — _deferred to a session of its own_
 
 From Magic UI, whose documentation shows every component on one page and previews each from the side menu. The
 Playground gains both.
+
+**Deferred by the user to a session of its own; the gallery and the nav preview are two pieces of work.** One question is open for that session: how a tile stands still until hovered, since CSS animations can be paused from outside but wheels, trails and particles run their own frame loops. The choices put so far: draw once and swap in a frozen copy of the markup, show only the page's name until hovered, pause only the CSS, or take screenshots at build time.
 
 - **The preview is the first example of each page**, live, drawn at full size and shrunk, the way the Playground
   already draws inside `Viewport`. Nothing new is written per component; the order of a page's examples decides
@@ -1374,141 +1260,19 @@ Playground gains both.
   It is also how the page meets WCAG 2.2.2 with dozens of moving examples on it.
 - **The nav shows the same preview in a `HoverCard`** on its items.
 
-## 39. `FittedText` — _decided, not yet built_
+## 31. A long list reopened onto a far-down selection settles a frame or two late in Solid and Svelte
 
-A component around `JSXTextMetricsUtils.getNormalizedFontSizes` in `ss-utils`, which nothing calls yet. The consumer
-gives the lines, already split; every line is scaled to the full width, then all of them shrink together until the
-stack fits the height, so a short line comes out larger than a long one. It sits in `Exotics/Text`, and measures
-again whenever its box changes size or a web font finishes loading, the two events `Typewriter` already watches.
-Splitting text into lines automatically is not part of it, by the user's call.
+Reachable in the Playground's windowed `Select` (the long list of routes): pick `Route 26`, close the list and open it
+again. In Solid and Svelte, for about two frames the picked row sits just above the list's box with only its bottom edge
+showing, then lands in view. React has one rough frame of its own; Vue does not show it.
 
-## 40. `Bracket` shows one family at a time, following focus — _decided, not yet built_
-
-From Skiper UI's [knockout bracket](https://skiper-ui.com/v1/skiper107), which shows a window of the tree and pages
-through it, folding what leaves onto the node it fed and gliding into the new layout. `Bracket` draws org charts and
-perk trees as well as brackets, so the window is defined by the tree rather than by rounds.
-
-- **A section is one node and its direct children** — a match and the two that fed it, a manager and their reports,
-  a perk and what it unlocks. The user's definition.
-- **The section follows the focused node.** Focusing a child shows that child's section, focusing the parent shows
-  the parent's. `Bracket` already moves focus between nodes from the keyboard, so the keyboard route needs nothing
-  new and no paging buttons are needed.
-- **The rest of the tree folds away onto the node it hangs from**, and everything glides between sections. `Bracket`
-  learns to animate between arrangements here, which it does not do today.
-
-## 41. The row `Accordion`: an open width per item — _decided, not yet built_
-
-From Skiper UI's [expanding panels](https://skiper-ui.com/v1/skiper76), where each panel opens to a width of its own.
-A panel's content cannot give the width, since text wraps to whatever width it is handed; the user's point. So
-**each item can carry an open width**, as a share of the row so that it holds when the window is resized, and an
-item without one fills what the collapsed strips leave. It is a property of one panel, beside `isDisabled` on the
-item record, and does not overlap `sizing`, which decides whether the whole accordion fills its container.
-
-## 42. Tracked patterns hold a cell warm before it fades — _decided, not yet built_
-
-A tracked pattern's cell answers the pointer at once, and with `trailMs` set it fades back to rest over that time
-once the pointer has passed (`decisions.md`, _"A trail for the tracked patterns, and three more tracked gradient
-families"_). The user's idea adds a hold before the fade.
-
-- **`retentionMs`, the user's name, is how long a cell stays at the level the pointer left it** — fully grown, fully
-  visible, whatever the sample's warm end is — before the `trailMs` fade begins.
-- **It defaults to `0`, which is today's behavior**, and joins `trailMs`, `tiled`, `reach` and `restLevel` among
-  the tracked patterns' options.
-- **Only the cooling waits; warming is still immediate.** A cell already shows the higher of its live level and
-  what it remembers, so moving back over a held or fading cell warms it at once.
-- **`TrackedPatternUtils.createTrail` already remembers each cell's level**; it gains the moment that level was set,
-  and the clock stays awake while any cell is holding as well as while one is fading.
-
-## 43. A drum of words turned by scrolling — _decided, not yet built_
-
-From Skiper UI's [3D rolling text](https://skiper-ui.com/v1/skiper88). A Playground example on the `Carousel` page:
-the drum rule with words for slides, its `progress` driven by the scroll observer. No new code.
-
-## 44. `Spine`, a hinge counterpart to `Barrel` — _decided, not yet built_
-
-The user's idea, explained and checked over several rounds before anything was written, and the reason the next
-round of `Odometer`, `Carousel` and other exploratory examples has somewhere to come from. Nothing is built; no code
-has been touched for it. The six questions it raised are settled below.
-
-**What `Barrel` is, for contrast.** `Primitives/Barrel` puts its faces around a circle like the sides of a drum: seen
-from above it is a closed convex polygon, each face lies along the rim facing outwards, and turning it brings the next
-face to the front. Its props are `angle`, `axis`, `faceSize`, `hasBacks`, `transitionDurationMs`,
-`transitionDelayMs`, `faceRoleDescription`, `computeFaceDefs`, `faces` and `renderFace`, and it is used by
-`FlipCard` (two faces hinged through their middle), `Odometer`'s reels and `Wheel` (the `DrumWheel`).
-
-**What the counterpart is.** Every face is its container's own box, hinged on one line, and the faces fan out from
-that line at different angles — seen from above, a star of lines rather than a polygon. At its rest angle a face sits
-exactly on its box, edge for edge; any other angle swings it out around the hinge like a door. **Where the hinge sits
-picks the object**, which is what makes it general rather than single-purpose:
-
-- **A vertical centre line**: faces stand like the paddles of a paddle wheel, each one's plane passing through the
-  axis, and turning the whole sweeps each face from edge-on to full-face and back. This is Made With GSAP's
-  [3D Wheel Gallery (091)](https://madewithgsap.com/effects/tutorial091), the look the user wants for the carousel's
-  ring. From a screenshot the user shared: upright image panels around a vertical axis through the middle, the ones
-  facing the viewer widest, the ones pointing at the viewer seen as slivers, the far ones smaller in perspective,
-  and a small empty core because the inner edges sit a little away from the axis.
-- **The left or right edge**: a door, or a book's right-hand page turning over to the left.
-- **The top or bottom edge, the axis lying flat**: a wall calendar, or one half of a split-flap card falling over its
-  middle line.
-
-**Settled in the explanation:**
-
-- **The gap between the inner edges and the axis is padding, a prop**, as a `Barrel` can be padded too — not a
-  defining part of the geometry. The paddle wheel's hollow core is that padding; at zero the faces meet on the hinge,
-  as a book's pages meet on the spine.
-- **It is to `Barrel` what a hinge is to a drum**: `Barrel` is "faces around a circle, one fills the front"; this is
-  "faces around a hinge, one fills the box". Which face rests in the box, and the angles the others sit at, is what
-  differs between a wheel and a book.
-
-**What it opens, each to be argued on its own once the abstract exists:**
-
-- **The carousel's ring.** The current _"A ring that turns and leans"_ example was rebuilt as a wide drum whose slides
-  face outwards, and the user's verdict is that it looks nothing like 091 — it cannot, since 091 is this arrangement
-  and not a barrel. It is the abstract's first natural consumer.
-- **A book that turns its pages** — `Flipbook` from the first round of Exotics candidates, named and never argued:
-  pages already read lie at 180°, unread ones at 0°, the one turning in between.
-- **A split-flap `Odometer`** — each flap half a character, hinged on the middle line, its front the top half of the
-  old character and its back the bottom half of the new one. The split-flap board was turned down in the second round
-  as "the drum again", a second way to spell what `Odometer` and `DrumWheel` do; the user reopened it on this
-  ground, since on a shared abstract it is a second consumer rather than a second mechanism.
-- **A rolodex** — cards spaced evenly round the hinge, turning past the viewer, as a carousel placement rule.
-- **The carousel's existing `hinge` rule** already flips cards about their bottom edge, which is this geometry in
-  miniature; whether it moves onto the abstract is part of the work.
-
-**Settled with the user, question by question:**
-
-1. **Named `Spine`** — the user's suggestion, over `Hinge`, `Spokes` and `Leaves`. It names an object the way
-   `Barrel` does — the line the faces grow from, a book's pages from its spine, ribs from a backbone — and it leaves the
-   carousel's `hinge` placement rule its own word.
-2. **A `Primitive`, beside `Barrel`** — it renders, holds no value, and is met through the components built on it.
-3. **Each face's angle comes from one rule taking the face's distance from the current one**, the arrangement
-   `Carousel`'s placement rules already use. Evenly spaced (the 091 wheel, a rolodex) and "flat on one side, flat on
-   the other, one turning between" (a book, a split-flap) are two ready-made rules, and a consumer can write their own.
-4. **`Spine` handles direction only.** It takes `Barrel`'s `axis` (`"row"` or `"column"`, which way the turn runs),
-   and its spine always runs through the middle of its own box. A hinge on an edge — a book, a door — is the
-   container moving the component by half its size, which is the consumer's job, and the Playground's in the
-   examples. There is no prop for the hinge's position.
-5. **`hasBacks` carries over from `Barrel`; there is no padding prop.** As on a `Barrel`, a face is the consumer's
-   to paint, and the gap between the spine and a face's inner edge — 091's hollow core — is painted inside the face.
-6. **The first pass builds three of the uses:**
-    - **The carousel's ring**, rebuilt on `Spine`'s geometry as a placement rule, to look like 091.
-    - **A split-flap `Odometer`**, through the primitive, beside the drum reels.
-    - **`Flipbook`**, a new component on `Spine` with its hinge at an edge. The user's call to include it now rather
-      than defer it: a separate item would not guarantee a session of its own. Its design is settled too:
-        - **A page turns three ways**: step buttons the library builds and the consumer places, as `Carousel`'s are; a
-          drag that turns the page partway and completes or falls back on release, as `CardStack` and `Cuboid` do; and
-          the arrow keys while the book has focus. The buttons are also WCAG 2.5.7's required alternative to the drag.
-          The point a drag has to pass to complete is a picked number, for the user to confirm once built.
-        - **A two-page spread, the spine in the middle**: pages read lie on the left, unread on the right, and a turning
-          page shows its back as it crosses. The front cover sits alone on the right and the back cover alone on the
-          left. A single page turning on an edge was ruled out as not a book at all — it is a carousel with a placement
-          rule, which the carousel's `hinge` rule nearly is already.
-        - **Each page is named on its own**, `computePageLabel(index, count)` giving "page 3 of 12", so a reader always
-          knows which of the two pages they are on, and **a turn announces the spread**, "pages 3 and 4 of 12", through
-          `LiveAnnouncer`, with a default wording the consumer can replace. The rest is `Carousel`'s already: the book is
-          a named region, the pages not showing are `inert` and hidden, and the buttons are real named buttons.
-
-    The rolodex placement rule is left for afterwards; it rides on what the ring builds.
+The cause is when those two frameworks first measure the box the list scrolls in: before the list's spacer has been
+given its height, so the first scroll is lined up against a box about 10px tall, and TanStack's own retry corrects it a
+frame or two later. Vue was fixed by taking up the scroller only after the render (`decisions.md`, under _"Porting: how
+the Vue side reads"_). Doing the same in Solid and Svelte means moving where their row windows call `_willUpdate`,
+which changes timing those windows were built on (`decisions.md`, _"The Solid and Svelte row windows report
+`getIsLive` once they are following their scroller"_), so it was left for a deliberate look. `select.spec.ts`'s
+reopening case waits for the list to settle, so it passes either way and will not catch a change here.
 
 ## Accepted limits
 
@@ -1634,6 +1398,12 @@ advanced layout features in Essentials, so "Exotics" would not mean "everything 
 Worth reopening if someone actually asks to install the Exotics alone, or if the type definitions a consumer
 installs grow large enough to slow their editor.
 
+### A multipurpose set of animated SVG samples
+
+Raised by the user while narrowing the page-change reveal to the default shapes: rather than one animated GIF as a
+mask, a sample set of animated SVGs of the library's own, usable as a mask, a fill or a decoration wherever an SVG
+fits. The reveal's mask would be its first use. Nothing about it is designed yet.
+
 ### Ready-made point sources: the phone's tilt, and a point that wanders by itself
 
 How a point other than the pointer plugs in is settled, in `decisions.md` under _"`PointerTracker`: one reading of where the pointer is relative to one element"_: a fraction across a box, taken by every
@@ -1754,7 +1524,7 @@ Whether the first two are wanted is the open question.
 
 **The icon cloud took the solid rather than the sphere.** Magic UI's Icon Cloud is the first reading — items at
 points on a sphere — and the user chose instead `Die` with transparent faces and an icon on each, turning freely
-(item 31), accepting that the number of items is the solid's. The first two readings are still unasked for.
+(item 30), accepting that the number of items is the solid's. The first two readings are still unasked for.
 
 ### A fifth round of Exotics candidates, and what became of each
 
@@ -1852,7 +1622,7 @@ example, so nothing is pending there either.
 - **A split-flap board**, the airport departure display whose characters flip through the alphabet one card
   at a time. Their verdict: the drum is already a component and this is that drum again, so it would be a
   second way to spell what `Odometer` and `DrumWheel` do. **Reopened by the user** once a hinge counterpart to
-  `Barrel` was proposed (item 44): on a shared abstract it is a second consumer, not a second mechanism.
+  `Barrel` was proposed (item 31): on a shared abstract it is a second consumer, not a second mechanism.
 - **A magnifying strip**, the macOS dock's swell around the pointer. Their verdict: it already existed as a
   Playground example, so a component would be a second way to spell it. **That example has since gone with the
   `PointerTracker` page**, so the reason as recorded no longer holds — the verdict is still theirs, but it now
@@ -1875,4 +1645,4 @@ without crossing.
 
 **Named and not discussed: `Flipbook`**, a two-page spread that turns with a fold at the spine. The user said
 they understood that one from its description, and it was not among the two they picked; it has never been
-argued either way. It is now one of the consumers of the hinge counterpart to `Barrel` (item 44).
+argued either way. It is now one of the consumers of the hinge counterpart to `Barrel` (item 31).

@@ -1,4 +1,4 @@
-import { Index, createEffect, createMemo, createSignal, createUniqueId, on } from "solid-js";
+import { Index, Show, createEffect, createMemo, createSignal, createUniqueId, on } from "solid-js";
 
 import {
     ACCORDION_DEFAULTS,
@@ -7,6 +7,7 @@ import {
     AccordionStyles as styles,
 } from "@thewaver/ss-components";
 
+import { ElementObserverSolidUtils } from "../../../Abstracts/ElementObserver/ElementObserverSolid.utils";
 import { NavigatorSolidUtils } from "../../../Abstracts/Navigator/NavigatorSolid.utils";
 import { SignalMirrorSolidUtils } from "../../../Abstracts/SignalMirror/SignalMirrorSolid.utils";
 import { access } from "../../../Utils/propUtils";
@@ -29,6 +30,7 @@ const AccordionSection = <T,>(props: AccordionSectionProps<T>) => {
             isFocusableWhenDisabled={() => access(props.item).isReachableWhenDisabled ?? false}
             headingLevel={props.headingLevel}
             side={props.side}
+            sizing={() => (access(props.isSideways) ? "fit-content" : "fill")}
             isScrolledIntoViewOnExpand={props.isScrolledIntoViewOnExpand}
             isPanelBuiltOnExpand={props.isPanelBuiltOnExpand}
             transitionDurationMs={props.transitionDurationMs}
@@ -36,14 +38,26 @@ const AccordionSection = <T,>(props: AccordionSectionProps<T>) => {
             panelAriaAttributes={() => ({ "aria-labelledby": headerId })}
             expanded={expandedSignal}
             renderTrigger={(getFlags) => props.renderHeader(() => access(props.item), getFlags)}
-            renderPanel={(getVisibilityTarget, getTransitionDurationMs) =>
-                props.renderPanel(
-                    () => access(props.item),
-                    getVisibilityTarget,
-                    getTransitionDurationMs,
-                    props.getMoveDirection,
-                )
-            }
+            renderPanel={(getVisibilityTarget, getTransitionDurationMs) => {
+                const renderContent = () =>
+                    props.renderPanel(
+                        () => access(props.item),
+                        getVisibilityTarget,
+                        getTransitionDurationMs,
+                        props.getMoveDirection,
+                    );
+
+                return (
+                    <Show when={access(props.isSideways)} fallback={renderContent()}>
+                        <div
+                            class={styles.accordionPanelSizer}
+                            style={{ width: AccordionUtils.toWidthStyle(access(props.openWidth)) }}
+                        >
+                            {renderContent()}
+                        </div>
+                    </Show>
+                );
+            }}
         />
     );
 };
@@ -65,6 +79,10 @@ export const Accordion = <T,>(props: AccordionProps<T>) => {
 
     const getPanelSide = createMemo(() => AccordionUtils.getPanelSide(getOrientation()));
 
+    const getGap = createMemo(() => access(props.gap) ?? ACCORDION_DEFAULTS.gap);
+
+    const getHasRowWidths = createMemo(() => AccordionUtils.getHasRowWidths(getOrientation(), getSizing()));
+
     const getExpandedIndexes = createMemo(() => {
         const expanded = expandedSignal[0]();
 
@@ -81,6 +99,30 @@ export const Accordion = <T,>(props: AccordionProps<T>) => {
 
             if (direction) setMoveDirection(direction);
         }),
+    );
+
+    const getRowSize = ElementObserverSolidUtils.createBorderBoxSizeObserver(getRootRef, () => !getHasRowWidths());
+
+    const getStripSizes = ElementObserverSolidUtils.createBorderBoxSizeListObserver(
+        getHeaderRefs,
+        () => !getHasRowWidths(),
+    );
+
+    const getOpenWidths = createMemo<(number | undefined)[]>(
+        (previous) =>
+            getHasRowWidths()
+                ? AccordionUtils.computeOpenWidths(
+                      access(props.items),
+                      getExpandedIndexes(),
+                      {
+                          rowWidth: getRowSize().width,
+                          stripWidths: getStripSizes().map((size) => size.width),
+                          gap: getGap(),
+                      },
+                      previous,
+                  )
+                : [],
+        [],
     );
 
     const setHeaderRef = (index: number, element: HTMLElement) => {
@@ -128,7 +170,7 @@ export const Accordion = <T,>(props: AccordionProps<T>) => {
                 styles.accordionSizingVariants[getSizing()],
                 styles.accordionOrientationVariants[getOrientation()],
             ].join(" ")}
-            style={{ gap: `${access(props.gap) ?? ACCORDION_DEFAULTS.gap}px` }}
+            style={{ gap: `${getGap()}px` }}
             onKeyDown={handleKeyDown}
         >
             <Index each={access(props.items)}>
@@ -139,6 +181,8 @@ export const Accordion = <T,>(props: AccordionProps<T>) => {
                         headingLevel={getHeadingLevel}
                         side={getPanelSide}
                         isExpanded={() => expandedSignal[0]().includes(getItem().value)}
+                        isSideways={() => getOrientation() === "horizontal"}
+                        openWidth={() => getOpenWidths()[index]}
                         isScrolledIntoViewOnExpand={props.isScrolledIntoViewOnExpand}
                         isPanelBuiltOnExpand={props.isPanelBuiltOnExpand}
                         transitionDurationMs={props.transitionDurationMs}

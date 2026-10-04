@@ -16,6 +16,7 @@ export type WraparoundPlaneOpts = {
     getViewportSize: () => Size2d;
     getOriginal: () => HTMLElement | undefined;
     getIsDisabled: () => boolean;
+    getIsMovable: () => boolean;
     getMomentumMs: () => number;
     getGlideDurationMs: () => number;
     getKeyStepPx: () => number;
@@ -26,5 +27,6 @@ export type WraparoundPlane = Store<WraparoundPlaneState> & {
     moveBy: (delta: Point2d, isGliding?: boolean) => void;
     reveal: (element: HTMLElement, isGliding?: boolean) => void;
     reset: () => void;
+    setDrift: (velocity: Point2d | undefined) => void;
     destroy: () => void;
 };

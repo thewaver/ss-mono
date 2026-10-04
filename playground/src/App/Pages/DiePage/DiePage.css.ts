@@ -8,3 +8,10 @@ export const stage = style({
     alignItems: "center",
     gap: themeVars.spacing.double,
 });
+
+export const controls = style({
+    display: "flex",
+    flexWrap: "wrap",
+    justifyContent: "center",
+    gap: themeVars.spacing.full,
+});

@@ -46,3 +46,11 @@ export const odometerDigitFace = style({
 export const odometerFixedClipped = style({
     overflow: "hidden",
 });
+
+export const odometerFlapTop = style({
+    clipPath: "inset(0 0 50% 0)",
+});
+
+export const odometerFlapBottom = style({
+    clipPath: "inset(50% 0 0 0)",
+});

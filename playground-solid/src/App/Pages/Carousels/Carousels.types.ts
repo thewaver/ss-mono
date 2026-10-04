@@ -6,6 +6,7 @@ import type {
     CarouselPlacementFn,
     CarouselPlacements,
 } from "@thewaver/ss-components-solid";
+import type { SlideFrameClasses } from "@thewaver/ss-playground/App/Pages/Carousels/Carousels.types";
 
 export type CarouselExampleProps = AccessorProps<{
     slides: string[];
@@ -16,7 +17,7 @@ export type CarouselExampleProps = AccessorProps<{
     index: Signal<number>;
     playback?: Signal<boolean>;
     computePlacement: CarouselPlacementFn;
-    isNarrow: boolean;
+    frameClasses: SlideFrameClasses;
 }>;
 
 export type CarouselSharedProps = Omit<CarouselExampleProps, "index" | "autoplayDelayMs" | "playback">;

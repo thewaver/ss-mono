@@ -6,6 +6,7 @@ import {
     BRACKET_ORIENTATIONS,
     BRACKET_ROOT_SIDES,
     BracketConnectors,
+    MediaQueryMonitorVueUtils,
 } from "@thewaver/ss-components-vue";
 import type { BracketOrientation, BracketRootSide } from "@thewaver/ss-components-vue";
 import { BracketKnobs } from "@thewaver/ss-playground/App/Knobs/Brackets.const";
@@ -25,6 +26,8 @@ import PageProp from "../../PageComponents/Prop/Prop.vue";
 import PagePropsPanel from "../../PageComponents/PropsPanel/PagePropsPanel.vue";
 import { NOTHING_PICKED } from "./BracketPage.const";
 import type { BracketExampleProps } from "./BracketPage.types";
+import BeamsExample from "./Examples/Beams.vue";
+import FamilyExample from "./Examples/Family.vue";
 import KnockoutExample from "./Examples/Knockout.vue";
 import OrgChartExample from "./Examples/OrgChart.vue";
 import SkillTreeExample from "./Examples/SkillTree.vue";
@@ -35,6 +38,7 @@ const CONNECTOR_RADIUS = 14;
 const CONNECTOR_WIDTH = 2;
 const ROUTE_CONNECTOR_WIDTH = 3;
 const WIDE_SPAN = 2;
+const NO_MOTION_DURATION_MS = 0;
 
 const layerGap = shallowRef(BRACKET_DEFAULTS.layerGap);
 const crossGap = shallowRef(BRACKET_DEFAULTS.crossGap);
@@ -42,6 +46,10 @@ const orientation = shallowRef<BracketOrientation>(BRACKET_DEFAULTS.orientation)
 const rootSide = shallowRef<BracketRootSide>(BRACKET_DEFAULTS.rootSide);
 const connector = shallowRef<BracketConnectors.SampleKey>(BracketConnectors.SAMPLE_KEYS[0]);
 const picked = shallowRef(NOTHING_PICKED);
+const transitionDurationMs = shallowRef(BRACKET_DEFAULTS.transitionDurationMs);
+const family = shallowRef("");
+
+const prefersReducedMotion = MediaQueryMonitorVueUtils.useReducedMotion();
 
 const commonProps = computed<BracketExampleProps>(() => ({
     layerGap: layerGap.value,
@@ -84,6 +92,22 @@ const examples: ExampleDefs[] = [
         readout: () =>
             "a chain of single children, which is what a bye looks like — each one level with the last, under headers that turn with the board",
         path: `${EXAMPLES_ROOT}/SkillTree.vue`,
+    },
+    {
+        key: "beams",
+        name: "A beam along the road to the final",
+        span: WIDE_SPAN,
+        readout: () =>
+            `picked: ${picked.value} — focus a seed or a match and a pulse runs along every line between it and the final, toward the final; it keeps running while the focus stays, so Pause is there to stop it`,
+        path: `${EXAMPLES_ROOT}/Beams.vue`,
+    },
+    {
+        key: "family",
+        name: "One family at a time",
+        span: WIDE_SPAN,
+        readout: () =>
+            `showing: ${family.value} — focus a node and the board shows what it feeds, it with all its siblings, and what feeds them; walk on with the arrows and the rest folds away`,
+        path: `${EXAMPLES_ROOT}/Family.vue`,
     },
 ];
 </script>
@@ -146,6 +170,22 @@ const examples: ExampleDefs[] = [
                 @input="(value: number) => (crossGap = value)"
             />
         </PageProp>
+
+        <PageProp
+            item-key="transitionDurationMs"
+            label="Glide (ms)"
+            hint="How long the family example takes to glide from one family to the next. It is off while the visitor has asked for reduced motion."
+        >
+            <PageNumberField
+                :value="transitionDurationMs"
+                :min="BracketKnobs.MIN_TRANSITION_DURATION_MS"
+                :max="BracketKnobs.MAX_TRANSITION_DURATION_MS"
+                :step="BracketKnobs.TRANSITION_DURATION_STEP_MS"
+                :is-disabled="prefersReducedMotion"
+                ariaLabel="Glide in milliseconds"
+                @input="(value: number) => (transitionDurationMs = value)"
+            />
+        </PageProp>
     </PagePropsPanel>
 
     <PageExamples :items="examples" layout="flow">
@@ -164,6 +204,22 @@ const examples: ExampleDefs[] = [
         <template #skillTree>
             <PageMeasureBox>
                 <SkillTreeExample v-bind="commonProps" />
+            </PageMeasureBox>
+        </template>
+
+        <template #beams>
+            <PageMeasureBox>
+                <BeamsExample v-bind="commonProps" :connector="connector" :connector-radius="CONNECTOR_RADIUS" />
+            </PageMeasureBox>
+        </template>
+
+        <template #family>
+            <PageMeasureBox>
+                <FamilyExample
+                    v-bind="commonProps"
+                    :transition-duration-ms="prefersReducedMotion ? NO_MOTION_DURATION_MS : transitionDurationMs"
+                    @family-change="(next: string) => (family = next)"
+                />
             </PageMeasureBox>
         </template>
     </PageExamples>

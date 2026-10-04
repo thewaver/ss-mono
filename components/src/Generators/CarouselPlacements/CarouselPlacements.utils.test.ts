@@ -99,3 +99,29 @@ describe("hinge", () => {
         expect(flipping.axis).toBe("column");
     });
 });
+
+describe("paddle wheel", () => {
+    it("lays the slide showing flat on the box, and turns the rest round the spine at even steps", () => {
+        expect(CarouselPlacementUtils.paddleWheel(at(0)).effect.rotateY).toBeCloseTo(0);
+        expect(CarouselPlacementUtils.paddleWheel(at(1)).effect.rotateY).toBe(-60);
+        expect(CarouselPlacementUtils.paddleWheel(at(3)).effect.rotateY).toBe(-180);
+    });
+
+    it("stacks a slide swung towards the viewer over one swung away, and the two lying flat level", () => {
+        const towards = CarouselPlacementUtils.paddleWheel(at(1)).layer!;
+        const away = CarouselPlacementUtils.paddleWheel(at(-1)).layer!;
+
+        expect(towards).toBeGreaterThan(away);
+        expect(CarouselPlacementUtils.paddleWheel(at(0)).layer).toBeCloseTo(0);
+        expect(CarouselPlacementUtils.paddleWheel(at(3)).layer).toBeCloseTo(0);
+    });
+
+    it("turns the slides about an upright spine across, and a level one up and down, showing backs the same way", () => {
+        expect(CarouselPlacementUtils.paddleWheel(at(1)).axis).toBe("row");
+
+        const vertical = CarouselPlacementUtils.paddleWheel(at(1, { orientation: "vertical" }));
+
+        expect(vertical.effect.rotateX).toBe(-60);
+        expect(vertical.axis).toBe("column");
+    });
+});

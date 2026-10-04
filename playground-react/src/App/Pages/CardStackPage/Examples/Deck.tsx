@@ -47,6 +47,7 @@ export const DeckExample = (props: Props) => {
                     mountedCount={props.mountedCount}
                     cardGap={props.cardGap}
                     funnelRatio={props.funnelRatio}
+                    pileSide={props.pileSide}
                     ariaLabel={"Deck of cards"}
                     computeCardLabel={(card) => card}
                     renderCard={(state) => (

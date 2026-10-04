@@ -1,6 +1,6 @@
 import type { Snippet } from "svelte";
 
-import type { OdometerReel, OdometerSlotFlags, OdometerSlotPhase } from "@thewaver/ss-components";
+import type { OdometerMechanism, OdometerReel, OdometerSlotFlags, OdometerSlotPhase } from "@thewaver/ss-components";
 import type { Size2d } from "@thewaver/ss-utils";
 
 export type OdometerProps = {
@@ -18,6 +18,15 @@ export type OdometerProps = {
      * Ignored while `computeReel` is given.
      */
     cascadeDelayMs?: number;
+    /**
+     * How a column changes from one digit to the next. `"drum"`, the default, turns it like a drum with the digits
+     * round its rim. `"splitFlap"` drops one flap after another, as a departures board does: each flap is half a
+     * character hinged on the middle line, its front the top half of the digit going and its back the bottom half
+     * of the digit coming. Either way a column passes through every digit between the old one and the new one, and
+     * `turnDurationMs`, `cascadeDelayMs` and `computeReel` mean the same. The digit is still drawn whole; a
+     * split-flap shows the halves of that drawing it needs.
+     */
+    mechanism?: OdometerMechanism;
     /** Names the odometer for assistive technology, so a reader hears the value rather than the separate digits. */
     ariaLabel?: string;
     /**
@@ -60,4 +69,17 @@ export type OdometerSlotProps = {
     onShrunk: () => void;
     /** What the slot holds. */
     children: Snippet;
+};
+
+export type OdometerFlapColumnProps = {
+    /** The position the column runs to, counted in flaps. A change of it starts the flaps falling. */
+    target: number;
+    /** How long the column waits before its first flap falls. */
+    delayMs: number;
+    /** How long the column takes from its first flap starting to its last one landing. */
+    durationMs: number;
+    /** How large one character is, which every flap fills. */
+    digitSize: Size2d;
+    /** Draws one whole character, of which the column shows a half on each side of a flap. */
+    renderCharacter: Snippet<[character: string]>;
 };

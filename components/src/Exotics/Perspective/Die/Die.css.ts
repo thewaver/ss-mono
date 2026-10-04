@@ -8,6 +8,11 @@ export const dieRoot = style({
     flexShrink: 0,
 });
 
+export const dieRootMovable = style({
+    touchAction: "none",
+    cursor: "grab",
+});
+
 export const diePerspective = style({
     position: "relative",
     flexShrink: 0,
@@ -24,4 +29,8 @@ export const dieFace = style({
     position: "absolute",
     transformOrigin: "center center",
     backfaceVisibility: "hidden",
+});
+
+export const dieFaceSeeThrough = style({
+    backfaceVisibility: "visible",
 });

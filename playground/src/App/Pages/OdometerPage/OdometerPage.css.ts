@@ -53,3 +53,41 @@ export const fixed = style({
     fontFamily: "monospace",
     fontSize: themeVars.fontSize.xLarge,
 });
+
+export const board = style({
+    display: "inline-flex",
+    padding: themeVars.spacing.full,
+    borderRadius: themeVars.borderRadius.full,
+    background: `linear-gradient(215deg, ${themeVars.color.background.light}, ${themeVars.color.background.dark})`,
+    boxShadow: themeVars.shadow.medium,
+});
+
+export const flapTile = style({
+    "position": "relative",
+    "display": "grid",
+    "placeItems": "center",
+    "width": "100%",
+    "height": "100%",
+    "border": `1px solid ${themeVars.color.background.dark}`,
+    "borderRadius": themeVars.borderRadius.half,
+    "background": `linear-gradient(215deg, ${themeVars.color.surface.light}, ${themeVars.color.surface.dark})`,
+    "color": themeVars.color.surface.contrast,
+    "fontFamily": "monospace",
+    "fontSize": themeVars.fontSize.xLarge,
+    "::after": {
+        content: "''",
+        position: "absolute",
+        left: 0,
+        right: 0,
+        top: "50%",
+        height: 2,
+        transform: "translateY(-50%)",
+        backgroundColor: themeVars.color.background.dark,
+    },
+});
+
+export const flapFixed = style({
+    color: themeVars.color.background.contrast,
+    fontFamily: "monospace",
+    fontSize: themeVars.fontSize.xLarge,
+});

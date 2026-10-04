@@ -62,6 +62,7 @@ const deal = () => {
                 :mounted-count="mountedCount"
                 :card-gap="cardGap"
                 :funnel-ratio="funnelRatio"
+                :pile-side="pileSide"
                 ariaLabel="Deck of cards"
                 :compute-card-label="computeCardLabel"
                 @send="props.onSend"

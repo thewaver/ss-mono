@@ -8,7 +8,6 @@ import {
     elementScroll,
     measureElement,
     observeElementOffset,
-    observeElementRect,
 } from "@tanstack/virtual-core";
 import { type VirtualizerRow, VirtualizerUtils } from "@thewaver/ss-components";
 
@@ -58,6 +57,10 @@ export namespace VirtualizerSvelteUtils {
      *
      * Everything falls back safely: with no scrolling ancestor or with virtualizing switched off, `getIsLive` reports
      * `false` and the caller should draw the whole list.
+     *
+     * `getIsLive` turns `true` only once the window is following its scroller, which is a step after the scroller is
+     * found: an effect keyed on it that scrolls to a row, run in the same pass as the search, would otherwise ask a
+     * window that has nothing to scroll yet, and the request would be dropped.
      *
      * Must run while a component is being set up.
      *
@@ -121,7 +124,7 @@ export namespace VirtualizerSvelteUtils {
 
                     return instance.options.horizontal ? box.inlineSize : box.blockSize;
                 },
-                observeElementRect,
+                observeElementRect: VirtualizerUtils.observeClientRect,
                 observeElementOffset,
                 scrollToFn: elementScroll,
                 onChange: (instance) => {
@@ -141,11 +144,18 @@ export namespace VirtualizerSvelteUtils {
             virtualTotalSize = virtualizer.getTotalSize();
         };
 
+        let isFollowing = $state(false);
+
+        const followScroller = () => {
+            virtualizer._willUpdate();
+            isFollowing = virtualizer.scrollElement !== null;
+        };
+
         $effect(() =>
             untrack(() => {
                 const cleanup = virtualizer._didMount();
 
-                virtualizer._willUpdate();
+                followScroller();
 
                 return cleanup;
             }),
@@ -156,7 +166,7 @@ export namespace VirtualizerSvelteUtils {
 
             untrack(() => {
                 virtualizer.setOptions(options);
-                virtualizer._willUpdate();
+                followScroller();
                 publish();
             });
         });
@@ -166,7 +176,7 @@ export namespace VirtualizerSvelteUtils {
         const totalSize = $derived(opts.getIsDisabled() ? 0 : virtualTotalSize);
 
         return {
-            getIsLive: () => !opts.getIsDisabled() && getScrollParent() !== undefined,
+            getIsLive: () => !opts.getIsDisabled() && isFollowing,
             getRows: () => visibleRows,
             getTotalSize: () => totalSize,
             getRowStart: (row) => row.start - scrollMargin,

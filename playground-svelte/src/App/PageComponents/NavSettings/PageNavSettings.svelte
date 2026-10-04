@@ -1,5 +1,10 @@
 <script lang="ts">
-    import { Toggle } from "@thewaver/ss-components-svelte";
+    import {
+        MediaQueryMonitorSvelteUtils,
+        SHAPE_REVEAL_DEFAULTS,
+        ShapeRevealUtils,
+        Toggle,
+    } from "@thewaver/ss-components-svelte";
     import { PLAYGROUND_THEMES } from "@thewaver/ss-playground/App/Theme.css";
 
     import PageToggleContent from "../../StyledComponents/ToggleContent/ToggleContent.svelte";
@@ -7,9 +12,11 @@
     import PageSelectField from "../Field/PageSelectField.svelte";
     import { OWN_FRAMEWORK } from "../FrameworkMenu/FrameworkMenu.const";
     import PageProp from "../Prop/Prop.svelte";
-    import { PAGE_VIEW_OPTIONS, THEME_OPTIONS, VIEWPORT_ANCHOR_OPTIONS } from "./NavSettings.const";
+    import { PAGE_VIEW_OPTIONS, THEME_FIELD_ID, THEME_OPTIONS, VIEWPORT_ANCHOR_OPTIONS } from "./NavSettings.const";
     import type { PageNavSettingsProps, PlaygroundTheme, ViewportAnchor } from "./NavSettings.types";
     import PageNavSettingsChoice from "./PageNavSettingsChoice.svelte";
+
+    const NO_MOTION_DURATION_MS = 0;
 
     const computeViewportAnchorLabel = (anchor: ViewportAnchor) =>
         VIEWPORT_ANCHOR_OPTIONS.find((option) => option.value === anchor)?.label ?? String(anchor);
@@ -34,9 +41,15 @@
 
     let theme = $state<PlaygroundTheme>(findAppliedTheme());
 
+    const getPrefersReducedMotion = MediaQueryMonitorSvelteUtils.createReducedMotion();
+
     const pickTheme = (nextTheme: PlaygroundTheme) => {
-        applyTheme(nextTheme);
         theme = nextTheme;
+
+        void ShapeRevealUtils.reveal(() => applyTheme(nextTheme), {
+            origin: document.getElementById(THEME_FIELD_ID) ?? SHAPE_REVEAL_DEFAULTS.origin,
+            durationMs: getPrefersReducedMotion() ? NO_MOTION_DURATION_MS : SHAPE_REVEAL_DEFAULTS.durationMs,
+        });
     };
 </script>
 
@@ -85,10 +98,11 @@
     <PageProp
         itemKey={"theme"}
         label={"Theme"}
-        hint={"Which color theme the playground is drawn in, independent of the framework it runs in."}
+        hint={"Which color theme the playground is drawn in, independent of the framework it runs in. The new theme is uncovered by a circle growing from this field."}
         defaultValue={computeThemeLabel(OWN_FRAMEWORK)}
     >
         <PageSelectField
+            id={THEME_FIELD_ID}
             value={theme}
             values={THEME_OPTIONS.map((option) => option.value)}
             computeLabel={computeThemeLabel}

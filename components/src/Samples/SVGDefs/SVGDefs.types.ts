@@ -31,7 +31,13 @@ export type TrackedPatternElementDefs = SVGDefsBaseElementDefs &
         cellSize: Size2d;
     };
 
-export type PatternProximityOpts = { tiled?: boolean; reach?: number; restLevel?: number; trailMs?: number };
+export type PatternProximityOpts = {
+    tiled?: boolean;
+    reach?: number;
+    restLevel?: number;
+    trailMs?: number;
+    retentionMs?: number;
+};
 
 export type TimedGradientElementDefs = SVGAnimationDefs & SVGDefsBaseElementDefs;
 

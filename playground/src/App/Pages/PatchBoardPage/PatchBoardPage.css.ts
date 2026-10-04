@@ -43,3 +43,11 @@ export const zoomScaler = style({
     width: BOARD_WIDTH,
     transformOrigin: "0 0",
 });
+
+export const beamStage = style({
+    display: "flex",
+    flexDirection: "column",
+    alignItems: "center",
+    gap: themeVars.spacing.full,
+    width: "100%",
+});

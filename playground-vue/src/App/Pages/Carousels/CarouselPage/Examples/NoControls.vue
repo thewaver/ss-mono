@@ -32,11 +32,11 @@ const index = useModel(props, "index");
         :compute-rotation-label="computeCarouselRotationLabel"
     >
         <template #renderSlide="{ slide, state }">
-            <SlideFront :title="slide" :state="state" :is-narrow="isNarrow" />
+            <SlideFront :title="slide" :state="state" :frame-class="frameClasses.front" />
         </template>
 
         <template #renderSlideBack>
-            <SlideBack :is-narrow="isNarrow" />
+            <SlideBack :frame-class="frameClasses.back" />
         </template>
     </Carousel>
 </template>

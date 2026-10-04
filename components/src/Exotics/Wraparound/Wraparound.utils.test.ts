@@ -1,4 +1,4 @@
-import { describe, expect, it } from "vitest";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
 import { WraparoundUtils } from "./Wraparound.utils";
 
@@ -131,5 +131,134 @@ describe("WraparoundUtils.computeKeyDelta", () => {
         expect(WraparoundUtils.computeKeyDelta("ArrowUp", 40, VIEW)).toEqual({ x: 0, y: 40 });
         expect(WraparoundUtils.computeKeyDelta("PageDown", 40, VIEW)?.y).toBeCloseTo(-108);
         expect(WraparoundUtils.computeKeyDelta("a", 40, VIEW)).toBeUndefined();
+    });
+});
+
+describe("WraparoundUtils.computeDriftVelocity", () => {
+    it("moves right at nought degrees and down at ninety, per millisecond", () => {
+        const right = WraparoundUtils.computeDriftVelocity(500, 0);
+        const down = WraparoundUtils.computeDriftVelocity(500, 90);
+
+        expect(right?.x).toBeCloseTo(0.5);
+        expect(right?.y).toBeCloseTo(0);
+        expect(down?.x).toBeCloseTo(0);
+        expect(down?.y).toBeCloseTo(0.5);
+    });
+
+    it("moves left at a half turn, at the speed it was given whichever way it goes", () => {
+        const left = WraparoundUtils.computeDriftVelocity(80, 180);
+        const slanted = WraparoundUtils.computeDriftVelocity(80, 30);
+
+        expect(left?.x).toBeLessThan(0);
+        expect(Math.hypot(slanted?.x ?? 0, slanted?.y ?? 0)).toBeCloseTo(0.08);
+    });
+
+    it("answers no drift for a speed of nothing or less", () => {
+        expect(WraparoundUtils.computeDriftVelocity(0, 0)).toBeUndefined();
+        expect(WraparoundUtils.computeDriftVelocity(-10, 0)).toBeUndefined();
+        expect(WraparoundUtils.computeDriftVelocity(Number.NaN, 0)).toBeUndefined();
+    });
+});
+
+describe("WraparoundUtils.createPlane drifting", () => {
+    let frames: Map<number, (nowMs: number) => void>;
+    let nextHandle: number;
+
+    const runFrame = (nowMs: number) => {
+        const pending = [...frames.values()];
+
+        frames.clear();
+        pending.forEach((callback) => callback(nowMs));
+    };
+
+    const createTestPlane = () =>
+        WraparoundUtils.createPlane({
+            getTileSize: () => TILE,
+            getViewportSize: () => VIEW,
+            getOriginal: () => undefined,
+            getIsDisabled: () => false,
+            getIsMovable: () => true,
+            getMomentumMs: () => 0,
+            getGlideDurationMs: () => 0,
+            getKeyStepPx: () => 40,
+        });
+
+    beforeEach(() => {
+        frames = new Map();
+        nextHandle = 0;
+        vi.stubGlobal("requestAnimationFrame", (callback: (nowMs: number) => void) => {
+            nextHandle += 1;
+            frames.set(nextHandle, callback);
+
+            return nextHandle;
+        });
+        vi.stubGlobal("cancelAnimationFrame", (handle: number) => frames.delete(handle));
+    });
+
+    afterEach(() => {
+        vi.unstubAllGlobals();
+    });
+
+    it("covers the same distance however the time is cut into frames", () => {
+        const fewFrames = createTestPlane();
+        const manyFrames = createTestPlane();
+
+        fewFrames.setDrift({ x: 0.1, y: 0 });
+        runFrame(0);
+        runFrame(1000);
+        fewFrames.setDrift(undefined);
+
+        manyFrames.setDrift({ x: 0.1, y: 0 });
+
+        for (let nowMs = 0; nowMs <= 1000; nowMs += 10) runFrame(nowMs);
+
+        expect(fewFrames.get().offset.x).toBeCloseTo(100);
+        expect(manyFrames.get().offset.x).toBeCloseTo(fewFrames.get().offset.x);
+    });
+
+    it("does not make up the time it spent stopped", () => {
+        const plane = createTestPlane();
+
+        plane.setDrift({ x: 0, y: 0.1 });
+        runFrame(0);
+        runFrame(100);
+        plane.setDrift(undefined);
+        runFrame(5000);
+        plane.setDrift({ x: 0, y: 0.1 });
+        runFrame(9000);
+        runFrame(9100);
+
+        expect(plane.get().offset.y).toBeCloseTo(20);
+    });
+
+    it("carries on from where a hand move left the content", () => {
+        const plane = createTestPlane();
+
+        plane.setDrift({ x: 0.1, y: 0 });
+        runFrame(0);
+        runFrame(100);
+        plane.moveBy({ x: 500, y: 0 });
+        runFrame(200);
+        runFrame(300);
+
+        expect(plane.get().offset.x, "the jump adds to the drift, which loses no time to it").toBeCloseTo(
+            10 + 500 + 20,
+        );
+    });
+
+    it("stops asking for frames once the drift is taken away or the plane is destroyed", () => {
+        const plane = createTestPlane();
+
+        plane.setDrift({ x: 0.1, y: 0 });
+        runFrame(0);
+        plane.setDrift(undefined);
+        runFrame(16);
+
+        expect(frames.size).toBe(0);
+
+        plane.setDrift({ x: 0.1, y: 0 });
+        plane.destroy();
+
+        expect(frames.size).toBe(0);
     });
 });

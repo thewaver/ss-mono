@@ -495,6 +495,13 @@ means editing both in the same change; a brief that disagrees with the full list
 because it is the one that gets read. `backlog.md` is the source of truth, so where the two differ the brief
 is what gets corrected.
 
+**Work left for another session is written for immediate pickup.** Stated by the user, who had asked one session to
+leave its decided items ready to build and found the next session opening with ten questions. An item marked _decided,
+not yet built_ settles the calls a builder meets in the first hour, not only the headline: the prop names and their
+types, what each defaults to, what happens at the edges (a drag let go, a leaf with no children, which faces a screen
+reader reaches), and where any asset comes from. If a call cannot be settled with the user before the session ends,
+the item says so in a line of its own, so the next session asks it before starting rather than discovering it.
+
 **Routine release steps are never backlog items.** Stated by the user, who had an item's last remaining line
 dropped for being "publish the packages": publishing, committing, merging, bumping a version are obvious steps, not
 tasks, and do not earn a place in `backlog.md` or `brief.md`. A fact such a step depends on — an order packages must

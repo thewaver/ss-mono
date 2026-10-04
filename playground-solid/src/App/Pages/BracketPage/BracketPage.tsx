@@ -5,6 +5,7 @@ import {
     BRACKET_ORIENTATIONS,
     BRACKET_ROOT_SIDES,
     BracketConnectors,
+    MediaQueryMonitorSolidUtils,
 } from "@thewaver/ss-components-solid";
 import type { BracketOrientation, BracketRootSide } from "@thewaver/ss-components-solid";
 import { BracketKnobs } from "@thewaver/ss-playground/App/Knobs/Brackets.const";
@@ -22,6 +23,8 @@ import { PageProp } from "../../PageComponents/Prop/Prop";
 import { PagePropsPanel } from "../../PageComponents/PropsPanel/PropsPanel";
 import { NOTHING_PICKED } from "./BracketPage.const";
 import type { BracketExampleProps } from "./BracketPage.types";
+import { BeamsExample } from "./Examples/Beams";
+import { FamilyExample } from "./Examples/Family";
 import { KnockoutExample } from "./Examples/Knockout";
 import { OrgChartExample } from "./Examples/OrgChart";
 import { SkillTreeExample } from "./Examples/SkillTree";
@@ -32,6 +35,7 @@ const CONNECTOR_RADIUS = 14;
 const CONNECTOR_WIDTH = 2;
 const ROUTE_CONNECTOR_WIDTH = 3;
 const WIDE_SPAN = 2;
+const NO_MOTION_DURATION_MS = 0;
 
 export const BracketPage = () => {
     const [getLayerGap, setLayerGap] = createSignal(BRACKET_DEFAULTS.layerGap);
@@ -40,6 +44,10 @@ export const BracketPage = () => {
     const [getRootSide, setRootSide] = createSignal<BracketRootSide>(BRACKET_DEFAULTS.rootSide);
     const [getConnector, setConnector] = createSignal<BracketConnectors.SampleKey>(BracketConnectors.SAMPLE_KEYS[0]);
     const [getPicked, setPicked] = createSignal(NOTHING_PICKED);
+    const [getTransitionDurationMs, setTransitionDurationMs] = createSignal(BRACKET_DEFAULTS.transitionDurationMs);
+    const [getFamily, setFamily] = createSignal("");
+
+    const getPrefersReducedMotion = MediaQueryMonitorSolidUtils.createReducedMotion();
 
     const getExamples = createMemo(() => {
         const commonProps: BracketExampleProps = {
@@ -96,6 +104,42 @@ export const BracketPage = () => {
                     </PageMeasureBox>
                 ),
                 path: `${EXAMPLES_ROOT}/SkillTree.tsx`,
+            },
+            {
+                key: "beams",
+                name: "A beam along the road to the final",
+                span: WIDE_SPAN,
+                readout: () =>
+                    `picked: ${getPicked()} — focus a seed or a match and a pulse runs along every line between it and the final, toward the final; it keeps running while the focus stays, so Pause is there to stop it`,
+                component: () => (
+                    <PageMeasureBox>
+                        <BeamsExample
+                            {...commonProps}
+                            connector={getConnector}
+                            connectorRadius={() => CONNECTOR_RADIUS}
+                        />
+                    </PageMeasureBox>
+                ),
+                path: `${EXAMPLES_ROOT}/Beams.tsx`,
+            },
+            {
+                key: "family",
+                name: "One family at a time",
+                span: WIDE_SPAN,
+                readout: () =>
+                    `showing: ${getFamily()} — focus a node and the board shows what it feeds, it with all its siblings, and what feeds them; walk on with the arrows and the rest folds away`,
+                component: () => (
+                    <PageMeasureBox>
+                        <FamilyExample
+                            {...commonProps}
+                            transitionDurationMs={() =>
+                                getPrefersReducedMotion() ? NO_MOTION_DURATION_MS : getTransitionDurationMs()
+                            }
+                            onFamilyChange={setFamily}
+                        />
+                    </PageMeasureBox>
+                ),
+                path: `${EXAMPLES_ROOT}/Family.tsx`,
             },
         ];
     });
@@ -165,6 +209,24 @@ export const BracketPage = () => {
                         step={() => BracketKnobs.CROSS_GAP_STEP}
                         ariaLabel={"Row gap in pixels"}
                         onInput={setCrossGap}
+                    />
+                </PageProp>
+
+                <PageProp
+                    key={"transitionDurationMs"}
+                    label={"Glide (ms)"}
+                    hint={
+                        "How long the family example takes to glide from one family to the next. It is off while the visitor has asked for reduced motion."
+                    }
+                >
+                    <PageNumberField
+                        value={getTransitionDurationMs}
+                        min={() => BracketKnobs.MIN_TRANSITION_DURATION_MS}
+                        max={() => BracketKnobs.MAX_TRANSITION_DURATION_MS}
+                        step={() => BracketKnobs.TRANSITION_DURATION_STEP_MS}
+                        isDisabled={getPrefersReducedMotion}
+                        ariaLabel={"Glide in milliseconds"}
+                        onInput={setTransitionDurationMs}
                     />
                 </PageProp>
             </PagePropsPanel>

@@ -36,11 +36,11 @@
     renderControls={renderBar}
 >
     {#snippet renderSlide(slide, state)}
-        <SlideFront title={slide} {state} isNarrow={props.isNarrow} />
+        <SlideFront title={slide} {state} frameClass={props.frameClasses.front} />
     {/snippet}
 
     {#snippet renderSlideBack()}
-        <SlideBack isNarrow={props.isNarrow} />
+        <SlideBack frameClass={props.frameClasses.back} />
     {/snippet}
 
     {#snippet renderStep(_step, renderProps)}

@@ -3,7 +3,8 @@ import { createMemo, createSignal } from "solid-js";
 import { CAROUSEL_DEFAULTS, CarouselPlacementUtils, CarouselPlacements } from "@thewaver/ss-components-solid";
 import type { CarouselOrientation } from "@thewaver/ss-components-solid";
 import { CarouselKnobs } from "@thewaver/ss-playground/App/Knobs/Carousels.const";
-import { NARROW_PLACEMENTS, TITLES } from "@thewaver/ss-playground/App/Pages/Carousels/Carousels.const";
+import { PLACEMENT_FRAMES, TITLES } from "@thewaver/ss-playground/App/Pages/Carousels/Carousels.const";
+import * as styles from "@thewaver/ss-playground/App/Pages/Carousels/Carousels.css";
 
 import type { CarouselsControls } from "./Carousels.types";
 
@@ -25,7 +26,8 @@ export const createCarouselsControls = (): CarouselsControls => {
         slides: getSlides,
         isDisabled: isDisabledSignal[0],
         orientation: orientationSignal[0],
-        isNarrow: () => NARROW_PLACEMENTS.includes(placementSignal[0]()),
+        frameClasses: () =>
+            styles.slideFrames[PLACEMENT_FRAMES[placementSignal[0]()] ?? "whole"][orientationSignal[0]()],
         get computePlacement() {
             return getComputePlacement();
         },

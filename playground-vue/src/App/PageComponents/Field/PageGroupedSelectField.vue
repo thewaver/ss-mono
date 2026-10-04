@@ -30,7 +30,14 @@ const setValue = (value: T | undefined) => {
 </script>
 
 <template>
-    <Select :value="value" :options="options" :is-disabled="isDisabled" :ariaLabel="ariaLabel" @update:value="setValue">
+    <Select
+        :id="id"
+        :value="value"
+        :options="options"
+        :is-disabled="isDisabled"
+        :ariaLabel="ariaLabel"
+        @update:value="setValue"
+    >
         <template #renderContent="{ selectedOption, flags }">
             <PageSelectContent :flags="flags" :width="width ?? DEFAULT_SELECT_FIELD_WIDTH">{{
                 selectedOption !== undefined

@@ -2,6 +2,7 @@ import type { EasingFn } from "@thewaver/ss-utils";
 import { EasingUtils, MathUtils, RotationUtils, StoreUtils } from "@thewaver/ss-utils";
 
 import { LiveAnnouncerUtils } from "../LiveAnnouncer/LiveAnnouncer.utils";
+import { TurnClockUtils } from "../TurnClock/TurnClock.utils";
 import type { RotatorController, RotatorCoreDefs, RotatorPhase, RotatorSpinDefs, RotatorState } from "./Rotator.types";
 
 /** Three whole turns and no overshoot, when the caller does not say. */
@@ -10,8 +11,6 @@ const DEFAULT_SPIN_DEFS: RotatorSpinDefs = { turns: 3, jitterRatio: 0 };
 const MIN_ROTATABLE_STEP_COUNT = 2;
 /** A consumer's own move goes straight to the step, with none of a spin's extra revolutions. */
 const NO_TURNS = 0;
-/** A backstop timer's grace period. A background tab stops delivering frames, and a spin that never finished would leave the component stuck mid-animation. */
-const FRAME_STARVATION_SLACK_MS = 100;
 /** Eases in and out, so a spin starts and stops rather than snapping to speed. */
 const SPIN_EASING: EasingFn = EasingUtils.ease;
 /** At rest at nought degrees, with nothing under way. */
@@ -70,9 +69,7 @@ export namespace RotatorUtils {
     ): RotatorPhase => {
         if (state.spinPhase !== "still") return state.spinPhase;
 
-        const isIdling = opts.idleDelayMs !== undefined && opts.isIdleAllowed && !state.isResting && opts.isRotatable;
-
-        return isIdling ? "idling" : "still";
+        return TurnClockUtils.getIsIdling({ ...opts, isResting: state.isResting }) ? "idling" : "still";
     };
 
     /**
@@ -124,55 +121,23 @@ export namespace RotatorUtils {
         const write = (next: Partial<RotatorState>) => store.update((current) => ({ ...current, ...next }));
 
         let targetIndex: number | undefined;
-        let spinFrameId: number | undefined;
-        let starvationHandle: ReturnType<typeof setTimeout> | undefined;
-        let generation = 0;
+
+        const tween = TurnClockUtils.createTween();
+        const targetRequest = TurnClockUtils.createTargetRequest();
 
         const getStepLabel = (index: number) => defs.computeStepLabel(index, defs.getStepCount());
 
-        const stopSpinFrames = () => {
-            if (spinFrameId !== undefined) cancelAnimationFrame(spinFrameId);
-            if (starvationHandle !== undefined) clearTimeout(starvationHandle);
-
-            spinFrameId = undefined;
-            starvationHandle = undefined;
-        };
-
         const turnTo = (toAngle: number, durationMs: number, easing: EasingFn, onArrival: () => void) => {
-            stopSpinFrames();
-
             const fromAngle = store.get().angle;
 
-            const arrive = () => {
-                stopSpinFrames();
-                write({ angle: toAngle });
-                onArrival();
-            };
-
-            if (durationMs <= 0) {
-                arrive();
-
-                return;
-            }
-
-            const startedAt = performance.now();
-
-            const advance = () => {
-                const ratio = MathUtils.clamp01((performance.now() - startedAt) / durationMs);
-
-                if (ratio >= 1) {
-                    arrive();
-
-                    return;
-                }
-
-                write({ angle: MathUtils.lerp(fromAngle, toAngle, easing(ratio)) });
-
-                spinFrameId = requestAnimationFrame(advance);
-            };
-
-            starvationHandle = setTimeout(arrive, durationMs + FRAME_STARVATION_SLACK_MS);
-            spinFrameId = requestAnimationFrame(advance);
+            tween.run(
+                durationMs,
+                (ratio) => write({ angle: MathUtils.lerp(fromAngle, toAngle, easing(ratio)) }),
+                () => {
+                    write({ angle: toAngle });
+                    onArrival();
+                },
+            );
         };
 
         const land = (index: number) => {
@@ -195,14 +160,11 @@ export namespace RotatorUtils {
         const spin = () => {
             if (!getIsSpinnable(store.get(), getIsRotatable(defs.getIsDisabled(), defs.getStepCount()))) return false;
 
-            const current = generation;
-
             write({ isResting: false, isAwaitingTarget: true });
 
-            void Promise.resolve(defs.computeSpinTarget())
-                .then((index) => {
-                    if (current !== generation) return;
-
+            targetRequest.request(
+                () => defs.computeSpinTarget(),
+                (index) => {
                     const stepCount = defs.getStepCount();
                     const spinDefs = defs.computeSpinDefs?.(index, stepCount) ?? DEFAULT_SPIN_DEFS;
                     const jitterAngle = RotationUtils.getJitterAngle(spinDefs.jitterRatio, stepCount);
@@ -225,12 +187,9 @@ export namespace RotatorUtils {
 
                         turnTo(spinAngle - jitterAngle, defs.getSettleDurationMs(), SPIN_EASING, settle);
                     });
-                })
-                .catch(() => {
-                    if (current !== generation) return;
-
-                    write({ isAwaitingTarget: false });
-                });
+                },
+                () => write({ isAwaitingTarget: false }),
+            );
 
             return true;
         };
@@ -257,11 +216,9 @@ export namespace RotatorUtils {
         };
 
         const startRest = (restDurationMs: number) => {
-            if (!store.get().isResting || restDurationMs < 0) return () => {};
+            if (!store.get().isResting) return () => {};
 
-            const handle = setTimeout(() => write({ isResting: false }), restDurationMs);
-
-            return () => clearTimeout(handle);
+            return TurnClockUtils.holdRest(restDurationMs, () => write({ isResting: false }));
         };
 
         const drift = (idleDelayMs: number | undefined, stepAngle: number) => {
@@ -269,29 +226,16 @@ export namespace RotatorUtils {
 
             const degreesPerMs = stepAngle / idleDelayMs;
 
-            let previousTime = performance.now();
-            let idleFrameId: number;
-
-            const advance = (time: number) => {
-                const elapsedMs = time - previousTime;
-
-                previousTime = time;
-
-                store.update((current) => ({ ...current, angle: current.angle + elapsedMs * degreesPerMs }));
-
-                idleFrameId = requestAnimationFrame(advance);
-            };
-
-            idleFrameId = requestAnimationFrame(advance);
-
-            return () => cancelAnimationFrame(idleFrameId);
+            return TurnClockUtils.runFrames((elapsedMs) =>
+                store.update((current) => ({ ...current, angle: current.angle + elapsedMs * degreesPerMs })),
+            );
         };
 
         const stop = () => {
-            generation++;
+            targetRequest.cancel();
             targetIndex = undefined;
 
-            stopSpinFrames();
+            tween.cancel();
             write({ spinPhase: "still", isAwaitingTarget: false });
         };
 

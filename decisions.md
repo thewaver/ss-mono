@@ -519,6 +519,19 @@ Every abstract is now split along the lines above; these are the recurring shape
   `Virtualizer` sit outside that wrapper and were not touched; `measureRow` still defers to `onMount`. One TanStack
   package serves both frameworks, and `solid-virtual` 3.13.40 was itself on `virtual-core` 3.17.11, so the version
   under the Solid lists did not change.
+- **The Solid and Svelte row windows report `getIsLive` once they are following their scroller, not once it is
+  found.** The two are a step apart: an effect finds the scroller, and the window takes it up only when its options
+  are worked out again — Solid's `createComputed`, Svelte's `$effect.pre` — after that effect pass has finished.
+  `Listbox`'s scroll-to-highlight effect runs in the same pass as the search, so it saw the scroller found and asked a
+  window that was following nothing; TanStack had nowhere to scroll and nowhere to schedule its retry and dropped the
+  request, and nothing the effect reads changed afterwards, so a list opened onto a selection far down — `Route 26` in
+  the Playground's windowed `Select` — opened at the top with the highlighted row thousands of pixels below the box.
+  The window now records whether it is following each time it updates, in the same two places `_willUpdate` already
+  ran, and `getIsLive` reads that. Where `_willUpdate` runs is unchanged, and so is `measureRow`'s deferral to
+  `onMount`. It is the Solid and Svelte half of what Vue's `isLive` waiting for the render does. Since the window still
+  reads the scroller's height before the spacer is drawn, the first scroll is aligned against a box a few pixels tall
+  and TanStack's retry settles it a frame or two later; moving the read after the render, as Vue does, would change
+  the timing these windows were built on. `select.spec.ts`'s reopening case covers it in all four apps.
 - **`Glass`'s filter builders** return markup through `Generators/SVGDefs`, which is JSX; they moved to
   `GlassSolidUtils`, and the geometry and ids stayed. `Glass` was at first left out of `core.ts`, because its
   description type borrowed Solid-flavored gradient types from `Generators/SVGDefs`; it rejoined once the generators
@@ -751,6 +764,25 @@ in `components-vue/src/Utils/` unless a folder is given.
   written and before the browser paints, so the split between the two React effects has nothing to map onto. Cleanups
   run in the order their effects were declared, as React's do, so an ordering rule like `Modal`'s — unseal before focus
   goes back — carries over as written.
+- **A watcher on several sources fires on every trigger once any source is a `shallowRef`**, even when every value
+  compares equal, so a source that should only fire on a change of one field is read through `useStore(store, select)`
+  rather than taken off a ref of the whole state. Found when `PaintedText`'s letter boxes, re-sent to the letter
+  registry on every layout change, fed `ProximityText` a new strength, which relaid the letters and looped; Svelte's
+  equivalent was an effect reading one field off the whole layout state, mended the same way with `readStore`.
+- **`VirtualizerVueUtils.useRowWindow` takes up its scroller only once a render has been written, and `isLive` turns
+  `true` at that moment.** The window read the scroller's height as soon as the scroller was found, in the effect that
+  runs before Vue renders, while the spacer inside it was still the height of an empty list — so it took the box to be
+  a few pixels tall. Opening then scrolled to the first option against that box and left the list 82px down, the first
+  option mostly out of sight, and the scroll left the virtualizer in its "user is scrolling" state long enough that an
+  End pressed straight after opening was placed from the last row's estimated height rather than its measured one. A
+  correction the virtualizer re-tries once the spacer has grown was also re-tried before the spacer had grown, and
+  undid the virtualizer's own follow-up scroll. Between them the last row sat about 60px below the box for two frames,
+  which `select.spec.ts`'s End case caught about half the time; the fault predates the Vue port's later work and was
+  found on the last commit too. Taking up the scroller after the render — on mount and on every render of the
+  component that owns the window, as React's window does in a layout effect — reads the real height and runs that
+  re-try at the right moment. `isLive` waits for it too, because Vue runs a component's post-render watchers before its
+  `onUpdated` hooks: `Listbox`'s scroll-to-highlight watcher, keyed on `isLive`, would otherwise ask for its scroll
+  before the window was following anything, and a list reopened onto a selection far down would stay at the top.
 - **The other React shapes map one to one.** `useEffect(fn, [])` is `watchAfterRender([], fn)`; an effect that is only a
   cleanup (`useEffect(() => x.stop, [x])`) is `onScopeDispose(x.stop)`; an effect with no deps list is `onMounted` plus
   `onUpdated`. State adjusted during render when an input changes — React's `if (x !== previous) setState(…)` — is a
@@ -5916,6 +5948,19 @@ rest. Keyed by place in the tile, the copies of a repeating tile share one trail
 repeats in every copy. The clock is the samples' shared one, woken by the pointer moving, so it stops once the last
 cell has faded. Three samples default to it: `square_g_trail_2`, `hexagon_pt_trail_2` and `triangle_t_trail_2`.
 
+**`retentionMs` holds a cell where the pointer left it before the fade begins.** The user's idea and name. A cell
+stays at the level it reached — fully grown, fully visible, whatever the sample's warm end is — for `retentionMs`,
+then fades over `trailMs` as before. Only the cooling waits: a cell already shows the higher of its live level and
+its memory, so moving back over a held or fading cell warms it at once. It defaults to `0`, which is the old
+behavior, on all three default sets, and every family carries a knob for it. The memory already stored when each
+cell was lit, so nothing new is recorded; `TrackedPatternUtils.computeTrailShare` turns the time since then into
+"held whole, then easing out", and `getTrailSpanMs` is the hold and the fade together, which is how long each
+framework's clock keeps ticking after the pointer last moved, since a clock that stopped after `trailMs` alone would
+leave a held cell stuck lit. A hold with no fade is allowed and drops the cell to rest the moment the hold ends, so
+`getHasTrail` is true when either is above zero. `createTrail`'s `computeLevel` now takes the resolved options as one
+object rather than `trailMs` and `restLevel` positionally, since a third tuning number would have made five
+positional arguments.
+
 **Comets, a swarm and a pixel trail are tracked gradients, not components** — the user's ruling, since React Bits
 draws the first two with WebGL and they are no different from `spot_smear`. Each is a family of three, `_1` to `_3`
 by how many colors it uses, the way every other family is numbered.
@@ -8672,6 +8717,30 @@ the consumer's; the Playground's row example slides the entering content in from
 **"Always one open" is `isSingleExpand` with `isExpandRequired`**, both already there, and the rotated strip label is
 the example's own painting rather than anything the component draws.
 
+### `Accordion` in a row: an open width per item
+
+From Skiper UI's expanding panels, where each panel opens to a width of its own. A panel's content cannot give that
+width, since text wraps to whatever width it is handed — the user's point — so **the width is a property of one item,
+`openWidthShare`, beside `isDisabled` on the item record.** It is a share of the accordion's own width, header strip
+included, so it holds when the window is resized; an open item without one splits what the closed strips, the gaps and
+the shared items leave. Shares that ask for more than the row has are scaled down together until they fit.
+
+**It needs a row with a width of its own, so it is read only under `orientation: "horizontal"` with `sizing:
+"fill"`.** A row sized to its content would be asking its panels how wide to be while they asked it; a column grows
+its panels in height. Everywhere else a panel is as wide as its content, as before, so `sizing` keeps its one job of
+deciding whether the whole accordion fills its container.
+
+**The accordion measures, and the panel is told.** `AccordionUtils.computeOpenWidths` takes the items, the open set,
+the row's width, each header strip's width and the gap, and answers a panel width per item; each framework measures
+the row and the strips with the border-box observers. A section in a row wraps its panel's content in a box of that
+width (`accordionPanelSizer`), and `Collapsible` — which already animates a sideways panel to its content's measured
+width — animates to it, so `Collapsible` learned nothing. A closed item keeps the width it last had, so its text does
+not reflow while it folds away.
+
+**A section in a row is now as wide as its strip and its panel, whatever `sizing` says.** Each section's `Collapsible`
+used to take its default `sizing: "fill"`, which a row sized to its content never showed, and which spread four closed
+strips evenly across a row that fills its box. A section in a row now asks for `fit-content`; a column is unchanged.
+
 ### A panel built on first expansion, and why the animation survives it
 
 Settled with the user, on their call between keeping a lazily built panel afterwards and unmounting it again
@@ -10979,7 +11048,7 @@ the moment a consumer gives their options a background. The override returns the
 path — the cache lookup, the estimate, the synchronous first measure — behaves exactly as before. The
 observed box is in layout pixels, so this is also the one measurement `Viewport`'s scale cannot distort.
 
-**Four things the package's documentation does not cover, all from one root: this library is a guest inside
+**Five things the package's documentation does not cover, all from one root: this library is a guest inside
 somebody else's popup.**
 
 - **Solid runs a `ref` while the element is still being built.** The measurer identifies a row by reading an
@@ -11009,6 +11078,17 @@ somebody else's popup.**
 first painted frame with every option mounted, against 71 ms with a window of four. Frame rate while open was
 never the problem and is unchanged. The remaining cost at open is linear but has no DOM in it — building the
 records, flattening them, finding the navigable ones — and that is the floor a windower cannot lower.
+
+- **A row brought in from below is aligned against the box the content shows in, not the scroller's outer box.**
+  TanStack's `observeElementRect` reports the scroller's border box, so a scroll lining a row's end up with the bottom
+  counts the scroller's borders, and a horizontal scrollbar if it has one, as room. In the Playground's popup, with a
+  2px border, every row the walk brought in from below and the selection a list opened onto stopped with its last 4px
+  clipped, and a row already clipped by up to 4px counted as in view and was not scrolled to at all.
+  `VirtualizerUtils.observeClientRect` reports `clientWidth` and `clientHeight` instead — the box the content is
+  clipped to, which is what a native `scrollIntoView` aligns against — and all four row windows hand it over as
+  `observeElementRect`. It is typed by the two fields of the virtualizer it reads, so the core package still does not
+  depend on TanStack. `End` was never affected, since it scrolls to the furthest offset rather than aligning a row.
+  `select.spec.ts`'s reopening case found it, in React and Vue as much as in Solid and Svelte.
 
 ### Controls: `Toolbar`, and why the overflow is the component
 
@@ -13959,6 +14039,15 @@ edge and nothing sticks out. An earlier build had the pile grow upwards out of t
 the box a statement about one card rather than about the stack. Raising the gap now makes every card shorter
 rather than making the stack taller, which is what keeps a consumer's layout still after they change it.
 
+**`pileSide` names the edge the pile peeks out of, `"bottom"` or `"top"`, after `Bracket`'s `rootSide`.** The default is
+the shape above: the top card flush with the top of the box and the cards behind showing beneath it, which is what
+most published card stacks do. `"top"` mirrors it — the top card flush with the bottom, the pile showing above — by
+measuring each card's offset from the box's top edge instead of from its bottom (`CardStackUtils.getCardOffsetPx`).
+Top and bottom only, the user's pick: a sideways pile turns the whole geometry, and widening the choice later breaks
+nobody. The backlog entry that decided this described today's look as peeking out above, and the default was to be
+"today's behavior"; the painted stack showed the opposite, so the default is `"bottom"`, which is today's look, and
+the prop still names the edge the pile shows from.
+
 **The funnel is width only, and the widest card is the one on top.** `funnelRatio` takes a share of the
 stack's width off each successive card, so the top card fills the box and the ones behind it narrow —
 `0.08` is eight percent off the second and sixteen off the third. The stack's width is therefore the width
@@ -15297,6 +15386,38 @@ the edge without the check reading the overhang as a drum painting outside its r
 **The example is gone; the user removed it because `Odometer`'s pull-to-spin reels already show a slot machine.**
 What it established still holds for anyone building one out of wheels. **One press fetches one result, and each wheel's `computeSpinTarget` returns its own part of it.** Writing `targetIndex` instead would move a wheel without a spin's turns and easing. **The stop order comes from `spinDurationMs` alone**, 600ms more for each reel, because the settle that follows is the same length for all three. **"All stopped" is a countdown of `onSpinEnd` from the number of `spin()` calls that returned true**, so a wheel that declined is never waited for.
 
+### `Spine`: faces hinged on one line, each swung out by its distance from the current one
+
+The user's idea, its six questions settled with them in `backlog.md` before anything was built.
+
+**It is to `Barrel` what a hinge is to a drum.** Every face is the component's own box, hinged on one line through its middle — upright for `axis="row"`, level for `"column"` — and swung round that line to its own angle; seen end-on it is a star of lines where a barrel is a polygon. At `0` a face lies exactly on the box. A positive angle lifts its leading half (the right half across, the top half up and down) towards the viewer and lays it over the other half, which it reaches at `180`, the way a page turns or a split-flap's flap falls. A back is turned a further half turn so it reads the right way up once its face has gone over, and paints the other half. It is a `Primitive` for `Barrel`'s reason: it renders, holds no value, and has no use until something moves its `position`.
+
+**One rule sets every face's angle from its distance to the current one, and two ship.** `SpineUtils.radial` spaces the faces evenly round a turn (a paddle wheel or a rolodex, and a fan at less than a turn); `SpineUtils.leaves` lays the faces already passed flat on one side and the rest flat on the other, the one between at its fraction (a book or a split-flap). A consumer passes their own as `computeFaceAngle`. The distance is counted straight, never the short way round, because a wrapped distance jumps a whole turn at the seam and a transition would play it as a full spin.
+
+**The spine always runs through the middle of the box, and there is no padding prop.** A hinge on an edge is the box moved by half its size, and the gap between the spine and a face's inner edge — the paddle wheel's hollow core — is painted inside the face. Which half of the box a face paints is the consumer's.
+
+**Faces lying flat on each other are pushed apart by a quarter pixel per face of distance**, before the turn, so the current face sits on top of the faces still to come and the last one over sits on top of those before it; two faces at one angle are otherwise coplanar and the browser cannot order them.
+
+**Accessibility is `Barrel`'s**: `faceRoleDescription` is required, `computeFaceDefs` names each face and says whether it is hidden, and hidden faces get `aria-hidden` and `inert`. It is also handed the face's angle, because a wheel hides what is turned away (`SpineUtils.getIsTurnedAway`) while a book also hides pages that face the viewer but are covered. WCAG 4.1.2 checked; Spine never moves on its own, so 2.2.2 falls to whatever drives the position.
+
+**`hasBacks` defaults to `false`, and `perspectivePx` is a prop** (default `1000`, `Barrel`'s constant), because a split-flap the size of a character and a book the size of a spread want very different depths.
+
+**A face fills the whole box but paints half of it, so its unpainted half can catch clicks meant for what lies beneath.** `Flipbook` turns pointer events off on the face and back on for its painted half, in its own stylesheet; every half-painted use of `Spine` meets the same overlap, so it may belong in `Spine` itself.
+
+**The carousel's ring and its hinge rule are built from Spine's geometry.** The ring is the `paddleWheel` placement family: each slide is the carousel's whole box turned about its middle line by `SpineUtils.radial`, painting only its leading half with a core gap while its back paints the other, stacked by `SpineUtils.getLeadDepth` since half-planes sharing an edge cannot cross. That is Made With GSAP's 3D Wheel Gallery (091) look the user asked for. The ring example's frame was resized for the paddle wheel; its perspective stays at the user's 900 pixels, at which the panels pointing at the viewer may reach past the frame — left for the user to judge by eye. The `hinge` rule's flipping card was already `leaves` about a level spine, so it now calls `SpineUtils.leaves` with identical output; its waiting stack stays its own. The Playground's slide frame became `frameClasses: { front, back }` because a paddle paints half of itself.
+
+**Spine's page is docs only, as every primitive's is.** The paddle wheel is shown on the carousel page and the book is `Flipbook`'s.
+
+### `Flipbook`: a book on a spine, and three ways to turn a page
+
+**A spread counts the leaves lying on the left, and a leaf is two pages back to back.** Leaf `n` carries page `2n` on its front and `2n + 1` on its back, so spread `0` is the front cover alone on the right, each spread after shows the page just read on the left and the next on the right, and with an even page count the last spread is the back cover alone on the left. With an odd count the last spread shows the last two pages and the last leaf's back, never turned, is never shown. `index` is two-way and counts spreads, the user's pick over counting pages; a value past either end is shown at that end and not written back.
+
+**It is drawn on `Spine` with `SpineUtils.leaves`, the spine through the middle of the book's own box**, so no edge offset is needed. The position is fractional while a page turns, and `Flipbook` moves it frame by frame with `CarouselUtils.glide` rather than through `Spine`'s CSS transition, so a jump of several spreads turns each leaf in turn, a drag lets go from wherever the page was, and the glide ends exactly on the spread. All of it is `FlipbookUtils.createBook`, written once for the four views.
+
+**A page turns three ways, and the buttons are the drag's alternative.** The step controls are real `<button>`s the book builds and the consumer places through `renderControls`, as `Carousel`'s are, named by the required `computeStepLabel` and disabled at the end they would turn past. The arrow keys turn the book while the region itself has focus — Left back, Right on, not swapped under right-to-left text since read pages always lie on the left — and a refused key is left to the page. A drag follows the pointer, one book width of travel being one whole leaf, and on release completes or falls back; **`commitRatio` is `0.25` of the book's width, confirmed by the user.** WCAG 2.5.7 Dragging Movements: turning a page is a discrete choice, so the step buttons are the route, and a book drawn without `renderControls` takes no drags, as `Carousel` does; they also answer 2.5.1. 2.1.1 is met by the arrow keys; 2.3.3 by `transitionDurationMs={0}`, which the Playground passes under reduced motion; 2.2.2 does not apply.
+
+**Every reader-facing phrase except the role descriptions is the consumer's.** Each page is named on its own by the required `computePageLabel(index, count)`, and a turn announces the spread through `LiveAnnouncer`, politely, in the words of the required `computeSpreadAnnouncement(pages, count)`, handed the showing pages in reading order; nothing is said as the book first appears. Only `roleDescription` ("book") and `pageRoleDescription` ("page") have defaults. The book is a region, so `ariaLabel` is required. Every page other than the two the book is open at — turned-away pages and those under the pile alike — is `aria-hidden` and `inert`, decided by the spread rather than the angle.
+
 ### `Barrel`: the drum, lifted out of the wheel so a second component can turn one
 
 A drum and a carousel are the same picture driven by different arithmetic — a barrel of faces seen through a
@@ -15850,6 +15971,16 @@ mechanism with a window of two recycled faces, and that a barrel rendering every
 where the window is as long as the list. Nothing here forecloses it: the window would go on `Barrel`, and
 whether a split-flap is then a second component or a mode on this one is the user's call, still open.
 
+### `Odometer`: a split-flap is a second way to draw the same count, on `Spine`
+
+**`mechanism` picks how a column changes, `"drum"` by default and `"splitFlap"` beside it.** The user's call: a prop on `Odometer` rather than a separate component, left open to more layouts later, so it is a union rather than a flag. Everything above the column is shared: the direction, the cascade, the reels, the slots that grow in and shrink away, and the reduced-motion rules come from `computeTurn` exactly as for the drum. **A split-flap reads the drum's angle as a count of flaps** (`getFlapPosition`), because a cumulative angle and a cumulative count are one running total spelled two ways — which is also why nine to zero drops one flap forward rather than nine back. Going down plays the flaps in reverse, lifting them back up, as the drum turns backwards; a real board only ever flips forwards, and that difference was accepted.
+
+**A column draws three flaps on a `Spine` laid out by `SpineUtils.leaves`, and the characters on them are reassigned as the column moves.** The flap that fell last lies below the middle line showing the bottom half of the character on show; the flap on show carries that character's top half on its front and the next character's bottom half on its back; the next flap stands behind it with the next character's top half. That is the whole picture at any moment, so a reel running through forty characters still draws three flaps, and the picture is identical either side of a whole position, so moving to the next set of characters cannot be seen. Each flap is the full character box with the consumer's drawing clipped to the half it needs, so **`renderDigit` and `renderFixed` keep their meaning**.
+
+**The flaps run on animation frames, not on a CSS transition**, because a transition moves every flap at once and a split-flap drops them one after another. `OdometerUtils.createFlapper` holds each column's position and moves it after the column's delay so the last flap lands one turn duration after the first starts: **more flaps fall faster rather than taking longer**, which is what `turnDurationMs` means for the drum. Each flap is eased inside its own step, so a run reads as separate flaps, and a run asked for partway through another starts from where that one had reached. A column whose target has not moved does nothing, so a digit that did not change never flips. Changing `mechanism` mid-run rebuilds the columns at the current target with no animation.
+
+**What a screen reader gets is unchanged.** Every flap face is hidden and inert, as the drum's faces are, and the value is still the one visually hidden span. WCAG checked: 1.3.1 and 4.1.2 are met as for the drum; 2.3.3 Animation from Interactions as for the drum, extra turns dropped under reduced motion and the duration the consumer's; 2.2.2 does not apply, since the flaps move only when the value changes and each change finishes within the turn duration.
+
 ### `Odometer`: a reel is asked per column, and it replaces the ripple rather than adding to it
 
 **`computeReel(digitIndex, digitCount)` returns `{ extraTurns, durationMs }` for each column, and giving it turns the cascade off.** All columns start together and the stagger comes from their durations, so the order they stop in is the consumer's to set. A delay on top of that would be a second way to express the same thing. **The extra turns are added to the step that reaches the digit, in the direction the whole number is going.** The angle stays cumulative, and a reel spinning up lands still moving forward. **Every column spins, an unchanged digit included, and nothing spins when no digit changed.** The consumer is not told which columns changed, and a slot machine spins every reel. A sign change alone is `"same"` and moves nothing. **Under reduced motion the extra turns are dropped and each column turns only as far as its digit needs** (WCAG 2.3.3, animation started by an interaction). The reel's duration is kept, because only the turns were named. **The samples are `Samples/Odometer/Reels`, kept in one file with inline samples** under the rule that a registry is split only when a single file would be unreadable. They are functions of position and count only, so each one is a stagger shape rather than a speed.
@@ -15980,6 +16111,49 @@ nothing in the component does.
 **`computeConnectors` lists the route's connectors last.** Every connector is drawn into one SVG, and SVG has no stacking order — whatever is painted later sits on top — so a plain connector painted after a route connector covered it where they crossed, and a consumer styling the route could not fix that from outside. The order is otherwise meaningless, so the route goes to the end and every renderer that paints in order draws it on top.
 
 **In the Playground the focused node is styled as one more node on the route, and nothing else.** The user's call: stacking a `primary` "focused" border and text under the route's `secondary` ring gave a node with two borders in two colors. The keyboard focus ring still marks focus; after a click, the route starting there is the mark.
+
+### Travelling beams on `Bracket` and `PatchBoard` are Playground paint
+
+From Magic UI's Animated Beam, a pulse of light running along the line between two elements. Both components already
+hand every line to the consumer to draw, so the library learned nothing: each page carries a beam example, and the
+beam is a second path laid over the line with the same `d`.
+
+**`pathLength="1"` makes every line one lap long.** The beam is a dash of `0.18` with a gap of `0.82` of the path,
+and the animation runs `stroke-dashoffset` across exactly one path length, so a pulse takes the same time on a long
+cable as on a short one — travelling faster, and drawn longer, on the long one — and exactly one is ever on a line. The dash moves toward the path's end or its start: a `PatchBoard` cable
+runs from the output to the input it feeds, so it moves toward whichever end is the input; a `Bracket` connector is
+drawn from the parent to the child, so it moves back toward the parent, which is the way to the final.
+
+**On `Bracket` the beam runs only along the focused node's route to the root**, through `isOnFocusedRoute`, which the
+connector defs already carried. The route means "holds focus", so pressing the example's Pause button takes the route
+away with the focus, and the pause is seen on the next node focused. WCAG 2.2.2 is still met: nothing moves until a
+node is focused, and while one is, the pause is one press away and stays in force.
+
+**The beam is a styled component, `PageBeam`, in each Playground**, painted from one shared stylesheet, and the cable's
+curve moved into `PatchBoardContent.const.ts` in the shared Playground so the cable and its beam are the same curve in
+all four apps; it had been written out once per app. On `Bracket` the beam follows the page's connector knob through a
+lookup from each connector sample to the path it draws (`BEAM_PATHS`), since the samples themselves only return
+markup.
+
+### `Bracket`: the family view shows one family at a time and follows focus
+
+From Skiper UI's knockout bracket, which shows a window of the tree and pages through it.
+
+**A family is three rows, named by the node the focused one feeds.** The user's definition: the focused node's parent, the focused node with every sibling it has, and every node that feeds any of those siblings — so focusing a semi-finalist shows the four quarter-finalists, the two semi-finalists and the final. A row that does not exist is absent: a leaf shows its parent and itself among its siblings; the root shows itself and the nodes that feed it, never what comes after it; nothing focused shows the root's family. The rule is one function, `BracketUtils.getFamilyAnchorId`, and membership is `getIsInFamily`, read off the ids the way the route is.
+
+**It is opt-in, `view: "family"`, and the tree view is untouched**, connector markup included.
+
+**Everything outside the family folds onto the member it hangs from.** A node below the last row gathers on the member it feeds; a node with no member on its way to the root — the anchor's own parent, a cousin's branch — gathers on the anchor. A folded node is `aria-hidden="true"` and `inert` from the moment its family stops showing, fades as it glides and is not drawn once it arrives. A connector is drawn as faintly as its fainter end.
+
+**Focus never sits on a folded node, and the keyboard walk is not confined to the family.** Stepping toward the leaves from the family's last row always lands on a folded node, so a confined walk could never go deeper; instead, walking onto a folded node moves the family there first and then moves focus, so the node is unfolded before it is focused (React with `flushSync`, Vue after `nextTick`, Svelte with `flushSync`; Solid updates at once). The tab stop resolves among unfolded nodes. Focus leaving the board shows the root's family, so Tab returns to the remembered node only when that family holds it. A blur from one node to another of the same board does not count as leaving, or the root's family would flash in between and the target could turn `inert` mid-move. Each view also ignores blurs during an arrow-key move (`isStepping`): unfolding the target's family can fold the node that holds focus, and the browser drops focus from it at once, which read as focus leaving. The guard trusts that a blur during a move is the move's own, so if focusing the target ever failed, the board would count itself focused until the next blur. **A node is hidden only once it is folded and has finished fading** (`BracketUtils.getIsFrameHidden`), since a node unfolding starts its glide faded and hiding it then made the focus call land on nothing.
+
+**The board is sized for the largest family, so the page never moves while focus does.** `computeFamilyExtent` keeps the most layers and rows any family needs; a family sits with its top row at the root's end, centered across the board, so moving focus outward pages the window one layer at a time. Each layer header travels with its layer, and a header the family does not reach folds away with its list.
+
+**The glide is drawn frame by frame, nodes and connectors together.** The connectors are the consumer's SVG, and the only CSS route to moving a path is transitioning `d`, which Safari does not support. One clock (`TreemapUtils.createZoomClock`, now with four users, so its name may want to become neutral) drives every node, header and connector through `computeShownArrangement` on an ease-in-out curve; a glide that starts mid-glide starts from what is on screen, and `transitionDurationMs: 0` jumps. Only a change of family glides.
+
+**`onFamilyChange` names the family**, handed the value and placement of the node its middle row feeds, or `undefined` for the root's own family; the Playground's readout is built from it.
+
+**What WCAG said.** 1.3.1 Info and Relationships: folded nodes are out of the accessibility tree, so the list reports only what is on screen. 2.4.3 Focus Order: the walk keeps its order and the family moves ahead of it. 2.4.11 Focus Not Obscured (Minimum): the focused node is always a member of the family on screen. 3.2.1 On Focus, "When any user interface component receives focus, it does not initiate a change of context": checked, moving the family is a change of content inside the widget, not of context. 2.3.3 Animation from Interactions: the glide is started by the person and turned off with `0`, which the Playground passes under reduced motion.
 
 ### `Bracket`: round headers make each layer its own list
 
@@ -16166,6 +16340,92 @@ raced the fade it was watching.
 the grid build, and that build is gone; `Reveal` and `Spotlight` each pass a list of one. The list form is kept
 rather than reverted because it is tested and costs nothing, but it is now a generalization with no second
 consumer, which is worth knowing before anything is built on it.
+
+### `Lens`: Reveal's window the other way round
+
+**`Reveal` cuts a hole in a cover; `Lens` shows a magnified copy only inside the hole.** So it sits beside `Reveal` and `ScratchCard` in `Exotics/Reveals`. Everything about where the window is, when it is open, what shape it has and how the keyboard moves it is `Reveal`'s, reused rather than repeated: the view calls `RevealUtils` for the pointer point, the keyboard point, the nudges and the window's image. `LensUtils` holds only the two things a lens adds, the layer's mask and the copy's scale. `radius`, `joinRadii`, `lameExponents`, `softness`, `computePoints`, `stepSize`, `isDisabled` and `pointSource` mean exactly what they mean on `Reveal`, so a consumer moving between the two meets one vocabulary.
+
+**`renderContent` is called twice, and only the first is real.** The second is drawn inside a layer carrying `aria-hidden="true"` and `inert`, with pointer events off, so a screen reader meets the content once, Tab never lands in the copy, and a click always reaches the real thing underneath. It is `Wraparound`'s arrangement for its copies, with the same consequence written on the prop: anything with a state of its own runs separately in the copy.
+
+**The mask and the scale are on two different elements, and that is the whole trick.** The outer layer covers the element and carries the mask, the lens's image placed once, so only the inside of the window paints. The copy inside it carries `scale(zoom)` with its `transform-origin` at the lens's center; scaling about a point leaves that point where it is, so whatever sits under the middle of the lens sits there in the copy too. With both on one element the mask would scale along with the content and the window would grow with the zoom. Magic UI's `Lens` splits them the same way.
+
+**The mask is one layer, not `Cutout`'s.** `CutoutUtils.getMaskStyle` composes a full layer minus holes, which is a cover; a lens wants the window alone, one image at one position, small enough that it did not earn a second mode on the abstract.
+
+**With no lens, the layer is hidden rather than taken out**, so moving the pointer in and out does not rebuild the copy or decode a picture in it again each time. The lens shows whenever the pointer is anywhere on the page, as `Reveal`'s hole does, so it slides in from the edge.
+
+**The defaults are a zoom of 2, a radius of 90, a step of 20 and a softness of 1.** Softness is 1, a hard edge, where `Reveal`'s is 0.45, because a lens reads as glass only if its rim is sharp. Zoom is not clamped: 1 magnifies nothing and below 1 shrinks the copy. A radius of 0 shows no lens.
+
+**The keyboard is `Reveal`'s, for the same reason.** WCAG 2.1.1 applies as it does there: what the lens shows depends on where the pointer is, so a keyboard user needs their own way to move it. One Tab stop, `role="group"` and a required `ariaLabel`; the lens opens at the center on `:focus-visible`, the arrows move it by `stepSize` inside the element, and blur closes it.
+
+### `PaintedText`: along a path, set by the browser and slid by `progress`
+
+From Magic UI's Spinning Text, text set round a circle and turning. **`PaintedText` takes a `path`, the user's pick over letters riding `Trail`.** SVG already lays text along any path with `<textPath>`, and `PaintedText` is SVG, so the browser places every letter, kerning stays right, and every kind of paint works as it does on lines. A circle is one helper away, `PaintedTextUtils.computeCirclePath`, which starts at the top and runs clockwise so the letters stand on the outside.
+
+**On a path there is one line, and the line machinery stands idle.** Nothing wraps, line breaks are left out, and whole elements are not drawn, since SVG cannot place an image in a `<textPath>`; a console warning names what was left out. Letters never push each other along on a path: `ProximityText`'s letters swell where they sit.
+
+**The path is in pixels and drawn as written, and the box is the path's own box grown by how far the letters reach.** The core measures each letter's height above and below its baseline and grows every side of the path's box by the larger, since which side the letters' tops point to changes round a curve. The drawing's coordinates start at that box's corner, reported as `origin`, and the paint area, the mask and the boxes reported to a wrapper are measured from it.
+
+**Turning is the text sliding along its path, through `progress` and `playback`**, in the shape `Trail` and `Typewriter` use, with `lapDurationMs` for one lap and `TrailUtils.run` as the clock. **`playback` is off unless asked for, unlike `Trail`'s**: text on a path is a layout first, so adding a path does not set anything moving. The slide always loops.
+
+**Text that slides past the end comes round from the start because every layer is drawn twice**, the second copy one whole path length behind and hidden from screen readers. On an open path it reads as a ticker; a text longer than its path overlaps itself where the two copies meet.
+
+**`isFittedToPath` stretches or squeezes the spacing so the text runs the path's whole length once**, through `textLength` and `lengthAdjust="spacing"` on the `<text>` (Solid's types do not offer it on `<textPath>`). On a closed path the text's end meets its own start, so a trailing space or separator is asked for in the docs.
+
+**The spacing is read from the browser by laying the same text along a straight line**: a hidden SVG in the layout host sets the runs on a `<textPath>` along a long straight track with the same `textLength`, and each letter's distance and advance are read back, so a wrapper's letters are placed by the browser's own spacing.
+
+**`Typewriter` and `ProximityText` still drive the letters.** `placeAlongPath` puts each letter where `<textPath>` would — the middle of its advance on the path, turned to the path's direction there — as a `<text>` inside a group carrying the place and the turn, so a wrapper's keyframes still scale and slide it about its own center. While the text slides the letters move every frame and the reported boxes move with them. The caret turns to stand on the letter beside it and is rebuilt on every move, so it does not blink while the text slides. No Playground example drives a path text with `Typewriter` or `ProximityText` yet.
+
+**Checked 2.2.2 Pause, Stop, Hide**: the Playground's circle and wave both start moving, so each has a Pause/Play button writing `playback`; under reduced motion the page starts both stopped, and the component never reads the media query.
+
+### `MorphText`: two copies melting into each other under one filter
+
+From Magic UI's Morphing Text. When the text changes, the old and the new copies cross-fade while blurring, under a
+filter that makes anything half-transparent either solid or clear, so the blur melts one word into the next.
+
+**It sits in `Exotics/Text` beside `ScrambleText`, whose contract it shares: text that changes with an effect.** The
+user's pick over a text switcher in `MediaSwitchers`, whose components own a list of values and step through it.
+`MorphText` takes one `text`; cycling through words is the consumer's timer, as with `Typewriter`'s phrases, and the
+Playground's examples each own one with a Pause button, which is the stop WCAG 2.2.2 asks of anything moving for more
+than five seconds.
+
+**The content arrives as a function of the text, `renderText`, not as children**, because the outgoing text is drawn
+beside the incoming one and both need drawing. Left out, the text is drawn as it is.
+
+**The filter sits on the component's own box**, an SVG `feColorMatrix` that stretches alpha far past one and pulls it
+back down (`MorphTextUtils.THRESHOLD_MATRIX`), so plain text and `PaintedText` both work inside, gradient and pattern
+paint included. It is applied only while a morph runs, so text at rest keeps its normal smooth edges.
+
+**The blur and the opacity follow Magic UI's curve**: a copy's blur is `maxBlurPx / share - maxBlurPx`, capped at
+`maxBlurPx`, and its opacity is `share ** 0.4`, so both copies are visible and blurred across the middle, where the
+filter fuses them (`computeCopyStyle`). The clock is a frame loop in `MorphTextUtils.createMorpher`; a change part-way
+through starts a new morph from the text that was arriving, and `morphDurationMs: 0` swaps at once, which is the
+reduced-motion route, the consumer's call as everywhere else.
+
+**Only the incoming copy is offered to a screen reader**; the outgoing one is `aria-hidden`. The copies share one
+grid cell, so the box is as large as the larger of the two and nothing around it moves.
+
+**The root is a block-level grid, not an inline one.** The first build used `inline-grid`, which sizes to its content,
+and a freshly mounted `PaintedText` copy measures its wrapping width from its container — so the outgoing copy wrapped
+to nothing for a frame and the whole example grew taller at the start of every morph. Taking the container's width
+removes it; a consumer who wants the text inline wraps it in an inline box of their own.
+
+### `FittedText`: lines sized to fill their box, around a function that sat unused
+
+A component around `JSXTextMetricsUtils.getNormalizedFontSizes` in `ss-utils`, which nothing called. The consumer hands
+over the lines already split, the user's call: splitting text into lines is not part of it. Every line is scaled to
+the box's full width, then all of them shrink by one factor until the stack fits the height, so a short line comes out
+larger than a long one.
+
+**The box is the container's.** The root fills its parent on both axes, as `CardStack`'s does, so a consumer sizes the
+text by sizing what it sits in, and the lines are measured against the root's layout size, which a scaled ancestor
+does not change. `lineHeightRatio` is each line's height as a multiple of its own size, and it is both the CSS
+`line-height` each line is drawn at and the room the fit leaves for it, so the two cannot disagree.
+
+**The font is the one the component inherits, read off the root when it measures.** The lines are measured on a canvas
+at a reference size and scaled from there, so the reference does not matter; letter and word spacing are carried as a
+share of the root's own size, so spacing written in `em` keeps its proportion as a line grows. It measures again when
+the box changes size or a web font finishes loading — the two events `Typewriter` already watches — and the
+controller's `update` is the way in for a change it cannot see, such as a class on an ancestor that swaps the font.
 
 ### `ScrambleText`: the text is replaced rather than animated, and that decides the whole shape
 
@@ -17912,6 +18172,36 @@ gap the arrangement leaves at its edges shows at every join; the Playground's mo
 mosaic's gap so the joins match the gaps inside. `ImageMosaic`'s free side comes out flat, since every row is
 scaled to fill the width exactly, which is why it is the showcase.
 
+### `Wraparound`: it drifts by itself, and one switch turns off moving it by hand
+
+A marquee is `Wraparound` moving by itself along one axis, so `Wraparound` gained a drift rather than a `Marquee` preset whose only difference would have been its defaults; the Playground's example is called "Marquee" so someone looking for the word finds it.
+
+**The drift is the plane's, so the four frameworks share it.** `WraparoundUtils.computeDriftVelocity` turns `driftPxPerSecond` and `driftDegrees` into pixels per millisecond, and the plane's `setDrift` sets it going. The angle runs the way the screen's axes do: `0` moves the content right, `90` down, `180` (the default) left. Each frame moves the offset by the velocity times the time since the last frame, so the strip covers the same ground on any frame rate. Each view calls `setDrift` with nothing while `playback` is false, while the hold is on, or while the window is disabled, and stopping resets the clock so a drift that resumes does not make up the time it spent stopped.
+
+**The drift gives way to everything a person does, and carries on from where they left it.** A press stops it from pointer-down to pointer-up, and a glide or a coast stops it while they run; after each it picks up from wherever the content now sits. It pauses under the pointer, under focus and while the page is hidden through `InteractionTrackerUtils.trackHold`, the same hold the carousels and `Toasts` call — which is also what keeps the original tile under the cursor long enough to be clicked.
+
+**`isMovable` turns off dragging, the wheel and the keys together.** The user's call, over turning off dragging alone: a marquee that kept the wheel would catch the page's scrolling whenever the pointer passed over it, because the wheel route calls `preventDefault` to move the content. With `isMovable` off, the wheel returns before that, a press never becomes a drag, the arrow, page and `Home` keys are ignored, and `touch-action` returns to `auto` so a touch scrolls the page too. Hover handing the original to the tile under the pointer, a tap on a copy clicking the real item, and a focused item being brought into view all stay on, since none of them is a person moving the content.
+
+**With hand moving off, the window is no longer a tab stop.** Checked 2.1.1 Keyboard, "All functionality of the content is operable through a keyboard interface": the window took focus only so its keys could move the content, so once moving by hand is off for every input a focused window would do nothing. Focusable content inside is still reached by Tab, and focus inside it is still a hold. The window keeps `role="region"` and its required name.
+
+**The pause WCAG asks for is `playback`, and the library does not warn when it is missing.** Checked 2.2.2 Pause, Stop, Hide: a drift is moving content that starts automatically and lasts more than five seconds, so it needs a mechanism to pause it. The hold is not that mechanism, since it lasts only while the pointer or focus stays; `playback` wired to a control the user can reach is. Whether a consumer drew that control is something the component cannot see, so unlike _"An accessibility mistake the library can detect is warned about"_ there is no development warning; the prop docs say what is owed, and the Playground's Marquee carries a Play/Pause button. Reduced motion is the consumer's call: a speed of `0`, which the Playground passes under the media query.
+
+**The offset is left to grow while drifting.** Bringing it back near zero would hand the original and every copy to different cells and rebuild every copy, which is the blinking the first build was corrected for. A strip drifting at tens of pixels a second takes hours to reach offsets where pixel precision starts to slip.
+
+### `ShapeReveal`: a change shown through a shape growing from a point
+
+From Magic UI's Animated Theme Toggler and Skiper UI's theme transitions.
+
+**It is a helper in `Abstracts`, not a component, and only the core holds it.** `ShapeRevealUtils.reveal(change, opts)` runs the change inside the browser's view transition and uncovers the new page inside a shape that grows from a named spot, a point, or an element's center until it covers the viewport. Nothing in it is about a framework, so the four packages get it through their re-export of the core. A framework that renders after the write flushes inside the change: React with `flushSync`, Vue by awaiting `nextTick`, Svelte with `flushSync`; Solid's writes land at once. It is not tied to themes, though the Playground's theme switch is its first consumer, growing a circle from the theme field.
+
+**Where the browser has no view transitions, or the duration is 0, the change simply runs.** The promise says which happened: `true` when the change was revealed, `false` when it was not. Reduced motion is the consumer's call, and the Playground passes 0 under it.
+
+**The browser's own cross-fade is overridden by script, not by a stylesheet.** By default the browser fades the old snapshot out and the new one in and blends them with `plus-lighter`, which would brighten the inside of the shape; the helper runs one animation on each snapshot holding opacity at 1 and blending at normal, which wins because a script animation comes after the browser's own in the cascade. A `globalStyle` toggled on the root was rejected because the helper would have had to import a `.css.ts` the unit tests cannot load, and because a stylesheet whose exports nobody imports can be dropped from a build, leaving the reveal broken only in production. The animations are cancelled once the transition ends, so a second reveal does not inherit the first one's.
+
+**The shapes are a circle and `Shape`'s default contours, passed as `computePoints`.** The user narrowed this item to the library's default shapes, dropping the animated GIF, the star and custom outlines; a set of animated SVG samples is in `backlog.md` under _Open discussion_. Leaving `computePoints` out gives an exact circle. A contour grows about the average of its corners until its nearest edge clears the farthest viewport corner, so it covers the viewport whichever way it is turned; that overshoots for a long, flat shape, accepted because it holds for every contour without a case per shape. A hard edge is a `clip-path` whose corners each travel in a straight line from the origin. A soft edge is a blurred SVG of the shape used as a mask grown from size 0, so `blur` is a standard deviation in pixels as CSS `blur()` takes it — not `Reveal`'s `softness`, which is a ratio, because one name should not carry two units. The reach is extended by three times the blur so the faded edge clears the viewport.
+
+**WCAG.** 2.3.3 Animation from Interactions (AAA), "Motion animation triggered by interaction can be disabled": the duration is the way to turn it off. 2.2.2 Pause, Stop, Hide applies to motion that "starts automatically" and "lasts more than five seconds"; a reveal starts from the visitor's own action and runs well under that, so it needs no pause control. Checked 2.3.1 Three Flashes: one reveal per action is not a flash sequence. While a reveal runs the browser draws snapshots over the page, so a press during those few hundred milliseconds lands on nothing; that is the platform, not the helper.
+
 ### Playback is `playback` everywhere, and `Trail` lost its `play` and `pause`
 
 **The carousels' `playingSignal` and `Trail`'s `isPlayingSignal` are both `playback`**, matching
@@ -18452,8 +18742,10 @@ showing the moment a roll's result was known, so the painter lit it up while the
 arrived before the roll did. `isShowing` now follows the face the die last came to rest on, and is false for every
 face while it turns. `face` still carries the target early, as the wheel's does, for a consumer that wants it.
 
-**Only the face showing is offered to a screen reader**, as `Cuboid` does: the rest are `aria-hidden` and `inert`, and
-while the die turns none is offered. The die reports `aria-busy` while it rolls.
+**Only one face is offered to a screen reader**, the rest `aria-hidden` and `inert`. Since `Die` moved onto `Roller` that
+face is the target, as on the drum wheel — the one it is heading for or last landed on — so it stays offered while the
+die turns; see _"`Roller`: the wheel's behavior with one more dimension"_. The die reports `aria-busy` while a turn
+somebody started is under way.
 
 **The box the faces are laid out in must not shrink.** Pushed back by its radius, a die is drawn smaller than life,
 so the frame it reserves is narrower than the box its faces sit in, unlike `Cuboid`'s. That box is a flex item, and a
@@ -18515,6 +18807,30 @@ written onto every run whose color differs from the baseline, which is every col
 would find the text frozen at the color it was parsed with, and the property they would have to know about to
 explain it is one they never wrote. So a fill color set inside a `Typewriter` is lost, and that is the cheaper
 of the two failures.
+
+### `Roller`: the wheel's behavior with one more dimension
+
+Asked for by the user as "a Roller is a Rotator with more dimensions", so that `Die` does what `Wheel` does wherever the two have an equivalent. `Rotator` holds one angle; `Roller` holds one rotation, kept as a quaternion, because two angles applied one after the other make a freely dragged solid feel wrong after a few drags. Everything else follows the wheel: it drifts while idle, a roll asks for its target and may wait for it, the target is written as soon as it is known, the landing is announced, and the solid rests before drift resumes. `Die` keeps only the solid's geometry and the drawing, and uses `Roller` as the wheels use `Rotator`.
+
+**A face, to a roller, is two directions**: the way it points out of the solid and the way that reads as down on it, which is all `getLandingQuaternion` needs to bring a face to the front the right way up. `getClosestFace` and `getOppositeFace`, asked for by the user, sit beside it.
+
+**The solid never stops crooked.** The user's call, taken from the wheel, over a prop choosing between coasting and settling: a drag that lets go coasts on its last moment's speed, slowing exponentially as `Wraparound`'s does, then settles onto the nearest face over `settleDurationMs`, eased — the wheel's spin and settle, overshooting or falling short and then easing in. A roll, a step and a write to the target land the same way, and pressing the solid while it coasts or settles grabs it at once.
+
+**A step goes to whichever face turning that way brings round first.** `getNextFace` turns the solid a couple of degrees at a time about the screen axis a drag that way would use until a different face is nearest the viewer, so it works on any solid from d4 to d100, and a step right does what a drag right does.
+
+**`idleDelayMs` keeps the wheel's meaning, adapted**: how long one face's share of a whole turn takes about the drift axis, as the wheel's is how long one wedge takes to pass; a page wanting one speed for every solid divides by the face count. Drift is switched by `autoSpin`, the wheel's name, as the user asked.
+
+**Only the target face is offered to a screen reader**, as on the drum wheel — the face it is heading for or last landed on — so the accessibility tree does not churn while it drifts. An earlier reading, every face reachable at once through a prop, was dropped by the user.
+
+**WCAG.** 2.5.7 Dragging Movements, and its Understanding document's note that a keyboard equivalent satisfies it only if it "also provides controls that can be clicked or tapped with a pointer": the controller's `step` is the route, and the consumer wires it to buttons, as the icon cloud example does. 2.1.1: a movable die takes focus and the arrow keys step it. 2.2.2: drift starts by itself and lasts, so `autoSpin` is the two-way switch and the example draws a Pause/Play button bound to it.
+
+### The timing both turning abstracts share is `TurnClock`
+
+`Rotator` and `Roller` stay two abstracts, because one turns an angle and the other a rotation; folding them together would make every wheel carry the 3D arithmetic or every helper ask which kind it was. What they share is time, and it lives once in `TurnClockUtils`: a timed turn on animation frames with a backstop timer that lands it anyway in a tab that stops painting; a frame loop for drift, which owes nobody an answer and has no backstop; the rest after a landing; a target request that ignores the answer to a request cancelled while it was awaited; and the rule for when a thing at a standstill should be idling. Pausing while the page is hidden was already shared through each framework's `InteractionTracker`. `Rotator` moved onto `TurnClock` without a change of behavior, which the wheel specs and `noAnimationFrames.spec.ts` confirm.
+
+### `Die`: free turning, drift and dragging, through `Roller`
+
+`computeRollTarget` is optional, and without it `roll()` returns false. `face` stays the two-way target, written as soon as a roll's result is known and when a step or a drag picks a face; drift leaves it alone. Drift is `autoSpin` with `idleDelayMs` and `driftAxis`, as on the wheel, none unless a delay is given and none while the page is hidden. `isMovable`, off by default and named after `Wraparound`'s, turns on the drag and the arrow keys and puts the die in the tab order. `isSeeThrough` lets back faces paint, for transparent faces whose far side should show mirrored through the front. `aria-busy` now covers any turn somebody started, which is how a turn is told from a snap now that the target face stays offered while the die turns. The tabletop dice behave as before except that a direct turn to a face takes `settleDurationMs`. The icon cloud on the Die page is the user's Magic UI reference: drifting, draggable, transparent faces with an emoji each, step buttons for the single-pointer route, and Pause/Play.
 
 ### `Rotator`, and the difference between where a wheel is and where it is going
 

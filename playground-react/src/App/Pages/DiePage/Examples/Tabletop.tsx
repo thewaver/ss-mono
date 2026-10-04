@@ -30,6 +30,7 @@ export const TabletopExample = (props: Props) => {
                 shape={props.shape}
                 size={props.size}
                 rollDurationMs={props.rollDurationMs}
+                settleDurationMs={props.settleDurationMs}
                 tumbleCount={props.tumbleCount}
                 face={props.face}
                 ariaLabel={"A die"}

@@ -1,10 +1,12 @@
 import {
     For,
+    Index,
     Show,
     createEffect,
     createMemo,
     createSignal,
     createUniqueId,
+    on,
     onCleanup,
     onMount,
     untrack,
@@ -20,11 +22,14 @@ import {
     type PaintedTextRun,
     PaintedTextUtils,
     ShapeLayerUtils,
+    TrailUtils,
     PaintedTextStyles as styles,
 } from "@thewaver/ss-components";
 import { Size2d } from "@thewaver/ss-utils";
 
+import { InteractionTrackerSolidUtils } from "../../../Abstracts/InteractionTracker/InteractionTrackerSolid.utils";
 import { useLetterDriverContext } from "../../../Abstracts/LetterDriver/LetterDriver.context";
+import { SignalMirrorSolidUtils } from "../../../Abstracts/SignalMirror/SignalMirrorSolid.utils";
 import type { SVGDefs } from "../../../Generators/SVGDefs/SVGDefsSolid.types";
 import { PaintAreaContextProvider } from "../../../Generators/SVGDefs/SVGGradients/PaintArea.context";
 import { access } from "../../../Utils/propUtils";
@@ -32,7 +37,8 @@ import { accessStore } from "../../../Utils/storeUtils";
 import type { PaintedTextProps } from "./PaintedTextSolid.types";
 
 const NO_OFFSET = 0;
-const BEFORE_FIRST = -1;
+const NO_LENGTH = 0;
+const NO_PROGRESS = 0;
 const MASK_PADDING_SIDES = 2;
 const EMPTY_STYLE = {};
 
@@ -40,8 +46,22 @@ type LayerAttributes = Record<string, unknown>;
 
 export const PaintedText = (props: ParentProps<PaintedTextProps>) => {
     const maskId = `painted-text-mask-${createUniqueId()}`;
+    const pathId = `painted-text-path-${createUniqueId()}`;
 
     const driver = useLetterDriverContext();
+
+    const [getProgress, setProgress] = SignalMirrorSolidUtils.createOptional(() => props.progress, NO_PROGRESS);
+    const [getIsPlaying] = SignalMirrorSolidUtils.createOptional(() => props.playback, PAINTED_TEXT_DEFAULTS.playback);
+
+    const getIsPageHidden = InteractionTrackerSolidUtils.trackPageHidden();
+
+    const getPath = createMemo(() => access(props.path));
+
+    const getIsOnPath = () => getPath() !== undefined;
+
+    const getIsFittedToPath = createMemo(() => access(props.isFittedToPath) ?? PAINTED_TEXT_DEFAULTS.isFittedToPath);
+
+    const getLapDurationMs = createMemo(() => access(props.lapDurationMs) ?? PAINTED_TEXT_DEFAULTS.lapDurationMs);
 
     const [getRootRef, setRootRef] = createSignal<HTMLElement>();
     const [getSourceRef, setSourceRef] = createSignal<HTMLElement>();
@@ -62,6 +82,8 @@ export const PaintedText = (props: ParentProps<PaintedTextProps>) => {
         getLayoutHost: getLayoutRef,
         getIsMeasuringLetters: () => !!driver,
         getComputePushingAnimationName: () => untrack(getComputePushingAnimationName),
+        getPath: () => untrack(getPath),
+        getIsFittedToPath: () => untrack(getIsFittedToPath),
     });
 
     const getRuns = accessStore(layout, (state) => state.runs);
@@ -76,11 +98,25 @@ export const PaintedText = (props: ParentProps<PaintedTextProps>) => {
 
     const getHeight = accessStore(layout, (state) => state.height);
 
+    const getOrigin = accessStore(layout, (state) => state.origin);
+
+    const getPathLength = accessStore(layout, (state) => state.pathLength);
+
+    const getAscent = accessStore(layout, (state) => state.ascent);
+
+    const getDescent = accessStore(layout, (state) => state.descent);
+
+    const getStartOffset = () => getProgress() * getPathLength();
+
+    const getIsSliding = createMemo(
+        () => getIsOnPath() && getIsPlaying() && !getIsPageHidden() && getPathLength() > NO_LENGTH,
+    );
+
     const getSize = createMemo(() => ({ width: getWidth(), height: getHeight() }), undefined, {
         equals: Size2d.isSame,
     });
 
-    const getPaintArea = () => ({ x: 0, y: 0, ...getSize() });
+    const getPaintArea = () => ({ ...getOrigin(), ...getSize() });
 
     const getRegistryEntries = driver ? accessStore(driver.registry, (state) => state.entries) : () => [];
 
@@ -128,26 +164,22 @@ export const PaintedText = (props: ParentProps<PaintedTextProps>) => {
     const getCaretBox = createMemo(() => {
         if (!driver?.renderCaret || !driver.getCaretIndex) return undefined;
 
-        const caretIndex = driver.getCaretIndex();
-
-        const letters = getLetters();
-        const offset = getOffset();
-
-        if (caretIndex === BEFORE_FIRST) {
-            const first = letters[0];
-
-            return offset === NO_OFFSET && first ? { x: first.x, top: first.top, height: first.height } : undefined;
-        }
-
-        const letter = letters[caretIndex - offset];
-
-        return letter ? { x: letter.x + letter.width, top: letter.top, height: letter.height } : undefined;
+        return PaintedTextUtils.computeCaretBox(
+            getLetters(),
+            driver.getCaretIndex(),
+            getOffset(),
+            getIsOnPath() ? { ascent: getAscent(), descent: getDescent() } : undefined,
+        );
     });
+
+    const getRunX = (run: PaintedTextRun) => (getIsOnPath() ? undefined : run.x);
+
+    const getRunY = (run: PaintedTextRun) => (getIsOnPath() ? undefined : run.y);
 
     const renderRun = (run: PaintedTextRun, isReadable: boolean) => {
         if (isReadable && run.anchor) {
             return (
-                <tspan x={run.x} y={run.y} style={run.style}>
+                <tspan x={getRunX(run)} y={getRunY(run)} style={run.style}>
                     <title>{run.title}</title>
                     <a href={run.anchor.href} target={run.anchor.target} rel={run.anchor.rel}>
                         {run.text}
@@ -158,7 +190,7 @@ export const PaintedText = (props: ParentProps<PaintedTextProps>) => {
 
         if (isReadable && run.title) {
             return (
-                <tspan x={run.x} y={run.y} style={run.style}>
+                <tspan x={getRunX(run)} y={getRunY(run)} style={run.style}>
                     <title>{run.title}</title>
                     {run.text}
                 </tspan>
@@ -166,7 +198,7 @@ export const PaintedText = (props: ParentProps<PaintedTextProps>) => {
         }
 
         return (
-            <tspan x={run.x} y={run.y} style={run.style}>
+            <tspan x={getRunX(run)} y={getRunY(run)} style={run.style}>
                 {run.text}
             </tspan>
         );
@@ -197,21 +229,86 @@ export const PaintedText = (props: ParentProps<PaintedTextProps>) => {
         </For>
     );
 
+    const renderPathLetters = () => (
+        <Index each={getLetters()}>
+            {(getLetter, localIndex) => (
+                <Show when={getLetter().placement}>
+                    {(getPlacement) => {
+                        const getGlyph = () => driver?.getLetterState(getOffset() + localIndex).glyph;
+
+                        return (
+                            <g
+                                transform={`translate(${getPlacement().point.x} ${getPlacement().point.y}) rotate(${getPlacement().angle})`}
+                            >
+                                <text
+                                    class={styles.paintedTextLayer}
+                                    x={getGlyph() ? 0 : -getPlacement().advance * 0.5}
+                                    y={0}
+                                    text-anchor={getGlyph() ? "middle" : undefined}
+                                    style={{
+                                        ...getRuns()[getLetter().runIndex ?? 0]?.style,
+                                        ...getLetterStyle(localIndex),
+                                    }}
+                                >
+                                    {getGlyph() ?? getLetter().character}
+                                </text>
+                            </g>
+                        );
+                    }}
+                </Show>
+            )}
+        </Index>
+    );
+
+    const renderPathText = (
+        getAttributes: () => LayerAttributes,
+        isReadable: boolean,
+        getStartOffsetFor: () => number,
+    ) => (
+        <text
+            class={styles.paintedTextLayer}
+            {...getAttributes()}
+            textLength={getIsFittedToPath() ? getPathLength() : undefined}
+            lengthAdjust={getIsFittedToPath() ? "spacing" : undefined}
+            aria-hidden={isReadable ? undefined : "true"}
+        >
+            <textPath href={`#${pathId}`} startOffset={getStartOffsetFor()}>
+                {renderRuns(isReadable)}
+            </textPath>
+        </text>
+    );
+
+    const renderPathTexts = (getAttributes: () => LayerAttributes, isReadable: boolean) => (
+        <>
+            {renderPathText(getAttributes, isReadable, getStartOffset)}
+            {renderPathText(getAttributes, false, () => getStartOffset() - getPathLength())}
+        </>
+    );
+
     const renderLayer = (getAttributes: () => LayerAttributes, isReadable: boolean) => (
         <Show
             when={getIsPerLetter()}
             fallback={
-                <text
-                    class={styles.paintedTextLayer}
-                    {...getAttributes()}
-                    aria-hidden={isReadable ? undefined : "true"}
+                <Show
+                    when={getIsOnPath()}
+                    fallback={
+                        <text
+                            class={styles.paintedTextLayer}
+                            {...getAttributes()}
+                            aria-hidden={isReadable ? undefined : "true"}
+                        >
+                            {renderRuns(isReadable)}
+                        </text>
+                    }
                 >
-                    {renderRuns(isReadable)}
-                </text>
+                    {renderPathTexts(getAttributes, isReadable)}
+                </Show>
             }
         >
             <g {...getAttributes()} aria-hidden="true">
-                {renderLetters()}
+                <Show when={getIsOnPath()} fallback={renderLetters()}>
+                    {renderPathLetters()}
+                </Show>
             </g>
         </Show>
     );
@@ -249,16 +346,36 @@ export const PaintedText = (props: ParentProps<PaintedTextProps>) => {
 
     createEffect(() => getRegistration()?.setCharacters(getLetters().map((letter) => letter.character)));
 
-    createEffect(() =>
+    createEffect(() => {
+        const origin = getOrigin();
+
         getRegistration()?.setBoxes(
             getRestLetters().map((letter) => ({
-                x: letter.x,
-                y: letter.top,
+                x: letter.x - origin.x,
+                y: letter.top - origin.y,
                 width: letter.width,
                 height: letter.height,
             })),
-        ),
-    );
+        );
+    });
+
+    createEffect(on([getPath, getIsFittedToPath], () => layout.update(), { defer: true }));
+
+    createEffect(() => layout.placeAlongPath(getStartOffset()));
+
+    createEffect(() => {
+        if (!getIsSliding()) return;
+
+        onCleanup(
+            TrailUtils.run({
+                getProgress: () => untrack(getProgress),
+                setProgress,
+                getRunDurationMs: getLapDurationMs,
+                getIsLooping: () => true,
+                onEnd: () => undefined,
+            }),
+        );
+    });
 
     createEffect(() => {
         if (!driver?.getComputePushingAnimationName) return;
@@ -276,18 +393,28 @@ export const PaintedText = (props: ParentProps<PaintedTextProps>) => {
     });
 
     return (
-        <div ref={setRootRef} class={styles.paintedTextRoot}>
+        <div
+            ref={setRootRef}
+            class={styles.paintedTextRoot}
+            style={getIsOnPath() ? { width: `${getWidth()}px`, height: `${getHeight()}px` } : undefined}
+        >
             <div ref={setSourceRef} class={styles.paintedTextSourceWrap} aria-hidden="true" inert>
                 {props.children}
             </div>
 
-            <div ref={setLayoutRef} class={styles.paintedTextLayoutWrap} aria-hidden="true" inert />
+            <div
+                ref={setLayoutRef}
+                class={styles.paintedTextLayoutWrap}
+                classList={{ [styles.paintedTextLayoutWrapOnPath]: getIsOnPath() }}
+                aria-hidden="true"
+                inert
+            />
 
             <svg
                 class={styles.paintedTextSVG}
                 width={getWidth()}
                 height={getHeight()}
-                viewBox={`0 0 ${getWidth()} ${getHeight()}`}
+                viewBox={`${getOrigin().x} ${getOrigin().y} ${getWidth()} ${getHeight()}`}
                 style={driver?.getIsHidden() ? { visibility: "hidden" } : undefined}
             >
                 <defs>
@@ -296,20 +423,22 @@ export const PaintedText = (props: ParentProps<PaintedTextProps>) => {
                         {renderDefsElements(getStrokeDefs())}
                     </PaintAreaContextProvider>
 
+                    <Show when={getPath()}>{(getD) => <path id={pathId} d={getD()} />}</Show>
+
                     <Show when={getStrokePaint().maskKind}>
                         {(getMaskKind) => (
                             <mask
                                 id={maskId}
                                 maskUnits="userSpaceOnUse"
-                                x={-getMaskPadding()}
-                                y={-getMaskPadding()}
+                                x={getOrigin().x - getMaskPadding()}
+                                y={getOrigin().y - getMaskPadding()}
                                 width={getWidth() + getMaskPadding() * MASK_PADDING_SIDES}
                                 height={getHeight() + getMaskPadding() * MASK_PADDING_SIDES}
                             >
                                 {getMaskKind() === "outside" && (
                                     <rect
-                                        x={-getMaskPadding()}
-                                        y={-getMaskPadding()}
+                                        x={getOrigin().x - getMaskPadding()}
+                                        y={getOrigin().y - getMaskPadding()}
                                         width={getWidth() + getMaskPadding() * MASK_PADDING_SIDES}
                                         height={getHeight() + getMaskPadding() * MASK_PADDING_SIDES}
                                         fill="white"
@@ -323,9 +452,16 @@ export const PaintedText = (props: ParentProps<PaintedTextProps>) => {
                 </defs>
 
                 <Show when={getIsPerLetter()}>
-                    <text class={styles.paintedTextLayer} opacity={0}>
-                        {renderRuns(true)}
-                    </text>
+                    <Show
+                        when={getIsOnPath()}
+                        fallback={
+                            <text class={styles.paintedTextLayer} opacity={0}>
+                                {renderRuns(true)}
+                            </text>
+                        }
+                    >
+                        {renderPathText(() => ({ opacity: 0 }), true, getStartOffset)}
+                    </Show>
                 </Show>
 
                 <For each={getFillDefs()}>
@@ -383,10 +519,7 @@ export const PaintedText = (props: ParentProps<PaintedTextProps>) => {
 
             <Show when={getCaretBox()} keyed>
                 {(box) => (
-                    <div
-                        class={styles.paintedTextCaret}
-                        style={{ left: `${box.x}px`, top: `${box.top}px`, height: `${box.height}px` }}
-                    >
+                    <div class={styles.paintedTextCaret} style={PaintedTextUtils.computeCaretStyle(box, getOrigin())}>
                         {driver?.renderCaret?.()}
                     </div>
                 )}

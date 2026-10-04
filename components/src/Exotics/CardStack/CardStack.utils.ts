@@ -8,7 +8,7 @@ import {
 } from "@thewaver/ss-utils";
 
 import type { InteractionDragRatio } from "../../Abstracts/InteractionTracker/InteractionTracker.types";
-import type { CardStackMotion, CardStackPileDefs } from "./CardStack.types";
+import type { CardStackMotion, CardStackPileDefs, CardStackPileSide } from "./CardStack.types";
 
 /** The top card's depth. */
 const TOP_DEPTH = 0;
@@ -115,24 +115,53 @@ export namespace CardStackUtils {
         `${Math.max(FULL_WIDTH - depth * funnelRatio, NO_WIDTH) * PERCENT}%`;
 
     /**
-     * A card's transform: lifted into its place in the pile, and for the top card pushed or flown as well.
+     * How far down the box a card sits, in pixels, before any push.
      *
-     * The bottom-most mounted card sits flush with the bottom of the box and each card above it is lifted by one gap.
-     * The top card follows the push while it is in the pile, and sits at the away pose while it is leaving or about
-     * to return — travel arrives as a share of the card, so the flight is in percentages whatever the box is.
+     * The card furthest down the pile sits flush with the edge the pile peeks out of, and each card nearer the top is
+     * moved one gap towards the other edge, so with every card mounted the top card sits flush with that other edge.
+     * With fewer cards mounted the pile keeps its far end where it was and the top card stops short.
      *
      * @param depth How far down the pile the card is.
      * @param opts.mountedLength How many cards are mounted right now.
      * @param opts.pileExtentPx From {@link getPileExtentPx}.
      * @param opts.cardGap How far apart the cards sit, in pixels.
+     * @param opts.pileSide The edge the cards behind the top one peek out of.
+     */
+    export const getCardOffsetPx = (
+        depth: number,
+        opts: { mountedLength: number; pileExtentPx: number; cardGap: number; pileSide: CardStackPileSide },
+    ) => {
+        const fromFarEnd = (opts.mountedLength - SINGLE - depth) * opts.cardGap;
+
+        return opts.pileSide === "top" ? fromFarEnd : opts.pileExtentPx - fromFarEnd;
+    };
+
+    /**
+     * A card's transform: moved into its place in the pile, and for the top card pushed or flown as well.
+     *
+     * The place comes from {@link getCardOffsetPx}. The top card follows the push while it is in the pile, and sits at
+     * the away pose while it is leaving or about to return — travel arrives as a share of the card, so the flight is in
+     * percentages whatever the box is.
+     *
+     * @param depth How far down the pile the card is.
+     * @param opts.mountedLength How many cards are mounted right now.
+     * @param opts.pileExtentPx From {@link getPileExtentPx}.
+     * @param opts.cardGap How far apart the cards sit, in pixels.
+     * @param opts.pileSide The edge the cards behind the top one peek out of.
      * @param opts.getMotion Reads the top card's push and flight. Called only for the top card, so a view that follows
      * what it reads leaves every card below the top out of the push, which changes on each pointer move.
      */
     export const getCardTransform = (
         depth: number,
-        opts: { mountedLength: number; pileExtentPx: number; cardGap: number; getMotion: () => CardStackMotion },
+        opts: {
+            mountedLength: number;
+            pileExtentPx: number;
+            cardGap: number;
+            pileSide: CardStackPileSide;
+            getMotion: () => CardStackMotion;
+        },
     ) => {
-        const stacked = `translateY(${opts.pileExtentPx - (opts.mountedLength - SINGLE - depth) * opts.cardGap}px)`;
+        const stacked = `translateY(${getCardOffsetPx(depth, opts)}px)`;
 
         if (depth !== TOP_DEPTH) return stacked;
 

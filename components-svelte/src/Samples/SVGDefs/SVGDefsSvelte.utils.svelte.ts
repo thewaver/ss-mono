@@ -103,15 +103,16 @@ export namespace SVGDefsSvelteUtils {
     ) => {
         const trail = TrackedPatternUtils.createTrail();
         const trailMs = $derived(getOpts().trailMs);
+        const retentionMs = $derived(getOpts().retentionMs);
 
         let clock = $state.raw<ReturnType<typeof SVGDefsUtils.createClock>>();
 
         const getFrameMs = $derived(clock ? readStore(clock.frameMs) : undefined);
 
         $effect(() => {
-            if (!TrackedPatternUtils.getHasTrail({ trailMs })) return;
+            if (!TrackedPatternUtils.getHasTrail({ trailMs, retentionMs })) return;
 
-            const next = SVGDefsUtils.createClock(trailMs);
+            const next = SVGDefsUtils.createClock(TrackedPatternUtils.getTrailSpanMs({ trailMs, retentionMs }));
             const release = next.retain();
 
             clock = next;
@@ -130,7 +131,7 @@ export namespace SVGDefsSvelteUtils {
             const opts = getOpts();
 
             return getFrameMs && TrackedPatternUtils.getHasTrail(opts)
-                ? trail.computeLevel(`${index.row}_${index.col}`, liveLevel, getFrameMs(), opts.trailMs, opts.restLevel)
+                ? trail.computeLevel(`${index.row}_${index.col}`, liveLevel, getFrameMs(), opts)
                 : liveLevel;
         };
     };

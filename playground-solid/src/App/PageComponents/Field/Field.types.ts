@@ -49,6 +49,7 @@ export type PageSelectFieldProps<T> = {
     computeLabel?: (value: T) => string;
     onChange: (value: T) => void;
 } & AccessorProps<{
+    id?: string;
     width?: number;
     isDisabled?: boolean;
     ariaLabel?: string;

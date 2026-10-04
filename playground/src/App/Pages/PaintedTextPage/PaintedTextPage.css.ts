@@ -70,3 +70,13 @@ export const caretBlinking = style({
     animationTimingFunction: "steps(1)",
     animationIterationCount: "infinite",
 });
+
+export const ringText = style({
+    fontSize: themeVars.fontSize.large,
+    fontWeight: "bold",
+    letterSpacing: "0.1em",
+});
+
+export const waveText = style({
+    fontSize: themeVars.fontSize.large,
+});

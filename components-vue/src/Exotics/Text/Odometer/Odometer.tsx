@@ -1,25 +1,42 @@
-import { type SlotsType, computed, defineComponent, onBeforeUnmount, shallowRef, watch } from "vue";
+import {
+    type SlotsType,
+    type VNodeChild,
+    computed,
+    defineComponent,
+    onBeforeUnmount,
+    onScopeDispose,
+    shallowRef,
+    watch,
+} from "vue";
 
 import {
     ODOMETER_DEFAULTS,
     type OdometerDigitSlot,
     type OdometerFixedSlot,
+    type OdometerFlapLeaf,
+    type OdometerSlotFlags,
     type OdometerSlotPhase,
     OdometerStyles,
     OdometerUtils,
+    SpineUtils,
 } from "@thewaver/ss-components";
+import type { Size2d } from "@thewaver/ss-utils";
 
 import { MediaQueryMonitorVueUtils } from "../../../Abstracts/MediaQueryMonitor/MediaQueryMonitorVue.utils";
 import { Barrel } from "../../../Primitives/Barrel/Barrel";
 import type { BarrelSlots } from "../../../Primitives/Barrel/Barrel.types";
+import { Spine } from "../../../Primitives/Spine/Spine";
+import type { SpineSlots } from "../../../Primitives/Spine/Spine.types";
 import { watchAfterRender } from "../../../Utils/effectUtils";
 import { callSlot, declareProps } from "../../../Utils/propUtils";
+import { useStore } from "../../../Utils/storeUtils";
 import type { SlotsContext } from "../../../Utils/typeUtils";
 import type { OdometerProps, OdometerSlots } from "./Odometer.types";
 
 const RESTING_ANGLE = 0;
 const NO_DELAY = 0;
 const FIRST = 0;
+const HIDDEN_FACE = { ariaLabel: "", isHidden: true };
 
 type SlotProps = {
     phase: OdometerSlotPhase;
@@ -76,6 +93,73 @@ const OdometerSlot = defineComponent(
             isHidden: Boolean,
             onGrown: null,
             onShrunk: null,
+        }),
+    },
+);
+
+type FlapColumnProps = {
+    target: number;
+    delayMs: number;
+    durationMs: number;
+    digitSize: Size2d;
+    renderCharacter: (character: string) => VNodeChild;
+};
+
+const OdometerFlapColumn = defineComponent(
+    (props: FlapColumnProps) => {
+        const flapper = OdometerUtils.createFlapper(props.target);
+
+        onScopeDispose(flapper.stop);
+
+        watch(
+            () => props.target,
+            (target) => flapper.flapTo(target, props.delayMs, props.durationMs),
+        );
+
+        const position = useStore(flapper);
+
+        return () => {
+            const flapWindow = OdometerUtils.getFlapWindow(OdometerUtils.getDrawnFlapPosition(position.value));
+
+            return (
+                <Spine
+                    faces={flapWindow.leaves}
+                    position={flapWindow.position}
+                    axis="column"
+                    hasBacks={true}
+                    faceSize={props.digitSize}
+                    faceRoleDescription=""
+                    computeFaceAngle={SpineUtils.leaves}
+                    computeFaceDefs={() => HIDDEN_FACE}
+                >
+                    {
+                        {
+                            renderFace: ({ item, side }) => (
+                                <div
+                                    class={[
+                                        OdometerStyles.odometerDigitFace,
+                                        side === "front"
+                                            ? OdometerStyles.odometerFlapTop
+                                            : OdometerStyles.odometerFlapBottom,
+                                    ]}
+                                >
+                                    {props.renderCharacter(side === "front" ? item.front : item.back)}
+                                </div>
+                            ),
+                        } satisfies SpineSlots<OdometerFlapLeaf>
+                    }
+                </Spine>
+            );
+        };
+    },
+    {
+        name: "OdometerFlapColumn",
+        props: declareProps<FlapColumnProps>({
+            target: null,
+            delayMs: null,
+            durationMs: null,
+            digitSize: null,
+            renderCharacter: null,
         }),
     },
 );
@@ -173,8 +257,12 @@ export const Odometer = defineComponent(
         return () => {
             const digitSize = props.digitSize;
             const turnDurationMs = props.turnDurationMs ?? ODOMETER_DEFAULTS.turnDurationMs;
+            const mechanism = props.mechanism ?? ODOMETER_DEFAULTS.mechanism;
             const slotSize = { width: `${digitSize.width}px`, height: `${digitSize.height}px` };
             const { fixed, digitSlots, angles, durations, delays } = board.value;
+
+            const renderDigitFace = (digit: string, flags: OdometerSlotFlags) =>
+                callSlot(slots.renderDigit, { digit, flags }) ?? digit;
 
             return (
                 <div class={OdometerStyles.odometerRoot} role="group" aria-label={props.ariaLabel}>
@@ -219,29 +307,39 @@ export const Odometer = defineComponent(
                                 onGrown={() => settleDigit(index)}
                                 onShrunk={() => dropDigitColumn(index)}
                             >
-                                <div class={OdometerStyles.odometerBarrel}>
-                                    <Barrel
-                                        faces={OdometerUtils.DIGITS}
-                                        axis="column"
-                                        hasBacks={false}
-                                        faceSize={digitSize}
-                                        angle={angles[digitIndex] ?? RESTING_ANGLE}
-                                        transitionDurationMs={durations[digitIndex] ?? turnDurationMs}
-                                        transitionDelayMs={delays[digitIndex] ?? NO_DELAY}
-                                        faceRoleDescription=""
-                                        computeFaceDefs={() => ({ ariaLabel: "", isHidden: true })}
-                                    >
-                                        {
+                                {mechanism === "splitFlap" ? (
+                                    <OdometerFlapColumn
+                                        target={OdometerUtils.getFlapPosition(angles[digitIndex] ?? RESTING_ANGLE)}
+                                        delayMs={delays[digitIndex] ?? NO_DELAY}
+                                        durationMs={durations[digitIndex] ?? turnDurationMs}
+                                        digitSize={digitSize}
+                                        renderCharacter={(character: string) => renderDigitFace(character, flags)}
+                                    />
+                                ) : (
+                                    <div class={OdometerStyles.odometerBarrel}>
+                                        <Barrel
+                                            faces={OdometerUtils.DIGITS}
+                                            axis="column"
+                                            hasBacks={false}
+                                            faceSize={digitSize}
+                                            angle={angles[digitIndex] ?? RESTING_ANGLE}
+                                            transitionDurationMs={durations[digitIndex] ?? turnDurationMs}
+                                            transitionDelayMs={delays[digitIndex] ?? NO_DELAY}
+                                            faceRoleDescription=""
+                                            computeFaceDefs={() => ({ ariaLabel: "", isHidden: true })}
+                                        >
                                             {
-                                                renderFace: ({ item }) => (
-                                                    <div class={OdometerStyles.odometerDigitFace}>
-                                                        {callSlot(slots.renderDigit, { digit: item, flags }) ?? item}
-                                                    </div>
-                                                ),
-                                            } satisfies BarrelSlots<string>
-                                        }
-                                    </Barrel>
-                                </div>
+                                                {
+                                                    renderFace: ({ item }) => (
+                                                        <div class={OdometerStyles.odometerDigitFace}>
+                                                            {renderDigitFace(item, flags)}
+                                                        </div>
+                                                    ),
+                                                } satisfies BarrelSlots<string>
+                                            }
+                                        </Barrel>
+                                    </div>
+                                )}
                             </OdometerSlot>
                         );
                     })}
@@ -259,6 +357,7 @@ export const Odometer = defineComponent(
             cascadeDelayMs: null,
             ariaLabel: null,
             computeReel: null,
+            mechanism: null,
         }),
     },
 );

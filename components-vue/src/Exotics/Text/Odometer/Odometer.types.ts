@@ -1,6 +1,6 @@
 import type { VNodeChild } from "vue";
 
-import type { OdometerReel, OdometerSlotFlags } from "@thewaver/ss-components";
+import type { OdometerMechanism, OdometerReel, OdometerSlotFlags } from "@thewaver/ss-components";
 import type { Size2d } from "@thewaver/ss-utils";
 
 export type OdometerProps = {
@@ -18,6 +18,15 @@ export type OdometerProps = {
      * Ignored while `computeReel` is given.
      */
     cascadeDelayMs?: number;
+    /**
+     * How a column changes from one digit to the next. `"drum"`, the default, turns it like a drum with the digits
+     * round its rim. `"splitFlap"` drops one flap after another, as a departures board does: each flap is half a
+     * character hinged on the middle line, its front the top half of the digit going and its back the bottom half
+     * of the digit coming. Either way a column passes through every digit between the old one and the new one, and
+     * `turnDurationMs`, `cascadeDelayMs` and `computeReel` mean the same. The digit is still drawn whole; a
+     * split-flap shows the halves of that drawing it needs.
+     */
+    mechanism?: OdometerMechanism;
     /** Names the odometer for assistive technology, so a reader hears the value rather than the separate digits. */
     ariaLabel?: string;
     /**

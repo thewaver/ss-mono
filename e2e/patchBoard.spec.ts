@@ -525,3 +525,22 @@ test("a node carried with the keyboard past the edge of the window brings the wi
 
     expect((await panView(page, "Mic")).isInView, "where it stays once it is dropped").toBe(true);
 });
+
+/**
+ * The beams are the page's paint over the cables the board hands it, one per plugged cable, and the example's Pause
+ * is the stop WCAG 2.2.2 asks of anything moving for more than five seconds. Whether a beam is moving is read off
+ * `animation-play-state`, which is the example's own state rather than its paint.
+ */
+const BEAMS = "beams";
+const BEAM = `${demo(BEAMS)} [data-beam]`;
+
+test("every plugged cable carries a beam, and pausing stops them all", async ({ page }) => {
+    const cableCount = Number((await readout(page, BEAMS)).match(/^(\d+) cables/)![1]);
+
+    await expect(page.locator(BEAM)).toHaveCount(cableCount);
+    await expect(page.locator(BEAM).first()).toHaveCSS("animation-play-state", "running");
+
+    await page.locator("#patchBeamsPlayback").click();
+
+    for (const beam of await page.locator(BEAM).all()) await expect(beam).toHaveCSS("animation-play-state", "paused");
+});

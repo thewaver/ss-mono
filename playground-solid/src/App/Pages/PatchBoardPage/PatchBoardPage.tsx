@@ -24,6 +24,7 @@ import { PageCheckField, PageNumberField } from "../../PageComponents/Field/Fiel
 import { PageMeasureBox } from "../../PageComponents/MeasureBox/MeasureBox";
 import { PageProp } from "../../PageComponents/Prop/Prop";
 import { PagePropsPanel } from "../../PageComponents/PropsPanel/PropsPanel";
+import { BeamsExample } from "./Examples/Beams";
 import { ChainExample } from "./Examples/Chain";
 import { MixerExample } from "./Examples/Mixer";
 import { PanExample } from "./Examples/Pan";
@@ -46,6 +47,7 @@ export const PatchBoardPage = () => {
     const [getRackAction, setRackAction] = createSignal(NOTHING_DONE);
     const [getPanAction, setPanAction] = createSignal(NOTHING_DONE);
     const [getZoomAction, setZoomAction] = createSignal(NOTHING_DONE);
+    const [getBeamsAction, setBeamsAction] = createSignal(NOTHING_DONE);
     const [getZoom, setZoom] = createSignal(STARTING_ZOOM);
 
     const chainNodesSignal = createSignal(CHAIN_NODES);
@@ -58,6 +60,8 @@ export const PatchBoardPage = () => {
     const panLinksSignal = createSignal(PAN_LINKS);
     const zoomNodesSignal = createSignal(CHAIN_NODES);
     const zoomLinksSignal = createSignal(CHAIN_LINKS);
+    const beamsNodesSignal = createSignal(CHAIN_NODES);
+    const beamsLinksSignal = createSignal(CHAIN_LINKS);
 
     const getLinkWords = (link: PatchBoardLink) =>
         `${link.from.nodeKey} ${link.from.socketId} to ${link.to.nodeKey} ${link.to.socketId}`;
@@ -169,6 +173,26 @@ export const PatchBoardPage = () => {
                     />
                 ),
                 path: `${EXAMPLES_ROOT}/Zoom.tsx`,
+            },
+            {
+                key: "beams",
+                name: "The signal running along its cables",
+                span: WIDE_SPAN,
+                readout: () =>
+                    `${beamsLinksSignal[0]().length} cables, last: ${getBeamsAction()} — a pulse runs along every plugged cable from the output to the input it feeds, taking the same time on a long cable as on a short one; Pause stops it`,
+                component: () => (
+                    <PageMeasureBox width={() => BOARD_WIDTH}>
+                        <BeamsExample
+                            {...commonProps}
+                            nodes={beamsNodesSignal}
+                            links={beamsLinksSignal}
+                            onLink={(link) => setBeamsAction(`connected ${getLinkWords(link)}`)}
+                            onUnlink={(link) => setBeamsAction(`unplugged ${getLinkWords(link)}`)}
+                            onMove={(nodeKey) => setBeamsAction(`moved ${nodeKey}`)}
+                        />
+                    </PageMeasureBox>
+                ),
+                path: `${EXAMPLES_ROOT}/Beams.tsx`,
             },
         ];
     });

@@ -320,3 +320,170 @@ test("the typed caret blinks without end, and the toggle stops it and starts it 
     await toggle.click();
     await expect.poll(readBlink, "started again").toEqual([Infinity]);
 });
+
+/**
+ * Given a path, a painted text is set along it with SVG's own `<textPath>`, so the browser places every letter. Each
+ * paint layer is drawn twice, the second copy one whole path length behind the first, which is what brings text that
+ * slides past the end round from the start. These read every `<text>` holding a `<textPath>` in the drawing — the
+ * hidden layout copy the component measures from sits in a drawing with no `<defs>`, so it is never among them — and
+ * the length of the path they all point at.
+ */
+const PATH_SVG = "svg:has(> defs > path[id])";
+const SLIDE_WAIT_MS = 400;
+const SAMPLE_GAP_MS = 300;
+const SAMPLE_COUNT = 3;
+const PIXEL_SLACK = 1;
+
+const readPathTexts = (page: Page, key: string) =>
+    page.locator(`${demo(key)} ${PATH_SVG}`).evaluate((svg) => {
+        const painted = svg.parentElement as HTMLElement;
+        const source = painted.querySelector(":scope > [inert]") as HTMLElement;
+        const texts = [...svg.querySelectorAll(":scope > text")].filter((text) =>
+            text.querySelector(":scope > textPath"),
+        );
+        const hrefs = texts.map((text) => text.querySelector("textPath")?.getAttribute("href") ?? "");
+        const path = svg.querySelector(`defs > path${hrefs[0] ?? ""}`) as SVGPathElement | null;
+        const viewBox = (svg.getAttribute("viewBox") ?? "").split(" ").map(Number);
+
+        return {
+            source: (source.textContent ?? "").replace(/\s+/g, " ").trim(),
+            hrefs,
+            pathLength: path?.getTotalLength() ?? 0,
+            viewBox: { x: viewBox[0], y: viewBox[1], width: viewBox[2], height: viewBox[3] },
+            texts: texts.map((text) => {
+                const element = text as SVGTextElement;
+                const drawn = Array.from({ length: element.getNumberOfChars() }, (_unused, index) =>
+                    element.getExtentOfChar(index),
+                ).filter((extent) => extent.width > 0);
+                const left = Math.min(...drawn.map((extent) => extent.x));
+                const top = Math.min(...drawn.map((extent) => extent.y));
+                const box = drawn.length
+                    ? {
+                          x: left,
+                          y: top,
+                          width: Math.max(...drawn.map((extent) => extent.x + extent.width)) - left,
+                          height: Math.max(...drawn.map((extent) => extent.y + extent.height)) - top,
+                      }
+                    : { x: 0, y: 0, width: 0, height: 0 };
+
+                return {
+                    isReadable: !text.hasAttribute("aria-hidden"),
+                    paint: `${text.getAttribute("fill")} ${text.getAttribute("stroke")}`,
+                    content: (text.textContent ?? "").replace(/\s+/g, " ").trim(),
+                    startOffset: Number(text.querySelector("textPath")?.getAttribute("startOffset")),
+                    textLength: text.getAttribute("textLength"),
+                    box: { x: box.x, y: box.y, width: box.width, height: box.height },
+                };
+            }),
+        };
+    });
+
+/** Whether a path text's readable copy moves along its path over a short wait. */
+const readIsSliding = (page: Page, key: string) =>
+    page.locator(`${demo(key)} ${PATH_SVG}`).evaluate(async (svg, waitMs) => {
+        const readOffset = () =>
+            svg.querySelector(":scope > text:not([aria-hidden]) > textPath")?.getAttribute("startOffset") ?? "";
+        const before = readOffset();
+
+        await new Promise((resolve) => setTimeout(resolve, waitMs));
+
+        return readOffset() !== before;
+    }, SLIDE_WAIT_MS);
+
+test("on a path, the text is set along the path, and exactly one copy of it is read out", async ({ page }) => {
+    await expect(page.locator(`${demo("circle")} ${PATH_SVG}`)).toBeVisible();
+
+    const drawing = await readPathTexts(page, "circle");
+    const readable = drawing.texts.filter((text) => text.isReadable);
+
+    expect(drawing.pathLength, "the path the text points at is in the drawing").toBeGreaterThan(0);
+    expect(new Set(drawing.hrefs).size, "every copy follows the same path").toBe(1);
+    expect(readable, "one copy is read out").toHaveLength(1);
+    expect(readable[0].content, "and it says what the consumer wrote").toBe(drawing.source);
+});
+
+test("on a path, each layer is drawn a second time one path length behind, so nothing slides off into a gap", async ({
+    page,
+}) => {
+    await expect(page.locator(`${demo("circle")} ${PATH_SVG}`)).toBeVisible();
+
+    const drawing = await readPathTexts(page, "circle");
+    const layers = [...Map.groupBy(drawing.texts, (text) => text.paint).values()];
+
+    expect(layers.length, "the text is painted at all").toBeGreaterThan(0);
+
+    for (const copies of layers) {
+        expect(copies, "two copies per layer").toHaveLength(2);
+        expect(copies[0].startOffset - copies[1].startOffset, "one whole path apart").toBeCloseTo(
+            drawing.pathLength,
+            1,
+        );
+        expect(copies[1].isReadable, "and the second is never read out").toBe(false);
+    }
+});
+
+test("the Pause button stops the text sliding along its path, and pressing it again starts it", async ({ page }) => {
+    await expect(page.locator(`${demo("circle")} ${PATH_SVG}`)).toBeVisible();
+
+    const toggle = page.locator(`${demo("circle")} #circlePlayback`);
+    const wasSliding = await readIsSliding(page, "circle");
+
+    await toggle.click();
+    await expect.poll(() => readIsSliding(page, "circle"), "the press flipped it").toBe(!wasSliding);
+
+    await toggle.click();
+    await expect.poll(() => readIsSliding(page, "circle"), "and the second press flipped it back").toBe(wasSliding);
+});
+
+test("text fitted to its path is spaced to run the path's whole length once, and is not once unfitted", async ({
+    page,
+}) => {
+    await expect(page.locator(`${demo("circle")} ${PATH_SVG}`)).toBeVisible();
+
+    const fitted = await readPathTexts(page, "circle");
+
+    for (const text of fitted.texts) {
+        expect(Number(text.textLength), "the text is as long as the path").toBeCloseTo(fitted.pathLength, 1);
+    }
+
+    await revealProp(page, "isFittedToPath", "circle");
+    await page.locator(`${prop("isFittedToPath")} input`).uncheck();
+
+    await expect
+        .poll(async () => (await readPathTexts(page, "circle")).texts.every((text) => text.textLength === null))
+        .toBe(true);
+});
+
+/**
+ * The box a path text takes is the path's own box grown by how far its letters reach, so whichever way the letters
+ * are turned and wherever they have slid to, every drawn copy stays inside the drawing. Read a few times while the
+ * text slides, since a box sized to one moment would hold at that moment only.
+ *
+ * Each copy's box is the union of the letters it actually places. A letter slid past either end of the path is not
+ * drawn, but Chrome still counts it into the `<text>`'s own `getBBox`, as a glyph standing at the drawing's origin —
+ * so a copy wholly off the path would read as a box poking out of the top-left corner with nothing painted there.
+ */
+test("on a path, the drawing's box holds every letter wherever the text has slid to", async ({ page }) => {
+    for (const key of ["circle", "wave"]) {
+        await expect(page.locator(`${demo(key)} ${PATH_SVG}`)).toBeVisible();
+
+        for (let sample = 0; sample < SAMPLE_COUNT; sample++) {
+            const drawing = await readPathTexts(page, key);
+
+            for (const text of drawing.texts.filter((copy) => copy.box.width > 0)) {
+                expect(text.box.x, `${key}: inside on the left`).toBeGreaterThanOrEqual(
+                    drawing.viewBox.x - PIXEL_SLACK,
+                );
+                expect(text.box.y, `${key}: inside at the top`).toBeGreaterThanOrEqual(drawing.viewBox.y - PIXEL_SLACK);
+                expect(text.box.x + text.box.width, `${key}: inside on the right`).toBeLessThanOrEqual(
+                    drawing.viewBox.x + drawing.viewBox.width + PIXEL_SLACK,
+                );
+                expect(text.box.y + text.box.height, `${key}: inside at the bottom`).toBeLessThanOrEqual(
+                    drawing.viewBox.y + drawing.viewBox.height + PIXEL_SLACK,
+                );
+            }
+
+            await page.waitForTimeout(SAMPLE_GAP_MS);
+        }
+    }
+});

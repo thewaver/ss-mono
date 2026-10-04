@@ -1,5 +1,5 @@
 <script lang="ts">
-    import { CARD_STACK_DEFAULTS } from "@thewaver/ss-components-svelte";
+    import { CARD_STACK_DEFAULTS, CARD_STACK_PILE_SIDES } from "@thewaver/ss-components-svelte";
     import { CardStackKnobs } from "@thewaver/ss-playground/App/Knobs/CardStacks.const";
     import type { SwipeDirection } from "@thewaver/ss-utils";
 
@@ -7,6 +7,7 @@
     import PageExamples from "../../PageComponents/Examples/PageExamples.svelte";
     import PageCheckField from "../../PageComponents/Field/PageCheckField.svelte";
     import PageNumberField from "../../PageComponents/Field/PageNumberField.svelte";
+    import PageSelectField from "../../PageComponents/Field/PageSelectField.svelte";
     import PageProp from "../../PageComponents/Prop/Prop.svelte";
     import PagePropsPanel from "../../PageComponents/PropsPanel/PagePropsPanel.svelte";
     import DeckExample from "./Examples/Deck.svelte";
@@ -22,6 +23,7 @@
     let mountedCount = $state(CARD_STACK_DEFAULTS.mountedCount);
     let cardGap = $state(CARD_STACK_DEFAULTS.cardGap);
     let funnelRatio = $state(CARD_STACK_DEFAULTS.funnelRatio);
+    let pileSide = $state(CARD_STACK_DEFAULTS.pileSide);
 
     let lastSend = $state.raw<{ direction: SwipeDirection; card: string }>();
     let isEmpty = $state(false);
@@ -66,6 +68,7 @@
         {mountedCount}
         {cardGap}
         {funnelRatio}
+        {pileSide}
         onSend={(direction, card) => {
             lastSend = { direction, card };
         }}
@@ -90,6 +93,7 @@
         {mountedCount}
         {cardGap}
         {funnelRatio}
+        {pileSide}
         onSend={(direction, card) => {
             lastEndlessSend = { direction, card };
         }}
@@ -206,6 +210,21 @@
             ariaLabel={"Funnel"}
             onInput={(value) => {
                 funnelRatio = value;
+            }}
+        />
+    </PageProp>
+
+    <PageProp
+        itemKey={"pileSide"}
+        label={"Pile side"}
+        hint={"The edge the cards behind the top one peek out of: below the top card, or above it."}
+    >
+        <PageSelectField
+            value={pileSide}
+            values={CARD_STACK_PILE_SIDES}
+            ariaLabel={"Pile side"}
+            onChange={(next) => {
+                pileSide = next;
             }}
         />
     </PageProp>

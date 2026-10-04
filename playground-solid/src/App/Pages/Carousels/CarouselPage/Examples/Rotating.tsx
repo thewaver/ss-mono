@@ -45,9 +45,9 @@ export const RotatingExample = (props: Props) => {
             computeStepLabel={computeCarouselStepLabel}
             computeRotationLabel={computeCarouselRotationLabel}
             renderSlide={(getSlide, getState) => (
-                <SlideFront title={getSlide()} state={getState} isNarrow={() => access(props.isNarrow)} />
+                <SlideFront title={getSlide()} state={getState} frameClass={() => access(props.frameClasses).front} />
             )}
-            renderSlideBack={() => <SlideBack isNarrow={() => access(props.isNarrow)} />}
+            renderSlideBack={() => <SlideBack frameClass={() => access(props.frameClasses).back} />}
             renderStep={(_getStep, getRenderProps) => <PageCarouselStep renderProps={getRenderProps} />}
             renderPick={(_getIndex, getRenderProps) => <PageCarouselPick renderProps={getRenderProps} />}
             renderRotationControl={(getFlags) => <PageCarouselRotation flags={getFlags} />}

@@ -95,21 +95,25 @@ export namespace SVGDefsReactUtils {
     };
 
     /**
-     * The level each cell of a pattern with a trail is drawn at, so a cell the pointer has left keeps a fading glow.
+     * The level each cell of a pattern with a trail is drawn at, so a cell the pointer has left keeps its glow a while.
      *
      * Holds the pattern's {@link TrackedPatternUtils.createTrail} memory and a clock made by
-     * {@link SVGDefsUtils.createClock} that runs for `trailMs` after the pointer last moved over it, so the component
-     * re-renders while a trail is fading and stops once every cell has come to rest. A pattern without a trail is
-     * handed its live levels back unchanged and runs no clock.
+     * {@link SVGDefsUtils.createClock} that runs for the hold and the fade after the pointer last moved over it, so the
+     * component re-renders while a cell is held or fading and stops once every cell has come to rest. A pattern without
+     * a trail is handed its live levels back unchanged and runs no clock.
      *
      * @param opts The pattern's resolved options, from `TrackedPatternUtils.resolveOpts`.
      * @param pointer Where the pointer is over the pattern, from {@link usePatternPointer}.
      * @returns The level to draw a cell at, from the cell's key — its row and column — and its live level.
      */
-    export const usePatternTrail = (opts: { trailMs: number; restLevel: number }, pointer: Point2d | undefined) => {
+    export const usePatternTrail = (
+        opts: { trailMs: number; retentionMs: number; restLevel: number },
+        pointer: Point2d | undefined,
+    ) => {
         const hasTrail = TrackedPatternUtils.getHasTrail(opts);
+        const spanMs = TrackedPatternUtils.getTrailSpanMs(opts);
         const [trail] = useState(TrackedPatternUtils.createTrail);
-        const clock = useMemo(() => SVGDefsUtils.createClock(opts.trailMs), [opts.trailMs]);
+        const clock = useMemo(() => SVGDefsUtils.createClock(spanMs), [spanMs]);
         const frameMs = useStore(clock.frameMs);
 
         useEffect(() => (hasTrail ? clock.retain() : undefined), [clock, hasTrail]);
@@ -119,7 +123,7 @@ export namespace SVGDefsReactUtils {
         }, [clock, hasTrail, pointer?.x, pointer?.y]);
 
         return (key: string, liveLevel: number) =>
-            hasTrail ? trail.computeLevel(key, liveLevel, frameMs, opts.trailMs, opts.restLevel) : liveLevel;
+            hasTrail ? trail.computeLevel(key, liveLevel, frameMs, opts) : liveLevel;
     };
 
     /**

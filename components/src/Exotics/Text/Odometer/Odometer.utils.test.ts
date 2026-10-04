@@ -1,4 +1,4 @@
-import { describe, expect, it } from "vitest";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
 import { OdometerUtils } from "./Odometer.utils";
 
@@ -277,5 +277,208 @@ describe("computeTurn", () => {
         expect(turn.delays).toEqual([0, 0]);
         expect(turn.durations).toEqual([500, 900]);
         expect(turn.angles[0]).toBe(-360);
+    });
+});
+
+describe("getFlapPosition", () => {
+    it("reads a resting angle back as a position whose digit is the one the angle shows", () => {
+        for (let digit = 0; digit < 10; digit++) {
+            const position = OdometerUtils.getFlapPosition(OdometerUtils.getRestingAngle(digit));
+
+            expect(((position % 10) + 10) % 10).toBe(digit);
+        }
+    });
+
+    it("rises by one flap for each step a turn takes going up, and never wraps", () => {
+        const from = OdometerUtils.getRestingAngle(9);
+        const to = from + OdometerUtils.computeAngleDelta(9, 0, "up");
+
+        expect(OdometerUtils.getFlapPosition(to) - OdometerUtils.getFlapPosition(from)).toBe(1);
+    });
+
+    it("falls the same way going down", () => {
+        const from = OdometerUtils.getRestingAngle(0);
+        const to = from + OdometerUtils.computeAngleDelta(0, 9, "down");
+
+        expect(OdometerUtils.getFlapPosition(to) - OdometerUtils.getFlapPosition(from)).toBe(-1);
+    });
+
+    it("counts a reel's extra turn as a full round of flaps", () => {
+        expect(OdometerUtils.getFlapPosition(OdometerUtils.computeReelAngle(1, "up"))).toBe(10);
+    });
+});
+
+describe("computeFlapRunPosition", () => {
+    it("stays at the start while waiting, and lands exactly on the end", () => {
+        expect(OdometerUtils.computeFlapRunPosition(2, 6, 50, 100, 400)).toBe(2);
+        expect(OdometerUtils.computeFlapRunPosition(2, 6, 500, 100, 400)).toBe(6);
+        expect(OdometerUtils.computeFlapRunPosition(0.3, 6, 900, 100, 400)).toBe(6);
+    });
+
+    it("moves at a steady rate once started, either way", () => {
+        expect(OdometerUtils.computeFlapRunPosition(2, 6, 300, 100, 400)).toBe(4);
+        expect(OdometerUtils.computeFlapRunPosition(6, 2, 300, 100, 400)).toBe(4);
+    });
+
+    it("jumps once the wait is over when there is no duration", () => {
+        expect(OdometerUtils.computeFlapRunPosition(2, 6, 99, 100, 0)).toBe(2);
+        expect(OdometerUtils.computeFlapRunPosition(2, 6, 100, 100, 0)).toBe(6);
+    });
+});
+
+describe("getDrawnFlapPosition", () => {
+    it("leaves a whole position where it is", () => {
+        expect(OdometerUtils.getDrawnFlapPosition(3)).toBe(3);
+        expect(OdometerUtils.getDrawnFlapPosition(-4)).toBe(-4);
+    });
+
+    it("keeps each flap inside its own step, and keeps the middle of a flap in the middle", () => {
+        expect(OdometerUtils.getDrawnFlapPosition(3.5)).toBe(3.5);
+        expect(OdometerUtils.getDrawnFlapPosition(3.25)).toBeGreaterThan(3);
+        expect(OdometerUtils.getDrawnFlapPosition(3.25)).toBeLessThan(3.25);
+        expect(OdometerUtils.getDrawnFlapPosition(3.75)).toBeGreaterThan(3.75);
+        expect(OdometerUtils.getDrawnFlapPosition(3.75)).toBeLessThan(4);
+    });
+
+    it("never runs backwards as the run goes on", () => {
+        let previous = OdometerUtils.getDrawnFlapPosition(0);
+
+        for (let step = 1; step <= 40; step++) {
+            const drawn = OdometerUtils.getDrawnFlapPosition(step / 10);
+
+            expect(drawn).toBeGreaterThanOrEqual(previous);
+            previous = drawn;
+        }
+    });
+});
+
+describe("getFlapWindow", () => {
+    it("draws the flap that fell last, the one on show and the next, standing on the one on show", () => {
+        expect(OdometerUtils.getFlapWindow(13)).toEqual({
+            leaves: [
+                { front: "2", back: "3" },
+                { front: "3", back: "4" },
+                { front: "4", back: "5" },
+            ],
+            position: 1,
+        });
+    });
+
+    it("wraps from nine to zero and below zero", () => {
+        expect(OdometerUtils.getFlapWindow(9.5).leaves[1]).toEqual({ front: "9", back: "0" });
+        expect(OdometerUtils.getFlapWindow(-0.25)).toEqual({
+            leaves: [
+                { front: "8", back: "9" },
+                { front: "9", back: "0" },
+                { front: "0", back: "1" },
+            ],
+            position: 1.75,
+        });
+    });
+
+    it("shows the same halves either side of a whole position", () => {
+        const landing = OdometerUtils.getFlapWindow(3.999999);
+        const landed = OdometerUtils.getFlapWindow(4);
+
+        expect(landing.leaves[1].back, "the bottom half the falling flap brings").toBe(landed.leaves[0].back);
+        expect(landing.leaves[2].front, "the top half standing behind it").toBe(landed.leaves[1].front);
+    });
+});
+
+describe("createFlapper", () => {
+    let now = 0;
+    let frames: ((nowMs: number) => void)[] = [];
+
+    const runFrame = (atMs: number) => {
+        now = atMs;
+
+        const due = frames;
+
+        frames = [];
+        due.forEach((callback) => callback(atMs));
+    };
+
+    beforeEach(() => {
+        now = 0;
+        frames = [];
+        vi.stubGlobal("performance", { now: () => now });
+        vi.stubGlobal("requestAnimationFrame", (callback: (nowMs: number) => void) => frames.push(callback));
+        vi.stubGlobal("cancelAnimationFrame", (handle: number) => {
+            frames = frames.filter((_callback, index) => index !== handle - 1);
+        });
+    });
+
+    afterEach(() => {
+        vi.unstubAllGlobals();
+    });
+
+    it("runs to the target on frames and stops asking for frames once there", () => {
+        const flapper = OdometerUtils.createFlapper(0);
+
+        flapper.flapTo(4, 0, 400);
+        runFrame(100);
+
+        expect(flapper.get()).toBe(1);
+
+        runFrame(400);
+
+        expect(flapper.get()).toBe(4);
+        expect(frames).toHaveLength(0);
+    });
+
+    it("does nothing when asked for the position it is resting on", () => {
+        const flapper = OdometerUtils.createFlapper(2);
+        const heard: number[] = [];
+
+        flapper.subscribe(() => heard.push(flapper.get()));
+        flapper.flapTo(2, 0, 400);
+
+        expect(frames).toHaveLength(0);
+        expect(heard).toEqual([]);
+    });
+
+    it("starts a new run from where the last one had reached", () => {
+        const flapper = OdometerUtils.createFlapper(0);
+
+        flapper.flapTo(4, 0, 400);
+        runFrame(200);
+        flapper.flapTo(0, 0, 200);
+        runFrame(300);
+
+        expect(flapper.get()).toBe(1);
+    });
+
+    it("waits out its delay before moving", () => {
+        const flapper = OdometerUtils.createFlapper(0);
+
+        flapper.flapTo(2, 100, 200);
+        runFrame(50);
+
+        expect(flapper.get()).toBe(0);
+    });
+
+    it("puts the position straight on with neither a wait nor a duration", () => {
+        const flapper = OdometerUtils.createFlapper(0);
+
+        flapper.flapTo(7, 0, 0);
+
+        expect(flapper.get()).toBe(7);
+        expect(frames).toHaveLength(0);
+    });
+
+    it("rests and stops on request", () => {
+        const flapper = OdometerUtils.createFlapper(0);
+
+        flapper.flapTo(4, 0, 400);
+        flapper.rest(9);
+
+        expect(flapper.get()).toBe(9);
+
+        flapper.flapTo(1, 0, 400);
+        runFrame(200);
+        flapper.stop();
+
+        expect(frames).toHaveLength(0);
+        expect(flapper.get()).toBe(5);
     });
 });

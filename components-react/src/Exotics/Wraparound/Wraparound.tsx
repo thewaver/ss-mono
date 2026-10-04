@@ -3,6 +3,8 @@ import { useEffect, useRef, useState } from "react";
 import { WRAPAROUND_DEFAULTS, WraparoundStyles, type WraparoundTile, WraparoundUtils } from "@thewaver/ss-components";
 
 import { ElementObserverReactUtils } from "../../Abstracts/ElementObserver/ElementObserverReact.utils";
+import { InteractionTrackerReactUtils } from "../../Abstracts/InteractionTracker/InteractionTrackerReact.utils";
+import { SignalMirrorReactUtils } from "../../Abstracts/SignalMirror/SignalMirrorReact.utils";
 import { useElement, useLatest } from "../../Utils/refUtils";
 import { useStore } from "../../Utils/storeUtils";
 import type { WraparoundProps } from "./Wraparound.types";
@@ -24,10 +26,17 @@ export const Wraparound = (props: WraparoundProps) => {
     const viewportSize = ElementObserverReactUtils.useBorderBoxSize(rootRef);
     const tileSize = ElementObserverReactUtils.useBorderBoxSize(originalRef);
 
-    const isDisabled = props.isDisabled ?? false;
-    const maxCopies = props.maxCopies ?? WRAPAROUND_DEFAULTS.maxCopies;
+    const [isPlaying] = SignalMirrorReactUtils.useOptionalState(props.playback, true);
+    const isHeld = InteractionTrackerReactUtils.useHold(rootRef);
 
-    const latest = useLatest({ props, isDisabled, viewportSize, tileSize });
+    const isDisabled = props.isDisabled ?? false;
+    const isMovable = props.isMovable ?? WRAPAROUND_DEFAULTS.isMovable;
+    const maxCopies = props.maxCopies ?? WRAPAROUND_DEFAULTS.maxCopies;
+    const driftPxPerSecond = props.driftPxPerSecond ?? WRAPAROUND_DEFAULTS.driftPxPerSecond;
+    const driftDegrees = props.driftDegrees ?? WRAPAROUND_DEFAULTS.driftDegrees;
+    const isDrifting = isPlaying && !isHeld && !isDisabled;
+
+    const latest = useLatest({ props, isDisabled, isMovable, viewportSize, tileSize });
 
     const [plane] = useState(() =>
         WraparoundUtils.createPlane({
@@ -35,6 +44,7 @@ export const Wraparound = (props: WraparoundProps) => {
             getViewportSize: () => latest.current.viewportSize,
             getOriginal: () => originalRef.current ?? undefined,
             getIsDisabled: () => latest.current.isDisabled,
+            getIsMovable: () => latest.current.isMovable,
             getMomentumMs: () => latest.current.props.momentumMs ?? WRAPAROUND_DEFAULTS.momentumMs,
             getGlideDurationMs: () => latest.current.props.glideDurationMs ?? WRAPAROUND_DEFAULTS.glideDurationMs,
             getKeyStepPx: () => latest.current.props.keyStepPx ?? WRAPAROUND_DEFAULTS.keyStepPx,
@@ -47,6 +57,10 @@ export const Wraparound = (props: WraparoundProps) => {
 
     useEffect(() => (root ? plane.observe(root) : undefined), [plane, root]);
 
+    useEffect(() => {
+        plane.setDrift(isDrifting ? WraparoundUtils.computeDriftVelocity(driftPxPerSecond, driftDegrees) : undefined);
+    }, [plane, isDrifting, driftPxPerSecond, driftDegrees]);
+
     const { offset, original, isDragging } = useStore(plane);
 
     const copyKeys = WraparoundUtils.computeTiles(offset, tileSize, viewportSize, maxCopies).map(toKey);
@@ -58,12 +72,16 @@ export const Wraparound = (props: WraparoundProps) => {
     return (
         <div
             ref={rootRef}
-            className={[WraparoundStyles.wraparoundRoot, isDragging && WraparoundStyles.isDragging]
+            className={[
+                WraparoundStyles.wraparoundRoot,
+                isDragging && WraparoundStyles.isDragging,
+                !isMovable && WraparoundStyles.isImmovable,
+            ]
                 .filter(Boolean)
                 .join(" ")}
             role="region"
             aria-label={props.ariaLabel}
-            tabIndex={isDisabled ? undefined : 0}
+            tabIndex={isDisabled || !isMovable ? undefined : 0}
         >
             <div
                 className={WraparoundStyles.wraparoundPlane}

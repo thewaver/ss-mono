@@ -9,6 +9,7 @@
     } from "@thewaver/ss-components";
 
     import { ElementObserverSvelteUtils } from "../../Abstracts/ElementObserver/ElementObserverSvelte.utils.svelte.js";
+    import { InteractionTrackerSvelteUtils } from "../../Abstracts/InteractionTracker/InteractionTrackerSvelte.utils.svelte.js";
     import { readStore } from "../../Utils/storeUtils.js";
     import type { WraparoundProps } from "./Wraparound.types.js";
 
@@ -22,7 +23,7 @@
         return { column, row };
     };
 
-    let props: WraparoundProps = $props();
+    let { playback = $bindable(true), ...props }: WraparoundProps = $props();
 
     let root = $state<HTMLDivElement>();
     let original = $state<HTMLDivElement>();
@@ -31,13 +32,21 @@
     const getTileSize = ElementObserverSvelteUtils.createBorderBoxSizeObserver(() => original ?? undefined);
 
     const isDisabled = $derived(props.isDisabled ?? false);
+    const isMovable = $derived(props.isMovable ?? WRAPAROUND_DEFAULTS.isMovable);
     const maxCopies = $derived(props.maxCopies ?? WRAPAROUND_DEFAULTS.maxCopies);
+    const driftPxPerSecond = $derived(props.driftPxPerSecond ?? WRAPAROUND_DEFAULTS.driftPxPerSecond);
+    const driftDegrees = $derived(props.driftDegrees ?? WRAPAROUND_DEFAULTS.driftDegrees);
+
+    const getIsHeld = InteractionTrackerSvelteUtils.trackHold(() => root);
+
+    const isDrifting = $derived(playback && !getIsHeld() && !isDisabled);
 
     const plane = WraparoundUtils.createPlane({
         getTileSize: () => untrack(getTileSize),
         getViewportSize: () => untrack(getViewportSize),
         getOriginal: () => untrack(() => original ?? undefined),
         getIsDisabled: () => untrack(() => isDisabled),
+        getIsMovable: () => untrack(() => isMovable),
         getMomentumMs: () => untrack(() => props.momentumMs ?? WRAPAROUND_DEFAULTS.momentumMs),
         getGlideDurationMs: () => untrack(() => props.glideDurationMs ?? WRAPAROUND_DEFAULTS.glideDurationMs),
         getKeyStepPx: () => untrack(() => props.keyStepPx ?? WRAPAROUND_DEFAULTS.keyStepPx),
@@ -51,6 +60,10 @@
         if (!element) return;
 
         return untrack(() => plane.observe(element));
+    });
+
+    $effect(() => {
+        plane.setDrift(isDrifting ? WraparoundUtils.computeDriftVelocity(driftPxPerSecond, driftDegrees) : undefined);
     });
 
     const getOffset = readStore(plane, (state) => state.offset);
@@ -78,10 +91,10 @@
 
 <div
     bind:this={root}
-    class={[styles.wraparoundRoot, getIsDragging() && styles.isDragging]}
+    class={[styles.wraparoundRoot, getIsDragging() && styles.isDragging, !isMovable && styles.isImmovable]}
     role="region"
     aria-label={props.ariaLabel}
-    tabindex={isDisabled ? undefined : 0}
+    tabindex={isDisabled || !isMovable ? undefined : 0}
 >
     <div class={styles.wraparoundPlane} style:transform={`translate(${getOffset().x}px, ${getOffset().y}px)`}>
         <div bind:this={original} class={styles.wraparoundTile} style:transform={toTileTransform(getOriginalTile())}>

@@ -1,17 +1,24 @@
 import { createMemo, createSignal } from "solid-js";
 
-import { DIE_DEFAULTS, DieShapes, MediaQueryMonitorSolidUtils } from "@thewaver/ss-components-solid";
+import { DIE_DEFAULTS, DieShapes, MediaQueryMonitorSolidUtils, RollerUtils } from "@thewaver/ss-components-solid";
 import { DieKnobs } from "@thewaver/ss-playground/App/Knobs/Dice.const";
+import {
+    ICON_CLOUD_EMPTY_LABEL,
+    ICON_CLOUD_ICONS,
+    ICON_CLOUD_TURN_MS,
+} from "@thewaver/ss-playground/App/Pages/DiePage/DiePage.const";
 
 import { PageExamples } from "../../PageComponents/Examples/Examples";
 import { PageNumberField, PageSelectField } from "../../PageComponents/Field/Field";
 import { PageProp } from "../../PageComponents/Prop/Prop";
 import { PagePropsPanel } from "../../PageComponents/PropsPanel/PropsPanel";
+import { IconCloudExample } from "./Examples/IconCloud";
 import { TabletopExample } from "./Examples/Tabletop";
 
 const EXAMPLES_ROOT = "/src/App/Pages/DiePage/Examples";
 
 const DIE_SIZE = 160;
+const CLOUD_SIZE = 240;
 const NO_MOTION_DURATION_MS = 0;
 const FIRST_NUMBER = 1;
 
@@ -21,10 +28,22 @@ export const DiePage = () => {
     const [getTumbleCount, setTumbleCount] = createSignal(DIE_DEFAULTS.tumbleCount);
 
     const dieFaceSignal = createSignal(0);
+    const cloudFaceSignal = createSignal(0);
+    const cloudAutoSpinSignal = createSignal(true);
 
     const getPrefersReducedMotion = MediaQueryMonitorSolidUtils.createReducedMotion();
 
     const getShownRollDurationMs = () => (getPrefersReducedMotion() ? NO_MOTION_DURATION_MS : getRollDurationMs());
+
+    const getShownSettleDurationMs = () =>
+        getPrefersReducedMotion() ? NO_MOTION_DURATION_MS : DIE_DEFAULTS.settleDurationMs;
+
+    const getShownMomentumMs = () => (getPrefersReducedMotion() ? NO_MOTION_DURATION_MS : DIE_DEFAULTS.momentumMs);
+
+    const getShape = () => DieShapes.SAMPLE_SHAPES[getShapeKey()];
+
+    const getCloudIdleDelayMs = () =>
+        getPrefersReducedMotion() ? undefined : ICON_CLOUD_TURN_MS / getShape().faces.length;
 
     const getExamples = createMemo(() => [
         {
@@ -34,21 +53,44 @@ export const DiePage = () => {
                 `showing ${dieFaceSignal[0]() + FIRST_NUMBER} of ${DieShapes.SAMPLE_SHAPES[getShapeKey()].faces.length} — the page picks the number, and the die tumbles and lands on it`,
             component: () => (
                 <TabletopExample
-                    shape={() => DieShapes.SAMPLE_SHAPES[getShapeKey()]}
+                    shape={getShape}
                     size={() => DIE_SIZE}
                     rollDurationMs={getShownRollDurationMs}
+                    settleDurationMs={getShownSettleDurationMs}
                     tumbleCount={getTumbleCount}
                     face={dieFaceSignal}
                 />
             ),
             path: `${EXAMPLES_ROOT}/Tabletop.tsx`,
         },
+        {
+            key: "iconCloud",
+            name: "Icon cloud",
+            readout: () =>
+                `${cloudAutoSpinSignal[0]() ? "turning by itself" : "paused"}, facing ${ICON_CLOUD_ICONS[RollerUtils.clampFace(cloudFaceSignal[0](), getShape().faces.length)]?.label ?? ICON_CLOUD_EMPTY_LABEL} — drag it, or focus it and use the arrow keys, and it settles on the nearest icon`,
+            component: () => (
+                <IconCloudExample
+                    shape={getShape}
+                    size={() => CLOUD_SIZE}
+                    idleDelayMs={getCloudIdleDelayMs}
+                    settleDurationMs={getShownSettleDurationMs}
+                    momentumMs={getShownMomentumMs}
+                    face={cloudFaceSignal}
+                    autoSpin={cloudAutoSpinSignal}
+                />
+            ),
+            path: `${EXAMPLES_ROOT}/IconCloud.tsx`,
+        },
     ]);
 
     return (
         <>
             <PagePropsPanel scope={"global"}>
-                <PageProp key={"shape"} label={"Die"} hint={"Which die to roll, from four faces to a hundred."}>
+                <PageProp
+                    key={"shape"}
+                    label={"Die"}
+                    hint={"Which solid both examples are, from four faces to a hundred."}
+                >
                     <PageSelectField
                         value={getShapeKey}
                         values={() => DieShapes.SAMPLE_KEYS}

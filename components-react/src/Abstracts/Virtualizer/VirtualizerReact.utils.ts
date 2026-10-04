@@ -9,7 +9,6 @@ import {
     elementScroll,
     measureElement,
     observeElementOffset,
-    observeElementRect,
 } from "@tanstack/virtual-core";
 import { type VirtualizerRow, VirtualizerUtils } from "@thewaver/ss-components";
 
@@ -124,7 +123,7 @@ export namespace VirtualizerReactUtils {
 
                 return instance.options.horizontal ? box.inlineSize : box.blockSize;
             },
-            observeElementRect,
+            observeElementRect: VirtualizerUtils.observeClientRect,
             observeElementOffset,
             scrollToFn: elementScroll,
             onChange: (_instance, isSync) => (isSync && !isInsideReactRef.current ? flushSync(rerender) : rerender()),

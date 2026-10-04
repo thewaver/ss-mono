@@ -3,7 +3,8 @@ import { useMemo, useState } from "react";
 import { CAROUSEL_DEFAULTS, CarouselPlacementUtils, CarouselPlacements } from "@thewaver/ss-components-react";
 import type { CarouselOrientation } from "@thewaver/ss-components-react";
 import { CarouselKnobs } from "@thewaver/ss-playground/App/Knobs/Carousels.const";
-import { NARROW_PLACEMENTS, TITLES } from "@thewaver/ss-playground/App/Pages/Carousels/Carousels.const";
+import { PLACEMENT_FRAMES, TITLES } from "@thewaver/ss-playground/App/Pages/Carousels/Carousels.const";
+import * as styles from "@thewaver/ss-playground/App/Pages/Carousels/Carousels.css";
 
 import type { CarouselsControls } from "./Carousels.types";
 
@@ -33,7 +34,7 @@ export const useCarouselsControls = (): CarouselsControls => {
             isDisabled,
             orientation,
             computePlacement,
-            isNarrow: NARROW_PLACEMENTS.includes(placement),
+            frameClasses: styles.slideFrames[PLACEMENT_FRAMES[placement] ?? "whole"][orientation],
         }),
         [slides, isDisabled, orientation, computePlacement, placement],
     );

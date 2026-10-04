@@ -1,10 +1,11 @@
-import { type SlotsType, defineComponent, onScopeDispose, shallowRef } from "vue";
+import { type SlotsType, computed, defineComponent, onScopeDispose, shallowRef } from "vue";
 
 import { WRAPAROUND_DEFAULTS, WraparoundStyles, type WraparoundTile, WraparoundUtils } from "@thewaver/ss-components";
 
 import { ElementObserverVueUtils } from "../../Abstracts/ElementObserver/ElementObserverVue.utils";
+import { InteractionTrackerVueUtils } from "../../Abstracts/InteractionTracker/InteractionTrackerVue.utils";
 import { watchAfterRender } from "../../Utils/effectUtils";
-import { callSlot, declareProps } from "../../Utils/propUtils";
+import { callSlot, declareProps, useTwoWay } from "../../Utils/propUtils";
 import { useStableList } from "../../Utils/refUtils";
 import { useStore } from "../../Utils/storeUtils";
 import type { SlotsContext } from "../../Utils/typeUtils";
@@ -29,13 +30,18 @@ export const Wraparound = defineComponent(
         const viewportSize = ElementObserverVueUtils.useBorderBoxSize(rootRef);
         const tileSize = ElementObserverVueUtils.useBorderBoxSize(originalRef);
 
+        const isPlaying = useTwoWay(props, "playback", true);
+        const isHeld = InteractionTrackerVueUtils.useHold(rootRef);
+
         const getIsDisabled = () => props.isDisabled ?? false;
+        const getIsMovable = () => props.isMovable ?? WRAPAROUND_DEFAULTS.isMovable;
 
         const plane = WraparoundUtils.createPlane({
             getTileSize: () => tileSize.value,
             getViewportSize: () => viewportSize.value,
             getOriginal: () => originalRef.value,
             getIsDisabled,
+            getIsMovable,
             getMomentumMs: () => props.momentumMs ?? WRAPAROUND_DEFAULTS.momentumMs,
             getGlideDurationMs: () => props.glideDurationMs ?? WRAPAROUND_DEFAULTS.glideDurationMs,
             getKeyStepPx: () => props.keyStepPx ?? WRAPAROUND_DEFAULTS.keyStepPx,
@@ -44,6 +50,18 @@ export const Wraparound = defineComponent(
         onScopeDispose(plane.destroy);
 
         watchAfterRender([rootRef], ([root]) => (root ? plane.observe(root) : undefined));
+
+        const isDrifting = computed(() => isPlaying.value && !isHeld.value && !getIsDisabled());
+
+        watchAfterRender(
+            [
+                isDrifting,
+                () => props.driftPxPerSecond ?? WRAPAROUND_DEFAULTS.driftPxPerSecond,
+                () => props.driftDegrees ?? WRAPAROUND_DEFAULTS.driftDegrees,
+            ],
+            ([drifting, pxPerSecond, degrees]) =>
+                plane.setDrift(drifting ? WraparoundUtils.computeDriftVelocity(pxPerSecond, degrees) : undefined),
+        );
 
         const offset = useStore(plane, (state) => state.offset);
         const originalTile = useStore(plane, (state) => state.original);
@@ -68,10 +86,14 @@ export const Wraparound = defineComponent(
             return (
                 <div
                     ref={rootRef}
-                    class={[WraparoundStyles.wraparoundRoot, isDragging.value && WraparoundStyles.isDragging]}
+                    class={[
+                        WraparoundStyles.wraparoundRoot,
+                        isDragging.value && WraparoundStyles.isDragging,
+                        !getIsMovable() && WraparoundStyles.isImmovable,
+                    ]}
                     role="region"
                     aria-label={props.ariaLabel}
-                    tabindex={getIsDisabled() ? undefined : 0}
+                    tabindex={getIsDisabled() || !getIsMovable() ? undefined : 0}
                 >
                     <div
                         class={WraparoundStyles.wraparoundPlane}
@@ -109,12 +131,17 @@ export const Wraparound = defineComponent(
         name: "Wraparound",
         slots: Object as SlotsType<WraparoundSlots>,
         props: declareProps<WraparoundProps>({
-            ariaLabel: null,
-            isDisabled: Boolean,
-            momentumMs: null,
-            glideDurationMs: null,
-            keyStepPx: null,
-            maxCopies: null,
+            "ariaLabel": null,
+            "isDisabled": Boolean,
+            "momentumMs": null,
+            "glideDurationMs": null,
+            "keyStepPx": null,
+            "maxCopies": null,
+            "isMovable": Boolean,
+            "driftPxPerSecond": null,
+            "driftDegrees": null,
+            "playback": Boolean,
+            "onUpdate:playback": null,
         }),
     },
 );

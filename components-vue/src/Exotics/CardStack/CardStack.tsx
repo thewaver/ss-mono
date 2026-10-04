@@ -93,6 +93,7 @@ export const CardStack = defineComponent(
             const mountedCount = Math.max(props.mountedCount ?? CARD_STACK_DEFAULTS.mountedCount, MIN_MOUNTED_COUNT);
             const cardGap = props.cardGap ?? CARD_STACK_DEFAULTS.cardGap;
             const funnelRatio = props.funnelRatio ?? CARD_STACK_DEFAULTS.funnelRatio;
+            const pileSide = props.pileSide ?? CARD_STACK_DEFAULTS.pileSide;
             const isDisabled = getIsDisabled();
             const pileExtentPx = CardStackUtils.getPileExtentPx(mountedCount, cardGap);
             const mounted = CardStackUtils.getMounted(props.cards, topIndex.value, mountedCount);
@@ -124,6 +125,7 @@ export const CardStack = defineComponent(
                                         mountedLength: mounted.length,
                                         pileExtentPx,
                                         cardGap,
+                                        pileSide,
                                         getMotion: () => motion.value,
                                     }),
                                     transitionDuration: `${CardStackUtils.getCardTransitionDurationMs(depth, {
@@ -163,6 +165,7 @@ export const CardStack = defineComponent(
             "mountedCount": null,
             "cardGap": null,
             "funnelRatio": null,
+            "pileSide": null,
             "allowedDirections": null,
             "isDisabled": Boolean,
             "ariaLabel": null,

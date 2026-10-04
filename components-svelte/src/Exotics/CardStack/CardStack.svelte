@@ -22,6 +22,7 @@
     const mountedCount = $derived(Math.max(props.mountedCount ?? CARD_STACK_DEFAULTS.mountedCount, MIN_MOUNTED_COUNT));
     const cardGap = $derived(props.cardGap ?? CARD_STACK_DEFAULTS.cardGap);
     const funnelRatio = $derived(props.funnelRatio ?? CARD_STACK_DEFAULTS.funnelRatio);
+    const pileSide = $derived(props.pileSide ?? CARD_STACK_DEFAULTS.pileSide);
     const allowedDirections = $derived(props.allowedDirections ?? CARD_STACK_DEFAULTS.allowedDirections);
     const isDisabled = $derived(props.isDisabled ?? false);
     const isEmpty = $derived(topIndex >= props.cards.length);
@@ -112,6 +113,7 @@
                 mountedLength: mounted.length,
                 pileExtentPx,
                 cardGap,
+                pileSide,
                 getMotion,
             })}
             style:transition-duration={`${CardStackUtils.getCardTransitionDurationMs(depth, {

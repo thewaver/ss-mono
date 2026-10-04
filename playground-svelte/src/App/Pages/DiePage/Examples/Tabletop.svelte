@@ -23,6 +23,7 @@
         shape={props.shape}
         size={props.size}
         rollDurationMs={props.rollDurationMs}
+        settleDurationMs={props.settleDurationMs}
         tumbleCount={props.tumbleCount}
         bind:face
         ariaLabel={"A die"}

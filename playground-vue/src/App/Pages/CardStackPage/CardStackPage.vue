@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { shallowRef } from "vue";
 
-import { CARD_STACK_DEFAULTS } from "@thewaver/ss-components-vue";
+import { CARD_STACK_DEFAULTS, CARD_STACK_PILE_SIDES, type CardStackPileSide } from "@thewaver/ss-components-vue";
 import { CardStackKnobs } from "@thewaver/ss-playground/App/Knobs/CardStacks.const";
 import type { SwipeDirection } from "@thewaver/ss-utils";
 
@@ -9,6 +9,7 @@ import type { ExampleDefs } from "../../PageComponents/Examples/Examples.types";
 import PageExamples from "../../PageComponents/Examples/PageExamples.vue";
 import PageCheckField from "../../PageComponents/Field/PageCheckField.vue";
 import PageNumberField from "../../PageComponents/Field/PageNumberField.vue";
+import PageSelectField from "../../PageComponents/Field/PageSelectField.vue";
 import PageProp from "../../PageComponents/Prop/Prop.vue";
 import PagePropsPanel from "../../PageComponents/PropsPanel/PagePropsPanel.vue";
 import DeckExample from "./Examples/Deck.vue";
@@ -24,6 +25,7 @@ const transitionDurationMs = shallowRef(CARD_STACK_DEFAULTS.transitionDurationMs
 const mountedCount = shallowRef(CARD_STACK_DEFAULTS.mountedCount);
 const cardGap = shallowRef(CARD_STACK_DEFAULTS.cardGap);
 const funnelRatio = shallowRef(CARD_STACK_DEFAULTS.funnelRatio);
+const pileSide = shallowRef(CARD_STACK_DEFAULTS.pileSide);
 
 const lastSend = shallowRef<{ direction: SwipeDirection; card: string }>();
 const isEmpty = shallowRef(false);
@@ -156,6 +158,19 @@ const examples: ExampleDefs[] = [
                 @input="(value: number) => (funnelRatio = value)"
             />
         </PageProp>
+
+        <PageProp
+            item-key="pileSide"
+            label="Pile side"
+            hint="The edge the cards behind the top one peek out of: below the top card, or above it."
+        >
+            <PageSelectField
+                :value="pileSide"
+                :values="CARD_STACK_PILE_SIDES"
+                ariaLabel="Pile side"
+                @change="(side: CardStackPileSide) => (pileSide = side)"
+            />
+        </PageProp>
     </PagePropsPanel>
 
     <PageExamples :items="examples">
@@ -167,6 +182,7 @@ const examples: ExampleDefs[] = [
                 :mounted-count="mountedCount"
                 :card-gap="cardGap"
                 :funnel-ratio="funnelRatio"
+                :pile-side="pileSide"
                 @send="(direction: SwipeDirection, card: string) => (lastSend = { direction, card })"
                 @empty="isEmpty = true"
                 @deal="deal"
@@ -182,6 +198,7 @@ const examples: ExampleDefs[] = [
                 :mounted-count="mountedCount"
                 :card-gap="cardGap"
                 :funnel-ratio="funnelRatio"
+                :pile-side="pileSide"
                 @send="(direction: SwipeDirection, card: string) => (lastEndlessSend = { direction, card })"
                 @load="(count: number) => (loadedCount = count)"
             />

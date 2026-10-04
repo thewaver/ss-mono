@@ -311,6 +311,29 @@ test("a progress driven by a scroll moves the slides, and the slide showing foll
 });
 
 /**
+ * The word drum is the scrolled carousel again under the drum rule, run up and down, with words for slides. What it
+ * adds is that the scroll rolls the words round the drum rather than sliding them, so a word part-way through the
+ * scroll is the one the drum has turned to the front.
+ */
+test("scrolling the word drum rolls it round to the last word", async ({ page }) => {
+    const wordReadout = async () => (await readout(page, "wordDrum")).match(/^word (\d+) of (\d+)/)!.slice(1);
+
+    expect((await wordReadout())[0]).toBe("1");
+
+    await page.locator("#wordDrumScrollBox").evaluate((element) => {
+        element.scrollTop = element.scrollHeight;
+    });
+
+    await expect
+        .poll(async () => {
+            const [word, count] = await wordReadout();
+
+            return word === count;
+        }, "scrolled to the end, the last word is at the front")
+        .toBe(true);
+});
+
+/**
  * The ring turns on its own, with its progress written on a clock, so WCAG 2.2.2 asks for a way to stop it. The
  * example's own button is that way, and once pressed the turn holds still.
  */

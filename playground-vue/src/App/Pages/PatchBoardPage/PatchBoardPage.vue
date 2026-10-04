@@ -27,6 +27,7 @@ import PageNumberField from "../../PageComponents/Field/PageNumberField.vue";
 import PageMeasureBox from "../../PageComponents/MeasureBox/MeasureBox.vue";
 import PageProp from "../../PageComponents/Prop/Prop.vue";
 import PagePropsPanel from "../../PageComponents/PropsPanel/PagePropsPanel.vue";
+import BeamsExample from "./Examples/Beams.vue";
 import ChainExample from "./Examples/Chain.vue";
 import MixerExample from "./Examples/Mixer.vue";
 import PanExample from "./Examples/Pan.vue";
@@ -50,6 +51,7 @@ const mixerAction = shallowRef(NOTHING_DONE);
 const rackAction = shallowRef(NOTHING_DONE);
 const panAction = shallowRef(NOTHING_DONE);
 const zoomAction = shallowRef(NOTHING_DONE);
+const beamsAction = shallowRef(NOTHING_DONE);
 const zoom = shallowRef(STARTING_ZOOM);
 
 const chainNodes = shallowRef(CHAIN_NODES);
@@ -62,6 +64,8 @@ const panNodes = shallowRef(PAN_NODES);
 const panLinks = shallowRef(PAN_LINKS);
 const zoomNodes = shallowRef(CHAIN_NODES);
 const zoomLinks = shallowRef(CHAIN_LINKS);
+const beamsNodes = shallowRef(CHAIN_NODES);
+const beamsLinks = shallowRef(CHAIN_LINKS);
 
 const examples: ExampleDefs[] = [
     {
@@ -103,6 +107,14 @@ const examples: ExampleDefs[] = [
         readout: () =>
             `${zoomLinks.value.length} cables at ${Math.round(zoom.value * PERCENT)}%, last: ${zoomAction.value} — the board is scaled with a CSS transform, and a drag still lands under the pointer`,
         path: `${EXAMPLES_ROOT}/Zoom.vue`,
+    },
+    {
+        key: "beams",
+        name: "The signal running along its cables",
+        span: WIDE_SPAN,
+        readout: () =>
+            `${beamsLinks.value.length} cables, last: ${beamsAction.value} — a pulse runs along every plugged cable from the output to the input it feeds, taking the same time on a long cable as on a short one; Pause stops it`,
+        path: `${EXAMPLES_ROOT}/Beams.vue`,
     },
 ];
 </script>
@@ -223,6 +235,21 @@ const examples: ExampleDefs[] = [
                 @unlink="(link: PatchBoardLink) => (zoomAction = `unplugged ${getLinkWords(link)}`)"
                 @move="(nodeKey: string) => (zoomAction = `moved ${nodeKey}`)"
             />
+        </template>
+
+        <template #beams>
+            <PageMeasureBox :width="BOARD_WIDTH">
+                <BeamsExample
+                    v-model:nodes="beamsNodes"
+                    v-model:links="beamsLinks"
+                    :socket-size="socketSize"
+                    :is-locked="isLocked"
+                    :is-disabled="isDisabled"
+                    @link="(link: PatchBoardLink) => (beamsAction = `connected ${getLinkWords(link)}`)"
+                    @unlink="(link: PatchBoardLink) => (beamsAction = `unplugged ${getLinkWords(link)}`)"
+                    @move="(nodeKey: string) => (beamsAction = `moved ${nodeKey}`)"
+                />
+            </PageMeasureBox>
         </template>
     </PageExamples>
 </template>

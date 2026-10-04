@@ -1,6 +1,8 @@
 <script setup lang="ts">
 import { shallowRef } from "vue";
 
+import { CarouselKnobs } from "@thewaver/ss-playground/App/Knobs/Carousels.const";
+
 import type { ExampleDefs } from "../../../PageComponents/Examples/Examples.types";
 import PageExamples from "../../../PageComponents/Examples/PageExamples.vue";
 import PageCarouselBox from "../../../StyledComponents/CarouselContent/PageCarouselBox.vue";
@@ -11,6 +13,7 @@ import RingExample from "./Examples/Ring.vue";
 import RotatingExample from "./Examples/Rotating.vue";
 import ScrolledExample from "./Examples/Scrolled.vue";
 import SteppedExample from "./Examples/Stepped.vue";
+import WordDrumExample from "./Examples/WordDrum.vue";
 
 const EXAMPLES_ROOT = "/src/App/Pages/Carousels/CarouselPage/Examples";
 
@@ -24,6 +27,7 @@ const rotatingPlaying = shallowRef(true);
 const barelessIndex = shallowRef(0);
 const scrolledIndex = shallowRef(0);
 const ringIndex = shallowRef(0);
+const wordDrumIndex = shallowRef(0);
 
 const examples: ExampleDefs[] = [
     {
@@ -58,8 +62,15 @@ const examples: ExampleDefs[] = [
         key: "ring",
         name: "A ring that turns and leans",
         readout: () =>
-            `slide ${ringIndex.value + 1} of ${controls.slideCount.value} — a placement rule written in the example, a wide ring of small slides inside a Tilter, with its progress written on a clock for a continuous turn; Stop is the way to halt it that a turn running on its own owes the reader`,
+            `slide ${ringIndex.value + 1} of ${controls.slideCount.value} — the paddle wheel rule, the slides standing round an upright spine with each painting only the half away from it, inside a Tilter, with its progress written on a clock for a continuous turn; Stop is the way to halt it that a turn running on its own owes the reader`,
         path: `${EXAMPLES_ROOT}/Ring.vue`,
+    },
+    {
+        key: "wordDrum",
+        name: "A drum of words turned by scrolling",
+        readout: () =>
+            `word ${wordDrumIndex.value + 1} of ${CarouselKnobs.WORD_DRUM_WORDS.length} — the drum rule with a word on each face, its progress written by the box's scroll, so scrolling rolls the next word up`,
+        path: `${EXAMPLES_ROOT}/WordDrum.vue`,
     },
 ];
 </script>
@@ -103,6 +114,10 @@ const examples: ExampleDefs[] = [
                 :is-disabled="isDisabled"
                 :orientation="orientation"
             />
+        </template>
+
+        <template #wordDrum>
+            <WordDrumExample v-model:index="wordDrumIndex" :is-disabled="isDisabled" />
         </template>
     </PageExamples>
 </template>

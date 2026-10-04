@@ -7,6 +7,7 @@ import type {
     BracketOrientation,
     BracketPlacement,
     BracketRootSide,
+    BracketView,
 } from "@thewaver/ss-components";
 import type { Size2d } from "@thewaver/ss-utils";
 
@@ -33,6 +34,19 @@ export type BracketProps<T> = AccessorProps<{
      * that follows `orientation` and `rootSide` with the layers.
      */
     renderLayerHeader?: (layer: number) => JSX.Element;
+    /**
+     * `"tree"` draws every node. `"family"` draws one family at a time and follows focus: the node the focused one
+     * feeds, the focused node with all its siblings, and every node that feeds those siblings. Focusing the root, or
+     * nothing, shows the root and the nodes that feed it. Every other node folds onto the family member it hangs from,
+     * unseen and out of reach of Tab and a screen reader, and the board keeps the size of the largest family so the
+     * page around it never shifts.
+     */
+    view?: BracketView;
+    /**
+     * How long the family view takes to glide from one family to the next. `0` jumps, which is the reduced-motion
+     * route. Ignored in the tree view.
+     */
+    transitionDurationMs?: number;
 }> & {
     /** The final, with the rounds that feed it hanging off it as children. */
     root: MaybeAccessor<BracketNode<T>>;
@@ -42,4 +56,9 @@ export type BracketProps<T> = AccessorProps<{
     renderConnector?: (getDefs: Accessor<BracketConnectorDefs>) => JSX.Element;
     /** Runs when a node is activated, handed its value and where it sits, so two nodes with the same value can be told apart. */
     onActivate?: (value: T, placement: BracketPlacement) => void;
+    /**
+     * Runs in the family view when it first shows a family and whenever it moves to another, handed the value and
+     * placement of the node the family's middle row feeds. Both are `undefined` while the root's own family shows.
+     */
+    onFamilyChange?: (value: T | undefined, placement: BracketPlacement | undefined) => void;
 };

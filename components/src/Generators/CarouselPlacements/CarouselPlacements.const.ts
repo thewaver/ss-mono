@@ -5,6 +5,7 @@ import type {
     DrumPlacementDefs,
     FoldersPlacementDefs,
     HingePlacementDefs,
+    PaddleWheelPlacementDefs,
     TrackPlacementDefs,
 } from "./CarouselPlacements.types";
 
@@ -52,6 +53,11 @@ export namespace CarouselPlacementDefaults {
         visibleDistance: 4,
     };
 
+    export const PADDLE_WHEEL_DEFAULTS: Required<PaddleWheelPlacementDefs> = {
+        spanDegrees: 360,
+        perspectivePx: 1000,
+    };
+
     export const DEFAULTS_BY_FAMILY = {
         track: TRACK_DEFAULTS,
         drum: DRUM_DEFAULTS,
@@ -60,5 +66,6 @@ export namespace CarouselPlacementDefaults {
         cylinder: CYLINDER_DEFAULTS,
         folders: FOLDERS_DEFAULTS,
         hinge: HINGE_DEFAULTS,
+        paddleWheel: PADDLE_WHEEL_DEFAULTS,
     };
 }

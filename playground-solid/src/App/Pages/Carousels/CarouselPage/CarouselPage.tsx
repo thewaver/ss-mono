@@ -1,5 +1,7 @@
 import { createMemo, createSignal } from "solid-js";
 
+import { CarouselKnobs } from "@thewaver/ss-playground/App/Knobs/Carousels.const";
+
 import { PageExamples } from "../../../PageComponents/Examples/Examples";
 import { PageCarouselBox } from "../../../StyledComponents/CarouselContent/CarouselContent";
 import { createCarouselsControls } from "../Carousels.utils";
@@ -9,6 +11,7 @@ import { RingExample } from "./Examples/Ring";
 import { RotatingExample } from "./Examples/Rotating";
 import { ScrolledExample } from "./Examples/Scrolled";
 import { SteppedExample } from "./Examples/Stepped";
+import { WordDrumExample } from "./Examples/WordDrum";
 
 const EXAMPLES_ROOT = "/src/App/Pages/Carousels/CarouselPage/Examples";
 
@@ -21,6 +24,7 @@ export const CarouselPage = () => {
     const barelessIndexSignal = createSignal(0);
     const scrolledIndexSignal = createSignal(0);
     const ringIndexSignal = createSignal(0);
+    const wordDrumIndexSignal = createSignal(0);
 
     const getExamples = createMemo(() => [
         {
@@ -81,7 +85,7 @@ export const CarouselPage = () => {
             key: "ring",
             name: "A ring that turns and leans",
             readout: () =>
-                `slide ${ringIndexSignal[0]() + 1} of ${controls.getSlideCount()} — a placement rule written in the example, a wide ring of small slides inside a Tilter, with its progress written on a clock for a continuous turn; Stop is the way to halt it that a turn running on its own owes the reader`,
+                `slide ${ringIndexSignal[0]() + 1} of ${controls.getSlideCount()} — the paddle wheel rule, the slides standing round an upright spine with each painting only the half away from it, inside a Tilter, with its progress written on a clock for a continuous turn; Stop is the way to halt it that a turn running on its own owes the reader`,
             component: () => (
                 <RingExample
                     slides={controls.getSlides}
@@ -91,6 +95,14 @@ export const CarouselPage = () => {
                 />
             ),
             path: `${EXAMPLES_ROOT}/Ring.tsx`,
+        },
+        {
+            key: "wordDrum",
+            name: "A drum of words turned by scrolling",
+            readout: () =>
+                `word ${wordDrumIndexSignal[0]() + 1} of ${CarouselKnobs.WORD_DRUM_WORDS.length} — the drum rule with a word on each face, its progress written by the box's scroll, so scrolling rolls the next word up`,
+            component: () => <WordDrumExample index={wordDrumIndexSignal} isDisabled={controls.isDisabled[0]} />,
+            path: `${EXAMPLES_ROOT}/WordDrum.tsx`,
         },
     ]);
 

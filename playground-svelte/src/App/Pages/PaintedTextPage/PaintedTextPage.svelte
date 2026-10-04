@@ -1,5 +1,6 @@
 <script lang="ts">
     import {
+        MediaQueryMonitorSvelteUtils,
         PAINTED_TEXT_DEFAULTS,
         type PaintedTextStrokeAlignment,
         type SVGDefsColors,
@@ -20,14 +21,18 @@
     import PagePropsDivider from "../../PageComponents/PropsPanel/PagePropsDivider.svelte";
     import PagePropsGroups from "../../PageComponents/PropsPanel/PagePropsGroups.svelte";
     import PagePropsPanel from "../../PageComponents/PropsPanel/PagePropsPanel.svelte";
+    import CircleExampleWrapper from "./CircleExampleWrapper.svelte";
     import CustomInputExampleWrapper from "./CustomInputExampleWrapper.svelte";
     import HeadingExampleWrapper from "./HeadingExampleWrapper.svelte";
     import type { PaintedTextExampleWrapperProps } from "./PaintedTextPage.types";
     import ParagraphExampleWrapper from "./ParagraphExampleWrapper.svelte";
     import ScrambledExampleWrapper from "./ScrambledExampleWrapper.svelte";
     import TypedExampleWrapper from "./TypedExampleWrapper.svelte";
+    import WaveExampleWrapper from "./WaveExampleWrapper.svelte";
 
     const EXAMPLES_ROOT = "/src/App/Pages/PaintedTextPage/Examples";
+
+    const PERCENT = 100;
 
     const fill = createPaintSlot(PaintedTextKnobs.STARTING_FILL_PAINT_KIND, PaintedTextKnobs.STARTING_KEYS);
     const stroke = createPaintSlot(PaintedTextKnobs.STARTING_STROKE_PAINT_KIND, PaintedTextKnobs.STARTING_KEYS);
@@ -40,6 +45,15 @@
     let iterationConfigKey = $state<SVGDefsSamples.Iteration.SampleKey>(PaintedTextKnobs.STARTING_ITERATION_KEY);
     let cellSize = $state(PaintedTextKnobs.STARTING_CELL_SIZE);
     let colors = $state.raw<SVGDefsColors>({ ...SVGDefsSamples.SAMPLE_COLORS });
+
+    const getPrefersReducedMotion = MediaQueryMonitorSvelteUtils.createReducedMotion();
+
+    let circleProgress = $state(0);
+    let circlePlaying = $state(!getPrefersReducedMotion());
+    let waveProgress = $state(0);
+    let wavePlaying = $state(!getPrefersReducedMotion());
+
+    const getPercent = (progress: number) => `${Math.round(progress * PERCENT)}%`;
 
     const colorKeys = $derived(Object.keys(colors) as (keyof SVGDefsColors)[]);
 
@@ -98,6 +112,22 @@
             component: scrambledExample,
             path: `${EXAMPLES_ROOT}/Scrambled.svelte`,
         },
+        {
+            key: "circle",
+            name: "Round a circle",
+            readout: () =>
+                `${getPercent(circleProgress)} round the circle, ${circlePlaying ? "turning" : "stopped"} — the browser sets every letter along the path, the paint runs across the ring as one, and what slides past the end comes round from the start`,
+            component: circleExample,
+            path: `${EXAMPLES_ROOT}/Circle.svelte`,
+        },
+        {
+            key: "wave",
+            name: "Along a wave",
+            readout: () =>
+                `${getPercent(waveProgress)} along the wave, ${wavePlaying ? "sliding" : "stopped"} — any path will do, and on an open one the text leaves at the far end as it comes back in at the near one`,
+            component: waveExample,
+            path: `${EXAMPLES_ROOT}/Wave.svelte`,
+        },
     ];
 </script>
 
@@ -119,6 +149,14 @@
 
 {#snippet scrambledExample()}
     <ScrambledExampleWrapper {...commonProps} />
+{/snippet}
+
+{#snippet circleExample()}
+    <CircleExampleWrapper {...commonProps} bind:progress={circleProgress} bind:playback={circlePlaying} />
+{/snippet}
+
+{#snippet waveExample()}
+    <WaveExampleWrapper {...commonProps} bind:progress={waveProgress} bind:playback={wavePlaying} />
 {/snippet}
 
 <div class={styles.root}>

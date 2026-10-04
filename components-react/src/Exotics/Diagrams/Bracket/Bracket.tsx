@@ -1,30 +1,62 @@
-import { Fragment, type KeyboardEvent, type ReactNode, useId, useMemo, useRef, useState } from "react";
+import {
+    Fragment,
+    type KeyboardEvent,
+    type ReactNode,
+    useEffect,
+    useId,
+    useLayoutEffect,
+    useMemo,
+    useRef,
+    useState,
+} from "react";
+import { flushSync } from "react-dom";
 
 import {
     BRACKET_DEFAULTS,
     BRACKET_MISSING_PLACEMENT,
+    type BracketArrangement,
     BracketStyles,
     BracketUtils,
     NavigatorUtils,
+    TreemapUtils,
 } from "@thewaver/ss-components";
 
+import { useStore } from "../../../Utils/storeUtils";
 import type { BracketProps } from "./Bracket.types";
 
 const NOTHING = 0;
+const NEXT = 1;
+
+type BracketGlide = {
+    anchorId: string | undefined;
+    from: BracketArrangement | undefined;
+    generation: number;
+};
 
 export const Bracket = <T,>(props: BracketProps<T>) => {
     const boardId = useId();
     const nodeRefs = useRef(new Map<string, HTMLElement>());
+    const isStepping = useRef(false);
 
     const [lastFocusedId, setLastFocusedId] = useState<string>();
     const [hasFocus, setHasFocus] = useState(false);
+    const [glideClock] = useState(TreemapUtils.createZoomClock);
+
+    const progress = useStore(glideClock);
 
     const orientation = props.orientation ?? BRACKET_DEFAULTS.orientation;
     const rootSide = props.rootSide ?? BRACKET_DEFAULTS.rootSide;
+    const isFamilyView = (props.view ?? BRACKET_DEFAULTS.view) === "family";
+    const transitionDurationMs = props.transitionDurationMs ?? BRACKET_DEFAULTS.transitionDurationMs;
 
     const layout = useMemo(() => BracketUtils.computeLayout(props.root), [props.root]);
 
-    const geometry = BracketUtils.computeGeometry(layout, {
+    const extent = useMemo(
+        () => (isFamilyView ? BracketUtils.computeFamilyExtent(layout) : layout),
+        [isFamilyView, layout],
+    );
+
+    const geometry = BracketUtils.computeGeometry(extent, {
         nodeSize: props.nodeSize,
         layerGap: props.layerGap ?? BRACKET_DEFAULTS.layerGap,
         crossGap: props.crossGap ?? BRACKET_DEFAULTS.crossGap,
@@ -34,8 +66,32 @@ export const Bracket = <T,>(props: BracketProps<T>) => {
     });
 
     const focusedId = hasFocus ? lastFocusedId : undefined;
+    const anchorId = BracketUtils.getFamilyAnchorId(focusedId);
+
+    const computeArrangement = (id: string | undefined) =>
+        BracketUtils.computeFamilyArrangement(layout, geometry, extent, id);
+
+    const [glide, setGlide] = useState<BracketGlide>(() => ({
+        anchorId,
+        from: undefined,
+        generation: NOTHING,
+    }));
+
+    if (glide.anchorId !== anchorId) {
+        setGlide({
+            anchorId,
+            from: isFamilyView
+                ? BracketUtils.computeShownArrangement(glide.from, computeArrangement(glide.anchorId), progress)
+                : undefined,
+            generation: isFamilyView ? glide.generation + NEXT : glide.generation,
+        });
+    }
+
+    const target = isFamilyView ? computeArrangement(anchorId) : undefined;
+    const shown = target && BracketUtils.computeShownArrangement(glide.from, target, progress);
+
     const boardSize = geometry.boardSize;
-    const connectors = BracketUtils.computeConnectors(layout, geometry, boardId, focusedId);
+    const connectors = BracketUtils.computeConnectors(layout, geometry, boardId, focusedId, shown?.nodes);
 
     const placementById = useMemo(
         () => new Map(layout.placements.map((placement) => [placement.id, placement])),
@@ -43,7 +99,28 @@ export const Bracket = <T,>(props: BracketProps<T>) => {
     );
 
     const stops = layout.placements.filter((placement) => !placement.isDisabled);
-    const rovingId = BracketUtils.resolveRovingId(stops, lastFocusedId);
+    const unfoldedStops = stops.filter((placement) => !target?.nodes[placement.id]?.isFolded);
+    const rovingId = BracketUtils.resolveRovingId(unfoldedStops, lastFocusedId);
+
+    const getIsNode = (eventTarget: EventTarget | null) =>
+        [...nodeRefs.current.values()].some((element) => element === eventTarget);
+
+    useEffect(() => glideClock.stop, [glideClock]);
+
+    useLayoutEffect(() => {
+        if (glide.generation === NOTHING) return;
+
+        glideClock.start(transitionDurationMs);
+    }, [glide.generation]);
+
+    useEffect(() => {
+        if (!isFamilyView) return;
+
+        props.onFamilyChange?.(
+            anchorId === undefined ? undefined : BracketUtils.findNode(props.root, anchorId).value,
+            anchorId === undefined ? undefined : placementById.get(anchorId),
+        );
+    }, [isFamilyView, anchorId]);
 
     const activate = (id: string) => {
         props.onActivate?.(
@@ -71,14 +148,18 @@ export const Bracket = <T,>(props: BracketProps<T>) => {
         if (next === undefined) return;
 
         e.preventDefault();
-        setLastFocusedId(next);
+        isStepping.current = true;
+        flushSync(() => setLastFocusedId(next));
         nodeRefs.current.get(next)?.focus();
+        isStepping.current = false;
     };
 
     const renderItem = (id: string): ReactNode => {
         const placement = placementById.get(id) ?? BRACKET_MISSING_PLACEMENT;
         const isNodeDisabled = placement.isDisabled;
-        const inset = BracketUtils.computeInset(geometry, placement);
+        const frame = shown?.nodes[id];
+        const inset = frame ?? BracketUtils.computeInset(geometry, placement);
+        const isFolded = target?.nodes[id]?.isFolded ?? false;
 
         return (
             <li
@@ -89,7 +170,11 @@ export const Bracket = <T,>(props: BracketProps<T>) => {
                     top: `${inset.top}px`,
                     width: `${props.nodeSize.width}px`,
                     height: `${props.nodeSize.height}px`,
+                    opacity: frame?.opacity,
+                    visibility: BracketUtils.getIsFrameHidden(frame) ? "hidden" : undefined,
                 }}
+                aria-hidden={isFolded ? "true" : undefined}
+                inert={isFolded || undefined}
             >
                 <div
                     ref={(element) => {
@@ -108,6 +193,7 @@ export const Bracket = <T,>(props: BracketProps<T>) => {
                     }}
                     onBlur={(e) => {
                         if (e.target !== e.currentTarget) return;
+                        if (isStepping.current || getIsNode(e.relatedTarget)) return;
 
                         setHasFocus(false);
                     }}
@@ -143,15 +229,23 @@ export const Bracket = <T,>(props: BracketProps<T>) => {
                 viewBox={`0 0 ${boardSize.width} ${boardSize.height}`}
                 aria-hidden="true"
             >
-                {connectors.map((defs, index) => (
-                    <Fragment key={index}>{props.renderConnector?.(defs)}</Fragment>
-                ))}
+                {connectors.map((defs, index) =>
+                    shown ? (
+                        <g key={index} style={{ opacity: BracketUtils.computeConnectorOpacity(shown.nodes, defs) }}>
+                            {props.renderConnector?.(defs)}
+                        </g>
+                    ) : (
+                        <Fragment key={index}>{props.renderConnector?.(defs)}</Fragment>
+                    ),
+                )}
             </svg>
 
             {renderLayerHeader ? (
                 Array.from({ length: layout.layerCount }, (_unused, layer) => {
                     const headerId = `${boardId}-layer-${layer}`;
                     const headerBox = BracketUtils.computeHeaderBox(geometry, layer);
+                    const headerFrame = shown?.headers[layer];
+                    const isHeaderFolded = target?.headers[layer]?.isFolded ?? false;
 
                     return (
                         <Fragment key={layer}>
@@ -159,16 +253,23 @@ export const Bracket = <T,>(props: BracketProps<T>) => {
                                 id={headerId}
                                 className={BracketStyles.bracketLayerHeader}
                                 style={{
-                                    left: `${headerBox.left}px`,
-                                    top: `${headerBox.top}px`,
+                                    left: `${headerFrame?.left ?? headerBox.left}px`,
+                                    top: `${headerFrame?.top ?? headerBox.top}px`,
                                     width: `${headerBox.width}px`,
                                     height: `${headerBox.height}px`,
+                                    opacity: headerFrame?.opacity,
+                                    visibility: BracketUtils.getIsFrameHidden(headerFrame) ? "hidden" : undefined,
                                 }}
+                                aria-hidden={isHeaderFolded ? "true" : undefined}
                             >
                                 {renderLayerHeader(layer)}
                             </div>
 
-                            <ul className={BracketStyles.bracketList} aria-labelledby={headerId}>
+                            <ul
+                                className={BracketStyles.bracketList}
+                                aria-labelledby={headerId}
+                                aria-hidden={isHeaderFolded ? "true" : undefined}
+                            >
                                 {layout.placements
                                     .filter((placement) => placement.layer === layer)
                                     .map((placement) => renderItem(placement.id))}

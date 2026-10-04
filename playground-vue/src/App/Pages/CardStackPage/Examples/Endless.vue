@@ -73,6 +73,7 @@ onMounted(() => {
                 :mounted-count="mountedCount"
                 :card-gap="cardGap"
                 :funnel-ratio="funnelRatio"
+                :pile-side="pileSide"
                 ariaLabel="Endless deck"
                 :compute-card-label="computeCardLabel"
                 @send="handleSend"

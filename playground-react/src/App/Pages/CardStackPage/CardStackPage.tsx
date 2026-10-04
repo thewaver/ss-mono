@@ -1,11 +1,11 @@
 import { useState } from "react";
 
-import { CARD_STACK_DEFAULTS } from "@thewaver/ss-components-react";
+import { CARD_STACK_DEFAULTS, CARD_STACK_PILE_SIDES } from "@thewaver/ss-components-react";
 import { CardStackKnobs } from "@thewaver/ss-playground/App/Knobs/CardStacks.const";
 import type { SwipeDirection } from "@thewaver/ss-utils";
 
 import { PageExamples } from "../../PageComponents/Examples/Examples";
-import { PageCheckField, PageNumberField } from "../../PageComponents/Field/Field";
+import { PageCheckField, PageNumberField, PageSelectField } from "../../PageComponents/Field/Field";
 import { PageProp } from "../../PageComponents/Prop/Prop";
 import { PagePropsPanel } from "../../PageComponents/PropsPanel/PropsPanel";
 import { DeckExample } from "./Examples/Deck";
@@ -22,6 +22,7 @@ export const CardStackPage = () => {
     const [mountedCount, setMountedCount] = useState(CARD_STACK_DEFAULTS.mountedCount);
     const [cardGap, setCardGap] = useState(CARD_STACK_DEFAULTS.cardGap);
     const [funnelRatio, setFunnelRatio] = useState(CARD_STACK_DEFAULTS.funnelRatio);
+    const [pileSide, setPileSide] = useState(CARD_STACK_DEFAULTS.pileSide);
 
     const [lastSend, setLastSend] = useState<{ direction: SwipeDirection; card: string }>();
     const [isEmpty, setIsEmpty] = useState(false);
@@ -48,6 +49,7 @@ export const CardStackPage = () => {
                     mountedCount={mountedCount}
                     cardGap={cardGap}
                     funnelRatio={funnelRatio}
+                    pileSide={pileSide}
                     onSend={(direction, card) => setLastSend({ direction, card })}
                     onEmpty={() => setIsEmpty(true)}
                     onDeal={() => {
@@ -76,6 +78,7 @@ export const CardStackPage = () => {
                     mountedCount={mountedCount}
                     cardGap={cardGap}
                     funnelRatio={funnelRatio}
+                    pileSide={pileSide}
                     onSend={(direction, card) => setLastEndlessSend({ direction, card })}
                     onLoad={setLoadedCount}
                 />
@@ -178,6 +181,19 @@ export const CardStackPage = () => {
                         width={FIELD_WIDTH}
                         ariaLabel={"Funnel"}
                         onInput={setFunnelRatio}
+                    />
+                </PageProp>
+
+                <PageProp
+                    itemKey={"pileSide"}
+                    label={"Pile side"}
+                    hint={"The edge the cards behind the top one peek out of: below the top card, or above it."}
+                >
+                    <PageSelectField
+                        value={pileSide}
+                        values={CARD_STACK_PILE_SIDES}
+                        ariaLabel={"Pile side"}
+                        onChange={(side) => setPileSide(side)}
                     />
                 </PageProp>
             </PagePropsPanel>

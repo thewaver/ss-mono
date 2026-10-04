@@ -1,6 +1,13 @@
 import { For, createSignal } from "solid-js";
 
-import { Radio, RadioGroup, Toggle } from "@thewaver/ss-components-solid";
+import {
+    MediaQueryMonitorSolidUtils,
+    Radio,
+    RadioGroup,
+    SHAPE_REVEAL_DEFAULTS,
+    ShapeRevealUtils,
+    Toggle,
+} from "@thewaver/ss-components-solid";
 import { PLAYGROUND_THEMES } from "@thewaver/ss-playground/App/Theme.css";
 
 import {
@@ -13,13 +20,15 @@ import { PageExampleKnobsButton } from "../ExampleKnobs/ExampleKnobs";
 import { PageSelectField } from "../Field/Field";
 import { OWN_FRAMEWORK } from "../FrameworkMenu/FrameworkMenu.const";
 import { PageProp } from "../Prop/Prop";
-import { PAGE_VIEW_OPTIONS, THEME_OPTIONS, VIEWPORT_ANCHOR_OPTIONS } from "./NavSettings.const";
+import { PAGE_VIEW_OPTIONS, THEME_FIELD_ID, THEME_OPTIONS, VIEWPORT_ANCHOR_OPTIONS } from "./NavSettings.const";
 import type {
     PageNavSettingsChoiceProps,
     PageNavSettingsProps,
     PlaygroundTheme,
     ViewportAnchor,
 } from "./NavSettings.types";
+
+const NO_MOTION_DURATION_MS = 0;
 
 const computeViewportAnchorLabel = (anchor: ViewportAnchor) =>
     VIEWPORT_ANCHOR_OPTIONS.find((option) => option.value === anchor)?.label ?? String(anchor);
@@ -68,9 +77,15 @@ const PageNavSettingsChoice = <T,>(props: PageNavSettingsChoiceProps<T>) => (
 export const PageNavSettings = (props: PageNavSettingsProps) => {
     const [getTheme, setTheme] = createSignal(findAppliedTheme());
 
+    const getPrefersReducedMotion = MediaQueryMonitorSolidUtils.createReducedMotion();
+
     const pickTheme = (theme: PlaygroundTheme) => {
-        applyTheme(theme);
         setTheme(theme);
+
+        void ShapeRevealUtils.reveal(() => applyTheme(theme), {
+            origin: document.getElementById(THEME_FIELD_ID) ?? SHAPE_REVEAL_DEFAULTS.origin,
+            durationMs: getPrefersReducedMotion() ? NO_MOTION_DURATION_MS : SHAPE_REVEAL_DEFAULTS.durationMs,
+        });
     };
 
     return (
@@ -127,10 +142,13 @@ export const PageNavSettings = (props: PageNavSettingsProps) => {
                     <PageProp
                         key={"theme"}
                         label={"Theme"}
-                        hint={"Which color theme the playground is drawn in, independent of the framework it runs in."}
+                        hint={
+                            "Which color theme the playground is drawn in, independent of the framework it runs in. The new theme is uncovered by a circle growing from this field."
+                        }
                         defaultValue={computeThemeLabel(OWN_FRAMEWORK)}
                     >
                         <PageSelectField
+                            id={THEME_FIELD_ID}
                             value={getTheme}
                             values={THEME_OPTIONS.map((option) => option.value)}
                             computeLabel={computeThemeLabel}

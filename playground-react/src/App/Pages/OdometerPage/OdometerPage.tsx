@@ -12,6 +12,7 @@ import { PagePropsPanel } from "../../PageComponents/PropsPanel/PropsPanel";
 import { PageButtonContent } from "../../StyledComponents/ButtonContent/ButtonContent";
 import { CounterExample } from "./Examples/Counter";
 import { ReelsExample } from "./Examples/Reels";
+import { SplitFlapExample } from "./Examples/SplitFlap";
 import type { OdometerExampleProps } from "./OdometerPage.types";
 
 const EXAMPLES_ROOT = "/src/App/Pages/OdometerPage/Examples";
@@ -146,6 +147,14 @@ export const OdometerPage = () => {
                 </>
             ),
             path: `${EXAMPLES_ROOT}/Reels.tsx`,
+        },
+        {
+            key: "splitFlap",
+            name: "Departures board",
+            readout: () =>
+                "each column drops one flap after another through every digit between the old one and the new, the top half of the digit going falling to uncover the bottom half of the digit coming; a column that carries waits for the one to its right, and a column whose digit has not changed does not flip",
+            component: () => <SplitFlapExample {...commonProps} />,
+            path: `${EXAMPLES_ROOT}/SplitFlap.tsx`,
         },
     ];
 

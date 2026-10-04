@@ -118,7 +118,7 @@ export namespace SVGPatterns {
 
         const trail = TrackedPatternUtils.createTrail();
         const hasTrail = TrackedPatternUtils.getHasTrail(opts);
-        const clock = hasTrail ? SVGDefsSolidUtils.createClock(opts.trailMs) : undefined;
+        const clock = hasTrail ? SVGDefsSolidUtils.createClock(TrackedPatternUtils.getTrailSpanMs(opts)) : undefined;
 
         if (clock) {
             clock.subscribe();
@@ -141,13 +141,7 @@ export namespace SVGPatterns {
                     if (!clock) return renderCell(cellId, index, isSplit, getLiveLevel);
 
                     const getLevel = createMemo(() =>
-                        trail.computeLevel(
-                            `${index.row}_${index.col}`,
-                            getLiveLevel(),
-                            clock.getFrameMs(),
-                            opts.trailMs,
-                            opts.restLevel,
-                        ),
+                        trail.computeLevel(`${index.row}_${index.col}`, getLiveLevel(), clock.getFrameMs(), opts),
                     );
 
                     return renderCell(cellId, index, isSplit, getLevel);

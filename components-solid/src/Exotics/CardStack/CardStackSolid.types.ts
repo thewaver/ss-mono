@@ -1,6 +1,6 @@
 import type { Accessor, JSX } from "solid-js";
 
-import type { CardStackCardState } from "@thewaver/ss-components";
+import type { CardStackCardState, CardStackPileSide } from "@thewaver/ss-components";
 import type { SwipeDirection } from "@thewaver/ss-utils";
 
 import type { AccessorProps, MaybeAccessor, SignalSource } from "../../Utils/typeUtils";
@@ -53,8 +53,8 @@ export type CardStackProps<T> = AccessorProps<{
      * How far apart the cards in the pile sit, in pixels.
      *
      * The whole pile fits the stack's box rather than spilling out of it: a card is as tall as the box less
-     * the room the lift needs, which is `(mountedCount - 1) * cardGap`, and the bottom-most card sits flush
-     * with the bottom of the box. Raising this makes the pile deeper and every card shorter. It is the
+     * the room the lift needs, which is `(mountedCount - 1) * cardGap`, and the card furthest down the pile sits
+     * flush with the edge `pileSide` names. Raising this makes the pile deeper and every card shorter. It is the
      * stack's number rather than the painter's because a painter is handed one card and cannot know how many
      * others there are.
      */
@@ -67,6 +67,11 @@ export type CardStackProps<T> = AccessorProps<{
      * card narrowed past nothing is held at nothing rather than turning inside out.
      */
     funnelRatio?: number;
+    /**
+     * The edge the cards behind the top one peek out of. `"bottom"` sits the top card flush with the top of the box
+     * and lets the pile show beneath it; `"top"` sits it flush with the bottom and lets the pile show above it.
+     */
+    pileSide?: CardStackPileSide;
     /**
      * Which ways a card may be sent. All four by default.
      *

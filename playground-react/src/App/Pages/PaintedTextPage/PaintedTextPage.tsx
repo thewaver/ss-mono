@@ -1,6 +1,7 @@
 import { useState } from "react";
 
 import {
+    MediaQueryMonitorReactUtils,
     PAINTED_TEXT_DEFAULTS,
     type PaintedTextStrokeAlignment,
     type SVGDefsColors,
@@ -18,7 +19,7 @@ import {
 import { PaintedTextKnobs } from "../../Knobs/PaintedTexts.const";
 import { PageExampleKnobs } from "../../PageComponents/ExampleKnobs/ExampleKnobs";
 import { PageExamples } from "../../PageComponents/Examples/Examples";
-import { PageColorField, PageNumberField, PageSelectField } from "../../PageComponents/Field/Field";
+import { PageCheckField, PageColorField, PageNumberField, PageSelectField } from "../../PageComponents/Field/Field";
 import { PageMeasureBox } from "../../PageComponents/MeasureBox/MeasureBox";
 import { PagePaintPicker, usePaintSlot } from "../../PageComponents/PaintPicker/PaintPicker";
 import { getIsUsingKind } from "../../PageComponents/PaintPicker/PaintPicker.const";
@@ -29,14 +30,18 @@ import {
     computePageTextFieldTextStyle,
 } from "../../StyledComponents/TextFieldContent/TextFieldContent";
 import { PageTextFieldPlaceholder } from "../../StyledComponents/TextFieldPlaceholder/TextFieldPlaceholder";
+import { CircleExample } from "./Examples/Circle";
 import { CustomInputExample } from "./Examples/CustomInput";
 import { HeadingExample } from "./Examples/Heading";
 import { ParagraphExample } from "./Examples/Paragraph";
 import { ScrambledExample } from "./Examples/Scrambled";
 import { TypedExample } from "./Examples/Typed";
+import { WaveExample } from "./Examples/Wave";
 import type { PaintedTextExampleProps } from "./PaintedTextPage.types";
 
 const EXAMPLES_ROOT = "/src/App/Pages/PaintedTextPage/Examples";
+
+const PERCENT = 100;
 
 const ARRIVAL_EFFECTS = ["fade", "scale", "glow", "drop", "slide"] as const;
 
@@ -179,6 +184,101 @@ const TypedExampleWrapper = ({ width, ...props }: ExampleWrapperProps) => {
     );
 };
 
+type PathExampleWrapperProps = ExampleWrapperProps & {
+    progress: readonly [number, (value: number) => void];
+    playback: readonly [boolean, (value: boolean) => void];
+};
+
+type LapDurationKnobProps = {
+    value: number;
+    onInput: (value: number) => void;
+};
+
+const LapDurationKnob = (props: LapDurationKnobProps) => (
+    <PageProp
+        itemKey={"lapDurationMs"}
+        label={"Lap duration (ms)"}
+        hint={"How long the text takes to slide once round the whole length of its path."}
+    >
+        <PageNumberField
+            value={props.value}
+            min={PaintedTextKnobs.MIN_LAP_DURATION_MS}
+            max={PaintedTextKnobs.MAX_LAP_DURATION_MS}
+            step={PaintedTextKnobs.LAP_DURATION_STEP_MS}
+            ariaLabel={"Lap duration in milliseconds"}
+            onInput={props.onInput}
+        />
+    </PageProp>
+);
+
+const CircleExampleWrapper = ({ width, ...props }: PathExampleWrapperProps) => {
+    const [radius, setRadius] = useState(PaintedTextKnobs.STARTING_CIRCLE_RADIUS);
+    const [lapDurationMs, setLapDurationMs] = useState(PAINTED_TEXT_DEFAULTS.lapDurationMs);
+    const [isFittedToPath, setIsFittedToPath] = useState(PaintedTextKnobs.STARTING_IS_FITTED_TO_PATH);
+
+    return (
+        <>
+            <PageMeasureBox padding={MEASURE_BOX_PADDING}>
+                <CircleExample
+                    {...props}
+                    radius={radius}
+                    lapDurationMs={lapDurationMs}
+                    isFittedToPath={isFittedToPath}
+                />
+            </PageMeasureBox>
+
+            <PageExampleKnobs>
+                <PageProp
+                    itemKey={"radius"}
+                    label={"Radius (px)"}
+                    hint={"How far the circle the text runs round is from its center."}
+                >
+                    <PageNumberField
+                        value={radius}
+                        min={PaintedTextKnobs.MIN_CIRCLE_RADIUS}
+                        max={PaintedTextKnobs.MAX_CIRCLE_RADIUS}
+                        step={PaintedTextKnobs.CIRCLE_RADIUS_STEP}
+                        ariaLabel={"Radius in pixels"}
+                        onInput={setRadius}
+                    />
+                </PageProp>
+
+                <LapDurationKnob value={lapDurationMs} onInput={setLapDurationMs} />
+
+                <PageProp
+                    itemKey={"isFittedToPath"}
+                    label={"Fit to the circle"}
+                    hint={
+                        "Stretches or squeezes the spacing between the letters so the text goes round the circle exactly once, meeting its own start."
+                    }
+                >
+                    <PageCheckField
+                        value={isFittedToPath}
+                        ariaLabel={"Fit to the circle"}
+                        onChange={setIsFittedToPath}
+                    />
+                </PageProp>
+            </PageExampleKnobs>
+        </>
+    );
+};
+
+const WaveExampleWrapper = ({ width, ...props }: PathExampleWrapperProps) => {
+    const [lapDurationMs, setLapDurationMs] = useState(PAINTED_TEXT_DEFAULTS.lapDurationMs);
+
+    return (
+        <>
+            <PageMeasureBox width={width} padding={MEASURE_BOX_PADDING}>
+                <WaveExample {...props} lapDurationMs={lapDurationMs} />
+            </PageMeasureBox>
+
+            <PageExampleKnobs>
+                <LapDurationKnob value={lapDurationMs} onInput={setLapDurationMs} />
+            </PageExampleKnobs>
+        </>
+    );
+};
+
 const ScrambledExampleWrapper = ({ width, ...props }: ExampleWrapperProps) => (
     <PageMeasureBox width={width} padding={MEASURE_BOX_PADDING}>
         <ScrambledExample {...props} />
@@ -201,6 +301,15 @@ export const PaintedTextPage = () => {
     );
     const [cellSize, setCellSize] = useState(PaintedTextKnobs.STARTING_CELL_SIZE);
     const [colors, setColors] = useState<SVGDefsColors>({ ...SVGDefsSamples.SAMPLE_COLORS });
+
+    const prefersReducedMotion = MediaQueryMonitorReactUtils.useReducedMotion();
+
+    const circleProgressState = useState(0);
+    const circlePlaybackState = useState(!prefersReducedMotion);
+    const waveProgressState = useState(0);
+    const wavePlaybackState = useState(!prefersReducedMotion);
+
+    const getPercent = (progress: number) => `${Math.round(progress * PERCENT)}%`;
 
     const usesPattern = getIsUsingKind([fill.paint, stroke.paint], ["pattern", "trackedPattern"]);
     const usesTiming = getIsUsingKind([fill.paint, stroke.paint], ["pattern", "timed"]);
@@ -256,6 +365,26 @@ export const PaintedTextPage = () => {
                 "a ScrambleText around a painted text: it decides which glyph each letter shows while it churns, and the painted text draws that glyph, painted, in the letter's place",
             component: () => <ScrambledExampleWrapper {...commonProps} />,
             path: `${EXAMPLES_ROOT}/Scrambled.tsx`,
+        },
+        {
+            key: "circle",
+            name: "Round a circle",
+            readout: () =>
+                `${getPercent(circleProgressState[0])} round the circle, ${circlePlaybackState[0] ? "turning" : "stopped"} — the browser sets every letter along the path, the paint runs across the ring as one, and what slides past the end comes round from the start`,
+            component: () => (
+                <CircleExampleWrapper {...commonProps} progress={circleProgressState} playback={circlePlaybackState} />
+            ),
+            path: `${EXAMPLES_ROOT}/Circle.tsx`,
+        },
+        {
+            key: "wave",
+            name: "Along a wave",
+            readout: () =>
+                `${getPercent(waveProgressState[0])} along the wave, ${wavePlaybackState[0] ? "sliding" : "stopped"} — any path will do, and on an open one the text leaves at the far end as it comes back in at the near one`,
+            component: () => (
+                <WaveExampleWrapper {...commonProps} progress={waveProgressState} playback={wavePlaybackState} />
+            ),
+            path: `${EXAMPLES_ROOT}/Wave.tsx`,
         },
     ];
 

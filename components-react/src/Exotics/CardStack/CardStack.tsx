@@ -36,6 +36,7 @@ export const CardStack = <T,>(props: CardStackProps<T>) => {
     const mountedCount = Math.max(props.mountedCount ?? CARD_STACK_DEFAULTS.mountedCount, MIN_MOUNTED_COUNT);
     const cardGap = props.cardGap ?? CARD_STACK_DEFAULTS.cardGap;
     const funnelRatio = props.funnelRatio ?? CARD_STACK_DEFAULTS.funnelRatio;
+    const pileSide = props.pileSide ?? CARD_STACK_DEFAULTS.pileSide;
     const allowedDirections = props.allowedDirections ?? CARD_STACK_DEFAULTS.allowedDirections;
     const isDisabled = props.isDisabled ?? false;
     const isEmpty = topIndex >= cards.length;
@@ -138,6 +139,7 @@ export const CardStack = <T,>(props: CardStackProps<T>) => {
                                 mountedLength: mounted.length,
                                 pileExtentPx,
                                 cardGap,
+                                pileSide,
                                 getMotion: () => motion,
                             }),
                             transitionDuration: `${CardStackUtils.getCardTransitionDurationMs(depth, {

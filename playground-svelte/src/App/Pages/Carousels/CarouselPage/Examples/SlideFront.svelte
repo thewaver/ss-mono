@@ -1,18 +1,17 @@
 <script lang="ts">
     import type { CarouselSlideState } from "@thewaver/ss-components-svelte";
-    import * as styles from "@thewaver/ss-playground/App/Pages/Carousels/Carousels.css";
 
     import PageCarouselSlide from "../../../../StyledComponents/CarouselContent/PageCarouselSlide.svelte";
 
     type Props = {
         title: string;
         state: CarouselSlideState;
-        isNarrow: boolean;
+        frameClass: string;
     };
 
     let props: Props = $props();
 </script>
 
-<div class={[styles.slideFrame, props.isNarrow && styles.slideFrameNarrow]}>
+<div class={props.frameClass}>
     <PageCarouselSlide state={props.state}>{props.title}</PageCarouselSlide>
 </div>

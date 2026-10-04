@@ -1,8 +1,13 @@
 <script lang="ts">
     import { untrack } from "svelte";
 
-    import { Button, Carousel, MediaQueryMonitorSvelteUtils, Tilter } from "@thewaver/ss-components-svelte";
-    import type { CarouselPlacementFn } from "@thewaver/ss-components-svelte";
+    import {
+        Button,
+        Carousel,
+        CarouselPlacementUtils,
+        MediaQueryMonitorSvelteUtils,
+        Tilter,
+    } from "@thewaver/ss-components-svelte";
     import { CarouselKnobs } from "@thewaver/ss-playground/App/Knobs/Carousels.const";
     import {
         computeCarouselRotationLabel,
@@ -12,38 +17,22 @@
     import * as styles from "@thewaver/ss-playground/App/Pages/Carousels/Carousels.css";
 
     import PageButtonContent from "../../../../StyledComponents/ButtonContent/ButtonContent.svelte";
+    import PageCarouselSlide from "../../../../StyledComponents/CarouselContent/PageCarouselSlide.svelte";
     import type { CarouselExampleProps } from "../../Carousels.types";
-    import SlideBack from "./SlideBack.svelte";
-    import SlideFront from "./SlideFront.svelte";
 
     const TILT_DEGREES = 18;
-    const FULL_TURN_DEGREES = 360;
-    const HALF_TURN_DEGREES = 180;
-    const PERCENT = 100;
 
     type Props = Pick<CarouselExampleProps, "slides" | "index" | "isDisabled" | "orientation">;
 
-    const computeRingPlacement: CarouselPlacementFn = (defs) => {
-        const along = defs.orientation === "horizontal" ? defs.size.width : defs.size.height;
-        const angle = (defs.distance * FULL_TURN_DEGREES) / Math.max(defs.count, 1);
-        const radians = (angle * Math.PI) / HALF_TURN_DEGREES;
-        const radius = along * CarouselKnobs.RING_RADIUS_RATIO;
-        const alongPercent = along > 0 ? ((radius * Math.sin(radians)) / along) * PERCENT : 0;
-        const depth = radius * (Math.cos(radians) - 1);
-
-        return {
-            effect: {
-                perspective: CarouselKnobs.RING_PERSPECTIVE_PX,
-                translate3d: defs.orientation === "horizontal" ? [alongPercent, 0, depth] : [0, alongPercent, depth],
-                ...(defs.orientation === "horizontal" ? { rotateY: angle } : { rotateX: -angle }),
-            },
-            layer: Math.cos(radians),
-        };
-    };
+    const computeRingPlacement = CarouselPlacementUtils.createPaddleWheel({
+        perspectivePx: CarouselKnobs.RING_PERSPECTIVE_PX,
+    });
 
     let { index = $bindable(), ...props }: Props = $props();
 
     let progress = $state(0);
+
+    const frameClasses = $derived(styles.ringFrames[props.orientation]);
 
     const getPrefersReducedMotion = MediaQueryMonitorSvelteUtils.createReducedMotion();
 
@@ -71,7 +60,7 @@
 
 <div class={styles.ringStack}>
     <Tilter maxTiltDegrees={TILT_DEGREES}>
-        <div class={[styles.ringFrame, props.orientation === "vertical" && styles.ringFrameVertical]}>
+        <div class={styles.ringFrame}>
             <div class={styles.ringSlot}>
                 <Carousel
                     computePlacement={computeRingPlacement}
@@ -86,11 +75,15 @@
                     computeRotationLabel={computeCarouselRotationLabel}
                 >
                     {#snippet renderSlide(slide, state)}
-                        <SlideFront title={slide} {state} isNarrow={false} />
+                        <div class={frameClasses.front}>
+                            <PageCarouselSlide {state}>{slide}</PageCarouselSlide>
+                        </div>
                     {/snippet}
 
-                    {#snippet renderSlideBack()}
-                        <SlideBack isNarrow={false} />
+                    {#snippet renderSlideBack(slide, state)}
+                        <div class={frameClasses.back}>
+                            <PageCarouselSlide {state}>{slide}</PageCarouselSlide>
+                        </div>
                     {/snippet}
                 </Carousel>
             </div>

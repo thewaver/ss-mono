@@ -388,6 +388,56 @@ test("a list given an estimated height mounts a window rather than every option"
 });
 
 /**
+ * Where the highlighted row sits against the box the list scrolls in: above it, below it, or inside it. Read in
+ * one go, so a scroll landing between two reads cannot split the answer.
+ */
+const highlightedRowPlacement = (page: Page) =>
+    page.evaluate(() => {
+        const id = document.querySelector("[aria-activedescendant]")?.getAttribute("aria-activedescendant");
+        const active = document.getElementById(id ?? "")?.getBoundingClientRect();
+        const host = [...document.querySelectorAll('[role="listbox"] *')].find(
+            (element) => element.scrollHeight > element.clientHeight + 1,
+        ) as HTMLElement | undefined;
+
+        if (!active || !host) return "missing";
+
+        const hostRect = host.getBoundingClientRect();
+        const scale = hostRect.height / host.offsetHeight;
+        const viewTop = hostRect.top + host.clientTop * scale;
+        const viewBottom = hostRect.top + (host.clientTop + host.clientHeight) * scale;
+
+        if (active.bottom > viewBottom + 1) return "below";
+
+        return active.top < viewTop - 1 ? "above" : "inside";
+    });
+
+/**
+ * Opening onto a selection is the one scroll nobody pressed a key for: the highlight starts on the picked
+ * option, and the list has to be brought to it. In a windowed list that scroll belongs to the window rather
+ * than to the option, and a window asked for it before it is following its scroller drops the request — the
+ * list then opens at the top, with the picked row thousands of pixels below the box and nothing to say so but
+ * the highlight pointing out of sight. Picking by name is what puts the selection far down without scrolling
+ * the list there by hand first.
+ */
+test("reopening a windowed list onto a selection far down shows that option", async ({ page }) => {
+    await openedWithHighlight(page, "virtualized");
+    await page.keyboard.type("route 26", { delay: 30 });
+    await page.keyboard.press("Enter");
+    await expect(page.locator(LISTBOX), "picking closes the list").toHaveCount(0);
+
+    await openedWithHighlight(page, "virtualized");
+    expect(
+        await activeDescendantText(page, field("virtualized")),
+        "reopening highlights the option that was picked",
+    ).toMatch(/Route 26(?!\d)/);
+    await expect
+        .poll(() => highlightedRowPlacement(page), {
+            message: "and brings the list to it rather than opening at the top",
+        })
+        .toBe("inside");
+});
+
+/**
  * The two halves compose without knowing about each other: the query is the consumer's, the batches are the
  * consumer's, and the library only reports that the end of what it holds is on screen. Typing therefore has
  * to start a new search rather than narrow what already arrived — which is the whole point of asking a server

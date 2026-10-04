@@ -3,6 +3,8 @@ import { style } from "@vanilla-extract/css";
 import { themeVars } from "../../Theme.css";
 import { layerVars } from "../Layer/Layer.css";
 
+export const CAROUSEL_SLIDE_HEIGHT = 140;
+
 export const isCurrent = style({});
 export const isHovered = style({});
 export const isActive = style({});
@@ -14,7 +16,7 @@ export const carouselSlide = style({
     justifyContent: "center",
     alignItems: "center",
     gap: themeVars.spacing.half,
-    height: 140,
+    height: CAROUSEL_SLIDE_HEIGHT,
     minHeight: "100%",
     borderRadius: themeVars.borderRadius.half,
     backgroundImage: `linear-gradient(135deg, rgb(from ${layerVars.main} r g b / 50%), rgb(from ${layerVars.main} r g b / 75%))`,

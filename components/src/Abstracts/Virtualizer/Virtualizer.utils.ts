@@ -27,4 +27,44 @@ export namespace VirtualizerUtils {
 
         return undefined;
     };
+
+    /**
+     * Reports the size of the box a scroller shows its content in, now and whenever the scroller is resized.
+     *
+     * Stands in for TanStack's own `observeElementRect`, which reports the scroller's border box. A row scrolled to
+     * the bottom edge is aligned against that size, so a scroller with a border, or a horizontal scrollbar, hid the
+     * bottom of the row it had just scrolled to by that much — the row counted as in view while part of it was
+     * clipped. The box reported here is the one the content is clipped to, which is what a scroll aligns with
+     * natively.
+     *
+     * Typed by the parts of TanStack's virtualizer it reads, so it can be handed over as that option directly.
+     *
+     * @param instance The virtualizer, read for the scroller it is following and that scroller's window.
+     * @param onRect Called with the visible box's width and height, in layout pixels.
+     * @returns A function that stops observing, or nothing when there is no scroller to observe.
+     */
+    export const observeClientRect = (
+        instance: {
+            scrollElement: Element | null;
+            targetWindow: { ResizeObserver?: typeof ResizeObserver } | null;
+        },
+        onRect: (rect: { width: number; height: number }) => void,
+    ) => {
+        const element = instance.scrollElement;
+        const ResizeObserverOfWindow = instance.targetWindow?.ResizeObserver;
+
+        if (!element || !instance.targetWindow) return undefined;
+
+        const report = () => onRect({ width: element.clientWidth, height: element.clientHeight });
+
+        report();
+
+        if (!ResizeObserverOfWindow) return () => {};
+
+        const observer = new ResizeObserverOfWindow(report);
+
+        observer.observe(element, { box: "border-box" });
+
+        return () => observer.disconnect();
+    };
 }

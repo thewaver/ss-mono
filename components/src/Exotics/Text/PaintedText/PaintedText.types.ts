@@ -1,4 +1,4 @@
-import type { TextMetricsStyle } from "@thewaver/ss-utils";
+import type { Point2d, TextMetricsStyle } from "@thewaver/ss-utils";
 
 export type PaintedTextStrokeAlignment = "outside" | "center" | "inside";
 
@@ -15,9 +15,9 @@ export type PaintedTextController = {
 export type PaintedTextRun = {
     /** The words, exactly as they are drawn on one line. */
     text: string;
-    /** Where the run starts, from the left of the text block. */
+    /** Where the run starts, from the left of the text block, or `0` on a path, where the path places it. */
     x: number;
-    /** Where the run's baseline sits, from the top of the text block. */
+    /** Where the run's baseline sits, from the top of the text block, or `0` on a path, where the path places it. */
     y: number;
     /** The font the run is drawn in, as dashed CSS properties. */
     style: TextMetricsStyle;
@@ -29,6 +29,15 @@ export type PaintedTextRun = {
         target?: string;
         rel?: string;
     };
+};
+
+export type PaintedTextPathPlacement = {
+    /** Where the middle of the letter's baseline sits, in the path's own coordinates. */
+    point: Point2d;
+    /** Which way the letter's baseline runs there, in degrees, zero pointing right and increasing clockwise. */
+    angle: number;
+    /** How far the letter takes up along the path. */
+    advance: number;
 };
 
 export type PaintedTextLetter = {
@@ -50,6 +59,25 @@ export type PaintedTextLetter = {
     runIndex?: number;
     /** The whole element a letter stands for, as its place among the layout's atomics. */
     atomicIndex?: number;
+    /**
+     * Where the letter sits on a path, and which way it is turned, or `undefined` off a path and for a letter that
+     * falls past the end of the path. On a path, `x`, `top`, `width` and `height` are the upright box round the
+     * turned letter, and `baseline` is the height of `point`.
+     */
+    placement?: PaintedTextPathPlacement;
+};
+
+export type PaintedTextCaretBox = {
+    /** Where the caret's left edge sits, in the drawing's coordinates. */
+    x: number;
+    /** Where the caret's top sits, in the drawing's coordinates. */
+    top: number;
+    /** How tall the caret stands. */
+    height: number;
+    /** On a path, how far the caret is turned, in degrees, to stand upright on the letter beside it. */
+    angle?: number;
+    /** On a path, how far below the caret's top it meets the baseline, which is the point it is turned about. */
+    pivotY?: number;
 };
 
 export type PaintedTextStrokePaint = {
@@ -60,13 +88,30 @@ export type PaintedTextStrokePaint = {
 };
 
 export type PaintedTextLayoutState = {
-    /** The width the text was wrapped at, or `undefined` before it was first measured. */
+    /**
+     * The width the text was wrapped at, or `undefined` before it was first measured. On a path, the width of the
+     * box the text is drawn in.
+     */
     width: number | undefined;
-    /** How tall the wrapped text stands. */
+    /** How tall the wrapped text stands. On a path, the height of the box the text is drawn in. */
     height: number;
+    /**
+     * Where the box the text is drawn in starts, in the coordinates the text is drawn in: `0, 0` off a path, and on a
+     * path the corner of the path's own box grown by how far the letters reach either side of it.
+     */
+    origin: Point2d;
+    /** How long the path is, or `0` off a path. */
+    pathLength: number;
+    /** On a path, how far the tallest letter reaches above its baseline; `0` off a path. */
+    ascent: number;
+    /** On a path, how far the deepest letter reaches below its baseline; `0` off a path. */
+    descent: number;
     /** Every run of text, one line at most each, in reading order. */
     runs: PaintedTextRun[];
-    /** The images and other whole elements, already built as SVG and placed where they sit in the text. */
+    /**
+     * The images and other whole elements, already built as SVG and placed where they sit in the text. Empty on a
+     * path.
+     */
     atomics: SVGElement[];
     /**
      * Every letter on its own, counted as `Typewriter` counts them — a character, a line break the text holds or a
@@ -94,6 +139,14 @@ export type PaintedTextLayoutOpts = {
      * {@link PaintedTextLayout.relayout} can move the letters along as they grow without moving a line break.
      */
     getComputePushingAnimationName?: () => ((character: string, index: number, count: number) => string) | undefined;
+    /**
+     * The path the text is set along, as SVG path data, or `undefined` for text laid out in lines. On a path the text
+     * is one line that never wraps, line breaks and whole elements are left out, and letters do not push each other
+     * along.
+     */
+    getPath?: () => string | undefined;
+    /** Whether the spacing between letters is stretched or squeezed so the text runs the path's whole length once. */
+    getIsFittedToPath?: () => boolean;
 };
 
 export type PaintedTextLayout = {
@@ -110,8 +163,16 @@ export type PaintedTextLayout = {
      */
     relayout: (styles: readonly (Record<string, string> | undefined)[]) => void;
     /**
+     * Places every letter along the path for the text starting `startOffset` along it, as the drawn text does, so a
+     * wrapper's letters follow the text as it slides. A letter that slides past the end comes round from the start.
+     * Does nothing off a path or while no wrapper is driving the letters.
+     */
+    placeAlongPath: (startOffset: number) => void;
+    /**
      * Lays the text out again whenever its size or content changes or a web font or an image in it finishes
      * loading, until the returned function is called.
      */
     observe: (source: HTMLElement) => () => void;
 };
+
+export type PaintedTextCircleDirection = "clockwise" | "counterclockwise";

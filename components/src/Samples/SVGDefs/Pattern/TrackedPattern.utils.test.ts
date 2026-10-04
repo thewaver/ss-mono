@@ -70,3 +70,53 @@ describe("TrackedPatternUtils.computeLevel", () => {
         ).toBeGreaterThan(0.2);
     });
 });
+
+describe("TrackedPatternUtils.computeTrailShare", () => {
+    it("holds the whole level through the retention, then fades", () => {
+        const opts = { trailMs: 400, retentionMs: 300 };
+
+        expect(TrackedPatternUtils.computeTrailShare(0, opts)).toBe(1);
+        expect(TrackedPatternUtils.computeTrailShare(300, opts)).toBe(1);
+        expect(TrackedPatternUtils.computeTrailShare(500, opts)).toBeLessThan(1);
+        expect(TrackedPatternUtils.computeTrailShare(700, opts)).toBe(0);
+    });
+
+    it("fades straight away with no retention, which is the old behavior", () => {
+        expect(TrackedPatternUtils.computeTrailShare(1, { trailMs: 400, retentionMs: 0 })).toBeLessThan(1);
+    });
+
+    it("drops at once when the hold ends and there is no fade", () => {
+        const opts = { trailMs: 0, retentionMs: 300 };
+
+        expect(TrackedPatternUtils.computeTrailShare(300, opts)).toBe(1);
+        expect(TrackedPatternUtils.computeTrailShare(301, opts)).toBe(0);
+    });
+});
+
+describe("TrackedPatternUtils.createTrail", () => {
+    const opts = { trailMs: 400, retentionMs: 300, restLevel: 0.1 };
+
+    it("keeps a cell at the level the pointer left it for the retention", () => {
+        const trail = TrackedPatternUtils.createTrail();
+
+        trail.computeLevel("a", 0.8, 0, opts);
+
+        expect(trail.computeLevel("a", 0.1, 250, opts)).toBe(0.8);
+        expect(trail.computeLevel("a", 0.1, 500, opts)).toBeLessThan(0.8);
+        expect(trail.computeLevel("a", 0.1, 800, opts)).toBe(0.1);
+    });
+
+    it("warms a held cell at once when the pointer comes back brighter", () => {
+        const trail = TrackedPatternUtils.createTrail();
+
+        trail.computeLevel("a", 0.5, 0, opts);
+
+        expect(trail.computeLevel("a", 0.9, 100, opts)).toBe(0.9);
+    });
+
+    it("counts the hold and the fade together for the clock", () => {
+        expect(TrackedPatternUtils.getTrailSpanMs(opts)).toBe(700);
+        expect(TrackedPatternUtils.getHasTrail({ trailMs: 0, retentionMs: 0 })).toBe(false);
+        expect(TrackedPatternUtils.getHasTrail({ trailMs: 0, retentionMs: 200 })).toBe(true);
+    });
+});

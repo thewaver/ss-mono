@@ -5,6 +5,7 @@
         BRACKET_ROOT_SIDES,
         BracketConnectors,
         Markup,
+        MediaQueryMonitorSvelteUtils,
     } from "@thewaver/ss-components-svelte";
     import type { BracketConnectorDefs, BracketOrientation, BracketRootSide } from "@thewaver/ss-components-svelte";
     import { BracketKnobs } from "@thewaver/ss-playground/App/Knobs/Brackets.const";
@@ -24,6 +25,8 @@
     import PagePropsPanel from "../../PageComponents/PropsPanel/PagePropsPanel.svelte";
     import { NOTHING_PICKED } from "./BracketPage.const";
     import type { BracketExampleProps } from "./BracketPage.types";
+    import BeamsExample from "./Examples/Beams.svelte";
+    import FamilyExample from "./Examples/Family.svelte";
     import KnockoutExample from "./Examples/Knockout.svelte";
     import OrgChartExample from "./Examples/OrgChart.svelte";
     import SkillTreeExample from "./Examples/SkillTree.svelte";
@@ -34,6 +37,7 @@
     const CONNECTOR_WIDTH = 2;
     const ROUTE_CONNECTOR_WIDTH = 3;
     const WIDE_SPAN = 2;
+    const NO_MOTION_DURATION_MS = 0;
 
     let layerGap = $state(BRACKET_DEFAULTS.layerGap);
     let crossGap = $state(BRACKET_DEFAULTS.crossGap);
@@ -41,6 +45,10 @@
     let rootSide = $state<BracketRootSide>(BRACKET_DEFAULTS.rootSide);
     let connector = $state<BracketConnectors.SampleKey>(BracketConnectors.SAMPLE_KEYS[0]);
     let picked = $state(NOTHING_PICKED);
+    let transitionDurationMs = $state(BRACKET_DEFAULTS.transitionDurationMs);
+    let family = $state("");
+
+    const getPrefersReducedMotion = MediaQueryMonitorSvelteUtils.createReducedMotion();
 
     const commonProps: BracketExampleProps = $derived({
         layerGap,
@@ -80,6 +88,24 @@
             component: skillTreeExample,
             path: `${EXAMPLES_ROOT}/SkillTree.svelte`,
         },
+        {
+            key: "beams",
+            name: "A beam along the road to the final",
+            span: WIDE_SPAN,
+            readout: () =>
+                `picked: ${picked} — focus a seed or a match and a pulse runs along every line between it and the final, toward the final; it keeps running while the focus stays, so Pause is there to stop it`,
+            component: beamsExample,
+            path: `${EXAMPLES_ROOT}/Beams.svelte`,
+        },
+        {
+            key: "family",
+            name: "One family at a time",
+            span: WIDE_SPAN,
+            readout: () =>
+                `showing: ${family} — focus a node and the board shows what it feeds, it with all its siblings, and what feeds them; walk on with the arrows and the rest folds away`,
+            component: familyExample,
+            path: `${EXAMPLES_ROOT}/Family.svelte`,
+        },
     ];
 </script>
 
@@ -110,6 +136,24 @@
 {#snippet skillTreeExample()}
     <PageMeasureBox>
         <SkillTreeExample {...commonProps} />
+    </PageMeasureBox>
+{/snippet}
+
+{#snippet beamsExample()}
+    <PageMeasureBox>
+        <BeamsExample {...commonProps} {connector} connectorRadius={CONNECTOR_RADIUS} />
+    </PageMeasureBox>
+{/snippet}
+
+{#snippet familyExample()}
+    <PageMeasureBox>
+        <FamilyExample
+            {...commonProps}
+            transitionDurationMs={getPrefersReducedMotion() ? NO_MOTION_DURATION_MS : transitionDurationMs}
+            onFamilyChange={(next) => {
+                family = next;
+            }}
+        />
     </PageMeasureBox>
 {/snippet}
 
@@ -177,6 +221,26 @@
             ariaLabel={"Row gap in pixels"}
             onInput={(value) => {
                 crossGap = value;
+            }}
+        />
+    </PageProp>
+
+    <PageProp
+        itemKey={"transitionDurationMs"}
+        label={"Glide (ms)"}
+        hint={
+            "How long the family example takes to glide from one family to the next. It is off while the visitor has asked for reduced motion."
+        }
+    >
+        <PageNumberField
+            value={transitionDurationMs}
+            min={BracketKnobs.MIN_TRANSITION_DURATION_MS}
+            max={BracketKnobs.MAX_TRANSITION_DURATION_MS}
+            step={BracketKnobs.TRANSITION_DURATION_STEP_MS}
+            isDisabled={getPrefersReducedMotion()}
+            ariaLabel={"Glide in milliseconds"}
+            onInput={(value) => {
+                transitionDurationMs = value;
             }}
         />
     </PageProp>

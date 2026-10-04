@@ -1,6 +1,7 @@
 import type { ComputedRef, Ref } from "vue";
 
 import type { CarouselOrientation, CarouselPlacementFn, CarouselPlacements } from "@thewaver/ss-components-vue";
+import type { SlideFrameClasses } from "@thewaver/ss-playground/App/Pages/Carousels/Carousels.types";
 
 export type CarouselExampleProps = {
     "slides": string[];
@@ -13,7 +14,7 @@ export type CarouselExampleProps = {
     "playback"?: boolean;
     "onUpdate:playback"?: (value: boolean) => void;
     "computePlacement": CarouselPlacementFn;
-    "isNarrow": boolean;
+    "frameClasses": SlideFrameClasses;
 };
 
 export type CarouselSharedProps = Omit<

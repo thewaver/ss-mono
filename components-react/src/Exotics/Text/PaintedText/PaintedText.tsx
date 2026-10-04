@@ -21,19 +21,23 @@ import {
     PaintedTextStyles,
     PaintedTextUtils,
     ShapeLayerUtils,
+    TrailUtils,
 } from "@thewaver/ss-components";
 import { StringUtils } from "@thewaver/ss-utils";
 
+import { InteractionTrackerReactUtils } from "../../../Abstracts/InteractionTracker/InteractionTrackerReact.utils";
 import { useLetterDriverContext } from "../../../Abstracts/LetterDriver/LetterDriver.context";
+import { SignalMirrorReactUtils } from "../../../Abstracts/SignalMirror/SignalMirrorReact.utils";
 import type { SVGDefs } from "../../../Generators/SVGDefs/SVGDefs.types";
 import { PaintAreaContextProvider } from "../../../Generators/SVGDefs/SVGGradients/PaintArea.context";
-import { useElement } from "../../../Utils/refUtils";
+import { useElement, useLatest } from "../../../Utils/refUtils";
 import { useStore } from "../../../Utils/storeUtils";
 import type { PaintedTextController, PaintedTextProps } from "./PaintedText.types";
 
 const MASK_PADDING_SIDES = 2;
 const NO_OFFSET = 0;
-const BEFORE_FIRST = -1;
+const NO_LENGTH = 0;
+const NO_PROGRESS = 0;
 const NO_REGISTRY = LetterDriverUtils.createRegistry();
 
 type LayerAttributes = SVGProps<SVGTextElement> & SVGProps<SVGGElement>;
@@ -52,8 +56,13 @@ const renderDefsElements = (defs: SVGDefs[]) =>
         </Fragment>
     ));
 
-const renderRun = (run: PaintedTextRun, index: number, isReadable: boolean) => (
-    <tspan key={index} x={run.x} y={run.y} style={toReactStyle(run.style)}>
+const renderRun = (run: PaintedTextRun, index: number, isReadable: boolean, isOnPath: boolean) => (
+    <tspan
+        key={index}
+        x={isOnPath ? undefined : run.x}
+        y={isOnPath ? undefined : run.y}
+        style={toReactStyle(run.style)}
+    >
         {isReadable && run.title && <title>{run.title}</title>}
         {isReadable && run.anchor ? (
             <a href={run.anchor.href} target={run.anchor.target} rel={run.anchor.rel}>
@@ -67,8 +76,21 @@ const renderRun = (run: PaintedTextRun, index: number, isReadable: boolean) => (
 
 export const PaintedText = (props: PaintedTextProps) => {
     const maskId = `painted-text-mask-${useId()}`;
+    const pathId = `painted-text-path-${useId()}`;
 
     const driver = useLetterDriverContext();
+
+    const [progress, setProgressState] = SignalMirrorReactUtils.useOptionalState(props.progress, NO_PROGRESS);
+    const [isPlaying] = SignalMirrorReactUtils.useOptionalState(props.playback, PAINTED_TEXT_DEFAULTS.playback);
+
+    const isPageHidden = InteractionTrackerReactUtils.usePageHidden();
+
+    const isOnPath = props.path !== undefined;
+    const isFittedToPath = props.isFittedToPath ?? PAINTED_TEXT_DEFAULTS.isFittedToPath;
+    const lapDurationMs = props.lapDurationMs ?? PAINTED_TEXT_DEFAULTS.lapDurationMs;
+
+    const pathRef = useLatest({ path: props.path, isFittedToPath });
+    const progressRef = useLatest(progress);
 
     const rootRef = useRef<HTMLDivElement>(null);
     const rootElement = useElement(rootRef);
@@ -98,6 +120,8 @@ export const PaintedText = (props: PaintedTextProps) => {
             getLayoutHost: () => layoutRef.current ?? undefined,
             getIsMeasuringLetters: () => isDrivenRef.current,
             getComputePushingAnimationName: () => computePushingNameRef.current,
+            getPath: () => pathRef.current.path,
+            getIsFittedToPath: () => pathRef.current.isFittedToPath,
         }),
     );
 
@@ -107,6 +131,20 @@ export const PaintedText = (props: PaintedTextProps) => {
     const restLetters = useStore(layout, (state) => state.restLetters);
     const width = useStore(layout, (state) => state.width ?? 0);
     const height = useStore(layout, (state) => state.height);
+    const origin = useStore(layout, (state) => state.origin);
+    const pathLength = useStore(layout, (state) => state.pathLength);
+    const ascent = useStore(layout, (state) => state.ascent);
+    const descent = useStore(layout, (state) => state.descent);
+
+    const startOffset = progress * pathLength;
+    const isSliding = isOnPath && isPlaying && !isPageHidden && pathLength > NO_LENGTH;
+
+    const setProgress = (value: number) => {
+        progressRef.current = value;
+        setProgressState(value);
+    };
+
+    const latest = useLatest({ lapDurationMs, setProgress });
 
     useStore(driver?.registry ?? NO_REGISTRY, (state) => state.entries);
 
@@ -158,16 +196,52 @@ export const PaintedText = (props: PaintedTextProps) => {
 
     useEffect(() => {
         registrationRef.current?.setBoxes(
-            restLetters.map((letter) => ({ x: letter.x, y: letter.top, width: letter.width, height: letter.height })),
+            restLetters.map((letter) => ({
+                x: letter.x - origin.x,
+                y: letter.top - origin.y,
+                width: letter.width,
+                height: letter.height,
+            })),
         );
-    }, [restLetters]);
+    }, [restLetters, origin]);
+
+    const isFirstPathRef = useRef(true);
+
+    useLayoutEffect(() => {
+        if (isFirstPathRef.current) {
+            isFirstPathRef.current = false;
+
+            return;
+        }
+
+        layout.update();
+    }, [props.path, isFittedToPath]);
+
+    useLayoutEffect(() => {
+        layout.placeAlongPath(startOffset);
+    }, [startOffset]);
+
+    useEffect(() => {
+        if (!isSliding) return;
+
+        return TrailUtils.run({
+            getProgress: () => progressRef.current,
+            setProgress: (value) => latest.current.setProgress(value),
+            getRunDurationMs: () => latest.current.lapDurationMs,
+            getIsLooping: () => true,
+            onEnd: () => undefined,
+        });
+    }, [isSliding]);
 
     useEffect(() => {
         props.onMount?.(controller);
     }, [controller]);
 
     const size = { width, height };
-    const paintAreaContext = useMemo(() => ({ paintArea: { x: 0, y: 0, width, height } }), [width, height]);
+    const paintAreaContext = useMemo(
+        () => ({ paintArea: { x: origin.x, y: origin.y, width, height } }),
+        [origin, width, height],
+    );
     const strokePaint = PaintedTextUtils.computeStrokePaint(
         props.strokeAlignment ?? PAINTED_TEXT_DEFAULTS.strokeAlignment,
         props.strokeWidth ?? PAINTED_TEXT_DEFAULTS.strokeWidth,
@@ -208,23 +282,17 @@ export const PaintedText = (props: PaintedTextProps) => {
         return indices;
     }, []);
 
-    const computeCaretBox = () => {
-        if (!driver?.renderCaret || driver.caretIndex === undefined) return undefined;
+    const caretBox =
+        driver?.renderCaret && driver.caretIndex !== undefined
+            ? PaintedTextUtils.computeCaretBox(
+                  letters,
+                  driver.caretIndex,
+                  offset,
+                  isOnPath ? { ascent, descent } : undefined,
+              )
+            : undefined;
 
-        if (driver.caretIndex === BEFORE_FIRST) {
-            const first = letters[0];
-
-            return offset === NO_OFFSET && first ? { x: first.x, top: first.top, height: first.height } : undefined;
-        }
-
-        const letter = letters[driver.caretIndex - offset];
-
-        return letter ? { x: letter.x + letter.width, top: letter.top, height: letter.height } : undefined;
-    };
-
-    const caretBox = computeCaretBox();
-
-    const renderRuns = (isReadable: boolean) => runs.map((run, index) => renderRun(run, index, isReadable));
+    const renderRuns = (isReadable: boolean) => runs.map((run, index) => renderRun(run, index, isReadable, isOnPath));
 
     const renderLetter = (letter: PaintedTextLetter, localIndex: number) => {
         const state = driver?.getLetterState(offset + localIndex);
@@ -246,11 +314,57 @@ export const PaintedText = (props: PaintedTextProps) => {
 
     const renderLetters = () => letters.map((letter, index) => letter.kind === "text" && renderLetter(letter, index));
 
+    const renderPathLetter = (letter: PaintedTextLetter, localIndex: number) => {
+        const placement = letter.placement;
+
+        if (!placement) return undefined;
+
+        const state = driver?.getLetterState(offset + localIndex);
+        const letterStyle = getLetterStyle(localIndex);
+
+        return (
+            <g
+                key={localIndex}
+                transform={`translate(${placement.point.x} ${placement.point.y}) rotate(${placement.angle})`}
+            >
+                <text
+                    className={PaintedTextStyles.paintedTextLayer}
+                    x={state?.glyph ? 0 : -placement.advance * 0.5}
+                    y={0}
+                    textAnchor={state?.glyph ? "middle" : undefined}
+                    style={toReactStyle({ ...runs[letter.runIndex ?? 0]?.style, ...letterStyle })}
+                >
+                    {state?.glyph ?? letter.character}
+                </text>
+            </g>
+        );
+    };
+
+    const renderPathText = (key: string, attributes: LayerAttributes, isReadable: boolean, textOffset: number) => (
+        <text
+            key={key}
+            className={PaintedTextStyles.paintedTextLayer}
+            {...(attributes as SVGProps<SVGTextElement>)}
+            textLength={isFittedToPath ? pathLength : undefined}
+            lengthAdjust={isFittedToPath ? "spacing" : undefined}
+            aria-hidden={isReadable ? undefined : "true"}
+        >
+            <textPath href={`#${pathId}`} startOffset={textOffset}>
+                {renderRuns(isReadable)}
+            </textPath>
+        </text>
+    );
+
     const renderLayer = (key: string, attributes: LayerAttributes, isReadable: boolean) =>
         isPerLetter ? (
             <g key={key} {...(attributes as SVGProps<SVGGElement>)} aria-hidden="true">
-                {renderLetters()}
+                {isOnPath ? letters.map(renderPathLetter) : renderLetters()}
             </g>
+        ) : isOnPath ? (
+            <Fragment key={key}>
+                {renderPathText("main", attributes, isReadable, startOffset)}
+                {renderPathText("wrap", attributes, false, startOffset - pathLength)}
+            </Fragment>
         ) : (
             <text
                 key={key}
@@ -263,18 +377,32 @@ export const PaintedText = (props: PaintedTextProps) => {
         );
 
     return (
-        <div ref={rootRef} className={PaintedTextStyles.paintedTextRoot}>
+        <div
+            ref={rootRef}
+            className={PaintedTextStyles.paintedTextRoot}
+            style={isOnPath ? { width: `${width}px`, height: `${height}px` } : undefined}
+        >
             <div ref={sourceRef} className={PaintedTextStyles.paintedTextSourceWrap} aria-hidden="true" inert>
                 {props.children}
             </div>
 
-            <div ref={layoutRef} className={PaintedTextStyles.paintedTextLayoutWrap} aria-hidden="true" inert />
+            <div
+                ref={layoutRef}
+                className={[
+                    PaintedTextStyles.paintedTextLayoutWrap,
+                    isOnPath ? PaintedTextStyles.paintedTextLayoutWrapOnPath : undefined,
+                ]
+                    .filter(Boolean)
+                    .join(" ")}
+                aria-hidden="true"
+                inert
+            />
 
             <svg
                 className={PaintedTextStyles.paintedTextSVG}
                 width={width}
                 height={height}
-                viewBox={`0 0 ${width} ${height}`}
+                viewBox={`${origin.x} ${origin.y} ${width} ${height}`}
                 style={driver?.isHidden ? { visibility: "hidden" } : undefined}
             >
                 <defs>
@@ -283,19 +411,21 @@ export const PaintedText = (props: PaintedTextProps) => {
                         {renderDefsElements(strokeDefs)}
                     </PaintAreaContextProvider>
 
+                    {isOnPath && <path id={pathId} d={props.path} />}
+
                     {strokePaint.maskKind && (
                         <mask
                             id={maskId}
                             maskUnits="userSpaceOnUse"
-                            x={-maskPadding}
-                            y={-maskPadding}
+                            x={origin.x - maskPadding}
+                            y={origin.y - maskPadding}
                             width={width + maskPadding * MASK_PADDING_SIDES}
                             height={height + maskPadding * MASK_PADDING_SIDES}
                         >
                             {strokePaint.maskKind === "outside" && (
                                 <rect
-                                    x={-maskPadding}
-                                    y={-maskPadding}
+                                    x={origin.x - maskPadding}
+                                    y={origin.y - maskPadding}
                                     width={width + maskPadding * MASK_PADDING_SIDES}
                                     height={height + maskPadding * MASK_PADDING_SIDES}
                                     fill="white"
@@ -311,11 +441,14 @@ export const PaintedText = (props: PaintedTextProps) => {
                     )}
                 </defs>
 
-                {isPerLetter && (
-                    <text className={PaintedTextStyles.paintedTextLayer} opacity={0}>
-                        {renderRuns(true)}
-                    </text>
-                )}
+                {isPerLetter &&
+                    (isOnPath ? (
+                        renderPathText("readable", { opacity: 0 }, true, startOffset)
+                    ) : (
+                        <text className={PaintedTextStyles.paintedTextLayer} opacity={0}>
+                            {renderRuns(true)}
+                        </text>
+                    ))}
 
                 {fillDefs.map((def, index) => {
                     const paint = ShapeLayerUtils.computePaint(def);
@@ -372,7 +505,7 @@ export const PaintedText = (props: PaintedTextProps) => {
                 <div
                     key={`${caretBox.x}-${caretBox.top}`}
                     className={PaintedTextStyles.paintedTextCaret}
-                    style={{ left: `${caretBox.x}px`, top: `${caretBox.top}px`, height: `${caretBox.height}px` }}
+                    style={toReactStyle(PaintedTextUtils.computeCaretStyle(caretBox, origin))}
                 >
                     {driver?.renderCaret?.()}
                 </div>

@@ -15,6 +15,7 @@ import PagePropsPanel from "../../PageComponents/PropsPanel/PagePropsPanel.vue";
 import PageButtonContent from "../../StyledComponents/ButtonContent/ButtonContent.vue";
 import CounterExample from "./Examples/Counter.vue";
 import ReelsExample from "./Examples/Reels.vue";
+import SplitFlapExample from "./Examples/SplitFlap.vue";
 import type { OdometerExampleProps } from "./OdometerPage.types";
 
 const EXAMPLES_ROOT = "/src/App/Pages/OdometerPage/Examples";
@@ -81,6 +82,13 @@ const examples: ExampleDefs[] = [
         readout: () =>
             "every column spins at once and stops in the order its reel gives, taking extra whole turns on the way; with less motion asked for it only turns as far as its digit needs",
         path: `${EXAMPLES_ROOT}/Reels.vue`,
+    },
+    {
+        key: "splitFlap",
+        name: "Departures board",
+        readout: () =>
+            "each column drops one flap after another through every digit between the old one and the new, the top half of the digit going falling to uncover the bottom half of the digit coming; a column that carries waits for the one to its right, and a column whose digit has not changed does not flip",
+        path: `${EXAMPLES_ROOT}/SplitFlap.vue`,
     },
 ];
 </script>
@@ -188,6 +196,10 @@ const examples: ExampleDefs[] = [
                     />
                 </PageProp>
             </PageExampleKnobs>
+        </template>
+
+        <template #splitFlap>
+            <SplitFlapExample v-bind="commonProps" />
         </template>
     </PageExamples>
 </template>

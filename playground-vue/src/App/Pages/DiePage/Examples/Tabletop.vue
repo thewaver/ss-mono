@@ -37,6 +37,7 @@ const roll = () => {
             :shape="shape"
             :size="size"
             :roll-duration-ms="rollDurationMs"
+            :settle-duration-ms="settleDurationMs"
             :tumble-count="tumbleCount"
             ariaLabel="A die"
             :compute-face-label="computeFaceLabel"

@@ -10,6 +10,8 @@ export type BracketOrientation = "horizontal" | "vertical";
 
 export type BracketRootSide = "start" | "end";
 
+export type BracketView = "tree" | "family";
+
 export type BracketStep = "toRoot" | "toLeaves" | "previous" | "next" | "first" | "last";
 
 export type BracketPlacement = {
@@ -26,6 +28,8 @@ export type BracketLayout = {
     layerCount: number;
     leafCount: number;
 };
+
+export type BracketExtent = Pick<BracketLayout, "layerCount" | "leafCount">;
 
 export type BracketGeometryOpts = {
     nodeSize: Size2d;
@@ -51,6 +55,18 @@ export type BracketBox = {
     top: number;
     width: number;
     height: number;
+};
+
+export type BracketFrame = {
+    left: number;
+    top: number;
+    opacity: number;
+    isFolded: boolean;
+};
+
+export type BracketArrangement = {
+    nodes: Record<string, BracketFrame>;
+    headers: BracketFrame[];
 };
 
 export type BracketConnectorDefs = {

@@ -1,9 +1,12 @@
-import { RotationUtils } from "@thewaver/ss-utils";
+import { MathUtils, RotationUtils, StoreUtils } from "@thewaver/ss-utils";
 
 import type {
     OdometerDigitSlot,
     OdometerDirection,
     OdometerFixedSlot,
+    OdometerFlapLeaf,
+    OdometerFlapWindow,
+    OdometerFlapper,
     OdometerReel,
     OdometerShownSlot,
     OdometerSlot,
@@ -28,6 +31,18 @@ const NO_ANGLE = 0;
 const NO_DELAY = 0;
 /** A slot shrunk to nothing. */
 const ZERO_WIDTH = "0px";
+/** A run of flaps that has not started. */
+const RUN_NOT_STARTED = 0;
+/** A run of flaps that has finished. */
+const RUN_DONE = 1;
+/** The weight of the square in the smooth step a flap falls along, `3s² − 2s³`. */
+const SMOOTH_STEP_SQUARE = 3;
+/** The weight of the cube in the smooth step a flap falls along. */
+const SMOOTH_STEP_CUBE = 2;
+/** Where the flap on show sits among the three a column draws, after the one that fell last. */
+const SHOWN_LEAF = 1;
+/** The flaps a column draws, counted from the one on show: the one that fell last, itself, and the next. */
+const LEAF_OFFSETS = [-1, 0, 1];
 
 /** The digits in the order they appear around a wheel. */
 const DIGIT_FACES = Array.from({ length: DIGIT_COUNT }, (_unused, index) => String(index));
@@ -360,5 +375,146 @@ export namespace OdometerUtils {
         animation.onfinish = onFinish;
 
         return animation;
+    };
+
+    /**
+     * Where a split-flap column stands for the angle a drum column would be turned to, counted in flaps.
+     *
+     * A drum's angle and a split-flap's position are two spellings of one running count of steps, so a split-flap
+     * reuses every rule {@link computeTurn} applies — the direction, the cascade, the reels, the leaving columns —
+     * and only reads the answer differently. The count is never wrapped, for the reason the angle is not: a column
+     * going from `9` to `0` has to go one flap forward rather than nine back.
+     *
+     * @param angle An angle {@link computeTurn} or {@link getRestingAngle} gave.
+     * @returns How many flaps along the column is, rising as the number goes up. Its digit is the count wrapped
+     * into `0`–`9`.
+     */
+    export const getFlapPosition = (angle: number) => Math.round(-angle / RotationUtils.getStepAngle(DIGIT_COUNT));
+
+    /**
+     * How far a run of flaps has gone at a moment, before any flap is eased.
+     *
+     * The run waits `delayMs`, then moves from `from` to `to` at a steady rate over `durationMs`, so a run of many
+     * flaps drops each one faster rather than taking longer. A run with no duration jumps once the wait is over.
+     *
+     * @param from The position the run starts from, which may be partway through a flap.
+     * @param to The position the run ends on.
+     * @param elapsedMs How long since the run was asked for.
+     * @param delayMs How long the run waits before the first flap moves.
+     * @param durationMs How long the run takes once it starts.
+     * @returns The position reached, `from` while waiting and `to` once done.
+     */
+    export const computeFlapRunPosition = (
+        from: number,
+        to: number,
+        elapsedMs: number,
+        delayMs: number,
+        durationMs: number,
+    ) => {
+        const progress =
+            durationMs > NOTHING
+                ? MathUtils.clamp01((elapsedMs - delayMs) / durationMs)
+                : elapsedMs >= delayMs
+                  ? RUN_DONE
+                  : RUN_NOT_STARTED;
+
+        return progress >= RUN_DONE ? to : from + (to - from) * progress;
+    };
+
+    /**
+     * The position to draw for a position a run has reached, with each flap eased on its own.
+     *
+     * Every flap starts falling slowly, speeds up and slows again as it lands, so a run reads as one flap after
+     * another rather than one smooth slide. Whole positions are left exactly where they are, which is what lets a
+     * run be interrupted and restarted from the position reached without the drawing jumping.
+     *
+     * @param position A position {@link computeFlapRunPosition} gave.
+     */
+    export const getDrawnFlapPosition = (position: number) => {
+        const whole = Math.floor(position);
+        const part = position - whole;
+
+        return whole + part * part * (SMOOTH_STEP_SQUARE - SMOOTH_STEP_CUBE * part);
+    };
+
+    /**
+     * The flaps a split-flap column draws at a drawn position, and where among them it stands.
+     *
+     * Three flaps are enough to draw any moment, and they are handed out afresh as the column moves, so a column
+     * travelling through forty characters still draws three. The one that fell last lies below the middle line and
+     * shows the bottom half of the character on show; the one on show carries that character's top half on its front
+     * and the next character's bottom half on its back; the next one stands behind it with the next character's top
+     * half. Laid out by `SpineUtils.leaves` at the position given, the column reads as one character while the flap
+     * is upright and as the next once it has landed, and the picture is the same either side of a whole position.
+     *
+     * @param position A position {@link getDrawnFlapPosition} gave.
+     */
+    export const getFlapWindow = (position: number): OdometerFlapWindow => {
+        const whole = Math.floor(position);
+
+        return {
+            leaves: LEAF_OFFSETS.map((offset): OdometerFlapLeaf => ({
+                front: DIGIT_FACES[MathUtils.wrapIndex(whole + offset, DIGIT_COUNT)],
+                back: DIGIT_FACES[MathUtils.wrapIndex(whole + offset + SINGLE, DIGIT_COUNT)],
+            })),
+            position: SHOWN_LEAF + position - whole,
+        };
+    };
+
+    /**
+     * Holds where a split-flap column has reached, and runs it to a new position on animation frames.
+     *
+     * The position is a running count of flaps, as {@link getFlapPosition} gives it, and it moves at a steady rate;
+     * {@link getDrawnFlapPosition} is what eases each flap. A new run asked for partway through another starts from
+     * where that one had reached, so nothing jumps. A run with neither a wait nor a duration puts the position
+     * straight on.
+     *
+     * @param position The position to start on.
+     * @returns The flapper, whose value is the position reached.
+     */
+    export const createFlapper = (position: number): OdometerFlapper => {
+        const store = StoreUtils.create(position);
+
+        let frame: number | undefined;
+
+        const cancelFrame = () => {
+            if (frame !== undefined) cancelAnimationFrame(frame);
+
+            frame = undefined;
+        };
+
+        const rest = (next: number) => {
+            cancelFrame();
+            store.set(next);
+        };
+
+        const stop = cancelFrame;
+
+        const flapTo = (target: number, delayMs: number, durationMs: number) => {
+            const from = store.get();
+
+            if (frame === undefined && target === from) return;
+
+            if (delayMs <= NOTHING && durationMs <= NOTHING) {
+                rest(target);
+
+                return;
+            }
+
+            cancelFrame();
+
+            const startMs = performance.now();
+
+            const tick = (nowMs: number) => {
+                const reached = computeFlapRunPosition(from, target, nowMs - startMs, delayMs, durationMs);
+
+                store.set(reached);
+                frame = reached === target ? undefined : requestAnimationFrame(tick);
+            };
+
+            frame = requestAnimationFrame(tick);
+        };
+
+        return { get: store.get, subscribe: store.subscribe, flapTo, rest, stop };
     };
 }

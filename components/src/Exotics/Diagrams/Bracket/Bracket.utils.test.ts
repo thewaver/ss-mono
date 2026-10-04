@@ -222,3 +222,253 @@ describe("resolveRovingId", () => {
         expect(BracketUtils.resolveRovingId([], "0")).toBeUndefined();
     });
 });
+
+const DEEP = pair(
+    "Final",
+    pair("Semi 1", pair("Quarter 1", leaf("A"), leaf("B")), pair("Quarter 2", leaf("C"), leaf("D"))),
+    pair("Semi 2", pair("Quarter 3", leaf("E"), leaf("F")), pair("Quarter 4", leaf("G"), leaf("H"))),
+);
+
+const DEEP_LAYOUT = BracketUtils.computeLayout(DEEP);
+
+const ID_OF = Object.fromEntries(
+    DEEP_LAYOUT.placements.map((placement) => [BracketUtils.findNode(DEEP, placement.id).value, placement.id]),
+);
+
+const familyOf = (focused: string | undefined) => {
+    const anchorId = BracketUtils.getFamilyAnchorId(focused === undefined ? undefined : ID_OF[focused]);
+
+    return DEEP_LAYOUT.placements
+        .filter((placement) => BracketUtils.getIsInFamily(placement.id, anchorId))
+        .map((placement) => BracketUtils.findNode(DEEP, placement.id).value);
+};
+
+describe("getParentId", () => {
+    it("takes the last position off an id, and the root has no parent", () => {
+        expect(BracketUtils.getParentId("0.1.10")).toBe("0.1");
+        expect(BracketUtils.getParentId("0")).toBeUndefined();
+    });
+});
+
+describe("the family view's rows", () => {
+    it("shows, for a node in the middle, what it feeds, it with its siblings, and everything that feeds them", () => {
+        expect(familyOf("Semi 1")).toEqual([
+            "Final",
+            "Semi 1",
+            "Semi 2",
+            "Quarter 1",
+            "Quarter 2",
+            "Quarter 3",
+            "Quarter 4",
+        ]);
+        expect(familyOf("Quarter 2"), "the same rule one round further out").toEqual([
+            "Semi 1",
+            "Quarter 1",
+            "Quarter 2",
+            "A",
+            "B",
+            "C",
+            "D",
+        ]);
+    });
+
+    it("shows two rows for a leaf, because nothing feeds it: what it feeds, and it with its siblings", () => {
+        expect(familyOf("B")).toEqual(["Quarter 1", "A", "B"]);
+    });
+
+    it("shows two rows for the root, because it feeds nothing: the root and the nodes that feed it", () => {
+        expect(familyOf("Final")).toEqual(["Final", "Semi 1", "Semi 2"]);
+    });
+
+    it("shows the root's rows when nothing is focused", () => {
+        expect(familyOf(undefined)).toEqual(familyOf("Final"));
+    });
+
+    it("reads a separator rather than a shared prefix, so a tenth child is not counted as the first one's", () => {
+        expect(BracketUtils.getIsInFamily("0.10", "0.1")).toBe(false);
+    });
+});
+
+describe("getFoldId", () => {
+    it("folds a node below the family onto the member it feeds into", () => {
+        expect(BracketUtils.getFoldId(ID_OF.A, ID_OF.Final)).toBe(ID_OF["Quarter 1"]);
+        expect(BracketUtils.getFoldId(ID_OF.H, ID_OF.Final)).toBe(ID_OF["Quarter 4"]);
+    });
+
+    it("folds the anchor's parent and every other branch onto the anchor", () => {
+        const anchorId = ID_OF["Semi 1"];
+
+        expect(BracketUtils.getFoldId(ID_OF.Final, anchorId)).toBe(anchorId);
+        expect(BracketUtils.getFoldId(ID_OF["Semi 2"], anchorId)).toBe(anchorId);
+        expect(BracketUtils.getFoldId(ID_OF.E, anchorId)).toBe(anchorId);
+    });
+
+    it("leaves a member where it is", () => {
+        expect(BracketUtils.getFoldId(ID_OF.A, ID_OF["Semi 1"])).toBe(ID_OF.A);
+    });
+});
+
+describe("computeFamilyLayout", () => {
+    const spellFamily = (anchorId: string | undefined) =>
+        BracketUtils.computeFamilyLayout(DEEP_LAYOUT, anchorId)
+            .placements.map(
+                (placement) =>
+                    `${BracketUtils.findNode(DEEP, placement.id).value}@${placement.layer},${placement.cross}`,
+            )
+            .join(" ");
+
+    it("places a family as though the tree ended at its last row, with its top row first", () => {
+        expect(spellFamily(ID_OF["Semi 1"])).toBe(
+            "Semi 1@0,1.5 Quarter 1@1,0.5 Quarter 2@1,2.5 A@2,0 B@2,1 C@2,2 D@2,3",
+        );
+        expect(spellFamily(ID_OF["Quarter 1"])).toBe("Quarter 1@0,0.5 A@1,0 B@1,1");
+        expect(spellFamily(undefined)).toBe("Final@0,0.5 Semi 1@1,0 Semi 2@1,1");
+    });
+});
+
+describe("computeFamilyExtent", () => {
+    it("is as deep and as wide as the largest family", () => {
+        expect(BracketUtils.computeFamilyExtent(DEEP_LAYOUT)).toEqual({ layerCount: 3, leafCount: 4 });
+    });
+
+    it("counts an uneven family by the rows it actually holds", () => {
+        const uneven: BracketNode<string> = {
+            value: "Top",
+            children: [pair("Left", leaf("A"), leaf("B")), { value: "Right", children: [leaf("C")] }, leaf("Lone")],
+        };
+
+        expect(BracketUtils.computeFamilyExtent(BracketUtils.computeLayout(uneven))).toEqual({
+            layerCount: 3,
+            leafCount: 4,
+        });
+    });
+});
+
+describe("computeFamilyArrangement", () => {
+    const extent = BracketUtils.computeFamilyExtent(DEEP_LAYOUT);
+    const geometry = BracketUtils.computeGeometry(extent, {
+        nodeSize: { width: 100, height: 20 },
+        layerGap: 10,
+        crossGap: 4,
+        orientation: "horizontal",
+        rootSide: "end",
+        headerExtent: 24,
+    });
+
+    it("draws the members and folds everyone else, unseen, onto the member they gather on", () => {
+        const arrangement = BracketUtils.computeFamilyArrangement(DEEP_LAYOUT, geometry, extent, ID_OF["Quarter 1"]);
+        const quarter = arrangement.nodes[ID_OF["Quarter 1"]];
+        const final = arrangement.nodes[ID_OF.Final];
+
+        expect(quarter, "a member is drawn and reachable").toMatchObject({ opacity: 1, isFolded: false });
+        expect(final, "the final is folded away").toMatchObject({ opacity: 0, isFolded: true });
+        expect({ left: final.left, top: final.top }, "onto the top of the family").toEqual({
+            left: quarter.left,
+            top: quarter.top,
+        });
+    });
+
+    it("centers a family narrower than the board across it", () => {
+        const arrangement = BracketUtils.computeFamilyArrangement(DEEP_LAYOUT, geometry, extent, ID_OF["Quarter 1"]);
+        const first = arrangement.nodes[ID_OF.A];
+        const second = arrangement.nodes[ID_OF.B];
+        const middle = (first.top + second.top + geometry.crossExtent) * 0.5;
+
+        expect(middle, "two rows sit in the middle of a board four rows tall").toBeCloseTo(
+            geometry.headerExtent + (geometry.boardSize.height - geometry.headerExtent) * 0.5,
+        );
+    });
+
+    it("moves each header over its layer's row, and folds the headers of layers the family does not reach", () => {
+        const arrangement = BracketUtils.computeFamilyArrangement(DEEP_LAYOUT, geometry, extent, ID_OF["Quarter 1"]);
+        const quarters = arrangement.nodes[ID_OF["Quarter 1"]];
+        const leaves = arrangement.nodes[ID_OF.A];
+
+        expect(arrangement.headers[2], "the quarters' header is over the quarters").toMatchObject({
+            left: quarters.left,
+            isFolded: false,
+        });
+        expect(arrangement.headers[3].left, "and the first round's over the first round").toBe(leaves.left);
+        expect(arrangement.headers[0], "the final's is gone").toMatchObject({ opacity: 0, isFolded: true });
+    });
+});
+
+describe("getIsFrameHidden", () => {
+    it("hides a folded frame once it has faded out", () => {
+        expect(BracketUtils.getIsFrameHidden({ left: 0, top: 0, opacity: 0, isFolded: true })).toBe(true);
+    });
+
+    it("keeps an unfolding frame in the picture at the start of its glide, so focus can land on it", () => {
+        expect(BracketUtils.getIsFrameHidden({ left: 0, top: 0, opacity: 0, isFolded: false })).toBe(false);
+    });
+
+    it("keeps a frame still fading out, and hides nothing outside the family view", () => {
+        expect(BracketUtils.getIsFrameHidden({ left: 0, top: 0, opacity: 0.5, isFolded: true })).toBe(false);
+        expect(BracketUtils.getIsFrameHidden(undefined)).toBe(false);
+    });
+});
+
+describe("computeShownArrangement", () => {
+    const frame = (left: number, opacity: number) => ({ left, top: 0, opacity, isFolded: opacity === 0 });
+    const from = { nodes: { a: frame(0, 1), b: frame(0, 1) }, headers: [frame(0, 1)] };
+    const to = { nodes: { a: frame(100, 0), b: frame(40, 1), c: frame(10, 1) }, headers: [frame(50, 0)] };
+
+    it("is halfway at half time, and takes whether a node is folded from where it is going", () => {
+        const shown = BracketUtils.computeShownArrangement(from, to, 0.5);
+
+        expect(shown.nodes.a).toEqual({ left: 50, top: 0, opacity: 0.5, isFolded: true });
+        expect(shown.headers[0].left).toBe(25);
+    });
+
+    it("starts a frame it had no start for where it is going", () => {
+        expect(BracketUtils.computeShownArrangement(from, to, 0.5).nodes.c).toEqual(to.nodes.c);
+    });
+
+    it("is where it is going once the glide is done, and before any glide", () => {
+        expect(BracketUtils.computeShownArrangement(from, to, 1)).toBe(to);
+        expect(BracketUtils.computeShownArrangement(undefined, to, 0)).toBe(to);
+    });
+
+    it("eases, so it moves less than its share at the start", () => {
+        expect(BracketUtils.computeShownArrangement(from, to, 0.1).nodes.b.left).toBeLessThan(4);
+    });
+});
+
+describe("connectors in the family view", () => {
+    const geometry = BracketUtils.computeGeometry(DEEP_LAYOUT, {
+        nodeSize: { width: 100, height: 20 },
+        layerGap: 10,
+        crossGap: 4,
+        orientation: "horizontal",
+        rootSide: "end",
+        headerExtent: 0,
+    });
+
+    it("runs between where the nodes are drawn, when that is handed over", () => {
+        const frames = Object.fromEntries(
+            DEEP_LAYOUT.placements.map((placement) => [
+                placement.id,
+                { left: 500, top: 300, opacity: 1, isFolded: false },
+            ]),
+        );
+        const connector = BracketUtils.computeConnectors(DEEP_LAYOUT, geometry, "b", undefined, frames)[0];
+
+        expect(connector.from, "every node drawn in one spot puts both ends of every line there").toEqual({
+            x: 500,
+            y: 310,
+        });
+        expect(connector.to).toEqual({ x: 600, y: 310 });
+    });
+
+    it("is drawn as faintly as its fainter end", () => {
+        const frames = {
+            [ID_OF.Final]: { left: 0, top: 0, opacity: 1, isFolded: false },
+            [ID_OF["Semi 1"]]: { left: 0, top: 0, opacity: 0.25, isFolded: true },
+        };
+        const connector = BracketUtils.computeConnectors(DEEP_LAYOUT, geometry, "b", undefined).find(
+            (defs) => defs.childId === ID_OF["Semi 1"],
+        )!;
+
+        expect(BracketUtils.computeConnectorOpacity(frames, connector)).toBe(0.25);
+    });
+});

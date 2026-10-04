@@ -3,6 +3,7 @@ import type {
     PaintedTextStrokeAlignment,
     SVGDefsColors,
     SVGDefsSamples,
+    SignalSource,
 } from "@thewaver/ss-components-solid";
 import type { Size2d } from "@thewaver/ss-utils";
 
@@ -19,3 +20,16 @@ export type PaintedTextExampleProps = AccessorProps<{
     iterationConfigKey: SVGDefsSamples.Iteration.SampleKey;
     cellSize: Size2d;
 }>;
+
+export type PaintedTextPathExampleProps = PaintedTextExampleProps &
+    AccessorProps<{
+        lapDurationMs: number;
+        progress: SignalSource<number>;
+        playback: SignalSource<boolean>;
+    }>;
+
+export type PaintedTextCircleExampleProps = PaintedTextPathExampleProps &
+    AccessorProps<{
+        radius: number;
+        isFittedToPath: boolean;
+    }>;

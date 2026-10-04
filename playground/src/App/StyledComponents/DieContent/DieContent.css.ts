@@ -19,3 +19,11 @@ export const dieFaceShowing = style({
     backgroundImage: `radial-gradient(circle at 70% 30%, ${themeVars.color.primary.light}, ${themeVars.color.primary.dark})`,
     color: themeVars.color.primary.contrast,
 });
+
+export const dieIcon = style({
+    display: "grid",
+    placeItems: "center",
+    width: "100%",
+    height: "100%",
+    userSelect: "none",
+});

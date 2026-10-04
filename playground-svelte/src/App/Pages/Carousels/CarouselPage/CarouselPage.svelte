@@ -1,4 +1,6 @@
 <script lang="ts">
+    import { CarouselKnobs } from "@thewaver/ss-playground/App/Knobs/Carousels.const";
+
     import type { ExampleDefs } from "../../../PageComponents/Examples/Examples.types";
     import PageExamples from "../../../PageComponents/Examples/PageExamples.svelte";
     import PageCarouselBox from "../../../StyledComponents/CarouselContent/PageCarouselBox.svelte";
@@ -9,6 +11,7 @@
     import RotatingExample from "./Examples/Rotating.svelte";
     import ScrolledExample from "./Examples/Scrolled.svelte";
     import SteppedExample from "./Examples/Stepped.svelte";
+    import WordDrumExample from "./Examples/WordDrum.svelte";
 
     const EXAMPLES_ROOT = "/src/App/Pages/Carousels/CarouselPage/Examples";
 
@@ -20,6 +23,7 @@
     let barelessIndex = $state(0);
     let scrolledIndex = $state(0);
     let ringIndex = $state(0);
+    let wordDrumIndex = $state(0);
 
     const isLooping = $derived(controls.isLooping);
 
@@ -60,9 +64,17 @@
             key: "ring",
             name: "A ring that turns and leans",
             readout: () =>
-                `slide ${ringIndex + 1} of ${controls.slideCount} — a placement rule written in the example, a wide ring of small slides inside a Tilter, with its progress written on a clock for a continuous turn; Stop is the way to halt it that a turn running on its own owes the reader`,
+                `slide ${ringIndex + 1} of ${controls.slideCount} — the paddle wheel rule, the slides standing round an upright spine with each painting only the half away from it, inside a Tilter, with its progress written on a clock for a continuous turn; Stop is the way to halt it that a turn running on its own owes the reader`,
             component: ringExample,
             path: `${EXAMPLES_ROOT}/Ring.svelte`,
+        },
+        {
+            key: "wordDrum",
+            name: "A drum of words turned by scrolling",
+            readout: () =>
+                `word ${wordDrumIndex + 1} of ${CarouselKnobs.WORD_DRUM_WORDS.length} — the drum rule with a word on each face, its progress written by the box's scroll, so scrolling rolls the next word up`,
+            component: wordDrumExample,
+            path: `${EXAMPLES_ROOT}/WordDrum.svelte`,
         },
     ];
 </script>
@@ -102,6 +114,10 @@
         isDisabled={controls.isDisabled}
         orientation={controls.orientation}
     />
+{/snippet}
+
+{#snippet wordDrumExample()}
+    <WordDrumExample bind:index={wordDrumIndex} isDisabled={controls.isDisabled} />
 {/snippet}
 
 <PageCarouselsPanel {controls} hasPlacement={true} hasDelay={true} hasLooping={true} />

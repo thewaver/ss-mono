@@ -461,3 +461,144 @@ test("with reduced motion a column arrives and leaves at once, and no painter is
     expect(left.digits.length, "the column 999 does not need is gone straight away").toBe(3);
     expect(left.fixed.length).toBe(0);
 });
+
+const SPLIT_FLAP = example("splitFlap");
+
+/**
+ * A split-flap column is three flaps on a spine, each the whole character box with half of it painted: its front
+ * carries a top half, and its back, turned a further half turn, carries a bottom half. What the column shows is the
+ * top half on the nearest front still facing the viewer and the bottom half on the nearest back facing the viewer —
+ * read here from the turn and the push each flap's transform carries, which is what decides what is painted on top.
+ * A front faces the viewer while it is less than a quarter turn over; a back, once it is more than a quarter turn
+ * over. `turning` says whether any flap in the column is caught partway, between upright and lying flat.
+ */
+const readFlapColumns = (page: Page) =>
+    page.evaluate((value) => {
+        const root = document.querySelector(`${value} [data-demo] [role="group"][aria-label]`) as HTMLElement;
+        const windows = [...root.children].filter((child) => child.querySelector('[style*="rotateX"]'));
+
+        return windows.map((column) => {
+            const faces = ([...column.querySelectorAll('[style*="rotateX"]')] as HTMLElement[]).map((face) => {
+                const turns = [...face.style.transform.matchAll(/rotateX\((-?[\d.]+)deg\)/g)];
+                const angle = -Number.parseFloat(turns[0]?.[1] ?? "0");
+                const push = Number.parseFloat(/translateZ\((-?[\d.]+)px\)/.exec(face.style.transform)?.[1] ?? "0");
+
+                return { angle, push, isBack: turns.length > 1, text: (face.textContent ?? "").trim() };
+            });
+
+            const nearest = (isBack: boolean) =>
+                faces
+                    .filter((face) => face.isBack === isBack && (isBack ? face.angle > 90 : face.angle < 90))
+                    .sort((first, second) => second.push - first.push)[0]?.text ?? "";
+
+            return {
+                top: nearest(false),
+                bottom: nearest(true),
+                turning: faces.some((face) => face.angle % 180 !== 0),
+            };
+        });
+    }, SPLIT_FLAP);
+
+const digitsOf = (text: string) => text.replace(/\D/g, "");
+
+test("the split-flap settles on the new text, both halves of every column agreeing", async ({ page }) => {
+    await setField(page, "value", "4321");
+
+    await expect
+        .poll(
+            async () => {
+                const columns = await readFlapColumns(page);
+
+                return columns.every((column) => !column.turning && column.top === column.bottom)
+                    ? columns.map((column) => column.top).join("")
+                    : "still turning";
+            },
+            { message: "the columns read, top halves and bottom halves alike, as the value's digits" },
+        )
+        .toBe(digitsOf(await accessibleText(page.locator(demo("splitFlap")))));
+});
+
+/**
+ * The counter's demo also holds the page's step buttons, so the two are compared on the odometers themselves —
+ * the outermost labelled group in each demo — rather than on everything their demos hold. The faces inside a
+ * column are groups too, hidden from a screen reader, which is why it is the first one that is read.
+ */
+const odometerIn = (page: Page, key: string) => page.locator(`${demo(key)} [role="group"][aria-label]`).first();
+
+test("the split-flap's accessible value is the drum's", async ({ page }) => {
+    await setField(page, "value", "-1234");
+
+    const drum = await accessibleText(odometerIn(page, "counter"));
+
+    expect(drum, "the drum carries the value").toContain("1,234");
+    expect(await accessibleText(odometerIn(page, "splitFlap")), "and the split-flap carries the same").toBe(drum);
+});
+
+/**
+ * Every column is watched on every frame while the value changes, and a column counts as having flipped if any of
+ * its flaps was ever caught partway. Which columns should flip is worked out from the value before and after, so
+ * the test names no digit.
+ */
+test("a split-flap column whose digit has not changed does not flip", async ({ page }) => {
+    await setField(page, "turnDurationMs", LONG_TURN_MS);
+    await setField(page, "value", "1200");
+
+    const settled = () =>
+        expect.poll(async () => (await readFlapColumns(page)).some((column) => column.turning)).toBe(false);
+
+    await settled();
+
+    const before = digitsOf(await accessibleText(page.locator(demo("splitFlap"))));
+
+    await page.evaluate((value) => {
+        const flipped: boolean[] = [];
+        const watcher = window as unknown as { flapFlips: boolean[]; flapWatching: boolean };
+
+        watcher.flapFlips = flipped;
+        watcher.flapWatching = true;
+
+        const sample = () => {
+            const root = document.querySelector(`${value} [data-demo] [role="group"][aria-label]`) as HTMLElement;
+            const windows = [...root.children].filter((child) => child.querySelector('[style*="rotateX"]'));
+
+            windows.forEach((column, index) => {
+                const faces = [...column.querySelectorAll('[style*="rotateX"]')] as HTMLElement[];
+                const isTurning = faces.some((face) => {
+                    const angle = Number.parseFloat(/rotateX\((-?[\d.]+)deg\)/.exec(face.style.transform)?.[1] ?? "0");
+
+                    return angle % 180 !== 0;
+                });
+
+                flipped[index] = (flipped[index] ?? false) || isTurning;
+            });
+
+            if (watcher.flapWatching) requestAnimationFrame(sample);
+        };
+
+        requestAnimationFrame(sample);
+    }, SPLIT_FLAP);
+
+    await setField(page, "value", "1201");
+
+    const after = digitsOf(await accessibleText(page.locator(demo("splitFlap"))));
+
+    const readFlips = () => page.evaluate(() => (window as unknown as { flapFlips: boolean[] }).flapFlips);
+
+    await expect
+        .poll(async () => (await readFlips()).some(Boolean), { message: "the column that changed starts flipping" })
+        .toBe(true);
+    await settled();
+
+    const flips = await page.evaluate(() => {
+        const watcher = window as unknown as { flapFlips: boolean[]; flapWatching: boolean };
+
+        watcher.flapWatching = false;
+
+        return watcher.flapFlips;
+    });
+
+    expect(before.length, "the same columns before and after").toBe(after.length);
+    expect(flips, "the columns that flipped are exactly the ones whose digit changed").toEqual(
+        Array.from(after, (digit, index) => digit !== before[index]),
+    );
+});

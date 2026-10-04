@@ -1,17 +1,15 @@
-import { Index, createComputed, createMemo, on, onCleanup, onMount, untrack } from "solid-js";
+import { Index, createMemo, createSignal, onMount } from "solid-js";
 
-import { BarrelUtils, DIE_DEFAULTS, DieUtils, LiveAnnouncerUtils, DieStyles as styles } from "@thewaver/ss-components";
+import { BarrelUtils, DIE_DEFAULTS, DieUtils, DieStyles as styles } from "@thewaver/ss-components";
 
-import { SignalMirrorSolidUtils } from "../../../Abstracts/SignalMirror/SignalMirrorSolid.utils";
+import { RollerSolidUtils } from "../../../Abstracts/Roller/RollerSolid.utils";
 import { access } from "../../../Utils/propUtils";
-import { accessStore } from "../../../Utils/storeUtils";
-import type { DieProps } from "./DieSolid.types";
+import type { DieController, DieProps } from "./DieSolid.types";
 
 const HALF = 0.5;
-const FIRST_FACE = 0;
 
 export const Die = (props: DieProps) => {
-    const [getFace, setFace] = SignalMirrorSolidUtils.createOptional(() => props.face, FIRST_FACE);
+    const [getRootRef, setRootRef] = createSignal<HTMLElement>();
 
     const getShape = createMemo(() => access(props.shape));
 
@@ -21,54 +19,55 @@ export const Die = (props: DieProps) => {
 
     const getGeometry = createMemo(() => DieUtils.computeFaceGeometry(getShape(), getSize() * HALF));
 
-    const getShownFace = createMemo(() => DieUtils.clampFace(getFace(), getGeometry().length));
+    const getIsMovable = createMemo(() => access(props.isMovable) ?? DIE_DEFAULTS.isMovable);
 
-    const roller = DieUtils.createRoller({
-        getGeometry,
-        getShownFace,
-        getRollDurationMs: () => access(props.rollDurationMs) ?? DIE_DEFAULTS.rollDurationMs,
-        getTumbleCount: () => access(props.tumbleCount) ?? DIE_DEFAULTS.tumbleCount,
-        computeRollTarget: () => props.computeRollTarget(),
+    const getIsSeeThrough = createMemo(() => access(props.isSeeThrough) ?? DIE_DEFAULTS.isSeeThrough);
+
+    const roller = RollerSolidUtils.createRoller(getRootRef, () => false, {
+        faces: getGeometry,
+        radius: () => getSize() * HALF,
+        rollDurationMs: props.rollDurationMs,
+        settleDurationMs: props.settleDurationMs,
+        restDurationMs: props.restDurationMs,
+        tumbleCount: props.tumbleCount,
+        momentumMs: props.momentumMs,
+        driftAxis: props.driftAxis,
+        idleDelayMs: props.idleDelayMs,
+        isMovable: getIsMovable,
+        get computeRollTarget() {
+            return props.computeRollTarget;
+        },
         computeFaceLabel: (index) => props.computeFaceLabel(index),
-        writeFace: (index) => setFace(index),
+        targetFace: props.face,
+        autoSpin: props.autoSpin,
         onRollEnd: (index) => props.onRollEnd?.(index),
     });
 
-    onCleanup(roller.stop);
-
-    const getOrientation = accessStore(roller, (state) => state.orientation);
-
-    const getIsRolling = accessStore(roller, (state) => state.isRolling);
-
-    const getRestingFace = accessStore(roller, (state) => state.restingFace);
-
-    createComputed(
-        on(getShownFace, (index, previous) => {
-            if (previous === undefined) {
-                roller.rest(index);
-
-                return;
-            }
-
-            roller.turnTo(index);
-        }),
-    );
-
-    createComputed(on(getGeometry, () => roller.reshape(untrack(getShownFace))));
+    const controller: DieController = {
+        getCurrentFace: roller.getCurrentFace,
+        getPhase: roller.getPhase,
+        getIsRollable: roller.getIsRollable,
+        getIsRolling: () => roller.getIsAwaitingTarget() || roller.getPhase() === "rolling",
+        getIsAutoSpinning: () => roller.getPhase() === "idling",
+        roll: roller.roll,
+        step: roller.step,
+    };
 
     onMount(() => {
-        LiveAnnouncerUtils.reserve("polite");
-        props.onMount?.({ getIsRolling, roll: roller.roll });
+        props.onMount?.(controller);
     });
 
     return (
         <div
+            ref={setRootRef}
             class={styles.dieRoot}
+            classList={{ [styles.dieRootMovable]: getIsMovable() }}
             style={{ width: `${getReservedSize().width}px`, height: `${getReservedSize().height}px` }}
             role="group"
+            tabIndex={getIsMovable() ? 0 : undefined}
             aria-roledescription={access(props.roleDescription) ?? DIE_DEFAULTS.roleDescription}
             aria-label={access(props.ariaLabel)}
-            aria-busy={getIsRolling() || undefined}
+            aria-busy={roller.getIsBusy() || undefined}
         >
             <div
                 class={styles.diePerspective}
@@ -80,17 +79,18 @@ export const Die = (props: DieProps) => {
             >
                 <div
                     class={styles.dieBody}
-                    style={{ transform: DieUtils.getBodyTransform(getOrientation(), getSize()) }}
+                    style={{ transform: DieUtils.getBodyTransform(roller.getOrientation(), getSize()) }}
                 >
                     <Index each={getGeometry()}>
                         {(getFaceGeometry, index) => {
-                            const getIsShowing = () => index === getRestingFace();
+                            const getIsTarget = () => index === roller.getTargetFace();
 
                             const getFaceBox = () => DieUtils.getFaceBox(getFaceGeometry(), getSize());
 
                             return (
                                 <div
                                     class={styles.dieFace}
+                                    classList={{ [styles.dieFaceSeeThrough]: getIsSeeThrough() }}
                                     style={{
                                         "width": `${getFaceGeometry().size.width}px`,
                                         "height": `${getFaceGeometry().size.height}px`,
@@ -104,12 +104,12 @@ export const Die = (props: DieProps) => {
                                         access(props.faceRoleDescription) ?? DIE_DEFAULTS.faceRoleDescription
                                     }
                                     aria-label={props.computeFaceLabel(index)}
-                                    aria-hidden={!getIsShowing() || undefined}
-                                    inert={!getIsShowing()}
+                                    aria-hidden={getIsTarget() ? undefined : "true"}
+                                    inert={!getIsTarget()}
                                 >
                                     {props.renderFace(
                                         () => index,
-                                        () => DieUtils.getFaceState(getGeometry(), index, getRestingFace()),
+                                        () => DieUtils.getFaceState(getGeometry(), index, roller.getRestingFace()),
                                     )}
                                 </div>
                             );

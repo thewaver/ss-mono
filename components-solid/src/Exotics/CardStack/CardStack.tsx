@@ -39,6 +39,8 @@ export const CardStack = <T,>(props: CardStackProps<T>) => {
 
     const getFunnelRatio = createMemo(() => access(props.funnelRatio) ?? CARD_STACK_DEFAULTS.funnelRatio);
 
+    const getPileSide = createMemo(() => access(props.pileSide) ?? CARD_STACK_DEFAULTS.pileSide);
+
     const getPileExtentPx = createMemo(() => CardStackUtils.getPileExtentPx(getMountedCount(), getCardGap()));
 
     const getAllowedDirections = createMemo(
@@ -105,6 +107,7 @@ export const CardStack = <T,>(props: CardStackProps<T>) => {
             mountedLength: getMounted().length,
             pileExtentPx: getPileExtentPx(),
             cardGap: getCardGap(),
+            pileSide: getPileSide(),
             getMotion,
         });
 

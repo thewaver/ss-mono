@@ -14,3 +14,14 @@ export type PaintedTextExampleProps = {
     iterationConfigKey: SVGDefsSamples.Iteration.SampleKey;
     cellSize: Size2d;
 };
+
+export type PaintedTextPathExampleProps = PaintedTextExampleProps & {
+    lapDurationMs: number;
+    progress: readonly [number, (value: number) => void];
+    playback: readonly [boolean, (value: boolean) => void];
+};
+
+export type PaintedTextCircleExampleProps = PaintedTextPathExampleProps & {
+    radius: number;
+    isFittedToPath: boolean;
+};

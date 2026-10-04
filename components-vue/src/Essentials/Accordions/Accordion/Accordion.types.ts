@@ -31,6 +31,10 @@ export type AccordionSectionProps<T> = {
     side: CollapsibleSide;
     /** Whether this section is open. */
     isExpanded: boolean;
+    /** Whether this section sits in a row, so its panel is wrapped in a box the row can size. */
+    isSideways: boolean;
+    /** How wide the panel is, in pixels, or `undefined` to leave it as wide as its content. */
+    openWidth?: number;
     /** Scrolls this section into view once it has finished opening. */
     isScrolledIntoViewOnExpand?: boolean;
     /** Builds this section's panel only once it is first opened. */

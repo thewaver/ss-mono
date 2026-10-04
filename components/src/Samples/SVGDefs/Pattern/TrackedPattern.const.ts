@@ -1,11 +1,11 @@
 import type { TrackedPatternDefaultsByFamily } from "../SVGDefs.types";
 
 export namespace TrackedPatternDefaults {
-    export const GROW_DEFAULTS = { tiled: false, reach: 3, restLevel: 0.15, trailMs: 0 };
+    export const GROW_DEFAULTS = { tiled: false, reach: 3, restLevel: 0.15, trailMs: 0, retentionMs: 0 };
 
-    export const FADE_DEFAULTS = { tiled: false, reach: 3, restLevel: 0.1, trailMs: 0 };
+    export const FADE_DEFAULTS = { tiled: false, reach: 3, restLevel: 0.1, trailMs: 0, retentionMs: 0 };
 
-    export const TRAIL_DEFAULTS = { tiled: false, reach: 1, restLevel: 0, trailMs: 700 };
+    export const TRAIL_DEFAULTS = { tiled: false, reach: 1, restLevel: 0, trailMs: 700, retentionMs: 0 };
 
     export const DEFAULTS_BY_FAMILY: TrackedPatternDefaultsByFamily = {
         circle_g_grow_2: GROW_DEFAULTS,

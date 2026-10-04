@@ -33,11 +33,32 @@ describe("the pile's geometry", () => {
     });
 
     it("sits the bottom card flush and lifts each one above it by a gap", () => {
-        const opts = { mountedLength: 3, pileExtentPx: 8, cardGap: 4, getMotion: () => REST };
+        const opts = {
+            mountedLength: 3,
+            pileExtentPx: 8,
+            cardGap: 4,
+            pileSide: "bottom" as const,
+            getMotion: () => REST,
+        };
 
         expect(CardStackUtils.getCardTransform(2, opts)).toBe("translateY(8px)");
         expect(CardStackUtils.getCardTransform(1, opts)).toBe("translateY(4px)");
         expect(CardStackUtils.getCardTransform(0, opts)).toBe("translate(0%, 0%) translateY(0px)");
+    });
+
+    it("piled toward the top, mirrors the pile: the far card flush with the top, the top card flush with the bottom", () => {
+        const opts = { mountedLength: 3, pileExtentPx: 8, cardGap: 4, pileSide: "top" as const };
+
+        expect(CardStackUtils.getCardOffsetPx(2, opts)).toBe(0);
+        expect(CardStackUtils.getCardOffsetPx(1, opts)).toBe(4);
+        expect(CardStackUtils.getCardOffsetPx(0, opts)).toBe(8);
+    });
+
+    it("keeps the pile's far end in place as cards run out, on either side", () => {
+        const opts = { mountedLength: 2, pileExtentPx: 8, cardGap: 4 };
+
+        expect(CardStackUtils.getCardOffsetPx(1, { ...opts, pileSide: "bottom" })).toBe(8);
+        expect(CardStackUtils.getCardOffsetPx(1, { ...opts, pileSide: "top" })).toBe(0);
     });
 
     it("pushes only the top card, and flies it out a width and a half", () => {
@@ -45,6 +66,7 @@ describe("the pile's geometry", () => {
             mountedLength: 1,
             pileExtentPx: 0,
             cardGap: 4,
+            pileSide: "bottom" as const,
             getMotion: () => ({ ...REST, leavingTo: "left" as const }),
         };
 

@@ -75,3 +75,11 @@ export const rowPanelEnterForward = style({
     animationName: slideFromEnd,
     animationFillMode: "both",
 });
+
+export const rowFittedPanel = style([
+    rowPanel,
+    {
+        width: "100%",
+        boxSizing: "border-box",
+    },
+]);

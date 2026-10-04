@@ -42,6 +42,7 @@ export type PageFileFieldProps = {
 };
 
 export type PageSelectFieldProps<T> = {
+    id?: string;
     value: T;
     values: readonly T[];
     width?: number;

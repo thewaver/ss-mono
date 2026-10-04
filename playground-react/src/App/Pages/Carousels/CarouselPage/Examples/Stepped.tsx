@@ -40,8 +40,10 @@ export const SteppedExample = (props: Props) => {
             computeSlideLabel={computePositionLabel}
             computeStepLabel={computeCarouselStepLabel}
             computeRotationLabel={computeCarouselRotationLabel}
-            renderSlide={(slide, state) => <SlideFront title={slide} state={state} isNarrow={props.isNarrow} />}
-            renderSlideBack={() => <SlideBack isNarrow={props.isNarrow} />}
+            renderSlide={(slide, state) => (
+                <SlideFront title={slide} state={state} frameClass={props.frameClasses.front} />
+            )}
+            renderSlideBack={() => <SlideBack frameClass={props.frameClasses.back} />}
             renderStep={(_step, renderProps) => <PageCarouselStep renderProps={renderProps} />}
             renderPick={(_index, renderProps) => <PageCarouselPick renderProps={renderProps} />}
             renderControls={renderBar}

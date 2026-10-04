@@ -1,7 +1,12 @@
 <script setup lang="ts">
 import { ref, useModel } from "vue";
 
-import { Toggle } from "@thewaver/ss-components-vue";
+import {
+    MediaQueryMonitorVueUtils,
+    SHAPE_REVEAL_DEFAULTS,
+    ShapeRevealUtils,
+    Toggle,
+} from "@thewaver/ss-components-vue";
 import { PLAYGROUND_THEMES } from "@thewaver/ss-playground/App/Theme.css";
 
 import PageToggleContent from "../../StyledComponents/ToggleContent/ToggleContent.vue";
@@ -9,9 +14,11 @@ import PageExampleKnobsButton from "../ExampleKnobs/PageExampleKnobsButton.vue";
 import PageSelectField from "../Field/PageSelectField.vue";
 import { OWN_FRAMEWORK } from "../FrameworkMenu/FrameworkMenu.const";
 import PageProp from "../Prop/Prop.vue";
-import { PAGE_VIEW_OPTIONS, THEME_OPTIONS, VIEWPORT_ANCHOR_OPTIONS } from "./NavSettings.const";
+import { PAGE_VIEW_OPTIONS, THEME_FIELD_ID, THEME_OPTIONS, VIEWPORT_ANCHOR_OPTIONS } from "./NavSettings.const";
 import type { PageNavSettingsProps, PlaygroundTheme, ViewportAnchor } from "./NavSettings.types";
 import PageNavSettingsChoice from "./PageNavSettingsChoice.vue";
+
+const NO_MOTION_DURATION_MS = 0;
 
 const computeViewportAnchorLabel = (anchor: ViewportAnchor) =>
     VIEWPORT_ANCHOR_OPTIONS.find((option) => option.value === anchor)?.label ?? String(anchor);
@@ -36,9 +43,15 @@ const viewportAnchor = useModel(props, "viewportAnchor");
 
 const theme = ref<PlaygroundTheme>(findAppliedTheme());
 
+const prefersReducedMotion = MediaQueryMonitorVueUtils.useReducedMotion();
+
 const pickTheme = (nextTheme: PlaygroundTheme) => {
-    applyTheme(nextTheme);
     theme.value = nextTheme;
+
+    void ShapeRevealUtils.reveal(() => applyTheme(nextTheme), {
+        origin: document.getElementById(THEME_FIELD_ID) ?? SHAPE_REVEAL_DEFAULTS.origin,
+        durationMs: prefersReducedMotion.value ? NO_MOTION_DURATION_MS : SHAPE_REVEAL_DEFAULTS.durationMs,
+    });
 };
 
 const setViewportAnchor = (anchor: ViewportAnchor) => {
@@ -93,10 +106,11 @@ const setViewportAnchor = (anchor: ViewportAnchor) => {
             <PageProp
                 item-key="theme"
                 label="Theme"
-                hint="Which color theme the playground is drawn in, independent of the framework it runs in."
+                hint="Which color theme the playground is drawn in, independent of the framework it runs in. The new theme is uncovered by a circle growing from this field."
                 :default-value="computeThemeLabel(OWN_FRAMEWORK)"
             >
                 <PageSelectField
+                    :id="THEME_FIELD_ID"
                     :value="theme"
                     :values="THEME_OPTIONS.map((option) => option.value)"
                     :compute-label="computeThemeLabel"

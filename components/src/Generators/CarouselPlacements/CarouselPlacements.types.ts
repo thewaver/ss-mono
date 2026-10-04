@@ -41,6 +41,11 @@ export type HingePlacementDefs = {
     visibleDistance?: number;
 };
 
+export type PaddleWheelPlacementDefs = {
+    spanDegrees?: number;
+    perspectivePx?: number;
+};
+
 export type CarouselPlacementEntry =
     | { family: "track"; defs?: TrackPlacementDefs }
     | { family: "drum"; defs?: DrumPlacementDefs }
@@ -48,6 +53,7 @@ export type CarouselPlacementEntry =
     | { family: "depthWave"; defs?: DepthWavePlacementDefs }
     | { family: "cylinder"; defs?: CylinderPlacementDefs }
     | { family: "folders"; defs?: FoldersPlacementDefs }
-    | { family: "hinge"; defs?: HingePlacementDefs };
+    | { family: "hinge"; defs?: HingePlacementDefs }
+    | { family: "paddleWheel"; defs?: PaddleWheelPlacementDefs };
 
 export type CarouselPlacementFamily = CarouselPlacementEntry["family"];

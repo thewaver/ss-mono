@@ -18,3 +18,19 @@ export type PaintedTextExampleProps = {
 export type PaintedTextExampleWrapperProps = PaintedTextExampleProps & {
     width: number;
 };
+
+export type PaintedTextPathExampleProps = PaintedTextExampleProps & {
+    lapDurationMs: number;
+    progress: number;
+    playback: boolean;
+};
+
+export type PaintedTextCircleExampleProps = PaintedTextPathExampleProps & {
+    radius: number;
+    isFittedToPath: boolean;
+};
+
+export type PaintedTextPathExampleWrapperProps = PaintedTextExampleWrapperProps & {
+    progress: number;
+    playback: boolean;
+};

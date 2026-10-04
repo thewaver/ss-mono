@@ -10,7 +10,6 @@ import {
     elementScroll,
     measureElement,
     observeElementOffset,
-    observeElementRect,
 } from "@tanstack/virtual-core";
 import { VirtualizerUtils } from "@thewaver/ss-components";
 
@@ -63,6 +62,10 @@ export namespace VirtualizerSolidUtils {
      *
      * Everything falls back safely: with no scrolling ancestor or with virtualizing switched off,
      * `getIsLive` reports `false` and the caller should draw the whole list.
+     *
+     * `getIsLive` turns `true` only once the window is following its scroller, which is a step after the
+     * scroller is found: an effect keyed on it that scrolls to a row, run in the same pass as the search,
+     * would otherwise ask a window that has nothing to scroll yet, and the request would be dropped.
      *
      * @param getRef The list's own element.
      * @param getCount How many rows there are.
@@ -122,7 +125,7 @@ export namespace VirtualizerSolidUtils {
 
                     return instance.options.horizontal ? box.inlineSize : box.blockSize;
                 },
-                observeElementRect,
+                observeElementRect: VirtualizerUtils.observeClientRect,
                 observeElementOffset,
                 scrollToFn: elementScroll,
                 onChange: (instance) => {
@@ -141,16 +144,23 @@ export namespace VirtualizerSolidUtils {
             setVirtualTotalSize(virtualizer.getTotalSize());
         };
 
+        const [getIsFollowing, setIsFollowing] = createSignal(false);
+
+        const followScroller = () => {
+            virtualizer._willUpdate();
+            setIsFollowing(virtualizer.scrollElement !== null);
+        };
+
         onMount(() => {
             const cleanup = virtualizer._didMount();
 
-            virtualizer._willUpdate();
+            followScroller();
             onCleanup(cleanup);
         });
 
         createComputed(() => {
             virtualizer.setOptions(computeOptions());
-            virtualizer._willUpdate();
+            followScroller();
             publish();
         });
 
@@ -159,7 +169,7 @@ export namespace VirtualizerSolidUtils {
         const getTotalSize = createMemo(() => (opts.getIsDisabled() ? 0 : getVirtualTotalSize()));
 
         return {
-            getIsLive: () => !opts.getIsDisabled() && getScrollParent() !== undefined,
+            getIsLive: () => !opts.getIsDisabled() && getIsFollowing(),
             getRows,
             getTotalSize,
             getRowStart: (row) => row.start - getScrollMargin(),

@@ -1,4 +1,5 @@
 import type { CarouselOrientation, CarouselPlacementFn, CarouselPlacements } from "@thewaver/ss-components-react";
+import type { SlideFrameClasses } from "@thewaver/ss-playground/App/Pages/Carousels/Carousels.types";
 
 type ValueState<T> = readonly [T, (value: T) => void];
 
@@ -11,7 +12,7 @@ export type CarouselExampleProps = {
     index: ValueState<number>;
     playback?: ValueState<boolean>;
     computePlacement: CarouselPlacementFn;
-    isNarrow: boolean;
+    frameClasses: SlideFrameClasses;
 };
 
 export type CarouselSharedProps = Omit<CarouselExampleProps, "index" | "autoplayDelayMs" | "playback">;

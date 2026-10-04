@@ -6,6 +6,7 @@ import { layerVars } from "../../StyledComponents/Layer/Layer.css";
 import { themeVars } from "../../Theme.css";
 
 const GRID_CELL_SIZE = 72;
+const MARQUEE_ROW_HEIGHT = 64;
 
 export const stage = style({
     width: "100%",
@@ -49,4 +50,32 @@ export const gridCell = style({
             outlineOffset: 2,
         },
     },
+});
+
+export const marqueeStack = style({
+    display: "flex",
+    flexDirection: "column",
+    alignItems: "center",
+    gap: themeVars.spacing.full,
+    width: "100%",
+});
+
+export const marqueeStage = style([stage, { height: MARQUEE_ROW_HEIGHT }]);
+
+export const marqueeTile = style({
+    display: "flex",
+    alignItems: "center",
+    gap: themeVars.spacing.double,
+    height: MARQUEE_ROW_HEIGHT,
+    paddingInline: `calc(${themeVars.spacing.double} * 0.5)`,
+});
+
+export const marqueeWord = style({
+    padding: `${themeVars.spacing.half} ${themeVars.spacing.full}`,
+    borderRadius: themeVars.borderRadius.half,
+    backgroundColor: `rgb(from ${themeVars.color.primary.main} r g b / 25%)`,
+    color: layerVars.contrast,
+    fontSize: themeVars.fontSize.large,
+    fontWeight: "bold",
+    whiteSpace: "nowrap",
 });

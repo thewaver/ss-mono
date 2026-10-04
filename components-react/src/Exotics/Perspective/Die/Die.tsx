@@ -1,75 +1,81 @@
 import { useEffect, useLayoutEffect, useMemo, useRef, useState } from "react";
 
-import { BarrelUtils, DIE_DEFAULTS, DieStyles, DieUtils, LiveAnnouncerUtils } from "@thewaver/ss-components";
+import { BarrelUtils, DIE_DEFAULTS, DieStyles, DieUtils, type RollerPhase } from "@thewaver/ss-components";
 import { StoreUtils } from "@thewaver/ss-utils";
 
-import { SignalMirrorReactUtils } from "../../../Abstracts/SignalMirror/SignalMirrorReact.utils";
-import { useLatest } from "../../../Utils/refUtils";
-import { useStore } from "../../../Utils/storeUtils";
+import { RollerReactUtils } from "../../../Abstracts/Roller/RollerReact.utils";
 import type { DieController, DieProps } from "./Die.types";
 
 const HALF = 0.5;
-const FIRST_FACE = 0;
+
+type DieSnapshot = {
+    currentFace: number;
+    phase: RollerPhase;
+    isRollable: boolean;
+    isRolling: boolean;
+    isAutoSpinning: boolean;
+};
+
+const getIsSameSnapshot = (a: DieSnapshot, b: DieSnapshot) =>
+    a.currentFace === b.currentFace &&
+    a.phase === b.phase &&
+    a.isRollable === b.isRollable &&
+    a.isRolling === b.isRolling &&
+    a.isAutoSpinning === b.isAutoSpinning;
 
 export const Die = (props: DieProps) => {
-    const [face, setFace] = SignalMirrorReactUtils.useOptionalState(props.face, FIRST_FACE);
     const size = props.size;
+    const isMovable = props.isMovable ?? DIE_DEFAULTS.isMovable;
+    const isSeeThrough = props.isSeeThrough ?? DIE_DEFAULTS.isSeeThrough;
 
+    const rootRef = useRef<HTMLDivElement | null>(null);
     const reservedSize = DieUtils.getReservedSize(size);
     const geometry = useMemo(() => DieUtils.computeFaceGeometry(props.shape, size * HALF), [props.shape, size]);
-    const shownFace = DieUtils.clampFace(face, geometry.length);
 
-    const latest = useLatest({ props, geometry, shownFace, setFace });
+    const roller = RollerReactUtils.useRoller(rootRef, false, {
+        faces: geometry,
+        radius: size * HALF,
+        targetFace: props.face,
+        isAutoSpinEnabled: props.autoSpin?.[0],
+        rollDurationMs: props.rollDurationMs,
+        settleDurationMs: props.settleDurationMs,
+        restDurationMs: props.restDurationMs,
+        tumbleCount: props.tumbleCount,
+        momentumMs: props.momentumMs,
+        idleDelayMs: props.idleDelayMs,
+        driftAxis: props.driftAxis,
+        isMovable,
+        computeRollTarget: props.computeRollTarget,
+        computeFaceLabel: props.computeFaceLabel,
+        onRollEnd: props.onRollEnd,
+    });
 
-    const [roller] = useState(() =>
-        DieUtils.createRoller({
-            getGeometry: () => latest.current.geometry,
-            getShownFace: () => latest.current.shownFace,
-            getRollDurationMs: () => latest.current.props.rollDurationMs ?? DIE_DEFAULTS.rollDurationMs,
-            getTumbleCount: () => latest.current.props.tumbleCount ?? DIE_DEFAULTS.tumbleCount,
-            computeRollTarget: () => latest.current.props.computeRollTarget(),
-            computeFaceLabel: (index) => latest.current.props.computeFaceLabel(index),
-            writeFace: (index) => latest.current.setFace(index),
-            onRollEnd: (index) => latest.current.props.onRollEnd?.(index),
-        }),
-    );
+    const snapshot: DieSnapshot = {
+        currentFace: roller.currentFace,
+        phase: roller.phase,
+        isRollable: roller.isRollable,
+        isRolling: roller.isAwaitingTarget || roller.phase === "rolling",
+        isAutoSpinning: roller.phase === "idling",
+    };
 
-    useEffect(() => () => roller.stop(), [roller]);
-
-    const orientation = useStore(roller, (state) => state.orientation);
-    const isRolling = useStore(roller, (state) => state.isRolling);
-    const restingFace = useStore(roller, (state) => state.restingFace);
-
-    const previousShownFaceRef = useRef<number>(undefined);
-
-    useLayoutEffect(() => {
-        const previous = previousShownFaceRef.current;
-
-        previousShownFaceRef.current = shownFace;
-
-        if (previous === undefined) {
-            roller.rest(shownFace);
-        } else if (previous !== shownFace) {
-            roller.turnTo(shownFace);
-        }
-    }, [shownFace]);
+    const [controllerStore] = useState(() => StoreUtils.create(snapshot, { isEqual: getIsSameSnapshot }));
 
     useLayoutEffect(() => {
-        roller.reshape(latest.current.shownFace);
-    }, [geometry]);
-
-    const [rollingStore] = useState(() => StoreUtils.create(roller.get().isRolling));
-
-    useEffect(() => roller.subscribe(() => rollingStore.set(roller.get().isRolling)), [roller]);
+        controllerStore.set(snapshot);
+    });
 
     const [controller] = useState<DieController>(() => ({
-        getIsRolling: rollingStore.get,
+        getCurrentFace: () => controllerStore.get().currentFace,
+        getPhase: () => controllerStore.get().phase,
+        getIsRollable: () => controllerStore.get().isRollable,
+        getIsRolling: () => controllerStore.get().isRolling,
+        getIsAutoSpinning: () => controllerStore.get().isAutoSpinning,
         roll: roller.roll,
-        subscribe: rollingStore.subscribe,
+        step: roller.step,
+        subscribe: controllerStore.subscribe,
     }));
 
     useEffect(() => {
-        LiveAnnouncerUtils.reserve("polite");
         props.onMount?.(controller);
     }, [controller]);
 
@@ -77,26 +83,33 @@ export const Die = (props: DieProps) => {
 
     return (
         <div
-            className={DieStyles.dieRoot}
+            ref={rootRef}
+            className={[DieStyles.dieRoot, isMovable && DieStyles.dieRootMovable].filter(Boolean).join(" ")}
             style={{ width: `${reservedSize.width}px`, height: `${reservedSize.height}px` }}
             role="group"
+            tabIndex={isMovable ? 0 : undefined}
             aria-roledescription={props.roleDescription ?? DIE_DEFAULTS.roleDescription}
             aria-label={props.ariaLabel}
-            aria-busy={isRolling ? "true" : undefined}
+            aria-busy={roller.isBusy ? "true" : undefined}
         >
             <div
                 className={DieStyles.diePerspective}
                 style={{ width: `${size}px`, height: `${size}px`, perspective: `${BarrelUtils.PERSPECTIVE_PX}px` }}
             >
-                <div className={DieStyles.dieBody} style={{ transform: DieUtils.getBodyTransform(orientation, size) }}>
+                <div
+                    className={DieStyles.dieBody}
+                    style={{ transform: DieUtils.getBodyTransform(roller.orientation, size) }}
+                >
                     {geometry.map((faceGeometry, index) => {
-                        const isShowing = index === restingFace;
+                        const isTarget = index === roller.targetFace;
                         const faceBox = DieUtils.getFaceBox(faceGeometry, size);
 
                         return (
                             <div
                                 key={index}
-                                className={DieStyles.dieFace}
+                                className={[DieStyles.dieFace, isSeeThrough && DieStyles.dieFaceSeeThrough]
+                                    .filter(Boolean)
+                                    .join(" ")}
                                 style={{
                                     width: `${faceGeometry.size.width}px`,
                                     height: `${faceGeometry.size.height}px`,
@@ -108,10 +121,10 @@ export const Die = (props: DieProps) => {
                                 role="group"
                                 aria-roledescription={faceRoleDescription}
                                 aria-label={props.computeFaceLabel(index)}
-                                aria-hidden={isShowing ? undefined : "true"}
-                                inert={!isShowing}
+                                aria-hidden={isTarget ? undefined : "true"}
+                                inert={!isTarget}
                             >
-                                {props.renderFace(index, DieUtils.getFaceState(geometry, index, restingFace))}
+                                {props.renderFace(index, DieUtils.getFaceState(geometry, index, roller.restingFace))}
                             </div>
                         );
                     })}

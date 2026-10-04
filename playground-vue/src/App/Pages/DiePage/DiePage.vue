@@ -1,8 +1,13 @@
 <script setup lang="ts">
 import { computed, shallowRef } from "vue";
 
-import { DIE_DEFAULTS, DieShapes, MediaQueryMonitorVueUtils } from "@thewaver/ss-components-vue";
+import { DIE_DEFAULTS, DieShapes, MediaQueryMonitorVueUtils, RollerUtils } from "@thewaver/ss-components-vue";
 import { DieKnobs } from "@thewaver/ss-playground/App/Knobs/Dice.const";
+import {
+    ICON_CLOUD_EMPTY_LABEL,
+    ICON_CLOUD_ICONS,
+    ICON_CLOUD_TURN_MS,
+} from "@thewaver/ss-playground/App/Pages/DiePage/DiePage.const";
 
 import type { ExampleDefs } from "../../PageComponents/Examples/Examples.types";
 import PageExamples from "../../PageComponents/Examples/PageExamples.vue";
@@ -10,11 +15,13 @@ import PageNumberField from "../../PageComponents/Field/PageNumberField.vue";
 import PageSelectField from "../../PageComponents/Field/PageSelectField.vue";
 import PageProp from "../../PageComponents/Prop/Prop.vue";
 import PagePropsPanel from "../../PageComponents/PropsPanel/PagePropsPanel.vue";
+import IconCloudExample from "./Examples/IconCloud.vue";
 import TabletopExample from "./Examples/Tabletop.vue";
 
 const EXAMPLES_ROOT = "/src/App/Pages/DiePage/Examples";
 
 const DIE_SIZE = 160;
+const CLOUD_SIZE = 240;
 const NO_MOTION_DURATION_MS = 0;
 const FIRST_NUMBER = 1;
 
@@ -23,10 +30,24 @@ const rollDurationMs = shallowRef(DIE_DEFAULTS.rollDurationMs);
 const tumbleCount = shallowRef(DIE_DEFAULTS.tumbleCount);
 
 const dieFace = shallowRef(0);
+const cloudFace = shallowRef(0);
+const cloudAutoSpin = shallowRef(true);
 
 const prefersReducedMotion = MediaQueryMonitorVueUtils.useReducedMotion();
 
 const shownRollDurationMs = computed(() => (prefersReducedMotion.value ? NO_MOTION_DURATION_MS : rollDurationMs.value));
+
+const shownSettleDurationMs = computed(() =>
+    prefersReducedMotion.value ? NO_MOTION_DURATION_MS : DIE_DEFAULTS.settleDurationMs,
+);
+
+const shownMomentumMs = computed(() => (prefersReducedMotion.value ? NO_MOTION_DURATION_MS : DIE_DEFAULTS.momentumMs));
+
+const shape = computed(() => DieShapes.SAMPLE_SHAPES[shapeKey.value]);
+
+const cloudIdleDelayMs = computed(() =>
+    prefersReducedMotion.value ? undefined : ICON_CLOUD_TURN_MS / shape.value.faces.length,
+);
 
 const examples: ExampleDefs[] = [
     {
@@ -36,12 +57,19 @@ const examples: ExampleDefs[] = [
             `showing ${dieFace.value + FIRST_NUMBER} of ${DieShapes.SAMPLE_SHAPES[shapeKey.value].faces.length} — the page picks the number, and the die tumbles and lands on it`,
         path: `${EXAMPLES_ROOT}/Tabletop.vue`,
     },
+    {
+        key: "iconCloud",
+        name: "Icon cloud",
+        readout: () =>
+            `${cloudAutoSpin.value ? "turning by itself" : "paused"}, facing ${ICON_CLOUD_ICONS[RollerUtils.clampFace(cloudFace.value, shape.value.faces.length)]?.label ?? ICON_CLOUD_EMPTY_LABEL} — drag it, or focus it and use the arrow keys, and it settles on the nearest icon`,
+        path: `${EXAMPLES_ROOT}/IconCloud.vue`,
+    },
 ];
 </script>
 
 <template>
     <PagePropsPanel scope="global">
-        <PageProp item-key="shape" label="Die" hint="Which die to roll, from four faces to a hundred.">
+        <PageProp item-key="shape" label="Die" hint="Which solid both examples are, from four faces to a hundred.">
             <PageSelectField
                 :value="shapeKey"
                 :values="DieShapes.SAMPLE_KEYS"
@@ -82,10 +110,23 @@ const examples: ExampleDefs[] = [
         <template #tabletop>
             <TabletopExample
                 v-model:face="dieFace"
-                :shape="DieShapes.SAMPLE_SHAPES[shapeKey]"
+                :shape="shape"
                 :size="DIE_SIZE"
                 :roll-duration-ms="shownRollDurationMs"
+                :settle-duration-ms="shownSettleDurationMs"
                 :tumble-count="tumbleCount"
+            />
+        </template>
+
+        <template #iconCloud>
+            <IconCloudExample
+                v-model:face="cloudFace"
+                v-model:autoSpin="cloudAutoSpin"
+                :shape="shape"
+                :size="CLOUD_SIZE"
+                :idle-delay-ms="cloudIdleDelayMs"
+                :settle-duration-ms="shownSettleDurationMs"
+                :momentum-ms="shownMomentumMs"
             />
         </template>
     </PageExamples>

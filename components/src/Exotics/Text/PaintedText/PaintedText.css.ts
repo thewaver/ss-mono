@@ -20,6 +20,12 @@ export const paintedTextLayoutWrap = style({
     whiteSpace: "pre",
 });
 
+export const paintedTextLayoutWrapOnPath = style({
+    position: "absolute",
+    left: 0,
+    top: 0,
+});
+
 export const paintedTextSVG = style({
     position: "absolute",
     inset: 0,

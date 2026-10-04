@@ -421,3 +421,43 @@ test("and keeps it once built, so closing a lazy section does not discard what i
         "and a section nobody opened is still unbuilt",
     ).toHaveCount(0);
 });
+
+/**
+ * A row that fills its box hands each open section the width its item asks for, as a share of the row, and gives
+ * a section asking for none whatever is left. Everything is read as a share of the row's own painted width, so the
+ * window's scale cancels out; the closed strips and gaps are what the share has to make room around.
+ */
+const WIDTHS = demo("widths");
+const WIDTHS_ACCORDION = `${WIDTHS} > div`;
+const SHARE_TOLERANCE = 0.02;
+
+const rowShares = (page: Page) =>
+    page.evaluate((selector) => {
+        const row = document.querySelector(selector)!;
+        const rowWidth = row.getBoundingClientRect().width;
+        const sections = [...row.children].map((section) => section.getBoundingClientRect());
+        const right = Math.max(...sections.map((box) => box.right));
+
+        return {
+            sections: sections.map((box) => box.width / rowWidth),
+            filled: (right - row.getBoundingClientRect().left) / rowWidth,
+        };
+    }, WIDTHS_ACCORDION);
+
+test("a row's open section takes the share of the row its item asks for", async ({ page }) => {
+    await expect
+        .poll(async () => (await rowShares(page)).sections[0], { timeout: TRANSITION_TIMEOUT_MS })
+        .toBeGreaterThan(0.5 - SHARE_TOLERANCE);
+    expect((await rowShares(page)).sections[0]).toBeLessThan(0.5 + SHARE_TOLERANCE);
+});
+
+test("a section with no share fills what the closed strips leave", async ({ page }) => {
+    await page.locator(`${WIDTHS} button[aria-expanded]`).nth(2).click();
+
+    await expect
+        .poll(async () => (await rowShares(page)).filled, { timeout: TRANSITION_TIMEOUT_MS })
+        .toBeGreaterThan(1 - SHARE_TOLERANCE);
+    const { sections } = await rowShares(page);
+
+    expect(sections[2], "and it is the widest section in the row").toBe(Math.max(...sections));
+});

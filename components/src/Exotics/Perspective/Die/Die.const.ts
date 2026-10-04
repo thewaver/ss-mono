@@ -1,6 +1,9 @@
+import { ROLLER_DEFAULTS } from "../../../Abstracts/Roller/Roller.const";
+
 export const DIE_DEFAULTS = {
-    rollDurationMs: 1400,
-    tumbleCount: 2,
+    ...ROLLER_DEFAULTS,
+    isMovable: false,
+    isSeeThrough: false,
     roleDescription: "die",
     faceRoleDescription: "face",
 };

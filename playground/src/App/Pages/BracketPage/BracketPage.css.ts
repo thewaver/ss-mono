@@ -53,3 +53,11 @@ export const nodeDisabled = style({
     filter: themeVars.disabled.filter,
     cursor: "not-allowed",
 });
+
+export const beamStage = style({
+    display: "flex",
+    flexDirection: "column",
+    alignItems: "center",
+    gap: themeVars.spacing.full,
+    width: "100%",
+});

@@ -2,6 +2,8 @@ import type { SwipeDirection } from "@thewaver/ss-utils";
 
 import type { InteractionDragRatio } from "../../Abstracts/InteractionTracker/InteractionTracker.types";
 
+export type CardStackPileSide = "top" | "bottom";
+
 export type CardStackCardState<T> = {
     /** The card's own value, straight from `cards`. */
     card: T;

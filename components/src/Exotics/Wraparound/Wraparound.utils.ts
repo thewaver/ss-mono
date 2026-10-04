@@ -20,6 +20,9 @@ const PAGE_SHARE = 0.9;
 /** Elements a press is left to, since dragging from one would take away selecting its text. */
 const TEXT_ENTRY_SELECTOR = "input, textarea, select, [contenteditable]";
 
+/** Milliseconds in a second, for turning a speed per second into one per millisecond. */
+const MS_PER_SECOND = 1000;
+
 const ORIGIN: Point2d = { x: 0, y: 0 };
 
 const ORIGINAL_TILE: WraparoundTile = { column: 0, row: 0 };
@@ -250,6 +253,25 @@ export namespace WraparoundUtils {
     };
 
     /**
+     * How fast, and which way, a drifting plane moves.
+     *
+     * The angle is measured the way the screen's axes run: `0` moves the content to the right, `90` down, `180` to
+     * the left and `270` up. It is the content's movement, so the view seems to travel the other way.
+     *
+     * @param pxPerSecond How far the content travels in a second, in pixels. `0` or less is no drift.
+     * @param degrees Which way it travels, in degrees.
+     * @returns Pixels per millisecond on each axis, or `undefined` when there is no drift.
+     */
+    export const computeDriftVelocity = (pxPerSecond: number, degrees: number): Point2d | undefined => {
+        if (!(pxPerSecond > 0)) return undefined;
+
+        const radians = (degrees * Math.PI) / 180;
+        const speedPxPerMs = pxPerSecond / MS_PER_SECOND;
+
+        return { x: Math.cos(radians) * speedPxPerMs, y: Math.sin(radians) * speedPxPerMs };
+    };
+
+    /**
      * Holds where a `Wraparound` has been moved to, and moves it.
      *
      * `observe` attaches every route to the window element: a drag that coasts on after the pointer lets go, the
@@ -257,6 +279,14 @@ export namespace WraparoundUtils {
      * also keeps the original under the pointer, so hovering and clicking reach real elements, and brings a focused
      * item into view, unless the focus arrived from a press. A drag that moved does not also click what it started
      * on; a tap on a copy clicks the matching element in the original.
+     *
+     * While `getIsMovable` answers `false` the drag, the wheel and the keys are all left alone, so the wheel scrolls
+     * the page and a touch can scroll it too; hover, a tap on a copy and bringing a focused item into view still
+     * work, since none of them is a person moving the content.
+     *
+     * `setDrift` sets the plane moving by itself at a steady velocity, measured in time rather than in frames, so it
+     * covers the same distance on any frame rate. It gives way to everything else: a press, a glide and a coast each
+     * stop it while they last, and it carries on from wherever they left the content.
      *
      * @param opts What the plane reads, at the moment it needs it.
      * @returns The plane.
@@ -271,11 +301,19 @@ export namespace WraparoundUtils {
         let motion: Motion | undefined;
         let frame: number | undefined;
         let press: Press | undefined;
+        let drift: Point2d | undefined;
+        let lastDriftMs: number | undefined;
 
         const setOffset = (offset: Point2d) => store.update((state) => ({ ...state, offset }));
 
         const setOriginal = (original: WraparoundTile) =>
             store.update((state) => (getIsSameTile(state.original, original) ? state : { ...state, original }));
+
+        const getIsDriftDue = () => drift !== undefined && press === undefined;
+
+        const schedule = () => {
+            if (frame === undefined && (motion || getIsDriftDue())) frame = requestAnimationFrame(tick);
+        };
 
         const stopMotion = () => {
             motion = undefined;
@@ -283,21 +321,22 @@ export namespace WraparoundUtils {
             if (frame !== undefined) cancelAnimationFrame(frame);
 
             frame = undefined;
+            schedule();
         };
 
         const tick = (nowMs: number) => {
             frame = undefined;
 
-            if (!motion) return;
-
-            if (motion.kind === "glide") {
+            if (motion?.kind === "glide") {
                 const ratio = MathUtils.clamp01((nowMs - motion.startMs) / motion.durationMs);
                 const eased = easeOut(ratio);
 
                 setOffset(Point2dUtils.lerp(motion.from, motion.to, eased));
 
                 if (ratio >= 1) motion = undefined;
-            } else {
+
+                lastDriftMs = nowMs;
+            } else if (motion) {
                 const step = stepCoast(motion.velocity, nowMs - motion.lastMs, opts.getMomentumMs());
                 const { offset } = store.get();
 
@@ -305,16 +344,34 @@ export namespace WraparoundUtils {
 
                 motion =
                     getSpeed(step.velocity) < MIN_SPEED_PX_PER_MS ? undefined : { ...motion, ...step, lastMs: nowMs };
+                lastDriftMs = nowMs;
+            } else if (drift && getIsDriftDue()) {
+                const elapsedMs = lastDriftMs === undefined ? 0 : nowMs - lastDriftMs;
+                const { offset } = store.get();
+
+                if (elapsedMs > 0) setOffset({ x: offset.x + drift.x * elapsedMs, y: offset.y + drift.y * elapsedMs });
+
+                lastDriftMs = nowMs;
+            } else {
+                lastDriftMs = undefined;
             }
 
-            if (motion) frame = requestAnimationFrame(tick);
+            schedule();
         };
 
         const startMotion = (next: Motion) => {
             stopMotion();
 
             motion = next;
-            frame = requestAnimationFrame(tick);
+            schedule();
+        };
+
+        const setDrift = (velocity: Point2d | undefined) => {
+            drift = velocity && getSpeed(velocity) > 0 ? velocity : undefined;
+
+            if (!drift) lastDriftMs = undefined;
+
+            schedule();
         };
 
         const moveBy = (delta: Point2d, isGliding = false) => {
@@ -427,7 +484,7 @@ export namespace WraparoundUtils {
 
                 const moved = { x: event.clientX - press.start.x, y: event.clientY - press.start.y };
 
-                if (!press.isDragging && Math.hypot(moved.x, moved.y) > DRAG_SLOP_PX) {
+                if (!press.isDragging && opts.getIsMovable() && Math.hypot(moved.x, moved.y) > DRAG_SLOP_PX) {
                     press.isDragging = true;
                     root.setPointerCapture(event.pointerId);
                     store.update((state) => ({ ...state, isDragging: true }));
@@ -444,6 +501,7 @@ export namespace WraparoundUtils {
             const endPress = () => {
                 press = undefined;
                 store.update((state) => (state.isDragging ? { ...state, isDragging: false } : state));
+                schedule();
             };
 
             const handlePointerUp = (event: PointerEvent) => {
@@ -473,7 +531,7 @@ export namespace WraparoundUtils {
             };
 
             const handleWheel = (event: WheelEvent) => {
-                if (opts.getIsDisabled()) return;
+                if (opts.getIsDisabled() || !opts.getIsMovable()) return;
 
                 event.preventDefault();
 
@@ -488,7 +546,7 @@ export namespace WraparoundUtils {
             };
 
             const handleKeyDown = (event: KeyboardEvent) => {
-                if (event.target !== root || opts.getIsDisabled()) return;
+                if (event.target !== root || opts.getIsDisabled() || !opts.getIsMovable()) return;
 
                 if (event.key === "Home") {
                     event.preventDefault();
@@ -542,7 +600,11 @@ export namespace WraparoundUtils {
             moveBy,
             reveal,
             reset,
-            destroy: stopMotion,
+            setDrift,
+            destroy: () => {
+                drift = undefined;
+                stopMotion();
+            },
         };
     };
 }

@@ -1,4 +1,4 @@
-import type { BracketOrientation, BracketPlacement, BracketRootSide } from "./Bracket.types";
+import type { BracketOrientation, BracketPlacement, BracketRootSide, BracketView } from "./Bracket.types";
 
 export const BRACKET_DEFAULTS = {
     layerGap: 40,
@@ -6,6 +6,8 @@ export const BRACKET_DEFAULTS = {
     orientation: "horizontal" as BracketOrientation,
     rootSide: "end" as BracketRootSide,
     layerHeaderSize: 24,
+    view: "tree" as BracketView,
+    transitionDurationMs: 450,
 };
 
 export const BRACKET_ORIENTATIONS: readonly BracketOrientation[] = ["horizontal", "vertical"];

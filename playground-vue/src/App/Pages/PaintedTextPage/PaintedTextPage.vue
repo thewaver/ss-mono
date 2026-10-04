@@ -2,6 +2,7 @@
 import { computed, shallowRef } from "vue";
 
 import {
+    MediaQueryMonitorVueUtils,
     PAINTED_TEXT_DEFAULTS,
     type PaintedTextStrokeAlignment,
     type SVGDefsColors,
@@ -22,14 +23,18 @@ import PageProp from "../../PageComponents/Prop/Prop.vue";
 import PagePropsDivider from "../../PageComponents/PropsPanel/PagePropsDivider.vue";
 import PagePropsGroups from "../../PageComponents/PropsPanel/PagePropsGroups.vue";
 import PagePropsPanel from "../../PageComponents/PropsPanel/PagePropsPanel.vue";
+import CircleExampleWrapper from "./CircleExampleWrapper.vue";
 import CustomInputExampleWrapper from "./CustomInputExampleWrapper.vue";
 import HeadingExampleWrapper from "./HeadingExampleWrapper.vue";
 import type { PaintedTextExampleWrapperProps } from "./PaintedTextPage.types";
 import ParagraphExampleWrapper from "./ParagraphExampleWrapper.vue";
 import ScrambledExampleWrapper from "./ScrambledExampleWrapper.vue";
 import TypedExampleWrapper from "./TypedExampleWrapper.vue";
+import WaveExampleWrapper from "./WaveExampleWrapper.vue";
 
 const EXAMPLES_ROOT = "/src/App/Pages/PaintedTextPage/Examples";
+
+const PERCENT = 100;
 
 const fill = usePaintSlot(PaintedTextKnobs.STARTING_FILL_PAINT_KIND, PaintedTextKnobs.STARTING_KEYS);
 const stroke = usePaintSlot(PaintedTextKnobs.STARTING_STROKE_PAINT_KIND, PaintedTextKnobs.STARTING_KEYS);
@@ -42,6 +47,15 @@ const animationDurationMs = shallowRef(PaintedTextKnobs.STARTING_DURATION_MS);
 const iterationConfigKey = shallowRef<SVGDefsSamples.Iteration.SampleKey>(PaintedTextKnobs.STARTING_ITERATION_KEY);
 const cellSize = shallowRef(PaintedTextKnobs.STARTING_CELL_SIZE);
 const colors = shallowRef<SVGDefsColors>({ ...SVGDefsSamples.SAMPLE_COLORS });
+
+const prefersReducedMotion = MediaQueryMonitorVueUtils.useReducedMotion();
+
+const circleProgress = shallowRef(0);
+const isCirclePlaying = shallowRef(!prefersReducedMotion.value);
+const waveProgress = shallowRef(0);
+const isWavePlaying = shallowRef(!prefersReducedMotion.value);
+
+const getPercent = (progress: number) => `${Math.round(progress * PERCENT)}%`;
 
 const colorKeys = computed(() => Object.keys(colors.value) as (keyof SVGDefsColors)[]);
 
@@ -100,6 +114,20 @@ const examples: ExampleDefs[] = [
         readout: () =>
             "a ScrambleText around a painted text: it decides which glyph each letter shows while it churns, and the painted text draws that glyph, painted, in the letter's place",
         path: `${EXAMPLES_ROOT}/Scrambled.vue`,
+    },
+    {
+        key: "circle",
+        name: "Round a circle",
+        readout: () =>
+            `${getPercent(circleProgress.value)} round the circle, ${isCirclePlaying.value ? "turning" : "stopped"} — the browser sets every letter along the path, the paint runs across the ring as one, and what slides past the end comes round from the start`,
+        path: `${EXAMPLES_ROOT}/Circle.vue`,
+    },
+    {
+        key: "wave",
+        name: "Along a wave",
+        readout: () =>
+            `${getPercent(waveProgress.value)} along the wave, ${isWavePlaying.value ? "sliding" : "stopped"} — any path will do, and on an open one the text leaves at the far end as it comes back in at the near one`,
+        path: `${EXAMPLES_ROOT}/Wave.vue`,
     },
 ];
 </script>
@@ -267,6 +295,22 @@ const examples: ExampleDefs[] = [
 
             <template #scrambled>
                 <ScrambledExampleWrapper v-bind="commonProps" />
+            </template>
+
+            <template #circle>
+                <CircleExampleWrapper
+                    v-bind="commonProps"
+                    v-model:progress="circleProgress"
+                    v-model:playback="isCirclePlaying"
+                />
+            </template>
+
+            <template #wave>
+                <WaveExampleWrapper
+                    v-bind="commonProps"
+                    v-model:progress="waveProgress"
+                    v-model:playback="isWavePlaying"
+                />
             </template>
         </PageExamples>
     </div>

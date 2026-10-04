@@ -8,6 +8,8 @@ import {
 } from "@thewaver/ss-components";
 
 import { ElementObserverSolidUtils } from "../../Abstracts/ElementObserver/ElementObserverSolid.utils";
+import { InteractionTrackerSolidUtils } from "../../Abstracts/InteractionTracker/InteractionTrackerSolid.utils";
+import { SignalMirrorSolidUtils } from "../../Abstracts/SignalMirror/SignalMirrorSolid.utils";
 import { access } from "../../Utils/propUtils";
 import { accessStore } from "../../Utils/storeUtils";
 import type { WraparoundProps } from "./WraparoundSolid.types";
@@ -29,7 +31,19 @@ export const Wraparound = (props: WraparoundProps) => {
     const getViewportSize = ElementObserverSolidUtils.createBorderBoxSizeObserver(getRootRef);
     const getTileSize = ElementObserverSolidUtils.createBorderBoxSizeObserver(getOriginalRef);
 
+    const [getIsPlaying] = SignalMirrorSolidUtils.createOptional(() => props.playback, true);
+
     const getIsDisabled = createMemo(() => access(props.isDisabled) ?? false);
+
+    const getIsMovable = createMemo(() => access(props.isMovable) ?? WRAPAROUND_DEFAULTS.isMovable);
+
+    const getDriftPxPerSecond = createMemo(
+        () => access(props.driftPxPerSecond) ?? WRAPAROUND_DEFAULTS.driftPxPerSecond,
+    );
+
+    const getDriftDegrees = createMemo(() => access(props.driftDegrees) ?? WRAPAROUND_DEFAULTS.driftDegrees);
+
+    const getIsHeld = InteractionTrackerSolidUtils.trackHold(getRootRef);
 
     const getMaxCopies = createMemo(() => access(props.maxCopies) ?? WRAPAROUND_DEFAULTS.maxCopies);
 
@@ -38,6 +52,7 @@ export const Wraparound = (props: WraparoundProps) => {
         getViewportSize: () => untrack(getViewportSize),
         getOriginal: () => untrack(getOriginalRef),
         getIsDisabled: () => untrack(getIsDisabled),
+        getIsMovable: () => untrack(getIsMovable),
         getMomentumMs: () => untrack(() => access(props.momentumMs) ?? WRAPAROUND_DEFAULTS.momentumMs),
         getGlideDurationMs: () => untrack(() => access(props.glideDurationMs) ?? WRAPAROUND_DEFAULTS.glideDurationMs),
         getKeyStepPx: () => untrack(() => access(props.keyStepPx) ?? WRAPAROUND_DEFAULTS.keyStepPx),
@@ -51,6 +66,14 @@ export const Wraparound = (props: WraparoundProps) => {
         if (!root) return;
 
         onCleanup(plane.observe(root));
+    });
+
+    createEffect(() => {
+        const isDrifting = getIsPlaying() && !getIsHeld() && !getIsDisabled();
+
+        plane.setDrift(
+            isDrifting ? WraparoundUtils.computeDriftVelocity(getDriftPxPerSecond(), getDriftDegrees()) : undefined,
+        );
     });
 
     const getOffset = accessStore(plane, (state) => state.offset);
@@ -75,10 +98,10 @@ export const Wraparound = (props: WraparoundProps) => {
         <div
             ref={setRootRef}
             class={styles.wraparoundRoot}
-            classList={{ [styles.isDragging]: getIsDragging() }}
+            classList={{ [styles.isDragging]: getIsDragging(), [styles.isImmovable]: !getIsMovable() }}
             role="region"
             aria-label={access(props.ariaLabel)}
-            tabindex={getIsDisabled() ? undefined : 0}
+            tabindex={getIsDisabled() || !getIsMovable() ? undefined : 0}
         >
             <div
                 class={styles.wraparoundPlane}

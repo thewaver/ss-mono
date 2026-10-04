@@ -9,6 +9,7 @@ export namespace CarouselPlacements {
         cylinder: { family: "cylinder" },
         folders: { family: "folders" },
         hinge: { family: "hinge" },
+        paddleWheel: { family: "paddleWheel" },
     } satisfies Record<string, CarouselPlacementEntry>;
 
     export type SampleKey = keyof typeof SAMPLE_PLACEMENTS;

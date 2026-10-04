@@ -528,3 +528,173 @@ test("activating a node reports where it is, not only what it holds", async ({ p
     expect(byKey, "Enter reports a placement too").toBeDefined();
     expect(seen.has(byKey!.id), "and a different node reports a different id").toBe(false);
 });
+
+/**
+ * The beam is a Playground example rather than a library feature: the bracket hands every line to the page to draw,
+ * and says which of them run between the focused node and the root. So the checks are that beams appear only along
+ * that route, and that the pause the example owes WCAG 2.2.2 stops them. Pressing the pause takes focus off the board,
+ * and the route goes with it, so the pause is seen on the next node focused. Whether a beam is moving is read off
+ * `animation-play-state`, which is the example's own state rather than its paint.
+ */
+const BEAMS = example("beams");
+const BEAM = `${BEAMS} [data-beam]`;
+const SEED = `${BEAMS} li [role="button"]`;
+
+test("a beam runs only along the focused node's route to the final, and pausing it stops it", async ({ page }) => {
+    await expect(page.locator(BEAM), "nothing is focused, so there is no route to run along").toHaveCount(0);
+
+    await page.locator(SEED, { hasText: /^Ada$/ }).click();
+
+    await expect(page.locator(BEAM), "one beam on each line from the seed to the final, and no others").toHaveCount(3);
+    await expect(page.locator(BEAM).first()).toHaveCSS("animation-play-state", "running");
+
+    await page.locator("#bracketBeamsPlayback").click();
+    await page.locator(SEED, { hasText: /^Hal$/ }).click();
+
+    await expect(page.locator(BEAM)).toHaveCount(3);
+    await expect(page.locator(BEAM).first(), "the next route runs paused").toHaveCSS("animation-play-state", "paused");
+});
+
+/**
+ * The family view shows one family at a time: the node the focused one feeds, the focused node with all its
+ * siblings, and every node that feeds those siblings — two rows where a third does not exist, so a leaf shows its
+ * parent with the leaf and its siblings, and the root shows itself with the nodes that feed it. Nothing focused
+ * shows the root's family. Every other node is folded away: hidden from a screen reader, out of reach of Tab and the
+ * pointer, and not drawn once the glide has settled. What is read back is which nodes are left unfolded, by the
+ * names the example gives them, and never where they sit or how long the glide takes.
+ */
+const FAMILY = example("family");
+const FAMILY_NODE = `${FAMILY} li [role="button"]`;
+const ROOT_FAMILY = ["Final", "Semi 1", "Semi 2"];
+
+const shownNodes = (page: Page) =>
+    page.evaluate(
+        (value) =>
+            [...document.querySelectorAll(`${value} li`)]
+                .filter((item) => item.getAttribute("aria-hidden") !== "true")
+                .map((item) => (item.textContent ?? "").trim())
+                .sort(),
+        FAMILY,
+    );
+
+const foldedNodes = (page: Page) =>
+    page.evaluate(
+        (value) =>
+            [...document.querySelectorAll(`${value} li[aria-hidden="true"]`)].map((item) => ({
+                text: (item.textContent ?? "").trim(),
+                isInert: (item as HTMLElement).inert,
+            })),
+        FAMILY,
+    );
+
+const focusedText = (page: Page) => page.evaluate(() => (document.activeElement?.textContent ?? "").trim());
+
+const isFocusFolded = (page: Page) =>
+    page.evaluate(() => document.activeElement?.closest('li[aria-hidden="true"]') !== null);
+
+test("with nothing focused the family view shows the root and the nodes that feed it, and folds the rest", async ({
+    page,
+}) => {
+    await expect
+        .poll(() => shownNodes(page), { message: "the root's family and no one else" })
+        .toEqual([...ROOT_FAMILY].sort());
+
+    const folded = await foldedNodes(page);
+
+    expect(folded.length, "everything else is folded away").toBeGreaterThan(0);
+    expect(
+        folded.filter((node) => !node.isInert).map((node) => node.text),
+        "and every folded node is out of reach of Tab and the pointer",
+    ).toEqual([]);
+    await expect(page.locator(`${FAMILY} li[aria-hidden="true"]`).first(), "and is not drawn").toBeHidden();
+});
+
+test("focusing a node shows what it feeds, it with all its siblings, and every node that feeds them", async ({
+    page,
+}) => {
+    await page.locator(FAMILY_NODE, { hasText: /^Semi 1$/ }).click();
+
+    await expect
+        .poll(() => shownNodes(page))
+        .toEqual(["Final", "Quarter 1", "Quarter 2", "Quarter 3", "Quarter 4", "Semi 1", "Semi 2"]);
+});
+
+test("moving focus to a node that feeds the focused one shows that node's family", async ({ page }) => {
+    await page.locator(FAMILY_NODE, { hasText: /^Semi 1$/ }).click();
+    await page.keyboard.press("ArrowLeft");
+
+    expect(await focusedText(page), "left steps from the semi into the round that feeds it").toBe("Quarter 1");
+    await expect
+        .poll(() => shownNodes(page), { message: "the semi it feeds, the quarters beside it, and their entrants" })
+        .toEqual(["Ada", "Bo", "Cai", "Dee", "Quarter 1", "Quarter 2", "Semi 1"]);
+});
+
+test("a leaf shows the node it feeds and itself among its siblings, and nothing below", async ({ page }) => {
+    await page.locator(FAMILY_NODE, { hasText: /^Semi 1$/ }).click();
+    await page.keyboard.press("ArrowLeft");
+    await page.keyboard.press("ArrowLeft");
+
+    expect(await focusedText(page)).toBe("Ada");
+    await expect.poll(() => shownNodes(page)).toEqual(["Ada", "Bo", "Quarter 1"]);
+});
+
+test("walking onto a folded node unfolds its family, so focus never sits on a folded node", async ({ page }) => {
+    await page.locator(FAMILY_NODE, { hasText: /^Semi 1$/ }).click();
+    await page.keyboard.press("ArrowLeft");
+    await page.keyboard.press("ArrowLeft");
+    await page.keyboard.press("ArrowDown");
+
+    expect(await focusedText(page)).toBe("Bo");
+    expect(await shownNodes(page), "the next entrant along is in another family, folded away").not.toContain("Cai");
+
+    await page.keyboard.press("ArrowDown");
+
+    expect(await focusedText(page), "the walk goes on into it rather than stopping at the family's edge").toBe("Cai");
+    expect(await isFocusFolded(page), "and the node focus landed on is not folded").toBe(false);
+    await expect.poll(() => shownNodes(page)).toEqual(["Cai", "Dee", "Quarter 2"]);
+});
+
+test("the root's family comes back when focus leaves the board, and Tab lands on a node that is shown", async ({
+    page,
+}) => {
+    await expect.poll(() => shownNodes(page)).toEqual([...ROOT_FAMILY].sort());
+
+    const readBefore = await readout(page, "family");
+
+    await page.locator(FAMILY_NODE, { hasText: /^Semi 1$/ }).click();
+    await page.keyboard.press("ArrowLeft");
+    await expect.poll(() => shownNodes(page)).not.toEqual([...ROOT_FAMILY].sort());
+    await expect
+        .poll(() => readout(page, "family"), { message: "the readout names the family shown" })
+        .not.toBe(readBefore);
+
+    await page.locator(`${FAMILY} [data-readout]`).click();
+
+    await expect
+        .poll(() => shownNodes(page), { message: "nothing focused is the root's family" })
+        .toEqual([...ROOT_FAMILY].sort());
+    await expect.poll(() => readout(page, "family"), { message: "and the readout says so" }).toBe(readBefore);
+
+    await page.locator(`${FAMILY} button`).first().focus();
+    await page.keyboard.press("Tab");
+
+    expect(await focusedText(page), "Tab enters the board").not.toBe("");
+    expect(await isFocusFolded(page), "on a node that is shown, not the folded one focus last left").toBe(false);
+});
+
+test("the family view's board keeps one size while the family changes", async ({ page }) => {
+    const board = page.locator(`${FAMILY} svg`).locator("..");
+    const resting = await board.boundingBox();
+
+    await page.locator(FAMILY_NODE, { hasText: /^Semi 1$/ }).click();
+    await page.keyboard.press("ArrowLeft");
+    await page.keyboard.press("ArrowLeft");
+    await expect.poll(() => shownNodes(page)).toEqual(["Ada", "Bo", "Quarter 1"]);
+
+    const moved = await board.boundingBox();
+
+    expect({ width: moved!.width, height: moved!.height }, "sized for the largest family, so nothing shifts").toEqual({
+        width: resting!.width,
+        height: resting!.height,
+    });
+});

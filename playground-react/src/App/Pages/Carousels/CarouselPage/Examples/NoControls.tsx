@@ -22,8 +22,10 @@ export const NoControlsExample = (props: Props) => {
             computeSlideLabel={computePositionLabel}
             computeStepLabel={computeCarouselStepLabel}
             computeRotationLabel={computeCarouselRotationLabel}
-            renderSlide={(slide, state) => <SlideFront title={slide} state={state} isNarrow={props.isNarrow} />}
-            renderSlideBack={() => <SlideBack isNarrow={props.isNarrow} />}
+            renderSlide={(slide, state) => (
+                <SlideFront title={slide} state={state} frameClass={props.frameClasses.front} />
+            )}
+            renderSlideBack={() => <SlideBack frameClass={props.frameClasses.back} />}
         />
     );
 };

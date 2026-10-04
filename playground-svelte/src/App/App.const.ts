@@ -30,6 +30,7 @@ const DrawerPage = () => import("./Pages/DrawerPage/DrawerPage.svelte");
 const EdgeFaderPage = () => import("./Pages/EdgeFaderPage/EdgeFaderPage.svelte");
 const FileInputPage = () => import("./Pages/FileInputPage/FileInputPage.svelte");
 const FlipCardPage = () => import("./Pages/FlipCardPage/FlipCardPage.svelte");
+const FlipbookPage = () => import("./Pages/FlipbookPage/FlipbookPage.svelte");
 const FormFieldPage = () => import("./Pages/FormFieldPage/FormFieldPage.svelte");
 const FormPage = () => import("./Pages/FormPage/FormPage.svelte");
 const FormSectionPage = () => import("./Pages/FormSectionPage/FormSectionPage.svelte");
@@ -49,6 +50,9 @@ const ElementMosaicPage = () => import("./Pages/Mosaics/ElementMosaicPage/Elemen
 const ImageMosaicPage = () => import("./Pages/Mosaics/ImageMosaicPage/ImageMosaicPage.svelte");
 const MultiSelectPage = () => import("./Pages/MultiSelectPage/MultiSelectPage.svelte");
 const NumberInputPage = () => import("./Pages/NumberInputPage/NumberInputPage.svelte");
+const FittedTextPage = () => import("./Pages/FittedTextPage/FittedTextPage.svelte");
+const MorphTextPage = () => import("./Pages/MorphTextPage/MorphTextPage.svelte");
+const ShapeRevealPage = () => import("./Pages/ShapeRevealPage/ShapeRevealPage.svelte");
 const OdometerPage = () => import("./Pages/OdometerPage/OdometerPage.svelte");
 const PaintedTextPage = () => import("./Pages/PaintedTextPage/PaintedTextPage.svelte");
 const PaginatorPage = () => import("./Pages/PaginatorPage/PaginatorPage.svelte");
@@ -64,6 +68,7 @@ const ProgressPage = () => import("./Pages/ProgressPage/ProgressPage.svelte");
 const RadioPage = () => import("./Pages/RadioPage/RadioPage.svelte");
 const RangeCalendarPage = () => import("./Pages/RangeCalendarPage/RangeCalendarPage.svelte");
 const RangePage = () => import("./Pages/RangePage/RangePage.svelte");
+const LensPage = () => import("./Pages/Reveals/LensPage/LensPage.svelte");
 const RevealPage = () => import("./Pages/Reveals/RevealPage/RevealPage.svelte");
 const ScratchCardPage = () => import("./Pages/Reveals/ScratchCardPage/ScratchCardPage.svelte");
 const RichTextPage = () => import("./Pages/RichTextPage/RichTextPage.svelte");
@@ -245,6 +250,12 @@ export const MENU_CONFIGS: MenuBranchConfig[] = [
                 name: "Selection",
                 description:
                     "Picking items out of a list: one of them, several, or the whole run between two. It keeps no list of its own — what is selected belongs to whichever control is drawing it — and owns only the anchor, the memory of where the last plain pick landed, so that a shifted pick knows where to measure its run from. The anchor is held as the item rather than as a position, which is what lets a run survive the list being sorted or filtered underneath it. A folder's tick box that reports ticked, empty or half-ticked by asking what is under it, and a press that moves the folder and everything inside it together, are the same idea one level down.",
+            },
+            {
+                name: "ShapeReveal",
+                description:
+                    "Makes a change to the page and shows the result through a shape growing from a point. The browser pictures the page as it was, the change is made underneath, and the new page is uncovered inside a circle or one of the default shapes, growing from the center, a corner or an element until it covers the whole window, with a hard edge or a blurred one. A theme, a route or a large filter all go through it the same way, and where the browser has no view transitions, or the duration is nothing, the change simply happens. The playground's own theme switch is built on it.",
+                component: ShapeRevealPage,
             },
             {
                 name: "SignalMirror",
@@ -888,6 +899,12 @@ export const MENU_CONFIGS: MenuBranchConfig[] = [
                             "Two faces back to back on a barrel with no depth, turned by the side you ask it for. It renders no control of its own: what turns the card is the page's own button, driven through the signal the two share.",
                         component: FlipCardPage,
                     },
+                    {
+                        name: "Flipbook",
+                        description:
+                            "A book that turns its pages over a spine down its middle: pages read lie on the left, pages to come on the right, and the one turning shows its back as it crosses. The front cover sits alone on the right and the back cover alone on the left. A page turns from the step buttons the book builds and the page places, from the arrow keys while the book has focus, or by being dragged across, falling back if it is let go too early. Each page is named on its own, and every turn announces the spread the book opened at.",
+                        component: FlipbookPage,
+                    },
                 ],
             },
             {
@@ -917,6 +934,12 @@ export const MENU_CONFIGS: MenuBranchConfig[] = [
                 name: "Reveals",
                 children: [
                     {
+                        name: "Lens",
+                        description:
+                            "Reveal's window the other way round: rather than cutting a hole in a cover, it draws the content a second time, larger, and shows that copy only inside a window that follows the pointer. The copy is scaled about the window's center, so whatever is under the middle of the lens stays there. Only the content underneath is real — the copy is hidden from screen readers and from Tab — and the keyboard moves the lens as it moves Reveal's hole.",
+                        component: LensPage,
+                    },
+                    {
                         name: "Reveal",
                         description:
                             "A cover with a hole cut where the pointer is, traveling with it, so the cover is whole again the moment the pointer leaves. The cover is the consumer's — opaque, frosted, or something that reads what it is told — and the component hands it the mask that cuts the hole and whether a reveal is happening.",
@@ -945,6 +968,18 @@ export const MENU_CONFIGS: MenuBranchConfig[] = [
             {
                 name: "Text",
                 children: [
+                    {
+                        name: "FittedText",
+                        description:
+                            "A stack of lines sized so the whole block fills its box: every line is scaled to the box's full width, then all of them shrink together until the stack fits the height, so a short line comes out larger than a long one. The lines arrive already split, so where they break is the consumer's, and the font is whatever the component inherits. It sizes them again when the box changes size or a web font finishes loading.",
+                        component: FittedTextPage,
+                    },
+                    {
+                        name: "MorphText",
+                        description:
+                            "Text that melts from one word into the next. When the text changes, the old and the new copies cross-fade while blurring, under a filter that makes anything half-transparent either solid or clear, so the blurred letters fuse and pull apart into the new shape. The filter sits on the component's own box, so plain text and PaintedText both work inside it, paint included; cycling through words is the consumer's timer.",
+                        component: MorphTextPage,
+                    },
                     {
                         name: "Odometer",
                         description:
@@ -1162,6 +1197,11 @@ export const MENU_CONFIGS: MenuBranchConfig[] = [
                 name: "PopupTrigger",
                 description:
                     "The button that opens a picker's popup, shared by `DatePicker`, `DateRangePicker` and `TimePicker`. It says that it opens a dialog, whether that dialog is showing and which element it is, and that last part is also what lets a press inside a popup drawn elsewhere on the page count as a press inside this control rather than outside it.",
+            },
+            {
+                name: "Spine",
+                description:
+                    "Faces that are all its own box, hinged on one line through the middle and swung out round it, each to the angle one rule gives its distance from the current face — seen end-on, a star of lines where a barrel makes a polygon. Spaced evenly round a turn it is a paddle wheel or a rolodex; laid flat on one side and flat on the other with one turning between, it is a book or a split-flap. It is handed a position and shows it, and the faces turned away leave the accessibility tree. A hinge on an edge is the box moved by half its size, and which half of a face is painted is the consumer's. The carousel's paddle wheel and hinge rules are built from its geometry.",
             },
             {
                 name: "Spotlight",

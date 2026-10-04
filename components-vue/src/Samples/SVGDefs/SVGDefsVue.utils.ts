@@ -105,14 +105,14 @@ export namespace SVGDefsVueUtils {
     };
 
     /**
-     * The pixel trail of a pattern whose cells answer to the pointer: each cell lights as the pointer passes and fades
-     * back to rest on its own over `trailMs`.
+     * The pixel trail of a pattern whose cells answer to the pointer: each cell lights as the pointer passes, holds for
+     * `retentionMs` and fades back to rest on its own over `trailMs`.
      *
      * A frame clock from {@link SVGDefsUtils.createClock} runs while the trail has something left to fade, woken by
      * every move of the pointer, and the component re-renders on each of its frames. Each cell's level is the higher of
      * its live level and what is left of its brightest recent one, remembered by {@link TrackedPatternUtils.createTrail}
-     * under the key the caller gives it. With `trailMs` at `0` there is no clock and no memory, and a cell's live level
-     * is drawn as it is. A change of `trailMs` starts a clock of the new length.
+     * under the key the caller gives it. With both at `0` there is no clock and no memory, and a cell's live level is
+     * drawn as it is. A change of either starts a clock of the new length.
      *
      * Must run inside a component's `setup`.
      *
@@ -129,10 +129,10 @@ export namespace SVGDefsVueUtils {
 
         let clock: ReturnType<typeof SVGDefsUtils.createClock> | undefined;
 
-        watchAfterRender([() => getOpts().trailMs], ([trailMs]) => {
-            if (!TrackedPatternUtils.getHasTrail({ trailMs })) return;
+        watchAfterRender([() => getOpts().trailMs, () => getOpts().retentionMs], ([trailMs, retentionMs]) => {
+            if (!TrackedPatternUtils.getHasTrail({ trailMs, retentionMs })) return;
 
-            const next = SVGDefsUtils.createClock(trailMs);
+            const next = SVGDefsUtils.createClock(TrackedPatternUtils.getTrailSpanMs({ trailMs, retentionMs }));
             const release = next.retain();
             const unsubscribe = next.frameMs.subscribe(() => {
                 frameMs.value = next.frameMs.get();
@@ -155,7 +155,7 @@ export namespace SVGDefsVueUtils {
             const opts = getOpts();
 
             return TrackedPatternUtils.getHasTrail(opts)
-                ? trail.computeLevel(key, liveLevel, frameMs.value, opts.trailMs, opts.restLevel)
+                ? trail.computeLevel(key, liveLevel, frameMs.value, opts)
                 : liveLevel;
         };
     };

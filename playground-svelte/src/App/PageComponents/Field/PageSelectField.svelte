@@ -31,6 +31,7 @@
 </script>
 
 <Select
+    id={props.id}
     renderHighlightFloater={renderPageHighlightFloater}
     bind:value={() => props.value, setValue}
     {options}

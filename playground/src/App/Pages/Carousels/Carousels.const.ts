@@ -1,5 +1,7 @@
 import type { CarouselOrientation, CarouselPlacements } from "@thewaver/ss-components";
 
+import type { SlideFrame } from "./Carousels.types";
+
 export const FIELD_WIDTH = 110;
 export const ORIENTATION_FIELD_WIDTH = 150;
 
@@ -15,9 +17,14 @@ export const PLACEMENT_LABELS: Record<CarouselPlacements.SampleKey, string> = {
     cylinder: "Cylinder",
     folders: "Folders",
     hinge: "Hinge",
+    paddleWheel: "Paddle wheel",
 };
 
-export const NARROW_PLACEMENTS: readonly CarouselPlacements.SampleKey[] = ["coverFlow", "depthWave"];
+export const PLACEMENT_FRAMES: Partial<Record<CarouselPlacements.SampleKey, SlideFrame>> = {
+    coverFlow: "narrow",
+    depthWave: "narrow",
+    paddleWheel: "paddle",
+};
 
 export const ORIENTATION_LABELS: Record<CarouselOrientation, string> = {
     horizontal: "Across",
