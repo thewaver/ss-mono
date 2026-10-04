@@ -6,6 +6,7 @@
     import PageExampleKnobs from "../../../PageComponents/ExampleKnobs/PageExampleKnobs.svelte";
     import PageSelectField from "../../../PageComponents/Field/PageSelectField.svelte";
     import PageProp from "../../../PageComponents/Prop/Prop.svelte";
+    import { renderPageHighlightFloater } from "../../../StyledComponents/GlideFloater/GlideFloater.const.svelte";
     import PageTreeNodeContent from "../../../StyledComponents/TreeNodeContent/PageTreeNodeContent.svelte";
     import { FILES } from "../TreePage.const.svelte";
     import type { TreeExampleProps } from "../TreePage.types";
@@ -44,6 +45,7 @@
 </script>
 
 <Tree
+    renderHighlightFloater={renderPageHighlightFloater}
     nodes={FILES}
     bind:value
     bind:expanded
@@ -52,7 +54,7 @@
     {computeEffect}
 >
     {#snippet renderNode(node, renderProps)}
-        <PageTreeNodeContent {renderProps}>{node.value}</PageTreeNodeContent>
+        <PageTreeNodeContent isGliding {renderProps}>{node.value}</PageTreeNodeContent>
     {/snippet}
 </Tree>
 

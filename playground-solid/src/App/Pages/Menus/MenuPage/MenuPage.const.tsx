@@ -55,7 +55,12 @@ export const renderMenuItem = (
     getItem: Accessor<MenuItem<Action>>,
     getFlags: () => InteractionFlags<MenuItemFlags>,
 ) => (
-    <PageMenuItemContent flags={getFlags} kind={() => getItem().kind} shortcut={() => getItem().value.shortcut ?? ""}>
+    <PageMenuItemContent
+        isGliding
+        flags={getFlags}
+        kind={() => getItem().kind}
+        shortcut={() => getItem().value.shortcut ?? ""}
+    >
         {getItem().value.name}
     </PageMenuItemContent>
 );
@@ -64,7 +69,7 @@ export const renderDestinationItem = (
     getItem: Accessor<MenuItem<Destination>>,
     getFlags: () => InteractionFlags<MenuItemFlags>,
 ) => (
-    <PageMenuItemContent flags={getFlags} kind={() => getItem().kind} shortcut={""}>
+    <PageMenuItemContent isGliding flags={getFlags} kind={() => getItem().kind} shortcut={""}>
         {getItem().value.name}
     </PageMenuItemContent>
 );

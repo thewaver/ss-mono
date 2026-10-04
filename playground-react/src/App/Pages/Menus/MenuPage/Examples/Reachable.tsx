@@ -1,11 +1,13 @@
 import { Menu } from "@thewaver/ss-components-react";
 
+import { renderPageHighlightFloater } from "../../../../StyledComponents/GlideFloater/GlideFloater";
 import { PageMenuTriggerContent } from "../../../../StyledComponents/MenuTriggerContent/MenuTriggerContent";
 import { PageTooltipContent } from "../../../../StyledComponents/TooltipContent/TooltipContent";
 import { ACTIONS, renderMenuItem, renderMenuPopup } from "../MenuPage.const";
 
 export const ReachableExample = () => (
     <Menu
+        renderHighlightFloater={renderPageHighlightFloater}
         items={ACTIONS}
         isDisabled={true}
         isReachableWhenDisabled={true}

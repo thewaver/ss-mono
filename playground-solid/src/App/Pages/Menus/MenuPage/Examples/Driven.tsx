@@ -3,6 +3,7 @@ import { createSignal } from "solid-js";
 import { Button, Menu } from "@thewaver/ss-components-solid";
 
 import { PageButtonContent } from "../../../../StyledComponents/ButtonContent/ButtonContent";
+import { renderPageHighlightFloater } from "../../../../StyledComponents/GlideFloater/GlideFloater";
 import { PageMenuTriggerContent } from "../../../../StyledComponents/MenuTriggerContent/MenuTriggerContent";
 import { ACTIONS, renderMenuItem, renderMenuPopup } from "../MenuPage.const";
 import type { MenuDrivenExampleProps } from "../MenuPage.types";
@@ -15,6 +16,7 @@ export const DrivenExample = (props: Props) => {
     return (
         <>
             <Menu
+                renderHighlightFloater={renderPageHighlightFloater}
                 visibility={props.visibility}
                 anchorRef={getAnchorRef}
                 items={() => ACTIONS}

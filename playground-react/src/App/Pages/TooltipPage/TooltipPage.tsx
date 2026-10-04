@@ -4,6 +4,7 @@ import type { AnchorHPlacement, AnchorVPlacement } from "@thewaver/ss-components
 import { ANCHOR_H_PLACEMENTS, ANCHOR_V_PLACEMENTS, TOOLTIP_DEFAULTS } from "@thewaver/ss-components-react";
 import { TooltipKnobs } from "@thewaver/ss-playground/App/Knobs/Tooltips.const";
 import {
+    TOOLTIP_HOVER_DELAY_MS,
     TOOLTIP_REVEALS,
     TOOLTIP_REVEAL_LABELS,
     type TooltipReveal,
@@ -29,7 +30,7 @@ export const TooltipPage = () => {
     const [offsetY, setOffsetY] = useState(TooltipKnobs.STARTING_OFFSET_Y);
     const [transitionDurationMs, setTransitionDurationMs] = useState(TOOLTIP_DEFAULTS.transitionDurationMs);
     const [focusShowDelayMs, setFocusShowDelayMs] = useState(TOOLTIP_DEFAULTS.focusShowDelayMs);
-    const [hoverShowDelayMs, setHoverShowDelayMs] = useState(TOOLTIP_DEFAULTS.hoverShowDelayMs);
+    const [hoverShowDelayMs, setHoverShowDelayMs] = useState(TOOLTIP_HOVER_DELAY_MS);
     const [skipDelayWindowMs, setSkipDelayWindowMs] = useState(TOOLTIP_DEFAULTS.skipDelayWindowMs);
     const [reveal, setReveal] = useState<TooltipReveal>(TooltipKnobs.STARTING_REVEAL);
 

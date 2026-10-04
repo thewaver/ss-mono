@@ -4,6 +4,7 @@ import type { PropsWithChildren, ReactNode } from "react";
 import { RichText, Tooltip } from "@thewaver/ss-components-react";
 import { GLOSSARY_CONTENT } from "@thewaver/ss-playground/App/Pages/RichTextPage/RichTextPage.const";
 import * as styles from "@thewaver/ss-playground/App/Pages/RichTextPage/RichTextPage.css";
+import { TOOLTIP_HOVER_DELAY_MS } from "@thewaver/ss-playground/App/StyledComponents/TooltipContent/TooltipContent.const";
 
 import { PageTooltipContent } from "../../../StyledComponents/TooltipContent/TooltipContent";
 
@@ -29,6 +30,7 @@ const GlossaryTerm = (props: PropsWithChildren<TermProps>) => {
                 anchorRef={anchorRef ?? undefined}
                 placement={TOOLTIP_PLACEMENT}
                 offset={TOOLTIP_OFFSET}
+                hoverShowDelayMs={TOOLTIP_HOVER_DELAY_MS}
                 renderContent={(visibilityTarget, transitionDurationMs) => (
                     <PageTooltipContent visibilityTarget={visibilityTarget} transitionDurationMs={transitionDurationMs}>
                         {props.tip}

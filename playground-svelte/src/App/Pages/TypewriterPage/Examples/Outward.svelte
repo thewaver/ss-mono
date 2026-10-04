@@ -6,11 +6,10 @@
         Typewriter,
     } from "@thewaver/ss-components-svelte";
     import * as styles from "@thewaver/ss-playground/App/Pages/TypewriterPage/TypewriterPage.css";
-    import { MathUtils } from "@thewaver/ss-utils";
+    import { TypewriterPageUtils } from "@thewaver/ss-playground/App/Pages/TypewriterPage/TypewriterPage.utils";
 
     const TEXT = "Scroll me past the middle";
-    const FLY_FROM = 0.4;
-    const FLY_SPAN = 0.25;
+    const FLY_BAND_PX = 80;
     const CHARACTER_DELAY_MS = 40;
     const CHARACTER_DURATION_MS = 500;
     const HALF = 0.5;
@@ -25,7 +24,11 @@
 
     const getPrefersReducedMotion = MediaQueryMonitorSvelteUtils.createReducedMotion();
 
-    const flown = $derived(MathUtils.clamp01((getTravel() - FLY_FROM) / FLY_SPAN));
+    const flown = $derived.by(() => {
+        getTravel();
+
+        return TypewriterPageUtils.computeMiddleLineShare(boxRef, ref, FLY_BAND_PX);
+    });
 
     const computeAnimationName = (_character: string, index: number, count: number) => {
         if (getPrefersReducedMotion()) return styles.typewriterFadeOut;

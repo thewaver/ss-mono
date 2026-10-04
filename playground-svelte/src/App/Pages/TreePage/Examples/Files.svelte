@@ -2,6 +2,7 @@
     import { Tree } from "@thewaver/ss-components-svelte";
     import type { TreeNode } from "@thewaver/ss-components-svelte";
 
+    import { renderPageHighlightFloater } from "../../../StyledComponents/GlideFloater/GlideFloater.const.svelte";
     import PageTreeNodeContent from "../../../StyledComponents/TreeNodeContent/PageTreeNodeContent.svelte";
     import { FILES } from "../TreePage.const.svelte";
     import type { TreeExampleProps } from "../TreePage.types";
@@ -11,8 +12,14 @@
     let { value = $bindable(), expanded = $bindable([]), ...props }: Props = $props();
 </script>
 
-<Tree nodes={props.nodes ?? FILES} bind:value bind:expanded ariaLabel={"Repository"}>
+<Tree
+    renderHighlightFloater={renderPageHighlightFloater}
+    nodes={props.nodes ?? FILES}
+    bind:value
+    bind:expanded
+    ariaLabel={"Repository"}
+>
     {#snippet renderNode(node, renderProps)}
-        <PageTreeNodeContent {renderProps}>{node.value}</PageTreeNodeContent>
+        <PageTreeNodeContent isGliding {renderProps}>{node.value}</PageTreeNodeContent>
     {/snippet}
 </Tree>

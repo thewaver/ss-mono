@@ -9,6 +9,7 @@ import { RANGE_THUMB_SIZE } from "@thewaver/ss-playground/App/StyledComponents/R
 
 import { PageVariants } from "../../PageComponents/Variants/Variants";
 import { PageButtonContent } from "../../StyledComponents/ButtonContent/ButtonContent";
+import { renderPageHighlightFloater } from "../../StyledComponents/GlideFloater/GlideFloater";
 import { PagePopoverSurface } from "../../StyledComponents/PopoverSurface/PopoverSurface";
 import { PageRangeContent } from "../../StyledComponents/RangeContent/RangeContent";
 import { PageSelectContent } from "../../StyledComponents/SelectContent/SelectContent";
@@ -154,6 +155,7 @@ export const ViewportWrapperPage = () => {
                                         }}
                                     >
                                         <Select
+                                            renderHighlightFloater={renderPageHighlightFloater}
                                             value={[roamingValue, setRoamingValue]}
                                             options={COUNTRIES}
                                             id={"roamingCountry"}
@@ -165,7 +167,7 @@ export const ViewportWrapperPage = () => {
                                                 </PageSelectContent>
                                             )}
                                             renderOption={(option, flags) => (
-                                                <PageSelectOptionContent flags={flags}>
+                                                <PageSelectOptionContent isGliding flags={flags}>
                                                     {option.value}
                                                 </PageSelectOptionContent>
                                             )}
@@ -245,6 +247,7 @@ export const ViewportWrapperPage = () => {
                                         <div className={styles.scrollFiller} />
 
                                         <Select
+                                            renderHighlightFloater={renderPageHighlightFloater}
                                             value={[scrolledValue, setScrolledValue]}
                                             options={COUNTRIES}
                                             id={"scrolledCountry"}
@@ -255,7 +258,7 @@ export const ViewportWrapperPage = () => {
                                                 </PageSelectContent>
                                             )}
                                             renderOption={(option, flags) => (
-                                                <PageSelectOptionContent flags={flags}>
+                                                <PageSelectOptionContent isGliding flags={flags}>
                                                     {option.value}
                                                 </PageSelectOptionContent>
                                             )}

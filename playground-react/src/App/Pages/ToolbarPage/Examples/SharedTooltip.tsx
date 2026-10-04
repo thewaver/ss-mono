@@ -3,6 +3,7 @@ import { useState } from "react";
 import { Toolbar, Tooltip } from "@thewaver/ss-components-react";
 import type { ToolbarAction } from "@thewaver/ss-components-react";
 import * as styles from "@thewaver/ss-playground/App/Pages/ToolbarPage/ToolbarPage.css";
+import { TOOLTIP_HOVER_DELAY_MS } from "@thewaver/ss-playground/App/StyledComponents/TooltipContent/TooltipContent.const";
 
 import { PageButtonContent } from "../../../StyledComponents/ButtonContent/ButtonContent";
 import { PageMenuTriggerContent } from "../../../StyledComponents/MenuTriggerContent/MenuTriggerContent";
@@ -19,7 +20,7 @@ const HINTS: Record<string, string> = {
     Undo: "Takes back the last change",
 };
 
-const PLACEMENT = { x: "center", y: "bottom-out" } as const;
+const PLACEMENT = { x: "center", y: "top-out" } as const;
 const OFFSET = { x: 0, y: 8 };
 
 type Props = ToolbarExampleProps;
@@ -59,6 +60,7 @@ export const SharedTooltipExample = (props: Props) => {
                 anchorRef={anchor}
                 placement={PLACEMENT}
                 offset={OFFSET}
+                hoverShowDelayMs={TOOLTIP_HOVER_DELAY_MS}
                 renderContent={(visibilityTarget, transitionDurationMs) => (
                     <PageTooltipContent visibilityTarget={visibilityTarget} transitionDurationMs={transitionDurationMs}>
                         {HINTS[anchor?.querySelector("[data-hint]")?.getAttribute("data-hint") ?? ""]}

@@ -99,9 +99,6 @@ export const hexTab = style([
         transition: `color ${themeVars.animation.duration}, background-color ${themeVars.animation.duration}, opacity ${themeVars.animation.duration}`,
 
         selectors: {
-            [`&.${isHovered}`]: {
-                backgroundColor: `rgb(from ${themeVars.color.primary.main} r g b / 25%)`,
-            },
             [`&.${isSelected}`]: {
                 color: themeVars.color.primary.contrast,
                 backgroundColor: "transparent",
@@ -109,6 +106,21 @@ export const hexTab = style([
         },
     },
 ]);
+
+export const hexTabHighlightFloater = style({
+    width: "100%",
+    height: "100%",
+    clipPath: HEX_CLIP,
+    backgroundColor: `rgb(from ${themeVars.color.primary.main} r g b / 25%)`,
+    opacity: 0,
+    transitionProperty: "opacity",
+
+    selectors: {
+        [`&.${isVisible}`]: {
+            opacity: 1,
+        },
+    },
+});
 
 export const hexTabFloater = style({
     width: "100%",

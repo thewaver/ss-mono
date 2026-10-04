@@ -1,5 +1,6 @@
 import { Select } from "@thewaver/ss-components-solid";
 
+import { renderPageHighlightFloater } from "../../../StyledComponents/GlideFloater/GlideFloater";
 import { PageSelectContent } from "../../../StyledComponents/SelectContent/SelectContent";
 import { PageSelectOptionContent } from "../../../StyledComponents/SelectOptionContent/SelectOptionContent";
 import { AIRPORTS, PLACEHOLDER, renderSelectPopup } from "../SelectPage.const";
@@ -9,6 +10,7 @@ type Props = SelectAirportExampleProps;
 
 export const AirportsExample = (props: Props) => (
     <Select
+        renderHighlightFloater={renderPageHighlightFloater}
         value={props.value}
         options={() => AIRPORTS}
         ariaLabel={"Airport"}
@@ -18,7 +20,7 @@ export const AirportsExample = (props: Props) => (
             </PageSelectContent>
         )}
         renderOption={(getOption, getFlags) => (
-            <PageSelectOptionContent flags={getFlags}>
+            <PageSelectOptionContent isGliding flags={getFlags}>
                 {getOption().value.city} ({getOption().value.code})
             </PageSelectOptionContent>
         )}

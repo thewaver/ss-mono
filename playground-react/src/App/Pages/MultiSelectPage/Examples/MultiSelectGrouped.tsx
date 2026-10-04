@@ -2,6 +2,7 @@ import { MultiSelect } from "@thewaver/ss-components-react";
 import type { SelectItem } from "@thewaver/ss-components-react";
 import * as popupStyles from "@thewaver/ss-playground/App/StyledComponents/PopoverSurface/PopoverSurface.css";
 
+import { renderPageHighlightFloater } from "../../../StyledComponents/GlideFloater/GlideFloater";
 import { PagePopoverSurface } from "../../../StyledComponents/PopoverSurface/PopoverSurface";
 import { PageSelectContent, computePageSelectTextStyle } from "../../../StyledComponents/SelectContent/SelectContent";
 import { PageSelectGroupContent } from "../../../StyledComponents/SelectGroupContent/SelectGroupContent";
@@ -17,6 +18,7 @@ type Props = {
 export const MultiSelectGroupedExample = (props: Props) => {
     return (
         <MultiSelect
+            renderHighlightFloater={renderPageHighlightFloater}
             values={props.values}
             query={props.query}
             options={props.options}
@@ -30,7 +32,9 @@ export const MultiSelectGroupedExample = (props: Props) => {
             )}
             renderGroup={(group, flags) => <PageSelectGroupContent flags={flags}>{group.label}</PageSelectGroupContent>}
             renderOption={(option, flags) => (
-                <PageSelectOptionContent flags={flags}>{option.value}</PageSelectOptionContent>
+                <PageSelectOptionContent isGliding flags={flags}>
+                    {option.value}
+                </PageSelectOptionContent>
             )}
             renderPopup={(renderOptions, visibilityTarget, transitionDurationMs, placement) => (
                 <PagePopoverSurface

@@ -23,6 +23,7 @@ import PageSidebarToggle from "./PageComponents/SidebarToggle/SidebarToggle.vue"
 import PageViewTabs from "./PageComponents/ViewTabs/PageViewTabs.vue";
 import type { PageViewKey } from "./PageComponents/ViewTabs/ViewTabs.types";
 import PageDependencies from "./PageDependencies.vue";
+import PageGlideFloater from "./StyledComponents/GlideFloater/PageGlideFloater.vue";
 import PageTreeNodeContent from "./StyledComponents/TreeNodeContent/PageTreeNodeContent.vue";
 
 const viewportAnchor = defineModel<ViewportAnchor>("viewportAnchor", { required: true });
@@ -199,6 +200,7 @@ const computeNodeText = (node: TreeNode<unknown>) => (node.value as MenuNodeConf
                                     >
                                         <template #renderNode="{ node, renderProps }">
                                             <PageTreeNodeContent
+                                                is-gliding
                                                 :render-props="renderProps"
                                                 :has-examples="
                                                     AppUtils.getIsBranchConfig(node.value) ||
@@ -212,6 +214,10 @@ const computeNodeText = (node: TreeNode<unknown>) => (node.value as MenuNodeConf
                                             >
                                                 {{ node.value.name }}
                                             </PageTreeNodeContent>
+                                        </template>
+
+                                        <template #renderHighlightFloater="floater">
+                                            <PageGlideFloater kind="highlight" v-bind="floater" />
                                         </template>
                                     </Tree>
                                 </div>

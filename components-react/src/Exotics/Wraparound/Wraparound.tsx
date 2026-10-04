@@ -49,7 +49,8 @@ export const Wraparound = (props: WraparoundProps) => {
 
     const { offset, original, isDragging } = useStore(plane);
 
-    const copyKeys = WraparoundUtils.computeTiles(offset, tileSize, viewportSize, original, maxCopies).map(toKey);
+    const copyKeys = WraparoundUtils.computeTiles(offset, tileSize, viewportSize, maxCopies).map(toKey);
+    const originalKey = toKey(original);
 
     const toTileTransform = (tile: WraparoundTile) =>
         `translate(${tile.column * tileSize.width}px, ${tile.row * tileSize.height}px)`;
@@ -80,7 +81,10 @@ export const Wraparound = (props: WraparoundProps) => {
                     <div
                         key={key}
                         className={WraparoundStyles.wraparoundTile}
-                        style={{ transform: toTileTransform(fromKey(key)) }}
+                        style={{
+                            transform: toTileTransform(fromKey(key)),
+                            visibility: key === originalKey ? "hidden" : undefined,
+                        }}
                         aria-hidden="true"
                         inert
                     >

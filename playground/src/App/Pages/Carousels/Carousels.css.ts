@@ -1,5 +1,7 @@
 import { style } from "@vanilla-extract/css";
 
+import { CarouselKnobs } from "../../Knobs/Carousels.const";
+
 import { themeVars } from "../../Theme.css";
 
 export const SCROLL_BOX_HEIGHT = 240;
@@ -40,8 +42,22 @@ export const ringStack = style({
     flexDirection: "column",
     gap: themeVars.spacing.full,
     alignItems: "center",
+    width: "100%",
 });
 
 export const ringFrame = style({
-    width: 200,
+    display: "flex",
+    justifyContent: "center",
+    alignItems: "center",
+    width: "100%",
+    paddingBlock: themeVars.spacing.quad,
+});
+
+export const ringFrameVertical = style({
+    paddingBlock: CarouselKnobs.RING_SLOT_HEIGHT * CarouselKnobs.RING_RADIUS_RATIO,
+});
+
+export const ringSlot = style({
+    width: CarouselKnobs.RING_SLOT_WIDTH,
+    height: CarouselKnobs.RING_SLOT_HEIGHT,
 });

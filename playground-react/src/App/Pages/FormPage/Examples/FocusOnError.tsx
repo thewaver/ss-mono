@@ -7,6 +7,7 @@ import {
     PageFormFieldMessage,
     PageFormStack,
 } from "../../../StyledComponents/FormFieldContent/FormFieldContent";
+import { renderPageHighlightFloater } from "../../../StyledComponents/GlideFloater/GlideFloater";
 import { PageSelectContent } from "../../../StyledComponents/SelectContent/SelectContent";
 import { PageSelectOptionContent } from "../../../StyledComponents/SelectOptionContent/SelectOptionContent";
 import { PLACEHOLDER, renderSelectPopup } from "../../SelectPage/SelectPage.const";
@@ -38,6 +39,7 @@ export const FocusOnErrorExample = (props: Props) => (
                         )}
                         renderControl={(fieldState) => (
                             <Select
+                                renderHighlightFloater={renderPageHighlightFloater}
                                 value={props.plan}
                                 options={PLANS}
                                 ariaLabel={"Plan"}
@@ -49,7 +51,9 @@ export const FocusOnErrorExample = (props: Props) => (
                                     </PageSelectContent>
                                 )}
                                 renderOption={(option, flags) => (
-                                    <PageSelectOptionContent flags={flags}>{option.value}</PageSelectOptionContent>
+                                    <PageSelectOptionContent isGliding flags={flags}>
+                                        {option.value}
+                                    </PageSelectOptionContent>
                                 )}
                                 renderPopup={renderSelectPopup}
                             />
@@ -65,6 +69,7 @@ export const FocusOnErrorExample = (props: Props) => (
                         )}
                         renderControl={(fieldState) => (
                             <MultiSelect
+                                renderHighlightFloater={renderPageHighlightFloater}
                                 values={props.topics}
                                 options={TOPICS}
                                 ariaLabel={"Topics"}
@@ -78,7 +83,9 @@ export const FocusOnErrorExample = (props: Props) => (
                                     </PageSelectContent>
                                 )}
                                 renderOption={(option, flags) => (
-                                    <PageSelectOptionContent flags={flags}>{option.value}</PageSelectOptionContent>
+                                    <PageSelectOptionContent isGliding flags={flags}>
+                                        {option.value}
+                                    </PageSelectOptionContent>
                                 )}
                                 renderPopup={renderSelectPopup}
                             />

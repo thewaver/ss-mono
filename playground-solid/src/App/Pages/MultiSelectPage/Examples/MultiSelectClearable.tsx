@@ -1,5 +1,6 @@
 import { MultiSelect } from "@thewaver/ss-components-solid";
 
+import { renderPageHighlightFloater } from "../../../StyledComponents/GlideFloater/GlideFloater";
 import { PageSelectClear } from "../../../StyledComponents/SelectClear/SelectClear";
 import { PageSelectContent } from "../../../StyledComponents/SelectContent/SelectContent";
 import { PageSelectOptionContent } from "../../../StyledComponents/SelectOptionContent/SelectOptionContent";
@@ -10,6 +11,7 @@ type Props = MultiSelectClearableExampleProps;
 
 export const MultiSelectClearableExample = (props: Props) => (
     <MultiSelect
+        renderHighlightFloater={renderPageHighlightFloater}
         values={props.values}
         options={() => COUNTRIES}
         ariaLabel={"Countries"}
@@ -25,7 +27,9 @@ export const MultiSelectClearableExample = (props: Props) => (
             </PageSelectContent>
         )}
         renderOption={(getOption, getFlags) => (
-            <PageSelectOptionContent flags={getFlags}>{getOption().value}</PageSelectOptionContent>
+            <PageSelectOptionContent isGliding flags={getFlags}>
+                {getOption().value}
+            </PageSelectOptionContent>
         )}
         renderClear={(getFlags) => <PageSelectClear flags={getFlags} />}
         renderPopup={renderSelectPopup}

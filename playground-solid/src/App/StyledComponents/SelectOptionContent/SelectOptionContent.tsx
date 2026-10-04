@@ -15,8 +15,8 @@ export const PageSelectOptionContent = (props: ParentProps<SelectOptionContentPr
             class={styles.selectOptionContent}
             classList={{
                 [getLayerClass()]: true,
-                [styles.isHovered]: access(props.flags).isHovered,
-                [styles.isHighlighted]: access(props.flags).isHighlighted,
+                [styles.isHovered]: !access(props.isGliding) && access(props.flags).isHovered,
+                [styles.isHighlighted]: !access(props.isGliding) && access(props.flags).isHighlighted,
                 [styles.isSelected]: access(props.flags).isSelected,
                 [styles.isDisabled]: access(props.flags).isDisabled,
             }}

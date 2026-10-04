@@ -3,6 +3,7 @@ import { useModel } from "vue";
 
 import { Label, Select } from "@thewaver/ss-components-vue";
 
+import PageGlideFloater from "../../../StyledComponents/GlideFloater/PageGlideFloater.vue";
 import PageLabelCaption from "../../../StyledComponents/LabelCaption/LabelCaption.vue";
 import PageSelectContent from "../../../StyledComponents/SelectContent/SelectContent.vue";
 import PageSelectOptionContent from "../../../StyledComponents/SelectOptionContent/SelectOptionContent.vue";
@@ -29,7 +30,11 @@ const value = useModel(props, "value");
             </template>
 
             <template #renderOption="{ option, flags }">
-                <PageSelectOptionContent :flags="flags">{{ option.value }}</PageSelectOptionContent>
+                <PageSelectOptionContent is-gliding :flags="flags">{{ option.value }}</PageSelectOptionContent>
+            </template>
+
+            <template #renderHighlightFloater="floater">
+                <PageGlideFloater kind="highlight" v-bind="floater" />
             </template>
 
             <template #renderPopup="popup">

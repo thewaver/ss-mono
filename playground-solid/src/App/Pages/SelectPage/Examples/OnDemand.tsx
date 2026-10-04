@@ -3,6 +3,7 @@ import { Show } from "solid-js";
 import { Select, access } from "@thewaver/ss-components-solid";
 import * as popupStyles from "@thewaver/ss-playground/App/StyledComponents/PopoverSurface/PopoverSurface.css";
 
+import { renderPageHighlightFloater } from "../../../StyledComponents/GlideFloater/GlideFloater";
 import { PagePopoverSurface } from "../../../StyledComponents/PopoverSurface/PopoverSurface";
 import { PageSelectContent } from "../../../StyledComponents/SelectContent/SelectContent";
 import { PageSelectOptionContent } from "../../../StyledComponents/SelectOptionContent/SelectOptionContent";
@@ -14,6 +15,7 @@ type Props = SelectRoutesExampleProps;
 export const OnDemandExample = (props: Props) => {
     return (
         <Select
+            renderHighlightFloater={renderPageHighlightFloater}
             value={props.value}
             options={props.options}
             hasMoreOptions={props.hasMore}
@@ -22,7 +24,7 @@ export const OnDemandExample = (props: Props) => {
                 <PageSelectContent flags={getFlags}>{getSelectedOption()?.value.name ?? PLACEHOLDER}</PageSelectContent>
             )}
             renderOption={(getOption, getFlags) => (
-                <PageSelectOptionContent flags={getFlags} description={() => getOption().value.description}>
+                <PageSelectOptionContent isGliding flags={getFlags} description={() => getOption().value.description}>
                     {getOption().value.name}
                 </PageSelectOptionContent>
             )}

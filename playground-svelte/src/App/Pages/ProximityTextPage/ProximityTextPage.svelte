@@ -1,6 +1,7 @@
 <script lang="ts">
     import { PROXIMITY_TEXT_DEFAULTS } from "@thewaver/ss-components-svelte";
     import { ProximityTextKnobs } from "@thewaver/ss-playground/App/Knobs/ProximityTexts.const";
+    import { MEASURE_BOX_PADDING } from "@thewaver/ss-playground/App/PageComponents/MeasureBox/MeasureBox.css";
 
     import type { ExampleDefs } from "../../PageComponents/Examples/Examples.types";
     import PageExamples from "../../PageComponents/Examples/PageExamples.svelte";
@@ -55,19 +56,19 @@
 </script>
 
 {#snippet pointerExample()}
-    <PageMeasureBox width={BOX_WIDTH}>
+    <PageMeasureBox width={BOX_WIDTH} padding={MEASURE_BOX_PADDING}>
         <PointerExample {...commonProps} />
     </PageMeasureBox>
 {/snippet}
 
 {#snippet waveExample()}
-    <PageMeasureBox width={BOX_WIDTH}>
+    <PageMeasureBox width={BOX_WIDTH} padding={MEASURE_BOX_PADDING}>
         <WaveExample {...commonProps} />
     </PageMeasureBox>
 {/snippet}
 
 {#snippet paintedExample()}
-    <PageMeasureBox width={BOX_WIDTH}>
+    <PageMeasureBox width={BOX_WIDTH} padding={MEASURE_BOX_PADDING}>
         <PaintedExample {...commonProps} />
     </PageMeasureBox>
 {/snippet}

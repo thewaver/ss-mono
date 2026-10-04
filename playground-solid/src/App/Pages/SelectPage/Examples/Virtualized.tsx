@@ -8,6 +8,7 @@ import * as styles from "@thewaver/ss-playground/App/Pages/SelectPage/SelectPage
 import { PageExampleKnobs } from "../../../PageComponents/ExampleKnobs/ExampleKnobs";
 import { PageNumberField } from "../../../PageComponents/Field/Field";
 import { PageProp } from "../../../PageComponents/Prop/Prop";
+import { renderPageHighlightFloater } from "../../../StyledComponents/GlideFloater/GlideFloater";
 import { PageSelectContent } from "../../../StyledComponents/SelectContent/SelectContent";
 import { PageSelectGroupContent } from "../../../StyledComponents/SelectGroupContent/SelectGroupContent";
 import { PageSelectOptionContent } from "../../../StyledComponents/SelectOptionContent/SelectOptionContent";
@@ -32,6 +33,7 @@ export const VirtualizedExample = (props: Props) => {
     return (
         <div class={styles.column}>
             <Select
+                renderHighlightFloater={renderPageHighlightFloater}
                 value={props.value}
                 visibility={props.visibility}
                 options={props.options}
@@ -46,7 +48,11 @@ export const VirtualizedExample = (props: Props) => {
                     </PageSelectContent>
                 )}
                 renderOption={(getOption, getFlags) => (
-                    <PageSelectOptionContent flags={getFlags} description={() => getOption().value.description}>
+                    <PageSelectOptionContent
+                        isGliding
+                        flags={getFlags}
+                        description={() => getOption().value.description}
+                    >
                         {getOption().value.name}
                     </PageSelectOptionContent>
                 )}

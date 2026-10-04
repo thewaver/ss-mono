@@ -3,6 +3,7 @@ import { shallowRef } from "vue";
 
 import { Tooltip } from "@thewaver/ss-components-vue";
 import * as styles from "@thewaver/ss-playground/App/Pages/RichTextPage/RichTextPage.css";
+import { TOOLTIP_HOVER_DELAY_MS } from "@thewaver/ss-playground/App/StyledComponents/TooltipContent/TooltipContent.const";
 
 import PageTooltipContent from "../../../StyledComponents/TooltipContent/TooltipContent.vue";
 
@@ -22,7 +23,12 @@ const anchorRef = shallowRef<HTMLElement>();
     <span>
         <span ref="anchorRef" :class="styles.glossaryTerm" tabindex="0"><slot /></span>
 
-        <Tooltip :anchor-ref="anchorRef" :placement="TOOLTIP_PLACEMENT" :offset="TOOLTIP_OFFSET">
+        <Tooltip
+            :anchor-ref="anchorRef"
+            :placement="TOOLTIP_PLACEMENT"
+            :offset="TOOLTIP_OFFSET"
+            :hover-show-delay-ms="TOOLTIP_HOVER_DELAY_MS"
+        >
             <template #renderContent="{ visibilityTarget, transitionDurationMs }">
                 <PageTooltipContent
                     :visibility-target="visibilityTarget"

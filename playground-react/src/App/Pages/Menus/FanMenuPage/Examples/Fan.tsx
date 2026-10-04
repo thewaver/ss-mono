@@ -34,8 +34,6 @@ export const FanExample = (props: FanMenuExampleProps) => {
                                 .filter(Boolean)
                                 .join(" ")}
                         >
-                            <div className={styles.itemFill} aria-hidden={"true"} />
-
                             {flags.isBack && <span aria-hidden={"true"}>{BACK_MARK}</span>}
 
                             <span>{item.value.name}</span>
@@ -46,6 +44,15 @@ export const FanExample = (props: FanMenuExampleProps) => {
                         </div>
                     );
                 }}
+                renderHighlightFloater={(visibilityTarget, transitionDurationMs) => (
+                    <div
+                        className={[styles.itemFloater, visibilityTarget === 1 && styles.itemFloaterVisible]
+                            .filter(Boolean)
+                            .join(" ")}
+                        style={{ transitionDuration: `${transitionDurationMs}ms` }}
+                        data-floater={"highlight"}
+                    />
+                )}
                 renderPopup={(renderItems, visibilityTarget, transitionDurationMs) => (
                     <div
                         className={[styles.layer, visibilityTarget === 1 && styles.layerVisible]

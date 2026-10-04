@@ -148,7 +148,7 @@ export const LIBRARY: TreemapNode<string> = branch(
         leaf("TileBoard", 1284),
         leaf("Trail", 437),
         branch("Wheels", leaf("DrumWheel", 4), leaf("OverheadWheel", 4)),
-        leaf("Wraparound", 773),
+        leaf("Wraparound", 775),
     ),
     branch(
         "Generators",
@@ -202,10 +202,10 @@ export const LIBRARY: TreemapNode<string> = branch(
         branch("Proximity", leaf("Effects", 13)),
         branch(
             "SVGDefs",
-            branch("Gradient", leaf("Timed", 3427), leaf("Tracked", 3556), leaf("Gradient files", 184)),
+            branch("Gradient", leaf("Timed", 3427), leaf("Tracked", 3568), leaf("Gradient files", 184)),
             leaf("Iteration", 56),
             branch("Pattern", leaf("Timed", 647), leaf("Tracked", 634), leaf("Pattern files", 205)),
-            leaf("SVGDefs files", 1707),
+            leaf("SVGDefs files", 1695),
         ),
         branch("ScanlineAnimation", leaf("Keyframes", 259)),
         branch("ScrambleText", leaf("Glyphs", 37), leaf("Weights", 37)),

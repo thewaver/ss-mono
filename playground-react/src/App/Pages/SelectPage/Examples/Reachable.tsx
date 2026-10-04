@@ -1,5 +1,6 @@
 import { Select } from "@thewaver/ss-components-react";
 
+import { renderPageHighlightFloater } from "../../../StyledComponents/GlideFloater/GlideFloater";
 import { PageSelectContent } from "../../../StyledComponents/SelectContent/SelectContent";
 import { PageSelectOptionContent } from "../../../StyledComponents/SelectOptionContent/SelectOptionContent";
 import { PageTooltipContent } from "../../../StyledComponents/TooltipContent/TooltipContent";
@@ -11,6 +12,7 @@ type Props = SelectExampleProps;
 export const ReachableExample = (props: Props) => {
     return (
         <Select
+            renderHighlightFloater={renderPageHighlightFloater}
             value={props.value}
             options={COUNTRIES}
             isDisabled={true}
@@ -20,7 +22,9 @@ export const ReachableExample = (props: Props) => {
                 <PageSelectContent flags={flags}>{selectedOption?.value ?? PLACEHOLDER}</PageSelectContent>
             )}
             renderOption={(option, flags) => (
-                <PageSelectOptionContent flags={flags}>{option.value}</PageSelectOptionContent>
+                <PageSelectOptionContent isGliding flags={flags}>
+                    {option.value}
+                </PageSelectOptionContent>
             )}
             renderPopup={renderSelectPopup}
             tooltipDefs={{

@@ -3,6 +3,7 @@
     import type { SelectOption } from "@thewaver/ss-components-svelte";
     import * as popupStyles from "@thewaver/ss-playground/App/StyledComponents/PopoverSurface/PopoverSurface.css";
 
+    import { renderPageHighlightFloater } from "../../../StyledComponents/GlideFloater/GlideFloater.const.svelte";
     import PagePopoverSurface from "../../../StyledComponents/PopoverSurface/PopoverSurface.svelte";
     import PageSelectContent, {
         computePageSelectTextStyle,
@@ -21,6 +22,7 @@
 </script>
 
 <Select
+    renderHighlightFloater={renderPageHighlightFloater}
     bind:value
     bind:query
     options={props.options}
@@ -33,7 +35,7 @@
     {/snippet}
 
     {#snippet renderOption(option, flags)}
-        <PageSelectOptionContent {flags}>
+        <PageSelectOptionContent isGliding {flags}>
             {option.value.city} ({option.value.code})
         </PageSelectOptionContent>
     {/snippet}

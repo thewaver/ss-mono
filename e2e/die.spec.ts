@@ -102,19 +102,24 @@ test("the die turns about the middle of the faces it is made of", async ({ page 
  * die to turn there — and the shape changes in the same breath. The turn has to be worked out on the new shape, from
  * wherever the die is drawn, so it arrives upright; the alternatives were snapping straight onto the face, or
  * finishing on the old shape's angle and resting crooked. A turn shows no face until it lands, so seeing none just
- * after the switch is what tells a turn from a snap.
+ * after the switch is what tells a turn from a snap. It rolls until the number is past the smaller die's faces and then
+ * waits on a timed turn, which a parallel sweep can starve; it passes every time on its own, hence `@solo`.
  */
-test("switching to a smaller die turns it onto its last face rather than snapping there", async ({ page }) => {
-    await pickShape(page, "d100");
+test(
+    "switching to a smaller die turns it onto its last face rather than snapping there",
+    { tag: "@solo" },
+    async ({ page }) => {
+        await pickShape(page, "d100");
 
-    while (Number(await shownNumber(page)) <= 4) await page.locator(ROLL).click();
+        while (Number(await shownNumber(page)) <= 4) await page.locator(ROLL).click();
 
-    await page.emulateMedia({ reducedMotion: "no-preference" });
-    await page.locator(`${prop("shape")} [role="combobox"]`).click();
-    await page.getByRole("option", { name: "d4", exact: true }).click();
+        await page.emulateMedia({ reducedMotion: "no-preference" });
+        await page.locator(`${prop("shape")} [role="combobox"]`).click();
+        await page.getByRole("option", { name: "d4", exact: true }).click();
 
-    await expect(page.locator(SHOWING), "no face is showing while the die turns").toHaveCount(0);
-    await expect(page.locator(SHOWING), "and it lands on the last face").toHaveAttribute("aria-label", "4", {
-        timeout: 5000,
-    });
-});
+        await expect(page.locator(SHOWING), "no face is showing while the die turns").toHaveCount(0);
+        await expect(page.locator(SHOWING), "and it lands on the last face").toHaveAttribute("aria-label", "4", {
+            timeout: 5000,
+        });
+    },
+);

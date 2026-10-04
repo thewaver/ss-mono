@@ -4,6 +4,7 @@ import { Select, access } from "@thewaver/ss-components-solid";
 import type { MaybeAccessor, SelectOption } from "@thewaver/ss-components-solid";
 import * as popupStyles from "@thewaver/ss-playground/App/StyledComponents/PopoverSurface/PopoverSurface.css";
 
+import { renderPageHighlightFloater } from "../../../StyledComponents/GlideFloater/GlideFloater";
 import { PagePopoverSurface } from "../../../StyledComponents/PopoverSurface/PopoverSurface";
 import { PageSelectContent, computePageSelectTextStyle } from "../../../StyledComponents/SelectContent/SelectContent";
 import { PageSelectOptionContent } from "../../../StyledComponents/SelectOptionContent/SelectOptionContent";
@@ -19,6 +20,7 @@ type Props = {
 export const AutocompleteExample = (props: Props) => {
     return (
         <Select
+            renderHighlightFloater={renderPageHighlightFloater}
             value={props.value}
             query={props.query}
             options={props.options}
@@ -29,7 +31,7 @@ export const AutocompleteExample = (props: Props) => {
                 <PageSelectContent flags={getFlags}>{getSelectedOption()?.value.city ?? PLACEHOLDER}</PageSelectContent>
             )}
             renderOption={(getOption, getFlags) => (
-                <PageSelectOptionContent flags={getFlags}>
+                <PageSelectOptionContent isGliding flags={getFlags}>
                     {getOption().value.city} ({getOption().value.code})
                 </PageSelectOptionContent>
             )}

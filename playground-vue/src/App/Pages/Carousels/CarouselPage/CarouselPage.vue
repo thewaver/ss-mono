@@ -16,7 +16,7 @@ const EXAMPLES_ROOT = "/src/App/Pages/Carousels/CarouselPage/Examples";
 
 const controls = useCarouselsControls();
 
-const { isLooping, sharedProps, delay, slides } = controls;
+const { isLooping, isDisabled, orientation, sharedProps, delay, slides } = controls;
 
 const manualIndex = shallowRef(0);
 const rotatingIndex = shallowRef(0);
@@ -58,7 +58,7 @@ const examples: ExampleDefs[] = [
         key: "ring",
         name: "A ring that turns and leans",
         readout: () =>
-            `slide ${ringIndex.value + 1} of ${controls.slideCount.value} — the drum inside a Tilter, with its progress written on a clock for a continuous turn; Stop is the way to halt it that a turn running on its own owes the reader`,
+            `slide ${ringIndex.value + 1} of ${controls.slideCount.value} — a placement rule written in the example, a wide ring of small slides inside a Tilter, with its progress written on a clock for a continuous turn; Stop is the way to halt it that a turn running on its own owes the reader`,
         path: `${EXAMPLES_ROOT}/Ring.vue`,
     },
 ];
@@ -97,7 +97,12 @@ const examples: ExampleDefs[] = [
         </template>
 
         <template #ring>
-            <RingExample v-model:index="ringIndex" :slides="slides" />
+            <RingExample
+                v-model:index="ringIndex"
+                :slides="slides"
+                :is-disabled="isDisabled"
+                :orientation="orientation"
+            />
         </template>
     </PageExamples>
 </template>

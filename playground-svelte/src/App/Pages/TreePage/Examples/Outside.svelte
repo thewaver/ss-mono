@@ -3,6 +3,7 @@
 
     import PageControlColumn from "../../../PageComponents/ControlRow/PageControlColumn.svelte";
     import PageButtonContent from "../../../StyledComponents/ButtonContent/ButtonContent.svelte";
+    import { renderPageHighlightFloater } from "../../../StyledComponents/GlideFloater/GlideFloater.const.svelte";
     import PageTreeNodeContent from "../../../StyledComponents/TreeNodeContent/PageTreeNodeContent.svelte";
     import { FILES, OUTSIDE_COLLAPSE_DELAY_MS } from "../TreePage.const.svelte";
     import type { TreeExampleProps } from "../TreePage.types";
@@ -13,9 +14,15 @@
 </script>
 
 <PageControlColumn>
-    <Tree nodes={FILES} bind:value bind:expanded ariaLabel={"Repository, collapsed from outside"}>
+    <Tree
+        renderHighlightFloater={renderPageHighlightFloater}
+        nodes={FILES}
+        bind:value
+        bind:expanded
+        ariaLabel={"Repository, collapsed from outside"}
+    >
         {#snippet renderNode(node, renderProps)}
-            <PageTreeNodeContent {renderProps}>{node.value}</PageTreeNodeContent>
+            <PageTreeNodeContent isGliding {renderProps}>{node.value}</PageTreeNodeContent>
         {/snippet}
     </Tree>
 

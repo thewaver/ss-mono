@@ -7,33 +7,25 @@ const VIEW = { width: 250, height: 120 };
 const ORIGINAL = { column: 0, row: 0 };
 
 describe("WraparoundUtils.computeTiles", () => {
-    it("covers the window with copies and leaves out the original's cell", () => {
-        const tiles = WraparoundUtils.computeTiles({ x: 0, y: 0 }, TILE, VIEW, ORIGINAL, 100);
+    it("covers the window with copies, the original's cell included", () => {
+        const tiles = WraparoundUtils.computeTiles({ x: 0, y: 0 }, TILE, VIEW, 100);
 
-        expect(tiles).toHaveLength(3 * 3 - 1);
-        expect(tiles).not.toContainEqual(ORIGINAL);
+        expect(tiles).toHaveLength(3 * 3);
+        expect(tiles).toContainEqual(ORIGINAL);
         expect(tiles).toContainEqual({ column: 2, row: 2 });
     });
 
     it("reaches cells to the left and above once the plane has moved the other way", () => {
-        const tiles = WraparoundUtils.computeTiles({ x: 30, y: 20 }, TILE, VIEW, ORIGINAL, 100);
+        const tiles = WraparoundUtils.computeTiles({ x: 30, y: 20 }, TILE, VIEW, 100);
 
         expect(tiles).toContainEqual({ column: -1, row: -1 });
         expect(tiles).toContainEqual({ column: 2, row: 1 });
         expect(tiles, "the bottom row has moved out of the window").not.toContainEqual({ column: 0, row: 2 });
     });
 
-    it("draws a copy where the original would be, once the original has moved to another cell", () => {
-        const tiles = WraparoundUtils.computeTiles({ x: 0, y: 0 }, TILE, VIEW, { column: 5, row: 5 }, 100);
-
-        expect(tiles).toContainEqual(ORIGINAL);
-    });
-
     it("draws nothing for content with no size, and stops at the limit", () => {
-        expect(WraparoundUtils.computeTiles({ x: 0, y: 0 }, { width: 0, height: 50 }, VIEW, ORIGINAL, 100)).toEqual([]);
-        expect(WraparoundUtils.computeTiles({ x: 0, y: 0 }, { width: 1, height: 1 }, VIEW, ORIGINAL, 10)).toHaveLength(
-            10,
-        );
+        expect(WraparoundUtils.computeTiles({ x: 0, y: 0 }, { width: 0, height: 50 }, VIEW, 100)).toEqual([]);
+        expect(WraparoundUtils.computeTiles({ x: 0, y: 0 }, { width: 1, height: 1 }, VIEW, 10)).toHaveLength(10);
     });
 });
 

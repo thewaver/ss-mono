@@ -1,6 +1,7 @@
 <script lang="ts">
     import { Label, Select } from "@thewaver/ss-components-svelte";
 
+    import { renderPageHighlightFloater } from "../../../StyledComponents/GlideFloater/GlideFloater.const.svelte";
     import PageLabelCaption from "../../../StyledComponents/LabelCaption/LabelCaption.svelte";
     import PageSelectContent from "../../../StyledComponents/SelectContent/SelectContent.svelte";
     import PageSelectOptionContent from "../../../StyledComponents/SelectOptionContent/SelectOptionContent.svelte";
@@ -17,13 +18,19 @@
 <Label orientation={"vertical"} gap={LABEL_GAP}>
     <PageLabelCaption>Country</PageLabelCaption>
 
-    <Select bind:value options={COUNTRIES} listAriaLabel={"Country"} renderPopup={renderSelectPopup}>
+    <Select
+        renderHighlightFloater={renderPageHighlightFloater}
+        bind:value
+        options={COUNTRIES}
+        listAriaLabel={"Country"}
+        renderPopup={renderSelectPopup}
+    >
         {#snippet renderContent(selectedOption, flags)}
             <PageSelectContent {flags}>{selectedOption?.value ?? PLACEHOLDER}</PageSelectContent>
         {/snippet}
 
         {#snippet renderOption(option, flags)}
-            <PageSelectOptionContent {flags}>{option.value}</PageSelectOptionContent>
+            <PageSelectOptionContent isGliding {flags}>{option.value}</PageSelectOptionContent>
         {/snippet}
     </Select>
 </Label>

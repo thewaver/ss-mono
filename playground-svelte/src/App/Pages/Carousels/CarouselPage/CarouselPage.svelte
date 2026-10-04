@@ -60,7 +60,7 @@
             key: "ring",
             name: "A ring that turns and leans",
             readout: () =>
-                `slide ${ringIndex + 1} of ${controls.slideCount} — the drum inside a Tilter, with its progress written on a clock for a continuous turn; Stop is the way to halt it that a turn running on its own owes the reader`,
+                `slide ${ringIndex + 1} of ${controls.slideCount} — a placement rule written in the example, a wide ring of small slides inside a Tilter, with its progress written on a clock for a continuous turn; Stop is the way to halt it that a turn running on its own owes the reader`,
             component: ringExample,
             path: `${EXAMPLES_ROOT}/Ring.svelte`,
         },
@@ -96,7 +96,12 @@
 {/snippet}
 
 {#snippet ringExample()}
-    <RingExample slides={controls.slides} bind:index={ringIndex} />
+    <RingExample
+        slides={controls.slides}
+        bind:index={ringIndex}
+        isDisabled={controls.isDisabled}
+        orientation={controls.orientation}
+    />
 {/snippet}
 
 <PageCarouselsPanel {controls} hasPlacement={true} hasDelay={true} hasLooping={true} />

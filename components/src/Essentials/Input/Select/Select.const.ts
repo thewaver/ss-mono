@@ -1,4 +1,4 @@
 export const SELECT_DEFAULTS = {
     padding: 0,
-    floaterTransitionDurationMs: 150,
+    floaterTransitionDurationMs: 100,
 };

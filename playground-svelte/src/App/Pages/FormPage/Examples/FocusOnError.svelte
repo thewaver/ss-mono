@@ -6,6 +6,7 @@
     import PageFormFieldCaption from "../../../StyledComponents/FormFieldContent/PageFormFieldCaption.svelte";
     import PageFormFieldMessage from "../../../StyledComponents/FormFieldContent/PageFormFieldMessage.svelte";
     import PageFormStack from "../../../StyledComponents/FormFieldContent/PageFormStack.svelte";
+    import { renderPageHighlightFloater } from "../../../StyledComponents/GlideFloater/GlideFloater.const.svelte";
     import PageSelectContent from "../../../StyledComponents/SelectContent/SelectContent.svelte";
     import PageSelectOptionContent from "../../../StyledComponents/SelectOptionContent/SelectOptionContent.svelte";
     import { PLACEHOLDER, renderSelectPopup } from "../../SelectPage/SelectPage.const.svelte";
@@ -36,6 +37,7 @@
 
                 {#snippet renderControl(fieldState)}
                     <Select
+                        renderHighlightFloater={renderPageHighlightFloater}
                         bind:value={plan}
                         options={PLANS}
                         ariaLabel={"Plan"}
@@ -48,7 +50,7 @@
                         {/snippet}
 
                         {#snippet renderOption(option, flags)}
-                            <PageSelectOptionContent {flags}>{option.value}</PageSelectOptionContent>
+                            <PageSelectOptionContent isGliding {flags}>{option.value}</PageSelectOptionContent>
                         {/snippet}
                     </Select>
                 {/snippet}
@@ -65,6 +67,7 @@
 
                 {#snippet renderControl(fieldState)}
                     <MultiSelect
+                        renderHighlightFloater={renderPageHighlightFloater}
                         bind:values={topics}
                         options={TOPICS}
                         ariaLabel={"Topics"}
@@ -81,7 +84,7 @@
                         {/snippet}
 
                         {#snippet renderOption(option, flags)}
-                            <PageSelectOptionContent {flags}>{option.value}</PageSelectOptionContent>
+                            <PageSelectOptionContent isGliding {flags}>{option.value}</PageSelectOptionContent>
                         {/snippet}
                     </MultiSelect>
                 {/snippet}

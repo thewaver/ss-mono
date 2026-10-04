@@ -5,6 +5,7 @@ import { Tree } from "@thewaver/ss-components-vue";
 import type { TreeNode } from "@thewaver/ss-components-vue";
 import * as styles from "@thewaver/ss-playground/App/Pages/TreePage/TreePage.css";
 
+import PageGlideFloater from "../../../StyledComponents/GlideFloater/PageGlideFloater.vue";
 import PageTreeNodeContent from "../../../StyledComponents/TreeNodeContent/PageTreeNodeContent.vue";
 import type { TreeExampleProps } from "../TreePage.types";
 
@@ -30,7 +31,11 @@ const computeEstimatedNodeHeight = () => STRESS_NODE_HEIGHT;
             :compute-estimated-node-height="computeEstimatedNodeHeight"
         >
             <template #renderNode="{ node, renderProps }">
-                <PageTreeNodeContent :render-props="renderProps">{{ node.value }}</PageTreeNodeContent>
+                <PageTreeNodeContent is-gliding :render-props="renderProps">{{ node.value }}</PageTreeNodeContent>
+            </template>
+
+            <template #renderHighlightFloater="floater">
+                <PageGlideFloater kind="highlight" v-bind="floater" />
             </template>
         </Tree>
     </div>

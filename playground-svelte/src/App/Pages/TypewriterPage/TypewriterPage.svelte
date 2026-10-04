@@ -110,13 +110,13 @@
 {/snippet}
 
 {#snippet scrollLitExample()}
-    <PageMeasureBox width={textContainerWidth} padding={MEASURE_BOX_PADDING}>
+    <PageMeasureBox width={textContainerWidth}>
         <ScrollLitExample />
     </PageMeasureBox>
 {/snippet}
 
 {#snippet outwardExample()}
-    <PageMeasureBox width={textContainerWidth} padding={MEASURE_BOX_PADDING}>
+    <PageMeasureBox width={textContainerWidth}>
         <OutwardExample />
     </PageMeasureBox>
 {/snippet}

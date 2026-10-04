@@ -22,7 +22,7 @@ const layerClass = useLayerClass();
             layerClass,
             renderProps.isBranch && styles.isBranch,
             renderProps.isExpanded && styles.isExpanded,
-            renderProps.isHovered && styles.isHovered,
+            !isGliding && renderProps.isHovered && styles.isHovered,
             renderProps.isSelected && styles.isSelected,
             renderProps.isDisabled && styles.isDisabled,
             renderProps.depth === 0 && styles.isCategory,

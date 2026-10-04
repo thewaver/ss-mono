@@ -3,4 +3,5 @@ import type { AccessorProps, InteractionFlags, SelectOptionFlags } from "@thewav
 export type SelectOptionContentProps = AccessorProps<{
     flags: InteractionFlags<SelectOptionFlags>;
     description?: string;
+    isGliding?: boolean;
 }>;

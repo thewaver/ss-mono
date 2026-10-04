@@ -28,7 +28,7 @@ export const PageTreeNodeContent = (props: ParentProps<TreeNodeContentProps>) =>
                 [getLayerClass()]: true,
                 [styles.isBranch]: access(props.renderProps).isBranch,
                 [styles.isExpanded]: access(props.renderProps).isExpanded,
-                [styles.isHovered]: access(props.renderProps).isHovered,
+                [styles.isHovered]: !access(props.isGliding) && access(props.renderProps).isHovered,
                 [styles.isSelected]: access(props.renderProps).isSelected,
                 [styles.isDisabled]: access(props.renderProps).isDisabled,
                 [styles.isCategory]: access(props.renderProps).depth === 0,

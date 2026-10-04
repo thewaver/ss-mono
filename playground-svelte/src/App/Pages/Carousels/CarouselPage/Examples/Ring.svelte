@@ -1,13 +1,8 @@
 <script lang="ts">
     import { untrack } from "svelte";
 
-    import {
-        Button,
-        Carousel,
-        CarouselPlacementUtils,
-        MediaQueryMonitorSvelteUtils,
-        Tilter,
-    } from "@thewaver/ss-components-svelte";
+    import { Button, Carousel, MediaQueryMonitorSvelteUtils, Tilter } from "@thewaver/ss-components-svelte";
+    import type { CarouselPlacementFn } from "@thewaver/ss-components-svelte";
     import { CarouselKnobs } from "@thewaver/ss-playground/App/Knobs/Carousels.const";
     import {
         computeCarouselRotationLabel,
@@ -22,8 +17,29 @@
     import SlideFront from "./SlideFront.svelte";
 
     const TILT_DEGREES = 18;
+    const FULL_TURN_DEGREES = 360;
+    const HALF_TURN_DEGREES = 180;
+    const PERCENT = 100;
 
-    type Props = Pick<CarouselExampleProps, "slides" | "index">;
+    type Props = Pick<CarouselExampleProps, "slides" | "index" | "isDisabled" | "orientation">;
+
+    const computeRingPlacement: CarouselPlacementFn = (defs) => {
+        const along = defs.orientation === "horizontal" ? defs.size.width : defs.size.height;
+        const angle = (defs.distance * FULL_TURN_DEGREES) / Math.max(defs.count, 1);
+        const radians = (angle * Math.PI) / HALF_TURN_DEGREES;
+        const radius = along * CarouselKnobs.RING_RADIUS_RATIO;
+        const alongPercent = along > 0 ? ((radius * Math.sin(radians)) / along) * PERCENT : 0;
+        const depth = radius * (Math.cos(radians) - 1);
+
+        return {
+            effect: {
+                perspective: CarouselKnobs.RING_PERSPECTIVE_PX,
+                translate3d: defs.orientation === "horizontal" ? [alongPercent, 0, depth] : [0, alongPercent, depth],
+                ...(defs.orientation === "horizontal" ? { rotateY: angle } : { rotateX: -angle }),
+            },
+            layer: Math.cos(radians),
+        };
+    };
 
     let { index = $bindable(), ...props }: Props = $props();
 
@@ -54,28 +70,32 @@
 </script>
 
 <div class={styles.ringStack}>
-    <div class={styles.ringFrame}>
-        <Tilter maxTiltDegrees={TILT_DEGREES}>
-            <Carousel
-                computePlacement={CarouselPlacementUtils.drum}
-                slides={props.slides}
-                bind:index
-                bind:progress
-                ariaLabel={"Turning ring"}
-                computeSlideLabel={computePositionLabel}
-                computeStepLabel={computeCarouselStepLabel}
-                computeRotationLabel={computeCarouselRotationLabel}
-            >
-                {#snippet renderSlide(slide, state)}
-                    <SlideFront title={slide} {state} isNarrow={false} />
-                {/snippet}
+    <Tilter maxTiltDegrees={TILT_DEGREES}>
+        <div class={[styles.ringFrame, props.orientation === "vertical" && styles.ringFrameVertical]}>
+            <div class={styles.ringSlot}>
+                <Carousel
+                    computePlacement={computeRingPlacement}
+                    slides={props.slides}
+                    bind:index
+                    bind:progress
+                    isDisabled={props.isDisabled}
+                    orientation={props.orientation}
+                    ariaLabel={"Turning ring"}
+                    computeSlideLabel={computePositionLabel}
+                    computeStepLabel={computeCarouselStepLabel}
+                    computeRotationLabel={computeCarouselRotationLabel}
+                >
+                    {#snippet renderSlide(slide, state)}
+                        <SlideFront title={slide} {state} isNarrow={false} />
+                    {/snippet}
 
-                {#snippet renderSlideBack()}
-                    <SlideBack isNarrow={false} />
-                {/snippet}
-            </Carousel>
-        </Tilter>
-    </div>
+                    {#snippet renderSlideBack()}
+                        <SlideBack isNarrow={false} />
+                    {/snippet}
+                </Carousel>
+            </div>
+        </div>
+    </Tilter>
 
     <Button
         id={"ringTurn"}

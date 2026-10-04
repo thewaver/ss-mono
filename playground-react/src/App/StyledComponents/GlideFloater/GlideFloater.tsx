@@ -23,6 +23,22 @@ export const PageGlideFloater = (props: GlideFloaterProps) => {
     );
 };
 
+export const renderPageHighlightFloater = (visibilityTarget: 0 | 1, transitionDurationMs: number) => (
+    <PageGlideFloater
+        kind={"highlight"}
+        visibilityTarget={visibilityTarget}
+        transitionDurationMs={transitionDurationMs}
+    />
+);
+
+export const renderPageSelectionFloater = (visibilityTarget: 0 | 1, transitionDurationMs: number) => (
+    <PageGlideFloater
+        kind={"selection"}
+        visibilityTarget={visibilityTarget}
+        transitionDurationMs={transitionDurationMs}
+    />
+);
+
 export const PageGlideLabel = (props: PropsWithChildren<GlideLabelProps>) => {
     const layerClass = useLayerClass();
 

@@ -2,6 +2,7 @@ import { useState } from "react";
 
 import { PROXIMITY_TEXT_DEFAULTS } from "@thewaver/ss-components-react";
 import { ProximityTextKnobs } from "@thewaver/ss-playground/App/Knobs/ProximityTexts.const";
+import { MEASURE_BOX_PADDING } from "@thewaver/ss-playground/App/PageComponents/MeasureBox/MeasureBox.css";
 
 import { PageExamples } from "../../PageComponents/Examples/Examples";
 import { PageCheckField, PageNumberField } from "../../PageComponents/Field/Field";
@@ -31,7 +32,7 @@ export const ProximityTextPage = () => {
             readout: () =>
                 "each letter plays its keyframes held at how near the pointer is; the lines were wrapped for every letter at its heaviest, so the spare room sits at the end of each line while they rest",
             component: () => (
-                <PageMeasureBox width={BOX_WIDTH}>
+                <PageMeasureBox width={BOX_WIDTH} padding={MEASURE_BOX_PADDING}>
                     <PointerExample {...commonProps} />
                 </PageMeasureBox>
             ),
@@ -44,7 +45,7 @@ export const ProximityTextPage = () => {
             readout: () =>
                 "a point supplied in place of the pointer, moved across the line on a clock; Stop is the way to halt it that a motion running on its own owes the reader",
             component: () => (
-                <PageMeasureBox width={BOX_WIDTH}>
+                <PageMeasureBox width={BOX_WIDTH} padding={MEASURE_BOX_PADDING}>
                     <WaveExample {...commonProps} />
                 </PageMeasureBox>
             ),
@@ -57,7 +58,7 @@ export const ProximityTextPage = () => {
             readout: () =>
                 "PaintedText inside draws the letters; each grows and pushes the rest of its line along, as plain text does, while the line breaks stay put",
             component: () => (
-                <PageMeasureBox width={BOX_WIDTH}>
+                <PageMeasureBox width={BOX_WIDTH} padding={MEASURE_BOX_PADDING}>
                     <PaintedExample {...commonProps} />
                 </PageMeasureBox>
             ),

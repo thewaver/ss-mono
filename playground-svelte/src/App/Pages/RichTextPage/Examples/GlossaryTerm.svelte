@@ -3,6 +3,7 @@
 
     import { Tooltip } from "@thewaver/ss-components-svelte";
     import * as styles from "@thewaver/ss-playground/App/Pages/RichTextPage/RichTextPage.css";
+    import { TOOLTIP_HOVER_DELAY_MS } from "@thewaver/ss-playground/App/StyledComponents/TooltipContent/TooltipContent.const";
 
     import PageTooltipContent from "../../../StyledComponents/TooltipContent/TooltipContent.svelte";
 
@@ -23,6 +24,7 @@
         {anchorRef}
         placement={TOOLTIP_PLACEMENT}
         offset={TOOLTIP_OFFSET}
+        hoverShowDelayMs={TOOLTIP_HOVER_DELAY_MS}
     >
         {#snippet renderContent(visibilityTarget, transitionDurationMs)}
             <PageTooltipContent {visibilityTarget} {transitionDurationMs}>

@@ -4,6 +4,7 @@ import { shallowRef } from "vue";
 import { Toolbar, Tooltip } from "@thewaver/ss-components-vue";
 import type { ToolbarAction } from "@thewaver/ss-components-vue";
 import * as styles from "@thewaver/ss-playground/App/Pages/ToolbarPage/ToolbarPage.css";
+import { TOOLTIP_HOVER_DELAY_MS } from "@thewaver/ss-playground/App/StyledComponents/TooltipContent/TooltipContent.const";
 
 import PageButtonContent from "../../../StyledComponents/ButtonContent/ButtonContent.vue";
 import PageMenuTriggerContent from "../../../StyledComponents/MenuTriggerContent/MenuTriggerContent.vue";
@@ -21,7 +22,7 @@ const HINTS: Record<string, string> = {
     Undo: "Takes back the last change",
 };
 
-const PLACEMENT = { x: "center", y: "bottom-out" } as const;
+const PLACEMENT = { x: "center", y: "top-out" } as const;
 const OFFSET = { x: 0, y: 8 };
 
 type Props = ToolbarExampleProps;
@@ -72,7 +73,12 @@ const getHint = () => HINTS[anchor.value?.querySelector("[data-hint]")?.getAttri
             </template>
         </Toolbar>
 
-        <Tooltip :anchor-ref="anchor" :placement="PLACEMENT" :offset="OFFSET">
+        <Tooltip
+            :anchor-ref="anchor"
+            :placement="PLACEMENT"
+            :offset="OFFSET"
+            :hover-show-delay-ms="TOOLTIP_HOVER_DELAY_MS"
+        >
             <template #renderContent="content">
                 <PageTooltipContent
                     :visibility-target="content.visibilityTarget"

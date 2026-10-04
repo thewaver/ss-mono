@@ -364,7 +364,9 @@ test("a drum steps by turning, and its slides ride the faces round", async ({ pa
     expect(await currentSlide(page, MANUAL), "the step lands on the next slide, exactly as on the track").toBe(
         "2 of 4",
     );
-    expect(await faceTransform(page, MANUAL), "and the faces turned to bring it to the front").not.toBe(before);
+    await expect
+        .poll(() => faceTransform(page, MANUAL), { message: "and the faces turned to bring it to the front" })
+        .not.toBe(before);
 });
 
 test("a swipe turns the drum the way the finger went", async ({ page }) => {

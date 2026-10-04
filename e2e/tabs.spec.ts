@@ -316,7 +316,7 @@ test("a placed tab list is still a tab list: the pairing, the walk and the skip 
 });
 
 test("the floater lands on the cell the layout chose, in both axes", async ({ page }) => {
-    const box = page.locator(floater(HONEYCOMB)).locator("..");
+    const box = page.locator(`${HONEYCOMB} [data-floater=""]`).locator("..");
     const before = { left: await inlineStyle(box, "left"), top: await inlineStyle(box, "top") };
 
     expect(before.left, "the floater is placed from the layout rather than left at zero").not.toBe("");

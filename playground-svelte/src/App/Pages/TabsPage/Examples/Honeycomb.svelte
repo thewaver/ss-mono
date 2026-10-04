@@ -12,6 +12,7 @@
     import PageTabPanel from "../../../PageComponents/TabPanel/TabPanel.svelte";
     import PageTabCell from "../../../StyledComponents/TabContent/PageTabCell.svelte";
     import PageTabHexFloater from "../../../StyledComponents/TabContent/PageTabHexFloater.svelte";
+    import PageTabHexHighlightFloater from "../../../StyledComponents/TabContent/PageTabHexHighlightFloater.svelte";
     import type { TabsExampleProps } from "../TabsPage.types";
 
     const HONEYCOMB_DEFS: HoneycombDefs = { perRow: 3, gapRatio: 0 };
@@ -38,6 +39,10 @@
         >
             {#snippet renderSelectionFloater(visibilityTarget, transitionDurationMs)}
                 <PageTabHexFloater orientation={"horizontal"} {visibilityTarget} {transitionDurationMs} />
+            {/snippet}
+
+            {#snippet renderHighlightFloater(visibilityTarget, transitionDurationMs)}
+                <PageTabHexHighlightFloater orientation={"horizontal"} {visibilityTarget} {transitionDurationMs} />
             {/snippet}
 
             {#snippet renderTab(tab, flags)}

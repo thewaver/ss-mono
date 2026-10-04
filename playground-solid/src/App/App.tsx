@@ -45,6 +45,7 @@ import type { ViewportAnchor } from "./PageComponents/NavSettings/NavSettings.ty
 import { PageSidebarToggle } from "./PageComponents/SidebarToggle/SidebarToggle";
 import { PageViewTabs } from "./PageComponents/ViewTabs/ViewTabs";
 import type { PageViewKey } from "./PageComponents/ViewTabs/ViewTabs.types";
+import { renderPageHighlightFloater } from "./StyledComponents/GlideFloater/GlideFloater";
 import { useLayerClass } from "./StyledComponents/Layer/Layer.context";
 import { PageTreeNodeContent } from "./StyledComponents/TreeNodeContent/TreeNodeContent";
 
@@ -423,6 +424,7 @@ export function AppContent(props: RouteSectionProps & { viewportAnchor: SignalPa
                                         style={{ "transition-duration": `${getTransitionDurationMs()}ms` }}
                                     >
                                         <Tree
+                                            renderHighlightFloater={renderPageHighlightFloater}
                                             nodes={getVisibleNodes}
                                             value={selectedSignal}
                                             expanded={expandedSignal}
@@ -431,6 +433,7 @@ export function AppContent(props: RouteSectionProps & { viewportAnchor: SignalPa
                                             computeCustomText={(node) => node.value.name}
                                             renderNode={(getNode, getRenderProps) => (
                                                 <PageTreeNodeContent
+                                                    isGliding
                                                     renderProps={getRenderProps}
                                                     hasExamples={() => {
                                                         const node = getNode().value;

@@ -137,7 +137,7 @@ export const TypewriterPage = () => {
             readout: () =>
                 "playback is off and the progress is how far the paragraph has traveled up its box; the letters not yet reached show their animation's first frame, which is the dimmed text",
             component: () => (
-                <PageMeasureBox width={textContainerWidth} padding={MEASURE_BOX_PADDING}>
+                <PageMeasureBox width={textContainerWidth}>
                     <ScrollLitExample />
                 </PageMeasureBox>
             ),
@@ -149,7 +149,7 @@ export const TypewriterPage = () => {
             readout: () =>
                 "an animation per letter: the left half flies off to the left and the right half to the right, from the middle out, as the line crosses the middle of its box",
             component: () => (
-                <PageMeasureBox width={textContainerWidth} padding={MEASURE_BOX_PADDING}>
+                <PageMeasureBox width={textContainerWidth}>
                     <OutwardExample />
                 </PageMeasureBox>
             ),

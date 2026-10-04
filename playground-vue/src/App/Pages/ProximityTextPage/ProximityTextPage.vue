@@ -3,6 +3,7 @@ import { computed, shallowRef } from "vue";
 
 import { PROXIMITY_TEXT_DEFAULTS } from "@thewaver/ss-components-vue";
 import { ProximityTextKnobs } from "@thewaver/ss-playground/App/Knobs/ProximityTexts.const";
+import { MEASURE_BOX_PADDING } from "@thewaver/ss-playground/App/PageComponents/MeasureBox/MeasureBox.css";
 
 import type { ExampleDefs } from "../../PageComponents/Examples/Examples.types";
 import PageExamples from "../../PageComponents/Examples/PageExamples.vue";
@@ -88,19 +89,19 @@ const examples: ExampleDefs[] = [
 
     <PageExamples :items="examples">
         <template #pointer>
-            <PageMeasureBox :width="BOX_WIDTH">
+            <PageMeasureBox :width="BOX_WIDTH" :padding="MEASURE_BOX_PADDING">
                 <PointerExample v-bind="commonProps" />
             </PageMeasureBox>
         </template>
 
         <template #wave>
-            <PageMeasureBox :width="BOX_WIDTH">
+            <PageMeasureBox :width="BOX_WIDTH" :padding="MEASURE_BOX_PADDING">
                 <WaveExample v-bind="commonProps" />
             </PageMeasureBox>
         </template>
 
         <template #painted>
-            <PageMeasureBox :width="BOX_WIDTH">
+            <PageMeasureBox :width="BOX_WIDTH" :padding="MEASURE_BOX_PADDING">
                 <PaintedExample v-bind="commonProps" />
             </PageMeasureBox>
         </template>

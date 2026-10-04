@@ -109,13 +109,16 @@ export namespace WraparoundUtils {
     });
 
     /**
-     * The cells to draw copies in: every one that shows in the window, except the original's.
+     * The cells to draw copies in: every one that shows in the window, the original's included.
+     *
+     * The original's cell gets a copy too, hidden by the caller while the original covers it, so that moving the
+     * original from one cell to another changes which copy is hidden rather than which copies exist. A copy built
+     * fresh needs a frame to draw, and rebuilding one on every move is what made tiles blink under a moving pointer.
      *
      * @param offset How far the plane has been moved.
      * @param tileSize The content's size. Under one pixel on either side there is nothing to repeat, and no copies
      * are drawn.
      * @param viewportSize The window's size.
-     * @param original The cell the original is in, which is drawn whether it shows or not.
      * @param maxCopies The most copies drawn. Content tiny next to its window would otherwise ask for thousands; past
      * the limit the window's far side is left uncovered rather than the page brought to a halt.
      * @returns The cells, row by row.
@@ -124,7 +127,6 @@ export namespace WraparoundUtils {
         offset: Point2d,
         tileSize: Size2d,
         viewportSize: Size2d,
-        original: WraparoundTile,
         maxCopies: number,
     ): WraparoundTile[] => {
         if (tileSize.width < 1 || tileSize.height < 1) return [];
@@ -141,8 +143,6 @@ export namespace WraparoundUtils {
         for (let row = first.row; row <= last.row; row++) {
             for (let column = first.column; column <= last.column; column++) {
                 if (tiles.length >= maxCopies) return tiles;
-                if (column === original.column && row === original.row) continue;
-
                 tiles.push({ column, row });
             }
         }

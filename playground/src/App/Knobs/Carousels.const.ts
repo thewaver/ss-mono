@@ -12,4 +12,8 @@ export namespace CarouselKnobs {
     export const STARTING_IS_DISABLED = false;
     export const STARTING_PLACEMENT: CarouselPlacements.SampleKey = "coverFlow";
     export const RING_LAP_MS = 12_000;
+    export const RING_RADIUS_RATIO = 1.8;
+    export const RING_PERSPECTIVE_PX = 900;
+    export const RING_SLOT_WIDTH = 110;
+    export const RING_SLOT_HEIGHT = 140;
 }

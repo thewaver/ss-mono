@@ -2,12 +2,11 @@ import { useRef } from "react";
 
 import { ElementObserverReactUtils, Typewriter } from "@thewaver/ss-components-react";
 import * as styles from "@thewaver/ss-playground/App/Pages/TypewriterPage/TypewriterPage.css";
-import { MathUtils } from "@thewaver/ss-utils";
+import { TypewriterPageUtils } from "@thewaver/ss-playground/App/Pages/TypewriterPage/TypewriterPage.utils";
 
 const TEXT =
-    "Every word here waits, dimmed, until the paragraph is scrolled into view, then lights up in reading order as it travels up the box — and dims again on the way back down.";
-const LIT_FROM = 0.15;
-const LIT_SPAN = 0.35;
+    "Every word here waits, dimmed, until it reaches the middle of the box, then lights up in reading order as it passes — and dims again on the way back down.";
+const LIT_BAND_PX = 24;
 const CHARACTER_DELAY_MS = 30;
 const CHARACTER_DURATION_MS = 400;
 
@@ -17,9 +16,13 @@ export const ScrollLitExample = () => {
     const boxRef = useRef<HTMLDivElement | null>(null);
     const ref = useRef<HTMLDivElement | null>(null);
 
-    const travel = ElementObserverReactUtils.useScrollContainerProgress(ref, boxRef);
+    ElementObserverReactUtils.useScrollContainerProgress(ref, boxRef);
 
-    const lit = MathUtils.clamp01((travel - LIT_FROM) / LIT_SPAN);
+    const lit = TypewriterPageUtils.computeMiddleLineShare(
+        boxRef.current ?? undefined,
+        ref.current ?? undefined,
+        LIT_BAND_PX,
+    );
 
     return (
         <div ref={boxRef} id={"scrollLitScrollBox"} className={styles.scrollBox}>

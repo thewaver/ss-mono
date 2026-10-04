@@ -20,6 +20,7 @@ import {
 
 import { PageColorInputContent } from "../../StyledComponents/ColorInputContent/ColorInputContent";
 import { PageFileInputContent } from "../../StyledComponents/FileInputContent/FileInputContent";
+import { renderPageHighlightFloater } from "../../StyledComponents/GlideFloater/GlideFloater";
 import { PagePopoverSurface } from "../../StyledComponents/PopoverSurface/PopoverSurface";
 import { PageSelectContent } from "../../StyledComponents/SelectContent/SelectContent";
 import { PageSelectGroupContent } from "../../StyledComponents/SelectGroupContent/SelectGroupContent";
@@ -125,6 +126,7 @@ export const PageSelectField = <T,>(props: PageSelectFieldProps<T>) => {
 
     return (
         <Select
+            renderHighlightFloater={renderPageHighlightFloater}
             value={[props.value, setValue]}
             options={options}
             isDisabled={props.isDisabled}
@@ -137,7 +139,7 @@ export const PageSelectField = <T,>(props: PageSelectFieldProps<T>) => {
                 </PageSelectContent>
             )}
             renderOption={(option, flags) => (
-                <PageSelectOptionContent flags={flags}>
+                <PageSelectOptionContent isGliding flags={flags}>
                     {props.computeLabel?.(option.value) ?? String(option.value)}
                 </PageSelectOptionContent>
             )}
@@ -162,6 +164,7 @@ export const PageGroupedSelectField = <T,>(props: PageGroupedSelectFieldProps<T>
 
     return (
         <Select
+            renderHighlightFloater={renderPageHighlightFloater}
             value={[props.value, setValue]}
             options={options}
             isDisabled={props.isDisabled}
@@ -175,7 +178,7 @@ export const PageGroupedSelectField = <T,>(props: PageGroupedSelectFieldProps<T>
             )}
             renderGroup={(group) => <PageSelectGroupContent>{group.label}</PageSelectGroupContent>}
             renderOption={(option, flags) => (
-                <PageSelectOptionContent flags={flags}>
+                <PageSelectOptionContent isGliding flags={flags}>
                     {props.computeLabel?.(option.value) ?? String(option.value)}
                 </PageSelectOptionContent>
             )}

@@ -42,6 +42,7 @@
     import PageViewTabs from "./PageComponents/ViewTabs/PageViewTabs.svelte";
     import type { PageViewKey } from "./PageComponents/ViewTabs/ViewTabs.types";
     import PageDependencies from "./PageDependencies.svelte";
+    import { renderPageHighlightFloater } from "./StyledComponents/GlideFloater/GlideFloater.const.svelte";
     import PageTreeNodeContent from "./StyledComponents/TreeNodeContent/PageTreeNodeContent.svelte";
 
     const getIsMenuFaded = (phase: SidebarPhase) => phase === "collapsing" || phase === "collapsed";
@@ -241,6 +242,7 @@
                                 style:transition-duration={`${transitionDurationMs}ms`}
                             >
                                 <Tree
+                                    renderHighlightFloater={renderPageHighlightFloater}
                                     nodes={visibleNodes}
                                     bind:value={() => selectedConfig as MenuNodeConfig | undefined, () => undefined}
                                     bind:expanded={

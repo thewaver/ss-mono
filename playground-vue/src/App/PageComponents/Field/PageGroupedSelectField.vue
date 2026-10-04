@@ -3,6 +3,7 @@ import { computed } from "vue";
 
 import { Select } from "@thewaver/ss-components-vue";
 
+import PageGlideFloater from "../../StyledComponents/GlideFloater/PageGlideFloater.vue";
 import PagePopoverSurface from "../../StyledComponents/PopoverSurface/PopoverSurface.vue";
 import PageSelectContent from "../../StyledComponents/SelectContent/SelectContent.vue";
 import PageSelectGroupContent from "../../StyledComponents/SelectGroupContent/SelectGroupContent.vue";
@@ -43,9 +44,13 @@ const setValue = (value: T | undefined) => {
         </template>
 
         <template #renderOption="{ option, flags }">
-            <PageSelectOptionContent :flags="flags">{{
+            <PageSelectOptionContent is-gliding :flags="flags">{{
                 computeLabel?.(option.value) ?? String(option.value)
             }}</PageSelectOptionContent>
+        </template>
+
+        <template #renderHighlightFloater="floater">
+            <PageGlideFloater kind="highlight" v-bind="floater" />
         </template>
 
         <template #renderPopup="{ renderOptions, visibilityTarget, transitionDurationMs, placement }">

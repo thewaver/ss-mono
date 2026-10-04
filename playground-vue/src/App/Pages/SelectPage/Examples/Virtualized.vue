@@ -9,6 +9,7 @@ import * as styles from "@thewaver/ss-playground/App/Pages/SelectPage/SelectPage
 import PageExampleKnobs from "../../../PageComponents/ExampleKnobs/PageExampleKnobs.vue";
 import PageNumberField from "../../../PageComponents/Field/PageNumberField.vue";
 import PageProp from "../../../PageComponents/Prop/Prop.vue";
+import PageGlideFloater from "../../../StyledComponents/GlideFloater/PageGlideFloater.vue";
 import PageSelectContent from "../../../StyledComponents/SelectContent/SelectContent.vue";
 import PageSelectGroupContent from "../../../StyledComponents/SelectGroupContent/SelectGroupContent.vue";
 import PageSelectOptionContent from "../../../StyledComponents/SelectOptionContent/SelectOptionContent.vue";
@@ -56,9 +57,13 @@ const visibility = useModel(props, "visibility");
             </template>
 
             <template #renderOption="{ option, flags }">
-                <PageSelectOptionContent :flags="flags" :description="option.value.description">{{
+                <PageSelectOptionContent is-gliding :flags="flags" :description="option.value.description">{{
                     option.value.name
                 }}</PageSelectOptionContent>
+            </template>
+
+            <template #renderHighlightFloater="floater">
+                <PageGlideFloater kind="highlight" v-bind="floater" />
             </template>
 
             <template #renderPopup="popup">

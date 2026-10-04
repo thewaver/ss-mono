@@ -49,13 +49,13 @@
 {/snippet}
 
 {#snippet renderMenuItem(item: MenuItem<Action>, flags: InteractionFlags<MenuItemFlags>)}
-    <PageMenuItemContent {flags} kind={item.kind} shortcut={item.value.shortcut ?? ""}>
+    <PageMenuItemContent isGliding {flags} kind={item.kind} shortcut={item.value.shortcut ?? ""}>
         {item.value.name}
     </PageMenuItemContent>
 {/snippet}
 
 {#snippet renderDestinationItem(item: MenuItem<Destination>, flags: InteractionFlags<MenuItemFlags>)}
-    <PageMenuItemContent {flags} kind={item.kind} shortcut={""}>
+    <PageMenuItemContent isGliding {flags} kind={item.kind} shortcut={""}>
         {item.value.name}
     </PageMenuItemContent>
 {/snippet}

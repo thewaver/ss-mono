@@ -3,4 +3,5 @@ import type { InteractionFlags, SelectOptionFlags } from "@thewaver/ss-component
 export type SelectOptionContentProps = {
     flags: InteractionFlags<SelectOptionFlags>;
     description?: string;
+    isGliding?: boolean;
 };

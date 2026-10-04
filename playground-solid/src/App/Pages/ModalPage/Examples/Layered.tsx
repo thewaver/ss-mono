@@ -2,6 +2,7 @@ import { Button, Modal, Select } from "@thewaver/ss-components-solid";
 import type { SelectOption } from "@thewaver/ss-components-solid";
 
 import { PageButtonContent } from "../../../StyledComponents/ButtonContent/ButtonContent";
+import { renderPageHighlightFloater } from "../../../StyledComponents/GlideFloater/GlideFloater";
 import { PageModalOverlay } from "../../../StyledComponents/ModalOverlay/ModalOverlay";
 import { PageModalPanel } from "../../../StyledComponents/ModalPanel/ModalPanel";
 import { PagePopoverSurface } from "../../../StyledComponents/PopoverSurface/PopoverSurface";
@@ -39,6 +40,7 @@ export const LayeredExample = (props: Props) => (
                     <div id={LAYERED_TITLE_ID}>Where are you flying from?</div>
 
                     <Select
+                        renderHighlightFloater={renderPageHighlightFloater}
                         value={props.value}
                         options={() => COUNTRIES}
                         ariaLabel={"Country"}
@@ -48,7 +50,9 @@ export const LayeredExample = (props: Props) => (
                             </PageSelectContent>
                         )}
                         renderOption={(getOption, getFlags) => (
-                            <PageSelectOptionContent flags={getFlags}>{getOption().value}</PageSelectOptionContent>
+                            <PageSelectOptionContent isGliding flags={getFlags}>
+                                {getOption().value}
+                            </PageSelectOptionContent>
                         )}
                         renderPopup={(
                             renderOptions,

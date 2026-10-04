@@ -9,7 +9,11 @@ import {
 import * as styles from "@thewaver/ss-playground/App/Pages/TabsPage/TabsPage.css";
 
 import { PageTabPanel } from "../../../PageComponents/TabPanel/TabPanel";
-import { PageTabCell, PageTabHexFloater } from "../../../StyledComponents/TabContent/TabContent";
+import {
+    PageTabCell,
+    PageTabHexFloater,
+    PageTabHexHighlightFloater,
+} from "../../../StyledComponents/TabContent/TabContent";
 import type { TabsExampleProps } from "../TabsPage.types";
 
 const HONEYCOMB_DEFS: HoneycombDefs = { perRow: 3, gapRatio: 0 };
@@ -34,6 +38,13 @@ export const HoneycombExample = (props: Props) => {
                     onSelectionChange={props.onSelectionChange}
                     renderSelectionFloater={(getVisibilityTarget, getTransitionDurationMs) => (
                         <PageTabHexFloater
+                            orientation={"horizontal"}
+                            visibilityTarget={getVisibilityTarget}
+                            transitionDurationMs={getTransitionDurationMs}
+                        />
+                    )}
+                    renderHighlightFloater={(getVisibilityTarget, getTransitionDurationMs) => (
+                        <PageTabHexHighlightFloater
                             orientation={"horizontal"}
                             visibilityTarget={getVisibilityTarget}
                             transitionDurationMs={getTransitionDurationMs}

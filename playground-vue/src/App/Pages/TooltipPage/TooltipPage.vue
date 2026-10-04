@@ -5,6 +5,7 @@ import type { AnchorHPlacement, AnchorVPlacement } from "@thewaver/ss-components
 import { ANCHOR_H_PLACEMENTS, ANCHOR_V_PLACEMENTS, TOOLTIP_DEFAULTS } from "@thewaver/ss-components-vue";
 import { TooltipKnobs } from "@thewaver/ss-playground/App/Knobs/Tooltips.const";
 import {
+    TOOLTIP_HOVER_DELAY_MS,
     TOOLTIP_REVEALS,
     TOOLTIP_REVEAL_LABELS,
     type TooltipReveal,
@@ -31,7 +32,7 @@ const offsetX = shallowRef(TooltipKnobs.STARTING_OFFSET_X);
 const offsetY = shallowRef(TooltipKnobs.STARTING_OFFSET_Y);
 const transitionDurationMs = shallowRef(TOOLTIP_DEFAULTS.transitionDurationMs);
 const focusShowDelayMs = shallowRef(TOOLTIP_DEFAULTS.focusShowDelayMs);
-const hoverShowDelayMs = shallowRef(TOOLTIP_DEFAULTS.hoverShowDelayMs);
+const hoverShowDelayMs = shallowRef(TOOLTIP_HOVER_DELAY_MS);
 const skipDelayWindowMs = shallowRef(TOOLTIP_DEFAULTS.skipDelayWindowMs);
 const reveal = shallowRef<TooltipReveal>(TooltipKnobs.STARTING_REVEAL);
 

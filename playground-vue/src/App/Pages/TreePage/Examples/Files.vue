@@ -4,6 +4,7 @@ import { useModel } from "vue";
 import { Tree } from "@thewaver/ss-components-vue";
 import type { TreeNode } from "@thewaver/ss-components-vue";
 
+import PageGlideFloater from "../../../StyledComponents/GlideFloater/PageGlideFloater.vue";
 import PageTreeNodeContent from "../../../StyledComponents/TreeNodeContent/PageTreeNodeContent.vue";
 import { FILES } from "../TreePage.const";
 import type { TreeExampleProps } from "../TreePage.types";
@@ -19,7 +20,11 @@ const expanded = useModel(props, "expanded");
 <template>
     <Tree v-model:value="value" v-model:expanded="expanded" :nodes="nodes ?? FILES" ariaLabel="Repository">
         <template #renderNode="{ node, renderProps }">
-            <PageTreeNodeContent :render-props="renderProps">{{ node.value }}</PageTreeNodeContent>
+            <PageTreeNodeContent is-gliding :render-props="renderProps">{{ node.value }}</PageTreeNodeContent>
+        </template>
+
+        <template #renderHighlightFloater="floater">
+            <PageGlideFloater kind="highlight" v-bind="floater" />
         </template>
     </Tree>
 </template>

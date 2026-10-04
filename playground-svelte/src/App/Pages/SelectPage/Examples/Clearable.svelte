@@ -1,6 +1,7 @@
 <script lang="ts">
     import { Select } from "@thewaver/ss-components-svelte";
 
+    import { renderPageHighlightFloater } from "../../../StyledComponents/GlideFloater/GlideFloater.const.svelte";
     import PageSelectClear from "../../../StyledComponents/SelectClear/SelectClear.svelte";
     import PageSelectContent from "../../../StyledComponents/SelectContent/SelectContent.svelte";
     import PageSelectOptionContent from "../../../StyledComponents/SelectOptionContent/SelectOptionContent.svelte";
@@ -13,6 +14,7 @@
 </script>
 
 <Select
+    renderHighlightFloater={renderPageHighlightFloater}
     bind:value
     options={COUNTRIES}
     ariaLabel={"Country"}
@@ -28,7 +30,7 @@
     {/snippet}
 
     {#snippet renderOption(option, flags)}
-        <PageSelectOptionContent {flags}>{option.value}</PageSelectOptionContent>
+        <PageSelectOptionContent isGliding {flags}>{option.value}</PageSelectOptionContent>
     {/snippet}
 
     {#snippet renderClear(flags)}

@@ -1,5 +1,6 @@
 import { Select } from "@thewaver/ss-components-solid";
 
+import { renderPageHighlightFloater } from "../../../StyledComponents/GlideFloater/GlideFloater";
 import { PageSelectContent } from "../../../StyledComponents/SelectContent/SelectContent";
 import { PageSelectOptionContent } from "../../../StyledComponents/SelectOptionContent/SelectOptionContent";
 import { HOURS, PLACEHOLDER, renderSelectPopup } from "../SelectPage.const";
@@ -10,6 +11,7 @@ type Props = SelectExampleProps;
 export const HoursExample = (props: Props) => {
     return (
         <Select
+            renderHighlightFloater={renderPageHighlightFloater}
             value={props.value}
             options={() => HOURS}
             ariaLabel={"Departure hour"}
@@ -17,7 +19,9 @@ export const HoursExample = (props: Props) => {
                 <PageSelectContent flags={getFlags}>{getSelectedOption()?.value ?? PLACEHOLDER}</PageSelectContent>
             )}
             renderOption={(getOption, getFlags) => (
-                <PageSelectOptionContent flags={getFlags}>{getOption().value}</PageSelectOptionContent>
+                <PageSelectOptionContent isGliding flags={getFlags}>
+                    {getOption().value}
+                </PageSelectOptionContent>
             )}
             renderPopup={renderSelectPopup}
         />

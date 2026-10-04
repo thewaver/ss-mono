@@ -4002,7 +4002,12 @@ Focus does not use the window. Both numbers start from the Radix pair and are th
 **One timer serves both ways in, and a mouse focus no longer cancels a pending hover.** Focus clears the pending
 timer only when it is about to start its own, a `:focus-visible` focus. Otherwise clicking a button within the hover
 delay would have cancelled the tooltip for as long as the pointer stayed on the button. Playground demos that a spec
-hovers set `hoverShowDelayMs` to 0; the Tooltip page keeps the defaults and exposes both as knobs.
+hovers set `hoverShowDelayMs` to 0.
+
+**The Playground waits 300ms, the library 700.** The user found 700 far too long for a tooltip that is the only label
+an icon-only button or a "?" mark has, and chose to set the Playground's own tooltips to 300 from one constant,
+`TOOLTIP_HOVER_DELAY_MS`, rather than change the library's default; the Tooltip page's knob starts there too. The
+default is still open to revisiting on the same argument.
 
 ### `Tooltip`: handed a new anchor while showing, it glides there
 
@@ -7483,8 +7488,8 @@ control's container only has to be positioned and `isolation: isolate`.
 beside it; both take the visibility target and the duration every appearing painter takes. Where the selected
 item and the highlighted item are different things each gets its own marker, and the name says which one it
 follows. `Select`, `Listbox`, `Tree`, `Tabs` and `RadioGroup` take both; `Menu`, which has no selection, takes
-the highlight one only. One `floaterTransitionDurationMs` drives both, defaulting to 150 in each control's
-defaults.
+the highlight one only. One `floaterTransitionDurationMs` drives both, defaulting to 100 in each control's
+defaults — the user's number, after 150 felt slow; `Tabs` and `RadioGroup` keep their own 200, also the user's call.
 
 **The highlight is the hovered item first, then the focused or keyboard-highlighted one.** In `Tabs`,
 `RadioGroup` and `Tree` the controls read the pointer through `pointerover` and `pointerleave` on their container
@@ -7509,6 +7514,21 @@ are kept in a map that drops an element when its row unmounts.
 **An option's ref is keyed by its element, not by its index.** `Listbox` records each mounted option with the
 accessor for its flat index, and looks an index up by reading those accessors. Keying by index meant the cleanup
 had to ask a removed option for its index, which reads a row that filtering has already taken away and throws.
+
+**In the Playground, a floater replaces every background that marks hover or selection.** The user's rule: any
+control that takes a floater and whose painter changes a box's background to show the hovered, highlighted or
+selected item shows it with a floater instead — `Select`, `MultiSelect`, `Listbox`, `Menu`, `ContextMenu`, `Tree`
+(the left nav included), the honeycomb `Tabs` and `FanMenu`. The painters shared with controls that take no floater
+— the text field's suggestions, the menubar, the toolbar's overflow menu — keep their backgrounds, so the switch is a
+prop on the painter, `isGliding`, rather than a deletion from its styles. Painters that mark state by color, a
+filter or an underline are untouched, and so are the wheel's wedges, which fill a path rather than a box.
+`renderPageHighlightFloater` and `renderPageSelectionFloater` are the one-line way a usage takes the floater in Solid and
+React; Svelte keeps them as snippets in `GlideFloater.const.svelte`, since a component file cannot export snippets
+that render itself, and Vue fills a `#renderHighlightFloater` slot with `PageGlideFloater` at each usage, since a slot
+cannot be handed a function from a template.
+
+**The radial `Tree` keeps its own selection gradient for now.** Its outer ring draws each circle at 70% of its box,
+and a floater fills the box, so the marker would show larger than the circle it marks.
 
 ### A segmented control is `RadioGroup` paint, and the Radio page proves it
 
@@ -17847,6 +17867,12 @@ are whichever intersect the window, plus the original's wherever it is — so th
 whatever state it holds survives any amount of movement. Copies carry `inert` and `aria-hidden`, which is what
 keeps them out of Tab and out of a screen reader, and they are keyed by their cell so a copy is only built when its
 cell comes into view.
+
+**Every visible cell keeps a copy, the original's included, and the one under the original is hidden.** The first
+build left the original's cell without a copy, so moving the original under the pointer threw one copy away and built
+another where the original had been; a copy built fresh needs a frame to draw, and shaking the pointer made tiles
+blink. `computeTiles` now returns every cell in view, and the copy sharing the original's cell is `visibility:
+hidden`, so a move changes which copy is hidden rather than which copies exist.
 
 **The original is not tied to a cell, and that is the whole keyboard and pointer story.** Every cell looks the
 same, so handing the original to another cell changes nothing on screen. Three things use that:

@@ -4,4 +4,5 @@ export type MenuItemContentProps = {
     flags: InteractionFlags<MenuItemFlags>;
     kind: MenuItemKind | undefined;
     shortcut?: string;
+    isGliding?: boolean;
 };

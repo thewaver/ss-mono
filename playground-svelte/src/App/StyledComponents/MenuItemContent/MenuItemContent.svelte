@@ -19,9 +19,9 @@
     class={[
         styles.menuItemContent,
         layerClass,
-        props.flags.isHovered && styles.isHovered,
+        !props.isGliding && props.flags.isHovered && styles.isHovered,
         props.flags.isActive && styles.isActive,
-        props.flags.isHighlighted && styles.isHighlighted,
+        !props.isGliding && props.flags.isHighlighted && styles.isHighlighted,
         props.flags.isOpen && styles.isOpen,
         props.flags.isDisabled && styles.isDisabled,
     ]}

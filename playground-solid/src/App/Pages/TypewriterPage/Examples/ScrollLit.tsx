@@ -2,12 +2,11 @@ import { createSignal } from "solid-js";
 
 import { ElementObserverSolidUtils, Typewriter } from "@thewaver/ss-components-solid";
 import * as styles from "@thewaver/ss-playground/App/Pages/TypewriterPage/TypewriterPage.css";
-import { MathUtils } from "@thewaver/ss-utils";
+import { TypewriterPageUtils } from "@thewaver/ss-playground/App/Pages/TypewriterPage/TypewriterPage.utils";
 
 const TEXT =
-    "Every word here waits, dimmed, until the paragraph is scrolled into view, then lights up in reading order as it travels up the box — and dims again on the way back down.";
-const LIT_FROM = 0.15;
-const LIT_SPAN = 0.35;
+    "Every word here waits, dimmed, until it reaches the middle of the box, then lights up in reading order as it passes — and dims again on the way back down.";
+const LIT_BAND_PX = 24;
 const CHARACTER_DELAY_MS = 30;
 const CHARACTER_DURATION_MS = 400;
 
@@ -17,7 +16,11 @@ export const ScrollLitExample = () => {
 
     const getTravel = ElementObserverSolidUtils.createScrollContainerProgressObserver(getRef, getBoxRef);
 
-    const getLit = () => MathUtils.clamp01((getTravel() - LIT_FROM) / LIT_SPAN);
+    const getLit = () => {
+        getTravel();
+
+        return TypewriterPageUtils.computeMiddleLineShare(getBoxRef(), getRef(), LIT_BAND_PX);
+    };
 
     return (
         <div ref={setBoxRef} id={"scrollLitScrollBox"} class={styles.scrollBox}>

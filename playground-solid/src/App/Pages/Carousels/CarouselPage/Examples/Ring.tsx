@@ -1,12 +1,7 @@
 import { createEffect, createSignal, onCleanup } from "solid-js";
 
-import {
-    Button,
-    Carousel,
-    CarouselPlacementUtils,
-    MediaQueryMonitorSolidUtils,
-    Tilter,
-} from "@thewaver/ss-components-solid";
+import { Button, Carousel, MediaQueryMonitorSolidUtils, Tilter, access } from "@thewaver/ss-components-solid";
+import type { CarouselPlacementFn } from "@thewaver/ss-components-solid";
 import { CarouselKnobs } from "@thewaver/ss-playground/App/Knobs/Carousels.const";
 import {
     computeCarouselRotationLabel,
@@ -20,8 +15,29 @@ import type { CarouselExampleProps } from "../../Carousels.types";
 import { SlideBack, SlideFront } from "./Slide";
 
 const TILT_DEGREES = 18;
+const FULL_TURN_DEGREES = 360;
+const HALF_TURN_DEGREES = 180;
+const PERCENT = 100;
 
-type Props = Pick<CarouselExampleProps, "slides" | "index">;
+type Props = Pick<CarouselExampleProps, "slides" | "index" | "isDisabled" | "orientation">;
+
+const computeRingPlacement: CarouselPlacementFn = (defs) => {
+    const along = defs.orientation === "horizontal" ? defs.size.width : defs.size.height;
+    const angle = (defs.distance * FULL_TURN_DEGREES) / Math.max(defs.count, 1);
+    const radians = (angle * Math.PI) / HALF_TURN_DEGREES;
+    const radius = along * CarouselKnobs.RING_RADIUS_RATIO;
+    const alongPercent = along > 0 ? ((radius * Math.sin(radians)) / along) * PERCENT : 0;
+    const depth = radius * (Math.cos(radians) - 1);
+
+    return {
+        effect: {
+            perspective: CarouselKnobs.RING_PERSPECTIVE_PX,
+            translate3d: defs.orientation === "horizontal" ? [alongPercent, 0, depth] : [0, alongPercent, depth],
+            ...(defs.orientation === "horizontal" ? { rotateY: angle } : { rotateX: -angle }),
+        },
+        layer: Math.cos(radians),
+    };
+};
 
 export const RingExample = (props: Props) => {
     const [getProgress, setProgress] = createSignal(0);
@@ -51,24 +67,31 @@ export const RingExample = (props: Props) => {
 
     return (
         <div class={styles.ringStack}>
-            <div class={styles.ringFrame}>
-                <Tilter maxTiltDegrees={() => TILT_DEGREES}>
-                    <Carousel
-                        computePlacement={CarouselPlacementUtils.drum}
-                        slides={props.slides}
-                        index={props.index}
-                        progress={[getProgress, setProgress]}
-                        ariaLabel={"Turning ring"}
-                        computeSlideLabel={computePositionLabel}
-                        computeStepLabel={computeCarouselStepLabel}
-                        computeRotationLabel={computeCarouselRotationLabel}
-                        renderSlide={(getSlide, getState) => (
-                            <SlideFront title={getSlide()} state={getState} isNarrow={() => false} />
-                        )}
-                        renderSlideBack={() => <SlideBack isNarrow={() => false} />}
-                    />
-                </Tilter>
-            </div>
+            <Tilter maxTiltDegrees={() => TILT_DEGREES}>
+                <div
+                    class={styles.ringFrame}
+                    classList={{ [styles.ringFrameVertical]: access(props.orientation) === "vertical" }}
+                >
+                    <div class={styles.ringSlot}>
+                        <Carousel
+                            computePlacement={computeRingPlacement}
+                            slides={props.slides}
+                            index={props.index}
+                            progress={[getProgress, setProgress]}
+                            isDisabled={props.isDisabled}
+                            orientation={props.orientation}
+                            ariaLabel={"Turning ring"}
+                            computeSlideLabel={computePositionLabel}
+                            computeStepLabel={computeCarouselStepLabel}
+                            computeRotationLabel={computeCarouselRotationLabel}
+                            renderSlide={(getSlide, getState) => (
+                                <SlideFront title={getSlide()} state={getState} isNarrow={() => false} />
+                            )}
+                            renderSlideBack={() => <SlideBack isNarrow={() => false} />}
+                        />
+                    </div>
+                </div>
+            </Tilter>
 
             <Button
                 id={"ringTurn"}

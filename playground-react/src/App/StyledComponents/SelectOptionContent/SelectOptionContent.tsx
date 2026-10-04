@@ -13,8 +13,8 @@ export const PageSelectOptionContent = (props: PropsWithChildren<SelectOptionCon
             className={[
                 styles.selectOptionContent,
                 layerClass,
-                props.flags.isHovered && styles.isHovered,
-                props.flags.isHighlighted && styles.isHighlighted,
+                !props.isGliding && props.flags.isHovered && styles.isHovered,
+                !props.isGliding && props.flags.isHighlighted && styles.isHighlighted,
                 props.flags.isSelected && styles.isSelected,
                 props.flags.isDisabled && styles.isDisabled,
             ]

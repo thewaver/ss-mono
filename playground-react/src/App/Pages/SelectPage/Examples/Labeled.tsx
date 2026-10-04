@@ -1,5 +1,6 @@
 import { Label, Select } from "@thewaver/ss-components-react";
 
+import { renderPageHighlightFloater } from "../../../StyledComponents/GlideFloater/GlideFloater";
 import { PageLabelCaption } from "../../../StyledComponents/LabelCaption/LabelCaption";
 import { PageSelectContent } from "../../../StyledComponents/SelectContent/SelectContent";
 import { PageSelectOptionContent } from "../../../StyledComponents/SelectOptionContent/SelectOptionContent";
@@ -16,6 +17,7 @@ export const LabeledExample = (props: Props) => {
             <PageLabelCaption>Country</PageLabelCaption>
 
             <Select
+                renderHighlightFloater={renderPageHighlightFloater}
                 value={props.value}
                 options={COUNTRIES}
                 listAriaLabel={"Country"}
@@ -23,7 +25,9 @@ export const LabeledExample = (props: Props) => {
                     <PageSelectContent flags={flags}>{selectedOption?.value ?? PLACEHOLDER}</PageSelectContent>
                 )}
                 renderOption={(option, flags) => (
-                    <PageSelectOptionContent flags={flags}>{option.value}</PageSelectOptionContent>
+                    <PageSelectOptionContent isGliding flags={flags}>
+                        {option.value}
+                    </PageSelectOptionContent>
                 )}
                 renderPopup={renderSelectPopup}
             />

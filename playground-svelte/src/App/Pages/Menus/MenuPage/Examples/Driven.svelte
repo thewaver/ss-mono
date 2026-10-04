@@ -2,6 +2,7 @@
     import { Button, Menu } from "@thewaver/ss-components-svelte";
 
     import PageButtonContent from "../../../../StyledComponents/ButtonContent/ButtonContent.svelte";
+    import { renderPageHighlightFloater } from "../../../../StyledComponents/GlideFloater/GlideFloater.const.svelte";
     import PageMenuTriggerContent from "../../../../StyledComponents/MenuTriggerContent/MenuTriggerContent.svelte";
     import { ACTIONS, renderMenuItem, renderMenuPopup } from "../MenuPage.const.svelte";
     import type { MenuDrivenExampleProps } from "../MenuPage.types";
@@ -14,6 +15,7 @@
 </script>
 
 <Menu
+    renderHighlightFloater={renderPageHighlightFloater}
     bind:visibility
     {anchorRef}
     items={ACTIONS}

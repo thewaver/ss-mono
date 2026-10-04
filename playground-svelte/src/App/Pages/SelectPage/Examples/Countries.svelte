@@ -1,6 +1,7 @@
 <script lang="ts">
     import { Select, type SelectOptionGroup } from "@thewaver/ss-components-svelte";
 
+    import { renderPageHighlightFloater } from "../../../StyledComponents/GlideFloater/GlideFloater.const.svelte";
     import PageSelectContent from "../../../StyledComponents/SelectContent/SelectContent.svelte";
     import PageSelectGroupContent from "../../../StyledComponents/SelectGroupContent/SelectGroupContent.svelte";
     import PageSelectOptionContent from "../../../StyledComponents/SelectOptionContent/SelectOptionContent.svelte";
@@ -17,6 +18,7 @@
 </script>
 
 <Select
+    renderHighlightFloater={renderPageHighlightFloater}
     bind:value
     options={props.options ?? COUNTRIES}
     isDisabled={props.isDisabled}
@@ -30,7 +32,7 @@
     {/snippet}
 
     {#snippet renderOption(option, flags)}
-        <PageSelectOptionContent {flags}>{option.value}</PageSelectOptionContent>
+        <PageSelectOptionContent isGliding {flags}>{option.value}</PageSelectOptionContent>
     {/snippet}
 </Select>
 

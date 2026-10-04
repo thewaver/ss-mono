@@ -4,6 +4,7 @@
     import { Toolbar, Tooltip } from "@thewaver/ss-components-svelte";
     import type { ToolbarAction } from "@thewaver/ss-components-svelte";
     import * as styles from "@thewaver/ss-playground/App/Pages/ToolbarPage/ToolbarPage.css";
+    import { TOOLTIP_HOVER_DELAY_MS } from "@thewaver/ss-playground/App/StyledComponents/TooltipContent/TooltipContent.const";
 
     import PageButtonContent from "../../../StyledComponents/ButtonContent/ButtonContent.svelte";
     import PageMenuTriggerContent from "../../../StyledComponents/MenuTriggerContent/MenuTriggerContent.svelte";
@@ -20,7 +21,7 @@
         Undo: "Takes back the last change",
     };
 
-    const PLACEMENT = { x: "center", y: "bottom-out" } as const;
+    const PLACEMENT = { x: "center", y: "top-out" } as const;
     const OFFSET = { x: 0, y: 8 };
 
     type Props = ToolbarExampleProps;
@@ -59,7 +60,7 @@
         {/snippet}
     </Toolbar>
 
-    <Tooltip anchorRef={anchor} placement={PLACEMENT} offset={OFFSET}>
+    <Tooltip anchorRef={anchor} placement={PLACEMENT} offset={OFFSET} hoverShowDelayMs={TOOLTIP_HOVER_DELAY_MS}>
         {#snippet renderContent(visibilityTarget, transitionDurationMs)}
             <PageTooltipContent {visibilityTarget} {transitionDurationMs}
                 >{HINTS[anchor?.querySelector("[data-hint]")?.getAttribute("data-hint") ?? ""]}</PageTooltipContent

@@ -10,6 +10,7 @@
     import PageVariants from "../../PageComponents/Variants/Variants.svelte";
     import type { VariantDefs } from "../../PageComponents/Variants/Variants.types";
     import PageButtonContent from "../../StyledComponents/ButtonContent/ButtonContent.svelte";
+    import { renderPageHighlightFloater } from "../../StyledComponents/GlideFloater/GlideFloater.const.svelte";
     import PagePopoverSurface from "../../StyledComponents/PopoverSurface/PopoverSurface.svelte";
     import PageRangeContent from "../../StyledComponents/RangeContent/RangeContent.svelte";
     import PageSelectContent from "../../StyledComponents/SelectContent/SelectContent.svelte";
@@ -157,6 +158,7 @@
                     style:transform={`translate(-${roamerX}%, -${roamerY}%)`}
                 >
                     <Select
+                        renderHighlightFloater={renderPageHighlightFloater}
                         bind:value={roamingValue}
                         options={COUNTRIES}
                         id={"roamingCountry"}
@@ -169,7 +171,7 @@
                         {/snippet}
 
                         {#snippet renderOption(option, flags)}
-                            <PageSelectOptionContent {flags}>{option.value}</PageSelectOptionContent>
+                            <PageSelectOptionContent isGliding {flags}>{option.value}</PageSelectOptionContent>
                         {/snippet}
                     </Select>
                 </div>
@@ -242,6 +244,7 @@
                     <div class={styles.scrollFiller}></div>
 
                     <Select
+                        renderHighlightFloater={renderPageHighlightFloater}
                         bind:value={scrolledValue}
                         options={COUNTRIES}
                         id={"scrolledCountry"}
@@ -253,7 +256,7 @@
                         {/snippet}
 
                         {#snippet renderOption(option, flags)}
-                            <PageSelectOptionContent {flags}>{option.value}</PageSelectOptionContent>
+                            <PageSelectOptionContent isGliding {flags}>{option.value}</PageSelectOptionContent>
                         {/snippet}
                     </Select>
 

@@ -60,14 +60,7 @@ export const Wraparound = (props: WraparoundProps) => {
     const getIsDragging = accessStore(plane, (state) => state.isDragging);
 
     const getCopyKeys = createMemo(
-        () =>
-            WraparoundUtils.computeTiles(
-                getOffset(),
-                getTileSize(),
-                getViewportSize(),
-                getOriginalTile(),
-                getMaxCopies(),
-            ).map(toKey),
+        () => WraparoundUtils.computeTiles(getOffset(), getTileSize(), getViewportSize(), getMaxCopies()).map(toKey),
         [],
         { equals: (a, b) => a.length === b.length && a.every((key, index) => key === b[index]) },
     );
@@ -103,7 +96,10 @@ export const Wraparound = (props: WraparoundProps) => {
                     {(key) => (
                         <div
                             class={styles.wraparoundTile}
-                            style={{ transform: toTileTransform(fromKey(key)) }}
+                            style={{
+                                transform: toTileTransform(fromKey(key)),
+                                visibility: key === toKey(getOriginalTile()) ? "hidden" : undefined,
+                            }}
                             aria-hidden="true"
                             inert
                         >

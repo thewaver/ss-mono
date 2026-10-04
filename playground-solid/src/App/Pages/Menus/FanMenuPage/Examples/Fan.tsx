@@ -31,8 +31,6 @@ export const FanExample = (props: FanMenuExampleProps) => {
                             [styles.itemDisabled]: getFlags().isDisabled,
                         }}
                     >
-                        <div class={styles.itemFill} aria-hidden={"true"} />
-
                         <Show when={getFlags().isBack}>
                             <span aria-hidden={"true"}>{BACK_MARK}</span>
                         </Show>
@@ -47,6 +45,14 @@ export const FanExample = (props: FanMenuExampleProps) => {
                             <span aria-hidden={"true"}>{SUBMENU_MARK}</span>
                         </Show>
                     </div>
+                )}
+                renderHighlightFloater={(getVisibilityTarget, getTransitionDurationMs) => (
+                    <div
+                        class={styles.itemFloater}
+                        classList={{ [styles.itemFloaterVisible]: getVisibilityTarget() === 1 }}
+                        style={{ "transition-duration": `${getTransitionDurationMs()}ms` }}
+                        data-floater={"highlight"}
+                    />
                 )}
                 renderPopup={(renderItems, getVisibilityTarget, getTransitionDurationMs) => (
                     <div

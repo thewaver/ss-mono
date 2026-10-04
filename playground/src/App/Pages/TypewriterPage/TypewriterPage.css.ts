@@ -1,5 +1,6 @@
 import { globalStyle, keyframes, style } from "@vanilla-extract/css";
 
+import { MEASURE_BOX_PADDING } from "../../PageComponents/MeasureBox/MeasureBox.css";
 import { layerVars } from "../../StyledComponents/Layer/Layer.css";
 import { themeVars } from "../../Theme.css";
 
@@ -185,6 +186,7 @@ export const SCROLL_BOX_HEIGHT = 220;
 
 export const scrollBox = style({
     height: SCROLL_BOX_HEIGHT,
+    paddingInline: MEASURE_BOX_PADDING,
     overflowY: "scroll",
     overscrollBehavior: "contain",
 });

@@ -1,12 +1,11 @@
 <script lang="ts">
     import { ElementObserverSvelteUtils, Typewriter } from "@thewaver/ss-components-svelte";
     import * as styles from "@thewaver/ss-playground/App/Pages/TypewriterPage/TypewriterPage.css";
-    import { MathUtils } from "@thewaver/ss-utils";
+    import { TypewriterPageUtils } from "@thewaver/ss-playground/App/Pages/TypewriterPage/TypewriterPage.utils";
 
     const TEXT =
-        "Every word here waits, dimmed, until the paragraph is scrolled into view, then lights up in reading order as it travels up the box — and dims again on the way back down.";
-    const LIT_FROM = 0.15;
-    const LIT_SPAN = 0.35;
+        "Every word here waits, dimmed, until it reaches the middle of the box, then lights up in reading order as it passes — and dims again on the way back down.";
+    const LIT_BAND_PX = 24;
     const CHARACTER_DELAY_MS = 30;
     const CHARACTER_DURATION_MS = 400;
 
@@ -18,7 +17,11 @@
         () => boxRef,
     );
 
-    const lit = $derived(MathUtils.clamp01((getTravel() - LIT_FROM) / LIT_SPAN));
+    const lit = $derived.by(() => {
+        getTravel();
+
+        return TypewriterPageUtils.computeMiddleLineShare(boxRef, ref, LIT_BAND_PX);
+    });
 </script>
 
 <div bind:this={boxRef} id={"scrollLitScrollBox"} class={styles.scrollBox}>

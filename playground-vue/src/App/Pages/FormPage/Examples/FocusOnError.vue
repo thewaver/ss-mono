@@ -8,6 +8,7 @@ import PageFormButtons from "../../../StyledComponents/FormFieldContent/PageForm
 import PageFormFieldCaption from "../../../StyledComponents/FormFieldContent/PageFormFieldCaption.vue";
 import PageFormFieldMessage from "../../../StyledComponents/FormFieldContent/PageFormFieldMessage.vue";
 import PageFormStack from "../../../StyledComponents/FormFieldContent/PageFormStack.vue";
+import PageGlideFloater from "../../../StyledComponents/GlideFloater/PageGlideFloater.vue";
 import PageSelectContent from "../../../StyledComponents/SelectContent/SelectContent.vue";
 import PageSelectOptionContent from "../../../StyledComponents/SelectOptionContent/SelectOptionContent.vue";
 import { PLACEHOLDER } from "../../SelectPage/SelectPage.const";
@@ -63,7 +64,13 @@ const computeTopicsMessage = (hasSubmitted: boolean) =>
                             </template>
 
                             <template #renderOption="{ option, flags }">
-                                <PageSelectOptionContent :flags="flags">{{ option.value }}</PageSelectOptionContent>
+                                <PageSelectOptionContent is-gliding :flags="flags">{{
+                                    option.value
+                                }}</PageSelectOptionContent>
+                            </template>
+
+                            <template #renderHighlightFloater="floater">
+                                <PageGlideFloater kind="highlight" v-bind="floater" />
                             </template>
 
                             <template #renderPopup="popup">
@@ -104,7 +111,13 @@ const computeTopicsMessage = (hasSubmitted: boolean) =>
                             </template>
 
                             <template #renderOption="{ option, flags }">
-                                <PageSelectOptionContent :flags="flags">{{ option.value }}</PageSelectOptionContent>
+                                <PageSelectOptionContent is-gliding :flags="flags">{{
+                                    option.value
+                                }}</PageSelectOptionContent>
+                            </template>
+
+                            <template #renderHighlightFloater="floater">
+                                <PageGlideFloater kind="highlight" v-bind="floater" />
                             </template>
 
                             <template #renderPopup="popup">

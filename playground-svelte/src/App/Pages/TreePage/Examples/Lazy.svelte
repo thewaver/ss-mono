@@ -2,6 +2,7 @@
     import { Tree } from "@thewaver/ss-components-svelte";
     import type { TreeNode } from "@thewaver/ss-components-svelte";
 
+    import { renderPageHighlightFloater } from "../../../StyledComponents/GlideFloater/GlideFloater.const.svelte";
     import PageTreeNodeContent from "../../../StyledComponents/TreeNodeContent/PageTreeNodeContent.svelte";
     import PageTreeNodePending from "../../../StyledComponents/TreeNodeContent/PageTreeNodePending.svelte";
     import { REMOTE_CHILDREN, REMOTE_LOAD_DELAY_MS, REMOTE_ROOT } from "../TreePage.const.svelte";
@@ -39,9 +40,15 @@
     });
 </script>
 
-<Tree {nodes} bind:value bind:expanded ariaLabel={"Remote repository"}>
+<Tree
+    renderHighlightFloater={renderPageHighlightFloater}
+    {nodes}
+    bind:value
+    bind:expanded
+    ariaLabel={"Remote repository"}
+>
     {#snippet renderNode(node, renderProps)}
-        <PageTreeNodeContent {renderProps}>{node.value}</PageTreeNodeContent>
+        <PageTreeNodeContent isGliding {renderProps}>{node.value}</PageTreeNodeContent>
     {/snippet}
 
     {#snippet renderPendingChildren(_node, depth)}

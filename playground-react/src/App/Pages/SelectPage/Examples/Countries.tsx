@@ -1,5 +1,6 @@
 import { Select } from "@thewaver/ss-components-react";
 
+import { renderPageHighlightFloater } from "../../../StyledComponents/GlideFloater/GlideFloater";
 import { PageSelectContent } from "../../../StyledComponents/SelectContent/SelectContent";
 import { PageSelectGroupContent } from "../../../StyledComponents/SelectGroupContent/SelectGroupContent";
 import { PageSelectOptionContent } from "../../../StyledComponents/SelectOptionContent/SelectOptionContent";
@@ -15,6 +16,7 @@ type Props = SelectExampleProps & {
 export const CountriesExample = (props: Props) => {
     return (
         <Select
+            renderHighlightFloater={renderPageHighlightFloater}
             value={props.value}
             options={props.options ?? COUNTRIES}
             isDisabled={props.isDisabled}
@@ -27,7 +29,9 @@ export const CountriesExample = (props: Props) => {
                 props.hasGroups ? (group) => <PageSelectGroupContent>{group.label}</PageSelectGroupContent> : undefined
             }
             renderOption={(option, flags) => (
-                <PageSelectOptionContent flags={flags}>{option.value}</PageSelectOptionContent>
+                <PageSelectOptionContent isGliding flags={flags}>
+                    {option.value}
+                </PageSelectOptionContent>
             )}
             renderPopup={renderSelectPopup}
         />

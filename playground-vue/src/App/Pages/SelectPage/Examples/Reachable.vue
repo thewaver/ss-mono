@@ -4,6 +4,7 @@ import { h, useModel } from "vue";
 import { Select } from "@thewaver/ss-components-vue";
 import type { InteractionTooltipDefs, SelectFlags } from "@thewaver/ss-components-vue";
 
+import PageGlideFloater from "../../../StyledComponents/GlideFloater/PageGlideFloater.vue";
 import PageSelectContent from "../../../StyledComponents/SelectContent/SelectContent.vue";
 import PageSelectOptionContent from "../../../StyledComponents/SelectOptionContent/SelectOptionContent.vue";
 import PageTooltipContent from "../../../StyledComponents/TooltipContent/TooltipContent.vue";
@@ -43,7 +44,11 @@ const tooltipDefs: InteractionTooltipDefs<SelectFlags> = {
         </template>
 
         <template #renderOption="{ option, flags }">
-            <PageSelectOptionContent :flags="flags">{{ option.value }}</PageSelectOptionContent>
+            <PageSelectOptionContent is-gliding :flags="flags">{{ option.value }}</PageSelectOptionContent>
+        </template>
+
+        <template #renderHighlightFloater="floater">
+            <PageGlideFloater kind="highlight" v-bind="floater" />
         </template>
 
         <template #renderPopup="popup">

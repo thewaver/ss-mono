@@ -79,8 +79,15 @@ export const CarouselPage = () => {
             key: "ring",
             name: "A ring that turns and leans",
             readout: () =>
-                `slide ${ringIndexState[0] + 1} of ${controls.slideCount} — the drum inside a Tilter, with its progress written on a clock for a continuous turn; Stop is the way to halt it that a turn running on its own owes the reader`,
-            component: () => <RingExample slides={controls.slides} index={ringIndexState} />,
+                `slide ${ringIndexState[0] + 1} of ${controls.slideCount} — a placement rule written in the example, a wide ring of small slides inside a Tilter, with its progress written on a clock for a continuous turn; Stop is the way to halt it that a turn running on its own owes the reader`,
+            component: () => (
+                <RingExample
+                    slides={controls.slides}
+                    index={ringIndexState}
+                    isDisabled={controls.isDisabled[0]}
+                    orientation={controls.orientation[0]}
+                />
+            ),
             path: `${EXAMPLES_ROOT}/Ring.tsx`,
         },
     ];

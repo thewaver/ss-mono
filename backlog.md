@@ -75,6 +75,7 @@ reading.
 41. The row `Accordion`: an open width per item — _decided, not yet built_
 42. Tracked patterns hold a cell warm before it fades — _decided, not yet built_
 43. A drum of words turned by scrolling — _decided, not yet built_
+44. `Spine`, a hinge counterpart to `Barrel` — _decided, not yet built_
 
 ### Build order
 
@@ -1423,6 +1424,92 @@ families"_). The user's idea adds a hold before the fade.
 From Skiper UI's [3D rolling text](https://skiper-ui.com/v1/skiper88). A Playground example on the `Carousel` page:
 the drum rule with words for slides, its `progress` driven by the scroll observer. No new code.
 
+## 44. `Spine`, a hinge counterpart to `Barrel` — _decided, not yet built_
+
+The user's idea, explained and checked over several rounds before anything was written, and the reason the next
+round of `Odometer`, `Carousel` and other exploratory examples has somewhere to come from. Nothing is built; no code
+has been touched for it. The six questions it raised are settled below.
+
+**What `Barrel` is, for contrast.** `Primitives/Barrel` puts its faces around a circle like the sides of a drum: seen
+from above it is a closed convex polygon, each face lies along the rim facing outwards, and turning it brings the next
+face to the front. Its props are `angle`, `axis`, `faceSize`, `hasBacks`, `transitionDurationMs`,
+`transitionDelayMs`, `faceRoleDescription`, `computeFaceDefs`, `faces` and `renderFace`, and it is used by
+`FlipCard` (two faces hinged through their middle), `Odometer`'s reels and `Wheel` (the `DrumWheel`).
+
+**What the counterpart is.** Every face is its container's own box, hinged on one line, and the faces fan out from
+that line at different angles — seen from above, a star of lines rather than a polygon. At its rest angle a face sits
+exactly on its box, edge for edge; any other angle swings it out around the hinge like a door. **Where the hinge sits
+picks the object**, which is what makes it general rather than single-purpose:
+
+- **A vertical centre line**: faces stand like the paddles of a paddle wheel, each one's plane passing through the
+  axis, and turning the whole sweeps each face from edge-on to full-face and back. This is Made With GSAP's
+  [3D Wheel Gallery (091)](https://madewithgsap.com/effects/tutorial091), the look the user wants for the carousel's
+  ring. From a screenshot the user shared: upright image panels around a vertical axis through the middle, the ones
+  facing the viewer widest, the ones pointing at the viewer seen as slivers, the far ones smaller in perspective,
+  and a small empty core because the inner edges sit a little away from the axis.
+- **The left or right edge**: a door, or a book's right-hand page turning over to the left.
+- **The top or bottom edge, the axis lying flat**: a wall calendar, or one half of a split-flap card falling over its
+  middle line.
+
+**Settled in the explanation:**
+
+- **The gap between the inner edges and the axis is padding, a prop**, as a `Barrel` can be padded too — not a
+  defining part of the geometry. The paddle wheel's hollow core is that padding; at zero the faces meet on the hinge,
+  as a book's pages meet on the spine.
+- **It is to `Barrel` what a hinge is to a drum**: `Barrel` is "faces around a circle, one fills the front"; this is
+  "faces around a hinge, one fills the box". Which face rests in the box, and the angles the others sit at, is what
+  differs between a wheel and a book.
+
+**What it opens, each to be argued on its own once the abstract exists:**
+
+- **The carousel's ring.** The current _"A ring that turns and leans"_ example was rebuilt as a wide drum whose slides
+  face outwards, and the user's verdict is that it looks nothing like 091 — it cannot, since 091 is this arrangement
+  and not a barrel. It is the abstract's first natural consumer.
+- **A book that turns its pages** — `Flipbook` from the first round of Exotics candidates, named and never argued:
+  pages already read lie at 180°, unread ones at 0°, the one turning in between.
+- **A split-flap `Odometer`** — each flap half a character, hinged on the middle line, its front the top half of the
+  old character and its back the bottom half of the new one. The split-flap board was turned down in the second round
+  as "the drum again", a second way to spell what `Odometer` and `DrumWheel` do; the user reopened it on this
+  ground, since on a shared abstract it is a second consumer rather than a second mechanism.
+- **A rolodex** — cards spaced evenly round the hinge, turning past the viewer, as a carousel placement rule.
+- **The carousel's existing `hinge` rule** already flips cards about their bottom edge, which is this geometry in
+  miniature; whether it moves onto the abstract is part of the work.
+
+**Settled with the user, question by question:**
+
+1. **Named `Spine`** — the user's suggestion, over `Hinge`, `Spokes` and `Leaves`. It names an object the way
+   `Barrel` does — the line the faces grow from, a book's pages from its spine, ribs from a backbone — and it leaves the
+   carousel's `hinge` placement rule its own word.
+2. **A `Primitive`, beside `Barrel`** — it renders, holds no value, and is met through the components built on it.
+3. **Each face's angle comes from one rule taking the face's distance from the current one**, the arrangement
+   `Carousel`'s placement rules already use. Evenly spaced (the 091 wheel, a rolodex) and "flat on one side, flat on
+   the other, one turning between" (a book, a split-flap) are two ready-made rules, and a consumer can write their own.
+4. **`Spine` handles direction only.** It takes `Barrel`'s `axis` (`"row"` or `"column"`, which way the turn runs),
+   and its spine always runs through the middle of its own box. A hinge on an edge — a book, a door — is the
+   container moving the component by half its size, which is the consumer's job, and the Playground's in the
+   examples. There is no prop for the hinge's position.
+5. **`hasBacks` carries over from `Barrel`; there is no padding prop.** As on a `Barrel`, a face is the consumer's
+   to paint, and the gap between the spine and a face's inner edge — 091's hollow core — is painted inside the face.
+6. **The first pass builds three of the uses:**
+    - **The carousel's ring**, rebuilt on `Spine`'s geometry as a placement rule, to look like 091.
+    - **A split-flap `Odometer`**, through the primitive, beside the drum reels.
+    - **`Flipbook`**, a new component on `Spine` with its hinge at an edge. The user's call to include it now rather
+      than defer it: a separate item would not guarantee a session of its own. Its design is settled too:
+        - **A page turns three ways**: step buttons the library builds and the consumer places, as `Carousel`'s are; a
+          drag that turns the page partway and completes or falls back on release, as `CardStack` and `Cuboid` do; and
+          the arrow keys while the book has focus. The buttons are also WCAG 2.5.7's required alternative to the drag.
+          The point a drag has to pass to complete is a picked number, for the user to confirm once built.
+        - **A two-page spread, the spine in the middle**: pages read lie on the left, unread on the right, and a turning
+          page shows its back as it crosses. The front cover sits alone on the right and the back cover alone on the
+          left. A single page turning on an edge was ruled out as not a book at all — it is a carousel with a placement
+          rule, which the carousel's `hinge` rule nearly is already.
+        - **Each page is named on its own**, `computePageLabel(index, count)` giving "page 3 of 12", so a reader always
+          knows which of the two pages they are on, and **a turn announces the spread**, "pages 3 and 4 of 12", through
+          `LiveAnnouncer`, with a default wording the consumer can replace. The rest is `Carousel`'s already: the book is
+          a named region, the pages not showing are `inert` and hidden, and the buttons are real named buttons.
+
+    The rolodex placement rule is left for afterwards; it rides on what the ring builds.
+
 ## Accepted limits
 
 Faults that have been looked at and consciously left alone. Not outstanding work, not numbered, and not part
@@ -1764,7 +1851,8 @@ example, so nothing is pending there either.
 
 - **A split-flap board**, the airport departure display whose characters flip through the alphabet one card
   at a time. Their verdict: the drum is already a component and this is that drum again, so it would be a
-  second way to spell what `Odometer` and `DrumWheel` do.
+  second way to spell what `Odometer` and `DrumWheel` do. **Reopened by the user** once a hinge counterpart to
+  `Barrel` was proposed (item 44): on a shared abstract it is a second consumer, not a second mechanism.
 - **A magnifying strip**, the macOS dock's swell around the pointer. Their verdict: it already existed as a
   Playground example, so a component would be a second way to spell it. **That example has since gone with the
   `PointerTracker` page**, so the reason as recorded no longer holds — the verdict is still theirs, but it now
@@ -1787,4 +1875,4 @@ without crossing.
 
 **Named and not discussed: `Flipbook`**, a two-page spread that turns with a fold at the spine. The user said
 they understood that one from its description, and it was not among the two they picked; it has never been
-argued either way.
+argued either way. It is now one of the consumers of the hinge counterpart to `Barrel` (item 44).

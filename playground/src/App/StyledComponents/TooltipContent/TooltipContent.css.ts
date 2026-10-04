@@ -2,6 +2,8 @@ import { style, styleVariants } from "@vanilla-extract/css";
 
 import { themeVars } from "../../Theme.css";
 
+const SHADOW_REACH = "32px";
+
 export const isVisible = style({});
 
 export const tooltipVisibility = style({
@@ -42,11 +44,11 @@ export const tooltipRevealVariants = styleVariants({
     clip: {
         opacity: 1,
         transitionProperty: "clip-path",
-        clipPath: "inset(0 100% 0 0)",
+        clipPath: `inset(-${SHADOW_REACH} 100% -${SHADOW_REACH} -${SHADOW_REACH})`,
 
         selectors: {
             [`&.${isVisible}`]: {
-                clipPath: "inset(0 0 0 0)",
+                clipPath: `inset(-${SHADOW_REACH})`,
             },
         },
     },

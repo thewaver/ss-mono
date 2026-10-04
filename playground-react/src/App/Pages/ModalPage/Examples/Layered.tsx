@@ -2,6 +2,7 @@ import { Button, Modal, Select } from "@thewaver/ss-components-react";
 import type { SelectOption } from "@thewaver/ss-components-react";
 
 import { PageButtonContent } from "../../../StyledComponents/ButtonContent/ButtonContent";
+import { renderPageHighlightFloater } from "../../../StyledComponents/GlideFloater/GlideFloater";
 import { PageModalOverlay } from "../../../StyledComponents/ModalOverlay/ModalOverlay";
 import { PageModalPanel } from "../../../StyledComponents/ModalPanel/ModalPanel";
 import { PagePopoverSurface } from "../../../StyledComponents/PopoverSurface/PopoverSurface";
@@ -36,6 +37,7 @@ export const LayeredExample = (props: Props) => (
                     <div id={LAYERED_TITLE_ID}>Where are you flying from?</div>
 
                     <Select
+                        renderHighlightFloater={renderPageHighlightFloater}
                         value={props.value}
                         options={COUNTRIES}
                         ariaLabel={"Country"}
@@ -43,7 +45,9 @@ export const LayeredExample = (props: Props) => (
                             <PageSelectContent flags={flags}>{selectedOption?.value ?? "Pick one"}</PageSelectContent>
                         )}
                         renderOption={(option, flags) => (
-                            <PageSelectOptionContent flags={flags}>{option.value}</PageSelectOptionContent>
+                            <PageSelectOptionContent isGliding flags={flags}>
+                                {option.value}
+                            </PageSelectOptionContent>
                         )}
                         renderPopup={(renderOptions, popupVisibilityTarget, popupTransitionDurationMs, placement) => (
                             <PagePopoverSurface

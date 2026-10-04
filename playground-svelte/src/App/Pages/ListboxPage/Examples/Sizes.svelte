@@ -1,6 +1,7 @@
 <script lang="ts">
     import { Listbox } from "@thewaver/ss-components-svelte";
 
+    import { renderPageHighlightFloater } from "../../../StyledComponents/GlideFloater/GlideFloater.const.svelte";
     import PageListboxSurface from "../../../StyledComponents/ListboxSurface/ListboxSurface.svelte";
     import PageSelectOptionContent from "../../../StyledComponents/SelectOptionContent/SelectOptionContent.svelte";
     import { SIZES } from "../ListboxPage.const";
@@ -13,9 +14,15 @@
 
 <div dir="rtl">
     <PageListboxSurface isWide={true}>
-        <Listbox bind:value options={SIZES} orientation={"horizontal"} ariaLabel={"Size"}>
+        <Listbox
+            renderHighlightFloater={renderPageHighlightFloater}
+            bind:value
+            options={SIZES}
+            orientation={"horizontal"}
+            ariaLabel={"Size"}
+        >
             {#snippet renderOption(option, flags)}
-                <PageSelectOptionContent {flags}>{option.value}</PageSelectOptionContent>
+                <PageSelectOptionContent isGliding {flags}>{option.value}</PageSelectOptionContent>
             {/snippet}
         </Listbox>
     </PageListboxSurface>

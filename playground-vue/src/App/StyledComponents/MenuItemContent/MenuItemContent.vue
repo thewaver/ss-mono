@@ -18,9 +18,9 @@ const layerClass = useLayerClass();
         :class="[
             styles.menuItemContent,
             layerClass,
-            flags.isHovered && styles.isHovered,
+            !isGliding && flags.isHovered && styles.isHovered,
             flags.isActive && styles.isActive,
-            flags.isHighlighted && styles.isHighlighted,
+            !isGliding && flags.isHighlighted && styles.isHighlighted,
             flags.isOpen && styles.isOpen,
             flags.isDisabled && styles.isDisabled,
         ]"

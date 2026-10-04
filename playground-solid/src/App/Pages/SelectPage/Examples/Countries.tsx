@@ -1,6 +1,7 @@
 import { Select, access } from "@thewaver/ss-components-solid";
 import type { MaybeAccessor } from "@thewaver/ss-components-solid";
 
+import { renderPageHighlightFloater } from "../../../StyledComponents/GlideFloater/GlideFloater";
 import { PageSelectContent } from "../../../StyledComponents/SelectContent/SelectContent";
 import { PageSelectGroupContent } from "../../../StyledComponents/SelectGroupContent/SelectGroupContent";
 import { PageSelectOptionContent } from "../../../StyledComponents/SelectOptionContent/SelectOptionContent";
@@ -16,6 +17,7 @@ type Props = SelectExampleProps & {
 export const CountriesExample = (props: Props) => {
     return (
         <Select
+            renderHighlightFloater={renderPageHighlightFloater}
             value={props.value}
             options={props.options ?? (() => COUNTRIES)}
             isDisabled={props.isDisabled}
@@ -30,7 +32,9 @@ export const CountriesExample = (props: Props) => {
                     : undefined
             }
             renderOption={(getOption, getFlags) => (
-                <PageSelectOptionContent flags={getFlags}>{getOption().value}</PageSelectOptionContent>
+                <PageSelectOptionContent isGliding flags={getFlags}>
+                    {getOption().value}
+                </PageSelectOptionContent>
             )}
             renderPopup={renderSelectPopup}
         />

@@ -1,3 +1,3 @@
 export const TREE_DEFAULTS = {
-    floaterTransitionDurationMs: 150,
+    floaterTransitionDurationMs: 100,
 };

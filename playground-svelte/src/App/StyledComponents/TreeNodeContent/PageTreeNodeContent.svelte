@@ -26,7 +26,7 @@
         layerClass,
         props.renderProps.isBranch && styles.isBranch,
         props.renderProps.isExpanded && styles.isExpanded,
-        props.renderProps.isHovered && styles.isHovered,
+        !props.isGliding && props.renderProps.isHovered && styles.isHovered,
         props.renderProps.isSelected && styles.isSelected,
         props.renderProps.isDisabled && styles.isDisabled,
         props.renderProps.depth === 0 && styles.isCategory,

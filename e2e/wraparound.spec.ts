@@ -74,24 +74,33 @@ test("pressing a copy presses the matching real button", async ({ page }) => {
     expect(await readout(page, "grid"), "the readout names the button the copy showed").toContain(`pressed: ${name} `);
 });
 
-test("a drag moves the content and lets it coast on, and does not press what it started on", async ({ page }) => {
-    const before = await planeOffset(page, GRID);
-    const box = (await page.locator(region(GRID)).boundingBox())!;
+/**
+ * The coast takes its speed from the pointer's last 100ms before it lets go, and the simulated drag sends its moves
+ * further apart than that once a parallel sweep loads the machine — so in a sweep the content reads as having been
+ * held still before release, and correctly does not coast. It passes every time on its own, hence `@solo`.
+ */
+test(
+    "a drag moves the content and lets it coast on, and does not press what it started on",
+    { tag: "@solo" },
+    async ({ page }) => {
+        const before = await planeOffset(page, GRID);
+        const box = (await page.locator(region(GRID)).boundingBox())!;
 
-    await page.mouse.move(box.x + 40, box.y + 40);
-    await page.mouse.down();
-    await page.mouse.move(box.x + 140, box.y + 80, { steps: 5 });
-    await page.mouse.up();
+        await page.mouse.move(box.x + 40, box.y + 40);
+        await page.mouse.down();
+        await page.mouse.move(box.x + 140, box.y + 80, { steps: 5 });
+        await page.mouse.up();
 
-    const released = await planeOffset(page, GRID);
+        const released = await planeOffset(page, GRID);
 
-    expect(released.x - before.x, "the content followed the pointer across").toBeGreaterThan(90);
+        expect(released.x - before.x, "the content followed the pointer across").toBeGreaterThan(90);
 
-    await waitUntilStill(page.locator(plane(GRID)));
+        await waitUntilStill(page.locator(plane(GRID)));
 
-    expect((await planeOffset(page, GRID)).x, "and kept going after it let go").toBeGreaterThan(released.x);
-    expect(await readout(page, "grid"), "a drag is not a press").toContain("pressed: nothing yet");
-});
+        expect((await planeOffset(page, GRID)).x, "and kept going after it let go").toBeGreaterThan(released.x);
+        expect(await readout(page, "grid"), "a drag is not a press").toContain("pressed: nothing yet");
+    },
+);
 
 test("the wheel moves the content", async ({ page }) => {
     const before = await planeOffset(page, GRID);

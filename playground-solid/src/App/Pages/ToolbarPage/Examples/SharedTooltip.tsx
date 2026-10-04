@@ -3,6 +3,7 @@ import { createSignal } from "solid-js";
 import { Toolbar, Tooltip } from "@thewaver/ss-components-solid";
 import type { ToolbarAction } from "@thewaver/ss-components-solid";
 import * as styles from "@thewaver/ss-playground/App/Pages/ToolbarPage/ToolbarPage.css";
+import { TOOLTIP_HOVER_DELAY_MS } from "@thewaver/ss-playground/App/StyledComponents/TooltipContent/TooltipContent.const";
 
 import { PageButtonContent } from "../../../StyledComponents/ButtonContent/ButtonContent";
 import { PageMenuTriggerContent } from "../../../StyledComponents/MenuTriggerContent/MenuTriggerContent";
@@ -58,8 +59,9 @@ export const SharedTooltipExample = (props: Props) => {
 
             <Tooltip
                 anchorRef={getAnchor}
-                placement={() => ({ x: "center", y: "bottom-out" })}
+                placement={() => ({ x: "center", y: "top-out" })}
                 offset={() => OFFSET}
+                hoverShowDelayMs={() => TOOLTIP_HOVER_DELAY_MS}
                 renderContent={(getVisibilityTarget, getTransitionDurationMs) => (
                     <PageTooltipContent
                         visibilityTarget={getVisibilityTarget}

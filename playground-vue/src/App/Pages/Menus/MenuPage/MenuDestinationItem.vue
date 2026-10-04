@@ -6,5 +6,7 @@ defineProps<MenuDestinationItemProps>();
 </script>
 
 <template>
-    <PageMenuItemContent :flags="flags" :kind="item.kind" shortcut="">{{ item.value.name }}</PageMenuItemContent>
+    <PageMenuItemContent is-gliding :flags="flags" :kind="item.kind" shortcut="">{{
+        item.value.name
+    }}</PageMenuItemContent>
 </template>

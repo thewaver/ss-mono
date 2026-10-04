@@ -1,5 +1,6 @@
 import { Select } from "@thewaver/ss-components-react";
 
+import { renderPageHighlightFloater } from "../../../StyledComponents/GlideFloater/GlideFloater";
 import { PageSelectClear } from "../../../StyledComponents/SelectClear/SelectClear";
 import { PageSelectContent } from "../../../StyledComponents/SelectContent/SelectContent";
 import { PageSelectOptionContent } from "../../../StyledComponents/SelectOptionContent/SelectOptionContent";
@@ -11,6 +12,7 @@ type Props = SelectClearableExampleProps;
 export const ClearableExample = (props: Props) => {
     return (
         <Select
+            renderHighlightFloater={renderPageHighlightFloater}
             value={props.value}
             options={COUNTRIES}
             ariaLabel={"Country"}
@@ -22,7 +24,9 @@ export const ClearableExample = (props: Props) => {
                 </PageSelectContent>
             )}
             renderOption={(option, flags) => (
-                <PageSelectOptionContent flags={flags}>{option.value}</PageSelectOptionContent>
+                <PageSelectOptionContent isGliding flags={flags}>
+                    {option.value}
+                </PageSelectOptionContent>
             )}
             renderClear={(flags) => <PageSelectClear flags={flags} />}
             renderPopup={renderSelectPopup}

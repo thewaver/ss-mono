@@ -4,6 +4,7 @@ import { shallowRef, useModel, watch } from "vue";
 import { Tree } from "@thewaver/ss-components-vue";
 import type { TreeNode } from "@thewaver/ss-components-vue";
 
+import PageGlideFloater from "../../../StyledComponents/GlideFloater/PageGlideFloater.vue";
 import PageTreeNodeContent from "../../../StyledComponents/TreeNodeContent/PageTreeNodeContent.vue";
 import PageTreeNodePending from "../../../StyledComponents/TreeNodeContent/PageTreeNodePending.vue";
 import { REMOTE_CHILDREN, REMOTE_LOAD_DELAY_MS, REMOTE_ROOT } from "../TreePage.const";
@@ -50,7 +51,11 @@ watch(
 <template>
     <Tree v-model:value="value" v-model:expanded="expanded" :nodes="nodes" ariaLabel="Remote repository">
         <template #renderNode="{ node, renderProps }">
-            <PageTreeNodeContent :render-props="renderProps">{{ node.value }}</PageTreeNodeContent>
+            <PageTreeNodeContent is-gliding :render-props="renderProps">{{ node.value }}</PageTreeNodeContent>
+        </template>
+
+        <template #renderHighlightFloater="floater">
+            <PageGlideFloater kind="highlight" v-bind="floater" />
         </template>
 
         <template #renderPendingChildren="{ depth }">

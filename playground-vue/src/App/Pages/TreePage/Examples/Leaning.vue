@@ -8,6 +8,7 @@ import { MathUtils } from "@thewaver/ss-utils";
 import PageExampleKnobs from "../../../PageComponents/ExampleKnobs/PageExampleKnobs.vue";
 import PageSelectField from "../../../PageComponents/Field/PageSelectField.vue";
 import PageProp from "../../../PageComponents/Prop/Prop.vue";
+import PageGlideFloater from "../../../StyledComponents/GlideFloater/PageGlideFloater.vue";
 import PageTreeNodeContent from "../../../StyledComponents/TreeNodeContent/PageTreeNodeContent.vue";
 import { FILES } from "../TreePage.const";
 import type { TreeExampleProps } from "../TreePage.types";
@@ -58,7 +59,11 @@ const computeEffect: ProximityEffectFn = (defs) => {
         :compute-effect="computeEffect"
     >
         <template #renderNode="{ node, renderProps }">
-            <PageTreeNodeContent :render-props="renderProps">{{ node.value }}</PageTreeNodeContent>
+            <PageTreeNodeContent is-gliding :render-props="renderProps">{{ node.value }}</PageTreeNodeContent>
+        </template>
+
+        <template #renderHighlightFloater="floater">
+            <PageGlideFloater kind="highlight" v-bind="floater" />
         </template>
     </Tree>
 

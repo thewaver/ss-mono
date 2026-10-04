@@ -2,6 +2,7 @@
     import { Menu } from "@thewaver/ss-components-svelte";
     import type { MenuItem } from "@thewaver/ss-components-svelte";
 
+    import { renderPageHighlightFloater } from "../../../../StyledComponents/GlideFloater/GlideFloater.const.svelte";
     import PageMenuTriggerContent from "../../../../StyledComponents/MenuTriggerContent/MenuTriggerContent.svelte";
     import { ACTIONS, renderMenuItem, renderMenuPopup } from "../MenuPage.const.svelte";
     import type { Action, MenuExampleProps } from "../MenuPage.types";
@@ -12,6 +13,7 @@
 </script>
 
 <Menu
+    renderHighlightFloater={renderPageHighlightFloater}
     items={props.items ?? ACTIONS}
     ariaLabel={"Edit actions"}
     renderItem={renderMenuItem}

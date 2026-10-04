@@ -88,6 +88,8 @@ const paintedLetters = (page: Page) =>
 test("painted letters push the rest of their line along, and the line breaks stay put", async ({ page }) => {
     await expect(page.locator(`${PAINTED} svg g text`).first()).toBeAttached();
 
+    await page.locator(`${PAINTED} svg`).scrollIntoViewIfNeeded();
+
     const rest = await paintedLetters(page);
     const box = (await page.locator(`${PAINTED} svg`).boundingBox())!;
 

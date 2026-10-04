@@ -5,6 +5,7 @@ import { RichText, Tooltip, access } from "@thewaver/ss-components-solid";
 import type { AccessorProps } from "@thewaver/ss-components-solid";
 import { GLOSSARY_CONTENT } from "@thewaver/ss-playground/App/Pages/RichTextPage/RichTextPage.const";
 import * as styles from "@thewaver/ss-playground/App/Pages/RichTextPage/RichTextPage.css";
+import { TOOLTIP_HOVER_DELAY_MS } from "@thewaver/ss-playground/App/StyledComponents/TooltipContent/TooltipContent.const";
 
 import { PageTooltipContent } from "../../../StyledComponents/TooltipContent/TooltipContent";
 
@@ -30,6 +31,7 @@ const GlossaryTerm = (props: ParentProps<TermProps>) => {
                 anchorRef={getAnchorRef}
                 placement={TOOLTIP_PLACEMENT}
                 offset={TOOLTIP_OFFSET}
+                hoverShowDelayMs={() => TOOLTIP_HOVER_DELAY_MS}
                 renderContent={(getVisibilityTarget, getTransitionDurationMs) => (
                     <PageTooltipContent
                         visibilityTarget={getVisibilityTarget}

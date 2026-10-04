@@ -4,6 +4,7 @@ import { computed, useModel } from "vue";
 import { Menu } from "@thewaver/ss-components-vue";
 import { POPOVER_SURFACE_INSET } from "@thewaver/ss-playground/App/StyledComponents/PopoverSurface/PopoverSurface.css";
 
+import PageGlideFloater from "../../../../StyledComponents/GlideFloater/PageGlideFloater.vue";
 import PageMenuTriggerContent from "../../../../StyledComponents/MenuTriggerContent/MenuTriggerContent.vue";
 import MenuDestinationItem from "../MenuDestinationItem.vue";
 import { DESTINATIONS } from "../MenuPage.const";
@@ -39,6 +40,10 @@ const activate = (destination: Destination) => {
 
         <template #renderItem="{ item, flags }">
             <MenuDestinationItem :item="item" :flags="flags" />
+        </template>
+
+        <template #renderHighlightFloater="floater">
+            <PageGlideFloater kind="highlight" v-bind="floater" />
         </template>
 
         <template #renderPopup="popup">

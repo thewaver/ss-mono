@@ -70,6 +70,20 @@ export const PageTabHexFloater = (props: TabFloaterProps) => {
     );
 };
 
+export const PageTabHexHighlightFloater = (props: TabFloaterProps) => {
+    const layerClass = useLayerClass();
+
+    return (
+        <div
+            className={[styles.hexTabHighlightFloater, layerClass, props.visibilityTarget === 1 && styles.isVisible]
+                .filter(Boolean)
+                .join(" ")}
+            style={{ transitionDuration: `${props.transitionDurationMs}ms` }}
+            data-floater={"highlight"}
+        />
+    );
+};
+
 export const PageTabFloater = (props: TabFloaterProps) => {
     const layerClass = useLayerClass();
 

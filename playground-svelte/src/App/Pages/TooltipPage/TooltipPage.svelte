@@ -3,6 +3,7 @@
     import { ANCHOR_H_PLACEMENTS, ANCHOR_V_PLACEMENTS, TOOLTIP_DEFAULTS } from "@thewaver/ss-components-svelte";
     import { TooltipKnobs } from "@thewaver/ss-playground/App/Knobs/Tooltips.const";
     import {
+        TOOLTIP_HOVER_DELAY_MS,
         TOOLTIP_REVEALS,
         TOOLTIP_REVEAL_LABELS,
         type TooltipReveal,
@@ -29,7 +30,7 @@
     let offsetY = $state(TooltipKnobs.STARTING_OFFSET_Y);
     let transitionDurationMs = $state(TOOLTIP_DEFAULTS.transitionDurationMs);
     let focusShowDelayMs = $state(TOOLTIP_DEFAULTS.focusShowDelayMs);
-    let hoverShowDelayMs = $state(TOOLTIP_DEFAULTS.hoverShowDelayMs);
+    let hoverShowDelayMs = $state(TOOLTIP_HOVER_DELAY_MS);
     let skipDelayWindowMs = $state(TOOLTIP_DEFAULTS.skipDelayWindowMs);
     let reveal = $state<TooltipReveal>(TooltipKnobs.STARTING_REVEAL);
 

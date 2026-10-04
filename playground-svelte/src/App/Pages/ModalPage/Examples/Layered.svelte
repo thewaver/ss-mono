@@ -5,6 +5,7 @@
     import type { AnchorPlacement, SelectOption } from "@thewaver/ss-components-svelte";
 
     import PageButtonContent from "../../../StyledComponents/ButtonContent/ButtonContent.svelte";
+    import { renderPageHighlightFloater } from "../../../StyledComponents/GlideFloater/GlideFloater.const.svelte";
     import PageModalOverlay from "../../../StyledComponents/ModalOverlay/ModalOverlay.svelte";
     import PageModalPanel from "../../../StyledComponents/ModalPanel/PageModalPanel.svelte";
     import PagePopoverSurface from "../../../StyledComponents/PopoverSurface/PopoverSurface.svelte";
@@ -41,13 +42,19 @@
         <PageModalPanel {visibilityTarget} {transitionDurationMs}>
             <div id={LAYERED_TITLE_ID}>Where are you flying from?</div>
 
-            <Select bind:value options={COUNTRIES} ariaLabel={"Country"} renderPopup={countryPopup}>
+            <Select
+                renderHighlightFloater={renderPageHighlightFloater}
+                bind:value
+                options={COUNTRIES}
+                ariaLabel={"Country"}
+                renderPopup={countryPopup}
+            >
                 {#snippet renderContent(selectedOption, flags)}
                     <PageSelectContent {flags}>{selectedOption?.value ?? "Pick one"}</PageSelectContent>
                 {/snippet}
 
                 {#snippet renderOption(option, flags)}
-                    <PageSelectOptionContent {flags}>{option.value}</PageSelectOptionContent>
+                    <PageSelectOptionContent isGliding {flags}>{option.value}</PageSelectOptionContent>
                 {/snippet}
             </Select>
         </PageModalPanel>

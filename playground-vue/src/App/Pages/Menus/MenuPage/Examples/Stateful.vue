@@ -3,6 +3,7 @@ import { useModel } from "vue";
 
 import { Menu } from "@thewaver/ss-components-vue";
 
+import PageGlideFloater from "../../../../StyledComponents/GlideFloater/PageGlideFloater.vue";
 import PageMenuTriggerContent from "../../../../StyledComponents/MenuTriggerContent/MenuTriggerContent.vue";
 import MenuActionItem from "../MenuActionItem.vue";
 import { VIEW_OPTIONS } from "../MenuPage.const";
@@ -24,6 +25,10 @@ const checked = useModel(props, "checked");
 
         <template #renderItem="{ item, flags }">
             <MenuActionItem :item="item" :flags="flags" />
+        </template>
+
+        <template #renderHighlightFloater="floater">
+            <PageGlideFloater kind="highlight" v-bind="floater" />
         </template>
 
         <template #renderPopup="popup">

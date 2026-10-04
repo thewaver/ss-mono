@@ -3,6 +3,7 @@ import { useModel } from "vue";
 
 import { Listbox } from "@thewaver/ss-components-vue";
 
+import PageGlideFloater from "../../../StyledComponents/GlideFloater/PageGlideFloater.vue";
 import PageListboxSurface from "../../../StyledComponents/ListboxSurface/ListboxSurface.vue";
 import PageSelectOptionContent from "../../../StyledComponents/SelectOptionContent/SelectOptionContent.vue";
 import { COUNTRIES_WITH_REACHABLE } from "../../SelectPage/SelectPage.const";
@@ -19,7 +20,11 @@ const value = useModel(props, "value");
     <PageListboxSurface>
         <Listbox v-model:value="value" :options="COUNTRIES_WITH_REACHABLE" ariaLabel="Shipping country">
             <template #renderOption="{ option, flags }">
-                <PageSelectOptionContent :flags="flags">{{ option.value }}</PageSelectOptionContent>
+                <PageSelectOptionContent is-gliding :flags="flags">{{ option.value }}</PageSelectOptionContent>
+            </template>
+
+            <template #renderHighlightFloater="floater">
+                <PageGlideFloater kind="highlight" v-bind="floater" />
             </template>
         </Listbox>
     </PageListboxSurface>

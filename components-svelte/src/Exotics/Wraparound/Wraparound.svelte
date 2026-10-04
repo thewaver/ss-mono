@@ -60,13 +60,7 @@
     let lastCopyKeys: string[] = [];
 
     const copyKeys = $derived.by(() => {
-        const keys = WraparoundUtils.computeTiles(
-            getOffset(),
-            getTileSize(),
-            getViewportSize(),
-            getOriginalTile(),
-            maxCopies,
-        ).map(toKey);
+        const keys = WraparoundUtils.computeTiles(getOffset(), getTileSize(), getViewportSize(), maxCopies).map(toKey);
         const isSame =
             keys.length === lastCopyKeys.length && keys.every((key, index) => key === lastCopyKeys[index]);
 
@@ -98,6 +92,7 @@
             <div
                 class={styles.wraparoundTile}
                 style:transform={toTileTransform(fromKey(key))}
+                style:visibility={key === toKey(getOriginalTile()) ? "hidden" : undefined}
                 aria-hidden="true"
                 inert
             >

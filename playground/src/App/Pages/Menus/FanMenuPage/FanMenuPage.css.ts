@@ -26,26 +26,22 @@ export const item = style({
     selectors: {
         [`&.${itemHighlighted}`]: {
             color: themeVars.color.primary.contrast,
-            transform: "scale(1.06)",
+            backgroundColor: "transparent",
         },
     },
 });
 
-export const itemFill = style({
-    position: "absolute",
-    zIndex: -1,
-    inset: 0,
-    borderRadius: "inherit",
+export const itemFloater = style({
+    width: "100%",
+    height: "100%",
+    borderRadius: themeVars.borderRadius.full,
     backgroundImage: `linear-gradient(45deg, ${themeVars.color.primary.dark}, ${themeVars.color.primary.light})`,
     opacity: 0,
-    pointerEvents: "none",
-    transition: "opacity 120ms ease-out",
+    transitionProperty: "opacity",
+});
 
-    selectors: {
-        [`.${itemHighlighted} &`]: {
-            opacity: 1,
-        },
-    },
+export const itemFloaterVisible = style({
+    opacity: 1,
 });
 
 export const itemBack = style({

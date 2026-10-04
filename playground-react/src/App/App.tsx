@@ -45,6 +45,7 @@ import { PageRouterLink } from "./PageComponents/RouterLink/RouterLink";
 import { PageSidebarToggle } from "./PageComponents/SidebarToggle/SidebarToggle";
 import { PageViewTabs } from "./PageComponents/ViewTabs/ViewTabs";
 import type { PageViewKey } from "./PageComponents/ViewTabs/ViewTabs.types";
+import { renderPageHighlightFloater } from "./StyledComponents/GlideFloater/GlideFloater";
 import { useLayerClass } from "./StyledComponents/Layer/Layer.context";
 import { PageTreeNodeContent } from "./StyledComponents/TreeNodeContent/TreeNodeContent";
 
@@ -412,6 +413,7 @@ export function AppContent(props: { viewportAnchor: readonly [ViewportAnchor, (v
                                         style={{ transitionDuration: `${transitionDurationMs}ms` }}
                                     >
                                         <Tree
+                                            renderHighlightFloater={renderPageHighlightFloater}
                                             nodes={visibleNodes}
                                             value={selectedState}
                                             expanded={expandedState}
@@ -420,6 +422,7 @@ export function AppContent(props: { viewportAnchor: readonly [ViewportAnchor, (v
                                             computeCustomText={(node) => node.value.name}
                                             renderNode={(node, renderProps) => (
                                                 <PageTreeNodeContent
+                                                    isGliding
                                                     renderProps={renderProps}
                                                     hasExamples={
                                                         getIsBranchConfig(node.value) ||

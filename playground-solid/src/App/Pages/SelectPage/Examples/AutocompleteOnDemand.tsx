@@ -5,6 +5,7 @@ import { Select, access } from "@thewaver/ss-components-solid";
 import type { MaybeAccessor, SelectOption } from "@thewaver/ss-components-solid";
 import * as popupStyles from "@thewaver/ss-playground/App/StyledComponents/PopoverSurface/PopoverSurface.css";
 
+import { renderPageHighlightFloater } from "../../../StyledComponents/GlideFloater/GlideFloater";
 import { PagePopoverSurface } from "../../../StyledComponents/PopoverSurface/PopoverSurface";
 import { PageSelectContent, computePageSelectTextStyle } from "../../../StyledComponents/SelectContent/SelectContent";
 import { PageSelectOptionContent } from "../../../StyledComponents/SelectOptionContent/SelectOptionContent";
@@ -24,6 +25,7 @@ type Props = {
 export const AutocompleteOnDemandExample = (props: Props) => {
     return (
         <Select
+            renderHighlightFloater={renderPageHighlightFloater}
             value={props.value}
             query={props.query}
             options={props.options}
@@ -35,7 +37,7 @@ export const AutocompleteOnDemandExample = (props: Props) => {
                 <PageSelectContent flags={getFlags}>{getSelectedOption()?.value.name ?? PLACEHOLDER}</PageSelectContent>
             )}
             renderOption={(getOption, getFlags) => (
-                <PageSelectOptionContent flags={getFlags} description={() => getOption().value.description}>
+                <PageSelectOptionContent isGliding flags={getFlags} description={() => getOption().value.description}>
                     {getOption().value.name}
                 </PageSelectOptionContent>
             )}

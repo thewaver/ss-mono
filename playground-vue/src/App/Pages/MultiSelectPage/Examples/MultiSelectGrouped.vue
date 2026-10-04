@@ -5,6 +5,7 @@ import { MultiSelect } from "@thewaver/ss-components-vue";
 import type { SelectItem } from "@thewaver/ss-components-vue";
 import * as popupStyles from "@thewaver/ss-playground/App/StyledComponents/PopoverSurface/PopoverSurface.css";
 
+import PageGlideFloater from "../../../StyledComponents/GlideFloater/PageGlideFloater.vue";
 import PagePopoverSurface from "../../../StyledComponents/PopoverSurface/PopoverSurface.vue";
 import PageSelectContent, {
     computePageSelectTextStyle,
@@ -47,7 +48,11 @@ const query = useModel(props, "query");
         </template>
 
         <template #renderOption="{ option, flags }">
-            <PageSelectOptionContent :flags="flags">{{ option.value }}</PageSelectOptionContent>
+            <PageSelectOptionContent is-gliding :flags="flags">{{ option.value }}</PageSelectOptionContent>
+        </template>
+
+        <template #renderHighlightFloater="floater">
+            <PageGlideFloater kind="highlight" v-bind="floater" />
         </template>
 
         <template #renderPopup="{ renderOptions, visibilityTarget, transitionDurationMs, placement }">

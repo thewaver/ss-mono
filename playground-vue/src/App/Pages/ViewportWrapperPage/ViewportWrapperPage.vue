@@ -10,6 +10,7 @@ import { RANGE_THUMB_SIZE } from "@thewaver/ss-playground/App/StyledComponents/R
 import type { VariantDefs } from "../../PageComponents/Variants/Variants.types";
 import PageVariants from "../../PageComponents/Variants/Variants.vue";
 import PageButtonContent from "../../StyledComponents/ButtonContent/ButtonContent.vue";
+import PageGlideFloater from "../../StyledComponents/GlideFloater/PageGlideFloater.vue";
 import PagePopoverSurface from "../../StyledComponents/PopoverSurface/PopoverSurface.vue";
 import PageRangeContent from "../../StyledComponents/RangeContent/RangeContent.vue";
 import PageSelectContent from "../../StyledComponents/SelectContent/SelectContent.vue";
@@ -177,7 +178,13 @@ const dismissInnerToast = (id: string) => {
                                 </template>
 
                                 <template #renderOption="{ option, flags }">
-                                    <PageSelectOptionContent :flags="flags">{{ option.value }}</PageSelectOptionContent>
+                                    <PageSelectOptionContent is-gliding :flags="flags">{{
+                                        option.value
+                                    }}</PageSelectOptionContent>
+                                </template>
+
+                                <template #renderHighlightFloater="floater">
+                                    <PageGlideFloater kind="highlight" v-bind="floater" />
                                 </template>
 
                                 <template
@@ -258,7 +265,13 @@ const dismissInnerToast = (id: string) => {
                                 </template>
 
                                 <template #renderOption="{ option, flags }">
-                                    <PageSelectOptionContent :flags="flags">{{ option.value }}</PageSelectOptionContent>
+                                    <PageSelectOptionContent is-gliding :flags="flags">{{
+                                        option.value
+                                    }}</PageSelectOptionContent>
+                                </template>
+
+                                <template #renderHighlightFloater="floater">
+                                    <PageGlideFloater kind="highlight" v-bind="floater" />
                                 </template>
 
                                 <template

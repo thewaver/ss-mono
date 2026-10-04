@@ -7,6 +7,7 @@ import { MathUtils } from "@thewaver/ss-utils";
 import { PageExampleKnobs } from "../../../PageComponents/ExampleKnobs/ExampleKnobs";
 import { PageSelectField } from "../../../PageComponents/Field/Field";
 import { PageProp } from "../../../PageComponents/Prop/Prop";
+import { renderPageHighlightFloater } from "../../../StyledComponents/GlideFloater/GlideFloater";
 import { PageTreeNodeContent } from "../../../StyledComponents/TreeNodeContent/TreeNodeContent";
 import { FILES } from "../TreePage.const";
 import type { TreeExampleProps } from "../TreePage.types";
@@ -45,6 +46,7 @@ export const LeaningExample = (props: Props) => {
     return (
         <>
             <Tree
+                renderHighlightFloater={renderPageHighlightFloater}
                 nodes={FILES}
                 value={props.value}
                 expanded={props.expanded}
@@ -52,7 +54,9 @@ export const LeaningExample = (props: Props) => {
                 computeLayout={COLUMN}
                 computeEffect={computeEffect}
                 renderNode={(node, renderProps) => (
-                    <PageTreeNodeContent renderProps={renderProps}>{node.value}</PageTreeNodeContent>
+                    <PageTreeNodeContent isGliding renderProps={renderProps}>
+                        {node.value}
+                    </PageTreeNodeContent>
                 )}
             />
 

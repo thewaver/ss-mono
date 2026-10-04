@@ -3,6 +3,7 @@ import { createEffect, createSignal, onCleanup } from "solid-js";
 import { Tree } from "@thewaver/ss-components-solid";
 import type { TreeNode } from "@thewaver/ss-components-solid";
 
+import { renderPageHighlightFloater } from "../../../StyledComponents/GlideFloater/GlideFloater";
 import { PageTreeNodeContent, PageTreeNodePending } from "../../../StyledComponents/TreeNodeContent/TreeNodeContent";
 import { REMOTE_CHILDREN, REMOTE_LOAD_DELAY_MS, REMOTE_ROOT } from "../TreePage.const";
 import type { TreeExampleProps } from "../TreePage.types";
@@ -43,12 +44,15 @@ export const LazyExample = (props: Props) => {
 
     return (
         <Tree
+            renderHighlightFloater={renderPageHighlightFloater}
             nodes={getNodes}
             value={props.value}
             expanded={props.expanded}
             ariaLabel={"Remote repository"}
             renderNode={(getNode, getRenderProps) => (
-                <PageTreeNodeContent renderProps={getRenderProps}>{getNode().value}</PageTreeNodeContent>
+                <PageTreeNodeContent isGliding renderProps={getRenderProps}>
+                    {getNode().value}
+                </PageTreeNodeContent>
             )}
             renderPendingChildren={(_getNode, getDepth) => (
                 <PageTreeNodePending depth={getDepth}>Fetching…</PageTreeNodePending>

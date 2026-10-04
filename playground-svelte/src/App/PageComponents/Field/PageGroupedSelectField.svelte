@@ -4,6 +4,7 @@
     import type { AnchorPlacement } from "@thewaver/ss-components-svelte";
     import { Select } from "@thewaver/ss-components-svelte";
 
+    import { renderPageHighlightFloater } from "../../StyledComponents/GlideFloater/GlideFloater.const.svelte";
     import PagePopoverSurface from "../../StyledComponents/PopoverSurface/PopoverSurface.svelte";
     import PageSelectContent from "../../StyledComponents/SelectContent/SelectContent.svelte";
     import PageSelectGroupContent from "../../StyledComponents/SelectGroupContent/SelectGroupContent.svelte";
@@ -33,6 +34,7 @@
 </script>
 
 <Select
+    renderHighlightFloater={renderPageHighlightFloater}
     bind:value={() => props.value, setValue}
     {options}
     isDisabled={props.isDisabled}
@@ -52,7 +54,7 @@
     {/snippet}
 
     {#snippet renderOption(option, flags)}
-        <PageSelectOptionContent {flags}>
+        <PageSelectOptionContent isGliding {flags}>
             {props.computeLabel?.(option.value) ?? String(option.value)}
         </PageSelectOptionContent>
     {/snippet}

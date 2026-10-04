@@ -1,6 +1,7 @@
 import { Menu } from "@thewaver/ss-components-solid";
 import { POPOVER_SURFACE_INSET } from "@thewaver/ss-playground/App/StyledComponents/PopoverSurface/PopoverSurface.css";
 
+import { renderPageHighlightFloater } from "../../../../StyledComponents/GlideFloater/GlideFloater";
 import { PageMenuTriggerContent } from "../../../../StyledComponents/MenuTriggerContent/MenuTriggerContent";
 import { DESTINATIONS, renderDestinationItem, renderMenuPopup } from "../MenuPage.const";
 import type { MenuCascaderExampleProps } from "../MenuPage.types";
@@ -19,6 +20,7 @@ export const CascaderExample = (props: Props) => {
 
     return (
         <Menu
+            renderHighlightFloater={renderPageHighlightFloater}
             items={() => DESTINATIONS}
             ariaLabel={() => `Destination: ${getPathText()}`}
             submenuOffset={() => ({ x: POPOVER_SURFACE_INSET, y: -POPOVER_SURFACE_INSET })}

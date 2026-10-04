@@ -21,6 +21,7 @@ import {
 
 import { PageColorInputContent } from "../../StyledComponents/ColorInputContent/ColorInputContent";
 import { PageFileInputContent } from "../../StyledComponents/FileInputContent/FileInputContent";
+import { renderPageHighlightFloater } from "../../StyledComponents/GlideFloater/GlideFloater";
 import { PagePopoverSurface } from "../../StyledComponents/PopoverSurface/PopoverSurface";
 import { PageSelectContent } from "../../StyledComponents/SelectContent/SelectContent";
 import { PageSelectGroupContent } from "../../StyledComponents/SelectGroupContent/SelectGroupContent";
@@ -142,6 +143,7 @@ export const PageSelectField = <T,>(props: PageSelectFieldProps<T>) => {
 
     return (
         <Select
+            renderHighlightFloater={renderPageHighlightFloater}
             value={[getValue, setValue]}
             options={() => access(props.values).map((value) => ({ value }))}
             isDisabled={props.isDisabled}
@@ -154,7 +156,7 @@ export const PageSelectField = <T,>(props: PageSelectFieldProps<T>) => {
                 </PageSelectContent>
             )}
             renderOption={(getOption, getFlags) => (
-                <PageSelectOptionContent flags={getFlags}>
+                <PageSelectOptionContent isGliding flags={getFlags}>
                     {props.computeLabel?.(getOption().value) ?? String(getOption().value)}
                 </PageSelectOptionContent>
             )}
@@ -176,6 +178,7 @@ export const PageGroupedSelectField = <T,>(props: PageGroupedSelectFieldProps<T>
 
     return (
         <Select
+            renderHighlightFloater={renderPageHighlightFloater}
             value={[getValue, setValue]}
             options={() =>
                 access(props.groups).map(([label, values]) => ({ label, options: values.map((value) => ({ value })) }))
@@ -191,7 +194,7 @@ export const PageGroupedSelectField = <T,>(props: PageGroupedSelectFieldProps<T>
             )}
             renderGroup={(getGroup) => <PageSelectGroupContent>{getGroup().label}</PageSelectGroupContent>}
             renderOption={(getOption, getFlags) => (
-                <PageSelectOptionContent flags={getFlags}>
+                <PageSelectOptionContent isGliding flags={getFlags}>
                     {props.computeLabel?.(getOption().value) ?? String(getOption().value)}
                 </PageSelectOptionContent>
             )}

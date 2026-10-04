@@ -36,8 +36,6 @@
                     flags.isDisabled && styles.itemDisabled,
                 ]}
             >
-                <div class={styles.itemFill} aria-hidden={"true"}></div>
-
                 {#if flags.isBack}
                     <span aria-hidden={"true"}>{BACK_MARK}</span>
                 {/if}
@@ -52,6 +50,14 @@
                     <span aria-hidden={"true"}>{SUBMENU_MARK}</span>
                 {/if}
             </div>
+        {/snippet}
+
+        {#snippet renderHighlightFloater(visibilityTarget, transitionDurationMs)}
+            <div
+                class={[styles.itemFloater, visibilityTarget === 1 && styles.itemFloaterVisible]}
+                style:transition-duration={`${transitionDurationMs}ms`}
+                data-floater="highlight"
+            ></div>
         {/snippet}
 
         {#snippet renderPopup(renderItems, visibilityTarget, transitionDurationMs)}

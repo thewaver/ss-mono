@@ -5,6 +5,7 @@ import { Button, Modal, Select } from "@thewaver/ss-components-vue";
 import type { SelectOption } from "@thewaver/ss-components-vue";
 
 import PageButtonContent from "../../../StyledComponents/ButtonContent/ButtonContent.vue";
+import PageGlideFloater from "../../../StyledComponents/GlideFloater/PageGlideFloater.vue";
 import PageModalOverlay from "../../../StyledComponents/ModalOverlay/ModalOverlay.vue";
 import PageModalPanel from "../../../StyledComponents/ModalPanel/PageModalPanel.vue";
 import PagePopoverSurface from "../../../StyledComponents/PopoverSurface/PopoverSurface.vue";
@@ -50,7 +51,11 @@ const open = () => {
                     </template>
 
                     <template #renderOption="{ option, flags }">
-                        <PageSelectOptionContent :flags="flags">{{ option.value }}</PageSelectOptionContent>
+                        <PageSelectOptionContent is-gliding :flags="flags">{{ option.value }}</PageSelectOptionContent>
+                    </template>
+
+                    <template #renderHighlightFloater="floater">
+                        <PageGlideFloater kind="highlight" v-bind="floater" />
                     </template>
 
                     <template

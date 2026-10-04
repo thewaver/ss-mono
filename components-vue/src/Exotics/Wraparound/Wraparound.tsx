@@ -54,13 +54,13 @@ export const Wraparound = defineComponent(
                 offset.value,
                 tileSize.value,
                 viewportSize.value,
-                originalTile.value,
                 props.maxCopies ?? WRAPAROUND_DEFAULTS.maxCopies,
             ).map(toKey),
         );
 
         return () => {
             const size = tileSize.value;
+            const originalKey = toKey(originalTile.value);
 
             const toTileTransform = (tile: WraparoundTile) =>
                 `translate(${tile.column * size.width}px, ${tile.row * size.height}px)`;
@@ -90,7 +90,10 @@ export const Wraparound = defineComponent(
                             <div
                                 key={key}
                                 class={WraparoundStyles.wraparoundTile}
-                                style={{ transform: toTileTransform(fromKey(key)) }}
+                                style={{
+                                    transform: toTileTransform(fromKey(key)),
+                                    visibility: key === originalKey ? "hidden" : undefined,
+                                }}
                                 aria-hidden="true"
                                 inert
                             >

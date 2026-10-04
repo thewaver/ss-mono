@@ -7,6 +7,7 @@
     import PageExampleKnobs from "../../../PageComponents/ExampleKnobs/PageExampleKnobs.svelte";
     import PageNumberField from "../../../PageComponents/Field/PageNumberField.svelte";
     import PageProp from "../../../PageComponents/Prop/Prop.svelte";
+    import { renderPageHighlightFloater } from "../../../StyledComponents/GlideFloater/GlideFloater.const.svelte";
     import PageSelectContent from "../../../StyledComponents/SelectContent/SelectContent.svelte";
     import PageSelectGroupContent from "../../../StyledComponents/SelectGroupContent/SelectGroupContent.svelte";
     import PageSelectOptionContent from "../../../StyledComponents/SelectOptionContent/SelectOptionContent.svelte";
@@ -30,6 +31,7 @@
 
 <div class={styles.column}>
     <Select
+        renderHighlightFloater={renderPageHighlightFloater}
         bind:value
         bind:visibility
         options={props.options}
@@ -48,7 +50,7 @@
         {/snippet}
 
         {#snippet renderOption(option, flags)}
-            <PageSelectOptionContent {flags} description={option.value.description}>
+            <PageSelectOptionContent isGliding {flags} description={option.value.description}>
                 {option.value.name}
             </PageSelectOptionContent>
         {/snippet}
