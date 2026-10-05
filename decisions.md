@@ -5357,9 +5357,9 @@ had to learn an index or thread a reading down. Tracking is off entirely while n
 **Effects are per item and pure, which is what stops the feedback the dock example warns about.** Each item is
 measured against the resting layout, never against where its neighbors have moved to — grow an item from its
 live position and it shifts its neighbor, which changes that neighbor's distance from a pointer that has not
-moved, which changes its size. What a consumer gives up is a `zoomIn` that genuinely re-flows the run: the
+moved, which changes its size. What a consumer gives up is a `zoom_in` that genuinely re-flows the run: the
 displacement is a transform, so items pass over one another rather than pushing — a few pixels of overlap at
-the boundary between two growing neighbors is this trade-off's residue, not a bug to chase. `zoomIn` gets the
+the boundary between two growing neighbors is this trade-off's residue, not a bug to chase. `zoom_in` gets the
 look back analytically instead, by displacing each item by the running total of what its inner neighbors
 grew — which is the falloff curve integrated and normalized, and comes out as a closed form.
 
@@ -5371,7 +5371,7 @@ constant amount, and two items equally near the pointer (the common case of it s
 as "at the growth center" and got zero push each while both were still growing, colliding into each other.
 `PlacementUtils.getRunOverreach` is the fix: `0` anywhere between the run's first and last item, where the gap
 to a neighbor is a real gap between real neighbors, and only positive once the pointer has actually left the
-run's own span. `ProximityEffectDefs.overreach` carries it, and `zoomIn`'s push subtracts the share already
+run's own span. `ProximityEffectDefs.overreach` carries it, and `zoom_in`'s push subtracts the share already
 spent by the time that overreach is reached — nothing, while the pointer is inside the run, so the original
 per-item math is untouched there; the full share, once the pointer is far enough outside it that nothing
 anywhere is growing.
@@ -5475,7 +5475,7 @@ not being there: the box reports no point at all and no item computes an effect.
 would have left `fade` dimming a whole arrangement the pointer had already walked away from, since a distant
 item and an absent pointer are different things to an effect that answers on remoteness.
 
-**A `zoomIn`'s push is clamped to the room the arrangement actually has, and a closed run is where that room
+**A `zoom_in`'s push is clamped to the room the arrangement actually has, and a closed run is where that room
 runs out.** Past the reach the push saturates at its full value, which is right for a row — everything beyond
 the growing item shifts outward and the row gets longer — and ruinous for a loop, where the two directions travel
 round and pile into each other at the far side. The first answer was a flag: test whether the run closes and
@@ -5519,7 +5519,7 @@ in exactly the effects that move things.
 under success criterion 2.3.3 and a blur is too under its erratum, so the library could tell which half of an
 effect to strip — and stripping is the one thing the `PointerTracker` entry above argues it must not do, because
 only the consumer can _substitute_. So the flag arrives in the defs and each sample effect answers it in the
-way that suits it: `zoomIn` sends the same curve to `brightness` instead of to size, `fade` keeps its dimming
+way that suits it: `zoom_in` sends the same curve to `brightness` instead of to size, `fade` keeps its dimming
 and drops its blur, and `glow` is not motion under the criterion's own definition and is unchanged. Three
 samples, three different right answers, which is the argument for the flag rather than a rule.
 
@@ -5527,7 +5527,7 @@ samples, three different right answers, which is the argument for the flag rathe
 Every arrangement the library shipped curved, scattered or overlapped, which meant there was nothing to check
 a pointer effect against where the right answer is obvious by eye — and both faults above were invisible until
 there was. They are the two arrangements a control would have had without a layout at all, which is the second
-thing they buy: a dock is a row, and until these existed the one shape `zoomIn` most obviously wants was the one
+thing they buy: a dock is a row, and until these existed the one shape `zoom_in` most obviously wants was the one
 shape no layout could describe.
 
 **`Wheel` takes one, and it is the one place the effect is not measured against the layout it was given.** A
@@ -6057,9 +6057,9 @@ without a cut. The level eases from `restLevel` to `1` rather than in a straight
 Their rows (the lozenge, the sideways triangle) or columns (the upright triangle) step half a cell, so the samples'
 8 × 8 request drew a tile 8 cells one way and 4 the other, and square cells repeated at twice the distance across as
 down. The user saw it on a tiled lozenge; the timed samples had always had it. Fixed in the layouts rather than in
-each sample's request, the user's pick: `diagonal`, `triangle` and `triangleSideways` double the request along their
-half-step axis, so an even request now gives a tile exactly that many cells each way, as `grid`, `halfShift` and
-`halfDrop` already did. **The hexagons are left as they are**, the user's call: their rows overlap by a quarter of a
+each sample's request, the user's pick: `diagonal`, `triangle` and `triangle_sideways` double the request along their
+half-step axis, so an even request now gives a tile exactly that many cells each way, as `grid`, `half_shift` and
+`half_drop` already did. **The hexagons are left as they are**, the user's call: their rows overlap by a quarter of a
 cell, so their tile is 8 by 6 at the same request, and the user accepts that as the shape's, since a hexagon is not
 square to begin with. An exactly square hexagon tile exists only at multiples of six cells. `TrackedPatternUtils`
 hands the layouts a request in these same units and leaves the converting to them.
@@ -7873,9 +7873,9 @@ the line-shaped API reads better for the common case — the reasoning that make
 **A preset that loses an axis drops what indexed on it rather than narrowing it.** A scanline is a single
 column, so every weight reading `dist.x` collapses: measured on a single column of eleven with the origin pinned at
 `{ x: 0, y: 0 }`, which is what the Playground's Scanline page does, thirteen give every line the same weight
-(`lineColumn`, `lineColumnAlternate`, `lineColumnConvergent`, both `quadrant` entries, all six `radar` entries, and
+(`line_column`, `line_column_alternate`, `line_column_convergent`, both `quadrant` entries, all six `radar` entries, and
 all three `frame` forms, whose ring is zero for every cell of a single column) and three more fall to two
-values (`entwineRow`, `rollRow`, `rollRowConvergent`), and
+values (`entwine_row`, `roll_row`, `roll_row_convergent`), and
 most survivors are a plain row ramp wearing a name like `spiral` or `checkered`. The distance-based
 survivors are the only reason an origin would exist on a line, and a control meaningful for three of nine
 options reads as broken. This used to be enforced in the library — `ScanlineAnimation` narrowed `weightType`
@@ -7904,7 +7904,7 @@ brighter line. That is recorded as an accepted limit in `backlog.md`, with the t
 
 **Whole-grid operations cannot live in a per-cell evaluator**, which is why weights are computed once per
 count rather than per frame: `shouldMakeUnique` and `shouldNormalize` rank every cell against every other,
-and memoising the grid also stops `randomDefault` reshuffling every frame. The component owns that memo and
+and memoising the grid also stops `random_default` reshuffling every frame. The component owns that memo and
 calls the consumer's function to fill it.
 
 **Grid geometry belongs to `ss-utils`.** The per-axis distance between two cells, the clamp of a point into
@@ -7962,8 +7962,8 @@ separated the family that was called `circular`, the one called `quadratic`, and
 distance from the origin is measured: the `circular` family took the mean of the two axis distances, so its
 rings are diamonds standing on a corner, and it is now `diamond` — the word this file already used when it
 listed the shapes a wipe can be. `radial` takes the true straight-line distance, so its rings are the only
-actual circles in the collection, and it gained the third form the other two had, `radialConvergent`, built
-from `diamondConvergent`'s shape with the straight-line distance. `quadratic` took the larger of the two axis
+actual circles in the collection, and it gained the third form the other two had, `radial_convergent`, built
+from `diamond_convergent`'s shape with the straight-line distance. `quadratic` took the larger of the two axis
 distances, so its rings are squares — and that turned out to be one half of a pair rather than a family of its
 own, which is the entry below.
 
@@ -7999,13 +7999,13 @@ banded a wide grid's stretched entries across rings the ramp does not follow.
 
 **Handedness is an axis of an existing family, not a family of its own.** `_sweepCw` and `_sweepCcw` were a
 second implementation of the thing `radar` already does — one arm turning about the origin — and measured, with
-the origin at a corner they and `radarSingle` order the hundred and twenty-one cells identically to within a
+the origin at a corner they and `radar_single` order the hundred and twenty-one cells identically to within a
 rounding error, so nothing on the page could tell them apart. At a centerd origin they do differ, but only in
-which ray the arm starts from and which way it turns: `radarSingle` starts at six o'clock and turns
+which ray the arm starts from and which way it turns: `radar_single` starts at six o'clock and turns
 counter-clockwise, `_sweepCw` starts at twelve and turns clockwise. Sweep also spaces the arm by true angle
 where radar spaces it by how far round the square ring a cell sits, which is a few percent of one cell's start
 time and not a difference anybody was going to see. So both sweeps went and the handedness they were carrying
-became `radarSingleCw`, `radarDoubleCw` and `radarQuadCw`, which reaches Double and Quad as well — something
+became `radar_single_cw`, `radar_double_cw` and `radar_quad_cw`, which reaches Double and Quad as well — something
 a one-armed sweep could never have done. The three existing radar entries keep their names and are the
 counter-clockwise ones.
 
@@ -8020,21 +8020,21 @@ past a signature this file already calls readable only to its own callers, and t
 **A quadrant pair names the two corners it grows from, which `Default` could not.** The entry that was called
 `quadrantDefault` multiplied the two signed distances, so the product is negative in the two quadrants where the signs disagree
 and those corners start first — the top-right and the bottom-left, which are the two ends of a rising diagonal.
-It is therefore `quadrantUp`, and `quadrantDown` is the same expression with that product added instead of
+It is therefore `quadrant_up`, and `quadrant_down` is the same expression with that product added instead of
 subtracted, so it starts from the top-left and the bottom-right. The direction words are the ones the diagonal
 band entries already use, so the pair reads off the same vocabulary rather than inventing `Mirrored`.
 
 **The diagonal is a band direction, and it was the one thing the collection had none of.** Diagonals were not
 absent so much as never straight: `diamond`'s rings are four diagonal segments meeting at corners, and
 `checkered`'s two passes alternate on the parity of `dist.x + dist.y`, which is a diagonal parity. What nothing
-produced was a band whose edge is a single 45° line — the thing `lineRow` and `lineColumn` are, turned
+produced was a band whose edge is a single 45° line — the thing `line_row` and `line_column` are, turned
 half a right angle.
 
 **One rotated coordinate pair covers every family that had a Row and a Column.** `getDiagonalDelta` returns
 `down`, which is `|dx - dy|` and counts bands parallel to a line falling to the right, and `up`, which is
 `|dx + dy|` and counts bands parallel to one rising to the right. That is all the new arithmetic there is,
 because every one of these families is the same three ingredients: a band index, a position along the band,
-and the parity of the band index. `lineRow` is `(dist.y, dist.x, isEvenRow)`; `_lineDiagonalDown` is
+and the parity of the band index. `line_row` is `(dist.y, dist.x, isEvenRow)`; `_lineDiagonalDown` is
 `(down, up, isEven(down))`, and the Up member swaps the pair over. So `line` gained all three forms, `roll`
 gained its two and `entwine` gained one each way, from two helpers and no new formula.
 
@@ -8048,18 +8048,18 @@ direction instead.
 the rotated basis `down + up` is always even, so a cell's two diagonal distances always share a parity. `roll`
 and `entwine` use the band index for nothing but its parity, so that parity was the parity of the coordinate
 the ramp already ran on, and the weight collapsed into a function of one coordinate — a banded diagonal wipe.
-For `roll` the collapse was exact: measured, `rollDiagonalUp` came out byte-identical to
-`lineDiagonalDownAlternate` on every grid and origin tried, and `rollDiagonalDown` to `lineDiagonalUpAlternate`.
+For `roll` the collapse was exact: measured, `roll_diagonal_up` came out byte-identical to
+`line_diagonal_down_alternate` on every grid and origin tried, and `roll_diagonal_down` to `line_diagonal_up_alternate`.
 
 **What broke the collapse is dividing the position along a band by that band's own length.** Every row is as
-long as every other, so `rollRow` can divide by the grid's width and nothing is lost; diagonal bands are all
+long as every other, so `roll_row` can divide by the grid's width and nothing is lost; diagonal bands are all
 different lengths, so dividing by the longest left short bands using a sliver of their range — and left the
 band index out of the value, which is what allowed the collapse. `getMaxDiagonalDistanceInBand` answers how far
 the along-band coordinate reaches inside one band, by intersecting the band with the grid and evaluating at the
 two ends, which is exact because the distance along a band is convex. After it, no two diagonal entries are
 equal on any grid or origin tried, and `roll` and `entwine` each vary within a band as well as across bands.
 It reads off both signed bands at the same distance, because these families index a band by distance and treat
-the two sides of the origin as one, exactly as `lineRow` treats the rows above and below it.
+the two sides of the origin as one, exactly as `line_row` treats the rows above and below it.
 
 **`zigzag` is the one family with no diagonal member, and the reason is a ratio it cannot change.** Its
 along-band term is one part in `bandCount + 1` of the range whatever it is divided by, and a diagonal basis has
@@ -8070,28 +8070,28 @@ deleted both entries: a snake that reads as a straight diagonal wipe is a fifth 
 kept theirs, because for them the same normalization was the difference between a duplicate and a pattern.
 
 **The origin moves a diagonal wipe only across its bands, which is the family's own behavior rather than a
-gap.** `lineRow` reads `dist.y` alone, so sliding the origin sideways changes nothing; a diagonal reads its own
+gap.** `line_row` reads `dist.y` alone, so sliding the origin sideways changes nothing; a diagonal reads its own
 band index alone, so sliding the origin along the band changes nothing — measured, `_lineDiagonalDown` is
-identical at `center` and at `topLeft`, both being on the same falling line.
+identical at `center` and at `top_left`, both being on the same falling line.
 
 **Ripple and the concentric families were deliberately left out of this.** The user axed ripple's row and
 column entries in the same breath as asking for diagonals, on the grounds that ripple is for concentric
 patterns; the same reasoning keeps a diagonal out of `radial`, `diamond` and the three `frame` members, whose
 whole subject is a ring around a point.
 
-**`oval` is not one of them, and reading it as one was a mistake made from its name.** `ovalRow` is
-`zigzagRow`'s even branch with the parity flip removed: rows are the bands, the ramp runs along each row from
+**`oval` is not one of them, and reading it as one was a mistake made from its name.** `oval_row` is
+`zigzag_row`'s even branch with the parity flip removed: rows are the bands, the ramp runs along each row from
 the origin's column, and every row sweeps the same way. The frontier that gives it its name is curved because
 the two terms compound, not because anything measures a radius. It is therefore a band family and does take a
 diagonal member — the caution about rings never applied to it.
 
-**Its diagonal member was built, measured and deleted, on `zigzag`'s ratio.** With a centerd origin, `ovalRow`
-differs from `lineRow` by up to 0.167 on eleven by eleven and 0.250 on twenty-one by seven, while the diagonal
-member differed from `lineDiagonalDown` by 0.091 and 0.071 — the second figure worse, because a wide grid has
+**Its diagonal member was built, measured and deleted, on `zigzag`'s ratio.** With a centerd origin, `oval_row`
+differs from `line_row` by up to 0.167 on eleven by eleven and 0.250 on twenty-one by seven, while the diagonal
+member differed from `line_diagonal_down` by 0.091 and 0.071 — the second figure worse, because a wide grid has
 few rows and many diagonal bands. That is the same 0.091 that had both `zigzagDiagonal` entries deleted, so
 `oval` and `zigzag` are the two band families with no diagonal, for one reason rather than two.
 
-**A sequence starts at the origin, which is the whole of what an origin can mean to an ordering.** `sequenceMorton`
+**A sequence starts at the origin, which is the whole of what an origin can mean to an ordering.** `sequence_morton`
 and `sequenceStride` were indexed on absolute grid coordinates, so the Origin control did nothing for them.
 Morton now interleaves the bits of the distance from the origin rather than of the position, so the Z-curve
 grows out of the origin — and at an origin of `{ x: 0, y: 0 }` the distance is the position, so it reproduces
@@ -8101,18 +8101,18 @@ Scanline page, whose list is exactly that array; and the user had already said t
 scanline, so the removal went with their leaning rather than against it. Putting them back on that page means
 the page naming them, not the array.
 
-**Stride's axis is which way the flat index runs, not how long the step is.** `sequenceStrideRow` counts the
-index along rows and `sequenceStrideColumn` along columns, which is the `lineRow`/`lineColumn` pair applied to
+**Stride's axis is which way the flat index runs, not how long the step is.** `sequence_stride_row` counts the
+index along rows and `sequence_stride_column` along columns, which is the `line_row`/`line_column` pair applied to
 an ordering. The step itself stays the golden-ratio one, stepped down until it shares no factor with the total
 so that the walk visits every cell exactly once — a shorter step was offered as a second axis and not taken,
 so `stride` takes the total and the origin's index and owns the step.
 
-**`random` is a group of two, because reseeding made a third one redundant.** `randomDefault` draws per cell
-and `randomClustered` interpolates a hash over four-cell blocks, which is the only one that can give a smooth
-blob. A flat hash of the cell's coordinates was built as well, and its only distinction from `randomDefault` was
+**`random` is a group of two, because reseeding made a third one redundant.** `random_default` draws per cell
+and `random_clustered` interpolates a hash over four-cell blocks, which is the only one that can give a smooth
+blob. A flat hash of the cell's coordinates was built as well, and its only distinction from `random_default` was
 that it repeated; once the user chose a pattern that never repeats, a freshly seeded flat hash is a slower
 `Math.random()` giving a statistically identical picture, so it was dropped rather than kept as a duplicate.
-`randomClustered` takes a seed, and the seed is drawn once per `computeCellWeights` call: a cluster needs
+`random_clustered` takes a seed, and the seed is drawn once per `computeCellWeights` call: a cluster needs
 neighboring cells to agree on it, and a never-repeating pattern cannot fix it at module load either. That is
 the one piece of mutable state in the collection, it lives in `CellAnimationWeightUtils` beside the hash, and
 `FIXED_HASH_SEED` is there for the callers that want the opposite — `_computeHorizontalDropout` picks which
@@ -8125,7 +8125,7 @@ or a column and rings on the square metric were all discarded, and the diamond m
 is now two metrics, the straight-line distance and the diamond one, each with the same variants. The period
 gives `Tight` at two cells and `Wide` at eight, and the travel ratio gives `Traveling`, which mixes the bands
 with a falloff so the rings arrive in order outward instead of all at once — the difference between one wave
-crossing the grid and a set of standing rings. `rippleDefault` and `rippleDiamondDefault` are the two the user
+crossing the grid and a set of standing rings. `ripple_default` and `ripple_diamond_default` are the two the user
 has kept, and the plain-distance entries carry no metric word in their names for the same reason the
 counter-clockwise `radar` entries carry no handedness: the unmarked name is the one that was there first.
 
@@ -8142,19 +8142,19 @@ Alphabetising any of the three would scatter something a reader uses to find an 
 what the rule is for. The rule is about collections whose order is otherwise arbitrary.
 
 **A directional family names its members after the direction each one travels or the edge it turns on, and its
-quadrant entry reads that word off the zone.** `swing` pivots on an edge, so its members are `swingTop`,
-`swingBottom`, `swingLeft` and `swingRight`, and `swingDefault` became `swingTop` once there was more than one.
+quadrant entry reads that word off the zone.** `swing` pivots on an edge, so its members are `swing_top`,
+`swing_bottom`, `swing_left` and `swing_right`, and `swingDefault` became `swing_top` once there was more than one.
 `tumble`, `shoot`, `shake`, `drip` and `hop` are named for where the cell is heading, so they gained the missing
-directions under `Up`, `Down`, `Left` and `Right`, and `dripDefault` became `dripDown` for the same reason
+directions under `Up`, `Down`, `Left` and `Right`, and `dripDefault` became `drip_down` for the same reason
 `swingDefault` had to go: a family of four with one member called Default cannot say which one it is. Their
-quadrant entries dispatch outward — a cell above the origin travels up — which is the mapping `elasticUp` and
-`pullUp` already had against the `top` zone.
+quadrant entries dispatch outward — a cell above the origin travels up — which is the mapping `elastic_up` and
+`pull_up` already had against the `top` zone.
 
 **An entrance starts hidden, by opacity or by geometry, and `skew` was the one entry that did not.** A cell
 animation runs from a weight-decided moment to the cell at rest, so at its first stop the cell must not be
 visible — otherwise the whole grid shows the picture before anything animates, and the stagger is invisible.
-Most entries satisfy this by scaling from nothing (`zoomIn`, the `pop` family, `pull`, `swarm`, `encircle`) and
-the rest by opening at `opacity: 0` and reaching `100` a fifth of the way in. `skewCw` and `skewCcw` did
+Most entries satisfy this by scaling from nothing (`zoom_in`, the `pop` family, `pull`, `swarm`, `encircle`) and
+the rest by opening at `opacity: 0` and reaching `100` a fifth of the way in. `skew_cw` and `skew_ccw` did
 neither: they began at full size and full opacity with a 45 degree skew, so every cell was already there.
 Checked at the same time, those two were the only entries in the collection that started visible.
 
@@ -8171,8 +8171,8 @@ the grid. Opacity is still right where nothing about the geometry can hide the c
 plain entry sends a cell outward — above the origin travels up — the inverted one sends it inward, so `top` takes
 the Down member, `left` takes the Right one, and for the two diagonal families each quadrant and axis takes the
 member diagonally opposite. Nothing new is animated: an `Inverted` entry is its twin's list with the members
-swapped in pairs, which is why all thirteen came from one mapping. `pop` keeps `popCenter` as its fallback and
-the rest keep `zoomIn`, exactly as their plain twins do.
+swapped in pairs, which is why all thirteen came from one mapping. `pop` keeps `pop_center` as its fallback and
+the rest keep `zoom_in`, exactly as their plain twins do.
 
 **A pair that differs only in handedness or in axis can be mixed by a zone, and that is two entries rather than
 a new animation.** `encircle`, `skew`, `swarm`, `spinUp` and `spinDown` each hold a clockwise and a
@@ -8191,16 +8191,16 @@ nothing would otherwise sit fully visible and motionless while the rest of the g
 a defect rather than as a choice.
 
 **A zone entry picks the family member of the same name, and where no such member exists the family does not
-get a zone entry.** So the `top` zone takes `carouselTop`, `hingeTop`, `elasticUp` and `pullUp`, and the
-top-left quadrant takes `popTopLeft` and `rollUpLeft`. `spin` is the family deliberately left without one: its
+get a zone entry.** So the `top` zone takes `carousel_top`, `hinge_top`, `elastic_up` and `pull_up`, and the
+top-left quadrant takes `pop_top_left` and `roll_up_left`. `spin` is the family deliberately left without one: its
 four members are two directions times two handednesses rather than four positions, so any mapping onto
 quadrants would be invented here rather than read off the names.
 
 **A diagonal family needs the four axis zones as well as the four quadrants.** The quadrants leave out every
 cell sharing a row or a column with the origin, which on an odd grid with a centerd origin is a cross of
 twenty-one cells out of a hundred and twenty-one — enough to look broken if they all fall through to the
-fallback. `rollQuadrant` maps each axis to the quadrant member clockwise after it, and only the origin cell
-itself reaches the fallback. A family with a center member — `pop` has `popCenter` — needs no axis entries,
+fallback. `roll_quadrant` maps each axis to the quadrant member clockwise after it, and only the origin cell
+itself reaches the fallback. A family with a center member — `pop` has `pop_center` — needs no axis entries,
 because the fallback is already the right answer for the whole cross.
 
 **Entries the user has not yet groomed carry a leading underscore.** Asked for so that a batch of new samples
@@ -8881,6 +8881,17 @@ later stage, so both paths now start the same way and the clock is never consult
 sequence that reaches it — pick a repeating pattern, let it run, switch mid-run — twenty-four runs clean where
 the old path failed roughly one in three.
 
+**A loop with no start of its own runs on the page's clock instead of being begun.** A pattern that repeats forever
+with no delay has nothing anybody can see begin, only a phase, so `SVGAnimationDefsUtils.getIsPageClocked` answers
+`true` for it and every framework's builder writes `begin="0s"` rather than `"indefinite"`. The scheduler then does not
+call `beginElementAt` on it at all: a frame after the element is put in the page, it sets the outermost drawing's clock
+to the page's (`setCurrentTime`). Two drawings of the same loop then show the same moment of it, and a drawing put in
+the page later — a word replaced by the next, an example remounted — carries the loop on rather than starting it from
+its first frame. The frame's wait is needed because a browser
+holds a newly added animation at its first frame until something moves the clock it runs on. Anything scripted, a
+count or a delay, is begun from script as before, from the moment it is put in the page. `paintedText.spec.ts` reads
+every looping drawing's clock against the page's.
+
 **The guard is a spec rather than a note**, because the failure mode is silent: memoise the defs so the same
 record survives a change and the animation simply carries on with the old timing, looking like a component
 that ignores its props. `shape.spec.ts` holds an element, changes the duration, and asserts the one it held is
@@ -9053,7 +9064,7 @@ the seam. A wrong tiling still tiles — that is the whole reason this arithmeti
 and now the pointy-top hexagon's rows can be asserted to sit at −15, 7.5 and 30 for a 30px cell, which is the
 three-quarter overlap that makes hexagons interlock rather than merely repeat.
 
-**`triangleSideways` is `triangle` transposed, and it is a second entry rather than a flag.** The upright
+**`triangle_sideways` is `triangle` transposed, and it is a second entry rather than a flag.** The upright
 tiling wants an even number of rows and an odd number of columns, steps half a cell across and a whole cell
 down, and marks the first and last column as the ones cut by the seam; the sideways one wants the opposite
 on every one of those four counts. Writing it as an axis flag inside the existing entry would put four
@@ -10258,8 +10269,8 @@ every icon button carry a clip-rect idiom the consumer had to know.
 Three formulas leave the range a weight is defined on, and always for the same reason: they are built for
 whole-number distances, and a centerd origin on an even count makes the farthest bound a half-integer. `spiral`
 subtracts its raw result from 1 and divides, so a result below 1 lifts the weight above it. `radar` divides by
-`maxWeight - 1`, and measured on an eight-by-eight grid with a centerd origin `radarSingle` reached -0.019,
-`radarDouble` -0.038 and `radarQuad` -0.083. `checkeredConvergent` reached -0.071 on the same grid and -0.25 on
+`maxWeight - 1`, and measured on an eight-by-eight grid with a centerd origin `radar_single` reached -0.019,
+`radar_double` -0.038 and `radar_quad` -0.083. `checkered_convergent` reached -0.071 on the same grid and -0.25 on
 every cell of a two-by-two.
 
 **So the clamp sits in `computeCellWeights`, once, on the user's call.** It is the only place that knows a
@@ -13140,7 +13151,7 @@ tree-shaking. Splitting the registries was for the source-view tabs and remains 
 `SAMPLE_WEIGHTS` / `SAMPLE_ANIMATIONS`, matching the `SAMPLE_CONFIGS` / `SAMPLE_LAYOUTS` / `SAMPLE_INDENTS`
 names the other registries already used.
 
-**The key-based call is kept, as a one-line forwarder in the registry module.** `CellAnimationWeights.computeCellWeights("lineRow", …)` still works and every Playground call site is unchanged. This is not two APIs
+**The key-based call is kept, as a one-line forwarder in the registry module.** `CellAnimationWeights.computeCellWeights("line_row", …)` still works and every Playground call site is unchanged. This is not two APIs
 competing: the forwarder lives in the module that already costs the whole collection, so anyone paying for the
 registry keeps the ergonomic call, and anyone who wants one sample imports the sample and the utils module.
 
@@ -15404,7 +15415,7 @@ The user's idea, its six questions settled with them in `backlog.md` before anyt
 
 **A face fills the whole box but paints half of it, so its unpainted half can catch clicks meant for what lies beneath.** `Flipbook` turns pointer events off on the face and back on for its painted half, in its own stylesheet; every half-painted use of `Spine` meets the same overlap, so it may belong in `Spine` itself.
 
-**The carousel's ring and its hinge rule are built from Spine's geometry.** The ring is the `paddleWheel` placement family: each slide is the carousel's whole box turned about its middle line by `SpineUtils.radial`, painting only its leading half with a core gap while its back paints the other, stacked by `SpineUtils.getLeadDepth` since half-planes sharing an edge cannot cross. That is Made With GSAP's 3D Wheel Gallery (091) look the user asked for. The ring example's frame was resized for the paddle wheel; its perspective stays at the user's 900 pixels, at which the panels pointing at the viewer may reach past the frame — left for the user to judge by eye. The `hinge` rule's flipping card was already `leaves` about a level spine, so it now calls `SpineUtils.leaves` with identical output; its waiting stack stays its own. The Playground's slide frame became `frameClasses: { front, back }` because a paddle paints half of itself.
+**The carousel's ring and its hinge rule are built from Spine's geometry.** The ring is the `paddle_wheel` placement family: each slide is the carousel's whole box turned about its middle line by `SpineUtils.radial`, painting only its leading half with a core gap while its back paints the other, stacked by `SpineUtils.getLeadDepth` since half-planes sharing an edge cannot cross. That is Made With GSAP's 3D Wheel Gallery (091) look the user asked for. The ring example's frame was resized for the paddle wheel; its perspective stays at the user's 900 pixels, at which the panels pointing at the viewer may reach past the frame — left for the user to judge by eye. The `hinge` rule's flipping card was already `leaves` about a level spine, so it now calls `SpineUtils.leaves` with identical output; its waiting stack stays its own. The Playground's slide frame became `frameClasses: { front, back }` because a paddle paints half of itself.
 
 **Spine's page is docs only, as every primitive's is.** The paddle wheel is shown on the carousel page and the book is `Flipbook`'s.
 
@@ -15904,7 +15915,7 @@ survive a restyle on either side.
 
 **`renderTag(tag, renderChildren, attributes)` is asked first. An element is drawn; `undefined` hands the tag to the class map and then to the unknown-tag handling; `null` draws nothing.** Solid's `JSX.Element` already includes `undefined`, so the two answers can be told apart without another type. The children arrive as a function rather than as rendered nodes, so a renderer that wraps them (a tooltip anchor, a link) decides where they go, and calling it sends the nested tags through the same `renderTag` and class map. The attributes come third, so the two-argument form in the verdict still reads naturally for a renderer that uses none.
 
-### `Odometer`: the columns turn the way the number is going, and the arithmetic above the barrel is the component
+### `SlotText`: the columns turn the way the number is going, and the arithmetic above the barrel is the component
 
 `Abstracts/Barrel` already turns a stack of faces to an angle and is what both drum wheels are made of, so a
 digit column needed nothing new: ten faces, `0` to `9`, and an angle. What had to be decided is everything
@@ -15971,7 +15982,7 @@ mechanism with a window of two recycled faces, and that a barrel rendering every
 where the window is as long as the list. Nothing here forecloses it: the window would go on `Barrel`, and
 whether a split-flap is then a second component or a mode on this one is the user's call, still open.
 
-### `Odometer`: a split-flap is a second way to draw the same count, on `Spine`
+### `SlotText`: a split-flap is a second way to draw the same count, on `Spine`
 
 **`mechanism` picks how a column changes, `"drum"` by default and `"splitFlap"` beside it.** The user's call: a prop on `Odometer` rather than a separate component, left open to more layouts later, so it is a union rather than a flag. Everything above the column is shared: the direction, the cascade, the reels, the slots that grow in and shrink away, and the reduced-motion rules come from `computeTurn` exactly as for the drum. **A split-flap reads the drum's angle as a count of flaps** (`getFlapPosition`), because a cumulative angle and a cumulative count are one running total spelled two ways — which is also why nine to zero drops one flap forward rather than nine back. Going down plays the flaps in reverse, lifting them back up, as the drum turns backwards; a real board only ever flips forwards, and that difference was accepted.
 
@@ -15981,13 +15992,23 @@ whether a split-flap is then a second component or a mode on this one is the use
 
 **What a screen reader gets is unchanged.** Every flap face is hidden and inert, as the drum's faces are, and the value is still the one visually hidden span. WCAG checked: 1.3.1 and 4.1.2 are met as for the drum; 2.3.3 Animation from Interactions as for the drum, extra turns dropped under reduced motion and the duration the consumer's; 2.2.2 does not apply, since the flaps move only when the value changes and each change finishes within the turn duration.
 
-### `Odometer`: a reel is asked per column, and it replaces the ripple rather than adding to it
+### `SlotText`: a reel is asked per column, and it replaces the ripple rather than adding to it
 
 **`computeReel(digitIndex, digitCount)` returns `{ extraTurns, durationMs }` for each column, and giving it turns the cascade off.** All columns start together and the stagger comes from their durations, so the order they stop in is the consumer's to set. A delay on top of that would be a second way to express the same thing. **The extra turns are added to the step that reaches the digit, in the direction the whole number is going.** The angle stays cumulative, and a reel spinning up lands still moving forward. **Every column spins, an unchanged digit included, and nothing spins when no digit changed.** The consumer is not told which columns changed, and a slot machine spins every reel. A sign change alone is `"same"` and moves nothing. **Under reduced motion the extra turns are dropped and each column turns only as far as its digit needs** (WCAG 2.3.3, animation started by an interaction). The reel's duration is kept, because only the turns were named. **The samples are `Samples/Odometer/Reels`, kept in one file with inline samples** under the rule that a registry is split only when a single file would be unreadable. They are functions of position and count only, so each one is a stagger shape rather than a speed.
 
-### `Odometer`: an arriving slot grows in, a leaving one shrinks out, and it stays until it has
+### `SlotText`: an arriving slot grows in, a leaving one shrinks out, and it stays until it has
 
 **Width is animated through the Web Animations API over `turnDurationMs`, for digit columns and fixed slots alike**, since a separator appears at 1,000 just as a digit does. **Slots are matched by position within their own list, as the component already keys them.** A position the new text lacks stays as a leaving slot, holding its last character, its old position in the row and, for a digit, its angle, so it does not spin back to rest while it shrinks. It is removed when its shrink ends, taking any leaving slots after it. A slot the text asks for again mid-shrink grows again from the width it had reached. **The painter is told `isEntering` / `isLeaving` and does its own fading or scaling.** The library animates only the width. **A fixed slot clips its content only while its width is moving**, so a painter drawing wider than its slot is not clipped at rest. **Under reduced motion the width changes at once and no slot is ever flagged** (WCAG 2.3.3).
+
+### `SlotText`: letters are columns of their own, and each turns its own way
+
+**`letters` lists the characters a letter column holds, in the order they sit round it, and any character of the text found in it gets a column.** Digits always do; anything in neither stays a fixed slot as before. A letter column is the same wheel as a digit column with the consumer's faces on it, so the mechanisms, the reels, the slots growing in and the reduced-motion rules all reach it unchanged. A column that changes from a digit to a letter, or onto a different set of faces, starts at rest on its face rather than turning, since there is no step between two wheels that do not share faces.
+
+**The digits turn the way the number goes and the letters do not, because letters have no number.** `compareDigits` reads one direction from the digits as a whole, which is what makes 199 → 200 carry; a word has nothing to compare, so each letter column decides for itself through `computeLetterStepDelta`. **`letterRoute` picks how: `"forward"`, the default, always goes on round the letters, as a departures board does, so C to Z passes every letter between; `"shortest"` takes the nearer way, so C to Z goes back three.** Forward is the default because it is what the physical thing does, and the one a split-flap reads most naturally as; shortest is there for a drum, where a long way round is just a long spin. The angle stays cumulative either way.
+
+**The cascade waits only for columns that change**, so a word that keeps some letters moves the rest at once, the rule digits already follow.
+
+**The Playground's words are padded with spaces to one length**, and the space is the first of `WORD_LETTERS`, so no column ever comes or goes between words and every letter turns rather than growing in. The words and letters live in the shared Playground, since all four apps show the same ones.
 
 ### `Bracket`: a layered tree with connectors, and a knockout draw is one arrangement of it
 
@@ -16043,9 +16064,9 @@ over a spine position instead would have made the elbow a contract, and an elbow
 layout.
 
 **The elbow is therefore sample vocabulary, not behavior**, which is the rule the SVG defs move already
-settled. `Samples/Bracket/Connectors` holds `BracketConnectorPaths` — `elbow`, `roundedElbow` and `curve`,
+settled. `Samples/Bracket/Connectors` holds `BracketConnectorPaths` — `elbow`, `rounded_elbow` and `curve`,
 pure functions returning a `d` string, in a file with no JSX so the unit tests can reach them — and
-`BracketConnectors`, the painters built on top: `flat`, `rounded`, `curved` and `ballAndArrow`. A consumer
+`BracketConnectors`, the painters built on top: `flat`, `rounded`, `curved` and `ball_and_arrow`. A consumer
 who wants the usual thing calls one of those; a consumer who wants something else has the numbers.
 
 **A painter is called inside a JSX expression, and getting that wrong looks like a dead control.** The call
@@ -16115,19 +16136,34 @@ nothing in the component does.
 ### Travelling beams on `Bracket` and `PatchBoard` are Playground paint
 
 From Magic UI's Animated Beam, a pulse of light running along the line between two elements. Both components already
-hand every line to the consumer to draw, so the library learned nothing: each page carries a beam example, and the
-beam is a second path laid over the line with the same `d`.
+hand every line to the consumer to draw, so the library learned nothing: every example on both pages carries beams,
+and a beam is a second path laid over the line with the same `d`.
 
-**`pathLength="1"` makes every line one lap long.** The beam is a dash of `0.18` with a gap of `0.82` of the path,
-and the animation runs `stroke-dashoffset` across exactly one path length, so a pulse takes the same time on a long
-cable as on a short one — travelling faster, and drawn longer, on the long one — and exactly one is ever on a line. The dash moves toward the path's end or its start: a `PatchBoard` cable
-runs from the output to the input it feeds, so it moves toward whichever end is the input; a `Bracket` connector is
-drawn from the parent to the child, so it moves back toward the parent, which is the way to the final.
+**A beam measures its length on screen and moves at one speed.** The dash is `BEAM_DASH_PX` long and travels at
+`BEAM_SPEED_PX_PER_SECOND`, so a pulse looks the same on a short line as on a long one and takes longer on the long
+one. The length is the path's own times the scale it is drawn at (`computeBeamLengthPx`), and a `ResizeObserver` on
+its drawing measures again when the board is scaled, as `PatchBoard`'s zoomed example is. The first build used
+`pathLength="1"`, which gave every line one lap of the same duration: a pulse then raced along a long cable and
+crawled along a short one, which is what was replaced. The dash moves toward the path's end or its start: a
+`PatchBoard` cable runs from the output to the input it feeds, so it moves toward whichever end is the input; a
+`Bracket` connector is drawn from the parent to the child, so it moves back toward the parent, which is the way to the
+final.
+
+**Each beam is one Web Animations API animation, set to the page's clock** — its `currentTime` is the page's time
+modulo its period. Two beams of the same period are therefore always at the same point of it, a beam put on the page
+later carries on in step rather than starting over, and pausing one leaves it where the clock had it. A CSS animation
+could not be set that way: it starts when it is applied.
+
+**On `Bracket` the beams along one route are one pulse.** Every beam reports its length (`onLengthPx`) to the page,
+which adds up each route's lines by the board they are on (`computeRouteSpan`, keyed by `toConnectorBoard`); each beam
+is then given the route's whole length as its period and the length of the lines below it as its start. So one dash
+leaves the focused node and runs to the final across every line in turn, rather than each line running its own.
 
 **On `Bracket` the beam runs only along the focused node's route to the root**, through `isOnFocusedRoute`, which the
-connector defs already carried. The route means "holds focus", so pressing the example's Pause button takes the route
-away with the focus, and the pause is seen on the next node focused. WCAG 2.2.2 is still met: nothing moves until a
-node is focused, and while one is, the pause is one press away and stays in force.
+connector defs already carried. **Both pages carry a "Beams moving" box among their page-wide props**, starting off
+under reduced motion, and that is the stop WCAG 2.2.2 asks of anything moving for more than five seconds: one press
+away, in force across every example, and in force for a route focused afterwards. The separate beam examples went
+with it.
 
 **The beam is a styled component, `PageBeam`, in each Playground**, painted from one shared stylesheet, and the cable's
 curve moved into `PatchBoardContent.const.ts` in the shared Playground so the cable and its beam are the same curve in
@@ -16145,13 +16181,25 @@ From Skiper UI's knockout bracket, which shows a window of the tree and pages th
 
 **Everything outside the family folds onto the member it hangs from.** A node below the last row gathers on the member it feeds; a node with no member on its way to the root — the anchor's own parent, a cousin's branch — gathers on the anchor. A folded node is `aria-hidden="true"` and `inert` from the moment its family stops showing, fades as it glides and is not drawn once it arrives. A connector is drawn as faintly as its fainter end.
 
-**Focus never sits on a folded node, and the keyboard walk is not confined to the family.** Stepping toward the leaves from the family's last row always lands on a folded node, so a confined walk could never go deeper; instead, walking onto a folded node moves the family there first and then moves focus, so the node is unfolded before it is focused (React with `flushSync`, Vue after `nextTick`, Svelte with `flushSync`; Solid updates at once). The tab stop resolves among unfolded nodes. Focus leaving the board shows the root's family, so Tab returns to the remembered node only when that family holds it. A blur from one node to another of the same board does not count as leaving, or the root's family would flash in between and the target could turn `inert` mid-move. Each view also ignores blurs during an arrow-key move (`isStepping`): unfolding the target's family can fold the node that holds focus, and the browser drops focus from it at once, which read as focus leaving. The guard trusts that a blur during a move is the move's own, so if focusing the target ever failed, the board would count itself focused until the next blur. **A node is hidden only once it is folded and has finished fading** (`BracketUtils.getIsFrameHidden`), since a node unfolding starts its glide faded and hiding it then made the focus call land on nothing.
+**The family is a two-way prop, `family`, written by the board as focus moves and by the consumer from outside.** It is named by the node its middle row feeds, `undefined` for the root's own. It replaced an `onFamilyChange` callback: the Playground's stage buttons page through families without focus ever entering the board, which a callback cannot do. `BracketUtils.computeFamilyStep` finds the family a step away and answers the family itself when there is none, so a button can disable itself by comparing the two. **The tree view writes it too**, as focus moves, though it folds nothing — that is what lets a consumer follow the focused node's family with a camera of its own, which is what the Playground does (below).
+
+**Focus never sits on a folded node, and the keyboard walk is not confined to the family.** Stepping toward the leaves from the family's last row always lands on a folded node, so a confined walk could never go deeper; instead, walking onto a folded node moves the family there first and then moves focus, so the node is unfolded before it is focused (React with `flushSync`, Vue after `nextTick`, Svelte with `flushSync`; Solid updates at once). The tab stop resolves among unfolded nodes. Focus leaving the board leaves the family where it was, so Tab returns to the remembered node, which the family still holds. A blur from one node to another of the same board does not count as leaving, or the root's family would flash in between and the target could turn `inert` mid-move. Each view also ignores blurs during an arrow-key move (`isStepping`): unfolding the target's family can fold the node that holds focus, and the browser drops focus from it at once, which read as focus leaving. The guard trusts that a blur during a move is the move's own, so if focusing the target ever failed, the board would count itself focused until the next blur. **A node is hidden only once it is folded and has finished fading** (`BracketUtils.getIsFrameHidden`), since a node unfolding starts its glide faded and hiding it then made the focus call land on nothing.
 
 **The board is sized for the largest family, so the page never moves while focus does.** `computeFamilyExtent` keeps the most layers and rows any family needs; a family sits with its top row at the root's end, centered across the board, so moving focus outward pages the window one layer at a time. Each layer header travels with its layer, and a header the family does not reach folds away with its list.
 
-**The glide is drawn frame by frame, nodes and connectors together.** The connectors are the consumer's SVG, and the only CSS route to moving a path is transitioning `d`, which Safari does not support. One clock (`TreemapUtils.createZoomClock`, now with four users, so its name may want to become neutral) drives every node, header and connector through `computeShownArrangement` on an ease-in-out curve; a glide that starts mid-glide starts from what is on screen, and `transitionDurationMs: 0` jumps. Only a change of family glides.
+**The glide is drawn frame by frame, nodes and connectors together.** The connectors are the consumer's SVG, and the only CSS route to moving a path is transitioning `d`, which Safari does not support. One clock (`TreemapUtils.createZoomClock`, now with four users, so its name may want to become neutral) drives every node, header and connector through `computeShownArrangement` on an ease-in-out curve; a glide that starts mid-glide starts from what is on screen, and `transitionDurationMs: 0` jumps. A change of family glides, and so does a change of `view`: the tree view has an arrangement of its own (`computeTreeArrangement`), so the board grows or shrinks between the two along with everything on it. The start of a glide is whatever was last drawn, so a change arriving mid-glide never jumps.
 
-**`onFamilyChange` names the family**, handed the value and placement of the node its middle row feeds, or `undefined` for the root's own family; the Playground's readout is built from it.
+**`renderLayerHeader` is handed whether its layer is the current round**, `isCurrent`, which is the layer holding the family's middle row (`BracketUtils.getFamilyLayer`) — the focused node's own layer, since the family is named by its parent — and the root's layer for the root's own family, whose middle the root is. Vue's slot takes one value, so there it is `{ layer, state }`, the shape its `renderNode` already had.
+
+### `Bracket`: the Playground frames one family with a camera over the whole draw
+
+**The family example does not use `view: "family"`.** It keeps the whole draw in the tree view, always mounted, and moves a camera over it: a frame the size of the largest family, and inside it the board translated and scaled so the family named by `family` fills the frame, with room for the round names. It replaced the example that showed the folding view. Nothing is folded, so every node stays where the tree puts it, reachable and in the accessibility tree.
+
+**The camera glides frame by frame over `transitionDurationMs`**, from wherever it is drawn, eased in and out, and jumps at `0`, which reduced motion passes. **Zoom out fits the whole draw and Zoom in goes back to the family**; the stage buttons are disabled while zoomed out, since paging families the camera is not framing would change nothing anyone can see.
+
+**The round names are pinned to the frame's leading edge**, its top while the rounds run across and its left while they run down, by translating each header against the camera through two variables (`headerPinXVar`, `headerPinYVar`). Only the current round is lit, from `isCurrent`. The pinned headers sit above the nodes, so a node outside the family that the frame shows at its very edge can sit under its round's name; **a pinned name lets the pointer through** (`pointer-events: none`), since it is not something to press, so the node under it still takes a press. `bracket.spec.ts` presses at a point inside both.
+
+**The library's `view: "family"` stays**, folding and all, for a consumer who wants the board itself to show one family. The Playground no longer demonstrates it.
 
 **What WCAG said.** 1.3.1 Info and Relationships: folded nodes are out of the accessibility tree, so the list reports only what is on screen. 2.4.3 Focus Order: the walk keeps its order and the family moves ahead of it. 2.4.11 Focus Not Obscured (Minimum): the focused node is always a member of the family on screen. 3.2.1 On Focus, "When any user interface component receives focus, it does not initiate a change of context": checked, moving the family is a change of content inside the widget, not of context. 2.3.3 Animation from Interactions: the glide is started by the person and turned off with `0`, which the Playground passes under reduced motion.
 
@@ -16367,7 +16415,7 @@ From Magic UI's Spinning Text, text set round a circle and turning. **`PaintedTe
 
 **Turning is the text sliding along its path, through `progress` and `playback`**, in the shape `Trail` and `Typewriter` use, with `lapDurationMs` for one lap and `TrailUtils.run` as the clock. **`playback` is off unless asked for, unlike `Trail`'s**: text on a path is a layout first, so adding a path does not set anything moving. The slide always loops.
 
-**Text that slides past the end comes round from the start because every layer is drawn twice**, the second copy one whole path length behind and hidden from screen readers. On an open path it reads as a ticker; a text longer than its path overlaps itself where the two copies meet.
+**Text that slides past the end comes round from the start because the path it is set on is the consumer's path traced twice**, `PaintedTextUtils.computeLapPath`, and every layer is drawn once along it. The second lap is the same line on the page, so a letter passing the end of the first carries straight on along the second. The first build drew every layer twice instead, the second copy one path length behind; the browser draws a letter only while its middle is on the path, and at the seam between the two copies there was a pixel or so neither copy counted as on, so a letter crossing it vanished for a frame. On an open path the jump back between laps sends the text in at the near end as it leaves at the far one, which reads as a ticker; a text longer than one lap overlaps itself.
 
 **`isFittedToPath` stretches or squeezes the spacing so the text runs the path's whole length once**, through `textLength` and `lengthAdjust="spacing"` on the `<text>` (Solid's types do not offer it on `<textPath>`). On a closed path the text's end meets its own start, so a trailing space or separator is asked for in the docs.
 
@@ -16593,13 +16641,14 @@ strength carried in each letter's own delay — so the browser blends any proper
 `Proximity`'s falloff of a plain distance (`ProximityUtils.getDistanceFalloff`): one under the point, falling as the
 square of the distance to nothing at `reachPx`.
 
-**Every line is sized for all its letters at the last frame, and that is written once in the shared layer.**
-`LetterDriverUtils.wrapAtLastFrame` reads each animation's last keyframe from the page's style sheets and, when any
-of them changes a letter's width, measures the words with every letter at that frame in a hidden box, through a
+**Every line is sized for all its letters at their widest end frame, and that is written once in the shared layer.**
+`LetterDriverUtils.wrapAtWidestFrame` reads each animation's end keyframes from the page's style sheets and, when any
+of them changes a letter's width, measures the words with every letter at the wider of the two in a hidden box, through a
 `measureTextWidths` override `JSXTextParserUtils.getInlinedSegments` now accepts; otherwise it wraps exactly as before,
 so `Typewriter` changes only for a keyframe that widens letters. The user's design over reserving room per letter or
 per word: at rest the spare room sits at the end of each line, and a growing letter really pushes the rest of its line
-along. **The contract is that the last frame is the widest**, and the props documentation says so.
+along. **The contract is that the widest frame is the first or the last**, and the props documentation says so: keyframes running
+from spread to closed — the barrel example's letter spacing, widest at rest — wrap as safely as ones that grow.
 
 **Nearness is measured from where the letters sit at rest**, so a letter pushed along by its neighbor does not weaken
 because of the push and the effect cannot feed back on itself — `Proximity`'s rule for the dock. A second copy of the
@@ -18756,10 +18805,13 @@ every die had it. `flex-shrink: 0` keeps the box whole and lets it overflow the 
 overflow is the box's empty corners. `e2e/die.spec.ts` checks that every face is laid out around the box's middle.
 
 **A change of shape part-way through a turn turns on to the same face of the new shape.** The roller's `reshape` is
-what both views call when the geometry changes: at rest it puts the die straight onto the face, and during a turn the
-page asked for it starts the turn again from wherever the die is drawn, towards that face's rotation on the new shape.
-The common way in is switching to a die with fewer faces than the number showing, which pulls the number back and
-changes the shape at once. Two alternatives were set aside by the user. Snapping onto the new shape, which the port
+what both views call when the geometry changes: at rest on a face the new shape also has, it puts the die straight
+onto that face, and during a turn the page asked for it starts the turn again from wherever the die is drawn, towards
+that face's rotation on the new shape. **At rest on a face the new shape lacks, it turns too**, onto the face the
+target clamps to. The common way in is switching to a die with fewer faces than the number showing, which pulls the
+number back and changes the shape at once — and the change of shape and the change of face arrive together, so which
+one the framework answers first is not something to lean on: putting a resting die straight onto the clamped face
+made a later `turnToTarget` see it already resting there and do nothing, and the switch snapped. Two alternatives were set aside by the user. Snapping onto the new shape, which the port
 had shipped, jumps mid-motion. Finishing the turn on the old shape's angle, which the Solid view did before the port,
 can leave the die resting crooked. Turning to whichever face of the new shape is nearest to the viewer was also
 rejected: it can land off the face the page asked for, and then the die would have to overwrite the page's own face.

@@ -62,9 +62,9 @@
         },
         {
             key: "ring",
-            name: "A ring that turns and leans",
+            name: "A ring at the edge",
             readout: () =>
-                `slide ${ringIndex + 1} of ${controls.slideCount} — the paddle wheel rule, the slides standing round an upright spine with each painting only the half away from it, inside a Tilter, with its progress written on a clock for a continuous turn; Stop is the way to halt it that a turn running on its own owes the reader`,
+                `slide ${ringIndex + 1} of ${controls.slideCount} — the paddle wheel rule, the slides standing round an upright spine with each painting only the half away from it, the spine set flush with the box's right edge so only the half turning outward shows, with its progress written on a clock for a continuous turn; Stop is the way to halt it that a turn running on its own owes the reader`,
             component: ringExample,
             path: `${EXAMPLES_ROOT}/Ring.svelte`,
         },

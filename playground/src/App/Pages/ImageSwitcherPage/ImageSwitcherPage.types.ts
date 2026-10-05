@@ -1,1 +1,1 @@
-export type SourceType = "profile" | "date" | "missingFile" | "none";
+export type SourceType = "profile" | "date" | "missing_file" | "none";

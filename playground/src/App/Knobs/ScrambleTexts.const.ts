@@ -2,7 +2,7 @@ import { ScrambleTextGlyphs, ScrambleTextWeights } from "@thewaver/ss-components
 
 export namespace ScrambleTextKnobs {
     export const GLYPH_SETS = ["library", ...ScrambleTextGlyphs.SAMPLE_KEYS] as const;
-    export const SETTLE_ORDERS = ["leftToRight", ...ScrambleTextWeights.SAMPLE_KEYS] as const;
+    export const SETTLE_ORDERS = ["left_to_right", ...ScrambleTextWeights.SAMPLE_KEYS] as const;
 
     export const MIN_SETTLE_DURATION_MS = 0;
     export const MAX_SETTLE_DURATION_MS = 4000;

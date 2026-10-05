@@ -53,6 +53,7 @@
     const computeAnimationName = $derived(props.computeAnimationName ?? PROXIMITY_TEXT_DEFAULTS.computeAnimationName);
     const reachPx = $derived(props.reachPx ?? PROXIMITY_TEXT_DEFAULTS.reachPx);
     const isDisabled = $derived(props.isDisabled ?? false);
+    const distanceAxis = $derived(props.distanceAxis ?? PROXIMITY_TEXT_DEFAULTS.distanceAxis);
 
     const registry = LetterDriverUtils.createRegistry();
     const getIsDriven = readStore(registry, (state) => state.entries.length > 0);
@@ -108,6 +109,7 @@
                 getSize(),
             ),
             reachPx,
+            distanceAxis,
         ),
     );
 

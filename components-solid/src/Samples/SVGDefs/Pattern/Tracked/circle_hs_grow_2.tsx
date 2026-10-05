@@ -22,7 +22,7 @@ export const circle_hs_grow_2 = (opts?: PatternProximityOpts): TrackedPatternCon
                     id: `pattern1-${id}`,
                     renderDefsElement: () =>
                         SVGPatterns.computeTrackedLayoutPattern(
-                            "halfShift",
+                            "half_shift",
                             `pattern1-${id}`,
                             getRef,
                             defs,

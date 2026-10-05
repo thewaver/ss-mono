@@ -45,7 +45,7 @@ export namespace SVGPatternLayouts {
                 (MathUtils.isEven(index.row) && isFirstOrLastCol(index, cellCount)) ||
                 isFirstOrLastRow(index, cellCount),
         },
-        halfShift: {
+        half_shift: {
             computeCellCount: (requested) => ({ rows: toEven(requested.rows), cols: toOdd(requested.cols) }),
             computePatternSize: (cellCount, cellSize) => ({
                 width: cellSize.width * (cellCount.cols - 1),
@@ -57,7 +57,7 @@ export namespace SVGPatternLayouts {
             }),
             computeIsSplit: (index, cellCount) => isFirstOrLastCol(index, cellCount) && MathUtils.isEven(index.row),
         },
-        halfDrop: {
+        half_drop: {
             computeCellCount: (requested) => ({ rows: toOdd(requested.rows), cols: toEven(requested.cols) }),
             computePatternSize: (cellCount, cellSize) => ({
                 width: cellSize.width * cellCount.cols,
@@ -81,7 +81,7 @@ export namespace SVGPatternLayouts {
             }),
             computeIsSplit: (index, cellCount) => isFirstOrLastCol(index, cellCount),
         },
-        triangleSideways: {
+        triangle_sideways: {
             computeCellCount: (requested) => ({ rows: toOdd(requested.rows * 2), cols: toEven(requested.cols) }),
             computePatternSize: (cellCount, cellSize) => ({
                 width: cellSize.width * cellCount.cols,
@@ -93,7 +93,7 @@ export namespace SVGPatternLayouts {
             }),
             computeIsSplit: (index, cellCount) => isFirstOrLastRow(index, cellCount),
         },
-        hexPointyTop: {
+        hex_pointy_top: {
             computeCellCount: (requested) => ({ rows: toOdd(requested.rows), cols: toOdd(requested.cols) }),
             computePatternSize: (cellCount, cellSize) => ({
                 width: cellSize.width * (cellCount.cols - 1),
@@ -107,7 +107,7 @@ export namespace SVGPatternLayouts {
                 (MathUtils.isEven(index.row) && isFirstOrLastCol(index, cellCount)) ||
                 isFirstOrLastRow(index, cellCount),
         },
-        hexFlatTop: {
+        hex_flat_top: {
             computeCellCount: (requested) => ({ rows: toOdd(requested.rows), cols: toOdd(requested.cols) }),
             computePatternSize: (cellCount, cellSize) => ({
                 width: cellSize.width * (cellCount.cols - 1) * 0.75,

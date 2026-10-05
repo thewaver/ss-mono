@@ -402,7 +402,13 @@ test("on a path, the text is set along the path, and exactly one copy of it is r
     expect(readable[0].content, "and it says what the consumer wrote").toBe(drawing.source);
 });
 
-test("on a path, each layer is drawn a second time one path length behind, so nothing slides off into a gap", async ({
+/**
+ * Text slides by moving where it starts along its path, so whatever passes the end has to show again at the start.
+ * It is drawn once per layer along the consumer's path traced twice, end to end, so it carries on along the second
+ * lap rather than being handed to a second copy at a seam. What is read back is that each layer is one copy, and
+ * that the path it follows is the same line on the page for its second half as for its first.
+ */
+test("on a path, each layer is drawn once along the path traced twice, so nothing slides off into a gap", async ({
     page,
 }) => {
     await expect(page.locator(`${demo("circle")} ${PATH_SVG}`)).toBeVisible();
@@ -412,14 +418,21 @@ test("on a path, each layer is drawn a second time one path length behind, so no
 
     expect(layers.length, "the text is painted at all").toBeGreaterThan(0);
 
-    for (const copies of layers) {
-        expect(copies, "two copies per layer").toHaveLength(2);
-        expect(copies[0].startOffset - copies[1].startOffset, "one whole path apart").toBeCloseTo(
-            drawing.pathLength,
-            1,
-        );
-        expect(copies[1].isReadable, "and the second is never read out").toBe(false);
-    }
+    for (const copies of layers) expect(copies, "one copy per layer").toHaveLength(1);
+
+    const laps = await page.locator(`${demo("circle")} ${PATH_SVG}`).evaluate((svg, href) => {
+        const path = svg.querySelector(`defs > path${href}`) as SVGPathElement;
+        const lapLength = path.getTotalLength() * 0.5;
+
+        return [0.1, 0.35, 0.6, 0.85].map((share) => {
+            const first = path.getPointAtLength(lapLength * share);
+            const second = path.getPointAtLength(lapLength * (1 + share));
+
+            return Math.hypot(first.x - second.x, first.y - second.y);
+        });
+    }, drawing.hrefs[0]);
+
+    for (const gap of laps) expect(gap, "the second lap runs over the first").toBeLessThan(0.5);
 });
 
 test("the Pause button stops the text sliding along its path, and pressing it again starts it", async ({ page }) => {
@@ -443,7 +456,10 @@ test("text fitted to its path is spaced to run the path's whole length once, and
     const fitted = await readPathTexts(page, "circle");
 
     for (const text of fitted.texts) {
-        expect(Number(text.textLength), "the text is as long as the path").toBeCloseTo(fitted.pathLength, 1);
+        expect(Number(text.textLength), "the text is as long as one lap of the path").toBeCloseTo(
+            fitted.pathLength * 0.5,
+            1,
+        );
     }
 
     await revealProp(page, "isFittedToPath", "circle");
@@ -486,4 +502,40 @@ test("on a path, the drawing's box holds every letter wherever the text has slid
             await page.waitForTimeout(SAMPLE_GAP_MS);
         }
     }
+});
+
+/**
+ * A paint that loops forever with no delay has no start anybody can see, only a phase, so it runs on the page's
+ * clock: it is written to begin at its drawing's time zero, and every drawing holding one has its clock set to the
+ * page's. Two drawings of the same loop then show the same moment of it, and one put in the page later carries the
+ * loop on rather than restarting it. Read here as each drawing's clock against the page's, at one instant.
+ */
+test("a paint that loops forever runs on the page's clock, whichever drawing it is in", async ({ page }) => {
+    const readClocks = () =>
+        page.evaluate(() => {
+            const nowS = performance.now() / 1000;
+            const loops = [...document.querySelectorAll("animate, animateTransform, animateMotion")].filter(
+                (element) => element.getAttribute("repeatCount") === "indefinite",
+            ) as SVGAnimationElement[];
+            const outermost = (element: SVGElement) => {
+                let svg = element.ownerSVGElement;
+
+                while (svg?.ownerSVGElement) svg = svg.ownerSVGElement;
+
+                return svg;
+            };
+
+            return {
+                begins: [...new Set(loops.map((element) => element.getAttribute("begin")))],
+                lagsS: [...new Set(loops.map(outermost))].map((svg) => Math.abs(svg!.getCurrentTime() - nowS)),
+            };
+        });
+
+    await expect.poll(async () => (await readClocks()).lagsS.length, "the page paints some loop").toBeGreaterThan(0);
+
+    const { begins, lagsS } = await readClocks();
+
+    expect(begins, "every endless loop begins at its drawing's time zero").toEqual(["0s"]);
+
+    for (const lagS of lagsS) expect(lagS, "and its drawing's clock reads the page's").toBeLessThan(0.1);
 });

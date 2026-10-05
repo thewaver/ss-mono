@@ -39,7 +39,7 @@
         width: textContainerWidth,
         computeAnimationName,
         computeCharacterWeights: (count) =>
-            arrivalOrder === "leftToRight" ? [] : ScrambleTextWeights.SAMPLE_WEIGHTS[arrivalOrder](count),
+            arrivalOrder === "left_to_right" ? [] : ScrambleTextWeights.SAMPLE_WEIGHTS[arrivalOrder](count),
     });
 
     const examples: ExampleDefs[] = [

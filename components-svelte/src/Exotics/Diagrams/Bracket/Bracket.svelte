@@ -28,6 +28,8 @@
     let hasFocus = $state(false);
     let glideFrom = $state.raw<BracketArrangement>();
     let glidedAnchorId: string | undefined;
+    let glidedIsFamilyView: boolean | undefined;
+    let lastShown: BracketArrangement | undefined;
     let isStepping = false;
 
     const glideClock = TreemapUtils.createZoomClock();
@@ -65,27 +67,28 @@
 
     const anchorId = $derived(BracketUtils.findNodeId(props.root, layout, getFamily()));
 
-    const showFamilyOf = (id: string) => {
-        if (!isFamilyView) return;
+    const currentLayer = $derived(BracketUtils.getFamilyLayer(layout, anchorId));
 
+    const showFamilyOf = (id: string) => {
         const familyAnchorId = BracketUtils.getFamilyAnchorId(id);
 
         setFamily(familyAnchorId === undefined ? undefined : BracketUtils.findNode(props.root, familyAnchorId));
     };
 
-    const computeArrangement = (id: string | undefined) =>
-        BracketUtils.computeFamilyArrangement(layout, geometry, extent, id);
+    const target = $derived(
+        isFamilyView
+            ? BracketUtils.computeFamilyArrangement(layout, geometry, extent, anchorId)
+            : BracketUtils.computeTreeArrangement(layout, geometry),
+    );
+    const shown = $derived(BracketUtils.computeShownArrangement(glideFrom, target, getProgress()));
 
-    const target = $derived(isFamilyView ? computeArrangement(anchorId) : undefined);
-    const shown = $derived(target && BracketUtils.computeShownArrangement(glideFrom, target, getProgress()));
-
-    const boardSize = $derived(geometry.boardSize);
-    const connectors = $derived(BracketUtils.computeConnectors(layout, geometry, boardId, focusedId, shown?.nodes));
+    const boardSize = $derived(shown.boardSize);
+    const connectors = $derived(BracketUtils.computeConnectors(layout, geometry, boardId, focusedId, shown.nodes));
 
     const placementById = $derived(new Map(layout.placements.map((placement) => [placement.id, placement])));
 
     const stops = $derived(layout.placements.filter((placement) => !placement.isDisabled));
-    const unfoldedStops = $derived(stops.filter((placement) => !target?.nodes[placement.id]?.isFolded));
+    const unfoldedStops = $derived(stops.filter((placement) => !target.nodes[placement.id]?.isFolded));
     const rovingId = $derived(BracketUtils.resolveRovingId(unfoldedStops, lastFocusedId));
 
     const getIsNode = (eventTarget: EventTarget | null) =>
@@ -93,19 +96,26 @@
 
     $effect(() => glideClock.stop);
 
+    $effect(() => {
+        lastShown = shown;
+    });
+
     $effect.pre(() => {
         const next = anchorId;
+        const isFamily = isFamilyView;
 
         untrack(() => {
-            if (next === glidedAnchorId) return;
+            if (next === glidedAnchorId && isFamily === glidedIsFamilyView) return;
 
-            const previous = glidedAnchorId;
+            const isViewChange = glidedIsFamilyView !== undefined && glidedIsFamilyView !== isFamily;
+            const isFirst = glidedIsFamilyView === undefined;
 
             glidedAnchorId = next;
+            glidedIsFamilyView = isFamily;
 
-            if (!isFamilyView) return;
+            if (isFirst || (!isFamily && !isViewChange)) return;
 
-            glideFrom = BracketUtils.computeShownArrangement(glideFrom, computeArrangement(previous), getProgress());
+            glideFrom = lastShown;
             glideClock.start(props.transitionDurationMs ?? BRACKET_DEFAULTS.transitionDurationMs);
         });
     });
@@ -156,9 +166,9 @@
 {#snippet item(id: string)}
     {@const placement = placementById.get(id) ?? BRACKET_MISSING_PLACEMENT}
     {@const isNodeDisabled = placement.isDisabled}
-    {@const frame = shown?.nodes[id]}
+    {@const frame = shown.nodes[id]}
     {@const inset = frame ?? BracketUtils.computeInset(geometry, placement)}
-    {@const isFolded = target?.nodes[id]?.isFolded ?? false}
+    {@const isFolded = target.nodes[id]?.isFolded ?? false}
     <li
         class={styles.bracketItem}
         style:left={`${inset.left}px`}
@@ -213,13 +223,9 @@
 >
     <svg class={styles.bracketConnectors} viewBox={`0 0 ${boardSize.width} ${boardSize.height}`} aria-hidden="true">
         {#each connectors as defs}
-            {#if shown}
-                <g style:opacity={BracketUtils.computeConnectorOpacity(shown.nodes, defs)}>
-                    {@render props.renderConnector?.(defs)}
-                </g>
-            {:else}
+            <g style:opacity={BracketUtils.computeConnectorOpacity(shown.nodes, defs)}>
                 {@render props.renderConnector?.(defs)}
-            {/if}
+            </g>
         {/each}
     </svg>
 
@@ -227,8 +233,8 @@
         {#each { length: layout.layerCount }, layer}
             {@const headerId = `${boardId}-layer-${layer}`}
             {@const headerBox = BracketUtils.computeHeaderBox(geometry, layer)}
-            {@const headerFrame = shown?.headers[layer]}
-            {@const isHeaderFolded = target?.headers[layer]?.isFolded ?? false}
+            {@const headerFrame = shown.headers[layer]}
+            {@const isHeaderFolded = target.headers[layer]?.isFolded ?? false}
             <div
                 id={headerId}
                 class={styles.bracketLayerHeader}
@@ -240,7 +246,7 @@
                 style:visibility={BracketUtils.getIsFrameHidden(headerFrame) ? "hidden" : undefined}
                 aria-hidden={isHeaderFolded ? "true" : undefined}
             >
-                {@render props.renderLayerHeader(layer)}
+                {@render props.renderLayerHeader(layer, { isCurrent: currentLayer === layer })}
             </div>
 
             <ul

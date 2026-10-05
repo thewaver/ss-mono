@@ -6,7 +6,6 @@
         Carousel,
         CarouselPlacementUtils,
         MediaQueryMonitorSvelteUtils,
-        Tilter,
     } from "@thewaver/ss-components-svelte";
     import { CarouselKnobs } from "@thewaver/ss-playground/App/Knobs/Carousels.const";
     import {
@@ -19,8 +18,6 @@
     import PageButtonContent from "../../../../StyledComponents/ButtonContent/ButtonContent.svelte";
     import PageCarouselSlide from "../../../../StyledComponents/CarouselContent/PageCarouselSlide.svelte";
     import type { CarouselExampleProps } from "../../Carousels.types";
-
-    const TILT_DEGREES = 18;
 
     type Props = Pick<CarouselExampleProps, "slides" | "index" | "isDisabled" | "orientation">;
 
@@ -59,36 +56,34 @@
 </script>
 
 <div class={styles.ringStack}>
-    <Tilter maxTiltDegrees={TILT_DEGREES}>
-        <div class={styles.ringFrame}>
-            <div class={styles.ringSlot}>
-                <Carousel
-                    computePlacement={computeRingPlacement}
-                    slides={props.slides}
-                    bind:index
-                    bind:progress
-                    isDisabled={props.isDisabled}
-                    orientation={props.orientation}
-                    ariaLabel={"Turning ring"}
-                    computeSlideLabel={computePositionLabel}
-                    computeStepLabel={computeCarouselStepLabel}
-                    computeRotationLabel={computeCarouselRotationLabel}
-                >
-                    {#snippet renderSlide(slide, state)}
-                        <div class={frameClasses.front}>
-                            <PageCarouselSlide {state}>{slide}</PageCarouselSlide>
-                        </div>
-                    {/snippet}
+    <div class={styles.ringFrame}>
+        <div class={styles.ringSlot}>
+            <Carousel
+                computePlacement={computeRingPlacement}
+                slides={props.slides}
+                bind:index
+                bind:progress
+                isDisabled={props.isDisabled}
+                orientation={props.orientation}
+                ariaLabel={"Turning ring"}
+                computeSlideLabel={computePositionLabel}
+                computeStepLabel={computeCarouselStepLabel}
+                computeRotationLabel={computeCarouselRotationLabel}
+            >
+                {#snippet renderSlide(slide, state)}
+                    <div class={frameClasses.front}>
+                        <PageCarouselSlide {state}>{slide}</PageCarouselSlide>
+                    </div>
+                {/snippet}
 
-                    {#snippet renderSlideBack(slide, state)}
-                        <div class={frameClasses.back}>
-                            <PageCarouselSlide {state}>{slide}</PageCarouselSlide>
-                        </div>
-                    {/snippet}
-                </Carousel>
-            </div>
+                {#snippet renderSlideBack(slide, state)}
+                    <div class={frameClasses.back}>
+                        <PageCarouselSlide {state}>{slide}</PageCarouselSlide>
+                    </div>
+                {/snippet}
+            </Carousel>
         </div>
-    </Tilter>
+    </div>
 
     <Button
         id={"ringTurn"}

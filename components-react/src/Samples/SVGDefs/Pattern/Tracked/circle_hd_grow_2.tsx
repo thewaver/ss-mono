@@ -29,7 +29,7 @@ const PatternElement = (props: PatternElementProps) => {
     const r = Math.min(cellSize.width, cellSize.height) * 0.5;
 
     return SVGPatterns.computeTrackedLayoutPattern(
-        "halfDrop",
+        "half_drop",
         `pattern1-${props.id}`,
         cellSize,
         areaSize,

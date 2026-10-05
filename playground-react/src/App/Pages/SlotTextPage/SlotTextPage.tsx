@@ -1,18 +1,22 @@
 import { useState } from "react";
 
 import { Button, SLOT_TEXT_DEFAULTS, SlotTextReels } from "@thewaver/ss-components-react";
+import type { SlotTextLetterRoute, SlotTextMechanism } from "@thewaver/ss-components-react";
 import { SlotTextKnobs } from "@thewaver/ss-playground/App/Knobs/SlotTexts.const";
+import { WORDS } from "@thewaver/ss-playground/App/Pages/SlotTextPage/SlotTextPage.const";
 import * as styles from "@thewaver/ss-playground/App/Pages/SlotTextPage/SlotTextPage.css";
 
 import { PageExampleKnobs } from "../../PageComponents/ExampleKnobs/ExampleKnobs";
 import { PageExamples } from "../../PageComponents/Examples/Examples";
 import { PageNumberField, PageSelectField } from "../../PageComponents/Field/Field";
+import { PageMeasureBox } from "../../PageComponents/MeasureBox/MeasureBox";
 import { PageProp } from "../../PageComponents/Prop/Prop";
 import { PagePropsPanel } from "../../PageComponents/PropsPanel/PropsPanel";
 import { PageButtonContent } from "../../StyledComponents/ButtonContent/ButtonContent";
 import { CounterExample } from "./Examples/Counter";
 import { ReelsExample } from "./Examples/Reels";
 import { SplitFlapExample } from "./Examples/SplitFlap";
+import { WordsExample } from "./Examples/Words";
 import type { SlotTextExampleProps } from "./SlotTextPage.types";
 
 const EXAMPLES_ROOT = "/src/App/Pages/SlotTextPage/Examples";
@@ -27,6 +31,12 @@ const REEL_PAD = "0";
 const REEL_RANGE = 10 ** REEL_DIGITS;
 const STARTING_REEL_VALUE = 7;
 const FIELD_WIDTH = 130;
+
+const STEPS = [
+    { id: "stepDown", flapId: "flapStepDown", label: `take ${SMALL_STEP}`, delta: -SMALL_STEP },
+    { id: "stepUp", flapId: "flapStepUp", label: `add ${SMALL_STEP}`, delta: SMALL_STEP },
+    { id: "jumpUp", flapId: "flapJumpUp", label: `add ${BIG_STEP}`, delta: BIG_STEP },
+];
 
 const group = (value: number) => {
     const digits = String(Math.abs(value));
@@ -51,9 +61,27 @@ export const SlotTextPage = () => {
     const [cascadeMs, setCascadeMs] = useState(SLOT_TEXT_DEFAULTS.turnDelayMs);
     const [reelValue, setReelValue] = useState(STARTING_REEL_VALUE);
     const [reelKey, setReelKey] = useState<SlotTextReels.SampleKey>(SlotTextKnobs.STARTING_REEL_KEY);
+    const [wordIndex, setWordIndex] = useState(FIRST);
+    const [wordMechanism, setWordMechanism] = useState<SlotTextMechanism>(SlotTextKnobs.STARTING_WORD_MECHANISM);
+    const [letterRoute, setLetterRoute] = useState<SlotTextLetterRoute>(SlotTextKnobs.STARTING_LETTER_ROUTE);
 
     const step = (delta: number) =>
         setValue((prev) => Math.min(Math.max(prev + delta, SlotTextKnobs.MIN_VALUE), SlotTextKnobs.MAX_VALUE));
+
+    const renderStepControls = (isFlap: boolean) => (
+        <div className={styles.controls}>
+            {STEPS.map((entry) => (
+                <Button
+                    key={entry.id}
+                    id={isFlap ? entry.flapId : entry.id}
+                    renderContent={(flags) => <PageButtonContent flags={flags}>{entry.label}</PageButtonContent>}
+                    onClick={() => {
+                        step(entry.delta);
+                    }}
+                />
+            ))}
+        </div>
+    );
 
     const commonProps: SlotTextExampleProps = {
         text: group(value),
@@ -69,39 +97,13 @@ export const SlotTextPage = () => {
                 "every column that has to carry waits for the one to its right, a column going nine to zero keeps turning forward rather than rewinding, and crossing zero turns the whole number back the other way, and a digit or separator arriving or going grows in or shrinks away while it fades",
             component: () => (
                 <div className={styles.stack}>
-                    <CounterExample {...commonProps} />
+                    <PageMeasureBox>
+                        <div className={styles.line}>
+                            <CounterExample {...commonProps} />
+                        </div>
+                    </PageMeasureBox>
 
-                    <div className={styles.controls}>
-                        <Button
-                            id={"stepDown"}
-                            renderContent={(flags) => (
-                                <PageButtonContent flags={flags}>{`take ${SMALL_STEP}`}</PageButtonContent>
-                            )}
-                            onClick={() => {
-                                step(-SMALL_STEP);
-                            }}
-                        />
-
-                        <Button
-                            id={"stepUp"}
-                            renderContent={(flags) => (
-                                <PageButtonContent flags={flags}>{`add ${SMALL_STEP}`}</PageButtonContent>
-                            )}
-                            onClick={() => {
-                                step(SMALL_STEP);
-                            }}
-                        />
-
-                        <Button
-                            id={"jumpUp"}
-                            renderContent={(flags) => (
-                                <PageButtonContent flags={flags}>{`add ${BIG_STEP}`}</PageButtonContent>
-                            )}
-                            onClick={() => {
-                                step(BIG_STEP);
-                            }}
-                        />
-                    </div>
+                    {renderStepControls(false)}
                 </div>
             ),
             path: `${EXAMPLES_ROOT}/Counter.tsx`,
@@ -114,7 +116,11 @@ export const SlotTextPage = () => {
             component: () => (
                 <>
                     <div className={styles.stack}>
-                        <ReelsExample text={pad(reelValue)} reelKey={reelKey} />
+                        <PageMeasureBox>
+                            <div className={styles.line}>
+                                <ReelsExample text={pad(reelValue)} reelKey={reelKey} />
+                            </div>
+                        </PageMeasureBox>
 
                         <div className={styles.controls}>
                             <Button
@@ -152,9 +158,86 @@ export const SlotTextPage = () => {
             key: "splitFlap",
             name: "Departures board",
             readout: () =>
-                "each column drops one flap after another through every digit between the old one and the new, the top half of the digit going falling to uncover the bottom half of the digit coming; a column that carries waits for the one to its right, and a column whose digit has not changed does not flip",
-            component: () => <SplitFlapExample {...commonProps} />,
+                "the counter's number on flaps: each column drops one flap after another through every digit between the old one and the new, the top half of the digit going falling to uncover the bottom half of the digit coming; a column that carries waits for the one to its right, and a column whose digit has not changed does not flip",
+            component: () => (
+                <div className={styles.stack}>
+                    <PageMeasureBox>
+                        <div className={styles.line}>
+                            <SplitFlapExample {...commonProps} />
+                        </div>
+                    </PageMeasureBox>
+
+                    {renderStepControls(true)}
+                </div>
+            ),
             path: `${EXAMPLES_ROOT}/SplitFlap.tsx`,
+        },
+        {
+            key: "words",
+            name: "Words, a letter at a time",
+            readout: () =>
+                `showing: ${WORDS[wordIndex].trim()} — every letter is a column of its own that turns through the alphabet to its next letter, with the words padded by spaces so no column comes or goes; forward always goes on round, as a departures board does, and shortest takes the nearer way`,
+            component: () => (
+                <>
+                    <div className={styles.stack}>
+                        <PageMeasureBox>
+                            <div className={styles.line}>
+                                <WordsExample
+                                    {...commonProps}
+                                    text={WORDS[wordIndex]}
+                                    mechanism={wordMechanism}
+                                    letterRoute={letterRoute}
+                                />
+                            </div>
+                        </PageMeasureBox>
+
+                        <div className={styles.controls}>
+                            <Button
+                                id={"nextWord"}
+                                renderContent={(flags) => (
+                                    <PageButtonContent flags={flags}>Next word</PageButtonContent>
+                                )}
+                                onClick={() => {
+                                    setWordIndex((index) => (index + 1) % WORDS.length);
+                                }}
+                            />
+                        </div>
+                    </div>
+
+                    <PageExampleKnobs>
+                        <PageProp
+                            itemKey={"mechanism"}
+                            label={"Mechanism"}
+                            hint={"Whether each letter turns on a drum or drops through flaps."}
+                        >
+                            <PageSelectField
+                                value={wordMechanism}
+                                values={SlotTextKnobs.MECHANISMS}
+                                width={FIELD_WIDTH}
+                                ariaLabel={"Mechanism"}
+                                onChange={setWordMechanism}
+                            />
+                        </PageProp>
+
+                        <PageProp
+                            itemKey={"letterRoute"}
+                            label={"Letter route"}
+                            hint={
+                                "Forward always goes on round the alphabet, so C to Z passes every letter between; shortest takes the nearer way, so C to Z goes back three."
+                            }
+                        >
+                            <PageSelectField
+                                value={letterRoute}
+                                values={SlotTextKnobs.LETTER_ROUTES}
+                                width={FIELD_WIDTH}
+                                ariaLabel={"Letter route"}
+                                onChange={setLetterRoute}
+                            />
+                        </PageProp>
+                    </PageExampleKnobs>
+                </>
+            ),
+            path: `${EXAMPLES_ROOT}/Words.tsx`,
         },
     ];
 
@@ -164,7 +247,9 @@ export const SlotTextPage = () => {
                 <PageProp
                     itemKey={"value"}
                     label={"Value"}
-                    hint={"The number the odometer is counting to. Changing it is what starts the digits turning."}
+                    hint={
+                        "The number the counter and the departures board show. Changing it is what starts them turning."
+                    }
                 >
                     <PageNumberField
                         value={value}
@@ -179,7 +264,7 @@ export const SlotTextPage = () => {
                 <PageProp
                     itemKey={"turnDurationMs"}
                     label={"Turn (ms)"}
-                    hint={"How long one digit takes to turn from its old face to its new one."}
+                    hint={"How long one column takes to turn from its old character to its new one."}
                 >
                     <PageNumberField
                         value={turnMs}
@@ -193,9 +278,9 @@ export const SlotTextPage = () => {
 
                 <PageProp
                     itemKey={"turnDelayMs"}
-                    label={"Cascade (ms)"}
+                    label={"Turn delay (ms)"}
                     hint={
-                        "How long each digit waits after the one beside it starts, which is what makes the turn ripple along."
+                        "How long each column waits after the turning column beside it starts, which is what makes the turn ripple along."
                     }
                 >
                     <PageNumberField
@@ -203,7 +288,7 @@ export const SlotTextPage = () => {
                         min={SlotTextKnobs.MIN_CASCADE_MS}
                         max={SlotTextKnobs.MAX_CASCADE_MS}
                         step={SlotTextKnobs.CASCADE_STEP_MS}
-                        ariaLabel={"Cascade delay in milliseconds"}
+                        ariaLabel={"Turn delay in milliseconds"}
                         onInput={setCascadeMs}
                     />
                 </PageProp>

@@ -235,6 +235,26 @@ Where a framework makes the same name impossible, the fallback is the framework'
 same name, rather than a new name — Vue reserves `ref`, so a Vue consumer reaches the element through the
 component's `$el` rather than through a prop called something else.
 
+### A sample's key is snake_case, and a picker shows the key itself
+
+Stated by the user. Every key that names a sample — a registry entry under `Samples/`, the `family` a sample entry
+is built from, and a list of variants the Playground keeps for itself (its easings, its paint kinds, its image
+sources, its audio tracks) — is written in snake_case: `cover_flow`, `right_to_left`, `checkered_convergent`,
+`ease_in_out_quad`, `spot_smudge_3`. The painted gradients and patterns were already written this way, and the rest
+were brought to it.
+
+**A picker listing samples shows the key, never a prettier label laid over it.** The point is that what the
+Playground displays is exactly what a consumer types, so a sample has one spelling everywhere: the registry, its
+type, the picker, the readout and the spec. Carousel's map of readable names went for that reason.
+
+**The functions behind the keys keep ordinary camelCase names**, and a registry maps one to the other —
+`right_to_left: rightToLeft` — so the rule touches what a consumer passes and reads, not how the code names its own
+functions. Pattern samples whose files are named for their keys (`circle_g_2`) are the exception that predates this.
+
+**A value that spells a prop's own API is not a sample and keeps its spelling** — an `orientation`, a `rootSide`, a
+corner such as `"top-right"`, an easing such as `"ease-in"`, `SlotText`'s `"splitFlap"`. Those are the component's
+vocabulary rather than entries in a collection, and follow the rules for props.
+
 ### "Outline" means the focus indicator; paint along an edge is a "stroke", and the edge itself is a "contour"
 
 Stated by the user, in those terms, after a new text component's controls and docs called its stroke an

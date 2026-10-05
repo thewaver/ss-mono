@@ -2,6 +2,7 @@ import type { VNodeChild } from "vue";
 
 import type {
     BracketConnectorDefs,
+    BracketLayerHeaderState,
     BracketNode,
     BracketNodeState,
     BracketOrientation,
@@ -39,8 +40,9 @@ export type BracketProps<T> = {
      */
     "view"?: BracketView;
     /**
-     * How long the family view takes to glide from one family to the next. `0` jumps, which is the reduced-motion
-     * route. Ignored in the tree view.
+     * How long the board takes to glide from one family to the next, and between the family view and the tree view
+     * when `view` changes, the board growing or shrinking with it — a consumer scaling the board to fit a frame of
+     * its own gets a zoom. `0` jumps, which is the reduced-motion route.
      */
     "transitionDurationMs"?: number;
     /** The final, with the rounds that feed it hanging off it as children. */
@@ -55,8 +57,9 @@ export type BracketProps<T> = {
      * `undefined` is the root's own family, the root and the nodes that feed it. Both sides write it: the board when
      * focus moves, the consumer to move the family from outside — which is how buttons beside the board page through
      * it without taking focus. `BracketUtils.computeFamilyStep` finds the family a step away. Leave it out and the
-     * board keeps it itself. A node that is not in the tree shows the root's own family. Ignored in the tree view.
-     * Bind it with `v-model:family`.
+     * board keeps it itself. A node that is not in the tree shows the root's own family. The tree view folds nothing
+     * but still writes it as focus moves, so a consumer framing part of a large tree can follow the focused node's
+     * family with a camera of its own. Bind it with `v-model:family`.
      */
     "family"?: BracketNode<T> | undefined;
     /** Receives the board's own family changes, which is what `v-model:family` binds. */
@@ -65,11 +68,12 @@ export type BracketProps<T> = {
 
 export type BracketSlots<T> = {
     /**
-     * Draws the header above one layer, handed the layer counting from the root, so `0` is the final. Given,
-     * each layer becomes its own list named by its header, and a strip opens along the board's leading edge
-     * that follows `orientation` and `rootSide` with the layers.
+     * Draws the header above one layer, handed the layer counting from the root, so `0` is the final, and whether
+     * it is the current round, so the round a camera is framing can be marked. Given, each layer becomes its own list
+     * named by its header, and a strip opens along the board's leading edge that follows `orientation` and
+     * `rootSide` with the layers.
      */
-    renderLayerHeader?: (layer: number) => VNodeChild;
+    renderLayerHeader?: (props: { layer: number; state: BracketLayerHeaderState }) => VNodeChild;
     /** Draws one node, and is told where it sits in the bracket. */
     renderNode: (props: { node: BracketNode<T>; state: BracketNodeState }) => VNodeChild;
     /** Draws the line between a node and the one it feeds. */

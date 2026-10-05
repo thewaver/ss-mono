@@ -2,8 +2,10 @@ import { useEffect, useState } from "react";
 
 import { Button, MediaQueryMonitorReactUtils, ProximityText } from "@thewaver/ss-components-react";
 import { ProximityTextKnobs } from "@thewaver/ss-playground/App/Knobs/ProximityTexts.const";
+import { MEASURE_BOX_PADDING } from "@thewaver/ss-playground/App/PageComponents/MeasureBox/MeasureBox.css";
 import * as styles from "@thewaver/ss-playground/App/Pages/ProximityTextPage/ProximityTextPage.css";
 
+import { PageMeasureBox } from "../../../PageComponents/MeasureBox/MeasureBox";
 import { PageButtonContent } from "../../../StyledComponents/ButtonContent/ButtonContent";
 import type { ProximityTextExampleProps } from "../ProximityTextPageReact.types";
 
@@ -41,15 +43,17 @@ export const WaveExample = (props: Props) => {
 
     return (
         <div className={styles.stack}>
-            <div className={styles.variableText}>
-                <ProximityText
-                    reachPx={props.reachPx}
-                    isDisabled={props.isDisabled}
-                    pointSource={{ ratio: { x, y: MIDDLE } }}
-                >
-                    A wave of weight rolls through this line
-                </ProximityText>
-            </div>
+            <PageMeasureBox width={ProximityTextKnobs.BOX_WIDTH} padding={MEASURE_BOX_PADDING}>
+                <div className={styles.variableText}>
+                    <ProximityText
+                        reachPx={props.reachPx}
+                        isDisabled={props.isDisabled}
+                        pointSource={{ ratio: { x, y: MIDDLE } }}
+                    >
+                        A wave of weight rolls through this line
+                    </ProximityText>
+                </div>
+            </PageMeasureBox>
 
             <Button
                 id={"waveMove"}

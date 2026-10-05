@@ -40,7 +40,7 @@ const PatternElement = defineComponent(
             const r = Math.min(cellSize.width, cellSize.height) * 0.5;
 
             return SVGPatterns.computeTrackedLayoutPattern(
-                "halfShift",
+                "half_shift",
                 `pattern1-${props.id}`,
                 cellSize,
                 areaSize,

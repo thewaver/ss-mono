@@ -6,12 +6,14 @@ import {
     type SVGAnimationIterationPattern,
 } from "@thewaver/ss-components";
 
+const FIRST_PATTERN_INDEX = 0;
+
 /** The attributes spread onto every `animate` element of one animation. */
 type AnimateAttributes = {
     dur: string;
     repeatCount: number | "indefinite";
     fill: "freeze";
-    begin: "indefinite";
+    begin: "0s" | "indefinite";
     onVnodeMounted: (vnode: VNode) => void;
     onVnodeBeforeUnmount: (vnode: VNode) => void;
 };
@@ -83,7 +85,7 @@ export namespace SVGAnimationDefsVueUtils {
             dur: `${toValue(defs).animationDurationMs}ms`,
             repeatCount: SVGAnimationDefsUtils.computeRepeatCount(patterns.value[patternIndex.value]),
             fill: "freeze",
-            begin: "indefinite",
+            begin: SVGAnimationDefsUtils.getIsPageClocked(patterns.value[FIRST_PATTERN_INDEX]) ? "0s" : "indefinite",
             onVnodeMounted: (vnode) => {
                 const element = vnode.el as SVGAnimateElement;
 

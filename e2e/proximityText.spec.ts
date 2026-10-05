@@ -112,3 +112,67 @@ test("painted letters push the rest of their line along, and the line breaks sta
         "every letter sits on the line it sat on at rest",
     ).toEqual(rest.map((letter) => letter.baseline));
 });
+
+/**
+ * The barrel example measures nearness up and down only, so the point — the middle of a scrolling box — acts as a line
+ * across the text: every letter on one line answers it alike, the line at the middle is held furthest through its
+ * keyframes, and scrolling moves which line that is. Read off each letter's own animation, as above.
+ */
+const BARREL = demo("barrel");
+const BARREL_BOX = "#barrelScrollBox";
+
+const barrelLines = (page: Page) =>
+    page.locator(BARREL).evaluate((root) => {
+        const lines = root.querySelector("[inert] + div") as HTMLElement;
+        const byLine = new Map<number, number[]>();
+
+        for (const letter of lines.querySelectorAll("span span") as NodeListOf<HTMLElement>) {
+            const progress = Number(letter.getAnimations()[0]?.effect?.getComputedTiming().progress ?? -1);
+
+            byLine.set(letter.offsetTop, [...(byLine.get(letter.offsetTop) ?? []), progress]);
+        }
+
+        return [...byLine.entries()].sort(([first], [second]) => first - second).map(([, progresses]) => progresses);
+    });
+
+const strongestLine = (lines: number[][]) =>
+    lines.reduce((best, line, index) => (line[0] > lines[best][0] ? index : best), 0);
+
+const scrollBarrelTo = (page: Page, share: number) =>
+    page.locator(BARREL_BOX).evaluate((box, value) => {
+        box.scrollTop = (box.scrollHeight - box.clientHeight) * value;
+    }, share);
+
+test("measured up and down only, every letter on a line answers the point alike", async ({ page }) => {
+    await page.locator(BARREL_BOX).scrollIntoViewIfNeeded();
+    await scrollBarrelTo(page, 0.5);
+
+    await expect
+        .poll(
+            async () => {
+                const lines = await barrelLines(page);
+
+                return (
+                    lines.every((line) => Math.max(...line) - Math.min(...line) < 0.01) &&
+                    lines.some((line) => line[0] > 0.9) &&
+                    lines.some((line) => line[0] === 0)
+                );
+            },
+            { message: "each line held at one point of its keyframes, the middle one far through and others at rest" },
+        )
+        .toBe(true);
+});
+
+test("scrolling the barrel moves which line is held furthest", async ({ page }) => {
+    await page.locator(BARREL_BOX).scrollIntoViewIfNeeded();
+    await scrollBarrelTo(page, 0.25);
+    await expect.poll(async () => Math.max(...(await barrelLines(page)).map((line) => line[0]))).toBeGreaterThan(0.9);
+
+    const before = strongestLine(await barrelLines(page));
+
+    await scrollBarrelTo(page, 0.75);
+
+    await expect
+        .poll(async () => strongestLine(await barrelLines(page)), { message: "a line further down the text" })
+        .toBeGreaterThan(before);
+});

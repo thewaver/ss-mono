@@ -144,7 +144,7 @@ test("pressing play starts it, and the caption follows the component rather than
  * and the caption has to notice, since nobody pressed play.
  */
 test("changing the source plays what arrived, without being asked twice", async ({ page }) => {
-    await pickTrack(page, "Synthwave");
+    await pickTrack(page, "synthwave");
     await expect.poll(() => settledPlays(page), "the browser has answered the request to play").toHaveLength(1);
 
     const calls = await playCalls(page);

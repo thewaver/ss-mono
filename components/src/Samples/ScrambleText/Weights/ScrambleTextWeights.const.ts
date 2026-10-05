@@ -25,8 +25,8 @@ const scattered: ScrambleTextWeightFn = (count) =>
 
 export namespace ScrambleTextWeights {
     export const SAMPLE_WEIGHTS = {
-        rightToLeft,
-        fromMiddle,
+        right_to_left: rightToLeft,
+        from_middle: fromMiddle,
         scattered,
     } satisfies Record<string, ScrambleTextWeightFn>;
 

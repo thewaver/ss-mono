@@ -21,14 +21,14 @@ const MISSING_SRC = "missing_image.webp";
 const SOURCE_URLS: Record<SourceType, string | undefined> = {
     profile: knight_profile,
     date: knight_date,
-    missingFile: MISSING_SRC,
+    missing_file: MISSING_SRC,
     none: undefined,
 };
 
 const SOURCE_ALTS: Record<SourceType, string | undefined> = {
     profile: "A knight in profile",
     date: "A knight on a date",
-    missingFile: "A picture that will not load",
+    missing_file: "A picture that will not load",
     none: undefined,
 };
 

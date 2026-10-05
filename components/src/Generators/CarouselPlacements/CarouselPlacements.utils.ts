@@ -382,9 +382,9 @@ export namespace CarouselPlacementUtils {
                 return createTrack(entry.defs);
             case "drum":
                 return createDrum(entry.defs);
-            case "coverFlow":
+            case "cover_flow":
                 return createCoverFlow(entry.defs);
-            case "depthWave":
+            case "depth_wave":
                 return createDepthWave(entry.defs);
             case "cylinder":
                 return createCylinder(entry.defs);
@@ -392,7 +392,7 @@ export namespace CarouselPlacementUtils {
                 return createFolders(entry.defs);
             case "hinge":
                 return createHinge(entry.defs);
-            case "paddleWheel":
+            case "paddle_wheel":
                 return createPaddleWheel(entry.defs);
         }
     };

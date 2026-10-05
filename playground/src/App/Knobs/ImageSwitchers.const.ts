@@ -5,7 +5,7 @@ export namespace ImageSwitcherKnobs {
     export const MAX_DURATION_MS = 5000;
     export const DURATION_STEP_MS = 50;
 
-    export const SOURCE_TYPES: SourceType[] = ["profile", "date", "missingFile", "none"];
+    export const SOURCE_TYPES: SourceType[] = ["profile", "date", "missing_file", "none"];
 
     export const STARTING_SOURCE_TYPE: SourceType = "profile";
 }

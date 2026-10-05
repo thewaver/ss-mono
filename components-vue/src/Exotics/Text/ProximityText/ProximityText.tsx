@@ -66,6 +66,7 @@ export const ProximityText = defineComponent(
             props.computeAnimationName ?? PROXIMITY_TEXT_DEFAULTS.computeAnimationName;
         const getReachPx = () => props.reachPx ?? PROXIMITY_TEXT_DEFAULTS.reachPx;
         const getIsDisabled = () => props.isDisabled ?? false;
+        const getDistanceAxis = () => props.distanceAxis ?? PROXIMITY_TEXT_DEFAULTS.distanceAxis;
 
         const registry = LetterDriverUtils.createRegistry();
         const registryState = useStore(registry);
@@ -125,6 +126,7 @@ export const ProximityText = defineComponent(
                 getIsDriven() ? drivenBoxes.value : restBoxes.value,
                 ProximityTextUtils.toPoint(reading.value, isPointerPresent.value && !getIsDisabled(), size.value),
                 getReachPx(),
+                getDistanceAxis(),
             ),
         );
 
@@ -323,6 +325,7 @@ export const ProximityText = defineComponent(
             computeAnimationName: null,
             reachPx: null,
             pointSource: null,
+            distanceAxis: null,
             isDisabled: Boolean,
         }),
     },

@@ -413,7 +413,7 @@ export const ShapePage = () => {
                 <PagePropsDivider />
 
                 <PagePropsPanel scope={"global"}>
-                    <Show when={getIsUsingKind([stroke.getPaint(), fill.getPaint()], ["pattern", "trackedPattern"])}>
+                    <Show when={getIsUsingKind([stroke.getPaint(), fill.getPaint()], ["pattern", "tracked_pattern"])}>
                         <PageProp
                             key={"cellSize"}
                             label={"Pattern Cell Size (px)"}

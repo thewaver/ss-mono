@@ -404,7 +404,7 @@ test("the arrival order decides which characters arrive first, and erasing runs 
     expect(leftToRight.delays.length, "the phrase has characters to order").toBeGreaterThan(1);
     expect(isIncreasing(leftToRight.delays), "by default each character starts after the one before it").toBe(true);
 
-    await pickArrivalOrder(page, "rightToLeft");
+    await pickArrivalOrder(page, "right_to_left");
 
     const rightToLeft = await typingFrame(page);
 

@@ -1,6 +1,6 @@
 import { type Page, expect, test } from "@playwright/test";
 
-import { demo, readout, waitUntilStill } from "./helpers";
+import { demo, prop, readout, waitUntilStill } from "./helpers";
 
 const board = (key: string, label: string) => `${demo(key)} [role="group"][aria-label="${label}"]`;
 
@@ -527,20 +527,42 @@ test("a node carried with the keyboard past the edge of the window brings the wi
 });
 
 /**
- * The beams are the page's paint over the cables the board hands it, one per plugged cable, and the example's Pause
- * is the stop WCAG 2.2.2 asks of anything moving for more than five seconds. Whether a beam is moving is read off
- * `animation-play-state`, which is the example's own state rather than its paint.
+ * The beams are the page's paint over the cables the board hands it, one per plugged cable on every example, and the
+ * page's "Beams moving" box is the stop WCAG 2.2.2 asks of anything moving for more than five seconds. Whether a beam
+ * is moving is read off the play state of the animations running on it, which is the example's own state rather than
+ * its paint, and holds however the beam happens to be animated.
  */
-const BEAMS = "beams";
+const BEAMS = "chain";
 const BEAM = `${demo(BEAMS)} [data-beam]`;
 
-test("every plugged cable carries a beam, and pausing stops them all", async ({ page }) => {
+const readBeamStates = (page: Page) =>
+    page
+        .locator(BEAM)
+        .evaluateAll((beams) => beams.map((beam) => beam.getAnimations().map((animation) => animation.playState)));
+
+test("every plugged cable carries a beam, and turning the beams off stops them all", async ({ page }) => {
     const cableCount = Number((await readout(page, BEAMS)).match(/^(\d+) cables/)![1]);
 
     await expect(page.locator(BEAM)).toHaveCount(cableCount);
-    await expect(page.locator(BEAM).first()).toHaveCSS("animation-play-state", "running");
+    await expect
+        .poll(async () =>
+            (await readBeamStates(page)).every(
+                (states) => states.length > 0 && states.every((state) => state === "running"),
+            ),
+        )
+        .toBe(true);
 
-    await page.locator("#patchBeamsPlayback").click();
+    await page.locator(`${prop("isBeamPlaying")} input`).uncheck();
 
-    for (const beam of await page.locator(BEAM).all()) await expect(beam).toHaveCSS("animation-play-state", "paused");
+    await expect
+        .poll(
+            async () =>
+                (await readBeamStates(page)).every(
+                    (states) => states.length > 0 && states.every((state) => state === "paused"),
+                ),
+            {
+                message: "every beam is stopped",
+            },
+        )
+        .toBe(true);
 });

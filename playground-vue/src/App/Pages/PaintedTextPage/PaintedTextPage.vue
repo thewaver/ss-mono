@@ -60,7 +60,7 @@ const getPercent = (progress: number) => `${Math.round(progress * PERCENT)}%`;
 const colorKeys = computed(() => Object.keys(colors.value) as (keyof SVGDefsColors)[]);
 
 const usesPattern = computed(() =>
-    getIsUsingKind([fill.paint.value, stroke.paint.value], ["pattern", "trackedPattern"]),
+    getIsUsingKind([fill.paint.value, stroke.paint.value], ["pattern", "tracked_pattern"]),
 );
 const usesTiming = computed(() => getIsUsingKind([fill.paint.value, stroke.paint.value], ["pattern", "timed"]));
 

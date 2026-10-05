@@ -49,7 +49,7 @@ const props = defineProps<Props>();
                 <PageBracketNode :node="node" :state="state" />
             </template>
 
-            <template #renderLayerHeader="layer">
+            <template #renderLayerHeader="{ layer }">
                 <PageBracketLayerHeader :names="ROUND_NAMES" :layer="layer" />
             </template>
         </Bracket>

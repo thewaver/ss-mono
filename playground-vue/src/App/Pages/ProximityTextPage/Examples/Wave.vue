@@ -3,8 +3,10 @@ import { computed, shallowRef, watch } from "vue";
 
 import { Button, MediaQueryMonitorVueUtils, ProximityText } from "@thewaver/ss-components-vue";
 import { ProximityTextKnobs } from "@thewaver/ss-playground/App/Knobs/ProximityTexts.const";
+import { MEASURE_BOX_PADDING } from "@thewaver/ss-playground/App/PageComponents/MeasureBox/MeasureBox.css";
 import * as styles from "@thewaver/ss-playground/App/Pages/ProximityTextPage/ProximityTextPage.css";
 
+import PageMeasureBox from "../../../PageComponents/MeasureBox/MeasureBox.vue";
 import PageButtonContent from "../../../StyledComponents/ButtonContent/ButtonContent.vue";
 import type { ProximityTextExampleProps } from "../ProximityTextPageVue.types";
 
@@ -54,11 +56,13 @@ watch(
 
 <template>
     <div :class="styles.stack">
-        <div :class="styles.variableText">
-            <ProximityText :reach-px="reachPx" :is-disabled="isDisabled" :point-source="pointSource"
-                >A wave of weight rolls through this line</ProximityText
-            >
-        </div>
+        <PageMeasureBox :width="ProximityTextKnobs.BOX_WIDTH" :padding="MEASURE_BOX_PADDING">
+            <div :class="styles.variableText">
+                <ProximityText :reach-px="reachPx" :is-disabled="isDisabled" :point-source="pointSource"
+                    >A wave of weight rolls through this line</ProximityText
+                >
+            </div>
+        </PageMeasureBox>
 
         <Button id="waveMove" @click="toggleMoving">
             <template #renderContent="flags">

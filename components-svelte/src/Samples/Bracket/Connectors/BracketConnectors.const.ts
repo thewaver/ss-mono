@@ -61,7 +61,7 @@ export namespace BracketConnectors {
         });
     };
 
-    export const SAMPLE_CONNECTORS = { flat, rounded, curved, ballAndArrow } satisfies Record<
+    export const SAMPLE_CONNECTORS = { flat, rounded, curved, ball_and_arrow: ballAndArrow } satisfies Record<
         string,
         BracketConnectorFn
     >;

@@ -36,7 +36,7 @@ export const triangle_s_fade_2 = (opts?: PatternProximityOpts): TrackedPatternCo
                             {rightTriangle}
                             {leftTriangle}
                             {SVGPatterns.computeTrackedLayoutPattern(
-                                "triangleSideways",
+                                "triangle_sideways",
                                 `pattern1-${id}`,
                                 getRef,
                                 defs,

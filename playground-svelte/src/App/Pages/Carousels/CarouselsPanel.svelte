@@ -6,7 +6,6 @@
         ORIENTATION_FIELD_WIDTH,
         ORIENTATION_LABELS,
         PLACEMENT_FIELD_WIDTH,
-        PLACEMENT_LABELS,
     } from "@thewaver/ss-playground/App/Pages/Carousels/Carousels.const";
 
     import PageCheckField from "../../PageComponents/Field/PageCheckField.svelte";
@@ -38,7 +37,6 @@
             <PageSelectField
                 value={controls.placement}
                 values={CarouselPlacements.SAMPLE_KEYS}
-                computeLabel={(placement) => PLACEMENT_LABELS[placement]}
                 width={PLACEMENT_FIELD_WIDTH}
                 ariaLabel={"Placement"}
                 onChange={(placement) => {

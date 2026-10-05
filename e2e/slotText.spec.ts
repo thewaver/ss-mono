@@ -1,6 +1,6 @@
 import { type Page, expect, test } from "@playwright/test";
 
-import { accessibleText, demo, example, prop, revealProp } from "./helpers";
+import { accessibleText, demo, example, prop, readout, revealProp } from "./helpers";
 
 /**
  * Every column is a barrel turned to an angle, so the checks read the angle the component wrote rather than
@@ -45,6 +45,13 @@ const readColumns = (page: Page) =>
             ];
         });
     }, COUNTER);
+
+/**
+ * A demo holds more than its `SlotText` — the measure box around it reads out its size — so what the component
+ * says is read off the component itself, the outermost labelled group in the demo. The faces inside a
+ * column are groups too, hidden from a screen reader, which is why it is the first one that is read.
+ */
+const slotTextIn = (page: Page, key: string) => page.locator(`${demo(key)} [role="group"][aria-label]`).first();
 
 test.beforeEach(async ({ page }) => {
     await page.goto("/slot-text");
@@ -166,9 +173,9 @@ test("a separator is a slot that never turns", async ({ page }) => {
 test("what a screen reader gets is the number, and never the digits going past", async ({ page }) => {
     await setField(page, "value", "4321");
 
-    expect(await accessibleText(page.locator(demo("counter"))), "the whole value, once").toContain("4,321");
+    expect(await accessibleText(slotTextIn(page, "counter")), "the whole value, once").toContain("4,321");
     expect(
-        (await accessibleText(page.locator(demo("counter")))).match(/9/g) ?? [],
+        (await accessibleText(slotTextIn(page, "counter"))).match(/9/g) ?? [],
         "and no trace of the other nine faces every column is carrying",
     ).toEqual([]);
 });
@@ -263,7 +270,7 @@ const pickReel = async (page: Page, key: string) => {
  */
 test("a pull turns every column, and they come to rest in the order the chosen reel gives", async ({ page }) => {
     await expect(page.locator(`${REELS} [data-demo] [style*="rotateX"]`).first()).toBeVisible();
-    await pickReel(page, "leftToRight");
+    await pickReel(page, "left_to_right");
 
     const first = await pullAndWatch(page);
     const turns = first.after.map((column, index) => column.angle - first.before[index].angle);
@@ -286,7 +293,7 @@ test("a pull turns every column, and they come to rest in the order the chosen r
         orderBy(first.after.map((column) => column.durationMs)),
     );
 
-    await pickReel(page, "rightToLeft");
+    await pickReel(page, "right_to_left");
 
     const second = await pullAndWatch(page);
     const rightToLeft = orderBy(second.stops);
@@ -515,15 +522,8 @@ test("the split-flap settles on the new text, both halves of every column agreei
             },
             { message: "the columns read, top halves and bottom halves alike, as the value's digits" },
         )
-        .toBe(digitsOf(await accessibleText(page.locator(demo("splitFlap")))));
+        .toBe(digitsOf(await accessibleText(slotTextIn(page, "splitFlap"))));
 });
-
-/**
- * The counter's demo also holds the page's step buttons, so the two are compared on the odometers themselves —
- * the outermost labelled group in each demo — rather than on everything their demos hold. The faces inside a
- * column are groups too, hidden from a screen reader, which is why it is the first one that is read.
- */
-const slotTextIn = (page: Page, key: string) => page.locator(`${demo(key)} [role="group"][aria-label]`).first();
 
 test("the split-flap's accessible value is the drum's", async ({ page }) => {
     await setField(page, "value", "-1234");
@@ -548,7 +548,7 @@ test("a split-flap column whose digit has not changed does not flip", async ({ p
 
     await settled();
 
-    const before = digitsOf(await accessibleText(page.locator(demo("splitFlap"))));
+    const before = digitsOf(await accessibleText(slotTextIn(page, "splitFlap")));
 
     await page.evaluate((value) => {
         const flipped: boolean[] = [];
@@ -580,7 +580,7 @@ test("a split-flap column whose digit has not changed does not flip", async ({ p
 
     await setField(page, "value", "1201");
 
-    const after = digitsOf(await accessibleText(page.locator(demo("splitFlap"))));
+    const after = digitsOf(await accessibleText(slotTextIn(page, "splitFlap")));
 
     const readFlips = () => page.evaluate(() => (window as unknown as { flapFlips: boolean[] }).flapFlips);
 
@@ -601,4 +601,97 @@ test("a split-flap column whose digit has not changed does not flip", async ({ p
     expect(flips, "the columns that flipped are exactly the ones whose digit changed").toEqual(
         Array.from(after, (digit, index) => digit !== before[index]),
     );
+});
+
+/**
+ * The words example turns letters rather than digits, each one a column of its own over the alphabet the page hands
+ * it. Which word is showing is read off the example's readout, so the test names no word.
+ */
+const WORDS = example("words");
+const NEXT_WORD = "#nextWord";
+
+const pickWordKnob = async (page: Page, key: string, option: string) => {
+    await revealProp(page, key, "words");
+    await page.locator(`${prop(key)} [role="combobox"]`).click();
+    await page.locator('[role="listbox"] [role="option"]', { hasText: option }).first().click();
+    await page.keyboard.press("Escape");
+    await page.waitForTimeout(SETTLE_MS);
+};
+
+const readWordAngles = (page: Page) =>
+    page.evaluate((value) => {
+        const barrels = [
+            ...document.querySelectorAll(`${value} [data-demo] div[style*="translateZ"]`),
+        ] as HTMLElement[];
+
+        return barrels.flatMap((barrel) => {
+            const face = barrel.querySelector('[style*="rotateX"]') as HTMLElement | null;
+
+            return face ? [Number.parseFloat(/rotateX\((-?[\d.]+)deg\)/.exec(face.style.transform)?.[1] ?? "0")] : [];
+        });
+    }, WORDS);
+
+const shownWord = async (page: Page) => /showing: (\S+)/.exec(await readout(page, "words"))?.[1] ?? "";
+
+/** Each column's turn across two presses of Next word, in degrees, signed the way `readColumns` signs them. */
+const turnTwoWords = async (page: Page) => {
+    const turns: number[][] = [];
+
+    for (let press = 0; press < 2; press++) {
+        const before = await readWordAngles(page);
+
+        await page.locator(NEXT_WORD).click();
+        await page.waitForTimeout(SETTLE_MS);
+
+        const after = await readWordAngles(page);
+
+        expect(after.length, "the same columns before and after").toBe(before.length);
+        turns.push(after.map((angle, index) => angle - before[index]));
+    }
+
+    return turns.flat();
+};
+
+test("every letter of a word is a column, and the next word arrives in the same columns", async ({ page }) => {
+    await pickWordKnob(page, "mechanism", "drum");
+
+    const before = await readWordAngles(page);
+
+    await page.locator(NEXT_WORD).click();
+
+    await expect
+        .poll(async () => (await accessibleText(slotTextIn(page, "words"))).trim(), {
+            message: "a screen reader gets the word now showing",
+        })
+        .toBe(await shownWord(page));
+    expect((await readWordAngles(page)).length, "no column came or went").toBe(before.length);
+});
+
+test("the forward route only ever turns a letter on round the alphabet", async ({ page }) => {
+    await pickWordKnob(page, "mechanism", "drum");
+    await pickWordKnob(page, "letterRoute", "forward");
+
+    for (const turn of await turnTwoWords(page)) {
+        expect(turn, "no column turns back").toBeGreaterThanOrEqual(0);
+    }
+});
+
+/**
+ * A letter is one step of a whole turn, so the shortest way to any other letter is never more than half a turn —
+ * which is the claim, read off the angles, and it turns some column back on the way, which forward never does.
+ */
+test("the shortest route takes the nearer way, never more than half a turn", async ({ page }) => {
+    await pickWordKnob(page, "mechanism", "drum");
+    await pickWordKnob(page, "letterRoute", "shortest");
+
+    const turns = await turnTwoWords(page);
+
+    for (const turn of turns) {
+        expect(Math.abs(turn), "no column goes the long way round").toBeLessThanOrEqual(180.5);
+    }
+
+    expect(
+        turns.some((turn) => turn < 0),
+        "and over the same words, some column turns back",
+    ).toBe(true);
 });

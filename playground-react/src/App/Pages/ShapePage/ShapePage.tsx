@@ -317,7 +317,7 @@ export const ShapePage = () => {
     const [cellSize, setCellSize] = useState(ShapeKnobs.STARTING_CELL_SIZE);
     const [colors, setColors] = useState<SVGDefsColors>({ ...SVGDefsSamples.SAMPLE_COLORS });
 
-    const usesPattern = getIsUsingKind([stroke.paint, fill.paint], ["pattern", "trackedPattern"]);
+    const usesPattern = getIsUsingKind([stroke.paint, fill.paint], ["pattern", "tracked_pattern"]);
     const usesTiming = getIsUsingKind([stroke.paint, fill.paint], ["pattern", "timed"]);
 
     const commonProps: ShapeExampleProps = {

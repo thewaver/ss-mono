@@ -88,6 +88,7 @@ export const familyCamera = style({
 });
 
 export const pinnedLayerHeader = style({
+    pointerEvents: "none",
     transform: `translate(${fallbackVar(headerPinXVar, "0px")}, ${fallbackVar(headerPinYVar, "0px")})`,
 });
 

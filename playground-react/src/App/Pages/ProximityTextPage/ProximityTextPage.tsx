@@ -9,13 +9,13 @@ import { PageCheckField, PageNumberField } from "../../PageComponents/Field/Fiel
 import { PageMeasureBox } from "../../PageComponents/MeasureBox/MeasureBox";
 import { PageProp } from "../../PageComponents/Prop/Prop";
 import { PagePropsPanel } from "../../PageComponents/PropsPanel/PropsPanel";
+import { BarrelExample } from "./Examples/Barrel";
 import { PaintedExample } from "./Examples/Painted";
 import { PointerExample } from "./Examples/Pointer";
 import { WaveExample } from "./Examples/Wave";
 import type { ProximityTextExampleProps } from "./ProximityTextPageReact.types";
 
 const EXAMPLES_ROOT = "/src/App/Pages/ProximityTextPage/Examples";
-const BOX_WIDTH = 360;
 const WIDE_SPAN = 2;
 
 export const ProximityTextPage = () => {
@@ -32,7 +32,7 @@ export const ProximityTextPage = () => {
             readout: () =>
                 "each letter plays its keyframes held at how near the pointer is; the lines were wrapped for every letter at its heaviest, so the spare room sits at the end of each line while they rest",
             component: () => (
-                <PageMeasureBox width={BOX_WIDTH} padding={MEASURE_BOX_PADDING}>
+                <PageMeasureBox width={ProximityTextKnobs.BOX_WIDTH} padding={MEASURE_BOX_PADDING}>
                     <PointerExample {...commonProps} />
                 </PageMeasureBox>
             ),
@@ -44,11 +44,7 @@ export const ProximityTextPage = () => {
             span: WIDE_SPAN,
             readout: () =>
                 "a point supplied in place of the pointer, moved across the line on a clock; Stop is the way to halt it that a motion running on its own owes the reader",
-            component: () => (
-                <PageMeasureBox width={BOX_WIDTH} padding={MEASURE_BOX_PADDING}>
-                    <WaveExample {...commonProps} />
-                </PageMeasureBox>
-            ),
+            component: () => <WaveExample {...commonProps} />,
             path: `${EXAMPLES_ROOT}/Wave.tsx`,
         },
         {
@@ -58,11 +54,24 @@ export const ProximityTextPage = () => {
             readout: () =>
                 "PaintedText inside draws the letters; each grows and pushes the rest of its line along, as plain text does, while the line breaks stay put",
             component: () => (
-                <PageMeasureBox width={BOX_WIDTH} padding={MEASURE_BOX_PADDING}>
+                <PageMeasureBox width={ProximityTextKnobs.BOX_WIDTH} padding={MEASURE_BOX_PADDING}>
                     <PaintedExample {...commonProps} />
                 </PageMeasureBox>
             ),
             path: `${EXAMPLES_ROOT}/Painted.tsx`,
+        },
+        {
+            key: "barrel",
+            name: "Inside a barrel",
+            span: WIDE_SPAN,
+            readout: () =>
+                "a point fixed to the middle of the box and measured up and down only, so every letter on a line answers it alike: a line closes up as it reaches the middle and spreads apart again towards either edge, its keyframes running from spread to closed; the lines were wrapped with every letter at its widest, which here is the first frame, so no word jumps from one line to the next as they spread",
+            component: () => (
+                <PageMeasureBox width={ProximityTextKnobs.BOX_WIDTH}>
+                    <BarrelExample isDisabled={isDisabled} />
+                </PageMeasureBox>
+            ),
+            path: `${EXAMPLES_ROOT}/Barrel.tsx`,
         },
     ];
 

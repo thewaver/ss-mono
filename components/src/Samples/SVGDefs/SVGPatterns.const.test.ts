@@ -29,27 +29,27 @@ describe("SVGPatternLayouts.ALL", () => {
     });
 
     it("overlaps pointy-top hexagon rows by a quarter of a cell, which is what makes them interlock", () => {
-        const rows = positions("hexPointyTop", 3, 3).map((row) => row[0].y);
+        const rows = positions("hex_pointy_top", 3, 3).map((row) => row[0].y);
 
         expect(rows, "three quarters of a cell apart, starting half a cell above the tile").toEqual([-15, 7.5, 30]);
     });
 
     it("shifts every other hexagon row by half a cell", () => {
-        const [first, second] = positions("hexPointyTop", 3, 3);
+        const [first, second] = positions("hex_pointy_top", 3, 3);
 
         expect(first[0].x, "row 0 is even, so it starts half a cell to the left").toBe(-15);
         expect(second[0].x, "and row 1 does not").toBe(0);
     });
 
     it("turns flat-top hexagons through the other axis", () => {
-        const cols = positions("hexFlatTop", 3, 3)[0].map((cell) => cell.x);
+        const cols = positions("hex_flat_top", 3, 3)[0].map((cell) => cell.x);
 
         expect(cols, "three quarters of a cell apart across, not down").toEqual([-15, 7.5, 30]);
     });
 
     it("steps sideways triangles down by half a cell, which is the same overlap turned", () => {
-        const rows = positions("triangleSideways", 1, 2).map((row) => row[0].y);
-        const cols = positions("triangleSideways", 1, 2)[0].map((cell) => cell.x);
+        const rows = positions("triangle_sideways", 1, 2).map((row) => row[0].y);
+        const cols = positions("triangle_sideways", 1, 2)[0].map((cell) => cell.x);
 
         expect(rows, "half a cell apart, starting half a cell above the tile").toEqual([-15, 0, 15]);
         expect(cols, "and a whole cell apart across, where the upright one is a half").toEqual([0, 30]);
@@ -65,11 +65,11 @@ describe("SVGPatternLayouts.ALL", () => {
             "a diagonal wants odd, and two rows for every cell down, since its rows are half a cell apart",
         ).toEqual({ rows: 9, cols: 5 });
         expect(
-            SVGPatternLayouts.ALL.halfShift.computeCellCount({ rows: 5, cols: 4 }),
+            SVGPatternLayouts.ALL.half_shift.computeCellCount({ rows: 5, cols: 4 }),
             "a half shift wants even rows and odd columns",
         ).toEqual({ rows: 6, cols: 5 });
         expect(
-            SVGPatternLayouts.ALL.halfDrop.computeCellCount({ rows: 4, cols: 5 }),
+            SVGPatternLayouts.ALL.half_drop.computeCellCount({ rows: 4, cols: 5 }),
             "and a half drop wants the opposite",
         ).toEqual({ rows: 5, cols: 6 });
         expect(
@@ -77,12 +77,12 @@ describe("SVGPatternLayouts.ALL", () => {
             "a triangle wants even rows and odd columns, two for every cell across",
         ).toEqual({ rows: 6, cols: 9 });
         expect(
-            SVGPatternLayouts.ALL.triangleSideways.computeCellCount({ rows: 4, cols: 5 }),
+            SVGPatternLayouts.ALL.triangle_sideways.computeCellCount({ rows: 4, cols: 5 }),
             "and a sideways triangle wants the opposite",
         ).toEqual({ rows: 9, cols: 6 });
     });
 
-    it.each(["grid", "diagonal", "halfShift", "halfDrop", "triangle", "triangleSideways"] as const)(
+    it.each(["grid", "diagonal", "half_shift", "half_drop", "triangle", "triangle_sideways"] as const)(
         "gives %s a tile as many cells across and down as were asked for, so square cells repeat squarely",
         (kind) => {
             const layout = SVGPatternLayouts.ALL[kind];
@@ -98,7 +98,7 @@ describe("SVGPatternLayouts.ALL", () => {
             height: 60,
         });
         expect(
-            SVGPatternLayouts.ALL.hexPointyTop.computePatternSize({ rows: 3, cols: 3 }, CELL),
+            SVGPatternLayouts.ALL.hex_pointy_top.computePatternSize({ rows: 3, cols: 3 }, CELL),
             "a hexagon tile is two cells across and one and a half down",
         ).toEqual({ width: 60, height: 45 });
         expect(
@@ -106,13 +106,13 @@ describe("SVGPatternLayouts.ALL", () => {
             "a triangle tile is half a cell per column",
         ).toEqual({ width: 60, height: 60 });
         expect(
-            SVGPatternLayouts.ALL.triangleSideways.computePatternSize({ rows: 5, cols: 2 }, CELL),
+            SVGPatternLayouts.ALL.triangle_sideways.computePatternSize({ rows: 5, cols: 2 }, CELL),
             "and a sideways one is half a cell per row",
         ).toEqual({ width: 60, height: 60 });
     });
 
     it("marks the cells that straddle the seam, because they are the ones drawn twice", () => {
-        const layout = SVGPatternLayouts.ALL.hexPointyTop;
+        const layout = SVGPatternLayouts.ALL.hex_pointy_top;
         const cellCount = { rows: 3, cols: 3 };
 
         expect(layout.computeIsSplit({ row: 0, col: 1 }, cellCount), "the first row is cut by the top edge").toBe(true);

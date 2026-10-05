@@ -46,7 +46,7 @@ const commonProps = computed<ScrambleTextExampleProps>(() => {
                 ? SCRAMBLE_TEXT_DEFAULTS.computeGlyphs()
                 : ScrambleTextGlyphs.SAMPLE_GLYPHS[currentGlyphSet](character),
         computeCharacterWeights: (count) =>
-            currentSettleOrder === "leftToRight" ? [] : ScrambleTextWeights.SAMPLE_WEIGHTS[currentSettleOrder](count),
+            currentSettleOrder === "left_to_right" ? [] : ScrambleTextWeights.SAMPLE_WEIGHTS[currentSettleOrder](count),
     };
 });
 

@@ -31,7 +31,7 @@ export const BEAM_PATHS: Record<string, BracketConnectorPathFn> = {
     flat: BracketConnectorPaths.elbow,
     rounded: BracketConnectorPaths.roundedElbow,
     curved: BracketConnectorPaths.curve,
-    ballAndArrow: BracketConnectorPaths.roundedElbow,
+    ball_and_arrow: BracketConnectorPaths.roundedElbow,
 };
 
 const ID_SEPARATOR = ".";

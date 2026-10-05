@@ -49,19 +49,27 @@ test("Switch turns the panel over, and the readout reports once the helper has s
     expect(await page.locator(demo("switch")).textContent()).toBe(before);
 });
 
-test("with view transitions, the new page is uncovered by an animation on its snapshot", async ({ page }) => {
-    test.skip(!(await hasViewTransitions(page)), "this browser has no view transitions");
+/**
+ * The snapshot's animation is sampled every 20ms while it runs, and a parallel sweep can starve that sampling past the
+ * animation's end; it passes every time on its own, hence `@solo`.
+ */
+test(
+    "with view transitions, the new page is uncovered by an animation on its snapshot",
+    { tag: "@solo" },
+    async ({ page }) => {
+        test.skip(!(await hasViewTransitions(page)), "this browser has no view transitions");
 
-    await page.locator(SWITCH).click();
+        await page.locator(SWITCH).click();
 
-    await expect
-        .poll(async () => (await newSnapshotKeyframes(page)).some((frame) => frame.clipPath !== undefined), {
-            intervals: [20],
-        })
-        .toBe(true);
-    await expect.poll(() => readout(page, "switch")).toMatch(/^showing dusk, revealed through a /);
-    await expect.poll(() => newSnapshotKeyframes(page), "nothing is left running afterwards").toEqual([]);
-});
+        await expect
+            .poll(async () => (await newSnapshotKeyframes(page)).some((frame) => frame.clipPath !== undefined), {
+                intervals: [20],
+            })
+            .toBe(true);
+        await expect.poll(() => readout(page, "switch")).toMatch(/^showing dusk, revealed through a /);
+        await expect.poll(() => newSnapshotKeyframes(page), "nothing is left running afterwards").toEqual([]);
+    },
+);
 
 test("a blurred edge is drawn with a mask rather than a clip", async ({ page }) => {
     test.skip(!(await hasViewTransitions(page)), "this browser has no view transitions");

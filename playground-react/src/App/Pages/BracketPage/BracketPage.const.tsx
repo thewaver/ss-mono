@@ -1,4 +1,4 @@
-import type { BracketNode, BracketNodeState } from "@thewaver/ss-components-react";
+import type { BracketLayerHeaderState, BracketNode, BracketNodeState } from "@thewaver/ss-components-react";
 import * as styles from "@thewaver/ss-playground/App/Pages/BracketPage/BracketPage.css";
 
 const ROOT_LAYER = 0;
@@ -22,4 +22,14 @@ export const renderBracketNode = (node: BracketNode<string>, state: BracketNodeS
 
 export const computeBracketLayerHeader = (names: string[]) => (layer: number) => (
     <div className={styles.layerHeader}>{names[layer]}</div>
+);
+
+export const computeBracketPinnedLayerHeader = (names: string[]) => (layer: number, state: BracketLayerHeaderState) => (
+    <div
+        className={[styles.layerHeader, styles.pinnedLayerHeader, state.isCurrent && styles.layerHeaderCurrent]
+            .filter(Boolean)
+            .join(" ")}
+    >
+        {names[layer]}
+    </div>
 );

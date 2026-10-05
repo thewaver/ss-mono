@@ -5,6 +5,8 @@ import { type SVGAnimationDefs, SVGAnimationDefsUtils } from "@thewaver/ss-compo
 
 import { useLatest } from "../../../Utils/refUtils";
 
+const FIRST_PATTERN_INDEX = 0;
+
 /** The React side of `SVGAnimationDefsUtils`: an animation's schedule as a key and attributes to spread. */
 export namespace SVGAnimationDefsReactUtils {
     /**
@@ -54,7 +56,7 @@ export namespace SVGAnimationDefsReactUtils {
             dur: `${defs.animationDurationMs}ms`,
             repeatCount: SVGAnimationDefsUtils.computeRepeatCount(patterns[patternIndex]),
             fill: "freeze",
-            begin: "indefinite",
+            begin: SVGAnimationDefsUtils.getIsPageClocked(patterns[FIRST_PATTERN_INDEX]) ? "0s" : "indefinite",
             ref,
         };
 

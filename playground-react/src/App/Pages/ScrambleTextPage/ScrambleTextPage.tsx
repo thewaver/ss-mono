@@ -42,7 +42,7 @@ export const ScrambleTextPage = () => {
                 ? SCRAMBLE_TEXT_DEFAULTS.computeGlyphs()
                 : ScrambleTextGlyphs.SAMPLE_GLYPHS[glyphSet](character),
         computeCharacterWeights: (count) =>
-            settleOrder === "leftToRight" ? [] : ScrambleTextWeights.SAMPLE_WEIGHTS[settleOrder](count),
+            settleOrder === "left_to_right" ? [] : ScrambleTextWeights.SAMPLE_WEIGHTS[settleOrder](count),
     };
 
     const examples = [

@@ -61,7 +61,7 @@
 
     const pattern = $derived(
         SVGPatterns.computeTrackedLayoutPattern(
-            "hexFlatTop",
+            "hex_flat_top",
             `pattern1-${props.id}`,
             props.defs.cellSize,
             props.defs.getSize(),

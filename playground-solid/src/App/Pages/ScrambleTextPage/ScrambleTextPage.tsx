@@ -48,7 +48,7 @@ export const ScrambleTextPage = () => {
             computeCharacterWeights: (count) => {
                 const settleOrder = getSettleOrder();
 
-                return settleOrder === "leftToRight" ? [] : ScrambleTextWeights.SAMPLE_WEIGHTS[settleOrder](count);
+                return settleOrder === "left_to_right" ? [] : ScrambleTextWeights.SAMPLE_WEIGHTS[settleOrder](count);
             },
         };
 

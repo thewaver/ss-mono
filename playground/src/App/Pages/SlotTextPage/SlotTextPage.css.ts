@@ -54,14 +54,6 @@ export const fixed = style({
     fontSize: themeVars.fontSize.xLarge,
 });
 
-export const board = style({
-    display: "inline-flex",
-    padding: themeVars.spacing.full,
-    borderRadius: themeVars.borderRadius.full,
-    background: `linear-gradient(215deg, ${themeVars.color.background.light}, ${themeVars.color.background.dark})`,
-    boxShadow: themeVars.shadow.medium,
-});
-
 export const flapTile = style({
     "position": "relative",
     "display": "grid",
@@ -84,12 +76,6 @@ export const flapTile = style({
         transform: "translateY(-50%)",
         backgroundColor: themeVars.color.background.dark,
     },
-});
-
-export const flapFixed = style({
-    color: themeVars.color.background.contrast,
-    fontFamily: "monospace",
-    fontSize: themeVars.fontSize.xLarge,
 });
 
 export const line = style({

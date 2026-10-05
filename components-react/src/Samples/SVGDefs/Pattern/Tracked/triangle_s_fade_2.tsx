@@ -38,7 +38,7 @@ const PatternElement = (props: PatternElementProps) => {
                 d={ShapeUtils.pointsToPath(ShapeConst.getDefaultShapePoints("triangle-left", cellSize))}
             />
             {SVGPatterns.computeTrackedLayoutPattern(
-                "triangleSideways",
+                "triangle_sideways",
                 `pattern1-${props.id}`,
                 cellSize,
                 areaSize,

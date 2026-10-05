@@ -54,7 +54,7 @@ describe("elbow", () => {
     });
 });
 
-describe("roundedElbow", () => {
+describe("rounded_elbow", () => {
     it("still starts and ends on the two edges", () => {
         const points = numbersIn(BracketConnectorPaths.roundedElbow(across, 12));
 

@@ -7,7 +7,6 @@ import {
     ORIENTATION_FIELD_WIDTH,
     ORIENTATION_LABELS,
     PLACEMENT_FIELD_WIDTH,
-    PLACEMENT_LABELS,
 } from "@thewaver/ss-playground/App/Pages/Carousels/Carousels.const";
 
 import PageCheckField from "../../PageComponents/Field/PageCheckField.vue";
@@ -33,7 +32,6 @@ const controls = props.controls;
             <PageSelectField
                 :value="controls.placement.value"
                 :values="CarouselPlacements.SAMPLE_KEYS"
-                :compute-label="(placement: CarouselPlacements.SampleKey) => PLACEMENT_LABELS[placement]"
                 :width="PLACEMENT_FIELD_WIDTH"
                 ariaLabel="Placement"
                 @change="(placement: CarouselPlacements.SampleKey) => (controls.placement.value = placement)"

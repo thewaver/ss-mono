@@ -25,7 +25,7 @@
     import PageProp from "../../PageComponents/Prop/Prop.svelte";
     import PagePropsPanel from "../../PageComponents/PropsPanel/PagePropsPanel.svelte";
     import PageBeam from "../../StyledComponents/Beam/PageBeam.svelte";
-    import { BEAM_PATHS, NOTHING_PICKED } from "./BracketPage.const";
+    import { BEAM_PATHS, NOTHING_PICKED, computeRouteSpan, toConnectorBoard } from "./BracketPage.const";
     import type { BracketExampleProps } from "./BracketPage.types";
     import FamilyExample from "./Examples/Family.svelte";
     import KnockoutExample from "./Examples/Knockout.svelte";
@@ -52,6 +52,19 @@
     const getPrefersReducedMotion = MediaQueryMonitorSvelteUtils.createReducedMotion();
 
     let isBeamPlaying = $state(!getPrefersReducedMotion());
+    let beamLengths = $state.raw<Record<string, { board: string; childId: string; lengthPx: number }>>({});
+
+    const setBeamLength = (defs: BracketConnectorDefs, lengthPx: number | undefined) => {
+        const { [defs.id]: _previous, ...others } = beamLengths;
+
+        beamLengths =
+            lengthPx === undefined
+                ? others
+                : { ...others, [defs.id]: { board: toConnectorBoard(defs), childId: defs.childId, lengthPx } };
+    };
+
+    const computeBeamSpan = (defs: BracketConnectorDefs) =>
+        computeRouteSpan(beamLengths, toConnectorBoard(defs), defs.childId);
 
     const commonProps: BracketExampleProps = $derived({
         layerGap,
@@ -96,7 +109,7 @@
             name: "One family at a time",
             span: WIDE_SPAN,
             readout: () =>
-                `showing: ${family} — focus a node and the board shows what it feeds, it with all its siblings, and what feeds them; walk on with the arrows, or page through with the buttons without leaving them, and the rest folds away`,
+                `showing: ${family} — the whole draw stays mounted and a camera frames one family at a time: what the focused node feeds, it with all its siblings, and what feeds them; walk on with the arrows, or page through with the buttons without leaving them, and the camera pans and zooms to fit; Zoom out fits the whole draw, and Zoom in goes back to the family`,
             component: familyExample,
             path: `${EXAMPLES_ROOT}/Family.svelte`,
         },
@@ -119,6 +132,9 @@
             d={BEAM_PATHS[connector](defs, CONNECTOR_RADIUS)}
             direction={"backward"}
             isPlaying={isBeamPlaying}
+            routeStartPx={computeBeamSpan(defs).startPx}
+            routeLengthPx={computeBeamSpan(defs).totalPx}
+            onLengthPx={(lengthPx) => setBeamLength(defs, lengthPx)}
         />
     {/if}
 {/snippet}

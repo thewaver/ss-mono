@@ -12,4 +12,11 @@ export type SVGPatternLayout = {
 };
 
 export type SVGPatternKind =
-    "grid" | "diagonal" | "halfShift" | "halfDrop" | "triangle" | "triangleSideways" | "hexPointyTop" | "hexFlatTop";
+    | "grid"
+    | "diagonal"
+    | "half_shift"
+    | "half_drop"
+    | "triangle"
+    | "triangle_sideways"
+    | "hex_pointy_top"
+    | "hex_flat_top";

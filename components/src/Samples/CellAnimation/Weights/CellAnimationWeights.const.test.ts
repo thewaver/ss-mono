@@ -18,26 +18,26 @@ const RANDOM_WEIGHTS = CellAnimationWeights.WEIGHT_TYPES.filter((type) => type.s
 
 describe("CellAnimationWeightsConst", () => {
     it("knows which weights ignore the origin", () => {
-        expect(CellAnimationWeights.isOriginAware("lineRow")).toBe(true);
-        expect(CellAnimationWeights.isOriginAware("diamondDefault")).toBe(true);
-        expect(CellAnimationWeights.isOriginAware("sequenceLinear")).toBe(false);
-        expect(CellAnimationWeights.isOriginAware("randomDefault")).toBe(false);
+        expect(CellAnimationWeights.isOriginAware("line_row")).toBe(true);
+        expect(CellAnimationWeights.isOriginAware("diamond_default")).toBe(true);
+        expect(CellAnimationWeights.isOriginAware("sequence_linear")).toBe(false);
+        expect(CellAnimationWeights.isOriginAware("random_default")).toBe(false);
     });
 
     it("gives a row per y and a column per x", () => {
-        const weights = CellAnimationWeights.computeCellWeights("lineRow", { col: 3, row: 5 }, { col: 0, row: 0 });
+        const weights = CellAnimationWeights.computeCellWeights("line_row", { col: 3, row: 5 }, { col: 0, row: 0 });
 
         expect(weights).toHaveLength(5);
         expect(weights.every((row) => row.length === 3)).toBe(true);
     });
 
     it("returns an empty grid rather than throwing on a zero count", () => {
-        expect(CellAnimationWeights.computeCellWeights("lineRow", { col: 0, row: 0 }, { col: 0, row: 0 })).toEqual([]);
+        expect(CellAnimationWeights.computeCellWeights("line_row", { col: 0, row: 0 }, { col: 0, row: 0 })).toEqual([]);
     });
 
     it("stays finite on a single-cell grid, where the farthest bound is zero", () => {
         const weights = CellAnimationWeights.computeCellWeights(
-            "diamondDefault",
+            "diamond_default",
             { col: 1, row: 1 },
             { col: 0, row: 0 },
         );
@@ -71,15 +71,15 @@ describe("CellAnimationWeightsConst", () => {
     );
 
     it("moves an origin-aware weight when the origin moves", () => {
-        const fromCorner = CellAnimationWeights.computeCellWeights("diamondDefault", ODD_GRID, { col: 0, row: 0 });
-        const fromCenter = CellAnimationWeights.computeCellWeights("diamondDefault", ODD_GRID, centerOf(ODD_GRID));
+        const fromCorner = CellAnimationWeights.computeCellWeights("diamond_default", ODD_GRID, { col: 0, row: 0 });
+        const fromCenter = CellAnimationWeights.computeCellWeights("diamond_default", ODD_GRID, centerOf(ODD_GRID));
 
         expect(fromCorner).not.toEqual(fromCenter);
     });
 
     it("normalizes to span the full range, evenly spaced by rank rather than by value", () => {
         const weights = CellAnimationWeights.computeCellWeights(
-            "lineRow",
+            "line_row",
             ODD_GRID,
             { col: 0, row: 0 },
             {
@@ -93,7 +93,7 @@ describe("CellAnimationWeightsConst", () => {
 
     it("gives every cell its own weight when asked to make them unique", () => {
         const weights = CellAnimationWeights.computeCellWeights(
-            "lineRow",
+            "line_row",
             ODD_GRID,
             { col: 0, row: 0 },
             {
@@ -109,7 +109,7 @@ describe("CellAnimationWeightsConst", () => {
 
     it("still alternates on an even count with a centered origin, where a raw modulo would not", () => {
         const alternating = CellAnimationWeights.computeCellWeights(
-            "lineRowAlternate",
+            "line_row_alternate",
             EVEN_COLUMN,
             centerOf(EVEN_COLUMN),
         ).flat();
@@ -117,7 +117,7 @@ describe("CellAnimationWeightsConst", () => {
         expect(alternating).toEqual([0, 0.643, 0.286, 0.929, 0.929, 0.286, 0.643, 0]);
 
         const convergent = CellAnimationWeights.computeCellWeights(
-            "lineRowConvergent",
+            "line_row_convergent",
             EVEN_COLUMN,
             centerOf(EVEN_COLUMN),
         ).flat();
@@ -142,7 +142,7 @@ describe("CellAnimationWeightsConst", () => {
         expect(first).not.toEqual(second);
     });
 
-    it.each(["sequenceMorton", "sequenceStrideRow", "sequenceStrideColumn"] as const)(
+    it.each(["sequence_morton", "sequence_stride_row", "sequence_stride_column"] as const)(
         "starts %s from the origin, rather than from the first cell",
         (type) => {
             const fromCorner = CellAnimationWeights.computeCellWeights(type, ODD_GRID, { col: 0, row: 0 });
@@ -155,8 +155,8 @@ describe("CellAnimationWeightsConst", () => {
 
     it("turns the mirrored radar the other way round", () => {
         const center = centerOf(ODD_GRID);
-        const ccw = CellAnimationWeights.computeCellWeights("radarSingle", ODD_GRID, center);
-        const cw = CellAnimationWeights.computeCellWeights("radarSingleCw", ODD_GRID, center);
+        const ccw = CellAnimationWeights.computeCellWeights("radar_single", ODD_GRID, center);
+        const cw = CellAnimationWeights.computeCellWeights("radar_single_cw", ODD_GRID, center);
         const axes = (weights: number[][]) => [weights[center.row][ODD_GRID.col - 1], weights[center.row][0]];
 
         expect(axes(ccw), "counter-clockwise reaches the right of the origin before the left").toEqual(

@@ -67,7 +67,10 @@ export namespace BracketConnectorPaths {
         ].join(" ");
     };
 
-    export const SAMPLE_PATHS = { elbow, roundedElbow, curve } satisfies Record<string, BracketConnectorPathFn>;
+    export const SAMPLE_PATHS = { elbow, rounded_elbow: roundedElbow, curve } satisfies Record<
+        string,
+        BracketConnectorPathFn
+    >;
 
     export type SampleKey = keyof typeof SAMPLE_PATHS;
 

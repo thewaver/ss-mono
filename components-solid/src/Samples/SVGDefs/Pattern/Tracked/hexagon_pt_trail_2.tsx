@@ -28,7 +28,7 @@ export const hexagon_pt_trail_2 = (opts?: PatternProximityOpts): TrackedPatternC
                         <>
                             {shape}
                             {SVGPatterns.computeTrackedLayoutPattern(
-                                "hexPointyTop",
+                                "hex_pointy_top",
                                 `pattern1-${id}`,
                                 getRef,
                                 defs,

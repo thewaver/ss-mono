@@ -21,26 +21,26 @@ import type { Paint, PaintKind, PaintSampleKey, PaintSampleKind, PaintSettings }
 
 const NO_KNOBS = {};
 
-export const PAINT_KINDS: PaintKind[] = ["solid", "pattern", "trackedPattern", "timed", "tracked"];
+export const PAINT_KINDS: PaintKind[] = ["solid", "pattern", "tracked_pattern", "timed", "tracked"];
 
 export const PAINT_KIND_LABELS: Record<PaintKind, string> = {
     solid: "Solid",
     pattern: "Timed pattern",
-    trackedPattern: "Tracked pattern",
+    tracked_pattern: "Tracked pattern",
     timed: "Timed gradient",
     tracked: "Tracked gradient",
 };
 
 export const STARTING_KEYS: Record<PaintSampleKind, PaintSampleKey> = {
     pattern: "hexagon_pt_2",
-    trackedPattern: "hexagon_pt_fade_2",
+    tracked_pattern: "hexagon_pt_fade_2",
     timed: "sweep_diag_1v1",
     tracked: "spot_1",
 };
 
 export const SAMPLE_GROUPS: Record<PaintSampleKind, [string, PaintSampleKey[]][]> = {
     pattern: toGroupEntries(splitEntriesIntoGroups(SVGDefsSamples.Pattern.Timed.SAMPLE_CONFIGS)),
-    trackedPattern: toGroupEntries(splitEntriesIntoGroups(SVGDefsSamples.Pattern.Tracked.SAMPLE_ENTRIES)),
+    tracked_pattern: toGroupEntries(splitEntriesIntoGroups(SVGDefsSamples.Pattern.Tracked.SAMPLE_ENTRIES)),
     timed: toGroupEntries(splitEntriesIntoGroups(SVGDefsSamples.Gradient.Timed.SAMPLE_ENTRIES)),
     tracked: toGroupEntries(splitEntriesIntoGroups(SVGDefsSamples.Gradient.Tracked.SAMPLE_ENTRIES)),
 };
@@ -49,7 +49,7 @@ export const getIsUsingKind = (paints: Paint[], kinds: PaintKind[]) =>
     paints.some((paint) => kinds.includes(paint.kind));
 
 export const getPaintKnobs = (kind: PaintKind, key: PaintSampleKey): Record<string, Knob> => {
-    if (kind === "trackedPattern") {
+    if (kind === "tracked_pattern") {
         return TrackedPatternKnobs.KNOBS_BY_FAMILY[key as SVGDefsSamples.Pattern.Tracked.SampleKey] as Record<
             string,
             Knob
@@ -74,7 +74,7 @@ export const getPaintKnobs = (kind: PaintKind, key: PaintSampleKey): Record<stri
 };
 
 export const getPaintDefaults = (kind: PaintKind, key: PaintSampleKey): Record<string, unknown> => {
-    if (kind === "trackedPattern") {
+    if (kind === "tracked_pattern") {
         return TrackedPatternDefaults.DEFAULTS_BY_FAMILY[key as SVGDefsSamples.Pattern.Tracked.SampleKey] as Record<
             string,
             unknown
@@ -122,7 +122,7 @@ export const computePaintDefs = (
             return SVGDefsSamples.Pattern.Timed.SAMPLE_CONFIGS[
                 paint.key as SVGDefsSamples.Pattern.Timed.SampleKey
             ].computeSVGDefs(id, getFlags, getRef, { ...elementDefs, ...animationDefs, cellSize: settings.cellSize });
-        case "trackedPattern":
+        case "tracked_pattern":
             return SVGDefsSamples.Pattern.Tracked.toConfig({
                 family: paint.key,
                 defs: paint.configDefs,

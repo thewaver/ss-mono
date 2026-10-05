@@ -12,7 +12,7 @@ purpose: it answers "what is outstanding", and neither of them is.
 | Section                                                 | Count |
 | ------------------------------------------------------- | ----: |
 | [Missing components](#missing-components)               |     3 |
-| [Blockers and known issues](#blockers-and-known-issues) |    25 |
+| [Blockers and known issues](#blockers-and-known-issues) |    24 |
 | [Deliberately not built](#deliberately-not-built)       |    27 |
 | [Accessibility gaps](#accessibility-gaps)               |     8 |
 | [Planned projects](#planned-projects)                   |     5 |
@@ -61,7 +61,6 @@ Something that misbehaves, or a cost nobody has paid down.
 | 29  | **`CellAnimation`**              | **Pending decision.** Paused, it shows the cut grid rather than the whole picture, and a resize no longer restarts the pass                                                                                                                                                                               |
 | 29  | **`SlotText`**                   | **Pending decision.** Under reduced motion a reel keeps its own duration and drops only its extra turns                                                                                                                                                                                                   |
 | 31  | **Long list reopened late**      | In Solid and Svelte a windowed list reopened onto a far-down selection shows the row just above its box for a frame or two before it lands                                                                                                                                                                |
-| 32  | **Solid-only work**              | Bracket's camera and round names, beams, page-clocked SVG loops, SlotText's page, ProximityText, Carousel and several page layouts are built in Solid only: no React, Vue or Svelte ports and no updated specs. Bracket's round-name style is still to be chosen                                          |
 
 ## Deliberately not built
 

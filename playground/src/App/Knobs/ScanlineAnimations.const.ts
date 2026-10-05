@@ -24,7 +24,7 @@ export namespace ScanlineAnimationKnobs {
     export const STARTING_LINE_COUNT = 120;
     export const STARTING_DURATION_MS = 2000;
     export const STARTING_ITERATION_DELAY_MS = 1000;
-    export const STARTING_WEIGHT_TYPE: CellAnimationWeights.OriginFreeWeightType = "sequenceLinear";
+    export const STARTING_WEIGHT_TYPE: CellAnimationWeights.OriginFreeWeightType = "sequence_linear";
     export const STARTING_GLITCH_OPTS = { count: 3, shiftPercent: 10, chunkyness: 0.8 };
     export const STARTING_SURGE_BREAKPOINT_OPTS: CellAnimationBreakpointOpts = { dir: "asc", smoothness: 0.2 };
     export const STARTING_SNAKE_BREAKPOINT_OPTS: CellAnimationBreakpointOpts = { dir: "asc", smoothness: 0.2 };

@@ -8,7 +8,7 @@ import {
     BracketConnectors,
     MediaQueryMonitorVueUtils,
 } from "@thewaver/ss-components-vue";
-import type { BracketOrientation, BracketRootSide } from "@thewaver/ss-components-vue";
+import type { BracketConnectorDefs, BracketOrientation, BracketRootSide } from "@thewaver/ss-components-vue";
 import { BracketKnobs } from "@thewaver/ss-playground/App/Knobs/Brackets.const";
 import {
     CONNECTOR_FROM_COLOR,
@@ -26,7 +26,7 @@ import PageMeasureBox from "../../PageComponents/MeasureBox/MeasureBox.vue";
 import PageProp from "../../PageComponents/Prop/Prop.vue";
 import PagePropsPanel from "../../PageComponents/PropsPanel/PagePropsPanel.vue";
 import PageBeam from "../../StyledComponents/Beam/Beam.vue";
-import { BEAM_PATHS, NOTHING_PICKED } from "./BracketPage.const";
+import { BEAM_PATHS, NOTHING_PICKED, computeRouteSpan, toConnectorBoard } from "./BracketPage.const";
 import type { BracketExampleProps } from "./BracketPage.types";
 import FamilyExample from "./Examples/Family.vue";
 import KnockoutExample from "./Examples/Knockout.vue";
@@ -53,6 +53,19 @@ const family = shallowRef("");
 const prefersReducedMotion = MediaQueryMonitorVueUtils.useReducedMotion();
 
 const isBeamPlaying = shallowRef(!prefersReducedMotion.value);
+const beamLengths = shallowRef<Record<string, { board: string; childId: string; lengthPx: number }>>({});
+
+const setBeamLength = (defs: BracketConnectorDefs, lengthPx: number | undefined) => {
+    const { [defs.id]: _previous, ...others } = beamLengths.value;
+
+    beamLengths.value =
+        lengthPx === undefined
+            ? others
+            : { ...others, [defs.id]: { board: toConnectorBoard(defs), childId: defs.childId, lengthPx } };
+};
+
+const computeBeamSpan = (defs: BracketConnectorDefs) =>
+    computeRouteSpan(beamLengths.value, toConnectorBoard(defs), defs.childId);
 
 const commonProps = computed<BracketExampleProps>(() => ({
     layerGap: layerGap.value,
@@ -75,6 +88,9 @@ const commonProps = computed<BracketExampleProps>(() => ({
                   d: BEAM_PATHS[connector.value](defs, CONNECTOR_RADIUS),
                   direction: "backward",
                   isPlaying: isBeamPlaying.value,
+                  routeStartPx: computeBeamSpan(defs).startPx,
+                  routeLengthPx: computeBeamSpan(defs).totalPx,
+                  onLengthPx: (lengthPx: number | undefined) => setBeamLength(defs, lengthPx),
               })
             : null,
     ],
@@ -109,7 +125,7 @@ const examples: ExampleDefs[] = [
         name: "One family at a time",
         span: WIDE_SPAN,
         readout: () =>
-            `showing: ${family.value} — focus a node and the board shows what it feeds, it with all its siblings, and what feeds them; walk on with the arrows, or page through with the buttons without leaving them, and the rest folds away`,
+            `showing: ${family.value} — the whole draw stays mounted and a camera frames one family at a time: what the focused node feeds, it with all its siblings, and what feeds them; walk on with the arrows, or page through with the buttons without leaving them, and the camera pans and zooms to fit; Zoom out fits the whole draw, and Zoom in goes back to the family`,
         path: `${EXAMPLES_ROOT}/Family.vue`,
     },
 ];

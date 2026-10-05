@@ -20,7 +20,7 @@ describe("SlotTextReels", () => {
     });
 
     it("stops the columns one after another from the left, the way a slot machine does", () => {
-        const durations = [0, 1, 2].map((index) => SlotTextReels.SAMPLE_REELS.leftToRight(index, 3).durationMs);
+        const durations = [0, 1, 2].map((index) => SlotTextReels.SAMPLE_REELS.left_to_right(index, 3).durationMs);
 
         expect([...durations].sort((first, second) => first - second)).toEqual(durations);
         expect(new Set(durations).size).toBe(3);

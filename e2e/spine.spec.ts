@@ -40,7 +40,7 @@ const pickOption = async (page: import("@playwright/test").Page, key: string, na
 test.beforeEach(async ({ page }) => {
     await page.goto("/carousel");
     await expect(page.locator(viewport)).toBeVisible();
-    await pickOption(page, "placement", "Paddle wheel");
+    await pickOption(page, "placement", "paddle_wheel");
     await page.mouse.move(0, 0);
 });
 

@@ -4,6 +4,8 @@ import type { SVGAttributes } from "svelte/elements";
 
 import { type SVGAnimationDefs, SVGAnimationDefsUtils } from "@thewaver/ss-components";
 
+const FIRST_PATTERN_INDEX = 0;
+
 /** The Svelte side of `SVGAnimationDefsUtils`: an animation's schedule as a key and attributes to spread. */
 export namespace SVGAnimationDefsSvelteUtils {
     /**
@@ -52,7 +54,7 @@ export namespace SVGAnimationDefsSvelteUtils {
             dur: `${getDefs().animationDurationMs}ms`,
             repeatCount: SVGAnimationDefsUtils.computeRepeatCount(patterns[patternIndex]),
             fill: "freeze",
-            begin: "indefinite",
+            begin: SVGAnimationDefsUtils.getIsPageClocked(patterns[FIRST_PATTERN_INDEX]) ? "0s" : "indefinite",
             [attachmentKey]: attachAnimate,
         });
 

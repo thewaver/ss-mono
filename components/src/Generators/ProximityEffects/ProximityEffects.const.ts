@@ -22,6 +22,6 @@ export namespace ProximityEffectDefaults {
     export const DEFAULTS_BY_FAMILY = {
         fade: FADE_DEFAULTS,
         glow: GLOW_DEFAULTS,
-        zoomIn: ZOOM_IN_DEFAULTS,
+        zoom_in: ZOOM_IN_DEFAULTS,
     };
 }

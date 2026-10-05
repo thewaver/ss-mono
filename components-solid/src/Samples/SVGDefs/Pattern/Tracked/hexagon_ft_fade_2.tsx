@@ -28,7 +28,7 @@ export const hexagon_ft_fade_2 = (opts?: PatternProximityOpts): TrackedPatternCo
                         <>
                             {shape}
                             {SVGPatterns.computeTrackedLayoutPattern(
-                                "hexFlatTop",
+                                "hex_flat_top",
                                 `pattern1-${id}`,
                                 getRef,
                                 defs,

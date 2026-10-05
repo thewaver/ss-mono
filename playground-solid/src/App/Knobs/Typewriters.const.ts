@@ -3,7 +3,7 @@ import { ScrambleTextWeights } from "@thewaver/ss-components-solid";
 import type { TypewriterTextEffect } from "../Pages/TypewriterPage/TypewriterPage.types";
 
 export namespace TypewriterKnobs {
-    export const ARRIVAL_ORDERS = ["leftToRight", ...ScrambleTextWeights.SAMPLE_KEYS] as const;
+    export const ARRIVAL_ORDERS = ["left_to_right", ...ScrambleTextWeights.SAMPLE_KEYS] as const;
 
     export const STARTING_WIDTH = 240;
     export const STARTING_TEXT_EFFECT: TypewriterTextEffect = "fade";

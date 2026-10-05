@@ -30,8 +30,8 @@ export namespace ParticleFieldKnobs {
     export const STARTING_HOLD_SHARE = 0.4;
     export const STARTING_IS_SCATTERED = false;
     export const STARTING_ORIGIN_KEY: CellAnimationOrigins.OriginType = "center";
-    export const STARTING_WEIGHT_KEY: CellAnimationWeights.WeightType = "radarSingle";
-    export const STARTING_ANIMATION_KEY: CellAnimationKeyframes.AnimationType = "fadeInFlash";
+    export const STARTING_WEIGHT_KEY: CellAnimationWeights.WeightType = "radar_single";
+    export const STARTING_ANIMATION_KEY: CellAnimationKeyframes.AnimationType = "fade_in_flash";
     export const STARTING_SHAPE_KIND: ShapeConst.DefaultShape = "lozenge";
     export const STARTING_JOIN_RADIUS = 0;
 }

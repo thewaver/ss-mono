@@ -294,7 +294,7 @@ export const PaintedTextPage = () => {
 
     const getPercent = (progress: number) => `${Math.round(progress * PERCENT)}%`;
 
-    const usesPattern = getIsUsingKind([fill.paint, stroke.paint], ["pattern", "trackedPattern"]);
+    const usesPattern = getIsUsingKind([fill.paint, stroke.paint], ["pattern", "tracked_pattern"]);
     const usesTiming = getIsUsingKind([fill.paint, stroke.paint], ["pattern", "timed"]);
 
     const commonProps: ExampleWrapperProps = {

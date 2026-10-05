@@ -170,7 +170,7 @@ export namespace ProximityEffectUtils {
      */
     export const toEffectFn = (entry: ProximityEffectEntry): ProximityEffectFn => {
         switch (entry.family) {
-            case "zoomIn":
+            case "zoom_in":
                 return createZoomIn(entry.defs);
             case "glow":
                 return createGlow(entry.defs);

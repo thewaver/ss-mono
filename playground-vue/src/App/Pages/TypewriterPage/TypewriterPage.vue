@@ -44,7 +44,7 @@ const commonProps = computed<TypewriterExampleWrapperProps>(() => {
         width: textContainerWidth.value,
         computeAnimationName: () => TEXT_EFFECT_MAP[textEffect.value],
         computeCharacterWeights: (count) =>
-            order === "leftToRight" ? [] : ScrambleTextWeights.SAMPLE_WEIGHTS[order](count),
+            order === "left_to_right" ? [] : ScrambleTextWeights.SAMPLE_WEIGHTS[order](count),
     };
 });
 

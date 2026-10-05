@@ -66,6 +66,7 @@ export const ProximityText = (props: ProximityTextProps) => {
     const computeAnimationName = props.computeAnimationName ?? PROXIMITY_TEXT_DEFAULTS.computeAnimationName;
     const reachPx = props.reachPx ?? PROXIMITY_TEXT_DEFAULTS.reachPx;
     const isDisabled = props.isDisabled ?? false;
+    const distanceAxis = props.distanceAxis ?? PROXIMITY_TEXT_DEFAULTS.distanceAxis;
 
     const rootRef = useRef<HTMLDivElement | null>(null);
     const containerRef = useRef<HTMLDivElement | null>(null);
@@ -126,6 +127,7 @@ export const ProximityText = (props: ProximityTextProps) => {
         isDriven ? drivenBoxes : restBoxes,
         ProximityTextUtils.toPoint(reading, isPointerPresent && !isDisabled, size),
         reachPx,
+        distanceAxis,
     );
 
     const getLetterAnimation = (index: number, isResting: boolean) =>

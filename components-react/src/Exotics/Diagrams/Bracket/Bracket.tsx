@@ -31,6 +31,7 @@ const NEXT = 1;
 
 type BracketGlide = {
     anchorId: string | undefined;
+    isFamilyView: boolean;
     from: BracketArrangement | undefined;
     generation: number;
 };
@@ -76,30 +77,39 @@ export const Bracket = <T,>(props: BracketProps<T>) => {
 
     const anchorId = useMemo(() => BracketUtils.findNodeId(props.root, layout, family), [props.root, layout, family]);
 
-    const computeArrangement = (id: string | undefined) =>
-        BracketUtils.computeFamilyArrangement(layout, geometry, extent, id);
+    const currentLayer = BracketUtils.getFamilyLayer(layout, anchorId);
+
+    const lastShown = useRef<BracketArrangement>(undefined);
 
     const [glide, setGlide] = useState<BracketGlide>(() => ({
         anchorId,
+        isFamilyView,
         from: undefined,
         generation: NOTHING,
     }));
 
-    if (glide.anchorId !== anchorId) {
+    if (glide.anchorId !== anchorId || glide.isFamilyView !== isFamilyView) {
+        const isGliding = isFamilyView || glide.isFamilyView !== isFamilyView;
+
         setGlide({
             anchorId,
-            from: isFamilyView
-                ? BracketUtils.computeShownArrangement(glide.from, computeArrangement(glide.anchorId), progress)
-                : undefined,
-            generation: isFamilyView ? glide.generation + NEXT : glide.generation,
+            isFamilyView,
+            from: isGliding ? lastShown.current : glide.from,
+            generation: isGliding ? glide.generation + NEXT : glide.generation,
         });
     }
 
-    const target = isFamilyView ? computeArrangement(anchorId) : undefined;
-    const shown = target && BracketUtils.computeShownArrangement(glide.from, target, progress);
+    const target = isFamilyView
+        ? BracketUtils.computeFamilyArrangement(layout, geometry, extent, anchorId)
+        : BracketUtils.computeTreeArrangement(layout, geometry);
+    const shown = BracketUtils.computeShownArrangement(glide.from, target, progress);
 
-    const boardSize = geometry.boardSize;
-    const connectors = BracketUtils.computeConnectors(layout, geometry, boardId, focusedId, shown?.nodes);
+    useLayoutEffect(() => {
+        lastShown.current = shown;
+    });
+
+    const boardSize = shown.boardSize;
+    const connectors = BracketUtils.computeConnectors(layout, geometry, boardId, focusedId, shown.nodes);
 
     const placementById = useMemo(
         () => new Map(layout.placements.map((placement) => [placement.id, placement])),
@@ -107,7 +117,7 @@ export const Bracket = <T,>(props: BracketProps<T>) => {
     );
 
     const stops = layout.placements.filter((placement) => !placement.isDisabled);
-    const unfoldedStops = stops.filter((placement) => !target?.nodes[placement.id]?.isFolded);
+    const unfoldedStops = stops.filter((placement) => !target.nodes[placement.id]?.isFolded);
     const rovingId = BracketUtils.resolveRovingId(unfoldedStops, lastFocusedId);
 
     const getIsNode = (eventTarget: EventTarget | null) =>
@@ -122,8 +132,6 @@ export const Bracket = <T,>(props: BracketProps<T>) => {
     }, [glide.generation]);
 
     const showFamilyOf = (id: string) => {
-        if (!isFamilyView) return;
-
         const familyAnchorId = BracketUtils.getFamilyAnchorId(id);
 
         setFamily(familyAnchorId === undefined ? undefined : BracketUtils.findNode(props.root, familyAnchorId));
@@ -167,9 +175,9 @@ export const Bracket = <T,>(props: BracketProps<T>) => {
     const renderItem = (id: string): ReactNode => {
         const placement = placementById.get(id) ?? BRACKET_MISSING_PLACEMENT;
         const isNodeDisabled = placement.isDisabled;
-        const frame = shown?.nodes[id];
+        const frame = shown.nodes[id];
         const inset = frame ?? BracketUtils.computeInset(geometry, placement);
-        const isFolded = target?.nodes[id]?.isFolded ?? false;
+        const isFolded = target.nodes[id]?.isFolded ?? false;
 
         return (
             <li
@@ -240,23 +248,19 @@ export const Bracket = <T,>(props: BracketProps<T>) => {
                 viewBox={`0 0 ${boardSize.width} ${boardSize.height}`}
                 aria-hidden="true"
             >
-                {connectors.map((defs, index) =>
-                    shown ? (
-                        <g key={index} style={{ opacity: BracketUtils.computeConnectorOpacity(shown.nodes, defs) }}>
-                            {props.renderConnector?.(defs)}
-                        </g>
-                    ) : (
-                        <Fragment key={index}>{props.renderConnector?.(defs)}</Fragment>
-                    ),
-                )}
+                {connectors.map((defs, index) => (
+                    <g key={index} style={{ opacity: BracketUtils.computeConnectorOpacity(shown.nodes, defs) }}>
+                        {props.renderConnector?.(defs)}
+                    </g>
+                ))}
             </svg>
 
             {renderLayerHeader ? (
                 Array.from({ length: layout.layerCount }, (_unused, layer) => {
                     const headerId = `${boardId}-layer-${layer}`;
                     const headerBox = BracketUtils.computeHeaderBox(geometry, layer);
-                    const headerFrame = shown?.headers[layer];
-                    const isHeaderFolded = target?.headers[layer]?.isFolded ?? false;
+                    const headerFrame = shown.headers[layer];
+                    const isHeaderFolded = target.headers[layer]?.isFolded ?? false;
 
                     return (
                         <Fragment key={layer}>
@@ -273,7 +277,7 @@ export const Bracket = <T,>(props: BracketProps<T>) => {
                                 }}
                                 aria-hidden={isHeaderFolded ? "true" : undefined}
                             >
-                                {renderLayerHeader(layer)}
+                                {renderLayerHeader(layer, { isCurrent: currentLayer === layer })}
                             </div>
 
                             <ul

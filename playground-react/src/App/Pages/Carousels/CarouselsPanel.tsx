@@ -5,7 +5,6 @@ import {
     ORIENTATION_FIELD_WIDTH,
     ORIENTATION_LABELS,
     PLACEMENT_FIELD_WIDTH,
-    PLACEMENT_LABELS,
 } from "@thewaver/ss-playground/App/Pages/Carousels/Carousels.const";
 
 import { PageCheckField, PageNumberField, PageSelectField } from "../../PageComponents/Field/Field";
@@ -36,7 +35,6 @@ export const PageCarouselsPanel = (props: Props) => {
                     <PageSelectField
                         value={controls.placement[0]}
                         values={CarouselPlacements.SAMPLE_KEYS}
-                        computeLabel={(placement) => PLACEMENT_LABELS[placement]}
                         width={PLACEMENT_FIELD_WIDTH}
                         ariaLabel={"Placement"}
                         onChange={(placement) => controls.placement[1](placement)}

@@ -60,13 +60,13 @@ const lastLingers: SlotTextReelFn = (wheelIndex, wheelCount) => {
 
 export namespace SlotTextReels {
     export const SAMPLE_REELS = {
-        leftToRight,
-        rightToLeft,
+        left_to_right: leftToRight,
+        right_to_left: rightToLeft,
         together,
-        centerOut,
-        outsideIn,
+        center_out: centerOut,
+        outside_in: outsideIn,
         alternating,
-        lastLingers,
+        last_lingers: lastLingers,
     } satisfies Record<string, SlotTextReelFn>;
 
     export type SampleKey = keyof typeof SAMPLE_REELS;

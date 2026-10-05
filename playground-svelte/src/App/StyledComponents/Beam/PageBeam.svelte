@@ -1,17 +1,23 @@
 <svelte:options namespace="svg" />
 
 <script lang="ts">
-    import { toStyle } from "@thewaver/ss-components-svelte";
-    import { computeBeamLengthPx, observeBeamLength } from "@thewaver/ss-playground/App/StyledComponents/Beam/Beam.const";
+    import { untrack } from "svelte";
+
+    import {
+        computeBeamLengthPx,
+        computeBeamMotion,
+        observeBeamLength,
+    } from "@thewaver/ss-playground/App/StyledComponents/Beam/Beam.const";
     import * as styles from "@thewaver/ss-playground/App/StyledComponents/Beam/Beam.css";
-    import { assignInlineVars } from "@vanilla-extract/dynamic";
 
     import type { PageBeamProps } from "./Beam.types";
+
+    const NO_LENGTH = 0;
 
     let props: PageBeamProps = $props();
 
     let path = $state<SVGPathElement>();
-    let lengthPx = $state(0);
+    let lengthPx = $state(NO_LENGTH);
 
     $effect(() => {
         if (!path) return;
@@ -26,12 +32,40 @@
 
         if (path) lengthPx = computeBeamLengthPx(path);
     });
+
+    $effect(() => {
+        const value = lengthPx;
+
+        untrack(() => props.onLengthPx?.(value));
+    });
+
+    $effect(() => () => untrack(() => props.onLengthPx?.(undefined)));
+
+    const motion = $derived(
+        computeBeamMotion({
+            lengthPx,
+            startPx: props.routeStartPx ?? NO_LENGTH,
+            totalPx: props.routeLengthPx ?? lengthPx,
+            direction: props.direction,
+        }),
+    );
+
+    $effect(() => {
+        const { fromPx, toPx, durationMs } = motion;
+
+        if (!path || durationMs <= NO_LENGTH) return;
+
+        const animation = path.animate([{ strokeDashoffset: `${fromPx}px` }, { strokeDashoffset: `${toPx}px` }], {
+            duration: durationMs,
+            iterations: Infinity,
+        });
+
+        animation.currentTime = performance.now() % durationMs;
+
+        if (!props.isPlaying) animation.pause();
+
+        return () => animation.cancel();
+    });
 </script>
 
-<path
-    bind:this={path}
-    class={[styles.beam, styles.beamDirectionVariants[props.direction], !props.isPlaying && styles.beamPaused]}
-    style={toStyle(assignInlineVars({ [styles.beamLengthVar]: `${lengthPx}px` }))}
-    d={props.d}
-    data-beam
-/>
+<path bind:this={path} class={styles.beam} style:stroke-dasharray={motion.dashArray} d={props.d} data-beam />

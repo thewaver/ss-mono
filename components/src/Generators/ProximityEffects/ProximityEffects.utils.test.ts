@@ -33,7 +33,7 @@ const defsFor = (placement: PlacementRect, prefersReducedMotion = false) =>
 
 const toNumbers = (value: number | number[] | undefined) => (Array.isArray(value) ? value : [value ?? 0]);
 
-describe("zoomIn", () => {
+describe("zoom_in", () => {
     const zoomIn = ProximityEffectUtils.createZoomIn();
 
     it("grows the item the pointer is on, grows its neighbor less, and leaves a distant one alone", () => {

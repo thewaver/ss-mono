@@ -48,14 +48,14 @@ export namespace SVGPatterns {
         cellCount: SVGPatternCellCount,
         cellSize: Size2d,
         renderCell: SVGPatternCellRenderer,
-    ) => computeLayoutPattern("halfShift", id, cellCount, cellSize, renderCell);
+    ) => computeLayoutPattern("half_shift", id, cellCount, cellSize, renderCell);
 
     export const computeHalfDropPattern = (
         id: string,
         cellCount: SVGPatternCellCount,
         cellSize: Size2d,
         renderCell: SVGPatternCellRenderer,
-    ) => computeLayoutPattern("halfDrop", id, cellCount, cellSize, renderCell);
+    ) => computeLayoutPattern("half_drop", id, cellCount, cellSize, renderCell);
 
     export const computeTrianglePattern = (
         id: string,
@@ -69,21 +69,21 @@ export namespace SVGPatterns {
         cellCount: SVGPatternCellCount,
         cellSize: Size2d,
         renderCell: SVGPatternCellRenderer,
-    ) => computeLayoutPattern("triangleSideways", id, cellCount, cellSize, renderCell);
+    ) => computeLayoutPattern("triangle_sideways", id, cellCount, cellSize, renderCell);
 
     export const computeHexPointyTopPattern = (
         id: string,
         cellCount: SVGPatternCellCount,
         cellSize: Size2d,
         renderCell: SVGPatternCellRenderer,
-    ) => computeLayoutPattern("hexPointyTop", id, cellCount, cellSize, renderCell);
+    ) => computeLayoutPattern("hex_pointy_top", id, cellCount, cellSize, renderCell);
 
     export const computeHexFlatTopPattern = (
         id: string,
         cellCount: SVGPatternCellCount,
         cellSize: Size2d,
         renderCell: SVGPatternCellRenderer,
-    ) => computeLayoutPattern("hexFlatTop", id, cellCount, cellSize, renderCell);
+    ) => computeLayoutPattern("hex_flat_top", id, cellCount, cellSize, renderCell);
 
     export const computeTrackedLayoutPattern = (
         kind: SVGPatternKind,

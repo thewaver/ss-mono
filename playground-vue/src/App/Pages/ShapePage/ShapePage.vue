@@ -42,7 +42,7 @@ const colors = shallowRef<SVGDefsColors>({ ...SVGDefsSamples.SAMPLE_COLORS });
 const colorKeys = computed(() => Object.keys(colors.value) as (keyof SVGDefsColors)[]);
 
 const usesPattern = computed(() =>
-    getIsUsingKind([stroke.paint.value, fill.paint.value], ["pattern", "trackedPattern"]),
+    getIsUsingKind([stroke.paint.value, fill.paint.value], ["pattern", "tracked_pattern"]),
 );
 const usesTiming = computed(() => getIsUsingKind([stroke.paint.value, fill.paint.value], ["pattern", "timed"]));
 

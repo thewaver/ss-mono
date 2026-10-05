@@ -10,13 +10,13 @@
     import PageMeasureBox from "../../PageComponents/MeasureBox/MeasureBox.svelte";
     import PageProp from "../../PageComponents/Prop/Prop.svelte";
     import PagePropsPanel from "../../PageComponents/PropsPanel/PagePropsPanel.svelte";
+    import BarrelExample from "./Examples/Barrel.svelte";
     import PaintedExample from "./Examples/Painted.svelte";
     import PointerExample from "./Examples/Pointer.svelte";
     import WaveExample from "./Examples/Wave.svelte";
     import type { ProximityTextExampleProps } from "./ProximityTextPageSvelte.types";
 
     const EXAMPLES_ROOT = "/src/App/Pages/ProximityTextPage/Examples";
-    const BOX_WIDTH = 360;
     const WIDE_SPAN = 2;
 
     let reachPx = $state(PROXIMITY_TEXT_DEFAULTS.reachPx);
@@ -52,24 +52,37 @@
             component: paintedExample,
             path: `${EXAMPLES_ROOT}/Painted.svelte`,
         },
+        {
+            key: "barrel",
+            name: "Inside a barrel",
+            span: WIDE_SPAN,
+            readout: () =>
+                "a point fixed to the middle of the box and measured up and down only, so every letter on a line answers it alike: a line closes up as it reaches the middle and spreads apart again towards either edge, its keyframes running from spread to closed; the lines were wrapped with every letter at its widest, which here is the first frame, so no word jumps from one line to the next as they spread",
+            component: barrelExample,
+            path: `${EXAMPLES_ROOT}/Barrel.svelte`,
+        },
     ];
 </script>
 
 {#snippet pointerExample()}
-    <PageMeasureBox width={BOX_WIDTH} padding={MEASURE_BOX_PADDING}>
+    <PageMeasureBox width={ProximityTextKnobs.BOX_WIDTH} padding={MEASURE_BOX_PADDING}>
         <PointerExample {...commonProps} />
     </PageMeasureBox>
 {/snippet}
 
 {#snippet waveExample()}
-    <PageMeasureBox width={BOX_WIDTH} padding={MEASURE_BOX_PADDING}>
-        <WaveExample {...commonProps} />
-    </PageMeasureBox>
+    <WaveExample {...commonProps} />
 {/snippet}
 
 {#snippet paintedExample()}
-    <PageMeasureBox width={BOX_WIDTH} padding={MEASURE_BOX_PADDING}>
+    <PageMeasureBox width={ProximityTextKnobs.BOX_WIDTH} padding={MEASURE_BOX_PADDING}>
         <PaintedExample {...commonProps} />
+    </PageMeasureBox>
+{/snippet}
+
+{#snippet barrelExample()}
+    <PageMeasureBox width={ProximityTextKnobs.BOX_WIDTH}>
+        <BarrelExample {isDisabled} />
     </PageMeasureBox>
 {/snippet}
 

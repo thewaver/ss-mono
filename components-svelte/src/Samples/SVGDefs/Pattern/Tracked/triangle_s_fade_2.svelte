@@ -61,7 +61,7 @@
 
     const pattern = $derived(
         SVGPatterns.computeTrackedLayoutPattern(
-            "triangleSideways",
+            "triangle_sideways",
             `pattern1-${props.id}`,
             props.defs.cellSize,
             props.defs.getSize(),

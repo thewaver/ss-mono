@@ -9,8 +9,8 @@ const EVEN_COLUMN: Index2d = { col: 1, row: 8 };
 
 describe("CellAnimationOriginsConst", () => {
     it("puts each named origin on the cell its name promises", () => {
-        expect(CellAnimationOrigins.computeOrigin("topLeft", ODD_GRID)).toEqual({ col: 0, row: 0 });
-        expect(CellAnimationOrigins.computeOrigin("bottomRight", ODD_GRID)).toEqual({ col: 6, row: 6 });
+        expect(CellAnimationOrigins.computeOrigin("top_left", ODD_GRID)).toEqual({ col: 0, row: 0 });
+        expect(CellAnimationOrigins.computeOrigin("bottom_right", ODD_GRID)).toEqual({ col: 6, row: 6 });
         expect(CellAnimationOrigins.computeOrigin("center", ODD_GRID)).toEqual({ col: 3, row: 3 });
         expect(CellAnimationOrigins.computeOrigin("top", ODD_GRID)).toEqual({ col: 3, row: 0 });
         expect(CellAnimationOrigins.computeOrigin("bottom", ODD_GRID)).toEqual({ col: 3, row: 6 });

@@ -57,7 +57,7 @@
 
     const colorKeys = $derived(Object.keys(colors) as (keyof SVGDefsColors)[]);
 
-    const usesPattern = $derived(getIsUsingKind([fill.paint, stroke.paint], ["pattern", "trackedPattern"]));
+    const usesPattern = $derived(getIsUsingKind([fill.paint, stroke.paint], ["pattern", "tracked_pattern"]));
     const usesTiming = $derived(getIsUsingKind([fill.paint, stroke.paint], ["pattern", "timed"]));
 
     const commonProps: PaintedTextExampleWrapperProps = $derived({

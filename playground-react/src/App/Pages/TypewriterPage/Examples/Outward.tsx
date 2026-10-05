@@ -44,7 +44,7 @@ export const OutwardExample = () => {
                     progress={[flown, IGNORE]}
                     playback={[false, IGNORE]}
                     computeAnimationName={computeAnimationName}
-                    computeCharacterWeights={ScrambleTextWeights.SAMPLE_WEIGHTS.fromMiddle}
+                    computeCharacterWeights={ScrambleTextWeights.SAMPLE_WEIGHTS.from_middle}
                     animationDelayMs={CHARACTER_DELAY_MS}
                     animationDurationMs={CHARACTER_DURATION_MS}
                 >

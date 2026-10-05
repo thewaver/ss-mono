@@ -33,8 +33,8 @@ const alternating: StaircaseIndentFn = (defs) => {
 export namespace StaircaseIndents {
     export const SAMPLE_INDENTS = {
         linear,
-        easedIn,
-        easedOut,
+        eased_in: easedIn,
+        eased_out: easedOut,
         hourglass,
         repeating,
         alternating,

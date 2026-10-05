@@ -13,7 +13,7 @@ import { example, prop, readout } from "./helpers";
 const BOARD = example("knockout");
 const CHART = example("orgChart");
 const CHAIN = example("skillTree");
-const CONNECTOR_SAMPLES = ["flat", "rounded", "curved", "ballAndArrow"];
+const CONNECTOR_SAMPLES = ["flat", "rounded", "curved", "ball_and_arrow"];
 const NODE = `${BOARD} li`;
 const CONNECTOR = `${BOARD} svg path`;
 
@@ -202,7 +202,7 @@ test("the consumer decides what a connector is, and the component only says wher
     await pick(page, "connector", "rounded");
     expect((await drawn()).curved, "the rounded one takes the corners off").toBe(true);
 
-    await pick(page, "connector", "ballAndArrow");
+    await pick(page, "connector", "ball_and_arrow");
 
     const decorated = await drawn();
 
@@ -530,168 +530,356 @@ test("activating a node reports where it is, not only what it holds", async ({ p
 });
 
 /**
- * The beam is a Playground example rather than a library feature: the bracket hands every line to the page to draw,
- * and says which of them run between the focused node and the root. So the checks are that beams appear only along
- * that route, and that the pause the example owes WCAG 2.2.2 stops them. Pressing the pause takes focus off the board,
- * and the route goes with it, so the pause is seen on the next node focused. Whether a beam is moving is read off
- * `animation-play-state`, which is the example's own state rather than its paint.
+ * The beams are the page's paint rather than a library feature: the bracket hands every line to the page to draw, and
+ * says which of them run between the focused node and the root. So the checks are that beams appear only along that
+ * route, that the beams along one route run as one pulse, and that the page's "Beams moving" box — the stop WCAG 2.2.2
+ * asks of anything moving for more than five seconds — stops them. Whether a beam is moving is read off the play state
+ * of the animations running on it, which is the example's own state rather than its paint.
  */
-const BEAMS = example("beams");
-const BEAM = `${BEAMS} [data-beam]`;
-const SEED = `${BEAMS} li [role="button"]`;
+const BEAM = `${BOARD} [data-beam]`;
+const SEED = `${BOARD} li [role="button"]`;
 
-test("a beam runs only along the focused node's route to the final, and pausing it stops it", async ({ page }) => {
+const readBeams = (page: Page) =>
+    page.locator(BEAM).evaluateAll((beams) =>
+        beams.map((beam) =>
+            beam.getAnimations().map((animation) => ({
+                state: animation.playState,
+                durationMs: Number(animation.effect?.getComputedTiming().duration ?? 0),
+                atMs: Number(animation.currentTime ?? 0),
+            })),
+        ),
+    );
+
+test("a beam runs only along the focused node's route to the final, and the page's box stops it", async ({ page }) => {
     await expect(page.locator(BEAM), "nothing is focused, so there is no route to run along").toHaveCount(0);
 
     await page.locator(SEED, { hasText: /^Ada$/ }).click();
 
     await expect(page.locator(BEAM), "one beam on each line from the seed to the final, and no others").toHaveCount(3);
-    await expect(page.locator(BEAM).first()).toHaveCSS("animation-play-state", "running");
+    await expect
+        .poll(async () =>
+            (await readBeams(page)).every((runs) => runs.length > 0 && runs.every((run) => run.state === "running")),
+        )
+        .toBe(true);
 
-    await page.locator("#bracketBeamsPlayback").click();
-    await page.locator(SEED, { hasText: /^Hal$/ }).click();
+    await page.locator(`${prop("isBeamPlaying")} input`).uncheck();
+    await page.locator(SEED, { hasText: /^Gus$/ }).click();
 
     await expect(page.locator(BEAM)).toHaveCount(3);
-    await expect(page.locator(BEAM).first(), "the next route runs paused").toHaveCSS("animation-play-state", "paused");
+    await expect
+        .poll(
+            async () =>
+                (await readBeams(page)).every((runs) => runs.length > 0 && runs.every((run) => run.state === "paused")),
+            {
+                message: "the next route runs stopped",
+            },
+        )
+        .toBe(true);
 });
 
 /**
- * The family view shows one family at a time: the node the focused one feeds, the focused node with all its
- * siblings, and every node that feeds those siblings — two rows where a third does not exist, so a leaf shows its
- * parent with the leaf and its siblings, and the root shows itself with the nodes that feed it. Nothing focused
- * shows the root's family. Every other node is folded away: hidden from a screen reader, out of reach of Tab and the
- * pointer, and not drawn once the glide has settled. What is read back is which nodes are left unfolded, by the
+ * One pulse runs the whole route rather than one per line, so every beam on the route repeats over the same time —
+ * the route's length, not its own line's — and all of them are at the same point of it, which is the page's clock.
+ */
+test("the beams along one route share one period and one clock, so the pulse runs the route as one", async ({
+    page,
+}) => {
+    await page.locator(SEED, { hasText: /^Ada$/ }).click();
+    await expect(page.locator(BEAM)).toHaveCount(3);
+
+    await expect
+        .poll(
+            async () => {
+                const runs = (await readBeams(page)).flat();
+                const periods = runs.map((run) => run.durationMs);
+
+                return runs.length === 3 && Math.max(...periods) - Math.min(...periods) < 1;
+            },
+            { message: "one period for the whole route" },
+        )
+        .toBe(true);
+
+    const runs = (await readBeams(page)).flat();
+    const phases = runs.map((run) => run.atMs % run.durationMs);
+
+    expect(Math.max(...phases) - Math.min(...phases), "and the same moment of it").toBeLessThan(50);
+});
+
+/**
+ * The family example keeps the whole draw mounted and puts a camera over it that frames one family at a time: the
+ * node the focused one feeds, the focused node with all its siblings, and every node that feeds those siblings. Nothing
+ * is folded away, so what is read back is which nodes the camera has inside its frame once it has settled, by the
  * names the example gives them, and never where they sit or how long the glide takes.
  */
 const FAMILY = example("family");
+const FAMILY_DEMO = `${FAMILY} [data-demo]`;
+const FAMILY_FRAME = `${FAMILY_DEMO} [data-measure-box] > div`;
 const FAMILY_NODE = `${FAMILY} li [role="button"]`;
+const FAMILY_ZOOM = "#familyZoom";
+const STAGE_BUTTONS = ["toLeaves", "toRoot", "previous", "next"].map((step) => `#familyStep-${step}`);
 const ROOT_FAMILY = ["Final", "Semi 1", "Semi 2"];
+const ALL_NODES = [
+    ...["Final", "Semi 1", "Semi 2", "Quarter 1", "Quarter 2", "Quarter 3", "Quarter 4"],
+    ...["Ada", "Bo", "Cai", "Dee", "Eli", "Fay", "Gus", "Hal"],
+];
 
-const shownNodes = (page: Page) =>
+/** Every node whose box lies wholly inside the camera's frame, sorted by name. */
+const framedNodes = (page: Page) =>
     page.evaluate(
-        (value) =>
-            [...document.querySelectorAll(`${value} li`)]
-                .filter((item) => item.getAttribute("aria-hidden") !== "true")
+        ({ scope, frame }) => {
+            const bounds = document.querySelector(frame)!.getBoundingClientRect();
+            const within = (box: DOMRect) =>
+                box.left >= bounds.left - 0.5 &&
+                box.right <= bounds.right + 0.5 &&
+                box.top >= bounds.top - 0.5 &&
+                box.bottom <= bounds.bottom + 0.5;
+
+            return [...document.querySelectorAll(`${scope} li`)]
+                .filter((item) => within(item.getBoundingClientRect()))
                 .map((item) => (item.textContent ?? "").trim())
-                .sort(),
-        FAMILY,
+                .sort();
+        },
+        { scope: FAMILY, frame: FAMILY_FRAME },
     );
 
-const foldedNodes = (page: Page) =>
-    page.evaluate(
-        (value) =>
-            [...document.querySelectorAll(`${value} li[aria-hidden="true"]`)].map((item) => ({
-                text: (item.textContent ?? "").trim(),
-                isInert: (item as HTMLElement).inert,
-            })),
-        FAMILY,
-    );
+const expectFramed = (page: Page, names: string[], message: string) =>
+    expect
+        .poll(
+            async () => {
+                const framed = await framedNodes(page);
+
+                return names.every((name) => framed.includes(name));
+            },
+            { message },
+        )
+        .toBe(true);
 
 const focusedText = (page: Page) => page.evaluate(() => (document.activeElement?.textContent ?? "").trim());
 
-const isFocusFolded = (page: Page) =>
-    page.evaluate(() => document.activeElement?.closest('li[aria-hidden="true"]') !== null);
+/**
+ * Which layer header is lit, read as the one header whose painted element is dressed unlike the others, and handed
+ * back as the round it names — the list it labels. `undefined` while none stands out, or more than one does.
+ */
+const litRound = (page: Page) =>
+    page.evaluate((scope) => {
+        const headers = [...document.querySelectorAll(`${scope} [id*="-layer-"]`)] as HTMLElement[];
+        const dress = headers.map((header) => header.firstElementChild?.className ?? "");
+        const odd = headers.filter((_header, index) => dress.filter((other) => other === dress[index]).length === 1);
 
-test("with nothing focused the family view shows the root and the nodes that feed it, and folds the rest", async ({
+        return odd.length === 1 && headers.length > 2 ? odd[0].id : undefined;
+    }, FAMILY);
+
+const roundOf = (page: Page, name: string) =>
+    page
+        .locator(FAMILY_NODE, { hasText: new RegExp(`^${name}$`) })
+        .evaluate((node) => node.closest("ul")?.getAttribute("aria-labelledby") ?? "");
+
+test("the whole draw stays mounted, and nothing is ever folded away", async ({ page }) => {
+    await page.locator(FAMILY_NODE, { hasText: /^Semi 1$/ }).click();
+    await page.keyboard.press("ArrowLeft");
+
+    const items = page.locator(`${FAMILY} li`);
+
+    await expect(items).toHaveCount(ALL_NODES.length);
+    await expect(page.locator(`${FAMILY} li[aria-hidden="true"], ${FAMILY} li[inert]`)).toHaveCount(0);
+});
+
+test("with nothing focused the camera frames the root and the nodes that feed it", async ({ page }) => {
+    await expectFramed(page, ROOT_FAMILY, "the root's family is in the frame");
+    expect((await framedNodes(page)).length, "and the frame holds less than the whole draw").toBeLessThan(
+        ALL_NODES.length,
+    );
+});
+
+test("focusing a node frames what it feeds, it with all its siblings, and every node that feeds them", async ({
     page,
 }) => {
-    await expect
-        .poll(() => shownNodes(page), { message: "the root's family and no one else" })
-        .toEqual([...ROOT_FAMILY].sort());
-
-    const folded = await foldedNodes(page);
-
-    expect(folded.length, "everything else is folded away").toBeGreaterThan(0);
-    expect(
-        folded.filter((node) => !node.isInert).map((node) => node.text),
-        "and every folded node is out of reach of Tab and the pointer",
-    ).toEqual([]);
-    await expect(page.locator(`${FAMILY} li[aria-hidden="true"]`).first(), "and is not drawn").toBeHidden();
-});
-
-test("focusing a node shows what it feeds, it with all its siblings, and every node that feeds them", async ({
-    page,
-}) => {
     await page.locator(FAMILY_NODE, { hasText: /^Semi 1$/ }).click();
 
-    await expect
-        .poll(() => shownNodes(page))
-        .toEqual(["Final", "Quarter 1", "Quarter 2", "Quarter 3", "Quarter 4", "Semi 1", "Semi 2"]);
+    await expectFramed(
+        page,
+        ["Final", "Quarter 1", "Quarter 2", "Quarter 3", "Quarter 4", "Semi 1", "Semi 2"],
+        "the final's family",
+    );
 });
 
-test("moving focus to a node that feeds the focused one shows that node's family", async ({ page }) => {
-    await page.locator(FAMILY_NODE, { hasText: /^Semi 1$/ }).click();
-    await page.keyboard.press("ArrowLeft");
-
-    expect(await focusedText(page), "left steps from the semi into the round that feeds it").toBe("Quarter 1");
-    await expect
-        .poll(() => shownNodes(page), { message: "the semi it feeds, the quarters beside it, and their entrants" })
-        .toEqual(["Ada", "Bo", "Cai", "Dee", "Quarter 1", "Quarter 2", "Semi 1"]);
-});
-
-test("a leaf shows the node it feeds and itself among its siblings, and nothing below", async ({ page }) => {
-    await page.locator(FAMILY_NODE, { hasText: /^Semi 1$/ }).click();
-    await page.keyboard.press("ArrowLeft");
-    await page.keyboard.press("ArrowLeft");
-
-    expect(await focusedText(page)).toBe("Ada");
-    await expect.poll(() => shownNodes(page)).toEqual(["Ada", "Bo", "Quarter 1"]);
-});
-
-test("walking onto a folded node unfolds its family, so focus never sits on a folded node", async ({ page }) => {
-    await page.locator(FAMILY_NODE, { hasText: /^Semi 1$/ }).click();
-    await page.keyboard.press("ArrowLeft");
-    await page.keyboard.press("ArrowLeft");
-    await page.keyboard.press("ArrowDown");
-
-    expect(await focusedText(page)).toBe("Bo");
-    expect(await shownNodes(page), "the next entrant along is in another family, folded away").not.toContain("Cai");
-
-    await page.keyboard.press("ArrowDown");
-
-    expect(await focusedText(page), "the walk goes on into it rather than stopping at the family's edge").toBe("Cai");
-    expect(await isFocusFolded(page), "and the node focus landed on is not folded").toBe(false);
-    await expect.poll(() => shownNodes(page)).toEqual(["Cai", "Dee", "Quarter 2"]);
-});
-
-test("the root's family comes back when focus leaves the board, and Tab lands on a node that is shown", async ({
-    page,
-}) => {
-    await expect.poll(() => shownNodes(page)).toEqual([...ROOT_FAMILY].sort());
-
+test("walking with the arrows moves the camera to the family of the node walked to", async ({ page }) => {
     const readBefore = await readout(page, "family");
 
     await page.locator(FAMILY_NODE, { hasText: /^Semi 1$/ }).click();
     await page.keyboard.press("ArrowLeft");
-    await expect.poll(() => shownNodes(page)).not.toEqual([...ROOT_FAMILY].sort());
+
+    expect(await focusedText(page), "left steps from the semi into the round that feeds it").toBe("Quarter 1");
+    await expectFramed(page, ["Ada", "Bo", "Cai", "Dee", "Quarter 1", "Quarter 2", "Semi 1"], "the semi's family");
     await expect
         .poll(() => readout(page, "family"), { message: "the readout names the family shown" })
         .not.toBe(readBefore);
+});
+
+test("focus leaving the board leaves the family where it was", async ({ page }) => {
+    await page.locator(FAMILY_NODE, { hasText: /^Semi 1$/ }).click();
+    await page.keyboard.press("ArrowLeft");
+    await expectFramed(page, ["Ada", "Bo", "Cai", "Dee"], "the semi's family");
+
+    const shown = await readout(page, "family");
 
     await page.locator(`${FAMILY} [data-readout]`).click();
 
-    await expect
-        .poll(() => shownNodes(page), { message: "nothing focused is the root's family" })
-        .toEqual([...ROOT_FAMILY].sort());
-    await expect.poll(() => readout(page, "family"), { message: "and the readout says so" }).toBe(readBefore);
-
-    await page.locator(`${FAMILY} button`).first().focus();
-    await page.keyboard.press("Tab");
-
-    expect(await focusedText(page), "Tab enters the board").not.toBe("");
-    expect(await isFocusFolded(page), "on a node that is shown, not the folded one focus last left").toBe(false);
+    expect(await readout(page, "family"), "the readout still names it").toBe(shown);
+    await expectFramed(page, ["Ada", "Bo", "Cai", "Dee"], "and the camera stays on it");
 });
 
-test("the family view's board keeps one size while the family changes", async ({ page }) => {
-    const board = page.locator(`${FAMILY} svg`).locator("..");
-    const resting = await board.boundingBox();
+/**
+ * The stage buttons move the family from outside the board, through the two-way `family` prop, so they page through
+ * it without focus ever entering the board; and a button whose step would land on the family already showing is
+ * disabled, so a press never does nothing.
+ */
+test("the stage buttons page through families without taking focus into the board", async ({ page }) => {
+    await expect(page.locator(STAGE_BUTTONS[1]), "the root's own family has no stage nearer the final").toHaveAttribute(
+        "aria-disabled",
+        "true",
+    );
+
+    const readBefore = await readout(page, "family");
+
+    await page.locator(STAGE_BUTTONS[0]).click();
+
+    await expect.poll(() => readout(page, "family"), { message: "a stage further out" }).not.toBe(readBefore);
+    await expectFramed(page, ["Final", "Quarter 1", "Quarter 4", "Semi 1", "Semi 2"], "the final's family");
+    expect(
+        await page.evaluate(() => document.activeElement?.closest("li") === null),
+        "focus stayed off the board",
+    ).toBe(true);
+
+    await page.locator(STAGE_BUTTONS[1]).click();
+
+    await expect.poll(() => readout(page, "family"), { message: "and back" }).toBe(readBefore);
+});
+
+test("zooming out frames the whole draw and parks the stage buttons, and zooming in goes back", async ({ page }) => {
+    await page.locator(FAMILY_ZOOM).click();
+
+    await expect.poll(() => framedNodes(page), { message: "every node in the frame" }).toEqual([...ALL_NODES].sort());
+
+    for (const button of STAGE_BUTTONS) await expect(page.locator(button)).toHaveAttribute("aria-disabled", "true");
+
+    await page.locator(FAMILY_ZOOM).click();
+
+    await expect
+        .poll(async () => (await framedNodes(page)).length, { message: "back on one family" })
+        .toBeLessThan(ALL_NODES.length);
+    await expectFramed(page, ROOT_FAMILY, "the one it left");
+    await expect(page.locator(STAGE_BUTTONS[0]), "and the buttons are back").not.toHaveAttribute(
+        "aria-disabled",
+        "true",
+    );
+});
+
+test("only the current round's name is lit, and it is the round of the node holding focus", async ({ page }) => {
+    await expect
+        .poll(() => litRound(page), { message: "before anything is focused, the final's" })
+        .toBe(await roundOf(page, "Final"));
+
+    await page.locator(FAMILY_NODE, { hasText: /^Semi 1$/ }).click();
+    await expect.poll(() => litRound(page)).toBe(await roundOf(page, "Semi 1"));
+
+    await page.keyboard.press("ArrowLeft");
+    await expect.poll(() => litRound(page)).toBe(await roundOf(page, "Quarter 1"));
+});
+
+/**
+ * The round names are pinned to the frame's leading edge while the camera moves under them — its top while the rounds
+ * run across, its left while they run down — so a family framed anywhere on the draw still has its rounds named.
+ */
+const readHeaderEdges = (page: Page) =>
+    page.evaluate(
+        ({ scope, frame }) => {
+            const bounds = document.querySelector(frame)!.getBoundingClientRect();
+
+            return [...document.querySelectorAll(`${scope} [id*="-layer-"]`)].map((header) => {
+                const box = header.firstElementChild!.getBoundingClientRect();
+
+                return { top: box.top - bounds.top, left: box.left - bounds.left };
+            });
+        },
+        { scope: FAMILY, frame: FAMILY_FRAME },
+    );
+
+test("the round names stay pinned to the frame's leading edge wherever the camera goes", async ({ page }) => {
+    await page.locator(FAMILY_NODE, { hasText: /^Semi 1$/ }).click();
+    await page.keyboard.press("ArrowLeft");
+    await expectFramed(page, ["Ada", "Bo", "Cai", "Dee"], "the camera has moved down the draw");
+
+    for (const edge of await readHeaderEdges(page))
+        expect(Math.abs(edge.top), "across, on the top edge").toBeLessThan(1);
+
+    await pick(page, "orientation", "vertical");
+    await page.locator(FAMILY_NODE, { hasText: /^Quarter 1$/ }).focus();
+    await expectFramed(page, ["Ada", "Bo", "Cai", "Dee"], "the camera has moved along the draw");
+
+    for (const edge of await readHeaderEdges(page))
+        expect(Math.abs(edge.left), "down, on the left edge").toBeLessThan(1);
+});
+
+/**
+ * A pinned round name floats over the draw, so a node the frame shows at its very edge can sit under its round's
+ * name. The name is not something to press, so the node under it still takes the pointer. Read as a press at a point
+ * inside both a name and a node, which has to land on the node; the vertical board on the root's family is where the
+ * frame puts a quarter-final under the name strip.
+ */
+test("a node under a pinned round name still takes a press there", async ({ page }) => {
+    await pick(page, "orientation", "vertical");
+    await page.locator(FAMILY_FRAME).scrollIntoViewIfNeeded();
+
+    const findOverlap = () =>
+        page.evaluate((scope) => {
+            const names = [...document.querySelectorAll(`${scope} [id*="-layer-"]`)].map((header) =>
+                header.firstElementChild!.getBoundingClientRect(),
+            );
+
+            for (const node of document.querySelectorAll(`${scope} li [role="button"]`)) {
+                const box = node.getBoundingClientRect();
+
+                for (const name of names) {
+                    const left = Math.max(box.left, name.left);
+                    const right = Math.min(box.right, name.right);
+                    const top = Math.max(box.top, name.top);
+                    const bottom = Math.min(box.bottom, name.bottom);
+
+                    if (right - left > 4 && bottom - top > 4) {
+                        return {
+                            text: (node.textContent ?? "").trim(),
+                            x: (left + right) * 0.5,
+                            y: (top + bottom) * 0.5,
+                        };
+                    }
+                }
+            }
+
+            return undefined;
+        }, FAMILY);
+
+    await expect
+        .poll(async () => (await findOverlap()) !== undefined, { message: "a node sits under a name" })
+        .toBe(true);
+
+    const overlap = (await findOverlap())!;
+
+    await page.mouse.click(overlap.x, overlap.y);
+
+    expect(await focusedText(page), "the press landed on the node").toBe(overlap.text);
+});
+
+test("the family view's frame keeps one size while the family changes", async ({ page }) => {
+    const frame = page.locator(FAMILY_FRAME);
+    const resting = await frame.boundingBox();
 
     await page.locator(FAMILY_NODE, { hasText: /^Semi 1$/ }).click();
     await page.keyboard.press("ArrowLeft");
     await page.keyboard.press("ArrowLeft");
-    await expect.poll(() => shownNodes(page)).toEqual(["Ada", "Bo", "Quarter 1"]);
+    await expectFramed(page, ["Ada", "Bo", "Quarter 1"], "a leaf's family");
 
-    const moved = await board.boundingBox();
+    const moved = await frame.boundingBox();
 
     expect({ width: moved!.width, height: moved!.height }, "sized for the largest family, so nothing shifts").toEqual({
         width: resting!.width,

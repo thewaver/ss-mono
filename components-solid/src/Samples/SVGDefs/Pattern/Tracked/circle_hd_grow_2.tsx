@@ -22,7 +22,7 @@ export const circle_hd_grow_2 = (opts?: PatternProximityOpts): TrackedPatternCon
                     id: `pattern1-${id}`,
                     renderDefsElement: () =>
                         SVGPatterns.computeTrackedLayoutPattern(
-                            "halfDrop",
+                            "half_drop",
                             `pattern1-${id}`,
                             getRef,
                             defs,

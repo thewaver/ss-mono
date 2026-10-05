@@ -63,11 +63,11 @@ export namespace CarouselPlacementDefaults {
     export const DEFAULTS_BY_FAMILY = {
         track: TRACK_DEFAULTS,
         drum: DRUM_DEFAULTS,
-        coverFlow: COVER_FLOW_DEFAULTS,
-        depthWave: DEPTH_WAVE_DEFAULTS,
+        cover_flow: COVER_FLOW_DEFAULTS,
+        depth_wave: DEPTH_WAVE_DEFAULTS,
         cylinder: CYLINDER_DEFAULTS,
         folders: FOLDERS_DEFAULTS,
         hinge: HINGE_DEFAULTS,
-        paddleWheel: PADDLE_WHEEL_DEFAULTS,
+        paddle_wheel: PADDLE_WHEEL_DEFAULTS,
     };
 }

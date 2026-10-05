@@ -334,6 +334,47 @@ test("scrolling the word drum rolls it round to the last word", async ({ page })
 });
 
 /**
+ * The word drum has a fixed number of faces rather than one per word, so a long list never crowds it: a word more
+ * than half a turn from the front is not drawn, and the faces turning out of sight are the ones the next words arrive
+ * on. Not drawn is read as the opacity filter the carousel draws a hidden slide with, which is its own state; which
+ * words are far enough away is worked out from the list's two ends, so the test names no face count.
+ */
+const hiddenWords = (page: import("@playwright/test").Page) =>
+    page.locator(demo("wordDrum")).evaluate((root) =>
+        [...root.querySelectorAll('[aria-roledescription="slide"]')].map((slide) => {
+            for (let element: Element | null = slide; element && element !== root; element = element.parentElement) {
+                if (getComputedStyle(element).filter.includes("opacity(0)")) return true;
+            }
+
+            return false;
+        }),
+    );
+
+test("a word more than half a turn round the word drum is not drawn, whichever end is at the front", async ({
+    page,
+}) => {
+    const atStart = await hiddenWords(page);
+
+    expect(atStart.at(-1), "with the first word at the front, the last is round the back").toBe(true);
+    expect(atStart.slice(0, 2), "and the front word and the one after it are drawn").toEqual([false, false]);
+
+    await page.locator("#wordDrumScrollBox").evaluate((element) => {
+        element.scrollTop = element.scrollHeight;
+    });
+
+    await expect
+        .poll(
+            async () => {
+                const atEnd = await hiddenWords(page);
+
+                return atEnd[0] === true && atEnd.at(-1) === false && atEnd.at(-2) === false;
+            },
+            { message: "rolled to the last word, the first is round the back" },
+        )
+        .toBe(true);
+});
+
+/**
  * The ring turns on its own, with its progress written on a clock, so WCAG 2.2.2 asks for a way to stop it. The
  * example's own button is that way, and once pressed the turn holds still.
  */
@@ -372,7 +413,7 @@ const faceTransform = (page: import("@playwright/test").Page, scope: string) =>
         .evaluate((element) => (element as HTMLElement).style.transform);
 
 const openDrum = async (page: import("@playwright/test").Page) => {
-    await pickOption(page, "placement", "Drum");
+    await pickOption(page, "placement", "drum");
     await page.mouse.move(0, 0);
 };
 

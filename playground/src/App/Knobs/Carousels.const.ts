@@ -10,7 +10,7 @@ export namespace CarouselKnobs {
     export const DELAY_STEP_MS = 500;
     export const STARTING_DELAY_MS = 2000;
     export const STARTING_IS_DISABLED = false;
-    export const STARTING_PLACEMENT: CarouselPlacements.SampleKey = "coverFlow";
+    export const STARTING_PLACEMENT: CarouselPlacements.SampleKey = "cover_flow";
     export const RING_LAP_MS = 12_000;
     export const RING_PERSPECTIVE_PX = 900;
     export const RING_SLOT_WIDTH = 440;

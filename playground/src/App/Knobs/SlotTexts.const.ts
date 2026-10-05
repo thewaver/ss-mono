@@ -10,7 +10,7 @@ export namespace SlotTextKnobs {
     export const MIN_CASCADE_MS = 0;
     export const MAX_CASCADE_MS = 500;
     export const CASCADE_STEP_MS = 10;
-    export const STARTING_REEL_KEY: SlotTextReels.SampleKey = "leftToRight";
+    export const STARTING_REEL_KEY: SlotTextReels.SampleKey = "left_to_right";
     export const STARTING_WORD_MECHANISM: SlotTextMechanism = "splitFlap";
     export const STARTING_LETTER_ROUTE: SlotTextLetterRoute = "forward";
     export const MECHANISMS: SlotTextMechanism[] = ["drum", "splitFlap"];

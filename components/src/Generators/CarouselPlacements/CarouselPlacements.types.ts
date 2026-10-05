@@ -51,11 +51,11 @@ export type PaddleWheelPlacementDefs = {
 export type CarouselPlacementEntry =
     | { family: "track"; defs?: TrackPlacementDefs }
     | { family: "drum"; defs?: DrumPlacementDefs }
-    | { family: "coverFlow"; defs?: CoverFlowPlacementDefs }
-    | { family: "depthWave"; defs?: DepthWavePlacementDefs }
+    | { family: "cover_flow"; defs?: CoverFlowPlacementDefs }
+    | { family: "depth_wave"; defs?: DepthWavePlacementDefs }
     | { family: "cylinder"; defs?: CylinderPlacementDefs }
     | { family: "folders"; defs?: FoldersPlacementDefs }
     | { family: "hinge"; defs?: HingePlacementDefs }
-    | { family: "paddleWheel"; defs?: PaddleWheelPlacementDefs };
+    | { family: "paddle_wheel"; defs?: PaddleWheelPlacementDefs };
 
 export type CarouselPlacementFamily = CarouselPlacementEntry["family"];

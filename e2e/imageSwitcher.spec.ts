@@ -105,7 +105,7 @@ test("a source that fails to load still swaps, rather than stranding the old ima
         if (message.type() === "warning") warnings.push(message.text());
     });
 
-    await chooseSource(page, "missingFile");
+    await chooseSource(page, "missing_file");
 
     await expect
         .poll(async () => (await sources(page)).some((src) => src?.includes(MISSING)), {
@@ -165,7 +165,7 @@ test("each source that actually loads is reported once, and names itself", async
 test("a source that fails and a source that is cleared both swap without reporting a load", async ({ page }) => {
     await expect.poll(() => loadReadout(page)).toContain("loads: 1");
 
-    await chooseSource(page, "missingFile");
+    await chooseSource(page, "missing_file");
     await expect
         .poll(async () => (await sources(page)).some((src) => src?.includes(MISSING)), {
             message: "the swap happens on the error path",

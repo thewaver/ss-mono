@@ -2,6 +2,7 @@ import type { Snippet } from "svelte";
 
 import type {
     BracketConnectorDefs,
+    BracketLayerHeaderState,
     BracketNode,
     BracketNodeState,
     BracketOrientation,
@@ -30,11 +31,12 @@ export type BracketProps<T> = {
      */
     layerHeaderSize?: number;
     /**
-     * Draws the header above one layer, handed the layer counting from the root, so `0` is the final. Given,
-     * each layer becomes its own list named by its header, and a strip opens along the board's leading edge
-     * that follows `orientation` and `rootSide` with the layers.
+     * Draws the header above one layer, handed the layer counting from the root, so `0` is the final, and whether
+     * it is the current round, so the round a camera is framing can be marked. Given, each layer becomes its own list
+     * named by its header, and a strip opens along the board's leading edge that follows `orientation` and
+     * `rootSide` with the layers.
      */
-    renderLayerHeader?: Snippet<[layer: number]>;
+    renderLayerHeader?: Snippet<[layer: number, state: BracketLayerHeaderState]>;
     /**
      * `"tree"` draws every node. `"family"` draws one family at a time and follows focus: the node the focused one
      * feeds, the focused node with all its siblings, and every node that feeds those siblings. Focusing the root shows
@@ -45,8 +47,9 @@ export type BracketProps<T> = {
      */
     view?: BracketView;
     /**
-     * How long the family view takes to glide from one family to the next. `0` jumps, which is the reduced-motion
-     * route. Ignored in the tree view.
+     * How long the board takes to glide from one family to the next, and between the family view and the tree view
+     * when `view` changes, the board growing or shrinking with it — a consumer scaling the board to fit a frame of
+     * its own gets a zoom. `0` jumps, which is the reduced-motion route.
      */
     transitionDurationMs?: number;
     /** The final, with the rounds that feed it hanging off it as children. */
@@ -65,7 +68,9 @@ export type BracketProps<T> = {
      * `undefined` is the root's own family, the root and the nodes that feed it. Both sides write it: the board when
      * focus moves, the consumer to move the family from outside — which is how buttons beside the board page through
      * it without taking focus. `BracketUtils.computeFamilyStep` finds the family a step away. Leave it out and the
-     * board keeps it itself. A node that is not in the tree shows the root's own family. Ignored in the tree view.
+     * board keeps it itself. A node that is not in the tree shows the root's own family. The tree view folds nothing
+     * but still writes it as focus moves, so a consumer framing part of a large tree can follow the focused node's
+     * family with a camera of its own.
      * Bind it with `bind:family` to drive or follow it, to a variable declared with `$state.raw`: a node is found by
      * identity, and `$state` would hand over a watched copy of it instead.
      */

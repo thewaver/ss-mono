@@ -3,23 +3,21 @@ import * as styles from "@thewaver/ss-playground/App/Pages/SlotTextPage/SlotText
 
 import type { SlotTextExampleProps } from "../SlotTextPage.types";
 
-const DIGIT_SIZE = { width: 40, height: 60 };
+const CHARACTER_SIZE = { width: 34, height: 52 };
 
 type Props = SlotTextExampleProps;
 
 export const SplitFlapExample = (props: Props) => {
     return (
-        <div className={styles.board}>
-            <SlotText
-                text={props.text}
-                mechanism={"splitFlap"}
-                characterSize={DIGIT_SIZE}
-                turnDurationMs={props.turnDurationMs}
-                turnDelayMs={props.turnDelayMs}
-                ariaLabel={"Departures"}
-                renderTurning={(digit) => <div className={styles.flapTile}>{digit}</div>}
-                renderFixed={(character) => <div className={styles.flapFixed}>{character}</div>}
-            />
-        </div>
+        <SlotText
+            text={props.text}
+            mechanism={"splitFlap"}
+            characterSize={CHARACTER_SIZE}
+            turnDurationMs={props.turnDurationMs}
+            turnDelayMs={props.turnDelayMs}
+            ariaLabel={"Departures"}
+            renderTurning={(digit) => <div className={styles.flapTile}>{digit}</div>}
+            renderFixed={(character) => <div className={styles.fixed}>{character}</div>}
+        />
     );
 };

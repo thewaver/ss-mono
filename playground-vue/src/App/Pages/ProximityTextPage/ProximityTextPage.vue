@@ -12,13 +12,13 @@ import PageNumberField from "../../PageComponents/Field/PageNumberField.vue";
 import PageMeasureBox from "../../PageComponents/MeasureBox/MeasureBox.vue";
 import PageProp from "../../PageComponents/Prop/Prop.vue";
 import PagePropsPanel from "../../PageComponents/PropsPanel/PagePropsPanel.vue";
+import BarrelExample from "./Examples/Barrel.vue";
 import PaintedExample from "./Examples/Painted.vue";
 import PointerExample from "./Examples/Pointer.vue";
 import WaveExample from "./Examples/Wave.vue";
 import type { ProximityTextExampleProps } from "./ProximityTextPageVue.types";
 
 const EXAMPLES_ROOT = "/src/App/Pages/ProximityTextPage/Examples";
-const BOX_WIDTH = 360;
 const WIDE_SPAN = 2;
 
 const reachPx = shallowRef(PROXIMITY_TEXT_DEFAULTS.reachPx);
@@ -53,6 +53,14 @@ const examples: ExampleDefs[] = [
         readout: () =>
             "PaintedText inside draws the letters; each grows and pushes the rest of its line along, as plain text does, while the line breaks stay put",
         path: `${EXAMPLES_ROOT}/Painted.vue`,
+    },
+    {
+        key: "barrel",
+        name: "Inside a barrel",
+        span: WIDE_SPAN,
+        readout: () =>
+            "a point fixed to the middle of the box and measured up and down only, so every letter on a line answers it alike: a line closes up as it reaches the middle and spreads apart again towards either edge, its keyframes running from spread to closed; the lines were wrapped with every letter at its widest, which here is the first frame, so no word jumps from one line to the next as they spread",
+        path: `${EXAMPLES_ROOT}/Barrel.vue`,
     },
 ];
 </script>
@@ -89,20 +97,24 @@ const examples: ExampleDefs[] = [
 
     <PageExamples :items="examples">
         <template #pointer>
-            <PageMeasureBox :width="BOX_WIDTH" :padding="MEASURE_BOX_PADDING">
+            <PageMeasureBox :width="ProximityTextKnobs.BOX_WIDTH" :padding="MEASURE_BOX_PADDING">
                 <PointerExample v-bind="commonProps" />
             </PageMeasureBox>
         </template>
 
         <template #wave>
-            <PageMeasureBox :width="BOX_WIDTH" :padding="MEASURE_BOX_PADDING">
-                <WaveExample v-bind="commonProps" />
-            </PageMeasureBox>
+            <WaveExample v-bind="commonProps" />
         </template>
 
         <template #painted>
-            <PageMeasureBox :width="BOX_WIDTH" :padding="MEASURE_BOX_PADDING">
+            <PageMeasureBox :width="ProximityTextKnobs.BOX_WIDTH" :padding="MEASURE_BOX_PADDING">
                 <PaintedExample v-bind="commonProps" />
+            </PageMeasureBox>
+        </template>
+
+        <template #barrel>
+            <PageMeasureBox :width="ProximityTextKnobs.BOX_WIDTH">
+                <BarrelExample :is-disabled="isDisabled" />
             </PageMeasureBox>
         </template>
     </PageExamples>

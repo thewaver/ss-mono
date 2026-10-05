@@ -483,9 +483,10 @@ export namespace RollerUtils {
      * - `rest` puts the solid straight onto a face, stopping anything under way. For the first face, at mount.
      * - `turnToTarget` settles the solid onto a face the owner chose, unless anything is under way or it already rests
      *   there. Call it when the target face changes from outside.
-     * - `reshape` answers a change of faces: a solid resting on a face is put straight onto that face of the new
-     *   shape, a settle under way starts again from where the solid is towards the new shape's face, and anything
-     *   else is left to finish on its own.
+     * - `reshape` answers a change of faces: a solid resting on a face the new shape also has is put straight onto
+     *   that face of the new shape, one resting on a face the new shape lacks turns from where it is drawn onto the
+     *   face its target clamps to ({@link clampFace}), the last for a face past its end, a settle under way starts again from where the solid is towards the new shape's face,
+     *   and anything else is left to finish on its own.
      * - `startRest` holds the solid still after landing, for the given time, and returns the function that calls it
      *   off. A negative time rests for good.
      * - `drift` turns the solid about an axis on screen, one step per `idleDelayMs`, and returns the function that
@@ -647,7 +648,12 @@ export namespace RollerUtils {
                 return;
             }
 
-            if (state.rollPhase === "still" && state.restingFace !== undefined) rest(getClampedTarget());
+            if (state.rollPhase !== "still" || state.restingFace === undefined) return;
+
+            const target = getClampedTarget();
+
+            if (target === state.restingFace) rest(target);
+            else settleOnto(target);
         };
 
         const startRest = (restDurationMs: number) => {

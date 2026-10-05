@@ -100,7 +100,7 @@ export const TypewriterPage = () => {
             computeCharacterWeights: (count) => {
                 const arrivalOrder = getArrivalOrder();
 
-                return arrivalOrder === "leftToRight" ? [] : ScrambleTextWeights.SAMPLE_WEIGHTS[arrivalOrder](count);
+                return arrivalOrder === "left_to_right" ? [] : ScrambleTextWeights.SAMPLE_WEIGHTS[arrivalOrder](count);
             },
         };
 

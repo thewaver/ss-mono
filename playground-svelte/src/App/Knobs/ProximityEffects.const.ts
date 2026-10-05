@@ -87,6 +87,6 @@ export namespace ProximityEffectKnobs {
     export const KNOBS_BY_FAMILY = {
         fade: FADE_KNOBS,
         glow: GLOW_KNOBS,
-        zoomIn: ZOOM_IN_KNOBS,
+        zoom_in: ZOOM_IN_KNOBS,
     };
 }

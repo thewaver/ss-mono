@@ -31,4 +31,6 @@ export type PageBracketNodeProps = {
 export type PageBracketLayerHeaderProps = {
     names: string[];
     layer: number;
+    isPinned?: boolean;
+    isCurrent?: boolean;
 };

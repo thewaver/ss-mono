@@ -63,7 +63,7 @@
 
     const pattern = $derived(
         SVGPatterns.computeTrackedLayoutPattern(
-            "halfShift",
+            "half_shift",
             `pattern1-${props.id}`,
             props.defs.cellSize,
             props.defs.getSize(),

@@ -34,7 +34,7 @@ const PatternElement = (props: PatternElementProps) => {
                 d={ShapeUtils.pointsToPath(ShapeConst.getDefaultShapePoints("hexagon-pointy-top", cellSize))}
             />
             {SVGPatterns.computeTrackedLayoutPattern(
-                "hexPointyTop",
+                "hex_pointy_top",
                 `pattern1-${props.id}`,
                 cellSize,
                 areaSize,

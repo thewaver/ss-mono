@@ -4,12 +4,12 @@ export namespace CarouselPlacements {
     export const SAMPLE_PLACEMENTS = {
         track: { family: "track" },
         drum: { family: "drum" },
-        coverFlow: { family: "coverFlow" },
-        depthWave: { family: "depthWave" },
+        cover_flow: { family: "cover_flow" },
+        depth_wave: { family: "depth_wave" },
         cylinder: { family: "cylinder" },
         folders: { family: "folders" },
         hinge: { family: "hinge" },
-        paddleWheel: { family: "paddleWheel" },
+        paddle_wheel: { family: "paddle_wheel" },
     } satisfies Record<string, CarouselPlacementEntry>;
 
     export type SampleKey = keyof typeof SAMPLE_PLACEMENTS;

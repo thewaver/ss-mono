@@ -43,7 +43,7 @@ const computeAnimationName = (_character: string, index: number, count: number) 
                 :progress="flown"
                 :playback="false"
                 :compute-animation-name="computeAnimationName"
-                :compute-character-weights="ScrambleTextWeights.SAMPLE_WEIGHTS.fromMiddle"
+                :compute-character-weights="ScrambleTextWeights.SAMPLE_WEIGHTS.from_middle"
                 :animation-delay-ms="CHARACTER_DELAY_MS"
                 :animation-duration-ms="CHARACTER_DURATION_MS"
                 >{{ TEXT }}</Typewriter
