@@ -410,8 +410,16 @@ describe("getIsFrameHidden", () => {
 
 describe("computeShownArrangement", () => {
     const frame = (left: number, opacity: number) => ({ left, top: 0, opacity, isFolded: opacity === 0 });
-    const from = { nodes: { a: frame(0, 1), b: frame(0, 1) }, headers: [frame(0, 1)] };
-    const to = { nodes: { a: frame(100, 0), b: frame(40, 1), c: frame(10, 1) }, headers: [frame(50, 0)] };
+    const from = {
+        nodes: { a: frame(0, 1), b: frame(0, 1) },
+        headers: [frame(0, 1)],
+        boardSize: { width: 100, height: 50 },
+    };
+    const to = {
+        nodes: { a: frame(100, 0), b: frame(40, 1), c: frame(10, 1) },
+        headers: [frame(50, 0)],
+        boardSize: { width: 300, height: 150 },
+    };
 
     it("is halfway at half time, and takes whether a node is folded from where it is going", () => {
         const shown = BracketUtils.computeShownArrangement(from, to, 0.5);
@@ -422,6 +430,10 @@ describe("computeShownArrangement", () => {
 
     it("starts a frame it had no start for where it is going", () => {
         expect(BracketUtils.computeShownArrangement(from, to, 0.5).nodes.c).toEqual(to.nodes.c);
+    });
+
+    it("grows or shrinks the board along with everything on it", () => {
+        expect(BracketUtils.computeShownArrangement(from, to, 0.5).boardSize).toEqual({ width: 200, height: 100 });
     });
 
     it("is where it is going once the glide is done, and before any glide", () => {
@@ -470,5 +482,62 @@ describe("connectors in the family view", () => {
         )!;
 
         expect(BracketUtils.computeConnectorOpacity(frames, connector)).toBe(0.25);
+    });
+});
+
+describe("findNodeId", () => {
+    it("finds a node by identity, not by value", () => {
+        const twin: BracketNode<string> = pair("Final", leaf("Same"), leaf("Same"));
+        const layout = BracketUtils.computeLayout(twin);
+
+        expect(BracketUtils.findNodeId(twin, layout, twin.children![1])).toBe("0.1");
+    });
+
+    it("answers undefined for a node that is not in the tree", () => {
+        expect(BracketUtils.findNodeId(FINAL, BracketUtils.computeLayout(FINAL), leaf("A"))).toBeUndefined();
+    });
+});
+
+describe("computeFamilyStep", () => {
+    const [semi1, semi2] = FINAL.children!;
+
+    it("walks from the root's own family to the one the root names, and back", () => {
+        expect(BracketUtils.computeFamilyStep(FINAL, undefined, "toLeaves")).toBe(FINAL);
+        expect(BracketUtils.computeFamilyStep(FINAL, FINAL, "toRoot")).toBeUndefined();
+    });
+
+    it("moves a stage out onto the middle child, and back in to the parent", () => {
+        expect(BracketUtils.computeFamilyStep(FINAL, FINAL, "toLeaves")).toBe(semi1);
+        expect(BracketUtils.computeFamilyStep(FINAL, semi2, "toRoot")).toBe(FINAL);
+    });
+
+    it("moves across a stage to the neighbor", () => {
+        expect(BracketUtils.computeFamilyStep(FINAL, semi1, "next")).toBe(semi2);
+        expect(BracketUtils.computeFamilyStep(FINAL, semi2, "previous")).toBe(semi1);
+    });
+
+    it("stays put where there is nowhere to go, since a leaf cannot name a family", () => {
+        expect(BracketUtils.computeFamilyStep(FINAL, semi1, "toLeaves"), "its children are all leaves").toBe(semi1);
+        expect(BracketUtils.computeFamilyStep(FINAL, semi2, "next"), "the stage does not wrap").toBe(semi2);
+        expect(BracketUtils.computeFamilyStep(FINAL, undefined, "toRoot")).toBeUndefined();
+    });
+});
+
+describe("computeTreeArrangement", () => {
+    it("draws every node where the whole tree puts it, none folded, on the whole tree's board", () => {
+        const layout = BracketUtils.computeLayout(FINAL);
+        const geometry = BracketUtils.computeGeometry(layout, {
+            nodeSize: { width: 80, height: 20 },
+            layerGap: 10,
+            crossGap: 4,
+            orientation: "horizontal",
+            rootSide: "end",
+            headerExtent: 0,
+        });
+        const arrangement = BracketUtils.computeTreeArrangement(layout, geometry);
+
+        expect(arrangement.boardSize).toEqual(geometry.boardSize);
+        expect(Object.values(arrangement.nodes).every((frame) => !frame.isFolded && frame.opacity === 1)).toBe(true);
+        expect(arrangement.nodes["0.1"]).toMatchObject(BracketUtils.computeInset(geometry, layout.placements[2]));
     });
 });

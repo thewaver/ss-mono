@@ -23,7 +23,7 @@ export const Formation = defineComponent(
 
         return () => {
             const transitionDurationMs = props.transitionDurationMs ?? FORMATION_DEFAULTS.transitionDurationMs;
-            const staggerMs = props.staggerMs ?? FORMATION_DEFAULTS.staggerMs;
+            const transitionDelayMs = props.transitionDelayMs ?? FORMATION_DEFAULTS.transitionDelayMs;
             const count = itemCount.value;
 
             const itemIds = new Map<T, number>();
@@ -55,7 +55,7 @@ export const Formation = defineComponent(
                                 key={`${itemIds.get(item)}:${occurrence}`}
                                 placement={placement}
                                 stackAt={props.isStackedInReverse ? count - index : index + NEXT}
-                                transitionDelayMs={index * staggerMs}
+                                transitionDelayMs={index * transitionDelayMs}
                             >
                                 {callSlot(slots.renderItem, { item, state: { index, itemCount: count, placement } })}
                             </PlacementItem>
@@ -73,7 +73,7 @@ export const Formation = defineComponent(
             computeLayout: null,
             computeEffect: null,
             transitionDurationMs: null,
-            staggerMs: null,
+            transitionDelayMs: null,
             items: null,
         }),
     },

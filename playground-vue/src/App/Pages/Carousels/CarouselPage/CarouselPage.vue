@@ -69,7 +69,7 @@ const examples: ExampleDefs[] = [
         key: "wordDrum",
         name: "A drum of words turned by scrolling",
         readout: () =>
-            `word ${wordDrumIndex.value + 1} of ${CarouselKnobs.WORD_DRUM_WORDS.length} — the drum rule with a word on each face, its progress written by the box's scroll, so scrolling rolls the next word up`,
+            `word ${wordDrumIndex.value + 1} of ${CarouselKnobs.WORD_DRUM_WORDS.length} — a drum of a fixed number of faces, each a quarter of the box, with a word on each face near the front, its progress written by the box's scroll; scrolling rolls the next word up, and the faces past the first and last word stay empty`,
         path: `${EXAMPLES_ROOT}/WordDrum.vue`,
     },
 ];

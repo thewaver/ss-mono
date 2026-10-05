@@ -16,7 +16,7 @@
 
     const itemCount = $derived(props.items.length);
     const transitionDurationMs = $derived(props.transitionDurationMs ?? FORMATION_DEFAULTS.transitionDurationMs);
-    const staggerMs = $derived(props.staggerMs ?? FORMATION_DEFAULTS.staggerMs);
+    const transitionDelayMs = $derived(props.transitionDelayMs ?? FORMATION_DEFAULTS.transitionDelayMs);
 
     const layout = $derived(props.computeLayout({ itemCount }));
 
@@ -48,7 +48,7 @@
         <PlacementItem
             {placement}
             stackAt={props.isStackedInReverse ? itemCount - index : index + NEXT}
-            transitionDelayMs={index * staggerMs}
+            transitionDelayMs={index * transitionDelayMs}
         >
             {@render props.renderItem(entry.item, { index, itemCount, placement })}
         </PlacementItem>

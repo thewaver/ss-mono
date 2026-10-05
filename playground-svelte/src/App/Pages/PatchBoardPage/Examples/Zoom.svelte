@@ -71,7 +71,7 @@
                     {/snippet}
 
                     {#snippet renderCable(defs)}
-                        <PagePatchCable {defs} />
+                        <PagePatchCable {defs} isBeamPlaying={props.isBeamPlaying} />
                     {/snippet}
                 </PatchBoard>
             </div>

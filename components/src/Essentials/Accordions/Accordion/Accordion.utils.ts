@@ -1,15 +1,7 @@
 import type { NavigatorDirection } from "../../../Abstracts/Navigator/Navigator.types";
 import { NavigatorUtils } from "../../../Abstracts/Navigator/Navigator.utils";
 import type { CollapsibleSide } from "../Collapsible/Collapsible.types";
-import type {
-    AccordionItem,
-    AccordionMoveDirection,
-    AccordionOrientation,
-    AccordionSizing,
-    AccordionWidthOpts,
-} from "./Accordion.types";
-
-const NO_WIDTH = 0;
+import type { AccordionItem, AccordionMoveDirection, AccordionOrientation } from "./Accordion.types";
 
 /** The part of an accordion that is not about drawing it: which sections open, and how the arrow keys walk them. */
 export namespace AccordionUtils {
@@ -134,75 +126,5 @@ export namespace AccordionUtils {
         if (from === undefined) return undefined;
 
         return opened > from ? "forward" : "backward";
-    };
-
-    /**
-     * A panel width from {@link computeOpenWidths} as CSS.
-     *
-     * @param width The width in pixels, or `undefined` for none.
-     * @returns The width with its unit, or `undefined`, which leaves the panel as wide as its content.
-     */
-    export const toWidthStyle = (width: number | undefined) => (width === undefined ? undefined : `${width}px`);
-
-    /**
-     * Whether a row's open panels take widths from the row rather than from their content.
-     *
-     * Only a row with a width of its own can hand one out: a column's panels grow in height, and a row sized to fit its
-     * content would be asking its panels how wide to be while they ask it.
-     *
-     * @param orientation Which way the sections run.
-     * @param sizing Whether the accordion fills its container.
-     */
-    export const getHasRowWidths = (orientation: AccordionOrientation, sizing: AccordionSizing) =>
-        orientation === "horizontal" && sizing === "fill";
-
-    /**
-     * How wide each open section's panel is in a row, from the open width its item carries and the room left over.
-     *
-     * A section with an `openWidthShare` takes that share of the row, its header strip included, so its panel is
-     * the share less the strip. The open sections without one split evenly whatever the closed strips, the gaps and
-     * the shared sections leave. When the shares ask for more than the row has, they are scaled down together until
-     * they fit, and the unshared sections get nothing. A closed section keeps the width it last had, so its content
-     * does not reflow while it folds away.
-     *
-     * @param items The sections, in the order they are shown.
-     * @param expandedIndexes The positions of the open sections.
-     * @param opts The row's measurements.
-     * @param previous The widths this returned last time, which a closed section keeps.
-     * @returns One panel width per section, in pixels, or `undefined` for a section never yet opened, which is left
-     * as wide as its content.
-     */
-    export const computeOpenWidths = <T>(
-        items: readonly AccordionItem<T>[],
-        expandedIndexes: readonly number[],
-        opts: AccordionWidthOpts,
-        previous: readonly (number | undefined)[] = [],
-    ): (number | undefined)[] => {
-        const stripTotal = items.reduce((sum, _, index) => sum + (opts.stripWidths[index] ?? NO_WIDTH), NO_WIDTH);
-        const gapTotal = Math.max(items.length - 1, NO_WIDTH) * opts.gap;
-        const freeWidth = Math.max(opts.rowWidth - stripTotal - gapTotal, NO_WIDTH);
-        const getStrip = (index: number) => opts.stripWidths[index] ?? NO_WIDTH;
-
-        const sharedIndexes = expandedIndexes.filter((index) => items[index]?.openWidthShare !== undefined);
-        const fillIndexes = expandedIndexes.filter((index) => items[index]?.openWidthShare === undefined);
-
-        const askedWidths = sharedIndexes.map((index) =>
-            Math.max(items[index].openWidthShare! * opts.rowWidth - getStrip(index), NO_WIDTH),
-        );
-        const askedTotal = askedWidths.reduce((sum, width) => sum + width, NO_WIDTH);
-        const sharedScale = askedTotal > freeWidth && askedTotal > NO_WIDTH ? freeWidth / askedTotal : 1;
-        const fillWidth =
-            fillIndexes.length > 0
-                ? Math.max(freeWidth - askedTotal * sharedScale, NO_WIDTH) / fillIndexes.length
-                : NO_WIDTH;
-
-        return items.map((_, index) => {
-            const sharedAt = sharedIndexes.indexOf(index);
-
-            if (sharedAt >= 0) return askedWidths[sharedAt] * sharedScale;
-            if (fillIndexes.includes(index)) return fillWidth;
-
-            return previous[index];
-        });
     };
 }

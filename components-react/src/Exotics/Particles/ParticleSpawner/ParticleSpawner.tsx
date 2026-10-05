@@ -21,7 +21,7 @@ const NOT_STARTED = 0;
 
 export const ParticleSpawner = (props: ParticleSpawnerProps) => {
     const travelDurationMs = props.travelDurationMs ?? PARTICLE_SPAWNER_DEFAULTS.travelDurationMs;
-    const retentionMs = props.retentionMs ?? PARTICLE_SPAWNER_DEFAULTS.retentionMs;
+    const restDurationMs = props.restDurationMs ?? PARTICLE_SPAWNER_DEFAULTS.restDurationMs;
     const spawnDelayMs = props.spawnDelayMs ?? PARTICLE_SPAWNER_DEFAULTS.spawnDelayMs;
     const particleCount = ParticleSpawnerUtils.toParticleCount(props.particleCount);
 
@@ -52,7 +52,7 @@ export const ParticleSpawner = (props: ParticleSpawnerProps) => {
         targetRects,
         prefersReducedMotion,
         canSpawn,
-        timing: { spawnDelayMs, travelDurationMs, retentionMs },
+        timing: { spawnDelayMs, travelDurationMs, restDurationMs },
     });
 
     const [engine] = useState(() =>
@@ -98,7 +98,7 @@ export const ParticleSpawner = (props: ParticleSpawnerProps) => {
             onAnimationEnd: () => latest.current.props.onAnimationEnd?.(),
             onNextStage: (index) => setStage({ index }),
         });
-    }, [engine, canSpawn, isPlaying, particleCount, pattern, stage, travelDurationMs, retentionMs, spawnDelayMs]);
+    }, [engine, canSpawn, isPlaying, particleCount, pattern, stage, travelDurationMs, restDurationMs, spawnDelayMs]);
 
     return (
         <div ref={rootRef} className={ParticleSpawnerStyles.particleSpawnerRoot} role="presentation" aria-hidden="true">

@@ -162,14 +162,12 @@ const CustomInputExampleWrapper = ({ width, ...props }: ExampleWrapperProps) => 
     );
 };
 
-const TypedExampleWrapper = ({ width, ...props }: ExampleWrapperProps) => {
+const TypedExampleWrapper = (props: ExampleWrapperProps) => {
     const [getArrivalEffect, setArrivalEffect] = createSignal<ArrivalEffect>(PaintedTextKnobs.STARTING_ARRIVAL_EFFECT);
 
     return (
         <>
-            <PageMeasureBox width={width} padding={() => MEASURE_BOX_PADDING}>
-                <TypedExample {...props} computeAnimationName={() => ARRIVAL_EFFECT_NAMES[getArrivalEffect()]} />
-            </PageMeasureBox>
+            <TypedExample {...props} computeAnimationName={() => ARRIVAL_EFFECT_NAMES[getArrivalEffect()]} />
 
             <PageExampleKnobs>
                 <PageProp
@@ -219,21 +217,19 @@ const LapDurationKnob = (props: LapDurationKnobProps) => (
     </PageProp>
 );
 
-const CircleExampleWrapper = ({ width, ...props }: PathExampleWrapperProps) => {
+const CircleExampleWrapper = (props: PathExampleWrapperProps) => {
     const [getRadius, setRadius] = createSignal(PaintedTextKnobs.STARTING_CIRCLE_RADIUS);
     const [getLapDurationMs, setLapDurationMs] = createSignal(PAINTED_TEXT_DEFAULTS.lapDurationMs);
     const [getIsFittedToPath, setIsFittedToPath] = createSignal(PaintedTextKnobs.STARTING_IS_FITTED_TO_PATH);
 
     return (
         <>
-            <PageMeasureBox padding={() => MEASURE_BOX_PADDING}>
-                <CircleExample
-                    {...props}
-                    radius={getRadius}
-                    lapDurationMs={getLapDurationMs}
-                    isFittedToPath={getIsFittedToPath}
-                />
-            </PageMeasureBox>
+            <CircleExample
+                {...props}
+                radius={getRadius}
+                lapDurationMs={getLapDurationMs}
+                isFittedToPath={getIsFittedToPath}
+            />
 
             <PageExampleKnobs>
                 <PageProp
@@ -271,14 +267,12 @@ const CircleExampleWrapper = ({ width, ...props }: PathExampleWrapperProps) => {
     );
 };
 
-const WaveExampleWrapper = ({ width, ...props }: PathExampleWrapperProps) => {
+const WaveExampleWrapper = (props: PathExampleWrapperProps) => {
     const [getLapDurationMs, setLapDurationMs] = createSignal(PAINTED_TEXT_DEFAULTS.lapDurationMs);
 
     return (
         <>
-            <PageMeasureBox width={width} padding={() => MEASURE_BOX_PADDING}>
-                <WaveExample {...props} lapDurationMs={getLapDurationMs} />
-            </PageMeasureBox>
+            <WaveExample {...props} lapDurationMs={getLapDurationMs} />
 
             <PageExampleKnobs>
                 <LapDurationKnob value={getLapDurationMs} onInput={setLapDurationMs} />
@@ -286,12 +280,6 @@ const WaveExampleWrapper = ({ width, ...props }: PathExampleWrapperProps) => {
         </>
     );
 };
-
-const ScrambledExampleWrapper = ({ width, ...props }: ExampleWrapperProps) => (
-    <PageMeasureBox width={width} padding={() => MEASURE_BOX_PADDING}>
-        <ScrambledExample {...props} />
-    </PageMeasureBox>
-);
 
 export const PaintedTextPage = () => {
     const fill = createPaintSlot(PaintedTextKnobs.STARTING_FILL_PAINT_KIND, PaintedTextKnobs.STARTING_KEYS);
@@ -369,7 +357,7 @@ export const PaintedTextPage = () => {
                 name: "Scrambled",
                 readout: () =>
                     "a ScrambleText around a painted text: it decides which glyph each letter shows while it churns, and the painted text draws that glyph, painted, in the letter's place",
-                component: () => <ScrambledExampleWrapper {...commonProps} />,
+                component: () => <ScrambledExample {...commonProps} />,
                 path: `${EXAMPLES_ROOT}/Scrambled.tsx`,
             },
             {

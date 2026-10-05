@@ -3,14 +3,16 @@ import { shallowRef, useId } from "vue";
 
 import { Button, PaintedText, ScrambleText } from "@thewaver/ss-components-vue";
 import type { ScrambleTextController } from "@thewaver/ss-components-vue";
+import { MEASURE_BOX_PADDING } from "@thewaver/ss-playground/App/PageComponents/MeasureBox/MeasureBox.css";
 import * as styles from "@thewaver/ss-playground/App/Pages/PaintedTextPage/PaintedTextPage.css";
 import type { Size2d } from "@thewaver/ss-utils";
 
+import PageMeasureBox from "../../../PageComponents/MeasureBox/MeasureBox.vue";
 import PageButtonContent from "../../../StyledComponents/ButtonContent/ButtonContent.vue";
 import { computeSampleDefs } from "../PaintedTextPage.const";
-import type { PaintedTextExampleProps } from "../PaintedTextPage.types";
+import type { PaintedTextBoxedExampleProps } from "../PaintedTextPage.types";
 
-const props = defineProps<PaintedTextExampleProps>();
+const props = defineProps<PaintedTextBoxedExampleProps>();
 
 const id = useId();
 
@@ -33,18 +35,20 @@ const computeStrokeDefs = (size: Size2d, element: HTMLElement | undefined) =>
 
 <template>
     <div :class="styles.stack">
-        <div :class="[styles.fill, styles.typedHeading]">
-            <ScrambleText :settle-duration-ms="1800" @mount="setController">
-                <PaintedText
-                    :compute-fill-defs="computeFillDefs"
-                    :compute-stroke-defs="computeStrokeDefs"
-                    :stroke-width="strokeWidth"
-                    :stroke-alignment="strokeAlignment"
-                >
-                    Build 1.4.3 ready
-                </PaintedText>
-            </ScrambleText>
-        </div>
+        <PageMeasureBox :width="width" :padding="MEASURE_BOX_PADDING">
+            <div :class="[styles.fill, styles.typedHeading]">
+                <ScrambleText :settle-duration-ms="1800" @mount="setController">
+                    <PaintedText
+                        :compute-fill-defs="computeFillDefs"
+                        :compute-stroke-defs="computeStrokeDefs"
+                        :stroke-width="strokeWidth"
+                        :stroke-alignment="strokeAlignment"
+                    >
+                        Build 1.4.3 ready
+                    </PaintedText>
+                </ScrambleText>
+            </div>
+        </PageMeasureBox>
 
         <Button id="scrambleAgain" @click="restart">
             <template #renderContent="flags">

@@ -37,7 +37,7 @@ const computeParticleStyle = (t: number) => {
                 v-model:playback="playback"
                 :particle-count="particleCount"
                 :travel-duration-ms="travelDurationMs"
-                :retention-ms="retentionMs"
+                :rest-duration-ms="restDurationMs"
                 :spawn-delay-ms="spawnDelayMs"
                 :spawn-iteration-patterns="spawnIterationPatterns"
                 :compute-particle-pos="computeParticlePos"

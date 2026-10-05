@@ -17,13 +17,13 @@ import {
 } from "@thewaver/ss-playground/App/Pages/BracketPage/BracketPage.css";
 
 import { PageExamples } from "../../PageComponents/Examples/Examples";
-import { PageNumberField, PageSelectField } from "../../PageComponents/Field/Field";
+import { PageCheckField, PageNumberField, PageSelectField } from "../../PageComponents/Field/Field";
 import { PageMeasureBox } from "../../PageComponents/MeasureBox/MeasureBox";
 import { PageProp } from "../../PageComponents/Prop/Prop";
 import { PagePropsPanel } from "../../PageComponents/PropsPanel/PropsPanel";
-import { NOTHING_PICKED } from "./BracketPage.const";
+import { PageBeam } from "../../StyledComponents/Beam/Beam";
+import { BEAM_PATHS, NOTHING_PICKED } from "./BracketPage.const";
 import type { BracketExampleProps } from "./BracketPage.types";
-import { BeamsExample } from "./Examples/Beams";
 import { FamilyExample } from "./Examples/Family";
 import { KnockoutExample } from "./Examples/Knockout";
 import { OrgChartExample } from "./Examples/OrgChart";
@@ -49,20 +49,33 @@ export const BracketPage = () => {
 
     const prefersReducedMotion = MediaQueryMonitorReactUtils.useReducedMotion();
 
+    const [isBeamPlaying, setIsBeamPlaying] = useState(!prefersReducedMotion);
+
     const commonProps: BracketExampleProps = {
         layerGap,
         crossGap,
         orientation,
         rootSide,
         onActivate: (value, placement) => setPicked(`${value}, node ${placement.id} in layer ${placement.layer}`),
-        renderConnector: (defs) =>
-            BracketConnectors.SAMPLE_CONNECTORS[connector]({
-                defs,
-                radius: CONNECTOR_RADIUS,
-                width: defs.isOnFocusedRoute ? ROUTE_CONNECTOR_WIDTH : CONNECTOR_WIDTH,
-                fromColor: defs.isOnFocusedRoute ? ROUTE_FROM_COLOR : CONNECTOR_FROM_COLOR,
-                toColor: defs.isOnFocusedRoute ? ROUTE_TO_COLOR : CONNECTOR_TO_COLOR,
-            }),
+        renderConnector: (defs) => (
+            <>
+                {BracketConnectors.SAMPLE_CONNECTORS[connector]({
+                    defs,
+                    radius: CONNECTOR_RADIUS,
+                    width: defs.isOnFocusedRoute ? ROUTE_CONNECTOR_WIDTH : CONNECTOR_WIDTH,
+                    fromColor: defs.isOnFocusedRoute ? ROUTE_FROM_COLOR : CONNECTOR_FROM_COLOR,
+                    toColor: defs.isOnFocusedRoute ? ROUTE_TO_COLOR : CONNECTOR_TO_COLOR,
+                })}
+
+                {defs.isOnFocusedRoute && (
+                    <PageBeam
+                        d={BEAM_PATHS[connector](defs, CONNECTOR_RADIUS)}
+                        direction={"backward"}
+                        isPlaying={isBeamPlaying}
+                    />
+                )}
+            </>
+        ),
     };
 
     const examples = [
@@ -105,32 +118,17 @@ export const BracketPage = () => {
             path: `${EXAMPLES_ROOT}/SkillTree.tsx`,
         },
         {
-            key: "beams",
-            name: "A beam along the road to the final",
-            span: WIDE_SPAN,
-            readout: () =>
-                `picked: ${picked} — focus a seed or a match and a pulse runs along every line between it and the final, toward the final; it keeps running while the focus stays, so Pause is there to stop it`,
-            component: () => (
-                <PageMeasureBox>
-                    <BeamsExample {...commonProps} connector={connector} connectorRadius={CONNECTOR_RADIUS} />
-                </PageMeasureBox>
-            ),
-            path: `${EXAMPLES_ROOT}/Beams.tsx`,
-        },
-        {
             key: "family",
             name: "One family at a time",
             span: WIDE_SPAN,
             readout: () =>
-                `showing: ${family} — focus a node and the board shows what it feeds, it with all its siblings, and what feeds them; walk on with the arrows and the rest folds away`,
+                `showing: ${family} — focus a node and the board shows what it feeds, it with all its siblings, and what feeds them; walk on with the arrows, or page through with the buttons without leaving them, and the rest folds away`,
             component: () => (
-                <PageMeasureBox>
-                    <FamilyExample
-                        {...commonProps}
-                        transitionDurationMs={prefersReducedMotion ? NO_MOTION_DURATION_MS : transitionDurationMs}
-                        onFamilyChange={setFamily}
-                    />
-                </PageMeasureBox>
+                <FamilyExample
+                    {...commonProps}
+                    transitionDurationMs={prefersReducedMotion ? NO_MOTION_DURATION_MS : transitionDurationMs}
+                    onFamilyChange={setFamily}
+                />
             ),
             path: `${EXAMPLES_ROOT}/Family.tsx`,
         },
@@ -150,6 +148,16 @@ export const BracketPage = () => {
                         ariaLabel={"Connectors"}
                         onChange={(next) => setConnector(next)}
                     />
+                </PageProp>
+
+                <PageProp
+                    itemKey={"isBeamPlaying"}
+                    label={"Beams moving"}
+                    hint={
+                        "Whether the pulse runs along the lines between the focused node and the final. It starts stopped while the visitor has asked for reduced motion."
+                    }
+                >
+                    <PageCheckField value={isBeamPlaying} ariaLabel={"Beams moving"} onChange={setIsBeamPlaying} />
                 </PageProp>
 
                 <PageProp

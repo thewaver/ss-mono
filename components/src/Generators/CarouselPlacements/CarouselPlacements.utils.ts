@@ -85,28 +85,42 @@ export namespace CarouselPlacementUtils {
     /**
      * Slides on the faces of a drum, turning about the axis across the way the carousel runs.
      *
-     * The ring's depth comes from the box: its faces are as wide as the box and meet edge to edge, so a carousel of
-     * more slides is a wider ring. A face turned away shows the slide's back, drawn by `renderSlideBack`.
+     * The ring's depth comes from the box: its faces are as long as the box, or the share of it `faceRatio` gives, and
+     * meet edge to edge. Faces shorter than the box let several show inside it at once, rising and falling round the
+     * drum, where faces as long as the box show only the one at the front. By default the drum has one face per slide, so a carousel of more slides is a wider ring and one of few slides turns in big steps
+     * that hardly read as a drum. `faceCount` fixes the number of faces instead, the way a picker wheel has the same
+     * curve whatever it lists: each slide sits on the face as far from the front as the slide is from the one
+     * showing, and a slide more than half a turn away is not drawn, so a long list never crowds the drum and the
+     * faces turning out of sight are the ones the next slides arrive on. Only that hidden slide is given an opacity:
+     * the carousel draws opacity as a filter, and a filter flattens the slide, which would show its front mirrored
+     * where its back belongs. A list that does not loop leaves the faces
+     * past its ends empty. A face turned away shows the slide's back, drawn by `renderSlideBack`.
      *
-     * @param defs `perspectivePx`, how far away the viewer sits.
+     * @param defs `perspectivePx`, how far away the viewer sits; `faceCount`, how many faces the drum has, or `0`
+     * for one per slide; `faceRatio`, how long each face is as a share of the box.
      * @returns The rule, ready to hand to `computePlacement`.
      */
     export const createDrum = (defs?: DrumPlacementDefs): CarouselPlacementFn => {
         const perspectivePx = defs?.perspectivePx ?? CarouselPlacementDefaults.DRUM_DEFAULTS.perspectivePx;
+        const faceCount = defs?.faceCount ?? CarouselPlacementDefaults.DRUM_DEFAULTS.faceCount;
+        const faceRatio = defs?.faceRatio ?? CarouselPlacementDefaults.DRUM_DEFAULTS.faceRatio;
 
         return (placementDefs) => {
             const along = getAlong(placementDefs);
-            const count = Math.max(placementDefs.count, SMALLEST_RING);
+            const isFixed = faceCount > 0;
+            const count = Math.max(isFixed ? faceCount : placementDefs.count, SMALLEST_RING);
             const angle = (placementDefs.distance * FULL_TURN_DEGREES) / count;
-            const radius = (along * HALF) / Math.tan(Math.PI / count);
+            const radius = (along * faceRatio * HALF) / Math.tan(Math.PI / count);
             const radians = toRadians(angle);
             const alongPercent = along > 0 ? ((radius * Math.sin(radians)) / along) * PERCENT : 0;
+            const isPastHalfTurn = isFixed && Math.abs(placementDefs.distance) > count * HALF;
 
             return {
                 effect: {
                     perspective: perspectivePx,
                     translate3d: toTranslation(placementDefs, alongPercent, radius * (Math.cos(radians) - WHOLE)),
                     ...toTurn(placementDefs, angle),
+                    ...(isPastHalfTurn ? { opacity: 0 } : {}),
                 },
                 layer: Math.cos(radians),
             };

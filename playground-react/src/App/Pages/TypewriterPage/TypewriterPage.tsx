@@ -124,11 +124,7 @@ export const TypewriterPage = () => {
             name: "Karaoke",
             readout: () =>
                 "the line and the slider share one progress: singing writes it as it goes, and dragging the slider draws that moment — a stop can fall partway through a letter's own sweep",
-            component: () => (
-                <PageMeasureBox width={textContainerWidth} padding={MEASURE_BOX_PADDING}>
-                    <KaraokeExample />
-                </PageMeasureBox>
-            ),
+            component: () => <KaraokeExample width={textContainerWidth} />,
             path: `${EXAMPLES_ROOT}/Karaoke.tsx`,
         },
         {

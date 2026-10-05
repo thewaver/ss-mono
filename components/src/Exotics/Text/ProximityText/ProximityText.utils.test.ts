@@ -19,6 +19,11 @@ describe("computeStrengths", () => {
     it("rests every letter while there is no point", () => {
         expect(ProximityTextUtils.computeStrengths(BOXES, undefined, 50)).toEqual([0, 0]);
     });
+
+    it("counts only up and down on the vertical axis, however far across the point is", () => {
+        expect(ProximityTextUtils.computeStrengths(BOXES, { x: 500, y: 5 }, 50, "vertical")[0]).toBe(1);
+        expect(ProximityTextUtils.computeStrengths(BOXES, { x: 500, y: 5 }, 50, "both")[0]).toBe(0);
+    });
 });
 
 describe("toLetterAnimation", () => {

@@ -16,6 +16,9 @@ export namespace CarouselKnobs {
     export const RING_SLOT_WIDTH = 440;
     export const RING_PANEL_HEIGHT = 220;
 
-    export const WORD_DRUM_SLOT_HEIGHT = 64;
+    export const WORD_DRUM_SLOT_HEIGHT = 200;
+    export const WORD_DRUM_FACE_COUNT = 12;
+    export const WORD_DRUM_FACE_RATIO = 0.25;
+    export const WORD_DRUM_PERSPECTIVE_PX = 600;
     export const WORD_DRUM_WORDS = ["Sketch", "Shape", "Build", "Test", "Ship", "Listen", "Learn", "Again"];
 }

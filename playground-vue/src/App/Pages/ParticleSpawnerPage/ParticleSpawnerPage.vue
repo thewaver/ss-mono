@@ -51,7 +51,7 @@ const NO_TRAVEL_DEFS: Record<string, number | boolean> = {};
 
 const particleCount = shallowRef(ParticleSpawnerKnobs.STARTING_PARTICLE_COUNT);
 const travelDurationMs = shallowRef(PARTICLE_SPAWNER_DEFAULTS.travelDurationMs);
-const retentionMs = shallowRef(PARTICLE_SPAWNER_DEFAULTS.retentionMs);
+const restDurationMs = shallowRef(PARTICLE_SPAWNER_DEFAULTS.restDurationMs);
 const spawnDelayMs = shallowRef(ParticleSpawnerKnobs.STARTING_SPAWN_DELAY_MS);
 const overshootPercent = shallowRef(ParticleSpawnerKnobs.STARTING_OVERSHOOT_PERCENT);
 const travelEasingKey = shallowRef<TravelEasingKey>(ParticleSpawnerKnobs.STARTING_TRAVEL_EASING_KEY);
@@ -86,7 +86,7 @@ const spawnIterationPatterns = computed(() => ITERATION_PATTERNS[iterationPatter
 const commonProps = computed<Omit<ParticleSpawnerExampleProps, "playback">>(() => ({
     particleCount: particleCount.value,
     travelDurationMs: travelDurationMs.value,
-    retentionMs: retentionMs.value,
+    restDurationMs: restDurationMs.value,
     spawnDelayMs: spawnDelayMs.value,
     spawnIterationPatterns: spawnIterationPatterns.value,
     computeParticlePos: computeParticlePos.value,
@@ -216,18 +216,18 @@ const examples: ExampleDefs[] = [
             </PageProp>
 
             <PageProp
-                item-key="retentionMs"
-                label="Retention (ms)"
+                item-key="restDurationMs"
+                label="Rest duration (ms)"
                 hint="How long a particle stays put at the end of its path before it disappears."
             >
                 <PageNumberField
-                    :value="retentionMs"
+                    :value="restDurationMs"
                     :min="ParticleSpawnerKnobs.MIN_RETENTION_MS"
                     :max="ParticleSpawnerKnobs.MAX_RETENTION_MS"
                     :step="ParticleSpawnerKnobs.RETENTION_STEP_MS"
                     :width="FIELD_WIDTH"
-                    ariaLabel="Retention in milliseconds"
-                    @input="(value: number) => (retentionMs = value)"
+                    ariaLabel="Rest duration in milliseconds"
+                    @input="(value: number) => (restDurationMs = value)"
                 />
             </PageProp>
 

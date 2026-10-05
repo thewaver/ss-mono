@@ -32,19 +32,19 @@ const FADE_REST_LEVEL_KNOB: NumberKnob = {
     step: 0.05,
 };
 
-const TRAIL_KNOB: NumberKnob = {
+const FADE_DELAY_KNOB: NumberKnob = {
     kind: "number",
-    label: "Trail (ms)",
-    hint: "How long a cell keeps glowing after the pointer has passed, fading on its own. 0 leaves no trail.",
+    label: "Fade delay (ms)",
+    hint: "How long a cell stays fully lit after the pointer leaves it, before it starts to fade. Moving back over it lights it again at once.",
     min: 0,
     max: 3000,
     step: 100,
 };
 
-const RETENTION_KNOB: NumberKnob = {
+const FADE_DURATION_KNOB: NumberKnob = {
     kind: "number",
-    label: "Retention (ms)",
-    hint: "How long a cell stays where the pointer left it before its trail starts to fade. Moving back over it lights it again at once.",
+    label: "Fade duration (ms)",
+    hint: "Once the delay is over, how long the cell takes to fade back to rest. With both at 0 the cell drops to rest the moment the pointer leaves.",
     min: 0,
     max: 3000,
     step: 100,
@@ -54,15 +54,15 @@ const GROW_KNOBS = {
     tiled: TILED_KNOB,
     reach: REACH_KNOB,
     restLevel: GROW_REST_LEVEL_KNOB,
-    trailMs: TRAIL_KNOB,
-    retentionMs: RETENTION_KNOB,
+    fadeDelayMs: FADE_DELAY_KNOB,
+    fadeDurationMs: FADE_DURATION_KNOB,
 };
 const FADE_KNOBS = {
     tiled: TILED_KNOB,
     reach: REACH_KNOB,
     restLevel: FADE_REST_LEVEL_KNOB,
-    trailMs: TRAIL_KNOB,
-    retentionMs: RETENTION_KNOB,
+    fadeDelayMs: FADE_DELAY_KNOB,
+    fadeDurationMs: FADE_DURATION_KNOB,
 };
 
 export namespace TrackedPatternKnobs {

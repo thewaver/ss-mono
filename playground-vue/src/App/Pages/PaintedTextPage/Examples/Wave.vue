@@ -2,9 +2,11 @@
 import { useId, useModel } from "vue";
 
 import { Button, PaintedText } from "@thewaver/ss-components-vue";
+import { MEASURE_BOX_PADDING } from "@thewaver/ss-playground/App/PageComponents/MeasureBox/MeasureBox.css";
 import * as styles from "@thewaver/ss-playground/App/Pages/PaintedTextPage/PaintedTextPage.css";
 import type { Size2d } from "@thewaver/ss-utils";
 
+import PageMeasureBox from "../../../PageComponents/MeasureBox/MeasureBox.vue";
 import PageButtonContent from "../../../StyledComponents/ButtonContent/ButtonContent.vue";
 import { computeSampleDefs } from "../PaintedTextPage.const";
 import type { PaintedTextPathExampleProps } from "../PaintedTextPage.types";
@@ -34,20 +36,22 @@ const computeStrokeDefs = (size: Size2d, element: HTMLElement | undefined) =>
 
 <template>
     <div :class="styles.stack">
-        <div :class="styles.waveText">
-            <PaintedText
-                v-model:progress="progress"
-                v-model:playback="playback"
-                :path="WAVE_PATH"
-                :lap-duration-ms="lapDurationMs"
-                :compute-fill-defs="computeFillDefs"
-                :compute-stroke-defs="computeStrokeDefs"
-                :stroke-width="strokeWidth"
-                :stroke-alignment="strokeAlignment"
-            >
-                {{ WAVE_TEXT }}
-            </PaintedText>
-        </div>
+        <PageMeasureBox :width="width" :padding="MEASURE_BOX_PADDING">
+            <div :class="styles.waveText">
+                <PaintedText
+                    v-model:progress="progress"
+                    v-model:playback="playback"
+                    :path="WAVE_PATH"
+                    :lap-duration-ms="lapDurationMs"
+                    :compute-fill-defs="computeFillDefs"
+                    :compute-stroke-defs="computeStrokeDefs"
+                    :stroke-width="strokeWidth"
+                    :stroke-alignment="strokeAlignment"
+                >
+                    {{ WAVE_TEXT }}
+                </PaintedText>
+            </div>
+        </PageMeasureBox>
 
         <div :class="styles.buttonRow">
             <Button id="wavePlayback" @click="togglePlayback">

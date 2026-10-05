@@ -155,7 +155,7 @@ describe("createScrambler", () => {
             getGlyphSets: () => characters.map(() => Array.from("ABCXYZ")),
             getSettleTimes: () => [0, 50, 50, 100],
             getStartTimes: () => [0, 0, 0, 0],
-            getInitialDelayMs: () => 0,
+            getSettleDelayMs: () => 0,
             getSettleDurationMs: () => 100,
             getScrambleIntervalMs: () => 10,
             onAnimationEnd,

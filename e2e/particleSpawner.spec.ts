@@ -8,7 +8,7 @@ import { demo, example, prop } from "./helpers";
  * reports the arrival. None of these examples print a reading, so the spec keeps its own: a log installed in
  * the page that notes each particle element as it is added, follows where it is painted frame by frame, and
  * closes its entry when the element is removed. **An entry's last position is where the particle arrived**, and
- * a nonzero rest (`retentionMs`) is what makes that exact rather than a frame short of the end.
+ * a nonzero rest (`restDurationMs`) is what makes that exact rather than a frame short of the end.
  *
  * Positions are never compared with a number. A particle arrived at its target when it ended up much closer to
  * that target than the distance it had to cover, and it set off from its spawner when it started much closer to
@@ -182,7 +182,7 @@ test.beforeEach(async ({ page }) => {
     await page.goto("/particle-spawner");
     await expect(page.locator(BURST)).toBeVisible();
     await setNumber(page, "particleCount", PARTICLE_COUNT);
-    await setNumber(page, "retentionMs", RETENTION_MS);
+    await setNumber(page, "restDurationMs", RETENTION_MS);
 });
 
 /**

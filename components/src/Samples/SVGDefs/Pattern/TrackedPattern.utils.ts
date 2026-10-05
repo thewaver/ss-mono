@@ -8,8 +8,8 @@ import type { SVGPatternCellCount, SVGPatternCellIndex, SVGPatternKind } from ".
 const TILE_CELL_COUNT: SVGPatternCellCount = { rows: 8, cols: 8 };
 const MIN_COUNT = 1;
 const FULL_LEVEL = 1;
-const NO_TRAIL_MS = 0;
-const NO_RETENTION_MS = 0;
+const NO_FADE_DURATION_MS = 0;
+const NO_FADE_DELAY_MS = 0;
 
 /** A cell's brightest recent level and when it was reached, which its trail fades from. */
 type TrailMark = { level: number; litMs: number };
@@ -31,19 +31,19 @@ export namespace TrackedPatternUtils {
         isTiled: opts?.tiled ?? defaults.tiled,
         reach: opts?.reach ?? defaults.reach,
         restLevel: opts?.restLevel ?? defaults.restLevel,
-        trailMs: opts?.trailMs ?? defaults.trailMs,
-        retentionMs: opts?.retentionMs ?? defaults.retentionMs,
+        fadeDurationMs: opts?.fadeDurationMs ?? defaults.fadeDurationMs,
+        fadeDelayMs: opts?.fadeDelayMs ?? defaults.fadeDelayMs,
     });
 
     /**
-     * Whether a sample's cells remember the pointer once it has passed: held where it left them for `retentionMs`,
-     * then fading back to rest over `trailMs`.
+     * Whether a sample's cells remember the pointer once it has passed: held where it left them for `fadeDelayMs`,
+     * then fading back to rest over `fadeDurationMs`.
      *
      * @param opts The resolved options, from {@link resolveOpts}.
      * @returns `false` when both are `0`, so a cell shows its live level and nothing has to run between pointer moves.
      */
-    export const getHasTrail = (opts: { trailMs: number; retentionMs: number }) =>
-        opts.trailMs > NO_TRAIL_MS || opts.retentionMs > NO_RETENTION_MS;
+    export const getHasTrail = (opts: { fadeDurationMs: number; fadeDelayMs: number }) =>
+        opts.fadeDurationMs > NO_FADE_DURATION_MS || opts.fadeDelayMs > NO_FADE_DELAY_MS;
 
     /**
      * How long a cell can go on changing after the pointer last moved: the hold and the fade together.
@@ -53,36 +53,36 @@ export namespace TrackedPatternUtils {
      *
      * @param opts The resolved options, from {@link resolveOpts}.
      */
-    export const getTrailSpanMs = (opts: { trailMs: number; retentionMs: number }) =>
-        Math.max(opts.retentionMs, NO_RETENTION_MS) + Math.max(opts.trailMs, NO_TRAIL_MS);
+    export const getTrailSpanMs = (opts: { fadeDurationMs: number; fadeDelayMs: number }) =>
+        Math.max(opts.fadeDelayMs, NO_FADE_DELAY_MS) + Math.max(opts.fadeDurationMs, NO_FADE_DURATION_MS);
 
     /**
      * How much of a remembered level is left at a moment, from `1` while it is held down to `0` once it has faded.
      *
-     * The level is held whole for `retentionMs` after it was reached, then falls away over `trailMs`, easing out. With
-     * no fade it drops straight to nothing the moment the hold ends.
+     * The level is held whole for `fadeDelayMs` after it was reached, then falls away over `fadeDurationMs`, easing
+     * out. With no fade it drops straight to nothing the moment the hold ends.
      *
      * @param elapsedMs How long ago the level was reached.
-     * @param opts.trailMs How long the fade takes.
-     * @param opts.retentionMs How long the level is held before the fade begins.
+     * @param opts.fadeDurationMs How long the fade takes.
+     * @param opts.fadeDelayMs How long the level is held before the fade begins.
      */
-    export const computeTrailShare = (elapsedMs: number, opts: { trailMs: number; retentionMs: number }) => {
-        const fadingMs = elapsedMs - Math.max(opts.retentionMs, NO_RETENTION_MS);
+    export const computeTrailShare = (elapsedMs: number, opts: { fadeDurationMs: number; fadeDelayMs: number }) => {
+        const fadingMs = elapsedMs - Math.max(opts.fadeDelayMs, NO_FADE_DELAY_MS);
 
         if (fadingMs <= 0) return FULL_LEVEL;
-        if (opts.trailMs <= NO_TRAIL_MS) return 0;
+        if (opts.fadeDurationMs <= NO_FADE_DURATION_MS) return 0;
 
-        return (1 - MathUtils.clamp01(fadingMs / opts.trailMs)) ** 2;
+        return (1 - MathUtils.clamp01(fadingMs / opts.fadeDurationMs)) ** 2;
     };
 
     /**
      * Remembers how brightly each cell was lit, so a cell the pointer has left keeps its glow for a while.
      *
      * A cell's shown level is the higher of its live level, from {@link computeLevel}, and what is left of the
-     * brightest level it reached recently: held there for `retentionMs`, then falling back to rest over `trailMs`, as
-     * {@link computeTrailShare} gives it. Only the cooling waits — a live level above what is remembered shows at once
-     * and becomes the new memory. The memory is kept by the key the caller gives each cell, so a repeating tile's
-     * copies share one trail.
+     * brightest level it reached recently: held there for `fadeDelayMs`, then falling back to rest over
+     * `fadeDurationMs`, as {@link computeTrailShare} gives it. Only the cooling waits — a live level above what is
+     * remembered shows at once and becomes the new memory. The memory is kept by the key the caller gives each cell, so
+     * a repeating tile's copies share one trail.
      *
      * @returns `computeLevel`, which takes a cell's key, its live level, the frame time and the resolved options,
      * records the live level when it is the brighter, and answers the level to draw.
@@ -94,7 +94,7 @@ export namespace TrackedPatternUtils {
             key: string,
             liveLevel: number,
             nowMs: number,
-            opts: { trailMs: number; retentionMs: number; restLevel: number },
+            opts: { fadeDurationMs: number; fadeDelayMs: number; restLevel: number },
         ) => {
             const { restLevel } = opts;
             const mark = marks.get(key);

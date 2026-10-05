@@ -2,7 +2,6 @@ import type { Snippet } from "svelte";
 
 import type {
     BracketConnectorDefs,
-    BracketConnectors,
     BracketOrientation,
     BracketPlacement,
     BracketRootSide,
@@ -15,11 +14,6 @@ export type BracketExampleProps = {
     rootSide: BracketRootSide;
     onActivate: (value: string, placement: BracketPlacement) => void;
     renderConnector: Snippet<[defs: BracketConnectorDefs]>;
-};
-
-export type BracketBeamsExampleProps = BracketExampleProps & {
-    connector: BracketConnectors.SampleKey;
-    connectorRadius: number;
 };
 
 export type BracketFamilyExampleProps = BracketExampleProps & {

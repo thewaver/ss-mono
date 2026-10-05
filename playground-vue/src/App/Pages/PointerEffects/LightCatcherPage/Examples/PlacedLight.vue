@@ -4,6 +4,7 @@ import { computed, shallowRef } from "vue";
 import { LightCatcher, Range } from "@thewaver/ss-components-vue";
 import * as styles from "@thewaver/ss-playground/App/Pages/PointerEffects/LightCatcherPage/LightCatcherPage.css";
 
+import PageMeasureBox from "../../../../PageComponents/MeasureBox/MeasureBox.vue";
 import PageRangeContent from "../../../../StyledComponents/RangeContent/RangeContent.vue";
 import type { LightCatcherExampleProps } from "../LightCatcherPageVue.types";
 
@@ -26,23 +27,25 @@ const pointSource = computed(() => ({ ratio: { x: percent.value / PERCENT, y: MI
 
 <template>
     <div :class="styles.placedStage">
-        <div ref="rowRef" :class="styles.placedRow">
-            <div v-for="lamp in LAMPS" :key="lamp" :class="styles.lampSlot">
-                <LightCatcher
-                    :is-disabled="isDisabled"
-                    :active-range-px="activeRangePx"
-                    :smoothing-ms="smoothingMs"
-                    :light-range-px="lightRangePx"
-                    :max-brightness="maxBrightness"
-                    :resting-brightness="restingBrightness"
-                    :max-lightness="maxLightness"
-                    :resting-lightness="restingLightness"
-                    :point-source="pointSource"
-                >
-                    <div :class="styles.lamp">{{ lamp }}</div>
-                </LightCatcher>
+        <PageMeasureBox is-filling>
+            <div ref="rowRef" :class="styles.placedRow">
+                <div v-for="lamp in LAMPS" :key="lamp" :class="styles.lampSlot">
+                    <LightCatcher
+                        :is-disabled="isDisabled"
+                        :active-range-px="activeRangePx"
+                        :smoothing-ms="smoothingMs"
+                        :light-range-px="lightRangePx"
+                        :max-brightness="maxBrightness"
+                        :resting-brightness="restingBrightness"
+                        :max-lightness="maxLightness"
+                        :resting-lightness="restingLightness"
+                        :point-source="pointSource"
+                    >
+                        <div :class="styles.lamp">{{ lamp }}</div>
+                    </LightCatcher>
+                </div>
             </div>
-        </div>
+        </PageMeasureBox>
 
         <div :class="styles.slider">
             <Range

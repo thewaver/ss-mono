@@ -22,7 +22,7 @@ import {
     TreemapUtils,
 } from "@thewaver/ss-components";
 
-import { callSlot, declareProps } from "../../../Utils/propUtils";
+import { callSlot, declareProps, useTwoWay } from "../../../Utils/propUtils";
 import { toElement } from "../../../Utils/refUtils";
 import { useStore } from "../../../Utils/storeUtils";
 import type { SlotsContext } from "../../../Utils/typeUtils";
@@ -70,7 +70,18 @@ export const Bracket = defineComponent(
 
         const focusedId = computed(() => (hasFocus.value ? lastFocusedId.value : undefined));
 
-        const anchorId = computed(() => BracketUtils.getFamilyAnchorId(focusedId.value));
+        const family = useTwoWay(props, "family");
+
+        const anchorId = computed(() => BracketUtils.findNodeId(props.root, layout.value, family.value));
+
+        const showFamilyOf = (id: string) => {
+            if (!isFamilyView.value) return;
+
+            const familyAnchorId = BracketUtils.getFamilyAnchorId(id);
+
+            family.value =
+                familyAnchorId === undefined ? undefined : BracketUtils.findNode<T>(props.root, familyAnchorId);
+        };
 
         const computeArrangement = (id: string | undefined) =>
             BracketUtils.computeFamilyArrangement(layout.value, computeGeometry(), extent.value, id);
@@ -105,19 +116,6 @@ export const Bracket = defineComponent(
             glideClock.start(props.transitionDurationMs ?? BRACKET_DEFAULTS.transitionDurationMs);
         });
 
-        watch(
-            [isFamilyView, anchorId],
-            ([isFamily, id]) => {
-                if (!isFamily) return;
-
-                props.onFamilyChange?.(
-                    id === undefined ? undefined : BracketUtils.findNode(props.root, id).value,
-                    id === undefined ? undefined : placementById.value.get(id),
-                );
-            },
-            { immediate: true },
-        );
-
         const activate = (id: string) => {
             props.onActivate?.(
                 BracketUtils.findNode(props.root, id).value,
@@ -147,6 +145,7 @@ export const Bracket = defineComponent(
 
             e.preventDefault();
             isStepping = true;
+            showFamilyOf(next);
             lastFocusedId.value = next;
             void nextTick(() => {
                 nodeRefs.get(next)?.focus();
@@ -192,6 +191,7 @@ export const Bracket = defineComponent(
                         tabindex={isNodeDisabled ? undefined : id === rovingId.value ? 0 : -1}
                         aria-disabled={isNodeDisabled || undefined}
                         onFocus={() => {
+                            showFamilyOf(id);
                             lastFocusedId.value = id;
                             hasFocus.value = true;
                         }}
@@ -314,18 +314,19 @@ export const Bracket = defineComponent(
         name: "Bracket",
         slots: Object as SlotsType<BracketSlots<any>>,
         props: declareProps<BracketProps<unknown>>({
-            nodeSize: null,
-            layerGap: null,
-            crossGap: null,
-            orientation: null,
-            rootSide: null,
-            ariaLabel: null,
-            layerHeaderSize: null,
-            view: null,
-            transitionDurationMs: null,
-            root: null,
-            onActivate: null,
-            onFamilyChange: null,
+            "nodeSize": null,
+            "layerGap": null,
+            "crossGap": null,
+            "orientation": null,
+            "rootSide": null,
+            "ariaLabel": null,
+            "layerHeaderSize": null,
+            "view": null,
+            "transitionDurationMs": null,
+            "root": null,
+            "onActivate": null,
+            "family": null,
+            "onUpdate:family": null,
         }),
     },
 );

@@ -242,9 +242,10 @@ export namespace TypewriterUtils {
      * what the container holds is a content cause, so a consumer who wants the typing to wait for a pause debounces
      * the text they pass in.
      *
-     * The text is wrapped for every letter at its animation's last frame, so a keyframe that widens letters pushes
-     * no line out of the box — see `LetterDriverUtils.wrapAtLastFrame`. The first measurement and every content cause
-     * warn about elements the typed copy cannot reproduce — see `JSXTextParserUtils.findUnsupportedElements`.
+     * The text is wrapped for every letter at its animation's widest end frame, so a keyframe that widens letters
+     * pushes no line out of the box — see `LetterDriverUtils.wrapAtWidestFrame`. The first measurement and every
+     * content cause warn about elements the typed copy cannot reproduce — see
+     * `JSXTextParserUtils.findUnsupportedElements`.
      *
      * While `opts.getIsDriven` says a drawer such as `PaintedText` is drawing the letters, the player measures
      * nothing and takes its letter count from {@link TypewriterPlayer.setCount} instead.
@@ -296,7 +297,7 @@ export namespace TypewriterUtils {
 
             const tokens = JSXTextParserUtils.getSegmentTokens(container);
             const { segments, count } = LetterDriverUtils.indexSegments(
-                LetterDriverUtils.wrapAtLastFrame(
+                LetterDriverUtils.wrapAtWidestFrame(
                     tokens,
                     width,
                     container.parentElement ?? container,

@@ -63,7 +63,7 @@ export const FormationPage = () => {
     const [getShapeKind, setShapeKind] = createSignal<ShapeConst.DefaultShape>(FormationKnobs.STARTING_SHAPE_KIND);
     const [getIsStackedInReverse, setIsStackedInReverse] = createSignal(FormationKnobs.STARTING_IS_STACKED_IN_REVERSE);
     const [getTransitionDurationMs, setTransitionDurationMs] = createSignal(FORMATION_DEFAULTS.transitionDurationMs);
-    const [getStaggerMs, setStaggerMs] = createSignal(FORMATION_DEFAULTS.staggerMs);
+    const [getTransitionDelayMs, setTransitionDelayMs] = createSignal(FORMATION_DEFAULTS.transitionDelayMs);
     const [layoutDefs, setLayoutDefs] = createStore<Record<string, Record<string, number | boolean>>>({});
     const [effectDefs, setEffectDefs] = createStore<Record<string, Record<string, number | boolean>>>({});
 
@@ -117,7 +117,7 @@ export const FormationPage = () => {
             effectEntry: getEffectEntry,
             shapeKind: getShapeKind,
             transitionDurationMs: getTransitionDurationMs,
-            staggerMs: getStaggerMs,
+            transitionDelayMs: getTransitionDelayMs,
         };
 
         return [
@@ -265,18 +265,18 @@ export const FormationPage = () => {
                     </PageProp>
 
                     <PageProp
-                        key={"staggerMs"}
-                        label={"Stagger (ms)"}
+                        key={"transitionDelayMs"}
+                        label={"Transition delay (ms)"}
                         hint={"How much later each item sets off than the one before it, while gliding is on."}
                     >
                         <PageNumberField
-                            value={getStaggerMs}
+                            value={getTransitionDelayMs}
                             min={() => FormationKnobs.MIN_STAGGER_MS}
                             max={() => FormationKnobs.MAX_STAGGER_MS}
                             step={() => FormationKnobs.STAGGER_STEP_MS}
                             width={() => FIELD_WIDTH}
-                            ariaLabel={"Stagger in milliseconds"}
-                            onInput={setStaggerMs}
+                            ariaLabel={"Transition delay in milliseconds"}
+                            onInput={setTransitionDelayMs}
                         />
                     </PageProp>
                 </PagePropsPanel>

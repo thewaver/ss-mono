@@ -2,9 +2,11 @@
 import { computed, useId, useModel } from "vue";
 
 import { Button, PaintedText, PaintedTextUtils } from "@thewaver/ss-components-vue";
+import { MEASURE_BOX_PADDING } from "@thewaver/ss-playground/App/PageComponents/MeasureBox/MeasureBox.css";
 import * as styles from "@thewaver/ss-playground/App/Pages/PaintedTextPage/PaintedTextPage.css";
 import type { Size2d } from "@thewaver/ss-utils";
 
+import PageMeasureBox from "../../../PageComponents/MeasureBox/MeasureBox.vue";
 import PageButtonContent from "../../../StyledComponents/ButtonContent/ButtonContent.vue";
 import { computeSampleDefs } from "../PaintedTextPage.const";
 import type { PaintedTextCircleExampleProps } from "../PaintedTextPage.types";
@@ -35,21 +37,23 @@ const computeStrokeDefs = (size: Size2d, element: HTMLElement | undefined) =>
 
 <template>
     <div :class="styles.stack">
-        <div :class="styles.ringText">
-            <PaintedText
-                v-model:progress="progress"
-                v-model:playback="playback"
-                :path="path"
-                :is-fitted-to-path="isFittedToPath"
-                :lap-duration-ms="lapDurationMs"
-                :compute-fill-defs="computeFillDefs"
-                :compute-stroke-defs="computeStrokeDefs"
-                :stroke-width="strokeWidth"
-                :stroke-alignment="strokeAlignment"
-            >
-                {{ RING_TEXT }}
-            </PaintedText>
-        </div>
+        <PageMeasureBox :padding="MEASURE_BOX_PADDING">
+            <div :class="styles.ringText">
+                <PaintedText
+                    v-model:progress="progress"
+                    v-model:playback="playback"
+                    :path="path"
+                    :is-fitted-to-path="isFittedToPath"
+                    :lap-duration-ms="lapDurationMs"
+                    :compute-fill-defs="computeFillDefs"
+                    :compute-stroke-defs="computeStrokeDefs"
+                    :stroke-width="strokeWidth"
+                    :stroke-alignment="strokeAlignment"
+                >
+                    {{ RING_TEXT }}
+                </PaintedText>
+            </div>
+        </PageMeasureBox>
 
         <div :class="styles.buttonRow">
             <Button id="circlePlayback" @click="togglePlayback">

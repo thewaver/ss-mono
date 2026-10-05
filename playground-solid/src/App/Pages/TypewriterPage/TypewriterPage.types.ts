@@ -11,3 +11,7 @@ export type TypewriterPhrasesExampleProps = TypewriterExampleProps &
     AccessorProps<{
         width: number;
     }>;
+
+export type TypewriterKaraokeExampleProps = AccessorProps<{
+    width: number;
+}>;

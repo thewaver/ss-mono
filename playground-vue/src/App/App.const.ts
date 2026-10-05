@@ -53,7 +53,7 @@ const NumberInputPage = () => import("./Pages/NumberInputPage/NumberInputPage.vu
 const FittedTextPage = () => import("./Pages/FittedTextPage/FittedTextPage.vue");
 const MorphTextPage = () => import("./Pages/MorphTextPage/MorphTextPage.vue");
 const ShapeRevealPage = () => import("./Pages/ShapeRevealPage/ShapeRevealPage.vue");
-const OdometerPage = () => import("./Pages/OdometerPage/OdometerPage.vue");
+const SlotTextPage = () => import("./Pages/SlotTextPage/SlotTextPage.vue");
 const PaintedTextPage = () => import("./Pages/PaintedTextPage/PaintedTextPage.vue");
 const ProximityTextPage = () => import("./Pages/ProximityTextPage/ProximityTextPage.vue");
 const PaginatorPage = () => import("./Pages/PaginatorPage/PaginatorPage.vue");
@@ -981,10 +981,10 @@ export const MENU_CONFIGS: MenuBranchConfig[] = [
                         component: MorphTextPage,
                     },
                     {
-                        name: "Odometer",
+                        name: "SlotText",
                         description:
                             "A number where each digit is a column that turns to its new value, so a change reads as travel rather than a swap. The columns turn the way the number is going, so nine to zero keeps going forward instead of rewinding, and a column waits for every column to its right that is also carrying. It takes the text rather than the number, so a separator is a slot that never turns and the component owns no locale.",
-                        component: OdometerPage,
+                        component: SlotTextPage,
                     },
                     {
                         name: "PaintedText",

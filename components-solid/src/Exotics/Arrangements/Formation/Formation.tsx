@@ -18,7 +18,9 @@ export const Formation = <T,>(props: FormationProps<T>) => {
         () => access(props.transitionDurationMs) ?? FORMATION_DEFAULTS.transitionDurationMs,
     );
 
-    const getStaggerMs = createMemo(() => access(props.staggerMs) ?? FORMATION_DEFAULTS.staggerMs);
+    const getTransitionDelayMs = createMemo(
+        () => access(props.transitionDelayMs) ?? FORMATION_DEFAULTS.transitionDelayMs,
+    );
 
     const getPlacement = (index: number) => getLayout().placements[index] ?? EMPTY_PLACEMENT;
 
@@ -35,7 +37,7 @@ export const Formation = <T,>(props: FormationProps<T>) => {
                     <PlacementItem
                         placement={() => getPlacement(getIndex())}
                         stackAt={() => getStackAt(getIndex())}
-                        transitionDelayMs={() => getIndex() * getStaggerMs()}
+                        transitionDelayMs={() => getIndex() * getTransitionDelayMs()}
                     >
                         {props.renderItem(
                             () => item,

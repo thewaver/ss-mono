@@ -24,7 +24,7 @@
     let { playback = $bindable(true), ...props }: ParticleSpawnerProps = $props();
 
     const travelDurationMs = $derived(props.travelDurationMs ?? PARTICLE_SPAWNER_DEFAULTS.travelDurationMs);
-    const retentionMs = $derived(props.retentionMs ?? PARTICLE_SPAWNER_DEFAULTS.retentionMs);
+    const restDurationMs = $derived(props.restDurationMs ?? PARTICLE_SPAWNER_DEFAULTS.restDurationMs);
     const spawnDelayMs = $derived(props.spawnDelayMs ?? PARTICLE_SPAWNER_DEFAULTS.spawnDelayMs);
     const particleCount = $derived(ParticleSpawnerUtils.toParticleCount(props.particleCount));
 
@@ -70,7 +70,7 @@
             targetRects: getTargetRects(),
             prefersReducedMotion: getPrefersReducedMotion(),
         }),
-        getTiming: () => ({ spawnDelayMs, travelDurationMs, retentionMs }),
+        getTiming: () => ({ spawnDelayMs, travelDurationMs, restDurationMs }),
         getCanSpawn: () => canSpawn,
         computeParticlePos: (travel, t) => props.computeParticlePos(travel, t),
         onParticleT: (id, t) => ts.set(id, t),
@@ -105,7 +105,7 @@
 
         void stage;
         void travelDurationMs;
-        void retentionMs;
+        void restDurationMs;
         void spawnDelayMs;
 
         if (!canSpawn || !playback || count <= 0 || !currentPattern) return;

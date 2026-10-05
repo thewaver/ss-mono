@@ -1,4 +1,10 @@
-import { type BracketConnectorPathFn, BracketConnectorPaths, type BracketNode } from "@thewaver/ss-components";
+import {
+    type BracketConnectorPathFn,
+    BracketConnectorPaths,
+    type BracketNode,
+    type BracketOrientation,
+    type BracketStep,
+} from "@thewaver/ss-components";
 
 export const NOTHING_PICKED = "nothing picked yet";
 
@@ -14,9 +20,38 @@ export const branch = (value: string, ...children: BracketNode<string>[]): Brack
     children,
 });
 
+export const computeFamilySteps = (orientation: BracketOrientation): { step: BracketStep; label: string }[] => [
+    { step: "toLeaves", label: "Previous stage" },
+    { step: "toRoot", label: "Next stage" },
+    { step: "previous", label: orientation === "horizontal" ? "Upper" : "Left" },
+    { step: "next", label: orientation === "horizontal" ? "Lower" : "Right" },
+];
+
 export const BEAM_PATHS: Record<string, BracketConnectorPathFn> = {
     flat: BracketConnectorPaths.elbow,
     rounded: BracketConnectorPaths.roundedElbow,
     curved: BracketConnectorPaths.curve,
     ballAndArrow: BracketConnectorPaths.roundedElbow,
+};
+
+const ID_SEPARATOR = ".";
+
+const getDepth = (id: string) => id.split(ID_SEPARATOR).length;
+
+export const toConnectorBoard = (defs: { id: string; parentId: string; childId: string }) =>
+    defs.id.slice(0, defs.id.length - `-${defs.parentId}-${defs.childId}`.length);
+
+export const computeRouteSpan = (
+    lengths: Record<string, { board: string; childId: string; lengthPx: number }>,
+    board: string,
+    childId: string,
+) => {
+    const onBoard = Object.values(lengths).filter((entry) => entry.board === board);
+
+    return {
+        startPx: onBoard
+            .filter((entry) => getDepth(entry.childId) > getDepth(childId))
+            .reduce((sum, entry) => sum + entry.lengthPx, 0),
+        totalPx: onBoard.reduce((sum, entry) => sum + entry.lengthPx, 0),
+    };
 };

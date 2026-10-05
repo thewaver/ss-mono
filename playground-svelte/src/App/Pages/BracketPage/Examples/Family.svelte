@@ -1,9 +1,11 @@
 <script lang="ts">
-    import { Bracket } from "@thewaver/ss-components-svelte";
-    import type { BracketNode } from "@thewaver/ss-components-svelte";
+    import { Bracket, BracketUtils, Button } from "@thewaver/ss-components-svelte";
+    import type { BracketNode, BracketStep } from "@thewaver/ss-components-svelte";
     import * as styles from "@thewaver/ss-playground/App/Pages/BracketPage/BracketPage.css";
 
-    import { branch, describeFamily, seed } from "../BracketPage.const";
+    import PageMeasureBox from "../../../PageComponents/MeasureBox/MeasureBox.svelte";
+    import PageButtonContent from "../../../StyledComponents/ButtonContent/ButtonContent.svelte";
+    import { branch, computeFamilySteps, describeFamily, seed } from "../BracketPage.const";
     import type { BracketFamilyExampleProps } from "../BracketPage.types";
     import PageBracketLayerHeader from "../PageBracketLayerHeader.svelte";
     import PageBracketNode from "../PageBracketNode.svelte";
@@ -22,30 +24,58 @@
     type Props = BracketFamilyExampleProps;
 
     let props: Props = $props();
+
+    let family = $state.raw<BracketNode<string>>();
+
+    const computeStep = (step: BracketStep) => BracketUtils.computeFamilyStep(DRAW, family, step);
+
+    $effect(() => {
+        props.onFamilyChange(describeFamily(DRAW.value, family?.value));
+    });
 </script>
 
-<div class={styles.board}>
-    <Bracket
-        root={DRAW}
-        nodeSize={NODE_SIZE}
-        view={"family"}
-        transitionDurationMs={props.transitionDurationMs}
-        layerGap={props.layerGap}
-        crossGap={props.crossGap}
-        orientation={props.orientation}
-        rootSide={props.rootSide}
-        layerHeaderSize={props.orientation === "horizontal" ? ACROSS_HEADER_SIZE : DOWN_HEADER_SIZE}
-        ariaLabel={"Knockout draw, one family at a time"}
-        onActivate={props.onActivate}
-        onFamilyChange={(value) => props.onFamilyChange(describeFamily(DRAW.value, value))}
-        renderConnector={props.renderConnector}
-    >
-        {#snippet renderNode(node, state)}
-            <PageBracketNode {node} {state} />
-        {/snippet}
+<div class={styles.familyStage}>
+    <PageMeasureBox>
+        <div class={styles.board}>
+            <Bracket
+                root={DRAW}
+                nodeSize={NODE_SIZE}
+                view={"family"}
+                bind:family
+                transitionDurationMs={props.transitionDurationMs}
+                layerGap={props.layerGap}
+                crossGap={props.crossGap}
+                orientation={props.orientation}
+                rootSide={props.rootSide}
+                layerHeaderSize={props.orientation === "horizontal" ? ACROSS_HEADER_SIZE : DOWN_HEADER_SIZE}
+                ariaLabel={"Knockout draw, one family at a time"}
+                onActivate={props.onActivate}
+                renderConnector={props.renderConnector}
+            >
+                {#snippet renderNode(node, state)}
+                    <PageBracketNode {node} {state} />
+                {/snippet}
 
-        {#snippet renderLayerHeader(layer)}
-            <PageBracketLayerHeader names={ROUND_NAMES} {layer} />
-        {/snippet}
-    </Bracket>
+                {#snippet renderLayerHeader(layer)}
+                    <PageBracketLayerHeader names={ROUND_NAMES} {layer} />
+                {/snippet}
+            </Bracket>
+        </div>
+    </PageMeasureBox>
+
+    <div class={styles.familyControls}>
+        {#each computeFamilySteps(props.orientation) as entry (entry.step)}
+            <Button
+                id={`familyStep-${entry.step}`}
+                isDisabled={computeStep(entry.step) === family}
+                onClick={() => {
+                    family = computeStep(entry.step);
+                }}
+            >
+                {#snippet renderContent(flags)}
+                    <PageButtonContent {flags}>{entry.label}</PageButtonContent>
+                {/snippet}
+            </Button>
+        {/each}
+    </div>
 </div>

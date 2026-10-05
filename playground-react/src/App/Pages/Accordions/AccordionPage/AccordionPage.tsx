@@ -6,7 +6,6 @@ import { GrowingExample } from "./Examples/Growing";
 import { RowExample } from "./Examples/Row";
 import { ScrolledExample } from "./Examples/Scrolled";
 import { SectionsExample } from "./Examples/Sections";
-import { WidthsExample } from "./Examples/Widths";
 
 const EXAMPLES_ROOT = "/src/App/Pages/Accordions/AccordionPage/Examples";
 
@@ -20,7 +19,6 @@ export const AccordionPage = () => {
     const scrolledState = useState<string[]>([]);
     const deferredState = useState<string[]>([]);
     const rowState = useState<string[]>(["Mountains"]);
-    const widthsState = useState<string[]>(["Mountains"]);
 
     const [extraLines, setExtraLines] = useState(STARTING_EXTRA_LINES);
     const [built, setBuilt] = useState<string[]>([]);
@@ -100,15 +98,6 @@ export const AccordionPage = () => {
                 `expanded: ${JSON.stringify(rowState[0])} — the panels sit in a row and open in width; the left and right arrows walk the headers, and the new panel's content slides in from the side the person moved toward`,
             component: () => <RowExample expanded={rowState} />,
             path: `${EXAMPLES_ROOT}/Row.tsx`,
-        },
-        {
-            key: "widths",
-            name: "A width for each panel",
-            span: 2,
-            readout: () =>
-                `expanded: ${JSON.stringify(widthsState[0])} — the row fills the box, and each panel opens to its own share of it; the one without a share takes what is left, and resizing the window keeps the shares`,
-            component: () => <WidthsExample expanded={widthsState} />,
-            path: `${EXAMPLES_ROOT}/Widths.tsx`,
         },
     ];
 

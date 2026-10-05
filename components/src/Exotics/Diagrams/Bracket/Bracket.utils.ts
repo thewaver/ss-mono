@@ -418,6 +418,56 @@ export namespace BracketUtils {
         focusedId === undefined ? undefined : getParentId(focusedId);
 
     /**
+     * The id a node of the consumer's own tree was given by {@link computeLayout}.
+     *
+     * A family is handed in and out as a node rather than an id, the way the consumer built the tree, so the board
+     * has to find which place that node holds. It is found by identity, not by value, because two nodes can carry
+     * the same value.
+     *
+     * @param root The final, as {@link computeLayout} was given it.
+     * @param layout What {@link computeLayout} answered for that root.
+     * @param node The node to look for, or `undefined`.
+     * @returns Its id, or `undefined` when it is `undefined` or not in the tree.
+     */
+    export const findNodeId = <T>(root: BracketNode<T>, layout: BracketLayout, node: BracketNode<T> | undefined) =>
+        node === undefined
+            ? undefined
+            : layout.placements.find((placement) => findNode(root, placement.id) === node)?.id;
+
+    /**
+     * The family one step away from another, for a consumer moving the family view from outside the board.
+     *
+     * A family is named by the node its middle row feeds, so only a node with children can name one, and the steps
+     * walk those nodes alone: `"toRoot"` names the family one stage nearer the final, `"toLeaves"` one stage further
+     * out, landing on the middle child as the keyboard does, and `"previous"` and `"next"` the neighbor across the
+     * same stage, crossing from one branch into the next. The root's own family, `undefined`, sits one stage nearer
+     * the final than the one the root names, so `"toLeaves"` from it names the root and `"toRoot"` from the root
+     * comes back to it.
+     *
+     * @param root The final, with its feeders as children.
+     * @param family The node naming the family on show, or `undefined` for the root's own.
+     * @param step Which way to move. `"first"` and `"last"` work across a stage as the keyboard's do.
+     * @returns The node naming the family that way, or `family` itself when there is none, so a step that cannot
+     * move changes nothing and a caller can compare the two to tell.
+     */
+    export const computeFamilyStep = <T>(
+        root: BracketNode<T>,
+        family: BracketNode<T> | undefined,
+        step: BracketStep,
+    ): BracketNode<T> | undefined => {
+        const layout = computeLayout(root);
+        const anchors = layout.placements.filter((placement) => placement.childIds.length > NOTHING);
+        const fromId = findNodeId(root, layout, family);
+
+        if (fromId === undefined) return step === "toLeaves" && anchors.length > NOTHING ? root : family;
+        if (step === "toRoot" && fromId === ROOT_ID) return undefined;
+
+        const nextId = computeStepId(step, fromId, anchors);
+
+        return nextId === undefined ? family : findNode(root, nextId);
+    };
+
+    /**
      * Whether a node belongs to the family the family view is showing.
      *
      * @param id The node being asked about.
@@ -432,6 +482,20 @@ export namespace BracketUtils {
         return (
             id === anchorId || parentId === anchorId || (parentId !== undefined && getParentId(parentId) === anchorId)
         );
+    };
+
+    /**
+     * The current round: the layer holding the family's middle row.
+     *
+     * @param layout What {@link computeLayout} answered.
+     * @param anchorId What {@link getFamilyAnchorId} answered.
+     * @returns The layer below the anchor's, or the root's own layer with no anchor, because the root's family has
+     * no row above it and the root is its middle.
+     */
+    export const getFamilyLayer = (layout: BracketLayout, anchorId: string | undefined) => {
+        const anchor = findPlacement(layout.placements, anchorId);
+
+        return anchor ? anchor.layer + 1 : FIRST_LAYER;
     };
 
     /**
@@ -570,18 +634,44 @@ export namespace BracketUtils {
             return { left: box.left, top: box.top, opacity: isShown ? SHOWN : NOTHING, isFolded: !isShown };
         });
 
-        return { nodes, headers };
+        return { nodes, headers, boardSize: geometry.boardSize };
     };
+
+    /**
+     * Where everything sits in the tree view, as an arrangement the family view can glide to and from.
+     *
+     * Every node and every header is drawn where the whole tree puts it, none folded, and the board is the whole
+     * tree's size. Handing the tree view an arrangement of its own is what lets a change of view glide like a change
+     * of family: from what is on screen to this, the board growing or shrinking with it.
+     *
+     * @param layout What {@link computeLayout} answered.
+     * @param geometry What {@link computeGeometry} answered for the whole layout.
+     */
+    export const computeTreeArrangement = (layout: BracketLayout, geometry: BracketGeometry): BracketArrangement => ({
+        nodes: Object.fromEntries(
+            layout.placements.map((placement): [string, BracketFrame] => [
+                placement.id,
+                { ...computeInset(geometry, placement), opacity: SHOWN, isFolded: false },
+            ]),
+        ),
+        headers: Array.from({ length: layout.layerCount }, (_unused, layer): BracketFrame => {
+            const box = computeHeaderBox(geometry, layer);
+
+            return { left: box.left, top: box.top, opacity: SHOWN, isFolded: false };
+        }),
+        boardSize: geometry.boardSize,
+    });
 
     /**
      * Where everything is drawn partway through a glide from one arrangement to another.
      *
      * @param from Where the glide began — what was on screen at that moment, even if that was itself partway through
      * another glide. `undefined` before the first glide.
-     * @param to What {@link computeFamilyArrangement} answered for the family now showing.
+     * @param to What {@link computeFamilyArrangement} answered for the family now showing, or
+     * {@link computeTreeArrangement} for the tree view.
      * @param progress How far through the glide's time, `0` to `1`.
-     * @returns Every frame moved and faded along the way between its two ends, slow at the start and the finish and
-     * fastest in the middle. Whether a frame is folded takes its new value as the glide starts, whatever its opacity
+     * @returns Every frame moved and faded along the way between its two ends, and the board's size with them, slow
+     * at the start and the finish and fastest in the middle. Whether a frame is folded takes its new value as the glide starts, whatever its opacity
      * is doing, so focus and a screen reader never wait for the picture. A frame `from` does not have appears where
      * it is going. `to` itself once the glide has finished.
      */
@@ -609,6 +699,10 @@ export namespace BracketUtils {
                 Object.entries(to.nodes).map(([id, frame]) => [id, blend(from.nodes[id], frame)]),
             ),
             headers: to.headers.map((frame, layer) => blend(from.headers[layer], frame)),
+            boardSize: {
+                width: MathUtils.lerp(from.boardSize.width, to.boardSize.width, ratio),
+                height: MathUtils.lerp(from.boardSize.height, to.boardSize.height, ratio),
+            },
         };
     };
 

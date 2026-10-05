@@ -35,8 +35,8 @@ export type PatternProximityOpts = {
     tiled?: boolean;
     reach?: number;
     restLevel?: number;
-    trailMs?: number;
-    retentionMs?: number;
+    fadeDurationMs?: number;
+    fadeDelayMs?: number;
 };
 
 export type TimedGradientElementDefs = SVGAnimationDefs & SVGDefsBaseElementDefs;

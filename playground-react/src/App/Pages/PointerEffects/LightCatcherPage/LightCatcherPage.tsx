@@ -71,11 +71,7 @@ export const LightCatcherPage = () => {
             span: ROW_SPAN,
             readout: () =>
                 "the slider puts one light across the whole row and every lamp answers to that same spot — the pointer is ignored, since a supplied point replaces it",
-            component: () => (
-                <PageMeasureBox isFilling height={BOX_HEIGHT}>
-                    <PlacedLightExample {...commonProps} />
-                </PageMeasureBox>
-            ),
+            component: () => <PlacedLightExample {...commonProps} />,
             path: `${EXAMPLES_ROOT}/PlacedLight.tsx`,
         },
     ];

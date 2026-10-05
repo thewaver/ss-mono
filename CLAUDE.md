@@ -359,6 +359,11 @@ shouting.
 
 ## Writing code
 
+**Work is built in Solid first, then paused for the user to test.** Stated by the user as the default unless they
+say otherwise: implement the change in the library and in `playground-solid` only, then stop and report. Specs and
+the ports to React, Vue and Svelte come after their feedback on the Solid version, not before — they test by hand
+first, and porting or specifying something they are about to change spends the work twice.
+
 **When you find something broken and can fix it, fix it — do not stop to ask.** Stated by the user on
 , after two rounds of reporting a date bug and waiting for permission before touching it.
 Two conditions, and they are the whole of it: the fix must not add a package, and it must not break

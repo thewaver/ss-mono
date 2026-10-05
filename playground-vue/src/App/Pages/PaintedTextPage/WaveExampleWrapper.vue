@@ -2,15 +2,13 @@
 import { computed, shallowRef, useModel } from "vue";
 
 import { PAINTED_TEXT_DEFAULTS } from "@thewaver/ss-components-vue";
-import { MEASURE_BOX_PADDING } from "@thewaver/ss-playground/App/PageComponents/MeasureBox/MeasureBox.css";
 
 import { PaintedTextKnobs } from "../../Knobs/PaintedTexts.const";
 import PageExampleKnobs from "../../PageComponents/ExampleKnobs/PageExampleKnobs.vue";
 import PageNumberField from "../../PageComponents/Field/PageNumberField.vue";
-import PageMeasureBox from "../../PageComponents/MeasureBox/MeasureBox.vue";
 import PageProp from "../../PageComponents/Prop/Prop.vue";
 import WaveExample from "./Examples/Wave.vue";
-import type { PaintedTextExampleProps, PaintedTextPathExampleWrapperProps } from "./PaintedTextPage.types";
+import type { PaintedTextBoxedExampleProps, PaintedTextPathExampleWrapperProps } from "./PaintedTextPage.types";
 
 const props = defineProps<PaintedTextPathExampleWrapperProps>();
 
@@ -19,9 +17,8 @@ const playback = useModel(props, "playback");
 
 const lapDurationMs = shallowRef(PAINTED_TEXT_DEFAULTS.lapDurationMs);
 
-const exampleProps = computed((): PaintedTextExampleProps => {
+const exampleProps = computed((): PaintedTextBoxedExampleProps => {
     const {
-        "width": _width,
         "progress": _progress,
         "onUpdate:progress": _onProgress,
         "playback": _playback,
@@ -34,14 +31,12 @@ const exampleProps = computed((): PaintedTextExampleProps => {
 </script>
 
 <template>
-    <PageMeasureBox :width="width" :padding="MEASURE_BOX_PADDING">
-        <WaveExample
-            v-bind="exampleProps"
-            v-model:progress="progress"
-            v-model:playback="playback"
-            :lap-duration-ms="lapDurationMs"
-        />
-    </PageMeasureBox>
+    <WaveExample
+        v-bind="exampleProps"
+        v-model:progress="progress"
+        v-model:playback="playback"
+        :lap-duration-ms="lapDurationMs"
+    />
 
     <PageExampleKnobs>
         <PageProp

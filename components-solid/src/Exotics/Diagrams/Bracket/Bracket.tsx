@@ -3,8 +3,8 @@ import {
     Index,
     Show,
     createComputed,
-    createEffect,
     createMemo,
+    createRenderEffect,
     createSignal,
     createUniqueId,
     on,
@@ -16,6 +16,7 @@ import {
     BRACKET_DEFAULTS,
     BRACKET_MISSING_PLACEMENT,
     type BracketArrangement,
+    type BracketNode,
     type BracketPlacement,
     BracketUtils,
     NavigatorUtils,
@@ -23,6 +24,7 @@ import {
     BracketStyles as styles,
 } from "@thewaver/ss-components";
 
+import { SignalMirrorSolidUtils } from "../../../Abstracts/SignalMirror/SignalMirrorSolid.utils";
 import { access } from "../../../Utils/propUtils";
 import { accessStore } from "../../../Utils/storeUtils";
 import type { BracketProps } from "./BracketSolid.types";
@@ -80,72 +82,72 @@ export const Bracket = <T,>(props: BracketProps<T>) => {
 
     const getFocusedId = createMemo(() => (getHasFocus() ? getLastFocusedId() : undefined));
 
-    const getAnchorId = createMemo(() => BracketUtils.getFamilyAnchorId(getFocusedId()));
+    const [getFamily, setFamily] = SignalMirrorSolidUtils.createOptional<BracketNode<T> | undefined>(
+        () => props.family,
+        undefined,
+    );
+
+    const getAnchorId = createMemo(() => BracketUtils.findNodeId(getRootNode(), getLayout(), getFamily()));
+
+    const getCurrentLayer = createMemo(() => BracketUtils.getFamilyLayer(getLayout(), getAnchorId()));
+
+    const showFamilyOf = (id: string) => {
+        const anchorId = BracketUtils.getFamilyAnchorId(id);
+
+        setFamily(() => (anchorId === undefined ? undefined : BracketUtils.findNode(getRootNode(), anchorId)));
+    };
 
     const computeArrangement = (anchorId: string | undefined) =>
         BracketUtils.computeFamilyArrangement(getLayout(), getGeometry(), getExtent(), anchorId);
 
-    const getTarget = createMemo(() => (getIsFamilyView() ? computeArrangement(getAnchorId()) : undefined));
+    const getTarget = createMemo(() =>
+        getIsFamilyView()
+            ? computeArrangement(getAnchorId())
+            : BracketUtils.computeTreeArrangement(getLayout(), getGeometry()),
+    );
 
-    const getShown = createMemo(() => {
-        const target = getTarget();
+    const getShown = createMemo(() => BracketUtils.computeShownArrangement(getGlideFrom(), getTarget(), getProgress()));
 
-        return target && BracketUtils.computeShownArrangement(getGlideFrom(), target, getProgress());
+    let lastShown: BracketArrangement | undefined;
+
+    createRenderEffect(() => {
+        lastShown = getShown();
     });
 
     createComputed(
         on(
-            getAnchorId,
-            (_next, previous) => {
-                if (!untrack(getIsFamilyView)) return;
+            [getAnchorId, getIsFamilyView],
+            ([, isFamilyView], previous) => {
+                const isViewChange = previous !== undefined && previous[1] !== isFamilyView;
 
-                setGlideFrom(
-                    untrack(() =>
-                        BracketUtils.computeShownArrangement(
-                            getGlideFrom(),
-                            computeArrangement(previous),
-                            getProgress(),
-                        ),
-                    ),
-                );
+                if (!isFamilyView && !isViewChange) return;
+
+                setGlideFrom(lastShown);
                 glideClock.start(untrack(getTransitionDurationMs));
             },
             { defer: true },
         ),
     );
 
-    const getBoardSize = createMemo(() => getGeometry().boardSize);
+    const getBoardSize = createMemo(() => getShown().boardSize);
 
     const getInset = (placement: BracketPlacement) =>
-        getShown()?.nodes[placement.id] ?? BracketUtils.computeInset(getGeometry(), placement);
+        getShown().nodes[placement.id] ?? BracketUtils.computeInset(getGeometry(), placement);
 
     const getHeaderBox = (layer: number) => {
         const box = BracketUtils.computeHeaderBox(getGeometry(), layer);
-        const frame = getShown()?.headers[layer];
+        const frame = getShown().headers[layer];
 
         return frame ? { ...box, left: frame.left, top: frame.top } : box;
     };
 
     const getConnectors = createMemo(() =>
-        BracketUtils.computeConnectors(getLayout(), getGeometry(), boardId, getFocusedId(), getShown()?.nodes),
+        BracketUtils.computeConnectors(getLayout(), getGeometry(), boardId, getFocusedId(), getShown().nodes),
     );
 
     const getPlacementById = createMemo(
         () => new Map(getLayout().placements.map((placement) => [placement.id, placement])),
     );
-
-    createEffect(() => {
-        if (!getIsFamilyView()) return;
-
-        const anchorId = getAnchorId();
-
-        untrack(() =>
-            props.onFamilyChange?.(
-                anchorId === undefined ? undefined : BracketUtils.findNode(getRootNode(), anchorId).value,
-                anchorId === undefined ? undefined : getPlacementById().get(anchorId),
-            ),
-        );
-    });
 
     const getNodeIds = createMemo(() => getLayout().placements.map((placement) => placement.id));
 
@@ -199,6 +201,7 @@ export const Bracket = <T,>(props: BracketProps<T>) => {
 
         e.preventDefault();
         isStepping = true;
+        showFamilyOf(next);
         setLastFocusedId(next);
         getNodeRefs()[next]?.focus();
         isStepping = false;
@@ -231,6 +234,7 @@ export const Bracket = <T,>(props: BracketProps<T>) => {
                     tabindex={getIsNodeDisabled() ? undefined : id === getRovingId() ? 0 : -1}
                     aria-disabled={getIsNodeDisabled() || undefined}
                     onFocus={() => {
+                        showFamilyOf(id);
                         setLastFocusedId(id);
                         setHasFocus(true);
                     }}
@@ -327,7 +331,9 @@ export const Bracket = <T,>(props: BracketProps<T>) => {
                                         }}
                                         aria-hidden={getIsFolded() ? "true" : undefined}
                                     >
-                                        {getRenderLayerHeader()(layer)}
+                                        {getRenderLayerHeader()(layer, () => ({
+                                            isCurrent: getCurrentLayer() === layer,
+                                        }))}
                                     </div>
 
                                     <ul

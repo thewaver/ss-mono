@@ -1,31 +1,22 @@
 <script lang="ts">
     import { PAINTED_TEXT_DEFAULTS } from "@thewaver/ss-components-svelte";
-    import { MEASURE_BOX_PADDING } from "@thewaver/ss-playground/App/PageComponents/MeasureBox/MeasureBox.css";
 
     import { PaintedTextKnobs } from "../../Knobs/PaintedTexts.const";
     import PageExampleKnobs from "../../PageComponents/ExampleKnobs/PageExampleKnobs.svelte";
     import PageCheckField from "../../PageComponents/Field/PageCheckField.svelte";
     import PageNumberField from "../../PageComponents/Field/PageNumberField.svelte";
-    import PageMeasureBox from "../../PageComponents/MeasureBox/MeasureBox.svelte";
     import PageProp from "../../PageComponents/Prop/Prop.svelte";
     import CircleExample from "./Examples/Circle.svelte";
     import type { PaintedTextPathExampleWrapperProps } from "./PaintedTextPage.types";
 
-    let {
-        width: _width,
-        progress = $bindable(),
-        playback = $bindable(),
-        ...props
-    }: PaintedTextPathExampleWrapperProps = $props();
+    let { progress = $bindable(), playback = $bindable(), ...props }: PaintedTextPathExampleWrapperProps = $props();
 
     let radius = $state(PaintedTextKnobs.STARTING_CIRCLE_RADIUS);
     let lapDurationMs = $state(PAINTED_TEXT_DEFAULTS.lapDurationMs);
     let isFittedToPath = $state(PaintedTextKnobs.STARTING_IS_FITTED_TO_PATH);
 </script>
 
-<PageMeasureBox padding={MEASURE_BOX_PADDING}>
-    <CircleExample {...props} bind:progress bind:playback {radius} {lapDurationMs} {isFittedToPath} />
-</PageMeasureBox>
+<CircleExample {...props} bind:progress bind:playback {radius} {lapDurationMs} {isFittedToPath} />
 
 <PageExampleKnobs>
     <PageProp

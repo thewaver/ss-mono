@@ -54,7 +54,7 @@ export const IconCloudExample = (props: Props) => {
                 <For each={ICON_CLOUD_STEPS}>
                     {(step) => (
                         <Button
-                            id={`dieCloud${step.label}`}
+                            id={step.id}
                             renderContent={(getFlags) => (
                                 <PageButtonContent flags={getFlags}>{step.label}</PageButtonContent>
                             )}

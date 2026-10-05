@@ -72,11 +72,11 @@ export namespace ScrambleTextUtils {
      * When each character settles, in milliseconds from the start.
      *
      * @param weights The characters' weights.
-     * @param initialDelayMs How long before the first character settles.
+     * @param settleDelayMs How long before the first character settles.
      * @param durationMs How long the whole reveal takes.
      */
-    export const getSettleTimes = (weights: number[], initialDelayMs: number, durationMs: number) =>
-        weights.map((weight) => initialDelayMs + weight * durationMs);
+    export const getSettleTimes = (weights: number[], settleDelayMs: number, durationMs: number) =>
+        weights.map((weight) => settleDelayMs + weight * durationMs);
 
     /**
      * When each character begins churning.
@@ -247,7 +247,7 @@ export namespace ScrambleTextUtils {
 
                 store.set({ ...ticked, noise: rollNoise(ticked) });
 
-                if (elapsedMs < opts.getInitialDelayMs() + opts.getSettleDurationMs()) return;
+                if (elapsedMs < opts.getSettleDelayMs() + opts.getSettleDurationMs()) return;
 
                 stop();
                 opts.onAnimationEnd?.();

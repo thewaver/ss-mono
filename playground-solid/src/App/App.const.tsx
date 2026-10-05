@@ -66,7 +66,7 @@ const NumberInputPage = lazyPage(() => import("./Pages/NumberInputPage/NumberInp
 const FittedTextPage = lazyPage(() => import("./Pages/FittedTextPage/FittedTextPage"), "FittedTextPage");
 const MorphTextPage = lazyPage(() => import("./Pages/MorphTextPage/MorphTextPage"), "MorphTextPage");
 const ShapeRevealPage = lazyPage(() => import("./Pages/ShapeRevealPage/ShapeRevealPage"), "ShapeRevealPage");
-const OdometerPage = lazyPage(() => import("./Pages/OdometerPage/OdometerPage"), "OdometerPage");
+const SlotTextPage = lazyPage(() => import("./Pages/SlotTextPage/SlotTextPage"), "SlotTextPage");
 const PaginatorPage = lazyPage(() => import("./Pages/PaginatorPage/PaginatorPage"), "PaginatorPage");
 const PaintedTextPage = lazyPage(() => import("./Pages/PaintedTextPage/PaintedTextPage"), "PaintedTextPage");
 const ProximityTextPage = lazyPage(() => import("./Pages/ProximityTextPage/ProximityTextPage"), "ProximityTextPage");
@@ -1039,10 +1039,10 @@ export const MENU_CONFIGS: MenuBranchConfig[] = [
                         component: () => <MorphTextPage />,
                     },
                     {
-                        name: "Odometer",
+                        name: "SlotText",
                         description:
-                            "A number where each digit is a column that turns to its new value, so a change reads as travel rather than a swap. The columns turn the way the number is going, so nine to zero keeps going forward instead of rewinding, and a column waits for every column to its right that is also carrying. It takes the text rather than the number, so a separator is a slot that never turns and the component owns no locale.",
-                        component: () => <OdometerPage />,
+                            "Text where each character is a column that turns to its new value, on a drum or through flaps, so a change reads as travel rather than a swap. Digits turn the way their number is going, so nine to zero keeps going forward instead of rewinding, and a column waits for every column to its right that is also turning. Letters turn too when they are listed, each round its own alphabet, forward like a departures board or the shortest way. It takes the text rather than a number, so a separator is a slot that never turns and the component owns no locale.",
+                        component: () => <SlotTextPage />,
                     },
                     {
                         name: "PaintedText",

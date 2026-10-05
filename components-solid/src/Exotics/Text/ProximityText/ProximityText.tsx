@@ -42,6 +42,8 @@ export const ProximityText = (props: ParentProps<ProximityTextProps>) => {
 
     const getIsDisabled = createMemo(() => access(props.isDisabled) ?? false);
 
+    const getDistanceAxis = createMemo(() => access(props.distanceAxis) ?? PROXIMITY_TEXT_DEFAULTS.distanceAxis);
+
     const registry = LetterDriverUtils.createRegistry();
 
     const getIsDriven = accessStore(registry, (state) => state.entries.length > 0);
@@ -100,6 +102,7 @@ export const ProximityText = (props: ParentProps<ProximityTextProps>) => {
             getIsDriven() ? getDrivenBoxes() : getRestBoxes(),
             ProximityTextUtils.toPoint(getReading(), getIsPointerPresent() && !getIsDisabled(), getSize()),
             getReachPx(),
+            getDistanceAxis(),
         ),
     );
 
@@ -113,18 +116,16 @@ export const ProximityText = (props: ParentProps<ProximityTextProps>) => {
         );
 
     const measureRest = () => {
-        const boxes = restLetterRefs
-            .slice(0, untrack(getCharacters).length)
-            .map((element) =>
-                element
-                    ? {
-                          x: element.offsetLeft,
-                          y: element.offsetTop,
-                          width: element.offsetWidth,
-                          height: element.offsetHeight,
-                      }
-                    : { x: 0, y: 0, width: 0, height: 0 },
-            );
+        const boxes = restLetterRefs.slice(0, untrack(getCharacters).length).map((element) =>
+            element
+                ? {
+                      x: element.offsetLeft,
+                      y: element.offsetTop,
+                      width: element.offsetWidth,
+                      height: element.offsetHeight,
+                  }
+                : { x: 0, y: 0, width: 0, height: 0 },
+        );
 
         setRestBoxes(boxes);
     };

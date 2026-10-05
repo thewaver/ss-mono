@@ -34,7 +34,7 @@ export type ScrambleTextScramblerOpts = {
     /** When each position starts churning, from the start of a run. */
     getStartTimes: () => number[];
     /** How long to wait before starting. */
-    getInitialDelayMs: () => number;
+    getSettleDelayMs: () => number;
     /** How long the whole run takes. */
     getSettleDurationMs: () => number;
     /** How often an unsettled position is swapped for another glyph. */

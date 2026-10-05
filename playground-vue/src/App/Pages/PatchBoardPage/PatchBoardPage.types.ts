@@ -5,6 +5,7 @@ export type PatchBoardExampleProps = {
     "socketSize": number;
     "isLocked": boolean;
     "isDisabled": boolean;
+    "isBeamPlaying": boolean;
     "nodes": PatchBoardNode<PatchDevice>[];
     "onUpdate:nodes"?: (nodes: PatchBoardNode<PatchDevice>[]) => void;
     "links": PatchBoardLink[];

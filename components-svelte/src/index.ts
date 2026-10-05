@@ -304,8 +304,8 @@ export { default as Staircase } from "./Exotics/Arrangements/Staircase/Staircase
 export type * from "./Exotics/Arrangements/Staircase/Staircase.types.js";
 export { default as MorphText } from "./Exotics/Text/MorphText/MorphText.svelte";
 export type * from "./Exotics/Text/MorphText/MorphText.types.js";
-export { default as Odometer } from "./Exotics/Text/Odometer/Odometer.svelte";
-export type * from "./Exotics/Text/Odometer/Odometer.types.js";
+export { default as SlotText } from "./Exotics/Text/SlotText/SlotText.svelte";
+export type * from "./Exotics/Text/SlotText/SlotText.types.js";
 export { default as PaintedText } from "./Exotics/Text/PaintedText/PaintedText.svelte";
 export type * from "./Exotics/Text/PaintedText/PaintedText.types.js";
 export { default as Formation } from "./Exotics/Arrangements/Formation/Formation.svelte";

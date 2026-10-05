@@ -21,7 +21,12 @@ export type PaintedTextExampleProps = AccessorProps<{
     cellSize: Size2d;
 }>;
 
-export type PaintedTextPathExampleProps = PaintedTextExampleProps &
+export type PaintedTextBoxedExampleProps = PaintedTextExampleProps &
+    AccessorProps<{
+        width?: number;
+    }>;
+
+export type PaintedTextPathExampleProps = PaintedTextBoxedExampleProps &
     AccessorProps<{
         lapDurationMs: number;
         progress: SignalSource<number>;

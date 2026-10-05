@@ -2,7 +2,7 @@
 import { shallowRef } from "vue";
 
 import type { PatchBoardLink } from "@thewaver/ss-components-vue";
-import { PATCH_BOARD_DEFAULTS } from "@thewaver/ss-components-vue";
+import { MediaQueryMonitorVueUtils, PATCH_BOARD_DEFAULTS } from "@thewaver/ss-components-vue";
 import { PatchBoardKnobs } from "@thewaver/ss-playground/App/Knobs/PatchBoards.const";
 import {
     BOARD_WIDTH,
@@ -27,7 +27,6 @@ import PageNumberField from "../../PageComponents/Field/PageNumberField.vue";
 import PageMeasureBox from "../../PageComponents/MeasureBox/MeasureBox.vue";
 import PageProp from "../../PageComponents/Prop/Prop.vue";
 import PagePropsPanel from "../../PageComponents/PropsPanel/PagePropsPanel.vue";
-import BeamsExample from "./Examples/Beams.vue";
 import ChainExample from "./Examples/Chain.vue";
 import MixerExample from "./Examples/Mixer.vue";
 import PanExample from "./Examples/Pan.vue";
@@ -51,7 +50,6 @@ const mixerAction = shallowRef(NOTHING_DONE);
 const rackAction = shallowRef(NOTHING_DONE);
 const panAction = shallowRef(NOTHING_DONE);
 const zoomAction = shallowRef(NOTHING_DONE);
-const beamsAction = shallowRef(NOTHING_DONE);
 const zoom = shallowRef(STARTING_ZOOM);
 
 const chainNodes = shallowRef(CHAIN_NODES);
@@ -64,8 +62,10 @@ const panNodes = shallowRef(PAN_NODES);
 const panLinks = shallowRef(PAN_LINKS);
 const zoomNodes = shallowRef(CHAIN_NODES);
 const zoomLinks = shallowRef(CHAIN_LINKS);
-const beamsNodes = shallowRef(CHAIN_NODES);
-const beamsLinks = shallowRef(CHAIN_LINKS);
+
+const prefersReducedMotion = MediaQueryMonitorVueUtils.useReducedMotion();
+
+const isBeamPlaying = shallowRef(!prefersReducedMotion.value);
 
 const examples: ExampleDefs[] = [
     {
@@ -107,14 +107,6 @@ const examples: ExampleDefs[] = [
         readout: () =>
             `${zoomLinks.value.length} cables at ${Math.round(zoom.value * PERCENT)}%, last: ${zoomAction.value} — the board is scaled with a CSS transform, and a drag still lands under the pointer`,
         path: `${EXAMPLES_ROOT}/Zoom.vue`,
-    },
-    {
-        key: "beams",
-        name: "The signal running along its cables",
-        span: WIDE_SPAN,
-        readout: () =>
-            `${beamsLinks.value.length} cables, last: ${beamsAction.value} — a pulse runs along every plugged cable from the output to the input it feeds, taking the same time on a long cable as on a short one; Pause stops it`,
-        path: `${EXAMPLES_ROOT}/Beams.vue`,
     },
 ];
 </script>
@@ -159,6 +151,18 @@ const examples: ExampleDefs[] = [
                 @change="(value: boolean) => (isDisabled = value)"
             />
         </PageProp>
+
+        <PageProp
+            item-key="isBeamPlaying"
+            label="Beams moving"
+            hint="Whether a pulse runs along every plugged cable, from the output to the input it feeds. It starts stopped while the visitor has asked for reduced motion."
+        >
+            <PageCheckField
+                :value="isBeamPlaying"
+                ariaLabel="Beams moving"
+                @change="(value: boolean) => (isBeamPlaying = value)"
+            />
+        </PageProp>
     </PagePropsPanel>
 
     <PageExamples :items="examples" layout="flow">
@@ -170,6 +174,7 @@ const examples: ExampleDefs[] = [
                     :socket-size="socketSize"
                     :is-locked="isLocked"
                     :is-disabled="isDisabled"
+                    :is-beam-playing="isBeamPlaying"
                     @link="(link: PatchBoardLink) => (chainAction = `connected ${getLinkWords(link)}`)"
                     @unlink="(link: PatchBoardLink) => (chainAction = `unplugged ${getLinkWords(link)}`)"
                     @move="(nodeKey: string) => (chainAction = `moved ${nodeKey}`)"
@@ -185,6 +190,7 @@ const examples: ExampleDefs[] = [
                     :socket-size="socketSize"
                     :is-locked="isLocked"
                     :is-disabled="isDisabled"
+                    :is-beam-playing="isBeamPlaying"
                     @link="(link: PatchBoardLink) => (mixerAction = `connected ${getLinkWords(link)}`)"
                     @unlink="(link: PatchBoardLink) => (mixerAction = `unplugged ${getLinkWords(link)}`)"
                     @move="(nodeKey: string) => (mixerAction = `moved ${nodeKey}`)"
@@ -200,6 +206,7 @@ const examples: ExampleDefs[] = [
                     :socket-size="socketSize"
                     :is-locked="isLocked"
                     :is-disabled="isDisabled"
+                    :is-beam-playing="isBeamPlaying"
                     @link="(link: PatchBoardLink) => (rackAction = `connected ${getLinkWords(link)}`)"
                     @unlink="(link: PatchBoardLink) => (rackAction = `unplugged ${getLinkWords(link)}`)"
                     @move="(nodeKey: string) => (rackAction = `moved ${nodeKey}`)"
@@ -215,6 +222,7 @@ const examples: ExampleDefs[] = [
                     :socket-size="socketSize"
                     :is-locked="isLocked"
                     :is-disabled="isDisabled"
+                    :is-beam-playing="isBeamPlaying"
                     @link="(link: PatchBoardLink) => (panAction = `connected ${getLinkWords(link)}`)"
                     @unlink="(link: PatchBoardLink) => (panAction = `unplugged ${getLinkWords(link)}`)"
                     @move="(nodeKey: string) => (panAction = `moved ${nodeKey}`)"
@@ -229,27 +237,13 @@ const examples: ExampleDefs[] = [
                 :socket-size="socketSize"
                 :is-locked="isLocked"
                 :is-disabled="isDisabled"
+                :is-beam-playing="isBeamPlaying"
                 :zoom="zoom"
                 @zoom-change="(next: number) => (zoom = MathUtils.clamp(next, MIN_ZOOM, MAX_ZOOM))"
                 @link="(link: PatchBoardLink) => (zoomAction = `connected ${getLinkWords(link)}`)"
                 @unlink="(link: PatchBoardLink) => (zoomAction = `unplugged ${getLinkWords(link)}`)"
                 @move="(nodeKey: string) => (zoomAction = `moved ${nodeKey}`)"
             />
-        </template>
-
-        <template #beams>
-            <PageMeasureBox :width="BOARD_WIDTH">
-                <BeamsExample
-                    v-model:nodes="beamsNodes"
-                    v-model:links="beamsLinks"
-                    :socket-size="socketSize"
-                    :is-locked="isLocked"
-                    :is-disabled="isDisabled"
-                    @link="(link: PatchBoardLink) => (beamsAction = `connected ${getLinkWords(link)}`)"
-                    @unlink="(link: PatchBoardLink) => (beamsAction = `unplugged ${getLinkWords(link)}`)"
-                    @move="(nodeKey: string) => (beamsAction = `moved ${nodeKey}`)"
-                />
-            </PageMeasureBox>
         </template>
     </PageExamples>
 </template>

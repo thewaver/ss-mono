@@ -1,11 +1,9 @@
 <script lang="ts">
-    import { MEASURE_BOX_PADDING } from "@thewaver/ss-playground/App/PageComponents/MeasureBox/MeasureBox.css";
     import * as typewriterStyles from "@thewaver/ss-playground/App/Pages/TypewriterPage/TypewriterPage.css";
 
     import { PaintedTextKnobs } from "../../Knobs/PaintedTexts.const";
     import PageExampleKnobs from "../../PageComponents/ExampleKnobs/PageExampleKnobs.svelte";
     import PageSelectField from "../../PageComponents/Field/PageSelectField.svelte";
-    import PageMeasureBox from "../../PageComponents/MeasureBox/MeasureBox.svelte";
     import PageProp from "../../PageComponents/Prop/Prop.svelte";
     import TypedExample from "./Examples/Typed.svelte";
     import type { PaintedTextExampleWrapperProps } from "./PaintedTextPage.types";
@@ -22,14 +20,12 @@
         slide: typewriterStyles.typewriterSlide,
     };
 
-    let { width, ...props }: PaintedTextExampleWrapperProps = $props();
+    let props: PaintedTextExampleWrapperProps = $props();
 
     let arrivalEffect = $state<ArrivalEffect>(PaintedTextKnobs.STARTING_ARRIVAL_EFFECT);
 </script>
 
-<PageMeasureBox {width} padding={MEASURE_BOX_PADDING}>
-    <TypedExample {...props} computeAnimationName={() => ARRIVAL_EFFECT_NAMES[arrivalEffect]} />
-</PageMeasureBox>
+<TypedExample {...props} computeAnimationName={() => ARRIVAL_EFFECT_NAMES[arrivalEffect]} />
 
 <PageExampleKnobs>
     <PageProp

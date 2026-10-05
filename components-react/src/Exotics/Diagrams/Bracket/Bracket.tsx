@@ -15,12 +15,14 @@ import {
     BRACKET_DEFAULTS,
     BRACKET_MISSING_PLACEMENT,
     type BracketArrangement,
+    type BracketNode,
     BracketStyles,
     BracketUtils,
     NavigatorUtils,
     TreemapUtils,
 } from "@thewaver/ss-components";
 
+import { SignalMirrorReactUtils } from "../../../Abstracts/SignalMirror/SignalMirrorReact.utils";
 import { useStore } from "../../../Utils/storeUtils";
 import type { BracketProps } from "./Bracket.types";
 
@@ -66,7 +68,13 @@ export const Bracket = <T,>(props: BracketProps<T>) => {
     });
 
     const focusedId = hasFocus ? lastFocusedId : undefined;
-    const anchorId = BracketUtils.getFamilyAnchorId(focusedId);
+
+    const [family, setFamily] = SignalMirrorReactUtils.useOptionalState<BracketNode<T> | undefined>(
+        props.family,
+        undefined,
+    );
+
+    const anchorId = useMemo(() => BracketUtils.findNodeId(props.root, layout, family), [props.root, layout, family]);
 
     const computeArrangement = (id: string | undefined) =>
         BracketUtils.computeFamilyArrangement(layout, geometry, extent, id);
@@ -113,14 +121,13 @@ export const Bracket = <T,>(props: BracketProps<T>) => {
         glideClock.start(transitionDurationMs);
     }, [glide.generation]);
 
-    useEffect(() => {
+    const showFamilyOf = (id: string) => {
         if (!isFamilyView) return;
 
-        props.onFamilyChange?.(
-            anchorId === undefined ? undefined : BracketUtils.findNode(props.root, anchorId).value,
-            anchorId === undefined ? undefined : placementById.get(anchorId),
-        );
-    }, [isFamilyView, anchorId]);
+        const familyAnchorId = BracketUtils.getFamilyAnchorId(id);
+
+        setFamily(familyAnchorId === undefined ? undefined : BracketUtils.findNode(props.root, familyAnchorId));
+    };
 
     const activate = (id: string) => {
         props.onActivate?.(
@@ -149,7 +156,10 @@ export const Bracket = <T,>(props: BracketProps<T>) => {
 
         e.preventDefault();
         isStepping.current = true;
-        flushSync(() => setLastFocusedId(next));
+        flushSync(() => {
+            showFamilyOf(next);
+            setLastFocusedId(next);
+        });
         nodeRefs.current.get(next)?.focus();
         isStepping.current = false;
     };
@@ -188,6 +198,7 @@ export const Bracket = <T,>(props: BracketProps<T>) => {
                     onFocus={(e) => {
                         if (e.target !== e.currentTarget) return;
 
+                        showFamilyOf(id);
                         setLastFocusedId(id);
                         setHasFocus(true);
                     }}

@@ -5,6 +5,7 @@ export type PatchBoardExampleProps = AccessorProps<{
     socketSize: number;
     isLocked: boolean;
     isDisabled: boolean;
+    isBeamPlaying: boolean;
     nodes: SignalSource<PatchBoardNode<PatchDevice>[]>;
     links: SignalSource<PatchBoardLink[]>;
     onLink: (link: PatchBoardLink) => void;

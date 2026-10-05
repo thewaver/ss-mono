@@ -3,7 +3,6 @@ import type { Accessor, JSX } from "solid-js";
 import type {
     AccessorProps,
     BracketConnectorDefs,
-    BracketConnectors,
     BracketOrientation,
     BracketPlacement,
     BracketRootSide,
@@ -17,11 +16,6 @@ export type BracketExampleProps = AccessorProps<{
     onActivate: (value: string, placement: BracketPlacement) => void;
 }> & {
     renderConnector: (getDefs: Accessor<BracketConnectorDefs>) => JSX.Element;
-};
-
-export type BracketBeamsExampleProps = BracketExampleProps & {
-    connector: Accessor<BracketConnectors.SampleKey>;
-    connectorRadius: Accessor<number>;
 };
 
 export type BracketFamilyExampleProps = BracketExampleProps &

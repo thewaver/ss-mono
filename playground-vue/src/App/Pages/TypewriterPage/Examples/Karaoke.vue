@@ -2,10 +2,13 @@
 import { shallowRef } from "vue";
 
 import { Button, Range, Typewriter } from "@thewaver/ss-components-vue";
+import { MEASURE_BOX_PADDING } from "@thewaver/ss-playground/App/PageComponents/MeasureBox/MeasureBox.css";
 import * as styles from "@thewaver/ss-playground/App/Pages/TypewriterPage/TypewriterPage.css";
 
+import PageMeasureBox from "../../../PageComponents/MeasureBox/MeasureBox.vue";
 import PageButtonContent from "../../../StyledComponents/ButtonContent/ButtonContent.vue";
 import PageRangeContent from "../../../StyledComponents/RangeContent/RangeContent.vue";
+import type { TypewriterKaraokeExampleProps } from "../TypewriterPage.types";
 
 const LYRIC = "Twinkle, twinkle, little star";
 const PERCENT = 100;
@@ -15,6 +18,10 @@ const CHARACTER_DELAY_MS = 120;
 const CHARACTER_DURATION_MS = 600;
 const RUN_START = 0;
 const RUN_END = 1;
+
+type Props = TypewriterKaraokeExampleProps;
+
+defineProps<Props>();
 
 const progress = shallowRef(RUN_START);
 const isPlaying = shallowRef(false);
@@ -34,17 +41,19 @@ const seek = (value: number) => {
 
 <template>
     <div :class="styles.karaokeStack">
-        <div :class="styles.karaokeLine">
-            <Typewriter
-                v-model:progress="progress"
-                v-model:playback="isPlaying"
-                :compute-animation-name="computeAnimationName"
-                :animation-delay-ms="CHARACTER_DELAY_MS"
-                :animation-duration-ms="CHARACTER_DURATION_MS"
-                @animation-end="isPlaying = false"
-                >{{ LYRIC }}</Typewriter
-            >
-        </div>
+        <PageMeasureBox :width="width" :padding="MEASURE_BOX_PADDING">
+            <div :class="styles.karaokeLine">
+                <Typewriter
+                    v-model:progress="progress"
+                    v-model:playback="isPlaying"
+                    :compute-animation-name="computeAnimationName"
+                    :animation-delay-ms="CHARACTER_DELAY_MS"
+                    :animation-duration-ms="CHARACTER_DURATION_MS"
+                    @animation-end="isPlaying = false"
+                    >{{ LYRIC }}</Typewriter
+                >
+            </div>
+        </PageMeasureBox>
 
         <div :class="styles.karaokeControls">
             <Button id="karaokePlay" @click="togglePlaying">

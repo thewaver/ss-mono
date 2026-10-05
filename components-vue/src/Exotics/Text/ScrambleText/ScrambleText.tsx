@@ -36,7 +36,7 @@ export const ScrambleText = defineComponent(
         });
 
         const getSettleDurationMs = () => props.settleDurationMs ?? SCRAMBLE_TEXT_DEFAULTS.settleDurationMs;
-        const getInitialDelayMs = () => props.initialDelayMs ?? NO_DELAY;
+        const getSettleDelayMs = () => props.settleDelayMs ?? NO_DELAY;
 
         const settleTimes = computed(() =>
             ScrambleTextUtils.getSettleTimes(
@@ -44,7 +44,7 @@ export const ScrambleText = defineComponent(
                     characters.value.length,
                     props.computeCharacterWeights?.(characters.value.length),
                 ),
-                getInitialDelayMs(),
+                getSettleDelayMs(),
                 getSettleDurationMs(),
             ),
         );
@@ -56,7 +56,7 @@ export const ScrambleText = defineComponent(
             getGlyphSets: () => glyphSets.value,
             getSettleTimes: () => settleTimes.value,
             getStartTimes: () => startTimes.value,
-            getInitialDelayMs,
+            getSettleDelayMs,
             getSettleDurationMs,
             getScrambleIntervalMs: () => props.scrambleIntervalMs ?? SCRAMBLE_TEXT_DEFAULTS.scrambleIntervalMs,
             onAnimationEnd: () => props.onAnimationEnd?.(),
@@ -161,7 +161,7 @@ export const ScrambleText = defineComponent(
             settleDurationMs: null,
             churnDurationMs: null,
             scrambleIntervalMs: null,
-            initialDelayMs: null,
+            settleDelayMs: null,
             computeCharacterWeights: null,
             computeGlyphs: null,
             changedOnly: Boolean,

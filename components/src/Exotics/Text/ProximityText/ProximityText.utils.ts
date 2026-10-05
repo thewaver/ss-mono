@@ -4,7 +4,12 @@ import type { LetterAnimation } from "../../../Abstracts/LetterDriver/LetterDriv
 import { LetterDriverUtils } from "../../../Abstracts/LetterDriver/LetterDriver.utils";
 import type { PointerReading } from "../../../Abstracts/PointerTracker/PointerTracker.types";
 import { ProximityUtils } from "../../../Abstracts/Proximity/Proximity.utils";
-import type { ProximityTextLayout, ProximityTextLayoutOpts, ProximityTextLayoutState } from "./ProximityText.types";
+import type {
+    ProximityTextDistanceAxis,
+    ProximityTextLayout,
+    ProximityTextLayoutOpts,
+    ProximityTextLayoutState,
+} from "./ProximityText.types";
 
 /** How long a letter's keyframes are taken to last. Only the share of it that a strength names is ever shown. */
 const LETTER_RUN_MS = 1000;
@@ -27,9 +32,9 @@ const warnIfUnsupported = (container: HTMLElement) => {
  * under the point.
  *
  * The keyframes are the consumer's, so any property can follow the point — a variable font's axes as readily as a
- * color. The text is wrapped once for every letter at its last frame, so a growing letter pushes the rest of its line
- * along without ever moving a line break, and nearness is measured from where the letters sit at rest, so the push
- * cannot feed back into what is measured.
+ * color. The text is wrapped once for every letter at its widest end frame, so a growing letter pushes the rest of its
+ * line along without ever moving a line break, and nearness is measured from where the letters sit at rest, so the
+ * push cannot feed back into what is measured.
  */
 export namespace ProximityTextUtils {
     /**
@@ -48,18 +53,26 @@ export namespace ProximityTextUtils {
      * @param boxes Where each letter sits at rest, in the same layout pixels as the point.
      * @param point Where the point is, or `undefined` while there is none.
      * @param reachPx How far from a letter's middle the point still reaches it.
+     * @param axis Which way the distance is measured: `"both"`, straight to the point; `"vertical"`, up and down
+     * only, so the point acts as a line across the text and every letter on one line answers it alike;
+     * `"horizontal"`, across only, a line down the text.
      * @returns One strength per letter, `1` under the point falling with `Proximity`'s curve to `0` at the reach,
      * and `0` for every letter while there is no point.
      */
-    export const computeStrengths = (boxes: readonly Rect[], point: Point2d | undefined, reachPx: number) =>
-        boxes.map((box) =>
-            point
-                ? ProximityUtils.getDistanceFalloff(
-                      Math.hypot(point.x - (box.x + box.width * HALF), point.y - (box.y + box.height * HALF)),
-                      reachPx,
-                  )
-                : 0,
-        );
+    export const computeStrengths = (
+        boxes: readonly Rect[],
+        point: Point2d | undefined,
+        reachPx: number,
+        axis: ProximityTextDistanceAxis = "both",
+    ) =>
+        boxes.map((box) => {
+            if (!point) return 0;
+
+            const dx = axis === "vertical" ? 0 : point.x - (box.x + box.width * HALF);
+            const dy = axis === "horizontal" ? 0 : point.y - (box.y + box.height * HALF);
+
+            return ProximityUtils.getDistanceFalloff(Math.hypot(dx, dy), reachPx);
+        });
 
     /**
      * What one letter plays to show a strength.
@@ -81,9 +94,9 @@ export namespace ProximityTextUtils {
      * Measures and wraps the text a `ProximityText` draws, and keeps the result.
      *
      * The text is taken from the hidden copy the consumer's children are rendered into, wrapped at its width for every
-     * letter at its last frame (see `LetterDriverUtils.wrapAtLastFrame`) and numbered letter by letter. A change of
-     * size measures again only when the width changed; a web font or an image finishing loading measures again
-     * whatever the width, since either moves line breaks without moving the box. While a drawer inside draws the
+     * letter at its widest end frame (see `LetterDriverUtils.wrapAtWidestFrame`) and numbered letter by letter. A
+     * change of size measures again only when the width changed; a web font or an image finishing loading measures
+     * again whatever the width, since either moves line breaks without moving the box. While a drawer inside draws the
      * letters, nothing is measured here. The first measurement and every change of content warn about elements the
      * copy cannot reproduce — see `JSXTextParserUtils.findUnsupportedElements`.
      *
@@ -108,7 +121,7 @@ export namespace ProximityTextUtils {
             if (store.get().width === undefined || isContentChange) warnIfUnsupported(container);
 
             const { segments, count } = LetterDriverUtils.indexSegments(
-                LetterDriverUtils.wrapAtLastFrame(
+                LetterDriverUtils.wrapAtWidestFrame(
                     JSXTextParserUtils.getSegmentTokens(container),
                     width,
                     container.parentElement ?? container,

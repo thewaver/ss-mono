@@ -18,14 +18,15 @@
 
     import type { ExampleDefs } from "../../PageComponents/Examples/Examples.types";
     import PageExamples from "../../PageComponents/Examples/PageExamples.svelte";
+    import PageCheckField from "../../PageComponents/Field/PageCheckField.svelte";
     import PageNumberField from "../../PageComponents/Field/PageNumberField.svelte";
     import PageSelectField from "../../PageComponents/Field/PageSelectField.svelte";
     import PageMeasureBox from "../../PageComponents/MeasureBox/MeasureBox.svelte";
     import PageProp from "../../PageComponents/Prop/Prop.svelte";
     import PagePropsPanel from "../../PageComponents/PropsPanel/PagePropsPanel.svelte";
-    import { NOTHING_PICKED } from "./BracketPage.const";
+    import PageBeam from "../../StyledComponents/Beam/PageBeam.svelte";
+    import { BEAM_PATHS, NOTHING_PICKED } from "./BracketPage.const";
     import type { BracketExampleProps } from "./BracketPage.types";
-    import BeamsExample from "./Examples/Beams.svelte";
     import FamilyExample from "./Examples/Family.svelte";
     import KnockoutExample from "./Examples/Knockout.svelte";
     import OrgChartExample from "./Examples/OrgChart.svelte";
@@ -49,6 +50,8 @@
     let family = $state("");
 
     const getPrefersReducedMotion = MediaQueryMonitorSvelteUtils.createReducedMotion();
+
+    let isBeamPlaying = $state(!getPrefersReducedMotion());
 
     const commonProps: BracketExampleProps = $derived({
         layerGap,
@@ -89,20 +92,11 @@
             path: `${EXAMPLES_ROOT}/SkillTree.svelte`,
         },
         {
-            key: "beams",
-            name: "A beam along the road to the final",
-            span: WIDE_SPAN,
-            readout: () =>
-                `picked: ${picked} — focus a seed or a match and a pulse runs along every line between it and the final, toward the final; it keeps running while the focus stays, so Pause is there to stop it`,
-            component: beamsExample,
-            path: `${EXAMPLES_ROOT}/Beams.svelte`,
-        },
-        {
             key: "family",
             name: "One family at a time",
             span: WIDE_SPAN,
             readout: () =>
-                `showing: ${family} — focus a node and the board shows what it feeds, it with all its siblings, and what feeds them; walk on with the arrows and the rest folds away`,
+                `showing: ${family} — focus a node and the board shows what it feeds, it with all its siblings, and what feeds them; walk on with the arrows, or page through with the buttons without leaving them, and the rest folds away`,
             component: familyExample,
             path: `${EXAMPLES_ROOT}/Family.svelte`,
         },
@@ -119,6 +113,14 @@
             toColor: defs.isOnFocusedRoute ? ROUTE_TO_COLOR : CONNECTOR_TO_COLOR,
         })}
     />
+
+    {#if defs.isOnFocusedRoute}
+        <PageBeam
+            d={BEAM_PATHS[connector](defs, CONNECTOR_RADIUS)}
+            direction={"backward"}
+            isPlaying={isBeamPlaying}
+        />
+    {/if}
 {/snippet}
 
 {#snippet knockoutExample()}
@@ -139,22 +141,14 @@
     </PageMeasureBox>
 {/snippet}
 
-{#snippet beamsExample()}
-    <PageMeasureBox>
-        <BeamsExample {...commonProps} {connector} connectorRadius={CONNECTOR_RADIUS} />
-    </PageMeasureBox>
-{/snippet}
-
 {#snippet familyExample()}
-    <PageMeasureBox>
-        <FamilyExample
-            {...commonProps}
-            transitionDurationMs={getPrefersReducedMotion() ? NO_MOTION_DURATION_MS : transitionDurationMs}
-            onFamilyChange={(next) => {
-                family = next;
-            }}
-        />
-    </PageMeasureBox>
+    <FamilyExample
+        {...commonProps}
+        transitionDurationMs={getPrefersReducedMotion() ? NO_MOTION_DURATION_MS : transitionDurationMs}
+        onFamilyChange={(next) => {
+            family = next;
+        }}
+    />
 {/snippet}
 
 <PagePropsPanel scope={"global"}>
@@ -169,6 +163,22 @@
             ariaLabel={"Connectors"}
             onChange={(next) => {
                 connector = next;
+            }}
+        />
+    </PageProp>
+
+    <PageProp
+        itemKey={"isBeamPlaying"}
+        label={"Beams moving"}
+        hint={
+            "Whether the pulse runs along the lines between the focused node and the final. It starts stopped while the visitor has asked for reduced motion."
+        }
+    >
+        <PageCheckField
+            value={isBeamPlaying}
+            ariaLabel={"Beams moving"}
+            onChange={(value) => {
+                isBeamPlaying = value;
             }}
         />
     </PageProp>

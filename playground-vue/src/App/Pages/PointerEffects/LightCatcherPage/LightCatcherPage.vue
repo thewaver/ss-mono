@@ -209,9 +209,7 @@ const examples: ExampleDefs[] = [
         </template>
 
         <template #placed>
-            <PageMeasureBox is-filling :height="BOX_HEIGHT">
-                <PlacedLightExample v-bind="commonProps" />
-            </PageMeasureBox>
+            <PlacedLightExample v-bind="commonProps" />
         </template>
     </PageExamples>
 </template>

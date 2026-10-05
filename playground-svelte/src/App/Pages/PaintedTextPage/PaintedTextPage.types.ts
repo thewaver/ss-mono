@@ -19,7 +19,11 @@ export type PaintedTextExampleWrapperProps = PaintedTextExampleProps & {
     width: number;
 };
 
-export type PaintedTextPathExampleProps = PaintedTextExampleProps & {
+export type PaintedTextBoxedExampleProps = PaintedTextExampleProps & {
+    width?: number;
+};
+
+export type PaintedTextPathExampleProps = PaintedTextBoxedExampleProps & {
     lapDurationMs: number;
     progress: number;
     playback: boolean;

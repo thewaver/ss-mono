@@ -4,6 +4,7 @@ import { LightCatcher, Range } from "@thewaver/ss-components-solid";
 import * as styles from "@thewaver/ss-playground/App/Pages/PointerEffects/LightCatcherPage/LightCatcherPage.css";
 import type { LightCatcherExampleProps } from "@thewaver/ss-playground/App/Pages/PointerEffects/LightCatcherPage/LightCatcherPage.types";
 
+import { PageMeasureBox } from "../../../../PageComponents/MeasureBox/MeasureBox";
 import { PageRangeContent } from "../../../../StyledComponents/RangeContent/RangeContent";
 
 const LAMPS = [1, 2, 3, 4, 5];
@@ -23,27 +24,29 @@ export const PlacedLightExample = (props: Props) => {
 
     return (
         <div class={styles.placedStage}>
-            <div ref={setRowRef} class={styles.placedRow}>
-                <For each={LAMPS}>
-                    {(lamp) => (
-                        <div class={styles.lampSlot}>
-                            <LightCatcher
-                                isDisabled={props.isDisabled}
-                                activeRangePx={props.activeRangePx}
-                                smoothingMs={props.smoothingMs}
-                                lightRangePx={props.lightRangePx}
-                                maxBrightness={props.maxBrightness}
-                                restingBrightness={props.restingBrightness}
-                                maxLightness={props.maxLightness}
-                                restingLightness={props.restingLightness}
-                                pointSource={getPointSource}
-                            >
-                                <div class={styles.lamp}>{lamp}</div>
-                            </LightCatcher>
-                        </div>
-                    )}
-                </For>
-            </div>
+            <PageMeasureBox isFilling>
+                <div ref={setRowRef} class={styles.placedRow}>
+                    <For each={LAMPS}>
+                        {(lamp) => (
+                            <div class={styles.lampSlot}>
+                                <LightCatcher
+                                    isDisabled={props.isDisabled}
+                                    activeRangePx={props.activeRangePx}
+                                    smoothingMs={props.smoothingMs}
+                                    lightRangePx={props.lightRangePx}
+                                    maxBrightness={props.maxBrightness}
+                                    restingBrightness={props.restingBrightness}
+                                    maxLightness={props.maxLightness}
+                                    restingLightness={props.restingLightness}
+                                    pointSource={getPointSource}
+                                >
+                                    <div class={styles.lamp}>{lamp}</div>
+                                </LightCatcher>
+                            </div>
+                        )}
+                    </For>
+                </div>
+            </PageMeasureBox>
 
             <div class={styles.slider}>
                 <Range

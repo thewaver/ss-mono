@@ -56,7 +56,7 @@ const links = useModel(props, "links");
             </template>
 
             <template #renderCable="defs">
-                <PagePatchCable :defs="defs" />
+                <PagePatchCable :defs="defs" :is-beam-playing="isBeamPlaying" />
             </template>
         </PatchBoard>
     </div>

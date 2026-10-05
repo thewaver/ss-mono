@@ -1,13 +1,15 @@
 <script lang="ts">
     import { Button, MediaQueryMonitorSvelteUtils, PaintedText, Typewriter } from "@thewaver/ss-components-svelte";
     import type { TypewriterController } from "@thewaver/ss-components-svelte";
+    import { MEASURE_BOX_PADDING } from "@thewaver/ss-playground/App/PageComponents/MeasureBox/MeasureBox.css";
     import * as styles from "@thewaver/ss-playground/App/Pages/PaintedTextPage/PaintedTextPage.css";
 
+    import PageMeasureBox from "../../../PageComponents/MeasureBox/MeasureBox.svelte";
     import PageButtonContent from "../../../StyledComponents/ButtonContent/ButtonContent.svelte";
     import { computeSampleDefs } from "../PaintedTextPage.const";
-    import type { PaintedTextExampleProps } from "../PaintedTextPage.types";
+    import type { PaintedTextBoxedExampleProps } from "../PaintedTextPage.types";
 
-    type Props = PaintedTextExampleProps & {
+    type Props = PaintedTextBoxedExampleProps & {
         computeAnimationName: (character: string, index: number, count: number) => string;
     };
 
@@ -23,44 +25,46 @@
 </script>
 
 <div class={styles.stack}>
-    <div class={styles.fill}>
-        <Typewriter
-            computeAnimationName={props.computeAnimationName}
-            animationDelayMs={40}
-            animationDurationMs={400}
-            onMount={(next) => {
-                controller = next;
-            }}
-        >
-            <div class={styles.typedHeading}>
-                <PaintedText
-                    computeFillDefs={(size, element) => computeSampleDefs(props, "fill", id, size, element)}
-                    computeStrokeDefs={(size, element) => computeSampleDefs(props, "stroke", id, size, element)}
-                    strokeWidth={props.strokeWidth}
-                    strokeAlignment={props.strokeAlignment}
-                >
-                    Typed and painted
-                </PaintedText>
-            </div>
+    <PageMeasureBox width={props.width} padding={MEASURE_BOX_PADDING}>
+        <div class={styles.fill}>
+            <Typewriter
+                computeAnimationName={props.computeAnimationName}
+                animationDelayMs={40}
+                animationDurationMs={400}
+                onMount={(next) => {
+                    controller = next;
+                }}
+            >
+                <div class={styles.typedHeading}>
+                    <PaintedText
+                        computeFillDefs={(size, element) => computeSampleDefs(props, "fill", id, size, element)}
+                        computeStrokeDefs={(size, element) => computeSampleDefs(props, "stroke", id, size, element)}
+                        strokeWidth={props.strokeWidth}
+                        strokeAlignment={props.strokeAlignment}
+                    >
+                        Typed and painted
+                    </PaintedText>
+                </div>
 
-            <div class={styles.paragraph}>
-                <PaintedText
-                    computeFillDefs={(size, element) => computeSampleDefs(props, "fill", `${id}-body`, size, element)}
-                    computeStrokeDefs={(size, element) =>
-                        computeSampleDefs(props, "stroke", `${id}-body`, size, element)}
-                    strokeWidth={props.strokeWidth}
-                    strokeAlignment={props.strokeAlignment}
-                >
-                    The heading types first, then this line carries on from where it ended.
-                </PaintedText>
-            </div>
+                <div class={styles.paragraph}>
+                    <PaintedText
+                        computeFillDefs={(size, element) => computeSampleDefs(props, "fill", `${id}-body`, size, element)}
+                        computeStrokeDefs={(size, element) =>
+                            computeSampleDefs(props, "stroke", `${id}-body`, size, element)}
+                        strokeWidth={props.strokeWidth}
+                        strokeAlignment={props.strokeAlignment}
+                    >
+                        The heading types first, then this line carries on from where it ended.
+                    </PaintedText>
+                </div>
 
-            {#snippet renderCaret()}
-                <span class={[styles.caret, !isBlinkStopped && !getPrefersReducedMotion() && styles.caretBlinking]} aria-hidden="true"
-                ></span>
-            {/snippet}
-        </Typewriter>
-    </div>
+                {#snippet renderCaret()}
+                    <span class={[styles.caret, !isBlinkStopped && !getPrefersReducedMotion() && styles.caretBlinking]} aria-hidden="true"
+                    ></span>
+                {/snippet}
+            </Typewriter>
+        </div>
+    </PageMeasureBox>
 
     <div class={styles.buttonRow}>
         <Button

@@ -8,3 +8,7 @@ export type TypewriterExampleProps = {
 export type TypewriterPhrasesExampleProps = TypewriterExampleProps & {
     width: number;
 };
+
+export type TypewriterKaraokeExampleProps = {
+    width: number;
+};

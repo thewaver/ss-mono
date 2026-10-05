@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed, shallowRef } from "vue";
+import { computed, h, shallowRef } from "vue";
 
 import {
     BRACKET_DEFAULTS,
@@ -19,14 +19,15 @@ import {
 
 import type { ExampleDefs } from "../../PageComponents/Examples/Examples.types";
 import PageExamples from "../../PageComponents/Examples/PageExamples.vue";
+import PageCheckField from "../../PageComponents/Field/PageCheckField.vue";
 import PageNumberField from "../../PageComponents/Field/PageNumberField.vue";
 import PageSelectField from "../../PageComponents/Field/PageSelectField.vue";
 import PageMeasureBox from "../../PageComponents/MeasureBox/MeasureBox.vue";
 import PageProp from "../../PageComponents/Prop/Prop.vue";
 import PagePropsPanel from "../../PageComponents/PropsPanel/PagePropsPanel.vue";
-import { NOTHING_PICKED } from "./BracketPage.const";
+import PageBeam from "../../StyledComponents/Beam/Beam.vue";
+import { BEAM_PATHS, NOTHING_PICKED } from "./BracketPage.const";
 import type { BracketExampleProps } from "./BracketPage.types";
-import BeamsExample from "./Examples/Beams.vue";
 import FamilyExample from "./Examples/Family.vue";
 import KnockoutExample from "./Examples/Knockout.vue";
 import OrgChartExample from "./Examples/OrgChart.vue";
@@ -51,6 +52,8 @@ const family = shallowRef("");
 
 const prefersReducedMotion = MediaQueryMonitorVueUtils.useReducedMotion();
 
+const isBeamPlaying = shallowRef(!prefersReducedMotion.value);
+
 const commonProps = computed<BracketExampleProps>(() => ({
     layerGap: layerGap.value,
     crossGap: crossGap.value,
@@ -59,7 +62,7 @@ const commonProps = computed<BracketExampleProps>(() => ({
     onActivate: (value, placement) => {
         picked.value = `${value}, node ${placement.id} in layer ${placement.layer}`;
     },
-    renderConnector: (defs) =>
+    renderConnector: (defs) => [
         BracketConnectors.SAMPLE_CONNECTORS[connector.value]({
             defs,
             radius: CONNECTOR_RADIUS,
@@ -67,6 +70,14 @@ const commonProps = computed<BracketExampleProps>(() => ({
             fromColor: defs.isOnFocusedRoute ? ROUTE_FROM_COLOR : CONNECTOR_FROM_COLOR,
             toColor: defs.isOnFocusedRoute ? ROUTE_TO_COLOR : CONNECTOR_TO_COLOR,
         }),
+        defs.isOnFocusedRoute
+            ? h(PageBeam, {
+                  d: BEAM_PATHS[connector.value](defs, CONNECTOR_RADIUS),
+                  direction: "backward",
+                  isPlaying: isBeamPlaying.value,
+              })
+            : null,
+    ],
 }));
 
 const examples: ExampleDefs[] = [
@@ -94,19 +105,11 @@ const examples: ExampleDefs[] = [
         path: `${EXAMPLES_ROOT}/SkillTree.vue`,
     },
     {
-        key: "beams",
-        name: "A beam along the road to the final",
-        span: WIDE_SPAN,
-        readout: () =>
-            `picked: ${picked.value} — focus a seed or a match and a pulse runs along every line between it and the final, toward the final; it keeps running while the focus stays, so Pause is there to stop it`,
-        path: `${EXAMPLES_ROOT}/Beams.vue`,
-    },
-    {
         key: "family",
         name: "One family at a time",
         span: WIDE_SPAN,
         readout: () =>
-            `showing: ${family.value} — focus a node and the board shows what it feeds, it with all its siblings, and what feeds them; walk on with the arrows and the rest folds away`,
+            `showing: ${family.value} — focus a node and the board shows what it feeds, it with all its siblings, and what feeds them; walk on with the arrows, or page through with the buttons without leaving them, and the rest folds away`,
         path: `${EXAMPLES_ROOT}/Family.vue`,
     },
 ];
@@ -124,6 +127,18 @@ const examples: ExampleDefs[] = [
                 :values="BracketConnectors.SAMPLE_KEYS"
                 ariaLabel="Connectors"
                 @change="(next: BracketConnectors.SampleKey) => (connector = next)"
+            />
+        </PageProp>
+
+        <PageProp
+            item-key="isBeamPlaying"
+            label="Beams moving"
+            hint="Whether the pulse runs along the lines between the focused node and the final. It starts stopped while the visitor has asked for reduced motion."
+        >
+            <PageCheckField
+                :value="isBeamPlaying"
+                ariaLabel="Beams moving"
+                @change="(value: boolean) => (isBeamPlaying = value)"
             />
         </PageProp>
 
@@ -207,20 +222,12 @@ const examples: ExampleDefs[] = [
             </PageMeasureBox>
         </template>
 
-        <template #beams>
-            <PageMeasureBox>
-                <BeamsExample v-bind="commonProps" :connector="connector" :connector-radius="CONNECTOR_RADIUS" />
-            </PageMeasureBox>
-        </template>
-
         <template #family>
-            <PageMeasureBox>
-                <FamilyExample
-                    v-bind="commonProps"
-                    :transition-duration-ms="prefersReducedMotion ? NO_MOTION_DURATION_MS : transitionDurationMs"
-                    @family-change="(next: string) => (family = next)"
-                />
-            </PageMeasureBox>
+            <FamilyExample
+                v-bind="commonProps"
+                :transition-duration-ms="prefersReducedMotion ? NO_MOTION_DURATION_MS : transitionDurationMs"
+                @family-change="(next: string) => (family = next)"
+            />
         </template>
     </PageExamples>
 </template>

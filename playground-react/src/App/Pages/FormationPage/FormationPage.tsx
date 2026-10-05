@@ -64,7 +64,7 @@ export const FormationPage = () => {
     const [shapeKind, setShapeKind] = useState<ShapeConst.DefaultShape>(FormationKnobs.STARTING_SHAPE_KIND);
     const [isStackedInReverse, setIsStackedInReverse] = useState(FormationKnobs.STARTING_IS_STACKED_IN_REVERSE);
     const [transitionDurationMs, setTransitionDurationMs] = useState(FORMATION_DEFAULTS.transitionDurationMs);
-    const [staggerMs, setStaggerMs] = useState(FORMATION_DEFAULTS.staggerMs);
+    const [transitionDelayMs, setTransitionDelayMs] = useState(FORMATION_DEFAULTS.transitionDelayMs);
     const [layoutDefs, setLayoutDefs] = useState<Record<string, Record<string, number | boolean>>>({});
     const [effectDefs, setEffectDefs] = useState<Record<string, Record<string, number | boolean>>>({});
 
@@ -104,7 +104,7 @@ export const FormationPage = () => {
         effectEntry,
         shapeKind,
         transitionDurationMs,
-        staggerMs,
+        transitionDelayMs,
     };
 
     const examples = [
@@ -257,18 +257,18 @@ export const FormationPage = () => {
                     </PageProp>
 
                     <PageProp
-                        itemKey={"staggerMs"}
-                        label={"Stagger (ms)"}
+                        itemKey={"transitionDelayMs"}
+                        label={"Transition delay (ms)"}
                         hint={"How much later each item sets off than the one before it, while gliding is on."}
                     >
                         <PageNumberField
-                            value={staggerMs}
+                            value={transitionDelayMs}
                             min={FormationKnobs.MIN_STAGGER_MS}
                             max={FormationKnobs.MAX_STAGGER_MS}
                             step={FormationKnobs.STAGGER_STEP_MS}
                             width={FIELD_WIDTH}
-                            ariaLabel={"Stagger in milliseconds"}
-                            onInput={setStaggerMs}
+                            ariaLabel={"Transition delay in milliseconds"}
+                            onInput={setTransitionDelayMs}
                         />
                     </PageProp>
                 </PagePropsPanel>

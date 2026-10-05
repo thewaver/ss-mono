@@ -37,7 +37,7 @@ export const PanExample = (props: Props) => {
                         <PagePatchNode label={node.value.name} kind={node.value.kind} flags={flags} />
                     )}
                     renderSocket={(_socket, flags) => <PagePatchSocket flags={flags} />}
-                    renderCable={(defs) => <PagePatchCable defs={defs} />}
+                    renderCable={(defs) => <PagePatchCable defs={defs} isBeamPlaying={props.isBeamPlaying} />}
                     onLink={props.onLink}
                     onUnlink={props.onUnlink}
                     onMove={props.onMove}

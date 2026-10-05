@@ -1,10 +1,13 @@
 import { createSignal } from "solid-js";
 
 import { Button, Range, Typewriter } from "@thewaver/ss-components-solid";
+import { MEASURE_BOX_PADDING } from "@thewaver/ss-playground/App/PageComponents/MeasureBox/MeasureBox.css";
 import * as styles from "@thewaver/ss-playground/App/Pages/TypewriterPage/TypewriterPage.css";
 
+import { PageMeasureBox } from "../../../PageComponents/MeasureBox/MeasureBox";
 import { PageButtonContent } from "../../../StyledComponents/ButtonContent/ButtonContent";
 import { PageRangeContent } from "../../../StyledComponents/RangeContent/RangeContent";
+import type { TypewriterKaraokeExampleProps } from "../TypewriterPage.types";
 
 const LYRIC = "Twinkle, twinkle, little star";
 const PERCENT = 100;
@@ -15,7 +18,9 @@ const CHARACTER_DURATION_MS = 600;
 const RUN_START = 0;
 const RUN_END = 1;
 
-export const KaraokeExample = () => {
+type Props = TypewriterKaraokeExampleProps;
+
+export const KaraokeExample = (props: Props) => {
     const [getProgress, setProgress] = createSignal(RUN_START);
     const [getIsPlaying, setIsPlaying] = createSignal(false);
 
@@ -27,18 +32,20 @@ export const KaraokeExample = () => {
 
     return (
         <div class={styles.karaokeStack}>
-            <div class={styles.karaokeLine}>
-                <Typewriter
-                    progress={[getProgress, setProgress]}
-                    playback={[getIsPlaying, setIsPlaying]}
-                    computeAnimationName={() => styles.typewriterSweep}
-                    animationDelayMs={() => CHARACTER_DELAY_MS}
-                    animationDurationMs={() => CHARACTER_DURATION_MS}
-                    onAnimationEnd={() => setIsPlaying(false)}
-                >
-                    {LYRIC}
-                </Typewriter>
-            </div>
+            <PageMeasureBox width={props.width} padding={() => MEASURE_BOX_PADDING}>
+                <div class={styles.karaokeLine}>
+                    <Typewriter
+                        progress={[getProgress, setProgress]}
+                        playback={[getIsPlaying, setIsPlaying]}
+                        computeAnimationName={() => styles.typewriterSweep}
+                        animationDelayMs={() => CHARACTER_DELAY_MS}
+                        animationDurationMs={() => CHARACTER_DURATION_MS}
+                        onAnimationEnd={() => setIsPlaying(false)}
+                    >
+                        {LYRIC}
+                    </Typewriter>
+                </div>
+            </PageMeasureBox>
 
             <div class={styles.karaokeControls}>
                 <Button

@@ -16,8 +16,8 @@ export type ScrambleTextProps = {
     churnDurationMs?: number;
     /** How often an unsettled character is swapped for another. Shorter intervals make a busier churn. */
     scrambleIntervalMs?: number;
-    /** How long to wait before starting. */
-    initialDelayMs?: number;
+    /** How long to wait before the run starts; the run itself then takes `settleDurationMs`. */
+    settleDelayMs?: number;
     /** Decides the order the characters settle in, as a weight per character. */
     computeCharacterWeights?: (count: number) => number[];
     /**

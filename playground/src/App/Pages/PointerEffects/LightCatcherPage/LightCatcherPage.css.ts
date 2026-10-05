@@ -58,9 +58,7 @@ export const placedStage = style({
     flexDirection: "column",
     gap: themeVars.spacing.double,
     alignItems: "center",
-    justifyContent: "center",
     width: "100%",
-    height: "100%",
 });
 
 export const placedRow = style({

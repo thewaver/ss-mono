@@ -2,7 +2,7 @@ export const MORPH_WORDS = ["Melt", "Morph", "Blend", "Merge", "Shift"];
 
 export const PAINTED_WORDS = ["Gradient", "Pattern", "Shimmer", "Glow"];
 
-export const MORPH_PAINT = { kind: "timed" as const, key: "sweep_diag_1v1" as const, configDefs: {} };
+export const MORPH_PAINT = { kind: "timed" as const, key: "flow_diag_3" as const, configDefs: {} };
 
 export const MORPH_PAINT_TIMING = {
     animationDurationMs: 2000,

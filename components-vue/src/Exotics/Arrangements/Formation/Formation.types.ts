@@ -23,7 +23,7 @@ export type FormationProps<T> = {
      * How much later each item sets off than the one before it, so the arrangement changes as a ripple from the
      * first item to the last. Only felt while {@link FormationProps.transitionDurationMs} is above `0`.
      */
-    staggerMs?: number;
+    transitionDelayMs?: number;
     /**
      * The items to arrange. Each one keeps its own element for as long as it is in the list, so taking one out
      * leaves its neighbors' elements where they were rather than handing each the next one's contents. An item is

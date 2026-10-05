@@ -1,7 +1,10 @@
+import { Show } from "solid-js";
+
 import { access } from "@thewaver/ss-components-solid";
 import { computePatchCablePath } from "@thewaver/ss-playground/App/StyledComponents/PatchBoardContent/PatchBoardContent.const";
 import * as styles from "@thewaver/ss-playground/App/StyledComponents/PatchBoardContent/PatchBoardContent.css";
 
+import { PageBeam } from "../Beam/Beam";
 import { useLayerClass } from "../Layer/Layer.context";
 import type { PagePatchCableProps, PagePatchNodeProps, PagePatchSocketProps } from "./PatchBoardContent.types";
 
@@ -60,14 +63,24 @@ export const PagePatchCable = (props: PagePatchCableProps) => {
     const getPath = () => computePatchCablePath(getDefs());
 
     return (
-        <path
-            class={styles.patchCable}
-            classList={{
-                [getLayerClass()]: true,
-                [styles.isPending]: getDefs().isPending,
-                [styles.isRefused]: !getDefs().isAllowed,
-            }}
-            d={getPath()}
-        />
+        <>
+            <path
+                class={styles.patchCable}
+                classList={{
+                    [getLayerClass()]: true,
+                    [styles.isPending]: getDefs().isPending,
+                    [styles.isRefused]: !getDefs().isAllowed,
+                }}
+                d={getPath()}
+            />
+
+            <Show when={!getDefs().isPending}>
+                <PageBeam
+                    d={getPath}
+                    direction={() => (getDefs().fromKind === "out" ? "forward" : "backward")}
+                    isPlaying={props.isBeamPlaying}
+                />
+            </Show>
+        </>
     );
 };

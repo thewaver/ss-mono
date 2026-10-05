@@ -1242,7 +1242,7 @@ is the user's to confirm or change.
 - **A paused CellAnimation now shows its cut-up grid at the current point instead of the whole picture.** Before
   anything has run, that is the first frame. Resizing the window or switching tabs also no longer starts the
   pass over. Both follow from making the pass scrubbable.
-- **Odometer reels under reduced motion drop only their extra turns.** Each reel keeps its own duration, so a
+- **SlotText reels under reduced motion drop only their extra turns.** Each reel keeps its own duration, so a
   slow reel still turns its one step slowly. Falling back to `turnDurationMs` there is the alternative.
 
 ## 30. A gallery page, and a preview of each page from the nav — _deferred to a session of its own_
@@ -1273,6 +1273,56 @@ the Vue side reads"_). Doing the same in Solid and Svelte means moving where the
 which changes timing those windows were built on (`decisions.md`, _"The Solid and Svelte row windows report
 `getIsLive` once they are following their scroller"_), so it was left for a deliberate look. `select.spec.ts`'s
 reopening case waits for the list to settle, so it passes either way and will not catch a change here.
+
+## 32. Work built in Solid only, waiting for its ports and specs
+
+Built in the Solid library and `playground-solid` and tested there by the user. React, Vue and Svelte have not
+been brought level, and no spec has been updated or run against any of it. Anything in `components/src` (the
+shared core) already reaches every framework; what is listed is the per-framework half. Port each from the Solid
+version, which is the reference, then update the specs and run them. Some specs will be red on examples that were
+deleted (the Bracket "Beams" example and its view knob, Accordion's custom widths); that is the work the user asked
+for, so the spec follows the code.
+
+**One thing is still open, and goes first: the round names' look in `Bracket`.** They were last restyled as fully
+rounded tags with a teal tint, so they would not be mistaken for the match boxes. The user rejected it because no
+other part of the Playground looks like that. The new style has to come from something the Playground already uses,
+and must stay plainly different from a match box; ask the user which before building it. It lives in `layerHeader`
+in `playground/src/App/Pages/BracketPage/BracketPage.css.ts`, shared by every example and every framework.
+
+- **`Bracket`.**
+    - _Library:_ the `family` two-way prop exists everywhere. Missing outside Solid:
+        - the tree view writing `family` on focus;
+        - the glide between views (`computeTreeArrangement`, `boardSize` blended by `computeShownArrangement`);
+        - `renderLayerHeader`'s second argument, `getState` with `isCurrent` (from `BracketUtils.getFamilyLayer`).
+    - _Page:_ the Family example as a camera over the always-mounted tree. It glides frame by frame over
+      `transitionDurationMs`, frames the family's section with room for the names, and has a Zoom out/in button plus
+      stage buttons that are disabled while zoomed out. The round names are pinned to the frame's top (left when
+      vertical), and only the current round is lit.
+    - _Page:_ beams on every example, with a "Beams moving" knob, each beam timed along its whole route
+      (`computeRouteSpan`); the Beams example is deleted.
+    - _Unchecked:_ the vertical layout of the Family example has not been looked at.
+- **Beams.** `PageBeam` in Solid measures its length on screen and runs one animation timed to the page clock.
+  Every other app still uses the older beam, PatchBoard's cables included.
+- **SVG animations that loop forever start on the page clock** (`getIsPageClocked`, `begin="0s"` instead of
+  `"indefinite"`). Solid's defs builder only.
+- **`SlotText`** (the renamed `Odometer`). The library side is in every framework. Missing outside Solid on the
+  page:
+    - Counter and Split-flap inside a measure box, with their step buttons outside it;
+    - Reels with its Pull button outside;
+    - the Words example (`WORDS` and `WORD_LETTERS` are already shared).
+- **`ProximityText`.** The `distanceAxis` prop, in the Solid library only. The Barrel example (spacing shrinking
+  from 0.3em to 0 toward the center point) and Wave in its own box are page work.
+- **`Carousel`.** The ring at the edge (Tilter removed, half the ring flush right and clipped) and the word drum
+  built with `faceCount` 12 and `faceRatio` 0.25. Diff each app's page against Solid; the React page was touched
+  and may already be part way there.
+- **Controls moved outside measure boxes** (Karaoke, the four PaintedText examples, PlacedLight) and Accordion's
+  width example and props removed. Diff each app against Solid.
+- **Specs.** At least `bracket`, `slotText`, `proximityText`, `carousel`, `paintedText`, `morphText`,
+  `fittedText`, `patchBoard` and `accordion`, and any spec that names a renamed prop (`fadeDelayMs` and
+  `fadeDurationMs`, `restDurationMs`, `transitionDelayMs`, `settleDelayMs`, `turnDelayMs`).
+- **`decisions.md`.** Nothing from this work is recorded there yet: the camera replacing the mounted family view,
+  the current round being the family's middle row, beams on the page clock, page-clocked SVG loops and SlotText's
+  letter route.
 
 ## Accepted limits
 

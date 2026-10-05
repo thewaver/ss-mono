@@ -33,7 +33,7 @@ export const MixerExample = (props: Props) => {
             computeCanLink={(link) => link.to.nodeKey !== AMP_NODE_KEY || link.from.nodeKey === MIXER_NODE_KEY}
             renderNode={(node, flags) => <PagePatchNode label={node.value.name} kind={node.value.kind} flags={flags} />}
             renderSocket={(_socket, flags) => <PagePatchSocket flags={flags} />}
-            renderCable={(defs) => <PagePatchCable defs={defs} />}
+            renderCable={(defs) => <PagePatchCable defs={defs} isBeamPlaying={props.isBeamPlaying} />}
             onLink={props.onLink}
             onUnlink={props.onUnlink}
             onMove={props.onMove}

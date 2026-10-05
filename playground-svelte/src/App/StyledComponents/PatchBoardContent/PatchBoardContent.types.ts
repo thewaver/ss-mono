@@ -17,4 +17,5 @@ export type PagePatchSocketProps = {
 
 export type PagePatchCableProps = {
     defs: PatchBoardCableDefs;
+    isBeamPlaying: boolean;
 };

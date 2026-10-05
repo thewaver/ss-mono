@@ -82,9 +82,7 @@
 {/snippet}
 
 {#snippet placedExample()}
-    <PageMeasureBox isFilling height={BOX_HEIGHT}>
-        <PlacedLightExample {...commonProps} />
-    </PageMeasureBox>
+    <PlacedLightExample {...commonProps} />
 {/snippet}
 
 <PagePropsPanel scope={"global"}>

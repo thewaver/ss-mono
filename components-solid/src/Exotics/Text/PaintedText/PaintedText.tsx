@@ -278,13 +278,6 @@ export const PaintedText = (props: ParentProps<PaintedTextProps>) => {
         </text>
     );
 
-    const renderPathTexts = (getAttributes: () => LayerAttributes, isReadable: boolean) => (
-        <>
-            {renderPathText(getAttributes, isReadable, getStartOffset)}
-            {renderPathText(getAttributes, false, () => getStartOffset() - getPathLength())}
-        </>
-    );
-
     const renderLayer = (getAttributes: () => LayerAttributes, isReadable: boolean) => (
         <Show
             when={getIsPerLetter()}
@@ -301,7 +294,7 @@ export const PaintedText = (props: ParentProps<PaintedTextProps>) => {
                         </text>
                     }
                 >
-                    {renderPathTexts(getAttributes, isReadable)}
+                    {renderPathText(getAttributes, isReadable, getStartOffset)}
                 </Show>
             }
         >
@@ -423,7 +416,9 @@ export const PaintedText = (props: ParentProps<PaintedTextProps>) => {
                         {renderDefsElements(getStrokeDefs())}
                     </PaintAreaContextProvider>
 
-                    <Show when={getPath()}>{(getD) => <path id={pathId} d={getD()} />}</Show>
+                    <Show when={getPath()}>
+                        {(getD) => <path id={pathId} d={PaintedTextUtils.computeLapPath(getD())} />}
+                    </Show>
 
                     <Show when={getStrokePaint().maskKind}>
                         {(getMaskKind) => (

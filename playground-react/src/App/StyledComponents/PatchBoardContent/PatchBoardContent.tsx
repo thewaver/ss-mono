@@ -1,6 +1,7 @@
 import { computePatchCablePath } from "@thewaver/ss-playground/App/StyledComponents/PatchBoardContent/PatchBoardContent.const";
 import * as styles from "@thewaver/ss-playground/App/StyledComponents/PatchBoardContent/PatchBoardContent.css";
 
+import { PageBeam } from "../Beam/Beam";
 import { useLayerClass } from "../Layer/Layer.context";
 import type { PagePatchCableProps, PagePatchNodeProps, PagePatchSocketProps } from "./PatchBoardContent.types";
 
@@ -58,17 +59,29 @@ export const PagePatchSocket = (props: PagePatchSocketProps) => {
 export const PagePatchCable = (props: PagePatchCableProps) => {
     const layerClass = useLayerClass();
 
+    const path = computePatchCablePath(props.defs);
+
     return (
-        <path
-            className={[
-                styles.patchCable,
-                layerClass,
-                props.defs.isPending && styles.isPending,
-                !props.defs.isAllowed && styles.isRefused,
-            ]
-                .filter(Boolean)
-                .join(" ")}
-            d={computePatchCablePath(props.defs)}
-        />
+        <>
+            <path
+                className={[
+                    styles.patchCable,
+                    layerClass,
+                    props.defs.isPending && styles.isPending,
+                    !props.defs.isAllowed && styles.isRefused,
+                ]
+                    .filter(Boolean)
+                    .join(" ")}
+                d={path}
+            />
+
+            {!props.defs.isPending && (
+                <PageBeam
+                    d={path}
+                    direction={props.defs.fromKind === "out" ? "forward" : "backward"}
+                    isPlaying={props.isBeamPlaying}
+                />
+            )}
+        </>
     );
 };

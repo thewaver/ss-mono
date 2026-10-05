@@ -6,18 +6,20 @@
         BRACKET_DEFAULTS,
         BRACKET_MISSING_PLACEMENT,
         type BracketArrangement,
+        type BracketNode,
         BracketUtils,
         NavigatorUtils,
         TreemapUtils,
         BracketStyles as styles,
     } from "@thewaver/ss-components";
 
+    import { createHeldValue } from "../../../Utils/bindableUtils.svelte.js";
     import { readStore } from "../../../Utils/storeUtils.js";
     import type { BracketProps } from "./Bracket.types.js";
 
     const NOTHING = 0;
 
-    let props: BracketProps<T> = $props();
+    let { family = $bindable(), ...props }: BracketProps<T> = $props();
 
     const boardId = $props.id();
     const nodeRefs = new Map<string, HTMLElement>();
@@ -53,7 +55,23 @@
     );
 
     const focusedId = $derived(hasFocus ? lastFocusedId : undefined);
-    const anchorId = $derived(BracketUtils.getFamilyAnchorId(focusedId));
+
+    const [getFamily, setFamily] = createHeldValue<BracketNode<T> | undefined>([
+        () => family,
+        (next) => {
+            family = next;
+        },
+    ]);
+
+    const anchorId = $derived(BracketUtils.findNodeId(props.root, layout, getFamily()));
+
+    const showFamilyOf = (id: string) => {
+        if (!isFamilyView) return;
+
+        const familyAnchorId = BracketUtils.getFamilyAnchorId(id);
+
+        setFamily(familyAnchorId === undefined ? undefined : BracketUtils.findNode(props.root, familyAnchorId));
+    };
 
     const computeArrangement = (id: string | undefined) =>
         BracketUtils.computeFamilyArrangement(layout, geometry, extent, id);
@@ -92,19 +110,6 @@
         });
     });
 
-    $effect(() => {
-        if (!isFamilyView) return;
-
-        const id = anchorId;
-
-        untrack(() =>
-            props.onFamilyChange?.(
-                id === undefined ? undefined : BracketUtils.findNode(props.root, id).value,
-                id === undefined ? undefined : placementById.get(id),
-            ),
-        );
-    });
-
     const activate = (id: string) => {
         props.onActivate?.(
             BracketUtils.findNode(props.root, id).value,
@@ -132,6 +137,7 @@
 
         e.preventDefault();
         isStepping = true;
+        showFamilyOf(next);
         lastFocusedId = next;
         flushSync();
         nodeRefs.get(next)?.focus();
@@ -178,6 +184,7 @@
             tabindex={isNodeDisabled ? undefined : id === rovingId ? 0 : -1}
             aria-disabled={isNodeDisabled || undefined}
             onfocus={() => {
+                showFamilyOf(id);
                 lastFocusedId = id;
                 hasFocus = true;
             }}

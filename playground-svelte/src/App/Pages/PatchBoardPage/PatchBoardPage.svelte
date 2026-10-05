@@ -1,6 +1,6 @@
 <script lang="ts">
     import type { PatchBoardLink, PatchBoardNode } from "@thewaver/ss-components-svelte";
-    import { PATCH_BOARD_DEFAULTS } from "@thewaver/ss-components-svelte";
+    import { MediaQueryMonitorSvelteUtils, PATCH_BOARD_DEFAULTS } from "@thewaver/ss-components-svelte";
     import { PatchBoardKnobs } from "@thewaver/ss-playground/App/Knobs/PatchBoards.const";
     import {
         BOARD_WIDTH,
@@ -26,7 +26,6 @@
     import PageMeasureBox from "../../PageComponents/MeasureBox/MeasureBox.svelte";
     import PageProp from "../../PageComponents/Prop/Prop.svelte";
     import PagePropsPanel from "../../PageComponents/PropsPanel/PagePropsPanel.svelte";
-    import BeamsExample from "./Examples/Beams.svelte";
     import ChainExample from "./Examples/Chain.svelte";
     import MixerExample from "./Examples/Mixer.svelte";
     import PanExample from "./Examples/Pan.svelte";
@@ -51,7 +50,6 @@
     let rackAction = $state(NOTHING_DONE);
     let panAction = $state(NOTHING_DONE);
     let zoomAction = $state(NOTHING_DONE);
-    let beamsAction = $state(NOTHING_DONE);
     let zoom = $state(STARTING_ZOOM);
 
     let chainNodes = $state.raw<PatchBoardNode<PatchDevice>[]>(CHAIN_NODES);
@@ -64,11 +62,13 @@
     let panLinks = $state.raw<PatchBoardLink[]>(PAN_LINKS);
     let zoomNodes = $state.raw<PatchBoardNode<PatchDevice>[]>(CHAIN_NODES);
     let zoomLinks = $state.raw<PatchBoardLink[]>(CHAIN_LINKS);
-    let beamsNodes = $state.raw<PatchBoardNode<PatchDevice>[]>(CHAIN_NODES);
-    let beamsLinks = $state.raw<PatchBoardLink[]>(CHAIN_LINKS);
+
+    const getPrefersReducedMotion = MediaQueryMonitorSvelteUtils.createReducedMotion();
+
+    let isBeamPlaying = $state(!getPrefersReducedMotion());
 
     const commonProps: Omit<PatchBoardExampleProps, "nodes" | "links" | "onLink" | "onUnlink" | "onMove"> =
-        $derived({ socketSize, isLocked, isDisabled });
+        $derived({ socketSize, isLocked, isDisabled, isBeamPlaying });
 
     const examples: ExampleDefs[] = [
         {
@@ -115,15 +115,6 @@
                 `${zoomLinks.length} cables at ${Math.round(zoom * PERCENT)}%, last: ${zoomAction} — the board is scaled with a CSS transform, and a drag still lands under the pointer`,
             component: zoomExample,
             path: `${EXAMPLES_ROOT}/Zoom.svelte`,
-        },
-        {
-            key: "beams",
-            name: "The signal running along its cables",
-            span: WIDE_SPAN,
-            readout: () =>
-                `${beamsLinks.length} cables, last: ${beamsAction} — a pulse runs along every plugged cable from the output to the input it feeds, taking the same time on a long cable as on a short one; Pause stops it`,
-            component: beamsExample,
-            path: `${EXAMPLES_ROOT}/Beams.svelte`,
         },
     ];
 </script>
@@ -193,19 +184,6 @@
     />
 {/snippet}
 
-{#snippet beamsExample()}
-    <PageMeasureBox width={BOARD_WIDTH}>
-        <BeamsExample
-            {...commonProps}
-            bind:nodes={beamsNodes}
-            bind:links={beamsLinks}
-            onLink={(link) => (beamsAction = `connected ${getLinkWords(link)}`)}
-            onUnlink={(link) => (beamsAction = `unplugged ${getLinkWords(link)}`)}
-            onMove={(nodeKey) => (beamsAction = `moved ${nodeKey}`)}
-        />
-    </PageMeasureBox>
-{/snippet}
-
 <PagePropsPanel scope={"global"}>
     <PageProp
         itemKey={"socketSize"}
@@ -248,6 +226,22 @@
             ariaLabel={"Disabled"}
             onChange={(value) => {
                 isDisabled = value;
+            }}
+        />
+    </PageProp>
+
+    <PageProp
+        itemKey={"isBeamPlaying"}
+        label={"Beams moving"}
+        hint={
+            "Whether a pulse runs along every plugged cable, from the output to the input it feeds. It starts stopped while the visitor has asked for reduced motion."
+        }
+    >
+        <PageCheckField
+            value={isBeamPlaying}
+            ariaLabel={"Beams moving"}
+            onChange={(value) => {
+                isBeamPlaying = value;
             }}
         />
     </PageProp>

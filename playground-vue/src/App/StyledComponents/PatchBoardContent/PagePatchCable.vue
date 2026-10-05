@@ -2,6 +2,7 @@
 import { computePatchCablePath } from "@thewaver/ss-playground/App/StyledComponents/PatchBoardContent/PatchBoardContent.const";
 import * as styles from "@thewaver/ss-playground/App/StyledComponents/PatchBoardContent/PatchBoardContent.css";
 
+import PageBeam from "../Beam/Beam.vue";
 import { useLayerClass } from "../Layer/Layer.context";
 import type { PagePatchCableProps } from "./PatchBoardContent.types";
 
@@ -19,5 +20,12 @@ const layerClass = useLayerClass();
             !defs.isAllowed && styles.isRefused,
         ]"
         :d="computePatchCablePath(defs)"
+    />
+
+    <PageBeam
+        v-if="!defs.isPending"
+        :d="computePatchCablePath(defs)"
+        :direction="defs.fromKind === 'out' ? 'forward' : 'backward'"
+        :is-playing="isBeamPlaying"
     />
 </template>

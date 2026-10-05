@@ -2,7 +2,6 @@ import type { VNodeChild } from "vue";
 
 import type {
     BracketConnectorDefs,
-    BracketConnectors,
     BracketNode,
     BracketNodeState,
     BracketOrientation,
@@ -17,11 +16,6 @@ export type BracketExampleProps = {
     rootSide: BracketRootSide;
     onActivate: (value: string, placement: BracketPlacement) => void;
     renderConnector: (defs: BracketConnectorDefs) => VNodeChild;
-};
-
-export type BracketBeamsExampleProps = BracketExampleProps & {
-    connector: BracketConnectors.SampleKey;
-    connectorRadius: number;
 };
 
 export type BracketFamilyExampleProps = BracketExampleProps & {

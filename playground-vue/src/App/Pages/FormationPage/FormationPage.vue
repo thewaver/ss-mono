@@ -57,7 +57,7 @@ const effectKey = shallowRef<WithNoSample<ProximityEffects.SampleKey>>(Formation
 const shapeKind = shallowRef<ShapeConst.DefaultShape>(FormationKnobs.STARTING_SHAPE_KIND);
 const isStackedInReverse = shallowRef(FormationKnobs.STARTING_IS_STACKED_IN_REVERSE);
 const transitionDurationMs = shallowRef(FORMATION_DEFAULTS.transitionDurationMs);
-const staggerMs = shallowRef(FORMATION_DEFAULTS.staggerMs);
+const transitionDelayMs = shallowRef(FORMATION_DEFAULTS.transitionDelayMs);
 const layoutDefs = shallowRef<Record<string, Record<string, number | boolean>>>({});
 const effectDefs = shallowRef<Record<string, Record<string, number | boolean>>>({});
 
@@ -104,7 +104,7 @@ const commonProps = computed<FormationExampleProps>(() => ({
     effectEntry: effectEntry.value,
     shapeKind: shapeKind.value,
     transitionDurationMs: transitionDurationMs.value,
-    staggerMs: staggerMs.value,
+    transitionDelayMs: transitionDelayMs.value,
 }));
 
 const setLayoutDef = (key: string, value: number | boolean) => {
@@ -246,18 +246,18 @@ const examples: ExampleDefs[] = [
             </PageProp>
 
             <PageProp
-                item-key="staggerMs"
-                label="Stagger (ms)"
+                item-key="transitionDelayMs"
+                label="Transition delay (ms)"
                 hint="How much later each item sets off than the one before it, while gliding is on."
             >
                 <PageNumberField
-                    :value="staggerMs"
+                    :value="transitionDelayMs"
                     :min="FormationKnobs.MIN_STAGGER_MS"
                     :max="FormationKnobs.MAX_STAGGER_MS"
                     :step="FormationKnobs.STAGGER_STEP_MS"
                     :width="FIELD_WIDTH"
-                    ariaLabel="Stagger in milliseconds"
-                    @input="(value: number) => (staggerMs = value)"
+                    ariaLabel="Transition delay in milliseconds"
+                    @input="(value: number) => (transitionDelayMs = value)"
                 />
             </PageProp>
         </PagePropsPanel>

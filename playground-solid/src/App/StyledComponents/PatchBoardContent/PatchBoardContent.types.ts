@@ -18,4 +18,5 @@ export type PagePatchSocketProps = AccessorProps<{
 
 export type PagePatchCableProps = AccessorProps<{
     defs: PatchBoardCableDefs;
+    isBeamPlaying: boolean;
 }>;

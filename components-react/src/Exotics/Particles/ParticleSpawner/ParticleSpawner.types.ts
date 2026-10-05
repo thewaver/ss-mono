@@ -15,7 +15,7 @@ export type ParticleSpawnerProps = {
     /** How long one particle takes to walk its path. */
     travelDurationMs?: number;
     /** How long a particle stays put at the end of its path before it disappears. */
-    retentionMs?: number;
+    restDurationMs?: number;
     /** How long each particle waits after the one before it sets off, which is what staggers them. */
     spawnDelayMs?: number;
     /** How the rounds follow each other — in bursts, one at a time, or without a pause. */

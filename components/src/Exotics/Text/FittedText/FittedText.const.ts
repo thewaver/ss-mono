@@ -1,3 +1,3 @@
 export const FITTED_TEXT_DEFAULTS = {
-    lineHeightRatio: 1.1,
+    lineHeightRatio: 1,
 };

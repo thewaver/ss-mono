@@ -49,7 +49,7 @@
 
     let particleCount = $state(ParticleSpawnerKnobs.STARTING_PARTICLE_COUNT);
     let travelDurationMs = $state(PARTICLE_SPAWNER_DEFAULTS.travelDurationMs);
-    let retentionMs = $state(PARTICLE_SPAWNER_DEFAULTS.retentionMs);
+    let restDurationMs = $state(PARTICLE_SPAWNER_DEFAULTS.restDurationMs);
     let spawnDelayMs = $state(ParticleSpawnerKnobs.STARTING_SPAWN_DELAY_MS);
     let overshootPercent = $state(ParticleSpawnerKnobs.STARTING_OVERSHOOT_PERCENT);
     let travelEasingKey = $state<TravelEasingKey>(ParticleSpawnerKnobs.STARTING_TRAVEL_EASING_KEY);
@@ -84,7 +84,7 @@
     const commonProps: Omit<ParticleSpawnerExampleProps, "playback"> = $derived({
         particleCount,
         travelDurationMs,
-        retentionMs,
+        restDurationMs,
         spawnDelayMs,
         spawnIterationPatterns,
         computeParticlePos,
@@ -289,18 +289,18 @@
         </PageProp>
 
         <PageProp
-            itemKey={"retentionMs"}
-            label={"Retention (ms)"}
+            itemKey={"restDurationMs"}
+            label={"Rest duration (ms)"}
             hint={"How long a particle stays put at the end of its path before it disappears."}
         >
             <PageNumberField
-                value={retentionMs}
+                value={restDurationMs}
                 min={ParticleSpawnerKnobs.MIN_RETENTION_MS}
                 max={ParticleSpawnerKnobs.MAX_RETENTION_MS}
                 step={ParticleSpawnerKnobs.RETENTION_STEP_MS}
                 width={FIELD_WIDTH}
-                ariaLabel={"Retention in milliseconds"}
-                onInput={(value) => (retentionMs = value)}
+                ariaLabel={"Rest duration in milliseconds"}
+                onInput={(value) => (restDurationMs = value)}
             />
         </PageProp>
 

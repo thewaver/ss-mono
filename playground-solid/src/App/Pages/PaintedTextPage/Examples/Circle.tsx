@@ -1,8 +1,10 @@
 import { createUniqueId } from "solid-js";
 
 import { Button, PaintedText, PaintedTextUtils, access } from "@thewaver/ss-components-solid";
+import { MEASURE_BOX_PADDING } from "@thewaver/ss-playground/App/PageComponents/MeasureBox/MeasureBox.css";
 import * as styles from "@thewaver/ss-playground/App/Pages/PaintedTextPage/PaintedTextPage.css";
 
+import { PageMeasureBox } from "../../../PageComponents/MeasureBox/MeasureBox";
 import { PageButtonContent } from "../../../StyledComponents/ButtonContent/ButtonContent";
 import { computeSampleDefs } from "../PaintedTextPage.const";
 import type { PaintedTextCircleExampleProps } from "../PaintedTextPage.types";
@@ -22,21 +24,23 @@ export const CircleExample = (props: Props) => {
 
     return (
         <div class={styles.stack}>
-            <div class={styles.ringText}>
-                <PaintedText
-                    path={getPath}
-                    isFittedToPath={props.isFittedToPath}
-                    lapDurationMs={props.lapDurationMs}
-                    progress={props.progress}
-                    playback={props.playback}
-                    computeFillDefs={(getSize, getRef) => computeSampleDefs(props, "fill", id, getSize, getRef)}
-                    computeStrokeDefs={(getSize, getRef) => computeSampleDefs(props, "stroke", id, getSize, getRef)}
-                    strokeWidth={props.strokeWidth}
-                    strokeAlignment={props.strokeAlignment}
-                >
-                    {RING_TEXT}
-                </PaintedText>
-            </div>
+            <PageMeasureBox padding={() => MEASURE_BOX_PADDING}>
+                <div class={styles.ringText}>
+                    <PaintedText
+                        path={getPath}
+                        isFittedToPath={props.isFittedToPath}
+                        lapDurationMs={props.lapDurationMs}
+                        progress={props.progress}
+                        playback={props.playback}
+                        computeFillDefs={(getSize, getRef) => computeSampleDefs(props, "fill", id, getSize, getRef)}
+                        computeStrokeDefs={(getSize, getRef) => computeSampleDefs(props, "stroke", id, getSize, getRef)}
+                        strokeWidth={props.strokeWidth}
+                        strokeAlignment={props.strokeAlignment}
+                    >
+                        {RING_TEXT}
+                    </PaintedText>
+                </div>
+            </PageMeasureBox>
 
             <div class={styles.buttonRow}>
                 <Button

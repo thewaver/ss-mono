@@ -32,7 +32,7 @@ export type ParticleSpawnerTiming = {
     /** How long one particle takes to walk its path. */
     travelDurationMs: number;
     /** How long a particle stays put at the end of its path. */
-    retentionMs: number;
+    restDurationMs: number;
 };
 
 export type ParticleSpawnerFrame = {

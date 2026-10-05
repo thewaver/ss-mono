@@ -306,7 +306,6 @@
         </g>
     {:else if isOnPath}
         {@render pathText(attributes, isReadable, startOffset)}
-        {@render pathText(attributes, false, startOffset - pathLength)}
     {:else}
         <text class={styles.paintedTextLayer} {...attributes} aria-hidden={isReadable ? undefined : "true"}>
             {@render runs(isReadable)}
@@ -348,7 +347,7 @@
             </PaintAreaProvider>
 
             {#if isOnPath}
-                <path id={pathId} d={props.path} />
+                <path id={pathId} d={PaintedTextUtils.computeLapPath(props.path ?? "")} />
             {/if}
 
             {#if strokePaint.maskKind}

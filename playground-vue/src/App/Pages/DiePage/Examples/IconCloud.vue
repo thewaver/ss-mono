@@ -65,7 +65,7 @@ const stepCloud = (direction: RollerDirection) => {
 
             <Button
                 v-for="step in ICON_CLOUD_STEPS"
-                :id="`dieCloud${step.label}`"
+                :id="step.id"
                 :key="step.direction"
                 @click="stepCloud(step.direction)"
             >

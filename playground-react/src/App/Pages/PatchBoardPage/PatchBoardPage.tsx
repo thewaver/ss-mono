@@ -1,7 +1,7 @@
 import { useState } from "react";
 
 import type { PatchBoardLink } from "@thewaver/ss-components-react";
-import { PATCH_BOARD_DEFAULTS } from "@thewaver/ss-components-react";
+import { MediaQueryMonitorReactUtils, PATCH_BOARD_DEFAULTS } from "@thewaver/ss-components-react";
 import { PatchBoardKnobs } from "@thewaver/ss-playground/App/Knobs/PatchBoards.const";
 import {
     BOARD_WIDTH,
@@ -24,7 +24,6 @@ import { PageCheckField, PageNumberField } from "../../PageComponents/Field/Fiel
 import { PageMeasureBox } from "../../PageComponents/MeasureBox/MeasureBox";
 import { PageProp } from "../../PageComponents/Prop/Prop";
 import { PagePropsPanel } from "../../PageComponents/PropsPanel/PropsPanel";
-import { BeamsExample } from "./Examples/Beams";
 import { ChainExample } from "./Examples/Chain";
 import { MixerExample } from "./Examples/Mixer";
 import { PanExample } from "./Examples/Pan";
@@ -50,7 +49,6 @@ export const PatchBoardPage = () => {
     const [rackAction, setRackAction] = useState(NOTHING_DONE);
     const [panAction, setPanAction] = useState(NOTHING_DONE);
     const [zoomAction, setZoomAction] = useState(NOTHING_DONE);
-    const [beamsAction, setBeamsAction] = useState(NOTHING_DONE);
     const [zoom, setZoom] = useState(STARTING_ZOOM);
 
     const chainNodesState = useState(CHAIN_NODES);
@@ -63,13 +61,16 @@ export const PatchBoardPage = () => {
     const panLinksState = useState(PAN_LINKS);
     const zoomNodesState = useState(CHAIN_NODES);
     const zoomLinksState = useState(CHAIN_LINKS);
-    const beamsNodesState = useState(CHAIN_NODES);
-    const beamsLinksState = useState(CHAIN_LINKS);
+
+    const prefersReducedMotion = MediaQueryMonitorReactUtils.useReducedMotion();
+
+    const [isBeamPlaying, setIsBeamPlaying] = useState(!prefersReducedMotion);
 
     const commonProps: Omit<PatchBoardExampleProps, "nodes" | "links" | "onLink" | "onUnlink" | "onMove"> = {
         socketSize,
         isLocked,
         isDisabled,
+        isBeamPlaying,
     };
 
     const examples = [
@@ -173,26 +174,6 @@ export const PatchBoardPage = () => {
             ),
             path: `${EXAMPLES_ROOT}/Zoom.tsx`,
         },
-        {
-            key: "beams",
-            name: "The signal running along its cables",
-            span: WIDE_SPAN,
-            readout: () =>
-                `${beamsLinksState[0].length} cables, last: ${beamsAction} — a pulse runs along every plugged cable from the output to the input it feeds, taking the same time on a long cable as on a short one; Pause stops it`,
-            component: () => (
-                <PageMeasureBox width={BOARD_WIDTH}>
-                    <BeamsExample
-                        {...commonProps}
-                        nodes={beamsNodesState}
-                        links={beamsLinksState}
-                        onLink={(link) => setBeamsAction(`connected ${getLinkWords(link)}`)}
-                        onUnlink={(link) => setBeamsAction(`unplugged ${getLinkWords(link)}`)}
-                        onMove={(nodeKey) => setBeamsAction(`moved ${nodeKey}`)}
-                    />
-                </PageMeasureBox>
-            ),
-            path: `${EXAMPLES_ROOT}/Beams.tsx`,
-        },
     ];
 
     return (
@@ -231,6 +212,16 @@ export const PatchBoardPage = () => {
                     hint={"Turns the whole board off, so nothing on it responds to the pointer or the keyboard."}
                 >
                     <PageCheckField value={isDisabled} ariaLabel={"Disabled"} onChange={setIsDisabled} />
+                </PageProp>
+
+                <PageProp
+                    itemKey={"isBeamPlaying"}
+                    label={"Beams moving"}
+                    hint={
+                        "Whether a pulse runs along every plugged cable, from the output to the input it feeds. It starts stopped while the visitor has asked for reduced motion."
+                    }
+                >
+                    <PageCheckField value={isBeamPlaying} ariaLabel={"Beams moving"} onChange={setIsBeamPlaying} />
                 </PageProp>
             </PagePropsPanel>
 

@@ -102,17 +102,17 @@ export namespace SVGDefsSvelteUtils {
         getPointer: () => Point2d | undefined,
     ) => {
         const trail = TrackedPatternUtils.createTrail();
-        const trailMs = $derived(getOpts().trailMs);
-        const retentionMs = $derived(getOpts().retentionMs);
+        const fadeDurationMs = $derived(getOpts().fadeDurationMs);
+        const fadeDelayMs = $derived(getOpts().fadeDelayMs);
 
         let clock = $state.raw<ReturnType<typeof SVGDefsUtils.createClock>>();
 
         const getFrameMs = $derived(clock ? readStore(clock.frameMs) : undefined);
 
         $effect(() => {
-            if (!TrackedPatternUtils.getHasTrail({ trailMs, retentionMs })) return;
+            if (!TrackedPatternUtils.getHasTrail({ fadeDurationMs, fadeDelayMs })) return;
 
-            const next = SVGDefsUtils.createClock(TrackedPatternUtils.getTrailSpanMs({ trailMs, retentionMs }));
+            const next = SVGDefsUtils.createClock(TrackedPatternUtils.getTrailSpanMs({ fadeDurationMs, fadeDelayMs }));
             const release = next.retain();
 
             clock = next;

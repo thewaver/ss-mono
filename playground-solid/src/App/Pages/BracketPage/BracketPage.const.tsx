@@ -1,6 +1,6 @@
 import type { Accessor } from "solid-js";
 
-import type { BracketNode, BracketNodeState } from "@thewaver/ss-components-solid";
+import type { BracketLayerHeaderState, BracketNode, BracketNodeState } from "@thewaver/ss-components-solid";
 import * as styles from "@thewaver/ss-playground/App/Pages/BracketPage/BracketPage.css";
 
 const ROOT_LAYER = 0;
@@ -23,3 +23,13 @@ export const renderBracketNode = (getNode: Accessor<BracketNode<string>>, getSta
 export const computeBracketLayerHeader = (names: string[]) => (layer: number) => (
     <div class={styles.layerHeader}>{names[layer]}</div>
 );
+
+export const computeBracketPinnedLayerHeader =
+    (names: string[]) => (layer: number, getState: Accessor<BracketLayerHeaderState>) => (
+        <div
+            class={styles.layerHeader}
+            classList={{ [styles.pinnedLayerHeader]: true, [styles.layerHeaderCurrent]: getState().isCurrent }}
+        >
+            {names[layer]}
+        </div>
+    );

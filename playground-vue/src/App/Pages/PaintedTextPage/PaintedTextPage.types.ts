@@ -26,7 +26,11 @@ export type PaintedTextPlaybackProps = {
     "onUpdate:playback"?: (value: boolean) => void;
 };
 
-export type PaintedTextPathExampleProps = PaintedTextExampleProps &
+export type PaintedTextBoxedExampleProps = PaintedTextExampleProps & {
+    width?: number;
+};
+
+export type PaintedTextPathExampleProps = PaintedTextBoxedExampleProps &
     PaintedTextPlaybackProps & {
         lapDurationMs: number;
     };

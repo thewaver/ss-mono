@@ -361,10 +361,7 @@ export const PaintedText = (props: PaintedTextProps) => {
                 {isOnPath ? letters.map(renderPathLetter) : renderLetters()}
             </g>
         ) : isOnPath ? (
-            <Fragment key={key}>
-                {renderPathText("main", attributes, isReadable, startOffset)}
-                {renderPathText("wrap", attributes, false, startOffset - pathLength)}
-            </Fragment>
+            renderPathText(key, attributes, isReadable, startOffset)
         ) : (
             <text
                 key={key}
@@ -411,7 +408,7 @@ export const PaintedText = (props: PaintedTextProps) => {
                         {renderDefsElements(strokeDefs)}
                     </PaintAreaContextProvider>
 
-                    {isOnPath && <path id={pathId} d={props.path} />}
+                    {isOnPath && <path id={pathId} d={PaintedTextUtils.computeLapPath(props.path!)} />}
 
                     {strokePaint.maskKind && (
                         <mask

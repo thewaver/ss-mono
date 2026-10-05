@@ -16,7 +16,7 @@ export const Formation = <T,>(props: FormationProps<T>) => {
 
     const itemCount = props.items.length;
     const transitionDurationMs = props.transitionDurationMs ?? FORMATION_DEFAULTS.transitionDurationMs;
-    const staggerMs = props.staggerMs ?? FORMATION_DEFAULTS.staggerMs;
+    const transitionDelayMs = props.transitionDelayMs ?? FORMATION_DEFAULTS.transitionDelayMs;
 
     const layout = useMemo(() => props.computeLayout({ itemCount }), [props.computeLayout, itemCount]);
 
@@ -47,7 +47,7 @@ export const Formation = <T,>(props: FormationProps<T>) => {
                         key={`${itemIds.get(item)}:${occurrence}`}
                         placement={placement}
                         stackAt={props.isStackedInReverse ? itemCount - index : index + NEXT}
-                        transitionDelayMs={index * staggerMs}
+                        transitionDelayMs={index * transitionDelayMs}
                     >
                         {props.renderItem(item, { index, itemCount, placement })}
                     </PlacementItem>

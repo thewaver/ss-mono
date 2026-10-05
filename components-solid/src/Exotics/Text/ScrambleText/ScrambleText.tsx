@@ -42,7 +42,7 @@ export const ScrambleText = (props: ParentProps<ScrambleTextProps>) => {
         () => access(props.settleDurationMs) ?? SCRAMBLE_TEXT_DEFAULTS.settleDurationMs,
     );
 
-    const getInitialDelayMs = createMemo(() => access(props.initialDelayMs) ?? NO_DELAY);
+    const getSettleDelayMs = createMemo(() => access(props.settleDelayMs) ?? NO_DELAY);
 
     const getChurnDurationMs = createMemo(() => access(props.churnDurationMs));
 
@@ -55,7 +55,7 @@ export const ScrambleText = (props: ParentProps<ScrambleTextProps>) => {
 
         return ScrambleTextUtils.getSettleTimes(
             ScrambleTextUtils.resolveWeights(characters.length, props.computeCharacterWeights?.(characters.length)),
-            getInitialDelayMs(),
+            getSettleDelayMs(),
             getSettleDurationMs(),
         );
     });
@@ -67,7 +67,7 @@ export const ScrambleText = (props: ParentProps<ScrambleTextProps>) => {
         getGlyphSets,
         getSettleTimes,
         getStartTimes,
-        getInitialDelayMs,
+        getSettleDelayMs,
         getSettleDurationMs,
         getScrambleIntervalMs,
         onAnimationEnd: () => props.onAnimationEnd?.(),

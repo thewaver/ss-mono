@@ -35,3 +35,15 @@ describe("SVGAnimationDefsUtils", () => {
         expect(identity(1000, 1)).not.toBe(identity(1000, 2));
     });
 });
+
+describe("getIsPageClocked", () => {
+    it("puts an endless loop with no delay on the page's clock", () => {
+        expect(SVGAnimationDefsUtils.getIsPageClocked({ count: Infinity })).toBe(true);
+        expect(SVGAnimationDefsUtils.getIsPageClocked(undefined), "no pattern loops forever").toBe(true);
+    });
+
+    it("leaves anything scripted to begin from the moment it is put in the page", () => {
+        expect(SVGAnimationDefsUtils.getIsPageClocked({ count: 3 })).toBe(false);
+        expect(SVGAnimationDefsUtils.getIsPageClocked({ count: Infinity, beginDelayMs: 300 })).toBe(false);
+    });
+});

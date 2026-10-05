@@ -4,6 +4,8 @@ export type TrackPlacementDefs = {
 
 export type DrumPlacementDefs = {
     perspectivePx?: number;
+    faceCount?: number;
+    faceRatio?: number;
 };
 
 export type CoverFlowPlacementDefs = {

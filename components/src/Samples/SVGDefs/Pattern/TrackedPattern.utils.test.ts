@@ -72,8 +72,8 @@ describe("TrackedPatternUtils.computeLevel", () => {
 });
 
 describe("TrackedPatternUtils.computeTrailShare", () => {
-    it("holds the whole level through the retention, then fades", () => {
-        const opts = { trailMs: 400, retentionMs: 300 };
+    it("holds the whole level through the delay, then fades", () => {
+        const opts = { fadeDurationMs: 400, fadeDelayMs: 300 };
 
         expect(TrackedPatternUtils.computeTrailShare(0, opts)).toBe(1);
         expect(TrackedPatternUtils.computeTrailShare(300, opts)).toBe(1);
@@ -81,12 +81,12 @@ describe("TrackedPatternUtils.computeTrailShare", () => {
         expect(TrackedPatternUtils.computeTrailShare(700, opts)).toBe(0);
     });
 
-    it("fades straight away with no retention, which is the old behavior", () => {
-        expect(TrackedPatternUtils.computeTrailShare(1, { trailMs: 400, retentionMs: 0 })).toBeLessThan(1);
+    it("fades straight away with no delay, which is the old behavior", () => {
+        expect(TrackedPatternUtils.computeTrailShare(1, { fadeDurationMs: 400, fadeDelayMs: 0 })).toBeLessThan(1);
     });
 
     it("drops at once when the hold ends and there is no fade", () => {
-        const opts = { trailMs: 0, retentionMs: 300 };
+        const opts = { fadeDurationMs: 0, fadeDelayMs: 300 };
 
         expect(TrackedPatternUtils.computeTrailShare(300, opts)).toBe(1);
         expect(TrackedPatternUtils.computeTrailShare(301, opts)).toBe(0);
@@ -94,9 +94,9 @@ describe("TrackedPatternUtils.computeTrailShare", () => {
 });
 
 describe("TrackedPatternUtils.createTrail", () => {
-    const opts = { trailMs: 400, retentionMs: 300, restLevel: 0.1 };
+    const opts = { fadeDurationMs: 400, fadeDelayMs: 300, restLevel: 0.1 };
 
-    it("keeps a cell at the level the pointer left it for the retention", () => {
+    it("keeps a cell at the level the pointer left it for the delay", () => {
         const trail = TrackedPatternUtils.createTrail();
 
         trail.computeLevel("a", 0.8, 0, opts);
@@ -116,7 +116,7 @@ describe("TrackedPatternUtils.createTrail", () => {
 
     it("counts the hold and the fade together for the clock", () => {
         expect(TrackedPatternUtils.getTrailSpanMs(opts)).toBe(700);
-        expect(TrackedPatternUtils.getHasTrail({ trailMs: 0, retentionMs: 0 })).toBe(false);
-        expect(TrackedPatternUtils.getHasTrail({ trailMs: 0, retentionMs: 200 })).toBe(true);
+        expect(TrackedPatternUtils.getHasTrail({ fadeDurationMs: 0, fadeDelayMs: 0 })).toBe(false);
+        expect(TrackedPatternUtils.getHasTrail({ fadeDurationMs: 0, fadeDelayMs: 200 })).toBe(true);
     });
 });

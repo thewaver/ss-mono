@@ -37,7 +37,7 @@ export type TypewriterState = {
 export type TypewriterPlayerOpts = {
     /** The element holding the text to measure: the hidden copy the consumer's children are rendered into. */
     getContainer: () => HTMLElement | undefined;
-    /** Names each letter's keyframes, which the text is wrapped for — see `LetterDriverUtils.wrapAtLastFrame`. */
+    /** Names each letter's keyframes, which the text is wrapped for — see `LetterDriverUtils.wrapAtWidestFrame`. */
     getComputeAnimationName: () => (character: string, index: number, count: number) => string;
     /** Whether the run is playing, which is the only time a change starts it again from the beginning. */
     getIsPlaying: () => boolean;

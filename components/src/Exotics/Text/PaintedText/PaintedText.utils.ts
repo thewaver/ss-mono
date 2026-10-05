@@ -324,12 +324,28 @@ export namespace PaintedTextUtils {
     };
 
     /**
+     * The path a sliding text is drawn along: the consumer's path traced twice, end to end.
+     *
+     * Text slides by moving where it starts along the path, so part of it is always past the end and has to show
+     * again at the start. Two copies of the text, one a whole path length behind the other, would hand each letter
+     * from one to the other at the seam, and the browser draws a letter only while its middle is on the path — with
+     * a pixel or so at the seam that neither copy counts as on, so a letter crossing it would vanish for a frame. One
+     * copy on a path that goes round twice has no seam to cross: the second lap is the same line on the page, and the
+     * text carries on along it. An open path traced twice jumps back to its start between the laps, which is what
+     * sends the text in at the near end as it leaves at the far one.
+     *
+     * @param d The path, as an SVG path's `d`.
+     * @returns The same path twice over, as one `d`.
+     */
+    export const computeLapPath = (d: string) => `${d} ${d}`;
+
+    /**
      * Where a point some way along a sliding text lands on the path, once the part past the end has come round
      * from the start.
      *
-     * Text along a path is drawn twice: once from its starting offset, and once a whole path length earlier, so what
-     * slides past the end shows again at the start. A point up to one path length past the end is therefore on the
-     * path, that far from the start; one further than that is drawn by neither copy.
+     * Text along a path is drawn along the path traced twice, from {@link computeLapPath}, so what slides past the end
+     * of the first lap carries on along the second, which is the same line on the page. A point up to one path length
+     * past the end is therefore on the path, that far from the start; one further than that is drawn nowhere.
      *
      * @param along How far along the path the point would be, without coming round, in pixels.
      * @param length How long the path is.
@@ -470,9 +486,9 @@ export namespace PaintedTextUtils {
      * becomes an SVG `<image>`, an `<svg>` is copied in whole, and anything else is copied into a `<foreignObject>`.
      *
      * While a wrapper's letters push each other along as they grow (`getComputePushingAnimationName`), the text is
-     * wrapped with every letter at its last frame, as `ProximityText` wraps it, and each letter is laid out in a box
-     * of its own; `relayout` then styles those boxes and reads them back, moving each letter by as much as the ones
-     * before it on its line grew, while the line breaks and `restLetters` stay where the text was first laid out.
+     * wrapped with every letter at its widest end frame, as `ProximityText` wraps it, and each letter is laid out in a
+     * box of its own; `relayout` then styles those boxes and reads them back, moving each letter by as much as the
+     * ones before it on its line grew, while the line breaks and `restLetters` stay where the text was first laid out.
      *
      * On a path (`getPath`), the text is one line that never wraps: its runs are set along a straight line in the
      * layout host, as SVG, and every letter's distance from the start and its advance are read back, so the spacing
@@ -675,7 +691,7 @@ export namespace PaintedTextUtils {
             const computePushingName = opts.getComputePushingAnimationName?.();
             const tokens = JSXTextParserUtils.getSegmentTokens(source);
             const segments = computePushingName
-                ? LetterDriverUtils.wrapAtLastFrame(tokens, width, host.parentElement ?? host, computePushingName)
+                ? LetterDriverUtils.wrapAtWidestFrame(tokens, width, host.parentElement ?? host, computePushingName)
                 : JSXTextParserUtils.getInlinedSegments(tokens, width);
             const nodes = segments.map((segment) =>
                 computePushingName ? createPushingLayoutNode(segment) : createLayoutNode(segment),

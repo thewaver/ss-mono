@@ -28,13 +28,13 @@
     const glyphSets = $derived(characters.map((character) => Array.from(computeGlyphs(character))));
 
     const settleDurationMs = $derived(props.settleDurationMs ?? SCRAMBLE_TEXT_DEFAULTS.settleDurationMs);
-    const initialDelayMs = $derived(props.initialDelayMs ?? NO_DELAY);
+    const settleDelayMs = $derived(props.settleDelayMs ?? NO_DELAY);
     const scrambleIntervalMs = $derived(props.scrambleIntervalMs ?? SCRAMBLE_TEXT_DEFAULTS.scrambleIntervalMs);
 
     const settleTimes = $derived(
         ScrambleTextUtils.getSettleTimes(
             ScrambleTextUtils.resolveWeights(characters.length, props.computeCharacterWeights?.(characters.length)),
-            initialDelayMs,
+            settleDelayMs,
             settleDurationMs,
         ),
     );
@@ -45,7 +45,7 @@
         getGlyphSets: () => glyphSets,
         getSettleTimes: () => settleTimes,
         getStartTimes: () => startTimes,
-        getInitialDelayMs: () => initialDelayMs,
+        getSettleDelayMs: () => settleDelayMs,
         getSettleDurationMs: () => settleDurationMs,
         getScrambleIntervalMs: () => scrambleIntervalMs,
         onAnimationEnd: () => props.onAnimationEnd?.(),

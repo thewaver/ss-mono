@@ -112,15 +112,18 @@ export const ringStack = style({
 
 export const ringFrame = style({
     display: "flex",
-    justifyContent: "center",
+    justifyContent: "flex-end",
     alignItems: "center",
-    width: "100%",
+    width: CarouselKnobs.RING_SLOT_WIDTH * 0.5,
+    maxWidth: "100%",
+    overflow: "hidden",
     paddingBlock: themeVars.spacing.quad,
 });
 
 export const ringSlot = style({
+    flex: "none",
     width: CarouselKnobs.RING_SLOT_WIDTH,
-    maxWidth: "100%",
+    marginRight: -CarouselKnobs.RING_SLOT_WIDTH * 0.5,
 });
 
 export const wordDrumSlot = style({
@@ -133,7 +136,7 @@ export const wordDrumWord = style({
     justifyContent: "center",
     alignItems: "center",
     width: "100%",
-    height: "100%",
+    height: CarouselKnobs.WORD_DRUM_SLOT_HEIGHT,
     fontSize: themeVars.fontSize.xLarge,
     fontWeight: "bold",
 });

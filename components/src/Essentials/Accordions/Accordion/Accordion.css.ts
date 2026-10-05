@@ -22,7 +22,3 @@ export const accordionOrientationVariants = styleVariants({
         flexDirection: "column",
     },
 });
-
-export const accordionPanelSizer = style({
-    height: "100%",
-});

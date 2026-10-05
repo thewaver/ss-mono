@@ -1,4 +1,4 @@
-import { style } from "@vanilla-extract/css";
+import { createVar, fallbackVar, style } from "@vanilla-extract/css";
 
 import { layerVars } from "../../StyledComponents/Layer/Layer.css";
 import { themeVars } from "../../Theme.css";
@@ -33,12 +33,20 @@ export const nodeOnRoute = style({
     boxShadow: `0 0 0 2px ${themeVars.color.secondary.main}`,
 });
 
+export const headerPinXVar = createVar();
+
+export const headerPinYVar = createVar();
+
 export const layerHeader = style({
+    position: "relative",
+    zIndex: 1,
     display: "grid",
     placeItems: "center",
     width: "100%",
     height: "100%",
-    color: layerVars.contrast,
+    borderRadius: themeVars.borderRadius.half,
+    backgroundColor: layerVars.contrast,
+    color: layerVars.main,
     fontSize: themeVars.fontSize.xSmall,
     textAlign: "center",
 });
@@ -54,10 +62,36 @@ export const nodeDisabled = style({
     cursor: "not-allowed",
 });
 
-export const beamStage = style({
+export const familyStage = style({
     display: "flex",
     flexDirection: "column",
     alignItems: "center",
     gap: themeVars.spacing.full,
     width: "100%",
+});
+
+export const familyControls = style({
+    display: "flex",
+    flexWrap: "wrap",
+    justifyContent: "center",
+    gap: themeVars.spacing.half,
+});
+
+export const familyFrame = style({
+    position: "relative",
+    overflow: "hidden",
+});
+
+export const familyCamera = style({
+    width: "max-content",
+    transformOrigin: "0 0",
+});
+
+export const pinnedLayerHeader = style({
+    transform: `translate(${fallbackVar(headerPinXVar, "0px")}, ${fallbackVar(headerPinYVar, "0px")})`,
+});
+
+export const layerHeaderCurrent = style({
+    backgroundColor: themeVars.color.primary.main,
+    fontWeight: "bold",
 });

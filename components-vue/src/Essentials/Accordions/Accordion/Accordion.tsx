@@ -1,4 +1,4 @@
-import { type SlotsType, computed, defineComponent, shallowRef, useId, watch } from "vue";
+import { type SlotsType, defineComponent, shallowRef, useId, watch } from "vue";
 
 import {
     ACCORDION_DEFAULTS,
@@ -7,7 +7,6 @@ import {
     AccordionUtils,
 } from "@thewaver/ss-components";
 
-import { ElementObserverVueUtils } from "../../../Abstracts/ElementObserver/ElementObserverVue.utils";
 import { NavigatorVueUtils } from "../../../Abstracts/Navigator/NavigatorVue.utils";
 import { callSlot, declareProps, useTwoWay } from "../../../Utils/propUtils";
 import { exposeElement, toElement, useStableList } from "../../../Utils/refUtils";
@@ -34,7 +33,6 @@ const AccordionSection = defineComponent(
                 isFocusableWhenDisabled={props.item.isReachableWhenDisabled ?? false}
                 headingLevel={props.headingLevel}
                 side={props.side}
-                sizing={props.isSideways ? "fit-content" : "fill"}
                 isScrolledIntoViewOnExpand={props.isScrolledIntoViewOnExpand}
                 isPanelBuiltOnExpand={props.isPanelBuiltOnExpand}
                 transitionDurationMs={props.transitionDurationMs}
@@ -46,25 +44,13 @@ const AccordionSection = defineComponent(
                 {
                     {
                         renderTrigger: (flags) => callSlot(slots.renderHeader, { item: props.item, flags }),
-                        renderPanel: ({ visibilityTarget, transitionDurationMs }) => {
-                            const content = callSlot(slots.renderPanel, {
+                        renderPanel: ({ visibilityTarget, transitionDurationMs }) =>
+                            callSlot(slots.renderPanel, {
                                 item: props.item,
                                 visibilityTarget,
                                 transitionDurationMs,
                                 moveDirection: props.moveDirection,
-                            });
-
-                            if (!props.isSideways) return content;
-
-                            return (
-                                <div
-                                    class={AccordionStyles.accordionPanelSizer}
-                                    style={{ width: AccordionUtils.toWidthStyle(props.openWidth) }}
-                                >
-                                    {content}
-                                </div>
-                            );
-                        },
+                            }),
                     } satisfies Partial<CollapsibleSlots>
                 }
             </Collapsible>
@@ -78,8 +64,6 @@ const AccordionSection = defineComponent(
             headingLevel: null,
             side: null,
             isExpanded: Boolean,
-            isSideways: Boolean,
-            openWidth: null,
             isScrolledIntoViewOnExpand: Boolean,
             isPanelBuiltOnExpand: Boolean,
             transitionDurationMs: null,
@@ -97,28 +81,10 @@ export const Accordion = defineComponent(
         const moveDirection = shallowRef<AccordionMoveDirection>();
 
         const headerRefs: (HTMLElement | undefined)[] = [];
-        const headerElements = shallowRef<(HTMLElement | undefined)[]>([]);
 
         const direction = NavigatorVueUtils.useDirection(rootRef);
 
         const getOrientation = () => props.orientation ?? ACCORDION_DEFAULTS.orientation;
-
-        const getGap = () => props.gap ?? ACCORDION_DEFAULTS.gap;
-
-        const hasRowWidths = computed(() =>
-            AccordionUtils.getHasRowWidths(getOrientation(), props.sizing ?? ACCORDION_DEFAULTS.sizing),
-        );
-
-        const setHeaderRef = (index: number, element: HTMLElement | undefined) => {
-            headerRefs[index] = element;
-
-            if (headerElements.value[index] === element) return;
-
-            const next = [...headerElements.value];
-
-            next[index] = element;
-            headerElements.value = next;
-        };
 
         const expandedIndexes = useStableList(() =>
             props.items.reduce<number[]>((acc, item, index) => {
@@ -126,27 +92,6 @@ export const Accordion = defineComponent(
 
                 return acc;
             }, []),
-        );
-
-        const rowSize = ElementObserverVueUtils.useBorderBoxSize(rootRef, () => !hasRowWidths.value);
-        const stripSizes = ElementObserverVueUtils.useBorderBoxSizes(
-            () => headerElements.value.slice(0, props.items.length),
-            () => !hasRowWidths.value,
-        );
-
-        const openWidths = computed<(number | undefined)[]>((previous) =>
-            hasRowWidths.value
-                ? AccordionUtils.computeOpenWidths(
-                      props.items,
-                      expandedIndexes.value,
-                      {
-                          rowWidth: rowSize.value.width,
-                          stripWidths: stripSizes.value.map((size) => size.width),
-                          gap: getGap(),
-                      },
-                      previous,
-                  )
-                : [],
         );
 
         watch(expandedIndexes, (next, previous) => {
@@ -194,19 +139,19 @@ export const Accordion = defineComponent(
                         AccordionStyles.accordionSizingVariants[sizing],
                         AccordionStyles.accordionOrientationVariants[orientation],
                     ]}
-                    style={{ gap: `${getGap()}px` }}
+                    style={{ gap: `${props.gap ?? ACCORDION_DEFAULTS.gap}px` }}
                     onKeydown={handleKeyDown}
                 >
                     {props.items.map((item, index) => (
                         <AccordionSection
                             key={index}
-                            ref={(target) => setHeaderRef(index, toElement(target))}
+                            ref={(target) => {
+                                headerRefs[index] = toElement(target);
+                            }}
                             item={item}
                             headingLevel={headingLevel}
                             side={side}
                             isExpanded={expanded.value.includes(item.value)}
-                            isSideways={orientation === "horizontal"}
-                            openWidth={openWidths.value[index]}
                             isScrolledIntoViewOnExpand={props.isScrolledIntoViewOnExpand}
                             isPanelBuiltOnExpand={props.isPanelBuiltOnExpand}
                             transitionDurationMs={props.transitionDurationMs}

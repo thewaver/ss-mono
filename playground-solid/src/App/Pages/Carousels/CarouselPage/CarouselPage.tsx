@@ -83,9 +83,9 @@ export const CarouselPage = () => {
         },
         {
             key: "ring",
-            name: "A ring that turns and leans",
+            name: "A ring at the edge",
             readout: () =>
-                `slide ${ringIndexSignal[0]() + 1} of ${controls.getSlideCount()} — the paddle wheel rule, the slides standing round an upright spine with each painting only the half away from it, inside a Tilter, with its progress written on a clock for a continuous turn; Stop is the way to halt it that a turn running on its own owes the reader`,
+                `slide ${ringIndexSignal[0]() + 1} of ${controls.getSlideCount()} — the paddle wheel rule, the slides standing round an upright spine with each painting only the half away from it, the spine set flush with the box's right edge so only the half turning outward shows, with its progress written on a clock for a continuous turn; Stop is the way to halt it that a turn running on its own owes the reader`,
             component: () => (
                 <RingExample
                     slides={controls.getSlides}
@@ -100,7 +100,7 @@ export const CarouselPage = () => {
             key: "wordDrum",
             name: "A drum of words turned by scrolling",
             readout: () =>
-                `word ${wordDrumIndexSignal[0]() + 1} of ${CarouselKnobs.WORD_DRUM_WORDS.length} — the drum rule with a word on each face, its progress written by the box's scroll, so scrolling rolls the next word up`,
+                `word ${wordDrumIndexSignal[0]() + 1} of ${CarouselKnobs.WORD_DRUM_WORDS.length} — a drum of a fixed number of faces, each a quarter of the box, with a word on each face near the front, its progress written by the box's scroll; scrolling rolls the next word up, and the faces past the first and last word stay empty`,
             component: () => <WordDrumExample index={wordDrumIndexSignal} isDisabled={controls.isDisabled[0]} />,
             path: `${EXAMPLES_ROOT}/WordDrum.tsx`,
         },

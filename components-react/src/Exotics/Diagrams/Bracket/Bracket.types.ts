@@ -37,10 +37,11 @@ export type BracketProps<T> = {
     renderLayerHeader?: (layer: number) => ReactNode;
     /**
      * `"tree"` draws every node. `"family"` draws one family at a time and follows focus: the node the focused one
-     * feeds, the focused node with all its siblings, and every node that feeds those siblings. Focusing the root, or
-     * nothing, shows the root and the nodes that feed it. Every other node folds onto the family member it hangs from,
-     * unseen and out of reach of Tab and a screen reader, and the board keeps the size of the largest family so the
-     * page around it never shifts.
+     * feeds, the focused node with all its siblings, and every node that feeds those siblings. Focusing the root shows
+     * the root and the nodes that feed it, and so does the board before anything has been focused. Focus leaving the
+     * board leaves the family where it was. Every other node folds onto the family member it hangs from, unseen and
+     * out of reach of Tab and a screen reader, and the board keeps the size of the largest family so the page around
+     * it never shifts. Which family shows is `family`.
      */
     view?: BracketView;
     /**
@@ -60,8 +61,11 @@ export type BracketProps<T> = {
      */
     onActivate?: (value: T, placement: BracketPlacement) => void;
     /**
-     * Runs in the family view when it first shows a family and whenever it moves to another, handed the value and
-     * placement of the node the family's middle row feeds. Both are `undefined` while the root's own family shows.
+     * Which family the family view shows, named by the node its middle row feeds: that node, its children and theirs.
+     * `undefined` is the root's own family, the root and the nodes that feed it. Both sides write it: the board when
+     * focus moves, the consumer to move the family from outside — which is how buttons beside the board page through
+     * it without taking focus. `BracketUtils.computeFamilyStep` finds the family a step away. Leave it out and the
+     * board keeps it itself. A node that is not in the tree shows the root's own family. Ignored in the tree view.
      */
-    onFamilyChange?: (value: T | undefined, placement: BracketPlacement | undefined) => void;
+    family?: readonly [BracketNode<T> | undefined, (value: BracketNode<T> | undefined) => void];
 };

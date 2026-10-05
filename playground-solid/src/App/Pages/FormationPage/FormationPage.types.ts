@@ -8,5 +8,5 @@ export type FormationExampleProps = AccessorProps<{
     effectEntry: ProximityEffectEntry | undefined;
     shapeKind: ShapeConst.DefaultShape;
     transitionDurationMs: number;
-    staggerMs: number;
+    transitionDelayMs: number;
 }>;

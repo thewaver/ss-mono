@@ -1,6 +1,8 @@
 import type { SVGAnimationDefs, SVGAnimationIterationPattern } from "./SVGAnimationDefs.types";
 
 const MS_PER_SECOND = 1000;
+/** What an animation begun from script has written for its `begin`. */
+const INDEFINITE_BEGIN = "indefinite";
 const FIRST_PATTERN_INDEX = 0;
 
 /**
@@ -11,6 +13,15 @@ const FIRST_PATTERN_INDEX = 0;
  * The cost is that its scheduling has to be driven by hand, and that is what this does. The markup
  * the schedule is spread onto is each framework's.
  */
+/** The outermost `<svg>` an element is drawn in, whose clock its animations run on. */
+const getOutermostSvg = (el: SVGElement) => {
+    let svg = el.ownerSVGElement;
+
+    while (svg?.ownerSVGElement) svg = svg.ownerSVGElement;
+
+    return svg;
+};
+
 export namespace SVGAnimationDefsUtils {
     /**
      * Rewrites a pattern that loops to itself as a pair that alternate.
@@ -57,6 +68,21 @@ export namespace SVGAnimationDefsUtils {
         !pattern || pattern.count === Infinity ? "indefinite" : pattern.count;
 
     /**
+     * Whether an animation runs on the page's clock rather than from the moment it is put in the page.
+     *
+     * A pattern that loops forever with no delay has no start anybody can see, only a phase, so it is written to begin
+     * at the drawing's time zero and the drawing's clock is set to the page's: two drawings of the same looping paint
+     * then show the same moment of it, and one put in the page later, such as a word replaced by the next, carries the
+     * loop on instead of restarting it. Anything scripted — a count, a delay — is begun from script, after its own delay
+     * from the moment it is put in the page, as it was written. A framework writes `begin="0s"` on an animation this
+     * answers `true` for, and `"indefinite"` otherwise; {@link createScheduler} reads which it was given.
+     *
+     * @param pattern The first pattern, or `undefined` for none, which loops forever.
+     */
+    export const getIsPageClocked = (pattern: SVGAnimationIterationPattern | undefined) =>
+        computeRepeatCount(pattern) === "indefinite" && !((pattern?.beginDelayMs ?? 0) > 0);
+
+    /**
      * Names an animation by what it plays, so two records describing the same animation get the same name.
      *
      * A running SMIL animation cannot be rewound or retimed in place, so a framework that keeps elements across
@@ -81,7 +107,10 @@ export namespace SVGAnimationDefsUtils {
      * whichever is still in the document — is picked to drive the schedule, so the callbacks fire once
      * per iteration rather than once per element. Beginning is deferred to the next frame, because an
      * element that has not yet been laid out cannot be told to start, and it is asked for as a delay from
-     * now rather than as a moment on the document's clock.
+     * now rather than as a moment on the document's clock. An element written to begin at time zero rather than
+     * `"indefinite"` — a loop with no start of its own ({@link getIsPageClocked}) — is not begun at all: its drawing's
+     * clock is set to the page's instead, a frame after it is put in the page. That frame matters, as browsers hold a
+     * newly added animation at its first frame until something moves the clock it runs on.
      *
      * The pattern index is the caller's, read and written through `opts`. `setPatternIndex` must have
      * applied its value to the elements' `repeatCount` by the time it returns, since the elements are begun
@@ -116,8 +145,14 @@ export namespace SVGAnimationDefsUtils {
             attach: (el: SVGAnimateElement) => {
                 elements.add(el);
 
-                const frameId = requestAnimationFrame(() => {
+                const frameId = requestAnimationFrame((frameMs) => {
                     if (!el.isConnected) return;
+
+                    if (el.getAttribute("begin") !== INDEFINITE_BEGIN) {
+                        getOutermostSvg(el)?.setCurrentTime(frameMs / MS_PER_SECOND);
+
+                        return;
+                    }
 
                     el.beginElementAt((opts.getPatterns()[FIRST_PATTERN_INDEX]?.beginDelayMs ?? 0) / MS_PER_SECOND);
                 });

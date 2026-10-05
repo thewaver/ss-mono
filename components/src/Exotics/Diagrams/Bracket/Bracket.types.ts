@@ -67,6 +67,7 @@ export type BracketFrame = {
 export type BracketArrangement = {
     nodes: Record<string, BracketFrame>;
     headers: BracketFrame[];
+    boardSize: Size2d;
 };
 
 export type BracketConnectorDefs = {
@@ -93,4 +94,13 @@ export type BracketNodeState = {
     isFocused: boolean;
     /** Whether this node holds focus or is one of the nodes between it and the root, so a whole path can light up. */
     isOnFocusedRoute: boolean;
+};
+
+export type BracketLayerHeaderState = {
+    /**
+     * Whether this layer is the current round: the middle row of the family the board names, which the family view
+     * shows and the tree view follows with focus. One layer at most, so a header can mark it while the rounds either
+     * side of it stay in view.
+     */
+    isCurrent: boolean;
 };

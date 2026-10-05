@@ -23,10 +23,10 @@
     import PagePropsPanel from "../../PageComponents/PropsPanel/PagePropsPanel.svelte";
     import CircleExampleWrapper from "./CircleExampleWrapper.svelte";
     import CustomInputExampleWrapper from "./CustomInputExampleWrapper.svelte";
+    import ScrambledExample from "./Examples/Scrambled.svelte";
     import HeadingExampleWrapper from "./HeadingExampleWrapper.svelte";
     import type { PaintedTextExampleWrapperProps } from "./PaintedTextPage.types";
     import ParagraphExampleWrapper from "./ParagraphExampleWrapper.svelte";
-    import ScrambledExampleWrapper from "./ScrambledExampleWrapper.svelte";
     import TypedExampleWrapper from "./TypedExampleWrapper.svelte";
     import WaveExampleWrapper from "./WaveExampleWrapper.svelte";
 
@@ -148,7 +148,7 @@
 {/snippet}
 
 {#snippet scrambledExample()}
-    <ScrambledExampleWrapper {...commonProps} />
+    <ScrambledExample {...commonProps} />
 {/snippet}
 
 {#snippet circleExample()}

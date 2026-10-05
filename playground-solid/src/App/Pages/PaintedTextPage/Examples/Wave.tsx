@@ -1,8 +1,10 @@
 import { createUniqueId } from "solid-js";
 
 import { Button, PaintedText } from "@thewaver/ss-components-solid";
+import { MEASURE_BOX_PADDING } from "@thewaver/ss-playground/App/PageComponents/MeasureBox/MeasureBox.css";
 import * as styles from "@thewaver/ss-playground/App/Pages/PaintedTextPage/PaintedTextPage.css";
 
+import { PageMeasureBox } from "../../../PageComponents/MeasureBox/MeasureBox";
 import { PageButtonContent } from "../../../StyledComponents/ButtonContent/ButtonContent";
 import { computeSampleDefs } from "../PaintedTextPage.const";
 import type { PaintedTextPathExampleProps } from "../PaintedTextPage.types";
@@ -17,20 +19,22 @@ export const WaveExample = (props: Props) => {
 
     return (
         <div class={styles.stack}>
-            <div class={styles.waveText}>
-                <PaintedText
-                    path={WAVE_PATH}
-                    lapDurationMs={props.lapDurationMs}
-                    progress={props.progress}
-                    playback={props.playback}
-                    computeFillDefs={(getSize, getRef) => computeSampleDefs(props, "fill", id, getSize, getRef)}
-                    computeStrokeDefs={(getSize, getRef) => computeSampleDefs(props, "stroke", id, getSize, getRef)}
-                    strokeWidth={props.strokeWidth}
-                    strokeAlignment={props.strokeAlignment}
-                >
-                    {WAVE_TEXT}
-                </PaintedText>
-            </div>
+            <PageMeasureBox width={props.width} padding={() => MEASURE_BOX_PADDING}>
+                <div class={styles.waveText}>
+                    <PaintedText
+                        path={WAVE_PATH}
+                        lapDurationMs={props.lapDurationMs}
+                        progress={props.progress}
+                        playback={props.playback}
+                        computeFillDefs={(getSize, getRef) => computeSampleDefs(props, "fill", id, getSize, getRef)}
+                        computeStrokeDefs={(getSize, getRef) => computeSampleDefs(props, "stroke", id, getSize, getRef)}
+                        strokeWidth={props.strokeWidth}
+                        strokeAlignment={props.strokeAlignment}
+                    >
+                        {WAVE_TEXT}
+                    </PaintedText>
+                </div>
+            </PageMeasureBox>
 
             <div class={styles.buttonRow}>
                 <Button

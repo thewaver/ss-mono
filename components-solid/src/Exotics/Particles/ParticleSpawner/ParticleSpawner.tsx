@@ -19,7 +19,9 @@ export const ParticleSpawner = (props: ParticleSpawnerProps) => {
     const getTravelDurationMs = createMemo(
         () => access(props.travelDurationMs) ?? PARTICLE_SPAWNER_DEFAULTS.travelDurationMs,
     );
-    const getRetentionMs = createMemo(() => access(props.retentionMs) ?? PARTICLE_SPAWNER_DEFAULTS.retentionMs);
+    const getRestDurationMs = createMemo(
+        () => access(props.restDurationMs) ?? PARTICLE_SPAWNER_DEFAULTS.restDurationMs,
+    );
     const getSpawnDelayMs = createMemo(() => access(props.spawnDelayMs) ?? PARTICLE_SPAWNER_DEFAULTS.spawnDelayMs);
 
     const getSpawnIterationPatterns = createMemo(
@@ -63,7 +65,7 @@ export const ParticleSpawner = (props: ParticleSpawnerProps) => {
         getTiming: () => ({
             spawnDelayMs: getSpawnDelayMs(),
             travelDurationMs: getTravelDurationMs(),
-            retentionMs: getRetentionMs(),
+            restDurationMs: getRestDurationMs(),
         }),
         getCanSpawn,
         computeParticlePos: (travel, t) => props.computeParticlePos(travel, t),
@@ -86,7 +88,7 @@ export const ParticleSpawner = (props: ParticleSpawnerProps) => {
         const canSpawn = getCanSpawn();
 
         getTravelDurationMs();
-        getRetentionMs();
+        getRestDurationMs();
         getSpawnDelayMs();
 
         if (!canSpawn || !isPlaying || particleCount <= 0 || !pattern) return;

@@ -2,7 +2,6 @@
 import { computed, shallowRef } from "vue";
 
 import { ScrambleTextWeights } from "@thewaver/ss-components-vue";
-import { MEASURE_BOX_PADDING } from "@thewaver/ss-playground/App/PageComponents/MeasureBox/MeasureBox.css";
 import * as styles from "@thewaver/ss-playground/App/Pages/TypewriterPage/TypewriterPage.css";
 
 import { TypewriterKnobs } from "../../Knobs/Typewriters.const";
@@ -150,9 +149,7 @@ const examples: ExampleDefs[] = [
             </template>
 
             <template #karaoke>
-                <PageMeasureBox :width="textContainerWidth" :padding="MEASURE_BOX_PADDING">
-                    <KaraokeExample />
-                </PageMeasureBox>
+                <KaraokeExample :width="textContainerWidth" />
             </template>
 
             <template #scrollLit>

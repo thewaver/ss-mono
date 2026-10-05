@@ -80,7 +80,7 @@ const StressTestWrapper = (props: ParticleSpawnerExampleProps) => {
 export const ParticleSpawnerPage = () => {
     const [particleCount, setParticleCount] = useState(ParticleSpawnerKnobs.STARTING_PARTICLE_COUNT);
     const [travelDurationMs, setTravelDurationMs] = useState(PARTICLE_SPAWNER_DEFAULTS.travelDurationMs);
-    const [retentionMs, setRetentionMs] = useState(PARTICLE_SPAWNER_DEFAULTS.retentionMs);
+    const [restDurationMs, setRestDurationMs] = useState(PARTICLE_SPAWNER_DEFAULTS.restDurationMs);
     const [spawnDelayMs, setSpawnDelayMs] = useState(ParticleSpawnerKnobs.STARTING_SPAWN_DELAY_MS);
     const [overshootPercent, setOvershootPercent] = useState(ParticleSpawnerKnobs.STARTING_OVERSHOOT_PERCENT);
     const [travelEasingKey, setTravelEasingKey] = useState<TravelEasingKey>(
@@ -118,7 +118,7 @@ export const ParticleSpawnerPage = () => {
     const commonProps: ParticleSpawnerExampleProps = {
         particleCount,
         travelDurationMs,
-        retentionMs,
+        restDurationMs,
         spawnDelayMs,
         spawnIterationPatterns: ITERATION_PATTERNS[iterationPatternKey](),
         computeParticlePos,
@@ -304,18 +304,18 @@ export const ParticleSpawnerPage = () => {
                     </PageProp>
 
                     <PageProp
-                        itemKey={"retentionMs"}
-                        label={"Retention (ms)"}
+                        itemKey={"restDurationMs"}
+                        label={"Rest duration (ms)"}
                         hint={"How long a particle stays put at the end of its path before it disappears."}
                     >
                         <PageNumberField
-                            value={retentionMs}
+                            value={restDurationMs}
                             min={ParticleSpawnerKnobs.MIN_RETENTION_MS}
                             max={ParticleSpawnerKnobs.MAX_RETENTION_MS}
                             step={ParticleSpawnerKnobs.RETENTION_STEP_MS}
                             width={FIELD_WIDTH}
-                            ariaLabel={"Retention in milliseconds"}
-                            onInput={setRetentionMs}
+                            ariaLabel={"Rest duration in milliseconds"}
+                            onInput={setRestDurationMs}
                         />
                     </PageProp>
 

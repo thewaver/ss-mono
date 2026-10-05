@@ -22,7 +22,7 @@ const computeEffect = computed(() =>
         :items="items"
         :is-stacked-in-reverse="isStackedInReverse"
         :transition-duration-ms="transitionDurationMs"
-        :stagger-ms="staggerMs"
+        :transition-delay-ms="transitionDelayMs"
         :compute-layout="computeLayout"
         :compute-effect="computeEffect"
     >

@@ -11,11 +11,27 @@ import type {
 const EMPTY_OFFSET = 0;
 const SINGLE_ELEMENT = 1;
 
-/** Properties beyond the text-measuring ones that change how wide a letter is drawn. */
-const EXTRA_WIDTH_KEYS = new Set(["font-variation-settings", "font-stretch", "font-width", "font"]);
+/** Which end of a keyframes rule a letter is measured at. */
+type FrameEdge = "first" | "last";
 
-/** The last frame's width-changing declarations of each keyframes rule, by name, once found. */
-const lastFrameCache = new Map<string, Record<string, string>>();
+/** Properties beyond the text-measuring ones that change how wide a letter is drawn. */
+const EXTRA_WIDTH_KEYS = new Set([
+    "font-variation-settings",
+    "font-stretch",
+    "font-width",
+    "font",
+    "padding-left",
+    "padding-right",
+    "padding-inline-start",
+    "padding-inline-end",
+    "margin-left",
+    "margin-right",
+    "margin-inline-start",
+    "margin-inline-end",
+]);
+
+/** The width-changing declarations of each keyframes rule's first or last frame, by edge and name, once found. */
+const edgeFrameCache = new Map<string, Record<string, string>>();
 
 /** Whether a declaration can change how wide a letter is drawn. */
 const getIsWidthKey = (key: string) => CSSUtils.isCssKeyUsedToMeasureText(key) || EXTRA_WIDTH_KEYS.has(key);
@@ -52,9 +68,13 @@ const toKeyframeOffset = (keyText: string) =>
         }),
     );
 
-/** What a keyframes rule's last frame sets that changes a letter's width, empty when nothing does or the rule is missing. */
-const getLastFrameWidthStyle = (name: string): Record<string, string> => {
-    const cached = lastFrameCache.get(name);
+/**
+ * What a keyframes rule's first or last frame sets that changes a letter's width, empty when nothing does or the rule
+ * is missing.
+ */
+const getEdgeFrameWidthStyle = (name: string, edge: FrameEdge): Record<string, string> => {
+    const cacheKey = `${edge}:${name}`;
+    const cached = edgeFrameCache.get(cacheKey);
 
     if (cached) return cached;
 
@@ -62,35 +82,40 @@ const getLastFrameWidthStyle = (name: string): Record<string, string> => {
 
     if (!rule) return {};
 
-    let last: CSSKeyframeRule | undefined;
+    let picked: CSSKeyframeRule | undefined;
 
     for (const frame of Array.from(rule.cssRules) as CSSKeyframeRule[]) {
-        if (!last || toKeyframeOffset(frame.keyText) >= toKeyframeOffset(last.keyText)) last = frame;
+        const offset = toKeyframeOffset(frame.keyText);
+
+        if (!picked) picked = frame;
+        else if (edge === "last" && offset >= toKeyframeOffset(picked.keyText)) picked = frame;
+        else if (edge === "first" && offset < toKeyframeOffset(picked.keyText)) picked = frame;
     }
 
     const style: Record<string, string> = {};
 
-    if (last) {
-        for (const key of Array.from(last.style)) {
-            if (getIsWidthKey(key)) style[key] = last.style.getPropertyValue(key);
+    if (picked) {
+        for (const key of Array.from(picked.style)) {
+            if (getIsWidthKey(key)) style[key] = picked.style.getPropertyValue(key);
         }
     }
 
-    lastFrameCache.set(name, style);
+    edgeFrameCache.set(cacheKey, style);
 
     return style;
 };
 
 /**
- * Measures words with every letter drawn at its animation's last frame, by laying them out in a hidden box inside
- * `host` and reading their widths back.
+ * Measures words with every letter drawn at its animation's first or last frame, by laying them out in a hidden box
+ * inside `host` and reading their widths back.
  */
-const measureAtLastFrame = (
+const measureAtEdgeFrame = (
     host: HTMLElement,
     texts: readonly string[],
     metrics: Record<string, string>,
     startIndex: number,
     getName: (character: string, index: number) => string,
+    edge: FrameEdge,
 ) => {
     const box = document.createElement("div");
 
@@ -110,7 +135,7 @@ const measureAtLastFrame = (
 
             letter.style.display = "inline-block";
             letter.style.whiteSpace = "pre";
-            letter.style.animation = `${getName(character, index)} 1ms linear -1ms 1 normal both paused`;
+            letter.style.animation = `${getName(character, index)} 1ms linear ${edge === "last" ? "-1ms" : "0ms"} 1 normal both paused`;
             letter.textContent = character;
             word.appendChild(letter);
             index++;
@@ -232,14 +257,17 @@ export namespace LetterDriverUtils {
     export const getTimeValue = (timeMs: number) => `${timeMs}ms`;
 
     /**
-     * Wraps a driver's text so that no line is too long for the box with every letter at its animation's last frame.
+     * Wraps a driver's text so that no line is too long for the box with every letter at the wider end of its
+     * keyframes.
      *
-     * A letter whose keyframes make it wider — a heavier weight, a looser spacing — pushes the rest of its line along
-     * as it grows, and a line wrapped for the letters at rest would then run out of the box. So the words are
-     * measured as they will be drawn at the end of their keyframes, and the spare room sits at the end of each line
-     * while the letters rest. The contract this rests on is that the last frame is the widest; a keyframe widest
-     * partway through can still push past the box. When no letter's last frame changes its width, the text is wrapped
-     * exactly as `JSXTextParserUtils.getInlinedSegments` wraps it.
+     * A letter whose keyframes make it wider — a heavier weight, a looser spacing, padding beside it — pushes the rest
+     * of its line along as it grows, and a line wrapped for the letters at their narrowest would then run out of the
+     * box. So each word is measured with its letters at their first frame and again at their last, and the wider of
+     * the two is what the line is fitted to; the spare room sits at the end of each line while the letters are
+     * narrower. Either end may be the wide one — a letter that starts spread and closes up as well as one that swells
+     * — and the contract this rests on is that the widest frame is one of the two ends; a keyframe widest partway
+     * through can still push past the box. When neither end changes a letter's width, the text is wrapped exactly as
+     * `JSXTextParserUtils.getInlinedSegments` wraps it.
      *
      * Browser only: the keyframes are read from the page's style sheets, and the words are laid out in a hidden box.
      *
@@ -251,7 +279,7 @@ export namespace LetterDriverUtils {
      * from `0`, and how many there are.
      * @returns The pieces with breaks inserted, as `getInlinedSegments` returns them.
      */
-    export const wrapAtLastFrame = (
+    export const wrapAtWidestFrame = (
         segments: readonly ElementSegment[],
         width: number,
         host: HTMLElement,
@@ -270,15 +298,24 @@ export namespace LetterDriverUtils {
             }
         }
 
-        const isWidening = Array.from(names).some((name) => Object.keys(getLastFrameWidthStyle(name)).length > 0);
+        const isWidening = Array.from(names).some(
+            (name) =>
+                Object.keys(getEdgeFrameWidthStyle(name, "first")).length > 0 ||
+                Object.keys(getEdgeFrameWidthStyle(name, "last")).length > 0,
+        );
 
         if (!isWidening) return JSXTextParserUtils.getInlinedSegments(segments, width);
 
+        const getName = (character: string, at: number) => computeAnimationName(character, at, count);
+
         return JSXTextParserUtils.getInlinedSegments(segments, width, {
-            measureTextWidths: (texts, metrics, startIndex) =>
-                measureAtLastFrame(host, texts, metrics as Record<string, string>, startIndex, (character, at) =>
-                    computeAnimationName(character, at, count),
-                ),
+            measureTextWidths: (texts, metrics, startIndex) => {
+                const style = metrics as Record<string, string>;
+                const atFirst = measureAtEdgeFrame(host, texts, style, startIndex, getName, "first");
+                const atLast = measureAtEdgeFrame(host, texts, style, startIndex, getName, "last");
+
+                return atLast.map((widthAtLast, at) => Math.max(widthAtLast, atFirst[at] ?? widthAtLast));
+            },
         });
     };
     /**

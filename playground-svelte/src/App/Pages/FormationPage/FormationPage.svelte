@@ -55,7 +55,7 @@
     let shapeKind = $state<ShapeConst.DefaultShape>(FormationKnobs.STARTING_SHAPE_KIND);
     let isStackedInReverse = $state(FormationKnobs.STARTING_IS_STACKED_IN_REVERSE);
     let transitionDurationMs = $state(FORMATION_DEFAULTS.transitionDurationMs);
-    let staggerMs = $state(FORMATION_DEFAULTS.staggerMs);
+    let transitionDelayMs = $state(FORMATION_DEFAULTS.transitionDelayMs);
     let layoutDefs = $state.raw<Record<string, Record<string, number | boolean>>>({});
     let effectDefs = $state.raw<Record<string, Record<string, number | boolean>>>({});
 
@@ -97,7 +97,7 @@
         effectEntry,
         shapeKind,
         transitionDurationMs,
-        staggerMs,
+        transitionDelayMs,
     });
 
     const examples: ExampleDefs[] = [
@@ -259,19 +259,19 @@
         </PageProp>
 
         <PageProp
-            itemKey={"staggerMs"}
-            label={"Stagger (ms)"}
+            itemKey={"transitionDelayMs"}
+            label={"Transition delay (ms)"}
             hint={"How much later each item sets off than the one before it, while gliding is on."}
         >
             <PageNumberField
-                value={staggerMs}
+                value={transitionDelayMs}
                 min={FormationKnobs.MIN_STAGGER_MS}
                 max={FormationKnobs.MAX_STAGGER_MS}
                 step={FormationKnobs.STAGGER_STEP_MS}
                 width={FIELD_WIDTH}
-                ariaLabel={"Stagger in milliseconds"}
+                ariaLabel={"Transition delay in milliseconds"}
                 onInput={(value) => {
-                    staggerMs = value;
+                    transitionDelayMs = value;
                 }}
             />
         </PageProp>

@@ -24,7 +24,7 @@ const NOT_STARTED = 0;
 export const ParticleSpawner = defineComponent(
     (props: ParticleSpawnerProps, { slots }: SlotsContext<ParticleSpawnerSlots>) => {
         const getTravelDurationMs = () => props.travelDurationMs ?? PARTICLE_SPAWNER_DEFAULTS.travelDurationMs;
-        const getRetentionMs = () => props.retentionMs ?? PARTICLE_SPAWNER_DEFAULTS.retentionMs;
+        const getRestDurationMs = () => props.restDurationMs ?? PARTICLE_SPAWNER_DEFAULTS.restDurationMs;
         const getSpawnDelayMs = () => props.spawnDelayMs ?? PARTICLE_SPAWNER_DEFAULTS.spawnDelayMs;
         const getParticleCount = () => ParticleSpawnerUtils.toParticleCount(props.particleCount);
 
@@ -64,7 +64,7 @@ export const ParticleSpawner = defineComponent(
             getTiming: () => ({
                 spawnDelayMs: getSpawnDelayMs(),
                 travelDurationMs: getTravelDurationMs(),
-                retentionMs: getRetentionMs(),
+                restDurationMs: getRestDurationMs(),
             }),
             getCanSpawn: () => canSpawn.value,
             computeParticlePos: (travel, t) => props.computeParticlePos(travel, t),
@@ -99,7 +99,7 @@ export const ParticleSpawner = defineComponent(
                 pattern,
                 stage,
                 getTravelDurationMs,
-                getRetentionMs,
+                getRestDurationMs,
                 getSpawnDelayMs,
             ],
             ([isSpawnable, isOn, particleCount, current]) => {
@@ -157,7 +157,7 @@ export const ParticleSpawner = defineComponent(
             "targets": null,
             "particleCount": null,
             "travelDurationMs": null,
-            "retentionMs": null,
+            "restDurationMs": null,
             "spawnDelayMs": null,
             "spawnIterationPatterns": null,
             "playback": Boolean,

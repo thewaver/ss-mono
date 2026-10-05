@@ -107,7 +107,7 @@ export namespace SVGDefsReactUtils {
      * @returns The level to draw a cell at, from the cell's key — its row and column — and its live level.
      */
     export const usePatternTrail = (
-        opts: { trailMs: number; retentionMs: number; restLevel: number },
+        opts: { fadeDurationMs: number; fadeDelayMs: number; restLevel: number },
         pointer: Point2d | undefined,
     ) => {
         const hasTrail = TrackedPatternUtils.getHasTrail(opts);

@@ -1,6 +1,5 @@
 <script lang="ts">
     import { ScrambleTextWeights } from "@thewaver/ss-components-svelte";
-    import { MEASURE_BOX_PADDING } from "@thewaver/ss-playground/App/PageComponents/MeasureBox/MeasureBox.css";
     import * as styles from "@thewaver/ss-playground/App/Pages/TypewriterPage/TypewriterPage.css";
 
     import { TypewriterKnobs } from "../../Knobs/Typewriters.const";
@@ -104,9 +103,7 @@
 {/snippet}
 
 {#snippet karaokeExample()}
-    <PageMeasureBox width={textContainerWidth} padding={MEASURE_BOX_PADDING}>
-        <KaraokeExample />
-    </PageMeasureBox>
+    <KaraokeExample width={textContainerWidth} />
 {/snippet}
 
 {#snippet scrollLitExample()}

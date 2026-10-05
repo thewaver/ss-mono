@@ -2,6 +2,7 @@
     import { LightCatcher, Range } from "@thewaver/ss-components-svelte";
     import * as styles from "@thewaver/ss-playground/App/Pages/PointerEffects/LightCatcherPage/LightCatcherPage.css";
 
+    import PageMeasureBox from "../../../../PageComponents/MeasureBox/MeasureBox.svelte";
     import PageRangeContent from "../../../../StyledComponents/RangeContent/RangeContent.svelte";
     import type { LightCatcherExampleProps } from "../LightCatcherPageSvelte.types";
 
@@ -23,25 +24,27 @@
 </script>
 
 <div class={styles.placedStage}>
-    <div bind:this={row} class={styles.placedRow}>
-        {#each LAMPS as lamp (lamp)}
-            <div class={styles.lampSlot}>
-                <LightCatcher
-                    isDisabled={props.isDisabled}
-                    activeRangePx={props.activeRangePx}
-                    smoothingMs={props.smoothingMs}
-                    lightRangePx={props.lightRangePx}
-                    maxBrightness={props.maxBrightness}
-                    restingBrightness={props.restingBrightness}
-                    maxLightness={props.maxLightness}
-                    restingLightness={props.restingLightness}
-                    {pointSource}
-                >
-                    <div class={styles.lamp}>{lamp}</div>
-                </LightCatcher>
-            </div>
-        {/each}
-    </div>
+    <PageMeasureBox isFilling>
+        <div bind:this={row} class={styles.placedRow}>
+            {#each LAMPS as lamp (lamp)}
+                <div class={styles.lampSlot}>
+                    <LightCatcher
+                        isDisabled={props.isDisabled}
+                        activeRangePx={props.activeRangePx}
+                        smoothingMs={props.smoothingMs}
+                        lightRangePx={props.lightRangePx}
+                        maxBrightness={props.maxBrightness}
+                        restingBrightness={props.restingBrightness}
+                        maxLightness={props.maxLightness}
+                        restingLightness={props.restingLightness}
+                        {pointSource}
+                    >
+                        <div class={styles.lamp}>{lamp}</div>
+                    </LightCatcher>
+                </div>
+            {/each}
+        </div>
+    </PageMeasureBox>
 
     <div class={styles.slider}>
         <Range

@@ -16,7 +16,7 @@ export type {
 export type ParticleSpawnerExampleProps = AccessorProps<{
     particleCount: number;
     travelDurationMs: number;
-    retentionMs: number;
+    restDurationMs: number;
     spawnDelayMs: number;
     spawnIterationPatterns: ParticleSpawnIterationPattern[];
     computeParticlePos: ParticleTravelPatternFn;

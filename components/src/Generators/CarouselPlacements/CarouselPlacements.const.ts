@@ -16,6 +16,8 @@ export namespace CarouselPlacementDefaults {
 
     export const DRUM_DEFAULTS: Required<DrumPlacementDefs> = {
         perspectivePx: 1000,
+        faceCount: 0,
+        faceRatio: 1,
     };
 
     export const COVER_FLOW_DEFAULTS: Required<CoverFlowPlacementDefs> = {

@@ -25,10 +25,10 @@ import PagePropsGroups from "../../PageComponents/PropsPanel/PagePropsGroups.vue
 import PagePropsPanel from "../../PageComponents/PropsPanel/PagePropsPanel.vue";
 import CircleExampleWrapper from "./CircleExampleWrapper.vue";
 import CustomInputExampleWrapper from "./CustomInputExampleWrapper.vue";
+import ScrambledExample from "./Examples/Scrambled.vue";
 import HeadingExampleWrapper from "./HeadingExampleWrapper.vue";
 import type { PaintedTextExampleWrapperProps } from "./PaintedTextPage.types";
 import ParagraphExampleWrapper from "./ParagraphExampleWrapper.vue";
-import ScrambledExampleWrapper from "./ScrambledExampleWrapper.vue";
 import TypedExampleWrapper from "./TypedExampleWrapper.vue";
 import WaveExampleWrapper from "./WaveExampleWrapper.vue";
 
@@ -294,7 +294,7 @@ const examples: ExampleDefs[] = [
             </template>
 
             <template #scrambled>
-                <ScrambledExampleWrapper v-bind="commonProps" />
+                <ScrambledExample v-bind="commonProps" />
             </template>
 
             <template #circle>

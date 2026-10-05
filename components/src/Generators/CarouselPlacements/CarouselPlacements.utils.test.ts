@@ -63,6 +63,20 @@ describe("drum", () => {
         expect(back.effect.rotateY).toBe(180);
         expect(back.layer!).toBeLessThan(front.layer!);
     });
+
+    it("keeps its step whatever the slide count once its faces are fixed", () => {
+        const drum = CarouselPlacementUtils.createDrum({ faceCount: 18 });
+
+        expect(drum(at(1, { count: 6 })).effect.rotateY).toBe(20);
+        expect(drum(at(1, { count: 40 })).effect.rotateY).toBe(20);
+    });
+
+    it("draws a slide only while it is less than half a turn away, so the drum never wraps onto itself", () => {
+        const drum = CarouselPlacementUtils.createDrum({ faceCount: 18 });
+
+        expect(drum(at(4, { count: 40 })).effect.opacity, "drawn, with no filter to flatten it").toBeUndefined();
+        expect(drum(at(12, { count: 40 })).effect.opacity).toBe(0);
+    });
 });
 
 describe("cover flow", () => {

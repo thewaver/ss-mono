@@ -41,7 +41,7 @@ export const PanExample = (props: Props) => {
                         />
                     )}
                     renderSocket={(_getSocket, getFlags) => <PagePatchSocket flags={getFlags} />}
-                    renderCable={(getDefs) => <PagePatchCable defs={getDefs} />}
+                    renderCable={(getDefs) => <PagePatchCable defs={getDefs} isBeamPlaying={props.isBeamPlaying} />}
                     onLink={props.onLink}
                     onUnlink={props.onUnlink}
                     onMove={props.onMove}

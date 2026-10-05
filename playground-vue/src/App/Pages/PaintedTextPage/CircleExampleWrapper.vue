@@ -2,16 +2,14 @@
 import { computed, shallowRef, useModel } from "vue";
 
 import { PAINTED_TEXT_DEFAULTS } from "@thewaver/ss-components-vue";
-import { MEASURE_BOX_PADDING } from "@thewaver/ss-playground/App/PageComponents/MeasureBox/MeasureBox.css";
 
 import { PaintedTextKnobs } from "../../Knobs/PaintedTexts.const";
 import PageExampleKnobs from "../../PageComponents/ExampleKnobs/PageExampleKnobs.vue";
 import PageCheckField from "../../PageComponents/Field/PageCheckField.vue";
 import PageNumberField from "../../PageComponents/Field/PageNumberField.vue";
-import PageMeasureBox from "../../PageComponents/MeasureBox/MeasureBox.vue";
 import PageProp from "../../PageComponents/Prop/Prop.vue";
 import CircleExample from "./Examples/Circle.vue";
-import type { PaintedTextExampleProps, PaintedTextPathExampleWrapperProps } from "./PaintedTextPage.types";
+import type { PaintedTextBoxedExampleProps, PaintedTextPathExampleWrapperProps } from "./PaintedTextPage.types";
 
 const props = defineProps<PaintedTextPathExampleWrapperProps>();
 
@@ -22,9 +20,8 @@ const radius = shallowRef(PaintedTextKnobs.STARTING_CIRCLE_RADIUS);
 const lapDurationMs = shallowRef(PAINTED_TEXT_DEFAULTS.lapDurationMs);
 const isFittedToPath = shallowRef(PaintedTextKnobs.STARTING_IS_FITTED_TO_PATH);
 
-const exampleProps = computed((): PaintedTextExampleProps => {
+const exampleProps = computed((): PaintedTextBoxedExampleProps => {
     const {
-        "width": _width,
         "progress": _progress,
         "onUpdate:progress": _onProgress,
         "playback": _playback,
@@ -37,16 +34,14 @@ const exampleProps = computed((): PaintedTextExampleProps => {
 </script>
 
 <template>
-    <PageMeasureBox :padding="MEASURE_BOX_PADDING">
-        <CircleExample
-            v-bind="exampleProps"
-            v-model:progress="progress"
-            v-model:playback="playback"
-            :radius="radius"
-            :lap-duration-ms="lapDurationMs"
-            :is-fitted-to-path="isFittedToPath"
-        />
-    </PageMeasureBox>
+    <CircleExample
+        v-bind="exampleProps"
+        v-model:progress="progress"
+        v-model:playback="playback"
+        :radius="radius"
+        :lap-duration-ms="lapDurationMs"
+        :is-fitted-to-path="isFittedToPath"
+    />
 
     <PageExampleKnobs>
         <PageProp

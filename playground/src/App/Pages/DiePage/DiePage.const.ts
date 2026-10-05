@@ -30,8 +30,8 @@ export const ICON_CLOUD_EMPTY_LABEL = "Empty";
 export const ICON_CLOUD_TURN_MS = 24000;
 
 export const ICON_CLOUD_STEPS = [
-    { direction: "left" as const, label: "Left" },
-    { direction: "up" as const, label: "Up" },
-    { direction: "down" as const, label: "Down" },
-    { direction: "right" as const, label: "Right" },
+    { direction: "left" as const, id: "dieCloudLeft", label: "Spin left" },
+    { direction: "up" as const, id: "dieCloudUp", label: "Spin up" },
+    { direction: "down" as const, id: "dieCloudDown", label: "Spin down" },
+    { direction: "right" as const, id: "dieCloudRight", label: "Spin right" },
 ];

@@ -15,7 +15,11 @@ export type PaintedTextExampleProps = {
     cellSize: Size2d;
 };
 
-export type PaintedTextPathExampleProps = PaintedTextExampleProps & {
+export type PaintedTextBoxedExampleProps = PaintedTextExampleProps & {
+    width?: number;
+};
+
+export type PaintedTextPathExampleProps = PaintedTextBoxedExampleProps & {
     lapDurationMs: number;
     progress: readonly [number, (value: number) => void];
     playback: readonly [boolean, (value: boolean) => void];

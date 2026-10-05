@@ -8,7 +8,6 @@ import GrowingExample from "./Examples/Growing.vue";
 import RowExample from "./Examples/Row.vue";
 import ScrolledExample from "./Examples/Scrolled.vue";
 import SectionsExample from "./Examples/Sections.vue";
-import WidthsExample from "./Examples/Widths.vue";
 
 const EXAMPLES_ROOT = "/src/App/Pages/Accordions/AccordionPage/Examples";
 
@@ -21,7 +20,6 @@ const growing = shallowRef<string[]>(["Shipping"]);
 const scrolled = shallowRef<string[]>([]);
 const deferred = shallowRef<string[]>([]);
 const row = shallowRef<string[]>(["Mountains"]);
-const widths = shallowRef<string[]>(["Mountains"]);
 
 const extraLines = shallowRef(STARTING_EXTRA_LINES);
 const built = shallowRef<string[]>([]);
@@ -86,14 +84,6 @@ const examples: ExampleDefs[] = [
             `expanded: ${JSON.stringify(row.value)} — the panels sit in a row and open in width; the left and right arrows walk the headers, and the new panel's content slides in from the side the person moved toward`,
         path: `${EXAMPLES_ROOT}/Row.vue`,
     },
-    {
-        key: "widths",
-        name: "A width for each panel",
-        span: 2,
-        readout: () =>
-            `expanded: ${JSON.stringify(widths.value)} — the row fills the box, and each panel opens to its own share of it; the one without a share takes what is left, and resizing the window keeps the shares`,
-        path: `${EXAMPLES_ROOT}/Widths.vue`,
-    },
 ];
 </script>
 
@@ -129,10 +119,6 @@ const examples: ExampleDefs[] = [
 
         <template #row>
             <RowExample v-model:expanded="row" />
-        </template>
-
-        <template #widths>
-            <WidthsExample v-model:expanded="widths" />
         </template>
     </PageExamples>
 </template>

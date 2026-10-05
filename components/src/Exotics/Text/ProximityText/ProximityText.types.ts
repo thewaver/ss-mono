@@ -1,5 +1,7 @@
 import type { LetterSegment } from "../../../Abstracts/LetterDriver/LetterDriver.types";
 
+export type ProximityTextDistanceAxis = "both" | "horizontal" | "vertical";
+
 export type ProximityTextLayoutState = {
     /** The measured text, split and wrapped for every letter at its last frame. */
     segments: LetterSegment[];

@@ -52,7 +52,7 @@ export const IconCloudExample = (props: Props) => {
                 {ICON_CLOUD_STEPS.map((step) => (
                     <Button
                         key={step.direction}
-                        id={`dieCloud${step.label}`}
+                        id={step.id}
                         renderContent={(flags) => <PageButtonContent flags={flags}>{step.label}</PageButtonContent>}
                         onClick={() => {
                             controller?.step(step.direction);

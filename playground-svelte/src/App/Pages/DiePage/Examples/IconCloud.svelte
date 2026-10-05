@@ -55,7 +55,7 @@
 
         {#each ICON_CLOUD_STEPS as step (step.direction)}
             <Button
-                id={`dieCloud${step.label}`}
+                id={step.id}
                 onClick={() => {
                     controller?.step(step.direction);
                 }}

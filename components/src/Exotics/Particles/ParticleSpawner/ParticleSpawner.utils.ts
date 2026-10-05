@@ -197,9 +197,9 @@ export namespace ParticleSpawnerUtils {
 
                 hasMoved = true;
 
-                const { travelDurationMs, retentionMs } = particle.round;
+                const { travelDurationMs, restDurationMs } = particle.round;
 
-                if (nowMs >= particle.spawnedAtMs + travelDurationMs + retentionMs) arrived.push(particle);
+                if (nowMs >= particle.spawnedAtMs + travelDurationMs + restDurationMs) arrived.push(particle);
             }
 
             if (arrived.length > 0) {

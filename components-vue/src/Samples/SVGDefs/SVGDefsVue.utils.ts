@@ -106,7 +106,7 @@ export namespace SVGDefsVueUtils {
 
     /**
      * The pixel trail of a pattern whose cells answer to the pointer: each cell lights as the pointer passes, holds for
-     * `retentionMs` and fades back to rest on its own over `trailMs`.
+     * `fadeDelayMs` and fades back to rest on its own over `fadeDurationMs`.
      *
      * A frame clock from {@link SVGDefsUtils.createClock} runs while the trail has something left to fade, woken by
      * every move of the pointer, and the component re-renders on each of its frames. Each cell's level is the higher of
@@ -129,23 +129,28 @@ export namespace SVGDefsVueUtils {
 
         let clock: ReturnType<typeof SVGDefsUtils.createClock> | undefined;
 
-        watchAfterRender([() => getOpts().trailMs, () => getOpts().retentionMs], ([trailMs, retentionMs]) => {
-            if (!TrackedPatternUtils.getHasTrail({ trailMs, retentionMs })) return;
+        watchAfterRender(
+            [() => getOpts().fadeDurationMs, () => getOpts().fadeDelayMs],
+            ([fadeDurationMs, fadeDelayMs]) => {
+                if (!TrackedPatternUtils.getHasTrail({ fadeDurationMs, fadeDelayMs })) return;
 
-            const next = SVGDefsUtils.createClock(TrackedPatternUtils.getTrailSpanMs({ trailMs, retentionMs }));
-            const release = next.retain();
-            const unsubscribe = next.frameMs.subscribe(() => {
-                frameMs.value = next.frameMs.get();
-            });
+                const next = SVGDefsUtils.createClock(
+                    TrackedPatternUtils.getTrailSpanMs({ fadeDurationMs, fadeDelayMs }),
+                );
+                const release = next.retain();
+                const unsubscribe = next.frameMs.subscribe(() => {
+                    frameMs.value = next.frameMs.get();
+                });
 
-            clock = next;
+                clock = next;
 
-            return () => {
-                unsubscribe();
-                release();
-                clock = undefined;
-            };
-        });
+                return () => {
+                    unsubscribe();
+                    release();
+                    clock = undefined;
+                };
+            },
+        );
 
         watch(getPointer, (pointer) => {
             if (pointer) clock?.keepAwake();

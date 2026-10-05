@@ -3,14 +3,16 @@ import { shallowRef, useId } from "vue";
 
 import { Button, MediaQueryMonitorVueUtils, PaintedText, Typewriter } from "@thewaver/ss-components-vue";
 import type { TypewriterController } from "@thewaver/ss-components-vue";
+import { MEASURE_BOX_PADDING } from "@thewaver/ss-playground/App/PageComponents/MeasureBox/MeasureBox.css";
 import * as styles from "@thewaver/ss-playground/App/Pages/PaintedTextPage/PaintedTextPage.css";
 import type { Size2d } from "@thewaver/ss-utils";
 
+import PageMeasureBox from "../../../PageComponents/MeasureBox/MeasureBox.vue";
 import PageButtonContent from "../../../StyledComponents/ButtonContent/ButtonContent.vue";
 import { computeSampleDefs } from "../PaintedTextPage.const";
-import type { PaintedTextExampleProps } from "../PaintedTextPage.types";
+import type { PaintedTextBoxedExampleProps } from "../PaintedTextPage.types";
 
-type Props = PaintedTextExampleProps & {
+type Props = PaintedTextBoxedExampleProps & {
     computeAnimationName: (character: string, index: number, count: number) => string;
 };
 
@@ -51,45 +53,47 @@ const computeBodyStrokeDefs = (size: Size2d, element: HTMLElement | undefined) =
 
 <template>
     <div :class="styles.stack">
-        <div :class="styles.fill">
-            <Typewriter
-                :compute-animation-name="computeAnimationName"
-                :animation-delay-ms="40"
-                :animation-duration-ms="400"
-                @mount="setController"
-            >
-                <template #default>
-                    <div :class="styles.typedHeading">
-                        <PaintedText
-                            :compute-fill-defs="computeHeadingFillDefs"
-                            :compute-stroke-defs="computeHeadingStrokeDefs"
-                            :stroke-width="strokeWidth"
-                            :stroke-alignment="strokeAlignment"
-                        >
-                            Typed and painted
-                        </PaintedText>
-                    </div>
+        <PageMeasureBox :width="width" :padding="MEASURE_BOX_PADDING">
+            <div :class="styles.fill">
+                <Typewriter
+                    :compute-animation-name="computeAnimationName"
+                    :animation-delay-ms="40"
+                    :animation-duration-ms="400"
+                    @mount="setController"
+                >
+                    <template #default>
+                        <div :class="styles.typedHeading">
+                            <PaintedText
+                                :compute-fill-defs="computeHeadingFillDefs"
+                                :compute-stroke-defs="computeHeadingStrokeDefs"
+                                :stroke-width="strokeWidth"
+                                :stroke-alignment="strokeAlignment"
+                            >
+                                Typed and painted
+                            </PaintedText>
+                        </div>
 
-                    <div :class="styles.paragraph">
-                        <PaintedText
-                            :compute-fill-defs="computeBodyFillDefs"
-                            :compute-stroke-defs="computeBodyStrokeDefs"
-                            :stroke-width="strokeWidth"
-                            :stroke-alignment="strokeAlignment"
-                        >
-                            The heading types first, then this line carries on from where it ended.
-                        </PaintedText>
-                    </div>
-                </template>
+                        <div :class="styles.paragraph">
+                            <PaintedText
+                                :compute-fill-defs="computeBodyFillDefs"
+                                :compute-stroke-defs="computeBodyStrokeDefs"
+                                :stroke-width="strokeWidth"
+                                :stroke-alignment="strokeAlignment"
+                            >
+                                The heading types first, then this line carries on from where it ended.
+                            </PaintedText>
+                        </div>
+                    </template>
 
-                <template #renderCaret>
-                    <span
-                        :class="[styles.caret, !isBlinkStopped && !prefersReducedMotion && styles.caretBlinking]"
-                        aria-hidden="true"
-                    />
-                </template>
-            </Typewriter>
-        </div>
+                    <template #renderCaret>
+                        <span
+                            :class="[styles.caret, !isBlinkStopped && !prefersReducedMotion && styles.caretBlinking]"
+                            aria-hidden="true"
+                        />
+                    </template>
+                </Typewriter>
+            </div>
+        </PageMeasureBox>
 
         <div :class="styles.buttonRow">
             <Button id="typeAgain" @click="restart">

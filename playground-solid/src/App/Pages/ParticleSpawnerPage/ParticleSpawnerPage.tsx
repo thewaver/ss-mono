@@ -79,7 +79,7 @@ const StressTestWrapper = (props: ParticleSpawnerExampleProps) => {
 export const ParticleSpawnerPage = () => {
     const [getParticleCount, setParticleCount] = createSignal(ParticleSpawnerKnobs.STARTING_PARTICLE_COUNT);
     const [getTravelDurationMs, setTravelDurationMs] = createSignal(PARTICLE_SPAWNER_DEFAULTS.travelDurationMs);
-    const [getRetentionMs, setRetentionMs] = createSignal(PARTICLE_SPAWNER_DEFAULTS.retentionMs);
+    const [getRestDurationMs, setRestDurationMs] = createSignal(PARTICLE_SPAWNER_DEFAULTS.restDurationMs);
     const [getSpawnDelayMs, setSpawnDelayMs] = createSignal(ParticleSpawnerKnobs.STARTING_SPAWN_DELAY_MS);
     const [getOvershootPercent, setOvershootPercent] = createSignal(ParticleSpawnerKnobs.STARTING_OVERSHOOT_PERCENT);
     const [getTravelEasingKey, setTravelEasingKey] = createSignal<TravelEasingKey>(
@@ -119,7 +119,7 @@ export const ParticleSpawnerPage = () => {
         const commonProps: ParticleSpawnerExampleProps = {
             particleCount: getParticleCount,
             travelDurationMs: getTravelDurationMs,
-            retentionMs: getRetentionMs,
+            restDurationMs: getRestDurationMs,
             spawnDelayMs: getSpawnDelayMs,
             spawnIterationPatterns: () => ITERATION_PATTERNS[getIterationPatternKey()](),
             computeParticlePos: (defs, t) => getComputeParticlePos()(defs, t),
@@ -303,18 +303,18 @@ export const ParticleSpawnerPage = () => {
                     </PageProp>
 
                     <PageProp
-                        key={"retentionMs"}
-                        label={"Retention (ms)"}
+                        key={"restDurationMs"}
+                        label={"Rest duration (ms)"}
                         hint={"How long a particle stays put at the end of its path before it disappears."}
                     >
                         <PageNumberField
-                            value={getRetentionMs}
+                            value={getRestDurationMs}
                             min={() => ParticleSpawnerKnobs.MIN_RETENTION_MS}
                             max={() => ParticleSpawnerKnobs.MAX_RETENTION_MS}
                             step={() => ParticleSpawnerKnobs.RETENTION_STEP_MS}
                             width={() => FIELD_WIDTH}
-                            ariaLabel={"Retention in milliseconds"}
-                            onInput={setRetentionMs}
+                            ariaLabel={"Rest duration in milliseconds"}
+                            onInput={setRestDurationMs}
                         />
                     </PageProp>
 
