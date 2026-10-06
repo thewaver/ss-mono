@@ -9,8 +9,9 @@ import {
     ICON_CLOUD_STEPS,
 } from "@thewaver/ss-playground/App/Pages/DiePage/DiePage.const";
 import * as styles from "@thewaver/ss-playground/App/Pages/DiePage/DiePage.css";
+import { CONTROL_GLYPHS } from "@thewaver/ss-playground/App/StyledComponents/ControlButtonContent/ControlButtonContent.const";
 
-import PageButtonContent from "../../../StyledComponents/ButtonContent/ButtonContent.vue";
+import PageControlButtonContent from "../../../StyledComponents/ControlButtonContent/ControlButtonContent.vue";
 import PageDieIcon from "../../../StyledComponents/DieContent/PageDieIcon.vue";
 import type { IconCloudExampleProps } from "../DiePage.types";
 
@@ -57,9 +58,12 @@ const stepCloud = (direction: RollerDirection) => {
         </Die>
 
         <div :class="styles.controls">
-            <Button id="dieCloudPlayback" @click="togglePlayback">
+            <Button id="dieCloudPlayback" :ariaLabel="autoSpin ? 'Pause' : 'Play'" @click="togglePlayback">
                 <template #renderContent="flags">
-                    <PageButtonContent :flags="flags">{{ autoSpin ? "Pause" : "Play" }}</PageButtonContent>
+                    <PageControlButtonContent
+                        :flags="flags"
+                        :glyph="autoSpin ? CONTROL_GLYPHS.pause : CONTROL_GLYPHS.play"
+                    />
                 </template>
             </Button>
 
@@ -67,10 +71,11 @@ const stepCloud = (direction: RollerDirection) => {
                 v-for="step in ICON_CLOUD_STEPS"
                 :id="step.id"
                 :key="step.direction"
+                :ariaLabel="step.label"
                 @click="stepCloud(step.direction)"
             >
                 <template #renderContent="flags">
-                    <PageButtonContent :flags="flags">{{ step.label }}</PageButtonContent>
+                    <PageControlButtonContent :flags="flags" :glyph="CONTROL_GLYPHS[step.direction]" />
                 </template>
             </Button>
         </div>

@@ -3,8 +3,9 @@
     import { MorphTextKnobs } from "@thewaver/ss-playground/App/Knobs/MorphTexts.const";
     import { MORPH_WORDS } from "@thewaver/ss-playground/App/Pages/MorphTextPage/MorphTextPage.const";
     import * as styles from "@thewaver/ss-playground/App/Pages/MorphTextPage/MorphTextPage.css";
+    import { CONTROL_GLYPHS } from "@thewaver/ss-playground/App/StyledComponents/ControlButtonContent/ControlButtonContent.const";
 
-    import PageButtonContent from "../../../StyledComponents/ButtonContent/ButtonContent.svelte";
+    import PageControlButtonContent from "../../../StyledComponents/ControlButtonContent/ControlButtonContent.svelte";
     import type { MorphTextExampleProps } from "../MorphTextPage.types";
 
     type Props = MorphTextExampleProps;
@@ -36,12 +37,13 @@
 
     <Button
         id={"morphWordsPlayback"}
+        ariaLabel={isPlaying ? "Pause" : "Play"}
         onClick={() => {
             isPlaying = !isPlaying;
         }}
     >
         {#snippet renderContent(flags)}
-            <PageButtonContent {flags}>{isPlaying ? "Pause" : "Play"}</PageButtonContent>
+            <PageControlButtonContent {flags} glyph={isPlaying ? CONTROL_GLYPHS.pause : CONTROL_GLYPHS.play} />
         {/snippet}
     </Button>
 </div>

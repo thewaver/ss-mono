@@ -3,8 +3,9 @@ import { useModel } from "vue";
 
 import { Button, Cuboid } from "@thewaver/ss-components-vue";
 import { computeCuboidFaceLabel } from "@thewaver/ss-playground/App/PageComponents/Announcements/Announcements.const";
+import { CONTROL_GLYPHS } from "@thewaver/ss-playground/App/StyledComponents/ControlButtonContent/ControlButtonContent.const";
 
-import PageButtonContent from "../../../StyledComponents/ButtonContent/ButtonContent.vue";
+import PageControlButtonContent from "../../../StyledComponents/ControlButtonContent/ControlButtonContent.vue";
 import PageCuboidFace from "../../../StyledComponents/CuboidContent/PageCuboidFace.vue";
 import PageCuboidPad from "../../../StyledComponents/CuboidContent/PageCuboidPad.vue";
 import PageCuboidStack from "../../../StyledComponents/CuboidContent/PageCuboidStack.vue";
@@ -47,27 +48,27 @@ const turnPitch = (turn: number) => {
             <div />
             <Button id="pitchUp" ariaLabel="Turn the top towards you" @click="turnPitch(QUARTER_TURN)">
                 <template #renderContent="flags">
-                    <PageButtonContent :flags="flags">↑</PageButtonContent>
+                    <PageControlButtonContent :flags="flags" :glyph="CONTROL_GLYPHS.up" />
                 </template>
             </Button>
             <div />
 
             <Button id="yawLeft" ariaLabel="Turn the left face towards you" @click="turnYaw(-QUARTER_TURN)">
                 <template #renderContent="flags">
-                    <PageButtonContent :flags="flags">←</PageButtonContent>
+                    <PageControlButtonContent :flags="flags" :glyph="CONTROL_GLYPHS.left" />
                 </template>
             </Button>
             <div />
             <Button id="yawRight" ariaLabel="Turn the right face towards you" @click="turnYaw(QUARTER_TURN)">
                 <template #renderContent="flags">
-                    <PageButtonContent :flags="flags">→</PageButtonContent>
+                    <PageControlButtonContent :flags="flags" :glyph="CONTROL_GLYPHS.right" />
                 </template>
             </Button>
 
             <div />
             <Button id="pitchDown" ariaLabel="Turn the bottom towards you" @click="turnPitch(-QUARTER_TURN)">
                 <template #renderContent="flags">
-                    <PageButtonContent :flags="flags">↓</PageButtonContent>
+                    <PageControlButtonContent :flags="flags" :glyph="CONTROL_GLYPHS.down" />
                 </template>
             </Button>
             <div />

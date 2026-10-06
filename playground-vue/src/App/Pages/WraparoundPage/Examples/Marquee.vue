@@ -4,8 +4,9 @@ import { useModel } from "vue";
 import { Button, Wraparound } from "@thewaver/ss-components-vue";
 import { MARQUEE_WORDS } from "@thewaver/ss-playground/App/Pages/WraparoundPage/WraparoundPage.const";
 import * as styles from "@thewaver/ss-playground/App/Pages/WraparoundPage/WraparoundPage.css";
+import { CONTROL_GLYPHS } from "@thewaver/ss-playground/App/StyledComponents/ControlButtonContent/ControlButtonContent.const";
 
-import PageButtonContent from "../../../StyledComponents/ButtonContent/ButtonContent.vue";
+import PageControlButtonContent from "../../../StyledComponents/ControlButtonContent/ControlButtonContent.vue";
 import type { WraparoundMarqueeExampleProps } from "../WraparoundPage.types";
 
 type Props = WraparoundMarqueeExampleProps;
@@ -37,9 +38,12 @@ const togglePlayback = () => {
             </Wraparound>
         </div>
 
-        <Button id="marqueePlayback" @click="togglePlayback">
+        <Button id="marqueePlayback" :ariaLabel="playback ? 'Pause' : 'Play'" @click="togglePlayback">
             <template #renderContent="flags">
-                <PageButtonContent :flags="flags">{{ playback ? "Pause" : "Play" }}</PageButtonContent>
+                <PageControlButtonContent
+                    :flags="flags"
+                    :glyph="playback ? CONTROL_GLYPHS.pause : CONTROL_GLYPHS.play"
+                />
             </template>
         </Button>
     </div>

@@ -13,6 +13,7 @@ const cardFace = style({
     height: "100%",
     borderRadius: themeVars.borderRadius.half,
     color: layerVars.contrast,
+    userSelect: "none",
 });
 
 export const flipCardFront = style([

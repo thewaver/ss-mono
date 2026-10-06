@@ -3,11 +3,12 @@ import { useEffect, useRef, useState } from "react";
 import { Bracket, BracketUtils, Button } from "@thewaver/ss-components-react";
 import type { BracketNode, BracketStep } from "@thewaver/ss-components-react";
 import * as styles from "@thewaver/ss-playground/App/Pages/BracketPage/BracketPage.css";
+import { CONTROL_GLYPHS } from "@thewaver/ss-playground/App/StyledComponents/ControlButtonContent/ControlButtonContent.const";
 import { EasingUtils, MathUtils } from "@thewaver/ss-utils";
 import { assignInlineVars } from "@vanilla-extract/dynamic";
 
 import { PageMeasureBox } from "../../../PageComponents/MeasureBox/MeasureBox";
-import { PageButtonContent } from "../../../StyledComponents/ButtonContent/ButtonContent";
+import { PageControlButtonContent } from "../../../StyledComponents/ControlButtonContent/ControlButtonContent";
 import {
     branch,
     computeBracketPinnedLayerHeader,
@@ -165,8 +166,12 @@ export const FamilyExample = (props: Props) => {
             <div className={styles.familyControls}>
                 <Button
                     id={"familyZoom"}
+                    ariaLabel={isZoomedIn ? "Zoom out" : "Zoom in"}
                     renderContent={(flags) => (
-                        <PageButtonContent flags={flags}>{isZoomedIn ? "Zoom out" : "Zoom in"}</PageButtonContent>
+                        <PageControlButtonContent
+                            flags={flags}
+                            glyph={isZoomedIn ? CONTROL_GLYPHS.zoomOut : CONTROL_GLYPHS.zoomIn}
+                        />
                     )}
                     onClick={() => {
                         setIsZoomedIn((zoomedIn) => !zoomedIn);
@@ -178,7 +183,8 @@ export const FamilyExample = (props: Props) => {
                         key={entry.step}
                         id={`familyStep-${entry.step}`}
                         isDisabled={!isZoomedIn || computeStep(entry.step) === family}
-                        renderContent={(flags) => <PageButtonContent flags={flags}>{entry.label}</PageButtonContent>}
+                        ariaLabel={entry.label}
+                        renderContent={(flags) => <PageControlButtonContent flags={flags} glyph={entry.glyph} />}
                         onClick={() => {
                             setFamily(computeStep(entry.step));
                         }}

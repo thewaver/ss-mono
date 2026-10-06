@@ -2,9 +2,10 @@
     import { Button, Trail } from "@thewaver/ss-components-svelte";
     import type { TrailController } from "@thewaver/ss-components-svelte";
     import * as styles from "@thewaver/ss-playground/App/Pages/TrailPage/TrailPage.css";
+    import { CONTROL_GLYPHS } from "@thewaver/ss-playground/App/StyledComponents/ControlButtonContent/ControlButtonContent.const";
 
     import PageMeasureBox from "../../../PageComponents/MeasureBox/MeasureBox.svelte";
-    import PageButtonContent from "../../../StyledComponents/ButtonContent/ButtonContent.svelte";
+    import PageControlButtonContent from "../../../StyledComponents/ControlButtonContent/ControlButtonContent.svelte";
     import PageTrailTrack from "../../../StyledComponents/TrailContent/PageTrailTrack.svelte";
     import PageTrailVehicle from "../../../StyledComponents/TrailContent/PageTrailVehicle.svelte";
     import type { TrailExampleProps } from "../TrailPage.types";
@@ -48,34 +49,37 @@
     <div class={styles.controls}>
         <Button
             id={"circuitPlay"}
+            ariaLabel={"Play"}
             onClick={() => {
                 playback = true;
             }}
         >
             {#snippet renderContent(flags)}
-                <PageButtonContent {flags}>Play</PageButtonContent>
+                <PageControlButtonContent {flags} glyph={CONTROL_GLYPHS.play} />
             {/snippet}
         </Button>
 
         <Button
             id={"circuitPause"}
+            ariaLabel={"Pause"}
             onClick={() => {
                 playback = false;
             }}
         >
             {#snippet renderContent(flags)}
-                <PageButtonContent {flags}>Pause</PageButtonContent>
+                <PageControlButtonContent {flags} glyph={CONTROL_GLYPHS.pause} />
             {/snippet}
         </Button>
 
         <Button
             id={"circuitRewind"}
+            ariaLabel={"Back to start"}
             onClick={() => {
                 controller?.seek(0);
             }}
         >
             {#snippet renderContent(flags)}
-                <PageButtonContent {flags}>Back to start</PageButtonContent>
+                <PageControlButtonContent {flags} glyph={CONTROL_GLYPHS.toStart} />
             {/snippet}
         </Button>
     </div>

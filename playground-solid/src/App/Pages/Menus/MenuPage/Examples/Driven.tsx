@@ -2,7 +2,7 @@ import { createSignal } from "solid-js";
 
 import { Button, Menu } from "@thewaver/ss-components-solid";
 
-import { PageButtonContent } from "../../../../StyledComponents/ButtonContent/ButtonContent";
+import { PageControlButtonContent } from "../../../../StyledComponents/ControlButtonContent/ControlButtonContent";
 import { renderPageHighlightFloater } from "../../../../StyledComponents/GlideFloater/GlideFloater";
 import { PageMenuTriggerContent } from "../../../../StyledComponents/MenuTriggerContent/MenuTriggerContent";
 import { ACTIONS, renderMenuItem, renderMenuPopup } from "../MenuPage.const";
@@ -30,11 +30,10 @@ export const DrivenExample = (props: Props) => {
             <Button
                 ref={setAnchorRef}
                 id={"menuToggle"}
-                ariaLabel={"Toggle the menu from outside"}
                 renderContent={(getFlags) => (
-                    <PageButtonContent flags={getFlags}>
+                    <PageControlButtonContent flags={getFlags}>
                         {props.visibility[0]() ? "Close it" : "Open it"}
-                    </PageButtonContent>
+                    </PageControlButtonContent>
                 )}
                 onClick={() => {
                     props.visibility[1]((prev) => !prev);

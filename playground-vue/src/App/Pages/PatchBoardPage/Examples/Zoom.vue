@@ -10,9 +10,10 @@ import {
     ZOOM_STEP,
 } from "@thewaver/ss-playground/App/Pages/PatchBoardPage/PatchBoardPage.const";
 import * as styles from "@thewaver/ss-playground/App/Pages/PatchBoardPage/PatchBoardPage.css";
+import { CONTROL_GLYPHS } from "@thewaver/ss-playground/App/StyledComponents/ControlButtonContent/ControlButtonContent.const";
 
 import PageMeasureBox from "../../../PageComponents/MeasureBox/MeasureBox.vue";
-import PageButtonContent from "../../../StyledComponents/ButtonContent/ButtonContent.vue";
+import PageControlButtonContent from "../../../StyledComponents/ControlButtonContent/ControlButtonContent.vue";
 import PagePatchCable from "../../../StyledComponents/PatchBoardContent/PagePatchCable.vue";
 import PagePatchNode from "../../../StyledComponents/PatchBoardContent/PagePatchNode.vue";
 import PagePatchSocket from "../../../StyledComponents/PatchBoardContent/PagePatchSocket.vue";
@@ -30,18 +31,24 @@ const links = useModel(props, "links");
     <div :class="styles.zoomStage">
         <div :class="styles.zoomControls">
             <Button
+                ariaLabel="Zoom out"
                 id="patchBoardZoomOut"
                 :is-disabled="zoom <= MIN_ZOOM"
                 @click="props.onZoomChange(zoom - ZOOM_STEP)"
             >
                 <template #renderContent="flags">
-                    <PageButtonContent :flags="flags">Zoom out</PageButtonContent>
+                    <PageControlButtonContent :flags="flags" :glyph="CONTROL_GLYPHS.zoomOut" />
                 </template>
             </Button>
 
-            <Button id="patchBoardZoomIn" :is-disabled="zoom >= MAX_ZOOM" @click="props.onZoomChange(zoom + ZOOM_STEP)">
+            <Button
+                id="patchBoardZoomIn"
+                ariaLabel="Zoom in"
+                :is-disabled="zoom >= MAX_ZOOM"
+                @click="props.onZoomChange(zoom + ZOOM_STEP)"
+            >
                 <template #renderContent="flags">
-                    <PageButtonContent :flags="flags">Zoom in</PageButtonContent>
+                    <PageControlButtonContent :flags="flags" :glyph="CONTROL_GLYPHS.zoomIn" />
                 </template>
             </Button>
         </div>

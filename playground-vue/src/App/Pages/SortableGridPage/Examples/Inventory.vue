@@ -12,8 +12,9 @@ import type {
 import { SORTABLE_GRID_ANNOUNCEMENTS } from "@thewaver/ss-playground/App/PageComponents/Announcements/Announcements.const";
 import * as styles from "@thewaver/ss-playground/App/Pages/SortableGridPage/SortableGridPage.css";
 import type { Gear } from "@thewaver/ss-playground/App/Pages/SortableGridPage/SortableGridPage.types";
+import { CONTROL_GLYPHS } from "@thewaver/ss-playground/App/StyledComponents/ControlButtonContent/ControlButtonContent.const";
 
-import PageButtonContent from "../../../StyledComponents/ButtonContent/ButtonContent.vue";
+import PageControlButtonContent from "../../../StyledComponents/ControlButtonContent/ControlButtonContent.vue";
 import PageSortableGridCell from "../../../StyledComponents/SortableGridContent/PageSortableGridCell.vue";
 import PageSortableGridItemContent from "../../../StyledComponents/SortableGridContent/PageSortableGridItemContent.vue";
 import PageSortableGridLanding from "../../../StyledComponents/SortableGridContent/PageSortableGridLanding.vue";
@@ -114,13 +115,13 @@ watch(
         <div v-if="hasTurnButtons" :class="styles.sortableGridTurnControls">
             <Button ariaLabel="Turn counterclockwise" :is-disabled="!isCarrying" @click="turn(-1)">
                 <template #renderContent="flags">
-                    <PageButtonContent :flags="flags">{{ "↺" }}</PageButtonContent>
+                    <PageControlButtonContent :flags="flags" :glyph="CONTROL_GLYPHS.turnLeft" />
                 </template>
             </Button>
 
             <Button ariaLabel="Turn clockwise" :is-disabled="!isCarrying" @click="turn(1)">
                 <template #renderContent="flags">
-                    <PageButtonContent :flags="flags">{{ "↻" }}</PageButtonContent>
+                    <PageControlButtonContent :flags="flags" :glyph="CONTROL_GLYPHS.turnRight" />
                 </template>
             </Button>
         </div>
@@ -135,7 +136,7 @@ watch(
                 "
             >
                 <template #renderContent="flags">
-                    <PageButtonContent :flags="flags">{{ "Tidy up" }}</PageButtonContent>
+                    <PageControlButtonContent :flags="flags">{{ "Tidy up" }}</PageControlButtonContent>
                 </template>
             </Button>
         </div>

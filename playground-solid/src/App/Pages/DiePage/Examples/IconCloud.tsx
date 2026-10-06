@@ -8,8 +8,9 @@ import {
     ICON_CLOUD_STEPS,
 } from "@thewaver/ss-playground/App/Pages/DiePage/DiePage.const";
 import * as styles from "@thewaver/ss-playground/App/Pages/DiePage/DiePage.css";
+import { CONTROL_GLYPHS } from "@thewaver/ss-playground/App/StyledComponents/ControlButtonContent/ControlButtonContent.const";
 
-import { PageButtonContent } from "../../../StyledComponents/ButtonContent/ButtonContent";
+import { PageControlButtonContent } from "../../../StyledComponents/ControlButtonContent/ControlButtonContent";
 import { PageDieIcon } from "../../../StyledComponents/DieContent/DieContent";
 import type { IconCloudExampleProps } from "../DiePage.types";
 
@@ -43,8 +44,12 @@ export const IconCloudExample = (props: Props) => {
             <div class={styles.controls}>
                 <Button
                     id={"dieCloudPlayback"}
+                    ariaLabel={() => (getAutoSpin() ? "Pause" : "Play")}
                     renderContent={(getFlags) => (
-                        <PageButtonContent flags={getFlags}>{getAutoSpin() ? "Pause" : "Play"}</PageButtonContent>
+                        <PageControlButtonContent
+                            flags={getFlags}
+                            glyph={() => (getAutoSpin() ? CONTROL_GLYPHS.pause : CONTROL_GLYPHS.play)}
+                        />
                     )}
                     onClick={() => {
                         setAutoSpin(!getAutoSpin());
@@ -55,8 +60,9 @@ export const IconCloudExample = (props: Props) => {
                     {(step) => (
                         <Button
                             id={step.id}
+                            ariaLabel={step.label}
                             renderContent={(getFlags) => (
-                                <PageButtonContent flags={getFlags}>{step.label}</PageButtonContent>
+                                <PageControlButtonContent flags={getFlags} glyph={CONTROL_GLYPHS[step.direction]} />
                             )}
                             onClick={() => {
                                 getController()?.step(step.direction);

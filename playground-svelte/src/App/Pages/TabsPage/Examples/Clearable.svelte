@@ -7,7 +7,7 @@
     import { CLEARABLE_TABS, ROW_TAB_GAP } from "@thewaver/ss-playground/App/Pages/TabsPage/TabsPage.const";
 
     import PageControlColumn from "../../../PageComponents/ControlRow/PageControlColumn.svelte";
-    import PageButtonContent from "../../../StyledComponents/ButtonContent/ButtonContent.svelte";
+    import PageControlButtonContent from "../../../StyledComponents/ControlButtonContent/ControlButtonContent.svelte";
     import PageTabContent from "../../../StyledComponents/TabContent/PageTabContent.svelte";
     import PageTabFloater from "../../../StyledComponents/TabContent/PageTabFloater.svelte";
     import PageTabGutter from "../../../StyledComponents/TabContent/PageTabGutter.svelte";
@@ -45,7 +45,7 @@
 
     <Button ariaLabel={"Clear the selection"} onClick={async () => props.onClear()}>
         {#snippet renderContent(flags)}
-            <PageButtonContent {flags}>Clear</PageButtonContent>
+            <PageControlButtonContent {flags}>Clear</PageControlButtonContent>
         {/snippet}
     </Button>
 </PageControlColumn>

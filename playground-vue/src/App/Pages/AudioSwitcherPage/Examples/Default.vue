@@ -4,8 +4,9 @@ import { shallowRef, useModel } from "vue";
 import { AudioSwitcher, Button } from "@thewaver/ss-components-vue";
 import type { AudioSwitcherController } from "@thewaver/ss-components-vue";
 import * as styles from "@thewaver/ss-playground/App/Pages/AudioSwitcherPage/AudioSwitcherPage.css";
+import { CONTROL_GLYPHS } from "@thewaver/ss-playground/App/StyledComponents/ControlButtonContent/ControlButtonContent.const";
 
-import PageButtonContent from "../../../StyledComponents/ButtonContent/ButtonContent.vue";
+import PageControlButtonContent from "../../../StyledComponents/ControlButtonContent/ControlButtonContent.vue";
 import type { AudioSwitcherExampleProps } from "../AudioSwitcherPage.types";
 
 type Props = AudioSwitcherExampleProps;
@@ -28,15 +29,18 @@ const startOver = () => {
 <template>
     <div :class="styles.deck">
         <div :class="styles.row">
-            <Button @click="togglePlayback">
+            <Button :ariaLabel="isPlaying ? 'Stop' : 'Play'" @click="togglePlayback">
                 <template #renderContent="flags">
-                    <PageButtonContent :flags="flags">{{ isPlaying ? "Stop" : "Play" }}</PageButtonContent>
+                    <PageControlButtonContent
+                        :flags="flags"
+                        :glyph="isPlaying ? CONTROL_GLYPHS.stop : CONTROL_GLYPHS.play"
+                    />
                 </template>
             </Button>
 
-            <Button :is-disabled="!isPlaying" @click="startOver">
+            <Button ariaLabel="Start over" :is-disabled="!isPlaying" @click="startOver">
                 <template #renderContent="flags">
-                    <PageButtonContent :flags="flags">Start over</PageButtonContent>
+                    <PageControlButtonContent :flags="flags" :glyph="CONTROL_GLYPHS.replay" />
                 </template>
             </Button>
         </div>

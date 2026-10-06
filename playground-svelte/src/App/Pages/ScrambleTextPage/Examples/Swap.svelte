@@ -2,9 +2,10 @@
     import { Button, ScrambleText } from "@thewaver/ss-components-svelte";
     import { MEASURE_BOX_PADDING } from "@thewaver/ss-playground/App/PageComponents/MeasureBox/MeasureBox.css";
     import * as styles from "@thewaver/ss-playground/App/Pages/ScrambleTextPage/ScrambleTextPage.css";
+    import { CONTROL_GLYPHS } from "@thewaver/ss-playground/App/StyledComponents/ControlButtonContent/ControlButtonContent.const";
 
     import PageMeasureBox from "../../../PageComponents/MeasureBox/MeasureBox.svelte";
-    import PageButtonContent from "../../../StyledComponents/ButtonContent/ButtonContent.svelte";
+    import PageControlButtonContent from "../../../StyledComponents/ControlButtonContent/ControlButtonContent.svelte";
     import type { ScrambleTextExampleProps } from "../ScrambleTextPage.types";
 
     const STATUSES = ["CONNECTING", "HANDSHAKE", "AUTHORIZED", "STREAMING", "IDLE"];
@@ -33,12 +34,13 @@
 
     <Button
         id={"nextStatus"}
+        ariaLabel={"Next status"}
         onClick={() => {
             statusIndex = (statusIndex + 1) % STATUSES.length;
         }}
     >
         {#snippet renderContent(flags)}
-            <PageButtonContent {flags}>Next status</PageButtonContent>
+            <PageControlButtonContent {flags} glyph={CONTROL_GLYPHS.next} />
         {/snippet}
     </Button>
 </div>

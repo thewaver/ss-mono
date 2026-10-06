@@ -3,9 +3,10 @@ import { useState } from "react";
 import { Button, ScratchCard } from "@thewaver/ss-components-react";
 import type { ScratchCardController } from "@thewaver/ss-components-react";
 import * as styles from "@thewaver/ss-playground/App/Pages/Reveals/ScratchCardPage/ScratchCardPage.css";
+import { CONTROL_GLYPHS } from "@thewaver/ss-playground/App/StyledComponents/ControlButtonContent/ControlButtonContent.const";
 
 import { PageMeasureBox } from "../../../../PageComponents/MeasureBox/MeasureBox";
-import { PageButtonContent } from "../../../../StyledComponents/ButtonContent/ButtonContent";
+import { PageControlButtonContent } from "../../../../StyledComponents/ControlButtonContent/ControlButtonContent";
 import type { ScratchCardExampleProps } from "../ScratchCardPage.types";
 
 const CARD_WIDTH = 360;
@@ -45,7 +46,8 @@ export const TicketExample = (props: Props) => {
             <div className={styles.buttonRow}>
                 <Button
                     id={"newTicket"}
-                    renderContent={(flags) => <PageButtonContent flags={flags}>New ticket</PageButtonContent>}
+                    ariaLabel={"New ticket"}
+                    renderContent={(flags) => <PageControlButtonContent flags={flags} glyph={CONTROL_GLYPHS.replay} />}
                     onClick={() => {
                         controller?.reset();
                     }}

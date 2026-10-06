@@ -6,6 +6,8 @@ import {
     type BracketStep,
 } from "@thewaver/ss-components";
 
+import { CONTROL_GLYPHS } from "../../StyledComponents/ControlButtonContent/ControlButtonContent.const";
+
 export const NOTHING_PICKED = "nothing picked yet";
 
 export const describeFamily = (rootValue: string, anchorValue: string | undefined) =>
@@ -20,11 +22,21 @@ export const branch = (value: string, ...children: BracketNode<string>[]): Brack
     children,
 });
 
-export const computeFamilySteps = (orientation: BracketOrientation): { step: BracketStep; label: string }[] => [
-    { step: "toLeaves", label: "Previous stage" },
-    { step: "toRoot", label: "Next stage" },
-    { step: "previous", label: orientation === "horizontal" ? "Upper" : "Left" },
-    { step: "next", label: orientation === "horizontal" ? "Lower" : "Right" },
+export const computeFamilySteps = (
+    orientation: BracketOrientation,
+): { step: BracketStep; label: string; glyph: string }[] => [
+    { step: "toLeaves", label: "Previous stage", glyph: CONTROL_GLYPHS.previous },
+    { step: "toRoot", label: "Next stage", glyph: CONTROL_GLYPHS.next },
+    {
+        step: "previous",
+        label: orientation === "horizontal" ? "Upper" : "Left",
+        glyph: orientation === "horizontal" ? CONTROL_GLYPHS.up : CONTROL_GLYPHS.left,
+    },
+    {
+        step: "next",
+        label: orientation === "horizontal" ? "Lower" : "Right",
+        glyph: orientation === "horizontal" ? CONTROL_GLYPHS.down : CONTROL_GLYPHS.right,
+    },
 ];
 
 export const BEAM_PATHS: Record<string, BracketConnectorPathFn> = {

@@ -3,7 +3,7 @@ import { type ComponentPublicInstance, shallowRef, useModel } from "vue";
 
 import { Button, Menu, toElement } from "@thewaver/ss-components-vue";
 
-import PageButtonContent from "../../../../StyledComponents/ButtonContent/ButtonContent.vue";
+import PageControlButtonContent from "../../../../StyledComponents/ControlButtonContent/ControlButtonContent.vue";
 import PageGlideFloater from "../../../../StyledComponents/GlideFloater/PageGlideFloater.vue";
 import PageMenuTriggerContent from "../../../../StyledComponents/MenuTriggerContent/MenuTriggerContent.vue";
 import MenuActionItem from "../MenuActionItem.vue";
@@ -53,9 +53,9 @@ const toggle = () => {
         </template>
     </Menu>
 
-    <Button id="menuToggle" :ref="setAnchorRef" ariaLabel="Toggle the menu from outside" @click="toggle">
+    <Button id="menuToggle" :ref="setAnchorRef" @click="toggle">
         <template #renderContent="flags">
-            <PageButtonContent :flags="flags">{{ isOpen ? "Close it" : "Open it" }}</PageButtonContent>
+            <PageControlButtonContent :flags="flags">{{ isOpen ? "Close it" : "Open it" }}</PageControlButtonContent>
         </template>
     </Button>
 </template>

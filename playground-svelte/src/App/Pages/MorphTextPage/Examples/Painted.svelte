@@ -7,9 +7,10 @@
         PAINTED_WORDS,
     } from "@thewaver/ss-playground/App/Pages/MorphTextPage/MorphTextPage.const";
     import * as styles from "@thewaver/ss-playground/App/Pages/MorphTextPage/MorphTextPage.css";
+    import { CONTROL_GLYPHS } from "@thewaver/ss-playground/App/StyledComponents/ControlButtonContent/ControlButtonContent.const";
 
     import { computePaintDefs } from "../../../PageComponents/PaintPicker/PaintPicker.const";
-    import PageButtonContent from "../../../StyledComponents/ButtonContent/ButtonContent.svelte";
+    import PageControlButtonContent from "../../../StyledComponents/ControlButtonContent/ControlButtonContent.svelte";
     import type { MorphTextExampleProps } from "../MorphTextPage.types";
 
     const PAINT_SETTINGS = { colors: SVGDefsSamples.SAMPLE_COLORS, ...MORPH_PAINT_TIMING };
@@ -54,12 +55,13 @@
 
     <Button
         id={"morphPaintedPlayback"}
+        ariaLabel={isPlaying ? "Pause" : "Play"}
         onClick={() => {
             isPlaying = !isPlaying;
         }}
     >
         {#snippet renderContent(flags)}
-            <PageButtonContent {flags}>{isPlaying ? "Pause" : "Play"}</PageButtonContent>
+            <PageControlButtonContent {flags} glyph={isPlaying ? CONTROL_GLYPHS.pause : CONTROL_GLYPHS.play} />
         {/snippet}
     </Button>
 </div>

@@ -5,10 +5,11 @@
     import type { BracketNode, BracketStep } from "@thewaver/ss-components-svelte";
     import * as styles from "@thewaver/ss-playground/App/Pages/BracketPage/BracketPage.css";
     import { EasingUtils, MathUtils } from "@thewaver/ss-utils";
+    import { CONTROL_GLYPHS } from "@thewaver/ss-playground/App/StyledComponents/ControlButtonContent/ControlButtonContent.const";
     import { assignInlineVars } from "@vanilla-extract/dynamic";
 
     import PageMeasureBox from "../../../PageComponents/MeasureBox/MeasureBox.svelte";
-    import PageButtonContent from "../../../StyledComponents/ButtonContent/ButtonContent.svelte";
+    import PageControlButtonContent from "../../../StyledComponents/ControlButtonContent/ControlButtonContent.svelte";
     import { branch, computeFamilySteps, describeFamily, seed } from "../BracketPage.const";
     import type { BracketFamilyExampleProps } from "../BracketPage.types";
     import PageBracketLayerHeader from "../PageBracketLayerHeader.svelte";
@@ -172,12 +173,13 @@
     <div class={styles.familyControls}>
         <Button
             id={"familyZoom"}
+            ariaLabel={isZoomedIn ? "Zoom out" : "Zoom in"}
             onClick={() => {
                 isZoomedIn = !isZoomedIn;
             }}
         >
             {#snippet renderContent(flags)}
-                <PageButtonContent {flags}>{isZoomedIn ? "Zoom out" : "Zoom in"}</PageButtonContent>
+                <PageControlButtonContent {flags} glyph={isZoomedIn ? CONTROL_GLYPHS.zoomOut : CONTROL_GLYPHS.zoomIn} />
             {/snippet}
         </Button>
 
@@ -185,12 +187,13 @@
             <Button
                 id={`familyStep-${entry.step}`}
                 isDisabled={!isZoomedIn || computeStep(entry.step) === family}
+                ariaLabel={entry.label}
                 onClick={() => {
                     family = computeStep(entry.step);
                 }}
             >
                 {#snippet renderContent(flags)}
-                    <PageButtonContent {flags}>{entry.label}</PageButtonContent>
+                    <PageControlButtonContent {flags} glyph={entry.glyph} />
                 {/snippet}
             </Button>
         {/each}

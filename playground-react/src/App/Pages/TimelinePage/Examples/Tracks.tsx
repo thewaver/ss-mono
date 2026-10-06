@@ -11,12 +11,13 @@ import {
     TRACKS,
     formatStopwatch,
 } from "@thewaver/ss-playground/App/Pages/TimelinePage/TimelinePage.const";
+import { CONTROL_GLYPHS } from "@thewaver/ss-playground/App/StyledComponents/ControlButtonContent/ControlButtonContent.const";
 import {
     AXIS_HEIGHT,
     PAGE_TIMELINE_FAMILIES,
 } from "@thewaver/ss-playground/App/StyledComponents/TimelineContent/TimelineContent.css";
 
-import { PageButtonContent } from "../../../StyledComponents/ButtonContent/ButtonContent";
+import { PageControlButtonContent } from "../../../StyledComponents/ControlButtonContent/ControlButtonContent";
 import {
     PageTimelineBlock,
     PageTimelineControls,
@@ -123,7 +124,8 @@ export const TracksExample = (props: Props) => {
             <PageTimelineControls>
                 <Button
                     id={"tracksPlay"}
-                    renderContent={(flags) => <PageButtonContent flags={flags}>Play</PageButtonContent>}
+                    ariaLabel={"Play"}
+                    renderContent={(flags) => <PageControlButtonContent flags={flags} glyph={CONTROL_GLYPHS.play} />}
                     onClick={() => {
                         if (playhead >= REEL.end) {
                             playheadRef.current = REEL.start;
@@ -136,7 +138,8 @@ export const TracksExample = (props: Props) => {
 
                 <Button
                     id={"tracksPause"}
-                    renderContent={(flags) => <PageButtonContent flags={flags}>Pause</PageButtonContent>}
+                    ariaLabel={"Pause"}
+                    renderContent={(flags) => <PageControlButtonContent flags={flags} glyph={CONTROL_GLYPHS.pause} />}
                     onClick={() => {
                         setIsPlaying(false);
                     }}
@@ -145,7 +148,8 @@ export const TracksExample = (props: Props) => {
                 <Button
                     id={"tracksEarlier"}
                     isDisabled={props.isDisabled}
-                    renderContent={(flags) => <PageButtonContent flags={flags}>Earlier</PageButtonContent>}
+                    ariaLabel={"Earlier"}
+                    renderContent={(flags) => <PageControlButtonContent flags={flags} glyph={CONTROL_GLYPHS.left} />}
                     onClick={() => {
                         controller?.panBy(-PAN_STEP);
                     }}
@@ -154,7 +158,8 @@ export const TracksExample = (props: Props) => {
                 <Button
                     id={"tracksLater"}
                     isDisabled={props.isDisabled}
-                    renderContent={(flags) => <PageButtonContent flags={flags}>Later</PageButtonContent>}
+                    ariaLabel={"Later"}
+                    renderContent={(flags) => <PageControlButtonContent flags={flags} glyph={CONTROL_GLYPHS.right} />}
                     onClick={() => {
                         controller?.panBy(PAN_STEP);
                     }}
@@ -163,7 +168,8 @@ export const TracksExample = (props: Props) => {
                 <Button
                     id={"tracksZoomIn"}
                     isDisabled={props.isDisabled}
-                    renderContent={(flags) => <PageButtonContent flags={flags}>Zoom in</PageButtonContent>}
+                    ariaLabel={"Zoom in"}
+                    renderContent={(flags) => <PageControlButtonContent flags={flags} glyph={CONTROL_GLYPHS.zoomIn} />}
                     onClick={() => {
                         controller?.zoomBy(ZOOM_IN);
                     }}
@@ -172,7 +178,8 @@ export const TracksExample = (props: Props) => {
                 <Button
                     id={"tracksZoomOut"}
                     isDisabled={props.isDisabled}
-                    renderContent={(flags) => <PageButtonContent flags={flags}>Zoom out</PageButtonContent>}
+                    ariaLabel={"Zoom out"}
+                    renderContent={(flags) => <PageControlButtonContent flags={flags} glyph={CONTROL_GLYPHS.zoomOut} />}
                     onClick={() => {
                         controller?.zoomBy(ZOOM_OUT);
                     }}
@@ -181,7 +188,8 @@ export const TracksExample = (props: Props) => {
                 <Button
                     id={"tracksWholeReel"}
                     isDisabled={props.isDisabled}
-                    renderContent={(flags) => <PageButtonContent flags={flags}>Whole reel</PageButtonContent>}
+                    ariaLabel={"Whole reel"}
+                    renderContent={(flags) => <PageControlButtonContent flags={flags} glyph={CONTROL_GLYPHS.fit} />}
                     onClick={async () => {
                         props.view[1](REEL);
                     }}

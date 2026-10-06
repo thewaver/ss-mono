@@ -182,7 +182,7 @@ export const ViewportWrapperPage = () => {
                                     <div class={styles.toastRaiser}>
                                         <Button
                                             id={"raiseInnerToast"}
-                                            ariaLabel={"Raise a notification inside the viewport"}
+                                            ariaLabel={"Notify inside the viewport"}
                                             renderContent={(getFlags) => (
                                                 <PageButtonContent flags={getFlags}>Notify</PageButtonContent>
                                             )}

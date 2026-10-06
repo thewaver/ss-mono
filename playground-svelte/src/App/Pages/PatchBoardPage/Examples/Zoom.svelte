@@ -8,9 +8,10 @@
         ZOOM_STEP,
     } from "@thewaver/ss-playground/App/Pages/PatchBoardPage/PatchBoardPage.const";
     import * as styles from "@thewaver/ss-playground/App/Pages/PatchBoardPage/PatchBoardPage.css";
+    import { CONTROL_GLYPHS } from "@thewaver/ss-playground/App/StyledComponents/ControlButtonContent/ControlButtonContent.const";
 
     import PageMeasureBox from "../../../PageComponents/MeasureBox/MeasureBox.svelte";
-    import PageButtonContent from "../../../StyledComponents/ButtonContent/ButtonContent.svelte";
+    import PageControlButtonContent from "../../../StyledComponents/ControlButtonContent/ControlButtonContent.svelte";
     import PagePatchCable from "../../../StyledComponents/PatchBoardContent/PagePatchCable.svelte";
     import PagePatchNode from "../../../StyledComponents/PatchBoardContent/PagePatchNode.svelte";
     import PagePatchSocket from "../../../StyledComponents/PatchBoardContent/PagePatchSocket.svelte";
@@ -25,20 +26,22 @@
     <div class={styles.zoomControls}>
         <Button
             id={"patchBoardZoomOut"}
+            ariaLabel={"Zoom out"}
             isDisabled={props.zoom <= MIN_ZOOM}
             onClick={() => props.onZoomChange(props.zoom - ZOOM_STEP)}
         >
             {#snippet renderContent(flags)}
-                <PageButtonContent {flags}>Zoom out</PageButtonContent>
+                <PageControlButtonContent {flags} glyph={CONTROL_GLYPHS.zoomOut} />
             {/snippet}
         </Button>
         <Button
             id={"patchBoardZoomIn"}
+            ariaLabel={"Zoom in"}
             isDisabled={props.zoom >= MAX_ZOOM}
             onClick={() => props.onZoomChange(props.zoom + ZOOM_STEP)}
         >
             {#snippet renderContent(flags)}
-                <PageButtonContent {flags}>Zoom in</PageButtonContent>
+                <PageControlButtonContent {flags} glyph={CONTROL_GLYPHS.zoomIn} />
             {/snippet}
         </Button>
     </div>

@@ -3,9 +3,10 @@ import { createSignal } from "solid-js";
 import { Button, Range, Typewriter } from "@thewaver/ss-components-solid";
 import { MEASURE_BOX_PADDING } from "@thewaver/ss-playground/App/PageComponents/MeasureBox/MeasureBox.css";
 import * as styles from "@thewaver/ss-playground/App/Pages/TypewriterPage/TypewriterPage.css";
+import { CONTROL_GLYPHS } from "@thewaver/ss-playground/App/StyledComponents/ControlButtonContent/ControlButtonContent.const";
 
 import { PageMeasureBox } from "../../../PageComponents/MeasureBox/MeasureBox";
-import { PageButtonContent } from "../../../StyledComponents/ButtonContent/ButtonContent";
+import { PageControlButtonContent } from "../../../StyledComponents/ControlButtonContent/ControlButtonContent";
 import { PageRangeContent } from "../../../StyledComponents/RangeContent/RangeContent";
 import type { TypewriterKaraokeExampleProps } from "../TypewriterPage.types";
 
@@ -50,8 +51,12 @@ export const KaraokeExample = (props: Props) => {
             <div class={styles.karaokeControls}>
                 <Button
                     id={"karaokePlay"}
+                    ariaLabel={() => (getIsPlaying() ? "Pause" : "Sing")}
                     renderContent={(getFlags) => (
-                        <PageButtonContent flags={getFlags}>{getIsPlaying() ? "Pause" : "Sing"}</PageButtonContent>
+                        <PageControlButtonContent
+                            flags={getFlags}
+                            glyph={() => (getIsPlaying() ? CONTROL_GLYPHS.pause : CONTROL_GLYPHS.play)}
+                        />
                     )}
                     onClick={togglePlaying}
                 />

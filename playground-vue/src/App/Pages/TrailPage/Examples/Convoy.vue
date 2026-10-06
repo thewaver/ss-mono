@@ -4,9 +4,10 @@ import { shallowRef, useModel } from "vue";
 import { Button, Trail } from "@thewaver/ss-components-vue";
 import type { TrailController } from "@thewaver/ss-components-vue";
 import * as styles from "@thewaver/ss-playground/App/Pages/TrailPage/TrailPage.css";
+import { CONTROL_GLYPHS } from "@thewaver/ss-playground/App/StyledComponents/ControlButtonContent/ControlButtonContent.const";
 
 import PageMeasureBox from "../../../PageComponents/MeasureBox/MeasureBox.vue";
-import PageButtonContent from "../../../StyledComponents/ButtonContent/ButtonContent.vue";
+import PageControlButtonContent from "../../../StyledComponents/ControlButtonContent/ControlButtonContent.vue";
 import PageTrailTrack from "../../../StyledComponents/TrailContent/PageTrailTrack.vue";
 import PageTrailVehicle from "../../../StyledComponents/TrailContent/PageTrailVehicle.vue";
 import type { TrailExampleProps } from "../TrailPage.types";
@@ -71,21 +72,21 @@ const rewind = () => {
         </PageMeasureBox>
 
         <div :class="styles.controls">
-            <Button id="convoyPlay" @click="play">
+            <Button id="convoyPlay" ariaLabel="Play" @click="play">
                 <template #renderContent="flags">
-                    <PageButtonContent :flags="flags">Play</PageButtonContent>
+                    <PageControlButtonContent :flags="flags" :glyph="CONTROL_GLYPHS.play" />
                 </template>
             </Button>
 
-            <Button id="convoyPause" @click="pause">
+            <Button id="convoyPause" ariaLabel="Pause" @click="pause">
                 <template #renderContent="flags">
-                    <PageButtonContent :flags="flags">Pause</PageButtonContent>
+                    <PageControlButtonContent :flags="flags" :glyph="CONTROL_GLYPHS.pause" />
                 </template>
             </Button>
 
-            <Button id="convoyRewind" @click="rewind">
+            <Button id="convoyRewind" ariaLabel="Back to start" @click="rewind">
                 <template #renderContent="flags">
-                    <PageButtonContent :flags="flags">Back to start</PageButtonContent>
+                    <PageControlButtonContent :flags="flags" :glyph="CONTROL_GLYPHS.toStart" />
                 </template>
             </Button>
         </div>

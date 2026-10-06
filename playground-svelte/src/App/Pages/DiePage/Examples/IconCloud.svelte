@@ -7,8 +7,9 @@
         ICON_CLOUD_STEPS,
     } from "@thewaver/ss-playground/App/Pages/DiePage/DiePage.const";
     import * as styles from "@thewaver/ss-playground/App/Pages/DiePage/DiePage.css";
+    import { CONTROL_GLYPHS } from "@thewaver/ss-playground/App/StyledComponents/ControlButtonContent/ControlButtonContent.const";
 
-    import PageButtonContent from "../../../StyledComponents/ButtonContent/ButtonContent.svelte";
+    import PageControlButtonContent from "../../../StyledComponents/ControlButtonContent/ControlButtonContent.svelte";
     import PageDieIcon from "../../../StyledComponents/DieContent/PageDieIcon.svelte";
     import type { IconCloudExampleProps } from "../DiePage.types";
 
@@ -44,24 +45,26 @@
     <div class={styles.controls}>
         <Button
             id={"dieCloudPlayback"}
+            ariaLabel={autoSpin ? "Pause" : "Play"}
             onClick={() => {
                 autoSpin = !autoSpin;
             }}
         >
             {#snippet renderContent(flags)}
-                <PageButtonContent {flags}>{autoSpin ? "Pause" : "Play"}</PageButtonContent>
+                <PageControlButtonContent {flags} glyph={autoSpin ? CONTROL_GLYPHS.pause : CONTROL_GLYPHS.play} />
             {/snippet}
         </Button>
 
         {#each ICON_CLOUD_STEPS as step (step.direction)}
             <Button
                 id={step.id}
+                ariaLabel={step.label}
                 onClick={() => {
                     controller?.step(step.direction);
                 }}
             >
                 {#snippet renderContent(flags)}
-                    <PageButtonContent {flags}>{step.label}</PageButtonContent>
+                    <PageControlButtonContent {flags} glyph={CONTROL_GLYPHS[step.direction]} />
                 {/snippet}
             </Button>
         {/each}

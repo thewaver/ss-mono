@@ -4,8 +4,9 @@ import { useModel } from "vue";
 import { Button, CUBOID_FACES, Cuboid } from "@thewaver/ss-components-vue";
 import type { CuboidController, CuboidFace } from "@thewaver/ss-components-vue";
 import { computeCuboidFaceLabel } from "@thewaver/ss-playground/App/PageComponents/Announcements/Announcements.const";
+import { CONTROL_GLYPHS } from "@thewaver/ss-playground/App/StyledComponents/ControlButtonContent/ControlButtonContent.const";
 
-import PageButtonContent from "../../../StyledComponents/ButtonContent/ButtonContent.vue";
+import PageControlButtonContent from "../../../StyledComponents/ControlButtonContent/ControlButtonContent.vue";
 import PageCuboidFace from "../../../StyledComponents/CuboidContent/PageCuboidFace.vue";
 import PageCuboidPad from "../../../StyledComponents/CuboidContent/PageCuboidPad.vue";
 import PageCuboidRow from "../../../StyledComponents/CuboidContent/PageCuboidRow.vue";
@@ -57,7 +58,7 @@ const turnTo = (face: CuboidFace) => {
             <div />
             <Button id="uprightPitchUp" ariaLabel="Turn the face above towards you" @click="turnPitch(QUARTER_TURN)">
                 <template #renderContent="flags">
-                    <PageButtonContent :flags="flags">↑</PageButtonContent>
+                    <PageControlButtonContent :flags="flags" :glyph="CONTROL_GLYPHS.up" />
                 </template>
             </Button>
             <div />
@@ -68,7 +69,7 @@ const turnTo = (face: CuboidFace) => {
                 @click="turnYaw(-QUARTER_TURN)"
             >
                 <template #renderContent="flags">
-                    <PageButtonContent :flags="flags">←</PageButtonContent>
+                    <PageControlButtonContent :flags="flags" :glyph="CONTROL_GLYPHS.left" />
                 </template>
             </Button>
             <div />
@@ -78,14 +79,14 @@ const turnTo = (face: CuboidFace) => {
                 @click="turnYaw(QUARTER_TURN)"
             >
                 <template #renderContent="flags">
-                    <PageButtonContent :flags="flags">→</PageButtonContent>
+                    <PageControlButtonContent :flags="flags" :glyph="CONTROL_GLYPHS.right" />
                 </template>
             </Button>
 
             <div />
             <Button id="uprightPitchDown" ariaLabel="Turn the face below towards you" @click="turnPitch(-QUARTER_TURN)">
                 <template #renderContent="flags">
-                    <PageButtonContent :flags="flags">↓</PageButtonContent>
+                    <PageControlButtonContent :flags="flags" :glyph="CONTROL_GLYPHS.down" />
                 </template>
             </Button>
             <div />
@@ -100,7 +101,9 @@ const turnTo = (face: CuboidFace) => {
                 @click="turnTo(face)"
             >
                 <template #renderContent="flags">
-                    <PageButtonContent :flags="flags">{{ computeCuboidFaceLabel(face) }}</PageButtonContent>
+                    <PageControlButtonContent :flags="flags">{{
+                        computeCuboidFaceLabel(face)
+                    }}</PageControlButtonContent>
                 </template>
             </Button>
         </PageCuboidRow>

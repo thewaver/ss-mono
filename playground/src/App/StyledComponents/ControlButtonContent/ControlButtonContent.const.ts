@@ -1,0 +1,18 @@
+export const CONTROL_GLYPHS = {
+    play: "▶",
+    pause: "❙❙",
+    stop: "■",
+    replay: "↺",
+    toStart: "⇤",
+    previous: "‹",
+    next: "›",
+    up: "↑",
+    down: "↓",
+    left: "←",
+    right: "→",
+    turnLeft: "↺",
+    turnRight: "↻",
+    zoomIn: "+",
+    zoomOut: "−",
+    fit: "⤢",
+};

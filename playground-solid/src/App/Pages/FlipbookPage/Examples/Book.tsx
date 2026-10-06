@@ -5,13 +5,11 @@ import {
     computeFlipbookSpreadAnnouncement,
     computeFlipbookStepLabel,
 } from "@thewaver/ss-playground/App/PageComponents/Announcements/Announcements.const";
-import {
-    FLIPBOOK_PAGES,
-    FLIPBOOK_STEP_CAPTIONS,
-} from "@thewaver/ss-playground/App/Pages/FlipbookPage/FlipbookPage.const";
+import { FLIPBOOK_PAGES } from "@thewaver/ss-playground/App/Pages/FlipbookPage/FlipbookPage.const";
 import * as styles from "@thewaver/ss-playground/App/Pages/FlipbookPage/FlipbookPage.css";
+import { CONTROL_GLYPHS } from "@thewaver/ss-playground/App/StyledComponents/ControlButtonContent/ControlButtonContent.const";
 
-import { PageButtonContent } from "../../../StyledComponents/ButtonContent/ButtonContent";
+import { PageControlButtonContent } from "../../../StyledComponents/ControlButtonContent/ControlButtonContent";
 import type { FlipbookExampleProps } from "../FlipbookPage.types";
 
 const BOOK_GAP = 10;
@@ -54,7 +52,7 @@ export const BookExample = (props: Props) => (
                     </div>
                 )}
                 renderStep={(getStep, getRenderProps) => (
-                    <PageButtonContent flags={getRenderProps}>{FLIPBOOK_STEP_CAPTIONS[getStep()]}</PageButtonContent>
+                    <PageControlButtonContent flags={getRenderProps} glyph={() => CONTROL_GLYPHS[getStep()]} />
                 )}
                 renderControls={renderControls}
             />

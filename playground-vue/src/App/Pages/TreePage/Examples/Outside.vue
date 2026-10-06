@@ -4,7 +4,7 @@ import { useModel } from "vue";
 import { Button, Tree } from "@thewaver/ss-components-vue";
 
 import PageControlColumn from "../../../PageComponents/ControlRow/PageControlColumn.vue";
-import PageButtonContent from "../../../StyledComponents/ButtonContent/ButtonContent.vue";
+import PageControlButtonContent from "../../../StyledComponents/ControlButtonContent/ControlButtonContent.vue";
 import PageGlideFloater from "../../../StyledComponents/GlideFloater/PageGlideFloater.vue";
 import PageTreeNodeContent from "../../../StyledComponents/TreeNodeContent/PageTreeNodeContent.vue";
 import { FILES, OUTSIDE_COLLAPSE_DELAY_MS } from "../TreePage.const";
@@ -43,9 +43,9 @@ const collapseLibLater = async () => {
 
         <Button @click="collapseLibLater">
             <template #renderContent="flags">
-                <PageButtonContent :flags="flags">{{
+                <PageControlButtonContent :flags="flags">{{
                     `Collapse Lib in ${OUTSIDE_COLLAPSE_DELAY_MS}ms`
-                }}</PageButtonContent>
+                }}</PageControlButtonContent>
             </template>
         </Button>
     </PageControlColumn>

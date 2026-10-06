@@ -1,7 +1,7 @@
 <script lang="ts">
     import { Button, Menu } from "@thewaver/ss-components-svelte";
 
-    import PageButtonContent from "../../../../StyledComponents/ButtonContent/ButtonContent.svelte";
+    import PageControlButtonContent from "../../../../StyledComponents/ControlButtonContent/ControlButtonContent.svelte";
     import { renderPageHighlightFloater } from "../../../../StyledComponents/GlideFloater/GlideFloater.const.svelte";
     import PageMenuTriggerContent from "../../../../StyledComponents/MenuTriggerContent/MenuTriggerContent.svelte";
     import { ACTIONS, renderMenuItem, renderMenuPopup } from "../MenuPage.const.svelte";
@@ -32,12 +32,11 @@
 <Button
     bind:ref={anchorRef}
     id={"menuToggle"}
-    ariaLabel={"Toggle the menu from outside"}
     onClick={() => {
         visibility = !visibility;
     }}
 >
     {#snippet renderContent(flags)}
-        <PageButtonContent {flags}>{visibility ? "Close it" : "Open it"}</PageButtonContent>
+        <PageControlButtonContent {flags}>{visibility ? "Close it" : "Open it"}</PageControlButtonContent>
     {/snippet}
 </Button>

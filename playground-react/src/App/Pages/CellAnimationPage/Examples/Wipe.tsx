@@ -16,7 +16,7 @@ import type { CellAnimationPlaybackOpts } from "@thewaver/ss-components-react";
 import * as styles from "@thewaver/ss-playground/App/Pages/CellAnimationPage/CellAnimationPage.css";
 import type { Index2d, Size2d } from "@thewaver/ss-utils";
 
-import { PageButtonContent } from "../../../StyledComponents/ButtonContent/ButtonContent";
+import { PageControlButtonContent } from "../../../StyledComponents/ControlButtonContent/ControlButtonContent";
 import type { CellAnimationExampleProps } from "../CellAnimationPage.types";
 
 const WIPE_CELL_SIZE = 120;
@@ -62,7 +62,9 @@ export const WipeExample = (props: Props) => {
         <>
             <Button
                 id={"cellAnimationWipe"}
-                renderContent={(flags) => <PageButtonContent flags={flags}>Wipe the screen</PageButtonContent>}
+                renderContent={(flags) => (
+                    <PageControlButtonContent flags={flags}>Wipe the screen</PageControlButtonContent>
+                )}
                 onClick={() => {
                     if (wipeSize) return;
 

@@ -12,12 +12,13 @@ import {
     TRACKS,
     formatStopwatch,
 } from "@thewaver/ss-playground/App/Pages/TimelinePage/TimelinePage.const";
+import { CONTROL_GLYPHS } from "@thewaver/ss-playground/App/StyledComponents/ControlButtonContent/ControlButtonContent.const";
 import {
     AXIS_HEIGHT,
     PAGE_TIMELINE_FAMILIES,
 } from "@thewaver/ss-playground/App/StyledComponents/TimelineContent/TimelineContent.css";
 
-import PageButtonContent from "../../../StyledComponents/ButtonContent/ButtonContent.vue";
+import PageControlButtonContent from "../../../StyledComponents/ControlButtonContent/ControlButtonContent.vue";
 import PageTimelineBlock from "../../../StyledComponents/TimelineContent/PageTimelineBlock.vue";
 import PageTimelineControls from "../../../StyledComponents/TimelineContent/PageTimelineControls.vue";
 import PageTimelineFrame from "../../../StyledComponents/TimelineContent/PageTimelineFrame.vue";
@@ -156,45 +157,45 @@ const showWholeReel = async () => {
         </PageTimelineRow>
 
         <PageTimelineControls>
-            <Button id="tracksPlay" @click="play">
+            <Button id="tracksPlay" ariaLabel="Play" @click="play">
                 <template #renderContent="flags">
-                    <PageButtonContent :flags="flags">Play</PageButtonContent>
+                    <PageControlButtonContent :flags="flags" :glyph="CONTROL_GLYPHS.play" />
                 </template>
             </Button>
 
-            <Button id="tracksPause" @click="pause">
+            <Button id="tracksPause" ariaLabel="Pause" @click="pause">
                 <template #renderContent="flags">
-                    <PageButtonContent :flags="flags">Pause</PageButtonContent>
+                    <PageControlButtonContent :flags="flags" :glyph="CONTROL_GLYPHS.pause" />
                 </template>
             </Button>
 
-            <Button id="tracksEarlier" :is-disabled="isDisabled" @click="panBy(-PAN_STEP)">
+            <Button id="tracksEarlier" ariaLabel="Earlier" :is-disabled="isDisabled" @click="panBy(-PAN_STEP)">
                 <template #renderContent="flags">
-                    <PageButtonContent :flags="flags">Earlier</PageButtonContent>
+                    <PageControlButtonContent :flags="flags" :glyph="CONTROL_GLYPHS.left" />
                 </template>
             </Button>
 
-            <Button id="tracksLater" :is-disabled="isDisabled" @click="panBy(PAN_STEP)">
+            <Button id="tracksLater" ariaLabel="Later" :is-disabled="isDisabled" @click="panBy(PAN_STEP)">
                 <template #renderContent="flags">
-                    <PageButtonContent :flags="flags">Later</PageButtonContent>
+                    <PageControlButtonContent :flags="flags" :glyph="CONTROL_GLYPHS.right" />
                 </template>
             </Button>
 
-            <Button id="tracksZoomIn" :is-disabled="isDisabled" @click="zoomBy(ZOOM_IN)">
+            <Button id="tracksZoomIn" ariaLabel="Zoom in" :is-disabled="isDisabled" @click="zoomBy(ZOOM_IN)">
                 <template #renderContent="flags">
-                    <PageButtonContent :flags="flags">Zoom in</PageButtonContent>
+                    <PageControlButtonContent :flags="flags" :glyph="CONTROL_GLYPHS.zoomIn" />
                 </template>
             </Button>
 
-            <Button id="tracksZoomOut" :is-disabled="isDisabled" @click="zoomBy(ZOOM_OUT)">
+            <Button id="tracksZoomOut" ariaLabel="Zoom out" :is-disabled="isDisabled" @click="zoomBy(ZOOM_OUT)">
                 <template #renderContent="flags">
-                    <PageButtonContent :flags="flags">Zoom out</PageButtonContent>
+                    <PageControlButtonContent :flags="flags" :glyph="CONTROL_GLYPHS.zoomOut" />
                 </template>
             </Button>
 
-            <Button id="tracksWholeReel" :is-disabled="isDisabled" @click="showWholeReel">
+            <Button id="tracksWholeReel" ariaLabel="Whole reel" :is-disabled="isDisabled" @click="showWholeReel">
                 <template #renderContent="flags">
-                    <PageButtonContent :flags="flags">Whole reel</PageButtonContent>
+                    <PageControlButtonContent :flags="flags" :glyph="CONTROL_GLYPHS.fit" />
                 </template>
             </Button>
         </PageTimelineControls>

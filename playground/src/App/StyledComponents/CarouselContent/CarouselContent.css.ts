@@ -1,14 +1,13 @@
 import { style } from "@vanilla-extract/css";
 
 import { themeVars } from "../../Theme.css";
+import { controlButtonBase, isActive, isDisabled, isHovered } from "../ControlButtonContent/ControlButtonContent.css";
 import { layerVars } from "../Layer/Layer.css";
 
 export const CAROUSEL_SLIDE_HEIGHT = 140;
 
 export const isCurrent = style({});
-export const isHovered = style({});
-export const isActive = style({});
-export const isDisabled = style({});
+export { isActive, isDisabled, isHovered };
 
 export const carouselSlide = style({
     display: "flex",
@@ -21,6 +20,7 @@ export const carouselSlide = style({
     borderRadius: themeVars.borderRadius.half,
     backgroundImage: `linear-gradient(135deg, rgb(from ${layerVars.main} r g b / 50%), rgb(from ${layerVars.main} r g b / 75%))`,
     color: layerVars.contrast,
+    userSelect: "none",
 });
 
 export const carouselSlideTitle = style({
@@ -37,6 +37,7 @@ export const carouselSlideBack = style({
     minHeight: "100%",
     borderRadius: themeVars.borderRadius.half,
     backgroundColor: `rgb(from ${layerVars.contrast} r g b / 10%)`,
+    userSelect: "none",
 });
 
 export const carouselBox = style({
@@ -53,40 +54,8 @@ export const carouselBar = style({
     gap: themeVars.spacing.half,
 });
 
-const controlBase = style({
-    display: "flex",
-    justifyContent: "center",
-    alignItems: "center",
-    color: layerVars.contrast,
-    backgroundColor: `rgb(from ${layerVars.contrast} r g b / 10%)`,
-    borderRadius: themeVars.borderRadius.half,
-    transition: `color ${themeVars.animation.duration}, filter ${themeVars.animation.duration}, opacity ${themeVars.animation.duration}, background-color ${themeVars.animation.duration}`,
-
-    selectors: {
-        [`&.${isHovered}`]: {
-            color: themeVars.color.primary.main,
-        },
-        [`&.${isActive}`]: {
-            filter: themeVars.active.filter,
-        },
-        [`&.${isDisabled}`]: {
-            opacity: themeVars.disabled.opacity,
-            filter: themeVars.disabled.filter,
-        },
-    },
-});
-
-export const carouselButton = style([
-    controlBase,
-    {
-        width: 28,
-        height: 28,
-        fontSize: themeVars.fontSize.small,
-    },
-]);
-
 export const carouselPick = style([
-    controlBase,
+    controlButtonBase,
     {
         width: 10,
         height: 10,

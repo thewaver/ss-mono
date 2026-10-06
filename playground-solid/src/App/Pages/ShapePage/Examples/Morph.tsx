@@ -6,7 +6,7 @@ import * as styles from "@thewaver/ss-playground/App/Pages/ShapePage/ShapePage.c
 import { EasingUtils, MathUtils, Point2dUtils } from "@thewaver/ss-utils";
 import type { Point2d, Size2d } from "@thewaver/ss-utils";
 
-import { PageButtonContent } from "../../../StyledComponents/ButtonContent/ButtonContent";
+import { PageControlButtonContent } from "../../../StyledComponents/ControlButtonContent/ControlButtonContent";
 import { computeShapeFillDefs, computeShapeStrokeDefs } from "../ShapePage.const";
 import type { ShapeExampleProps } from "../ShapePage.types";
 
@@ -128,9 +128,9 @@ export const MorphExample = (props: Props) => {
                 id={"morphToggle"}
                 ariaLabel={getTarget() === 0 ? "Turn into a star" : "Turn into a circle"}
                 renderContent={(getFlags) => (
-                    <PageButtonContent flags={getFlags}>
+                    <PageControlButtonContent flags={getFlags}>
                         {getTarget() === 0 ? "Turn into a star" : "Turn into a circle"}
-                    </PageButtonContent>
+                    </PageControlButtonContent>
                 )}
                 onClick={() => morphTo(getTarget() === 0 ? 1 : 0)}
             />

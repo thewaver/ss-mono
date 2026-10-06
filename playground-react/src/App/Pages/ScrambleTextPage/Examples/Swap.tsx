@@ -3,9 +3,10 @@ import { useState } from "react";
 import { Button, ScrambleText } from "@thewaver/ss-components-react";
 import { MEASURE_BOX_PADDING } from "@thewaver/ss-playground/App/PageComponents/MeasureBox/MeasureBox.css";
 import * as styles from "@thewaver/ss-playground/App/Pages/ScrambleTextPage/ScrambleTextPage.css";
+import { CONTROL_GLYPHS } from "@thewaver/ss-playground/App/StyledComponents/ControlButtonContent/ControlButtonContent.const";
 
 import { PageMeasureBox } from "../../../PageComponents/MeasureBox/MeasureBox";
-import { PageButtonContent } from "../../../StyledComponents/ButtonContent/ButtonContent";
+import { PageControlButtonContent } from "../../../StyledComponents/ControlButtonContent/ControlButtonContent";
 import type { ScrambleTextExampleProps } from "../ScrambleTextPage.types";
 
 const STATUSES = ["CONNECTING", "HANDSHAKE", "AUTHORIZED", "STREAMING", "IDLE"];
@@ -33,7 +34,8 @@ export const SwapExample = (props: Props) => {
 
             <Button
                 id={"nextStatus"}
-                renderContent={(flags) => <PageButtonContent flags={flags}>Next status</PageButtonContent>}
+                ariaLabel={"Next status"}
+                renderContent={(flags) => <PageControlButtonContent flags={flags} glyph={CONTROL_GLYPHS.next} />}
                 onClick={() => {
                     setStatusIndex((index) => (index + 1) % STATUSES.length);
                 }}

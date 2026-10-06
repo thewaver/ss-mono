@@ -5,6 +5,7 @@ import type { SlotTextLetterRoute, SlotTextMechanism } from "@thewaver/ss-compon
 import { SlotTextKnobs } from "@thewaver/ss-playground/App/Knobs/SlotTexts.const";
 import { WORDS } from "@thewaver/ss-playground/App/Pages/SlotTextPage/SlotTextPage.const";
 import * as styles from "@thewaver/ss-playground/App/Pages/SlotTextPage/SlotTextPage.css";
+import { CONTROL_GLYPHS } from "@thewaver/ss-playground/App/StyledComponents/ControlButtonContent/ControlButtonContent.const";
 
 import { PageExampleKnobs } from "../../PageComponents/ExampleKnobs/ExampleKnobs";
 import { PageExamples } from "../../PageComponents/Examples/Examples";
@@ -12,7 +13,7 @@ import { PageNumberField, PageSelectField } from "../../PageComponents/Field/Fie
 import { PageMeasureBox } from "../../PageComponents/MeasureBox/MeasureBox";
 import { PageProp } from "../../PageComponents/Prop/Prop";
 import { PagePropsPanel } from "../../PageComponents/PropsPanel/PropsPanel";
-import { PageButtonContent } from "../../StyledComponents/ButtonContent/ButtonContent";
+import { PageControlButtonContent } from "../../StyledComponents/ControlButtonContent/ControlButtonContent";
 import { CounterExample } from "./Examples/Counter";
 import { ReelsExample } from "./Examples/Reels";
 import { SplitFlapExample } from "./Examples/SplitFlap";
@@ -75,7 +76,7 @@ export const SlotTextPage = () => {
                     <Button
                         id={isFlap ? entry.flapId : entry.id}
                         renderContent={(getFlags) => (
-                            <PageButtonContent flags={getFlags}>{entry.label}</PageButtonContent>
+                            <PageControlButtonContent flags={getFlags}>{entry.label}</PageControlButtonContent>
                         )}
                         onClick={() => {
                             step(entry.delta);
@@ -130,7 +131,7 @@ export const SlotTextPage = () => {
                                 <Button
                                     id={"pullReels"}
                                     renderContent={(getFlags) => (
-                                        <PageButtonContent flags={getFlags}>Pull</PageButtonContent>
+                                        <PageControlButtonContent flags={getFlags}>Pull</PageControlButtonContent>
                                     )}
                                     onClick={() => {
                                         setReelValue(pull);
@@ -200,8 +201,9 @@ export const SlotTextPage = () => {
                             <div class={styles.controls}>
                                 <Button
                                     id={"nextWord"}
+                                    ariaLabel={"Next word"}
                                     renderContent={(getFlags) => (
-                                        <PageButtonContent flags={getFlags}>Next word</PageButtonContent>
+                                        <PageControlButtonContent flags={getFlags} glyph={CONTROL_GLYPHS.next} />
                                     )}
                                     onClick={() => {
                                         setWordIndex((index) => (index + 1) % WORDS.length);

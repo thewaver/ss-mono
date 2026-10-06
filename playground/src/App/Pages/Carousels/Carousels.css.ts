@@ -11,6 +11,7 @@ export const SCROLL_BOX_HEIGHT = 240;
 export const slideFrame = style({
     display: "grid",
     minWidth: 0,
+    userSelect: "none",
 });
 
 export const slideFrameNarrow = style([
@@ -124,11 +125,13 @@ export const ringSlot = style({
     flex: "none",
     width: CarouselKnobs.RING_SLOT_WIDTH,
     marginRight: -CarouselKnobs.RING_SLOT_WIDTH * 0.5,
+    userSelect: "none",
 });
 
 export const wordDrumSlot = style({
     width: "100%",
     height: CarouselKnobs.WORD_DRUM_SLOT_HEIGHT,
+    userSelect: "none",
 });
 
 export const wordDrumWord = style({

@@ -2,8 +2,9 @@
     import { Button, Wraparound } from "@thewaver/ss-components-svelte";
     import { MARQUEE_WORDS } from "@thewaver/ss-playground/App/Pages/WraparoundPage/WraparoundPage.const";
     import * as styles from "@thewaver/ss-playground/App/Pages/WraparoundPage/WraparoundPage.css";
+    import { CONTROL_GLYPHS } from "@thewaver/ss-playground/App/StyledComponents/ControlButtonContent/ControlButtonContent.const";
 
-    import PageButtonContent from "../../../StyledComponents/ButtonContent/ButtonContent.svelte";
+    import PageControlButtonContent from "../../../StyledComponents/ControlButtonContent/ControlButtonContent.svelte";
     import type { WraparoundMarqueeExampleProps } from "../WraparoundPage.types";
 
     type Props = WraparoundMarqueeExampleProps;
@@ -32,12 +33,13 @@
 
     <Button
         id={"marqueePlayback"}
+        ariaLabel={playback ? "Pause" : "Play"}
         onClick={() => {
             playback = !playback;
         }}
     >
         {#snippet renderContent(flags)}
-            <PageButtonContent {flags}>{playback ? "Pause" : "Play"}</PageButtonContent>
+            <PageControlButtonContent {flags} glyph={playback ? CONTROL_GLYPHS.pause : CONTROL_GLYPHS.play} />
         {/snippet}
     </Button>
 </div>

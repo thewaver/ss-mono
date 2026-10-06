@@ -11,12 +11,13 @@ import {
     TRACKS,
     formatStopwatch,
 } from "@thewaver/ss-playground/App/Pages/TimelinePage/TimelinePage.const";
+import { CONTROL_GLYPHS } from "@thewaver/ss-playground/App/StyledComponents/ControlButtonContent/ControlButtonContent.const";
 import {
     AXIS_HEIGHT,
     PAGE_TIMELINE_FAMILIES,
 } from "@thewaver/ss-playground/App/StyledComponents/TimelineContent/TimelineContent.css";
 
-import { PageButtonContent } from "../../../StyledComponents/ButtonContent/ButtonContent";
+import { PageControlButtonContent } from "../../../StyledComponents/ControlButtonContent/ControlButtonContent";
 import {
     PageTimelineBlock,
     PageTimelineControls,
@@ -121,7 +122,10 @@ export const TracksExample = (props: Props) => {
             <PageTimelineControls>
                 <Button
                     id={"tracksPlay"}
-                    renderContent={(getFlags) => <PageButtonContent flags={getFlags}>Play</PageButtonContent>}
+                    ariaLabel={"Play"}
+                    renderContent={(getFlags) => (
+                        <PageControlButtonContent flags={getFlags} glyph={CONTROL_GLYPHS.play} />
+                    )}
                     onClick={() => {
                         if (getPlayhead() >= REEL.end) setPlayhead(REEL.start);
 
@@ -131,7 +135,10 @@ export const TracksExample = (props: Props) => {
 
                 <Button
                     id={"tracksPause"}
-                    renderContent={(getFlags) => <PageButtonContent flags={getFlags}>Pause</PageButtonContent>}
+                    ariaLabel={"Pause"}
+                    renderContent={(getFlags) => (
+                        <PageControlButtonContent flags={getFlags} glyph={CONTROL_GLYPHS.pause} />
+                    )}
                     onClick={() => {
                         setIsPlaying(false);
                     }}
@@ -140,7 +147,10 @@ export const TracksExample = (props: Props) => {
                 <Button
                     id={"tracksEarlier"}
                     isDisabled={props.isDisabled}
-                    renderContent={(getFlags) => <PageButtonContent flags={getFlags}>Earlier</PageButtonContent>}
+                    ariaLabel={"Earlier"}
+                    renderContent={(getFlags) => (
+                        <PageControlButtonContent flags={getFlags} glyph={CONTROL_GLYPHS.left} />
+                    )}
                     onClick={() => {
                         getController()?.panBy(-PAN_STEP);
                     }}
@@ -149,7 +159,10 @@ export const TracksExample = (props: Props) => {
                 <Button
                     id={"tracksLater"}
                     isDisabled={props.isDisabled}
-                    renderContent={(getFlags) => <PageButtonContent flags={getFlags}>Later</PageButtonContent>}
+                    ariaLabel={"Later"}
+                    renderContent={(getFlags) => (
+                        <PageControlButtonContent flags={getFlags} glyph={CONTROL_GLYPHS.right} />
+                    )}
                     onClick={() => {
                         getController()?.panBy(PAN_STEP);
                     }}
@@ -158,7 +171,10 @@ export const TracksExample = (props: Props) => {
                 <Button
                     id={"tracksZoomIn"}
                     isDisabled={props.isDisabled}
-                    renderContent={(getFlags) => <PageButtonContent flags={getFlags}>Zoom in</PageButtonContent>}
+                    ariaLabel={"Zoom in"}
+                    renderContent={(getFlags) => (
+                        <PageControlButtonContent flags={getFlags} glyph={CONTROL_GLYPHS.zoomIn} />
+                    )}
                     onClick={() => {
                         getController()?.zoomBy(ZOOM_IN);
                     }}
@@ -167,7 +183,10 @@ export const TracksExample = (props: Props) => {
                 <Button
                     id={"tracksZoomOut"}
                     isDisabled={props.isDisabled}
-                    renderContent={(getFlags) => <PageButtonContent flags={getFlags}>Zoom out</PageButtonContent>}
+                    ariaLabel={"Zoom out"}
+                    renderContent={(getFlags) => (
+                        <PageControlButtonContent flags={getFlags} glyph={CONTROL_GLYPHS.zoomOut} />
+                    )}
                     onClick={() => {
                         getController()?.zoomBy(ZOOM_OUT);
                     }}
@@ -176,7 +195,10 @@ export const TracksExample = (props: Props) => {
                 <Button
                     id={"tracksWholeReel"}
                     isDisabled={props.isDisabled}
-                    renderContent={(getFlags) => <PageButtonContent flags={getFlags}>Whole reel</PageButtonContent>}
+                    ariaLabel={"Whole reel"}
+                    renderContent={(getFlags) => (
+                        <PageControlButtonContent flags={getFlags} glyph={CONTROL_GLYPHS.fit} />
+                    )}
                     onClick={async () => {
                         viewSignal[1](() => REEL);
                     }}

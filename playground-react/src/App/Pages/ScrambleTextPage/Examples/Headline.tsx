@@ -4,9 +4,10 @@ import { Button, ScrambleText } from "@thewaver/ss-components-react";
 import type { ScrambleTextController } from "@thewaver/ss-components-react";
 import { MEASURE_BOX_PADDING } from "@thewaver/ss-playground/App/PageComponents/MeasureBox/MeasureBox.css";
 import * as styles from "@thewaver/ss-playground/App/Pages/ScrambleTextPage/ScrambleTextPage.css";
+import { CONTROL_GLYPHS } from "@thewaver/ss-playground/App/StyledComponents/ControlButtonContent/ControlButtonContent.const";
 
 import { PageMeasureBox } from "../../../PageComponents/MeasureBox/MeasureBox";
-import { PageButtonContent } from "../../../StyledComponents/ButtonContent/ButtonContent";
+import { PageControlButtonContent } from "../../../StyledComponents/ControlButtonContent/ControlButtonContent";
 import type { ScrambleTextExampleProps } from "../ScrambleTextPage.types";
 
 const HEADLINE = "SYSTEM ONLINE";
@@ -34,7 +35,8 @@ export const HeadlineExample = (props: Props) => {
 
             <Button
                 id={"runItAgain"}
-                renderContent={(flags) => <PageButtonContent flags={flags}>Run it again</PageButtonContent>}
+                ariaLabel={"Run it again"}
+                renderContent={(flags) => <PageControlButtonContent flags={flags} glyph={CONTROL_GLYPHS.replay} />}
                 onClick={() => {
                     controller?.restartAnimation();
                 }}

@@ -1,29 +1,16 @@
 <script lang="ts">
     import type { CarouselStep } from "@thewaver/ss-components-svelte";
-    import * as styles from "@thewaver/ss-playground/App/StyledComponents/CarouselContent/CarouselContent.css";
+    import { CONTROL_GLYPHS } from "@thewaver/ss-playground/App/StyledComponents/ControlButtonContent/ControlButtonContent.const";
 
-    import { getLayerClass } from "../Layer/Layer.context";
+    import PageControlButtonContent from "../ControlButtonContent/ControlButtonContent.svelte";
     import type { CarouselStepProps } from "./CarouselContent.types";
 
     const STEP_GLYPHS: Record<CarouselStep, string> = {
-        previous: "‹",
-        next: "›",
+        previous: CONTROL_GLYPHS.previous,
+        next: CONTROL_GLYPHS.next,
     };
 
     let props: CarouselStepProps = $props();
-
-    const layerClass = $derived.by(getLayerClass());
 </script>
 
-<div
-    class={[
-        styles.carouselButton,
-        layerClass,
-        props.renderProps.isHovered && styles.isHovered,
-        props.renderProps.isActive && styles.isActive,
-        props.renderProps.isDisabled && styles.isDisabled,
-    ]}
-    aria-hidden="true"
->
-    {STEP_GLYPHS[props.renderProps.step]}
-</div>
+<PageControlButtonContent flags={props.renderProps} glyph={STEP_GLYPHS[props.renderProps.step]} />

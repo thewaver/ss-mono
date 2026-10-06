@@ -18,6 +18,7 @@ export const wheelWedge = style({
     containerType: "inline-size",
     width: "100%",
     height: "100%",
+    userSelect: "none",
 });
 
 export const wheelWedgeSVG = style({
@@ -172,6 +173,7 @@ export const wheelCard = style({
     color: layerVars.contrast,
     fontSize: themeVars.fontSize.small,
     textAlign: "center",
+    userSelect: "none",
 
     selectors: {
         [`&.${isSelected}`]: {

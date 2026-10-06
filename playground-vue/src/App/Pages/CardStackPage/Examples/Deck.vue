@@ -5,19 +5,20 @@ import { Button, CardStack } from "@thewaver/ss-components-vue";
 import type { CardStackControls } from "@thewaver/ss-components-vue";
 import { computeCardTilt } from "@thewaver/ss-playground/App/Pages/CardStackPage/CardStackPage.const";
 import * as styles from "@thewaver/ss-playground/App/Pages/CardStackPage/CardStackPage.css";
+import { CONTROL_GLYPHS } from "@thewaver/ss-playground/App/StyledComponents/ControlButtonContent/ControlButtonContent.const";
 import type { SwipeDirection } from "@thewaver/ss-utils";
 
 import PageMeasureBox from "../../../PageComponents/MeasureBox/MeasureBox.vue";
-import PageButtonContent from "../../../StyledComponents/ButtonContent/ButtonContent.vue";
+import PageControlButtonContent from "../../../StyledComponents/ControlButtonContent/ControlButtonContent.vue";
 import type { CardStackDeckExampleProps } from "../CardStackExamples.types";
 
 const CARDS = ["Ace", "King", "Queen", "Jack", "Ten", "Nine", "Eight", "Seven", "Six", "Five", "Four", "Three", "Two"];
 const DIRECTIONS: SwipeDirection[] = ["left", "right", "up", "down"];
-const DIRECTION_LABELS: Record<SwipeDirection, string> = {
-    left: "Left",
-    right: "Right",
-    up: "Up",
-    down: "Down",
+const DIRECTION_GLYPHS: Record<SwipeDirection, string> = {
+    left: CONTROL_GLYPHS.left,
+    right: CONTROL_GLYPHS.right,
+    up: CONTROL_GLYPHS.up,
+    down: CONTROL_GLYPHS.down,
 };
 
 const BOX_HEIGHT = 240;
@@ -94,24 +95,24 @@ const deal = () => {
                 @click="send(direction)"
             >
                 <template #renderContent="flags">
-                    <PageButtonContent :flags="flags">{{ DIRECTION_LABELS[direction] }}</PageButtonContent>
+                    <PageControlButtonContent :flags="flags" :glyph="DIRECTION_GLYPHS[direction]" />
                 </template>
             </Button>
 
             <Button
                 id="recall"
                 :is-disabled="isDisabled || topIndex === FIRST_INDEX"
-                ariaLabel="Bring the last card back"
+                ariaLabel="Recall the last card"
                 @click="recall"
             >
                 <template #renderContent="flags">
-                    <PageButtonContent :flags="flags">Recall</PageButtonContent>
+                    <PageControlButtonContent :flags="flags">Recall</PageControlButtonContent>
                 </template>
             </Button>
 
             <Button v-if="isEmpty" id="deal" ariaLabel="Deal the cards again" @click="deal">
                 <template #renderContent="flags">
-                    <PageButtonContent :flags="flags">Deal again</PageButtonContent>
+                    <PageControlButtonContent :flags="flags" :glyph="CONTROL_GLYPHS.replay" />
                 </template>
             </Button>
         </div>

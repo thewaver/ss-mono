@@ -3,9 +3,10 @@ import { useState } from "react";
 import { Button, Trail } from "@thewaver/ss-components-react";
 import type { TrailController } from "@thewaver/ss-components-react";
 import * as styles from "@thewaver/ss-playground/App/Pages/TrailPage/TrailPage.css";
+import { CONTROL_GLYPHS } from "@thewaver/ss-playground/App/StyledComponents/ControlButtonContent/ControlButtonContent.const";
 
 import { PageMeasureBox } from "../../../PageComponents/MeasureBox/MeasureBox";
-import { PageButtonContent } from "../../../StyledComponents/ButtonContent/ButtonContent";
+import { PageControlButtonContent } from "../../../StyledComponents/ControlButtonContent/ControlButtonContent";
 import { PageTrailTrack, PageTrailVehicle } from "../../../StyledComponents/TrailContent/TrailContent";
 import type { TrailExampleProps } from "../TrailPage.types";
 
@@ -39,7 +40,8 @@ export const CircuitExample = (props: Props) => {
             <div className={styles.controls}>
                 <Button
                     id={"circuitPlay"}
-                    renderContent={(flags) => <PageButtonContent flags={flags}>Play</PageButtonContent>}
+                    ariaLabel={"Play"}
+                    renderContent={(flags) => <PageControlButtonContent flags={flags} glyph={CONTROL_GLYPHS.play} />}
                     onClick={() => {
                         props.playback[1](true);
                     }}
@@ -47,7 +49,8 @@ export const CircuitExample = (props: Props) => {
 
                 <Button
                     id={"circuitPause"}
-                    renderContent={(flags) => <PageButtonContent flags={flags}>Pause</PageButtonContent>}
+                    ariaLabel={"Pause"}
+                    renderContent={(flags) => <PageControlButtonContent flags={flags} glyph={CONTROL_GLYPHS.pause} />}
                     onClick={() => {
                         props.playback[1](false);
                     }}
@@ -55,7 +58,8 @@ export const CircuitExample = (props: Props) => {
 
                 <Button
                     id={"circuitRewind"}
-                    renderContent={(flags) => <PageButtonContent flags={flags}>Back to start</PageButtonContent>}
+                    ariaLabel={"Back to start"}
+                    renderContent={(flags) => <PageControlButtonContent flags={flags} glyph={CONTROL_GLYPHS.toStart} />}
                     onClick={() => {
                         controller?.seek(0);
                     }}

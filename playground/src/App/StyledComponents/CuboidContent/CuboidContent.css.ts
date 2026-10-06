@@ -15,6 +15,7 @@ const cuboidFaceBase = style({
     height: "100%",
     borderRadius: themeVars.borderRadius.half,
     textAlign: "center",
+    userSelect: "none",
 });
 
 export const cuboidFace = styleVariants({

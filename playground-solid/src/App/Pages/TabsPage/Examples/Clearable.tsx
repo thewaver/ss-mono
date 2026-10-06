@@ -2,7 +2,7 @@ import { Button, Tabs, access } from "@thewaver/ss-components-solid";
 import { CLEARABLE_TABS, ROW_TAB_GAP } from "@thewaver/ss-playground/App/Pages/TabsPage/TabsPage.const";
 
 import { PageControlColumn } from "../../../PageComponents/ControlRow/ControlRow";
-import { PageButtonContent } from "../../../StyledComponents/ButtonContent/ButtonContent";
+import { PageControlButtonContent } from "../../../StyledComponents/ControlButtonContent/ControlButtonContent";
 import { PageTabContent, PageTabFloater, PageTabGutter } from "../../../StyledComponents/TabContent/TabContent";
 import type { TabsExampleProps } from "../TabsPage.types";
 
@@ -42,7 +42,9 @@ export const ClearableExample = (props: Props) => {
 
             <Button
                 ariaLabel={"Clear the selection"}
-                renderContent={(getFlags) => <PageButtonContent flags={getFlags}>Clear</PageButtonContent>}
+                renderContent={(getFlags) => (
+                    <PageControlButtonContent flags={getFlags}>Clear</PageControlButtonContent>
+                )}
                 onClick={async () => props.onClear()}
             />
         </PageControlColumn>

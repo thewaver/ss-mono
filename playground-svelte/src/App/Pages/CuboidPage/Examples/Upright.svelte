@@ -1,8 +1,9 @@
 <script lang="ts">
     import { Button, CUBOID_FACES, Cuboid } from "@thewaver/ss-components-svelte";
     import { computeCuboidFaceLabel } from "@thewaver/ss-playground/App/PageComponents/Announcements/Announcements.const";
+    import { CONTROL_GLYPHS } from "@thewaver/ss-playground/App/StyledComponents/ControlButtonContent/ControlButtonContent.const";
 
-    import PageButtonContent from "../../../StyledComponents/ButtonContent/ButtonContent.svelte";
+    import PageControlButtonContent from "../../../StyledComponents/ControlButtonContent/ControlButtonContent.svelte";
     import PageCuboidFace from "../../../StyledComponents/CuboidContent/PageCuboidFace.svelte";
     import PageCuboidPad from "../../../StyledComponents/CuboidContent/PageCuboidPad.svelte";
     import PageCuboidRow from "../../../StyledComponents/CuboidContent/PageCuboidRow.svelte";
@@ -19,7 +20,7 @@
 {#snippet renderTurn(id: string, label: string, glyph: string, turn: () => void)}
     <Button {id} ariaLabel={label} onClick={turn}>
         {#snippet renderContent(flags)}
-            <PageButtonContent {flags}>{glyph}</PageButtonContent>
+            <PageControlButtonContent {flags} {glyph} />
         {/snippet}
     </Button>
 {/snippet}
@@ -45,21 +46,21 @@
 
     <PageCuboidPad>
         <div></div>
-        {@render renderTurn("uprightPitchUp", "Turn the face above towards you", "↑", () => {
+        {@render renderTurn("uprightPitchUp", "Turn the face above towards you", CONTROL_GLYPHS.up, () => {
             pitch = pitch + QUARTER_TURN;
         })}
         <div></div>
 
-        {@render renderTurn("uprightYawLeft", "Turn the face on the left towards you", "←", () => {
+        {@render renderTurn("uprightYawLeft", "Turn the face on the left towards you", CONTROL_GLYPHS.left, () => {
             yaw = yaw - QUARTER_TURN;
         })}
         <div></div>
-        {@render renderTurn("uprightYawRight", "Turn the face on the right towards you", "→", () => {
+        {@render renderTurn("uprightYawRight", "Turn the face on the right towards you", CONTROL_GLYPHS.right, () => {
             yaw = yaw + QUARTER_TURN;
         })}
 
         <div></div>
-        {@render renderTurn("uprightPitchDown", "Turn the face below towards you", "↓", () => {
+        {@render renderTurn("uprightPitchDown", "Turn the face below towards you", CONTROL_GLYPHS.down, () => {
             pitch = pitch - QUARTER_TURN;
         })}
         <div></div>
@@ -75,7 +76,7 @@
                 }}
             >
                 {#snippet renderContent(flags)}
-                    <PageButtonContent {flags}>{computeCuboidFaceLabel(face)}</PageButtonContent>
+                    <PageControlButtonContent {flags}>{computeCuboidFaceLabel(face)}</PageControlButtonContent>
                 {/snippet}
             </Button>
         {/each}

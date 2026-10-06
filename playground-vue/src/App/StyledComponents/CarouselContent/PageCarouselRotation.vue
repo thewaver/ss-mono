@@ -1,30 +1,12 @@
 <script setup lang="ts">
-import * as styles from "@thewaver/ss-playground/App/StyledComponents/CarouselContent/CarouselContent.css";
+import { CONTROL_GLYPHS } from "@thewaver/ss-playground/App/StyledComponents/ControlButtonContent/ControlButtonContent.const";
 
-import { useLayerClass } from "../Layer/Layer.context";
+import PageControlButtonContent from "../ControlButtonContent/ControlButtonContent.vue";
 import type { CarouselRotationProps } from "./CarouselContent.types";
 
-const ROTATION_GLYPHS = {
-    playing: "❙❙",
-    stopped: "▶",
-};
-
 defineProps<CarouselRotationProps>();
-
-const layerClass = useLayerClass();
 </script>
 
 <template>
-    <div
-        :class="[
-            styles.carouselButton,
-            layerClass,
-            flags.isHovered && styles.isHovered,
-            flags.isActive && styles.isActive,
-            flags.isDisabled && styles.isDisabled,
-        ]"
-        aria-hidden="true"
-    >
-        {{ flags.isPlaying ? ROTATION_GLYPHS.playing : ROTATION_GLYPHS.stopped }}
-    </div>
+    <PageControlButtonContent :flags="flags" :glyph="flags.isPlaying ? CONTROL_GLYPHS.pause : CONTROL_GLYPHS.play" />
 </template>

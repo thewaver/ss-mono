@@ -179,7 +179,7 @@
                 <div class={styles.toastRaiser}>
                     <Button
                         id={"raiseInnerToast"}
-                        ariaLabel={"Raise a notification inside the viewport"}
+                        ariaLabel={"Notify inside the viewport"}
                         onClick={() => {
                             toastCount += 1;
 

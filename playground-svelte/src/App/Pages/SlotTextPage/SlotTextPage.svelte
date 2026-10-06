@@ -4,6 +4,7 @@
     import { SlotTextKnobs } from "@thewaver/ss-playground/App/Knobs/SlotTexts.const";
     import { WORDS } from "@thewaver/ss-playground/App/Pages/SlotTextPage/SlotTextPage.const";
     import * as styles from "@thewaver/ss-playground/App/Pages/SlotTextPage/SlotTextPage.css";
+    import { CONTROL_GLYPHS } from "@thewaver/ss-playground/App/StyledComponents/ControlButtonContent/ControlButtonContent.const";
 
     import PageExampleKnobs from "../../PageComponents/ExampleKnobs/PageExampleKnobs.svelte";
     import type { ExampleDefs } from "../../PageComponents/Examples/Examples.types";
@@ -13,7 +14,7 @@
     import PageMeasureBox from "../../PageComponents/MeasureBox/MeasureBox.svelte";
     import PageProp from "../../PageComponents/Prop/Prop.svelte";
     import PagePropsPanel from "../../PageComponents/PropsPanel/PagePropsPanel.svelte";
-    import PageButtonContent from "../../StyledComponents/ButtonContent/ButtonContent.svelte";
+    import PageControlButtonContent from "../../StyledComponents/ControlButtonContent/ControlButtonContent.svelte";
     import CounterExample from "./Examples/Counter.svelte";
     import ReelsExample from "./Examples/Reels.svelte";
     import SplitFlapExample from "./Examples/SplitFlap.svelte";
@@ -121,7 +122,7 @@
                 }}
             >
                 {#snippet renderContent(flags)}
-                    <PageButtonContent {flags}>{entry.label}</PageButtonContent>
+                    <PageControlButtonContent {flags}>{entry.label}</PageControlButtonContent>
                 {/snippet}
             </Button>
         {/each}
@@ -156,7 +157,7 @@
                 }}
             >
                 {#snippet renderContent(flags)}
-                    <PageButtonContent {flags}>Pull</PageButtonContent>
+                    <PageControlButtonContent {flags}>Pull</PageControlButtonContent>
                 {/snippet}
             </Button>
         </div>
@@ -206,12 +207,13 @@
         <div class={styles.controls}>
             <Button
                 id={"nextWord"}
+                ariaLabel={"Next word"}
                 onClick={() => {
                     wordIndex = (wordIndex + 1) % WORDS.length;
                 }}
             >
                 {#snippet renderContent(flags)}
-                    <PageButtonContent {flags}>Next word</PageButtonContent>
+                    <PageControlButtonContent {flags} glyph={CONTROL_GLYPHS.next} />
                 {/snippet}
             </Button>
         </div>

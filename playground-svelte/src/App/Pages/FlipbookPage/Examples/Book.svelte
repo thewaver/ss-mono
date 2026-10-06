@@ -6,13 +6,11 @@
         computeFlipbookSpreadAnnouncement,
         computeFlipbookStepLabel,
     } from "@thewaver/ss-playground/App/PageComponents/Announcements/Announcements.const";
-    import {
-        FLIPBOOK_PAGES,
-        FLIPBOOK_STEP_CAPTIONS,
-    } from "@thewaver/ss-playground/App/Pages/FlipbookPage/FlipbookPage.const";
+    import { FLIPBOOK_PAGES } from "@thewaver/ss-playground/App/Pages/FlipbookPage/FlipbookPage.const";
     import * as styles from "@thewaver/ss-playground/App/Pages/FlipbookPage/FlipbookPage.css";
+    import { CONTROL_GLYPHS } from "@thewaver/ss-playground/App/StyledComponents/ControlButtonContent/ControlButtonContent.const";
 
-    import PageButtonContent from "../../../StyledComponents/ButtonContent/ButtonContent.svelte";
+    import PageControlButtonContent from "../../../StyledComponents/ControlButtonContent/ControlButtonContent.svelte";
     import type { FlipbookExampleProps } from "../FlipbookPage.types";
 
     const BOOK_GAP = 10;
@@ -51,7 +49,7 @@
             {/snippet}
 
             {#snippet renderStep(step, renderProps)}
-                <PageButtonContent flags={renderProps}>{FLIPBOOK_STEP_CAPTIONS[step]}</PageButtonContent>
+                <PageControlButtonContent flags={renderProps} glyph={CONTROL_GLYPHS[step]} />
             {/snippet}
         </Flipbook>
     </div>

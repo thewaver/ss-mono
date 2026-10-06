@@ -7,9 +7,10 @@ import {
     ZOOM_STEP,
 } from "@thewaver/ss-playground/App/Pages/PatchBoardPage/PatchBoardPage.const";
 import * as styles from "@thewaver/ss-playground/App/Pages/PatchBoardPage/PatchBoardPage.css";
+import { CONTROL_GLYPHS } from "@thewaver/ss-playground/App/StyledComponents/ControlButtonContent/ControlButtonContent.const";
 
 import { PageMeasureBox } from "../../../PageComponents/MeasureBox/MeasureBox";
-import { PageButtonContent } from "../../../StyledComponents/ButtonContent/ButtonContent";
+import { PageControlButtonContent } from "../../../StyledComponents/ControlButtonContent/ControlButtonContent";
 import {
     PagePatchCable,
     PagePatchNode,
@@ -26,13 +27,19 @@ export const ZoomExample = (props: Props) => {
                 <Button
                     id={"patchBoardZoomOut"}
                     isDisabled={() => access(props.zoom) <= MIN_ZOOM}
-                    renderContent={(getFlags) => <PageButtonContent flags={getFlags}>Zoom out</PageButtonContent>}
+                    ariaLabel={"Zoom out"}
+                    renderContent={(getFlags) => (
+                        <PageControlButtonContent flags={getFlags} glyph={CONTROL_GLYPHS.zoomOut} />
+                    )}
                     onClick={() => props.onZoomChange(access(props.zoom) - ZOOM_STEP)}
                 />
                 <Button
                     id={"patchBoardZoomIn"}
                     isDisabled={() => access(props.zoom) >= MAX_ZOOM}
-                    renderContent={(getFlags) => <PageButtonContent flags={getFlags}>Zoom in</PageButtonContent>}
+                    ariaLabel={"Zoom in"}
+                    renderContent={(getFlags) => (
+                        <PageControlButtonContent flags={getFlags} glyph={CONTROL_GLYPHS.zoomIn} />
+                    )}
                     onClick={() => props.onZoomChange(access(props.zoom) + ZOOM_STEP)}
                 />
             </div>

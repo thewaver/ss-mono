@@ -1,8 +1,9 @@
 import { Button, Wraparound } from "@thewaver/ss-components-react";
 import { MARQUEE_WORDS } from "@thewaver/ss-playground/App/Pages/WraparoundPage/WraparoundPage.const";
 import * as styles from "@thewaver/ss-playground/App/Pages/WraparoundPage/WraparoundPage.css";
+import { CONTROL_GLYPHS } from "@thewaver/ss-playground/App/StyledComponents/ControlButtonContent/ControlButtonContent.const";
 
-import { PageButtonContent } from "../../../StyledComponents/ButtonContent/ButtonContent";
+import { PageControlButtonContent } from "../../../StyledComponents/ControlButtonContent/ControlButtonContent";
 import type { WraparoundMarqueeExampleProps } from "../WraparoundPage.types";
 
 type Props = WraparoundMarqueeExampleProps;
@@ -30,8 +31,12 @@ export const MarqueeExample = (props: Props) => (
 
         <Button
             id={"marqueePlayback"}
+            ariaLabel={props.playback[0] ? "Pause" : "Play"}
             renderContent={(flags) => (
-                <PageButtonContent flags={flags}>{props.playback[0] ? "Pause" : "Play"}</PageButtonContent>
+                <PageControlButtonContent
+                    flags={flags}
+                    glyph={props.playback[0] ? CONTROL_GLYPHS.pause : CONTROL_GLYPHS.play}
+                />
             )}
             onClick={() => {
                 props.playback[1](!props.playback[0]);

@@ -5,7 +5,7 @@
     import type { Size2d } from "@thewaver/ss-utils";
 
     import PageMeasureBox from "../../../../PageComponents/MeasureBox/MeasureBox.svelte";
-    import PageButtonContent from "../../../../StyledComponents/ButtonContent/ButtonContent.svelte";
+    import PageControlButtonContent from "../../../../StyledComponents/ControlButtonContent/ControlButtonContent.svelte";
     import PageWheelBar from "../../../../StyledComponents/WheelContent/PageWheelBar.svelte";
     import PageWheelCard from "../../../../StyledComponents/WheelContent/PageWheelCard.svelte";
     import PageWheelMount from "../../../../StyledComponents/WheelContent/PageWheelMount.svelte";
@@ -61,7 +61,7 @@
         }}
     >
         {#snippet renderContent(flags)}
-            <PageButtonContent {flags}>Spin</PageButtonContent>
+            <PageControlButtonContent {flags}>Spin</PageControlButtonContent>
         {/snippet}
     </Button>
 </PageWheelBar>

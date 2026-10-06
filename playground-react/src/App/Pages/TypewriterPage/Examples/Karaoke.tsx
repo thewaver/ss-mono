@@ -3,9 +3,10 @@ import { useState } from "react";
 import { Button, Range, Typewriter } from "@thewaver/ss-components-react";
 import { MEASURE_BOX_PADDING } from "@thewaver/ss-playground/App/PageComponents/MeasureBox/MeasureBox.css";
 import * as styles from "@thewaver/ss-playground/App/Pages/TypewriterPage/TypewriterPage.css";
+import { CONTROL_GLYPHS } from "@thewaver/ss-playground/App/StyledComponents/ControlButtonContent/ControlButtonContent.const";
 
 import { PageMeasureBox } from "../../../PageComponents/MeasureBox/MeasureBox";
-import { PageButtonContent } from "../../../StyledComponents/ButtonContent/ButtonContent";
+import { PageControlButtonContent } from "../../../StyledComponents/ControlButtonContent/ControlButtonContent";
 import { PageRangeContent } from "../../../StyledComponents/RangeContent/RangeContent";
 import type { TypewriterKaraokeExampleProps } from "../TypewriterPage.types";
 
@@ -50,8 +51,12 @@ export const KaraokeExample = (props: Props) => {
             <div className={styles.karaokeControls}>
                 <Button
                     id={"karaokePlay"}
+                    ariaLabel={isPlaying ? "Pause" : "Sing"}
                     renderContent={(flags) => (
-                        <PageButtonContent flags={flags}>{isPlaying ? "Pause" : "Sing"}</PageButtonContent>
+                        <PageControlButtonContent
+                            flags={flags}
+                            glyph={isPlaying ? CONTROL_GLYPHS.pause : CONTROL_GLYPHS.play}
+                        />
                     )}
                     onClick={togglePlaying}
                 />

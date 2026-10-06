@@ -1,7 +1,8 @@
 import { Button, Cuboid } from "@thewaver/ss-components-solid";
 import { computeCuboidFaceLabel } from "@thewaver/ss-playground/App/PageComponents/Announcements/Announcements.const";
+import { CONTROL_GLYPHS } from "@thewaver/ss-playground/App/StyledComponents/ControlButtonContent/ControlButtonContent.const";
 
-import { PageButtonContent } from "../../../StyledComponents/ButtonContent/ButtonContent";
+import { PageControlButtonContent } from "../../../StyledComponents/ControlButtonContent/ControlButtonContent";
 import { PageCuboidFace, PageCuboidPad, PageCuboidStack } from "../../../StyledComponents/CuboidContent/CuboidContent";
 import type { CuboidExampleProps } from "../CuboidPage.types";
 
@@ -17,7 +18,7 @@ export const DefaultExample = (props: Props) => {
         <Button
             id={id}
             ariaLabel={label}
-            renderContent={(getFlags) => <PageButtonContent flags={getFlags}>{glyph}</PageButtonContent>}
+            renderContent={(getFlags) => <PageControlButtonContent flags={getFlags} glyph={glyph} />}
             onClick={turn}
         />
     );
@@ -36,21 +37,21 @@ export const DefaultExample = (props: Props) => {
 
             <PageCuboidPad>
                 <div />
-                {renderTurn("pitchUp", "Turn the top towards you", "\u2191", () => {
+                {renderTurn("pitchUp", "Turn the top towards you", CONTROL_GLYPHS.up, () => {
                     setPitch((pitch) => pitch + QUARTER_TURN);
                 })}
                 <div />
 
-                {renderTurn("yawLeft", "Turn the left face towards you", "\u2190", () => {
+                {renderTurn("yawLeft", "Turn the left face towards you", CONTROL_GLYPHS.left, () => {
                     setYaw((yaw) => yaw - QUARTER_TURN);
                 })}
                 <div />
-                {renderTurn("yawRight", "Turn the right face towards you", "\u2192", () => {
+                {renderTurn("yawRight", "Turn the right face towards you", CONTROL_GLYPHS.right, () => {
                     setYaw((yaw) => yaw + QUARTER_TURN);
                 })}
 
                 <div />
-                {renderTurn("pitchDown", "Turn the bottom towards you", "\u2193", () => {
+                {renderTurn("pitchDown", "Turn the bottom towards you", CONTROL_GLYPHS.down, () => {
                     setPitch((pitch) => pitch - QUARTER_TURN);
                 })}
                 <div />

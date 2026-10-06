@@ -15,7 +15,7 @@
     import * as styles from "@thewaver/ss-playground/App/Pages/CellAnimationPage/CellAnimationPage.css";
     import type { Index2d, Size2d } from "@thewaver/ss-utils";
 
-    import PageButtonContent from "../../../StyledComponents/ButtonContent/ButtonContent.svelte";
+    import PageControlButtonContent from "../../../StyledComponents/ControlButtonContent/ControlButtonContent.svelte";
     import type { CellAnimationExampleProps } from "../CellAnimationPage.types";
 
     const WIPE_CELL_SIZE = 120;
@@ -62,7 +62,7 @@
     }}
 >
     {#snippet renderContent(flags)}
-        <PageButtonContent {flags}>Wipe the screen</PageButtonContent>
+        <PageControlButtonContent {flags}>Wipe the screen</PageControlButtonContent>
     {/snippet}
 </Button>
 

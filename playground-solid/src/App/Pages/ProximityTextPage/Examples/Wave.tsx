@@ -5,9 +5,10 @@ import { ProximityTextKnobs } from "@thewaver/ss-playground/App/Knobs/ProximityT
 import { MEASURE_BOX_PADDING } from "@thewaver/ss-playground/App/PageComponents/MeasureBox/MeasureBox.css";
 import * as styles from "@thewaver/ss-playground/App/Pages/ProximityTextPage/ProximityTextPage.css";
 import type { ProximityTextExampleProps } from "@thewaver/ss-playground/App/Pages/ProximityTextPage/ProximityTextPage.types";
+import { CONTROL_GLYPHS } from "@thewaver/ss-playground/App/StyledComponents/ControlButtonContent/ControlButtonContent.const";
 
 import { PageMeasureBox } from "../../../PageComponents/MeasureBox/MeasureBox";
-import { PageButtonContent } from "../../../StyledComponents/ButtonContent/ButtonContent";
+import { PageControlButtonContent } from "../../../StyledComponents/ControlButtonContent/ControlButtonContent";
 
 const MIDDLE = 0.5;
 const OVERSHOOT = 0.4;
@@ -59,8 +60,12 @@ export const WaveExample = (props: Props) => {
 
             <Button
                 id={"waveMove"}
+                ariaLabel={() => (getIsMoving() ? "Stop" : "Move")}
                 renderContent={(getFlags) => (
-                    <PageButtonContent flags={getFlags}>{getIsMoving() ? "Stop" : "Move"}</PageButtonContent>
+                    <PageControlButtonContent
+                        flags={getFlags}
+                        glyph={() => (getIsMoving() ? CONTROL_GLYPHS.stop : CONTROL_GLYPHS.play)}
+                    />
                 )}
                 onClick={() => {
                     setIsMoving((isMoving) => !isMoving);

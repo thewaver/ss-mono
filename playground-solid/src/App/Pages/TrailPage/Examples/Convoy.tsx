@@ -3,9 +3,10 @@ import { createSignal } from "solid-js";
 import { Button, Trail } from "@thewaver/ss-components-solid";
 import type { TrailController } from "@thewaver/ss-components-solid";
 import * as styles from "@thewaver/ss-playground/App/Pages/TrailPage/TrailPage.css";
+import { CONTROL_GLYPHS } from "@thewaver/ss-playground/App/StyledComponents/ControlButtonContent/ControlButtonContent.const";
 
 import { PageMeasureBox } from "../../../PageComponents/MeasureBox/MeasureBox";
-import { PageButtonContent } from "../../../StyledComponents/ButtonContent/ButtonContent";
+import { PageControlButtonContent } from "../../../StyledComponents/ControlButtonContent/ControlButtonContent";
 import { PageTrailTrack, PageTrailVehicle } from "../../../StyledComponents/TrailContent/TrailContent";
 import type { TrailExampleProps } from "../TrailPage.types";
 
@@ -46,7 +47,10 @@ export const ConvoyExample = (props: Props) => {
             <div class={styles.controls}>
                 <Button
                     id={"convoyPlay"}
-                    renderContent={(getFlags) => <PageButtonContent flags={getFlags}>Play</PageButtonContent>}
+                    ariaLabel={"Play"}
+                    renderContent={(getFlags) => (
+                        <PageControlButtonContent flags={getFlags} glyph={CONTROL_GLYPHS.play} />
+                    )}
                     onClick={() => {
                         props.playback[1](true);
                     }}
@@ -54,7 +58,10 @@ export const ConvoyExample = (props: Props) => {
 
                 <Button
                     id={"convoyPause"}
-                    renderContent={(getFlags) => <PageButtonContent flags={getFlags}>Pause</PageButtonContent>}
+                    ariaLabel={"Pause"}
+                    renderContent={(getFlags) => (
+                        <PageControlButtonContent flags={getFlags} glyph={CONTROL_GLYPHS.pause} />
+                    )}
                     onClick={() => {
                         props.playback[1](false);
                     }}
@@ -62,7 +69,10 @@ export const ConvoyExample = (props: Props) => {
 
                 <Button
                     id={"convoyRewind"}
-                    renderContent={(getFlags) => <PageButtonContent flags={getFlags}>Back to start</PageButtonContent>}
+                    ariaLabel={"Back to start"}
+                    renderContent={(getFlags) => (
+                        <PageControlButtonContent flags={getFlags} glyph={CONTROL_GLYPHS.toStart} />
+                    )}
                     onClick={() => {
                         getController()?.seek(0);
                     }}

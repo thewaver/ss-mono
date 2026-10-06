@@ -9,10 +9,11 @@ import {
     PAINTED_WORDS,
 } from "@thewaver/ss-playground/App/Pages/MorphTextPage/MorphTextPage.const";
 import * as styles from "@thewaver/ss-playground/App/Pages/MorphTextPage/MorphTextPage.css";
+import { CONTROL_GLYPHS } from "@thewaver/ss-playground/App/StyledComponents/ControlButtonContent/ControlButtonContent.const";
 import type { Size2d } from "@thewaver/ss-utils";
 
 import { computePaintDefs } from "../../../PageComponents/PaintPicker/PaintPicker.const";
-import PageButtonContent from "../../../StyledComponents/ButtonContent/ButtonContent.vue";
+import PageControlButtonContent from "../../../StyledComponents/ControlButtonContent/ControlButtonContent.vue";
 import type { MorphTextExampleProps } from "../MorphTextPage.types";
 
 const PAINT_SETTINGS = { colors: SVGDefsSamples.SAMPLE_COLORS, ...MORPH_PAINT_TIMING };
@@ -56,9 +57,12 @@ const computeFillDefs = (text: string) => (size: Size2d, element: HTMLElement | 
             </MorphText>
         </div>
 
-        <Button id="morphPaintedPlayback" @click="togglePlaying">
+        <Button id="morphPaintedPlayback" :ariaLabel="isPlaying ? 'Pause' : 'Play'" @click="togglePlaying">
             <template #renderContent="flags">
-                <PageButtonContent :flags="flags">{{ isPlaying ? "Pause" : "Play" }}</PageButtonContent>
+                <PageControlButtonContent
+                    :flags="flags"
+                    :glyph="isPlaying ? CONTROL_GLYPHS.pause : CONTROL_GLYPHS.play"
+                />
             </template>
         </Button>
     </div>

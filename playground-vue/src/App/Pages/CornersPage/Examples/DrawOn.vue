@@ -5,7 +5,7 @@ import { Button, Corners, MediaQueryMonitorVueUtils } from "@thewaver/ss-compone
 import * as styles from "@thewaver/ss-playground/App/Pages/CornersPage/CornersPage.css";
 import { EasingUtils, MathUtils } from "@thewaver/ss-utils";
 
-import PageButtonContent from "../../../StyledComponents/ButtonContent/ButtonContent.vue";
+import PageControlButtonContent from "../../../StyledComponents/ControlButtonContent/ControlButtonContent.vue";
 import type { CornersExampleProps } from "../CornersPage.types";
 
 type Props = CornersExampleProps;
@@ -86,7 +86,7 @@ const cornerLength = computed(() => ({
         <div :class="styles.controlRow">
             <Button id="cornersDrawOn" :is-pressed="isShown" @click="toggle">
                 <template #renderContent="flags">
-                    <PageButtonContent :flags="flags">{{ isShown ? "Hide" : "Draw" }}</PageButtonContent>
+                    <PageControlButtonContent :flags="flags">{{ isShown ? "Hide" : "Draw" }}</PageControlButtonContent>
                 </template>
             </Button>
         </div>

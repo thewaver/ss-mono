@@ -3,8 +3,9 @@
     import type { FlipCardAxis, FlipCardTurnDirection } from "@thewaver/ss-components-svelte";
     import { computeFlipCardFaceLabel } from "@thewaver/ss-playground/App/PageComponents/Announcements/Announcements.const";
     import * as styles from "@thewaver/ss-playground/App/Pages/FlipCardPage/FlipCardPage.css";
+    import { CONTROL_GLYPHS } from "@thewaver/ss-playground/App/StyledComponents/ControlButtonContent/ControlButtonContent.const";
 
-    import PageButtonContent from "../../../StyledComponents/ButtonContent/ButtonContent.svelte";
+    import PageControlButtonContent from "../../../StyledComponents/ControlButtonContent/ControlButtonContent.svelte";
     import PageFlipCardBack from "../../../StyledComponents/FlipCardContent/PageFlipCardBack.svelte";
     import PageFlipCardFront from "../../../StyledComponents/FlipCardContent/PageFlipCardFront.svelte";
     import PageFlipCardStack from "../../../StyledComponents/FlipCardContent/PageFlipCardStack.svelte";
@@ -16,6 +17,11 @@
     const EDGE_LABELS: Record<FlipCardAxis, Record<FlipCardTurnDirection, string>> = {
         row: { backward: "Press the left edge", forward: "Press the right edge" },
         column: { backward: "Press the bottom edge", forward: "Press the top edge" },
+    };
+
+    const EDGE_GLYPHS: Record<FlipCardAxis, Record<FlipCardTurnDirection, string>> = {
+        row: { backward: CONTROL_GLYPHS.left, forward: CONTROL_GLYPHS.right },
+        column: { backward: CONTROL_GLYPHS.down, forward: CONTROL_GLYPHS.up },
     };
 
     const PERCENT = 100;
@@ -63,7 +69,7 @@
         {#each FLIP_CARD_TURN_DIRECTIONS as direction (direction)}
             <Button id={`press-${direction}`} ariaLabel={getEdgeLabel(direction)} onClick={() => turn(direction)}>
                 {#snippet renderContent(flags)}
-                    <PageButtonContent {flags}>{getEdgeLabel(direction)}</PageButtonContent>
+                    <PageControlButtonContent {flags} glyph={EDGE_GLYPHS[props.axis][direction]} />
                 {/snippet}
             </Button>
         {/each}

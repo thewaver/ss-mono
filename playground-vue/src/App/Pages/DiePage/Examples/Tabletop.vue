@@ -5,7 +5,7 @@ import { Button, Die } from "@thewaver/ss-components-vue";
 import type { DieController } from "@thewaver/ss-components-vue";
 import * as styles from "@thewaver/ss-playground/App/Pages/DiePage/DiePage.css";
 
-import PageButtonContent from "../../../StyledComponents/ButtonContent/ButtonContent.vue";
+import PageControlButtonContent from "../../../StyledComponents/ControlButtonContent/ControlButtonContent.vue";
 import PageDieFace from "../../../StyledComponents/DieContent/DieContent.vue";
 import type { DieExampleProps } from "../DiePage.types";
 
@@ -51,7 +51,7 @@ const roll = () => {
 
         <Button id="dieRoll" :is-disabled="isRolling" @click="roll">
             <template #renderContent="flags">
-                <PageButtonContent :flags="flags">Roll</PageButtonContent>
+                <PageControlButtonContent :flags="flags">Roll</PageControlButtonContent>
             </template>
         </Button>
     </div>

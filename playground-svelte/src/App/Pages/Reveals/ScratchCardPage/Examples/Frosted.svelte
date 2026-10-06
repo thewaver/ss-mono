@@ -2,9 +2,10 @@
     import { Button, ScratchCard } from "@thewaver/ss-components-svelte";
     import type { ScratchCardController } from "@thewaver/ss-components-svelte";
     import * as styles from "@thewaver/ss-playground/App/Pages/Reveals/ScratchCardPage/ScratchCardPage.css";
+    import { CONTROL_GLYPHS } from "@thewaver/ss-playground/App/StyledComponents/ControlButtonContent/ControlButtonContent.const";
 
     import PageMeasureBox from "../../../../PageComponents/MeasureBox/MeasureBox.svelte";
-    import PageButtonContent from "../../../../StyledComponents/ButtonContent/ButtonContent.svelte";
+    import PageControlButtonContent from "../../../../StyledComponents/ControlButtonContent/ControlButtonContent.svelte";
     import type { ScratchCardExampleProps } from "../ScratchCardPage.types";
 
     const CARD_WIDTH = 360;
@@ -50,12 +51,13 @@
     <div class={styles.buttonRow}>
         <Button
             id={"newFrost"}
+            ariaLabel={"Re-freeze"}
             onClick={() => {
                 controller?.reset();
             }}
         >
             {#snippet renderContent(flags)}
-                <PageButtonContent {flags}>Re-freeze</PageButtonContent>
+                <PageControlButtonContent {flags} glyph={CONTROL_GLYPHS.replay} />
             {/snippet}
         </Button>
     </div>

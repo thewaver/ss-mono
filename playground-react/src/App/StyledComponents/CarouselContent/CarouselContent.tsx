@@ -2,7 +2,9 @@ import type { PropsWithChildren } from "react";
 
 import type { CarouselStep } from "@thewaver/ss-components-react";
 import * as styles from "@thewaver/ss-playground/App/StyledComponents/CarouselContent/CarouselContent.css";
+import { CONTROL_GLYPHS } from "@thewaver/ss-playground/App/StyledComponents/ControlButtonContent/ControlButtonContent.const";
 
+import { PageControlButtonContent } from "../ControlButtonContent/ControlButtonContent";
 import { useLayerClass } from "../Layer/Layer.context";
 import type {
     CarouselPickProps,
@@ -12,13 +14,8 @@ import type {
 } from "./CarouselContent.types";
 
 const STEP_GLYPHS: Record<CarouselStep, string> = {
-    previous: "‹",
-    next: "›",
-};
-
-const ROTATION_GLYPHS = {
-    playing: "❙❙",
-    stopped: "▶",
+    previous: CONTROL_GLYPHS.previous,
+    next: CONTROL_GLYPHS.next,
 };
 
 export const PageCarouselSlide = (props: PropsWithChildren<CarouselSlideProps>) => {
@@ -50,47 +47,16 @@ export const PageCarouselBar = (props: PropsWithChildren) => {
     return <div className={[styles.carouselBar, layerClass].join(" ")}>{props.children}</div>;
 };
 
-export const PageCarouselStep = (props: CarouselStepProps) => {
-    const layerClass = useLayerClass();
+export const PageCarouselStep = (props: CarouselStepProps) => (
+    <PageControlButtonContent flags={props.renderProps} glyph={STEP_GLYPHS[props.renderProps.step]} />
+);
 
-    return (
-        <div
-            className={[
-                styles.carouselButton,
-                layerClass,
-                props.renderProps.isHovered && styles.isHovered,
-                props.renderProps.isActive && styles.isActive,
-                props.renderProps.isDisabled && styles.isDisabled,
-            ]
-                .filter(Boolean)
-                .join(" ")}
-            aria-hidden="true"
-        >
-            {STEP_GLYPHS[props.renderProps.step]}
-        </div>
-    );
-};
-
-export const PageCarouselRotation = (props: CarouselRotationProps) => {
-    const layerClass = useLayerClass();
-
-    return (
-        <div
-            className={[
-                styles.carouselButton,
-                layerClass,
-                props.flags.isHovered && styles.isHovered,
-                props.flags.isActive && styles.isActive,
-                props.flags.isDisabled && styles.isDisabled,
-            ]
-                .filter(Boolean)
-                .join(" ")}
-            aria-hidden="true"
-        >
-            {props.flags.isPlaying ? ROTATION_GLYPHS.playing : ROTATION_GLYPHS.stopped}
-        </div>
-    );
-};
+export const PageCarouselRotation = (props: CarouselRotationProps) => (
+    <PageControlButtonContent
+        flags={props.flags}
+        glyph={props.flags.isPlaying ? CONTROL_GLYPHS.pause : CONTROL_GLYPHS.play}
+    />
+);
 
 export const PageCarouselPick = (props: CarouselPickProps) => {
     const layerClass = useLayerClass();

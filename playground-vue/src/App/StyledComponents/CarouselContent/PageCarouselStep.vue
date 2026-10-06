@@ -1,31 +1,18 @@
 <script setup lang="ts">
 import type { CarouselStep } from "@thewaver/ss-components-vue";
-import * as styles from "@thewaver/ss-playground/App/StyledComponents/CarouselContent/CarouselContent.css";
+import { CONTROL_GLYPHS } from "@thewaver/ss-playground/App/StyledComponents/ControlButtonContent/ControlButtonContent.const";
 
-import { useLayerClass } from "../Layer/Layer.context";
+import PageControlButtonContent from "../ControlButtonContent/ControlButtonContent.vue";
 import type { CarouselStepProps } from "./CarouselContent.types";
 
 const STEP_GLYPHS: Record<CarouselStep, string> = {
-    previous: "‹",
-    next: "›",
+    previous: CONTROL_GLYPHS.previous,
+    next: CONTROL_GLYPHS.next,
 };
 
 defineProps<CarouselStepProps>();
-
-const layerClass = useLayerClass();
 </script>
 
 <template>
-    <div
-        :class="[
-            styles.carouselButton,
-            layerClass,
-            renderProps.isHovered && styles.isHovered,
-            renderProps.isActive && styles.isActive,
-            renderProps.isDisabled && styles.isDisabled,
-        ]"
-        aria-hidden="true"
-    >
-        {{ STEP_GLYPHS[renderProps.step] }}
-    </div>
+    <PageControlButtonContent :flags="renderProps" :glyph="STEP_GLYPHS[renderProps.step]" />
 </template>

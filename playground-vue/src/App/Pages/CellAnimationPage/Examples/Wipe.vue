@@ -16,7 +16,7 @@ import type { CellAnimationEvaluationDefs, CellAnimationPlaybackOpts } from "@th
 import * as styles from "@thewaver/ss-playground/App/Pages/CellAnimationPage/CellAnimationPage.css";
 import type { Index2d, Size2d } from "@thewaver/ss-utils";
 
-import PageButtonContent from "../../../StyledComponents/ButtonContent/ButtonContent.vue";
+import PageControlButtonContent from "../../../StyledComponents/ControlButtonContent/ControlButtonContent.vue";
 import type { CellAnimationExampleProps } from "../CellAnimationPage.types";
 
 const WIPE_CELL_SIZE = 120;
@@ -78,7 +78,7 @@ const computeCellAnimation = (defs: CellAnimationEvaluationDefs, timeline: numbe
 <template>
     <Button id="cellAnimationWipe" @click="wipe">
         <template #renderContent="flags">
-            <PageButtonContent :flags="flags">Wipe the screen</PageButtonContent>
+            <PageControlButtonContent :flags="flags">Wipe the screen</PageControlButtonContent>
         </template>
     </Button>
 

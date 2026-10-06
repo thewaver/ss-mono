@@ -7,7 +7,7 @@ import { Button, Tabs } from "@thewaver/ss-components-vue";
 import { CLEARABLE_TABS, ROW_TAB_GAP } from "@thewaver/ss-playground/App/Pages/TabsPage/TabsPage.const";
 
 import PageControlColumn from "../../../PageComponents/ControlRow/PageControlColumn.vue";
-import PageButtonContent from "../../../StyledComponents/ButtonContent/ButtonContent.vue";
+import PageControlButtonContent from "../../../StyledComponents/ControlButtonContent/ControlButtonContent.vue";
 import PageTabContent from "../../../StyledComponents/TabContent/PageTabContent.vue";
 import PageTabFloater from "../../../StyledComponents/TabContent/PageTabFloater.vue";
 import PageTabGutter from "../../../StyledComponents/TabContent/PageTabGutter.vue";
@@ -50,7 +50,7 @@ const props = defineProps<Props>();
 
         <Button ariaLabel="Clear the selection" @click="async () => props.onClear()">
             <template #renderContent="flags">
-                <PageButtonContent :flags="flags">Clear</PageButtonContent>
+                <PageControlButtonContent :flags="flags">Clear</PageControlButtonContent>
             </template>
         </Button>
     </PageControlColumn>

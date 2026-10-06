@@ -11,6 +11,7 @@ export const deckStage = style({
     alignItems: "stretch",
     width: "100%",
     minWidth: 0,
+    userSelect: "none",
 });
 
 export const deckControls = style({

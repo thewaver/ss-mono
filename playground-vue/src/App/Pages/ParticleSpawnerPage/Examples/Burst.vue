@@ -6,7 +6,7 @@ import type { ParticleSpawnIterationPattern } from "@thewaver/ss-components-vue"
 import { computeParticleGlow } from "@thewaver/ss-playground/App/Pages/ParticleSpawnerPage/ParticleSpawnerPage.const";
 import * as styles from "@thewaver/ss-playground/App/Pages/ParticleSpawnerPage/ParticleSpawnerPage.css";
 
-import PageButtonContent from "../../../StyledComponents/ButtonContent/ButtonContent.vue";
+import PageControlButtonContent from "../../../StyledComponents/ControlButtonContent/ControlButtonContent.vue";
 import type { ParticleSpawnerExampleProps } from "../ParticleSpawnerPage.types";
 
 const ONE_ROUND: ParticleSpawnIterationPattern[] = [{ count: 1 }];
@@ -60,7 +60,7 @@ const computeParticleStyle = (t: number) => {
         <div :class="styles.burstRoot" :style="{ left: '50%', top: '50%' }">
             <Button id="particleBurst" @click="burst">
                 <template #renderContent="flags">
-                    <PageButtonContent :flags="flags">Burst</PageButtonContent>
+                    <PageControlButtonContent :flags="flags">Burst</PageControlButtonContent>
                 </template>
             </Button>
 

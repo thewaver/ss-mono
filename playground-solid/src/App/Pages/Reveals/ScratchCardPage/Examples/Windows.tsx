@@ -3,9 +3,10 @@ import { For } from "solid-js";
 import { Button, ScratchCard } from "@thewaver/ss-components-solid";
 import type { ScratchCardController } from "@thewaver/ss-components-solid";
 import * as styles from "@thewaver/ss-playground/App/Pages/Reveals/ScratchCardPage/ScratchCardPage.css";
+import { CONTROL_GLYPHS } from "@thewaver/ss-playground/App/StyledComponents/ControlButtonContent/ControlButtonContent.const";
 
 import { PageMeasureBox } from "../../../../PageComponents/MeasureBox/MeasureBox";
-import { PageButtonContent } from "../../../../StyledComponents/ButtonContent/ButtonContent";
+import { PageControlButtonContent } from "../../../../StyledComponents/ControlButtonContent/ControlButtonContent";
 import type { ScratchCardWindowsExampleProps } from "../ScratchCardPage.types";
 
 const TICKET_WIDTH = 360;
@@ -53,7 +54,10 @@ export const WindowsExample = (props: Props) => {
             <div class={styles.buttonRow}>
                 <Button
                     id={"newWindowsTicket"}
-                    renderContent={(getFlags) => <PageButtonContent flags={getFlags}>New ticket</PageButtonContent>}
+                    ariaLabel={"New ticket"}
+                    renderContent={(getFlags) => (
+                        <PageControlButtonContent flags={getFlags} glyph={CONTROL_GLYPHS.replay} />
+                    )}
                     onClick={() => {
                         controllers.forEach((controller) => controller.reset());
                     }}

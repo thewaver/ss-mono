@@ -4,8 +4,9 @@ import { Button, MorphText } from "@thewaver/ss-components-react";
 import { MorphTextKnobs } from "@thewaver/ss-playground/App/Knobs/MorphTexts.const";
 import { MORPH_WORDS } from "@thewaver/ss-playground/App/Pages/MorphTextPage/MorphTextPage.const";
 import * as styles from "@thewaver/ss-playground/App/Pages/MorphTextPage/MorphTextPage.css";
+import { CONTROL_GLYPHS } from "@thewaver/ss-playground/App/StyledComponents/ControlButtonContent/ControlButtonContent.const";
 
-import { PageButtonContent } from "../../../StyledComponents/ButtonContent/ButtonContent";
+import { PageControlButtonContent } from "../../../StyledComponents/ControlButtonContent/ControlButtonContent";
 import type { MorphTextExampleProps } from "../MorphTextPage.types";
 
 type Props = MorphTextExampleProps;
@@ -41,8 +42,12 @@ export const WordsExample = (props: Props) => {
 
             <Button
                 id={"morphWordsPlayback"}
+                ariaLabel={isPlaying ? "Pause" : "Play"}
                 renderContent={(flags) => (
-                    <PageButtonContent flags={flags}>{isPlaying ? "Pause" : "Play"}</PageButtonContent>
+                    <PageControlButtonContent
+                        flags={flags}
+                        glyph={isPlaying ? CONTROL_GLYPHS.pause : CONTROL_GLYPHS.play}
+                    />
                 )}
                 onClick={() => setIsPlaying((playing) => !playing)}
             />

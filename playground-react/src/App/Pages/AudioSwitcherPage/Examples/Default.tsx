@@ -3,8 +3,9 @@ import { useState } from "react";
 import { AudioSwitcher, Button } from "@thewaver/ss-components-react";
 import type { AudioSwitcherController } from "@thewaver/ss-components-react";
 import * as styles from "@thewaver/ss-playground/App/Pages/AudioSwitcherPage/AudioSwitcherPage.css";
+import { CONTROL_GLYPHS } from "@thewaver/ss-playground/App/StyledComponents/ControlButtonContent/ControlButtonContent.const";
 
-import { PageButtonContent } from "../../../StyledComponents/ButtonContent/ButtonContent";
+import { PageControlButtonContent } from "../../../StyledComponents/ControlButtonContent/ControlButtonContent";
 import type { AudioSwitcherExampleProps } from "../AudioSwitcherPage.types";
 
 type Props = AudioSwitcherExampleProps;
@@ -18,8 +19,12 @@ export const DefaultExample = (props: Props) => {
         <div className={styles.deck}>
             <div className={styles.row}>
                 <Button
+                    ariaLabel={isPlaying ? "Stop" : "Play"}
                     renderContent={(flags) => (
-                        <PageButtonContent flags={flags}>{isPlaying ? "Stop" : "Play"}</PageButtonContent>
+                        <PageControlButtonContent
+                            flags={flags}
+                            glyph={isPlaying ? CONTROL_GLYPHS.stop : CONTROL_GLYPHS.play}
+                        />
                     )}
                     onClick={() => {
                         setIsPlaying(!isPlaying);
@@ -28,7 +33,8 @@ export const DefaultExample = (props: Props) => {
 
                 <Button
                     isDisabled={!isPlaying}
-                    renderContent={(flags) => <PageButtonContent flags={flags}>Start over</PageButtonContent>}
+                    ariaLabel={"Start over"}
+                    renderContent={(flags) => <PageControlButtonContent flags={flags} glyph={CONTROL_GLYPHS.replay} />}
                     onClick={() => {
                         controller?.reset();
                     }}

@@ -6,7 +6,7 @@ import { pickPrizeIndex } from "@thewaver/ss-playground/App/Pages/Wheels/Wheels.
 import type { Size2d } from "@thewaver/ss-utils";
 
 import { PageMeasureBox } from "../../../../PageComponents/MeasureBox/MeasureBox";
-import { PageButtonContent } from "../../../../StyledComponents/ButtonContent/ButtonContent";
+import { PageControlButtonContent } from "../../../../StyledComponents/ControlButtonContent/ControlButtonContent";
 import {
     PageWheelBar,
     PageWheelCard,
@@ -54,7 +54,7 @@ export const OverExample = ({ wedges, ...otherProps }: Props) => {
                     id={"reelSpin"}
                     ariaLabel={"Spin the wheel"}
                     isDisabled={!isSpinnable}
-                    renderContent={(flags) => <PageButtonContent flags={flags}>Spin</PageButtonContent>}
+                    renderContent={(flags) => <PageControlButtonContent flags={flags}>Spin</PageControlButtonContent>}
                     onClick={() => {
                         controller?.spin();
                     }}

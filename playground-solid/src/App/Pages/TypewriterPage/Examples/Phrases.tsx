@@ -4,9 +4,10 @@ import { Button, MediaQueryMonitorSolidUtils, Typewriter } from "@thewaver/ss-co
 import type { TypewriterMode } from "@thewaver/ss-components-solid";
 import { MEASURE_BOX_PADDING } from "@thewaver/ss-playground/App/PageComponents/MeasureBox/MeasureBox.css";
 import * as styles from "@thewaver/ss-playground/App/Pages/TypewriterPage/TypewriterPage.css";
+import { CONTROL_GLYPHS } from "@thewaver/ss-playground/App/StyledComponents/ControlButtonContent/ControlButtonContent.const";
 
 import { PageMeasureBox } from "../../../PageComponents/MeasureBox/MeasureBox";
-import { PageButtonContent } from "../../../StyledComponents/ButtonContent/ButtonContent";
+import { PageControlButtonContent } from "../../../StyledComponents/ControlButtonContent/ControlButtonContent";
 import type { TypewriterPhrasesExampleProps } from "../TypewriterPage.types";
 
 const LEAD = "We build";
@@ -108,8 +109,12 @@ export const PhrasesExample = (props: Props) => {
 
             <Button
                 id={"pausePhrases"}
+                ariaLabel={() => (getIsPaused() ? "Resume" : "Pause")}
                 renderContent={(getFlags) => (
-                    <PageButtonContent flags={getFlags}>{getIsPaused() ? "Resume" : "Pause"}</PageButtonContent>
+                    <PageControlButtonContent
+                        flags={getFlags}
+                        glyph={() => (getIsPaused() ? CONTROL_GLYPHS.play : CONTROL_GLYPHS.pause)}
+                    />
                 )}
                 onClick={() => {
                     togglePause();

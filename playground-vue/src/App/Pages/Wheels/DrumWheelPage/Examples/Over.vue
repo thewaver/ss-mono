@@ -7,7 +7,7 @@ import { pickPrizeIndex } from "@thewaver/ss-playground/App/Pages/Wheels/Wheels.
 import type { Size2d } from "@thewaver/ss-utils";
 
 import PageMeasureBox from "../../../../PageComponents/MeasureBox/MeasureBox.vue";
-import PageButtonContent from "../../../../StyledComponents/ButtonContent/ButtonContent.vue";
+import PageControlButtonContent from "../../../../StyledComponents/ControlButtonContent/ControlButtonContent.vue";
 import PageWheelBar from "../../../../StyledComponents/WheelContent/PageWheelBar.vue";
 import PageWheelCard from "../../../../StyledComponents/WheelContent/PageWheelCard.vue";
 import PageWheelMount from "../../../../StyledComponents/WheelContent/PageWheelMount.vue";
@@ -73,7 +73,7 @@ const spin = () => {
     <PageWheelBar>
         <Button id="reelSpin" ariaLabel="Spin the wheel" :is-disabled="!controller?.getIsSpinnable()" @click="spin">
             <template #renderContent="flags">
-                <PageButtonContent :flags="flags">Spin</PageButtonContent>
+                <PageControlButtonContent :flags="flags">Spin</PageControlButtonContent>
             </template>
         </Button>
     </PageWheelBar>

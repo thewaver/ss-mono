@@ -4,8 +4,9 @@ import { Button, FLIP_CARD_TURN_DIRECTIONS, FlipCard, Range, access } from "@the
 import type { FlipCardAxis, FlipCardTurnDirection } from "@thewaver/ss-components-solid";
 import { computeFlipCardFaceLabel } from "@thewaver/ss-playground/App/PageComponents/Announcements/Announcements.const";
 import * as styles from "@thewaver/ss-playground/App/Pages/FlipCardPage/FlipCardPage.css";
+import { CONTROL_GLYPHS } from "@thewaver/ss-playground/App/StyledComponents/ControlButtonContent/ControlButtonContent.const";
 
-import { PageButtonContent } from "../../../StyledComponents/ButtonContent/ButtonContent";
+import { PageControlButtonContent } from "../../../StyledComponents/ControlButtonContent/ControlButtonContent";
 import {
     PageFlipCardBack,
     PageFlipCardFront,
@@ -19,6 +20,11 @@ const CARD_SIZE = { width: 220, height: 300 };
 const EDGE_LABELS: Record<FlipCardAxis, Record<FlipCardTurnDirection, string>> = {
     row: { backward: "Press the left edge", forward: "Press the right edge" },
     column: { backward: "Press the bottom edge", forward: "Press the top edge" },
+};
+
+const EDGE_GLYPHS: Record<FlipCardAxis, Record<FlipCardTurnDirection, string>> = {
+    row: { backward: CONTROL_GLYPHS.left, forward: CONTROL_GLYPHS.right },
+    column: { backward: CONTROL_GLYPHS.down, forward: CONTROL_GLYPHS.up },
 };
 
 const PERCENT = 100;
@@ -64,7 +70,10 @@ export const PressedExample = (props: Props) => {
                             id={`press-${direction}`}
                             ariaLabel={getEdgeLabel(direction)}
                             renderContent={(getFlags) => (
-                                <PageButtonContent flags={getFlags}>{getEdgeLabel(direction)}</PageButtonContent>
+                                <PageControlButtonContent
+                                    flags={getFlags}
+                                    glyph={() => EDGE_GLYPHS[access(props.axis)][direction]}
+                                />
                             )}
                             onClick={() => turn(direction)}
                         />

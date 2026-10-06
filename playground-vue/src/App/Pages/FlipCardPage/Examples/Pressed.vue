@@ -5,8 +5,9 @@ import { Button, FLIP_CARD_TURN_DIRECTIONS, FlipCard, Range } from "@thewaver/ss
 import type { FlipCardAxis, FlipCardTurnDirection } from "@thewaver/ss-components-vue";
 import { computeFlipCardFaceLabel } from "@thewaver/ss-playground/App/PageComponents/Announcements/Announcements.const";
 import * as styles from "@thewaver/ss-playground/App/Pages/FlipCardPage/FlipCardPage.css";
+import { CONTROL_GLYPHS } from "@thewaver/ss-playground/App/StyledComponents/ControlButtonContent/ControlButtonContent.const";
 
-import PageButtonContent from "../../../StyledComponents/ButtonContent/ButtonContent.vue";
+import PageControlButtonContent from "../../../StyledComponents/ControlButtonContent/ControlButtonContent.vue";
 import PageFlipCardBack from "../../../StyledComponents/FlipCardContent/PageFlipCardBack.vue";
 import PageFlipCardFront from "../../../StyledComponents/FlipCardContent/PageFlipCardFront.vue";
 import PageFlipCardStack from "../../../StyledComponents/FlipCardContent/PageFlipCardStack.vue";
@@ -18,6 +19,11 @@ const CARD_SIZE = { width: 220, height: 300 };
 const EDGE_LABELS: Record<FlipCardAxis, Record<FlipCardTurnDirection, string>> = {
     row: { backward: "Press the left edge", forward: "Press the right edge" },
     column: { backward: "Press the bottom edge", forward: "Press the top edge" },
+};
+
+const EDGE_GLYPHS: Record<FlipCardAxis, Record<FlipCardTurnDirection, string>> = {
+    row: { backward: CONTROL_GLYPHS.left, forward: CONTROL_GLYPHS.right },
+    column: { backward: CONTROL_GLYPHS.down, forward: CONTROL_GLYPHS.up },
 };
 
 const PERCENT = 100;
@@ -73,7 +79,7 @@ const turn = (direction: FlipCardTurnDirection) => {
                 @click="turn(direction)"
             >
                 <template #renderContent="flags">
-                    <PageButtonContent :flags="flags">{{ getEdgeLabel(direction) }}</PageButtonContent>
+                    <PageControlButtonContent :flags="flags" :glyph="EDGE_GLYPHS[props.axis][direction]" />
                 </template>
             </Button>
         </div>

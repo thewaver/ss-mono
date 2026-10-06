@@ -2,9 +2,10 @@
     import { Button, ScratchCard } from "@thewaver/ss-components-svelte";
     import type { ScratchCardController } from "@thewaver/ss-components-svelte";
     import * as styles from "@thewaver/ss-playground/App/Pages/Reveals/ScratchCardPage/ScratchCardPage.css";
+    import { CONTROL_GLYPHS } from "@thewaver/ss-playground/App/StyledComponents/ControlButtonContent/ControlButtonContent.const";
 
     import PageMeasureBox from "../../../../PageComponents/MeasureBox/MeasureBox.svelte";
-    import PageButtonContent from "../../../../StyledComponents/ButtonContent/ButtonContent.svelte";
+    import PageControlButtonContent from "../../../../StyledComponents/ControlButtonContent/ControlButtonContent.svelte";
     import type { ScratchCardWindowsExampleProps } from "../ScratchCardPage.types";
 
     const TICKET_WIDTH = 360;
@@ -59,12 +60,13 @@
     <div class={styles.buttonRow}>
         <Button
             id={"newWindowsTicket"}
+            ariaLabel={"New ticket"}
             onClick={() => {
                 controllers.forEach((controller) => controller.reset());
             }}
         >
             {#snippet renderContent(flags)}
-                <PageButtonContent {flags}>New ticket</PageButtonContent>
+                <PageControlButtonContent {flags} glyph={CONTROL_GLYPHS.replay} />
             {/snippet}
         </Button>
     </div>

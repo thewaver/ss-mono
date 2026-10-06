@@ -4,11 +4,12 @@ import { computed, shallowRef, watch } from "vue";
 import { Bracket, BracketUtils, Button } from "@thewaver/ss-components-vue";
 import type { BracketNode, BracketStep } from "@thewaver/ss-components-vue";
 import * as styles from "@thewaver/ss-playground/App/Pages/BracketPage/BracketPage.css";
+import { CONTROL_GLYPHS } from "@thewaver/ss-playground/App/StyledComponents/ControlButtonContent/ControlButtonContent.const";
 import { EasingUtils, MathUtils } from "@thewaver/ss-utils";
 import { assignInlineVars } from "@vanilla-extract/dynamic";
 
 import PageMeasureBox from "../../../PageComponents/MeasureBox/MeasureBox.vue";
-import PageButtonContent from "../../../StyledComponents/ButtonContent/ButtonContent.vue";
+import PageControlButtonContent from "../../../StyledComponents/ControlButtonContent/ControlButtonContent.vue";
 import { branch, computeFamilySteps, describeFamily, seed } from "../BracketPage.const";
 import type { BracketFamilyExampleProps } from "../BracketPage.types";
 import PageBracketLayerHeader from "../PageBracketLayerHeader.vue";
@@ -184,9 +185,12 @@ watch(family, (next) => props.onFamilyChange(describeFamily(DRAW.value, next?.va
         </PageMeasureBox>
 
         <div :class="styles.familyControls">
-            <Button id="familyZoom" @click="toggleZoom">
+            <Button id="familyZoom" :ariaLabel="isZoomedIn ? 'Zoom out' : 'Zoom in'" @click="toggleZoom">
                 <template #renderContent="flags">
-                    <PageButtonContent :flags="flags">{{ isZoomedIn ? "Zoom out" : "Zoom in" }}</PageButtonContent>
+                    <PageControlButtonContent
+                        :flags="flags"
+                        :glyph="isZoomedIn ? CONTROL_GLYPHS.zoomOut : CONTROL_GLYPHS.zoomIn"
+                    />
                 </template>
             </Button>
 
@@ -195,10 +199,11 @@ watch(family, (next) => props.onFamilyChange(describeFamily(DRAW.value, next?.va
                 :id="`familyStep-${entry.step}`"
                 :key="entry.step"
                 :is-disabled="!isZoomedIn || computeStep(entry.step) === family"
+                :ariaLabel="entry.label"
                 @click="showStep(entry.step)"
             >
                 <template #renderContent="flags">
-                    <PageButtonContent :flags="flags">{{ entry.label }}</PageButtonContent>
+                    <PageControlButtonContent :flags="flags" :glyph="entry.glyph" />
                 </template>
             </Button>
         </div>

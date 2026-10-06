@@ -3,7 +3,7 @@
     import type { DieController } from "@thewaver/ss-components-svelte";
     import * as styles from "@thewaver/ss-playground/App/Pages/DiePage/DiePage.css";
 
-    import PageButtonContent from "../../../StyledComponents/ButtonContent/ButtonContent.svelte";
+    import PageControlButtonContent from "../../../StyledComponents/ControlButtonContent/ControlButtonContent.svelte";
     import PageDieFace from "../../../StyledComponents/DieContent/DieContent.svelte";
     import type { DieExampleProps } from "../DiePage.types";
 
@@ -46,7 +46,7 @@
         }}
     >
         {#snippet renderContent(flags)}
-            <PageButtonContent {flags}>Roll</PageButtonContent>
+            <PageControlButtonContent {flags}>Roll</PageControlButtonContent>
         {/snippet}
     </Button>
 </div>

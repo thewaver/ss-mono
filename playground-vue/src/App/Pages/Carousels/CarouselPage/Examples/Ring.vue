@@ -9,9 +9,10 @@ import {
     computePositionLabel,
 } from "@thewaver/ss-playground/App/PageComponents/Announcements/Announcements.const";
 import * as styles from "@thewaver/ss-playground/App/Pages/Carousels/Carousels.css";
+import { CONTROL_GLYPHS } from "@thewaver/ss-playground/App/StyledComponents/ControlButtonContent/ControlButtonContent.const";
 
-import PageButtonContent from "../../../../StyledComponents/ButtonContent/ButtonContent.vue";
 import PageCarouselSlide from "../../../../StyledComponents/CarouselContent/PageCarouselSlide.vue";
+import PageControlButtonContent from "../../../../StyledComponents/ControlButtonContent/ControlButtonContent.vue";
 import type { CarouselExampleProps } from "../../Carousels.types";
 
 type Props = Pick<CarouselExampleProps, "slides" | "index" | "onUpdate:index" | "isDisabled" | "orientation">;
@@ -91,9 +92,12 @@ watch(
             </div>
         </div>
 
-        <Button id="ringTurn" @click="toggleTurning">
+        <Button id="ringTurn" :ariaLabel="isTurning ? 'Stop' : 'Turn'" @click="toggleTurning">
             <template #renderContent="flags">
-                <PageButtonContent :flags="flags">{{ isTurning ? "Stop" : "Turn" }}</PageButtonContent>
+                <PageControlButtonContent
+                    :flags="flags"
+                    :glyph="isTurning ? CONTROL_GLYPHS.stop : CONTROL_GLYPHS.play"
+                />
             </template>
         </Button>
     </div>

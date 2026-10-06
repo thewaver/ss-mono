@@ -4,7 +4,7 @@ import { Button, Corners, MediaQueryMonitorReactUtils } from "@thewaver/ss-compo
 import * as styles from "@thewaver/ss-playground/App/Pages/CornersPage/CornersPage.css";
 import { EasingUtils, MathUtils } from "@thewaver/ss-utils";
 
-import { PageButtonContent } from "../../../StyledComponents/ButtonContent/ButtonContent";
+import { PageControlButtonContent } from "../../../StyledComponents/ControlButtonContent/ControlButtonContent";
 import type { CornersExampleProps } from "../CornersPage.types";
 
 type Props = CornersExampleProps;
@@ -79,7 +79,7 @@ export const DrawOnExample = (props: Props) => {
                     id={"cornersDrawOn"}
                     isPressed={isShown}
                     renderContent={(flags) => (
-                        <PageButtonContent flags={flags}>{isShown ? "Hide" : "Draw"}</PageButtonContent>
+                        <PageControlButtonContent flags={flags}>{isShown ? "Hide" : "Draw"}</PageControlButtonContent>
                     )}
                     onClick={() => {
                         if (!isShown) drawOn();

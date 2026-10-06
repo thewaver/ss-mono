@@ -3,11 +3,12 @@ import { For, createEffect, createMemo, createSignal, on, onCleanup, untrack } f
 import { BRACKET_DEFAULTS, Bracket, BracketUtils, Button, access } from "@thewaver/ss-components-solid";
 import type { BracketNode, BracketStep } from "@thewaver/ss-components-solid";
 import * as styles from "@thewaver/ss-playground/App/Pages/BracketPage/BracketPage.css";
+import { CONTROL_GLYPHS } from "@thewaver/ss-playground/App/StyledComponents/ControlButtonContent/ControlButtonContent.const";
 import { EasingUtils, MathUtils } from "@thewaver/ss-utils";
 import { assignInlineVars } from "@vanilla-extract/dynamic";
 
 import { PageMeasureBox } from "../../../PageComponents/MeasureBox/MeasureBox";
-import { PageButtonContent } from "../../../StyledComponents/ButtonContent/ButtonContent";
+import { PageControlButtonContent } from "../../../StyledComponents/ControlButtonContent/ControlButtonContent";
 import {
     branch,
     computeBracketPinnedLayerHeader,
@@ -173,10 +174,12 @@ export const FamilyExample = (props: Props) => {
             <div class={styles.familyControls}>
                 <Button
                     id={"familyZoom"}
+                    ariaLabel={() => (getIsZoomedIn() ? "Zoom out" : "Zoom in")}
                     renderContent={(getFlags) => (
-                        <PageButtonContent flags={getFlags}>
-                            {getIsZoomedIn() ? "Zoom out" : "Zoom in"}
-                        </PageButtonContent>
+                        <PageControlButtonContent
+                            flags={getFlags}
+                            glyph={() => (getIsZoomedIn() ? CONTROL_GLYPHS.zoomOut : CONTROL_GLYPHS.zoomIn)}
+                        />
                     )}
                     onClick={() => {
                         setIsZoomedIn((isZoomedIn) => !isZoomedIn);
@@ -188,8 +191,9 @@ export const FamilyExample = (props: Props) => {
                         <Button
                             id={`familyStep-${entry.step}`}
                             isDisabled={() => !getIsZoomedIn() || computeStep(entry.step) === getFamily()}
+                            ariaLabel={entry.label}
                             renderContent={(getFlags) => (
-                                <PageButtonContent flags={getFlags}>{entry.label}</PageButtonContent>
+                                <PageControlButtonContent flags={getFlags} glyph={entry.glyph} />
                             )}
                             onClick={() => {
                                 setFamily(() => computeStep(entry.step));

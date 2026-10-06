@@ -2,7 +2,7 @@
     import { Button, Tree } from "@thewaver/ss-components-svelte";
 
     import PageControlColumn from "../../../PageComponents/ControlRow/PageControlColumn.svelte";
-    import PageButtonContent from "../../../StyledComponents/ButtonContent/ButtonContent.svelte";
+    import PageControlButtonContent from "../../../StyledComponents/ControlButtonContent/ControlButtonContent.svelte";
     import { renderPageHighlightFloater } from "../../../StyledComponents/GlideFloater/GlideFloater.const.svelte";
     import PageTreeNodeContent from "../../../StyledComponents/TreeNodeContent/PageTreeNodeContent.svelte";
     import { FILES, OUTSIDE_COLLAPSE_DELAY_MS } from "../TreePage.const.svelte";
@@ -34,7 +34,7 @@
         }}
     >
         {#snippet renderContent(flags)}
-            <PageButtonContent {flags}>{`Collapse Lib in ${OUTSIDE_COLLAPSE_DELAY_MS}ms`}</PageButtonContent>
+            <PageControlButtonContent {flags}>{`Collapse Lib in ${OUTSIDE_COLLAPSE_DELAY_MS}ms`}</PageControlButtonContent>
         {/snippet}
     </Button>
 </PageControlColumn>

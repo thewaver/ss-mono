@@ -13,7 +13,7 @@
     } from "@thewaver/ss-playground/App/Pages/ShapeRevealPage/ShapeRevealPage.const";
     import * as styles from "@thewaver/ss-playground/App/Pages/ShapeRevealPage/ShapeRevealPage.css";
 
-    import PageButtonContent from "../../../StyledComponents/ButtonContent/ButtonContent.svelte";
+    import PageControlButtonContent from "../../../StyledComponents/ControlButtonContent/ControlButtonContent.svelte";
     import type { ShapeRevealExampleProps } from "../ShapeRevealPage.types";
 
     type Props = ShapeRevealExampleProps;
@@ -52,7 +52,7 @@
 
     <Button id={SWITCH_ID} onClick={switchPanel}>
         {#snippet renderContent(flags)}
-            <PageButtonContent {flags}>Switch</PageButtonContent>
+            <PageControlButtonContent {flags}>Switch</PageControlButtonContent>
         {/snippet}
     </Button>
 </div>

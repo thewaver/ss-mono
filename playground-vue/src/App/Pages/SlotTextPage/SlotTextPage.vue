@@ -6,6 +6,7 @@ import type { SlotTextLetterRoute, SlotTextMechanism } from "@thewaver/ss-compon
 import { SlotTextKnobs } from "@thewaver/ss-playground/App/Knobs/SlotTexts.const";
 import { WORDS } from "@thewaver/ss-playground/App/Pages/SlotTextPage/SlotTextPage.const";
 import * as styles from "@thewaver/ss-playground/App/Pages/SlotTextPage/SlotTextPage.css";
+import { CONTROL_GLYPHS } from "@thewaver/ss-playground/App/StyledComponents/ControlButtonContent/ControlButtonContent.const";
 
 import PageExampleKnobs from "../../PageComponents/ExampleKnobs/PageExampleKnobs.vue";
 import type { ExampleDefs } from "../../PageComponents/Examples/Examples.types";
@@ -15,7 +16,7 @@ import PageSelectField from "../../PageComponents/Field/PageSelectField.vue";
 import PageMeasureBox from "../../PageComponents/MeasureBox/MeasureBox.vue";
 import PageProp from "../../PageComponents/Prop/Prop.vue";
 import PagePropsPanel from "../../PageComponents/PropsPanel/PagePropsPanel.vue";
-import PageButtonContent from "../../StyledComponents/ButtonContent/ButtonContent.vue";
+import PageControlButtonContent from "../../StyledComponents/ControlButtonContent/ControlButtonContent.vue";
 import CounterExample from "./Examples/Counter.vue";
 import ReelsExample from "./Examples/Reels.vue";
 import SplitFlapExample from "./Examples/SplitFlap.vue";
@@ -177,7 +178,7 @@ const examples: ExampleDefs[] = [
                 <div :class="styles.controls">
                     <Button v-for="entry in STEPS" :id="entry.id" :key="entry.id" @click="step(entry.delta)">
                         <template #renderContent="flags">
-                            <PageButtonContent :flags="flags">{{ entry.label }}</PageButtonContent>
+                            <PageControlButtonContent :flags="flags">{{ entry.label }}</PageControlButtonContent>
                         </template>
                     </Button>
                 </div>
@@ -195,7 +196,7 @@ const examples: ExampleDefs[] = [
                 <div :class="styles.controls">
                     <Button id="pullReels" @click="pullReels">
                         <template #renderContent="flags">
-                            <PageButtonContent :flags="flags">Pull</PageButtonContent>
+                            <PageControlButtonContent :flags="flags">Pull</PageControlButtonContent>
                         </template>
                     </Button>
                 </div>
@@ -229,7 +230,7 @@ const examples: ExampleDefs[] = [
                 <div :class="styles.controls">
                     <Button v-for="entry in STEPS" :id="entry.flapId" :key="entry.flapId" @click="step(entry.delta)">
                         <template #renderContent="flags">
-                            <PageButtonContent :flags="flags">{{ entry.label }}</PageButtonContent>
+                            <PageControlButtonContent :flags="flags">{{ entry.label }}</PageControlButtonContent>
                         </template>
                     </Button>
                 </div>
@@ -250,9 +251,9 @@ const examples: ExampleDefs[] = [
                 </PageMeasureBox>
 
                 <div :class="styles.controls">
-                    <Button id="nextWord" @click="nextWord">
+                    <Button id="nextWord" ariaLabel="Next word" @click="nextWord">
                         <template #renderContent="flags">
-                            <PageButtonContent :flags="flags">Next word</PageButtonContent>
+                            <PageControlButtonContent :flags="flags" :glyph="CONTROL_GLYPHS.next" />
                         </template>
                     </Button>
                 </div>

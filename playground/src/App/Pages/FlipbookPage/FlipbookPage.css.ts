@@ -14,6 +14,7 @@ export const book = style({
     width: "100%",
     maxWidth: 520,
     height: 340,
+    userSelect: "none",
 });
 
 export const page = style({

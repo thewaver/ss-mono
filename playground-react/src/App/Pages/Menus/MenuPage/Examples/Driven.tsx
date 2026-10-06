@@ -2,7 +2,7 @@ import { useState } from "react";
 
 import { Button, Menu } from "@thewaver/ss-components-react";
 
-import { PageButtonContent } from "../../../../StyledComponents/ButtonContent/ButtonContent";
+import { PageControlButtonContent } from "../../../../StyledComponents/ControlButtonContent/ControlButtonContent";
 import { renderPageHighlightFloater } from "../../../../StyledComponents/GlideFloater/GlideFloater";
 import { PageMenuTriggerContent } from "../../../../StyledComponents/MenuTriggerContent/MenuTriggerContent";
 import { ACTIONS, renderMenuItem, renderMenuPopup } from "../MenuPage.const";
@@ -32,9 +32,8 @@ export const DrivenExample = (props: Props) => {
             <Button
                 ref={(element) => setAnchorRef(element ?? undefined)}
                 id={"menuToggle"}
-                ariaLabel={"Toggle the menu from outside"}
                 renderContent={(flags) => (
-                    <PageButtonContent flags={flags}>{isOpen ? "Close it" : "Open it"}</PageButtonContent>
+                    <PageControlButtonContent flags={flags}>{isOpen ? "Close it" : "Open it"}</PageControlButtonContent>
                 )}
                 onClick={() => {
                     setIsOpen(!isOpen);

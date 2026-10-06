@@ -5,9 +5,10 @@ import { Button, MediaQueryMonitorVueUtils, ProximityText } from "@thewaver/ss-c
 import { ProximityTextKnobs } from "@thewaver/ss-playground/App/Knobs/ProximityTexts.const";
 import { MEASURE_BOX_PADDING } from "@thewaver/ss-playground/App/PageComponents/MeasureBox/MeasureBox.css";
 import * as styles from "@thewaver/ss-playground/App/Pages/ProximityTextPage/ProximityTextPage.css";
+import { CONTROL_GLYPHS } from "@thewaver/ss-playground/App/StyledComponents/ControlButtonContent/ControlButtonContent.const";
 
 import PageMeasureBox from "../../../PageComponents/MeasureBox/MeasureBox.vue";
-import PageButtonContent from "../../../StyledComponents/ButtonContent/ButtonContent.vue";
+import PageControlButtonContent from "../../../StyledComponents/ControlButtonContent/ControlButtonContent.vue";
 import type { ProximityTextExampleProps } from "../ProximityTextPageVue.types";
 
 const MIDDLE = 0.5;
@@ -64,9 +65,12 @@ watch(
             </div>
         </PageMeasureBox>
 
-        <Button id="waveMove" @click="toggleMoving">
+        <Button id="waveMove" :ariaLabel="isMoving ? 'Stop' : 'Move'" @click="toggleMoving">
             <template #renderContent="flags">
-                <PageButtonContent :flags="flags">{{ isMoving ? "Stop" : "Move" }}</PageButtonContent>
+                <PageControlButtonContent
+                    :flags="flags"
+                    :glyph="isMoving ? CONTROL_GLYPHS.stop : CONTROL_GLYPHS.play"
+                />
             </template>
         </Button>
     </div>

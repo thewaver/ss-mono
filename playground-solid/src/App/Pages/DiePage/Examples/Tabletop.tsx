@@ -4,7 +4,7 @@ import { Button, Die, access } from "@thewaver/ss-components-solid";
 import type { DieController } from "@thewaver/ss-components-solid";
 import * as styles from "@thewaver/ss-playground/App/Pages/DiePage/DiePage.css";
 
-import { PageButtonContent } from "../../../StyledComponents/ButtonContent/ButtonContent";
+import { PageControlButtonContent } from "../../../StyledComponents/ControlButtonContent/ControlButtonContent";
 import { PageDieFace } from "../../../StyledComponents/DieContent/DieContent";
 import type { DieExampleProps } from "../DiePage.types";
 
@@ -36,7 +36,7 @@ export const TabletopExample = (props: Props) => {
             <Button
                 id={"dieRoll"}
                 isDisabled={() => getController()?.getIsRolling() ?? true}
-                renderContent={(getFlags) => <PageButtonContent flags={getFlags}>Roll</PageButtonContent>}
+                renderContent={(getFlags) => <PageControlButtonContent flags={getFlags}>Roll</PageControlButtonContent>}
                 onClick={() => {
                     getController()?.roll();
                 }}

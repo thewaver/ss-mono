@@ -6,7 +6,7 @@ import * as styles from "@thewaver/ss-playground/App/Pages/ShapePage/ShapePage.c
 import { EasingUtils, MathUtils, Point2dUtils } from "@thewaver/ss-utils";
 import type { Point2d, Size2d } from "@thewaver/ss-utils";
 
-import PageButtonContent from "../../../StyledComponents/ButtonContent/ButtonContent.vue";
+import PageControlButtonContent from "../../../StyledComponents/ControlButtonContent/ControlButtonContent.vue";
 import { computeShapeFillDefs, computeShapeStrokeDefs } from "../ShapePage.const";
 import type { ShapeExampleProps } from "../ShapePage.types";
 
@@ -142,9 +142,9 @@ const computeStrokeDefs = (size: Size2d, element: HTMLElement | undefined) =>
             @click="morphTo(target === 0 ? 1 : 0)"
         >
             <template #renderContent="flags">
-                <PageButtonContent :flags="flags">{{
+                <PageControlButtonContent :flags="flags">{{
                     target === 0 ? "Turn into a star" : "Turn into a circle"
-                }}</PageButtonContent>
+                }}</PageControlButtonContent>
             </template>
         </Button>
     </div>

@@ -3,9 +3,10 @@
     import type { TypewriterController } from "@thewaver/ss-components-svelte";
     import { MEASURE_BOX_PADDING } from "@thewaver/ss-playground/App/PageComponents/MeasureBox/MeasureBox.css";
     import * as styles from "@thewaver/ss-playground/App/Pages/PaintedTextPage/PaintedTextPage.css";
+    import { CONTROL_GLYPHS } from "@thewaver/ss-playground/App/StyledComponents/ControlButtonContent/ControlButtonContent.const";
 
     import PageMeasureBox from "../../../PageComponents/MeasureBox/MeasureBox.svelte";
-    import PageButtonContent from "../../../StyledComponents/ButtonContent/ButtonContent.svelte";
+    import PageControlButtonContent from "../../../StyledComponents/ControlButtonContent/ControlButtonContent.svelte";
     import { computeSampleDefs } from "../PaintedTextPage.const";
     import type { PaintedTextBoxedExampleProps } from "../PaintedTextPage.types";
 
@@ -69,12 +70,13 @@
     <div class={styles.buttonRow}>
         <Button
             id={"typeAgain"}
+            ariaLabel={"Type it again"}
             onClick={() => {
                 controller?.restartAnimation();
             }}
         >
             {#snippet renderContent(flags)}
-                <PageButtonContent {flags}>Type it again</PageButtonContent>
+                <PageControlButtonContent {flags} glyph={CONTROL_GLYPHS.replay} />
             {/snippet}
         </Button>
 
@@ -85,7 +87,7 @@
             }}
         >
             {#snippet renderContent(flags)}
-                <PageButtonContent {flags}>{isBlinkStopped ? "Start blinking" : "Stop blinking"}</PageButtonContent>
+                <PageControlButtonContent {flags}>{isBlinkStopped ? "Start blinking" : "Stop blinking"}</PageControlButtonContent>
             {/snippet}
         </Button>
     </div>

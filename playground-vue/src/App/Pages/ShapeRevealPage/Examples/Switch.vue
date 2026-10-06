@@ -13,7 +13,7 @@ import {
 } from "@thewaver/ss-playground/App/Pages/ShapeRevealPage/ShapeRevealPage.const";
 import * as styles from "@thewaver/ss-playground/App/Pages/ShapeRevealPage/ShapeRevealPage.css";
 
-import PageButtonContent from "../../../StyledComponents/ButtonContent/ButtonContent.vue";
+import PageControlButtonContent from "../../../StyledComponents/ControlButtonContent/ControlButtonContent.vue";
 import type { ShapeRevealExampleProps } from "../ShapeRevealPage.types";
 
 type Props = ShapeRevealExampleProps;
@@ -53,7 +53,7 @@ const switchPanel = async () => {
 
         <Button :id="SWITCH_ID" @click="switchPanel">
             <template #renderContent="flags">
-                <PageButtonContent :flags="flags">Switch</PageButtonContent>
+                <PageControlButtonContent :flags="flags">Switch</PageControlButtonContent>
             </template>
         </Button>
     </div>

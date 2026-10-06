@@ -4,9 +4,10 @@
     import { computeCardTilt } from "@thewaver/ss-playground/App/Pages/CardStackPage/CardStackPage.const";
     import * as styles from "@thewaver/ss-playground/App/Pages/CardStackPage/CardStackPage.css";
     import type { SwipeDirection } from "@thewaver/ss-utils";
+    import { CONTROL_GLYPHS } from "@thewaver/ss-playground/App/StyledComponents/ControlButtonContent/ControlButtonContent.const";
 
     import PageMeasureBox from "../../../PageComponents/MeasureBox/MeasureBox.svelte";
-    import PageButtonContent from "../../../StyledComponents/ButtonContent/ButtonContent.svelte";
+    import PageControlButtonContent from "../../../StyledComponents/ControlButtonContent/ControlButtonContent.svelte";
     import type { CardStackDeckExampleProps } from "../CardStackExamples.types";
 
     const CARDS = [
@@ -25,11 +26,11 @@
         "Two",
     ];
     const DIRECTIONS: SwipeDirection[] = ["left", "right", "up", "down"];
-    const DIRECTION_LABELS: Record<SwipeDirection, string> = {
-        left: "Left",
-        right: "Right",
-        up: "Up",
-        down: "Down",
+    const DIRECTION_GLYPHS: Record<SwipeDirection, string> = {
+        left: CONTROL_GLYPHS.left,
+        right: CONTROL_GLYPHS.right,
+        up: CONTROL_GLYPHS.up,
+        down: CONTROL_GLYPHS.down,
     };
 
     const BOX_HEIGHT = 240;
@@ -91,7 +92,7 @@
                 }}
             >
                 {#snippet renderContent(flags)}
-                    <PageButtonContent {flags}>{DIRECTION_LABELS[direction]}</PageButtonContent>
+                    <PageControlButtonContent {flags} glyph={DIRECTION_GLYPHS[direction]} />
                 {/snippet}
             </Button>
         {/each}
@@ -99,13 +100,13 @@
         <Button
             id={"recall"}
             isDisabled={props.isDisabled || topIndex === FIRST_INDEX}
-            ariaLabel={"Bring the last card back"}
+            ariaLabel={"Recall the last card"}
             onClick={() => {
                 if (controls?.recall()) props.onRecall();
             }}
         >
             {#snippet renderContent(flags)}
-                <PageButtonContent {flags}>Recall</PageButtonContent>
+                <PageControlButtonContent {flags}>Recall</PageControlButtonContent>
             {/snippet}
         </Button>
 
@@ -119,7 +120,7 @@
                 }}
             >
                 {#snippet renderContent(flags)}
-                    <PageButtonContent {flags}>Deal again</PageButtonContent>
+                    <PageControlButtonContent {flags} glyph={CONTROL_GLYPHS.replay} />
                 {/snippet}
             </Button>
         {/if}

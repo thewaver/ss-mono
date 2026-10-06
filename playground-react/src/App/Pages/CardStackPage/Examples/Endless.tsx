@@ -4,18 +4,19 @@ import { Button, CardStack } from "@thewaver/ss-components-react";
 import type { CardStackControls } from "@thewaver/ss-components-react";
 import { computeCardTilt } from "@thewaver/ss-playground/App/Pages/CardStackPage/CardStackPage.const";
 import * as styles from "@thewaver/ss-playground/App/Pages/CardStackPage/CardStackPage.css";
+import { CONTROL_GLYPHS } from "@thewaver/ss-playground/App/StyledComponents/ControlButtonContent/ControlButtonContent.const";
 import type { SwipeDirection } from "@thewaver/ss-utils";
 
 import { PageMeasureBox } from "../../../PageComponents/MeasureBox/MeasureBox";
-import { PageButtonContent } from "../../../StyledComponents/ButtonContent/ButtonContent";
+import { PageControlButtonContent } from "../../../StyledComponents/ControlButtonContent/ControlButtonContent";
 import type { CardStackEndlessExampleProps } from "../CardStackExamples.types";
 
 const DIRECTIONS: SwipeDirection[] = ["left", "right"];
-const DIRECTION_LABELS: Record<SwipeDirection, string> = {
-    left: "Left",
-    right: "Right",
-    up: "Up",
-    down: "Down",
+const DIRECTION_GLYPHS: Record<SwipeDirection, string> = {
+    left: CONTROL_GLYPHS.left,
+    right: CONTROL_GLYPHS.right,
+    up: CONTROL_GLYPHS.up,
+    down: CONTROL_GLYPHS.down,
 };
 
 const BATCH_SIZE = 6;
@@ -92,7 +93,7 @@ export const EndlessExample = (props: Props) => {
                         isDisabled={props.isDisabled}
                         ariaLabel={`Send the top card ${direction}`}
                         renderContent={(flags) => (
-                            <PageButtonContent flags={flags}>{DIRECTION_LABELS[direction]}</PageButtonContent>
+                            <PageControlButtonContent flags={flags} glyph={DIRECTION_GLYPHS[direction]} />
                         )}
                         onClick={() => {
                             controls?.send(direction);

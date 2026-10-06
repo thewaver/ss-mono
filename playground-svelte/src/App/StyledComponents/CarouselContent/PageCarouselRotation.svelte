@@ -1,28 +1,13 @@
 <script lang="ts">
-    import * as styles from "@thewaver/ss-playground/App/StyledComponents/CarouselContent/CarouselContent.css";
+    import { CONTROL_GLYPHS } from "@thewaver/ss-playground/App/StyledComponents/ControlButtonContent/ControlButtonContent.const";
 
-    import { getLayerClass } from "../Layer/Layer.context";
+    import PageControlButtonContent from "../ControlButtonContent/ControlButtonContent.svelte";
     import type { CarouselRotationProps } from "./CarouselContent.types";
 
-    const ROTATION_GLYPHS = {
-        playing: "❙❙",
-        stopped: "▶",
-    };
-
     let props: CarouselRotationProps = $props();
-
-    const layerClass = $derived.by(getLayerClass());
 </script>
 
-<div
-    class={[
-        styles.carouselButton,
-        layerClass,
-        props.flags.isHovered && styles.isHovered,
-        props.flags.isActive && styles.isActive,
-        props.flags.isDisabled && styles.isDisabled,
-    ]}
-    aria-hidden="true"
->
-    {props.flags.isPlaying ? ROTATION_GLYPHS.playing : ROTATION_GLYPHS.stopped}
-</div>
+<PageControlButtonContent
+    flags={props.flags}
+    glyph={props.flags.isPlaying ? CONTROL_GLYPHS.pause : CONTROL_GLYPHS.play}
+/>

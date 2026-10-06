@@ -3,9 +3,10 @@ import { createSignal } from "solid-js";
 import { Button, ScrambleText } from "@thewaver/ss-components-solid";
 import { MEASURE_BOX_PADDING } from "@thewaver/ss-playground/App/PageComponents/MeasureBox/MeasureBox.css";
 import * as styles from "@thewaver/ss-playground/App/Pages/ScrambleTextPage/ScrambleTextPage.css";
+import { CONTROL_GLYPHS } from "@thewaver/ss-playground/App/StyledComponents/ControlButtonContent/ControlButtonContent.const";
 
 import { PageMeasureBox } from "../../../PageComponents/MeasureBox/MeasureBox";
-import { PageButtonContent } from "../../../StyledComponents/ButtonContent/ButtonContent";
+import { PageControlButtonContent } from "../../../StyledComponents/ControlButtonContent/ControlButtonContent";
 import type { ScrambleTextExampleProps } from "../ScrambleTextPage.types";
 
 const BUILDS = ["Build 1.4.2 ready", "Build 1.4.3 ready", "Build 1.4.3 RC1 ready", "Build 1.5.0 ready"];
@@ -34,7 +35,8 @@ export const ChangedOnlyExample = (props: Props) => {
 
             <Button
                 id={"nextBuild"}
-                renderContent={(getFlags) => <PageButtonContent flags={getFlags}>Next build</PageButtonContent>}
+                ariaLabel={"Next build"}
+                renderContent={(getFlags) => <PageControlButtonContent flags={getFlags} glyph={CONTROL_GLYPHS.next} />}
                 onClick={() => {
                     setBuildIndex((index) => (index + 1) % BUILDS.length);
                 }}

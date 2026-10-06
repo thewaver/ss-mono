@@ -3,9 +3,10 @@ import { useId } from "react";
 import { Button, PaintedText, PaintedTextUtils } from "@thewaver/ss-components-react";
 import { MEASURE_BOX_PADDING } from "@thewaver/ss-playground/App/PageComponents/MeasureBox/MeasureBox.css";
 import * as styles from "@thewaver/ss-playground/App/Pages/PaintedTextPage/PaintedTextPage.css";
+import { CONTROL_GLYPHS } from "@thewaver/ss-playground/App/StyledComponents/ControlButtonContent/ControlButtonContent.const";
 
 import { PageMeasureBox } from "../../../PageComponents/MeasureBox/MeasureBox";
-import { PageButtonContent } from "../../../StyledComponents/ButtonContent/ButtonContent";
+import { PageControlButtonContent } from "../../../StyledComponents/ControlButtonContent/ControlButtonContent";
 import { computeSampleDefs } from "../PaintedTextPage.const";
 import type { PaintedTextCircleExampleProps } from "../PaintedTextPage.types";
 
@@ -41,8 +42,12 @@ export const CircleExample = (props: Props) => {
             <div className={styles.buttonRow}>
                 <Button
                     id={"circlePlayback"}
+                    ariaLabel={props.playback[0] ? "Pause" : "Play"}
                     renderContent={(flags) => (
-                        <PageButtonContent flags={flags}>{props.playback[0] ? "Pause" : "Play"}</PageButtonContent>
+                        <PageControlButtonContent
+                            flags={flags}
+                            glyph={props.playback[0] ? CONTROL_GLYPHS.pause : CONTROL_GLYPHS.play}
+                        />
                     )}
                     onClick={() => {
                         props.playback[1](!props.playback[0]);

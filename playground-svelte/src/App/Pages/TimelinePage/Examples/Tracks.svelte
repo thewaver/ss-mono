@@ -10,8 +10,9 @@
         formatStopwatch,
     } from "@thewaver/ss-playground/App/Pages/TimelinePage/TimelinePage.const";
     import { AXIS_HEIGHT, PAGE_TIMELINE_FAMILIES } from "@thewaver/ss-playground/App/StyledComponents/TimelineContent/TimelineContent.css";
+    import { CONTROL_GLYPHS } from "@thewaver/ss-playground/App/StyledComponents/ControlButtonContent/ControlButtonContent.const";
 
-    import PageButtonContent from "../../../StyledComponents/ButtonContent/ButtonContent.svelte";
+    import PageControlButtonContent from "../../../StyledComponents/ControlButtonContent/ControlButtonContent.svelte";
     import PageTimelineBlock from "../../../StyledComponents/TimelineContent/PageTimelineBlock.svelte";
     import PageTimelineControls from "../../../StyledComponents/TimelineContent/PageTimelineControls.svelte";
     import PageTimelineFrame from "../../../StyledComponents/TimelineContent/PageTimelineFrame.svelte";
@@ -119,6 +120,7 @@
     <PageTimelineControls>
         <Button
             id={"tracksPlay"}
+            ariaLabel={"Play"}
             onClick={() => {
                 if (playhead >= REEL.end) playhead = REEL.start;
 
@@ -126,78 +128,84 @@
             }}
         >
             {#snippet renderContent(flags)}
-                <PageButtonContent {flags}>Play</PageButtonContent>
+                <PageControlButtonContent {flags} glyph={CONTROL_GLYPHS.play} />
             {/snippet}
         </Button>
 
         <Button
             id={"tracksPause"}
+            ariaLabel={"Pause"}
             onClick={() => {
                 isPlaying = false;
             }}
         >
             {#snippet renderContent(flags)}
-                <PageButtonContent {flags}>Pause</PageButtonContent>
+                <PageControlButtonContent {flags} glyph={CONTROL_GLYPHS.pause} />
             {/snippet}
         </Button>
 
         <Button
             id={"tracksEarlier"}
+            ariaLabel={"Earlier"}
             isDisabled={props.isDisabled}
             onClick={() => {
                 controller?.panBy(-PAN_STEP);
             }}
         >
             {#snippet renderContent(flags)}
-                <PageButtonContent {flags}>Earlier</PageButtonContent>
+                <PageControlButtonContent {flags} glyph={CONTROL_GLYPHS.left} />
             {/snippet}
         </Button>
 
         <Button
             id={"tracksLater"}
+            ariaLabel={"Later"}
             isDisabled={props.isDisabled}
             onClick={() => {
                 controller?.panBy(PAN_STEP);
             }}
         >
             {#snippet renderContent(flags)}
-                <PageButtonContent {flags}>Later</PageButtonContent>
+                <PageControlButtonContent {flags} glyph={CONTROL_GLYPHS.right} />
             {/snippet}
         </Button>
 
         <Button
             id={"tracksZoomIn"}
+            ariaLabel={"Zoom in"}
             isDisabled={props.isDisabled}
             onClick={() => {
                 controller?.zoomBy(ZOOM_IN);
             }}
         >
             {#snippet renderContent(flags)}
-                <PageButtonContent {flags}>Zoom in</PageButtonContent>
+                <PageControlButtonContent {flags} glyph={CONTROL_GLYPHS.zoomIn} />
             {/snippet}
         </Button>
 
         <Button
             id={"tracksZoomOut"}
+            ariaLabel={"Zoom out"}
             isDisabled={props.isDisabled}
             onClick={() => {
                 controller?.zoomBy(ZOOM_OUT);
             }}
         >
             {#snippet renderContent(flags)}
-                <PageButtonContent {flags}>Zoom out</PageButtonContent>
+                <PageControlButtonContent {flags} glyph={CONTROL_GLYPHS.zoomOut} />
             {/snippet}
         </Button>
 
         <Button
             id={"tracksWholeReel"}
+            ariaLabel={"Whole reel"}
             isDisabled={props.isDisabled}
             onClick={async () => {
                 view = REEL;
             }}
         >
             {#snippet renderContent(flags)}
-                <PageButtonContent {flags}>Whole reel</PageButtonContent>
+                <PageControlButtonContent {flags} glyph={CONTROL_GLYPHS.fit} />
             {/snippet}
         </Button>
     </PageTimelineControls>

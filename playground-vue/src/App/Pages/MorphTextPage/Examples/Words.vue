@@ -5,8 +5,9 @@ import { Button, MorphText } from "@thewaver/ss-components-vue";
 import { MorphTextKnobs } from "@thewaver/ss-playground/App/Knobs/MorphTexts.const";
 import { MORPH_WORDS } from "@thewaver/ss-playground/App/Pages/MorphTextPage/MorphTextPage.const";
 import * as styles from "@thewaver/ss-playground/App/Pages/MorphTextPage/MorphTextPage.css";
+import { CONTROL_GLYPHS } from "@thewaver/ss-playground/App/StyledComponents/ControlButtonContent/ControlButtonContent.const";
 
-import PageButtonContent from "../../../StyledComponents/ButtonContent/ButtonContent.vue";
+import PageControlButtonContent from "../../../StyledComponents/ControlButtonContent/ControlButtonContent.vue";
 import type { MorphTextExampleProps } from "../MorphTextPage.types";
 
 type Props = MorphTextExampleProps;
@@ -39,9 +40,12 @@ const togglePlaying = () => {
             <MorphText :text="MORPH_WORDS[index]" :morph-duration-ms="morphDurationMs" :max-blur-px="maxBlurPx" />
         </div>
 
-        <Button id="morphWordsPlayback" @click="togglePlaying">
+        <Button id="morphWordsPlayback" :ariaLabel="isPlaying ? 'Pause' : 'Play'" @click="togglePlaying">
             <template #renderContent="flags">
-                <PageButtonContent :flags="flags">{{ isPlaying ? "Pause" : "Play" }}</PageButtonContent>
+                <PageControlButtonContent
+                    :flags="flags"
+                    :glyph="isPlaying ? CONTROL_GLYPHS.pause : CONTROL_GLYPHS.play"
+                />
             </template>
         </Button>
     </div>

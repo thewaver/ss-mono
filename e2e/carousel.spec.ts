@@ -387,7 +387,7 @@ test("the turning ring stops when its stop control is pressed, and stays stopped
 
     const turning = page.locator("#ringTurn");
 
-    if ((await turning.textContent())?.includes("Turn")) await turning.click();
+    if (await page.getByRole("button", { name: "Turn", exact: true }).count()) await turning.click();
 
     await expect.poll(ringTransform, { message: "it is turning" }).not.toBe(await ringTransform());
 

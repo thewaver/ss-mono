@@ -5,9 +5,10 @@ import { Button, MediaQueryMonitorVueUtils, Typewriter } from "@thewaver/ss-comp
 import type { TypewriterMode } from "@thewaver/ss-components-vue";
 import { MEASURE_BOX_PADDING } from "@thewaver/ss-playground/App/PageComponents/MeasureBox/MeasureBox.css";
 import * as styles from "@thewaver/ss-playground/App/Pages/TypewriterPage/TypewriterPage.css";
+import { CONTROL_GLYPHS } from "@thewaver/ss-playground/App/StyledComponents/ControlButtonContent/ControlButtonContent.const";
 
 import PageMeasureBox from "../../../PageComponents/MeasureBox/MeasureBox.vue";
-import PageButtonContent from "../../../StyledComponents/ButtonContent/ButtonContent.vue";
+import PageControlButtonContent from "../../../StyledComponents/ControlButtonContent/ControlButtonContent.vue";
 import type { TypewriterPhrasesExampleProps } from "../TypewriterPage.types";
 
 const LEAD = "We build";
@@ -106,9 +107,12 @@ const togglePause = () => {
             </div>
         </PageMeasureBox>
 
-        <Button id="pausePhrases" @click="togglePause">
+        <Button id="pausePhrases" :ariaLabel="isPaused ? 'Resume' : 'Pause'" @click="togglePause">
             <template #renderContent="flags">
-                <PageButtonContent :flags="flags">{{ isPaused ? "Resume" : "Pause" }}</PageButtonContent>
+                <PageControlButtonContent
+                    :flags="flags"
+                    :glyph="isPaused ? CONTROL_GLYPHS.play : CONTROL_GLYPHS.pause"
+                />
             </template>
         </Button>
     </div>

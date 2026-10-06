@@ -3,9 +3,10 @@
     import type { TypewriterMode } from "@thewaver/ss-components-svelte";
     import { MEASURE_BOX_PADDING } from "@thewaver/ss-playground/App/PageComponents/MeasureBox/MeasureBox.css";
     import * as styles from "@thewaver/ss-playground/App/Pages/TypewriterPage/TypewriterPage.css";
+    import { CONTROL_GLYPHS } from "@thewaver/ss-playground/App/StyledComponents/ControlButtonContent/ControlButtonContent.const";
 
     import PageMeasureBox from "../../../PageComponents/MeasureBox/MeasureBox.svelte";
-    import PageButtonContent from "../../../StyledComponents/ButtonContent/ButtonContent.svelte";
+    import PageControlButtonContent from "../../../StyledComponents/ControlButtonContent/ControlButtonContent.svelte";
     import type { TypewriterPhrasesExampleProps } from "../TypewriterPage.types";
 
     const LEAD = "We build";
@@ -105,12 +106,13 @@
 
     <Button
         id={"pausePhrases"}
+        ariaLabel={isPaused ? "Resume" : "Pause"}
         onClick={() => {
             togglePause();
         }}
     >
         {#snippet renderContent(flags)}
-            <PageButtonContent {flags}>{isPaused ? "Resume" : "Pause"}</PageButtonContent>
+            <PageControlButtonContent {flags} glyph={isPaused ? CONTROL_GLYPHS.play : CONTROL_GLYPHS.pause} />
         {/snippet}
     </Button>
 </div>

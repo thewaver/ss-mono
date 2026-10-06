@@ -1,9 +1,10 @@
 <script setup lang="ts">
 import { Button, SlideButton } from "@thewaver/ss-components-vue";
+import { CONTROL_GLYPHS } from "@thewaver/ss-playground/App/StyledComponents/ControlButtonContent/ControlButtonContent.const";
 import { SLIDE_BUTTON_THUMB_SIZE } from "@thewaver/ss-playground/App/StyledComponents/SlideButtonContent/SlideButtonContent.css";
 
 import PageControlColumn from "../../../PageComponents/ControlRow/PageControlColumn.vue";
-import PageButtonContent from "../../../StyledComponents/ButtonContent/ButtonContent.vue";
+import PageControlButtonContent from "../../../StyledComponents/ControlButtonContent/ControlButtonContent.vue";
 import PageSlideButtonContent from "../../../StyledComponents/SlideButtonContent/SlideButtonContent.vue";
 import type { SlideButtonHeldExampleProps } from "../SlideButtonPage.types";
 
@@ -20,9 +21,9 @@ const props = defineProps<Props>();
             </template>
         </SlideButton>
 
-        <Button :is-disabled="!isArmed" @click="props.onReset">
+        <Button ariaLabel="Reset" :is-disabled="!isArmed" @click="props.onReset">
             <template #renderContent="renderProps">
-                <PageButtonContent :flags="renderProps">Reset</PageButtonContent>
+                <PageControlButtonContent :flags="renderProps" :glyph="CONTROL_GLYPHS.replay" />
             </template>
         </Button>
     </PageControlColumn>

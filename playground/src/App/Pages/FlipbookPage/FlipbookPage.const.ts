@@ -12,8 +12,3 @@ export const FLIPBOOK_PAGES = [
     { heading: "The end", text: "Nothing is left on the right but the back cover." },
     { heading: "Back cover", text: "Turn back to read it again." },
 ];
-
-export const FLIPBOOK_STEP_CAPTIONS = {
-    previous: "‹ Back",
-    next: "Next ›",
-};

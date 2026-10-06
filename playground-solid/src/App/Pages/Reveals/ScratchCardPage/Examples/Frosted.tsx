@@ -3,9 +3,10 @@ import { createSignal } from "solid-js";
 import { Button, ScratchCard } from "@thewaver/ss-components-solid";
 import type { ScratchCardController } from "@thewaver/ss-components-solid";
 import * as styles from "@thewaver/ss-playground/App/Pages/Reveals/ScratchCardPage/ScratchCardPage.css";
+import { CONTROL_GLYPHS } from "@thewaver/ss-playground/App/StyledComponents/ControlButtonContent/ControlButtonContent.const";
 
 import { PageMeasureBox } from "../../../../PageComponents/MeasureBox/MeasureBox";
-import { PageButtonContent } from "../../../../StyledComponents/ButtonContent/ButtonContent";
+import { PageControlButtonContent } from "../../../../StyledComponents/ControlButtonContent/ControlButtonContent";
 import type { ScratchCardExampleProps } from "../ScratchCardPage.types";
 
 const CARD_WIDTH = 360;
@@ -45,7 +46,10 @@ export const FrostedExample = (props: Props) => {
             <div class={styles.buttonRow}>
                 <Button
                     id={"newFrost"}
-                    renderContent={(getFlags) => <PageButtonContent flags={getFlags}>Re-freeze</PageButtonContent>}
+                    ariaLabel={"Re-freeze"}
+                    renderContent={(getFlags) => (
+                        <PageControlButtonContent flags={getFlags} glyph={CONTROL_GLYPHS.replay} />
+                    )}
                     onClick={() => {
                         getController()?.reset();
                     }}

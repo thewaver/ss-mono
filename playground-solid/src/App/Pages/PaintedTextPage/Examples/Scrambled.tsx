@@ -4,9 +4,10 @@ import { Button, PaintedText, ScrambleText } from "@thewaver/ss-components-solid
 import type { ScrambleTextController } from "@thewaver/ss-components-solid";
 import { MEASURE_BOX_PADDING } from "@thewaver/ss-playground/App/PageComponents/MeasureBox/MeasureBox.css";
 import * as styles from "@thewaver/ss-playground/App/Pages/PaintedTextPage/PaintedTextPage.css";
+import { CONTROL_GLYPHS } from "@thewaver/ss-playground/App/StyledComponents/ControlButtonContent/ControlButtonContent.const";
 
 import { PageMeasureBox } from "../../../PageComponents/MeasureBox/MeasureBox";
-import { PageButtonContent } from "../../../StyledComponents/ButtonContent/ButtonContent";
+import { PageControlButtonContent } from "../../../StyledComponents/ControlButtonContent/ControlButtonContent";
 import { computeSampleDefs } from "../PaintedTextPage.const";
 import type { PaintedTextBoxedExampleProps } from "../PaintedTextPage.types";
 
@@ -36,7 +37,10 @@ export const ScrambledExample = (props: PaintedTextBoxedExampleProps) => {
 
             <Button
                 id={"scrambleAgain"}
-                renderContent={(getFlags) => <PageButtonContent flags={getFlags}>Scramble it again</PageButtonContent>}
+                ariaLabel={"Scramble it again"}
+                renderContent={(getFlags) => (
+                    <PageControlButtonContent flags={getFlags} glyph={CONTROL_GLYPHS.replay} />
+                )}
                 onClick={() => {
                     getController()?.restartAnimation();
                 }}

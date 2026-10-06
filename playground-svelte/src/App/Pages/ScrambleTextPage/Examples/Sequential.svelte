@@ -3,9 +3,10 @@
     import type { ScrambleTextController } from "@thewaver/ss-components-svelte";
     import { MEASURE_BOX_PADDING } from "@thewaver/ss-playground/App/PageComponents/MeasureBox/MeasureBox.css";
     import * as styles from "@thewaver/ss-playground/App/Pages/ScrambleTextPage/ScrambleTextPage.css";
+    import { CONTROL_GLYPHS } from "@thewaver/ss-playground/App/StyledComponents/ControlButtonContent/ControlButtonContent.const";
 
     import PageMeasureBox from "../../../PageComponents/MeasureBox/MeasureBox.svelte";
-    import PageButtonContent from "../../../StyledComponents/ButtonContent/ButtonContent.svelte";
+    import PageControlButtonContent from "../../../StyledComponents/ControlButtonContent/ControlButtonContent.svelte";
     import type { ScrambleTextExampleProps } from "../ScrambleTextPage.types";
 
     const LINE = "DECRYPTING PAYLOAD FROM THE ARCHIVE";
@@ -46,12 +47,13 @@
 
     <Button
         id={"revealAgain"}
+        ariaLabel={"Reveal again"}
         onClick={() => {
             controller?.restartAnimation();
         }}
     >
         {#snippet renderContent(flags)}
-            <PageButtonContent {flags}>Reveal again</PageButtonContent>
+            <PageControlButtonContent {flags} glyph={CONTROL_GLYPHS.replay} />
         {/snippet}
     </Button>
 </div>

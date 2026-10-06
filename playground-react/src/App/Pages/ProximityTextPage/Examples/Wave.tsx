@@ -4,9 +4,10 @@ import { Button, MediaQueryMonitorReactUtils, ProximityText } from "@thewaver/ss
 import { ProximityTextKnobs } from "@thewaver/ss-playground/App/Knobs/ProximityTexts.const";
 import { MEASURE_BOX_PADDING } from "@thewaver/ss-playground/App/PageComponents/MeasureBox/MeasureBox.css";
 import * as styles from "@thewaver/ss-playground/App/Pages/ProximityTextPage/ProximityTextPage.css";
+import { CONTROL_GLYPHS } from "@thewaver/ss-playground/App/StyledComponents/ControlButtonContent/ControlButtonContent.const";
 
 import { PageMeasureBox } from "../../../PageComponents/MeasureBox/MeasureBox";
-import { PageButtonContent } from "../../../StyledComponents/ButtonContent/ButtonContent";
+import { PageControlButtonContent } from "../../../StyledComponents/ControlButtonContent/ControlButtonContent";
 import type { ProximityTextExampleProps } from "../ProximityTextPageReact.types";
 
 const MIDDLE = 0.5;
@@ -57,8 +58,12 @@ export const WaveExample = (props: Props) => {
 
             <Button
                 id={"waveMove"}
+                ariaLabel={isMoving ? "Stop" : "Move"}
                 renderContent={(flags) => (
-                    <PageButtonContent flags={flags}>{isMoving ? "Stop" : "Move"}</PageButtonContent>
+                    <PageControlButtonContent
+                        flags={flags}
+                        glyph={isMoving ? CONTROL_GLYPHS.stop : CONTROL_GLYPHS.play}
+                    />
                 )}
                 onClick={() => {
                     setIsMoving(!isMoving);

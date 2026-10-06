@@ -4,10 +4,11 @@ import { computed, useId, useModel } from "vue";
 import { Button, PaintedText, PaintedTextUtils } from "@thewaver/ss-components-vue";
 import { MEASURE_BOX_PADDING } from "@thewaver/ss-playground/App/PageComponents/MeasureBox/MeasureBox.css";
 import * as styles from "@thewaver/ss-playground/App/Pages/PaintedTextPage/PaintedTextPage.css";
+import { CONTROL_GLYPHS } from "@thewaver/ss-playground/App/StyledComponents/ControlButtonContent/ControlButtonContent.const";
 import type { Size2d } from "@thewaver/ss-utils";
 
 import PageMeasureBox from "../../../PageComponents/MeasureBox/MeasureBox.vue";
-import PageButtonContent from "../../../StyledComponents/ButtonContent/ButtonContent.vue";
+import PageControlButtonContent from "../../../StyledComponents/ControlButtonContent/ControlButtonContent.vue";
 import { computeSampleDefs } from "../PaintedTextPage.const";
 import type { PaintedTextCircleExampleProps } from "../PaintedTextPage.types";
 
@@ -56,9 +57,12 @@ const computeStrokeDefs = (size: Size2d, element: HTMLElement | undefined) =>
         </PageMeasureBox>
 
         <div :class="styles.buttonRow">
-            <Button id="circlePlayback" @click="togglePlayback">
+            <Button id="circlePlayback" :ariaLabel="playback ? 'Pause' : 'Play'" @click="togglePlayback">
                 <template #renderContent="flags">
-                    <PageButtonContent :flags="flags">{{ playback ? "Pause" : "Play" }}</PageButtonContent>
+                    <PageControlButtonContent
+                        :flags="flags"
+                        :glyph="playback ? CONTROL_GLYPHS.pause : CONTROL_GLYPHS.play"
+                    />
                 </template>
             </Button>
         </div>

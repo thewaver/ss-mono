@@ -4,9 +4,10 @@ import { shallowRef } from "vue";
 import { Button, Range, Typewriter } from "@thewaver/ss-components-vue";
 import { MEASURE_BOX_PADDING } from "@thewaver/ss-playground/App/PageComponents/MeasureBox/MeasureBox.css";
 import * as styles from "@thewaver/ss-playground/App/Pages/TypewriterPage/TypewriterPage.css";
+import { CONTROL_GLYPHS } from "@thewaver/ss-playground/App/StyledComponents/ControlButtonContent/ControlButtonContent.const";
 
 import PageMeasureBox from "../../../PageComponents/MeasureBox/MeasureBox.vue";
-import PageButtonContent from "../../../StyledComponents/ButtonContent/ButtonContent.vue";
+import PageControlButtonContent from "../../../StyledComponents/ControlButtonContent/ControlButtonContent.vue";
 import PageRangeContent from "../../../StyledComponents/RangeContent/RangeContent.vue";
 import type { TypewriterKaraokeExampleProps } from "../TypewriterPage.types";
 
@@ -56,9 +57,12 @@ const seek = (value: number) => {
         </PageMeasureBox>
 
         <div :class="styles.karaokeControls">
-            <Button id="karaokePlay" @click="togglePlaying">
+            <Button id="karaokePlay" :ariaLabel="isPlaying ? 'Pause' : 'Sing'" @click="togglePlaying">
                 <template #renderContent="flags">
-                    <PageButtonContent :flags="flags">{{ isPlaying ? "Pause" : "Sing" }}</PageButtonContent>
+                    <PageControlButtonContent
+                        :flags="flags"
+                        :glyph="isPlaying ? CONTROL_GLYPHS.pause : CONTROL_GLYPHS.play"
+                    />
                 </template>
             </Button>
 

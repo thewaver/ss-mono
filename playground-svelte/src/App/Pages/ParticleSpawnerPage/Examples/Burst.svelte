@@ -7,7 +7,7 @@
     import { computeParticleGlow } from "@thewaver/ss-playground/App/Pages/ParticleSpawnerPage/ParticleSpawnerPage.const";
     import * as styles from "@thewaver/ss-playground/App/Pages/ParticleSpawnerPage/ParticleSpawnerPage.css";
 
-    import PageButtonContent from "../../../StyledComponents/ButtonContent/ButtonContent.svelte";
+    import PageControlButtonContent from "../../../StyledComponents/ControlButtonContent/ControlButtonContent.svelte";
     import type { ParticleSpawnerExampleProps } from "../ParticleSpawnerPage.types";
 
     const ONE_ROUND: ParticleSpawnIterationPattern[] = [{ count: 1 }];
@@ -60,7 +60,7 @@
             }}
         >
             {#snippet renderContent(flags)}
-                <PageButtonContent {flags}>Burst</PageButtonContent>
+                <PageControlButtonContent {flags}>Burst</PageControlButtonContent>
             {/snippet}
         </Button>
 

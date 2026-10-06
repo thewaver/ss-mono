@@ -5,10 +5,11 @@ import { Button, MediaQueryMonitorVueUtils, PaintedText, Typewriter } from "@the
 import type { TypewriterController } from "@thewaver/ss-components-vue";
 import { MEASURE_BOX_PADDING } from "@thewaver/ss-playground/App/PageComponents/MeasureBox/MeasureBox.css";
 import * as styles from "@thewaver/ss-playground/App/Pages/PaintedTextPage/PaintedTextPage.css";
+import { CONTROL_GLYPHS } from "@thewaver/ss-playground/App/StyledComponents/ControlButtonContent/ControlButtonContent.const";
 import type { Size2d } from "@thewaver/ss-utils";
 
 import PageMeasureBox from "../../../PageComponents/MeasureBox/MeasureBox.vue";
-import PageButtonContent from "../../../StyledComponents/ButtonContent/ButtonContent.vue";
+import PageControlButtonContent from "../../../StyledComponents/ControlButtonContent/ControlButtonContent.vue";
 import { computeSampleDefs } from "../PaintedTextPage.const";
 import type { PaintedTextBoxedExampleProps } from "../PaintedTextPage.types";
 
@@ -96,17 +97,17 @@ const computeBodyStrokeDefs = (size: Size2d, element: HTMLElement | undefined) =
         </PageMeasureBox>
 
         <div :class="styles.buttonRow">
-            <Button id="typeAgain" @click="restart">
+            <Button id="typeAgain" ariaLabel="Type it again" @click="restart">
                 <template #renderContent="flags">
-                    <PageButtonContent :flags="flags">Type it again</PageButtonContent>
+                    <PageControlButtonContent :flags="flags" :glyph="CONTROL_GLYPHS.replay" />
                 </template>
             </Button>
 
             <Button id="toggleBlink" @click="toggleBlink">
                 <template #renderContent="flags">
-                    <PageButtonContent :flags="flags">
+                    <PageControlButtonContent :flags="flags">
                         {{ isBlinkStopped ? "Start blinking" : "Stop blinking" }}
-                    </PageButtonContent>
+                    </PageControlButtonContent>
                 </template>
             </Button>
         </div>

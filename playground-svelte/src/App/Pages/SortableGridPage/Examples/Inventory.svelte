@@ -13,8 +13,9 @@
     import { SORTABLE_GRID_ANNOUNCEMENTS } from "@thewaver/ss-playground/App/PageComponents/Announcements/Announcements.const";
     import * as styles from "@thewaver/ss-playground/App/Pages/SortableGridPage/SortableGridPage.css";
     import type { Gear } from "@thewaver/ss-playground/App/Pages/SortableGridPage/SortableGridPage.types";
+    import { CONTROL_GLYPHS } from "@thewaver/ss-playground/App/StyledComponents/ControlButtonContent/ControlButtonContent.const";
 
-    import PageButtonContent from "../../../StyledComponents/ButtonContent/ButtonContent.svelte";
+    import PageControlButtonContent from "../../../StyledComponents/ControlButtonContent/ControlButtonContent.svelte";
     import PageSortableGridCell from "../../../StyledComponents/SortableGridContent/PageSortableGridCell.svelte";
     import PageSortableGridItemContent from "../../../StyledComponents/SortableGridContent/PageSortableGridItemContent.svelte";
     import PageSortableGridLanding from "../../../StyledComponents/SortableGridContent/PageSortableGridLanding.svelte";
@@ -118,13 +119,13 @@
         <div class={styles.sortableGridTurnControls}>
             <Button ariaLabel={"Turn counterclockwise"} isDisabled={!isCarrying} onClick={() => turn(-1)}>
                 {#snippet renderContent(flags)}
-                    <PageButtonContent {flags}>{"↺"}</PageButtonContent>
+                    <PageControlButtonContent {flags} glyph={CONTROL_GLYPHS.turnLeft} />
                 {/snippet}
             </Button>
 
             <Button ariaLabel={"Turn clockwise"} isDisabled={!isCarrying} onClick={() => turn(1)}>
                 {#snippet renderContent(flags)}
-                    <PageButtonContent {flags}>{"↻"}</PageButtonContent>
+                    <PageControlButtonContent {flags} glyph={CONTROL_GLYPHS.turnRight} />
                 {/snippet}
             </Button>
         </div>
@@ -139,7 +140,7 @@
                 }}
             >
                 {#snippet renderContent(flags)}
-                    <PageButtonContent {flags}>{"Tidy up"}</PageButtonContent>
+                    <PageControlButtonContent {flags}>{"Tidy up"}</PageControlButtonContent>
                 {/snippet}
             </Button>
         </div>

@@ -14,8 +14,9 @@ import type {
 import { SORTABLE_GRID_ANNOUNCEMENTS } from "@thewaver/ss-playground/App/PageComponents/Announcements/Announcements.const";
 import * as styles from "@thewaver/ss-playground/App/Pages/SortableGridPage/SortableGridPage.css";
 import type { Gear } from "@thewaver/ss-playground/App/Pages/SortableGridPage/SortableGridPage.types";
+import { CONTROL_GLYPHS } from "@thewaver/ss-playground/App/StyledComponents/ControlButtonContent/ControlButtonContent.const";
 
-import { PageButtonContent } from "../../../StyledComponents/ButtonContent/ButtonContent";
+import { PageControlButtonContent } from "../../../StyledComponents/ControlButtonContent/ControlButtonContent";
 import {
     PageSortableGridCell,
     PageSortableGridItemContent,
@@ -118,14 +119,18 @@ export const InventoryExample = (props: Props) => {
                         ariaLabel={"Turn counterclockwise"}
                         isDisabled={() => !getController()?.getIsCarrying()}
                         onClick={() => turn(-1)}
-                        renderContent={(getFlags) => <PageButtonContent flags={getFlags}>{"↺"}</PageButtonContent>}
+                        renderContent={(getFlags) => (
+                            <PageControlButtonContent flags={getFlags} glyph={CONTROL_GLYPHS.turnLeft} />
+                        )}
                     />
 
                     <Button
                         ariaLabel={"Turn clockwise"}
                         isDisabled={() => !getController()?.getIsCarrying()}
                         onClick={() => turn(1)}
-                        renderContent={(getFlags) => <PageButtonContent flags={getFlags}>{"↻"}</PageButtonContent>}
+                        renderContent={(getFlags) => (
+                            <PageControlButtonContent flags={getFlags} glyph={CONTROL_GLYPHS.turnRight} />
+                        )}
                     />
                 </div>
             </Show>
@@ -138,7 +143,7 @@ export const InventoryExample = (props: Props) => {
                             getController()?.compact();
                         }}
                         renderContent={(getFlags) => (
-                            <PageButtonContent flags={getFlags}>{"Tidy up"}</PageButtonContent>
+                            <PageControlButtonContent flags={getFlags}>{"Tidy up"}</PageControlButtonContent>
                         )}
                     />
                 </div>

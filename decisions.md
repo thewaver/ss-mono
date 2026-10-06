@@ -7711,6 +7711,38 @@ wide as its tags, which is the documented behavior of the control.
 so it takes the black fill and shadow rather than sitting transparent on the card. It never receives the flag
 classes, so only the resting appearance applies.
 
+### An example's own controls wear the small control look, not the Button look
+
+The user's call: a button that operates the example — play, pause, replay, zoom, pan, turn, step, and the
+one-shot actions beside them (Spin, Roll, Burst, Recall, Tidy up) — is painted by
+**`PageControlButtonContent`**, the small translucent square `Carousel` drew for its own controls first.
+`PageButtonContent`, the bold gradient, stays for a button that **is** the subject or belongs to the scene: the
+Button page, form submits and resets, buttons inside a dialog, popover or tour step, toolbar items, modal and
+drawer openers, toast raisers, and the page-level Reset among the knobs.
+
+**A symbol where one is obvious, the word otherwise** — option B of three the user was shown. Words stay
+in a pill of the same look (28px tall, at least 28px wide) rather than inventing a symbol nobody reads without
+hovering. Steppers such as SlotText's "add 10" keep their words too: "+10" would have needed a name that does
+not contain it, which WCAG 2.5.3 (Label in Name) refuses.
+
+**The symbols are one table, `CONTROL_GLYPHS`, in the shared `playground`**, so every framework draws the
+same character for the same act. A symbol is passed as `glyph`, which marks it `aria-hidden`, and the
+`Button` carries the name as `ariaLabel` — reactive where the control toggles (`"Pause"` / `"Play"`). A word is
+passed as children and is its own name.
+
+**`Carousel` paints through it rather than beside it.** `PageCarouselStep` and `PageCarouselRotation` render
+`PageControlButtonContent` with a glyph, and the pick dot is `controlButtonBase` plus its own size, taking the
+flag classes from `ControlButtonContent.css` — so the carousel's controls cannot drift from every other
+example's. `Flipbook`'s page turns are ‹ › for the same reason; its old captions table is gone.
+
+### Text painted on a surface that moves is not selectable
+
+The user's call: the words on a carousel slide, a cuboid face, a flip card, a dealt card, a flipbook page or a
+wheel's wedge and drum card are part of the object, not reading matter, so the painter sets
+`userSelect: "none"` and a swipe, drag or double-press never lights them up. The readouts under each example
+stay selectable. Controls built on `InteractionWrapper` — `Sortable`, `SortableGrid`, `TileBoard`'s tiles — already
+get this from `interactionRoot` and needed nothing.
+
 ### A Playground demo a visitor can move must be a demo they can put back
 
 Stated by the user, after `TagInput` and `Stepper` shipped with no way to restore them.

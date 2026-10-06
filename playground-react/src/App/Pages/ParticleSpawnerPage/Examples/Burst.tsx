@@ -5,7 +5,7 @@ import type { ParticleSpawnIterationPattern } from "@thewaver/ss-components-reac
 import { computeParticleGlow } from "@thewaver/ss-playground/App/Pages/ParticleSpawnerPage/ParticleSpawnerPage.const";
 import * as styles from "@thewaver/ss-playground/App/Pages/ParticleSpawnerPage/ParticleSpawnerPage.css";
 
-import { PageButtonContent } from "../../../StyledComponents/ButtonContent/ButtonContent";
+import { PageControlButtonContent } from "../../../StyledComponents/ControlButtonContent/ControlButtonContent";
 import type { ParticleSpawnerExampleProps } from "../ParticleSpawnerPage.types";
 
 const ONE_ROUND: ParticleSpawnIterationPattern[] = [{ count: 1 }];
@@ -49,7 +49,7 @@ export const BurstExample = (props: ParticleSpawnerExampleProps) => {
             <div className={styles.burstRoot} style={{ left: "50%", top: "50%" }}>
                 <Button
                     id={"particleBurst"}
-                    renderContent={(flags) => <PageButtonContent flags={flags}>Burst</PageButtonContent>}
+                    renderContent={(flags) => <PageControlButtonContent flags={flags}>Burst</PageControlButtonContent>}
                     onClick={() => {
                         setIsPlaying(true);
                     }}

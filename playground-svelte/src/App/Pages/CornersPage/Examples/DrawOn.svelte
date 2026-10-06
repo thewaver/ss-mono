@@ -3,7 +3,7 @@
     import * as styles from "@thewaver/ss-playground/App/Pages/CornersPage/CornersPage.css";
     import { EasingUtils, MathUtils } from "@thewaver/ss-utils";
 
-    import PageButtonContent from "../../../StyledComponents/ButtonContent/ButtonContent.svelte";
+    import PageControlButtonContent from "../../../StyledComponents/ControlButtonContent/ControlButtonContent.svelte";
     import type { CornersExampleProps } from "../CornersPage.types";
 
     type Props = CornersExampleProps;
@@ -85,7 +85,7 @@
             }}
         >
             {#snippet renderContent(flags)}
-                <PageButtonContent {flags}>{isShown ? "Hide" : "Draw"}</PageButtonContent>
+                <PageControlButtonContent {flags}>{isShown ? "Hide" : "Draw"}</PageControlButtonContent>
             {/snippet}
         </Button>
     </div>

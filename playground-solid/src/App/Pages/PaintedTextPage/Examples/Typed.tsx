@@ -4,9 +4,10 @@ import { Button, MediaQueryMonitorSolidUtils, PaintedText, Typewriter } from "@t
 import type { AccessorProps, TypewriterController } from "@thewaver/ss-components-solid";
 import { MEASURE_BOX_PADDING } from "@thewaver/ss-playground/App/PageComponents/MeasureBox/MeasureBox.css";
 import * as styles from "@thewaver/ss-playground/App/Pages/PaintedTextPage/PaintedTextPage.css";
+import { CONTROL_GLYPHS } from "@thewaver/ss-playground/App/StyledComponents/ControlButtonContent/ControlButtonContent.const";
 
 import { PageMeasureBox } from "../../../PageComponents/MeasureBox/MeasureBox";
-import { PageButtonContent } from "../../../StyledComponents/ButtonContent/ButtonContent";
+import { PageControlButtonContent } from "../../../StyledComponents/ControlButtonContent/ControlButtonContent";
 import { computeSampleDefs } from "../PaintedTextPage.const";
 import type { PaintedTextBoxedExampleProps } from "../PaintedTextPage.types";
 
@@ -79,7 +80,10 @@ export const TypedExample = (props: Props) => {
             <div class={styles.buttonRow}>
                 <Button
                     id={"typeAgain"}
-                    renderContent={(getFlags) => <PageButtonContent flags={getFlags}>Type it again</PageButtonContent>}
+                    ariaLabel={"Type it again"}
+                    renderContent={(getFlags) => (
+                        <PageControlButtonContent flags={getFlags} glyph={CONTROL_GLYPHS.replay} />
+                    )}
                     onClick={() => {
                         getController()?.restartAnimation();
                     }}
@@ -88,9 +92,9 @@ export const TypedExample = (props: Props) => {
                 <Button
                     id={"toggleBlink"}
                     renderContent={(getFlags) => (
-                        <PageButtonContent flags={getFlags}>
+                        <PageControlButtonContent flags={getFlags}>
                             {getIsBlinkStopped() ? "Start blinking" : "Stop blinking"}
-                        </PageButtonContent>
+                        </PageControlButtonContent>
                     )}
                     onClick={() => {
                         setIsBlinkStopped((isStopped) => !isStopped);

@@ -2,8 +2,9 @@ import { For } from "solid-js";
 
 import { Button, CUBOID_FACES, Cuboid } from "@thewaver/ss-components-solid";
 import { computeCuboidFaceLabel } from "@thewaver/ss-playground/App/PageComponents/Announcements/Announcements.const";
+import { CONTROL_GLYPHS } from "@thewaver/ss-playground/App/StyledComponents/ControlButtonContent/ControlButtonContent.const";
 
-import { PageButtonContent } from "../../../StyledComponents/ButtonContent/ButtonContent";
+import { PageControlButtonContent } from "../../../StyledComponents/ControlButtonContent/ControlButtonContent";
 import {
     PageCuboidFace,
     PageCuboidPad,
@@ -25,7 +26,7 @@ export const UprightExample = (props: Props) => {
         <Button
             id={id}
             ariaLabel={label}
-            renderContent={(getFlags) => <PageButtonContent flags={getFlags}>{glyph}</PageButtonContent>}
+            renderContent={(getFlags) => <PageControlButtonContent flags={getFlags} glyph={glyph} />}
             onClick={turn}
         />
     );
@@ -47,21 +48,21 @@ export const UprightExample = (props: Props) => {
 
             <PageCuboidPad>
                 <div />
-                {renderTurn("uprightPitchUp", "Turn the face above towards you", "↑", () => {
+                {renderTurn("uprightPitchUp", "Turn the face above towards you", CONTROL_GLYPHS.up, () => {
                     setPitch((pitch) => pitch + QUARTER_TURN);
                 })}
                 <div />
 
-                {renderTurn("uprightYawLeft", "Turn the face on the left towards you", "←", () => {
+                {renderTurn("uprightYawLeft", "Turn the face on the left towards you", CONTROL_GLYPHS.left, () => {
                     setYaw((yaw) => yaw - QUARTER_TURN);
                 })}
                 <div />
-                {renderTurn("uprightYawRight", "Turn the face on the right towards you", "→", () => {
+                {renderTurn("uprightYawRight", "Turn the face on the right towards you", CONTROL_GLYPHS.right, () => {
                     setYaw((yaw) => yaw + QUARTER_TURN);
                 })}
 
                 <div />
-                {renderTurn("uprightPitchDown", "Turn the face below towards you", "↓", () => {
+                {renderTurn("uprightPitchDown", "Turn the face below towards you", CONTROL_GLYPHS.down, () => {
                     setPitch((pitch) => pitch - QUARTER_TURN);
                 })}
                 <div />
@@ -74,7 +75,9 @@ export const UprightExample = (props: Props) => {
                             id={`turnTo${computeCuboidFaceLabel(face)}`}
                             ariaLabel={`Turn to the ${face}`}
                             renderContent={(getFlags) => (
-                                <PageButtonContent flags={getFlags}>{computeCuboidFaceLabel(face)}</PageButtonContent>
+                                <PageControlButtonContent flags={getFlags}>
+                                    {computeCuboidFaceLabel(face)}
+                                </PageControlButtonContent>
                             )}
                             onClick={() => {
                                 getController()?.turnTo(face);

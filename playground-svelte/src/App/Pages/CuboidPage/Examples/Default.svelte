@@ -1,8 +1,9 @@
 <script lang="ts">
     import { Button, Cuboid } from "@thewaver/ss-components-svelte";
     import { computeCuboidFaceLabel } from "@thewaver/ss-playground/App/PageComponents/Announcements/Announcements.const";
+    import { CONTROL_GLYPHS } from "@thewaver/ss-playground/App/StyledComponents/ControlButtonContent/ControlButtonContent.const";
 
-    import PageButtonContent from "../../../StyledComponents/ButtonContent/ButtonContent.svelte";
+    import PageControlButtonContent from "../../../StyledComponents/ControlButtonContent/ControlButtonContent.svelte";
     import PageCuboidFace from "../../../StyledComponents/CuboidContent/PageCuboidFace.svelte";
     import PageCuboidPad from "../../../StyledComponents/CuboidContent/PageCuboidPad.svelte";
     import PageCuboidStack from "../../../StyledComponents/CuboidContent/PageCuboidStack.svelte";
@@ -18,7 +19,7 @@
 {#snippet renderTurn(id: string, label: string, glyph: string, turn: () => void)}
     <Button {id} ariaLabel={label} onClick={turn}>
         {#snippet renderContent(flags)}
-            <PageButtonContent {flags}>{glyph}</PageButtonContent>
+            <PageControlButtonContent {flags} {glyph} />
         {/snippet}
     </Button>
 {/snippet}
@@ -39,21 +40,21 @@
 
     <PageCuboidPad>
         <div></div>
-        {@render renderTurn("pitchUp", "Turn the top towards you", "↑", () => {
+        {@render renderTurn("pitchUp", "Turn the top towards you", CONTROL_GLYPHS.up, () => {
             pitch = pitch + QUARTER_TURN;
         })}
         <div></div>
 
-        {@render renderTurn("yawLeft", "Turn the left face towards you", "←", () => {
+        {@render renderTurn("yawLeft", "Turn the left face towards you", CONTROL_GLYPHS.left, () => {
             yaw = yaw - QUARTER_TURN;
         })}
         <div></div>
-        {@render renderTurn("yawRight", "Turn the right face towards you", "→", () => {
+        {@render renderTurn("yawRight", "Turn the right face towards you", CONTROL_GLYPHS.right, () => {
             yaw = yaw + QUARTER_TURN;
         })}
 
         <div></div>
-        {@render renderTurn("pitchDown", "Turn the bottom towards you", "↓", () => {
+        {@render renderTurn("pitchDown", "Turn the bottom towards you", CONTROL_GLYPHS.down, () => {
             pitch = pitch - QUARTER_TURN;
         })}
         <div></div>

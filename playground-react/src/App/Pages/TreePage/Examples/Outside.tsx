@@ -1,7 +1,7 @@
 import { Button, Tree } from "@thewaver/ss-components-react";
 
 import { PageControlColumn } from "../../../PageComponents/ControlRow/ControlRow";
-import { PageButtonContent } from "../../../StyledComponents/ButtonContent/ButtonContent";
+import { PageControlButtonContent } from "../../../StyledComponents/ControlButtonContent/ControlButtonContent";
 import { renderPageHighlightFloater } from "../../../StyledComponents/GlideFloater/GlideFloater";
 import { PageTreeNodeContent } from "../../../StyledComponents/TreeNodeContent/TreeNodeContent";
 import { FILES, OUTSIDE_COLLAPSE_DELAY_MS } from "../TreePage.const";
@@ -26,7 +26,9 @@ export const OutsideExample = (props: Props) => (
 
         <Button
             renderContent={(flags) => (
-                <PageButtonContent flags={flags}>{`Collapse Lib in ${OUTSIDE_COLLAPSE_DELAY_MS}ms`}</PageButtonContent>
+                <PageControlButtonContent
+                    flags={flags}
+                >{`Collapse Lib in ${OUTSIDE_COLLAPSE_DELAY_MS}ms`}</PageControlButtonContent>
             )}
             onClick={async () => {
                 setTimeout(() => {

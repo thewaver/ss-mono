@@ -3,8 +3,9 @@ import { createSignal } from "solid-js";
 import { AudioSwitcher, Button, access } from "@thewaver/ss-components-solid";
 import type { AudioSwitcherController } from "@thewaver/ss-components-solid";
 import * as styles from "@thewaver/ss-playground/App/Pages/AudioSwitcherPage/AudioSwitcherPage.css";
+import { CONTROL_GLYPHS } from "@thewaver/ss-playground/App/StyledComponents/ControlButtonContent/ControlButtonContent.const";
 
-import { PageButtonContent } from "../../../StyledComponents/ButtonContent/ButtonContent";
+import { PageControlButtonContent } from "../../../StyledComponents/ControlButtonContent/ControlButtonContent";
 import type { AudioSwitcherExampleProps } from "../AudioSwitcherPage.types";
 
 type Props = AudioSwitcherExampleProps;
@@ -20,8 +21,12 @@ export const DefaultExample = (props: Props) => {
         <div class={styles.deck}>
             <div class={styles.row}>
                 <Button
+                    ariaLabel={() => (getIsPlaying() ? "Stop" : "Play")}
                     renderContent={(getFlags) => (
-                        <PageButtonContent flags={getFlags}>{getIsPlaying() ? "Stop" : "Play"}</PageButtonContent>
+                        <PageControlButtonContent
+                            flags={getFlags}
+                            glyph={() => (getIsPlaying() ? CONTROL_GLYPHS.stop : CONTROL_GLYPHS.play)}
+                        />
                     )}
                     onClick={() => {
                         setIsPlaying(!getIsPlaying());
@@ -30,7 +35,10 @@ export const DefaultExample = (props: Props) => {
 
                 <Button
                     isDisabled={() => !getIsPlaying()}
-                    renderContent={(getFlags) => <PageButtonContent flags={getFlags}>Start over</PageButtonContent>}
+                    ariaLabel={"Start over"}
+                    renderContent={(getFlags) => (
+                        <PageControlButtonContent flags={getFlags} glyph={CONTROL_GLYPHS.replay} />
+                    )}
                     onClick={() => {
                         getController()?.reset();
                     }}

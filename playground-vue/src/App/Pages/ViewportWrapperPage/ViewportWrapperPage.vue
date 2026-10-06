@@ -204,7 +204,7 @@ const dismissInnerToast = (id: string) => {
                         <div :class="styles.toastRaiser">
                             <Button
                                 id="raiseInnerToast"
-                                ariaLabel="Raise a notification inside the viewport"
+                                ariaLabel="Notify inside the viewport"
                                 @click="raiseInnerToast"
                             >
                                 <template #renderContent="flags">

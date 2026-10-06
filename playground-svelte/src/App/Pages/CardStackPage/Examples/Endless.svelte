@@ -6,17 +6,18 @@
     import { computeCardTilt } from "@thewaver/ss-playground/App/Pages/CardStackPage/CardStackPage.const";
     import * as styles from "@thewaver/ss-playground/App/Pages/CardStackPage/CardStackPage.css";
     import type { SwipeDirection } from "@thewaver/ss-utils";
+    import { CONTROL_GLYPHS } from "@thewaver/ss-playground/App/StyledComponents/ControlButtonContent/ControlButtonContent.const";
 
     import PageMeasureBox from "../../../PageComponents/MeasureBox/MeasureBox.svelte";
-    import PageButtonContent from "../../../StyledComponents/ButtonContent/ButtonContent.svelte";
+    import PageControlButtonContent from "../../../StyledComponents/ControlButtonContent/ControlButtonContent.svelte";
     import type { CardStackEndlessExampleProps } from "../CardStackExamples.types";
 
     const DIRECTIONS: SwipeDirection[] = ["left", "right"];
-    const DIRECTION_LABELS: Record<SwipeDirection, string> = {
-        left: "Left",
-        right: "Right",
-        up: "Up",
-        down: "Down",
+    const DIRECTION_GLYPHS: Record<SwipeDirection, string> = {
+        left: CONTROL_GLYPHS.left,
+        right: CONTROL_GLYPHS.right,
+        up: CONTROL_GLYPHS.up,
+        down: CONTROL_GLYPHS.down,
     };
 
     const BATCH_SIZE = 6;
@@ -98,7 +99,7 @@
                 }}
             >
                 {#snippet renderContent(flags)}
-                    <PageButtonContent {flags}>{DIRECTION_LABELS[direction]}</PageButtonContent>
+                    <PageControlButtonContent {flags} glyph={DIRECTION_GLYPHS[direction]} />
                 {/snippet}
             </Button>
         {/each}

@@ -2,9 +2,10 @@
     import { Button, PaintedText, PaintedTextUtils } from "@thewaver/ss-components-svelte";
     import { MEASURE_BOX_PADDING } from "@thewaver/ss-playground/App/PageComponents/MeasureBox/MeasureBox.css";
     import * as styles from "@thewaver/ss-playground/App/Pages/PaintedTextPage/PaintedTextPage.css";
+    import { CONTROL_GLYPHS } from "@thewaver/ss-playground/App/StyledComponents/ControlButtonContent/ControlButtonContent.const";
 
     import PageMeasureBox from "../../../PageComponents/MeasureBox/MeasureBox.svelte";
-    import PageButtonContent from "../../../StyledComponents/ButtonContent/ButtonContent.svelte";
+    import PageControlButtonContent from "../../../StyledComponents/ControlButtonContent/ControlButtonContent.svelte";
     import { computeSampleDefs } from "../PaintedTextPage.const";
     import type { PaintedTextCircleExampleProps } from "../PaintedTextPage.types";
 
@@ -41,12 +42,13 @@
     <div class={styles.buttonRow}>
         <Button
             id={"circlePlayback"}
+            ariaLabel={playback ? "Pause" : "Play"}
             onClick={() => {
                 playback = !playback;
             }}
         >
             {#snippet renderContent(flags)}
-                <PageButtonContent {flags}>{playback ? "Pause" : "Play"}</PageButtonContent>
+                <PageControlButtonContent {flags} glyph={playback ? CONTROL_GLYPHS.pause : CONTROL_GLYPHS.play} />
             {/snippet}
         </Button>
     </div>

@@ -4,19 +4,20 @@ import { Button, CardStack } from "@thewaver/ss-components-react";
 import type { CardStackControls } from "@thewaver/ss-components-react";
 import { computeCardTilt } from "@thewaver/ss-playground/App/Pages/CardStackPage/CardStackPage.const";
 import * as styles from "@thewaver/ss-playground/App/Pages/CardStackPage/CardStackPage.css";
+import { CONTROL_GLYPHS } from "@thewaver/ss-playground/App/StyledComponents/ControlButtonContent/ControlButtonContent.const";
 import type { SwipeDirection } from "@thewaver/ss-utils";
 
 import { PageMeasureBox } from "../../../PageComponents/MeasureBox/MeasureBox";
-import { PageButtonContent } from "../../../StyledComponents/ButtonContent/ButtonContent";
+import { PageControlButtonContent } from "../../../StyledComponents/ControlButtonContent/ControlButtonContent";
 import type { CardStackDeckExampleProps } from "../CardStackExamples.types";
 
 const CARDS = ["Ace", "King", "Queen", "Jack", "Ten", "Nine", "Eight", "Seven", "Six", "Five", "Four", "Three", "Two"];
 const DIRECTIONS: SwipeDirection[] = ["left", "right", "up", "down"];
-const DIRECTION_LABELS: Record<SwipeDirection, string> = {
-    left: "Left",
-    right: "Right",
-    up: "Up",
-    down: "Down",
+const DIRECTION_GLYPHS: Record<SwipeDirection, string> = {
+    left: CONTROL_GLYPHS.left,
+    right: CONTROL_GLYPHS.right,
+    up: CONTROL_GLYPHS.up,
+    down: CONTROL_GLYPHS.down,
 };
 
 const BOX_HEIGHT = 240;
@@ -77,7 +78,7 @@ export const DeckExample = (props: Props) => {
                         isDisabled={props.isDisabled || (isEmpty ?? true)}
                         ariaLabel={`Send the top card ${direction}`}
                         renderContent={(flags) => (
-                            <PageButtonContent flags={flags}>{DIRECTION_LABELS[direction]}</PageButtonContent>
+                            <PageControlButtonContent flags={flags} glyph={DIRECTION_GLYPHS[direction]} />
                         )}
                         onClick={() => {
                             controls?.send(direction);
@@ -88,8 +89,8 @@ export const DeckExample = (props: Props) => {
                 <Button
                     id={"recall"}
                     isDisabled={props.isDisabled || topIndex === FIRST_INDEX}
-                    ariaLabel={"Bring the last card back"}
-                    renderContent={(flags) => <PageButtonContent flags={flags}>Recall</PageButtonContent>}
+                    ariaLabel={"Recall the last card"}
+                    renderContent={(flags) => <PageControlButtonContent flags={flags}>Recall</PageControlButtonContent>}
                     onClick={() => {
                         if (controls?.recall()) props.onRecall();
                     }}
@@ -99,7 +100,9 @@ export const DeckExample = (props: Props) => {
                     <Button
                         id={"deal"}
                         ariaLabel={"Deal the cards again"}
-                        renderContent={(flags) => <PageButtonContent flags={flags}>Deal again</PageButtonContent>}
+                        renderContent={(flags) => (
+                            <PageControlButtonContent flags={flags} glyph={CONTROL_GLYPHS.replay} />
+                        )}
                         onClick={() => {
                             props.onDeal();
                             controls?.deal();

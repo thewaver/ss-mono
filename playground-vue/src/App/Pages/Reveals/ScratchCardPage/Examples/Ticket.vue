@@ -4,9 +4,10 @@ import { shallowRef } from "vue";
 import { Button, ScratchCard } from "@thewaver/ss-components-vue";
 import type { ScratchCardController } from "@thewaver/ss-components-vue";
 import * as styles from "@thewaver/ss-playground/App/Pages/Reveals/ScratchCardPage/ScratchCardPage.css";
+import { CONTROL_GLYPHS } from "@thewaver/ss-playground/App/StyledComponents/ControlButtonContent/ControlButtonContent.const";
 
 import PageMeasureBox from "../../../../PageComponents/MeasureBox/MeasureBox.vue";
-import PageButtonContent from "../../../../StyledComponents/ButtonContent/ButtonContent.vue";
+import PageControlButtonContent from "../../../../StyledComponents/ControlButtonContent/ControlButtonContent.vue";
 import type { ScratchCardExampleProps } from "../ScratchCardPage.types";
 
 const CARD_WIDTH = 360;
@@ -57,9 +58,9 @@ const reset = () => {
         </PageMeasureBox>
 
         <div :class="styles.buttonRow">
-            <Button id="newTicket" @click="reset">
+            <Button id="newTicket" ariaLabel="New ticket" @click="reset">
                 <template #renderContent="flags">
-                    <PageButtonContent :flags="flags">New ticket</PageButtonContent>
+                    <PageControlButtonContent :flags="flags" :glyph="CONTROL_GLYPHS.replay" />
                 </template>
             </Button>
         </div>

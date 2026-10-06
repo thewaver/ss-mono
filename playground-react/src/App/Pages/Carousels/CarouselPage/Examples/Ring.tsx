@@ -8,9 +8,10 @@ import {
     computePositionLabel,
 } from "@thewaver/ss-playground/App/PageComponents/Announcements/Announcements.const";
 import * as styles from "@thewaver/ss-playground/App/Pages/Carousels/Carousels.css";
+import { CONTROL_GLYPHS } from "@thewaver/ss-playground/App/StyledComponents/ControlButtonContent/ControlButtonContent.const";
 
-import { PageButtonContent } from "../../../../StyledComponents/ButtonContent/ButtonContent";
 import { PageCarouselSlide } from "../../../../StyledComponents/CarouselContent/CarouselContent";
+import { PageControlButtonContent } from "../../../../StyledComponents/ControlButtonContent/ControlButtonContent";
 import type { CarouselExampleProps } from "../../Carousels.types";
 
 const computeRingPlacement = CarouselPlacementUtils.createPaddleWheel({
@@ -79,8 +80,12 @@ export const RingExample = (props: Props) => {
 
             <Button
                 id={"ringTurn"}
+                ariaLabel={isTurning ? "Stop" : "Turn"}
                 renderContent={(flags) => (
-                    <PageButtonContent flags={flags}>{isTurning ? "Stop" : "Turn"}</PageButtonContent>
+                    <PageControlButtonContent
+                        flags={flags}
+                        glyph={isTurning ? CONTROL_GLYPHS.stop : CONTROL_GLYPHS.play}
+                    />
                 )}
                 onClick={() => {
                     setIsTurning(!isTurning);

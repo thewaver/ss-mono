@@ -4,7 +4,7 @@
     import { EasingUtils, MathUtils, Point2dUtils } from "@thewaver/ss-utils";
     import type { Point2d, Size2d } from "@thewaver/ss-utils";
 
-    import PageButtonContent from "../../../StyledComponents/ButtonContent/ButtonContent.svelte";
+    import PageControlButtonContent from "../../../StyledComponents/ControlButtonContent/ControlButtonContent.svelte";
     import { computeShapeFillDefs, computeShapeStrokeDefs } from "../ShapePage.const";
     import type { ShapeExampleProps } from "../ShapePage.types";
 
@@ -134,7 +134,7 @@
         onClick={() => morphTo(target === 0 ? 1 : 0)}
     >
         {#snippet renderContent(flags)}
-            <PageButtonContent {flags}>{target === 0 ? "Turn into a star" : "Turn into a circle"}</PageButtonContent>
+            <PageControlButtonContent {flags}>{target === 0 ? "Turn into a star" : "Turn into a circle"}</PageControlButtonContent>
         {/snippet}
     </Button>
 </div>

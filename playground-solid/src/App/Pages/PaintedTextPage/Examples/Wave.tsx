@@ -3,9 +3,10 @@ import { createUniqueId } from "solid-js";
 import { Button, PaintedText } from "@thewaver/ss-components-solid";
 import { MEASURE_BOX_PADDING } from "@thewaver/ss-playground/App/PageComponents/MeasureBox/MeasureBox.css";
 import * as styles from "@thewaver/ss-playground/App/Pages/PaintedTextPage/PaintedTextPage.css";
+import { CONTROL_GLYPHS } from "@thewaver/ss-playground/App/StyledComponents/ControlButtonContent/ControlButtonContent.const";
 
 import { PageMeasureBox } from "../../../PageComponents/MeasureBox/MeasureBox";
-import { PageButtonContent } from "../../../StyledComponents/ButtonContent/ButtonContent";
+import { PageControlButtonContent } from "../../../StyledComponents/ControlButtonContent/ControlButtonContent";
 import { computeSampleDefs } from "../PaintedTextPage.const";
 import type { PaintedTextPathExampleProps } from "../PaintedTextPage.types";
 
@@ -39,8 +40,12 @@ export const WaveExample = (props: Props) => {
             <div class={styles.buttonRow}>
                 <Button
                     id={"wavePlayback"}
+                    ariaLabel={() => (props.playback[0]() ? "Pause" : "Play")}
                     renderContent={(getFlags) => (
-                        <PageButtonContent flags={getFlags}>{props.playback[0]() ? "Pause" : "Play"}</PageButtonContent>
+                        <PageControlButtonContent
+                            flags={getFlags}
+                            glyph={() => (props.playback[0]() ? CONTROL_GLYPHS.pause : CONTROL_GLYPHS.play)}
+                        />
                     )}
                     onClick={() => {
                         props.playback[1](!props.playback[0]());
