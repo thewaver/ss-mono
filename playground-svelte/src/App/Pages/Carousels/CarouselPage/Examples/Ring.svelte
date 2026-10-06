@@ -88,13 +88,13 @@
 
     <Button
         id={"ringTurn"}
-        ariaLabel={isTurning ? "Stop" : "Turn"}
+        ariaLabel={isTurning ? "Pause" : "Turn"}
         onClick={() => {
             isTurning = !isTurning;
         }}
     >
         {#snippet renderContent(flags)}
-            <PageControlButtonContent {flags} glyph={isTurning ? CONTROL_GLYPHS.stop : CONTROL_GLYPHS.play} />
+            <PageControlButtonContent {flags} glyph={isTurning ? CONTROL_GLYPHS.pause : CONTROL_GLYPHS.play} />
         {/snippet}
     </Button>
 </div>

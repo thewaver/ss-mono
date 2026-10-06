@@ -1,4 +1,4 @@
-import type { ComputedRef, MaybeRefOrGetter, VNodeChild } from "vue";
+import type { ComputedRef, MaybeRefOrGetter, Ref, VNodeChild } from "vue";
 
 import type {
     InteractionFlags,
@@ -42,6 +42,7 @@ export type ListboxCursor<T> = {
     flatOptions: ComputedRef<SelectOption<T>[]>;
     highlightedIndex: ComputedRef<number | undefined>;
     isHighlightShown: ComputedRef<boolean>;
+    highlightRequests: Readonly<Ref<number>>;
     activeOptionId: ComputedRef<string | undefined>;
     getOptionId: (index: number) => string;
     setHasFocus: (hasFocus: boolean) => void;

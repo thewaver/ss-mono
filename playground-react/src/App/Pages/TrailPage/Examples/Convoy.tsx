@@ -46,20 +46,16 @@ export const ConvoyExample = (props: Props) => {
 
             <div className={styles.controls}>
                 <Button
-                    id={"convoyPlay"}
-                    ariaLabel={"Play"}
-                    renderContent={(flags) => <PageControlButtonContent flags={flags} glyph={CONTROL_GLYPHS.play} />}
+                    id={"convoyPlayback"}
+                    ariaLabel={props.playback[0] ? "Pause" : "Play"}
+                    renderContent={(flags) => (
+                        <PageControlButtonContent
+                            flags={flags}
+                            glyph={props.playback[0] ? CONTROL_GLYPHS.pause : CONTROL_GLYPHS.play}
+                        />
+                    )}
                     onClick={() => {
-                        props.playback[1](true);
-                    }}
-                />
-
-                <Button
-                    id={"convoyPause"}
-                    ariaLabel={"Pause"}
-                    renderContent={(flags) => <PageControlButtonContent flags={flags} glyph={CONTROL_GLYPHS.pause} />}
-                    onClick={() => {
-                        props.playback[1](false);
+                        props.playback[1](!props.playback[0]);
                     }}
                 />
 

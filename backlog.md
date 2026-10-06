@@ -63,6 +63,7 @@ reading.
 29. Choices the add-ons round made on the user's behalf — _pending decision_
 30. A gallery page, and a preview of each page from the nav — _deferred to a session of its own_
 31. A long list reopened onto a far-down selection settles a frame or two late in Solid and Svelte — _open_
+32. `Die`'s step buttons and arrow keys fall into a loop of two or three faces — _open, no fix chosen_
 
 ### Build order
 
@@ -1273,6 +1274,33 @@ the Vue side reads"_). Doing the same in Solid and Svelte means moving where the
 which changes timing those windows were built on (`decisions.md`, _"The Solid and Svelte row windows report
 `getIsLive` once they are following their scroller"_), so it was left for a deliberate look. `select.spec.ts`'s
 reopening case waits for the list to settle, so it passes either way and will not catch a change here.
+
+## 32. `Die`'s step buttons and arrow keys fall into a loop of two or three faces
+
+Reachable on the Die page's icon cloud: pick the d20 and press down a few times. The die goes back and forth
+between the same two faces. Every shape does it — a d20 pressed right goes between faces 1 and 2 from the first
+press, and a cube pressed up visits three faces and repeats them, where a real cube rolled up visits four.
+
+**The cause is the righting spin at the end of a step.** A step rolls the die about the screen axis until the next
+face is in front, then settles that face the right way up (`getLandingQuaternion`, which depends only on the face).
+That spin changes which side of the die is on top, so the next press does not continue the roll. And because each
+face always lands the same way, the face a step reaches from a given face is fixed: pressing the same key repeats a
+fixed path that soon loops, and a two-face loop happens wherever B's "right way up" points back towards A.
+
+**No fix was taken; the user judged all three put to them inadequate.** Rolling straight across the die and landing
+every face upright cannot both hold, so each option gives one up:
+
+- **A step lands by the shortest roll, with no righting spin.** It rolls straight around the die like a real one,
+  but faces end up at an angle, so a number or an icon may read sideways; it breaks _"The solid never stops
+  crooked"_ (`decisions.md`, under _"`Roller`: the wheel's behavior with one more dimension"_) for steps.
+- **The die remembers which way it has been rolling, and keeps the righting spin.** Faces land upright, but after
+  the spin a press of up can move the front face sideways on screen, and the memory is extra state that a drag or
+  another key clears.
+- **A step never goes back to the face it came from.** Stops the two-face loop only; the cube's three-face loop and
+  longer ones remain.
+
+`Cuboid`'s upright mode has the same tension and accepted it, since a box has only six resting orientations
+(`decisions.md`, _"`Cuboid`: upright mode keeps an orientation"_); a d20 has many more faces for the loop to skip.
 
 ## Accepted limits
 

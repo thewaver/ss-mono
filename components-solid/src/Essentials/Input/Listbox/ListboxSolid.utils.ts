@@ -38,6 +38,7 @@ export namespace ListboxSolidUtils {
 
         const getHighlightedValue = accessStore(controller, (state) => state.highlightedValue);
         const getHasFocus = accessStore(controller, (state) => state.hasFocus);
+        const getHighlightRequests = accessStore(controller, (state) => state.highlightRequests);
 
         const getIsOpen = () => opts.getIsOpen?.() ?? true;
         const isRoving = opts.focusModel === "roving";
@@ -102,6 +103,7 @@ export namespace ListboxSolidUtils {
             getFlatOptions,
             getHighlightedIndex,
             getIsHighlightShown,
+            getHighlightRequests,
             getActiveOptionId,
             getOptionId,
             setHasFocus: controller.setHasFocus,

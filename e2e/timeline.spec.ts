@@ -17,8 +17,7 @@ const TRACKS = example("tracks");
 const BLOCK = `${MEETINGS} li [role="button"]`;
 
 /** The "Three tracks" row of buttons, found by the ids the page gave them rather than by what they say. */
-const TRACKS_PLAY = "#tracksPlay";
-const TRACKS_PAUSE = "#tracksPause";
+const TRACKS_PLAYBACK = "#tracksPlayback";
 const TRACKS_LATER = "#tracksLater";
 const TRACKS_ZOOM_IN = "#tracksZoomIn";
 const TRACKS_WHOLE_REEL = "#tracksWholeReel";
@@ -379,9 +378,9 @@ const markerTime = async (page: Page) => {
 };
 
 const playFor = async (page: Page, seconds: number) => {
-    await page.locator(TRACKS_PLAY).click();
+    await page.locator(TRACKS_PLAYBACK).click();
     await expect.poll(() => markerTime(page), { message: "the playhead sets off" }).toBeGreaterThan(seconds);
-    await page.locator(TRACKS_PAUSE).click();
+    await page.locator(TRACKS_PLAYBACK).click();
 };
 
 /**
@@ -393,12 +392,12 @@ const shareOfBlock = (marker: Marker, block: Block) => (marker.left - block.left
 test("the playhead moves while the page plays and stands still when it pauses", async ({ page }) => {
     const start = await playhead(page);
 
-    await page.locator(TRACKS_PLAY).click();
+    await page.locator(TRACKS_PLAYBACK).click();
     await expect
         .poll(async () => (await playhead(page)).left, { message: "Play moves the marker on" })
         .toBeGreaterThan(start.left);
 
-    await page.locator(TRACKS_PAUSE).click();
+    await page.locator(TRACKS_PLAYBACK).click();
 
     const paused = await playhead(page);
 

@@ -49,26 +49,14 @@
 
     <div class={styles.controls}>
         <Button
-            id={"convoyPlay"}
-            ariaLabel={"Play"}
+            id={"convoyPlayback"}
+            ariaLabel={playback ? "Pause" : "Play"}
             onClick={() => {
-                playback = true;
+                playback = !playback;
             }}
         >
             {#snippet renderContent(flags)}
-                <PageControlButtonContent {flags} glyph={CONTROL_GLYPHS.play} />
-            {/snippet}
-        </Button>
-
-        <Button
-            id={"convoyPause"}
-            ariaLabel={"Pause"}
-            onClick={() => {
-                playback = false;
-            }}
-        >
-            {#snippet renderContent(flags)}
-                <PageControlButtonContent {flags} glyph={CONTROL_GLYPHS.pause} />
+                <PageControlButtonContent {flags} glyph={playback ? CONTROL_GLYPHS.pause : CONTROL_GLYPHS.play} />
             {/snippet}
         </Button>
 

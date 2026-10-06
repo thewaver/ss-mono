@@ -6,4 +6,5 @@ export type GlideFloaterProps = {
 
 export type GlideLabelProps = {
     isSelected: boolean;
+    isDisabled?: boolean;
 };

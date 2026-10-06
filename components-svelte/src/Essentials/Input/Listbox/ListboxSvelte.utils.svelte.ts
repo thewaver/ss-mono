@@ -37,6 +37,7 @@ export namespace ListboxSvelteUtils {
 
         const getHighlightedValue = readStore(controller, (state) => state.highlightedValue);
         const getHasFocus = readStore(controller, (state) => state.hasFocus);
+        const getHighlightRequests = readStore(controller, (state) => state.highlightRequests);
 
         const isRoving = defs.focusModel === "roving";
 
@@ -96,6 +97,7 @@ export namespace ListboxSvelteUtils {
             getFlatOptions: () => flatOptions,
             getHighlightedIndex: () => highlightedIndex,
             getIsHighlightShown: () => isHighlightShown,
+            getHighlightRequests,
             getActiveOptionId: () => activeOptionId,
             getOptionId: (index) => ListboxUtils.getOptionId(defs.getListboxId(), index),
             setHasFocus: controller.setHasFocus,

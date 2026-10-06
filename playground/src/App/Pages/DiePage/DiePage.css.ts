@@ -13,5 +13,5 @@ export const controls = style({
     display: "flex",
     flexWrap: "wrap",
     justifyContent: "center",
-    gap: themeVars.spacing.full,
+    gap: themeVars.spacing.half,
 });

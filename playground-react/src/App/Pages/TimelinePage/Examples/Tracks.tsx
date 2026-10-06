@@ -123,25 +123,27 @@ export const TracksExample = (props: Props) => {
 
             <PageTimelineControls>
                 <Button
-                    id={"tracksPlay"}
-                    ariaLabel={"Play"}
-                    renderContent={(flags) => <PageControlButtonContent flags={flags} glyph={CONTROL_GLYPHS.play} />}
+                    id={"tracksPlayback"}
+                    ariaLabel={isPlaying ? "Pause" : "Play"}
+                    renderContent={(flags) => (
+                        <PageControlButtonContent
+                            flags={flags}
+                            glyph={isPlaying ? CONTROL_GLYPHS.pause : CONTROL_GLYPHS.play}
+                        />
+                    )}
                     onClick={() => {
+                        if (isPlaying) {
+                            setIsPlaying(false);
+
+                            return;
+                        }
+
                         if (playhead >= REEL.end) {
                             playheadRef.current = REEL.start;
                             setPlayhead(REEL.start);
                         }
 
                         setIsPlaying(true);
-                    }}
-                />
-
-                <Button
-                    id={"tracksPause"}
-                    ariaLabel={"Pause"}
-                    renderContent={(flags) => <PageControlButtonContent flags={flags} glyph={CONTROL_GLYPHS.pause} />}
-                    onClick={() => {
-                        setIsPlaying(false);
                     }}
                 />
 

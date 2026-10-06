@@ -17,13 +17,13 @@
 <div class={styles.deck}>
     <div class={styles.row}>
         <Button
-            ariaLabel={playback ? "Stop" : "Play"}
+            ariaLabel={playback ? "Pause" : "Play"}
             onClick={() => {
                 playback = !playback;
             }}
         >
             {#snippet renderContent(flags)}
-                <PageControlButtonContent {flags} glyph={playback ? CONTROL_GLYPHS.stop : CONTROL_GLYPHS.play} />
+                <PageControlButtonContent {flags} glyph={playback ? CONTROL_GLYPHS.pause : CONTROL_GLYPHS.play} />
             {/snippet}
         </Button>
 

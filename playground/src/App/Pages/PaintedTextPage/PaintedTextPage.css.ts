@@ -45,7 +45,7 @@ export const stack = style({
 
 export const buttonRow = style({
     display: "flex",
-    gap: themeVars.spacing.double,
+    gap: themeVars.spacing.half,
 });
 
 export const fill = style({

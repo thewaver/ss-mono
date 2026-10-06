@@ -99,7 +99,7 @@ const pauseCalls = async (page: Page) =>
 
 const playControl = (page: Page) => page.getByRole("button", { name: "Play", exact: true });
 
-const stopControl = (page: Page) => page.getByRole("button", { name: "Stop", exact: true });
+const pauseControl = (page: Page) => page.getByRole("button", { name: "Pause", exact: true });
 
 const startOverControl = (page: Page) => page.getByRole("button", { name: "Start over", exact: true });
 
@@ -107,7 +107,7 @@ const startOverControl = (page: Page) => page.getByRole("button", { name: "Start
  * The caption is the whole of what a visitor can tell about playback, so it is read as one answer rather
  * than as two locators: whichever of the pair is on screen is what the component currently believes.
  */
-const playbackCaption = async (page: Page) => ((await stopControl(page).count()) ? "Stop" : "Play");
+const playbackCaption = async (page: Page) => ((await pauseControl(page).count()) ? "Pause" : "Play");
 
 const pickTrack = async (page: Page, name: string) => {
     await page.getByRole("combobox", { name: "Track" }).click();
@@ -134,7 +134,7 @@ test("pressing play starts it, and the caption follows the component rather than
 
     expect(await playCalls(page), "the first source is what plays").toHaveLength(1);
     expect((await playCalls(page))[0]).toContain("lofi");
-    expect(await playbackCaption(page), "and the control now offers to stop it").toBe("Stop");
+    expect(await playbackCaption(page), "and the control now offers to pause it").toBe("Pause");
     expect(await readout(page, "default")).toContain("playing");
 });
 
@@ -151,7 +151,7 @@ test("changing the source plays what arrived, without being asked twice", async 
 
     expect(calls, "one source change, one play").toHaveLength(1);
     expect(calls[0], "and it is the source that arrived").toContain("synthwave");
-    expect(await playbackCaption(page), "the caption notices a start nobody pressed for").toBe("Stop");
+    expect(await playbackCaption(page), "the caption notices a start nobody pressed for").toBe("Pause");
 });
 
 test("stopping fades it out and pauses it, rather than cutting", async ({ page }) => {
@@ -161,7 +161,7 @@ test("stopping fades it out and pauses it, rather than cutting", async ({ page }
 
     expect(await pauseCalls(page), "nothing is paused while it is playing").toEqual([]);
 
-    await stopControl(page).click();
+    await pauseControl(page).click();
 
     await expect
         .poll(() => pauseCalls(page), "the pause lands at the end of the fade, not at the press")
@@ -177,7 +177,7 @@ test("starting over is offered only while something is playing", async ({ page }
 
     await expect(startOverControl(page)).not.toHaveAttribute("aria-disabled", "true");
 
-    await stopControl(page).click();
+    await pauseControl(page).click();
 
     await expect(startOverControl(page), "and nothing to restart once more").toHaveAttribute("aria-disabled", "true");
 });
@@ -186,7 +186,7 @@ test("starting over is offered only while something is playing", async ({ page }
  * A stop that arrives while the sound is still starting has to win. The browser can take a while to begin
  * playback, and a visitor who presses Play and changes their mind at once has already said "stop" by the time
  * the start comes through. The component used to hear the start and set itself playing again, so the caption
- * flipped back to Stop over a sound nobody wanted. Playback is made slow on purpose here, by holding every
+ * flipped back to Pause over a sound nobody wanted. Playback is made slow on purpose here, by holding every
  * `play()` back before it reaches the browser, so the stop lands squarely inside the start.
  */
 const slowPlayback = `
@@ -203,7 +203,7 @@ test("a stop pressed while the sound is still starting wins over the start", asy
     await expect(playControl(page)).toBeVisible();
 
     await playControl(page).click();
-    await stopControl(page).click();
+    await pauseControl(page).click();
 
     await expect.poll(() => startedPlays(page), "the start came through after the stop").toHaveLength(1);
     await expect

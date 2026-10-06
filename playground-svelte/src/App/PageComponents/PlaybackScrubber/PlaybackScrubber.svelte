@@ -1,15 +1,14 @@
 <script lang="ts">
     import { Button, ElementObserverSvelteUtils, Range } from "@thewaver/ss-components-svelte";
     import * as styles from "@thewaver/ss-playground/App/PageComponents/PlaybackScrubber/PlaybackScrubber.css";
+    import { CONTROL_GLYPHS } from "@thewaver/ss-playground/App/StyledComponents/ControlButtonContent/ControlButtonContent.const";
 
-    import PageButtonContent from "../../StyledComponents/ButtonContent/ButtonContent.svelte";
+    import PageControlButtonContent from "../../StyledComponents/ControlButtonContent/ControlButtonContent.svelte";
     import PageRangeContent from "../../StyledComponents/RangeContent/RangeContent.svelte";
     import type { PagePlaybackScrubberProps } from "./PlaybackScrubber.types";
 
     const PERCENT = 100;
     const SLIDER_STEP = 1;
-    const PLAY_ICON_PATH = "M7 4 L20 12 L7 20 Z";
-    const PAUSE_ICON_PATH = "M6 4 H10 V20 H6 Z M14 4 H18 V20 H14 Z";
 
     let { playback = $bindable(), progress = $bindable(), ...props }: PagePlaybackScrubberProps = $props();
 
@@ -27,11 +26,7 @@
         }}
     >
         {#snippet renderContent(flags)}
-            <PageButtonContent {flags}>
-                <svg class={styles.playbackIcon} viewBox="0 0 24 24" aria-hidden="true">
-                    <path d={playback ? PAUSE_ICON_PATH : PLAY_ICON_PATH} />
-                </svg>
-            </PageButtonContent>
+            <PageControlButtonContent {flags} glyph={playback ? CONTROL_GLYPHS.pause : CONTROL_GLYPHS.play} />
         {/snippet}
     </Button>
 

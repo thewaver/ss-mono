@@ -19,11 +19,11 @@ export const DefaultExample = (props: Props) => {
         <div className={styles.deck}>
             <div className={styles.row}>
                 <Button
-                    ariaLabel={isPlaying ? "Stop" : "Play"}
+                    ariaLabel={isPlaying ? "Pause" : "Play"}
                     renderContent={(flags) => (
                         <PageControlButtonContent
                             flags={flags}
-                            glyph={isPlaying ? CONTROL_GLYPHS.stop : CONTROL_GLYPHS.play}
+                            glyph={isPlaying ? CONTROL_GLYPHS.pause : CONTROL_GLYPHS.play}
                         />
                     )}
                     onClick={() => {

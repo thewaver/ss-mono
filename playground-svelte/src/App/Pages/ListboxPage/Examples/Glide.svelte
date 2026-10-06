@@ -15,7 +15,9 @@
 <PageListboxSurface>
     <Listbox bind:value options={COUNTRIES_WITH_REACHABLE} ariaLabel={"Shipping country, gliding"}>
         {#snippet renderOption(option, flags)}
-            <PageGlideLabel isSelected={flags.isSelected}>{option.value}</PageGlideLabel>
+            <PageGlideLabel isSelected={flags.isSelected} isDisabled={flags.isDisabled ?? false}>
+                {option.value}
+            </PageGlideLabel>
         {/snippet}
 
         {#snippet renderSelectionFloater(visibilityTarget, transitionDurationMs)}

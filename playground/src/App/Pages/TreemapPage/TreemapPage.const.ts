@@ -74,7 +74,7 @@ export const LIBRARY: TreemapNode<string> = branch(
             leaf("FormField", 204),
             leaf("FormSection", 126),
             leaf("Label", 146),
-            leaf("Listbox", 1468),
+            leaf("Listbox", 1496),
             leaf("MultiListbox", 44),
             leaf("MultiSelect", 61),
             leaf("NumberInput", 571),

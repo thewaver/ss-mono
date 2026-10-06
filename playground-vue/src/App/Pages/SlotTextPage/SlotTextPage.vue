@@ -6,7 +6,6 @@ import type { SlotTextLetterRoute, SlotTextMechanism } from "@thewaver/ss-compon
 import { SlotTextKnobs } from "@thewaver/ss-playground/App/Knobs/SlotTexts.const";
 import { WORDS } from "@thewaver/ss-playground/App/Pages/SlotTextPage/SlotTextPage.const";
 import * as styles from "@thewaver/ss-playground/App/Pages/SlotTextPage/SlotTextPage.css";
-import { CONTROL_GLYPHS } from "@thewaver/ss-playground/App/StyledComponents/ControlButtonContent/ControlButtonContent.const";
 
 import PageExampleKnobs from "../../PageComponents/ExampleKnobs/PageExampleKnobs.vue";
 import type { ExampleDefs } from "../../PageComponents/Examples/Examples.types";
@@ -253,7 +252,7 @@ const examples: ExampleDefs[] = [
                 <div :class="styles.controls">
                     <Button id="nextWord" ariaLabel="Next word" @click="nextWord">
                         <template #renderContent="flags">
-                            <PageControlButtonContent :flags="flags" :glyph="CONTROL_GLYPHS.next" />
+                            <PageControlButtonContent :flags="flags">Next</PageControlButtonContent>
                         </template>
                     </Button>
                 </div>

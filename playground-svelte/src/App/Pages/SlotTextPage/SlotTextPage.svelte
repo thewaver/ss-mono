@@ -4,7 +4,6 @@
     import { SlotTextKnobs } from "@thewaver/ss-playground/App/Knobs/SlotTexts.const";
     import { WORDS } from "@thewaver/ss-playground/App/Pages/SlotTextPage/SlotTextPage.const";
     import * as styles from "@thewaver/ss-playground/App/Pages/SlotTextPage/SlotTextPage.css";
-    import { CONTROL_GLYPHS } from "@thewaver/ss-playground/App/StyledComponents/ControlButtonContent/ControlButtonContent.const";
 
     import PageExampleKnobs from "../../PageComponents/ExampleKnobs/PageExampleKnobs.svelte";
     import type { ExampleDefs } from "../../PageComponents/Examples/Examples.types";
@@ -213,7 +212,7 @@
                 }}
             >
                 {#snippet renderContent(flags)}
-                    <PageControlButtonContent {flags} glyph={CONTROL_GLYPHS.next} />
+                    <PageControlButtonContent {flags}>Next</PageControlButtonContent>
                 {/snippet}
             </Button>
         </div>

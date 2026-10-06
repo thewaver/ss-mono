@@ -1783,6 +1783,11 @@ the track buttons, the play control and the start-over button on its page are th
 is to experience is the crossfade between two ten-second loops, which no amount of markup would convey. The
 two loops sit beside the knight images in `playground/src/App`, supplied by the user.
 
+**A page that needs a picture of the knight uses `knight_profile.webp`, not `knight.webp`.** Stated by the user,
+after the Lens page was built on `knight.webp`: that one has a transparent background and is kept for the specific
+places that want the figure cut out, so as a general photo it shows the page through it. `knight_profile.webp` is
+the full picture with its own background, and is the default.
+
 **`AudioSwitcher`'s playback signal reports what is true rather than only what it was told.** It used to be
 written by the consumer and never by the component, so a switcher that started playing on its own — which it
 does the moment it is given a source — left the signal saying stopped, and any control painted from it said

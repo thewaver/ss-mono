@@ -4,15 +4,18 @@ import { PAGE_CONTENT_WIDTH } from "../../App.css";
 import { layerVars } from "../../StyledComponents/Layer/Layer.css";
 import { themeVars } from "../../Theme.css";
 
+const DOCS_TABLE_WIDTH = 960;
+
 export const docsView = style({
     display: "flex",
     flexDirection: "column",
     gap: themeVars.spacing.quad,
     width: "100%",
-    maxWidth: PAGE_CONTENT_WIDTH,
+    maxWidth: DOCS_TABLE_WIDTH,
 });
 
 export const docsLead = style({
+    maxWidth: PAGE_CONTENT_WIDTH,
     margin: 0,
     fontSize: themeVars.fontSize.medium,
     fontWeight: "normal",
@@ -44,6 +47,7 @@ export const docsTableTitle = style({
 });
 
 export const docsDescription = style({
+    maxWidth: PAGE_CONTENT_WIDTH,
     margin: 0,
     fontSize: themeVars.fontSize.small,
 });

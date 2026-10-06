@@ -12,5 +12,5 @@ export const deck = style({
 export const row = style({
     display: "flex",
     alignItems: "center",
-    gap: themeVars.spacing.full,
+    gap: themeVars.spacing.half,
 });

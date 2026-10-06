@@ -256,14 +256,13 @@ describe("createCursor", () => {
         expect(events).toEqual(["close"]);
     });
 
-    it("reports whether a highlight changed anything, and notifies only then", () => {
+    it("reports whether a highlight changed anything, and counts every request either way", () => {
         const { cursor } = create();
-        let notified = 0;
-
-        cursor.subscribe(() => notified++);
+        const before = cursor.get().highlightRequests;
 
         expect(cursor.highlight("d")).toBe(true);
         expect(cursor.highlight("d")).toBe(false);
-        expect(notified).toBe(1);
+        expect(cursor.get().highlightedValue).toBe("d");
+        expect(cursor.get().highlightRequests - before).toBe(2);
     });
 });

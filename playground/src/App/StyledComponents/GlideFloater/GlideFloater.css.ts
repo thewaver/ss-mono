@@ -22,7 +22,6 @@ const glideFloaterBase = style({
 export const selectionGlideFloater = style([
     glideFloaterBase,
     {
-        boxShadow: `inset 0 0 0 2px ${themeVars.color.primary.main}`,
         backgroundColor: `rgb(from ${themeVars.color.primary.main} r g b / 15%)`,
     },
 ]);
@@ -35,17 +34,22 @@ export const highlightGlideFloater = style([
 ]);
 
 export const isSelected = style({});
+export const isDisabled = style({});
 
 export const glideLabel = style({
     padding: themeVars.spacing.full,
     fontSize: themeVars.fontSize.medium,
     whiteSpace: "nowrap",
-    transition: `color ${themeVars.animation.duration}`,
+    transition: `color ${themeVars.animation.duration}, opacity ${themeVars.animation.duration}`,
 
     selectors: {
         [`&.${isSelected}`]: {
             color: themeVars.color.primary.main,
             fontWeight: 700,
+        },
+        [`&.${isDisabled}`]: {
+            filter: themeVars.disabled.filter,
+            opacity: 0.5,
         },
     },
 });

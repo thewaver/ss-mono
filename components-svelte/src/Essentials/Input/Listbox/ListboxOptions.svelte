@@ -19,6 +19,7 @@
     import { FloaterSvelteUtils } from "../../../Abstracts/Floater/FloaterSvelte.utils.svelte.js";
     import { VirtualizerSvelteUtils } from "../../../Abstracts/Virtualizer/VirtualizerSvelte.utils.svelte.js";
     import InteractionWrapper from "../../../Primitives/InteractionWrapper/InteractionWrapper.svelte";
+    import { watchChange } from "../../../Utils/effectUtils.svelte.js";
     import { toStyle } from "../../../Utils/styleUtils.js";
     import type {
         SelectItem,
@@ -35,6 +36,7 @@
     let sizer = $state<HTMLDivElement>();
     let optionsWrapper = $state<HTMLDivElement>();
     let hoveredIndex = $state<number>();
+    let isPointerLed = $state(false);
 
     const optionRefs = new SvelteMap<HTMLElement, () => number>();
 
@@ -136,13 +138,32 @@
         () => selectedIndex,
     );
 
+    watchChange(
+        () => cursor.getHighlightRequests(),
+        () => {
+            isPointerLed = false;
+        },
+    );
+
+    $effect(() => {
+        if (props.isLive) return;
+
+        isPointerLed = false;
+    });
+
     const highlightFloater = createFloater(
         () => props.renderHighlightFloater !== undefined,
-        () => hoveredIndex ?? (cursor.getIsHighlightShown() ? cursor.getHighlightedIndex() : undefined),
+        () =>
+            isPointerLed
+                ? hoveredIndex
+                : cursor.getIsHighlightShown()
+                  ? cursor.getHighlightedIndex()
+                  : undefined,
     );
 
     const attachHoverWatch = (element: HTMLElement) => {
         const stopOver = on(element, "pointerover", (e) => {
+            isPointerLed = true;
             hoveredIndex = findOptionIndex(e.target);
         });
         const stopLeave = on(element, "pointerleave", () => {

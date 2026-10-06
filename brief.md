@@ -12,7 +12,7 @@ purpose: it answers "what is outstanding", and neither of them is.
 | Section                                                 | Count |
 | ------------------------------------------------------- | ----: |
 | [Missing components](#missing-components)               |     3 |
-| [Blockers and known issues](#blockers-and-known-issues) |    24 |
+| [Blockers and known issues](#blockers-and-known-issues) |    25 |
 | [Deliberately not built](#deliberately-not-built)       |    27 |
 | [Accessibility gaps](#accessibility-gaps)               |     8 |
 | [Planned projects](#planned-projects)                   |     5 |
@@ -61,6 +61,7 @@ Something that misbehaves, or a cost nobody has paid down.
 | 29  | **`CellAnimation`**              | **Pending decision.** Paused, it shows the cut grid rather than the whole picture, and a resize no longer restarts the pass                                                                                                                                                                               |
 | 29  | **`SlotText`**                   | **Pending decision.** Under reduced motion a reel keeps its own duration and drops only its extra turns                                                                                                                                                                                                   |
 | 31  | **Long list reopened late**      | In Solid and Svelte a windowed list reopened onto a far-down selection shows the row just above its box for a frame or two before it lands                                                                                                                                                                |
+| 32  | **`Die`, stepping**              | Pressing the same arrow a few times sends the die back and forth between two or three faces, because each step spins the new face upright. No fix chosen; the three put were judged inadequate                                                                                                            |
 
 ## Deliberately not built
 

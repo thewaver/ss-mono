@@ -54,6 +54,7 @@ export namespace ListboxReactUtils {
 
         const highlightedValue = useStore(controller, (state) => state.highlightedValue);
         const hasFocus = useStore(controller, (state) => state.hasFocus);
+        const highlightRequests = useStore(controller, (state) => state.highlightRequests);
 
         const isOpen = opts.isOpen ?? true;
         const isRoving = opts.focusModel === "roving";
@@ -94,6 +95,7 @@ export namespace ListboxReactUtils {
             flatOptions,
             highlightedIndex,
             isHighlightShown: !isRoving || hasFocus,
+            highlightRequests,
             activeOptionId: ListboxUtils.computeActiveOptionId(opts.listboxId, highlightedIndex, {
                 focusModel: opts.focusModel,
                 isOpen,

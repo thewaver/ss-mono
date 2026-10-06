@@ -22,6 +22,7 @@ export type ListboxCursor<T> = {
     getFlatOptions: Accessor<SelectOption<T>[]>;
     getHighlightedIndex: Accessor<number | undefined>;
     getIsHighlightShown: Accessor<boolean>;
+    getHighlightRequests: Accessor<number>;
     getActiveOptionId: Accessor<string | undefined>;
     getOptionId: (index: number) => string;
     setHasFocus: (hasFocus: boolean) => void;

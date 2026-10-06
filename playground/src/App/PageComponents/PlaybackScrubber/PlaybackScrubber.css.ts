@@ -13,10 +13,3 @@ export const sliderSlot = style({
     flex: 1,
     minWidth: 0,
 });
-
-export const playbackIcon = style({
-    display: "block",
-    width: 16,
-    height: 16,
-    fill: "currentColor",
-});

@@ -87,14 +87,16 @@ const setController = (next: TimelineController) => {
     controller.value = next;
 };
 
-const play = () => {
+const togglePlayback = () => {
+    if (isPlaying.value) {
+        isPlaying.value = false;
+
+        return;
+    }
+
     if (playhead.value >= REEL.end) playhead.value = REEL.start;
 
     isPlaying.value = true;
-};
-
-const pause = () => {
-    isPlaying.value = false;
 };
 
 const panBy = (ratio: number) => {
@@ -157,15 +159,12 @@ const showWholeReel = async () => {
         </PageTimelineRow>
 
         <PageTimelineControls>
-            <Button id="tracksPlay" ariaLabel="Play" @click="play">
+            <Button id="tracksPlayback" :ariaLabel="isPlaying ? 'Pause' : 'Play'" @click="togglePlayback">
                 <template #renderContent="flags">
-                    <PageControlButtonContent :flags="flags" :glyph="CONTROL_GLYPHS.play" />
-                </template>
-            </Button>
-
-            <Button id="tracksPause" ariaLabel="Pause" @click="pause">
-                <template #renderContent="flags">
-                    <PageControlButtonContent :flags="flags" :glyph="CONTROL_GLYPHS.pause" />
+                    <PageControlButtonContent
+                        :flags="flags"
+                        :glyph="isPlaying ? CONTROL_GLYPHS.pause : CONTROL_GLYPHS.play"
+                    />
                 </template>
             </Button>
 

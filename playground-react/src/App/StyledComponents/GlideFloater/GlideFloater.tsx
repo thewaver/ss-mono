@@ -44,7 +44,14 @@ export const PageGlideLabel = (props: PropsWithChildren<GlideLabelProps>) => {
 
     return (
         <div
-            className={[styles.glideLabel, layerClass, props.isSelected && styles.isSelected].filter(Boolean).join(" ")}
+            className={[
+                styles.glideLabel,
+                layerClass,
+                props.isSelected && styles.isSelected,
+                (props.isDisabled ?? false) && styles.isDisabled,
+            ]
+                .filter(Boolean)
+                .join(" ")}
         >
             {props.children}
         </div>

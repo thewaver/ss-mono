@@ -4,7 +4,6 @@ import { shallowRef } from "vue";
 import { Button, ScrambleText } from "@thewaver/ss-components-vue";
 import { MEASURE_BOX_PADDING } from "@thewaver/ss-playground/App/PageComponents/MeasureBox/MeasureBox.css";
 import * as styles from "@thewaver/ss-playground/App/Pages/ScrambleTextPage/ScrambleTextPage.css";
-import { CONTROL_GLYPHS } from "@thewaver/ss-playground/App/StyledComponents/ControlButtonContent/ControlButtonContent.const";
 
 import PageMeasureBox from "../../../PageComponents/MeasureBox/MeasureBox.vue";
 import PageControlButtonContent from "../../../StyledComponents/ControlButtonContent/ControlButtonContent.vue";
@@ -41,7 +40,7 @@ const next = () => {
 
         <Button id="nextStatus" ariaLabel="Next status" @click="next">
             <template #renderContent="flags">
-                <PageControlButtonContent :flags="flags" :glyph="CONTROL_GLYPHS.next" />
+                <PageControlButtonContent :flags="flags">Next</PageControlButtonContent>
             </template>
         </Button>
     </div>

@@ -5,8 +5,7 @@ import { prop, readout } from "./helpers";
 const MARKER = "#timelineMarker";
 const VEHICLE = "#circuitVehicle";
 const SCRUBBER = "#timelineScrubber";
-const PLAY = "#circuitPlay";
-const PAUSE = "#circuitPause";
+const PLAYBACK = "#circuitPlayback";
 const REWIND = "#circuitRewind";
 
 const A_FEW_FRAMES_MS = 400;
@@ -124,7 +123,7 @@ test("one step of the slider moves the marker", async ({ page }) => {
  * on its own, so the page has to offer the control and it has to work.
  */
 test("pause stops the traveling, and play starts it again", async ({ page }) => {
-    await page.locator(PAUSE).click();
+    await page.locator(PLAYBACK).click();
 
     const stopped = await progressOf(page, "circuit");
 
@@ -132,7 +131,7 @@ test("pause stops the traveling, and play starts it again", async ({ page }) => 
 
     expect(await progressOf(page, "circuit"), "nothing moves while it is paused").toBe(stopped);
 
-    await page.locator(PLAY).click();
+    await page.locator(PLAYBACK).click();
     await expect
         .poll(() => progressOf(page, "circuit"), { message: "and it carries on from where it stopped" })
         .toBeGreaterThan(stopped);
@@ -146,7 +145,7 @@ test("pause stops the traveling, and play starts it again", async ({ page }) => 
 test("the controller can send it back to the start", async ({ page }) => {
     await expect.poll(() => progressOf(page, "circuit"), { message: "it sets off on its own" }).toBeGreaterThan(0);
 
-    await page.locator(PAUSE).click();
+    await page.locator(PLAYBACK).click();
     await page.locator(REWIND).click();
 
     expect(await progressOf(page, "circuit"), "and the rewind puts it back at the beginning").toBe(0);
@@ -158,14 +157,14 @@ test("the controller can send it back to the start", async ({ page }) => {
  * coordinate — which is what makes the assertion true at any scale.
  */
 test("the traveler leaves the point it set off from", async ({ page }) => {
-    await page.locator(PAUSE).click();
+    await page.locator(PLAYBACK).click();
     await page.locator(REWIND).click();
 
     const start = await centerOf(page, VEHICLE);
 
-    await page.locator(PLAY).click();
+    await page.locator(PLAYBACK).click();
     await expect.poll(() => progressOf(page, "circuit")).toBeGreaterThan(0);
-    await page.locator(PAUSE).click();
+    await page.locator(PLAYBACK).click();
 
     const moved = await centerOf(page, VEHICLE);
 
@@ -185,20 +184,19 @@ test("the traveler stays on the path all the way round, at every angle", async (
     const A_SIXTH_OF_A_LAP_MS = 900;
 
     for (let sample = 0; sample < SAMPLES; sample += 1) {
-        await page.locator(PAUSE).click();
+        await page.locator(PLAYBACK).click();
 
         expect(
             await distanceFromPath(page, VEHICLE),
             `the traveler is on the curve at ${await progressOf(page, "circuit")}% round`,
         ).toBeLessThan(2);
 
-        await page.locator(PLAY).click();
+        await page.locator(PLAYBACK).click();
         await page.waitForTimeout(A_SIXTH_OF_A_LAP_MS);
     }
 });
 
-const CONVOY_PLAY = "#convoyPlay";
-const CONVOY_PAUSE = "#convoyPause";
+const CONVOY_PLAYBACK = "#convoyPlayback";
 const CONVOY_REWIND = "#convoyRewind";
 const CONVOY_COUNT = 4;
 const convoyVehicle = (index: number) => `#convoyVehicle${index}`;
@@ -270,7 +268,7 @@ test("the travelers of a convoy keep their spacing along the path as they go", a
     await expect
         .poll(() => progressOf(page, "convoy"), { message: "the convoy sets off on its own" })
         .toBeGreaterThan(0);
-    await page.locator(CONVOY_PAUSE).click();
+    await page.locator(CONVOY_PLAYBACK).click();
 
     const first = await convoyGaps(page);
     const leadBefore = await arcPositionOf(page, convoyVehicle(0));
@@ -279,11 +277,11 @@ test("the travelers of a convoy keep their spacing along the path as they go", a
         expect(Math.abs(gap - first[0]), "every gap is the same as the first").toBeLessThan(ALONG_PATH_TOLERANCE);
     }
 
-    await page.locator(CONVOY_PLAY).click();
+    await page.locator(CONVOY_PLAYBACK).click();
     await expect
         .poll(async () => Math.abs((await arcPositionOf(page, convoyVehicle(0))).at - leadBefore.at))
         .toBeGreaterThan(10);
-    await page.locator(CONVOY_PAUSE).click();
+    await page.locator(CONVOY_PLAYBACK).click();
 
     const second = await convoyGaps(page);
 
@@ -303,7 +301,7 @@ test("on a run that does not loop, the followers wait at the start until the lea
     page,
 }) => {
     await page.locator(`${prop("isLooping")} input`).uncheck();
-    await page.locator(CONVOY_PAUSE).click();
+    await page.locator(CONVOY_PLAYBACK).click();
     await page.locator(CONVOY_REWIND).click();
 
     const parked = await convoyPositions(page);
@@ -314,13 +312,13 @@ test("on a run that does not loop, the followers wait at the start until the lea
         );
     }
 
-    await page.locator(CONVOY_PLAY).click();
+    await page.locator(CONVOY_PLAYBACK).click();
     await expect
         .poll(async () => (await arcPositionOf(page, convoyVehicle(0))).at - parked[0].at, {
             message: "the lead sets off",
         })
         .toBeGreaterThan(ALONG_PATH_TOLERANCE);
-    await page.locator(CONVOY_PAUSE).click();
+    await page.locator(CONVOY_PLAYBACK).click();
 
     const lead = await arcPositionOf(page, convoyVehicle(0));
     const last = await arcPositionOf(page, convoyVehicle(CONVOY_COUNT - 1));

@@ -417,13 +417,15 @@ export namespace ListboxUtils {
      * @param defs.onOpen Asked for when a key should open the list.
      * @param defs.onClose Asked for when a key or a pick should close it.
      * @param defs.onPick Told which value was picked.
-     * @returns The cursor: a store of the highlighted value and whether focus is inside, `getHighlightedIndex`,
+     * @returns The cursor: a store of the highlighted value, whether focus is inside, and `highlightRequests` — a count
+     * that rises on every request for a highlight, including one naming the option already highlighted, so a binding
+     * can tell the reader asked for it even when nothing moved — `getHighlightedIndex`,
      * `handleKeyDown` for whichever element holds focus, and `clear` to drop a pending typeahead query when the owner
      * goes away. `highlight` and `pick` report whether they changed anything. The cursor stays usable after `clear`.
      */
     export const createCursor = <T, D>(defs: ListboxCursorDefs<T, D>): ListboxCursorController<T> => {
         const store = StoreUtils.create<ListboxCursorState<T>>(
-            { highlightedValue: undefined, hasFocus: false },
+            { highlightedValue: undefined, hasFocus: false, highlightRequests: 0 },
             { isEqual: StoreUtils.getIsShallowEqual },
         );
 
@@ -434,8 +436,11 @@ export namespace ListboxUtils {
         const getIsMultiple = () => defs.getIsMultiple?.() ?? false;
         const getHasMoreOptions = () => defs.getHasMoreOptions?.() ?? false;
 
-        const setHighlightedValue = (highlightedValue: T | undefined) =>
-            store.set({ ...store.get(), highlightedValue });
+        const setHighlightedValue = (highlightedValue: T | undefined) => {
+            const state = store.get();
+
+            store.set({ ...state, highlightedValue, highlightRequests: state.highlightRequests + 1 });
+        };
 
         const readHighlightedIndex = (options: SelectOption<T, D>[], navigable: number[]) =>
             computeHighlightedIndex({
@@ -454,11 +459,11 @@ export namespace ListboxUtils {
         };
 
         const highlight = (value: T | undefined) => {
-            if (store.get().highlightedValue === value) return false;
+            const hasChanged = store.get().highlightedValue !== value;
 
             setHighlightedValue(value);
 
-            return true;
+            return hasChanged;
         };
 
         const pick = (value: T) => {

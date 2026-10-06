@@ -5,7 +5,6 @@ import type { SlotTextLetterRoute, SlotTextMechanism } from "@thewaver/ss-compon
 import { SlotTextKnobs } from "@thewaver/ss-playground/App/Knobs/SlotTexts.const";
 import { WORDS } from "@thewaver/ss-playground/App/Pages/SlotTextPage/SlotTextPage.const";
 import * as styles from "@thewaver/ss-playground/App/Pages/SlotTextPage/SlotTextPage.css";
-import { CONTROL_GLYPHS } from "@thewaver/ss-playground/App/StyledComponents/ControlButtonContent/ControlButtonContent.const";
 
 import { PageExampleKnobs } from "../../PageComponents/ExampleKnobs/ExampleKnobs";
 import { PageExamples } from "../../PageComponents/Examples/Examples";
@@ -201,7 +200,7 @@ export const SlotTextPage = () => {
                                 id={"nextWord"}
                                 ariaLabel={"Next word"}
                                 renderContent={(flags) => (
-                                    <PageControlButtonContent flags={flags} glyph={CONTROL_GLYPHS.next} />
+                                    <PageControlButtonContent flags={flags}>Next</PageControlButtonContent>
                                 )}
                                 onClick={() => {
                                     setWordIndex((index) => (index + 1) % WORDS.length);

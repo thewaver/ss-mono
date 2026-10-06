@@ -1,5 +1,6 @@
 import { MultiListbox } from "@thewaver/ss-components-solid";
 
+import { renderPageHighlightFloater } from "../../../StyledComponents/GlideFloater/GlideFloater";
 import { PageListboxSurface } from "../../../StyledComponents/ListboxSurface/ListboxSurface";
 import { PageSelectGroupContent } from "../../../StyledComponents/SelectGroupContent/SelectGroupContent";
 import { PageSelectOptionContent } from "../../../StyledComponents/SelectOptionContent/SelectOptionContent";
@@ -11,6 +12,7 @@ type Props = MultiListboxExampleProps;
 export const GroupedExample = (props: Props) => (
     <PageListboxSurface>
         <MultiListbox
+            renderHighlightFloater={renderPageHighlightFloater}
             values={props.values}
             options={() => GROUPED_COUNTRIES}
             ariaLabel={"Countries to ship to"}
@@ -18,7 +20,9 @@ export const GroupedExample = (props: Props) => (
                 <PageSelectGroupContent flags={getFlags}>{getGroup().label}</PageSelectGroupContent>
             )}
             renderOption={(getOption, getFlags) => (
-                <PageSelectOptionContent flags={getFlags}>{getOption().value}</PageSelectOptionContent>
+                <PageSelectOptionContent isGliding flags={getFlags}>
+                    {getOption().value}
+                </PageSelectOptionContent>
             )}
         />
     </PageListboxSurface>

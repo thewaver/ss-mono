@@ -2,15 +2,14 @@ import { useRef } from "react";
 
 import { Button, ElementObserverReactUtils, Range } from "@thewaver/ss-components-react";
 import * as styles from "@thewaver/ss-playground/App/PageComponents/PlaybackScrubber/PlaybackScrubber.css";
+import { CONTROL_GLYPHS } from "@thewaver/ss-playground/App/StyledComponents/ControlButtonContent/ControlButtonContent.const";
 
-import { PageButtonContent } from "../../StyledComponents/ButtonContent/ButtonContent";
+import { PageControlButtonContent } from "../../StyledComponents/ControlButtonContent/ControlButtonContent";
 import { PageRangeContent } from "../../StyledComponents/RangeContent/RangeContent";
 import type { PagePlaybackScrubberProps } from "./PlaybackScrubber.types";
 
 const PERCENT = 100;
 const SLIDER_STEP = 1;
-const PLAY_ICON_PATH = "M7 4 L20 12 L7 20 Z";
-const PAUSE_ICON_PATH = "M6 4 H10 V20 H6 Z M14 4 H18 V20 H14 Z";
 
 export const PagePlaybackScrubber = (props: PagePlaybackScrubberProps) => {
     const sliderSlotRef = useRef<HTMLDivElement>(null);
@@ -26,11 +25,10 @@ export const PagePlaybackScrubber = (props: PagePlaybackScrubberProps) => {
                 id={`${props.id}Playback`}
                 ariaLabel={isPlaying ? "Pause" : "Play"}
                 renderContent={(flags) => (
-                    <PageButtonContent flags={flags}>
-                        <svg className={styles.playbackIcon} viewBox="0 0 24 24" aria-hidden="true">
-                            <path d={isPlaying ? PAUSE_ICON_PATH : PLAY_ICON_PATH} />
-                        </svg>
-                    </PageButtonContent>
+                    <PageControlButtonContent
+                        flags={flags}
+                        glyph={isPlaying ? CONTROL_GLYPHS.pause : CONTROL_GLYPHS.play}
+                    />
                 )}
                 onClick={() => {
                     setIsPlaying(!isPlaying);

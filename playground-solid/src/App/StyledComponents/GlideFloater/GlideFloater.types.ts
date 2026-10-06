@@ -8,4 +8,5 @@ export type GlideFloaterProps = AccessorProps<{
 
 export type GlideLabelProps = AccessorProps<{
     isSelected: boolean;
+    isDisabled?: boolean;
 }>;

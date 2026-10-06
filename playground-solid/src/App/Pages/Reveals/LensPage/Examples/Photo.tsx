@@ -1,6 +1,6 @@
 import { Lens } from "@thewaver/ss-components-solid";
 import * as styles from "@thewaver/ss-playground/App/Pages/Reveals/LensPage/LensPage.css";
-import knight from "@thewaver/ss-playground/App/knight.webp";
+import knight_profile from "@thewaver/ss-playground/App/knight_profile.webp";
 
 import type { LensExampleProps } from "../LensPage.types";
 
@@ -19,7 +19,7 @@ export const PhotoExample = (props: Props) => {
                 isDisabled={props.isDisabled}
                 ariaLabel={"A magnifying lens over a picture of a knight"}
                 computePoints={props.computePoints}
-                renderContent={() => <img class={styles.photo} src={knight} alt={"A knight in armor"} />}
+                renderContent={() => <img class={styles.photo} src={knight_profile} alt={"A knight in armor"} />}
             />
         </div>
     );

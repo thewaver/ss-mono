@@ -3,7 +3,6 @@ import { createSignal } from "solid-js";
 import { Button, ScrambleText } from "@thewaver/ss-components-solid";
 import { MEASURE_BOX_PADDING } from "@thewaver/ss-playground/App/PageComponents/MeasureBox/MeasureBox.css";
 import * as styles from "@thewaver/ss-playground/App/Pages/ScrambleTextPage/ScrambleTextPage.css";
-import { CONTROL_GLYPHS } from "@thewaver/ss-playground/App/StyledComponents/ControlButtonContent/ControlButtonContent.const";
 
 import { PageMeasureBox } from "../../../PageComponents/MeasureBox/MeasureBox";
 import { PageControlButtonContent } from "../../../StyledComponents/ControlButtonContent/ControlButtonContent";
@@ -35,7 +34,7 @@ export const SwapExample = (props: Props) => {
             <Button
                 id={"nextStatus"}
                 ariaLabel={"Next status"}
-                renderContent={(getFlags) => <PageControlButtonContent flags={getFlags} glyph={CONTROL_GLYPHS.next} />}
+                renderContent={(getFlags) => <PageControlButtonContent flags={getFlags}>Next</PageControlButtonContent>}
                 onClick={() => {
                     setStatusIndex((index) => (index + 1) % STATUSES.length);
                 }}

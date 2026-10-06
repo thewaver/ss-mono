@@ -94,6 +94,7 @@ export const ListboxOptions = <T,>(props: ListboxOptionsProps<T>) => {
     const latest = useLatest(props);
 
     const [hoveredIndex, setHoveredIndex] = useState<number>();
+    const [isPointerLed, setIsPointerLed] = useState(false);
     const [floaterTargets, setFloaterTargets] = useState<FloaterTargets>({
         selection: undefined,
         highlight: undefined,
@@ -123,7 +124,10 @@ export const ListboxOptions = <T,>(props: ListboxOptionsProps<T>) => {
         if (isLive) return;
 
         reachEndGuard.reset();
+        setIsPointerLed(false);
     }, [isLive, reachEndGuard]);
+
+    useEffect(() => setIsPointerLed(false), [cursor.highlightRequests]);
 
     const rowWindow = VirtualizerReactUtils.useRowWindow(sizerRef, rows.length, {
         isDisabled: !isVirtualized || !isLive,
@@ -152,7 +156,7 @@ export const ListboxOptions = <T,>(props: ListboxOptionsProps<T>) => {
         props.computeIsSelected(option.value),
     );
     const selectedIndex = selectedFlatIndex < 0 ? undefined : selectedFlatIndex;
-    const highlightIndex = hoveredIndex ?? (cursor.isHighlightShown ? cursor.highlightedIndex : undefined);
+    const highlightIndex = isPointerLed ? hoveredIndex : cursor.isHighlightShown ? cursor.highlightedIndex : undefined;
 
     const sizer = useElement(sizerRef);
     const optionsWrapper = useElement(optionsRef);
@@ -190,6 +194,7 @@ export const ListboxOptions = <T,>(props: ListboxOptionsProps<T>) => {
     const handleOptionsPointerOver = (target: EventTarget) => {
         const option = target instanceof Element ? target.closest(OPTION_SELECTOR) : null;
 
+        setIsPointerLed(true);
         setHoveredIndex(option ? optionIndicesRef.current.get(option.id) : undefined);
     };
 

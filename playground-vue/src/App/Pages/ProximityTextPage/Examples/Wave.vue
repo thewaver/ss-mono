@@ -65,11 +65,11 @@ watch(
             </div>
         </PageMeasureBox>
 
-        <Button id="waveMove" :ariaLabel="isMoving ? 'Stop' : 'Move'" @click="toggleMoving">
+        <Button id="waveMove" :ariaLabel="isMoving ? 'Pause' : 'Move'" @click="toggleMoving">
             <template #renderContent="flags">
                 <PageControlButtonContent
                     :flags="flags"
-                    :glyph="isMoving ? CONTROL_GLYPHS.stop : CONTROL_GLYPHS.play"
+                    :glyph="isMoving ? CONTROL_GLYPHS.pause : CONTROL_GLYPHS.play"
                 />
             </template>
         </Button>

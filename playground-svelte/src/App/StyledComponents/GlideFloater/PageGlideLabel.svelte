@@ -11,4 +11,13 @@
     const layerClass = $derived.by(getLayerClass());
 </script>
 
-<div class={[styles.glideLabel, layerClass, props.isSelected && styles.isSelected]}>{@render props.children?.()}</div>
+<div
+    class={[
+        styles.glideLabel,
+        layerClass,
+        props.isSelected && styles.isSelected,
+        props.isDisabled && styles.isDisabled,
+    ]}
+>
+    {@render props.children?.()}
+</div>

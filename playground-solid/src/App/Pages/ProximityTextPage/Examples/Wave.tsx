@@ -60,11 +60,11 @@ export const WaveExample = (props: Props) => {
 
             <Button
                 id={"waveMove"}
-                ariaLabel={() => (getIsMoving() ? "Stop" : "Move")}
+                ariaLabel={() => (getIsMoving() ? "Pause" : "Move")}
                 renderContent={(getFlags) => (
                     <PageControlButtonContent
                         flags={getFlags}
-                        glyph={() => (getIsMoving() ? CONTROL_GLYPHS.stop : CONTROL_GLYPHS.play)}
+                        glyph={() => (getIsMoving() ? CONTROL_GLYPHS.pause : CONTROL_GLYPHS.play)}
                     />
                 )}
                 onClick={() => {

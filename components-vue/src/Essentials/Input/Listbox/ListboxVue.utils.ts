@@ -55,6 +55,7 @@ export namespace ListboxVueUtils {
 
         const highlightedValue = useStore(controller, (state) => state.highlightedValue);
         const hasFocus = useStore(controller, (state) => state.hasFocus);
+        const highlightRequests = useStore(controller, (state) => state.highlightRequests);
 
         const isRoving = opts.focusModel === "roving";
 
@@ -100,6 +101,7 @@ export namespace ListboxVueUtils {
             flatOptions,
             highlightedIndex,
             isHighlightShown: computed(() => !isRoving || hasFocus.value),
+            highlightRequests,
             activeOptionId: computed(() =>
                 ListboxUtils.computeActiveOptionId(listboxId.value, highlightedIndex.value, {
                     focusModel: opts.focusModel,

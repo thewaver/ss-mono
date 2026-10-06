@@ -146,7 +146,7 @@ export const pageHeader = style({
     display: "flex",
     flexDirection: "column",
     gap: themeVars.spacing.full,
-    maxWidth: PAGE_CONTENT_WIDTH,
+    maxWidth: 960,
 });
 
 export const pageTitle = style({

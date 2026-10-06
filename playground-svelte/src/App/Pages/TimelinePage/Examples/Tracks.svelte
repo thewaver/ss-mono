@@ -119,28 +119,22 @@
 
     <PageTimelineControls>
         <Button
-            id={"tracksPlay"}
-            ariaLabel={"Play"}
+            id={"tracksPlayback"}
+            ariaLabel={isPlaying ? "Pause" : "Play"}
             onClick={() => {
+                if (isPlaying) {
+                    isPlaying = false;
+
+                    return;
+                }
+
                 if (playhead >= REEL.end) playhead = REEL.start;
 
                 isPlaying = true;
             }}
         >
             {#snippet renderContent(flags)}
-                <PageControlButtonContent {flags} glyph={CONTROL_GLYPHS.play} />
-            {/snippet}
-        </Button>
-
-        <Button
-            id={"tracksPause"}
-            ariaLabel={"Pause"}
-            onClick={() => {
-                isPlaying = false;
-            }}
-        >
-            {#snippet renderContent(flags)}
-                <PageControlButtonContent {flags} glyph={CONTROL_GLYPHS.pause} />
+                <PageControlButtonContent {flags} glyph={isPlaying ? CONTROL_GLYPHS.pause : CONTROL_GLYPHS.play} />
             {/snippet}
         </Button>
 

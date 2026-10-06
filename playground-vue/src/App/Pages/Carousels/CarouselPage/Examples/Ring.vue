@@ -92,11 +92,11 @@ watch(
             </div>
         </div>
 
-        <Button id="ringTurn" :ariaLabel="isTurning ? 'Stop' : 'Turn'" @click="toggleTurning">
+        <Button id="ringTurn" :ariaLabel="isTurning ? 'Pause' : 'Turn'" @click="toggleTurning">
             <template #renderContent="flags">
                 <PageControlButtonContent
                     :flags="flags"
-                    :glyph="isTurning ? CONTROL_GLYPHS.stop : CONTROL_GLYPHS.play"
+                    :glyph="isTurning ? CONTROL_GLYPHS.pause : CONTROL_GLYPHS.play"
                 />
             </template>
         </Button>

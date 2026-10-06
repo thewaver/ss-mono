@@ -11,6 +11,7 @@ export type ListboxOrientation = "horizontal" | "vertical";
 export type ListboxCursorState<T> = {
     highlightedValue: T | undefined;
     hasFocus: boolean;
+    highlightRequests: number;
 };
 
 export type ListboxCursorController<T> = Store<ListboxCursorState<T>> & {

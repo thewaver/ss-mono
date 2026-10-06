@@ -80,11 +80,11 @@ export const RingExample = (props: Props) => {
 
             <Button
                 id={"ringTurn"}
-                ariaLabel={isTurning ? "Stop" : "Turn"}
+                ariaLabel={isTurning ? "Pause" : "Turn"}
                 renderContent={(flags) => (
                     <PageControlButtonContent
                         flags={flags}
-                        glyph={isTurning ? CONTROL_GLYPHS.stop : CONTROL_GLYPHS.play}
+                        glyph={isTurning ? CONTROL_GLYPHS.pause : CONTROL_GLYPHS.play}
                     />
                 )}
                 onClick={() => {

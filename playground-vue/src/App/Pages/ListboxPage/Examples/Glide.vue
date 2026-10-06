@@ -20,7 +20,9 @@ const value = useModel(props, "value");
     <PageListboxSurface>
         <Listbox v-model:value="value" :options="COUNTRIES_WITH_REACHABLE" ariaLabel="Shipping country, gliding">
             <template #renderOption="{ option, flags }">
-                <PageGlideLabel :is-selected="flags.isSelected">{{ option.value }}</PageGlideLabel>
+                <PageGlideLabel :is-selected="flags.isSelected" :is-disabled="flags.isDisabled ?? false">
+                    {{ option.value }}
+                </PageGlideLabel>
             </template>
 
             <template #renderSelectionFloater="{ visibilityTarget, transitionDurationMs }">

@@ -59,13 +59,13 @@
 
     <Button
         id={"waveMove"}
-        ariaLabel={isMoving ? "Stop" : "Move"}
+        ariaLabel={isMoving ? "Pause" : "Move"}
         onClick={() => {
             isMoving = !isMoving;
         }}
     >
         {#snippet renderContent(flags)}
-            <PageControlButtonContent {flags} glyph={isMoving ? CONTROL_GLYPHS.stop : CONTROL_GLYPHS.play} />
+            <PageControlButtonContent {flags} glyph={isMoving ? CONTROL_GLYPHS.pause : CONTROL_GLYPHS.play} />
         {/snippet}
     </Button>
 </div>

@@ -11,7 +11,7 @@ export const stack = style({
 
 export const controls = style({
     display: "flex",
-    gap: themeVars.spacing.full,
+    gap: themeVars.spacing.half,
     alignItems: "center",
     justifyContent: "center",
     flexWrap: "wrap",

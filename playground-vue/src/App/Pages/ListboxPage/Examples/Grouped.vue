@@ -3,6 +3,7 @@ import { useModel } from "vue";
 
 import { MultiListbox } from "@thewaver/ss-components-vue";
 
+import PageGlideFloater from "../../../StyledComponents/GlideFloater/PageGlideFloater.vue";
 import PageListboxSurface from "../../../StyledComponents/ListboxSurface/ListboxSurface.vue";
 import PageSelectGroupContent from "../../../StyledComponents/SelectGroupContent/SelectGroupContent.vue";
 import PageSelectOptionContent from "../../../StyledComponents/SelectOptionContent/SelectOptionContent.vue";
@@ -24,7 +25,11 @@ const values = useModel(props, "values");
             </template>
 
             <template #renderOption="{ option, flags }">
-                <PageSelectOptionContent :flags="flags">{{ option.value }}</PageSelectOptionContent>
+                <PageSelectOptionContent is-gliding :flags="flags">{{ option.value }}</PageSelectOptionContent>
+            </template>
+
+            <template #renderHighlightFloater="floater">
+                <PageGlideFloater kind="highlight" v-bind="floater" />
             </template>
         </MultiListbox>
     </PageListboxSurface>

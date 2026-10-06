@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { Lens } from "@thewaver/ss-components-vue";
 import * as styles from "@thewaver/ss-playground/App/Pages/Reveals/LensPage/LensPage.css";
-import knight from "@thewaver/ss-playground/App/knight.webp";
+import knight_profile from "@thewaver/ss-playground/App/knight_profile.webp";
 
 import type { LensExampleProps } from "../LensPage.types";
 
@@ -24,7 +24,7 @@ defineProps<Props>();
             :compute-points="computePoints"
         >
             <template #renderContent>
-                <img :class="styles.photo" :src="knight" alt="A knight in armor" />
+                <img :class="styles.photo" :src="knight_profile" alt="A knight in armor" />
             </template>
         </Lens>
     </div>

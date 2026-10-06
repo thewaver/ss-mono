@@ -204,14 +204,36 @@ export const ListboxOptions = defineComponent(
             () => selectedIndex.value,
         );
 
+        const isPointerLed = shallowRef(false);
+
+        watch(
+            () => props.cursor.highlightRequests.value,
+            () => {
+                isPointerLed.value = false;
+            },
+        );
+
+        watch(
+            () => props.isLive,
+            (isLive) => {
+                if (isLive) return;
+
+                isPointerLed.value = false;
+            },
+        );
+
         const highlightFloater = useOptionFloater(
             () => slots.renderHighlightFloater !== undefined,
             () =>
-                hoveredIndex.value ??
-                (props.cursor.isHighlightShown.value ? props.cursor.highlightedIndex.value : undefined),
+                isPointerLed.value
+                    ? hoveredIndex.value
+                    : props.cursor.isHighlightShown.value
+                      ? props.cursor.highlightedIndex.value
+                      : undefined,
         );
 
         const handleOptionsPointerOver = (e: PointerEvent) => {
+            isPointerLed.value = true;
             hoveredIndex.value = findOptionIndex(e.target);
         };
 

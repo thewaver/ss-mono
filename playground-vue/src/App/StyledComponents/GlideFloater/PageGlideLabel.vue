@@ -10,5 +10,7 @@ const layerClass = useLayerClass();
 </script>
 
 <template>
-    <div :class="[styles.glideLabel, layerClass, isSelected && styles.isSelected]"><slot /></div>
+    <div :class="[styles.glideLabel, layerClass, isSelected && styles.isSelected, isDisabled && styles.isDisabled]">
+        <slot />
+    </div>
 </template>

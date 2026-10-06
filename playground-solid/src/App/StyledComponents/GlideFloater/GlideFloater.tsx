@@ -41,7 +41,11 @@ export const PageGlideLabel = (props: ParentProps<GlideLabelProps>) => {
     return (
         <div
             class={styles.glideLabel}
-            classList={{ [getLayerClass()]: true, [styles.isSelected]: access(props.isSelected) }}
+            classList={{
+                [getLayerClass()]: true,
+                [styles.isSelected]: access(props.isSelected),
+                [styles.isDisabled]: access(props.isDisabled) ?? false,
+            }}
         >
             {props.children}
         </div>

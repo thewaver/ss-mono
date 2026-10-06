@@ -8,6 +8,7 @@ import {
     createMemo,
     createSignal,
     createUniqueId,
+    on,
     onCleanup,
     untrack,
 } from "solid-js";
@@ -170,7 +171,20 @@ export const ListboxOptions = <T,>(props: ListboxOptionsProps<T>) => {
     const findOptionIndex = (target: EventTarget | null) =>
         target instanceof Node ? [...getOptionRefs()].find(([element]) => element.contains(target))?.[1]() : undefined;
 
-    const handleOptionsPointerOver = (e: PointerEvent) => setHoveredIndex(findOptionIndex(e.target));
+    const [getIsPointerLed, setIsPointerLed] = createSignal(false);
+
+    createEffect(on(cursor.getHighlightRequests, () => setIsPointerLed(false), { defer: true }));
+
+    createEffect(() => {
+        if (getIsLive()) return;
+
+        setIsPointerLed(false);
+    });
+
+    const handleOptionsPointerOver = (e: PointerEvent) => {
+        setIsPointerLed(true);
+        setHoveredIndex(findOptionIndex(e.target));
+    };
 
     const handleOptionsPointerLeave = () => setHoveredIndex(undefined);
 
@@ -189,7 +203,12 @@ export const ListboxOptions = <T,>(props: ListboxOptionsProps<T>) => {
 
     const highlightFloater = createFloater(
         () => props.renderHighlightFloater !== undefined,
-        () => getHoveredIndex() ?? (cursor.getIsHighlightShown() ? cursor.getHighlightedIndex() : undefined),
+        () =>
+            getIsPointerLed()
+                ? getHoveredIndex()
+                : cursor.getIsHighlightShown()
+                  ? cursor.getHighlightedIndex()
+                  : undefined,
     );
 
     const renderFloater = (

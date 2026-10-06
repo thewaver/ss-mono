@@ -29,11 +29,11 @@ const startOver = () => {
 <template>
     <div :class="styles.deck">
         <div :class="styles.row">
-            <Button :ariaLabel="isPlaying ? 'Stop' : 'Play'" @click="togglePlayback">
+            <Button :ariaLabel="isPlaying ? 'Pause' : 'Play'" @click="togglePlayback">
                 <template #renderContent="flags">
                     <PageControlButtonContent
                         :flags="flags"
-                        :glyph="isPlaying ? CONTROL_GLYPHS.stop : CONTROL_GLYPHS.play"
+                        :glyph="isPlaying ? CONTROL_GLYPHS.pause : CONTROL_GLYPHS.play"
                     />
                 </template>
             </Button>

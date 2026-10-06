@@ -42,6 +42,7 @@ export type ListboxCursor<T> = {
     flatOptions: SelectOption<T>[];
     highlightedIndex: number | undefined;
     isHighlightShown: boolean;
+    highlightRequests: number;
     activeOptionId: string | undefined;
     getOptionId: (index: number) => string;
     setHasFocus: (hasFocus: boolean) => void;

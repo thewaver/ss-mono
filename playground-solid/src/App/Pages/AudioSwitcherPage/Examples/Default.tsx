@@ -21,11 +21,11 @@ export const DefaultExample = (props: Props) => {
         <div class={styles.deck}>
             <div class={styles.row}>
                 <Button
-                    ariaLabel={() => (getIsPlaying() ? "Stop" : "Play")}
+                    ariaLabel={() => (getIsPlaying() ? "Pause" : "Play")}
                     renderContent={(getFlags) => (
                         <PageControlButtonContent
                             flags={getFlags}
-                            glyph={() => (getIsPlaying() ? CONTROL_GLYPHS.stop : CONTROL_GLYPHS.play)}
+                            glyph={() => (getIsPlaying() ? CONTROL_GLYPHS.pause : CONTROL_GLYPHS.play)}
                         />
                     )}
                     onClick={() => {

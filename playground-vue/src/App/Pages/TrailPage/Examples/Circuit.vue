@@ -30,12 +30,8 @@ const setController = (next: TrailController) => {
     controller.value = next;
 };
 
-const play = () => {
-    playback.value = true;
-};
-
-const pause = () => {
-    playback.value = false;
+const togglePlayback = () => {
+    playback.value = !playback.value;
 };
 
 const rewind = () => {
@@ -67,15 +63,12 @@ const rewind = () => {
         </PageMeasureBox>
 
         <div :class="styles.controls">
-            <Button id="circuitPlay" ariaLabel="Play" @click="play">
+            <Button id="circuitPlayback" :ariaLabel="playback ? 'Pause' : 'Play'" @click="togglePlayback">
                 <template #renderContent="flags">
-                    <PageControlButtonContent :flags="flags" :glyph="CONTROL_GLYPHS.play" />
-                </template>
-            </Button>
-
-            <Button id="circuitPause" ariaLabel="Pause" @click="pause">
-                <template #renderContent="flags">
-                    <PageControlButtonContent :flags="flags" :glyph="CONTROL_GLYPHS.pause" />
+                    <PageControlButtonContent
+                        :flags="flags"
+                        :glyph="playback ? CONTROL_GLYPHS.pause : CONTROL_GLYPHS.play"
+                    />
                 </template>
             </Button>
 

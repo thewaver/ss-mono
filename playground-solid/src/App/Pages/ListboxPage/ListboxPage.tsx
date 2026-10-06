@@ -43,7 +43,7 @@ export const ListboxPage = () => {
             key: "glide",
             name: "Gliding markers",
             readout: () =>
-                `value: ${glideSignal[0]() ?? "undefined"} — one outlined marker sits on the picked option and a second glides to whichever option the pointer or the arrows are on`,
+                `value: ${glideSignal[0]() ?? "undefined"} — one tinted marker sits on the picked option and a second glides to whichever option the pointer or the arrows are on`,
             component: () => <GlideExample value={glideSignal} />,
             path: `${EXAMPLES_ROOT}/Glide.tsx`,
         },
