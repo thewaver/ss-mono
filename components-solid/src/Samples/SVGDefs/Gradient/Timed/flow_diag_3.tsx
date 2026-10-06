@@ -1,7 +1,7 @@
-import { Show } from "solid-js";
+import { Show, createMemo } from "solid-js";
 
 import { type CycleColorKey, type GradientBandedCycleOpts, SVGDefsUtils } from "@thewaver/ss-components";
-import { AngleUtils } from "@thewaver/ss-utils";
+import { AngleUtils, SVGUtils } from "@thewaver/ss-utils";
 
 import { SVGGradientDefsSolidUtils } from "../../../../Generators/SVGDefs/SVGGradients/SVGGradientDefsSolid.utils";
 import { SVGAnimations } from "../../SVGAnimations.const";
@@ -11,6 +11,7 @@ import { SVGDefsSolidUtils } from "../../SVGDefsSolid.utils";
 const CYCLE_KEYS: CycleColorKey[] = ["primary", "secondary", "tertiary"];
 const SMOOTH_REPEATS = 2;
 const BANDED_REPEATS = 4;
+const SCALE = { width: 2, height: 2 };
 
 export const flow_diag_3 = (opts?: GradientBandedCycleOpts): TimedGradientConfig => ({
     computeSVGDefs: (id, __, ___, defs) => {
@@ -23,27 +24,30 @@ export const flow_diag_3 = (opts?: GradientBandedCycleOpts): TimedGradientConfig
             {
                 gradientOrPattern: {
                     id: `gradient1-${id}`,
-                    renderDefsElement: () =>
-                        SVGGradientDefsSolidUtils.computeLinearGradient(
+                    renderDefsElement: () => {
+                        const getAngle = createMemo(() => AngleUtils.unwarp(45, defs.getSize()));
+                        const getOffset = () => SVGDefsUtils.offsetDiagonally(opts?.banded ? 0.25 : 0.5, getAngle());
+                        const getCoords = createMemo(() =>
+                            SVGUtils.getLinearCoords({ angle: getAngle(), scale: SCALE, offset: getOffset() }),
+                        );
+
+                        return SVGGradientDefsSolidUtils.computeLinearGradient(
                             {
                                 id: `gradient1-${id}`,
                                 colors: stopKeys.map((key) => ({ value: defs.colors[key] })),
                                 spreadKind: opts?.banded ? "banded" : undefined,
-                                angle: AngleUtils.unwarp(45, defs.getSize()),
-                                scale: { width: 2, height: 2 },
-                                offset: SVGDefsUtils.offsetDiagonally(
-                                    opts?.banded ? 0.25 : 0.5,
-                                    AngleUtils.unwarp(45, defs.getSize()),
-                                ),
+                                angle: getAngle,
+                                scale: SCALE,
+                                offset: getOffset,
                             },
-                            (x1, y1, x2, y2) => (
+                            () => (
                                 <>
                                     {SVGAnimations.Linear.sweepDiagonal(
-                                        x1,
-                                        y1,
-                                        x2,
-                                        y2,
-                                        AngleUtils.unwarp(45, defs.getSize()),
+                                        () => getCoords().x1,
+                                        () => getCoords().y1,
+                                        () => getCoords().x2,
+                                        () => getCoords().y2,
+                                        getAngle,
                                         [0, opts?.banded ? -0.5 : -1],
                                         defs,
                                     )}
@@ -58,7 +62,8 @@ export const flow_diag_3 = (opts?: GradientBandedCycleOpts): TimedGradientConfig
                                     </Show>
                                 </>
                             ),
-                        ),
+                        );
+                    },
                 },
                 filter: opts?.banded ? undefined : SVGDefsSolidUtils.getBaseBlur(id, defs),
             },

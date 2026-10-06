@@ -129,6 +129,9 @@ export const PaintedText = defineComponent(
             if (driver && root) registration = driver.registry.register(root);
 
             const source = sourceRef.value;
+
+            if (source) layout.update();
+
             const stopObserving = source ? layout.observe(source) : undefined;
 
             return () => {

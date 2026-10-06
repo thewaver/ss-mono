@@ -85,7 +85,11 @@
         return untrack(() => {
             props.onMount?.(controller);
 
-            return element ? layout.observe(element) : undefined;
+            if (!element) return undefined;
+
+            layout.update();
+
+            return layout.observe(element);
         });
     });
 

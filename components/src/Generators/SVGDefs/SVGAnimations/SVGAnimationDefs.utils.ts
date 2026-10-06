@@ -109,8 +109,11 @@ export namespace SVGAnimationDefsUtils {
      * element that has not yet been laid out cannot be told to start, and it is asked for as a delay from
      * now rather than as a moment on the document's clock. An element written to begin at time zero rather than
      * `"indefinite"` — a loop with no start of its own ({@link getIsPageClocked}) — is not begun at all: its drawing's
-     * clock is set to the page's instead, a frame after it is put in the page. That frame matters, as browsers hold a
-     * newly added animation at its first frame until something moves the clock it runs on.
+     * clock is set to the page's instead, once as soon as it is in the page and again on the next frame. The first is
+     * what keeps it seamless: browsers hold a newly added animation at its first frame until something moves the clock
+     * it runs on, so one added after the page has worked out its animations for a frame — a paint rebuilt when its box
+     * is resized — would otherwise be drawn for that frame at its start. The second lines it up with the frame's own
+     * time.
      *
      * The pattern index is the caller's, read and written through `opts`. `setPatternIndex` must have
      * applied its value to the elements' `repeatCount` by the time it returns, since the elements are begun
@@ -144,6 +147,14 @@ export namespace SVGAnimationDefsUtils {
         return {
             attach: (el: SVGAnimateElement) => {
                 elements.add(el);
+
+                let isAttached = true;
+
+                queueMicrotask(() => {
+                    if (!isAttached || !el.isConnected || el.getAttribute("begin") === INDEFINITE_BEGIN) return;
+
+                    getOutermostSvg(el)?.setCurrentTime(performance.now() / MS_PER_SECOND);
+                });
 
                 const frameId = requestAnimationFrame((frameMs) => {
                     if (!el.isConnected) return;
@@ -184,6 +195,7 @@ export namespace SVGAnimationDefsUtils {
                 el.addEventListener("endEvent", handleEndEvent);
 
                 return () => {
+                    isAttached = false;
                     cancelAnimationFrame(frameId);
                     el.removeEventListener("endEvent", handleEndEvent);
                     elements.delete(el);

@@ -334,6 +334,7 @@ export const PaintedText = (props: ParentProps<PaintedTextProps>) => {
 
         if (!sourceRef) return;
 
+        layout.update();
         onCleanup(layout.observe(sourceRef));
     });
 

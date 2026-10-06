@@ -8887,10 +8887,30 @@ with no delay has nothing anybody can see begin, only a phase, so `SVGAnimationD
 call `beginElementAt` on it at all: a frame after the element is put in the page, it sets the outermost drawing's clock
 to the page's (`setCurrentTime`). Two drawings of the same loop then show the same moment of it, and a drawing put in
 the page later — a word replaced by the next, an example remounted — carries the loop on rather than starting it from
-its first frame. The frame's wait is needed because a browser
-holds a newly added animation at its first frame until something moves the clock it runs on. Anything scripted, a
-count or a delay, is begun from script as before, from the moment it is put in the page. `paintedText.spec.ts` reads
-every looping drawing's clock against the page's.
+its first frame. Anything scripted, a count or a delay, is begun from script as before, from the moment it is put in
+the page. `paintedText.spec.ts` reads every looping drawing's clock against the page's.
+
+**The clock is set twice: once in a microtask straight after the element is attached, and again on the next frame.** A
+browser holds a newly added animation at its first frame until something moves the clock it runs on, and it advances
+its animations for a frame before running the frame's resize callbacks. So an element added from a resize callback — a
+paint rebuilt because `PaintedText` or `Shape` just learned its size — was drawn for one frame at the loop's start,
+seen as a blink of the gradient snapping back. The microtask seek runs before that frame is painted and removes it;
+it reads `performance.now()`, a few milliseconds past the frame's own time, so the frame seek follows to line the
+drawing up exactly with the others. The microtask is used rather than a synchronous seek because Solid's `ref` runs
+before the element is in the page, when it has no outermost drawing yet.
+
+**`PaintedText` measures once as soon as it mounts, then observes.** Its first layout used to come from the resize
+observer's first report, which arrives after the frame's animations have been advanced. A copy mounted mid-animation —
+`MorphText`'s outgoing word, mounted fresh at the start of every morph — therefore drew its first frame from an
+unmeasured layout. Measuring in the mount handler puts the real size in place before the frame is worked out.
+
+**The two diagonal-flow gradients update in place when the box changes shape, in Solid.** `flow_diag_2` and
+`flow_diag_3` turn 45° into whatever angle looks like 45° on the box (`AngleUtils.unwarp`), so their angle, offset and
+sweep values depend on the size. Solid's `renderDefsElement` runs inside one tracked expression, so reading the size
+directly in it rebuilt the whole gradient on every resize. The samples now read it inside memos handed to the gradient
+and to `SVGAnimations.Linear.sweepDiagonal`, whose coordinates and angle accept accessors, so a resize rewrites
+attributes on the elements already there and the running animation keeps its phase. React, Vue and Svelte needed no
+change: each re-renders the same description onto the same elements by key, which already updates in place.
 
 **The guard is a spec rather than a note**, because the failure mode is silent: memoise the defs so the same
 record survives a change and the animation simply carries on with the old timing, looking like a component

@@ -1,9 +1,11 @@
-import { For, Show } from "solid-js";
+import { For, Show, createMemo } from "solid-js";
 
 import { type SVGAnimationDefs, SVGAnimationTracks } from "@thewaver/ss-components";
 import { SVGUtils } from "@thewaver/ss-utils";
 
 import { SVGAnimationDefsSolidUtils } from "../../Generators/SVGDefs/SVGAnimations/SVGAnimationDefsSolid.utils";
+import { access } from "../../Utils/propUtils";
+import type { MaybeAccessor } from "../../Utils/typeUtils";
 
 const join = (values: number[]) => values.map((value) => `${value}`).join(";");
 
@@ -47,11 +49,11 @@ export namespace SVGAnimations {
         };
 
         export const sweepDiagonal = (
-            x1: number,
-            y1: number,
-            x2: number,
-            y2: number,
-            angle: number,
+            x1: MaybeAccessor<number>,
+            y1: MaybeAccessor<number>,
+            x2: MaybeAccessor<number>,
+            y2: MaybeAccessor<number>,
+            angle: MaybeAccessor<number>,
             offsets: number[],
             defs: SVGAnimationDefs,
         ) => {
@@ -64,18 +66,25 @@ export namespace SVGAnimations {
             return (
                 <For each={points}>
                     {(point, getIndex) => {
-                        const tracks = SVGAnimationTracks.computeDiagonalTracks(point[0], point[1], angle, offsets);
+                        const getTracks = createMemo(() =>
+                            SVGAnimationTracks.computeDiagonalTracks(
+                                access(point[0]),
+                                access(point[1]),
+                                access(angle),
+                                offsets,
+                            ),
+                        );
 
                         return (
                             <>
                                 <animate
                                     attributeName={`x${getIndex() + 1}`}
-                                    values={join(tracks.x)}
+                                    values={join(getTracks().x)}
                                     {...animateDefs()}
                                 />
                                 <animate
                                     attributeName={`y${getIndex() + 1}`}
-                                    values={join(tracks.y)}
+                                    values={join(getTracks().y)}
                                     {...animateDefs()}
                                 />
                             </>

@@ -187,7 +187,11 @@ export const PaintedText = (props: PaintedTextProps) => {
     useLayoutEffect(() => {
         const source = sourceRef.current;
 
-        return source ? layout.observe(source) : undefined;
+        if (!source) return undefined;
+
+        layout.update();
+
+        return layout.observe(source);
     }, [layout]);
 
     useEffect(() => {

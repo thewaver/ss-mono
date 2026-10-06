@@ -337,6 +337,14 @@ cheaper model would do it as well, suggest it in a line before starting — what
 saves — and wait for them to take it up. It is a suggestion, not a licence: agents are still spawned only once
 they say so.
 
+**A spec run never blocks the conversation.** Stated by the user, after a run held the session unresponsive for
+the second time in one day: always start `npm run verify:dom` / `npx playwright test` with `run_in_background`, keep
+answering while it runs, and read the result when it reports in.
+
+**A browser launched for a probe is always headless.** A headed Chromium window took keyboard focus from the user
+while they were typing and garbled their message. `chromium.launch()` with no options is headless; never pass
+`headless: false`.
+
 **Never kill the user's processes.** No `pkill`, no killing a dev server, no stopping anything you did not
 start. They keep `npm start` running while working, and losing it interrupts them. `npm run verify:dom`
 serves a production preview on its own port and `reuseExistingServer` handles a stale one, so it never
