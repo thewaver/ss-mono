@@ -29,7 +29,7 @@ export const Popover = defineComponent(
             ref: rootRef,
         });
 
-        const { anchorRect, isAnchorOnScreen, placement, position, zIndex, setContentRef } =
+        const { anchorRect, isAnchorOnScreen, placement, position, arrowAim, zIndex, setContentRef } =
             AnchorVueUtils.usePortalPosition(() => props.anchorRef, fader.isVisible, {
                 placement: () => props.placement ?? POPOVER_DEFAULTS.placement,
                 offset: () => props.offset,
@@ -109,6 +109,7 @@ export const Popover = defineComponent(
                                 visibilityTarget: fader.transitionTarget.value,
                                 transitionDurationMs: getTransitionDurationMs(),
                                 placement: placement.value,
+                                arrowAim: arrowAim.value,
                             })}
                         </div>
                     </div>

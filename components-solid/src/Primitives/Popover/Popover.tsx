@@ -28,7 +28,7 @@ export const Popover = (props: PopoverProps) => {
         },
     );
 
-    const { getAnchorRect, getIsAnchorOnScreen, getPlacement, getPosition, getZIndex, setContentRef } =
+    const { getAnchorRect, getIsAnchorOnScreen, getPlacement, getPosition, getArrowAim, getZIndex, setContentRef } =
         AnchorSolidUtils.createPortalPosition(() => access(props.anchorRef), getIsVisible, {
             getPlacement: () => access(props.placement) ?? POPOVER_DEFAULTS.placement,
             getOffset: props.offset === undefined ? undefined : () => access(props.offset)!,
@@ -112,7 +112,7 @@ export const Popover = (props: PopoverProps) => {
                         class={styles.popoverContent}
                         classList={{ [styles.popoverContentCovered]: access(props.isCovered) === true }}
                     >
-                        {props.renderContent(getTransitionTarget, getTransitionDurationMs, getPlacement)}
+                        {props.renderContent(getTransitionTarget, getTransitionDurationMs, getPlacement, getArrowAim)}
                     </div>
                 </div>
             </Portal>

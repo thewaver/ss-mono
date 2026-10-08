@@ -6,6 +6,39 @@ import { ShapeLayerUtils } from "./ShapeLayer.utils";
 
 const SQUARE = ShapeConst.getDefaultShapePoints("square", { width: 100, height: 50 });
 
+describe("ShapeLayerUtils.computeGeometry", () => {
+    const POINTS = ShapeConst.getDefaultShapePoints("square", { width: 10, height: 10 });
+
+    it("passes bare corners through with the props as they are", () => {
+        expect(ShapeLayerUtils.computeGeometry(POINTS, [4], [2], [{ thicknesses: [1], offset: 3 }])).toEqual({
+            points: POINTS,
+            joinRadii: [4],
+            lameExponents: [2],
+            strokeGeom: [{ thicknesses: [1], offset: 3 }],
+        });
+    });
+
+    it("lets a returned list replace its prop, and falls back to the prop for one left out", () => {
+        expect(ShapeLayerUtils.computeGeometry({ points: POINTS, joinRadii: [0, 4] }, [4], [2], undefined)).toEqual({
+            points: POINTS,
+            joinRadii: [0, 4],
+            lameExponents: [2],
+            strokeGeom: undefined,
+        });
+    });
+
+    it("replaces each stroke's thicknesses in turn, keeping its offset", () => {
+        const geometry = ShapeLayerUtils.computeGeometry(
+            { points: POINTS, strokeThicknesses: [[1, 2], [3]] },
+            undefined,
+            undefined,
+            [{ thicknesses: [9], offset: 5 }],
+        );
+
+        expect(geometry.strokeGeom).toEqual([{ thicknesses: [1, 2], offset: 5 }, { thicknesses: [3] }]);
+    });
+});
+
 describe("ShapeLayerUtils.computeLayerPaths", () => {
     it("draws one contour, the shape's own, when there are no strokes", () => {
         const paths = ShapeLayerUtils.computeLayerPaths(SQUARE, undefined, undefined, undefined, undefined);

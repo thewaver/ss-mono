@@ -34,7 +34,8 @@ export namespace AnchorSolidUtils {
      * that should be allowed to run off screen rather than move.
      * @returns `getAnchorRect` and `getIsAnchorOnScreen` for deciding whether to draw at all,
      * `getPlacement` for styling that depends on which way the content opened, `getPosition` for where
-     * to put it, `getZIndex`, and `setContentRef`, which must be attached to the content's own element
+     * to put it, `getArrowAim` for where an arrow pointing at the anchor leaves the content (see
+     * {@link AnchorUtils.computeArrowAim}), `getZIndex`, and `setContentRef`, which must be attached to the content's own element
      * for any of the rest to have a size to work with. `getPosition` is `undefined` until both anchor
      * and content have been measured.
      */
@@ -87,6 +88,10 @@ export namespace AnchorSolidUtils {
             ),
         );
 
+        const getArrowAim = createMemo(() =>
+            AnchorUtils.computeArrowAim(getPlacement(), getAnchorRect(), getPosition(), getContentSize()),
+        );
+
         const getIsAnchorOnScreen = createMemo(() =>
             AnchorUtils.getIsAnchorOnScreen(getAnchorRect(), viewportContext.getSize()),
         );
@@ -120,6 +125,14 @@ export namespace AnchorSolidUtils {
             onCleanup(AnchorUtils.observeContentSize(contentRef, setContentSize));
         });
 
-        return { getAnchorRect, getIsAnchorOnScreen, getPlacement, getPosition, getZIndex, setContentRef };
+        return {
+            getAnchorRect,
+            getIsAnchorOnScreen,
+            getPlacement,
+            getPosition,
+            getArrowAim,
+            getZIndex,
+            setContentRef,
+        };
     };
 }

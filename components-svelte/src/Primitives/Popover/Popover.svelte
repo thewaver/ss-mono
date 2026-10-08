@@ -100,7 +100,12 @@
         }}
     >
         <div class={[styles.popoverContent, props.isCovered === true && styles.popoverContentCovered]}>
-            {@render props.renderContent(fader.getTransitionTarget(), transitionDurationMs, position.getPlacement())}
+            {@render props.renderContent(
+                fader.getTransitionTarget(),
+                transitionDurationMs,
+                position.getPlacement(),
+                position.getArrowAim(),
+            )}
         </div>
     </div>
 {/if}

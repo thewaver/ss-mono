@@ -5,9 +5,12 @@ import type { AnchorHPlacement, AnchorVPlacement } from "@thewaver/ss-components
 import { ANCHOR_H_PLACEMENTS, ANCHOR_V_PLACEMENTS, TOOLTIP_DEFAULTS } from "@thewaver/ss-components-vue";
 import { TooltipKnobs } from "@thewaver/ss-playground/App/Knobs/Tooltips.const";
 import {
+    TOOLTIP_ARROWS,
+    TOOLTIP_ARROW_LABELS,
     TOOLTIP_HOVER_DELAY_MS,
     TOOLTIP_REVEALS,
     TOOLTIP_REVEAL_LABELS,
+    type TooltipArrow,
     type TooltipReveal,
 } from "@thewaver/ss-playground/App/StyledComponents/TooltipContent/TooltipContent.const";
 
@@ -35,6 +38,9 @@ const focusShowDelayMs = shallowRef(TOOLTIP_DEFAULTS.focusShowDelayMs);
 const hoverShowDelayMs = shallowRef(TOOLTIP_HOVER_DELAY_MS);
 const skipDelayWindowMs = shallowRef(TOOLTIP_DEFAULTS.skipDelayWindowMs);
 const reveal = shallowRef<TooltipReveal>(TooltipKnobs.STARTING_REVEAL);
+const arrow = shallowRef<TooltipArrow>(TooltipKnobs.STARTING_ARROW);
+const arrowWidth = shallowRef(TooltipKnobs.STARTING_ARROW_WIDTH);
+const arrowLength = shallowRef(TooltipKnobs.STARTING_ARROW_LENGTH);
 
 const placement = computed(() => ({ x: hPlacement.value, y: vPlacement.value }));
 
@@ -48,6 +54,9 @@ const commonProps = computed<TooltipExampleProps>(() => ({
     hoverShowDelayMs: hoverShowDelayMs.value,
     skipDelayWindowMs: skipDelayWindowMs.value,
     reveal: reveal.value,
+    arrow: arrow.value,
+    arrowWidth: arrowWidth.value,
+    arrowLength: arrowLength.value,
 }));
 
 const examples: ExampleDefs[] = [
@@ -88,6 +97,55 @@ const examples: ExampleDefs[] = [
                 :width="FIELD_WIDTH"
                 ariaLabel="Reveal"
                 @change="(next: TooltipReveal) => (reveal = next)"
+            />
+        </PageProp>
+
+        <PageProp
+            item-key="arrow"
+            label="Arrow"
+            hint="An arrow grown out of the tooltip's body to point at its anchor. It comes out of the side facing the anchor, or out of the nearest corner when the tooltip sits off a corner, and there is none while the tooltip overlaps its anchor. The offset is what makes room for it."
+        >
+            <PageSelectField
+                :value="arrow"
+                :values="TOOLTIP_ARROWS"
+                :compute-label="(next: TooltipArrow) => TOOLTIP_ARROW_LABELS[next]"
+                :width="FIELD_WIDTH"
+                ariaLabel="Arrow"
+                @change="(next: TooltipArrow) => (arrow = next)"
+            />
+        </PageProp>
+
+        <PageProp
+            v-if="arrow !== 'none'"
+            item-key="arrowWidth"
+            label="Arrow width (px)"
+            hint="How wide the arrow is across its base. The lightning bolt spans this much from where its base starts to its tip."
+        >
+            <PageNumberField
+                :value="arrowWidth"
+                :min="TooltipKnobs.MIN_ARROW_SIZE"
+                :max="TooltipKnobs.MAX_ARROW_SIZE"
+                :step="TooltipKnobs.ARROW_SIZE_STEP"
+                :width="FIELD_WIDTH"
+                ariaLabel="Arrow width"
+                @input="(value: number) => (arrowWidth = value)"
+            />
+        </PageProp>
+
+        <PageProp
+            v-if="arrow !== 'none'"
+            item-key="arrowLength"
+            label="Arrow length (px)"
+            hint="How far the arrow's tip stands off the tooltip. Longer than the offset, and the tip reaches over the anchor."
+        >
+            <PageNumberField
+                :value="arrowLength"
+                :min="TooltipKnobs.MIN_ARROW_SIZE"
+                :max="TooltipKnobs.MAX_ARROW_SIZE"
+                :step="TooltipKnobs.ARROW_SIZE_STEP"
+                :width="FIELD_WIDTH"
+                ariaLabel="Arrow length"
+                @input="(value: number) => (arrowLength = value)"
             />
         </PageProp>
 

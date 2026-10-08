@@ -219,3 +219,66 @@ describe("clampToBand", () => {
         ).toBe(800);
     });
 });
+
+describe("computeArrowAim", () => {
+    const AIM_ANCHOR: Rect = { x: 100, y: 200, width: 40, height: 20 };
+    const AIM_CONTENT: Size2d = { width: 120, height: 30 };
+
+    it("grows from the side facing the anchor, lined up with its middle and pointing straight out", () => {
+        expect(
+            AnchorUtils.computeArrowAim({ x: "center", y: "top-out" }, AIM_ANCHOR, { x: 60, y: 160 }, AIM_CONTENT),
+        ).toEqual({ point: { x: 60, y: 30 }, angle: 90 });
+        expect(
+            AnchorUtils.computeArrowAim({ x: "left-in", y: "bottom-out" }, AIM_ANCHOR, { x: 100, y: 230 }, AIM_CONTENT),
+        ).toEqual({ point: { x: 20, y: 0 }, angle: -90 });
+        expect(
+            AnchorUtils.computeArrowAim({ x: "right-out", y: "center" }, AIM_ANCHOR, { x: 150, y: 195 }, AIM_CONTENT),
+        ).toEqual({ point: { x: 0, y: 15 }, angle: 180 });
+        expect(
+            AnchorUtils.computeArrowAim({ x: "left-out", y: "top-in" }, AIM_ANCHOR, { x: -30, y: 200 }, AIM_CONTENT),
+        ).toEqual({ point: { x: 120, y: 10 }, angle: 0 });
+    });
+
+    it("stays on the side's ends when the content was pushed past the anchor's middle", () => {
+        expect(
+            AnchorUtils.computeArrowAim({ x: "center", y: "top-out" }, AIM_ANCHOR, { x: 150, y: 160 }, AIM_CONTENT),
+        ).toEqual({ point: { x: 0, y: 30 }, angle: 90 });
+    });
+
+    it("grows from the nearest corner off a corner of the anchor, pointing out along that corner's diagonal", () => {
+        expect(
+            AnchorUtils.computeArrowAim({ x: "left-out", y: "top-out" }, AIM_ANCHOR, { x: -20, y: 170 }, AIM_CONTENT),
+        ).toEqual({ point: { x: 120, y: 30 }, angle: 45 });
+        expect(
+            AnchorUtils.computeArrowAim({ x: "right-out", y: "top-out" }, AIM_ANCHOR, { x: 140, y: 170 }, AIM_CONTENT),
+        ).toEqual({ point: { x: 0, y: 30 }, angle: 135 });
+        expect(
+            AnchorUtils.computeArrowAim(
+                { x: "left-out", y: "bottom-out" },
+                AIM_ANCHOR,
+                { x: -20, y: 220 },
+                AIM_CONTENT,
+            ),
+        ).toEqual({ point: { x: 120, y: 0 }, angle: -45 });
+        expect(
+            AnchorUtils.computeArrowAim(
+                { x: "right-out", y: "bottom-out" },
+                AIM_ANCHOR,
+                { x: 140, y: 220 },
+                AIM_CONTENT,
+            ),
+        ).toEqual({ point: { x: 0, y: 0 }, angle: -135 });
+    });
+
+    it("has nothing to point at when the content overlaps its anchor on both axes", () => {
+        expect(
+            AnchorUtils.computeArrowAim({ x: "left-in", y: "bottom-in" }, AIM_ANCHOR, { x: 100, y: 190 }, AIM_CONTENT),
+        ).toBeUndefined();
+    });
+
+    it("waits until everything has been measured", () => {
+        expect(
+            AnchorUtils.computeArrowAim({ x: "center", y: "top-out" }, AIM_ANCHOR, undefined, AIM_CONTENT),
+        ).toBeUndefined();
+    });
+});

@@ -24,7 +24,7 @@ export const Popover = (props: PopoverProps) => {
 
     const fader = ElementFaderReactUtils.useFader(props.isOpen, { transitionDurationMs, ref: rootRef });
 
-    const { anchorRect, isAnchorOnScreen, placement, position, zIndex, setContentRef } =
+    const { anchorRect, isAnchorOnScreen, placement, position, arrowAim, zIndex, setContentRef } =
         AnchorReactUtils.usePortalPosition(anchorRef, fader.isVisible, {
             placement: props.placement ?? POPOVER_DEFAULTS.placement,
             offset: props.offset,
@@ -112,7 +112,7 @@ export const Popover = (props: PopoverProps) => {
             }}
         >
             <div className={contentClassName}>
-                {props.renderContent(fader.transitionTarget, transitionDurationMs, placement)}
+                {props.renderContent(fader.transitionTarget, transitionDurationMs, placement, arrowAim)}
             </div>
         </div>,
         viewportContext.getPortalRef() ?? document.body,

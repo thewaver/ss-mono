@@ -1,7 +1,7 @@
 import type { JSX } from "solid-js";
 
 import type { AnchorPlacement } from "@thewaver/ss-components";
-import type { Point2d, Size2d } from "@thewaver/ss-utils";
+import type { Point2d, ShapeArrowAim, Size2d } from "@thewaver/ss-utils";
 
 import type { AccessorProps } from "../../../Utils/typeUtils";
 
@@ -51,12 +51,14 @@ export type TooltipProps = AccessorProps<{
     anchorRef: HTMLElement | undefined;
     /**
      * Draws the tooltip body. The fade is handed in rather than applied, so the consumer decides what
-     * fading looks like; the placement comes with it for a caller that wants to point an arrow at the
-     * anchor.
+     * fading looks like. The placement it settled on comes with it, and so does where an arrow pointing at
+     * the anchor would leave the body: in the body's own pixels, ready for `ShapeUtils.attachArrow`, and
+     * `undefined` while the tooltip overlaps its anchor and has nothing to point at.
      */
     renderContent: (
         getVisibilityTarget: () => 0 | 1,
         getTransitionDurationMs: () => number,
         getPlacement: () => AnchorPlacement,
+        getArrowAim: () => ShapeArrowAim | undefined,
     ) => JSX.Element;
 }>;

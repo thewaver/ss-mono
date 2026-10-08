@@ -37,7 +37,7 @@ export const Tooltip = (props: TooltipProps) => {
 
     const fader = ElementFaderReactUtils.useFader(isShown, { transitionDurationMs, ref: contentRef });
 
-    const { placement, position, zIndex, setContentRef } = AnchorReactUtils.usePortalPosition(
+    const { placement, position, arrowAim, zIndex, setContentRef } = AnchorReactUtils.usePortalPosition(
         anchorRef,
         fader.isVisible,
         {
@@ -107,7 +107,7 @@ export const Tooltip = (props: TooltipProps) => {
             style={style}
             role="tooltip"
         >
-            {props.renderContent(fader.transitionTarget, transitionDurationMs, placement)}
+            {props.renderContent(fader.transitionTarget, transitionDurationMs, placement, arrowAim)}
         </div>,
         viewportContext.getPortalRef() ?? document.body,
     );

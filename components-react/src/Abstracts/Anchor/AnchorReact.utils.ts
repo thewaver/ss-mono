@@ -38,7 +38,8 @@ export namespace AnchorReactUtils {
      * an element. Given this, no element is observed.
      * @param opts.isPinned Keeps the placement asked for and skips clamping.
      * @returns `anchorRect` and `isAnchorOnScreen` for deciding whether to draw at all, `placement` for styling
-     * that depends on which way the content opened, `position` for where to put it, `zIndex`, and
+     * that depends on which way the content opened, `position` for where to put it, `arrowAim` for where an arrow
+     * pointing at the anchor leaves the content (see {@link AnchorUtils.computeArrowAim}), `zIndex`, and
      * `setContentRef`, a ref callback for the content's own element, without which nothing has a size to work with.
      * `position` is `undefined` until both anchor and content have been measured.
      */
@@ -78,6 +79,7 @@ export namespace AnchorReactUtils {
             layoutOpts,
         );
         const position = AnchorUtils.computePortalPosition(placement, anchorRect, contentSize, screenSize, layoutOpts);
+        const arrowAim = AnchorUtils.computeArrowAim(placement, anchorRect, position, contentSize);
 
         const zIndex = useMemo(
             () => (isVisible ? Math.max(AnchorUtils.getStackingBase(anchor), ElevationUtils.getBase(anchor)) + 1 : 1),
@@ -102,6 +104,7 @@ export namespace AnchorReactUtils {
             isAnchorOnScreen: AnchorUtils.getIsAnchorOnScreen(anchorRect, screenSize),
             placement,
             position,
+            arrowAim,
             zIndex,
             setContentRef,
         };

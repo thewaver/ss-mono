@@ -61,12 +61,19 @@ export const Shape = defineComponent(
             const fillDefs = props.computeFillDefs?.(size, rootRef.value);
             const strokeDefs = props.computeStrokeDefs?.(size, rootRef.value);
 
-            const paths = ShapeLayerUtils.computeLayerPaths(
+            const geometry = ShapeLayerUtils.computeGeometry(
                 props.computePoints(size),
-                strokeDefs,
-                props.strokeGeom,
                 props.joinRadii,
                 props.lameExponents,
+                props.strokeGeom,
+            );
+
+            const paths = ShapeLayerUtils.computeLayerPaths(
+                geometry.points,
+                strokeDefs,
+                geometry.strokeGeom,
+                geometry.joinRadii,
+                geometry.lameExponents,
             );
 
             const viewBox = `0 0 ${size.width} ${size.height}`;

@@ -34,6 +34,10 @@ const anchorRef = shallowRef<HTMLElement>();
                     :visibility-target="content.visibilityTarget"
                     :transition-duration-ms="content.transitionDurationMs"
                     :reveal="reveal"
+                    :arrow="arrow"
+                    :arrow-width="arrowWidth"
+                    :arrow-length="arrowLength"
+                    :arrow-aim="content.arrowAim"
                     >A weight of silver, not a coin — eight ounces, counted rather than struck.</PageTooltipContent
                 >
             </template>

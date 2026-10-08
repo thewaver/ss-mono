@@ -24,8 +24,16 @@
         hoverShowDelayMs={props.hoverShowDelayMs}
         skipDelayWindowMs={props.skipDelayWindowMs}
     >
-        {#snippet renderContent(visibilityTarget, transitionDurationMs)}
-            <PageTooltipContent {visibilityTarget} {transitionDurationMs} reveal={props.reveal}>
+        {#snippet renderContent(visibilityTarget, transitionDurationMs, _placement, arrowAim)}
+            <PageTooltipContent
+                {visibilityTarget}
+                {transitionDurationMs}
+                reveal={props.reveal}
+                arrow={props.arrow}
+                arrowWidth={props.arrowWidth}
+                arrowLength={props.arrowLength}
+                {arrowAim}
+            >
                 <div class={styles.richTitle}>Everyone with the link</div>
 
                 <div class={styles.richBody}>

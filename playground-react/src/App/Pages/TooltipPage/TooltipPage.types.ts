@@ -1,5 +1,8 @@
 import type { AnchorPlacement } from "@thewaver/ss-components-react";
-import type { TooltipReveal } from "@thewaver/ss-playground/App/StyledComponents/TooltipContent/TooltipContent.const";
+import type {
+    TooltipArrow,
+    TooltipReveal,
+} from "@thewaver/ss-playground/App/StyledComponents/TooltipContent/TooltipContent.const";
 import type { Point2d } from "@thewaver/ss-utils";
 
 export type TooltipExampleProps = {
@@ -10,4 +13,7 @@ export type TooltipExampleProps = {
     hoverShowDelayMs: number;
     skipDelayWindowMs: number;
     reveal: TooltipReveal;
+    arrow: TooltipArrow;
+    arrowWidth: number;
+    arrowLength: number;
 };

@@ -35,13 +35,22 @@ export const Shape = (props: ShapeProps) => {
         return props.computeStrokeDefs?.(getRootSize, getRootRef);
     });
 
-    const getPaths = createMemo(() =>
-        ShapeLayerUtils.computeLayerPaths(
+    const getGeometry = createMemo(() =>
+        ShapeLayerUtils.computeGeometry(
             props.computePoints(getRootSize()),
-            getStrokeDefs(),
-            access(props.strokeGeom),
             access(props.joinRadii),
             access(props.lameExponents),
+            access(props.strokeGeom),
+        ),
+    );
+
+    const getPaths = createMemo(() =>
+        ShapeLayerUtils.computeLayerPaths(
+            getGeometry().points,
+            getStrokeDefs(),
+            getGeometry().strokeGeom,
+            getGeometry().joinRadii,
+            getGeometry().lameExponents,
         ),
     );
 

@@ -3,9 +3,12 @@
     import { ANCHOR_H_PLACEMENTS, ANCHOR_V_PLACEMENTS, TOOLTIP_DEFAULTS } from "@thewaver/ss-components-svelte";
     import { TooltipKnobs } from "@thewaver/ss-playground/App/Knobs/Tooltips.const";
     import {
+        TOOLTIP_ARROWS,
+        TOOLTIP_ARROW_LABELS,
         TOOLTIP_HOVER_DELAY_MS,
         TOOLTIP_REVEALS,
         TOOLTIP_REVEAL_LABELS,
+        type TooltipArrow,
         type TooltipReveal,
     } from "@thewaver/ss-playground/App/StyledComponents/TooltipContent/TooltipContent.const";
 
@@ -33,6 +36,9 @@
     let hoverShowDelayMs = $state(TOOLTIP_HOVER_DELAY_MS);
     let skipDelayWindowMs = $state(TOOLTIP_DEFAULTS.skipDelayWindowMs);
     let reveal = $state<TooltipReveal>(TooltipKnobs.STARTING_REVEAL);
+    let arrow = $state<TooltipArrow>(TooltipKnobs.STARTING_ARROW);
+    let arrowWidth = $state(TooltipKnobs.STARTING_ARROW_WIDTH);
+    let arrowLength = $state(TooltipKnobs.STARTING_ARROW_LENGTH);
 
     const placement = $derived({ x: hPlacement, y: vPlacement });
 
@@ -46,6 +52,9 @@
         hoverShowDelayMs,
         skipDelayWindowMs,
         reveal,
+        arrow,
+        arrowWidth,
+        arrowLength,
     });
 
     const examples: ExampleDefs[] = [
@@ -104,6 +113,67 @@
             }}
         />
     </PageProp>
+
+    <PageProp
+        itemKey={"arrow"}
+        label={"Arrow"}
+        hint={
+            "An arrow grown out of the tooltip's body to point at its anchor. It comes out of the side facing the anchor, or out of the nearest corner when the tooltip sits off a corner, and there is none while the tooltip overlaps its anchor. The offset is what makes room for it."
+        }
+    >
+        <PageSelectField
+            value={arrow}
+            values={TOOLTIP_ARROWS}
+            computeLabel={(next) => TOOLTIP_ARROW_LABELS[next]}
+            width={FIELD_WIDTH}
+            ariaLabel={"Arrow"}
+            onChange={(next) => {
+                arrow = next;
+            }}
+        />
+    </PageProp>
+
+    {#if arrow !== "none"}
+        <PageProp
+            itemKey={"arrowWidth"}
+            label={"Arrow width (px)"}
+            hint={
+                "How wide the arrow is across its base. The lightning bolt spans this much from where its base starts to its tip."
+            }
+        >
+            <PageNumberField
+                value={arrowWidth}
+                min={TooltipKnobs.MIN_ARROW_SIZE}
+                max={TooltipKnobs.MAX_ARROW_SIZE}
+                step={TooltipKnobs.ARROW_SIZE_STEP}
+                width={FIELD_WIDTH}
+                ariaLabel={"Arrow width"}
+                onInput={(value) => {
+                    arrowWidth = value;
+                }}
+            />
+        </PageProp>
+
+        <PageProp
+            itemKey={"arrowLength"}
+            label={"Arrow length (px)"}
+            hint={
+                "How far the arrow's tip stands off the tooltip. Longer than the offset, and the tip reaches over the anchor."
+            }
+        >
+            <PageNumberField
+                value={arrowLength}
+                min={TooltipKnobs.MIN_ARROW_SIZE}
+                max={TooltipKnobs.MAX_ARROW_SIZE}
+                step={TooltipKnobs.ARROW_SIZE_STEP}
+                width={FIELD_WIDTH}
+                ariaLabel={"Arrow length"}
+                onInput={(value) => {
+                    arrowLength = value;
+                }}
+            />
+        </PageProp>
+    {/if}
 
     <PageProp
         itemKey={"hPlacement"}

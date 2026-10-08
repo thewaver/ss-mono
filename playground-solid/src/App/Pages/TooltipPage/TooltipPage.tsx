@@ -1,12 +1,15 @@
-import { createMemo, createSignal } from "solid-js";
+import { Show, createMemo, createSignal } from "solid-js";
 
 import type { AnchorHPlacement, AnchorVPlacement } from "@thewaver/ss-components-solid";
 import { ANCHOR_H_PLACEMENTS, ANCHOR_V_PLACEMENTS, TOOLTIP_DEFAULTS } from "@thewaver/ss-components-solid";
 import { TooltipKnobs } from "@thewaver/ss-playground/App/Knobs/Tooltips.const";
 import {
+    TOOLTIP_ARROWS,
+    TOOLTIP_ARROW_LABELS,
     TOOLTIP_HOVER_DELAY_MS,
     TOOLTIP_REVEALS,
     TOOLTIP_REVEAL_LABELS,
+    type TooltipArrow,
     type TooltipReveal,
 } from "@thewaver/ss-playground/App/StyledComponents/TooltipContent/TooltipContent.const";
 
@@ -33,6 +36,9 @@ export const TooltipPage = () => {
     const [getHoverShowDelayMs, setHoverShowDelayMs] = createSignal(TOOLTIP_HOVER_DELAY_MS);
     const [getSkipDelayWindowMs, setSkipDelayWindowMs] = createSignal(TOOLTIP_DEFAULTS.skipDelayWindowMs);
     const [getReveal, setReveal] = createSignal<TooltipReveal>(TooltipKnobs.STARTING_REVEAL);
+    const [getArrow, setArrow] = createSignal<TooltipArrow>(TooltipKnobs.STARTING_ARROW);
+    const [getArrowWidth, setArrowWidth] = createSignal(TooltipKnobs.STARTING_ARROW_WIDTH);
+    const [getArrowLength, setArrowLength] = createSignal(TooltipKnobs.STARTING_ARROW_LENGTH);
 
     const getPlacement = createMemo(() => ({ x: getHPlacement(), y: getVPlacement() }));
 
@@ -47,6 +53,9 @@ export const TooltipPage = () => {
             hoverShowDelayMs: getHoverShowDelayMs,
             skipDelayWindowMs: getSkipDelayWindowMs,
             reveal: getReveal,
+            arrow: getArrow,
+            arrowWidth: getArrowWidth,
+            arrowLength: getArrowLength,
         };
 
         return [
@@ -95,6 +104,61 @@ export const TooltipPage = () => {
                         onChange={(reveal) => setReveal(() => reveal)}
                     />
                 </PageProp>
+
+                <PageProp
+                    key={"arrow"}
+                    label={"Arrow"}
+                    hint={
+                        "An arrow grown out of the tooltip's body to point at its anchor. It comes out of the side facing the anchor, or out of the nearest corner when the tooltip sits off a corner, and there is none while the tooltip overlaps its anchor. The offset is what makes room for it."
+                    }
+                >
+                    <PageSelectField
+                        value={getArrow}
+                        values={() => TOOLTIP_ARROWS}
+                        computeLabel={(arrow) => TOOLTIP_ARROW_LABELS[arrow]}
+                        width={() => FIELD_WIDTH}
+                        ariaLabel={"Arrow"}
+                        onChange={(arrow) => setArrow(() => arrow)}
+                    />
+                </PageProp>
+
+                <Show when={getArrow() !== "none"}>
+                    <PageProp
+                        key={"arrowWidth"}
+                        label={"Arrow width (px)"}
+                        hint={
+                            "How wide the arrow is across its base. The lightning bolt spans this much from where its base starts to its tip."
+                        }
+                    >
+                        <PageNumberField
+                            value={getArrowWidth}
+                            min={() => TooltipKnobs.MIN_ARROW_SIZE}
+                            max={() => TooltipKnobs.MAX_ARROW_SIZE}
+                            step={() => TooltipKnobs.ARROW_SIZE_STEP}
+                            width={() => FIELD_WIDTH}
+                            ariaLabel={"Arrow width"}
+                            onInput={setArrowWidth}
+                        />
+                    </PageProp>
+
+                    <PageProp
+                        key={"arrowLength"}
+                        label={"Arrow length (px)"}
+                        hint={
+                            "How far the arrow's tip stands off the tooltip. Longer than the offset, and the tip reaches over the anchor."
+                        }
+                    >
+                        <PageNumberField
+                            value={getArrowLength}
+                            min={() => TooltipKnobs.MIN_ARROW_SIZE}
+                            max={() => TooltipKnobs.MAX_ARROW_SIZE}
+                            step={() => TooltipKnobs.ARROW_SIZE_STEP}
+                            width={() => FIELD_WIDTH}
+                            ariaLabel={"Arrow length"}
+                            onInput={setArrowLength}
+                        />
+                    </PageProp>
+                </Show>
 
                 <PageProp
                     key={"hPlacement"}

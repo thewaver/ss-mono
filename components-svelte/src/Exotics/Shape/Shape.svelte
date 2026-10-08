@@ -31,13 +31,22 @@
     const fillDefs = $derived(props.computeFillDefs?.(rootSize, root ?? undefined));
     const strokeDefs = $derived(props.computeStrokeDefs?.(rootSize, root ?? undefined));
 
-    const paths = $derived(
-        ShapeLayerUtils.computeLayerPaths(
+    const geometry = $derived(
+        ShapeLayerUtils.computeGeometry(
             props.computePoints(rootSize),
-            strokeDefs,
-            props.strokeGeom,
             props.joinRadii,
             props.lameExponents,
+            props.strokeGeom,
+        ),
+    );
+
+    const paths = $derived(
+        ShapeLayerUtils.computeLayerPaths(
+            geometry.points,
+            strokeDefs,
+            geometry.strokeGeom,
+            geometry.joinRadii,
+            geometry.lameExponents,
         ),
     );
 

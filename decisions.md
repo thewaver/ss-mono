@@ -12195,6 +12195,72 @@ one home that two callers use.
 
 **No morph prop exists; the Playground example is the whole feature.** `computePoints` already runs inside the memo that builds the contour, so a signal it reads re-runs the contour, and `joinRadii` and `lameExponents` are accessors blended the same way. The two point sets must be the same length, since blending pairs one point with one point. `Point2dUtils.lerp` is the per-pair step, in ss-utils beside `MathUtils.lerp`. Under reduced motion the example jumps straight to the other shape. It also rounds its value to 1/64 steps, because `ShapeUtils.getPaths` keeps every result forever: a smooth value would add one entry per frame on every press, while a stepped one reuses the same 65 contours.
 
+### Arrows: grown on the unrounded contour, aimed by `Anchor`
+
+Asked for by the user so that a tooltip or popover can carry an arrow whatever its placement or shape. Two
+functions, which know nothing of each other beyond one small type, and `Shape` knows nothing of either.
+
+**`ShapeUtils.attachArrow(geometry, aim, template)` works on the corners before any rounding.** The user's model,
+stated in those terms: the arrow attaches to the sharp contour and returns its three new corners at radius 0, and
+`getPaths` rounds what is left exactly as it would any contour. From `Shape`'s side, whether an arrow was attached,
+drawn by hand or absent is opaque. A body corner the arrow swallows loses its entries in every list; the arrow's
+corners take the template's `joinRadii` / `lameExponents`, sharp when it gives none; each of the arrow's two sides
+takes the stroke thickness of the edge it grows out of, so a border runs round the arrow unbroken rather than
+leaving a gap where it joins. A short list is padded before it is reshaped, so `[8]` still means every body corner.
+
+**Where it attaches is a point, moved to the nearest place on the contour.** Chosen by the user over an edge index
+plus a fraction (the consumer would have to know which index is which edge) and over a fraction of the whole
+perimeter (lands somewhere different on every shape): `Anchor` knows only the box, and a point in the box's pixels
+is the one form it can give for any contour the consumer draws.
+
+**Direction is independent of position.** The user's point: an arrow near the bottom-left may want to point
+straight down, at the middle, or left. `aim.angle` is degrees on screen, `0` right and `90` down.
+
+**The arrow is a template in its own frame, and may be scalene.** The frame is an arrow hanging off the bottom of a
+box — origin where it leaves the contour, `+y` the way it points — and the template is turned to `aim.angle`, never
+mirrored. The user's lightning bolt (`0,0 · 10,0 · 20,20`) is why the triangle is three free points rather than a
+width and a length; `ShapeConst.getIsoscelesArrow(baseWidth, length)` builds the ordinary one.
+
+**The two sides are extended back from the tip until each meets the contour.** Also the user's: an arrow on an
+octagon's corner has to reach the two neighboring edges. The two meeting points and the tip replace the stretch of
+contour between them. Of the two stretches the meeting points split the contour into, the one replaced is the one
+whose replacement leaves the larger area with the body's own winding, which is what makes the result independent of
+which way the corners run. **A side that runs away from the contour and never meets it ends at the attachment point
+instead**, the user's choice over attaching nothing: a lopsided arrow tells the consumer their aim is odd, a missing
+one looks like a bug. Only a tip inside the contour, or both sides missing, attaches nothing.
+
+The rule has a cost worth knowing before blaming the code: a side running nearly parallel to the edge it is extended
+towards meets it far away, so a wide arrow on a box corner — half-angle close to 45° — becomes a long sliver along the
+edges. At 45° or wider, which is any symmetric arrow at least twice as wide as it is long, both sides run parallel to or
+away from the edges and the arrow attaches nothing at a corner. The Playground starts on a 14 × 9 triangle to stay
+clear of it, and `tooltipArrow.spec.ts` types its own narrower one in before checking the corner case; the fix is
+open, as `backlog.md` item 33.
+
+**The arrow sticks out of the box, into the gap.** The user's call: the body is what `Anchor` measures and positions,
+and making room for the arrow is the consumer's `offset`, if they want it. `Shape` already paints its layers with
+`overflow="visible"`, and the gap is already bridged for the hover, so nothing else had to change.
+
+**`computePoints` may return a `ShapeGeometry`, and its lists replace the props'.** `Shape`'s rounding props sit
+outside `computePoints`, but an arrow's corners depend on the measured size, so only the contour knows which entry
+belongs to which corner. An arrow-specific prop on `Shape` was proposed and refused by the user ("we can't put that on
+Shape"); the general form was accepted because it carries no knowledge of arrows. Returned `strokeThicknesses`
+replace each stroke's `thicknesses` in turn and keep its offset. `ShapeLayerUtils.computeGeometry` does the merge.
+
+**`AnchorUtils.computeArrowAim` reads the aim off the placement.** Content beside the anchor on one axis grows the
+arrow from the side facing it, slid to line up with the anchor's middle and held at the side's ends, pointing straight
+out — sliding is what keeps it on the anchor after the screen edge has pushed the content along. Content off a corner
+(`-out` on both axes) grows it from its own nearest corner, **pointing along that corner's diagonal** rather than at the
+anchor's middle: aimed at the middle, the angle is rarely 45°, and the first build showed one side of the triangle then
+running away above the content and the arrow vanishing. The diagonal lands on the anchor's facing corner when the
+offset is the same across and down. Content over the anchor on both axes (`-in` or `center`
+on each) gets no arrow: whichever covers the other, the arrow would start on top of what it points at — confirmed by
+the user, who had expected exactly that case to be the awkward one. The point is in the content's own pixels. Solid's
+`createPortalPosition` exposes it as `getArrowAim`, which `Tooltip` and `Popover` hand to `renderContent` after
+`getPlacement`.
+
+**The corner aim and the side fallback are provisional.** The user's words on taking both: the answers were tentative
+and only testing will settle them. Reopening either after the Playground has been tried is expected, not a reversal.
+
 ### The Playground: a paint is chosen as a kind, then a sample
 
 **Every page that paints a slot with a defs sample offers it as two dropdowns: what kind of paint, then which

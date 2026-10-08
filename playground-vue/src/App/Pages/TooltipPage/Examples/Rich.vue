@@ -32,6 +32,10 @@ const anchorRef = shallowRef<HTMLElement>();
                     :visibility-target="content.visibilityTarget"
                     :transition-duration-ms="content.transitionDurationMs"
                     :reveal="reveal"
+                    :arrow="arrow"
+                    :arrow-width="arrowWidth"
+                    :arrow-length="arrowLength"
+                    :arrow-aim="content.arrowAim"
                 >
                     <div :class="styles.richTitle">Everyone with the link</div>
 

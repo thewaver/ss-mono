@@ -41,7 +41,7 @@ export const Tooltip = (props: TooltipProps) => {
         getRef: getContentRef,
     });
 
-    const { getPlacement, getPosition, getZIndex, setContentRef } = AnchorSolidUtils.createPortalPosition(
+    const { getPlacement, getPosition, getArrowAim, getZIndex, setContentRef } = AnchorSolidUtils.createPortalPosition(
         () => access(props.anchorRef),
         getIsVisible,
         {
@@ -115,7 +115,7 @@ export const Tooltip = (props: TooltipProps) => {
                     }}
                     role="tooltip"
                 >
-                    {props.renderContent(getTransitionTarget, getTransitionDurationMs, getPlacement)}
+                    {props.renderContent(getTransitionTarget, getTransitionDurationMs, getPlacement, getArrowAim)}
                 </div>
             </Portal>
         </Show>

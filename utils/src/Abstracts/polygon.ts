@@ -1,4 +1,31 @@
+import { MathUtils } from "./math.js";
 import { Point2d, Point2dUtils } from "./point2d.js";
+
+const PARALLEL_EPSILON = 1e-12;
+const RAY_START_EPSILON = 1e-9;
+const EDGE_RATIO_EPSILON = 1e-9;
+
+/**
+ * A point on a polygon's contour, and where along the contour it lies.
+ *
+ * `edgeIndex` names the edge that runs from corner `edgeIndex` to the corner after it, and `edgeRatio` says how
+ * far along that edge the point lies, from `0` at its first corner to `1` at its second.
+ */
+export type PolygonContourPoint = {
+    point: Point2d;
+    edgeIndex: number;
+    edgeRatio: number;
+};
+
+/**
+ * Where a ray first meets a polygon's contour, as {@link PolygonUtils.castRay} reports it.
+ *
+ * Placed on the contour as a {@link PolygonContourPoint} is. `distance` is measured in multiples of the direction the
+ * ray was cast with, so it is in pixels only for a direction of length 1.
+ */
+export type PolygonCrossing = PolygonContourPoint & {
+    distance: number;
+};
 
 export namespace PolygonUtils {
     /**
@@ -94,4 +121,128 @@ export namespace PolygonUtils {
 
         return result;
     }
+
+    /**
+     * Measures the area a polygon encloses, signed by which way its corners run.
+     *
+     * The sign is what makes it useful beyond the area itself: two polygons whose corners run the same way give
+     * areas of the same sign, so comparing signed areas tells a polygon from the one its edges would trace if a
+     * stretch of it were walked the wrong way round.
+     *
+     * @param pts The corners, in order.
+     * @returns Positive when the corners run clockwise on screen (y pointing down), negative when they run the other
+     * way, and `0` for fewer than three corners.
+     */
+    export const getSignedArea = (pts: Point2d[]) => {
+        let sum = 0;
+
+        for (let i = 0; i < pts.length; i++) {
+            const curr = pts[i];
+            const next = pts[(i + 1) % pts.length];
+
+            sum += curr.x * next.y - next.x * curr.y;
+        }
+
+        return sum * 0.5;
+    };
+
+    /**
+     * Whether a point lies inside a polygon.
+     *
+     * Counts how many edges a line running right from the point crosses, so it works for any polygon whose edges do
+     * not cross each other, dents included. A point exactly on an edge may land either way.
+     *
+     * @param pts The corners, in order. Either winding.
+     * @param point The point to test.
+     */
+    export const getIsPointInside = (pts: Point2d[], point: Point2d) => {
+        let isInside = false;
+
+        for (let i = 0, j = pts.length - 1; i < pts.length; j = i++) {
+            const a = pts[i];
+            const b = pts[j];
+
+            if (a.y > point.y !== b.y > point.y && point.x < ((b.x - a.x) * (point.y - a.y)) / (b.y - a.y) + a.x) {
+                isInside = !isInside;
+            }
+        }
+
+        return isInside;
+    };
+
+    /**
+     * Finds the point on a polygon's contour nearest to a given point.
+     *
+     * The contour is the closed run of edges, so the answer may sit anywhere along an edge, not only at a corner, and
+     * a point already on the contour comes back unchanged.
+     *
+     * @param pts The corners, in order.
+     * @param point The point to move onto the contour. It may be inside, outside or on it.
+     * @returns The nearest contour point with the edge it lies on, or a copy of `point` on edge `0` when there are no
+     * corners to measure against. A point exactly on a corner is reported on the edge that ends there.
+     */
+    export const getNearestContourPoint = (pts: Point2d[], point: Point2d): PolygonContourPoint => {
+        let best: PolygonContourPoint = { point: { ...point }, edgeIndex: 0, edgeRatio: 0 };
+        let bestDistance = Infinity;
+
+        for (let i = 0; i < pts.length; i++) {
+            const a = pts[i];
+            const b = pts[(i + 1) % pts.length];
+            const dx = b.x - a.x;
+            const dy = b.y - a.y;
+            const lengthSq = dx * dx + dy * dy;
+            const ratio = lengthSq ? MathUtils.clamp01(((point.x - a.x) * dx + (point.y - a.y) * dy) / lengthSq) : 0;
+            const candidate = { x: a.x + dx * ratio, y: a.y + dy * ratio };
+            const distance = Math.hypot(candidate.x - point.x, candidate.y - point.y);
+
+            if (distance < bestDistance) {
+                best = { point: candidate, edgeIndex: i, edgeRatio: ratio };
+                bestDistance = distance;
+            }
+        }
+
+        return best;
+    };
+
+    /**
+     * Finds where a ray first meets a polygon's contour.
+     *
+     * The ray starts at `origin` and runs one way only, in `direction`. Of every edge it crosses, the nearest crossing
+     * is the one reported, so a ray from outside a polygon reports where it enters, and one from inside reports where
+     * it leaves. An edge running exactly along the ray is never counted as crossed.
+     *
+     * @param pts The corners, in order.
+     * @param origin Where the ray starts. A crossing at the origin itself is not counted.
+     * @param direction Which way the ray runs. Its length only scales the reported `distance`.
+     * @returns The first crossing, or `undefined` when the ray misses the contour altogether.
+     */
+    export const castRay = (pts: Point2d[], origin: Point2d, direction: Point2d): PolygonCrossing | undefined => {
+        let best: PolygonCrossing | undefined;
+
+        for (let i = 0; i < pts.length; i++) {
+            const a = pts[i];
+            const b = pts[(i + 1) % pts.length];
+            const edge = { x: b.x - a.x, y: b.y - a.y };
+            const denominator = direction.x * edge.y - direction.y * edge.x;
+
+            if (Math.abs(denominator) < PARALLEL_EPSILON) continue;
+
+            const offset = { x: a.x - origin.x, y: a.y - origin.y };
+            const distance = (offset.x * edge.y - offset.y * edge.x) / denominator;
+            const edgeRatio = (offset.x * direction.y - offset.y * direction.x) / denominator;
+
+            if (distance <= RAY_START_EPSILON) continue;
+            if (edgeRatio < -EDGE_RATIO_EPSILON || edgeRatio > 1 + EDGE_RATIO_EPSILON) continue;
+            if (best && distance >= best.distance) continue;
+
+            best = {
+                point: { x: origin.x + direction.x * distance, y: origin.y + direction.y * distance },
+                edgeIndex: i,
+                edgeRatio: MathUtils.clamp01(edgeRatio),
+                distance,
+            };
+        }
+
+        return best;
+    };
 }

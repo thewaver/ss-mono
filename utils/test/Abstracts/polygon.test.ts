@@ -113,3 +113,82 @@ describe("PolygonUtils.insetPolygon", () => {
         expect(input).toEqual(SQUARE);
     });
 });
+
+describe("PolygonUtils.getSignedArea", () => {
+    it("is positive for corners running clockwise on screen", () => {
+        expect(PolygonUtils.getSignedArea(SQUARE)).toBe(100);
+    });
+
+    it("flips sign when the corners run the other way", () => {
+        expect(PolygonUtils.getSignedArea([...SQUARE].reverse())).toBe(-100);
+    });
+
+    it("is zero for fewer than three corners", () => {
+        expect(PolygonUtils.getSignedArea(SQUARE.slice(0, 2))).toBe(0);
+    });
+});
+
+describe("PolygonUtils.getIsPointInside", () => {
+    it("tells inside from outside", () => {
+        expect(PolygonUtils.getIsPointInside(SQUARE, { x: 5, y: 5 })).toBe(true);
+        expect(PolygonUtils.getIsPointInside(SQUARE, { x: 15, y: 5 })).toBe(false);
+    });
+
+    it("leaves a dent outside", () => {
+        const notched: Point2d[] = [
+            { x: 0, y: 0 },
+            { x: 10, y: 0 },
+            { x: 10, y: 10 },
+            { x: 5, y: 5 },
+            { x: 0, y: 10 },
+        ];
+
+        expect(PolygonUtils.getIsPointInside(notched, { x: 5, y: 8 })).toBe(false);
+        expect(PolygonUtils.getIsPointInside(notched, { x: 5, y: 2 })).toBe(true);
+    });
+});
+
+describe("PolygonUtils.getNearestContourPoint", () => {
+    it("moves a point inside onto the nearest edge", () => {
+        expect(PolygonUtils.getNearestContourPoint(SQUARE, { x: 5, y: 8 })).toEqual({
+            point: { x: 5, y: 10 },
+            edgeIndex: 2,
+            edgeRatio: 0.5,
+        });
+    });
+
+    it("moves a point outside a corner onto the corner", () => {
+        expect(PolygonUtils.getNearestContourPoint(SQUARE, { x: 14, y: -3 })).toEqual({
+            point: { x: 10, y: 0 },
+            edgeIndex: 0,
+            edgeRatio: 1,
+        });
+    });
+
+    it("leaves a point already on the contour where it is", () => {
+        expect(PolygonUtils.getNearestContourPoint(SQUARE, { x: 0, y: 4 }).point).toEqual({ x: 0, y: 4 });
+    });
+});
+
+describe("PolygonUtils.castRay", () => {
+    it("reports where a ray from outside enters, with the edge and how far along it", () => {
+        const crossing = PolygonUtils.castRay(SQUARE, { x: 4, y: 20 }, { x: 0, y: -1 });
+
+        expect(crossing).toEqual({ point: { x: 4, y: 10 }, edgeIndex: 2, edgeRatio: 0.6, distance: 10 });
+    });
+
+    it("reports where a ray from inside leaves", () => {
+        const crossing = PolygonUtils.castRay(SQUARE, { x: 5, y: 5 }, { x: 1, y: 0 });
+
+        expect(crossing?.point).toEqual({ x: 10, y: 5 });
+        expect(crossing?.edgeIndex).toBe(1);
+    });
+
+    it("misses a contour that is behind the ray", () => {
+        expect(PolygonUtils.castRay(SQUARE, { x: 4, y: 20 }, { x: 0, y: 1 })).toBeUndefined();
+    });
+
+    it("does not count an edge running along the ray", () => {
+        expect(PolygonUtils.castRay(SQUARE, { x: -5, y: 0 }, { x: -1, y: 0 })).toBeUndefined();
+    });
+});

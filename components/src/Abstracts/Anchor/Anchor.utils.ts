@@ -1,4 +1,4 @@
-import type { Point2d, Rect, Size2d } from "@thewaver/ss-utils";
+import { MathUtils, type Point2d, type Rect, type ShapeArrowAim, type Size2d } from "@thewaver/ss-utils";
 
 import type { AnchorBand, AnchorBandKind, AnchorHPlacement, AnchorPlacement, AnchorVPlacement } from "./Anchor.types";
 
@@ -18,6 +18,15 @@ const V_FAMILIES: Record<AnchorVPlacement, readonly AnchorVPlacement[]> = {
     "bottom-out": ["bottom-out", "top-out"],
     "center": ["center", "top-in", "bottom-in"],
 };
+const ARROW_ANGLE_RIGHT = 0;
+const ARROW_ANGLE_DOWN = 90;
+const ARROW_ANGLE_LEFT = 180;
+const ARROW_ANGLE_UP = -90;
+const ARROW_ANGLE_DOWN_RIGHT = 45;
+const ARROW_ANGLE_DOWN_LEFT = 135;
+const ARROW_ANGLE_UP_RIGHT = -45;
+const ARROW_ANGLE_UP_LEFT = -135;
+
 /** How many pixels a run of `size` starting at `start` spills past either edge of the usable space. */
 const getOverflow = (start: number, size: number, limit: number, reserved: number) =>
     Math.max(0, reserved - start) + Math.max(0, start + size - (limit - reserved));
@@ -417,6 +426,77 @@ export namespace AnchorUtils {
         return {
             x: clampToBand(x, contentSize.width, bandX, kinds.x),
             y: clampToBand(y, contentSize.height, bandY, kinds.y),
+        };
+    };
+
+    /**
+     * Where an arrow leaves portaled content to point at its anchor, and which way it points.
+     *
+     * Read from which side of the anchor each axis put the content. Content beside the anchor on one axis only grows
+     * its arrow from the side facing the anchor, slid along that side to line up with the anchor's middle and held
+     * at the side's ends when the anchor's middle is past them, which is what keeps it pointing at the anchor after
+     * the screen edge has pushed the content along; it points straight out. Content off one of the anchor's corners
+     * grows it from its own corner nearest the anchor, pointing out along that corner's diagonal, which lands on the
+     * anchor's facing corner when the offset is the same across and down. Content over the anchor on both axes has
+     * nothing to point at.
+     *
+     * The answer is in the form {@link ShapeUtils.attachArrow} takes, so a consumer drawing the content with `Shape`
+     * hands it straight on.
+     *
+     * @param placement The placement in use, as {@link computePortalPlacement} gives it.
+     * @param anchorRect The anchor, in the same space as `position`.
+     * @param position The content's top-left corner, as {@link computePortalPosition} gives it.
+     * @param contentSize The content's measured size.
+     * @returns The point in the content's own pixels, where `0,0` is its top-left corner, and the angle in degrees on
+     * screen; or `undefined` when the content overlaps its anchor on both axes, or before everything has been
+     * measured.
+     */
+    export const computeArrowAim = (
+        placement: AnchorPlacement,
+        anchorRect: Rect | undefined,
+        position: Point2d | undefined,
+        contentSize: Size2d | undefined,
+    ): ShapeArrowAim | undefined => {
+        if (!anchorRect || !position || !contentSize) return;
+
+        const hKind = getHBandKind(placement.x);
+        const vKind = getVBandKind(placement.y);
+
+        if (hKind === "over" && vKind === "over") return;
+
+        const anchorMiddle = {
+            x: anchorRect.x + anchorRect.width * 0.5 - position.x,
+            y: anchorRect.y + anchorRect.height * 0.5 - position.y,
+        };
+
+        if (hKind !== "over" && vKind !== "over") {
+            const corner = {
+                x: hKind === "before" ? contentSize.width : 0,
+                y: vKind === "before" ? contentSize.height : 0,
+            };
+
+            const downAngle = hKind === "before" ? ARROW_ANGLE_DOWN_RIGHT : ARROW_ANGLE_DOWN_LEFT;
+            const upAngle = hKind === "before" ? ARROW_ANGLE_UP_RIGHT : ARROW_ANGLE_UP_LEFT;
+
+            return { point: corner, angle: vKind === "before" ? downAngle : upAngle };
+        }
+
+        if (vKind !== "over") {
+            return {
+                point: {
+                    x: MathUtils.clamp(anchorMiddle.x, 0, contentSize.width),
+                    y: vKind === "before" ? contentSize.height : 0,
+                },
+                angle: vKind === "before" ? ARROW_ANGLE_DOWN : ARROW_ANGLE_UP,
+            };
+        }
+
+        return {
+            point: {
+                x: hKind === "before" ? contentSize.width : 0,
+                y: MathUtils.clamp(anchorMiddle.y, 0, contentSize.height),
+            },
+            angle: hKind === "before" ? ARROW_ANGLE_RIGHT : ARROW_ANGLE_LEFT,
         };
     };
 

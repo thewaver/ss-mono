@@ -29,11 +29,15 @@ export const WordExample = (props: Props) => {
                 focusShowDelayMs={props.focusShowDelayMs}
                 hoverShowDelayMs={props.hoverShowDelayMs}
                 skipDelayWindowMs={props.skipDelayWindowMs}
-                renderContent={(visibilityTarget, transitionDurationMs) => (
+                renderContent={(visibilityTarget, transitionDurationMs, _placement, arrowAim) => (
                     <PageTooltipContent
                         visibilityTarget={visibilityTarget}
                         transitionDurationMs={transitionDurationMs}
                         reveal={props.reveal}
+                        arrow={props.arrow}
+                        arrowWidth={props.arrowWidth}
+                        arrowLength={props.arrowLength}
+                        arrowAim={arrowAim}
                     >
                         A weight of silver, not a coin — eight ounces, counted rather than struck.
                     </PageTooltipContent>

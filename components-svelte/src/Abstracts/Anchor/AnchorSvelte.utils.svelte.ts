@@ -33,9 +33,10 @@ export namespace AnchorSvelteUtils {
      * @param opts.getIsPinned Keeps the placement the caller asked for and skips clamping, for content that should
      * be allowed to run off screen rather than move.
      * @returns `getAnchorRect` and `getIsAnchorOnScreen` for deciding whether to draw at all, `getPlacement` for
-     * styling that depends on which way the content opened, `getPosition` for where to put it, `getZIndex`, and
-     * `attachContent`, which must be attached to the content's own element with `{@attach}` for any of the rest to
-     * have a size to work with. `getPosition` is `undefined` until both anchor and content have been measured.
+     * styling that depends on which way the content opened, `getPosition` for where to put it, `getArrowAim` for
+     * where an arrow pointing at the anchor leaves the content (see {@link AnchorUtils.computeArrowAim}), `getZIndex`,
+     * and `attachContent`, which must be attached to the content's own element with `{@attach}` for any of the rest
+     * to have a size to work with. `getPosition` is `undefined` until both anchor and content have been measured.
      */
     export const createPortalPosition = (
         getAnchorRef: () => HTMLElement | undefined,
@@ -81,6 +82,8 @@ export namespace AnchorSvelteUtils {
                 getLayoutOpts(),
             ),
         );
+
+        const arrowAim = $derived(AnchorUtils.computeArrowAim(placement, anchorRect, position, contentSize));
 
         const isAnchorOnScreen = $derived(AnchorUtils.getIsAnchorOnScreen(anchorRect, viewportContext.getSize()));
 
@@ -132,6 +135,7 @@ export namespace AnchorSvelteUtils {
             getIsAnchorOnScreen: () => isAnchorOnScreen,
             getPlacement: () => placement,
             getPosition: () => position,
+            getArrowAim: () => arrowAim,
             getZIndex: () => zIndex,
             attachContent,
         };

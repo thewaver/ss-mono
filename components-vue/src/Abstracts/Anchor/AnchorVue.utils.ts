@@ -31,7 +31,8 @@ export namespace AnchorVueUtils {
      * an element. Given this, no element is observed.
      * @param opts.isPinned Keeps the placement asked for and skips clamping.
      * @returns Computed refs: `anchorRect` and `isAnchorOnScreen` for deciding whether to draw at all, `placement`
-     * for styling that depends on which way the content opened, `position` for where to put it, and `zIndex`; and
+     * for styling that depends on which way the content opened, `position` for where to put it, `arrowAim` for where
+     * an arrow pointing at the anchor leaves the content (see {@link AnchorUtils.computeArrowAim}), and `zIndex`; and
      * `setContentRef`, a function ref for the content's own element, without which nothing has a size to work with.
      * `position` is `undefined` until both anchor and content have been measured.
      */
@@ -84,6 +85,10 @@ export namespace AnchorVueUtils {
             ),
         );
 
+        const arrowAim = computed(() =>
+            AnchorUtils.computeArrowAim(placement.value, anchorRect.value, position.value, contentSize.value),
+        );
+
         const isAnchorOnScreen = computed(() =>
             AnchorUtils.getIsAnchorOnScreen(anchorRect.value, viewportContext.getSize()),
         );
@@ -116,6 +121,7 @@ export namespace AnchorVueUtils {
             isAnchorOnScreen,
             placement,
             position,
+            arrowAim,
             zIndex,
             setContentRef: (target: Element | ComponentPublicInstance | null) => {
                 contentElement.value = toElement(target);

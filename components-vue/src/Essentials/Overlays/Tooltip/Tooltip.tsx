@@ -40,7 +40,7 @@ export const Tooltip = defineComponent(
             ref: contentRef,
         });
 
-        const { placement, position, zIndex, setContentRef } = AnchorVueUtils.usePortalPosition(
+        const { placement, position, arrowAim, zIndex, setContentRef } = AnchorVueUtils.usePortalPosition(
             () => props.anchorRef,
             fader.isVisible,
             {
@@ -114,6 +114,7 @@ export const Tooltip = defineComponent(
                             visibilityTarget: fader.transitionTarget.value,
                             transitionDurationMs: getTransitionDurationMs(),
                             placement: placement.value,
+                            arrowAim: arrowAim.value,
                         })}
                     </div>
                 </Teleport>

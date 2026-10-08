@@ -64,6 +64,7 @@ reading.
 30. A gallery page, and a preview of each page from the nav — _deferred to a session of its own_
 31. A long list reopened onto a far-down selection settles a frame or two late in Solid and Svelte — _open_
 32. `Die`'s step buttons and arrow keys fall into a loop of two or three faces — _open, no fix chosen_
+33. A wide arrow vanishes at a corner, and a nearly-as-wide one becomes a sliver — _open, the user is analysing it_
 
 ### Build order
 
@@ -1301,6 +1302,25 @@ every face upright cannot both hold, so each option gives one up:
 
 `Cuboid`'s upright mode has the same tension and accepted it, since a box has only six resting orientations
 (`decisions.md`, _"`Cuboid`: upright mode keeps an orientation"_); a d20 has many more faces for the loop to skip.
+
+## 33. A wide arrow vanishes at a corner, and a nearly-as-wide one becomes a sliver
+
+Reachable on the Tooltip page: pick the triangle, set its width to at least twice its length, and place the tooltip
+off a corner of its anchor (`left-out` with `bottom-out`). No arrow is drawn. Make it a little narrower than that and
+the arrow comes back as a long thin wedge running down the tooltip's edges.
+
+**The cause is the rule that joins the arrow to the body.** `ShapeUtils.attachArrow` extends the triangle's two sides
+back from the tip until each meets the contour, as asked for so that an arrow on an octagon's corner reaches the two
+neighboring edges (`decisions.md`, _"Arrows: grown on the unrounded contour, aimed by `Anchor`"_). Out of a box corner
+the arrow points along the diagonal, so a side leaning 45° from the arrow's middle line runs exactly parallel to the
+edge it is extended towards and never meets it, and one leaning a little less meets it far away. A symmetric arrow
+leans 45° when it is twice as wide as it is long.
+
+**For now the Playground starts on a 14 × 9 triangle**, which leans about 38° and draws a short wedge at a corner.
+The library is unchanged, so a consumer's wide arrow still vanishes there. The user is analysing the edge cases
+before choosing a fix. The one put to them and not taken yet: limit how far a side may be extended, and past that
+end the side at its base corner and run straight back to the contour along the arrow's direction, which never
+vanishes but gives a wide corner arrow a short straight neck.
 
 ## Accepted limits
 

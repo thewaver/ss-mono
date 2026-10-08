@@ -1,7 +1,9 @@
 import type * as CSS from "csstype";
 
+import { AngleUtils } from "./angle.js";
 import { ObjectUtils } from "./object.js";
 import { Point2d } from "./point2d.js";
+import { type PolygonContourPoint, PolygonUtils } from "./polygon.js";
 import { Size2d } from "./size.js";
 
 const INNER_RECT_ITERATIONS = 5;
@@ -11,6 +13,12 @@ const HALF_PI = Math.PI * 0.5;
 const DODECAGON_SIDES = 12;
 const MIN_TANGENT_COS_GAP = 1e-9;
 const MAX_TANGENT_LENGTH_FACTOR = 1e6;
+const ARROW_BASE_START = -1;
+const ARROW_TIP = -2;
+const ARROW_BASE_END = -3;
+const NO_ARROW_RADII: [number, number, number] = [0, 0, 0];
+const NO_ARROW_EXPONENTS: [number, number, number] = [CIRCLE_KAPPA, CIRCLE_KAPPA, CIRCLE_KAPPA];
+const COINCIDENT_EPSILON = 1e-6;
 
 /** The outer and inner contours of a shape, as both SVG path text and raw points. */
 type ShapePaths = {
@@ -19,6 +27,97 @@ type ShapePaths = {
     outerPath: string;
     outerPoints: Point2d[];
     outerContour: Point2d[];
+};
+
+/**
+ * A contour together with the lists that style it, matched to its corners and edges by position.
+ *
+ * This is everything {@link ShapeUtils.getPaths} reads about a shape apart from its offset, gathered so that a
+ * function reshaping the contour can hand back the lists reshaped to match. `joinRadii` and `lameExponents` hold one
+ * entry per corner; `strokeThicknesses` holds one list per stroke, each with one entry per edge, where edge `i` runs
+ * from corner `i` to the corner after it. As everywhere in {@link ShapeUtils}, a list shorter than the contour repeats
+ * its last entry, and a missing one takes the default.
+ */
+export type ShapeGeometry = {
+    points: Point2d[];
+    joinRadii?: number[];
+    lameExponents?: number[];
+    strokeThicknesses?: number[][];
+};
+
+/**
+ * Where an arrow leaves a contour and which way it points.
+ *
+ * `point` is in the contour's own pixels and need not lie on the contour: {@link ShapeUtils.attachArrow} moves it to
+ * the nearest place that does. `angle` is in degrees on screen, `0` pointing right and `90` pointing down, and is
+ * independent of the edge the arrow leaves from.
+ */
+export type ShapeArrowAim = {
+    point: Point2d;
+    angle: number;
+};
+
+/**
+ * An arrow's triangle, drawn once in a frame of its own.
+ *
+ * The frame is that of an arrow hanging off the bottom of a box: the origin is where it leaves the contour and `+y`
+ * is the way it points, so a symmetric arrow is `baseStart` and `baseEnd` either side of the origin on the `x` axis
+ * and `tip` straight below it. Nothing has to be symmetric — a lightning bolt is `{ x: -10, y: 0 }`,
+ * `{ x: -5, y: 0 }` and `{ x: 0, y: 10 }` — and the base corners need not touch the contour, since the two sides are
+ * extended back from the tip until they meet it.
+ *
+ * The three corners can be styled like any other. Left out, they are sharp.
+ */
+export type ShapeArrowTemplate = {
+    baseStart: Point2d;
+    tip: Point2d;
+    baseEnd: Point2d;
+    joinRadii?: [number, number, number];
+    lameExponents?: [number, number, number];
+};
+
+/** One corner of a contour with an arrow attached: where it is, what styles it, and what styles the edge leaving it. */
+type ArrowVertex = {
+    point: Point2d;
+    corner: number;
+    edge: number;
+};
+
+/** The corners a walk along the contour passes, from one contour point forward to another. */
+const getCornersBetween = (from: PolygonContourPoint, to: PolygonContourPoint, count: number) => {
+    if (from.edgeIndex === to.edgeIndex && to.edgeRatio >= from.edgeRatio) return [];
+
+    const corners: number[] = [];
+
+    for (let corner = (from.edgeIndex + 1) % count; ; corner = (corner + 1) % count) {
+        corners.push(corner);
+
+        if (corner === to.edgeIndex) return corners;
+    }
+};
+
+/** Drops a contour corner that an arrow corner landed on, keeping the arrow's. */
+const dropCoincidentVertices = (vertices: ArrowVertex[]) => {
+    const result = [...vertices];
+
+    for (let i = 0; i < result.length && result.length > 3;) {
+        const next = (i + 1) % result.length;
+        const curr = result[i];
+        const other = result[next];
+        const isCoincident =
+            Math.hypot(curr.point.x - other.point.x, curr.point.y - other.point.y) < COINCIDENT_EPSILON;
+
+        if (!isCoincident || curr.corner < 0 === other.corner < 0) {
+            i++;
+        } else if (curr.corner < 0) {
+            result[i] = { ...curr, edge: other.edge };
+            result.splice(next, 1);
+        } else {
+            result.splice(i, 1);
+        }
+    }
+
+    return result;
 };
 
 /**
@@ -170,6 +269,19 @@ export namespace ShapeConst {
                 ];
         }
     };
+
+    /**
+     * Builds the ordinary arrow: a symmetric triangle, as a template for {@link ShapeUtils.attachArrow}.
+     *
+     * @param baseWidth How wide the arrow is where it leaves the contour.
+     * @param length How far its tip stands off that point.
+     */
+
+    export const getIsoscelesArrow = (baseWidth: number, length: number): ShapeArrowTemplate => ({
+        baseStart: { x: -baseWidth * 0.5, y: 0 },
+        tip: { x: 0, y: length },
+        baseEnd: { x: baseWidth * 0.5, y: 0 },
+    });
 }
 
 export namespace ShapeUtils {
@@ -862,6 +974,110 @@ export namespace ShapeUtils {
             "padding-left": `${innerRect.x}px`,
             "padding-bottom": `${size.height - innerRect.y - innerRect.height}px`,
             "padding-right": `${size.width - innerRect.x - innerRect.width}px`,
+        };
+    };
+
+    /**
+     * Grows an arrow out of a contour, and reshapes the contour's styling lists to match.
+     *
+     * The arrow is attached to the unrounded corners, before any of them is drawn: `template` is placed with its origin
+     * on the contour point nearest `aim.point` and turned so its `+y` runs along `aim.angle`, then its two sides are
+     * extended back from the tip until each meets the contour. The two meeting points and the tip replace the stretch
+     * of contour between them, so an arrow at a corner swallows that corner, and the result is still one contour for
+     * {@link getPaths} to round as usual. A side that runs away from the contour and never meets it ends at the point
+     * the arrow is attached at instead, so an odd aim gives a lopsided arrow rather than none.
+     *
+     * The lists come back matched to the new corners. A corner the arrow swallowed loses its entries; the arrow's
+     * three corners take the template's styling, sharp unless it says otherwise; and each of the arrow's two sides
+     * takes the stroke thickness of the edge it grows out of, so a border runs round the arrow unbroken. The lists are
+     * never read for anything else, so the same call serves any contour and any styling.
+     *
+     * @param geometry The contour and its lists, which are never modified.
+     * @param aim Where the arrow leaves the contour and which way it points. Missing attaches nothing, which is what an
+     * anchored layer's arrow is when it overlaps its anchor and has nothing to point at.
+     * @param template The arrow's triangle, in its own frame.
+     * @returns The contour with the arrow attached, or `geometry` itself when there is nothing to attach to: fewer
+     * than three corners, a tip that lands inside the contour, or two sides that both never meet it.
+     */
+
+    export const attachArrow = (
+        geometry: ShapeGeometry,
+        aim: ShapeArrowAim | undefined,
+        template: ShapeArrowTemplate,
+    ): ShapeGeometry => {
+        const { points } = geometry;
+        const count = points.length;
+
+        if (!aim || count < 3) return geometry;
+
+        const attachment = PolygonUtils.getNearestContourPoint(points, aim.point);
+        const origin = attachment.point;
+        const turn = AngleUtils.toRadians(aim.angle) - HALF_PI;
+        const cos = Math.cos(turn);
+        const sin = Math.sin(turn);
+        const place = (p: Point2d) => ({ x: origin.x + p.x * cos - p.y * sin, y: origin.y + p.x * sin + p.y * cos });
+        const tip = place(template.tip);
+
+        if (PolygonUtils.getIsPointInside(points, tip)) return geometry;
+
+        const startCrossing = PolygonUtils.castRay(points, tip, Point2d.sub(place(template.baseStart), tip));
+        const endCrossing = PolygonUtils.castRay(points, tip, Point2d.sub(place(template.baseEnd), tip));
+
+        if (!startCrossing && !endCrossing) return geometry;
+
+        const start = startCrossing ?? attachment;
+        const end = endCrossing ?? attachment;
+
+        if (Math.hypot(start.point.x - end.point.x, start.point.y - end.point.y) < COINCIDENT_EPSILON) return geometry;
+
+        const toVertex = (corner: number): ArrowVertex => ({ point: points[corner], corner, edge: corner });
+        const coveringForward: ArrowVertex[] = [
+            { point: start.point, corner: ARROW_BASE_START, edge: start.edgeIndex },
+            { point: tip, corner: ARROW_TIP, edge: end.edgeIndex },
+            { point: end.point, corner: ARROW_BASE_END, edge: end.edgeIndex },
+            ...getCornersBetween(end, start, count).map(toVertex),
+        ];
+        const coveringBackward: ArrowVertex[] = [
+            { point: start.point, corner: ARROW_BASE_START, edge: start.edgeIndex },
+            ...getCornersBetween(start, end, count).map(toVertex),
+            { point: end.point, corner: ARROW_BASE_END, edge: end.edgeIndex },
+            { point: tip, corner: ARROW_TIP, edge: start.edgeIndex },
+        ];
+        const winding = Math.sign(PolygonUtils.getSignedArea(points));
+        const getArea = (vertices: ArrowVertex[]) =>
+            winding * PolygonUtils.getSignedArea(vertices.map((vertex) => vertex.point));
+        const vertices = dropCoincidentVertices(
+            getArea(coveringForward) >= getArea(coveringBackward) ? coveringForward : coveringBackward,
+        );
+
+        const spreadCorners = (
+            values: number[] | undefined,
+            arrowValues: [number, number, number] | undefined,
+            defaultValue: number,
+            noArrowValues: [number, number, number],
+        ) => {
+            if (!values && !arrowValues) return undefined;
+
+            const padded = ObjectUtils.padArray(values, defaultValue, count);
+            const arrow = arrowValues ?? noArrowValues;
+
+            return vertices.map((vertex) => (vertex.corner < 0 ? arrow[-1 - vertex.corner] : padded[vertex.corner]));
+        };
+
+        return {
+            points: vertices.map((vertex) => vertex.point),
+            joinRadii: spreadCorners(geometry.joinRadii, template.joinRadii, 0, NO_ARROW_RADII),
+            lameExponents: spreadCorners(
+                geometry.lameExponents,
+                template.lameExponents,
+                CIRCLE_KAPPA,
+                NO_ARROW_EXPONENTS,
+            ),
+            strokeThicknesses: geometry.strokeThicknesses?.map((thicknesses) => {
+                const padded = ObjectUtils.padArray(thicknesses, 0, count);
+
+                return vertices.map((vertex) => padded[vertex.edge]);
+            }),
         };
     };
 }

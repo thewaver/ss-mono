@@ -1,6 +1,7 @@
 import { beforeEach, describe, expect, it } from "vitest";
 
 import { Point2d } from "../../src/Abstracts/point2d.js";
+import { PolygonUtils } from "../../src/Abstracts/polygon.js";
 import { ShapeConst, ShapeUtils } from "../../src/Abstracts/shape.js";
 
 const SQUARE: Point2d[] = [
@@ -386,5 +387,139 @@ describe("ShapeUtils.getPolygonPadding", () => {
         expect(parseFloat(String(padding["padding-top"]))).toBeGreaterThan(0);
         expect(parseFloat(String(padding["padding-left"]))).toBeGreaterThan(0);
         expect(parseFloat(String(padding["padding-right"]))).toBeGreaterThan(0);
+    });
+});
+
+describe("ShapeUtils.attachArrow", () => {
+    const BOX: Point2d[] = [
+        { x: 0, y: 0 },
+        { x: 100, y: 0 },
+        { x: 100, y: 40 },
+        { x: 0, y: 40 },
+    ];
+    const ARROW = ShapeConst.getIsoscelesArrow(10, 8);
+    const round = (points: Point2d[]) =>
+        points.map((point) => ({ x: Math.round(point.x * 1e6) / 1e6, y: Math.round(point.y * 1e6) / 1e6 }));
+
+    it("grows out of an edge, keeping every corner of the box", () => {
+        const result = ShapeUtils.attachArrow({ points: BOX }, { point: { x: 50, y: 40 }, angle: 90 }, ARROW);
+
+        expect(round(result.points)).toEqual([
+            { x: 45, y: 40 },
+            { x: 0, y: 40 },
+            { x: 0, y: 0 },
+            { x: 100, y: 0 },
+            { x: 100, y: 40 },
+            { x: 55, y: 40 },
+            { x: 50, y: 48 },
+        ]);
+    });
+
+    it("moves an aim that is off the contour onto it", () => {
+        const result = ShapeUtils.attachArrow({ points: BOX }, { point: { x: 50, y: 30 }, angle: 90 }, ARROW);
+
+        expect(round(result.points)).toContainEqual({ x: 50, y: 48 });
+    });
+
+    it("turns the template to the angle, independently of the edge", () => {
+        const right = ShapeUtils.attachArrow({ points: BOX }, { point: { x: 100, y: 20 }, angle: 0 }, ARROW);
+
+        expect(round(right.points)).toContainEqual({ x: 108, y: 20 });
+    });
+
+    it("swallows a corner it is attached at, extending its sides back to the edges either side", () => {
+        const result = ShapeUtils.attachArrow({ points: BOX }, { point: { x: 0, y: 40 }, angle: 135 }, ARROW);
+        const points = round(result.points);
+
+        expect(points).toHaveLength(6);
+        expect(points).not.toContainEqual({ x: 0, y: 40 });
+        expect(points.filter((point) => point.x === 0 && point.y > 0 && point.y < 40)).toHaveLength(1);
+        expect(points.filter((point) => point.y === 40 && point.x > 0 && point.x < 100)).toHaveLength(1);
+    });
+
+    it("swallows an octagon's corner the same way", () => {
+        const octagon = Array.from({ length: 8 }, (_unused, index) => {
+            const angle = (index / 8) * Math.PI * 2;
+
+            return { x: 50 + 50 * Math.cos(angle), y: 50 + 50 * Math.sin(angle) };
+        });
+        const result = ShapeUtils.attachArrow({ points: octagon }, { point: octagon[2], angle: 90 }, ARROW);
+
+        expect(result.points).toHaveLength(10);
+        expect(round(result.points)).not.toContainEqual(round([octagon[2]])[0]);
+        expect(round(result.points)).toContainEqual({ x: 50, y: 108 });
+    });
+
+    it("takes a scalene template as drawn", () => {
+        const bolt = { baseStart: { x: -10, y: 0 }, tip: { x: 0, y: 10 }, baseEnd: { x: -5, y: 0 } };
+        const result = ShapeUtils.attachArrow({ points: BOX }, { point: { x: 50, y: 40 }, angle: 90 }, bolt);
+        const points = round(result.points);
+
+        expect(points).toContainEqual({ x: 40, y: 40 });
+        expect(points).toContainEqual({ x: 45, y: 40 });
+        expect(points).toContainEqual({ x: 50, y: 50 });
+        expect(points).toHaveLength(7);
+    });
+
+    it("works whichever way the corners run", () => {
+        const reversed = [...BOX].reverse();
+        const result = ShapeUtils.attachArrow({ points: reversed }, { point: { x: 50, y: 40 }, angle: 90 }, ARROW);
+
+        expect(result.points).toHaveLength(7);
+        expect(Math.abs(PolygonUtils.getSignedArea(result.points))).toBeCloseTo(4000 + 40, 6);
+    });
+
+    it("keeps the arrow sharp and the box's corners as they were", () => {
+        const result = ShapeUtils.attachArrow(
+            { points: BOX, joinRadii: [8], lameExponents: [2] },
+            { point: { x: 50, y: 40 }, angle: 90 },
+            ARROW,
+        );
+
+        expect(result.joinRadii).toEqual([0, 8, 8, 8, 8, 0, 0]);
+        expect(result.lameExponents).toEqual([1, 2, 2, 2, 2, 1, 1]);
+    });
+
+    it("styles the arrow's corners from the template", () => {
+        const result = ShapeUtils.attachArrow(
+            { points: BOX },
+            { point: { x: 50, y: 40 }, angle: 90 },
+            { ...ARROW, joinRadii: [3, 1, 3] },
+        );
+
+        expect(result.joinRadii).toEqual([3, 0, 0, 0, 0, 3, 1]);
+        expect(result.lameExponents).toBeUndefined();
+    });
+
+    it("gives each side of the arrow the stroke thickness of the edge it grows out of", () => {
+        const result = ShapeUtils.attachArrow(
+            { points: BOX, strokeThicknesses: [[1, 2, 3, 4], [5]] },
+            { point: { x: 50, y: 40 }, angle: 90 },
+            ARROW,
+        );
+
+        expect(result.strokeThicknesses).toEqual([
+            [3, 4, 1, 2, 3, 3, 3],
+            [5, 5, 5, 5, 5, 5, 5],
+        ]);
+    });
+
+    it("ends a side that never meets the contour at the point the arrow is attached at", () => {
+        const result = ShapeUtils.attachArrow({ points: BOX }, { point: { x: 100, y: 0 }, angle: -10 }, ARROW);
+        const points = round(result.points);
+        const tip = points.find((point) => point.x > 100);
+
+        expect(points).toHaveLength(6);
+        expect(points).toContainEqual({ x: 100, y: 0 });
+        expect(points.filter((point) => point.x === 100 && point.y > 0 && point.y < 40)).toHaveLength(1);
+        expect(tip?.x).toBeCloseTo(100 + 8 * Math.cos((10 * Math.PI) / 180), 6);
+        expect(tip?.y).toBeCloseTo(-8 * Math.sin((10 * Math.PI) / 180), 6);
+    });
+
+    it("attaches nothing when there is no aim, or when the tip would land inside", () => {
+        const geometry = { points: BOX };
+
+        expect(ShapeUtils.attachArrow(geometry, undefined, ARROW)).toBe(geometry);
+        expect(ShapeUtils.attachArrow(geometry, { point: { x: 50, y: 40 }, angle: -90 }, ARROW)).toBe(geometry);
     });
 });
