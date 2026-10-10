@@ -8,6 +8,7 @@ export type ComponentConfig = {
 
 export type MenuBranchConfig = {
     name: string;
+    description?: string;
     children: MenuNodeConfig[];
     hidden?: boolean;
 };

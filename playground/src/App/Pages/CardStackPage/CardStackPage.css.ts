@@ -4,6 +4,9 @@ import { themeVars } from "../../Theme.css";
 
 const panel = (from: string, to: string) => `linear-gradient(135deg, ${from}, ${to})`;
 
+const DECK_CARD_HEIGHT = 224;
+const DECK_CARD_ASPECT = 3 / 2;
+
 export const deckStage = style({
     display: "flex",
     flexDirection: "column",
@@ -11,6 +14,7 @@ export const deckStage = style({
     alignItems: "stretch",
     width: "100%",
     minWidth: 0,
+    maxWidth: DECK_CARD_HEIGHT * DECK_CARD_ASPECT,
     userSelect: "none",
 });
 

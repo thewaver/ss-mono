@@ -174,7 +174,8 @@ a time as _"Surface one decision at a time"_ asks, after the report of what was 
 remaining work is the exception, and even then it goes last in the reply, never above a report.
 
 **When asked what work is outstanding, answer in their recorded order, not by size.** `backlog.md` carries the
-ordering already: item 8 says in its own text not to list it, and item 5's **_Bottom of the list_** section
+ordering already: an item can say in its own text not to list it, and the **_Bottom of the list_** section under
+_"Other core controls the library does not have"_
 holds `Table` / data grid and the command palette, placed last by the user after each was argued. Both were
 put at the top of a "biggest remaining work" list anyway, on the grounds that the question was about extent —
 that is the mistake. A question about what is left is a question about what to do next, so anything they have

@@ -1,6 +1,11 @@
 import type { FlatRow } from "../../Abstracts/Flattener/Flattener.types";
 
-export type TreeNodeRenderProps = {
+export type TreeNodeRenderProps<T = unknown> = {
+    /**
+     * The item this node was built from, so whatever is drawn for the node — its tooltip, say — can tell which one
+     * it is for without a function of its own made per node.
+     */
+    value: T;
     /**
      * Whether this node can hold children, which is what separates a folder from a leaf even when the folder is empty.
      */

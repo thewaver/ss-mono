@@ -3,9 +3,17 @@
     import { untrack } from "svelte";
 
     import { Sidebar, Tree } from "@thewaver/ss-components-svelte";
-    import type { SidebarPhase, TreeNode } from "@thewaver/ss-components-svelte";
+    import type {
+        AnchorPlacement,
+        InteractionFlags,
+        InteractionTooltipDefs,
+        SidebarPhase,
+        TreeNode,
+        TreeNodeRenderProps,
+    } from "@thewaver/ss-components-svelte";
     import * as styles from "@thewaver/ss-playground/App/App.css";
     import { restoreRootSlash } from "@thewaver/ss-playground/App/PageComponents/FrameworkSwitch/FrameworkSwitch.const";
+    import type { ShapeArrowAim } from "@thewaver/ss-utils";
     import { IS_BUILD_PROGRESS_SHOWN } from "@thewaver/ss-playground/App/PageComponents/BuildProgress/BuildProgress.utils";
     import {
         DEFAULT_PAGE_VIEW,
@@ -23,8 +31,11 @@
     } from "./App.const";
     import {
         COMPONENT_CONFIGS_BY_ROUTE,
+        GALLERY_ROUTE,
+        GETTING_STARTED_ROUTE,
         componentToRouteName,
         flattenConfigs,
+        getHasPreview,
         getIsBranchConfig,
         route,
         toPageHref,
@@ -37,22 +48,38 @@
     import PageNavLink from "./PageComponents/NavLink/NavLink.svelte";
     import type { ViewportAnchor } from "./PageComponents/NavSettings/NavSettings.types";
     import PageNavSettings from "./PageComponents/NavSettings/PageNavSettings.svelte";
+    import PagePreview from "./PageComponents/Preview/Preview.svelte";
     import PageRouterLink from "./PageComponents/RouterLink/RouterLink.svelte";
     import PageSidebarToggle from "./PageComponents/SidebarToggle/SidebarToggle.svelte";
     import PageViewTabs from "./PageComponents/ViewTabs/PageViewTabs.svelte";
     import type { PageViewKey } from "./PageComponents/ViewTabs/ViewTabs.types";
     import PageDependencies from "./PageDependencies.svelte";
     import { renderPageHighlightFloater } from "./StyledComponents/GlideFloater/GlideFloater.const.svelte";
+    import PageTooltipContent from "./StyledComponents/TooltipContent/TooltipContent.svelte";
     import PageTreeNodeContent from "./StyledComponents/TreeNodeContent/PageTreeNodeContent.svelte";
 
     const getIsMenuFaded = (phase: SidebarPhase) => phase === "collapsing" || phase === "collapsed";
+
+    const NAV_PREVIEW_PLACEMENT: AnchorPlacement = { x: "right-out", y: "center" };
+    const NAV_PREVIEW_OFFSET = { x: 10, y: 0 };
+    const NAV_PREVIEW_ARROW = "triangle";
+
+    const NAV_PREVIEW_TOOLTIP_DEFS: InteractionTooltipDefs<TreeNodeRenderProps<MenuNodeConfig>> = {
+        placement: NAV_PREVIEW_PLACEMENT,
+        offset: NAV_PREVIEW_OFFSET,
+        renderContent: renderNavPreview,
+    };
 
     const toTreeNode =
         (view: PageViewKey) =>
         (node: MenuNodeConfig): TreeNode<MenuNodeConfig> =>
             getIsBranchConfig(node)
                 ? { value: node, children: node.children.map(toTreeNode(view)) }
-                : { value: node, href: toPageHref(node, view) };
+                : {
+                      value: node,
+                      href: toPageHref(node, view),
+                      tooltipDefs: getHasPreview(node) ? NAV_PREVIEW_TOOLTIP_DEFS : undefined,
+                  };
 
     const collectAncestors = (
         nodes: MenuNodeConfig[],
@@ -104,6 +131,10 @@
 
     const isAboutSelected = $derived(route.pathname === "/");
 
+    const isGettingStartedSelected = $derived(route.pathname === GETTING_STARTED_ROUTE);
+
+    const isGallerySelected = $derived(route.pathname === GALLERY_ROUTE);
+
     $effect(() => {
         void route.pathname;
 
@@ -148,6 +179,30 @@
 
     const isMenuExpanded = $derived(!isAutoHidden);
 </script>
+
+{#snippet renderNavPreview(
+    visibilityTarget: 0 | 1,
+    transitionDurationMs: number,
+    _placement: AnchorPlacement,
+    flags: InteractionFlags<TreeNodeRenderProps<MenuNodeConfig>>,
+    arrowAim: ShapeArrowAim | undefined,
+)}
+    {#if !getIsBranchConfig(flags.value) && flags.value.component}
+        <PageTooltipContent
+            {visibilityTarget}
+            {transitionDurationMs}
+            arrow={NAV_PREVIEW_ARROW}
+            {arrowAim}
+            isWide={true}
+        >
+            <div class={styles.navPreview} aria-hidden="true" inert>
+                <PageLayer level={1}>
+                    <PagePreview component={flags.value.component} />
+                </PageLayer>
+            </div>
+        </PageTooltipContent>
+    {/if}
+{/snippet}
 
 <div class={styles.appFrame}>
     {#if IS_BUILD_PROGRESS_SHOWN}
@@ -231,6 +286,12 @@
                                 style:transition-duration={`${transitionDurationMs}ms`}
                             >
                                 <PageNavLink href={"/"} isSelected={isAboutSelected}>About</PageNavLink>
+
+                                <PageNavLink href={GETTING_STARTED_ROUTE} isSelected={isGettingStartedSelected}>
+                                    Getting started
+                                </PageNavLink>
+
+                                <PageNavLink href={GALLERY_ROUTE} isSelected={isGallerySelected}>Gallery</PageNavLink>
                             </div>
 
                             <div

@@ -69,6 +69,19 @@ const describe = (step: Step<StepValue, PageStepState>, index: number) =>
 
 const examples: ExampleDefs[] = [
     {
+        key: "stacked",
+        name: "Stacked",
+        readout: () => `current: ${stackedCurrent.value} — the same steps down the page`,
+        path: `${EXAMPLES_ROOT}/Stacked.vue`,
+    },
+    {
+        key: "detailed",
+        name: "Steps that carry their own content",
+        readout: () =>
+            `current: ${detailedCurrent.value} — each step holds a body beside the connector, so the line runs past the content rather than stopping at it`,
+        path: `${EXAMPLES_ROOT}/Detailed.vue`,
+    },
+    {
         key: "linear",
         name: "Linear",
         readout: () =>
@@ -83,17 +96,10 @@ const examples: ExampleDefs[] = [
         path: `${EXAMPLES_ROOT}/Failed.vue`,
     },
     {
-        key: "stacked",
-        name: "Stacked",
-        readout: () => `current: ${stackedCurrent.value} — the same steps down the page`,
-        path: `${EXAMPLES_ROOT}/Stacked.vue`,
-    },
-    {
-        key: "detailed",
-        name: "Steps that carry their own content",
-        readout: () =>
-            `current: ${detailedCurrent.value} — each step holds a body beside the connector, so the line runs past the content rather than stopping at it`,
-        path: `${EXAMPLES_ROOT}/Detailed.vue`,
+        key: "bare",
+        name: "No connector",
+        readout: () => "the connector slot is optional, so a bare strip renders nothing between the steps",
+        path: `${EXAMPLES_ROOT}/Bare.vue`,
     },
     {
         key: "arc",
@@ -102,12 +108,6 @@ const examples: ExampleDefs[] = [
         readout: () =>
             `current: ${arcCurrent.value} — one layout function, and the run between two steps follows the curve they sit on rather than cutting across it`,
         path: `${EXAMPLES_ROOT}/Arc.vue`,
-    },
-    {
-        key: "bare",
-        name: "No connector",
-        readout: () => "the connector slot is optional, so a bare strip renders nothing between the steps",
-        path: `${EXAMPLES_ROOT}/Bare.vue`,
     },
 ];
 </script>

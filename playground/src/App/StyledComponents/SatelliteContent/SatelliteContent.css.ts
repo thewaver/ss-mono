@@ -3,7 +3,7 @@ import { style } from "@vanilla-extract/css";
 import { themeVars } from "../../Theme.css";
 import { layerVars } from "../Layer/Layer.css";
 
-const PILL_HEIGHT = 22;
+const PILL_HEIGHT = 48;
 
 export const satelliteSubject = style({
     display: "flex",
@@ -44,7 +44,7 @@ export const satellitePill = style({
     borderRadius: `${PILL_HEIGHT * 0.5}px`,
     backgroundImage: `linear-gradient(135deg, ${themeVars.color.primary.light}, ${themeVars.color.primary.dark})`,
     color: themeVars.color.primary.contrast,
-    fontSize: themeVars.fontSize.xSmall,
+    fontSize: themeVars.fontSize.large,
     whiteSpace: "nowrap",
     boxShadow: themeVars.shadow.small,
 });

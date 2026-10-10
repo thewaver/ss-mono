@@ -52,7 +52,6 @@ const MultiSelectPage = () => import("./Pages/MultiSelectPage/MultiSelectPage.sv
 const NumberInputPage = () => import("./Pages/NumberInputPage/NumberInputPage.svelte");
 const FittedTextPage = () => import("./Pages/FittedTextPage/FittedTextPage.svelte");
 const MorphTextPage = () => import("./Pages/MorphTextPage/MorphTextPage.svelte");
-const ShapeRevealPage = () => import("./Pages/ShapeRevealPage/ShapeRevealPage.svelte");
 const SlotTextPage = () => import("./Pages/SlotTextPage/SlotTextPage.svelte");
 const PaintedTextPage = () => import("./Pages/PaintedTextPage/PaintedTextPage.svelte");
 const PaginatorPage = () => import("./Pages/PaginatorPage/PaginatorPage.svelte");
@@ -126,10 +125,13 @@ export const MENU_ID = "library-menu";
 export const MENU_EDGE = "left";
 export const MENU_COLLAPSED_WIDTH = 68;
 export const MENU_EXPANDED_WIDTH = 320;
+export const PREVIEW_EXCLUDED_PAGES = ["AudioSwitcher", "ImageSwitcher", "TableOfContents", "ViewportWrapper"];
 
 export const MENU_CONFIGS: MenuBranchConfig[] = [
     {
         name: "Abstracts",
+        description:
+            "Logic with nothing to draw. The helpers and building blocks the components are made from, there for anyone writing their own.",
         children: [
             {
                 name: "Anchor",
@@ -255,7 +257,6 @@ export const MENU_CONFIGS: MenuBranchConfig[] = [
                 name: "ShapeReveal",
                 description:
                     "Makes a change to the page and shows the result through a shape growing from a point. The browser pictures the page as it was, the change is made underneath, and the new page is uncovered inside a circle or one of the default shapes, growing from the center, a corner or an element until it covers the whole window, with a hard edge or a blurred one. A theme, a route or a large filter all go through it the same way, and where the browser has no view transitions, or the duration is nothing, the change simply happens. The playground's own theme switch is built on it.",
-                component: ShapeRevealPage,
             },
             {
                 name: "SignalMirror",
@@ -291,6 +292,7 @@ export const MENU_CONFIGS: MenuBranchConfig[] = [
     },
     {
         name: "Composites",
+        description: "Several essentials put together into one ready-made piece.",
         hidden: !SHOW_COMPOSITES,
         children: [
             {
@@ -309,6 +311,7 @@ export const MENU_CONFIGS: MenuBranchConfig[] = [
     },
     {
         name: "Essentials",
+        description: "The controls an interface needs: inputs, menus, overlays, navigation and layout.",
         children: [
             {
                 name: "Accordions",
@@ -739,6 +742,7 @@ export const MENU_CONFIGS: MenuBranchConfig[] = [
     },
     {
         name: "Exotics",
+        description: "The ones you might want rather than need: effects, charts, motion and play.",
         children: [
             {
                 name: "Animations",
@@ -1057,6 +1061,8 @@ export const MENU_CONFIGS: MenuBranchConfig[] = [
     },
     {
         name: "Generators",
+        description:
+            "Functions that work out something to hand a component, such as a gradient, a pattern or a layout, rather than drawing anything themselves.",
         children: [
             {
                 name: "CellAnimationBreakpoints",
@@ -1157,6 +1163,8 @@ export const MENU_CONFIGS: MenuBranchConfig[] = [
     },
     {
         name: "Primitives",
+        description:
+            "The shared bodies other components are built out of. Each draws something, but only becomes useful once another component wraps it.",
         children: [
             {
                 name: "Barrel",

@@ -8,7 +8,15 @@ import * as styles from "@thewaver/ss-playground/App/App.css";
 import { IS_BUILD_PROGRESS_SHOWN } from "@thewaver/ss-playground/App/PageComponents/BuildProgress/BuildProgress.utils";
 import { DEFAULT_PAGE_VIEW, toBaseRoute } from "@thewaver/ss-playground/App/PageComponents/ViewTabs/ViewTabs.const";
 
-import { MENU_COLLAPSED_WIDTH, MENU_EDGE, MENU_EXPANDED_WIDTH, MENU_ID, SEARCH_FIELD_WIDTH } from "./App.const";
+import {
+    GALLERY_ROUTE,
+    GETTING_STARTED_ROUTE,
+    MENU_COLLAPSED_WIDTH,
+    MENU_EDGE,
+    MENU_EXPANDED_WIDTH,
+    MENU_ID,
+    SEARCH_FIELD_WIDTH,
+} from "./App.const";
 import type { ComponentConfig, MenuNodeConfig } from "./App.types";
 import { AppUtils } from "./App.utils";
 import PageBuildProgress from "./PageComponents/BuildProgress/PageBuildProgress.vue";
@@ -40,6 +48,10 @@ const searchExpanded = shallowRef<MenuNodeConfig[]>([]);
 const selectedConfig = computed(() => AppUtils.COMPONENT_CONFIGS_BY_ROUTE[toBaseRoute(route.path)]);
 
 const isAboutSelected = computed(() => route.path === "/");
+
+const isGettingStartedSelected = computed(() => route.path === GETTING_STARTED_ROUTE);
+
+const isGallerySelected = computed(() => route.path === GALLERY_ROUTE);
 
 const isSearching = computed(() => searchTerm.value.trim().length > 0);
 
@@ -98,7 +110,7 @@ const setExpanded = (next: unknown[]) => {
 
 const refuseSelection = () => undefined;
 
-const computeNodeText = (node: TreeNode<unknown>) => (node.value as MenuNodeConfig).name;
+const computeNodeText = (node: TreeNode<MenuNodeConfig>) => node.value.name;
 </script>
 
 <template>
@@ -178,6 +190,14 @@ const computeNodeText = (node: TreeNode<unknown>) => (node.value as MenuNodeConf
                                     :style="{ transitionDuration: `${transitionDurationMs}ms` }"
                                 >
                                     <PageNavLink href="/" :is-selected="isAboutSelected">About</PageNavLink>
+
+                                    <PageNavLink :href="GETTING_STARTED_ROUTE" :is-selected="isGettingStartedSelected">
+                                        Getting started
+                                    </PageNavLink>
+
+                                    <PageNavLink :href="GALLERY_ROUTE" :is-selected="isGallerySelected">
+                                        Gallery
+                                    </PageNavLink>
                                 </div>
 
                                 <div

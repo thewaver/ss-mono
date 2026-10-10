@@ -12,6 +12,7 @@ export type TooltipContentProps = AccessorProps<{
     arrow?: TooltipArrow;
     arrowWidth?: number;
     arrowLength?: number;
+    isWide?: boolean;
 }> & {
     arrowAim?: MaybeAccessor<ShapeArrowAim | undefined>;
 };

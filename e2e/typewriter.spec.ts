@@ -85,6 +85,22 @@ test("the output is split per character rather than left as one run", async ({ p
     expect(spans, "each animated element needs its own box to be staggered").toBeGreaterThan(5);
 });
 
+/**
+ * A run draws a box per character while it plays and drops back to plain runs of text once it has ended, so
+ * whether those boxes are there is whether a run is playing. The button under the example starts one again
+ * from the first character.
+ */
+test("the button under the example types the text again from the start", async ({ page }) => {
+    const isPlaying = () =>
+        page.locator(`${COMPLEX} [inert] + div`).evaluate((output) => !!output.querySelector(":scope > span > span"));
+
+    await expect.poll(isPlaying, { message: "the first run plays out and ends", timeout: 30_000 }).toBe(false);
+
+    await page.locator("#typeItAgain").click();
+
+    await expect.poll(isPlaying, { message: "pressing the button starts a run again" }).toBe(true);
+});
+
 test("structure survives the split but presentation is flattened onto the spans", async ({ page }) => {
     const output = page.locator(`${COMPLEX} [inert] + div`);
 

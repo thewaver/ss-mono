@@ -169,8 +169,8 @@ export const REACT_THEME_VALUES = {
                 contrast: "hsl(30, 100%, 95%)",
             },
             level2: {
-                main: "rgb(0, 0, 0)",
-                contrast: "rgb(255, 255, 255)",
+                main: "hsl(0, 10%, 0%)",
+                contrast: "hsl(30, 100%, 100%)",
             },
         },
     },
@@ -201,8 +201,8 @@ export const SOLID_THEME_VALUES = {
                 contrast: "hsl(210, 100%, 95%)",
             },
             level2: {
-                main: "rgb(0, 0, 0)",
-                contrast: "rgb(255, 255, 255)",
+                main: "hsl(240, 10%, 0%)",
+                contrast: "hsl(210, 100%, 100%)",
             },
         },
     },
@@ -233,8 +233,8 @@ export const SVELTE_THEME_VALUES = {
                 contrast: "hsl(30, 100%, 95%)",
             },
             level2: {
-                main: "rgb(0, 0, 0)",
-                contrast: "rgb(255, 255, 255)",
+                main: "hsl(0, 10%, 0%)",
+                contrast: "hsl(30, 100%, 100%)",
             },
         },
     },
@@ -265,8 +265,8 @@ export const VUE_THEME_VALUES = {
                 contrast: "hsl(90, 100%, 95%)",
             },
             level2: {
-                main: "rgb(0, 0, 0)",
-                contrast: "rgb(255, 255, 255)",
+                main: "hsl(120, 10%, 0%)",
+                contrast: "hsl(90, 100%, 100%)",
             },
         },
     },

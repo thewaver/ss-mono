@@ -1,13 +1,25 @@
 import COMPONENT_DEPENDENCIES from "virtual:component-dependencies";
 import type { DependencyNames } from "virtual:component-dependencies";
+import { type Component, defineAsyncComponent, h } from "vue";
 
-import type { SidebarPhase, TreeNode } from "@thewaver/ss-components-vue";
+import type {
+    AnchorPlacement,
+    InteractionTooltipDefs,
+    SidebarPhase,
+    TreeNode,
+    TreeNodeRenderProps,
+} from "@thewaver/ss-components-vue";
+import * as styles from "@thewaver/ss-playground/App/App.css";
 import { PAGE_VIEW_KEYS, toPageViewRoute } from "@thewaver/ss-playground/App/PageComponents/ViewTabs/ViewTabs.const";
 import { StringUtils } from "@thewaver/ss-utils";
 
-import { DEPENDENCY_GROUPS, LIST_PAGELESS_COMPONENTS, MENU_CONFIGS } from "./App.const";
+import { DEPENDENCY_GROUPS, LIST_PAGELESS_COMPONENTS, MENU_CONFIGS, PREVIEW_EXCLUDED_PAGES } from "./App.const";
 import type { ComponentConfig, MenuBranchConfig, MenuNodeConfig } from "./App.types";
+import PageLayer from "./PageComponents/Layer/Layer.vue";
+import PagePreview from "./PageComponents/Preview/Preview.vue";
 import type { PageViewKey } from "./PageComponents/ViewTabs/ViewTabs.types";
+import type { GallerySection } from "./Pages/GalleryPage/GalleryPage.types";
+import PageTooltipContent from "./StyledComponents/TooltipContent/TooltipContent.vue";
 
 export namespace AppUtils {
     export const getIsBranchConfig = (node: MenuNodeConfig): node is MenuBranchConfig => "children" in node;
@@ -22,12 +34,54 @@ export namespace AppUtils {
     export const toPageHref = (config: ComponentConfig, view: PageViewKey) =>
         toPageViewRoute(componentToRouteName(config.name), config.component === undefined ? "docs" : view);
 
+    const GALLERY_NAME_SEPARATOR = " / ";
+    const NAV_PREVIEW_PLACEMENT: AnchorPlacement = { x: "right-out", y: "center" };
+    const NAV_PREVIEW_OFFSET = { x: 10, y: 0 };
+    const NAV_PREVIEW_ARROW = "triangle";
+
+    type PreviewableConfig = ComponentConfig & Required<Pick<ComponentConfig, "component">>;
+
+    const PREVIEW_COMPONENTS = new Map<PreviewableConfig, Component>();
+
+    const getHasPreview = (config: ComponentConfig): config is PreviewableConfig =>
+        config.component !== undefined && !PREVIEW_EXCLUDED_PAGES.includes(config.name);
+
+    const getPreviewComponent = (config: PreviewableConfig) => {
+        const cached = PREVIEW_COMPONENTS.get(config);
+
+        if (cached) return cached;
+
+        const component = defineAsyncComponent(config.component);
+
+        PREVIEW_COMPONENTS.set(config, component);
+
+        return component;
+    };
+
+    const toPreviewTooltipDefs = (config: PreviewableConfig): InteractionTooltipDefs<TreeNodeRenderProps> => ({
+        placement: NAV_PREVIEW_PLACEMENT,
+        offset: NAV_PREVIEW_OFFSET,
+        renderContent: ({ visibilityTarget, transitionDurationMs, arrowAim }) =>
+            h(
+                PageTooltipContent,
+                { visibilityTarget, transitionDurationMs, arrow: NAV_PREVIEW_ARROW, arrowAim, isWide: true },
+                () =>
+                    h("div", { "class": styles.navPreview, "aria-hidden": "true", "inert": true }, [
+                        h(PageLayer, { level: 1 }, () => h(PagePreview, { component: getPreviewComponent(config) })),
+                    ]),
+            ),
+    });
+
     const toTreeNode =
         (view: PageViewKey) =>
         (node: MenuNodeConfig): TreeNode<MenuNodeConfig> =>
             getIsBranchConfig(node)
                 ? { value: node, children: node.children.map(toTreeNode(view)) }
-                : { value: node, href: toPageHref(node, view) };
+                : {
+                      value: node,
+                      href: toPageHref(node, view),
+                      tooltipDefs: getHasPreview(node) ? toPreviewTooltipDefs(node) : undefined,
+                  };
 
     const collectAncestors = (
         nodes: MenuNodeConfig[],
@@ -68,6 +122,27 @@ export namespace AppUtils {
     export const ANCESTORS_BY_CONFIG = new Map<MenuNodeConfig, MenuBranchConfig[]>();
 
     collectAncestors(VISIBLE_MENU_CONFIGS, [], ANCESTORS_BY_CONFIG);
+
+    const toGalleryName = (config: ComponentConfig) =>
+        [...(ANCESTORS_BY_CONFIG.get(config) ?? []).slice(1), config]
+            .map((node) => node.name)
+            .join(GALLERY_NAME_SEPARATOR);
+
+    export const GALLERY_SECTIONS: GallerySection[] = VISIBLE_MENU_CONFIGS.map((category) => ({
+        name: category.name,
+        description: category.description,
+        items: flattenConfigs([category]).flatMap((config) =>
+            getHasPreview(config)
+                ? [
+                      {
+                          name: toGalleryName(config),
+                          href: componentToRouteName(config.name),
+                          component: getPreviewComponent(config),
+                      },
+                  ]
+                : [],
+        ),
+    })).filter((section) => section.items.length > 0);
 
     export const COMPONENT_CONFIGS_BY_ROUTE: Record<string, ComponentConfig | undefined> = Object.fromEntries(
         COMPONENT_CONFIGS.map((config) => [componentToRouteName(config.name), config]),

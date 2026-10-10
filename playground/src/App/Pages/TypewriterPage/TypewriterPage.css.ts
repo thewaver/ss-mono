@@ -81,6 +81,13 @@ export const root = style({
     gap: themeVars.spacing.quad,
 });
 
+export const complexStack = style({
+    display: "flex",
+    flexDirection: "column",
+    gap: themeVars.spacing.full,
+    alignItems: "flex-start",
+});
+
 export const textHighlight = style({
     textTransform: "uppercase",
     lineHeight: 2,

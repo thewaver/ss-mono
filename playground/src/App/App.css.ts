@@ -121,6 +121,11 @@ export const navSettingsBox = style({
     height: SIDEBAR_TOGGLE_SIZE,
 });
 
+export const navPreview = style({
+    width: 360,
+    aspectRatio: "3 / 2",
+});
+
 export const aboutLink = style({
     transitionProperty: "opacity",
     flexShrink: 0,

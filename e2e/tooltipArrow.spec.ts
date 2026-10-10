@@ -130,7 +130,7 @@ test("beside the anchor, it leaves the facing side, lined up down the anchor", a
 /**
  * The triangle is typed in rather than left at the page's default, so this does not depend on what the page starts
  * on. Out of a corner along the diagonal, a side leaning 45° or more from the arrow's middle line runs parallel to,
- * or away from, the edge it is extended towards and never meets it (`backlog.md` item 33). What this checks is the
+ * or away from, the edge it is extended towards and never meets it (`backlog.md`, _"A wide arrow vanishes at a corner"_). What this checks is the
  * direction.
  */
 test("off a corner of the anchor, it leaves the nearest corner along that corner's diagonal", async ({ page }) => {

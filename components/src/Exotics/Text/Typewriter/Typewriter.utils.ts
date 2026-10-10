@@ -101,24 +101,15 @@ export namespace TypewriterUtils {
     export const getCaretIndexOnStart = (isErasing: boolean, index: number) =>
         isErasing ? index - SINGLE_ELEMENT : index;
 
-    /**
-     * Where the caret sits at a moment of the run.
-     *
-     * It follows the character that most recently started — after it while typing, before it while erasing — so with
-     * a scatter of weights it jumps to wherever the latest arrival was. Before any has started it is at
-     * {@link getFirstCaretIndex}, and once the run is over at {@link getLastCaretIndex}.
-     *
-     * @param startTimesMs When each character starts, from {@link computeStartTimes}.
-     * @param timeMs How far the run has gone.
-     * @param isErasing Whether the characters are leaving.
-     * @param isOver Whether the run has reached its end.
-     */
-    export const computeCaretIndex = (
-        startTimesMs: readonly number[],
-        timeMs: number,
-        isErasing: boolean,
-        isOver: boolean,
-    ) => {
+    const stepPastHanging = (index: number, hangingIndices: ReadonlySet<number>) => {
+        let result = index;
+
+        while (hangingIndices.has(result)) result--;
+
+        return result;
+    };
+
+    const findCaretIndex = (startTimesMs: readonly number[], timeMs: number, isErasing: boolean, isOver: boolean) => {
         const count = startTimesMs.length;
 
         if (isOver) return getLastCaretIndex(isErasing, count);
@@ -134,6 +125,33 @@ export namespace TypewriterUtils {
         }
 
         return latest === BEFORE_FIRST ? getFirstCaretIndex(isErasing, count) : getCaretIndexOnStart(isErasing, latest);
+    };
+
+    /**
+     * Where the caret sits at a moment of the run.
+     *
+     * It follows the character that most recently started — after it while typing, before it while erasing — so with
+     * a scatter of weights it jumps to wherever the latest arrival was. Before any has started it is at
+     * {@link getFirstCaretIndex}, and once the run is over at {@link getLastCaretIndex}.
+     *
+     * @param startTimesMs When each character starts, from {@link computeStartTimes}.
+     * @param timeMs How far the run has gone.
+     * @param isErasing Whether the characters are leaving.
+     * @param isOver Whether the run has reached its end.
+     * @param hangingIndices The characters that hang at the end of a wrapped line and take no room, from
+     * `LetterDriverUtils.getHangingIndices`. The caret is never placed after one of these but after the character
+     * before it, which is the same place on screen and is not clipped away with it.
+     */
+    export const computeCaretIndex = (
+        startTimesMs: readonly number[],
+        timeMs: number,
+        isErasing: boolean,
+        isOver: boolean,
+        hangingIndices?: ReadonlySet<number>,
+    ) => {
+        const index = findCaretIndex(startTimesMs, timeMs, isErasing, isOver);
+
+        return hangingIndices ? stepPastHanging(index, hangingIndices) : index;
     };
 
     /**
@@ -289,7 +307,7 @@ export namespace TypewriterUtils {
 
             if (!container || opts.getIsDriven?.()) return false;
 
-            const width = container.clientWidth;
+            const width = LetterDriverUtils.measureLineWidth(container);
 
             if (!isForced && cause === "layout" && width === store.get().width) return false;
 

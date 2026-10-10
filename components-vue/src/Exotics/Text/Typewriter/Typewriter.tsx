@@ -124,8 +124,16 @@ export const Typewriter = defineComponent(
             );
         });
 
+        const hangingIndices = computed(() => LetterDriverUtils.getHangingIndices(segments.value));
+
         const caretIndex = computed(() =>
-            TypewriterUtils.computeCaretIndex(startTimesMs.value, timeMs.value, getIsErasing(), !isAnimating.value),
+            TypewriterUtils.computeCaretIndex(
+                startTimesMs.value,
+                timeMs.value,
+                getIsErasing(),
+                !isAnimating.value,
+                hangingIndices.value,
+            ),
         );
 
         const controller: TypewriterController = {

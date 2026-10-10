@@ -119,7 +119,7 @@
         "typecheck": "tsc --noEmit"
     },
     "dependencies": {
-        "@tanstack/virtual-core": "^3.17.11",
+        "@tanstack/virtual-core": "^3.18.0",
         "@thewaver/ss-components": "^0.0.5"
     },
     "peerDependencies": {
@@ -128,9 +128,9 @@
     },
     "devDependencies": {
         "@thewaver/ss-utils": "^0.0.26",
-        "@vanilla-extract/css": "^1.21.2",
+        "@vanilla-extract/css": "^1.21.3",
         "@vanilla-extract/dynamic": "^2.1.5",
-        "vite": "^8.3.0",
+        "vite": "^8.3.4",
         "@vitejs/plugin-vue-jsx": "^5.1.6",
         "vue": "^3.5.43",
         "tsup": "^8.5.1"

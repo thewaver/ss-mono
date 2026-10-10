@@ -7,6 +7,8 @@ import { CSSUtils } from "@thewaver/ss-utils";
 
 import PageModalOverlay from "../../StyledComponents/ModalOverlay/ModalOverlay.vue";
 import PageModalPanel from "../../StyledComponents/ModalPanel/PageModalPanel.vue";
+import { provideExampleKnobsContext } from "../ExampleKnobs/ExampleKnobs.context";
+import { useIsPreview } from "../Preview/Preview.context";
 import PageSourceView from "../SourceView/SourceView.vue";
 import type { ExamplesProps, ExamplesSlots } from "./Examples.types";
 import PageExample from "./PageExample.vue";
@@ -19,6 +21,10 @@ const PERCENT = 100;
 const props = defineProps<ExamplesProps>();
 
 defineSlots<ExamplesSlots>();
+
+const isPreview = useIsPreview();
+
+if (isPreview) provideExampleKnobsContext({ setRenderKnobs: () => undefined });
 
 const activeIndex = shallowRef(0);
 const isModalOpen = shallowRef(false);
@@ -42,34 +48,51 @@ const viewSource = (exampleIndex: number) => {
 </script>
 
 <template>
-    <div :class="styles.examplesRootVariants[layout]" :style="{ gridTemplateColumns: columns }">
-        <PageExample
-            v-for="(example, exampleIndex) in items"
+    <template v-if="isPreview">
+        <div
+            v-for="example in items.slice(0, 1)"
             :key="example.key"
-            :example="example"
-            @view-source="viewSource(exampleIndex)"
+            :class="styles.exampleDemo"
+            data-demo=""
+            :data-testid="example.key"
         >
             <slot :name="example.key" />
-        </PageExample>
-    </div>
+        </div>
+    </template>
 
-    <Modal
-        v-model:visibility="isModalOpen"
-        :margins="CSSUtils.spreadMargin(40)"
-        :ariaLabel="`${items[activeIndex].name} source code`"
-    >
-        <template #renderOverlay="{ visibilityTarget, transitionDurationMs }">
-            <PageModalOverlay :visibility-target="visibilityTarget" :transition-duration-ms="transitionDurationMs" />
-        </template>
-
-        <template #renderContent="{ visibilityTarget, transitionDurationMs }">
-            <PageModalPanel
-                :visibility-target="visibilityTarget"
-                :transition-duration-ms="transitionDurationMs"
-                padding="0"
+    <template v-else>
+        <div :class="styles.examplesRootVariants[layout]" :style="{ gridTemplateColumns: columns }">
+            <PageExample
+                v-for="(example, exampleIndex) in items"
+                :key="example.key"
+                :example="example"
+                @view-source="viewSource(exampleIndex)"
             >
-                <PageSourceView :path="items[activeIndex].path!" />
-            </PageModalPanel>
-        </template>
-    </Modal>
+                <slot :name="example.key" />
+            </PageExample>
+        </div>
+
+        <Modal
+            v-model:visibility="isModalOpen"
+            :margins="CSSUtils.spreadMargin(40)"
+            :ariaLabel="`${items[activeIndex].name} source code`"
+        >
+            <template #renderOverlay="{ visibilityTarget, transitionDurationMs }">
+                <PageModalOverlay
+                    :visibility-target="visibilityTarget"
+                    :transition-duration-ms="transitionDurationMs"
+                />
+            </template>
+
+            <template #renderContent="{ visibilityTarget, transitionDurationMs }">
+                <PageModalPanel
+                    :visibility-target="visibilityTarget"
+                    :transition-duration-ms="transitionDurationMs"
+                    padding="0"
+                >
+                    <PageSourceView :path="items[activeIndex].path!" />
+                </PageModalPanel>
+            </template>
+        </Modal>
+    </template>
 </template>

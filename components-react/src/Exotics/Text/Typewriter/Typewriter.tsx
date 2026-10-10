@@ -205,7 +205,9 @@ export const Typewriter = (props: TypewriterProps) => {
         animationDelayMs,
     );
 
-    const caretIndex = TypewriterUtils.computeCaretIndex(startTimesMs, timeMs, isErasing, !isAnimating);
+    const hangingIndices = useMemo(() => LetterDriverUtils.getHangingIndices(state.segments), [state.segments]);
+
+    const caretIndex = TypewriterUtils.computeCaretIndex(startTimesMs, timeMs, isErasing, !isAnimating, hangingIndices);
 
     const getLetterAnimation = (index: number) => ({
         name: animationNames[index],

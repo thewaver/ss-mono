@@ -7,6 +7,7 @@ import type {
     InteractionFlags,
     InteractionSizing,
 } from "@thewaver/ss-components";
+import type { ShapeArrowAim } from "@thewaver/ss-utils";
 
 import type { TooltipProps } from "../../Essentials/Overlays/Tooltip/Tooltip.types";
 
@@ -33,13 +34,15 @@ export type InteractionControlSlots<TExtra extends object = {}> = {
 export type InteractionTooltipDefs<TExtra extends object = {}> = Omit<TooltipProps, "anchorRef"> & {
     /**
      * Draws the tooltip body. It is handed the control's state as well as the fade, since a tooltip on a control
-     * usually exists to explain the state it is in.
+     * usually exists to explain the state it is in, and last where an arrow pointing at the control would leave the
+     * body, as `Tooltip` hands it, for a body that draws one.
      */
     renderContent: (props: {
         visibilityTarget: 0 | 1;
         transitionDurationMs: number;
         placement: AnchorPlacement;
         flags: InteractionFlags<TExtra>;
+        arrowAim: ShapeArrowAim | undefined;
     }) => VNodeChild;
 };
 

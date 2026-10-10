@@ -75,12 +75,13 @@ export const InteractionWrapper = <TExtra extends object = {}>(props: Interactio
                 {(getDefs) => (
                     <Tooltip
                         {...getDefs()}
-                        renderContent={(getVisibilityTarget, getTransitionDurationMs, getPlacement) =>
+                        renderContent={(getVisibilityTarget, getTransitionDurationMs, getPlacement, getArrowAim) =>
                             getDefs().renderContent(
                                 getVisibilityTarget,
                                 getTransitionDurationMs,
                                 getPlacement,
                                 getFlags,
+                                getArrowAim,
                             )
                         }
                         anchorRef={getElementRef}

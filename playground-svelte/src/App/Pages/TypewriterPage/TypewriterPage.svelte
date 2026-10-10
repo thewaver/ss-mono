@@ -10,8 +10,8 @@
     import PageMeasureBox from "../../PageComponents/MeasureBox/MeasureBox.svelte";
     import PageProp from "../../PageComponents/Prop/Prop.svelte";
     import PagePropsPanel from "../../PageComponents/PropsPanel/PagePropsPanel.svelte";
-    import ComplexExampleWrapper from "./ComplexExampleWrapper.svelte";
     import CustomInputExampleWrapper from "./CustomInputExampleWrapper.svelte";
+    import ComplexExample from "./Examples/Complex.svelte";
     import KaraokeExample from "./Examples/Karaoke.svelte";
     import OutwardExample from "./Examples/Outward.svelte";
     import PhrasesExample from "./Examples/Phrases.svelte";
@@ -91,7 +91,7 @@
 </script>
 
 {#snippet complexExample()}
-    <ComplexExampleWrapper {...commonProps} />
+    <ComplexExample {...commonProps} />
 {/snippet}
 
 {#snippet customInputExample()}

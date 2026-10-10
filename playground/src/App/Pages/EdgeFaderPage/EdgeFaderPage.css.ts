@@ -6,14 +6,12 @@ import { themeVars } from "../../Theme.css";
 const tileBackground = `rgb(from ${layerVars.contrast} r g b / 10%)`;
 
 export const frame = style({
-    width: 320,
-    maxWidth: "100%",
+    width: "100%",
     height: 240,
 });
 
 export const autoHeightFrame = style({
-    width: 320,
-    maxWidth: "100%",
+    width: "100%",
 });
 
 export const column = style({

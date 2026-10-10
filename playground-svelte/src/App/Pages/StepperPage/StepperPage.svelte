@@ -67,6 +67,21 @@
 
     const examples: ExampleDefs[] = [
         {
+            key: "stacked",
+            name: "Stacked",
+            readout: () => `current: ${stackedCurrent} — the same steps down the page`,
+            component: stackedExample,
+            path: `${EXAMPLES_ROOT}/Stacked.svelte`,
+        },
+        {
+            key: "detailed",
+            name: "Steps that carry their own content",
+            readout: () =>
+                `current: ${detailedCurrent} — each step holds a body beside the connector, so the line runs past the content rather than stopping at it`,
+            component: detailedExample,
+            path: `${EXAMPLES_ROOT}/Detailed.svelte`,
+        },
+        {
             key: "linear",
             name: "Linear",
             readout: () =>
@@ -83,19 +98,11 @@
             path: `${EXAMPLES_ROOT}/Failed.svelte`,
         },
         {
-            key: "stacked",
-            name: "Stacked",
-            readout: () => `current: ${stackedCurrent} — the same steps down the page`,
-            component: stackedExample,
-            path: `${EXAMPLES_ROOT}/Stacked.svelte`,
-        },
-        {
-            key: "detailed",
-            name: "Steps that carry their own content",
-            readout: () =>
-                `current: ${detailedCurrent} — each step holds a body beside the connector, so the line runs past the content rather than stopping at it`,
-            component: detailedExample,
-            path: `${EXAMPLES_ROOT}/Detailed.svelte`,
+            key: "bare",
+            name: "No connector",
+            readout: () => "the connector slot is optional, so a bare strip renders nothing between the steps",
+            component: bareExample,
+            path: `${EXAMPLES_ROOT}/Bare.svelte`,
         },
         {
             key: "arc",
@@ -105,13 +112,6 @@
                 `current: ${arcCurrent} — one layout function, and the run between two steps follows the curve they sit on rather than cutting across it`,
             component: arcExample,
             path: `${EXAMPLES_ROOT}/Arc.svelte`,
-        },
-        {
-            key: "bare",
-            name: "No connector",
-            readout: () => "the connector slot is optional, so a bare strip renders nothing between the steps",
-            component: bareExample,
-            path: `${EXAMPLES_ROOT}/Bare.svelte`,
         },
     ];
 </script>

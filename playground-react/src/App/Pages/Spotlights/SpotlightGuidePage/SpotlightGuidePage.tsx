@@ -54,27 +54,6 @@ export const SpotlightGuidePage = () => {
 
     const examples = [
         {
-            key: "guide",
-            name: "Guide",
-            readout: () => `step: ${step + 1} of ${TOUR_STEPS.length} — ${finished}`,
-            component: () => (
-                <GuideExample
-                    visibility={visibilityState}
-                    step={step}
-                    onStepChange={setStep}
-                    onStart={() => {
-                        setStep(0);
-                        setFinished("running");
-                    }}
-                    onEnd={(reason) => {
-                        visibilityState[1](false);
-                        setFinished(reason);
-                    }}
-                />
-            ),
-            path: `${EXAMPLES_ROOT}/Guide.tsx`,
-        },
-        {
             key: "tour",
             name: "A tour with a step the reader does",
             span: 2,
@@ -105,6 +84,27 @@ export const SpotlightGuidePage = () => {
                 />
             ),
             path: `${EXAMPLES_ROOT}/Tour.tsx`,
+        },
+        {
+            key: "guide",
+            name: "Guide",
+            readout: () => `step: ${step + 1} of ${TOUR_STEPS.length} — ${finished}`,
+            component: () => (
+                <GuideExample
+                    visibility={visibilityState}
+                    step={step}
+                    onStepChange={setStep}
+                    onStart={() => {
+                        setStep(0);
+                        setFinished("running");
+                    }}
+                    onEnd={(reason) => {
+                        visibilityState[1](false);
+                        setFinished(reason);
+                    }}
+                />
+            ),
+            path: `${EXAMPLES_ROOT}/Guide.tsx`,
         },
     ];
 

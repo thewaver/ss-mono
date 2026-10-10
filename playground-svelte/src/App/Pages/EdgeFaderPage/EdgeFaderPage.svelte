@@ -104,4 +104,4 @@
     </PageProp>
 </PagePropsPanel>
 
-<PageExamples items={examples} minColumnWidth={360} />
+<PageExamples items={examples} minColumnWidth={400} />

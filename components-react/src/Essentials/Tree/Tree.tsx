@@ -349,6 +349,7 @@ export const Tree = <T,>(props: TreeProps<T>) => {
                 isTabbable={row.node.value === rovingRow?.node.value}
                 tooltipDefs={row.node.tooltipDefs}
                 extraFlags={{
+                    value: row.node.value,
                     isBranch: TreeUtils.getIsBranch(row.node),
                     isExpanded: row.isExpanded,
                     isPending: TreeUtils.computeIsPending(row),
@@ -365,7 +366,7 @@ export const Tree = <T,>(props: TreeProps<T>) => {
                         setSize={row.setSize}
                         flags={renderProps}
                         linkComponent={props.linkComponent}
-                        renderContent={(nodeFlags) => props.renderNode(row.node, nodeFlags)}
+                        renderContent={() => props.renderNode(row.node, renderProps)}
                         onActivate={() => activate(row)}
                     />
                 )}

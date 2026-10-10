@@ -12,8 +12,8 @@ import PageSelectField from "../../PageComponents/Field/PageSelectField.vue";
 import PageMeasureBox from "../../PageComponents/MeasureBox/MeasureBox.vue";
 import PageProp from "../../PageComponents/Prop/Prop.vue";
 import PagePropsPanel from "../../PageComponents/PropsPanel/PagePropsPanel.vue";
-import ComplexExampleWrapper from "./ComplexExampleWrapper.vue";
 import CustomInputExampleWrapper from "./CustomInputExampleWrapper.vue";
+import ComplexExample from "./Examples/Complex.vue";
 import KaraokeExample from "./Examples/Karaoke.vue";
 import OutwardExample from "./Examples/Outward.vue";
 import PhrasesExample from "./Examples/Phrases.vue";
@@ -137,7 +137,7 @@ const examples: ExampleDefs[] = [
 
         <PageExamples :items="examples" layout="flow">
             <template #complex>
-                <ComplexExampleWrapper v-bind="commonProps" />
+                <ComplexExample v-bind="commonProps" />
             </template>
 
             <template #customInput>

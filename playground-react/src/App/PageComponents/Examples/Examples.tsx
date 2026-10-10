@@ -11,6 +11,7 @@ import { PageTooltipContent } from "../../StyledComponents/TooltipContent/Toolti
 import { PageExampleKnobsButton } from "../ExampleKnobs/ExampleKnobs";
 import { ExampleKnobsContextProvider } from "../ExampleKnobs/ExampleKnobs.context";
 import { PageLayer } from "../Layer/Layer";
+import { useIsPreview } from "../Preview/Preview.context";
 import { PageSourceView } from "../SourceView/SourceView";
 import type { ExampleProps, ExamplesProps } from "./Examples.types";
 
@@ -18,6 +19,8 @@ const DEFAULT_LAYOUT = "grid" as const;
 const DEFAULT_MIN_COLUMN_WIDTH = 320;
 const SINGLE_SPAN = 1;
 const PERCENT = 100;
+
+const PREVIEW_KNOBS_CONTEXT = { setRenderKnobs: () => undefined };
 
 const PageExample = (props: ExampleProps) => {
     const [renderKnobs, setRenderKnobs] = useState<() => ReactNode>();
@@ -86,7 +89,20 @@ const PageExample = (props: ExampleProps) => {
     );
 };
 
-export const PageExamples = (props: ExamplesProps) => {
+const PagePreviewExample = (props: Pick<ExampleProps, "example">) => {
+    const demo = useMemo(() => props.example.component(), [props.example]);
+
+    return (
+        <div className={styles.exampleDemo} data-demo="" data-testid={props.example.key}>
+            <ExampleKnobsContextProvider value={PREVIEW_KNOBS_CONTEXT}>{demo}</ExampleKnobsContextProvider>
+        </div>
+    );
+};
+
+const PageFirstExample = (props: ExamplesProps) =>
+    props.items.slice(0, 1).map((example) => <PagePreviewExample key={example.key} example={example} />);
+
+const PageExampleList = (props: ExamplesProps) => {
     const [activeIndex, setActiveIndex] = useState(0);
     const modalVisibility = useState(false);
     const [, setIsModalOpen] = modalVisibility;
@@ -140,3 +156,6 @@ export const PageExamples = (props: ExamplesProps) => {
         </>
     );
 };
+
+export const PageExamples = (props: ExamplesProps) =>
+    useIsPreview() ? <PageFirstExample {...props} /> : <PageExampleList {...props} />;

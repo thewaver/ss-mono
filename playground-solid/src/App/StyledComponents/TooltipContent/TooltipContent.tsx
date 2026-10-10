@@ -11,8 +11,6 @@ import { CSSUtils, ShapeConst, ShapeUtils } from "@thewaver/ss-utils";
 import { PageLayer } from "../../PageComponents/Layer/Layer";
 import type { TooltipContentProps } from "./TooltipContent.types";
 
-const TINT_GRADIENT_ANGLE = 45;
-
 export const PageTooltipContent = (props: ParentProps<TooltipContentProps>) => {
     const getArrow = () => {
         const arrow = access(props.arrow) ?? "none";
@@ -35,21 +33,11 @@ export const PageTooltipContent = (props: ParentProps<TooltipContentProps>) => {
                     <GlassSurface
                         borderRadii={() => CSSUtils.spreadRadius(BORDER_RADIUS_FULL)}
                         glassDefs={() => ({
-                            tint: {
-                                opacity: 1,
-                                gradient: {
-                                    kind: "linear",
-                                    angle: TINT_GRADIENT_ANGLE,
-                                    colors: [
-                                        { value: themeVars.color.surface.dark },
-                                        { value: themeVars.color.surface.light },
-                                    ],
-                                },
-                            },
+                            tint: { color: themeVars.color.surface.dark, opacity: 1 },
                             sheen: { specularConstant: 0 },
                         })}
                     >
-                        <div class={styles.tooltipBody}>
+                        <div class={styles.tooltipBody} classList={{ [styles.tooltipBodyWide]: access(props.isWide) }}>
                             <PageLayer level={2}>{props.children}</PageLayer>
                         </div>
                     </GlassSurface>
@@ -73,7 +61,10 @@ export const PageTooltipContent = (props: ParentProps<TooltipContentProps>) => {
                             }
                             computeFillDefs={() => [{ color: themeVars.color.surface.dark }]}
                             renderChildren={() => (
-                                <div class={styles.tooltipBody}>
+                                <div
+                                    class={styles.tooltipBody}
+                                    classList={{ [styles.tooltipBodyWide]: access(props.isWide) }}
+                                >
                                     <PageLayer level={2}>{props.children}</PageLayer>
                                 </div>
                             )}

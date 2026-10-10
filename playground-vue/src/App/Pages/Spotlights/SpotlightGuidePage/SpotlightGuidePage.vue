@@ -78,18 +78,18 @@ const endTour = (reason: string) => {
 
 const examples: ExampleDefs[] = [
     {
-        key: "guide",
-        name: "Guide",
-        readout: () => `step: ${step.value + 1} of ${TOUR_STEPS.length} — ${finished.value}`,
-        path: `${EXAMPLES_ROOT}/Guide.vue`,
-    },
-    {
         key: "tour",
         name: "A tour with a step the reader does",
         span: 2,
         readout: () =>
             `step: ${tourStep.value + 1} of ${RICH_TOUR_STEPS.length} — ${tourStatus.value} — basket: ${basketCount.value}. The guide holds the whole page still, so on step 2 it closes and a prompt lights the button instead, and pressing it reopens the guide; the step is kept in sessionStorage, so reloading offers to resume`,
         path: `${EXAMPLES_ROOT}/Tour.vue`,
+    },
+    {
+        key: "guide",
+        name: "Guide",
+        readout: () => `step: ${step.value + 1} of ${TOUR_STEPS.length} — ${finished.value}`,
+        path: `${EXAMPLES_ROOT}/Guide.vue`,
     },
 ];
 </script>

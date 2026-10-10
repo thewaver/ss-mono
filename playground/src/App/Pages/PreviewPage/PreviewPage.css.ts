@@ -7,6 +7,7 @@ export const paragraphs = style({
     display: "flex",
     flexDirection: "column",
     gap: themeVars.spacing.full,
+    paddingBottom: themeVars.spacing.full,
 });
 
 export const panel = style({

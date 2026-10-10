@@ -12,4 +12,5 @@ export type TooltipContentProps = {
     arrowWidth?: number;
     arrowLength?: number;
     arrowAim?: ShapeArrowAim;
+    isWide?: boolean;
 };

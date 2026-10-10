@@ -1,10 +1,17 @@
+import type { ReactNode } from "react";
 import { Fragment, Suspense, lazy, useEffect, useMemo, useState } from "react";
 import { BrowserRouter, Link, Navigate, Outlet, Route, Routes, useLocation } from "react-router";
 import COMPONENT_DEPENDENCIES from "virtual:component-dependencies";
 import type { DependencyNames } from "virtual:component-dependencies";
 
 import { Collapsible, Sidebar, Tree, ViewportWrapper } from "@thewaver/ss-components-react";
-import type { SidebarPhase, TreeNode } from "@thewaver/ss-components-react";
+import type {
+    AnchorPlacement,
+    InteractionTooltipDefs,
+    SidebarPhase,
+    TreeNode,
+    TreeNodeRenderProps,
+} from "@thewaver/ss-components-react";
 import * as styles from "@thewaver/ss-playground/App/App.css";
 import { IS_BUILD_PROGRESS_SHOWN } from "@thewaver/ss-playground/App/PageComponents/BuildProgress/BuildProgress.utils";
 import {
@@ -30,6 +37,7 @@ import {
     MENU_EDGE,
     MENU_EXPANDED_WIDTH,
     MENU_ID,
+    PREVIEW_EXCLUDED_PAGES,
     SEARCH_FIELD_WIDTH,
 } from "./App.const";
 import type { ComponentConfig, MenuBranchConfig, MenuNodeConfig } from "./App.types";
@@ -41,12 +49,15 @@ import { PageNavLink } from "./PageComponents/NavLink/NavLink";
 import { PageNavSettings } from "./PageComponents/NavSettings/NavSettings";
 import { DEFAULT_VIEWPORT_ANCHOR } from "./PageComponents/NavSettings/NavSettings.const";
 import type { ViewportAnchor } from "./PageComponents/NavSettings/NavSettings.types";
+import { PagePreview } from "./PageComponents/Preview/Preview";
 import { PageRouterLink } from "./PageComponents/RouterLink/RouterLink";
 import { PageSidebarToggle } from "./PageComponents/SidebarToggle/SidebarToggle";
 import { PageViewTabs } from "./PageComponents/ViewTabs/ViewTabs";
 import type { PageViewKey } from "./PageComponents/ViewTabs/ViewTabs.types";
+import type { GallerySection } from "./Pages/GalleryPage/GalleryPage.types";
 import { renderPageHighlightFloater } from "./StyledComponents/GlideFloater/GlideFloater";
 import { useLayerClass } from "./StyledComponents/Layer/Layer.context";
+import { PageTooltipContent } from "./StyledComponents/TooltipContent/TooltipContent";
 import { PageTreeNodeContent } from "./StyledComponents/TreeNodeContent/TreeNodeContent";
 
 const PageDocsView = lazy(() =>
@@ -56,6 +67,21 @@ const PageDocsView = lazy(() =>
 const PageAboutPage = lazy(() =>
     import("./Pages/AboutPage/AboutPage").then((module) => ({ default: module.AboutPage })),
 );
+
+const PageGettingStartedPage = lazy(() =>
+    import("./Pages/GettingStartedPage/GettingStartedPage").then((module) => ({ default: module.GettingStartedPage })),
+);
+
+const PageGalleryPage = lazy(() =>
+    import("./Pages/GalleryPage/GalleryPage").then((module) => ({ default: module.GalleryPage })),
+);
+
+const GETTING_STARTED_ROUTE = "/getting-started";
+const GALLERY_ROUTE = "/gallery";
+const GALLERY_NAME_SEPARATOR = " / ";
+const NAV_PREVIEW_PLACEMENT: AnchorPlacement = { x: "right-out", y: "center" };
+const NAV_PREVIEW_OFFSET = { x: 10, y: 0 };
+const NAV_PREVIEW_ARROW = "triangle";
 
 const getIsBranchConfig = (node: MenuNodeConfig): node is MenuBranchConfig => "children" in node;
 
@@ -69,12 +95,39 @@ const flattenConfigs = (nodes: MenuNodeConfig[]): ComponentConfig[] =>
 const toPageHref = (config: ComponentConfig, view: PageViewKey) =>
     toPageViewRoute(componentToRouteName(config.name), config.component === undefined ? "docs" : view);
 
+const getHasPreview = (config: ComponentConfig): config is Required<ComponentConfig> =>
+    config.component !== undefined && !PREVIEW_EXCLUDED_PAGES.includes(config.name);
+
+const toPreviewTooltipDefs = (component: () => ReactNode): InteractionTooltipDefs<TreeNodeRenderProps> => ({
+    placement: NAV_PREVIEW_PLACEMENT,
+    offset: NAV_PREVIEW_OFFSET,
+    renderContent: (visibilityTarget, transitionDurationMs, _placement, _flags, arrowAim) => (
+        <PageTooltipContent
+            visibilityTarget={visibilityTarget}
+            transitionDurationMs={transitionDurationMs}
+            arrow={NAV_PREVIEW_ARROW}
+            arrowAim={arrowAim}
+            isWide={true}
+        >
+            <div className={styles.navPreview} aria-hidden="true" inert={true}>
+                <PageLayer level={1}>
+                    <PagePreview component={component} />
+                </PageLayer>
+            </div>
+        </PageTooltipContent>
+    ),
+});
+
 const toTreeNode =
     (view: PageViewKey) =>
     (node: MenuNodeConfig): TreeNode<MenuNodeConfig> =>
         getIsBranchConfig(node)
             ? { value: node, children: node.children.map(toTreeNode(view)) }
-            : { value: node, href: toPageHref(node, view) };
+            : {
+                  value: node,
+                  href: toPageHref(node, view),
+                  tooltipDefs: getHasPreview(node) ? toPreviewTooltipDefs(node.component) : undefined,
+              };
 
 const collectAncestors = (
     nodes: MenuNodeConfig[],
@@ -115,6 +168,19 @@ const COMPONENT_CONFIGS = flattenConfigs(MENU_CONFIGS);
 const ANCESTORS_BY_CONFIG = new Map<MenuNodeConfig, MenuBranchConfig[]>();
 
 collectAncestors(VISIBLE_MENU_CONFIGS, [], ANCESTORS_BY_CONFIG);
+
+const toGalleryName = (config: ComponentConfig) =>
+    [...(ANCESTORS_BY_CONFIG.get(config) ?? []).slice(1), config].map((node) => node.name).join(GALLERY_NAME_SEPARATOR);
+
+const GALLERY_SECTIONS: GallerySection[] = VISIBLE_MENU_CONFIGS.map((category) => ({
+    name: category.name,
+    description: category.description,
+    items: flattenConfigs([category]).flatMap((config) =>
+        getHasPreview(config)
+            ? [{ name: toGalleryName(config), href: componentToRouteName(config.name), component: config.component }]
+            : [],
+    ),
+})).filter((section) => section.items.length > 0);
 
 const COMPONENT_CONFIGS_BY_ROUTE: Record<string, ComponentConfig | undefined> = Object.fromEntries(
     COMPONENT_CONFIGS.map((config) => [componentToRouteName(config.name), config]),
@@ -255,6 +321,8 @@ export function AppContent(props: { viewportAnchor: readonly [ViewportAnchor, (v
     const selectedConfig = COMPONENT_CONFIGS_BY_ROUTE[toBaseRoute(location.pathname)];
 
     const isAboutSelected = location.pathname === "/";
+    const isGettingStartedSelected = location.pathname === GETTING_STARTED_ROUTE;
+    const isGallerySelected = location.pathname === GALLERY_ROUTE;
 
     useEffect(restoreRootSlash, [location.pathname]);
 
@@ -400,6 +468,14 @@ export function AppContent(props: { viewportAnchor: readonly [ViewportAnchor, (v
                                         <PageNavLink href={"/"} isSelected={isAboutSelected}>
                                             {"About"}
                                         </PageNavLink>
+
+                                        <PageNavLink href={GETTING_STARTED_ROUTE} isSelected={isGettingStartedSelected}>
+                                            {"Getting started"}
+                                        </PageNavLink>
+
+                                        <PageNavLink href={GALLERY_ROUTE} isSelected={isGallerySelected}>
+                                            {"Gallery"}
+                                        </PageNavLink>
                                     </div>
 
                                     <div
@@ -525,6 +601,8 @@ export function App() {
                         }
                     >
                         <Route index={true} element={<PageAboutPage />} />
+                        <Route path={GETTING_STARTED_ROUTE} element={<PageGettingStartedPage />} />
+                        <Route path={GALLERY_ROUTE} element={<PageGalleryPage sections={GALLERY_SECTIONS} />} />
                         {COMPONENT_CONFIGS.map((config) => (
                             <Route key={config.name} path={componentToRouteName(config.name)}>
                                 <Route

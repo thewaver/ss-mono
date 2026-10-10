@@ -202,6 +202,50 @@ export namespace LetterDriverUtils {
     };
 
     /**
+     * The width a text's lines may take inside an element, in whole pixels, rounded down.
+     *
+     * `clientWidth` rounds to the nearest pixel, so where a scrollbar or a scaled display leaves room such as 349.6
+     * pixels it answers 350, and lines laid out to it are wider than the room they are in — by less than a pixel,
+     * which no measurement in whole pixels shows, and which the browser still answers with a horizontal scrollbar.
+     * This reads the exact width the element lays its content out in, padding included as `clientWidth` includes it,
+     * and rounds it down.
+     *
+     * @param element The element the lines are laid out in. One with no box of its own, such as an inline element,
+     * falls back to its `clientWidth`.
+     * @returns The width, never more than the room the element has.
+     */
+    export const measureLineWidth = (element: HTMLElement) => {
+        const style = getComputedStyle(element);
+        const width = Number.parseFloat(style.width);
+
+        if (!Number.isFinite(width)) return element.clientWidth;
+
+        const borders = Number.parseFloat(style.borderLeftWidth) + Number.parseFloat(style.borderRightWidth);
+        const paddings = Number.parseFloat(style.paddingLeft) + Number.parseFloat(style.paddingRight);
+
+        return Math.floor(style.boxSizing === "border-box" ? width - borders : width + paddings);
+    };
+
+    /**
+     * Every character that hangs at the end of a wrapped line, by its place among all of them.
+     *
+     * These are the white space `JSXTextParserUtils.getInlinedSegments` splits off and draws taking no room, so a
+     * caller placing something after one of them can place it after the character before instead — see
+     * `JSXTextParserUtils.getIsHanging`.
+     *
+     * @param segments The segments, from {@link indexSegments}.
+     * @returns The places of the hanging characters.
+     */
+    export const getHangingIndices = (segments: readonly LetterSegment[]) =>
+        new Set(
+            segments.flatMap((segment) =>
+                JSXTextParserUtils.getIsHanging(segment) && segment.type === "text"
+                    ? Array.from(segment.text, (_, offset) => segment.startIndex + offset)
+                    : [],
+            ),
+        );
+
+    /**
      * Whether a segment takes a place among the animated characters.
      *
      * @param segment A segment from {@link indexSegments}.

@@ -59,6 +59,12 @@ export const overlayOff = style({
     backdropFilter: "none",
 });
 
+export const tourRow = style({
+    display: "flex",
+    alignItems: "center",
+    gap: themeVars.spacing.full,
+});
+
 export const tourStrip = style({
     display: "flex",
     flexDirection: "column",

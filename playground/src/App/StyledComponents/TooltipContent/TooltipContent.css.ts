@@ -90,3 +90,7 @@ export const tooltipBody = style({
 
     maxWidth: 240,
 });
+
+export const tooltipBodyWide = style({
+    maxWidth: "none",
+});

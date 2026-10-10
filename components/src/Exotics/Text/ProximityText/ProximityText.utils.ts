@@ -114,7 +114,7 @@ export namespace ProximityTextUtils {
 
             if (!container || opts.getIsDriven?.()) return false;
 
-            const width = container.clientWidth;
+            const width = LetterDriverUtils.measureLineWidth(container);
 
             if (!isForced && width === store.get().width) return false;
 

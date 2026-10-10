@@ -6,7 +6,6 @@ import { RICH_TOUR_STEPS } from "@thewaver/ss-playground/App/Pages/Spotlights/Sp
 import { PADDING } from "@thewaver/ss-playground/App/Pages/Spotlights/SpotlightTourSteps.const";
 import * as styles from "@thewaver/ss-playground/App/Pages/Spotlights/Spotlights.css";
 
-import PageControlRow from "../../../../PageComponents/ControlRow/PageControlRow.vue";
 import PageButtonContent from "../../../../StyledComponents/ButtonContent/ButtonContent.vue";
 import { useLayerClass } from "../../../../StyledComponents/Layer/Layer.context";
 import PageSpotlightPopup from "../../../../StyledComponents/SpotlightPopup/PageSpotlightPopup.vue";
@@ -79,7 +78,7 @@ const start = () => {
 
 <template>
     <div :class="[styles.root, layerClass]">
-        <PageControlRow>
+        <div :class="styles.tourRow">
             <div ref="shelfRef" :class="styles.tourTarget">Potatoes</div>
 
             <Button id="tourAdd" :ref="setAddRef" @click="add">
@@ -95,7 +94,7 @@ const start = () => {
                     <PageButtonContent :flags="flags">Checkout</PageButtonContent>
                 </template>
             </Button>
-        </PageControlRow>
+        </div>
 
         <Button id="tourStart" @click="start">
             <template #renderContent="flags">

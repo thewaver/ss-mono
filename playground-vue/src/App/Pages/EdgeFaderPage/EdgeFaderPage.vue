@@ -83,7 +83,7 @@ const examples: ExampleDefs[] = [
         </PageProp>
     </PagePropsPanel>
 
-    <PageExamples :items="examples" :min-column-width="360">
+    <PageExamples :items="examples" :min-column-width="400">
         <template #column>
             <ColumnExample :size="size" :is-scroll-aware="isScrollAware" />
         </template>

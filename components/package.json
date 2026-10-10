@@ -129,9 +129,9 @@
     },
     "devDependencies": {
         "@thewaver/ss-utils": "^0.0.26",
-        "@vanilla-extract/css": "^1.21.2",
+        "@vanilla-extract/css": "^1.21.3",
         "@vanilla-extract/vite-plugin": "^5.2.6",
         "tsup": "^8.5.1",
-        "vite": "^8.3.0"
+        "vite": "^8.3.4"
     }
 }

@@ -28,7 +28,6 @@ export const stack = style({
     flexDirection: "column",
     gap: themeVars.spacing.full,
     alignItems: "flex-start",
-    width: "100%",
 });
 
 export const controls = style({

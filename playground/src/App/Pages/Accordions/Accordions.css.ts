@@ -3,6 +3,12 @@ import { keyframes, style } from "@vanilla-extract/css";
 import { layerVars } from "../../StyledComponents/Layer/Layer.css";
 import { themeVars } from "../../Theme.css";
 
+export const textWithPanel = style({
+    display: "flex",
+    flexDirection: "column",
+    gap: themeVars.spacing.full,
+});
+
 export const scrollBox = style({
     height: 160,
     overflowY: "auto",

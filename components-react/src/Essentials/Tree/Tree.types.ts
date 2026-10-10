@@ -21,9 +21,9 @@ export type TreeLinkProps = AnchorHTMLAttributes<HTMLAnchorElement> & {
     ref?: Ref<HTMLAnchorElement>;
 };
 
-export type TreeNode<T> = TreeNodeRecord<T, InteractionTooltipDefs<TreeNodeRenderProps>>;
+export type TreeNode<T> = TreeNodeRecord<T, InteractionTooltipDefs<TreeNodeRenderProps<T>>>;
 
-export type TreeRow<T> = TreeRecordRow<T, InteractionTooltipDefs<TreeNodeRenderProps>>;
+export type TreeRow<T> = TreeRecordRow<T, InteractionTooltipDefs<TreeNodeRenderProps<T>>>;
 
 export type TreeNodeItemProps = InteractionControlProps<TreeNodeRenderProps> & {
     /** How deep this node sits, as assistive technology counts it — from one rather than from zero. */
@@ -88,7 +88,7 @@ export type TreeProps<T> = {
     /** The text a node is found by when the reader types, where that is not its visible text. */
     computeCustomText?: (node: TreeNode<T>) => string;
     /** Draws one node. It is handed the interaction state and where the node sits in the tree. */
-    renderNode: (node: TreeNode<T>, renderProps: InteractionFlags<TreeNodeRenderProps>) => ReactNode;
+    renderNode: (node: TreeNode<T>, renderProps: InteractionFlags<TreeNodeRenderProps<T>>) => ReactNode;
     /** Draws what stands in for a branch's children while they are still being fetched. */
     renderPendingChildren?: (node: TreeNode<T>, depth: number) => ReactNode;
     /** Runs when a different node is selected. */

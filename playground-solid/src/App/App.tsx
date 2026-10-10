@@ -1,10 +1,17 @@
-import { Index, Show, createEffect, createMemo, createSignal, lazy, on, onCleanup, onMount } from "solid-js";
+import { Index, type JSX, Show, createEffect, createMemo, createSignal, lazy, on, onCleanup, onMount } from "solid-js";
 import COMPONENT_DEPENDENCIES from "virtual:component-dependencies";
 import type { DependencyNames } from "virtual:component-dependencies";
 
 import { A, Navigate, Route, type RouteSectionProps, Router } from "@solidjs/router";
 import { Collapsible, Sidebar, Tree, ViewportWrapper } from "@thewaver/ss-components-solid";
-import type { SidebarPhase, SignalPair, TreeNode } from "@thewaver/ss-components-solid";
+import type {
+    AnchorPlacement,
+    InteractionTooltipDefs,
+    SidebarPhase,
+    SignalPair,
+    TreeNode,
+    TreeNodeRenderProps,
+} from "@thewaver/ss-components-solid";
 import * as styles from "@thewaver/ss-playground/App/App.css";
 import { IS_BUILD_PROGRESS_SHOWN } from "@thewaver/ss-playground/App/PageComponents/BuildProgress/BuildProgress.utils";
 import {
@@ -31,6 +38,7 @@ import {
     MENU_EDGE,
     MENU_EXPANDED_WIDTH,
     MENU_ID,
+    PREVIEW_EXCLUDED_PAGES,
     SEARCH_FIELD_WIDTH,
 } from "./App.const";
 import type { ComponentConfig, MenuBranchConfig, MenuNodeConfig } from "./App.types";
@@ -42,11 +50,14 @@ import { PageNavLink } from "./PageComponents/NavLink/NavLink";
 import { PageNavSettings } from "./PageComponents/NavSettings/NavSettings";
 import { DEFAULT_VIEWPORT_ANCHOR } from "./PageComponents/NavSettings/NavSettings.const";
 import type { ViewportAnchor } from "./PageComponents/NavSettings/NavSettings.types";
+import { PagePreview } from "./PageComponents/Preview/Preview";
 import { PageSidebarToggle } from "./PageComponents/SidebarToggle/SidebarToggle";
 import { PageViewTabs } from "./PageComponents/ViewTabs/ViewTabs";
 import type { PageViewKey } from "./PageComponents/ViewTabs/ViewTabs.types";
+import type { GallerySection } from "./Pages/GalleryPage/GalleryPage.types";
 import { renderPageHighlightFloater } from "./StyledComponents/GlideFloater/GlideFloater";
 import { useLayerClass } from "./StyledComponents/Layer/Layer.context";
+import { PageTooltipContent } from "./StyledComponents/TooltipContent/TooltipContent";
 import { PageTreeNodeContent } from "./StyledComponents/TreeNodeContent/TreeNodeContent";
 
 const PageDocsView = lazy(() =>
@@ -57,7 +68,22 @@ const PageAboutPage = lazy(() =>
     import("./Pages/AboutPage/AboutPage").then((module) => ({ default: module.AboutPage })),
 );
 
+const PageGettingStartedPage = lazy(() =>
+    import("./Pages/GettingStartedPage/GettingStartedPage").then((module) => ({ default: module.GettingStartedPage })),
+);
+
+const PageGalleryPage = lazy(() =>
+    import("./Pages/GalleryPage/GalleryPage").then((module) => ({ default: module.GalleryPage })),
+);
+
 const PassThroughPage = (props: RouteSectionProps) => <>{props.children}</>;
+
+const GETTING_STARTED_ROUTE = "/getting-started";
+const GALLERY_ROUTE = "/gallery";
+const GALLERY_NAME_SEPARATOR = " / ";
+const NAV_PREVIEW_PLACEMENT: AnchorPlacement = { x: "right-out", y: "center" };
+const NAV_PREVIEW_OFFSET = { x: 10, y: 0 };
+const NAV_PREVIEW_ARROW = "triangle";
 
 const getIsBranchConfig = (node: MenuNodeConfig): node is MenuBranchConfig => "children" in node;
 
@@ -71,12 +97,39 @@ const flattenConfigs = (nodes: MenuNodeConfig[]): ComponentConfig[] =>
 const toPageHref = (config: ComponentConfig, view: PageViewKey) =>
     toPageViewRoute(componentToRouteName(config.name), config.component === undefined ? "docs" : view);
 
+const getHasPreview = (config: ComponentConfig): config is Required<ComponentConfig> =>
+    config.component !== undefined && !PREVIEW_EXCLUDED_PAGES.includes(config.name);
+
+const toPreviewTooltipDefs = (component: () => JSX.Element): InteractionTooltipDefs<TreeNodeRenderProps> => ({
+    placement: NAV_PREVIEW_PLACEMENT,
+    offset: NAV_PREVIEW_OFFSET,
+    renderContent: (getVisibilityTarget, getTransitionDurationMs, _getPlacement, _getFlags, getArrowAim) => (
+        <PageTooltipContent
+            visibilityTarget={getVisibilityTarget}
+            transitionDurationMs={getTransitionDurationMs}
+            arrow={NAV_PREVIEW_ARROW}
+            arrowAim={getArrowAim}
+            isWide={true}
+        >
+            <div class={styles.navPreview} aria-hidden="true" inert>
+                <PageLayer level={1}>
+                    <PagePreview component={component} />
+                </PageLayer>
+            </div>
+        </PageTooltipContent>
+    ),
+});
+
 const toTreeNode =
     (view: PageViewKey) =>
     (node: MenuNodeConfig): TreeNode<MenuNodeConfig> =>
         getIsBranchConfig(node)
             ? { value: node, children: node.children.map(toTreeNode(view)) }
-            : { value: node, href: toPageHref(node, view) };
+            : {
+                  value: node,
+                  href: toPageHref(node, view),
+                  tooltipDefs: getHasPreview(node) ? toPreviewTooltipDefs(node.component) : undefined,
+              };
 
 const collectAncestors = (
     nodes: MenuNodeConfig[],
@@ -117,6 +170,19 @@ const COMPONENT_CONFIGS = flattenConfigs(MENU_CONFIGS);
 const ANCESTORS_BY_CONFIG = new Map<MenuNodeConfig, MenuBranchConfig[]>();
 
 collectAncestors(VISIBLE_MENU_CONFIGS, [], ANCESTORS_BY_CONFIG);
+
+const toGalleryName = (config: ComponentConfig) =>
+    [...(ANCESTORS_BY_CONFIG.get(config) ?? []).slice(1), config].map((node) => node.name).join(GALLERY_NAME_SEPARATOR);
+
+const GALLERY_SECTIONS: GallerySection[] = VISIBLE_MENU_CONFIGS.map((category) => ({
+    name: category.name,
+    description: category.description,
+    items: flattenConfigs([category]).flatMap((config) =>
+        getHasPreview(config)
+            ? [{ name: toGalleryName(config), href: componentToRouteName(config.name), component: config.component }]
+            : [],
+    ),
+})).filter((section) => section.items.length > 0);
 
 const COMPONENT_CONFIGS_BY_ROUTE = Object.fromEntries(
     COMPONENT_CONFIGS.map((config) => [componentToRouteName(config.name), config]),
@@ -272,6 +338,10 @@ export function AppContent(props: RouteSectionProps & { viewportAnchor: SignalPa
 
     const getIsAboutSelected = () => toRoutePath(props.location.pathname) === "/";
 
+    const getIsGettingStartedSelected = () => toRoutePath(props.location.pathname) === GETTING_STARTED_ROUTE;
+
+    const getIsGallerySelected = () => toRoutePath(props.location.pathname) === GALLERY_ROUTE;
+
     const getIsSearching = createMemo(() => getSearchTerm().trim().length > 0);
 
     const getVisibleNodes = createMemo(() => {
@@ -413,6 +483,17 @@ export function AppContent(props: RouteSectionProps & { viewportAnchor: SignalPa
                                         <PageNavLink href={"/"} isSelected={getIsAboutSelected()}>
                                             {"About"}
                                         </PageNavLink>
+
+                                        <PageNavLink
+                                            href={GETTING_STARTED_ROUTE}
+                                            isSelected={getIsGettingStartedSelected()}
+                                        >
+                                            {"Getting started"}
+                                        </PageNavLink>
+
+                                        <PageNavLink href={GALLERY_ROUTE} isSelected={getIsGallerySelected()}>
+                                            {"Gallery"}
+                                        </PageNavLink>
                                     </div>
 
                                     <div
@@ -536,6 +617,8 @@ export function App() {
                     )}
                 >
                     <Route path="/" component={PageAboutPage} />
+                    <Route path={GETTING_STARTED_ROUTE} component={PageGettingStartedPage} />
+                    <Route path={GALLERY_ROUTE} component={() => <PageGalleryPage sections={GALLERY_SECTIONS} />} />
                     {COMPONENT_CONFIGS.map((config) => (
                         <Route path={componentToRouteName(config.name)} component={PassThroughPage}>
                             <Route

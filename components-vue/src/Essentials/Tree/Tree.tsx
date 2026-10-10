@@ -391,6 +391,7 @@ export const Tree = defineComponent(
                         isTabbable={row.node.value === rovingValue}
                         tooltipDefs={row.node.tooltipDefs}
                         extraFlags={{
+                            value: row.node.value,
                             isBranch: TreeUtils.getIsBranch(row.node),
                             isExpanded: row.isExpanded,
                             isPending: TreeUtils.computeIsPending(row),
@@ -417,16 +418,16 @@ export const Tree = defineComponent(
                                     >
                                         {
                                             {
-                                                renderContent: (nodeFlags) =>
+                                                renderContent: () =>
                                                     callSlot(slots.renderNode, {
                                                         node: row.node,
-                                                        renderProps: nodeFlags,
+                                                        renderProps,
                                                     }),
                                             } satisfies InteractionControlSlots<TreeNodeRenderProps>
                                         }
                                     </TreeNodeItem>
                                 ),
-                            } satisfies Partial<InteractionWrapperSlots<TreeNodeRenderProps>>
+                            } satisfies Partial<InteractionWrapperSlots<TreeNodeRenderProps<T>>>
                         }
                     </InteractionWrapper>
                 );

@@ -12,19 +12,10 @@
     import PageLayer from "../../PageComponents/Layer/Layer.svelte";
     import type { TooltipContentProps } from "./TooltipContent.types";
 
-    const TINT_GRADIENT_ANGLE = 45;
-
     const BORDER_RADII = CSSUtils.spreadRadius(BORDER_RADIUS_FULL);
 
     const GLASS_DEFS: PartialGlassDefs = {
-        tint: {
-            opacity: 1,
-            gradient: {
-                kind: "linear",
-                angle: TINT_GRADIENT_ANGLE,
-                colors: [{ value: themeVars.color.surface.dark }, { value: themeVars.color.surface.light }],
-            },
-        },
+        tint: { color: themeVars.color.surface.dark, opacity: 1 },
         sheen: { specularConstant: 0 },
     };
 
@@ -34,7 +25,7 @@
 </script>
 
 {#snippet renderBody()}
-    <div class={styles.tooltipBody}>
+    <div class={[styles.tooltipBody, props.isWide && styles.tooltipBodyWide]}>
         <PageLayer level={2}>{@render props.children?.()}</PageLayer>
     </div>
 {/snippet}

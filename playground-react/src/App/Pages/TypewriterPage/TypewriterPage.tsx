@@ -45,14 +45,6 @@ type ExampleWrapperProps = TypewriterExampleProps & {
     width: number;
 };
 
-const ComplexExampleWrapper = ({ width, ...props }: ExampleWrapperProps) => {
-    return (
-        <PageMeasureBox width={width} padding={MEASURE_BOX_PADDING}>
-            <ComplexExample {...props} />
-        </PageMeasureBox>
-    );
-};
-
 const CustomInputExampleWrapper = ({ width, ...props }: ExampleWrapperProps) => {
     const textState = useState("Line one\n\nline two");
 
@@ -102,7 +94,7 @@ export const TypewriterPage = () => {
         {
             key: "complex",
             name: "Complex",
-            component: () => <ComplexExampleWrapper {...commonProps} />,
+            component: () => <ComplexExample {...commonProps} />,
             path: `${EXAMPLES_ROOT}/Complex.tsx`,
         },
         {

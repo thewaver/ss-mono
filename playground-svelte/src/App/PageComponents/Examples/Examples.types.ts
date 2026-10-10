@@ -19,3 +19,7 @@ export type ExampleProps = {
     example: ExampleDefs;
     onViewSource: () => void;
 };
+
+export type FirstExampleProps = {
+    example: ExampleDefs;
+};

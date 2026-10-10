@@ -6,6 +6,7 @@ import * as styles from "@thewaver/ss-playground/App/PageComponents/PropsPanel/P
 
 import PageButtonContent from "../../StyledComponents/ButtonContent/ButtonContent.vue";
 import { provideFieldReset } from "../Field/Field.context";
+import { useIsPreview } from "../Preview/Preview.context";
 import PageProp from "../Prop/Prop.vue";
 import { providePropsPanelContext } from "./PropsPanel.context";
 import type { PagePropsPanelProps } from "./PropsPanel.types";
@@ -14,6 +15,8 @@ const NOTHING_TO_RESET = 0;
 const SAMPLE_SELECTOR_ALONE = 1;
 
 const props = defineProps<PagePropsPanelProps>();
+
+const isPreview = useIsPreview();
 
 const resets = shallowRef<(() => void)[]>([]);
 
@@ -45,7 +48,7 @@ const resetAll = () => {
 </script>
 
 <template>
-    <div :class="styles.propsPanelScopeVariants[scope]" :data-panel="scope">
+    <div v-if="!isPreview" :class="styles.propsPanelScopeVariants[scope]" :data-panel="scope">
         <slot />
 
         <PageProp

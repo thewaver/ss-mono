@@ -12,19 +12,10 @@ import { CSSUtils, ShapeConst, ShapeUtils } from "@thewaver/ss-utils";
 import { PageLayer } from "../../PageComponents/Layer/Layer";
 import type { TooltipContentProps } from "./TooltipContent.types";
 
-const TINT_GRADIENT_ANGLE = 45;
-
 const BORDER_RADII = CSSUtils.spreadRadius(BORDER_RADIUS_FULL);
 
 const GLASS_DEFS: PartialGlassDefs = {
-    tint: {
-        opacity: 1,
-        gradient: {
-            kind: "linear",
-            angle: TINT_GRADIENT_ANGLE,
-            colors: [{ value: themeVars.color.surface.dark }, { value: themeVars.color.surface.light }],
-        },
-    },
+    tint: { color: themeVars.color.surface.dark, opacity: 1 },
     sheen: { specularConstant: 0 },
 };
 
@@ -34,7 +25,7 @@ export const PageTooltipContent = (props: PropsWithChildren<TooltipContentProps>
     const arrow = props.arrow ?? "none";
 
     const body = (
-        <div className={styles.tooltipBody}>
+        <div className={[styles.tooltipBody, props.isWide && styles.tooltipBodyWide].filter(Boolean).join(" ")}>
             <PageLayer level={2}>{props.children}</PageLayer>
         </div>
     );

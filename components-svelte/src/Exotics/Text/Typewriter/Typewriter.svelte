@@ -87,7 +87,10 @@
     const animationNames = $derived(
         characters.map((character, index) => computeAnimationName(character, index, characters.length)),
     );
-    const caretIndex = $derived(TypewriterUtils.computeCaretIndex(startTimesMs, timeMs, isErasing, !isAnimating));
+    const hangingIndices = $derived(LetterDriverUtils.getHangingIndices(getSegments()));
+    const caretIndex = $derived(
+        TypewriterUtils.computeCaretIndex(startTimesMs, timeMs, isErasing, !isAnimating, hangingIndices),
+    );
 
     const controller: TypewriterController = {
         restartAnimation: () => {

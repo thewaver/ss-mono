@@ -1,4 +1,5 @@
 import { Collapsible } from "@thewaver/ss-components-react";
+import * as styles from "@thewaver/ss-playground/App/Pages/Accordions/Accordions.css";
 
 import {
     PageAccordionHeader,
@@ -9,7 +10,7 @@ import type { AccordionSinglePanelExampleProps } from "../../Accordions.types";
 type Props = AccordionSinglePanelExampleProps;
 
 export const PanelExample = (props: Props) => (
-    <div>
+    <div className={styles.textWithPanel}>
         <div>
             Orders leave the warehouse within two working days, and tracking arrives by email as soon as the parcel is
             scanned.

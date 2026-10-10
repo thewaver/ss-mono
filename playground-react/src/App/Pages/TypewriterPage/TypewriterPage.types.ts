@@ -5,6 +5,10 @@ export type TypewriterExampleProps = {
     computeCharacterWeights?: (count: number) => number[];
 };
 
+export type TypewriterComplexExampleProps = TypewriterExampleProps & {
+    width: number;
+};
+
 export type TypewriterPhrasesExampleProps = TypewriterExampleProps & {
     width: number;
 };

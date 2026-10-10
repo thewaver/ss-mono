@@ -10,7 +10,6 @@ export const stack = style({
     flexDirection: "column",
     gap: themeVars.spacing.full,
     alignItems: "stretch",
-    width: "100%",
 });
 
 export const card = style({

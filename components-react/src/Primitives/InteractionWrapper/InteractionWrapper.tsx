@@ -88,8 +88,8 @@ export const InteractionWrapper = <TExtra extends object = {}>(props: Interactio
                 <Tooltip
                     {...tooltipDefs}
                     anchorRef={element}
-                    renderContent={(visibilityTarget, transitionDurationMs, placement) =>
-                        tooltipDefs.renderContent(visibilityTarget, transitionDurationMs, placement, flags)
+                    renderContent={(visibilityTarget, transitionDurationMs, placement, arrowAim) =>
+                        tooltipDefs.renderContent(visibilityTarget, transitionDurationMs, placement, flags, arrowAim)
                     }
                 />
             )}

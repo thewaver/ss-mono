@@ -88,8 +88,8 @@
     {#if props.tooltipDefs}
         {@const { renderContent: renderTooltipContent, ...tooltipDefs } = props.tooltipDefs}
         <Tooltip {...tooltipDefs} anchorRef={element}>
-            {#snippet renderContent(visibilityTarget, transitionDurationMs, placement)}
-                {@render renderTooltipContent(visibilityTarget, transitionDurationMs, placement, flags)}
+            {#snippet renderContent(visibilityTarget, transitionDurationMs, placement, arrowAim)}
+                {@render renderTooltipContent(visibilityTarget, transitionDurationMs, placement, flags, arrowAim)}
             {/snippet}
         </Tooltip>
     {/if}

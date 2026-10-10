@@ -18,16 +18,16 @@ export namespace SatelliteKnobs {
     export const MAX_COUNT = 99999;
     export const COUNT_STEP = 1;
     export const MIN_OVERHANG = 0;
-    export const MAX_OVERHANG = 16;
+    export const MAX_OVERHANG = 32;
     export const OVERHANG_STEP = 1;
 
     export const STARTING_H_PLACEMENT: AnchorHPlacement = "right-out";
     export const STARTING_V_PLACEMENT: AnchorVPlacement = "top-out";
-    export const STARTING_SUBJECT_WIDTH = 140;
-    export const STARTING_SUBJECT_HEIGHT = 80;
-    export const STARTING_BADGE_SIZE = 28;
+    export const STARTING_SUBJECT_WIDTH = 240;
+    export const STARTING_SUBJECT_HEIGHT = 160;
+    export const STARTING_BADGE_SIZE = 48;
     export const STARTING_HAS_SATELLITE = true;
     export const STARTING_CORNER: SatelliteBadgeCorner = "top-right";
     export const STARTING_COUNT = 7;
-    export const STARTING_OVERHANG = 8;
+    export const STARTING_OVERHANG = 16;
 }

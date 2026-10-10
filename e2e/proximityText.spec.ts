@@ -71,6 +71,8 @@ test("swelling letters never move a line break", async ({ page }) => {
  * With `PaintedText` inside, the letters are drawn as SVG, one `text` element each in the first painted layer. They
  * grow and push the rest of their line along as plain text does, so a letter after the pointer on its line is drawn
  * further right than it was at rest; the baselines it sits on, which are the line breaks, stay where they were.
+ * A baseline is read to the whole pixel: swelling letters move it by a few hundred-thousandths, which is no line
+ * moving, and a line that did move would move by a whole line's height.
  */
 const PAINTED = demo("painted");
 
@@ -81,7 +83,7 @@ const paintedLetters = (page: Page) =>
         .evaluate((layer) =>
             [...layer.querySelectorAll("text")].map((letter) => ({
                 x: Number(letter.getAttribute("x")),
-                baseline: Number(letter.getAttribute("y")),
+                baseline: Math.round(Number(letter.getAttribute("y"))),
             })),
         );
 

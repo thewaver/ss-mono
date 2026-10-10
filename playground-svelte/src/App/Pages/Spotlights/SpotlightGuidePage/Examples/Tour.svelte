@@ -4,7 +4,6 @@
     import { PADDING } from "@thewaver/ss-playground/App/Pages/Spotlights/SpotlightTourSteps.const";
     import * as styles from "@thewaver/ss-playground/App/Pages/Spotlights/Spotlights.css";
 
-    import PageControlRow from "../../../../PageComponents/ControlRow/PageControlRow.svelte";
     import PageButtonContent from "../../../../StyledComponents/ButtonContent/ButtonContent.svelte";
     import { getLayerClass } from "../../../../StyledComponents/Layer/Layer.context";
     import PageSpotlightPopup from "../../../../StyledComponents/SpotlightPopup/PageSpotlightPopup.svelte";
@@ -51,7 +50,7 @@
 </script>
 
 <div class={[styles.root, layerClass]}>
-    <PageControlRow>
+    <div class={styles.tourRow}>
         <div bind:this={shelfRef} class={styles.tourTarget}>Potatoes</div>
 
         <Button
@@ -81,7 +80,7 @@
                 <PageButtonContent {flags}>Checkout</PageButtonContent>
             {/snippet}
         </Button>
-    </PageControlRow>
+    </div>
 
     <Button
         id={"tourStart"}

@@ -17,7 +17,7 @@ import type { AccessorProps, MaybeAccessor, SignalSource } from "../../Utils/typ
 
 export type TreeLinkProps = JSX.AnchorHTMLAttributes<HTMLAnchorElement> & { href: string };
 
-export type TreeNode<T> = TreeNodeRecord<T, InteractionTooltipDefs<TreeNodeRenderProps>>;
+export type TreeNode<T> = TreeNodeRecord<T, InteractionTooltipDefs<TreeNodeRenderProps<T>>>;
 
 export type TreeRow<T> = FlatRow<TreeNode<T>>;
 
@@ -88,7 +88,7 @@ export type TreeProps<T> = AccessorProps<{
     /** Draws one node. It is handed the interaction state and where the node sits in the tree. */
     renderNode: (
         getNode: Accessor<TreeNode<T>>,
-        getRenderProps: () => InteractionFlags<TreeNodeRenderProps>,
+        getRenderProps: () => InteractionFlags<TreeNodeRenderProps<T>>,
     ) => JSX.Element;
     /** Draws what stands in for a branch's children while they are still being fetched. */
     renderPendingChildren?: (getNode: Accessor<TreeNode<T>>, getDepth: () => number) => JSX.Element;

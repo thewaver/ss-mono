@@ -14,14 +14,14 @@
         "@thewaver/ss-components-svelte": "*",
         "@thewaver/ss-playground": "*",
         "@thewaver/ss-utils": "*",
-        "svelte": "^5.57.1",
+        "svelte": "^5.57.2",
         "sv-router": "^0.19.0"
     },
     "devDependencies": {
-        "@vanilla-extract/css": "^1.21.2",
+        "@vanilla-extract/css": "^1.21.3",
         "@vanilla-extract/dynamic": "^2.1.5",
         "@vanilla-extract/vite-plugin": "^5.2.6",
-        "vite": "^8.3.0",
+        "vite": "^8.3.4",
         "@sveltejs/vite-plugin-svelte": "^7.3.1",
         "svelte-check": "^4.7.6"
     }

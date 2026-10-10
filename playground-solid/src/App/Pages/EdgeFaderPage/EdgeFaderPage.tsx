@@ -80,7 +80,7 @@ export const EdgeFaderPage = () => {
                 </PageProp>
             </PagePropsPanel>
 
-            <PageExamples items={getExamples} minColumnWidth={360} />
+            <PageExamples items={getExamples} minColumnWidth={400} />
         </>
     );
 };

@@ -687,7 +687,7 @@ export namespace PaintedTextUtils {
 
             if (isContentChange || store.get().width === undefined) warnIfUnsupported(source);
 
-            const width = source.clientWidth;
+            const width = LetterDriverUtils.measureLineWidth(source);
             const computePushingName = opts.getComputePushingAnimationName?.();
             const tokens = JSXTextParserUtils.getSegmentTokens(source);
             const segments = computePushingName

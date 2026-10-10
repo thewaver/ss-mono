@@ -4,6 +4,7 @@
 
     import PageButtonContent from "../../StyledComponents/ButtonContent/ButtonContent.svelte";
     import { setFieldResetContext } from "../Field/Field.context";
+    import { getIsPreview } from "../Preview/Preview.context";
     import PageProp from "../Prop/Prop.svelte";
     import { setPropsPanelContext } from "./PropsPanel.context";
     import type { PagePropsPanelProps } from "./PropsPanel.types";
@@ -12,6 +13,8 @@
     const SAMPLE_SELECTOR_ALONE = 1;
 
     let props: PagePropsPanelProps = $props();
+
+    const isPreview = getIsPreview();
 
     let resets = $state.raw<(() => void)[]>([]);
 
@@ -38,24 +41,26 @@
     const resettable = $derived(isSampleScope ? resets.slice(SAMPLE_SELECTOR_ALONE) : resets);
 </script>
 
-<div class={styles.propsPanelScopeVariants[props.scope]} data-panel={props.scope}>
-    {@render props.children?.()}
+{#if !isPreview}
+    <div class={styles.propsPanelScopeVariants[props.scope]} data-panel={props.scope}>
+        {@render props.children?.()}
 
-    {#if resets.length > leastToReset}
-        <PageProp
-            itemKey={"resetPanel"}
-            label={"These controls"}
-            hint={"Puts every control in this panel back to the value it started at."}
-        >
-            <Button
-                onClick={() => {
-                    resettable.forEach((reset) => reset());
-                }}
+        {#if resets.length > leastToReset}
+            <PageProp
+                itemKey={"resetPanel"}
+                label={"These controls"}
+                hint={"Puts every control in this panel back to the value it started at."}
             >
-                {#snippet renderContent(flags)}
-                    <PageButtonContent {flags}>Reset</PageButtonContent>
-                {/snippet}
-            </Button>
-        </PageProp>
-    {/if}
-</div>
+                <Button
+                    onClick={() => {
+                        resettable.forEach((reset) => reset());
+                    }}
+                >
+                    {#snippet renderContent(flags)}
+                        <PageButtonContent {flags}>Reset</PageButtonContent>
+                    {/snippet}
+                </Button>
+            </PageProp>
+        {/if}
+    </div>
+{/if}

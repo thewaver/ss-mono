@@ -105,92 +105,95 @@ const HIGHLIGHTER_LANGUAGES: Record<AboutCodeLanguage, string> = {
 await highlighter.loadLanguage(shellscript, svelte, vue);
 
 export namespace AboutPageUtils {
-    export const computeSections = (framework: PlaygroundFramework): AboutSection[] => {
+    export const computeSections = (framework: PlaygroundFramework): AboutSection[] => [
+        {
+            heading: "What it is",
+            blocks: [
+                {
+                    kind: "paragraph",
+                    text: [
+                        `ss-components-${framework} is a free, `,
+                        SOURCE_LINK,
+                        " library of interface components for ",
+                        toFrameworkLink(framework),
+                        ": buttons, text and number fields, date and time pickers, selects, menus, modals, tabs, trees, tables, carousels, and a set of visual and motion effects besides.",
+                    ],
+                },
+                {
+                    kind: "paragraph",
+                    text: [
+                        "It is headless. Every component brings its structure, its behavior and its accessibility wiring, and none of the color, spacing or type. What a component looks like is yours to draw.",
+                    ],
+                },
+                {
+                    kind: "paragraph",
+                    text: [
+                        "The same components exist for ",
+                        toFrameworkLink("solid"),
+                        ", ",
+                        toFrameworkLink("react"),
+                        ", ",
+                        toFrameworkLink("vue"),
+                        " and ",
+                        toFrameworkLink("svelte"),
+                        ", with the same names and the same props. All four sit on one framework-free core, so a control behaves the same way in each. This site is that library, built four times: pick the framework in the heading above the search field and the page you are reading opens in it.",
+                    ],
+                },
+            ],
+        },
+        {
+            heading: "Philosophy",
+            blocks: [
+                {
+                    kind: "list",
+                    items: [
+                        [
+                            "The library owns behavior and you own looks. A component never decides its own paint, so there is nothing to override and nothing to fight.",
+                        ],
+                        [
+                            "Accessible by default. Keyboard routes, focus handling and ARIA roles come built in and are checked against ",
+                            WCAG_LINK,
+                            ". Where a choice of yours would leave a control failing a criterion, the library says so loudly in development instead of quietly going along.",
+                        ],
+                        [
+                            "Your words, not ours. Apart from the name of what a control is, the library ships no sentence a reader would hear or see. Labels and announcements arrive through props, so a page in another language is never read out in English.",
+                        ],
+                        [
+                            "Controls stay out of the way. A component hands you a controller and draws no buttons of its own, so where the buttons go, and how they look, is your decision.",
+                        ],
+                        [
+                            "Nothing is hidden. The pieces the components are built from are exported too, so you can build the control the library does not have.",
+                        ],
+                        [
+                            "One name for one thing. A prop is called the same in every framework; only the way you hand it in changes.",
+                        ],
+                    ],
+                },
+            ],
+        },
+        {
+            heading: "How it works",
+            blocks: [
+                {
+                    kind: "paragraph",
+                    text: [
+                        "A component is a box that behaves. You mount it, give it its data, and give it a render function for whatever it draws. The library calls that function with the control's current state, such as hovered, pressed, showing a focus ring, disabled or open, and you return the markup and styling for that state.",
+                    ],
+                },
+                {
+                    kind: "paragraph",
+                    text: [
+                        `State that both you and the component change, such as a field's value or whether a popup is open, is handed in as ${TWO_WAY_STATE[framework]}. Every example on this site is a live component, and every page has a Docs tab with the full list of its props.`,
+                    ],
+                },
+            ],
+        },
+    ];
+
+    export const computeGettingStartedSections = (framework: PlaygroundFramework): AboutSection[] => {
         const packageName = `@thewaver/ss-components-${framework}`;
 
         return [
-            {
-                heading: "What it is",
-                blocks: [
-                    {
-                        kind: "paragraph",
-                        text: [
-                            `ss-components-${framework} is a free, `,
-                            SOURCE_LINK,
-                            " library of interface components for ",
-                            toFrameworkLink(framework),
-                            ": buttons, text and number fields, date and time pickers, selects, menus, modals, tabs, trees, tables, carousels, and a set of visual and motion effects besides.",
-                        ],
-                    },
-                    {
-                        kind: "paragraph",
-                        text: [
-                            "It is headless. Every component brings its structure, its behavior and its accessibility wiring, and none of the color, spacing or type. What a component looks like is yours to draw.",
-                        ],
-                    },
-                    {
-                        kind: "paragraph",
-                        text: [
-                            "The same components exist for ",
-                            toFrameworkLink("solid"),
-                            ", ",
-                            toFrameworkLink("react"),
-                            ", ",
-                            toFrameworkLink("vue"),
-                            " and ",
-                            toFrameworkLink("svelte"),
-                            ", with the same names and the same props. All four sit on one framework-free core, so a control behaves the same way in each. This site is that library, built four times: pick the framework in the heading above the search field and the page you are reading opens in it.",
-                        ],
-                    },
-                ],
-            },
-            {
-                heading: "Philosophy",
-                blocks: [
-                    {
-                        kind: "list",
-                        items: [
-                            [
-                                "The library owns behavior and you own looks. A component never decides its own paint, so there is nothing to override and nothing to fight.",
-                            ],
-                            [
-                                "Accessible by default. Keyboard routes, focus handling and ARIA roles come built in and are checked against ",
-                                WCAG_LINK,
-                                ". Where a choice of yours would leave a control failing a criterion, the library says so loudly in development instead of quietly going along.",
-                            ],
-                            [
-                                "Your words, not ours. Apart from the name of what a control is, the library ships no sentence a reader would hear or see. Labels and announcements arrive through props, so a page in another language is never read out in English.",
-                            ],
-                            [
-                                "Controls stay out of the way. A component hands you a controller and draws no buttons of its own, so where the buttons go, and how they look, is your decision.",
-                            ],
-                            [
-                                "Nothing is hidden. The pieces the components are built from are exported too, so you can build the control the library does not have.",
-                            ],
-                            [
-                                "One name for one thing. A prop is called the same in every framework; only the way you hand it in changes.",
-                            ],
-                        ],
-                    },
-                ],
-            },
-            {
-                heading: "How it works",
-                blocks: [
-                    {
-                        kind: "paragraph",
-                        text: [
-                            "A component is a box that behaves. You mount it, give it its data, and give it a render function for whatever it draws. The library calls that function with the control's current state, such as hovered, pressed, showing a focus ring, disabled or open, and you return the markup and styling for that state.",
-                        ],
-                    },
-                    {
-                        kind: "paragraph",
-                        text: [
-                            `State that both you and the component change, such as a field's value or whether a popup is open, is handed in as ${TWO_WAY_STATE[framework]}. Every example on this site is a live component, and every page has a Docs tab with the full list of its props.`,
-                        ],
-                    },
-                ],
-            },
             {
                 heading: "Install",
                 blocks: [

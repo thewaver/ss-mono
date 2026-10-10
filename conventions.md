@@ -1436,7 +1436,7 @@ above is not read as absolute.
 
 ### A popup's open state is private until a consumer asks for it
 
-Settled by the user, closing the `openSignal` question items 3, 4 and 11 of `backlog.md`
+Settled by the user, closing the `openSignal` question three `backlog.md` items
 were waiting on. `Select`, `MultiSelect`, `Menu`, `ColorInput` and `DatePicker` each take an optional
 `visibility`, which is `Modal`'s prop under `Modal`'s name and rules.
 
@@ -1470,10 +1470,9 @@ click outside would leave it.
 `open()` already refused, but a consumer writing `true` bypassed it, so `Select` and `Menu` write `false` back
 — the correction `Modal` makes for its own dismissal.
 
-**What this does not buy is an opener the dismiss layer knows about.** A consumer's own button sits outside the
-popup, so pressing it while open dismisses the popup and the handler then re-opens it: a toggle button appears
-not to close. The Playground demonstrates open and close as two separate buttons for that reason. Fixing it
-means `Menu` accepting an anchor and an opener, which is what `backlog.md` item 3 asks for next.
+**What this did not buy on its own was an opener the dismiss layer knows about.** A consumer's own button sits
+outside the popup, so pressing it while open dismissed the popup and the handler then re-opened it: a toggle
+button appeared not to close. Making that button the popup's anchor is what fixed it — the next section.
 
 ### Playback is a signal; a rewind is a command
 
@@ -1526,9 +1525,11 @@ anything new.
 **A split button is now a composition rather than a missing feature**: the arrow half is the anchor, the main
 half does its own work, and the consumer's own signal opens the menu.
 
-**A right-click context menu is still not possible**: it opens at the pointer rather than against an element,
-and `Anchor` positions against a ref only. That needs a virtual anchor — a rect standing in for an element —
-which is a change to `Anchor` rather than to `Menu`, and it is the last piece. `backlog.md` item 3.
+**A right-click context menu anchors to a rect rather than an element.** It opens at the pointer, not against
+an element, so `Popover` takes an `anchorRect` — a rect standing in for an element — beside `anchorRef`, and
+`ContextMenu` hands it the point that was right-clicked, or the focused element's rect when the ContextMenu key or
+Shift+F10 opened it. A rect is nothing anyone can press, so it is not a dismiss root; the component's own region
+is. See `decisions.md`, _"`ContextMenu`: the same menu, opened by a right-click at a point"_.
 
 ## Layout and styling
 
@@ -1585,7 +1586,7 @@ element-level input styling is what every reset stylesheet ships. What the scopi
 `PageFileField` live in one folder as one file, because seven two-line adapters in seven folders is worse
 than the family being visible in one place — the call `Select.tsx` makes with its three private components.
 Each keeps a local `*Signal` and mirrors the panel's plain value into it. That mirror is written seven times
-and is the gap `backlog.md` #10 records: every control owns its value as a signal, so a consumer whose state
+and is the gap `backlog.md` recorded: every control owns its value as a signal, so a consumer whose state
 is a store builds the bridge themselves.
 
 ### Each palette token has one job, and the two rules that follow from it
@@ -1798,8 +1799,8 @@ through `page.context().newCDPSession(page)` — the one place this suite reache
 on.
 
 **What it catches is the argument for it.** `TextSync` destroying an IME commit and `ElementFader` hanging
-its state machine on a single frame are both invisible in markup. `backlog.md` #11 carries what the suite
-still cannot see.
+its state machine on a single frame are both invisible in markup. `backlog.md`, under _"What the verification suite still
+cannot see"_, carries the rest.
 
 **A touch gesture is driven through the DevTools protocol, and `drawerTouch.spec.ts` is the only file that
 does it.** Playwright's touch API taps and nothing else, and synthetic touch events dispatched from page
@@ -1813,8 +1814,8 @@ the same finger.
 
 `e2e/` can only reach what a click can reach. A function taking rectangles and returning a placement has no
 page to be clicked on, so provoking its edge cases through a browser means a Playground variant per case —
-which is why `Anchor`'s flip-and-clamp logic went unchecked long enough to ship the overflow in
-`backlog.md` #5. `npm test` calls library functions directly.
+which is why `Anchor`'s flip-and-clamp logic went unchecked long enough to ship an overflow.
+`npm test` calls library functions directly.
 
 **One dependency, and no DOM.** `vitest` reads the repo's own Vite setup, and `vitest.config.ts` sets
 `environment: "node"`. A jsdom environment would invite component-rendering tests, the thing not to build
@@ -1875,9 +1876,9 @@ re-blessed wholesale by any change.
 - **The SVG defs builders.** `SVGPatternDefsUtils`, `SVGGradientDefsUtils` and `SVGAnimationDefsUtils` return
   JSX, and their arithmetic — tiling offsets, `resolveStops`' interpolation — is written inline inside the
   element or kept private. Real geometry, unreachable without rendering or a refactor separating arithmetic
-  from markup. `backlog.md` #12.
+  from markup. See `backlog.md`, _"What the verification suite still cannot see"_.
 - **A known-broken case is pinned rather than fixed.** `CellAnimation.utils.test.ts` asserts the
-  out-of-range weights `backlog.md` #5 describes, with the measured numbers. It passes today and fails the
+  out-of-range weights, with the measured numbers. It passes today and fails the
   moment anyone fixes the bug, which is the point — both candidate fixes change output across every affected
   weight, so the test is re-blessed as part of the fix rather than quietly surviving it.
 

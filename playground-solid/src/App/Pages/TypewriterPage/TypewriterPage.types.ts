@@ -7,6 +7,11 @@ export type TypewriterExampleProps = AccessorProps<{
     computeCharacterWeights?: (count: number) => number[];
 }>;
 
+export type TypewriterComplexExampleProps = TypewriterExampleProps &
+    AccessorProps<{
+        width: number;
+    }>;
+
 export type TypewriterPhrasesExampleProps = TypewriterExampleProps &
     AccessorProps<{
         width: number;

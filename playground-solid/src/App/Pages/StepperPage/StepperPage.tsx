@@ -68,6 +68,35 @@ export const StepperPage = () => {
 
     const getExamples = createMemo(() => [
         {
+            key: "stacked",
+            name: "Stacked",
+            readout: () => `current: ${getStackedCurrent()} — the same steps down the page`,
+            component: () => (
+                <StackedExample
+                    steps={() => buildSteps(getStackedCurrent())}
+                    currentValue={getStackedCurrent}
+                    computeStepAriaLabel={describe}
+                    onCurrentChange={setStackedCurrent}
+                />
+            ),
+            path: `${EXAMPLES_ROOT}/Stacked.tsx`,
+        },
+        {
+            key: "detailed",
+            name: "Steps that carry their own content",
+            readout: () =>
+                `current: ${getDetailedCurrent()} — each step holds a body beside the connector, so the line runs past the content rather than stopping at it`,
+            component: () => (
+                <DetailedExample
+                    steps={() => buildSteps(getDetailedCurrent())}
+                    currentValue={getDetailedCurrent}
+                    computeStepAriaLabel={describe}
+                    onCurrentChange={setDetailedCurrent}
+                />
+            ),
+            path: `${EXAMPLES_ROOT}/Detailed.tsx`,
+        },
+        {
             key: "linear",
             name: "Linear",
             readout: () =>
@@ -98,33 +127,18 @@ export const StepperPage = () => {
             path: `${EXAMPLES_ROOT}/Failed.tsx`,
         },
         {
-            key: "stacked",
-            name: "Stacked",
-            readout: () => `current: ${getStackedCurrent()} — the same steps down the page`,
+            key: "bare",
+            name: "No connector",
+            readout: () => "the connector slot is optional, so a bare strip renders nothing between the steps",
             component: () => (
-                <StackedExample
-                    steps={() => buildSteps(getStackedCurrent())}
-                    currentValue={getStackedCurrent}
+                <BareExample
+                    steps={() => buildSteps(getLinearCurrent())}
+                    currentValue={getLinearCurrent}
                     computeStepAriaLabel={describe}
-                    onCurrentChange={setStackedCurrent}
+                    onCurrentChange={setLinearCurrent}
                 />
             ),
-            path: `${EXAMPLES_ROOT}/Stacked.tsx`,
-        },
-        {
-            key: "detailed",
-            name: "Steps that carry their own content",
-            readout: () =>
-                `current: ${getDetailedCurrent()} — each step holds a body beside the connector, so the line runs past the content rather than stopping at it`,
-            component: () => (
-                <DetailedExample
-                    steps={() => buildSteps(getDetailedCurrent())}
-                    currentValue={getDetailedCurrent}
-                    computeStepAriaLabel={describe}
-                    onCurrentChange={setDetailedCurrent}
-                />
-            ),
-            path: `${EXAMPLES_ROOT}/Detailed.tsx`,
+            path: `${EXAMPLES_ROOT}/Bare.tsx`,
         },
         {
             key: "arc",
@@ -141,20 +155,6 @@ export const StepperPage = () => {
                 />
             ),
             path: `${EXAMPLES_ROOT}/Arc.tsx`,
-        },
-        {
-            key: "bare",
-            name: "No connector",
-            readout: () => "the connector slot is optional, so a bare strip renders nothing between the steps",
-            component: () => (
-                <BareExample
-                    steps={() => buildSteps(getLinearCurrent())}
-                    currentValue={getLinearCurrent}
-                    computeStepAriaLabel={describe}
-                    onCurrentChange={setLinearCurrent}
-                />
-            ),
-            path: `${EXAMPLES_ROOT}/Bare.tsx`,
         },
     ]);
 

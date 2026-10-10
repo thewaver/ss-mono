@@ -15,14 +15,14 @@
         "@thewaver/ss-components-solid": "*",
         "@thewaver/ss-playground": "*",
         "@thewaver/ss-utils": "*",
-        "shiki": "^4.4.3",
-        "solid-js": "^1.9.15"
+        "shiki": "^4.5.0",
+        "solid-js": "^1.9.17"
     },
     "devDependencies": {
-        "@vanilla-extract/css": "^1.21.2",
+        "@vanilla-extract/css": "^1.21.3",
         "@vanilla-extract/dynamic": "^2.1.5",
         "@vanilla-extract/vite-plugin": "^5.2.6",
-        "vite": "^8.3.0",
+        "vite": "^8.3.4",
         "vite-plugin-checker": "^0.14.5",
         "vite-plugin-solid": "^2.11.14"
     }

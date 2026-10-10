@@ -1,5 +1,6 @@
 <script lang="ts">
     import { Collapsible } from "@thewaver/ss-components-svelte";
+    import * as styles from "@thewaver/ss-playground/App/Pages/Accordions/Accordions.css";
 
     import PageAccordionHeader from "../../../../StyledComponents/AccordionContent/PageAccordionHeader.svelte";
     import PageAccordionPanel from "../../../../StyledComponents/AccordionContent/PageAccordionPanel.svelte";
@@ -10,7 +11,7 @@
     let { expanded = $bindable(false) }: Props = $props();
 </script>
 
-<div>
+<div class={styles.textWithPanel}>
     <div>
         Orders leave the warehouse within two working days, and tracking arrives by email as soon as the parcel is
         scanned.

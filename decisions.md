@@ -243,7 +243,7 @@ rather than the whole of it.
 framework switch.** The user's call on both halves. The target is the existing Playground with a Solid/React
 switch, every example in both, and the e2e specs run once per setting, so a divergence between the two
 frameworks surfaces as a red spec; a second, separate React app was rejected because nobody browses it and it
-falls behind. That work is postponed as a large task of its own (`backlog.md` #31), so in the meantime the React
+falls behind. That work was postponed as a large task of its own, so in the meantime the React
 views are covered by automated tests alone — which means the user's usual check, running the Playground and
 looking, does not reach them.
 
@@ -3132,7 +3132,7 @@ is its own input, absolutely positioned `inset: 0` over the same painter, so a p
 rendered twice and the two modes cannot diverge in paint, keyboard or ARIA. Native also keeps `step`,
 `Home`/`End`, `PageUp`/`PageDown`, drag and the track-click jump.
 
-`Range` therefore did **not** need `backlog.md` #2's pointer primitive. What did was a two-dimensional
+`Range` therefore did **not** need the pointer primitive `backlog.md` asked for. What did was a two-dimensional
 color surface, which has no native equivalent; `ColorArea` is built over `trackDrag` and that item is closed.
 
 **Crossing is prevented by the inputs' own `min` and `max`, not by JS.** Thumb `n`'s `min` is thumb
@@ -4100,7 +4100,7 @@ suffix is documented on `range`, the prop that makes a pair, rather than by rede
 ### Controls: `Select`, and who owns a floating list
 
 This and the two `Select` headings after it are what remains of a design brief
-deleted once it shipped; `backlog.md` #6 carries what was left out.
+deleted once it shipped; `backlog.md` carries what was left out, under `Select`.
 
 **One `mousedown` `preventDefault()` on the popup root is what makes the whole model work.** The options
 live in the `Viewport` portal, so clicking one would blur the field. Refusing the default action of
@@ -6412,7 +6412,7 @@ a drop by walking its items in order and comparing one coordinate against each m
 coordinate — the item at twelve o'clock is neither before nor after the one at three — so a placed list asks
 which placement is nearest instead. `toLayoutPoint` converts the pointer through the box's own rect, which is
 also why the `Viewport` scale divides out: a ratio taken within one rect does not care what scale that rect
-was measured at. Item 26 recorded the picking as a tested generalization with nothing consuming it, waiting on
+was measured at. The backlog recorded the picking as a tested generalization with nothing consuming it, waiting on
 the flick; the flick is still unbuilt and this got there first.
 
 **`Tree` is the only layout that needed to know more than how many items it is placing.** Where a node goes
@@ -9528,7 +9528,7 @@ being the stricter of the two.
 
 ### Pointer drag: a ratio, opt-in, and captured
 
-Settled, closing the primitive `backlog.md` #2 asked for.
+Settled, closing the primitive `backlog.md` asked for.
 `InteractionTrackerUtils.trackDrag(ref, disabled, opts)` reports where a pointer is inside an element for as long as
 a drag lasts.
 
@@ -9599,7 +9599,7 @@ over the control, so a ratio is a percentage and no measuring happens on the pai
 
 ### The swipe: one gesture over the drag machinery, an axis it claims, and a verdict at the end
 
-Settled, closing the gesture `Abstract` `backlog.md` #26 asked for. `InteractionTrackerUtils.trackAxialSwipe(ref,
+Settled, closing the gesture `Abstract` `backlog.md` asked for. `InteractionTrackerUtils.trackAxialSwipe(ref,
 disabled, opts)` reports how far a pointer has pushed an element along one axis, and at the release says
 whether that push counts. `Drawer` and `Carousel` are its two consumers.
 
@@ -10049,7 +10049,7 @@ animation there is the menu leaving.
 
 ### `ContextMenu`: the same menu, opened by a right-click at a point
 
-Settled while closing the last of `backlog.md` item 4's opener bullets. What differs between a menu on a
+Settled while closing the last of the opener bullets in `backlog.md`. What differs between a menu on a
 button and a menu on a right-click is the opener, not the menu — so the level, the items, the submenus, the
 typeahead, the keyboard and the dismissal are all the ones `Menu` already has.
 
@@ -12234,7 +12234,7 @@ towards meets it far away, so a wide arrow on a box corner — half-angle close 
 edges. At 45° or wider, which is any symmetric arrow at least twice as wide as it is long, both sides run parallel to or
 away from the edges and the arrow attaches nothing at a corner. The Playground starts on a 14 × 9 triangle to stay
 clear of it, and `tooltipArrow.spec.ts` types its own narrower one in before checking the corner case; the fix is
-open, as `backlog.md` item 33.
+open, in `backlog.md` under _"A wide arrow vanishes at a corner"_.
 
 **The arrow sticks out of the box, into the gap.** The user's call: the body is what `Anchor` measures and positions,
 and making room for the arrow is the consumer's `offset`, if they want it. `Shape` already paints its layers with
@@ -17612,7 +17612,7 @@ page mounting several independent instances has to say so.
 
 **_Elsewhere._** React Aria is the only one of the three with drag and drop, through `useDragAndDrop` shared
 with its lists, and its keyboard route is the same pick-move-drop this one implements. Radix and Ark UI ship
-nothing in this family, which matches item 13's note that nothing had asked for it. The packages that own the
+nothing in this family, which matches the backlog's note, at the time, that nothing had asked for it. The packages that own the
 problem outright — SortableJS, dnd-kit — are pointer-first: dnd-kit ships a keyboard sensor and SortableJS has
 no keyboard route at all, which is the same gap `SlideButton`'s entry records for swipe-to-confirm widgets.
 
@@ -18372,6 +18372,8 @@ From Magic UI's Animated Theme Toggler and Skiper UI's theme transitions.
 
 **The shapes are a circle and `Shape`'s default contours, passed as `computePoints`.** The user narrowed this item to the library's default shapes, dropping the animated GIF, the star and custom outlines; a set of animated SVG samples is in `backlog.md` under _Open discussion_. Leaving `computePoints` out gives an exact circle. A contour grows about the average of its corners until its nearest edge clears the farthest viewport corner, so it covers the viewport whichever way it is turned; that overshoots for a long, flat shape, accepted because it holds for every contour without a case per shape. A hard edge is a `clip-path` whose corners each travel in a straight line from the origin. A soft edge is a blurred SVG of the shape used as a mask grown from size 0, so `blur` is a standard deviation in pixels as CSS `blur()` takes it — not `Reveal`'s `softness`, which is a ratio, because one name should not carry two units. The reach is extended by three times the blur so the faded edge clears the viewport.
 
+**It has no examples page, and its spec went with it.** The user removed the page — a panel switched through a reveal, with knobs for the shape, origin and edge — in all four Playgrounds, leaving a docs entry only: proper consumers are to be written later, and the Playground's theme switch keeps the helper exercised by hand in the meantime. `shapeReveal.spec.ts` drove that page and was deleted with it, so nothing in `e2e/` covers the helper until a consumer brings a page back.
+
 **WCAG.** 2.3.3 Animation from Interactions (AAA), "Motion animation triggered by interaction can be disabled": the duration is the way to turn it off. 2.2.2 Pause, Stop, Hide applies to motion that "starts automatically" and "lasts more than five seconds"; a reveal starts from the visitor's own action and runs well under that, so it needs no pause control. Checked 2.3.1 Three Flashes: one reveal per action is not a flash sequence. While a reveal runs the browser draws snapshots over the page, so a press during those few hundred milliseconds lands on nothing; that is the platform, not the helper.
 
 ### Playback is `playback` everywhere, and `Trail` lost its `play` and `pause`
@@ -18983,6 +18985,35 @@ would find the text frozen at the color it was parsed with, and the property the
 explain it is one they never wrote. So a fill color set inside a `Typewriter` is lost, and that is the cheaper
 of the two failures.
 
+### `JSXTextParserUtils`: the space a wrapped line ends on hangs, as a piece of its own that takes no room
+
+Found through `ProximityText`'s barrel example, which scrolled sideways, and chosen by the user over fixing it in that
+one component or hiding the scroll in the example. `getInlinedSegments` wraps before the word that does not fit, so
+the space in front of it stays at the end of the line it leaves. A browser lets that space hang past the edge without
+counting it; every component that draws a letter at a time draws it as a box, so it pushed past the edge — 19px in
+the barrel, whose spaces widen with the effect, about 2px in `Typewriter` and `PaintedText` — and moved a centered line
+off its middle by half a space.
+
+**The space is split off and styled, not dropped.** Dropping it would change how many characters the text has with
+every change of width, and with it which letter each animation name, start time and rest position belongs to. So
+`getInlinedSegments` ends by splitting each wrapped line's trailing white space into its own text piece, marked
+`isHanging` and carrying a zero-width, clipping, top-aligned inline-block in its `nonMetrics`. Every drawer already
+applies a piece's `nonMetrics` to the element around its letters — the four frameworks' `Typewriter` and
+`ProximityText`, and `PaintedText`'s hidden layout — so none of them changed. `getIsHanging` tells such a piece apart.
+
+**Clipping costs the caret one place, so the caret steps back past it.** `Typewriter` draws the consumer's caret inside
+the piece holding the letter it follows, and a caret after a hanging space would be clipped with it for one step.
+`computeCaretIndex` takes the hanging places, from `LetterDriverUtils.getHangingIndices`, and places the caret after
+the letter before instead, which is the same spot on screen. Leaving the space unclipped was the alternative, and is
+what kept the overflow: a zero-width box whose content spills still widens what scrolls.
+
+**The width the lines are laid out to is read exactly and rounded down, not taken from `clientWidth`.** The hanging
+space cleared the barrel in every headless run, and the user's own Edge at 125% scale still drew a scrollbar with
+`clientWidth` and `scrollWidth` both 350. `clientWidth` rounds to the nearest pixel, so room of 349.6 pixels — a
+scrollbar of a fractional width leaves that — reads as 350, and lines set to 350 overflow by less than any whole-pixel
+measurement shows. `LetterDriverUtils.measureLineWidth` reads the used width from the computed style, adds the padding
+`clientWidth` counts, and floors it; `ProximityText`, `Typewriter` and `PaintedText` each lay out to it.
+
 ### `Roller`: the wheel's behavior with one more dimension
 
 Asked for by the user as "a Roller is a Rotator with more dimensions", so that `Die` does what `Wheel` does wherever the two have an equivalent. `Rotator` holds one angle; `Roller` holds one rotation, kept as a quaternion, because two angles applied one after the other make a freely dragged solid feel wrong after a few drags. Everything else follows the wheel: it drifts while idle, a roll asks for its target and may wait for it, the target is written as soon as it is known, the landing is announced, and the solid rests before drift resumes. `Die` keeps only the solid's geometry and the drawing, and uses `Roller` as the wheels use `Rotator`.
@@ -19301,3 +19332,69 @@ builtin rendered outside a header cell warns and renders nothing, as an orphan `
 **The guarantee this gave up**: under the slots, a consumer who painted nothing still had a working, invisible
 target, so sorting could not die silently. With builtins, a consumer who renders none gets no pointer route, and
 the warning is what stands in for the guarantee.
+
+### The gallery page: every page's first example, live, on one page
+
+Built in Solid first and ported once the user had tried it. `/gallery` sits under About in the nav and draws one tile per page that has
+examples, grouped under the menu's own categories, each with the one-line description its `MenuBranchConfig` carries.
+A tile is the page's name as a link and its first example, live and interactive. **The name carries its menu
+trail below the category** — `Input / Select`, not `Select` — because tiles run in menu order, which is alphabetical
+only within a branch, and without the branch the order reads as broken. Nothing pauses yet: the user deferred
+standing still until hovered to after this first pass.
+
+**A page draws its own preview, told by `PreviewContextProvider`.** The gallery renders the whole page component, so
+its knob signals start as they would on the page, and the page components that read `useIsPreview()` strip it down:
+`PageExamples` draws only its first item's demo, bare, and `PagePropsPanel`, `PagePropsGroups` and `PagePropsDivider`
+draw nothing. Nothing is written per page, so the order of a page's examples decides its tile. `PREVIEW_EXCLUDED_PAGES`
+in `App.const.tsx` leaves a page out of the gallery and the nav preview without touching its page; it holds `TableOfContents` and `ViewportWrapper`, which are too tall to read at tile size, and both media switchers, `AudioSwitcher` and `ImageSwitcher` — all four the user's call. The list was kept, at their request, after it first carried `ShapeReveal`.
+
+**A tile mounts only while on screen**, and is taken down when it leaves, so its state resets on the way back.
+
+**Each tile is a nested `ViewportWrapper`, so a preview is a real scaled viewport rather than a CSS shrink**: pointer
+positions, anchored popups and measurements inside all know the scale, and popups open clipped to the tile. The
+canvas is 600 wide and at least 400 tall, chosen by eye against how small a 960-wide canvas made text; the height
+grows to the example's natural height plus padding, so a tall example is shrunk to fit rather than cut off. Width
+does not grow, so an example wider than 520 still clips at the side (`Table`), and a very tall one comes out small
+(which is why `TableOfContents` and `ViewportWrapper` are excluded).
+
+**An example is centered by its own natural width, and anything meant to fill says so with a width.** The preview
+centers the page's wrapper and the demo's children, which shrinks each example to its content. That is right for a
+lone `Select`, and wrong for anything with no content width of its own — `Wraparound`'s stage and `Carousel`'s box
+collapsed — so a box meant to fill carries `width: "100%"`, which is a no-op on its page, where the example box
+stretches it anyway. The reverse holds too: the `ScrambleText`, `SlotText` and `ScratchCard` stacks had
+`width: "100%"` only to line their items up on the left, and lost it so they center. Centering one level deeper
+instead, inside each example's own column, was measured across every tile and squeezes `Carousel`, `Paginator`,
+`Tabs`, `Treemap` and `Timeline`, so it was not done.
+
+**The nav shows the same preview in a tooltip on each row whose page has examples.** Three
+calls, each the user's: the preview is a picture, not something to operate, since a usable card would make every row
+the keyboard passes a stop and every pointer crossing a risk of a stray press; it is drawn in a `Tooltip`, which is
+what non-operable content on hover or focus is, rather than a `HoverCard`, whose point is content one can use — the
+cost being that a tooltip takes a tap as a long hover, so on a touch screen a tapped row shows its preview after
+following its link, as every tooltip in the library does; and a page with no examples, or one in
+`PREVIEW_EXCLUDED_PAGES`, gets none. `Tree` already carries a tooltip per row. The preview is `aria-hidden` and
+`inert`, so the row's description comes out empty and nothing inside takes focus. `PagePreview` is the gallery
+tile's drawing lifted out, so the tile and the tooltip cannot drift; the tooltip box is 360 by 240, the nearest round size to the gallery tile's preview at a usual window width, so an example comes out at the scale it was tuned at in the gallery, and the Playground tooltip's `isWide` lifts its 240-pixel limit for it.
+
+**The nav's tooltip points at its row with the Playground tooltip's triangle**, at the arrow size the Tooltip page
+starts with. It needed the library to hand the arrow's aim through `InteractionWrapper`: `Tooltip` has always given its
+body `getArrowAim`, and the wrapper every control's `tooltipDefs` passes through dropped it in Solid, React and Svelte,
+so no tooltip on a control could draw an arrow at that control. The aim is now the last argument of
+`InteractionTooltipDefs.renderContent` in all four — last so every existing body keeps working unchanged; Vue's spread
+already carried it at runtime and only its type lacked it.
+
+**Porting: where the four differ.** React's `PagePreview` holds its own `Suspense`: a page component loads lazily,
+and without a boundary of its own the first tile to mount an unloaded page suspended the route's boundary, blanking
+the whole gallery until the code arrived — found by the spec of a tile far down, which came back to a scrolled page
+and let go again. Vue and Svelte keep the gallery tile in a file of its own, since each file holds one component.
+**A tree row's state carries the item it was built from**, as `value` on `TreeNodeRenderProps<T>`, which now takes
+the item's type with `unknown` as its default. The user's call, taken to let Svelte write the nav's preview as one
+snippet in `AppContent`'s template: a snippet cannot be made in code, the one `Tree` hands a row's tooltip was told
+the row's state and not the row, so the first port mounted a component per row by hand with `createRawSnippet` and
+`mount`, carrying the page's contexts along. Now every previewable row shares one tooltip that reads the page off
+`flags.value`, as any Svelte consumer giving tree rows tooltips can. It is the tree's own extras, so `Tooltip` and
+`InteractionWrapper` are untouched and no other control's tooltip sees it. Each `Tree` view hands `renderNode` the
+flags it built itself rather than the copy its row hands back, which is the same object but lost the item's type.
+
+**The tile's title is the text color in both link states**, declaring `:visited` itself as `dependencyLink` does,
+since the theme's `a:visited` rule outranks a single class.

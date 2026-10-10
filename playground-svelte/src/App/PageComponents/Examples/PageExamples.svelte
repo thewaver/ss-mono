@@ -5,9 +5,11 @@
 
     import PageModalOverlay from "../../StyledComponents/ModalOverlay/ModalOverlay.svelte";
     import PageModalPanel from "../../StyledComponents/ModalPanel/PageModalPanel.svelte";
+    import { getIsPreview } from "../Preview/Preview.context";
     import PageSourceView from "../SourceView/SourceView.svelte";
     import type { ExamplesProps } from "./Examples.types";
     import PageExample from "./PageExample.svelte";
+    import PageFirstExample from "./PageFirstExample.svelte";
 
     const DEFAULT_LAYOUT = "grid" as const;
     const DEFAULT_MIN_COLUMN_WIDTH = 320;
@@ -15,6 +17,8 @@
     const PERCENT = 100;
 
     let props: ExamplesProps = $props();
+
+    const isPreview = getIsPreview();
 
     let activeIndex = $state(0);
     let isModalOpen = $state(false);
@@ -34,30 +38,34 @@
     );
 </script>
 
-<div class={styles.examplesRootVariants[layout]} style:grid-template-columns={columns}>
-    {#each props.items as example, exampleIndex (example.key)}
-        <PageExample
-            {example}
-            onViewSource={() => {
-                activeIndex = exampleIndex;
-                isModalOpen = true;
-            }}
-        />
-    {/each}
-</div>
+{#if isPreview}
+    <PageFirstExample example={props.items[0]} />
+{:else}
+    <div class={styles.examplesRootVariants[layout]} style:grid-template-columns={columns}>
+        {#each props.items as example, exampleIndex (example.key)}
+            <PageExample
+                {example}
+                onViewSource={() => {
+                    activeIndex = exampleIndex;
+                    isModalOpen = true;
+                }}
+            />
+        {/each}
+    </div>
 
-<Modal
-    margins={CSSUtils.spreadMargin(40)}
-    bind:visibility={isModalOpen}
-    ariaLabel={`${props.items[activeIndex].name} source code`}
->
-    {#snippet renderOverlay(visibilityTarget, transitionDurationMs)}
-        <PageModalOverlay {visibilityTarget} {transitionDurationMs} />
-    {/snippet}
+    <Modal
+        margins={CSSUtils.spreadMargin(40)}
+        bind:visibility={isModalOpen}
+        ariaLabel={`${props.items[activeIndex].name} source code`}
+    >
+        {#snippet renderOverlay(visibilityTarget, transitionDurationMs)}
+            <PageModalOverlay {visibilityTarget} {transitionDurationMs} />
+        {/snippet}
 
-    {#snippet renderContent(visibilityTarget, transitionDurationMs)}
-        <PageModalPanel {visibilityTarget} {transitionDurationMs} padding={"0"}>
-            <PageSourceView path={props.items[activeIndex].path!} />
-        </PageModalPanel>
-    {/snippet}
-</Modal>
+        {#snippet renderContent(visibilityTarget, transitionDurationMs)}
+            <PageModalPanel {visibilityTarget} {transitionDurationMs} padding={"0"}>
+                <PageSourceView path={props.items[activeIndex].path!} />
+            </PageModalPanel>
+        {/snippet}
+    </Modal>
+{/if}

@@ -18,21 +18,12 @@ import type { TooltipContentProps } from "./TooltipContent.types";
 
 type ArrowKind = Exclude<TooltipArrow, "none">;
 
-const TINT_GRADIENT_ANGLE = 45;
-
 const BORDER_RADII = CSSUtils.spreadRadius(BORDER_RADIUS_FULL);
 
 const JOIN_RADII = [BORDER_RADIUS_FULL];
 
 const GLASS_DEFS: PartialGlassDefs = {
-    tint: {
-        opacity: 1,
-        gradient: {
-            kind: "linear",
-            angle: TINT_GRADIENT_ANGLE,
-            colors: [{ value: themeVars.color.surface.dark }, { value: themeVars.color.surface.light }],
-        },
-    },
+    tint: { color: themeVars.color.surface.dark, opacity: 1 },
     sheen: { specularConstant: 0 },
 };
 
@@ -71,7 +62,7 @@ const computeArrowedPoints = (kind: ArrowKind) => (size: Size2d) =>
                 :compute-fill-defs="() => [{ color: themeVars.color.surface.dark }]"
             >
                 <template #renderChildren>
-                    <div :class="styles.tooltipBody">
+                    <div :class="[styles.tooltipBody, isWide && styles.tooltipBodyWide]">
                         <PageLayer :level="2"><slot /></PageLayer>
                     </div>
                 </template>
@@ -79,7 +70,7 @@ const computeArrowedPoints = (kind: ArrowKind) => (size: Size2d) =>
         </div>
 
         <GlassSurface v-else :border-radii="BORDER_RADII" :glass-defs="GLASS_DEFS">
-            <div :class="styles.tooltipBody">
+            <div :class="[styles.tooltipBody, isWide && styles.tooltipBodyWide]">
                 <PageLayer :level="2"><slot /></PageLayer>
             </div>
         </GlassSurface>

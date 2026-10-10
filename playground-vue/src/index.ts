@@ -30,7 +30,19 @@ const router = createRouter({
         {
             path: "/",
             component: AppContent,
-            children: [{ path: "", component: () => import("./App/Pages/AboutPage/AboutPage.vue") }, ...PAGE_ROUTES],
+            children: [
+                { path: "", component: () => import("./App/Pages/AboutPage/AboutPage.vue") },
+                {
+                    path: "getting-started",
+                    component: () => import("./App/Pages/GettingStartedPage/GettingStartedPage.vue"),
+                },
+                {
+                    path: "gallery",
+                    component: () => import("./App/Pages/GalleryPage/GalleryPage.vue"),
+                    props: { sections: AppUtils.GALLERY_SECTIONS },
+                },
+                ...PAGE_ROUTES,
+            ],
         },
     ],
 });

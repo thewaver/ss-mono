@@ -6,9 +6,7 @@
     import {
         FlattenerUtils,
         FloaterStyles as floaterStyles,
-        type InteractionFlags,
         TREE_DEFAULTS,
-        type TreeNodeRenderProps,
         TreeUtils,
         TypeaheadUtils,
         TreeStyles as styles,
@@ -286,6 +284,7 @@
             isTabbable={row.node.value === rovingRow?.node.value}
             tooltipDefs={row.node.tooltipDefs}
             extraFlags={{
+                value: row.node.value,
                 isBranch: TreeUtils.getIsBranch(row.node),
                 isExpanded: row.isExpanded,
                 isPending: TreeUtils.computeIsPending(row),
@@ -294,8 +293,8 @@
             }}
         >
             {#snippet renderControl(attachElement, renderProps)}
-                {#snippet nodeContent(nodeFlags: InteractionFlags<TreeNodeRenderProps>)}
-                    {@render props.renderNode(row.node, nodeFlags)}
+                {#snippet nodeContent()}
+                    {@render props.renderNode(row.node, renderProps)}
                 {/snippet}
 
                 <TreeNodeItem

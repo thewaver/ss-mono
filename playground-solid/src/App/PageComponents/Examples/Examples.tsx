@@ -11,6 +11,7 @@ import { PageTooltipContent } from "../../StyledComponents/TooltipContent/Toolti
 import { PageExampleKnobsButton } from "../ExampleKnobs/ExampleKnobs";
 import { ExampleKnobsContextProvider } from "../ExampleKnobs/ExampleKnobs.context";
 import { PageLayer } from "../Layer/Layer";
+import { useIsPreview } from "../Preview/Preview.context";
 import { PageSourceView } from "../SourceView/SourceView";
 import type { ExamplesProps } from "./Examples.types";
 
@@ -19,7 +20,21 @@ const DEFAULT_MIN_COLUMN_WIDTH = 320;
 const SINGLE_SPAN = 1;
 const PERCENT = 100;
 
+const PageFirstExample = (props: ExamplesProps) => (
+    <For each={access(props.items).slice(0, 1)}>
+        {(example) => (
+            <div class={styles.exampleDemo} data-demo data-testid={example.key}>
+                <ExampleKnobsContextProvider value={{ setRenderKnobs: () => undefined }}>
+                    {example.component()}
+                </ExampleKnobsContextProvider>
+            </div>
+        )}
+    </For>
+);
+
 export const PageExamples = (props: ExamplesProps) => {
+    if (useIsPreview()) return <PageFirstExample {...props} />;
+
     const [getActiveIndex, setActiveIndex] = createSignal(0);
     const modalVisibility = createSignal(false);
     const [, setIsModalOpen] = modalVisibility;

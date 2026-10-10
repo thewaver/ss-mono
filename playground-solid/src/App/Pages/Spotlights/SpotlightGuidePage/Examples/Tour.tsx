@@ -5,7 +5,6 @@ import { RICH_TOUR_STEPS } from "@thewaver/ss-playground/App/Pages/Spotlights/Sp
 import { PADDING } from "@thewaver/ss-playground/App/Pages/Spotlights/SpotlightTourSteps.const";
 import * as styles from "@thewaver/ss-playground/App/Pages/Spotlights/Spotlights.css";
 
-import { PageControlRow } from "../../../../PageComponents/ControlRow/ControlRow";
 import { PageButtonContent } from "../../../../StyledComponents/ButtonContent/ButtonContent";
 import { useLayerClass } from "../../../../StyledComponents/Layer/Layer.context";
 import {
@@ -53,7 +52,7 @@ export const TourExample = (props: Props) => {
 
     return (
         <div class={[styles.root, getLayerClass()].join(" ")}>
-            <PageControlRow>
+            <div class={styles.tourRow}>
                 <div ref={setShelfRef} class={styles.tourTarget}>
                     Potatoes
                 </div>
@@ -82,7 +81,7 @@ export const TourExample = (props: Props) => {
                     ref={setCheckoutRef}
                     renderContent={(getFlags) => <PageButtonContent flags={getFlags}>Checkout</PageButtonContent>}
                 />
-            </PageControlRow>
+            </div>
 
             <Button
                 id={"tourStart"}

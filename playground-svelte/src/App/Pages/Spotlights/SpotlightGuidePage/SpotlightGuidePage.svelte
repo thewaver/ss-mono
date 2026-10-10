@@ -55,13 +55,6 @@
 
     const examples: ExampleDefs[] = [
         {
-            key: "guide",
-            name: "Guide",
-            readout: () => `step: ${step + 1} of ${TOUR_STEPS.length} — ${finished}`,
-            component: guideExample,
-            path: `${EXAMPLES_ROOT}/Guide.svelte`,
-        },
-        {
             key: "tour",
             name: "A tour with a step the reader does",
             span: 2,
@@ -69,6 +62,13 @@
                 `step: ${tourStep + 1} of ${RICH_TOUR_STEPS.length} — ${tourStatus} — basket: ${basketCount}. The guide holds the whole page still, so on step 2 it closes and a prompt lights the button instead, and pressing it reopens the guide; the step is kept in sessionStorage, so reloading offers to resume`,
             component: tourExample,
             path: `${EXAMPLES_ROOT}/Tour.svelte`,
+        },
+        {
+            key: "guide",
+            name: "Guide",
+            readout: () => `step: ${step + 1} of ${TOUR_STEPS.length} — ${finished}`,
+            component: guideExample,
+            path: `${EXAMPLES_ROOT}/Guide.svelte`,
         },
     ];
 </script>

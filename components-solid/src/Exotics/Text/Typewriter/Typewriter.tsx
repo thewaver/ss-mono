@@ -107,8 +107,16 @@ export const Typewriter = (props: ParentProps<TypewriterProps>) => {
         return characters.map((character, index) => computeAnimationName(character, index, characters.length));
     });
 
+    const getHangingIndices = createMemo(() => LetterDriverUtils.getHangingIndices(getIndexedSegments()));
+
     const getCaretIndex = createMemo(() =>
-        TypewriterUtils.computeCaretIndex(getStartTimesMs(), getTimeMs(), getIsErasing(), !getIsAnimating()),
+        TypewriterUtils.computeCaretIndex(
+            getStartTimesMs(),
+            getTimeMs(),
+            getIsErasing(),
+            !getIsAnimating(),
+            getHangingIndices(),
+        ),
     );
 
     const getRootStyle = () =>

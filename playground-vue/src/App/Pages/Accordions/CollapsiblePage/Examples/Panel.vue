@@ -2,6 +2,7 @@
 import { useModel } from "vue";
 
 import { Collapsible } from "@thewaver/ss-components-vue";
+import * as styles from "@thewaver/ss-playground/App/Pages/Accordions/Accordions.css";
 
 import PageAccordionHeader from "../../../../StyledComponents/AccordionContent/PageAccordionHeader.vue";
 import PageAccordionPanel from "../../../../StyledComponents/AccordionContent/PageAccordionPanel.vue";
@@ -15,7 +16,7 @@ const expanded = useModel(props, "expanded");
 </script>
 
 <template>
-    <div>
+    <div :class="styles.textWithPanel">
         <div>
             Orders leave the warehouse within two working days, and tracking arrives by email as soon as the parcel is
             scanned.

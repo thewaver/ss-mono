@@ -6,6 +6,7 @@ import * as styles from "@thewaver/ss-playground/App/PageComponents/PropsPanel/P
 
 import { PageButtonContent } from "../../StyledComponents/ButtonContent/ButtonContent";
 import { FieldResetProvider } from "../Field/Field.context";
+import { useIsPreview } from "../Preview/Preview.context";
 import { PageProp } from "../Prop/Prop";
 import { PropsPanelContextProvider } from "./PropsPanel.context";
 import type { PagePropsPanelProps } from "./PropsPanel.types";
@@ -13,9 +14,15 @@ import type { PagePropsPanelProps } from "./PropsPanel.types";
 const NOTHING_TO_RESET = 0;
 const SAMPLE_SELECTOR_ALONE = 1;
 
-export const PagePropsGroups = (props: ParentProps) => <div class={styles.propsGroups}>{props.children}</div>;
+export const PagePropsGroups = (props: ParentProps) => {
+    if (useIsPreview()) return null;
+
+    return <div class={styles.propsGroups}>{props.children}</div>;
+};
 
 export const PagePropsPanel = (props: ParentProps<PagePropsPanelProps>) => {
+    if (useIsPreview()) return null;
+
     const [getResets, setResets] = createSignal<(() => void)[]>([]);
 
     const getIsSampleScope = () => access(props.scope) === "sample";
@@ -58,4 +65,8 @@ export const PagePropsPanel = (props: ParentProps<PagePropsPanelProps>) => {
     );
 };
 
-export const PagePropsDivider = () => <div class={styles.propsPanelDivider} role={"separator"} />;
+export const PagePropsDivider = () => {
+    if (useIsPreview()) return null;
+
+    return <div class={styles.propsPanelDivider} role={"separator"} />;
+};

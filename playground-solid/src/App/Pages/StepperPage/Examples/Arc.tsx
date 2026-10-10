@@ -12,8 +12,8 @@ import type { StepperExampleProps } from "../StepperPage.types";
 const ARC_DEFS: ArcDefs = {
     curveHeightRatio: 1,
     spreadDegrees: 135,
-    itemWidthRatio: 0.302,
-    itemHeightRatio: 0.418,
+    itemWidthRatio: 0.222,
+    itemHeightRatio: 0.403,
 };
 
 const ARC_LAYOUT = PlacementLayoutUtils.createArc(ARC_DEFS);

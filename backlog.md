@@ -61,10 +61,9 @@ reading.
 27. The submit story — what a native submit carries, and what `Form` hands `onSubmit` — _pending decision_
 28. Work that has never been watched running — _open_
 29. Choices the add-ons round made on the user's behalf — _pending decision_
-30. A gallery page, and a preview of each page from the nav — _deferred to a session of its own_
-31. A long list reopened onto a far-down selection settles a frame or two late in Solid and Svelte — _open_
-32. `Die`'s step buttons and arrow keys fall into a loop of two or three faces — _open, no fix chosen_
-33. A wide arrow vanishes at a corner, and a nearly-as-wide one becomes a sliver — _open, the user is analysing it_
+30. A long list reopened onto a far-down selection settles a frame or two late in Solid and Svelte — _open_
+31. `Die`'s step buttons and arrow keys fall into a loop of two or three faces — _open, no fix chosen_
+32. A wide arrow vanishes at a corner, and a nearly-as-wide one becomes a sliver — _open, the user is analysing it_
 
 ### Build order
 
@@ -910,7 +909,7 @@ the coverage did.
   takes an `anchor-name`, the layer a `position-anchor`, and the layer writes its edges against the anchor's
   with `anchor()`; the browser then keeps the two glued in its own layout pass, which is why no frame can be
   lost. Choosing another side when there is no room is `position-try-fallbacks` — alternatives in order, the
-  browser takes the first that fits. The note in item 12 calling this Chromium-only was out of date.
+  browser takes the first that fits. An earlier note calling this Chromium-only was out of date.
 - **D — measure where the frame is actually lost before choosing.** Done, and it is what ruled B out.
 
 **What C would have to answer, worked out before the postponement so it is not re-derived.** Two shapes, and
@@ -1247,22 +1246,7 @@ is the user's to confirm or change.
 - **SlotText reels under reduced motion drop only their extra turns.** Each reel keeps its own duration, so a
   slow reel still turns its one step slowly. Falling back to `turnDurationMs` there is the alternative.
 
-## 30. A gallery page, and a preview of each page from the nav — _deferred to a session of its own_
-
-From Magic UI, whose documentation shows every component on one page and previews each from the side menu. The
-Playground gains both.
-
-**Deferred by the user to a session of its own; the gallery and the nav preview are two pieces of work.** One question is open for that session: how a tile stands still until hovered, since CSS animations can be paused from outside but wheels, trails and particles run their own frame loops. The choices put so far: draw once and swap in a frozen copy of the markup, show only the page's name until hovered, pause only the CSS, or take screenshots at build time.
-
-- **The preview is the first example of each page**, live, drawn at full size and shrunk, the way the Playground
-  already draws inside `Viewport`. Nothing new is written per component; the order of a page's examples decides
-  what it previews, and the user reorders where a first example is a poor picture — a modal's is just a button.
-- **The gallery shows every preview as a tile**, each coming to life only once scrolled into view.
-- **Tiles stand still until hovered or focused, then play.** The user's pick, and what the libraries browsed do.
-  It is also how the page meets WCAG 2.2.2 with dozens of moving examples on it.
-- **The nav shows the same preview in a `HoverCard`** on its items.
-
-## 31. A long list reopened onto a far-down selection settles a frame or two late in Solid and Svelte
+## 30. A long list reopened onto a far-down selection settles a frame or two late in Solid and Svelte
 
 Reachable in the Playground's windowed `Select` (the long list of routes): pick `Route 26`, close the list and open it
 again. In Solid and Svelte, for about two frames the picked row sits just above the list's box with only its bottom edge
@@ -1276,7 +1260,7 @@ which changes timing those windows were built on (`decisions.md`, _"The Solid an
 `getIsLive` once they are following their scroller"_), so it was left for a deliberate look. `select.spec.ts`'s
 reopening case waits for the list to settle, so it passes either way and will not catch a change here.
 
-## 32. `Die`'s step buttons and arrow keys fall into a loop of two or three faces
+## 31. `Die`'s step buttons and arrow keys fall into a loop of two or three faces
 
 Reachable on the Die page's icon cloud: pick the d20 and press down a few times. The die goes back and forth
 between the same two faces. Every shape does it — a d20 pressed right goes between faces 1 and 2 from the first
@@ -1303,7 +1287,7 @@ every face upright cannot both hold, so each option gives one up:
 `Cuboid`'s upright mode has the same tension and accepted it, since a box has only six resting orientations
 (`decisions.md`, _"`Cuboid`: upright mode keeps an orientation"_); a d20 has many more faces for the loop to skip.
 
-## 33. A wide arrow vanishes at a corner, and a nearly-as-wide one becomes a sliver
+## 32. A wide arrow vanishes at a corner, and a nearly-as-wide one becomes a sliver
 
 Reachable on the Tooltip page: pick the triangle, set its width to at least twice its length, and place the tooltip
 off a corner of its anchor (`left-out` with `bottom-out`). No arrow is drawn. Make it a little narrower than that and
@@ -1571,8 +1555,8 @@ surfaces are flat pieces the browser can turn in 3D; a sphere has none, so "a sp
 Whether the first two are wanted is the open question.
 
 **The icon cloud took the solid rather than the sphere.** Magic UI's Icon Cloud is the first reading — items at
-points on a sphere — and the user chose instead `Die` with transparent faces and an icon on each, turning freely
-(item 30), accepting that the number of items is the solid's. The first two readings are still unasked for.
+points on a sphere — and the user chose instead `Die` with transparent faces and an icon on each, turning freely,
+accepting that the number of items is the solid's. The first two readings are still unasked for.
 
 ### A fifth round of Exotics candidates, and what became of each
 
@@ -1670,13 +1654,13 @@ example, so nothing is pending there either.
 - **A split-flap board**, the airport departure display whose characters flip through the alphabet one card
   at a time. Their verdict: the drum is already a component and this is that drum again, so it would be a
   second way to spell what `Odometer` and `DrumWheel` do. **Reopened by the user** once a hinge counterpart to
-  `Barrel` was proposed (item 31): on a shared abstract it is a second consumer, not a second mechanism.
+  `Barrel` was proposed: on a shared abstract it is a second consumer, not a second mechanism.
 - **A magnifying strip**, the macOS dock's swell around the pointer. Their verdict: it already existed as a
   Playground example, so a component would be a second way to spell it. **That example has since gone with the
   `PointerTracker` page**, so the reason as recorded no longer holds — the verdict is still theirs, but it now
   rests on nothing a reader can go and look at.
 - **A ticker**, a strip of content looping seamlessly past. Turned down at first because the carousels cover it,
-  and reopened by the user once `Wraparound` existed: a marquee is `Wraparound` drifting along one axis (item 30).
+  and reopened by the user once `Wraparound` existed: a marquee is `Wraparound` drifting along one axis.
 - **A marquee selection layer**, dragging a rectangle across a board to pick up everything it touches.
   **This one was not turned down on its merits** — "interesting but can't think of a use" — so what it lacks
   is a use rather than an argument, and a real one would reopen it.
@@ -1693,4 +1677,4 @@ without crossing.
 
 **Named and not discussed: `Flipbook`**, a two-page spread that turns with a fold at the spine. The user said
 they understood that one from its description, and it was not among the two they picked; it has never been
-argued either way. It is now one of the consumers of the hinge counterpart to `Barrel` (item 31).
+argued either way. It is now one of the consumers of the hinge counterpart to `Barrel`.

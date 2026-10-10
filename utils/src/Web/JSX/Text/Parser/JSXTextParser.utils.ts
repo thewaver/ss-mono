@@ -28,6 +28,7 @@ type StyledTextSegment = {
     metrics: TextMetricsStyle;
     nonMetrics: TextNonMetricStyle;
     meta: StyledTextSegmentMeta;
+    isHanging?: boolean;
 };
 
 /** A forced break — a `<br>`, a newline, or the edge of a block element. */
@@ -62,6 +63,47 @@ const lineBreakToken: LineBreakSegment = { type: "linebreak" };
  * {@link lineBreakToken} only by identity, so a caller can tell a break the content holds from one the width made.
  */
 const wrapLineBreakToken: LineBreakSegment = { type: "linebreak" };
+
+/**
+ * Drawn on the white space a wrapped line ends on, so it takes no room: a box no wider than nothing, which clips what
+ * it holds rather than letting it spill past the line, set at the top of the line so it adds no height of its own.
+ */
+const hangingWhitespaceStyle: TextNonMetricStyle = {
+    "display": "inline-block",
+    "width": "0",
+    "overflow": "hidden",
+    "vertical-align": "top",
+};
+
+const TRAILING_WHITESPACE = /\s+$/u;
+
+/**
+ * Splits the white space each wrapped line ends on into a piece of its own, styled by {@link hangingWhitespaceStyle}
+ * and marked as hanging.
+ *
+ * A line is wrapped before the word that does not fit, so the space in front of that word stays at the end of the
+ * line it leaves. Drawn as text, that space would hang past the edge as a browser lets it; drawn a letter at a time,
+ * it is a box like any other, which pushes past the edge and shifts a centered line off its middle. Kept as its own
+ * piece it keeps its characters, so every count and position along the text stays the same.
+ */
+const hangTrailingWhitespace = (segments: readonly ElementSegment[]) =>
+    segments.flatMap((segment, index): ElementSegment[] => {
+        if (segment.type !== "text" || segments[index + 1] !== wrapLineBreakToken) return [segment];
+
+        const trailing = TRAILING_WHITESPACE.exec(segment.text)?.[0];
+
+        if (!trailing) return [segment];
+
+        const hanging: StyledTextSegment = {
+            ...segment,
+            text: trailing,
+            nonMetrics: { ...segment.nonMetrics, ...hangingWhitespaceStyle },
+            isHanging: true,
+        };
+        const head = segment.text.slice(0, -trailing.length);
+
+        return head ? [{ ...segment, text: head }, hanging] : [hanging];
+    });
 
 /**
  * The break standing for the edge of a block element, kept apart from {@link lineBreakToken} only by
@@ -166,6 +208,15 @@ export namespace JSXTextParserUtils {
      * count and every position in it stay the same at any width.
      */
     export const getIsWrapBreak = (segment: ElementSegment) => segment === wrapLineBreakToken;
+
+    /**
+     * Tests whether a piece is the white space a wrapped line ends on, which {@link getInlinedSegments} splits off
+     * and styles to take no room.
+     *
+     * Its characters still count, so a caller placing something after a character — a caret, say — can step back
+     * past these to the last character that takes room, which sits in the same place.
+     */
+    export const getIsHanging = (segment: ElementSegment) => segment.type === "text" && !!segment.isHanging;
 
     /**
      * Walks a rendered element and flattens it into a list of text runs, line breaks
@@ -395,7 +446,8 @@ export namespace JSXTextParserUtils {
      * words of one run in order, the run's measuring style, and where the run's first character falls among
      * every character, whole element and break the content holds, counted from `0`, so it can tell which
      * letters it is measuring. It answers one width per word, in pixels.
-     * @returns A new list with breaks inserted. The input is not modified.
+     * @returns A new list with breaks inserted, and the white space each wrapped line ends on split off and styled
+     * to take no room — see {@link getIsHanging}. The input is not modified.
      */
     export const getInlinedSegments = (
         segments: readonly ElementSegment[],
@@ -481,6 +533,6 @@ export namespace JSXTextParserUtils {
             segmentId++;
         }
 
-        return result;
+        return hangTrailingWhitespace(result);
     };
 }

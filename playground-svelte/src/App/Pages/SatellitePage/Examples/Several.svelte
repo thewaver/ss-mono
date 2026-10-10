@@ -6,11 +6,11 @@
     import PageSatelliteSubject from "../../../StyledComponents/SatelliteContent/PageSatelliteSubject.svelte";
     import type { SatelliteExampleProps } from "../SatellitePage.types";
 
-    const CORNER_SIZE = 28;
-    const SIDE_SIZE = 36;
-    const TUCKED_SIZE = 44;
-    const CORNER_OVERHANG = 10;
-    const TUCKED_DEPTH = 16;
+    const CORNER_SIZE = 48;
+    const SIDE_SIZE = 72;
+    const TUCKED_SIZE = 88;
+    const CORNER_OVERHANG = 20;
+    const TUCKED_DEPTH = 32;
 
     const SATELLITES: SatelliteDefs[] = [
         {
