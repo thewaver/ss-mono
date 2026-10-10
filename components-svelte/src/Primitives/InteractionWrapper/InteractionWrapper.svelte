@@ -65,10 +65,22 @@
         return { ...defs, renderContent: tooltipContent };
     });
 
+    let lastTooltipDefs: typeof props.tooltipDefs;
+
+    const shownTooltipDefs = $derived.by(() => {
+        if (props.tooltipDefs) lastTooltipDefs = props.tooltipDefs;
+
+        return lastTooltipDefs;
+    });
+
+    const shownTooltipProps = $derived(shownTooltipDefs && { ...shownTooltipDefs, renderContent: tooltipContent });
+
     const sharedTooltip = getSharedTooltipContext();
 
+    const claimTarget = $derived(element);
+
     $effect(() => {
-        const target = element;
+        const target = claimTarget;
 
         if (!sharedTooltip || !target) return;
 
@@ -119,8 +131,8 @@
         </div>
     {/if}
 
-    {#if !sharedTooltip && tooltipProps}
-        <Tooltip {...tooltipProps} anchorRef={element} />
+    {#if !sharedTooltip && shownTooltipProps}
+        <Tooltip {...shownTooltipProps} anchorRef={tooltipProps ? element : undefined} />
     {/if}
 </div>
 
@@ -130,7 +142,7 @@
     placement: AnchorPlacement,
     arrowAim: ShapeArrowAim | undefined,
 )}
-    {#if props.tooltipDefs}
-        {@render props.tooltipDefs.renderContent(visibilityTarget, transitionDurationMs, placement, flags, arrowAim)}
+    {#if shownTooltipDefs}
+        {@render shownTooltipDefs.renderContent(visibilityTarget, transitionDurationMs, placement, flags, arrowAim)}
     {/if}
 {/snippet}

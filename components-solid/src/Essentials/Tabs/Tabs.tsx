@@ -2,6 +2,7 @@ import { type Accessor, Index, type JSX, Show, createEffect, createMemo, createS
 import { Dynamic } from "solid-js/web";
 
 import {
+    InteractionTrackerUtils,
     TABS_DEFAULTS,
     type Tab,
     TabsUtils,
@@ -110,12 +111,20 @@ export const Tabs = <T,>(props: TabsProps<T>) => {
     );
 
     const [getHoveredIndex, setHoveredIndex] = createSignal<number>();
-    const [getFocusedIndex, setFocusedIndex] = createSignal<number>();
+    const [getFocusVisibleIndex, setFocusVisibleIndex] = createSignal<number>();
 
-    const getHighlightIndex = createMemo(() => getHoveredIndex() ?? getFocusedIndex());
+    const getHighlightIndex = createMemo(() => getHoveredIndex() ?? getFocusVisibleIndex());
 
     const findItemIndex = (target: EventTarget | null) =>
         target instanceof Node ? getItemRefs().findIndex((item) => item?.contains(target) ?? false) : -1;
+
+    const readFocusVisibleIndex = (target: EventTarget | null) => {
+        const index = findItemIndex(target);
+
+        return index < 0 || !(target instanceof HTMLElement) || !InteractionTrackerUtils.computeIsFocusVisible(target)
+            ? undefined
+            : index;
+    };
 
     const createFloater = (getIsEnabled: () => boolean, getIndex: () => number | undefined) =>
         FloaterSolidUtils.create({
@@ -238,19 +247,19 @@ export const Tabs = <T,>(props: TabsProps<T>) => {
             role="tablist"
             aria-label={access(props.ariaLabel)}
             aria-orientation={getOrientation()}
-            onKeyDown={handleKeyDown}
+            onKeyDown={(e) => {
+                handleKeyDown(e);
+
+                setFocusVisibleIndex(readFocusVisibleIndex(document.activeElement));
+            }}
             onPointerOver={(e) => {
                 const index = findItemIndex(e.target);
 
                 setHoveredIndex(index < 0 ? undefined : index);
             }}
             onPointerLeave={() => setHoveredIndex(undefined)}
-            onFocusIn={(e) => {
-                const index = findItemIndex(e.target);
-
-                setFocusedIndex(index < 0 ? undefined : index);
-            }}
-            onFocusOut={() => setFocusedIndex(undefined)}
+            onFocusIn={(e) => setFocusVisibleIndex(readFocusVisibleIndex(e.target))}
+            onFocusOut={() => setFocusVisibleIndex(undefined)}
         >
             {props.renderGutter && <div class={styles.tabsGutter}>{props.renderGutter()}</div>}
 

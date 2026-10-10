@@ -62,6 +62,10 @@ export const InteractionWrapper = <TExtra extends object = {}>(props: Interactio
         };
     });
 
+    const getLastTooltipProps = createMemo<Omit<TooltipProps, "anchorRef"> | undefined>(
+        (previous) => getTooltipProps() ?? previous,
+    );
+
     const sharedTooltip = useSharedTooltipContext();
 
     if (sharedTooltip) {
@@ -108,8 +112,10 @@ export const InteractionWrapper = <TExtra extends object = {}>(props: Interactio
                 <div class={styles.interactionDecorationWrapper}>{props.renderDecoration(getFlags)}</div>
             )}
 
-            <Show when={!sharedTooltip && getTooltipProps()}>
-                {(getProps) => <Tooltip {...getProps()} anchorRef={getElementRef} />}
+            <Show when={!sharedTooltip && getLastTooltipProps()}>
+                {(getProps) => (
+                    <Tooltip {...getProps()} anchorRef={() => (getTooltipProps() ? getElementRef() : undefined)} />
+                )}
             </Show>
         </div>
     );

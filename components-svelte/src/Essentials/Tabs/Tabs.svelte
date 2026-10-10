@@ -7,6 +7,7 @@
     import {
         FloaterStyles as floaterStyles,
         type InteractionFlags,
+        InteractionTrackerUtils,
         TABS_DEFAULTS,
         TabsUtils,
         TabsStyles as styles,
@@ -28,7 +29,7 @@
     let itemElements = $state.raw<(HTMLElement | undefined)[]>([]);
     let focusedValue = $state.raw<T>();
     let hoveredIndex = $state<number>();
-    let focusedIndex = $state<number>();
+    let focusVisibleIndex = $state<number>();
 
     watchChange(
         () => props.selectedValue,
@@ -49,10 +50,18 @@
 
     const selectedIndex = $derived(TabsUtils.computeSelectedIndex(props.tabs, props.selectedValue));
     const rovingIndex = $derived(TabsUtils.computeRovingIndex(props.tabs, props.selectedValue, focusedValue));
-    const highlightIndex = $derived(hoveredIndex ?? focusedIndex);
+    const highlightIndex = $derived(hoveredIndex ?? focusVisibleIndex);
 
     const findItemIndex = (target: EventTarget | null) =>
         target instanceof Node ? itemElements.findIndex((item) => item?.contains(target) ?? false) : -1;
+
+    const readFocusVisibleIndex = (target: EventTarget | null) => {
+        const index = findItemIndex(target);
+
+        return index < 0 || !(target instanceof HTMLElement) || !InteractionTrackerUtils.computeIsFocusVisible(target)
+            ? undefined
+            : index;
+    };
 
     const createFloater = (getIsEnabled: () => boolean, getIndex: () => number | undefined) =>
         FloaterSvelteUtils.create({
@@ -181,7 +190,11 @@
 
 <div
     bind:this={root}
-    {@attach (element) => on(element, "keydown", handleKeyDown)}
+    {@attach (element) =>
+        on(element, "keydown", (e) => {
+            handleKeyDown(e);
+            focusVisibleIndex = readFocusVisibleIndex(document.activeElement);
+        })}
     {@attach (element) => on(element, "pointerover", handlePointerOver)}
     {@attach (element) =>
         on(element, "pointerleave", () => {
@@ -194,12 +207,10 @@
     aria-label={props.ariaLabel}
     aria-orientation={orientation}
     onfocusin={(e) => {
-        const index = findItemIndex(e.target);
-
-        focusedIndex = index < 0 ? undefined : index;
+        focusVisibleIndex = readFocusVisibleIndex(e.target);
     }}
     onfocusout={() => {
-        focusedIndex = undefined;
+        focusVisibleIndex = undefined;
     }}
 >
     {#if props.renderGutter}

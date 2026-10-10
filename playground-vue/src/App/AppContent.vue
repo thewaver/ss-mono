@@ -55,7 +55,7 @@ const isGallerySelected = computed(() => route.path === GALLERY_ROUTE);
 
 const isSearching = computed(() => searchTerm.value.trim().length > 0);
 
-const visibleNodes = computed(() => {
+const filteredNodes = computed(() => {
     const menuNodes = AppUtils.MENU_NODES_BY_VIEW[pageView.value];
 
     if (!isSearching.value && showsDescriptionOnly.value) return menuNodes;
@@ -74,6 +74,10 @@ const visibleNodes = computed(() => {
         .map((node) => AppUtils.filterTreeNode(node, getIsKept))
         .filter((node): node is TreeNode<MenuNodeConfig> => node !== undefined);
 });
+
+const visibleNodes = computed(() =>
+    filteredNodes.value.map((node) => AppUtils.withoutPreview(node, selectedConfig.value)),
+);
 
 watch(
     () => (isSearching.value ? visibleNodes.value : undefined),

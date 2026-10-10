@@ -2,6 +2,7 @@ import { type SlotsType, computed, defineComponent, shallowRef, useId } from "vu
 
 import {
     FloaterStyles,
+    InteractionTrackerUtils,
     RADIO_GROUP_DEFAULTS,
     type RadioGroupEntry,
     RadioGroupStyles,
@@ -26,7 +27,7 @@ export const RadioGroup = defineComponent(
 
         const entries = shallowRef<RadioGroupEntry[]>([]);
         const hoveredEntry = shallowRef<RadioGroupEntry>();
-        const focusedEntry = shallowRef<RadioGroupEntry>();
+        const focusVisibleEntry = shallowRef<RadioGroupEntry>();
 
         const getTransitionDurationMs = () => props.transitionDurationMs ?? RADIO_GROUP_DEFAULTS.transitionDurationMs;
 
@@ -42,6 +43,11 @@ export const RadioGroup = defineComponent(
         const findEntry = (target: EventTarget | null) =>
             target instanceof Node
                 ? orderedEntries.value.find((entry) => entry.getElementRef()?.parentElement?.contains(target) ?? false)
+                : undefined;
+
+        const readFocusVisibleEntry = (target: EventTarget | null) =>
+            target instanceof HTMLElement && InteractionTrackerUtils.computeIsFocusVisible(target)
+                ? findEntry(target)
                 : undefined;
 
         const useEntryFloater = (isEnabled: () => boolean, getEntry: () => RadioGroupEntry | undefined) =>
@@ -67,7 +73,7 @@ export const RadioGroup = defineComponent(
 
         const highlightFloater = useEntryFloater(
             () => slots.renderHighlightFloater !== undefined,
-            () => hoveredEntry.value ?? focusedEntry.value,
+            () => hoveredEntry.value ?? focusVisibleEntry.value,
         );
 
         provideRadioGroupContext({
@@ -146,7 +152,10 @@ export const RadioGroup = defineComponent(
                     aria-label={props.ariaLabel}
                     aria-required={props.isRequired || undefined}
                     aria-invalid={props.hasError || undefined}
-                    onKeydown={handleKeyDown}
+                    onKeydown={(e) => {
+                        handleKeyDown(e);
+                        focusVisibleEntry.value = readFocusVisibleEntry(document.activeElement);
+                    }}
                     onPointerover={(e) => {
                         hoveredEntry.value = findEntry(e.target);
                     }}
@@ -154,10 +163,10 @@ export const RadioGroup = defineComponent(
                         hoveredEntry.value = undefined;
                     }}
                     onFocusin={(e) => {
-                        focusedEntry.value = findEntry(e.target);
+                        focusVisibleEntry.value = readFocusVisibleEntry(e.target);
                     }}
                     onFocusout={() => {
-                        focusedEntry.value = undefined;
+                        focusVisibleEntry.value = undefined;
                     }}
                 >
                     {layout.value ? (

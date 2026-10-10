@@ -71,6 +71,8 @@ export const InteractionWrapper = defineComponent(
 
         const sharedTooltip = useSharedTooltipContext();
 
+        let lastTooltipDefs: SharedTooltipDefs | undefined;
+
         if (sharedTooltip) {
             watchAfterRender([element], ([target]) => {
                 if (!target) return;
@@ -95,7 +97,11 @@ export const InteractionWrapper = defineComponent(
             const isDisabled = getIsDisabled();
             const flags = getFlags();
 
-            const tooltipDefs = sharedTooltip ? undefined : getTooltipDefs();
+            const currentTooltipDefs = sharedTooltip ? undefined : getTooltipDefs();
+
+            if (currentTooltipDefs) lastTooltipDefs = currentTooltipDefs;
+
+            const tooltipDefs = lastTooltipDefs;
 
             return (
                 <div
@@ -125,7 +131,7 @@ export const InteractionWrapper = defineComponent(
                             const { renderContent, ...tooltipProps } = tooltipDefs;
 
                             return (
-                                <Tooltip {...tooltipProps} anchorRef={element.value}>
+                                <Tooltip {...tooltipProps} anchorRef={currentTooltipDefs ? element.value : undefined}>
                                     {{ renderContent } satisfies TooltipSlots}
                                 </Tooltip>
                             );

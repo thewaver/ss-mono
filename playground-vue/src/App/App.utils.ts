@@ -108,6 +108,15 @@ export namespace AppUtils {
         return children.length > 0 ? { ...node, children } : undefined;
     };
 
+    export const withoutPreview = (
+        node: TreeNode<MenuNodeConfig>,
+        config: MenuNodeConfig | undefined,
+    ): TreeNode<MenuNodeConfig> => {
+        if (node.children) return { ...node, children: node.children.map((child) => withoutPreview(child, config)) };
+
+        return node.value === config ? { ...node, tooltipDefs: undefined } : node;
+    };
+
     export const collectBranchValues = (nodes: TreeNode<MenuNodeConfig>[]): MenuNodeConfig[] =>
         nodes.flatMap((node) => (node.children ? [node.value, ...collectBranchValues(node.children)] : []));
 

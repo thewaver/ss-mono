@@ -4,13 +4,15 @@ import type { SlotsContext } from "../../../Utils/typeUtils";
 import { Tooltip } from "../Tooltip/Tooltip";
 import type { TooltipSlots } from "../Tooltip/Tooltip.types";
 import { provideSharedTooltipContext } from "./SharedTooltip.context";
-import type { SharedTooltipClaim } from "./SharedTooltip.context.types";
+import type { SharedTooltipClaim, SharedTooltipDefs } from "./SharedTooltip.context.types";
 import type { SharedTooltipSlots } from "./SharedTooltip.types";
 
 export const SharedTooltip = defineComponent(
     (_props: {}, { slots }: SlotsContext<SharedTooltipSlots>) => {
         const claim = shallowRef<SharedTooltipClaim>();
         const claimGeneration = shallowRef(0);
+
+        let lastTooltipDefs: SharedTooltipDefs | undefined;
 
         provideSharedTooltipContext({
             claim: (next) => {
@@ -26,7 +28,11 @@ export const SharedTooltip = defineComponent(
 
         return () => {
             const shown = claim.value;
-            const tooltipDefs = shown?.getTooltipDefs();
+            const currentTooltipDefs = shown?.getTooltipDefs();
+
+            if (currentTooltipDefs) lastTooltipDefs = currentTooltipDefs;
+
+            const tooltipDefs = lastTooltipDefs;
             const generation = claimGeneration.value;
 
             const renderTooltip = () => {
@@ -35,7 +41,7 @@ export const SharedTooltip = defineComponent(
                 const { renderContent, ...tooltipProps } = tooltipDefs;
 
                 return (
-                    <Tooltip {...tooltipProps} anchorRef={shown.anchorRef}>
+                    <Tooltip {...tooltipProps} anchorRef={currentTooltipDefs ? shown.anchorRef : undefined}>
                         {
                             {
                                 renderContent: (value) => <Fragment key={generation}>{renderContent(value)}</Fragment>,

@@ -2,6 +2,7 @@ import { type KeyboardEvent, useCallback, useId, useMemo, useRef, useState } fro
 
 import {
     FloaterStyles,
+    InteractionTrackerUtils,
     RADIO_GROUP_DEFAULTS,
     type RadioGroupEntry,
     RadioGroupStyles,
@@ -23,7 +24,7 @@ export const RadioGroup = <T,>(props: RadioGroupProps<T>) => {
 
     const [entries, setEntries] = useState<RadioGroupEntry[]>([]);
     const [hoveredEntry, setHoveredEntry] = useState<RadioGroupEntry>();
-    const [focusedEntry, setFocusedEntry] = useState<RadioGroupEntry>();
+    const [focusVisibleEntry, setFocusVisibleEntry] = useState<RadioGroupEntry>();
 
     const [value, setValue] = props.value;
     const orientation = props.orientation ?? RADIO_GROUP_DEFAULTS.orientation;
@@ -48,6 +49,11 @@ export const RadioGroup = <T,>(props: RadioGroupProps<T>) => {
             ? orderedEntries.find((entry) => entry.getElementRef()?.parentElement?.contains(target) ?? false)
             : undefined;
 
+    const readFocusVisibleEntry = (target: EventTarget | null) =>
+        target instanceof HTMLElement && InteractionTrackerUtils.computeIsFocusVisible(target)
+            ? findEntry(target)
+            : undefined;
+
     const useEntryFloater = (isEnabled: boolean, entry: RadioGroupEntry | undefined) =>
         FloaterReactUtils.useFloater({
             isEnabled,
@@ -61,7 +67,10 @@ export const RadioGroup = <T,>(props: RadioGroupProps<T>) => {
 
     const selectionFloater = useEntryFloater(props.renderSelectionFloater !== undefined, selectedEntry);
 
-    const highlightFloater = useEntryFloater(props.renderHighlightFloater !== undefined, hoveredEntry ?? focusedEntry);
+    const highlightFloater = useEntryFloater(
+        props.renderHighlightFloater !== undefined,
+        hoveredEntry ?? focusVisibleEntry,
+    );
 
     const register = useCallback((entry: RadioGroupEntry) => {
         setEntries((previous) => [...previous, entry]);
@@ -131,11 +140,15 @@ export const RadioGroup = <T,>(props: RadioGroupProps<T>) => {
             aria-label={props.ariaLabel}
             aria-required={props.isRequired || undefined}
             aria-invalid={props.hasError || undefined}
-            onKeyDown={handleKeyDown}
+            onKeyDown={(e) => {
+                handleKeyDown(e);
+
+                setFocusVisibleEntry(readFocusVisibleEntry(document.activeElement));
+            }}
             onPointerOver={(e) => setHoveredEntry(findEntry(e.target))}
             onPointerLeave={() => setHoveredEntry(undefined)}
-            onFocus={(e) => setFocusedEntry(findEntry(e.target))}
-            onBlur={() => setFocusedEntry(undefined)}
+            onFocus={(e) => setFocusVisibleEntry(readFocusVisibleEntry(e.target))}
+            onBlur={() => setFocusVisibleEntry(undefined)}
         >
             {layout ? (
                 <PlacementBox layout={layout} computeEffect={props.computeEffect}>

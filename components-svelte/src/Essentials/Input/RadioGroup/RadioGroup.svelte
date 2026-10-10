@@ -4,6 +4,7 @@
 
     import {
         FloaterStyles as floaterStyles,
+        InteractionTrackerUtils,
         RADIO_GROUP_DEFAULTS,
         type RadioGroupEntry,
         RadioGroupUtils,
@@ -32,7 +33,7 @@
     let root = $state<HTMLDivElement>();
     let entries = $state.raw<RadioGroupEntry[]>([]);
     let hoveredEntry = $state.raw<RadioGroupEntry>();
-    let focusedEntry = $state.raw<RadioGroupEntry>();
+    let focusVisibleEntry = $state.raw<RadioGroupEntry>();
 
     const orientation = $derived(props.orientation ?? RADIO_GROUP_DEFAULTS.orientation);
     const transitionDurationMs = $derived(props.transitionDurationMs ?? RADIO_GROUP_DEFAULTS.transitionDurationMs);
@@ -52,6 +53,11 @@
     const findEntry = (target: EventTarget | null) =>
         target instanceof Node
             ? orderedEntries.find((entry) => entry.getElementRef()?.parentElement?.contains(target) ?? false)
+            : undefined;
+
+    const readFocusVisibleEntry = (target: EventTarget | null) =>
+        target instanceof HTMLElement && InteractionTrackerUtils.computeIsFocusVisible(target)
+            ? findEntry(target)
             : undefined;
 
     const createFloater = (getIsEnabled: () => boolean, getEntry: () => RadioGroupEntry | undefined) =>
@@ -75,7 +81,7 @@
 
     const highlightFloater = createFloater(
         () => props.renderHighlightFloater !== undefined,
-        () => hoveredEntry ?? focusedEntry,
+        () => hoveredEntry ?? focusVisibleEntry,
     );
 
     setRadioGroupContext({
@@ -134,7 +140,11 @@
 
 <div
     bind:this={root}
-    {@attach (element) => on(element, "keydown", handleKeyDown)}
+    {@attach (element) =>
+        on(element, "keydown", (e) => {
+            handleKeyDown(e);
+            focusVisibleEntry = readFocusVisibleEntry(document.activeElement);
+        })}
     {@attach (element) =>
         on(element, "pointerover", (e) => {
             hoveredEntry = findEntry(e.target);
@@ -151,10 +161,10 @@
     aria-required={props.isRequired || undefined}
     aria-invalid={props.hasError || undefined}
     onfocusin={(e) => {
-        focusedEntry = findEntry(e.target);
+        focusVisibleEntry = readFocusVisibleEntry(e.target);
     }}
     onfocusout={() => {
-        focusedEntry = undefined;
+        focusVisibleEntry = undefined;
     }}
 >
     {#if layout}

@@ -154,6 +154,15 @@ const filterTreeNode = (
     return children.length > 0 ? { ...node, children } : undefined;
 };
 
+const withoutPreview = (
+    node: TreeNode<MenuNodeConfig>,
+    config: MenuNodeConfig | undefined,
+): TreeNode<MenuNodeConfig> => {
+    if (node.children) return { ...node, children: node.children.map((child) => withoutPreview(child, config)) };
+
+    return node.value === config ? { ...node, tooltipDefs: undefined } : node;
+};
+
 const collectBranchValues = (nodes: TreeNode<MenuNodeConfig>[]): MenuNodeConfig[] =>
     nodes.flatMap((node) => (node.children ? [node.value, ...collectBranchValues(node.children)] : []));
 
@@ -330,7 +339,7 @@ export function AppContent(props: { viewportAnchor: readonly [ViewportAnchor, (v
     const showsDescriptionOnly = showsDescriptionOnlyState[0];
     const pageView = pageViewState[0];
 
-    const visibleNodes = useMemo(() => {
+    const filteredNodes = useMemo(() => {
         const menuNodes = MENU_NODES_BY_VIEW[pageView];
 
         if (!isSearching && showsDescriptionOnly) return menuNodes;
@@ -349,6 +358,11 @@ export function AppContent(props: { viewportAnchor: readonly [ViewportAnchor, (v
             .map((node) => filterTreeNode(node, getIsKept))
             .filter((node): node is TreeNode<MenuNodeConfig> => node !== undefined);
     }, [isSearching, showsDescriptionOnly, pageView, searchTerm, selectedConfig]);
+
+    const visibleNodes = useMemo(
+        () => filteredNodes.map((node) => withoutPreview(node, selectedConfig)),
+        [filteredNodes, selectedConfig],
+    );
 
     const [previousSearchNodes, setPreviousSearchNodes] = useState<TreeNode<MenuNodeConfig>[]>();
     const searchNodes = isSearching ? visibleNodes : undefined;

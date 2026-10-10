@@ -57,6 +57,13 @@ export const Tooltip = (props: TooltipProps) => {
         },
     });
 
+    useEffect(() => {
+        if (props.anchorRef) return;
+
+        hoverIntent.cancel();
+        setIsShown(false);
+    }, [props.anchorRef]);
+
     const [isGliding, setIsGliding] = useState(false);
     const previousAnchorRef = useRef(props.anchorRef);
     const glideRef = useLatest({ isVisible: fader.isVisible, transitionDurationMs });
@@ -74,6 +81,10 @@ export const Tooltip = (props: TooltipProps) => {
 
         return () => clearTimeout(settle);
     }, [props.anchorRef]);
+
+    useEffect(() => {
+        if (!fader.isVisible) setIsGliding(false);
+    }, [fader.isVisible]);
 
     useEffect(
         () => (props.anchorRef && fader.isVisible ? TooltipUtils.describe(props.anchorRef, tooltipId) : undefined),

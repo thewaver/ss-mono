@@ -156,6 +156,15 @@ const filterTreeNode = (
     return children.length > 0 ? { ...node, children } : undefined;
 };
 
+const withoutPreview = (
+    node: TreeNode<MenuNodeConfig>,
+    config: MenuNodeConfig | undefined,
+): TreeNode<MenuNodeConfig> => {
+    if (node.children) return { ...node, children: node.children.map((child) => withoutPreview(child, config)) };
+
+    return node.value === config ? { ...node, tooltipDefs: undefined } : node;
+};
+
 const collectBranchValues = (nodes: TreeNode<MenuNodeConfig>[]): MenuNodeConfig[] =>
     nodes.flatMap((node) => (node.children ? [node.value, ...collectBranchValues(node.children)] : []));
 
@@ -344,7 +353,7 @@ export function AppContent(props: RouteSectionProps & { viewportAnchor: SignalPa
 
     const getIsSearching = createMemo(() => getSearchTerm().trim().length > 0);
 
-    const getVisibleNodes = createMemo(() => {
+    const getFilteredNodes = createMemo(() => {
         const isSearching = getIsSearching();
         const showsDescriptionOnly = showsDescriptionOnlySignal[0]();
         const menuNodes = MENU_NODES_BY_VIEW[pageViewSignal[0]()];
@@ -366,6 +375,10 @@ export function AppContent(props: RouteSectionProps & { viewportAnchor: SignalPa
             .map((node) => filterTreeNode(node, getIsKept))
             .filter((node): node is TreeNode<MenuNodeConfig> => node !== undefined);
     });
+
+    const getVisibleNodes = createMemo(() =>
+        getFilteredNodes().map((node) => withoutPreview(node, getSelectedConfig())),
+    );
 
     createEffect(() => {
         if (!getIsSearching()) return;

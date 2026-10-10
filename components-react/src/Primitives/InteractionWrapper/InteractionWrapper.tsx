@@ -75,6 +75,12 @@ export const InteractionWrapper = <TExtra extends object = {}>(props: Interactio
             tooltipDefs.renderContent(visibilityTarget, transitionDurationMs, placement, flags, arrowAim),
     };
 
+    const lastTooltipPropsRef = useRef(tooltipProps);
+
+    if (tooltipProps) lastTooltipPropsRef.current = tooltipProps;
+
+    const shownTooltipProps = tooltipProps ?? lastTooltipPropsRef.current;
+
     const sharedTooltip = useSharedTooltipContext();
     const latestTooltipPropsRef = useLatest(tooltipProps);
 
@@ -118,7 +124,9 @@ export const InteractionWrapper = <TExtra extends object = {}>(props: Interactio
                 </div>
             )}
 
-            {!sharedTooltip && tooltipProps && <Tooltip {...tooltipProps} anchorRef={element} />}
+            {!sharedTooltip && shownTooltipProps && (
+                <Tooltip {...shownTooltipProps} anchorRef={tooltipProps ? element : undefined} />
+            )}
         </div>
     );
 };

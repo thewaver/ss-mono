@@ -106,6 +106,12 @@
         return children.length > 0 ? { ...node, children } : undefined;
     };
 
+    const withoutPreview = (node: TreeNode<MenuNodeConfig>, config: MenuNodeConfig | undefined): TreeNode<MenuNodeConfig> => {
+        if (node.children) return { ...node, children: node.children.map((child) => withoutPreview(child, config)) };
+
+        return node.value === config ? { ...node, tooltipDefs: undefined } : node;
+    };
+
     const collectBranchValues = (nodes: TreeNode<MenuNodeConfig>[]): MenuNodeConfig[] =>
         nodes.flatMap((node) => (node.children ? [node.value, ...collectBranchValues(node.children)] : []));
 
@@ -143,7 +149,7 @@
 
     const isSearching = $derived(searchTerm.trim().length > 0);
 
-    const visibleNodes = $derived.by(() => {
+    const filteredNodes = $derived.by(() => {
         const menuNodes = MENU_NODES_BY_VIEW[pageView];
 
         if (!isSearching && showsDescriptionOnly) return menuNodes;
@@ -162,6 +168,8 @@
             .map((node) => filterTreeNode(node, getIsKept))
             .filter((node): node is TreeNode<MenuNodeConfig> => node !== undefined);
     });
+
+    const visibleNodes = $derived(filteredNodes.map((node) => withoutPreview(node, selectedConfig)));
 
     let searchExpanded = $derived(isSearching ? collectBranchValues(visibleNodes) : []);
 

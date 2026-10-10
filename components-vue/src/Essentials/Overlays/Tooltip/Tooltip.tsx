@@ -58,6 +58,16 @@ export const Tooltip = defineComponent(
             },
         });
 
+        watch(
+            () => props.anchorRef,
+            (anchor) => {
+                if (anchor) return;
+
+                hoverIntent.cancel();
+                isShown.value = false;
+            },
+        );
+
         const isGliding = shallowRef(false);
 
         watch(
@@ -74,6 +84,10 @@ export const Tooltip = defineComponent(
                 onCleanup(() => clearTimeout(settle));
             },
         );
+
+        watch(fader.isVisible, (isVisible) => {
+            if (!isVisible) isGliding.value = false;
+        });
 
         watchAfterRender([() => props.anchorRef, fader.isVisible], ([anchor, isVisible]) =>
             anchor && isVisible ? TooltipUtils.describe(anchor, tooltipId) : undefined,

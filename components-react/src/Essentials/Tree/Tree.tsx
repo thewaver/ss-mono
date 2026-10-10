@@ -15,6 +15,7 @@ import {
 import {
     FlattenerUtils,
     FloaterStyles,
+    InteractionTrackerUtils,
     TREE_DEFAULTS,
     TreeStyles,
     TreeUtils,
@@ -248,7 +249,7 @@ export const Tree = <T,>(props: TreeProps<T>) => {
     };
 
     const [hoveredValue, setHoveredValue] = useState<T>();
-    const [focusInValue, setFocusInValue] = useState<T>();
+    const [focusVisibleValue, setFocusVisibleValue] = useState<T>();
     const [floaterTargets, setFloaterTargets] = useState<FloaterTargets>({
         selection: undefined,
         highlight: undefined,
@@ -272,7 +273,7 @@ export const Tree = <T,>(props: TreeProps<T>) => {
     };
 
     const selectedRow = findRow(value);
-    const highlightRow = findRow(hoveredValue ?? focusInValue);
+    const highlightRow = findRow(hoveredValue ?? focusVisibleValue);
 
     useLayoutEffect(() => {
         const selection = findNodeElement(selectedRow);
@@ -329,10 +330,15 @@ export const Tree = <T,>(props: TreeProps<T>) => {
     const findRowByTarget = (target: EventTarget | null) =>
         target instanceof Element ? findRowById(target.closest(TREE_ITEM_SELECTOR)?.id) : undefined;
 
+    const readFocusVisibleValue = (target: EventTarget | null) =>
+        target instanceof HTMLElement && InteractionTrackerUtils.computeIsFocusVisible(target)
+            ? findRowByTarget(target)?.node.value
+            : undefined;
+
     const handleFocus = (e: FocusEvent<HTMLDivElement>) => {
         lastFocusedValueRef.current = findRowById((e.target as HTMLElement).id)?.node.value;
 
-        setFocusInValue(() => findRowByTarget(e.target)?.node.value);
+        setFocusVisibleValue(() => readFocusVisibleValue(e.target));
     };
 
     const hasPendingPaint = (row: TreeRow<T>) =>
@@ -431,9 +437,13 @@ export const Tree = <T,>(props: TreeProps<T>) => {
             className={TreeStyles.treeRoot}
             role="tree"
             aria-label={props.ariaLabel}
-            onKeyDown={handleKeyDown}
+            onKeyDown={(e) => {
+                handleKeyDown(e);
+
+                setFocusVisibleValue(() => readFocusVisibleValue(document.activeElement));
+            }}
             onFocus={handleFocus}
-            onBlur={() => setFocusInValue(undefined)}
+            onBlur={() => setFocusVisibleValue(undefined)}
             onPointerOver={(e) => setHoveredValue(() => findRowByTarget(e.target)?.node.value)}
             onPointerLeave={() => setHoveredValue(undefined)}
         >

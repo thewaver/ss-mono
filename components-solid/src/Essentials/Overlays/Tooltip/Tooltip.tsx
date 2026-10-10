@@ -62,6 +62,13 @@ export const Tooltip = (props: TooltipProps) => {
         },
     });
 
+    createEffect(() => {
+        if (access(props.anchorRef)) return;
+
+        hoverIntent.cancel();
+        setShouldShow(false);
+    });
+
     const [getIsGliding, setIsGliding] = createSignal(false);
 
     createEffect(
@@ -79,6 +86,10 @@ export const Tooltip = (props: TooltipProps) => {
             { defer: true },
         ),
     );
+
+    createEffect(() => {
+        if (!getIsVisible()) setIsGliding(false);
+    });
 
     createEffect(() => {
         const anchorRef = access(props.anchorRef);

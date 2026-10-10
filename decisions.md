@@ -4061,7 +4061,10 @@ it up across the change** — leaving one control and entering the next inside t
 window, so it never faded — but the position jumped. So a change of anchor while the tooltip is visible now turns on a
 `transform` transition (`TooltipUtils.getGlideTransition`) for one fade duration, and nothing else that moves it — a
 scroll, a resize — is eased. The description moves with it for free, since `aria-describedby` already follows the
-anchor through `TooltipUtils.describe`. The Toolbar page's shared-tooltip example first picked the anchor itself, from
+anchor through `TooltipUtils.describe`. **The glide ends when the tooltip unmounts.** A new anchor arriving
+during the fade out turned the glide on; if the fade then finished and the tooltip reopened inside the glide's
+window, the fresh root started at the `translate(0, 0)` it carries before it has a position and slid in from the
+screen's corner. The left nav did this when scrolled fast. The Toolbar page's shared-tooltip example first picked the anchor itself, from
 the row's `pointerover` and `focusin`; it now gives each action its own tooltip and wraps the bar in `SharedTooltip`.
 
 **A Toolbar action carries a tooltip, as a Tree node or a Menu item does.** The core type is
@@ -4093,6 +4096,17 @@ nothing, so re-entering it does not rebuild its content.
 
 **A control that goes away while it is the anchor takes the tooltip with it**, with no fade, since there is
 nothing left to point at.
+
+**A control that stays but loses its `tooltipDefs` fades its tooltip out instead**, the user's call, found when
+the left nav stopped previewing the open page and a clicked row's preview blinked out. `Tooltip` closes whenever
+its `anchorRef` is `undefined`; `SharedTooltip` and `InteractionWrapper` both keep drawing the last props they
+were given and hand the `Tooltip` no anchor while the control has none, so the box stays where it was and plays
+its ordinary fade. **Svelte needed two more things.** Its wrapper draws the body from a snippet, which read the
+control's live `tooltipDefs` and so went empty the moment they were withdrawn, leaving the fade nothing to fade: the
+snippet now draws from the last defs it was given (`shownTooltipDefs`). And the Svelte `Tree` re-runs a row's
+attachment whenever the row's record is replaced, which detaches and re-attaches the same element; the wrapper's
+hand-over effect read that as the control going away and released the shared tooltip. It now follows
+`claimTarget`, a `$derived` of the element, so a re-attach of the same element changes nothing.
 
 **React's context has a third function, `update`.** Solid's shared tooltip reads the claiming control's props
 live; React's would hold the props as they were at the claim, so after each render a control calls `update`, which
@@ -7593,6 +7607,13 @@ is the same: its options hold the focus, and moving the focus on hover would ste
 left it, so the marker reads the pointer on its own and falls back to the list's highlight while the pointer is
 elsewhere. `Select`'s popup moves its highlight on hover anyway, so for it the two agree. `Menu` moves its
 highlight on hover already, so its marker follows the highlight alone.
+
+**The fallback is the focused item only while that focus is visible.** A click focuses what it lands on, so with
+a plain "hovered, else focused" rule the left nav's marker went back to the clicked row as soon as the pointer
+left the tree, instead of fading. `Tree`, `Tabs` and `RadioGroup` now remember the focused item only when
+`InteractionTrackerUtils.computeIsFocusVisible` says so, read on `focusin` and again after each key press, so a
+click leaves no fallback and the first arrow key brings it back. This is the same split `Listbox` makes with
+`getIsPointerLed`.
 
 **Each control wraps its items in one presentational container, because a floater needs a positioned box to
 sit in.** `Listbox`'s mounted options sit in a `role="presentation"` wrapper (`listboxOptions`) which takes the
@@ -19417,7 +19438,12 @@ the keyboard passes a stop and every pointer crossing a risk of a stray press; i
 what non-operable content on hover or focus is, rather than a `HoverCard`, whose point is content one can use — the
 cost being that a tooltip takes a tap as a long hover, so on a touch screen a tapped row shows its preview after
 following its link, as every tooltip in the library does; and a page with no examples, or one in
-`PREVIEW_EXCLUDED_PAGES`, gets none. `Tree` already carries a tooltip per row. The preview is `aria-hidden` and
+`PREVIEW_EXCLUDED_PAGES`, gets none. **Nor does the row of the page that is open**, the user's call: the
+preview is hoverable, as 1.4.13 requires, and it sits to the right of the row, which is where the pointer goes
+on its way from a clicked row to the page, so it stayed up over whatever the pointer was heading for. A preview
+of the page already on screen says nothing, and taking it away clears the commonest path without touching
+`Tooltip`. `getVisibleNodes` strips the open page's `tooltipDefs` (`withoutPreview`), so clicking a row that
+is showing its preview also closes it. `Tree` already carries a tooltip per row. The preview is `aria-hidden` and
 `inert`, so the row's description comes out empty and nothing inside takes focus. `PagePreview` is the gallery
 tile's drawing lifted out, so the tile and the tooltip cannot drift; the tooltip box is 360 by 240, the nearest round size to the gallery tile's preview at a usual window width, so an example comes out at the scale it was tuned at in the gallery, and the Playground tooltip's `isWide` lifts its 240-pixel limit for it.
 

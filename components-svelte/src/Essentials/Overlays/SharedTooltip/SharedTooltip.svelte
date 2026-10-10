@@ -7,7 +7,17 @@
 
     let claimed = $state.raw<SharedTooltipClaim>();
 
-    const tooltipProps = $derived(claimed?.getTooltipProps());
+    const currentTooltipProps = $derived(claimed?.getTooltipProps());
+
+    let lastTooltipProps: ReturnType<SharedTooltipClaim["getTooltipProps"]>;
+
+    const tooltipProps = $derived.by(() => {
+        if (!claimed) return undefined;
+
+        if (currentTooltipProps) lastTooltipProps = currentTooltipProps;
+
+        return lastTooltipProps;
+    });
 
     setSharedTooltipContext({
         claim: (claim) => {
@@ -23,7 +33,7 @@
 
 {#if tooltipProps}
     {@const { renderContent: renderClaimedContent, ...shownProps } = tooltipProps}
-    <Tooltip {...shownProps} anchorRef={claimed?.anchorRef}>
+    <Tooltip {...shownProps} anchorRef={currentTooltipProps ? claimed?.anchorRef : undefined}>
         {#snippet renderContent(visibilityTarget, transitionDurationMs, placement, arrowAim)}
             {#key claimed}
                 {@render renderClaimedContent(visibilityTarget, transitionDurationMs, placement, arrowAim)}

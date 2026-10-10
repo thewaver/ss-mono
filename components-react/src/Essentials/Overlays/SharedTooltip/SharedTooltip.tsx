@@ -5,7 +5,7 @@ import { SharedTooltipContextProvider } from "./SharedTooltip.context";
 import type { SharedTooltipClaim, SharedTooltipReactContextType } from "./SharedTooltip.context.types";
 import type { SharedTooltipProps } from "./SharedTooltip.types";
 
-type KeyedClaim = SharedTooltipClaim & { key: number };
+type KeyedClaim = SharedTooltipClaim & { key: number; lastTooltipProps: SharedTooltipClaim["tooltipProps"] };
 
 export const SharedTooltip = (props: SharedTooltipProps) => {
     const [claim, setClaim] = useState<KeyedClaim>();
@@ -14,12 +14,18 @@ export const SharedTooltip = (props: SharedTooltipProps) => {
         (): SharedTooltipReactContextType => ({
             claim: (next) =>
                 setClaim((previous) =>
-                    next.anchorRef === previous?.anchorRef ? previous : { ...next, key: (previous?.key ?? 0) + 1 },
+                    next.anchorRef === previous?.anchorRef
+                        ? previous
+                        : { ...next, key: (previous?.key ?? 0) + 1, lastTooltipProps: next.tooltipProps },
                 ),
             update: (next) =>
                 setClaim((previous) =>
                     next.anchorRef === previous?.anchorRef && next.tooltipProps !== previous.tooltipProps
-                        ? { ...previous, tooltipProps: next.tooltipProps }
+                        ? {
+                              ...previous,
+                              tooltipProps: next.tooltipProps,
+                              lastTooltipProps: next.tooltipProps ?? previous.lastTooltipProps,
+                          }
                         : previous,
                 ),
             release: (anchorRef) => setClaim((previous) => (anchorRef === previous?.anchorRef ? undefined : previous)),
@@ -27,7 +33,7 @@ export const SharedTooltip = (props: SharedTooltipProps) => {
         [],
     );
 
-    const tooltipProps = claim?.tooltipProps;
+    const tooltipProps = claim?.lastTooltipProps;
 
     return (
         <SharedTooltipContextProvider value={context}>
@@ -36,7 +42,7 @@ export const SharedTooltip = (props: SharedTooltipProps) => {
             {claim && tooltipProps && (
                 <Tooltip
                     {...tooltipProps}
-                    anchorRef={claim.anchorRef}
+                    anchorRef={claim.tooltipProps ? claim.anchorRef : undefined}
                     renderContent={(visibilityTarget, transitionDurationMs, placement, arrowAim) => (
                         <Fragment key={claim.key}>
                             {tooltipProps.renderContent(visibilityTarget, transitionDurationMs, placement, arrowAim)}

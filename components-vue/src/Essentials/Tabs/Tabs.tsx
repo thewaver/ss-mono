@@ -1,6 +1,6 @@
 import { type ComponentPublicInstance, type SlotsType, computed, defineComponent, h, shallowRef, watch } from "vue";
 
-import { FloaterStyles, TABS_DEFAULTS, TabsStyles, TabsUtils } from "@thewaver/ss-components";
+import { FloaterStyles, InteractionTrackerUtils, TABS_DEFAULTS, TabsStyles, TabsUtils } from "@thewaver/ss-components";
 
 import { FloaterVueUtils } from "../../Abstracts/Floater/FloaterVue.utils";
 import { NavigatorVueUtils } from "../../Abstracts/Navigator/NavigatorVue.utils";
@@ -98,7 +98,7 @@ export const Tabs = defineComponent(
         const itemElements = shallowRef<(HTMLElement | undefined)[]>([]);
         const focusedValue = shallowRef<T>();
         const hoveredIndex = shallowRef<number>();
-        const focusedIndex = shallowRef<number>();
+        const focusVisibleIndex = shallowRef<number>();
 
         watch(
             () => props.selectedValue,
@@ -117,12 +117,17 @@ export const Tabs = defineComponent(
 
         const selectedIndex = computed(() => TabsUtils.computeSelectedIndex(props.tabs, props.selectedValue));
 
-        const highlightIndex = computed(() => hoveredIndex.value ?? focusedIndex.value);
+        const highlightIndex = computed(() => hoveredIndex.value ?? focusVisibleIndex.value);
 
         const findItemIndex = (target: EventTarget | null) =>
             target instanceof Node ? itemElements.value.findIndex((item) => item?.contains(target) ?? false) : -1;
 
         const toIndex = (index: number) => (index < 0 ? undefined : index);
+
+        const readFocusVisibleIndex = (target: EventTarget | null) =>
+            target instanceof HTMLElement && InteractionTrackerUtils.computeIsFocusVisible(target)
+                ? toIndex(findItemIndex(target))
+                : undefined;
 
         const useItemFloater = (isEnabled: () => boolean, getIndex: () => number | undefined) =>
             FloaterVueUtils.useFloater({
@@ -269,7 +274,10 @@ export const Tabs = defineComponent(
                     role="tablist"
                     aria-label={props.ariaLabel}
                     aria-orientation={orientation}
-                    onKeydown={handleKeyDown}
+                    onKeydown={(e) => {
+                        handleKeyDown(e);
+                        focusVisibleIndex.value = readFocusVisibleIndex(document.activeElement);
+                    }}
                     onPointerover={(e) => {
                         hoveredIndex.value = toIndex(findItemIndex(e.target));
                     }}
@@ -277,10 +285,10 @@ export const Tabs = defineComponent(
                         hoveredIndex.value = undefined;
                     }}
                     onFocusin={(e) => {
-                        focusedIndex.value = toIndex(findItemIndex(e.target));
+                        focusVisibleIndex.value = readFocusVisibleIndex(e.target);
                     }}
                     onFocusout={() => {
-                        focusedIndex.value = undefined;
+                        focusVisibleIndex.value = undefined;
                     }}
                 >
                     {slots.renderGutter && <div class={TabsStyles.tabsGutter}>{slots.renderGutter()}</div>}

@@ -1,6 +1,7 @@
 import { Show, createMemo, createSignal, createUniqueId, onCleanup } from "solid-js";
 
 import {
+    InteractionTrackerUtils,
     RADIO_GROUP_DEFAULTS,
     type RadioGroupContextType,
     type RadioGroupEntry,
@@ -50,11 +51,16 @@ export const RadioGroup = <T,>(props: RadioGroupProps<T>) => {
         RadioGroupUtils.computePlacement(getOrderedEntries(), getLayout(), entry);
 
     const [getHoveredEntry, setHoveredEntry] = createSignal<RadioGroupEntry>();
-    const [getFocusedEntry, setFocusedEntry] = createSignal<RadioGroupEntry>();
+    const [getFocusVisibleEntry, setFocusVisibleEntry] = createSignal<RadioGroupEntry>();
 
     const findEntry = (target: EventTarget | null) =>
         target instanceof Node
             ? getOrderedEntries().find((entry) => entry.getElementRef()?.parentElement?.contains(target) ?? false)
+            : undefined;
+
+    const readFocusVisibleEntry = (target: EventTarget | null) =>
+        target instanceof HTMLElement && InteractionTrackerUtils.computeIsFocusVisible(target)
+            ? findEntry(target)
             : undefined;
 
     const createFloater = (getIsEnabled: () => boolean, getEntry: () => RadioGroupEntry | undefined) =>
@@ -75,7 +81,7 @@ export const RadioGroup = <T,>(props: RadioGroupProps<T>) => {
 
     const highlightFloater = createFloater(
         () => props.renderHighlightFloater !== undefined,
-        () => getHoveredEntry() ?? getFocusedEntry(),
+        () => getHoveredEntry() ?? getFocusVisibleEntry(),
     );
 
     const context: RadioGroupContextType = {
@@ -145,11 +151,15 @@ export const RadioGroup = <T,>(props: RadioGroupProps<T>) => {
             aria-label={access(props.ariaLabel)}
             aria-required={access(props.isRequired) || undefined}
             aria-invalid={access(props.hasError) || undefined}
-            onKeyDown={handleKeyDown}
+            onKeyDown={(e) => {
+                handleKeyDown(e);
+
+                setFocusVisibleEntry(readFocusVisibleEntry(document.activeElement));
+            }}
             onPointerOver={(e) => setHoveredEntry(findEntry(e.target))}
             onPointerLeave={() => setHoveredEntry(undefined)}
-            onFocusIn={(e) => setFocusedEntry(findEntry(e.target))}
-            onFocusOut={() => setFocusedEntry(undefined)}
+            onFocusIn={(e) => setFocusVisibleEntry(readFocusVisibleEntry(e.target))}
+            onFocusOut={() => setFocusVisibleEntry(undefined)}
         >
             <Show
                 when={getLayout()}

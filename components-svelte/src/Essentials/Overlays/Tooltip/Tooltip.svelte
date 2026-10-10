@@ -59,6 +59,16 @@
         getReservedScreenSize: () => props.reservedScreenSize,
     });
 
+    watchChange(
+        () => props.anchorRef,
+        (anchorRef) => {
+            if (anchorRef) return;
+
+            hoverIntent.cancel();
+            isShown = false;
+        },
+    );
+
     let isGliding = $state(false);
     let settleGlide: ReturnType<typeof setTimeout> | undefined;
 
@@ -77,6 +87,10 @@
     );
 
     $effect(() => () => clearTimeout(settleGlide));
+
+    $effect(() => {
+        if (!fader.getIsVisible()) isGliding = false;
+    });
 
     const bridge = $derived(HoverIntentUtils.computeBridgeInsets(position.getPlacement(), props.offset));
 

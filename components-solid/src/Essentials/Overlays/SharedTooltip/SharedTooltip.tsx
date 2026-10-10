@@ -1,4 +1,4 @@
-import { Show, createSignal } from "solid-js";
+import { Show, createMemo, createSignal } from "solid-js";
 
 import { Tooltip } from "../Tooltip/Tooltip";
 import { SharedTooltipContextProvider } from "./SharedTooltip.context";
@@ -7,7 +7,11 @@ import type { SharedTooltipClaim, SharedTooltipProps } from "./SharedTooltipSoli
 export const SharedTooltip = (props: SharedTooltipProps) => {
     const [getClaim, setClaim] = createSignal<SharedTooltipClaim>();
 
-    const getTooltipProps = () => getClaim()?.getTooltipProps();
+    const getTooltipProps = createMemo<ReturnType<SharedTooltipClaim["getTooltipProps"]>>((previous) => {
+        const claim = getClaim();
+
+        return claim && (claim.getTooltipProps() ?? previous);
+    });
 
     return (
         <SharedTooltipContextProvider
@@ -26,7 +30,11 @@ export const SharedTooltip = (props: SharedTooltipProps) => {
                 {(getShownProps) => (
                     <Tooltip
                         {...getShownProps()}
-                        anchorRef={() => getClaim()?.anchorRef}
+                        anchorRef={() => {
+                            const claim = getClaim();
+
+                            return claim?.getTooltipProps() ? claim.anchorRef : undefined;
+                        }}
                         renderContent={(getVisibilityTarget, getTransitionDurationMs, getPlacement, getArrowAim) => (
                             <Show when={getClaim()} keyed>
                                 {(claim) =>

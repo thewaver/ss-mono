@@ -6,6 +6,7 @@
     import {
         FlattenerUtils,
         FloaterStyles as floaterStyles,
+        InteractionTrackerUtils,
         TREE_DEFAULTS,
         TreeUtils,
         TypeaheadUtils,
@@ -213,7 +214,7 @@
     const nodeRefs = new SvelteMap<T, HTMLElement>();
 
     let hoveredValue = $state.raw<T>();
-    let focusInValue = $state.raw<T>();
+    let focusVisibleValue = $state.raw<T>();
 
     const recordNodeRef = (nodeValue: T, element: HTMLElement) => {
         untrack(() => nodeRefs.set(nodeValue, element));
@@ -259,15 +260,20 @@
 
     const highlightFloater = createFloater(
         () => props.renderHighlightFloater !== undefined,
-        () => hoveredValue ?? focusInValue,
+        () => hoveredValue ?? focusVisibleValue,
     );
 
     const findRowByTarget = (target: EventTarget | null) =>
         target instanceof Element ? findRowById(target.closest('[role="treeitem"]')?.id) : undefined;
 
+    const readFocusVisibleValue = (target: EventTarget | null) =>
+        target instanceof HTMLElement && InteractionTrackerUtils.computeIsFocusVisible(target)
+            ? findRowByTarget(target)?.node.value
+            : undefined;
+
     const handleFocusIn = (e: FocusEvent) => {
         lastFocusedValue = findRowById((e.target as HTMLElement).id)?.node.value;
-        focusInValue = findRowByTarget(e.target)?.node.value;
+        focusVisibleValue = readFocusVisibleValue(e.target);
     };
 
     const hasPendingPaint = (row: TreeRow<T>) =>
@@ -397,7 +403,11 @@
 
 <div
     bind:this={root}
-    {@attach (element) => on(element, "keydown", handleKeyDown)}
+    {@attach (element) =>
+        on(element, "keydown", (e) => {
+            handleKeyDown(e);
+            focusVisibleValue = readFocusVisibleValue(document.activeElement);
+        })}
     {@attach (element) =>
         on(element, "pointerover", (e) => {
             hoveredValue = findRowByTarget(e.target)?.node.value;
@@ -411,7 +421,7 @@
     aria-label={props.ariaLabel}
     onfocusin={handleFocusIn}
     onfocusout={() => {
-        focusInValue = undefined;
+        focusVisibleValue = undefined;
     }}
 >
     {#if layout}

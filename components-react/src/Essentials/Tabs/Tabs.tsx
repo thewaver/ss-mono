@@ -1,6 +1,6 @@
 import { Fragment, type KeyboardEvent, type MouseEvent, useCallback, useMemo, useRef, useState } from "react";
 
-import { FloaterStyles, TABS_DEFAULTS, TabsStyles, TabsUtils } from "@thewaver/ss-components";
+import { FloaterStyles, InteractionTrackerUtils, TABS_DEFAULTS, TabsStyles, TabsUtils } from "@thewaver/ss-components";
 
 import { FloaterReactUtils } from "../../Abstracts/Floater/FloaterReact.utils";
 import { NavigatorReactUtils } from "../../Abstracts/Navigator/NavigatorReact.utils";
@@ -61,7 +61,7 @@ export const Tabs = <T,>(props: TabsProps<T>) => {
     const [itemElements, setItemElements] = useState<(HTMLElement | undefined)[]>([]);
     const [focusedValue, setFocusedValue] = useState<T | undefined>();
     const [hoveredIndex, setHoveredIndex] = useState<number>();
-    const [focusedIndex, setFocusedIndex] = useState<number>();
+    const [focusVisibleIndex, setFocusVisibleIndex] = useState<number>();
     const [previousSelectedValue, setPreviousSelectedValue] = useState(props.selectedValue);
 
     if (previousSelectedValue !== props.selectedValue) {
@@ -82,7 +82,7 @@ export const Tabs = <T,>(props: TabsProps<T>) => {
 
     const selectedIndex = TabsUtils.computeSelectedIndex(tabs, props.selectedValue);
     const rovingIndex = TabsUtils.computeRovingIndex(tabs, props.selectedValue, focusedValue);
-    const highlightIndex = hoveredIndex ?? focusedIndex;
+    const highlightIndex = hoveredIndex ?? focusVisibleIndex;
 
     const root = useElement(rootRef);
 
@@ -107,6 +107,11 @@ export const Tabs = <T,>(props: TabsProps<T>) => {
         target instanceof Node ? itemElements.findIndex((item) => item?.contains(target) ?? false) : -1;
 
     const toIndex = (index: number) => (index < 0 ? undefined : index);
+
+    const readFocusVisibleIndex = (target: EventTarget | null) =>
+        target instanceof HTMLElement && InteractionTrackerUtils.computeIsFocusVisible(target)
+            ? toIndex(findItemIndex(target))
+            : undefined;
 
     const latestItemElementsRef = useRef<(HTMLElement | undefined)[]>([]);
 
@@ -207,11 +212,15 @@ export const Tabs = <T,>(props: TabsProps<T>) => {
             role="tablist"
             aria-label={props.ariaLabel}
             aria-orientation={orientation}
-            onKeyDown={handleKeyDown}
+            onKeyDown={(e) => {
+                handleKeyDown(e);
+
+                setFocusVisibleIndex(readFocusVisibleIndex(document.activeElement));
+            }}
             onPointerOver={(e) => setHoveredIndex(toIndex(findItemIndex(e.target)))}
             onPointerLeave={() => setHoveredIndex(undefined)}
-            onFocus={(e) => setFocusedIndex(toIndex(findItemIndex(e.target)))}
-            onBlur={() => setFocusedIndex(undefined)}
+            onFocus={(e) => setFocusVisibleIndex(readFocusVisibleIndex(e.target))}
+            onBlur={() => setFocusVisibleIndex(undefined)}
         >
             {props.renderGutter && <div className={TabsStyles.tabsGutter}>{props.renderGutter()}</div>}
 

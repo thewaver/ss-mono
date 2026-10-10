@@ -4,6 +4,7 @@ import { Dynamic } from "solid-js/web";
 
 import {
     FlattenerUtils,
+    InteractionTrackerUtils,
     TREE_DEFAULTS,
     TreeUtils,
     TypeaheadUtils,
@@ -256,7 +257,7 @@ export const Tree = <T,>(props: TreeProps<T>) => {
 
     const [getNodeRefs, setNodeRefs] = createSignal<Map<T, HTMLElement>>(new Map(), { equals: false });
     const [getHoveredValue, setHoveredValue] = createSignal<T>();
-    const [getFocusInValue, setFocusInValue] = createSignal<T>();
+    const [getFocusVisibleValue, setFocusVisibleValue] = createSignal<T>();
 
     const recordNodeRef = (value: T, element: HTMLElement) => {
         setNodeRefs((refs) => refs.set(value, element));
@@ -306,7 +307,7 @@ export const Tree = <T,>(props: TreeProps<T>) => {
 
     const highlightFloater = createFloater(
         () => props.renderHighlightFloater !== undefined,
-        () => getHoveredValue() ?? getFocusInValue(),
+        () => getHoveredValue() ?? getFocusVisibleValue(),
     );
 
     const renderFloater = (
@@ -333,6 +334,11 @@ export const Tree = <T,>(props: TreeProps<T>) => {
 
     const findRowByTarget = (target: EventTarget | null) =>
         target instanceof Element ? findRowById(target.closest('[role="treeitem"]')?.id) : undefined;
+
+    const readFocusVisibleValue = (target: EventTarget | null) =>
+        target instanceof HTMLElement && InteractionTrackerUtils.computeIsFocusVisible(target)
+            ? findRowByTarget(target)?.node.value
+            : undefined;
 
     const renderPlaced = (getRow: Accessor<TreeRow<T>>, element: JSX.Element) => (
         <Show when={getPlacementAt(getRow().index)} fallback={element}>
@@ -446,13 +452,17 @@ export const Tree = <T,>(props: TreeProps<T>) => {
             class={styles.treeRoot}
             role="tree"
             aria-label={access(props.ariaLabel)}
-            onKeyDown={handleKeyDown}
+            onKeyDown={(e) => {
+                handleKeyDown(e);
+
+                setFocusVisibleValue(() => readFocusVisibleValue(document.activeElement));
+            }}
             onFocusIn={(e) => {
                 lastFocusedValue = findRowById((e.target as HTMLElement).id)?.node.value;
 
-                setFocusInValue(() => findRowByTarget(e.target)?.node.value);
+                setFocusVisibleValue(() => readFocusVisibleValue(e.target));
             }}
-            onFocusOut={() => setFocusInValue(undefined)}
+            onFocusOut={() => setFocusVisibleValue(undefined)}
             onPointerOver={(e) => setHoveredValue(() => findRowByTarget(e.target)?.node.value)}
             onPointerLeave={() => setHoveredValue(undefined)}
         >
