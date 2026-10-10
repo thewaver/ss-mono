@@ -2,11 +2,11 @@ import { type KeyboardEvent, useEffect, useLayoutEffect, useMemo, useRef, useSta
 
 import {
     type InteractionSizing,
+    type MenuItemFlags,
     type MenuItemKind,
     type MenuTriggerRole,
     MenuUtils,
     TOOLBAR_DEFAULTS,
-    type ToolbarAction,
     ToolbarStyles,
     ToolbarUtils,
 } from "@thewaver/ss-components";
@@ -14,11 +14,18 @@ import {
 import { ElementObserverReactUtils } from "../../Abstracts/ElementObserver/ElementObserverReact.utils";
 import { NavigatorReactUtils } from "../../Abstracts/Navigator/NavigatorReact.utils";
 import { InteractionWrapper } from "../../Primitives/InteractionWrapper/InteractionWrapper";
+import type { InteractionTooltipDefs } from "../../Primitives/InteractionWrapper/InteractionWrapper.types";
 import { PlacementBox } from "../../Primitives/PlacementBox/PlacementBox";
 import { PlacementItem } from "../../Primitives/PlacementItem/PlacementItem";
 import { Menu } from "../Menus/Menu/Menu";
 import type { MenuItem } from "../Menus/Menu/Menu.types";
-import type { ToolbarButtonsProps, ToolbarCompositeProps, ToolbarMenusProps, ToolbarProps } from "./Toolbar.types";
+import type {
+    ToolbarAction,
+    ToolbarButtonsProps,
+    ToolbarCompositeProps,
+    ToolbarMenusProps,
+    ToolbarProps,
+} from "./Toolbar.types";
 
 const OVERFLOW_STOP = ToolbarUtils.OVERFLOW_STOP;
 const NO_RADIO_GROUP: never[] = [];
@@ -71,10 +78,11 @@ export const ToolbarComposite = <T,>(props: ToolbarCompositeProps<T>) => {
 
     const overflowItems = useMemo(
         () =>
-            ToolbarUtils.computeOverflowItems<T, MenuItem<T>>(props.actions, cut.collapsedIndexes, {
-                hasSubmenus: isMenubar,
-                isPressable,
-            }) as MenuItem<T>[],
+            ToolbarUtils.computeOverflowItems<T, MenuItem<T>, InteractionTooltipDefs<MenuItemFlags>>(
+                props.actions,
+                cut.collapsedIndexes,
+                { hasSubmenus: isMenubar, isPressable },
+            ) as MenuItem<T>[],
         [props.actions, cut.collapsedIndexes, isMenubar, isPressable],
     );
 
@@ -186,6 +194,7 @@ export const ToolbarComposite = <T,>(props: ToolbarCompositeProps<T>) => {
             isFocusableWhenDisabled={action.isReachableWhenDisabled ?? false}
             isPressed={pressedValues?.includes(action.value)}
             isTabbable={index === rovingStop}
+            tooltipDefs={action.tooltipDefs}
             ref={(element) => setItemRef(index, element)}
             onActivation={() => pressAction(buttonProps, action.value)}
             renderControl={(setElementRef, flags) => (

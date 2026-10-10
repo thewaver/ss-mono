@@ -1,4 +1,4 @@
-import { useCallback, useRef } from "react";
+import { useCallback, useEffect, useRef } from "react";
 
 import {
     INTERACTION_WRAPPER_DEFAULTS,
@@ -8,7 +8,9 @@ import {
 } from "@thewaver/ss-components";
 
 import { InteractionTrackerReactUtils } from "../../Abstracts/InteractionTracker/InteractionTrackerReact.utils";
+import { useSharedTooltipContext } from "../../Essentials/Overlays/SharedTooltip/SharedTooltip.context";
 import { Tooltip } from "../../Essentials/Overlays/Tooltip/Tooltip";
+import type { TooltipProps } from "../../Essentials/Overlays/Tooltip/Tooltip.types";
 import { useElement, useLatest } from "../../Utils/refUtils";
 import type { InteractionWrapperProps } from "./InteractionWrapper.types";
 
@@ -67,6 +69,38 @@ export const InteractionWrapper = <TExtra extends object = {}>(props: Interactio
 
     const tooltipDefs = props.tooltipDefs;
 
+    const tooltipProps: Omit<TooltipProps, "anchorRef"> | undefined = tooltipDefs && {
+        ...tooltipDefs,
+        renderContent: (visibilityTarget, transitionDurationMs, placement, arrowAim) =>
+            tooltipDefs.renderContent(visibilityTarget, transitionDurationMs, placement, flags, arrowAim),
+    };
+
+    const sharedTooltip = useSharedTooltipContext();
+    const latestTooltipPropsRef = useLatest(tooltipProps);
+
+    useEffect(() => {
+        if (sharedTooltip && element) sharedTooltip.update({ anchorRef: element, tooltipProps });
+    });
+
+    useEffect(() => {
+        if (!sharedTooltip || !element) return;
+
+        const claim = () => {
+            const latestTooltipProps = latestTooltipPropsRef.current;
+
+            if (latestTooltipProps) sharedTooltip.claim({ anchorRef: element, tooltipProps: latestTooltipProps });
+        };
+
+        element.addEventListener("mouseenter", claim);
+        element.addEventListener("focus", claim);
+
+        return () => {
+            element.removeEventListener("mouseenter", claim);
+            element.removeEventListener("focus", claim);
+            sharedTooltip.release(element);
+        };
+    }, [sharedTooltip, element, latestTooltipPropsRef]);
+
     return (
         <div
             className={className}
@@ -84,15 +118,7 @@ export const InteractionWrapper = <TExtra extends object = {}>(props: Interactio
                 </div>
             )}
 
-            {tooltipDefs && (
-                <Tooltip
-                    {...tooltipDefs}
-                    anchorRef={element}
-                    renderContent={(visibilityTarget, transitionDurationMs, placement, arrowAim) =>
-                        tooltipDefs.renderContent(visibilityTarget, transitionDurationMs, placement, flags, arrowAim)
-                    }
-                />
-            )}
+            {!sharedTooltip && tooltipProps && <Tooltip {...tooltipProps} anchorRef={element} />}
         </div>
     );
 };

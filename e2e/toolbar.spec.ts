@@ -1,4 +1,4 @@
-import { type Page, expect, test } from "@playwright/test";
+import { type Locator, type Page, expect, test } from "@playwright/test";
 
 import { accessibleText, activeText, attributesOf, demo, example, prop, readout } from "./helpers";
 
@@ -427,7 +427,7 @@ test("a tooltip shared along the row stays up as the pointer moves on, and descr
 }) => {
     await page.goto("/toolbar");
 
-    const actions = page.locator(`${SHARED} ${TOOLBAR} button:visible:has([data-hint])`);
+    const actions = page.locator(`${SHARED} ${TOOLBAR} button:visible:not([aria-haspopup]):not([aria-disabled])`);
     const tooltip = page.locator('[role="tooltip"]');
 
     await actions.nth(0).hover();
@@ -456,4 +456,120 @@ test("a tooltip shared along the row stays up as the pointer moves on, and descr
         "aria-describedby",
         new RegExp(tooltipId!),
     );
+});
+
+const SAMPLE_COUNT = 6;
+const SAMPLE_GAP_MS = 40;
+
+const sampleVisibility = async (tooltip: Locator) => {
+    const samples: boolean[] = [];
+
+    for (let sample = 0; sample < SAMPLE_COUNT; sample++) {
+        samples.push(await tooltip.isVisible());
+        await tooltip.page().waitForTimeout(SAMPLE_GAP_MS);
+    }
+
+    return samples;
+};
+
+const sharedRow = (page: Page) =>
+    page.locator(`${SHARED} ${TOOLBAR} > :not([aria-hidden]) button:not([aria-haspopup])`);
+
+/** The action with no tooltip of its own, and the enabled actions on either side of it, found by position. */
+const aroundGap = async (page: Page) => {
+    const row = sharedRow(page);
+    const gapIndex = await row.evaluateAll((buttons) =>
+        buttons.findIndex((button) => button.getAttribute("aria-disabled") === "true"),
+    );
+
+    return { before: row.nth(gapIndex - 1), gap: row.nth(gapIndex), after: row.nth(gapIndex + 1) };
+};
+
+/**
+ * The keyboard carries the tooltip the way the pointer does. Only the first opening waits; arrowing on from an action
+ * whose tooltip is showing moves it to the next one at once, so it never drops out on the way. The disabled action in
+ * the middle is not a stop, so the arrows skip it and the tooltip goes straight on to the action after it.
+ */
+test("arrowing along the row carries the shared tooltip with the focus", async ({ page }) => {
+    const tooltip = page.locator('[role="tooltip"]');
+    await setBarWidth(page, WIDEST_PX);
+
+    const { before, after } = await aroundGap(page);
+    const beforeText = ((await before.textContent()) ?? "").trim();
+
+    await sharedRow(page).first().focus();
+
+    for (let step = 0; step < (await sharedRow(page).count()) && (await focusedText(page)) !== beforeText; step++) {
+        await page.keyboard.press("ArrowRight");
+    }
+
+    await expect(tooltip, "a keyboard focus opens it").toBeVisible();
+
+    const tooltipId = await tooltip.getAttribute("id");
+
+    await page.keyboard.press("ArrowRight");
+
+    const samples = await sampleVisibility(tooltip);
+
+    expect(await focusedText(page), "the disabled action is stepped over").toBe(
+        ((await after.textContent()) ?? "").trim(),
+    );
+    expect(samples, "the tooltip never went away as focus moved on").not.toContain(false);
+    await expect(after, "and it describes the action focus reached").toHaveAttribute(
+        "aria-describedby",
+        new RegExp(tooltipId!),
+    );
+    await expect(before, "not the one focus left").not.toHaveAttribute("aria-describedby", new RegExp(tooltipId!));
+});
+
+/**
+ * An action with no tooltip of its own is a gap in the shared one: resting on it shows nothing and describes nothing,
+ * and the next action that has one picks the tooltip back up.
+ */
+test("an action without a tooltip of its own is a gap the shared tooltip closes over", async ({ page }) => {
+    const tooltip = page.locator('[role="tooltip"]');
+
+    await setBarWidth(page, WIDEST_PX);
+
+    const { before, gap, after } = await aroundGap(page);
+
+    await before.hover();
+    await expect(tooltip).toBeVisible();
+
+    await gap.hover();
+    await expect(tooltip, "it closes over the action that has none").toBeHidden();
+    await expect(gap, "and that action is described by nothing").not.toHaveAttribute("aria-describedby", /.+/);
+
+    await after.hover();
+    await expect(tooltip, "the next action with a tooltip picks it back up").toBeVisible();
+    await expect(after).toHaveAttribute("aria-describedby", new RegExp((await tooltip.getAttribute("id"))!));
+});
+
+/**
+ * An action keeps its tooltip when it runs out of room: the item standing for it in the overflow menu says the same
+ * thing it said in the row. What it says is read off the row first, so the copy is nobody's business here.
+ */
+test("an action collapsed into the overflow menu keeps its tooltip there", async ({ page }) => {
+    const tooltip = page.locator('[role="tooltip"]');
+
+    await setBarWidth(page, WIDEST_PX);
+
+    const last = sharedRow(page).and(page.locator(":not([aria-disabled])")).last();
+    const name = ((await last.textContent()) ?? "").trim();
+
+    await last.hover();
+    await expect(tooltip).toBeVisible();
+
+    const said = ((await tooltip.textContent()) ?? "").trim();
+
+    await page.mouse.move(0, 0);
+    await expect(tooltip).toBeHidden();
+    await setBarWidth(page, NARROW_PX);
+
+    expect(await readCollapsed(page, SHARED), "the action has moved into the menu").toContain(name);
+
+    await openOverflow(page, SHARED);
+    await page.locator(MENU_ITEM).filter({ hasText: name }).hover();
+
+    await expect(tooltip, "its menu item shows the tooltip it had in the row").toHaveText(said);
 });

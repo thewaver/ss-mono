@@ -29,8 +29,9 @@ export type TooltipProps = {
      */
     hoverShowDelayMs?: number;
     /**
-     * How soon after any tooltip on the page has closed a hover opens this one at once, without waiting out
-     * `hoverShowDelayMs`. Every tooltip shares one record of when the last one closed.
+     * How soon after any tooltip on the page has closed a hover or a keyboard focus opens this one at once,
+     * without waiting out `hoverShowDelayMs` or `focusShowDelayMs`. Every tooltip shares one record of when the
+     * last one closed.
      */
     skipDelayWindowMs?: number;
     /**

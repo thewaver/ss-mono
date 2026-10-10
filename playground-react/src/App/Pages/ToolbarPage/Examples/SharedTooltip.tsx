@@ -1,8 +1,5 @@
-import { useState } from "react";
-
-import { Toolbar, Tooltip } from "@thewaver/ss-components-react";
-import type { ToolbarAction } from "@thewaver/ss-components-react";
-import * as styles from "@thewaver/ss-playground/App/Pages/ToolbarPage/ToolbarPage.css";
+import { SharedTooltip, Toolbar } from "@thewaver/ss-components-react";
+import type { AnchorPlacement, InteractionTooltipDefs, ToolbarAction } from "@thewaver/ss-components-react";
 import { TOOLTIP_HOVER_DELAY_MS } from "@thewaver/ss-playground/App/StyledComponents/TooltipContent/TooltipContent.const";
 
 import { PageButtonContent } from "../../../StyledComponents/ButtonContent/ButtonContent";
@@ -11,62 +8,43 @@ import { PageTooltipContent } from "../../../StyledComponents/TooltipContent/Too
 import { renderToolbarOverflowItem, renderToolbarPopup } from "../ToolbarPage.const";
 import type { ToolbarExampleProps } from "../ToolbarPage.types";
 
-const ACTIONS: ToolbarAction<string>[] = [{ value: "Cut" }, { value: "Copy" }, { value: "Paste" }, { value: "Undo" }];
+const PLACEMENT: AnchorPlacement = { x: "center", y: "top-out" };
 
-const HINTS: Record<string, string> = {
-    Cut: "Moves the selection to the clipboard",
-    Copy: "Copies the selection to the clipboard",
-    Paste: "Puts the clipboard where the caret is",
-    Undo: "Takes back the last change",
-};
-
-const PLACEMENT = { x: "center", y: "top-out" } as const;
 const OFFSET = { x: 0, y: 8 };
+
+const toHint = (text: string): InteractionTooltipDefs => ({
+    placement: PLACEMENT,
+    offset: OFFSET,
+    hoverShowDelayMs: TOOLTIP_HOVER_DELAY_MS,
+    renderContent: (visibilityTarget, transitionDurationMs) => (
+        <PageTooltipContent visibilityTarget={visibilityTarget} transitionDurationMs={transitionDurationMs}>
+            {text}
+        </PageTooltipContent>
+    ),
+});
+
+const ACTIONS: ToolbarAction<string>[] = [
+    { value: "Cut", tooltipDefs: toHint("Moves the selection to the clipboard") },
+    { value: "Copy", tooltipDefs: toHint("Copies the selection to the clipboard") },
+    { value: "Clear", isDisabled: true },
+    { value: "Paste", tooltipDefs: toHint("Puts the clipboard where the caret is") },
+    { value: "Undo", tooltipDefs: toHint("Takes back the last change") },
+];
 
 type Props = ToolbarExampleProps;
 
-export const SharedTooltipExample = (props: Props) => {
-    const [anchor, setAnchor] = useState<HTMLElement>();
-
-    const pickAnchor = (target: EventTarget | null) => {
-        const button = target instanceof Element ? target.closest<HTMLElement>("button") : null;
-
-        if (button?.querySelector("[data-hint]") && button !== anchor) setAnchor(button);
-    };
-
-    return (
-        <div
-            className={styles.hoverWatch}
-            onPointerOver={(e) => pickAnchor(e.target)}
-            onFocus={(e) => pickAnchor(e.target)}
-        >
-            <Toolbar
-                actions={ACTIONS}
-                gap={props.gap}
-                ariaLabel={"Editing"}
-                overflowAriaLabel={"More editing actions"}
-                renderAction={(action, flags) => (
-                    <PageButtonContent flags={flags}>
-                        <span data-hint={action.value}>{action.value}</span>
-                    </PageButtonContent>
-                )}
-                renderOverflowTrigger={(flags) => <PageMenuTriggerContent flags={flags}>More</PageMenuTriggerContent>}
-                renderOverflowItem={renderToolbarOverflowItem}
-                renderOverflowPopup={renderToolbarPopup}
-                onActivate={props.onActivate}
-            />
-
-            <Tooltip
-                anchorRef={anchor}
-                placement={PLACEMENT}
-                offset={OFFSET}
-                hoverShowDelayMs={TOOLTIP_HOVER_DELAY_MS}
-                renderContent={(visibilityTarget, transitionDurationMs) => (
-                    <PageTooltipContent visibilityTarget={visibilityTarget} transitionDurationMs={transitionDurationMs}>
-                        {HINTS[anchor?.querySelector("[data-hint]")?.getAttribute("data-hint") ?? ""]}
-                    </PageTooltipContent>
-                )}
-            />
-        </div>
-    );
-};
+export const SharedTooltipExample = (props: Props) => (
+    <SharedTooltip>
+        <Toolbar
+            actions={ACTIONS}
+            gap={props.gap}
+            ariaLabel={"Editing"}
+            overflowAriaLabel={"More editing actions"}
+            renderAction={(action, flags) => <PageButtonContent flags={flags}>{action.value}</PageButtonContent>}
+            renderOverflowTrigger={(flags) => <PageMenuTriggerContent flags={flags}>More</PageMenuTriggerContent>}
+            renderOverflowItem={renderToolbarOverflowItem}
+            renderOverflowPopup={renderToolbarPopup}
+            onActivate={props.onActivate}
+        />
+    </SharedTooltip>
+);

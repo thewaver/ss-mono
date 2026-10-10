@@ -36,7 +36,7 @@ const closerOf = (page: Page, depth: number) => page.locator(MENU).nth(depth).lo
  */
 const boxOf = (locator: Locator) =>
     locator.evaluate((node: HTMLElement) => {
-        const [x, y] = (node.style.transform.match(/-?[\d.]+/g) ?? ["0", "0"]).map(Number);
+        const { e: x, f: y } = new DOMMatrixReadOnly(node.style.transform || "none");
 
         return { centerX: x + node.offsetWidth * 0.5, centerY: y + node.offsetHeight * 0.5, width: node.offsetWidth };
     });

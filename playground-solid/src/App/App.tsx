@@ -3,7 +3,7 @@ import COMPONENT_DEPENDENCIES from "virtual:component-dependencies";
 import type { DependencyNames } from "virtual:component-dependencies";
 
 import { A, Navigate, Route, type RouteSectionProps, Router } from "@solidjs/router";
-import { Collapsible, Sidebar, Tree, ViewportWrapper } from "@thewaver/ss-components-solid";
+import { Collapsible, SharedTooltip, Sidebar, Tree, ViewportWrapper } from "@thewaver/ss-components-solid";
 import type {
     AnchorPlacement,
     InteractionTooltipDefs,
@@ -504,35 +504,39 @@ export function AppContent(props: RouteSectionProps & { viewportAnchor: SignalPa
                                         }}
                                         style={{ "transition-duration": `${getTransitionDurationMs()}ms` }}
                                     >
-                                        <Tree
-                                            renderHighlightFloater={renderPageHighlightFloater}
-                                            nodes={getVisibleNodes}
-                                            value={selectedSignal}
-                                            expanded={expandedSignal}
-                                            ariaLabel={"Library"}
-                                            linkComponent={A}
-                                            computeCustomText={(node) => node.value.name}
-                                            renderNode={(getNode, getRenderProps) => (
-                                                <PageTreeNodeContent
-                                                    isGliding
-                                                    renderProps={getRenderProps}
-                                                    hasExamples={() => {
-                                                        const node = getNode().value;
+                                        <SharedTooltip>
+                                            <Tree
+                                                renderHighlightFloater={renderPageHighlightFloater}
+                                                nodes={getVisibleNodes}
+                                                value={selectedSignal}
+                                                expanded={expandedSignal}
+                                                ariaLabel={"Library"}
+                                                linkComponent={A}
+                                                computeCustomText={(node) => node.value.name}
+                                                renderNode={(getNode, getRenderProps) => (
+                                                    <PageTreeNodeContent
+                                                        isGliding
+                                                        renderProps={getRenderProps}
+                                                        hasExamples={() => {
+                                                            const node = getNode().value;
 
-                                                        return getIsBranchConfig(node) || node.component !== undefined;
-                                                    }}
-                                                    detail={() => {
-                                                        const node = getNode().value;
+                                                            return (
+                                                                getIsBranchConfig(node) || node.component !== undefined
+                                                            );
+                                                        }}
+                                                        detail={() => {
+                                                            const node = getNode().value;
 
-                                                        return getIsBranchConfig(node)
-                                                            ? `${flattenConfigs(node.children).length}`
-                                                            : "";
-                                                    }}
-                                                >
-                                                    {getNode().value.name}
-                                                </PageTreeNodeContent>
-                                            )}
-                                        />
+                                                            return getIsBranchConfig(node)
+                                                                ? `${flattenConfigs(node.children).length}`
+                                                                : "";
+                                                        }}
+                                                    >
+                                                        {getNode().value.name}
+                                                    </PageTreeNodeContent>
+                                                )}
+                                            />
+                                        </SharedTooltip>
                                     </div>
                                 </div>
                             </PageLayer>

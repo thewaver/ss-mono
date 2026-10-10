@@ -671,6 +671,8 @@ const edgeStrip = (name: string, edge: "start" | "end") =>
  * worth checking.
  */
 const zoomTrimAtStart = async (page: Page) => {
+    await page.locator(surface(TRIM)).first().scrollIntoViewIfNeeded();
+
     const box = (await page.locator(surface(TRIM)).first().boundingBox())!;
 
     await page.mouse.move(box.x + 2, box.y + box.height - 4);
@@ -681,6 +683,8 @@ const zoomTrimAtStart = async (page: Page) => {
 };
 
 const stripPoint = async (page: Page, name: string, edge: "start" | "end") => {
+    await page.locator(edgeStrip(name, edge)).scrollIntoViewIfNeeded();
+
     const box = (await page.locator(edgeStrip(name, edge)).boundingBox())!;
 
     return { x: box.x + box.width * 0.75, y: box.y + box.height * 0.5 };
@@ -735,6 +739,9 @@ test("dragging a clip's body still moves the window, and trims nothing", async (
 
     const before = await readBlocks(page, TRIM);
     const roomTone = page.locator(trimBlock("Room tone"));
+
+    await roomTone.scrollIntoViewIfNeeded();
+
     const box = (await roomTone.boundingBox())!;
 
     await dragFrom(page, { x: box.x + box.width * 0.3, y: box.y + box.height * 0.5 }, -60);

@@ -29,13 +29,31 @@ export const demo = (key: string) => `${example(key)} [data-demo]`;
  * one example is not in the document until that popup is open. This opens it when the row is not already on
  * screen — the named example's popup when one is given, otherwise each card's in turn until the row appears.
  * Only one popup is open at a time, so opening a second closes the first.
+ *
+ * A row on screen is not necessarily a row that can be used: a popup that has just been closed stays painted
+ * while it fades out, and is taken away the moment the fade ends, so a press aimed at a row in it lands on
+ * nothing. Such a row only counts while the button that opened its popup still says the popup is open — which
+ * `aria-controls` does only while it is — and one in a closing popup is waited out before the popup is reopened.
  */
 const POPUP_WAIT_MS = 1000;
 
+const readRowState = (page: Page, key: string) =>
+    page.evaluate((selector) => {
+        const row = document.querySelector(selector) as HTMLElement | null;
+
+        if (!row || row.getClientRects().length === 0 || getComputedStyle(row).visibility === "hidden") return "absent";
+
+        const popup = row.closest('[role="dialog"]');
+
+        return !popup || document.querySelector(`[aria-controls="${popup.id}"]`) ? "usable" : "closing";
+    }, prop(key));
+
 export const revealProp = async (page: Page, key: string, exampleKey?: string) => {
     const row = page.locator(prop(key)).first();
+    const state = await readRowState(page, key);
 
-    if (await row.isVisible()) return;
+    if (state === "usable") return;
+    if (state === "closing") await row.waitFor({ state: "hidden", timeout: POPUP_WAIT_MS });
 
     const triggers = page.locator(exampleKey ? `#${exampleKey}Knobs` : '[id$="Knobs"][aria-haspopup="dialog"]');
 

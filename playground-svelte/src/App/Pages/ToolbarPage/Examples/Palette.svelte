@@ -21,7 +21,7 @@
     const PALETTE_DEFS: ArcDefs = {
         curveHeightRatio: 1,
         spreadDegrees: 360,
-        facingDegrees: 70,
+        facingDegrees: 67.5,
         itemWidthRatio: 0.3542,
         itemHeightRatio: 0.4706,
     };

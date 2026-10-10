@@ -8,8 +8,11 @@ import {
 } from "@thewaver/ss-components";
 
 import { InteractionTrackerVueUtils } from "../../Abstracts/InteractionTracker/InteractionTrackerVue.utils";
+import { useSharedTooltipContext } from "../../Essentials/Overlays/SharedTooltip/SharedTooltip.context";
+import type { SharedTooltipDefs } from "../../Essentials/Overlays/SharedTooltip/SharedTooltip.context.types";
 import { Tooltip } from "../../Essentials/Overlays/Tooltip/Tooltip";
 import type { TooltipSlots } from "../../Essentials/Overlays/Tooltip/Tooltip.types";
+import { watchAfterRender } from "../../Utils/effectUtils";
 import { callSlot, declareProps } from "../../Utils/propUtils";
 import { exposeElement, toElement } from "../../Utils/refUtils";
 import type { SlotsContext } from "../../Utils/typeUtils";
@@ -48,19 +51,51 @@ export const InteractionWrapper = defineComponent(
             element.value = toElement(target);
         };
 
+        const getFlags = (): InteractionFlags<TExtra> => ({
+            ...internalFlags.value,
+            isDisabled: getIsDisabled(),
+            isPressed: props.isPressed,
+            hasError: props.hasError,
+            ...((props.extraFlags ?? NO_EXTRA_FLAGS) as TExtra),
+        });
+
+        const getTooltipDefs = (): SharedTooltipDefs | undefined => {
+            const tooltipDefs = props.tooltipDefs;
+
+            if (!tooltipDefs) return undefined;
+
+            const { renderContent, ...tooltipProps } = tooltipDefs;
+
+            return { ...tooltipProps, renderContent: (value) => renderContent({ ...value, flags: getFlags() }) };
+        };
+
+        const sharedTooltip = useSharedTooltipContext();
+
+        if (sharedTooltip) {
+            watchAfterRender([element], ([target]) => {
+                if (!target) return;
+
+                const claim = () => {
+                    if (props.tooltipDefs) sharedTooltip.claim({ anchorRef: target, getTooltipDefs });
+                };
+
+                target.addEventListener("mouseenter", claim);
+                target.addEventListener("focus", claim);
+
+                return () => {
+                    target.removeEventListener("mouseenter", claim);
+                    target.removeEventListener("focus", claim);
+                    sharedTooltip.release(target);
+                };
+            });
+        }
+
         return () => {
             const sizing = props.sizing ?? INTERACTION_WRAPPER_DEFAULTS.sizing;
             const isDisabled = getIsDisabled();
+            const flags = getFlags();
 
-            const flags: InteractionFlags<TExtra> = {
-                ...internalFlags.value,
-                isDisabled,
-                isPressed: props.isPressed,
-                hasError: props.hasError,
-                ...((props.extraFlags ?? NO_EXTRA_FLAGS) as TExtra),
-            };
-
-            const tooltipDefs = props.tooltipDefs;
+            const tooltipDefs = sharedTooltip ? undefined : getTooltipDefs();
 
             return (
                 <div
@@ -91,11 +126,7 @@ export const InteractionWrapper = defineComponent(
 
                             return (
                                 <Tooltip {...tooltipProps} anchorRef={element.value}>
-                                    {
-                                        {
-                                            renderContent: (value) => renderContent({ ...value, flags }),
-                                        } satisfies TooltipSlots
-                                    }
+                                    {{ renderContent } satisfies TooltipSlots}
                                 </Tooltip>
                             );
                         })()}

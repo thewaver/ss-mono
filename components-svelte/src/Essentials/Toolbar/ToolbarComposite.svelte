@@ -5,11 +5,11 @@
     import {
         DismisserUtils,
         type InteractionSizing,
+        type MenuItemFlags,
         type MenuItemKind,
         type MenuTriggerRole,
         MenuUtils,
         TOOLBAR_DEFAULTS,
-        type ToolbarAction,
         ToolbarUtils,
         ToolbarStyles as styles,
     } from "@thewaver/ss-components";
@@ -17,12 +17,18 @@
     import { ElementObserverSvelteUtils } from "../../Abstracts/ElementObserver/ElementObserverSvelte.utils.svelte.js";
     import { NavigatorSvelteUtils } from "../../Abstracts/Navigator/NavigatorSvelte.utils.svelte.js";
     import InteractionWrapper from "../../Primitives/InteractionWrapper/InteractionWrapper.svelte";
+    import type { InteractionTooltipDefs } from "../../Primitives/InteractionWrapper/InteractionWrapper.types.js";
     import PlacementBox from "../../Primitives/PlacementBox/PlacementBox.svelte";
     import PlacementItem from "../../Primitives/PlacementItem/PlacementItem.svelte";
     import { createHeldValue } from "../../Utils/bindableUtils.svelte.js";
     import Menu from "../Menus/Menu/Menu.svelte";
     import type { MenuItem } from "../Menus/Menu/Menu.types.js";
-    import type { ToolbarButtonsProps, ToolbarCompositeProps, ToolbarMenusProps } from "./Toolbar.types.js";
+    import type {
+        ToolbarAction,
+        ToolbarButtonsProps,
+        ToolbarCompositeProps,
+        ToolbarMenusProps,
+    } from "./Toolbar.types.js";
 
     const OVERFLOW_STOP = ToolbarUtils.OVERFLOW_STOP;
     const NO_RADIO_GROUP: never[] = [];
@@ -85,10 +91,11 @@
     );
 
     const overflowItems = $derived(
-        ToolbarUtils.computeOverflowItems<T, MenuItem<T>>(props.actions, cut.collapsedIndexes, {
-            hasSubmenus: isMenubar,
-            isPressable,
-        }) as MenuItem<T>[],
+        ToolbarUtils.computeOverflowItems<T, MenuItem<T>, InteractionTooltipDefs<MenuItemFlags>>(
+            props.actions,
+            cut.collapsedIndexes,
+            { hasSubmenus: isMenubar, isPressable },
+        ) as MenuItem<T>[],
     );
 
     const hasOverflow = $derived(overflowItems.length > 0);
@@ -230,6 +237,7 @@
             isFocusableWhenDisabled={action.isReachableWhenDisabled ?? false}
             isPressed={pressed?.includes(action.value)}
             isTabbable={index === rovingStop}
+            tooltipDefs={action.tooltipDefs}
             bind:ref={() => itemElements[index], (element) => setItemRef(index, element)}
             onActivation={() => pressAction(action.value)}
         >

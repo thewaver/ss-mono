@@ -1,4 +1,4 @@
-import { Show, createMemo, createSignal } from "solid-js";
+import { Show, createEffect, createMemo, createSignal, onCleanup } from "solid-js";
 
 import {
     INTERACTION_WRAPPER_DEFAULTS,
@@ -8,7 +8,9 @@ import {
 } from "@thewaver/ss-components";
 
 import { InteractionTrackerSolidUtils } from "../../Abstracts/InteractionTracker/InteractionTrackerSolid.utils";
+import { useSharedTooltipContext } from "../../Essentials/Overlays/SharedTooltip/SharedTooltip.context";
 import { Tooltip } from "../../Essentials/Overlays/Tooltip/Tooltip";
+import type { TooltipProps } from "../../Essentials/Overlays/Tooltip/TooltipSolid.types";
 import { access } from "../../Utils/propUtils";
 import type { InteractionWrapperProps } from "./InteractionWrapperSolid.types";
 
@@ -48,6 +50,41 @@ export const InteractionWrapper = <TExtra extends object = {}>(props: Interactio
         ...(access(props.extraFlags) ?? ({} as TExtra)),
     }));
 
+    const getTooltipProps = createMemo((): Omit<TooltipProps, "anchorRef"> | undefined => {
+        const defs = getTooltipDefs();
+
+        if (!defs) return undefined;
+
+        return {
+            ...defs,
+            renderContent: (getVisibilityTarget, getTransitionDurationMs, getPlacement, getArrowAim) =>
+                defs.renderContent(getVisibilityTarget, getTransitionDurationMs, getPlacement, getFlags, getArrowAim),
+        };
+    });
+
+    const sharedTooltip = useSharedTooltipContext();
+
+    if (sharedTooltip) {
+        createEffect(() => {
+            const element = getElementRef();
+
+            if (!element) return;
+
+            const claim = () => {
+                if (getTooltipProps()) sharedTooltip.claim({ anchorRef: element, getTooltipProps });
+            };
+
+            element.addEventListener("mouseenter", claim);
+            element.addEventListener("focus", claim);
+
+            onCleanup(() => {
+                element.removeEventListener("mouseenter", claim);
+                element.removeEventListener("focus", claim);
+                sharedTooltip.release(element);
+            });
+        });
+    }
+
     return (
         <div
             class={[styles.interactionRoot, styles.interactionSizingVariants[getSizing()]].join(" ")}
@@ -71,22 +108,8 @@ export const InteractionWrapper = <TExtra extends object = {}>(props: Interactio
                 <div class={styles.interactionDecorationWrapper}>{props.renderDecoration(getFlags)}</div>
             )}
 
-            <Show when={getTooltipDefs()}>
-                {(getDefs) => (
-                    <Tooltip
-                        {...getDefs()}
-                        renderContent={(getVisibilityTarget, getTransitionDurationMs, getPlacement, getArrowAim) =>
-                            getDefs().renderContent(
-                                getVisibilityTarget,
-                                getTransitionDurationMs,
-                                getPlacement,
-                                getFlags,
-                                getArrowAim,
-                            )
-                        }
-                        anchorRef={getElementRef}
-                    />
-                )}
+            <Show when={!sharedTooltip && getTooltipProps()}>
+                {(getProps) => <Tooltip {...getProps()} anchorRef={getElementRef} />}
             </Show>
         </div>
     );

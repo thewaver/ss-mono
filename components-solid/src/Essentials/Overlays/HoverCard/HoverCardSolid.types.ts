@@ -34,9 +34,9 @@ export type HoverCardProps = ModalNameProps &
          */
         hoverShowDelayMs?: number;
         /**
-         * How soon after any hover card on the page has closed a hover opens this one at once, without waiting
-         * out `hoverShowDelayMs`. Hover cards share this record with each other and not with tooltips. Focus
-         * always waits `focusShowDelayMs`.
+         * How soon after any hover card on the page has closed a hover or a keyboard focus opens this one at once,
+         * without waiting out `hoverShowDelayMs` or `focusShowDelayMs`. Hover cards share this record with each
+         * other and not with tooltips.
          */
         skipDelayWindowMs?: number;
         /**

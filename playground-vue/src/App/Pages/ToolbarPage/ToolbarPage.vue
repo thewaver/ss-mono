@@ -63,19 +63,19 @@ const examples: ExampleDefs[] = [
         path: `${EXAMPLES_ROOT}/Pressed.vue`,
     },
     {
+        key: "sharedTooltip",
+        name: "One tooltip for the row",
+        span: WIDE_SPAN,
+        readout: () =>
+            "a single tooltip whose anchor is whichever action is under the pointer or holds focus; moving along the row carries the tooltip with it instead of hiding one and showing the next, and its description moves with it; Clear is disabled and has no hint, so it gets no tooltip",
+        path: `${EXAMPLES_ROOT}/SharedTooltip.vue`,
+    },
+    {
         key: "palette",
         name: "A ring of tools",
         readout: () =>
             `last run: ${lastRun.value} — a layout sizes the bar itself, so nothing runs out of room and the overflow menu has nothing to hold`,
         path: `${EXAMPLES_ROOT}/Palette.vue`,
-    },
-    {
-        key: "sharedTooltip",
-        name: "One tooltip for the row",
-        span: WIDE_SPAN,
-        readout: () =>
-            "a single tooltip whose anchor is whichever action is under the pointer or holds focus; moving along the row carries the tooltip with it instead of hiding one and showing the next, and its description moves with it",
-        path: `${EXAMPLES_ROOT}/SharedTooltip.vue`,
     },
 ];
 </script>
@@ -128,14 +128,14 @@ const examples: ExampleDefs[] = [
             </ResizableBar>
         </template>
 
-        <template #palette>
-            <PaletteExample v-bind="commonProps" />
-        </template>
-
         <template #sharedTooltip>
             <ResizableBar :width="barWidth" @resize="resizeBar">
                 <SharedTooltipExample v-bind="commonProps" />
             </ResizableBar>
+        </template>
+
+        <template #palette>
+            <PaletteExample v-bind="commonProps" />
         </template>
     </PageExamples>
 </template>

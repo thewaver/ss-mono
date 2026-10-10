@@ -64,21 +64,21 @@
             path: `${EXAMPLES_ROOT}/Pressed.svelte`,
         },
         {
+            key: "sharedTooltip",
+            name: "One tooltip for the row",
+            span: WIDE_SPAN,
+            readout: () =>
+                "a single tooltip whose anchor is whichever action is under the pointer or holds focus; moving along the row carries the tooltip with it instead of hiding one and showing the next, and its description moves with it; Clear is disabled and has no hint, so it gets no tooltip",
+            component: sharedTooltipExample,
+            path: `${EXAMPLES_ROOT}/SharedTooltip.svelte`,
+        },
+        {
             key: "palette",
             name: "A ring of tools",
             readout: () =>
                 `last run: ${lastRun} — a layout sizes the bar itself, so nothing runs out of room and the overflow menu has nothing to hold`,
             component: paletteExample,
             path: `${EXAMPLES_ROOT}/Palette.svelte`,
-        },
-        {
-            key: "sharedTooltip",
-            name: "One tooltip for the row",
-            span: WIDE_SPAN,
-            readout: () =>
-                "a single tooltip whose anchor is whichever action is under the pointer or holds focus; moving along the row carries the tooltip with it instead of hiding one and showing the next, and its description moves with it",
-            component: sharedTooltipExample,
-            path: `${EXAMPLES_ROOT}/SharedTooltip.svelte`,
         },
     ];
 </script>

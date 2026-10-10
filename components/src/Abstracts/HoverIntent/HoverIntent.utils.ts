@@ -39,7 +39,7 @@ export namespace HoverIntentUtils {
      * Makes a record of when a panel in one family last closed, for {@link create} to share.
      *
      * Every panel handed the same group shares one skip window, so once a reader has waited for one, moving to
-     * its neighbor opens the next at once. Declare one at module level per family of panels — all tooltips, all
+     * its neighbor — by pointer or by keyboard — opens the next at once. Declare one at module level per family of panels — all tooltips, all
      * hover cards — so that families do not skip each other's wait.
      *
      * @returns A group that has never seen a close, so the first hover always waits.
@@ -47,21 +47,20 @@ export namespace HoverIntentUtils {
     export const createDelayGroup = (): HoverIntentDelayGroup => ({ lastClosedAtMs: Number.NEGATIVE_INFINITY });
 
     /**
-     * How long a hover arriving now has to wait before the panel shows.
+     * How long a hover or a keyboard focus arriving now has to wait before the panel shows.
      *
      * No wait when the panel is already showing, when the delay is zero or less, or when the last close in its
-     * group was less than the skip window ago; otherwise the whole delay.
+     * group was less than the skip window ago; otherwise the whole delay. Only opening waits: moving on from one
+     * panel to the next, by pointer or by keyboard, lands inside the window and shows at once.
      *
      * @param defs.isShown Whether the panel is already showing.
-     * @param defs.hoverShowDelayMs The wait the panel asks for.
-     * @param defs.skipDelayWindowMs How soon after a close in the group a hover skips the wait.
+     * @param defs.showDelayMs The wait the panel asks for, for the way the reader arrived.
+     * @param defs.skipDelayWindowMs How soon after a close in the group an arrival skips the wait.
      * @param defs.msSinceLastClose How long ago the group last closed, which is infinite when it never has.
      * @returns The wait in milliseconds, `0` for at once.
      */
     export const computeShowDelayMs = (defs: HoverIntentShowDelayDefs) =>
-        defs.isShown || defs.hoverShowDelayMs <= 0 || defs.msSinceLastClose < defs.skipDelayWindowMs
-            ? 0
-            : defs.hoverShowDelayMs;
+        defs.isShown || defs.showDelayMs <= 0 || defs.msSinceLastClose < defs.skipDelayWindowMs ? 0 : defs.showDelayMs;
 
     /**
      * How far a panel's hit region has to reach back towards its anchor to cover the gap an offset opens.
@@ -99,7 +98,8 @@ export namespace HoverIntentUtils {
      * Arriving on the panel opens it at once, so a pointer that crosses during a closing fade keeps it. Leaving
      * either closes it, unless the pointer left for the other, which is read from the event rather than
      * guessed with a grace period. With a focus delay, a keyboard focus on the anchor opens it after that delay
-     * too; a focus from a pointer press, or one that a closing layer is putting back, is ignored.
+     * too, or at once inside the skip window, exactly as a hover does; a focus from a pointer press, or one that a
+     * closing layer is putting back, is ignored.
      *
      * The open state stays the caller's: this writes `true` and `false` to it and never keeps a copy, so a
      * panel closed from elsewhere — by Escape, a press outside, a consumer's own button — is simply closed.
@@ -109,14 +109,15 @@ export namespace HoverIntentUtils {
      *
      * Nothing is listened for until `observeAnchor` and `observePanel` are handed the two elements; each returns
      * the function that stops listening to it, and a later call replaces an earlier one. An anchor handed over while
-     * the pointer is already on it counts as the pointer arriving, so a panel whose anchor is chosen by the very
-     * movement that reached it — one tooltip shared along a row — still opens. Every function in `defs`
+     * the pointer is already on it counts as the pointer arriving, and one handed over while it holds keyboard focus
+     * counts as the focus arriving, so a panel whose anchor is chosen by the very movement that reached it — one
+     * tooltip shared along a row — still opens. Every function in `defs`
      * is read when it is needed.
      *
      * @param visibilitySignal The panel's open state, read and written.
      * @param defs.delayGroup The family whose skip window this panel shares; see {@link createDelayGroup}.
      * @param defs.getHoverShowDelayMs How long the pointer has to rest on the anchor.
-     * @param defs.getSkipDelayWindowMs How soon after a close in the group a hover skips the wait.
+     * @param defs.getSkipDelayWindowMs How soon after a close in the group a hover or a keyboard focus skips the wait.
      * @param defs.getFocusShowDelayMs How long a keyboard focus has to rest on the anchor. Without it, focus
      * opens nothing.
      * @param defs.getIsHeld Read when the pointer leaves; while it answers `true` the leave closes nothing, for a
@@ -160,15 +161,12 @@ export namespace HoverIntentUtils {
             lastPointerType = e.pointerType;
         };
 
-        const handleAnchorMouseEnter = () => {
-            if (getIsTouch()) return;
-
-            isOverAnchor = true;
+        const showAfter = (showDelayMs: number) => {
             cancel();
 
             const delayMs = computeShowDelayMs({
                 isShown: getIsShown(),
-                hoverShowDelayMs: defs.getHoverShowDelayMs(),
+                showDelayMs,
                 skipDelayWindowMs: defs.getSkipDelayWindowMs(),
                 msSinceLastClose: performance.now() - defs.delayGroup.lastClosedAtMs,
             });
@@ -182,6 +180,13 @@ export namespace HoverIntentUtils {
             showTimeout = setTimeout(() => {
                 setIsShown(true);
             }, delayMs);
+        };
+
+        const handleAnchorMouseEnter = () => {
+            if (getIsTouch()) return;
+
+            isOverAnchor = true;
+            showAfter(defs.getHoverShowDelayMs());
         };
 
         const handlePanelMouseEnter = () => {
@@ -227,10 +232,7 @@ export namespace HoverIntentUtils {
             if (FocusManagerUtils.getIsRestoringFocus()) return;
             if (anchorRef && !anchorRef.matches(":focus-visible")) return;
 
-            cancel();
-            showTimeout = setTimeout(() => {
-                setIsShown(true);
-            }, defs.getFocusShowDelayMs());
+            showAfter(defs.getFocusShowDelayMs());
         };
 
         const handleAnchorBlur = () => {
@@ -267,6 +269,7 @@ export namespace HoverIntentUtils {
             stopAnchor = stop;
 
             if (element.matches(":hover")) handleAnchorMouseEnter();
+            if (element === element.ownerDocument.activeElement) handleAnchorFocus();
 
             return stop;
         };

@@ -11,7 +11,7 @@ export type HoverIntentBridgeInsets = {
 
 export type HoverIntentShowDelayDefs = {
     isShown: boolean;
-    hoverShowDelayMs: number;
+    showDelayMs: number;
     skipDelayWindowMs: number;
     msSinceLastClose: number;
 };

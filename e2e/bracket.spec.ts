@@ -129,7 +129,9 @@ test("there is one connector for every node that feeds another", async ({ page }
 /**
  * The reason the connectors stop at the edges rather than running from center to center: a node's box hides
  * whatever is under it only while it is fully opaque, so a line crossing a half-faded node shows through it.
- * This walks every point of every path against every node's rectangle.
+ * This walks every point of every path against every node's rectangle. Both are read in layout space — a node's
+ * box off the inline style the component wrote, a path's points in the drawing's own units — since the Playground
+ * draws everything scaled to the window, and a client rect would be the layout value times that factor.
  */
 test("no connector passes under a node, whichever way the consumer draws them", async ({ page }) => {
     for (const sample of CONNECTOR_SAMPLES) {
@@ -138,16 +140,16 @@ test("no connector passes under a node, whichever way the consumer draws them", 
         for (const scope of [BOARD, CHART, CHAIN]) {
             const crossings = await page.evaluate((value) => {
                 const board = document.querySelector(`${value} svg`)!.parentElement!;
-                const origin = board.getBoundingClientRect();
                 const boxes = [...board.querySelectorAll("li")].map((item) => {
-                    const rect = item.getBoundingClientRect();
+                    const left = Number.parseFloat(item.style.left);
+                    const top = Number.parseFloat(item.style.top);
 
                     return {
                         text: (item.textContent ?? "").trim(),
-                        left: rect.left - origin.left,
-                        top: rect.top - origin.top,
-                        right: rect.right - origin.left,
-                        bottom: rect.bottom - origin.top,
+                        left,
+                        top,
+                        right: left + Number.parseFloat(item.style.width),
+                        bottom: top + Number.parseFloat(item.style.height),
                     };
                 });
 
@@ -872,17 +874,14 @@ test("a node under a pinned round name still takes a press there", async ({ page
 
 test("the family view's frame keeps one size while the family changes", async ({ page }) => {
     const frame = page.locator(FAMILY_FRAME);
-    const resting = await frame.boundingBox();
+    const measure = () =>
+        frame.evaluate((element: HTMLElement) => ({ width: element.offsetWidth, height: element.offsetHeight }));
+    const resting = await measure();
 
     await page.locator(FAMILY_NODE, { hasText: /^Semi 1$/ }).click();
     await page.keyboard.press("ArrowLeft");
     await page.keyboard.press("ArrowLeft");
     await expectFramed(page, ["Ada", "Bo", "Quarter 1"], "a leaf's family");
 
-    const moved = await frame.boundingBox();
-
-    expect({ width: moved!.width, height: moved!.height }, "sized for the largest family, so nothing shifts").toEqual({
-        width: resting!.width,
-        height: resting!.height,
-    });
+    expect(await measure(), "sized for the largest family, so nothing shifts").toEqual(resting);
 });

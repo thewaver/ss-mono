@@ -139,3 +139,77 @@ test("resting on a menu row shows its page's first example beside it, as a pictu
         "and sits where nothing can be focused or pressed",
     ).toHaveCount(1);
 });
+
+/** Two rows next to each other in the menu whose pages both have a tile, so both rest on a preview. */
+const findPreviewedPair = async (page: Page) => {
+    const rows = menu(page).locator('[role="treeitem"]');
+    const routes = await page.locator(TILE).evaluateAll((tiles) => tiles.map((tile) => tile.dataset.testid!));
+    const hrefs = await rows.evaluateAll((items) => items.map((item) => item.getAttribute("href")));
+    const isPreviewed = (href: string | null) => href !== null && routes.includes(toRoute(href));
+    const index = hrefs.findIndex((href, at) => isPreviewed(href) && isPreviewed(hrefs[at + 1] ?? null));
+
+    return [rows.nth(index), rows.nth(index + 1)] as const;
+};
+
+const SAMPLE_COUNT = 6;
+const SAMPLE_GAP_MS = 40;
+
+const sampleVisibility = async (tooltip: Locator) => {
+    const samples: boolean[] = [];
+
+    for (let sample = 0; sample < SAMPLE_COUNT; sample++) {
+        samples.push(await tooltip.isVisible());
+        await tooltip.page().waitForTimeout(SAMPLE_GAP_MS);
+    }
+
+    return samples;
+};
+
+/**
+ * The menu's previews are one tooltip, shared by every row: moving from one row to the next hands it over rather than
+ * closing one and opening another, so it stays up the whole way and ends up describing the row it reached.
+ */
+test("moving the pointer down the menu carries one preview from row to row", async ({ page }) => {
+    const tooltip = page.locator('[role="tooltip"]');
+    const [first, second] = await findPreviewedPair(page);
+
+    await first.hover();
+    await expect(tooltip).toBeVisible();
+
+    const tooltipId = await tooltip.getAttribute("id");
+    const box = (await second.boundingBox())!;
+
+    await page.mouse.move(box.x + box.width * 0.5, box.y + box.height * 0.5, { steps: 6 });
+
+    expect(await sampleVisibility(tooltip), "the preview never went away on the way down").not.toContain(false);
+    await expect(tooltip, "there is only ever one").toHaveCount(1);
+    await expect(second, "and it is now the row the pointer reached").toHaveAttribute(
+        "aria-describedby",
+        new RegExp(tooltipId!),
+    );
+});
+
+/**
+ * The keyboard carries it too. Only the first opening waits; arrowing on from a row whose preview is showing moves the
+ * preview to the next row at once.
+ */
+test("arrowing through the menu carries the preview with the focus", async ({ page }) => {
+    const tooltip = page.locator('[role="tooltip"]');
+    const [first, second] = await findPreviewedPair(page);
+
+    await first.focus();
+    await page.keyboard.press("ArrowDown");
+    await expect(second).toBeFocused();
+    await expect(tooltip, "a keyboard focus opens the preview").toBeVisible();
+
+    const tooltipId = await tooltip.getAttribute("id");
+
+    await page.keyboard.press("ArrowUp");
+    await expect(first).toBeFocused();
+
+    expect(await sampleVisibility(tooltip), "the preview never went away as focus moved").not.toContain(false);
+    await expect(first, "and it moved to the row focus reached").toHaveAttribute(
+        "aria-describedby",
+        new RegExp(tooltipId!),
+    );
+});

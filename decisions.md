@@ -4033,8 +4033,15 @@ tooltip itself shows it at once, so the bridge still works during a fade.
 **The skip window is one module-level timestamp shared by every tooltip.** When a tooltip that was actually showing
 closes, it records the time; a hover within `skipDelayWindowMs` (300) of that shows at once. Only a real close
 refreshes the window, so a fast sweep across controls that never opened anything keeps every one of them waiting.
-Focus does not use the window. Both numbers start from the Radix pair and are the user's to tune; they live in
-`TOOLTIP_DEFAULTS` and nowhere else.
+Both numbers start from the Radix pair and are the user's to tune; they live in `TOOLTIP_DEFAULTS` and nowhere else.
+
+**Focus uses the window too: only opening waits.** The user's rule, stated when the nav's previews were made to
+share one tooltip: delays are skipped for moving between items, and only the first opening has one. Focus first
+ignored the window, so arrowing from one control to the next hid the tooltip on the blur and made the next wait out
+`focusShowDelayMs` again. The blur still closes it and still records the close, so the focus that follows lands
+inside the window and shows at once — which is what lets a shared tooltip glide under the keyboard as it does under
+the pointer. A plain row of separate tooltips gets the same: tabbing on from one that is showing opens the next at
+once.
 
 **One timer serves both ways in, and a mouse focus no longer cancels a pending hover.** Focus clears the pending
 timer only when it is about to start its own, a `:focus-visible` focus. Otherwise clicking a button within the hover
@@ -4054,8 +4061,46 @@ it up across the change** — leaving one control and entering the next inside t
 window, so it never faded — but the position jumped. So a change of anchor while the tooltip is visible now turns on a
 `transform` transition (`TooltipUtils.getGlideTransition`) for one fade duration, and nothing else that moves it — a
 scroll, a resize — is eased. The description moves with it for free, since `aria-describedby` already follows the
-anchor through `TooltipUtils.describe`. The Toolbar page's shared-tooltip example picks the anchor from the row's own
-`pointerover` and `focusin`, in a wrapper with `display: contents` so the toolbar measures its room as before.
+anchor through `TooltipUtils.describe`. The Toolbar page's shared-tooltip example first picked the anchor itself, from
+the row's `pointerover` and `focusin`; it now gives each action its own tooltip and wraps the bar in `SharedTooltip`.
+
+**A Toolbar action carries a tooltip, as a Tree node or a Menu item does.** The core type is
+`ToolbarActionRecord<T, TTooltipDefs>` and each framework's `ToolbarAction` fills the tooltip type in. A collapsed
+action takes its tooltip into the overflow menu, where the menu item shows the same one. A menubar's word takes none
+(`ToolbarActionRecord<T, never>`): it is a `Menu` trigger, which has no tooltip to hand it to.
+
+**An anchor handed over while it holds keyboard focus counts as the focus arriving**, as one handed over under the
+pointer already counted as the pointer arriving. A consumer picking the anchor in `focusin` does so after the
+element's own `focus` has fired, so the tooltip, which only starts listening once handed the element, never heard
+it: a shared tooltip never opened from the keyboard. `HoverIntentUtils.create`'s `observeAnchor` now checks for focus
+the way it checks `:hover`.
+
+### `SharedTooltip`: the controls inside it share one tooltip
+
+Asked for by the user for the Playground's nav previews, and at library level rather than as the Toolbar example's
+consumer wiring. **It is a wrapper, not an option on each collection.** Every control in the library that takes a
+tooltip does so through `InteractionWrapper`'s `tooltipDefs`, so a context read there reaches `Tree`, `Menu`,
+`Listbox`, `Sortable`, `SortableGrid` and `Stepper` at once, where a prop would have been added to each of them in
+four frameworks. Inside a `SharedTooltip`, a wrapper with `tooltipDefs` draws no `Tooltip` of its own: on its
+element's `mouseenter` or `focus` it hands over its element and its tooltip props, and the one `Tooltip` the
+wrapper draws takes them — placement, offset, delays and content all come from the control it is on, so nothing
+about the tooltip is configured twice. A control with no `tooltipDefs` hands nothing over and is a gap.
+
+**The content is rebuilt per control, the box is not.** The body is drawn from the current control's own
+`renderContent`, keyed on the hand-over, so each control's flags and content are its own; the positioned box
+around it stays, which is what glides. A control handing over again while it is already the anchor changes
+nothing, so re-entering it does not rebuild its content.
+
+**A control that goes away while it is the anchor takes the tooltip with it**, with no fade, since there is
+nothing left to point at.
+
+**React's context has a third function, `update`.** Solid's shared tooltip reads the claiming control's props
+live; React's would hold the props as they were at the claim, so after each render a control calls `update`, which
+only takes effect while that control holds the tooltip. React and Vue re-mount the content per claim with a fragment
+keyed on a counter that goes up on every new claim, Svelte with `{#key}`.
+
+**The scope is everything inside, through portals too.** A context follows the component tree, so a menu opened
+from inside a `SharedTooltip` shares the same tooltip. That has not been argued; it is what the mechanism does.
 
 **The reveal is the drawing's, and the Tooltip page now offers six.** From Codrops' image reveal effects, which the
 user judged covered already: `Tooltip` hands its drawing whether it is showing and for how long the change takes, so

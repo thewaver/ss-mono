@@ -36,10 +36,10 @@ export type TooltipProps = AccessorProps<{
      */
     hoverShowDelayMs?: number;
     /**
-     * How soon after any tooltip on the page has closed a hover opens this one at once, without waiting out
-     * `hoverShowDelayMs`. Every tooltip shares one record of when the last one closed, so once a reader has
-     * waited for one tooltip, moving to its neighbor shows the next straight away. Focus always waits
-     * `focusShowDelayMs`.
+     * How soon after any tooltip on the page has closed a hover or a keyboard focus opens this one at once,
+     * without waiting out `hoverShowDelayMs` or `focusShowDelayMs`. Every tooltip shares one record of when the
+     * last one closed, so once a reader has waited for one tooltip, moving to its neighbor — by pointer or by
+     * keyboard — shows the next straight away. Only opening waits.
      */
     skipDelayWindowMs?: number;
     /**

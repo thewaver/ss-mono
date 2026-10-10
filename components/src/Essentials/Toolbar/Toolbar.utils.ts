@@ -2,7 +2,7 @@ import type { NavigatorOrientation } from "../../Abstracts/Navigator/Navigator.t
 import { NavigatorUtils } from "../../Abstracts/Navigator/Navigator.utils";
 import type { MenuItemKind } from "../Menus/Menu/Menu.types";
 import type {
-    ToolbarAction,
+    ToolbarActionRecord,
     ToolbarCut,
     ToolbarCutDefs,
     ToolbarKeyDefs,
@@ -127,9 +127,9 @@ export namespace ToolbarUtils {
     /**
      * The items the overflow menu holds, one per collapsed action.
      *
-     * Each carries the action's value and its disabled state, so an action is described once whether it is in
-     * the row or in the menu. A menubar's word keeps the items of its menu, which become a submenu; a pressable
-     * toolbar's action becomes a checkbox, so its pressed state reads as checked.
+     * Each carries the action's value, its disabled state and its tooltip, so an action is described once whether
+     * it is in the row or in the menu. A menubar's word keeps the items of its menu, which become a submenu; a
+     * pressable toolbar's action becomes a checkbox, so its pressed state reads as checked.
      *
      * @param actions The bar's actions.
      * @param collapsedIndexes The collapsed ones, from {@link ToolbarUtils.computeCut}.
@@ -137,17 +137,18 @@ export namespace ToolbarUtils {
      * @param defs.isPressable Whether the actions are toggle buttons.
      * @returns The menu items, in the order the actions were collapsed in.
      */
-    export const computeOverflowItems = <T, TItem>(
-        actions: ToolbarOverflowSource<T, TItem>[],
+    export const computeOverflowItems = <T, TItem, TTooltipDefs = unknown>(
+        actions: ToolbarOverflowSource<T, TItem, TTooltipDefs>[],
         collapsedIndexes: number[],
         defs: ToolbarOverflowDefs,
-    ): ToolbarOverflowItem<T, TItem>[] =>
+    ): ToolbarOverflowItem<T, TItem, TTooltipDefs>[] =>
         collapsedIndexes.map((index) => {
             const action = actions[index];
-            const item: ToolbarOverflowItem<T, TItem> = {
+            const item: ToolbarOverflowItem<T, TItem, TTooltipDefs> = {
                 value: action.value,
                 isDisabled: action.isDisabled,
                 isReachableWhenDisabled: action.isReachableWhenDisabled,
+                tooltipDefs: action.tooltipDefs,
             };
 
             if (defs.hasSubmenus) return { ...item, items: action.items };
@@ -162,7 +163,7 @@ export namespace ToolbarUtils {
      * @param shownIndexes The shown ones, from {@link ToolbarUtils.computeCut}.
      * @returns Their positions, in drawing order. The overflow button is not among them.
      */
-    export const computeStops = <T>(actions: ToolbarAction<T>[], shownIndexes: number[]) =>
+    export const computeStops = <T>(actions: ToolbarActionRecord<T>[], shownIndexes: number[]) =>
         shownIndexes.filter((index) => {
             const action = actions[index];
 

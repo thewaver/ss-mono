@@ -4,7 +4,7 @@ import { HoverIntentUtils } from "./HoverIntent.utils";
 
 const DELAY_DEFS = {
     isShown: false,
-    hoverShowDelayMs: 700,
+    showDelayMs: 700,
     skipDelayWindowMs: 300,
     msSinceLastClose: Number.POSITIVE_INFINITY,
 };
@@ -27,8 +27,8 @@ describe("HoverIntentUtils.computeShowDelayMs", () => {
     });
 
     it("treats a delay of zero or less as at once", () => {
-        expect(HoverIntentUtils.computeShowDelayMs({ ...DELAY_DEFS, hoverShowDelayMs: 0 })).toBe(0);
-        expect(HoverIntentUtils.computeShowDelayMs({ ...DELAY_DEFS, hoverShowDelayMs: -5 })).toBe(0);
+        expect(HoverIntentUtils.computeShowDelayMs({ ...DELAY_DEFS, showDelayMs: 0 })).toBe(0);
+        expect(HoverIntentUtils.computeShowDelayMs({ ...DELAY_DEFS, showDelayMs: -5 })).toBe(0);
     });
 });
 

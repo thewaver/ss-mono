@@ -330,6 +330,8 @@ test("a header dragged past its neighbor's middle swaps the two columns", async 
     await expect(first).toContainText("SKU");
     await expect(second).toContainText("Name");
 
+    await first.scrollIntoViewIfNeeded();
+
     const from = await first.boundingBox();
     const to = await second.boundingBox();
 

@@ -5,13 +5,16 @@ import type {
     MenuFlags,
     PlacementLayoutFn,
     ProximityEffectFn,
-    ToolbarAction,
+    ToolbarActionRecord,
 } from "@thewaver/ss-components";
 import type { Point2d } from "@thewaver/ss-utils";
 
+import type { InteractionTooltipDefs } from "../../Primitives/InteractionWrapper/InteractionWrapper.types.js";
 import type { MenuItem, MenuRenderItem, MenuRenderPopup } from "../Menus/Menu/Menu.types.js";
 
-export type MenubarAction<T> = ToolbarAction<T> & {
+export type ToolbarAction<T> = ToolbarActionRecord<T, InteractionTooltipDefs>;
+
+export type MenubarAction<T> = ToolbarActionRecord<T, never> & {
     /**
      * The menu this word opens. When the word is collapsed into the overflow menu it becomes an item there, and these
      * become its submenu.

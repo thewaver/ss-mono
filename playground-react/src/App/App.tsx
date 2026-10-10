@@ -4,7 +4,7 @@ import { BrowserRouter, Link, Navigate, Outlet, Route, Routes, useLocation } fro
 import COMPONENT_DEPENDENCIES from "virtual:component-dependencies";
 import type { DependencyNames } from "virtual:component-dependencies";
 
-import { Collapsible, Sidebar, Tree, ViewportWrapper } from "@thewaver/ss-components-react";
+import { Collapsible, SharedTooltip, Sidebar, Tree, ViewportWrapper } from "@thewaver/ss-components-react";
 import type {
     AnchorPlacement,
     InteractionTooltipDefs,
@@ -488,32 +488,34 @@ export function AppContent(props: { viewportAnchor: readonly [ViewportAnchor, (v
                                             .join(" ")}
                                         style={{ transitionDuration: `${transitionDurationMs}ms` }}
                                     >
-                                        <Tree
-                                            renderHighlightFloater={renderPageHighlightFloater}
-                                            nodes={visibleNodes}
-                                            value={selectedState}
-                                            expanded={expandedState}
-                                            ariaLabel={"Library"}
-                                            linkComponent={PageRouterLink}
-                                            computeCustomText={(node) => node.value.name}
-                                            renderNode={(node, renderProps) => (
-                                                <PageTreeNodeContent
-                                                    isGliding
-                                                    renderProps={renderProps}
-                                                    hasExamples={
-                                                        getIsBranchConfig(node.value) ||
-                                                        node.value.component !== undefined
-                                                    }
-                                                    detail={
-                                                        getIsBranchConfig(node.value)
-                                                            ? `${flattenConfigs(node.value.children).length}`
-                                                            : ""
-                                                    }
-                                                >
-                                                    {node.value.name}
-                                                </PageTreeNodeContent>
-                                            )}
-                                        />
+                                        <SharedTooltip>
+                                            <Tree
+                                                renderHighlightFloater={renderPageHighlightFloater}
+                                                nodes={visibleNodes}
+                                                value={selectedState}
+                                                expanded={expandedState}
+                                                ariaLabel={"Library"}
+                                                linkComponent={PageRouterLink}
+                                                computeCustomText={(node) => node.value.name}
+                                                renderNode={(node, renderProps) => (
+                                                    <PageTreeNodeContent
+                                                        isGliding
+                                                        renderProps={renderProps}
+                                                        hasExamples={
+                                                            getIsBranchConfig(node.value) ||
+                                                            node.value.component !== undefined
+                                                        }
+                                                        detail={
+                                                            getIsBranchConfig(node.value)
+                                                                ? `${flattenConfigs(node.value.children).length}`
+                                                                : ""
+                                                        }
+                                                    >
+                                                        {node.value.name}
+                                                    </PageTreeNodeContent>
+                                                )}
+                                            />
+                                        </SharedTooltip>
                                     </div>
                                 </div>
                             </PageLayer>

@@ -3,11 +3,11 @@ import { type ComponentPublicInstance, type SlotsType, computed, defineComponent
 import {
     DismisserUtils,
     type InteractionSizing,
+    type MenuItemFlags,
     type MenuItemKind,
     type MenuTriggerRole,
     MenuUtils,
     TOOLBAR_DEFAULTS,
-    type ToolbarAction,
     ToolbarStyles,
     ToolbarUtils,
 } from "@thewaver/ss-components";
@@ -15,7 +15,10 @@ import {
 import { ElementObserverVueUtils } from "../../Abstracts/ElementObserver/ElementObserverVue.utils";
 import { NavigatorVueUtils } from "../../Abstracts/Navigator/NavigatorVue.utils";
 import { InteractionWrapper } from "../../Primitives/InteractionWrapper/InteractionWrapper";
-import type { InteractionWrapperSlots } from "../../Primitives/InteractionWrapper/InteractionWrapper.types";
+import type {
+    InteractionTooltipDefs,
+    InteractionWrapperSlots,
+} from "../../Primitives/InteractionWrapper/InteractionWrapper.types";
 import { PlacementBox } from "../../Primitives/PlacementBox/PlacementBox";
 import { PlacementItem } from "../../Primitives/PlacementItem/PlacementItem";
 import { watchAfterRender } from "../../Utils/effectUtils";
@@ -25,6 +28,7 @@ import type { SlotsContext } from "../../Utils/typeUtils";
 import { Menu } from "../Menus/Menu/Menu";
 import type { MenuItem, MenuSlots } from "../Menus/Menu/Menu.types";
 import type {
+    ToolbarAction,
     ToolbarButtonsSlots,
     ToolbarCompositeProps,
     ToolbarCompositeSlots,
@@ -84,10 +88,11 @@ export const ToolbarComposite = defineComponent(
 
         const overflowItems = computed(
             () =>
-                ToolbarUtils.computeOverflowItems<T, MenuItem<T>>(props.actions, cut.value.collapsedIndexes, {
-                    hasSubmenus: getIsMenubar(),
-                    isPressable: getPressedValues() !== undefined,
-                }) as MenuItem<T>[],
+                ToolbarUtils.computeOverflowItems<T, MenuItem<T>, InteractionTooltipDefs<MenuItemFlags>>(
+                    props.actions,
+                    cut.value.collapsedIndexes,
+                    { hasSubmenus: getIsMenubar(), isPressable: getPressedValues() !== undefined },
+                ) as MenuItem<T>[],
         );
 
         const hasOverflow = computed(() => overflowItems.value.length > 0);
@@ -226,6 +231,7 @@ export const ToolbarComposite = defineComponent(
                 isFocusableWhenDisabled={action.isReachableWhenDisabled ?? false}
                 isPressed={getPressedValues()?.includes(action.value)}
                 isTabbable={index === rovingStop.value}
+                tooltipDefs={action.tooltipDefs}
                 onActivation={() => pressAction(action.value)}
             >
                 {

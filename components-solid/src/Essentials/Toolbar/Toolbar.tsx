@@ -2,11 +2,11 @@ import { type Accessor, Index, type JSX, Show, createEffect, createMemo, createS
 
 import {
     type InteractionSizing,
+    type MenuItemFlags,
     type MenuItemKind,
     type MenuTriggerRole,
     MenuUtils,
     TOOLBAR_DEFAULTS,
-    type ToolbarAction,
     ToolbarUtils,
     ToolbarStyles as styles,
 } from "@thewaver/ss-components";
@@ -14,13 +14,20 @@ import {
 import { ElementObserverSolidUtils } from "../../Abstracts/ElementObserver/ElementObserverSolid.utils";
 import { NavigatorSolidUtils } from "../../Abstracts/Navigator/NavigatorSolid.utils";
 import { InteractionWrapper } from "../../Primitives/InteractionWrapper/InteractionWrapper";
+import type { InteractionTooltipDefs } from "../../Primitives/InteractionWrapper/InteractionWrapperSolid.types";
 import { PlacementBox } from "../../Primitives/PlacementBox/PlacementBox";
 import { PlacementItem } from "../../Primitives/PlacementItem/PlacementItem";
 import { access } from "../../Utils/propUtils";
 import type { SignalPair } from "../../Utils/typeUtils";
 import { Menu } from "../Menus/Menu/Menu";
 import type { MenuItem } from "../Menus/Menu/MenuSolid.types";
-import type { ToolbarButtonsProps, ToolbarCompositeProps, ToolbarMenusProps, ToolbarProps } from "./ToolbarSolid.types";
+import type {
+    ToolbarAction,
+    ToolbarButtonsProps,
+    ToolbarCompositeProps,
+    ToolbarMenusProps,
+    ToolbarProps,
+} from "./ToolbarSolid.types";
 
 const OVERFLOW_STOP = ToolbarUtils.OVERFLOW_STOP;
 const NO_RADIO_GROUP: never[] = [];
@@ -88,7 +95,7 @@ export const ToolbarComposite = <T,>(props: ToolbarCompositeProps<T>) => {
     const getIsShown = (index: number) => getCut().shownIndexes.includes(index);
 
     const getOverflowItems = createMemo((): MenuItem<T>[] =>
-        ToolbarUtils.computeOverflowItems<T, MenuItem<T>>(
+        ToolbarUtils.computeOverflowItems<T, MenuItem<T>, InteractionTooltipDefs<MenuItemFlags>>(
             props.role === "menubar" ? access(props.actions) : getActions(),
             getCut().collapsedIndexes,
             { hasSubmenus: props.role === "menubar", isPressable: getPressedValues() !== undefined },
@@ -201,6 +208,7 @@ export const ToolbarComposite = <T,>(props: ToolbarCompositeProps<T>) => {
             isFocusableWhenDisabled={() => getAction().isReachableWhenDisabled ?? false}
             isPressed={getPressedValues()?.includes(getAction().value)}
             isTabbable={() => index === getRovingStop()}
+            tooltipDefs={() => getAction().tooltipDefs}
             ref={(element) => setItemRef(index, element)}
             onActivation={() => pressAction(buttonProps, getAction().value)}
             renderControl={(setElementRef, getFlags) => (

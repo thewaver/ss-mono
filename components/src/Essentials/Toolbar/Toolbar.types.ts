@@ -5,7 +5,7 @@ export type ToolbarRole = "toolbar" | "menubar";
 
 export type ToolbarCollapse = "auto" | "never" | "always";
 
-export type ToolbarAction<T> = {
+export type ToolbarActionRecord<T, TTooltipDefs = unknown> = {
     value: T;
     collapse?: ToolbarCollapse;
     isDisabled?: boolean;
@@ -15,6 +15,11 @@ export type ToolbarAction<T> = {
      * menu, where the menu item keeps it reachable the same way.
      */
     isReachableWhenDisabled?: boolean;
+    /**
+     * A tooltip for this action. It travels with the action into the overflow menu, where the menu item shows the
+     * same tooltip, so what an action says about itself does not depend on whether it fitted.
+     */
+    tooltipDefs?: TTooltipDefs;
 };
 
 export type ToolbarCutDefs = {
@@ -30,16 +35,17 @@ export type ToolbarCut = {
     collapsedIndexes: number[];
 };
 
-export type ToolbarOverflowSource<T, TItem> = ToolbarAction<T> & {
+export type ToolbarOverflowSource<T, TItem, TTooltipDefs = unknown> = ToolbarActionRecord<T, TTooltipDefs> & {
     items?: TItem[];
 };
 
-export type ToolbarOverflowItem<T, TItem> = {
+export type ToolbarOverflowItem<T, TItem, TTooltipDefs = unknown> = {
     value: T;
     kind?: MenuItemKind;
     items?: TItem[];
     isDisabled?: boolean;
     isReachableWhenDisabled?: boolean;
+    tooltipDefs?: TTooltipDefs;
 };
 
 export type ToolbarOverflowDefs = {

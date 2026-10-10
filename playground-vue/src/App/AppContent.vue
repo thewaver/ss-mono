@@ -2,7 +2,7 @@
 import { computed, shallowRef, watch } from "vue";
 import { useRoute } from "vue-router";
 
-import { Sidebar, Tree } from "@thewaver/ss-components-vue";
+import { SharedTooltip, Sidebar, Tree } from "@thewaver/ss-components-vue";
 import type { TreeNode } from "@thewaver/ss-components-vue";
 import * as styles from "@thewaver/ss-playground/App/App.css";
 import { IS_BUILD_PROGRESS_SHOWN } from "@thewaver/ss-playground/App/PageComponents/BuildProgress/BuildProgress.utils";
@@ -208,38 +208,40 @@ const computeNodeText = (node: TreeNode<MenuNodeConfig>) => node.value.name;
                                     ]"
                                     :style="{ transitionDuration: `${transitionDurationMs}ms` }"
                                 >
-                                    <Tree
-                                        :nodes="visibleNodes"
-                                        :value="selectedConfig"
-                                        :expanded="isSearching ? searchExpanded : browseExpanded"
-                                        ariaLabel="Library"
-                                        :link-component="PageRouterLink"
-                                        :compute-custom-text="computeNodeText"
-                                        @update:value="refuseSelection"
-                                        @update:expanded="setExpanded"
-                                    >
-                                        <template #renderNode="{ node, renderProps }">
-                                            <PageTreeNodeContent
-                                                is-gliding
-                                                :render-props="renderProps"
-                                                :has-examples="
-                                                    AppUtils.getIsBranchConfig(node.value) ||
-                                                    node.value.component !== undefined
-                                                "
-                                                :detail="
-                                                    AppUtils.getIsBranchConfig(node.value)
-                                                        ? `${AppUtils.flattenConfigs(node.value.children).length}`
-                                                        : ''
-                                                "
-                                            >
-                                                {{ node.value.name }}
-                                            </PageTreeNodeContent>
-                                        </template>
+                                    <SharedTooltip>
+                                        <Tree
+                                            :nodes="visibleNodes"
+                                            :value="selectedConfig"
+                                            :expanded="isSearching ? searchExpanded : browseExpanded"
+                                            ariaLabel="Library"
+                                            :link-component="PageRouterLink"
+                                            :compute-custom-text="computeNodeText"
+                                            @update:value="refuseSelection"
+                                            @update:expanded="setExpanded"
+                                        >
+                                            <template #renderNode="{ node, renderProps }">
+                                                <PageTreeNodeContent
+                                                    is-gliding
+                                                    :render-props="renderProps"
+                                                    :has-examples="
+                                                        AppUtils.getIsBranchConfig(node.value) ||
+                                                        node.value.component !== undefined
+                                                    "
+                                                    :detail="
+                                                        AppUtils.getIsBranchConfig(node.value)
+                                                            ? `${AppUtils.flattenConfigs(node.value.children).length}`
+                                                            : ''
+                                                    "
+                                                >
+                                                    {{ node.value.name }}
+                                                </PageTreeNodeContent>
+                                            </template>
 
-                                        <template #renderHighlightFloater="floater">
-                                            <PageGlideFloater kind="highlight" v-bind="floater" />
-                                        </template>
-                                    </Tree>
+                                            <template #renderHighlightFloater="floater">
+                                                <PageGlideFloater kind="highlight" v-bind="floater" />
+                                            </template>
+                                        </Tree>
+                                    </SharedTooltip>
                                 </div>
                             </div>
                         </PageLayer>

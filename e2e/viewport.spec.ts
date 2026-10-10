@@ -32,6 +32,18 @@ const parkRoamer = async (page: Page, x: string, y: string) => {
     await page.waitForTimeout(SETTLE_MS);
 };
 
+/**
+ * The factor the Playground itself is drawn at, read off the page title, which sits outside every viewport on the
+ * page. It is the window's height over the Playground's anchor, so it is `1` only on a machine whose screen is
+ * exactly as tall as the window — the scales below are asserted relative to it rather than assuming it.
+ */
+const readOuterScale = (page: Page) =>
+    page
+        .locator("main h1")
+        .evaluate((element) => element.getBoundingClientRect().height / (element as HTMLElement).offsetHeight);
+
+const asReadout = (scale: number) => new RegExp(`${scale.toFixed(2).replace(".", "\\.")}×`);
+
 test.beforeEach(async ({ page }) => {
     await page.goto("/viewport-wrapper");
     await expect(page.locator("[data-variant]").first()).toBeVisible();
@@ -98,6 +110,7 @@ test("a list with nowhere to fit keeps its size and is cut by the edge", async (
 });
 
 test("the scale slider resizes the content without moving the boundary", async ({ page }) => {
+    const outer = await readOuterScale(page);
     const stageBefore = (await page.locator("[data-stage]").boundingBox())!;
     const anchorBefore = (await page.locator("#roamingCountry").boundingBox())!;
 
@@ -113,16 +126,14 @@ test("the scale slider resizes the content without moving the boundary", async (
     );
     await expect(
         page.locator("[data-inner-readout]"),
-        "and the viewport reports the scale it is drawing at",
-    ).toHaveText(/0\.50×/);
+        "and the viewport reports the scale it is drawing at, which is half of what the page is drawn at",
+    ).toHaveText(asReadout(outer * 0.5));
 });
 
 /**
- * The two scales multiply, and until now nothing proved it: the outer viewport is drawn at `1` whenever the
- * window's height matches the size the Playground anchors to, which is every machine it has run on. Shrinking
- * the window is what forces the outer factor off `1` — the fit works out to the window's height over that
- * anchor, whichever way the aspect ratio goes — and the inner square keeps its own factor throughout, so what
- * is left to check is the product.
+ * The two scales multiply. The outer factor is the window's height over the size the Playground anchors to,
+ * whichever way the aspect ratio goes, so halving the window halves it while the inner square keeps its own
+ * factor throughout — what is left to check is the product, read against whatever the outer factor started at.
  */
 test("a nested viewport's scale is the product of both, not either one", async ({ page }) => {
     const measure = async () => {
@@ -134,11 +145,18 @@ test("a nested viewport's scale is the product of both, not either one", async (
         return box.height / layoutHeight;
     };
 
+    const outer = await readOuterScale(page);
+
     await page.locator("#viewportScale").fill("50");
     await page.waitForTimeout(SETTLE_MS);
 
-    await expect(page.locator("[data-inner-readout]"), "the inner square is drawing at half").toHaveText(/0\.50×/);
-    expect(await measure(), "and a control two levels in is painted at half its layout size").toBeCloseTo(0.5, 1);
+    await expect(page.locator("[data-inner-readout]"), "the inner square is drawing at half").toHaveText(
+        asReadout(outer * 0.5),
+    );
+    expect(await measure(), "and a control two levels in is painted at half its layout size").toBeCloseTo(
+        outer * 0.5,
+        1,
+    );
 
     const window = page.viewportSize()!;
 
@@ -148,8 +166,11 @@ test("a nested viewport's scale is the product of both, not either one", async (
     await expect(
         page.locator("[data-inner-readout]"),
         "halving the window halves the outer factor, and the inner one is unchanged, so the product quarters",
-    ).toHaveText(/0\.25×/);
-    expect(await measure(), "which is what the control two levels in is actually drawn at").toBeCloseTo(0.25, 1);
+    ).toHaveText(asReadout(outer * 0.25));
+    expect(await measure(), "which is what the control two levels in is actually drawn at").toBeCloseTo(
+        outer * 0.25,
+        1,
+    );
 });
 
 /**

@@ -392,16 +392,20 @@ test.describe("a menu opened by a right-click", () => {
             .toBeLessThan(PLACEMENT_TOLERANCE);
     });
 
+    /**
+     * The menu opens with its corner on the pointer and hangs down from it, so the second press is made higher than
+     * the first: above the open menu's top edge, it lands on the region however wide the menu is drawn, rather than
+     * on the menu itself, where a right-click rightly does nothing.
+     */
     test("moves to the next point rather than staying where it was", async ({ page }) => {
         const box = (await page.locator(REGION).first().boundingBox())!;
-        const y = box.y + box.height * 0.4;
         const near = box.x + box.width * 0.2;
         const far = box.x + box.width * 0.6;
 
-        await page.mouse.click(near, y, { button: "right" });
+        await page.mouse.click(near, box.y + box.height * 0.6, { button: "right" });
         await expect(page.locator(MENU)).toBeFocused();
 
-        await page.mouse.click(far, y, { button: "right" });
+        await page.mouse.click(far, box.y + box.height * 0.15, { button: "right" });
 
         await expect(page.locator(MENU), "one menu, not two").toHaveCount(1);
 

@@ -486,6 +486,8 @@ test("a ring marks the gap it would land in, turned to lie across it", async ({ 
 
     await expect(marker, "nothing is marked while nothing is being carried").toHaveCount(0);
 
+    await page.locator(`${RING} [role="list"]`).scrollIntoViewIfNeeded();
+
     const from = (await cards.nth(0).boundingBox())!;
     const to = (await cards.nth(2).boundingBox())!;
 
@@ -520,6 +522,8 @@ test("a ring marks the gap it would land in, turned to lie across it", async ({ 
  * obvious the moment the four are compared.
  */
 test("the four gaps of a ring are a quarter turn apart, the last one included", async ({ page }) => {
+    await page.locator(`${RING} [role="list"]`).scrollIntoViewIfNeeded();
+
     const box = (await page.locator(`${RING} [role="list"]`).boundingBox())!;
     const cards = page.locator(`${RING} [role="listitem"]`);
     const first = (await cards.nth(0).boundingBox())!;

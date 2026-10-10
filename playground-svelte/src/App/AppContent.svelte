@@ -2,7 +2,7 @@
     import { Router } from "sv-router";
     import { untrack } from "svelte";
 
-    import { Sidebar, Tree } from "@thewaver/ss-components-svelte";
+    import { SharedTooltip, Sidebar, Tree } from "@thewaver/ss-components-svelte";
     import type {
         AnchorPlacement,
         InteractionFlags,
@@ -302,34 +302,36 @@
                                 ]}
                                 style:transition-duration={`${transitionDurationMs}ms`}
                             >
-                                <Tree
-                                    renderHighlightFloater={renderPageHighlightFloater}
-                                    nodes={visibleNodes}
-                                    bind:value={() => selectedConfig as MenuNodeConfig | undefined, () => undefined}
-                                    bind:expanded={
-                                        () => (isSearching ? searchExpanded : browseExpanded),
-                                        (next) => {
-                                            if (isSearching) searchExpanded = next ?? [];
-                                            else browseExpanded = next ?? [];
+                                <SharedTooltip>
+                                    <Tree
+                                        renderHighlightFloater={renderPageHighlightFloater}
+                                        nodes={visibleNodes}
+                                        bind:value={() => selectedConfig as MenuNodeConfig | undefined, () => undefined}
+                                        bind:expanded={
+                                            () => (isSearching ? searchExpanded : browseExpanded),
+                                            (next) => {
+                                                if (isSearching) searchExpanded = next ?? [];
+                                                else browseExpanded = next ?? [];
+                                            }
                                         }
-                                    }
-                                    ariaLabel={"Library"}
-                                    linkComponent={PageRouterLink}
-                                    computeCustomText={(node) => node.value.name}
-                                >
-                                    {#snippet renderNode(node, renderProps)}
-                                        <PageTreeNodeContent
-                                            {renderProps}
-                                            hasExamples={getIsBranchConfig(node.value) ||
-                                                node.value.component !== undefined}
-                                            detail={getIsBranchConfig(node.value)
-                                                ? `${flattenConfigs(node.value.children).length}`
-                                                : ""}
-                                        >
-                                            {node.value.name}
-                                        </PageTreeNodeContent>
-                                    {/snippet}
-                                </Tree>
+                                        ariaLabel={"Library"}
+                                        linkComponent={PageRouterLink}
+                                        computeCustomText={(node) => node.value.name}
+                                    >
+                                        {#snippet renderNode(node, renderProps)}
+                                            <PageTreeNodeContent
+                                                {renderProps}
+                                                hasExamples={getIsBranchConfig(node.value) ||
+                                                    node.value.component !== undefined}
+                                                detail={getIsBranchConfig(node.value)
+                                                    ? `${flattenConfigs(node.value.children).length}`
+                                                    : ""}
+                                            >
+                                                {node.value.name}
+                                            </PageTreeNodeContent>
+                                        {/snippet}
+                                    </Tree>
+                                </SharedTooltip>
                             </div>
                         </div>
                     </PageLayer>

@@ -1,0 +1,11 @@
+import type { VNodeChild } from "vue";
+
+export type SharedTooltipSlots = {
+    /**
+     * The controls that share the tooltip. Every control inside that was given a tooltip of its own hands it
+     * over instead of drawing it, so one tooltip follows the pointer and the keyboard from control to control,
+     * gliding between them rather than hiding and reappearing. A control without one is a gap: the tooltip
+     * closes over it and reopens on the next control that has one, without waiting again.
+     */
+    default?: () => VNodeChild;
+};

@@ -1,9 +1,6 @@
 <script lang="ts">
-    import { on } from "svelte/events";
-
-    import { Toolbar, Tooltip } from "@thewaver/ss-components-svelte";
-    import type { ToolbarAction } from "@thewaver/ss-components-svelte";
-    import * as styles from "@thewaver/ss-playground/App/Pages/ToolbarPage/ToolbarPage.css";
+    import { SharedTooltip, Toolbar } from "@thewaver/ss-components-svelte";
+    import type { AnchorPlacement, InteractionTooltipDefs, ToolbarAction } from "@thewaver/ss-components-svelte";
     import { TOOLTIP_HOVER_DELAY_MS } from "@thewaver/ss-playground/App/StyledComponents/TooltipContent/TooltipContent.const";
 
     import PageButtonContent from "../../../StyledComponents/ButtonContent/ButtonContent.svelte";
@@ -12,36 +9,47 @@
     import { renderToolbarOverflowItem, renderToolbarPopup } from "../ToolbarPage.const.svelte";
     import type { ToolbarExampleProps } from "../ToolbarPage.types";
 
-    const ACTIONS: ToolbarAction<string>[] = [{ value: "Cut" }, { value: "Copy" }, { value: "Paste" }, { value: "Undo" }];
+    const PLACEMENT: AnchorPlacement = { x: "center", y: "top-out" };
 
-    const HINTS: Record<string, string> = {
-        Cut: "Moves the selection to the clipboard",
-        Copy: "Copies the selection to the clipboard",
-        Paste: "Puts the clipboard where the caret is",
-        Undo: "Takes back the last change",
-    };
-
-    const PLACEMENT = { x: "center", y: "top-out" } as const;
     const OFFSET = { x: 0, y: 8 };
+
+    const toHint = (renderContent: InteractionTooltipDefs["renderContent"]): InteractionTooltipDefs => ({
+        placement: PLACEMENT,
+        offset: OFFSET,
+        hoverShowDelayMs: TOOLTIP_HOVER_DELAY_MS,
+        renderContent,
+    });
+
+    const ACTIONS: ToolbarAction<string>[] = [
+        { value: "Cut", tooltipDefs: toHint(cutHint) },
+        { value: "Copy", tooltipDefs: toHint(copyHint) },
+        { value: "Clear", isDisabled: true },
+        { value: "Paste", tooltipDefs: toHint(pasteHint) },
+        { value: "Undo", tooltipDefs: toHint(undoHint) },
+    ];
 
     type Props = ToolbarExampleProps;
 
     let props: Props = $props();
-
-    let anchor = $state<HTMLElement>();
-
-    const pickAnchor = (target: EventTarget | null) => {
-        const button = target instanceof Element ? target.closest<HTMLElement>("button") : null;
-
-        if (button?.querySelector("[data-hint]") && button !== anchor) anchor = button;
-    };
 </script>
 
-<div
-    {@attach (element) => on(element, "pointerover", (e) => pickAnchor(e.target))}
-    class={styles.hoverWatch}
-    onfocusin={(e) => pickAnchor(e.target)}
->
+{#snippet cutHint(visibilityTarget: 0 | 1, transitionDurationMs: number)}
+    <PageTooltipContent {visibilityTarget} {transitionDurationMs}>Moves the selection to the clipboard</PageTooltipContent>
+{/snippet}
+
+{#snippet copyHint(visibilityTarget: 0 | 1, transitionDurationMs: number)}
+    <PageTooltipContent {visibilityTarget} {transitionDurationMs}>Copies the selection to the clipboard</PageTooltipContent>
+{/snippet}
+
+{#snippet pasteHint(visibilityTarget: 0 | 1, transitionDurationMs: number)}
+    <PageTooltipContent {visibilityTarget} {transitionDurationMs}>Puts the clipboard where the caret is</PageTooltipContent>
+{/snippet}
+
+{#snippet undoHint(visibilityTarget: 0 | 1, transitionDurationMs: number)}
+    <PageTooltipContent {visibilityTarget} {transitionDurationMs}>Takes back the last change</PageTooltipContent>
+{/snippet}
+
+<SharedTooltip>
     <Toolbar
         actions={ACTIONS}
         gap={props.gap}
@@ -52,19 +60,11 @@
         onActivate={props.onActivate}
     >
         {#snippet renderAction(action, flags)}
-            <PageButtonContent {flags}><span data-hint={action.value}>{action.value}</span></PageButtonContent>
+            <PageButtonContent {flags}>{action.value}</PageButtonContent>
         {/snippet}
 
         {#snippet renderOverflowTrigger(flags)}
             <PageMenuTriggerContent {flags}>More</PageMenuTriggerContent>
         {/snippet}
     </Toolbar>
-
-    <Tooltip anchorRef={anchor} placement={PLACEMENT} offset={OFFSET} hoverShowDelayMs={TOOLTIP_HOVER_DELAY_MS}>
-        {#snippet renderContent(visibilityTarget, transitionDurationMs)}
-            <PageTooltipContent {visibilityTarget} {transitionDurationMs}
-                >{HINTS[anchor?.querySelector("[data-hint]")?.getAttribute("data-hint") ?? ""]}</PageTooltipContent
-            >
-        {/snippet}
-    </Tooltip>
-</div>
+</SharedTooltip>

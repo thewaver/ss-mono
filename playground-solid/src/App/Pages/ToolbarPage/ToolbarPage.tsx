@@ -100,25 +100,25 @@ export const ToolbarPage = () => {
                 path: `${EXAMPLES_ROOT}/Pressed.tsx`,
             },
             {
-                key: "palette",
-                name: "A ring of tools",
-                readout: () =>
-                    `last run: ${getLastRun()} — a layout sizes the bar itself, so nothing runs out of room and the overflow menu has nothing to hold`,
-                component: () => <PaletteExample {...commonProps} />,
-                path: `${EXAMPLES_ROOT}/Palette.tsx`,
-            },
-            {
                 key: "sharedTooltip",
                 name: "One tooltip for the row",
                 span: WIDE_SPAN,
                 readout: () =>
-                    "a single tooltip whose anchor is whichever action is under the pointer or holds focus; moving along the row carries the tooltip with it instead of hiding one and showing the next, and its description moves with it",
+                    "a single tooltip whose anchor is whichever action is under the pointer or holds focus; moving along the row carries the tooltip with it instead of hiding one and showing the next, and its description moves with it; Clear is disabled and has no hint, so it gets no tooltip",
                 component: () => (
                     <ResizableBar width={getBarWidth} onResize={setBarWidth}>
                         <SharedTooltipExample {...commonProps} />
                     </ResizableBar>
                 ),
                 path: `${EXAMPLES_ROOT}/SharedTooltip.tsx`,
+            },
+            {
+                key: "palette",
+                name: "A ring of tools",
+                readout: () =>
+                    `last run: ${getLastRun()} — a layout sizes the bar itself, so nothing runs out of room and the overflow menu has nothing to hold`,
+                component: () => <PaletteExample {...commonProps} />,
+                path: `${EXAMPLES_ROOT}/Palette.tsx`,
             },
         ];
     });

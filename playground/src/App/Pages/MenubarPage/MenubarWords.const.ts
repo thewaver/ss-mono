@@ -1,4 +1,4 @@
-import type { MenuItemRecord, ToolbarAction } from "@thewaver/ss-components";
+import type { MenuItemRecord, ToolbarActionRecord } from "@thewaver/ss-components";
 
 import type { MenubarEntry } from "./MenubarEntry.types";
 
@@ -39,7 +39,7 @@ const VIEW_ITEMS: MenuItemRecord<MenubarEntry>[] = [
     { value: { name: "Large" }, kind: "radio" },
 ];
 
-export const WORDS: (ToolbarAction<MenubarEntry> & { items: MenuItemRecord<MenubarEntry>[] })[] = [
+export const WORDS: (ToolbarActionRecord<MenubarEntry, never> & { items: MenuItemRecord<MenubarEntry>[] })[] = [
     { value: { name: "File" }, items: FILE_ITEMS },
     { value: { name: "Edit" }, items: EDIT_ITEMS },
     { value: { name: "View" }, items: VIEW_ITEMS },
