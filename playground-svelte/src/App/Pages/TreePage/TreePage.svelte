@@ -3,7 +3,6 @@
     import PageExamples from "../../PageComponents/Examples/PageExamples.svelte";
     import FilesExample from "./Examples/Files.svelte";
     import LazyExample from "./Examples/Lazy.svelte";
-    import LeaningExample from "./Examples/Leaning.svelte";
     import LinkComponentExample from "./Examples/LinkComponent.svelte";
     import LinksExample from "./Examples/Links.svelte";
     import OutsideExample from "./Examples/Outside.svelte";
@@ -19,6 +18,7 @@
         STRESS_LEAF_COUNT,
         createStressFiles,
     } from "./TreePage.const.svelte";
+    import LeaningExampleWrapper from "./LeaningExampleWrapper.svelte";
     import type { Asset } from "./TreePage.types";
 
     const EXAMPLES_ROOT = "/src/App/Pages/TreePage/Examples";
@@ -225,7 +225,7 @@
 {/snippet}
 
 {#snippet leaningExample()}
-    <LeaningExample bind:value={leaningValue} bind:expanded={leaningExpanded} />
+    <LeaningExampleWrapper bind:value={leaningValue} bind:expanded={leaningExpanded} />
 {/snippet}
 
 {#snippet radialExample()}

@@ -1,6 +1,11 @@
 import { createMemo, createSignal } from "solid-js";
 
+import { TreeKnobs } from "@thewaver/ss-playground/App/Knobs/Trees.const";
+
+import { PageExampleKnobs } from "../../PageComponents/ExampleKnobs/ExampleKnobs";
 import { PageExamples } from "../../PageComponents/Examples/Examples";
+import { PageSelectField } from "../../PageComponents/Field/Field";
+import { PageProp } from "../../PageComponents/Prop/Prop";
 import { FilesExample } from "./Examples/Files";
 import { LazyExample } from "./Examples/Lazy";
 import { LeaningExample } from "./Examples/Leaning";
@@ -19,9 +24,36 @@ import {
     STRESS_LEAF_COUNT,
     createStressFiles,
 } from "./TreePage.const";
-import type { Asset } from "./TreePage.types";
+import type { Asset, TreeExampleProps } from "./TreePage.types";
 
 const EXAMPLES_ROOT = "/src/App/Pages/TreePage/Examples";
+
+const LeaningExampleWrapper = (props: TreeExampleProps) => {
+    const [getFalloff, setFalloff] = createSignal(TreeKnobs.STARTING_FALLOFF);
+
+    return (
+        <>
+            <LeaningExample {...props} falloff={getFalloff} />
+
+            <PageExampleKnobs>
+                <PageProp
+                    key={"falloff"}
+                    label={"Falloff"}
+                    hint={
+                        "How the lean fades with distance from the pointer: smoothly, in a straight line, or sharply, so only the nearest items move."
+                    }
+                >
+                    <PageSelectField
+                        value={getFalloff}
+                        values={() => TreeKnobs.FALLOFFS}
+                        ariaLabel={"Falloff"}
+                        onChange={(falloff) => setFalloff(() => falloff)}
+                    />
+                </PageProp>
+            </PageExampleKnobs>
+        </>
+    );
+};
 
 export const TreePage = () => {
     const defaultSignal = createSignal<string | undefined>();
@@ -172,7 +204,7 @@ export const TreePage = () => {
             name: "Leaning toward the pointer",
             readout: () =>
                 `selected: ${leaningSignal[0]() ?? "nothing"} — a column layout with a proximity effect: each node shifts and brightens by how near the pointer is, and the painter keeps the selected one lit, since an effect is not told which node is current`,
-            component: () => <LeaningExample value={leaningSignal} expanded={leaningExpandedSignal} />,
+            component: () => <LeaningExampleWrapper value={leaningSignal} expanded={leaningExpandedSignal} />,
             path: `${EXAMPLES_ROOT}/Leaning.tsx`,
         },
         {

@@ -12,14 +12,14 @@
     import PageSelectField from "../../PageComponents/Field/PageSelectField.svelte";
     import PageProp from "../../PageComponents/Prop/Prop.svelte";
     import PagePropsPanel from "../../PageComponents/PropsPanel/PagePropsPanel.svelte";
-    import BlurExample from "./Examples/Blur.svelte";
-    import DropShadowExample from "./Examples/DropShadow.svelte";
-    import HueExample from "./Examples/Hue.svelte";
-    import PixelateExample from "./Examples/Pixelate.svelte";
+    import BlurExampleWrapper from "./BlurExampleWrapper.svelte";
+    import DropShadowExampleWrapper from "./DropShadowExampleWrapper.svelte";
     import StackExample from "./Examples/Stack.svelte";
-    import ToneExample from "./Examples/Tone.svelte";
-    import TurbulenceExample from "./Examples/Turbulence.svelte";
+    import HueExampleWrapper from "./HueExampleWrapper.svelte";
+    import PixelateExampleWrapper from "./PixelateExampleWrapper.svelte";
     import type { SVGFiltersExampleProps } from "./SVGFiltersPage.types";
+    import ToneExampleWrapper from "./ToneExampleWrapper.svelte";
+    import TurbulenceExampleWrapper from "./TurbulenceExampleWrapper.svelte";
 
     const EXAMPLES_ROOT = "/src/App/Pages/SVGFiltersPage/Examples";
 
@@ -90,27 +90,27 @@
 </script>
 
 {#snippet blurExample()}
-    <BlurExample {...commonProps} />
+    <BlurExampleWrapper {...commonProps} />
 {/snippet}
 
 {#snippet dropShadowExample()}
-    <DropShadowExample {...commonProps} />
+    <DropShadowExampleWrapper {...commonProps} />
 {/snippet}
 
 {#snippet turbulenceExample()}
-    <TurbulenceExample {...commonProps} />
+    <TurbulenceExampleWrapper {...commonProps} />
 {/snippet}
 
 {#snippet hueExample()}
-    <HueExample {...commonProps} />
+    <HueExampleWrapper {...commonProps} />
 {/snippet}
 
 {#snippet toneExample()}
-    <ToneExample {...commonProps} />
+    <ToneExampleWrapper {...commonProps} />
 {/snippet}
 
 {#snippet pixelateExample()}
-    <PixelateExample {...commonProps} />
+    <PixelateExampleWrapper {...commonProps} />
 {/snippet}
 
 {#snippet stackExample()}

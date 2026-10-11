@@ -21,6 +21,11 @@ export type SelectDeliveryExampleProps = {
     value: Delivery | undefined;
 };
 
+export type SelectVirtualizedExampleProps = SelectDeliveryExampleProps & {
+    visibility: boolean;
+    options: SelectItem<Delivery>[];
+};
+
 export type SelectRoutesExampleProps = SelectDeliveryExampleProps & {
     options: SelectOption<Delivery>[];
     hasMore: boolean;

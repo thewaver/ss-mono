@@ -40,6 +40,12 @@ export type SelectRoutesExampleProps = SelectDeliveryExampleProps & {
     onReachEnd: () => void;
 };
 
+export type SelectVirtualizedExampleProps = SelectDeliveryExampleProps & {
+    "visibility": boolean;
+    "onUpdate:visibility"?: (isOpen: boolean) => void;
+    "options": SelectItem<Delivery>[];
+};
+
 export type SelectPopupProps = {
     renderOptions: () => VNodeChild;
     visibilityTarget: 0 | 1;

@@ -17,7 +17,6 @@ import HoursExample from "./Examples/Hours.vue";
 import LabeledExample from "./Examples/Labeled.vue";
 import OnDemandExample from "./Examples/OnDemand.vue";
 import ReachableExample from "./Examples/Reachable.vue";
-import VirtualizedExample from "./Examples/Virtualized.vue";
 import {
     AIRPORTS,
     COUNTRIES_WITH_DISABLED,
@@ -28,6 +27,7 @@ import {
     createStressDeliveryGroups,
 } from "./SelectPage.const";
 import type { Airport, Delivery } from "./SelectPage.types";
+import VirtualizedExampleWrapper from "./VirtualizedExampleWrapper.vue";
 
 const PAGE_SIZE = 40;
 const PAGED_TOTAL = 500;
@@ -355,7 +355,7 @@ const examples: ExampleDefs[] = [
         </template>
 
         <template #virtualized>
-            <VirtualizedExample
+            <VirtualizedExampleWrapper
                 v-model:value="stressValue"
                 :visibility="isStressOpen"
                 :options="stressDeliveries"
@@ -366,7 +366,7 @@ const examples: ExampleDefs[] = [
         </template>
 
         <template #virtualizedGroups>
-            <VirtualizedExample
+            <VirtualizedExampleWrapper
                 v-model:value="groupedStressValue"
                 v-model:visibility="isGroupedStressOpen"
                 :options="stressDeliveryGroups"

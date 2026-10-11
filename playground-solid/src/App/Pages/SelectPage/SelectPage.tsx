@@ -2,10 +2,13 @@ import type { JSX } from "solid-js";
 import { createEffect, createMemo, createSignal, on } from "solid-js";
 
 import { FrameRateMonitorSolidUtils } from "@thewaver/ss-components-solid";
-import type { SelectOption } from "@thewaver/ss-components-solid";
+import type { MaybeAccessor, SelectOption } from "@thewaver/ss-components-solid";
 import { SelectKnobs } from "@thewaver/ss-playground/App/Knobs/Selects.const";
 
+import { PageExampleKnobs } from "../../PageComponents/ExampleKnobs/ExampleKnobs";
 import { PageExamples } from "../../PageComponents/Examples/Examples";
+import { PageNumberField } from "../../PageComponents/Field/Field";
+import { PageProp } from "../../PageComponents/Prop/Prop";
 import { AirportsExample } from "./Examples/Airports";
 import { AutocompleteExample } from "./Examples/Autocomplete";
 import { AutocompleteOnDemandExample } from "./Examples/AutocompleteOnDemand";
@@ -26,11 +29,12 @@ import {
     createStressDeliveries,
     createStressDeliveryGroups,
 } from "./SelectPage.const";
-import type { Airport, Delivery } from "./SelectPage.types";
+import type { Airport, Delivery, SelectVirtualizedExampleProps } from "./SelectPage.types";
 
 const PAGE_SIZE = 40;
 const PAGED_TOTAL = 500;
 const PAGE_DELAY_MS = 600;
+const STRESS_COUNT_FIELD_WIDTH = 120;
 const EXAMPLES_ROOT = "/src/App/Pages/SelectPage/Examples";
 
 const fetchRoutes = (offset: number) =>
@@ -54,6 +58,42 @@ const searchRoutes = (query: string, offset: number) =>
             resolve({ items: matched.slice(offset, offset + PAGE_SIZE), total: matched.length });
         }, PAGE_DELAY_MS);
     });
+
+const VirtualizedExampleWrapper = (
+    props: SelectVirtualizedExampleProps & { count: MaybeAccessor<number>; onCountChange: (count: number) => void },
+) => {
+    return (
+        <>
+            <VirtualizedExample
+                value={props.value}
+                visibility={props.visibility}
+                options={props.options}
+                hasGroups={props.hasGroups}
+                measureOpen={props.measureOpen}
+            />
+
+            <PageExampleKnobs>
+                <PageProp
+                    key={"stressCount"}
+                    label={"Option count"}
+                    hint={
+                        "How many options the list holds. Only the ones on screen are rendered, so a very large number should still open instantly."
+                    }
+                >
+                    <PageNumberField
+                        value={props.count}
+                        min={() => SelectKnobs.MIN_STRESS_COUNT}
+                        max={() => SelectKnobs.MAX_STRESS_COUNT}
+                        step={() => SelectKnobs.STRESS_COUNT_STEP}
+                        width={() => STRESS_COUNT_FIELD_WIDTH}
+                        ariaLabel={"Option count"}
+                        onInput={props.onCountChange}
+                    />
+                </PageProp>
+            </PageExampleKnobs>
+        </>
+    );
+};
 
 export const SelectPage = () => {
     const [getStressCount, setStressCount] = createSignal(SelectKnobs.STARTING_STRESS_COUNT);
@@ -250,7 +290,7 @@ export const SelectPage = () => {
                         : `${Math.round(getOpenMs()!)} ms from click to the first painted frame`
                 }, ${stressVisibility[0]() ? `${getFrameRate().current.toFixed(0)} fps while open` : "closed"}`,
             component: () => (
-                <VirtualizedExample
+                <VirtualizedExampleWrapper
                     value={stressSignal}
                     visibility={stressVisibility}
                     options={getStressDeliveries}
@@ -272,7 +312,7 @@ export const SelectPage = () => {
                     groupedStressVisibility[0]() ? "open" : "closed"
                 }`,
             component: () => (
-                <VirtualizedExample
+                <VirtualizedExampleWrapper
                     value={groupedStressSignal}
                     visibility={groupedStressVisibility}
                     options={getStressDeliveryGroups}

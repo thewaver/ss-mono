@@ -17,7 +17,6 @@
     import LabeledExample from "./Examples/Labeled.svelte";
     import OnDemandExample from "./Examples/OnDemand.svelte";
     import ReachableExample from "./Examples/Reachable.svelte";
-    import VirtualizedExample from "./Examples/Virtualized.svelte";
     import {
         AIRPORTS,
         COUNTRIES_WITH_DISABLED,
@@ -28,6 +27,7 @@
         createStressDeliveryGroups,
     } from "./SelectPage.const.svelte";
     import type { Airport, Delivery } from "./SelectPage.types";
+    import VirtualizedExampleWrapper from "./VirtualizedExampleWrapper.svelte";
 
     const PAGE_SIZE = 40;
     const PAGED_TOTAL = 500;
@@ -364,7 +364,7 @@
 {/snippet}
 
 {#snippet virtualizedExample()}
-    <VirtualizedExample
+    <VirtualizedExampleWrapper
         bind:value={stressValue}
         bind:visibility={() => isStressOpen, setIsStressOpen}
         options={stressDeliveries}
@@ -377,7 +377,7 @@
 {/snippet}
 
 {#snippet virtualizedGroupsExample()}
-    <VirtualizedExample
+    <VirtualizedExampleWrapper
         bind:value={groupedStressValue}
         bind:visibility={isGroupedStressOpen}
         options={stressDeliveryGroups}

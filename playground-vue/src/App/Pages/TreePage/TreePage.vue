@@ -5,7 +5,6 @@ import type { ExampleDefs } from "../../PageComponents/Examples/Examples.types";
 import PageExamples from "../../PageComponents/Examples/PageExamples.vue";
 import FilesExample from "./Examples/Files.vue";
 import LazyExample from "./Examples/Lazy.vue";
-import LeaningExample from "./Examples/Leaning.vue";
 import LinkComponentExample from "./Examples/LinkComponent.vue";
 import LinksExample from "./Examples/Links.vue";
 import OutsideExample from "./Examples/Outside.vue";
@@ -13,6 +12,7 @@ import RadialExample from "./Examples/Radial.vue";
 import RecordValuesExample from "./Examples/RecordValues.vue";
 import RightToLeftExample from "./Examples/RightToLeft.vue";
 import VirtualizedExample from "./Examples/Virtualized.vue";
+import LeaningExampleWrapper from "./LeaningExampleWrapper.vue";
 import {
     FILES_WITH_DISABLED,
     FILES_WITH_REACHABLE,
@@ -223,7 +223,7 @@ const examples: ExampleDefs[] = [
         </template>
 
         <template #leaning>
-            <LeaningExample v-model:value="leaningValue" v-model:expanded="leaningExpanded" />
+            <LeaningExampleWrapper v-model:value="leaningValue" v-model:expanded="leaningExpanded" />
         </template>
 
         <template #radial>

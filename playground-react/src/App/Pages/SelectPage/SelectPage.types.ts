@@ -27,3 +27,8 @@ export type SelectRoutesExampleProps = SelectDeliveryExampleProps & {
     isFetching: boolean;
     onReachEnd: () => void;
 };
+
+export type SelectVirtualizedExampleProps = SelectDeliveryExampleProps & {
+    visibility: readonly [boolean, (isOpen: boolean) => void];
+    options: SelectItem<Delivery>[];
+};

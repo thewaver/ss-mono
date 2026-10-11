@@ -14,14 +14,14 @@ import PageCheckField from "../../PageComponents/Field/PageCheckField.vue";
 import PageSelectField from "../../PageComponents/Field/PageSelectField.vue";
 import PageProp from "../../PageComponents/Prop/Prop.vue";
 import PagePropsPanel from "../../PageComponents/PropsPanel/PagePropsPanel.vue";
-import BlurExample from "./Examples/Blur.vue";
-import DropShadowExample from "./Examples/DropShadow.vue";
-import HueExample from "./Examples/Hue.vue";
-import PixelateExample from "./Examples/Pixelate.vue";
+import BlurExampleWrapper from "./BlurExampleWrapper.vue";
+import DropShadowExampleWrapper from "./DropShadowExampleWrapper.vue";
 import StackExample from "./Examples/Stack.vue";
-import ToneExample from "./Examples/Tone.vue";
-import TurbulenceExample from "./Examples/Turbulence.vue";
+import HueExampleWrapper from "./HueExampleWrapper.vue";
+import PixelateExampleWrapper from "./PixelateExampleWrapper.vue";
 import type { SVGFiltersExampleProps } from "./SVGFiltersPage.types";
+import ToneExampleWrapper from "./ToneExampleWrapper.vue";
+import TurbulenceExampleWrapper from "./TurbulenceExampleWrapper.vue";
 
 const EXAMPLES_ROOT = "/src/App/Pages/SVGFiltersPage/Examples";
 
@@ -113,27 +113,27 @@ const examples: ExampleDefs[] = [
 
     <PageExamples :items="examples">
         <template #blur>
-            <BlurExample v-bind="commonProps" />
+            <BlurExampleWrapper v-bind="commonProps" />
         </template>
 
         <template #dropShadow>
-            <DropShadowExample v-bind="commonProps" />
+            <DropShadowExampleWrapper v-bind="commonProps" />
         </template>
 
         <template #turbulence>
-            <TurbulenceExample v-bind="commonProps" />
+            <TurbulenceExampleWrapper v-bind="commonProps" />
         </template>
 
         <template #hue>
-            <HueExample v-bind="commonProps" />
+            <HueExampleWrapper v-bind="commonProps" />
         </template>
 
         <template #tone>
-            <ToneExample v-bind="commonProps" />
+            <ToneExampleWrapper v-bind="commonProps" />
         </template>
 
         <template #pixelate>
-            <PixelateExample v-bind="commonProps" />
+            <PixelateExampleWrapper v-bind="commonProps" />
         </template>
 
         <template #stack>

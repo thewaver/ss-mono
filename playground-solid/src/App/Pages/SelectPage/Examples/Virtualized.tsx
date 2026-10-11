@@ -1,33 +1,17 @@
-import type { JSX, Signal } from "solid-js";
-
 import { Select } from "@thewaver/ss-components-solid";
-import type { MaybeAccessor, SelectItem } from "@thewaver/ss-components-solid";
-import { SelectKnobs } from "@thewaver/ss-playground/App/Knobs/Selects.const";
 import * as styles from "@thewaver/ss-playground/App/Pages/SelectPage/SelectPage.css";
 
-import { PageExampleKnobs } from "../../../PageComponents/ExampleKnobs/ExampleKnobs";
-import { PageNumberField } from "../../../PageComponents/Field/Field";
-import { PageProp } from "../../../PageComponents/Prop/Prop";
 import { renderPageHighlightFloater } from "../../../StyledComponents/GlideFloater/GlideFloater";
 import { PageSelectContent } from "../../../StyledComponents/SelectContent/SelectContent";
 import { PageSelectGroupContent } from "../../../StyledComponents/SelectGroupContent/SelectGroupContent";
 import { PageSelectOptionContent } from "../../../StyledComponents/SelectOptionContent/SelectOptionContent";
 import { PLACEHOLDER, renderSelectPopup } from "../SelectPage.const";
-import type { Delivery } from "../SelectPage.types";
+import type { SelectVirtualizedExampleProps } from "../SelectPage.types";
 
-const STRESS_COUNT_FIELD_WIDTH = 120;
 const STRESS_OPTION_HEIGHT = 100;
 const STRESS_GROUP_HEIGHT = 32;
 
-type Props = {
-    value: Signal<Delivery | undefined>;
-    visibility: Signal<boolean>;
-    options: MaybeAccessor<SelectItem<Delivery>[]>;
-    hasGroups?: MaybeAccessor<boolean>;
-    count: MaybeAccessor<number>;
-    onCountChange: (count: number) => void;
-    measureOpen: (renderOptions: () => JSX.Element) => JSX.Element;
-};
+type Props = SelectVirtualizedExampleProps;
 
 export const VirtualizedExample = (props: Props) => {
     return (
@@ -65,26 +49,6 @@ export const VirtualizedExample = (props: Props) => {
                     )
                 }
             />
-
-            <PageExampleKnobs>
-                <PageProp
-                    key={"stressCount"}
-                    label={"Option count"}
-                    hint={
-                        "How many options the list holds. Only the ones on screen are rendered, so a very large number should still open instantly."
-                    }
-                >
-                    <PageNumberField
-                        value={props.count}
-                        min={() => SelectKnobs.MIN_STRESS_COUNT}
-                        max={() => SelectKnobs.MAX_STRESS_COUNT}
-                        step={() => SelectKnobs.STRESS_COUNT_STEP}
-                        width={() => STRESS_COUNT_FIELD_WIDTH}
-                        ariaLabel={"Option count"}
-                        onInput={props.onCountChange}
-                    />
-                </PageProp>
-            </PageExampleKnobs>
         </div>
     );
 };

@@ -1,6 +1,6 @@
-import type { Signal } from "solid-js";
+import type { JSX, Signal } from "solid-js";
 
-import type { AccessorProps, SelectItem, SelectOption } from "@thewaver/ss-components-solid";
+import type { AccessorProps, MaybeAccessor, SelectItem, SelectOption } from "@thewaver/ss-components-solid";
 import type { Airport, Delivery } from "@thewaver/ss-playground/App/Pages/SelectPage/SelectRecords.types";
 
 export type { Airport, Delivery } from "@thewaver/ss-playground/App/Pages/SelectPage/SelectRecords.types";
@@ -30,3 +30,10 @@ export type SelectRoutesExampleProps = SelectDeliveryExampleProps &
         isFetching: boolean;
         onReachEnd: () => void;
     }>;
+
+export type SelectVirtualizedExampleProps = SelectDeliveryExampleProps & {
+    visibility: Signal<boolean>;
+    options: MaybeAccessor<SelectItem<Delivery>[]>;
+    hasGroups?: MaybeAccessor<boolean>;
+    measureOpen: (renderOptions: () => JSX.Element) => JSX.Element;
+};

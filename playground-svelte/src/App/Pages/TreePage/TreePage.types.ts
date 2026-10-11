@@ -1,3 +1,4 @@
+import type { TreeFalloff } from "@thewaver/ss-playground/App/Pages/TreePage/TreeFalloffs.types";
 import type { Asset } from "@thewaver/ss-playground/App/Pages/TreePage/TreeRecords.types";
 
 export type { Asset } from "@thewaver/ss-playground/App/Pages/TreePage/TreeRecords.types";
@@ -5,6 +6,10 @@ export type { Asset } from "@thewaver/ss-playground/App/Pages/TreePage/TreeRecor
 export type TreeExampleProps = {
     value: string | undefined;
     expanded: string[];
+};
+
+export type TreeLeaningExampleProps = TreeExampleProps & {
+    falloff: TreeFalloff;
 };
 
 export type TreeRecordExampleProps = {
