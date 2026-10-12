@@ -1,14 +1,26 @@
-import { For, Show, createResource } from "solid-js";
+import { For, Show, createMemo, createResource, createSignal } from "solid-js";
 import type { ApiGroupKind, ApiTableKind } from "virtual:component-api";
 
-import { access } from "@thewaver/ss-components-solid";
+import { TableOfContents, access } from "@thewaver/ss-components-solid";
+import type { TableOfContentsLink } from "@thewaver/ss-components-solid";
 import * as styles from "@thewaver/ss-playground/App/PageComponents/DocsView/DocsView.css";
-import { loadApiGroups, toHighlightedType } from "@thewaver/ss-playground/App/PageComponents/DocsView/DocsView.utils";
+import type { DocsTableOfContentsEntry } from "@thewaver/ss-playground/App/PageComponents/DocsView/DocsView.types";
+import {
+    loadApiGroups,
+    toDocsGroupId,
+    toDocsTableId,
+    toDocsTableOfContents,
+    toHighlightedType,
+} from "@thewaver/ss-playground/App/PageComponents/DocsView/DocsView.utils";
 
+import { PageTableOfContentsContent } from "../../StyledComponents/TableOfContentsContent/TableOfContentsContent";
 import type { PageDocsTableProps, PageDocsViewProps } from "./DocsView.types";
 
 const NO_DESCRIPTION = "Not written yet.";
 const USE_COLUMN = "Use";
+const TABLE_OF_CONTENTS_LABEL = "On this page";
+const TABLE_OF_CONTENTS_GAP = 4;
+const MIN_TABLE_OF_CONTENTS_LINKS = 2;
 
 const GROUP_TITLES: Record<ApiGroupKind, string> = {
     props: "Props",
@@ -32,7 +44,9 @@ const PageDocsTable = (props: PageDocsTableProps) => {
     return (
         <div class={styles.docsSection}>
             <Show when={getTable().heading}>
-                <h3 class={styles.docsTableTitle}>{getTable().heading}</h3>
+                <h3 ref={props.headingRef} id={access(props.headingId)} class={styles.docsTableTitle}>
+                    {getTable().heading}
+                </h3>
             </Show>
 
             <Show when={getTable().description}>
@@ -87,32 +101,76 @@ const PageDocsTable = (props: PageDocsTableProps) => {
 
 export const PageDocsView = (props: PageDocsViewProps) => {
     const [getGroups] = createResource(() => access(props.name), loadApiGroups);
+    const [getHeadingRefs, setHeadingRefs] = createSignal<Record<string, HTMLElement>>({});
+
+    const getLinks = createMemo((): TableOfContentsLink<DocsTableOfContentsEntry>[] =>
+        toDocsTableOfContents(getGroups() ?? [], GROUP_TITLES).map((entry) => ({
+            value: entry,
+            target: getHeadingRefs()[entry.id],
+            href: `#${entry.id}`,
+            depth: entry.depth,
+        })),
+    );
+
+    const setHeadingRef = (id: string) => (element: HTMLElement) =>
+        setHeadingRefs((prev) => ({ ...prev, [id]: element }));
 
     return (
-        <div class={styles.docsView} data-view={"docs"}>
-            <p class={styles.docsLead}>{access(props.description)}</p>
+        <div class={styles.docsLayout} data-view={"docs"}>
+            <div class={styles.docsView}>
+                <p class={styles.docsLead}>{access(props.description)}</p>
 
-            <Show when={getGroups()}>
-                {(getLoadedGroups) => (
-                    <Show
-                        when={getLoadedGroups().length}
-                        fallback={
-                            <p class={styles.docsEmpty}>
-                                {`${access(props.name)} exports nothing of its own, so there is nothing to list.`}
-                            </p>
-                        }
-                    >
-                        <For each={getLoadedGroups()}>
-                            {(group) => (
-                                <section class={styles.docsGroup} data-api-group={group.kind}>
-                                    <h2 class={styles.docsGroupTitle}>{GROUP_TITLES[group.kind]}</h2>
+                <Show when={getGroups()}>
+                    {(getLoadedGroups) => (
+                        <Show
+                            when={getLoadedGroups().length}
+                            fallback={
+                                <p class={styles.docsEmpty}>
+                                    {`${access(props.name)} exports nothing of its own, so there is nothing to list.`}
+                                </p>
+                            }
+                        >
+                            <For each={getLoadedGroups()}>
+                                {(group) => (
+                                    <section class={styles.docsGroup} data-api-group={group.kind}>
+                                        <h2
+                                            ref={setHeadingRef(toDocsGroupId(group.kind))}
+                                            id={toDocsGroupId(group.kind)}
+                                            class={styles.docsGroupTitle}
+                                        >
+                                            {GROUP_TITLES[group.kind]}
+                                        </h2>
 
-                                    <For each={group.tables}>{(table) => <PageDocsTable table={table} />}</For>
-                                </section>
-                            )}
-                        </For>
-                    </Show>
-                )}
+                                        <For each={group.tables}>
+                                            {(table) => (
+                                                <PageDocsTable
+                                                    table={table}
+                                                    headingId={toDocsTableId(group.kind, table.name)}
+                                                    headingRef={setHeadingRef(toDocsTableId(group.kind, table.name))}
+                                                />
+                                            )}
+                                        </For>
+                                    </section>
+                                )}
+                            </For>
+                        </Show>
+                    )}
+                </Show>
+            </div>
+
+            <Show when={getLinks().length >= MIN_TABLE_OF_CONTENTS_LINKS}>
+                <aside class={styles.docsTableOfContents}>
+                    <TableOfContents
+                        links={getLinks}
+                        gap={TABLE_OF_CONTENTS_GAP}
+                        ariaLabel={TABLE_OF_CONTENTS_LABEL}
+                        renderLink={(getLink, getFlags) => (
+                            <PageTableOfContentsContent flags={getFlags} depth={() => getLink().value.depth}>
+                                {getLink().value.title}
+                            </PageTableOfContentsContent>
+                        )}
+                    />
+                </aside>
             </Show>
         </div>
     );

@@ -25,6 +25,7 @@
     let panel = $state<HTMLDivElement>();
     let isPeeking = $state(false);
     let isWaitingOnPopup = $state(false);
+    let isHoverPaused = $state(false);
 
     const edge = $derived(props.edge ?? SIDEBAR_DEFAULTS.edge);
     const isOverlay = $derived((props.layout ?? SIDEBAR_DEFAULTS.layout) === "overlay");
@@ -55,7 +56,7 @@
     };
 
     const hoverIntent = HoverIntentSvelteUtils.create(
-        () => (props.isExpandedOnHover ? (root ?? undefined) : undefined),
+        () => (props.isExpandedOnHover && !isHoverPaused ? (root ?? undefined) : undefined),
         [
             () => isPeeking,
             (value) => {
@@ -71,6 +72,20 @@
             isTouchIgnored: true,
         },
     );
+
+    $effect(() => {
+        const element = root;
+
+        if (!element || !isHoverPaused) return;
+
+        const resume = () => {
+            isHoverPaused = false;
+        };
+
+        element.addEventListener("mouseleave", resume);
+
+        return () => element.removeEventListener("mouseleave", resume);
+    });
 
     DismisserSvelteUtils.createLayer(
         () => isPeeking,
@@ -98,6 +113,8 @@
             }
 
             collapseHover();
+
+            if (root?.matches(":hover")) isHoverPaused = true;
         },
     );
 

@@ -26,6 +26,7 @@ export const Sidebar = (props: SidebarProps) => {
     const [getPanelRef, setPanelRef] = createSignal<HTMLElement>();
     const [getIsPeeking, setIsPeeking] = createSignal(false);
     const [getIsWaitingOnPopup, setIsWaitingOnPopup] = createSignal(false);
+    const [getIsHoverPaused, setIsHoverPaused] = createSignal(false);
 
     const getEdge = createMemo(() => access(props.edge) ?? SIDEBAR_DEFAULTS.edge);
 
@@ -67,7 +68,7 @@ export const Sidebar = (props: SidebarProps) => {
     };
 
     const hoverIntent = HoverIntentSolidUtils.create(
-        () => (access(props.isExpandedOnHover) ? getRootRef() : undefined),
+        () => (access(props.isExpandedOnHover) && !getIsHoverPaused() ? getRootRef() : undefined),
         [getIsPeeking, setIsPeeking],
         {
             delayGroup: HoverIntentUtils.createDelayGroup(),
@@ -78,6 +79,18 @@ export const Sidebar = (props: SidebarProps) => {
             isTouchIgnored: true,
         },
     );
+
+    createEffect(() => {
+        const root = getRootRef();
+
+        if (!root || !getIsHoverPaused()) return;
+
+        const resume = () => setIsHoverPaused(false);
+
+        root.addEventListener("mouseleave", resume);
+
+        onCleanup(() => root.removeEventListener("mouseleave", resume));
+    });
 
     DismisserSolidUtils.createLayer(getIsPeeking, {
         getRoots: () => [getRootRef()],
@@ -103,6 +116,8 @@ export const Sidebar = (props: SidebarProps) => {
                 }
 
                 collapseHover();
+
+                if (getRootRef()?.matches(":hover")) setIsHoverPaused(true);
             },
             { defer: true },
         ),

@@ -2,11 +2,9 @@ import { globalStyle, style } from "@vanilla-extract/css";
 
 import { toBackdropGradient } from "./Theme.utils";
 
+import { layoutVars } from "./Layout.css";
 import { layerVars } from "./StyledComponents/Layer/Layer.css";
-import { SIDEBAR_TOGGLE_SIZE } from "./StyledComponents/SidebarToggleButton/SidebarToggleButton.css";
 import { themeVars } from "./Theme.css";
-
-export const PAGE_CONTENT_WIDTH = 720;
 
 export const appRoot = style({
     position: "relative",
@@ -33,6 +31,7 @@ export const appContent = style({
 });
 
 export const leftMenu = style({
+    boxSizing: "border-box",
     color: themeVars.color.surface.contrast,
     backgroundImage: `linear-gradient(45deg, ${themeVars.color.surface.dark}, ${themeVars.color.surface.light})`,
     backdropFilter: "blur(10px)",
@@ -48,7 +47,7 @@ export const leftMenuContent = style({
     alignItems: "stretch",
     gap: themeVars.spacing.double,
     boxSizing: "border-box",
-    width: 320,
+    width: layoutVars.menuExpandedWidth,
     height: "100%",
     paddingTop: themeVars.spacing.double,
     overflow: "hidden",
@@ -79,7 +78,7 @@ export const menuTree = style({
     transitionProperty: "opacity",
     flex: 1,
     minHeight: 0,
-    padding: `0 ${themeVars.spacing.double} ${themeVars.spacing.double}`,
+    padding: `0 ${layoutVars.menuPadding} ${themeVars.spacing.double}`,
     overflowY: "auto",
 });
 
@@ -95,7 +94,7 @@ export const searchContainer = style({
     gap: themeVars.spacing.full,
     boxSizing: "border-box",
     width: "100%",
-    padding: `0 ${themeVars.spacing.double}`,
+    padding: `0 ${layoutVars.menuPadding}`,
 });
 
 export const frameworkHeading = style({
@@ -117,8 +116,8 @@ export const navSettingsBox = style({
     alignItems: "center",
     justifyContent: "center",
     flexShrink: 0,
-    width: SIDEBAR_TOGGLE_SIZE,
-    height: SIDEBAR_TOGGLE_SIZE,
+    width: layoutVars.iconButtonSize,
+    height: layoutVars.iconButtonSize,
 });
 
 export const navPreview = style({
@@ -129,16 +128,20 @@ export const navPreview = style({
 export const aboutLink = style({
     transitionProperty: "opacity",
     flexShrink: 0,
-    padding: `0 ${themeVars.spacing.double}`,
+    padding: `0 ${layoutVars.menuPadding}`,
 });
 
 export const pageColumn = style({
     display: "flex",
     flexDirection: "column",
     height: "100%",
-    padding: themeVars.spacing.quad,
+    padding: layoutVars.pageMargin,
     overflowY: "auto",
     scrollbarGutter: "stable",
+});
+
+globalStyle(`${pageColumn} > *`, {
+    maxWidth: layoutVars.pageBodyMaxWidth,
 });
 
 export const pageBody = style({
@@ -151,7 +154,6 @@ export const pageHeader = style({
     display: "flex",
     flexDirection: "column",
     gap: themeVars.spacing.full,
-    maxWidth: 960,
 });
 
 export const pageTitle = style({
@@ -162,7 +164,7 @@ export const pageTitle = style({
 
 export const pageDescription = style({
     fontSize: themeVars.fontSize.small,
-    maxWidth: PAGE_CONTENT_WIDTH,
+    maxWidth: layoutVars.readingWidth,
     opacity: 0.75,
 });
 
@@ -171,7 +173,7 @@ export const pageDependencies = style({
     gridTemplateColumns: "auto minmax(0, 1fr)",
     alignItems: "baseline",
     gap: themeVars.spacing.full,
-    maxWidth: PAGE_CONTENT_WIDTH,
+    maxWidth: layoutVars.readingWidth,
     fontSize: themeVars.fontSize.xSmall,
 });
 

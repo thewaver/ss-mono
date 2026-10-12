@@ -21,6 +21,7 @@ import { InteractionWrapper } from "../../Primitives/InteractionWrapper/Interact
 import { PlacementBox } from "../../Primitives/PlacementBox/PlacementBox";
 import { PlacementItem } from "../../Primitives/PlacementItem/PlacementItem";
 import { access } from "../../Utils/propUtils";
+import { TooltipSolidUtils } from "../Overlays/Tooltip/TooltipSolid.utils";
 import type { TreeNodeItemProps, TreeProps, TreeRow } from "./TreeSolid.types";
 
 const EMPTY_PINNED_ROWS: number[] = [];
@@ -305,6 +306,15 @@ export const Tree = <T,>(props: TreeProps<T>) => {
         () => valueSignal[0](),
     );
 
+    const hoverHold = TooltipSolidUtils.createHoverHold(
+        () => {
+            const value = getHoveredValue();
+
+            return value === undefined ? undefined : getNodeRefs().get(value);
+        },
+        () => setHoveredValue(undefined),
+    );
+
     const highlightFloater = createFloater(
         () => props.renderHighlightFloater !== undefined,
         () => getHoveredValue() ?? getFocusVisibleValue(),
@@ -463,8 +473,12 @@ export const Tree = <T,>(props: TreeProps<T>) => {
                 setFocusVisibleValue(() => readFocusVisibleValue(e.target));
             }}
             onFocusOut={() => setFocusVisibleValue(undefined)}
-            onPointerOver={(e) => setHoveredValue(() => findRowByTarget(e.target)?.node.value)}
-            onPointerLeave={() => setHoveredValue(undefined)}
+            onPointerOver={(e) => {
+                if (hoverHold.getIsOnTooltip(e.target)) return;
+
+                setHoveredValue(() => findRowByTarget(e.target)?.node.value);
+            }}
+            onPointerLeave={hoverHold.handlePointerLeave}
         >
             <Show when={getLayout()} fallback={renderTiers()}>
                 {(getResolved) => (

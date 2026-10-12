@@ -23,7 +23,7 @@
 
 <div class={styles.docsSection}>
     {#if table.heading}
-        <h3 class={styles.docsTableTitle}>{table.heading}</h3>
+        <h3 {@attach props.attachHeading} id={props.headingId} class={styles.docsTableTitle}>{table.heading}</h3>
     {/if}
 
     {#if table.description}

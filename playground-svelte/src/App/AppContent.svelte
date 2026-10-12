@@ -2,7 +2,7 @@
     import { Router } from "sv-router";
     import { untrack } from "svelte";
 
-    import { SharedTooltip, Sidebar, Tree } from "@thewaver/ss-components-svelte";
+    import { SharedTooltip, Sidebar, Tree, getViewportContext } from "@thewaver/ss-components-svelte";
     import type {
         AnchorPlacement,
         InteractionFlags,
@@ -12,6 +12,7 @@
         TreeNodeRenderProps,
     } from "@thewaver/ss-components-svelte";
     import * as styles from "@thewaver/ss-playground/App/App.css";
+    import { LAYOUT } from "@thewaver/ss-playground/App/Layout.const";
     import { restoreRootSlash } from "@thewaver/ss-playground/App/PageComponents/FrameworkSwitch/FrameworkSwitch.const";
     import type { ShapeArrowAim } from "@thewaver/ss-utils";
     import { IS_BUILD_PROGRESS_SHOWN } from "@thewaver/ss-playground/App/PageComponents/BuildProgress/BuildProgress.utils";
@@ -21,14 +22,7 @@
         toBaseRoute,
     } from "@thewaver/ss-playground/App/PageComponents/ViewTabs/ViewTabs.const";
 
-    import {
-        MENU_COLLAPSED_WIDTH,
-        MENU_CONFIGS,
-        MENU_EDGE,
-        MENU_EXPANDED_WIDTH,
-        MENU_ID,
-        SEARCH_FIELD_WIDTH,
-    } from "./App.const";
+    import { MENU_CONFIGS, MENU_EDGE, MENU_ID, SEARCH_FIELD_WIDTH } from "./App.const";
     import {
         COMPONENT_CONFIGS_BY_ROUTE,
         GALLERY_ROUTE,
@@ -46,6 +40,7 @@
     import PageFrameworkMenu from "./PageComponents/FrameworkMenu/FrameworkMenu.svelte";
     import PageLayer from "./PageComponents/Layer/Layer.svelte";
     import PageNavLink from "./PageComponents/NavLink/NavLink.svelte";
+    import PageNavLinkGroup from "./PageComponents/NavLink/PageNavLinkGroup.svelte";
     import type { ViewportAnchor } from "./PageComponents/NavSettings/NavSettings.types";
     import PageNavSettings from "./PageComponents/NavSettings/PageNavSettings.svelte";
     import PagePreview from "./PageComponents/Preview/Preview.svelte";
@@ -185,7 +180,15 @@
         });
     });
 
-    const isMenuExpanded = $derived(!isAutoHidden);
+    const viewportContext = getViewportContext();
+
+    const menuGutter = $derived(Math.max(0, (viewportContext.getSize().width - LAYOUT.pageMaxWidth) / 2));
+
+    const isMenuHideable = $derived(viewportContext.getSize().width < LAYOUT.menuHideableBelow);
+
+    const isMenuAutoHidden = $derived(isMenuHideable && isAutoHidden);
+
+    const isMenuExpanded = $derived(!isMenuAutoHidden);
 </script>
 
 {#snippet renderNavPreview(
@@ -221,9 +224,9 @@
         <Sidebar
             id={MENU_ID}
             edge={MENU_EDGE}
-            collapsedSize={MENU_COLLAPSED_WIDTH}
-            expandedSize={MENU_EXPANDED_WIDTH}
-            isExpandedOnHover={isAutoHidden}
+            collapsedSize={menuGutter + LAYOUT.menuCollapsedWidth}
+            expandedSize={menuGutter + LAYOUT.menuExpandedWidth}
+            isExpandedOnHover={isMenuAutoHidden}
             bind:expanded={
                 () => isMenuExpanded,
                 (isExpanded) => {
@@ -232,7 +235,7 @@
             }
         >
             {#snippet renderContent(phase, transitionDurationMs)}
-                <nav class={styles.leftMenu} aria-label={"Library"}>
+                <nav class={styles.leftMenu} style:padding-left={`${menuGutter}px`} aria-label={"Library"}>
                     <PageLayer level={1}>
                         <div class={styles.leftMenuContent}>
                             <div class={styles.searchContainer}>
@@ -240,6 +243,7 @@
                                     sidebarId={MENU_ID}
                                     edge={MENU_EDGE}
                                     isExpanded={isMenuExpanded}
+                                    isDisabled={!isMenuHideable}
                                     ariaLabel={isMenuExpanded ? "Auto-hide the menu" : "Keep the menu open"}
                                     onToggle={() => {
                                         isAutoHidden = isMenuExpanded;
@@ -293,13 +297,23 @@
                                 ]}
                                 style:transition-duration={`${transitionDurationMs}ms`}
                             >
-                                <PageNavLink href={"/"} isSelected={isAboutSelected}>About</PageNavLink>
+                                <PageNavLinkGroup>
+                                    <PageNavLink href={"/"} isSelected={isAboutSelected} isGliding={true}>
+                                        About
+                                    </PageNavLink>
 
-                                <PageNavLink href={GETTING_STARTED_ROUTE} isSelected={isGettingStartedSelected}>
-                                    Getting started
-                                </PageNavLink>
+                                    <PageNavLink
+                                        href={GETTING_STARTED_ROUTE}
+                                        isSelected={isGettingStartedSelected}
+                                        isGliding={true}
+                                    >
+                                        Getting started
+                                    </PageNavLink>
 
-                                <PageNavLink href={GALLERY_ROUTE} isSelected={isGallerySelected}>Gallery</PageNavLink>
+                                    <PageNavLink href={GALLERY_ROUTE} isSelected={isGallerySelected} isGliding={true}>
+                                        Gallery
+                                    </PageNavLink>
+                                </PageNavLinkGroup>
                             </div>
 
                             <div

@@ -130,3 +130,44 @@ test("switching tabs replaces the sections and closing the modal needs no source
     await page.keyboard.press("Escape");
     await expect(page.locator(DIALOG), "and Escape still closes the modal").toHaveCount(0);
 });
+
+/**
+ * Every card's source button draws the same mark, so a name that only said "source code" would read out identically
+ * for every example on the page, and a screen reader listing the buttons could not tell them apart. Each one is named
+ * for its own example instead. The title is read off the card — the text of the element the button sits beside — and
+ * the trailing punctuation the caption ends on is dropped, so what is asserted is that the two agree, not what either
+ * says.
+ */
+test("every source button is named for the example it belongs to", async ({ page }) => {
+    await page.goto("/surface");
+    await expect(page.locator("[data-example]").first()).toBeVisible();
+
+    const buttons = page.locator('[data-example] [id$="Source"]');
+    const count = await buttons.count();
+
+    expect(count, "the page has source buttons to check").toBeGreaterThan(1);
+
+    for (let index = 0; index < count; index++) {
+        const button = buttons.nth(index);
+        const title = await button.evaluate((element) => {
+            const card = element.closest("[data-example]");
+
+            for (let node = element.parentElement; node && node !== card; node = node.parentElement) {
+                const text = [...node.childNodes]
+                    .filter((child) => child.nodeType === Node.TEXT_NODE)
+                    .map((child) => child.textContent ?? "")
+                    .join("")
+                    .trim();
+
+                if (text) return text.replace(/[^\p{L}\p{N}]+$/u, "");
+            }
+
+            return "";
+        });
+
+        expect(title, "the card the button sits in has a title").not.toBe("");
+        await expect(button, "the button's name carries that title").toHaveAccessibleName(
+            new RegExp(title.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")),
+        );
+    }
+});

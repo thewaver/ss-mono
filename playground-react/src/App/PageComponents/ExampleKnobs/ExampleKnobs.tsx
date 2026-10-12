@@ -4,6 +4,7 @@ import { useEffect, useId, useLayoutEffect, useState } from "react";
 import type { AnchorPlacement, DismisserReason, PopupTriggerFlags } from "@thewaver/ss-components-react";
 import { InteractionWrapper, Popover, PopupTrigger } from "@thewaver/ss-components-react";
 import * as styles from "@thewaver/ss-playground/App/PageComponents/ExampleKnobs/ExampleKnobs.css";
+import * as examplesStyles from "@thewaver/ss-playground/App/PageComponents/Examples/Examples.css";
 
 import { PageTooltipContent } from "../../StyledComponents/TooltipContent/TooltipContent";
 import { PageLayer } from "../Layer/Layer";
@@ -56,7 +57,11 @@ export const PageExampleKnobsButton = (props: PageExampleKnobsButtonProps) => {
                         popupId={popupId}
                         isOpen={isOpen}
                         flags={flags}
-                        renderContent={() => <span aria-hidden="true">{KNOBS_MARK}</span>}
+                        renderContent={() => (
+                            <span className={examplesStyles.exampleActionMark} aria-hidden="true">
+                                {KNOBS_MARK}
+                            </span>
+                        )}
                         onToggle={() => setIsOpen((wasOpen) => !wasOpen)}
                     />
                 )}

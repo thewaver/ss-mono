@@ -22,6 +22,7 @@ export * from "./Abstracts/Dismisser/DismisserSvelte.utils.svelte.js";
 export * from "./Abstracts/ElementFader/ElementFaderSvelte.utils.svelte.js";
 export * from "./Abstracts/ElementObserver/ElementObserverSvelte.utils.svelte.js";
 export * from "./Abstracts/Elevation/ElevationSvelte.utils.svelte.js";
+export * from "./Abstracts/Floater/FloaterSvelte.utils.svelte.js";
 export * from "./Abstracts/FocusManager/FocusManagerSvelte.utils.svelte.js";
 export * from "./Abstracts/FrameRateMonitor/FrameRateMonitorSvelte.utils.svelte.js";
 export * from "./Abstracts/HoverIntent/HoverIntentSvelte.utils.svelte.js";

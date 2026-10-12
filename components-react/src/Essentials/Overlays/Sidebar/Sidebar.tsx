@@ -29,6 +29,7 @@ export const Sidebar = (props: SidebarProps) => {
     const peekingState = useState(false);
     const [isPeeking, setIsPeeking] = peekingState;
     const [isWaitingOnPopup, setIsWaitingOnPopup] = useState(false);
+    const [isHoverPaused, setIsHoverPaused] = useState(false);
 
     const edge = props.edge ?? SIDEBAR_DEFAULTS.edge;
     const isOverlay = (props.layout ?? SIDEBAR_DEFAULTS.layout) === "overlay";
@@ -57,7 +58,7 @@ export const Sidebar = (props: SidebarProps) => {
 
     const phase = SidebarUtils.computePhase(isExpanded, fader.hasTransitionFinished);
 
-    const hoverAnchorRef = useLatest(props.isExpandedOnHover ? (root ?? null) : null);
+    const hoverAnchorRef = useLatest(props.isExpandedOnHover && !isHoverPaused ? (root ?? null) : null);
     const [delayGroup] = useState(HoverIntentUtils.createDelayGroup);
 
     const hoverIntent = HoverIntentReactUtils.useHoverIntent(hoverAnchorRef, peekingState, {
@@ -104,7 +105,21 @@ export const Sidebar = (props: SidebarProps) => {
         }
 
         latestCollapseHover.current();
+
+        if (rootRef.current?.matches(":hover")) setIsHoverPaused(true);
     }, [isOwnerExpanded, latestCollapseHover]);
+
+    useEffect(() => {
+        if (!root || !isHoverPaused) return;
+
+        latestCollapseHover.current();
+
+        const resume = () => setIsHoverPaused(false);
+
+        root.addEventListener("mouseleave", resume);
+
+        return () => root.removeEventListener("mouseleave", resume);
+    }, [root, isHoverPaused, latestCollapseHover]);
 
     const elevationBase = ElevationReactUtils.useBase(root);
     const isRaised = isOverlay && phase !== "collapsed";

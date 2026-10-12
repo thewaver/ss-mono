@@ -21,6 +21,7 @@
     import InteractionWrapper from "../../../Primitives/InteractionWrapper/InteractionWrapper.svelte";
     import { watchChange } from "../../../Utils/effectUtils.svelte.js";
     import { toStyle } from "../../../Utils/styleUtils.js";
+    import { TooltipSvelteUtils } from "../../Overlays/Tooltip/TooltipSvelte.utils.svelte.js";
     import type {
         SelectItem,
         SelectOption,
@@ -161,14 +162,19 @@
                   : undefined,
     );
 
+    const handleOptionsPointerLeave = TooltipSvelteUtils.createHoverHold(
+        () => (hoveredIndex === undefined ? undefined : findOptionRef(hoveredIndex)),
+        () => {
+            hoveredIndex = undefined;
+        },
+    );
+
     const attachHoverWatch = (element: HTMLElement) => {
         const stopOver = on(element, "pointerover", (e) => {
             isPointerLed = true;
             hoveredIndex = findOptionIndex(e.target);
         });
-        const stopLeave = on(element, "pointerleave", () => {
-            hoveredIndex = undefined;
-        });
+        const stopLeave = on(element, "pointerleave", handleOptionsPointerLeave);
 
         return () => {
             stopOver();

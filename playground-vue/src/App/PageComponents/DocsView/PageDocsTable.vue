@@ -21,7 +21,9 @@ defineProps<PageDocsTableProps>();
 
 <template>
     <div :class="styles.docsSection">
-        <h3 v-if="table.heading" :class="styles.docsTableTitle">{{ table.heading }}</h3>
+        <h3 v-if="table.heading" :id="headingId" :ref="headingRef" :class="styles.docsTableTitle">
+            {{ table.heading }}
+        </h3>
 
         <p v-if="table.description" :class="styles.docsDescription">{{ table.description }}</p>
 

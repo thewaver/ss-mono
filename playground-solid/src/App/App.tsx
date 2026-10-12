@@ -3,7 +3,14 @@ import COMPONENT_DEPENDENCIES from "virtual:component-dependencies";
 import type { DependencyNames } from "virtual:component-dependencies";
 
 import { A, Navigate, Route, type RouteSectionProps, Router } from "@solidjs/router";
-import { Collapsible, SharedTooltip, Sidebar, Tree, ViewportWrapper } from "@thewaver/ss-components-solid";
+import {
+    Collapsible,
+    SharedTooltip,
+    Sidebar,
+    Tree,
+    ViewportWrapper,
+    useViewportContext,
+} from "@thewaver/ss-components-solid";
 import type {
     AnchorPlacement,
     InteractionTooltipDefs,
@@ -13,6 +20,7 @@ import type {
     TreeNodeRenderProps,
 } from "@thewaver/ss-components-solid";
 import * as styles from "@thewaver/ss-playground/App/App.css";
+import { LAYOUT } from "@thewaver/ss-playground/App/Layout.const";
 import { IS_BUILD_PROGRESS_SHOWN } from "@thewaver/ss-playground/App/PageComponents/BuildProgress/BuildProgress.utils";
 import {
     restoreRootSlash,
@@ -33,10 +41,8 @@ import {
     EMPTY_DEPENDENCY_NAMES,
     FIXED_ANCHOR_RATIO,
     LIST_PAGELESS_COMPONENTS,
-    MENU_COLLAPSED_WIDTH,
     MENU_CONFIGS,
     MENU_EDGE,
-    MENU_EXPANDED_WIDTH,
     MENU_ID,
     PREVIEW_EXCLUDED_PAGES,
     SEARCH_FIELD_WIDTH,
@@ -46,7 +52,7 @@ import { PageBuildProgress } from "./PageComponents/BuildProgress/BuildProgress"
 import { PageTextField } from "./PageComponents/Field/Field";
 import { PageFrameworkMenu } from "./PageComponents/FrameworkMenu/FrameworkMenu";
 import { PageLayer } from "./PageComponents/Layer/Layer";
-import { PageNavLink } from "./PageComponents/NavLink/NavLink";
+import { PageNavLink, PageNavLinkGroup } from "./PageComponents/NavLink/NavLink";
 import { PageNavSettings } from "./PageComponents/NavSettings/NavSettings";
 import { DEFAULT_VIEWPORT_ANCHOR } from "./PageComponents/NavSettings/NavSettings.const";
 import type { ViewportAnchor } from "./PageComponents/NavSettings/NavSettings.types";
@@ -410,8 +416,16 @@ export function AppContent(props: RouteSectionProps & { viewportAnchor: SignalPa
 
     const selectedSignal: SignalPair<MenuNodeConfig | undefined> = [getSelectedConfig, () => undefined];
 
+    const viewportContext = useViewportContext();
+
+    const getMenuGutter = createMemo(() => Math.max(0, (viewportContext.getSize().width - LAYOUT.pageMaxWidth) / 2));
+
+    const getIsMenuHideable = createMemo(() => viewportContext.getSize().width < LAYOUT.menuHideableBelow);
+
+    const getIsMenuAutoHidden = () => getIsMenuHideable() && isAutoHiddenSignal[0]();
+
     const menuExpandedSignal: SignalPair<boolean> = [
-        () => !isAutoHiddenSignal[0](),
+        () => !getIsMenuAutoHidden(),
         (isExpanded) => isAutoHiddenSignal[1](!isExpanded),
     ];
 
@@ -425,12 +439,16 @@ export function AppContent(props: RouteSectionProps & { viewportAnchor: SignalPa
                 <Sidebar
                     id={() => MENU_ID}
                     edge={() => MENU_EDGE}
-                    collapsedSize={() => MENU_COLLAPSED_WIDTH}
-                    expandedSize={() => MENU_EXPANDED_WIDTH}
-                    isExpandedOnHover={isAutoHiddenSignal[0]}
+                    collapsedSize={() => getMenuGutter() + LAYOUT.menuCollapsedWidth}
+                    expandedSize={() => getMenuGutter() + LAYOUT.menuExpandedWidth}
+                    isExpandedOnHover={getIsMenuAutoHidden}
                     expanded={menuExpandedSignal}
                     renderContent={(getPhase, getTransitionDurationMs) => (
-                        <nav class={styles.leftMenu} aria-label={"Library"}>
+                        <nav
+                            class={styles.leftMenu}
+                            style={{ "padding-left": `${getMenuGutter()}px` }}
+                            aria-label={"Library"}
+                        >
                             <PageLayer level={1}>
                                 <div class={styles.leftMenuContent}>
                                     <div class={styles.searchContainer}>
@@ -438,6 +456,7 @@ export function AppContent(props: RouteSectionProps & { viewportAnchor: SignalPa
                                             sidebarId={() => MENU_ID}
                                             edge={() => MENU_EDGE}
                                             isExpanded={menuExpandedSignal[0]}
+                                            isDisabled={() => !getIsMenuHideable()}
                                             ariaLabel={() =>
                                                 menuExpandedSignal[0]() ? "Auto-hide the menu" : "Keep the menu open"
                                             }
@@ -493,20 +512,27 @@ export function AppContent(props: RouteSectionProps & { viewportAnchor: SignalPa
                                         }}
                                         style={{ "transition-duration": `${getTransitionDurationMs()}ms` }}
                                     >
-                                        <PageNavLink href={"/"} isSelected={getIsAboutSelected()}>
-                                            {"About"}
-                                        </PageNavLink>
+                                        <PageNavLinkGroup>
+                                            <PageNavLink href={"/"} isSelected={getIsAboutSelected()} isGliding>
+                                                {"About"}
+                                            </PageNavLink>
 
-                                        <PageNavLink
-                                            href={GETTING_STARTED_ROUTE}
-                                            isSelected={getIsGettingStartedSelected()}
-                                        >
-                                            {"Getting started"}
-                                        </PageNavLink>
+                                            <PageNavLink
+                                                href={GETTING_STARTED_ROUTE}
+                                                isSelected={getIsGettingStartedSelected()}
+                                                isGliding
+                                            >
+                                                {"Getting started"}
+                                            </PageNavLink>
 
-                                        <PageNavLink href={GALLERY_ROUTE} isSelected={getIsGallerySelected()}>
-                                            {"Gallery"}
-                                        </PageNavLink>
+                                            <PageNavLink
+                                                href={GALLERY_ROUTE}
+                                                isSelected={getIsGallerySelected()}
+                                                isGliding
+                                            >
+                                                {"Gallery"}
+                                            </PageNavLink>
+                                        </PageNavLinkGroup>
                                     </div>
 
                                     <div

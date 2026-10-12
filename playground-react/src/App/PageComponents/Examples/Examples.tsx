@@ -19,6 +19,7 @@ const DEFAULT_LAYOUT = "grid" as const;
 const DEFAULT_MIN_COLUMN_WIDTH = 320;
 const SINGLE_SPAN = 1;
 const PERCENT = 100;
+const SOURCE_MARK = "</>";
 
 const PREVIEW_KNOBS_CONTEXT = { setRenderKnobs: () => undefined };
 
@@ -46,6 +47,7 @@ const PageExample = (props: ExampleProps) => {
                         {props.example.path && (
                             <Button
                                 id={`${props.example.key}Source`}
+                                ariaLabel={`${props.example.name} source code`}
                                 tooltipDefs={{
                                     placement: { x: "center", y: "top_out" },
                                     offset: { x: 0, y: 10 },
@@ -61,7 +63,11 @@ const PageExample = (props: ExampleProps) => {
                                 onClick={async () => {
                                     props.onViewSource();
                                 }}
-                                renderContent={() => "</>"}
+                                renderContent={() => (
+                                    <span className={styles.exampleActionMark} aria-hidden="true">
+                                        {SOURCE_MARK}
+                                    </span>
+                                )}
                             />
                         )}
 

@@ -15,6 +15,7 @@
         e.preventDefault();
 
         TableOfContentsUtils.goToTarget(target);
+        props.onGo();
     };
 </script>
 

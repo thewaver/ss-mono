@@ -5,9 +5,11 @@
     import type { SidebarToggleProps } from "./SidebarToggle.types";
 
     let props: SidebarToggleProps = $props();
+
+    const isDisabled = $derived(props.isDisabled ?? false);
 </script>
 
-<InteractionWrapper>
+<InteractionWrapper {isDisabled}>
     {#snippet renderControl(attachElement, flags)}
         <PageSidebarToggleButton
             {@attach attachElement}
@@ -17,7 +19,10 @@
             aria-label={props.ariaLabel}
             aria-expanded={props.isExpanded}
             aria-controls={props.sidebarId}
-            onclick={() => props.onToggle()}
+            aria-disabled={isDisabled || undefined}
+            onclick={() => {
+                if (!isDisabled) props.onToggle();
+            }}
         />
     {/snippet}
 </InteractionWrapper>

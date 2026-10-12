@@ -22,6 +22,7 @@ import type {
 import { watchAfterRender } from "../../../Utils/effectUtils";
 import { callSlot, declareProps, forwardProps, useTwoWay } from "../../../Utils/propUtils";
 import type { SlotsContext } from "../../../Utils/typeUtils";
+import { TooltipVueUtils } from "../../Overlays/Tooltip/TooltipVue.utils";
 import type { SelectItem, SelectOption, SelectOptionGroup } from "../Select/Select.types";
 import type {
     ListboxCompositeProps,
@@ -237,9 +238,16 @@ export const ListboxOptions = defineComponent(
             hoveredIndex.value = findOptionIndex(e.target);
         };
 
-        const handleOptionsPointerLeave = () => {
-            hoveredIndex.value = undefined;
-        };
+        const handleOptionsPointerLeave = TooltipVueUtils.useHoverHold(
+            () => {
+                const index = hoveredIndex.value;
+
+                return index === undefined ? undefined : findOptionRef(index);
+            },
+            () => {
+                hoveredIndex.value = undefined;
+            },
+        );
 
         let hadFocus = false;
 

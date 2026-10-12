@@ -1,4 +1,4 @@
-import { type MouseEvent, useEffect, useLayoutEffect, useMemo, useRef } from "react";
+import { type MouseEvent, useEffect, useLayoutEffect, useMemo, useRef, useState } from "react";
 
 import {
     type InteractionSizing,
@@ -28,6 +28,7 @@ const TableOfContentsItem = <T,>(props: TableOfContentsItemProps<T>) => {
         e.preventDefault();
 
         TableOfContentsUtils.goToTarget(target);
+        props.onGo();
     };
 
     const commonProps = {
@@ -59,9 +60,25 @@ export const TableOfContents = <T,>(props: TableOfContentsProps<T>) => {
 
     const targets = useStableList(links.map((link) => link.target));
 
-    const currentIndex = ElementObserverReactUtils.useCurrentIndex(targets, false, {
+    const scrolledIndex = ElementObserverReactUtils.useCurrentIndex(targets, false, {
         offsetRatio: props.offsetRatio ?? TABLE_OF_CONTENTS_DEFAULTS.offsetRatio,
     });
+
+    const [press, setPress] = useState<{ index: number }>();
+    const [previousTargets, setPreviousTargets] = useState(targets);
+
+    if (previousTargets !== targets) {
+        setPreviousTargets(targets);
+        setPress(undefined);
+    }
+
+    useEffect(() => {
+        if (!press) return;
+
+        return TableOfContentsUtils.observeNextReaderInput(() => setPress(undefined));
+    }, [press]);
+
+    const currentIndex = press?.index ?? scrolledIndex;
 
     const currentValue = TableOfContentsUtils.computeCurrentValue(links, currentIndex);
     const latestOnCurrentChange = useLatest(props.onCurrentChange);
@@ -91,6 +108,7 @@ export const TableOfContents = <T,>(props: TableOfContentsProps<T>) => {
                         ref={setElementRef}
                         link={link}
                         flags={flags}
+                        onGo={() => setPress({ index })}
                         renderContent={(itemFlags) => props.renderLink(link, itemFlags, placement)}
                     />
                 )}

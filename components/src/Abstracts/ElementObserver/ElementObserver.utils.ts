@@ -2,7 +2,11 @@ import { Bounds, MathUtils, type Point2d, Rect, Size2d } from "@thewaver/ss-util
 
 import type { ViewportContextType } from "../Viewport/Viewport.context.types";
 import { ViewportUtils } from "../Viewport/Viewport.utils";
+import { VirtualizerUtils } from "../Virtualizer/Virtualizer.utils";
 import { CURRENT_INDEX_OBSERVER_DEFAULTS } from "./ElementObserver.const";
+
+/** How far short of its end a scroller may stop and still count as scrolled to the end, for fractional layouts. */
+const SCROLL_END_TOLERANCE_PX = 1;
 
 /** Whether two size lists match entry for entry. */
 const isSameSizeList = (a: Size2d[], b: Size2d[]) =>
@@ -34,6 +38,26 @@ const reportChanges = <T>(report: (value: T) => void, isSame: (a: T, b: T) => bo
         last = value;
         report(value);
     };
+};
+
+/** The box a list of elements scrolls in: the nearest ancestor of the last one that scrolls, or the document's own. */
+const findScroller = (elements: Array<HTMLElement | undefined>) => {
+    const last = elements.findLast((element) => element !== undefined);
+
+    if (!last) return undefined;
+
+    return VirtualizerUtils.findScrollParent(last) ?? last.ownerDocument.scrollingElement ?? undefined;
+};
+
+/** The bottom edge of what a scroller shows, in a viewport's own coordinates, never below the viewport's. */
+const measureVisibleBottom = (scroller: Element, viewportContext: ViewportContextType) => {
+    const viewportBottom = viewportContext.getSize().height;
+
+    if (scroller === scroller.ownerDocument.scrollingElement) return viewportBottom;
+
+    const rect = ViewportUtils.getAdjustedBoundingClientRect(scroller, viewportContext);
+
+    return Math.min(viewportBottom, rect.y + scroller.clientTop + scroller.clientHeight);
 };
 
 /** Runs `update` now and on every scroll anywhere in the document and every resize, until the returned function is called. */
@@ -310,13 +334,30 @@ export namespace ElementObserverUtils {
     };
 
     /**
+     * Whether a scroller has been scrolled as far down as it goes.
+     *
+     * A scroller that has not been scrolled at all does not count, even when it has nothing to scroll: a page that
+     * fits on screen has no end to have reached. A pixel short of the end still counts, since fractional layouts
+     * rarely land on it exactly.
+     *
+     * @param scroll The scroller's `scrollTop`, `clientHeight` and `scrollHeight`, or the element itself.
+     * @returns `true` once there is nothing further to scroll to.
+     */
+    export const computeIsScrolledToEnd = (scroll: { scrollTop: number; clientHeight: number; scrollHeight: number }) =>
+        scroll.scrollTop > 0 && scroll.scrollTop + scroll.clientHeight >= scroll.scrollHeight - SCROLL_END_TOLERANCE_PX;
+
+    /**
      * Follows which of a list of elements the reader has scrolled to, in viewport coordinates.
      *
      * A line is drawn across the viewport at `offsetRatio` of its height from the top, and the current element is
      * the last one whose top has passed it, by {@link ElementObserverUtils.computeCurrentIndex}. It is re-read on
      * every scroll, anywhere in the document, and on every resize, which is what a table of contents marking
-     * the section in view needs. Near the end of a page whose last section is shorter than the stretch below the
-     * line, that section's top may never reach it; leave room after it if it has to become current.
+     * the section in view needs.
+     *
+     * Near the end of a page whose last sections are shorter than the stretch below the line, their tops would never
+     * reach it, so once the box the elements scroll in is scrolled all the way down — {@link computeIsScrolledToEnd} —
+     * the line drops to the bottom of what that box shows, and the last element on screen is current. The box is the
+     * nearest ancestor of the last element that scrolls, or the document's own scroller when none does.
      *
      * @param elements The elements to follow, in reading order. A missing entry is kept in place and never current.
      * @param viewportContext The viewport they are drawn in.
@@ -336,7 +377,12 @@ export namespace ElementObserverUtils {
         const offsetRatio = opts?.offsetRatio ?? CURRENT_INDEX_OBSERVER_DEFAULTS.offsetRatio;
 
         return followScroll(() => {
-            const line = viewportContext.getSize().height * offsetRatio;
+            const scroller = findScroller(elements);
+            const offsetLine = viewportContext.getSize().height * offsetRatio;
+            const line =
+                scroller && computeIsScrolledToEnd(scroller)
+                    ? Math.max(offsetLine, measureVisibleBottom(scroller, viewportContext))
+                    : offsetLine;
             const tops = elements.map((element) =>
                 element ? ViewportUtils.getAdjustedBoundingClientRect(element, viewportContext).y : undefined,
             );

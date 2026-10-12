@@ -16,6 +16,7 @@ import { NavigatorReactUtils } from "../../../Abstracts/Navigator/NavigatorReact
 import { VirtualizerReactUtils } from "../../../Abstracts/Virtualizer/VirtualizerReact.utils";
 import { InteractionWrapper } from "../../../Primitives/InteractionWrapper/InteractionWrapper";
 import { useElement, useLatest } from "../../../Utils/refUtils";
+import { TooltipReactUtils } from "../../Overlays/Tooltip/TooltipReact.utils";
 import type { SelectItem, SelectOption, SelectOptionGroup } from "../Select/Select.types";
 import type { ListboxCompositeProps, ListboxOptionItemProps, ListboxOptionsProps, ListboxProps } from "./Listbox.types";
 import { ListboxReactUtils } from "./ListboxReact.utils";
@@ -191,14 +192,18 @@ export const ListboxOptions = <T,>(props: ListboxOptionsProps<T>) => {
 
     const highlightFloater = useOptionFloater(props.renderHighlightFloater !== undefined, floaterTargets.highlight);
 
+    const hoverHold = TooltipReactUtils.useHoverHold(findOptionElement(hoveredIndex), () => setHoveredIndex(undefined));
+
     const handleOptionsPointerOver = (target: EventTarget) => {
+        if (hoverHold.getIsOnTooltip(target)) return;
+
         const option = target instanceof Element ? target.closest(OPTION_SELECTOR) : null;
 
         setIsPointerLed(true);
         setHoveredIndex(option ? optionIndicesRef.current.get(option.id) : undefined);
     };
 
-    const handleOptionsPointerLeave = () => setHoveredIndex(undefined);
+    const handleOptionsPointerLeave = hoverHold.handlePointerLeave;
 
     const renderFloater = (
         floater: ReturnType<typeof useOptionFloater>,

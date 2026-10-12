@@ -284,9 +284,10 @@ the same control. So:
   `borderWidths` and `borderRadii` mirror CSS and whose shape is always four-cornered. The distinction is the
   user's: a component that takes a geometry, as `Shape` and the SVG defs do, draws a stroke along it; a box has a
   border.
-- **Outline** stays for the focus indicator and the CSS property, and for one more sense the user kept on purpose:
-  a **document outline**, the heading structure a table of contents walks and an accordion's heading level keeps
-  correct, since that is the term HTML itself uses.
+- **Outline** is the focus indicator and the CSS property, and nothing else. An earlier version kept a second
+  sense, the **document outline** — the heading structure a table of contents walks — and the user withdrew it:
+  the list of links is a **table of contents**, in names and in prose, and the structure it walks is the page's
+  headings.
 
 ### When a function grows a sibling, both names get the distinguishing word
 

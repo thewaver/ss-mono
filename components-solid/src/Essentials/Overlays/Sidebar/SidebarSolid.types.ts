@@ -39,7 +39,9 @@ export type SidebarProps = AccessorProps<{
      * is pressed. It never writes `expanded`, so a sidebar the owner has expanded stays expanded, and one
      * expanded by hover reads as collapsed there. While something opened from inside it is still open elsewhere
      * on the page — a popup, a menu — leaving does not collapse it, so the pointer can reach that popup; the next
-     * move outside once it has closed does.
+     * move outside once it has closed does. Collapsed by the owner while the pointer is on it — a collapse button
+     * inside the sidebar — it does not expand again by hover until the pointer has left it once, so the press is
+     * not undone by the hover it was made with.
      */
     isExpandedOnHover?: boolean;
     /** How long the pointer has to rest on the sidebar before hovering expands it. */

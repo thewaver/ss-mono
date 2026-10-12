@@ -23,6 +23,29 @@ describe("computeCurrentIndex", () => {
     });
 });
 
+describe("computeIsScrolledToEnd", () => {
+    it("is true once nothing further is left to scroll to", () => {
+        expect(
+            ElementObserverUtils.computeIsScrolledToEnd({ scrollTop: 600, clientHeight: 400, scrollHeight: 1000 }),
+        ).toBe(true);
+        expect(
+            ElementObserverUtils.computeIsScrolledToEnd({ scrollTop: 500, clientHeight: 400, scrollHeight: 1000 }),
+        ).toBe(false);
+    });
+
+    it("counts a pixel short of the end as the end", () => {
+        expect(
+            ElementObserverUtils.computeIsScrolledToEnd({ scrollTop: 599.5, clientHeight: 400, scrollHeight: 1000 }),
+        ).toBe(true);
+    });
+
+    it("is false for a scroller that has not been scrolled, even with nothing to scroll", () => {
+        expect(
+            ElementObserverUtils.computeIsScrolledToEnd({ scrollTop: 0, clientHeight: 400, scrollHeight: 400 }),
+        ).toBe(false);
+    });
+});
+
 describe("computeViewportProgress", () => {
     it("is nothing while the element has yet to come up past the bottom edge", () => {
         expect(ElementObserverUtils.computeViewportProgress(800, 200, 800)).toBe(0);

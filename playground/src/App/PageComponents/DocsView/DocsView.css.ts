@@ -1,21 +1,43 @@
 import { style } from "@vanilla-extract/css";
 
-import { PAGE_CONTENT_WIDTH } from "../../App.css";
+import { LAYOUT } from "../../Layout.const";
+
+import { layoutVars } from "../../Layout.css";
 import { layerVars } from "../../StyledComponents/Layer/Layer.css";
 import { themeVars } from "../../Theme.css";
 
-const DOCS_TABLE_WIDTH = 960;
+export const docsLayout = style({
+    display: "flex",
+    alignItems: "flex-start",
+    gap: layoutVars.tableOfContentsGap,
+    containerType: "inline-size",
+});
+
+export const docsTableOfContents = style({
+    "position": "sticky",
+    "top": 0,
+    "flexShrink": 0,
+    "width": layoutVars.tableOfContentsWidth,
+    "fontSize": themeVars.fontSize.small,
+
+    "@container": {
+        [`(max-width: ${LAYOUT.tableOfContentsMinLayoutWidth}px)`]: {
+            display: "none",
+        },
+    },
+});
 
 export const docsView = style({
     display: "flex",
     flexDirection: "column",
     gap: themeVars.spacing.quad,
-    width: "100%",
-    maxWidth: DOCS_TABLE_WIDTH,
+    flex: 1,
+    minWidth: 0,
+    maxWidth: layoutVars.contentWidth,
 });
 
 export const docsLead = style({
-    maxWidth: PAGE_CONTENT_WIDTH,
+    maxWidth: layoutVars.readingWidth,
     margin: 0,
     fontSize: themeVars.fontSize.medium,
     fontWeight: "normal",
@@ -29,6 +51,7 @@ export const docsGroup = style({
 
 export const docsGroupTitle = style({
     margin: 0,
+    scrollMarginTop: themeVars.spacing.quad,
     fontSize: themeVars.fontSize.large,
     fontWeight: "normal",
 });
@@ -41,13 +64,14 @@ export const docsSection = style({
 
 export const docsTableTitle = style({
     margin: 0,
+    scrollMarginTop: themeVars.spacing.quad,
     fontFamily: "monospace",
     fontSize: themeVars.fontSize.small,
     fontWeight: "bold",
 });
 
 export const docsDescription = style({
-    maxWidth: PAGE_CONTENT_WIDTH,
+    maxWidth: layoutVars.readingWidth,
     margin: 0,
     fontSize: themeVars.fontSize.small,
 });

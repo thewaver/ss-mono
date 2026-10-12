@@ -4,6 +4,7 @@ import { Show, createSignal, createUniqueId, onCleanup } from "solid-js";
 import type { AnchorPlacement, DismisserReason, PopupTriggerFlags } from "@thewaver/ss-components-solid";
 import { InteractionWrapper, Popover, PopupTrigger, access } from "@thewaver/ss-components-solid";
 import * as styles from "@thewaver/ss-playground/App/PageComponents/ExampleKnobs/ExampleKnobs.css";
+import * as examplesStyles from "@thewaver/ss-playground/App/PageComponents/Examples/Examples.css";
 
 import { PageTooltipContent } from "../../StyledComponents/TooltipContent/TooltipContent";
 import { PageLayer } from "../Layer/Layer";
@@ -56,7 +57,11 @@ export const PageExampleKnobsButton = (props: PageExampleKnobsButtonProps) => {
                         popupId={() => popupId}
                         isOpen={getIsOpen}
                         flags={getFlags}
-                        renderContent={() => <span aria-hidden="true">{KNOBS_MARK}</span>}
+                        renderContent={() => (
+                            <span class={examplesStyles.exampleActionMark} aria-hidden="true">
+                                {KNOBS_MARK}
+                            </span>
+                        )}
                         onToggle={() => setIsOpen((isOpen) => !isOpen)}
                     />
                 )}

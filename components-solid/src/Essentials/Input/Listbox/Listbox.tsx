@@ -28,6 +28,7 @@ import { NavigatorSolidUtils } from "../../../Abstracts/Navigator/NavigatorSolid
 import { VirtualizerSolidUtils } from "../../../Abstracts/Virtualizer/VirtualizerSolid.utils";
 import { InteractionWrapper } from "../../../Primitives/InteractionWrapper/InteractionWrapper";
 import { access, accessSignal } from "../../../Utils/propUtils";
+import { TooltipSolidUtils } from "../../Overlays/Tooltip/TooltipSolid.utils";
 import type { SelectItem, SelectOption, SelectOptionGroup } from "../Select/SelectSolid.types";
 import type {
     ListboxCompositeProps,
@@ -181,12 +182,22 @@ export const ListboxOptions = <T,>(props: ListboxOptionsProps<T>) => {
         setIsPointerLed(false);
     });
 
+    const hoverHold = TooltipSolidUtils.createHoverHold(
+        () => {
+            const index = getHoveredIndex();
+
+            return index === undefined ? undefined : findOptionRef(index);
+        },
+        () => setHoveredIndex(undefined),
+    );
+
     const handleOptionsPointerOver = (e: PointerEvent) => {
         setIsPointerLed(true);
+
+        if (hoverHold.getIsOnTooltip(e.target)) return;
+
         setHoveredIndex(findOptionIndex(e.target));
     };
-
-    const handleOptionsPointerLeave = () => setHoveredIndex(undefined);
 
     const createFloater = (getIsEnabled: () => boolean, getIndex: () => number | undefined) =>
         FloaterSolidUtils.create({
@@ -284,7 +295,7 @@ export const ListboxOptions = <T,>(props: ListboxOptionsProps<T>) => {
             class={[styles.listboxOptions, getIsHorizontal() ? styles.listboxHorizontal : ""].join(" ")}
             role="presentation"
             onPointerOver={handleOptionsPointerOver}
-            onPointerLeave={handleOptionsPointerLeave}
+            onPointerLeave={hoverHold.handlePointerLeave}
         >
             {renderFloaters()}
 
@@ -379,7 +390,7 @@ export const ListboxOptions = <T,>(props: ListboxOptionsProps<T>) => {
             class={styles.listboxSizer}
             style={{ height: `${rowWindow.getTotalSize()}px` }}
             onPointerOver={handleOptionsPointerOver}
-            onPointerLeave={handleOptionsPointerLeave}
+            onPointerLeave={hoverHold.handlePointerLeave}
         >
             {renderFloaters()}
 

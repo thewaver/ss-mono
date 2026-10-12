@@ -155,13 +155,19 @@ test.describe("a table of contents following the page", () => {
         );
     });
 
+    /**
+     * The scroll back is made with the wheel rather than from script: a pressed link holds the mark until the reader
+     * does something of their own, and a scroll from script is not that.
+     */
     test("scrolling back to the top clears the mark", async ({ page }) => {
         await page.locator(LINKS).nth(2).click();
         await expect(page.locator(MARKED)).toHaveCount(1);
 
         const scroller = await scrollerOf(page);
+        const box = (await scroller.boundingBox())!;
 
-        await scroller.evaluate((element) => element.scrollTo({ top: 0 }));
+        await page.mouse.move(box.x + box.width / 2, box.y + box.height / 2);
+        await page.mouse.wheel(0, -100_000);
 
         await expect(page.locator(MARKED)).toHaveCount(0);
     });
@@ -206,5 +212,115 @@ test.describe("an outline whose links carry a depth", () => {
             await expect(link, "that link is the current one").toHaveAttribute("aria-current", "location");
             await expect(page.locator(`${LINKS}[aria-current]`), "and no other is").toHaveCount(1);
         }
+    });
+});
+
+/**
+ * The line that decides the mark sits a fifth of the way down, so on a page whose last sections are shorter than the
+ * stretch below it, their headings run out of scroll before they reach it. Two rules sit on top of the line for that:
+ * once the page is scrolled as far as it goes, the last heading on screen is current; and a pressed link holds the
+ * mark until the reader does something of their own, since the end rule alone would hand a press of the
+ * second-to-last link to the last one.
+ *
+ * The Playground's Breadcrumbs Docs page is the case: it ends on short tables, and its table of contents is the library's own
+ * table of contents. Each test checks that the page really does end short before it relies on it, so a page that
+ * grows past the problem fails with that said rather than passing for the wrong reason.
+ */
+test.describe("a table of contents on a page whose last sections are short", () => {
+    const DOCS = '[data-view="docs"]';
+    const LINKS = `${DOCS} nav a`;
+    const MARKED = `${LINKS}[aria-current="location"]`;
+    const WHEEL_STEP = 120;
+
+    const scrollerOf = (page: Page) =>
+        page
+            .locator(`${DOCS} [data-api-group]`)
+            .first()
+            .evaluateHandle((element) => {
+                let node = element.parentElement;
+
+                const scrolls = (candidate: HTMLElement) =>
+                    candidate.scrollHeight > candidate.clientHeight &&
+                    /auto|scroll/.test(getComputedStyle(candidate).overflowY);
+
+                while (node && !scrolls(node)) node = node.parentElement;
+
+                return node!;
+            })
+            .then((handle) => handle.asElement()!);
+
+    const isAtEnd = (scroller: Awaited<ReturnType<typeof scrollerOf>>) =>
+        scroller.evaluate(
+            (element) => element.scrollTop > 0 && element.scrollTop + element.clientHeight >= element.scrollHeight - 1,
+        );
+
+    const pressSecondToLast = async (page: Page) => {
+        const links = page.locator(LINKS);
+        const index = (await links.count()) - 2;
+        const id = ((await links.nth(index).getAttribute("href")) ?? "").replace(/^#/, "");
+
+        await links.nth(index).click();
+        await expect(page.locator(`[id="${id}"]`), "focus lands on the heading the link names").toBeFocused();
+        await waitUntilStill(page.locator(`[id="${id}"]`));
+
+        expect(
+            await isAtEnd(await scrollerOf(page)),
+            "the page ran out of scroll before that heading reached the top, which is the case being tested",
+        ).toBe(true);
+
+        return index;
+    };
+
+    test.beforeEach(async ({ page }) => {
+        await page.goto("/breadcrumbs/docs");
+        await expect(page.locator(LINKS).first()).toBeVisible();
+    });
+
+    test("scrolling all the way down marks the last link", async ({ page }) => {
+        const scroller = await scrollerOf(page);
+        const box = (await scroller.boundingBox())!;
+        const links = page.locator(LINKS);
+
+        await page.mouse.move(box.x + box.width / 2, box.y + box.height / 2);
+        await page.mouse.wheel(0, 100_000);
+        await expect.poll(() => isAtEnd(scroller), "the page reaches its end").toBe(true);
+        await waitUntilStill(page.locator(`${DOCS} [data-api-group]`).first());
+
+        await expect(links.last(), "the last link is the current one").toHaveAttribute("aria-current", "location");
+        await expect(page.locator(MARKED), "and no other is").toHaveCount(1);
+    });
+
+    test("pressing a link whose heading cannot reach the top marks that link, not the last", async ({ page }) => {
+        const index = await pressSecondToLast(page);
+        const links = page.locator(LINKS);
+
+        await expect(links.nth(index), "the pressed link is the current one").toHaveAttribute(
+            "aria-current",
+            "location",
+        );
+        await expect(links.last(), "even though the last heading is on screen too").not.toHaveAttribute(
+            "aria-current",
+            /.*/,
+        );
+        await expect(page.locator(MARKED)).toHaveCount(1);
+    });
+
+    /**
+     * The wheel is turned downwards at the end of the page, so nothing moves: what releases the mark is the reader's
+     * input, not a scroll, and once released it goes where the end rule puts it.
+     */
+    test("the reader's next wheel input releases the pressed link's hold", async ({ page }) => {
+        const index = await pressSecondToLast(page);
+        const links = page.locator(LINKS);
+
+        await expect(links.nth(index)).toHaveAttribute("aria-current", "location");
+
+        await page.mouse.wheel(0, WHEEL_STEP);
+
+        await expect(links.last(), "the mark goes back to the end rule's choice").toHaveAttribute(
+            "aria-current",
+            "location",
+        );
+        await expect(page.locator(MARKED)).toHaveCount(1);
     });
 });

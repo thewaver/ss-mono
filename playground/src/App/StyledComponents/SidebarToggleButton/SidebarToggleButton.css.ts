@@ -1,19 +1,19 @@
 import { style } from "@vanilla-extract/css";
 
+import { layoutVars } from "../../Layout.css";
 import { themeVars } from "../../Theme.css";
 import { layerVars } from "../Layer/Layer.css";
 
-export const SIDEBAR_TOGGLE_SIZE = 28;
-
 export const isHovered = style({});
+export const isDisabled = style({});
 
 export const sidebarToggle = style({
     display: "flex",
     alignItems: "center",
     justifyContent: "center",
     pointerEvents: "all",
-    width: SIDEBAR_TOGGLE_SIZE,
-    height: SIDEBAR_TOGGLE_SIZE,
+    width: layoutVars.iconButtonSize,
+    height: layoutVars.iconButtonSize,
     padding: 0,
     border: "none",
     borderRadius: themeVars.borderRadius.half,
@@ -25,8 +25,13 @@ export const sidebarToggle = style({
     transition: `background-color ${themeVars.animation.duration}`,
 
     selectors: {
-        [`&.${isHovered}`]: {
+        [`&.${isHovered}:not(.${isDisabled})`]: {
             backgroundColor: `rgb(from ${layerVars.contrast} r g b / 25%)`,
+        },
+        [`&.${isDisabled}`]: {
+            opacity: themeVars.disabled.opacity,
+            filter: themeVars.disabled.filter,
+            cursor: "default",
         },
     },
 });

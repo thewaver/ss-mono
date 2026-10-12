@@ -11,6 +11,7 @@
     import type { ExampleProps } from "./Examples.types";
 
     const SINGLE_SPAN = 1;
+    const SOURCE_MARK = "</>";
 
     let props: ExampleProps = $props();
 
@@ -36,6 +37,7 @@
                 {#if props.example.path}
                     <Button
                         id={`${props.example.key}Source`}
+                        ariaLabel={`${props.example.name} source code`}
                         tooltipDefs={{
                             placement: { x: "center", y: "top_out" },
                             offset: { x: 0, y: 10 },
@@ -46,7 +48,7 @@
                         }}
                     >
                         {#snippet renderContent()}
-                            {"</>"}
+                            <span class={styles.exampleActionMark} aria-hidden="true">{SOURCE_MARK}</span>
                         {/snippet}
                     </Button>
                 {/if}

@@ -1,6 +1,6 @@
 import { style } from "@vanilla-extract/css";
 
-import { PAGE_CONTENT_WIDTH } from "../../App.css";
+import { layoutVars } from "../../Layout.css";
 import { themeVars } from "../../Theme.css";
 
 export const aboutPage = style({
@@ -8,7 +8,7 @@ export const aboutPage = style({
     flexDirection: "column",
     gap: themeVars.spacing.quad,
     width: "100%",
-    maxWidth: PAGE_CONTENT_WIDTH,
+    maxWidth: layoutVars.readingWidth,
 });
 
 export const aboutTitle = style({

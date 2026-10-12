@@ -14,7 +14,12 @@
 
 <PageRouterLink
     href={props.href}
-    class={[styles.navLinkContent, layerClass, props.isSelected && styles.isSelected]}
+    class={[
+        styles.navLinkContent,
+        layerClass,
+        props.isSelected && styles.isSelected,
+        (props.isGliding ?? false) && styles.isGliding,
+    ]}
     aria-current={props.isSelected ? "page" : undefined}
 >
     {@render props.children?.()}

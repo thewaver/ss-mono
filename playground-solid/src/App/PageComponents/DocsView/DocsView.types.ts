@@ -9,4 +9,7 @@ export type PageDocsViewProps = AccessorProps<{
 
 export type PageDocsTableProps = AccessorProps<{
     table: ApiTable;
-}>;
+    headingId: string;
+}> & {
+    headingRef: (element: HTMLElement) => void;
+};

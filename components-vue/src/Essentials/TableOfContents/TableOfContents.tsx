@@ -1,4 +1,4 @@
-import { type SlotsType, computed, defineComponent, watch } from "vue";
+import { type SlotsType, computed, defineComponent, shallowRef, watch } from "vue";
 
 import {
     type InteractionSizing,
@@ -37,6 +37,7 @@ const TableOfContentsItem = defineComponent(
                 e.preventDefault();
 
                 TableOfContentsUtils.goToTarget(target);
+                props.onGo();
             };
 
             const commonProps = {
@@ -63,7 +64,12 @@ const TableOfContentsItem = defineComponent(
         },
     {
         name: "TableOfContentsItem",
-        props: declareProps<TableOfContentsItemProps<unknown>>({ ariaLabel: null, flags: null, link: null }),
+        props: declareProps<TableOfContentsItemProps<unknown>>({
+            ariaLabel: null,
+            flags: null,
+            link: null,
+            onGo: null,
+        }),
     },
 );
 
@@ -71,9 +77,28 @@ export const TableOfContents = defineComponent(
     <T,>(props: TableOfContentsProps<T>, { slots }: SlotsContext<TableOfContentsSlots<T>>) => {
         const targets = useStableList(() => props.links.map((link) => link.target));
 
-        const currentIndex = ElementObserverVueUtils.useCurrentIndex(targets, false, {
+        const scrolledIndex = ElementObserverVueUtils.useCurrentIndex(targets, false, {
             offsetRatio: () => props.offsetRatio ?? TABLE_OF_CONTENTS_DEFAULTS.offsetRatio,
         });
+
+        const pressedIndex = shallowRef<number>();
+
+        watch(
+            () => props.links,
+            () => {
+                pressedIndex.value = undefined;
+            },
+        );
+
+        watchAfterRender([pressedIndex], ([index]) => {
+            if (index === undefined) return;
+
+            return TableOfContentsUtils.observeNextReaderInput(() => {
+                pressedIndex.value = undefined;
+            });
+        });
+
+        const currentIndex = computed(() => pressedIndex.value ?? scrolledIndex.value);
 
         const currentValue = computed(() => TableOfContentsUtils.computeCurrentValue(props.links, currentIndex.value));
 
@@ -106,7 +131,14 @@ export const TableOfContents = defineComponent(
                         {
                             {
                                 renderControl: ({ setElementRef, flags }) => (
-                                    <TableOfContentsItem ref={setElementRef} link={link} flags={flags}>
+                                    <TableOfContentsItem
+                                        ref={setElementRef}
+                                        link={link}
+                                        flags={flags}
+                                        onGo={() => {
+                                            pressedIndex.value = index;
+                                        }}
+                                    >
                                         {
                                             {
                                                 renderContent: (itemFlags) =>

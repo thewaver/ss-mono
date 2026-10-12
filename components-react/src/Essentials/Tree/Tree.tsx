@@ -31,6 +31,7 @@ import { InteractionWrapper } from "../../Primitives/InteractionWrapper/Interact
 import { PlacementBox } from "../../Primitives/PlacementBox/PlacementBox";
 import { PlacementItem } from "../../Primitives/PlacementItem/PlacementItem";
 import { useElement } from "../../Utils/refUtils";
+import { TooltipReactUtils } from "../Overlays/Tooltip/TooltipReact.utils";
 import type { TreeNodeItemProps, TreeProps, TreeRow } from "./Tree.types";
 
 const EMPTY_PINNED_ROWS: number[] = [];
@@ -275,6 +276,10 @@ export const Tree = <T,>(props: TreeProps<T>) => {
     const selectedRow = findRow(value);
     const highlightRow = findRow(hoveredValue ?? focusVisibleValue);
 
+    const hoverHold = TooltipReactUtils.useHoverHold(findNodeElement(findRow(hoveredValue)), () =>
+        setHoveredValue(undefined),
+    );
+
     useLayoutEffect(() => {
         const selection = findNodeElement(selectedRow);
         const highlight = findNodeElement(highlightRow);
@@ -444,8 +449,12 @@ export const Tree = <T,>(props: TreeProps<T>) => {
             }}
             onFocus={handleFocus}
             onBlur={() => setFocusVisibleValue(undefined)}
-            onPointerOver={(e) => setHoveredValue(() => findRowByTarget(e.target)?.node.value)}
-            onPointerLeave={() => setHoveredValue(undefined)}
+            onPointerOver={(e) => {
+                if (hoverHold.getIsOnTooltip(e.target)) return;
+
+                setHoveredValue(() => findRowByTarget(e.target)?.node.value);
+            }}
+            onPointerLeave={hoverHold.handlePointerLeave}
         >
             {layout ? (
                 <PlacementBox layout={layout} computeEffect={props.computeEffect}>

@@ -67,6 +67,7 @@ export type ApiReader = {
 };
 
 type ExportRecord = {
+    name: string;
     symbol: ts.Symbol;
     declaration: ts.Declaration;
     unit: string;
@@ -345,7 +346,7 @@ const createApiReader = (
 
         const unit = getUnitName(relative);
 
-        if (unit) records.push({ symbol, declaration, unit, fileKind });
+        if (unit) records.push({ name: exported.getName(), symbol, declaration, unit, fileKind });
     }
 
     const units = new Map(records.map((record) => [record.unit.toLowerCase(), record.unit]));
@@ -396,8 +397,7 @@ const createApiReader = (
         };
 
         for (const { record } of placements.get(key) ?? []) {
-            const { symbol, declaration, fileKind } = record;
-            const name = symbol.getName();
+            const { name, symbol, declaration, fileKind } = record;
             const heading = `${name}${toTypeParameters(declaration)}`;
 
             if (symbol.flags & ts.SymbolFlags.Module) {

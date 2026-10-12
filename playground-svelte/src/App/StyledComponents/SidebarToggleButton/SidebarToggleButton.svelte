@@ -18,7 +18,12 @@
     bind:this={ref}
     {...others}
     type="button"
-    class={[styles.sidebarToggle, layerClass, flags.isHovered && styles.isHovered]}
+    class={[
+        styles.sidebarToggle,
+        layerClass,
+        flags.isHovered && styles.isHovered,
+        flags.isDisabled && styles.isDisabled,
+    ]}
 >
     <span aria-hidden="true">{isPointingRight ? OPEN_TOWARDS_RIGHT : OPEN_TOWARDS_LEFT}</span>
 </button>

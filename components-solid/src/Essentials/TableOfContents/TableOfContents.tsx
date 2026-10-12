@@ -1,4 +1,4 @@
-import { type Accessor, Index, type JSX, Show, createEffect, createMemo, on, onCleanup } from "solid-js";
+import { type Accessor, Index, type JSX, Show, createEffect, createMemo, createSignal, on, onCleanup } from "solid-js";
 
 import {
     type InteractionSizing,
@@ -28,6 +28,7 @@ const TableOfContentsItem = <T,>(props: TableOfContentsItemProps<T>) => {
         e.preventDefault();
 
         TableOfContentsUtils.goToTarget(target);
+        props.onGo();
     };
 
     const commonProps: Omit<JSX.HTMLAttributes<HTMLElement>, "ref"> = {
@@ -65,9 +66,27 @@ export const TableOfContents = <T,>(props: TableOfContentsProps<T>) => {
 
     const getTargets = createMemo(() => access(props.links).map((link) => link.target));
 
-    const getCurrentIndex = ElementObserverSolidUtils.createViewportCurrentIndexObserver(getTargets, undefined, {
+    const getScrolledIndex = ElementObserverSolidUtils.createViewportCurrentIndexObserver(getTargets, undefined, {
         getOffsetRatio: () => access(props.offsetRatio) ?? TABLE_OF_CONTENTS_DEFAULTS.offsetRatio,
     });
+
+    const [getPressedIndex, setPressedIndex] = createSignal<number>();
+
+    createEffect(
+        on(
+            () => access(props.links),
+            () => setPressedIndex(undefined),
+            { defer: true },
+        ),
+    );
+
+    createEffect(() => {
+        if (getPressedIndex() === undefined) return;
+
+        onCleanup(TableOfContentsUtils.observeNextReaderInput(() => setPressedIndex(undefined)));
+    });
+
+    const getCurrentIndex = () => getPressedIndex() ?? getScrolledIndex();
 
     const getCurrentValue = createMemo(() =>
         TableOfContentsUtils.computeCurrentValue(access(props.links), getCurrentIndex()),
@@ -92,6 +111,7 @@ export const TableOfContents = <T,>(props: TableOfContentsProps<T>) => {
                     ref={setElementRef}
                     link={getLink}
                     flags={getFlags}
+                    onGo={() => setPressedIndex(index)}
                     renderContent={(getItemFlags) =>
                         props.renderLink(getLink, getItemFlags, () => getPlacementAt(index))
                     }

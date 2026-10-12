@@ -4,6 +4,7 @@ import { type ComponentPublicInstance, computed, h, shallowRef, useId } from "vu
 import type { AnchorPlacement, DismisserReason, InteractionTooltipDefs } from "@thewaver/ss-components-vue";
 import { InteractionWrapper, Popover, PopupTrigger, toElement } from "@thewaver/ss-components-vue";
 import * as styles from "@thewaver/ss-playground/App/PageComponents/ExampleKnobs/ExampleKnobs.css";
+import * as examplesStyles from "@thewaver/ss-playground/App/PageComponents/Examples/Examples.css";
 
 import PageTooltipContent from "../../StyledComponents/TooltipContent/TooltipContent.vue";
 import PageLayer from "../Layer/Layer.vue";
@@ -58,7 +59,7 @@ const tooltipDefs: InteractionTooltipDefs = {
                 @toggle="isOpen = !isOpen"
             >
                 <template #renderContent>
-                    <span aria-hidden="true">{{ KNOBS_MARK }}</span>
+                    <span :class="examplesStyles.exampleActionMark" aria-hidden="true">{{ KNOBS_MARK }}</span>
                 </template>
             </PopupTrigger>
         </template>

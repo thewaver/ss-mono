@@ -181,8 +181,6 @@ export const LIST_PAGELESS_COMPONENTS = false;
 export const SEARCH_FIELD_WIDTH = 280;
 export const MENU_ID = "library-menu";
 export const MENU_EDGE = "left";
-export const MENU_COLLAPSED_WIDTH = 68;
-export const MENU_EXPANDED_WIDTH = 320;
 export const PREVIEW_EXCLUDED_PAGES = ["AudioSwitcher", "ImageSwitcher", "TableOfContents", "ViewportWrapper"];
 
 export const MENU_CONFIGS: MenuBranchConfig[] = [

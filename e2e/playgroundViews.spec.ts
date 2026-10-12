@@ -1,4 +1,4 @@
-import { expect, test } from "@playwright/test";
+import { type Page, expect, test } from "@playwright/test";
 
 const VIEW_TABS = "[data-view-tabs]";
 const DOCS = '[data-view="docs"]';
@@ -167,4 +167,81 @@ test("a page whose unit exports nothing says so rather than drawing empty tables
     await page.goto("/timed-gradients/docs");
     await expect(page.locator(`${DOCS} table`), "no table is drawn").toHaveCount(0);
     await expect(page.locator(DOCS), "and the view says why").toContainText("exports nothing");
+});
+
+/**
+ * Every Docs page carries a table of contents, drawn by the library's own `TableOfContents`: one link per group and
+ * one per table that has a heading. What it promises is a relationship between two lists — the links and the
+ * headings — so the check is that they are the same list in the same order, read off the page rather than counted.
+ * Breadcrumbs is used because its page has several groups and several headed tables.
+ */
+test.describe("the table of contents beside a Docs page", () => {
+    const TABLE_OF_CONTENTS = `${DOCS} nav`;
+    const LINKS = `${TABLE_OF_CONTENTS} a`;
+    const HEADINGS = `${DOCS} [data-api-group] h2, ${DOCS} [data-api-group] h3`;
+    const MARKED = `${LINKS}[aria-current="location"]`;
+
+    const targetOf = async (page: Page, index: number) =>
+        page.locator(`[id="${((await page.locator(LINKS).nth(index).getAttribute("href")) ?? "").replace(/^#/, "")}"]`);
+
+    test.beforeEach(async ({ page }) => {
+        await page.goto("/breadcrumbs/docs");
+        await expect(page.locator(LINKS).first()).toBeVisible();
+    });
+
+    /**
+     * The page already holds the left menu's navigation landmark, so the table of contents' is named — two unnamed ones
+     * could not be told apart — and the name is asserted to differ from every other landmark's rather than to read
+     * any particular way.
+     */
+    test("is a navigation landmark named apart from the others on the page", async ({ page }) => {
+        const names = await page
+            .locator('nav, [role="navigation"]')
+            .evaluateAll((landmarks) => landmarks.map((landmark) => landmark.getAttribute("aria-label")));
+        const own = await page.locator(TABLE_OF_CONTENTS).getAttribute("aria-label");
+
+        expect(own, "the table of contents' landmark carries a name").toBeTruthy();
+        expect(
+            names.filter((name) => name === own),
+            "and no other landmark on the page shares it",
+        ).toHaveLength(1);
+    });
+
+    test("links to every group and table heading on the page, in reading order", async ({ page }) => {
+        const targets = await page
+            .locator(LINKS)
+            .evaluateAll((links) => links.map((link) => (link.getAttribute("href") ?? "").replace(/^#/, "")));
+        const headings = await page.locator(HEADINGS).evaluateAll((elements) => elements.map((element) => element.id));
+
+        expect(targets.length, "the table of contents has links").toBeGreaterThan(1);
+        expect(headings, "every heading carries an id a link can point at").not.toContain("");
+        expect(targets, "and the links name exactly those headings, in the order the page shows them").toEqual(
+            headings,
+        );
+    });
+
+    /**
+     * Focus moving to the heading is the half a keyboard or screen reader user depends on; the mark is what says
+     * which link they came from. The last link is pressed first because it is the one a short ending can push out of
+     * reach of the line that decides the mark, and a pressed link holds the mark regardless.
+     */
+    test("pressing a link focuses its heading and marks that link alone", async ({ page }) => {
+        const links = page.locator(LINKS);
+        const count = await links.count();
+
+        for (const index of [count - 1, 1, 0]) {
+            await links.nth(index).click();
+
+            await expect(await targetOf(page, index), "focus lands on the heading the link names").toBeFocused();
+            await expect(links.nth(index), "that link is the current one").toHaveAttribute("aria-current", "location");
+            await expect(page.locator(MARKED), "and no other is").toHaveCount(1);
+        }
+    });
+
+    /** A table of contents of one link would only repeat the page's title, so a page that would get fewer has none. */
+    test("is left out of a page with too few sections", async ({ page }) => {
+        await page.goto("/timed-gradients/docs");
+        await expect(page.locator(DOCS), "the docs view is up").toContainText("exports nothing");
+        await expect(page.locator(TABLE_OF_CONTENTS), "and carries no table of contents").toHaveCount(0);
+    });
 });

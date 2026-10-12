@@ -30,13 +30,34 @@
 
     const targets = $derived(props.links.map((link) => link.target));
 
-    const getCurrentIndex = ElementObserverSvelteUtils.createViewportCurrentIndexObserver(
+    const getScrolledIndex = ElementObserverSvelteUtils.createViewportCurrentIndexObserver(
         () => targets,
         () => false,
         { getOffsetRatio: () => props.offsetRatio ?? TABLE_OF_CONTENTS_DEFAULTS.offsetRatio },
     );
 
-    const currentValue = $derived(TableOfContentsUtils.computeCurrentValue(props.links, getCurrentIndex()));
+    let pressedIndex = $state<number>();
+
+    watchChange(
+        () => props.links,
+        () => {
+            pressedIndex = undefined;
+        },
+    );
+
+    $effect(() => {
+        if (pressedIndex === undefined) return;
+
+        return untrack(() =>
+            TableOfContentsUtils.observeNextReaderInput(() => {
+                pressedIndex = undefined;
+            }),
+        );
+    });
+
+    const currentIndex = $derived(pressedIndex ?? getScrolledIndex());
+
+    const currentValue = $derived(TableOfContentsUtils.computeCurrentValue(props.links, currentIndex));
 
     watchChange(
         () => currentValue,
@@ -56,14 +77,22 @@
     {@const placement = layout?.placements[index]}
     <InteractionWrapper
         sizing={placement === undefined ? ROW_SIZING : PLACED_SIZING}
-        extraFlags={{ isCurrent: getCurrentIndex() === index }}
+        extraFlags={{ isCurrent: currentIndex === index }}
     >
         {#snippet renderControl(attachElement, flags)}
             {#snippet linkContent(itemFlags: InteractionFlags<TableOfContentsFlags>)}
                 {@render props.renderLink(link, itemFlags, placement)}
             {/snippet}
 
-            <TableOfContentsItem {attachElement} {link} {flags} renderContent={linkContent} />
+            <TableOfContentsItem
+                {attachElement}
+                {link}
+                {flags}
+                renderContent={linkContent}
+                onGo={() => {
+                    pressedIndex = index;
+                }}
+            />
         {/snippet}
     </InteractionWrapper>
 {/snippet}

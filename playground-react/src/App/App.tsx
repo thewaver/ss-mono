@@ -4,7 +4,14 @@ import { BrowserRouter, Link, Navigate, Outlet, Route, Routes, useLocation } fro
 import COMPONENT_DEPENDENCIES from "virtual:component-dependencies";
 import type { DependencyNames } from "virtual:component-dependencies";
 
-import { Collapsible, SharedTooltip, Sidebar, Tree, ViewportWrapper } from "@thewaver/ss-components-react";
+import {
+    Collapsible,
+    SharedTooltip,
+    Sidebar,
+    Tree,
+    ViewportWrapper,
+    useViewportContext,
+} from "@thewaver/ss-components-react";
 import type {
     AnchorPlacement,
     InteractionTooltipDefs,
@@ -13,6 +20,7 @@ import type {
     TreeNodeRenderProps,
 } from "@thewaver/ss-components-react";
 import * as styles from "@thewaver/ss-playground/App/App.css";
+import { LAYOUT } from "@thewaver/ss-playground/App/Layout.const";
 import { IS_BUILD_PROGRESS_SHOWN } from "@thewaver/ss-playground/App/PageComponents/BuildProgress/BuildProgress.utils";
 import {
     restoreRootSlash,
@@ -32,10 +40,8 @@ import {
     EMPTY_DEPENDENCY_NAMES,
     FIXED_ANCHOR_RATIO,
     LIST_PAGELESS_COMPONENTS,
-    MENU_COLLAPSED_WIDTH,
     MENU_CONFIGS,
     MENU_EDGE,
-    MENU_EXPANDED_WIDTH,
     MENU_ID,
     PREVIEW_EXCLUDED_PAGES,
     SEARCH_FIELD_WIDTH,
@@ -45,7 +51,7 @@ import { PageBuildProgress } from "./PageComponents/BuildProgress/BuildProgress"
 import { PageTextField } from "./PageComponents/Field/Field";
 import { PageFrameworkMenu } from "./PageComponents/FrameworkMenu/FrameworkMenu";
 import { PageLayer } from "./PageComponents/Layer/Layer";
-import { PageNavLink } from "./PageComponents/NavLink/NavLink";
+import { PageNavLink, PageNavLinkGroup } from "./PageComponents/NavLink/NavLink";
 import { PageNavSettings } from "./PageComponents/NavSettings/NavSettings";
 import { DEFAULT_VIEWPORT_ANCHOR } from "./PageComponents/NavSettings/NavSettings.const";
 import type { ViewportAnchor } from "./PageComponents/NavSettings/NavSettings.types";
@@ -395,7 +401,15 @@ export function AppContent(props: { viewportAnchor: readonly [ViewportAnchor, (v
 
     const selectedState = [selectedConfig as MenuNodeConfig | undefined, () => undefined] as const;
 
-    const isMenuExpanded = !isAutoHidden;
+    const viewportContext = useViewportContext();
+
+    const menuGutter = Math.max(0, (viewportContext.getSize().width - LAYOUT.pageMaxWidth) / 2);
+
+    const isMenuHideable = viewportContext.getSize().width < LAYOUT.menuHideableBelow;
+
+    const isMenuAutoHidden = isMenuHideable && isAutoHidden;
+
+    const isMenuExpanded = !isMenuAutoHidden;
 
     const menuExpandedState = [isMenuExpanded, (isExpanded: boolean) => setIsAutoHidden(!isExpanded)] as const;
 
@@ -407,12 +421,16 @@ export function AppContent(props: { viewportAnchor: readonly [ViewportAnchor, (v
                 <Sidebar
                     id={MENU_ID}
                     edge={MENU_EDGE}
-                    collapsedSize={MENU_COLLAPSED_WIDTH}
-                    expandedSize={MENU_EXPANDED_WIDTH}
-                    isExpandedOnHover={isAutoHidden}
+                    collapsedSize={menuGutter + LAYOUT.menuCollapsedWidth}
+                    expandedSize={menuGutter + LAYOUT.menuExpandedWidth}
+                    isExpandedOnHover={isMenuAutoHidden}
                     expanded={menuExpandedState}
                     renderContent={(phase, transitionDurationMs) => (
-                        <nav className={styles.leftMenu} aria-label={"Library"}>
+                        <nav
+                            className={styles.leftMenu}
+                            style={{ paddingLeft: `${menuGutter}px` }}
+                            aria-label={"Library"}
+                        >
                             <PageLayer level={1}>
                                 <div className={styles.leftMenuContent}>
                                     <div className={styles.searchContainer}>
@@ -420,6 +438,7 @@ export function AppContent(props: { viewportAnchor: readonly [ViewportAnchor, (v
                                             sidebarId={MENU_ID}
                                             edge={MENU_EDGE}
                                             isExpanded={isMenuExpanded}
+                                            isDisabled={!isMenuHideable}
                                             ariaLabel={isMenuExpanded ? "Auto-hide the menu" : "Keep the menu open"}
                                             onToggle={() => menuExpandedState[1](!isMenuExpanded)}
                                         />
@@ -479,17 +498,23 @@ export function AppContent(props: { viewportAnchor: readonly [ViewportAnchor, (v
                                             .join(" ")}
                                         style={{ transitionDuration: `${transitionDurationMs}ms` }}
                                     >
-                                        <PageNavLink href={"/"} isSelected={isAboutSelected}>
-                                            {"About"}
-                                        </PageNavLink>
+                                        <PageNavLinkGroup>
+                                            <PageNavLink href={"/"} isSelected={isAboutSelected} isGliding>
+                                                {"About"}
+                                            </PageNavLink>
 
-                                        <PageNavLink href={GETTING_STARTED_ROUTE} isSelected={isGettingStartedSelected}>
-                                            {"Getting started"}
-                                        </PageNavLink>
+                                            <PageNavLink
+                                                href={GETTING_STARTED_ROUTE}
+                                                isSelected={isGettingStartedSelected}
+                                                isGliding
+                                            >
+                                                {"Getting started"}
+                                            </PageNavLink>
 
-                                        <PageNavLink href={GALLERY_ROUTE} isSelected={isGallerySelected}>
-                                            {"Gallery"}
-                                        </PageNavLink>
+                                            <PageNavLink href={GALLERY_ROUTE} isSelected={isGallerySelected} isGliding>
+                                                {"Gallery"}
+                                            </PageNavLink>
+                                        </PageNavLinkGroup>
                                     </div>
 
                                     <div

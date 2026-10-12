@@ -3298,6 +3298,54 @@ furniture — adding a page or renaming a category used to break the keyboard sp
 regression, which happened once. The page carries a row, a column, links, a consumer link component and an
 all-disabled list.
 
+### The Playground is one centered block, 1600px at most
+
+The user's call, after the Docs table of contents made the old left-aligned page obvious: on a wide window the left menu,
+the page and the table of contents are centered together as one block no wider than `PAGE_MAX_WIDTH` (1600). The number is
+what the parts add up to at full size — menu 320, margin 40, docs 960, gap 40, table of contents 200, margin 40 — so nothing
+shrinks at the cap; 1440 was weighed and would have narrowed the docs to 800.
+
+**The dark menu panel still reaches the window's left edge.** The empty space left of the block, half of whatever
+the window has beyond 1600, is added to the `Sidebar`'s `collapsedSize` and `expandedSize` and given to the panel as
+left padding, so the panel grows into it and the menu's contents sit where the block starts. Painting the space with
+a separate element was rejected because the panel's background is a diagonal gradient that a second element cannot
+continue seamlessly.
+
+**The menu can only be hidden on a window narrower than the page cap minus the menu**, `LAYOUT.menuHideableBelow`
+(1600 − 320 = 1280), the user's rule. Above it the menu is always open and the auto-hide button is drawn but
+disabled, the user's call over leaving it out. Below it the button appears, and hiding the menu gives
+its width back to the page, which moves across, as the menu always did before the centered block. A first version
+kept the menu's space reserved when it hid; the user rejected it, since hiding is meant for narrow screens where
+the space is the point. A preference to auto-hide set on a narrow window is kept, and applies again when the window
+narrows.
+
+**The cap is a rule on every direct child of the page column**, not on `pageBody`, because the About, Getting
+started and Gallery pages render straight into the column without it.
+
+**Every width the layout depends on is stated once, in `Layout.const.ts`, and everything else is derived.** The
+user's call, after the first version scattered its numbers: the menu's 320 lived in both the Solid app and the
+shared styles, the 1600 cap and the table of contents' hide-point were sums done by hand, and 960 and 720 sat in several
+style files. `LAYOUT` holds the base widths — expanded menu, menu padding, the auto-hide button, page margin, content,
+reading, table of contents and the gap before it — and computes the rest from them: `menuCollapsedWidth` is the button with
+the menu's padding either side, which is all a collapsed menu shows, and `menuHideableBelow`, `pageBodyMaxWidth`,
+`pageMaxWidth` and `tableOfContentsMinLayoutWidth` follow from the widths. The button is 32 square, the user's call over the
+28 it had, so the grid lands on round numbers; the collapsed menu is 72.
+
+**The styles read CSS variables, not the numbers.** `Layout.css.ts` turns `LAYOUT`'s base widths into variables on
+`:root`, and `pageBodyMaxWidth` is a `calc()` over those variables rather than the precomputed number, so a later
+rule that overrides one base variable at a screen size — a narrower menu on phones — moves everything derived from it.
+The user chose this over plain numbers as the foundation for that. The variables are generated from `LAYOUT`, so the
+two cannot drift. **Two things cannot follow a variable**, and both read `LAYOUT` directly: the `Sidebar`'s sizes,
+which it takes as numbers, and the container query that hides the table of contents, since a query's condition cannot use a
+variable. An override at a screen size has to change those two alongside it.
+
+**The table of contents hides once the docs would be squeezed below the reading width**: `tableOfContentsMinLayoutWidth` is reading
+width plus gap plus table of contents. The first version hid it at a hand-picked 900; the rule gives 960.
+
+**The page margin and the menu's side padding belong to the layout, not the theme.** They were
+`themeVars.spacing.quad` and `.double`, the same 40px and 20px, but the cap and the collapsed width are computed in
+code from them, and a theme is free to change its spacing without telling those sums.
+
 ### The left menu is one tree, and the categories are its top three branches
 
 Settled on the user's call between three options, once the abstract pages took the menu to ninety-seven
@@ -3396,6 +3444,16 @@ is what keeps the shadow — see _"Nothing drawn in a `Sidebar` is clipped"_.
 **`auto` reads the screen's height once, when the page loads.** Reading it on every resize looks equivalent
 and is not: a test browser reports a screen the size of its window, so the anchor shrank with the window and
 `viewport.spec.ts`'s nested-scale check stopped seeing the outer scale change.
+
+**About, Getting started and Gallery stay outside the tree, with a track of their own.** The user's call, over
+making them the tree's first entries: outside it they are not filtered by the search, do not scroll with the
+components, and keep the extra space that sets them apart, and moving them in would have cost all three.
+`PageNavLinkGroup` gives them the same hover look the tree has instead — a highlight floater drawn by
+`FloaterSolidUtils` with `renderPageHighlightFloater` and the tree's `TREE_DEFAULTS.floaterTransitionDurationMs`,
+following the hovered or keyboard-focused link. The track does not glide across into the tree; the two are
+separate on purpose. Their font matches the tree's top level and their color does not, also the user's call. A
+link drawn inside the group switches off its own `:hover` background through `isGliding`, so links outside one
+keep theirs.
 
 ### The floater appears and disappears through `ElementFader`, like every other library element that comes and goes
 
@@ -3582,6 +3640,21 @@ namespace and types are its API; a sample is an example and has none. **The `SVG
 two sample pages, `TimedGradients` and `TrackedGradients`, and a group is not a page, so the generator had an
 API with nowhere to show it. The user's call: a page of the group's own name goes first inside it, which is how
 they structure such a case generally, over flattening the two sample pages up beside it.
+
+**A table is headed by the name it is exported under, not by its symbol's own name.** `export * as
+BreadcrumbsStyles from "./Breadcrumbs.css"` aliases a whole module, and a module's symbol is named after its file
+path, so every `*Styles` table was headed by an absolute path from the machine that built it. The record now
+keeps `exported.getName()`, which is also what a consumer types.
+
+**Every Docs page carries an "On this page" table of contents on its right, built from the library's own
+`TableOfContents`.** The user's call, for every page rather than as a trial on one. Each group is a top-level link
+and each table with a heading an indented one under it; the `Components` table has no heading and gets no link.
+`toDocsTableOfContents` and the two id builders live in the shared `DocsView.utils.ts`, so the ports read the same ids and
+the same links from the same groups. It is left out when it would hold fewer than two links, sticks
+to the top of the page column while the tables scroll, and is hidden by a container query once the docs area is
+too narrow to hold both columns. It carries no visible caption, at the user's call: the list's place and its
+entries say what it is. It is still named, through `ariaLabel`, because the page already holds the left menu's
+navigation landmark and two unnamed ones cannot be told apart.
 
 ### The props tables are built beside the dev server, while the Playground is already in use
 
@@ -4027,6 +4100,40 @@ was run against it precisely because sixteen spec files press `Escape`, and none
 tests the element receiving focus and gives up when there is none — focus leaving for the document body or
 another window would otherwise leave a tooltip standing. The press-outside and focus-out paths it did take
 are near no-ops for a tooltip, since a pointer that presses elsewhere has already left the anchor.
+
+### A control's hovered item stays hovered while the pointer is on that item's tooltip
+
+`Tree` and `Listbox` mark the hovered item — the highlight floater follows it — and clear the mark on the
+container's `pointerleave`. An item's tooltip is portalled out of the container, so the pointer crossing from the
+item onto its tooltip was a leave: the Playground's left menu dropped its hover track while the preview for that
+very row was still up, leaving an open tooltip pointing at a row that no longer looked hovered. The tooltip
+already treats anchor and panel as one hover region (above); the control now does the same.
+
+**The tooltip is recognised through `aria-describedby`, not through a flag threaded up from `Tooltip`.**
+`TooltipUtils.findDescribingTooltip` takes the leave's `relatedTarget` and accepts it only if it sits inside a
+`role="tooltip"` whose id the hovered item is described by right now. `describe` sets that id only while the
+tooltip is showing for that anchor, so a tooltip still waiting out its delay, fading out, or showing for another
+item does not count. It needs no wiring through `InteractionWrapper` or `SharedTooltip`, works whether the tooltip
+is shared or per-item, and is the same in every framework because it reads the page rather than any component's
+state.
+
+**The hold ends on the first `pointerover` outside the tooltip**, via a document listener from
+`TooltipUtils.observePointerExit`. Landing back inside the control only ends the hold — the control's own
+`pointerover` has already set the new item, and clearing here would race it, since both listen at the document
+in Solid. Landing anywhere else clears the mark. A tooltip dismissed with Escape under a resting pointer is
+noticed on the next move, which was judged not worth a mutation observer.
+
+`TooltipSolidUtils.createHoverHold` packages the pair as the handler for the container's `pointerleave`.
+
+**A tooltip the item draws itself also sends the crossing as a `pointerover`.** It is portalled from inside the
+control, and both Solid and React pass delegated events up through a portal to where it was declared, so the
+pointer arriving on it reaches the control's own `pointerover` as a hover on no item and cleared the mark before the
+hold could matter. The hold therefore also answers `getIsOnTooltip`, and `Tree` and `Listbox` skip their
+`pointerover` handling for a target inside the hovered item's showing tooltip. The React port found it; the left
+menu never showed it, because its preview is a `SharedTooltip` declared outside the tree. Vue's `Teleport` and
+Svelte's portal pass nothing up, so neither needs the check, though it costs them nothing.
+`Tabs` and `RadioGroup` also clear on leave but take no per-item tooltips, so they do not use it; `Menu` never
+clears on leave and has nothing to fix.
 
 ### `Tooltip`: a hover waits, and a shared window lets the next one skip the wait
 
@@ -7075,6 +7182,14 @@ registration re-ran itself and the panel never settled on its expanded width. Po
 panel through `AnchorUtils.getStackingBase`, which reads ancestors' `z-index` from the document, so the
 registration bought nothing.
 
+**A collapse made from inside, under the pointer, pauses hover-expanding until the pointer leaves.** With
+`isExpandedOnHover` on, a collapse button inside the sidebar undid itself: the press collapsed the panel, and the
+pointer still resting on it counted as a hover — `HoverIntent` treats an anchor handed over while hovered as the
+pointer arriving, on purpose, for tooltips shared along a row — so the panel grew straight back. When `expanded` goes
+to `false` while the root matches `:hover`, the sidebar stops handing its root to `HoverIntent` until the root's next
+`mouseleave`. Whichever of the two effects runs first, nothing reopens it: a peek already scheduled is cancelled by the
+collapse, and one not yet scheduled finds no anchor.
+
 ### Controls: `FileInput` and `ColorInput`, where the UA owns the activation
 
 Both are the `TextInput` arrangement (overlay geometry, wrapper, flags, private
@@ -7519,6 +7634,27 @@ Relationships: "Information, structure, and relationships conveyed through prese
 determined" — the highlighted link is presentation, and `aria-current` is what makes it determinable; the
 indentation a depth draws is not exposed, which is the cost of the flat list above. 2.4.4 Link Purpose (In
 Context) was checked too: the purpose comes from the link's text, which is the consumer's heading text.
+
+**Two rules sit on top of the line, both the user's call once the Docs table of contents showed the gap.** With the line a
+fifth of the way down, a page whose last sections are short runs out of scroll before their headings reach it: on
+the Breadcrumbs Docs page, pressing `Breadcrumb<T>` scrolled correctly and marked `BreadcrumbsStyles`.
+
+**At the end of the scroll, the line drops to the bottom of what is on screen.** `observeCurrentIndex` finds the box
+the elements scroll in — `VirtualizerUtils.findScrollParent` from the last element, or the document's own scroller —
+and once `computeIsScrolledToEnd` says it can go no further, the last element whose top is on screen is current. A
+box that has not been scrolled at all never counts as at its end, so a page that fits on screen keeps the plain
+rule rather than marking its last section on load. This lives in the shared observer, so every framework has it.
+Padding the bottom of the page instead was rejected: it puts most of a screen of blank space under every article,
+and every consumer would have to know to add it.
+
+**A pressed link holds the mark until the reader does something of their own.** The end rule alone still marks the
+wrong link when the second-to-last one is pressed, since both headings are then on screen and the last wins. So
+the press pins its index, and `TableOfContentsUtils.observeNextReaderInput` releases it on the first wheel, touch,
+key or pointer press anywhere, listened for in the capture phase. Pressing another link releases the pin on its
+`pointerdown` or `keydown` and pins anew on its `click`. Releasing on any later scroll was considered and dropped,
+because the press's own scroll cannot be told apart from a later one once a consumer's `scroll-behavior: smooth`
+animates it. The cost is that a scroll from script alone keeps the pin, which is why the spec that scrolls back to
+the top now does it with the wheel. A scrollbar drag counts only where the browser reports a `pointerdown` for it.
 
 **Not built:** updating the address bar's fragment as the reader scrolls or presses a link, a nested list for
 the outline, and a `linkComponent`.

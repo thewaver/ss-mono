@@ -17,7 +17,15 @@ const isPointingRight = computed(() => (props.edge === "left") !== props.isExpan
 </script>
 
 <template>
-    <button type="button" :class="[styles.sidebarToggle, layerClass, flags.isHovered && styles.isHovered]">
+    <button
+        type="button"
+        :class="[
+            styles.sidebarToggle,
+            layerClass,
+            flags.isHovered && styles.isHovered,
+            flags.isDisabled && styles.isDisabled,
+        ]"
+    >
         <span aria-hidden="true">{{ isPointingRight ? OPEN_TOWARDS_RIGHT : OPEN_TOWARDS_LEFT }}</span>
     </button>
 </template>

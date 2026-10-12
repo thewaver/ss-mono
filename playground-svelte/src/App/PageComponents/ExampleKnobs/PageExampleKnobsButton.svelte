@@ -2,6 +2,7 @@
     import type { AnchorPlacement, DismisserReason } from "@thewaver/ss-components-svelte";
     import { InteractionWrapper, Popover, PopupTrigger } from "@thewaver/ss-components-svelte";
     import * as styles from "@thewaver/ss-playground/App/PageComponents/ExampleKnobs/ExampleKnobs.css";
+    import * as examplesStyles from "@thewaver/ss-playground/App/PageComponents/Examples/Examples.css";
 
     import PageTooltipContent from "../../StyledComponents/TooltipContent/TooltipContent.svelte";
     import PageLayer from "../Layer/Layer.svelte";
@@ -48,7 +49,7 @@
             }}
         >
             {#snippet renderContent()}
-                <span aria-hidden="true">{KNOBS_MARK}</span>
+                <span class={examplesStyles.exampleActionMark} aria-hidden="true">{KNOBS_MARK}</span>
             {/snippet}
         </PopupTrigger>
     {/snippet}

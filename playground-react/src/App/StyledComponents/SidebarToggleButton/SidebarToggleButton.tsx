@@ -17,7 +17,12 @@ export const PageSidebarToggleButton = (props: SidebarToggleButtonProps) => {
         <button
             {...others}
             type="button"
-            className={[styles.sidebarToggle, layerClass, flags.isHovered && styles.isHovered]
+            className={[
+                styles.sidebarToggle,
+                layerClass,
+                flags.isHovered && styles.isHovered,
+                flags.isDisabled && styles.isDisabled,
+            ]
                 .filter(Boolean)
                 .join(" ")}
         >

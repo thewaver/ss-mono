@@ -2,21 +2,14 @@
 import { computed, shallowRef, watch } from "vue";
 import { useRoute } from "vue-router";
 
-import { SharedTooltip, Sidebar, Tree } from "@thewaver/ss-components-vue";
+import { SharedTooltip, Sidebar, Tree, useViewportContext } from "@thewaver/ss-components-vue";
 import type { TreeNode } from "@thewaver/ss-components-vue";
 import * as styles from "@thewaver/ss-playground/App/App.css";
+import { LAYOUT } from "@thewaver/ss-playground/App/Layout.const";
 import { IS_BUILD_PROGRESS_SHOWN } from "@thewaver/ss-playground/App/PageComponents/BuildProgress/BuildProgress.utils";
 import { DEFAULT_PAGE_VIEW, toBaseRoute } from "@thewaver/ss-playground/App/PageComponents/ViewTabs/ViewTabs.const";
 
-import {
-    GALLERY_ROUTE,
-    GETTING_STARTED_ROUTE,
-    MENU_COLLAPSED_WIDTH,
-    MENU_EDGE,
-    MENU_EXPANDED_WIDTH,
-    MENU_ID,
-    SEARCH_FIELD_WIDTH,
-} from "./App.const";
+import { GALLERY_ROUTE, GETTING_STARTED_ROUTE, MENU_EDGE, MENU_ID, SEARCH_FIELD_WIDTH } from "./App.const";
 import type { ComponentConfig, MenuNodeConfig } from "./App.types";
 import { AppUtils } from "./App.utils";
 import PageBuildProgress from "./PageComponents/BuildProgress/PageBuildProgress.vue";
@@ -24,6 +17,7 @@ import PageTextField from "./PageComponents/Field/PageTextField.vue";
 import PageFrameworkMenu from "./PageComponents/FrameworkMenu/FrameworkMenu.vue";
 import PageLayer from "./PageComponents/Layer/Layer.vue";
 import PageNavLink from "./PageComponents/NavLink/NavLink.vue";
+import PageNavLinkGroup from "./PageComponents/NavLink/PageNavLinkGroup.vue";
 import type { ViewportAnchor } from "./PageComponents/NavSettings/NavSettings.types";
 import PageNavSettings from "./PageComponents/NavSettings/PageNavSettings.vue";
 import PageRouterLink from "./PageComponents/RouterLink/RouterLink.vue";
@@ -101,7 +95,15 @@ watch(
     { immediate: true },
 );
 
-const isMenuExpanded = computed(() => !isAutoHidden.value);
+const viewportContext = useViewportContext();
+
+const menuGutter = computed(() => Math.max(0, (viewportContext.getSize().width - LAYOUT.pageMaxWidth) / 2));
+
+const isMenuHideable = computed(() => viewportContext.getSize().width < LAYOUT.menuHideableBelow);
+
+const isMenuAutoHidden = computed(() => isMenuHideable.value && isAutoHidden.value);
+
+const isMenuExpanded = computed(() => !isMenuAutoHidden.value);
 
 const setIsMenuExpanded = (isExpanded: boolean) => {
     isAutoHidden.value = !isExpanded;
@@ -125,14 +127,14 @@ const computeNodeText = (node: TreeNode<MenuNodeConfig>) => node.value.name;
             <Sidebar
                 :id="MENU_ID"
                 :edge="MENU_EDGE"
-                :collapsed-size="MENU_COLLAPSED_WIDTH"
-                :expanded-size="MENU_EXPANDED_WIDTH"
-                :is-expanded-on-hover="isAutoHidden"
+                :collapsed-size="menuGutter + LAYOUT.menuCollapsedWidth"
+                :expanded-size="menuGutter + LAYOUT.menuExpandedWidth"
+                :is-expanded-on-hover="isMenuAutoHidden"
                 :expanded="isMenuExpanded"
                 @update:expanded="setIsMenuExpanded"
             >
                 <template #renderContent="{ phase, transitionDurationMs }">
-                    <nav :class="styles.leftMenu" aria-label="Library">
+                    <nav :class="styles.leftMenu" :style="{ paddingLeft: `${menuGutter}px` }" aria-label="Library">
                         <PageLayer :level="1">
                             <div :class="styles.leftMenuContent">
                                 <div :class="styles.searchContainer">
@@ -140,6 +142,7 @@ const computeNodeText = (node: TreeNode<MenuNodeConfig>) => node.value.name;
                                         :sidebar-id="MENU_ID"
                                         :edge="MENU_EDGE"
                                         :is-expanded="isMenuExpanded"
+                                        :is-disabled="!isMenuHideable"
                                         :ariaLabel="isMenuExpanded ? 'Auto-hide the menu' : 'Keep the menu open'"
                                         @toggle="setIsMenuExpanded(!isMenuExpanded)"
                                     />
@@ -193,15 +196,23 @@ const computeNodeText = (node: TreeNode<MenuNodeConfig>) => node.value.name;
                                     ]"
                                     :style="{ transitionDuration: `${transitionDurationMs}ms` }"
                                 >
-                                    <PageNavLink href="/" :is-selected="isAboutSelected">About</PageNavLink>
+                                    <PageNavLinkGroup>
+                                        <PageNavLink href="/" :is-selected="isAboutSelected" is-gliding
+                                            >About</PageNavLink
+                                        >
 
-                                    <PageNavLink :href="GETTING_STARTED_ROUTE" :is-selected="isGettingStartedSelected">
-                                        Getting started
-                                    </PageNavLink>
+                                        <PageNavLink
+                                            :href="GETTING_STARTED_ROUTE"
+                                            :is-selected="isGettingStartedSelected"
+                                            is-gliding
+                                        >
+                                            Getting started
+                                        </PageNavLink>
 
-                                    <PageNavLink :href="GALLERY_ROUTE" :is-selected="isGallerySelected">
-                                        Gallery
-                                    </PageNavLink>
+                                        <PageNavLink :href="GALLERY_ROUTE" :is-selected="isGallerySelected" is-gliding>
+                                            Gallery
+                                        </PageNavLink>
+                                    </PageNavLinkGroup>
                                 </div>
 
                                 <div

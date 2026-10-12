@@ -5,6 +5,7 @@ export type SidebarToggleProps = AccessorProps<{
     edge: SidebarEdge;
     isExpanded: boolean;
     ariaLabel: string;
+    isDisabled?: boolean;
 }> & {
     onToggle: () => void;
 };

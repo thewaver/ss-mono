@@ -1,3 +1,4 @@
+import type { Attachment } from "svelte/attachments";
 import type { ApiTable } from "virtual:component-api";
 
 export type PageDocsViewProps = {
@@ -7,4 +8,6 @@ export type PageDocsViewProps = {
 
 export type PageDocsTableProps = {
     table: ApiTable;
+    headingId: string;
+    attachHeading: Attachment<HTMLElement>;
 };

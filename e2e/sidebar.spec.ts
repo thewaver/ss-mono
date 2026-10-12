@@ -104,69 +104,134 @@ test("the owner's button keeps focus across the swap between layouts", async ({ 
 });
 
 /**
- * A popup opened from inside the sidebar is portaled out of it, so reaching it means the pointer leaves the
- * sidebar. The Playground's own menu is the case: hover-expanded, its settings pane open, the pointer on the
- * pane. The sidebar holds while something it opened is still open, and lets go on the next move outside once
- * that closes.
+ * The Playground's menu can only be hidden on a window too narrow to hold it beside the page at full size, so the
+ * tests that hide it run on one. Above that width the arrow stays where it is and does nothing.
  */
-test("a popup opened from inside keeps a hover-expanded sidebar open", async ({ page }) => {
-    const menuWidth = () =>
-        page.locator("#library-menu").evaluate((element) => (element.firstElementChild as HTMLElement).offsetWidth);
-
-    const openWidth = await menuWidth();
-
-    await page.locator('#library-menu button[aria-controls="library-menu"]').click();
-    await page.mouse.move(1000, 600);
-
-    await expect.poll(menuWidth, "auto-hide collapses the menu once the pointer is away").toBeLessThan(openWidth);
-    await page.waitForTimeout(SETTLE_MS);
-
-    const collapsedWidth = await menuWidth();
-
-    await page.locator("#library-menu").hover();
-    await expect.poll(menuWidth, "resting on the strip expands it").toBeGreaterThan(collapsedWidth);
-    await page.waitForTimeout(SETTLE_MS);
-
-    const expandedWidth = await menuWidth();
-
-    await page.getByRole("button", { name: "Library settings" }).click();
-
-    const pane = page.getByRole("dialog", { name: "Library settings" });
-
-    await pane.hover();
-    await page.mouse.move(1000, 600, { steps: 5 });
-    await page.waitForTimeout(SETTLE_MS);
-
-    expect(await menuWidth(), "the menu holds while its settings pane is open").toBe(expandedWidth);
-
-    await page.keyboard.press("Escape");
-    await expect(pane).toBeHidden();
-    await page.mouse.move(1050, 650, { steps: 3 });
-
-    await expect.poll(menuWidth, "and lets go on the next move once the pane has closed").toBe(collapsedWidth);
-});
-
-/**
- * The Playground's arrow is the whole auto-hide setting: pressed on the open menu it collapses it to the strip,
- * and it stays on the strip, where pressing it again keeps the menu open.
- */
-test("the menu's arrow switches auto-hide on and off", async ({ page }) => {
+test("the menu's arrow is disabled on a window wide enough for the whole page", async ({ page }) => {
     const arrow = page.locator('#library-menu button[aria-controls="library-menu"]');
     const menuWidth = () =>
         page.locator("#library-menu").evaluate((element) => (element.firstElementChild as HTMLElement).offsetWidth);
 
     const openWidth = await menuWidth();
 
-    await expect(arrow, "the arrow is there with the menu open").toHaveAttribute("aria-expanded", "true");
+    await expect(arrow, "the arrow is drawn").toBeVisible();
+    await expect(arrow, "and marked unavailable").toHaveAttribute("aria-disabled", "true");
 
-    await arrow.click();
+    await arrow.click({ force: true });
+    await page.waitForTimeout(SETTLE_MS);
 
-    await expect(arrow, "pressing it hides the menu").toHaveAttribute("aria-expanded", "false");
-    await expect.poll(menuWidth, "down to the strip").toBeLessThan(openWidth);
-    await expect(arrow, "and the arrow stays on the strip, as the way back").toBeVisible();
+    expect(await menuWidth(), "pressing it leaves the menu open").toBe(openWidth);
+});
 
-    await arrow.click();
+test.describe("on a window narrow enough to hide the menu", () => {
+    test.use({ viewport: { width: 1000, height: 1200 } });
 
-    await expect(arrow).toHaveAttribute("aria-expanded", "true");
-    await expect.poll(menuWidth, "pressing it again keeps the menu open").toBe(openWidth);
+    /**
+     * A popup opened from inside the sidebar is portaled out of it, so reaching it means the pointer leaves the
+     * sidebar. The Playground's own menu is the case: hover-expanded, its settings pane open, the pointer on the
+     * pane. The sidebar holds while something it opened is still open, and lets go on the next move outside once
+     * that closes.
+     */
+    test("a popup opened from inside keeps a hover-expanded sidebar open", async ({ page }) => {
+        const menuWidth = () =>
+            page.locator("#library-menu").evaluate((element) => (element.firstElementChild as HTMLElement).offsetWidth);
+
+        const openWidth = await menuWidth();
+
+        await page.locator('#library-menu button[aria-controls="library-menu"]').click();
+        await page.mouse.move(800, 600);
+
+        await expect.poll(menuWidth, "auto-hide collapses the menu once the pointer is away").toBeLessThan(openWidth);
+        await page.waitForTimeout(SETTLE_MS);
+
+        const collapsedWidth = await menuWidth();
+
+        await page.locator("#library-menu").hover();
+        await expect.poll(menuWidth, "resting on the strip expands it").toBeGreaterThan(collapsedWidth);
+        await page.waitForTimeout(SETTLE_MS);
+
+        const expandedWidth = await menuWidth();
+
+        await page.getByRole("button", { name: "Library settings" }).click();
+
+        const pane = page.getByRole("dialog", { name: "Library settings" });
+
+        await pane.hover();
+        await page.mouse.move(800, 600, { steps: 5 });
+        await page.waitForTimeout(SETTLE_MS);
+
+        expect(await menuWidth(), "the menu holds while its settings pane is open").toBe(expandedWidth);
+
+        await page.keyboard.press("Escape");
+        await expect(pane).toBeHidden();
+        await page.mouse.move(850, 650, { steps: 3 });
+
+        await expect.poll(menuWidth, "and lets go on the next move once the pane has closed").toBe(collapsedWidth);
+    });
+
+    /**
+     * The Playground's arrow is the whole auto-hide setting: pressed on the open menu it collapses it to the strip,
+     * and it stays on the strip, where pressing it again keeps the menu open.
+     */
+    test("the menu's arrow switches auto-hide on and off", async ({ page }) => {
+        const arrow = page.locator('#library-menu button[aria-controls="library-menu"]');
+        const menuWidth = () =>
+            page.locator("#library-menu").evaluate((element) => (element.firstElementChild as HTMLElement).offsetWidth);
+
+        const openWidth = await menuWidth();
+
+        await expect(arrow, "the arrow is there with the menu open").toHaveAttribute("aria-expanded", "true");
+
+        await arrow.click();
+
+        await expect(arrow, "pressing it hides the menu").toHaveAttribute("aria-expanded", "false");
+        await expect.poll(menuWidth, "down to the strip").toBeLessThan(openWidth);
+        await expect(arrow, "and the arrow stays on the strip, as the way back").toBeVisible();
+
+        await arrow.click();
+
+        await expect(arrow).toHaveAttribute("aria-expanded", "true");
+        await expect.poll(menuWidth, "pressing it again keeps the menu open").toBe(openWidth);
+    });
+
+    /**
+     * The arrow sits inside the menu, so pressing it leaves the pointer on the menu — and a menu that expands on hover
+     * would take that pointer for a hover and grow straight back, undoing the press. So a collapse made under the
+     * pointer pauses hover-expanding until the pointer has left once: the menu stays on the strip for longer than a
+     * hover takes, and only a fresh arrival expands it again.
+     */
+    test("hiding the menu from its arrow is not undone by the pointer that pressed it", async ({ page }) => {
+        const menu = page.locator("#library-menu");
+        const arrow = page.locator('#library-menu button[aria-controls="library-menu"]');
+        const menuWidth = () => menu.evaluate((element) => (element.firstElementChild as HTMLElement).offsetWidth);
+
+        const openWidth = await menuWidth();
+
+        await arrow.click();
+
+        await expect(arrow, "pressing it hides the menu").toHaveAttribute("aria-expanded", "false");
+        await expect.poll(menuWidth, "down to the strip").toBeLessThan(openWidth);
+        expect(
+            await menu.evaluate((element) => element.matches(":hover")),
+            "with the pointer still on the menu, which is the case being tested",
+        ).toBe(true);
+
+        await page.waitForTimeout(SETTLE_MS);
+
+        const collapsedWidth = await menuWidth();
+
+        await page.waitForTimeout(SETTLE_MS);
+
+        expect(await menuWidth(), "the resting pointer does not expand it again").toBe(collapsedWidth);
+
+        await page.mouse.move(800, 600);
+        await page.waitForTimeout(SETTLE_MS);
+
+        expect(await menuWidth(), "moving away leaves it where it was").toBe(collapsedWidth);
+
+        await menu.hover();
+
+        await expect.poll(menuWidth, "and coming back expands it by hover again").toBeGreaterThan(collapsedWidth);
+        await expect(arrow, "without touching the setting the press made").toHaveAttribute("aria-expanded", "false");
+    });
 });

@@ -21,7 +21,11 @@ export const PageSidebarToggleButton = (props: SidebarToggleButtonProps) => {
             {...others}
             type="button"
             class={styles.sidebarToggle}
-            classList={{ [getLayerClass()]: true, [styles.isHovered]: access(local.flags).isHovered }}
+            classList={{
+                [getLayerClass()]: true,
+                [styles.isHovered]: access(local.flags).isHovered,
+                [styles.isDisabled]: access(local.flags).isDisabled,
+            }}
         >
             <span aria-hidden="true">{getIsPointingRight() ? OPEN_TOWARDS_RIGHT : OPEN_TOWARDS_LEFT}</span>
         </button>

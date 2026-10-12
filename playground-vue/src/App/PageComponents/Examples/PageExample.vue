@@ -48,10 +48,13 @@ const tooltipDefs: InteractionTooltipDefs = {
                     <Button
                         v-if="example.path"
                         :id="`${example.key}Source`"
+                        :ariaLabel="`${example.name} source code`"
                         :tooltip-defs="tooltipDefs"
                         @click="async () => props.onViewSource()"
                     >
-                        <template #renderContent>{{ SOURCE_MARK }}</template>
+                        <template #renderContent>
+                            <span :class="styles.exampleActionMark" aria-hidden="true">{{ SOURCE_MARK }}</span>
+                        </template>
                     </Button>
 
                     <PageExampleKnobsButton v-if="renderKnobs" :example-key="example.key" :example-name="example.name">

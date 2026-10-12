@@ -16,6 +16,8 @@ import type { AccessorProps, MaybeAccessor } from "../../Utils/typeUtils";
 export type TableOfContentsItemProps<T> = AccessorProps<Omit<InteractionControlProps<TableOfContentsFlags>, "id">> & {
     /** The link this item stands for. */
     link: MaybeAccessor<TableOfContentsLink<T>>;
+    /** Runs once a press has taken the reader to the link's target. */
+    onGo: () => void;
 };
 
 export type TableOfContentsNameProps =
@@ -46,7 +48,9 @@ export type TableOfContentsProps<T> = TableOfContentsNameProps &
         gap?: number;
         /**
          * How far down the viewport the line sits that decides which section is current, as a share of its height. A
-         * section becomes current once its target's top has scrolled above the line.
+         * section becomes current once its target's top has scrolled above the line. Once the page is scrolled as far
+         * as it goes, the last section whose target is on screen is current instead, so short sections at the end are
+         * reached too. A pressed link is current until the reader scrolls, presses a key or presses anywhere else.
          */
         offsetRatio?: number;
     }> & {

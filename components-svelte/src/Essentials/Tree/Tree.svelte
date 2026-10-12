@@ -20,6 +20,7 @@
     import InteractionWrapper from "../../Primitives/InteractionWrapper/InteractionWrapper.svelte";
     import PlacementBox from "../../Primitives/PlacementBox/PlacementBox.svelte";
     import PlacementItem from "../../Primitives/PlacementItem/PlacementItem.svelte";
+    import { TooltipSvelteUtils } from "../Overlays/Tooltip/TooltipSvelte.utils.svelte.js";
     import { createHeldValue } from "../../Utils/bindableUtils.svelte.js";
     import { watchChange } from "../../Utils/effectUtils.svelte.js";
     import { toStyle } from "../../Utils/styleUtils.js";
@@ -258,6 +259,13 @@
         () => getValue(),
     );
 
+    const handlePointerLeave = TooltipSvelteUtils.createHoverHold(
+        () => (hoveredValue === undefined ? undefined : nodeRefs.get(hoveredValue)),
+        () => {
+            hoveredValue = undefined;
+        },
+    );
+
     const highlightFloater = createFloater(
         () => props.renderHighlightFloater !== undefined,
         () => hoveredValue ?? focusVisibleValue,
@@ -412,10 +420,7 @@
         on(element, "pointerover", (e) => {
             hoveredValue = findRowByTarget(e.target)?.node.value;
         })}
-    {@attach (element) =>
-        on(element, "pointerleave", () => {
-            hoveredValue = undefined;
-        })}
+    {@attach (element) => on(element, "pointerleave", handlePointerLeave)}
     class={styles.treeRoot}
     role="tree"
     aria-label={props.ariaLabel}

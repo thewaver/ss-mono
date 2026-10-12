@@ -1,13 +1,26 @@
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import type { ApiGroup, ApiGroupKind, ApiTableKind } from "virtual:component-api";
 
+import { TableOfContents } from "@thewaver/ss-components-react";
+import type { TableOfContentsLink } from "@thewaver/ss-components-react";
 import * as styles from "@thewaver/ss-playground/App/PageComponents/DocsView/DocsView.css";
-import { loadApiGroups, toHighlightedType } from "@thewaver/ss-playground/App/PageComponents/DocsView/DocsView.utils";
+import type { DocsTableOfContentsEntry } from "@thewaver/ss-playground/App/PageComponents/DocsView/DocsView.types";
+import {
+    loadApiGroups,
+    toDocsGroupId,
+    toDocsTableId,
+    toDocsTableOfContents,
+    toHighlightedType,
+} from "@thewaver/ss-playground/App/PageComponents/DocsView/DocsView.utils";
 
+import { PageTableOfContentsContent } from "../../StyledComponents/TableOfContentsContent/TableOfContentsContent";
 import type { PageDocsTableProps, PageDocsViewProps } from "./DocsView.types";
 
 const NO_DESCRIPTION = "Not written yet.";
 const USE_COLUMN = "Use";
+const TABLE_OF_CONTENTS_LABEL = "On this page";
+const TABLE_OF_CONTENTS_GAP = 4;
+const MIN_TABLE_OF_CONTENTS_LINKS = 2;
 
 const GROUP_TITLES: Record<ApiGroupKind, string> = {
     props: "Props",
@@ -30,7 +43,11 @@ const PageDocsTable = (props: PageDocsTableProps) => {
 
     return (
         <div className={styles.docsSection}>
-            {table.heading && <h3 className={styles.docsTableTitle}>{table.heading}</h3>}
+            {table.heading && (
+                <h3 ref={props.headingRef} id={props.headingId} className={styles.docsTableTitle}>
+                    {table.heading}
+                </h3>
+            )}
 
             {table.description && <p className={styles.docsDescription}>{table.description}</p>}
 
@@ -78,6 +95,7 @@ const PageDocsTable = (props: PageDocsTableProps) => {
 
 export const PageDocsView = (props: PageDocsViewProps) => {
     const [groups, setGroups] = useState<ApiGroup[]>();
+    const [headingRefs, setHeadingRefs] = useState<Record<string, HTMLElement>>({});
 
     useEffect(() => {
         let isCurrent = true;
@@ -90,24 +108,69 @@ export const PageDocsView = (props: PageDocsViewProps) => {
         };
     }, [props.name]);
 
+    const links = useMemo(
+        (): TableOfContentsLink<DocsTableOfContentsEntry>[] =>
+            toDocsTableOfContents(groups ?? [], GROUP_TITLES).map((entry) => ({
+                value: entry,
+                target: headingRefs[entry.id],
+                href: `#${entry.id}`,
+                depth: entry.depth,
+            })),
+        [groups, headingRefs],
+    );
+
+    const setHeadingRef = (id: string) => (element: HTMLElement | null) => {
+        if (!element) return;
+
+        setHeadingRefs((prev) => (prev[id] === element ? prev : { ...prev, [id]: element }));
+    };
+
     return (
-        <div className={styles.docsView} data-view={"docs"}>
-            <p className={styles.docsLead}>{props.description}</p>
+        <div className={styles.docsLayout} data-view={"docs"}>
+            <div className={styles.docsView}>
+                <p className={styles.docsLead}>{props.description}</p>
 
-            {groups === undefined ? null : groups.length ? (
-                groups.map((group) => (
-                    <section key={group.kind} className={styles.docsGroup} data-api-group={group.kind}>
-                        <h2 className={styles.docsGroupTitle}>{GROUP_TITLES[group.kind]}</h2>
+                {groups === undefined ? null : groups.length ? (
+                    groups.map((group) => (
+                        <section key={group.kind} className={styles.docsGroup} data-api-group={group.kind}>
+                            <h2
+                                ref={setHeadingRef(toDocsGroupId(group.kind))}
+                                id={toDocsGroupId(group.kind)}
+                                className={styles.docsGroupTitle}
+                            >
+                                {GROUP_TITLES[group.kind]}
+                            </h2>
 
-                        {group.tables.map((table, index) => (
-                            <PageDocsTable key={`${table.name}-${index}`} table={table} />
-                        ))}
-                    </section>
-                ))
-            ) : (
-                <p className={styles.docsEmpty}>
-                    {`${props.name} exports nothing of its own, so there is nothing to list.`}
-                </p>
+                            {group.tables.map((table, index) => (
+                                <PageDocsTable
+                                    key={`${table.name}-${index}`}
+                                    table={table}
+                                    headingId={toDocsTableId(group.kind, table.name)}
+                                    headingRef={setHeadingRef(toDocsTableId(group.kind, table.name))}
+                                />
+                            ))}
+                        </section>
+                    ))
+                ) : (
+                    <p className={styles.docsEmpty}>
+                        {`${props.name} exports nothing of its own, so there is nothing to list.`}
+                    </p>
+                )}
+            </div>
+
+            {links.length >= MIN_TABLE_OF_CONTENTS_LINKS && (
+                <aside className={styles.docsTableOfContents}>
+                    <TableOfContents
+                        links={links}
+                        gap={TABLE_OF_CONTENTS_GAP}
+                        ariaLabel={TABLE_OF_CONTENTS_LABEL}
+                        renderLink={(link, flags) => (
+                            <PageTableOfContentsContent flags={flags} depth={link.value.depth}>
+                                {link.value.title}
+                            </PageTableOfContentsContent>
+                        )}
+                    />
+                </aside>
             )}
         </div>
     );

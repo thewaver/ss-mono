@@ -13,6 +13,7 @@ export * from "./Abstracts/Dismisser/DismisserVue.utils";
 export * from "./Abstracts/ElementFader/ElementFaderVue.utils";
 export * from "./Abstracts/ElementObserver/ElementObserverVue.utils";
 export * from "./Abstracts/Elevation/ElevationVue.utils";
+export * from "./Abstracts/Floater/FloaterVue.utils";
 export * from "./Abstracts/FocusManager/FocusManagerVue.utils";
 export * from "./Abstracts/FrameRateMonitor/FrameRateMonitorVue.utils";
 export * from "./Abstracts/HoverIntent/HoverIntentVue.utils";

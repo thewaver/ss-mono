@@ -29,6 +29,7 @@ export const Sidebar = defineComponent(
 
         const isPeeking = shallowRef(false);
         const isWaitingOnPopup = shallowRef(false);
+        const isHoverPaused = shallowRef(false);
 
         const getTransitionDurationMs = () => props.transitionDurationMs ?? SIDEBAR_DEFAULTS.transitionDurationMs;
 
@@ -56,7 +57,7 @@ export const Sidebar = defineComponent(
         const delayGroup = HoverIntentUtils.createDelayGroup();
 
         const hoverIntent = HoverIntentVueUtils.useHoverIntent(
-            () => (props.isExpandedOnHover ? rootRef.value : undefined),
+            () => (props.isExpandedOnHover && !isHoverPaused.value ? rootRef.value : undefined),
             isPeeking,
             {
                 delayGroup,
@@ -73,6 +74,18 @@ export const Sidebar = defineComponent(
             isPeeking.value = false;
             isWaitingOnPopup.value = false;
         };
+
+        watchAfterRender([rootRef, isHoverPaused], ([root, isPaused]) => {
+            if (!root || !isPaused) return;
+
+            const resume = () => {
+                isHoverPaused.value = false;
+            };
+
+            root.addEventListener("mouseleave", resume);
+
+            return () => root.removeEventListener("mouseleave", resume);
+        });
 
         DismisserVueUtils.useLayer(isPeeking, {
             getRoots: () => [rootRef.value],
@@ -97,6 +110,8 @@ export const Sidebar = defineComponent(
                 }
 
                 collapseHover();
+
+                if (rootRef.value?.matches(":hover")) isHoverPaused.value = true;
             },
             { flush: "post" },
         );

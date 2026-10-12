@@ -19,6 +19,7 @@ const DEFAULT_LAYOUT = "grid" as const;
 const DEFAULT_MIN_COLUMN_WIDTH = 320;
 const SINGLE_SPAN = 1;
 const PERCENT = 100;
+const SOURCE_MARK = "</>";
 
 const PageFirstExample = (props: ExamplesProps) => (
     <For each={access(props.items).slice(0, 1)}>
@@ -73,6 +74,7 @@ export const PageExamples = (props: ExamplesProps) => {
                                             {example.path && (
                                                 <Button
                                                     id={() => `${example.key}Source`}
+                                                    ariaLabel={() => `${example.name} source code`}
                                                     tooltipDefs={() => ({
                                                         placement: () => ({ x: "center", y: "top_out" }),
                                                         offset: () => ({ x: 0, y: 10 }),
@@ -92,7 +94,11 @@ export const PageExamples = (props: ExamplesProps) => {
                                                         setActiveIndex(getExampleIndex());
                                                         setIsModalOpen(true);
                                                     }}
-                                                    renderContent={() => "</>"}
+                                                    renderContent={() => (
+                                                        <span class={styles.exampleActionMark} aria-hidden="true">
+                                                            {SOURCE_MARK}
+                                                        </span>
+                                                    )}
                                                 />
                                             )}
 

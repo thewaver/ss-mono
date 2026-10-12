@@ -37,6 +37,7 @@ import { watchAfterRender } from "../../Utils/effectUtils";
 import { callSlot, declareProps, useTwoWay } from "../../Utils/propUtils";
 import { toElement } from "../../Utils/refUtils";
 import type { SlotsContext } from "../../Utils/typeUtils";
+import { TooltipVueUtils } from "../Overlays/Tooltip/TooltipVue.utils";
 import type { TreeNodeItemProps, TreeProps, TreeRow, TreeSlots } from "./Tree.types";
 
 const EMPTY_PINNED_ROWS: number[] = [];
@@ -339,6 +340,17 @@ export const Tree = defineComponent(
             () => hoveredValue.value ?? focusVisibleValue.value,
         );
 
+        const handlePointerLeave = TooltipVueUtils.useHoverHold(
+            () => {
+                const nodeValue = hoveredValue.value;
+
+                return nodeValue === undefined ? undefined : nodeRefs.get(nodeValue);
+            },
+            () => {
+                hoveredValue.value = undefined;
+            },
+        );
+
         const findRowByTarget = (target: EventTarget | null) =>
             target instanceof Element ? findRowById(target.closest('[role="treeitem"]')?.id) : undefined;
 
@@ -508,9 +520,7 @@ export const Tree = defineComponent(
                     onPointerover={(e) => {
                         hoveredValue.value = findRowByTarget(e.target)?.node.value;
                     }}
-                    onPointerleave={() => {
-                        hoveredValue.value = undefined;
-                    }}
+                    onPointerleave={handlePointerLeave}
                 >
                     {currentLayout ? (
                         <PlacementBox layout={currentLayout} computeEffect={props.computeEffect}>

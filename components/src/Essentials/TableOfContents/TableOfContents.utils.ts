@@ -6,6 +6,9 @@ const TAB_INDEX_ATTRIBUTE = "tabindex";
 /** A `tabindex` that allows focus from script and from a link, but not from tabbing. */
 const PROGRAMMATIC_TAB_INDEX = "-1";
 
+/** What the reader does to move about a page of their own accord: a wheel, a touch, a key, a press. */
+const READER_INPUT_EVENTS = ["wheel", "touchstart", "keydown", "pointerdown"] as const;
+
 /**
  * The part of a table of contents that is not about drawing it: which section is current, and taking the reader to
  * one.
@@ -58,5 +61,36 @@ export namespace TableOfContentsUtils {
     export const goToTarget = (target: HTMLElement) => {
         target.scrollIntoView({ block: "start" });
         target.focus({ preventScroll: true });
+    };
+
+    /**
+     * Calls `onInput` the first time the reader turns a wheel, touches the screen, presses a key or presses a pointer
+     * anywhere in the document, then stops listening.
+     *
+     * A pressed link stays current until this fires. Scrolling to a section near the end of a page can stop short of
+     * putting its heading at the top, and then the line that decides the current section would land on a later one;
+     * the reader asked for this section, so it keeps the mark until they do something else. The scroll the press
+     * itself causes is not reader input, so it does not end the hold, and neither does a scroll made from script.
+     * Pressing another link ends it before that link's own press takes it over. Listening is in the capture phase,
+     * so nothing the page does with these events can hide them.
+     *
+     * @param onInput Called once, on the first input.
+     * @returns The function that stops listening without calling `onInput`.
+     */
+    export const observeNextReaderInput = (onInput: () => void) => {
+        const stop = () => {
+            for (const type of READER_INPUT_EVENTS) document.removeEventListener(type, handleInput, true);
+        };
+
+        const handleInput = () => {
+            stop();
+            onInput();
+        };
+
+        for (const type of READER_INPUT_EVENTS) {
+            document.addEventListener(type, handleInput, { capture: true, passive: true });
+        }
+
+        return stop;
     };
 }

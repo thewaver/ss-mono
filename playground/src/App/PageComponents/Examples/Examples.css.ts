@@ -1,5 +1,6 @@
 import { style, styleVariants } from "@vanilla-extract/css";
 
+import { layoutVars } from "../../Layout.css";
 import { themeVars } from "../../Theme.css";
 
 const examplesRoot = style({
@@ -77,4 +78,12 @@ export const exampleActions = style({
     display: "flex",
     alignItems: "center",
     gap: themeVars.spacing.double,
+});
+
+export const exampleActionMark = style({
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "center",
+    width: layoutVars.iconButtonSize,
+    height: layoutVars.iconButtonSize,
 });

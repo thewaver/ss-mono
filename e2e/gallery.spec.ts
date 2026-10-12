@@ -1,5 +1,7 @@
 import { type Locator, type Page, expect, test } from "@playwright/test";
 
+import { centerDistance } from "./helpers";
+
 /**
  * The gallery draws every page's first example as a tile, and the menu shows the same drawing beside a row the
  * pointer rests on. Both are found here by route — a tile carries its page's route in `data-testid`, a menu row
@@ -212,4 +214,58 @@ test("arrowing through the menu carries the preview with the focus", async ({ pa
         "aria-describedby",
         new RegExp(tooltipId!),
     );
+});
+
+const SETTLE_MS = 500;
+
+/**
+ * The menu marks the row under the pointer with its highlight floater, and the preview is drawn outside the menu, so
+ * carrying the pointer from a row onto that row's preview leaves the menu. That crossing is not the pointer going
+ * away: the preview is still up for that very row, and the row stays marked until the pointer has left both. The
+ * check is the floater's box against the row's, never where either sits.
+ *
+ * The drawing inside the preview is inert, which a pointer passes straight through, so the pointer is put on a spot
+ * the browser itself reports as part of the tooltip. It is carried there in one move, from the row straight onto the
+ * tooltip.
+ */
+test("a menu row stays marked while the pointer is on its preview", async ({ page }) => {
+    const tooltip = page.locator('[role="tooltip"]');
+    const highlight = menu(page).locator('[data-floater="highlight"]');
+    const [row] = await findPreviewedPair(page);
+
+    await row.hover();
+    await expect(tooltip, "resting on the row shows its preview").toBeVisible();
+    await expect(row).toHaveAttribute("aria-describedby", new RegExp((await tooltip.getAttribute("id"))!));
+    await expect.poll(() => centerDistance(highlight.locator(".."), row), "the row is marked").toBeLessThan(2);
+
+    const spot = await tooltip.evaluate((element) => {
+        const rect = element.getBoundingClientRect();
+        const STEPS = 12;
+
+        for (let across = 1; across < STEPS; across++) {
+            for (let down = 1; down < STEPS; down++) {
+                const x = rect.left + (rect.width * across) / STEPS;
+                const y = rect.top + (rect.height * down) / STEPS;
+
+                if (element.contains(document.elementFromPoint(x, y))) return { x, y };
+            }
+        }
+
+        return undefined;
+    });
+
+    expect(spot, "some part of the tooltip takes the pointer").toBeDefined();
+
+    await page.mouse.move(spot!.x, spot!.y);
+    await page.waitForTimeout(SETTLE_MS);
+
+    await expect(tooltip, "the preview is still up with the pointer on it").toBeVisible();
+    await expect(highlight, "the row is still marked").toHaveCount(1);
+    expect(await centerDistance(highlight.locator(".."), row), "and the mark is still on that row").toBeLessThan(2);
+
+    const viewport = page.viewportSize()!;
+
+    await page.mouse.move(viewport.width - 40, viewport.height - 40);
+
+    await expect(highlight, "once the pointer has left both, the mark plays out and goes").toHaveCount(0);
 });

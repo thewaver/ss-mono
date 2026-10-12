@@ -4,6 +4,12 @@ import { themeVars } from "../../Theme.css";
 import { layerVars } from "../Layer/Layer.css";
 
 export const isSelected = style({});
+export const isGliding = style({});
+
+export const navLinkGroup = style({
+    position: "relative",
+    isolation: "isolate",
+});
 
 export const navLinkContent = style({
     display: "block",
@@ -16,7 +22,7 @@ export const navLinkContent = style({
     transition: `background-color ${themeVars.animation.duration}`,
 
     selectors: {
-        "&:hover": {
+        [`&:hover:not(.${isGliding})`]: {
             backgroundColor: `rgb(from ${layerVars.contrast} r g b / 25%)`,
         },
     },

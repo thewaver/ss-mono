@@ -7,4 +7,6 @@ export type PageDocsViewProps = {
 
 export type PageDocsTableProps = {
     table: ApiTable;
+    headingId: string;
+    headingRef: (element: HTMLElement | null) => void;
 };

@@ -5,10 +5,14 @@ import PageSidebarToggleButton from "../../StyledComponents/SidebarToggleButton/
 import type { SidebarToggleProps } from "./SidebarToggle.types";
 
 const props = defineProps<SidebarToggleProps>();
+
+const handleClick = () => {
+    if (!props.isDisabled) props.onToggle();
+};
 </script>
 
 <template>
-    <InteractionWrapper>
+    <InteractionWrapper :is-disabled="isDisabled">
         <template #renderControl="{ setElementRef, flags }">
             <PageSidebarToggleButton
                 :ref="setElementRef"
@@ -18,7 +22,8 @@ const props = defineProps<SidebarToggleProps>();
                 :aria-label="ariaLabel"
                 :aria-expanded="isExpanded"
                 :aria-controls="sidebarId"
-                @click="props.onToggle()"
+                :aria-disabled="isDisabled || undefined"
+                @click="handleClick"
             />
         </template>
     </InteractionWrapper>
