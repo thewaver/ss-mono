@@ -27,11 +27,7 @@ export const RevealPage = () => {
     const [stepSize, setStepSize] = useState(REVEAL_DEFAULTS.stepSize);
     const [isDisabled, setIsDisabled] = useState(RevealKnobs.STARTING_IS_DISABLED);
 
-    const isCircle = shape === RevealKnobs.CIRCLE;
-
     const computePoints = useMemo(() => {
-        if (shape === RevealKnobs.CIRCLE) return undefined;
-
         return (size: Size2d) => ShapeConst.getDefaultShapePoints(shape, size);
     }, [shape]);
 
@@ -118,7 +114,6 @@ export const RevealPage = () => {
                         max={RevealKnobs.MAX_JOIN_RADIUS}
                         step={RevealKnobs.JOIN_RADIUS_STEP}
                         width={FIELD_WIDTH}
-                        isDisabled={isCircle}
                         ariaLabel={"Corner radius"}
                         onInput={setJoinRadius}
                     />
@@ -137,7 +132,6 @@ export const RevealPage = () => {
                         max={RevealKnobs.MAX_LAME_EXPONENT}
                         step={RevealKnobs.LAME_EXPONENT_STEP}
                         width={FIELD_WIDTH}
-                        isDisabled={isCircle}
                         ariaLabel={"Corner style"}
                         onInput={setLameExponent}
                     />

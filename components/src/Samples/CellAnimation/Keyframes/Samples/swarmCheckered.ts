@@ -4,6 +4,6 @@ import { swarmCcw } from "./swarmCcw";
 import { swarmCw } from "./swarmCw";
 
 export const swarmCheckered: CellAnimationFn = CellAnimationKeyframeUtils.fromZones(
-    [{ zone: "evenCheckeredCells", animation: swarmCw }],
+    [{ zone: "even_checkered_cells", animation: swarmCw }],
     swarmCcw,
 );

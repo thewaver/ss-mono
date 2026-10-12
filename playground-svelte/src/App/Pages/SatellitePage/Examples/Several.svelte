@@ -14,16 +14,16 @@
 
     const SATELLITES: SatelliteDefs[] = [
         {
-            placement: { x: "right-in", y: "top-in" },
+            placement: { x: "right_in", y: "top_in" },
             offset: { x: CORNER_OVERHANG, y: -CORNER_OVERHANG },
             renderSatellite: cornerBadge,
         },
         {
-            placement: { x: "left-out", y: "center" },
+            placement: { x: "left_out", y: "center" },
             renderSatellite: sideBadge,
         },
         {
-            placement: { x: "center", y: "bottom-out" },
+            placement: { x: "center", y: "bottom_out" },
             offset: { x: 0, y: -TUCKED_DEPTH },
             isBehindSubject: true,
             renderSatellite: tuckedBadge,

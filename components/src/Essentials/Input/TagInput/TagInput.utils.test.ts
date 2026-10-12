@@ -44,14 +44,14 @@ describe("computeFieldKeyAction", () => {
     });
 
     it("steps onto the last tag from an empty field on Backspace and the arrow pointing back", () => {
-        expect(TagInputUtils.computeFieldKeyAction("Backspace", empty)).toEqual({ kind: "focusTag", index: 1 });
-        expect(TagInputUtils.computeFieldKeyAction("ArrowLeft", empty)).toEqual({ kind: "focusTag", index: 1 });
+        expect(TagInputUtils.computeFieldKeyAction("Backspace", empty)).toEqual({ kind: "focus_tag", index: 1 });
+        expect(TagInputUtils.computeFieldKeyAction("ArrowLeft", empty)).toEqual({ kind: "focus_tag", index: 1 });
     });
 
     it("mirrors the arrow on a right-to-left page", () => {
         const rtl = { ...empty, direction: "rtl" as const };
 
-        expect(TagInputUtils.computeFieldKeyAction("ArrowRight", rtl)).toEqual({ kind: "focusTag", index: 1 });
+        expect(TagInputUtils.computeFieldKeyAction("ArrowRight", rtl)).toEqual({ kind: "focus_tag", index: 1 });
         expect(TagInputUtils.computeFieldKeyAction("ArrowLeft", rtl)).toBeUndefined();
     });
 
@@ -66,7 +66,7 @@ describe("computeTagKeyAction", () => {
     const state = { tagCount: 3, direction: "ltr" as const };
 
     it("hands a printable key back to the field to be typed there", () => {
-        expect(TagInputUtils.computeTagKeyAction(key("z"), 1, state)).toEqual({ kind: "focusField", isTyping: true });
+        expect(TagInputUtils.computeTagKeyAction(key("z"), 1, state)).toEqual({ kind: "focus_field", isTyping: true });
         expect(TagInputUtils.computeTagKeyAction(key("z", { ctrlKey: true }), 1, state)).toBeUndefined();
     });
 
@@ -76,11 +76,11 @@ describe("computeTagKeyAction", () => {
     });
 
     it("walks the tags, stopping at the first and returning to the field past the last", () => {
-        expect(TagInputUtils.computeTagKeyAction(key("ArrowLeft"), 1, state)).toEqual({ kind: "focusTag", index: 0 });
+        expect(TagInputUtils.computeTagKeyAction(key("ArrowLeft"), 1, state)).toEqual({ kind: "focus_tag", index: 0 });
         expect(TagInputUtils.computeTagKeyAction(key("ArrowLeft"), 0, state)).toBeUndefined();
-        expect(TagInputUtils.computeTagKeyAction(key("ArrowRight"), 1, state)).toEqual({ kind: "focusTag", index: 2 });
+        expect(TagInputUtils.computeTagKeyAction(key("ArrowRight"), 1, state)).toEqual({ kind: "focus_tag", index: 2 });
         expect(TagInputUtils.computeTagKeyAction(key("ArrowRight"), 2, state)).toEqual({
-            kind: "focusField",
+            kind: "focus_field",
             isTyping: false,
         });
     });
@@ -88,15 +88,15 @@ describe("computeTagKeyAction", () => {
     it("mirrors the walk on a right-to-left page", () => {
         const rtl = { ...state, direction: "rtl" as const };
 
-        expect(TagInputUtils.computeTagKeyAction(key("ArrowRight"), 1, rtl)).toEqual({ kind: "focusTag", index: 0 });
-        expect(TagInputUtils.computeTagKeyAction(key("ArrowLeft"), 1, rtl)).toEqual({ kind: "focusTag", index: 2 });
+        expect(TagInputUtils.computeTagKeyAction(key("ArrowRight"), 1, rtl)).toEqual({ kind: "focus_tag", index: 0 });
+        expect(TagInputUtils.computeTagKeyAction(key("ArrowLeft"), 1, rtl)).toEqual({ kind: "focus_tag", index: 2 });
     });
 });
 
 describe("getIsKeyTaken", () => {
     it("takes every key but one being typed into the field", () => {
         expect(TagInputUtils.getIsKeyTaken({ kind: "add" })).toBe(true);
-        expect(TagInputUtils.getIsKeyTaken({ kind: "focusField", isTyping: false })).toBe(true);
-        expect(TagInputUtils.getIsKeyTaken({ kind: "focusField", isTyping: true })).toBe(false);
+        expect(TagInputUtils.getIsKeyTaken({ kind: "focus_field", isTyping: false })).toBe(true);
+        expect(TagInputUtils.getIsKeyTaken({ kind: "focus_field", isTyping: true })).toBe(false);
     });
 });

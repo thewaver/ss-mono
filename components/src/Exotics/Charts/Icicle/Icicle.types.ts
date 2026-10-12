@@ -12,7 +12,7 @@ export type IcicleSpan = {
     column: number;
 };
 
-export type IcicleStep = "up" | "down" | "toParent" | "toChildren" | "first" | "last";
+export type IcicleStep = "up" | "down" | "to_parent" | "to_children" | "first" | "last";
 
 export type IcicleCellState = {
     /** Where the cell sits at this moment, in pixels from the icicle's top left corner. */

@@ -14,7 +14,7 @@ export const ReachableExample = (props: Props) => (
         isReachableWhenDisabled={true}
         renderContent={(flags) => <PageToggleContent flags={flags} />}
         tooltipDefs={{
-            placement: { x: "center", y: "top-out" },
+            placement: { x: "center", y: "top_out" },
             offset: { x: 0, y: 10 },
             renderContent: (visibilityTarget, transitionDurationMs) => (
                 <PageTooltipContent visibilityTarget={visibilityTarget} transitionDurationMs={transitionDurationMs}>

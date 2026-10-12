@@ -11,8 +11,8 @@ export namespace SlotTextKnobs {
     export const MAX_CASCADE_MS = 500;
     export const CASCADE_STEP_MS = 10;
     export const STARTING_REEL_KEY: SlotTextReels.SampleKey = "left_to_right";
-    export const STARTING_WORD_MECHANISM: SlotTextMechanism = "splitFlap";
+    export const STARTING_WORD_MECHANISM: SlotTextMechanism = "split_flap";
     export const STARTING_LETTER_ROUTE: SlotTextLetterRoute = "forward";
-    export const MECHANISMS: SlotTextMechanism[] = ["drum", "splitFlap"];
+    export const MECHANISMS: SlotTextMechanism[] = ["drum", "split_flap"];
     export const LETTER_ROUTES: SlotTextLetterRoute[] = ["forward", "shortest"];
 }

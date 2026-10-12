@@ -65,7 +65,7 @@ export const TextInput = defineComponent(
         };
 
         const cursor = ListboxVueUtils.useCursor<T>({
-            focusModel: "activeDescendant",
+            focusModel: "active_descendant",
             isHighlightExplicit: true,
             listboxId,
             options,

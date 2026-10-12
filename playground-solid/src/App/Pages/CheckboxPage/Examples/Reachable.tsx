@@ -14,7 +14,7 @@ export const ReachableExample = (props: Props) => (
         isReachableWhenDisabled={true}
         renderContent={(getFlags) => <PageCheckboxContent flags={getFlags} />}
         tooltipDefs={() => ({
-            placement: () => ({ x: "center", y: "top-out" }),
+            placement: () => ({ x: "center", y: "top_out" }),
             offset: () => ({ x: 0, y: 10 }),
             hoverShowDelayMs: 0,
             renderContent: (getVisibilityTarget, getTransitionDurationMs) => (

@@ -107,7 +107,7 @@ describe("expand and collapse", () => {
     });
 });
 
-describe("expandSiblings", () => {
+describe("expand_siblings", () => {
     it("opens every branch beside a row, leaving leaves alone", () => {
         const { rows, flatRows } = flatOf(NODES, ["src"]);
         const indexRow = flatRows.find((row) => row.node.value === "index.ts")!;
@@ -168,7 +168,7 @@ describe("computeKeyAction", () => {
     });
 
     it("claims the asterisk before the search can, and searches with anything else printable", () => {
-        expect(actionOf("*", "src", [], "*")).toBe("expandSiblings src");
+        expect(actionOf("*", "src", [], "*")).toBe("expand_siblings src");
         expect(actionOf("p", "src", [], "p")).toBe("focus package.json");
         expect(actionOf("z", "src", [], "z")).toBe("claim");
     });

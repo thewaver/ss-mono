@@ -4,13 +4,13 @@ export type ToastsVerticalAlignment = "top" | "middle" | "bottom";
 
 export type ToastsHorizontalAlignment = "left" | "center" | "right";
 
-export type ToastsAlignment = `${ToastsVerticalAlignment}-${ToastsHorizontalAlignment}`;
+export type ToastsAlignment = `${ToastsVerticalAlignment}_${ToastsHorizontalAlignment}`;
 
 export type ToastsDir = "column" | "column-reverse" | "row" | "row-reverse";
 
 export type ToastsAriaLive = "polite" | "assertive";
 
-export type ToastsOverflow = "dismiss-oldest" | "hold-newest";
+export type ToastsOverflow = "dismiss_oldest" | "hold_newest";
 
 export type ToastsStackAlignment = {
     justifyContent: "flex-start" | "center" | "flex-end";

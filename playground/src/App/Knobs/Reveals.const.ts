@@ -3,8 +3,7 @@ import { ShapeConst } from "@thewaver/ss-utils";
 import type { RevealShape } from "../Pages/Reveals/RevealPage/RevealPage.types";
 
 export namespace RevealKnobs {
-    export const CIRCLE = "circle";
-    export const SHAPES: readonly RevealShape[] = [CIRCLE, ...ShapeConst.DEFAULT_SHAPES];
+    export const SHAPES: readonly RevealShape[] = ShapeConst.DEFAULT_SHAPES;
 
     export const MIN_RADIUS = 20;
     export const MAX_RADIUS = 220;
@@ -18,7 +17,7 @@ export namespace RevealKnobs {
     export const MIN_SOFTNESS = 0;
     export const MAX_SOFTNESS = 1;
     export const SOFTNESS_STEP = 0.05;
-    export const STARTING_SHAPE: RevealShape = CIRCLE;
+    export const STARTING_SHAPE: RevealShape = "hectogon";
     export const STARTING_JOIN_RADIUS = 0;
     export const STARTING_LAME_EXPONENT = 1;
     export const STARTING_IS_DISABLED = false;

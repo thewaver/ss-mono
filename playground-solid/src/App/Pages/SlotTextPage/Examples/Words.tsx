@@ -9,7 +9,7 @@ const CHARACTER_SIZE = { width: 34, height: 52 };
 type Props = SlotTextWordsExampleProps;
 
 export const WordsExample = (props: Props) => {
-    const getTileClass = () => (access(props.mechanism) === "splitFlap" ? styles.flapTile : styles.digit);
+    const getTileClass = () => (access(props.mechanism) === "split_flap" ? styles.flapTile : styles.digit);
 
     return (
         <SlotText

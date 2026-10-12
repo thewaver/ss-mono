@@ -2,20 +2,21 @@ import { describe, expect, it } from "vitest";
 
 import { Index2d, type Point2d, ShapeConst, type Size2d } from "@thewaver/ss-utils";
 
+import type { TileBoardTilingKind } from "./TileBoard.types";
 import { TileBoardUtils } from "./TileBoard.utils";
 
 const COUNT: Index2d = { row: 5, col: 4 };
 const TILE: Size2d = { width: 80, height: 60 };
 
-const layoutOf = (shape: ShapeConst.DefaultShape, hasShortFirstRow = false) =>
-    TileBoardUtils.getLayout(shape, COUNT, TILE, hasShortFirstRow, 1);
+const layoutOf = (tiling: TileBoardTilingKind, hasShortFirstRow = false) =>
+    TileBoardUtils.getLayout(tiling, COUNT, TILE, hasShortFirstRow, 1);
 
-const HEXAGON = layoutOf("hexagon-pointy-top");
-const FLAT_HEXAGON = layoutOf("hexagon-flat-top");
+const HEXAGON = layoutOf("hexagon_pointy_top");
+const FLAT_HEXAGON = layoutOf("hexagon_flat_top");
 const LOZENGE = layoutOf("lozenge");
 const SQUARE = layoutOf("square");
-const TRIANGLE = layoutOf("triangle-up");
-const SIDEWAYS_TRIANGLE = layoutOf("triangle-right");
+const TRIANGLE = layoutOf("triangle_up");
+const SIDEWAYS_TRIANGLE = layoutOf("triangle_right");
 
 const at = (row: number, col: number): Index2d => ({ row, col });
 
@@ -38,7 +39,7 @@ describe("getTiling", () => {
     it("turns a flat-top hexagon's spacing through the other axis", () => {
         expect(FLAT_HEXAGON.pitch).toEqual({ width: 120, height: 30 });
         expect(FLAT_HEXAGON.hasOffsetRows).toBe(true);
-        expect(FLAT_HEXAGON.neighborhood, "and its two upright neighbors with it").toBe("diagonalAndDown");
+        expect(FLAT_HEXAGON.neighborhood, "and its two upright neighbors with it").toBe("diagonal_and_down");
     });
 
     it("packs lozenges twice as tightly down as squares, which do not interlock at all", () => {
@@ -50,19 +51,19 @@ describe("getTiling", () => {
     it("overlaps triangles by half a tile across and turns every other one over", () => {
         expect(TRIANGLE.pitch).toEqual({ width: 40, height: 60 });
         expect(TRIANGLE.hasOffsetRows).toBe(false);
-        expect(TRIANGLE.tileFlip).toBe("topToBottom");
+        expect(TRIANGLE.tileFlip).toBe("top_to_bottom");
     });
 
     it("turns a sideways triangle's overlap through the other axis and turns it over the other way", () => {
         expect(SIDEWAYS_TRIANGLE.pitch).toEqual({ width: 80, height: 30 });
         expect(SIDEWAYS_TRIANGLE.hasOffsetRows).toBe(false);
-        expect(SIDEWAYS_TRIANGLE.tileFlip).toBe("leftToRight");
+        expect(SIDEWAYS_TRIANGLE.tileFlip).toBe("left_to_right");
     });
 });
 
 describe("the tiling table against the shapes it was written for", () => {
     it("puts a pointy-top hexagon's shoulders a quarter of the way down", () => {
-        const points = ShapeConst.getDefaultShapePoints("hexagon-pointy-top", TILE);
+        const points = ShapeConst.getDefaultShapePoints("hexagon_pointy_top", TILE);
         const shoulder = Math.min(...points.filter((point) => point.x === 0).map((point) => point.y));
 
         expect(TILE.height - shoulder).toBe(HEXAGON.pitch.height);
@@ -76,7 +77,7 @@ describe("the tiling table against the shapes it was written for", () => {
     });
 
     it("starts a flat-top hexagon's top edge a quarter of the way across", () => {
-        const points = ShapeConst.getDefaultShapePoints("hexagon-flat-top", TILE);
+        const points = ShapeConst.getDefaultShapePoints("hexagon_flat_top", TILE);
         const shoulder = Math.min(...points.filter((point) => point.y === 0).map((point) => point.x));
 
         expect((TILE.width - shoulder) * 2).toBe(FLAT_HEXAGON.pitch.width);
@@ -84,14 +85,14 @@ describe("the tiling table against the shapes it was written for", () => {
     });
 
     it("puts a triangle's apex halfway across, which is the half-tile overlap", () => {
-        const points = ShapeConst.getDefaultShapePoints("triangle-up", TILE);
+        const points = ShapeConst.getDefaultShapePoints("triangle_up", TILE);
         const apex = points.find((point) => point.y === 0)!;
 
         expect(apex.x).toBe(TRIANGLE.pitch.width);
     });
 
     it("puts a sideways triangle's apex halfway down, which is the same overlap turned", () => {
-        const points = ShapeConst.getDefaultShapePoints("triangle-right", TILE);
+        const points = ShapeConst.getDefaultShapePoints("triangle_right", TILE);
         const apex = points.find((point) => point.x === TILE.width)!;
 
         expect(apex.y).toBe(SIDEWAYS_TRIANGLE.pitch.height);
@@ -101,20 +102,20 @@ describe("the tiling table against the shapes it was written for", () => {
 
 describe("getTilePoints", () => {
     it("turns a triangle over rather than drawing a second shape for it", () => {
-        const flipped = TileBoardUtils.getTilePoints("triangle-up", TILE, true);
+        const flipped = TileBoardUtils.getTilePoints("triangle_up", TILE, true);
 
-        expect(flipped).toEqual(ShapeConst.getDefaultShapePoints("triangle-down", TILE));
+        expect(flipped).toEqual(ShapeConst.getDefaultShapePoints("triangle_down", TILE));
     });
 
     it("turns a sideways triangle over the other way, so it lands on the one pointing back", () => {
-        const flipped = TileBoardUtils.getTilePoints("triangle-right", TILE, true);
+        const flipped = TileBoardUtils.getTilePoints("triangle_right", TILE, true);
 
-        expect(fromTopLeft(flipped)).toEqual(fromTopLeft(ShapeConst.getDefaultShapePoints("triangle-left", TILE)));
+        expect(fromTopLeft(flipped)).toEqual(fromTopLeft(ShapeConst.getDefaultShapePoints("triangle_left", TILE)));
     });
 
     it("leaves a shape alone when nothing is turned over", () => {
-        expect(TileBoardUtils.getTilePoints("triangle-up", TILE, false)).toEqual(
-            ShapeConst.getDefaultShapePoints("triangle-up", TILE),
+        expect(TileBoardUtils.getTilePoints("triangle_up", TILE, false)).toEqual(
+            ShapeConst.getDefaultShapePoints("triangle_up", TILE),
         );
     });
 });
@@ -140,7 +141,7 @@ describe("getRowLength", () => {
     });
 
     it("starts on the short row when it is asked to", () => {
-        const layout = layoutOf("hexagon-pointy-top", true);
+        const layout = layoutOf("hexagon_pointy_top", true);
 
         expect(TileBoardUtils.getRowLength(0, layout)).toBe(3);
         expect(TileBoardUtils.getRowLength(1, layout)).toBe(4);
@@ -153,7 +154,7 @@ describe("getRowLength", () => {
     });
 
     it("never reports a negative length for a board one tile wide", () => {
-        const layout = TileBoardUtils.getLayout("hexagon-pointy-top", { row: 2, col: 1 }, TILE, false, 1);
+        const layout = TileBoardUtils.getLayout("hexagon_pointy_top", { row: 2, col: 1 }, TILE, false, 1);
 
         expect(TileBoardUtils.getRowLength(1, layout)).toBe(0);
     });
@@ -188,7 +189,7 @@ describe("getTileCenter", () => {
     });
 
     it("is the middle of the tile's box, which a gap does not move", () => {
-        const gapped = TileBoardUtils.getLayout("hexagon-pointy-top", COUNT, TILE, false, 1);
+        const gapped = TileBoardUtils.getLayout("hexagon_pointy_top", COUNT, TILE, false, 1);
 
         expect(TileBoardUtils.getTileCenter({ row: 2, col: 3 }, gapped)).toEqual({ x: 280, y: 120 });
     });
@@ -203,20 +204,20 @@ describe("getBoardSize", () => {
     });
 
     it("is one tile in each direction for a board of one, where nothing overlaps anything", () => {
-        const layout = TileBoardUtils.getLayout("hexagon-pointy-top", { row: 1, col: 1 }, TILE, false, 1);
+        const layout = TileBoardUtils.getLayout("hexagon_pointy_top", { row: 1, col: 1 }, TILE, false, 1);
 
         expect(TileBoardUtils.getBoardSize(layout)).toEqual({ width: 80, height: 60 });
     });
 
     it("takes no room at all when there is nothing to lay out", () => {
-        const layout = TileBoardUtils.getLayout("hexagon-pointy-top", { row: 0, col: 4 }, TILE, false, 1);
+        const layout = TileBoardUtils.getLayout("hexagon_pointy_top", { row: 0, col: 4 }, TILE, false, 1);
 
         expect(TileBoardUtils.getBoardSize(layout)).toEqual({ width: 0, height: 0 });
     });
 });
 
 describe("the taper", () => {
-    const TAPERED = TileBoardUtils.getLayout("hexagon-pointy-top", COUNT, TILE, false, 0.5);
+    const TAPERED = TileBoardUtils.getLayout("hexagon_pointy_top", COUNT, TILE, false, 0.5);
     const FLAT_SIZE = TileBoardUtils.getBoardSize(HEXAGON);
 
     const applyTransform = (transform: string, point: Point2d): Point2d => {
@@ -501,7 +502,7 @@ describe("getShortestRoute", () => {
 describe("getLastTile", () => {
     it("lands on the end of the last row, whichever kind of row that is", () => {
         expect(TileBoardUtils.getLastTile(HEXAGON)).toEqual({ row: 4, col: 3 });
-        expect(TileBoardUtils.getLastTile(layoutOf("hexagon-pointy-top", true))).toEqual({ row: 4, col: 2 });
+        expect(TileBoardUtils.getLastTile(layoutOf("hexagon_pointy_top", true))).toEqual({ row: 4, col: 2 });
     });
 });
 
@@ -563,7 +564,7 @@ describe("computeNextTile", () => {
     });
 
     it("answers nothing for an empty board rather than an index nothing can hold", () => {
-        const layout = TileBoardUtils.getLayout("hexagon-pointy-top", { row: 0, col: 0 }, TILE, false, 1);
+        const layout = TileBoardUtils.getLayout("hexagon_pointy_top", { row: 0, col: 0 }, TILE, false, 1);
 
         expect(TileBoardUtils.computeNextTile("ArrowRight", { row: 0, col: 0 }, layout)).toBeUndefined();
     });
@@ -612,5 +613,118 @@ describe("getTileBoxSize and getRowOrigin", () => {
             x: TileBoardUtils.getRowOffset(1, HEXAGON) + 2,
             y: TileBoardUtils.getRowTop(1, HEXAGON) + 2,
         });
+    });
+});
+
+describe("tilings that cut a box into pieces", () => {
+    const HALVES = layoutOf("triangle_rtl");
+    const FALLING_HALVES = layoutOf("triangle_ltr");
+    const QUARTERS = layoutOf("square_quarters");
+    const DIAMONDS = layoutOf("lozenge_quarters");
+    const CUT = [HALVES, FALLING_HALVES, QUARTERS, DIAMONDS];
+
+    const absolutePoints = (tile: Index2d, layout: typeof HALVES, gap: number) => {
+        const geometry = TileBoardUtils.getTileGeometry(tile, layout, gap);
+        const origin = TileBoardUtils.getRowOrigin(tile.row, layout, gap);
+
+        return geometry.points.map((point) => ({
+            x: origin.x + geometry.offset.x + point.x,
+            y: origin.y + geometry.offset.y + point.y,
+        }));
+    };
+
+    const areaOf = (points: Point2d[]) =>
+        Math.abs(
+            points.reduce((sum, point, index) => {
+                const next = points[(index + 1) % points.length];
+
+                return sum + point.x * next.y - next.x * point.y;
+            }, 0) * 0.5,
+        );
+
+    it("counts boxes, so a row holds two halves or four quarters for every column asked for", () => {
+        expect(HALVES.pitch).toEqual({ width: 80, height: 60 });
+        expect(TileBoardUtils.getRowLength(0, HALVES)).toBe(8);
+        expect(TileBoardUtils.getColumnCount(QUARTERS)).toBe(16);
+        expect(TileBoardUtils.getBoardSize(HALVES)).toEqual(TileBoardUtils.getBoardSize(SQUARE));
+        expect(TileBoardUtils.getBoardSize(QUARTERS)).toEqual(TileBoardUtils.getBoardSize(SQUARE));
+        expect(TileBoardUtils.getLastTile(QUARTERS)).toEqual(at(4, 15));
+    });
+
+    it("covers the board exactly, with no gap left and none of it covered twice", () => {
+        for (const layout of CUT) {
+            let covered = 0;
+
+            for (let row = 0; row < COUNT.row; row++) {
+                for (let col = 0; col < TileBoardUtils.getRowLength(row, layout); col++) {
+                    covered += areaOf(absolutePoints(at(row, col), layout, 0));
+                }
+            }
+
+            const size = TileBoardUtils.getBoardSize(layout);
+
+            expect(covered, layout.tiling).toBeCloseTo(size.width * size.height);
+        }
+    });
+
+    it("cuts from the top left down for ltr and from the top right down for rtl", () => {
+        expect(absolutePoints(at(0, 0), FALLING_HALVES, 0)).toEqual(
+            ShapeConst.getDefaultShapePoints("triangle_bottom_left", TILE),
+        );
+        expect(absolutePoints(at(0, 0), HALVES, 0)).toEqual(
+            ShapeConst.getDefaultShapePoints("triangle_top_left", TILE),
+        );
+    });
+
+    it("gives a half its three, clockwise from the top", () => {
+        expect(TileBoardUtils.getNeighborTiles(at(2, 2), HALVES)).toEqual([at(1, 3), at(2, 3), at(2, 1)]);
+    });
+
+    it("gives a quarter the two beside it in its own box and the one across the box edge", () => {
+        expect(TileBoardUtils.getNeighborTiles(at(2, 1), QUARTERS)).toEqual([at(1, 2), at(2, 3), at(2, 0)]);
+    });
+
+    it("turns the cut every other box for a board of diamonds", () => {
+        expect(TileBoardUtils.getNeighborTiles(at(2, 2), DIAMONDS)).toEqual([at(2, 3), at(3, 2), at(2, 1)]);
+    });
+
+    it("finds every neighbor from both sides, and three for a tile clear of the edges", () => {
+        for (const layout of CUT) {
+            for (let row = 0; row < COUNT.row; row++) {
+                for (let col = 0; col < TileBoardUtils.getRowLength(row, layout); col++) {
+                    for (const neighbor of TileBoardUtils.getNeighborTiles(at(row, col), layout)) {
+                        expect(TileBoardUtils.getNeighborTiles(neighbor, layout), layout.tiling).toContainEqual(
+                            at(row, col),
+                        );
+                    }
+                }
+            }
+
+            expect(TileBoardUtils.getNeighborTiles(at(2, 1), layout), layout.tiling).toHaveLength(3);
+        }
+    });
+
+    it("puts the whole gap between two halves across their cut, not only along the box edges", () => {
+        const [, from, to] = absolutePoints(at(0, 0), HALVES, 4);
+        const [across] = absolutePoints(at(0, 1), HALVES, 4);
+        const cut = { x: to.x - from.x, y: to.y - from.y };
+        const distance = Math.abs((across.x - from.x) * cut.y - (across.y - from.y) * cut.x) / Math.hypot(cut.x, cut.y);
+
+        expect(distance).toBeCloseTo(4);
+    });
+
+    it("stands a piece at a half's middle, not on the cut where the box's middle falls", () => {
+        const center = TileBoardUtils.getTileCenter(at(0, 0), HALVES);
+
+        expect(center.x).toBeCloseTo(TILE.width / 3);
+        expect(center.y).toBeCloseTo(TILE.height / 3);
+    });
+
+    it("packs hectogons as tightly as circles go, rows √3/2 apart with six around each", () => {
+        const layout = layoutOf("hectogon");
+
+        expect(layout.pitch.width).toBe(TILE.width);
+        expect(layout.pitch.height).toBeCloseTo((TILE.height * Math.sqrt(3)) / 2);
+        expect(TileBoardUtils.getNeighborTiles(at(2, 2), layout)).toHaveLength(6);
     });
 });

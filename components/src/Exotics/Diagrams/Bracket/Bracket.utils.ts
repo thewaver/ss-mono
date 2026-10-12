@@ -143,7 +143,7 @@ export namespace BracketUtils {
      * Moving towards the leaves lands on the middle feeder rather than the first, so repeatedly stepping
      * in and back out returns to where it started rather than drifting to one side.
      *
-     * @param step `"toRoot"`, `"toLeaves"`, `"next"`, `"previous"`, `"first"` or `"last"`. The last four
+     * @param step `"to_root"`, `"to_leaves"`, `"next"`, `"previous"`, `"first"` or `"last"`. The last four
      * move within the current layer.
      * @param fromId Where the cursor is now.
      * @param placements The matches the walk may land on. A caller that skips disabled matches passes
@@ -157,9 +157,9 @@ export namespace BracketUtils {
 
         if (!from) return undefined;
 
-        if (step === "toRoot") return findPlacement(placements, from.parentId)?.id;
+        if (step === "to_root") return findPlacement(placements, from.parentId)?.id;
 
-        if (step === "toLeaves") {
+        if (step === "to_leaves") {
             const children = from.childIds.filter((id) => findPlacement(placements, id) !== undefined);
 
             if (!children.length) return undefined;
@@ -362,8 +362,8 @@ export namespace BracketUtils {
         const alongLayers = isHorizontal ? ["ArrowLeft", "ArrowRight"] : ["ArrowUp", "ArrowDown"];
         const towardRoot = rootSide === "start" ? alongLayers[NOTHING] : alongLayers[SINGLE];
 
-        if (key === towardRoot) return "toRoot";
-        if (alongLayers.includes(key)) return "toLeaves";
+        if (key === towardRoot) return "to_root";
+        if (alongLayers.includes(key)) return "to_leaves";
         if (key === "Home") return "first";
         if (key === "End") return "last";
 
@@ -438,10 +438,10 @@ export namespace BracketUtils {
      * The family one step away from another, for a consumer moving the family view from outside the board.
      *
      * A family is named by the node its middle row feeds, so only a node with children can name one, and the steps
-     * walk those nodes alone: `"toRoot"` names the family one stage nearer the final, `"toLeaves"` one stage further
+     * walk those nodes alone: `"to_root"` names the family one stage nearer the final, `"to_leaves"` one stage further
      * out, landing on the middle child as the keyboard does, and `"previous"` and `"next"` the neighbor across the
      * same stage, crossing from one branch into the next. The root's own family, `undefined`, sits one stage nearer
-     * the final than the one the root names, so `"toLeaves"` from it names the root and `"toRoot"` from the root
+     * the final than the one the root names, so `"to_leaves"` from it names the root and `"to_root"` from the root
      * comes back to it.
      *
      * @param root The final, with its feeders as children.
@@ -459,8 +459,8 @@ export namespace BracketUtils {
         const anchors = layout.placements.filter((placement) => placement.childIds.length > NOTHING);
         const fromId = findNodeId(root, layout, family);
 
-        if (fromId === undefined) return step === "toLeaves" && anchors.length > NOTHING ? root : family;
-        if (step === "toRoot" && fromId === ROOT_ID) return undefined;
+        if (fromId === undefined) return step === "to_leaves" && anchors.length > NOTHING ? root : family;
+        if (step === "to_root" && fromId === ROOT_ID) return undefined;
 
         const nextId = computeStepId(step, fromId, anchors);
 

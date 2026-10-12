@@ -4,6 +4,6 @@ import { pullHorizontal } from "./pullHorizontal";
 import { pullVertical } from "./pullVertical";
 
 export const pullRings: CellAnimationFn = CellAnimationKeyframeUtils.fromZones(
-    [{ zone: "evenRings", animation: pullHorizontal }],
+    [{ zone: "even_rings", animation: pullHorizontal }],
     pullVertical,
 );

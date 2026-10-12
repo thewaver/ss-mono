@@ -96,14 +96,14 @@ export namespace SVGFilterDefsUtils {
                 defs.stdDeviation <= 0 && defs.dx === 0 && defs.dy === 0
                     ? undefined
                     : add(
-                          "dropShadow",
+                          "drop_shadow",
                           defs.stdDeviation * BLUR_REACH_SIGMAS + Math.max(Math.abs(defs.dx), Math.abs(defs.dy)),
                       ),
             addGaussianBlur: (defs: SVGGaussianBlurFilterDefs) =>
-                defs.stdDeviation <= 0 ? undefined : add("gaussianBlur", defs.stdDeviation * BLUR_REACH_SIGMAS),
+                defs.stdDeviation <= 0 ? undefined : add("gaussian_blur", defs.stdDeviation * BLUR_REACH_SIGMAS),
             addTurbulence: (defs: SVGTurbulenceFilterDefs) =>
                 defs.scale === 0 ? undefined : add("turbulence", Math.abs(defs.scale) * 0.5),
-            addHueRotation: (defs: SVGHueRotationFilterDefs) => (defs.deg === 0 ? undefined : add("hueRotation")),
+            addHueRotation: (defs: SVGHueRotationFilterDefs) => (defs.deg === 0 ? undefined : add("hue_rotation")),
             addSaturation: (defs: SVGSaturationFilterDefs) => (defs.amount === 1 ? undefined : add("saturation")),
             addBrightness: (defs: SVGBrightnessFilterDefs) => (defs.amount === 1 ? undefined : add("brightness")),
             addContrast: (defs: SVGContrastFilterDefs) => (defs.amount === 1 ? undefined : add("contrast")),
@@ -112,8 +112,8 @@ export namespace SVGFilterDefsUtils {
                 defs.r === 1 && defs.g === 1 && defs.b === 1 ? undefined : add("color"),
             addPixelate: (defs: SVGPixelateFilterDefs) => (defs.size <= 1 ? undefined : add("pixelate")),
             addSpecularLighting: (specularConstant: number | undefined) =>
-                (specularConstant ?? SVG_FILTER_DEFAULTS.specularConstant) <= 0 ? undefined : add("specularLighting"),
-            addDiffuseLighting: () => add("diffuseLighting"),
+                (specularConstant ?? SVG_FILTER_DEFAULTS.specularConstant) <= 0 ? undefined : add("specular_lighting"),
+            addDiffuseLighting: () => add("diffuse_lighting"),
             computeAssembly: (defs?: SVGFilterAssemblyDefs): SVGFilterAssembly | undefined => {
                 const size = defs?.elementSize;
                 const hasSize = size !== undefined && size.width > 0 && size.height > 0;

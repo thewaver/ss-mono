@@ -81,7 +81,7 @@ const PassThroughPage = (props: RouteSectionProps) => <>{props.children}</>;
 const GETTING_STARTED_ROUTE = "/getting-started";
 const GALLERY_ROUTE = "/gallery";
 const GALLERY_NAME_SEPARATOR = " / ";
-const NAV_PREVIEW_PLACEMENT: AnchorPlacement = { x: "right-out", y: "center" };
+const NAV_PREVIEW_PLACEMENT: AnchorPlacement = { x: "right_out", y: "center" };
 const NAV_PREVIEW_OFFSET = { x: 10, y: 0 };
 const NAV_PREVIEW_ARROW = "triangle";
 

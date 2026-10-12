@@ -221,7 +221,7 @@ export namespace TreeUtils {
     ): TreeKeyAction<T, TTooltipDefs> | undefined => {
         const navigable = opts.navigable;
 
-        if (key === EXPAND_SIBLINGS_KEY) return { kind: "expandSiblings", row: current };
+        if (key === EXPAND_SIBLINGS_KEY) return { kind: "expand_siblings", row: current };
 
         const query = opts.pushQuery();
 

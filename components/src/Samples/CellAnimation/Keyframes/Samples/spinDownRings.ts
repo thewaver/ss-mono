@@ -4,6 +4,6 @@ import { spinDownCcw } from "./spinDownCcw";
 import { spinDownCw } from "./spinDownCw";
 
 export const spinDownRings: CellAnimationFn = CellAnimationKeyframeUtils.fromZones(
-    [{ zone: "evenRings", animation: spinDownCw }],
+    [{ zone: "even_rings", animation: spinDownCw }],
     spinDownCcw,
 );

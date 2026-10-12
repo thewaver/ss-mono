@@ -24,11 +24,11 @@ describe("SVGFilterDefsUtils.createRegistry", () => {
     it("names each kept effect from the filter's id, counted per kind", () => {
         const registry = SVGFilterDefsUtils.createRegistry("f");
 
-        expect(registry.addGaussianBlur({ stdDeviation: 1 })).toBe("f_gaussianBlur_0");
-        expect(registry.addHueRotation({ deg: 90 })).toBe("f_hueRotation_0");
-        expect(registry.addGaussianBlur({ stdDeviation: 2 })).toBe("f_gaussianBlur_1");
-        expect(registry.addSpecularLighting(undefined)).toBe("f_specularLighting_0");
-        expect(registry.addDiffuseLighting()).toBe("f_diffuseLighting_0");
+        expect(registry.addGaussianBlur({ stdDeviation: 1 })).toBe("f_gaussian_blur_0");
+        expect(registry.addHueRotation({ deg: 90 })).toBe("f_hue_rotation_0");
+        expect(registry.addGaussianBlur({ stdDeviation: 2 })).toBe("f_gaussian_blur_1");
+        expect(registry.addSpecularLighting(undefined)).toBe("f_specular_lighting_0");
+        expect(registry.addDiffuseLighting()).toBe("f_diffuse_lighting_0");
     });
 
     it("isolates by default: every effect reads the original, and all of them are merged over it", () => {
@@ -40,10 +40,10 @@ describe("SVGFilterDefsUtils.createRegistry", () => {
         expect(registry.computeAssembly()).toEqual({
             region: undefined,
             inputs: [
-                { key: "f_hueRotation_0", srcIn: "SourceGraphic" },
+                { key: "f_hue_rotation_0", srcIn: "SourceGraphic" },
                 { key: "f_saturation_0", srcIn: "SourceGraphic" },
             ],
-            mergeKeys: ["SourceGraphic", "f_hueRotation_0", "f_saturation_0"],
+            mergeKeys: ["SourceGraphic", "f_hue_rotation_0", "f_saturation_0"],
         });
     });
 
@@ -55,7 +55,7 @@ describe("SVGFilterDefsUtils.createRegistry", () => {
 
         const assembly = registry.computeAssembly({ method: "chain" });
 
-        expect(assembly?.inputs.map((input) => input.srcIn)).toEqual(["SourceGraphic", "f_hueRotation_0"]);
+        expect(assembly?.inputs.map((input) => input.srcIn)).toEqual(["SourceGraphic", "f_hue_rotation_0"]);
         expect(assembly?.mergeKeys).toBeUndefined();
     });
 
@@ -98,8 +98,8 @@ describe("SVGFilterDefsUtils.createRegistry", () => {
         const assembly = registry.computeAssembly({ method: "chain" });
 
         expect(assembly?.inputs).toEqual([
-            { key: "f_hueRotation_0", srcIn: "SourceGraphic" },
-            { key: "f_saturation_0", srcIn: "f_hueRotation_0" },
+            { key: "f_hue_rotation_0", srcIn: "SourceGraphic" },
+            { key: "f_saturation_0", srcIn: "f_hue_rotation_0" },
         ]);
         expect(assembly?.frame).toBeUndefined();
 

@@ -26,7 +26,7 @@ export const MeepleExample = ({ shape, piece, marked, ...otherProps }: Props) =>
         <div className={styles.meepleHost}>
             <TileBoard
                 {...otherProps}
-                tileShape={shape}
+                tiling={shape}
                 computeTileAriaLabel={(tile) => `Row ${tile.row + 1}, tile ${tile.col + 1}`}
                 renderTile={(tile, renderProps) => (
                     <PageTileBoardTile

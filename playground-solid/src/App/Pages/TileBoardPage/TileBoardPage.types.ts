@@ -1,12 +1,13 @@
+import type { TileBoardTilingKind } from "@thewaver/ss-components";
 import type { AccessorProps, MaybeAccessor } from "@thewaver/ss-components-solid";
-import type { Index2d, Index2dString, ShapeConst, Size2d } from "@thewaver/ss-utils";
+import type { Index2d, Index2dString, Size2d } from "@thewaver/ss-utils";
 
 export type TileBoardExampleProps = AccessorProps<{
     ariaLabel: string;
     tileCount: Index2d;
     tileSize: Size2d;
     gap: number;
-    shape: ShapeConst.DefaultShape;
+    tiling: TileBoardTilingKind;
     hasShortFirstRow: boolean;
     taper: number;
     isDisabled: boolean;

@@ -81,7 +81,7 @@ export const TagInput = (props: TagInputProps) => {
 
         if (action.kind === "add") addTag();
         else if (action.kind === "remove") removeTag(action.index);
-        else if (action.kind === "focusTag") focusTag(action.index);
+        else if (action.kind === "focus_tag") focusTag(action.index);
         else focusField();
     };
 

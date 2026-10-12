@@ -27,7 +27,7 @@ export const ReachableExample = (props: Props) => (
         renderContent={(flags) => <PageTextFieldContent flags={flags} width={FIELD_WIDTH} />}
         renderTrailing={(flags, stepper) => <PageNumberInputStepper flags={flags} stepper={stepper} />}
         tooltipDefs={{
-            placement: { x: "center", y: "top-out" },
+            placement: { x: "center", y: "top_out" },
             offset: { x: 0, y: 10 },
             renderContent: (visibilityTarget, transitionDurationMs) => (
                 <PageTooltipContent visibilityTarget={visibilityTarget} transitionDurationMs={transitionDurationMs}>

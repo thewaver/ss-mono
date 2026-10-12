@@ -12,7 +12,7 @@ export const PlacedAboveExample = (props: Props) => (
         renderHighlightFloater={renderPageHighlightFloater}
         items={ACTIONS}
         ariaLabel={"Edit actions"}
-        placement={{ x: "left-in", y: "top-out" }}
+        placement={{ x: "left_in", y: "top_out" }}
         renderContent={(flags) => <PageMenuTriggerContent flags={flags}>Edit</PageMenuTriggerContent>}
         renderItem={renderMenuItem}
         renderPopup={renderMenuPopup}

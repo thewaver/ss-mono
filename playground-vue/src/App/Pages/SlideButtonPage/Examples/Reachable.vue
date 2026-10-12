@@ -14,7 +14,7 @@ type Props = SlideButtonExampleProps;
 const props = defineProps<Props>();
 
 const tooltipDefs: InteractionTooltipDefs<SlideButtonRenderProps> = {
-    placement: { x: "center", y: "top-out" },
+    placement: { x: "center", y: "top_out" },
     offset: { x: 0, y: 10 },
     renderContent: ({ visibilityTarget, transitionDurationMs }) =>
         h(

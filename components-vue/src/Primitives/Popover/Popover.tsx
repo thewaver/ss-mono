@@ -53,7 +53,7 @@ export const Popover = defineComponent(
 
             hasSeenAnchor = presence.hasSeenAnchor;
 
-            if (presence.isGone) props.onDismiss?.("anchorGone");
+            if (presence.isGone) props.onDismiss?.("anchor_gone");
         });
 
         DismisserVueUtils.useLayer(() => props.isOpen, {

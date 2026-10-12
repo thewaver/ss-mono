@@ -105,23 +105,15 @@ export const TileBoard = defineComponent(
         const getGap = () => props.gap ?? TILE_BOARD_DEFAULTS.gap;
         const getIsDisabled = () => props.isDisabled ?? false;
 
-        const tileSize = computed(() =>
-            TileBoardUtils.getTileBoxSize({ width: props.tileSize.width, height: props.tileSize.height }, getGap()),
-        );
-
         const layout = computed(() =>
             TileBoardUtils.getLayout(
-                props.tileShape ?? TILE_BOARD_DEFAULTS.tileShape,
+                props.tiling ?? TILE_BOARD_DEFAULTS.tiling,
                 { row: props.tileCount.row, col: props.tileCount.col },
                 { width: props.tileSize.width, height: props.tileSize.height },
                 props.hasShortFirstRow ?? false,
                 props.taper ?? TILE_BOARD_DEFAULTS.taper,
             ),
         );
-
-        const points = computed(() => TileBoardUtils.getTilePoints(layout.value.shape, tileSize.value, false));
-
-        const flippedPoints = computed(() => TileBoardUtils.getTilePoints(layout.value.shape, tileSize.value, true));
 
         const getIsTileDisabled = (tile: Index2d) => getIsDisabled() || (props.computeIsTileDisabled?.(tile) ?? false);
 
@@ -187,16 +179,16 @@ export const TileBoard = defineComponent(
         const renderTile = (row: number, col: number) => {
             const tile: Index2d = { row, col };
             const key = Index2d.toString(tile);
-            const isFlipped = TileBoardUtils.getIsFlippedTile(tile, layout.value);
+            const geometry = TileBoardUtils.getTileGeometry(tile, layout.value, getGap());
             const isRoving = Index2d.isSame(tile, rovingTile.value);
-            const clipPath = TileBoardUtils.getClipPath(isFlipped ? flippedPoints.value : points.value);
+            const clipPath = TileBoardUtils.getClipPath(geometry.points);
 
             return (
                 <div
                     key={key}
                     class={TileBoardStyles.tileBoardCell}
                     role="presentation"
-                    style={{ left: `${col * layout.value.pitch.width}px` }}
+                    style={{ left: `${geometry.offset.x}px`, top: `${geometry.offset.y}px` }}
                 >
                     <InteractionWrapper
                         isDisabled={getIsTileDisabled(tile)}
@@ -204,9 +196,9 @@ export const TileBoard = defineComponent(
                         isTabbable={isRoving}
                         extraFlags={{
                             tile,
-                            size: tileSize.value,
-                            points: isFlipped ? flippedPoints.value : points.value,
-                            isFlipped,
+                            size: geometry.size,
+                            points: geometry.points,
+                            isFlipped: geometry.isFlipped,
                             isHighlighted: isRoving,
                         }}
                     >
@@ -226,7 +218,7 @@ export const TileBoard = defineComponent(
                                         flags={flags}
                                         ariaLabel={props.computeTileAriaLabel?.(tile)}
                                         colIndex={col + FIRST_ARIA_INDEX}
-                                        size={tileSize.value}
+                                        size={geometry.size}
                                         clipPath={clipPath}
                                         onActivate={() => activateTile(tile)}
                                         hitRef={(element) => sweeper.addHitLayer(element, tile)}
@@ -260,7 +252,7 @@ export const TileBoard = defineComponent(
                     role="grid"
                     aria-label={props.ariaLabel}
                     aria-rowcount={currentLayout.count.row}
-                    aria-colcount={currentLayout.count.col}
+                    aria-colcount={TileBoardUtils.getColumnCount(currentLayout)}
                     aria-disabled={isDisabled || undefined}
                     style={{ width: `${boardSize.width}px`, height: `${boardSize.height}px` }}
                     onKeydown={handleKeyDown}
@@ -300,7 +292,7 @@ export const TileBoard = defineComponent(
             ariaLabel: null,
             tileCount: null,
             tileSize: null,
-            tileShape: null,
+            tiling: null,
             gap: null,
             hasShortFirstRow: Boolean,
             taper: null,

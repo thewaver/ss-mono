@@ -34,7 +34,7 @@ export type TreeRecordRow<T, TTooltipDefs> = FlatRow<TreeNodeRecord<T, TTooltipD
 
 export type TreeKeyAction<T, TTooltipDefs> =
     | { kind: "claim" }
-    | { kind: "expandSiblings"; row: TreeRecordRow<T, TTooltipDefs> }
+    | { kind: "expand_siblings"; row: TreeRecordRow<T, TTooltipDefs> }
     | { kind: "focus"; row: TreeRecordRow<T, TTooltipDefs> }
     | { kind: "expand"; row: TreeRecordRow<T, TTooltipDefs> }
     | { kind: "collapse"; row: TreeRecordRow<T, TTooltipDefs> }

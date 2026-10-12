@@ -1,7 +1,19 @@
-import { Color, type Index2d, MathUtils, type Point2d, RandomUtils, type Store, StoreUtils } from "@thewaver/ss-utils";
+import {
+    Color,
+    type Index2d,
+    MathUtils,
+    type Point2d,
+    RandomUtils,
+    ShapeConst,
+    type Size2d,
+    type Store,
+    StoreUtils,
+} from "@thewaver/ss-utils";
 
 import type { PointerReading } from "../../Abstracts/PointerTracker/PointerTracker.types";
 import type { CycleColorKey, SVGDefsColors } from "./SVGDefs.types";
+import { SVGPatternLayouts } from "./SVGPatternLayouts.const";
+import type { SVGPatternCellIndex, SVGPatternCellPiece, SVGPatternKind } from "./SVGPatternLayouts.types";
 
 const NO_CONSUMERS = 0;
 const TRANSPARENT_ALPHA = 0;
@@ -17,6 +29,87 @@ const MIN_PIXEL_TRAIL_SQUARE = 1;
 
 export namespace SVGDefsUtils {
     export const DEBUG_SEAMS = false;
+
+    /**
+     * Which piece of its cell a pattern cell is.
+     *
+     * The layouts that cut each cell into triangles — `triangle_ltr`, `triangle_rtl`, `square_quarters`, `lozenge_quarters` — give
+     * every triangle a cell index of its own, several to one box, and this says which triangle a given index is. A
+     * sample draws the piece's shape rather than choosing one by the index's parity, so the sample and the layout can
+     * never disagree about it.
+     *
+     * @param kind The layout the cells are placed by.
+     * @param index The cell's place in the grid.
+     * @returns The piece's shape and where in the cell it sits, as fractions of the cell. A layout that does not cut its
+     * cells answers the whole cell, as a `square`.
+     */
+    export const getCellPiece = (kind: SVGPatternKind, index: SVGPatternCellIndex): SVGPatternCellPiece =>
+        SVGPatternLayouts.ALL[kind].computeCellPiece?.(index) ?? {
+            shape: "square",
+            box: { x: 0, y: 0, width: 1, height: 1 },
+        };
+
+    /**
+     * Every distinct piece a layout cuts its cells into, each once.
+     *
+     * A sample draws each piece's path once and points every cell at the one it is, rather than writing a path per
+     * cell. A tile of two cells by two holds every piece a layout uses, the alternating cut of `lozenge_quarters`
+     * included, so that is what is walked.
+     *
+     * @param kind The layout the cells are placed by.
+     * @returns The pieces, told apart by shape, which no layout repeats with a different box. A layout that does not
+     * cut its cells answers the whole cell alone.
+     */
+    export const getCellPieces = (kind: SVGPatternKind): SVGPatternCellPiece[] => {
+        const count = SVGPatternLayouts.ALL[kind].computeCellCount({ rows: 2, cols: 2 });
+        const pieces = new Map<ShapeConst.DefaultShape, SVGPatternCellPiece>();
+
+        for (let row = 0; row < count.rows; row++) {
+            for (let col = 0; col < count.cols; col++) {
+                const piece = getCellPiece(kind, { row, col });
+
+                if (!pieces.has(piece.shape)) pieces.set(piece.shape, piece);
+            }
+        }
+
+        return [...pieces.values()];
+    };
+
+    /**
+     * A piece's corners at a given cell size, in the cell's own coordinates.
+     *
+     * @param piece The piece, from {@link getCellPiece}.
+     * @param cellSize One cell's size.
+     * @returns The corners, clockwise from the top, ready to be written as a path inside the cell's group.
+     */
+    export const computeCellPiecePoints = (piece: SVGPatternCellPiece, cellSize: Size2d): Point2d[] => {
+        const left = piece.box.x * cellSize.width;
+        const top = piece.box.y * cellSize.height;
+
+        return ShapeConst.getDefaultShapePoints(piece.shape, {
+            width: piece.box.width * cellSize.width,
+            height: piece.box.height * cellSize.height,
+        }).map((point) => ({ x: point.x + left, y: point.y + top }));
+    };
+
+    /**
+     * Where a cell's middle is, in the cell's own coordinates.
+     *
+     * The middle of the cell for a whole cell, and the average of the piece's corners for a cut one, since two halves of
+     * a cell cut corner to corner share the cell's middle and would otherwise answer the pointer as one.
+     *
+     * @param kind The layout the cells are placed by.
+     * @param index The cell's place in the grid.
+     * @param cellSize One cell's size.
+     */
+    export const computeCellCenter = (kind: SVGPatternKind, index: SVGPatternCellIndex, cellSize: Size2d): Point2d => {
+        const points = computeCellPiecePoints(getCellPiece(kind, index), cellSize);
+
+        return {
+            x: points.reduce((sum, point) => sum + point.x, 0) / points.length,
+            y: points.reduce((sum, point) => sum + point.y, 0) / points.length,
+        };
+    };
 
     /**
      * The color stops of a gradient that repeats a run of colors a given number of times.

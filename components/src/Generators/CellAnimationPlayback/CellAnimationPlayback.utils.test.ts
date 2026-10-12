@@ -14,7 +14,7 @@ describe("CellAnimationPlaybackUtils", () => {
     it("charges a round trip for both trips plus the hold between them", () => {
         expect(CellAnimationPlaybackUtils.computeCycleDurationMs(2000, { dir: "stack" })).toBe(4000);
         expect(CellAnimationPlaybackUtils.computeCycleDurationMs(2000, { dir: "stack", holdMs: 1000 })).toBe(5000);
-        expect(CellAnimationPlaybackUtils.computeCycleDurationMs(2000, { dir: "stack-reverse", holdMs: 1000 })).toBe(
+        expect(CellAnimationPlaybackUtils.computeCycleDurationMs(2000, { dir: "stack_reverse", holdMs: 1000 })).toBe(
             5000,
         );
         expect(CellAnimationPlaybackUtils.computeCycleDurationMs(2000, { dir: "stack", holdMs: -1000 })).toBe(4000);
@@ -56,7 +56,7 @@ describe("CellAnimationPlaybackUtils", () => {
     it("starts a stack-reverse pass at the far end and holds there instead", () => {
         const at = (timeline: number) =>
             CellAnimationPlaybackUtils.computeGlobalTimeline(timeline, 2000, {
-                dir: "stack-reverse",
+                dir: "stack_reverse",
                 holdMs: 1000,
             });
 
@@ -70,7 +70,7 @@ describe("CellAnimationPlaybackUtils", () => {
 
     it("ends a round trip where it started, so the next one joins onto it", () => {
         for (const holdMs of [0, 500, 5000]) {
-            for (const dir of ["stack", "stack-reverse", "pipe", "pipe-reverse"] as const) {
+            for (const dir of ["stack", "stack_reverse", "pipe", "pipe_reverse"] as const) {
                 const first = CellAnimationPlaybackUtils.computeGlobalTimeline(0, 2000, { dir, holdMs });
                 const last = CellAnimationPlaybackUtils.computeGlobalTimeline(1, 2000, { dir, holdMs });
 
@@ -89,7 +89,7 @@ describe("CellAnimationPlaybackUtils", () => {
         expect(CellAnimationPlaybackUtils.isRoundTrip("normal")).toBe(false);
         expect(CellAnimationPlaybackUtils.isRoundTrip("reverse")).toBe(false);
 
-        for (const dir of ["stack", "stack-reverse", "pipe", "pipe-reverse"] as const) {
+        for (const dir of ["stack", "stack_reverse", "pipe", "pipe_reverse"] as const) {
             expect(CellAnimationPlaybackUtils.isRoundTrip(dir), dir).toBe(true);
         }
     });
@@ -100,9 +100,9 @@ describe("CellAnimationPlaybackUtils", () => {
                 CellAnimationPlaybackUtils.computeGlobalTimeline(timeline, 2000, { dir: "stack", holdMs: 500 }),
             );
             expect(
-                CellAnimationPlaybackUtils.computeGlobalTimeline(timeline, 2000, { dir: "pipe-reverse", holdMs: 500 }),
+                CellAnimationPlaybackUtils.computeGlobalTimeline(timeline, 2000, { dir: "pipe_reverse", holdMs: 500 }),
             ).toBe(
-                CellAnimationPlaybackUtils.computeGlobalTimeline(timeline, 2000, { dir: "stack-reverse", holdMs: 500 }),
+                CellAnimationPlaybackUtils.computeGlobalTimeline(timeline, 2000, { dir: "stack_reverse", holdMs: 500 }),
             );
         }
     });
@@ -114,10 +114,10 @@ describe("CellAnimationPlaybackUtils", () => {
 
         expect(at(0.25, "pipe")).toBe("asc");
         expect(at(0.75, "pipe")).toBe("desc");
-        expect(at(0.25, "pipe-reverse")).toBe("desc");
-        expect(at(0.75, "pipe-reverse")).toBe("asc");
+        expect(at(0.25, "pipe_reverse")).toBe("desc");
+        expect(at(0.75, "pipe_reverse")).toBe("asc");
 
-        for (const dir of ["normal", "reverse", "stack", "stack-reverse"] as const) {
+        for (const dir of ["normal", "reverse", "stack", "stack_reverse"] as const) {
             expect(CellAnimationPlaybackUtils.computeBreakpointOpts(opts, 0.75, { dir }), dir).toBe(opts);
         }
 
@@ -172,13 +172,13 @@ describe("CellAnimationPlaybackUtils", () => {
         });
 
         it("starts a pipe-reverse with every cell out, and the heavy cell leads both ways", () => {
-            expect(progressOf(1, 0, "pipe-reverse")).toBe(1);
-            expect(progressOf(0, 0, "pipe-reverse")).toBe(1);
-            expect(progressOf(1, outwardAt(0.3), "pipe-reverse"), "first to leave").toBeLessThan(
-                progressOf(0, outwardAt(0.3), "pipe-reverse"),
+            expect(progressOf(1, 0, "pipe_reverse")).toBe(1);
+            expect(progressOf(0, 0, "pipe_reverse")).toBe(1);
+            expect(progressOf(1, outwardAt(0.3), "pipe_reverse"), "first to leave").toBeLessThan(
+                progressOf(0, outwardAt(0.3), "pipe_reverse"),
             );
-            expect(progressOf(1, returnAt(0.3), "pipe-reverse"), "and first to come back").toBeGreaterThan(
-                progressOf(0, returnAt(0.3), "pipe-reverse"),
+            expect(progressOf(1, returnAt(0.3), "pipe_reverse"), "and first to come back").toBeGreaterThan(
+                progressOf(0, returnAt(0.3), "pipe_reverse"),
             );
         });
     });

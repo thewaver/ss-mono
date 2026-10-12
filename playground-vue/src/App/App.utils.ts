@@ -35,7 +35,7 @@ export namespace AppUtils {
         toPageViewRoute(componentToRouteName(config.name), config.component === undefined ? "docs" : view);
 
     const GALLERY_NAME_SEPARATOR = " / ";
-    const NAV_PREVIEW_PLACEMENT: AnchorPlacement = { x: "right-out", y: "center" };
+    const NAV_PREVIEW_PLACEMENT: AnchorPlacement = { x: "right_out", y: "center" };
     const NAV_PREVIEW_OFFSET = { x: 10, y: 0 };
     const NAV_PREVIEW_ARROW = "triangle";
 

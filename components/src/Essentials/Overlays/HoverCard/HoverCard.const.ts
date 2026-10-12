@@ -5,5 +5,5 @@ export const HOVER_CARD_DEFAULTS = {
     focusShowDelayMs: 500,
     hoverShowDelayMs: 700,
     skipDelayWindowMs: 300,
-    placement: { x: "center", y: "bottom-out" } as AnchorPlacement,
+    placement: { x: "center", y: "bottom_out" } as AnchorPlacement,
 };

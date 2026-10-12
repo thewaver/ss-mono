@@ -15,11 +15,11 @@ const SNAPSHOT_STYLE = { opacity: 1, mixBlendMode: "normal" };
 const HOLD_KEYFRAMES: Keyframe[] = [SNAPSHOT_STYLE, SNAPSHOT_STYLE];
 
 const SPOT_RATIOS: Record<ShapeRevealSpot, Point2d> = {
-    "center": { x: HALF, y: HALF },
-    "top-left": { x: 0, y: 0 },
-    "top-right": { x: 1, y: 0 },
-    "bottom-left": { x: 0, y: 1 },
-    "bottom-right": { x: 1, y: 1 },
+    center: { x: HALF, y: HALF },
+    top_left: { x: 0, y: 0 },
+    top_right: { x: 1, y: 0 },
+    bottom_left: { x: 0, y: 1 },
+    bottom_right: { x: 1, y: 1 },
 };
 
 const px = (value: number) => `${value}px`;

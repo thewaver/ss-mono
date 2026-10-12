@@ -7,7 +7,7 @@
 
     import PageTooltipContent from "../../../StyledComponents/TooltipContent/TooltipContent.svelte";
 
-    const TOOLTIP_PLACEMENT = { x: "center", y: "top-out" } as const;
+    const TOOLTIP_PLACEMENT = { x: "center", y: "top_out" } as const;
     const TOOLTIP_OFFSET = { x: 0, y: 10 };
 
     type TermProps = {

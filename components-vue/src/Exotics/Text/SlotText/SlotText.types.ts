@@ -20,7 +20,7 @@ export type SlotTextProps = {
     turnDelayMs?: number;
     /**
      * How a column changes from one character to the next. `"drum"`, the default, turns it like a drum with the
-     * characters round its rim. `"splitFlap"` drops one flap after another, as a departures board does: each flap is
+     * characters round its rim. `"split_flap"` drops one flap after another, as a departures board does: each flap is
      * half a character hinged on the middle line, its front the top half of the character going and its back the
      * bottom half of the character coming. Either way a column passes through every character between the old one
      * and the new one, and `turnDurationMs`, `turnDelayMs` and `computeReel` mean the same. The character is still

@@ -37,8 +37,6 @@
     let brushShape = $state<(typeof ScratchCardKnobs.BRUSH_SHAPES)[number]>(ScratchCardKnobs.STARTING_BRUSH_SHAPE);
 
     const computePoints = $derived.by(() => {
-        if (brushShape === ScratchCardKnobs.CIRCLE) return undefined;
-
         const polygon = brushShape;
 
         return (size: Size2d) => ShapeConst.getDefaultShapePoints(polygon, size);

@@ -8,7 +8,7 @@ import { PageTooltipContent } from "../../../StyledComponents/TooltipContent/Too
 import { renderToolbarOverflowItem, renderToolbarPopup } from "../ToolbarPage.const";
 import type { ToolbarExampleProps } from "../ToolbarPage.types";
 
-const PLACEMENT: AnchorPlacement = { x: "center", y: "top-out" };
+const PLACEMENT: AnchorPlacement = { x: "center", y: "top_out" };
 
 const OFFSET = { x: 0, y: 8 };
 

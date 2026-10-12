@@ -1290,7 +1290,7 @@ every face upright cannot both hold, so each option gives one up:
 ## 32. A wide arrow vanishes at a corner, and a nearly-as-wide one becomes a sliver
 
 Reachable on the Tooltip page: pick the triangle, set its width to at least twice its length, and place the tooltip
-off a corner of its anchor (`left-out` with `bottom-out`). No arrow is drawn. Make it a little narrower than that and
+off a corner of its anchor (`left_out` with `bottom_out`). No arrow is drawn. Make it a little narrower than that and
 the arrow comes back as a long thin wedge running down the tooltip's edges.
 
 **The cause is the rule that joins the arrow to the body.** `ShapeUtils.attachArrow` extends the triangle's two sides

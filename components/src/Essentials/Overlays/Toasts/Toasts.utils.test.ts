@@ -9,46 +9,46 @@ const FIVE = ["a", "b", "c", "d", "e"].map(toast);
 
 describe("computeStackAlignment", () => {
     it("maps a corner onto both flex axes for a plain column", () => {
-        expect(ToastUtils.computeStackAlignment("bottom-right", "column")).toEqual({
+        expect(ToastUtils.computeStackAlignment("bottom_right", "column")).toEqual({
             justifyContent: "flex-end",
             alignItems: "flex-end",
         });
     });
 
     it("keeps the same corner when the column is reversed, by flipping the main axis alone", () => {
-        expect(ToastUtils.computeStackAlignment("bottom-right", "column-reverse")).toEqual({
+        expect(ToastUtils.computeStackAlignment("bottom_right", "column-reverse")).toEqual({
             justifyContent: "flex-start",
             alignItems: "flex-end",
         });
     });
 
     it("swaps which axis each half of the alignment drives for a row", () => {
-        expect(ToastUtils.computeStackAlignment("top-center", "row")).toEqual({
+        expect(ToastUtils.computeStackAlignment("top_center", "row")).toEqual({
             justifyContent: "center",
             alignItems: "flex-start",
         });
     });
 
     it("leaves a centered main axis alone when reversed, since center has no opposite", () => {
-        expect(ToastUtils.computeStackAlignment("top-center", "row-reverse")).toEqual({
+        expect(ToastUtils.computeStackAlignment("top_center", "row-reverse")).toEqual({
             justifyContent: "center",
             alignItems: "flex-start",
         });
     });
 
     it("flips the horizontal half for a reversed row", () => {
-        expect(ToastUtils.computeStackAlignment("bottom-left", "row-reverse")).toEqual({
+        expect(ToastUtils.computeStackAlignment("bottom_left", "row-reverse")).toEqual({
             justifyContent: "flex-end",
             alignItems: "flex-end",
         });
     });
 
     it("reads middle and center as the same edge on whichever axis they land", () => {
-        expect(ToastUtils.computeStackAlignment("middle-left", "column")).toEqual({
+        expect(ToastUtils.computeStackAlignment("middle_left", "column")).toEqual({
             justifyContent: "center",
             alignItems: "flex-start",
         });
-        expect(ToastUtils.computeStackAlignment("middle-center", "row")).toEqual({
+        expect(ToastUtils.computeStackAlignment("middle_center", "row")).toEqual({
             justifyContent: "center",
             alignItems: "center",
         });
@@ -57,18 +57,18 @@ describe("computeStackAlignment", () => {
 
 describe("computeSwipeDirection", () => {
     it("sends a toast off the side it sits against, corners included", () => {
-        expect(ToastUtils.computeSwipeDirection("bottom-right")).toBe("right");
-        expect(ToastUtils.computeSwipeDirection("top-left")).toBe("left");
-        expect(ToastUtils.computeSwipeDirection("middle-right")).toBe("right");
+        expect(ToastUtils.computeSwipeDirection("bottom_right")).toBe("right");
+        expect(ToastUtils.computeSwipeDirection("top_left")).toBe("left");
+        expect(ToastUtils.computeSwipeDirection("middle_right")).toBe("right");
     });
 
     it("sends a toast centered along the top or bottom off that edge", () => {
-        expect(ToastUtils.computeSwipeDirection("top-center")).toBe("up");
-        expect(ToastUtils.computeSwipeDirection("bottom-center")).toBe("down");
+        expect(ToastUtils.computeSwipeDirection("top_center")).toBe("up");
+        expect(ToastUtils.computeSwipeDirection("bottom_center")).toBe("down");
     });
 
     it("has no way off for a stack in the middle of the screen", () => {
-        expect(ToastUtils.computeSwipeDirection("middle-center")).toBeUndefined();
+        expect(ToastUtils.computeSwipeDirection("middle_center")).toBeUndefined();
     });
 });
 
@@ -82,19 +82,19 @@ describe("computeSwipeAxis", () => {
 
 describe("computeAdmitted", () => {
     it("admits everything without a limit, or within it", () => {
-        expect(ToastUtils.computeAdmitted(FIVE, undefined, "dismiss-oldest")).toBe(FIVE);
-        expect(ToastUtils.computeAdmitted(FIVE, 5, "dismiss-oldest")).toBe(FIVE);
+        expect(ToastUtils.computeAdmitted(FIVE, undefined, "dismiss_oldest")).toBe(FIVE);
+        expect(ToastUtils.computeAdmitted(FIVE, 5, "dismiss_oldest")).toBe(FIVE);
     });
 
     it("admits the newest when the oldest are to be dismissed, and the oldest when the newest wait", () => {
-        expect(ToastUtils.computeAdmitted(FIVE, 3, "dismiss-oldest").map((entry) => entry.id)).toEqual(["c", "d", "e"]);
-        expect(ToastUtils.computeAdmitted(FIVE, 3, "hold-newest").map((entry) => entry.id)).toEqual(["a", "b", "c"]);
+        expect(ToastUtils.computeAdmitted(FIVE, 3, "dismiss_oldest").map((entry) => entry.id)).toEqual(["c", "d", "e"]);
+        expect(ToastUtils.computeAdmitted(FIVE, 3, "hold_newest").map((entry) => entry.id)).toEqual(["a", "b", "c"]);
     });
 });
 
 describe("computeOverflowTrim", () => {
     it("writes the oldest out past the limit", () => {
-        expect(ToastUtils.computeOverflowTrim(FIVE, 3, "dismiss-oldest")?.map((entry) => entry.id)).toEqual([
+        expect(ToastUtils.computeOverflowTrim(FIVE, 3, "dismiss_oldest")?.map((entry) => entry.id)).toEqual([
             "c",
             "d",
             "e",
@@ -102,9 +102,9 @@ describe("computeOverflowTrim", () => {
     });
 
     it("trims nothing within the limit, without one, or when the newest wait", () => {
-        expect(ToastUtils.computeOverflowTrim(FIVE, 5, "dismiss-oldest")).toBeUndefined();
-        expect(ToastUtils.computeOverflowTrim(FIVE, undefined, "dismiss-oldest")).toBeUndefined();
-        expect(ToastUtils.computeOverflowTrim(FIVE, 3, "hold-newest")).toBeUndefined();
+        expect(ToastUtils.computeOverflowTrim(FIVE, 5, "dismiss_oldest")).toBeUndefined();
+        expect(ToastUtils.computeOverflowTrim(FIVE, undefined, "dismiss_oldest")).toBeUndefined();
+        expect(ToastUtils.computeOverflowTrim(FIVE, 3, "hold_newest")).toBeUndefined();
     });
 });
 

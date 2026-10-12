@@ -201,7 +201,7 @@ export namespace ListboxUtils {
     /**
      * Scrolls the highlighted option into view, moving the page only when the option is what holds focus.
      *
-     * Under `"activeDescendant"` focus stays in the field and the list is that field's popup, whose root carries
+     * Under `"active_descendant"` focus stays in the field and the list is that field's popup, whose root carries
      * `role="listbox"`. An option is highlighted the moment the popup opens, while it is still unplaced, so only the
      * scrollers between the option and that root move, through {@link PopoverUtils.revealWithin}, and a page with no
      * `Viewport` never jumps. Under `"roving"` the option is itself the focused element, drawn in the page among the
@@ -383,7 +383,7 @@ export namespace ListboxUtils {
      *
      * One cursor serves a list whose options are drawn inside a popup opened from a field and a list standing on its
      * own in the page. The difference between the two is `focusModel`, fixed by whoever creates the cursor. Under
-     * `"activeDescendant"` focus stays on the field and the highlight is announced through the field; under
+     * `"active_descendant"` focus stays on the field and the highlight is announced through the field; under
      * `"roving"` each option takes focus itself, the highlighted one is the list's single tab stop, and the binding
      * moves focus to the highlighted option while focus is inside the list.
      *

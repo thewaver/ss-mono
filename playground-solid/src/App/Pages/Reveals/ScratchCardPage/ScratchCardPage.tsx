@@ -37,8 +37,6 @@ export const ScratchCardPage = () => {
     const getComputePoints = createMemo(() => {
         const shape = getBrushShape();
 
-        if (shape === ScratchCardKnobs.CIRCLE) return undefined;
-
         return (size: Size2d) => ShapeConst.getDefaultShapePoints(shape, size);
     });
     const [getThreshold, setThreshold] = createSignal(SCRATCH_CARD_DEFAULTS.clearThreshold);

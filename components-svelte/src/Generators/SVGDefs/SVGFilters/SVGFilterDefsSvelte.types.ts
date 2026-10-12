@@ -11,13 +11,13 @@ import type {
 import type { SvelteMarkup } from "../../../Utils/typeUtils.js";
 
 export type SVGFilterPrimitive = { key: string; custom?: SvelteMarkup } & (
-    | { kind: "dropShadow"; defs: SVGDropShadowFilterDefs }
-    | { kind: "gaussianBlur"; defs: SVGGaussianBlurFilterDefs }
+    | { kind: "drop_shadow"; defs: SVGDropShadowFilterDefs }
+    | { kind: "gaussian_blur"; defs: SVGGaussianBlurFilterDefs }
     | { kind: "turbulence"; defs: SVGTurbulenceFilterDefs }
-    | { kind: "colorMatrix"; type: "hueRotate" | "saturate" | "matrix"; values: string }
+    | { kind: "color_matrix"; type: "hueRotate" | "saturate" | "matrix"; values: string }
     | { kind: "pixelate"; defs: SVGPixelateFilterDefs }
-    | { kind: "specularLighting"; defs: SVGSpecularLightingFilterDefs }
-    | { kind: "diffuseLighting"; defs: SVGDiffuseLightingFilterDefs }
+    | { kind: "specular_lighting"; defs: SVGSpecularLightingFilterDefs }
+    | { kind: "diffuse_lighting"; defs: SVGDiffuseLightingFilterDefs }
 );
 
 export type SVGFilterElementProps = {

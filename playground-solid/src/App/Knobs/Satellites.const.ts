@@ -3,7 +3,7 @@ import type { AnchorHPlacement, AnchorVPlacement } from "@thewaver/ss-components
 import type { SatelliteBadgeCorner } from "../Pages/SatellitePage/SatellitePage.types";
 
 export namespace SatelliteKnobs {
-    export const BADGE_CORNERS: SatelliteBadgeCorner[] = ["top-right", "top-left", "bottom-right", "bottom-left"];
+    export const BADGE_CORNERS: SatelliteBadgeCorner[] = ["top_right", "top_left", "bottom_right", "bottom_left"];
 
     export const MIN_OFFSET = -40;
     export const MAX_OFFSET = 40;
@@ -21,13 +21,13 @@ export namespace SatelliteKnobs {
     export const MAX_OVERHANG = 32;
     export const OVERHANG_STEP = 1;
 
-    export const STARTING_H_PLACEMENT: AnchorHPlacement = "right-out";
-    export const STARTING_V_PLACEMENT: AnchorVPlacement = "top-out";
+    export const STARTING_H_PLACEMENT: AnchorHPlacement = "right_out";
+    export const STARTING_V_PLACEMENT: AnchorVPlacement = "top_out";
     export const STARTING_SUBJECT_WIDTH = 240;
     export const STARTING_SUBJECT_HEIGHT = 160;
     export const STARTING_BADGE_SIZE = 48;
     export const STARTING_HAS_SATELLITE = true;
-    export const STARTING_CORNER: SatelliteBadgeCorner = "top-right";
+    export const STARTING_CORNER: SatelliteBadgeCorner = "top_right";
     export const STARTING_COUNT = 7;
     export const STARTING_OVERHANG = 16;
 }

@@ -77,8 +77,8 @@ test("the wrapper grows on exactly the sides the satellite hangs over", async ({
 });
 
 test("moving the placement moves the growth with it", async ({ page }) => {
-    await pick(page, "hPlacement", "left-out");
-    await pick(page, "vPlacement", "bottom-out");
+    await pick(page, "hPlacement", "left_out");
+    await pick(page, "vPlacement", "bottom_out");
 
     const badgeSize = await (await knob(page, "badgeSize", numberField)).inputValue();
 
@@ -88,8 +88,8 @@ test("moving the placement moves the growth with it", async ({ page }) => {
 });
 
 test("a satellite placed inside a corner costs no room at all", async ({ page }) => {
-    await pick(page, "hPlacement", "right-in");
-    await pick(page, "vPlacement", "top-in");
+    await pick(page, "hPlacement", "right_in");
+    await pick(page, "vPlacement", "top_in");
 
     await expect
         .poll(() => paddings(page, BADGE), {
@@ -303,7 +303,7 @@ test("a satellite set behind stacks under the subject while the others stay in f
  * moves toward the middle. The padding is asked too, because an overhang that never changes is a box that never
  * changes.
  */
-for (const corner of ["top-right", "top-left", "bottom-right", "bottom-left"]) {
+for (const corner of ["top_right", "top_left", "bottom_right", "bottom_left"]) {
     test(`a growing count widens the badge toward the middle with its outer edge pinned, at ${corner}`, async ({
         page,
     }) => {

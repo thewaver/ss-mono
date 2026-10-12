@@ -1,7 +1,7 @@
 <script lang="ts">
     import { TILE_BOARD_DEFAULTS, TileBoardUtils } from "@thewaver/ss-components-svelte";
     import { TileBoardKnobs } from "@thewaver/ss-playground/App/Knobs/TileBoards.const";
-    import { Index2d, type Index2dString, ShapeConst } from "@thewaver/ss-utils";
+    import { Index2d, type Index2dString } from "@thewaver/ss-utils";
 
     import PageExampleKnobs from "../../PageComponents/ExampleKnobs/PageExampleKnobs.svelte";
     import type { ExampleDefs } from "../../PageComponents/Examples/Examples.types";
@@ -40,7 +40,7 @@
     let tileWidth = $state(TileBoardKnobs.STARTING_TILE_WIDTH);
     let tileHeight = $state(TileBoardKnobs.STARTING_TILE_HEIGHT);
     let gap = $state(TILE_BOARD_DEFAULTS.gap);
-    let shape = $state<ShapeConst.DefaultShape>(TILE_BOARD_DEFAULTS.tileShape);
+    let shape = $state(TILE_BOARD_DEFAULTS.tiling);
     let hasShortFirstRow = $state(TileBoardKnobs.STARTING_HAS_SHORT_FIRST_ROW);
     let taper = $state(TILE_BOARD_DEFAULTS.taper);
     let reach = $state(TileBoardKnobs.STARTING_REACH);
@@ -292,15 +292,15 @@
     </PageProp>
 
     <PageProp
-        itemKey={"shape"}
-        label={"Tile shape"}
-        hint={"The contour each tile is cut to. A hexagon offsets alternate rows; a square does not."}
+        itemKey={"tiling"}
+        label={"Tiling"}
+        hint={"How the board is tiled. A shape lays that shape whole; the two halves cut each box corner to corner, from the top left down or the top right down, and the two quarters cut a square or a lozenge into four."}
     >
         <PageSelectField
             value={shape}
-            values={ShapeConst.DEFAULT_SHAPES}
+            values={TileBoardKnobs.TILINGS}
             width={FIELD_WIDTH}
-            ariaLabel={"Tile shape"}
+            ariaLabel={"Tiling"}
             onChange={(value) => {
                 shape = value;
             }}

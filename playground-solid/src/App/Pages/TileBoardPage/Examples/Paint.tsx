@@ -7,11 +7,11 @@ import type { TileBoardExampleProps } from "../TileBoardPage.types";
 
 type Props = TileBoardExampleProps;
 
-export const PaintExample = ({ shape, marked, ...otherProps }: Props) => (
+export const PaintExample = ({ tiling, marked, ...otherProps }: Props) => (
     <div class={styles.meepleHost}>
         <TileBoard
             {...otherProps}
-            tileShape={shape}
+            tiling={tiling}
             computeTileAriaLabel={(tile) => `Row ${tile.row + 1}, tile ${tile.col + 1}`}
             renderTile={(getTile, getRenderProps) => (
                 <PageTileBoardTile

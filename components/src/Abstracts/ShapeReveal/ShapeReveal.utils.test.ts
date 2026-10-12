@@ -33,13 +33,13 @@ const getCorners = (size: Size2d): Point2d[] => [
 describe("where a reveal grows from", () => {
     it("puts the center and the corners where their names say", () => {
         expect(ShapeRevealUtils.resolveSpot("center", VIEWPORT)).toEqual({ x: 600, y: 400 });
-        expect(ShapeRevealUtils.resolveSpot("top-left", VIEWPORT)).toEqual({ x: 0, y: 0 });
-        expect(ShapeRevealUtils.resolveSpot("bottom-right", VIEWPORT)).toEqual({ x: 1200, y: 800 });
+        expect(ShapeRevealUtils.resolveSpot("top_left", VIEWPORT)).toEqual({ x: 0, y: 0 });
+        expect(ShapeRevealUtils.resolveSpot("bottom_right", VIEWPORT)).toEqual({ x: 1200, y: 800 });
     });
 
     it("takes a point as it is", () => {
         expect(ShapeRevealUtils.resolveOrigin({ x: 12, y: 34 }, VIEWPORT)).toEqual({ x: 12, y: 34 });
-        expect(ShapeRevealUtils.resolveOrigin("top-right", VIEWPORT)).toEqual({ x: 1200, y: 0 });
+        expect(ShapeRevealUtils.resolveOrigin("top_right", VIEWPORT)).toEqual({ x: 1200, y: 0 });
     });
 
     it("has to reach the corner across from it", () => {

@@ -23,7 +23,7 @@ const PatternElement = defineComponent(
                 <>
                     <path
                         id={`${props.id}-hexagon`}
-                        d={ShapeUtils.pointsToPath(ShapeConst.getDefaultShapePoints("hexagon-flat-top", cellSize))}
+                        d={ShapeUtils.pointsToPath(ShapeConst.getDefaultShapePoints("hexagon_flat_top", cellSize))}
                     />
                     {SVGPatterns.computeHexFlatTopPattern(
                         `pattern1-${props.id}`,

@@ -74,7 +74,7 @@
     });
 
     const cursor = ListboxSvelteUtils.createCursor<T>({
-        focusModel: "activeDescendant",
+        focusModel: "active_descendant",
         getListboxId: () => listboxId,
         getOptions: () => props.options,
         getSelectedOptions: () => props.selectedOptions,

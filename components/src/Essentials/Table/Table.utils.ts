@@ -218,7 +218,7 @@ export namespace TableUtils {
     ): TableKeyCommand | undefined => {
         if (grid.colCount < 1) return undefined;
 
-        if (e.key === "a" && (e.ctrlKey || e.metaKey)) return { kind: "selectAll" };
+        if (e.key === "a" && (e.ctrlKey || e.metaKey)) return { kind: "select_all" };
 
         if (e.ctrlKey && (e.key === "Home" || e.key === "End")) {
             return {
@@ -238,13 +238,13 @@ export namespace TableUtils {
             if (NavigatorUtils.getIsActivationKey(e.key)) return { kind: "sort" };
             if (e.ctrlKey && isHorizontalArrow) return { kind: "resize", step: logicalKey === "ArrowLeft" ? -1 : 1 };
             if (e.shiftKey && isHorizontalArrow) {
-                return { kind: "moveColumn", to: from.col + (logicalKey === "ArrowLeft" ? -1 : 1) };
+                return { kind: "move_column", to: from.col + (logicalKey === "ArrowLeft" ? -1 : 1) };
             }
         } else {
-            if (e.key === "Enter") return { kind: "activateRow", rowIndex: from.row - 1 };
+            if (e.key === "Enter") return { kind: "activate_row", rowIndex: from.row - 1 };
             if (e.key === " ") {
                 return {
-                    kind: "pickRow",
+                    kind: "pick_row",
                     rowIndex: from.row - 1,
                     gesture: { isToggling: !e.shiftKey, isExtending: e.shiftKey },
                 };

@@ -158,7 +158,7 @@ test("hovering the stack holds the countdown the painter draws", async ({ page }
         .toBe("running");
 });
 
-test("dismiss-oldest trims the consumer's list to the limit", async ({ page }) => {
+test("dismiss_oldest trims the consumer's list to the limit", async ({ page }) => {
     await page.locator("#raiseBurst").click();
 
     await expect(page.locator(QUEUED), "the component writes the overflow out of the consumer's list").toContainText(
@@ -169,9 +169,9 @@ test("dismiss-oldest trims the consumer's list to the limit", async ({ page }) =
     });
 });
 
-test("hold-newest keeps the overflow queued rather than dropping it", async ({ page }) => {
+test("hold_newest keeps the overflow queued rather than dropping it", async ({ page }) => {
     await page.locator(`${prop("overflow")} [role="combobox"]`).click();
-    await page.locator(OPTION, { hasText: "hold-newest" }).first().click();
+    await page.locator(OPTION, { hasText: "hold_newest" }).first().click();
 
     await page.locator("#raiseBurst").click();
 

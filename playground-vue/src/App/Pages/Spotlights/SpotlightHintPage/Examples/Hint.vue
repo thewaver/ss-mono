@@ -33,7 +33,7 @@ const setAnchorRef = (index: number, element: Element | ComponentPublicInstance 
 };
 
 const tooltipDefs: InteractionTooltipDefs[] = ANCHOR_INDICES.map((index) => ({
-    placement: { x: "center", y: "top-out" },
+    placement: { x: "center", y: "top_out" },
     offset: { x: 0, y: 10 },
     renderContent: ({ visibilityTarget, transitionDurationMs }) =>
         h(PageTooltipContent, { visibilityTarget, transitionDurationMs }, () =>

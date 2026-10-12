@@ -31,11 +31,11 @@ const PatternElement = (props: PatternElementProps) => {
         <>
             <path
                 id={`${props.id}-triangle-up`}
-                d={ShapeUtils.pointsToPath(ShapeConst.getDefaultShapePoints("triangle-up", cellSize))}
+                d={ShapeUtils.pointsToPath(ShapeConst.getDefaultShapePoints("triangle_up", cellSize))}
             />
             <path
                 id={`${props.id}-triangle-down`}
-                d={ShapeUtils.pointsToPath(ShapeConst.getDefaultShapePoints("triangle-down", cellSize))}
+                d={ShapeUtils.pointsToPath(ShapeConst.getDefaultShapePoints("triangle_down", cellSize))}
             />
             {SVGPatterns.computeTrackedLayoutPattern(
                 "triangle",

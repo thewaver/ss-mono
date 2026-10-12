@@ -243,6 +243,10 @@ export type TrackedPatternEntry =
     | { family: "lozenge_d_fade_2"; defs?: PatternProximityOpts }
     | { family: "triangle_s_fade_2"; defs?: PatternProximityOpts }
     | { family: "triangle_t_fade_2"; defs?: PatternProximityOpts }
+    | { family: "triangle_ltr_fade_2"; defs?: PatternProximityOpts }
+    | { family: "triangle_rtl_fade_2"; defs?: PatternProximityOpts }
+    | { family: "triangle_sq_fade_2"; defs?: PatternProximityOpts }
+    | { family: "triangle_lq_fade_2"; defs?: PatternProximityOpts }
     | { family: "square_g_trail_2"; defs?: PatternProximityOpts }
     | { family: "hexagon_pt_trail_2"; defs?: PatternProximityOpts }
     | { family: "triangle_t_trail_2"; defs?: PatternProximityOpts };

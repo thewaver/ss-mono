@@ -315,7 +315,7 @@ export const SlotText = defineComponent(
                                 onGrown={() => settleTurning(index)}
                                 onShrunk={() => dropTurningColumn(index)}
                             >
-                                {mechanism === "splitFlap" ? (
+                                {mechanism === "split_flap" ? (
                                     <SlotTextFlapColumn
                                         target={SlotTextUtils.getFlapPosition(
                                             angles[wheelIndex] ?? RESTING_ANGLE,

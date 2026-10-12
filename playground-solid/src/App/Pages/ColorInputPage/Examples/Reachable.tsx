@@ -18,7 +18,7 @@ export const ReachableExample = (props: Props) => (
         {...COLOR_INPUT_LABELS}
         renderContent={(getRenderProps) => <PageColorInputContent renderProps={getRenderProps} />}
         tooltipDefs={() => ({
-            placement: () => ({ x: "center", y: "top-out" }),
+            placement: () => ({ x: "center", y: "top_out" }),
             offset: () => ({ x: 0, y: 10 }),
             renderContent: (getVisibilityTarget, getTransitionDurationMs) => (
                 <PageTooltipContent

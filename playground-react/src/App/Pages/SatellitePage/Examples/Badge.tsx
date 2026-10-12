@@ -6,17 +6,17 @@ import { PageSatellitePill, PageSatelliteSubject } from "../../../StyledComponen
 import type { SatelliteBadgeCorner, SatelliteBadgeExampleProps } from "../SatellitePage.types";
 
 const PLACEMENTS: Record<SatelliteBadgeCorner, AnchorPlacement> = {
-    "top-left": { x: "left-in", y: "top-in" },
-    "top-right": { x: "right-in", y: "top-in" },
-    "bottom-left": { x: "left-in", y: "bottom-in" },
-    "bottom-right": { x: "right-in", y: "bottom-in" },
+    top_left: { x: "left_in", y: "top_in" },
+    top_right: { x: "right_in", y: "top_in" },
+    bottom_left: { x: "left_in", y: "bottom_in" },
+    bottom_right: { x: "right_in", y: "bottom_in" },
 };
 
 const OUTWARD: Record<SatelliteBadgeCorner, Point2d> = {
-    "top-left": { x: -1, y: -1 },
-    "top-right": { x: 1, y: -1 },
-    "bottom-left": { x: -1, y: 1 },
-    "bottom-right": { x: 1, y: 1 },
+    top_left: { x: -1, y: -1 },
+    top_right: { x: 1, y: -1 },
+    bottom_left: { x: -1, y: 1 },
+    bottom_right: { x: 1, y: 1 },
 };
 
 type Props = SatelliteBadgeExampleProps;

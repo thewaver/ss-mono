@@ -13,7 +13,7 @@ export const hexagon_ft_2: TimedPatternConfig = {
         const shape = (
             <path
                 id={`${id}-hexagon`}
-                d={ShapeUtils.pointsToPath(ShapeConst.getDefaultShapePoints("hexagon-flat-top", cellSize))}
+                d={ShapeUtils.pointsToPath(ShapeConst.getDefaultShapePoints("hexagon_flat_top", cellSize))}
             />
         );
 

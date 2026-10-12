@@ -42,7 +42,7 @@ export const TextInput = <T = string,>(props: TextInputProps<T>) => {
     };
 
     const cursor = ListboxReactUtils.useCursor<T>({
-        focusModel: "activeDescendant",
+        focusModel: "active_descendant",
         isHighlightExplicit: true,
         listboxId,
         options,

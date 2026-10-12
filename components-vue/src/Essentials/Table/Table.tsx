@@ -452,7 +452,7 @@ export const Table = defineComponent(
 
             e.preventDefault();
 
-            if (command.kind === "selectAll") {
+            if (command.kind === "select_all") {
                 selection.selectAll();
 
                 return;
@@ -470,7 +470,7 @@ export const Table = defineComponent(
                 return;
             }
 
-            if (command.kind === "moveColumn") {
+            if (command.kind === "move_column") {
                 if (!moveColumn(from.col, command.to)) return;
 
                 focusCell({ row: HEADER_ROW_INDEX, col: command.to });
@@ -482,13 +482,13 @@ export const Table = defineComponent(
                 return;
             }
 
-            if (command.kind === "activateRow") {
+            if (command.kind === "activate_row") {
                 if (!getIsDisabled()) props.onRowActivate?.(rows.value[command.rowIndex], command.rowIndex);
 
                 return;
             }
 
-            if (command.kind === "pickRow") {
+            if (command.kind === "pick_row") {
                 selectRow(command.rowIndex, command.gesture);
 
                 return;

@@ -77,7 +77,7 @@ export class SVGFilterDefsFactory {
     public addDropShadowFilter = (defs: SVGDropShadowFilterDefs, custom?: SvelteMarkup) => {
         const key = this.registry.addDropShadow(defs);
 
-        if (key !== undefined) this.primitives[key] = { kind: "dropShadow", key, defs, custom };
+        if (key !== undefined) this.primitives[key] = { kind: "drop_shadow", key, defs, custom };
 
         return this;
     };
@@ -94,7 +94,7 @@ export class SVGFilterDefsFactory {
     public addGaussianBlurFilter = (defs: SVGGaussianBlurFilterDefs, custom?: SvelteMarkup) => {
         const key = this.registry.addGaussianBlur(defs);
 
-        if (key !== undefined) this.primitives[key] = { kind: "gaussianBlur", key, defs, custom };
+        if (key !== undefined) this.primitives[key] = { kind: "gaussian_blur", key, defs, custom };
 
         return this;
     };
@@ -132,7 +132,7 @@ export class SVGFilterDefsFactory {
         const key = this.registry.addHueRotation(defs);
 
         if (key !== undefined) {
-            this.primitives[key] = { kind: "colorMatrix", key, type: "hueRotate", values: `${defs.deg}`, custom };
+            this.primitives[key] = { kind: "color_matrix", key, type: "hueRotate", values: `${defs.deg}`, custom };
         }
 
         return this;
@@ -151,7 +151,7 @@ export class SVGFilterDefsFactory {
         const key = this.registry.addSaturation(defs);
 
         if (key !== undefined) {
-            this.primitives[key] = { kind: "colorMatrix", key, type: "saturate", values: `${defs.amount}`, custom };
+            this.primitives[key] = { kind: "color_matrix", key, type: "saturate", values: `${defs.amount}`, custom };
         }
 
         return this;
@@ -171,7 +171,7 @@ export class SVGFilterDefsFactory {
 
         if (key !== undefined) {
             this.primitives[key] = {
-                kind: "colorMatrix",
+                kind: "color_matrix",
                 key,
                 type: "matrix",
                 values: SVGFilterDefsUtils.computeBrightnessMatrix(defs),
@@ -196,7 +196,7 @@ export class SVGFilterDefsFactory {
 
         if (key !== undefined) {
             this.primitives[key] = {
-                kind: "colorMatrix",
+                kind: "color_matrix",
                 key,
                 type: "matrix",
                 values: SVGFilterDefsUtils.computeContrastMatrix(defs),
@@ -221,7 +221,7 @@ export class SVGFilterDefsFactory {
 
         if (key !== undefined) {
             this.primitives[key] = {
-                kind: "colorMatrix",
+                kind: "color_matrix",
                 key,
                 type: "matrix",
                 values: SVGFilterDefsUtils.computeInversionMatrix(defs),
@@ -246,7 +246,7 @@ export class SVGFilterDefsFactory {
 
         if (key !== undefined) {
             this.primitives[key] = {
-                kind: "colorMatrix",
+                kind: "color_matrix",
                 key,
                 type: "matrix",
                 values: SVGFilterDefsUtils.computeColorChannelMatrix(defs),
@@ -290,7 +290,7 @@ export class SVGFilterDefsFactory {
     public addSpecularLightingFilter = (defs: SVGSpecularLightingFilterDefs, custom?: SvelteMarkup) => {
         const key = this.registry.addSpecularLighting(defs.specularConstant);
 
-        if (key !== undefined) this.primitives[key] = { kind: "specularLighting", key, defs, custom };
+        if (key !== undefined) this.primitives[key] = { kind: "specular_lighting", key, defs, custom };
 
         return this;
     };
@@ -309,7 +309,7 @@ export class SVGFilterDefsFactory {
     public addDiffuseLightingFilter = (defs: SVGDiffuseLightingFilterDefs, custom?: SvelteMarkup) => {
         const key = this.registry.addDiffuseLighting();
 
-        this.primitives[key] = { kind: "diffuseLighting", key, defs, custom };
+        this.primitives[key] = { kind: "diffuse_lighting", key, defs, custom };
 
         return this;
     };

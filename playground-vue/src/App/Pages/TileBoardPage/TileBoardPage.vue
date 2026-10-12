@@ -1,9 +1,10 @@
 <script setup lang="ts">
 import { computed, shallowRef } from "vue";
 
+import type { TileBoardTilingKind } from "@thewaver/ss-components";
 import { TILE_BOARD_DEFAULTS, TileBoardUtils } from "@thewaver/ss-components-vue";
 import { TileBoardKnobs } from "@thewaver/ss-playground/App/Knobs/TileBoards.const";
-import { Index2d, type Index2dString, ShapeConst } from "@thewaver/ss-utils";
+import { Index2d, type Index2dString } from "@thewaver/ss-utils";
 
 import PageExampleKnobs from "../../PageComponents/ExampleKnobs/PageExampleKnobs.vue";
 import type { ExampleDefs } from "../../PageComponents/Examples/Examples.types";
@@ -42,7 +43,7 @@ const cols = shallowRef(TileBoardKnobs.STARTING_COLS);
 const tileWidth = shallowRef(TileBoardKnobs.STARTING_TILE_WIDTH);
 const tileHeight = shallowRef(TileBoardKnobs.STARTING_TILE_HEIGHT);
 const gap = shallowRef(TILE_BOARD_DEFAULTS.gap);
-const shape = shallowRef<ShapeConst.DefaultShape>(TILE_BOARD_DEFAULTS.tileShape);
+const shape = shallowRef(TILE_BOARD_DEFAULTS.tiling);
 const hasShortFirstRow = shallowRef(TileBoardKnobs.STARTING_HAS_SHORT_FIRST_ROW);
 const taper = shallowRef(TILE_BOARD_DEFAULTS.taper);
 const reach = shallowRef(TileBoardKnobs.STARTING_REACH);
@@ -210,16 +211,16 @@ const examples: ExampleDefs[] = [
         </PageProp>
 
         <PageProp
-            item-key="shape"
-            label="Tile shape"
-            hint="The contour each tile is cut to. A hexagon offsets alternate rows; a square does not."
+            item-key="tiling"
+            label="Tiling"
+            hint="How the board is tiled. A shape lays that shape whole; the two halves cut each box corner to corner, from the top left down or the top right down, and the two quarters cut a square or a lozenge into four."
         >
             <PageSelectField
                 :value="shape"
-                :values="ShapeConst.DEFAULT_SHAPES"
+                :values="TileBoardKnobs.TILINGS"
                 :width="FIELD_WIDTH"
-                ariaLabel="Tile shape"
-                @change="(value: ShapeConst.DefaultShape) => (shape = value)"
+                ariaLabel="Tiling"
+                @change="(value: TileBoardTilingKind) => (shape = value)"
             />
         </PageProp>
 

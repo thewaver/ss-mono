@@ -89,12 +89,12 @@
 
 <path
     id={`${props.id}-triangle-right`}
-    d={ShapeUtils.pointsToPath(ShapeConst.getDefaultShapePoints("triangle-right", props.defs.cellSize))}
+    d={ShapeUtils.pointsToPath(ShapeConst.getDefaultShapePoints("triangle_right", props.defs.cellSize))}
 />
 
 <path
     id={`${props.id}-triangle-left`}
-    d={ShapeUtils.pointsToPath(ShapeConst.getDefaultShapePoints("triangle-left", props.defs.cellSize))}
+    d={ShapeUtils.pointsToPath(ShapeConst.getDefaultShapePoints("triangle_left", props.defs.cellSize))}
 />
 
 <Markup markup={pattern} />

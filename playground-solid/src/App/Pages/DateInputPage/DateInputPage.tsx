@@ -40,7 +40,7 @@ export const DateInputPage = () => {
                 <TypedExample
                     value={localeSignal}
                     calendar={getCalendarId}
-                    format={"day-month-year"}
+                    format={"day_month_year"}
                     ariaLabel={"Day-first date"}
                 />
             ),

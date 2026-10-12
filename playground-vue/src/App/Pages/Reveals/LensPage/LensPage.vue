@@ -30,12 +30,8 @@ const softness = shallowRef(LENS_DEFAULTS.softness);
 const stepSize = shallowRef(LENS_DEFAULTS.stepSize);
 const isDisabled = shallowRef(LensKnobs.STARTING_IS_DISABLED);
 
-const isCircle = computed(() => shape.value === LensKnobs.CIRCLE);
-
 const computePoints = computed(() => {
     const picked = shape.value;
-
-    if (picked === LensKnobs.CIRCLE) return undefined;
 
     return (size: Size2d) => ShapeConst.getDefaultShapePoints(picked, size);
 });
@@ -121,7 +117,6 @@ const examples: ExampleDefs[] = [
                 :max="LensKnobs.MAX_JOIN_RADIUS"
                 :step="LensKnobs.JOIN_RADIUS_STEP"
                 :width="FIELD_WIDTH"
-                :is-disabled="isCircle"
                 ariaLabel="Corner radius"
                 @input="(value: number) => (joinRadius = value)"
             />
@@ -138,7 +133,6 @@ const examples: ExampleDefs[] = [
                 :max="LensKnobs.MAX_LAME_EXPONENT"
                 :step="LensKnobs.LAME_EXPONENT_STEP"
                 :width="FIELD_WIDTH"
-                :is-disabled="isCircle"
                 ariaLabel="Corner style"
                 @input="(value: number) => (lameExponent = value)"
             />

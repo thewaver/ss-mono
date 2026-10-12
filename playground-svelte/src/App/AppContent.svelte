@@ -60,7 +60,7 @@
 
     const getIsMenuFaded = (phase: SidebarPhase) => phase === "collapsing" || phase === "collapsed";
 
-    const NAV_PREVIEW_PLACEMENT: AnchorPlacement = { x: "right-out", y: "center" };
+    const NAV_PREVIEW_PLACEMENT: AnchorPlacement = { x: "right_out", y: "center" };
     const NAV_PREVIEW_OFFSET = { x: 10, y: 0 };
     const NAV_PREVIEW_ARROW = "triangle";
 

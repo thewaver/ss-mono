@@ -42,7 +42,7 @@ const PatternElement = defineComponent(
                 <>
                     <path
                         id={`${props.id}-hexagon`}
-                        d={ShapeUtils.pointsToPath(ShapeConst.getDefaultShapePoints("hexagon-pointy-top", cellSize))}
+                        d={ShapeUtils.pointsToPath(ShapeConst.getDefaultShapePoints("hexagon_pointy_top", cellSize))}
                     />
                     {SVGPatterns.computeTrackedLayoutPattern(
                         "hex_pointy_top",

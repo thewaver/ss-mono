@@ -1,8 +1,8 @@
 import type { Snippet } from "svelte";
 import type { Attachment } from "svelte/attachments";
 
-import type { InteractionFlags, TileBoardRenderProps } from "@thewaver/ss-components";
-import type { Index2d, ShapeConst, Size2d } from "@thewaver/ss-utils";
+import type { InteractionFlags, TileBoardRenderProps, TileBoardTilingKind } from "@thewaver/ss-components";
+import type { Index2d, Size2d } from "@thewaver/ss-utils";
 
 import type { InteractionControlProps } from "../../Primitives/InteractionWrapper/InteractionWrapper.types.js";
 
@@ -29,12 +29,22 @@ export type TileBoardTileProps = Omit<InteractionControlProps<TileBoardRenderPro
 export type TileBoardProps = {
     /** Names the board for assistive technology. */
     ariaLabel?: string;
-    /** How many tiles the board has, across and down. */
+    /**
+     * How many tiles the board has, across and down. A tiling that cuts boxes into pieces counts boxes, so three
+     * columns of `square-quarters` is three squares, twelve tiles across.
+     */
     tileCount: Index2d;
-    /** How large one tile is. */
+    /** How large one tile is, or for a tiling that cuts boxes into pieces, how large one box is. */
     tileSize: Size2d;
-    /** The contour each tile is cut to, which also decides whether rows are offset. */
-    tileShape?: ShapeConst.DefaultShape;
+    /**
+     * How the board is tiled, which decides each tile's contour, whether rows are offset and which tiles touch.
+     * A shape name lays that shape whole, turning alternate pointed triangles over so they interlock.
+     * `triangle-ltr` cuts each box corner to corner from its top left down, `triangle-rtl` from its top right
+     * down; `square-quarters` cuts each box along both diagonals, and `lozenge-quarters` cuts boxes corner to
+     * corner the opposite way in turn, which draws lozenges cut into four. Painters are handed each tile's own points,
+     * so they never need to know which of these they are drawing.
+     */
+    tiling?: TileBoardTilingKind;
     /** The space between tiles. */
     gap?: number;
     /** Starts the offset rows at the top instead of the second row, for shapes that stagger. */

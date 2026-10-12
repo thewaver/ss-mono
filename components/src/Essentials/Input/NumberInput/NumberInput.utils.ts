@@ -316,8 +316,11 @@ export namespace NumberInputUtils {
      * Repeats a step while a stepper button is held, the way a native spinner does.
      *
      * Starting steps once straight away, then waits the delay, then steps again on every interval until stopped —
-     * so a tap stays a single step. A first step that is refused starts nothing. Starting again while repeating
-     * stops the earlier repeat first, so only one is ever running.
+     * so a tap stays a single step. A first step that is refused starts nothing, and a repeated step that is refused
+     * ends the repeat. That second rule is what keeps a repeat from outliving its press: a stepper button usually
+     * disables itself at the bound it just reached, and a disabled button does not hear the release, so without it the
+     * repeat would run on unseen and walk the value back to the bound the moment anything else moved it away. Starting
+     * again while repeating stops the earlier repeat first, so only one is ever running.
      *
      * @param defs.getDelayMs How long to wait before repeating, read each time a repeat starts.
      * @param defs.getIntervalMs How often to repeat once it has started, read as the repeat begins.
@@ -350,7 +353,10 @@ export namespace NumberInputUtils {
             if (!step()) return false;
 
             repeatDelay = setTimeout(() => {
-                repeatInterval = setInterval(step, defs.getIntervalMs());
+                repeatDelay = undefined;
+                repeatInterval = setInterval(() => {
+                    if (!step()) stop();
+                }, defs.getIntervalMs());
             }, defs.getDelayMs());
 
             return true;

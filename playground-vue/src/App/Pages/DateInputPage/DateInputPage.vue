@@ -74,7 +74,7 @@ const examples: ExampleDefs[] = [
             <TypedExample
                 v-model:value="locale"
                 :calendar="calendarId"
-                format="day-month-year"
+                format="day_month_year"
                 ariaLabel="Day-first date"
             />
         </template>

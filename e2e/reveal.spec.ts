@@ -193,3 +193,14 @@ test("the pointer and the keyboard hand the hole back and forth", async ({ page 
         "and an arrow picks it up from where the pointer left it, not from the center",
     ).toBe(true);
 });
+
+/**
+ * The shape picker lists the library's own built-in shapes and nothing the page invents. A hundred-sided polygon
+ * reads as a circle on its own, so the page no longer adds a circle of its own beside it.
+ */
+test("the shape picker offers the built-in shapes and no circle of the page's own", async ({ page }) => {
+    await page.locator(`${prop("computePoints")} [role="combobox"]`).click();
+
+    await expect(page.getByRole("option", { name: "hectogon", exact: true })).toBeVisible();
+    await expect(page.getByRole("option", { name: "circle", exact: true })).toHaveCount(0);
+});

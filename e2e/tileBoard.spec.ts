@@ -79,7 +79,7 @@ const clipPathOf = (page: Page, selector: string, index: number) =>
     });
 
 const pickShape = async (page: Page, name: string) => {
-    await page.locator(`${prop("shape")} [role="combobox"]`).click();
+    await page.locator(`${prop("tiling")} [role="combobox"]`).click();
     await page.getByRole("option", { name, exact: true }).click();
 };
 
@@ -206,7 +206,7 @@ test("a tile that refuses a press is still drawn as focused, because nothing els
 });
 
 test("triangles turn every other tile over, which is what makes them meet edge to edge", async ({ page }) => {
-    await pickShape(page, "triangle-up");
+    await pickShape(page, "triangle_up");
 
     const first = await clipPathOf(page, hitLayer(MARKED), 0);
     const second = await clipPathOf(page, hitLayer(MARKED), 1);
@@ -796,4 +796,82 @@ test("Enter toggles the focused tile on the paint board", async ({ page }) => {
     await page.keyboard.press("Enter");
 
     expect(await litLabels(page, PAINT, resting), "and cleared again").toEqual([]);
+});
+
+/**
+ * The cut tilings — a square halved corner to corner, quartered along both diagonals, or halved with the lean
+ * alternating so lozenges show cut in four — put several triangles in one box. The count names boxes, the
+ * same unit the tile size names, so a board of them covers exactly what a square board of the same count
+ * covers, and every row holds as many tiles as the box is cut into, times the count. The grid announces those
+ * tiles, not the boxes, since a reader walks the tiles.
+ */
+const CUT_TILINGS: [string, number][] = [
+    ["triangle_ltr", 2],
+    ["triangle_rtl", 2],
+    ["square_quarters", 4],
+    ["lozenge_quarters", 2],
+];
+
+test("a cut tiling counts boxes, so it covers what a square board of the same count covers", async ({ page }) => {
+    const grid = page.locator(`${MARKED} [role="grid"]`);
+    const firstRowTiles = () =>
+        page
+            .locator(`${row(MARKED)} >> nth=0`)
+            .locator('[role="gridcell"]')
+            .count();
+
+    await pickShape(page, "square");
+
+    const squareTiles = await firstRowTiles();
+    const squareBox = (await grid.boundingBox())!;
+
+    for (const [tiling, piecesPerBox] of CUT_TILINGS) {
+        await pickShape(page, tiling);
+
+        const tiles = await firstRowTiles();
+        const box = (await grid.boundingBox())!;
+
+        expect(tiles, `${tiling} holds every piece of every box in a row`).toBe(squareTiles * piecesPerBox);
+        expect(box.width, `${tiling} is as wide as the square board`).toBeCloseTo(squareBox.width, 0);
+        expect(box.height, `${tiling} is as tall as the square board`).toBeCloseTo(squareBox.height, 0);
+        await expect(grid, `${tiling} announces the tiles a reader walks, not the boxes`).toHaveAttribute(
+            "aria-colcount",
+            String(tiles),
+        );
+    }
+});
+
+/**
+ * Two halves of one box have the same box, so only the hit layers' clips tell them apart. On a board cut from
+ * the top left down, a press in the box's top right corner has to reach the half drawn there, and one in its
+ * bottom left corner the other half.
+ */
+test("a press lands on the half drawn under it, though both halves share one box", async ({ page }) => {
+    await pickShape(page, "triangle_ltr");
+
+    const firstHalf = page.locator(tile(MARKED)).nth(0);
+    const secondHalf = page.locator(tile(MARKED)).nth(1);
+    const box = (await secondHalf.boundingBox())!;
+
+    await page.mouse.click(box.x + box.width * 0.85, box.y + box.height * 0.15);
+    await expect(secondHalf, "the top right corner belongs to the top right half").toBeFocused();
+
+    await page.mouse.click(box.x + box.width * 0.1, box.y + box.height * 0.9);
+    await expect(firstHalf, "and the bottom left corner to the bottom left one").toBeFocused();
+});
+
+/**
+ * A triangle shares an edge with three others, whichever way its box is cut, so a piece one step from home
+ * on a cut board can reach exactly three tiles. The piece's board refuses every tile out of reach, which is
+ * what is counted.
+ */
+test("a piece on a cut board reaches the three tiles that share its edges", async ({ page }) => {
+    for (const [tiling] of CUT_TILINGS) {
+        await pickShape(page, tiling);
+
+        await expect(
+            page.locator(`${tile(MEEPLE)}:not([aria-disabled="true"])`),
+            `${tiling} gives a tile clear of the edges three neighbors`,
+        ).toHaveCount(3);
+    }
 });

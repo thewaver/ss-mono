@@ -52,7 +52,7 @@ export const TextInput = <T = string,>(props: TextInputProps<T>) => {
     };
 
     const cursor = ListboxSolidUtils.createCursor<T>({
-        focusModel: "activeDescendant",
+        focusModel: "active_descendant",
         isHighlightExplicit: true,
         getListboxId: () => listboxId,
         getOptions,

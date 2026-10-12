@@ -24,7 +24,7 @@ export const ReachableExample = (props: Props) => (
         computeTextStyle={computePageTextFieldTextStyle}
         renderContent={(flags) => <PageTextFieldContent flags={flags} />}
         tooltipDefs={{
-            placement: { x: "center", y: "top-out" },
+            placement: { x: "center", y: "top_out" },
             offset: { x: 0, y: 10 },
             renderContent: (visibilityTarget, transitionDurationMs) => (
                 <PageTooltipContent visibilityTarget={visibilityTarget} transitionDurationMs={transitionDurationMs}>

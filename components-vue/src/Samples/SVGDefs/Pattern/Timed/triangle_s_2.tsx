@@ -23,11 +23,11 @@ const PatternElement = defineComponent(
                 <>
                     <path
                         id={`${props.id}-triangle-right`}
-                        d={ShapeUtils.pointsToPath(ShapeConst.getDefaultShapePoints("triangle-right", cellSize))}
+                        d={ShapeUtils.pointsToPath(ShapeConst.getDefaultShapePoints("triangle_right", cellSize))}
                     />
                     <path
                         id={`${props.id}-triangle-left`}
-                        d={ShapeUtils.pointsToPath(ShapeConst.getDefaultShapePoints("triangle-left", cellSize))}
+                        d={ShapeUtils.pointsToPath(ShapeConst.getDefaultShapePoints("triangle_left", cellSize))}
                     />
                     {SVGPatterns.computeTriangleSidewaysPattern(
                         `pattern1-${props.id}`,

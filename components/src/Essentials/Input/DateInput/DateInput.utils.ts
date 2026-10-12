@@ -19,9 +19,9 @@ const PART_LENGTHS: Record<DateInputPart, number> = {
 
 /** The order each format writes the parts in, and what it puts between them. */
 const FORMATS: Record<DateInputFormat, { parts: DateInputPart[]; separator: string }> = {
-    "iso": { parts: ["year", "month", "day"], separator: "-" },
-    "day-month-year": { parts: ["day", "month", "year"], separator: "/" },
-    "month-day-year": { parts: ["month", "day", "year"], separator: "/" },
+    iso: { parts: ["year", "month", "day"], separator: "-" },
+    day_month_year: { parts: ["day", "month", "year"], separator: "/" },
+    month_day_year: { parts: ["month", "day", "year"], separator: "/" },
 };
 
 /**

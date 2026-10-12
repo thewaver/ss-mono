@@ -4,6 +4,6 @@ import { encircleCcw } from "./encircleCcw";
 import { encircleCw } from "./encircleCw";
 
 export const encircleRings: CellAnimationFn = CellAnimationKeyframeUtils.fromZones(
-    [{ zone: "evenRings", animation: encircleCw }],
+    [{ zone: "even_rings", animation: encircleCw }],
     encircleCcw,
 );

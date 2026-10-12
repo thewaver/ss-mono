@@ -165,7 +165,7 @@ export const SelectComposite = <T,>(props: SelectCompositeProps<T>) => {
     };
 
     const cursor = ListboxSolidUtils.createCursor<T>({
-        focusModel: "activeDescendant",
+        focusModel: "active_descendant",
         getListboxId: () => listboxId,
         getOptions: () => access(props.options),
         getSelectedOptions: () => access(props.selectedOptions),

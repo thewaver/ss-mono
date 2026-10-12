@@ -24,7 +24,7 @@ export const ReachableExample = (props: Props) => (
                     tooltipDefs={
                         option.value === REACHABLE_VALUE
                             ? () => ({
-                                  placement: () => ({ x: "center", y: "top-out" }),
+                                  placement: () => ({ x: "center", y: "top_out" }),
                                   offset: () => ({ x: 0, y: 10 }),
                                   renderContent: (getVisibilityTarget, getTransitionDurationMs) => (
                                       <PageTooltipContent

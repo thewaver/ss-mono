@@ -9,10 +9,10 @@ import type { TileBoardMeepleExampleProps } from "../TileBoardPage.types";
 
 type Props = TileBoardMeepleExampleProps;
 
-export const MeepleExample = ({ shape, piece, marked, ...otherProps }: Props) => {
+export const MeepleExample = ({ tiling, piece, marked, ...otherProps }: Props) => {
     const getLayout = createMemo(() =>
         TileBoardUtils.getLayout(
-            access(shape),
+            access(tiling),
             access(otherProps.tileCount),
             access(otherProps.tileSize),
             access(otherProps.hasShortFirstRow),
@@ -24,7 +24,7 @@ export const MeepleExample = ({ shape, piece, marked, ...otherProps }: Props) =>
         <div class={styles.meepleHost}>
             <TileBoard
                 {...otherProps}
-                tileShape={shape}
+                tiling={tiling}
                 computeTileAriaLabel={(tile) => `Row ${tile.row + 1}, tile ${tile.col + 1}`}
                 renderTile={(getTile, getRenderProps) => (
                     <PageTileBoardTile

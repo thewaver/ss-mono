@@ -21,7 +21,7 @@
     import PagePopoverSurface from "../../../StyledComponents/PopoverSurface/PopoverSurface.svelte";
     import type { NavFlyoutProps } from "../HoverCardPage.types";
 
-    const FLYOUT_PLACEMENT: AnchorPlacement = { x: "left-in", y: "bottom-out" };
+    const FLYOUT_PLACEMENT: AnchorPlacement = { x: "left_in", y: "bottom_out" };
     const FLYOUT_OFFSET = { x: 0, y: 6 };
 
     let { openKey = $bindable(), ...props }: NavFlyoutProps = $props();

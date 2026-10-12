@@ -16,14 +16,14 @@ export const triangle_t_fade_2 = (opts?: PatternProximityOpts): TrackedPatternCo
         const upTriangle = (
             <path
                 id={`${id}-triangle-up`}
-                d={ShapeUtils.pointsToPath(ShapeConst.getDefaultShapePoints("triangle-up", defs.cellSize))}
+                d={ShapeUtils.pointsToPath(ShapeConst.getDefaultShapePoints("triangle_up", defs.cellSize))}
             />
         );
 
         const downTriangle = (
             <path
                 id={`${id}-triangle-down`}
-                d={ShapeUtils.pointsToPath(ShapeConst.getDefaultShapePoints("triangle-down", defs.cellSize))}
+                d={ShapeUtils.pointsToPath(ShapeConst.getDefaultShapePoints("triangle_down", defs.cellSize))}
             />
         );
 

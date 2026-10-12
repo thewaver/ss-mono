@@ -235,9 +235,9 @@ Where a framework makes the same name impossible, the fallback is the framework'
 same name, rather than a new name — Vue reserves `ref`, so a Vue consumer reaches the element through the
 component's `$el` rather than through a prop called something else.
 
-### A sample's key is snake_case, and a picker shows the key itself
+### A word-valued name is snake_case, and a picker shows the key itself
 
-Stated by the user. Every key that names a sample — a registry entry under `Samples/`, the `family` a sample entry
+Stated by the user, first for samples and then for every value. Every key that names a sample — a registry entry under `Samples/`, the `family` a sample entry
 is built from, and a list of variants the Playground keeps for itself (its easings, its paint kinds, its image
 sources, its audio tracks) — is written in snake_case: `cover_flow`, `right_to_left`, `checkered_convergent`,
 `ease_in_out_quad`, `spot_smudge_3`. The painted gradients and patterns were already written this way, and the rest
@@ -251,9 +251,22 @@ type, the picker, the readout and the spec. Carousel's map of readable names wen
 `right_to_left: rightToLeft` — so the rule touches what a consumer passes and reads, not how the code names its own
 functions. Pattern samples whose files are named for their keys (`circle_g_2`) are the exception that predates this.
 
-**A value that spells a prop's own API is not a sample and keeps its spelling** — an `orientation`, a `rootSide`, a
-corner such as `"top-right"`, an easing such as `"ease-in"`, `SlotText`'s `"splitFlap"`. Those are the component's
-vocabulary rather than entries in a collection, and follow the rules for props.
+**Every other string that names a choice is snake_case too** — a prop's value (`"top_out"`, `"hold_newest"`,
+`"split_flap"`, `"month_day_year"`), a built-in shape (`"triangle_up"`, `"hexagon_pointy_top"`), a tiling
+(`"square_quarters"`), and a `kind` a utility hands back (`"pick_up"`, `"expand_siblings"`). The user widened the
+rule from samples to all of these so that one spelling holds everywhere a name is written, and the same arrangement
+is no longer `triangle-ltr` in one place and `triangle_ltr` in another.
+
+**A value the browser reads under its own name keeps that spelling.** The user's exception is CSS: `"fit-content"`,
+`"row-reverse"`, `"flex-start"`, the easings `"ease-in"` and `"ease-in-out"` — a `sizing` that picks the CSS width of
+the same name counts, and so do easings computed by hand that are the CSS curves. The user then extended it, in the
+same terms, to the other platform vocabularies a value is handed to unchanged: SVG attribute values
+(`"userSpaceOnUse"`, `"objectBoundingBox"`, `"fractalNoise"`, `"hueRotate"`) and the `Intl` calendar ids
+(`"islamic-umalqura"`). Translating those would give a reader who knows the platform a second spelling to learn.
+
+**Identifiers are not values and keep camelCase**: property names (`maxSizeBytes`), function names, and the
+Playground's example and props-row keys behind `data-testid` (`selectAll`, `autoSizing`), which name a demo rather
+than a choice a consumer passes.
 
 ### "Outline" means the focus indicator; paint along an edge is a "stroke", and the edge itself is a "contour"
 

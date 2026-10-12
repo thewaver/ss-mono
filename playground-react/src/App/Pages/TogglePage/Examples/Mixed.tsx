@@ -17,7 +17,7 @@ export const MixedExample = (props: Props) => {
                 ariaLabel={"All settings"}
                 renderContent={(flags) => <PageToggleContent flags={flags} />}
                 tooltipDefs={{
-                    placement: { x: "center", y: "top-out" },
+                    placement: { x: "center", y: "top_out" },
                     offset: { x: 0, y: 10 },
                     renderContent: (visibilityTarget, transitionDurationMs, _placement, flags) => (
                         <PageTooltipContent

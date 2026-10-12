@@ -4,6 +4,6 @@ import { swarmCcw } from "./swarmCcw";
 import { swarmCw } from "./swarmCw";
 
 export const swarmRings: CellAnimationFn = CellAnimationKeyframeUtils.fromZones(
-    [{ zone: "evenRings", animation: swarmCw }],
+    [{ zone: "even_rings", animation: swarmCw }],
     swarmCcw,
 );

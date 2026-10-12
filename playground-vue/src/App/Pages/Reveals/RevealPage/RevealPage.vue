@@ -30,12 +30,8 @@ const softness = shallowRef(REVEAL_DEFAULTS.softness);
 const stepSize = shallowRef(REVEAL_DEFAULTS.stepSize);
 const isDisabled = shallowRef(RevealKnobs.STARTING_IS_DISABLED);
 
-const isCircle = computed(() => shape.value === RevealKnobs.CIRCLE);
-
 const computePoints = computed(() => {
     const picked = shape.value;
-
-    if (picked === RevealKnobs.CIRCLE) return undefined;
 
     return (size: Size2d) => ShapeConst.getDefaultShapePoints(picked, size);
 });
@@ -110,7 +106,6 @@ const examples: ExampleDefs[] = [
                 :max="RevealKnobs.MAX_JOIN_RADIUS"
                 :step="RevealKnobs.JOIN_RADIUS_STEP"
                 :width="FIELD_WIDTH"
-                :is-disabled="isCircle"
                 ariaLabel="Corner radius"
                 @input="(value: number) => (joinRadius = value)"
             />
@@ -127,7 +122,6 @@ const examples: ExampleDefs[] = [
                 :max="RevealKnobs.MAX_LAME_EXPONENT"
                 :step="RevealKnobs.LAME_EXPONENT_STEP"
                 :width="FIELD_WIDTH"
-                :is-disabled="isCircle"
                 ariaLabel="Corner style"
                 @input="(value: number) => (lameExponent = value)"
             />

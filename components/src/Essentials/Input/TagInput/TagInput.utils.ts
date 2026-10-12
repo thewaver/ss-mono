@@ -67,7 +67,7 @@ export namespace TagInputUtils {
         if (!state.isEmpty || state.tagCount < 1) return undefined;
 
         if (key === STEP_BACK_KEY || NavigatorUtils.computeLogicalKey(key, state.direction) === "ArrowLeft") {
-            return { kind: "focusTag", index: state.tagCount - 1 };
+            return { kind: "focus_tag", index: state.tagCount - 1 };
         }
 
         return undefined;
@@ -92,18 +92,18 @@ export namespace TagInputUtils {
         index: number,
         state: { tagCount: number; direction: NavigatorDirection },
     ): TagInputKeyAction | undefined => {
-        if (e.key.length === 1 && !e.ctrlKey && !e.metaKey && !e.altKey) return { kind: "focusField", isTyping: true };
+        if (e.key.length === 1 && !e.ctrlKey && !e.metaKey && !e.altKey) return { kind: "focus_field", isTyping: true };
 
         if (REMOVE_KEYS.includes(e.key)) return { kind: "remove", index };
 
         const logicalKey = NavigatorUtils.computeLogicalKey(e.key, state.direction);
 
-        if (logicalKey === "ArrowLeft" && index > 0) return { kind: "focusTag", index: index - 1 };
+        if (logicalKey === "ArrowLeft" && index > 0) return { kind: "focus_tag", index: index - 1 };
 
         if (logicalKey === "ArrowRight") {
             return index < state.tagCount - 1
-                ? { kind: "focusTag", index: index + 1 }
-                : { kind: "focusField", isTyping: false };
+                ? { kind: "focus_tag", index: index + 1 }
+                : { kind: "focus_field", isTyping: false };
         }
 
         return undefined;
@@ -116,5 +116,5 @@ export namespace TagInputUtils {
      *
      * @param action What {@link computeFieldKeyAction} or {@link computeTagKeyAction} answered.
      */
-    export const getIsKeyTaken = (action: TagInputKeyAction) => action.kind !== "focusField" || !action.isTyping;
+    export const getIsKeyTaken = (action: TagInputKeyAction) => action.kind !== "focus_field" || !action.isTyping;
 }

@@ -60,11 +60,9 @@ export const TileBoard = (props: TileBoardProps) => {
 
     const getPitchSize = createMemo(() => access(props.tileSize));
 
-    const getTileSize = createMemo(() => TileBoardUtils.getTileBoxSize(getPitchSize(), getGap()));
-
     const getLayout = createMemo(() =>
         TileBoardUtils.getLayout(
-            access(props.tileShape) ?? TILE_BOARD_DEFAULTS.tileShape,
+            access(props.tiling) ?? TILE_BOARD_DEFAULTS.tiling,
             access(props.tileCount),
             getPitchSize(),
             access(props.hasShortFirstRow) ?? false,
@@ -73,14 +71,6 @@ export const TileBoard = (props: TileBoardProps) => {
     );
 
     const getBoardSize = createMemo(() => TileBoardUtils.getBoardSize(getLayout()));
-
-    const getPoints = createMemo(() => TileBoardUtils.getTilePoints(getLayout().shape, getTileSize(), false));
-
-    const getFlippedPoints = createMemo(() => TileBoardUtils.getTilePoints(getLayout().shape, getTileSize(), true));
-
-    const getClipPath = createMemo(() => TileBoardUtils.getClipPath(getPoints()));
-
-    const getFlippedClipPath = createMemo(() => TileBoardUtils.getClipPath(getFlippedPoints()));
 
     const getIsDisabled = createMemo(() => access(props.isDisabled) ?? false);
 
@@ -146,7 +136,7 @@ export const TileBoard = (props: TileBoardProps) => {
         const tile: Index2d = { row, col };
         const key = Index2d.toString(tile);
         const getTile = () => tile;
-        const getIsFlipped = () => TileBoardUtils.getIsFlippedTile(tile, getLayout());
+        const getGeometry = createMemo(() => TileBoardUtils.getTileGeometry(tile, getLayout(), getGap()));
 
         onCleanup(() => {
             tileRefs.delete(key);
@@ -160,7 +150,7 @@ export const TileBoard = (props: TileBoardProps) => {
             <div
                 class={styles.tileBoardCell}
                 role="presentation"
-                style={{ left: `${col * getLayout().pitch.width}px` }}
+                style={{ left: `${getGeometry().offset.x}px`, top: `${getGeometry().offset.y}px` }}
             >
                 <InteractionWrapper
                     isDisabled={() => getIsTileDisabled(tile)}
@@ -168,9 +158,9 @@ export const TileBoard = (props: TileBoardProps) => {
                     isTabbable={() => Index2d.isSame(tile, getRovingTile())}
                     extraFlags={(): TileBoardRenderProps => ({
                         tile,
-                        size: getTileSize(),
-                        points: getIsFlipped() ? getFlippedPoints() : getPoints(),
-                        isFlipped: getIsFlipped(),
+                        size: getGeometry().size,
+                        points: getGeometry().points,
+                        isFlipped: getGeometry().isFlipped,
                         isHighlighted: Index2d.isSame(tile, getRovingTile()),
                     })}
                     ref={(element) => tileRefs.set(key, element)}
@@ -185,8 +175,8 @@ export const TileBoard = (props: TileBoardProps) => {
                                     : () => props.computeTileAriaLabel!(tile)
                             }
                             colIndex={col + FIRST_ARIA_INDEX}
-                            size={getTileSize}
-                            clipPath={() => (getIsFlipped() ? getFlippedClipPath() : getClipPath())}
+                            size={() => getGeometry().size}
+                            clipPath={() => TileBoardUtils.getClipPath(getGeometry().points)}
                             renderContent={(getFlags) => props.renderTile(getTile, getFlags)}
                             onActivate={() => activateTile(tile)}
                             hitRef={setHitRef}
@@ -206,7 +196,7 @@ export const TileBoard = (props: TileBoardProps) => {
             role="grid"
             aria-label={access(props.ariaLabel)}
             aria-rowcount={getLayout().count.row}
-            aria-colcount={getLayout().count.col}
+            aria-colcount={TileBoardUtils.getColumnCount(getLayout())}
             aria-disabled={getIsDisabled() || undefined}
             style={{ width: `${getBoardSize().width}px`, height: `${getBoardSize().height}px` }}
             onKeyDown={handleKeyDown}

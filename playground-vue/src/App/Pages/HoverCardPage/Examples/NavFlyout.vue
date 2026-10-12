@@ -17,7 +17,7 @@ import PageNavMenuTrigger from "../../../StyledComponents/NavMenuContent/NavMenu
 import PagePopoverSurface from "../../../StyledComponents/PopoverSurface/PopoverSurface.vue";
 import type { NavFlyoutProps } from "../HoverCardPage.types";
 
-const FLYOUT_PLACEMENT: AnchorPlacement = { x: "left-in", y: "bottom-out" };
+const FLYOUT_PLACEMENT: AnchorPlacement = { x: "left_in", y: "bottom_out" };
 const FLYOUT_OFFSET = { x: 0, y: 6 };
 
 const props = defineProps<NavFlyoutProps>();

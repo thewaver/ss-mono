@@ -74,7 +74,7 @@ export type TimelineStop = {
     span: TimelineSpan;
 };
 
-export type TimelineStep = "previous" | "next" | "laneBefore" | "laneAfter" | "first" | "last";
+export type TimelineStep = "previous" | "next" | "lane_before" | "lane_after" | "first" | "last";
 
 export type TimelineKeyAction =
     | { kind: "cancel" }

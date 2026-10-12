@@ -5,32 +5,32 @@ import { DateInputUtils } from "./DateInput.utils";
 
 const date = (iso: string) => DateValueUtils.fromIso(iso)!;
 
-const parse = (digits: string, format: "iso" | "day-month-year" = "iso") =>
+const parse = (digits: string, format: "iso" | "day_month_year" = "iso") =>
     DateInputUtils.parseDigits(digits, { format, calendar: "gregory", era: "AD" });
 
 describe("DateInputUtils masks and hints", () => {
     it("derives the mask and hint from the format's order", () => {
         expect(DateInputUtils.computeMask("iso")).toBe("####-##-##");
-        expect(DateInputUtils.computeMask("day-month-year")).toBe("##/##/####");
-        expect(DateInputUtils.computeHint("month-day-year", { year: "yyyy", month: "mm", day: "dd" })).toBe(
+        expect(DateInputUtils.computeMask("day_month_year")).toBe("##/##/####");
+        expect(DateInputUtils.computeHint("month_day_year", { year: "yyyy", month: "mm", day: "dd" })).toBe(
             "mm/dd/yyyy",
         );
     });
 
     it("writes a date as digits in the format's order", () => {
-        expect(DateInputUtils.toDigits(date("2026-12-25"), "day-month-year")).toBe("25122026");
+        expect(DateInputUtils.toDigits(date("2026-12-25"), "day_month_year")).toBe("25122026");
     });
 });
 
 describe("DateInputUtils.parseDigits", () => {
     it("reads a complete date in either order", () => {
         expect(DateValueUtils.toIso(parse("20261225")!)).toBe("2026-12-25");
-        expect(DateValueUtils.toIso(parse("25122026", "day-month-year")!)).toBe("2026-12-25");
+        expect(DateValueUtils.toIso(parse("25122026", "day_month_year")!)).toBe("2026-12-25");
     });
 
     it("refuses a date that does not exist rather than nudging it", () => {
         expect(parse("20260231")).toBeUndefined();
-        expect(parse("31022026", "day-month-year")).toBeUndefined();
+        expect(parse("31022026", "day_month_year")).toBeUndefined();
     });
 
     it("refuses an incomplete run and a date outside the bounds", () => {

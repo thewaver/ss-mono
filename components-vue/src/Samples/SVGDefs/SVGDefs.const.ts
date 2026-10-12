@@ -77,7 +77,11 @@ import { circle_hs_2 } from "./Pattern/Timed/circle_hs_2";
 import { hexagon_ft_2 } from "./Pattern/Timed/hexagon_ft_2";
 import { hexagon_pt_2 } from "./Pattern/Timed/hexagon_pt_2";
 import { lozenge_d_2 } from "./Pattern/Timed/lozenge_d_2";
+import { triangle_lq_2 } from "./Pattern/Timed/triangle_lq_2";
+import { triangle_ltr_2 } from "./Pattern/Timed/triangle_ltr_2";
+import { triangle_rtl_2 } from "./Pattern/Timed/triangle_rtl_2";
 import { triangle_s_2 } from "./Pattern/Timed/triangle_s_2";
+import { triangle_sq_2 } from "./Pattern/Timed/triangle_sq_2";
 import { triangle_t_2 } from "./Pattern/Timed/triangle_t_2";
 import { whirl_2 } from "./Pattern/Timed/whirl_2";
 import { whirl_curved_2 } from "./Pattern/Timed/whirl_curved_2";
@@ -89,7 +93,11 @@ import { hexagon_pt_fade_2 } from "./Pattern/Tracked/hexagon_pt_fade_2";
 import { hexagon_pt_trail_2 } from "./Pattern/Tracked/hexagon_pt_trail_2";
 import { lozenge_d_fade_2 } from "./Pattern/Tracked/lozenge_d_fade_2";
 import { square_g_trail_2 } from "./Pattern/Tracked/square_g_trail_2";
+import { triangle_lq_fade_2 } from "./Pattern/Tracked/triangle_lq_fade_2";
+import { triangle_ltr_fade_2 } from "./Pattern/Tracked/triangle_ltr_fade_2";
+import { triangle_rtl_fade_2 } from "./Pattern/Tracked/triangle_rtl_fade_2";
 import { triangle_s_fade_2 } from "./Pattern/Tracked/triangle_s_fade_2";
+import { triangle_sq_fade_2 } from "./Pattern/Tracked/triangle_sq_fade_2";
 import { triangle_t_fade_2 } from "./Pattern/Tracked/triangle_t_fade_2";
 import { triangle_t_trail_2 } from "./Pattern/Tracked/triangle_t_trail_2";
 import type {
@@ -138,6 +146,10 @@ export namespace SVGDefsSamples {
                 lozenge_d_2,
                 triangle_s_2,
                 triangle_t_2,
+                triangle_ltr_2,
+                triangle_rtl_2,
+                triangle_sq_2,
+                triangle_lq_2,
                 whirl_2,
                 whirl_curved_2,
             } as const satisfies Record<string, TimedPatternConfig>;
@@ -157,6 +169,10 @@ export namespace SVGDefsSamples {
                 lozenge_d_fade_2,
                 triangle_s_fade_2,
                 triangle_t_fade_2,
+                triangle_ltr_fade_2,
+                triangle_rtl_fade_2,
+                triangle_sq_fade_2,
+                triangle_lq_fade_2,
                 square_g_trail_2,
                 hexagon_pt_trail_2,
                 triangle_t_trail_2,
@@ -171,6 +187,10 @@ export namespace SVGDefsSamples {
                 lozenge_d_fade_2: { family: "lozenge_d_fade_2" },
                 triangle_s_fade_2: { family: "triangle_s_fade_2" },
                 triangle_t_fade_2: { family: "triangle_t_fade_2" },
+                triangle_ltr_fade_2: { family: "triangle_ltr_fade_2" },
+                triangle_rtl_fade_2: { family: "triangle_rtl_fade_2" },
+                triangle_sq_fade_2: { family: "triangle_sq_fade_2" },
+                triangle_lq_fade_2: { family: "triangle_lq_fade_2" },
                 square_g_trail_2: { family: "square_g_trail_2" },
                 hexagon_pt_trail_2: { family: "hexagon_pt_trail_2" },
                 triangle_t_trail_2: { family: "triangle_t_trail_2" },

@@ -28,11 +28,7 @@
     let stepSize = $state(REVEAL_DEFAULTS.stepSize);
     let isDisabled = $state(RevealKnobs.STARTING_IS_DISABLED);
 
-    const isCircle = $derived(shape === RevealKnobs.CIRCLE);
-
     const computePoints = $derived.by(() => {
-        if (shape === RevealKnobs.CIRCLE) return undefined;
-
         const polygon = shape;
 
         return (size: Size2d) => ShapeConst.getDefaultShapePoints(polygon, size);
@@ -130,7 +126,6 @@
             max={RevealKnobs.MAX_JOIN_RADIUS}
             step={RevealKnobs.JOIN_RADIUS_STEP}
             width={FIELD_WIDTH}
-            isDisabled={isCircle}
             ariaLabel={"Corner radius"}
             onInput={(value) => (joinRadius = value)}
         />
@@ -147,7 +142,6 @@
             max={RevealKnobs.MAX_LAME_EXPONENT}
             step={RevealKnobs.LAME_EXPONENT_STEP}
             width={FIELD_WIDTH}
-            isDisabled={isCircle}
             ariaLabel={"Corner style"}
             onInput={(value) => (lameExponent = value)}
         />

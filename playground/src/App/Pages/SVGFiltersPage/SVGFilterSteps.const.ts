@@ -32,8 +32,8 @@ const step = (id: SVGFiltersStepId, name: string): SortableItemRecord<SVGFilters
 
 export const APPLIED_STEPS: SortableItemRecord<SVGFiltersStep, never>[] = [
     step("turbulence", "Turbulence"),
-    step("gaussianBlur", "Blur"),
-    step("dropShadow", "Drop shadow"),
+    step("gaussian_blur", "Blur"),
+    step("drop_shadow", "Drop shadow"),
     step("saturation", "Saturation"),
 ];
 

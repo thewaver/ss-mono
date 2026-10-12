@@ -52,7 +52,7 @@ export const Popover = (props: PopoverProps) => {
 
         hasSeenAnchorRef.current = presence.hasSeenAnchor;
 
-        if (presence.isGone) latest.current.onDismiss?.("anchorGone");
+        if (presence.isGone) latest.current.onDismiss?.("anchor_gone");
     }, [props.isOpen, isPinned, isAnchorOnScreen, latest]);
 
     DismisserReactUtils.useLayer(props.isOpen, {

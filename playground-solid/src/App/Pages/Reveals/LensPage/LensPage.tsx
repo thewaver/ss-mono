@@ -26,12 +26,8 @@ export const LensPage = () => {
     const [getStepSize, setStepSize] = createSignal(LENS_DEFAULTS.stepSize);
     const [getIsDisabled, setIsDisabled] = createSignal(LensKnobs.STARTING_IS_DISABLED);
 
-    const getIsCircle = createMemo(() => getShape() === LensKnobs.CIRCLE);
-
     const getComputePoints = createMemo(() => {
         const shape = getShape();
-
-        if (shape === LensKnobs.CIRCLE) return undefined;
 
         return (size: Size2d) => ShapeConst.getDefaultShapePoints(shape, size);
     });
@@ -117,7 +113,6 @@ export const LensPage = () => {
                         max={() => LensKnobs.MAX_JOIN_RADIUS}
                         step={() => LensKnobs.JOIN_RADIUS_STEP}
                         width={() => FIELD_WIDTH}
-                        isDisabled={getIsCircle}
                         ariaLabel={"Corner radius"}
                         onInput={setJoinRadius}
                     />
@@ -136,7 +131,6 @@ export const LensPage = () => {
                         max={() => LensKnobs.MAX_LAME_EXPONENT}
                         step={() => LensKnobs.LAME_EXPONENT_STEP}
                         width={() => FIELD_WIDTH}
-                        isDisabled={getIsCircle}
                         ariaLabel={"Corner style"}
                         onInput={setLameExponent}
                     />

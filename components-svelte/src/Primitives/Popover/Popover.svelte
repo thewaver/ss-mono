@@ -57,7 +57,7 @@
 
         hasSeenAnchor = presence.hasSeenAnchor;
 
-        if (presence.isGone) untrack(() => props.onDismiss?.("anchorGone"));
+        if (presence.isGone) untrack(() => props.onDismiss?.("anchor_gone"));
     });
 
     DismisserSvelteUtils.createLayer(

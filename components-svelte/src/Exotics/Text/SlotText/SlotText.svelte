@@ -165,7 +165,7 @@
             onGrown={() => settleTurning(index)}
             onShrunk={() => dropTurningColumn(index)}
         >
-            {#if mechanism === "splitFlap"}
+            {#if mechanism === "split_flap"}
                 {#snippet flapCharacter(character: string)}
                     {#if props.renderTurning}
                         {@render props.renderTurning(character, flags)}

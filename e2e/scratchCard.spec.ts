@@ -221,3 +221,14 @@ test("the ticket can be put back", async ({ page }) => {
 
     expect(await clearedPercent(page), "and the reset put the whole cover back").toBe(0);
 });
+
+/**
+ * The shape picker lists the library's own built-in shapes and nothing the page invents. A hundred-sided polygon
+ * reads as a circle on its own, so the page no longer adds a circle of its own beside it.
+ */
+test("the shape picker offers the built-in shapes and no circle of the page's own", async ({ page }) => {
+    await page.locator(`${prop("brushShape")} [role="combobox"]`).click();
+
+    await expect(page.getByRole("option", { name: "hectogon", exact: true })).toBeVisible();
+    await expect(page.getByRole("option", { name: "circle", exact: true })).toHaveCount(0);
+});

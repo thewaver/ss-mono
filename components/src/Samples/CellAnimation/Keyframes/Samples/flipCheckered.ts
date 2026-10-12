@@ -4,6 +4,6 @@ import { flipHorizontal } from "./flipHorizontal";
 import { flipVertical } from "./flipVertical";
 
 export const flipCheckered: CellAnimationFn = CellAnimationKeyframeUtils.fromZones(
-    [{ zone: "evenCheckeredCells", animation: flipHorizontal }],
+    [{ zone: "even_checkered_cells", animation: flipHorizontal }],
     flipVertical,
 );

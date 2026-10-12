@@ -4,6 +4,6 @@ import { encircleCcw } from "./encircleCcw";
 import { encircleCw } from "./encircleCw";
 
 export const encircleCheckered: CellAnimationFn = CellAnimationKeyframeUtils.fromZones(
-    [{ zone: "evenCheckeredCells", animation: encircleCw }],
+    [{ zone: "even_checkered_cells", animation: encircleCw }],
     encircleCcw,
 );

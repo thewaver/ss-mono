@@ -26,7 +26,7 @@ export const DefaultExample = ({ shape, marked, ...otherProps }: Props) => {
         <div className={styles.meepleHost}>
             <TileBoard
                 {...otherProps}
-                tileShape={shape}
+                tiling={shape}
                 computeTileAriaLabel={(tile) => `Row ${tile.row + 1}, tile ${tile.col + 1}`}
                 renderTile={(tile, renderProps) => (
                     <PageTileBoardTile renderProps={renderProps} isMarked={marked.includes(Index2d.toString(tile))} />

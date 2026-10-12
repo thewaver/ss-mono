@@ -13,7 +13,7 @@ type Props = SlotTextWordsExampleProps;
 
 const props = defineProps<Props>();
 
-const tileClass = computed(() => (props.mechanism === "splitFlap" ? styles.flapTile : styles.digit));
+const tileClass = computed(() => (props.mechanism === "split_flap" ? styles.flapTile : styles.digit));
 </script>
 
 <template>

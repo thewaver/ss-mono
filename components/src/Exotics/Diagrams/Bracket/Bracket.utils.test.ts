@@ -83,13 +83,16 @@ describe("computeStepId", () => {
     const placements = BracketUtils.computeLayout(FINAL).placements;
 
     it("steps toward the root by following the node that this one feeds", () => {
-        expect(BracketUtils.computeStepId("toRoot", "0.0.0", placements)).toBe("0.0");
-        expect(BracketUtils.computeStepId("toRoot", "0", placements), "the final feeds nobody").toBeUndefined();
+        expect(BracketUtils.computeStepId("to_root", "0.0.0", placements)).toBe("0.0");
+        expect(BracketUtils.computeStepId("to_root", "0", placements), "the final feeds nobody").toBeUndefined();
     });
 
     it("steps toward the leaves by the middle of the nodes that feed this one", () => {
-        expect(BracketUtils.computeStepId("toLeaves", "0.0", placements)).toBe("0.0.0");
-        expect(BracketUtils.computeStepId("toLeaves", "0.0.0", placements), "a leaf feeds from nobody").toBeUndefined();
+        expect(BracketUtils.computeStepId("to_leaves", "0.0", placements)).toBe("0.0.0");
+        expect(
+            BracketUtils.computeStepId("to_leaves", "0.0.0", placements),
+            "a leaf feeds from nobody",
+        ).toBeUndefined();
     });
 
     it("steps up and down inside one layer, in the order the board draws them", () => {
@@ -199,10 +202,10 @@ describe("computeGeometry", () => {
 
 describe("getKeyStep", () => {
     it("points the arrow along the board at the final towards it", () => {
-        expect(BracketUtils.getKeyStep("ArrowRight", "horizontal", "end")).toBe("toRoot");
-        expect(BracketUtils.getKeyStep("ArrowLeft", "horizontal", "end")).toBe("toLeaves");
-        expect(BracketUtils.getKeyStep("ArrowLeft", "horizontal", "start")).toBe("toRoot");
-        expect(BracketUtils.getKeyStep("ArrowUp", "vertical", "start")).toBe("toRoot");
+        expect(BracketUtils.getKeyStep("ArrowRight", "horizontal", "end")).toBe("to_root");
+        expect(BracketUtils.getKeyStep("ArrowLeft", "horizontal", "end")).toBe("to_leaves");
+        expect(BracketUtils.getKeyStep("ArrowLeft", "horizontal", "start")).toBe("to_root");
+        expect(BracketUtils.getKeyStep("ArrowUp", "vertical", "start")).toBe("to_root");
     });
 
     it("moves within a layer across the board, and leaves other keys alone", () => {
@@ -502,13 +505,13 @@ describe("computeFamilyStep", () => {
     const [semi1, semi2] = FINAL.children!;
 
     it("walks from the root's own family to the one the root names, and back", () => {
-        expect(BracketUtils.computeFamilyStep(FINAL, undefined, "toLeaves")).toBe(FINAL);
-        expect(BracketUtils.computeFamilyStep(FINAL, FINAL, "toRoot")).toBeUndefined();
+        expect(BracketUtils.computeFamilyStep(FINAL, undefined, "to_leaves")).toBe(FINAL);
+        expect(BracketUtils.computeFamilyStep(FINAL, FINAL, "to_root")).toBeUndefined();
     });
 
     it("moves a stage out onto the middle child, and back in to the parent", () => {
-        expect(BracketUtils.computeFamilyStep(FINAL, FINAL, "toLeaves")).toBe(semi1);
-        expect(BracketUtils.computeFamilyStep(FINAL, semi2, "toRoot")).toBe(FINAL);
+        expect(BracketUtils.computeFamilyStep(FINAL, FINAL, "to_leaves")).toBe(semi1);
+        expect(BracketUtils.computeFamilyStep(FINAL, semi2, "to_root")).toBe(FINAL);
     });
 
     it("moves across a stage to the neighbor", () => {
@@ -517,9 +520,9 @@ describe("computeFamilyStep", () => {
     });
 
     it("stays put where there is nowhere to go, since a leaf cannot name a family", () => {
-        expect(BracketUtils.computeFamilyStep(FINAL, semi1, "toLeaves"), "its children are all leaves").toBe(semi1);
+        expect(BracketUtils.computeFamilyStep(FINAL, semi1, "to_leaves"), "its children are all leaves").toBe(semi1);
         expect(BracketUtils.computeFamilyStep(FINAL, semi2, "next"), "the stage does not wrap").toBe(semi2);
-        expect(BracketUtils.computeFamilyStep(FINAL, undefined, "toRoot")).toBeUndefined();
+        expect(BracketUtils.computeFamilyStep(FINAL, undefined, "to_root")).toBeUndefined();
     });
 });
 

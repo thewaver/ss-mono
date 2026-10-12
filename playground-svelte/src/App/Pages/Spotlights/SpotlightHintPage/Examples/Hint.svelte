@@ -31,7 +31,7 @@
             <div bind:this={anchorRefs[index]} class={index === 0 ? styles.anchorSlidingH : styles.anchorSlidingV}>
                 <Button
                     tooltipDefs={{
-                        placement: { x: "center", y: "top-out" },
+                        placement: { x: "center", y: "top_out" },
                         offset: { x: 0, y: 10 },
                         renderContent: tooltip,
                     }}

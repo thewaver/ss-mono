@@ -2,7 +2,7 @@ import { createMemo, createSignal } from "solid-js";
 
 import { TILE_BOARD_DEFAULTS, TileBoardUtils } from "@thewaver/ss-components-solid";
 import { TileBoardKnobs } from "@thewaver/ss-playground/App/Knobs/TileBoards.const";
-import { Index2d, type Index2dString, ShapeConst } from "@thewaver/ss-utils";
+import { Index2d, type Index2dString } from "@thewaver/ss-utils";
 
 import { PageExampleKnobs } from "../../PageComponents/ExampleKnobs/ExampleKnobs";
 import { PageExamples } from "../../PageComponents/Examples/Examples";
@@ -39,7 +39,7 @@ export const TileBoardPage = () => {
     const [getTileWidth, setTileWidth] = createSignal(TileBoardKnobs.STARTING_TILE_WIDTH);
     const [getTileHeight, setTileHeight] = createSignal(TileBoardKnobs.STARTING_TILE_HEIGHT);
     const [getGap, setGap] = createSignal(TILE_BOARD_DEFAULTS.gap);
-    const [getShape, setShape] = createSignal<ShapeConst.DefaultShape>(TILE_BOARD_DEFAULTS.tileShape);
+    const [getTiling, setTiling] = createSignal(TILE_BOARD_DEFAULTS.tiling);
     const [getHasShortFirstRow, setHasShortFirstRow] = createSignal(TileBoardKnobs.STARTING_HAS_SHORT_FIRST_ROW);
     const [getTaper, setTaper] = createSignal(TILE_BOARD_DEFAULTS.taper);
     const [getReach, setReach] = createSignal(TileBoardKnobs.STARTING_REACH);
@@ -54,7 +54,7 @@ export const TileBoardPage = () => {
     const getTileSize = createMemo(() => ({ width: getTileWidth(), height: getTileHeight() }));
 
     const getLayout = createMemo(() =>
-        TileBoardUtils.getLayout(getShape(), getTileCount(), getTileSize(), getHasShortFirstRow(), getTaper()),
+        TileBoardUtils.getLayout(getTiling(), getTileCount(), getTileSize(), getHasShortFirstRow(), getTaper()),
     );
 
     const getReachable = createMemo(() => TileBoardUtils.getTilesWithin(getPiece(), getReach(), getLayout()));
@@ -104,7 +104,7 @@ export const TileBoardPage = () => {
             tileCount: getTileCount,
             tileSize: getTileSize,
             gap: getGap,
-            shape: getShape,
+            tiling: getTiling,
             hasShortFirstRow: getHasShortFirstRow,
             taper: getTaper,
         };
@@ -285,16 +285,18 @@ export const TileBoardPage = () => {
                 </PageProp>
 
                 <PageProp
-                    key={"shape"}
-                    label={"Tile shape"}
-                    hint={"The contour each tile is cut to. A hexagon offsets alternate rows; a square does not."}
+                    key={"tiling"}
+                    label={"Tiling"}
+                    hint={
+                        "How the board is tiled. A shape lays that shape whole; the two halves cut each box corner to corner, from the top left down or the top right down, and the two quarters cut a square or a lozenge into four."
+                    }
                 >
                     <PageSelectField
-                        value={getShape}
-                        values={() => ShapeConst.DEFAULT_SHAPES}
+                        value={getTiling}
+                        values={() => TileBoardKnobs.TILINGS}
                         width={() => FIELD_WIDTH}
-                        ariaLabel={"Tile shape"}
-                        onChange={(shape) => setShape(() => shape)}
+                        ariaLabel={"Tiling"}
+                        onChange={(tiling) => setTiling(() => tiling)}
                     />
                 </PageProp>
 

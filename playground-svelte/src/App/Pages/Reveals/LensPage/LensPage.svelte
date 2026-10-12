@@ -28,11 +28,7 @@
     let stepSize = $state(LENS_DEFAULTS.stepSize);
     let isDisabled = $state(LensKnobs.STARTING_IS_DISABLED);
 
-    const isCircle = $derived(shape === LensKnobs.CIRCLE);
-
     const computePoints = $derived.by(() => {
-        if (shape === LensKnobs.CIRCLE) return undefined;
-
         const polygon = shape;
 
         return (size: Size2d) => ShapeConst.getDefaultShapePoints(polygon, size);
@@ -128,7 +124,6 @@
             max={LensKnobs.MAX_JOIN_RADIUS}
             step={LensKnobs.JOIN_RADIUS_STEP}
             width={FIELD_WIDTH}
-            isDisabled={isCircle}
             ariaLabel={"Corner radius"}
             onInput={(value) => (joinRadius = value)}
         />
@@ -145,7 +140,6 @@
             max={LensKnobs.MAX_LAME_EXPONENT}
             step={LensKnobs.LAME_EXPONENT_STEP}
             width={FIELD_WIDTH}
-            isDisabled={isCircle}
             ariaLabel={"Corner style"}
             onInput={(value) => (lameExponent = value)}
         />

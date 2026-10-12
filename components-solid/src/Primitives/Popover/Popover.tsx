@@ -66,7 +66,7 @@ export const Popover = (props: PopoverProps) => {
 
         hasSeenAnchor = presence.hasSeenAnchor;
 
-        if (presence.isGone) props.onDismiss?.("anchorGone");
+        if (presence.isGone) props.onDismiss?.("anchor_gone");
     });
 
     DismisserSolidUtils.createLayer(() => access(props.isOpen), {

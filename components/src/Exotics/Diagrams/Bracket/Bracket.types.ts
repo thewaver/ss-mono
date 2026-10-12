@@ -12,7 +12,7 @@ export type BracketRootSide = "start" | "end";
 
 export type BracketView = "tree" | "family";
 
-export type BracketStep = "toRoot" | "toLeaves" | "previous" | "next" | "first" | "last";
+export type BracketStep = "to_root" | "to_leaves" | "previous" | "next" | "first" | "last";
 
 export type BracketPlacement = {
     id: string;

@@ -771,9 +771,10 @@ export namespace SortableGridUtils {
     ): SortableKeyAction | undefined => {
         if (key === CANCEL_KEY) return opts.isCarrying ? { kind: "cancel" } : undefined;
 
-        if (NavigatorUtils.getIsActivationKey(key)) return opts.isCarrying ? { kind: "drop" } : { kind: "pickUp" };
+        if (NavigatorUtils.getIsActivationKey(key)) return opts.isCarrying ? { kind: "drop" } : { kind: "pick_up" };
 
-        if (opts.isCarrying && key === NEXT_ZONE_KEY) return { kind: "aimAtNextZone", step: opts.isShifted ? -1 : 1 };
+        if (opts.isCarrying && key === NEXT_ZONE_KEY)
+            return { kind: "aim_at_next_zone", step: opts.isShifted ? -1 : 1 };
 
         if (opts.isCarrying) {
             const nudge = NUDGE_KEYS[key];

@@ -10,10 +10,10 @@ import PageLayer from "../Layer/Layer.vue";
 import PagePropsPanel from "../PropsPanel/PagePropsPanel.vue";
 import type { PageExampleKnobsButtonProps, PageExampleKnobsButtonSlots } from "./ExampleKnobs.types";
 
-const KNOBS_PLACEMENT: AnchorPlacement = { x: "right-out", y: "top-in" };
+const KNOBS_PLACEMENT: AnchorPlacement = { x: "right_out", y: "top_in" };
 const KNOBS_OFFSET = { x: 10, y: 0 };
 const KNOBS_MARK = "⚙";
-const TOOLTIP_PLACEMENT: AnchorPlacement = { x: "center", y: "top-out" };
+const TOOLTIP_PLACEMENT: AnchorPlacement = { x: "center", y: "top_out" };
 const TOOLTIP_OFFSET = { x: 0, y: 10 };
 
 const props = defineProps<PageExampleKnobsButtonProps>();

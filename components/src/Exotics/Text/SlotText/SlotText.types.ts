@@ -2,7 +2,7 @@ import type { Store } from "@thewaver/ss-utils";
 
 export type SlotTextSlotKind = "digit" | "letter" | "fixed";
 
-export type SlotTextMechanism = "drum" | "splitFlap";
+export type SlotTextMechanism = "drum" | "split_flap";
 
 export type SlotTextLetterRoute = "forward" | "shortest";
 

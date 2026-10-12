@@ -1,6 +1,6 @@
 import type { Point2d, ShapeConst, Size2d } from "@thewaver/ss-utils";
 
-export type RevealShape = "circle" | ShapeConst.DefaultShape;
+export type RevealShape = ShapeConst.DefaultShape;
 
 export type RevealExampleProps = {
     radius: () => number;

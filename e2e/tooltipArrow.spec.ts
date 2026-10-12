@@ -94,7 +94,7 @@ test("with no arrow picked, nothing is painted outside the tooltip's box", async
 test("above the anchor, the arrow leaves the bottom edge lined up with the anchor's middle", async ({ page }) => {
     await pick(page, "arrow", "Triangle");
     await pick(page, "hPlacement", "center");
-    await pick(page, "vPlacement", "top-out");
+    await pick(page, "vPlacement", "top_out");
 
     const reading = await readArrow(page);
     const tip = findTip(reading);
@@ -105,8 +105,8 @@ test("above the anchor, the arrow leaves the bottom edge lined up with the ancho
 
 test("below the anchor, it leaves the top edge, still lined up", async ({ page }) => {
     await pick(page, "arrow", "Triangle");
-    await pick(page, "hPlacement", "left-in");
-    await pick(page, "vPlacement", "bottom-out");
+    await pick(page, "hPlacement", "left_in");
+    await pick(page, "vPlacement", "bottom_out");
 
     const reading = await readArrow(page);
     const tip = findTip(reading);
@@ -117,7 +117,7 @@ test("below the anchor, it leaves the top edge, still lined up", async ({ page }
 
 test("beside the anchor, it leaves the facing side, lined up down the anchor", async ({ page }) => {
     await pick(page, "arrow", "Triangle");
-    await pick(page, "hPlacement", "right-out");
+    await pick(page, "hPlacement", "right_out");
     await pick(page, "vPlacement", "center");
 
     const reading = await readArrow(page);
@@ -137,8 +137,8 @@ test("off a corner of the anchor, it leaves the nearest corner along that corner
     await pick(page, "arrow", "Triangle");
     await type(page, "arrowWidth", 12);
     await type(page, "arrowLength", 12);
-    await pick(page, "hPlacement", "left-out");
-    await pick(page, "vPlacement", "bottom-out");
+    await pick(page, "hPlacement", "left_out");
+    await pick(page, "vPlacement", "bottom_out");
 
     const reading = await readArrow(page);
     const tip = findTip(reading);
@@ -158,8 +158,8 @@ test("off a corner of the anchor, it leaves the nearest corner along that corner
 
 test("overlapping its anchor, the tooltip has nothing to point at and draws no arrow", async ({ page }) => {
     await pick(page, "arrow", "Triangle");
-    await pick(page, "hPlacement", "left-in");
-    await pick(page, "vPlacement", "bottom-in");
+    await pick(page, "hPlacement", "left_in");
+    await pick(page, "vPlacement", "bottom_in");
 
     const reading = await readArrow(page);
 
@@ -169,7 +169,7 @@ test("overlapping its anchor, the tooltip has nothing to point at and draws no a
 test("the tip stands off by the length typed in, and the base is as wide as the width", async ({ page }) => {
     await pick(page, "arrow", "Triangle");
     await pick(page, "hPlacement", "center");
-    await pick(page, "vPlacement", "top-out");
+    await pick(page, "vPlacement", "top_out");
 
     for (const [width, length] of [
         [12, 6],
@@ -192,7 +192,7 @@ test("the tip stands off by the length typed in, and the base is as wide as the 
 test("the lightning bolt keeps its lean: its tip on the anchor, its base wholly to one side", async ({ page }) => {
     await pick(page, "arrow", "Lightning bolt");
     await pick(page, "hPlacement", "center");
-    await pick(page, "vPlacement", "top-out");
+    await pick(page, "vPlacement", "top_out");
 
     const reading = await readArrow(page);
     const tip = findTip(reading);

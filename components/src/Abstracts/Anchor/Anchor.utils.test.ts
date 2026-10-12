@@ -12,13 +12,13 @@ const WIDE_CONTENT: Size2d = { width: 200, height: 100 };
 
 describe("getHPlacementShift", () => {
     it("hangs an out placement off the edge it names", () => {
-        expect(AnchorUtils.getHPlacementShift("left-out", ANCHOR, CONTENT)).toBe(70);
-        expect(AnchorUtils.getHPlacementShift("right-out", ANCHOR, CONTENT)).toBe(150);
+        expect(AnchorUtils.getHPlacementShift("left_out", ANCHOR, CONTENT)).toBe(70);
+        expect(AnchorUtils.getHPlacementShift("right_out", ANCHOR, CONTENT)).toBe(150);
     });
 
     it("aligns an in placement with the edge it names, keeping the content inside", () => {
-        expect(AnchorUtils.getHPlacementShift("left-in", ANCHOR, CONTENT)).toBe(100);
-        expect(AnchorUtils.getHPlacementShift("right-in", ANCHOR, CONTENT)).toBe(120);
+        expect(AnchorUtils.getHPlacementShift("left_in", ANCHOR, CONTENT)).toBe(100);
+        expect(AnchorUtils.getHPlacementShift("right_in", ANCHOR, CONTENT)).toBe(120);
     });
 
     it("centers by the difference in widths, so a content wider than the anchor overhangs both sides", () => {
@@ -29,13 +29,13 @@ describe("getHPlacementShift", () => {
 
 describe("getVPlacementShift", () => {
     it("hangs an out placement off the edge it names", () => {
-        expect(AnchorUtils.getVPlacementShift("top-out", ANCHOR, CONTENT)).toBe(190);
-        expect(AnchorUtils.getVPlacementShift("bottom-out", ANCHOR, CONTENT)).toBe(220);
+        expect(AnchorUtils.getVPlacementShift("top_out", ANCHOR, CONTENT)).toBe(190);
+        expect(AnchorUtils.getVPlacementShift("bottom_out", ANCHOR, CONTENT)).toBe(220);
     });
 
     it("aligns an in placement with the edge it names", () => {
-        expect(AnchorUtils.getVPlacementShift("top-in", ANCHOR, CONTENT)).toBe(200);
-        expect(AnchorUtils.getVPlacementShift("bottom-in", ANCHOR, CONTENT)).toBe(210);
+        expect(AnchorUtils.getVPlacementShift("top_in", ANCHOR, CONTENT)).toBe(200);
+        expect(AnchorUtils.getVPlacementShift("bottom_in", ANCHOR, CONTENT)).toBe(210);
     });
 
     it("centers by the difference in heights", () => {
@@ -45,17 +45,17 @@ describe("getVPlacementShift", () => {
 
 describe("placement offsets", () => {
     it("pushes an out placement away from the anchor", () => {
-        expect(AnchorUtils.getHPlacementOffset("right-out", 8)).toBe(8);
-        expect(AnchorUtils.getHPlacementOffset("left-out", 8)).toBe(-8);
-        expect(AnchorUtils.getVPlacementOffset("bottom-out", 8)).toBe(8);
-        expect(AnchorUtils.getVPlacementOffset("top-out", 8)).toBe(-8);
+        expect(AnchorUtils.getHPlacementOffset("right_out", 8)).toBe(8);
+        expect(AnchorUtils.getHPlacementOffset("left_out", 8)).toBe(-8);
+        expect(AnchorUtils.getVPlacementOffset("bottom_out", 8)).toBe(8);
+        expect(AnchorUtils.getVPlacementOffset("top_out", 8)).toBe(-8);
     });
 
     it("pushes an in placement inward from the edge it is aligned to", () => {
-        expect(AnchorUtils.getHPlacementOffset("left-in", 8)).toBe(8);
-        expect(AnchorUtils.getHPlacementOffset("right-in", 8)).toBe(-8);
-        expect(AnchorUtils.getVPlacementOffset("top-in", 8)).toBe(8);
-        expect(AnchorUtils.getVPlacementOffset("bottom-in", 8)).toBe(-8);
+        expect(AnchorUtils.getHPlacementOffset("left_in", 8)).toBe(8);
+        expect(AnchorUtils.getHPlacementOffset("right_in", 8)).toBe(-8);
+        expect(AnchorUtils.getVPlacementOffset("top_in", 8)).toBe(8);
+        expect(AnchorUtils.getVPlacementOffset("bottom_in", 8)).toBe(-8);
     });
 
     it("leaves a centered placement alone", () => {
@@ -69,18 +69,18 @@ describe("getSafeHPlacement", () => {
         AnchorUtils.getSafeHPlacement(placement, anchor, WIDE_CONTENT, SCREEN, undefined, reserved);
 
     it("keeps the asked-for out placement when it fits", () => {
-        expect(safeH("right-out", ANCHOR)).toBe("right-out");
-        expect(safeH("left-out", { ...ANCHOR, x: 500 })).toBe("left-out");
+        expect(safeH("right_out", ANCHOR)).toBe("right_out");
+        expect(safeH("left_out", { ...ANCHOR, x: 500 })).toBe("left_out");
     });
 
     it("flips an out placement that would overflow to the side with room", () => {
-        expect(safeH("right-out", { ...ANCHOR, x: 900 })).toBe("left-out");
-        expect(safeH("left-out", { ...ANCHOR, x: 50 })).toBe("right-out");
+        expect(safeH("right_out", { ...ANCHOR, x: 900 })).toBe("left_out");
+        expect(safeH("left_out", { ...ANCHOR, x: 50 })).toBe("right_out");
     });
 
     it("picks the roomier side when neither fits, rather than overflowing the asked-for one", () => {
-        expect(safeH("right-out", { ...ANCHOR, x: 100 }, { width: 700, height: 0 })).toBe("right-out");
-        expect(safeH("left-out", { ...ANCHOR, x: 900 }, { width: 700, height: 0 })).toBe("left-out");
+        expect(safeH("right_out", { ...ANCHOR, x: 100 }, { width: 700, height: 0 })).toBe("right_out");
+        expect(safeH("left_out", { ...ANCHOR, x: 900 }, { width: 700, height: 0 })).toBe("left_out");
     });
 
     it("keeps center when there is room either side of it", () => {
@@ -88,58 +88,58 @@ describe("getSafeHPlacement", () => {
     });
 
     it("drops center to the in placement that grows away from the nearer edge", () => {
-        expect(safeH("center", { ...ANCHOR, x: 10 })).toBe("left-in");
-        expect(safeH("center", { ...ANCHOR, x: 940 })).toBe("right-in");
+        expect(safeH("center", { ...ANCHOR, x: 10 })).toBe("left_in");
+        expect(safeH("center", { ...ANCHOR, x: 940 })).toBe("right_in");
     });
 
     it("counts reserved screen space as unavailable, so a docked panel pushes the flip earlier", () => {
-        expect(safeH("right-out", { ...ANCHOR, x: 700 })).toBe("right-out");
-        expect(safeH("right-out", { ...ANCHOR, x: 700 }, { width: 200, height: 0 })).toBe("left-out");
+        expect(safeH("right_out", { ...ANCHOR, x: 700 })).toBe("right_out");
+        expect(safeH("right_out", { ...ANCHOR, x: 700 }, { width: 200, height: 0 })).toBe("left_out");
     });
 
     it("takes the offset into account when deciding, not only when positioning", () => {
         const anchor = { ...ANCHOR, x: 730 };
 
-        expect(AnchorUtils.getSafeHPlacement("right-out", anchor, WIDE_CONTENT, SCREEN)).toBe("right-out");
-        expect(AnchorUtils.getSafeHPlacement("right-out", anchor, WIDE_CONTENT, SCREEN, { x: 40, y: 0 })).toBe(
-            "left-out",
+        expect(AnchorUtils.getSafeHPlacement("right_out", anchor, WIDE_CONTENT, SCREEN)).toBe("right_out");
+        expect(AnchorUtils.getSafeHPlacement("right_out", anchor, WIDE_CONTENT, SCREEN, { x: 40, y: 0 })).toBe(
+            "left_out",
         );
     });
 
     it("keeps the asked-for in placement when the content fits beside the edge it is aligned to", () => {
-        expect(safeH("left-in", { ...ANCHOR, x: 100 })).toBe("left-in");
-        expect(safeH("right-in", { ...ANCHOR, x: 700 })).toBe("right-in");
+        expect(safeH("left_in", { ...ANCHOR, x: 100 })).toBe("left_in");
+        expect(safeH("right_in", { ...ANCHOR, x: 700 })).toBe("right_in");
     });
 
     it("measures an in placement by where the content lands, not by where the anchor edge is", () => {
         expect(
-            safeH("left-in", { ...ANCHOR, x: 900 }),
+            safeH("left_in", { ...ANCHOR, x: 900 }),
             "a left-in anchored at 900 with 200 of content would end at 1100, off a 1000 screen",
-        ).toBe("right-in");
+        ).toBe("right_in");
         expect(
-            safeH("right-in", { ...ANCHOR, x: 20 }),
+            safeH("right_in", { ...ANCHOR, x: 20 }),
             "and a right-in near the left edge grows backwards off it",
-        ).toBe("left-in");
+        ).toBe("left_in");
     });
 
     it("never leaves the family it was asked for, because in and out mean different things", () => {
         const clipped = { ...ANCHOR, x: 950, width: 300 };
 
         expect(
-            safeH("left-in", clipped),
+            safeH("left_in", clipped),
             "an anchor hanging off the screen has no in placement that fits, and out is not an answer",
-        ).toMatch(/-in$/);
-        expect(safeH("right-in", clipped)).toMatch(/-in$/);
-        expect(safeH("left-out", { ...ANCHOR, x: 400 })).toMatch(/-out$/);
+        ).toMatch(/_in$/);
+        expect(safeH("right_in", clipped)).toMatch(/_in$/);
+        expect(safeH("left_out", { ...ANCHOR, x: 400 })).toMatch(/_out$/);
     });
 
     it("takes the least overflow when nothing in the family fits", () => {
         const clipped = { ...ANCHOR, x: 980, width: 300 };
 
         expect(
-            safeH("left-in", clipped),
-            "right-in starts at 1080 and left-in at 980, so left-in is the shorter fall off the edge",
-        ).toBe("left-in");
+            safeH("left_in", clipped),
+            "right_in starts at 1080 and left_in at 980, so left_in is the shorter fall off the edge",
+        ).toBe("left_in");
     });
 });
 
@@ -148,13 +148,13 @@ describe("getSafeVPlacement", () => {
         AnchorUtils.getSafeVPlacement(placement, anchor, WIDE_CONTENT, SCREEN, undefined, reserved);
 
     it("keeps the asked-for out placement when it fits", () => {
-        expect(safeV("bottom-out", ANCHOR)).toBe("bottom-out");
-        expect(safeV("top-out", { ...ANCHOR, y: 400 })).toBe("top-out");
+        expect(safeV("bottom_out", ANCHOR)).toBe("bottom_out");
+        expect(safeV("top_out", { ...ANCHOR, y: 400 })).toBe("top_out");
     });
 
     it("flips an out placement that would overflow to the side with room", () => {
-        expect(safeV("bottom-out", { ...ANCHOR, y: 700 })).toBe("top-out");
-        expect(safeV("top-out", { ...ANCHOR, y: 50 })).toBe("bottom-out");
+        expect(safeV("bottom_out", { ...ANCHOR, y: 700 })).toBe("top_out");
+        expect(safeV("top_out", { ...ANCHOR, y: 50 })).toBe("bottom_out");
     });
 
     it("keeps center when there is room above and below", () => {
@@ -162,13 +162,13 @@ describe("getSafeVPlacement", () => {
     });
 
     it("drops center to the in placement that grows away from the nearer edge", () => {
-        expect(safeV("center", { ...ANCHOR, y: 10 })).toBe("top-in");
-        expect(safeV("center", { ...ANCHOR, y: 760 })).toBe("bottom-in");
+        expect(safeV("center", { ...ANCHOR, y: 10 })).toBe("top_in");
+        expect(safeV("center", { ...ANCHOR, y: 760 })).toBe("bottom_in");
     });
 
     it("counts reserved screen space as unavailable", () => {
-        expect(safeV("bottom-out", { ...ANCHOR, y: 500 })).toBe("bottom-out");
-        expect(safeV("bottom-out", { ...ANCHOR, y: 500 }, { width: 0, height: 200 })).toBe("top-out");
+        expect(safeV("bottom_out", { ...ANCHOR, y: 500 })).toBe("bottom_out");
+        expect(safeV("bottom_out", { ...ANCHOR, y: 500 }, { width: 0, height: 200 })).toBe("top_out");
     });
 });
 
@@ -226,35 +226,35 @@ describe("computeArrowAim", () => {
 
     it("grows from the side facing the anchor, lined up with its middle and pointing straight out", () => {
         expect(
-            AnchorUtils.computeArrowAim({ x: "center", y: "top-out" }, AIM_ANCHOR, { x: 60, y: 160 }, AIM_CONTENT),
+            AnchorUtils.computeArrowAim({ x: "center", y: "top_out" }, AIM_ANCHOR, { x: 60, y: 160 }, AIM_CONTENT),
         ).toEqual({ point: { x: 60, y: 30 }, angle: 90 });
         expect(
-            AnchorUtils.computeArrowAim({ x: "left-in", y: "bottom-out" }, AIM_ANCHOR, { x: 100, y: 230 }, AIM_CONTENT),
+            AnchorUtils.computeArrowAim({ x: "left_in", y: "bottom_out" }, AIM_ANCHOR, { x: 100, y: 230 }, AIM_CONTENT),
         ).toEqual({ point: { x: 20, y: 0 }, angle: -90 });
         expect(
-            AnchorUtils.computeArrowAim({ x: "right-out", y: "center" }, AIM_ANCHOR, { x: 150, y: 195 }, AIM_CONTENT),
+            AnchorUtils.computeArrowAim({ x: "right_out", y: "center" }, AIM_ANCHOR, { x: 150, y: 195 }, AIM_CONTENT),
         ).toEqual({ point: { x: 0, y: 15 }, angle: 180 });
         expect(
-            AnchorUtils.computeArrowAim({ x: "left-out", y: "top-in" }, AIM_ANCHOR, { x: -30, y: 200 }, AIM_CONTENT),
+            AnchorUtils.computeArrowAim({ x: "left_out", y: "top_in" }, AIM_ANCHOR, { x: -30, y: 200 }, AIM_CONTENT),
         ).toEqual({ point: { x: 120, y: 10 }, angle: 0 });
     });
 
     it("stays on the side's ends when the content was pushed past the anchor's middle", () => {
         expect(
-            AnchorUtils.computeArrowAim({ x: "center", y: "top-out" }, AIM_ANCHOR, { x: 150, y: 160 }, AIM_CONTENT),
+            AnchorUtils.computeArrowAim({ x: "center", y: "top_out" }, AIM_ANCHOR, { x: 150, y: 160 }, AIM_CONTENT),
         ).toEqual({ point: { x: 0, y: 30 }, angle: 90 });
     });
 
     it("grows from the nearest corner off a corner of the anchor, pointing out along that corner's diagonal", () => {
         expect(
-            AnchorUtils.computeArrowAim({ x: "left-out", y: "top-out" }, AIM_ANCHOR, { x: -20, y: 170 }, AIM_CONTENT),
+            AnchorUtils.computeArrowAim({ x: "left_out", y: "top_out" }, AIM_ANCHOR, { x: -20, y: 170 }, AIM_CONTENT),
         ).toEqual({ point: { x: 120, y: 30 }, angle: 45 });
         expect(
-            AnchorUtils.computeArrowAim({ x: "right-out", y: "top-out" }, AIM_ANCHOR, { x: 140, y: 170 }, AIM_CONTENT),
+            AnchorUtils.computeArrowAim({ x: "right_out", y: "top_out" }, AIM_ANCHOR, { x: 140, y: 170 }, AIM_CONTENT),
         ).toEqual({ point: { x: 0, y: 30 }, angle: 135 });
         expect(
             AnchorUtils.computeArrowAim(
-                { x: "left-out", y: "bottom-out" },
+                { x: "left_out", y: "bottom_out" },
                 AIM_ANCHOR,
                 { x: -20, y: 220 },
                 AIM_CONTENT,
@@ -262,7 +262,7 @@ describe("computeArrowAim", () => {
         ).toEqual({ point: { x: 120, y: 0 }, angle: -45 });
         expect(
             AnchorUtils.computeArrowAim(
-                { x: "right-out", y: "bottom-out" },
+                { x: "right_out", y: "bottom_out" },
                 AIM_ANCHOR,
                 { x: 140, y: 220 },
                 AIM_CONTENT,
@@ -272,13 +272,13 @@ describe("computeArrowAim", () => {
 
     it("has nothing to point at when the content overlaps its anchor on both axes", () => {
         expect(
-            AnchorUtils.computeArrowAim({ x: "left-in", y: "bottom-in" }, AIM_ANCHOR, { x: 100, y: 190 }, AIM_CONTENT),
+            AnchorUtils.computeArrowAim({ x: "left_in", y: "bottom_in" }, AIM_ANCHOR, { x: 100, y: 190 }, AIM_CONTENT),
         ).toBeUndefined();
     });
 
     it("waits until everything has been measured", () => {
         expect(
-            AnchorUtils.computeArrowAim({ x: "center", y: "top-out" }, AIM_ANCHOR, undefined, AIM_CONTENT),
+            AnchorUtils.computeArrowAim({ x: "center", y: "top_out" }, AIM_ANCHOR, undefined, AIM_CONTENT),
         ).toBeUndefined();
     });
 });

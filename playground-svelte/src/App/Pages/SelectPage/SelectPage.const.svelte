@@ -15,7 +15,7 @@
             isDisabled: true,
             isReachableWhenDisabled: true,
             tooltipDefs: {
-                placement: { x: "right-out", y: "center" },
+                placement: { x: "right_out", y: "center" },
                 offset: { x: 10, y: 0 },
                 renderContent: denmarkTooltip,
             },
@@ -26,7 +26,7 @@
             isDisabled: true,
             isReachableWhenDisabled: true,
             tooltipDefs: {
-                placement: { x: "right-out", y: "center" },
+                placement: { x: "right_out", y: "center" },
                 offset: { x: 10, y: 0 },
                 renderContent: finlandTooltip,
             },

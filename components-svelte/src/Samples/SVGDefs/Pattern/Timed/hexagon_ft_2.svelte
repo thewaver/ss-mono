@@ -64,7 +64,7 @@
 
 <path
     id={`${props.id}-hexagon`}
-    d={ShapeUtils.pointsToPath(ShapeConst.getDefaultShapePoints("hexagon-flat-top", props.defs.cellSize))}
+    d={ShapeUtils.pointsToPath(ShapeConst.getDefaultShapePoints("hexagon_flat_top", props.defs.cellSize))}
 />
 
 <Markup markup={pattern} />

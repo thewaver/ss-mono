@@ -39,7 +39,7 @@
 <filter id={props.filterId} {...props.assembly.region}>
     {#each props.assembly.inputs as input (input.key)}
         {@const primitive = props.primitives[input.key]}
-        {#if primitive.kind === "dropShadow"}
+        {#if primitive.kind === "drop_shadow"}
             <feDropShadow
                 in={input.srcIn}
                 dx={primitive.defs.dx}
@@ -51,7 +51,7 @@
             >
                 <Markup markup={primitive.custom} />
             </feDropShadow>
-        {:else if primitive.kind === "gaussianBlur"}
+        {:else if primitive.kind === "gaussian_blur"}
             <feGaussianBlur in={input.srcIn} stdDeviation={primitive.defs.stdDeviation} result={primitive.key}>
                 <Markup markup={primitive.custom} />
             </feGaussianBlur>
@@ -114,7 +114,7 @@
                 yChannelSelector={resolved.yChannelSelector}
                 result={primitive.key}
             />
-        {:else if primitive.kind === "colorMatrix"}
+        {:else if primitive.kind === "color_matrix"}
             <feColorMatrix in={input.srcIn} type={primitive.type} values={primitive.values} result={primitive.key}>
                 <Markup markup={primitive.custom} />
             </feColorMatrix>
@@ -142,7 +142,7 @@
                     result={primitive.key}
                 />
             {/if}
-        {:else if primitive.kind === "specularLighting"}
+        {:else if primitive.kind === "specular_lighting"}
             {@render lightSurface(primitive.defs.surface, `${primitive.key}_surface`)}
 
             <feSpecularLighting
@@ -177,7 +177,7 @@
                 color-interpolation-filters={SVGFilterDefs.COLOR_SPACE}
                 result={primitive.key}
             />
-        {:else if primitive.kind === "diffuseLighting"}
+        {:else if primitive.kind === "diffuse_lighting"}
             {@render lightSurface(primitive.defs.surface, `${primitive.key}_surface`)}
 
             <feDiffuseLighting

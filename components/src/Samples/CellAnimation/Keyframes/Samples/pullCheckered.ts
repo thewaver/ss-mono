@@ -4,6 +4,6 @@ import { pullHorizontal } from "./pullHorizontal";
 import { pullVertical } from "./pullVertical";
 
 export const pullCheckered: CellAnimationFn = CellAnimationKeyframeUtils.fromZones(
-    [{ zone: "evenCheckeredCells", animation: pullHorizontal }],
+    [{ zone: "even_checkered_cells", animation: pullHorizontal }],
     pullVertical,
 );

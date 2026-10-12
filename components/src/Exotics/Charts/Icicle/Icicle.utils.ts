@@ -11,8 +11,8 @@ const SINGLE = 1;
 const STEP_KEYS: Record<string, IcicleStep> = {
     ArrowUp: "up",
     ArrowDown: "down",
-    ArrowLeft: "toParent",
-    ArrowRight: "toChildren",
+    ArrowLeft: "to_parent",
+    ArrowRight: "to_children",
     Home: "first",
     End: "last",
 };
@@ -145,8 +145,8 @@ export namespace IcicleUtils {
     /**
      * Which cell a keyboard step moves to.
      *
-     * @param step `"up"` and `"down"` move within a column, `"first"` and `"last"` jump to its ends, `"toParent"` moves
-     * one column left to the cell this one sits beside, and `"toChildren"` one column right to the topmost of the cells
+     * @param step `"up"` and `"down"` move within a column, `"first"` and `"last"` jump to its ends, `"to_parent"` moves
+     * one column left to the cell this one sits beside, and `"to_children"` one column right to the topmost of the cells
      * beside it.
      * @param from The cell the cursor is on.
      * @param cells The cells the walk may land on, each with its span as {@link computeView} answers it.
@@ -163,7 +163,7 @@ export namespace IcicleUtils {
 
         if (!origin) return undefined;
 
-        if (step === "toParent") {
+        if (step === "to_parent") {
             const parent = getParent(from);
 
             return cells.find((cell) => cell.node === parent)?.node;
@@ -172,7 +172,7 @@ export namespace IcicleUtils {
         const byStart = (first: { span: IcicleSpan }, second: { span: IcicleSpan }) =>
             first.span.start - second.span.start;
 
-        if (step === "toChildren") {
+        if (step === "to_children") {
             return cells.filter((cell) => getParent(cell.node) === from).sort(byStart)[NOTHING]?.node;
         }
 

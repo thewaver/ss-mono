@@ -14,7 +14,7 @@ export const PagePopoverSurface = (props: PropsWithChildren<PopoverSurfaceProps>
                 styles.popoverSurface,
                 layerClass,
                 props.visibilityTarget === 1 && styles.isVisible,
-                props.placement.y === "top-out" && styles.isFlipped,
+                props.placement.y === "top_out" && styles.isFlipped,
             ]
                 .filter(Boolean)
                 .join(" ")}

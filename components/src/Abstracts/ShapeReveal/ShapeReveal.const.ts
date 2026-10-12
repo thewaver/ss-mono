@@ -9,8 +9,8 @@ export const SHAPE_REVEAL_DEFAULTS = {
 
 export const SHAPE_REVEAL_SPOTS: readonly ShapeRevealSpot[] = [
     "center",
-    "top-left",
-    "top-right",
-    "bottom-left",
-    "bottom-right",
+    "top_left",
+    "top_right",
+    "bottom_left",
+    "bottom_right",
 ];

@@ -1,7 +1,23 @@
-import { Index2d, type Index2dString, MathUtils, type Point2d, ShapeConst, type Size2d } from "@thewaver/ss-utils";
+import {
+    Index2d,
+    type Index2dString,
+    MathUtils,
+    Point2d,
+    type Rect,
+    ShapeConst,
+    type Size2d,
+} from "@thewaver/ss-utils";
 
 import { NavigatorUtils } from "../../Abstracts/Navigator/Navigator.utils";
-import type { TileBoardKeyAction, TileBoardLayout, TileBoardSweepDefs, TileBoardTiling } from "./TileBoard.types";
+import type {
+    TileBoardKeyAction,
+    TileBoardLayout,
+    TileBoardPiece,
+    TileBoardSweepDefs,
+    TileBoardTileGeometry,
+    TileBoardTiling,
+    TileBoardTilingKind,
+} from "./TileBoard.types";
 
 /** The size of a board with no tiles. */
 const EMPTY_SIZE: Size2d = { width: 0, height: 0 };
@@ -14,9 +30,9 @@ const SHORT_ROW_TILES = 1;
 /** Halfway, for centering a tile or offsetting a row. */
 const HALF = 0.5;
 /** The triangle shape whose unflipped tiles point upwards. */
-const POINTS_UP = "triangle-up";
+const POINTS_UP = "triangle_up";
 /** The triangle shape whose unflipped tiles point rightwards. */
-const POINTS_RIGHT = "triangle-right";
+const POINTS_RIGHT = "triangle_right";
 /** A top row as wide as the bottom one, which is a board drawn flat. */
 const NO_TAPER = 1;
 /** The narrowest top row a taper may ask for, since a top row of no width would put the bottom one at infinity. */
@@ -33,74 +49,149 @@ const NO_BUTTONS = 0;
 /** The primary mouse button. */
 const PRIMARY_BUTTON = 0;
 
-const DODECAGON_ROW_PITCH = Math.sqrt(3) * HALF;
+/** The row spacing of circles packed as tightly as they go, which the hectogon tiles at. */
+const CLOSE_PACKED_ROW_PITCH = Math.sqrt(3) * HALF;
+/** One whole box, as fractions of itself. */
+const WHOLE_BOX: Rect = { x: 0, y: 0, width: 1, height: 1 };
+/** The pitch of a tiling that cuts each box into pieces, which steps one whole box at a time. */
+const BOX_PITCH: Size2d = { width: 1, height: 1 };
+/** A full turn, for ordering neighbors by direction. */
+const FULL_TURN = Math.PI * 2;
+
+/** A box cut from its bottom left corner to its top right one, the left-hand half first. */
+const HALVES_RISING: TileBoardPiece[] = [
+    { shape: "triangle_top_left", box: WHOLE_BOX },
+    { shape: "triangle_bottom_right", box: WHOLE_BOX },
+];
+/** A box cut from its top left corner to its bottom right one, the left-hand half first. */
+const HALVES_FALLING: TileBoardPiece[] = [
+    { shape: "triangle_bottom_left", box: WHOLE_BOX },
+    { shape: "triangle_top_right", box: WHOLE_BOX },
+];
+/** A box cut along both diagonals, left to right by where each quarter sits. */
+const QUARTERS: TileBoardPiece[] = [
+    { shape: "triangle_right", box: { x: 0, y: 0, width: HALF, height: 1 } },
+    { shape: "triangle_down", box: { x: 0, y: 0, width: 1, height: HALF } },
+    { shape: "triangle_up", box: { x: 0, y: HALF, width: 1, height: HALF } },
+    { shape: "triangle_left", box: { x: HALF, y: 0, width: HALF, height: 1 } },
+];
 
 /**
- * How each tile shape tiles, as fractions of one tile's size.
+ * The pieces of a tiling where every tile is the whole shape, which is every tiling that does not cut a box.
+ *
+ * @param shape The tile shape.
+ */
+const asWhole = (shape: ShapeConst.DefaultShape): TileBoardPiece[][] => [[{ shape, box: WHOLE_BOX }]];
+
+/**
+ * A tiling that cuts every box into pieces, so the tiles meet along the cuts as well as the box edges.
+ *
+ * @param pieces The pieces of one box, left to right, with a second list for the boxes in between when
+ * the cut alternates like a checkerboard.
+ */
+const asCut = (pieces: TileBoardPiece[][]): TileBoardTiling => ({
+    pitch: BOX_PITCH,
+    hasOffsetRows: false,
+    tileFlip: "none",
+    neighborhood: "shared_edge",
+    pieces,
+});
+
+/**
+ * How each tiling lays its tiles, as fractions of one tile's size.
  *
  * The pitch is how far apart tile centers sit, which for anything but a square is less than the
  * tile's own size because the tiles interlock — pointy-top hexagons overlap vertically by a quarter,
  * so their rows are three-quarters of a tile apart. `hasOffsetRows` marks the shapes whose
  * alternating rows are shifted half a tile across, and `tileFlip` the shapes where alternate tiles
- * are mirrored, as triangles are. `neighborhood` names which tiles touch which, since that differs
- * for every shape.
+ * are mirrored, as the pointed triangles are. `neighborhood` names which tiles touch which, since that
+ * differs for every shape.
+ *
+ * The halved and quartered boxes work differently: the tile size is a box, and `pieces` cuts each box into
+ * several tiles, so a row holds that many tiles per box and its pitch is the box. `triangle-ltr` cuts each box
+ * from its top left corner down to its bottom right one, `triangle-rtl` from its top right corner down to its
+ * bottom left one.
  */
-const TILING_RATIOS: Record<ShapeConst.DefaultShape, TileBoardTiling> = {
-    "square": {
+const TILING_RATIOS: Record<TileBoardTilingKind, TileBoardTiling> = {
+    square: {
         pitch: { width: 1, height: 1 },
         hasOffsetRows: false,
         tileFlip: "none",
         neighborhood: "orthogonal",
+        pieces: asWhole("square"),
     },
-    "lozenge": {
+    lozenge: {
         pitch: { width: 1, height: 0.5 },
         hasOffsetRows: true,
         tileFlip: "none",
         neighborhood: "diagonal",
+        pieces: asWhole("lozenge"),
     },
-    "hexagon-pointy-top": {
+    hexagon_pointy_top: {
         pitch: { width: 1, height: 0.75 },
         hasOffsetRows: true,
         tileFlip: "none",
-        neighborhood: "diagonalAndAcross",
+        neighborhood: "diagonal_and_across",
+        pieces: asWhole("hexagon_pointy_top"),
     },
-    "hexagon-flat-top": {
+    hexagon_flat_top: {
         pitch: { width: 1.5, height: 0.5 },
         hasOffsetRows: true,
         tileFlip: "none",
-        neighborhood: "diagonalAndDown",
+        neighborhood: "diagonal_and_down",
+        pieces: asWhole("hexagon_flat_top"),
     },
-    "triangle-up": {
+    triangle_up: {
         pitch: { width: 0.5, height: 1 },
         hasOffsetRows: false,
-        tileFlip: "topToBottom",
-        neighborhood: "uprightTriangle",
+        tileFlip: "top_to_bottom",
+        neighborhood: "upright_triangle",
+        pieces: asWhole("triangle_up"),
     },
-    "triangle-down": {
+    triangle_down: {
         pitch: { width: 0.5, height: 1 },
         hasOffsetRows: false,
-        tileFlip: "topToBottom",
-        neighborhood: "uprightTriangle",
+        tileFlip: "top_to_bottom",
+        neighborhood: "upright_triangle",
+        pieces: asWhole("triangle_down"),
     },
-    "triangle-left": {
+    triangle_left: {
         pitch: { width: 1, height: 0.5 },
         hasOffsetRows: false,
-        tileFlip: "leftToRight",
-        neighborhood: "sidewaysTriangle",
+        tileFlip: "left_to_right",
+        neighborhood: "sideways_triangle",
+        pieces: asWhole("triangle_left"),
     },
-    "triangle-right": {
+    triangle_right: {
         pitch: { width: 1, height: 0.5 },
         hasOffsetRows: false,
-        tileFlip: "leftToRight",
-        neighborhood: "sidewaysTriangle",
+        tileFlip: "left_to_right",
+        neighborhood: "sideways_triangle",
+        pieces: asWhole("triangle_right"),
     },
-    "dodecagon": {
-        pitch: { width: 1, height: DODECAGON_ROW_PITCH },
+    hectogon: {
+        pitch: { width: 1, height: CLOSE_PACKED_ROW_PITCH },
         hasOffsetRows: true,
         tileFlip: "none",
-        neighborhood: "diagonalAndAcross",
+        neighborhood: "diagonal_and_across",
+        pieces: asWhole("hectogon"),
     },
+    triangle_ltr: asCut([HALVES_FALLING]),
+    triangle_rtl: asCut([HALVES_RISING]),
+    square_quarters: asCut([QUARTERS]),
+    lozenge_quarters: asCut([HALVES_RISING, HALVES_FALLING]),
 };
+
+/**
+ * Whether a built-in shape is also a tiling of its own.
+ *
+ * Every shape is, except the four corner-cut triangles, which only ever appear as pieces of `triangle_ltr` and
+ * `triangle_rtl`.
+ *
+ * @param shape The shape.
+ */
+const computeIsTilingKind = (shape: ShapeConst.DefaultShape): shape is ShapeConst.DefaultShape & TileBoardTilingKind =>
+    shape in TILING_RATIOS;
 
 /**
  * Whether a row is offset half a tile across, and so holds one tile fewer.
@@ -129,6 +220,166 @@ const computeIsFlippedTile = (tile: Index2d, layout: TileBoardLayout) =>
     layout.tileFlip !== "none" && MathUtils.isOdd(tile.row + tile.col);
 
 /**
+ * Whether a tiling cuts each box into several tiles rather than laying one whole shape per tile.
+ *
+ * @param tiling The tiling.
+ */
+const computeIsCut = (tiling: TileBoardTiling) => tiling.pieces.length > 1 || tiling.pieces[0].length > 1;
+
+/**
+ * How many tiles the longest row holds.
+ *
+ * At module level for the same reason as {@link computeIsShortRow}, and published as
+ * {@link TileBoardUtils.getColumnCount}.
+ *
+ * @param layout The board's layout.
+ * @returns The column count, or for a tiling that cuts boxes, the boxes across times the pieces in each.
+ */
+const computeColumnCount = (layout: TileBoardLayout) =>
+    layout.count.col * (computeIsCut(layout) ? layout.pieces[0].length : 1);
+
+/**
+ * Which piece of which box a tile is, on a tiling that cuts its boxes.
+ *
+ * @param tile Which tile.
+ * @param layout The board's layout.
+ * @param pitch The size of one box. The layout's own pitch places the piece in pixels; a pitch of one
+ * places it in whole boxes, where every corner lands on a half and two tiles' corners compare exactly.
+ * @returns The piece and the room it is cut from, before any gap, measured from the board's top left.
+ */
+const computePiece = (tile: Index2d, layout: TileBoardLayout, pitch: Size2d) => {
+    const perBox = layout.pieces[0].length;
+    const index = tile.col;
+    const boxCol = Math.floor(index / perBox);
+    const variant = layout.pieces[MathUtils.wrapIndex(tile.row + boxCol, layout.pieces.length)];
+    const piece = variant[MathUtils.wrapIndex(index, perBox)];
+    const room: Rect = {
+        x: (boxCol + piece.box.x) * pitch.width,
+        y: (tile.row + piece.box.y) * pitch.height,
+        width: piece.box.width * pitch.width,
+        height: piece.box.height * pitch.height,
+    };
+
+    return { piece, room };
+};
+
+/**
+ * A cut tile's corners where they sit on the board, before any gap.
+ *
+ * @param tile Which tile.
+ * @param layout The board's layout.
+ * @param pitch The size of one box, as {@link computePiece} takes it.
+ */
+const computePiecePoints = (tile: Index2d, layout: TileBoardLayout, pitch: Size2d) => {
+    const { piece, room } = computePiece(tile, layout, pitch);
+
+    return ShapeConst.getDefaultShapePoints(piece.shape, room).map((point) => ({
+        x: point.x + room.x,
+        y: point.y + room.y,
+    }));
+};
+
+/**
+ * The average of a contour's corners, which for a triangle is where its weight sits.
+ *
+ * @param points The corners.
+ */
+const computeMeanPoint = (points: Point2d[]): Point2d => ({
+    x: points.reduce((sum, point) => sum + point.x, 0) / points.length,
+    y: points.reduce((sum, point) => sum + point.y, 0) / points.length,
+});
+
+/**
+ * A convex contour with every edge moved inwards by the same distance.
+ *
+ * This is what puts an even gap between cut tiles: each tile gives up half the gap along every edge,
+ * the slanted cuts included, where shrinking the tile's box would leave the cuts touching.
+ *
+ * @param points The corners, clockwise.
+ * @param distance How far each edge moves in.
+ * @returns The new corners, in the same order. A contour too small to give up that much collapses to its
+ * own middle rather than turning inside out.
+ */
+const computeInsetPoints = (points: Point2d[], distance: number): Point2d[] => {
+    const lines = points.map((point, index) => {
+        const next = points[(index + 1) % points.length];
+        const length = Math.hypot(next.x - point.x, next.y - point.y);
+        const direction = { x: (next.x - point.x) / length, y: (next.y - point.y) / length };
+
+        return { origin: { x: point.x - direction.y * distance, y: point.y + direction.x * distance }, direction };
+    });
+
+    const inset = lines.map((line, index) => {
+        const previous = lines[(index + lines.length - 1) % lines.length];
+        const cross = previous.direction.x * line.direction.y - previous.direction.y * line.direction.x;
+        const along =
+            ((line.origin.x - previous.origin.x) * line.direction.y -
+                (line.origin.y - previous.origin.y) * line.direction.x) /
+            cross;
+
+        return {
+            x: previous.origin.x + previous.direction.x * along,
+            y: previous.origin.y + previous.direction.y * along,
+        };
+    });
+
+    const twiceArea = inset.reduce((sum, point, index) => {
+        const next = inset[(index + 1) % inset.length];
+
+        return sum + point.x * next.y - next.x * point.y;
+    }, 0);
+
+    if (twiceArea > 0) return inset;
+
+    const middle = computeMeanPoint(points);
+
+    return points.map(() => middle);
+};
+
+/**
+ * The tiles a cut tile shares an edge with, found from the pieces themselves.
+ *
+ * Every tile within a row and two boxes of this one is cut out in whole boxes, where corners land on
+ * halves and compare exactly, and any whose contour runs back along one of this tile's edges is a
+ * neighbor. They come back clockwise from the top, by the direction of the shared edge from this tile's
+ * middle.
+ *
+ * @param tile Which tile.
+ * @param layout The board's layout.
+ */
+const computeSharedEdgeNeighbors = (tile: Index2d, layout: TileBoardLayout): Index2d[] => {
+    const own = computePiecePoints(tile, layout, BOX_PITCH);
+    const middle = computeMeanPoint(own);
+    const reach = layout.pieces[0].length * 2;
+    const neighbors: { tile: Index2d; turn: number }[] = [];
+
+    for (let row = tile.row - 1; row <= tile.row + 1; row++) {
+        for (let col = tile.col - reach; col <= tile.col + reach; col++) {
+            if (row === tile.row && col === tile.col) continue;
+
+            const other = computePiecePoints({ row, col }, layout, BOX_PITCH);
+
+            own.forEach((point, index) => {
+                const next = own[(index + 1) % own.length];
+                const isShared = other.some(
+                    (otherPoint, otherIndex) =>
+                        Point2d.isSame(point, other[(otherIndex + 1) % other.length]) &&
+                        Point2d.isSame(next, otherPoint),
+                );
+
+                if (!isShared) return;
+
+                const turn = Math.atan2((point.x + next.x) * HALF - middle.x, middle.y - (point.y + next.y) * HALF);
+
+                neighbors.push({ tile: { row, col }, turn: (turn + FULL_TURN) % FULL_TURN });
+            });
+        }
+    }
+
+    return neighbors.sort((a, b) => a.turn - b.turn).map((neighbor) => neighbor.tile);
+};
+
+/**
  * The board's size before any taper, which is the sheet the taper is applied to.
  *
  * At module level for the same reason as {@link computeIsShortRow}; the published
@@ -137,9 +388,41 @@ const computeIsFlippedTile = (tile: Index2d, layout: TileBoardLayout) =>
 const computeFlatBoardSize = (layout: TileBoardLayout): Size2d => {
     if (layout.count.row < 1 || layout.count.col < 1) return EMPTY_SIZE;
 
+    if (computeIsCut(layout)) {
+        const lastCol = computeColumnCount(layout) - 1;
+        const rights = Array.from({ length: Math.min(layout.count.row, layout.pieces.length) }, (_unused, row) => {
+            const { room } = computePiece({ row, col: lastCol }, layout, layout.pitch);
+
+            return room.x + room.width;
+        });
+
+        return { width: Math.max(...rights), height: layout.pitch.height * layout.count.row };
+    }
+
     return {
         width: layout.pitch.width * (layout.count.col - 1) + layout.tileSize.width,
         height: layout.pitch.height * (layout.count.row - 1) + layout.tileSize.height,
+    };
+};
+
+/**
+ * Where a tile's middle sits on the flat board.
+ *
+ * The middle of the tile's box for a whole shape. A cut tile uses the average of its corners instead,
+ * because the middle of a box cut corner to corner lies on the cut, between two tiles.
+ *
+ * @param tile Which tile.
+ * @param layout The board's layout.
+ */
+const computeFlatTileCenter = (tile: Index2d, layout: TileBoardLayout): Point2d => {
+    if (computeIsCut(layout)) return computeMeanPoint(computePiecePoints(tile, layout, layout.pitch));
+
+    return {
+        x:
+            (computeIsShortRow(tile.row, layout) ? layout.pitch.width * HALF : 0) +
+            tile.col * layout.pitch.width +
+            layout.tileSize.width * HALF,
+        y: tile.row * layout.pitch.height + layout.tileSize.height * HALF,
     };
 };
 
@@ -153,6 +436,8 @@ const computeFlatBoardSize = (layout: TileBoardLayout): Size2d => {
  * and below are two rows away rather than one.
  */
 const computeNeighbors = (tile: Index2d, layout: TileBoardLayout): Index2d[] => {
+    if (layout.neighborhood === "shared_edge") return computeSharedEdgeNeighbors(tile, layout);
+
     const near = computeIsShortRow(tile.row, layout) ? 0 : -SHORT_ROW_TILES;
     const far = near + SHORT_ROW_TILES;
 
@@ -165,7 +450,7 @@ const computeNeighbors = (tile: Index2d, layout: TileBoardLayout): Index2d[] => 
         ];
     }
 
-    if (layout.neighborhood === "diagonalAndAcross") {
+    if (layout.neighborhood === "diagonal_and_across") {
         return [
             { row: tile.row - 1, col: tile.col + near },
             { row: tile.row - 1, col: tile.col + far },
@@ -176,7 +461,7 @@ const computeNeighbors = (tile: Index2d, layout: TileBoardLayout): Index2d[] => 
         ];
     }
 
-    if (layout.neighborhood === "diagonalAndDown") {
+    if (layout.neighborhood === "diagonal_and_down") {
         return [
             { row: tile.row - 2, col: tile.col },
             { row: tile.row - 1, col: tile.col + far },
@@ -187,8 +472,8 @@ const computeNeighbors = (tile: Index2d, layout: TileBoardLayout): Index2d[] => 
         ];
     }
 
-    if (layout.neighborhood === "sidewaysTriangle") {
-        const pointsRight = (layout.shape === POINTS_RIGHT) !== computeIsFlippedTile(tile, layout);
+    if (layout.neighborhood === "sideways_triangle") {
+        const pointsRight = (layout.tiling === POINTS_RIGHT) !== computeIsFlippedTile(tile, layout);
 
         if (pointsRight) {
             return [
@@ -205,8 +490,8 @@ const computeNeighbors = (tile: Index2d, layout: TileBoardLayout): Index2d[] => 
         ];
     }
 
-    if (layout.neighborhood === "uprightTriangle") {
-        const pointsUp = (layout.shape === POINTS_UP) !== computeIsFlippedTile(tile, layout);
+    if (layout.neighborhood === "upright_triangle") {
+        const pointsUp = (layout.tiling === POINTS_UP) !== computeIsFlippedTile(tile, layout);
 
         if (pointsUp) {
             return [
@@ -245,15 +530,15 @@ const computeNeighbors = (tile: Index2d, layout: TileBoardLayout): Index2d[] => 
  */
 export namespace TileBoardUtils {
     /**
-     * How a shape tiles at a given tile size.
+     * How a tiling lays its tiles at a given tile size.
      *
-     * @param shape Which tile shape.
-     * @param tileSize One tile's size.
+     * @param tiling Which tiling.
+     * @param tileSize One tile's size, or for a tiling that cuts boxes into pieces, one box's.
      * @returns The tiling with its pitch in pixels — how far apart tile centers sit, which is less than
      * the tile's own size wherever the tiles interlock.
      */
-    export const getTiling = (shape: ShapeConst.DefaultShape, tileSize: Size2d): TileBoardTiling => {
-        const ratios = TILING_RATIOS[shape];
+    export const getTiling = (tiling: TileBoardTilingKind, tileSize: Size2d): TileBoardTiling => {
+        const ratios = TILING_RATIOS[tiling];
 
         return {
             ...ratios,
@@ -267,23 +552,24 @@ export namespace TileBoardUtils {
     /**
      * Everything needed to place a board's tiles.
      *
-     * @param shape Which tile shape.
-     * @param count How many rows and columns.
-     * @param tileSize One tile's size.
+     * @param tiling Which tiling.
+     * @param count How many rows and columns. A tiling that cuts boxes counts boxes, so three columns of
+     * quartered squares is three squares and twelve tiles across.
+     * @param tileSize One tile's size, or for a tiling that cuts boxes into pieces, one box's.
      * @param hasShortFirstRow Whether the first row is the offset, one-tile-shorter one. Only matters
      * for shapes with offset rows, and lets two boards be joined without a seam.
      * @param taper How wide the top of the board is drawn, as a fraction of the bottom. `1` is a flat
      * board; anything less leans it away from the viewer. Held between a hundredth and `1`.
      */
     export const getLayout = (
-        shape: ShapeConst.DefaultShape,
+        tiling: TileBoardTilingKind,
         count: Index2d,
         tileSize: Size2d,
         hasShortFirstRow: boolean,
         taper: number,
     ): TileBoardLayout => ({
-        ...getTiling(shape, tileSize),
-        shape,
+        ...getTiling(tiling, tileSize),
+        tiling,
         count,
         tileSize,
         hasShortFirstRow,
@@ -300,15 +586,23 @@ export namespace TileBoardUtils {
     export const getIsShortRow = computeIsShortRow;
 
     /**
+     * How many tiles the longest row holds, which is what a grid announces as its column count.
+     *
+     * @param layout The board's layout.
+     * @returns The column count, or for a tiling that cuts boxes, the boxes across times the pieces in each.
+     */
+    export const getColumnCount = computeColumnCount;
+
+    /**
      * How many tiles a row holds.
      *
      * @param row Which row.
      * @param layout The board's layout.
-     * @returns The column count, or one fewer for a short row. Never negative, so a single-column board
+     * @returns {@link getColumnCount}, or one fewer for a short row. Never negative, so a single-column board
      * with offset rows does not report nonsense.
      */
     export const getRowLength = (row: number, layout: TileBoardLayout) =>
-        Math.max(layout.count.col - (getIsShortRow(row, layout) ? SHORT_ROW_TILES : 0), NO_TILES);
+        Math.max(computeColumnCount(layout) - (getIsShortRow(row, layout) ? SHORT_ROW_TILES : 0), NO_TILES);
 
     /**
      * How far a row is shifted across.
@@ -406,16 +700,12 @@ export namespace TileBoardUtils {
      *
      * @param tile Which tile.
      * @param layout The board's layout.
-     * @returns The middle of the tile's box, taper included, measured from the board's top left corner.
+     * @returns The middle of the tile's box, taper included, measured from the board's top left corner. A
+     * tile cut from a box answers the average of its corners instead, since the middle of a box cut corner
+     * to corner lies on the cut.
      */
     export const getTileCenter = (tile: Index2d, layout: TileBoardLayout): Point2d =>
-        getDrawnPoint(
-            {
-                x: getRowOffset(tile.row, layout) + tile.col * layout.pitch.width + layout.tileSize.width * HALF,
-                y: getRowTop(tile.row, layout) + layout.tileSize.height * HALF,
-            },
-            layout,
-        );
+        getDrawnPoint(computeFlatTileCenter(tile, layout), layout);
 
     /**
      * How much the taper shrinks a piece standing on a tile.
@@ -428,7 +718,7 @@ export namespace TileBoardUtils {
      * @returns `1` on a flat board.
      */
     export const getTileScale = (tile: Index2d, layout: TileBoardLayout) =>
-        getDrawnScale({ x: 0, y: getRowTop(tile.row, layout) + layout.tileSize.height * HALF }, layout);
+        getDrawnScale({ x: 0, y: computeFlatTileCenter(tile, layout).y }, layout);
 
     /**
      * The whole board's size, as drawn.
@@ -472,7 +762,7 @@ export namespace TileBoardUtils {
 
         if (!isFlipped) return points;
 
-        if (TILING_RATIOS[shape].tileFlip === "leftToRight") {
+        if (computeIsTilingKind(shape) && TILING_RATIOS[shape].tileFlip === "left_to_right") {
             return points.map((point) => ({ x: tileSize.width - point.x, y: point.y })).reverse();
         }
 
@@ -714,16 +1004,62 @@ export namespace TileBoardUtils {
      * Where a row's first tile box is drawn, on the flat board.
      *
      * {@link getRowOffset} across and {@link getRowTop} down, each moved in by half the gap, which is what
-     * centers a tile shrunk by the gap in the room it was given.
+     * centers a tile shrunk by the gap in the room it was given. A tiling that cuts boxes answers the row's
+     * own top left, because each of its tiles works out its gap for itself in {@link getTileGeometry}.
      *
      * @param row The row.
      * @param layout The board's layout.
      * @param gap The space left between tiles.
      */
-    export const getRowOrigin = (row: number, layout: TileBoardLayout, gap: number): Point2d => ({
-        x: getRowOffset(row, layout) + gap * HALF,
-        y: getRowTop(row, layout) + gap * HALF,
-    });
+    export const getRowOrigin = (row: number, layout: TileBoardLayout, gap: number): Point2d => {
+        if (computeIsCut(layout)) return { x: 0, y: getRowTop(row, layout) };
+
+        return {
+            x: getRowOffset(row, layout) + gap * HALF,
+            y: getRowTop(row, layout) + gap * HALF,
+        };
+    };
+
+    /**
+     * Where one tile is drawn inside its row, how large, and the contour it is cut to.
+     *
+     * A whole shape steps along the row by the pitch, shrinks by the gap and is turned over where the tiling
+     * says. A tile cut from a box gives up half the gap along every edge, its cuts included, and its box is
+     * then whatever that leaves — so the tiles of one board need not all be the same size.
+     *
+     * @param tile Which tile.
+     * @param layout The board's layout.
+     * @param gap The space left between tiles.
+     * @returns The tile's offset from {@link getRowOrigin}, its box size, its corners inside that box, and
+     * whether it is turned over.
+     */
+    export const getTileGeometry = (tile: Index2d, layout: TileBoardLayout, gap: number): TileBoardTileGeometry => {
+        if (!computeIsCut(layout)) {
+            const size = getTileBoxSize(layout.tileSize, gap);
+            const isFlipped = computeIsFlippedTile(tile, layout);
+
+            return {
+                offset: { x: tile.col * layout.pitch.width, y: 0 },
+                size,
+                points: getTilePoints(layout.pieces[0][0].shape, size, isFlipped),
+                isFlipped,
+            };
+        }
+
+        const points = computeInsetPoints(computePiecePoints(tile, layout, layout.pitch), gap * HALF);
+        const left = Math.min(...points.map((point) => point.x));
+        const top = Math.min(...points.map((point) => point.y));
+
+        return {
+            offset: { x: left, y: top - getRowTop(tile.row, layout) },
+            size: {
+                width: Math.max(...points.map((point) => point.x)) - left,
+                height: Math.max(...points.map((point) => point.y)) - top,
+            },
+            points: points.map((point) => ({ x: point.x - left, y: point.y - top })),
+            isFlipped: false,
+        };
+    };
 
     /**
      * What a key pressed on the board does.

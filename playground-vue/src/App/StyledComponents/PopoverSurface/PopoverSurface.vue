@@ -15,7 +15,7 @@ const layerClass = useLayerClass();
             styles.popoverSurface,
             layerClass,
             visibilityTarget === 1 && styles.isVisible,
-            placement.y === 'top-out' && styles.isFlipped,
+            placement.y === 'top_out' && styles.isFlipped,
         ]"
         :style="{
             transition: `opacity ${transitionDurationMs}ms, transform ${transitionDurationMs}ms`,

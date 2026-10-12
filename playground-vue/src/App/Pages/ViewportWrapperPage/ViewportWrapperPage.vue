@@ -50,7 +50,7 @@ const INNER_TOAST_MARGINS = {
 };
 
 const renderTooltip = (text: string): InteractionTooltipDefs<SelectFlags> => ({
-    placement: { x: "center", y: "top-out" } as const,
+    placement: { x: "center", y: "top_out" } as const,
     offset: { x: 0, y: 10 },
     renderContent: ({ visibilityTarget, transitionDurationMs }) =>
         h(PageTooltipContent, { visibilityTarget, transitionDurationMs }, () => text),
@@ -216,7 +216,7 @@ const dismissInnerToast = (id: string) => {
                         <Toasts
                             v-model:toasts="innerToasts"
                             ariaLabel="Viewport notifications"
-                            alignment="bottom-center"
+                            alignment="bottom_center"
                             :margins="INNER_TOAST_MARGINS"
                         >
                             <template #renderToast="{ toast, visibilityTarget, transitionDurationMs, state }">

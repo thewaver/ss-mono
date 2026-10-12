@@ -11,7 +11,7 @@ export namespace TooltipKnobs {
     export const DURATION_STEP = 50;
 
     export const STARTING_H_PLACEMENT: AnchorHPlacement = "center";
-    export const STARTING_V_PLACEMENT: AnchorVPlacement = "top-out";
+    export const STARTING_V_PLACEMENT: AnchorVPlacement = "top_out";
     export const STARTING_OFFSET_Y = 10;
     export const STARTING_OFFSET_X = 0;
     export const STARTING_REVEAL: TooltipReveal = "fade";

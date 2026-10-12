@@ -13,7 +13,7 @@
 
 <SlotText
     text={props.text}
-    mechanism={"splitFlap"}
+    mechanism={"split_flap"}
     characterSize={CHARACTER_SIZE}
     turnDurationMs={props.turnDurationMs}
     turnDelayMs={props.turnDelayMs}

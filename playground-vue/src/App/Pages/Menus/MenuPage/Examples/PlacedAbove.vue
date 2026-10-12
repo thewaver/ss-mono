@@ -17,7 +17,7 @@ const props = defineProps<Props>();
     <Menu
         :items="ACTIONS"
         ariaLabel="Edit actions"
-        :placement="{ x: 'left-in', y: 'top-out' }"
+        :placement="{ x: 'left_in', y: 'top_out' }"
         @activate="props.onActivate"
     >
         <template #renderContent="flags">

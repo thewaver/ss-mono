@@ -1,4 +1,7 @@
+import { TILE_BOARD_TILINGS } from "@thewaver/ss-components";
+
 export namespace TileBoardKnobs {
+    export const TILINGS = TILE_BOARD_TILINGS;
     export const MIN_ROWS = 1;
     export const MAX_ROWS = 9;
     export const MIN_COLS = 1;

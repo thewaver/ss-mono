@@ -1,5 +1,6 @@
 import { describe, expect, it } from "vitest";
 
+import { SVGDefsUtils } from "./SVGDefs.utils";
 import { SVGPatternLayouts } from "./SVGPatternLayouts.const";
 import type { SVGPatternKind } from "./SVGPatternLayouts.types";
 
@@ -125,5 +126,81 @@ describe("SVGPatternLayouts.ALL", () => {
 
     it("never marks a grid cell as split, because a grid has no half cells", () => {
         expect(SVGPatternLayouts.ALL.grid.computeIsSplit({ row: 0, col: 0 }, { rows: 3, cols: 3 })).toBe(false);
+    });
+});
+
+describe("the layouts that cut each cell into triangles", () => {
+    const CUT: SVGPatternKind[] = ["triangle_ltr", "triangle_rtl", "square_quarters", "lozenge_quarters"];
+
+    const areaOf = (points: { x: number; y: number }[]) =>
+        Math.abs(
+            points.reduce((sum, point, index) => {
+                const next = points[(index + 1) % points.length];
+
+                return sum + point.x * next.y - next.x * point.y;
+            }, 0) * 0.5,
+        );
+
+    it("asks for one cell index per triangle, so a cell of halves is two across and a quartered one four", () => {
+        expect(SVGPatternLayouts.ALL.triangle_ltr.computeCellCount({ rows: 3, cols: 3 })).toEqual({ rows: 3, cols: 6 });
+        expect(SVGPatternLayouts.ALL.triangle_rtl.computeCellCount({ rows: 3, cols: 3 })).toEqual({ rows: 3, cols: 6 });
+        expect(SVGPatternLayouts.ALL.square_quarters.computeCellCount({ rows: 3, cols: 3 })).toEqual({
+            rows: 3,
+            cols: 12,
+        });
+        expect(
+            SVGPatternLayouts.ALL.lozenge_quarters.computeCellCount({ rows: 3, cols: 3 }),
+            "and a checkerboard of cuts wants an even count both ways, or the tile would not repeat",
+        ).toEqual({ rows: 4, cols: 8 });
+    });
+
+    it("puts every triangle of one cell in that cell's box, and the tile is whole cells", () => {
+        expect(positions("square_quarters", 1, 2)[0].map((cell) => cell.x)).toEqual([0, 0, 0, 0, 30, 30, 30, 30]);
+        expect(SVGPatternLayouts.ALL.square_quarters.computePatternSize({ rows: 1, cols: 8 }, CELL)).toEqual({
+            width: 60,
+            height: 30,
+        });
+    });
+
+    it("fills each cell exactly with its triangles", () => {
+        for (const kind of CUT) {
+            const layout = SVGPatternLayouts.ALL[kind];
+            const count = layout.computeCellCount({ rows: 2, cols: 2 });
+            let covered = 0;
+
+            for (let row = 0; row < count.rows; row++) {
+                for (let col = 0; col < count.cols; col++) {
+                    covered += areaOf(
+                        SVGDefsUtils.computeCellPiecePoints(SVGDefsUtils.getCellPiece(kind, { row, col }), CELL),
+                    );
+                }
+            }
+
+            const size = layout.computePatternSize(count, CELL);
+
+            expect(covered, kind).toBeCloseTo(size.width * size.height);
+        }
+    });
+
+    it("cuts the halves from the top left down for ltr, and from the top right down for rtl", () => {
+        expect(SVGDefsUtils.getCellPiece("triangle_ltr", { row: 0, col: 0 }).shape).toBe("triangle_bottom_left");
+        expect(SVGDefsUtils.getCellPiece("triangle_rtl", { row: 0, col: 0 }).shape).toBe("triangle_top_left");
+    });
+
+    it("turns the cut every other cell for lozenges, and keeps it for the halves", () => {
+        const shapeAt = (kind: SVGPatternKind, row: number, col: number) =>
+            SVGDefsUtils.getCellPiece(kind, { row, col }).shape;
+
+        expect(shapeAt("lozenge_quarters", 0, 0)).not.toBe(shapeAt("lozenge_quarters", 0, 2));
+        expect(shapeAt("lozenge_quarters", 0, 0)).toBe(shapeAt("lozenge_quarters", 1, 2));
+        expect(shapeAt("triangle_ltr", 0, 0)).toBe(shapeAt("triangle_ltr", 1, 2));
+    });
+
+    it("measures each triangle from its own middle, so two halves of a cell answer the pointer apart", () => {
+        const first = SVGDefsUtils.computeCellCenter("triangle_ltr", { row: 0, col: 0 }, CELL);
+        const second = SVGDefsUtils.computeCellCenter("triangle_ltr", { row: 0, col: 1 }, CELL);
+
+        expect(first).not.toEqual(second);
+        expect(SVGDefsUtils.computeCellCenter("grid", { row: 0, col: 0 }, CELL)).toEqual({ x: 15, y: 15 });
     });
 });

@@ -13,14 +13,14 @@ export const triangle_t_2: TimedPatternConfig = {
         const upTriangle = (
             <path
                 id={`${id}-triangle-up`}
-                d={ShapeUtils.pointsToPath(ShapeConst.getDefaultShapePoints("triangle-up", cellSize))}
+                d={ShapeUtils.pointsToPath(ShapeConst.getDefaultShapePoints("triangle_up", cellSize))}
             />
         );
 
         const downTriangle = (
             <path
                 id={`${id}-triangle-down`}
-                d={ShapeUtils.pointsToPath(ShapeConst.getDefaultShapePoints("triangle-down", cellSize))}
+                d={ShapeUtils.pointsToPath(ShapeConst.getDefaultShapePoints("triangle_down", cellSize))}
             />
         );
 

@@ -67,8 +67,8 @@ const NUDGE_BY_KEY: Record<string, number> = {
 const STEP_BY_KEY: Record<string, TimelineStep> = {
     ArrowRight: "next",
     ArrowLeft: "previous",
-    ArrowDown: "laneAfter",
-    ArrowUp: "laneBefore",
+    ArrowDown: "lane_after",
+    ArrowUp: "lane_before",
     Home: "first",
     End: "last",
 };
@@ -308,7 +308,7 @@ export namespace TimelineUtils {
      * Moving between lanes goes to the nearest lane in that direction and, within it, the span nearest in
      * time — so moving down from a span lands under it rather than at the start of the lane below.
      *
-     * @param step `"first"`, `"last"`, `"previous"`, `"next"`, `"laneBefore"` or `"laneAfter"`.
+     * @param step `"first"`, `"last"`, `"previous"`, `"next"`, `"lane_before"` or `"lane_after"`.
      * @param fromIndex Where the cursor is now. An index that is not a stop starts from the first one.
      * @param stops The stops from {@link TimelineUtils.computeStops}.
      * @returns The span's index, or `undefined` when there is none that way.
@@ -328,7 +328,7 @@ export namespace TimelineUtils {
         }
 
         const from = stops[at];
-        const isAfter = step === "laneAfter";
+        const isAfter = step === "lane_after";
 
         return stops
             .filter((stop) => (isAfter ? stop.lane > from.lane : stop.lane < from.lane))

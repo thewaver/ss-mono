@@ -34,8 +34,8 @@ describe("CellAnimationZoneUtils", () => {
     });
 
     it("keeps the axes and the origin as their own zones", () => {
-        expect(inZone("axisX", { col: 0, row: 3 })).toBe(true);
-        expect(inZone("axisY", { col: 3, row: 0 })).toBe(true);
+        expect(inZone("axis_x", { col: 0, row: 3 })).toBe(true);
+        expect(inZone("axis_y", { col: 3, row: 0 })).toBe(true);
         expect(inZone("origin", origin)).toBe(true);
         expect(inZone("origin", { col: 3, row: 4 })).toBe(false);
         expect(inZone("axis1", { col: 3, row: 1 })).toBe(true);
@@ -49,16 +49,16 @@ describe("CellAnimationZoneUtils", () => {
             { col: 4, row: 5 },
             { col: 6, row: 3 },
         ]) {
-            expect(inZone("evenRows", pos)).toBe(!inZone("oddRows", pos));
-            expect(inZone("evenColumns", pos)).toBe(!inZone("oddColumns", pos));
-            expect(inZone("evenRings", pos)).toBe(!inZone("oddRings", pos));
-            expect(inZone("evenCheckeredCells", pos)).toBe(!inZone("oddCheckeredCells", pos));
+            expect(inZone("even_rows", pos)).toBe(!inZone("odd_rows", pos));
+            expect(inZone("even_columns", pos)).toBe(!inZone("odd_columns", pos));
+            expect(inZone("even_rings", pos)).toBe(!inZone("odd_rings", pos));
+            expect(inZone("even_checkered_cells", pos)).toBe(!inZone("odd_checkered_cells", pos));
         }
     });
 
     it("splits by weight at the halfway mark, with the boundary in the heavier half", () => {
-        expect(inZone("lighterHalf", origin, 0.49)).toBe(true);
-        expect(inZone("lighterHalf", origin, 0.5)).toBe(false);
-        expect(inZone("heavierHalf", origin, 0.5)).toBe(true);
+        expect(inZone("lighter_half", origin, 0.49)).toBe(true);
+        expect(inZone("lighter_half", origin, 0.5)).toBe(false);
+        expect(inZone("heavier_half", origin, 0.5)).toBe(true);
     });
 });

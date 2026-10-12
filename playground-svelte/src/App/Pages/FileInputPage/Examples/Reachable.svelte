@@ -16,7 +16,7 @@
     isReachableWhenDisabled={true}
     ariaLabel={"Disabled but reachable attachment"}
     tooltipDefs={{
-        placement: { x: "center", y: "top-out" },
+        placement: { x: "center", y: "top_out" },
         offset: { x: 0, y: 10 },
         hoverShowDelayMs: 0,
         renderContent: tooltip,

@@ -24,7 +24,7 @@ const computeTileAriaLabel = (tile: Index2d) => `Row ${tile.row + 1}, tile ${til
             :taper="taper"
             :is-disabled="isDisabled"
             :compute-is-tile-disabled="computeIsTileDisabled"
-            :tile-shape="shape"
+            :tiling="shape"
             :compute-tile-aria-label="computeTileAriaLabel"
             @tile-activate="props.onTileActivate"
             @tile-sweep="props.onTileSweep"

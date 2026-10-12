@@ -25,8 +25,8 @@ export const branch = (value: string, ...children: BracketNode<string>[]): Brack
 export const computeFamilySteps = (
     orientation: BracketOrientation,
 ): { step: BracketStep; label: string; glyph: string }[] => [
-    { step: "toLeaves", label: "Previous stage", glyph: CONTROL_GLYPHS.previous },
-    { step: "toRoot", label: "Next stage", glyph: CONTROL_GLYPHS.next },
+    { step: "to_leaves", label: "Previous stage", glyph: CONTROL_GLYPHS.previous },
+    { step: "to_root", label: "Next stage", glyph: CONTROL_GLYPHS.next },
     {
         step: "previous",
         label: orientation === "horizontal" ? "Upper" : "Left",

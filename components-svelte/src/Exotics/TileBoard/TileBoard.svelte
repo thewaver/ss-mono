@@ -26,24 +26,16 @@
     let highlighted = $state.raw<Index2d>(TileBoardUtils.getFirstTile());
 
     const gap = $derived(props.gap ?? TILE_BOARD_DEFAULTS.gap);
-    const tileShape = $derived(props.tileShape ?? TILE_BOARD_DEFAULTS.tileShape);
+    const tiling = $derived(props.tiling ?? TILE_BOARD_DEFAULTS.tiling);
     const hasShortFirstRow = $derived(props.hasShortFirstRow ?? false);
     const taper = $derived(props.taper ?? TILE_BOARD_DEFAULTS.taper);
     const isDisabled = $derived(props.isDisabled ?? false);
 
-    const tileSize = $derived(TileBoardUtils.getTileBoxSize(props.tileSize, gap));
-
     const layout = $derived(
-        TileBoardUtils.getLayout(tileShape, props.tileCount, props.tileSize, hasShortFirstRow, taper),
+        TileBoardUtils.getLayout(tiling, props.tileCount, props.tileSize, hasShortFirstRow, taper),
     );
 
     const boardSize = $derived(TileBoardUtils.getBoardSize(layout));
-
-    const points = $derived(TileBoardUtils.getTilePoints(layout.shape, tileSize, false));
-    const flippedPoints = $derived(TileBoardUtils.getTilePoints(layout.shape, tileSize, true));
-
-    const clipPath = $derived(TileBoardUtils.getClipPath(points));
-    const flippedClipPath = $derived(TileBoardUtils.getClipPath(flippedPoints));
 
     const getIsTileDisabled = (tile: Index2d) => isDisabled || (props.computeIsTileDisabled?.(tile) ?? false);
 
@@ -112,18 +104,23 @@
 {#snippet tileAt(row: number, col: number)}
     {@const tile = { row, col }}
     {@const key = Index2d.toString(tile)}
-    {@const isFlipped = TileBoardUtils.getIsFlippedTile(tile, layout)}
+    {@const geometry = TileBoardUtils.getTileGeometry(tile, layout, gap)}
     {@const isRoving = Index2d.isSame(tile, rovingTile)}
-    <div class={styles.tileBoardCell} role="presentation" style:left={`${col * layout.pitch.width}px`}>
+    <div
+        class={styles.tileBoardCell}
+        role="presentation"
+        style:left={`${geometry.offset.x}px`}
+        style:top={`${geometry.offset.y}px`}
+    >
         <InteractionWrapper
             isDisabled={getIsTileDisabled(tile)}
             isFocusableWhenDisabled={!isDisabled}
             isTabbable={isRoving}
             extraFlags={{
                 tile,
-                size: tileSize,
-                points: isFlipped ? flippedPoints : points,
-                isFlipped,
+                size: geometry.size,
+                points: geometry.points,
+                isFlipped: geometry.isFlipped,
                 isHighlighted: isRoving,
             }}
             bind:ref={() => tileRefs.get(key), (element) => setTileRef(key, element)}
@@ -138,8 +135,8 @@
                     {flags}
                     ariaLabel={props.computeTileAriaLabel?.(tile)}
                     colIndex={col + FIRST_ARIA_INDEX}
-                    size={tileSize}
-                    clipPath={isFlipped ? flippedClipPath : clipPath}
+                    size={geometry.size}
+                    clipPath={TileBoardUtils.getClipPath(geometry.points)}
                     renderContent={tileContent}
                     onActivate={() => activateTile(tile)}
                     attachHit={(element) => sweeper.addHitLayer(element, tile)}
@@ -158,7 +155,7 @@
     role="grid"
     aria-label={props.ariaLabel}
     aria-rowcount={layout.count.row}
-    aria-colcount={layout.count.col}
+    aria-colcount={TileBoardUtils.getColumnCount(layout)}
     aria-disabled={isDisabled || undefined}
     style:width={`${boardSize.width}px`}
     style:height={`${boardSize.height}px`}

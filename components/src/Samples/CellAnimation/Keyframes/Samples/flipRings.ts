@@ -4,6 +4,6 @@ import { flipHorizontal } from "./flipHorizontal";
 import { flipVertical } from "./flipVertical";
 
 export const flipRings: CellAnimationFn = CellAnimationKeyframeUtils.fromZones(
-    [{ zone: "evenRings", animation: flipHorizontal }],
+    [{ zone: "even_rings", animation: flipHorizontal }],
     flipVertical,
 );

@@ -41,8 +41,6 @@ const brushShape = shallowRef<(typeof ScratchCardKnobs.BRUSH_SHAPES)[number]>(Sc
 const computePoints = computed(() => {
     const shape = brushShape.value;
 
-    if (shape === ScratchCardKnobs.CIRCLE) return undefined;
-
     return (size: Size2d) => ShapeConst.getDefaultShapePoints(shape, size);
 });
 const threshold = shallowRef(SCRATCH_CARD_DEFAULTS.clearThreshold);

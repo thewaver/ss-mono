@@ -1,7 +1,7 @@
 import type { AccessorProps, AnchorPlacement } from "@thewaver/ss-components-solid";
 import type { Point2d } from "@thewaver/ss-utils";
 
-export type SatelliteBadgeCorner = "top-left" | "top-right" | "bottom-left" | "bottom-right";
+export type SatelliteBadgeCorner = "top_left" | "top_right" | "bottom_left" | "bottom_right";
 
 export type SatelliteExampleProps = AccessorProps<{
     subjectWidth: number;

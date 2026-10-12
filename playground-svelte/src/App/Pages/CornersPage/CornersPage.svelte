@@ -20,10 +20,10 @@
     const EXAMPLES_ROOT = "/src/App/Pages/CornersPage/Examples";
 
     const CORNER_LABELS: Record<CornerKey, string> = {
-        topLeft: "Top left",
-        topRight: "Top right",
-        bottomLeft: "Bottom left",
-        bottomRight: "Bottom right",
+        top_left: "Top left",
+        top_right: "Top right",
+        bottom_left: "Bottom left",
+        bottom_right: "Bottom right",
     };
 
     const FIELD_WIDTH = 110;

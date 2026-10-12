@@ -155,7 +155,7 @@ export const SelectComposite = <T,>(props: SelectCompositeProps<T>) => {
     }, [isOpen, isDisabled, setIsOpen]);
 
     const cursor = ListboxReactUtils.useCursor<T>({
-        focusModel: "activeDescendant",
+        focusModel: "active_descendant",
         listboxId,
         options: props.options,
         selectedOptions: props.selectedOptions,

@@ -287,4 +287,27 @@ describe("createStepRepeater", () => {
         expect(step).toHaveBeenCalledTimes(1);
         expect(repeater.stop()).toBe(false);
     });
+
+    it("ends the repeat at the first refused step, so a release nobody heard cannot leave it running", () => {
+        const repeater = makeRepeater();
+        let value = 2;
+        const step = vi.fn(() => {
+            if (value <= 1) return false;
+
+            value -= 1;
+
+            return true;
+        });
+
+        repeater.start(step);
+        vi.advanceTimersByTime(400 + 60);
+
+        expect(value).toBe(1);
+        expect(repeater.stop(), "nothing is left running once the bound refused a step").toBe(false);
+
+        value = 5;
+        vi.advanceTimersByTime(2000);
+
+        expect(value, "so a value moved away from the bound afterwards stays where it was put").toBe(5);
+    });
 });

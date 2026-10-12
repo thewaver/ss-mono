@@ -1,17 +1,17 @@
 import type { AnchorHPlacement, AnchorVPlacement } from "./Anchor.types";
 
 export const ANCHOR_H_PLACEMENTS: readonly AnchorHPlacement[] = [
-    "left-out",
-    "left-in",
+    "left_out",
+    "left_in",
     "center",
-    "right-in",
-    "right-out",
+    "right_in",
+    "right_out",
 ];
 
 export const ANCHOR_V_PLACEMENTS: readonly AnchorVPlacement[] = [
-    "top-out",
-    "top-in",
+    "top_out",
+    "top_in",
     "center",
-    "bottom-in",
-    "bottom-out",
+    "bottom_in",
+    "bottom_out",
 ];

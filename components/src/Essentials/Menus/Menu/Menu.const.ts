@@ -4,8 +4,8 @@ import type { MenuSubmenuMode, MenuSubmenuTrigger, MenuTriggerRole } from "./Men
 
 export const MENU_DEFAULTS = {
     submenuPlacement: {
-        ltr: { x: "right-out", y: "top-in" },
-        rtl: { x: "left-out", y: "top-in" },
+        ltr: { x: "right_out", y: "top_in" },
+        rtl: { x: "left_out", y: "top_in" },
     } as Record<NavigatorDirection, AnchorPlacement>,
     submenuMode: "cascade" as MenuSubmenuMode,
     submenuOpensOn: "hover" as MenuSubmenuTrigger,

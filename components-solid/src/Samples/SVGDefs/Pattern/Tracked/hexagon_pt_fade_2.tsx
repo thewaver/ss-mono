@@ -16,7 +16,7 @@ export const hexagon_pt_fade_2 = (opts?: PatternProximityOpts): TrackedPatternCo
         const shape = (
             <path
                 id={`${id}-hexagon`}
-                d={ShapeUtils.pointsToPath(ShapeConst.getDefaultShapePoints("hexagon-pointy-top", defs.cellSize))}
+                d={ShapeUtils.pointsToPath(ShapeConst.getDefaultShapePoints("hexagon_pointy_top", defs.cellSize))}
             />
         );
 

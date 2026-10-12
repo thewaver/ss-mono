@@ -5,8 +5,8 @@ export namespace CellAnimationPlayback {
         "normal",
         "reverse",
         "stack",
-        "stack-reverse",
+        "stack_reverse",
         "pipe",
-        "pipe-reverse",
+        "pipe_reverse",
     ];
 }

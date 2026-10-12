@@ -9,7 +9,7 @@
     import { renderToolbarOverflowItem, renderToolbarPopup } from "../ToolbarPage.const.svelte";
     import type { ToolbarExampleProps } from "../ToolbarPage.types";
 
-    const PLACEMENT: AnchorPlacement = { x: "center", y: "top-out" };
+    const PLACEMENT: AnchorPlacement = { x: "center", y: "top_out" };
 
     const OFFSET = { x: 0, y: 8 };
 

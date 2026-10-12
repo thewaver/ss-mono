@@ -13,14 +13,14 @@ export const triangle_s_2: TimedPatternConfig = {
         const rightTriangle = (
             <path
                 id={`${id}-triangle-right`}
-                d={ShapeUtils.pointsToPath(ShapeConst.getDefaultShapePoints("triangle-right", cellSize))}
+                d={ShapeUtils.pointsToPath(ShapeConst.getDefaultShapePoints("triangle_right", cellSize))}
             />
         );
 
         const leftTriangle = (
             <path
                 id={`${id}-triangle-left`}
-                d={ShapeUtils.pointsToPath(ShapeConst.getDefaultShapePoints("triangle-left", cellSize))}
+                d={ShapeUtils.pointsToPath(ShapeConst.getDefaultShapePoints("triangle_left", cellSize))}
             />
         );
 

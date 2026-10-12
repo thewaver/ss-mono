@@ -4,6 +4,6 @@ import { spinDownCcw } from "./spinDownCcw";
 import { spinDownCw } from "./spinDownCw";
 
 export const spinDownCheckered: CellAnimationFn = CellAnimationKeyframeUtils.fromZones(
-    [{ zone: "evenCheckeredCells", animation: spinDownCw }],
+    [{ zone: "even_checkered_cells", animation: spinDownCw }],
     spinDownCcw,
 );

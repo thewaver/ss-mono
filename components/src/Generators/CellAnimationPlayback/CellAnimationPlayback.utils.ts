@@ -5,8 +5,8 @@ import type { CellAnimationPlaybackDirection, CellAnimationPlaybackOpts } from "
 
 const DEFAULT_DIRECTION: CellAnimationPlaybackDirection = "normal";
 const DEFAULT_HOLD_MS = 0;
-const ROUND_TRIPS: readonly CellAnimationPlaybackDirection[] = ["stack", "stack-reverse", "pipe", "pipe-reverse"];
-const FAR_END_STARTS: readonly CellAnimationPlaybackDirection[] = ["reverse", "stack-reverse", "pipe-reverse"];
+const ROUND_TRIPS: readonly CellAnimationPlaybackDirection[] = ["stack", "stack_reverse", "pipe", "pipe_reverse"];
+const FAR_END_STARTS: readonly CellAnimationPlaybackDirection[] = ["reverse", "stack_reverse", "pipe_reverse"];
 const computeAlternated = (progress: number, outward: number) => {
     if (outward <= 0) return 1;
     if (progress < outward) return progress / outward;
@@ -16,7 +16,7 @@ const computeAlternated = (progress: number, outward: number) => {
 };
 const isOrderSwapped = (dir: CellAnimationPlaybackDirection, progress: number) => {
     if (dir === "pipe") return progress > 0.5;
-    if (dir === "pipe-reverse") return progress < 0.5;
+    if (dir === "pipe_reverse") return progress < 0.5;
 
     return false;
 };

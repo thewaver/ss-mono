@@ -12,7 +12,7 @@ export const ReachableExample = (props: Props) => (
         isReachableWhenDisabled={true}
         renderContent={(getFlags) => <PageButtonContent flags={getFlags}>Click Me</PageButtonContent>}
         tooltipDefs={() => ({
-            placement: () => ({ x: "center", y: "top-out" }),
+            placement: () => ({ x: "center", y: "top_out" }),
             offset: () => ({ x: 0, y: 10 }),
             hoverShowDelayMs: 0,
             renderContent: (getVisibilityTarget, getTransitionDurationMs, _getPlacement, getFlags) => (

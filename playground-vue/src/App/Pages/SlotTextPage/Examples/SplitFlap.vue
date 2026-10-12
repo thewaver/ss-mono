@@ -14,7 +14,7 @@ defineProps<Props>();
 <template>
     <SlotText
         :text="text"
-        mechanism="splitFlap"
+        mechanism="split_flap"
         :character-size="CHARACTER_SIZE"
         :turn-duration-ms="turnDurationMs"
         :turn-delay-ms="turnDelayMs"

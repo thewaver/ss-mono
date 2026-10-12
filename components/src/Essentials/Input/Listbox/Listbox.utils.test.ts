@@ -74,15 +74,15 @@ describe("computeHighlightedIndex", () => {
 
 describe("computeActiveOptionId", () => {
     it("points at the highlighted option only while open and holding focus on a field", () => {
-        expect(ListboxUtils.computeActiveOptionId("list", 2, { focusModel: "activeDescendant", isOpen: true })).toBe(
+        expect(ListboxUtils.computeActiveOptionId("list", 2, { focusModel: "active_descendant", isOpen: true })).toBe(
             "list-option-2",
         );
         expect(
-            ListboxUtils.computeActiveOptionId("list", 2, { focusModel: "activeDescendant", isOpen: false }),
+            ListboxUtils.computeActiveOptionId("list", 2, { focusModel: "active_descendant", isOpen: false }),
         ).toBeUndefined();
         expect(ListboxUtils.computeActiveOptionId("list", 2, { focusModel: "roving", isOpen: true })).toBeUndefined();
         expect(
-            ListboxUtils.computeActiveOptionId("list", undefined, { focusModel: "activeDescendant", isOpen: true }),
+            ListboxUtils.computeActiveOptionId("list", undefined, { focusModel: "active_descendant", isOpen: true }),
         ).toBeUndefined();
     });
 });
@@ -184,7 +184,7 @@ describe("createCursor", () => {
         let isOpen = overrides.isOpen ?? true;
 
         const cursor = ListboxUtils.createCursor({
-            focusModel: "activeDescendant",
+            focusModel: "active_descendant",
             isHighlightExplicit: overrides.isHighlightExplicit,
             getListboxId: () => "list",
             getOptions: () => OPTIONS,

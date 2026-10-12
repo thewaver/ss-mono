@@ -1,1 +1,1 @@
-export type CornerKey = "topLeft" | "topRight" | "bottomLeft" | "bottomRight";
+export type CornerKey = "top_left" | "top_right" | "bottom_left" | "bottom_right";

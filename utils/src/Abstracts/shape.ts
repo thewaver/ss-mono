@@ -10,7 +10,7 @@ const INNER_RECT_ITERATIONS = 5;
 const INNER_RECT_SAMPLES = 50;
 const CIRCLE_KAPPA = 1;
 const HALF_PI = Math.PI * 0.5;
-const DODECAGON_SIDES = 12;
+const HECTOGON_SIDES = 100;
 const MIN_TANGENT_COS_GAP = 1e-9;
 const MAX_TANGENT_LENGTH_FACTOR = 1e6;
 const ARROW_BASE_START = -1;
@@ -121,6 +121,22 @@ const dropCoincidentVertices = (vertices: ArrowVertex[]) => {
 };
 
 /**
+ * The corners of a regular polygon stretched to fill a box, the first one at the top middle.
+ *
+ * Kept apart from the shape switch so the hectogon reads as what it is: a circle sampled at a hundred corners.
+ *
+ * @param sides How many corners.
+ * @param size The box to fill.
+ * @returns The corners, clockwise from the top.
+ */
+const getRegularPolygonPoints = (sides: number, { width, height }: Size2d): Point2d[] =>
+    Array.from({ length: sides }, (_unused, index) => {
+        const angle = (index / sides) * Math.PI * 2 - HALF_PI;
+
+        return { x: width * 0.5 * (1 + Math.cos(angle)), y: height * 0.5 * (1 + Math.sin(angle)) };
+    });
+
+/**
  * Every result {@link ShapeConst.getPaths} has ever worked out.
  *
  * Deliberately unbounded and never evicted. Generating a shape is expensive and
@@ -147,21 +163,28 @@ export namespace ShapeConst {
     /**
      * The built-in shapes {@link getDefaultShapePoints} knows how to build.
      *
-     * `dodecagon` is a twelve-sided polygon rather than a circle: it sits up to 3.41% of the radius inside
-     * the circle it approximates, so its flats stay visible at the sizes these are drawn at. For an exact
-     * circle, take a `square` and give every corner a join radius of half its side.
+     * The first four triangles point at the middle of one side of their box; the next four are the halves
+     * of a box cut corner to corner, each named for the corner its right angle sits in.
+     *
+     * `hectogon` is a hundred-sided polygon rather than a circle: it sits at most 0.05% of the radius inside the
+     * circle it approximates, which is a circle to the eye while still being corners that anything taking points
+     * can use. For an exact circle, take a `square` and give every corner a join radius of half its side.
      */
 
     export const DEFAULT_SHAPES = [
-        "triangle-up",
-        "triangle-down",
-        "triangle-left",
-        "triangle-right",
+        "triangle_up",
+        "triangle_down",
+        "triangle_left",
+        "triangle_right",
+        "triangle_top_left",
+        "triangle_top_right",
+        "triangle_bottom_right",
+        "triangle_bottom_left",
         "square",
         "lozenge",
-        "hexagon-pointy-top",
-        "hexagon-flat-top",
-        "dodecagon",
+        "hexagon_pointy_top",
+        "hexagon_flat_top",
+        "hectogon",
     ] as const;
 
     /** One of the built-in shape names. */
@@ -197,38 +220,62 @@ export namespace ShapeConst {
 
     export const getDefaultShapePoints = (shape: DefaultShape, { width, height }: Size2d): Point2d[] => {
         switch (shape) {
-            case "dodecagon":
-                return Array.from({ length: DODECAGON_SIDES }, (_unused, index) => {
-                    const angle = (index / DODECAGON_SIDES) * Math.PI * 2 - HALF_PI;
+            case "hectogon":
+                return getRegularPolygonPoints(HECTOGON_SIDES, { width, height });
 
-                    return { x: width * 0.5 * (1 + Math.cos(angle)), y: height * 0.5 * (1 + Math.sin(angle)) };
-                });
-
-            case "triangle-up":
+            case "triangle_up":
                 return [
                     { x: width * 0.5, y: 0 },
                     { x: width, y: height },
                     { x: 0, y: height },
                 ];
 
-            case "triangle-down":
+            case "triangle_down":
                 return [
                     { x: 0, y: 0 },
                     { x: width, y: 0 },
                     { x: width * 0.5, y: height },
                 ];
 
-            case "triangle-left":
+            case "triangle_left":
                 return [
                     { x: width, y: 0 },
                     { x: width, y: height },
                     { x: 0, y: height * 0.5 },
                 ];
 
-            case "triangle-right":
+            case "triangle_right":
                 return [
                     { x: 0, y: 0 },
                     { x: width, y: height * 0.5 },
+                    { x: 0, y: height },
+                ];
+
+            case "triangle_top_left":
+                return [
+                    { x: 0, y: 0 },
+                    { x: width, y: 0 },
+                    { x: 0, y: height },
+                ];
+
+            case "triangle_top_right":
+                return [
+                    { x: 0, y: 0 },
+                    { x: width, y: 0 },
+                    { x: width, y: height },
+                ];
+
+            case "triangle_bottom_right":
+                return [
+                    { x: width, y: 0 },
+                    { x: width, y: height },
+                    { x: 0, y: height },
+                ];
+
+            case "triangle_bottom_left":
+                return [
+                    { x: 0, y: 0 },
+                    { x: width, y: height },
                     { x: 0, y: height },
                 ];
 
@@ -248,7 +295,7 @@ export namespace ShapeConst {
                     { x: 0, y: height * 0.5 },
                 ];
 
-            case "hexagon-pointy-top":
+            case "hexagon_pointy_top":
                 return [
                     { x: width * 0.5, y: 0 },
                     { x: width, y: height * 0.25 },
@@ -258,7 +305,7 @@ export namespace ShapeConst {
                     { x: 0, y: height * 0.25 },
                 ];
 
-            case "hexagon-flat-top":
+            case "hexagon_flat_top":
                 return [
                     { x: width * 0.25, y: 0 },
                     { x: width * 0.75, y: 0 },

@@ -4,7 +4,7 @@ import type { NavigatorDirection } from "../../../Abstracts/Navigator/Navigator.
 import type { VirtualizerRow } from "../../../Abstracts/Virtualizer/Virtualizer.types";
 import type { SelectItemRecord, SelectOptionGroupRecord, SelectOptionRecord } from "../Select/Select.types";
 
-export type ListboxFocusModel = "activeDescendant" | "roving";
+export type ListboxFocusModel = "active_descendant" | "roving";
 
 export type ListboxOrientation = "horizontal" | "vertical";
 

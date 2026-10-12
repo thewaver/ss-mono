@@ -82,10 +82,10 @@ describe("computeStep", () => {
     });
 
     it("moves left to the parent and right to the topmost child", () => {
-        expect(IcicleUtils.computeStep("toParent", DEEP_B, cells, getParent)).toBe(TALL);
-        expect(IcicleUtils.computeStep("toChildren", TALL, cells, getParent)).toBe(DEEP_A);
+        expect(IcicleUtils.computeStep("to_parent", DEEP_B, cells, getParent)).toBe(TALL);
+        expect(IcicleUtils.computeStep("to_children", TALL, cells, getParent)).toBe(DEEP_A);
         expect(
-            IcicleUtils.computeStep("toChildren", HEAVY, cells, getParent),
+            IcicleUtils.computeStep("to_children", HEAVY, cells, getParent),
             "a leaf has nothing to the right",
         ).toBeUndefined();
     });
@@ -114,8 +114,8 @@ describe("listNodes", () => {
 
 describe("getKeyStep", () => {
     it("maps the arrows and Home and End, and nothing else", () => {
-        expect(IcicleUtils.getKeyStep("ArrowRight")).toBe("toChildren");
-        expect(IcicleUtils.getKeyStep("ArrowLeft")).toBe("toParent");
+        expect(IcicleUtils.getKeyStep("ArrowRight")).toBe("to_children");
+        expect(IcicleUtils.getKeyStep("ArrowLeft")).toBe("to_parent");
         expect(IcicleUtils.getKeyStep("Home")).toBe("first");
         expect(IcicleUtils.getKeyStep("x")).toBeUndefined();
     });

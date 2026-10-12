@@ -48,7 +48,7 @@ test("hovering portals a tooltip and points the anchor at it", async ({ page }) 
     ).toBe(true);
 });
 
-test("a top-out placement lands the whole tooltip above the anchor", async ({ page }) => {
+test("a top_out placement lands the whole tooltip above the anchor", async ({ page }) => {
     await page.locator(ANCHOR).hover();
     await expect(page.locator(TOOLTIP)).toBeVisible();
 
@@ -57,7 +57,7 @@ test("a top-out placement lands the whole tooltip above the anchor", async ({ pa
 
     expect(
         tooltipBox.y + tooltipBox.height <= anchorBox.y,
-        "a top-out placement puts the whole tooltip above the anchor, not overlapping it",
+        "a top_out placement puts the whole tooltip above the anchor, not overlapping it",
     ).toBe(true);
 });
 

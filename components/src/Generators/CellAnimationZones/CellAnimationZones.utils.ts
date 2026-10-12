@@ -15,27 +15,27 @@ const zoneRegistry: Record<CellAnimationZoneType, CellAnimationZoneFn> = {
     quadrant2: ({ pos, origin }) => pos.col < origin.col && pos.row < origin.row,
     quadrant3: ({ pos, origin }) => pos.col < origin.col && pos.row > origin.row,
     quadrant4: ({ pos, origin }) => pos.col > origin.col && pos.row > origin.row,
-    axisX: ({ pos, origin }) => pos.row === origin.row,
-    axisY: ({ pos, origin }) => pos.col === origin.col,
+    axis_x: ({ pos, origin }) => pos.row === origin.row,
+    axis_y: ({ pos, origin }) => pos.col === origin.col,
     axis1: ({ pos, origin }) => pos.col === origin.col && pos.row < origin.row,
     axis2: ({ pos, origin }) => pos.col < origin.col && pos.row === origin.row,
     axis3: ({ pos, origin }) => pos.col > origin.col && pos.row === origin.row,
     axis4: ({ pos, origin }) => pos.col === origin.col && pos.row > origin.row,
     origin: ({ pos, origin }) => pos.col === origin.col && pos.row === origin.row,
-    evenRows: ({ pos, origin }) => CellAnimationUtils.isEvenRow(CellAnimationWeightUtils.getCellDelta(origin, pos)),
-    oddRows: ({ pos, origin }) => !CellAnimationUtils.isEvenRow(CellAnimationWeightUtils.getCellDelta(origin, pos)),
-    evenColumns: ({ pos, origin }) =>
+    even_rows: ({ pos, origin }) => CellAnimationUtils.isEvenRow(CellAnimationWeightUtils.getCellDelta(origin, pos)),
+    odd_rows: ({ pos, origin }) => !CellAnimationUtils.isEvenRow(CellAnimationWeightUtils.getCellDelta(origin, pos)),
+    even_columns: ({ pos, origin }) =>
         CellAnimationUtils.isEvenColumn(CellAnimationWeightUtils.getCellDelta(origin, pos)),
-    oddColumns: ({ pos, origin }) =>
+    odd_columns: ({ pos, origin }) =>
         !CellAnimationUtils.isEvenColumn(CellAnimationWeightUtils.getCellDelta(origin, pos)),
-    evenRings: ({ pos, origin }) => CellAnimationUtils.isEvenRing(CellAnimationWeightUtils.getCellDelta(origin, pos)),
-    oddRings: ({ pos, origin }) => !CellAnimationUtils.isEvenRing(CellAnimationWeightUtils.getCellDelta(origin, pos)),
-    evenCheckeredCells: ({ pos, origin }) =>
+    even_rings: ({ pos, origin }) => CellAnimationUtils.isEvenRing(CellAnimationWeightUtils.getCellDelta(origin, pos)),
+    odd_rings: ({ pos, origin }) => !CellAnimationUtils.isEvenRing(CellAnimationWeightUtils.getCellDelta(origin, pos)),
+    even_checkered_cells: ({ pos, origin }) =>
         CellAnimationUtils.isEvenCheckered(CellAnimationWeightUtils.getCellDelta(origin, pos)),
-    oddCheckeredCells: ({ pos, origin }) =>
+    odd_checkered_cells: ({ pos, origin }) =>
         !CellAnimationUtils.isEvenCheckered(CellAnimationWeightUtils.getCellDelta(origin, pos)),
-    lighterHalf: ({ weight }) => weight < 0.5,
-    heavierHalf: ({ weight }) => weight >= 0.5,
+    lighter_half: ({ weight }) => weight < 0.5,
+    heavier_half: ({ weight }) => weight >= 0.5,
 };
 
 /**

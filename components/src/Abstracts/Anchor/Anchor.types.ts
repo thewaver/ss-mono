@@ -1,6 +1,6 @@
-export type AnchorHPlacement = "left-in" | "left-out" | "right-in" | "right-out" | "center";
+export type AnchorHPlacement = "left_in" | "left_out" | "right_in" | "right_out" | "center";
 
-export type AnchorVPlacement = "top-in" | "top-out" | "bottom-in" | "bottom-out" | "center";
+export type AnchorVPlacement = "top_in" | "top_out" | "bottom_in" | "bottom_out" | "center";
 
 export type AnchorPlacement = {
     x: AnchorHPlacement;

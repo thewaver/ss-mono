@@ -2151,11 +2151,16 @@ overshoot alone while still pinning the two ends.
 **`Vec2d`, `Vec3d` and `Vec4d` are factories taking key names** so that `Point2d`, `Size2d`, `Index2d`,
 `Vector3d`, `Rect` and `Bounds` share one set of operations without the arithmetic being written six times.
 
-**`ShapeConst`'s `dodecagon` is named for what it is rather than for the circle it stands in for**, because a
+**`ShapeConst`'s `hectogon` is named for what it is rather than for the circle it stands in for**, because a
 shape here is a list of corners and a circle has none. An exact circle is reachable without a name — a
 `square` whose join radii are half its side rounds into one, every corner's arc sharing the square's own
-center — but that takes a second descriptor the caller has to pass, which is why the twelve-sided entry earns
+center — but that takes a second descriptor the caller has to pass, which is why the hundred-sided entry earns
 its place.
+
+**The four corner-cut triangles are named for the corner their right angle sits in** — `triangle_top_left`
+and the rest — because they do not point at the middle of a side the way `triangle_up` does, and the corner is
+the one thing about them that differs. Each starts at its topmost-leftmost corner and runs clockwise, as every
+other entry does.
 
 **`ShapeUtils` falls back to an edge length of `1` where two corners sit in the same spot.** The division
 would otherwise produce `NaN` and take the whole path with it, and a path of `NaN` renders as nothing at all.
@@ -3846,8 +3851,8 @@ judge its mirror, whose offset has the opposite sign.
 
 **A placement never crosses between `in` and `out`.** `in` means aligned to an anchor edge and overlapping
 it; `out` means beside it. Choosing between them is the consumer stating a relationship, not a hint — a
-tooltip that hops from inside its anchor to outside has changed what it means. So `left-in` may become
-`right-in` and `left-out` may become `right-out`, and nothing else. `center` may fall back to either `in`,
+tooltip that hops from inside its anchor to outside has changed what it means. So `left_in` may become
+`right_in` and `left_out` may become `right_out`, and nothing else. `center` may fall back to either `in`,
 since a centerd layer already overlaps.
 
 The cost is measured: when an anchor is itself clipped by the viewport there are cases where no `in`
@@ -4260,7 +4265,7 @@ popup and the standalone list both draw through it. The keyboard handler is `Sel
 it. The one change in the walk is that the arrow keys are the ones for the list's orientation, with the page's
 text direction applied, so a horizontal list in a right-to-left page walks leftward. `Select` stays vertical.
 
-**The focus model is `focusModel: "activeDescendant" | "roving"`, a required field of the cursor's defs, fixed
+**The focus model is `focusModel: "active_descendant" | "roving"`, a required field of the cursor's defs, fixed
 by whoever creates the cursor and never a prop.** A consumer cannot choose it, because the choice follows from
 whether a field exists. Where one does, focus has to stay there, and the popup's `mousedown` refusal is what
 keeps it there. Under `"roving"`, each option's `isTabbable` is true only for the highlighted one, so the list is
@@ -4732,7 +4737,7 @@ are drawn at, which is what makes a submenu concentric with the level above it.
   breaks exactly that. `getIsPinned` skips both adjustments it makes — choosing a safe placement from the
   family, and clamping into the viewport bands.
 - **Pinned means it has to close.** A layer that does not follow its anchor is pointing at nothing once the
-  anchor scrolls away, so `Popover` dismisses with a new `"anchorGone"` reason. Only when pinned, so no
+  anchor scrolls away, so `Popover` dismisses with a new `"anchor_gone"` reason. Only when pinned, so no
   existing popover changed. **The anchor's rect is only observed while the layer is visible**, which produced
   the nastiest bug of the batch: after an auto-close the last reading kept was the off-screen one, so the next
   open read a stale rect, decided the anchor was already gone and dismissed inside a frame — indistinguishable
@@ -6282,21 +6287,19 @@ The starting values are `STARTING_…` constants now, beside their own `MIN_…`
 inline is the state that is not a prop — click counters, index signals, progress readouts — where a
 `createSignal(0)` says all there is to say and a constant would only add a name to nothing.
 
-### `dodecagon` is named for what it is, and the exact circle needs no name at all
+### `hectogon` is the near-circle, named for what it is
 
 The built-in shapes are lists of corners, and a circle has none, which is why the set never had one. The
 user's proposal: add a many-sided polygon and let it stand in for one.
 
 **It is named for the polygon rather than the circle**, at the user's word, to avoid claiming to be something
-it is not. It also avoids a collision: `RevealPage` and `ScratchCardPage` both build their pickers as
-`[CIRCLE, ...DEFAULT_SHAPES]`, where their own `circle` means "no points at all, let the component draw a
-real one" — a built-in also called `circle` put the same word in those lists twice, meaning two different
-things.
+it is not, and so that no shape name collides with a page's own idea of a circle.
 
-**Twelve sides rather than twenty-four, chosen so the flats stay visible.** The sag between a vertex and an
-edge midpoint is `1 - cos(15°)`, 3.41% of the radius, against 0.86% at twenty-four. The user picked the
-coarser one deliberately: a shape that almost passes for a circle invites being used as one, and this one
-never does.
+**A hundred sides, so it does pass for a circle — the user's call, after trying it the other way.** A twelve-sided
+polygon came first, kept coarse on purpose so its flats would always show and nobody would mistake it for a
+circle. Seeing the hundred-sided one was what settled it: the near-circle was what was wanted, and the twelve-sided
+one was dropped. The hectogon sits at most 0.05% of its radius inside the circle, which keeps a flat within half a
+pixel of the true curve up to a radius of about a thousand pixels.
 
 **An exact circle was already reachable and is still not a name.** `setupPaths` takes a join radius per
 corner, and at the `round` exponent the corner is a plain circular arc; give a square radii of half its side
@@ -6306,13 +6309,18 @@ clamping tops out at exactly that value. What that cannot do is come from a shap
 descriptor to carry the radii in. Closing that gap would touch every caller that builds points from a name;
 the polygon touches none, which is why it won.
 
-**It tiles at a pitch of `√3/2` with offset rows**, the hexagonal close packing, sharing the pointy-top
-hexagon's neighborhood — six touching neighbors either way. `TileBoard` needs a tiling for every shape in
-the set, so this was not optional.
+**The Reveal, Lens and ScratchCard pages have no `circle` entry of their own**, and start on `hectogon`. That
+entry meant "pass no points and let the component draw a true circle", so those components' no-points path is
+still in the library and simply has no picker entry showing it. The knob that greyed out the corner fields while
+`circle` was picked went with it, since every remaining entry has corners to round. The pickers are
+`ShapeConst.DEFAULT_SHAPES` unchanged, so a shape added there reaches them without anyone editing a page.
 
-**The Shape page caps its per-corner grid at six columns.** It laid one column per two corners, which is
-three for a hexagon and twelve when this was a twenty-four-gon, and twelve overran the row and painted over
-its own label. At twelve sides it lands exactly on the cap, and the cap changes nothing for any other shape.
+**`TileBoard` lays it at a pitch of `√3/2` with offset rows**, the hexagonal close packing, sharing the
+pointy-top hexagon's neighborhood — six touching neighbors either way. It does not tile without gaps; the board
+needs a layout for every name it accepts, so this was not optional.
+
+**The Shape page caps its per-corner grid at six columns.** It lays one column per two corners, which is three
+for a hexagon and would be fifty for the hectogon, overrunning the row and painting over its own label.
 
 ### The cliff exposes one knob, because the other four broke it
 
@@ -6703,7 +6711,7 @@ menu lands under the pointer that just clicked the trigger and `onMouseEnter` ta
 menu specs failed on a highlight one item further down. That makes it a question about whether the pointer or
 the keyboard owns the highlight at open, which nobody has decided.
 
-**The submenu's placement defaults to `right-out` / `top-in`; its offset is zero and belongs to the
+**The submenu's placement defaults to `right_out` / `top_in`; its offset is zero and belongs to the
 consumer.** A submenu anchors to its parent item, and an item sits inside whatever padding and border the
 painter's surface has, so a submenu flush against its anchor overlaps the surface it came from. The library
 cannot know that inset, so `getSubmenuOffset` is where the consumer states it; the Playground passes its own
@@ -8282,7 +8290,7 @@ a new animation.** `encircle`, `skew`, `swarm`, `spinUp` and `spinDown` each hol
 counter-clockwise member; `pull` and `flip` each hold a horizontal and a vertical one. Every one of those pairs
 gained a `Rings` entry, which gives the even square rings the first member and the odd rings the second, and a
 `Checkered` entry, which splits them by checkerboard parity instead. Both come free of new keyframes:
-`evenRings` and `evenCheckeredCells` were already in the zone vocabulary, and `fromZones` already dispatches on
+`even_rings` and `even_checkered_cells` were already in the zone vocabulary, and `fromZones` already dispatches on
 it. This is the _"machinery that recombines what is already there"_ argument applied to the animation side a
 second time, and the reason it pays is that neither member changes — what changes is which cell gets which.
 
@@ -8559,7 +8567,7 @@ boundary, which is the whole of what these two add.
 **The direction comes from the alignment, the way Drawer's comes from its edge.** `ToastUtils.computeSwipeDirection`
 sends a toast off the side it sits against: a stack against the left or right edge, corners included, swipes
 sideways, which also leaves the page's vertical scroll to the browser; a stack centered along the top or bottom
-swipes up or down; `middle-center` has no edge to leave by and cannot be swiped, as a centered `Modal` cannot.
+swipes up or down; `middle_center` has no edge to leave by and cannot be swiped, as a centered `Modal` cannot.
 
 **A committed swipe removes the toast from `toasts`**, the same path the timer takes and the same thing a
 consumer's close control does, so the toast leaves through its ordinary exit. The toast's countdown is held while
@@ -8618,7 +8626,7 @@ entry sits in a minimal library box that re-enables pointer events and is the fl
 since politeness is set once on the region and a role per entry would announce twice.
 
 **Alignment is independent of direction, and `ToastUtils.computeStackAlignment` keeps it that way.** A
-reversed flex direction inverts "start" on the main axis, so a naive mapping would make `bottom-right` name
+reversed flex direction inverts "start" on the main axis, so a naive mapping would make `bottom_right` name
 different corners depending on `getDir`. The function flips the main axis alone — exact arithmetic over two
 enums, and the one part of this component reachable from `npm test`.
 
@@ -8635,8 +8643,8 @@ prop whose value may be `undefined` cannot pass through the mapped type, and "no
 switches to at runtime rather than a prop they omit. `getAriaLabel` is **required**, since a `role="region"`
 with no name is not exposed as a landmark at all.
 
-**`getOverflow` keeps both queue behaviors rather than picking one.** `dismiss-oldest` writes the excess out
-of the consumer's list so the newest is on screen; `hold-newest` renders only the limit and leaves the rest
+**`getOverflow` keeps both queue behaviors rather than picking one.** `dismiss_oldest` writes the excess out
+of the consumer's list so the newest is on screen; `hold_newest` renders only the limit and leaves the rest
 queued, entering as slots free. Genuinely different products — latest-news versus lose-nothing — and the
 request for a prop rather than a default is why both exist. Held entries are not rendered at all, so they run
 no clock, which falls out of the design.
@@ -9273,7 +9281,7 @@ sits between the left edge of the item before and the right edge of the item aft
 resize handle sit on logical edges (`insetInlineStart`, `insetInlineEnd`), so they move with the columns.
 
 **The default submenu side follows the direction; a side the consumer gave does not.** `MENU_DEFAULTS.submenuPlacement`
-holds one placement per direction, `right-out` under `ltr` and `left-out` under `rtl`, and `Menu` and `ContextMenu`
+holds one placement per direction, `right_out` under `ltr` and `left_out` under `rtl`, and `Menu` and `ContextMenu`
 read it with the direction they already hold for their keys, so a submenu opens on the side the opening arrow points
 to. It is still one entry keyed by the prop's name, as the defaults rule asks; only its value is keyed a second time,
 and a consumer reading the constant gets the pair. A consumer's `submenuPlacement` is used as given in either
@@ -10014,7 +10022,7 @@ picked, because the clock only learns its limit from the day.
 
 ### Controls: `DateInput`'s format states the order, and the mask follows from it
 
-Settled, with the mask. `getFormat` takes `"iso"`, `"day-month-year"` or `"month-day-year"`,
+Settled, with the mask. `getFormat` takes `"iso"`, `"day_month_year"` or `"month_day_year"`,
 defaulting to ISO.
 
 **An arbitrary mask string is deliberately not the prop.** A consumer passing `##/##/####` directly would
@@ -10568,6 +10576,14 @@ behavior is the shell's — the argument that put the auto-dismiss clock inside 
 `getRepeatIntervalMs` at 60 match a native spin button, and they are exposed rather than baked because a
 consumer with a slow store or a coarse step wants different numbers.
 
+**A repeat ends at the first step that cannot move.** Reported by the user as Reset not sticking: a field stepped
+down to its minimum, then reset to 5, walked itself back down to 1. The painter's stepper button disables itself
+at the bound it reaches, and a disabled `Button` refuses the pointer release and the mouse leaving, so
+`stopStepping` was never called and the repeat ran on unseen, refused at every tick, until something moved the value
+off the bound and gave it room again. Making a disabled button pass the release on was the other way out, and
+was not taken: it changes what every disabled button does for the sake of one pairing. The repeater is the thing
+that should not outlive its usefulness, and a refused step is the moment it has none.
+
 **A tap still steps exactly once.** `startStepping` steps immediately and only then arms the delay, so the
 first step is not deferred and releasing before the delay leaves that single step behind. Both halves are
 pinned in `numberInput.spec.ts`, since a repeat that starts too eagerly is indistinguishable from a working one
@@ -10750,7 +10766,7 @@ early as the highlight does, and nothing outside `root` can move — including a
 which `scrollIntoView` would scroll too. `MenuUtils.revealItem` finds the item's `role="menu"` popup and calls it;
 `Clock` calls it with its own root, since it is drawn both inline and inside `TimePicker`'s popup, and an inline clock
 below the fold scrolled the page to itself on mount in the same way. **A `Listbox` option goes through
-`ListboxUtils.revealOption`, which splits on where focus sits.** Under `"activeDescendant"` — the lists `Select` and
+`ListboxUtils.revealOption`, which splits on where focus sits.** Under `"active_descendant"` — the lists `Select` and
 `TextInput` open — focus stays in the field and the list is its popup, so only the scrollers up to the popup's
 `role="listbox"` root move. Under `"roving"` — an inline `Listbox` — the option is itself the focused element, drawn
 among the consumer's own scrollers, which sit outside the list's root, and it is only highlighted once the reader has
@@ -15093,7 +15109,7 @@ before anything is measured the padding is zero and the layout is simply the sub
 scheme only works if the number fed to `computeLayout` as the subject's size is the subject's size. What is
 observed is not the child the consumer passed but the `satelliteSubject` div wrapped around it, and that div
 is an ordinary block: it takes the full width of whatever contains it. A 140px subject inside a 260px parent
-therefore measured 232px wide, and `right-out` put the satellite 92px past the subject's right edge, floating
+therefore measured 232px wide, and `right_out` put the satellite 92px past the subject's right edge, floating
 in space. `satelliteRoot` carries `width: fit-content`, so the root shrinks to the subject's own width, the
 wrapper reports that width, and the placement lands on the corner. The horizontal case is the only one that
 was ever wrong — a block already shrinks to its content vertically, which is why the growth up and down looked
@@ -16173,7 +16189,7 @@ whether a split-flap is then a second component or a mode on this one is the use
 
 ### `SlotText`: a split-flap is a second way to draw the same count, on `Spine`
 
-**`mechanism` picks how a column changes, `"drum"` by default and `"splitFlap"` beside it.** The user's call: a prop on `Odometer` rather than a separate component, left open to more layouts later, so it is a union rather than a flag. Everything above the column is shared: the direction, the cascade, the reels, the slots that grow in and shrink away, and the reduced-motion rules come from `computeTurn` exactly as for the drum. **A split-flap reads the drum's angle as a count of flaps** (`getFlapPosition`), because a cumulative angle and a cumulative count are one running total spelled two ways — which is also why nine to zero drops one flap forward rather than nine back. Going down plays the flaps in reverse, lifting them back up, as the drum turns backwards; a real board only ever flips forwards, and that difference was accepted.
+**`mechanism` picks how a column changes, `"drum"` by default and `"split_flap"` beside it.** The user's call: a prop on `Odometer` rather than a separate component, left open to more layouts later, so it is a union rather than a flag. Everything above the column is shared: the direction, the cascade, the reels, the slots that grow in and shrink away, and the reduced-motion rules come from `computeTurn` exactly as for the drum. **A split-flap reads the drum's angle as a count of flaps** (`getFlapPosition`), because a cumulative angle and a cumulative count are one running total spelled two ways — which is also why nine to zero drops one flap forward rather than nine back. Going down plays the flaps in reverse, lifting them back up, as the drum turns backwards; a real board only ever flips forwards, and that difference was accepted.
 
 **A column draws three flaps on a `Spine` laid out by `SpineUtils.leaves`, and the characters on them are reassigned as the column moves.** The flap that fell last lies below the middle line showing the bottom half of the character on show; the flap on show carries that character's top half on its front and the next character's bottom half on its back; the next flap stands behind it with the next character's top half. That is the whole picture at any moment, so a reel running through forty characters still draws three flaps, and the picture is identical either side of a whole position, so moving to the next set of characters cannot be seen. Each flap is the full character box with the consumer's drawing clipped to the half it needs, so **`renderDigit` and `renderFixed` keep their meaning**.
 
@@ -16284,7 +16300,7 @@ anything about this component.
 
 **The ball marks where the line starts and the arrow where it arrives, which is at the parent.** Children feed
 a node, so the arrow points the way the tree reads — a seed advancing to the final, a report reporting to a
-manager — and the component's own vocabulary already says so with `childIds` and `toRoot`.
+manager — and the component's own vocabulary already says so with `childIds` and `to_root`.
 
 **A connector stops at the edge of the box it joins, and getting that backwards is invisible until a node
 fades.** The first build asked for a node's facing edge with the test inverted, so a parent's line began at
@@ -17742,21 +17758,21 @@ Where it sits says nothing about what it owes: `Calendar` is what it was written
 
 The first build read the row spacing off the shape's own corners — the topmost corner on its left edge,
 divided by the height — and claimed no constant was needed. **That is true only for the shapes whose rows
-interlock by a half-tile shift, and it was wrong to generalize from them.** `hexagon-flat-top` tiles through
+interlock by a half-tile shift, and it was wrong to generalize from them.** `hexagon_flat_top` tiles through
 the other axis entirely, with its rows half a tile apart and its columns one and a half tiles apart, and no
 reading of the left edge produces that. Triangles do not tile by translation at all.
 
 So `TILING_RATIOS` names, per `ShapeConst.DefaultShape`, the pitch as a fraction of the tile box and two
 questions about how the rows and tiles sit:
 
-| Shape                      | Pitch across | Pitch down | Offset rows | Turned-over tiles | Neighbors           |
-| -------------------------- | ------------ | ---------- | ----------- | ----------------- | ------------------- |
-| `square`                   | 1            | 1          | no          | `none`            | `orthogonal`        |
-| `lozenge`                  | 1            | 1/2        | yes         | `none`            | `diagonal`          |
-| `hexagon-pointy-top`       | 1            | 3/4        | yes         | `none`            | `diagonalAndAcross` |
-| `hexagon-flat-top`         | 1 1/2        | 1/2        | yes         | `none`            | `diagonalAndDown`   |
-| `triangle-up` / `-down`    | 1/2          | 1          | no          | `topToBottom`     | `uprightTriangle`   |
-| `triangle-left` / `-right` | 1            | 1/2        | no          | `leftToRight`     | `sidewaysTriangle`  |
+| Shape                      | Pitch across | Pitch down | Offset rows | Turned-over tiles | Neighbors             |
+| -------------------------- | ------------ | ---------- | ----------- | ----------------- | --------------------- |
+| `square`                   | 1            | 1          | no          | `none`            | `orthogonal`          |
+| `lozenge`                  | 1            | 1/2        | yes         | `none`            | `diagonal`            |
+| `hexagon_pointy_top`       | 1            | 3/4        | yes         | `none`            | `diagonal_and_across` |
+| `hexagon_flat_top`         | 1 1/2        | 1/2        | yes         | `none`            | `diagonal_and_down`   |
+| `triangle_up` / `-down`    | 1/2          | 1          | no          | `top_to_bottom`   | `upright_triangle`    |
+| `triangle_left` / `-right` | 1            | 1/2        | no          | `left_to_right`   | `sideways_triangle`   |
 
 **Offset rows** shift every other row half a pitch across and give it one tile fewer, which is what puts it
 in the notches; **turned-over tiles** mirror a tile when `row + col` is odd, which is what makes a triangle's
@@ -17766,7 +17782,7 @@ the one shape here that does not interlock at all.
 **`tileFlip` names the direction rather than answering yes or no, because the sideways triangles turn over
 through the other axis.** An upright triangle is mirrored top to bottom; a left- or right-pointing one is
 mirrored left to right, and a boolean cannot say which. So `TileBoardTiling` carries
-`tileFlip: "none" | "topToBottom" | "leftToRight"`, `getIsFlippedTile` asks whether it is anything but
+`tileFlip: "none" | "top_to_bottom" | "left_to_right"`, `getIsFlippedTile` asks whether it is anything but
 `"none"`, and `getTilePoints` reads it to pick the axis it mirrors across.
 
 **The sideways pair is the upright pair transposed, in every number.** Half a tile of overlap moves from
@@ -17781,18 +17797,18 @@ it is worth naming here.
 
 **Which is why the shape is a name again and `computeTilePoints` is gone.** A consumer cannot supply a
 tiling for an arbitrary polygon without supplying the lattice as well, and two props that must agree is a
-trap. `tileShape` defaults to `hexagon-pointy-top`, the board derives the points and the tiling from it, and
+trap. `tiling` (once `tileShape`) defaults to `hexagon_pointy_top`, the board derives the points and the tiling from it, and
 the points it worked out — turned over or not — are handed to `renderTile` in its render props, so the
-painter never needs to know which shape it is drawing. `triangle-down` is not a second implementation: it is
+painter never needs to know which shape it is drawing. `triangle_down` is not a second implementation: it is
 the same tiling with the starting orientation inverted, which the unit tests pin by asserting a turned-over
-`triangle-up` equals `triangle-down`'s own points. `triangle-left` and `triangle-right` stand in the same
+`triangle_up` equals `triangle_down`'s own points. `triangle_left` and `triangle_right` stand in the same
 relation to each other, with one wrinkle the test has to allow for: `getDefaultShapePoints` promises corners
 clockwise **starting from the top**, and mirroring a right-pointing triangle lands its top corner in the
 middle of the list rather than at the front. The corners are the same corners in the same order round the
 contour, so the test rotates both lists to start at the topmost corner before comparing them.
 
 **`hasShortFirstRow` inverts which rows are short.** Asked for by the user. It has no effect on a shape whose
-rows are not offset; a triangle board that should start the other way round asks for `triangle-down` instead,
+rows are not offset; a triangle board that should start the other way round asks for `triangle_down` instead,
 which is what the two names are for.
 
 **A tile's neighbors are a sixth column in the table, because "the rows are offset" does not decide them.**
@@ -17800,18 +17816,18 @@ The first build read them off `hasOffsetRows`, which handed the same six-tile li
 that is wrong for two of the three. A lozenge has four edges, so the tiles to its left and right — which the
 six-tile list claimed — meet it at a single corner and nowhere else. A flat-top hexagon has six edges, but
 its flat ones point up and down, and the tile they meet is **two rows away**, not one column across: rows two
-apart sit at the same offset and the same column positions, so `hexagon-flat-top` is the one shape whose
+apart sit at the same offset and the same column positions, so `hexagon_flat_top` is the one shape whose
 neighbor steps are `row ± 2`. Both were reporting two tiles that touch nothing and, for the hexagon, missing
 two that do.
 
 Neither is derivable from the two questions already in the table, so `neighborhood` names the family
 outright and `computeNeighbors` switches on it. The six families: `orthogonal` is a square's four;
-`diagonal` is the lozenge's four; `diagonalAndAcross` adds the two beside it, which is the pointy-top
-hexagon; `diagonalAndDown` adds the two `row ± 2` away, which is the flat-top one; `uprightTriangle` and
-`sidewaysTriangle` are three each. Every list is clockwise from the top, filtered to what is on the board.
+`diagonal` is the lozenge's four; `diagonal_and_across` adds the two beside it, which is the pointy-top
+hexagon; `diagonal_and_down` adds the two `row ± 2` away, which is the flat-top one; `upright_triangle` and
+`sideways_triangle` are three each. Every list is clockwise from the top, filtered to what is on the board.
 
 For a triangle, which three depends on the way the tile points, which is the shape name and the turn
-together — so `triangle-right` unturned and `triangle-left` turned over answer the same list. For an upright
+together — so `triangle_right` unturned and `triangle_left` turned over answer the same list. For an upright
 triangle the two beside it are always there and the vertical one depends; for a sideways one it is the two
 above and below that are always there and the horizontal one that depends.
 
@@ -18063,6 +18079,82 @@ one.
 **The board finds the tile under the pointer with `elementFromPoint` rather than listening on the tiles.** A touch press is implicitly captured by the hit layer it began on, so the other tiles never hear the finger arrive. Looking up the topmost element in a map of hit layers works the same for mouse, pen and touch, and goes through the taper's transform for free. Only the pointer that started the press is followed. A move with no buttons held ends the sweep, which covers a mouse released outside the window.
 
 **While sweeping is on, the root carries `touch-action: none`, so a touch that lands on a tile sweeps instead of scrolling the page.** That was the owner's call. Pressing tiles one by one, or Enter from the keyboard, is the single-pointer route (2.5.7). For 2.5.2 Pointer Cancellation, the press going down does nothing on its own; tiles are acted on as the pointer moves, before release, which meets "No Down-Event" as written without being the release pattern the Understanding document prefers. A board that fills the screen cannot be scrolled by touching its tiles while sweeping is on.
+
+### Triangles that share a box: the cut tilings on `TileBoard` and in the patterns
+
+The user's observation: the triangles the library tiled with were only the two strips (`triangle_up` and
+`triangle_left` and their mirrors), while cutting a square or a lozenge gives more. Sorted by what the board
+looks like rather than by how it was cut, the cuts collapse to five arrangements: a lozenge cut across is the
+upright strip, a lozenge cut down is the sideways strip, and a hexagon cut into six from its middle is one of those
+two again, depending on which way up it is. Three are new: a square cut by one diagonal, a square cut by both, and
+a lozenge cut both ways — which is squares cut by one diagonal whose lean alternates like a checkerboard. The only
+new shapes they need are the four corner-cut triangles; a square cut by both diagonals is the four pointed
+triangles at half size, all on one board.
+
+**`tileShape` became `tiling`, the user's pick over two others.** A square cut in four puts four shapes on one
+board, so no shape name can describe it, and `triangle_up` already meant the strip. Widening `tileShape` to accept
+names that are not shapes, and adding a second `tiling` prop beside it, were the alternatives; the second is the
+two-props-that-must-agree trap `computeTilePoints` was removed for. `TileBoardTilingKind` is every shape name but the
+four corner-cut triangles, plus `triangle_ltr`, `triangle_rtl`, `square_quarters` and `lozenge_quarters`, and
+`TILE_BOARD_TILINGS` lists them for a picker. A shape name keeps meaning what it meant.
+
+**The halved boards are two, named for the way the cut runs: `triangle_ltr` from each box's top left corner down to
+its bottom right, `triangle_rtl` from its top right corner down to its bottom left.** The user's names, read the way
+a page is read, top down. The first build gave each of the four corner-cut triangles a board of its own: the two
+sharing a diagonal drew the same board, so the second was made to start each row half a box late, which left a
+missing triangle at both ends of every row and was rejected on sight. Two halves of a box cut one way are one
+arrangement, so one name each. The corner-cut triangles stay built-in shapes, and appear on a board only as the
+pieces of these two.
+
+**The tile size is the box, and so is the count.** For a cut tiling `tileSize` is one uncut box and
+`tileCount.col` counts boxes across, so a five-by-five board of any cut tiling covers the same five squares by
+five that a `square` board does. The first build counted triangles, which put the two props in different units
+on one board and let a row end on a part of a square; the user called it, and the patterns already counted the
+same way. The pointed triangles are not affected: their `tileSize` is one triangle, so counting triangles keeps
+their units agreeing.
+
+**Each triangle is still addressed by its own column, so a row's columns run past the count.** Three boxes of
+quarters is a row of twelve tiles, `getRowLength` and `getColumnCount` say so, and the grid announces twelve
+columns. The pieces of a box sit side by side in one row rather than across rows, and that is a choice about
+addressing rather than about the picture — for halves the two are interchangeable to look at. Rows were taken
+because a grid is read row by row, which keeps a box's pieces next to each other in reading order, and the arrow
+keys then walk them in that order: right steps through a box's pieces, down goes to the same piece of the box
+below. Columns run left to right by where each piece sits: left quarter, top, bottom, right; a half-square's two
+halves, left one first.
+
+**A cut tiling is one more row of the same table, holding `pieces`.** Every entry in `TILING_RATIOS` now carries
+the pieces one box is cut into — a whole tiling has one, the whole shape. A
+second list of pieces is the checkerboard: which list a box uses alternates with `row + box`. The pitch of a cut
+tiling is the box, nothing is offset and nothing is turned over, since each piece already names its own shape.
+
+**Neighbors of a cut tile are found from the pieces rather than written into a table.** The whole tilings keep
+their hand-written families, checked once by intersecting polygons. For the cut ones the check _is_ the answer:
+each piece is cut out in whole-box units, where every corner lands on a half and compares exactly, and a piece
+whose contour runs back along one of this tile's edges is a neighbor. They come back clockwise from the top by the
+direction of the shared edge. A unit test walks every tile of every cut board and asks that each neighbor lists it
+back, and that a tile clear of the edges has three.
+
+**The gap is taken off every edge of a cut tile, its cuts included.** Shrinking the box by the gap, which is what a
+whole tile does, would leave two halves of one box touching along their diagonal. So a cut tile's contour is moved
+in by half the gap along each edge, and its box is whatever that leaves: the tiles of one board are no longer all
+the same size, which is why `getTileGeometry` answers the offset, size and points per tile and the Solid board
+places every tile from it. On a box edge the result is the same as shrinking the box, so the square and the
+quartered square agree at their outside.
+
+**A cut tile's middle is the average of its corners, not its box's middle.** `getTileCenter` promised the box's
+middle, and for a half-square that point is on the cut, shared with the other half — a piece stood there belongs to
+neither. Whole tiles keep the box's middle.
+
+**The patterns cut their cells the same way, through four layouts named as the tilings are.** `triangle_ltr`,
+`triangle_rtl`, `square_quarters` and `lozenge_quarters` give every triangle a cell index of its own, several to one cell,
+and a layout carries `computeCellPiece` to say which triangle an index is. A sample asks
+`SVGDefsUtils.getCellPiece` and draws that shape rather than choosing one by the index's parity, so the sample and
+the layout cannot disagree. The tracked level is measured from each piece's own middle, through
+`SVGDefsUtils.computeCellCenter`; measured from the cell's, the two halves of a cell would light as one. The
+checkerboard layout asks for an even count both ways, or the tile would not repeat. Each arrangement has a timed
+sample and a fading tracked one, `triangle_ltr`, `triangle_rtl`, `triangle_sq` and `triangle_lq`, in every framework. A sample draws each piece's
+path once, from `SVGDefsUtils.getCellPieces`, and points every cell at its piece with a `use`, as the pointed
+triangles do.
 
 ### The carry engine stopped counting in indices, and holds a place the zone defines
 
@@ -18538,7 +18630,7 @@ derives every position from the shape of the tree; here the positions come from 
 more than one parent and therefore no layer to be placed in, and the cables **are** the data rather than
 something read off it. A draggable prop would have had to switch off the layout, which is the only thing
 `Bracket` owns, swap `root` for a list of boxes plus a list of links, and add sockets, which `Bracket` has no
-notion of; the keyboard walk would go too, since `toRoot` and `toLeaves` mean nothing once a box has two
+notion of; the keyboard walk would go too, since `to_root` and `to_leaves` mean nothing once a box has two
 parents. What the two genuinely share is drawing a curve between two points, and `renderConnector` already
 hands that to the consumer — a seam that is already the consumer's is the sign these are two components.
 

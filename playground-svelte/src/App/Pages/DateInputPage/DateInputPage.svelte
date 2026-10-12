@@ -57,7 +57,7 @@
     <TypedExample
         bind:value={localeValue}
         calendar={calendarId}
-        format={"day-month-year"}
+        format={"day_month_year"}
         ariaLabel={"Day-first date"}
     />
 {/snippet}

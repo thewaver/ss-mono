@@ -14,7 +14,7 @@ export const ReachableExample = (props: Props) => (
         ariaLabel={"Disabled but reachable attachment"}
         renderContent={(renderProps) => <PageFileInputContent renderProps={renderProps} />}
         tooltipDefs={{
-            placement: { x: "center", y: "top-out" },
+            placement: { x: "center", y: "top_out" },
             offset: { x: 0, y: 10 },
             hoverShowDelayMs: 0,
             renderContent: (visibilityTarget, transitionDurationMs) => (

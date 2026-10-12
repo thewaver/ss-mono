@@ -67,12 +67,12 @@ export namespace ToastUtils {
      * `flex-start` means — so it is mirrored back, which is what lets new toasts enter from the top
      * while the stack still sits in the bottom corner.
      *
-     * @param alignment The corner, as a vertical and a horizontal edge — `"bottom-right"` and the like.
+     * @param alignment The corner, as a vertical and a horizontal edge — `"bottom_right"` and the like.
      * @param dir Which way the stack grows.
      * @returns The `justifyContent` and `alignItems` to apply.
      */
     export const computeStackAlignment = (alignment: ToastsAlignment, dir: ToastsDir): ToastsStackAlignment => {
-        const [vertical, horizontal] = alignment.split("-") as [ToastsVerticalAlignment, ToastsHorizontalAlignment];
+        const [vertical, horizontal] = alignment.split("_") as [ToastsVerticalAlignment, ToastsHorizontalAlignment];
         const isColumn = dir === "column" || dir === "column-reverse";
         const isReversed = dir === "column-reverse" || dir === "row-reverse";
 
@@ -92,11 +92,11 @@ export namespace ToastUtils {
      * edge is swiped sideways, corners included; a stack centered along the top or bottom is swiped up or down; a stack in the middle of the screen has
      * no edge to leave by.
      *
-     * @param alignment The corner, as a vertical and a horizontal edge — `"bottom-right"` and the like.
-     * @returns The direction, or `undefined` for `"middle-center"`.
+     * @param alignment The corner, as a vertical and a horizontal edge — `"bottom_right"` and the like.
+     * @returns The direction, or `undefined` for `"middle_center"`.
      */
     export const computeSwipeDirection = (alignment: ToastsAlignment): SwipeDirection | undefined => {
-        const [vertical, horizontal] = alignment.split("-") as [ToastsVerticalAlignment, ToastsHorizontalAlignment];
+        const [vertical, horizontal] = alignment.split("_") as [ToastsVerticalAlignment, ToastsHorizontalAlignment];
 
         return SWIPE_DIRECTION_BY_HORIZONTAL[horizontal] ?? SWIPE_DIRECTION_BY_VERTICAL[vertical];
     };
@@ -104,8 +104,8 @@ export namespace ToastUtils {
     /**
      * The toasts that are on screen, out of all the consumer has raised.
      *
-     * Past the limit, `"dismiss-oldest"` shows the newest ones — the oldest are about to be written out of the
-     * consumer's list by {@link computeOverflowTrim} — and `"hold-newest"` shows the oldest, keeping the rest waiting
+     * Past the limit, `"dismiss_oldest"` shows the newest ones — the oldest are about to be written out of the
+     * consumer's list by {@link computeOverflowTrim} — and `"hold_newest"` shows the oldest, keeping the rest waiting
      * their turn without running a clock.
      *
      * @param toasts Every toast the consumer holds, oldest first.
@@ -116,11 +116,11 @@ export namespace ToastUtils {
     export const computeAdmitted = <T>(toasts: Toast<T>[], limit: number | undefined, overflow: ToastsOverflow) => {
         if (limit === undefined || toasts.length <= limit) return toasts;
 
-        return overflow === "hold-newest" ? toasts.slice(0, limit) : toasts.slice(toasts.length - limit);
+        return overflow === "hold_newest" ? toasts.slice(0, limit) : toasts.slice(toasts.length - limit);
     };
 
     /**
-     * The consumer's list once the toasts past the limit have been dismissed, for `"dismiss-oldest"`.
+     * The consumer's list once the toasts past the limit have been dismissed, for `"dismiss_oldest"`.
      *
      * @param toasts Every toast the consumer holds, oldest first.
      * @param limit How many may be on screen at once, or `undefined` for no limit.
@@ -129,7 +129,7 @@ export namespace ToastUtils {
      * within it, or the overflow held rather than dropped.
      */
     export const computeOverflowTrim = <T>(toasts: Toast<T>[], limit: number | undefined, overflow: ToastsOverflow) => {
-        if (limit === undefined || overflow !== "dismiss-oldest" || toasts.length <= limit) return undefined;
+        if (limit === undefined || overflow !== "dismiss_oldest" || toasts.length <= limit) return undefined;
 
         return toasts.slice(toasts.length - limit);
     };

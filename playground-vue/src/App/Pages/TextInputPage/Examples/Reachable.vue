@@ -21,7 +21,7 @@ const props = defineProps<Props>();
 const value = useModel(props, "value");
 
 const tooltipDefs: InteractionTooltipDefs<TextFieldFlags> = {
-    placement: { x: "center", y: "top-out" },
+    placement: { x: "center", y: "top_out" },
     offset: { x: 0, y: 10 },
     renderContent: ({ visibilityTarget, transitionDurationMs }) =>
         h(

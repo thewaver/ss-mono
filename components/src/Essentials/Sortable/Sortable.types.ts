@@ -34,12 +34,12 @@ export type SortablePickUp = {
 export type SortableKeyAction =
     | { kind: "cancel" }
     | { kind: "drop" }
-    | { kind: "pickUp" }
-    | { kind: "aimAtNextZone"; step: number }
+    | { kind: "pick_up" }
+    | { kind: "aim_at_next_zone"; step: number }
     | { kind: "nudge"; nudge: CarryNudge }
     | { kind: "focus"; index: number };
 
-export type SortableClickAction = "pickUp" | "drop" | "aimAndDrop";
+export type SortableClickAction = "pick_up" | "drop" | "aim_and_drop";
 
 export type SortableZoneDefs<T, TTooltipDefs> = {
     getItems: () => SortableItemRecord<T, TTooltipDefs>[];

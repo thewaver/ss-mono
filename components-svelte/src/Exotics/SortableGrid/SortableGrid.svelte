@@ -219,7 +219,7 @@
             CarrierUtils.getCarry() ? CarrierUtils.getCarryMode() : undefined,
         );
 
-        if (action === "pickUp") {
+        if (action === "pick_up") {
             pickUp(index, "tap", { x: e.clientX, y: e.clientY });
             focusIndex(index);
 
@@ -227,7 +227,7 @@
         }
 
         if (action === undefined) return;
-        if (action === "aimAndDrop") CarrierUtils.aimAtPoint(e.clientX, e.clientY);
+        if (action === "aim_and_drop") CarrierUtils.aimAtPoint(e.clientX, e.clientY);
 
         CarrierUtils.end("drop");
     };
@@ -249,8 +249,8 @@
 
         if (action.kind === "cancel") CarrierUtils.end("cancel");
         if (action.kind === "drop") CarrierUtils.end("drop");
-        if (action.kind === "pickUp") pickUp(index, "key");
-        if (action.kind === "aimAtNextZone") CarrierUtils.aimAtNextZone(action.step);
+        if (action.kind === "pick_up") pickUp(index, "key");
+        if (action.kind === "aim_at_next_zone") CarrierUtils.aimAtNextZone(action.step);
         if (action.kind === "nudge") CarrierUtils.aimAtNudge(action.nudge);
         if (action.kind === "focus") focusIndex(action.index);
     };

@@ -25,7 +25,7 @@ const spell = (placement: AnchorPlacement, offset = NO_OFFSET, satellite = SATEL
 
 describe("computeLayout", () => {
     it("grows nothing when the satellite sits inside a corner", () => {
-        expect(spell({ x: "left-in", y: "top-in" })).toBe("0 0 0 0 0 0");
+        expect(spell({ x: "left_in", y: "top_in" })).toBe("0 0 0 0 0 0");
     });
 
     it("centers the satellite over the subject without growing either way", () => {
@@ -33,22 +33,22 @@ describe("computeLayout", () => {
     });
 
     it("grows on the side the satellite hangs off, by exactly its overhang", () => {
-        expect(spell({ x: "right-out", y: "center" })).toBe("0 0 20 0 100 40");
-        expect(spell({ x: "left-out", y: "center" })).toBe("20 0 0 0 0 40");
-        expect(spell({ x: "center", y: "top-out" })).toBe("0 20 0 0 40 0");
-        expect(spell({ x: "center", y: "bottom-out" })).toBe("0 0 0 20 40 100");
+        expect(spell({ x: "right_out", y: "center" })).toBe("0 0 20 0 100 40");
+        expect(spell({ x: "left_out", y: "center" })).toBe("20 0 0 0 0 40");
+        expect(spell({ x: "center", y: "top_out" })).toBe("0 20 0 0 40 0");
+        expect(spell({ x: "center", y: "bottom_out" })).toBe("0 0 0 20 40 100");
     });
 
     it("grows on two sides at once for an outward corner", () => {
-        expect(spell({ x: "right-out", y: "top-out" })).toBe("0 20 20 0 100 0");
+        expect(spell({ x: "right_out", y: "top_out" })).toBe("0 20 20 0 100 0");
     });
 
     it("counts an offset that pushes an inside satellite back out again", () => {
-        expect(spell({ x: "left-in", y: "top-in" }, { x: -8, y: -8 })).toBe("8 8 0 0 0 0");
+        expect(spell({ x: "left_in", y: "top_in" }, { x: -8, y: -8 })).toBe("8 8 0 0 0 0");
     });
 
     it("nudges without growing while the satellite still fits inside", () => {
-        expect(spell({ x: "left-in", y: "top-in" }, { x: 8, y: 8 })).toBe("0 0 0 0 8 8");
+        expect(spell({ x: "left_in", y: "top_in" }, { x: 8, y: 8 })).toBe("0 0 0 0 8 8");
     });
 
     it("grows for a satellite larger than the subject even when it is placed inside", () => {
@@ -58,7 +58,7 @@ describe("computeLayout", () => {
     it("reports no padding at all before either element has been measured", () => {
         expect(
             SatelliteUtils.computeLayout({ width: 0, height: 0 }, [
-                { size: { width: 0, height: 0 }, placement: { x: "right-out", y: "top-out" }, offset: NO_OFFSET },
+                { size: { width: 0, height: 0 }, placement: { x: "right_out", y: "top_out" }, offset: NO_OFFSET },
             ]),
         ).toEqual({
             padding: { paddingLeft: 0, paddingTop: 0, paddingRight: 0, paddingBottom: 0 },
@@ -79,9 +79,9 @@ describe("computeLayout with several satellites", () => {
 
     it("grows each side by the furthest overhang any satellite has there", () => {
         const layout = SatelliteUtils.computeLayout(SUBJECT, [
-            entry({ x: "right-out", y: "top-out" }),
-            entry({ x: "left-out", y: "center" }, { width: 30, height: 30 }),
-            entry({ x: "right-out", y: "center" }, { width: 12, height: 12 }),
+            entry({ x: "right_out", y: "top_out" }),
+            entry({ x: "left_out", y: "center" }, { width: 30, height: 30 }),
+            entry({ x: "right_out", y: "center" }, { width: 12, height: 12 }),
         ]);
 
         expect(layout.padding).toEqual({ paddingLeft: 30, paddingTop: 20, paddingRight: 20, paddingBottom: 0 });
@@ -89,8 +89,8 @@ describe("computeLayout with several satellites", () => {
 
     it("shifts every satellite by the same padding, so one that needed none still moves with the rest", () => {
         const layout = SatelliteUtils.computeLayout(SUBJECT, [
-            entry({ x: "left-out", y: "top-out" }),
-            entry({ x: "right-in", y: "bottom-in" }),
+            entry({ x: "left_out", y: "top_out" }),
+            entry({ x: "right_in", y: "bottom_in" }),
         ]);
 
         expect(layout.satelliteOffsets).toEqual([
@@ -102,7 +102,7 @@ describe("computeLayout with several satellites", () => {
     it("gives the offsets back in the order the satellites were given", () => {
         const layout = SatelliteUtils.computeLayout(SUBJECT, [
             entry({ x: "center", y: "center" }),
-            entry({ x: "left-in", y: "top-in" }),
+            entry({ x: "left_in", y: "top_in" }),
         ]);
 
         expect(layout.satelliteOffsets).toEqual([

@@ -1,8 +1,7 @@
 import { ShapeConst } from "@thewaver/ss-utils";
 
 export namespace ScratchCardKnobs {
-    export const CIRCLE = "circle";
-    export const BRUSH_SHAPES = [CIRCLE, ...ShapeConst.DEFAULT_SHAPES] as const;
+    export const BRUSH_SHAPES = ShapeConst.DEFAULT_SHAPES;
 
     export const MIN_PRECISION = 8;
     export const MAX_PRECISION = 64;
@@ -17,5 +16,5 @@ export namespace ScratchCardKnobs {
     export const MAX_THRESHOLD = 1;
     export const THRESHOLD_STEP = 0.05;
 
-    export const STARTING_BRUSH_SHAPE: (typeof BRUSH_SHAPES)[number] = CIRCLE;
+    export const STARTING_BRUSH_SHAPE: (typeof BRUSH_SHAPES)[number] = "hectogon";
 }

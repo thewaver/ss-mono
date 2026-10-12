@@ -178,7 +178,7 @@ export const SelectComposite = defineComponent(
         });
 
         const cursor = ListboxVueUtils.useCursor<T>({
-            focusModel: "activeDescendant",
+            focusModel: "active_descendant",
             listboxId,
             options: () => props.options,
             selectedOptions: () => props.selectedOptions,

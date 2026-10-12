@@ -15,7 +15,7 @@
     renderHighlightFloater={renderPageHighlightFloater}
     items={ACTIONS}
     ariaLabel={"Edit actions"}
-    placement={{ x: "left-in", y: "top-out" }}
+    placement={{ x: "left_in", y: "top_out" }}
     renderItem={renderMenuItem}
     renderPopup={renderMenuPopup}
     onActivate={props.onActivate}

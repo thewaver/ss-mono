@@ -104,10 +104,10 @@ export type TableGrid = {
 };
 
 export type TableKeyCommand =
-    | { kind: "selectAll" }
+    | { kind: "select_all" }
     | { kind: "focus"; cell: Index2d; isExtending: boolean }
     | { kind: "sort" }
     | { kind: "resize"; step: -1 | 1 }
-    | { kind: "moveColumn"; to: number }
-    | { kind: "activateRow"; rowIndex: number }
-    | { kind: "pickRow"; rowIndex: number; gesture: SelectionGesture };
+    | { kind: "move_column"; to: number }
+    | { kind: "activate_row"; rowIndex: number }
+    | { kind: "pick_row"; rowIndex: number; gesture: SelectionGesture };

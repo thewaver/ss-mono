@@ -4,19 +4,19 @@ import type { AnchorBand, AnchorBandKind, AnchorHPlacement, AnchorPlacement, Anc
 
 /** For each horizontal placement, the placements to try if it does not fit, best first. */
 const H_FAMILIES: Record<AnchorHPlacement, readonly AnchorHPlacement[]> = {
-    "left-in": ["left-in", "right-in"],
-    "right-in": ["right-in", "left-in"],
-    "left-out": ["left-out", "right-out"],
-    "right-out": ["right-out", "left-out"],
-    "center": ["center", "left-in", "right-in"],
+    left_in: ["left_in", "right_in"],
+    right_in: ["right_in", "left_in"],
+    left_out: ["left_out", "right_out"],
+    right_out: ["right_out", "left_out"],
+    center: ["center", "left_in", "right_in"],
 };
 /** For each vertical placement, the placements to try if it does not fit, best first. */
 const V_FAMILIES: Record<AnchorVPlacement, readonly AnchorVPlacement[]> = {
-    "top-in": ["top-in", "bottom-in"],
-    "bottom-in": ["bottom-in", "top-in"],
-    "top-out": ["top-out", "bottom-out"],
-    "bottom-out": ["bottom-out", "top-out"],
-    "center": ["center", "top-in", "bottom-in"],
+    top_in: ["top_in", "bottom_in"],
+    bottom_in: ["bottom_in", "top_in"],
+    top_out: ["top_out", "bottom_out"],
+    bottom_out: ["bottom_out", "top_out"],
+    center: ["center", "top_in", "bottom_in"],
 };
 const ARROW_ANGLE_RIGHT = 0;
 const ARROW_ANGLE_DOWN = 90;
@@ -55,16 +55,16 @@ export namespace AnchorUtils {
      */
     export const getHPlacementShift = (hPlacement: AnchorHPlacement, anchorRect: Rect, contentSize: Size2d) => {
         switch (hPlacement) {
-            case "left-in": {
+            case "left_in": {
                 return anchorRect.x;
             }
-            case "left-out": {
+            case "left_out": {
                 return anchorRect.x - contentSize.width;
             }
-            case "right-in": {
+            case "right_in": {
                 return anchorRect.x + anchorRect.width - contentSize.width;
             }
-            case "right-out": {
+            case "right_out": {
                 return anchorRect.x + anchorRect.width;
             }
             case "center": {
@@ -84,16 +84,16 @@ export namespace AnchorUtils {
      */
     export const getVPlacementShift = (vPlacement: AnchorVPlacement, anchorRect: Rect, contentSize: Size2d) => {
         switch (vPlacement) {
-            case "top-in": {
+            case "top_in": {
                 return anchorRect.y;
             }
-            case "top-out": {
+            case "top_out": {
                 return anchorRect.y - contentSize.height;
             }
-            case "bottom-in": {
+            case "bottom_in": {
                 return anchorRect.y + anchorRect.height - contentSize.height;
             }
-            case "bottom-out": {
+            case "bottom_out": {
                 return anchorRect.y + anchorRect.height;
             }
             case "center": {
@@ -115,11 +115,11 @@ export namespace AnchorUtils {
      */
     export const getHPlacementOffset = (hPlacement: AnchorHPlacement, offsetX: number) => {
         switch (hPlacement) {
-            case "left-in":
-            case "right-out":
+            case "left_in":
+            case "right_out":
                 return offsetX;
-            case "left-out":
-            case "right-in":
+            case "left_out":
+            case "right_in":
                 return -offsetX;
             default:
                 return 0;
@@ -135,11 +135,11 @@ export namespace AnchorUtils {
      */
     export const getVPlacementOffset = (vPlacement: AnchorVPlacement, offsetY: number) => {
         switch (vPlacement) {
-            case "top-in":
-            case "bottom-out":
+            case "top_in":
+            case "bottom_out":
                 return offsetY;
-            case "top-out":
-            case "bottom-in":
+            case "top_out":
+            case "bottom_in":
                 return -offsetY;
             default:
                 return 0;
@@ -188,7 +188,7 @@ export namespace AnchorUtils {
      * @returns `"before"` for `left-out`, `"after"` for `right-out`, `"over"` for the rest.
      */
     export const getHBandKind = (hPlacement: AnchorHPlacement): AnchorBandKind =>
-        hPlacement === "left-out" ? "before" : hPlacement === "right-out" ? "after" : "over";
+        hPlacement === "left_out" ? "before" : hPlacement === "right_out" ? "after" : "over";
 
     /**
      * Which side of the anchor a vertical placement puts the content on.
@@ -197,7 +197,7 @@ export namespace AnchorUtils {
      * @returns `"before"` for `top-out`, `"after"` for `bottom-out`, `"over"` for the rest.
      */
     export const getVBandKind = (vPlacement: AnchorVPlacement): AnchorBandKind =>
-        vPlacement === "top-out" ? "before" : vPlacement === "bottom-out" ? "after" : "over";
+        vPlacement === "top_out" ? "before" : vPlacement === "bottom_out" ? "after" : "over";
 
     /**
      * Holds a position inside its band, giving up the far edge before the near one.

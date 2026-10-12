@@ -6,9 +6,9 @@ export const applyStep = (factory: SVGFilterDefsFactory, id: SVGFiltersStepId) =
     switch (id) {
         case "turbulence":
             return factory.addTurbulenceFilter(BEND);
-        case "gaussianBlur":
+        case "gaussian_blur":
             return factory.addGaussianBlurFilter(BLUR);
-        case "dropShadow":
+        case "drop_shadow":
             return factory.addDropShadowFilter(SHADOW);
         case "saturation":
             return factory.addSaturationFilter(SATURATION);

@@ -98,18 +98,18 @@ export type SVGDiffuseLightingFilterDefs = SVGBaseLightingFilterDefs & {
 };
 
 export type SVGFilterPrimitiveKind =
-    | "dropShadow"
-    | "gaussianBlur"
+    | "drop_shadow"
+    | "gaussian_blur"
     | "turbulence"
-    | "hueRotation"
+    | "hue_rotation"
     | "saturation"
     | "brightness"
     | "contrast"
     | "inversion"
     | "color"
     | "pixelate"
-    | "specularLighting"
-    | "diffuseLighting";
+    | "specular_lighting"
+    | "diffuse_lighting";
 
 export type SVGFilterAssemblyDefs = {
     method?: SVGFilterMethod;

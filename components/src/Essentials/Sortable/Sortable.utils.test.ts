@@ -92,7 +92,7 @@ describe("computePlaceCount and computeSourceIndex", () => {
 
 describe("computeKeyAction", () => {
     it("picks up and puts down with either activation key, and cancels only a carry", () => {
-        expect(keyActionOf("Enter")).toEqual({ kind: "pickUp" });
+        expect(keyActionOf("Enter")).toEqual({ kind: "pick_up" });
         expect(keyActionOf(" ", { isCarrying: true })).toEqual({ kind: "drop" });
         expect(keyActionOf("Escape")).toBeUndefined();
         expect(keyActionOf("Escape", { isCarrying: true })).toEqual({ kind: "cancel" });
@@ -113,16 +113,16 @@ describe("computeKeyAction", () => {
     });
 
     it("carries to the next list with Tab, and leaves Tab alone otherwise", () => {
-        expect(keyActionOf("Tab", { isCarrying: true })).toEqual({ kind: "aimAtNextZone", step: 1 });
+        expect(keyActionOf("Tab", { isCarrying: true })).toEqual({ kind: "aim_at_next_zone", step: 1 });
         expect(keyActionOf("Tab")).toBeUndefined();
     });
 });
 
 describe("computeClickAction", () => {
     it("picks up with nothing carried, drops a tap, aims a key carry first, and leaves a drag alone", () => {
-        expect(SortableUtils.computeClickAction(undefined)).toBe("pickUp");
+        expect(SortableUtils.computeClickAction(undefined)).toBe("pick_up");
         expect(SortableUtils.computeClickAction("tap")).toBe("drop");
-        expect(SortableUtils.computeClickAction("key")).toBe("aimAndDrop");
+        expect(SortableUtils.computeClickAction("key")).toBe("aim_and_drop");
         expect(SortableUtils.computeClickAction("drag")).toBeUndefined();
     });
 });

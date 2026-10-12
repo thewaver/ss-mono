@@ -181,7 +181,7 @@ describe("TableUtils.computeKeyCommand", () => {
             step: -1,
         });
         expect(TableUtils.computeKeyCommand(press("ArrowRight", { shiftKey: true }), header, GRID, OPTS)).toEqual({
-            kind: "moveColumn",
+            kind: "move_column",
             to: 2,
         });
     });
@@ -192,18 +192,18 @@ describe("TableUtils.computeKeyCommand", () => {
                 ...OPTS,
                 direction: "rtl",
             }),
-        ).toEqual({ kind: "moveColumn", to: 0 });
+        ).toEqual({ kind: "move_column", to: 0 });
     });
 
     it("activates and picks from a body row", () => {
         const body = { row: 2, col: 0 };
 
         expect(TableUtils.computeKeyCommand(press("Enter"), body, GRID, OPTS)).toEqual({
-            kind: "activateRow",
+            kind: "activate_row",
             rowIndex: 1,
         });
         expect(TableUtils.computeKeyCommand(press(" ", { shiftKey: true }), body, GRID, OPTS)).toEqual({
-            kind: "pickRow",
+            kind: "pick_row",
             rowIndex: 1,
             gesture: { isToggling: false, isExtending: true },
         });
@@ -219,7 +219,7 @@ describe("TableUtils.computeKeyCommand", () => {
 
         expect(walked).toEqual({ kind: "focus", cell: { row: 3, col: 0 }, isExtending: true });
         expect(TableUtils.computeKeyCommand(press("a", { metaKey: true }), { row: 1, col: 0 }, GRID, OPTS)).toEqual({
-            kind: "selectAll",
+            kind: "select_all",
         });
         expect(TableUtils.computeKeyCommand(press("x"), { row: 1, col: 0 }, GRID, OPTS)).toBeUndefined();
     });

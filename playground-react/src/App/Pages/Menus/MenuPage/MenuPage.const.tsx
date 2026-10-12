@@ -18,7 +18,7 @@ export const ACTIONS_WITH_REACHABLE: MenuItem<Action>[] = [
         isDisabled: true,
         isReachableWhenDisabled: true,
         tooltipDefs: {
-            placement: { x: "right-out", y: "center" },
+            placement: { x: "right_out", y: "center" },
             offset: { x: 10, y: 0 },
             renderContent: (visibilityTarget, transitionDurationMs) => (
                 <PageTooltipContent visibilityTarget={visibilityTarget} transitionDurationMs={transitionDurationMs}>

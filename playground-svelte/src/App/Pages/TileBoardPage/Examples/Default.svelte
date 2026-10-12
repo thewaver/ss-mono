@@ -25,7 +25,7 @@
 <div class={styles.meepleHost}>
     <TileBoard
         {...otherProps}
-        tileShape={shape}
+        tiling={shape}
         computeTileAriaLabel={(tile) => `Row ${tile.row + 1}, tile ${tile.col + 1}`}
     >
         {#snippet renderTile(tile, renderProps)}

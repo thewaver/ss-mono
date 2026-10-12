@@ -2,9 +2,9 @@ import type { ToastsAlignment, ToastsAriaLive, ToastsDir, ToastsOverflow } from 
 
 export const TOASTS_DEFAULTS = {
     transitionDurationMs: 300,
-    alignment: "bottom-right" as ToastsAlignment,
+    alignment: "bottom_right" as ToastsAlignment,
     dir: "column" as ToastsDir,
-    overflow: "dismiss-oldest" as ToastsOverflow,
+    overflow: "dismiss_oldest" as ToastsOverflow,
     hotkey: "F8",
     ariaLive: "polite" as ToastsAriaLive,
     gap: 10,
@@ -12,17 +12,17 @@ export const TOASTS_DEFAULTS = {
 };
 
 export const TOASTS_ALIGNMENTS: readonly ToastsAlignment[] = [
-    "top-left",
-    "top-center",
-    "top-right",
-    "middle-left",
-    "middle-center",
-    "middle-right",
-    "bottom-left",
-    "bottom-center",
-    "bottom-right",
+    "top_left",
+    "top_center",
+    "top_right",
+    "middle_left",
+    "middle_center",
+    "middle_right",
+    "bottom_left",
+    "bottom_center",
+    "bottom_right",
 ];
 
 export const TOASTS_DIRS: readonly ToastsDir[] = ["column", "column-reverse", "row", "row-reverse"];
 
-export const TOASTS_OVERFLOWS: readonly ToastsOverflow[] = ["dismiss-oldest", "hold-newest"];
+export const TOASTS_OVERFLOWS: readonly ToastsOverflow[] = ["dismiss_oldest", "hold_newest"];

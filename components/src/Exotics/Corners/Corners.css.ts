@@ -19,22 +19,22 @@ export const cornerSVG = style({
 });
 
 export const cornerVariant = styleVariants({
-    bottomLeft: {
+    bottom_left: {
         bottom: 0,
         left: 0,
         transform: "scale(1, -1)",
     },
-    bottomRight: {
+    bottom_right: {
         bottom: 0,
         right: 0,
         transform: "scale(-1, -1)",
     },
-    topLeft: {
+    top_left: {
         top: 0,
         left: 0,
         transform: "scale(1, 1)",
     },
-    topRight: {
+    top_right: {
         top: 0,
         right: 0,
         transform: "scale(-1, 1)",

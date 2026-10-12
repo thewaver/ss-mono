@@ -189,3 +189,37 @@ test("holding a stepper repeats, and a tap does not", async ({ page }) => {
 
     expect(await readValue(), "and releasing stops it").toBe(afterHold);
 });
+
+/**
+ * Holding a stepper into its bound used to leave the repeat running unseen: the button disables itself at the
+ * bound, a disabled button does not hear the release, and the repeat went on stepping into the bound until
+ * something moved the value away — then walked it straight back. Reported from the Playground's Reset, which
+ * put a field back to its default only to watch it slide to the bound again. Typing a value after the hold is
+ * the same move made from inside the field, so this page can show it without a panel.
+ */
+test("a stepper held into its bound does not pull a value moved away afterwards back to it", async ({ page }) => {
+    const readValue = async () => Number(/value: (-?\d+)/.exec(await readout(page, "steppedClamped"))?.[1]);
+    const field = page.locator(QUANTITY);
+    const minimum = (await field.getAttribute("aria-valuemin"))!;
+    const box = (await page.locator(QUANTITY_UP).boundingBox())!;
+
+    await page.mouse.move(box.x + box.width * 0.5, box.y + box.height * 0.5);
+    await page.mouse.down();
+    await expect(page.locator(QUANTITY_UP), "held until the button gives up at the top").toHaveAttribute(
+        "aria-disabled",
+        "true",
+        { timeout: 15_000 },
+    );
+    await page.mouse.up();
+
+    await field.focus();
+    await page.keyboard.press("ControlOrMeta+a");
+    await page.keyboard.type(minimum);
+    await field.blur();
+
+    expect(await readValue(), "the typed value is taken").toBe(Number(minimum));
+
+    await page.waitForTimeout(1000);
+
+    expect(await readValue(), "and nothing walks it back up afterwards").toBe(Number(minimum));
+});

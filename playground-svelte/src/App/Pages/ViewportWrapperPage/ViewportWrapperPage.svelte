@@ -43,7 +43,7 @@
     const INNER_TOAST_MESSAGE = "Raised inside the square.";
 
     const TOOLTIP_DEFS = {
-        placement: { x: "center", y: "top-out" } as const,
+        placement: { x: "center", y: "top_out" } as const,
         offset: { x: 0, y: 10 },
         renderContent: roamingTooltip,
     };
@@ -200,7 +200,7 @@
                 <Toasts
                     bind:toasts={innerToasts}
                     ariaLabel={"Viewport notifications"}
-                    alignment={"bottom-center"}
+                    alignment={"bottom_center"}
                     margins={{
                         marginTop: INNER_TOAST_MARGIN,
                         marginRight: INNER_TOAST_MARGIN,

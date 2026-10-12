@@ -12,7 +12,7 @@ import ToolbarOverflowItem from "../ToolbarOverflowItem.vue";
 import type { ToolbarExampleProps } from "../ToolbarPage.types";
 import ToolbarPopup from "../ToolbarPopup.vue";
 
-const PLACEMENT: AnchorPlacement = { x: "center", y: "top-out" };
+const PLACEMENT: AnchorPlacement = { x: "center", y: "top_out" };
 
 const OFFSET = { x: 0, y: 8 };
 

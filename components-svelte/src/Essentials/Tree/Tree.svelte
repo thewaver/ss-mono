@@ -203,7 +203,7 @@
 
         e.preventDefault();
 
-        if (action.kind === "expandSiblings") expandSiblings(action.row);
+        if (action.kind === "expand_siblings") expandSiblings(action.row);
         if (action.kind === "focus") focusRow(action.row);
         if (action.kind === "expand") expand(action.row);
         if (action.kind === "collapse") collapse(action.row);

@@ -17,7 +17,7 @@ import { PageNavMenuTrigger } from "../../../StyledComponents/NavMenuContent/Nav
 import { PagePopoverSurface } from "../../../StyledComponents/PopoverSurface/PopoverSurface";
 import type { NavFlyoutProps, NavMenuEntry, NavigationMenuExampleProps } from "../HoverCardPage.types";
 
-const FLYOUT_PLACEMENT: AnchorPlacement = { x: "left-in", y: "bottom-out" };
+const FLYOUT_PLACEMENT: AnchorPlacement = { x: "left_in", y: "bottom_out" };
 const FLYOUT_OFFSET = { x: 0, y: 6 };
 
 const NAV_DELAY_GROUP = HoverIntentUtils.createDelayGroup();

@@ -1,6 +1,6 @@
 import type { Point2d, Size2d } from "@thewaver/ss-utils";
 
-export type ShapeRevealSpot = "center" | "top-left" | "top-right" | "bottom-left" | "bottom-right";
+export type ShapeRevealSpot = "center" | "top_left" | "top_right" | "bottom_left" | "bottom_right";
 
 export type ShapeRevealOrigin = ShapeRevealSpot | Point2d | Element;
 

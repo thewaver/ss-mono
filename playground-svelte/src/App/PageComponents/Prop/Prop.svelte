@@ -8,7 +8,7 @@
     import { getPropsPanelContext } from "../PropsPanel/PropsPanel.context";
     import type { PagePropProps } from "./Prop.types";
 
-    const HINT_PLACEMENT = { x: "center", y: "top-out" } as const;
+    const HINT_PLACEMENT = { x: "center", y: "top_out" } as const;
     const HINT_OFFSET = { x: 0, y: 10 };
     const EMPTY_TEXT = "";
     const SINGLE_FIELD = 1;

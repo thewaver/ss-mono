@@ -318,7 +318,7 @@ describe("computeKeyAction", () => {
     const opts = { index: 0, isShifted: false, isCarrying: false, navigable: [0, 1, 2], boxes };
 
     it("picks up and drops on the activation keys, and cancels only a carry", () => {
-        expect(SortableGridUtils.computeKeyAction("Enter", opts)).toEqual({ kind: "pickUp" });
+        expect(SortableGridUtils.computeKeyAction("Enter", opts)).toEqual({ kind: "pick_up" });
         expect(SortableGridUtils.computeKeyAction("Enter", { ...opts, isCarrying: true })).toEqual({ kind: "drop" });
         expect(SortableGridUtils.computeKeyAction("Escape", opts)).toBe(undefined);
         expect(SortableGridUtils.computeKeyAction("Escape", { ...opts, isCarrying: true })).toEqual({ kind: "cancel" });
@@ -330,7 +330,7 @@ describe("computeKeyAction", () => {
             nudge: { y: 1 },
         });
         expect(SortableGridUtils.computeKeyAction("Tab", { ...opts, isCarrying: true, isShifted: true })).toEqual({
-            kind: "aimAtNextZone",
+            kind: "aim_at_next_zone",
             step: -1,
         });
     });

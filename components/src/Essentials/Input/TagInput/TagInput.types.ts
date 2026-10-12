@@ -6,8 +6,8 @@ export type TagInputFlags = {
 export type TagInputKeyAction =
     | { kind: "add" }
     | { kind: "remove"; index: number }
-    | { kind: "focusTag"; index: number }
-    | { kind: "focusField"; isTyping: boolean };
+    | { kind: "focus_tag"; index: number }
+    | { kind: "focus_field"; isTyping: boolean };
 
 export type TagInputCbs = {
     /**

@@ -51,14 +51,63 @@ describe("ShapeConst.getDefaultShapePoints", () => {
     });
 
     it("gives the expected corner counts", () => {
-        expect(ShapeConst.getDefaultShapePoints("triangle-up", size)).toHaveLength(3);
-        expect(ShapeConst.getDefaultShapePoints("triangle-down", size)).toHaveLength(3);
-        expect(ShapeConst.getDefaultShapePoints("triangle-left", size)).toHaveLength(3);
-        expect(ShapeConst.getDefaultShapePoints("triangle-right", size)).toHaveLength(3);
+        expect(ShapeConst.getDefaultShapePoints("triangle_up", size)).toHaveLength(3);
+        expect(ShapeConst.getDefaultShapePoints("triangle_down", size)).toHaveLength(3);
+        expect(ShapeConst.getDefaultShapePoints("triangle_left", size)).toHaveLength(3);
+        expect(ShapeConst.getDefaultShapePoints("triangle_right", size)).toHaveLength(3);
         expect(ShapeConst.getDefaultShapePoints("square", size)).toHaveLength(4);
         expect(ShapeConst.getDefaultShapePoints("lozenge", size)).toHaveLength(4);
-        expect(ShapeConst.getDefaultShapePoints("hexagon-pointy-top", size)).toHaveLength(6);
-        expect(ShapeConst.getDefaultShapePoints("hexagon-flat-top", size)).toHaveLength(6);
+        expect(ShapeConst.getDefaultShapePoints("hexagon_pointy_top", size)).toHaveLength(6);
+        expect(ShapeConst.getDefaultShapePoints("hexagon_flat_top", size)).toHaveLength(6);
+        expect(ShapeConst.getDefaultShapePoints("hectogon", size)).toHaveLength(100);
+    });
+
+    it("puts a corner-cut triangle's right angle in the corner it is named for", () => {
+        expect(ShapeConst.getDefaultShapePoints("triangle_top_left", size)).toEqual([
+            { x: 0, y: 0 },
+            { x: 100, y: 0 },
+            { x: 0, y: 60 },
+        ]);
+        expect(ShapeConst.getDefaultShapePoints("triangle_top_right", size)).toEqual([
+            { x: 0, y: 0 },
+            { x: 100, y: 0 },
+            { x: 100, y: 60 },
+        ]);
+        expect(ShapeConst.getDefaultShapePoints("triangle_bottom_right", size)).toEqual([
+            { x: 100, y: 0 },
+            { x: 100, y: 60 },
+            { x: 0, y: 60 },
+        ]);
+        expect(ShapeConst.getDefaultShapePoints("triangle_bottom_left", size)).toEqual([
+            { x: 0, y: 0 },
+            { x: 100, y: 60 },
+            { x: 0, y: 60 },
+        ]);
+    });
+
+    it("winds every shape clockwise, so a fill rule or a stroke never treats one as inside out", () => {
+        for (const shape of ShapeConst.DEFAULT_SHAPES) {
+            const points = ShapeConst.getDefaultShapePoints(shape, size);
+            const twiceArea = points.reduce((sum, point, index) => {
+                const next = points[(index + 1) % points.length];
+
+                return sum + point.x * next.y - next.x * point.y;
+            }, 0);
+
+            expect(twiceArea, shape).toBeGreaterThan(0);
+        }
+    });
+
+    it("keeps a hectogon within a twentieth of a percent of the circle it stands for", () => {
+        const square = { width: 100, height: 100 };
+        const points = ShapeConst.getDefaultShapePoints("hectogon", square);
+
+        for (const [index, point] of points.entries()) {
+            const next = points[(index + 1) % points.length];
+            const middle = { x: (point.x + next.x) * 0.5, y: (point.y + next.y) * 0.5 };
+
+            expect(Math.hypot(middle.x - 50, middle.y - 50)).toBeGreaterThan(50 * 0.9995);
+        }
     });
 
     it("stretches the shape to fill the box", () => {
@@ -68,17 +117,17 @@ describe("ShapeConst.getDefaultShapePoints", () => {
             { x: 100, y: 60 },
             { x: 0, y: 60 },
         ]);
-        expect(ShapeConst.getDefaultShapePoints("triangle-up", size)).toEqual([
+        expect(ShapeConst.getDefaultShapePoints("triangle_up", size)).toEqual([
             { x: 50, y: 0 },
             { x: 100, y: 60 },
             { x: 0, y: 60 },
         ]);
-        expect(ShapeConst.getDefaultShapePoints("triangle-right", size)).toEqual([
+        expect(ShapeConst.getDefaultShapePoints("triangle_right", size)).toEqual([
             { x: 0, y: 0 },
             { x: 100, y: 30 },
             { x: 0, y: 60 },
         ]);
-        expect(ShapeConst.getDefaultShapePoints("triangle-left", size)).toEqual([
+        expect(ShapeConst.getDefaultShapePoints("triangle_left", size)).toEqual([
             { x: 100, y: 0 },
             { x: 100, y: 60 },
             { x: 0, y: 30 },

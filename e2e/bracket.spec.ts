@@ -618,7 +618,7 @@ const FAMILY_DEMO = `${FAMILY} [data-demo]`;
 const FAMILY_FRAME = `${FAMILY_DEMO} [data-measure-box] > div`;
 const FAMILY_NODE = `${FAMILY} li [role="button"]`;
 const FAMILY_ZOOM = "#familyZoom";
-const STAGE_BUTTONS = ["toLeaves", "toRoot", "previous", "next"].map((step) => `#familyStep-${step}`);
+const STAGE_BUTTONS = ["to_leaves", "to_root", "previous", "next"].map((step) => `#familyStep-${step}`);
 const ROOT_FAMILY = ["Final", "Semi 1", "Semi 2"];
 const ALL_NODES = [
     ...["Final", "Semi 1", "Semi 2", "Quarter 1", "Quarter 2", "Quarter 3", "Quarter 4"],

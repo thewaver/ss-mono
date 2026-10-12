@@ -285,7 +285,7 @@ export const SlotText = (props: SlotTextProps) => {
                             }}
                         >
                             <Show
-                                when={getMechanism() === "splitFlap"}
+                                when={getMechanism() === "split_flap"}
                                 fallback={
                                     <div class={styles.slotTextBarrel}>
                                         <Barrel

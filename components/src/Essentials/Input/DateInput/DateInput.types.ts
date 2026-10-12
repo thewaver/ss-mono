@@ -1,6 +1,6 @@
 import type { DateValueEra } from "../../../Abstracts/DateValue/DateValue.types";
 
-export type DateInputFormat = "iso" | "day-month-year" | "month-day-year";
+export type DateInputFormat = "iso" | "day_month_year" | "month_day_year";
 
 export type DateInputPart = "year" | "month" | "day";
 

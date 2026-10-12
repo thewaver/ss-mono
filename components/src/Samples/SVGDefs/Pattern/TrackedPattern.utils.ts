@@ -2,6 +2,7 @@ import { MathUtils, type Point2d, type Size2d } from "@thewaver/ss-utils";
 
 import type { PointerReading } from "../../../Abstracts/PointerTracker/PointerTracker.types";
 import type { PatternProximityOpts } from "../SVGDefs.types";
+import { SVGDefsUtils } from "../SVGDefs.utils";
 import { SVGPatternLayouts } from "../SVGPatternLayouts.const";
 import type { SVGPatternCellCount, SVGPatternCellIndex, SVGPatternKind } from "../SVGPatternLayouts.types";
 
@@ -181,7 +182,8 @@ export namespace TrackedPatternUtils {
      * How strongly one cell reacts to the pointer, from its rest level up to `1`.
      *
      * Distance is measured from the cell's center in cells rather than in pixels, so the reach keeps its meaning as
-     * the cell size changes and stays round on cells that are not square. The level eases in rather than rising in a
+     * the cell size changes and stays round on cells that are not square. A cell cut into triangles is measured from
+     * its own triangle's middle, so the pieces of one cell light one at a time. The level eases in rather than rising in a
      * straight line, so the edge of the lit area is soft. On a repeating tile the distance is taken to the nearest copy
      * of the pointer, which is what makes the cells at one edge of a tile answer to a pointer just past the other.
      *
@@ -207,11 +209,12 @@ export namespace TrackedPatternUtils {
 
         const layout = SVGPatternLayouts.ALL[kind];
         const pos = layout.computeCellPos(index, cellSize);
+        const center = SVGDefsUtils.computeCellCenter(kind, index, cellSize);
         const tileSize = layout.computePatternSize(cellCount, cellSize);
         const wrap = (delta: number, period: number) =>
             opts.isTiled && period > 0 ? delta - Math.round(delta / period) * period : delta;
-        const dx = wrap(pos.x + cellSize.width * 0.5 - pointer.x, tileSize.width) / cellSize.width;
-        const dy = wrap(pos.y + cellSize.height * 0.5 - pointer.y, tileSize.height) / cellSize.height;
+        const dx = wrap(pos.x + center.x - pointer.x, tileSize.width) / cellSize.width;
+        const dy = wrap(pos.y + center.y - pointer.y, tileSize.height) / cellSize.height;
         const nearness = MathUtils.clamp01(1 - Math.hypot(dx, dy) / opts.reach);
 
         return MathUtils.lerp(opts.restLevel, FULL_LEVEL, nearness * nearness * (3 - 2 * nearness));

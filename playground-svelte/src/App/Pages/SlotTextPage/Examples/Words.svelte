@@ -11,7 +11,7 @@
 
     let props: Props = $props();
 
-    const tileClass = $derived(props.mechanism === "splitFlap" ? styles.flapTile : styles.digit);
+    const tileClass = $derived(props.mechanism === "split_flap" ? styles.flapTile : styles.digit);
 </script>
 
 <SlotText

@@ -17,7 +17,7 @@ export const MixedExample = (props: Props) => {
                 ariaLabel={"Select all"}
                 renderContent={(getFlags) => <PageCheckboxContent flags={getFlags} />}
                 tooltipDefs={() => ({
-                    placement: () => ({ x: "center", y: "top-out" }),
+                    placement: () => ({ x: "center", y: "top_out" }),
                     offset: () => ({ x: 0, y: 10 }),
                     renderContent: (getVisibilityTarget, getTransitionDurationMs, _getPlacement, getFlags) => (
                         <PageTooltipContent

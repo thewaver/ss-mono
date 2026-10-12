@@ -154,14 +154,14 @@ describe("computeStepIndex", () => {
     it("crosses to the nearest lane and then to the nearest start in it", () => {
         const stops = stopsOf(SPANS);
 
-        expect(TimelineUtils.computeStepIndex("laneAfter", 0, stops)).toBe(1);
-        expect(TimelineUtils.computeStepIndex("laneBefore", 1, stops)).toBe(0);
+        expect(TimelineUtils.computeStepIndex("lane_after", 0, stops)).toBe(1);
+        expect(TimelineUtils.computeStepIndex("lane_before", 1, stops)).toBe(0);
     });
 
     it("has nowhere to go from the outermost lane", () => {
         const stops = stopsOf(SPANS);
 
-        expect(TimelineUtils.computeStepIndex("laneBefore", 0, stops)).toBeUndefined();
+        expect(TimelineUtils.computeStepIndex("lane_before", 0, stops)).toBeUndefined();
     });
 
     it("jumps to the ends", () => {
@@ -306,7 +306,7 @@ describe("computeKeyAction", () => {
 
     it("walks with the arrows, Home and End while nothing is held", () => {
         expect(TimelineUtils.computeKeyAction("ArrowRight", resting)).toEqual({ kind: "step", step: "next" });
-        expect(TimelineUtils.computeKeyAction("ArrowUp", resting)).toEqual({ kind: "step", step: "laneBefore" });
+        expect(TimelineUtils.computeKeyAction("ArrowUp", resting)).toEqual({ kind: "step", step: "lane_before" });
         expect(TimelineUtils.computeKeyAction("End", resting)).toEqual({ kind: "step", step: "last" });
     });
 
