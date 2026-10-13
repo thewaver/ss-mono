@@ -2,7 +2,7 @@
 import * as styles from "@thewaver/ss-playground/App/StyledComponents/TabContent/TabContent.css";
 
 import { useLayerClass } from "../Layer/Layer.context";
-import type { TabFloaterProps } from "./TabContent.types";
+import type { TabFloaterProps } from "./TabContentVue.types";
 
 defineProps<TabFloaterProps>();
 

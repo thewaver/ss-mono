@@ -1,11 +1,10 @@
 import { SVGDefsUtils, type TimedPatternElementDefs } from "@thewaver/ss-components";
+import { LozengeD2Const } from "@thewaver/ss-components/internal";
 import { MathUtils, ShapeConst, ShapeUtils } from "@thewaver/ss-utils";
 
 import type { TimedPatternConfig } from "../../SVGDefsReact.types";
 import { SVGDefsReactUtils } from "../../SVGDefsReact.utils";
 import { SVGPatterns } from "../../SVGPatterns.const";
-
-const CELL_COUNT = { rows: 8, cols: 8 };
 
 const PatternElement = (props: { id: string; defs: TimedPatternElementDefs }) => {
     const getSplitValues = SVGDefsReactUtils.useSplitValues();
@@ -19,7 +18,7 @@ const PatternElement = (props: { id: string; defs: TimedPatternElementDefs }) =>
             />
             {SVGPatterns.computeDiagonalPattern(
                 `pattern1-${props.id}`,
-                CELL_COUNT,
+                LozengeD2Const.CELL_COUNT,
                 cellSize,
                 (cellId, index, cellCount, isSplit) => {
                     const isEven = MathUtils.isEven(index.row);

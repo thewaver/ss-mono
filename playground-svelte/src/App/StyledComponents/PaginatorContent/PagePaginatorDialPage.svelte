@@ -1,6 +1,6 @@
 <script lang="ts">
     import PagePaginatorWedge from "./PagePaginatorWedge.svelte";
-    import type { PaginatorPageContentProps } from "./PaginatorContent.types";
+    import type { PaginatorPageContentProps } from "./PaginatorContentSvelte.types";
 
     let props: PaginatorPageContentProps = $props();
 </script>

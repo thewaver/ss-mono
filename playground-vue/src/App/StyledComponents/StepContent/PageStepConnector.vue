@@ -4,7 +4,7 @@ import { computed } from "vue";
 import * as styles from "@thewaver/ss-playground/App/StyledComponents/StepContent/StepContent.css";
 
 import { useLayerClass } from "../Layer/Layer.context";
-import type { StepConnectorProps } from "./StepContent.types";
+import type { StepConnectorProps } from "./StepContentVue.types";
 
 const props = defineProps<StepConnectorProps>();
 

@@ -1,5 +1,5 @@
 <script lang="ts">
-    import { GlassSurface, InteractionTrackerSvelteUtils, SVGDefsSamples, toStyle } from "@thewaver/ss-components-svelte";
+    import { GlassSurface, InteractionTrackerSvelteUtils, SVGDefsSampleConfigs, SVGDefsSamples, toStyle } from "@thewaver/ss-components-svelte";
     import {
         NO_SAMPLE_KEY,
         computeNoSampleDefs,
@@ -9,7 +9,7 @@
     import { CSSUtils, type Point2d } from "@thewaver/ss-utils";
     import { assignInlineVars } from "@vanilla-extract/dynamic";
 
-    import type { GlassSurfaceExampleProps } from "../GlassSurfacePage.types";
+    import type { GlassSurfaceExampleProps } from "../GlassSurfacePageSvelte.types";
 
     const STARTING_RATIO: Point2d = { x: 0.5, y: 0.5 };
     const HALF_PANE = styles.paneSize * 0.5;
@@ -75,7 +75,7 @@
             computeStrokeDefs={(size, element) => {
                 if (strokeConfigKey === NO_SAMPLE_KEY) return computeNoSampleDefs(colors, "stroke");
 
-                return SVGDefsSamples.Gradient.Tracked.toConfig({
+                return SVGDefsSampleConfigs.Gradient.Tracked.toConfig({
                     family: strokeConfigKey,
                     defs: strokeConfigDefs,
                 } as SVGDefsSamples.Gradient.Tracked.Entry).computeSVGDefs(`stroke-${id}`, undefined, element, {

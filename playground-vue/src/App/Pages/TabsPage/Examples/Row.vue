@@ -17,7 +17,7 @@ import PageGlideFloater from "../../../StyledComponents/GlideFloater/PageGlideFl
 import PageTabContent from "../../../StyledComponents/TabContent/PageTabContent.vue";
 import PageTabFloater from "../../../StyledComponents/TabContent/PageTabFloater.vue";
 import PageTabGutter from "../../../StyledComponents/TabContent/PageTabGutter.vue";
-import type { TabsExampleProps } from "../TabsPage.types";
+import type { TabsExampleProps } from "../TabsPageVue.types";
 
 const DEFAULT_ID_PREFIX = "row";
 

@@ -2,7 +2,7 @@ import { Tabs } from "@thewaver/ss-components-react";
 import { DISABLED_TABS, ROW_TAB_GAP } from "@thewaver/ss-playground/App/Pages/TabsPage/TabsPage.const";
 
 import { PageTabContent, PageTabFloater, PageTabGutter } from "../../../StyledComponents/TabContent/TabContent";
-import type { TabsExampleProps } from "../TabsPage.types";
+import type { TabsExampleProps } from "../TabsPageReact.types";
 
 type Props = TabsExampleProps;
 

@@ -3,7 +3,7 @@
 
     import * as styles from "@thewaver/ss-playground/App/StyledComponents/SidebarContent/SidebarContent.css";
 
-    import type { SidebarFrameProps } from "./SidebarContent.types";
+    import type { SidebarFrameProps } from "./SidebarContentSvelte.types";
 
     let props: SidebarFrameProps & { children?: Snippet } = $props();
 </script>

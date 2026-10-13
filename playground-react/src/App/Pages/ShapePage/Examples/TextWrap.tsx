@@ -4,8 +4,8 @@ import { Shape } from "@thewaver/ss-components-react";
 import * as styles from "@thewaver/ss-playground/App/Pages/ShapePage/ShapePage.css";
 import { ShapeConst } from "@thewaver/ss-utils";
 
-import { computeShapeFillDefs, computeShapeStrokeDefs } from "../ShapePage.const";
 import type { ShapeExampleProps } from "../ShapePage.types";
+import { computeShapeFillDefs, computeShapeStrokeDefs } from "../ShapePageReact.const";
 
 const FLOAT_SIZE = 256;
 

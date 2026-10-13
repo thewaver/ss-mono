@@ -1,6 +1,7 @@
 import { type SlotsType, computed, defineComponent, shallowRef, useId } from "vue";
 
 import { ListboxUtils } from "@thewaver/ss-components";
+import { TextInputConst } from "@thewaver/ss-components/internal";
 
 import { Popover } from "../../../Primitives/Popover/Popover";
 import type { PopoverSlots } from "../../../Primitives/Popover/Popover.types";
@@ -14,9 +15,6 @@ import type { ListboxOptionsSlots } from "../Listbox/Listbox.types";
 import { ListboxVueUtils } from "../Listbox/ListboxVue.utils";
 import type { SelectOption } from "../Select/Select.types";
 import type { TextInputProps, TextInputSlots } from "./TextInput.types";
-
-const EMPTY_SELECTION: never[] = [];
-const NO_AUTOCOMPLETE = "off";
 
 export const TextInput = defineComponent(
     <T = string,>(props: TextInputProps<T>, { slots, expose }: SlotsContext<TextInputSlots<T>>) => {
@@ -34,7 +32,7 @@ export const TextInput = defineComponent(
 
         const options = computed((): SelectOption<T>[] =>
             props.suggestions === undefined
-                ? EMPTY_SELECTION
+                ? TextInputConst.EMPTY_SELECTION
                 : props.suggestions.map((suggestion) => ({ value: suggestion })),
         );
 
@@ -69,7 +67,7 @@ export const TextInput = defineComponent(
             isHighlightExplicit: true,
             listboxId,
             options,
-            selectedOptions: EMPTY_SELECTION,
+            selectedOptions: TextInputConst.EMPTY_SELECTION,
             isDisabled: getIsRefused,
             isOpen,
             isFilterable: true,
@@ -115,7 +113,9 @@ export const TextInput = defineComponent(
                             fieldElement.value = toElement(target);
                         }}
                         element={"input"}
-                        autoComplete={props.autoComplete ?? (hasSuggestions ? NO_AUTOCOMPLETE : undefined)}
+                        autoComplete={
+                            props.autoComplete ?? (hasSuggestions ? TextInputConst.NO_AUTOCOMPLETE : undefined)
+                        }
                         ariaAttributes={
                             hasSuggestions
                                 ? ListboxUtils.computeComboboxAttributes({

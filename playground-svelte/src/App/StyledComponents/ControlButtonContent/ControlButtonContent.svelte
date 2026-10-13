@@ -4,7 +4,7 @@
     import * as styles from "@thewaver/ss-playground/App/StyledComponents/ControlButtonContent/ControlButtonContent.css";
 
     import { getLayerClass } from "../Layer/Layer.context";
-    import type { ControlButtonContentProps } from "./ControlButtonContent.types";
+    import type { ControlButtonContentProps } from "./ControlButtonContentSvelte.types";
 
     let props: ControlButtonContentProps & { children?: Snippet } = $props();
 

@@ -1,6 +1,7 @@
 import { createMemo, createSignal } from "solid-js";
 
 import { MenubarKnobs } from "@thewaver/ss-playground/App/Knobs/Menubars.const";
+import { EXAMPLES_ROOT, EXAMPLE_NAMES } from "@thewaver/ss-playground/App/Pages/MenubarPage/MenubarPage.const";
 import * as styles from "@thewaver/ss-playground/App/Pages/MenubarPage/MenubarPage.css";
 
 import { PageExamples } from "../../PageComponents/Examples/Examples";
@@ -9,9 +10,7 @@ import { PageProp } from "../../PageComponents/Prop/Prop";
 import { PagePropsPanel } from "../../PageComponents/PropsPanel/PropsPanel";
 import { useLayerClass } from "../../StyledComponents/Layer/Layer.context";
 import { DefaultExample } from "./Examples/Default";
-import { NOTHING_PICKED, VIEW_DEFAULTS } from "./MenubarPage.const";
-
-const EXAMPLES_ROOT = "/src/App/Pages/MenubarPage/Examples";
+import { NOTHING_PICKED, VIEW_DEFAULTS } from "./MenubarPageSolid.const";
 
 export const MenubarPage = () => {
     const [getBarWidth, setBarWidth] = createSignal(MenubarKnobs.STARTING_BAR_WIDTH);
@@ -21,7 +20,7 @@ export const MenubarPage = () => {
     const getExamples = createMemo(() => [
         {
             key: "default",
-            name: "File, Edit and View",
+            name: EXAMPLE_NAMES.default,
             readout: () =>
                 `last picked: ${getLastPicked()} — with a menu open, the left and right arrows close it and open the next one; narrow the bar and a word becomes a submenu of the overflow menu`,
             component: () => {

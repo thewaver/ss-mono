@@ -14,16 +14,6 @@ import { access } from "../../Utils/propUtils";
 import { accessStore } from "../../Utils/storeUtils";
 import type { WraparoundProps } from "./WraparoundSolid.types";
 
-const KEY_SEPARATOR = ",";
-
-const toKey = (tile: WraparoundTile) => `${tile.column}${KEY_SEPARATOR}${tile.row}`;
-
-const fromKey = (key: string): WraparoundTile => {
-    const [column, row] = key.split(KEY_SEPARATOR).map(Number);
-
-    return { column, row };
-};
-
 export const Wraparound = (props: WraparoundProps) => {
     const [getRootRef, setRootRef] = createSignal<HTMLElement>();
     const [getOriginalRef, setOriginalRef] = createSignal<HTMLElement>();
@@ -83,7 +73,10 @@ export const Wraparound = (props: WraparoundProps) => {
     const getIsDragging = accessStore(plane, (state) => state.isDragging);
 
     const getCopyKeys = createMemo(
-        () => WraparoundUtils.computeTiles(getOffset(), getTileSize(), getViewportSize(), getMaxCopies()).map(toKey),
+        () =>
+            WraparoundUtils.computeTiles(getOffset(), getTileSize(), getViewportSize(), getMaxCopies()).map(
+                WraparoundUtils.toTileKey,
+            ),
         [],
         { equals: (a, b) => a.length === b.length && a.every((key, index) => key === b[index]) },
     );
@@ -120,8 +113,8 @@ export const Wraparound = (props: WraparoundProps) => {
                         <div
                             class={styles.wraparoundTile}
                             style={{
-                                transform: toTileTransform(fromKey(key)),
-                                visibility: key === toKey(getOriginalTile()) ? "hidden" : undefined,
+                                transform: toTileTransform(WraparoundUtils.fromTileKey(key)),
+                                visibility: key === WraparoundUtils.toTileKey(getOriginalTile()) ? "hidden" : undefined,
                             }}
                             aria-hidden="true"
                             inert

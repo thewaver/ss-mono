@@ -3,14 +3,13 @@ import type { Accessor, JSX } from "solid-js";
 import type {
     AccordionItem,
     AccordionMoveDirection,
-    AccordionOrientation,
-    AccordionSizing,
+    BaseAccordionValues,
     CollapsibleFlags,
     CollapsibleSide,
     InteractionFlags,
 } from "@thewaver/ss-components";
 
-import type { AccessorProps, MaybeAccessor, SignalSource } from "../../../Utils/typeUtils";
+import type { AccessorProps, AccessorValues, MaybeAccessor, SignalSource } from "../../../Utils/typeUtils";
 
 export type AccordionHeaderRenderer<T> = (
     getItem: Accessor<AccordionItem<T>>,
@@ -31,12 +30,6 @@ export type AccordionSectionProps<T> = AccessorProps<{
     side: CollapsibleSide;
     /** Whether this section is open. */
     isExpanded: boolean;
-    /** Scrolls this section into view once it has finished opening. */
-    isScrolledIntoViewOnExpand?: boolean;
-    /** Builds this section's panel only once it is first opened. */
-    isPanelBuiltOnExpand?: boolean;
-    /** How long this section takes to open and close. */
-    transitionDurationMs?: number;
     /** Receives the section element once it exists, for a consumer that has to measure or scroll it. */
     ref?: (element: HTMLElement) => void;
     /** Runs when this section's header is activated. */
@@ -50,41 +43,16 @@ export type AccordionSectionProps<T> = AccessorProps<{
     renderPanel: AccordionPanelRenderer<T>;
     /** Which way the open section last moved, handed on to the panel. */
     getMoveDirection: () => AccordionMoveDirection | undefined;
-};
+} & AccessorProps<{
+        /** Scrolls this section into view once it has finished opening. */
+        isScrolledIntoViewOnExpand?: boolean;
+        /** Builds this section's panel only once it is first opened. */
+        isPanelBuiltOnExpand?: boolean;
+        /** How long this section takes to open and close. */
+        transitionDurationMs?: number;
+    }>;
 
-export type AccordionProps<T> = AccessorProps<{
-    /** The space between sections. */
-    gap?: number;
-    /** Whether the accordion takes only the room its content needs, or fills the width it is given. */
-    sizing?: AccordionSizing;
-    /**
-     * Which way the sections run. `vertical`, the default, stacks them and each panel opens below its header,
-     * growing in height. `horizontal` sets them side by side and each panel opens beside its header, growing in
-     * width, so a closed section is a strip its header fills. The arrow keys that move between headers follow it:
-     * up and down for a column, left and right for a row, reversed under right-to-left text.
-     */
-    orientation?: AccordionOrientation;
-    /**
-     * Which heading level the section headers sit at, so the page's outline stays correct wherever the accordion is
-     * used.
-     */
-    headingLevel?: number;
-    /** Closes whatever is open when another section is opened, so at most one is ever open. */
-    isSingleExpand?: boolean;
-    /**
-     * Keeps at least one section open, so the last open one cannot be closed. It is what stops the accordion collapsing
-     * to nothing.
-     */
-    isExpandRequired?: boolean;
-    /** Scrolls a section into view once it has finished opening. */
-    isScrolledIntoViewOnExpand?: boolean;
-    /** Builds a section's panel only once it is first opened, rather than all of them up front. */
-    isPanelBuiltOnExpand?: boolean;
-    /** How long a section takes to open and close. */
-    transitionDurationMs?: number;
-}> & {
-    /** The sections, in the order they are shown. */
-    items: MaybeAccessor<AccordionItem<T>[]>;
+export type AccordionProps<T> = AccessorValues<BaseAccordionValues<T>> & {
     /**
      * Which sections are open, by item. Both sides write it: the accordion when a header is pressed, the consumer to
      * open or close sections from outside. Leave it out and the accordion keeps the state itself, starting with every

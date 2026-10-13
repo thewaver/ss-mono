@@ -1,8 +1,11 @@
 import type { Snippet } from "svelte";
 
-import type { AnchorPlacement, SpotlightCbs, SpotlightMode, SpotlightPopupState } from "@thewaver/ss-components";
-
-export type { SpotlightCbs, SpotlightPopupState };
+import type {
+    AnchorPlacement,
+    BaseSpotlightGuideProps,
+    BaseSpotlightHintProps,
+    BaseSpotlightProps,
+} from "@thewaver/ss-components";
 
 export type SpotlightRenderer = Snippet<[visibilityTarget: 0 | 1, transitionDurationMs: number]>;
 
@@ -16,12 +19,6 @@ export type SpotlightState = {
      * and the spotlight writes `false` when it is dismissed.
      */
     visibility: boolean;
-    /** How much room is left around the element being lit, so the hole is not cut tight against it. */
-    padding?: number;
-    /** How long the spotlight takes to fade in and out, and to move from one element to the next. */
-    transitionDurationMs?: number;
-    /** The element being lit. Changing it moves the spotlight rather than restarting it. */
-    elementRef: HTMLElement | undefined;
 };
 
 export type SpotlightSlots = {
@@ -39,23 +36,10 @@ export type SpotlightPopupSlot = {
     renderPopup: Snippet<[visibilityTarget: 0 | 1, transitionDurationMs: number, placement: AnchorPlacement]>;
 };
 
-export type SpotlightProps = SpotlightState &
-    SpotlightCbs &
-    SpotlightSlots &
-    SpotlightPopupState & {
-        /**
-         * Whether the spotlight only lights an element or also blocks everything else, which is the difference
-         * between pointing something out and insisting on it.
-         */
-        mode: SpotlightMode;
-    } & Partial<SpotlightPopupSlot>;
+export type SpotlightProps = SpotlightState & SpotlightSlots & Partial<SpotlightPopupSlot> & BaseSpotlightProps;
 
-export type SpotlightHintProps = SpotlightState & SpotlightCbs & SpotlightSlots;
+export type SpotlightHintProps = SpotlightState & SpotlightSlots & BaseSpotlightHintProps;
 
-export type SpotlightPromptProps = SpotlightState & SpotlightCbs & SpotlightSlots;
+export type SpotlightPromptProps = SpotlightState & SpotlightSlots & BaseSpotlightHintProps;
 
-export type SpotlightGuideProps = SpotlightState &
-    SpotlightCbs &
-    SpotlightSlots &
-    SpotlightPopupState &
-    SpotlightPopupSlot;
+export type SpotlightGuideProps = SpotlightState & SpotlightSlots & SpotlightPopupSlot & BaseSpotlightGuideProps;

@@ -13,11 +13,13 @@
     import LinkComponentExample from "./Examples/LinkComponent.svelte";
     import LinksExample from "./Examples/Links.svelte";
     import StepsExample from "./Examples/Steps.svelte";
-    import type { PaginatorExampleProps } from "./PaginatorPage.types";
-
-    const STARTING_PAGE = 1;
-    const COUNT_FIELD_WIDTH = 90;
-    const EXAMPLES_ROOT = "/src/App/Pages/PaginatorPage/Examples";
+    import type { PaginatorExampleProps } from "./PaginatorPageSvelte.types";
+    import {
+    COUNT_FIELD_WIDTH,
+    EXAMPLE_NAMES,
+    EXAMPLES_ROOT,
+    STARTING_PAGE,
+} from "@thewaver/ss-playground/App/Pages/PaginatorPage/PaginatorPage.const";
 
     let pageCount = $state(PaginatorKnobs.STARTING_PAGE_COUNT);
     let siblingCount = $state(PAGINATOR_DEFAULTS.siblingCount);
@@ -40,7 +42,7 @@
     const examples: ExampleDefs[] = [
         {
             key: "steps",
-            name: "Previous and next",
+            name: EXAMPLE_NAMES.steps,
             readout: () =>
                 `page ${stepPage} of ${pageCount} — the gaps name the pages they stand for, and a gap standing for one page is spelled as that page instead`,
             component: stepsExample,
@@ -48,7 +50,7 @@
         },
         {
             key: "ends",
-            name: "Jumps to either end",
+            name: EXAMPLE_NAMES.ends,
             readout: () =>
                 `page ${endPage} of ${pageCount} — first and previous go quiet together on page one, and next and last on the final page`,
             component: endsExample,
@@ -56,7 +58,7 @@
         },
         {
             key: "links",
-            name: "Pages that are links",
+            name: EXAMPLE_NAMES.links,
             readout: () =>
                 `page ${linkPage} of ${pageCount} — the consumer knows the address shape, so it computes the href from the page the library worked out`,
             component: linksExample,
@@ -64,7 +66,7 @@
         },
         {
             key: "linkComponent",
-            name: "Links through a component",
+            name: EXAMPLE_NAMES.linkComponent,
             readout: () =>
                 `page ${customLinkPage} of ${pageCount} — the same links rendered by a consumer's own link component`,
             component: linkComponentExample,
@@ -72,7 +74,7 @@
         },
         {
             key: "dial",
-            name: "The same row, round half a dial",
+            name: EXAMPLE_NAMES.dial,
             readout: () =>
                 `page ${dialPage} of ${pageCount} — one layout function, and the steps, pages and gaps become wedges in the order they already had`,
             component: dialExample,

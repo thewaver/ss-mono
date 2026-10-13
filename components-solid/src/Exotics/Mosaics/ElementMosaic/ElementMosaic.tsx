@@ -1,14 +1,12 @@
 import { type Accessor, createMemo, createSignal, onCleanup } from "solid-js";
 
 import { MosaicUtils, ElementMosaicStyles as styles } from "@thewaver/ss-components";
-import type { Size2d } from "@thewaver/ss-utils";
+import { ElementMosaicConst } from "@thewaver/ss-components/internal";
 
 import { ElementObserverSolidUtils } from "../../../Abstracts/ElementObserver/ElementObserverSolid.utils";
 import { Mosaic } from "../../../Primitives/Mosaic/Mosaic";
 import type { ElementMosaicProps } from "../../../Primitives/Mosaic/MosaicSolid.types";
 import { access } from "../../../Utils/propUtils";
-
-const EMPTY_SIZE: Size2d = { width: 0, height: 0 };
 
 export const ElementMosaic = <T,>(props: ElementMosaicProps<T>) => {
     const [getItemElements, setItemElements] = createSignal(new Map<HTMLElement, Accessor<number>>());
@@ -23,7 +21,9 @@ export const ElementMosaic = <T,>(props: ElementMosaicProps<T>) => {
 
     const getMeasuredSizes = ElementObserverSolidUtils.createBorderBoxSizeListObserver(getItemRefs);
 
-    const getSizes = createMemo(() => access(props.items).map((_, index) => getMeasuredSizes()[index] ?? EMPTY_SIZE));
+    const getSizes = createMemo(() =>
+        access(props.items).map((_, index) => getMeasuredSizes()[index] ?? ElementMosaicConst.EMPTY_SIZE),
+    );
 
     const addItemElement = (element: HTMLElement, getIndex: Accessor<number>) => {
         setItemElements((elements) => new Map(elements).set(element, getIndex));

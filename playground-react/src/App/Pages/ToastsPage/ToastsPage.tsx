@@ -10,10 +10,17 @@ import {
     useStore,
 } from "@thewaver/ss-components-react";
 import type { Toast, ToastsAlignment, ToastsDir, ToastsOverflow } from "@thewaver/ss-components-react";
+import { ToastKnobs } from "@thewaver/ss-playground/App/Knobs/Toasts.const";
+import {
+    BURST_SIZE,
+    MESSAGES,
+    NO_LIMIT,
+    STICKY,
+    TOAST_ID_PREFIX,
+} from "@thewaver/ss-playground/App/Pages/ToastsPage/ToastsPage.const";
 import * as styles from "@thewaver/ss-playground/App/Pages/ToastsPage/ToastsPage.css";
 import { StoreUtils } from "@thewaver/ss-utils";
 
-import { ToastKnobs } from "../../Knobs/Toasts.const";
 import { PageNumberField, PageSelectField } from "../../PageComponents/Field/Field";
 import { PageProp } from "../../PageComponents/Prop/Prop";
 import { PagePropsPanel } from "../../PageComponents/PropsPanel/PropsPanel";
@@ -24,20 +31,7 @@ import type {
     ToastDefs,
     ToastKind,
     ToastStacking,
-} from "../../StyledComponents/ToastContent/ToastContent.types";
-
-const NO_LIMIT = 0;
-const STICKY = 0;
-
-const BURST_SIZE = 5;
-
-const MESSAGES: Record<ToastKind, string> = {
-    info: "Your export is being prepared.",
-    success: "Settings saved.",
-    error: "Upload failed — the file was larger than 25 MB.",
-};
-
-const TOAST_ID_PREFIX = "toast";
+} from "../../StyledComponents/ToastContent/ToastContentReact.types";
 
 const toastQueue = StoreUtils.create<Toast<ToastDefs>[]>([]);
 const toastBoundaries = StoreUtils.create({ shown: 0, hidden: 0 });

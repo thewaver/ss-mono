@@ -1,6 +1,7 @@
 import { ShadowCaster } from "@thewaver/ss-components-solid";
 import * as styles from "@thewaver/ss-playground/App/Pages/PointerEffects/ShadowCasterPage/ShadowCasterPage.css";
-import type { ShadowCasterExampleProps } from "@thewaver/ss-playground/App/Pages/PointerEffects/ShadowCasterPage/ShadowCasterPage.types";
+
+import type { ShadowCasterExampleProps } from "../ShadowCasterPageSolid.types";
 
 type Props = ShadowCasterExampleProps;
 

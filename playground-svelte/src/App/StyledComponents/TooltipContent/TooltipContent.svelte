@@ -3,16 +3,17 @@
 
     import { GlassSurface, type PartialGlassDefs, Shape } from "@thewaver/ss-components-svelte";
     import { TooltipKnobs } from "@thewaver/ss-playground/App/Knobs/Tooltips.const";
-    import { TOOLTIP_ARROW_TEMPLATES } from "@thewaver/ss-playground/App/StyledComponents/TooltipContent/TooltipContent.const";
+    import {
+    BORDER_RADII,
+    TOOLTIP_ARROW_TEMPLATES,
+} from "@thewaver/ss-playground/App/StyledComponents/TooltipContent/TooltipContent.const";
     import * as styles from "@thewaver/ss-playground/App/StyledComponents/TooltipContent/TooltipContent.css";
     import { BORDER_RADIUS_FULL } from "@thewaver/ss-playground/App/Theme.const";
     import { themeVars } from "@thewaver/ss-playground/App/Theme.css";
-    import { CSSUtils, ShapeConst, ShapeUtils } from "@thewaver/ss-utils";
+    import { ShapeConst, ShapeUtils } from "@thewaver/ss-utils";
 
     import PageLayer from "../../PageComponents/Layer/Layer.svelte";
     import type { TooltipContentProps } from "./TooltipContent.types";
-
-    const BORDER_RADII = CSSUtils.spreadRadius(BORDER_RADIUS_FULL);
 
     const GLASS_DEFS: PartialGlassDefs = {
         tint: { color: themeVars.color.surface.dark, opacity: 1 },

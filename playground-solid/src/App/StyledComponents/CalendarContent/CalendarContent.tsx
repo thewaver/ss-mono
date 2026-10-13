@@ -4,7 +4,7 @@ import { access } from "@thewaver/ss-components-solid";
 import * as styles from "@thewaver/ss-playground/App/StyledComponents/CalendarContent/CalendarContent.css";
 
 import { useLayerClass } from "../Layer/Layer.context";
-import type { CalendarCaptionFieldsProps, CalendarDayProps, CalendarTitleProps } from "./CalendarContent.types";
+import type { CalendarCaptionFieldsProps, CalendarDayProps, CalendarTitleProps } from "./CalendarContentSolid.types";
 
 export const PageCalendarDay = (props: CalendarDayProps) => {
     const getLayerClass = useLayerClass();

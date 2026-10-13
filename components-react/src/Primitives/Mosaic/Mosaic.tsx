@@ -2,16 +2,13 @@ import { type KeyboardEvent, useLayoutEffect, useMemo, useRef, useState } from "
 
 import type { MosaicItemState } from "@thewaver/ss-components";
 import { MOSAIC_DEFAULTS, MosaicStyles, MosaicUtils, NavigatorUtils } from "@thewaver/ss-components";
+import { MosaicConst } from "@thewaver/ss-components/internal";
 import type { Rect } from "@thewaver/ss-utils";
 
 import { ElementObserverReactUtils } from "../../Abstracts/ElementObserver/ElementObserverReact.utils";
 import { MediaQueryMonitorReactUtils } from "../../Abstracts/MediaQueryMonitor/MediaQueryMonitorReact.utils";
 import { useStableList } from "../../Utils/refUtils";
 import type { MosaicProps } from "./Mosaic.types";
-
-const EMPTY_RECT: Rect = { x: 0, y: 0, width: 0, height: 0 };
-const NOT_PLACED = -1;
-const NO_TRANSITION_MS = 0;
 
 type MosaicTileProps = Pick<MosaicProps, "isItemSized" | "renderItem"> & {
     slot: object;
@@ -36,7 +33,7 @@ const MosaicTile = (props: MosaicTileProps) => {
     const [isFocusVisible, setIsFocusVisible] = useState(false);
 
     const isPlaced = props.rect !== undefined;
-    const rect = props.rect ?? EMPTY_RECT;
+    const rect = props.rect ?? MosaicConst.EMPTY_RECT;
 
     useLayoutEffect(() => {
         const from = shownRectRef.current;
@@ -115,8 +112,10 @@ export const Mosaic = (props: MosaicProps) => {
     const transitionDurationMs = props.transitionDurationMs ?? MOSAIC_DEFAULTS.transitionDurationMs;
     const isWalked = props.onActivate !== undefined;
 
-    const prefersReducedMotion = MediaQueryMonitorReactUtils.useReducedMotion(transitionDurationMs <= NO_TRANSITION_MS);
-    const glideDurationMs = prefersReducedMotion ? NO_TRANSITION_MS : transitionDurationMs;
+    const prefersReducedMotion = MediaQueryMonitorReactUtils.useReducedMotion(
+        transitionDurationMs <= MosaicConst.NO_TRANSITION_MS,
+    );
+    const glideDurationMs = prefersReducedMotion ? MosaicConst.NO_TRANSITION_MS : transitionDurationMs;
 
     const rootRef = useRef<HTMLDivElement | null>(null);
     const buttonRefs = useRef(new Map<object, HTMLElement>());
@@ -245,7 +244,7 @@ export const Mosaic = (props: MosaicProps) => {
             onKeyDown={handleKeyDown}
         >
             {slotOrder.map((slot, readingIndex) => {
-                const index = indexBySlot.get(slot) ?? NOT_PLACED;
+                const index = indexBySlot.get(slot) ?? MosaicConst.NOT_PLACED;
 
                 return (
                     <MosaicTile

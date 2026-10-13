@@ -39,3 +39,13 @@ export const LINKS_CONTENT = [
     'this one is [a href="/shape"][b]bold inside a link[/b][/a], and',
     '[a href="javascript:alert(1)"]this one[/a] was turned down by the page, so it prints as typed.',
 ].join(" ");
+
+export const EXAMPLE_NAMES = {
+    defaultTags: "Default Tags",
+    customTags: "Custom Tags",
+    glossary: "Glossary",
+    links: "Links",
+    customInput: "Custom Input",
+};
+
+export const EXAMPLES_ROOT = "/src/App/Pages/RichTextPage/Examples";

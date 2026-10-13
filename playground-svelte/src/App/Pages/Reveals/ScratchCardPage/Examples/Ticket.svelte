@@ -6,7 +6,7 @@
 
     import PageMeasureBox from "../../../../PageComponents/MeasureBox/MeasureBox.svelte";
     import PageControlButtonContent from "../../../../StyledComponents/ControlButtonContent/ControlButtonContent.svelte";
-    import type { ScratchCardExampleProps } from "../ScratchCardPage.types";
+    import type { ScratchCardExampleProps } from "../ScratchCardPageSvelte.types";
 
     const CARD_WIDTH = 360;
     const PRIZE = "★ 10 000 ★";

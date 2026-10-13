@@ -136,3 +136,29 @@ export type CarouselLabels = {
      */
     slideRoleDescription?: string;
 };
+
+export type BaseCarouselValues<T> = CarouselState &
+    Pick<CarouselLabels, "roleDescription" | "slideRoleDescription"> & {
+        /** Which way the slides run, which is the way the carousel is swiped. */
+        orientation?: CarouselOrientation;
+        /** The slides, in the order they are shown. */
+        slides: T[];
+    };
+
+export type BaseCarouselCbs = Omit<CarouselLabels, "roleDescription" | "slideRoleDescription"> & {
+    /**
+     * Where each slide is drawn, from how far it is from the one showing. It is handed the slide's distance —
+     * counted in slides, fractional while the carousel moves, and the short way round when it loops — with the
+     * carousel's box, and answers with the transforms and filters that put the slide there, as a proximity effect
+     * does. `CarouselPlacementUtils` ships the track, the drum, cover flow, a depth wave, a cylinder, a stack of
+     * folders and a hinge, each tunable; a rule of the consumer's own is any function of the same shape. Every
+     * slide fills the carousel's box before it is placed, and the box clips them. A press on a slide drawn beside
+     * the one showing brings it up, worked out from where the press landed rather than from which slide is on
+     * top; the pickers stay the keyboard's way to do the same.
+     */
+    computePlacement: CarouselPlacementFn;
+    /** Runs when a different slide comes up. */
+    onIndexChange?: (index: number) => void;
+};
+
+export type BaseCarouselProps<T> = BaseCarouselValues<T> & BaseCarouselCbs;

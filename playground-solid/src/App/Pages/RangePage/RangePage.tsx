@@ -1,6 +1,7 @@
 import { createMemo, createSignal } from "solid-js";
 
 import type { RangeValues } from "@thewaver/ss-components-solid";
+import { EXAMPLES_ROOT, EXAMPLE_NAMES, STEP_COUNT } from "@thewaver/ss-playground/App/Pages/RangePage/RangePage.const";
 
 import { PageExamples } from "../../PageComponents/Examples/Examples";
 import { DefaultExample } from "./Examples/Default";
@@ -13,9 +14,6 @@ import { PriceExample } from "./Examples/Price";
 import { ReachableExample } from "./Examples/Reachable";
 import { SteppedExample } from "./Examples/Stepped";
 import { VerticalExample } from "./Examples/Vertical";
-
-const STEP_COUNT = 5;
-const EXAMPLES_ROOT = "/src/App/Pages/RangePage/Examples";
 
 export const RangePage = () => {
     const volumeSignal = createSignal(40);
@@ -35,28 +33,28 @@ export const RangePage = () => {
     const getExamples = createMemo(() => [
         {
             key: "default",
-            name: "Default",
+            name: EXAMPLE_NAMES.default,
             readout: () => `value: ${volumeSignal[0]()}`,
             component: () => <DefaultExample value={volumeSignal} />,
             path: `${EXAMPLES_ROOT}/Default.tsx`,
         },
         {
             key: "stepped",
-            name: "Stepped",
+            name: EXAMPLE_NAMES.stepped,
             readout: () => `value: ${stepsSignal[0]()} of ${STEP_COUNT}`,
             component: () => <SteppedExample value={stepsSignal} />,
             path: `${EXAMPLES_ROOT}/Stepped.tsx`,
         },
         {
             key: "pair",
-            name: "Pair",
+            name: EXAMPLE_NAMES.pair,
             readout: () => `start: ${priceSignal[0]().start} | end: ${priceSignal[0]().end}`,
             component: () => <PairExample range={priceSignal} />,
             path: `${EXAMPLES_ROOT}/Pair.tsx`,
         },
         {
             key: "priceRange",
-            name: "Price range, read as prices",
+            name: EXAMPLE_NAMES.priceRange,
             readout: () =>
                 `start: ${budgetSignal[0]().start} | end: ${budgetSignal[0]().end} | settled: ${getSettledBudget()} — each thumb reads its value as a price, and "settled" changes only when a drag lets go or a key is pressed`,
             component: () => (
@@ -71,7 +69,7 @@ export const RangePage = () => {
         },
         {
             key: "vertical",
-            name: "Vertical",
+            name: EXAMPLE_NAMES.vertical,
             readout: () =>
                 `single: ${verticalSignal[0]()} | pair: ${verticalPairSignal[0]().start}–${verticalPairSignal[0]().end}`,
             component: () => <VerticalExample value={verticalSignal} range={verticalPairSignal} />,
@@ -79,7 +77,7 @@ export const RangePage = () => {
         },
         {
             key: "knob",
-            name: "Knob",
+            name: EXAMPLE_NAMES.knob,
             readout: () =>
                 `value: ${knobSignal[0]()} — computeValueAtPoint reads the pointer by its angle round the center, so dragging turns it; the arrow keys still step it`,
             component: () => <KnobExample value={knobSignal} />,
@@ -87,14 +85,14 @@ export const RangePage = () => {
         },
         {
             key: "disabled",
-            name: "Disabled",
+            name: EXAMPLE_NAMES.disabled,
             readout: () => `value: ${disabledSignal[0]()}`,
             component: () => <DisabledExample value={disabledSignal} />,
             path: `${EXAMPLES_ROOT}/Disabled.tsx`,
         },
         {
             key: "disabledPair",
-            name: "Disabled pair",
+            name: EXAMPLE_NAMES.disabledPair,
             readout: () =>
                 `start: ${disabledPairSignal[0]().start} | end: ${disabledPairSignal[0]().end} — both thumbs must be out of the tab order`,
             component: () => <DisabledPairExample range={disabledPairSignal} />,
@@ -102,14 +100,14 @@ export const RangePage = () => {
         },
         {
             key: "reachable",
-            name: "Disabled + reachable",
+            name: EXAMPLE_NAMES.reachable,
             readout: () => `value: ${reachableSignal[0]()}`,
             component: () => <ReachableExample value={reachableSignal} />,
             path: `${EXAMPLES_ROOT}/Reachable.tsx`,
         },
         {
             key: "errored",
-            name: "Error",
+            name: EXAMPLE_NAMES.errored,
             readout: () => `value: ${erroredSignal[0]()}`,
             component: () => <ErroredExample value={erroredSignal} />,
             path: `${EXAMPLES_ROOT}/Errored.tsx`,

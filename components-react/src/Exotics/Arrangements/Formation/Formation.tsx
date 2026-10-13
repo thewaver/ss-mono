@@ -1,14 +1,11 @@
 import { useMemo, useRef } from "react";
 
-import { FORMATION_DEFAULTS, type PlacementRect } from "@thewaver/ss-components";
+import { FORMATION_DEFAULTS } from "@thewaver/ss-components";
+import { FormationConst } from "@thewaver/ss-components/internal";
 
 import { PlacementBox } from "../../../Primitives/PlacementBox/PlacementBox";
 import { PlacementItem } from "../../../Primitives/PlacementItem/PlacementItem";
 import type { FormationProps } from "./Formation.types";
-
-const EMPTY_PLACEMENT: PlacementRect = { topShare: 0, leftShare: 0, widthShare: 0, heightShare: 0 };
-const FIRST_OCCURRENCE = 0;
-const NEXT = 1;
 
 export const Formation = <T,>(props: FormationProps<T>) => {
     const itemIdsRef = useRef(new Map<T, number>());
@@ -37,16 +34,16 @@ export const Formation = <T,>(props: FormationProps<T>) => {
     return (
         <PlacementBox layout={layout} computeEffect={props.computeEffect} transitionDurationMs={transitionDurationMs}>
             {props.items.map((item, index) => {
-                const occurrence = occurrences.get(item) ?? FIRST_OCCURRENCE;
-                const placement = layout.placements[index] ?? EMPTY_PLACEMENT;
+                const occurrence = occurrences.get(item) ?? FormationConst.FIRST_OCCURRENCE;
+                const placement = layout.placements[index] ?? FormationConst.EMPTY_PLACEMENT;
 
-                occurrences.set(item, occurrence + NEXT);
+                occurrences.set(item, occurrence + FormationConst.NEXT);
 
                 return (
                     <PlacementItem
                         key={`${itemIds.get(item)}:${occurrence}`}
                         placement={placement}
-                        stackAt={props.isStackedInReverse ? itemCount - index : index + NEXT}
+                        stackAt={props.isStackedInReverse ? itemCount - index : index + FormationConst.NEXT}
                         transitionDelayMs={index * transitionDelayMs}
                     >
                         {props.renderItem(item, { index, itemCount, placement })}

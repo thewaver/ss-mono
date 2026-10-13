@@ -4,11 +4,12 @@
     import type { ExampleDefs } from "../../../PageComponents/Examples/Examples.types";
     import PageExamples from "../../../PageComponents/Examples/PageExamples.svelte";
     import FanExample from "./Examples/Fan.svelte";
-    import type { FanAction } from "./FanMenuPage.types";
-
-    const EXAMPLES_ROOT = "/src/App/Pages/Menus/FanMenuPage/Examples";
-
-    const NOTHING_RUN = "nothing run yet";
+    import type { FanAction } from "./FanMenuPageSvelte.types";
+    import {
+    EXAMPLE_NAMES,
+    EXAMPLES_ROOT,
+    NOTHING_RUN,
+} from "@thewaver/ss-playground/App/Pages/Menus/FanMenuPage/FanMenuPage.const";
 
     const ACTIONS: MenuItem<FanAction>[] = [
         { value: { name: "Cut", shortcut: "Ctrl+X" } },
@@ -48,7 +49,7 @@
     const examples: ExampleDefs[] = [
         {
             key: "default",
-            name: "Default",
+            name: EXAMPLE_NAMES.default,
             readout: () =>
                 `${lastAction} — a narrow arc opening sideways, the shape a combat menu uses: upright labels reading outward from the thing that opened them`,
             component: defaultExample,
@@ -56,7 +57,7 @@
         },
         {
             key: "submenus",
-            name: "Submenus",
+            name: EXAMPLE_NAMES.submenus,
             readout: () =>
                 `${lastNestedAction} — a level replaces the one before it rather than stacking beside it, and the row at the top is the item you came in through`,
             component: submenusExample,

@@ -1,13 +1,14 @@
 import { Button, CalendarUtils, DateValueUtils } from "@thewaver/ss-components-react";
+import {
+    MONTH_TITLE_OPTIONS,
+    PAGE_STEP,
+    WEEK_STARTS_ON,
+    YEAR_OPTIONS,
+} from "@thewaver/ss-playground/App/PageComponents/CalendarCaption/CalendarCaption.const";
 
 import { PageButtonContent } from "../../StyledComponents/ButtonContent/ButtonContent";
 import { PageCalendarHeader, PageCalendarTitle } from "../../StyledComponents/CalendarContent/CalendarContent";
 import type { PageCalendarPagedCaptionProps } from "./CalendarPagedCaption.types";
-
-const PAGE_STEP = 1;
-const WEEK_STARTS_ON = 1;
-const YEAR_OPTIONS: Intl.DateTimeFormatOptions = { year: "numeric" };
-const MONTH_TITLE_OPTIONS: Intl.DateTimeFormatOptions = { month: "long", year: "numeric" };
 
 export const PageCalendarPagedCaption = (props: PageCalendarPagedCaptionProps) => {
     const [month, setMonth] = props.month;

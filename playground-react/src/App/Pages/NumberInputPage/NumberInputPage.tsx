@@ -2,6 +2,8 @@ import { useState } from "react";
 
 import {
     AMOUNT_STEP,
+    EXAMPLES_ROOT,
+    EXAMPLE_NAMES,
     GERMAN_LOCALE,
     QUANTITY_MIN,
     QUANTITY_STEP,
@@ -20,8 +22,6 @@ import { ReadOnlyExample } from "./Examples/ReadOnly";
 import { SteppedClampedExample } from "./Examples/SteppedClamped";
 import { UnitExample } from "./Examples/Unit";
 
-const EXAMPLES_ROOT = "/src/App/Pages/NumberInputPage/Examples";
-
 export const NumberInputPage = () => {
     const defaultState = useState<number | undefined>(undefined);
     const quantityState = useState<number | undefined>(13);
@@ -37,14 +37,14 @@ export const NumberInputPage = () => {
     const examples = [
         {
             key: "default",
-            name: "Default",
+            name: EXAMPLE_NAMES.default,
             readout: () => `value: ${defaultState[0]} — an empty field has no value at all`,
             component: () => <DefaultExample value={defaultState} />,
             path: `${EXAMPLES_ROOT}/Default.tsx`,
         },
         {
             key: "steppedClamped",
-            name: "Stepped and clamped",
+            name: EXAMPLE_NAMES.steppedClamped,
             readout: () =>
                 `value: ${quantityState[0]} — steps of ${QUANTITY_STEP} counted from ${QUANTITY_MIN}; an out-of-range value is held back until the field is left`,
             component: () => <SteppedClampedExample value={quantityState} />,
@@ -52,14 +52,14 @@ export const NumberInputPage = () => {
         },
         {
             key: "fractionalStep",
-            name: "Fractional step",
+            name: EXAMPLE_NAMES.fractionalStep,
             readout: () => `value: ${ratingState[0]} — a step of ${RATING_STEP} must not drift`,
             component: () => <FractionalStepExample value={ratingState} />,
             path: `${EXAMPLES_ROOT}/FractionalStep.tsx`,
         },
         {
             key: "german",
-            name: "German conventions",
+            name: EXAMPLE_NAMES.german,
             readout: () =>
                 `value: ${germanState[0]} — under ${GERMAN_LOCALE} "1.000" is one thousand and "1,5" is one and a half; PageUp and PageDown move ${AMOUNT_STEP * 10}, ten steps`,
             component: () => <GermanExample value={germanState} />,
@@ -67,42 +67,42 @@ export const NumberInputPage = () => {
         },
         {
             key: "unit",
-            name: "With a unit",
+            name: EXAMPLE_NAMES.unit,
             readout: () => `value: ${unitState[0]} — one slot holds both the unit and the stepper`,
             component: () => <UnitExample value={unitState} />,
             path: `${EXAMPLES_ROOT}/Unit.tsx`,
         },
         {
             key: "readOnly",
-            name: "Read-only",
+            name: EXAMPLE_NAMES.readOnly,
             readout: () => `value: ${readOnlyState[0]} — the stepper is refused along with the keyboard`,
             component: () => <ReadOnlyExample value={readOnlyState} />,
             path: `${EXAMPLES_ROOT}/ReadOnly.tsx`,
         },
         {
             key: "disabled",
-            name: "Disabled",
+            name: EXAMPLE_NAMES.disabled,
             readout: () => `value: ${disabledState[0]}`,
             component: () => <DisabledExample value={disabledState} />,
             path: `${EXAMPLES_ROOT}/Disabled.tsx`,
         },
         {
             key: "reachable",
-            name: "Disabled + reachable",
+            name: EXAMPLE_NAMES.reachable,
             readout: () => `value: ${reachableState[0]}`,
             component: () => <ReachableExample value={reachableState} />,
             path: `${EXAMPLES_ROOT}/Reachable.tsx`,
         },
         {
             key: "errored",
-            name: "Error",
+            name: EXAMPLE_NAMES.errored,
             readout: () => `value: ${erroredState[0]} — anything but a positive count is an error`,
             component: () => <ErroredExample value={erroredState} />,
             path: `${EXAMPLES_ROOT}/Errored.tsx`,
         },
         {
             key: "label",
-            name: "In a Label",
+            name: EXAMPLE_NAMES.label,
             readout: () => `value: ${labeledState[0]}`,
             component: () => <LabeledExample value={labeledState} />,
             path: `${EXAMPLES_ROOT}/Labeled.tsx`,

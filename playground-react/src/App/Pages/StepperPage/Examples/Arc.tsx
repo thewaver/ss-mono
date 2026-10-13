@@ -7,7 +7,7 @@ import {
     PageStepArcConnector,
     PageStepContent,
 } from "../../../StyledComponents/StepContent/StepContent";
-import type { StepperExampleProps } from "../StepperPage.types";
+import type { StepperExampleProps } from "../StepperPageReact.types";
 
 const ARC_DEFS: ArcDefs = {
     curveHeightRatio: 1,

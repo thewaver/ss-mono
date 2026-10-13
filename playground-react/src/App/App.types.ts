@@ -2,13 +2,11 @@ import type { ReactNode } from "react";
 
 export type ComponentConfig = {
     name: string;
-    description: string;
     component?: () => ReactNode;
 };
 
 export type MenuBranchConfig = {
     name: string;
-    description?: string;
     children: MenuNodeConfig[];
     hidden?: boolean;
 };

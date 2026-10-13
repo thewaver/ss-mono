@@ -9,12 +9,14 @@
     import LiveRangeExample from "./Examples/LiveRange.svelte";
     import OutOfRangeExample from "./Examples/OutOfRange.svelte";
     import RingExample from "./Examples/Ring.svelte";
-    import type { ProgressExampleProps } from "./ProgressPage.types";
-
-    const UPLOAD_TOTAL_BYTES = 2_400_000;
-    const UPLOAD_TICK_MS = 50;
-    const UPLOAD_TICK_BYTES = 24_000;
-    const EXAMPLES_ROOT = "/src/App/Pages/ProgressPage/Examples";
+    import type { ProgressExampleProps } from "./ProgressPageSvelte.types";
+    import {
+    EXAMPLE_NAMES,
+    EXAMPLES_ROOT,
+    UPLOAD_TICK_BYTES,
+    UPLOAD_TICK_MS,
+    UPLOAD_TOTAL_BYTES,
+} from "@thewaver/ss-playground/App/Pages/ProgressPage/ProgressPage.const";
 
     let uploadedBytes = $state(0);
 
@@ -36,42 +38,42 @@
     const examples: ExampleDefs[] = [
         {
             key: "determinate",
-            name: "Determinate",
+            name: EXAMPLE_NAMES.determinate,
             readout: () => "ratio: 0.4 — a plain 0..1 value, which is what the painter is handed",
             component: determinateExample,
             path: `${EXAMPLES_ROOT}/Determinate.svelte`,
         },
         {
             key: "indeterminate",
-            name: "Indeterminate",
+            name: EXAMPLE_NAMES.indeterminate,
             readout: () => "no value at all, so aria-valuenow is absent and the painter animates instead",
             component: indeterminateExample,
             path: `${EXAMPLES_ROOT}/Indeterminate.svelte`,
         },
         {
             key: "liveRange",
-            name: "Live range",
+            name: EXAMPLE_NAMES.liveRange,
             readout: () => `${uploadedBytes} of ${UPLOAD_TOTAL_BYTES} bytes — min and max are the real units`,
             component: liveRangeExample,
             path: `${EXAMPLES_ROOT}/LiveRange.svelte`,
         },
         {
             key: "outOfRange",
-            name: "Out of range",
+            name: EXAMPLE_NAMES.outOfRange,
             readout: () => "value: 5 against a 0..1 range — clamped rather than drawn past the end",
             component: outOfRangeExample,
             path: `${EXAMPLES_ROOT}/OutOfRange.svelte`,
         },
         {
             key: "errored",
-            name: "Error",
+            name: EXAMPLE_NAMES.errored,
             readout: () => "value: 0.62 — the transfer stalled, and hasError is the owner's to say",
             component: erroredExample,
             path: `${EXAMPLES_ROOT}/Errored.svelte`,
         },
         {
             key: "diskMeter",
-            name: "Disk usage, as a meter",
+            name: EXAMPLE_NAMES.diskMeter,
             readout: () =>
                 'role="meter" — a reading of how full the disk is rather than work that will finish, so it is announced as a gauge and has no indeterminate state',
             component: diskMeterExample,
@@ -79,7 +81,7 @@
         },
         {
             key: "ring",
-            name: "Drawn as a ring",
+            name: EXAMPLE_NAMES.ring,
             readout: () =>
                 `${uploadedBytes} of ${UPLOAD_TOTAL_BYTES} bytes — the same upload as the live range, painted round a circle; the component is unchanged`,
             component: ringExample,
@@ -87,7 +89,7 @@
         },
         {
             key: "fillingContainer",
-            name: "Filling its container",
+            name: EXAMPLE_NAMES.fillingContainer,
             readout: () => "sizing: fill — the default, since a track's natural width is its container's",
             component: fillingContainerExample,
             path: `${EXAMPLES_ROOT}/FillingContainer.svelte`,

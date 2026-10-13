@@ -1,6 +1,6 @@
 import { type InjectionKey, inject, provide } from "vue";
 
-import type { PagePropsPanelScope } from "./PropsPanel.types";
+import type { PagePropsPanelScope } from "./PropsPanelVue.types";
 
 const PROPS_PANEL_CONTEXT_KEY: InjectionKey<{ scope: PagePropsPanelScope }> = Symbol("PropsPanelContext");
 

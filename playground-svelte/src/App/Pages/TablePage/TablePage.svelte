@@ -12,8 +12,7 @@
     import VirtualizedExample from "./Examples/Virtualized.svelte";
     import { STRESS_PART_COUNT, createStressParts } from "./TablePage.const.svelte";
     import type { Part } from "./TablePage.types";
-
-    const EXAMPLES_ROOT = "/src/App/Pages/TablePage/Examples";
+    import { EXAMPLE_NAMES, EXAMPLES_ROOT } from "@thewaver/ss-playground/App/Pages/TablePage/TablePage.const";
 
     const spellSort = (sort: TableSort | undefined) =>
         sort === undefined ? "unsorted" : `${sort.columnId} ${sort.direction}`;
@@ -49,7 +48,7 @@
         {
             key: "default",
             span: 2,
-            name: "Default",
+            name: EXAMPLE_NAMES.default,
             readout: () =>
                 `sort: ${spellSort(defaultSort)} | selected: ${spellSelection(defaultSelection)} — one tab stop for the whole grid, then arrows walk cell to cell and Space picks a row`,
             component: partsExample,
@@ -57,7 +56,7 @@
         },
         {
             key: "singleSelection",
-            name: "One row at a time",
+            name: EXAMPLE_NAMES.singleSelection,
             readout: () =>
                 `selected: ${spellSelection(singleSelection)} — the same grid with room for one row in the selection, so picking a second drops the first`,
             component: singleSelectionExample,
@@ -66,7 +65,7 @@
         {
             key: "resizable",
             span: 2,
-            name: "Resizable columns",
+            name: EXAMPLE_NAMES.resizable,
             readout: () =>
                 `widths: ${JSON.stringify(resizableWidths)} — drag a column's right edge, or focus a header cell and hold Ctrl with the left and right arrows`,
             component: resizableExample,
@@ -75,7 +74,7 @@
         {
             key: "reorderable",
             span: 2,
-            name: "Reorderable columns",
+            name: EXAMPLE_NAMES.reorderable,
             readout: () =>
                 `order: ${reorderableOrder.join(", ") || "as declared"} — drag a header sideways, or focus a header cell and hold Shift with the left and right arrows`,
             component: reorderableExample,
@@ -83,7 +82,7 @@
         },
         {
             key: "consumerSorted",
-            name: "Sorted by the page",
+            name: EXAMPLE_NAMES.consumerSorted,
             readout: () =>
                 `sort: ${spellSort(consumerSort)} — no column carries a comparator, so the table reports the sort and the page is what reorders the rows`,
             component: consumerSortedExample,
@@ -92,7 +91,7 @@
         {
             key: "virtualized",
             span: 2,
-            name: "Virtualized",
+            name: EXAMPLE_NAMES.virtualized,
             readout: () =>
                 `${STRESS_PART_COUNT.toLocaleString("en-GB")} rows, ${stressSelection.length} selected | sort: ${spellSort(stressSort)} — the header stays put, and only the rows on screen exist`,
             component: virtualizedExample,
@@ -100,7 +99,7 @@
         },
         {
             key: "disabled",
-            name: "Disabled",
+            name: EXAMPLE_NAMES.disabled,
             readout: () =>
                 `sort: ${spellSort(disabledSort)} — nothing sorts, nothing selects, and every cell still reads out to a screen reader`,
             component: disabledExample,

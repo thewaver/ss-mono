@@ -1,9 +1,9 @@
 <script lang="ts">
 import { computed, shallowRef } from "vue";
 
+import { ShapeKnobs } from "@thewaver/ss-playground/App/Knobs/Shapes.const";
 import { ShapeConst } from "@thewaver/ss-utils";
 
-import { ShapeKnobs } from "../../Knobs/Shapes.const";
 import type { ShapeGeometry } from "./ShapePage.types";
 
 const computeShapePointCount = (shapeKind: ShapeConst.DefaultShape) =>
@@ -32,6 +32,7 @@ export const useShapeGeometry = (
 </script>
 
 <script setup lang="ts">
+import { CORNER_FIELD_WIDTH, MAX_CORNER_COLUMNS } from "@thewaver/ss-playground/App/Pages/ShapePage/ShapePage.const";
 import * as styles from "@thewaver/ss-playground/App/Pages/ShapePage/ShapePage.css";
 
 import PageCheckField from "../../PageComponents/Field/PageCheckField.vue";
@@ -39,9 +40,6 @@ import PageNumberField from "../../PageComponents/Field/PageNumberField.vue";
 import PageSelectField from "../../PageComponents/Field/PageSelectField.vue";
 import PageProp from "../../PageComponents/Prop/Prop.vue";
 import type { ShapeGeometryKnobsProps } from "./ShapePage.types";
-
-const CORNER_FIELD_WIDTH = 80;
-const MAX_CORNER_COLUMNS = 6;
 
 const spreadCornerValue = (previous: number[], index: number, value: number, hasIndividualCorners: boolean) => {
     if (!hasIndividualCorners) return previous.map(() => value);

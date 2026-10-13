@@ -1,28 +1,15 @@
 <script setup lang="ts">
 import { computed } from "vue";
 
+import {
+    FIRST_PAGE,
+    PAGE_SIZE,
+    RESULTS,
+} from "@thewaver/ss-playground/App/StyledComponents/PaginatorContent/PaginatorContent.const";
 import * as styles from "@thewaver/ss-playground/App/StyledComponents/PaginatorContent/PaginatorContent.css";
 
 import { useLayerClass } from "../Layer/Layer.context";
-import type { PaginatorPanelProps } from "./PaginatorContent.types";
-
-const PAGE_SIZE = 3;
-const FIRST_PAGE = 1;
-
-const RESULTS = [
-    "Aurora",
-    "Basalt",
-    "Cinder",
-    "Drift",
-    "Ember",
-    "Fathom",
-    "Glimmer",
-    "Hollow",
-    "Iris",
-    "Jetty",
-    "Kelp",
-    "Loam",
-];
+import type { PaginatorPanelProps } from "./PaginatorContentVue.types";
 
 const toResult = (index: number) => RESULTS[index % RESULTS.length];
 

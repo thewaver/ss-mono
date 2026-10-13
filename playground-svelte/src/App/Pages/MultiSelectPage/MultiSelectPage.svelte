@@ -7,8 +7,7 @@
     import MultiSelectClearableExample from "./Examples/MultiSelectClearable.svelte";
     import MultiSelectCountriesExample from "./Examples/MultiSelectCountries.svelte";
     import MultiSelectGroupedExample from "./Examples/MultiSelectGrouped.svelte";
-
-    const EXAMPLES_ROOT = "/src/App/Pages/MultiSelectPage/Examples";
+    import { EXAMPLE_NAMES, EXAMPLES_ROOT } from "@thewaver/ss-playground/App/Pages/MultiSelectPage/MultiSelectPage.const";
 
     let countries = $state.raw<string[]>(["Denmark"]);
     let grouped = $state.raw<string[]>([]);
@@ -36,21 +35,21 @@
     const examples: ExampleDefs[] = [
         {
             key: "multiSelect",
-            name: "Many at once",
+            name: EXAMPLE_NAMES.multiSelect,
             readout: () => `values: [${countries.join(", ")}] — picking keeps the list open`,
             component: multiSelectExample,
             path: `${EXAMPLES_ROOT}/MultiSelectCountries.svelte`,
         },
         {
             key: "multiSelectGrouped",
-            name: "Grouped, with a query",
+            name: EXAMPLE_NAMES.multiSelectGrouped,
             readout: () => `values: [${grouped.join(", ")}] | query: "${query}" — the page drops groups it has emptied`,
             component: multiSelectGroupedExample,
             path: `${EXAMPLES_ROOT}/MultiSelectGrouped.svelte`,
         },
         {
             key: "multiSelectClearable",
-            name: "Clearable",
+            name: EXAMPLE_NAMES.multiSelectClearable,
             readout: () =>
                 `values: [${clearable.join(", ")}] | last change: ${clearableChange} — the clear control empties every pick at once`,
             component: multiSelectClearableExample,

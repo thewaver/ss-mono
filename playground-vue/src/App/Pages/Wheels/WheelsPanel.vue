@@ -1,7 +1,7 @@
 <script setup lang="ts">
+import { WheelKnobs } from "@thewaver/ss-playground/App/Knobs/Wheels.const";
 import { FIELD_WIDTH, SPIN_STYLE_KEYS } from "@thewaver/ss-playground/App/Pages/Wheels/Wheels.const";
 
-import { WheelKnobs } from "../../Knobs/Wheels.const";
 import PageCheckField from "../../PageComponents/Field/PageCheckField.vue";
 import PageNumberField from "../../PageComponents/Field/PageNumberField.vue";
 import PageSelectField from "../../PageComponents/Field/PageSelectField.vue";

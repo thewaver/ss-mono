@@ -1,6 +1,8 @@
 import { useState } from "react";
 
 import {
+    EXAMPLES_ROOT,
+    EXAMPLE_NAMES,
     RICH_TOUR_STEPS,
     TOUR_STORAGE_KEY,
 } from "@thewaver/ss-playground/App/Pages/Spotlights/SpotlightGuidePage/SpotlightGuidePage.const";
@@ -9,8 +11,6 @@ import { TOUR_STEPS } from "@thewaver/ss-playground/App/Pages/Spotlights/Spotlig
 import { PageExamples } from "../../../PageComponents/Examples/Examples";
 import { GuideExample } from "./Examples/Guide";
 import { TourExample } from "./Examples/Tour";
-
-const EXAMPLES_ROOT = "/src/App/Pages/Spotlights/SpotlightGuidePage/Examples";
 
 const readStoredStep = () => {
     try {
@@ -55,7 +55,7 @@ export const SpotlightGuidePage = () => {
     const examples = [
         {
             key: "tour",
-            name: "A tour with a step the reader does",
+            name: EXAMPLE_NAMES.tour,
             span: 2,
             readout: () =>
                 `step: ${tourStep + 1} of ${RICH_TOUR_STEPS.length} — ${tourStatus} — basket: ${basketCount}. The guide holds the whole page still, so on step 2 it closes and a prompt lights the button instead, and pressing it reopens the guide; the step is kept in sessionStorage, so reloading offers to resume`,
@@ -87,7 +87,7 @@ export const SpotlightGuidePage = () => {
         },
         {
             key: "guide",
-            name: "Guide",
+            name: EXAMPLE_NAMES.guide,
             readout: () => `step: ${step + 1} of ${TOUR_STEPS.length} — ${finished}`,
             component: () => (
                 <GuideExample

@@ -18,6 +18,7 @@ import {
     TypewriterStyles,
     TypewriterUtils,
 } from "@thewaver/ss-components";
+import { TypewriterConst } from "@thewaver/ss-components/internal";
 import { StringUtils } from "@thewaver/ss-utils";
 import { setElementVars } from "@vanilla-extract/dynamic";
 
@@ -29,27 +30,25 @@ import { useStore } from "../../../Utils/storeUtils";
 import type { SlotsContext } from "../../../Utils/typeUtils";
 import type { TypewriterController, TypewriterProps, TypewriterSlots } from "./Typewriter.types";
 
-const BEFORE_FIRST = TypewriterUtils.CARET_BEFORE_FIRST;
-const NO_PROGRESS = 0;
-const CUSTOM_PROPERTY_PREFIX = "--";
-const DATA_PREFIX = "data-";
-
 const toVueStyle = (style: Record<string, unknown>) =>
     Object.fromEntries(
         Object.entries(style).map(([key, value]) => [
-            key.startsWith(CUSTOM_PROPERTY_PREFIX) ? key : StringUtils.kebabToCamelCase(key),
+            key.startsWith(TypewriterConst.CUSTOM_PROPERTY_PREFIX) ? key : StringUtils.kebabToCamelCase(key),
             value,
         ]),
     ) as CSSProperties;
 
 const toDataAttributes = (dataset: DOMStringMap) =>
     Object.fromEntries(
-        Object.entries(dataset).map(([key, value]) => [`${DATA_PREFIX}${StringUtils.camelToKebabCase(key)}`, value]),
+        Object.entries(dataset).map(([key, value]) => [
+            `${TypewriterConst.DATA_PREFIX}${StringUtils.camelToKebabCase(key)}`,
+            value,
+        ]),
     );
 
 export const Typewriter = defineComponent(
     (props: TypewriterProps, { slots }: SlotsContext<TypewriterSlots>) => {
-        const progress = useTwoWay(props, "progress", NO_PROGRESS);
+        const progress = useTwoWay(props, "progress", TypewriterConst.NO_PROGRESS);
         const isPlaying = useTwoWay(props, "playback", true);
 
         const getComputeAnimationName = () => props.computeAnimationName ?? TYPEWRITER_DEFAULTS.computeAnimationName;
@@ -336,13 +335,13 @@ export const Typewriter = defineComponent(
 
                     {!getIsDriven() && current.segments.length > 0 && (
                         <div class={TypewriterStyles.typewriterTextWrap} style={{ width: `${current.width ?? 0}px` }}>
-                            {caret === BEFORE_FIRST && renderCaret()}
+                            {caret === TypewriterConst.BEFORE_FIRST && renderCaret()}
 
                             {current.segments.map((segment, index) => (
                                 <Fragment key={index}>{renderSegment(segment)}</Fragment>
                             ))}
 
-                            {!isRunning && caret !== BEFORE_FIRST && renderCaret()}
+                            {!isRunning && caret !== TypewriterConst.BEFORE_FIRST && renderCaret()}
                         </div>
                     )}
                 </div>

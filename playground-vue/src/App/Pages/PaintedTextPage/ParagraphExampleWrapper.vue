@@ -5,7 +5,7 @@ import { MEASURE_BOX_PADDING } from "@thewaver/ss-playground/App/PageComponents/
 
 import PageMeasureBox from "../../PageComponents/MeasureBox/MeasureBox.vue";
 import ParagraphExample from "./Examples/Paragraph.vue";
-import type { PaintedTextExampleProps, PaintedTextExampleWrapperProps } from "./PaintedTextPage.types";
+import type { PaintedTextExampleProps, PaintedTextExampleWrapperProps } from "./PaintedTextPageVue.types";
 
 const props = defineProps<PaintedTextExampleWrapperProps>();
 

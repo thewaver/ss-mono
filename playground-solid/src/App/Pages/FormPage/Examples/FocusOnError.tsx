@@ -10,7 +10,7 @@ import {
 import { renderPageHighlightFloater } from "../../../StyledComponents/GlideFloater/GlideFloater";
 import { PageSelectContent } from "../../../StyledComponents/SelectContent/SelectContent";
 import { PageSelectOptionContent } from "../../../StyledComponents/SelectOptionContent/SelectOptionContent";
-import { PLACEHOLDER, renderSelectPopup } from "../../SelectPage/SelectPage.const";
+import { PLACEHOLDER, renderSelectPopup } from "../../SelectPage/SelectPageSolid.const";
 import type { FormFocusExampleProps } from "../FormPage.types";
 
 const PLANS = [{ value: "Basic" }, { value: "Team" }, { value: "Enterprise" }];

@@ -15,3 +15,17 @@ export type CheckboxGroupController = {
      */
     setIsEveryChecked: (isChecked: boolean) => boolean;
 };
+
+export type BaseCheckboxGroupValues = {
+    /**
+     * Names the group for assistive technology. Required, because a set of boxes read without it is heard as a run of
+     * unrelated choices.
+     */
+    ariaLabel: string;
+    /** Whether the boxes run across the page or down it. */
+    orientation?: CheckboxGroupOrientation;
+    /** The space between the boxes. */
+    gap?: number;
+};
+
+export type BaseCheckboxGroupProps = BaseCheckboxGroupValues;

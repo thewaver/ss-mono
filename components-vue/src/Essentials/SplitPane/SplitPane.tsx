@@ -2,15 +2,13 @@ import { Fragment, type SlotsType, computed, defineComponent, shallowRef, useId,
 
 import type { SplitPaneCollapsedBoundaries } from "@thewaver/ss-components";
 import { SPLIT_PANE_DEFAULTS, SplitPaneStyles, SplitPaneUtils } from "@thewaver/ss-components";
+import { SplitPaneConst } from "@thewaver/ss-components/internal";
 
 import { ElementObserverVueUtils } from "../../Abstracts/ElementObserver/ElementObserverVue.utils";
 import { NavigatorVueUtils } from "../../Abstracts/Navigator/NavigatorVue.utils";
 import { callSlot, declareProps, useTwoWay } from "../../Utils/propUtils";
 import type { SlotsContext } from "../../Utils/typeUtils";
 import type { SplitPaneProps, SplitPaneSlots } from "./SplitPane.types";
-
-const NO_GUTTER_DRAGGING = -1;
-const PERCENT = 100;
 
 export const SplitPane = defineComponent(
     (props: SplitPaneProps, { slots }: SlotsContext<SplitPaneSlots>) => {
@@ -22,7 +20,7 @@ export const SplitPane = defineComponent(
 
         let hasDragged = false;
 
-        const draggingIndex = shallowRef(NO_GUTTER_DRAGGING);
+        const draggingIndex = shallowRef(SplitPaneConst.NO_GUTTER_DRAGGING);
         const collapsedBoundaries = shallowRef<SplitPaneCollapsedBoundaries>({});
 
         const getOrientation = () => props.orientation ?? SPLIT_PANE_DEFAULTS.orientation;
@@ -129,7 +127,7 @@ export const SplitPane = defineComponent(
             const gutter = e.currentTarget as HTMLButtonElement;
 
             gutter.releasePointerCapture(e.pointerId);
-            draggingIndex.value = NO_GUTTER_DRAGGING;
+            draggingIndex.value = SplitPaneConst.NO_GUTTER_DRAGGING;
 
             if (hasDragged) return;
 
@@ -149,7 +147,7 @@ export const SplitPane = defineComponent(
         const handleGutterPointerCancel = (index: number) => {
             if (draggingIndex.value !== index) return;
 
-            draggingIndex.value = NO_GUTTER_DRAGGING;
+            draggingIndex.value = SplitPaneConst.NO_GUTTER_DRAGGING;
         };
 
         const handleGutterKeyDown = (e: KeyboardEvent, index: number) => {
@@ -207,9 +205,9 @@ export const SplitPane = defineComponent(
                                         aria-controls={getPaneId(index - 1)}
                                         aria-label={props.panes[index - 1].gutterAriaLabel}
                                         aria-disabled={isDisabled || undefined}
-                                        aria-valuenow={Math.round(getBoundary(index - 1) * PERCENT)}
-                                        aria-valuemin={Math.round(limits.floor * PERCENT)}
-                                        aria-valuemax={Math.round(limits.ceiling * PERCENT)}
+                                        aria-valuenow={Math.round(getBoundary(index - 1) * SplitPaneConst.PERCENT)}
+                                        aria-valuemin={Math.round(limits.floor * SplitPaneConst.PERCENT)}
+                                        aria-valuemax={Math.round(limits.ceiling * SplitPaneConst.PERCENT)}
                                         onPointerdown={(e) => handleGutterPointerDown(e, index - 1)}
                                         onPointermove={(e) => handleGutterPointerMove(e, index - 1)}
                                         onPointerup={(e) => handleGutterPointerUp(e, index - 1)}

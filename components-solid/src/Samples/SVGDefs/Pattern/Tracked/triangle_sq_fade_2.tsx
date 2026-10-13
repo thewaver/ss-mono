@@ -1,15 +1,9 @@
-import {
-    type PatternProximityOpts,
-    SVGDefsUtils,
-    TrackedPatternDefaults,
-    TrackedPatternUtils,
-} from "@thewaver/ss-components";
+import { type PatternProximityOpts, SVGDefsUtils, TrackedPatternUtils } from "@thewaver/ss-components";
+import { TriangleSqFade2Const } from "@thewaver/ss-components/internal";
 import { MathUtils, ShapeUtils } from "@thewaver/ss-utils";
 
 import type { TrackedPatternConfig } from "../../SVGDefsSolid.types";
 import { SVGPatterns } from "../../SVGPatterns.const";
-
-const DEFAULTS = TrackedPatternDefaults.FADE_DEFAULTS;
 
 export const triangle_sq_fade_2 = (opts?: PatternProximityOpts): TrackedPatternConfig => ({
     computeSVGDefs: (id, __, getRef, defs) => {
@@ -32,7 +26,7 @@ export const triangle_sq_fade_2 = (opts?: PatternProximityOpts): TrackedPatternC
                                 `pattern1-${id}`,
                                 getRef,
                                 defs,
-                                TrackedPatternUtils.resolveOpts(opts, DEFAULTS),
+                                TrackedPatternUtils.resolveOpts(opts, TriangleSqFade2Const.DEFAULTS),
                                 (cellId, index, isSplit, getLevel) => {
                                     const isEven = MathUtils.isEven(index.col + index.row);
                                     const piece = SVGDefsUtils.getCellPiece("square_quarters", index);

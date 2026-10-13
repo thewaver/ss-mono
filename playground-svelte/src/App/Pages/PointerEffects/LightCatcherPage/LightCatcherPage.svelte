@@ -13,12 +13,13 @@
     import PlacedLightExample from "./Examples/PlacedLight.svelte";
     import RowExample from "./Examples/Row.svelte";
     import type { LightCatcherExampleProps } from "./LightCatcherPageSvelte.types";
-
-    const EXAMPLES_ROOT = "/src/App/Pages/PointerEffects/LightCatcherPage/Examples";
-
-    const FIELD_WIDTH = 110;
-    const BOX_HEIGHT = 200;
-    const ROW_SPAN = 2;
+    import {
+    BOX_HEIGHT,
+    EXAMPLE_NAMES,
+    EXAMPLES_ROOT,
+    FIELD_WIDTH,
+    ROW_SPAN,
+} from "@thewaver/ss-playground/App/Pages/PointerEffects/LightCatcherPage/LightCatcherPage.const";
 
     let isDisabled = $state(LightCatcherKnobs.STARTING_IS_DISABLED);
     let smoothingMs = $state(LIGHT_CATCHER_DEFAULTS.smoothingMs);
@@ -43,14 +44,14 @@
     const examples: ExampleDefs[] = [
         {
             key: "panel",
-            name: "One panel",
+            name: EXAMPLE_NAMES.panel,
             readout: () => "brightest with the pointer on it, fading back to resting as the pointer walks out",
             component: panelExample,
             path: `${EXAMPLES_ROOT}/Panel.svelte`,
         },
         {
             key: "row",
-            name: "A row of them",
+            name: EXAMPLE_NAMES.row,
             span: ROW_SPAN,
             readout: () =>
                 "five of them side by side, each reading the pointer against its own box — drop the resting brightness below 1 and the row becomes a spotlight",
@@ -59,7 +60,7 @@
         },
         {
             key: "placed",
-            name: "A light placed by hand",
+            name: EXAMPLE_NAMES.placed,
             span: ROW_SPAN,
             readout: () =>
                 "the slider puts one light across the whole row and every lamp answers to that same spot — the pointer is ignored, since a supplied point replaces it",

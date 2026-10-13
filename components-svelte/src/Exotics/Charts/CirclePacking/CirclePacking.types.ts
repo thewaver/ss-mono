@@ -1,19 +1,8 @@
 import type { Snippet } from "svelte";
 
-import type { CirclePackingCircleState, CirclePackingNode } from "@thewaver/ss-components";
+import type { BaseCirclePackingProps, CirclePackingCircleState, CirclePackingNode } from "@thewaver/ss-components";
 
-export type CirclePackingProps<T> = {
-    /** Names the circle packing for assistive technology. */
-    ariaLabel: string;
-    /** The space left between neighboring circles and around the inside of their parent, in pixels. */
-    padding?: number;
-    /** How long a zoom takes. `0` jumps straight to the new view, which is the route for reduced motion. */
-    zoomDurationMs?: number;
-    /**
-     * The whole tree. A leaf's area comes from its `weight` and a branch is packed around its children, so a weight set
-     * on a branch is ignored. A child weighing nothing gets no circle.
-     */
-    root: CirclePackingNode<T>;
+export type CirclePackingProps<T> = BaseCirclePackingProps<T> & {
     /**
      * The branch whose circle fills the view, and how to change it. Both sides write it: the component when a circle
      * is activated, when a press lands on nothing it can zoom into — which goes back to the root — or when Escape is

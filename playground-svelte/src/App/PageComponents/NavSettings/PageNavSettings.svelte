@@ -12,11 +12,10 @@
     import PageSelectField from "../Field/PageSelectField.svelte";
     import { OWN_FRAMEWORK } from "../FrameworkMenu/FrameworkMenu.const";
     import PageProp from "../Prop/Prop.svelte";
-    import { PAGE_VIEW_OPTIONS, THEME_FIELD_ID, THEME_OPTIONS, VIEWPORT_ANCHOR_OPTIONS } from "./NavSettings.const";
-    import type { PageNavSettingsProps, PlaygroundTheme, ViewportAnchor } from "./NavSettings.types";
+    import { PAGE_VIEW_OPTIONS, THEME_FIELD_ID, THEME_OPTIONS, VIEWPORT_ANCHOR_OPTIONS } from "@thewaver/ss-playground/App/PageComponents/NavSettings/NavSettings.const";
+    import type { PageNavSettingsProps, PlaygroundTheme, ViewportAnchor } from "./NavSettingsSvelte.types";
     import PageNavSettingsChoice from "./PageNavSettingsChoice.svelte";
-
-    const NO_MOTION_DURATION_MS = 0;
+    import { NO_MOTION_DURATION_MS } from "@thewaver/ss-playground/App/PageComponents/NavSettings/NavSettings.const";
 
     const computeViewportAnchorLabel = (anchor: ViewportAnchor) =>
         VIEWPORT_ANCHOR_OPTIONS.find((option) => option.value === anchor)?.label ?? String(anchor);

@@ -5,7 +5,7 @@ import { LINK_TABS, ROW_TAB_GAP } from "@thewaver/ss-playground/App/Pages/TabsPa
 import PageTabContent from "../../../StyledComponents/TabContent/PageTabContent.vue";
 import PageTabFloater from "../../../StyledComponents/TabContent/PageTabFloater.vue";
 import PageTabGutter from "../../../StyledComponents/TabContent/PageTabGutter.vue";
-import type { TabsExampleProps } from "../TabsPage.types";
+import type { TabsExampleProps } from "../TabsPageVue.types";
 
 type Props = TabsExampleProps;
 

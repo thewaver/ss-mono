@@ -1430,6 +1430,68 @@ advanced layout features in Essentials, so "Exotics" would not mean "everything 
 Worth reopening if someone actually asks to install the Exotics alone, or if the type definitions a consumer
 installs grow large enough to slow their editor.
 
+### One source for the Solid and React components, markup included
+
+Raised by the user: Solid and React are close enough that their matching pieces — `createSignal` and `useState`,
+`createMemo` and `useMemo`, `createEffect` and `useEffect` — could be hidden behind the library's own functions, so
+that one component file serves both packages. Vue and Svelte were left out of the question on purpose. **The user's
+verdict for now: not yet, but worth keeping** for the candidates below.
+
+**How the markup could be shared.** Every shared component would be written in one dialect, which each package
+compiles with its own JSX compiler and its own small set of helpers:
+
+- **Our own `Show`, `For`, `Index`, `Dynamic` and `Portal`**, one version per framework.
+- **Styles written once in camelCase**, converted to the kebab-case Solid wants by the helpers `ss-utils` already has.
+- **Attributes whose names differ** — `class` and `className`, `for` and `htmlFor` — set through small typed helpers,
+  one per framework. Installed Solid does not accept `className` at all. A spread with a computed key, such as
+  `{...{ [getNameOfClassProp()]: getClassName() }}`, would also work, but it switches off type checking for that
+  element.
+- **Refs set by callback only**, since Solid's "assign to a variable" form has no React equivalent.
+- **`onInput` rather than `onChange`**, which means different things in the two. React also wraps its events, so
+  handlers are typed against what both have in common.
+- **Every effect names what it depends on**, through Solid's `on(...)`, which turns one for one into React's
+  dependency list. A forgotten dependency is then wrong in both frameworks at once, and shows in Solid, which is
+  tested first — so there is no fault that exists only in React. Memos need the same list, or React recalculates them
+  on every render, which is correct but slower.
+- **A shim for children**, since reading `props.children` twice builds the content twice in Solid.
+- **A helper at every call into a painter**, since Solid's painters receive getters and React's receive values. Each
+  package's public props stay as they are.
+- **No state created inside a `For` callback or an `if` statement**, which React forbids; those become small per-item
+  components.
+
+The Solid code is already most of the way to this dialect, so the work would be converting the Solid package to it
+rather than rewriting both, with the React Playground's specs as the safety net.
+
+**Why the dialect is needed at all.** Swapping the matching pieces one for one does not work on its own, because the
+two frameworks run a component differently. React runs the component's whole body again on every change; Solid runs
+it once and updates only what read a changed value. So shared code has to be written Solid's way, with every derived
+value wrapped, and React then needs to be told what each wrapped value depends on — which is what the effect rule
+above settles.
+
+**What it costs:**
+
+- **React fixes would have to be solved again inside the helpers**: `useStableList`, setting state while drawing, and
+  `useLatest` exist because of faults met while porting.
+- **A stranger build**: one folder compiled by two different JSX compilers, type-checked twice against two sets of
+  JSX types, with an import alias choosing each package's helpers.
+- **React code that does not read like React** to anyone debugging into the package.
+
+**Routes looked at and set aside:**
+
+- **Sharing only the logic** is already the plan, recorded in `decisions.md` under _"Porting beyond Solid: the shared
+  logic is this library's own, not Zag's"_, and does not shrink the code by much: what is still written twice is the
+  markup and the wiring around it, and those are most of what each framework package holds — about 40,000 lines each,
+  beside about 53,000 shared.
+- **Signals in React** help only a little. The Preact team publishes `@preact/signals-react` (and
+  `@preact/signals-core`, with no framework at all); React has none of its own, and the proposal to add signals to
+  JavaScript itself is at its earliest stage. They would let React work out what a value depends on by itself, but
+  React still re-runs the whole component, a consumer's props still arrive as plain values that would have to be
+  copied into signals while React is drawing, a component reacts only if a build plugin rewrites it or it opts in by
+  hand, and the package would ship to every React consumer. They do nothing for the markup.
+- **Generating the code from one source with a compiler** ([Mitosis](https://github.com/BuilderIO/mitosis)) removes
+  the duplicated markup too, but is the most expensive: only a subset of each framework is supported, the output is
+  hard to read and debug, and the whole library would be rebuilt around a new tool.
+
 ### A multipurpose set of animated SVG samples
 
 Raised by the user while narrowing the page-change reveal to the default shapes: rather than one animated GIF as a

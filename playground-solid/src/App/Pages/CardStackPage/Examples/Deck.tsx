@@ -1,15 +1,15 @@
 import { For, Show, createSignal } from "solid-js";
 
-import { Button, CardStack } from "@thewaver/ss-components-solid";
+import { Button, CardStack, access } from "@thewaver/ss-components-solid";
 import type { CardStackControls } from "@thewaver/ss-components-solid";
 import { computeCardTilt } from "@thewaver/ss-playground/App/Pages/CardStackPage/CardStackPage.const";
 import * as styles from "@thewaver/ss-playground/App/Pages/CardStackPage/CardStackPage.css";
-import type { CardStackDeckExampleProps } from "@thewaver/ss-playground/App/Pages/CardStackPage/CardStackPage.types";
 import { CONTROL_GLYPHS } from "@thewaver/ss-playground/App/StyledComponents/ControlButtonContent/ControlButtonContent.const";
 import type { SwipeDirection } from "@thewaver/ss-utils";
 
 import { PageMeasureBox } from "../../../PageComponents/MeasureBox/MeasureBox";
 import { PageControlButtonContent } from "../../../StyledComponents/ControlButtonContent/ControlButtonContent";
+import type { CardStackDeckExampleProps } from "../CardStackExamplesSolid.types";
 
 const CARDS = ["Ace", "King", "Queen", "Jack", "Ten", "Nine", "Eight", "Seven", "Six", "Five", "Four", "Three", "Two"];
 const DIRECTIONS: SwipeDirection[] = ["left", "right", "up", "down"];
@@ -54,7 +54,7 @@ export const DeckExample = (props: Props) => {
                                     getState().leavingTo === undefined && getState().returningFrom === undefined
                                         ? SHOWN
                                         : GONE,
-                                "transition-duration": `${props.transitionDurationMs()}ms`,
+                                "transition-duration": `${access(props.transitionDurationMs)}ms`,
                             }}
                         >
                             {getState().card}
@@ -71,7 +71,7 @@ export const DeckExample = (props: Props) => {
                     {(direction) => (
                         <Button
                             id={`send-${direction}`}
-                            isDisabled={() => props.isDisabled() || (getControls()?.getIsEmpty() ?? true)}
+                            isDisabled={() => access(props.isDisabled) || (getControls()?.getIsEmpty() ?? true)}
                             ariaLabel={`Send the top card ${direction}`}
                             renderContent={(getFlags) => (
                                 <PageControlButtonContent flags={getFlags} glyph={DIRECTION_GLYPHS[direction]} />
@@ -86,7 +86,7 @@ export const DeckExample = (props: Props) => {
                 <Button
                     id={"recall"}
                     isDisabled={() =>
-                        props.isDisabled() || (getControls()?.getTopIndex() ?? FIRST_INDEX) === FIRST_INDEX
+                        access(props.isDisabled) || (getControls()?.getTopIndex() ?? FIRST_INDEX) === FIRST_INDEX
                     }
                     ariaLabel={"Recall the last card"}
                     renderContent={(getFlags) => (

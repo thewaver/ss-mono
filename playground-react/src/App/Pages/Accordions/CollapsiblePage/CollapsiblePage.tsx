@@ -1,11 +1,14 @@
 import { useState } from "react";
 
+import {
+    EXAMPLES_ROOT,
+    EXAMPLE_NAMES,
+} from "@thewaver/ss-playground/App/Pages/Accordions/CollapsiblePage/CollapsiblePage.const";
+
 import { PageExamples } from "../../../PageComponents/Examples/Examples";
 import { FilledExample } from "./Examples/Filled";
 import { PanelExample } from "./Examples/Panel";
 import { SidewaysExample } from "./Examples/Sideways";
-
-const EXAMPLES_ROOT = "/src/App/Pages/Accordions/CollapsiblePage/Examples";
 
 export const CollapsiblePage = () => {
     const panelState = useState(false);
@@ -15,7 +18,7 @@ export const CollapsiblePage = () => {
     const examples = [
         {
             key: "panel",
-            name: "A single panel, no heading",
+            name: EXAMPLE_NAMES.panel,
             readout: () =>
                 `expanded: ${panelState[0]} — one trigger and one panel, with none of the group behavior an accordion adds`,
             component: () => <PanelExample expanded={panelState} />,
@@ -23,7 +26,7 @@ export const CollapsiblePage = () => {
         },
         {
             key: "unheld",
-            name: "Nobody holding the state",
+            name: EXAMPLE_NAMES.unheld,
             readout: () =>
                 "no signal passed — the collapsible keeps whether it is open itself, so the page has nothing to show here",
             component: () => <PanelExample />,
@@ -31,7 +34,7 @@ export const CollapsiblePage = () => {
         },
         {
             key: "filled",
-            name: "Filling its container, built on first open",
+            name: EXAMPLE_NAMES.filled,
             readout: () =>
                 `expanded: ${filledState[0]} — the panel's contents are not built until it is opened, and are kept once they are`,
             component: () => <FilledExample expanded={filledState} />,
@@ -39,7 +42,7 @@ export const CollapsiblePage = () => {
         },
         {
             key: "sideways",
-            name: "Opening to the side",
+            name: EXAMPLE_NAMES.sideways,
             readout: () =>
                 `expanded: ${sidewaysState[0]} — the panel grows its width instead of its height, and its contents keep theirs`,
             component: () => <SidewaysExample expanded={sidewaysState} />,

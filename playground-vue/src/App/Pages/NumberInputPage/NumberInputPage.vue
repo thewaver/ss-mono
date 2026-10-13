@@ -3,6 +3,8 @@ import { shallowRef } from "vue";
 
 import {
     AMOUNT_STEP,
+    EXAMPLES_ROOT,
+    EXAMPLE_NAMES,
     GERMAN_LOCALE,
     QUANTITY_MIN,
     QUANTITY_STEP,
@@ -22,8 +24,6 @@ import ReadOnlyExample from "./Examples/ReadOnly.vue";
 import SteppedClampedExample from "./Examples/SteppedClamped.vue";
 import UnitExample from "./Examples/Unit.vue";
 
-const EXAMPLES_ROOT = "/src/App/Pages/NumberInputPage/Examples";
-
 const defaultValue = shallowRef<number | undefined>(undefined);
 const quantity = shallowRef<number | undefined>(13);
 const rating = shallowRef<number | undefined>(3.7);
@@ -38,63 +38,63 @@ const labeled = shallowRef<number | undefined>(undefined);
 const examples: ExampleDefs[] = [
     {
         key: "default",
-        name: "Default",
+        name: EXAMPLE_NAMES.default,
         readout: () => `value: ${defaultValue.value} — an empty field has no value at all`,
         path: `${EXAMPLES_ROOT}/Default.vue`,
     },
     {
         key: "steppedClamped",
-        name: "Stepped and clamped",
+        name: EXAMPLE_NAMES.steppedClamped,
         readout: () =>
             `value: ${quantity.value} — steps of ${QUANTITY_STEP} counted from ${QUANTITY_MIN}; an out-of-range value is held back until the field is left`,
         path: `${EXAMPLES_ROOT}/SteppedClamped.vue`,
     },
     {
         key: "fractionalStep",
-        name: "Fractional step",
+        name: EXAMPLE_NAMES.fractionalStep,
         readout: () => `value: ${rating.value} — a step of ${RATING_STEP} must not drift`,
         path: `${EXAMPLES_ROOT}/FractionalStep.vue`,
     },
     {
         key: "german",
-        name: "German conventions",
+        name: EXAMPLE_NAMES.german,
         readout: () =>
             `value: ${german.value} — under ${GERMAN_LOCALE} "1.000" is one thousand and "1,5" is one and a half; PageUp and PageDown move ${AMOUNT_STEP * 10}, ten steps`,
         path: `${EXAMPLES_ROOT}/German.vue`,
     },
     {
         key: "unit",
-        name: "With a unit",
+        name: EXAMPLE_NAMES.unit,
         readout: () => `value: ${unit.value} — one slot holds both the unit and the stepper`,
         path: `${EXAMPLES_ROOT}/Unit.vue`,
     },
     {
         key: "readOnly",
-        name: "Read-only",
+        name: EXAMPLE_NAMES.readOnly,
         readout: () => `value: ${readOnly.value} — the stepper is refused along with the keyboard`,
         path: `${EXAMPLES_ROOT}/ReadOnly.vue`,
     },
     {
         key: "disabled",
-        name: "Disabled",
+        name: EXAMPLE_NAMES.disabled,
         readout: () => `value: ${disabled.value}`,
         path: `${EXAMPLES_ROOT}/Disabled.vue`,
     },
     {
         key: "reachable",
-        name: "Disabled + reachable",
+        name: EXAMPLE_NAMES.reachable,
         readout: () => `value: ${reachable.value}`,
         path: `${EXAMPLES_ROOT}/Reachable.vue`,
     },
     {
         key: "errored",
-        name: "Error",
+        name: EXAMPLE_NAMES.errored,
         readout: () => `value: ${errored.value} — anything but a positive count is an error`,
         path: `${EXAMPLES_ROOT}/Errored.vue`,
     },
     {
         key: "label",
-        name: "In a Label",
+        name: EXAMPLE_NAMES.label,
         readout: () => `value: ${labeled.value}`,
         path: `${EXAMPLES_ROOT}/Labeled.vue`,
     },

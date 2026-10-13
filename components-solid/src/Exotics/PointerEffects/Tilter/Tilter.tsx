@@ -2,13 +2,12 @@ import type { ParentProps } from "solid-js";
 import { Show, createMemo, createSignal } from "solid-js";
 
 import { PointerEffectsUtils, TILTER_DEFAULTS, TilterStyles as styles } from "@thewaver/ss-components";
+import { TilterConst } from "@thewaver/ss-components/internal";
 
 import { PointerTrackerSolidUtils } from "../../../Abstracts/PointerTracker/PointerTrackerSolid.utils";
 import { SmootherSolidUtils } from "../../../Abstracts/Smoother/SmootherSolid.utils";
 import { access } from "../../../Utils/propUtils";
 import type { TilterProps } from "./TilterSolid.types";
-
-const NO_LEAN = 0;
 
 export const Tilter = (props: ParentProps<TilterProps>) => {
     const [getRef, setRef] = createSignal<HTMLElement>();
@@ -32,7 +31,7 @@ export const Tilter = (props: ParentProps<TilterProps>) => {
 
     const getStrength = createMemo(() =>
         getIsResting()
-            ? NO_LEAN
+            ? TilterConst.NO_LEAN
             : PointerEffectsUtils.computeEdgeStrength(
                   getReading(),
                   access(props.tiltRangePx) ?? TILTER_DEFAULTS.tiltRangePx,

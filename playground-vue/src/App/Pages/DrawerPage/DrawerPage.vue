@@ -3,20 +3,12 @@ import { shallowRef } from "vue";
 
 import type { DrawerEdge } from "@thewaver/ss-components-vue";
 import { DRAWER_EDGES } from "@thewaver/ss-components-vue";
+import { EXAMPLES_ROOT, FILLERS } from "@thewaver/ss-playground/App/Pages/DrawerPage/DrawerPage.const";
 
 import type { ExampleDefs } from "../../PageComponents/Examples/Examples.types";
 import PageExamples from "../../PageComponents/Examples/PageExamples.vue";
 import type { DrawerExampleProps } from "./DrawerPage.types";
 import DefaultExample from "./Examples/Default.vue";
-
-const FILLER_NAMES = ["Alder", "Birch", "Cedar", "Elm", "Hazel", "Larch", "Maple", "Rowan", "Willow", "Yew"];
-const FILLER_COUNT = 60;
-const EXAMPLES_ROOT = "/src/App/Pages/DrawerPage/Examples";
-
-const FILLERS = Array.from(
-    { length: FILLER_COUNT },
-    (_, index) => `${FILLER_NAMES[index % FILLER_NAMES.length]} ${index + 1}`,
-);
 
 const visibilityByEdge = shallowRef<Partial<Record<DrawerEdge, boolean>>>({});
 

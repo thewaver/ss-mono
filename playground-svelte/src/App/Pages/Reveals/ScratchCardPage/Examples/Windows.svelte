@@ -6,7 +6,7 @@
 
     import PageMeasureBox from "../../../../PageComponents/MeasureBox/MeasureBox.svelte";
     import PageControlButtonContent from "../../../../StyledComponents/ControlButtonContent/ControlButtonContent.svelte";
-    import type { ScratchCardWindowsExampleProps } from "../ScratchCardPage.types";
+    import type { ScratchCardWindowsExampleProps } from "../ScratchCardPageSvelte.types";
 
     const TICKET_WIDTH = 360;
     const SYMBOLS = ["★", "♦", "★"];

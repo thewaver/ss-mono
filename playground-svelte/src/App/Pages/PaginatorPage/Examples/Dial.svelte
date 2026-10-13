@@ -12,7 +12,7 @@
     import PagePaginatorDialPage from "../../../StyledComponents/PaginatorContent/PagePaginatorDialPage.svelte";
     import PagePaginatorDialStep from "../../../StyledComponents/PaginatorContent/PagePaginatorDialStep.svelte";
     import PagePaginatorPanel from "../../../StyledComponents/PaginatorContent/PagePaginatorPanel.svelte";
-    import type { PaginatorExampleProps } from "../PaginatorPage.types";
+    import type { PaginatorExampleProps } from "../PaginatorPageSvelte.types";
 
     const DIAL_STEPS: PaginatorStep[] = ["first", "previous", "next", "last"];
 

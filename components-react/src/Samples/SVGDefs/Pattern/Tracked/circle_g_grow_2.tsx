@@ -1,10 +1,10 @@
 import {
     type PatternProximityOpts,
     SVGDefsUtils,
-    TrackedPatternDefaults,
     type TrackedPatternElementDefs,
     TrackedPatternUtils,
 } from "@thewaver/ss-components";
+import { CircleGGrow2Const } from "@thewaver/ss-components/internal";
 import { MathUtils } from "@thewaver/ss-utils";
 
 import type { TrackedPatternConfig } from "../../SVGDefsReact.types";
@@ -18,12 +18,10 @@ type PatternElementProps = {
     opts?: PatternProximityOpts;
 };
 
-const DEFAULTS = TrackedPatternDefaults.GROW_DEFAULTS;
-
 const PatternElement = (props: PatternElementProps) => {
     const cellSize = props.defs.cellSize;
     const areaSize = props.defs.getSize();
-    const opts = TrackedPatternUtils.resolveOpts(props.opts, DEFAULTS);
+    const opts = TrackedPatternUtils.resolveOpts(props.opts, CircleGGrow2Const.DEFAULTS);
     const pointer = SVGDefsReactUtils.usePatternPointer(props.element, areaSize, props.defs.getPointSource?.());
     const computeTrailLevel = SVGDefsReactUtils.usePatternTrail(opts, pointer);
     const r = Math.min(cellSize.width, cellSize.height) * 0.5;

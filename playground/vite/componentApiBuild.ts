@@ -39,6 +39,13 @@ export type ApiEntry = {
     isAccessor: boolean;
 };
 
+export type ApiInclude = {
+    /** The named type as written, such as `Omit<InteractionWrapperProps<ButtonFlags>, "renderControl">`. */
+    text: string;
+    /** Where that type's own table is, when it is one this build lists. */
+    target?: { unit: string; group: ApiGroupKind; table: string };
+};
+
 export type ApiTable = {
     kind: ApiTableKind;
     name: string;
@@ -46,6 +53,8 @@ export type ApiTable = {
     description: string;
     isDocumented: boolean;
     entries: ApiEntry[];
+    /** The named types this one is built from, whose members are listed in their own tables rather than here. */
+    includes: ApiInclude[];
 };
 
 export type ApiGroup = {
@@ -80,6 +89,71 @@ type Placement = {
 };
 
 const GROUP_ORDER: ApiGroupKind[] = ["props", "components", "context", "utilities", "classes", "types"];
+
+/** Types that wrap another type without being one a reader looks up, so an include points at what they wrap. */
+const WRAPPER_TYPES = new Set(["AccessorValues", "AccessorProps", "Omit", "Pick", "Partial", "Required", "Readonly"]);
+
+/** Wrappers that change each member on its own, so wrapping an intersection is the same as wrapping each part. */
+const MEMBERWISE_WRAPPERS = new Set(["AccessorValues", "AccessorProps"]);
+
+type TypePart = {
+    /** The part as written, inside any wrapper it was distributed from. */
+    node: ts.TypeNode;
+    /** The text to show for it, with that wrapper put back around it. */
+    text: string;
+};
+
+const unwrapParentheses = (node: ts.TypeNode): ts.TypeNode =>
+    ts.isParenthesizedTypeNode(node) ? unwrapParentheses(node.type) : node;
+
+const containsTypeLiteral = (node: ts.Node): boolean =>
+    ts.isTypeLiteralNode(node) || ts.forEachChild(node, (child) => containsTypeLiteral(child) || undefined) === true;
+
+/**
+ * The parts a type alias is built from, when it is written as an intersection or as a bare reference to another type.
+ * A part holding an inline `{ … }` declares members of its own; any other part is a named type whose members belong to
+ * that type's own table.
+ */
+const toParts = (declaration: ts.Declaration): TypePart[] | undefined => {
+    if (!ts.isTypeAliasDeclaration(declaration)) return undefined;
+
+    const node = unwrapParentheses(declaration.type);
+    const toPart = (part: ts.TypeNode, wrapper?: string): TypePart => {
+        const unwrapped = unwrapParentheses(part);
+        const text = normalize(unwrapped.getText());
+
+        return { node: unwrapped, text: wrapper ? `${wrapper}<${text}>` : text };
+    };
+
+    if (ts.isIntersectionTypeNode(node)) {
+        return node.types.flatMap((part) => {
+            const unwrapped = unwrapParentheses(part);
+            const inner = ts.isTypeReferenceNode(unwrapped) ? unwrapped.typeArguments?.[0] : undefined;
+            const wrapper = ts.isTypeReferenceNode(unwrapped) ? unwrapped.typeName.getText() : "";
+
+            if (inner && MEMBERWISE_WRAPPERS.has(wrapper) && ts.isIntersectionTypeNode(unwrapParentheses(inner))) {
+                return (unwrapParentheses(inner) as ts.IntersectionTypeNode).types.map((member) =>
+                    toPart(member, containsTypeLiteral(member) ? undefined : wrapper),
+                );
+            }
+
+            return [toPart(unwrapped)];
+        });
+    }
+
+    if (ts.isTypeReferenceNode(node)) {
+        const inner = node.typeArguments?.[0] && unwrapParentheses(node.typeArguments[0]);
+        const wrapper = node.typeName.getText();
+
+        if (inner && MEMBERWISE_WRAPPERS.has(wrapper) && ts.isIntersectionTypeNode(inner)) {
+            return inner.types.map((member) => toPart(member, containsTypeLiteral(member) ? undefined : wrapper));
+        }
+
+        if (!containsTypeLiteral(node)) return [toPart(node)];
+    }
+
+    return undefined;
+};
 
 const toPosix = (value: string) => value.split(path.sep).join("/");
 
@@ -321,12 +395,20 @@ const createApiReader = (
         return `${toTypeParameters(setup)}(${parameters.join(", ")}) => ${COMPONENT_RETURN_TYPE}`;
     };
 
-    const toTable = (kind: ApiTableKind, name: string, heading: string, description: string, entries: ApiEntry[]) => ({
+    const toTable = (
+        kind: ApiTableKind,
+        name: string,
+        heading: string,
+        description: string,
+        entries: ApiEntry[],
+        includes: ApiInclude[] = [],
+    ): ApiTable => ({
         kind,
         name,
         heading,
         description,
         entries,
+        includes,
         isDocumented: kind === "props" || entries.some((entry) => entry.description),
     });
 
@@ -375,6 +457,62 @@ const createApiReader = (
         placed.push({ record, owner });
         placements.set(owner.toLowerCase(), placed);
     }
+
+    const recordsBySymbol = new Map(records.map((record) => [record.symbol, record]));
+
+    const toOwnEntries = (parts: TypePart[]) => {
+        const entries = new Map<string, ApiEntry>();
+
+        for (const { node } of parts.filter((part) => containsTypeLiteral(part.node))) {
+            for (const entry of toEntries(checker.getTypeFromTypeNode(node), node)) entries.set(entry.name, entry);
+        }
+
+        return [...entries.values()].sort(byName);
+    };
+
+    const toComposition = (declaration: ts.Declaration) => {
+        const parts = toParts(declaration);
+
+        if (!parts) return undefined;
+        if (parts.length === 1 && !containsTypeLiteral(parts[0].node) && !toIncludeTarget(parts[0].node))
+            return undefined;
+
+        return parts;
+    };
+
+    const toTableAddress = (record: ExportRecord): { group: ApiGroupKind; table: string } => {
+        if (getOwnerSuffix(record.symbol)) return { group: "props", table: record.name };
+
+        const declared = checker.getDeclaredTypeOfSymbol(record.symbol);
+        const isObjectShaped =
+            toComposition(record.declaration) !== undefined ||
+            ((declared.flags & OBJECT_TYPE_FLAGS) !== 0 &&
+                !declared.getCallSignatures().length &&
+                toEntries(declared, record.declaration).length > 0);
+
+        return { group: "types", table: isObjectShaped ? record.name : "aliases" };
+    };
+
+    const toIncludeTarget = (part: ts.TypeNode): ApiInclude["target"] => {
+        let node = part;
+
+        while (ts.isTypeReferenceNode(node) && WRAPPER_TYPES.has(node.typeName.getText()) && node.typeArguments?.[0]) {
+            node = unwrapParentheses(node.typeArguments[0]);
+        }
+
+        if (!ts.isTypeReferenceNode(node)) return undefined;
+
+        const symbol = checker.getSymbolAtLocation(node.typeName);
+        const resolved = symbol && symbol.flags & ts.SymbolFlags.Alias ? checker.getAliasedSymbol(symbol) : symbol;
+        const record = resolved && recordsBySymbol.get(resolved);
+
+        return record ? { unit: toOwner(record), ...toTableAddress(record) } : undefined;
+    };
+
+    const toIncludes = (parts: TypePart[]): ApiInclude[] =>
+        parts
+            .filter((part) => !containsTypeLiteral(part.node))
+            .map((part) => ({ text: part.text, target: toIncludeTarget(part.node) }));
 
     const read = (key: string): ApiGroup[] => {
         const unit = units.get(key) ?? key;
@@ -434,6 +572,28 @@ const createApiReader = (
 
             if (symbol.flags & (ts.SymbolFlags.TypeAlias | ts.SymbolFlags.Interface)) {
                 const declared = checker.getDeclaredTypeOfSymbol(symbol);
+                const parts = toComposition(declaration);
+
+                if (parts) {
+                    const entries = toOwnEntries(parts);
+                    const includes = toIncludes(parts);
+                    const { group } = toTableAddress(record);
+
+                    if (entries.length || includes.length)
+                        addTable(
+                            group,
+                            toTable(
+                                group === "props" ? "props" : "fields",
+                                name,
+                                heading,
+                                toDescription(symbol, checker),
+                                entries,
+                                includes,
+                            ),
+                        );
+
+                    continue;
+                }
 
                 if (getOwnerSuffix(symbol)) {
                     const entries = toEntries(declared, declaration);

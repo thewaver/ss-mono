@@ -4,7 +4,7 @@ import * as styles from "@thewaver/ss-playground/App/StyledComponents/TextFieldC
 import { themeVars } from "@thewaver/ss-playground/App/Theme.css";
 
 import { useLayerClass } from "../Layer/Layer.context";
-import type { TextFieldContentProps } from "./TextFieldContent.types";
+import type { TextFieldContentProps } from "./TextFieldContentReact.types";
 
 export const computePageTextFieldTextStyle = (flags: InteractionFlags): TextFieldTextStyle => ({
     color: flags.isDisabled ? `rgb(from ${layerVars.contrast} r g b / 50%)` : layerVars.contrast,

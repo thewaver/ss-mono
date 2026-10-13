@@ -5,11 +5,12 @@
     import PageCalendarHeader from "../../StyledComponents/CalendarContent/PageCalendarHeader.svelte";
     import PageCalendarTitle from "../../StyledComponents/CalendarContent/PageCalendarTitle.svelte";
     import type { PageCalendarPagedCaptionProps } from "./CalendarPagedCaption.types";
-
-    const PAGE_STEP = 1;
-    const WEEK_STARTS_ON = 1;
-    const YEAR_OPTIONS: Intl.DateTimeFormatOptions = { year: "numeric" };
-    const MONTH_TITLE_OPTIONS: Intl.DateTimeFormatOptions = { month: "long", year: "numeric" };
+    import {
+        MONTH_TITLE_OPTIONS,
+        PAGE_STEP,
+        WEEK_STARTS_ON,
+        YEAR_OPTIONS,
+    } from "@thewaver/ss-playground/App/PageComponents/CalendarCaption/CalendarCaption.const";
 
     let props: PageCalendarPagedCaptionProps = $props();
 

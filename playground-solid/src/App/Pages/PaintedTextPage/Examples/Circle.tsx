@@ -7,8 +7,8 @@ import { CONTROL_GLYPHS } from "@thewaver/ss-playground/App/StyledComponents/Con
 
 import { PageMeasureBox } from "../../../PageComponents/MeasureBox/MeasureBox";
 import { PageControlButtonContent } from "../../../StyledComponents/ControlButtonContent/ControlButtonContent";
-import { computeSampleDefs } from "../PaintedTextPage.const";
-import type { PaintedTextCircleExampleProps } from "../PaintedTextPage.types";
+import { computeSampleDefs } from "../PaintedTextPageSolid.const";
+import type { PaintedTextCircleExampleProps } from "../PaintedTextPageSolid.types";
 
 const RING_TEXT = "PAINTED TEXT • ROUND A CIRCLE • ";
 

@@ -28,3 +28,16 @@ export const QUEUE: CardItem[] = [
 ];
 
 export const CHEAP_ONLY = 3;
+
+export const EXAMPLE_NAMES = {
+    reorder: "Reordering one list",
+    row: "Laid out in a row",
+    rightToLeft: "A row in a right-to-left box",
+    ring: "Reordering round a ring",
+    pair: "Between two lists",
+    picky: "A list that refuses some cards",
+    locked: "A list that takes nothing",
+    disabled: "Disabled",
+};
+
+export const EXAMPLES_ROOT = "/src/App/Pages/SortablePage/Examples";

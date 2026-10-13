@@ -10,7 +10,7 @@
         computePageTextFieldTextStyle,
     } from "../../../StyledComponents/TextFieldContent/TextFieldContent.svelte";
     import PageTextFieldPlaceholder from "../../../StyledComponents/TextFieldPlaceholder/TextFieldPlaceholder.svelte";
-    import type { TextInputPasswordExampleProps } from "../TextInputPage.types";
+    import type { TextInputPasswordExampleProps } from "../TextInputPageSvelte.types";
 
     type Props = TextInputPasswordExampleProps;
 

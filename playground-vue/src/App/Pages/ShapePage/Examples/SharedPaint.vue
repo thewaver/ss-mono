@@ -7,8 +7,8 @@ import { ShapeConst, type Size2d } from "@thewaver/ss-utils";
 
 import type { PagePaintAreaGroupCell } from "../../../PageComponents/PaintAreaGroup/PaintAreaGroup.types";
 import PagePaintAreaGroup from "../../../PageComponents/PaintAreaGroup/PaintAreaGroup.vue";
-import { computeShapeFillDefs, computeShapeStrokeDefs } from "../ShapePage.const";
 import type { ShapeExampleProps } from "../ShapePage.types";
+import { computeShapeFillDefs, computeShapeStrokeDefs } from "../ShapePageVue.const";
 
 const CELL_COUNT = 4;
 

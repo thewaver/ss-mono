@@ -1,24 +1,15 @@
 import type { PropsWithChildren } from "react";
 
 import type { TableSortDirection } from "@thewaver/ss-components-react";
+import {
+    DEFAULT_ALIGN,
+    SORT_MARKERS,
+    UNSORTED_MARKER,
+} from "@thewaver/ss-playground/App/StyledComponents/TableContent/TableContent.const";
 import * as styles from "@thewaver/ss-playground/App/StyledComponents/TableContent/TableContent.css";
 
 import { useLayerClass } from "../Layer/Layer.context";
-import type {
-    TableAlign,
-    TableCellContentProps,
-    TableHeaderContentProps,
-    TableResizerProps,
-} from "./TableContent.types";
-
-const DEFAULT_ALIGN: TableAlign = "start";
-
-const UNSORTED_MARKER = "↕";
-
-const SORT_MARKERS: Record<TableSortDirection, string> = {
-    ascending: "▲",
-    descending: "▼",
-};
+import type { TableCellContentProps, TableHeaderContentProps, TableResizerProps } from "./TableContentReact.types";
 
 const getSortMarker = (direction: TableSortDirection | undefined) =>
     direction === undefined ? UNSORTED_MARKER : SORT_MARKERS[direction];

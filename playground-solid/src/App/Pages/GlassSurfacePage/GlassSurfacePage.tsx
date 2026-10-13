@@ -3,16 +3,20 @@ import { createStore } from "solid-js/store";
 
 import { DEFAULT_GLASS_DEFS, SVGDefsSamples, TrackedGradientDefaults } from "@thewaver/ss-components-solid";
 import { GlassSurfaceKnobs } from "@thewaver/ss-playground/App/Knobs/GlassSurfaces.const";
+import { TrackedGradientKnobs } from "@thewaver/ss-playground/App/Knobs/TrackedGradients.const";
 import {
     NO_SAMPLE_KEY,
-    splitEntriesIntoGroups,
     toGroupEntriesWithNoSample,
 } from "@thewaver/ss-playground/App/PageComponents/SampleGroups/SampleGroups.const";
 import type { WithNoSample } from "@thewaver/ss-playground/App/PageComponents/SampleGroups/SampleGroups.types";
+import {
+    DEFAULT_EXAMPLE_PATH,
+    EXAMPLE_NAMES,
+    GROUPPED_GRADIENTS,
+} from "@thewaver/ss-playground/App/Pages/GlassSurfacePage/GlassSurfacePage.const";
 import * as styles from "@thewaver/ss-playground/App/Pages/GlassSurfacePage/GlassSurfacePage.css";
 import { BORDER_RADIUS_FULL } from "@thewaver/ss-playground/App/Theme.const";
 
-import { TrackedGradientKnobs } from "../../Knobs/TrackedGradients.const";
 import { PageExamples } from "../../PageComponents/Examples/Examples";
 import { PageColorField, PageGroupedSelectField, PageNumberField } from "../../PageComponents/Field/Field";
 import { PageKnobs } from "../../PageComponents/Knobs/Knobs";
@@ -20,11 +24,7 @@ import type { Knob } from "../../PageComponents/Knobs/Knobs.types";
 import { PageProp } from "../../PageComponents/Prop/Prop";
 import { PagePropsDivider, PagePropsGroups, PagePropsPanel } from "../../PageComponents/PropsPanel/PropsPanel";
 import { DefaultExample } from "./Examples/Default";
-import type { GlassSurfaceExampleProps } from "./GlassSurfacePage.types";
-
-const GROUPPED_GRADIENTS = splitEntriesIntoGroups(SVGDefsSamples.Gradient.Tracked.SAMPLE_ENTRIES);
-
-const DEFAULT_EXAMPLE_PATH = "/src/App/Pages/GlassSurfacePage/Examples/Default.tsx";
+import type { GlassSurfaceExampleProps } from "./GlassSurfacePageSolid.types";
 
 export const GlassSurfacePage = () => {
     const [getBorderRadius, setBorderRadius] = createSignal(BORDER_RADIUS_FULL);
@@ -83,7 +83,7 @@ export const GlassSurfacePage = () => {
         return [
             {
                 key: "default",
-                name: "Default",
+                name: EXAMPLE_NAMES.default,
                 component: () => <DefaultExample {...commonProps} />,
                 path: DEFAULT_EXAMPLE_PATH,
             },

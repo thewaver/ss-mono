@@ -4,8 +4,8 @@
 
     import PageColorInputContent from "../../StyledComponents/ColorInputContent/ColorInputContent.svelte";
     import { pageColorPickerSlots } from "../ColorPicker/ColorPicker.svelte";
-    import { useFieldReset } from "./Field.context";
-    import type { PageColorFieldProps } from "./Field.types";
+    import { useFieldReset } from "./FieldSvelte.context";
+    import type { PageColorFieldProps } from "./FieldSvelte.types";
 
     let props: PageColorFieldProps = $props();
 

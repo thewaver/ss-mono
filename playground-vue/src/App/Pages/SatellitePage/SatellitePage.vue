@@ -3,8 +3,13 @@ import { computed, shallowRef } from "vue";
 
 import { ANCHOR_H_PLACEMENTS, ANCHOR_V_PLACEMENTS, SATELLITE_DEFAULTS } from "@thewaver/ss-components-vue";
 import type { AnchorHPlacement, AnchorVPlacement } from "@thewaver/ss-components-vue";
+import { SatelliteKnobs } from "@thewaver/ss-playground/App/Knobs/Satellites.const";
+import {
+    EXAMPLES_ROOT,
+    EXAMPLE_NAMES,
+    FIELD_WIDTH,
+} from "@thewaver/ss-playground/App/Pages/SatellitePage/SatellitePage.const";
 
-import { SatelliteKnobs } from "../../Knobs/Satellites.const";
 import PageExampleKnobs from "../../PageComponents/ExampleKnobs/PageExampleKnobs.vue";
 import type { ExampleDefs } from "../../PageComponents/Examples/Examples.types";
 import PageExamples from "../../PageComponents/Examples/PageExamples.vue";
@@ -17,10 +22,7 @@ import PagePropsPanel from "../../PageComponents/PropsPanel/PagePropsPanel.vue";
 import BadgeExample from "./Examples/Badge.vue";
 import DefaultExample from "./Examples/Default.vue";
 import SeveralExample from "./Examples/Several.vue";
-import type { SatelliteBadgeCorner } from "./SatellitePage.types";
-
-const FIELD_WIDTH = 110;
-const EXAMPLES_ROOT = "/src/App/Pages/SatellitePage/Examples";
+import type { SatelliteBadgeCorner } from "./SatellitePageVue.types";
 
 const hPlacement = shallowRef<AnchorHPlacement>(SatelliteKnobs.STARTING_H_PLACEMENT);
 const vPlacement = shallowRef<AnchorVPlacement>(SatelliteKnobs.STARTING_V_PLACEMENT);
@@ -42,20 +44,20 @@ const offset = computed(() => ({ x: offsetX.value, y: offsetY.value }));
 const examples: ExampleDefs[] = [
     {
         key: "default",
-        name: "Default",
+        name: EXAMPLE_NAMES.default,
         readout: () => "one satellite, moved through every placement; the dashed box is what the pair takes up",
         path: `${EXAMPLES_ROOT}/Default.vue`,
     },
     {
         key: "several",
-        name: "Several satellites",
+        name: EXAMPLE_NAMES.several,
         readout: () =>
             "a corner badge, one hanging off the left and one tucked behind the bottom edge — each side of the box grows by the furthest any of them reaches",
         path: `${EXAMPLES_ROOT}/Several.vue`,
     },
     {
         key: "badge",
-        name: "Badge",
+        name: EXAMPLE_NAMES.badge,
         readout: () =>
             "a count pinned inside a corner and pushed out past it by the same amount on both axes, so a longer number grows the badge inward and the overhang never changes",
         path: `${EXAMPLES_ROOT}/Badge.vue`,

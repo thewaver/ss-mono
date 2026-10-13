@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { NumberInput, SignalMirrorVueUtils } from "@thewaver/ss-components-vue";
+import { DEFAULT_NUMBER_FIELD_WIDTH } from "@thewaver/ss-playground/App/PageComponents/Field/Field.const";
 import {
     FIELD_GAP,
     FIELD_STEPPER_PADDING,
@@ -9,10 +10,8 @@ import PageTextFieldContent, {
     computePageTextFieldTextStyle,
 } from "../../StyledComponents/TextFieldContent/TextFieldContent.vue";
 import PageNumberInputStepper from "../NumberInputStepper/NumberInputStepper.vue";
-import { useFieldReset } from "./Field.context";
-import type { PageNumberFieldProps } from "./Field.types";
-
-const DEFAULT_NUMBER_FIELD_WIDTH = 100;
+import { useFieldReset } from "./FieldVue.context";
+import type { PageNumberFieldProps } from "./FieldVue.types";
 
 const props = defineProps<PageNumberFieldProps>();
 

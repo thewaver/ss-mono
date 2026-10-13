@@ -2,6 +2,12 @@ import { useState } from "react";
 
 import { PAGINATOR_DEFAULTS } from "@thewaver/ss-components-react";
 import { PaginatorKnobs } from "@thewaver/ss-playground/App/Knobs/Paginators.const";
+import {
+    COUNT_FIELD_WIDTH,
+    EXAMPLES_ROOT,
+    EXAMPLE_NAMES,
+    STARTING_PAGE,
+} from "@thewaver/ss-playground/App/Pages/PaginatorPage/PaginatorPage.const";
 
 import { PageExamples } from "../../PageComponents/Examples/Examples";
 import { PageCheckField, PageNumberField } from "../../PageComponents/Field/Field";
@@ -12,11 +18,7 @@ import { EndsExample } from "./Examples/Ends";
 import { LinkComponentExample } from "./Examples/LinkComponent";
 import { LinksExample } from "./Examples/Links";
 import { StepsExample } from "./Examples/Steps";
-import type { PaginatorExampleProps } from "./PaginatorPage.types";
-
-const STARTING_PAGE = 1;
-const COUNT_FIELD_WIDTH = 90;
-const EXAMPLES_ROOT = "/src/App/Pages/PaginatorPage/Examples";
+import type { PaginatorExampleProps } from "./PaginatorPageReact.types";
 
 export const PaginatorPage = () => {
     const [pageCount, setPageCount] = useState(PaginatorKnobs.STARTING_PAGE_COUNT);
@@ -40,7 +42,7 @@ export const PaginatorPage = () => {
     const examples = [
         {
             key: "steps",
-            name: "Previous and next",
+            name: EXAMPLE_NAMES.steps,
             readout: () =>
                 `page ${stepPage} of ${pageCount} — the gaps name the pages they stand for, and a gap standing for one page is spelled as that page instead`,
             component: () => <StepsExample {...commonProps} page={stepPage} onPageChange={setStepPage} />,
@@ -48,7 +50,7 @@ export const PaginatorPage = () => {
         },
         {
             key: "ends",
-            name: "Jumps to either end",
+            name: EXAMPLE_NAMES.ends,
             readout: () =>
                 `page ${endPage} of ${pageCount} — first and previous go quiet together on page one, and next and last on the final page`,
             component: () => <EndsExample {...commonProps} page={endPage} onPageChange={setEndPage} />,
@@ -56,7 +58,7 @@ export const PaginatorPage = () => {
         },
         {
             key: "links",
-            name: "Pages that are links",
+            name: EXAMPLE_NAMES.links,
             readout: () =>
                 `page ${linkPage} of ${pageCount} — the consumer knows the address shape, so it computes the href from the page the library worked out`,
             component: () => <LinksExample {...commonProps} page={linkPage} onPageChange={setLinkPage} />,
@@ -64,7 +66,7 @@ export const PaginatorPage = () => {
         },
         {
             key: "linkComponent",
-            name: "Links through a component",
+            name: EXAMPLE_NAMES.linkComponent,
             readout: () =>
                 `page ${customLinkPage} of ${pageCount} — the same links rendered by a consumer's own link component`,
             component: () => (
@@ -74,7 +76,7 @@ export const PaginatorPage = () => {
         },
         {
             key: "dial",
-            name: "The same row, round half a dial",
+            name: EXAMPLE_NAMES.dial,
             readout: () =>
                 `page ${dialPage} of ${pageCount} — one layout function, and the steps, pages and gaps become wedges in the order they already had`,
             component: () => <DialExample {...commonProps} page={dialPage} onPageChange={setDialPage} />,

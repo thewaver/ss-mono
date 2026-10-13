@@ -2,7 +2,7 @@
     import * as styles from "@thewaver/ss-playground/App/StyledComponents/SortableContent/SortableContent.css";
 
     import { getLayerClass } from "../Layer/Layer.context";
-    import type { SortableMarkerProps } from "./SortableContent.types";
+    import type { SortableMarkerProps } from "./SortableContentSvelte.types";
 
     let props: SortableMarkerProps = $props();
 

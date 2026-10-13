@@ -9,40 +9,51 @@ test.beforeEach(async ({ page }) => {
 
 /**
  * What a table of contents promises is the relationship between two lists: the link marked `aria-current` is the
- * one for the last heading scrolled past a line near the top, and pressing a link takes the reader to its
- * heading. So these read the mark off the links and the position off the headings, and never ask what the mark
- * looks like. The token is `location` — the current place within a document — rather than `page`, which would say
- * the link is the page itself.
+ * one for the last heading scrolled past a line near the top of the box the headings scroll in, and pressing a link
+ * takes the reader to its heading. So these read the mark off the links and the position off the headings, and
+ * never ask what the mark looks like. The token is `location` — the current place within a document — rather than
+ * `page`, which would say the link is the page itself.
  *
- * The page scrolls in a container of the Playground's own rather than the window, so the one that moves is
- * found by walking up from the article to the first ancestor that actually scrolls.
+ * The example's article is its own scrolling box, beside the links, so the box that moves is the article itself.
+ * Its sections are an outline: a sub-section's heading is one level below its parent's, and its link carries a depth.
  */
-test.describe("a table of contents following the page", () => {
+test.describe("a table of contents following its own scrolling box", () => {
     const TOC = demo("tableOfContents");
     const LINKS = `${TOC} nav a`;
-    const HEADINGS = `${TOC} article h3`;
+    const ARTICLE = `${TOC} article`;
+    const HEADINGS = `${ARTICLE} :is(h1, h2, h3, h4, h5, h6)`;
     const MARKED = `${LINKS}[aria-current="location"]`;
-    const WHEEL_STEP = 120;
+    const WHEEL_STEP = 80;
     const MAX_WHEEL_STEPS = 80;
+    const SHORT_WINDOW = { width: 1600, height: 560 };
 
     const markedIndex = (page: Page) =>
         page.locator(LINKS).evaluateAll((links) => links.findIndex((link) => link.getAttribute("aria-current")));
 
-    const scrollerOf = (page: Page) =>
+    const isBoxAtEnd = (page: Page) =>
         page
-            .locator(`${TOC} article`)
-            .evaluateHandle((element) => {
-                let node = element.parentElement;
+            .locator(ARTICLE)
+            .evaluate((element) => element.scrollTop + element.clientHeight >= element.scrollHeight - 1);
 
-                const scrolls = (candidate: HTMLElement) =>
-                    candidate.scrollHeight > candidate.clientHeight &&
-                    /auto|scroll/.test(getComputedStyle(candidate).overflowY);
+    const pageScrollTop = (page: Page) =>
+        page.locator(TOC).evaluate((element) => {
+            let node = element.parentElement;
 
-                while (node && !scrolls(node)) node = node.parentElement;
+            const scrolls = (candidate: HTMLElement) =>
+                candidate.scrollHeight > candidate.clientHeight &&
+                /auto|scroll/.test(getComputedStyle(candidate).overflowY);
 
-                return node!;
-            })
-            .then((handle) => handle.asElement()!);
+            while (node && !scrolls(node)) node = node.parentElement;
+
+            return node ? node.scrollTop : undefined;
+        });
+
+    const wheelOverBox = async (page: Page, deltaY: number) => {
+        const box = (await page.locator(ARTICLE).boundingBox())!;
+
+        await page.mouse.move(box.x + box.width / 2, box.y + box.height / 2);
+        await page.mouse.wheel(0, deltaY);
+    };
 
     test("is a named navigation landmark whose links each point at their own heading", async ({ page }) => {
         const nav = page.locator(`${TOC} nav`);
@@ -67,28 +78,52 @@ test.describe("a table of contents following the page", () => {
         expect(pairs.length, "one link per section").toBe(await page.locator(HEADINGS).count());
 
         for (const pair of pairs) {
-            expect(pair.tag, "every link's fragment names a heading on the page").toBe("H3");
+            expect(pair.tag, "every link's fragment names a heading on the page").toMatch(/^H[1-6]$/);
             expect(pair.focusable, "which can take focus without joining the tab order").toBe("-1");
             expect(pair.labels, "and names the section it opens").toBe(true);
         }
     });
 
-    test("marks nothing before any heading has been reached", async ({ page }) => {
-        await expect(page.locator(MARKED)).toHaveCount(0);
+    /**
+     * A depth is something the painter is handed so it can indent, and nothing else: the links stay one flat list
+     * for the keyboard and for a screen reader, so a sub-section is reached by the same Tab as its parent and is
+     * announced as one more item of the same list rather than as the start of a nested one.
+     */
+    test("stays one flat list, every link a direct item of it", async ({ page }) => {
+        await expect(page.locator(`${TOC} nav ol`), "one list").toHaveCount(1);
+        await expect(page.locator(`${TOC} nav ol ol, ${TOC} nav ol ul`), "and nothing nested in it").toHaveCount(0);
+
+        const parents = await page
+            .locator(LINKS)
+            .evaluateAll((links) => links.map((link) => link.closest("li")?.parentElement?.tagName));
+
+        expect(parents.length, "the outline has links").toBeGreaterThan(0);
+
+        for (const parent of parents) expect(parent, "each link sits in an item of that one list").toBe("OL");
+    });
+
+    /**
+     * The first heading sits at the very top of its box, which is above the line before anything has scrolled, so
+     * the first section is the one being read from the start.
+     */
+    test("marks the first section while its box is at the top", async ({ page }) => {
+        await expect(page.locator(LINKS).first()).toHaveAttribute("aria-current", "location");
+        await expect(page.locator(MARKED)).toHaveCount(1);
     });
 
     /**
      * Focus moving to the heading is the half a keyboard or screen reader user depends on: scrolling alone
      * would leave them on the link, and the next Tab would carry on through the table of contents rather than
      * into the section they asked for. The readout is compared against the marked link's own words, so this
-     * checks that the page and the markup agree rather than what either says.
+     * checks that the page and the markup agree rather than what either says. Every link is pressed, last first,
+     * so a sub-section's link is covered as well as a section's, and every press moves the box.
      */
     test("pressing a link brings its heading into view, focuses it, and marks that link alone", async ({ page }) => {
         const links = page.locator(LINKS);
         const headings = page.locator(HEADINGS);
         const count = await links.count();
 
-        for (const index of [2, count - 1, 0]) {
+        for (let index = count - 1; index >= 0; index--) {
             await links.nth(index).click();
 
             await expect(headings.nth(index), "focus lands on the heading the link names").toBeFocused();
@@ -99,6 +134,33 @@ test.describe("a table of contents following the page", () => {
                 ((await links.nth(index).textContent()) ?? "").trim(),
             );
         }
+    });
+
+    /**
+     * `scrollIntoView` scrolls every scrolling ancestor, so the page would jump until the box's top met the window's.
+     * The window is made short so the page has scroll of its own to lose, and the test checks that it does before
+     * relying on it.
+     */
+    test("pressing a link scrolls the box and leaves the page where it was", async ({ page }) => {
+        await page.setViewportSize(SHORT_WINDOW);
+        await page.reload();
+        await expect(page.locator(LINKS).first()).toBeVisible();
+
+        const before = await pageScrollTop(page);
+
+        expect(before, "the page itself scrolls at this window size, which is the case being tested").toBeDefined();
+
+        const links = page.locator(LINKS);
+        const index = (await links.count()) - 1;
+
+        await links.nth(index).click();
+        await expect(page.locator(HEADINGS).nth(index)).toBeFocused();
+        await waitUntilStill(page.locator(HEADINGS).nth(index));
+
+        expect(await page.locator(ARTICLE).evaluate((element) => element.scrollTop), "the box moved").toBeGreaterThan(
+            0,
+        );
+        expect(await pageScrollTop(page), "and the page did not").toBe(before);
     });
 
     test("a link pressed from the keyboard does the same", async ({ page }) => {
@@ -116,32 +178,25 @@ test.describe("a table of contents following the page", () => {
 
     /**
      * The mark has to follow a reader who scrolls rather than one who presses links, which is the half the
-     * observer exists for. The wheel moves the page a little at a time, and the mark is read after each step
-     * once the headings have stopped moving; what is asserted is the order it visits the sections in and that
-     * it visits all of them, not which one is marked at any particular scroll offset — that depends on a tuned
-     * line and on how tall the window is.
+     * observer exists for. The wheel moves the box a little at a time, and the mark is read after each step
+     * once the headings have stopped moving; what is asserted is the order it visits the sections in and where it
+     * starts and ends, not which one is marked at any particular scroll offset — that depends on a tuned line. A
+     * short section near the end can be passed over, because the box runs out of scroll before its heading reaches
+     * the line and the end rule then marks the last heading on screen.
      */
-    test("scrolling by hand moves the mark through every section in reading order", async ({ page }) => {
-        const scroller = await scrollerOf(page);
-        const box = (await scroller.boundingBox())!;
+    test("scrolling by hand moves the mark down through the sections, from the first to the last", async ({ page }) => {
         const count = await page.locator(LINKS).count();
         const seen: number[] = [await markedIndex(page)];
 
-        await page.mouse.move(box.x + box.width / 2, box.y + box.height / 2);
-
         for (let step = 0; step < MAX_WHEEL_STEPS; step++) {
-            const atBottom = await scroller.evaluate(
-                (element) => element.scrollTop + element.clientHeight >= element.scrollHeight - 1,
-            );
+            if (await isBoxAtEnd(page)) break;
 
-            if (atBottom) break;
-
-            await page.mouse.wheel(0, WHEEL_STEP);
+            await wheelOverBox(page, WHEEL_STEP);
             await waitUntilStill(page.locator(HEADINGS).first());
             seen.push(await markedIndex(page));
         }
 
-        expect(seen[0], "nothing is marked at the top").toBe(-1);
+        expect(seen[0], "the first section is marked at the top").toBe(0);
 
         for (let step = 1; step < seen.length; step++) {
             expect(
@@ -150,68 +205,24 @@ test.describe("a table of contents following the page", () => {
             ).toBeGreaterThanOrEqual(seen[step - 1]);
         }
 
-        expect([...new Set(seen.filter((index) => index >= 0))], "and every section is marked on the way down").toEqual(
-            Array.from({ length: count }, (_, index) => index),
-        );
+        expect(seen.at(-1), "and the last section is marked at the end").toBe(count - 1);
+        expect(new Set(seen).size, "with sections in between marked on the way").toBeGreaterThan(2);
     });
 
     /**
      * The scroll back is made with the wheel rather than from script: a pressed link holds the mark until the reader
      * does something of their own, and a scroll from script is not that.
      */
-    test("scrolling back to the top clears the mark", async ({ page }) => {
-        await page.locator(LINKS).nth(2).click();
-        await expect(page.locator(MARKED)).toHaveCount(1);
-
-        const scroller = await scrollerOf(page);
-        const box = (await scroller.boundingBox())!;
-
-        await page.mouse.move(box.x + box.width / 2, box.y + box.height / 2);
-        await page.mouse.wheel(0, -100_000);
-
-        await expect(page.locator(MARKED)).toHaveCount(0);
-    });
-});
-
-/**
- * A depth is something the painter is handed so it can indent, and nothing else: the links stay one flat list
- * for the keyboard and for a screen reader, so a sub-section is reached by the same Tab as its parent and is
- * announced as one more item of the same list rather than as the start of a nested one.
- */
-test.describe("an outline whose links carry a depth", () => {
-    const OUTLINE = demo("outline");
-    const LINKS = `${OUTLINE} nav a`;
-
-    test("stays one flat list, every link a direct item of it", async ({ page }) => {
-        await expect(page.locator(`${OUTLINE} nav ol`), "one list").toHaveCount(1);
-        await expect(
-            page.locator(`${OUTLINE} nav ol ol, ${OUTLINE} nav ol ul`),
-            "and nothing nested in it",
-        ).toHaveCount(0);
-
-        const parents = await page
-            .locator(LINKS)
-            .evaluateAll((links) => links.map((link) => link.closest("li")?.parentElement?.tagName));
-
-        expect(parents.length, "the outline has links").toBeGreaterThan(0);
-
-        for (const parent of parents) expect(parent, "each link sits in an item of that one list").toBe("OL");
-    });
-
-    test("pressing a sub-section's link focuses its heading and marks that link alone", async ({ page }) => {
+    test("scrolling back to the top returns the mark to the first section", async ({ page }) => {
         const links = page.locator(LINKS);
-        const count = await links.count();
 
-        for (let index = 0; index < count; index++) {
-            const link = links.nth(index);
-            const id = ((await link.getAttribute("href")) ?? "").replace(/^#/, "");
+        await links.nth(4).click();
+        await expect(links.nth(4)).toHaveAttribute("aria-current", "location");
 
-            await link.click();
+        await wheelOverBox(page, -100_000);
 
-            await expect(page.locator(`#${id}`), "focus lands on the heading the link names").toBeFocused();
-            await expect(link, "that link is the current one").toHaveAttribute("aria-current", "location");
-            await expect(page.locator(`${LINKS}[aria-current]`), "and no other is").toHaveCount(1);
-        }
+        await expect(links.first()).toHaveAttribute("aria-current", "location");
+        await expect(page.locator(MARKED)).toHaveCount(1);
     });
 });
 

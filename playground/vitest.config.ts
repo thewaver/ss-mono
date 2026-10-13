@@ -6,6 +6,7 @@ const fromRepo = (path: string) => fileURLToPath(new URL(path, import.meta.url))
 export default defineConfig({
     resolve: {
         alias: {
+            "@thewaver/ss-components/internal": fromRepo("../components/src/internal.ts"),
             "@thewaver/ss-components": fromRepo("../components/src/index.ts"),
             "@thewaver/ss-utils": fromRepo("../utils/src/index.ts"),
         },

@@ -2,7 +2,7 @@
 import * as styles from "@thewaver/ss-playground/App/StyledComponents/SplitPaneContent/SplitPaneContent.css";
 
 import { useLayerClass } from "../Layer/Layer.context";
-import type { SplitPaneCompareProps } from "./SplitPaneContent.types";
+import type { SplitPaneCompareProps } from "./SplitPaneContentVue.types";
 
 defineProps<SplitPaneCompareProps>();
 

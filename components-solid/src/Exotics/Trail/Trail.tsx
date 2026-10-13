@@ -1,6 +1,7 @@
 import { Index, createEffect, createMemo, createSignal, onCleanup, onMount, untrack } from "solid-js";
 
 import { TRAIL_DEFAULTS, type TrailPlace, TrailUtils, TrailStyles as styles } from "@thewaver/ss-components";
+import { TrailConst } from "@thewaver/ss-components/internal";
 import { MathUtils } from "@thewaver/ss-utils";
 
 import { InteractionTrackerSolidUtils } from "../../Abstracts/InteractionTracker/InteractionTrackerSolid.utils";
@@ -8,16 +9,15 @@ import { SignalMirrorSolidUtils } from "../../Abstracts/SignalMirror/SignalMirro
 import { access } from "../../Utils/propUtils";
 import type { TrailController, TrailProps } from "./TrailSolid.types";
 
-const NO_LENGTH = 0;
-const NO_PROGRESS = 0;
-const NO_OFFSET = 0;
-
 export const Trail = (props: TrailProps) => {
-    const [getProgress, setProgress] = SignalMirrorSolidUtils.createOptional(() => props.progress, NO_PROGRESS);
+    const [getProgress, setProgress] = SignalMirrorSolidUtils.createOptional(
+        () => props.progress,
+        TrailConst.NO_PROGRESS,
+    );
     const [getIsPlaying, setIsPlaying] = SignalMirrorSolidUtils.createOptional(() => props.playback, true);
 
     const [getPathRef, setPathRef] = createSignal<SVGPathElement>();
-    const [getPathLength, setPathLength] = createSignal(NO_LENGTH);
+    const [getPathLength, setPathLength] = createSignal(TrailConst.NO_LENGTH);
 
     const getIsPageHidden = InteractionTrackerSolidUtils.trackPageHidden();
 
@@ -38,7 +38,7 @@ export const Trail = (props: TrailProps) => {
     const getRunExtent = createMemo(() => TrailUtils.getRunExtent(getFollowerOffsets(), getIsLooping()));
 
     const getIsRunning = createMemo(
-        () => getIsPlaying() && !getIsDisabled() && !getIsPageHidden() && getPathLength() > NO_LENGTH,
+        () => getIsPlaying() && !getIsDisabled() && !getIsPageHidden() && getPathLength() > TrailConst.NO_LENGTH,
     );
 
     const computePlace = (offset: number): TrailPlace =>
@@ -48,7 +48,7 @@ export const Trail = (props: TrailProps) => {
             TrailUtils.getTravelerProgress(getProgress(), offset, getRunExtent(), getIsLooping()),
         );
 
-    const getPlace = createMemo(() => computePlace(NO_OFFSET));
+    const getPlace = createMemo(() => computePlace(TrailConst.NO_OFFSET));
 
     const getPlaces = createMemo(() => getFollowerOffsets().map((offset) => computePlace(offset)));
 
@@ -71,7 +71,7 @@ export const Trail = (props: TrailProps) => {
 
         getPath();
 
-        setPathLength(path ? path.getTotalLength() : NO_LENGTH);
+        setPathLength(path ? path.getTotalLength() : TrailConst.NO_LENGTH);
     });
 
     createEffect(() => {

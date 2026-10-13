@@ -11,6 +11,7 @@ import {
     FloaterStyles as floaterStyles,
     TreeStyles as styles,
 } from "@thewaver/ss-components";
+import { TreeConst } from "@thewaver/ss-components/internal";
 
 import { FloaterSolidUtils } from "../../Abstracts/Floater/FloaterSolid.utils";
 import { NavigatorSolidUtils } from "../../Abstracts/Navigator/NavigatorSolid.utils";
@@ -23,8 +24,6 @@ import { PlacementItem } from "../../Primitives/PlacementItem/PlacementItem";
 import { access } from "../../Utils/propUtils";
 import { TooltipSolidUtils } from "../Overlays/Tooltip/TooltipSolid.utils";
 import type { TreeNodeItemProps, TreeProps, TreeRow } from "./TreeSolid.types";
-
-const EMPTY_PINNED_ROWS: number[] = [];
 
 const TreeNodeItem = (props: TreeNodeItemProps) => {
     const getIsDisabled = () => access(props.flags).isDisabled ?? false;
@@ -130,7 +129,7 @@ export const Tree = <T,>(props: TreeProps<T>) => {
         getPinnedRows: () => {
             const roving = getRovingRow();
 
-            return roving === undefined ? EMPTY_PINNED_ROWS : [roving.index];
+            return roving === undefined ? TreeConst.EMPTY_PINNED_ROWS : [roving.index];
         },
     });
 

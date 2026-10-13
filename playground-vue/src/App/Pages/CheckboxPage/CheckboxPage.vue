@@ -1,6 +1,8 @@
 <script setup lang="ts">
 import { computed, shallowRef, watch } from "vue";
 
+import { EXAMPLES_ROOT, EXAMPLE_NAMES } from "@thewaver/ss-playground/App/Pages/CheckboxPage/CheckboxPage.const";
+
 import type { ExampleDefs } from "../../PageComponents/Examples/Examples.types";
 import PageExamples from "../../PageComponents/Examples/PageExamples.vue";
 import DecoratedExample from "./Examples/Decorated.vue";
@@ -10,8 +12,6 @@ import ErroredExample from "./Examples/Errored.vue";
 import MixedExample from "./Examples/Mixed.vue";
 import ReachableExample from "./Examples/Reachable.vue";
 import RefusedWriteExample from "./Examples/RefusedWrite.vue";
-
-const EXAMPLES_ROOT = "/src/App/Pages/CheckboxPage/Examples";
 
 const defaultChecked = shallowRef(false);
 const decoratedChecked = shallowRef(true);
@@ -39,44 +39,44 @@ watch(
 const examples: ExampleDefs[] = [
     {
         key: "default",
-        name: "Default",
+        name: EXAMPLE_NAMES.default,
         readout: () => `checked: ${defaultChecked.value}`,
         path: `${EXAMPLES_ROOT}/Default.vue`,
     },
     {
         key: "decorated",
-        name: "Decorated",
+        name: EXAMPLE_NAMES.decorated,
         readout: () => `checked: ${decoratedChecked.value}`,
         path: `${EXAMPLES_ROOT}/Decorated.vue`,
     },
     {
         key: "mixed",
-        name: "Mixed",
+        name: EXAMPLE_NAMES.mixed,
         readout: () =>
             `mixed: ${isAllMixed.value} | all: ${all.value} | children: ${firstChild.value}, ${secondChild.value}`,
         path: `${EXAMPLES_ROOT}/Mixed.vue`,
     },
     {
         key: "refusedWrite",
-        name: "Refused write",
+        name: EXAMPLE_NAMES.refusedWrite,
         readout: () => `email: ${email.value} | sms: ${sms.value} — whichever is the last one on refuses to go off`,
         path: `${EXAMPLES_ROOT}/RefusedWrite.vue`,
     },
     {
         key: "disabled",
-        name: "Disabled",
+        name: EXAMPLE_NAMES.disabled,
         readout: () => `checked: ${disabledChecked.value}`,
         path: `${EXAMPLES_ROOT}/Disabled.vue`,
     },
     {
         key: "reachable",
-        name: "Disabled + reachable",
+        name: EXAMPLE_NAMES.reachable,
         readout: () => `checked: ${reachableChecked.value}`,
         path: `${EXAMPLES_ROOT}/Reachable.vue`,
     },
     {
         key: "errored",
-        name: "Error",
+        name: EXAMPLE_NAMES.errored,
         readout: () => `checked: ${erroredChecked.value}`,
         path: `${EXAMPLES_ROOT}/Errored.vue`,
     },

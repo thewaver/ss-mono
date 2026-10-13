@@ -2,16 +2,12 @@
     import type { SVGDefsColors } from "@thewaver/ss-components-svelte";
     import { DEFAULT_GLASS_DEFS, SVGDefsSamples, TrackedGradientDefaults } from "@thewaver/ss-components-svelte";
     import { GlassSurfaceKnobs } from "@thewaver/ss-playground/App/Knobs/GlassSurfaces.const";
-    import {
-        NO_SAMPLE_KEY,
-        splitEntriesIntoGroups,
-        toGroupEntriesWithNoSample,
-    } from "@thewaver/ss-playground/App/PageComponents/SampleGroups/SampleGroups.const";
+    import { NO_SAMPLE_KEY } from "@thewaver/ss-playground/App/PageComponents/SampleGroups/SampleGroups.const";
     import type { WithNoSample } from "@thewaver/ss-playground/App/PageComponents/SampleGroups/SampleGroups.types";
     import * as styles from "@thewaver/ss-playground/App/Pages/GlassSurfacePage/GlassSurfacePage.css";
     import { BORDER_RADIUS_FULL } from "@thewaver/ss-playground/App/Theme.const";
 
-    import { TrackedGradientKnobs } from "../../Knobs/TrackedGradients.const";
+    import { TrackedGradientKnobs } from "@thewaver/ss-playground/App/Knobs/TrackedGradients.const";
     import type { ExampleDefs } from "../../PageComponents/Examples/Examples.types";
     import PageExamples from "../../PageComponents/Examples/PageExamples.svelte";
     import PageColorField from "../../PageComponents/Field/PageColorField.svelte";
@@ -24,11 +20,11 @@
     import PagePropsGroups from "../../PageComponents/PropsPanel/PagePropsGroups.svelte";
     import PagePropsPanel from "../../PageComponents/PropsPanel/PagePropsPanel.svelte";
     import DefaultExample from "./Examples/Default.svelte";
-    import type { GlassSurfaceExampleProps } from "./GlassSurfacePage.types";
-
-    const GROUPPED_GRADIENTS = splitEntriesIntoGroups(SVGDefsSamples.Gradient.Tracked.SAMPLE_ENTRIES);
-
-    const STROKE_GROUPS = toGroupEntriesWithNoSample(GROUPPED_GRADIENTS);
+    import type { GlassSurfaceExampleProps } from "./GlassSurfacePageSvelte.types";
+    import {
+    EXAMPLE_NAMES,
+    STROKE_GROUPS,
+} from "@thewaver/ss-playground/App/Pages/GlassSurfacePage/GlassSurfacePage.const";
 
     const DEFAULT_EXAMPLE_PATH = "/src/App/Pages/GlassSurfacePage/Examples/Default.svelte";
 
@@ -87,7 +83,7 @@
     const examples: ExampleDefs[] = [
         {
             key: "default",
-            name: "Default",
+            name: EXAMPLE_NAMES.default,
             component: defaultExample,
             path: DEFAULT_EXAMPLE_PATH,
         },

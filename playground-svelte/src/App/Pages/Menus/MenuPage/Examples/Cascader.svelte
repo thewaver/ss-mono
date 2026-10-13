@@ -5,7 +5,7 @@
     import { renderPageHighlightFloater } from "../../../../StyledComponents/GlideFloater/GlideFloater.const.svelte";
     import PageMenuTriggerContent from "../../../../StyledComponents/MenuTriggerContent/MenuTriggerContent.svelte";
     import { DESTINATIONS, renderDestinationItem, renderMenuPopup } from "../MenuPage.const.svelte";
-    import type { MenuCascaderExampleProps } from "../MenuPage.types";
+    import type { MenuCascaderExampleProps } from "../MenuPageSvelte.types";
 
     const PATH_SEPARATOR = " / ";
     const NOTHING_CHOSEN = "Choose a destination";

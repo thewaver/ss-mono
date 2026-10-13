@@ -7,7 +7,7 @@
 
     import PageMeasureBox from "../../../PageComponents/MeasureBox/MeasureBox.svelte";
     import PageControlButtonContent from "../../../StyledComponents/ControlButtonContent/ControlButtonContent.svelte";
-    import type { TypewriterPhrasesExampleProps } from "../TypewriterPage.types";
+    import type { TypewriterPhrasesExampleProps } from "../TypewriterPageSvelte.types";
 
     const LEAD = "We build";
     const PHRASES = ["websites", "apps", "games"];

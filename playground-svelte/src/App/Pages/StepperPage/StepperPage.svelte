@@ -11,20 +11,22 @@
     import PageProp from "../../PageComponents/Prop/Prop.svelte";
     import PagePropsPanel from "../../PageComponents/PropsPanel/PagePropsPanel.svelte";
     import PageButtonContent from "../../StyledComponents/ButtonContent/ButtonContent.svelte";
-    import type { PageStepState } from "../../StyledComponents/StepContent/StepContent.types";
+    import type { PageStepState } from "../../StyledComponents/StepContent/StepContentSvelte.types";
     import ArcExample from "./Examples/Arc.svelte";
     import BareExample from "./Examples/Bare.svelte";
     import DetailedExample from "./Examples/Detailed.svelte";
     import FailedExample from "./Examples/Failed.svelte";
     import LinearExample from "./Examples/Linear.svelte";
     import StackedExample from "./Examples/Stacked.svelte";
-    import { STATE_WORDS } from "./StepperPage.const";
-
-    const STARTING_LINEAR: StepValue = "address";
-    const STARTING_FAILED: StepValue = "payment";
-    const STARTING_STACKED: StepValue = "address";
-    const STARTING_DETAILED: StepValue = "payment";
-    const EXAMPLES_ROOT = "/src/App/Pages/StepperPage/Examples";
+    import { STATE_WORDS } from "@thewaver/ss-playground/App/Pages/StepperPage/StepperPage.const";
+    import {
+    EXAMPLE_NAMES,
+    EXAMPLES_ROOT,
+    STARTING_DETAILED,
+    STARTING_FAILED,
+    STARTING_LINEAR,
+    STARTING_STACKED,
+} from "@thewaver/ss-playground/App/Pages/StepperPage/StepperPage.const";
 
     let isFreeNavigation = $state(StepperKnobs.STARTING_IS_FREE_NAVIGATION);
 
@@ -68,14 +70,14 @@
     const examples: ExampleDefs[] = [
         {
             key: "stacked",
-            name: "Stacked",
+            name: EXAMPLE_NAMES.stacked,
             readout: () => `current: ${stackedCurrent} — the same steps down the page`,
             component: stackedExample,
             path: `${EXAMPLES_ROOT}/Stacked.svelte`,
         },
         {
             key: "detailed",
-            name: "Steps that carry their own content",
+            name: EXAMPLE_NAMES.detailed,
             readout: () =>
                 `current: ${detailedCurrent} — each step holds a body beside the connector, so the line runs past the content rather than stopping at it`,
             component: detailedExample,
@@ -83,7 +85,7 @@
         },
         {
             key: "linear",
-            name: "Linear",
+            name: EXAMPLE_NAMES.linear,
             readout: () =>
                 `current: ${linearCurrent} — only the steps behind you can be pressed, unless free navigation is on`,
             component: linearExample,
@@ -91,7 +93,7 @@
         },
         {
             key: "failed",
-            name: "A step that failed",
+            name: EXAMPLE_NAMES.failed,
             readout: () =>
                 `current: ${failedCurrent} — the failed step is reachable by keyboard so its tooltip can be read, and its name carries the state as words`,
             component: failedExample,
@@ -99,7 +101,7 @@
         },
         {
             key: "bare",
-            name: "No connector",
+            name: EXAMPLE_NAMES.bare,
             readout: () => "the connector slot is optional, so a bare strip renders nothing between the steps",
             component: bareExample,
             path: `${EXAMPLES_ROOT}/Bare.svelte`,
@@ -107,7 +109,7 @@
         {
             key: "arc",
             span: 2,
-            name: "The same steps, bent along an arc",
+            name: EXAMPLE_NAMES.arc,
             readout: () =>
                 `current: ${arcCurrent} — one layout function, and the run between two steps follows the curve they sit on rather than cutting across it`,
             component: arcExample,

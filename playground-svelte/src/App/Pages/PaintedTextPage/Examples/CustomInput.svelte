@@ -2,8 +2,8 @@
     import { PaintedText } from "@thewaver/ss-components-svelte";
     import * as styles from "@thewaver/ss-playground/App/Pages/PaintedTextPage/PaintedTextPage.css";
 
-    import { computeSampleDefs } from "../PaintedTextPage.const";
-    import type { PaintedTextExampleProps } from "../PaintedTextPage.types";
+    import { computeSampleDefs } from "../PaintedTextPageSvelte.const";
+    import type { PaintedTextExampleProps } from "../PaintedTextPageSvelte.types";
 
     type Props = PaintedTextExampleProps & {
         text: string;

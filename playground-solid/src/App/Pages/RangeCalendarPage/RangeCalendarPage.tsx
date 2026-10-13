@@ -10,6 +10,11 @@ import {
     TODAY,
     WEEK_START_LABELS,
 } from "@thewaver/ss-playground/App/Pages/CalendarPage/CalendarPage.const";
+import {
+    CALENDAR_FIELD_WIDTH,
+    EXAMPLES_ROOT,
+    EXAMPLE_NAMES,
+} from "@thewaver/ss-playground/App/Pages/RangeCalendarPage/RangeCalendarPage.const";
 
 import { PageExamples } from "../../PageComponents/Examples/Examples";
 import { PageSelectField } from "../../PageComponents/Field/Field";
@@ -17,9 +22,6 @@ import { PageProp } from "../../PageComponents/Prop/Prop";
 import { PagePropsPanel } from "../../PageComponents/PropsPanel/PropsPanel";
 import { BoundedExample } from "./Examples/Bounded";
 import { DefaultExample } from "./Examples/Default";
-
-const CALENDAR_FIELD_WIDTH = 180;
-const EXAMPLES_ROOT = "/src/App/Pages/RangeCalendarPage/Examples";
 
 const describe = (value: DateValueRange | undefined) =>
     value ? `${DateValueUtils.toIso(value.start)} to ${DateValueUtils.toIso(value.end)}` : "none";
@@ -43,7 +45,7 @@ export const RangeCalendarPage = () => {
     const getExamples = createMemo(() => [
         {
             key: "default",
-            name: "Default",
+            name: EXAMPLE_NAMES.default,
             readout: () => `value: ${describe(defaultValue[0]())}`,
             component: () => (
                 <DefaultExample value={defaultValue} month={defaultMonth} weekStartsOn={getWeekStartsOn} />
@@ -52,7 +54,7 @@ export const RangeCalendarPage = () => {
         },
         {
             key: "bounded",
-            name: "Bounded",
+            name: EXAMPLE_NAMES.bounded,
             readout: () =>
                 `min ${DateValueUtils.toIso(MIN_DATE)}, max ${DateValueUtils.toIso(MAX_DATE)} — value: ${describe(boundedValue[0]())}`,
             component: () => (

@@ -1,51 +1,20 @@
 import type { VNodeChild } from "vue";
 
-import type {
-    AnchorPlacement,
-    ClockSteps,
-    InteractionFlags,
-    PopupTriggerFlags,
-    TextFieldFlags,
-} from "@thewaver/ss-components";
-import type { Point2d, TimeValue } from "@thewaver/ss-utils";
+import type { BaseTimePickerProps, InteractionFlags, PopupTriggerFlags, TextFieldFlags } from "@thewaver/ss-components";
 
 import type { ClockColumnRenderer, ClockOptionRenderer, ClockUnitRenderer } from "../Clock/Clock.types";
 import type { TimeInputMeridiem, TimeInputProps, TimeInputSlots } from "../TimeInput/TimeInput.types";
 
-export type TimePickerProps = TimeInputProps & {
-    /** Where the clock sits against the field. */
-    "placement"?: AnchorPlacement;
-    /** How far the clock is held clear of the field. */
-    "offset"?: Point2d;
-    /** How long the clock takes to fade in and out. */
-    "popupTransitionDurationMs"?: number;
-    /** Names the clock for assistive technology. */
-    "clockLabel": string;
-    /** Which country's conventions the times are written in. */
-    "locale"?: string;
-    /** How far apart the offered times are, per unit. */
-    "clockSteps"?: ClockSteps;
-    /** The space between the clock's columns. */
-    "clockGap"?: number;
-    /** Whether one time can be picked, for rules a plain earliest and latest cannot express. */
-    "computeIsTimeDisabled"?: (time: TimeValue) => boolean;
-    /**
-     * Whether the clock is open, which is what `v-model:visibility` binds. Left unbound, the picker keeps its own.
-     * It is the only thing that opens or closes it.
-     */
-    "visibility"?: boolean;
-    /** Receives the clock opening or closing. */
-    "onUpdate:visibility"?: (isOpen: boolean) => void;
-    /**
-     * The trigger's own element id, for a consumer that has to reach it from a label or a test.
-     *
-     * It is separate from the field's `id` because the two are different elements now that the component
-     * owns the trigger.
-     */
-    "triggerId"?: string;
-    /** Names the control that opens the clock. */
-    "triggerAriaLabel": string;
-};
+export type TimePickerProps = TimeInputProps &
+    BaseTimePickerProps & {
+        /**
+         * Whether the clock is open, which is what `v-model:visibility` binds. Left unbound, the picker keeps its own.
+         * It is the only thing that opens or closes it.
+         */
+        "visibility"?: boolean;
+        /** Receives the clock opening or closing. */
+        "onUpdate:visibility"?: (isOpen: boolean) => void;
+    };
 
 export type TimePickerSlots = Omit<TimeInputSlots, "renderTrailing"> & {
     /**

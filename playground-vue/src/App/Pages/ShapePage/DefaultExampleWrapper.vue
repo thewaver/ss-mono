@@ -1,7 +1,8 @@
 <script setup lang="ts">
 import { shallowRef } from "vue";
 
-import { ShapeKnobs } from "../../Knobs/Shapes.const";
+import { ShapeKnobs } from "@thewaver/ss-playground/App/Knobs/Shapes.const";
+
 import PageExampleKnobs from "../../PageComponents/ExampleKnobs/PageExampleKnobs.vue";
 import PageCheckField from "../../PageComponents/Field/PageCheckField.vue";
 import PageProp from "../../PageComponents/Prop/Prop.vue";

@@ -20,7 +20,7 @@
     import PageSortableGridItemContent from "../../../StyledComponents/SortableGridContent/PageSortableGridItemContent.svelte";
     import PageSortableGridLanding from "../../../StyledComponents/SortableGridContent/PageSortableGridLanding.svelte";
     import PageSortableGridSurface from "../../../StyledComponents/SortableGridContent/PageSortableGridSurface.svelte";
-    import type { SortableGridPaint } from "../../../StyledComponents/SortableGridContent/SortableGridContent.types";
+    import type { SortableGridPaint } from "../../../StyledComponents/SortableGridContent/SortableGridContentSvelte.types";
     import {
         CELL_SIZE,
         GRID_GAP,
@@ -29,7 +29,7 @@
         computeGearHue,
         computeGearKey,
         computeGearLabel,
-    } from "../SortableGridPage.const";
+    } from "@thewaver/ss-playground/App/Pages/SortableGridPage/SortableGridPage.const";
 
     type Props = {
         groupId: string;

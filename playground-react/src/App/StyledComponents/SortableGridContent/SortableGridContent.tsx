@@ -1,6 +1,7 @@
 import type { CSSProperties } from "react";
 
 import type { SortableGridGeometry } from "@thewaver/ss-components-react";
+import { NAMED_WIDTH } from "@thewaver/ss-playground/App/StyledComponents/SortableGridContent/SortableGridContent.const";
 import * as styles from "@thewaver/ss-playground/App/StyledComponents/SortableGridContent/SortableGridContent.css";
 import { assignInlineVars } from "@vanilla-extract/dynamic";
 
@@ -10,9 +11,7 @@ import type {
     SortableGridItemContentProps,
     SortableGridLandingProps,
     SortableGridSurfaceProps,
-} from "./SortableGridContent.types";
-
-const NAMED_WIDTH = 2;
+} from "./SortableGridContentReact.types";
 
 const getBox = (geometry: SortableGridGeometry) => ({
     width: Math.max(...geometry.contour.map((point) => point.x)),

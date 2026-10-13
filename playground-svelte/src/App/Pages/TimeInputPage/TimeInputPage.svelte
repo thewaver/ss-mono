@@ -6,8 +6,7 @@
     import type { ExampleDefs } from "../../PageComponents/Examples/Examples.types";
     import PageExamples from "../../PageComponents/Examples/PageExamples.svelte";
     import TimeExample from "./Examples/Time.svelte";
-
-    const EXAMPLES_ROOT = "/src/App/Pages/TimeInputPage/Examples";
+    import { EXAMPLE_NAMES, EXAMPLES_ROOT } from "@thewaver/ss-playground/App/Pages/TimeInputPage/TimeInputPage.const";
 
     const describeTime = (value: TimeValue | undefined) => (value ? TimeUtils.toIso(value) : "none");
 
@@ -19,28 +18,28 @@
     const examples: ExampleDefs[] = [
         {
             key: "time",
-            name: "A time, typed or stepped",
+            name: EXAMPLE_NAMES.time,
             readout: () => `value: ${describeTime(time)} — the arrows step whichever segment the caret is in`,
             component: timeExample,
             path: `${EXAMPLES_ROOT}/Time.svelte`,
         },
         {
             key: "twelve",
-            name: "Twelve hour",
+            name: EXAMPLE_NAMES.twelve,
             readout: () => `value: ${describeTime(twelveHour)} — the value stays 24-hour, the field reads it as 12`,
             component: twelveExample,
             path: `${EXAMPLES_ROOT}/Time.svelte`,
         },
         {
             key: "precise",
-            name: "To the second",
+            name: EXAMPLE_NAMES.precise,
             readout: () => `value: ${describeTime(precise)} — three segments instead of two`,
             component: preciseExample,
             path: `${EXAMPLES_ROOT}/Time.svelte`,
         },
         {
             key: "shift",
-            name: "Within opening hours",
+            name: EXAMPLE_NAMES.shift,
             readout: () =>
                 `value: ${describeTime(shift)} — ${TimeUtils.toIso(OPENING_TIME)} to ${TimeUtils.toIso(CLOSING_TIME)}`,
             component: shiftExample,

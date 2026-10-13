@@ -10,7 +10,7 @@
 
     import PageMeasureBox from "../../../PageComponents/MeasureBox/MeasureBox.svelte";
     import PageControlButtonContent from "../../../StyledComponents/ControlButtonContent/ControlButtonContent.svelte";
-    import type { CardStackEndlessExampleProps } from "../CardStackExamples.types";
+    import type { CardStackEndlessExampleProps } from "../CardStackExamplesSvelte.types";
 
     const DIRECTIONS: SwipeDirection[] = ["left", "right"];
     const DIRECTION_GLYPHS: Record<SwipeDirection, string> = {

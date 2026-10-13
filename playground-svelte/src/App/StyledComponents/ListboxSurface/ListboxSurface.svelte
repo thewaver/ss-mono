@@ -4,7 +4,7 @@
     import * as styles from "@thewaver/ss-playground/App/StyledComponents/ListboxSurface/ListboxSurface.css";
 
     import { getLayerClass } from "../Layer/Layer.context";
-    import type { ListboxSurfaceProps } from "./ListboxSurface.types";
+    import type { ListboxSurfaceProps } from "./ListboxSurfaceSvelte.types";
 
     let props: ListboxSurfaceProps & { children?: Snippet } = $props();
 

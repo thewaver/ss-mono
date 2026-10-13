@@ -3,8 +3,7 @@
     import PageExamples from "../../PageComponents/Examples/PageExamples.svelte";
     import NestedExample from "./Examples/Nested.svelte";
     import SectionsExample from "./Examples/Sections.svelte";
-
-    const EXAMPLES_ROOT = "/src/App/Pages/FormSectionPage/Examples";
+    import { EXAMPLE_NAMES, EXAMPLES_ROOT } from "@thewaver/ss-playground/App/Pages/FormSectionPage/FormSectionPage.const";
 
     let email = $state("");
     let password = $state("");
@@ -19,7 +18,7 @@
     const examples: ExampleDefs[] = [
         {
             key: "sections",
-            name: "Sections with their own validity",
+            name: EXAMPLE_NAMES.sections,
             readout: () =>
                 `outcome: ${outcome} — each field reports to its own section, and the form hears one answer per section rather than one per field`,
             component: sectionsExample,
@@ -27,7 +26,7 @@
         },
         {
             key: "nested",
-            name: "A section inside a section",
+            name: EXAMPLE_NAMES.nested,
             readout: () =>
                 `outcome: ${nestedOutcome} — the payment section answers to the delivery section, which answers to the form, so the verdict travels up two levels rather than one`,
             component: nestedExample,

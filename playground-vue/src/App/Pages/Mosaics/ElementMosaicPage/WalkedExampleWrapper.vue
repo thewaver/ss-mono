@@ -4,7 +4,7 @@ import { computed } from "vue";
 import { MOSAIC_EXTENT, TILES } from "@thewaver/ss-playground/App/Pages/Mosaics/Mosaics.const";
 
 import PageMeasureBox from "../../../PageComponents/MeasureBox/MeasureBox.vue";
-import type { WalkedExampleWrapperProps } from "./ElementMosaicPage.types";
+import type { WalkedExampleWrapperProps } from "./ElementMosaicPageVue.types";
 import WalkedExample from "./Examples/Walked.vue";
 
 const props = defineProps<WalkedExampleWrapperProps>();

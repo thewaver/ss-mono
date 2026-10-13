@@ -4,7 +4,7 @@ import { renderPageHighlightFloater } from "../../../StyledComponents/GlideFloat
 import { PageListboxSurface } from "../../../StyledComponents/ListboxSurface/ListboxSurface";
 import { PageSelectGroupContent } from "../../../StyledComponents/SelectGroupContent/SelectGroupContent";
 import { PageSelectOptionContent } from "../../../StyledComponents/SelectOptionContent/SelectOptionContent";
-import { GROUPED_COUNTRIES } from "../../SelectPage/SelectPage.const";
+import { GROUPED_COUNTRIES } from "../../SelectPage/SelectPageReact.const";
 import type { MultiListboxExampleProps } from "../ListboxPage.types";
 
 type Props = MultiListboxExampleProps;

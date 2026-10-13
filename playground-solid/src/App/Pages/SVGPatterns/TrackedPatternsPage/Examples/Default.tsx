@@ -1,6 +1,6 @@
 import { createUniqueId } from "solid-js";
 
-import { SVGDefsSamples, Shape, access } from "@thewaver/ss-components-solid";
+import { SVGDefsSampleConfigs, SVGDefsSamples, Shape, access } from "@thewaver/ss-components-solid";
 import {
     NO_SAMPLE_KEY,
     computeNoSampleDefs,
@@ -8,7 +8,7 @@ import {
 import * as styles from "@thewaver/ss-playground/App/Pages/SVGPatterns/SVGPatterns.css";
 import { ShapeConst } from "@thewaver/ss-utils";
 
-import type { TrackedPatternExampleProps } from "../../SVGPatterns.types";
+import type { TrackedPatternExampleProps } from "../../SVGPatternsSolid.types";
 
 export const DefaultExample = ({ configKey, configDefs, colors, cellSize, blurWidth }: TrackedPatternExampleProps) => {
     const id = createUniqueId();
@@ -21,7 +21,7 @@ export const DefaultExample = ({ configKey, configDefs, colors, cellSize, blurWi
 
                 if (key === NO_SAMPLE_KEY) return computeNoSampleDefs(access(colors), "fill");
 
-                return SVGDefsSamples.Pattern.Tracked.toConfig({
+                return SVGDefsSampleConfigs.Pattern.Tracked.toConfig({
                     family: key,
                     defs: access(configDefs),
                 } as SVGDefsSamples.Pattern.Tracked.Entry).computeSVGDefs(`fill-${id}`, undefined, getRef, {

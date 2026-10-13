@@ -4,7 +4,7 @@
     import * as styles from "@thewaver/ss-playground/App/StyledComponents/CirclePackingContent/CirclePackingContent.css";
 
     import { getLayerClass } from "../Layer/Layer.context";
-    import type { PageCirclePackingCircleProps } from "./CirclePackingContent.types";
+    import type { PageCirclePackingCircleProps } from "./CirclePackingContentSvelte.types";
 
     let props: PageCirclePackingCircleProps = $props();
 

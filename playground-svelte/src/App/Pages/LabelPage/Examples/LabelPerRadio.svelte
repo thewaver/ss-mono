@@ -3,7 +3,7 @@
 
     import PageLabelCaption from "../../../StyledComponents/LabelCaption/LabelCaption.svelte";
     import PageRadioContent from "../../../StyledComponents/RadioContent/RadioContent.svelte";
-    import type { LabelRadioExampleProps, PlanValue } from "../LabelPage.types";
+    import type { LabelRadioExampleProps, PlanValue } from "../LabelPageSvelte.types";
 
     const GAP = 20;
 

@@ -12,7 +12,7 @@
     import PageTextFieldContent, {
         computePageTextFieldTextStyle,
     } from "../../../StyledComponents/TextFieldContent/TextFieldContent.svelte";
-    import type { TextInputEditableExampleProps } from "../TextInputPage.types";
+    import type { TextInputEditableExampleProps } from "../TextInputPageSvelte.types";
 
     type Props = TextInputEditableExampleProps;
 

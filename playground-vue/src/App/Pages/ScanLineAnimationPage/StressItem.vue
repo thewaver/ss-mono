@@ -1,5 +1,5 @@
 <script lang="ts">
-import type { StressTestDefs } from "../../PageComponents/StressTest/StressText.types";
+import type { StressTestDefs } from "../../PageComponents/StressTest/StressTextVue.types";
 
 export const STRESS_LINE_COUNT = 120;
 export const STRESS_ITEMS: (StressTestDefs & { size: number; kind: "transform" | "filter" })[] = (
@@ -48,12 +48,11 @@ import {
     ScanlineAnimationKeyframes,
 } from "@thewaver/ss-components-vue";
 import type { ScanlineAnimationEvaluationDefs } from "@thewaver/ss-components-vue";
+import { WEIGHT_ORIGIN } from "@thewaver/ss-playground/App/Pages/ScanLineAnimationPage/ScanLineAnimationPage.const";
 import type { Index2d } from "@thewaver/ss-utils";
 
 import PageMeasureBox from "../../PageComponents/MeasureBox/MeasureBox.vue";
 import type { ScanlineAnimationExampleProps } from "./ScanlineAnimationPage.types";
-
-const WEIGHT_ORIGIN = { row: 0, col: 0 };
 
 const pickStressKeyframes = (kind: "transform" | "filter") => {
     const random = Math.random() * 3;

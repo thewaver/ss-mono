@@ -1,11 +1,9 @@
 import type { PropsWithChildren } from "react";
 
+import { FILLING_WIDTH, NO_PADDING } from "@thewaver/ss-playground/App/PageComponents/MeasureBox/MeasureBox.const";
 import * as styles from "@thewaver/ss-playground/App/PageComponents/MeasureBox/MeasureBox.css";
 
 import type { PageMeasureBoxProps } from "./MeasureBox.types";
-
-const NO_PADDING = 0;
-const FILLING_WIDTH = "100%";
 
 export const PageMeasureBox = (props: PropsWithChildren<PageMeasureBoxProps>) => {
     const getWidth = () => {

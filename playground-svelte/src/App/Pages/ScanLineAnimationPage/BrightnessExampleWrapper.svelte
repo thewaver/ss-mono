@@ -8,8 +8,9 @@
     import BrightnessExample from "./Examples/Brightness.svelte";
     import type { ScanlineAnimationExampleProps } from "./ScanlineAnimationPage.types";
     import SmoothnessInput from "./SmoothnessInput.svelte";
-
-    const IMAGE_CONTAINER_SIZE = 360;
+    import {
+        IMAGE_CONTAINER_SIZE,
+    } from "@thewaver/ss-playground/App/Pages/ScanLineAnimationPage/ScanLineAnimationPage.const";
 
     let { playback = $bindable(), ...props }: ScanlineAnimationExampleProps = $props();
 

@@ -11,7 +11,7 @@
     } from "../../../StyledComponents/TextFieldContent/TextFieldContent.svelte";
     import PageTextFieldPlaceholder from "../../../StyledComponents/TextFieldPlaceholder/TextFieldPlaceholder.svelte";
     import { renderSelectPopup } from "../../SelectPage/SelectPage.const.svelte";
-    import type { TextInputCitiesExampleProps } from "../TextInputPage.types";
+    import type { TextInputCitiesExampleProps } from "../TextInputPageSvelte.types";
 
     type Props = TextInputCitiesExampleProps;
 

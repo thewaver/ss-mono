@@ -4,7 +4,7 @@ import { access } from "@thewaver/ss-components-solid";
 import * as styles from "@thewaver/ss-playground/App/StyledComponents/SplitPaneContent/SplitPaneContent.css";
 
 import { useLayerClass } from "../Layer/Layer.context";
-import type { SplitPaneCompareProps, SplitPaneGutterProps } from "./SplitPaneContent.types";
+import type { SplitPaneCompareProps, SplitPaneGutterProps } from "./SplitPaneContentSolid.types";
 
 export const PageSplitPaneGutter = (props: SplitPaneGutterProps) => {
     const getLayerClass = useLayerClass();

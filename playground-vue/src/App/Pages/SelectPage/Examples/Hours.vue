@@ -6,8 +6,8 @@ import { Select } from "@thewaver/ss-components-vue";
 import PageGlideFloater from "../../../StyledComponents/GlideFloater/PageGlideFloater.vue";
 import PageSelectContent from "../../../StyledComponents/SelectContent/SelectContent.vue";
 import PageSelectOptionContent from "../../../StyledComponents/SelectOptionContent/SelectOptionContent.vue";
-import { HOURS, PLACEHOLDER } from "../SelectPage.const";
 import type { SelectExampleProps } from "../SelectPage.types";
+import { HOURS, PLACEHOLDER } from "../SelectPageVue.const";
 import SelectPopup from "../SelectPopup.vue";
 
 type Props = SelectExampleProps;

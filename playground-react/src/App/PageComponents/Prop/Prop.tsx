@@ -2,19 +2,20 @@ import type { PropsWithChildren } from "react";
 import { useState } from "react";
 
 import { Button } from "@thewaver/ss-components-react";
+import {
+    EMPTY_TEXT,
+    HINT_OFFSET,
+    HINT_PLACEMENT,
+    SINGLE_FIELD,
+} from "@thewaver/ss-playground/App/PageComponents/Prop/Prop.const";
 import * as styles from "@thewaver/ss-playground/App/PageComponents/Prop/Prop.css";
 
 import { PagePropHintBadge } from "../../StyledComponents/PropHintBadge/PropHintBadge";
 import { PageTooltipContent } from "../../StyledComponents/TooltipContent/TooltipContent";
-import type { FieldDefaultRegistry } from "../Field/Field.context";
-import { FieldDefaultProvider } from "../Field/Field.context";
+import type { FieldDefaultRegistry } from "../Field/FieldReact.context";
+import { FieldDefaultProvider } from "../Field/FieldReact.context";
 import { usePropsPanelContext } from "../PropsPanel/PropsPanel.context";
 import type { PagePropProps } from "./Prop.types";
-
-const HINT_PLACEMENT = { x: "center", y: "top_out" } as const;
-const HINT_OFFSET = { x: 0, y: 10 };
-const EMPTY_TEXT = "";
-const SINGLE_FIELD = 1;
 
 const toDefaultText = (value: unknown) => {
     if (typeof value === "boolean") return value ? "on" : "off";

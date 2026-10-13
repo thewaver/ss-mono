@@ -5,8 +5,8 @@ import { TOOLTIP_HOVER_DELAY_MS } from "@thewaver/ss-playground/App/StyledCompon
 import { PageButtonContent } from "../../../StyledComponents/ButtonContent/ButtonContent";
 import { PageMenuTriggerContent } from "../../../StyledComponents/MenuTriggerContent/MenuTriggerContent";
 import { PageTooltipContent } from "../../../StyledComponents/TooltipContent/TooltipContent";
-import { renderToolbarOverflowItem, renderToolbarPopup } from "../ToolbarPage.const";
-import type { ToolbarExampleProps } from "../ToolbarPage.types";
+import { renderToolbarOverflowItem, renderToolbarPopup } from "../ToolbarPageReact.const";
+import type { ToolbarExampleProps } from "../ToolbarPageReact.types";
 
 const PLACEMENT: AnchorPlacement = { x: "center", y: "top_out" };
 

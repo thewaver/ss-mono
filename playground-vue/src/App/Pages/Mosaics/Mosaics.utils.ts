@@ -3,7 +3,7 @@ import { computed, shallowRef } from "vue";
 import { MOSAIC_DEFAULTS, type MosaicSizeAnchor } from "@thewaver/ss-components-vue";
 import { MosaicKnobs } from "@thewaver/ss-playground/App/Knobs/Mosaics.const";
 
-import type { MosaicsControls } from "./Mosaics.types";
+import type { MosaicsControls } from "./MosaicsVue.types";
 
 export const useMosaicsControls = (): MosaicsControls => {
     const itemCount = shallowRef(MosaicKnobs.STARTING_ITEM_COUNT);

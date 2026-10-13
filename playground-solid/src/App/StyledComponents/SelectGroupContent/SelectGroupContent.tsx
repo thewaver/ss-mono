@@ -3,13 +3,14 @@ import { Show } from "solid-js";
 
 import { access } from "@thewaver/ss-components-solid";
 import type { SelectGroupFlags } from "@thewaver/ss-components-solid";
+import {
+    CHECKED_MARK,
+    MIXED_MARK,
+} from "@thewaver/ss-playground/App/StyledComponents/SelectGroupContent/SelectGroupContent.const";
 import * as styles from "@thewaver/ss-playground/App/StyledComponents/SelectGroupContent/SelectGroupContent.css";
 
 import { useLayerClass } from "../Layer/Layer.context";
-import type { SelectGroupContentProps } from "./SelectGroupContent.types";
-
-const CHECKED_MARK = "✓";
-const MIXED_MARK = "–";
+import type { SelectGroupContentProps } from "./SelectGroupContentSolid.types";
 
 export const PageSelectGroupContent = (props: ParentProps<SelectGroupContentProps>) => {
     const getLayerClass = useLayerClass();

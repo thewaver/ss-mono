@@ -14,7 +14,7 @@ import {
     PageTabHexFloater,
     PageTabHexHighlightFloater,
 } from "../../../StyledComponents/TabContent/TabContent";
-import type { TabsExampleProps } from "../TabsPage.types";
+import type { TabsExampleProps } from "../TabsPageSolid.types";
 
 const HONEYCOMB_DEFS: HoneycombDefs = { perRow: 3, gapRatio: 0 };
 

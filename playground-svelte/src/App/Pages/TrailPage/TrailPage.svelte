@@ -13,11 +13,12 @@
     import ScrollExample from "./Examples/Scroll.svelte";
     import TimelineExample from "./Examples/Timeline.svelte";
     import type { TrailExampleProps } from "./TrailPage.types";
-
-    const EXAMPLES_ROOT = "/src/App/Pages/TrailPage/Examples";
-
-    const PERCENT = 100;
-    const HALF_WAY = 0.5;
+    import {
+    EXAMPLE_NAMES,
+    EXAMPLES_ROOT,
+    HALF_WAY,
+    PERCENT,
+} from "@thewaver/ss-playground/App/Pages/TrailPage/TrailPage.const";
 
     let durationMs = $state(TRAIL_DEFAULTS.durationMs);
     let isLooping = $state(TrailKnobs.STARTING_IS_LOOPING);
@@ -44,7 +45,7 @@
     const examples: ExampleDefs[] = [
         {
             key: "circuit",
-            name: "Circuit",
+            name: EXAMPLE_NAMES.circuit,
             readout: () =>
                 `${getPercent(circuitProgress)} round the loop, ${circuitPlaying ? "running" : "stopped"} — the playback signal starts and stops it, and the controller sends it back to the start`,
             component: circuitExample,
@@ -52,7 +53,7 @@
         },
         {
             key: "timeline",
-            name: "Timeline",
+            name: EXAMPLE_NAMES.timeline,
             readout: () =>
                 `${getPercent(timelineProgress)} along the path — nothing is running, the slider is what puts the marker there`,
             component: timelineExample,
@@ -60,7 +61,7 @@
         },
         {
             key: "convoy",
-            name: "Convoy",
+            name: EXAMPLE_NAMES.convoy,
             readout: () =>
                 `${getPercent(convoyProgress)} of the run, ${convoyPlaying ? "running" : "stopped"} — four travelers on one clock, each a share of the path behind the one in front; with looping off they wait at the start and the run ends when the last one arrives`,
             component: convoyExample,
@@ -68,7 +69,7 @@
         },
         {
             key: "scroll",
-            name: "Driven by scrolling",
+            name: EXAMPLE_NAMES.scroll,
             readout: () =>
                 getPrefersReducedMotion()
                     ? "reduced motion is on, so the marker stays at the start instead of following the scroll"

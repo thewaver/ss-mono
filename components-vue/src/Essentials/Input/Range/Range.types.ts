@@ -1,4 +1,4 @@
-import type { RangeCbs, RangeRenderProps, RangeState, RangeValues } from "@thewaver/ss-components";
+import type { BaseRangeValues, RangeCbs, RangeRenderProps, RangeValues } from "@thewaver/ss-components";
 
 import type {
     InteractionControlProps,
@@ -9,14 +9,9 @@ import type {
 
 export type { RangeCbs };
 
-type RangeRequiredState = Required<
-    Omit<RangeState, "name" | "ariaLabel" | "thumbLabels" | "computeValueText" | "computeValueAtPoint" | "isRequired">
->;
+type RangeRequiredState = Required<Omit<BaseRangeValues, "name" | "ariaLabel" | "thumbLabels" | "isRequired">>;
 
-type RangeOptionalState = Pick<
-    RangeState,
-    "name" | "ariaLabel" | "thumbLabels" | "computeValueText" | "computeValueAtPoint" | "isRequired"
->;
+type RangeOptionalState = Pick<BaseRangeValues, "name" | "ariaLabel" | "thumbLabels" | "isRequired">;
 
 export type RangeElementProps = RangeCbs &
     InteractionControlProps<RangeRenderProps> &
@@ -35,7 +30,7 @@ export type RangeElementProps = RangeCbs &
 export type RangeProps = Omit<InteractionWrapperProps<RangeRenderProps>, "extraFlags"> &
     RangeCbs &
     Pick<InteractionControlProps<RangeRenderProps>, "id"> &
-    RangeState & {
+    BaseRangeValues & {
         /** The value. It is the only thing that moves the thumb. Give this or `range`. */
         "value"?: number;
         /** Receives the value as the thumb moves, which is what `v-model:value` binds. */

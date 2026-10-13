@@ -11,7 +11,7 @@ export type { TimeInputMeridiem } from "./Essentials/Input/TimeInput/TimeInput.t
 export type { AudioSwitcherController } from "./Essentials/MediaSwitchers/AudioSwitcher/AudioSwitcher.types";
 export type { PaintedTextController } from "./Exotics/Text/PaintedText/PaintedText.types";
 export type { TypewriterController } from "./Exotics/Text/Typewriter/Typewriter.types";
-export type { BinarySwitchCbs, BinarySwitchState } from "./Primitives/BinarySwitch/BinarySwitch.types";
+export type { BinarySwitchCbs } from "./Primitives/BinarySwitch/BinarySwitch.types";
 export type { CarouselState } from "./Essentials/Carousel/Carousel.types";
 
 export * from "./Abstracts/Anchor/AnchorReact.utils";

@@ -26,3 +26,19 @@ export type IcicleCellState = {
     /** Whether the cell is still there once the current zoom settles, rather than on its way out. */
     isInView: boolean;
 };
+
+export type BaseIcicleValues<T> = {
+    /** Names the icicle for assistive technology. */
+    ariaLabel: string;
+    /** How many columns fit across the icicle: the one in view and the levels under it. */
+    columnCount?: number;
+    /** How long a zoom takes. `0` jumps straight to the new view, which is the route for reduced motion. */
+    zoomDurationMs?: number;
+    /**
+     * The whole tree. A leaf's height comes from its `weight` and a branch's from the total of its children, so a
+     * weight set on a branch is ignored. A child weighing nothing gets no cell.
+     */
+    root: IcicleNode<T>;
+};
+
+export type BaseIcicleProps<T> = BaseIcicleValues<T>;

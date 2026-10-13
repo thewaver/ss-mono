@@ -6,7 +6,7 @@ import * as styles from "@thewaver/ss-playground/App/Pages/Menus/WheelMenuPage/W
 
 import { PageLayer } from "../../../../PageComponents/Layer/Layer";
 import { PageMenuTriggerContent } from "../../../../StyledComponents/MenuTriggerContent/MenuTriggerContent";
-import type { WheelMenuExampleProps } from "../WheelMenuPage.types";
+import type { WheelMenuExampleProps } from "../WheelMenuPageReact.types";
 
 const HALF = 0.5;
 const SUBMENU_MARK = "›";

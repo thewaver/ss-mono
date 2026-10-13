@@ -1,5 +1,6 @@
-import type { DateValueWeekStart } from "@thewaver/ss-components";
-import { DateValueUtils } from "@thewaver/ss-components";
+import { DateValueUtils, type DateValueWeekStart } from "@thewaver/ss-components";
+
+import { CalendarKnobs } from "../../Knobs/Calendars.const";
 
 export const LOCALE = "en-GB";
 export const WEEKEND_DAYS = [0, 6];
@@ -19,3 +20,20 @@ export const WEEK_START_LABELS: Record<DateValueWeekStart, string> = {
     5: "Friday",
     6: "Saturday",
 };
+
+export const EXAMPLE_NAMES = {
+    default: "Default",
+    bounded: "Bounded",
+    weekdays: "Weekdays only",
+    rightToLeft: "In a right-to-left box",
+    monthPicker: "Month picker",
+    yearPicker: "Year picker",
+};
+
+export const CALENDAR_FIELD_WIDTH = 180;
+
+export const EXAMPLES_ROOT = "/src/App/Pages/CalendarPage/Examples";
+
+export const CALENDAR_IDS = DateValueUtils.getCalendarIds();
+
+export const WEEK_STARTS: DateValueWeekStart[] = [...CalendarKnobs.WEEK_STARTS];

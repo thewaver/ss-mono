@@ -1,16 +1,13 @@
 <script setup lang="ts">
 import type { TableSortDirection } from "@thewaver/ss-components-vue";
+import {
+    SORT_MARKERS,
+    UNSORTED_MARKER,
+} from "@thewaver/ss-playground/App/StyledComponents/TableContent/TableContent.const";
 import * as styles from "@thewaver/ss-playground/App/StyledComponents/TableContent/TableContent.css";
 
 import { useLayerClass } from "../Layer/Layer.context";
-import type { TableResizerProps } from "./TableContent.types";
-
-const UNSORTED_MARKER = "↕";
-
-const SORT_MARKERS: Record<TableSortDirection, string> = {
-    ascending: "▲",
-    descending: "▼",
-};
+import type { TableResizerProps } from "./TableContentVue.types";
 
 const getSortMarker = (direction: TableSortDirection | undefined) =>
     direction === undefined ? UNSORTED_MARKER : SORT_MARKERS[direction];

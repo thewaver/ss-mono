@@ -4,7 +4,7 @@
     import * as styles from "@thewaver/ss-playground/App/StyledComponents/NumberInputStepperContent/NumberInputStepperContent.css";
 
     import { getLayerClass } from "../Layer/Layer.context";
-    import type { NumberInputStepperContentProps } from "./NumberInputStepperContent.types";
+    import type { NumberInputStepperContentProps } from "./NumberInputStepperContentSvelte.types";
 
     let props: NumberInputStepperContentProps & { children?: Snippet } = $props();
 

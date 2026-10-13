@@ -3,6 +3,8 @@ import { createMemo, createSignal } from "solid-js";
 import { AUDIO_SWITCHER_DEFAULTS } from "@thewaver/ss-components-solid";
 import { AudioSwitcherKnobs } from "@thewaver/ss-playground/App/Knobs/AudioSwitchers.const";
 import {
+    EXAMPLES_ROOT,
+    EXAMPLE_NAMES,
     FIELD_WIDTH,
     PERCENT,
     TRACKS,
@@ -14,8 +16,6 @@ import { PageNumberField, PageSelectField } from "../../PageComponents/Field/Fie
 import { PageProp } from "../../PageComponents/Prop/Prop";
 import { PagePropsPanel } from "../../PageComponents/PropsPanel/PropsPanel";
 import { DefaultExample } from "./Examples/Default";
-
-const EXAMPLES_ROOT = "/src/App/Pages/AudioSwitcherPage/Examples";
 
 export const AudioSwitcherPage = () => {
     const [getCrossfadeMs, setCrossfadeMs] = createSignal(AudioSwitcherKnobs.STARTING_CROSSFADE_MS);
@@ -29,7 +29,7 @@ export const AudioSwitcherPage = () => {
     const getExamples = createMemo(() => [
         {
             key: "default",
-            name: "Crossfading between two loops",
+            name: EXAMPLE_NAMES.default,
             readout: () =>
                 `${getTrackName()} — ${playbackSignal[0]() ? "playing" : "stopped"}; nothing sounds until you ask, because a source arriving at mount does not start on its own — every switch after that does`,
             component: () => (

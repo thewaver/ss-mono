@@ -12,7 +12,7 @@ import PagePaginatorDialGap from "../../../StyledComponents/PaginatorContent/Pag
 import PagePaginatorDialPage from "../../../StyledComponents/PaginatorContent/PagePaginatorDialPage.vue";
 import PagePaginatorDialStep from "../../../StyledComponents/PaginatorContent/PagePaginatorDialStep.vue";
 import PagePaginatorPanel from "../../../StyledComponents/PaginatorContent/PagePaginatorPanel.vue";
-import type { PaginatorExampleProps } from "../PaginatorPage.types";
+import type { PaginatorExampleProps } from "../PaginatorPageVue.types";
 
 const DIAL_STEPS: PaginatorStep[] = ["first", "previous", "next", "last"];
 

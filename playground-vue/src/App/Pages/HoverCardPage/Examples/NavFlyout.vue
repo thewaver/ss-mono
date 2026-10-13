@@ -15,7 +15,7 @@ import { assignInlineVars } from "@vanilla-extract/dynamic";
 import PageLayer from "../../../PageComponents/Layer/Layer.vue";
 import PageNavMenuTrigger from "../../../StyledComponents/NavMenuContent/NavMenuContent.vue";
 import PagePopoverSurface from "../../../StyledComponents/PopoverSurface/PopoverSurface.vue";
-import type { NavFlyoutProps } from "../HoverCardPage.types";
+import type { NavFlyoutProps } from "../HoverCardPageVue.types";
 
 const FLYOUT_PLACEMENT: AnchorPlacement = { x: "left_in", y: "bottom_out" };
 const FLYOUT_OFFSET = { x: 0, y: 6 };

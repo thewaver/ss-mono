@@ -3,6 +3,8 @@ import { useState } from "react";
 import type { FileInputRejection } from "@thewaver/ss-components-react";
 import {
     DROP_ZONE_REASON_TEXT,
+    EXAMPLES_ROOT,
+    EXAMPLE_NAMES,
     MAX_ATTACHMENT_BYTES,
 } from "@thewaver/ss-playground/App/Pages/FileInputPage/FileInputPage.const";
 
@@ -16,8 +18,6 @@ import { LabeledExample } from "./Examples/Labeled";
 import { MultipleExample } from "./Examples/Multiple";
 import { ReachableExample } from "./Examples/Reachable";
 import { RejectingSetterExample } from "./Examples/RejectingSetter";
-
-const EXAMPLES_ROOT = "/src/App/Pages/FileInputPage/Examples";
 
 const describe = (files: File[]) => (files.length ? files.map((file) => file.name).join(", ") : "none");
 
@@ -43,28 +43,28 @@ export const FileInputPage = () => {
     const examples = [
         {
             key: "default",
-            name: "Default",
+            name: EXAMPLE_NAMES.default,
             readout: () => `files: ${describe(defaultState[0])}`,
             component: () => <DefaultExample files={defaultState} />,
             path: `${EXAMPLES_ROOT}/Default.tsx`,
         },
         {
             key: "multiple",
-            name: "Multiple",
+            name: EXAMPLE_NAMES.multiple,
             readout: () => `files: ${describe(multipleState[0])}`,
             component: () => <MultipleExample files={multipleState} />,
             path: `${EXAMPLES_ROOT}/Multiple.tsx`,
         },
         {
             key: "images",
-            name: "Accepting images only",
+            name: EXAMPLE_NAMES.images,
             readout: () => `files: ${describe(imagesState[0])} — accept is a filter, never a guarantee`,
             component: () => <ImagesExample files={imagesState} />,
             path: `${EXAMPLES_ROOT}/Images.tsx`,
         },
         {
             key: "rejectingSetter",
-            name: "Rejecting setter",
+            name: EXAMPLE_NAMES.rejectingSetter,
             readout: () =>
                 `files: ${describe(rejectingState[0])}${rejection ? ` — ${rejection}` : ` — anything over ${MAX_ATTACHMENT_BYTES} bytes is refused`}`,
             component: () => (
@@ -74,35 +74,35 @@ export const FileInputPage = () => {
         },
         {
             key: "disabled",
-            name: "Disabled",
+            name: EXAMPLE_NAMES.disabled,
             readout: () => `files: ${describe(disabledState[0])}`,
             component: () => <DisabledExample files={disabledState} />,
             path: `${EXAMPLES_ROOT}/Disabled.tsx`,
         },
         {
             key: "reachable",
-            name: "Disabled + reachable",
+            name: EXAMPLE_NAMES.reachable,
             readout: () => `files: ${describe(reachableState[0])}`,
             component: () => <ReachableExample files={reachableState} />,
             path: `${EXAMPLES_ROOT}/Reachable.tsx`,
         },
         {
             key: "errored",
-            name: "Error",
+            name: EXAMPLE_NAMES.errored,
             readout: () => `files: ${describe(erroredState[0])} — required, nothing picked yet`,
             component: () => <ErroredExample files={erroredState} />,
             path: `${EXAMPLES_ROOT}/Errored.tsx`,
         },
         {
             key: "label",
-            name: "In a Label",
+            name: EXAMPLE_NAMES.label,
             readout: () => `files: ${describe(labeledState[0])} — the caption opens the dialog`,
             component: () => <LabeledExample files={labeledState} />,
             path: `${EXAMPLES_ROOT}/Labeled.tsx`,
         },
         {
             key: "dropZone",
-            name: "Drop area with limits",
+            name: EXAMPLE_NAMES.dropZone,
             readout: () => `files: ${describe(dropZoneState[0])} — refused: ${describeRejections(dropZoneRejections)}`,
             component: () => <DropZoneExample files={dropZoneState} onRejectionsChange={setDropZoneRejections} />,
             path: `${EXAMPLES_ROOT}/DropZone.tsx`,

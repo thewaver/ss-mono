@@ -1,6 +1,10 @@
 import { createMemo, createSignal } from "solid-js";
 
-import { PALETTE } from "@thewaver/ss-playground/App/Pages/ColorInputPage/ColorInputPage.const";
+import {
+    EXAMPLES_ROOT,
+    EXAMPLE_NAMES,
+    PALETTE,
+} from "@thewaver/ss-playground/App/Pages/ColorInputPage/ColorInputPage.const";
 
 import { PageExamples } from "../../PageComponents/Examples/Examples";
 import { CompactExample } from "./Examples/Compact";
@@ -10,8 +14,6 @@ import { ErroredExample } from "./Examples/Errored";
 import { LabeledExample } from "./Examples/Labeled";
 import { ReachableExample } from "./Examples/Reachable";
 import { SnappingExample } from "./Examples/Snapping";
-
-const EXAMPLES_ROOT = "/src/App/Pages/ColorInputPage/Examples";
 
 export const ColorInputPage = () => {
     const defaultSignal = createSignal("#3366ff");
@@ -25,49 +27,49 @@ export const ColorInputPage = () => {
     const getExamples = createMemo(() => [
         {
             key: "default",
-            name: "Default",
+            name: EXAMPLE_NAMES.default,
             readout: () => `value: ${defaultSignal[0]()} — the swatch is the painter's, not the browser's`,
             component: () => <DefaultExample value={defaultSignal} />,
             path: `${EXAMPLES_ROOT}/Default.tsx`,
         },
         {
             key: "compact",
-            name: "Compact",
+            name: EXAMPLE_NAMES.compact,
             readout: () => `value: ${compactSignal[0]()} — swatch only, no hex readout`,
             component: () => <CompactExample value={compactSignal} />,
             path: `${EXAMPLES_ROOT}/Compact.tsx`,
         },
         {
             key: "snapping",
-            name: "Snapping setter",
+            name: EXAMPLE_NAMES.snapping,
             readout: () => `value: ${snappingSignal[0]()} — snapped to the nearest of four`,
             component: () => <SnappingExample value={snappingSignal} />,
             path: `${EXAMPLES_ROOT}/Snapping.tsx`,
         },
         {
             key: "disabled",
-            name: "Disabled",
+            name: EXAMPLE_NAMES.disabled,
             readout: () => `value: ${disabledSignal[0]()}`,
             component: () => <DisabledExample value={disabledSignal} />,
             path: `${EXAMPLES_ROOT}/Disabled.tsx`,
         },
         {
             key: "reachable",
-            name: "Disabled + reachable",
+            name: EXAMPLE_NAMES.reachable,
             readout: () => `value: ${reachableSignal[0]()}`,
             component: () => <ReachableExample value={reachableSignal} />,
             path: `${EXAMPLES_ROOT}/Reachable.tsx`,
         },
         {
             key: "errored",
-            name: "Error",
+            name: EXAMPLE_NAMES.errored,
             readout: () => `value: ${erroredSignal[0]()} — black is not a brand color`,
             component: () => <ErroredExample value={erroredSignal} />,
             path: `${EXAMPLES_ROOT}/Errored.tsx`,
         },
         {
             key: "label",
-            name: "In a Label",
+            name: EXAMPLE_NAMES.label,
             readout: () => `value: ${labeledSignal[0]()} — the caption opens the picker`,
             component: () => <LabeledExample value={labeledSignal} />,
             path: `${EXAMPLES_ROOT}/Labeled.tsx`,

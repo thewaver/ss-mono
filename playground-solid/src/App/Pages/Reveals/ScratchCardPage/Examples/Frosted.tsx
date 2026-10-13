@@ -7,7 +7,7 @@ import { CONTROL_GLYPHS } from "@thewaver/ss-playground/App/StyledComponents/Con
 
 import { PageMeasureBox } from "../../../../PageComponents/MeasureBox/MeasureBox";
 import { PageControlButtonContent } from "../../../../StyledComponents/ControlButtonContent/ControlButtonContent";
-import type { ScratchCardExampleProps } from "../ScratchCardPage.types";
+import type { ScratchCardExampleProps } from "../ScratchCardPageSolid.types";
 
 const CARD_WIDTH = 360;
 

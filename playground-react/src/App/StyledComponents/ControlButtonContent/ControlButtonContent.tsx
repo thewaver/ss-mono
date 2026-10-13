@@ -3,7 +3,7 @@ import type { PropsWithChildren } from "react";
 import * as styles from "@thewaver/ss-playground/App/StyledComponents/ControlButtonContent/ControlButtonContent.css";
 
 import { useLayerClass } from "../Layer/Layer.context";
-import type { ControlButtonContentProps } from "./ControlButtonContent.types";
+import type { ControlButtonContentProps } from "./ControlButtonContentReact.types";
 
 export const PageControlButtonContent = (props: PropsWithChildren<ControlButtonContentProps>) => {
     const layerClass = useLayerClass();

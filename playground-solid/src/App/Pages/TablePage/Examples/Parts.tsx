@@ -3,8 +3,8 @@ import { createMemo } from "solid-js";
 import { Table } from "@thewaver/ss-components-solid";
 import * as styles from "@thewaver/ss-playground/App/Pages/TablePage/TablePage.css";
 
-import { PARTS, createPartColumns } from "../TablePage.const";
 import type { TableExampleProps } from "../TablePage.types";
+import { PARTS, createPartColumns } from "../TablePageSolid.const";
 
 export const PartsExample = (props: TableExampleProps) => {
     const getColumns = createMemo(() => createPartColumns({ isResizable: false }));

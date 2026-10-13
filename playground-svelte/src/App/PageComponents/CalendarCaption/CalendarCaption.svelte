@@ -12,13 +12,14 @@
     import PageNumberField from "../Field/PageNumberField.svelte";
     import PageSelectField from "../Field/PageSelectField.svelte";
     import type { PageCalendarCaptionProps } from "./CalendarCaption.types";
-
-    const MONTH_STEP = 1;
-    const MONTH_FIELD_WIDTH = 122;
-    const YEAR_FIELD_WIDTH = 80;
-    const YEAR_SETTLE_MS = 300;
-    const TITLE_OPTIONS: Intl.DateTimeFormatOptions = { month: "long", year: "numeric" };
-    const PAST_ERA_TITLE_OPTIONS: Intl.DateTimeFormatOptions = { ...TITLE_OPTIONS, era: "short" };
+    import {
+        MONTH_FIELD_WIDTH,
+        MONTH_STEP,
+        PAST_ERA_TITLE_OPTIONS,
+        TITLE_OPTIONS,
+        YEAR_FIELD_WIDTH,
+        YEAR_SETTLE_MS,
+    } from "@thewaver/ss-playground/App/PageComponents/CalendarCaption/CalendarCaption.const";
 
     let props: PageCalendarCaptionProps = $props();
 

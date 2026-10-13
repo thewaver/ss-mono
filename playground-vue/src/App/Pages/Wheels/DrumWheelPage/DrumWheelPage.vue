@@ -1,14 +1,17 @@
 <script setup lang="ts">
 import { shallowRef } from "vue";
 
+import {
+    EXAMPLES_ROOT,
+    EXAMPLE_NAMES,
+} from "@thewaver/ss-playground/App/Pages/Wheels/DrumWheelPage/DrumWheelPage.const";
+
 import type { ExampleDefs } from "../../../PageComponents/Examples/Examples.types";
 import PageExamples from "../../../PageComponents/Examples/PageExamples.vue";
 import { useWheelsControls } from "../Wheels.utils";
 import PageWheelsPanel from "../WheelsPanel.vue";
 import OverExample from "./Examples/Over.vue";
 import SidewaysExample from "./Examples/Sideways.vue";
-
-const EXAMPLES_ROOT = "/src/App/Pages/Wheels/DrumWheelPage/Examples";
 
 const controls = useWheelsControls();
 
@@ -24,13 +27,13 @@ const getReadout = (markedIndex: number, settledIndex: number) =>
 const examples: ExampleDefs[] = [
     {
         key: "sideways",
-        name: "Turning sideways",
+        name: EXAMPLE_NAMES.sideways,
         readout: () => getReadout(sidewaysMarkedIndex.value, sidewaysIndex.value),
         path: `${EXAMPLES_ROOT}/Sideways.vue`,
     },
     {
         key: "reel",
-        name: "Turning over",
+        name: EXAMPLE_NAMES.reel,
         readout: () => getReadout(reelMarkedIndex.value, reelIndex.value),
         path: `${EXAMPLES_ROOT}/Over.vue`,
     },

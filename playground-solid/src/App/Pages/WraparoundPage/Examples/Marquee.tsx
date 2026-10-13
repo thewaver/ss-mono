@@ -6,7 +6,7 @@ import * as styles from "@thewaver/ss-playground/App/Pages/WraparoundPage/Wrapar
 import { CONTROL_GLYPHS } from "@thewaver/ss-playground/App/StyledComponents/ControlButtonContent/ControlButtonContent.const";
 
 import { PageControlButtonContent } from "../../../StyledComponents/ControlButtonContent/ControlButtonContent";
-import type { WraparoundMarqueeExampleProps } from "../WraparoundPage.types";
+import type { WraparoundMarqueeExampleProps } from "../WraparoundPageSolid.types";
 
 type Props = WraparoundMarqueeExampleProps;
 

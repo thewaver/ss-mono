@@ -9,8 +9,8 @@ import PageTextFieldContent, {
     computePageTextFieldTextStyle,
 } from "../../StyledComponents/TextFieldContent/TextFieldContent.vue";
 import PageTextFieldPlaceholder from "../../StyledComponents/TextFieldPlaceholder/TextFieldPlaceholder.vue";
-import { useFieldReset } from "./Field.context";
-import type { PageTextFieldProps } from "./Field.types";
+import { useFieldReset } from "./FieldVue.context";
+import type { PageTextFieldProps } from "./FieldVue.types";
 
 const props = defineProps<PageTextFieldProps>();
 

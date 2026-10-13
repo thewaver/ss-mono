@@ -9,7 +9,7 @@ import {
 } from "vue";
 
 import { ElementMosaicStyles, MosaicUtils } from "@thewaver/ss-components";
-import type { Size2d } from "@thewaver/ss-utils";
+import { ElementMosaicConst } from "@thewaver/ss-components/internal";
 
 import { ElementObserverVueUtils } from "../../../Abstracts/ElementObserver/ElementObserverVue.utils";
 import { Mosaic } from "../../../Primitives/Mosaic/Mosaic";
@@ -18,8 +18,6 @@ import { callSlot, declareProps } from "../../../Utils/propUtils";
 import { toElement } from "../../../Utils/refUtils";
 import type { SlotsContext } from "../../../Utils/typeUtils";
 import type { ElementMosaicProps, ElementMosaicSlots } from "./ElementMosaic.types";
-
-const EMPTY_SIZE: Size2d = { width: 0, height: 0 };
 
 export const ElementMosaic = defineComponent(
     <T,>(props: ElementMosaicProps<T>, { slots }: SlotsContext<ElementMosaicSlots<T>>) => {
@@ -41,7 +39,10 @@ export const ElementMosaic = defineComponent(
         const measuredSizes = ElementObserverVueUtils.useBorderBoxSizes(itemElements);
 
         const sizes = computed(() =>
-            Array.from({ length: itemCount.value }, (_, index) => measuredSizes.value[index] ?? EMPTY_SIZE),
+            Array.from(
+                { length: itemCount.value },
+                (_, index) => measuredSizes.value[index] ?? ElementMosaicConst.EMPTY_SIZE,
+            ),
         );
 
         const setItemElement = (index: number, target: Element | ComponentPublicInstance | null) => {

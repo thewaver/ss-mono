@@ -1,15 +1,7 @@
 import { type KeyboardEvent, useEffect, useLayoutEffect, useMemo, useRef, useState } from "react";
 
-import {
-    type InteractionSizing,
-    type MenuItemFlags,
-    type MenuItemKind,
-    type MenuTriggerRole,
-    MenuUtils,
-    TOOLBAR_DEFAULTS,
-    ToolbarStyles,
-    ToolbarUtils,
-} from "@thewaver/ss-components";
+import { type MenuItemFlags, MenuUtils, TOOLBAR_DEFAULTS, ToolbarStyles, ToolbarUtils } from "@thewaver/ss-components";
+import { PlacementConst, ToolbarConst } from "@thewaver/ss-components/internal";
 
 import { ElementObserverReactUtils } from "../../Abstracts/ElementObserver/ElementObserverReact.utils";
 import { NavigatorReactUtils } from "../../Abstracts/Navigator/NavigatorReact.utils";
@@ -26,13 +18,6 @@ import type {
     ToolbarMenusProps,
     ToolbarProps,
 } from "./Toolbar.types";
-
-const OVERFLOW_STOP = ToolbarUtils.OVERFLOW_STOP;
-const NO_RADIO_GROUP: never[] = [];
-const ROW_SIZING: InteractionSizing = "fit-content";
-const PLACED_SIZING: InteractionSizing = "fill";
-const PRESSED_ITEM_KIND: MenuItemKind = "checkbox";
-const WORD_ROLE: MenuTriggerRole = "menuitem";
 
 export const ToolbarComposite = <T,>(props: ToolbarCompositeProps<T>) => {
     const rootRef = useRef<HTMLDivElement | null>(null);
@@ -107,7 +92,7 @@ export const ToolbarComposite = <T,>(props: ToolbarCompositeProps<T>) => {
     const focusStop = (stop: number) => {
         setFocusedStop(stop);
 
-        if (stop === OVERFLOW_STOP) overflowRef.current?.focus();
+        if (stop === ToolbarConst.OVERFLOW_STOP) overflowRef.current?.focus();
         else itemElements[stop]?.focus();
     };
 
@@ -178,14 +163,19 @@ export const ToolbarComposite = <T,>(props: ToolbarCompositeProps<T>) => {
 
         if (pressedValuesState) {
             pressedValuesState[1](
-                MenuUtils.computeNextChecked(pressedValuesState[0], { value, kind: PRESSED_ITEM_KIND }, NO_RADIO_GROUP),
+                MenuUtils.computeNextChecked(
+                    pressedValuesState[0],
+                    { value, kind: ToolbarConst.PRESSED_ITEM_KIND },
+                    ToolbarConst.NO_RADIO_GROUP,
+                ),
             );
         }
 
         props.onActivate(value);
     };
 
-    const getSizingAt = (index: number) => (layout?.placements[index] === undefined ? ROW_SIZING : PLACED_SIZING);
+    const getSizingAt = (index: number) =>
+        layout?.placements[index] === undefined ? PlacementConst.ROW_SIZING : PlacementConst.PLACED_SIZING;
 
     const renderButton = (buttonProps: ToolbarButtonsProps<T>, action: ToolbarAction<T>, index: number) => (
         <InteractionWrapper
@@ -224,7 +214,7 @@ export const ToolbarComposite = <T,>(props: ToolbarCompositeProps<T>) => {
                 visibility={createStopVisibility(index)}
                 checked={menuProps.checked}
                 submenuOffset={menuProps.submenuOffset}
-                triggerRole={WORD_ROLE}
+                triggerRole={ToolbarConst.WORD_ROLE}
                 ref={(element) => setItemRef(index, element)}
                 renderContent={(flags) => menuProps.renderAction(word, flags)}
                 renderItem={menuProps.renderItem}
@@ -294,11 +284,11 @@ export const ToolbarComposite = <T,>(props: ToolbarCompositeProps<T>) => {
                 <Menu<T>
                     items={overflowItems}
                     ariaLabel={props.overflowAriaLabel}
-                    isTabbable={rovingStop === OVERFLOW_STOP}
-                    visibility={createStopVisibility(OVERFLOW_STOP)}
+                    isTabbable={rovingStop === ToolbarConst.OVERFLOW_STOP}
+                    visibility={createStopVisibility(ToolbarConst.OVERFLOW_STOP)}
                     checked={props.role === "menubar" ? props.checked : props.pressedValues}
                     submenuOffset={props.role === "menubar" ? props.submenuOffset : undefined}
-                    triggerRole={isMenubar ? WORD_ROLE : undefined}
+                    triggerRole={isMenubar ? ToolbarConst.WORD_ROLE : undefined}
                     ref={(element) => {
                         overflowRef.current = element;
                     }}

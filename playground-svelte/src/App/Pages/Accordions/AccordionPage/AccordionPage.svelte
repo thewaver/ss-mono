@@ -6,10 +6,11 @@
     import RowExample from "./Examples/Row.svelte";
     import ScrolledExample from "./Examples/Scrolled.svelte";
     import SectionsExample from "./Examples/Sections.svelte";
-
-    const EXAMPLES_ROOT = "/src/App/Pages/Accordions/AccordionPage/Examples";
-
-    const STARTING_EXTRA_LINES = 0;
+    import {
+    EXAMPLE_NAMES,
+    EXAMPLES_ROOT,
+    STARTING_EXTRA_LINES,
+} from "@thewaver/ss-playground/App/Pages/Accordions/AccordionPage/AccordionPage.const";
 
     let multiExpanded = $state.raw<string[]>(["Shipping"]);
     let singleExpanded = $state.raw<string[]>([]);
@@ -25,14 +26,14 @@
     const examples: ExampleDefs[] = [
         {
             key: "multi",
-            name: "Many open at once",
+            name: EXAMPLE_NAMES.multi,
             readout: () => `expanded: ${JSON.stringify(multiExpanded)}`,
             component: multiExample,
             path: `${EXAMPLES_ROOT}/Sections.svelte`,
         },
         {
             key: "unheld",
-            name: "Nobody holding the state",
+            name: EXAMPLE_NAMES.unheld,
             readout: () =>
                 "no signal passed — the accordion keeps which sections are open itself, so the page has nothing to show here",
             component: unheldExample,
@@ -40,14 +41,14 @@
         },
         {
             key: "single",
-            name: "One at a time",
+            name: EXAMPLE_NAMES.single,
             readout: () => `expanded: ${JSON.stringify(singleExpanded)} — the component keeps at most one`,
             component: singleExample,
             path: `${EXAMPLES_ROOT}/Sections.svelte`,
         },
         {
             key: "required",
-            name: "One at a time, and always one",
+            name: EXAMPLE_NAMES.required,
             readout: () =>
                 `expanded: ${JSON.stringify(requiredExpanded)} — pressing the open header does nothing, because the only way out of a section is into another one`,
             component: requiredExample,
@@ -55,14 +56,14 @@
         },
         {
             key: "growing",
-            name: "Content that grows while open",
+            name: EXAMPLE_NAMES.growing,
             readout: () => `extra lines: ${extraLines} — the panel follows its content without reopening`,
             component: growingExample,
             path: `${EXAMPLES_ROOT}/Growing.svelte`,
         },
         {
             key: "deferred",
-            name: "Panels built on first open",
+            name: EXAMPLE_NAMES.deferred,
             readout: () =>
                 `built: ${JSON.stringify(built)} — a section's content is not in the page until it is opened once, and stays there afterwards`,
             component: deferredExample,
@@ -70,7 +71,7 @@
         },
         {
             key: "scrolled",
-            name: "Inside a box that scrolls",
+            name: EXAMPLE_NAMES.scrolled,
             readout: () =>
                 `expanded: ${JSON.stringify(scrolledExpanded)} — opening a section below the fold brings it up`,
             component: scrolledExample,
@@ -78,7 +79,7 @@
         },
         {
             key: "row",
-            name: "Side by side",
+            name: EXAMPLE_NAMES.row,
             span: 2,
             readout: () =>
                 `expanded: ${JSON.stringify(rowExpanded)} — the panels sit in a row and open in width; the left and right arrows walk the headers, and the new panel's content slides in from the side the person moved toward`,

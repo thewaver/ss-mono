@@ -4,16 +4,15 @@
     import * as styles from "@thewaver/ss-playground/App/Pages/CellAnimationPage/CellAnimationPage.css";
     import type { Size2d } from "@thewaver/ss-utils";
 
-    import { CellAnimationKnobs } from "../../Knobs/CellAnimations.const";
+    import { CellAnimationKnobs } from "@thewaver/ss-playground/App/Knobs/CellAnimations.const";
     import PageExampleKnobs from "../../PageComponents/ExampleKnobs/PageExampleKnobs.svelte";
     import PageSelectField from "../../PageComponents/Field/PageSelectField.svelte";
     import PageMeasureBox from "../../PageComponents/MeasureBox/MeasureBox.svelte";
     import PageProp from "../../PageComponents/Prop/Prop.svelte";
-    import { SVGDefsSources } from "../../PageComponents/SVGDefsSources/SVGDefsSources.const";
+    import { SVGDefsSources } from "../../PageComponents/SVGDefsSources/SVGDefsSourcesSvelte.const";
     import type { CellAnimationExampleProps } from "./CellAnimationPage.types";
     import DefaultExample from "./Examples/Default.svelte";
-
-    const IMAGE_CONTAINER_SIZE = 480;
+    import { IMAGE_CONTAINER_SIZE } from "@thewaver/ss-playground/App/Pages/CellAnimationPage/CellAnimationPage.const";
 
     const computeContainerWidth = (size: Size2d) =>
         (IMAGE_CONTAINER_SIZE * size.width) / Math.max(size.width, size.height);

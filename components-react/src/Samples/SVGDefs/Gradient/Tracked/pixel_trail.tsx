@@ -7,6 +7,7 @@ import {
     TrackedGradientDefaults,
     type TrackedGradientElementDefs,
 } from "@thewaver/ss-components";
+import { PixelTrailConst, TrackedGradientSampleConst } from "@thewaver/ss-components/internal";
 import type { Index2d, Point2d, Size2d } from "@thewaver/ss-utils";
 
 import { PointerTrackerReactUtils } from "../../../../Abstracts/PointerTracker/PointerTrackerReact.utils";
@@ -34,17 +35,13 @@ type PixelTrailProps = {
     opts?: GradientPixelTrailSampleOpts;
 };
 
-const STAMP_COUNT = 48;
-const GRACE_MS = 100;
-const NO_FADE = 0;
-const EMPTY_STAMPS: (PixelTrailStamp | undefined)[] = Array.from({ length: STAMP_COUNT }, () => undefined);
+const EMPTY_STAMPS: (PixelTrailStamp | undefined)[] = Array.from(
+    { length: PixelTrailConst.STAMP_COUNT },
+    () => undefined,
+);
 const EMPTY_SQUARE = { x: 0, y: 0, width: 0, height: 0 };
 
-const CYCLING_DEFAULTS = TrackedGradientDefaults.PIXEL_TRAIL_CYCLING_DEFAULTS;
-
-const RENDERED_ELSEWHERE = () => undefined;
-
-const clock = SVGDefsUtils.createClock(GRACE_MS);
+const clock = SVGDefsUtils.createClock(PixelTrailConst.GRACE_MS);
 
 const getGradientId = (id: string, index: number) => `gradient${index + 1}-${id}`;
 const getClipId = (id: string, index: number) => `clip${index + 1}-${id}`;
@@ -74,8 +71,8 @@ const PixelTrail = (props: PixelTrailProps) => {
     const squareSize = props.opts?.squareSize ?? props.defaults.squareSize;
     const squareAlpha = props.opts?.squareAlpha ?? props.defaults.squareAlpha;
     const trailMs = props.opts?.trailMs ?? props.defaults.trailMs;
-    const cycleMs = props.opts?.cycleMs ?? CYCLING_DEFAULTS.cycleMs;
-    const ageColorSpan = props.opts?.ageColorSpan ?? CYCLING_DEFAULTS.ageColorSpan;
+    const cycleMs = props.opts?.cycleMs ?? PixelTrailConst.CYCLING_DEFAULTS.cycleMs;
+    const ageColorSpan = props.opts?.ageColorSpan ?? PixelTrailConst.CYCLING_DEFAULTS.ageColorSpan;
     const size = props.defs.getSize();
 
     const [motion] = useState<PixelTrailMotion>(() => ({
@@ -86,7 +83,8 @@ const PixelTrail = (props: PixelTrailProps) => {
 
     useEffect(() => {
         const isLaying =
-            getIsInside(reading.boxRatio) && SVGDefsUtils.getPointerFade(reading, isPointerPresent) > NO_FADE;
+            getIsInside(reading.boxRatio) &&
+            SVGDefsUtils.getPointerFade(reading, isPointerPresent) > TrackedGradientSampleConst.NO_FADE;
         const point = { x: reading.boxRatio.x * size.width, y: reading.boxRatio.y * size.height };
         const laid = isLaying ? SVGDefsUtils.computePixelTrailCells(motion.lastPoint, point, squareSize) : [];
 
@@ -96,7 +94,7 @@ const PixelTrail = (props: PixelTrailProps) => {
 
         for (const cell of laid) {
             motion.stamps[motion.nextSlot] = { ...cell, bornMs: frameMs };
-            motion.nextSlot = (motion.nextSlot + 1) % STAMP_COUNT;
+            motion.nextSlot = (motion.nextSlot + 1) % PixelTrailConst.STAMP_COUNT;
         }
     }, [frameMs, reading, isPointerPresent]);
 
@@ -151,7 +149,7 @@ export const createPixelTrailSample =
 
             return [
                 { color: SVGDefsUtils.getBaseBorderColor(defs) },
-                ...Array.from({ length: STAMP_COUNT }, (_unused, index) => ({
+                ...Array.from({ length: PixelTrailConst.STAMP_COUNT }, (_unused, index) => ({
                     gradientOrPattern: {
                         id: getGradientId(id, index),
                         renderDefsElement:
@@ -166,11 +164,11 @@ export const createPixelTrailSample =
                                           opts={opts}
                                       />
                                   )
-                                : RENDERED_ELSEWHERE,
+                                : TrackedGradientSampleConst.RENDERED_ELSEWHERE,
                     },
                     clipPath: {
                         id: getClipId(id, index),
-                        renderDefsElement: RENDERED_ELSEWHERE,
+                        renderDefsElement: TrackedGradientSampleConst.RENDERED_ELSEWHERE,
                     },
                     filter: index === 0 ? sharedBlur : sharedBlurRef,
                 })),

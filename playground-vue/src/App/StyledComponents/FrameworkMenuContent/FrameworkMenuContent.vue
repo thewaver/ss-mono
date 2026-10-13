@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import * as styles from "@thewaver/ss-playground/App/StyledComponents/FrameworkMenuContent/FrameworkMenuContent.css";
 
-import type { FrameworkMenuTriggerProps } from "./FrameworkMenuContent.types";
+import type { FrameworkMenuTriggerProps } from "./FrameworkMenuContentVue.types";
 
 defineProps<FrameworkMenuTriggerProps>();
 </script>

@@ -1,31 +1,23 @@
 <script setup lang="ts">
 import { computed } from "vue";
 
-import type { PartialGlassDefs } from "@thewaver/ss-components-vue";
 import { GlassSurface, Shape } from "@thewaver/ss-components-vue";
 import { TooltipKnobs } from "@thewaver/ss-playground/App/Knobs/Tooltips.const";
 import {
+    BORDER_RADII,
+    GLASS_DEFS,
+    JOIN_RADII,
     TOOLTIP_ARROW_TEMPLATES,
     type TooltipArrow,
 } from "@thewaver/ss-playground/App/StyledComponents/TooltipContent/TooltipContent.const";
 import * as styles from "@thewaver/ss-playground/App/StyledComponents/TooltipContent/TooltipContent.css";
-import { BORDER_RADIUS_FULL } from "@thewaver/ss-playground/App/Theme.const";
 import { themeVars } from "@thewaver/ss-playground/App/Theme.css";
-import { CSSUtils, ShapeConst, ShapeUtils, type Size2d } from "@thewaver/ss-utils";
+import { ShapeConst, ShapeUtils, type Size2d } from "@thewaver/ss-utils";
 
 import PageLayer from "../../PageComponents/Layer/Layer.vue";
 import type { TooltipContentProps } from "./TooltipContent.types";
 
 type ArrowKind = Exclude<TooltipArrow, "none">;
-
-const BORDER_RADII = CSSUtils.spreadRadius(BORDER_RADIUS_FULL);
-
-const JOIN_RADII = [BORDER_RADIUS_FULL];
-
-const GLASS_DEFS: PartialGlassDefs = {
-    tint: { color: themeVars.color.surface.dark, opacity: 1 },
-    sheen: { specularConstant: 0 },
-};
 
 const props = defineProps<TooltipContentProps>();
 

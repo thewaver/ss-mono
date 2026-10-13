@@ -2,8 +2,8 @@ import { Tree } from "@thewaver/ss-components-react";
 
 import { renderPageHighlightFloater } from "../../../StyledComponents/GlideFloater/GlideFloater";
 import { PageTreeNodeContent } from "../../../StyledComponents/TreeNodeContent/TreeNodeContent";
-import { ASSETS } from "../TreePage.const";
 import type { TreeRecordExampleProps } from "../TreePage.types";
+import { ASSETS } from "../TreePageReact.const";
 
 type Props = TreeRecordExampleProps;
 

@@ -3,6 +3,15 @@ import { createMemo, createSignal } from "solid-js";
 import { Button } from "@thewaver/ss-components-solid";
 import type { Step } from "@thewaver/ss-components-solid";
 import { StepperKnobs } from "@thewaver/ss-playground/App/Knobs/Steppers.const";
+import { STATE_WORDS } from "@thewaver/ss-playground/App/Pages/StepperPage/StepperPage.const";
+import {
+    EXAMPLES_ROOT,
+    EXAMPLE_NAMES,
+    STARTING_DETAILED,
+    STARTING_FAILED,
+    STARTING_LINEAR,
+    STARTING_STACKED,
+} from "@thewaver/ss-playground/App/Pages/StepperPage/StepperPage.const";
 import { LABELS, ORDER } from "@thewaver/ss-playground/App/Pages/StepperPage/StepperSteps.const";
 import type { StepValue } from "@thewaver/ss-playground/App/Pages/StepperPage/StepperSteps.types";
 
@@ -11,20 +20,13 @@ import { PageCheckField } from "../../PageComponents/Field/Field";
 import { PageProp } from "../../PageComponents/Prop/Prop";
 import { PagePropsPanel } from "../../PageComponents/PropsPanel/PropsPanel";
 import { PageButtonContent } from "../../StyledComponents/ButtonContent/ButtonContent";
-import type { PageStepState } from "../../StyledComponents/StepContent/StepContent.types";
+import type { PageStepState } from "../../StyledComponents/StepContent/StepContentSolid.types";
 import { ArcExample } from "./Examples/Arc";
 import { BareExample } from "./Examples/Bare";
 import { DetailedExample } from "./Examples/Detailed";
 import { FailedExample } from "./Examples/Failed";
 import { LinearExample } from "./Examples/Linear";
 import { StackedExample } from "./Examples/Stacked";
-import { STATE_WORDS } from "./StepperPage.const";
-
-const STARTING_LINEAR: StepValue = "address";
-const STARTING_FAILED: StepValue = "payment";
-const STARTING_STACKED: StepValue = "address";
-const STARTING_DETAILED: StepValue = "payment";
-const EXAMPLES_ROOT = "/src/App/Pages/StepperPage/Examples";
 
 export const StepperPage = () => {
     const [getIsFreeNavigation, setIsFreeNavigation] = createSignal(StepperKnobs.STARTING_IS_FREE_NAVIGATION);
@@ -69,7 +71,7 @@ export const StepperPage = () => {
     const getExamples = createMemo(() => [
         {
             key: "stacked",
-            name: "Stacked",
+            name: EXAMPLE_NAMES.stacked,
             readout: () => `current: ${getStackedCurrent()} — the same steps down the page`,
             component: () => (
                 <StackedExample
@@ -83,7 +85,7 @@ export const StepperPage = () => {
         },
         {
             key: "detailed",
-            name: "Steps that carry their own content",
+            name: EXAMPLE_NAMES.detailed,
             readout: () =>
                 `current: ${getDetailedCurrent()} — each step holds a body beside the connector, so the line runs past the content rather than stopping at it`,
             component: () => (
@@ -98,7 +100,7 @@ export const StepperPage = () => {
         },
         {
             key: "linear",
-            name: "Linear",
+            name: EXAMPLE_NAMES.linear,
             readout: () =>
                 `current: ${getLinearCurrent()} — only the steps behind you can be pressed, unless free navigation is on`,
             component: () => (
@@ -113,7 +115,7 @@ export const StepperPage = () => {
         },
         {
             key: "failed",
-            name: "A step that failed",
+            name: EXAMPLE_NAMES.failed,
             readout: () =>
                 `current: ${getFailedCurrent()} — the failed step is reachable by keyboard so its tooltip can be read, and its name carries the state as words`,
             component: () => (
@@ -128,7 +130,7 @@ export const StepperPage = () => {
         },
         {
             key: "bare",
-            name: "No connector",
+            name: EXAMPLE_NAMES.bare,
             readout: () => "the connector slot is optional, so a bare strip renders nothing between the steps",
             component: () => (
                 <BareExample
@@ -143,7 +145,7 @@ export const StepperPage = () => {
         {
             key: "arc",
             span: 2,
-            name: "The same steps, bent along an arc",
+            name: EXAMPLE_NAMES.arc,
             readout: () =>
                 `current: ${getArcCurrent()} — one layout function, and the run between two steps follows the curve they sit on rather than cutting across it`,
             component: () => (

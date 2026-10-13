@@ -4,8 +4,8 @@ import { renderPageHighlightFloater } from "../../../StyledComponents/GlideFloat
 import { PageSelectClear } from "../../../StyledComponents/SelectClear/SelectClear";
 import { PageSelectContent } from "../../../StyledComponents/SelectContent/SelectContent";
 import { PageSelectOptionContent } from "../../../StyledComponents/SelectOptionContent/SelectOptionContent";
-import { COUNTRIES, PLACEHOLDER, QUERY_PADDING, renderSelectPopup } from "../SelectPage.const";
 import type { SelectClearableExampleProps } from "../SelectPage.types";
+import { COUNTRIES, PLACEHOLDER, QUERY_PADDING, renderSelectPopup } from "../SelectPageReact.const";
 
 type Props = SelectClearableExampleProps;
 

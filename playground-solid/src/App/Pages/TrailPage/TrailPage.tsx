@@ -2,6 +2,12 @@ import { createMemo, createSignal } from "solid-js";
 
 import { MediaQueryMonitorSolidUtils, TRAIL_DEFAULTS } from "@thewaver/ss-components-solid";
 import { TrailKnobs } from "@thewaver/ss-playground/App/Knobs/Trails.const";
+import {
+    EXAMPLES_ROOT,
+    EXAMPLE_NAMES,
+    HALF_WAY,
+    PERCENT,
+} from "@thewaver/ss-playground/App/Pages/TrailPage/TrailPage.const";
 
 import { PageExamples } from "../../PageComponents/Examples/Examples";
 import { PageCheckField, PageNumberField } from "../../PageComponents/Field/Field";
@@ -12,11 +18,6 @@ import { ConvoyExample } from "./Examples/Convoy";
 import { ScrollExample } from "./Examples/Scroll";
 import { TimelineExample } from "./Examples/Timeline";
 import type { TrailExampleProps } from "./TrailPage.types";
-
-const EXAMPLES_ROOT = "/src/App/Pages/TrailPage/Examples";
-
-const PERCENT = 100;
-const HALF_WAY = 0.5;
 
 export const TrailPage = () => {
     const [getDurationMs, setDurationMs] = createSignal(TRAIL_DEFAULTS.durationMs);
@@ -45,7 +46,7 @@ export const TrailPage = () => {
         return [
             {
                 key: "circuit",
-                name: "Circuit",
+                name: EXAMPLE_NAMES.circuit,
                 readout: () =>
                     `${getPercent(circuitProgressSignal[0]())} round the loop, ${circuitPlayingSignal[0]() ? "running" : "stopped"} — the playback signal starts and stops it, and the controller sends it back to the start`,
                 component: () => (
@@ -55,7 +56,7 @@ export const TrailPage = () => {
             },
             {
                 key: "timeline",
-                name: "Timeline",
+                name: EXAMPLE_NAMES.timeline,
                 readout: () =>
                     `${getPercent(timelineProgressSignal[0]())} along the path — nothing is running, the slider is what puts the marker there`,
                 component: () => (
@@ -69,7 +70,7 @@ export const TrailPage = () => {
             },
             {
                 key: "convoy",
-                name: "Convoy",
+                name: EXAMPLE_NAMES.convoy,
                 readout: () =>
                     `${getPercent(convoyProgressSignal[0]())} of the run, ${convoyPlayingSignal[0]() ? "running" : "stopped"} — four travelers on one clock, each a share of the path behind the one in front; with looping off they wait at the start and the run ends when the last one arrives`,
                 component: () => (
@@ -79,7 +80,7 @@ export const TrailPage = () => {
             },
             {
                 key: "scroll",
-                name: "Driven by scrolling",
+                name: EXAMPLE_NAMES.scroll,
                 readout: () =>
                     getPrefersReducedMotion()
                         ? "reduced motion is on, so the marker stays at the start instead of following the scroll"

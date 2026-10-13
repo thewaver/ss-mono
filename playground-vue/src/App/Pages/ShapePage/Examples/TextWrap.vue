@@ -5,8 +5,8 @@ import { Shape } from "@thewaver/ss-components-vue";
 import * as styles from "@thewaver/ss-playground/App/Pages/ShapePage/ShapePage.css";
 import { ShapeConst, type Size2d } from "@thewaver/ss-utils";
 
-import { computeShapeFillDefs, computeShapeStrokeDefs } from "../ShapePage.const";
 import type { ShapeExampleProps } from "../ShapePage.types";
+import { computeShapeFillDefs, computeShapeStrokeDefs } from "../ShapePageVue.const";
 
 const FLOAT_SIZE = 256;
 

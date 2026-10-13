@@ -1,9 +1,9 @@
 import type { RollerFace } from "@thewaver/ss-components";
 import type { Point3d } from "@thewaver/ss-utils";
 
-import type { AccessorProps, MaybeAccessor, SignalSource } from "../../Utils/typeUtils";
+import type { AccessorValues, SignalSource } from "../../Utils/typeUtils";
 
-export type RollerDefs = AccessorProps<{
+export type RollerDefs = AccessorValues<{
     faces: RollerFace[];
     radius: number;
     rollDurationMs?: number;
@@ -13,11 +13,11 @@ export type RollerDefs = AccessorProps<{
     momentumMs?: number;
     driftAxis?: Point3d;
     isMovable?: boolean;
+    idleDelayMs?: number;
+}> & {
     computeRollTarget?: () => number | Promise<number>;
     computeFaceLabel: (index: number, faceCount: number) => string;
     targetFace?: SignalSource<number>;
     autoSpin?: SignalSource<boolean>;
     onRollEnd?: (index: number) => void;
-}> & {
-    idleDelayMs?: MaybeAccessor<number | undefined>;
 };

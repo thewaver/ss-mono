@@ -4,8 +4,8 @@ import { useId } from "vue";
 import { PaintedText } from "@thewaver/ss-components-vue";
 import type { Size2d } from "@thewaver/ss-utils";
 
-import { computeSampleDefs } from "../PaintedTextPage.const";
-import type { PaintedTextExampleProps } from "../PaintedTextPage.types";
+import { computeSampleDefs } from "../PaintedTextPageVue.const";
+import type { PaintedTextExampleProps } from "../PaintedTextPageVue.types";
 
 type Props = PaintedTextExampleProps & {
     fontSize: number;

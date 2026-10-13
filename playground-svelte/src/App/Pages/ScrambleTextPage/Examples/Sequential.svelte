@@ -7,7 +7,7 @@
 
     import PageMeasureBox from "../../../PageComponents/MeasureBox/MeasureBox.svelte";
     import PageControlButtonContent from "../../../StyledComponents/ControlButtonContent/ControlButtonContent.svelte";
-    import type { ScrambleTextExampleProps } from "../ScrambleTextPage.types";
+    import type { ScrambleTextExampleProps } from "../ScrambleTextPageSvelte.types";
 
     const LINE = "DECRYPTING PAYLOAD FROM THE ARCHIVE";
     const BOX_WIDTH = 320;

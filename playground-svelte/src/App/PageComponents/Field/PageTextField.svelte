@@ -10,8 +10,8 @@
         computePageTextFieldTextStyle,
     } from "../../StyledComponents/TextFieldContent/TextFieldContent.svelte";
     import PageTextFieldPlaceholder from "../../StyledComponents/TextFieldPlaceholder/TextFieldPlaceholder.svelte";
-    import { useFieldReset } from "./Field.context";
-    import type { PageTextFieldProps } from "./Field.types";
+    import { useFieldReset } from "./FieldSvelte.context";
+    import type { PageTextFieldProps } from "./FieldSvelte.types";
 
     let props: PageTextFieldProps = $props();
 

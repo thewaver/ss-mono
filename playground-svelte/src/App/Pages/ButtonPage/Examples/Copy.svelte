@@ -3,7 +3,7 @@
 
     import PageControlRow from "../../../PageComponents/ControlRow/PageControlRow.svelte";
     import PageButtonContent from "../../../StyledComponents/ButtonContent/ButtonContent.svelte";
-    import type { ButtonCopyExampleProps } from "../ButtonPage.types";
+    import type { ButtonCopyExampleProps } from "../ButtonPageSvelte.types";
 
     const COPIED_MS = 2000;
     const COPIED_ANNOUNCEMENT = "Copied to the clipboard";

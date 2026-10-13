@@ -1,14 +1,23 @@
 import { useState } from "react";
 
 import { ScrambleTextWeights, TextArea } from "@thewaver/ss-components-react";
+import { TypewriterKnobs } from "@thewaver/ss-playground/App/Knobs/Typewriters.const";
 import { MEASURE_BOX_PADDING } from "@thewaver/ss-playground/App/PageComponents/MeasureBox/MeasureBox.css";
+import {
+    CUSTOM_TEXT_MAX_ROWS,
+    CUSTOM_TEXT_MIN_ROWS,
+    CUSTOM_TEXT_WIDTH,
+    EXAMPLES_ROOT,
+    EXAMPLE_NAMES,
+    TEXT_EFFECTS,
+    TEXT_EFFECT_MAP,
+} from "@thewaver/ss-playground/App/Pages/TypewriterPage/TypewriterPage.const";
 import * as styles from "@thewaver/ss-playground/App/Pages/TypewriterPage/TypewriterPage.css";
 import {
     FIELD_GAP,
     FIELD_PADDING,
 } from "@thewaver/ss-playground/App/StyledComponents/TextFieldContent/TextFieldContent.css";
 
-import { TypewriterKnobs } from "../../Knobs/Typewriters.const";
 import { PageExamples } from "../../PageComponents/Examples/Examples";
 import { PageNumberField, PageSelectField } from "../../PageComponents/Field/Field";
 import { PageMeasureBox } from "../../PageComponents/MeasureBox/MeasureBox";
@@ -25,21 +34,7 @@ import { KaraokeExample } from "./Examples/Karaoke";
 import { OutwardExample } from "./Examples/Outward";
 import { PhrasesExample } from "./Examples/Phrases";
 import { ScrollLitExample } from "./Examples/ScrollLit";
-import type { TypewriterExampleProps, TypewriterTextEffect } from "./TypewriterPage.types";
-
-const TEXT_EFFECTS: TypewriterTextEffect[] = ["fade", "scale", "glow", "drop", "slide"];
-const TEXT_EFFECT_MAP: Record<TypewriterTextEffect, string> = {
-    fade: styles.typewriterFade,
-    scale: styles.typewriterScale,
-    glow: styles.typewriterGlow,
-    drop: styles.typewriterDrop,
-    slide: styles.typewriterSlide,
-};
-
-const CUSTOM_TEXT_WIDTH = 320;
-const CUSTOM_TEXT_MIN_ROWS = 6;
-const CUSTOM_TEXT_MAX_ROWS = 12;
-const EXAMPLES_ROOT = "/src/App/Pages/TypewriterPage/Examples";
+import type { TypewriterExampleProps, TypewriterTextEffect } from "./TypewriterPageReact.types";
 
 type ExampleWrapperProps = TypewriterExampleProps & {
     width: number;
@@ -93,19 +88,19 @@ export const TypewriterPage = () => {
     const examples = [
         {
             key: "complex",
-            name: "Complex",
+            name: EXAMPLE_NAMES.complex,
             component: () => <ComplexExample {...commonProps} />,
             path: `${EXAMPLES_ROOT}/Complex.tsx`,
         },
         {
             key: "customInput",
-            name: "Custom Input",
+            name: EXAMPLE_NAMES.customInput,
             component: () => <CustomInputExampleWrapper {...commonProps} />,
             path: `${EXAMPLES_ROOT}/CustomInput.tsx`,
         },
         {
             key: "phrases",
-            name: "Phrases",
+            name: EXAMPLE_NAMES.phrases,
             readout: () =>
                 "the example owns the loop: each run's end either holds the phrase and switches to erasing, or moves to the next phrase and types it, and the caret is placed from the same progress the characters are drawn from",
             component: () => <PhrasesExample {...commonProps} />,
@@ -113,7 +108,7 @@ export const TypewriterPage = () => {
         },
         {
             key: "karaoke",
-            name: "Karaoke",
+            name: EXAMPLE_NAMES.karaoke,
             readout: () =>
                 "the line and the slider share one progress: singing writes it as it goes, and dragging the slider draws that moment — a stop can fall partway through a letter's own sweep",
             component: () => <KaraokeExample width={textContainerWidth} />,
@@ -121,7 +116,7 @@ export const TypewriterPage = () => {
         },
         {
             key: "scrollLit",
-            name: "Lit by scrolling",
+            name: EXAMPLE_NAMES.scrollLit,
             readout: () =>
                 "playback is off and the progress is how far the paragraph has traveled up its box; the letters not yet reached show their animation's first frame, which is the dimmed text",
             component: () => (
@@ -133,7 +128,7 @@ export const TypewriterPage = () => {
         },
         {
             key: "outward",
-            name: "Flying outward",
+            name: EXAMPLE_NAMES.outward,
             readout: () =>
                 "an animation per letter: the left half flies off to the left and the right half to the right, from the middle out, as the line crosses the middle of its box",
             component: () => (

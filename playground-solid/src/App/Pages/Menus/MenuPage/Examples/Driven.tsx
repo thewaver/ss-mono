@@ -5,8 +5,8 @@ import { Button, Menu } from "@thewaver/ss-components-solid";
 import { PageControlButtonContent } from "../../../../StyledComponents/ControlButtonContent/ControlButtonContent";
 import { renderPageHighlightFloater } from "../../../../StyledComponents/GlideFloater/GlideFloater";
 import { PageMenuTriggerContent } from "../../../../StyledComponents/MenuTriggerContent/MenuTriggerContent";
-import { ACTIONS, renderMenuItem, renderMenuPopup } from "../MenuPage.const";
-import type { MenuDrivenExampleProps } from "../MenuPage.types";
+import { ACTIONS, renderMenuItem, renderMenuPopup } from "../MenuPageSolid.const";
+import type { MenuDrivenExampleProps } from "../MenuPageSolid.types";
 
 type Props = MenuDrivenExampleProps;
 

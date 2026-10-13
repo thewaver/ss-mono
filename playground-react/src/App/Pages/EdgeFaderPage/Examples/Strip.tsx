@@ -2,7 +2,7 @@ import { EdgeFader } from "@thewaver/ss-components-react";
 import { STRIP_CHIPS } from "@thewaver/ss-playground/App/Pages/EdgeFaderPage/EdgeFaderPage.const";
 import * as styles from "@thewaver/ss-playground/App/Pages/EdgeFaderPage/EdgeFaderPage.css";
 
-import type { EdgeFaderExampleProps } from "../EdgeFaderPage.types";
+import type { EdgeFaderExampleProps } from "../EdgeFaderPageReact.types";
 
 export const StripExample = (props: EdgeFaderExampleProps) => {
     return (

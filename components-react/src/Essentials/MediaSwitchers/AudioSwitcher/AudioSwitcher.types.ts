@@ -1,4 +1,7 @@
-import type { AudioSwitcherController as AudioSwitcherCoreController } from "@thewaver/ss-components";
+import type {
+    AudioSwitcherController as AudioSwitcherCoreController,
+    BaseAudioSwitcherProps,
+} from "@thewaver/ss-components";
 
 export type AudioSwitcherController = AudioSwitcherCoreController & {
     /**
@@ -9,15 +12,7 @@ export type AudioSwitcherController = AudioSwitcherCoreController & {
     subscribe: (listener: () => void) => () => void;
 };
 
-export type AudioSwitcherProps = {
-    /** The track to play. Changing it is what the switcher crossfades between. */
-    src: string;
-    /** How long the old track takes to fade out while the new one fades in. */
-    crossfadeMs?: number;
-    /** Starts playing as soon as it is mounted, where the browser allows it. */
-    shouldAutoPlayOnMount?: boolean;
-    /** How loud the playback is. */
-    volume?: number;
+export type AudioSwitcherProps = BaseAudioSwitcherProps & {
     /**
      * Whether audio is playing, with its setter. It is the only thing that starts or stops it; the switcher writes
      * through the setter once the browser has actually started a track, or refused to.

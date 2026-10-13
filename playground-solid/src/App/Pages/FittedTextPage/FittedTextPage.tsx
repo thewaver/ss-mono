@@ -2,6 +2,11 @@ import { createMemo, createSignal } from "solid-js";
 
 import { FITTED_TEXT_DEFAULTS } from "@thewaver/ss-components-solid";
 import { FittedTextKnobs } from "@thewaver/ss-playground/App/Knobs/FittedTexts.const";
+import {
+    EXAMPLES_ROOT,
+    EXAMPLE_NAMES,
+    WIDE_SPAN,
+} from "@thewaver/ss-playground/App/Pages/FittedTextPage/FittedTextPage.const";
 
 import { PageExamples } from "../../PageComponents/Examples/Examples";
 import { PageNumberField } from "../../PageComponents/Field/Field";
@@ -10,17 +15,13 @@ import { PagePropsPanel } from "../../PageComponents/PropsPanel/PropsPanel";
 import { PosterExample } from "./Examples/Poster";
 import { StackExample } from "./Examples/Stack";
 
-const EXAMPLES_ROOT = "/src/App/Pages/FittedTextPage/Examples";
-
-const WIDE_SPAN = 2;
-
 export const FittedTextPage = () => {
     const [getLineHeightRatio, setLineHeightRatio] = createSignal(FITTED_TEXT_DEFAULTS.lineHeightRatio);
 
     const getExamples = createMemo(() => [
         {
             key: "poster",
-            name: "A poster",
+            name: EXAMPLE_NAMES.poster,
             span: WIDE_SPAN,
             readout: () =>
                 "every line is scaled to the full width, then the stack shrinks as one until it fits the height, so the shortest line comes out the largest; resize the window and it fits again",
@@ -29,7 +30,7 @@ export const FittedTextPage = () => {
         },
         {
             key: "stack",
-            name: "A narrow box",
+            name: EXAMPLE_NAMES.stack,
             readout: () =>
                 "in a box this narrow the width runs out before the height does, so nothing has to shrink to fit and the lines keep their full-width sizes",
             component: () => <StackExample lineHeightRatio={getLineHeightRatio} />,

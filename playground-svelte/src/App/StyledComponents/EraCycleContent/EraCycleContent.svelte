@@ -4,7 +4,7 @@
     import * as styles from "@thewaver/ss-playground/App/StyledComponents/EraCycleContent/EraCycleContent.css";
 
     import { getLayerClass } from "../Layer/Layer.context";
-    import type { EraCycleContentProps } from "./EraCycleContent.types";
+    import type { EraCycleContentProps } from "./EraCycleContentSvelte.types";
 
     let props: EraCycleContentProps & { children?: Snippet } = $props();
 

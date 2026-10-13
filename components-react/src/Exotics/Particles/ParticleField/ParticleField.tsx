@@ -6,6 +6,7 @@ import {
     ParticleFieldStyles,
     ParticleFieldUtils,
 } from "@thewaver/ss-components";
+import { ParticleFieldConst } from "@thewaver/ss-components/internal";
 import { MathUtils } from "@thewaver/ss-utils";
 
 import { ElementObserverReactUtils } from "../../../Abstracts/ElementObserver/ElementObserverReact.utils";
@@ -13,10 +14,6 @@ import { InteractionTrackerReactUtils } from "../../../Abstracts/InteractionTrac
 import { SignalMirrorReactUtils } from "../../../Abstracts/SignalMirror/SignalMirrorReact.utils";
 import { useLatest } from "../../../Utils/refUtils";
 import type { ParticleFieldProps } from "./ParticleField.types";
-
-const NO_PROGRESS = 0;
-const FIRST_ITERATION = 0;
-const NO_WEIGHTS: number[][] = [];
 
 export const ParticleField = (props: ParticleFieldProps) => {
     const spawnChance = props.spawnChance ?? PARTICLE_FIELD_DEFAULTS.spawnChance;
@@ -31,8 +28,11 @@ export const ParticleField = (props: ParticleFieldProps) => {
     const isPageHidden = InteractionTrackerReactUtils.usePageHidden();
 
     const [isPlaying] = SignalMirrorReactUtils.useOptionalState(props.playback, true);
-    const [progress, setProgressState] = SignalMirrorReactUtils.useOptionalState(props.progress, NO_PROGRESS);
-    const [currentIteration, setCurrentIterationState] = useState(FIRST_ITERATION);
+    const [progress, setProgressState] = SignalMirrorReactUtils.useOptionalState(
+        props.progress,
+        ParticleFieldConst.NO_PROGRESS,
+    );
+    const [currentIteration, setCurrentIterationState] = useState(ParticleFieldConst.FIRST_ITERATION);
 
     const rootSize = ElementObserverReactUtils.useBorderBoxSize(rootRef);
 
@@ -68,7 +68,7 @@ export const ParticleField = (props: ParticleFieldProps) => {
             ParticleFieldUtils.computeCells(
                 cellCount,
                 rootSize,
-                props.computeCellWeights?.(cellCount) ?? NO_WEIGHTS,
+                props.computeCellWeights?.(cellCount) ?? ParticleFieldConst.NO_WEIGHTS,
                 contour,
             ),
         [cellCount.col, cellCount.row, rootSize, props.computeCellWeights, contour],
@@ -104,8 +104,8 @@ export const ParticleField = (props: ParticleFieldProps) => {
         if (CellAnimationUtils.getIsSameCount(drawnCountRef.current, cellCount)) return;
 
         drawnCountRef.current = cellCount;
-        latest.current.setCurrentIteration(FIRST_ITERATION);
-        latest.current.setProgress(NO_PROGRESS);
+        latest.current.setCurrentIteration(ParticleFieldConst.FIRST_ITERATION);
+        latest.current.setProgress(ParticleFieldConst.NO_PROGRESS);
     }, [cellCount.col, cellCount.row]);
 
     useLayoutEffect(() => {

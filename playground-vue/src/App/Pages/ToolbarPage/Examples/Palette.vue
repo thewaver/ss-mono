@@ -5,7 +5,7 @@ import type { ArcDefs, ToolbarAction } from "@thewaver/ss-components-vue";
 import PageButtonContent from "../../../StyledComponents/ButtonContent/ButtonContent.vue";
 import PageMenuTriggerContent from "../../../StyledComponents/MenuTriggerContent/MenuTriggerContent.vue";
 import ToolbarOverflowItem from "../ToolbarOverflowItem.vue";
-import type { ToolbarExampleProps } from "../ToolbarPage.types";
+import type { ToolbarExampleProps } from "../ToolbarPageVue.types";
 import ToolbarPopup from "../ToolbarPopup.vue";
 
 const ACTIONS: ToolbarAction<string>[] = [

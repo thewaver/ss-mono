@@ -93,3 +93,19 @@ export const PANEL_BODIES: Record<string, string> = {
     History: "Disabled, so nothing reaches this panel.",
     Settings: "The knobs, which nobody reads until something goes wrong.",
 };
+
+export const EXAMPLE_NAMES = {
+    row: "A row of tabs",
+    column: "A column of tabs",
+    automatic: "Arrows that select as they move",
+    hoverPill: "A pill that follows the pointer",
+    reachable: "A disabled tab the arrows still reach",
+    rightToLeft: "Tabs in a right-to-left box",
+    honeycomb: "A honeycomb of tabs",
+    links: "Tabs that are links",
+    linkComponent: "Links through a component",
+    clearable: "A selection that can be cleared",
+    disabled: "Every tab disabled",
+};
+
+export const EXAMPLES_ROOT = "/src/App/Pages/TabsPage/Examples";

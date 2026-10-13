@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { useModel } from "vue";
 
-import type { RadioOptionalExampleProps } from "../RadioPage.types";
+import type { RadioOptionalExampleProps } from "../RadioPageVue.types";
 import DefaultExample from "./Default.vue";
 
 type Props = RadioOptionalExampleProps;

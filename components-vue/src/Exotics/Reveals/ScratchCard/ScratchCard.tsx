@@ -7,6 +7,7 @@ import {
     ScratchCardStyles,
     ScratchCardUtils,
 } from "@thewaver/ss-components";
+import { ScratchCardConst } from "@thewaver/ss-components/internal";
 import { StringUtils } from "@thewaver/ss-utils";
 import { assignInlineVars } from "@vanilla-extract/dynamic";
 
@@ -17,9 +18,6 @@ import { watchAfterRender } from "../../../Utils/effectUtils";
 import { callSlot, declareProps } from "../../../Utils/propUtils";
 import type { SlotsContext } from "../../../Utils/typeUtils";
 import type { ScratchCardProps, ScratchCardSlots } from "./ScratchCard.types";
-
-const NOTHING_RUBBED = 0;
-const NO_PATH = "";
 
 const toVueStyle = (style: Record<string, string>) =>
     Object.fromEntries(
@@ -34,8 +32,8 @@ export const ScratchCard = defineComponent(
         const coverRef = shallowRef<HTMLDivElement>();
         const pathRef = shallowRef<SVGPathElement>();
 
-        const path = shallowRef(NO_PATH);
-        const clearedRatio = shallowRef(NOTHING_RUBBED);
+        const path = shallowRef(ScratchCardConst.NO_PATH);
+        const clearedRatio = shallowRef(ScratchCardConst.NOTHING_RUBBED);
         const isClearing = shallowRef(false);
         const isCleared = shallowRef(false);
 
@@ -66,8 +64,8 @@ export const ScratchCard = defineComponent(
                 scheduler.reset();
                 isClearing.value = false;
                 isCleared.value = false;
-                path.value = NO_PATH;
-                clearedRatio.value = NOTHING_RUBBED;
+                path.value = ScratchCardConst.NO_PATH;
+                clearedRatio.value = ScratchCardConst.NOTHING_RUBBED;
 
                 return true;
             },
@@ -87,7 +85,7 @@ export const ScratchCard = defineComponent(
         onScopeDispose(scheduler.cancel);
 
         watchAfterRender([path], ([current]) => {
-            if (current !== NO_PATH) scheduler.schedule();
+            if (current !== ScratchCardConst.NO_PATH) scheduler.schedule();
         });
 
         let reportedRatio = clearedRatio.value;

@@ -23,13 +23,12 @@ import {
     TreemapUtils,
     BracketStyles as styles,
 } from "@thewaver/ss-components";
+import { BracketConst } from "@thewaver/ss-components/internal";
 
 import { SignalMirrorSolidUtils } from "../../../Abstracts/SignalMirror/SignalMirrorSolid.utils";
 import { access } from "../../../Utils/propUtils";
 import { accessStore } from "../../../Utils/storeUtils";
 import type { BracketProps } from "./BracketSolid.types";
-
-const NOTHING = 0;
 
 export const Bracket = <T,>(props: BracketProps<T>) => {
     const boardId = createUniqueId();
@@ -76,7 +75,7 @@ export const Bracket = <T,>(props: BracketProps<T>) => {
             rootSide: getRootSide(),
             headerExtent: props.renderLayerHeader
                 ? (access(props.layerHeaderSize) ?? BRACKET_DEFAULTS.layerHeaderSize)
-                : NOTHING,
+                : BracketConst.NOTHING,
         }),
     );
 

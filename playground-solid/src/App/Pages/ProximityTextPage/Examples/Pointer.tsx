@@ -1,6 +1,7 @@
 import { ProximityText } from "@thewaver/ss-components-solid";
 import * as styles from "@thewaver/ss-playground/App/Pages/ProximityTextPage/ProximityTextPage.css";
-import type { ProximityTextExampleProps } from "@thewaver/ss-playground/App/Pages/ProximityTextPage/ProximityTextPage.types";
+
+import type { ProximityTextExampleProps } from "../ProximityTextPageSolid.types";
 
 type Props = ProximityTextExampleProps;
 

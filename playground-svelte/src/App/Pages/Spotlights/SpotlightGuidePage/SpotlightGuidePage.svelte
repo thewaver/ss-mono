@@ -1,16 +1,16 @@
 <script lang="ts">
     import {
-        RICH_TOUR_STEPS,
-        TOUR_STORAGE_KEY,
-    } from "@thewaver/ss-playground/App/Pages/Spotlights/SpotlightGuidePage/SpotlightGuidePage.const";
+    EXAMPLE_NAMES,
+    EXAMPLES_ROOT,
+    RICH_TOUR_STEPS,
+    TOUR_STORAGE_KEY,
+} from "@thewaver/ss-playground/App/Pages/Spotlights/SpotlightGuidePage/SpotlightGuidePage.const";
     import { TOUR_STEPS } from "@thewaver/ss-playground/App/Pages/Spotlights/SpotlightTourSteps.const";
 
     import type { ExampleDefs } from "../../../PageComponents/Examples/Examples.types";
     import PageExamples from "../../../PageComponents/Examples/PageExamples.svelte";
     import GuideExample from "./Examples/Guide.svelte";
     import TourExample from "./Examples/Tour.svelte";
-
-    const EXAMPLES_ROOT = "/src/App/Pages/Spotlights/SpotlightGuidePage/Examples";
 
     const readStoredStep = () => {
         try {
@@ -56,7 +56,7 @@
     const examples: ExampleDefs[] = [
         {
             key: "tour",
-            name: "A tour with a step the reader does",
+            name: EXAMPLE_NAMES.tour,
             span: 2,
             readout: () =>
                 `step: ${tourStep + 1} of ${RICH_TOUR_STEPS.length} — ${tourStatus} — basket: ${basketCount}. The guide holds the whole page still, so on step 2 it closes and a prompt lights the button instead, and pressing it reopens the guide; the step is kept in sessionStorage, so reloading offers to resume`,
@@ -65,7 +65,7 @@
         },
         {
             key: "guide",
-            name: "Guide",
+            name: EXAMPLE_NAMES.guide,
             readout: () => `step: ${step + 1} of ${TOUR_STEPS.length} — ${finished}`,
             component: guideExample,
             path: `${EXAMPLES_ROOT}/Guide.svelte`,

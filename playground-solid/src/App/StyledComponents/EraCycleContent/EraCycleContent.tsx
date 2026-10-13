@@ -4,7 +4,7 @@ import { access } from "@thewaver/ss-components-solid";
 import * as styles from "@thewaver/ss-playground/App/StyledComponents/EraCycleContent/EraCycleContent.css";
 
 import { useLayerClass } from "../Layer/Layer.context";
-import type { EraCycleContentProps } from "./EraCycleContent.types";
+import type { EraCycleContentProps } from "./EraCycleContentSolid.types";
 
 export const PageEraCycleContent = (props: ParentProps<EraCycleContentProps>) => {
     const getLayerClass = useLayerClass();

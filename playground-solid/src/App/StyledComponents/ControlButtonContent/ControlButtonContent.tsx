@@ -4,7 +4,7 @@ import { access } from "@thewaver/ss-components-solid";
 import * as styles from "@thewaver/ss-playground/App/StyledComponents/ControlButtonContent/ControlButtonContent.css";
 
 import { useLayerClass } from "../Layer/Layer.context";
-import type { ControlButtonContentProps } from "./ControlButtonContent.types";
+import type { ControlButtonContentProps } from "./ControlButtonContentSolid.types";
 
 export const PageControlButtonContent = (props: ParentProps<ControlButtonContentProps>) => {
     const getLayerClass = useLayerClass();

@@ -2,7 +2,6 @@ import { Fragment, type KeyboardEvent, useEffect, useLayoutEffect, useMemo, useR
 
 import {
     CIRCLE_PACKING_DEFAULTS,
-    type CirclePackingCircle,
     type CirclePackingCircleState,
     type CirclePackingNode,
     CirclePackingStyles,
@@ -10,16 +9,12 @@ import {
     type CirclePackingView,
     TreemapUtils,
 } from "@thewaver/ss-components";
+import { CirclePackingConst } from "@thewaver/ss-components/internal";
 
 import { ElementObserverReactUtils } from "../../../Abstracts/ElementObserver/ElementObserverReact.utils";
 import { SignalMirrorReactUtils } from "../../../Abstracts/SignalMirror/SignalMirrorReact.utils";
 import { useStore } from "../../../Utils/storeUtils";
 import type { CirclePackingProps } from "./CirclePacking.types";
-
-const NOTHING = 0;
-const NEXT = 1;
-const HALF = 0.5;
-const EMPTY_CIRCLE: CirclePackingCircle = { x: 0, y: 0, radius: 0 };
 
 type CirclePackingZoomState<T> = {
     branch: CirclePackingNode<T>;
@@ -59,13 +54,13 @@ export const CirclePacking = <T,>(props: CirclePackingProps<T>) => {
         branch,
         cameFrom: undefined,
         path: undefined,
-        generation: NOTHING,
+        generation: CirclePackingConst.NOTHING,
     }));
 
     if (zoom.branch !== branch) {
         const from = CirclePackingUtils.computeShownView(
             zoom.path,
-            CirclePackingUtils.toView(layout.get(zoom.branch) ?? EMPTY_CIRCLE),
+            CirclePackingUtils.toView(layout.get(zoom.branch) ?? CirclePackingConst.EMPTY_CIRCLE),
             progress,
         );
 
@@ -74,15 +69,15 @@ export const CirclePacking = <T,>(props: CirclePackingProps<T>) => {
             cameFrom: zoom.branch,
             path: CirclePackingUtils.interpolateZoom(
                 from,
-                CirclePackingUtils.toView(layout.get(branch) ?? EMPTY_CIRCLE),
+                CirclePackingUtils.toView(layout.get(branch) ?? CirclePackingConst.EMPTY_CIRCLE),
             ),
-            generation: zoom.generation + NEXT,
+            generation: zoom.generation + CirclePackingConst.NEXT,
         });
     }
 
     const view = CirclePackingUtils.computeShownView(
         zoom.path,
-        CirclePackingUtils.toView(layout.get(branch) ?? EMPTY_CIRCLE),
+        CirclePackingUtils.toView(layout.get(branch) ?? CirclePackingConst.EMPTY_CIRCLE),
         progress,
     );
 
@@ -93,11 +88,11 @@ export const CirclePacking = <T,>(props: CirclePackingProps<T>) => {
     const rovingNode = TreemapUtils.resolveStop(focusedNode, stops);
 
     const computeState = (node: CirclePackingNode<T>): CirclePackingCircleState => ({
-        ...CirclePackingUtils.project(layout.get(node) ?? EMPTY_CIRCLE, view, side),
-        weight: weights.get(node) ?? NOTHING,
+        ...CirclePackingUtils.project(layout.get(node) ?? CirclePackingConst.EMPTY_CIRCLE, view, side),
+        weight: weights.get(node) ?? CirclePackingConst.NOTHING,
         isBranch: TreemapUtils.getIsBranch(node, weights),
         isInView: getIsInView(node),
-        depth: depths.get(node) ?? NOTHING,
+        depth: depths.get(node) ?? CirclePackingConst.NOTHING,
     });
 
     const zoomTo = (node: CirclePackingNode<T>) => {
@@ -116,7 +111,7 @@ export const CirclePacking = <T,>(props: CirclePackingProps<T>) => {
     useEffect(() => zoomClock.stop, [zoomClock]);
 
     useLayoutEffect(() => {
-        if (zoom.generation === NOTHING) return;
+        if (zoom.generation === CirclePackingConst.NOTHING) return;
 
         zoomClock.start(zoomDurationMs);
     }, [zoom.generation]);
@@ -166,7 +161,7 @@ export const CirclePacking = <T,>(props: CirclePackingProps<T>) => {
         >
             <svg
                 className={CirclePackingStyles.circlePackingCanvas}
-                viewBox={`${-size.width * HALF} ${-size.height * HALF} ${size.width} ${size.height}`}
+                viewBox={`${-size.width * CirclePackingConst.HALF} ${-size.height * CirclePackingConst.HALF} ${size.width} ${size.height}`}
                 role="list"
                 aria-label={props.ariaLabel}
             >

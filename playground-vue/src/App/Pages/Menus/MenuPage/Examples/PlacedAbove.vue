@@ -4,8 +4,8 @@ import { Menu } from "@thewaver/ss-components-vue";
 import PageGlideFloater from "../../../../StyledComponents/GlideFloater/PageGlideFloater.vue";
 import PageMenuTriggerContent from "../../../../StyledComponents/MenuTriggerContent/MenuTriggerContent.vue";
 import MenuActionItem from "../MenuActionItem.vue";
-import { ACTIONS } from "../MenuPage.const";
-import type { MenuExampleProps } from "../MenuPage.types";
+import { ACTIONS } from "../MenuPageVue.const";
+import type { MenuExampleProps } from "../MenuPageVue.types";
 import MenuPopup from "../MenuPopup.vue";
 
 type Props = MenuExampleProps;

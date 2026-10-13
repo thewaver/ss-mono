@@ -2,8 +2,8 @@
     import { Toggle } from "@thewaver/ss-components-svelte";
 
     import PageToggleContent from "../../StyledComponents/ToggleContent/ToggleContent.svelte";
-    import { useFieldReset } from "./Field.context";
-    import type { PageCheckFieldProps } from "./Field.types";
+    import { useFieldReset } from "./FieldSvelte.context";
+    import type { PageCheckFieldProps } from "./FieldSvelte.types";
 
     let props: PageCheckFieldProps = $props();
 

@@ -3,7 +3,12 @@ import { shallowRef } from "vue";
 
 import { MediaQueryMonitorVueUtils, WRAPAROUND_DEFAULTS } from "@thewaver/ss-components-vue";
 import { WraparoundKnobs } from "@thewaver/ss-playground/App/Knobs/Wraparounds.const";
-import { NOTHING_PRESSED } from "@thewaver/ss-playground/App/Pages/WraparoundPage/WraparoundPage.const";
+import {
+    EXAMPLES_ROOT,
+    EXAMPLE_NAMES,
+    NOTHING_PRESSED,
+    NO_DRIFT_PX_PER_SECOND,
+} from "@thewaver/ss-playground/App/Pages/WraparoundPage/WraparoundPage.const";
 
 import type { ExampleDefs } from "../../PageComponents/Examples/Examples.types";
 import PageExamples from "../../PageComponents/Examples/PageExamples.vue";
@@ -13,10 +18,6 @@ import PagePropsPanel from "../../PageComponents/PropsPanel/PagePropsPanel.vue";
 import GridExample from "./Examples/Grid.vue";
 import MarqueeExample from "./Examples/Marquee.vue";
 import MosaicExample from "./Examples/Mosaic.vue";
-
-const EXAMPLES_ROOT = "/src/App/Pages/WraparoundPage/Examples";
-
-const NO_DRIFT_PX_PER_SECOND = 0;
 
 const mosaicPressed = shallowRef(NOTHING_PRESSED);
 const gridPressed = shallowRef(NOTHING_PRESSED);
@@ -31,7 +32,7 @@ const examples: ExampleDefs[] = [
     {
         key: "mosaic",
         span: 2,
-        name: "A mosaic that never ends",
+        name: EXAMPLE_NAMES.mosaic,
         readout: () =>
             `opened: ${mosaicPressed.value} — drag and let go to send it coasting, or use the wheel; with the window focused the arrows and page keys move it and Home brings it back, and tabbing into the pictures brings the one focused into view`,
         path: `${EXAMPLES_ROOT}/Mosaic.vue`,
@@ -39,7 +40,7 @@ const examples: ExampleDefs[] = [
     {
         key: "grid",
         span: 2,
-        name: "Content smaller than the window",
+        name: EXAMPLE_NAMES.grid,
         readout: () =>
             `pressed: ${gridPressed.value} — six buttons, copied until the window is full; only one set can be tabbed to or read out, and pressing any copy presses the real button`,
         path: `${EXAMPLES_ROOT}/Grid.vue`,
@@ -47,7 +48,7 @@ const examples: ExampleDefs[] = [
     {
         key: "marquee",
         span: 2,
-        name: "Marquee",
+        name: EXAMPLE_NAMES.marquee,
         readout: () =>
             prefersReducedMotion.value
                 ? "reduced motion is on, so the strip stays still"

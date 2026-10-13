@@ -3,12 +3,11 @@ import { computed, useId } from "vue";
 
 import type { PlacementRect } from "@thewaver/ss-components-vue";
 import { PlacementUtils } from "@thewaver/ss-components-vue";
+import { HALF } from "@thewaver/ss-playground/App/StyledComponents/PaginatorContent/PaginatorContent.const";
 import * as styles from "@thewaver/ss-playground/App/StyledComponents/PaginatorContent/PaginatorContent.css";
 
 import { useLayerClass } from "../Layer/Layer.context";
-import type { PaginatorWedgeProps } from "./PaginatorContent.types";
-
-const HALF = 0.5;
+import type { PaginatorWedgeProps } from "./PaginatorContentVue.types";
 
 const toViewBox = (rect: PlacementRect) =>
     `${rect.leftShare - rect.widthShare * HALF} ${rect.topShare - rect.heightShare * HALF} ${rect.widthShare} ${rect.heightShare}`;

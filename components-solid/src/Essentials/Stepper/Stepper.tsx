@@ -1,21 +1,13 @@
 import { type Accessor, Index, type JSX, Show, createMemo } from "solid-js";
 
-import {
-    type InteractionSizing,
-    STEPPER_DEFAULTS,
-    type Step,
-    StepperUtils,
-    StepperStyles as styles,
-} from "@thewaver/ss-components";
+import { STEPPER_DEFAULTS, type Step, StepperUtils, StepperStyles as styles } from "@thewaver/ss-components";
+import { PlacementConst } from "@thewaver/ss-components/internal";
 
 import { InteractionWrapper } from "../../Primitives/InteractionWrapper/InteractionWrapper";
 import { PlacementBox } from "../../Primitives/PlacementBox/PlacementBox";
 import { PlacementItem } from "../../Primitives/PlacementItem/PlacementItem";
 import { access } from "../../Utils/propUtils";
 import type { StepperItemProps, StepperProps } from "./StepperSolid.types";
-
-const ROW_SIZING: InteractionSizing = "fit-content";
-const PLACED_SIZING: InteractionSizing = "fill";
 
 const StepperItem = <TValue, TState>(props: StepperItemProps<TValue, TState>) => {
     const getIsNavigable = () => access(props.step).isNavigable ?? false;
@@ -65,7 +57,7 @@ export const Stepper = <TValue, TState>(props: StepperProps<TValue, TState>) => 
 
         return (
             <InteractionWrapper
-                sizing={getPlacementAt(index) === undefined ? ROW_SIZING : PLACED_SIZING}
+                sizing={getPlacementAt(index) === undefined ? PlacementConst.ROW_SIZING : PlacementConst.PLACED_SIZING}
                 isDisabled={() => !(getStep().isNavigable ?? false)}
                 isReachableWhenDisabled={() => getTooltipDefs() !== undefined}
                 isFocusableWhenDisabled={() => getStep().isReachableWhenDisabled ?? false}

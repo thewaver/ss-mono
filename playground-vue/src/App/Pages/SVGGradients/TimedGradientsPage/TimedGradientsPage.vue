@@ -2,14 +2,15 @@
 import { computed, shallowRef } from "vue";
 
 import { type SVGDefsColors, SVGDefsSamples, TimedGradientDefaults } from "@thewaver/ss-components-vue";
-import {
-    NO_SAMPLE_KEY,
-    toGroupEntriesWithNoSample,
-} from "@thewaver/ss-playground/App/PageComponents/SampleGroups/SampleGroups.const";
+import { SVGGradientKnobs } from "@thewaver/ss-playground/App/Knobs/SVGGradients.const";
+import { TimedGradientKnobs } from "@thewaver/ss-playground/App/Knobs/TimedGradients.const";
+import { NO_SAMPLE_KEY } from "@thewaver/ss-playground/App/PageComponents/SampleGroups/SampleGroups.const";
 import type { WithNoSample } from "@thewaver/ss-playground/App/PageComponents/SampleGroups/SampleGroups.types";
+import {
+    EXAMPLE_NAMES,
+    TIMED_GRADIENT_GROUPS,
+} from "@thewaver/ss-playground/App/Pages/SVGGradients/TimedGradientsPage/TimedGradientsPage.const";
 
-import { SVGGradientKnobs } from "../../../Knobs/SVGGradients.const";
-import { TimedGradientKnobs } from "../../../Knobs/TimedGradients.const";
 import type { ExampleDefs } from "../../../PageComponents/Examples/Examples.types";
 import PageExamples from "../../../PageComponents/Examples/PageExamples.vue";
 import PageGroupedSelectField from "../../../PageComponents/Field/PageGroupedSelectField.vue";
@@ -21,14 +22,11 @@ import PageProp from "../../../PageComponents/Prop/Prop.vue";
 import PagePropsDivider from "../../../PageComponents/PropsPanel/PagePropsDivider.vue";
 import PagePropsGroups from "../../../PageComponents/PropsPanel/PagePropsGroups.vue";
 import PagePropsPanel from "../../../PageComponents/PropsPanel/PagePropsPanel.vue";
-import { GROUPPED_TIMED_GRADIENTS } from "../SVGGradients.const";
-import type { SVGGradientsControls, SVGGradientsPaintKind, TimedGradientExampleProps } from "../SVGGradients.types";
 import PageSVGGradientsProps from "../SVGGradientsProps.vue";
+import type { SVGGradientsControls, SVGGradientsPaintKind, TimedGradientExampleProps } from "../SVGGradientsVue.types";
 import DefaultExample from "./Examples/Default.vue";
 
 const DEFAULT_EXAMPLE_PATH = "/src/App/Pages/SVGGradients/TimedGradientsPage/Examples/Default.vue";
-
-const TIMED_GRADIENT_GROUPS = toGroupEntriesWithNoSample(GROUPPED_TIMED_GRADIENTS);
 
 const configKey = shallowRef<WithNoSample<SVGDefsSamples.Gradient.Timed.SampleKey>>(
     SVGGradientKnobs.STARTING_TIMED_GRADIENT_KEY,
@@ -81,7 +79,7 @@ const setConfigDef = (key: string, value: number | boolean) => {
 const examples: ExampleDefs[] = [
     {
         key: "default",
-        name: "Default",
+        name: EXAMPLE_NAMES.default,
         path: DEFAULT_EXAMPLE_PATH,
     },
 ];

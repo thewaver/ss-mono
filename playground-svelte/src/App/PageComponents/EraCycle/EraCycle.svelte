@@ -2,9 +2,8 @@
     import { Button } from "@thewaver/ss-components-svelte";
 
     import PageEraCycleContent from "../../StyledComponents/EraCycleContent/EraCycleContent.svelte";
-    import type { EraCycleProps } from "./EraCycle.types";
-
-    const SINGLE_ERA = 1;
+    import type { EraCycleProps } from "./EraCycleSvelte.types";
+    import { SINGLE_ERA } from "@thewaver/ss-playground/App/PageComponents/EraCycle/EraCycle.const";
 
     let props: EraCycleProps = $props();
 

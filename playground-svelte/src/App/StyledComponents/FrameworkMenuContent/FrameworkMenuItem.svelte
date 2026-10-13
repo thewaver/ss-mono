@@ -4,7 +4,7 @@
     import * as styles from "@thewaver/ss-playground/App/StyledComponents/SelectOptionContent/SelectOptionContent.css";
 
     import { getLayerClass } from "../Layer/Layer.context";
-    import type { FrameworkMenuItemProps } from "./FrameworkMenuContent.types";
+    import type { FrameworkMenuItemProps } from "./FrameworkMenuContentSvelte.types";
 
     let props: FrameworkMenuItemProps & { children?: Snippet } = $props();
 

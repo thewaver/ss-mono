@@ -2,6 +2,11 @@ import { useState } from "react";
 
 import { MORPH_TEXT_DEFAULTS, MediaQueryMonitorReactUtils } from "@thewaver/ss-components-react";
 import { MorphTextKnobs } from "@thewaver/ss-playground/App/Knobs/MorphTexts.const";
+import {
+    EXAMPLES_ROOT,
+    EXAMPLE_NAMES,
+    NO_MOTION_DURATION_MS,
+} from "@thewaver/ss-playground/App/Pages/MorphTextPage/MorphTextPage.const";
 
 import { PageExamples } from "../../PageComponents/Examples/Examples";
 import { PageNumberField } from "../../PageComponents/Field/Field";
@@ -9,10 +14,6 @@ import { PageProp } from "../../PageComponents/Prop/Prop";
 import { PagePropsPanel } from "../../PageComponents/PropsPanel/PropsPanel";
 import { PaintedExample } from "./Examples/Painted";
 import { WordsExample } from "./Examples/Words";
-
-const EXAMPLES_ROOT = "/src/App/Pages/MorphTextPage/Examples";
-
-const NO_MOTION_DURATION_MS = 0;
 
 export const MorphTextPage = () => {
     const [morphDurationMs, setMorphDurationMs] = useState(MORPH_TEXT_DEFAULTS.morphDurationMs);
@@ -30,7 +31,7 @@ export const MorphTextPage = () => {
     const examples = [
         {
             key: "words",
-            name: "Words in turn",
+            name: EXAMPLE_NAMES.words,
             readout: () =>
                 `showing: ${word} — the page changes the word on a timer and the text melts into the next; Pause stops the cycle`,
             component: () => <WordsExample {...commonProps} onWordChange={setWord} />,
@@ -38,7 +39,7 @@ export const MorphTextPage = () => {
         },
         {
             key: "painted",
-            name: "Painted text",
+            name: EXAMPLE_NAMES.painted,
             readout: () =>
                 `showing: ${paintedWord} — each copy is a PaintedText with a moving gradient, and the melt still works because the filter sits on the morph's own box`,
             component: () => <PaintedExample {...commonProps} onWordChange={setPaintedWord} />,

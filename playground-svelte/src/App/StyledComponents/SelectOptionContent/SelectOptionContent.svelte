@@ -4,7 +4,7 @@
     import * as styles from "@thewaver/ss-playground/App/StyledComponents/SelectOptionContent/SelectOptionContent.css";
 
     import { getLayerClass } from "../Layer/Layer.context";
-    import type { SelectOptionContentProps } from "./SelectOptionContent.types";
+    import type { SelectOptionContentProps } from "./SelectOptionContentSvelte.types";
 
     let props: SelectOptionContentProps & { children?: Snippet } = $props();
 

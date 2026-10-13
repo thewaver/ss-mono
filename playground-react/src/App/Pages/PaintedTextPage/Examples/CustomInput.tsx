@@ -3,8 +3,8 @@ import { useId } from "react";
 import { PaintedText } from "@thewaver/ss-components-react";
 import * as styles from "@thewaver/ss-playground/App/Pages/PaintedTextPage/PaintedTextPage.css";
 
-import { computeSampleDefs } from "../PaintedTextPage.const";
-import type { PaintedTextExampleProps } from "../PaintedTextPage.types";
+import { computeSampleDefs } from "../PaintedTextPageReact.const";
+import type { PaintedTextExampleProps } from "../PaintedTextPageReact.types";
 
 type Props = PaintedTextExampleProps & {
     text: string;

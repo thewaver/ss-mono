@@ -2,7 +2,7 @@
     import * as styles from "@thewaver/ss-playground/App/StyledComponents/CarouselContent/CarouselContent.css";
 
     import { getLayerClass } from "../Layer/Layer.context";
-    import type { CarouselPickProps } from "./CarouselContent.types";
+    import type { CarouselPickProps } from "./CarouselContentSvelte.types";
 
     let props: CarouselPickProps = $props();
 

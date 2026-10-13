@@ -6,8 +6,8 @@ import PageColorInputContent from "../../StyledComponents/ColorInputContent/Colo
 import PageColorPickerArea from "../ColorPicker/PageColorPickerArea.vue";
 import PageColorPickerHue from "../ColorPicker/PageColorPickerHue.vue";
 import PageColorPickerPanel from "../ColorPicker/PageColorPickerPanel.vue";
-import { useFieldReset } from "./Field.context";
-import type { PageColorFieldProps } from "./Field.types";
+import { useFieldReset } from "./FieldVue.context";
+import type { PageColorFieldProps } from "./FieldVue.types";
 
 const props = defineProps<PageColorFieldProps>();
 

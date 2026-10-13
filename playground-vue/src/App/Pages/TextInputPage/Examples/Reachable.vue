@@ -12,7 +12,7 @@ import PageTextFieldContent, {
     computePageTextFieldTextStyle,
 } from "../../../StyledComponents/TextFieldContent/TextFieldContent.vue";
 import PageTooltipContent from "../../../StyledComponents/TooltipContent/TooltipContent.vue";
-import type { TextInputExampleProps } from "../TextInputPage.types";
+import type { TextInputExampleProps } from "../TextInputPageVue.types";
 
 type Props = TextInputExampleProps;
 

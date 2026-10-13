@@ -8,7 +8,7 @@ import { CONTROL_GLYPHS } from "@thewaver/ss-playground/App/StyledComponents/Con
 
 import { PageMeasureBox } from "../../../PageComponents/MeasureBox/MeasureBox";
 import { PageControlButtonContent } from "../../../StyledComponents/ControlButtonContent/ControlButtonContent";
-import type { ScrambleTextExampleProps } from "../ScrambleTextPage.types";
+import type { ScrambleTextExampleProps } from "../ScrambleTextPageSolid.types";
 
 const LINE = "DECRYPTING PAYLOAD FROM THE ARCHIVE";
 const BOX_WIDTH = 320;

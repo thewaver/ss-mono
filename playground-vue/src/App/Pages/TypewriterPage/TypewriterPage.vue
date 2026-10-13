@@ -2,9 +2,15 @@
 import { computed, shallowRef } from "vue";
 
 import { ScrambleTextWeights } from "@thewaver/ss-components-vue";
+import { TypewriterKnobs } from "@thewaver/ss-playground/App/Knobs/Typewriters.const";
+import {
+    EXAMPLES_ROOT,
+    EXAMPLE_NAMES,
+    TEXT_EFFECTS,
+    TEXT_EFFECT_MAP,
+} from "@thewaver/ss-playground/App/Pages/TypewriterPage/TypewriterPage.const";
 import * as styles from "@thewaver/ss-playground/App/Pages/TypewriterPage/TypewriterPage.css";
 
-import { TypewriterKnobs } from "../../Knobs/Typewriters.const";
 import type { ExampleDefs } from "../../PageComponents/Examples/Examples.types";
 import PageExamples from "../../PageComponents/Examples/PageExamples.vue";
 import PageNumberField from "../../PageComponents/Field/PageNumberField.vue";
@@ -18,18 +24,7 @@ import KaraokeExample from "./Examples/Karaoke.vue";
 import OutwardExample from "./Examples/Outward.vue";
 import PhrasesExample from "./Examples/Phrases.vue";
 import ScrollLitExample from "./Examples/ScrollLit.vue";
-import type { TypewriterExampleWrapperProps, TypewriterTextEffect } from "./TypewriterPage.types";
-
-const TEXT_EFFECTS: TypewriterTextEffect[] = ["fade", "scale", "glow", "drop", "slide"];
-const TEXT_EFFECT_MAP: Record<TypewriterTextEffect, string> = {
-    fade: styles.typewriterFade,
-    scale: styles.typewriterScale,
-    glow: styles.typewriterGlow,
-    drop: styles.typewriterDrop,
-    slide: styles.typewriterSlide,
-};
-
-const EXAMPLES_ROOT = "/src/App/Pages/TypewriterPage/Examples";
+import type { TypewriterExampleWrapperProps, TypewriterTextEffect } from "./TypewriterPageVue.types";
 
 type ArrivalOrder = (typeof TypewriterKnobs.ARRIVAL_ORDERS)[number];
 
@@ -51,38 +46,38 @@ const commonProps = computed<TypewriterExampleWrapperProps>(() => {
 const examples: ExampleDefs[] = [
     {
         key: "complex",
-        name: "Complex",
+        name: EXAMPLE_NAMES.complex,
         path: `${EXAMPLES_ROOT}/Complex.vue`,
     },
     {
         key: "customInput",
-        name: "Custom Input",
+        name: EXAMPLE_NAMES.customInput,
         path: `${EXAMPLES_ROOT}/CustomInput.vue`,
     },
     {
         key: "phrases",
-        name: "Phrases",
+        name: EXAMPLE_NAMES.phrases,
         readout: () =>
             "the example owns the loop: each run's end either holds the phrase and switches to erasing, or moves to the next phrase and types it, and the caret is placed from the same progress the characters are drawn from",
         path: `${EXAMPLES_ROOT}/Phrases.vue`,
     },
     {
         key: "karaoke",
-        name: "Karaoke",
+        name: EXAMPLE_NAMES.karaoke,
         readout: () =>
             "the line and the slider share one progress: singing writes it as it goes, and dragging the slider draws that moment — a stop can fall partway through a letter's own sweep",
         path: `${EXAMPLES_ROOT}/Karaoke.vue`,
     },
     {
         key: "scrollLit",
-        name: "Lit by scrolling",
+        name: EXAMPLE_NAMES.scrollLit,
         readout: () =>
             "playback is off and the progress is how far the paragraph has traveled up its box; the letters not yet reached show their animation's first frame, which is the dimmed text",
         path: `${EXAMPLES_ROOT}/ScrollLit.vue`,
     },
     {
         key: "outward",
-        name: "Flying outward",
+        name: EXAMPLE_NAMES.outward,
         readout: () =>
             "an animation per letter: the left half flies off to the left and the right half to the right, from the middle out, as the line crosses the middle of its box",
         path: `${EXAMPLES_ROOT}/Outward.vue`,

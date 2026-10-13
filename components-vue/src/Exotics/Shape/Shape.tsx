@@ -1,6 +1,7 @@
 import { Fragment, type SlotsType, defineComponent, shallowRef } from "vue";
 
 import { ShapeLayerUtils, ShapeStyles } from "@thewaver/ss-components";
+import { ShapeConst } from "@thewaver/ss-components/internal";
 import { Size2d } from "@thewaver/ss-utils";
 
 import type { SVGDefs } from "../../Generators/SVGDefs/SVGDefs.types";
@@ -8,8 +9,6 @@ import { watchAfterRender } from "../../Utils/effectUtils";
 import { callSlot, declareProps } from "../../Utils/propUtils";
 import type { SlotsContext } from "../../Utils/typeUtils";
 import type { ShapeProps, ShapeSlots } from "./Shape.types";
-
-const INITIAL_SIZE: Size2d = { width: 0, height: 0 };
 
 const renderDefsElements = (defs: SVGDefs[]) =>
     defs.map((def, index) => (
@@ -40,7 +39,7 @@ const renderPath = (def: SVGDefs, index: number, d: string, fillRule?: "evenodd"
 export const Shape = defineComponent(
     (props: ShapeProps, { slots }: SlotsContext<ShapeSlots>) => {
         const rootRef = shallowRef<HTMLDivElement>();
-        const rootSize = shallowRef(INITIAL_SIZE);
+        const rootSize = shallowRef(ShapeConst.INITIAL_SIZE);
 
         watchAfterRender([rootRef], ([root]) => {
             if (!root) return;

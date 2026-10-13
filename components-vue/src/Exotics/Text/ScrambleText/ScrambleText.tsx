@@ -8,6 +8,7 @@ import {
     ScrambleTextStyles,
     ScrambleTextUtils,
 } from "@thewaver/ss-components";
+import { ScrambleTextConst } from "@thewaver/ss-components/internal";
 
 import { provideLetterDriverContext } from "../../../Abstracts/LetterDriver/LetterDriver.context";
 import { watchAfterRender } from "../../../Utils/effectUtils";
@@ -15,8 +16,6 @@ import { declareProps } from "../../../Utils/propUtils";
 import { useStore } from "../../../Utils/storeUtils";
 import type { SlotsContext } from "../../../Utils/typeUtils";
 import type { ScrambleTextProps, ScrambleTextSlots } from "./ScrambleText.types";
-
-const NO_DELAY = 0;
 
 export const ScrambleText = defineComponent(
     (props: ScrambleTextProps, { slots }: SlotsContext<ScrambleTextSlots>) => {
@@ -36,7 +35,7 @@ export const ScrambleText = defineComponent(
         });
 
         const getSettleDurationMs = () => props.settleDurationMs ?? SCRAMBLE_TEXT_DEFAULTS.settleDurationMs;
-        const getSettleDelayMs = () => props.settleDelayMs ?? NO_DELAY;
+        const getSettleDelayMs = () => props.settleDelayMs ?? ScrambleTextConst.NO_DELAY;
 
         const settleTimes = computed(() =>
             ScrambleTextUtils.getSettleTimes(

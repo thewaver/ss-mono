@@ -2,10 +2,11 @@
     import * as styles from "@thewaver/ss-playground/App/StyledComponents/FileInputContent/FileInputContent.css";
 
     import { getLayerClass } from "../Layer/Layer.context";
-    import type { FileInputContentProps } from "./FileInputContent.types";
-
-    const NO_FILES = "none picked";
-    const PICK_FILE_MARK = "⬆️";
+    import type { FileInputContentProps } from "./FileInputContentSvelte.types";
+    import {
+        NO_FILES,
+        PICK_FILE_MARK,
+    } from "@thewaver/ss-playground/App/StyledComponents/FileInputContent/FileInputContent.const";
 
     let props: FileInputContentProps = $props();
 

@@ -2,7 +2,7 @@
 import * as styles from "@thewaver/ss-playground/App/StyledComponents/TagInputContent/TagInputContent.css";
 
 import { useLayerClass } from "../Layer/Layer.context";
-import type { TagContentProps } from "./TagInputContent.types";
+import type { TagContentProps } from "./TagInputContentVue.types";
 
 defineProps<TagContentProps>();
 

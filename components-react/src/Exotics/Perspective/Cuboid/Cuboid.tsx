@@ -8,16 +8,12 @@ import {
     type CuboidTurns,
     CuboidUtils,
 } from "@thewaver/ss-components";
+import { CuboidConst } from "@thewaver/ss-components/internal";
 import { type Matrix3d, StoreUtils } from "@thewaver/ss-utils";
 
 import { InteractionTrackerReactUtils } from "../../../Abstracts/InteractionTracker/InteractionTrackerReact.utils";
 import { useLatest } from "../../../Utils/refUtils";
 import type { CuboidController, CuboidProps } from "./Cuboid.types";
-
-const NO_DURATION = 0;
-const DRAG_COMMIT_RATIO = 0.5;
-
-const NO_TURNS: CuboidTurns = { yaw: 0, pitch: 0 };
 
 type PendingSettle = { from: Matrix3d | undefined; to: Matrix3d; turns: CuboidTurns };
 
@@ -33,7 +29,7 @@ export const Cuboid = (props: CuboidProps) => {
     const bodyRef = useRef<HTMLDivElement | null>(null);
     const pendingSettleRef = useRef<PendingSettle>(undefined);
 
-    const [dragTurns, setDragTurns] = useState(NO_TURNS);
+    const [dragTurns, setDragTurns] = useState(CuboidConst.NO_TURNS);
     const [tracked, setTracked] = useState(() => ({
         yaw,
         pitch,
@@ -49,7 +45,7 @@ export const Cuboid = (props: CuboidProps) => {
             const counted = CuboidUtils.getCountedOrientation(yaw, pitch);
 
             orientation = CuboidUtils.standUpright(counted);
-            pendingSettleRef.current = { from, to: isUpright ? orientation : counted, turns: NO_TURNS };
+            pendingSettleRef.current = { from, to: isUpright ? orientation : counted, turns: CuboidConst.NO_TURNS };
         } else if (isUpright) {
             const turns = { yaw: yaw - tracked.yaw, pitch: pitch - tracked.pitch };
 
@@ -82,7 +78,7 @@ export const Cuboid = (props: CuboidProps) => {
     const latest = useLatest({ yaw, pitch, isUpright, orientation, dragTurns, setYaw, setPitch });
 
     const { isSwiping } = InteractionTrackerReactUtils.useFreeSwipe(perspectiveRef, !isDraggable, {
-        commitRatio: DRAG_COMMIT_RATIO,
+        commitRatio: CuboidConst.DRAG_COMMIT_RATIO,
         onSwipe: (travel) => {
             if (isUpright) CuboidUtils.stopSettling(bodyRef.current ?? undefined);
 
@@ -92,10 +88,10 @@ export const Cuboid = (props: CuboidProps) => {
             const turns = CuboidUtils.getReleaseTurns(direction, dragTurns);
             const from = isUpright ? CuboidUtils.readDrawnOrientation(bodyRef.current ?? undefined) : undefined;
 
-            setDragTurns(NO_TURNS);
+            setDragTurns(CuboidConst.NO_TURNS);
 
             if (turns.yaw === 0 && turns.pitch === 0) {
-                if (from) pendingSettleRef.current = { from, to: orientation, turns: NO_TURNS };
+                if (from) pendingSettleRef.current = { from, to: orientation, turns: CuboidConst.NO_TURNS };
 
                 return;
             }
@@ -162,7 +158,7 @@ export const Cuboid = (props: CuboidProps) => {
                     className={CuboidStyles.cuboidBody}
                     style={{
                         transform: CuboidUtils.getBodyTransform(isUpright, orientation, yaw, pitch, dragTurns, size),
-                        transitionDuration: `${isUpright || isSwiping ? NO_DURATION : transitionDurationMs}ms`,
+                        transitionDuration: `${isUpright || isSwiping ? CuboidConst.NO_DURATION : transitionDurationMs}ms`,
                     }}
                 >
                     {CUBOID_FACES.map((face) => {

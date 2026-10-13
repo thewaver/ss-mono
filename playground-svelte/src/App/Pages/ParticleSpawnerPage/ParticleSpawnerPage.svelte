@@ -1,16 +1,22 @@
 <script lang="ts">
     import { PARTICLE_SPAWNER_DEFAULTS } from "@thewaver/ss-components-svelte";
     import {
-        ITERATION_PATTERNS,
-        ITERATION_PATTERN_KEYS,
-        TRAVEL_EASING_FNS,
-        TRAVEL_EASING_KEYS,
-        TRAVEL_PATTERN_FACTORIES,
-        TRAVEL_PATTERN_KEYS,
-        applyOvershoot,
-    } from "@thewaver/ss-playground/App/Pages/ParticleSpawnerPage/ParticleSpawnerPage.const";
+    applyOvershoot,
+    BOX_HEIGHT,
+    BOX_WIDTH,
+    EXAMPLE_NAMES,
+    EXAMPLES_ROOT,
+    FIELD_WIDTH,
+    ITERATION_PATTERN_KEYS,
+    ITERATION_PATTERNS,
+    NO_TRAVEL_DEFS,
+    TRAVEL_EASING_FNS,
+    TRAVEL_EASING_KEYS,
+    TRAVEL_PATTERN_FACTORIES,
+    TRAVEL_PATTERN_KEYS,
+} from "@thewaver/ss-playground/App/Pages/ParticleSpawnerPage/ParticleSpawnerPage.const";
 
-    import { ParticleSpawnerKnobs } from "../../Knobs/ParticleSpawners.const";
+    import { ParticleSpawnerKnobs } from "@thewaver/ss-playground/App/Knobs/ParticleSpawners.const";
     import type { ExampleDefs } from "../../PageComponents/Examples/Examples.types";
     import PageExamples from "../../PageComponents/Examples/PageExamples.svelte";
     import PageCheckField from "../../PageComponents/Field/PageCheckField.svelte";
@@ -39,13 +45,6 @@
         TravelEasingKey,
     } from "./ParticleSpawnerPage.types";
     import StressTestWrapper from "./StressTestWrapper.svelte";
-
-    const EXAMPLES_ROOT = "/src/App/Pages/ParticleSpawnerPage/Examples";
-    const FIELD_WIDTH = 130;
-    const BOX_WIDTH = 420;
-    const BOX_HEIGHT = 260;
-
-    const NO_TRAVEL_DEFS: Record<string, number | boolean> = {};
 
     let particleCount = $state(ParticleSpawnerKnobs.STARTING_PARTICLE_COUNT);
     let travelDurationMs = $state(PARTICLE_SPAWNER_DEFAULTS.travelDurationMs);
@@ -94,67 +93,67 @@
     const examples: ExampleDefs[] = [
         {
             key: "singleTarget",
-            name: "Single target",
+            name: EXAMPLE_NAMES.singleTarget,
             component: singleTargetExample,
             path: `${EXAMPLES_ROOT}/SingleTarget.svelte`,
         },
         {
             key: "vertical",
-            name: "Vertical",
+            name: EXAMPLE_NAMES.vertical,
             component: verticalExample,
             path: `${EXAMPLES_ROOT}/Vertical.svelte`,
         },
         {
             key: "diagonal",
-            name: "Diagonal",
+            name: EXAMPLE_NAMES.diagonal,
             component: diagonalExample,
             path: `${EXAMPLES_ROOT}/Diagonal.svelte`,
         },
         {
             key: "movingTarget",
-            name: "Moving target",
+            name: EXAMPLE_NAMES.movingTarget,
             component: movingTargetExample,
             path: `${EXAMPLES_ROOT}/MovingTarget.svelte`,
         },
         {
             key: "radial",
-            name: "Radial (1 spawner, many targets)",
+            name: EXAMPLE_NAMES.radial,
             component: radialExample,
             path: `${EXAMPLES_ROOT}/Radial.svelte`,
         },
         {
             key: "manyToOne",
-            name: "Many to one (many spawners, 1 target)",
+            name: EXAMPLE_NAMES.manyToOne,
             component: manyToOneExample,
             path: `${EXAMPLES_ROOT}/ManyToOne.svelte`,
         },
         {
             key: "burst",
-            name: "Burst on press",
+            name: EXAMPLE_NAMES.burst,
             component: burstExample,
             path: `${EXAMPLES_ROOT}/Burst.svelte`,
         },
         {
             key: "roundTrip",
-            name: "Round trip (a relay on arrival)",
+            name: EXAMPLE_NAMES.roundTrip,
             component: roundTripExample,
             path: `${EXAMPLES_ROOT}/RoundTrip.svelte`,
         },
         {
             key: "multipleTargets",
-            name: "Multiple targets",
+            name: EXAMPLE_NAMES.multipleTargets,
             component: multipleTargetsExample,
             path: `${EXAMPLES_ROOT}/MultipleTargets.svelte`,
         },
         {
             key: "grid",
-            name: "N spawners x M targets",
+            name: EXAMPLE_NAMES.grid,
             component: gridExample,
             path: `${EXAMPLES_ROOT}/Grid.svelte`,
         },
         {
             key: "stressTest",
-            name: "Stress Test",
+            name: EXAMPLE_NAMES.stressTest,
             component: stressTestExample,
         },
     ];

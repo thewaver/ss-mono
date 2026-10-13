@@ -12,8 +12,14 @@ import {
     STARTING_KEYS,
     getPaintDefaults,
     getPaintKnobs,
-} from "./PaintPicker.const";
-import type { PagePaintPickerProps, PaintKind, PaintSampleKey, PaintSampleKind, PaintSlot } from "./PaintPicker.types";
+} from "./PaintPickerSolid.const";
+import type {
+    PagePaintPickerProps,
+    PaintKind,
+    PaintSampleKey,
+    PaintSampleKind,
+    PaintSlot,
+} from "./PaintPickerSolid.types";
 
 type ConfigDefs = Record<string, Record<string, number | boolean>>;
 

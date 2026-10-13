@@ -9,6 +9,7 @@ import {
     ToastUtils,
     ToastsStyles,
 } from "@thewaver/ss-components";
+import { ToastsConst } from "@thewaver/ss-components/internal";
 import { CSSUtils, GestureUtils } from "@thewaver/ss-utils";
 
 import { ElementFaderReactUtils } from "../../../Abstracts/ElementFader/ElementFaderReact.utils";
@@ -17,8 +18,6 @@ import { InteractionTrackerReactUtils } from "../../../Abstracts/InteractionTrac
 import { useViewportContext } from "../../../Abstracts/Viewport/Viewport.context";
 import { useElement, useLatest } from "../../../Utils/refUtils";
 import type { ToastsItemProps, ToastsProps } from "./Toasts.types";
-
-const DEFAULT_MARGINS = CSSUtils.spreadMargin(0);
 
 const ToastsItem = <T,>(props: ToastsItemProps<T>) => {
     const itemRef = useRef<HTMLDivElement | null>(null);
@@ -125,7 +124,7 @@ export const Toasts = <T,>(props: ToastsProps<T>) => {
     const alignment = props.alignment ?? TOASTS_DEFAULTS.alignment;
     const dir = props.dir ?? TOASTS_DEFAULTS.dir;
     const overflow = props.overflow ?? TOASTS_DEFAULTS.overflow;
-    const margins = props.margins ?? DEFAULT_MARGINS;
+    const margins = props.margins ?? ToastsConst.DEFAULT_MARGINS;
     const hotkey = props.hotkey ?? TOASTS_DEFAULTS.hotkey;
     const politeness = props.ariaLive ?? TOASTS_DEFAULTS.ariaLive;
     const stackAlignment = ToastUtils.computeStackAlignment(alignment, dir);

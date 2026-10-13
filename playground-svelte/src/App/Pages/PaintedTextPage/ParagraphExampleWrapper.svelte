@@ -3,7 +3,7 @@
 
     import PageMeasureBox from "../../PageComponents/MeasureBox/MeasureBox.svelte";
     import ParagraphExample from "./Examples/Paragraph.svelte";
-    import type { PaintedTextExampleWrapperProps } from "./PaintedTextPage.types";
+    import type { PaintedTextExampleWrapperProps } from "./PaintedTextPageSvelte.types";
 
     let { width, ...props }: PaintedTextExampleWrapperProps = $props();
 </script>

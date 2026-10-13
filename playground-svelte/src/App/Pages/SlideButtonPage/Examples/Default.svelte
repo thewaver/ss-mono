@@ -3,7 +3,7 @@
     import { SLIDE_BUTTON_THUMB_SIZE } from "@thewaver/ss-playground/App/StyledComponents/SlideButtonContent/SlideButtonContent.css";
 
     import PageSlideButtonContent from "../../../StyledComponents/SlideButtonContent/SlideButtonContent.svelte";
-    import type { SlideButtonExampleProps } from "../SlideButtonPage.types";
+    import type { SlideButtonExampleProps } from "../SlideButtonPageSvelte.types";
 
     type Props = SlideButtonExampleProps & { progress?: number };
 

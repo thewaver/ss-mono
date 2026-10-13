@@ -4,7 +4,7 @@
     import { assignInlineVars } from "@vanilla-extract/dynamic";
 
     import { getLayerClass } from "../Layer/Layer.context";
-    import type { ColorSwatchProps } from "./ColorAreaContent.types";
+    import type { ColorSwatchProps } from "./ColorAreaContentSvelte.types";
 
     let props: ColorSwatchProps = $props();
 

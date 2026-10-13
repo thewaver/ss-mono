@@ -2,7 +2,21 @@
     import { Button, SLOT_TEXT_DEFAULTS, SlotTextReels } from "@thewaver/ss-components-svelte";
     import type { SlotTextLetterRoute, SlotTextMechanism } from "@thewaver/ss-components-svelte";
     import { SlotTextKnobs } from "@thewaver/ss-playground/App/Knobs/SlotTexts.const";
-    import { WORDS } from "@thewaver/ss-playground/App/Pages/SlotTextPage/SlotTextPage.const";
+    import {
+    BIG_STEP,
+    EXAMPLE_NAMES,
+    EXAMPLES_ROOT,
+    FIELD_WIDTH,
+    FIRST,
+    GROUP_SIZE,
+    REEL_DIGITS,
+    REEL_PAD,
+    REEL_RANGE,
+    SMALL_STEP,
+    STARTING_REEL_VALUE,
+    WORDS,
+    ZERO,
+} from "@thewaver/ss-playground/App/Pages/SlotTextPage/SlotTextPage.const";
     import * as styles from "@thewaver/ss-playground/App/Pages/SlotTextPage/SlotTextPage.css";
 
     import PageExampleKnobs from "../../PageComponents/ExampleKnobs/PageExampleKnobs.svelte";
@@ -18,20 +32,7 @@
     import ReelsExample from "./Examples/Reels.svelte";
     import SplitFlapExample from "./Examples/SplitFlap.svelte";
     import WordsExample from "./Examples/Words.svelte";
-    import type { SlotTextExampleProps } from "./SlotTextPage.types";
-
-    const EXAMPLES_ROOT = "/src/App/Pages/SlotTextPage/Examples";
-
-    const ZERO = 0;
-    const SMALL_STEP = 1;
-    const BIG_STEP = 137;
-    const GROUP_SIZE = 3;
-    const FIRST = 0;
-    const REEL_DIGITS = 4;
-    const REEL_PAD = "0";
-    const REEL_RANGE = 10 ** REEL_DIGITS;
-    const STARTING_REEL_VALUE = 7;
-    const FIELD_WIDTH = 130;
+    import type { SlotTextExampleProps } from "./SlotTextPageSvelte.types";
 
     const STEPS = [
         { id: "stepDown", flapId: "flapStepDown", label: `take ${SMALL_STEP}`, delta: -SMALL_STEP },
@@ -78,7 +79,7 @@
     const examples: ExampleDefs[] = [
         {
             key: "counter",
-            name: "Counter",
+            name: EXAMPLE_NAMES.counter,
             readout: () =>
                 "every column that has to carry waits for the one to its right, a column going nine to zero keeps turning forward rather than rewinding, and crossing zero turns the whole number back the other way, and a digit or separator arriving or going grows in or shrinks away while it fades",
             component: counterExample,
@@ -86,7 +87,7 @@
         },
         {
             key: "reels",
-            name: "Reels",
+            name: EXAMPLE_NAMES.reels,
             readout: () =>
                 "every column spins at once and stops in the order its reel gives, taking extra whole turns on the way; with less motion asked for it only turns as far as its digit needs",
             component: reelsExample,
@@ -94,7 +95,7 @@
         },
         {
             key: "splitFlap",
-            name: "Departures board",
+            name: EXAMPLE_NAMES.splitFlap,
             readout: () =>
                 "the counter's number on flaps: each column drops one flap after another through every digit between the old one and the new, the top half of the digit going falling to uncover the bottom half of the digit coming; a column that carries waits for the one to its right, and a column whose digit has not changed does not flip",
             component: splitFlapExample,
@@ -102,7 +103,7 @@
         },
         {
             key: "words",
-            name: "Words, a letter at a time",
+            name: EXAMPLE_NAMES.words,
             readout: () =>
                 `showing: ${WORDS[wordIndex].trim()} — every letter is a column of its own that turns through the alphabet to its next letter, with the words padded by spaces so no column comes or goes; forward always goes on round, as a departures board does, and shortest takes the nearer way`,
             component: wordsExample,

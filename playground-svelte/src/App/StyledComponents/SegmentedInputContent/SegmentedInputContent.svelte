@@ -3,7 +3,7 @@
     import * as fieldStyles from "@thewaver/ss-playground/App/StyledComponents/TextFieldContent/TextFieldContent.css";
 
     import { getLayerClass } from "../Layer/Layer.context";
-    import type { SegmentedInputCellProps } from "./SegmentedInputContent.types";
+    import type { SegmentedInputCellProps } from "./SegmentedInputContentSvelte.types";
 
     let props: SegmentedInputCellProps = $props();
 

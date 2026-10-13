@@ -2,7 +2,7 @@ import { Label, Radio, RadioGroup } from "@thewaver/ss-components-react";
 
 import { PageLabelCaption } from "../../../StyledComponents/LabelCaption/LabelCaption";
 import { PageRadioContent } from "../../../StyledComponents/RadioContent/RadioContent";
-import type { LabelRadioExampleProps, PlanValue } from "../LabelPage.types";
+import type { LabelRadioExampleProps, PlanValue } from "../LabelPageReact.types";
 
 const GAP = 20;
 

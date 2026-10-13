@@ -2,7 +2,7 @@
     import { Button } from "@thewaver/ss-components-svelte";
 
     import PageButtonContent from "../../../StyledComponents/ButtonContent/ButtonContent.svelte";
-    import type { ButtonExampleProps } from "../ButtonPage.types";
+    import type { ButtonExampleProps } from "../ButtonPageSvelte.types";
 
     const SAVE_DURATION_MS = 1000;
 

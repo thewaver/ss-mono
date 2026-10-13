@@ -1,9 +1,15 @@
 import type { Accessor, Component, JSX } from "solid-js";
 
-import type { Breadcrumb, BreadcrumbsFlags, InteractionFlags } from "@thewaver/ss-components";
+import type {
+    BaseBreadcrumbsCbs,
+    BaseBreadcrumbsValues,
+    Breadcrumb,
+    BreadcrumbsFlags,
+    InteractionFlags,
+} from "@thewaver/ss-components";
 
 import type { InteractionControlProps } from "../../Primitives/InteractionWrapper/InteractionWrapperSolid.types";
-import type { AccessorProps, MaybeAccessor } from "../../Utils/typeUtils";
+import type { AccessorProps, AccessorValues, MaybeAccessor } from "../../Utils/typeUtils";
 import type { TabLinkProps } from "../Tabs/TabsSolid.types";
 
 export type BreadcrumbsItemProps<T> = AccessorProps<
@@ -18,24 +24,17 @@ export type BreadcrumbsItemProps<T> = AccessorProps<
     onSelect: (value: T) => void;
 };
 
-export type BreadcrumbsProps<T> = AccessorProps<{
-    /** The space between crumbs and separators. */
-    gap?: number;
-    /**
-     * Names the trail for assistive technology. Required, because the `<nav>` around it is a landmark and
-     * nothing else can name it — a page with two unnamed navigation landmarks gives a reader no way to tell
-     * them apart.
-     */
-    ariaLabel: string;
-    /** The component to draw navigating crumbs with, for a trail of links rather than of buttons. */
-    linkComponent?: Component<TabLinkProps>;
-    /** Draws whatever sits between two crumbs. */
-    renderSeparator?: () => JSX.Element;
-}> & {
-    /** The crumbs, from the root to where the reader is now. */
-    crumbs: MaybeAccessor<Breadcrumb<T>[]>;
-    /** Draws one crumb. */
-    renderCrumb: (getCrumb: Accessor<Breadcrumb<T>>, getFlags: () => InteractionFlags<BreadcrumbsFlags>) => JSX.Element;
-    /** Runs when a crumb is chosen. */
-    onSelect?: (value: T) => void;
-};
+export type BreadcrumbsProps<T> = AccessorValues<BaseBreadcrumbsValues<T>> &
+    BaseBreadcrumbsCbs<T> &
+    AccessorProps<{
+        /** The component to draw navigating crumbs with, for a trail of links rather than of buttons. */
+        linkComponent?: Component<TabLinkProps>;
+        /** Draws whatever sits between two crumbs. */
+        renderSeparator?: () => JSX.Element;
+    }> & {
+        /** Draws one crumb. */
+        renderCrumb: (
+            getCrumb: Accessor<Breadcrumb<T>>,
+            getFlags: () => InteractionFlags<BreadcrumbsFlags>,
+        ) => JSX.Element;
+    };

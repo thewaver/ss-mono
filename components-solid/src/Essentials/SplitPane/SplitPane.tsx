@@ -6,14 +6,12 @@ import {
     SplitPaneUtils,
     SplitPaneStyles as styles,
 } from "@thewaver/ss-components";
+import { SplitPaneConst } from "@thewaver/ss-components/internal";
 
 import { ElementObserverSolidUtils } from "../../Abstracts/ElementObserver/ElementObserverSolid.utils";
 import { NavigatorSolidUtils } from "../../Abstracts/Navigator/NavigatorSolid.utils";
 import { access, accessSignal } from "../../Utils/propUtils";
 import type { SplitPaneProps } from "./SplitPaneSolid.types";
-
-const NO_GUTTER_DRAGGING = -1;
-const PERCENT = 100;
 
 export const SplitPane = (props: SplitPaneProps) => {
     const ratiosSignal = accessSignal(() => props.ratios);
@@ -21,7 +19,7 @@ export const SplitPane = (props: SplitPaneProps) => {
     const paneIdPrefix = createUniqueId();
 
     const [getRootRef, setRootRef] = createSignal<HTMLElement>();
-    const [getDraggingIndex, setDraggingIndex] = createSignal(NO_GUTTER_DRAGGING);
+    const [getDraggingIndex, setDraggingIndex] = createSignal(SplitPaneConst.NO_GUTTER_DRAGGING);
     const [getCollapsedBoundaries, setCollapsedBoundaries] = createSignal<SplitPaneCollapsedBoundaries>({});
 
     const getPaneId = (index: number) => access(props.panes)[index]?.id ?? `${paneIdPrefix}-pane-${index}`;
@@ -133,7 +131,7 @@ export const SplitPane = (props: SplitPaneProps) => {
         if (getDraggingIndex() !== index) return;
 
         (e.currentTarget as HTMLElement).releasePointerCapture(e.pointerId);
-        setDraggingIndex(NO_GUTTER_DRAGGING);
+        setDraggingIndex(SplitPaneConst.NO_GUTTER_DRAGGING);
 
         if (hasDragged) return;
 
@@ -153,7 +151,7 @@ export const SplitPane = (props: SplitPaneProps) => {
     const handleGutterPointerCancel = (index: number) => {
         if (getDraggingIndex() !== index) return;
 
-        setDraggingIndex(NO_GUTTER_DRAGGING);
+        setDraggingIndex(SplitPaneConst.NO_GUTTER_DRAGGING);
     };
 
     const toggleCollapsed = (index: number) => {
@@ -220,9 +218,13 @@ export const SplitPane = (props: SplitPaneProps) => {
                                 aria-controls={getPaneId(index - 1)}
                                 aria-label={access(props.panes)[index - 1].gutterAriaLabel}
                                 aria-disabled={getIsDisabled() || undefined}
-                                aria-valuenow={Math.round(getBoundary(index - 1) * PERCENT)}
-                                aria-valuemin={Math.round(computeBoundaryLimits(index - 1).floor * PERCENT)}
-                                aria-valuemax={Math.round(computeBoundaryLimits(index - 1).ceiling * PERCENT)}
+                                aria-valuenow={Math.round(getBoundary(index - 1) * SplitPaneConst.PERCENT)}
+                                aria-valuemin={Math.round(
+                                    computeBoundaryLimits(index - 1).floor * SplitPaneConst.PERCENT,
+                                )}
+                                aria-valuemax={Math.round(
+                                    computeBoundaryLimits(index - 1).ceiling * SplitPaneConst.PERCENT,
+                                )}
                                 onPointerDown={(e) => handleGutterPointerDown(e, index - 1)}
                                 onPointerMove={(e) => handleGutterPointerMove(e, index - 1)}
                                 onPointerUp={(e) => handleGutterPointerUp(e, index - 1)}

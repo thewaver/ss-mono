@@ -6,7 +6,7 @@ import { MultiSelect } from "@thewaver/ss-components-vue";
 import PageGlideFloater from "../../../StyledComponents/GlideFloater/PageGlideFloater.vue";
 import PageSelectContent from "../../../StyledComponents/SelectContent/SelectContent.vue";
 import PageSelectOptionContent from "../../../StyledComponents/SelectOptionContent/SelectOptionContent.vue";
-import { COUNTRIES, PLACEHOLDER } from "../../SelectPage/SelectPage.const";
+import { COUNTRIES, PLACEHOLDER } from "../../SelectPage/SelectPageVue.const";
 import SelectPopup from "../../SelectPage/SelectPopup.vue";
 
 type Props = {

@@ -2,7 +2,7 @@
 import * as styles from "@thewaver/ss-playground/App/StyledComponents/NavMenuContent/NavMenuContent.css";
 
 import { useLayerClass } from "../Layer/Layer.context";
-import type { NavMenuTriggerProps } from "./NavMenuContent.types";
+import type { NavMenuTriggerProps } from "./NavMenuContentVue.types";
 
 defineProps<NavMenuTriggerProps>();
 

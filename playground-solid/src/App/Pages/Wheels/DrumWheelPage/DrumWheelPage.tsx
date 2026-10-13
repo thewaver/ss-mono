@@ -1,13 +1,16 @@
 import type { Accessor } from "solid-js";
 import { createMemo, createSignal } from "solid-js";
 
+import {
+    EXAMPLES_ROOT,
+    EXAMPLE_NAMES,
+} from "@thewaver/ss-playground/App/Pages/Wheels/DrumWheelPage/DrumWheelPage.const";
+
 import { PageExamples } from "../../../PageComponents/Examples/Examples";
 import { createWheelsControls } from "../Wheels.utils";
 import { PageWheelsPanel } from "../WheelsPanel";
 import { OverExample } from "./Examples/Over";
 import { SidewaysExample } from "./Examples/Sideways";
-
-const EXAMPLES_ROOT = "/src/App/Pages/Wheels/DrumWheelPage/Examples";
 
 export const DrumWheelPage = () => {
     const controls = createWheelsControls();
@@ -24,7 +27,7 @@ export const DrumWheelPage = () => {
     const getExamples = createMemo(() => [
         {
             key: "sideways",
-            name: "Turning sideways",
+            name: EXAMPLE_NAMES.sideways,
             component: () => (
                 <SidewaysExample
                     {...controls.getSharedProps()}
@@ -37,7 +40,7 @@ export const DrumWheelPage = () => {
         },
         {
             key: "reel",
-            name: "Turning over",
+            name: EXAMPLE_NAMES.reel,
             component: () => (
                 <OverExample
                     {...controls.getSharedProps()}

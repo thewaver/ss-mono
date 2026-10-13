@@ -4,7 +4,7 @@
     import { renderPageHighlightFloater } from "../../../StyledComponents/GlideFloater/GlideFloater.const.svelte";
     import PageListboxSurface from "../../../StyledComponents/ListboxSurface/ListboxSurface.svelte";
     import PageSelectOptionContent from "../../../StyledComponents/SelectOptionContent/SelectOptionContent.svelte";
-    import { SIZES } from "../ListboxPage.const";
+    import { SIZES } from "@thewaver/ss-playground/App/Pages/ListboxPage/ListboxPage.const";
     import type { ListboxExampleProps } from "../ListboxPage.types";
 
     type Props = ListboxExampleProps;

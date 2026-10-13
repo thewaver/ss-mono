@@ -1,49 +1,23 @@
 import type { JSX, Signal } from "solid-js";
 
 import type {
-    AnchorPlacement,
-    CalendarPrecision,
+    BaseDatePickerCbs,
+    BaseDatePickerValues,
     DateValue,
-    DateValueWeekStart,
     InteractionFlags,
     PopupTriggerFlags,
 } from "@thewaver/ss-components";
-import type { Point2d } from "@thewaver/ss-utils";
 
-import type { AccessorProps, SignalSource } from "../../../Utils/typeUtils";
+import type { AccessorProps, AccessorValues, SignalSource } from "../../../Utils/typeUtils";
 import type { CalendarDayRenderer, CalendarWeekdayRenderer } from "../Calendar/CalendarSolid.types";
 import type { DateInputProps } from "../DateInput/DateInputSolid.types";
 
 export type DatePickerProps = Omit<DateInputProps, "renderTrailing"> &
+    AccessorValues<BaseDatePickerValues> &
+    BaseDatePickerCbs &
     AccessorProps<{
-        /** Where the calendar sits against the field. */
-        placement?: AnchorPlacement;
-        /** How far the calendar is held clear of the field. */
-        offset?: Point2d;
-        /** How long the calendar takes to fade in and out. */
-        popupTransitionDurationMs?: number;
-        /** Names the calendar for assistive technology. */
-        calendarLabel: string;
-        /** Which day begins a week, which decides the order of the column headings. */
-        weekStartsOn?: DateValueWeekStart;
-        /**
-         * What one cell of the popup's calendar holds — days, months or years — and so what a pick there sets.
-         * It is handed to the calendar as it stands; the field still takes a whole date.
-         */
-        precision?: CalendarPrecision;
-        /** Whether one day can be picked, for rules a plain earliest and latest cannot express. */
-        computeIsDayDisabled?: (day: DateValue) => boolean;
         /** Whether the calendar is open. It is the only thing that opens or closes it. */
         visibility?: SignalSource<boolean>;
-        /**
-         * The trigger's own element id, for a consumer that has to reach it from a label or a test.
-         *
-         * It is separate from the field's `id` because the two are different elements now that the component
-         * owns the trigger.
-         */
-        triggerId?: string;
-        /** Names the control that opens the calendar. */
-        triggerAriaLabel: string;
         /**
          * Draws what sits inside the control that opens the calendar.
          *

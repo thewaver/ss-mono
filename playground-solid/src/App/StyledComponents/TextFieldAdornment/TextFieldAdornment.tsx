@@ -4,7 +4,7 @@ import { access } from "@thewaver/ss-components-solid";
 import * as styles from "@thewaver/ss-playground/App/StyledComponents/TextFieldAdornment/TextFieldAdornment.css";
 
 import { useLayerClass } from "../Layer/Layer.context";
-import type { TextFieldAdornmentProps } from "./TextFieldAdornment.types";
+import type { TextFieldAdornmentProps } from "./TextFieldAdornmentSolid.types";
 
 export const PageTextFieldAdornment = (props: ParentProps<TextFieldAdornmentProps>) => {
     const getLayerClass = useLayerClass();

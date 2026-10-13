@@ -2,10 +2,16 @@
     import { DIE_DEFAULTS, DieShapes, MediaQueryMonitorSvelteUtils, RollerUtils } from "@thewaver/ss-components-svelte";
     import { DieKnobs } from "@thewaver/ss-playground/App/Knobs/Dice.const";
     import {
-        ICON_CLOUD_EMPTY_LABEL,
-        ICON_CLOUD_ICONS,
-        ICON_CLOUD_TURN_MS,
-    } from "@thewaver/ss-playground/App/Pages/DiePage/DiePage.const";
+    CLOUD_SIZE,
+    DIE_SIZE,
+    EXAMPLE_NAMES,
+    EXAMPLES_ROOT,
+    FIRST_NUMBER,
+    ICON_CLOUD_EMPTY_LABEL,
+    ICON_CLOUD_ICONS,
+    ICON_CLOUD_TURN_MS,
+    NO_MOTION_DURATION_MS,
+} from "@thewaver/ss-playground/App/Pages/DiePage/DiePage.const";
 
     import type { ExampleDefs } from "../../PageComponents/Examples/Examples.types";
     import PageExamples from "../../PageComponents/Examples/PageExamples.svelte";
@@ -15,13 +21,6 @@
     import PagePropsPanel from "../../PageComponents/PropsPanel/PagePropsPanel.svelte";
     import IconCloudExample from "./Examples/IconCloud.svelte";
     import TabletopExample from "./Examples/Tabletop.svelte";
-
-    const EXAMPLES_ROOT = "/src/App/Pages/DiePage/Examples";
-
-    const DIE_SIZE = 160;
-    const CLOUD_SIZE = 240;
-    const NO_MOTION_DURATION_MS = 0;
-    const FIRST_NUMBER = 1;
 
     let shapeKey = $state<DieShapes.SampleKey>(DieKnobs.STARTING_SHAPE_KEY);
     let rollDurationMs = $state(DIE_DEFAULTS.rollDurationMs);
@@ -46,7 +45,7 @@
     const examples: ExampleDefs[] = [
         {
             key: "tabletop",
-            name: "Tabletop die",
+            name: EXAMPLE_NAMES.tabletop,
             readout: () =>
                 `showing ${dieFace + FIRST_NUMBER} of ${DieShapes.SAMPLE_SHAPES[shapeKey].faces.length} — the page picks the number, and the die tumbles and lands on it`,
             component: tabletopExample,
@@ -54,7 +53,7 @@
         },
         {
             key: "iconCloud",
-            name: "Icon cloud",
+            name: EXAMPLE_NAMES.iconCloud,
             readout: () =>
                 `${cloudAutoSpin ? "turning by itself" : "paused"}, facing ${ICON_CLOUD_ICONS[RollerUtils.clampFace(cloudFace, shape.faces.length)]?.label ?? ICON_CLOUD_EMPTY_LABEL} — drag it, or focus it and use the arrow keys, and it settles on the nearest icon`,
             component: iconCloudExample,

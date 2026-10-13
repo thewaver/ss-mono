@@ -7,7 +7,7 @@ import { SLIDE_BUTTON_THUMB_SIZE } from "@thewaver/ss-playground/App/StyledCompo
 
 import PageSlideButtonContent from "../../../StyledComponents/SlideButtonContent/SlideButtonContent.vue";
 import PageTooltipContent from "../../../StyledComponents/TooltipContent/TooltipContent.vue";
-import type { SlideButtonExampleProps } from "../SlideButtonPage.types";
+import type { SlideButtonExampleProps } from "../SlideButtonPageVue.types";
 
 type Props = SlideButtonExampleProps;
 

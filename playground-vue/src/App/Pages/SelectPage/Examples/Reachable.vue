@@ -8,8 +8,8 @@ import PageGlideFloater from "../../../StyledComponents/GlideFloater/PageGlideFl
 import PageSelectContent from "../../../StyledComponents/SelectContent/SelectContent.vue";
 import PageSelectOptionContent from "../../../StyledComponents/SelectOptionContent/SelectOptionContent.vue";
 import PageTooltipContent from "../../../StyledComponents/TooltipContent/TooltipContent.vue";
-import { COUNTRIES, PLACEHOLDER } from "../SelectPage.const";
 import type { SelectExampleProps } from "../SelectPage.types";
+import { COUNTRIES, PLACEHOLDER } from "../SelectPageVue.const";
 import SelectPopup from "../SelectPopup.vue";
 
 type Props = SelectExampleProps;

@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import * as styles from "@thewaver/ss-playground/App/StyledComponents/StaircaseContent/StaircaseContent.css";
 
-import type { PageStaircaseStepProps } from "./StaircaseContent.types";
+import type { PageStaircaseStepProps } from "./StaircaseContentVue.types";
 
 defineProps<PageStaircaseStepProps>();
 </script>

@@ -1,10 +1,3 @@
-export type TilterExampleProps = {
-    isDisabled: boolean;
-    activeRangePx: number;
-    smoothingMs: number;
-    tiltRangePx: number;
-    maxTiltDegrees: number;
-    perspectivePx: number;
-    sheenOpacity: number;
-    sheenSpreadPercent: number;
-};
+import type { BaseTilterExampleProps } from "@thewaver/ss-playground/App/Pages/PointerEffects/TilterPage/TilterPage.types";
+
+export type TilterExampleProps = BaseTilterExampleProps;

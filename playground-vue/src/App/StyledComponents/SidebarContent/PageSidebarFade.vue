@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import * as styles from "@thewaver/ss-playground/App/StyledComponents/SidebarContent/SidebarContent.css";
 
-import type { SidebarFadeProps } from "./SidebarContent.types";
+import type { SidebarFadeProps } from "./SidebarContentVue.types";
 
 defineProps<SidebarFadeProps>();
 </script>

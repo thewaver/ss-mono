@@ -3,7 +3,7 @@ import type { PropsWithChildren } from "react";
 import * as styles from "@thewaver/ss-playground/App/StyledComponents/ClockContent/ClockContent.css";
 
 import { useLayerClass } from "../Layer/Layer.context";
-import type { ClockOptionProps } from "./ClockContent.types";
+import type { ClockOptionProps } from "./ClockContentReact.types";
 
 export const PageClockOption = (props: ClockOptionProps) => {
     const layerClass = useLayerClass();

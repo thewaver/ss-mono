@@ -2,8 +2,8 @@
     import { Radio, RadioGroup } from "@thewaver/ss-components-svelte";
 
     import PageRadioContent from "../../../StyledComponents/RadioContent/RadioContent.svelte";
-    import { RADIO_GROUP_GAP, SIZE_OPTIONS } from "../RadioPage.const";
-    import type { RadioOptionalExampleProps } from "../RadioPage.types";
+    import { RADIO_GROUP_GAP, SIZE_OPTIONS } from "@thewaver/ss-playground/App/Pages/RadioPage/RadioPage.const";
+    import type { RadioOptionalExampleProps } from "../RadioPageSvelte.types";
 
     type Props = RadioOptionalExampleProps;
 

@@ -3,18 +3,19 @@ import { computed, shallowRef } from "vue";
 
 import type { SVGDefsColors } from "@thewaver/ss-components-vue";
 import { SVGDefsSamples } from "@thewaver/ss-components-vue";
+import { ShapeKnobs } from "@thewaver/ss-playground/App/Knobs/Shapes.const";
+import { EXAMPLES_ROOT, EXAMPLE_NAMES } from "@thewaver/ss-playground/App/Pages/ShapePage/ShapePage.const";
 import * as styles from "@thewaver/ss-playground/App/Pages/ShapePage/ShapePage.css";
 import { assignInlineVars } from "@vanilla-extract/dynamic";
 
-import { ShapeKnobs } from "../../Knobs/Shapes.const";
 import type { ExampleDefs } from "../../PageComponents/Examples/Examples.types";
 import PageExamples from "../../PageComponents/Examples/PageExamples.vue";
 import PageColorField from "../../PageComponents/Field/PageColorField.vue";
 import PageNumberField from "../../PageComponents/Field/PageNumberField.vue";
 import PageSelectField from "../../PageComponents/Field/PageSelectField.vue";
 import PagePaintPicker from "../../PageComponents/PaintPicker/PagePaintPicker.vue";
-import { getIsUsingKind } from "../../PageComponents/PaintPicker/PaintPicker.const";
 import { usePaintSlot } from "../../PageComponents/PaintPicker/PaintPicker.utils";
+import { getIsUsingKind } from "../../PageComponents/PaintPicker/PaintPickerVue.const";
 import PageProp from "../../PageComponents/Prop/Prop.vue";
 import PagePropsDivider from "../../PageComponents/PropsPanel/PagePropsDivider.vue";
 import PagePropsGroups from "../../PageComponents/PropsPanel/PagePropsGroups.vue";
@@ -26,7 +27,6 @@ import SharedPaintExampleWrapper from "./SharedPaintExampleWrapper.vue";
 import StressTestWrapper from "./StressTestWrapper.vue";
 import TextWrapExampleWrapper from "./TextWrapExampleWrapper.vue";
 
-const EXAMPLES_ROOT = "/src/App/Pages/ShapePage/Examples";
 const DEFAULT_EXAMPLE_PATH = `${EXAMPLES_ROOT}/Default.vue`;
 
 const blurWidth = shallowRef(ShapeKnobs.STARTING_BLUR_WIDTH);
@@ -69,33 +69,33 @@ const setColor = (key: keyof SVGDefsColors, value: string) => {
 const examples: ExampleDefs[] = [
     {
         key: "default",
-        name: "Default",
+        name: EXAMPLE_NAMES.default,
         path: DEFAULT_EXAMPLE_PATH,
     },
     {
         key: "morph",
-        name: "Morph",
+        name: EXAMPLE_NAMES.morph,
         readout: () =>
             "one number from 0 to 1 is read inside computePoints and blends two contours of twice the star-point count each, their corner radii and their exponents with them; under reduced motion the press jumps straight to the other shape",
         path: `${EXAMPLES_ROOT}/Morph.vue`,
     },
     {
         key: "sharedPaint",
-        name: "Shared Paint",
+        name: EXAMPLE_NAMES.sharedPaint,
         readout: () =>
             "four shapes painted by one fill and one stroke laid across the whole group, so each shows its own part of a single picture; resize any of them and the picture stretches to the new group",
         path: `${EXAMPLES_ROOT}/SharedPaint.vue`,
     },
     {
         key: "textWrap",
-        name: "Text Wrap",
+        name: EXAMPLE_NAMES.textWrap,
         readout: () =>
             "the shape writes its contour as shape-outside, so floating it is all the page does for the text to follow the edge",
         path: `${EXAMPLES_ROOT}/TextWrap.vue`,
     },
     {
         key: "stressTest",
-        name: "Stress Test",
+        name: EXAMPLE_NAMES.stressTest,
     },
 ];
 </script>

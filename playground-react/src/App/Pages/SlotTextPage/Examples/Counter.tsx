@@ -5,7 +5,7 @@ import type { SlotTextSlotFlags } from "@thewaver/ss-components-react";
 import * as styles from "@thewaver/ss-playground/App/Pages/SlotTextPage/SlotTextPage.css";
 import { assignInlineVars } from "@vanilla-extract/dynamic";
 
-import type { SlotTextExampleProps } from "../SlotTextPage.types";
+import type { SlotTextExampleProps } from "../SlotTextPageReact.types";
 
 const DIGIT_SIZE = { width: 34, height: 52 };
 

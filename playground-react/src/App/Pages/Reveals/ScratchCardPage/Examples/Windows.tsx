@@ -7,7 +7,7 @@ import { CONTROL_GLYPHS } from "@thewaver/ss-playground/App/StyledComponents/Con
 
 import { PageMeasureBox } from "../../../../PageComponents/MeasureBox/MeasureBox";
 import { PageControlButtonContent } from "../../../../StyledComponents/ControlButtonContent/ControlButtonContent";
-import type { ScratchCardWindowsExampleProps } from "../ScratchCardPage.types";
+import type { ScratchCardWindowsExampleProps } from "../ScratchCardPageReact.types";
 
 const TICKET_WIDTH = 360;
 const SYMBOLS = ["★", "♦", "★"];

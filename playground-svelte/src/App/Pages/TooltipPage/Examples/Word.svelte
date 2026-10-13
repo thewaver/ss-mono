@@ -3,7 +3,7 @@
     import * as styles from "@thewaver/ss-playground/App/Pages/TooltipPage/TooltipPage.css";
 
     import PageTooltipContent from "../../../StyledComponents/TooltipContent/TooltipContent.svelte";
-    import type { TooltipExampleProps } from "../TooltipPage.types";
+    import type { TooltipExampleProps } from "../TooltipPageSvelte.types";
 
     type Props = TooltipExampleProps;
 

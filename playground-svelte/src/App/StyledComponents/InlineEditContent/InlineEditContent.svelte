@@ -4,7 +4,7 @@
     import * as styles from "@thewaver/ss-playground/App/StyledComponents/InlineEditContent/InlineEditContent.css";
 
     import { getLayerClass } from "../Layer/Layer.context";
-    import type { InlineEditContentProps } from "./InlineEditContent.types";
+    import type { InlineEditContentProps } from "./InlineEditContentSvelte.types";
 
     let props: InlineEditContentProps & { children?: Snippet } = $props();
 

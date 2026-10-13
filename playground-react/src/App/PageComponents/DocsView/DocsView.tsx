@@ -1,26 +1,30 @@
-import { useEffect, useMemo, useState } from "react";
+import { Fragment, useEffect, useMemo, useState } from "react";
 import type { ApiGroup, ApiGroupKind, ApiTableKind } from "virtual:component-api";
 
 import { TableOfContents } from "@thewaver/ss-components-react";
 import type { TableOfContentsLink } from "@thewaver/ss-components-react";
+import {
+    MIN_TABLE_OF_CONTENTS_LINKS,
+    NO_DESCRIPTION,
+    TABLE_OF_CONTENTS_GAP,
+    TABLE_OF_CONTENTS_LABEL,
+    USE_COLUMN,
+} from "@thewaver/ss-playground/App/PageComponents/DocsView/DocsView.const";
 import * as styles from "@thewaver/ss-playground/App/PageComponents/DocsView/DocsView.css";
 import type { DocsTableOfContentsEntry } from "@thewaver/ss-playground/App/PageComponents/DocsView/DocsView.types";
 import {
+    DOCS_INCLUDES_LEAD,
+    DOCS_INCLUDES_SEPARATOR,
     loadApiGroups,
     toDocsGroupId,
+    toDocsIncludeHref,
     toDocsTableId,
     toDocsTableOfContents,
     toHighlightedType,
 } from "@thewaver/ss-playground/App/PageComponents/DocsView/DocsView.utils";
 
 import { PageTableOfContentsContent } from "../../StyledComponents/TableOfContentsContent/TableOfContentsContent";
-import type { PageDocsTableProps, PageDocsViewProps } from "./DocsView.types";
-
-const NO_DESCRIPTION = "Not written yet.";
-const USE_COLUMN = "Use";
-const TABLE_OF_CONTENTS_LABEL = "On this page";
-const TABLE_OF_CONTENTS_GAP = 4;
-const MIN_TABLE_OF_CONTENTS_LINKS = 2;
+import type { PageDocsTableProps, PageDocsViewProps } from "./DocsViewReact.types";
 
 const GROUP_TITLES: Record<ApiGroupKind, string> = {
     props: "Props",
@@ -42,7 +46,7 @@ const PageDocsTable = (props: PageDocsTableProps) => {
     const table = props.table;
 
     return (
-        <div className={styles.docsSection}>
+        <div className={styles.docsSection} data-api-table={table.name}>
             {table.heading && (
                 <h3 ref={props.headingRef} id={props.headingId} className={styles.docsTableTitle}>
                     {table.heading}
@@ -51,44 +55,68 @@ const PageDocsTable = (props: PageDocsTableProps) => {
 
             {table.description && <p className={styles.docsDescription}>{table.description}</p>}
 
-            <div className={styles.docsTableScroller}>
-                <table className={styles.docsTable} data-api-table={table.name}>
-                    <thead>
-                        <tr>
-                            {TABLE_COLUMNS[table.kind].map((column) => (
-                                <th key={column} className={styles.docsHeadCell}>
-                                    {column}
-                                </th>
-                            ))}
-                            {table.isDocumented && <th className={styles.docsHeadCell}>{USE_COLUMN}</th>}
-                        </tr>
-                    </thead>
+            {table.includes.length > 0 && (
+                <p className={styles.docsDescription} data-api-includes>
+                    {DOCS_INCLUDES_LEAD}
+                    {table.includes.map((include, index) => {
+                        const href = toDocsIncludeHref(include, props.unit);
 
-                    <tbody>
-                        {table.entries.map((entry) => (
-                            <tr key={entry.name} data-api-row={entry.name}>
-                                <td className={styles.docsNameCell}>
-                                    {entry.name}
-                                    {entry.isOptional && <span className={styles.docsOptional}>{"?"}</span>}
-                                </td>
-
-                                <td
-                                    className={styles.docsTypeCell}
-                                    dangerouslySetInnerHTML={{ __html: toHighlightedType(entry.type) }}
-                                />
-
-                                {table.isDocumented && (
-                                    <td className={styles.docsCell}>
-                                        {entry.description || (
-                                            <span className={styles.docsPending}>{NO_DESCRIPTION}</span>
-                                        )}
-                                    </td>
+                        return (
+                            <Fragment key={include.text}>
+                                {index ? DOCS_INCLUDES_SEPARATOR : ""}
+                                {href ? (
+                                    <a href={href}>
+                                        <code>{include.text}</code>
+                                    </a>
+                                ) : (
+                                    <code>{include.text}</code>
                                 )}
+                            </Fragment>
+                        );
+                    })}
+                </p>
+            )}
+
+            {table.entries.length > 0 && (
+                <div className={styles.docsTableScroller}>
+                    <table className={styles.docsTable}>
+                        <thead>
+                            <tr>
+                                {TABLE_COLUMNS[table.kind].map((column) => (
+                                    <th key={column} className={styles.docsHeadCell}>
+                                        {column}
+                                    </th>
+                                ))}
+                                {table.isDocumented && <th className={styles.docsHeadCell}>{USE_COLUMN}</th>}
                             </tr>
-                        ))}
-                    </tbody>
-                </table>
-            </div>
+                        </thead>
+
+                        <tbody>
+                            {table.entries.map((entry) => (
+                                <tr key={entry.name} data-api-row={entry.name}>
+                                    <td className={styles.docsNameCell}>
+                                        {entry.name}
+                                        {entry.isOptional && <span className={styles.docsOptional}>{"?"}</span>}
+                                    </td>
+
+                                    <td
+                                        className={styles.docsTypeCell}
+                                        dangerouslySetInnerHTML={{ __html: toHighlightedType(entry.type) }}
+                                    />
+
+                                    {table.isDocumented && (
+                                        <td className={styles.docsCell}>
+                                            {entry.description || (
+                                                <span className={styles.docsPending}>{NO_DESCRIPTION}</span>
+                                            )}
+                                        </td>
+                                    )}
+                                </tr>
+                            ))}
+                        </tbody>
+                    </table>
+                </div>
+            )}
         </div>
     );
 };
@@ -145,6 +173,7 @@ export const PageDocsView = (props: PageDocsViewProps) => {
                                 <PageDocsTable
                                     key={`${table.name}-${index}`}
                                     table={table}
+                                    unit={props.name}
                                     headingId={toDocsTableId(group.kind, table.name)}
                                     headingRef={setHeadingRef(toDocsTableId(group.kind, table.name))}
                                 />

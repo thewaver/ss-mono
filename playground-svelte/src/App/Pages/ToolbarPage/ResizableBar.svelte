@@ -6,8 +6,7 @@
     import * as styles from "@thewaver/ss-playground/App/Pages/ToolbarPage/ToolbarPage.css";
 
     import { getLayerClass } from "../../StyledComponents/Layer/Layer.context";
-
-    const NO_WIDTH = 0;
+    import { NO_WIDTH } from "@thewaver/ss-playground/App/Pages/ToolbarPage/ToolbarPage.const";
 
     type ResizableBarProps = {
         width: number;

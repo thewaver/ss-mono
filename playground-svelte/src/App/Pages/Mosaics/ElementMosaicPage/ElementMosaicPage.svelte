@@ -7,8 +7,10 @@
     import PageMosaicsPanel from "../MosaicsPanel.svelte";
     import ElementsExampleWrapper from "./ElementsExampleWrapper.svelte";
     import WalkedExampleWrapper from "./WalkedExampleWrapper.svelte";
-
-    const EXAMPLES_ROOT = "/src/App/Pages/Mosaics/ElementMosaicPage/Examples";
+    import {
+    EXAMPLE_NAMES,
+    EXAMPLES_ROOT,
+} from "@thewaver/ss-playground/App/Pages/Mosaics/ElementMosaicPage/ElementMosaicPage.const";
 
     const controls = createMosaicsControls();
 
@@ -27,7 +29,7 @@
     const examples: ExampleDefs[] = [
         {
             key: "elements",
-            name: "Elements the consumer sizes",
+            name: EXAMPLE_NAMES.elements,
             readout: () =>
                 "every tile is handed its own width and height, and the arrangement only decides where each one goes",
             component: elementsExample,
@@ -35,7 +37,7 @@
         },
         {
             key: "walked",
-            name: "One tab stop, walked by the arrow keys",
+            name: EXAMPLE_NAMES.walked,
             readout: () =>
                 `${pickedNames.length ? `grown: ${pickedNames.join(", ")}` : "nothing grown"} — Tab in, then Left and Right follow the reading order, Up and Down go to the tile below or above, and Enter, Space or a press grows or shrinks a tile so the rest re-pack around it`,
             component: walkedExample,

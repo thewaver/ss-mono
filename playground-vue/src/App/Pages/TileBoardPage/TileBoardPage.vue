@@ -4,6 +4,15 @@ import { computed, shallowRef } from "vue";
 import type { TileBoardTilingKind } from "@thewaver/ss-components";
 import { TILE_BOARD_DEFAULTS, TileBoardUtils } from "@thewaver/ss-components-vue";
 import { TileBoardKnobs } from "@thewaver/ss-playground/App/Knobs/TileBoards.const";
+import {
+    EXAMPLES_ROOT,
+    EXAMPLE_NAMES,
+    FIELD_WIDTH,
+    NO_MARKS,
+    ROCKS,
+    ROUTE_START,
+    STARTING_PIECE,
+} from "@thewaver/ss-playground/App/Pages/TileBoardPage/TileBoardPage.const";
 import { Index2d, type Index2dString } from "@thewaver/ss-utils";
 
 import PageExampleKnobs from "../../PageComponents/ExampleKnobs/PageExampleKnobs.vue";
@@ -17,22 +26,6 @@ import PagePropsPanel from "../../PageComponents/PropsPanel/PagePropsPanel.vue";
 import DefaultExample from "./Examples/Default.vue";
 import MeepleExample from "./Examples/Meeple.vue";
 import PaintExample from "./Examples/Paint.vue";
-
-const EXAMPLES_ROOT = "/src/App/Pages/TileBoardPage/Examples";
-
-const FIELD_WIDTH = 130;
-
-const STARTING_PIECE: Index2d = { row: 2, col: 2 };
-const ROUTE_START: Index2d = { row: 0, col: 0 };
-const ROCKS: Index2d[] = [
-    { row: 1, col: 0 },
-    { row: 1, col: 1 },
-    { row: 2, col: 2 },
-    { row: 3, col: 1 },
-    { row: 3, col: 2 },
-];
-
-const NO_MARKS: Index2dString[] = [];
 
 const describeTile = (tile: Index2d) => `row ${tile.row + 1}, tile ${tile.col + 1}`;
 
@@ -112,7 +105,7 @@ const commonProps = computed(() => ({
 const examples: ExampleDefs[] = [
     {
         key: "default",
-        name: "A board you can mark",
+        name: EXAMPLE_NAMES.default,
         readout: () =>
             marked.value.length === 0
                 ? "nothing marked — click a tile, or tab into the board and press Enter"
@@ -121,27 +114,27 @@ const examples: ExampleDefs[] = [
     },
     {
         key: "meeple",
-        name: "A piece that lives above the board",
+        name: EXAMPLE_NAMES.meeple,
         readout: () =>
             `standing on ${describeTile(piece.value)} — the ${reachable.value.length} tiles within ${reach.value} of it take it, the rest are refused but still walked`,
         path: `${EXAMPLES_ROOT}/Meeple.vue`,
     },
     {
         key: "route",
-        name: "The shortest way round",
+        name: EXAMPLE_NAMES.route,
         readout: describeRoute,
         path: `${EXAMPLES_ROOT}/Meeple.vue`,
     },
     {
         key: "paint",
-        name: "Paint by sweeping",
+        name: EXAMPLE_NAMES.paint,
         readout: () =>
             `${painted.value.length} painted — drag across tiles to paint them, or press one to paint or clear it`,
         path: `${EXAMPLES_ROOT}/Paint.vue`,
     },
     {
         key: "disabled",
-        name: "Disabled",
+        name: EXAMPLE_NAMES.disabled,
         readout: () => "nothing responds, by pointer or by key",
         path: `${EXAMPLES_ROOT}/Default.vue`,
     },

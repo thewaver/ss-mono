@@ -13,7 +13,7 @@ export const computePageSelectTextStyle = (flags: InteractionFlags<SelectFlags>)
 
 <script setup lang="ts">
 import { useLayerClass } from "../Layer/Layer.context";
-import type { SelectContentProps } from "./SelectContent.types";
+import type { SelectContentProps } from "./SelectContentVue.types";
 
 defineProps<SelectContentProps>();
 

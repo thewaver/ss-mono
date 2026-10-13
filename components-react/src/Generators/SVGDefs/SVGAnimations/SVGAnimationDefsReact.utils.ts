@@ -2,10 +2,9 @@ import { type SVGProps, useMemo, useState } from "react";
 import { flushSync } from "react-dom";
 
 import { type SVGAnimationDefs, SVGAnimationDefsUtils } from "@thewaver/ss-components";
+import { SVGAnimationDefsConst } from "@thewaver/ss-components/internal";
 
 import { useLatest } from "../../../Utils/refUtils";
-
-const FIRST_PATTERN_INDEX = 0;
 
 /** The React side of `SVGAnimationDefsUtils`: an animation's schedule as a key and attributes to spread. */
 export namespace SVGAnimationDefsReactUtils {
@@ -56,7 +55,9 @@ export namespace SVGAnimationDefsReactUtils {
             dur: `${defs.animationDurationMs}ms`,
             repeatCount: SVGAnimationDefsUtils.computeRepeatCount(patterns[patternIndex]),
             fill: "freeze",
-            begin: SVGAnimationDefsUtils.getIsPageClocked(patterns[FIRST_PATTERN_INDEX]) ? "0s" : "indefinite",
+            begin: SVGAnimationDefsUtils.getIsPageClocked(patterns[SVGAnimationDefsConst.FIRST_PATTERN_INDEX])
+                ? "0s"
+                : "indefinite",
             ref,
         };
 

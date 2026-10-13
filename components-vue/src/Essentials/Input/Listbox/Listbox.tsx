@@ -9,6 +9,7 @@ import {
     SelectUtils,
     type VirtualizerRow,
 } from "@thewaver/ss-components";
+import { ListboxConst } from "@thewaver/ss-components/internal";
 
 import { ElementObserverVueUtils } from "../../../Abstracts/ElementObserver/ElementObserverVue.utils";
 import { FloaterVueUtils } from "../../../Abstracts/Floater/FloaterVue.utils";
@@ -34,8 +35,6 @@ import type {
     ListboxSlots,
 } from "./Listbox.types";
 import { ListboxVueUtils } from "./ListboxVue.utils";
-
-const EMPTY_SELECTION: never[] = [];
 
 const ListboxOptionItem = defineComponent(
     (props: ListboxOptionItemProps, { slots }: SlotsContext<InteractionControlSlots<SelectOptionFlags>>) => {
@@ -556,7 +555,7 @@ export const Listbox = defineComponent(
                 (option) => option.value === value.value,
             );
 
-            return selectedOption ? [selectedOption] : EMPTY_SELECTION;
+            return selectedOption ? [selectedOption] : ListboxConst.EMPTY_SELECTION;
         });
 
         return () => (

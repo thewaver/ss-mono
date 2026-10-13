@@ -1,6 +1,6 @@
 import { createContext, useContext } from "solid-js";
 
-import type { LayerContextType } from "./Layer.context.types";
+import type { LayerContextType } from "./Layer.contextSolid.types";
 
 const LayerContext = createContext<LayerContextType>();
 

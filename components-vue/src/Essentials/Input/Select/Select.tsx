@@ -8,6 +8,7 @@ import {
     SelectUtils,
     TextFieldUtils,
 } from "@thewaver/ss-components";
+import { SelectConst } from "@thewaver/ss-components/internal";
 import { CSSUtils } from "@thewaver/ss-utils";
 
 import { TextSyncVueUtils } from "../../../Abstracts/TextSync/TextSyncVue.utils";
@@ -37,9 +38,6 @@ import type {
     SelectProps,
     SelectSlots,
 } from "./Select.types";
-
-const EMPTY_QUERY = "";
-const EMPTY_SELECTION: never[] = [];
 
 const SelectField = defineComponent(
     (props: SelectFieldProps, { slots, expose }: SlotsContext<InteractionControlSlots<SelectFlags>>) => {
@@ -155,7 +153,7 @@ export const SelectComposite = defineComponent(
 
         const getIsDisabled = () => props.isDisabled ?? false;
         const getIsFilterable = () => props.query !== undefined;
-        const getQuery = () => query.value ?? EMPTY_QUERY;
+        const getQuery = () => query.value ?? SelectConst.EMPTY_QUERY;
 
         watch(isOpen, (isShown) => {
             if (!isShown) hasPopoverSettled.value = false;
@@ -186,7 +184,7 @@ export const SelectComposite = defineComponent(
             isMultiple: () => props.isMultiple ?? false,
             isOpen,
             isFilterable: getIsFilterable,
-            isFiltering: () => getQuery() !== EMPTY_QUERY,
+            isFiltering: () => getQuery() !== SelectConst.EMPTY_QUERY,
             hasMoreOptions: () => props.hasMoreOptions ?? false,
             getComputeCustomText: () => props.computeCustomText,
             onOpen: open,
@@ -209,7 +207,7 @@ export const SelectComposite = defineComponent(
         watchAfterRender([isOpen, hasPopoverSettled, getQuery], ([isShown, hasSettled, current]) => {
             if (!SelectUtils.getIsQueryClearDue(isShown, hasSettled, current)) return;
 
-            query.value = EMPTY_QUERY;
+            query.value = SelectConst.EMPTY_QUERY;
         });
 
         const renderOptions = () => (
@@ -248,7 +246,7 @@ export const SelectComposite = defineComponent(
             const extraFlags: SelectFlags = {
                 isOpen: isOpen.value,
                 isEmpty: props.selectedOptions.length < 1,
-                isFiltering: getQuery() !== EMPTY_QUERY,
+                isFiltering: getQuery() !== SelectConst.EMPTY_QUERY,
             };
 
             return (
@@ -407,7 +405,7 @@ export const Select = defineComponent(
                 (option) => option.value === value.value,
             );
 
-            return selectedOption ? [selectedOption] : EMPTY_SELECTION;
+            return selectedOption ? [selectedOption] : SelectConst.EMPTY_SELECTION;
         });
 
         return () => (

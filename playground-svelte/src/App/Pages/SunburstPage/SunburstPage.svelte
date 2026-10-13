@@ -10,11 +10,12 @@
     import PageProp from "../../PageComponents/Prop/Prop.svelte";
     import PagePropsPanel from "../../PageComponents/PropsPanel/PagePropsPanel.svelte";
     import LibraryExample from "./Examples/Library.svelte";
-
-    const EXAMPLES_ROOT = "/src/App/Pages/SunburstPage/Examples";
-
-    const NO_MOTION_DURATION_MS = 0;
-    const WIDE_SPAN = 2;
+    import {
+    EXAMPLE_NAMES,
+    EXAMPLES_ROOT,
+    NO_MOTION_DURATION_MS,
+    WIDE_SPAN,
+} from "@thewaver/ss-playground/App/Pages/SunburstPage/SunburstPage.const";
 
     let ringCount = $state(SUNBURST_DEFAULTS.ringCount);
     let zoomDurationMs = $state(SUNBURST_DEFAULTS.zoomDurationMs);
@@ -27,7 +28,7 @@
     const examples: ExampleDefs[] = [
         {
             key: "library",
-            name: "This library, by lines of code",
+            name: EXAMPLE_NAMES.library,
             span: WIDE_SPAN,
             readout: () =>
                 `showing ${showing} — press an arc with rings outside it to zoom into it, and the middle or Escape to come back out`,

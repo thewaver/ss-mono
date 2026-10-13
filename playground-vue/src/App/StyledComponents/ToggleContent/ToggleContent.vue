@@ -2,7 +2,7 @@
 import * as styles from "@thewaver/ss-playground/App/StyledComponents/ToggleContent/ToggleContent.css";
 
 import { useLayerClass } from "../Layer/Layer.context";
-import type { ToggleContentProps } from "./ToggleContent.types";
+import type { ToggleContentProps } from "./ToggleContentVue.types";
 
 defineProps<ToggleContentProps>();
 

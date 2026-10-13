@@ -3,7 +3,7 @@ import * as styles from "@thewaver/ss-playground/App/StyledComponents/ColorAreaC
 import { assignInlineVars } from "@vanilla-extract/dynamic";
 
 import { useLayerClass } from "../Layer/Layer.context";
-import type { ColorSwatchProps } from "./ColorAreaContent.types";
+import type { ColorSwatchProps } from "./ColorAreaContentVue.types";
 
 defineProps<ColorSwatchProps>();
 

@@ -350,6 +350,41 @@ distinguishes "no accessor" from "an accessor returning undefined".
 **Forwarding a prop to a child needs neither.** `min={props.min}` passes the `MaybeAccessor` straight through,
 because the child's own prop accepts both forms.
 
+### A component's props are written once, in the core, as `Base<Component>Values` and `Base<Component>Cbs`
+
+The user's call, after a sweep found about 1,200 prop documentation blocks word for word the same in all four
+framework packages. Every member that means the same thing in every framework is declared once, documented once, in
+the core's `<Component>.types.ts`, in one of two halves:
+
+- **`Base<Component>Values`** — everything a consumer hands in as data, generic or not. It holds no functions.
+- **`Base<Component>Cbs`** — every callback and every compute function (`on*`, `compute*`, and any other function
+  that is not a painter). `Cbs` is `ButtonCbs`' word.
+- **`Base<Component>Props`** is the two intersected, for the frameworks that take the props as they are.
+
+Each framework composes its own props from them: React, Vue and Svelte write
+`type XProps = BaseXProps & { …own }`, and Solid writes `type XProps = AccessorValues<BaseXValues> & BaseXCbs &
+{ …own }`. **What stays per framework is only what differs by framework**: painters (getters in Solid, values
+elsewhere, and a different return type in each), two-way state (a signal in Solid, a value-and-setter pair in React,
+`v-model` in Vue, `$bindable` in Svelte), children, slots, snippets and refs. A union that names the component, such
+as `TableOfContentsNameProps`, moves to the core with the values; a framework never re-declares a name the core
+exports, since every framework package re-exports the core and two exports of one name break its index.
+
+**A `Base…` type holds only what is identical in every framework, so no framework ever narrows one.** The user's
+rule: `type XProps = Omit<BaseXProps, "onKeyDown"> & { onKeyDown… }` is wrong, because a member one framework has to
+redeclare was never common. Such a member leaves the `Base…` half and each framework declares it. Where three
+frameworks would declare it identically — a callback taking a browser `MouseEvent` or `KeyboardEvent`, which React
+alone replaces with its own event types — the core carries it once beside the base half, as `XCbs = BaseXCbs & { … }`
+(`ColorAreaCbs`, `BinarySwitchCbs`, `PopoverCbs`, `AudioSwitcherCbs`), and React declares its own instead. Where a
+framework already owns a type of that name (`TextFieldCbs`), the members go into each framework's own. An `Omit` over
+a `Base…` type is still fine in an internal leaf that takes a subset of the values, since that narrows nothing a
+framework disagrees on.
+
+**The split is what closes the two holes below for shared props.** `AccessorValues` is a plain mapping —
+`MaybeAccessor<T[K]>` for every key — that never asks what a value is, so a value naming a type parameter passes
+through, and an optional value's accessor may return `undefined`. It can be that simple only because the values half
+holds no functions: a callback wrapped as a `MaybeAccessor` would be called as a getter. `AccessorProps`, and its
+generic hole, still apply to the props types that stay Solid-only, such as a component's internal leaf.
+
 ### What the mapped type skips, and the two holes in it
 
 **These entries were written when `AccessorProps` produced `getX` names — every one still holds now that it
@@ -373,31 +408,21 @@ beside the accessorized block — `RadioProps<T>` writes `getValue: Accessor<T>`
 keeps `value: SignalSource<T>` outside its `AccessorProps<{...}>`. The type compiles and the prop just
 vanishes, so check for it whenever a generic component is added.
 
-**It also cannot express an optional prop whose own value may be `undefined`, and a ref is exactly
-that.** `AccessorizedPart` maps an optional key to `Accessor<Exclude<T[K], undefined>> | undefined`, so
-the `undefined` is stripped from the _return_ type. `initialFocusRef?: HTMLElement` yields
-`getInitialFocusRef?: Accessor<HTMLElement>`, which a consumer's `createSignal<HTMLElement>()` cannot
-satisfy — an element ref does not exist until mount. Existing refs sidestep it by being **required**
-(`Tooltip`'s `anchorRef: HTMLElement | undefined` is not optional, so the union survives). An
-_optional_ ref is declared by hand: `ModalProps` writes
-`getInitialFocusRef?: Accessor<HTMLElement | undefined>`, as `InteractionWrapperProps` already did with
-`getTooltipDefs`. One rule: if the prop mentions a type parameter, or its value can itself be
-`undefined`, write the accessor out.
+**The second hole is closed: an optional prop's accessor may return `undefined`.** It used to strip `undefined`
+from what an accessor returned, on readability grounds, so an optional ref or an optional number whose "off" value is
+`undefined` had to be written out by hand (`initialFocusRef?: Accessor<HTMLElement | undefined>`,
+`idleDelayMs?: Accessor<number | undefined>`). The user reversed that once shared values arrived through
+`AccessorValues`, which keeps `undefined`: a shared value handed on to a Solid-only leaf typed through
+`AccessorProps` clashed with it at every such hand-off. Both helpers now map an optional value to
+`MaybeAccessor<T[K]>`, `undefined` included, and the hand-written forms moved back into their blocks. Inside a
+component nothing changes, since an optional prop already reads as possibly `undefined`.
 
-**The rule bites on plain numbers too, not only on refs.** A wheel's `idleDelayMs` is absent when the wheel is
-not to turn on its own, so a consumer switching that off at runtime has to return `undefined` from the accessor
-— and the accessorized form will not let them, because it promises a `number`. `RotatorDefs` and the three
-wheel props types therefore all declare `getIdleDelayMs?: Accessor<number | undefined>` by hand. Worth stating
-because the ref cases read as being about refs: **any optional prop whose meaningful "off" value is `undefined`
-is in the same position**, and the type error arrives at the call site rather than at the declaration.
-
-**Outside those two holes, a props type is one `AccessorProps` block and nothing else, and the test is
+**Outside the generic hole, a props type is one `AccessorProps` block and nothing else, and the test is
 whether the prop mentions a type parameter.** Restated by the user in exactly those terms — one place decides
 what a prop's shape is, or two spots fight for control of it. So a signal, a callback, a record or an array
 goes _inside_ the block like everything else and the mapped type sorts it out: `Signal`s and functions are
 skipped, so putting them in changes nothing about their type and everything about where a reader looks. What
-sits outside is what cannot go through — anything naming `T`, the `undefined`-valued optional above, and the
-`ScrollerStepper` shape below. A hand-written `MaybeAccessor<X>` moving into the block loses that wrapper,
+sits outside is what cannot go through — anything naming `T`, and the `ScrollerStepper` shape below. A hand-written `MaybeAccessor<X>` moving into the block loses that wrapper,
 since the block adds it.
 
 Intersecting another _named_ props type is not a split and stays: `Omit<InteractionWrapperProps<…>, …> &

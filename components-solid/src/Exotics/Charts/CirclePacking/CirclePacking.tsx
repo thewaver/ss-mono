@@ -2,7 +2,6 @@ import { For, Show, createComputed, createEffect, createMemo, createSignal, on, 
 
 import {
     CIRCLE_PACKING_DEFAULTS,
-    type CirclePackingCircle,
     type CirclePackingCircleState,
     type CirclePackingNode,
     CirclePackingUtils,
@@ -10,16 +9,13 @@ import {
     TreemapUtils,
     CirclePackingStyles as styles,
 } from "@thewaver/ss-components";
+import { CirclePackingConst } from "@thewaver/ss-components/internal";
 
 import { ElementObserverSolidUtils } from "../../../Abstracts/ElementObserver/ElementObserverSolid.utils";
 import { SignalMirrorSolidUtils } from "../../../Abstracts/SignalMirror/SignalMirrorSolid.utils";
 import { access } from "../../../Utils/propUtils";
 import { accessStore } from "../../../Utils/storeUtils";
 import type { CirclePackingProps } from "./CirclePackingSolid.types";
-
-const NOTHING = 0;
-const HALF = 0.5;
-const EMPTY_CIRCLE: CirclePackingCircle = { x: 0, y: 0, radius: 0 };
 
 export const CirclePacking = <T,>(props: CirclePackingProps<T>) => {
     const circleRefs = new Map<CirclePackingNode<T>, SVGGElement>();
@@ -63,7 +59,9 @@ export const CirclePacking = <T,>(props: CirclePackingProps<T>) => {
 
     const getDepths = createMemo(() => CirclePackingUtils.computeDepths(getRootNode()));
 
-    const getTargetView = createMemo(() => CirclePackingUtils.toView(getLayout().get(getBranch()) ?? EMPTY_CIRCLE));
+    const getTargetView = createMemo(() =>
+        CirclePackingUtils.toView(getLayout().get(getBranch()) ?? CirclePackingConst.EMPTY_CIRCLE),
+    );
 
     const getView = createMemo(() => CirclePackingUtils.computeShownView(getPath(), getTargetView(), getProgress()));
 
@@ -76,11 +74,11 @@ export const CirclePacking = <T,>(props: CirclePackingProps<T>) => {
     const getRovingNode = createMemo(() => TreemapUtils.resolveStop(getFocusedNode(), getStops()));
 
     const computeState = (node: CirclePackingNode<T>): CirclePackingCircleState => ({
-        ...CirclePackingUtils.project(getLayout().get(node) ?? EMPTY_CIRCLE, getView(), getSide()),
-        weight: getWeights().get(node) ?? NOTHING,
+        ...CirclePackingUtils.project(getLayout().get(node) ?? CirclePackingConst.EMPTY_CIRCLE, getView(), getSide()),
+        weight: getWeights().get(node) ?? CirclePackingConst.NOTHING,
         isBranch: TreemapUtils.getIsBranch(node, getWeights()),
         isInView: getIsInView(node),
-        depth: getDepths().get(node) ?? NOTHING,
+        depth: getDepths().get(node) ?? CirclePackingConst.NOTHING,
     });
 
     createComputed(
@@ -92,7 +90,7 @@ export const CirclePacking = <T,>(props: CirclePackingProps<T>) => {
             const from = untrack(() =>
                 CirclePackingUtils.computeShownView(
                     getPath(),
-                    CirclePackingUtils.toView(getLayout().get(previous) ?? EMPTY_CIRCLE),
+                    CirclePackingUtils.toView(getLayout().get(previous) ?? CirclePackingConst.EMPTY_CIRCLE),
                     getProgress(),
                 ),
             );
@@ -100,7 +98,7 @@ export const CirclePacking = <T,>(props: CirclePackingProps<T>) => {
             setPath(() =>
                 CirclePackingUtils.interpolateZoom(
                     from,
-                    CirclePackingUtils.toView(untrack(getLayout).get(next) ?? EMPTY_CIRCLE),
+                    CirclePackingUtils.toView(untrack(getLayout).get(next) ?? CirclePackingConst.EMPTY_CIRCLE),
                 ),
             );
             zoomClock.start(untrack(getZoomDurationMs));
@@ -169,7 +167,7 @@ export const CirclePacking = <T,>(props: CirclePackingProps<T>) => {
         >
             <svg
                 class={styles.circlePackingCanvas}
-                viewBox={`${-getSize().width * HALF} ${-getSize().height * HALF} ${getSize().width} ${getSize().height}`}
+                viewBox={`${-getSize().width * CirclePackingConst.HALF} ${-getSize().height * CirclePackingConst.HALF} ${getSize().width} ${getSize().height}`}
                 role="list"
                 aria-label={access(props.ariaLabel)}
             >

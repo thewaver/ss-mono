@@ -8,7 +8,7 @@ import { PageButtonContent } from "../../StyledComponents/ButtonContent/ButtonCo
 import { PageModalOverlay } from "../../StyledComponents/ModalOverlay/ModalOverlay";
 import { PageModalPanel } from "../../StyledComponents/ModalPanel/ModalPanel";
 import { PagePropsPanel } from "../PropsPanel/PropsPanel";
-import type { StressTestProps } from "./StressText.types";
+import type { StressTestProps } from "./StressTextReact.types";
 
 export const StressTest = (props: StressTestProps) => {
     const modalVisibility = useState(false);

@@ -1,10 +1,9 @@
 import { access } from "@thewaver/ss-components-solid";
+import { PERCENT } from "@thewaver/ss-playground/App/StyledComponents/ProgressContent/ProgressContent.const";
 import * as styles from "@thewaver/ss-playground/App/StyledComponents/ProgressContent/ProgressContent.css";
 
 import { useLayerClass } from "../Layer/Layer.context";
-import type { ProgressContentProps } from "./ProgressContent.types";
-
-const PERCENT = 100;
+import type { ProgressContentProps } from "./ProgressContentSolid.types";
 
 export const PageProgressContent = (props: ProgressContentProps) => {
     const getLayerClass = useLayerClass();

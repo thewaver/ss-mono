@@ -9,13 +9,12 @@
         TileBoardUtils,
         TileBoardStyles as styles,
     } from "@thewaver/ss-components";
+    import { TileBoardConst } from "@thewaver/ss-components/internal";
     import { Index2d } from "@thewaver/ss-utils";
 
     import InteractionWrapper from "../../Primitives/InteractionWrapper/InteractionWrapper.svelte";
     import type { TileBoardProps } from "./TileBoard.types.js";
     import TileBoardTile from "./TileBoardTile.svelte";
-
-    const FIRST_ARIA_INDEX = 1;
 
     let props: TileBoardProps = $props();
 
@@ -134,7 +133,7 @@
                     id={`${boardId}-tile-${key}`}
                     {flags}
                     ariaLabel={props.computeTileAriaLabel?.(tile)}
-                    colIndex={col + FIRST_ARIA_INDEX}
+                    colIndex={col + TileBoardConst.FIRST_ARIA_INDEX}
                     size={geometry.size}
                     clipPath={TileBoardUtils.getClipPath(geometry.points)}
                     renderContent={tileContent}
@@ -166,7 +165,7 @@
             <div
                 class={styles.tileBoardRow}
                 role="row"
-                aria-rowindex={rowIndex + FIRST_ARIA_INDEX}
+                aria-rowindex={rowIndex + TileBoardConst.FIRST_ARIA_INDEX}
                 style:left={`${origin.x}px`}
                 style:top={`${origin.y}px`}
             >

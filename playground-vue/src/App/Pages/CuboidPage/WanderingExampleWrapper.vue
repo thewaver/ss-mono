@@ -2,6 +2,7 @@
 import { shallowRef, useModel } from "vue";
 
 import { CuboidKnobs } from "@thewaver/ss-playground/App/Knobs/Cuboids.const";
+import { FIELD_WIDTH } from "@thewaver/ss-playground/App/Pages/CuboidPage/CuboidPage.const";
 
 import PageExampleKnobs from "../../PageComponents/ExampleKnobs/PageExampleKnobs.vue";
 import PageCheckField from "../../PageComponents/Field/PageCheckField.vue";
@@ -9,8 +10,6 @@ import PageNumberField from "../../PageComponents/Field/PageNumberField.vue";
 import PageProp from "../../PageComponents/Prop/Prop.vue";
 import type { CuboidExampleProps } from "./CuboidPage.types";
 import WanderingExample from "./Examples/Wandering.vue";
-
-const FIELD_WIDTH = 110;
 
 type Props = CuboidExampleProps;
 

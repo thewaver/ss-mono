@@ -1,27 +1,14 @@
 <script lang="ts">
     import type { Snippet } from "svelte";
 
-    import {
-        type InteractionFlags,
-        type InteractionSizing,
-        PAGINATOR_DEFAULTS,
-        type PaginatorGapEntry,
-        type PaginatorPageEntry,
-        type PaginatorPageRenderProps,
-        type PaginatorStep,
-        type PaginatorStepRenderProps,
-        PaginatorUtils,
-        PaginatorStyles as styles,
-    } from "@thewaver/ss-components";
+    import { type InteractionFlags, PAGINATOR_DEFAULTS, type PaginatorGapEntry, type PaginatorPageEntry, type PaginatorPageRenderProps, type PaginatorStep, type PaginatorStepRenderProps, PaginatorUtils, PaginatorStyles as styles } from "@thewaver/ss-components";
+    import { PlacementConst } from "@thewaver/ss-components/internal";
 
     import InteractionWrapper from "../../Primitives/InteractionWrapper/InteractionWrapper.svelte";
     import PlacementBox from "../../Primitives/PlacementBox/PlacementBox.svelte";
     import PlacementItem from "../../Primitives/PlacementItem/PlacementItem.svelte";
     import type { PaginatorProps } from "./Paginator.types.js";
     import PaginatorItem from "./PaginatorItem.svelte";
-
-    const ROW_SIZING: InteractionSizing = "fit-content";
-    const PLACED_SIZING: InteractionSizing = "fill";
 
     let props: PaginatorProps = $props();
 
@@ -65,7 +52,7 @@
     {@const stepState = PaginatorUtils.computeStepState(step, page, pageCount, isDisabled)}
     {#snippet body()}
         <InteractionWrapper
-            sizing={placement === undefined ? ROW_SIZING : PLACED_SIZING}
+            sizing={placement === undefined ? PlacementConst.ROW_SIZING : PlacementConst.PLACED_SIZING}
             isDisabled={stepState.isDisabled}
             extraFlags={{ step, targetPage: stepState.targetPage, placement }}
         >
@@ -96,7 +83,7 @@
     {@const isCurrent = entry.page === page}
     {#snippet body()}
         <InteractionWrapper
-            sizing={placement === undefined ? ROW_SIZING : PLACED_SIZING}
+            sizing={placement === undefined ? PlacementConst.ROW_SIZING : PlacementConst.PLACED_SIZING}
             {isDisabled}
             extraFlags={{ page: entry.page, isCurrent, placement }}
         >

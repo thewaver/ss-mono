@@ -11,11 +11,12 @@
     import DefaultExample from "./Examples/Default.svelte";
     import UprightExampleWrapper from "./UprightExampleWrapper.svelte";
     import WanderingExampleWrapper from "./WanderingExampleWrapper.svelte";
-
-    const NO_MOTION_DURATION_MS = 0;
-
-    const FIELD_WIDTH = 110;
-    const EXAMPLES_ROOT = "/src/App/Pages/CuboidPage/Examples";
+    import {
+    EXAMPLE_NAMES,
+    EXAMPLES_ROOT,
+    FIELD_WIDTH,
+    NO_MOTION_DURATION_MS,
+} from "@thewaver/ss-playground/App/Pages/CuboidPage/CuboidPage.const";
 
     let width = $state(CuboidKnobs.STARTING_WIDTH);
     let height = $state(CuboidKnobs.STARTING_HEIGHT);
@@ -43,7 +44,7 @@
     const examples: ExampleDefs[] = [
         {
             key: "default",
-            name: "Six faces, two turns",
+            name: EXAMPLE_NAMES.default,
             readout: () =>
                 `${CuboidUtils.getFacingFromTurns(yaw, pitch)} — across ${yaw}, up ${pitch}; the two counts are quarter turns rather than a face, so the box always takes the way it was pushed`,
             component: defaultExample,
@@ -51,7 +52,7 @@
         },
         {
             key: "wandering",
-            name: "Turning to a neighbor on its own",
+            name: EXAMPLE_NAMES.wandering,
             readout: () =>
                 `${CuboidUtils.getFacingFromTurns(wanderingYaw, wanderingPitch)} — every tick takes one quarter turn at random, discarding the ones that would leave the same face in view or turn back to the face it just left, so the box only ever moves on to a new face sharing an edge with this one`,
             component: wanderingExample,
@@ -59,7 +60,7 @@
         },
         {
             key: "upright",
-            name: "Upright, by name, and by hand",
+            name: EXAMPLE_NAMES.upright,
             readout: () =>
                 `${uprightFacing ?? "front"} — across ${uprightYaw}, up ${uprightPitch}; the counts only record the presses here, so the box keeps its own orientation and the face names ask it for the shortest way round`,
             component: uprightExample,

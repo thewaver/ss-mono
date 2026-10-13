@@ -3,18 +3,19 @@ import { computed, h, shallowRef } from "vue";
 
 import { Button } from "@thewaver/ss-components-vue";
 import type { InteractionTooltipDefs } from "@thewaver/ss-components-vue";
+import {
+    EMPTY_TEXT,
+    HINT_OFFSET,
+    HINT_PLACEMENT,
+    SINGLE_FIELD,
+} from "@thewaver/ss-playground/App/PageComponents/Prop/Prop.const";
 import * as styles from "@thewaver/ss-playground/App/PageComponents/Prop/Prop.css";
 
 import PagePropHintBadge from "../../StyledComponents/PropHintBadge/PropHintBadge.vue";
 import PageTooltipContent from "../../StyledComponents/TooltipContent/TooltipContent.vue";
-import { provideFieldDefault } from "../Field/Field.context";
+import { provideFieldDefault } from "../Field/FieldVue.context";
 import { usePropsPanelContext } from "../PropsPanel/PropsPanel.context";
 import type { PagePropProps } from "./Prop.types";
-
-const HINT_PLACEMENT = { x: "center", y: "top_out" } as const;
-const HINT_OFFSET = { x: 0, y: 10 };
-const EMPTY_TEXT = "";
-const SINGLE_FIELD = 1;
 
 const toDefaultText = (value: unknown) => {
     if (typeof value === "boolean") return value ? "on" : "off";

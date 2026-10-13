@@ -3,19 +3,20 @@ import { computed, useId } from "vue";
 
 import type { PlacementSector } from "@thewaver/ss-components-vue";
 import { PlacementUtils } from "@thewaver/ss-components-vue";
+import {
+    FULL_TURN,
+    HALF,
+    HALF_TURN,
+    LABEL_TYPE_RATIO,
+    NO_TILT,
+    QUARTER_TURN,
+    UPSIDE_DOWN_FROM,
+    UPSIDE_DOWN_TO,
+} from "@thewaver/ss-playground/App/StyledComponents/WheelContent/WheelContent.const";
 import * as styles from "@thewaver/ss-playground/App/StyledComponents/WheelContent/WheelContent.css";
 
 import { useLayerClass } from "../Layer/Layer.context";
-import type { PageWheelWedgeProps } from "./WheelContent.types";
-
-const LABEL_TYPE_RATIO = 0.14;
-const NO_TILT = 0;
-const HALF = 0.5;
-const QUARTER_TURN = 90;
-const UPSIDE_DOWN_FROM = 90;
-const UPSIDE_DOWN_TO = 270;
-const HALF_TURN = 180;
-const FULL_TURN = 360;
+import type { PageWheelWedgeProps } from "./WheelContentVue.types";
 
 const toLabelTilt = (wedgeAngle: number, sector: PlacementSector | undefined) => {
     if (!sector) return NO_TILT;

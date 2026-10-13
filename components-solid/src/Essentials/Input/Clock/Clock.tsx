@@ -5,20 +5,18 @@ import {
     CLOCK_DEFAULTS,
     type ClockColumn,
     type ClockRenderProps,
-    type ClockSteps,
     type ClockUnit,
     ClockUtils,
     PopoverUtils,
     ClockStyles as styles,
 } from "@thewaver/ss-components";
+import { ClockConst } from "@thewaver/ss-components/internal";
 import type { TimeValue } from "@thewaver/ss-utils";
 
 import { NavigatorSolidUtils } from "../../../Abstracts/Navigator/NavigatorSolid.utils";
 import { InteractionWrapper } from "../../../Primitives/InteractionWrapper/InteractionWrapper";
 import { access, accessSignal } from "../../../Utils/propUtils";
 import type { ClockOptionProps, ClockProps } from "./ClockSolid.types";
-
-const NO_CLOCK_STEPS: ClockSteps = {};
 
 const ClockOptionControl = (props: ClockOptionProps) => {
     const getIsDisabled = () => access(props.flags).isDisabled ?? false;
@@ -83,7 +81,7 @@ export const Clock = (props: ClockProps) => {
             getUnits(),
             getBase(),
             getIsTwelveHour(),
-            access(props.steps) ?? NO_CLOCK_STEPS,
+            access(props.steps) ?? ClockConst.NO_CLOCK_STEPS,
             getMeridiemNames(),
         ),
     );

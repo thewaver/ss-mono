@@ -3,9 +3,15 @@ import { useState } from "react";
 import { DIE_DEFAULTS, DieShapes, MediaQueryMonitorReactUtils, RollerUtils } from "@thewaver/ss-components-react";
 import { DieKnobs } from "@thewaver/ss-playground/App/Knobs/Dice.const";
 import {
+    CLOUD_SIZE,
+    DIE_SIZE,
+    EXAMPLES_ROOT,
+    EXAMPLE_NAMES,
+    FIRST_NUMBER,
     ICON_CLOUD_EMPTY_LABEL,
     ICON_CLOUD_ICONS,
     ICON_CLOUD_TURN_MS,
+    NO_MOTION_DURATION_MS,
 } from "@thewaver/ss-playground/App/Pages/DiePage/DiePage.const";
 
 import { PageExamples } from "../../PageComponents/Examples/Examples";
@@ -14,13 +20,6 @@ import { PageProp } from "../../PageComponents/Prop/Prop";
 import { PagePropsPanel } from "../../PageComponents/PropsPanel/PropsPanel";
 import { IconCloudExample } from "./Examples/IconCloud";
 import { TabletopExample } from "./Examples/Tabletop";
-
-const EXAMPLES_ROOT = "/src/App/Pages/DiePage/Examples";
-
-const DIE_SIZE = 160;
-const CLOUD_SIZE = 240;
-const NO_MOTION_DURATION_MS = 0;
-const FIRST_NUMBER = 1;
 
 export const DiePage = () => {
     const [shapeKey, setShapeKey] = useState<DieShapes.SampleKey>(DieKnobs.STARTING_SHAPE_KEY);
@@ -42,7 +41,7 @@ export const DiePage = () => {
     const examples = [
         {
             key: "tabletop",
-            name: "Tabletop die",
+            name: EXAMPLE_NAMES.tabletop,
             readout: () =>
                 `showing ${dieFaceState[0] + FIRST_NUMBER} of ${DieShapes.SAMPLE_SHAPES[shapeKey].faces.length} — the page picks the number, and the die tumbles and lands on it`,
             component: () => (
@@ -59,7 +58,7 @@ export const DiePage = () => {
         },
         {
             key: "iconCloud",
-            name: "Icon cloud",
+            name: EXAMPLE_NAMES.iconCloud,
             readout: () =>
                 `${cloudAutoSpinState[0] ? "turning by itself" : "paused"}, facing ${ICON_CLOUD_ICONS[RollerUtils.clampFace(cloudFaceState[0], shape.faces.length)]?.label ?? ICON_CLOUD_EMPTY_LABEL} — drag it, or focus it and use the arrow keys, and it settles on the nearest icon`,
             component: () => (

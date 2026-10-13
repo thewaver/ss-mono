@@ -1,6 +1,7 @@
 import { type SlotsType, Teleport, defineComponent, shallowRef, useId, watch } from "vue";
 
 import { HoverIntentUtils, TOOLTIP_DEFAULTS, TooltipStyles, TooltipUtils } from "@thewaver/ss-components";
+import { TooltipConst } from "@thewaver/ss-components/internal";
 import { assignInlineVars } from "@vanilla-extract/dynamic";
 
 import { AnchorVueUtils } from "../../../Abstracts/Anchor/AnchorVue.utils";
@@ -14,8 +15,6 @@ import { toElement } from "../../../Utils/refUtils";
 import type { SlotsContext } from "../../../Utils/typeUtils";
 import type { TooltipProps, TooltipSlots } from "./Tooltip.types";
 
-const TOOLTIP_DELAY_GROUP = HoverIntentUtils.createDelayGroup();
-
 export const Tooltip = defineComponent(
     (props: TooltipProps, { slots }: SlotsContext<TooltipSlots>) => {
         const viewportContext = useViewportContext();
@@ -27,7 +26,7 @@ export const Tooltip = defineComponent(
         const getTransitionDurationMs = () => props.transitionDurationMs ?? TOOLTIP_DEFAULTS.transitionDurationMs;
 
         const hoverIntent = HoverIntentVueUtils.useHoverIntent(() => props.anchorRef, isShown, {
-            delayGroup: TOOLTIP_DELAY_GROUP,
+            delayGroup: TooltipConst.TOOLTIP_DELAY_GROUP,
             panelRef: contentRef,
             hoverShowDelayMs: () => props.hoverShowDelayMs ?? TOOLTIP_DEFAULTS.hoverShowDelayMs,
             skipDelayWindowMs: () => props.skipDelayWindowMs ?? TOOLTIP_DEFAULTS.skipDelayWindowMs,

@@ -1,7 +1,15 @@
 import { For, type ParentProps, Show, createUniqueId } from "solid-js";
 
-import type { PaginatorStep, PlacementRect } from "@thewaver/ss-components-solid";
+import type { PlacementRect } from "@thewaver/ss-components-solid";
 import { PlacementUtils, access } from "@thewaver/ss-components-solid";
+import {
+    FIRST_PAGE,
+    GAP_MARK,
+    HALF,
+    PAGE_SIZE,
+    RESULTS,
+    STEP_GLYPHS,
+} from "@thewaver/ss-playground/App/StyledComponents/PaginatorContent/PaginatorContent.const";
 import * as styles from "@thewaver/ss-playground/App/StyledComponents/PaginatorContent/PaginatorContent.css";
 
 import { useLayerClass } from "../Layer/Layer.context";
@@ -12,39 +20,12 @@ import type {
     PaginatorPanelProps,
     PaginatorStepContentProps,
     PaginatorWedgeProps,
-} from "./PaginatorContent.types";
-
-const HALF = 0.5;
-const GAP_MARK = "…";
-const PAGE_SIZE = 3;
-const FIRST_PAGE = 1;
-
-const RESULTS = [
-    "Aurora",
-    "Basalt",
-    "Cinder",
-    "Drift",
-    "Ember",
-    "Fathom",
-    "Glimmer",
-    "Hollow",
-    "Iris",
-    "Jetty",
-    "Kelp",
-    "Loam",
-];
+} from "./PaginatorContentSolid.types";
 
 const toResult = (index: number) => RESULTS[index % RESULTS.length];
 
 const toViewBox = (rect: PlacementRect) =>
     `${rect.leftShare - rect.widthShare * HALF} ${rect.topShare - rect.heightShare * HALF} ${rect.widthShare} ${rect.heightShare}`;
-
-const STEP_GLYPHS: Record<PaginatorStep, string> = {
-    first: "«",
-    previous: "‹",
-    next: "›",
-    last: "»",
-};
 
 export const PagePaginatorPage = (props: PaginatorPageContentProps) => {
     const getLayerClass = useLayerClass();

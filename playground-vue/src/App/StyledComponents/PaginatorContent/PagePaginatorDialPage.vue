@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import PagePaginatorWedge from "./PagePaginatorWedge.vue";
-import type { PaginatorPageContentProps } from "./PaginatorContent.types";
+import type { PaginatorPageContentProps } from "./PaginatorContentVue.types";
 
 defineProps<PaginatorPageContentProps>();
 </script>

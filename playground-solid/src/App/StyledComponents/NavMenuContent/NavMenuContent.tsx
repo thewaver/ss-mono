@@ -4,7 +4,7 @@ import { access } from "@thewaver/ss-components-solid";
 import * as styles from "@thewaver/ss-playground/App/StyledComponents/NavMenuContent/NavMenuContent.css";
 
 import { useLayerClass } from "../Layer/Layer.context";
-import type { NavMenuTriggerProps } from "./NavMenuContent.types";
+import type { NavMenuTriggerProps } from "./NavMenuContentSolid.types";
 
 export const PageNavMenuTrigger = (props: ParentProps<NavMenuTriggerProps>) => {
     const getLayerClass = useLayerClass();

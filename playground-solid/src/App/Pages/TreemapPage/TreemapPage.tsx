@@ -2,18 +2,19 @@ import { createMemo, createSignal } from "solid-js";
 
 import { MediaQueryMonitorSolidUtils, TREEMAP_DEFAULTS, TreemapUtils } from "@thewaver/ss-components-solid";
 import { TreemapKnobs } from "@thewaver/ss-playground/App/Knobs/Treemaps.const";
-import { LIBRARY } from "@thewaver/ss-playground/App/Pages/TreemapPage/TreemapPage.const";
+import {
+    EXAMPLES_ROOT,
+    EXAMPLE_NAMES,
+    LIBRARY,
+    NO_MOTION_DURATION_MS,
+    WIDE_SPAN,
+} from "@thewaver/ss-playground/App/Pages/TreemapPage/TreemapPage.const";
 
 import { PageExamples } from "../../PageComponents/Examples/Examples";
 import { PageNumberField } from "../../PageComponents/Field/Field";
 import { PageProp } from "../../PageComponents/Prop/Prop";
 import { PagePropsPanel } from "../../PageComponents/PropsPanel/PropsPanel";
 import { LibraryExample } from "./Examples/Library";
-
-const EXAMPLES_ROOT = "/src/App/Pages/TreemapPage/Examples";
-
-const NO_MOTION_DURATION_MS = 0;
-const WIDE_SPAN = 2;
 
 export const TreemapPage = () => {
     const [getZoomDurationMs, setZoomDurationMs] = createSignal(TREEMAP_DEFAULTS.zoomDurationMs);
@@ -28,7 +29,7 @@ export const TreemapPage = () => {
     const getExamples = createMemo(() => [
         {
             key: "library",
-            name: "This library, by lines of code",
+            name: EXAMPLE_NAMES.library,
             span: WIDE_SPAN,
             readout: () =>
                 `showing ${getShowing()} — press a branch to zoom into it, and the bar above or Escape to come back out; a leaf has nothing inside it and does not answer a press`,

@@ -4,9 +4,8 @@
     import { assignInlineVars } from "@vanilla-extract/dynamic";
 
     import { getLayerClass } from "../Layer/Layer.context";
-    import type { ColorAreaContentProps } from "./ColorAreaContent.types";
-
-    const PERCENT = 100;
+    import type { ColorAreaContentProps } from "./ColorAreaContentSvelte.types";
+    import { PERCENT } from "@thewaver/ss-playground/App/StyledComponents/ColorAreaContent/ColorAreaContent.const";
 
     let props: ColorAreaContentProps = $props();
 

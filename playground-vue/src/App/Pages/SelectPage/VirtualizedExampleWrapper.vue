@@ -2,14 +2,13 @@
 import { useModel } from "vue";
 
 import { SelectKnobs } from "@thewaver/ss-playground/App/Knobs/Selects.const";
+import { STRESS_COUNT_FIELD_WIDTH } from "@thewaver/ss-playground/App/Pages/SelectPage/SelectPage.const";
 
 import PageExampleKnobs from "../../PageComponents/ExampleKnobs/PageExampleKnobs.vue";
 import PageNumberField from "../../PageComponents/Field/PageNumberField.vue";
 import PageProp from "../../PageComponents/Prop/Prop.vue";
 import VirtualizedExample from "./Examples/Virtualized.vue";
 import type { SelectVirtualizedExampleProps } from "./SelectPage.types";
-
-const STRESS_COUNT_FIELD_WIDTH = 120;
 
 type Props = SelectVirtualizedExampleProps & {
     count: number;

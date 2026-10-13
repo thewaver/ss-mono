@@ -11,12 +11,11 @@ import {
     observeElementOffset,
 } from "@tanstack/virtual-core";
 import { type VirtualizerRow, VirtualizerUtils } from "@thewaver/ss-components";
+import { VirtualizerConst } from "@thewaver/ss-components/internal";
 
 import { useElement } from "../../Utils/refUtils";
 
 /** No pinned rows. */
-const NO_PINNED_ROWS: number[] = [];
-
 /**
  * The React side of `VirtualizerUtils`: drawing only the rows of a long list that are on screen, over TanStack's
  * framework-free `virtual-core`.
@@ -105,7 +104,7 @@ export namespace VirtualizerReactUtils {
             }
         };
 
-        const pinnedRows = opts.pinnedRows ?? NO_PINNED_ROWS;
+        const pinnedRows = opts.pinnedRows ?? VirtualizerConst.NO_PINNED_ROWS;
 
         const options: VirtualizerOptions<HTMLElement, HTMLElement> = {
             count,

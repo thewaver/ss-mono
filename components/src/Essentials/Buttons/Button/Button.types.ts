@@ -26,3 +26,13 @@ export type ButtonCbs = {
     /** Runs when the pointer leaves the button. */
     onMouseLeave?: (e: MouseEvent) => void;
 };
+
+export type BaseButtonValues = {
+    /**
+     * What the button does inside a form. It defaults to doing nothing, so a button in a form does not submit it by
+     * accident. A disabled or pending button neither submits nor resets.
+     */
+    type?: ButtonType;
+};
+
+export type BaseButtonProps = BaseButtonValues & ButtonCbs;

@@ -1,6 +1,6 @@
 import type { Snippet } from "svelte";
 
-import type { InteractionFlags, TagInputFlags, TagInputState } from "@thewaver/ss-components";
+import type { BaseTagInputValues, InteractionFlags, TagInputCbs, TagInputFlags } from "@thewaver/ss-components";
 
 import type {
     InteractionControlProps,
@@ -8,26 +8,12 @@ import type {
 } from "../../../Primitives/InteractionWrapper/InteractionWrapper.types.js";
 import type { TextFieldTextStyle } from "../../../Primitives/TextField/TextField.types.js";
 
-export type TagInputCbs = {
-    /**
-     * Turns what was typed into a tag, or refuses it by answering with nothing — which is where trimming, lower-casing
-     * and rejecting duplicates live.
-     */
-    computeTag?: (text: string) => string | undefined;
-    /** Names one tag for assistive technology, so a reader hears what removing it would do. */
-    computeTagAriaLabel?: (tag: string) => string;
-    /** Runs when a tag is added or removed. */
-    onTagsChange?: (tags: string[]) => void;
-    /** Runs when the pointer arrives over the field. */
-    onMouseEnter?: (e: MouseEvent) => void;
-    /** Runs when the pointer leaves the field. */
-    onMouseLeave?: (e: MouseEvent) => void;
-};
+export type { TagInputCbs };
 
 export type TagInputProps = Omit<InteractionWrapperProps<TagInputFlags>, "renderControl" | "extraFlags" | "role"> &
     TagInputCbs &
     Pick<InteractionControlProps<TagInputFlags>, "id" | "renderContent"> &
-    TagInputState & {
+    BaseTagInputValues & {
         /** The tags. Bind it with `bind:value`; it is the only thing that adds or removes one. */
         value: string[];
         /**

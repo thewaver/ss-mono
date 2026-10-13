@@ -2,6 +2,8 @@
 import { shallowRef } from "vue";
 
 import {
+    EXAMPLES_ROOT,
+    EXAMPLE_NAMES,
     RICH_TOUR_STEPS,
     TOUR_STORAGE_KEY,
 } from "@thewaver/ss-playground/App/Pages/Spotlights/SpotlightGuidePage/SpotlightGuidePage.const";
@@ -11,8 +13,6 @@ import type { ExampleDefs } from "../../../PageComponents/Examples/Examples.type
 import PageExamples from "../../../PageComponents/Examples/PageExamples.vue";
 import GuideExample from "./Examples/Guide.vue";
 import TourExample from "./Examples/Tour.vue";
-
-const EXAMPLES_ROOT = "/src/App/Pages/Spotlights/SpotlightGuidePage/Examples";
 
 const readStoredStep = () => {
     try {
@@ -79,7 +79,7 @@ const endTour = (reason: string) => {
 const examples: ExampleDefs[] = [
     {
         key: "tour",
-        name: "A tour with a step the reader does",
+        name: EXAMPLE_NAMES.tour,
         span: 2,
         readout: () =>
             `step: ${tourStep.value + 1} of ${RICH_TOUR_STEPS.length} — ${tourStatus.value} — basket: ${basketCount.value}. The guide holds the whole page still, so on step 2 it closes and a prompt lights the button instead, and pressing it reopens the guide; the step is kept in sessionStorage, so reloading offers to resume`,
@@ -87,7 +87,7 @@ const examples: ExampleDefs[] = [
     },
     {
         key: "guide",
-        name: "Guide",
+        name: EXAMPLE_NAMES.guide,
         readout: () => `step: ${step.value + 1} of ${TOUR_STEPS.length} — ${finished.value}`,
         path: `${EXAMPLES_ROOT}/Guide.vue`,
     },

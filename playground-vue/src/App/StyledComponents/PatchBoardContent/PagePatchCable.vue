@@ -4,7 +4,7 @@ import * as styles from "@thewaver/ss-playground/App/StyledComponents/PatchBoard
 
 import PageBeam from "../Beam/Beam.vue";
 import { useLayerClass } from "../Layer/Layer.context";
-import type { PagePatchCableProps } from "./PatchBoardContent.types";
+import type { PagePatchCableProps } from "./PatchBoardContentVue.types";
 
 defineProps<PagePatchCableProps>();
 

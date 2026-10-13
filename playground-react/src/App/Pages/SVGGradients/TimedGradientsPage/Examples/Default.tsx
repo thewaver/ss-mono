@@ -1,15 +1,15 @@
 import { useId } from "react";
 
-import { SVGDefsSamples, Shape } from "@thewaver/ss-components-react";
+import { SVGDefsSampleConfigs, SVGDefsSamples, Shape } from "@thewaver/ss-components-react";
 import {
     NO_SAMPLE_KEY,
     computeNoSampleDefs,
 } from "@thewaver/ss-playground/App/PageComponents/SampleGroups/SampleGroups.const";
+import { STROKE_THICKNESS } from "@thewaver/ss-playground/App/Pages/SVGGradients/SVGGradients.const";
 import * as styles from "@thewaver/ss-playground/App/Pages/SVGGradients/SVGGradients.css";
 import { ShapeConst, type Size2d } from "@thewaver/ss-utils";
 
-import { STROKE_THICKNESS } from "../../SVGGradients.const";
-import type { TimedGradientExampleProps } from "../../SVGGradients.types";
+import type { TimedGradientExampleProps } from "../../SVGGradientsReact.types";
 
 export const DefaultExample = ({
     configKey,
@@ -27,7 +27,7 @@ export const DefaultExample = ({
     const computeDefs = (size: Size2d, element: HTMLElement | undefined) => {
         if (configKey === NO_SAMPLE_KEY) return computeNoSampleDefs(colors, paintKind);
 
-        return SVGDefsSamples.Gradient.Timed.toConfig({
+        return SVGDefsSampleConfigs.Gradient.Timed.toConfig({
             family: configKey,
             defs: configDefs,
         } as SVGDefsSamples.Gradient.Timed.Entry).computeSVGDefs(`${paintKind}-${id}`, undefined, element, {

@@ -2,7 +2,7 @@
 import * as styles from "@thewaver/ss-playground/App/StyledComponents/TextFieldAdornment/TextFieldAdornment.css";
 
 import { useLayerClass } from "../Layer/Layer.context";
-import type { TextFieldAdornmentProps } from "./TextFieldAdornment.types";
+import type { TextFieldAdornmentProps } from "./TextFieldAdornmentVue.types";
 
 defineProps<TextFieldAdornmentProps>();
 

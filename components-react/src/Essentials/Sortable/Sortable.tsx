@@ -17,7 +17,6 @@ import {
     CarrierUtils,
     type CarrierZone,
     type CarryMode,
-    type InteractionSizing,
     PlacementUtils,
     SORTABLE_DEFAULTS,
     type SortableFlags,
@@ -26,6 +25,7 @@ import {
     SortableUtils,
     ViewportUtils,
 } from "@thewaver/ss-components";
+import { PlacementConst } from "@thewaver/ss-components/internal";
 import type { Point2d, Size2d } from "@thewaver/ss-utils";
 
 import { CarrierReactUtils } from "../../Abstracts/Carrier/CarrierReact.utils";
@@ -38,8 +38,6 @@ import { PlacementItem } from "../../Primitives/PlacementItem/PlacementItem";
 import { useElement } from "../../Utils/refUtils";
 import { LabelReactUtils } from "../Input/Label/LabelReact.utils";
 import type { SortableItem, SortableItemSlotProps, SortableProps } from "./Sortable.types";
-
-const PLACED_SIZING: InteractionSizing = "fill";
 
 const SortableItemSlot = (props: SortableItemSlotProps) => {
     const isDisabled = props.flags.isDisabled ?? false;
@@ -361,7 +359,13 @@ export const Sortable = <T,>(props: SortableProps<T>) => {
 
         const element = (
             <InteractionWrapper<SortableItemFlags>
-                sizing={placement !== undefined ? PLACED_SIZING : orientation === "horizontal" ? "fit-content" : "fill"}
+                sizing={
+                    placement !== undefined
+                        ? PlacementConst.PLACED_SIZING
+                        : orientation === "horizontal"
+                          ? "fit-content"
+                          : "fill"
+                }
                 isDisabled={item.isDisabled ?? false}
                 isReachableWhenDisabled={item.isReachableWhenDisabled ?? false}
                 isTabbable={rovingIndex === index}

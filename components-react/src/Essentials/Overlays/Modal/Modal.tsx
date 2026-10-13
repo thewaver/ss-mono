@@ -2,6 +2,7 @@ import { type CSSProperties, useEffect, useRef, useState } from "react";
 import { createPortal } from "react-dom";
 
 import { FocusManagerUtils, MODAL_DEFAULTS, ModalStyles, ModalUtils } from "@thewaver/ss-components";
+import { ModalConst } from "@thewaver/ss-components/internal";
 import { CSSUtils, GestureUtils } from "@thewaver/ss-utils";
 
 import { DismisserReactUtils } from "../../../Abstracts/Dismisser/DismisserReact.utils";
@@ -11,8 +12,6 @@ import { InteractionTrackerReactUtils } from "../../../Abstracts/InteractionTrac
 import { useViewportContext } from "../../../Abstracts/Viewport/Viewport.context";
 import { useElement, useLatest } from "../../../Utils/refUtils";
 import type { ModalProps } from "./Modal.types";
-
-const DEFAULT_MARGINS = CSSUtils.spreadMargin(0);
 
 export const Modal = (props: ModalProps) => {
     const viewportContext = useViewportContext();
@@ -27,7 +26,7 @@ export const Modal = (props: ModalProps) => {
 
     const transitionDurationMs = props.transitionDurationMs ?? MODAL_DEFAULTS.transitionDurationMs;
     const alignment = props.alignment ?? MODAL_DEFAULTS.alignment;
-    const margins = props.margins ?? DEFAULT_MARGINS;
+    const margins = props.margins ?? ModalConst.DEFAULT_MARGINS;
     const isDismissableOnOverlayClick = props.isDismissableOnOverlayClick ?? MODAL_DEFAULTS.isDismissableOnOverlayClick;
 
     const fader = ElementFaderReactUtils.useFader(isOpen, {

@@ -4,7 +4,7 @@ import { access } from "@thewaver/ss-components-solid";
 import * as styles from "@thewaver/ss-playground/App/StyledComponents/NumberInputStepperContent/NumberInputStepperContent.css";
 
 import { useLayerClass } from "../Layer/Layer.context";
-import type { NumberInputStepperContentProps } from "./NumberInputStepperContent.types";
+import type { NumberInputStepperContentProps } from "./NumberInputStepperContentSolid.types";
 
 export const PageNumberInputStepperFrame = (props: ParentProps) => (
     <div class={styles.numberInputStepper}>{props.children}</div>

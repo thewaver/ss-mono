@@ -7,7 +7,7 @@ import PageNumberField from "../../PageComponents/Field/PageNumberField.vue";
 import PageSelectField from "../../PageComponents/Field/PageSelectField.vue";
 import PageProp from "../../PageComponents/Prop/Prop.vue";
 import PagePropsPanel from "../../PageComponents/PropsPanel/PagePropsPanel.vue";
-import type { MosaicsPanelProps } from "./Mosaics.types";
+import type { MosaicsPanelProps } from "./MosaicsVue.types";
 
 const props = defineProps<MosaicsPanelProps>();
 

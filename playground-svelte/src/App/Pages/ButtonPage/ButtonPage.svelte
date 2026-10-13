@@ -8,9 +8,7 @@
     import ErroredExample from "./Examples/Errored.svelte";
     import PendingExample from "./Examples/Pending.svelte";
     import ReachableExample from "./Examples/Reachable.svelte";
-
-    const COPY_TEXT = "npm install @thewaver/ss-components";
-    const EXAMPLES_ROOT = "/src/App/Pages/ButtonPage/Examples";
+    import { COPY_TEXT, EXAMPLE_NAMES, EXAMPLES_ROOT } from "@thewaver/ss-playground/App/Pages/ButtonPage/ButtonPage.const";
 
     let clicks = $state(0);
     let toggleOn = $state(false);
@@ -23,42 +21,42 @@
     const examples: ExampleDefs[] = [
         {
             key: "default",
-            name: "Default",
+            name: EXAMPLE_NAMES.default,
             readout: () => `clicks: ${clicks}`,
             component: defaultExample,
             path: `${EXAMPLES_ROOT}/Default.svelte`,
         },
         {
             key: "decorated",
-            name: "Decorated",
+            name: EXAMPLE_NAMES.decorated,
             readout: () => `pressed: ${toggleOn}`,
             component: decoratedExample,
             path: `${EXAMPLES_ROOT}/Decorated.svelte`,
         },
         {
             key: "disabled",
-            name: "Disabled",
+            name: EXAMPLE_NAMES.disabled,
             readout: () => `clicks: ${disabledClicks}`,
             component: disabledExample,
             path: `${EXAMPLES_ROOT}/Disabled.svelte`,
         },
         {
             key: "reachable",
-            name: "Disabled + reachable",
+            name: EXAMPLE_NAMES.reachable,
             readout: () => `clicks: ${reachableClicks}`,
             component: reachableExample,
             path: `${EXAMPLES_ROOT}/Reachable.svelte`,
         },
         {
             key: "errored",
-            name: "Error",
+            name: EXAMPLE_NAMES.errored,
             readout: () => `hasError: ${hasError}`,
             component: erroredExample,
             path: `${EXAMPLES_ROOT}/Errored.svelte`,
         },
         {
             key: "pending",
-            name: "Pending",
+            name: EXAMPLE_NAMES.pending,
             readout: () =>
                 `saves: ${saves} — the handler answers with a promise that takes a second, and presses that land before it settles are ignored`,
             component: pendingExample,
@@ -66,7 +64,7 @@
         },
         {
             key: "copy",
-            name: "Copy to the clipboard",
+            name: EXAMPLE_NAMES.copy,
             readout: () =>
                 `copies: ${copies} — the handler answers with the clipboard's own promise, so the button is pending while it writes, then says Copied for two seconds and announces it`,
             component: copyExample,

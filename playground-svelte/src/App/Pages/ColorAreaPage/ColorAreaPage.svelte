@@ -5,12 +5,13 @@
     import PageExamples from "../../PageComponents/Examples/PageExamples.svelte";
     import DropdownExample from "./Examples/Dropdown.svelte";
     import SurfaceExample from "./Examples/Surface.svelte";
-
-    const EXAMPLES_ROOT = "/src/App/Pages/ColorAreaPage/Examples";
-
-    const STARTING_HSV: Color.HSVA = { h: 210, s: 70, v: 90, a: 1 };
-    const STARTING_PICKER_HSV: Color.HSVA = { h: 90, s: 50, v: 80, a: 1 };
-    const STARTING_DISABLED_HSV: Color.HSVA = { h: 0, s: 60, v: 60, a: 1 };
+    import {
+    EXAMPLE_NAMES,
+    EXAMPLES_ROOT,
+    STARTING_DISABLED_HSV,
+    STARTING_HSV,
+    STARTING_PICKER_HSV,
+} from "@thewaver/ss-playground/App/Pages/ColorAreaPage/ColorAreaPage.const";
 
     const popupId = $props.id();
 
@@ -23,7 +24,7 @@
     const examples: ExampleDefs[] = [
         {
             key: "bare",
-            name: "The surface alone",
+            name: EXAMPLE_NAMES.bare,
             readout: () =>
                 `hsv: ${Math.round(bareHsv.h)}° ${Math.round(bareHsv.s)}% ${Math.round(bareHsv.v)}% — hex: ${Color.HSV.toHex(bareHsv)}`,
             component: bareExample,
@@ -31,14 +32,14 @@
         },
         {
             key: "dropdown",
-            name: "In a dropdown, replacing the OS dialog",
+            name: EXAMPLE_NAMES.dropdown,
             readout: () => `${Color.HSVA.toHexa(pickerHsv)} — open: ${isOpen}`,
             component: dropdownExample,
             path: `${EXAMPLES_ROOT}/Dropdown.svelte`,
         },
         {
             key: "disabled",
-            name: "Disabled",
+            name: EXAMPLE_NAMES.disabled,
             readout: () => "the drag is not attached at all, so nothing moves",
             component: disabledExample,
             path: `${EXAMPLES_ROOT}/Surface.svelte`,

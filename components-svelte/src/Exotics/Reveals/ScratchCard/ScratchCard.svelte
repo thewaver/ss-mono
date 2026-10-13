@@ -8,6 +8,7 @@
         ScratchCardUtils,
         ScratchCardStyles as styles,
     } from "@thewaver/ss-components";
+    import { ScratchCardConst } from "@thewaver/ss-components/internal";
     import { assignInlineVars } from "@vanilla-extract/dynamic";
 
     import { ElementObserverSvelteUtils } from "../../../Abstracts/ElementObserver/ElementObserverSvelte.utils.svelte.js";
@@ -17,9 +18,6 @@
     import { toStyle } from "../../../Utils/styleUtils.js";
     import type { ScratchCardProps } from "./ScratchCard.types.js";
 
-    const NOTHING_RUBBED = 0;
-    const NO_PATH = "";
-
     let props: ScratchCardProps = $props();
 
     const maskId = $props.id();
@@ -28,8 +26,8 @@
     let cover = $state<HTMLDivElement>();
     let pathElement = $state<SVGPathElement>();
 
-    let path = $state(NO_PATH);
-    let clearedRatio = $state(NOTHING_RUBBED);
+    let path = $state(ScratchCardConst.NO_PATH);
+    let clearedRatio = $state(ScratchCardConst.NOTHING_RUBBED);
     let isClearing = $state(false);
     let isCleared = $state(false);
 
@@ -66,8 +64,8 @@
             scheduler.reset();
             isClearing = false;
             isCleared = false;
-            path = NO_PATH;
-            clearedRatio = NOTHING_RUBBED;
+            path = ScratchCardConst.NO_PATH;
+            clearedRatio = ScratchCardConst.NOTHING_RUBBED;
 
             return true;
         },
@@ -87,7 +85,7 @@
     $effect(() => scheduler.cancel);
 
     $effect(() => {
-        if (path !== NO_PATH) untrack(() => scheduler.schedule());
+        if (path !== ScratchCardConst.NO_PATH) untrack(() => scheduler.schedule());
     });
 
     watchChange(

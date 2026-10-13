@@ -1,11 +1,12 @@
 <script lang="ts">
     import StressTest from "../../PageComponents/StressTest/StressTest.svelte";
-    import type { StressTestDefs } from "../../PageComponents/StressTest/StressText.types";
+    import type { StressTestDefs } from "../../PageComponents/StressTest/StressTextSvelte.types";
     import SingleTargetExample from "./Examples/SingleTarget.svelte";
     import type { ParticleSpawnerExampleProps } from "./ParticleSpawnerPage.types";
-
-    const STRESS_BOX_WIDTH = 120;
-    const STRESS_BOX_HEIGHT = 80;
+    import {
+        STRESS_BOX_HEIGHT,
+        STRESS_BOX_WIDTH,
+    } from "@thewaver/ss-playground/App/Pages/ParticleSpawnerPage/ParticleSpawnerPage.const";
 
     const STRESS_ITEMS: (StressTestDefs & { width: number; height: number })[] = [
         { count: 8, cols: 4, gap: 10, width: STRESS_BOX_WIDTH, height: STRESS_BOX_HEIGHT },

@@ -1,11 +1,11 @@
 import { MediaQueryMonitorSvelteUtils } from "@thewaver/ss-components-svelte";
+import { WheelKnobs } from "@thewaver/ss-playground/App/Knobs/Wheels.const";
 import {
     INDEFINITE_REST_DURATION_MS,
     PRIZES,
     SPIN_STYLES,
 } from "@thewaver/ss-playground/App/Pages/Wheels/Wheels.const";
 
-import { WheelKnobs } from "../../Knobs/Wheels.const";
 import type { WheelSpinStyleKey, WheelsControls } from "./Wheels.types";
 
 export const createWheelsControls = (): WheelsControls => {

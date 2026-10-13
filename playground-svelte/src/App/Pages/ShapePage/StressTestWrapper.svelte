@@ -4,8 +4,8 @@
     import { ShapeConst } from "@thewaver/ss-utils";
 
     import StressTest from "../../PageComponents/StressTest/StressTest.svelte";
-    import type { StressTestDefs } from "../../PageComponents/StressTest/StressText.types";
-    import { computeShapeFillDefs, computeShapeStrokeDefs } from "./ShapePage.const";
+    import type { StressTestDefs } from "../../PageComponents/StressTest/StressTextSvelte.types";
+    import { computeShapeFillDefs, computeShapeStrokeDefs } from "./ShapePageSvelte.const";
     import type { ShapeExampleProps } from "./ShapePage.types";
 
     const STRESS_ITEMS: (StressTestDefs & { size: number })[] = [

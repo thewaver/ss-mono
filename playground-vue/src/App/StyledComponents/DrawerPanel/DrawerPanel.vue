@@ -2,7 +2,7 @@
 import * as styles from "@thewaver/ss-playground/App/StyledComponents/DrawerPanel/DrawerPanel.css";
 
 import PageLayer from "../../PageComponents/Layer/Layer.vue";
-import type { DrawerPanelProps } from "./DrawerPanel.types";
+import type { DrawerPanelProps } from "./DrawerPanelVue.types";
 
 defineProps<DrawerPanelProps>();
 </script>

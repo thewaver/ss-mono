@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import * as styles from "@thewaver/ss-playground/App/StyledComponents/LabelCaption/LabelCaption.css";
 
-import type { PageLabelCaptionProps } from "./LabelCaption.types";
+import type { PageLabelCaptionProps } from "./LabelCaptionVue.types";
 
 defineProps<PageLabelCaptionProps>();
 </script>

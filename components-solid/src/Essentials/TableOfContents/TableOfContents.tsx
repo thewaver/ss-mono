@@ -1,13 +1,13 @@
 import { type Accessor, Index, type JSX, Show, createEffect, createMemo, createSignal, on, onCleanup } from "solid-js";
 
 import {
-    type InteractionSizing,
     TABLE_OF_CONTENTS_DEFAULTS,
     type TableOfContentsFlags,
     type TableOfContentsLink,
     TableOfContentsUtils,
     TableOfContentsStyles as styles,
 } from "@thewaver/ss-components";
+import { PlacementConst } from "@thewaver/ss-components/internal";
 
 import { ElementObserverSolidUtils } from "../../Abstracts/ElementObserver/ElementObserverSolid.utils";
 import { InteractionWrapper } from "../../Primitives/InteractionWrapper/InteractionWrapper";
@@ -15,9 +15,6 @@ import { PlacementBox } from "../../Primitives/PlacementBox/PlacementBox";
 import { PlacementItem } from "../../Primitives/PlacementItem/PlacementItem";
 import { access } from "../../Utils/propUtils";
 import type { TableOfContentsItemProps, TableOfContentsProps } from "./TableOfContentsSolid.types";
-
-const ROW_SIZING: InteractionSizing = "fit-content";
-const PLACED_SIZING: InteractionSizing = "fill";
 
 const TableOfContentsItem = <T,>(props: TableOfContentsItemProps<T>) => {
     const handleClick = (e: MouseEvent) => {
@@ -104,7 +101,7 @@ export const TableOfContents = <T,>(props: TableOfContentsProps<T>) => {
 
     const renderControl = (getLink: Accessor<TableOfContentsLink<T>>, index: number) => (
         <InteractionWrapper<TableOfContentsFlags>
-            sizing={getPlacementAt(index) === undefined ? ROW_SIZING : PLACED_SIZING}
+            sizing={getPlacementAt(index) === undefined ? PlacementConst.ROW_SIZING : PlacementConst.PLACED_SIZING}
             extraFlags={() => ({ isCurrent: getCurrentIndex() === index })}
             renderControl={(setElementRef, getFlags) => (
                 <TableOfContentsItem

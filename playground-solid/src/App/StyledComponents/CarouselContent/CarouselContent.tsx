@@ -1,7 +1,7 @@
 import type { ParentProps } from "solid-js";
 
-import type { CarouselStep } from "@thewaver/ss-components-solid";
 import { access } from "@thewaver/ss-components-solid";
+import { STEP_GLYPHS } from "@thewaver/ss-playground/App/StyledComponents/CarouselContent/CarouselContent.const";
 import * as styles from "@thewaver/ss-playground/App/StyledComponents/CarouselContent/CarouselContent.css";
 import { CONTROL_GLYPHS } from "@thewaver/ss-playground/App/StyledComponents/ControlButtonContent/ControlButtonContent.const";
 
@@ -12,12 +12,7 @@ import type {
     CarouselRotationProps,
     CarouselSlideProps,
     CarouselStepProps,
-} from "./CarouselContent.types";
-
-const STEP_GLYPHS: Record<CarouselStep, string> = {
-    previous: CONTROL_GLYPHS.previous,
-    next: CONTROL_GLYPHS.next,
-};
+} from "./CarouselContentSolid.types";
 
 export const PageCarouselSlide = (props: ParentProps<CarouselSlideProps>) => {
     const getLayerClass = useLayerClass();

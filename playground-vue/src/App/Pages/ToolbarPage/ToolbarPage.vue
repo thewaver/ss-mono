@@ -3,6 +3,12 @@ import { computed, shallowRef } from "vue";
 
 import { TOOLBAR_DEFAULTS } from "@thewaver/ss-components-vue";
 import { ToolbarKnobs } from "@thewaver/ss-playground/App/Knobs/Toolbars.const";
+import { NOTHING_RUN } from "@thewaver/ss-playground/App/Pages/ToolbarPage/ToolbarPage.const";
+import {
+    EXAMPLES_ROOT,
+    EXAMPLE_NAMES,
+    WIDE_SPAN,
+} from "@thewaver/ss-playground/App/Pages/ToolbarPage/ToolbarPage.const";
 
 import type { ExampleDefs } from "../../PageComponents/Examples/Examples.types";
 import PageExamples from "../../PageComponents/Examples/PageExamples.vue";
@@ -15,12 +21,7 @@ import PressedExample from "./Examples/Pressed.vue";
 import RefusingExample from "./Examples/Refusing.vue";
 import SharedTooltipExample from "./Examples/SharedTooltip.vue";
 import ResizableBar from "./ResizableBar.vue";
-import { NOTHING_RUN } from "./ToolbarPage.const";
-import type { ToolbarExampleProps } from "./ToolbarPage.types";
-
-const EXAMPLES_ROOT = "/src/App/Pages/ToolbarPage/Examples";
-
-const WIDE_SPAN = 2;
+import type { ToolbarExampleProps } from "./ToolbarPageVue.types";
 
 const barWidth = shallowRef(ToolbarKnobs.STARTING_BAR_WIDTH);
 const gap = shallowRef(TOOLBAR_DEFAULTS.gap);
@@ -41,14 +42,14 @@ const resizeBar = (width: number) => {
 const examples: ExampleDefs[] = [
     {
         key: "default",
-        name: "Default",
+        name: EXAMPLE_NAMES.default,
         span: WIDE_SPAN,
         readout: () => `last run: ${lastRun.value} — drag the right edge and the row's tail moves into the menu`,
         path: `${EXAMPLES_ROOT}/Default.vue`,
     },
     {
         key: "refusing",
-        name: "Refusing",
+        name: EXAMPLE_NAMES.refusing,
         span: WIDE_SPAN,
         readout: () =>
             "Share never collapses, so it is the last one standing; Print is never in the row; Rename is disabled, so the arrows step past it",
@@ -56,7 +57,7 @@ const examples: ExampleDefs[] = [
     },
     {
         key: "pressed",
-        name: "Pressed",
+        name: EXAMPLE_NAMES.pressed,
         span: WIDE_SPAN,
         readout: () =>
             `pressed: ${pressedValues.value.join(", ") || "nothing"} — each action stays down until pressed again, and one that collapses is a checkbox in the menu, checked from the same list`,
@@ -64,7 +65,7 @@ const examples: ExampleDefs[] = [
     },
     {
         key: "sharedTooltip",
-        name: "One tooltip for the row",
+        name: EXAMPLE_NAMES.sharedTooltip,
         span: WIDE_SPAN,
         readout: () =>
             "a single tooltip whose anchor is whichever action is under the pointer or holds focus; moving along the row carries the tooltip with it instead of hiding one and showing the next, and its description moves with it; Clear is disabled and has no hint, so it gets no tooltip",
@@ -72,7 +73,7 @@ const examples: ExampleDefs[] = [
     },
     {
         key: "palette",
-        name: "A ring of tools",
+        name: EXAMPLE_NAMES.palette,
         readout: () =>
             `last run: ${lastRun.value} — a layout sizes the bar itself, so nothing runs out of room and the overflow menu has nothing to hold`,
         path: `${EXAMPLES_ROOT}/Palette.vue`,

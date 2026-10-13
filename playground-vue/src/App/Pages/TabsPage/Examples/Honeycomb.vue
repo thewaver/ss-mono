@@ -13,7 +13,7 @@ import PageTabPanel from "../../../PageComponents/TabPanel/TabPanel.vue";
 import PageTabCell from "../../../StyledComponents/TabContent/PageTabCell.vue";
 import PageTabHexFloater from "../../../StyledComponents/TabContent/PageTabHexFloater.vue";
 import PageTabHexHighlightFloater from "../../../StyledComponents/TabContent/PageTabHexHighlightFloater.vue";
-import type { TabsExampleProps } from "../TabsPage.types";
+import type { TabsExampleProps } from "../TabsPageVue.types";
 
 const HONEYCOMB_DEFS: HoneycombDefs = { perRow: 3, gapRatio: 0 };
 

@@ -13,6 +13,7 @@ import {
     CarouselUtils,
     LiveAnnouncerUtils,
 } from "@thewaver/ss-components";
+import { CarouselConst } from "@thewaver/ss-components/internal";
 import { StringUtils } from "@thewaver/ss-utils";
 
 import { ElementObserverReactUtils } from "../../Abstracts/ElementObserver/ElementObserverReact.utils";
@@ -21,9 +22,6 @@ import { SignalMirrorReactUtils } from "../../Abstracts/SignalMirror/SignalMirro
 import { InteractionWrapper } from "../../Primitives/InteractionWrapper/InteractionWrapper";
 import { useLatest } from "../../Utils/refUtils";
 import type { CarouselControlProps, CarouselControls, CarouselProps } from "./Carousel.types";
-
-const NO_PROGRESS = 0;
-const HIDDEN_OPACITY = 0;
 
 const toReactStyle = (style: Record<string, string>) =>
     Object.fromEntries(
@@ -62,7 +60,10 @@ export const Carousel = <T,>(props: CarouselProps<T>) => {
 
     const [index, setIndex] = SignalMirrorReactUtils.useOptionalState(props.index, 0);
     const [isPlaying, setIsPlaying] = SignalMirrorReactUtils.useOptionalState(props.playback, true);
-    const [progress, setProgressState] = SignalMirrorReactUtils.useOptionalState(props.progress, NO_PROGRESS);
+    const [progress, setProgressState] = SignalMirrorReactUtils.useOptionalState(
+        props.progress,
+        CarouselConst.NO_PROGRESS,
+    );
 
     const count = props.slides.length;
     const currentIndex = CarouselUtils.wrapIndex(index, count);
@@ -298,7 +299,7 @@ export const Carousel = <T,>(props: CarouselProps<T>) => {
         if (getDrawn(currentIndex)?.contains(e.target as Node)) return;
 
         const rects = props.slides.map((_, slideIndex) =>
-            slideIndex !== currentIndex && placements[slideIndex].effect.opacity !== HIDDEN_OPACITY
+            slideIndex !== currentIndex && placements[slideIndex].effect.opacity !== CarouselConst.HIDDEN_OPACITY
                 ? getDrawn(slideIndex)?.getBoundingClientRect()
                 : undefined,
         );

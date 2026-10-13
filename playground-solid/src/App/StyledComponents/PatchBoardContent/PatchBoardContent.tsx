@@ -6,7 +6,7 @@ import * as styles from "@thewaver/ss-playground/App/StyledComponents/PatchBoard
 
 import { PageBeam } from "../Beam/Beam";
 import { useLayerClass } from "../Layer/Layer.context";
-import type { PagePatchCableProps, PagePatchNodeProps, PagePatchSocketProps } from "./PatchBoardContent.types";
+import type { PagePatchCableProps, PagePatchNodeProps, PagePatchSocketProps } from "./PatchBoardContentSolid.types";
 
 export const PagePatchNode = (props: PagePatchNodeProps) => {
     const getLayerClass = useLayerClass();

@@ -8,13 +8,12 @@ import {
     TREE_DEFAULTS,
     access,
 } from "@thewaver/ss-components-solid";
+import { LINK_SELECTOR } from "@thewaver/ss-playground/App/PageComponents/NavLink/NavLink.const";
 import * as styles from "@thewaver/ss-playground/App/StyledComponents/NavLinkContent/NavLinkContent.css";
 
 import { renderPageHighlightFloater } from "../../StyledComponents/GlideFloater/GlideFloater";
 import { useLayerClass } from "../../StyledComponents/Layer/Layer.context";
-import type { PageNavLinkProps } from "./NavLink.types";
-
-const LINK_SELECTOR = "a";
+import type { PageNavLinkProps } from "./NavLinkSolid.types";
 
 const getTransitionDurationMs = () => TREE_DEFAULTS.floaterTransitionDurationMs;
 

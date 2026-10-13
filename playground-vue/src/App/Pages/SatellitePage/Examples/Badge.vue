@@ -7,7 +7,7 @@ import type { Point2d } from "@thewaver/ss-utils";
 
 import PageSatellitePill from "../../../StyledComponents/SatelliteContent/PageSatellitePill.vue";
 import PageSatelliteSubject from "../../../StyledComponents/SatelliteContent/PageSatelliteSubject.vue";
-import type { SatelliteBadgeCorner, SatelliteBadgeExampleProps } from "../SatellitePage.types";
+import type { SatelliteBadgeCorner, SatelliteBadgeExampleProps } from "../SatellitePageVue.types";
 
 const PLACEMENTS: Record<SatelliteBadgeCorner, AnchorPlacement> = {
     top_left: { x: "left_in", y: "top_in" },

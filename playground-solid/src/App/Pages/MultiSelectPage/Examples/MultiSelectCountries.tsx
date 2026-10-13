@@ -5,7 +5,7 @@ import { MultiSelect } from "@thewaver/ss-components-solid";
 import { renderPageHighlightFloater } from "../../../StyledComponents/GlideFloater/GlideFloater";
 import { PageSelectContent } from "../../../StyledComponents/SelectContent/SelectContent";
 import { PageSelectOptionContent } from "../../../StyledComponents/SelectOptionContent/SelectOptionContent";
-import { COUNTRIES, PLACEHOLDER, renderSelectPopup } from "../../SelectPage/SelectPage.const";
+import { COUNTRIES, PLACEHOLDER, renderSelectPopup } from "../../SelectPage/SelectPageSolid.const";
 
 type Props = {
     values: Signal<string[]>;

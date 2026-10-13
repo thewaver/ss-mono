@@ -2,11 +2,10 @@
 import { shallowRef } from "vue";
 
 import { FloaterStyles, FloaterVueUtils, InteractionTrackerUtils, TREE_DEFAULTS } from "@thewaver/ss-components-vue";
+import { LINK_SELECTOR } from "@thewaver/ss-playground/App/PageComponents/NavLink/NavLink.const";
 import * as styles from "@thewaver/ss-playground/App/StyledComponents/NavLinkContent/NavLinkContent.css";
 
 import PageGlideFloater from "../../StyledComponents/GlideFloater/PageGlideFloater.vue";
-
-const LINK_SELECTOR = "a";
 
 const transitionDurationMs = TREE_DEFAULTS.floaterTransitionDurationMs;
 

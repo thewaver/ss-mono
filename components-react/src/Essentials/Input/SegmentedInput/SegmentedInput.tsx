@@ -7,12 +7,11 @@ import {
     SegmentedInputUtils,
     TextSyncUtils,
 } from "@thewaver/ss-components";
+import { SegmentedInputConst } from "@thewaver/ss-components/internal";
 
 import { TextField } from "../../../Primitives/TextField/TextField";
 import { useElement, useLatest } from "../../../Utils/refUtils";
 import type { SegmentedInputProps } from "./SegmentedInput.types";
-
-const NO_SELECTION: SegmentedInputSelection = { start: 0, end: 0 };
 
 export const SegmentedInput = (props: SegmentedInputProps) => {
     const [value] = props.value;
@@ -22,7 +21,7 @@ export const SegmentedInput = (props: SegmentedInputProps) => {
     const cellRefs = useRef<(HTMLDivElement | null)[]>([]);
     const latestRef = useLatest(props.ref);
 
-    const [selection, setSelection] = useState(NO_SELECTION);
+    const [selection, setSelection] = useState(SegmentedInputConst.NO_SELECTION);
 
     const cellCount = Math.max(0, props.cellCount);
     const indices = Array.from({ length: cellCount }, (_unused, index) => index);

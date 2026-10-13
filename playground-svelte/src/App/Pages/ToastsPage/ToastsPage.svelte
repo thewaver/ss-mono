@@ -2,7 +2,7 @@
     import type { Toast } from "@thewaver/ss-components-svelte";
     import { StoreUtils } from "@thewaver/ss-utils";
 
-    import type { ToastDefs, ToastKind } from "../../StyledComponents/ToastContent/ToastContent.types";
+    import type { ToastDefs, ToastKind } from "../../StyledComponents/ToastContent/ToastContentSvelte.types";
 
     const NO_LIMIT = 0;
     const STICKY = 0;
@@ -54,14 +54,14 @@
     import type { ToastsAlignment, ToastsDir, ToastsOverflow } from "@thewaver/ss-components-svelte";
     import * as styles from "@thewaver/ss-playground/App/Pages/ToastsPage/ToastsPage.css";
 
-    import { ToastKnobs } from "../../Knobs/Toasts.const";
+    import { ToastKnobs } from "@thewaver/ss-playground/App/Knobs/Toasts.const";
     import PageNumberField from "../../PageComponents/Field/PageNumberField.svelte";
     import PageSelectField from "../../PageComponents/Field/PageSelectField.svelte";
     import PageProp from "../../PageComponents/Prop/Prop.svelte";
     import PagePropsPanel from "../../PageComponents/PropsPanel/PagePropsPanel.svelte";
     import PageButtonContent from "../../StyledComponents/ButtonContent/ButtonContent.svelte";
     import PageToastContent from "../../StyledComponents/ToastContent/ToastContent.svelte";
-    import type { ToastAnimation, ToastStacking } from "../../StyledComponents/ToastContent/ToastContent.types";
+    import type { ToastAnimation, ToastStacking } from "../../StyledComponents/ToastContent/ToastContentSvelte.types";
 
     let alignment = $state<ToastsAlignment>(TOASTS_DEFAULTS.alignment);
     let dir = $state<ToastsDir>(TOASTS_DEFAULTS.dir);

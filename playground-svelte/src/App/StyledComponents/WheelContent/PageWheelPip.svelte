@@ -2,9 +2,8 @@
     import * as styles from "@thewaver/ss-playground/App/StyledComponents/WheelContent/WheelContent.css";
 
     import { getLayerClass } from "../Layer/Layer.context";
-    import type { PageWheelPipProps, PageWheelPipSide } from "./WheelContent.types";
-
-    const PIP_PATH = "M 2 2 H 18 L 10 18 Z";
+    import type { PageWheelPipProps, PageWheelPipSide } from "./WheelContentSvelte.types";
+    import { PIP_PATH } from "@thewaver/ss-playground/App/StyledComponents/WheelContent/WheelContent.const";
 
     const PIP_SIDE_STYLES: Record<PageWheelPipSide, string> = {
         top: styles.wheelPipTop,

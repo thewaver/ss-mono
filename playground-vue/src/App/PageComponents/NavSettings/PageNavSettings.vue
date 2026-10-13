@@ -7,6 +7,13 @@ import {
     ShapeRevealUtils,
     Toggle,
 } from "@thewaver/ss-components-vue";
+import {
+    PAGE_VIEW_OPTIONS,
+    THEME_FIELD_ID,
+    THEME_OPTIONS,
+    VIEWPORT_ANCHOR_OPTIONS,
+} from "@thewaver/ss-playground/App/PageComponents/NavSettings/NavSettings.const";
+import { NO_MOTION_DURATION_MS } from "@thewaver/ss-playground/App/PageComponents/NavSettings/NavSettings.const";
 import { PLAYGROUND_THEMES } from "@thewaver/ss-playground/App/Theme.css";
 
 import PageToggleContent from "../../StyledComponents/ToggleContent/ToggleContent.vue";
@@ -14,11 +21,8 @@ import PageExampleKnobsButton from "../ExampleKnobs/PageExampleKnobsButton.vue";
 import PageSelectField from "../Field/PageSelectField.vue";
 import { OWN_FRAMEWORK } from "../FrameworkMenu/FrameworkMenu.const";
 import PageProp from "../Prop/Prop.vue";
-import { PAGE_VIEW_OPTIONS, THEME_FIELD_ID, THEME_OPTIONS, VIEWPORT_ANCHOR_OPTIONS } from "./NavSettings.const";
-import type { PageNavSettingsProps, PlaygroundTheme, ViewportAnchor } from "./NavSettings.types";
+import type { PageNavSettingsProps, PlaygroundTheme, ViewportAnchor } from "./NavSettingsVue.types";
 import PageNavSettingsChoice from "./PageNavSettingsChoice.vue";
-
-const NO_MOTION_DURATION_MS = 0;
 
 const computeViewportAnchorLabel = (anchor: ViewportAnchor) =>
     VIEWPORT_ANCHOR_OPTIONS.find((option) => option.value === anchor)?.label ?? String(anchor);

@@ -2,7 +2,7 @@
     import * as styles from "@thewaver/ss-playground/App/StyledComponents/CalendarContent/CalendarContent.css";
 
     import { getLayerClass } from "../Layer/Layer.context";
-    import type { CalendarCaptionFieldsProps } from "./CalendarContent.types";
+    import type { CalendarCaptionFieldsProps } from "./CalendarContentSvelte.types";
 
     let { ref = $bindable(), children, ...props }: CalendarCaptionFieldsProps = $props();
 

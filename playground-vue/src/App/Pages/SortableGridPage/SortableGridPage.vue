@@ -3,16 +3,10 @@ import { shallowRef } from "vue";
 
 import { SortableGridUtils } from "@thewaver/ss-components-vue";
 import type { SortableGridItem } from "@thewaver/ss-components-vue";
-import type { Gear } from "@thewaver/ss-playground/App/Pages/SortableGridPage/SortableGridPage.types";
-
-import type { ExampleDefs } from "../../PageComponents/Examples/Examples.types";
-import PageExamples from "../../PageComponents/Examples/PageExamples.vue";
-import InventoryExample from "./Examples/Inventory.vue";
-import LootExample from "./Examples/Loot.vue";
-import PairExample from "./Examples/Pair.vue";
 import {
     ARROWS,
     ARROW_IDS,
+    EXAMPLES_ROOT,
     LOOT,
     PACK,
     PACK_COLUMNS,
@@ -25,9 +19,15 @@ import {
     TURNS_COLUMNS,
     TURNS_ROWS,
     computeIsWall,
-} from "./SortableGridPage.const";
+} from "@thewaver/ss-playground/App/Pages/SortableGridPage/SortableGridPage.const";
+import { EXAMPLE_NAMES } from "@thewaver/ss-playground/App/Pages/SortableGridPage/SortableGridPage.const";
+import type { Gear } from "@thewaver/ss-playground/App/Pages/SortableGridPage/SortableGridPage.types";
 
-const EXAMPLES_ROOT = "/src/App/Pages/SortableGridPage/Examples";
+import type { ExampleDefs } from "../../PageComponents/Examples/Examples.types";
+import PageExamples from "../../PageComponents/Examples/PageExamples.vue";
+import InventoryExample from "./Examples/Inventory.vue";
+import LootExample from "./Examples/Loot.vue";
+import PairExample from "./Examples/Pair.vue";
 
 const filled = (items: SortableGridItem<Gear>[]) =>
     items.reduce((cells, item) => cells + SortableGridUtils.getItemShape(item).cells.length, 0);
@@ -65,28 +65,28 @@ const dashboard = shallowRef(PACK);
 const examples: ExampleDefs[] = [
     {
         key: "pack",
-        name: "One grid",
+        name: EXAMPLE_NAMES.pack,
         readout: () =>
             `${room(pack.value, PACK_COLUMNS, PACK_ROWS)} — the page binds R and Shift with R to the two turn commands, and the wheel to the same pair`,
         path: `${EXAMPLES_ROOT}/Inventory.vue`,
     },
     {
         key: "turns",
-        name: "An L turns two ways",
+        name: EXAMPLE_NAMES.turns,
         readout: () =>
             `${spots(turns.value)} — clockwise puts the hook's arm where the flint is and is refused, counterclockwise fits`,
         path: `${EXAMPLES_ROOT}/Inventory.vue`,
     },
     {
         key: "cells",
-        name: "Painted cell by cell",
+        name: EXAMPLE_NAMES.cells,
         readout: () =>
             `${room(cellsPack.value, PACK_COLUMNS, PACK_ROWS)} — the same items, drawn as their own squares instead of one clipped shape`,
         path: `${EXAMPLES_ROOT}/Inventory.vue`,
     },
     {
         key: "pair",
-        name: "Between two grids",
+        name: EXAMPLE_NAMES.pair,
         readout: () =>
             `pack: ${room(pairPack.value, PACK_COLUMNS, PACK_ROWS)} | stash: ${room(stash.value, STASH_COLUMNS, STASH_ROWS)}`,
         span: 2,
@@ -94,14 +94,14 @@ const examples: ExampleDefs[] = [
     },
     {
         key: "picky",
-        name: "A grid that refuses most gear",
+        name: EXAMPLE_NAMES.picky,
         readout: () => `quiver: ${spots(quiver.value)} — the quiver takes arrows and nothing else`,
         span: 2,
         path: `${EXAMPLES_ROOT}/Pair.vue`,
     },
     {
         key: "locked",
-        name: "A grid that takes nothing",
+        name: EXAMPLE_NAMES.locked,
         readout: () =>
             `stash: ${spots(lockedStash.value)} — it can be rearranged from inside but accepts nothing from outside`,
         span: 2,
@@ -109,7 +109,7 @@ const examples: ExampleDefs[] = [
     },
     {
         key: "loot",
-        name: "From a list into a grid",
+        name: EXAMPLE_NAMES.loot,
         readout: () =>
             `ground: ${
                 loot.value.map((item) => item.value.name).join(", ") || "empty"
@@ -119,19 +119,19 @@ const examples: ExampleDefs[] = [
     },
     {
         key: "walls",
-        name: "Walls, and a tidy-up",
+        name: EXAMPLE_NAMES.walls,
         readout: () => `${spots(walled.value)} — nothing lands on a hatched cell, and Tidy up pulls everything upward`,
         path: `${EXAMPLES_ROOT}/Inventory.vue`,
     },
     {
         key: "dashboard",
-        name: "Packed after every move",
+        name: EXAMPLE_NAMES.dashboard,
         readout: () => `${spots(dashboard.value)} — each drop is followed by compact(), so no hole stays open`,
         path: `${EXAMPLES_ROOT}/Inventory.vue`,
     },
     {
         key: "disabled",
-        name: "Disabled",
+        name: EXAMPLE_NAMES.disabled,
         readout: () => `${spots(disabled.value)} — nothing moves, by pointer or by key`,
         path: `${EXAMPLES_ROOT}/Inventory.vue`,
     },

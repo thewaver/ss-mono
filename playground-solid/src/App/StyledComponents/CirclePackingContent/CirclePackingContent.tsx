@@ -2,13 +2,14 @@ import type { ParentProps } from "solid-js";
 import { createUniqueId } from "solid-js";
 
 import { access } from "@thewaver/ss-components-solid";
+import {
+    LABEL_HIDDEN,
+    LABEL_SHOWN,
+} from "@thewaver/ss-playground/App/StyledComponents/CirclePackingContent/CirclePackingContent.const";
 import * as styles from "@thewaver/ss-playground/App/StyledComponents/CirclePackingContent/CirclePackingContent.css";
 
 import { useLayerClass } from "../Layer/Layer.context";
-import type { PageCirclePackingCircleProps, PageCirclePackingLabelProps } from "./CirclePackingContent.types";
-
-const LABEL_SHOWN = 1;
-const LABEL_HIDDEN = 0;
+import type { PageCirclePackingCircleProps, PageCirclePackingLabelProps } from "./CirclePackingContentSolid.types";
 
 export const PageCirclePackingCircle = (props: PageCirclePackingCircleProps) => {
     const getLayerClass = useLayerClass();

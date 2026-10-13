@@ -7,13 +7,12 @@ import {
     ParticleFieldUtils,
     ParticleFieldStyles as styles,
 } from "@thewaver/ss-components";
+import { ParticleFieldConst } from "@thewaver/ss-components/internal";
 import { MathUtils, Size2d } from "@thewaver/ss-utils";
 
 import { SignalMirrorSolidUtils } from "../../../Abstracts/SignalMirror/SignalMirrorSolid.utils";
 import { access } from "../../../Utils/propUtils";
 import type { ParticleFieldProps } from "./ParticleFieldSolid.types";
-
-const NO_PROGRESS = 0;
 
 export const ParticleField = (props: ParticleFieldProps) => {
     const getSpawnChance = createMemo(() => access(props.spawnChance) ?? PARTICLE_FIELD_DEFAULTS.spawnChance);
@@ -37,7 +36,10 @@ export const ParticleField = (props: ParticleFieldProps) => {
     const [getRootRef, setRootRef] = createSignal<HTMLElement>();
     const [getIsWindowVisible, setIsWindowVisible] = createSignal(true);
     const [getIsPlaying] = SignalMirrorSolidUtils.createOptional(() => props.playback, true);
-    const [getProgress, setProgress] = SignalMirrorSolidUtils.createOptional(() => props.progress, NO_PROGRESS);
+    const [getProgress, setProgress] = SignalMirrorSolidUtils.createOptional(
+        () => props.progress,
+        ParticleFieldConst.NO_PROGRESS,
+    );
     const [getCurrentIteration, setCurrentIteration] = createSignal(0);
     const [getRootSize, setRootSize] = createSignal<Size2d>({ width: 0, height: 0 }, { equals: Size2d.isSame });
     const [getLiveParticles, setLiveParticles] = createSignal<ParticleFieldParticle[]>([]);
@@ -117,7 +119,7 @@ export const ParticleField = (props: ParticleFieldProps) => {
                 roster.clear();
                 setLiveParticles([]);
                 setCurrentIteration(0);
-                setProgress(NO_PROGRESS);
+                setProgress(ParticleFieldConst.NO_PROGRESS);
             },
             { defer: true },
         ),

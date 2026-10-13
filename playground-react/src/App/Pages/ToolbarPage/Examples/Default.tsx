@@ -3,8 +3,8 @@ import type { ToolbarAction } from "@thewaver/ss-components-react";
 
 import { PageButtonContent } from "../../../StyledComponents/ButtonContent/ButtonContent";
 import { PageMenuTriggerContent } from "../../../StyledComponents/MenuTriggerContent/MenuTriggerContent";
-import { renderToolbarOverflowItem, renderToolbarPopup } from "../ToolbarPage.const";
-import type { ToolbarExampleProps } from "../ToolbarPage.types";
+import { renderToolbarOverflowItem, renderToolbarPopup } from "../ToolbarPageReact.const";
+import type { ToolbarExampleProps } from "../ToolbarPageReact.types";
 
 const ACTIONS: ToolbarAction<string>[] = [
     { value: "Bold" },

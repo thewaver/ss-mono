@@ -1,11 +1,7 @@
-import type { DrawerEdge } from "@thewaver/ss-components";
+import type { BaseDrawerValues } from "@thewaver/ss-components";
 
-import type { AccessorProps } from "../../../Utils/typeUtils";
-import type { ModalNameProps, ModalProps } from "../Modal/ModalSolid.types";
+import type { AccessorValues } from "../../../Utils/typeUtils";
+import type { ModalProps } from "../Modal/ModalSolid.types";
 
-export type DrawerProps = ModalNameProps &
-    Omit<ModalProps, "role" | "alignment" | "ariaLabel" | "ariaLabelledBy"> &
-    AccessorProps<{
-        /** Which edge of the screen the drawer slides in from. */
-        edge: DrawerEdge;
-    }>;
+export type DrawerProps = Omit<ModalProps, "role" | "alignment" | "ariaLabel" | "ariaLabelledBy"> &
+    AccessorValues<BaseDrawerValues>;

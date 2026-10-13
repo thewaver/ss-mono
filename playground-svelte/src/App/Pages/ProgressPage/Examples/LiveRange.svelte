@@ -2,7 +2,7 @@
     import { Progress } from "@thewaver/ss-components-svelte";
 
     import PageProgressContent from "../../../StyledComponents/ProgressContent/ProgressContent.svelte";
-    import type { ProgressExampleProps } from "../ProgressPage.types";
+    import type { ProgressExampleProps } from "../ProgressPageSvelte.types";
 
     const BYTES_PER_KB = 1000;
 

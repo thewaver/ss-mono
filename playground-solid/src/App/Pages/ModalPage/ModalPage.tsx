@@ -1,12 +1,12 @@
 import { createMemo, createSignal } from "solid-js";
 
+import { EXAMPLES_ROOT, EXAMPLE_NAMES } from "@thewaver/ss-playground/App/Pages/ModalPage/ModalPage.const";
+
 import { PageExamples } from "../../PageComponents/Examples/Examples";
 import { DefaultExample } from "./Examples/Default";
 import { DestructiveConfirmationExample } from "./Examples/DestructiveConfirmation";
 import { LayeredExample } from "./Examples/Layered";
 import { TextOnlyExample } from "./Examples/TextOnly";
-
-const EXAMPLES_ROOT = "/src/App/Pages/ModalPage/Examples";
 
 export const ModalPage = () => {
     const modalVisibility = createSignal(false);
@@ -20,14 +20,14 @@ export const ModalPage = () => {
     const getExamples = createMemo(() => [
         {
             key: "default",
-            name: "Default",
+            name: EXAMPLE_NAMES.default,
             readout: () => `open: ${modalVisibility[0]()} — Escape and an overlay click both dismiss it`,
             component: () => <DefaultExample visibility={modalVisibility} />,
             path: `${EXAMPLES_ROOT}/Default.tsx`,
         },
         {
             key: "destructiveConfirmation",
-            name: "Destructive confirmation",
+            name: EXAMPLE_NAMES.destructiveConfirmation,
             readout: () =>
                 `open: ${destructiveVisibility[0]()} | outcome: ${getOutcome()} — the alertdialog role, a required focus target, and neither overlay nor Escape dismissal`,
             component: () => (
@@ -37,7 +37,7 @@ export const ModalPage = () => {
         },
         {
             key: "layered",
-            name: "A popup inside it",
+            name: EXAMPLE_NAMES.layered,
             readout: () =>
                 `open: ${layeredVisibility[0]()} | country: ${layeredSignal[0]() ?? "undefined"} — Escape closes the innermost layer only`,
             component: () => <LayeredExample visibility={layeredVisibility} value={layeredSignal} />,
@@ -45,7 +45,7 @@ export const ModalPage = () => {
         },
         {
             key: "textOnly",
-            name: "Nothing focusable inside",
+            name: EXAMPLE_NAMES.textOnly,
             readout: () =>
                 `open: ${textOnlyVisibility[0]()} — with nothing to focus inside, the dialog takes focus itself`,
             component: () => <TextOnlyExample visibility={textOnlyVisibility} />,

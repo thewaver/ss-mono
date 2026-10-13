@@ -1,9 +1,8 @@
+import { BADGE_GLYPH } from "@thewaver/ss-playground/App/StyledComponents/PropHintBadge/PropHintBadge.const";
 import * as styles from "@thewaver/ss-playground/App/StyledComponents/PropHintBadge/PropHintBadge.css";
 
 import { useLayerClass } from "../Layer/Layer.context";
-import type { PropHintBadgeProps } from "./PropHintBadge.types";
-
-const BADGE_GLYPH = "?";
+import type { PropHintBadgeProps } from "./PropHintBadgeReact.types";
 
 export const PagePropHintBadge = (props: PropHintBadgeProps) => {
     const layerClass = useLayerClass();

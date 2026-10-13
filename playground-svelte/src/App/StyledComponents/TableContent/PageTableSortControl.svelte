@@ -3,9 +3,8 @@
     import * as styles from "@thewaver/ss-playground/App/StyledComponents/TableContent/TableContent.css";
 
     import { getLayerClass } from "../Layer/Layer.context";
-    import type { TableResizerProps } from "./TableContent.types";
-
-    const UNSORTED_MARKER = "↕";
+    import type { TableResizerProps } from "./TableContentSvelte.types";
+    import { UNSORTED_MARKER } from "@thewaver/ss-playground/App/StyledComponents/TableContent/TableContent.const";
 
     const SORT_MARKERS: Record<TableSortDirection, string> = {
         ascending: "▲",

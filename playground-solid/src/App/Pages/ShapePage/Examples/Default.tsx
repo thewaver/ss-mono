@@ -4,8 +4,8 @@ import { InteractionTrackerSolidUtils, Shape, access } from "@thewaver/ss-compon
 import * as styles from "@thewaver/ss-playground/App/Pages/ShapePage/ShapePage.css";
 import { ShapeConst, ShapeUtils } from "@thewaver/ss-utils";
 
-import { computeShapeFillDefs, computeShapeStrokeDefs } from "../ShapePage.const";
 import type { ShapeExampleProps } from "../ShapePage.types";
+import { computeShapeFillDefs, computeShapeStrokeDefs } from "../ShapePageSolid.const";
 
 export const DefaultExample = (props: ShapeExampleProps) => {
     const id = createUniqueId();

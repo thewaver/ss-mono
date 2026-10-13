@@ -1,12 +1,12 @@
 <script lang="ts">
     import { PAINTED_TEXT_DEFAULTS } from "@thewaver/ss-components-svelte";
 
-    import { PaintedTextKnobs } from "../../Knobs/PaintedTexts.const";
+    import { PaintedTextKnobs } from "@thewaver/ss-playground/App/Knobs/PaintedTexts.const";
     import PageExampleKnobs from "../../PageComponents/ExampleKnobs/PageExampleKnobs.svelte";
     import PageNumberField from "../../PageComponents/Field/PageNumberField.svelte";
     import PageProp from "../../PageComponents/Prop/Prop.svelte";
     import WaveExample from "./Examples/Wave.svelte";
-    import type { PaintedTextPathExampleWrapperProps } from "./PaintedTextPage.types";
+    import type { PaintedTextPathExampleWrapperProps } from "./PaintedTextPageSvelte.types";
 
     let { progress = $bindable(), playback = $bindable(), ...props }: PaintedTextPathExampleWrapperProps = $props();
 

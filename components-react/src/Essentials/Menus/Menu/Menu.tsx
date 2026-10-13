@@ -21,6 +21,7 @@ import {
     MenuUtils,
     TypeaheadUtils,
 } from "@thewaver/ss-components";
+import { MenuConst } from "@thewaver/ss-components/internal";
 import { type Point2d, Rect } from "@thewaver/ss-utils";
 
 import { FloaterReactUtils } from "../../../Abstracts/Floater/FloaterReact.utils";
@@ -43,12 +44,6 @@ import type {
     MenuProps,
     MenuTriggerProps,
 } from "./Menu.types";
-
-const EMPTY_CHECKED: never[] = [];
-
-const ROOT_PATH: number[] = [];
-const NO_PARENT_EXTENT = 0;
-const PRIMARY_BUTTON = 0;
 
 const usePointerPointReader = () => {
     useEffect(() => MenuUtils.observePointerPoint(), []);
@@ -451,7 +446,7 @@ const MenuLevel = <T,>(props: MenuLevelProps<T>) => {
                 hasSubmenu={hasSubmenu}
                 isSubmenuOpen={hasSubmenu && openValue === item.value}
                 isLaidOut={isLaidOut}
-                levelExtent={layout?.extent ?? NO_PARENT_EXTENT}
+                levelExtent={layout?.extent ?? MenuConst.NO_PARENT_EXTENT}
                 rootExtent={rootExtent}
                 onActivate={activateIndex}
                 onHover={hoverIndex}
@@ -577,7 +572,7 @@ export const Menu = <T,>(props: MenuProps<T>) => {
         setFlickOrigin(undefined);
     };
 
-    const checkedValues = props.checked?.[0] ?? EMPTY_CHECKED;
+    const checkedValues = props.checked?.[0] ?? MenuConst.EMPTY_CHECKED;
 
     const pick = (item: MenuItem<T>, radioGroupValues: T[]) => {
         const checkedState = props.checked;
@@ -592,7 +587,7 @@ export const Menu = <T,>(props: MenuProps<T>) => {
     };
 
     const handleTriggerPress = (e: PointerEvent<HTMLButtonElement>) => {
-        if (!isHoldable || e.button !== PRIMARY_BUTTON || isOpen) return;
+        if (!isHoldable || e.button !== MenuConst.PRIMARY_BUTTON || isOpen) return;
 
         isTogglePreventedRef.current = true;
 
@@ -659,9 +654,9 @@ export const Menu = <T,>(props: MenuProps<T>) => {
                         items={props.items}
                         isOpen={isOpen}
                         direction={direction}
-                        path={ROOT_PATH}
-                        parentExtent={NO_PARENT_EXTENT}
-                        rootExtent={NO_PARENT_EXTENT}
+                        path={MenuConst.ROOT_PATH}
+                        parentExtent={MenuConst.NO_PARENT_EXTENT}
+                        rootExtent={MenuConst.NO_PARENT_EXTENT}
                         layoutSize={props.layoutSize}
                         initialHighlightPosition={initialHighlightPosition}
                         anchorRef={anchorElement}
@@ -722,7 +717,7 @@ export const ContextMenu = <T,>(props: ContextMenuProps<T>) => {
         setIsOpen(false);
     };
 
-    const checkedValues = props.checked?.[0] ?? EMPTY_CHECKED;
+    const checkedValues = props.checked?.[0] ?? MenuConst.EMPTY_CHECKED;
 
     const pick = (item: MenuItem<T>, radioGroupValues: T[]) => {
         const checkedState = props.checked;
@@ -779,9 +774,9 @@ export const ContextMenu = <T,>(props: ContextMenuProps<T>) => {
                 items={props.items}
                 isOpen={isOpen}
                 direction={direction}
-                path={ROOT_PATH}
-                parentExtent={NO_PARENT_EXTENT}
-                rootExtent={NO_PARENT_EXTENT}
+                path={MenuConst.ROOT_PATH}
+                parentExtent={MenuConst.NO_PARENT_EXTENT}
+                rootExtent={MenuConst.NO_PARENT_EXTENT}
                 anchorRef={regionElement}
                 anchorRect={anchorRect}
                 placement={props.placement}

@@ -1,7 +1,7 @@
 import * as styles from "@thewaver/ss-playground/App/StyledComponents/ScrollerButtonContent/ScrollerButtonContent.css";
 
 import { useLayerClass } from "../Layer/Layer.context";
-import type { ScrollerButtonContentProps } from "./ScrollerButtonContent.types";
+import type { ScrollerButtonContentProps } from "./ScrollerButtonContentReact.types";
 
 export const PageScrollerButtonContent = (props: ScrollerButtonContentProps) => {
     const layerClass = useLayerClass();

@@ -14,13 +14,15 @@
     import DefaultExample from "./Examples/Default.svelte";
     import MeepleExample from "./Examples/Meeple.svelte";
     import PaintExample from "./Examples/Paint.svelte";
+    import {
+    EXAMPLE_NAMES,
+    EXAMPLES_ROOT,
+    FIELD_WIDTH,
+    NO_MARKS,
+    ROUTE_START,
+    STARTING_PIECE,
+} from "@thewaver/ss-playground/App/Pages/TileBoardPage/TileBoardPage.const";
 
-    const EXAMPLES_ROOT = "/src/App/Pages/TileBoardPage/Examples";
-
-    const FIELD_WIDTH = 130;
-
-    const STARTING_PIECE: Index2d = { row: 2, col: 2 };
-    const ROUTE_START: Index2d = { row: 0, col: 0 };
     const ROCKS: Index2d[] = [
         { row: 1, col: 0 },
         { row: 1, col: 1 },
@@ -28,8 +30,6 @@
         { row: 3, col: 1 },
         { row: 3, col: 2 },
     ];
-
-    const NO_MARKS: Index2dString[] = [];
 
     const describeTile = (tile: Index2d) => `row ${tile.row + 1}, tile ${tile.col + 1}`;
 
@@ -101,7 +101,7 @@
     const examples: ExampleDefs[] = [
         {
             key: "default",
-            name: "A board you can mark",
+            name: EXAMPLE_NAMES.default,
             readout: () =>
                 marked.length === 0
                     ? "nothing marked — click a tile, or tab into the board and press Enter"
@@ -111,7 +111,7 @@
         },
         {
             key: "meeple",
-            name: "A piece that lives above the board",
+            name: EXAMPLE_NAMES.meeple,
             readout: () =>
                 `standing on ${describeTile(piece)} — the ${reachable.length} tiles within ${reach} of it take it, the rest are refused but still walked`,
             component: meepleExample,
@@ -119,14 +119,14 @@
         },
         {
             key: "route",
-            name: "The shortest way round",
+            name: EXAMPLE_NAMES.route,
             readout: describeRoute,
             component: routeExample,
             path: `${EXAMPLES_ROOT}/Meeple.svelte`,
         },
         {
             key: "paint",
-            name: "Paint by sweeping",
+            name: EXAMPLE_NAMES.paint,
             readout: () =>
                 `${painted.length} painted — drag across tiles to paint them, or press one to paint or clear it`,
             component: paintExample,
@@ -134,7 +134,7 @@
         },
         {
             key: "disabled",
-            name: "Disabled",
+            name: EXAMPLE_NAMES.disabled,
             readout: () => "nothing responds, by pointer or by key",
             component: disabledExample,
             path: `${EXAMPLES_ROOT}/Default.svelte`,

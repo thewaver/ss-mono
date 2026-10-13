@@ -2,7 +2,7 @@
 import * as styles from "@thewaver/ss-playground/App/StyledComponents/FlipCardContent/FlipCardContent.css";
 
 import { useLayerClass } from "../Layer/Layer.context";
-import type { FlipCardFaceProps } from "./FlipCardContent.types";
+import type { FlipCardFaceProps } from "./FlipCardContentVue.types";
 
 defineProps<FlipCardFaceProps>();
 

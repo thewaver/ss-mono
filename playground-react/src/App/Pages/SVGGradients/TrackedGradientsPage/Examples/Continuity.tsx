@@ -1,7 +1,7 @@
+import { TRACKED_CELLS } from "@thewaver/ss-playground/App/Pages/SVGGradients/SVGGradients.const";
 import * as styles from "@thewaver/ss-playground/App/Pages/SVGGradients/SVGGradients.css";
 
-import { TRACKED_CELLS } from "../../SVGGradients.const";
-import type { TrackedGradientExampleProps } from "../../SVGGradients.types";
+import type { TrackedGradientExampleProps } from "../../SVGGradientsReact.types";
 import { TrackedShape } from "./Default";
 
 export const ContinuityExample = (props: TrackedGradientExampleProps) => (

@@ -12,11 +12,12 @@
     } from "../../StyledComponents/TextFieldContent/TextFieldContent.svelte";
     import PageTextFieldPlaceholder from "../../StyledComponents/TextFieldPlaceholder/TextFieldPlaceholder.svelte";
     import CustomInputExample from "./Examples/CustomInput.svelte";
-    import type { TypewriterExampleWrapperProps } from "./TypewriterPage.types";
-
-    const CUSTOM_TEXT_WIDTH = 320;
-    const CUSTOM_TEXT_MIN_ROWS = 6;
-    const CUSTOM_TEXT_MAX_ROWS = 12;
+    import type { TypewriterExampleWrapperProps } from "./TypewriterPageSvelte.types";
+    import {
+        CUSTOM_TEXT_MAX_ROWS,
+        CUSTOM_TEXT_MIN_ROWS,
+        CUSTOM_TEXT_WIDTH,
+    } from "@thewaver/ss-playground/App/Pages/TypewriterPage/TypewriterPage.const";
 
     let { width, ...props }: TypewriterExampleWrapperProps = $props();
 

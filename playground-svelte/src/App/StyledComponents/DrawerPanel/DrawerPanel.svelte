@@ -4,7 +4,7 @@
     import * as styles from "@thewaver/ss-playground/App/StyledComponents/DrawerPanel/DrawerPanel.css";
 
     import PageLayer from "../../PageComponents/Layer/Layer.svelte";
-    import type { DrawerPanelProps } from "./DrawerPanel.types";
+    import type { DrawerPanelProps } from "./DrawerPanelSvelte.types";
 
     let props: DrawerPanelProps & { children?: Snippet } = $props();
 </script>

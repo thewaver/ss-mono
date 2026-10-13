@@ -11,7 +11,7 @@ import PageLabelCaption from "../../../StyledComponents/LabelCaption/LabelCaptio
 import PageTextFieldContent, {
     computePageTextFieldTextStyle,
 } from "../../../StyledComponents/TextFieldContent/TextFieldContent.vue";
-import type { TextInputExampleProps } from "../TextInputPage.types";
+import type { TextInputExampleProps } from "../TextInputPageVue.types";
 
 const LABEL_GAP = 5;
 

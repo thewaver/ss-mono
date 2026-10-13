@@ -2,7 +2,6 @@ import { Fragment, type SlotsType, computed, defineComponent, onScopeDispose, sh
 
 import {
     CIRCLE_PACKING_DEFAULTS,
-    type CirclePackingCircle,
     type CirclePackingCircleState,
     type CirclePackingNode,
     CirclePackingStyles,
@@ -10,6 +9,7 @@ import {
     type CirclePackingView,
     TreemapUtils,
 } from "@thewaver/ss-components";
+import { CirclePackingConst } from "@thewaver/ss-components/internal";
 
 import { ElementObserverVueUtils } from "../../../Abstracts/ElementObserver/ElementObserverVue.utils";
 import { watchAfterRender } from "../../../Utils/effectUtils";
@@ -18,11 +18,6 @@ import { toElement } from "../../../Utils/refUtils";
 import { useStore } from "../../../Utils/storeUtils";
 import type { SlotsContext } from "../../../Utils/typeUtils";
 import type { CirclePackingProps, CirclePackingSlots } from "./CirclePacking.types";
-
-const NOTHING = 0;
-const NEXT = 1;
-const HALF = 0.5;
-const EMPTY_CIRCLE: CirclePackingCircle = { x: 0, y: 0, radius: 0 };
 
 type CirclePackingZoomState<T> = {
     branch: CirclePackingNode<T>;
@@ -66,14 +61,14 @@ export const CirclePacking = defineComponent(
             branch: branch.value,
             cameFrom: undefined,
             path: undefined,
-            generation: NOTHING,
+            generation: CirclePackingConst.NOTHING,
         });
 
         watch(branch, (next) => {
             const current = zoom.value;
             const from = CirclePackingUtils.computeShownView(
                 current.path,
-                CirclePackingUtils.toView(layout.value.get(current.branch) ?? EMPTY_CIRCLE),
+                CirclePackingUtils.toView(layout.value.get(current.branch) ?? CirclePackingConst.EMPTY_CIRCLE),
                 progress.value,
             );
 
@@ -82,9 +77,9 @@ export const CirclePacking = defineComponent(
                 cameFrom: current.branch,
                 path: CirclePackingUtils.interpolateZoom(
                     from,
-                    CirclePackingUtils.toView(layout.value.get(next) ?? EMPTY_CIRCLE),
+                    CirclePackingUtils.toView(layout.value.get(next) ?? CirclePackingConst.EMPTY_CIRCLE),
                 ),
-                generation: current.generation + NEXT,
+                generation: current.generation + CirclePackingConst.NEXT,
             };
         });
 
@@ -112,7 +107,7 @@ export const CirclePacking = defineComponent(
         onScopeDispose(zoomClock.stop);
 
         watchAfterRender([() => zoom.value.generation], ([generation]) => {
-            if (generation === NOTHING) return;
+            if (generation === CirclePackingConst.NOTHING) return;
 
             zoomClock.start(props.zoomDurationMs ?? CIRCLE_PACKING_DEFAULTS.zoomDurationMs);
         });
@@ -157,16 +152,20 @@ export const CirclePacking = defineComponent(
         return () => {
             const view = CirclePackingUtils.computeShownView(
                 zoom.value.path,
-                CirclePackingUtils.toView(layout.value.get(branch.value) ?? EMPTY_CIRCLE),
+                CirclePackingUtils.toView(layout.value.get(branch.value) ?? CirclePackingConst.EMPTY_CIRCLE),
                 progress.value,
             );
 
             const computeState = (node: CirclePackingNode<T>): CirclePackingCircleState => ({
-                ...CirclePackingUtils.project(layout.value.get(node) ?? EMPTY_CIRCLE, view, side.value),
-                weight: weights.value.get(node) ?? NOTHING,
+                ...CirclePackingUtils.project(
+                    layout.value.get(node) ?? CirclePackingConst.EMPTY_CIRCLE,
+                    view,
+                    side.value,
+                ),
+                weight: weights.value.get(node) ?? CirclePackingConst.NOTHING,
                 isBranch: TreemapUtils.getIsBranch(node, weights.value),
                 isInView: getIsInView(node),
-                depth: depths.value.get(node) ?? NOTHING,
+                depth: depths.value.get(node) ?? CirclePackingConst.NOTHING,
             });
 
             return (
@@ -179,7 +178,7 @@ export const CirclePacking = defineComponent(
                 >
                     <svg
                         class={CirclePackingStyles.circlePackingCanvas}
-                        viewBox={`${-size.value.width * HALF} ${-size.value.height * HALF} ${size.value.width} ${size.value.height}`}
+                        viewBox={`${-size.value.width * CirclePackingConst.HALF} ${-size.value.height * CirclePackingConst.HALF} ${size.value.width} ${size.value.height}`}
                         role="list"
                         aria-label={props.ariaLabel}
                     >

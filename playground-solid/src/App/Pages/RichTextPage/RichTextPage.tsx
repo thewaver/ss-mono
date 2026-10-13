@@ -3,6 +3,8 @@ import { createMemo, createSignal } from "solid-js";
 import { RICH_TEXT_DEFAULTS, TextArea } from "@thewaver/ss-components-solid";
 import { MEASURE_BOX_PADDING } from "@thewaver/ss-playground/App/PageComponents/MeasureBox/MeasureBox.css";
 import {
+    EXAMPLES_ROOT,
+    EXAMPLE_NAMES,
     FIELD_WIDTH,
     MAX_ROWS,
     MIN_ROWS,
@@ -31,8 +33,6 @@ import { DefaultTagsExample } from "./Examples/DefaultTags";
 import { GlossaryExample } from "./Examples/Glossary";
 import { LinksExample } from "./Examples/Links";
 
-const EXAMPLES_ROOT = "/src/App/Pages/RichTextPage/Examples";
-
 export const RichTextPage = () => {
     const contentSignal = createSignal(STARTING_CONTENT);
     const [getRemoveOtherTags, setRemoveOtherTags] = createSignal(RICH_TEXT_DEFAULTS.removeOtherTags);
@@ -40,31 +40,31 @@ export const RichTextPage = () => {
     const getExamples = createMemo(() => [
         {
             key: "defaultTags",
-            name: "Default Tags",
+            name: EXAMPLE_NAMES.defaultTags,
             component: () => <DefaultTagsExample />,
             path: `${EXAMPLES_ROOT}/DefaultTags.tsx`,
         },
         {
             key: "customTags",
-            name: "Custom Tags",
+            name: EXAMPLE_NAMES.customTags,
             component: () => <CustomTagsExample />,
             path: `${EXAMPLES_ROOT}/CustomTags.tsx`,
         },
         {
             key: "glossary",
-            name: "Glossary",
+            name: EXAMPLE_NAMES.glossary,
             component: () => <GlossaryExample />,
             path: `${EXAMPLES_ROOT}/Glossary.tsx`,
         },
         {
             key: "links",
-            name: "Links",
+            name: EXAMPLE_NAMES.links,
             component: () => <LinksExample />,
             path: `${EXAMPLES_ROOT}/Links.tsx`,
         },
         {
             key: "customInput",
-            name: "Custom Input",
+            name: EXAMPLE_NAMES.customInput,
             component: () => (
                 <>
                     <TextArea

@@ -3,10 +3,11 @@
 
     import { Button, Progress, Sidebar } from "@thewaver/ss-components-svelte";
     import {
-        BUILD_PROGRESS_DISMISS_LABEL,
-        BUILD_PROGRESS_HEIGHT,
-        BUILD_PROGRESS_LABEL,
-    } from "@thewaver/ss-playground/App/PageComponents/BuildProgress/BuildProgress.const";
+    BUILD_PROGRESS_DISMISS_LABEL,
+    BUILD_PROGRESS_HEIGHT,
+    BUILD_PROGRESS_LABEL,
+    PERCENT,
+} from "@thewaver/ss-playground/App/PageComponents/BuildProgress/BuildProgress.const";
     import * as styles from "@thewaver/ss-playground/App/PageComponents/BuildProgress/BuildProgress.css";
     import type { BuildProgress } from "@thewaver/ss-playground/App/PageComponents/BuildProgress/BuildProgress.types";
     import {
@@ -18,8 +19,6 @@
 
     import PageSelectClear from "../../StyledComponents/SelectClear/SelectClear.svelte";
     import PageLayer from "../Layer/Layer.svelte";
-
-    const PERCENT = 100;
 
     let progress = $state<BuildProgress>();
     let dismissedGeneration = $state<number>();

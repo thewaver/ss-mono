@@ -1,7 +1,7 @@
 import { Button } from "@thewaver/ss-components-react";
 
 import { PageButtonContent } from "../../../StyledComponents/ButtonContent/ButtonContent";
-import type { ButtonErroredExampleProps } from "../ButtonPage.types";
+import type { ButtonErroredExampleProps } from "../ButtonPageReact.types";
 
 type Props = ButtonErroredExampleProps;
 

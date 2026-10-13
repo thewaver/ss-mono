@@ -1,6 +1,13 @@
 <script lang="ts">
     import type { SortableItem } from "@thewaver/ss-components-svelte";
-    import { BOARD, CHEAP_ONLY, HAND, QUEUE } from "@thewaver/ss-playground/App/Pages/SortablePage/SortablePage.const";
+    import {
+    BOARD,
+    CHEAP_ONLY,
+    EXAMPLE_NAMES,
+    EXAMPLES_ROOT,
+    HAND,
+    QUEUE,
+} from "@thewaver/ss-playground/App/Pages/SortablePage/SortablePage.const";
     import type { Card } from "@thewaver/ss-playground/App/Pages/SortablePage/SortablePage.types";
 
     import type { ExampleDefs } from "../../PageComponents/Examples/Examples.types";
@@ -10,8 +17,6 @@
     import PairExample from "./Examples/Pair.svelte";
     import RightToLeftExample from "./Examples/RightToLeft.svelte";
     import RingExample from "./Examples/Ring.svelte";
-
-    const EXAMPLES_ROOT = "/src/App/Pages/SortablePage/Examples";
 
     const names = (items: SortableItem<Card>[]) => items.map((item) => item.value.name).join(", ") || "empty";
 
@@ -34,7 +39,7 @@
     const examples: ExampleDefs[] = [
         {
             key: "reorder",
-            name: "Reordering one list",
+            name: EXAMPLE_NAMES.reorder,
             readout: () =>
                 `order: ${names(queue)} — Second is disabled, so arrows skip it and it cannot be picked up`,
             component: reorderExample,
@@ -42,14 +47,14 @@
         },
         {
             key: "row",
-            name: "Laid out in a row",
+            name: EXAMPLE_NAMES.row,
             readout: () => `order: ${names(row)} — left and right walk it, because the direction decides the keys`,
             component: rowExample,
             path: `${EXAMPLES_ROOT}/Cards.svelte`,
         },
         {
             key: "rightToLeft",
-            name: "A row in a right-to-left box",
+            name: EXAMPLE_NAMES.rightToLeft,
             readout: () =>
                 `order: ${names(rightToLeft)} — the box around the row sets dir="rtl", so the cards run from the right and a carried card moves on to a later place with the left arrow`,
             component: rightToLeftExample,
@@ -57,7 +62,7 @@
         },
         {
             key: "ring",
-            name: "Reordering round a ring",
+            name: EXAMPLE_NAMES.ring,
             readout: () =>
                 `order: ${names(ring)} — dropping picks the nearest place rather than comparing one axis, because a ring has no axis to compare`,
             component: ringExample,
@@ -65,14 +70,14 @@
         },
         {
             key: "pair",
-            name: "Between two lists",
+            name: EXAMPLE_NAMES.pair,
             readout: () => `hand: ${names(hand)} | board: ${names(board)}`,
             component: pairExample,
             path: `${EXAMPLES_ROOT}/Pair.svelte`,
         },
         {
             key: "picky",
-            name: "A list that refuses some cards",
+            name: EXAMPLE_NAMES.picky,
             readout: () =>
                 `hand: ${names(pickyHand)} | board: ${names(pickyBoard)} — the board takes nothing costing more than ${CHEAP_ONLY}`,
             component: pickyExample,
@@ -80,7 +85,7 @@
         },
         {
             key: "locked",
-            name: "A list that takes nothing",
+            name: EXAMPLE_NAMES.locked,
             readout: () =>
                 `hand: ${names(lockedHand)} | board: ${names(lockedBoard)} — the board can be reordered but accepts nothing from outside`,
             component: lockedExample,
@@ -88,7 +93,7 @@
         },
         {
             key: "disabled",
-            name: "Disabled",
+            name: EXAMPLE_NAMES.disabled,
             readout: () => `order: ${names(disabled)} — nothing moves, by pointer or by key`,
             component: disabledExample,
             path: `${EXAMPLES_ROOT}/Cards.svelte`,

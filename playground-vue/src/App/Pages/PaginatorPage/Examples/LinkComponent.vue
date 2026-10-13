@@ -10,7 +10,7 @@ import PagePaginatorGap from "../../../StyledComponents/PaginatorContent/PagePag
 import PagePaginatorPage from "../../../StyledComponents/PaginatorContent/PagePaginatorPage.vue";
 import PagePaginatorPanel from "../../../StyledComponents/PaginatorContent/PagePaginatorPanel.vue";
 import PagePaginatorStep from "../../../StyledComponents/PaginatorContent/PagePaginatorStep.vue";
-import type { PaginatorExampleProps } from "../PaginatorPage.types";
+import type { PaginatorExampleProps } from "../PaginatorPageVue.types";
 import PagePaginatorLink from "./PagePaginatorLink.vue";
 
 const PAGINATOR_GAP = 5;

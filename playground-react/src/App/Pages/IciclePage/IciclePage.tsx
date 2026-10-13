@@ -3,6 +3,12 @@ import { useState } from "react";
 import { ICICLE_DEFAULTS, MediaQueryMonitorReactUtils, TreemapUtils } from "@thewaver/ss-components-react";
 import type { IcicleNode } from "@thewaver/ss-components-react";
 import { IcicleKnobs } from "@thewaver/ss-playground/App/Knobs/Icicles.const";
+import {
+    EXAMPLES_ROOT,
+    EXAMPLE_NAMES,
+    NO_MOTION_DURATION_MS,
+    WIDE_SPAN,
+} from "@thewaver/ss-playground/App/Pages/IciclePage/IciclePage.const";
 import { LIBRARY } from "@thewaver/ss-playground/App/Pages/TreemapPage/TreemapPage.const";
 
 import { PageExamples } from "../../PageComponents/Examples/Examples";
@@ -10,11 +16,6 @@ import { PageNumberField } from "../../PageComponents/Field/Field";
 import { PageProp } from "../../PageComponents/Prop/Prop";
 import { PagePropsPanel } from "../../PageComponents/PropsPanel/PropsPanel";
 import { LibraryExample } from "./Examples/Library";
-
-const EXAMPLES_ROOT = "/src/App/Pages/IciclePage/Examples";
-
-const NO_MOTION_DURATION_MS = 0;
-const WIDE_SPAN = 2;
 
 export const IciclePage = () => {
     const [columnCount, setColumnCount] = useState(ICICLE_DEFAULTS.columnCount);
@@ -29,7 +30,7 @@ export const IciclePage = () => {
     const examples = [
         {
             key: "library",
-            name: "This library, by lines of code",
+            name: EXAMPLE_NAMES.library,
             span: WIDE_SPAN,
             readout: () =>
                 `showing ${showing} — press any cell to bring it to the left at full height, the leftmost cell or Escape to go back up; the arrows walk up and down a column and across to a parent or its children`,

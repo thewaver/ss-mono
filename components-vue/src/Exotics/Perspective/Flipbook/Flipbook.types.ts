@@ -1,9 +1,8 @@
 import type { VNodeChild } from "vue";
 
 import type {
-    FlipbookLabels,
+    BaseFlipbookProps,
     FlipbookPageState,
-    FlipbookState,
     FlipbookStep,
     FlipbookStepRenderProps,
     InteractionFlags,
@@ -28,9 +27,7 @@ export type FlipbookControls = {
     renderStep: (step: FlipbookStep) => VNodeChild;
 };
 
-export type FlipbookContentProps<T> = {
-    /** The pages, in reading order: the first is the front cover and, when there is an even number, the last is the back. */
-    "pages": T[];
+export type FlipbookContentProps = {
     /**
      * Which spread the book is open at, counting from zero: `0` is the front cover alone on the right, the last is the
      * back cover alone on the left. Writing it turns the pages there, one after another; a spread past either end is
@@ -57,4 +54,4 @@ export type FlipbookSlots<T> = {
     renderControls?: (controls: FlipbookControls) => VNodeChild;
 };
 
-export type FlipbookProps<T> = FlipbookState & FlipbookLabels & FlipbookContentProps<T>;
+export type FlipbookProps<T> = BaseFlipbookProps<T> & FlipbookContentProps;

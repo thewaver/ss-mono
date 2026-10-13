@@ -1,6 +1,6 @@
 import { type InjectionKey, inject, provide } from "vue";
 
-import type { LayerContextType } from "./Layer.context.types";
+import type { LayerContextType } from "./Layer.contextVue.types";
 
 const LAYER_CONTEXT_KEY: InjectionKey<LayerContextType> = Symbol("LayerContext");
 

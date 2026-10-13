@@ -7,7 +7,7 @@
     import PageMenuItemContent from "../../../StyledComponents/MenuItemContent/MenuItemContent.svelte";
     import PagePopoverSurface from "../../../StyledComponents/PopoverSurface/PopoverSurface.svelte";
     import PageTooltipContent from "../../../StyledComponents/TooltipContent/TooltipContent.svelte";
-    import type { Action, Destination } from "./MenuPage.types";
+    import type { Action, Destination } from "./MenuPageSvelte.types";
 
     export * from "@thewaver/ss-playground/App/Pages/Menus/MenuPage/MenuActions.const";
 

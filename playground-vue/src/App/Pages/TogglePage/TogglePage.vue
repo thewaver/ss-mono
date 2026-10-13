@@ -1,6 +1,8 @@
 <script setup lang="ts">
 import { computed, shallowRef, watch } from "vue";
 
+import { EXAMPLES_ROOT, EXAMPLE_NAMES } from "@thewaver/ss-playground/App/Pages/TogglePage/TogglePage.const";
+
 import type { ExampleDefs } from "../../PageComponents/Examples/Examples.types";
 import PageExamples from "../../PageComponents/Examples/PageExamples.vue";
 import DecoratedExample from "./Examples/Decorated.vue";
@@ -9,8 +11,6 @@ import DisabledExample from "./Examples/Disabled.vue";
 import ErroredExample from "./Examples/Errored.vue";
 import MixedExample from "./Examples/Mixed.vue";
 import ReachableExample from "./Examples/Reachable.vue";
-
-const EXAMPLES_ROOT = "/src/App/Pages/TogglePage/Examples";
 
 const defaultChecked = shallowRef(false);
 const decoratedChecked = shallowRef(true);
@@ -35,38 +35,38 @@ watch(
 const examples: ExampleDefs[] = [
     {
         key: "default",
-        name: "Default",
+        name: EXAMPLE_NAMES.default,
         readout: () => `on: ${defaultChecked.value}`,
         path: `${EXAMPLES_ROOT}/Default.vue`,
     },
     {
         key: "decorated",
-        name: "Decorated",
+        name: EXAMPLE_NAMES.decorated,
         readout: () => `on: ${decoratedChecked.value}`,
         path: `${EXAMPLES_ROOT}/Decorated.vue`,
     },
     {
         key: "mixed",
-        name: "Mixed",
+        name: EXAMPLE_NAMES.mixed,
         readout: () =>
             `mixed: ${isAllMixed.value} | all: ${allChecked.value} | children: ${firstChildChecked.value}, ${secondChildChecked.value}`,
         path: `${EXAMPLES_ROOT}/Mixed.vue`,
     },
     {
         key: "disabled",
-        name: "Disabled",
+        name: EXAMPLE_NAMES.disabled,
         readout: () => `on: ${disabledChecked.value}`,
         path: `${EXAMPLES_ROOT}/Disabled.vue`,
     },
     {
         key: "reachable",
-        name: "Disabled + reachable",
+        name: EXAMPLE_NAMES.reachable,
         readout: () => `on: ${reachableChecked.value}`,
         path: `${EXAMPLES_ROOT}/Reachable.vue`,
     },
     {
         key: "errored",
-        name: "Error",
+        name: EXAMPLE_NAMES.errored,
         readout: () => `on: ${erroredChecked.value}`,
         path: `${EXAMPLES_ROOT}/Errored.vue`,
     },

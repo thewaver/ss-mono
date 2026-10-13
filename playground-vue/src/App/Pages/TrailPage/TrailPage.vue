@@ -3,6 +3,12 @@ import { computed, shallowRef } from "vue";
 
 import { MediaQueryMonitorVueUtils, TRAIL_DEFAULTS } from "@thewaver/ss-components-vue";
 import { TrailKnobs } from "@thewaver/ss-playground/App/Knobs/Trails.const";
+import {
+    EXAMPLES_ROOT,
+    EXAMPLE_NAMES,
+    HALF_WAY,
+    PERCENT,
+} from "@thewaver/ss-playground/App/Pages/TrailPage/TrailPage.const";
 
 import type { ExampleDefs } from "../../PageComponents/Examples/Examples.types";
 import PageExamples from "../../PageComponents/Examples/PageExamples.vue";
@@ -15,11 +21,6 @@ import ConvoyExample from "./Examples/Convoy.vue";
 import ScrollExample from "./Examples/Scroll.vue";
 import TimelineExample from "./Examples/Timeline.vue";
 import type { TrailScrollExampleProps } from "./TrailPage.types";
-
-const EXAMPLES_ROOT = "/src/App/Pages/TrailPage/Examples";
-
-const PERCENT = 100;
-const HALF_WAY = 0.5;
 
 const durationMs = shallowRef(TRAIL_DEFAULTS.durationMs);
 const isLooping = shallowRef(TrailKnobs.STARTING_IS_LOOPING);
@@ -46,28 +47,28 @@ const commonProps = computed<Omit<TrailScrollExampleProps, "isFollowing" | "onPr
 const examples: ExampleDefs[] = [
     {
         key: "circuit",
-        name: "Circuit",
+        name: EXAMPLE_NAMES.circuit,
         readout: () =>
             `${getPercent(circuitProgress.value)} round the loop, ${isCircuitPlaying.value ? "running" : "stopped"} — the playback signal starts and stops it, and the controller sends it back to the start`,
         path: `${EXAMPLES_ROOT}/Circuit.vue`,
     },
     {
         key: "timeline",
-        name: "Timeline",
+        name: EXAMPLE_NAMES.timeline,
         readout: () =>
             `${getPercent(timelineProgress.value)} along the path — nothing is running, the slider is what puts the marker there`,
         path: `${EXAMPLES_ROOT}/Timeline.vue`,
     },
     {
         key: "convoy",
-        name: "Convoy",
+        name: EXAMPLE_NAMES.convoy,
         readout: () =>
             `${getPercent(convoyProgress.value)} of the run, ${isConvoyPlaying.value ? "running" : "stopped"} — four travelers on one clock, each a share of the path behind the one in front; with looping off they wait at the start and the run ends when the last one arrives`,
         path: `${EXAMPLES_ROOT}/Convoy.vue`,
     },
     {
         key: "scroll",
-        name: "Driven by scrolling",
+        name: EXAMPLE_NAMES.scroll,
         readout: () =>
             prefersReducedMotion.value
                 ? "reduced motion is on, so the marker stays at the start instead of following the scroll"

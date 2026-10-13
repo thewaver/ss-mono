@@ -6,14 +6,14 @@
         FIELD_PADDING,
     } from "@thewaver/ss-playground/App/StyledComponents/TextFieldContent/TextFieldContent.css";
 
-    import { PaintedTextKnobs } from "../../Knobs/PaintedTexts.const";
+    import { PaintedTextKnobs } from "@thewaver/ss-playground/App/Knobs/PaintedTexts.const";
     import PageMeasureBox from "../../PageComponents/MeasureBox/MeasureBox.svelte";
     import PageTextFieldContent, {
         computePageTextFieldTextStyle,
     } from "../../StyledComponents/TextFieldContent/TextFieldContent.svelte";
     import PageTextFieldPlaceholder from "../../StyledComponents/TextFieldPlaceholder/TextFieldPlaceholder.svelte";
     import CustomInputExample from "./Examples/CustomInput.svelte";
-    import type { PaintedTextExampleWrapperProps } from "./PaintedTextPage.types";
+    import type { PaintedTextExampleWrapperProps } from "./PaintedTextPageSvelte.types";
 
     let { width, ...props }: PaintedTextExampleWrapperProps = $props();
 

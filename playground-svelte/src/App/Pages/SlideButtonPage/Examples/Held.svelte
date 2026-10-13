@@ -6,7 +6,7 @@
     import PageControlColumn from "../../../PageComponents/ControlRow/PageControlColumn.svelte";
     import PageControlButtonContent from "../../../StyledComponents/ControlButtonContent/ControlButtonContent.svelte";
     import PageSlideButtonContent from "../../../StyledComponents/SlideButtonContent/SlideButtonContent.svelte";
-    import type { SlideButtonHeldExampleProps } from "../SlideButtonPage.types";
+    import type { SlideButtonHeldExampleProps } from "../SlideButtonPageSvelte.types";
 
     type Props = SlideButtonHeldExampleProps;
 

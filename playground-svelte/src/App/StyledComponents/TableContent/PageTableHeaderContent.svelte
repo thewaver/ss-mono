@@ -4,9 +4,8 @@
     import * as styles from "@thewaver/ss-playground/App/StyledComponents/TableContent/TableContent.css";
 
     import { getLayerClass } from "../Layer/Layer.context";
-    import type { TableAlign, TableHeaderContentProps } from "./TableContent.types";
-
-    const DEFAULT_ALIGN: TableAlign = "start";
+    import type { TableHeaderContentProps } from "./TableContentSvelte.types";
+    import { DEFAULT_ALIGN } from "@thewaver/ss-playground/App/StyledComponents/TableContent/TableContent.const";
 
     let props: TableHeaderContentProps & { children?: Snippet } = $props();
 

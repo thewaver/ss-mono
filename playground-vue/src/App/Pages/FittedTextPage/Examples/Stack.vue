@@ -3,7 +3,7 @@ import { FittedText } from "@thewaver/ss-components-vue";
 import { STACK_LINES } from "@thewaver/ss-playground/App/Pages/FittedTextPage/FittedTextPage.const";
 import * as styles from "@thewaver/ss-playground/App/Pages/FittedTextPage/FittedTextPage.css";
 
-import type { FittedTextExampleProps } from "../FittedTextPage.types";
+import type { FittedTextExampleProps } from "../FittedTextPageVue.types";
 
 type Props = FittedTextExampleProps;
 

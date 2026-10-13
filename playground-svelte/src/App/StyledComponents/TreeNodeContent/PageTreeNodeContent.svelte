@@ -10,10 +10,11 @@
     import { themeVars } from "@thewaver/ss-playground/App/Theme.css";
 
     import { getLayerClass } from "../Layer/Layer.context";
-    import type { TreeNodeContentProps } from "./TreeNodeContent.types";
-
-    const BRANCH_MARKER = "▶";
-    const DESCRIPTION_ONLY_MARKER = "·";
+    import type { TreeNodeContentProps } from "./TreeNodeContentSvelte.types";
+    import {
+        BRANCH_MARKER,
+        DESCRIPTION_ONLY_MARKER,
+    } from "@thewaver/ss-playground/App/StyledComponents/TreeNodeContent/TreeNodeContent.const";
 
     let props: TreeNodeContentProps & { children?: Snippet } = $props();
 

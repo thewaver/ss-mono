@@ -2,7 +2,7 @@
 import * as styles from "@thewaver/ss-playground/App/StyledComponents/TrailContent/TrailContent.css";
 
 import { useLayerClass } from "../Layer/Layer.context";
-import type { PageTrailMarkerProps } from "./TrailContent.types";
+import type { PageTrailMarkerProps } from "./TrailContentVue.types";
 
 defineProps<PageTrailMarkerProps>();
 

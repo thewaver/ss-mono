@@ -1,14 +1,13 @@
 import { createMemo, createSignal } from "solid-js";
 
 import { SelectUtils } from "@thewaver/ss-components-solid";
+import { EXAMPLES_ROOT, EXAMPLE_NAMES } from "@thewaver/ss-playground/App/Pages/MultiSelectPage/MultiSelectPage.const";
 
 import { PageExamples } from "../../PageComponents/Examples/Examples";
-import { GROUPED_COUNTRIES } from "../SelectPage/SelectPage.const";
+import { GROUPED_COUNTRIES } from "../SelectPage/SelectPageSolid.const";
 import { MultiSelectClearableExample } from "./Examples/MultiSelectClearable";
 import { MultiSelectCountriesExample } from "./Examples/MultiSelectCountries";
 import { MultiSelectGroupedExample } from "./Examples/MultiSelectGrouped";
-
-const EXAMPLES_ROOT = "/src/App/Pages/MultiSelectPage/Examples";
 
 export const MultiSelectPage = () => {
     const countriesSignal = createSignal<string[]>(["Denmark"]);
@@ -37,14 +36,14 @@ export const MultiSelectPage = () => {
     const getExamples = createMemo(() => [
         {
             key: "multiSelect",
-            name: "Many at once",
+            name: EXAMPLE_NAMES.multiSelect,
             readout: () => `values: [${countriesSignal[0]().join(", ")}] — picking keeps the list open`,
             component: () => <MultiSelectCountriesExample values={countriesSignal} />,
             path: `${EXAMPLES_ROOT}/MultiSelectCountries.tsx`,
         },
         {
             key: "multiSelectGrouped",
-            name: "Grouped, with a query",
+            name: EXAMPLE_NAMES.multiSelectGrouped,
             readout: () =>
                 `values: [${groupedSignal[0]().join(", ")}] | query: "${querySignal[0]()}" — the page drops groups it has emptied`,
             component: () => (
@@ -54,7 +53,7 @@ export const MultiSelectPage = () => {
         },
         {
             key: "multiSelectClearable",
-            name: "Clearable",
+            name: EXAMPLE_NAMES.multiSelectClearable,
             readout: () =>
                 `values: [${clearableSignal[0]().join(", ")}] | last change: ${getClearableChange()} — the clear control empties every pick at once`,
             component: () => (

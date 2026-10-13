@@ -6,13 +6,12 @@
         PlacementItemUtils,
         PlacementItemStyles as styles,
     } from "@thewaver/ss-components";
+    import { PlacementItemConst } from "@thewaver/ss-components/internal";
 
     import { watchChange } from "../../Utils/effectUtils.svelte.js";
     import { toStyle } from "../../Utils/styleUtils.js";
     import { getPlacementBoxContext } from "../PlacementBox/PlacementBox.context.js";
     import type { PlacementItemProps } from "./PlacementItem.types.js";
-
-    const NO_TRANSITION_MS = 0;
 
     let props: PlacementItemProps = $props();
 
@@ -27,7 +26,7 @@
     watchChange(
         () => props.placement,
         () => {
-            isGliding = context.getTransitionDurationMs() > NO_TRANSITION_MS;
+            isGliding = context.getTransitionDurationMs() > PlacementItemConst.NO_TRANSITION_MS;
         },
         { isBeforeRender: true },
     );

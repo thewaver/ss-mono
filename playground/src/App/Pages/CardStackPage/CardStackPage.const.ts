@@ -15,3 +15,12 @@ export const computeCardTilt = (motion: CardStackMotion) => {
 
     return away === undefined ? motion.travel.x * MAX_TILT_DEGREES : (FLUNG_TILTS[away] ?? UPRIGHT);
 };
+
+export const EXAMPLE_NAMES = {
+    deck: "Deck of cards",
+    endless: "A deck that never runs out",
+};
+
+export const EXAMPLES_ROOT = "/src/App/Pages/CardStackPage/Examples";
+
+export const FIELD_WIDTH = 110;

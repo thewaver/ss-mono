@@ -11,15 +11,13 @@ import {
     PlacementUtils,
     PatchBoardStyles as styles,
 } from "@thewaver/ss-components";
+import { PatchBoardConst } from "@thewaver/ss-components/internal";
 
 import { CarrierSolidUtils } from "../../../Abstracts/Carrier/CarrierSolid.utils";
 import { LabelSolidUtils } from "../../../Essentials/Input/Label/LabelSolid.utils";
 import { InteractionWrapper } from "../../../Primitives/InteractionWrapper/InteractionWrapper";
 import { access, accessSignal } from "../../../Utils/propUtils";
 import type { PatchBoardProps } from "./PatchBoardSolid.types";
-
-const NOTHING = 0;
-const FULL_WIDTH = 1;
 
 export const PatchBoard = <T,>(props: PatchBoardProps<T>) => {
     onMount(() => LiveAnnouncerUtils.reserve("polite"));
@@ -139,7 +137,7 @@ export const PatchBoard = <T,>(props: PatchBoardProps<T>) => {
         const keys = getStopKeys();
         const focused = getFocusedStop();
 
-        return focused !== undefined && keys.includes(focused) ? focused : keys[NOTHING];
+        return focused !== undefined && keys.includes(focused) ? focused : keys[PatchBoardConst.NOTHING];
     });
 
     const getCableDefs = createMemo(() => {
@@ -226,7 +224,11 @@ export const PatchBoard = <T,>(props: PatchBoardProps<T>) => {
             <div id={socketHintId} class={styles.patchBoardHint}>
                 {access(props.announcements).socketRestingKeyHint}
             </div>
-            <svg class={styles.patchBoardCables} viewBox={`0 0 ${FULL_WIDTH} ${getHeightRatio()}`} aria-hidden="true">
+            <svg
+                class={styles.patchBoardCables}
+                viewBox={`0 0 ${PatchBoardConst.FULL_WIDTH} ${getHeightRatio()}`}
+                aria-hidden="true"
+            >
                 <Index each={getCableDefs()}>{(getDefs) => <>{props.renderCable(getDefs)}</>}</Index>
             </svg>
 
@@ -292,8 +294,12 @@ export const PatchBoard = <T,>(props: PatchBoardProps<T>) => {
                                     const getPlaced = createMemo(() => getPlacedSocketByEndKey().get(getStopKey()));
 
                                     const getOffset = createMemo(() => ({
-                                        x: (getPlaced()?.point.x ?? NOTHING) - (getPlacement()?.spot.x ?? NOTHING),
-                                        y: (getPlaced()?.point.y ?? NOTHING) - (getPlacement()?.spot.y ?? NOTHING),
+                                        x:
+                                            (getPlaced()?.point.x ?? PatchBoardConst.NOTHING) -
+                                            (getPlacement()?.spot.x ?? PatchBoardConst.NOTHING),
+                                        y:
+                                            (getPlaced()?.point.y ?? PatchBoardConst.NOTHING) -
+                                            (getPlacement()?.spot.y ?? PatchBoardConst.NOTHING),
                                     }));
 
                                     const getSocketFlags = createMemo(() =>

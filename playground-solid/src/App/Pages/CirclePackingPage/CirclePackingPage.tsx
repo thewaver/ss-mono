@@ -3,6 +3,12 @@ import { createMemo, createSignal } from "solid-js";
 import { CIRCLE_PACKING_DEFAULTS, MediaQueryMonitorSolidUtils, TreemapUtils } from "@thewaver/ss-components-solid";
 import type { CirclePackingNode } from "@thewaver/ss-components-solid";
 import { CirclePackingKnobs } from "@thewaver/ss-playground/App/Knobs/CirclePackings.const";
+import {
+    EXAMPLES_ROOT,
+    EXAMPLE_NAMES,
+    NO_MOTION_DURATION_MS,
+    WIDE_SPAN,
+} from "@thewaver/ss-playground/App/Pages/CirclePackingPage/CirclePackingPage.const";
 import { LIBRARY } from "@thewaver/ss-playground/App/Pages/TreemapPage/TreemapPage.const";
 
 import { PageExamples } from "../../PageComponents/Examples/Examples";
@@ -10,11 +16,6 @@ import { PageNumberField } from "../../PageComponents/Field/Field";
 import { PageProp } from "../../PageComponents/Prop/Prop";
 import { PagePropsPanel } from "../../PageComponents/PropsPanel/PropsPanel";
 import { LibraryExample } from "./Examples/Library";
-
-const EXAMPLES_ROOT = "/src/App/Pages/CirclePackingPage/Examples";
-
-const NO_MOTION_DURATION_MS = 0;
-const WIDE_SPAN = 2;
 
 export const CirclePackingPage = () => {
     const [getPadding, setPadding] = createSignal(CIRCLE_PACKING_DEFAULTS.padding);
@@ -30,7 +31,7 @@ export const CirclePackingPage = () => {
     const getExamples = createMemo(() => [
         {
             key: "library",
-            name: "This library, by lines of code",
+            name: EXAMPLE_NAMES.library,
             span: WIDE_SPAN,
             readout: () =>
                 `showing ${getShowing()} — press a circle with circles inside it to zoom into it, anywhere else to go back to the top, or Escape to go up one level`,

@@ -2,15 +2,16 @@
 import { shallowRef } from "vue";
 
 import type { MenuItem } from "@thewaver/ss-components-vue";
+import {
+    EXAMPLES_ROOT,
+    EXAMPLE_NAMES,
+    NOTHING_RUN,
+} from "@thewaver/ss-playground/App/Pages/Menus/FanMenuPage/FanMenuPage.const";
 
 import type { ExampleDefs } from "../../../PageComponents/Examples/Examples.types";
 import PageExamples from "../../../PageComponents/Examples/PageExamples.vue";
 import FanExample from "./Examples/Fan.vue";
-import type { FanAction } from "./FanMenuPage.types";
-
-const EXAMPLES_ROOT = "/src/App/Pages/Menus/FanMenuPage/Examples";
-
-const NOTHING_RUN = "nothing run yet";
+import type { FanAction } from "./FanMenuPageVue.types";
 
 const ACTIONS: MenuItem<FanAction>[] = [
     { value: { name: "Cut", shortcut: "Ctrl+X" } },
@@ -46,14 +47,14 @@ const lastNestedAction = shallowRef(NOTHING_RUN);
 const examples: ExampleDefs[] = [
     {
         key: "default",
-        name: "Default",
+        name: EXAMPLE_NAMES.default,
         readout: () =>
             `${lastAction.value} — a narrow arc opening sideways, the shape a combat menu uses: upright labels reading outward from the thing that opened them`,
         path: `${EXAMPLES_ROOT}/Fan.vue`,
     },
     {
         key: "submenus",
-        name: "Submenus",
+        name: EXAMPLE_NAMES.submenus,
         readout: () =>
             `${lastNestedAction.value} — a level replaces the one before it rather than stacking beside it, and the row at the top is the item you came in through`,
         path: `${EXAMPLES_ROOT}/Fan.vue`,

@@ -1,11 +1,13 @@
 <script lang="ts">
     import {
-        AMOUNT_STEP,
-        GERMAN_LOCALE,
-        QUANTITY_MIN,
-        QUANTITY_STEP,
-        RATING_STEP,
-    } from "@thewaver/ss-playground/App/Pages/NumberInputPage/NumberInputPage.const";
+    AMOUNT_STEP,
+    EXAMPLE_NAMES,
+    EXAMPLES_ROOT,
+    GERMAN_LOCALE,
+    QUANTITY_MIN,
+    QUANTITY_STEP,
+    RATING_STEP,
+} from "@thewaver/ss-playground/App/Pages/NumberInputPage/NumberInputPage.const";
 
     import type { ExampleDefs } from "../../PageComponents/Examples/Examples.types";
     import PageExamples from "../../PageComponents/Examples/PageExamples.svelte";
@@ -19,8 +21,6 @@
     import ReadOnlyExample from "./Examples/ReadOnly.svelte";
     import SteppedClampedExample from "./Examples/SteppedClamped.svelte";
     import UnitExample from "./Examples/Unit.svelte";
-
-    const EXAMPLES_ROOT = "/src/App/Pages/NumberInputPage/Examples";
 
     let defaultValue = $state<number | undefined>(undefined);
     let quantity = $state<number | undefined>(13);
@@ -36,14 +36,14 @@
     const examples: ExampleDefs[] = [
         {
             key: "default",
-            name: "Default",
+            name: EXAMPLE_NAMES.default,
             readout: () => `value: ${defaultValue} — an empty field has no value at all`,
             component: defaultExample,
             path: `${EXAMPLES_ROOT}/Default.svelte`,
         },
         {
             key: "steppedClamped",
-            name: "Stepped and clamped",
+            name: EXAMPLE_NAMES.steppedClamped,
             readout: () =>
                 `value: ${quantity} — steps of ${QUANTITY_STEP} counted from ${QUANTITY_MIN}; an out-of-range value is held back until the field is left`,
             component: steppedClampedExample,
@@ -51,14 +51,14 @@
         },
         {
             key: "fractionalStep",
-            name: "Fractional step",
+            name: EXAMPLE_NAMES.fractionalStep,
             readout: () => `value: ${rating} — a step of ${RATING_STEP} must not drift`,
             component: fractionalStepExample,
             path: `${EXAMPLES_ROOT}/FractionalStep.svelte`,
         },
         {
             key: "german",
-            name: "German conventions",
+            name: EXAMPLE_NAMES.german,
             readout: () =>
                 `value: ${german} — under ${GERMAN_LOCALE} "1.000" is one thousand and "1,5" is one and a half; PageUp and PageDown move ${AMOUNT_STEP * 10}, ten steps`,
             component: germanExample,
@@ -66,42 +66,42 @@
         },
         {
             key: "unit",
-            name: "With a unit",
+            name: EXAMPLE_NAMES.unit,
             readout: () => `value: ${unit} — one slot holds both the unit and the stepper`,
             component: unitExample,
             path: `${EXAMPLES_ROOT}/Unit.svelte`,
         },
         {
             key: "readOnly",
-            name: "Read-only",
+            name: EXAMPLE_NAMES.readOnly,
             readout: () => `value: ${readOnly} — the stepper is refused along with the keyboard`,
             component: readOnlyExample,
             path: `${EXAMPLES_ROOT}/ReadOnly.svelte`,
         },
         {
             key: "disabled",
-            name: "Disabled",
+            name: EXAMPLE_NAMES.disabled,
             readout: () => `value: ${disabled}`,
             component: disabledExample,
             path: `${EXAMPLES_ROOT}/Disabled.svelte`,
         },
         {
             key: "reachable",
-            name: "Disabled + reachable",
+            name: EXAMPLE_NAMES.reachable,
             readout: () => `value: ${reachable}`,
             component: reachableExample,
             path: `${EXAMPLES_ROOT}/Reachable.svelte`,
         },
         {
             key: "errored",
-            name: "Error",
+            name: EXAMPLE_NAMES.errored,
             readout: () => `value: ${errored} — anything but a positive count is an error`,
             component: erroredExample,
             path: `${EXAMPLES_ROOT}/Errored.svelte`,
         },
         {
             key: "label",
-            name: "In a Label",
+            name: EXAMPLE_NAMES.label,
             readout: () => `value: ${labeled}`,
             component: labeledExample,
             path: `${EXAMPLES_ROOT}/Labeled.svelte`,

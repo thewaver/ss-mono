@@ -3,7 +3,7 @@ import type { PropsWithChildren } from "react";
 import * as styles from "@thewaver/ss-playground/App/StyledComponents/SidebarContent/SidebarContent.css";
 
 import { PageLayer } from "../../PageComponents/Layer/Layer";
-import type { SidebarFadeProps, SidebarFrameProps, SidebarSurfaceProps } from "./SidebarContent.types";
+import type { SidebarFadeProps, SidebarFrameProps, SidebarSurfaceProps } from "./SidebarContentReact.types";
 
 export const PageSidebarFrame = (props: PropsWithChildren<SidebarFrameProps>) => (
     <div className={[styles.sidebarFrame, styles.sidebarFrameVariants[props.edge]].join(" ")}>{props.children}</div>

@@ -1,17 +1,16 @@
 import { type SlotsType, defineComponent } from "vue";
 
 import { CORNERS_DEFAULTS, CornerUtils, CornersStyles } from "@thewaver/ss-components";
+import { CornersConst } from "@thewaver/ss-components/internal";
 
 import { declareProps } from "../../Utils/propUtils";
 import type { SlotsContext } from "../../Utils/typeUtils";
 import type { CornersProps, CornersSlots } from "./Corners.types";
 
-const DEFAULT_COLOR = "currentColor";
-
 export const Corners = defineComponent(
     (props: CornersProps, { slots }: SlotsContext<CornersSlots>) =>
         () => {
-            const color = props.color ?? DEFAULT_COLOR;
+            const color = props.color ?? CornersConst.DEFAULT_COLOR;
             const transitionDurationMs = props.transitionDurationMs ?? CORNERS_DEFAULTS.transitionDurationMs;
             const cornerLength = props.cornerLength ?? CORNERS_DEFAULTS.cornerLength;
             const strokeThickness = props.strokeThickness ?? CORNERS_DEFAULTS.strokeThickness;

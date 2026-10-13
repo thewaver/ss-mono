@@ -7,7 +7,7 @@ import { PagePopoverSurface } from "../../../StyledComponents/PopoverSurface/Pop
 import { PageSelectContent, computePageSelectTextStyle } from "../../../StyledComponents/SelectContent/SelectContent";
 import { PageSelectGroupContent } from "../../../StyledComponents/SelectGroupContent/SelectGroupContent";
 import { PageSelectOptionContent } from "../../../StyledComponents/SelectOptionContent/SelectOptionContent";
-import { PLACEHOLDER, QUERY_PADDING } from "../../SelectPage/SelectPage.const";
+import { PLACEHOLDER, QUERY_PADDING } from "../../SelectPage/SelectPageReact.const";
 
 type Props = {
     values: readonly [string[], (values: string[]) => void];

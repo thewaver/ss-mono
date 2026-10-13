@@ -2,7 +2,7 @@ import type { PropsWithChildren } from "react";
 
 import * as styles from "@thewaver/ss-playground/App/StyledComponents/ButtonContent/ButtonContent.css";
 
-import type { ButtonContentProps } from "./ButtonContent.types";
+import type { ButtonContentProps } from "./ButtonContentReact.types";
 
 export const PageButtonContent = (props: PropsWithChildren<ButtonContentProps>) => {
     return (

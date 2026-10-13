@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import PageLayer from "../../../PageComponents/Layer/Layer.vue";
 import PagePopoverSurface from "../../../StyledComponents/PopoverSurface/PopoverSurface.vue";
-import type { MenuPopupProps } from "./MenuPage.types";
+import type { MenuPopupProps } from "./MenuPageVue.types";
 
 defineProps<MenuPopupProps>();
 </script>

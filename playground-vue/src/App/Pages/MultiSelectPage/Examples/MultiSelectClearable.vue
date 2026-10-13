@@ -7,7 +7,7 @@ import PageGlideFloater from "../../../StyledComponents/GlideFloater/PageGlideFl
 import PageSelectClear from "../../../StyledComponents/SelectClear/SelectClear.vue";
 import PageSelectContent from "../../../StyledComponents/SelectContent/SelectContent.vue";
 import PageSelectOptionContent from "../../../StyledComponents/SelectOptionContent/SelectOptionContent.vue";
-import { COUNTRIES, PLACEHOLDER, QUERY_PADDING } from "../../SelectPage/SelectPage.const";
+import { COUNTRIES, PLACEHOLDER, QUERY_PADDING } from "../../SelectPage/SelectPageVue.const";
 import SelectPopup from "../../SelectPage/SelectPopup.vue";
 import type { MultiSelectClearableExampleProps } from "../MultiSelectPage.types";
 

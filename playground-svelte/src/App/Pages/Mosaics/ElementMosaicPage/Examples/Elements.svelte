@@ -2,7 +2,7 @@
     import { ElementMosaic } from "@thewaver/ss-components-svelte";
 
     import PageMosaicTile from "../../../../StyledComponents/MosaicContent/PageMosaicTile.svelte";
-    import type { ElementsExampleProps } from "../ElementMosaicPage.types";
+    import type { ElementsExampleProps } from "../ElementMosaicPageSvelte.types";
 
     type Props = ElementsExampleProps;
 

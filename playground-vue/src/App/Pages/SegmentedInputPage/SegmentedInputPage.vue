@@ -2,6 +2,8 @@
 import { shallowRef } from "vue";
 
 import {
+    EXAMPLES_ROOT,
+    EXAMPLE_NAMES,
     ONE_TIME_CODE_LENGTH,
     RECOVERY_CODE_LENGTH,
 } from "@thewaver/ss-playground/App/Pages/SegmentedInputPage/SegmentedInputPage.const";
@@ -11,22 +13,20 @@ import PageExamples from "../../PageComponents/Examples/PageExamples.vue";
 import OneTimeCodeExample from "./Examples/OneTimeCode.vue";
 import RecoveryCodeExample from "./Examples/RecoveryCode.vue";
 
-const EXAMPLES_ROOT = "/src/App/Pages/SegmentedInputPage/Examples";
-
 const oneTimeCode = shallowRef("");
 const recoveryCode = shallowRef("");
 
 const examples: ExampleDefs[] = [
     {
         key: "oneTimeCode",
-        name: "One-time code",
+        name: EXAMPLE_NAMES.oneTimeCode,
         readout: () =>
             `value: "${oneTimeCode.value}" — ${ONE_TIME_CODE_LENGTH} digits in one field; press a cell to put the caret there`,
         path: `${EXAMPLES_ROOT}/OneTimeCode.vue`,
     },
     {
         key: "recoveryCode",
-        name: "Letters and digits",
+        name: EXAMPLE_NAMES.recoveryCode,
         readout: () =>
             `value: "${recoveryCode.value}" — ${RECOVERY_CODE_LENGTH} cells taking letters and digits, anything else refused`,
         path: `${EXAMPLES_ROOT}/RecoveryCode.vue`,

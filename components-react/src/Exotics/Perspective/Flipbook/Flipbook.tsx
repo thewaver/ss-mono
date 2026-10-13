@@ -10,6 +10,7 @@ import {
     type SpineSide,
     SpineUtils,
 } from "@thewaver/ss-components";
+import { FlipbookConst } from "@thewaver/ss-components/internal";
 
 import { InteractionTrackerReactUtils } from "../../../Abstracts/InteractionTracker/InteractionTrackerReact.utils";
 import { SignalMirrorReactUtils } from "../../../Abstracts/SignalMirror/SignalMirrorReact.utils";
@@ -18,8 +19,6 @@ import { Spine } from "../../../Primitives/Spine/Spine";
 import { useLatest } from "../../../Utils/refUtils";
 import { useStore } from "../../../Utils/storeUtils";
 import type { FlipbookControlProps, FlipbookControls, FlipbookProps } from "./Flipbook.types";
-
-const FIRST_SPREAD = 0;
 
 const FlipbookControl = (props: FlipbookControlProps) => {
     const isDisabled = props.flags.isDisabled ?? false;
@@ -47,7 +46,7 @@ export const Flipbook = <T,>(props: FlipbookProps<T>) => {
 
     const bookRef = useRef<HTMLDivElement | null>(null);
 
-    const [index, setIndex] = SignalMirrorReactUtils.useOptionalState(props.index, FIRST_SPREAD);
+    const [index, setIndex] = SignalMirrorReactUtils.useOptionalState(props.index, FlipbookConst.FIRST_SPREAD);
 
     const indexRef = useRef(index);
 

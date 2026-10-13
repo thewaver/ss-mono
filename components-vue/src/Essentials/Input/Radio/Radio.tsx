@@ -1,6 +1,7 @@
 import { type SlotsType, defineComponent, onScopeDispose, shallowRef } from "vue";
 
-import { type InteractionSizing, InteractionTrackerUtils, type RadioGroupEntry } from "@thewaver/ss-components";
+import { InteractionTrackerUtils, type RadioGroupEntry } from "@thewaver/ss-components";
+import { PlacementConst } from "@thewaver/ss-components/internal";
 
 import { BinarySwitch } from "../../../Primitives/BinarySwitch/BinarySwitch";
 import type { BinarySwitchSlots } from "../../../Primitives/BinarySwitch/BinarySwitch.types";
@@ -10,9 +11,6 @@ import { exposeElement, toElement } from "../../../Utils/refUtils";
 import type { SlotsContext } from "../../../Utils/typeUtils";
 import { useRadioGroupContext } from "../RadioGroup/RadioGroup.context";
 import type { RadioProps } from "./Radio.types";
-
-const ROW_SIZING: InteractionSizing = "fit-content";
-const PLACED_SIZING: InteractionSizing = "fill";
 
 export const Radio = defineComponent(
     <T,>(props: RadioProps<T>, { slots, expose }: SlotsContext<BinarySwitchSlots>) => {
@@ -56,7 +54,11 @@ export const Radio = defineComponent(
                     }}
                     type={"radio"}
                     name={context.getName()}
-                    sizing={placement === undefined ? (props.sizing ?? ROW_SIZING) : PLACED_SIZING}
+                    sizing={
+                        placement === undefined
+                            ? (props.sizing ?? PlacementConst.ROW_SIZING)
+                            : PlacementConst.PLACED_SIZING
+                    }
                     isChecked={context.getValue() === props.value}
                     isTabbable={context.computeIsTabbable(props.value)}
                 >

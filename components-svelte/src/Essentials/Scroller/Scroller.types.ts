@@ -1,14 +1,8 @@
 import type { Snippet } from "svelte";
 
-import type { ScrollerButtonPlacement, ScrollerStep, ScrollerStepper } from "@thewaver/ss-components";
+import type { BaseScrollerProps, ScrollerStep, ScrollerStepper } from "@thewaver/ss-components";
 
-export type ScrollerProps = {
-    /** The space between items. */
-    gap?: number;
-    /** How much room is left at the ends of the run, so the first and last items are not flush against the edge. */
-    padding?: number;
-    /** Where the scroll controls sit. */
-    buttonPlacement?: ScrollerButtonPlacement;
+export type ScrollerProps = BaseScrollerProps & {
     /**
      * How far through its run the strip is scrolled, from 0 to 1. Bind it with `bind:progress` to drive or follow it:
      * the strip writes its position as it moves, and a value written from outside scrolls it there. Left unbound, the

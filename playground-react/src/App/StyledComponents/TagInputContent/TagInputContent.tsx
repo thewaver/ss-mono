@@ -4,7 +4,7 @@ import * as styles from "@thewaver/ss-playground/App/StyledComponents/TagInputCo
 import * as fieldStyles from "@thewaver/ss-playground/App/StyledComponents/TextFieldContent/TextFieldContent.css";
 
 import { useLayerClass } from "../Layer/Layer.context";
-import type { TagContentProps, TagInputContentProps } from "./TagInputContent.types";
+import type { TagContentProps, TagInputContentProps } from "./TagInputContentReact.types";
 
 export const PageTagInputContent = (props: TagInputContentProps) => {
     const layerClass = useLayerClass();

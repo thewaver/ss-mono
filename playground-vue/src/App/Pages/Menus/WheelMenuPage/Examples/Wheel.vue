@@ -7,7 +7,7 @@ import * as styles from "@thewaver/ss-playground/App/Pages/Menus/WheelMenuPage/W
 
 import PageLayer from "../../../../PageComponents/Layer/Layer.vue";
 import PageMenuTriggerContent from "../../../../StyledComponents/MenuTriggerContent/MenuTriggerContent.vue";
-import type { WheelMenuExampleProps } from "../WheelMenuPage.types";
+import type { WheelMenuExampleProps } from "../WheelMenuPageVue.types";
 import WedgeDefs from "./WedgeDefs.vue";
 
 const HALF = 0.5;

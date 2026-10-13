@@ -4,7 +4,7 @@ import { access } from "@thewaver/ss-components-solid";
 import * as styles from "@thewaver/ss-playground/App/StyledComponents/FormFieldContent/FormFieldContent.css";
 
 import { useLayerClass } from "../Layer/Layer.context";
-import type { FormFieldMessageProps } from "./FormFieldContent.types";
+import type { FormFieldMessageProps } from "./FormFieldContentSolid.types";
 
 export const PageFormFieldCaption = (props: ParentProps) => {
     const getLayerClass = useLayerClass();

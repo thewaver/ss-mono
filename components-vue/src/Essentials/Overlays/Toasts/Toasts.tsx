@@ -8,6 +8,7 @@ import {
     ToastUtils,
     ToastsStyles,
 } from "@thewaver/ss-components";
+import { ToastsConst } from "@thewaver/ss-components/internal";
 import { CSSUtils, GestureUtils } from "@thewaver/ss-utils";
 
 import { ElementFaderVueUtils } from "../../../Abstracts/ElementFader/ElementFaderVue.utils";
@@ -19,8 +20,6 @@ import { callSlot, declareProps, useTwoWay } from "../../../Utils/propUtils";
 import { toElement } from "../../../Utils/refUtils";
 import type { SlotsContext } from "../../../Utils/typeUtils";
 import type { ToastsItemProps, ToastsProps, ToastsSlots } from "./Toasts.types";
-
-const DEFAULT_MARGINS = CSSUtils.spreadMargin(0);
 
 const ToastsItem = defineComponent(
     <T,>(props: ToastsItemProps<T>, { slots }: SlotsContext<ToastsSlots<T>>) => {
@@ -216,7 +215,7 @@ export const Toasts = defineComponent(
         return () => {
             const alignment = props.alignment ?? TOASTS_DEFAULTS.alignment;
             const dir = props.dir ?? TOASTS_DEFAULTS.dir;
-            const margins = props.margins ?? DEFAULT_MARGINS;
+            const margins = props.margins ?? ToastsConst.DEFAULT_MARGINS;
             const transitionDurationMs = props.transitionDurationMs ?? TOASTS_DEFAULTS.transitionDurationMs;
             const stackAlignment = ToastUtils.computeStackAlignment(alignment, dir);
             const swipeDirection =

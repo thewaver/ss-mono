@@ -5,8 +5,13 @@ import {
     type PointerReading,
     type SVGDefsColors,
     SVGDefsUtils,
-    TrackedGradientDefaults,
 } from "@thewaver/ss-components";
+import {
+    SpotConst,
+    SpotRipple2Const,
+    SpotRippleConst,
+    TrackedGradientSampleConst,
+} from "@thewaver/ss-components/internal";
 import { Color, EasingUtils, MathUtils, type Point2d, Point2dUtils } from "@thewaver/ss-utils";
 
 import { PointerTrackerSolidUtils } from "../../../../Abstracts/PointerTracker/PointerTrackerSolid.utils";
@@ -20,34 +25,21 @@ type Ripple = {
     bornMs: number;
 };
 
-const RIPPLE_LIFETIME_MS = 700;
-const CREST_OUTER_LIMIT = 99;
-const MOTION_STEP_RATIO = 0.002;
-const COLOR_KEYS: (keyof SVGDefsColors)[] = ["primary", "secondary"];
-
-const RESTING_ORIGIN: Point2d = { x: 0.5, y: 0.5 };
-const FULL_AGE_RATIO = 1;
-const NO_FADE = 0;
-const NO_TRAVEL = 0;
-const FIRST_MILESTONE = 0;
-
-const DEFAULTS = TrackedGradientDefaults.SPOT_RIPPLE_CYCLING_DEFAULTS;
-
 const NO_REF = () => undefined;
 
 const getCycleColor = (colors: SVGDefsColors, atMs: number, opts?: GradientRippleSampleOpts) => {
-    const cycleMs = opts?.cycleMs ?? DEFAULTS.cycleMs;
-    const phase = ((atMs % cycleMs) / cycleMs) * COLOR_KEYS.length;
+    const cycleMs = opts?.cycleMs ?? SpotRipple2Const.DEFAULTS.cycleMs;
+    const phase = ((atMs % cycleMs) / cycleMs) * SpotRipple2Const.COLOR_KEYS.length;
     const index = Math.floor(phase);
-    const from = colors[COLOR_KEYS[index % COLOR_KEYS.length]];
-    const to = colors[COLOR_KEYS[(index + 1) % COLOR_KEYS.length]];
+    const from = colors[SpotRipple2Const.COLOR_KEYS[index % SpotRipple2Const.COLOR_KEYS.length]];
+    const to = colors[SpotRipple2Const.COLOR_KEYS[(index + 1) % SpotRipple2Const.COLOR_KEYS.length]];
 
     if (!Color.Hex.isHex(from) || !Color.Hex.isHex(to)) return from;
 
     return Color.Hex.interpolate(from, to, phase - index);
 };
 
-const clock = SVGDefsSolidUtils.createClock(RIPPLE_LIFETIME_MS);
+const clock = SVGDefsSolidUtils.createClock(SpotRippleConst.RIPPLE_LIFETIME_MS);
 
 const createRipple = (
     index: number,
@@ -58,9 +50,9 @@ const createRipple = (
 ) => {
     const [getRipple, setRipple] = createSignal<Ripple>();
 
-    let bornMilestone = FIRST_MILESTONE;
+    let bornMilestone = SpotRippleConst.FIRST_MILESTONE;
     let lastOrigin: Point2d | undefined;
-    let travel = NO_TRAVEL;
+    let travel = SpotRippleConst.NO_TRAVEL;
 
     clock.subscribe();
 
@@ -73,17 +65,23 @@ const createRipple = (
 
         lastOrigin = origin;
 
-        if (isCycling && fade > NO_FADE) clock.keepAwake();
+        if (isCycling && fade > TrackedGradientSampleConst.NO_FADE) clock.keepAwake();
 
-        if (step === undefined || step <= MOTION_STEP_RATIO) return;
+        if (step === undefined || step <= SpotConst.MOTION_STEP_RATIO) return;
 
         travel += step;
 
-        if (fade > NO_FADE) clock.keepAwake();
+        if (fade > TrackedGradientSampleConst.NO_FADE) clock.keepAwake();
 
-        const milestone = Math.floor(travel / (opts?.rippleSpacingRatio ?? DEFAULTS.rippleSpacingRatio));
+        const milestone = Math.floor(
+            travel / (opts?.rippleSpacingRatio ?? SpotRipple2Const.DEFAULTS.rippleSpacingRatio),
+        );
 
-        if (milestone % (opts?.rippleCount ?? DEFAULTS.rippleCount) !== index || milestone === bornMilestone) return;
+        if (
+            milestone % (opts?.rippleCount ?? SpotRipple2Const.DEFAULTS.rippleCount) !== index ||
+            milestone === bornMilestone
+        )
+            return;
 
         bornMilestone = milestone;
 
@@ -93,43 +91,54 @@ const createRipple = (
     const getAgeRatio = () => {
         const ripple = getRipple();
 
-        return ripple ? MathUtils.clamp01((clock.getFrameMs() - ripple.bornMs) / RIPPLE_LIFETIME_MS) : FULL_AGE_RATIO;
+        return ripple
+            ? MathUtils.clamp01((clock.getFrameMs() - ripple.bornMs) / SpotRippleConst.RIPPLE_LIFETIME_MS)
+            : TrackedGradientSampleConst.FULL_AGE_RATIO;
     };
 
     const getSpread = () =>
         MathUtils.lerp(
-            opts?.crestSpreadStart ?? DEFAULTS.crestSpreadStart,
-            opts?.crestSpreadEnd ?? DEFAULTS.crestSpreadEnd,
+            opts?.crestSpreadStart ?? SpotRipple2Const.DEFAULTS.crestSpreadStart,
+            opts?.crestSpreadEnd ?? SpotRipple2Const.DEFAULTS.crestSpreadEnd,
             EasingUtils.easeOutCubic(getAgeRatio()),
         );
 
     const getAlpha = () =>
         (getRipple()?.fade ?? 0) *
-        (opts?.rippleAlpha ?? DEFAULTS.rippleAlpha) *
-        (1 - getAgeRatio()) ** (opts?.rippleDecay ?? DEFAULTS.rippleDecay);
+        (opts?.rippleAlpha ?? SpotRipple2Const.DEFAULTS.rippleAlpha) *
+        (1 - getAgeRatio()) ** (opts?.rippleDecay ?? SpotRipple2Const.DEFAULTS.rippleDecay);
 
     return {
-        getOrigin: () => getRipple()?.origin ?? RESTING_ORIGIN,
+        getOrigin: () => getRipple()?.origin ?? SpotConst.RESTING_ORIGIN,
         getScale: () =>
             MathUtils.lerp(
-                opts?.rippleStartScale ?? DEFAULTS.rippleStartScale,
-                opts?.rippleEndScale ?? DEFAULTS.rippleEndScale,
+                opts?.rippleStartScale ?? SpotRipple2Const.DEFAULTS.rippleStartScale,
+                opts?.rippleEndScale ?? SpotRipple2Const.DEFAULTS.rippleEndScale,
                 EasingUtils.easeOutCubic(getAgeRatio()),
             ),
         getColors: (colors: SVGDefsColors, index: number) => {
             const color = isCycling
                 ? getCycleColor(colors, getRipple()?.bornMs ?? 0, opts)
-                : colors[COLOR_KEYS[index % COLOR_KEYS.length]];
+                : colors[SpotRipple2Const.COLOR_KEYS[index % SpotRipple2Const.COLOR_KEYS.length]];
             const alpha = getAlpha();
             const spread = getSpread();
 
             return [
                 { value: `rgb(from ${color} r g b / 0)` },
-                { value: `rgb(from ${color} r g b / 0)`, stop: (opts?.crestStop ?? DEFAULTS.crestStop) - spread },
-                { value: `rgb(from ${color} r g b / ${alpha})`, stop: opts?.crestStop ?? DEFAULTS.crestStop },
                 {
                     value: `rgb(from ${color} r g b / 0)`,
-                    stop: Math.min((opts?.crestStop ?? DEFAULTS.crestStop) + spread, CREST_OUTER_LIMIT),
+                    stop: (opts?.crestStop ?? SpotRipple2Const.DEFAULTS.crestStop) - spread,
+                },
+                {
+                    value: `rgb(from ${color} r g b / ${alpha})`,
+                    stop: opts?.crestStop ?? SpotRipple2Const.DEFAULTS.crestStop,
+                },
+                {
+                    value: `rgb(from ${color} r g b / 0)`,
+                    stop: Math.min(
+                        (opts?.crestStop ?? SpotRipple2Const.DEFAULTS.crestStop) + spread,
+                        SpotRippleConst.CREST_OUTER_LIMIT,
+                    ),
                 },
                 { value: `rgb(from ${color} r g b / 0)`, stop: 100 },
             ];
@@ -158,9 +167,12 @@ export const spot_ripple_2 = (opts?: GradientRippleSampleOpts): TrackedGradientC
                     renderDefsElement: () => {
                         return SVGGradientDefsSolidUtils.computeRadialGradient({
                             id: `gradient1-${id}`,
-                            elementSize: (opts?.circular ?? DEFAULTS.circular) ? () => defs.getSize() : undefined,
+                            elementSize:
+                                (opts?.circular ?? SpotRipple2Const.DEFAULTS.circular)
+                                    ? () => defs.getSize()
+                                    : undefined,
                             origin: () => getReading().boxRatio,
-                            scale: opts?.sourceScale ?? DEFAULTS.sourceScale,
+                            scale: opts?.sourceScale ?? SpotRipple2Const.DEFAULTS.sourceScale,
                             colors: () => {
                                 const color = opts?.cycles
                                     ? getCycleColor(defs.colors, clock.getFrameMs(), opts)
@@ -169,8 +181,8 @@ export const spot_ripple_2 = (opts?: GradientRippleSampleOpts): TrackedGradientC
                                 return [
                                     { value: `rgb(from ${color} r g b / 1)` },
                                     {
-                                        value: `rgb(from ${color} r g b / ${opts?.sourceAlpha ?? DEFAULTS.sourceAlpha})`,
-                                        stop: opts?.sourceStop ?? DEFAULTS.sourceStop,
+                                        value: `rgb(from ${color} r g b / ${opts?.sourceAlpha ?? SpotRipple2Const.DEFAULTS.sourceAlpha})`,
+                                        stop: opts?.sourceStop ?? SpotRipple2Const.DEFAULTS.sourceStop,
                                     },
                                     { value: `rgb(from ${color} r g b / 0)`, stop: 100 },
                                 ];
@@ -180,7 +192,7 @@ export const spot_ripple_2 = (opts?: GradientRippleSampleOpts): TrackedGradientC
                 },
                 filter: sharedBlur,
             },
-            ...Array.from({ length: opts?.rippleCount ?? DEFAULTS.rippleCount }, (_unused, index) => ({
+            ...Array.from({ length: opts?.rippleCount ?? SpotRipple2Const.DEFAULTS.rippleCount }, (_unused, index) => ({
                 gradientOrPattern: {
                     id: `gradient${index + 2}-${id}`,
                     renderDefsElement: () => {
@@ -194,7 +206,10 @@ export const spot_ripple_2 = (opts?: GradientRippleSampleOpts): TrackedGradientC
 
                         return SVGGradientDefsSolidUtils.computeRadialGradient({
                             id: `gradient${index + 2}-${id}`,
-                            elementSize: (opts?.circular ?? DEFAULTS.circular) ? () => defs.getSize() : undefined,
+                            elementSize:
+                                (opts?.circular ?? SpotRipple2Const.DEFAULTS.circular)
+                                    ? () => defs.getSize()
+                                    : undefined,
                             origin: ripple.getOrigin,
                             scale: ripple.getScale,
                             colors: () => ripple.getColors(defs.colors, index),

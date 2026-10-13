@@ -8,18 +8,12 @@ import {
     SunburstUtils,
     TreemapUtils,
 } from "@thewaver/ss-components";
+import { SunburstConst } from "@thewaver/ss-components/internal";
 
 import { ElementObserverReactUtils } from "../../../Abstracts/ElementObserver/ElementObserverReact.utils";
 import { SignalMirrorReactUtils } from "../../../Abstracts/SignalMirror/SignalMirrorReact.utils";
 import { useStore } from "../../../Utils/storeUtils";
 import type { SunburstProps } from "./Sunburst.types";
-
-const NOTHING = 0;
-const SETTLED = 1;
-const NEXT = 1;
-const HALF = 0.5;
-const CENTER_RINGS = 1;
-const EMPTY_SPAN: SunburstSpan = { start: 0, end: 0, inner: 0, outer: 0 };
 
 type SunburstZoomState<T> = {
     branch: SunburstNode<T>;
@@ -39,8 +33,8 @@ export const Sunburst = <T,>(props: SunburstProps<T>) => {
     const progress = useStore(zoomClock);
     const size = ElementObserverReactUtils.useBorderBoxSize(rootRef);
     const side = Math.min(size.width, size.height);
-    const ringCount = Math.max(SETTLED, props.ringCount ?? SUNBURST_DEFAULTS.ringCount);
-    const ringWidth = (side * HALF) / (ringCount + CENTER_RINGS);
+    const ringCount = Math.max(SunburstConst.SETTLED, props.ringCount ?? SUNBURST_DEFAULTS.ringCount);
+    const ringWidth = (side * SunburstConst.HALF) / (ringCount + SunburstConst.CENTER_RINGS);
     const zoomDurationMs = props.zoomDurationMs ?? SUNBURST_DEFAULTS.zoomDurationMs;
 
     const weights = useMemo(() => TreemapUtils.computeWeights(props.root), [props.root]);
@@ -56,13 +50,13 @@ export const Sunburst = <T,>(props: SunburstProps<T>) => {
         branch,
         cameFrom: undefined,
         fromViews: new Map(),
-        generation: NOTHING,
+        generation: SunburstConst.NOTHING,
     }));
 
     const computeShownView = (node: SunburstNode<T>, center: SunburstNode<T>) =>
         SunburstUtils.computeShownSpan(
-            spans.get(node) ?? EMPTY_SPAN,
-            spans.get(center) ?? EMPTY_SPAN,
+            spans.get(node) ?? SunburstConst.EMPTY_SPAN,
+            spans.get(center) ?? SunburstConst.EMPTY_SPAN,
             zoom.fromViews.get(node),
             progress,
         );
@@ -72,27 +66,30 @@ export const Sunburst = <T,>(props: SunburstProps<T>) => {
             branch,
             cameFrom: zoom.branch,
             fromViews: new Map(allNodes.map((node) => [node, computeShownView(node, zoom.branch)])),
-            generation: zoom.generation + NEXT,
+            generation: zoom.generation + SunburstConst.NEXT,
         });
     }
 
-    const centerSpan = spans.get(branch) ?? EMPTY_SPAN;
+    const centerSpan = spans.get(branch) ?? SunburstConst.EMPTY_SPAN;
 
     const targetViews = useMemo(
         () =>
             new Map(
-                allNodes.map((node) => [node, SunburstUtils.computeView(spans.get(node) ?? EMPTY_SPAN, centerSpan)]),
+                allNodes.map((node) => [
+                    node,
+                    SunburstUtils.computeView(spans.get(node) ?? SunburstConst.EMPTY_SPAN, centerSpan),
+                ]),
             ),
         [allNodes, spans, centerSpan],
     );
 
-    const isZooming = progress < SETTLED;
+    const isZooming = progress < SunburstConst.SETTLED;
 
     const getIsVisibleAtTarget = (node: SunburstNode<T>) =>
-        SunburstUtils.getIsVisible(targetViews.get(node) ?? EMPTY_SPAN, ringCount);
+        SunburstUtils.getIsVisible(targetViews.get(node) ?? SunburstConst.EMPTY_SPAN, ringCount);
 
     const getIsVisibleAtStart = (node: SunburstNode<T>) =>
-        SunburstUtils.getIsVisible(zoom.fromViews.get(node) ?? EMPTY_SPAN, ringCount);
+        SunburstUtils.getIsVisible(zoom.fromViews.get(node) ?? SunburstConst.EMPTY_SPAN, ringCount);
 
     const renderedNodes = allNodes.filter(
         (node) => getIsVisibleAtTarget(node) || (isZooming && getIsVisibleAtStart(node)),
@@ -118,7 +115,7 @@ export const Sunburst = <T,>(props: SunburstProps<T>) => {
     useEffect(() => zoomClock.stop, [zoomClock]);
 
     useLayoutEffect(() => {
-        if (zoom.generation === NOTHING) return;
+        if (zoom.generation === SunburstConst.NOTHING) return;
 
         zoomClock.start(zoomDurationMs);
     }, [zoom.generation]);
@@ -162,7 +159,7 @@ export const Sunburst = <T,>(props: SunburstProps<T>) => {
         <div ref={rootRef} className={SunburstStyles.sunburstRoot} tabIndex={-1} onKeyDown={handleKeyDown}>
             <svg
                 className={SunburstStyles.sunburstCanvas}
-                viewBox={`${-side * HALF} ${-side * HALF} ${side} ${side}`}
+                viewBox={`${-side * SunburstConst.HALF} ${-side * SunburstConst.HALF} ${side} ${side}`}
                 role="list"
                 aria-label={props.ariaLabel}
             >
@@ -197,9 +194,9 @@ export const Sunburst = <T,>(props: SunburstProps<T>) => {
                             >
                                 {props.renderArc(node, {
                                     ...SunburstUtils.toArc(computeShownView(node, branch), ringWidth),
-                                    weight: weights.get(node) ?? NOTHING,
+                                    weight: weights.get(node) ?? SunburstConst.NOTHING,
                                     isBranch,
-                                    ring: (targetViews.get(node) ?? EMPTY_SPAN).inner,
+                                    ring: (targetViews.get(node) ?? SunburstConst.EMPTY_SPAN).inner,
                                 })}
                             </g>
                         </g>

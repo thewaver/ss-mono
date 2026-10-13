@@ -1,4 +1,4 @@
-import type { MenuExampleProps } from "../MenuPage.types";
+import type { MenuExampleProps } from "../MenuPageReact.types";
 import { SubmenusExample } from "./Submenus";
 
 type Props = MenuExampleProps;

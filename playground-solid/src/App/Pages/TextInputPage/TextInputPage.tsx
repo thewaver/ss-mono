@@ -1,6 +1,12 @@
 import { createMemo, createSignal } from "solid-js";
 
-import { CITIES, PIN_LENGTH, QUANTITY_STEP } from "@thewaver/ss-playground/App/Pages/TextInputPage/TextInputPage.const";
+import {
+    CITIES,
+    EXAMPLES_ROOT,
+    EXAMPLE_NAMES,
+    PIN_LENGTH,
+    QUANTITY_STEP,
+} from "@thewaver/ss-playground/App/Pages/TextInputPage/TextInputPage.const";
 
 import { PageExamples } from "../../PageComponents/Examples/Examples";
 import { BothAdornmentsExample } from "./Examples/BothAdornments";
@@ -16,8 +22,6 @@ import { ReachableExample } from "./Examples/Reachable";
 import { ReadOnlyExample } from "./Examples/ReadOnly";
 import { RefusingSetterExample } from "./Examples/RefusingSetter";
 import { TransformingSetterExample } from "./Examples/TransformingSetter";
-
-const EXAMPLES_ROOT = "/src/App/Pages/TextInputPage/Examples";
 
 export const TextInputPage = () => {
     const defaultSignal = createSignal("");
@@ -47,28 +51,28 @@ export const TextInputPage = () => {
     const getExamples = createMemo(() => [
         {
             key: "default",
-            name: "Default",
+            name: EXAMPLE_NAMES.default,
             readout: () => `value: "${defaultSignal[0]()}"`,
             component: () => <DefaultExample value={defaultSignal} />,
             path: `${EXAMPLES_ROOT}/Default.tsx`,
         },
         {
             key: "transformingSetter",
-            name: "Transforming setter",
+            name: EXAMPLE_NAMES.transformingSetter,
             readout: () => `value: "${codeSignal[0]()}" — type lowercase mid-string, the caret must not jump`,
             component: () => <TransformingSetterExample value={codeSignal} />,
             path: `${EXAMPLES_ROOT}/TransformingSetter.tsx`,
         },
         {
             key: "refusingSetter",
-            name: "Refusing setter",
+            name: EXAMPLE_NAMES.refusingSetter,
             readout: () => `value: "${pinSignal[0]()}" — letters are refused, ${PIN_LENGTH} digits max`,
             component: () => <RefusingSetterExample value={pinSignal} />,
             path: `${EXAMPLES_ROOT}/RefusingSetter.tsx`,
         },
         {
             key: "suggestions",
-            name: "Suggestions",
+            name: EXAMPLE_NAMES.suggestions,
             readout: () =>
                 `value: "${citySignal[0]()}" — ${getCitySuggestions().length} suggested; any text is kept, and Enter only picks once the arrows have moved into the list`,
             component: () => <CitiesExample value={citySignal} suggestions={getCitySuggestions} />,
@@ -76,7 +80,7 @@ export const TextInputPage = () => {
         },
         {
             key: "editable",
-            name: "Edit in place",
+            name: EXAMPLE_NAMES.editable,
             readout: () =>
                 `value: "${editableSignal[0]()}" | editing: ${editingSignal[0]()} — Enter or leaving keeps the edit, Escape puts the old text back`,
             component: () => <EditableExample value={editableSignal} editing={editingSignal} />,
@@ -84,56 +88,56 @@ export const TextInputPage = () => {
         },
         {
             key: "password",
-            name: "Password",
+            name: EXAMPLE_NAMES.password,
             readout: () => `value: "${passwordSignal[0]()}" | revealed: ${revealSignal[0]()}`,
             component: () => <PasswordExample value={passwordSignal} reveal={revealSignal} />,
             path: `${EXAMPLES_ROOT}/Password.tsx`,
         },
         {
             key: "bothAdornments",
-            name: "Both adornments",
+            name: EXAMPLE_NAMES.bothAdornments,
             readout: () => `value: "${amountSignal[0]()}"`,
             component: () => <BothAdornmentsExample value={amountSignal} />,
             path: `${EXAMPLES_ROOT}/BothAdornments.tsx`,
         },
         {
             key: "number",
-            name: "Number",
+            name: EXAMPLE_NAMES.number,
             readout: () => `value: "${quantitySignal[0]()}" — arrows step by ${QUANTITY_STEP}, no spinner buttons`,
             component: () => <NumberFieldExample value={quantitySignal} />,
             path: `${EXAMPLES_ROOT}/NumberField.tsx`,
         },
         {
             key: "readOnly",
-            name: "Read-only",
+            name: EXAMPLE_NAMES.readOnly,
             readout: () => `value: "${readOnlySignal[0]()}" — selectable and copyable, never editable`,
             component: () => <ReadOnlyExample value={readOnlySignal} />,
             path: `${EXAMPLES_ROOT}/ReadOnly.tsx`,
         },
         {
             key: "disabled",
-            name: "Disabled",
+            name: EXAMPLE_NAMES.disabled,
             readout: () => `value: "${disabledSignal[0]()}"`,
             component: () => <DisabledExample value={disabledSignal} />,
             path: `${EXAMPLES_ROOT}/Disabled.tsx`,
         },
         {
             key: "reachable",
-            name: "Disabled + reachable",
+            name: EXAMPLE_NAMES.reachable,
             readout: () => `value: "${reachableSignal[0]()}"`,
             component: () => <ReachableExample value={reachableSignal} />,
             path: `${EXAMPLES_ROOT}/Reachable.tsx`,
         },
         {
             key: "errored",
-            name: "Error",
+            name: EXAMPLE_NAMES.errored,
             readout: () => `value: "${erroredSignal[0]()}"`,
             component: () => <ErroredExample value={erroredSignal} />,
             path: `${EXAMPLES_ROOT}/Errored.tsx`,
         },
         {
             key: "label",
-            name: "In a Label",
+            name: EXAMPLE_NAMES.label,
             readout: () => `value: "${labeledSignal[0]()}"`,
             component: () => <LabeledExample value={labeledSignal} />,
             path: `${EXAMPLES_ROOT}/Labeled.tsx`,

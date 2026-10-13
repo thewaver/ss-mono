@@ -4,6 +4,11 @@ import { type ComponentPublicInstance, computed, shallowRef, watch } from "vue";
 
 import { TableOfContents } from "@thewaver/ss-components-vue";
 import type { TableOfContentsLink } from "@thewaver/ss-components-vue";
+import {
+    MIN_TABLE_OF_CONTENTS_LINKS,
+    TABLE_OF_CONTENTS_GAP,
+    TABLE_OF_CONTENTS_LABEL,
+} from "@thewaver/ss-playground/App/PageComponents/DocsView/DocsView.const";
 import * as styles from "@thewaver/ss-playground/App/PageComponents/DocsView/DocsView.css";
 import type { DocsTableOfContentsEntry } from "@thewaver/ss-playground/App/PageComponents/DocsView/DocsView.types";
 import {
@@ -14,12 +19,8 @@ import {
 } from "@thewaver/ss-playground/App/PageComponents/DocsView/DocsView.utils";
 
 import PageTableOfContentsContent from "../../StyledComponents/TableOfContentsContent/TableOfContentsContent.vue";
-import type { PageDocsViewProps } from "./DocsView.types";
+import type { PageDocsViewProps } from "./DocsViewVue.types";
 import PageDocsTable from "./PageDocsTable.vue";
-
-const TABLE_OF_CONTENTS_LABEL = "On this page";
-const TABLE_OF_CONTENTS_GAP = 4;
-const MIN_TABLE_OF_CONTENTS_LINKS = 2;
 
 const GROUP_TITLES: Record<ApiGroupKind, string> = {
     props: "Props",
@@ -96,6 +97,7 @@ watch(
                         v-for="(table, index) in group.tables"
                         :key="`${table.name}-${index}`"
                         :table="table"
+                        :unit="name"
                         :heading-id="toDocsTableId(group.kind, table.name)"
                         :heading-ref="setHeadingRef(toDocsTableId(group.kind, table.name))"
                     />

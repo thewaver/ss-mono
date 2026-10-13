@@ -3,7 +3,7 @@ import type { PropsWithChildren } from "react";
 import * as styles from "@thewaver/ss-playground/App/StyledComponents/SelectOptionContent/SelectOptionContent.css";
 
 import { useLayerClass } from "../Layer/Layer.context";
-import type { SelectOptionContentProps } from "./SelectOptionContent.types";
+import type { SelectOptionContentProps } from "./SelectOptionContentReact.types";
 
 export const PageSelectOptionContent = (props: PropsWithChildren<SelectOptionContentProps>) => {
     const layerClass = useLayerClass();

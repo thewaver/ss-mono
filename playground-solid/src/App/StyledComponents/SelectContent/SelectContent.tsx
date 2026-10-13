@@ -8,7 +8,7 @@ import * as styles from "@thewaver/ss-playground/App/StyledComponents/SelectCont
 import { themeVars } from "@thewaver/ss-playground/App/Theme.css";
 
 import { useLayerClass } from "../Layer/Layer.context";
-import type { SelectContentProps } from "./SelectContent.types";
+import type { SelectContentProps } from "./SelectContentSolid.types";
 
 export const computePageSelectTextStyle = (getFlags: () => InteractionFlags<SelectFlags>): TextFieldTextStyle => ({
     "color": getFlags().isDisabled ? `rgb(from ${layerVars.contrast} r g b / 50%)` : layerVars.contrast,

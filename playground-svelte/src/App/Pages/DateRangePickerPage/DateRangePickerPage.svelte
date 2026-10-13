@@ -9,9 +9,11 @@
     import PageProp from "../../PageComponents/Prop/Prop.svelte";
     import PagePropsPanel from "../../PageComponents/PropsPanel/PagePropsPanel.svelte";
     import PickedExample from "./Examples/Picked.svelte";
-
-    const CALENDAR_FIELD_WIDTH = 180;
-    const EXAMPLES_ROOT = "/src/App/Pages/DateRangePickerPage/Examples";
+    import {
+    CALENDAR_FIELD_WIDTH,
+    EXAMPLE_NAMES,
+    EXAMPLES_ROOT,
+} from "@thewaver/ss-playground/App/Pages/DateRangePickerPage/DateRangePickerPage.const";
 
     const describe = (value: DateValueRange | undefined) =>
         value ? `${DateValueUtils.toIso(value.start)} to ${DateValueUtils.toIso(value.end)}` : "none";
@@ -24,14 +26,14 @@
     const examples: ExampleDefs[] = [
         {
             key: "picked",
-            name: "Two fields, one value",
+            name: EXAMPLE_NAMES.picked,
             readout: () => `value: ${describe(defaultValue)}`,
             component: pickedExample,
             path: `${EXAMPLES_ROOT}/Picked.svelte`,
         },
         {
             key: "bounded",
-            name: "Bounded",
+            name: EXAMPLE_NAMES.bounded,
             readout: () =>
                 `min ${DateValueUtils.toIso(MIN_DATE)}, max ${DateValueUtils.toIso(MAX_DATE)} — value: ${describe(boundedValue)}`,
             component: boundedExample,

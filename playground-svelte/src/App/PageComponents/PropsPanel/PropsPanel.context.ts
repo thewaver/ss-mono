@@ -1,6 +1,6 @@
 import { createContext } from "svelte";
 
-import type { PagePropsPanelScope } from "./PropsPanel.types";
+import type { PagePropsPanelScope } from "./PropsPanelSvelte.types";
 
 const [getContext, setContext, hasContext] = createContext<{ scope: PagePropsPanelScope }>();
 

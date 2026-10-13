@@ -3,6 +3,11 @@ import { computed, shallowRef } from "vue";
 
 import { CellAnimationKeyframes, CellAnimationOrigins, CellAnimationWeights } from "@thewaver/ss-components-vue";
 import { ParticleFieldKnobs } from "@thewaver/ss-playground/App/Knobs/ParticleFields.const";
+import {
+    EXAMPLES_ROOT,
+    EXAMPLE_NAMES,
+    PERCENT,
+} from "@thewaver/ss-playground/App/Pages/ParticleFieldPage/ParticleFieldPage.const";
 import * as styles from "@thewaver/ss-playground/App/Pages/ParticleFieldPage/ParticleFieldPage.css";
 import type { Index2d } from "@thewaver/ss-utils";
 
@@ -18,9 +23,6 @@ import DefaultExampleWrapper from "./DefaultExampleWrapper.vue";
 import type { ParticleFieldExampleProps } from "./ParticleFieldPage.types";
 import ShapedExampleWrapper from "./ShapedExampleWrapper.vue";
 import StressTestWrapper from "./StressTestWrapper.vue";
-
-const EXAMPLES_ROOT = "/src/App/Pages/ParticleFieldPage/Examples";
-const PERCENT = 100;
 
 const extractOptionGroupWord = (key: string) => key.replace(/^_/, "").match(/^[a-z]+/)?.[0] ?? key;
 
@@ -71,21 +73,21 @@ const commonProps = computed<Omit<ParticleFieldExampleProps, "playback" | "onUpd
 const examples: ExampleDefs[] = [
     {
         key: "default",
-        name: "The whole box",
+        name: EXAMPLE_NAMES.default,
         readout: () =>
             `${Math.round(progress.value * PERCENT)}% through the pass, ${defaultPlayback.value ? "running" : "stopped"} — the progress signal is written by the field while it plays, and writing it moves the pass there`,
         path: `${EXAMPLES_ROOT}/Default.vue`,
     },
     {
         key: "shaped",
-        name: "Inside a shape",
+        name: EXAMPLE_NAMES.shaped,
         readout: () =>
             "the same field, limited to one of the built-in shapes Shape draws; a cell whose center falls outside it never spawns",
         path: `${EXAMPLES_ROOT}/Shaped.vue`,
     },
     {
         key: "stressTest",
-        name: "Stress Test",
+        name: EXAMPLE_NAMES.stressTest,
     },
 ];
 </script>

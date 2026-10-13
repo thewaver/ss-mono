@@ -62,3 +62,11 @@ export const formatStopwatch = (seconds: number) => {
 
     return `${minute}:${second < TENS ? "0" : ""}${second}`;
 };
+
+export const EXAMPLE_NAMES = {
+    meetings: "A day of meetings",
+    tracks: "Three tracks",
+    trim: "Trimming clips",
+};
+
+export const EXAMPLES_ROOT = "/src/App/Pages/TimelinePage/Examples";

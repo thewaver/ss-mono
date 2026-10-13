@@ -4,7 +4,7 @@ import { Tooltip } from "@thewaver/ss-components-react";
 import * as styles from "@thewaver/ss-playground/App/Pages/TooltipPage/TooltipPage.css";
 
 import { PageTooltipContent } from "../../../StyledComponents/TooltipContent/TooltipContent";
-import type { TooltipExampleProps } from "../TooltipPage.types";
+import type { TooltipExampleProps } from "../TooltipPageReact.types";
 
 type Props = TooltipExampleProps;
 

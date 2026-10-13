@@ -10,7 +10,7 @@ import type {
     PageTimelineLanesProps,
     PageTimelineMarkerProps,
     PageTimelineTickProps,
-} from "./TimelineContent.types";
+} from "./TimelineContentSolid.types";
 
 export const PageTimelineFrame = (props: PageTimelineFrameProps) => {
     const getLayerClass = useLayerClass();

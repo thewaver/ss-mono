@@ -6,6 +6,11 @@ import type {
     SortableItemFlags,
 } from "@thewaver/ss-components-react";
 import { SORTABLE_ANNOUNCEMENTS } from "@thewaver/ss-playground/App/PageComponents/Announcements/Announcements.const";
+import {
+    GRID_GAP,
+    computeGearKey,
+    computeGearLabel,
+} from "@thewaver/ss-playground/App/Pages/SortableGridPage/SortableGridPage.const";
 import * as styles from "@thewaver/ss-playground/App/Pages/SortableGridPage/SortableGridPage.css";
 import type { Gear } from "@thewaver/ss-playground/App/Pages/SortableGridPage/SortableGridPage.types";
 
@@ -14,7 +19,6 @@ import {
     PageSortableMarker,
     PageSortableSurface,
 } from "../../../StyledComponents/SortableContent/SortableContent";
-import { GRID_GAP, computeGearKey, computeGearLabel } from "../SortableGridPage.const";
 import { InventoryExample } from "./Inventory";
 
 type Props = {

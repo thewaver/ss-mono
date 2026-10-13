@@ -7,10 +7,11 @@
     import type { ExampleDefs } from "../../PageComponents/Examples/Examples.types";
     import PageExamples from "../../PageComponents/Examples/PageExamples.svelte";
     import DefaultExample from "./Examples/Default.svelte";
-
-    const FILLER_NAMES = ["Alder", "Birch", "Cedar", "Elm", "Hazel", "Larch", "Maple", "Rowan", "Willow", "Yew"];
-    const FILLER_COUNT = 60;
-    const EXAMPLES_ROOT = "/src/App/Pages/DrawerPage/Examples";
+    import {
+        EXAMPLES_ROOT,
+        FILLER_COUNT,
+        FILLER_NAMES,
+    } from "@thewaver/ss-playground/App/Pages/DrawerPage/DrawerPage.const";
 
     const FILLERS = Array.from(
         { length: FILLER_COUNT },

@@ -2,7 +2,7 @@
     import { Button } from "@thewaver/ss-components-svelte";
 
     import PageButtonContent from "../../../StyledComponents/ButtonContent/ButtonContent.svelte";
-    import type { ButtonErroredExampleProps } from "../ButtonPage.types";
+    import type { ButtonErroredExampleProps } from "../ButtonPageSvelte.types";
 
     type Props = ButtonErroredExampleProps;
 

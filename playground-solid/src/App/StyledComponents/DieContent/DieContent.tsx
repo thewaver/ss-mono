@@ -1,11 +1,9 @@
 import { access } from "@thewaver/ss-components-solid";
+import { ICON_SHARE, LABEL_SHARE } from "@thewaver/ss-playground/App/StyledComponents/DieContent/DieContent.const";
 import * as styles from "@thewaver/ss-playground/App/StyledComponents/DieContent/DieContent.css";
 
 import { useLayerClass } from "../Layer/Layer.context";
-import type { PageDieFaceProps, PageDieIconProps } from "./DieContent.types";
-
-const LABEL_SHARE = 0.35;
-const ICON_SHARE = 0.5;
+import type { PageDieFaceProps, PageDieIconProps } from "./DieContentSolid.types";
 
 export const PageDieFace = (props: PageDieFaceProps) => {
     const getLayerClass = useLayerClass();

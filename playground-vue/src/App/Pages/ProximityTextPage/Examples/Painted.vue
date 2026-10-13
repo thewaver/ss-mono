@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { useId } from "vue";
 
-import { PaintedText, ProximityText, SVGDefsSamples } from "@thewaver/ss-components-vue";
+import { PaintedText, ProximityText, SVGDefsSampleConfigs, SVGDefsSamples } from "@thewaver/ss-components-vue";
 import * as styles from "@thewaver/ss-playground/App/Pages/ProximityTextPage/ProximityTextPage.css";
 import type { Size2d } from "@thewaver/ss-utils";
 
@@ -17,12 +17,17 @@ defineProps<Props>();
 const id = useId();
 
 const computeFillDefs = (size: Size2d, element: HTMLElement | undefined) =>
-    SVGDefsSamples.Gradient.Timed.toConfig({ family: "flow_diag_3" }).computeSVGDefs(`fill-${id}`, undefined, element, {
-        getSize: () => size,
-        animationDurationMs: GRADIENT_DURATION_MS,
-        colors: SVGDefsSamples.SAMPLE_COLORS,
-        blurWidth: NO_BLUR,
-    });
+    SVGDefsSampleConfigs.Gradient.Timed.toConfig({ family: "flow_diag_3" }).computeSVGDefs(
+        `fill-${id}`,
+        undefined,
+        element,
+        {
+            getSize: () => size,
+            animationDurationMs: GRADIENT_DURATION_MS,
+            colors: SVGDefsSamples.SAMPLE_COLORS,
+            blurWidth: NO_BLUR,
+        },
+    );
 </script>
 
 <template>

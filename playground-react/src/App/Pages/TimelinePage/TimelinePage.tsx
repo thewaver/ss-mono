@@ -5,6 +5,8 @@ import { TimelineKnobs } from "@thewaver/ss-playground/App/Knobs/Timelines.const
 import type { Clip } from "@thewaver/ss-playground/App/Pages/TimelinePage/TimelineItems.types";
 import {
     DAY,
+    EXAMPLES_ROOT,
+    EXAMPLE_NAMES,
     REEL,
     TRIM_CLIPS,
     formatClock,
@@ -20,8 +22,6 @@ import { MeetingsExample } from "./Examples/Meetings";
 import { TracksExample } from "./Examples/Tracks";
 import { TrimExample } from "./Examples/Trim";
 import type { TimelineExampleProps } from "./TimelinePage.types";
-
-const EXAMPLES_ROOT = "/src/App/Pages/TimelinePage/Examples";
 
 export const TimelinePage = () => {
     const [isPannable, setIsPannable] = useState(TimelineKnobs.STARTING_IS_PANNABLE);
@@ -59,7 +59,7 @@ export const TimelinePage = () => {
     const examples = [
         {
             key: "meetings",
-            name: "A day of meetings",
+            name: EXAMPLE_NAMES.meetings,
             readout: () =>
                 `showing ${formatClock(dayState[0].start)} to ${formatClock(dayState[0].end)} — the lanes are the component's own answer to what overlaps, and it takes the gestures itself: the wheel zooms where the pointer is, a drag moves the window, and a press that never travels still picks the meeting under it. The red line is a marker at the time on this computer's clock, and it is only drawn while that time is inside the day shown`,
             component: () => <MeetingsExample {...commonProps} view={dayState} />,
@@ -67,7 +67,7 @@ export const TimelinePage = () => {
         },
         {
             key: "tracks",
-            name: "Three tracks",
+            name: EXAMPLE_NAMES.tracks,
             readout: () =>
                 `showing ${formatStopwatch(reelState[0].start)} to ${formatStopwatch(reelState[0].end)} — here the page says which lane each clip belongs to, and the buttons are the route for anyone who cannot drag or pinch. The orange line is a marker the page moves while it plays`,
             component: () => <TracksExample {...commonProps} view={reelState} />,
@@ -75,7 +75,7 @@ export const TimelinePage = () => {
         },
         {
             key: "trim",
-            name: "Trimming clips",
+            name: EXAMPLE_NAMES.trim,
             readout: () =>
                 `${trimReadout} — drag either end of a clip, or press an end and then press where it should go; from the keyboard, Enter takes hold of a clip's end, Home and End switch ends, the arrows move it a second at a time, Enter drops it and Escape puts it back`,
             component: () => (

@@ -22,6 +22,7 @@ import {
     TimelineStyles,
     TimelineUtils,
 } from "@thewaver/ss-components";
+import { TimelineConst } from "@thewaver/ss-components/internal";
 import { type Point2d, StoreUtils } from "@thewaver/ss-utils";
 
 import { CarrierReactUtils } from "../../../Abstracts/Carrier/CarrierReact.utils";
@@ -30,15 +31,6 @@ import { SignalMirrorReactUtils } from "../../../Abstracts/SignalMirror/SignalMi
 import { InteractionWrapper } from "../../../Primitives/InteractionWrapper/InteractionWrapper";
 import { useLatest } from "../../../Utils/refUtils";
 import type { TimelineController, TimelineItemProps, TimelineProps } from "./Timeline.types";
-
-const DEFAULT_FOCUS_RATIO = 0.5;
-const MIN_VIEW_SHARE = 0.001;
-const PERCENT = 100;
-const NOTHING = 0;
-const FIRST_ARIA_POSITION = 1;
-const ROVING_TAB_INDEX = 0;
-const NO_MARKERS: number[] = [];
-const DEFAULT_EDGE: TimelineEdge = "end";
 
 const getIsSameSpan = (a: TimelineSpan, b: TimelineSpan) => a.start === b.start && a.end === b.end;
 
@@ -75,11 +67,11 @@ export const Timeline = <T,>(props: TimelineProps<T>) => {
     const rootRef = useRef<HTMLDivElement | null>(null);
     const itemRefs = useRef(new Map<number, HTMLElement>());
     const isFocusFollowingRef = useRef(false);
-    const edgeGrabOffsetRef = useRef(NOTHING);
-    const heldEdgeRef = useRef<TimelineEdge>(DEFAULT_EDGE);
+    const edgeGrabOffsetRef = useRef(TimelineConst.NOTHING);
+    const heldEdgeRef = useRef<TimelineEdge>(TimelineConst.DEFAULT_EDGE);
 
     const [focusedIndex, setFocusedIndex] = useState<number>();
-    const [heldEdge, setHeldEdgeState] = useState<TimelineEdge>(DEFAULT_EDGE);
+    const [heldEdge, setHeldEdgeState] = useState<TimelineEdge>(TimelineConst.DEFAULT_EDGE);
 
     const setHeldEdge = (edge: TimelineEdge) => {
         heldEdgeRef.current = edge;
@@ -89,7 +81,7 @@ export const Timeline = <T,>(props: TimelineProps<T>) => {
     const size = ElementObserverReactUtils.useBorderBoxSize(rootRef);
 
     const range = props.range;
-    const minViewExtent = props.minViewExtent ?? TimelineUtils.getExtent(range) * MIN_VIEW_SHARE;
+    const minViewExtent = props.minViewExtent ?? TimelineUtils.getExtent(range) * TimelineConst.MIN_VIEW_SHARE;
 
     const [rawView, setRawView] = SignalMirrorReactUtils.useOptionalState(props.view, range);
 
@@ -174,7 +166,7 @@ export const Timeline = <T,>(props: TimelineProps<T>) => {
     const placementMap = new Map(placements.map((placement) => [placement.index, placement]));
     const renderedIndices = TimelineUtils.computeRenderedIndices(placements, rovingIndex);
     const ticks = TimelineUtils.computeTicks(view, steps);
-    const markers = TimelineUtils.computeMarkers(props.markers ?? NO_MARKERS, view);
+    const markers = TimelineUtils.computeMarkers(props.markers ?? TimelineConst.NO_MARKERS, view);
 
     const latest = useLatest({ range, minViewExtent, setRawView, isPannable, isZoomable, width: size.width });
 
@@ -204,7 +196,7 @@ export const Timeline = <T,>(props: TimelineProps<T>) => {
                     TimelineUtils.zoomView(
                         viewRef.current,
                         factor,
-                        focusRatio ?? DEFAULT_FOCUS_RATIO,
+                        focusRatio ?? TimelineConst.DEFAULT_FOCUS_RATIO,
                         latest.current.range,
                         latest.current.minViewExtent,
                     ),
@@ -237,7 +229,7 @@ export const Timeline = <T,>(props: TimelineProps<T>) => {
         if (!isFocusFollowingRef.current || element === undefined) return;
 
         isFocusFollowingRef.current = false;
-        element.tabIndex = ROVING_TAB_INDEX;
+        element.tabIndex = TimelineConst.ROVING_TAB_INDEX;
         element.focus();
     });
 
@@ -273,7 +265,7 @@ export const Timeline = <T,>(props: TimelineProps<T>) => {
 
         if (element === undefined) return;
 
-        element.tabIndex = ROVING_TAB_INDEX;
+        element.tabIndex = TimelineConst.ROVING_TAB_INDEX;
         element.focus();
     };
 
@@ -283,7 +275,9 @@ export const Timeline = <T,>(props: TimelineProps<T>) => {
         const span = spans[index];
 
         edgeGrabOffsetRef.current =
-            from === undefined ? NOTHING : TimelineUtils.toValue(getPointerRatio(from.x), viewRef.current) - span[edge];
+            from === undefined
+                ? TimelineConst.NOTHING
+                : TimelineUtils.toValue(getPointerRatio(from.x), viewRef.current) - span[edge];
 
         setHeldEdge(edge);
 
@@ -461,7 +455,7 @@ export const Timeline = <T,>(props: TimelineProps<T>) => {
                     top: `${box.top}px`,
                     height: `${box.height}px`,
                 }}
-                aria-posinset={placement.order + FIRST_ARIA_POSITION}
+                aria-posinset={placement.order + TimelineConst.FIRST_ARIA_POSITION}
                 aria-setsize={items.length}
             >
                 <InteractionWrapper<TimelineItemRenderProps>
@@ -537,7 +531,7 @@ export const Timeline = <T,>(props: TimelineProps<T>) => {
                     <div
                         key={index}
                         className={TimelineStyles.timelineTick}
-                        style={{ left: `${tick.ratio * PERCENT}%` }}
+                        style={{ left: `${tick.ratio * TimelineConst.PERCENT}%` }}
                     >
                         {props.renderTick?.(tick)}
                     </div>
@@ -559,7 +553,7 @@ export const Timeline = <T,>(props: TimelineProps<T>) => {
                     <div
                         key={index}
                         className={TimelineStyles.timelineMarker}
-                        style={{ left: `${marker.ratio * PERCENT}%` }}
+                        style={{ left: `${marker.ratio * TimelineConst.PERCENT}%` }}
                     >
                         {props.renderMarker?.(marker, index)}
                     </div>

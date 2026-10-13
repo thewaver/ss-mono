@@ -2,8 +2,10 @@
     import type { ExampleDefs } from "../../../PageComponents/Examples/Examples.types";
     import PageExamples from "../../../PageComponents/Examples/PageExamples.svelte";
     import PromptExample from "./Examples/Prompt.svelte";
-
-    const EXAMPLES_ROOT = "/src/App/Pages/Spotlights/SpotlightPromptPage/Examples";
+    import {
+    EXAMPLE_NAMES,
+    EXAMPLES_ROOT,
+} from "@thewaver/ss-playground/App/Pages/Spotlights/SpotlightPromptPage/SpotlightPromptPage.const";
 
     let bought = $state(0);
     let visibility = $state(false);
@@ -11,7 +13,7 @@
     const examples: ExampleDefs[] = [
         {
             key: "prompt",
-            name: "Prompt",
+            name: EXAMPLE_NAMES.prompt,
             readout: () => `bought: ${bought} — nothing else on the page answers until you do`,
             component: promptExample,
             path: `${EXAMPLES_ROOT}/Prompt.svelte`,

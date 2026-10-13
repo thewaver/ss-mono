@@ -3,6 +3,11 @@ import { computed, shallowRef } from "vue";
 
 import { HOVER_CARD_DEFAULTS } from "@thewaver/ss-components-vue";
 import { HoverCardKnobs } from "@thewaver/ss-playground/App/Knobs/HoverCards.const";
+import {
+    EXAMPLES_ROOT,
+    EXAMPLE_NAMES,
+    FIELD_WIDTH,
+} from "@thewaver/ss-playground/App/Pages/HoverCardPage/HoverCardPage.const";
 
 import type { ExampleDefs } from "../../PageComponents/Examples/Examples.types";
 import PageExamples from "../../PageComponents/Examples/PageExamples.vue";
@@ -11,10 +16,6 @@ import PageProp from "../../PageComponents/Prop/Prop.vue";
 import PagePropsPanel from "../../PageComponents/PropsPanel/PagePropsPanel.vue";
 import NavigationMenuExample from "./Examples/NavigationMenu.vue";
 import ProfileExample from "./Examples/Profile.vue";
-
-const EXAMPLES_ROOT = "/src/App/Pages/HoverCardPage/Examples";
-
-const FIELD_WIDTH = 110;
 
 const offsetY = shallowRef(HoverCardKnobs.STARTING_OFFSET_Y);
 const transitionDurationMs = shallowRef(HOVER_CARD_DEFAULTS.transitionDurationMs);
@@ -31,14 +32,14 @@ const offset = computed(() => ({ x: 0, y: offsetY.value }));
 const examples: ExampleDefs[] = [
     {
         key: "profile",
-        name: "A profile card",
+        name: EXAMPLE_NAMES.profile,
         readout: () =>
             `open: ${visibility.value}, following: ${following.value} — rest on the name, or tab to it and wait, then Tab again to reach the button and the link; Escape brings focus back to the name`,
         path: `${EXAMPLES_ROOT}/Profile.vue`,
     },
     {
         key: "navigation",
-        name: "A navigation menu",
+        name: EXAMPLE_NAMES.navigation,
         readout: () =>
             `open: ${openKey.value ?? "none"} — each flyout is a popup trigger over a popover, opened by a press or by resting on it through the same hover engine; only one is open at a time`,
         path: `${EXAMPLES_ROOT}/NavigationMenu.vue`,

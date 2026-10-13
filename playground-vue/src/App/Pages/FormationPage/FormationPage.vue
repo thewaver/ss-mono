@@ -9,13 +9,20 @@ import {
     ProximityEffects,
 } from "@thewaver/ss-components-vue";
 import type { PlacementLayoutEntry, ProximityEffectEntry } from "@thewaver/ss-components-vue";
+import { FormationKnobs } from "@thewaver/ss-playground/App/Knobs/Formations.const";
+import { PlacementLayoutKnobs } from "@thewaver/ss-playground/App/Knobs/PlacementLayouts.const";
+import { ProximityEffectKnobs } from "@thewaver/ss-playground/App/Knobs/ProximityEffects.const";
 import { NO_SAMPLE_KEY } from "@thewaver/ss-playground/App/PageComponents/SampleGroups/SampleGroups.const";
 import type { WithNoSample } from "@thewaver/ss-playground/App/PageComponents/SampleGroups/SampleGroups.types";
+import {
+    EXAMPLES_ROOT,
+    EXAMPLE_NAMES,
+    FIELD_WIDTH,
+    NAMES,
+    NO_DEFS,
+} from "@thewaver/ss-playground/App/Pages/FormationPage/FormationPage.const";
 import { ShapeConst } from "@thewaver/ss-utils";
 
-import { FormationKnobs } from "../../Knobs/Formations.const";
-import { PlacementLayoutKnobs } from "../../Knobs/PlacementLayouts.const";
-import { ProximityEffectKnobs } from "../../Knobs/ProximityEffects.const";
 import type { ExampleDefs } from "../../PageComponents/Examples/Examples.types";
 import PageExamples from "../../PageComponents/Examples/PageExamples.vue";
 import PageCheckField from "../../PageComponents/Field/PageCheckField.vue";
@@ -28,27 +35,7 @@ import PagePropsDivider from "../../PageComponents/PropsPanel/PagePropsDivider.v
 import PagePropsGroups from "../../PageComponents/PropsPanel/PagePropsGroups.vue";
 import PagePropsPanel from "../../PageComponents/PropsPanel/PagePropsPanel.vue";
 import DefaultExampleWrapper from "./DefaultExampleWrapper.vue";
-import type { FormationExampleProps } from "./FormationPage.types";
-
-const FIELD_WIDTH = 130;
-const EXAMPLES_ROOT = "/src/App/Pages/FormationPage/Examples";
-
-const NAMES = [
-    "Aurora",
-    "Basalt",
-    "Cinder",
-    "Drift",
-    "Ember",
-    "Fathom",
-    "Glimmer",
-    "Hollow",
-    "Iris",
-    "Jetty",
-    "Kelp",
-    "Loam",
-];
-
-const NO_DEFS: Record<string, number | boolean> = {};
+import type { FormationExampleProps } from "./FormationPageVue.types";
 
 const itemCount = shallowRef(FormationKnobs.STARTING_ITEM_COUNT);
 const skippedCount = shallowRef(FormationKnobs.MIN_SKIPPED_COUNT);
@@ -124,7 +111,7 @@ const setEffectDef = (key: string, value: number | boolean) => {
 const examples: ExampleDefs[] = [
     {
         key: "default",
-        name: "Default",
+        name: EXAMPLE_NAMES.default,
         path: `${EXAMPLES_ROOT}/Default.vue`,
     },
 ];

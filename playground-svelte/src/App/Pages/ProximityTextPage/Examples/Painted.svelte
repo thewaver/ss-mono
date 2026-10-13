@@ -1,5 +1,5 @@
 <script lang="ts">
-    import { PaintedText, ProximityText, SVGDefsSamples } from "@thewaver/ss-components-svelte";
+    import { PaintedText, ProximityText, SVGDefsSampleConfigs, SVGDefsSamples } from "@thewaver/ss-components-svelte";
     import * as styles from "@thewaver/ss-playground/App/Pages/ProximityTextPage/ProximityTextPage.css";
 
     import type { ProximityTextExampleProps } from "../ProximityTextPageSvelte.types";
@@ -18,7 +18,7 @@
     <ProximityText reachPx={props.reachPx} isDisabled={props.isDisabled}>
         <PaintedText
             computeFillDefs={(size, element) =>
-                SVGDefsSamples.Gradient.Timed.toConfig({ family: "flow_diag_3" }).computeSVGDefs(
+                SVGDefsSampleConfigs.Gradient.Timed.toConfig({ family: "flow_diag_3" }).computeSVGDefs(
                     `fill-${id}`,
                     undefined,
                     element,

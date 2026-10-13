@@ -8,7 +8,7 @@ import { CONTROL_GLYPHS } from "@thewaver/ss-playground/App/StyledComponents/Con
 import { PageMeasureBox } from "../../../PageComponents/MeasureBox/MeasureBox";
 import { PageControlButtonContent } from "../../../StyledComponents/ControlButtonContent/ControlButtonContent";
 import { PageRangeContent } from "../../../StyledComponents/RangeContent/RangeContent";
-import type { TypewriterKaraokeExampleProps } from "../TypewriterPage.types";
+import type { TypewriterKaraokeExampleProps } from "../TypewriterPageSolid.types";
 
 const LYRIC = "Twinkle, twinkle, little star";
 const PERCENT = 100;

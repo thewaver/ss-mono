@@ -4,7 +4,7 @@ import * as styles from "@thewaver/ss-playground/App/Pages/Menus/FanMenuPage/Fan
 
 import PageLayer from "../../../../PageComponents/Layer/Layer.vue";
 import PageMenuTriggerContent from "../../../../StyledComponents/MenuTriggerContent/MenuTriggerContent.vue";
-import type { FanMenuExampleProps } from "../FanMenuPage.types";
+import type { FanMenuExampleProps } from "../FanMenuPageVue.types";
 
 const BACK_MARK = "‹";
 const SUBMENU_MARK = "›";

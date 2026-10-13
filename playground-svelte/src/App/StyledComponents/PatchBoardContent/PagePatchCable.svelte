@@ -6,7 +6,7 @@
 
     import PageBeam from "../Beam/PageBeam.svelte";
     import { getLayerClass } from "../Layer/Layer.context";
-    import type { PagePatchCableProps } from "./PatchBoardContent.types";
+    import type { PagePatchCableProps } from "./PatchBoardContentSvelte.types";
 
     let props: PagePatchCableProps = $props();
 

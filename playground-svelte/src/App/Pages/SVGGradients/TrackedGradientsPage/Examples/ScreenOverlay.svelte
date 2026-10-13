@@ -1,18 +1,12 @@
 <script lang="ts">
-    import {
-        Button,
-        SVGDefsSamples,
-        Shape,
-        TrackedGradientDefaults,
-        attachPortal,
-    } from "@thewaver/ss-components-svelte";
+    import { attachPortal, Button, Shape, SVGDefsSampleConfigs, SVGDefsSamples, TrackedGradientDefaults } from "@thewaver/ss-components-svelte";
     import { NO_SAMPLE_KEY } from "@thewaver/ss-playground/App/PageComponents/SampleGroups/SampleGroups.const";
     import * as styles from "@thewaver/ss-playground/App/Pages/SVGGradients/SVGGradients.css";
     import { ShapeConst, type Size2d } from "@thewaver/ss-utils";
 
-    import { TrackedGradientKnobs } from "../../../../Knobs/TrackedGradients.const";
+    import { TrackedGradientKnobs } from "@thewaver/ss-playground/App/Knobs/TrackedGradients.const";
     import PageButtonContent from "../../../../StyledComponents/ButtonContent/ButtonContent.svelte";
-    import type { TrackedGradientExampleProps } from "../../SVGGradients.types";
+    import type { TrackedGradientExampleProps } from "../../SVGGradientsSvelte.types";
 
     let props: TrackedGradientExampleProps = $props();
 
@@ -34,7 +28,7 @@
             ]),
         );
 
-        return SVGDefsSamples.Gradient.Tracked.toConfig({
+        return SVGDefsSampleConfigs.Gradient.Tracked.toConfig({
             family: key,
             defs: { ...values, ...scaledValues },
         } as SVGDefsSamples.Gradient.Tracked.Entry)

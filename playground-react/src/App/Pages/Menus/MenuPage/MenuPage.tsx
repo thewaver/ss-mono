@@ -1,5 +1,7 @@
 import { useState } from "react";
 
+import { EXAMPLES_ROOT, EXAMPLE_NAMES } from "@thewaver/ss-playground/App/Pages/Menus/MenuPage/MenuPage.const";
+
 import { PageExamples } from "../../../PageComponents/Examples/Examples";
 import { CascaderExample } from "./Examples/Cascader";
 import { ContextAreaExample } from "./Examples/ContextArea";
@@ -22,10 +24,8 @@ import {
     ZOOM_RESET_PERCENT,
     ZOOM_STEPS,
     ZOOM_STEP_PERCENT,
-} from "./MenuPage.const";
-import type { Action } from "./MenuPage.types";
-
-const EXAMPLES_ROOT = "/src/App/Pages/Menus/MenuPage/Examples";
+} from "./MenuPageReact.const";
+import type { Action } from "./MenuPageReact.types";
 
 export const MenuPage = () => {
     const [lastAction, setLastAction] = useState(NOTHING_RUN);
@@ -56,14 +56,14 @@ export const MenuPage = () => {
     const examples = [
         {
             key: "default",
-            name: "Default",
+            name: EXAMPLE_NAMES.default,
             readout: () => `${lastAction} — activating an item closes the menu`,
             component: () => <DefaultExample onActivate={(action) => setLastAction(action.name)} />,
             path: `${EXAMPLES_ROOT}/Default.tsx`,
         },
         {
             key: "glide",
-            name: "A gliding highlight",
+            name: EXAMPLE_NAMES.glide,
             readout: () =>
                 `${lastGlideAction} — the items paint no highlight of their own; one marker glides to whichever item the pointer or the arrows are on`,
             component: () => <GlideExample onActivate={(action) => setLastGlideAction(action.name)} />,
@@ -71,7 +71,7 @@ export const MenuPage = () => {
         },
         {
             key: "driven",
-            name: "Driven from outside",
+            name: EXAMPLE_NAMES.driven,
             readout: () =>
                 `${lastDrivenAction} — the menu is ${drivenVisibility[0] ? "open" : "closed"}, and it is anchored to the toggle rather than to its own trigger`,
             component: () => (
@@ -84,7 +84,7 @@ export const MenuPage = () => {
         },
         {
             key: "context",
-            name: "Opened by a right-click",
+            name: EXAMPLE_NAMES.context,
             readout: () =>
                 `${lastContextAction} — the menu opens where the pointer was, and there is no trigger button anywhere`,
             component: () => <ContextAreaExample onActivate={(action) => setLastContextAction(action.name)} />,
@@ -92,7 +92,7 @@ export const MenuPage = () => {
         },
         {
             key: "staysOpen",
-            name: "Commands worth repeating",
+            name: EXAMPLE_NAMES.staysOpen,
             readout: () =>
                 `zoom: ${zoomPercent}% — Zoom in and Zoom out leave the menu open so they can be pressed again, and Reset zoom closes it`,
             component: () => <DefaultExample items={ZOOM_ACTIONS} caption={"Zoom"} onActivate={applyZoom} />,
@@ -100,7 +100,7 @@ export const MenuPage = () => {
         },
         {
             key: "disabledItems",
-            name: "Disabled items",
+            name: EXAMPLE_NAMES.disabledItems,
             readout: () => `${lastDisabledAction} — arrows skip Paste and Duplicate`,
             component: () => (
                 <DefaultExample
@@ -112,7 +112,7 @@ export const MenuPage = () => {
         },
         {
             key: "disabledItemsReachable",
-            name: "Disabled items + reachable",
+            name: EXAMPLE_NAMES.disabledItemsReachable,
             readout: () => `${lastReachableAction} — arrows stop on Paste, hover explains why`,
             component: () => (
                 <DefaultExample
@@ -124,14 +124,14 @@ export const MenuPage = () => {
         },
         {
             key: "submenus",
-            name: "Submenus",
+            name: EXAMPLE_NAMES.submenus,
             readout: () => `${lastNestedAction} — ArrowRight steps in, ArrowLeft steps back out`,
             component: () => <SubmenusExample onActivate={(action) => setLastNestedAction(action.name)} />,
             path: `${EXAMPLES_ROOT}/Submenus.tsx`,
         },
         {
             key: "cascader",
-            name: "Cascader",
+            name: EXAMPLE_NAMES.cascader,
             readout: () =>
                 `path: [${cascaderPathState[0].join(", ")}] — the trigger shows the path picked so far, and only a leaf writes it; a branch just opens the next level`,
             component: () => <CascaderExample path={cascaderPathState} />,
@@ -139,7 +139,7 @@ export const MenuPage = () => {
         },
         {
             key: "rightToLeft",
-            name: "Submenus in a right-to-left box",
+            name: EXAMPLE_NAMES.rightToLeft,
             readout: () =>
                 `${lastRightToLeftAction} — the box around the trigger sets dir="rtl", so a submenu opens on the left, ArrowLeft steps in and ArrowRight steps back out`,
             component: () => <RightToLeftExample onActivate={(action) => setLastRightToLeftAction(action.name)} />,
@@ -147,14 +147,14 @@ export const MenuPage = () => {
         },
         {
             key: "placedAbove",
-            name: "Placed above",
+            name: EXAMPLE_NAMES.placedAbove,
             readout: () => `${lastFlippedAction} — the surface flips its own transform`,
             component: () => <PlacedAboveExample onActivate={(action) => setLastFlippedAction(action.name)} />,
             path: `${EXAMPLES_ROOT}/PlacedAbove.tsx`,
         },
         {
             key: "scrollingList",
-            name: "Scrolling list",
+            name: EXAMPLE_NAMES.scrollingList,
             readout: () => `${lastLayerAction} — Home and End reach both ends`,
             component: () => (
                 <DefaultExample
@@ -167,7 +167,7 @@ export const MenuPage = () => {
         },
         {
             key: "stateful",
-            name: "Rows that hold a state",
+            name: EXAMPLE_NAMES.stateful,
             readout: () => `${lastViewAction} — ticked: [${viewState[0].map((action) => action.name).join(", ")}]`,
             component: () => (
                 <StatefulExample checked={viewState} onActivate={(action) => setLastViewAction(`ran ${action.name}`)} />
@@ -176,14 +176,14 @@ export const MenuPage = () => {
         },
         {
             key: "disabled",
-            name: "Disabled",
+            name: EXAMPLE_NAMES.disabled,
             readout: () => "the trigger neither opens nor takes focus",
             component: () => <DisabledExample />,
             path: `${EXAMPLES_ROOT}/Disabled.tsx`,
         },
         {
             key: "reachable",
-            name: "Disabled + reachable",
+            name: EXAMPLE_NAMES.reachable,
             readout: () => "focusable so the tooltip can be read, but the menu must not open",
             component: () => <ReachableExample />,
             path: `${EXAMPLES_ROOT}/Reachable.tsx`,

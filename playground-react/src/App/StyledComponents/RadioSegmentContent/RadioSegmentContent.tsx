@@ -3,7 +3,7 @@ import type { PropsWithChildren } from "react";
 import * as styles from "@thewaver/ss-playground/App/StyledComponents/RadioSegmentContent/RadioSegmentContent.css";
 
 import { useLayerClass } from "../Layer/Layer.context";
-import type { RadioSegmentContentProps, RadioSegmentFloaterProps } from "./RadioSegmentContent.types";
+import type { RadioSegmentContentProps, RadioSegmentFloaterProps } from "./RadioSegmentContentReact.types";
 
 export const PageRadioSegmentGroup = (props: PropsWithChildren) => {
     const layerClass = useLayerClass();

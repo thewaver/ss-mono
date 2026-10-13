@@ -8,7 +8,7 @@ import * as styles from "@thewaver/ss-playground/App/Pages/ToolbarPage/ToolbarPa
 import PageButtonContent from "../../../StyledComponents/ButtonContent/ButtonContent.vue";
 import PageMenuTriggerContent from "../../../StyledComponents/MenuTriggerContent/MenuTriggerContent.vue";
 import ToolbarOverflowItem from "../ToolbarOverflowItem.vue";
-import type { ToolbarPressedExampleProps } from "../ToolbarPage.types";
+import type { ToolbarPressedExampleProps } from "../ToolbarPageVue.types";
 import ToolbarPopup from "../ToolbarPopup.vue";
 
 const ACTIONS: ToolbarAction<string>[] = [{ value: "Bold" }, { value: "Italic" }, { value: "Underline" }];

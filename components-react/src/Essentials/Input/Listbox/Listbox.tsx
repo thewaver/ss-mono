@@ -9,6 +9,7 @@ import {
     SelectUtils,
     type VirtualizerRow,
 } from "@thewaver/ss-components";
+import { ListboxConst } from "@thewaver/ss-components/internal";
 
 import { ElementObserverReactUtils } from "../../../Abstracts/ElementObserver/ElementObserverReact.utils";
 import { FloaterReactUtils } from "../../../Abstracts/Floater/FloaterReact.utils";
@@ -20,8 +21,6 @@ import { TooltipReactUtils } from "../../Overlays/Tooltip/TooltipReact.utils";
 import type { SelectItem, SelectOption, SelectOptionGroup } from "../Select/Select.types";
 import type { ListboxCompositeProps, ListboxOptionItemProps, ListboxOptionsProps, ListboxProps } from "./Listbox.types";
 import { ListboxReactUtils } from "./ListboxReact.utils";
-
-const EMPTY_SELECTION: never[] = [];
 
 const OPTION_SELECTOR = '[role="option"]';
 
@@ -423,7 +422,7 @@ export const Listbox = <T,>(props: ListboxProps<T>) => {
     const selectedOptions = useMemo(() => {
         const selectedOption = SelectUtils.getFlatOptions(props.options).find((option) => option.value === value);
 
-        return selectedOption ? [selectedOption] : EMPTY_SELECTION;
+        return selectedOption ? [selectedOption] : ListboxConst.EMPTY_SELECTION;
     }, [props.options, value]);
 
     return (

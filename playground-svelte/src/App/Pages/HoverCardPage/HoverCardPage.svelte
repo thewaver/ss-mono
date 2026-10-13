@@ -9,11 +9,12 @@
     import PagePropsPanel from "../../PageComponents/PropsPanel/PagePropsPanel.svelte";
     import NavigationMenuExample from "./Examples/NavigationMenu.svelte";
     import ProfileExample from "./Examples/Profile.svelte";
-    import type { HoverCardExampleProps, NavigationMenuExampleProps } from "./HoverCardPage.types";
-
-    const EXAMPLES_ROOT = "/src/App/Pages/HoverCardPage/Examples";
-
-    const FIELD_WIDTH = 110;
+    import type { HoverCardExampleProps, NavigationMenuExampleProps } from "./HoverCardPageSvelte.types";
+    import {
+    EXAMPLE_NAMES,
+    EXAMPLES_ROOT,
+    FIELD_WIDTH,
+} from "@thewaver/ss-playground/App/Pages/HoverCardPage/HoverCardPage.const";
 
     let offsetY = $state(HoverCardKnobs.STARTING_OFFSET_Y);
     let transitionDurationMs = $state(HOVER_CARD_DEFAULTS.transitionDurationMs);
@@ -43,7 +44,7 @@
     const examples: ExampleDefs[] = [
         {
             key: "profile",
-            name: "A profile card",
+            name: EXAMPLE_NAMES.profile,
             readout: () =>
                 `open: ${visibility}, following: ${following} — rest on the name, or tab to it and wait, then Tab again to reach the button and the link; Escape brings focus back to the name`,
             component: profileExample,
@@ -51,7 +52,7 @@
         },
         {
             key: "navigation",
-            name: "A navigation menu",
+            name: EXAMPLE_NAMES.navigation,
             readout: () =>
                 `open: ${openKey ?? "none"} — each flyout is a popup trigger over a popover, opened by a press or by resting on it through the same hover engine; only one is open at a time`,
             component: navigationExample,

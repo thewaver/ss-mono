@@ -2,6 +2,7 @@
 import { reactive } from "vue";
 
 import { ScanlineAnimationKnobs } from "@thewaver/ss-playground/App/Knobs/ScanlineAnimations.const";
+import { IMAGE_CONTAINER_SIZE } from "@thewaver/ss-playground/App/Pages/ScanLineAnimationPage/ScanLineAnimationPage.const";
 
 import PageExampleKnobs from "../../PageComponents/ExampleKnobs/PageExampleKnobs.vue";
 import PageNumberField from "../../PageComponents/Field/PageNumberField.vue";
@@ -9,8 +10,6 @@ import PageMeasureBox from "../../PageComponents/MeasureBox/MeasureBox.vue";
 import PageProp from "../../PageComponents/Prop/Prop.vue";
 import GlitchExample from "./Examples/Glitch.vue";
 import type { ScanlineAnimationExampleProps } from "./ScanlineAnimationPage.types";
-
-const IMAGE_CONTAINER_SIZE = 360;
 
 const props = defineProps<ScanlineAnimationExampleProps>();
 

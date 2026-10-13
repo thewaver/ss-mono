@@ -3,6 +3,12 @@ import { createMemo, createSignal } from "solid-js";
 import type { CuboidController } from "@thewaver/ss-components-solid";
 import { CUBOID_DEFAULTS, CuboidUtils, MediaQueryMonitorSolidUtils } from "@thewaver/ss-components-solid";
 import { CuboidKnobs } from "@thewaver/ss-playground/App/Knobs/Cuboids.const";
+import {
+    EXAMPLES_ROOT,
+    EXAMPLE_NAMES,
+    FIELD_WIDTH,
+    NO_MOTION_DURATION_MS,
+} from "@thewaver/ss-playground/App/Pages/CuboidPage/CuboidPage.const";
 
 import { PageExampleKnobs } from "../../PageComponents/ExampleKnobs/ExampleKnobs";
 import { PageExamples } from "../../PageComponents/Examples/Examples";
@@ -13,11 +19,6 @@ import type { CuboidExampleProps, CuboidUprightExampleProps } from "./CuboidPage
 import { DefaultExample } from "./Examples/Default";
 import { UprightExample } from "./Examples/Upright";
 import { WanderingExample } from "./Examples/Wandering";
-
-const NO_MOTION_DURATION_MS = 0;
-
-const FIELD_WIDTH = 110;
-const EXAMPLES_ROOT = "/src/App/Pages/CuboidPage/Examples";
 
 const WanderingExampleWrapper = (props: CuboidExampleProps) => {
     const [getTurnIntervalMs, setTurnIntervalMs] = createSignal(CuboidKnobs.STARTING_TURN_INTERVAL_MS);
@@ -115,7 +116,7 @@ export const CuboidPage = () => {
     const getExamples = createMemo(() => [
         {
             key: "default",
-            name: "Six faces, two turns",
+            name: EXAMPLE_NAMES.default,
             readout: () =>
                 `${CuboidUtils.getFacingFromTurns(yawSignal[0](), pitchSignal[0]())} — across ${yawSignal[0]()}, up ${pitchSignal[0]()}; the two counts are quarter turns rather than a face, so the box always takes the way it was pushed`,
             component: () => (
@@ -130,7 +131,7 @@ export const CuboidPage = () => {
         },
         {
             key: "wandering",
-            name: "Turning to a neighbor on its own",
+            name: EXAMPLE_NAMES.wandering,
             readout: () =>
                 `${CuboidUtils.getFacingFromTurns(wanderingYawSignal[0](), wanderingPitchSignal[0]())} — every tick takes one quarter turn at random, discarding the ones that would leave the same face in view or turn back to the face it just left, so the box only ever moves on to a new face sharing an edge with this one`,
             component: () => (
@@ -145,7 +146,7 @@ export const CuboidPage = () => {
         },
         {
             key: "upright",
-            name: "Upright, by name, and by hand",
+            name: EXAMPLE_NAMES.upright,
             readout: () =>
                 `${uprightControllerSignal[0]()?.getFacing() ?? "front"} — across ${uprightYawSignal[0]()}, up ${uprightPitchSignal[0]()}; the counts only record the presses here, so the box keeps its own orientation and the face names ask it for the shortest way round`,
             component: () => (

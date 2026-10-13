@@ -4,7 +4,7 @@
 
     import PageStepConnector from "../../../StyledComponents/StepContent/PageStepConnector.svelte";
     import PageStepContent from "../../../StyledComponents/StepContent/PageStepContent.svelte";
-    import type { StepperExampleProps } from "../StepperPage.types";
+    import type { StepperExampleProps } from "../StepperPageSvelte.types";
 
     type Props = StepperExampleProps;
 

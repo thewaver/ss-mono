@@ -1,9 +1,9 @@
 <script setup lang="ts">
+import { TRACKED_CELLS } from "@thewaver/ss-playground/App/Pages/SVGGradients/SVGGradients.const";
 import * as styles from "@thewaver/ss-playground/App/Pages/SVGGradients/SVGGradients.css";
 
 import PagePaintAreaGroup from "../../../../PageComponents/PaintAreaGroup/PaintAreaGroup.vue";
-import { TRACKED_CELLS } from "../../SVGGradients.const";
-import type { TrackedGradientExampleProps } from "../../SVGGradients.types";
+import type { TrackedGradientExampleProps } from "../../SVGGradientsVue.types";
 import TrackedShape from "./TrackedShape.vue";
 
 type Props = TrackedGradientExampleProps;

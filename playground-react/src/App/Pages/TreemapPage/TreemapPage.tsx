@@ -2,18 +2,19 @@ import { useState } from "react";
 
 import { MediaQueryMonitorReactUtils, TREEMAP_DEFAULTS, TreemapUtils } from "@thewaver/ss-components-react";
 import { TreemapKnobs } from "@thewaver/ss-playground/App/Knobs/Treemaps.const";
-import { LIBRARY } from "@thewaver/ss-playground/App/Pages/TreemapPage/TreemapPage.const";
+import {
+    EXAMPLES_ROOT,
+    EXAMPLE_NAMES,
+    LIBRARY,
+    NO_MOTION_DURATION_MS,
+    WIDE_SPAN,
+} from "@thewaver/ss-playground/App/Pages/TreemapPage/TreemapPage.const";
 
 import { PageExamples } from "../../PageComponents/Examples/Examples";
 import { PageNumberField } from "../../PageComponents/Field/Field";
 import { PageProp } from "../../PageComponents/Prop/Prop";
 import { PagePropsPanel } from "../../PageComponents/PropsPanel/PropsPanel";
 import { LibraryExample } from "./Examples/Library";
-
-const EXAMPLES_ROOT = "/src/App/Pages/TreemapPage/Examples";
-
-const NO_MOTION_DURATION_MS = 0;
-const WIDE_SPAN = 2;
 
 export const TreemapPage = () => {
     const [zoomDurationMs, setZoomDurationMs] = useState(TREEMAP_DEFAULTS.zoomDurationMs);
@@ -27,7 +28,7 @@ export const TreemapPage = () => {
     const examples = [
         {
             key: "library",
-            name: "This library, by lines of code",
+            name: EXAMPLE_NAMES.library,
             span: WIDE_SPAN,
             readout: () =>
                 `showing ${showing} — press a branch to zoom into it, and the bar above or Escape to come back out; a leaf has nothing inside it and does not answer a press`,

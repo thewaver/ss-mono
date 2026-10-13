@@ -4,6 +4,8 @@ import { shallowRef } from "vue";
 import { RICH_TEXT_DEFAULTS, TextArea } from "@thewaver/ss-components-vue";
 import { MEASURE_BOX_PADDING } from "@thewaver/ss-playground/App/PageComponents/MeasureBox/MeasureBox.css";
 import {
+    EXAMPLES_ROOT,
+    EXAMPLE_NAMES,
     FIELD_WIDTH,
     MAX_ROWS,
     MIN_ROWS,
@@ -32,35 +34,33 @@ import DefaultTagsExample from "./Examples/DefaultTags.vue";
 import GlossaryExample from "./Examples/Glossary.vue";
 import LinksExample from "./Examples/Links.vue";
 
-const EXAMPLES_ROOT = "/src/App/Pages/RichTextPage/Examples";
-
 const content = shallowRef(STARTING_CONTENT);
 const removeOtherTags = shallowRef(RICH_TEXT_DEFAULTS.removeOtherTags);
 
 const examples: ExampleDefs[] = [
     {
         key: "defaultTags",
-        name: "Default Tags",
+        name: EXAMPLE_NAMES.defaultTags,
         path: `${EXAMPLES_ROOT}/DefaultTags.vue`,
     },
     {
         key: "customTags",
-        name: "Custom Tags",
+        name: EXAMPLE_NAMES.customTags,
         path: `${EXAMPLES_ROOT}/CustomTags.vue`,
     },
     {
         key: "glossary",
-        name: "Glossary",
+        name: EXAMPLE_NAMES.glossary,
         path: `${EXAMPLES_ROOT}/Glossary.vue`,
     },
     {
         key: "links",
-        name: "Links",
+        name: EXAMPLE_NAMES.links,
         path: `${EXAMPLES_ROOT}/Links.vue`,
     },
     {
         key: "customInput",
-        name: "Custom Input",
+        name: EXAMPLE_NAMES.customInput,
         path: `${EXAMPLES_ROOT}/CustomInput.vue`,
     },
 ];

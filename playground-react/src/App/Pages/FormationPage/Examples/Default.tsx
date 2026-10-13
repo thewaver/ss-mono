@@ -3,7 +3,7 @@ import { useMemo } from "react";
 import { Formation, PlacementLayoutUtils, ProximityEffectUtils } from "@thewaver/ss-components-react";
 
 import { PageFormationItem } from "../../../StyledComponents/FormationContent/FormationContent";
-import type { FormationExampleProps } from "../FormationPage.types";
+import type { FormationExampleProps } from "../FormationPageReact.types";
 
 type Props = FormationExampleProps;
 

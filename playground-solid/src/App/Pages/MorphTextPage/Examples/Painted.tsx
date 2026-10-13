@@ -10,9 +10,9 @@ import {
 import * as styles from "@thewaver/ss-playground/App/Pages/MorphTextPage/MorphTextPage.css";
 import { CONTROL_GLYPHS } from "@thewaver/ss-playground/App/StyledComponents/ControlButtonContent/ControlButtonContent.const";
 
-import { computePaintDefs } from "../../../PageComponents/PaintPicker/PaintPicker.const";
+import { computePaintDefs } from "../../../PageComponents/PaintPicker/PaintPickerSolid.const";
 import { PageControlButtonContent } from "../../../StyledComponents/ControlButtonContent/ControlButtonContent";
-import type { MorphTextExampleProps } from "../MorphTextPage.types";
+import type { MorphTextExampleProps } from "../MorphTextPageSolid.types";
 
 const PAINT_SETTINGS = { colors: SVGDefsSamples.SAMPLE_COLORS, ...MORPH_PAINT_TIMING };
 

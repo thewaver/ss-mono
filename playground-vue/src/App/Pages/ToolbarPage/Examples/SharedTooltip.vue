@@ -9,7 +9,7 @@ import PageButtonContent from "../../../StyledComponents/ButtonContent/ButtonCon
 import PageMenuTriggerContent from "../../../StyledComponents/MenuTriggerContent/MenuTriggerContent.vue";
 import PageTooltipContent from "../../../StyledComponents/TooltipContent/TooltipContent.vue";
 import ToolbarOverflowItem from "../ToolbarOverflowItem.vue";
-import type { ToolbarExampleProps } from "../ToolbarPage.types";
+import type { ToolbarExampleProps } from "../ToolbarPageVue.types";
 import ToolbarPopup from "../ToolbarPopup.vue";
 
 const PLACEMENT: AnchorPlacement = { x: "center", y: "top_out" };

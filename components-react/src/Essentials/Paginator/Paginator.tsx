@@ -1,7 +1,6 @@
 import { Fragment, type MouseEvent, type ReactNode, useMemo } from "react";
 
 import {
-    type InteractionSizing,
     PAGINATOR_DEFAULTS,
     type PaginatorGapEntry,
     type PaginatorPageEntry,
@@ -11,14 +10,12 @@ import {
     PaginatorStyles,
     PaginatorUtils,
 } from "@thewaver/ss-components";
+import { PlacementConst } from "@thewaver/ss-components/internal";
 
 import { InteractionWrapper } from "../../Primitives/InteractionWrapper/InteractionWrapper";
 import { PlacementBox } from "../../Primitives/PlacementBox/PlacementBox";
 import { PlacementItem } from "../../Primitives/PlacementItem/PlacementItem";
 import type { PaginatorItemProps, PaginatorProps } from "./Paginator.types";
-
-const ROW_SIZING: InteractionSizing = "fit-content";
-const PLACED_SIZING: InteractionSizing = "fill";
 
 const PaginatorItem = <TExtra extends object>(props: PaginatorItemProps<TExtra>) => {
     const isDisabled = props.flags.isDisabled ?? false;
@@ -105,7 +102,7 @@ export const Paginator = (props: PaginatorProps) => {
         return renderPlaced(
             index,
             <InteractionWrapper<PaginatorStepRenderProps>
-                sizing={placement === undefined ? ROW_SIZING : PLACED_SIZING}
+                sizing={placement === undefined ? PlacementConst.ROW_SIZING : PlacementConst.PLACED_SIZING}
                 isDisabled={isStepDisabled}
                 extraFlags={{ step, targetPage, placement }}
                 renderControl={(setElementRef, renderProps) => (
@@ -131,7 +128,7 @@ export const Paginator = (props: PaginatorProps) => {
         return renderPlaced(
             index,
             <InteractionWrapper<PaginatorPageRenderProps>
-                sizing={placement === undefined ? ROW_SIZING : PLACED_SIZING}
+                sizing={placement === undefined ? PlacementConst.ROW_SIZING : PlacementConst.PLACED_SIZING}
                 isDisabled={isDisabled}
                 extraFlags={{ page: entry.page, isCurrent, placement }}
                 renderControl={(setElementRef, renderProps) => (

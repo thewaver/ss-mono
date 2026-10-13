@@ -1,11 +1,10 @@
 import type { PropsWithChildren } from "react";
 
+import { DEFAULT_SLIDE_BUTTON_CONTENT_WIDTH } from "@thewaver/ss-playground/App/StyledComponents/SlideButtonContent/SlideButtonContent.const";
 import * as styles from "@thewaver/ss-playground/App/StyledComponents/SlideButtonContent/SlideButtonContent.css";
 
 import { useLayerClass } from "../Layer/Layer.context";
-import type { SlideButtonContentProps } from "./SlideButtonContent.types";
-
-const DEFAULT_SLIDE_BUTTON_CONTENT_WIDTH = styles.SLIDE_BUTTON_WIDTH;
+import type { SlideButtonContentProps } from "./SlideButtonContentReact.types";
 
 const travel = (ratio: number) => `calc(${ratio} * (100% - ${styles.SLIDE_BUTTON_THUMB_SIZE}px))`;
 

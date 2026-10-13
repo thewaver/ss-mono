@@ -4,7 +4,7 @@ import { CLEARABLE_TABS, ROW_TAB_GAP } from "@thewaver/ss-playground/App/Pages/T
 import { PageControlColumn } from "../../../PageComponents/ControlRow/ControlRow";
 import { PageControlButtonContent } from "../../../StyledComponents/ControlButtonContent/ControlButtonContent";
 import { PageTabContent, PageTabFloater, PageTabGutter } from "../../../StyledComponents/TabContent/TabContent";
-import type { TabsExampleProps } from "../TabsPage.types";
+import type { TabsExampleProps } from "../TabsPageReact.types";
 
 export const CLEARABLE_TRANSITION_DURATION_MS = 600;
 

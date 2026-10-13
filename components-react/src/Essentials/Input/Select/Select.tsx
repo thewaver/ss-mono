@@ -8,6 +8,7 @@ import {
     SelectUtils,
     TextFieldUtils,
 } from "@thewaver/ss-components";
+import { SelectConst } from "@thewaver/ss-components/internal";
 import { CSSUtils } from "@thewaver/ss-utils";
 
 import { SignalMirrorReactUtils } from "../../../Abstracts/SignalMirror/SignalMirrorReact.utils";
@@ -22,9 +23,6 @@ import { LabelReactUtils } from "../Label/LabelReact.utils";
 import { ListboxOptions } from "../Listbox/Listbox";
 import { ListboxReactUtils } from "../Listbox/ListboxReact.utils";
 import type { SelectCompositeProps, SelectFieldProps, SelectProps } from "./Select.types";
-
-const EMPTY_QUERY = "";
-const EMPTY_SELECTION: never[] = [];
 
 const SelectField = (props: SelectFieldProps) => {
     const ariaLabel = LabelReactUtils.useAriaLabel(props.ariaLabel);
@@ -126,8 +124,8 @@ export const SelectComposite = <T,>(props: SelectCompositeProps<T>) => {
     const isDisabled = props.isDisabled ?? false;
     const isMultiple = props.isMultiple ?? false;
     const isFilterable = props.query !== undefined;
-    const query = props.query?.[0] ?? EMPTY_QUERY;
-    const isFiltering = query !== EMPTY_QUERY;
+    const query = props.query?.[0] ?? SelectConst.EMPTY_QUERY;
+    const isFiltering = query !== SelectConst.EMPTY_QUERY;
 
     if (wasOpen !== isOpen) {
         setWasOpen(isOpen);
@@ -188,7 +186,7 @@ export const SelectComposite = <T,>(props: SelectCompositeProps<T>) => {
     useEffect(() => {
         if (!SelectUtils.getIsQueryClearDue(isOpen, hasPopoverSettled, query)) return;
 
-        latestQueryState.current?.[1](EMPTY_QUERY);
+        latestQueryState.current?.[1](SelectConst.EMPTY_QUERY);
     }, [isOpen, hasPopoverSettled, query, latestQueryState]);
 
     const setFieldRef = useCallback(
@@ -300,7 +298,7 @@ export const Select = <T,>(props: SelectProps<T>) => {
     const selectedOptions = useMemo(() => {
         const selectedOption = SelectUtils.getFlatOptions(props.options).find((option) => option.value === value);
 
-        return selectedOption ? [selectedOption] : EMPTY_SELECTION;
+        return selectedOption ? [selectedOption] : SelectConst.EMPTY_SELECTION;
     }, [props.options, value]);
 
     return (

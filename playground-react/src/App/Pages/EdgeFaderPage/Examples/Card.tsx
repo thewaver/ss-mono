@@ -1,7 +1,7 @@
 import { EdgeFader } from "@thewaver/ss-components-react";
 import * as styles from "@thewaver/ss-playground/App/Pages/EdgeFaderPage/EdgeFaderPage.css";
 
-import type { EdgeFaderExampleProps } from "../EdgeFaderPage.types";
+import type { EdgeFaderExampleProps } from "../EdgeFaderPageReact.types";
 
 export const CardExample = (props: EdgeFaderExampleProps) => {
     return (

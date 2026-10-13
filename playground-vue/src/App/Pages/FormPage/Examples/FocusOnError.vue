@@ -11,7 +11,7 @@ import PageFormStack from "../../../StyledComponents/FormFieldContent/PageFormSt
 import PageGlideFloater from "../../../StyledComponents/GlideFloater/PageGlideFloater.vue";
 import PageSelectContent from "../../../StyledComponents/SelectContent/SelectContent.vue";
 import PageSelectOptionContent from "../../../StyledComponents/SelectOptionContent/SelectOptionContent.vue";
-import { PLACEHOLDER } from "../../SelectPage/SelectPage.const";
+import { PLACEHOLDER } from "../../SelectPage/SelectPageVue.const";
 import SelectPopup from "../../SelectPage/SelectPopup.vue";
 import type { FormFocusExampleProps } from "../FormPage.types";
 

@@ -4,8 +4,8 @@ import { PaintedText, access } from "@thewaver/ss-components-solid";
 import type { AccessorProps } from "@thewaver/ss-components-solid";
 import * as styles from "@thewaver/ss-playground/App/Pages/PaintedTextPage/PaintedTextPage.css";
 
-import { computeSampleDefs } from "../PaintedTextPage.const";
-import type { PaintedTextExampleProps } from "../PaintedTextPage.types";
+import { computeSampleDefs } from "../PaintedTextPageSolid.const";
+import type { PaintedTextExampleProps } from "../PaintedTextPageSolid.types";
 
 type Props = PaintedTextExampleProps &
     AccessorProps<{

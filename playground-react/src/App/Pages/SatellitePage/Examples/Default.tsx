@@ -1,7 +1,7 @@
 import { Satellite } from "@thewaver/ss-components-react";
 
 import { PageSatelliteBadge, PageSatelliteSubject } from "../../../StyledComponents/SatelliteContent/SatelliteContent";
-import type { SatelliteDefaultExampleProps } from "../SatellitePage.types";
+import type { SatelliteDefaultExampleProps } from "../SatellitePageReact.types";
 
 type Props = SatelliteDefaultExampleProps;
 

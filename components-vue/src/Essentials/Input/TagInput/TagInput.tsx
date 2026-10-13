@@ -7,6 +7,7 @@ import {
     TagInputStyles,
     TagInputUtils,
 } from "@thewaver/ss-components";
+import { TagInputConst } from "@thewaver/ss-components/internal";
 
 import { NavigatorVueUtils } from "../../../Abstracts/Navigator/NavigatorVue.utils";
 import { InteractionWrapper } from "../../../Primitives/InteractionWrapper/InteractionWrapper";
@@ -19,15 +20,13 @@ import { FormFieldVueUtils } from "../FormField/FormFieldVue.utils";
 import { LabelVueUtils } from "../Label/LabelVue.utils";
 import type { TagInputProps, TagInputSlots } from "./TagInput.types";
 
-const EMPTY_TEXT = "";
-
 export const TagInput = defineComponent(
     (props: TagInputProps, { slots, expose }: SlotsContext<TagInputSlots>) => {
         const ariaLabel = LabelVueUtils.useAriaLabel(() => props.ariaLabel);
         const ariaDescribedBy = FormFieldVueUtils.useAriaDescribedBy();
 
         const tags = useTwoWay(props, "value", []);
-        const text = useTwoWay(props, "text", EMPTY_TEXT);
+        const text = useTwoWay(props, "text", TagInputConst.EMPTY_TEXT);
 
         const fieldRef = shallowRef<HTMLInputElement>();
         const tagRefs: (HTMLElement | undefined)[] = [];
@@ -67,7 +66,7 @@ export const TagInput = defineComponent(
             if (!tag) return;
 
             setTags([...tags.value, tag]);
-            text.value = EMPTY_TEXT;
+            text.value = TagInputConst.EMPTY_TEXT;
         };
 
         const removeTag = (index: number) => {

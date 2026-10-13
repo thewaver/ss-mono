@@ -3,6 +3,12 @@ import { useState } from "react";
 import { MediaQueryMonitorReactUtils, SUNBURST_DEFAULTS, TreemapUtils } from "@thewaver/ss-components-react";
 import type { SunburstNode } from "@thewaver/ss-components-react";
 import { SunburstKnobs } from "@thewaver/ss-playground/App/Knobs/Sunbursts.const";
+import {
+    EXAMPLES_ROOT,
+    EXAMPLE_NAMES,
+    NO_MOTION_DURATION_MS,
+    WIDE_SPAN,
+} from "@thewaver/ss-playground/App/Pages/SunburstPage/SunburstPage.const";
 import { LIBRARY } from "@thewaver/ss-playground/App/Pages/TreemapPage/TreemapPage.const";
 
 import { PageExamples } from "../../PageComponents/Examples/Examples";
@@ -10,11 +16,6 @@ import { PageNumberField } from "../../PageComponents/Field/Field";
 import { PageProp } from "../../PageComponents/Prop/Prop";
 import { PagePropsPanel } from "../../PageComponents/PropsPanel/PropsPanel";
 import { LibraryExample } from "./Examples/Library";
-
-const EXAMPLES_ROOT = "/src/App/Pages/SunburstPage/Examples";
-
-const NO_MOTION_DURATION_MS = 0;
-const WIDE_SPAN = 2;
 
 export const SunburstPage = () => {
     const [ringCount, setRingCount] = useState(SUNBURST_DEFAULTS.ringCount);
@@ -29,7 +30,7 @@ export const SunburstPage = () => {
     const examples = [
         {
             key: "library",
-            name: "This library, by lines of code",
+            name: EXAMPLE_NAMES.library,
             span: WIDE_SPAN,
             readout: () =>
                 `showing ${showing} — press an arc with rings outside it to zoom into it, and the middle or Escape to come back out`,

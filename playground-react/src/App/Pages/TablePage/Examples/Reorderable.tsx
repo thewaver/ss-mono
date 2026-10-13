@@ -5,8 +5,8 @@ import { TABLE_ANNOUNCEMENTS } from "@thewaver/ss-playground/App/PageComponents/
 import * as styles from "@thewaver/ss-playground/App/Pages/TablePage/TablePage.css";
 
 import { PageTableMarker } from "../../../StyledComponents/TableContent/TableContent";
-import { PARTS, createPartColumns } from "../TablePage.const";
 import type { TableExampleProps } from "../TablePage.types";
+import { PARTS, createPartColumns } from "../TablePageReact.const";
 
 type Props = TableExampleProps & { order: readonly [string[], (order: string[]) => void] };
 

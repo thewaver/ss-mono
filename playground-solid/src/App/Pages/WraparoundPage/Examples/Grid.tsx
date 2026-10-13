@@ -4,7 +4,7 @@ import { Wraparound } from "@thewaver/ss-components-solid";
 import { GRID_CELLS } from "@thewaver/ss-playground/App/Pages/WraparoundPage/WraparoundPage.const";
 import * as styles from "@thewaver/ss-playground/App/Pages/WraparoundPage/WraparoundPage.css";
 
-import type { WraparoundExampleProps } from "../WraparoundPage.types";
+import type { WraparoundExampleProps } from "../WraparoundPageSolid.types";
 
 type Props = WraparoundExampleProps;
 

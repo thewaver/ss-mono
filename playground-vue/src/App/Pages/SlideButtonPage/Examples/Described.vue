@@ -5,7 +5,7 @@ import { SLIDE_BUTTON_THUMB_SIZE } from "@thewaver/ss-playground/App/StyledCompo
 import PageFormFieldCaption from "../../../StyledComponents/FormFieldContent/PageFormFieldCaption.vue";
 import PageFormFieldMessage from "../../../StyledComponents/FormFieldContent/PageFormFieldMessage.vue";
 import PageSlideButtonContent from "../../../StyledComponents/SlideButtonContent/SlideButtonContent.vue";
-import type { SlideButtonExampleProps } from "../SlideButtonPage.types";
+import type { SlideButtonExampleProps } from "../SlideButtonPageVue.types";
 
 const HINT = "Hold the button, or slide it all the way, to send.";
 

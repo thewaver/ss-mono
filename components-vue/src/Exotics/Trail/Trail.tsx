@@ -1,6 +1,7 @@
 import { type SlotsType, computed, defineComponent, shallowRef } from "vue";
 
 import { TRAIL_DEFAULTS, TrailStyles, TrailUtils } from "@thewaver/ss-components";
+import { TrailConst } from "@thewaver/ss-components/internal";
 import { MathUtils } from "@thewaver/ss-utils";
 
 import { InteractionTrackerVueUtils } from "../../Abstracts/InteractionTracker/InteractionTrackerVue.utils";
@@ -9,17 +10,13 @@ import { callSlot, declareProps, useTwoWay } from "../../Utils/propUtils";
 import type { SlotsContext } from "../../Utils/typeUtils";
 import type { TrailController, TrailProps, TrailSlots } from "./Trail.types";
 
-const NO_LENGTH = 0;
-const NO_PROGRESS = 0;
-const NO_OFFSET = 0;
-
 export const Trail = defineComponent(
     (props: TrailProps, { slots }: SlotsContext<TrailSlots>) => {
-        const progress = useTwoWay(props, "progress", NO_PROGRESS);
+        const progress = useTwoWay(props, "progress", TrailConst.NO_PROGRESS);
         const isPlaying = useTwoWay(props, "playback", true);
 
         const pathRef = shallowRef<SVGPathElement>();
-        const pathLength = shallowRef(NO_LENGTH);
+        const pathLength = shallowRef(TrailConst.NO_LENGTH);
 
         const isPageHidden = InteractionTrackerVueUtils.usePageHidden();
 
@@ -30,11 +27,14 @@ export const Trail = defineComponent(
 
         const isRunning = computed(
             () =>
-                isPlaying.value && !(props.isDisabled ?? false) && !isPageHidden.value && pathLength.value > NO_LENGTH,
+                isPlaying.value &&
+                !(props.isDisabled ?? false) &&
+                !isPageHidden.value &&
+                pathLength.value > TrailConst.NO_LENGTH,
         );
 
         watchAfterRender([() => props.path], () => {
-            pathLength.value = pathRef.value ? pathRef.value.getTotalLength() : NO_LENGTH;
+            pathLength.value = pathRef.value ? pathRef.value.getTotalLength() : TrailConst.NO_LENGTH;
         });
 
         const computePlace = (offset: number) =>
@@ -44,7 +44,7 @@ export const Trail = defineComponent(
                 TrailUtils.getTravelerProgress(progress.value, offset, getRunExtent(), getIsLooping()),
             );
 
-        const leadPlace = computed(() => computePlace(NO_OFFSET));
+        const leadPlace = computed(() => computePlace(TrailConst.NO_OFFSET));
 
         const controller: TrailController = {
             getPlace: () => leadPlace.value,

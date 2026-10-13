@@ -5,11 +5,16 @@ import type { DateValue, DateValueCalendarId, DateValueWeekStart } from "@thewav
 import { CALENDAR_DEFAULTS, DateValueUtils } from "@thewaver/ss-components-vue";
 import { CalendarKnobs } from "@thewaver/ss-playground/App/Knobs/Calendars.const";
 import {
+    CALENDAR_FIELD_WIDTH,
+    CALENDAR_IDS,
+    EXAMPLES_ROOT,
+    EXAMPLE_NAMES,
     MAX_DATE,
     MAX_YEAR,
     MIN_DATE,
     MIN_YEAR,
     TODAY,
+    WEEK_STARTS,
     WEEK_START_LABELS,
 } from "@thewaver/ss-playground/App/Pages/CalendarPage/CalendarPage.const";
 
@@ -24,11 +29,6 @@ import MonthPickerExample from "./Examples/MonthPicker.vue";
 import RightToLeftExample from "./Examples/RightToLeft.vue";
 import WeekdaysExample from "./Examples/Weekdays.vue";
 import YearPickerExample from "./Examples/YearPicker.vue";
-
-const CALENDAR_FIELD_WIDTH = 180;
-const EXAMPLES_ROOT = "/src/App/Pages/CalendarPage/Examples";
-const CALENDAR_IDS = DateValueUtils.getCalendarIds();
-const WEEK_STARTS: DateValueWeekStart[] = [...CalendarKnobs.WEEK_STARTS];
 
 const describe = (value: DateValue | undefined) => (value ? DateValueUtils.toIso(value) : "none");
 
@@ -64,40 +64,40 @@ const yearPickerPage = useMonthState(calendarId);
 const examples: ExampleDefs[] = [
     {
         key: "default",
-        name: "Default",
+        name: EXAMPLE_NAMES.default,
         readout: () => `value: ${describe(defaultValue.value)} — month: ${describe(defaultMonth.value)}`,
         path: `${EXAMPLES_ROOT}/Default.vue`,
     },
     {
         key: "bounded",
-        name: "Bounded",
+        name: EXAMPLE_NAMES.bounded,
         readout: () => `min ${describe(MIN_DATE)}, max ${describe(MAX_DATE)} — value: ${describe(rangedValue.value)}`,
         path: `${EXAMPLES_ROOT}/Bounded.vue`,
     },
     {
         key: "weekdays",
-        name: "Weekdays only",
+        name: EXAMPLE_NAMES.weekdays,
         readout: () =>
             `week starts on ${WEEK_START_LABELS[weekStartsOn.value]} — value: ${describe(weekdaysValue.value)}`,
         path: `${EXAMPLES_ROOT}/Weekdays.vue`,
     },
     {
         key: "rightToLeft",
-        name: "In a right-to-left box",
+        name: EXAMPLE_NAMES.rightToLeft,
         readout: () =>
             `value: ${describe(rightToLeftValue.value)} — the box around the calendar sets dir="rtl", so each week runs from the right and the right arrow moves to the day before`,
         path: `${EXAMPLES_ROOT}/RightToLeft.vue`,
     },
     {
         key: "monthPicker",
-        name: "Month picker",
+        name: EXAMPLE_NAMES.monthPicker,
         readout: () =>
             `value: ${describe(monthPickerValue.value)} — precision="month": the grid holds the year's months, a pick sets the first of the month, and the page keys step a year`,
         path: `${EXAMPLES_ROOT}/MonthPicker.vue`,
     },
     {
         key: "yearPicker",
-        name: "Year picker",
+        name: EXAMPLE_NAMES.yearPicker,
         readout: () =>
             `value: ${describe(yearPickerValue.value)} — precision="year": twelve years to a page, bounded to ${MIN_YEAR.year}–${MAX_YEAR.year}, and a pick sets the first day of the year`,
         path: `${EXAMPLES_ROOT}/YearPicker.vue`,

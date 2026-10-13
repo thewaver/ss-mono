@@ -2,7 +2,7 @@
     import { ScrambleTextWeights } from "@thewaver/ss-components-svelte";
     import * as styles from "@thewaver/ss-playground/App/Pages/TypewriterPage/TypewriterPage.css";
 
-    import { TypewriterKnobs } from "../../Knobs/Typewriters.const";
+    import { TypewriterKnobs } from "@thewaver/ss-playground/App/Knobs/Typewriters.const";
     import type { ExampleDefs } from "../../PageComponents/Examples/Examples.types";
     import PageExamples from "../../PageComponents/Examples/PageExamples.svelte";
     import PageNumberField from "../../PageComponents/Field/PageNumberField.svelte";
@@ -16,9 +16,13 @@
     import OutwardExample from "./Examples/Outward.svelte";
     import PhrasesExample from "./Examples/Phrases.svelte";
     import ScrollLitExample from "./Examples/ScrollLit.svelte";
-    import type { TypewriterExampleWrapperProps, TypewriterTextEffect } from "./TypewriterPage.types";
+    import type { TypewriterExampleWrapperProps, TypewriterTextEffect } from "./TypewriterPageSvelte.types";
+    import {
+    EXAMPLE_NAMES,
+    EXAMPLES_ROOT,
+    TEXT_EFFECTS,
+} from "@thewaver/ss-playground/App/Pages/TypewriterPage/TypewriterPage.const";
 
-    const TEXT_EFFECTS: TypewriterTextEffect[] = ["fade", "scale", "glow", "drop", "slide"];
     const TEXT_EFFECT_MAP: Record<TypewriterTextEffect, string> = {
         fade: styles.typewriterFade,
         scale: styles.typewriterScale,
@@ -26,8 +30,6 @@
         drop: styles.typewriterDrop,
         slide: styles.typewriterSlide,
     };
-
-    const EXAMPLES_ROOT = "/src/App/Pages/TypewriterPage/Examples";
 
     let textContainerWidth = $state(TypewriterKnobs.STARTING_WIDTH);
     let textEffect = $state<TypewriterTextEffect>(TypewriterKnobs.STARTING_TEXT_EFFECT);
@@ -45,19 +47,19 @@
     const examples: ExampleDefs[] = [
         {
             key: "complex",
-            name: "Complex",
+            name: EXAMPLE_NAMES.complex,
             component: complexExample,
             path: `${EXAMPLES_ROOT}/Complex.svelte`,
         },
         {
             key: "customInput",
-            name: "Custom Input",
+            name: EXAMPLE_NAMES.customInput,
             component: customInputExample,
             path: `${EXAMPLES_ROOT}/CustomInput.svelte`,
         },
         {
             key: "phrases",
-            name: "Phrases",
+            name: EXAMPLE_NAMES.phrases,
             readout: () =>
                 "the example owns the loop: each run's end either holds the phrase and switches to erasing, or moves to the next phrase and types it, and the caret is placed from the same progress the characters are drawn from",
             component: phrasesExample,
@@ -65,7 +67,7 @@
         },
         {
             key: "karaoke",
-            name: "Karaoke",
+            name: EXAMPLE_NAMES.karaoke,
             readout: () =>
                 "the line and the slider share one progress: singing writes it as it goes, and dragging the slider draws that moment — a stop can fall partway through a letter's own sweep",
             component: karaokeExample,
@@ -73,7 +75,7 @@
         },
         {
             key: "scrollLit",
-            name: "Lit by scrolling",
+            name: EXAMPLE_NAMES.scrollLit,
             readout: () =>
                 "playback is off and the progress is how far the paragraph has traveled up its box; the letters not yet reached show their animation's first frame, which is the dimmed text",
             component: scrollLitExample,
@@ -81,7 +83,7 @@
         },
         {
             key: "outward",
-            name: "Flying outward",
+            name: EXAMPLE_NAMES.outward,
             readout: () =>
                 "an animation per letter: the left half flies off to the left and the right half to the right, from the middle out, as the line crosses the middle of its box",
             component: outwardExample,

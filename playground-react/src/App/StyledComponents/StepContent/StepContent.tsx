@@ -1,18 +1,11 @@
 import type { PropsWithChildren } from "react";
 
 import { PlacementUtils } from "@thewaver/ss-components-react";
+import { MARKER_GLYPHS } from "@thewaver/ss-playground/App/StyledComponents/StepContent/StepContent.const";
 import * as styles from "@thewaver/ss-playground/App/StyledComponents/StepContent/StepContent.css";
 
 import { useLayerClass } from "../Layer/Layer.context";
-import type { StepArcConnectorProps, StepConnectorProps, StepContentProps } from "./StepContent.types";
-
-const MARKER_GLYPHS = {
-    done: "✓",
-    current: "",
-    failed: "!",
-    skipped: "–",
-    ahead: "",
-} as const;
+import type { StepArcConnectorProps, StepConnectorProps, StepContentProps } from "./StepContentReact.types";
 
 export const PageStepContent = (props: PropsWithChildren<StepContentProps>) => {
     const layerClass = useLayerClass();

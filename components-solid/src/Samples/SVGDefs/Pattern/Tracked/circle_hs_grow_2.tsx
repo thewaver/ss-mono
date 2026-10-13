@@ -1,15 +1,9 @@
-import {
-    type PatternProximityOpts,
-    SVGDefsUtils,
-    TrackedPatternDefaults,
-    TrackedPatternUtils,
-} from "@thewaver/ss-components";
+import { type PatternProximityOpts, SVGDefsUtils, TrackedPatternUtils } from "@thewaver/ss-components";
+import { CircleHsGrow2Const } from "@thewaver/ss-components/internal";
 import { MathUtils } from "@thewaver/ss-utils";
 
 import type { TrackedPatternConfig } from "../../SVGDefsSolid.types";
 import { SVGPatterns } from "../../SVGPatterns.const";
-
-const DEFAULTS = TrackedPatternDefaults.GROW_DEFAULTS;
 
 export const circle_hs_grow_2 = (opts?: PatternProximityOpts): TrackedPatternConfig => ({
     computeSVGDefs: (id, __, getRef, defs) => {
@@ -26,7 +20,7 @@ export const circle_hs_grow_2 = (opts?: PatternProximityOpts): TrackedPatternCon
                             `pattern1-${id}`,
                             getRef,
                             defs,
-                            TrackedPatternUtils.resolveOpts(opts, DEFAULTS),
+                            TrackedPatternUtils.resolveOpts(opts, CircleHsGrow2Const.DEFAULTS),
                             (cellId, index, isSplit, getLevel) => (
                                 <circle
                                     id={cellId}

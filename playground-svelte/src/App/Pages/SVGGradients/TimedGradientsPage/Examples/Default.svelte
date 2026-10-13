@@ -1,5 +1,5 @@
 <script lang="ts">
-    import { SVGDefsSamples, Shape } from "@thewaver/ss-components-svelte";
+    import { Shape, SVGDefsSampleConfigs, SVGDefsSamples } from "@thewaver/ss-components-svelte";
     import {
         NO_SAMPLE_KEY,
         computeNoSampleDefs,
@@ -7,8 +7,8 @@
     import * as styles from "@thewaver/ss-playground/App/Pages/SVGGradients/SVGGradients.css";
     import { ShapeConst, type Size2d } from "@thewaver/ss-utils";
 
-    import { STROKE_THICKNESS } from "../../SVGGradients.const";
-    import type { TimedGradientExampleProps } from "../../SVGGradients.types";
+    import { STROKE_THICKNESS } from "@thewaver/ss-playground/App/Pages/SVGGradients/SVGGradients.const";
+    import type { TimedGradientExampleProps } from "../../SVGGradientsSvelte.types";
 
     let props: TimedGradientExampleProps = $props();
 
@@ -19,7 +19,7 @@
     const computeDefs = (size: Size2d, element: HTMLElement | undefined) => {
         if (props.configKey === NO_SAMPLE_KEY) return computeNoSampleDefs(props.colors, props.paintKind);
 
-        return SVGDefsSamples.Gradient.Timed.toConfig({
+        return SVGDefsSampleConfigs.Gradient.Timed.toConfig({
             family: props.configKey,
             defs: props.configDefs,
         } as SVGDefsSamples.Gradient.Timed.Entry).computeSVGDefs(`${props.paintKind}-${id}`, undefined, element, {

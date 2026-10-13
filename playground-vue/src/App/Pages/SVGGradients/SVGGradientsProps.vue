@@ -1,13 +1,13 @@
 <script setup lang="ts">
 import type { SVGDefsColors } from "@thewaver/ss-components-vue";
+import { SVGGradientKnobs } from "@thewaver/ss-playground/App/Knobs/SVGGradients.const";
 import * as styles from "@thewaver/ss-playground/App/Pages/SVGGradients/SVGGradients.css";
 
-import { SVGGradientKnobs } from "../../Knobs/SVGGradients.const";
 import PageColorField from "../../PageComponents/Field/PageColorField.vue";
 import PageNumberField from "../../PageComponents/Field/PageNumberField.vue";
 import PageSelectField from "../../PageComponents/Field/PageSelectField.vue";
 import PageProp from "../../PageComponents/Prop/Prop.vue";
-import type { SVGGradientsControls, SVGGradientsPaintKind } from "./SVGGradients.types";
+import type { SVGGradientsControls, SVGGradientsPaintKind } from "./SVGGradientsVue.types";
 
 type Props = {
     controls: SVGGradientsControls;

@@ -6,16 +6,19 @@ export type BinarySwitchFlags = {
     checkedState: CheckedState;
 };
 
-export type BinarySwitchCbs = {
+export type BaseBinarySwitchCbs = {
     /** Runs when the switch is turned on or off. */
     onChange?: (isChecked: boolean) => void;
+};
+
+export type BinarySwitchCbs = BaseBinarySwitchCbs & {
     /** Runs when the pointer arrives over the switch. */
     onMouseEnter?: (e: MouseEvent) => void;
     /** Runs when the pointer leaves the switch. */
     onMouseLeave?: (e: MouseEvent) => void;
 };
 
-export type BinarySwitchState = {
+export type BaseBinarySwitchValues = {
     /** Whether this behaves as a checkbox, which can be turned off again, or as a radio, which cannot. */
     type: BinarySwitchType;
     /** Whether it announces itself as a switch rather than a checkbox, which changes what a reader hears it as. */
@@ -24,10 +27,15 @@ export type BinarySwitchState = {
     name?: string;
     /** Names the switch for assistive technology, where no label already does. */
     ariaLabel?: string;
-    /** Whether a value has to be given. It is announced and not enforced, because the library validates nothing. A radio leaves this to its group. */
+    /**
+     * Whether a value has to be given. It is announced and not enforced, because the library validates nothing. A
+     * radio leaves this to its group.
+     */
     isRequired?: boolean;
     /** Whether the switch is on. */
     isChecked: boolean;
     /** Whether the switch stands for a group whose members disagree, which is the third state between on and off. */
     isMixed?: boolean;
 };
+
+export type BaseBinarySwitchProps = BaseBinarySwitchValues & BaseBinarySwitchCbs;

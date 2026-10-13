@@ -6,7 +6,7 @@ import type { SatelliteDefs } from "@thewaver/ss-components-vue";
 
 import PageSatelliteBadge from "../../../StyledComponents/SatelliteContent/PageSatelliteBadge.vue";
 import PageSatelliteSubject from "../../../StyledComponents/SatelliteContent/PageSatelliteSubject.vue";
-import type { SatelliteDefaultExampleProps } from "../SatellitePage.types";
+import type { SatelliteDefaultExampleProps } from "../SatellitePageVue.types";
 
 type Props = SatelliteDefaultExampleProps;
 

@@ -4,11 +4,16 @@ import type { DateValue, DateValueCalendarId, DateValueWeekStart } from "@thewav
 import { CALENDAR_DEFAULTS, DateValueUtils } from "@thewaver/ss-components-react";
 import { CalendarKnobs } from "@thewaver/ss-playground/App/Knobs/Calendars.const";
 import {
+    CALENDAR_FIELD_WIDTH,
+    CALENDAR_IDS,
+    EXAMPLES_ROOT,
+    EXAMPLE_NAMES,
     MAX_DATE,
     MAX_YEAR,
     MIN_DATE,
     MIN_YEAR,
     TODAY,
+    WEEK_STARTS,
     WEEK_START_LABELS,
 } from "@thewaver/ss-playground/App/Pages/CalendarPage/CalendarPage.const";
 
@@ -22,11 +27,6 @@ import { MonthPickerExample } from "./Examples/MonthPicker";
 import { RightToLeftExample } from "./Examples/RightToLeft";
 import { WeekdaysExample } from "./Examples/Weekdays";
 import { YearPickerExample } from "./Examples/YearPicker";
-
-const CALENDAR_FIELD_WIDTH = 180;
-const EXAMPLES_ROOT = "/src/App/Pages/CalendarPage/Examples";
-const CALENDAR_IDS = DateValueUtils.getCalendarIds();
-const WEEK_STARTS: DateValueWeekStart[] = [...CalendarKnobs.WEEK_STARTS];
 
 const describe = (value: DateValue | undefined) => (value ? DateValueUtils.toIso(value) : "none");
 
@@ -58,21 +58,21 @@ export const CalendarPage = () => {
     const examples = [
         {
             key: "default",
-            name: "Default",
+            name: EXAMPLE_NAMES.default,
             readout: () => `value: ${describe(defaultValue[0])} — month: ${describe(defaultMonth[0])}`,
             component: () => <DefaultExample value={defaultValue} month={defaultMonth} weekStartsOn={weekStartsOn} />,
             path: `${EXAMPLES_ROOT}/Default.tsx`,
         },
         {
             key: "bounded",
-            name: "Bounded",
+            name: EXAMPLE_NAMES.bounded,
             readout: () => `min ${describe(MIN_DATE)}, max ${describe(MAX_DATE)} — value: ${describe(rangedValue[0])}`,
             component: () => <BoundedExample value={rangedValue} month={rangedMonth} weekStartsOn={weekStartsOn} />,
             path: `${EXAMPLES_ROOT}/Bounded.tsx`,
         },
         {
             key: "weekdays",
-            name: "Weekdays only",
+            name: EXAMPLE_NAMES.weekdays,
             readout: () => `week starts on ${WEEK_START_LABELS[weekStartsOn]} — value: ${describe(weekdaysValue[0])}`,
             component: () => (
                 <WeekdaysExample value={weekdaysValue} month={weekdaysMonth} weekStartsOn={weekStartsOn} />
@@ -81,7 +81,7 @@ export const CalendarPage = () => {
         },
         {
             key: "rightToLeft",
-            name: "In a right-to-left box",
+            name: EXAMPLE_NAMES.rightToLeft,
             readout: () =>
                 `value: ${describe(rightToLeftValue[0])} — the box around the calendar sets dir="rtl", so each week runs from the right and the right arrow moves to the day before`,
             component: () => (
@@ -91,7 +91,7 @@ export const CalendarPage = () => {
         },
         {
             key: "monthPicker",
-            name: "Month picker",
+            name: EXAMPLE_NAMES.monthPicker,
             readout: () =>
                 `value: ${describe(monthPickerValue[0])} — precision="month": the grid holds the year's months, a pick sets the first of the month, and the page keys step a year`,
             component: () => <MonthPickerExample value={monthPickerValue} month={monthPickerPage} />,
@@ -99,7 +99,7 @@ export const CalendarPage = () => {
         },
         {
             key: "yearPicker",
-            name: "Year picker",
+            name: EXAMPLE_NAMES.yearPicker,
             readout: () =>
                 `value: ${describe(yearPickerValue[0])} — precision="year": twelve years to a page, bounded to ${MIN_YEAR.year}–${MAX_YEAR.year}, and a pick sets the first day of the year`,
             component: () => <YearPickerExample value={yearPickerValue} month={yearPickerPage} />,

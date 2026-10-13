@@ -1,12 +1,13 @@
 import { access } from "@thewaver/ss-components-solid";
+import {
+    LABEL_HIDDEN,
+    LABEL_SHOWN,
+    MIN_LABEL_HEIGHT,
+} from "@thewaver/ss-playground/App/StyledComponents/IcicleContent/IcicleContent.const";
 import * as styles from "@thewaver/ss-playground/App/StyledComponents/IcicleContent/IcicleContent.css";
 
 import { useLayerClass } from "../Layer/Layer.context";
-import type { PageIcicleCellProps } from "./IcicleContent.types";
-
-const MIN_LABEL_HEIGHT = 16;
-const LABEL_SHOWN = 1;
-const LABEL_HIDDEN = 0;
+import type { PageIcicleCellProps } from "./IcicleContentSolid.types";
 
 export const PageIcicleCell = (props: PageIcicleCellProps) => {
     const getLayerClass = useLayerClass();

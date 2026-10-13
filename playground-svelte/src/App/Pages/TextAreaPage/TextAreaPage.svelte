@@ -1,10 +1,12 @@
 <script lang="ts">
     import {
-        LONG_TEXT,
-        MAX_ROWS,
-        MIN_ROWS,
-        REVIEW_LIMIT,
-    } from "@thewaver/ss-playground/App/Pages/TextAreaPage/TextAreaPage.const";
+    EXAMPLE_NAMES,
+    EXAMPLES_ROOT,
+    LONG_TEXT,
+    MAX_ROWS,
+    MIN_ROWS,
+    REVIEW_LIMIT,
+} from "@thewaver/ss-playground/App/Pages/TextAreaPage/TextAreaPage.const";
 
     import type { ExampleDefs } from "../../PageComponents/Examples/Examples.types";
     import PageExamples from "../../PageComponents/Examples/PageExamples.svelte";
@@ -16,8 +18,6 @@
     import LabeledExample from "./Examples/Labeled.svelte";
     import ReachableExample from "./Examples/Reachable.svelte";
     import ReadOnlyExample from "./Examples/ReadOnly.svelte";
-
-    const EXAMPLES_ROOT = "/src/App/Pages/TextAreaPage/Examples";
 
     let fixedValue = $state("");
     let growingValue = $state("");
@@ -31,14 +31,14 @@
     const examples: ExampleDefs[] = [
         {
             key: "fixedHeight",
-            name: "Fixed height",
+            name: EXAMPLE_NAMES.fixedHeight,
             readout: () => `length: ${fixedValue.length} — the painter sizes the box and it stays put`,
             component: fixedHeightExample,
             path: `${EXAMPLES_ROOT}/FixedHeight.svelte`,
         },
         {
             key: "autoSizing",
-            name: "Auto-sizing",
+            name: EXAMPLE_NAMES.autoSizing,
             readout: () =>
                 `length: ${growingValue.length} — grows from ${MIN_ROWS} rows with no ceiling, so it never scrolls`,
             component: autoSizingExample,
@@ -46,42 +46,42 @@
         },
         {
             key: "autoSizingCapped",
-            name: "Auto-sizing, capped",
+            name: EXAMPLE_NAMES.autoSizingCapped,
             readout: () => `length: ${cappedValue.length} — stops growing at ${MAX_ROWS} rows and scrolls`,
             component: autoSizingCappedExample,
             path: `${EXAMPLES_ROOT}/AutoSizingCapped.svelte`,
         },
         {
             key: "readOnly",
-            name: "Read-only",
+            name: EXAMPLE_NAMES.readOnly,
             readout: () => `length: ${readOnlyValue.length} — selectable and copyable, never editable`,
             component: readOnlyExample,
             path: `${EXAMPLES_ROOT}/ReadOnly.svelte`,
         },
         {
             key: "disabled",
-            name: "Disabled",
+            name: EXAMPLE_NAMES.disabled,
             readout: () => `length: ${disabledValue.length}`,
             component: disabledExample,
             path: `${EXAMPLES_ROOT}/Disabled.svelte`,
         },
         {
             key: "reachable",
-            name: "Disabled + reachable",
+            name: EXAMPLE_NAMES.reachable,
             readout: () => `length: ${reachableValue.length}`,
             component: reachableExample,
             path: `${EXAMPLES_ROOT}/Reachable.svelte`,
         },
         {
             key: "errored",
-            name: "Error",
+            name: EXAMPLE_NAMES.errored,
             readout: () => `length: ${erroredValue.length} — fewer than ${REVIEW_LIMIT} characters is an error`,
             component: erroredExample,
             path: `${EXAMPLES_ROOT}/Errored.svelte`,
         },
         {
             key: "label",
-            name: "In a Label",
+            name: EXAMPLE_NAMES.label,
             readout: () => `length: ${labeledValue.length}`,
             component: labeledExample,
             path: `${EXAMPLES_ROOT}/Labeled.svelte`,

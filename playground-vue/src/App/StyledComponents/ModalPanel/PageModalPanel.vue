@@ -2,7 +2,7 @@
 import * as styles from "@thewaver/ss-playground/App/StyledComponents/ModalPanel/ModalPanel.css";
 
 import PageLayer from "../../PageComponents/Layer/Layer.vue";
-import type { ModalPanelProps } from "./ModalPanel.types";
+import type { ModalPanelProps } from "./ModalPanelVue.types";
 
 defineProps<ModalPanelProps>();
 </script>

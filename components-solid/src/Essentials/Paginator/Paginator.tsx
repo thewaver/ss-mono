@@ -3,7 +3,6 @@ import { Index, Show, createMemo } from "solid-js";
 import { Dynamic } from "solid-js/web";
 
 import {
-    type InteractionSizing,
     PAGINATOR_DEFAULTS,
     type PaginatorGapEntry,
     type PaginatorPageEntry,
@@ -13,15 +12,13 @@ import {
     PaginatorUtils,
     PaginatorStyles as styles,
 } from "@thewaver/ss-components";
+import { PlacementConst } from "@thewaver/ss-components/internal";
 
 import { InteractionWrapper } from "../../Primitives/InteractionWrapper/InteractionWrapper";
 import { PlacementBox } from "../../Primitives/PlacementBox/PlacementBox";
 import { PlacementItem } from "../../Primitives/PlacementItem/PlacementItem";
 import { access } from "../../Utils/propUtils";
 import type { PaginatorItemProps, PaginatorProps } from "./PaginatorSolid.types";
-
-const ROW_SIZING: InteractionSizing = "fit-content";
-const PLACED_SIZING: InteractionSizing = "fill";
 
 const PaginatorItem = (props: PaginatorItemProps) => {
     const getIsDisabled = () => access(props.flags).isDisabled ?? false;
@@ -102,7 +99,8 @@ export const Paginator = (props: PaginatorProps) => {
 
     const getPlacementAt = (index: number) => getLayout()?.placements[index];
 
-    const getSizingAt = (index: number) => (getPlacementAt(index) === undefined ? ROW_SIZING : PLACED_SIZING);
+    const getSizingAt = (index: number) =>
+        getPlacementAt(index) === undefined ? PlacementConst.ROW_SIZING : PlacementConst.PLACED_SIZING;
 
     const getEntryAt = (index: number) => getLeadingSteps().length + index;
 

@@ -1,5 +1,5 @@
 <script lang="ts">
-    import { SVGDefsSamples, Surface } from "@thewaver/ss-components-svelte";
+    import { Surface, SVGDefsSampleConfigs } from "@thewaver/ss-components-svelte";
     import type { SurfaceProps } from "@thewaver/ss-components-svelte";
     import * as styles from "@thewaver/ss-playground/App/Pages/SurfacePage/Examples/Avatar/Avatar.css";
     import knight_profile from "@thewaver/ss-playground/App/knight_profile.webp";
@@ -9,7 +9,7 @@
         borderRadii: CSSUtils.spreadRadius(styles.width * 0.5),
         borderWidths: CSSUtils.spreadWidth(4),
         computeStrokeDefs: (size, element) =>
-            SVGDefsSamples.Gradient.Timed.toConfig({ family: "sweep_diag_async_4" }).computeSVGDefs(
+            SVGDefsSampleConfigs.Gradient.Timed.toConfig({ family: "sweep_diag_async_4" }).computeSVGDefs(
                 strokeId,
                 undefined,
                 element,

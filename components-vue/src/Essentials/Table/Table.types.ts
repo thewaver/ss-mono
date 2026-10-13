@@ -1,7 +1,7 @@
 import type { VNodeChild } from "vue";
 
 import type {
-    SelectionMode,
+    BaseTableProps,
     TableAnnouncements,
     TableCellRenderProps,
     TableColumnDefs,
@@ -39,56 +39,23 @@ export type TableOrderProps =
           "onUpdate:order"?: undefined;
       };
 
-export type TableProps<T> = TableOrderProps & {
-    /**
-     * Names the table for assistive technology. It is required because nothing else can name it, and a page with two
-     * unnamed grids gives a reader no way to tell them apart.
-     */
-    "ariaLabel": string;
-    /** Whether rows cannot be selected, one can be, or many can be. */
-    "selectionMode"?: SelectionMode;
-    /** How far one press of an arrow key resizes a column, for resizing without a pointer. */
-    "resizeStepPx"?: number;
-    /** How many rows Page Up and Page Down move by. */
-    "pageRows"?: number;
-    /**
-     * How wide the grab area between two columns is. It is a hit target rather than a visible width, so it can be wider
-     * than the line that is drawn.
-     */
-    "resizerWidthPx"?: number;
-    /** Turns the table off, so nothing in it sorts, resizes, reorders or selects. */
-    "isDisabled"?: boolean;
-    /** Which column the table is sorted by and which way. It is the only thing that sorts it. */
-    "sort"?: TableSort;
-    /** Receives the sort the reader asks for, which is what `v-model:sort` binds. */
-    "onUpdate:sort"?: (sort: TableSort | undefined) => void;
-    /** How wide each column is, by column id. It is the only thing that resizes them. */
-    "widths"?: Record<string, number>;
-    /** Receives the widths as a column is resized, which is what `v-model:widths` binds. */
-    "onUpdate:widths"?: (widths: Record<string, number>) => void;
-    /**
-     * Guesses how tall a row will be before it is drawn, which is what lets a long table render only what is on screen.
-     */
-    "computeEstimatedRowHeight"?: (index: number) => number;
-    /** Runs when the reader sorts by a different column, or reverses the one it is sorted by. */
-    "onSortChange"?: (sort: TableSort | undefined) => void;
-    /** Runs when the reader moves a column. */
-    "onOrderChange"?: (order: string[]) => void;
-    /** The columns, each carrying its own id and how it is drawn. */
-    "columns": TableColumn<T>[];
-    /** The rows, in the order they are shown. */
-    "rows": T[];
-    /** Which rows are selected. It is the only thing that selects them. */
-    "selection"?: T[];
-    /** Receives the rows the reader selects, which is what `v-model:selection` binds. */
-    "onUpdate:selection"?: (rows: T[]) => void;
-    /** Names one row for assistive technology, so a reader hears what the row is rather than its number. */
-    "computeRowAriaLabel"?: (row: T, index: number) => string;
-    /** Runs when a row is activated, by pointer or by key. */
-    "onRowActivate"?: (row: T, index: number) => void;
-    /** Runs when the selection changes. */
-    "onSelectionChange"?: (rows: T[]) => void;
-};
+export type TableProps<T> = TableOrderProps &
+    BaseTableProps<T> & {
+        /** Which column the table is sorted by and which way. It is the only thing that sorts it. */
+        "sort"?: TableSort;
+        /** Receives the sort the reader asks for, which is what `v-model:sort` binds. */
+        "onUpdate:sort"?: (sort: TableSort | undefined) => void;
+        /** How wide each column is, by column id. It is the only thing that resizes them. */
+        "widths"?: Record<string, number>;
+        /** Receives the widths as a column is resized, which is what `v-model:widths` binds. */
+        "onUpdate:widths"?: (widths: Record<string, number>) => void;
+        /** The columns, each carrying its own id and how it is drawn. */
+        "columns": TableColumn<T>[];
+        /** Which rows are selected. It is the only thing that selects them. */
+        "selection"?: T[];
+        /** Receives the rows the reader selects, which is what `v-model:selection` binds. */
+        "onUpdate:selection"?: (rows: T[]) => void;
+    };
 
 export type TableSlots = {
     /** Draws the grab handle between two columns. */

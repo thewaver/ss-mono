@@ -1,6 +1,7 @@
 import { type SlotsType, computed, defineComponent, shallowRef } from "vue";
 
 import { BarrelUtils, DIE_DEFAULTS, DieStyles, DieUtils } from "@thewaver/ss-components";
+import { DieConst } from "@thewaver/ss-components/internal";
 
 import { RollerVueUtils } from "../../../Abstracts/Roller/RollerVue.utils";
 import { watchAfterRender } from "../../../Utils/effectUtils";
@@ -8,21 +9,18 @@ import { callSlot, declareProps, useTwoWay } from "../../../Utils/propUtils";
 import type { SlotsContext } from "../../../Utils/typeUtils";
 import type { DieController, DieProps, DieSlots } from "./Die.types";
 
-const HALF = 0.5;
-const FIRST_FACE = 0;
-
 export const Die = defineComponent(
     (props: DieProps, { slots }: SlotsContext<DieSlots>) => {
-        const face = useTwoWay(props, "face", FIRST_FACE);
+        const face = useTwoWay(props, "face", DieConst.FIRST_FACE);
 
         const rootRef = shallowRef<HTMLElement>();
 
-        const geometry = computed(() => DieUtils.computeFaceGeometry(props.shape, props.size * HALF));
+        const geometry = computed(() => DieUtils.computeFaceGeometry(props.shape, props.size * DieConst.HALF));
         const isMovable = computed(() => props.isMovable ?? DIE_DEFAULTS.isMovable);
 
         const roller = RollerVueUtils.useRoller(rootRef, false, {
             faces: geometry,
-            radius: () => props.size * HALF,
+            radius: () => props.size * DieConst.HALF,
             targetFace: face,
             isAutoSpinEnabled: () => props.autoSpin,
             rollDurationMs: () => props.rollDurationMs,

@@ -1,12 +1,11 @@
 import { useRef } from "react";
 
 import { PointerEffectsUtils, TILTER_DEFAULTS, TilterStyles } from "@thewaver/ss-components";
+import { TilterConst } from "@thewaver/ss-components/internal";
 
 import { PointerTrackerReactUtils } from "../../../Abstracts/PointerTracker/PointerTrackerReact.utils";
 import { SmootherReactUtils } from "../../../Abstracts/Smoother/SmootherReact.utils";
 import type { TilterProps } from "./Tilter.types";
-
-const NO_LEAN = 0;
 
 export const Tilter = (props: TilterProps) => {
     const ref = useRef<HTMLDivElement | null>(null);
@@ -24,7 +23,7 @@ export const Tilter = (props: TilterProps) => {
     const boxRatio = PointerEffectsUtils.getBoxRatio(reading);
 
     const strength = isResting
-        ? NO_LEAN
+        ? TilterConst.NO_LEAN
         : PointerEffectsUtils.computeEdgeStrength(reading, props.tiltRangePx ?? TILTER_DEFAULTS.tiltRangePx);
 
     const lean = SmootherReactUtils.useSmoothed(

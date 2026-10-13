@@ -3,16 +3,11 @@
     import type { Attachment } from "svelte/attachments";
 
     import { SATELLITE_DEFAULTS, SatelliteUtils, SatelliteStyles as styles } from "@thewaver/ss-components";
+    import { SatelliteConst } from "@thewaver/ss-components/internal";
 
     import { ElementObserverSvelteUtils } from "../../../Abstracts/ElementObserver/ElementObserverSvelte.utils.svelte.js";
     import type { SatelliteDefs, SatelliteProps } from "./Satellite.types.js";
 
-    const BEHIND_Z_INDEX = 0;
-    const SUBJECT_Z_INDEX = 1;
-    const FRONT_Z_INDEX = 2;
-    const NOTHING = 0;
-    const UNMEASURED = { width: 0, height: 0 };
-    const UNPLACED = { x: 0, y: 0 };
     const NO_SATELLITES: SatelliteDefs[] = [];
 
     let props: SatelliteProps = $props();
@@ -21,7 +16,7 @@
     let satelliteRefs = $state.raw<Array<HTMLElement | undefined>>([]);
 
     const satellites = $derived(props.satellites ?? NO_SATELLITES);
-    const hasSatellites = $derived(satellites.length > NOTHING);
+    const hasSatellites = $derived(satellites.length > SatelliteConst.NOTHING);
 
     const getSubjectSize = ElementObserverSvelteUtils.createBorderBoxSizeObserver(
         () => subject ?? undefined,
@@ -57,7 +52,7 @@
         SatelliteUtils.computeLayout(
             getSubjectSize(),
             satellites.map((satellite, index) => ({
-                size: getSatelliteSizes()[index] ?? UNMEASURED,
+                size: getSatelliteSizes()[index] ?? SatelliteConst.UNMEASURED,
                 placement: satellite.placement ?? SATELLITE_DEFAULTS.placement,
                 offset: satellite.offset ?? SATELLITE_DEFAULTS.offset,
             })),
@@ -75,20 +70,20 @@
         style:padding-right={`${layout.padding.paddingRight}px`}
         style:padding-bottom={`${layout.padding.paddingBottom}px`}
     >
-        <div bind:this={subject} class={styles.satelliteSubject} style:z-index={SUBJECT_Z_INDEX}>
+        <div bind:this={subject} class={styles.satelliteSubject} style:z-index={SatelliteConst.SUBJECT_Z_INDEX}>
             {@render props.children?.()}
         </div>
 
         {#each satellites as satellite, index (index)}
-            {@const offset = layout.satelliteOffsets[index] ?? UNPLACED}
+            {@const offset = layout.satelliteOffsets[index] ?? SatelliteConst.UNPLACED}
             <div
                 {@attach attachSatellite(index)}
                 class={styles.satelliteBody}
                 style:left={`${offset.x}px`}
                 style:top={`${offset.y}px`}
                 style:z-index={(satellite.isBehindSubject ?? SATELLITE_DEFAULTS.isBehindSubject)
-                    ? BEHIND_Z_INDEX
-                    : FRONT_Z_INDEX}
+                    ? SatelliteConst.BEHIND_Z_INDEX
+                    : SatelliteConst.FRONT_Z_INDEX}
             >
                 {@render satellite.renderSatellite()}
             </div>

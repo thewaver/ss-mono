@@ -15,7 +15,7 @@ import { assignInlineVars } from "@vanilla-extract/dynamic";
 import { PageLayer } from "../../../PageComponents/Layer/Layer";
 import { PageNavMenuTrigger } from "../../../StyledComponents/NavMenuContent/NavMenuContent";
 import { PagePopoverSurface } from "../../../StyledComponents/PopoverSurface/PopoverSurface";
-import type { NavFlyoutProps, NavMenuEntry, NavigationMenuExampleProps } from "../HoverCardPage.types";
+import type { NavFlyoutProps, NavMenuEntry, NavigationMenuExampleProps } from "../HoverCardPageSolid.types";
 
 const FLYOUT_PLACEMENT: AnchorPlacement = { x: "left_in", y: "bottom_out" };
 const FLYOUT_OFFSET = { x: 0, y: 6 };

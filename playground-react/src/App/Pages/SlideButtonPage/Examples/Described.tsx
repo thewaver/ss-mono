@@ -6,7 +6,7 @@ import {
     PageFormFieldMessage,
 } from "../../../StyledComponents/FormFieldContent/FormFieldContent";
 import { PageSlideButtonContent } from "../../../StyledComponents/SlideButtonContent/SlideButtonContent";
-import type { SlideButtonExampleProps } from "../SlideButtonPage.types";
+import type { SlideButtonExampleProps } from "../SlideButtonPageReact.types";
 
 const HINT = "Hold the button, or slide it all the way, to send.";
 

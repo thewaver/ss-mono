@@ -10,14 +10,17 @@
     import PageNumberField from "../../PageComponents/Field/PageNumberField.svelte";
     import PageProp from "../../PageComponents/Prop/Prop.svelte";
     import PagePropsPanel from "../../PageComponents/PropsPanel/PagePropsPanel.svelte";
-    import type { CornersExampleProps } from "./CornersPage.types";
+    import type { CornersExampleProps } from "./CornersPageSvelte.types";
     import ControlExample from "./Examples/Control.svelte";
     import DefaultExample from "./Examples/Default.svelte";
     import DrawOnExample from "./Examples/DrawOn.svelte";
     import FocusFollowExample from "./Examples/FocusFollow.svelte";
     import OverlayExample from "./Examples/Overlay.svelte";
-
-    const EXAMPLES_ROOT = "/src/App/Pages/CornersPage/Examples";
+    import {
+    EXAMPLE_NAMES,
+    EXAMPLES_ROOT,
+    FIELD_WIDTH,
+} from "@thewaver/ss-playground/App/Pages/CornersPage/CornersPage.const";
 
     const CORNER_LABELS: Record<CornerKey, string> = {
         top_left: "Top left",
@@ -25,8 +28,6 @@
         bottom_left: "Bottom left",
         bottom_right: "Bottom right",
     };
-
-    const FIELD_WIDTH = 110;
 
     let color = $state(CornerKnobs.STARTING_COLOR);
     let lengthAcross = $state(CornerKnobs.STARTING_LENGTH);
@@ -56,7 +57,7 @@
     const examples: ExampleDefs[] = [
         {
             key: "default",
-            name: "Around a box",
+            name: EXAMPLE_NAMES.default,
             readout: () =>
                 "each bracket is a single polygon rather than two rules, so the arm lengths and the thickness are numbers rather than a border pretending to be one",
             component: defaultExample,
@@ -64,7 +65,7 @@
         },
         {
             key: "control",
-            name: "As a control's decoration",
+            name: EXAMPLE_NAMES.control,
             readout: () =>
                 "press it — the color transitions rather than switching, which is the whole reason the component owns a duration",
             component: controlExample,
@@ -72,7 +73,7 @@
         },
         {
             key: "overlay",
-            name: "Over content it does not own",
+            name: EXAMPLE_NAMES.overlay,
             readout: () =>
                 "the button underneath still takes a press, because the layer carrying the brackets refuses the pointer and says nothing to a screen reader",
             component: overlayExample,
@@ -80,7 +81,7 @@
         },
         {
             key: "focusFollow",
-            name: "Following focus and hover",
+            name: EXAMPLE_NAMES.focusFollow,
             readout: () =>
                 "one set of marks glides to whichever control is hovered or reached by the keyboard, around the control's own focus ring rather than instead of it — and jumps rather than glides under reduced motion",
             component: focusFollowExample,
@@ -88,7 +89,7 @@
         },
         {
             key: "drawOn",
-            name: "Drawn on",
+            name: EXAMPLE_NAMES.drawOn,
             readout: () =>
                 "the arm length grows from nothing as the marks appear, so they draw out of each corner — at full length at once under reduced motion",
             component: drawOnExample,

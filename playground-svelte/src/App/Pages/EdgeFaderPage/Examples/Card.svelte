@@ -2,7 +2,7 @@
     import { EdgeFader } from "@thewaver/ss-components-svelte";
     import * as styles from "@thewaver/ss-playground/App/Pages/EdgeFaderPage/EdgeFaderPage.css";
 
-    import type { EdgeFaderExampleProps } from "../EdgeFaderPage.types";
+    import type { EdgeFaderExampleProps } from "../EdgeFaderPageSvelte.types";
 
     let props: EdgeFaderExampleProps = $props();
 </script>

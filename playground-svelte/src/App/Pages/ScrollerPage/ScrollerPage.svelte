@@ -11,9 +11,11 @@
     import ChipsExample from "./Examples/Chips.svelte";
     import FocusableChildrenExample from "./Examples/FocusableChildren.svelte";
     import TabbedExample from "./Examples/Tabbed.svelte";
-
-    const EXAMPLES_ROOT = "/src/App/Pages/ScrollerPage/Examples";
-    const PERCENT = 100;
+    import {
+    EXAMPLE_NAMES,
+    EXAMPLES_ROOT,
+    PERCENT,
+} from "@thewaver/ss-playground/App/Pages/ScrollerPage/ScrollerPage.const";
 
     const MONTHS = [
         "January",
@@ -41,7 +43,7 @@
     const examples: ExampleDefs[] = [
         {
             key: "split",
-            name: "One button at each end",
+            name: EXAMPLE_NAMES.split,
             readout: () =>
                 `${itemCount} items, ${Math.round(progress * PERCENT)}% along — the buttons stop at the ends rather than wrapping round, and leave altogether once everything fits`,
             component: splitExample,
@@ -49,21 +51,21 @@
         },
         {
             key: "bothButtonsEnd",
-            name: "Both buttons at the end",
+            name: EXAMPLE_NAMES.bothButtonsEnd,
             readout: () => "the same control with its buttons together instead of split",
             component: bothButtonsEndExample,
             path: `${EXAMPLES_ROOT}/Chips.svelte`,
         },
         {
             key: "bothButtonsStart",
-            name: "Both buttons at the start",
+            name: EXAMPLE_NAMES.bothButtonsStart,
             readout: () => "and the same pair on the other side",
             component: bothButtonsStartExample,
             path: `${EXAMPLES_ROOT}/Chips.svelte`,
         },
         {
             key: "tabbed",
-            name: "Focus reveals what it lands on",
+            name: EXAMPLE_NAMES.tabbed,
             readout: () =>
                 `selected: ${selectedMonth} — a tab already fully in view does not move the strip, and one cut off by the edge scrolls into view whole`,
             component: tabbedExample,
@@ -71,7 +73,7 @@
         },
         {
             key: "focusableChildren",
-            name: "Focusable children of any kind",
+            name: EXAMPLE_NAMES.focusableChildren,
             readout: () => "the track holds whatever it is given, and tabbing through pulls the strip along",
             component: focusableChildrenExample,
             path: `${EXAMPLES_ROOT}/FocusableChildren.svelte`,

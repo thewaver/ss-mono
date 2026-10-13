@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import * as styles from "@thewaver/ss-playground/App/StyledComponents/SidebarContent/SidebarContent.css";
 
-import type { SidebarFrameProps } from "./SidebarContent.types";
+import type { SidebarFrameProps } from "./SidebarContentVue.types";
 
 defineProps<SidebarFrameProps>();
 </script>

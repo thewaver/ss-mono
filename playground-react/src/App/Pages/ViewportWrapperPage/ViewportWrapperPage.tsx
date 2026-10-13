@@ -1,9 +1,18 @@
 import type { ReactNode } from "react";
 import { useMemo, useRef, useState } from "react";
 
-import type { AnchorPlacement, SelectOption, Toast } from "@thewaver/ss-components-react";
+import type { AnchorPlacement, Toast } from "@thewaver/ss-components-react";
 import { Button, Range, Select, Toasts, ViewportWrapper, useViewportContext } from "@thewaver/ss-components-react";
 import { ViewportWrapperKnobs } from "@thewaver/ss-playground/App/Knobs/ViewportWrappers.const";
+import {
+    COUNTRIES,
+    EXAMPLE_NAMES,
+    INNER_TOAST_GAP,
+    INNER_TOAST_MARGIN,
+    INNER_TOAST_MESSAGE,
+    PERCENT,
+    SCROLL_SIZE,
+} from "@thewaver/ss-playground/App/Pages/ViewportWrapperPage/ViewportWrapperPage.const";
 import * as styles from "@thewaver/ss-playground/App/Pages/ViewportWrapperPage/ViewportWrapperPage.css";
 import { RANGE_THUMB_SIZE } from "@thewaver/ss-playground/App/StyledComponents/RangeContent/RangeContent.css";
 
@@ -15,30 +24,8 @@ import { PageRangeContent } from "../../StyledComponents/RangeContent/RangeConte
 import { PageSelectContent } from "../../StyledComponents/SelectContent/SelectContent";
 import { PageSelectOptionContent } from "../../StyledComponents/SelectOptionContent/SelectOptionContent";
 import { PageToastContent } from "../../StyledComponents/ToastContent/ToastContent";
-import type { ToastDefs } from "../../StyledComponents/ToastContent/ToastContent.types";
+import type { ToastDefs } from "../../StyledComponents/ToastContent/ToastContentReact.types";
 import { PageTooltipContent } from "../../StyledComponents/TooltipContent/TooltipContent";
-
-const COUNTRIES: SelectOption<string>[] = [
-    { value: "Belgium" },
-    { value: "Denmark" },
-    { value: "Estonia" },
-    { value: "Finland" },
-    { value: "Germany" },
-    { value: "Iceland" },
-    { value: "Ireland" },
-    { value: "Latvia" },
-    { value: "Norway" },
-    { value: "Poland" },
-    { value: "Portugal" },
-    { value: "Sweden" },
-];
-
-const PERCENT = 100;
-
-const SCROLL_SIZE = { width: styles.HOST_SIZE, height: styles.HOST_SIZE };
-const INNER_TOAST_GAP = 10;
-const INNER_TOAST_MARGIN = 10;
-const INNER_TOAST_MESSAGE = "Raised inside the square.";
 
 const renderTooltip = (text: string) => ({
     placement: { x: "center", y: "top_out" } as const,
@@ -97,7 +84,7 @@ export const ViewportWrapperPage = () => {
             items={[
                 {
                     key: "roaming",
-                    name: "A control roaming the viewport",
+                    name: EXAMPLE_NAMES.roaming,
                     component: () => (
                         <div className={styles.sectionBody}>
                             <div>
@@ -232,7 +219,7 @@ export const ViewportWrapperPage = () => {
                 },
                 {
                     key: "scrolled",
-                    name: "An anchor inside a scrolled box",
+                    name: EXAMPLE_NAMES.scrolled,
                     component: () => (
                         <div className={styles.sectionBody}>
                             <div>

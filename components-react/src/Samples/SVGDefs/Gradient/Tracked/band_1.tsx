@@ -1,10 +1,5 @@
-import {
-    type GradientBandOpts,
-    SVGDefsUtils,
-    TrackedGradientDefaults,
-    type TrackedGradientElementDefs,
-} from "@thewaver/ss-components";
-import type { Size2d } from "@thewaver/ss-utils";
+import { type GradientBandOpts, SVGDefsUtils, type TrackedGradientElementDefs } from "@thewaver/ss-components";
+import { Band1Const } from "@thewaver/ss-components/internal";
 
 import { PointerTrackerReactUtils } from "../../../../Abstracts/PointerTracker/PointerTrackerReact.utils";
 import { SVGGradientDefsReactUtils } from "../../../../Generators/SVGDefs/SVGGradients/SVGGradientDefsReact.utils";
@@ -18,10 +13,6 @@ type BandGradientProps = {
     opts?: GradientBandOpts;
 };
 
-const BAND_SPAN: Size2d = { width: 0.8, height: 0.8 };
-
-const DEFAULTS = TrackedGradientDefaults.BAND_DEFAULTS;
-
 const BandGradient = (props: BandGradientProps) => {
     const ref = SVGDefsReactUtils.useElementRef(props.element);
     const { reading } = PointerTrackerReactUtils.usePointerReading(ref, false, props.defs.getPointSource?.());
@@ -29,16 +20,16 @@ const BandGradient = (props: BandGradientProps) => {
     return SVGGradientDefsReactUtils.computeLinearGradient({
         id: props.id,
         angle: 0,
-        scale: BAND_SPAN,
+        scale: Band1Const.BAND_SPAN,
         offset: {
-            x: (reading.boxRatio.x - 0.5) * (props.opts?.bandTravel ?? DEFAULTS.bandTravel),
+            x: (reading.boxRatio.x - 0.5) * (props.opts?.bandTravel ?? Band1Const.DEFAULTS.bandTravel),
             y: 0,
         },
         colors: SVGDefsUtils.getFalloffStops(props.defs.colors.primary, {
-            coreStop: props.opts?.coreStop ?? DEFAULTS.coreStop,
-            coreAlpha: props.opts?.coreAlpha ?? DEFAULTS.coreAlpha,
-            falloffSpread: props.opts?.falloffSpread ?? DEFAULTS.falloffSpread,
-            falloffAlpha: props.opts?.falloffAlpha ?? DEFAULTS.falloffAlpha,
+            coreStop: props.opts?.coreStop ?? Band1Const.DEFAULTS.coreStop,
+            coreAlpha: props.opts?.coreAlpha ?? Band1Const.DEFAULTS.coreAlpha,
+            falloffSpread: props.opts?.falloffSpread ?? Band1Const.DEFAULTS.falloffSpread,
+            falloffAlpha: props.opts?.falloffAlpha ?? Band1Const.DEFAULTS.falloffAlpha,
         }),
     });
 };

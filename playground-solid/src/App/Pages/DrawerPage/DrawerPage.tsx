@@ -1,19 +1,11 @@
 import { createMemo, createSignal } from "solid-js";
 
 import { DRAWER_EDGES } from "@thewaver/ss-components-solid";
+import { EXAMPLES_ROOT, FILLERS } from "@thewaver/ss-playground/App/Pages/DrawerPage/DrawerPage.const";
 
 import { PageExamples } from "../../PageComponents/Examples/Examples";
 import type { DrawerExampleProps } from "./DrawerPage.types";
 import { DefaultExample } from "./Examples/Default";
-
-const FILLER_NAMES = ["Alder", "Birch", "Cedar", "Elm", "Hazel", "Larch", "Maple", "Rowan", "Willow", "Yew"];
-const FILLER_COUNT = 60;
-const EXAMPLES_ROOT = "/src/App/Pages/DrawerPage/Examples";
-
-const FILLERS = Array.from(
-    { length: FILLER_COUNT },
-    (_, index) => `${FILLER_NAMES[index % FILLER_NAMES.length]} ${index + 1}`,
-);
 
 export const DrawerPage = () => {
     const visibilityByEdge = new Map(DRAWER_EDGES.map((edge) => [edge, createSignal(false)]));

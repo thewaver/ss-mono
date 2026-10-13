@@ -4,13 +4,17 @@ import { useModel } from "vue";
 import { Sortable } from "@thewaver/ss-components-vue";
 import type { InteractionFlags, SortableGridItem, SortableItem, SortableItemFlags } from "@thewaver/ss-components-vue";
 import { SORTABLE_ANNOUNCEMENTS } from "@thewaver/ss-playground/App/PageComponents/Announcements/Announcements.const";
+import {
+    GRID_GAP,
+    computeGearKey,
+    computeGearLabel,
+} from "@thewaver/ss-playground/App/Pages/SortableGridPage/SortableGridPage.const";
 import * as styles from "@thewaver/ss-playground/App/Pages/SortableGridPage/SortableGridPage.css";
 import type { Gear } from "@thewaver/ss-playground/App/Pages/SortableGridPage/SortableGridPage.types";
 
 import PageSortableItemContent from "../../../StyledComponents/SortableContent/PageSortableItemContent.vue";
 import PageSortableMarker from "../../../StyledComponents/SortableContent/PageSortableMarker.vue";
 import PageSortableSurface from "../../../StyledComponents/SortableContent/PageSortableSurface.vue";
-import { GRID_GAP, computeGearKey, computeGearLabel } from "../SortableGridPage.const";
 import InventoryExample from "./Inventory.vue";
 
 type Props = {

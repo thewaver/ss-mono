@@ -2,26 +2,28 @@ import { createMemo, createSignal } from "solid-js";
 import { createStore } from "solid-js/store";
 
 import { SVGDefsSamples, TimedGradientDefaults } from "@thewaver/ss-components-solid";
+import { SVGGradientKnobs } from "@thewaver/ss-playground/App/Knobs/SVGGradients.const";
+import { TimedGradientKnobs } from "@thewaver/ss-playground/App/Knobs/TimedGradients.const";
 import {
     NO_SAMPLE_KEY,
     toGroupEntriesWithNoSample,
 } from "@thewaver/ss-playground/App/PageComponents/SampleGroups/SampleGroups.const";
 import type { WithNoSample } from "@thewaver/ss-playground/App/PageComponents/SampleGroups/SampleGroups.types";
+import { GROUPPED_TIMED_GRADIENTS } from "@thewaver/ss-playground/App/Pages/SVGGradients/SVGGradients.const";
+import {
+    DEFAULT_EXAMPLE_PATH,
+    EXAMPLE_NAMES,
+} from "@thewaver/ss-playground/App/Pages/SVGGradients/TimedGradientsPage/TimedGradientsPage.const";
 
-import { SVGGradientKnobs } from "../../../Knobs/SVGGradients.const";
-import { TimedGradientKnobs } from "../../../Knobs/TimedGradients.const";
 import { PageExamples } from "../../../PageComponents/Examples/Examples";
 import { PageGroupedSelectField, PageNumberField, PageSelectField } from "../../../PageComponents/Field/Field";
 import { PageKnobs } from "../../../PageComponents/Knobs/Knobs";
 import type { Knob } from "../../../PageComponents/Knobs/Knobs.types";
 import { PageProp } from "../../../PageComponents/Prop/Prop";
 import { PagePropsDivider, PagePropsGroups, PagePropsPanel } from "../../../PageComponents/PropsPanel/PropsPanel";
-import { GROUPPED_TIMED_GRADIENTS } from "../SVGGradients.const";
-import type { SVGGradientsPaintKind, TimedGradientExampleProps } from "../SVGGradients.types";
 import { PageSVGGradientsProps } from "../SVGGradientsProps";
+import type { SVGGradientsPaintKind, TimedGradientExampleProps } from "../SVGGradientsSolid.types";
 import { DefaultExample } from "./Examples/Default";
-
-const DEFAULT_EXAMPLE_PATH = "/src/App/Pages/SVGGradients/TimedGradientsPage/Examples/Default.tsx";
 
 export const TimedGradientsPage = () => {
     const [getConfigKey, setConfigKey] = createSignal<WithNoSample<SVGDefsSamples.Gradient.Timed.SampleKey>>(
@@ -62,7 +64,7 @@ export const TimedGradientsPage = () => {
         return [
             {
                 key: "default",
-                name: "Default",
+                name: EXAMPLE_NAMES.default,
                 component: () => <DefaultExample {...commonProps} />,
                 path: DEFAULT_EXAMPLE_PATH,
             },

@@ -9,7 +9,7 @@ export type TagInputKeyAction =
     | { kind: "focus_tag"; index: number }
     | { kind: "focus_field"; isTyping: boolean };
 
-export type TagInputCbs = {
+export type BaseTagInputCbs = {
     /**
      * Turns what was typed into a tag, or refuses it by answering with nothing — which is where trimming, lower-casing
      * and rejecting duplicates live.
@@ -19,13 +19,16 @@ export type TagInputCbs = {
     computeTagAriaLabel?: (tag: string) => string;
     /** Runs when a tag is added or removed. */
     onTagsChange?: (tags: string[]) => void;
+};
+
+export type TagInputCbs = BaseTagInputCbs & {
     /** Runs when the pointer arrives over the field. */
     onMouseEnter?: (e: MouseEvent) => void;
     /** Runs when the pointer leaves the field. */
     onMouseLeave?: (e: MouseEvent) => void;
 };
 
-export type TagInputState = {
+export type BaseTagInputValues = {
     /** The field's name when it is submitted as part of a form. */
     name?: string;
     /** Names the field for assistive technology. */
@@ -35,3 +38,5 @@ export type TagInputState = {
     /** The space between tags. */
     gap?: number;
 };
+
+export type BaseTagInputProps = BaseTagInputValues & BaseTagInputCbs;

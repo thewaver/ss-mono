@@ -1,7 +1,7 @@
 import { Corners } from "@thewaver/ss-components-react";
 import * as styles from "@thewaver/ss-playground/App/Pages/CornersPage/CornersPage.css";
 
-import type { CornersExampleProps } from "../CornersPage.types";
+import type { CornersExampleProps } from "../CornersPageReact.types";
 
 type Props = CornersExampleProps;
 

@@ -13,6 +13,7 @@ import {
     CarouselUtils,
     LiveAnnouncerUtils,
 } from "@thewaver/ss-components";
+import { CarouselConst } from "@thewaver/ss-components/internal";
 
 import { ElementObserverVueUtils } from "../../Abstracts/ElementObserver/ElementObserverVue.utils";
 import { InteractionTrackerVueUtils } from "../../Abstracts/InteractionTracker/InteractionTrackerVue.utils";
@@ -25,9 +26,6 @@ import { watchAfterRender } from "../../Utils/effectUtils";
 import { callSlot, declareProps, useTwoWay } from "../../Utils/propUtils";
 import type { SlotsContext } from "../../Utils/typeUtils";
 import type { CarouselControlProps, CarouselControls, CarouselProps, CarouselSlots } from "./Carousel.types";
-
-const NO_PROGRESS = 0;
-const HIDDEN_OPACITY = 0;
 
 const CarouselControl = defineComponent(
     (props: CarouselControlProps, { slots }: SlotsContext<InteractionControlSlots>) =>
@@ -74,7 +72,7 @@ export const Carousel = defineComponent(
 
         const index = useTwoWay(props, "index", 0);
         const isPlaying = useTwoWay(props, "playback", true);
-        const progress = useTwoWay(props, "progress", NO_PROGRESS);
+        const progress = useTwoWay(props, "progress", CarouselConst.NO_PROGRESS);
 
         const faceRefs: (HTMLElement | undefined)[] = [];
         const placements: (CarouselPlacement | undefined)[] = [];
@@ -358,7 +356,7 @@ export const Carousel = defineComponent(
             if (getDrawn(current)?.contains(e.target as Node)) return;
 
             const rects = faceRefs.map((_face, slideIndex) =>
-                slideIndex !== current && placements[slideIndex]?.effect.opacity !== HIDDEN_OPACITY
+                slideIndex !== current && placements[slideIndex]?.effect.opacity !== CarouselConst.HIDDEN_OPACITY
                     ? getDrawn(slideIndex)?.getBoundingClientRect()
                     : undefined,
             );

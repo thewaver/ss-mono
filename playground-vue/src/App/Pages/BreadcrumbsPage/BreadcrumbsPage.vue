@@ -5,7 +5,12 @@ import type { Breadcrumb } from "@thewaver/ss-components-vue";
 import { Button } from "@thewaver/ss-components-vue";
 import { BreadcrumbKnobs } from "@thewaver/ss-playground/App/Knobs/Breadcrumbs.const";
 import type { CrumbValue } from "@thewaver/ss-playground/App/Pages/BreadcrumbsPage/BreadcrumbTrail.types";
-import { TRAIL } from "@thewaver/ss-playground/App/Pages/BreadcrumbsPage/BreadcrumbsPage.const";
+import {
+    DEPTH_FIELD_WIDTH,
+    EXAMPLES_ROOT,
+    EXAMPLE_NAMES,
+    TRAIL,
+} from "@thewaver/ss-playground/App/Pages/BreadcrumbsPage/BreadcrumbsPage.const";
 
 import type { ExampleDefs } from "../../PageComponents/Examples/Examples.types";
 import PageExamples from "../../PageComponents/Examples/PageExamples.vue";
@@ -14,14 +19,11 @@ import PageNumberField from "../../PageComponents/Field/PageNumberField.vue";
 import PageProp from "../../PageComponents/Prop/Prop.vue";
 import PagePropsPanel from "../../PageComponents/PropsPanel/PagePropsPanel.vue";
 import PageButtonContent from "../../StyledComponents/ButtonContent/ButtonContent.vue";
-import type { BreadcrumbsExampleProps } from "./BreadcrumbsPage.types";
+import type { BreadcrumbsExampleProps } from "./BreadcrumbsPageVue.types";
 import BareExample from "./Examples/Bare.vue";
 import LinkComponentExample from "./Examples/LinkComponent.vue";
 import LinkedExample from "./Examples/Linked.vue";
 import TrailExample from "./Examples/Trail.vue";
-
-const DEPTH_FIELD_WIDTH = 90;
-const EXAMPLES_ROOT = "/src/App/Pages/BreadcrumbsPage/Examples";
 
 const depth = shallowRef(BreadcrumbKnobs.STARTING_DEPTH);
 const isDisabled = shallowRef(BreadcrumbKnobs.STARTING_IS_DISABLED);
@@ -66,26 +68,26 @@ const selectLinked = (value: CrumbValue) => {
 const examples: ExampleDefs[] = [
     {
         key: "default",
-        name: "Default",
+        name: EXAMPLE_NAMES.default,
         readout: () =>
             `pressed: ${pressed.value ?? "nothing yet"} — pressing a crumb moves the page there, so the trail behind it is the whole trail; Reset puts it back`,
         path: `${EXAMPLES_ROOT}/Trail.vue`,
     },
     {
         key: "bare",
-        name: "No separator",
+        name: EXAMPLE_NAMES.bare,
         readout: () => "a trail with nothing between the crumbs, since the separator slot is optional",
         path: `${EXAMPLES_ROOT}/Bare.vue`,
     },
     {
         key: "linked",
-        name: "Crumbs that are links",
+        name: EXAMPLE_NAMES.linked,
         readout: () => `pressed: ${linkPressed.value ?? "nothing yet"} — an href makes a crumb an anchor`,
         path: `${EXAMPLES_ROOT}/Linked.vue`,
     },
     {
         key: "linkComponent",
-        name: "Links through a component",
+        name: EXAMPLE_NAMES.linkComponent,
         readout: () => "the same links rendered by a consumer's own link component",
         path: `${EXAMPLES_ROOT}/LinkComponent.vue`,
     },

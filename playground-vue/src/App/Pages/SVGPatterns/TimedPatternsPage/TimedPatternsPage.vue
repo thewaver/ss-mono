@@ -2,10 +2,11 @@
 import { computed, shallowRef } from "vue";
 
 import { type SVGDefsColors, SVGDefsSamples } from "@thewaver/ss-components-vue";
+import { SVGPatternKnobs } from "@thewaver/ss-playground/App/Knobs/SVGPatterns.const";
 import { toGroupEntriesWithNoSample } from "@thewaver/ss-playground/App/PageComponents/SampleGroups/SampleGroups.const";
 import type { WithNoSample } from "@thewaver/ss-playground/App/PageComponents/SampleGroups/SampleGroups.types";
+import { EXAMPLE_NAMES } from "@thewaver/ss-playground/App/Pages/SVGPatterns/TimedPatternsPage/TimedPatternsPage.const";
 
-import { SVGPatternKnobs } from "../../../Knobs/SVGPatterns.const";
 import type { ExampleDefs } from "../../../PageComponents/Examples/Examples.types";
 import PageExamples from "../../../PageComponents/Examples/PageExamples.vue";
 import PageGroupedSelectField from "../../../PageComponents/Field/PageGroupedSelectField.vue";
@@ -13,9 +14,9 @@ import PageNumberField from "../../../PageComponents/Field/PageNumberField.vue";
 import PageSelectField from "../../../PageComponents/Field/PageSelectField.vue";
 import PageProp from "../../../PageComponents/Prop/Prop.vue";
 import PagePropsPanel from "../../../PageComponents/PropsPanel/PagePropsPanel.vue";
-import { GROUPPED_TIMED_PATTERNS } from "../SVGPatterns.const";
-import type { SVGPatternsControls, TimedPatternExampleProps } from "../SVGPatterns.types";
 import PageSVGPatternsProps from "../SVGPatternsProps.vue";
+import { GROUPPED_TIMED_PATTERNS } from "../SVGPatternsVue.const";
+import type { SVGPatternsControls, TimedPatternExampleProps } from "../SVGPatternsVue.types";
 import DefaultExample from "./Examples/Default.vue";
 
 const TIMED_PATTERN_GROUPS = toGroupEntriesWithNoSample(GROUPPED_TIMED_PATTERNS);
@@ -54,7 +55,7 @@ const controls = computed<SVGPatternsControls>(() => ({
 const examples: ExampleDefs[] = [
     {
         key: "default",
-        name: "Default",
+        name: EXAMPLE_NAMES.default,
         path: DEFAULT_EXAMPLE_PATH,
     },
 ];

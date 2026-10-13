@@ -4,7 +4,7 @@ import { access } from "@thewaver/ss-components-solid";
 import * as styles from "@thewaver/ss-playground/App/StyledComponents/TableOfContentsContent/TableOfContentsContent.css";
 import { themeVars } from "@thewaver/ss-playground/App/Theme.css";
 
-import type { TableOfContentsContentProps } from "./TableOfContentsContent.types";
+import type { TableOfContentsContentProps } from "./TableOfContentsContentSolid.types";
 
 export const PageTableOfContentsContent = (props: ParentProps<TableOfContentsContentProps>) => {
     return (

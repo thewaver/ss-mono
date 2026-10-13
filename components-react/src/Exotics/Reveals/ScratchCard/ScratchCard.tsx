@@ -7,6 +7,7 @@ import {
     ScratchCardStyles,
     ScratchCardUtils,
 } from "@thewaver/ss-components";
+import { ScratchCardConst } from "@thewaver/ss-components/internal";
 import { StringUtils } from "@thewaver/ss-utils";
 import { assignInlineVars } from "@vanilla-extract/dynamic";
 
@@ -15,9 +16,6 @@ import { InteractionTrackerReactUtils } from "../../../Abstracts/InteractionTrac
 import { PointerTrackerReactUtils } from "../../../Abstracts/PointerTracker/PointerTrackerReact.utils";
 import { useLatest } from "../../../Utils/refUtils";
 import type { ScratchCardProps } from "./ScratchCard.types";
-
-const NOTHING_RUBBED = 0;
-const NO_PATH = "";
 
 const toReactStyle = (style: Record<string, string>) =>
     Object.fromEntries(
@@ -31,8 +29,8 @@ export const ScratchCard = (props: ScratchCardProps) => {
     const coverRef = useRef<HTMLDivElement | null>(null);
     const pathRef = useRef<SVGPathElement | null>(null);
 
-    const [path, setPath] = useState(NO_PATH);
-    const [clearedRatio, setClearedRatio] = useState(NOTHING_RUBBED);
+    const [path, setPath] = useState(ScratchCardConst.NO_PATH);
+    const [clearedRatio, setClearedRatio] = useState(ScratchCardConst.NOTHING_RUBBED);
     const [isClearing, setIsClearing] = useState(false);
     const [isCleared, setIsCleared] = useState(false);
 
@@ -80,8 +78,8 @@ export const ScratchCard = (props: ScratchCardProps) => {
             isClearingRef.current = false;
             setIsClearing(false);
             setIsCleared(false);
-            setPath(NO_PATH);
-            setClearedRatio(NOTHING_RUBBED);
+            setPath(ScratchCardConst.NO_PATH);
+            setClearedRatio(ScratchCardConst.NOTHING_RUBBED);
 
             return true;
         },
@@ -101,7 +99,7 @@ export const ScratchCard = (props: ScratchCardProps) => {
     useEffect(() => scheduler.cancel, [scheduler]);
 
     useLayoutEffect(() => {
-        if (path !== NO_PATH) scheduler.schedule();
+        if (path !== ScratchCardConst.NO_PATH) scheduler.schedule();
     }, [path, scheduler]);
 
     const reportedRatioRef = useRef(clearedRatio);

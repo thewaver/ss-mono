@@ -1,5 +1,4 @@
-import { SVGFilterDefs } from "@thewaver/ss-components";
-import type { SVGDisplacementChannel, SVGFilterMethod } from "@thewaver/ss-components";
+import { type SVGDisplacementChannel, SVGFilterDefs, type SVGFilterMethod } from "@thewaver/ss-components";
 
 export namespace SVGFilterKnobs {
     export const STARTING_METHOD: SVGFilterMethod = "chain";

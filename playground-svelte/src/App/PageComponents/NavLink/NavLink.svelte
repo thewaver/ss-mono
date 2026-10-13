@@ -5,7 +5,7 @@
 
     import { getLayerClass } from "../../StyledComponents/Layer/Layer.context";
     import PageRouterLink from "../RouterLink/RouterLink.svelte";
-    import type { PageNavLinkProps } from "./NavLink.types";
+    import type { PageNavLinkProps } from "./NavLinkSvelte.types";
 
     let props: PageNavLinkProps & { children?: Snippet } = $props();
 

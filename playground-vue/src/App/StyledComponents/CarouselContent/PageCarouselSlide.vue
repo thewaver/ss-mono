@@ -2,7 +2,7 @@
 import * as styles from "@thewaver/ss-playground/App/StyledComponents/CarouselContent/CarouselContent.css";
 
 import { useLayerClass } from "../Layer/Layer.context";
-import type { CarouselSlideProps } from "./CarouselContent.types";
+import type { CarouselSlideProps } from "./CarouselContentVue.types";
 
 defineProps<CarouselSlideProps>();
 

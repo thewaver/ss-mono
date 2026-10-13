@@ -2,7 +2,7 @@
     import * as styles from "@thewaver/ss-playground/App/StyledComponents/TimelineContent/TimelineContent.css";
 
     import { getLayerClass } from "../Layer/Layer.context";
-    import type { PageTimelineBlockProps } from "./TimelineContent.types";
+    import type { PageTimelineBlockProps } from "./TimelineContentSvelte.types";
 
     let props: PageTimelineBlockProps = $props();
 

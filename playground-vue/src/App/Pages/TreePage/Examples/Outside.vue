@@ -7,8 +7,8 @@ import PageControlColumn from "../../../PageComponents/ControlRow/PageControlCol
 import PageControlButtonContent from "../../../StyledComponents/ControlButtonContent/ControlButtonContent.vue";
 import PageGlideFloater from "../../../StyledComponents/GlideFloater/PageGlideFloater.vue";
 import PageTreeNodeContent from "../../../StyledComponents/TreeNodeContent/PageTreeNodeContent.vue";
-import { FILES, OUTSIDE_COLLAPSE_DELAY_MS } from "../TreePage.const";
 import type { TreeExampleProps } from "../TreePage.types";
+import { FILES, OUTSIDE_COLLAPSE_DELAY_MS } from "../TreePageVue.const";
 
 type Props = TreeExampleProps;
 

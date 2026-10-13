@@ -1,11 +1,7 @@
 import { defineComponent } from "vue";
 
-import {
-    type GradientHandOpts,
-    SVGDefsUtils,
-    TrackedGradientDefaults,
-    type TrackedGradientElementDefs,
-} from "@thewaver/ss-components";
+import { type GradientHandOpts, SVGDefsUtils, type TrackedGradientElementDefs } from "@thewaver/ss-components";
+import { Hand1Const } from "@thewaver/ss-components/internal";
 import { SVGUtils } from "@thewaver/ss-utils";
 
 import { PointerTrackerVueUtils } from "../../../../Abstracts/PointerTracker/PointerTrackerVue.utils";
@@ -21,11 +17,6 @@ type HandPartProps = {
     defs: TrackedGradientElementDefs;
     opts?: GradientHandOpts;
 };
-
-const QUARTER_TURN = 90;
-const HALF_TURN = 180;
-
-const DEFAULTS = TrackedGradientDefaults.HAND_DEFAULTS;
 
 const computeSweepColors = (color: string, alpha: number) => [
     { value: `rgb(from ${color} r g b / 0)` },
@@ -44,10 +35,10 @@ const HandGradient = defineComponent(
         return () =>
             SVGGradientDefsVueUtils.computeLinearGradient({
                 id: props.id,
-                angle: reading.value.angle + QUARTER_TURN,
+                angle: reading.value.angle + Hand1Const.QUARTER_TURN,
                 colors: computeSweepColors(
                     props.defs.colors.primary,
-                    (props.opts?.peakAlpha ?? DEFAULTS.peakAlpha) *
+                    (props.opts?.peakAlpha ?? Hand1Const.DEFAULTS.peakAlpha) *
                         SVGDefsUtils.getPointerFade(reading.value, isPointerPresent.value),
                 ),
             });
@@ -64,11 +55,13 @@ const HandClip = defineComponent(
         );
 
         return () => {
-            const sweepArc = props.opts?.sweepArc ?? DEFAULTS.sweepArc;
+            const sweepArc = props.opts?.sweepArc ?? Hand1Const.DEFAULTS.sweepArc;
 
             return (
                 <SVGClipPath id={props.id}>
-                    <path d={SVGUtils.getArcPath(sweepArc, reading.value.angle - HALF_TURN - sweepArc * 0.5)} />
+                    <path
+                        d={SVGUtils.getArcPath(sweepArc, reading.value.angle - Hand1Const.HALF_TURN - sweepArc * 0.5)}
+                    />
                 </SVGClipPath>
             );
         };

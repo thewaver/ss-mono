@@ -4,7 +4,7 @@ import { Typewriter, access } from "@thewaver/ss-components-solid";
 import type { AccessorProps } from "@thewaver/ss-components-solid";
 import { FunctionUtils } from "@thewaver/ss-utils";
 
-import type { TypewriterExampleProps } from "../TypewriterPage.types";
+import type { TypewriterExampleProps } from "../TypewriterPageSolid.types";
 
 type Props = TypewriterExampleProps &
     AccessorProps<{

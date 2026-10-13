@@ -3,7 +3,7 @@ import { ElementMosaic } from "@thewaver/ss-components-vue";
 import { PICKED_GROWTH } from "@thewaver/ss-playground/App/Pages/Mosaics/Mosaics.const";
 
 import PageMosaicTile from "../../../../StyledComponents/MosaicContent/PageMosaicTile.vue";
-import type { WalkedExampleProps } from "../ElementMosaicPage.types";
+import type { WalkedExampleProps } from "../ElementMosaicPageVue.types";
 
 type Props = WalkedExampleProps;
 

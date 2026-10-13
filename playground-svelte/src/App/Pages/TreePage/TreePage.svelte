@@ -20,8 +20,7 @@
     } from "./TreePage.const.svelte";
     import LeaningExampleWrapper from "./LeaningExampleWrapper.svelte";
     import type { Asset } from "./TreePage.types";
-
-    const EXAMPLES_ROOT = "/src/App/Pages/TreePage/Examples";
+    import { EXAMPLE_NAMES, EXAMPLES_ROOT } from "@thewaver/ss-playground/App/Pages/TreePage/TreePage.const";
 
     let defaultValue = $state<string>();
     let defaultExpanded = $state.raw<string[]>(["src"]);
@@ -66,7 +65,7 @@
     const examples: ExampleDefs[] = [
         {
             key: "default",
-            name: "Default",
+            name: EXAMPLE_NAMES.default,
             readout: () =>
                 `value: ${defaultValue ?? "undefined"} | expanded: ${JSON.stringify(defaultExpanded)} — right opens a branch, left closes it or climbs to the parent`,
             component: defaultExample,
@@ -74,7 +73,7 @@
         },
         {
             key: "collapsed",
-            name: "Everything collapsed",
+            name: EXAMPLE_NAMES.collapsed,
             readout: () =>
                 `value: ${collapsedValue ?? "undefined"} | expanded: ${JSON.stringify(collapsedExpanded)} — asterisk opens every branch at the level focus is on`,
             component: collapsedExample,
@@ -82,7 +81,7 @@
         },
         {
             key: "rightToLeft",
-            name: "In a right-to-left box",
+            name: EXAMPLE_NAMES.rightToLeft,
             readout: () =>
                 `value: ${rightToLeftValue ?? "undefined"} | expanded: ${JSON.stringify(rightToLeftExpanded)} — the box around the tree sets dir="rtl", so left opens a branch and right closes it or climbs to the parent`,
             component: rightToLeftExample,
@@ -90,7 +89,7 @@
         },
         {
             key: "unheld",
-            name: "Nobody holding the state",
+            name: EXAMPLE_NAMES.unheld,
             readout: () =>
                 "no signals passed — the tree keeps the selection and the open branches itself; a picked node is still marked selected and is still the tree's one tab stop",
             component: unheldExample,
@@ -98,7 +97,7 @@
         },
         {
             key: "disabled",
-            name: "Disabled nodes",
+            name: EXAMPLE_NAMES.disabled,
             readout: () =>
                 `value: ${disabledValue ?? "undefined"} — arrows skip index.ts and Lib, while what is inside Lib stays reachable`,
             component: disabledExample,
@@ -106,7 +105,7 @@
         },
         {
             key: "reachable",
-            name: "Disabled nodes + reachable",
+            name: EXAMPLE_NAMES.reachable,
             readout: () =>
                 `value: ${reachableValue ?? "undefined"} — arrows stop on node_modules, hover explains why, and nothing opens it`,
             component: reachableExample,
@@ -114,7 +113,7 @@
         },
         {
             key: "outside",
-            name: "Collapsed from outside",
+            name: EXAMPLE_NAMES.outside,
             readout: () =>
                 `expanded: ${JSON.stringify(outsideExpanded)} — press the button, then focus a row inside Lib before the delay elapses; focus must land on Lib rather than on the page body`,
             component: outsideExample,
@@ -122,7 +121,7 @@
         },
         {
             key: "links",
-            name: "Nodes that are links",
+            name: EXAMPLE_NAMES.links,
             readout: () =>
                 `value: ${linkValue ?? "undefined"} — every leaf carries an href, so each one is an anchor and the branches stay plain`,
             component: linksExample,
@@ -130,7 +129,7 @@
         },
         {
             key: "linkComponent",
-            name: "Links through a component",
+            name: EXAMPLE_NAMES.linkComponent,
             readout: () =>
                 `value: ${customLinkValue ?? "undefined"} — the same nodes rendered by a consumer's own link component`,
             component: linkComponentExample,
@@ -138,7 +137,7 @@
         },
         {
             key: "lazy",
-            name: "Branches that arrive later",
+            name: EXAMPLE_NAMES.lazy,
             readout: () =>
                 `expanded: ${JSON.stringify(lazyExpanded)} — packages and docs say they have children before they have them`,
             component: lazyExample,
@@ -146,7 +145,7 @@
         },
         {
             key: "virtualized",
-            name: "Virtualized",
+            name: EXAMPLE_NAMES.virtualized,
             readout: () =>
                 `${(STRESS_BRANCH_COUNT * (STRESS_LEAF_COUNT + 1)).toLocaleString("en-GB")} rows when everything is open — expanded: ${stressExpanded.length} branches, value: ${stressValue ?? "undefined"}`,
             component: virtualizedExample,
@@ -154,7 +153,7 @@
         },
         {
             key: "leaning",
-            name: "Leaning toward the pointer",
+            name: EXAMPLE_NAMES.leaning,
             readout: () =>
                 `selected: ${leaningValue ?? "nothing"} — a column layout with a proximity effect: each node shifts and brightens by how near the pointer is, and the painter keeps the selected one lit, since an effect is not told which node is current`,
             component: leaningExample,
@@ -163,7 +162,7 @@
         {
             key: "radial",
             span: 2,
-            name: "A tree drawn outward",
+            name: EXAMPLE_NAMES.radial,
             readout: () =>
                 `value: ${radialValue ?? "undefined"} — the layout is told which node each node hangs from, so children share the slice their parent was given, and every rank sits a ring further out whoever it hangs from`,
             component: radialExample,
@@ -171,7 +170,7 @@
         },
         {
             key: "recordValues",
-            name: "Record values",
+            name: EXAMPLE_NAMES.recordValues,
             readout: () =>
                 `value: ${recordValue?.name ?? "undefined"} | expanded: ${recordExpanded.length} branch(es) — the value is the record itself, not a name`,
             component: recordValuesExample,

@@ -7,6 +7,7 @@ import {
     HoverIntentUtils,
     HoverCardStyles as styles,
 } from "@thewaver/ss-components";
+import { HoverCardConst } from "@thewaver/ss-components/internal";
 import { assignInlineVars } from "@vanilla-extract/dynamic";
 
 import { HoverIntentSolidUtils } from "../../../Abstracts/HoverIntent/HoverIntentSolid.utils";
@@ -14,8 +15,6 @@ import { SignalMirrorSolidUtils } from "../../../Abstracts/SignalMirror/SignalMi
 import { Popover } from "../../../Primitives/Popover/Popover";
 import { access } from "../../../Utils/propUtils";
 import type { HoverCardProps } from "./HoverCardSolid.types";
-
-const HOVER_CARD_DELAY_GROUP = HoverIntentUtils.createDelayGroup();
 
 export const HoverCard = (props: HoverCardProps) => {
     const cardId = createUniqueId();
@@ -28,7 +27,7 @@ export const HoverCard = (props: HoverCardProps) => {
     const getIsHeld = () => HoverCardUtils.getIsHeld(access(props.anchorRef), getCardRef());
 
     const hoverIntent = HoverIntentSolidUtils.create(() => access(props.anchorRef), [getIsOpen, setIsOpen], {
-        delayGroup: HOVER_CARD_DELAY_GROUP,
+        delayGroup: HoverCardConst.HOVER_CARD_DELAY_GROUP,
         getPanelRef,
         getHoverShowDelayMs: () => access(props.hoverShowDelayMs) ?? HOVER_CARD_DEFAULTS.hoverShowDelayMs,
         getSkipDelayWindowMs: () => access(props.skipDelayWindowMs) ?? HOVER_CARD_DEFAULTS.skipDelayWindowMs,

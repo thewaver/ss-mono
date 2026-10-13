@@ -1,12 +1,10 @@
 import type { ParentProps } from "solid-js";
 
 import { access } from "@thewaver/ss-components-solid";
+import { FILLING_WIDTH, NO_PADDING } from "@thewaver/ss-playground/App/PageComponents/MeasureBox/MeasureBox.const";
 import * as styles from "@thewaver/ss-playground/App/PageComponents/MeasureBox/MeasureBox.css";
 
 import type { PageMeasureBoxProps } from "./MeasureBox.types";
-
-const NO_PADDING = 0;
-const FILLING_WIDTH = "100%";
 
 export const PageMeasureBox = (props: ParentProps<PageMeasureBoxProps>) => {
     const getWidth = () => {

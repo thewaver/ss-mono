@@ -11,7 +11,7 @@
     import { Rect } from "@thewaver/ss-utils";
 
     import PageButtonContent from "../../../StyledComponents/ButtonContent/ButtonContent.svelte";
-    import type { CornersExampleProps } from "../CornersPage.types";
+    import type { CornersExampleProps } from "../CornersPageSvelte.types";
 
     type Props = CornersExampleProps;
 

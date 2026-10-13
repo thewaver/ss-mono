@@ -10,7 +10,7 @@
 
     import PageMeasureBox from "../../../PageComponents/MeasureBox/MeasureBox.svelte";
     import PageControlButtonContent from "../../../StyledComponents/ControlButtonContent/ControlButtonContent.svelte";
-    import { branch, computeFamilySteps, describeFamily, seed } from "../BracketPage.const";
+    import { branch, computeFamilySteps, describeFamily, seed } from "../BracketPageSvelte.const";
     import type { BracketFamilyExampleProps } from "../BracketPage.types";
     import PageBracketLayerHeader from "../PageBracketLayerHeader.svelte";
     import PageBracketNode from "../PageBracketNode.svelte";

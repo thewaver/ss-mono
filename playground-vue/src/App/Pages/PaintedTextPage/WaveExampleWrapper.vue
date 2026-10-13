@@ -2,13 +2,13 @@
 import { computed, shallowRef, useModel } from "vue";
 
 import { PAINTED_TEXT_DEFAULTS } from "@thewaver/ss-components-vue";
+import { PaintedTextKnobs } from "@thewaver/ss-playground/App/Knobs/PaintedTexts.const";
 
-import { PaintedTextKnobs } from "../../Knobs/PaintedTexts.const";
 import PageExampleKnobs from "../../PageComponents/ExampleKnobs/PageExampleKnobs.vue";
 import PageNumberField from "../../PageComponents/Field/PageNumberField.vue";
 import PageProp from "../../PageComponents/Prop/Prop.vue";
 import WaveExample from "./Examples/Wave.vue";
-import type { PaintedTextBoxedExampleProps, PaintedTextPathExampleWrapperProps } from "./PaintedTextPage.types";
+import type { PaintedTextBoxedExampleProps, PaintedTextPathExampleWrapperProps } from "./PaintedTextPageVue.types";
 
 const props = defineProps<PaintedTextPathExampleWrapperProps>();
 

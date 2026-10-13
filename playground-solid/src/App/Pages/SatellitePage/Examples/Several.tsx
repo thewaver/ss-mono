@@ -2,7 +2,7 @@ import { Satellite } from "@thewaver/ss-components-solid";
 import type { SatelliteDefs } from "@thewaver/ss-components-solid";
 
 import { PageSatelliteBadge, PageSatelliteSubject } from "../../../StyledComponents/SatelliteContent/SatelliteContent";
-import type { SatelliteExampleProps } from "../SatellitePage.types";
+import type { SatelliteExampleProps } from "../SatellitePageSolid.types";
 
 const CORNER_SIZE = 48;
 const SIDE_SIZE = 72;

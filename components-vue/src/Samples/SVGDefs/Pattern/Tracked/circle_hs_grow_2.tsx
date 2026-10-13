@@ -3,10 +3,10 @@ import { defineComponent } from "vue";
 import {
     type PatternProximityOpts,
     SVGDefsUtils,
-    TrackedPatternDefaults,
     type TrackedPatternElementDefs,
     TrackedPatternUtils,
 } from "@thewaver/ss-components";
+import { CircleHsGrow2Const } from "@thewaver/ss-components/internal";
 import { MathUtils } from "@thewaver/ss-utils";
 
 import { declareProps } from "../../../../Utils/propUtils";
@@ -21,8 +21,6 @@ type PatternElementProps = {
     opts?: PatternProximityOpts;
 };
 
-const DEFAULTS = TrackedPatternDefaults.GROW_DEFAULTS;
-
 const PatternElement = defineComponent(
     (props: PatternElementProps) => {
         const getPointer = SVGDefsVueUtils.usePatternPointer(
@@ -30,7 +28,7 @@ const PatternElement = defineComponent(
             () => props.defs.getSize(),
             () => props.defs.getPointSource?.(),
         );
-        const getOpts = () => TrackedPatternUtils.resolveOpts(props.opts, DEFAULTS);
+        const getOpts = () => TrackedPatternUtils.resolveOpts(props.opts, CircleHsGrow2Const.DEFAULTS);
         const computeTrailLevel = SVGDefsVueUtils.usePatternTrail(getPointer, getOpts);
 
         return () => {

@@ -1,31 +1,28 @@
 import { useState } from "react";
 
 import { SVGDefsSamples, TrackedGradientDefaults } from "@thewaver/ss-components-react";
-import {
-    NO_SAMPLE_KEY,
-    toGroupEntriesWithNoSample,
-} from "@thewaver/ss-playground/App/PageComponents/SampleGroups/SampleGroups.const";
+import { SVGGradientKnobs } from "@thewaver/ss-playground/App/Knobs/SVGGradients.const";
+import { TrackedGradientKnobs } from "@thewaver/ss-playground/App/Knobs/TrackedGradients.const";
+import { NO_SAMPLE_KEY } from "@thewaver/ss-playground/App/PageComponents/SampleGroups/SampleGroups.const";
 import type { WithNoSample } from "@thewaver/ss-playground/App/PageComponents/SampleGroups/SampleGroups.types";
+import {
+    EXAMPLES_ROOT,
+    EXAMPLE_NAMES,
+    TRACKED_GRADIENT_GROUPS,
+} from "@thewaver/ss-playground/App/Pages/SVGGradients/TrackedGradientsPage/TrackedGradientsPage.const";
 
-import { SVGGradientKnobs } from "../../../Knobs/SVGGradients.const";
-import { TrackedGradientKnobs } from "../../../Knobs/TrackedGradients.const";
 import { PageExamples } from "../../../PageComponents/Examples/Examples";
 import { PageGroupedSelectField } from "../../../PageComponents/Field/Field";
 import { PageKnobs } from "../../../PageComponents/Knobs/Knobs";
 import type { Knob } from "../../../PageComponents/Knobs/Knobs.types";
 import { PageProp } from "../../../PageComponents/Prop/Prop";
 import { PagePropsDivider, PagePropsGroups, PagePropsPanel } from "../../../PageComponents/PropsPanel/PropsPanel";
-import { GROUPPED_TRACKED_GRADIENTS } from "../SVGGradients.const";
-import type { SVGGradientsPaintKind, TrackedGradientExampleProps } from "../SVGGradients.types";
 import { PageSVGGradientsProps } from "../SVGGradientsProps";
+import type { SVGGradientsPaintKind, TrackedGradientExampleProps } from "../SVGGradientsReact.types";
 import { ContinuityExample } from "./Examples/Continuity";
 import { DefaultExample } from "./Examples/Default";
 import { ScreenOverlayExample } from "./Examples/ScreenOverlay";
 import { SharedExample } from "./Examples/Shared";
-
-const EXAMPLES_ROOT = "/src/App/Pages/SVGGradients/TrackedGradientsPage/Examples";
-
-const TRACKED_GRADIENT_GROUPS = toGroupEntriesWithNoSample(GROUPPED_TRACKED_GRADIENTS);
 
 export const TrackedGradientsPage = () => {
     const [configKey, setConfigKey] = useState<WithNoSample<SVGDefsSamples.Gradient.Tracked.SampleKey>>(
@@ -55,20 +52,20 @@ export const TrackedGradientsPage = () => {
     const examples = [
         {
             key: "default",
-            name: "Default",
+            name: EXAMPLE_NAMES.default,
             component: () => <DefaultExample {...commonProps} />,
             path: `${EXAMPLES_ROOT}/Default.tsx`,
         },
         {
             key: "continuity",
-            name: "Continuity",
+            name: EXAMPLE_NAMES.continuity,
             readout: () => "four boxes, each reading the pointer against its own — a pool spans them, a hand does not",
             component: () => <ContinuityExample {...commonProps} />,
             path: `${EXAMPLES_ROOT}/Continuity.tsx`,
         },
         {
             key: "shared",
-            name: "Shared",
+            name: EXAMPLE_NAMES.shared,
             readout: () =>
                 "the same four boxes, now reading the pointer against the group and painting one gradient laid across all of it, so each box shows its own part of a single picture",
             component: () => <SharedExample {...commonProps} />,
@@ -76,7 +73,7 @@ export const TrackedGradientsPage = () => {
         },
         {
             key: "screenOverlay",
-            name: "A screen overlay",
+            name: EXAMPLE_NAMES.screenOverlay,
             readout: () =>
                 "the gradient on a layer over the whole window, following the pointer everywhere; clicks pass through it, a button in the top-right corner closes it, and its sizes are a quarter of what the knobs say, since the box it fills is the whole window",
             component: () => <ScreenOverlayExample {...commonProps} />,

@@ -4,9 +4,15 @@ import { computed, shallowRef } from "vue";
 import { DIE_DEFAULTS, DieShapes, MediaQueryMonitorVueUtils, RollerUtils } from "@thewaver/ss-components-vue";
 import { DieKnobs } from "@thewaver/ss-playground/App/Knobs/Dice.const";
 import {
+    CLOUD_SIZE,
+    DIE_SIZE,
+    EXAMPLES_ROOT,
+    EXAMPLE_NAMES,
+    FIRST_NUMBER,
     ICON_CLOUD_EMPTY_LABEL,
     ICON_CLOUD_ICONS,
     ICON_CLOUD_TURN_MS,
+    NO_MOTION_DURATION_MS,
 } from "@thewaver/ss-playground/App/Pages/DiePage/DiePage.const";
 
 import type { ExampleDefs } from "../../PageComponents/Examples/Examples.types";
@@ -17,13 +23,6 @@ import PageProp from "../../PageComponents/Prop/Prop.vue";
 import PagePropsPanel from "../../PageComponents/PropsPanel/PagePropsPanel.vue";
 import IconCloudExample from "./Examples/IconCloud.vue";
 import TabletopExample from "./Examples/Tabletop.vue";
-
-const EXAMPLES_ROOT = "/src/App/Pages/DiePage/Examples";
-
-const DIE_SIZE = 160;
-const CLOUD_SIZE = 240;
-const NO_MOTION_DURATION_MS = 0;
-const FIRST_NUMBER = 1;
 
 const shapeKey = shallowRef<DieShapes.SampleKey>(DieKnobs.STARTING_SHAPE_KEY);
 const rollDurationMs = shallowRef(DIE_DEFAULTS.rollDurationMs);
@@ -52,14 +51,14 @@ const cloudIdleDelayMs = computed(() =>
 const examples: ExampleDefs[] = [
     {
         key: "tabletop",
-        name: "Tabletop die",
+        name: EXAMPLE_NAMES.tabletop,
         readout: () =>
             `showing ${dieFace.value + FIRST_NUMBER} of ${DieShapes.SAMPLE_SHAPES[shapeKey.value].faces.length} — the page picks the number, and the die tumbles and lands on it`,
         path: `${EXAMPLES_ROOT}/Tabletop.vue`,
     },
     {
         key: "iconCloud",
-        name: "Icon cloud",
+        name: EXAMPLE_NAMES.iconCloud,
         readout: () =>
             `${cloudAutoSpin.value ? "turning by itself" : "paused"}, facing ${ICON_CLOUD_ICONS[RollerUtils.clampFace(cloudFace.value, shape.value.faces.length)]?.label ?? ICON_CLOUD_EMPTY_LABEL} — drag it, or focus it and use the arrow keys, and it settles on the nearest icon`,
         path: `${EXAMPLES_ROOT}/IconCloud.vue`,

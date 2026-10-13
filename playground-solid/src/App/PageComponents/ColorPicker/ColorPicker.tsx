@@ -1,5 +1,6 @@
 import type { JSX, Signal } from "solid-js";
 
+import { AREA_SIZE } from "@thewaver/ss-playground/App/PageComponents/ColorPicker/ColorPicker.const";
 import { Color } from "@thewaver/ss-utils";
 
 import {
@@ -9,8 +10,6 @@ import {
     PageHueSlider,
 } from "../../StyledComponents/ColorAreaContent/ColorAreaContent";
 import { PageColorChannels } from "../ColorChannels/ColorChannels";
-
-const AREA_SIZE = 160;
 
 export const pageColorPickerSlots = {
     renderArea: (getRenderProps: Parameters<typeof PageColorAreaContent>[0]["renderProps"]) => (

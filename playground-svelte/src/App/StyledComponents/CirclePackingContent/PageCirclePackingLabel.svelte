@@ -4,10 +4,11 @@
     import * as styles from "@thewaver/ss-playground/App/StyledComponents/CirclePackingContent/CirclePackingContent.css";
 
     import { getLayerClass } from "../Layer/Layer.context";
-    import type { PageCirclePackingLabelProps } from "./CirclePackingContent.types";
-
-    const LABEL_SHOWN = 1;
-    const LABEL_HIDDEN = 0;
+    import type { PageCirclePackingLabelProps } from "./CirclePackingContentSvelte.types";
+    import {
+        LABEL_HIDDEN,
+        LABEL_SHOWN,
+    } from "@thewaver/ss-playground/App/StyledComponents/CirclePackingContent/CirclePackingContent.const";
 
     let props: PageCirclePackingLabelProps = $props();
 

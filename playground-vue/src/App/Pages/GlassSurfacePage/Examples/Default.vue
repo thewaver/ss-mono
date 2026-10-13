@@ -1,7 +1,12 @@
 <script setup lang="ts">
 import { computed, shallowRef, useId } from "vue";
 
-import { GlassSurface, InteractionTrackerVueUtils, SVGDefsSamples } from "@thewaver/ss-components-vue";
+import {
+    GlassSurface,
+    InteractionTrackerVueUtils,
+    SVGDefsSampleConfigs,
+    SVGDefsSamples,
+} from "@thewaver/ss-components-vue";
 import type { PartialGlassDefs } from "@thewaver/ss-components-vue";
 import {
     NO_SAMPLE_KEY,
@@ -12,7 +17,7 @@ import knight from "@thewaver/ss-playground/App/knight.webp";
 import { CSSUtils, type Point2d, type Size2d } from "@thewaver/ss-utils";
 import { assignInlineVars } from "@vanilla-extract/dynamic";
 
-import type { GlassSurfaceExampleProps } from "../GlassSurfacePage.types";
+import type { GlassSurfaceExampleProps } from "../GlassSurfacePageVue.types";
 
 const STARTING_RATIO: Point2d = { x: 0.5, y: 0.5 };
 const HALF_PANE = styles.paneSize * 0.5;
@@ -43,7 +48,7 @@ const { isDragging } = InteractionTrackerVueUtils.useDrag(stageRef, false, {
 const computeStrokeDefs = (size: Size2d, element: HTMLElement | undefined) => {
     if (props.strokeConfigKey === NO_SAMPLE_KEY) return computeNoSampleDefs(props.colors, "stroke");
 
-    return SVGDefsSamples.Gradient.Tracked.toConfig({
+    return SVGDefsSampleConfigs.Gradient.Tracked.toConfig({
         family: props.strokeConfigKey,
         defs: props.strokeConfigDefs,
     } as SVGDefsSamples.Gradient.Tracked.Entry).computeSVGDefs(`stroke-${id}`, undefined, element, {

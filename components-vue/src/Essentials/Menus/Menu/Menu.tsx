@@ -10,6 +10,7 @@ import {
     MenuUtils,
     TypeaheadUtils,
 } from "@thewaver/ss-components";
+import { MenuConst } from "@thewaver/ss-components/internal";
 import { type Point2d, Rect } from "@thewaver/ss-utils";
 
 import { FloaterVueUtils } from "../../../Abstracts/Floater/FloaterVue.utils";
@@ -42,12 +43,6 @@ import type {
     MenuSlots,
     MenuTriggerProps,
 } from "./Menu.types";
-
-const EMPTY_CHECKED: never[] = [];
-
-const ROOT_PATH: number[] = [];
-const NO_PARENT_EXTENT = 0;
-const PRIMARY_BUTTON = 0;
 
 const usePointerPointReader = () => {
     watchAfterRender([], () => MenuUtils.observePointerPoint());
@@ -549,7 +544,7 @@ const MenuLevel = defineComponent(
                     hasSubmenu={hasSubmenu}
                     isSubmenuOpen={hasSubmenu && openValue.value === item.value}
                     isLaidOut={currentLayout !== undefined}
-                    levelExtent={currentLayout?.extent ?? NO_PARENT_EXTENT}
+                    levelExtent={currentLayout?.extent ?? MenuConst.NO_PARENT_EXTENT}
                     rootExtent={rootExtent.value}
                     onActivate={activateIndex}
                     onHover={hoverIndex}
@@ -759,7 +754,11 @@ export const Menu = defineComponent(
 
         const pick = (item: MenuItem<T>, radioGroupValues: T[]) => {
             if (MenuUtils.getIsStateful(item) && props.checked !== undefined) {
-                checked.value = MenuUtils.computeNextChecked(checked.value ?? EMPTY_CHECKED, item, radioGroupValues);
+                checked.value = MenuUtils.computeNextChecked(
+                    checked.value ?? MenuConst.EMPTY_CHECKED,
+                    item,
+                    radioGroupValues,
+                );
             }
 
             props.onActivate(item.value);
@@ -768,7 +767,7 @@ export const Menu = defineComponent(
         };
 
         const handleTriggerPress = (e: PointerEvent) => {
-            if (!getIsHoldable() || e.button !== PRIMARY_BUTTON || isOpen.value) return;
+            if (!getIsHoldable() || e.button !== MenuConst.PRIMARY_BUTTON || isOpen.value) return;
 
             isTogglePrevented = true;
 
@@ -840,9 +839,9 @@ export const Menu = defineComponent(
                                     items={props.items}
                                     isOpen={isOpen.value}
                                     direction={direction.value}
-                                    path={ROOT_PATH}
-                                    parentExtent={NO_PARENT_EXTENT}
-                                    rootExtent={NO_PARENT_EXTENT}
+                                    path={MenuConst.ROOT_PATH}
+                                    parentExtent={MenuConst.NO_PARENT_EXTENT}
+                                    rootExtent={MenuConst.NO_PARENT_EXTENT}
                                     layoutSize={props.layoutSize}
                                     initialHighlightPosition={initialHighlightPosition.value}
                                     anchorRef={getAnchorElement()}
@@ -858,7 +857,7 @@ export const Menu = defineComponent(
                                     transitionDurationMs={props.transitionDurationMs}
                                     floaterTransitionDurationMs={props.floaterTransitionDurationMs}
                                     openerFlags={flags}
-                                    checkedValues={checked.value ?? EMPTY_CHECKED}
+                                    checkedValues={checked.value ?? MenuConst.EMPTY_CHECKED}
                                     computeLayout={props.computeLayout}
                                     computeEffect={props.computeEffect}
                                     computeCustomText={props.computeCustomText}
@@ -955,7 +954,11 @@ export const ContextMenu = defineComponent(
 
         const pick = (item: MenuItem<T>, radioGroupValues: T[]) => {
             if (MenuUtils.getIsStateful(item) && props.checked !== undefined) {
-                checked.value = MenuUtils.computeNextChecked(checked.value ?? EMPTY_CHECKED, item, radioGroupValues);
+                checked.value = MenuUtils.computeNextChecked(
+                    checked.value ?? MenuConst.EMPTY_CHECKED,
+                    item,
+                    radioGroupValues,
+                );
             }
 
             props.onActivate(item.value);
@@ -1009,9 +1012,9 @@ export const ContextMenu = defineComponent(
                         items={props.items}
                         isOpen={isOpen.value}
                         direction={direction.value}
-                        path={ROOT_PATH}
-                        parentExtent={NO_PARENT_EXTENT}
-                        rootExtent={NO_PARENT_EXTENT}
+                        path={MenuConst.ROOT_PATH}
+                        parentExtent={MenuConst.NO_PARENT_EXTENT}
+                        rootExtent={MenuConst.NO_PARENT_EXTENT}
                         anchorRef={regionRef.value}
                         anchorRect={anchorRect.value}
                         placement={props.placement}
@@ -1024,7 +1027,7 @@ export const ContextMenu = defineComponent(
                         transitionDurationMs={props.transitionDurationMs}
                         floaterTransitionDurationMs={props.floaterTransitionDurationMs}
                         openerFlags={{ isOpen: isOpen.value }}
-                        checkedValues={checked.value ?? EMPTY_CHECKED}
+                        checkedValues={checked.value ?? MenuConst.EMPTY_CHECKED}
                         computeLayout={props.computeLayout}
                         computeEffect={props.computeEffect}
                         computeCustomText={props.computeCustomText}

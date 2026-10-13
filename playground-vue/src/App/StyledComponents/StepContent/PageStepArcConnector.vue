@@ -5,7 +5,7 @@ import { PlacementUtils } from "@thewaver/ss-components-vue";
 import * as styles from "@thewaver/ss-playground/App/StyledComponents/StepContent/StepContent.css";
 
 import { useLayerClass } from "../Layer/Layer.context";
-import type { StepArcConnectorProps } from "./StepContent.types";
+import type { StepArcConnectorProps } from "./StepContentVue.types";
 
 const props = defineProps<StepArcConnectorProps>();
 

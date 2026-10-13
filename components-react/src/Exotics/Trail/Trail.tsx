@@ -1,16 +1,13 @@
 import { useEffect, useLayoutEffect, useRef, useState } from "react";
 
 import { TRAIL_DEFAULTS, type TrailPlace, TrailStyles, TrailUtils } from "@thewaver/ss-components";
+import { TrailConst } from "@thewaver/ss-components/internal";
 import { MathUtils, StoreUtils } from "@thewaver/ss-utils";
 
 import { InteractionTrackerReactUtils } from "../../Abstracts/InteractionTracker/InteractionTrackerReact.utils";
 import { SignalMirrorReactUtils } from "../../Abstracts/SignalMirror/SignalMirrorReact.utils";
 import { useLatest } from "../../Utils/refUtils";
 import type { TrailController, TrailProps } from "./Trail.types";
-
-const NO_LENGTH = 0;
-const NO_PROGRESS = 0;
-const NO_OFFSET = 0;
 
 type TrailSnapshot = {
     place: TrailPlace;
@@ -25,11 +22,14 @@ const getIsSameSnapshot = (a: TrailSnapshot, b: TrailSnapshot) =>
     a.place.point.y === b.place.point.y;
 
 export const Trail = (props: TrailProps) => {
-    const [progress, setProgressState] = SignalMirrorReactUtils.useOptionalState(props.progress, NO_PROGRESS);
+    const [progress, setProgressState] = SignalMirrorReactUtils.useOptionalState(
+        props.progress,
+        TrailConst.NO_PROGRESS,
+    );
     const [isPlaying, setIsPlaying] = SignalMirrorReactUtils.useOptionalState(props.playback, true);
 
     const pathRef = useRef<SVGPathElement | null>(null);
-    const [pathLength, setPathLength] = useState(NO_LENGTH);
+    const [pathLength, setPathLength] = useState(TrailConst.NO_LENGTH);
 
     const isPageHidden = InteractionTrackerReactUtils.usePageHidden();
 
@@ -40,7 +40,7 @@ export const Trail = (props: TrailProps) => {
     const followerOffsets = props.followerOffsets ?? TRAIL_DEFAULTS.followerOffsets;
     const runExtent = TrailUtils.getRunExtent(followerOffsets, isLooping);
 
-    const isRunning = isPlaying && !isDisabled && !isPageHidden && pathLength > NO_LENGTH;
+    const isRunning = isPlaying && !isDisabled && !isPageHidden && pathLength > TrailConst.NO_LENGTH;
 
     const progressRef = useLatest(progress);
 
@@ -52,7 +52,7 @@ export const Trail = (props: TrailProps) => {
     const latest = useLatest({ props, durationMs, runExtent, isLooping, setProgress, setIsPlaying });
 
     useLayoutEffect(() => {
-        setPathLength(pathRef.current ? pathRef.current.getTotalLength() : NO_LENGTH);
+        setPathLength(pathRef.current ? pathRef.current.getTotalLength() : TrailConst.NO_LENGTH);
     }, [props.path]);
 
     const computePlace = (offset: number) =>
@@ -63,7 +63,7 @@ export const Trail = (props: TrailProps) => {
         );
 
     const places = followerOffsets.map(computePlace);
-    const snapshot: TrailSnapshot = { place: computePlace(NO_OFFSET), isPlaying };
+    const snapshot: TrailSnapshot = { place: computePlace(TrailConst.NO_OFFSET), isPlaying };
 
     const [controllerStore] = useState(() => StoreUtils.create(snapshot, { isEqual: getIsSameSnapshot }));
 

@@ -9,7 +9,7 @@ import type { SwipeDirection } from "@thewaver/ss-utils";
 
 import { PageMeasureBox } from "../../../PageComponents/MeasureBox/MeasureBox";
 import { PageControlButtonContent } from "../../../StyledComponents/ControlButtonContent/ControlButtonContent";
-import type { CardStackDeckExampleProps } from "../CardStackExamples.types";
+import type { CardStackDeckExampleProps } from "../CardStackExamplesReact.types";
 
 const CARDS = ["Ace", "King", "Queen", "Jack", "Ten", "Nine", "Eight", "Seven", "Six", "Five", "Four", "Three", "Two"];
 const DIRECTIONS: SwipeDirection[] = ["left", "right", "up", "down"];

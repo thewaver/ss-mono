@@ -1,11 +1,14 @@
 <script lang="ts">
     import { Tabs } from "@thewaver/ss-components-svelte";
     import {
-        PAGE_VIEW_KEYS,
-        PAGE_VIEW_LABELS,
-        toPageViewKey,
-        toPageViewRoute,
-    } from "@thewaver/ss-playground/App/PageComponents/ViewTabs/ViewTabs.const";
+    EXAMPLES_VIEW,
+    PAGE_VIEW_KEYS,
+    PAGE_VIEW_LABELS,
+    TAB_GAP,
+    TAB_ORIENTATION,
+    toPageViewKey,
+    toPageViewRoute,
+} from "@thewaver/ss-playground/App/PageComponents/ViewTabs/ViewTabs.const";
     import * as styles from "@thewaver/ss-playground/App/PageComponents/ViewTabs/ViewTabs.css";
 
     import { navigate, route } from "../../App.router";
@@ -14,11 +17,7 @@
     import PageTabFloater from "../../StyledComponents/TabContent/PageTabFloater.svelte";
     import PageTabGutter from "../../StyledComponents/TabContent/PageTabGutter.svelte";
     import PageViewTabLink from "./PageViewTabLink.svelte";
-    import type { PageViewKey, PageViewTabsProps } from "./ViewTabs.types";
-
-    const TAB_GAP = 20;
-    const TAB_ORIENTATION = "horizontal";
-    const EXAMPLES_VIEW: PageViewKey = "examples";
+    import type { PageViewTabsProps } from "./ViewTabsSvelte.types";
 
     let props: PageViewTabsProps = $props();
 

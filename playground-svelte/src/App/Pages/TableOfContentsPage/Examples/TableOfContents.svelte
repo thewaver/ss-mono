@@ -8,7 +8,7 @@
     import * as styles from "@thewaver/ss-playground/App/Pages/TableOfContentsPage/TableOfContentsPage.css";
 
     import PageTableOfContentsContent from "../../../StyledComponents/TableOfContentsContent/TableOfContentsContent.svelte";
-    import type { TableOfContentsExampleProps } from "../TableOfContentsPage.types";
+    import type { TableOfContentsExampleProps } from "../TableOfContentsPageSvelte.types";
 
     const TOP_DEPTH = 0;
 
@@ -54,7 +54,7 @@
                     {section.title}
                 </svelte:element>
 
-                <p>{section.text}</p>
+                <p class={styles.tocText}>{section.text}</p>
             </section>
         {/each}
     </article>

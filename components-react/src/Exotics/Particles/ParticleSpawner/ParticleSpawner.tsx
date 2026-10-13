@@ -7,6 +7,7 @@ import {
     ParticleSpawnerStyles,
     ParticleSpawnerUtils,
 } from "@thewaver/ss-components";
+import { ParticleSpawnerConst } from "@thewaver/ss-components/internal";
 
 import { ElementObserverReactUtils } from "../../../Abstracts/ElementObserver/ElementObserverReact.utils";
 import { InteractionTrackerReactUtils } from "../../../Abstracts/InteractionTracker/InteractionTrackerReact.utils";
@@ -15,9 +16,6 @@ import { SignalMirrorReactUtils } from "../../../Abstracts/SignalMirror/SignalMi
 import { useLatest } from "../../../Utils/refUtils";
 import { useStore } from "../../../Utils/storeUtils";
 import type { ParticleSpawnerProps } from "./ParticleSpawner.types";
-
-const FIRST_STAGE = 0;
-const NOT_STARTED = 0;
 
 export const ParticleSpawner = (props: ParticleSpawnerProps) => {
     const travelDurationMs = props.travelDurationMs ?? PARTICLE_SPAWNER_DEFAULTS.travelDurationMs;
@@ -35,8 +33,8 @@ export const ParticleSpawner = (props: ParticleSpawnerProps) => {
     const tsRef = useRef(new Map<number, number>());
 
     const [isPlaying] = SignalMirrorReactUtils.useOptionalState(props.playback, true);
-    const [stage, setStage] = useState({ index: FIRST_STAGE });
-    const [, setFrame] = useState(NOT_STARTED);
+    const [stage, setStage] = useState({ index: ParticleSpawnerConst.FIRST_STAGE });
+    const [, setFrame] = useState(ParticleSpawnerConst.NOT_STARTED);
 
     const isWindowVisible = !InteractionTrackerReactUtils.usePageHidden();
     const prefersReducedMotion = MediaQueryMonitorReactUtils.useReducedMotion();
@@ -85,7 +83,7 @@ export const ParticleSpawner = (props: ParticleSpawnerProps) => {
     useEffect(() => engine.stop, [engine]);
 
     useEffect(() => {
-        setStage({ index: FIRST_STAGE });
+        setStage({ index: ParticleSpawnerConst.FIRST_STAGE });
     }, [particleCount, spawnDelayMs, patterns]);
 
     const pattern = patterns[stage.index];

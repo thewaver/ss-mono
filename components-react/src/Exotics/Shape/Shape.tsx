@@ -1,13 +1,12 @@
 import { Fragment, useLayoutEffect, useRef, useState } from "react";
 
 import { ShapeLayerUtils, ShapeStyles } from "@thewaver/ss-components";
+import { ShapeConst } from "@thewaver/ss-components/internal";
 import { Size2d } from "@thewaver/ss-utils";
 
 import type { SVGDefs } from "../../Generators/SVGDefs/SVGDefs.types";
 import { useElement } from "../../Utils/refUtils";
 import type { ShapeProps } from "./Shape.types";
-
-const INITIAL_SIZE: Size2d = { width: 0, height: 0 };
 
 const renderDefsElements = (defs: SVGDefs[]) =>
     defs.map((def, index) => (
@@ -38,7 +37,7 @@ const renderPath = (def: SVGDefs, index: number, d: string, fillRule?: "evenodd"
 export const Shape = (props: ShapeProps) => {
     const rootRef = useRef<HTMLDivElement>(null);
     const rootElement = useElement(rootRef);
-    const [rootSize, setRootSize] = useState(INITIAL_SIZE);
+    const [rootSize, setRootSize] = useState(ShapeConst.INITIAL_SIZE);
 
     useLayoutEffect(() => {
         const root = rootRef.current;

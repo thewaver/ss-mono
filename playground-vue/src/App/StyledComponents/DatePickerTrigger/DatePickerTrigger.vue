@@ -2,7 +2,7 @@
 import * as styles from "@thewaver/ss-playground/App/StyledComponents/DatePickerTrigger/DatePickerTrigger.css";
 
 import { useLayerClass } from "../Layer/Layer.context";
-import type { DatePickerTriggerProps } from "./DatePickerTrigger.types";
+import type { DatePickerTriggerProps } from "./DatePickerTriggerVue.types";
 
 defineProps<DatePickerTriggerProps>();
 

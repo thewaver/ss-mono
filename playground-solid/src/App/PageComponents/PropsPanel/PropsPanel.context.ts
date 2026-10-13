@@ -2,7 +2,7 @@ import { createContext, useContext } from "solid-js";
 
 import type { AccessorProps } from "@thewaver/ss-components-solid";
 
-import type { PagePropsPanelScope } from "./PropsPanel.types";
+import type { PagePropsPanelScope } from "./PropsPanelSolid.types";
 
 const PropsPanelContext = createContext<AccessorProps<{ scope: PagePropsPanelScope }>>();
 

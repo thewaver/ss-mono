@@ -2,7 +2,7 @@
     import * as styles from "@thewaver/ss-playground/App/StyledComponents/RadioStarContent/RadioStarContent.css";
 
     import { getLayerClass } from "../Layer/Layer.context";
-    import type { RadioStarContentProps } from "./RadioStarContent.types";
+    import type { RadioStarContentProps } from "./RadioStarContentSvelte.types";
 
     let props: RadioStarContentProps = $props();
 

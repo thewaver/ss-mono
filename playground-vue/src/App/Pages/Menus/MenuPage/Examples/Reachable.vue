@@ -8,7 +8,7 @@ import PageGlideFloater from "../../../../StyledComponents/GlideFloater/PageGlid
 import PageMenuTriggerContent from "../../../../StyledComponents/MenuTriggerContent/MenuTriggerContent.vue";
 import PageTooltipContent from "../../../../StyledComponents/TooltipContent/TooltipContent.vue";
 import MenuActionItem from "../MenuActionItem.vue";
-import { ACTIONS } from "../MenuPage.const";
+import { ACTIONS } from "../MenuPageVue.const";
 import MenuPopup from "../MenuPopup.vue";
 
 const tooltipDefs: InteractionTooltipDefs<MenuFlags> = {

@@ -3,6 +3,7 @@
     import type { Attachment } from "svelte/attachments";
 
     import { MOSAIC_DEFAULTS, MosaicUtils, NavigatorUtils, MosaicStyles as styles } from "@thewaver/ss-components";
+    import { MosaicConst } from "@thewaver/ss-components/internal";
     import type { Rect } from "@thewaver/ss-utils";
 
     import { ElementObserverSvelteUtils } from "../../Abstracts/ElementObserver/ElementObserverSvelte.utils.svelte.js";
@@ -12,9 +13,6 @@
     import type { MosaicProps } from "./Mosaic.types.js";
     import MosaicTile from "./MosaicTile.svelte";
 
-    const NOT_PLACED = -1;
-    const NO_TRANSITION_MS = 0;
-
     let props: MosaicProps = $props();
 
     const sizeAnchor = $derived(props.sizeAnchor ?? MOSAIC_DEFAULTS.sizeAnchor);
@@ -23,10 +21,10 @@
     const isWalked = $derived(props.onActivate !== undefined);
 
     const getPrefersReducedMotion = MediaQueryMonitorSvelteUtils.createReducedMotion(
-        () => transitionDurationMs <= NO_TRANSITION_MS,
+        () => transitionDurationMs <= MosaicConst.NO_TRANSITION_MS,
     );
 
-    const glideDurationMs = $derived(getPrefersReducedMotion() ? NO_TRANSITION_MS : transitionDurationMs);
+    const glideDurationMs = $derived(getPrefersReducedMotion() ? MosaicConst.NO_TRANSITION_MS : transitionDurationMs);
 
     let root = $state<HTMLDivElement>();
     let focusedSlot = $state.raw<object>();
@@ -177,7 +175,7 @@
     onkeydown={handleKeyDown}
 >
     {#each slotOrder as slot, readingIndex (getSlotId(slot))}
-        {@const index = indexBySlot.get(slot) ?? NOT_PLACED}
+        {@const index = indexBySlot.get(slot) ?? MosaicConst.NOT_PLACED}
         <MosaicTile
             {index}
             {readingIndex}

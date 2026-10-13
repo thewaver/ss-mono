@@ -8,7 +8,7 @@
     import PageSelectField from "../../../PageComponents/Field/PageSelectField.svelte";
     import PageMeasureBox from "../../../PageComponents/MeasureBox/MeasureBox.svelte";
     import PageProp from "../../../PageComponents/Prop/Prop.svelte";
-    import type { MosaicSharedProps } from "../Mosaics.types";
+    import type { MosaicSharedProps } from "../MosaicsSvelte.types";
     import ImagesExample from "./Examples/Images.svelte";
 
     let props: MosaicSharedProps = $props();

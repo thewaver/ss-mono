@@ -5,7 +5,7 @@
 
     import PageButtonContent from "../../../StyledComponents/ButtonContent/ButtonContent.svelte";
     import PageHoverCardContent from "../../../StyledComponents/HoverCardContent/HoverCardContent.svelte";
-    import type { HoverCardExampleProps } from "../HoverCardPage.types";
+    import type { HoverCardExampleProps } from "../HoverCardPageSvelte.types";
 
     type Props = HoverCardExampleProps;
 

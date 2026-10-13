@@ -2,7 +2,13 @@ import { createMemo, createSignal } from "solid-js";
 
 import { LIGHT_CATCHER_DEFAULTS } from "@thewaver/ss-components-solid";
 import { LightCatcherKnobs } from "@thewaver/ss-playground/App/Knobs/LightCatchers.const";
-import type { LightCatcherExampleProps } from "@thewaver/ss-playground/App/Pages/PointerEffects/LightCatcherPage/LightCatcherPage.types";
+import {
+    BOX_HEIGHT,
+    EXAMPLES_ROOT,
+    EXAMPLE_NAMES,
+    FIELD_WIDTH,
+    ROW_SPAN,
+} from "@thewaver/ss-playground/App/Pages/PointerEffects/LightCatcherPage/LightCatcherPage.const";
 
 import { PageExamples } from "../../../PageComponents/Examples/Examples";
 import { PageCheckField, PageNumberField } from "../../../PageComponents/Field/Field";
@@ -12,12 +18,7 @@ import { PagePropsPanel } from "../../../PageComponents/PropsPanel/PropsPanel";
 import { PanelExample } from "./Examples/Panel";
 import { PlacedLightExample } from "./Examples/PlacedLight";
 import { RowExample } from "./Examples/Row";
-
-const EXAMPLES_ROOT = "/src/App/Pages/PointerEffects/LightCatcherPage/Examples";
-
-const FIELD_WIDTH = 110;
-const BOX_HEIGHT = 200;
-const ROW_SPAN = 2;
+import type { LightCatcherExampleProps } from "./LightCatcherPageSolid.types";
 
 export const LightCatcherPage = () => {
     const [getIsDisabled, setIsDisabled] = createSignal(LightCatcherKnobs.STARTING_IS_DISABLED);
@@ -44,7 +45,7 @@ export const LightCatcherPage = () => {
         return [
             {
                 key: "panel",
-                name: "One panel",
+                name: EXAMPLE_NAMES.panel,
                 readout: () => "brightest with the pointer on it, fading back to resting as the pointer walks out",
                 component: () => (
                     <PageMeasureBox isFilling height={() => BOX_HEIGHT}>
@@ -55,7 +56,7 @@ export const LightCatcherPage = () => {
             },
             {
                 key: "row",
-                name: "A row of them",
+                name: EXAMPLE_NAMES.row,
                 span: ROW_SPAN,
                 readout: () =>
                     "five of them side by side, each reading the pointer against its own box — drop the resting brightness below 1 and the row becomes a spotlight",
@@ -68,7 +69,7 @@ export const LightCatcherPage = () => {
             },
             {
                 key: "placed",
-                name: "A light placed by hand",
+                name: EXAMPLE_NAMES.placed,
                 span: ROW_SPAN,
                 readout: () =>
                     "the slider puts one light across the whole row and every lamp answers to that same spot — the pointer is ignored, since a supplied point replaces it",

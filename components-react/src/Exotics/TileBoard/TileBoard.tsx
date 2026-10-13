@@ -6,13 +6,12 @@ import {
     TileBoardStyles,
     TileBoardUtils,
 } from "@thewaver/ss-components";
+import { TileBoardConst } from "@thewaver/ss-components/internal";
 import { Index2d } from "@thewaver/ss-utils";
 
 import { InteractionWrapper } from "../../Primitives/InteractionWrapper/InteractionWrapper";
 import { useLatest } from "../../Utils/refUtils";
 import type { TileBoardProps, TileBoardTileProps } from "./TileBoard.types";
-
-const FIRST_ARIA_INDEX = 1;
 
 const TileBoardTile = (props: TileBoardTileProps) => {
     const isDisabled = props.flags.isDisabled ?? false;
@@ -181,7 +180,7 @@ export const TileBoard = (props: TileBoardProps) => {
                             id={`${boardId}-tile-${key}`}
                             flags={flags}
                             ariaLabel={props.computeTileAriaLabel?.(tile)}
-                            colIndex={col + FIRST_ARIA_INDEX}
+                            colIndex={col + TileBoardConst.FIRST_ARIA_INDEX}
                             size={geometry.size}
                             clipPath={TileBoardUtils.getClipPath(geometry.points)}
                             renderContent={(tileFlags) => props.renderTile(tile, tileFlags)}
@@ -224,7 +223,7 @@ export const TileBoard = (props: TileBoardProps) => {
                             key={rowIndex}
                             className={TileBoardStyles.tileBoardRow}
                             role="row"
-                            aria-rowindex={rowIndex + FIRST_ARIA_INDEX}
+                            aria-rowindex={rowIndex + TileBoardConst.FIRST_ARIA_INDEX}
                             style={{ left: `${origin.x}px`, top: `${origin.y}px` }}
                         >
                             {Array.from(

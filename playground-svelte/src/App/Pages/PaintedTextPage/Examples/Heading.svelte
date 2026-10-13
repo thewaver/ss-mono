@@ -1,8 +1,8 @@
 <script lang="ts">
     import { PaintedText } from "@thewaver/ss-components-svelte";
 
-    import { computeSampleDefs } from "../PaintedTextPage.const";
-    import type { PaintedTextExampleProps } from "../PaintedTextPage.types";
+    import { computeSampleDefs } from "../PaintedTextPageSvelte.const";
+    import type { PaintedTextExampleProps } from "../PaintedTextPageSvelte.types";
 
     type Props = PaintedTextExampleProps & {
         fontSize: number;

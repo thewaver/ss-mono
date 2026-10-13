@@ -7,6 +7,7 @@ import {
     SVGDefsUtils,
     TrackedGradientDefaults,
 } from "@thewaver/ss-components";
+import { CometConst, TrackedGradientSampleConst } from "@thewaver/ss-components/internal";
 import { MathUtils, type Point2d } from "@thewaver/ss-utils";
 
 import { PointerTrackerSolidUtils } from "../../../../Abstracts/PointerTracker/PointerTrackerSolid.utils";
@@ -14,17 +15,9 @@ import { SVGGradientDefsSolidUtils } from "../../../../Generators/SVGDefs/SVGGra
 import type { TrackedGradientConfig } from "../../SVGDefsSolid.types";
 import { SVGDefsSolidUtils } from "../../SVGDefsSolid.utils";
 
-const PACE_BY_COMET = [1, 0.7, 0.5];
-const SETTLE_MS = 1500;
-const RESTING_POINT: Point2d = { x: 0.5, y: 0.5 };
-const STILL: Point2d = { x: 0, y: 0 };
-const NO_FADE = 0;
-
-const CYCLING_DEFAULTS = TrackedGradientDefaults.COMET_CYCLING_DEFAULTS;
-
 const NO_REF = () => undefined;
 
-const clock = SVGDefsSolidUtils.createClock(SETTLE_MS);
+const clock = SVGDefsSolidUtils.createClock(CometConst.SETTLE_MS);
 
 const createComets = (
     getReading: () => PointerReading,
@@ -38,10 +31,10 @@ const createComets = (
     const follow = opts?.followStiffness ?? defaults.followStiffness;
 
     const [getChains, setChains] = createSignal<Point2d[][]>(
-        PACE_BY_COMET.map(() => Array.from({ length }, () => RESTING_POINT)),
+        CometConst.PACE_BY_COMET.map(() => Array.from({ length }, () => CometConst.RESTING_POINT)),
     );
 
-    const velocities = PACE_BY_COMET.map(() => STILL);
+    const velocities = CometConst.PACE_BY_COMET.map(() => CometConst.STILL);
 
     let lastMs: number | undefined;
 
@@ -54,7 +47,8 @@ const createComets = (
 
         lastMs = nowMs;
 
-        if (SVGDefsUtils.getPointerFade(reading, getIsPointerPresent()) > NO_FADE) clock.keepAwake();
+        if (SVGDefsUtils.getPointerFade(reading, getIsPointerPresent()) > TrackedGradientSampleConst.NO_FADE)
+            clock.keepAwake();
 
         if (frameMs <= 0) return;
 
@@ -65,7 +59,7 @@ const createComets = (
                     velocities[comet],
                     reading.boxRatio,
                     frameMs,
-                    stiffness * PACE_BY_COMET[comet],
+                    stiffness * CometConst.PACE_BY_COMET[comet],
                     damping,
                 );
 
@@ -86,8 +80,8 @@ export const createCometSample =
             const sharedBlur = SVGDefsSolidUtils.getBaseBlur(id, defs);
             const sharedBlurRef = SVGDefsUtils.getSharedFilter(sharedBlur);
             const length = opts?.tailLength ?? defaults.tailLength;
-            const cycleMs = opts?.cycles ? (opts.cycleMs ?? CYCLING_DEFAULTS.cycleMs) : undefined;
-            const comets = PACE_BY_COMET.map((_unused, comet) => comet).reverse();
+            const cycleMs = opts?.cycles ? (opts.cycleMs ?? CometConst.CYCLING_DEFAULTS.cycleMs) : undefined;
+            const comets = CometConst.PACE_BY_COMET.map((_unused, comet) => comet).reverse();
 
             const { getReading, getIsPointerPresent } = PointerTrackerSolidUtils.create(
                 getRef ?? NO_REF,
@@ -100,13 +94,13 @@ export const createCometSample =
             const getFade = () => SVGDefsUtils.getPointerFade(getReading(), getIsPointerPresent());
 
             const getColor = (comet: number) => {
-                if (cycleMs && getFade() > NO_FADE) clock.keepAwake();
+                if (cycleMs && getFade() > TrackedGradientSampleConst.NO_FADE) clock.keepAwake();
 
                 return SVGDefsUtils.computeTracerColor(
                     defs.colors,
                     colorKeys,
                     comet,
-                    PACE_BY_COMET.length,
+                    CometConst.PACE_BY_COMET.length,
                     clock.getFrameMs(),
                     cycleMs,
                 );

@@ -5,19 +5,18 @@ import { Tabs, access } from "@thewaver/ss-components-solid";
 import type { TabLinkProps } from "@thewaver/ss-components-solid";
 import { toRoutePath } from "@thewaver/ss-playground/App/PageComponents/FrameworkSwitch/FrameworkSwitch.const";
 import {
+    EXAMPLES_VIEW,
     PAGE_VIEW_KEYS,
     PAGE_VIEW_LABELS,
+    TAB_GAP,
+    TAB_ORIENTATION,
     toPageViewKey,
     toPageViewRoute,
 } from "@thewaver/ss-playground/App/PageComponents/ViewTabs/ViewTabs.const";
 import * as styles from "@thewaver/ss-playground/App/PageComponents/ViewTabs/ViewTabs.css";
 
 import { PageTabContent, PageTabFloater, PageTabGutter } from "../../StyledComponents/TabContent/TabContent";
-import type { PageViewKey, PageViewTabsProps } from "./ViewTabs.types";
-
-const TAB_GAP = 20;
-const TAB_ORIENTATION = "horizontal";
-const EXAMPLES_VIEW: PageViewKey = "examples";
+import type { PageViewKey, PageViewTabsProps } from "./ViewTabsSolid.types";
 
 const PageViewTabLink = (props: TabLinkProps) => <A {...props} data-view-tab={props.href} />;
 

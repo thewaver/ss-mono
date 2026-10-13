@@ -4,6 +4,12 @@ import { computed, shallowRef } from "vue";
 import type { FormFieldOrientation } from "@thewaver/ss-components-vue";
 import { FORM_FIELD_DEFAULTS, FORM_FIELD_ORIENTATIONS } from "@thewaver/ss-components-vue";
 import { FormFieldKnobs } from "@thewaver/ss-playground/App/Knobs/FormFields.const";
+import {
+    EXAMPLES_ROOT,
+    EXAMPLE_NAMES,
+    FIELD_WIDTH,
+    MESSAGE_WIDTH,
+} from "@thewaver/ss-playground/App/Pages/FormFieldPage/FormFieldPage.const";
 
 import type { ExampleDefs } from "../../PageComponents/Examples/Examples.types";
 import PageExamples from "../../PageComponents/Examples/PageExamples.vue";
@@ -17,11 +23,6 @@ import DefaultExample from "./Examples/Default.vue";
 import ForeignExample from "./Examples/Foreign.vue";
 import InFormExample from "./Examples/InForm.vue";
 import type { FormFieldExampleProps } from "./FormFieldPage.types";
-
-const EXAMPLES_ROOT = "/src/App/Pages/FormFieldPage/Examples";
-
-const FIELD_WIDTH = 110;
-const MESSAGE_WIDTH = 240;
 
 const orientation = shallowRef<FormFieldOrientation>(FORM_FIELD_DEFAULTS.orientation);
 const gap = shallowRef(FORM_FIELD_DEFAULTS.gap);
@@ -42,7 +43,7 @@ const commonProps = computed<Omit<FormFieldExampleProps, "value" | "onUpdate:val
 const examples: ExampleDefs[] = [
     {
         key: "default",
-        name: "Around a control of the library's",
+        name: EXAMPLE_NAMES.default,
         readout: () =>
             message.value.length > 0
                 ? "the message has an id of its own and the control inside is pointed at it, without either of them being told the other's name"
@@ -51,14 +52,14 @@ const examples: ExampleDefs[] = [
     },
     {
         key: "foreign",
-        name: "Around a control it has never seen",
+        name: EXAMPLE_NAMES.foreign,
         readout: () =>
             "a plain input, which knows nothing about any of this — one call to FormFieldVueUtils.useAriaDescribedBy gets it the same wiring the library's own controls get for free",
         path: `${EXAMPLES_ROOT}/Foreign.vue`,
     },
     {
         key: "inForm",
-        name: "Inside a form",
+        name: EXAMPLE_NAMES.inForm,
         readout: () =>
             "turn the error on — the field tells the form, and the form's own validity is what disables the button; nothing here reads the other's state directly",
         path: `${EXAMPLES_ROOT}/InForm.vue`,

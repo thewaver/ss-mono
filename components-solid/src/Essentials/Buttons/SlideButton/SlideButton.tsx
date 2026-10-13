@@ -6,6 +6,7 @@ import {
     SlideButtonUtils,
     SlideButtonStyles as styles,
 } from "@thewaver/ss-components";
+import { SlideButtonConst } from "@thewaver/ss-components/internal";
 
 import { InteractionTrackerSolidUtils } from "../../../Abstracts/InteractionTracker/InteractionTrackerSolid.utils";
 import { SignalMirrorSolidUtils } from "../../../Abstracts/SignalMirror/SignalMirrorSolid.utils";
@@ -15,8 +16,6 @@ import { accessStore } from "../../../Utils/storeUtils";
 import { FormFieldSolidUtils } from "../../Input/FormField/FormFieldSolid.utils";
 import { LabelSolidUtils } from "../../Input/Label/LabelSolid.utils";
 import type { SlideButtonElementProps, SlideButtonProps } from "./SlideButtonSolid.types";
-
-const RATIO_MIN = 0;
 
 const SlideButtonElement = (props: SlideButtonElementProps) => {
     const getAriaLabel = LabelSolidUtils.resolveAriaLabel(
@@ -100,7 +99,10 @@ const SlideButtonElement = (props: SlideButtonElementProps) => {
 };
 
 export const SlideButton = (props: SlideButtonProps) => {
-    const [getProgressRatio, setProgressRatio] = SignalMirrorSolidUtils.createOptional(() => props.progress, RATIO_MIN);
+    const [getProgressRatio, setProgressRatio] = SignalMirrorSolidUtils.createOptional(
+        () => props.progress,
+        SlideButtonConst.RATIO_MIN,
+    );
     const [getIsDragging, setIsDragging] = createSignal(false);
     const [getIsHolding, setIsHolding] = createSignal(false);
 

@@ -2,7 +2,7 @@
 import { Button } from "@thewaver/ss-components-vue";
 
 import PageMeridiemToggleContent from "../../StyledComponents/MeridiemToggleContent/MeridiemToggleContent.vue";
-import type { MeridiemToggleProps } from "./MeridiemToggle.types";
+import type { MeridiemToggleProps } from "./MeridiemToggleVue.types";
 
 const props = defineProps<MeridiemToggleProps>();
 </script>

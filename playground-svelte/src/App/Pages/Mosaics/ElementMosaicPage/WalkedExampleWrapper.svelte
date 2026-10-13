@@ -2,7 +2,7 @@
     import { MOSAIC_EXTENT, TILES } from "@thewaver/ss-playground/App/Pages/Mosaics/Mosaics.const";
 
     import PageMeasureBox from "../../../PageComponents/MeasureBox/MeasureBox.svelte";
-    import type { WalkedExampleWrapperProps } from "./ElementMosaicPage.types";
+    import type { WalkedExampleWrapperProps } from "./ElementMosaicPageSvelte.types";
     import WalkedExample from "./Examples/Walked.svelte";
 
     let props: WalkedExampleWrapperProps = $props();

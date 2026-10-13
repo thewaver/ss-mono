@@ -1,25 +1,14 @@
 import type { VNodeChild } from "vue";
 
-import type { SegmentedInputCellRenderProps } from "@thewaver/ss-components";
+import type { BaseSegmentedInputProps, SegmentedInputCellRenderProps } from "@thewaver/ss-components";
 
 import type { TextFieldPresetProps, TextFieldSlots } from "../../../Primitives/TextField/TextField.types";
 
 export type SegmentedInputProps = Omit<
     TextFieldPresetProps,
     "type" | "padding" | "gap" | "placeholderHint" | "min" | "max" | "step" | "computeMaskedText" | "computeTextStyle"
-> & {
-    /** How many cells the field has, which is also the most characters its value can hold. */
-    cellCount: number;
-    /** The space between two cells, in pixels. */
-    gap?: number;
-    /**
-     * Answers whether one character may be typed or pasted into the field. A refused character is dropped wherever
-     * it appears, so a pasted `123-456` lands as its six digits. Left out, only the digits `0` to `9` are taken; a
-     * field that takes more should also say so through `inputMode`, which otherwise asks a phone for its digit
-     * keyboard.
-     */
-    computeIsAllowed?: (char: string) => boolean;
-};
+> &
+    BaseSegmentedInputProps;
 
 export type SegmentedInputSlots = Pick<TextFieldSlots, "renderDecoration"> & {
     /**

@@ -10,16 +10,12 @@ import {
     CuboidUtils,
     CuboidStyles as styles,
 } from "@thewaver/ss-components";
+import { CuboidConst } from "@thewaver/ss-components/internal";
 import type { Matrix3d } from "@thewaver/ss-utils";
 
 import { InteractionTrackerSolidUtils } from "../../../Abstracts/InteractionTracker/InteractionTrackerSolid.utils";
 import { access, accessSignal } from "../../../Utils/propUtils";
 import type { CuboidController, CuboidProps } from "./CuboidSolid.types";
-
-const NO_DURATION = 0;
-const DRAG_COMMIT_RATIO = 0.5;
-
-const NO_TURNS: CuboidTurns = { yaw: 0, pitch: 0 };
 
 export const Cuboid = (props: CuboidProps) => {
     const [getYaw, setYaw] = accessSignal(() => props.yaw);
@@ -27,7 +23,7 @@ export const Cuboid = (props: CuboidProps) => {
 
     const [getPerspectiveRef, setPerspectiveRef] = createSignal<HTMLElement>();
     const [getBodyRef, setBodyRef] = createSignal<HTMLElement>();
-    const [getDragTurns, setDragTurns] = createSignal(NO_TURNS);
+    const [getDragTurns, setDragTurns] = createSignal(CuboidConst.NO_TURNS);
     const [getOrientation, setOrientation] = createSignal(
         CuboidUtils.standUpright(CuboidUtils.getCountedOrientation(untrack(getYaw), untrack(getPitch))),
     );
@@ -85,7 +81,7 @@ export const Cuboid = (props: CuboidProps) => {
                 const to = isUpright ? CuboidUtils.standUpright(counted) : counted;
 
                 setOrientation(CuboidUtils.standUpright(counted));
-                settle(from, to, NO_TURNS);
+                settle(from, to, CuboidConst.NO_TURNS);
             },
             { defer: true },
         ),
@@ -94,7 +90,7 @@ export const Cuboid = (props: CuboidProps) => {
     const getAcrossSign = () => CuboidUtils.getAcrossSign(getIsUpright(), getPitch());
 
     const { getIsSwiping } = InteractionTrackerSolidUtils.trackFreeSwipe(getPerspectiveRef, () => !getIsDraggable(), {
-        getCommitRatio: () => DRAG_COMMIT_RATIO,
+        getCommitRatio: () => CuboidConst.DRAG_COMMIT_RATIO,
         onSwipe: (travel) => {
             if (getIsUpright()) stopSettling();
 
@@ -107,12 +103,12 @@ export const Cuboid = (props: CuboidProps) => {
             const pitch = getPitch();
 
             batch(() => {
-                setDragTurns(NO_TURNS);
+                setDragTurns(CuboidConst.NO_TURNS);
                 setYaw(yaw + turns.yaw);
                 setPitch(pitch + turns.pitch);
             });
 
-            if (from && getYaw() === yaw && getPitch() === pitch) settle(from, getOrientation(), NO_TURNS);
+            if (from && getYaw() === yaw && getPitch() === pitch) settle(from, getOrientation(), CuboidConst.NO_TURNS);
         },
     });
 
@@ -137,7 +133,7 @@ export const Cuboid = (props: CuboidProps) => {
         CuboidUtils.getBodyTransform(getIsUpright(), getOrientation(), getYaw(), getPitch(), getDragTurns(), getSize());
 
     const getBodyTransitionDurationMs = () =>
-        getIsUpright() || getIsSwiping() ? NO_DURATION : getTransitionDurationMs();
+        getIsUpright() || getIsSwiping() ? CuboidConst.NO_DURATION : getTransitionDurationMs();
 
     onMount(() => {
         props.onMount?.(controller);

@@ -9,6 +9,7 @@
         TypewriterUtils,
         TypewriterStyles as styles,
     } from "@thewaver/ss-components";
+    import { TypewriterConst } from "@thewaver/ss-components/internal";
     import { StringUtils } from "@thewaver/ss-utils";
     import { assignInlineVars } from "@vanilla-extract/dynamic";
 
@@ -18,19 +19,15 @@
     import { toStyle } from "../../../Utils/styleUtils.js";
     import type { TypewriterController, TypewriterProps } from "./Typewriter.types.js";
 
-    const BEFORE_FIRST = TypewriterUtils.CARET_BEFORE_FIRST;
-    const NO_PROGRESS = 0;
-    const DATA_PREFIX = "data-";
-
     const toDataAttributes = (dataset: DOMStringMap) =>
         Object.fromEntries(
             Object.entries(dataset).map(([key, value]) => [
-                `${DATA_PREFIX}${StringUtils.camelToKebabCase(key)}`,
+                `${TypewriterConst.DATA_PREFIX}${StringUtils.camelToKebabCase(key)}`,
                 value,
             ]),
         );
 
-    let { progress = $bindable(NO_PROGRESS), playback = $bindable(true), ...props }: TypewriterProps = $props();
+    let { progress = $bindable(TypewriterConst.NO_PROGRESS), playback = $bindable(true), ...props }: TypewriterProps = $props();
 
     const computeAnimationName = $derived(props.computeAnimationName ?? TYPEWRITER_DEFAULTS.computeAnimationName);
     const animationDurationMs = $derived(props.animationDurationMs ?? TYPEWRITER_DEFAULTS.animationDurationMs);
@@ -226,7 +223,7 @@
 
     {#if !isDriven && getPlayerState().segments.length > 0}
         <div class={styles.typewriterTextWrap} style:width={`${getPlayerState().width ?? 0}px`}>
-            {#if caretIndex === BEFORE_FIRST}
+            {#if caretIndex === TypewriterConst.BEFORE_FIRST}
                 {@render props.renderCaret?.()}
             {/if}{#each getPlayerState().segments as segment, index (index)}
                 {#if segment.type === "atomic"}
@@ -272,7 +269,7 @@
                         >{segment.text}</span>
                     {/if}
                 {/if}
-            {/each}{#if !isAnimating && caretIndex !== BEFORE_FIRST}
+            {/each}{#if !isAnimating && caretIndex !== TypewriterConst.BEFORE_FIRST}
                 {@render props.renderCaret?.()}
             {/if}
         </div>

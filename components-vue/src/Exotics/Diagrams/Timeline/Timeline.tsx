@@ -22,6 +22,7 @@ import {
     TimelineStyles,
     TimelineUtils,
 } from "@thewaver/ss-components";
+import { TimelineConst } from "@thewaver/ss-components/internal";
 import type { Point2d } from "@thewaver/ss-utils";
 
 import { CarrierVueUtils } from "../../../Abstracts/Carrier/CarrierVue.utils";
@@ -39,15 +40,6 @@ import type {
     TimelineProps,
     TimelineSlots,
 } from "./Timeline.types";
-
-const DEFAULT_FOCUS_RATIO = 0.5;
-const MIN_VIEW_SHARE = 0.001;
-const PERCENT = 100;
-const NOTHING = 0;
-const FIRST_ARIA_POSITION = 1;
-const ROVING_TAB_INDEX = 0;
-const NO_MARKERS: number[] = [];
-const DEFAULT_EDGE: TimelineEdge = "end";
 
 const getIsSameSpan = (a: TimelineSpan, b: TimelineSpan) => a.start === b.start && a.end === b.end;
 
@@ -100,14 +92,15 @@ export const Timeline = defineComponent(
         const itemRefs = new Map<number, HTMLElement>();
 
         let isFocusFollowing = false;
-        let edgeGrabOffset = NOTHING;
+        let edgeGrabOffset = TimelineConst.NOTHING;
 
         const focusedIndex = shallowRef<number>();
-        const heldEdge = shallowRef<TimelineEdge>(DEFAULT_EDGE);
+        const heldEdge = shallowRef<TimelineEdge>(TimelineConst.DEFAULT_EDGE);
 
         const size = ElementObserverVueUtils.useBorderBoxSize(rootRef);
 
-        const getMinViewExtent = () => props.minViewExtent ?? TimelineUtils.getExtent(props.range) * MIN_VIEW_SHARE;
+        const getMinViewExtent = () =>
+            props.minViewExtent ?? TimelineUtils.getExtent(props.range) * TimelineConst.MIN_VIEW_SHARE;
 
         const rawView = useTwoWay(props, "view", props.range);
 
@@ -225,7 +218,7 @@ export const Timeline = defineComponent(
                     TimelineUtils.zoomView(
                         latestView,
                         factor,
-                        focusRatio ?? DEFAULT_FOCUS_RATIO,
+                        focusRatio ?? TimelineConst.DEFAULT_FOCUS_RATIO,
                         props.range,
                         getMinViewExtent(),
                     ),
@@ -254,7 +247,7 @@ export const Timeline = defineComponent(
             if (!isFocusFollowing || element === undefined) return;
 
             isFocusFollowing = false;
-            element.tabIndex = ROVING_TAB_INDEX;
+            element.tabIndex = TimelineConst.ROVING_TAB_INDEX;
             element.focus();
         };
 
@@ -284,7 +277,7 @@ export const Timeline = defineComponent(
 
             if (element === undefined) return;
 
-            element.tabIndex = ROVING_TAB_INDEX;
+            element.tabIndex = TimelineConst.ROVING_TAB_INDEX;
             element.focus();
         };
 
@@ -294,7 +287,9 @@ export const Timeline = defineComponent(
             const span = spans.value[index];
 
             edgeGrabOffset =
-                from === undefined ? NOTHING : TimelineUtils.toValue(getPointerRatio(from.x), latestView) - span[edge];
+                from === undefined
+                    ? TimelineConst.NOTHING
+                    : TimelineUtils.toValue(getPointerRatio(from.x), latestView) - span[edge];
 
             heldEdge.value = edge;
 
@@ -474,7 +469,7 @@ export const Timeline = defineComponent(
                         top: `${box.top}px`,
                         height: `${box.height}px`,
                     }}
-                    aria-posinset={placement.order + FIRST_ARIA_POSITION}
+                    aria-posinset={placement.order + TimelineConst.FIRST_ARIA_POSITION}
                     aria-setsize={props.items.length}
                 >
                     <InteractionWrapper
@@ -557,7 +552,7 @@ export const Timeline = defineComponent(
             const isZoomable = getIsZoomable();
             const renderedIndices = TimelineUtils.computeRenderedIndices(placements.value, rovingIndex.value);
             const ticks = TimelineUtils.computeTicks(view.value, steps.value);
-            const markers = TimelineUtils.computeMarkers(props.markers ?? NO_MARKERS, view.value);
+            const markers = TimelineUtils.computeMarkers(props.markers ?? TimelineConst.NO_MARKERS, view.value);
 
             return (
                 <div
@@ -580,7 +575,7 @@ export const Timeline = defineComponent(
                             <div
                                 key={index}
                                 class={TimelineStyles.timelineTick}
-                                style={{ left: `${tick.ratio * PERCENT}%` }}
+                                style={{ left: `${tick.ratio * TimelineConst.PERCENT}%` }}
                             >
                                 {callSlot(slots.renderTick, tick)}
                             </div>
@@ -602,7 +597,7 @@ export const Timeline = defineComponent(
                             <div
                                 key={index}
                                 class={TimelineStyles.timelineMarker}
-                                style={{ left: `${marker.ratio * PERCENT}%` }}
+                                style={{ left: `${marker.ratio * TimelineConst.PERCENT}%` }}
                             >
                                 {callSlot(slots.renderMarker, { marker, index })}
                             </div>

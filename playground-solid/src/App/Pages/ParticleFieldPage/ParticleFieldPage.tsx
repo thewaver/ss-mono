@@ -3,6 +3,16 @@ import { createStore } from "solid-js/store";
 
 import { CellAnimationKeyframes, CellAnimationOrigins, CellAnimationWeights } from "@thewaver/ss-components-solid";
 import { ParticleFieldKnobs } from "@thewaver/ss-playground/App/Knobs/ParticleFields.const";
+import {
+    BOX_HEIGHT,
+    BOX_WIDTH,
+    EXAMPLES_ROOT,
+    EXAMPLE_NAMES,
+    PERCENT,
+    SHAPED_BOX_SIZE,
+    STRESS_CELL_COUNT,
+    STRESS_ITEMS,
+} from "@thewaver/ss-playground/App/Pages/ParticleFieldPage/ParticleFieldPage.const";
 import * as styles from "@thewaver/ss-playground/App/Pages/ParticleFieldPage/ParticleFieldPage.css";
 import { type Index2d, ShapeConst } from "@thewaver/ss-utils";
 
@@ -19,25 +29,9 @@ import { PagePlaybackScrubber } from "../../PageComponents/PlaybackScrubber/Play
 import { PageProp } from "../../PageComponents/Prop/Prop";
 import { PagePropsPanel } from "../../PageComponents/PropsPanel/PropsPanel";
 import { StressTest } from "../../PageComponents/StressTest/StressTest";
-import type { StressTestDefs } from "../../PageComponents/StressTest/StressText.types";
 import { DefaultExample } from "./Examples/Default";
 import { ShapedExample } from "./Examples/Shaped";
 import type { ParticleFieldExampleProps } from "./ParticleFieldPage.types";
-
-const EXAMPLES_ROOT = "/src/App/Pages/ParticleFieldPage/Examples";
-const BOX_WIDTH = 320;
-const BOX_HEIGHT = 320;
-const SHAPED_BOX_SIZE = 320;
-const PERCENT = 100;
-
-const STRESS_CELL_COUNT: Index2d = { col: 11, row: 11 };
-const STRESS_ITEM_SIZE = 120;
-const STRESS_ITEMS: (StressTestDefs & { size: number })[] = [
-    { count: 4 * 3, cols: 4, gap: 10, size: STRESS_ITEM_SIZE },
-    { count: 6 * 4, cols: 6, gap: 10, size: STRESS_ITEM_SIZE },
-    { count: 8 * 6, cols: 8, gap: 10, size: STRESS_ITEM_SIZE },
-    { count: 12 * 6, cols: 12, gap: 10, size: STRESS_ITEM_SIZE },
-];
 
 const extractOptionGroupWord = (key: string) => key.replace(/^_/, "").match(/^[a-z]+/)?.[0] ?? key;
 
@@ -184,7 +178,7 @@ export const ParticleFieldPage = () => {
         return [
             {
                 key: "default",
-                name: "The whole box",
+                name: EXAMPLE_NAMES.default,
                 readout: () =>
                     `${Math.round(progress[0]() * PERCENT)}% through the pass, ${defaultPlayback[0]() ? "running" : "stopped"} — the progress signal is written by the field while it plays, and writing it moves the pass there`,
                 component: () => (
@@ -194,7 +188,7 @@ export const ParticleFieldPage = () => {
             },
             {
                 key: "shaped",
-                name: "Inside a shape",
+                name: EXAMPLE_NAMES.shaped,
                 readout: () =>
                     "the same field, limited to one of the built-in shapes Shape draws; a cell whose center falls outside it never spawns",
                 component: () => <ShapedExampleWrapper {...commonProps} />,
@@ -202,7 +196,7 @@ export const ParticleFieldPage = () => {
             },
             {
                 key: "stressTest",
-                name: "Stress Test",
+                name: EXAMPLE_NAMES.stressTest,
                 component: () => <StressTestWrapper {...commonProps} />,
             },
         ];

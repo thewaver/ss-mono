@@ -12,7 +12,7 @@ import PageTextFieldContent, {
     computePageTextFieldTextStyle,
 } from "../../../StyledComponents/TextFieldContent/TextFieldContent.vue";
 import PageTextFieldPlaceholder from "../../../StyledComponents/TextFieldPlaceholder/TextFieldPlaceholder.vue";
-import type { TextInputPasswordExampleProps } from "../TextInputPage.types";
+import type { TextInputPasswordExampleProps } from "../TextInputPageVue.types";
 
 type Props = TextInputPasswordExampleProps;
 

@@ -2,16 +2,17 @@
 import { computed, useId } from "vue";
 
 import { SunburstUtils } from "@thewaver/ss-components-vue";
+import {
+    LABEL_HIDDEN,
+    LABEL_SHOWN,
+    MIN_LABEL_ANGLE,
+    PAD_LENGTH,
+    RING_GAP,
+} from "@thewaver/ss-playground/App/StyledComponents/SunburstContent/SunburstContent.const";
 import * as styles from "@thewaver/ss-playground/App/StyledComponents/SunburstContent/SunburstContent.css";
 
 import { useLayerClass } from "../Layer/Layer.context";
-import type { PageSunburstArcProps } from "./SunburstContent.types";
-
-const PAD_LENGTH = 1;
-const RING_GAP = 1;
-const MIN_LABEL_ANGLE = 0.03;
-const LABEL_SHOWN = 1;
-const LABEL_HIDDEN = 0;
+import type { PageSunburstArcProps } from "./SunburstContentVue.types";
 
 const props = defineProps<PageSunburstArcProps>();
 

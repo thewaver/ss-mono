@@ -3,6 +3,12 @@ import { computed, shallowRef } from "vue";
 
 import { REVEAL_DEFAULTS } from "@thewaver/ss-components-vue";
 import { RevealKnobs } from "@thewaver/ss-playground/App/Knobs/Reveals.const";
+import {
+    EXAMPLES_ROOT,
+    EXAMPLE_NAMES,
+    FIELD_WIDTH,
+    SHAPE_FIELD_WIDTH,
+} from "@thewaver/ss-playground/App/Pages/Reveals/RevealPage/RevealPage.const";
 import type { RevealShape } from "@thewaver/ss-playground/App/Pages/Reveals/RevealPage/RevealPage.types";
 import { ShapeConst, type Size2d } from "@thewaver/ss-utils";
 
@@ -17,10 +23,6 @@ import FrostedExample from "./Examples/Frosted.vue";
 import PromptExample from "./Examples/Prompt.vue";
 import TorchExample from "./Examples/Torch.vue";
 import type { RevealExampleProps } from "./RevealExample.types";
-
-const EXAMPLES_ROOT = "/src/App/Pages/Reveals/RevealPage/Examples";
-const FIELD_WIDTH = 110;
-const SHAPE_FIELD_WIDTH = 170;
 
 const radius = shallowRef(REVEAL_DEFAULTS.radius);
 const shape = shallowRef<RevealShape>(RevealKnobs.STARTING_SHAPE);
@@ -52,19 +54,19 @@ const commonProps = computed<RevealExampleProps>(() => ({
 const examples: ExampleDefs[] = [
     {
         key: "torch",
-        name: "Torch",
+        name: EXAMPLE_NAMES.torch,
         readout: () => "an opaque cover with a hole cut where the pointer is",
         path: `${EXAMPLES_ROOT}/Torch.vue`,
     },
     {
         key: "frosted",
-        name: "Frosted",
+        name: EXAMPLE_NAMES.frosted,
         readout: () => "the cover blurs rather than hides, so the hole sharpens instead of uncovering",
         path: `${EXAMPLES_ROOT}/Frosted.vue`,
     },
     {
         key: "prompt",
-        name: "Cover that knows",
+        name: EXAMPLE_NAMES.prompt,
         readout: () => "the cover is told whether a reveal is happening, and says something different",
         path: `${EXAMPLES_ROOT}/Prompt.vue`,
     },

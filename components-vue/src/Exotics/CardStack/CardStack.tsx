@@ -1,6 +1,7 @@
 import { type SlotsType, computed, defineComponent, onScopeDispose, shallowRef } from "vue";
 
 import { CARD_STACK_DEFAULTS, CardStackStyles, CardStackUtils } from "@thewaver/ss-components";
+import { CardStackConst } from "@thewaver/ss-components/internal";
 
 import { InteractionTrackerVueUtils } from "../../Abstracts/InteractionTracker/InteractionTrackerVue.utils";
 import { watchAfterRender } from "../../Utils/effectUtils";
@@ -9,14 +10,9 @@ import { useStore } from "../../Utils/storeUtils";
 import type { SlotsContext } from "../../Utils/typeUtils";
 import type { CardStackControls, CardStackProps, CardStackSlots } from "./CardStack.types";
 
-const MIN_MOUNTED_COUNT = 1;
-const FIRST_INDEX = 0;
-const TOP_DEPTH = 0;
-const FALLBACK_AXIS = "horizontal";
-
 export const CardStack = defineComponent(
     <T,>(props: CardStackProps<T>, { slots }: SlotsContext<CardStackSlots<T>>) => {
-        const topIndex = useTwoWay(props, "topIndex", FIRST_INDEX);
+        const topIndex = useTwoWay(props, "topIndex", CardStackConst.FIRST_INDEX);
 
         const pileRef = shallowRef<HTMLDivElement>();
 
@@ -51,7 +47,7 @@ export const CardStack = defineComponent(
             () => (swipeAxis.value ? pileRef.value : undefined),
             getIsSwipeDisabled,
             {
-                axis: () => swipeAxis.value ?? FALLBACK_AXIS,
+                axis: () => swipeAxis.value ?? CardStackConst.FALLBACK_AXIS,
                 commitRatio: getCommitRatio,
                 onSwipe: (ratio) => pile.push(swipeAxis.value === "vertical" ? { x: 0, y: ratio } : { x: ratio, y: 0 }),
                 onSwipeEnd: pile.release,
@@ -90,7 +86,10 @@ export const CardStack = defineComponent(
 
         return () => {
             const transitionDurationMs = getTransitionDurationMs();
-            const mountedCount = Math.max(props.mountedCount ?? CARD_STACK_DEFAULTS.mountedCount, MIN_MOUNTED_COUNT);
+            const mountedCount = Math.max(
+                props.mountedCount ?? CARD_STACK_DEFAULTS.mountedCount,
+                CardStackConst.MIN_MOUNTED_COUNT,
+            );
             const cardGap = props.cardGap ?? CARD_STACK_DEFAULTS.cardGap;
             const funnelRatio = props.funnelRatio ?? CARD_STACK_DEFAULTS.funnelRatio;
             const pileSide = props.pileSide ?? CARD_STACK_DEFAULTS.pileSide;
@@ -111,7 +110,7 @@ export const CardStack = defineComponent(
                     onKeydown={onKeyDown}
                 >
                     {mounted.map((entry, depth) => {
-                        const isTop = depth === TOP_DEPTH;
+                        const isTop = depth === CardStackConst.TOP_DEPTH;
 
                         return (
                             <div

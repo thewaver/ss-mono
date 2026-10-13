@@ -1,6 +1,8 @@
 <script setup lang="ts">
 import { shallowRef } from "vue";
 
+import { EXAMPLES_ROOT, EXAMPLE_NAMES } from "@thewaver/ss-playground/App/Pages/TreePage/TreePage.const";
+
 import type { ExampleDefs } from "../../PageComponents/Examples/Examples.types";
 import PageExamples from "../../PageComponents/Examples/PageExamples.vue";
 import FilesExample from "./Examples/Files.vue";
@@ -13,6 +15,7 @@ import RecordValuesExample from "./Examples/RecordValues.vue";
 import RightToLeftExample from "./Examples/RightToLeft.vue";
 import VirtualizedExample from "./Examples/Virtualized.vue";
 import LeaningExampleWrapper from "./LeaningExampleWrapper.vue";
+import type { Asset } from "./TreePage.types";
 import {
     FILES_WITH_DISABLED,
     FILES_WITH_REACHABLE,
@@ -20,10 +23,7 @@ import {
     STRESS_BRANCH_COUNT,
     STRESS_LEAF_COUNT,
     createStressFiles,
-} from "./TreePage.const";
-import type { Asset } from "./TreePage.types";
-
-const EXAMPLES_ROOT = "/src/App/Pages/TreePage/Examples";
+} from "./TreePageVue.const";
 
 const defaultValue = shallowRef<string | undefined>();
 const defaultExpanded = shallowRef<string[]>(["src"]);
@@ -68,84 +68,84 @@ const recordExpanded = shallowRef<Asset[]>([]);
 const examples: ExampleDefs[] = [
     {
         key: "default",
-        name: "Default",
+        name: EXAMPLE_NAMES.default,
         readout: () =>
             `value: ${defaultValue.value ?? "undefined"} | expanded: ${JSON.stringify(defaultExpanded.value)} — right opens a branch, left closes it or climbs to the parent`,
         path: `${EXAMPLES_ROOT}/Files.vue`,
     },
     {
         key: "collapsed",
-        name: "Everything collapsed",
+        name: EXAMPLE_NAMES.collapsed,
         readout: () =>
             `value: ${collapsedValue.value ?? "undefined"} | expanded: ${JSON.stringify(collapsedExpanded.value)} — asterisk opens every branch at the level focus is on`,
         path: `${EXAMPLES_ROOT}/Files.vue`,
     },
     {
         key: "rightToLeft",
-        name: "In a right-to-left box",
+        name: EXAMPLE_NAMES.rightToLeft,
         readout: () =>
             `value: ${rightToLeftValue.value ?? "undefined"} | expanded: ${JSON.stringify(rightToLeftExpanded.value)} — the box around the tree sets dir="rtl", so left opens a branch and right closes it or climbs to the parent`,
         path: `${EXAMPLES_ROOT}/RightToLeft.vue`,
     },
     {
         key: "unheld",
-        name: "Nobody holding the state",
+        name: EXAMPLE_NAMES.unheld,
         readout: () =>
             "no signals passed — the tree keeps the selection and the open branches itself; a picked node is still marked selected and is still the tree's one tab stop",
         path: `${EXAMPLES_ROOT}/Files.vue`,
     },
     {
         key: "disabled",
-        name: "Disabled nodes",
+        name: EXAMPLE_NAMES.disabled,
         readout: () =>
             `value: ${disabledValue.value ?? "undefined"} — arrows skip index.ts and Lib, while what is inside Lib stays reachable`,
         path: `${EXAMPLES_ROOT}/Files.vue`,
     },
     {
         key: "reachable",
-        name: "Disabled nodes + reachable",
+        name: EXAMPLE_NAMES.reachable,
         readout: () =>
             `value: ${reachableValue.value ?? "undefined"} — arrows stop on node_modules, hover explains why, and nothing opens it`,
         path: `${EXAMPLES_ROOT}/Files.vue`,
     },
     {
         key: "outside",
-        name: "Collapsed from outside",
+        name: EXAMPLE_NAMES.outside,
         readout: () =>
             `expanded: ${JSON.stringify(outsideExpanded.value)} — press the button, then focus a row inside Lib before the delay elapses; focus must land on Lib rather than on the page body`,
         path: `${EXAMPLES_ROOT}/Outside.vue`,
     },
     {
         key: "links",
-        name: "Nodes that are links",
+        name: EXAMPLE_NAMES.links,
         readout: () =>
             `value: ${linkValue.value ?? "undefined"} — every leaf carries an href, so each one is an anchor and the branches stay plain`,
         path: `${EXAMPLES_ROOT}/Links.vue`,
     },
     {
         key: "linkComponent",
-        name: "Links through a component",
+        name: EXAMPLE_NAMES.linkComponent,
         readout: () =>
             `value: ${customLinkValue.value ?? "undefined"} — the same nodes rendered by a consumer's own link component`,
         path: `${EXAMPLES_ROOT}/LinkComponent.vue`,
     },
     {
         key: "lazy",
-        name: "Branches that arrive later",
+        name: EXAMPLE_NAMES.lazy,
         readout: () =>
             `expanded: ${JSON.stringify(lazyExpanded.value)} — packages and docs say they have children before they have them`,
         path: `${EXAMPLES_ROOT}/Lazy.vue`,
     },
     {
         key: "virtualized",
-        name: "Virtualized",
+        name: EXAMPLE_NAMES.virtualized,
         readout: () =>
             `${(STRESS_BRANCH_COUNT * (STRESS_LEAF_COUNT + 1)).toLocaleString("en-GB")} rows when everything is open — expanded: ${stressExpanded.value.length} branches, value: ${stressValue.value ?? "undefined"}`,
         path: `${EXAMPLES_ROOT}/Virtualized.vue`,
     },
     {
         key: "leaning",
-        name: "Leaning toward the pointer",
+        name: EXAMPLE_NAMES.leaning,
         readout: () =>
             `selected: ${leaningValue.value ?? "nothing"} — a column layout with a proximity effect: each node shifts and brightens by how near the pointer is, and the painter keeps the selected one lit, since an effect is not told which node is current`,
         path: `${EXAMPLES_ROOT}/Leaning.vue`,
@@ -153,14 +153,14 @@ const examples: ExampleDefs[] = [
     {
         key: "radial",
         span: 2,
-        name: "A tree drawn outward",
+        name: EXAMPLE_NAMES.radial,
         readout: () =>
             `value: ${radialValue.value ?? "undefined"} — the layout is told which node each node hangs from, so children share the slice their parent was given, and every rank sits a ring further out whoever it hangs from`,
         path: `${EXAMPLES_ROOT}/Radial.vue`,
     },
     {
         key: "recordValues",
-        name: "Record values",
+        name: EXAMPLE_NAMES.recordValues,
         readout: () =>
             `value: ${recordValue.value?.name ?? "undefined"} | expanded: ${recordExpanded.value.length} branch(es) — the value is the record itself, not a name`,
         path: `${EXAMPLES_ROOT}/RecordValues.vue`,

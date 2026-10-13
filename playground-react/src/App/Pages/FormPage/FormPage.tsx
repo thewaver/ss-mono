@@ -1,11 +1,11 @@
 import { useState } from "react";
 
+import { EXAMPLES_ROOT, EXAMPLE_NAMES } from "@thewaver/ss-playground/App/Pages/FormPage/FormPage.const";
+
 import { PageExamples } from "../../PageComponents/Examples/Examples";
 import { FocusOnErrorExample } from "./Examples/FocusOnError";
 import { SignUpExample } from "./Examples/SignUp";
 import type { FormExampleProps } from "./FormPage.types";
-
-const EXAMPLES_ROOT = "/src/App/Pages/FormPage/Examples";
 
 export const FormPage = () => {
     const emailState = useState("");
@@ -34,14 +34,14 @@ export const FormPage = () => {
     const examples = [
         {
             key: "reportsValidity",
-            name: "A form that reports its own validity",
+            name: EXAMPLE_NAMES.reportsValidity,
             readout: () => `outcome: ${outcome}`,
             component: () => <SignUpExample {...commonProps} />,
             path: `${EXAMPLES_ROOT}/SignUp.tsx`,
         },
         {
             key: "focusOnError",
-            name: "Submitting moves focus to the first error",
+            name: EXAMPLE_NAMES.focusOnError,
             readout: () =>
                 `outcome: ${focusOutcome} — the handler runs either way, and afterwards focus lands on the first field reporting an error`,
             component: () => (

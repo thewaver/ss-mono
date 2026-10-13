@@ -1,9 +1,11 @@
 <script lang="ts">
     import type { FileInputRejection } from "@thewaver/ss-components-svelte";
     import {
-        DROP_ZONE_REASON_TEXT,
-        MAX_ATTACHMENT_BYTES,
-    } from "@thewaver/ss-playground/App/Pages/FileInputPage/FileInputPage.const";
+    DROP_ZONE_REASON_TEXT,
+    EXAMPLE_NAMES,
+    EXAMPLES_ROOT,
+    MAX_ATTACHMENT_BYTES,
+} from "@thewaver/ss-playground/App/Pages/FileInputPage/FileInputPage.const";
 
     import type { ExampleDefs } from "../../PageComponents/Examples/Examples.types";
     import PageExamples from "../../PageComponents/Examples/PageExamples.svelte";
@@ -16,8 +18,6 @@
     import MultipleExample from "./Examples/Multiple.svelte";
     import ReachableExample from "./Examples/Reachable.svelte";
     import RejectingSetterExample from "./Examples/RejectingSetter.svelte";
-
-    const EXAMPLES_ROOT = "/src/App/Pages/FileInputPage/Examples";
 
     const describe = (files: File[]) => (files.length ? files.map((file) => file.name).join(", ") : "none");
 
@@ -44,28 +44,28 @@
     const examples: ExampleDefs[] = [
         {
             key: "default",
-            name: "Default",
+            name: EXAMPLE_NAMES.default,
             readout: () => `files: ${describe(defaultFiles)}`,
             component: defaultExample,
             path: `${EXAMPLES_ROOT}/Default.svelte`,
         },
         {
             key: "multiple",
-            name: "Multiple",
+            name: EXAMPLE_NAMES.multiple,
             readout: () => `files: ${describe(multipleFiles)}`,
             component: multipleExample,
             path: `${EXAMPLES_ROOT}/Multiple.svelte`,
         },
         {
             key: "images",
-            name: "Accepting images only",
+            name: EXAMPLE_NAMES.images,
             readout: () => `files: ${describe(imagesFiles)} — accept is a filter, never a guarantee`,
             component: imagesExample,
             path: `${EXAMPLES_ROOT}/Images.svelte`,
         },
         {
             key: "rejectingSetter",
-            name: "Rejecting setter",
+            name: EXAMPLE_NAMES.rejectingSetter,
             readout: () =>
                 `files: ${describe(rejectingFiles)}${rejection ? ` — ${rejection}` : ` — anything over ${MAX_ATTACHMENT_BYTES} bytes is refused`}`,
             component: rejectingSetterExample,
@@ -73,35 +73,35 @@
         },
         {
             key: "disabled",
-            name: "Disabled",
+            name: EXAMPLE_NAMES.disabled,
             readout: () => `files: ${describe(disabledFiles)}`,
             component: disabledExample,
             path: `${EXAMPLES_ROOT}/Disabled.svelte`,
         },
         {
             key: "reachable",
-            name: "Disabled + reachable",
+            name: EXAMPLE_NAMES.reachable,
             readout: () => `files: ${describe(reachableFiles)}`,
             component: reachableExample,
             path: `${EXAMPLES_ROOT}/Reachable.svelte`,
         },
         {
             key: "errored",
-            name: "Error",
+            name: EXAMPLE_NAMES.errored,
             readout: () => `files: ${describe(erroredFiles)} — required, nothing picked yet`,
             component: erroredExample,
             path: `${EXAMPLES_ROOT}/Errored.svelte`,
         },
         {
             key: "label",
-            name: "In a Label",
+            name: EXAMPLE_NAMES.label,
             readout: () => `files: ${describe(labeledFiles)} — the caption opens the dialog`,
             component: labeledExample,
             path: `${EXAMPLES_ROOT}/Labeled.svelte`,
         },
         {
             key: "dropZone",
-            name: "Drop area with limits",
+            name: EXAMPLE_NAMES.dropZone,
             readout: () => `files: ${describe(dropZoneFiles)} — refused: ${describeRejections(dropZoneRejections)}`,
             component: dropZoneExample,
             path: `${EXAMPLES_ROOT}/DropZone.svelte`,

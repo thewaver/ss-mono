@@ -4,8 +4,8 @@
     import PageRadioSegmentContent from "../../../StyledComponents/RadioSegmentContent/PageRadioSegmentContent.svelte";
     import PageRadioSegmentFloater from "../../../StyledComponents/RadioSegmentContent/PageRadioSegmentFloater.svelte";
     import PageRadioSegmentGroup from "../../../StyledComponents/RadioSegmentContent/PageRadioSegmentGroup.svelte";
-    import { SIZE_OPTIONS } from "../RadioPage.const";
-    import type { RadioExampleProps } from "../RadioPage.types";
+    import { SIZE_OPTIONS } from "@thewaver/ss-playground/App/Pages/RadioPage/RadioPage.const";
+    import type { RadioExampleProps } from "../RadioPageSvelte.types";
 
     type Props = RadioExampleProps;
 

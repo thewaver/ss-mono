@@ -5,7 +5,7 @@ import { FOCUS_RING_WIDTH } from "@thewaver/ss-playground/App/Theme.css";
 
 import PageScrollerButton from "../../../PageComponents/ScrollerButton/ScrollerButton.vue";
 import PageButtonContent from "../../../StyledComponents/ButtonContent/ButtonContent.vue";
-import type { ScrollerExampleProps } from "../ScrollerPage.types";
+import type { ScrollerExampleProps } from "../ScrollerPageVue.types";
 
 const SCROLLER_GAP = 10;
 

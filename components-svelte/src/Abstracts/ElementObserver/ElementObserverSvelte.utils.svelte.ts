@@ -5,19 +5,6 @@ import { type Bounds, type Point2d, Rect, Size2d } from "@thewaver/ss-utils";
 
 import { getViewportContext } from "../Viewport/Viewport.context.js";
 
-const EMPTY_SIZES: Size2d[] = [];
-
-const EMPTY_RECTS: (Rect | undefined)[] = [];
-
-const NO_SIZE: Size2d = { width: 0, height: 0 };
-
-const isSameSizeList = (a: Size2d[], b: Size2d[]) =>
-    a.length === b.length && a.every((size, index) => Size2d.isSame(size, b[index]));
-
-const isSameRectList = (a: (Rect | undefined)[], b: (Rect | undefined)[]) =>
-    a.length === b.length &&
-    a.every((rect, index) => (rect === undefined ? b[index] === undefined : Rect.isSame(rect, b[index])));
-
 /**
  * The Svelte side of {@link ElementObserverUtils}: each observer as a getter in and a getter out, torn down with the
  * component.
@@ -42,7 +29,7 @@ export namespace ElementObserverSvelteUtils {
         getRef: () => HTMLElement | undefined,
         getIsDisabled?: () => boolean,
     ) => {
-        let size = $state.raw(NO_SIZE);
+        let size = $state.raw(ElementObserverUtils.NO_SIZE);
 
         $effect(() => {
             const ref = getRef();
@@ -73,17 +60,17 @@ export namespace ElementObserverSvelteUtils {
         getRefs: () => Array<HTMLElement | undefined>,
         getIsDisabled?: () => boolean,
     ) => {
-        let sizes = $state.raw(EMPTY_SIZES);
+        let sizes = $state.raw(ElementObserverUtils.EMPTY_SIZES);
 
         const setSizes = (next: Size2d[]) => {
-            if (!isSameSizeList(sizes, next)) sizes = next;
+            if (!ElementObserverUtils.isSameSizeList(sizes, next)) sizes = next;
         };
 
         $effect(() => {
             const refs = getRefs();
 
             if (getIsDisabled?.()) {
-                untrack(() => setSizes(EMPTY_SIZES));
+                untrack(() => setSizes(ElementObserverUtils.EMPTY_SIZES));
 
                 return;
             }
@@ -212,10 +199,10 @@ export namespace ElementObserverSvelteUtils {
     ) => {
         const viewportContext = getViewportContext();
 
-        let rects = $state.raw(EMPTY_RECTS);
+        let rects = $state.raw(ElementObserverUtils.EMPTY_RECTS);
 
         const setRects = (next: (Rect | undefined)[]) => {
-            if (!isSameRectList(rects, next)) rects = next;
+            if (!ElementObserverUtils.isSameRectList(rects, next)) rects = next;
         };
 
         $effect(() => {
@@ -240,7 +227,7 @@ export namespace ElementObserverSvelteUtils {
      *
      * @param getRefs The elements to follow, in reading order. A missing entry is kept in place and never current.
      * @param getIsDisabled Pass `true` to stop following. Omitted means always on.
-     * @param opts.getOffsetRatio Where the line sits, as a share of the viewport's height from its top. Defaults to
+     * @param opts.getOffsetRatio Where the line sits, as a share of the scrolling box's visible height from its top. Defaults to
      * `CURRENT_INDEX_OBSERVER_DEFAULTS.offsetRatio`.
      * @returns The current element's index, or `undefined` while none has passed the line and while disabled.
      */

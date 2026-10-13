@@ -2,7 +2,7 @@
 import { SlotText } from "@thewaver/ss-components-vue";
 import * as styles from "@thewaver/ss-playground/App/Pages/SlotTextPage/SlotTextPage.css";
 
-import type { SlotTextExampleProps } from "../SlotTextPage.types";
+import type { SlotTextExampleProps } from "../SlotTextPageVue.types";
 import Fade from "./Fade.vue";
 
 const DIGIT_SIZE = { width: 34, height: 52 };

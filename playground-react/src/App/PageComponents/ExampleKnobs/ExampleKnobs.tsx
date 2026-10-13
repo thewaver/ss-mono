@@ -1,8 +1,15 @@
 import type { PropsWithChildren } from "react";
 import { useEffect, useId, useLayoutEffect, useState } from "react";
 
-import type { AnchorPlacement, DismisserReason, PopupTriggerFlags } from "@thewaver/ss-components-react";
+import type { DismisserReason, PopupTriggerFlags } from "@thewaver/ss-components-react";
 import { InteractionWrapper, Popover, PopupTrigger } from "@thewaver/ss-components-react";
+import {
+    KNOBS_MARK,
+    KNOBS_OFFSET,
+    KNOBS_PLACEMENT,
+    TOOLTIP_OFFSET,
+    TOOLTIP_PLACEMENT,
+} from "@thewaver/ss-playground/App/PageComponents/ExampleKnobs/ExampleKnobs.const";
 import * as styles from "@thewaver/ss-playground/App/PageComponents/ExampleKnobs/ExampleKnobs.css";
 import * as examplesStyles from "@thewaver/ss-playground/App/PageComponents/Examples/Examples.css";
 
@@ -11,12 +18,6 @@ import { PageLayer } from "../Layer/Layer";
 import { PagePropsPanel } from "../PropsPanel/PropsPanel";
 import { useExampleKnobsContext } from "./ExampleKnobs.context";
 import type { PageExampleKnobsButtonProps } from "./ExampleKnobs.types";
-
-const KNOBS_PLACEMENT: AnchorPlacement = { x: "right_out", y: "top_in" };
-const KNOBS_OFFSET = { x: 10, y: 0 };
-const KNOBS_MARK = "⚙";
-const TOOLTIP_PLACEMENT: AnchorPlacement = { x: "center", y: "top_out" };
-const TOOLTIP_OFFSET = { x: 0, y: 10 };
 
 export const PageExampleKnobsButton = (props: PageExampleKnobsButtonProps) => {
     const popupId = useId();

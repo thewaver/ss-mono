@@ -2,7 +2,7 @@
     import * as styles from "@thewaver/ss-playground/App/StyledComponents/PaginatorContent/PaginatorContent.css";
 
     import { getLayerClass } from "../Layer/Layer.context";
-    import type { PaginatorPageContentProps } from "./PaginatorContent.types";
+    import type { PaginatorPageContentProps } from "./PaginatorContentSvelte.types";
 
     let props: PaginatorPageContentProps = $props();
 

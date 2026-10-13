@@ -3,8 +3,8 @@ import { POPOVER_SURFACE_INSET } from "@thewaver/ss-playground/App/StyledCompone
 
 import { renderPageHighlightFloater } from "../../../../StyledComponents/GlideFloater/GlideFloater";
 import { PageMenuTriggerContent } from "../../../../StyledComponents/MenuTriggerContent/MenuTriggerContent";
-import { DESTINATIONS, renderDestinationItem, renderMenuPopup } from "../MenuPage.const";
-import type { MenuCascaderExampleProps } from "../MenuPage.types";
+import { DESTINATIONS, renderDestinationItem, renderMenuPopup } from "../MenuPageSolid.const";
+import type { MenuCascaderExampleProps } from "../MenuPageSolid.types";
 
 const PATH_SEPARATOR = " / ";
 const NOTHING_CHOSEN = "Choose a destination";

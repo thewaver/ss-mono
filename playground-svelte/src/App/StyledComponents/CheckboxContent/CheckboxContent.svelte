@@ -2,10 +2,11 @@
     import * as styles from "@thewaver/ss-playground/App/StyledComponents/CheckboxContent/CheckboxContent.css";
 
     import { getLayerClass } from "../Layer/Layer.context";
-    import type { CheckboxContentProps } from "./CheckboxContent.types";
-
-    const CHECKED_MARK = "✓";
-    const MIXED_MARK = "–";
+    import type { CheckboxContentProps } from "./CheckboxContentSvelte.types";
+    import {
+        CHECKED_MARK,
+        MIXED_MARK,
+    } from "@thewaver/ss-playground/App/StyledComponents/CheckboxContent/CheckboxContent.const";
 
     let props: CheckboxContentProps = $props();
 

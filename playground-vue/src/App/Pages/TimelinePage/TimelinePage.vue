@@ -6,6 +6,8 @@ import { TimelineKnobs } from "@thewaver/ss-playground/App/Knobs/Timelines.const
 import type { Clip } from "@thewaver/ss-playground/App/Pages/TimelinePage/TimelineItems.types";
 import {
     DAY,
+    EXAMPLES_ROOT,
+    EXAMPLE_NAMES,
     REEL,
     TRIM_CLIPS,
     formatClock,
@@ -22,8 +24,6 @@ import MeetingsExample from "./Examples/Meetings.vue";
 import TracksExample from "./Examples/Tracks.vue";
 import TrimExample from "./Examples/Trim.vue";
 import type { TimelineExampleProps } from "./TimelinePage.types";
-
-const EXAMPLES_ROOT = "/src/App/Pages/TimelinePage/Examples";
 
 const isPannable = shallowRef(TimelineKnobs.STARTING_IS_PANNABLE);
 const isZoomable = shallowRef(TimelineKnobs.STARTING_IS_ZOOMABLE);
@@ -63,21 +63,21 @@ const commonProps = computed<Omit<TimelineExampleProps, "view" | "onUpdate:view"
 const examples: ExampleDefs[] = [
     {
         key: "meetings",
-        name: "A day of meetings",
+        name: EXAMPLE_NAMES.meetings,
         readout: () =>
             `showing ${formatClock(dayView.value.start)} to ${formatClock(dayView.value.end)} — the lanes are the component's own answer to what overlaps, and it takes the gestures itself: the wheel zooms where the pointer is, a drag moves the window, and a press that never travels still picks the meeting under it. The red line is a marker at the time on this computer's clock, and it is only drawn while that time is inside the day shown`,
         path: `${EXAMPLES_ROOT}/Meetings.vue`,
     },
     {
         key: "tracks",
-        name: "Three tracks",
+        name: EXAMPLE_NAMES.tracks,
         readout: () =>
             `showing ${formatStopwatch(reelView.value.start)} to ${formatStopwatch(reelView.value.end)} — here the page says which lane each clip belongs to, and the buttons are the route for anyone who cannot drag or pinch. The orange line is a marker the page moves while it plays`,
         path: `${EXAMPLES_ROOT}/Tracks.vue`,
     },
     {
         key: "trim",
-        name: "Trimming clips",
+        name: EXAMPLE_NAMES.trim,
         readout: () =>
             `${trimReadout.value} — drag either end of a clip, or press an end and then press where it should go; from the keyboard, Enter takes hold of a clip's end, Home and End switch ends, the arrows move it a second at a time, Enter drops it and Escape puts it back`,
         path: `${EXAMPLES_ROOT}/Trim.vue`,

@@ -1,22 +1,10 @@
 import type { Accessor, JSX } from "solid-js";
 
-import type { SunburstArcState, SunburstNode } from "@thewaver/ss-components";
+import type { BaseSunburstValues, SunburstArcState, SunburstNode } from "@thewaver/ss-components";
 
-import type { AccessorProps, MaybeAccessor, SignalSource } from "../../../Utils/typeUtils";
+import type { AccessorValues, SignalSource } from "../../../Utils/typeUtils";
 
-export type SunburstProps<T> = AccessorProps<{
-    /** Names the sunburst for assistive technology. */
-    ariaLabel: string;
-    /** How many rings are drawn around the center. The center takes the room of one ring more. */
-    ringCount?: number;
-    /** How long a zoom takes. `0` jumps straight to the new level, which is the route for reduced motion. */
-    zoomDurationMs?: number;
-}> & {
-    /**
-     * The whole tree. A leaf's share of its ring comes from its `weight` and a branch's from the total of its children,
-     * so a weight set on a branch is ignored. A child weighing nothing gets no arc.
-     */
-    root: MaybeAccessor<SunburstNode<T>>;
+export type SunburstProps<T> = AccessorValues<BaseSunburstValues<T>> & {
     /**
      * The branch at the center, whose children make the first ring. Both sides write it: the sunburst when an arc is
      * activated or Escape is pressed, the consumer to move it from outside — which is how a way back out is drawn, in

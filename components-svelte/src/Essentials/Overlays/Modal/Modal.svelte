@@ -3,6 +3,7 @@
     import { on } from "svelte/events";
 
     import { FocusManagerUtils, MODAL_DEFAULTS, ModalUtils, ModalStyles as styles } from "@thewaver/ss-components";
+    import { ModalConst } from "@thewaver/ss-components/internal";
     import { CSSUtils, GestureUtils } from "@thewaver/ss-utils";
 
     import { DismisserSvelteUtils } from "../../../Abstracts/Dismisser/DismisserSvelte.utils.svelte.js";
@@ -14,8 +15,6 @@
     import { toStyle } from "../../../Utils/styleUtils.js";
     import type { ModalProps } from "./Modal.types.js";
 
-    const DEFAULT_MARGINS = CSSUtils.spreadMargin(0);
-
     let { visibility = $bindable(), ...props }: ModalProps = $props();
 
     const viewportContext = getViewportContext();
@@ -26,7 +25,7 @@
 
     const transitionDurationMs = $derived(props.transitionDurationMs ?? MODAL_DEFAULTS.transitionDurationMs);
     const alignment = $derived(props.alignment ?? MODAL_DEFAULTS.alignment);
-    const margins = $derived(props.margins ?? DEFAULT_MARGINS);
+    const margins = $derived(props.margins ?? ModalConst.DEFAULT_MARGINS);
     const isDismissableOnOverlayClick = $derived(
         props.isDismissableOnOverlayClick ?? MODAL_DEFAULTS.isDismissableOnOverlayClick,
     );

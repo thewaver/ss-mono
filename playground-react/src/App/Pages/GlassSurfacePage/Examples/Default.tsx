@@ -1,6 +1,11 @@
 import { useId, useRef, useState } from "react";
 
-import { GlassSurface, InteractionTrackerReactUtils, SVGDefsSamples } from "@thewaver/ss-components-react";
+import {
+    GlassSurface,
+    InteractionTrackerReactUtils,
+    SVGDefsSampleConfigs,
+    SVGDefsSamples,
+} from "@thewaver/ss-components-react";
 import {
     NO_SAMPLE_KEY,
     computeNoSampleDefs,
@@ -10,7 +15,7 @@ import knight from "@thewaver/ss-playground/App/knight.webp";
 import { CSSUtils, type Point2d } from "@thewaver/ss-utils";
 import { assignInlineVars } from "@vanilla-extract/dynamic";
 
-import type { GlassSurfaceExampleProps } from "../GlassSurfacePage.types";
+import type { GlassSurfaceExampleProps } from "../GlassSurfacePageReact.types";
 
 const STARTING_RATIO: Point2d = { x: 0.5, y: 0.5 };
 const HALF_PANE = styles.paneSize * 0.5;
@@ -69,7 +74,7 @@ export const DefaultExample = ({
                     computeStrokeDefs={(size, element) => {
                         if (strokeConfigKey === NO_SAMPLE_KEY) return computeNoSampleDefs(colors, "stroke");
 
-                        return SVGDefsSamples.Gradient.Tracked.toConfig({
+                        return SVGDefsSampleConfigs.Gradient.Tracked.toConfig({
                             family: strokeConfigKey,
                             defs: strokeConfigDefs,
                         } as SVGDefsSamples.Gradient.Tracked.Entry).computeSVGDefs(`stroke-${id}`, undefined, element, {

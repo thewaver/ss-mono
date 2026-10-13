@@ -9,16 +9,6 @@ import { useElement, useLatest } from "../../Utils/refUtils";
 import { useStore } from "../../Utils/storeUtils";
 import type { WraparoundProps } from "./Wraparound.types";
 
-const KEY_SEPARATOR = ",";
-
-const toKey = (tile: WraparoundTile) => `${tile.column}${KEY_SEPARATOR}${tile.row}`;
-
-const fromKey = (key: string): WraparoundTile => {
-    const [column, row] = key.split(KEY_SEPARATOR).map(Number);
-
-    return { column, row };
-};
-
 export const Wraparound = (props: WraparoundProps) => {
     const rootRef = useRef<HTMLDivElement | null>(null);
     const originalRef = useRef<HTMLDivElement | null>(null);
@@ -63,8 +53,10 @@ export const Wraparound = (props: WraparoundProps) => {
 
     const { offset, original, isDragging } = useStore(plane);
 
-    const copyKeys = WraparoundUtils.computeTiles(offset, tileSize, viewportSize, maxCopies).map(toKey);
-    const originalKey = toKey(original);
+    const copyKeys = WraparoundUtils.computeTiles(offset, tileSize, viewportSize, maxCopies).map(
+        WraparoundUtils.toTileKey,
+    );
+    const originalKey = WraparoundUtils.toTileKey(original);
 
     const toTileTransform = (tile: WraparoundTile) =>
         `translate(${tile.column * tileSize.width}px, ${tile.row * tileSize.height}px)`;
@@ -100,7 +92,7 @@ export const Wraparound = (props: WraparoundProps) => {
                         key={key}
                         className={WraparoundStyles.wraparoundTile}
                         style={{
-                            transform: toTileTransform(fromKey(key)),
+                            transform: toTileTransform(WraparoundUtils.fromTileKey(key)),
                             visibility: key === originalKey ? "hidden" : undefined,
                         }}
                         aria-hidden="true"

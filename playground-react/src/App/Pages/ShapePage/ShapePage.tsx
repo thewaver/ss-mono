@@ -2,29 +2,33 @@ import { useId, useState } from "react";
 
 import type { SVGDefsColors } from "@thewaver/ss-components-react";
 import { SVGDefsSamples, Shape } from "@thewaver/ss-components-react";
+import { ShapeKnobs } from "@thewaver/ss-playground/App/Knobs/Shapes.const";
+import {
+    CORNER_FIELD_WIDTH,
+    DEFAULT_EXAMPLE_PATH,
+    EXAMPLES_ROOT,
+    EXAMPLE_NAMES,
+    MAX_CORNER_COLUMNS,
+    STRESS_ITEMS,
+} from "@thewaver/ss-playground/App/Pages/ShapePage/ShapePage.const";
 import * as styles from "@thewaver/ss-playground/App/Pages/ShapePage/ShapePage.css";
 import { ShapeConst } from "@thewaver/ss-utils";
 import { assignInlineVars } from "@vanilla-extract/dynamic";
 
-import { ShapeKnobs } from "../../Knobs/Shapes.const";
 import { PageExampleKnobs } from "../../PageComponents/ExampleKnobs/ExampleKnobs";
 import { PageExamples } from "../../PageComponents/Examples/Examples";
 import { PageCheckField, PageColorField, PageNumberField, PageSelectField } from "../../PageComponents/Field/Field";
 import { PagePaintPicker, usePaintSlot } from "../../PageComponents/PaintPicker/PaintPicker";
-import { getIsUsingKind } from "../../PageComponents/PaintPicker/PaintPicker.const";
+import { getIsUsingKind } from "../../PageComponents/PaintPicker/PaintPickerReact.const";
 import { PageProp } from "../../PageComponents/Prop/Prop";
 import { PagePropsDivider, PagePropsGroups, PagePropsPanel } from "../../PageComponents/PropsPanel/PropsPanel";
 import { StressTest } from "../../PageComponents/StressTest/StressTest";
-import type { StressTestDefs } from "../../PageComponents/StressTest/StressText.types";
 import { DefaultExample } from "./Examples/Default";
 import { MorphExample } from "./Examples/Morph";
 import { SharedPaintExample } from "./Examples/SharedPaint";
 import { TextWrapExample } from "./Examples/TextWrap";
-import { computeShapeFillDefs, computeShapeStrokeDefs } from "./ShapePage.const";
 import type { ShapeExampleProps } from "./ShapePage.types";
-
-const CORNER_FIELD_WIDTH = 80;
-const MAX_CORNER_COLUMNS = 6;
+import { computeShapeFillDefs, computeShapeStrokeDefs } from "./ShapePageReact.const";
 
 const spreadCornerValue = (previous: number[], index: number, value: number, hasIndividualCorners: boolean) => {
     if (!hasIndividualCorners) return previous.map(() => value);
@@ -35,30 +39,6 @@ const spreadCornerValue = (previous: number[], index: number, value: number, has
 
     return next;
 };
-
-const STRESS_ITEMS: (StressTestDefs & { size: number })[] = [
-    {
-        count: 40,
-        cols: 8,
-        gap: 20,
-        size: 160,
-    },
-    {
-        count: 160,
-        cols: 16,
-        gap: 10,
-        size: 80,
-    },
-    {
-        count: 640,
-        cols: 32,
-        gap: 5,
-        size: 40,
-    },
-];
-
-const EXAMPLES_ROOT = "/src/App/Pages/ShapePage/Examples";
-const DEFAULT_EXAMPLE_PATH = `${EXAMPLES_ROOT}/Default.tsx`;
 
 const StressTestWrapper = (props: ShapeExampleProps) => {
     const id = useId();
@@ -339,13 +319,13 @@ export const ShapePage = () => {
     const examples = [
         {
             key: "default",
-            name: "Default",
+            name: EXAMPLE_NAMES.default,
             component: () => <DefaultExampleWrapper {...commonProps} />,
             path: DEFAULT_EXAMPLE_PATH,
         },
         {
             key: "morph",
-            name: "Morph",
+            name: EXAMPLE_NAMES.morph,
             readout: () =>
                 "one number from 0 to 1 is read inside computePoints and blends two contours of twice the star-point count each, their corner radii and their exponents with them; under reduced motion the press jumps straight to the other shape",
             component: () => <MorphExampleWrapper {...commonProps} />,
@@ -353,7 +333,7 @@ export const ShapePage = () => {
         },
         {
             key: "sharedPaint",
-            name: "Shared Paint",
+            name: EXAMPLE_NAMES.sharedPaint,
             readout: () =>
                 "four shapes painted by one fill and one stroke laid across the whole group, so each shows its own part of a single picture; resize any of them and the picture stretches to the new group",
             component: () => <SharedPaintExampleWrapper {...commonProps} />,
@@ -361,7 +341,7 @@ export const ShapePage = () => {
         },
         {
             key: "textWrap",
-            name: "Text Wrap",
+            name: EXAMPLE_NAMES.textWrap,
             readout: () =>
                 "the shape writes its contour as shape-outside, so floating it is all the page does for the text to follow the edge",
             component: () => <TextWrapExampleWrapper {...commonProps} />,
@@ -369,7 +349,7 @@ export const ShapePage = () => {
         },
         {
             key: "stressTest",
-            name: "Stress Test",
+            name: EXAMPLE_NAMES.stressTest,
             component: () => <StressTestWrapper {...commonProps} />,
         },
     ];

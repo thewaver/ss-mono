@@ -3,6 +3,13 @@ import { useMemo, useState } from "react";
 import { STAIRCASE_DEFAULTS, STAIRCASE_DIRS, StaircaseIndents } from "@thewaver/ss-components-react";
 import type { StaircaseDir } from "@thewaver/ss-components-react";
 import { StaircaseKnobs } from "@thewaver/ss-playground/App/Knobs/Staircases.const";
+import {
+    EXAMPLES_ROOT,
+    EXAMPLE_NAMES,
+    FIELD_WIDTH,
+    STAGES,
+    STAIRCASE_WIDTH,
+} from "@thewaver/ss-playground/App/Pages/StaircasePage/StaircasePage.const";
 
 import { PageExamples } from "../../PageComponents/Examples/Examples";
 import { PageNumberField, PageSelectField } from "../../PageComponents/Field/Field";
@@ -10,24 +17,7 @@ import { PageMeasureBox } from "../../PageComponents/MeasureBox/MeasureBox";
 import { PageProp } from "../../PageComponents/Prop/Prop";
 import { PagePropsPanel } from "../../PageComponents/PropsPanel/PropsPanel";
 import { DefaultExample } from "./Examples/Default";
-import type { StaircaseExampleProps } from "./StaircasePage.types";
-
-const FIELD_WIDTH = 110;
-const STAIRCASE_WIDTH = 340;
-const EXAMPLES_ROOT = "/src/App/Pages/StaircasePage/Examples";
-
-const STAGES = [
-    "Visitors",
-    "Signed up",
-    "Activated",
-    "Subscribed",
-    "Renewed",
-    "Advocates",
-    "Champions",
-    "Partners",
-    "Investors",
-    "Founders",
-];
+import type { StaircaseExampleProps } from "./StaircasePageReact.types";
 
 const DefaultExampleWrapper = (props: StaircaseExampleProps) => {
     return (
@@ -57,7 +47,7 @@ export const StaircasePage = () => {
     const examples = [
         {
             key: "default",
-            name: "Default",
+            name: EXAMPLE_NAMES.default,
             component: () => <DefaultExampleWrapper {...commonProps} />,
             path: `${EXAMPLES_ROOT}/Default.tsx`,
         },

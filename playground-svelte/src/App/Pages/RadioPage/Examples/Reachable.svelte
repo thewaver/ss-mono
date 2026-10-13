@@ -3,8 +3,8 @@
 
     import PageRadioContent from "../../../StyledComponents/RadioContent/RadioContent.svelte";
     import PageTooltipContent from "../../../StyledComponents/TooltipContent/TooltipContent.svelte";
-    import { RADIO_GROUP_GAP, SIZE_OPTIONS } from "../RadioPage.const";
-    import type { RadioExampleProps } from "../RadioPage.types";
+    import { RADIO_GROUP_GAP, SIZE_OPTIONS } from "@thewaver/ss-playground/App/Pages/RadioPage/RadioPage.const";
+    import type { RadioExampleProps } from "../RadioPageSvelte.types";
 
     const REACHABLE_VALUE = "medium";
 

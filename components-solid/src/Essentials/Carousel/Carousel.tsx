@@ -14,6 +14,7 @@ import {
     LiveAnnouncerUtils,
     CarouselStyles as styles,
 } from "@thewaver/ss-components";
+import { CarouselConst } from "@thewaver/ss-components/internal";
 
 import { ElementObserverSolidUtils } from "../../Abstracts/ElementObserver/ElementObserverSolid.utils";
 import { InteractionTrackerSolidUtils } from "../../Abstracts/InteractionTracker/InteractionTrackerSolid.utils";
@@ -21,9 +22,6 @@ import { SignalMirrorSolidUtils } from "../../Abstracts/SignalMirror/SignalMirro
 import { InteractionWrapper } from "../../Primitives/InteractionWrapper/InteractionWrapper";
 import { access } from "../../Utils/propUtils";
 import type { CarouselControlProps, CarouselControls, CarouselProps } from "./CarouselSolid.types";
-
-const NO_PROGRESS = 0;
-const HIDDEN_OPACITY = 0;
 
 const CarouselControl = (props: CarouselControlProps) => {
     const getIsDisabled = () => access(props.flags).isDisabled ?? false;
@@ -57,7 +55,10 @@ export const Carousel = <T,>(props: CarouselProps<T>) => {
 
     const [getIndex, setIndex] = SignalMirrorSolidUtils.createOptional(() => props.index, 0);
     const [getIsPlaying, setIsPlaying] = SignalMirrorSolidUtils.createOptional(() => props.playback, true);
-    const [getProgress, setProgress] = SignalMirrorSolidUtils.createOptional(() => props.progress, NO_PROGRESS);
+    const [getProgress, setProgress] = SignalMirrorSolidUtils.createOptional(
+        () => props.progress,
+        CarouselConst.NO_PROGRESS,
+    );
 
     const faceRefs: (HTMLElement | undefined)[] = [];
     const placements: Accessor<CarouselPlacement>[] = [];
@@ -270,7 +271,7 @@ export const Carousel = <T,>(props: CarouselProps<T>) => {
         if (getDrawn(currentIndex)?.contains(e.target as Node)) return;
 
         const rects = faceRefs.map((_face, index) =>
-            index !== currentIndex && placements[index]?.().effect.opacity !== HIDDEN_OPACITY
+            index !== currentIndex && placements[index]?.().effect.opacity !== CarouselConst.HIDDEN_OPACITY
                 ? getDrawn(index)?.getBoundingClientRect()
                 : undefined,
         );

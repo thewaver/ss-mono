@@ -7,7 +7,7 @@
     import PageMeasureBox from "../../../PageComponents/MeasureBox/MeasureBox.svelte";
     import PageControlButtonContent from "../../../StyledComponents/ControlButtonContent/ControlButtonContent.svelte";
     import PageRangeContent from "../../../StyledComponents/RangeContent/RangeContent.svelte";
-    import type { TypewriterKaraokeExampleProps } from "../TypewriterPage.types";
+    import type { TypewriterKaraokeExampleProps } from "../TypewriterPageSvelte.types";
 
     const LYRIC = "Twinkle, twinkle, little star";
     const PERCENT = 100;

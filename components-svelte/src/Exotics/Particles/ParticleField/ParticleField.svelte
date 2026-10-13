@@ -8,6 +8,7 @@
         ParticleFieldUtils,
         ParticleFieldStyles as styles,
     } from "@thewaver/ss-components";
+    import { ParticleFieldConst } from "@thewaver/ss-components/internal";
     import { type Index2d, MathUtils } from "@thewaver/ss-utils";
 
     import { ElementObserverSvelteUtils } from "../../../Abstracts/ElementObserver/ElementObserverSvelte.utils.svelte.js";
@@ -15,11 +16,7 @@
     import { watchChange } from "../../../Utils/effectUtils.svelte.js";
     import type { ParticleFieldProps } from "./ParticleField.types.js";
 
-    const NO_PROGRESS = 0;
-    const FIRST_ITERATION = 0;
-    const NO_WEIGHTS: number[][] = [];
-
-    let { playback = $bindable(true), progress = $bindable(NO_PROGRESS), ...props }: ParticleFieldProps = $props();
+    let { playback = $bindable(true), progress = $bindable(ParticleFieldConst.NO_PROGRESS), ...props }: ParticleFieldProps = $props();
 
     const spawnChance = $derived(props.spawnChance ?? PARTICLE_FIELD_DEFAULTS.spawnChance);
     const durationMs = $derived(props.animationDurationMs ?? PARTICLE_FIELD_DEFAULTS.animationDurationMs);
@@ -32,7 +29,7 @@
     );
 
     let root = $state<HTMLDivElement>();
-    let currentIteration = $state(FIRST_ITERATION);
+    let currentIteration = $state(ParticleFieldConst.FIRST_ITERATION);
 
     const bodies = new Map<number, HTMLElement>();
 
@@ -64,7 +61,7 @@
         ParticleFieldUtils.computeCells(
             cellCount,
             getRootSize(),
-            props.computeCellWeights?.(cellCount) ?? NO_WEIGHTS,
+            props.computeCellWeights?.(cellCount) ?? ParticleFieldConst.NO_WEIGHTS,
             contour,
         ),
     );
@@ -96,8 +93,8 @@
     watchChange(
         () => cellCount,
         () => {
-            currentIteration = FIRST_ITERATION;
-            progress = NO_PROGRESS;
+            currentIteration = ParticleFieldConst.FIRST_ITERATION;
+            progress = ParticleFieldConst.NO_PROGRESS;
         },
     );
 

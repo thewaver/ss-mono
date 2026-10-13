@@ -6,8 +6,8 @@ import * as styles from "@thewaver/ss-playground/App/Pages/TablePage/TablePage.c
 
 import { PageTableHeader } from "../../../PageComponents/TableHeader/TableHeader";
 import { PageTableCellContent } from "../../../StyledComponents/TableContent/TableContent";
-import { PARTS } from "../TablePage.const";
 import type { Part, TableExampleProps } from "../TablePage.types";
+import { PARTS } from "../TablePageReact.const";
 
 const COMPARATORS: Record<string, (a: Part, b: Part) => number> = {
     sku: (a, b) => a.sku.localeCompare(b.sku),

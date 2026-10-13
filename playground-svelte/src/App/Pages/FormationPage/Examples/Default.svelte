@@ -2,7 +2,7 @@
     import { Formation, PlacementLayoutUtils, ProximityEffectUtils } from "@thewaver/ss-components-svelte";
 
     import PageFormationItem from "../../../StyledComponents/FormationContent/FormationContent.svelte";
-    import type { FormationExampleProps } from "../FormationPage.types";
+    import type { FormationExampleProps } from "../FormationPageSvelte.types";
 
     type Props = FormationExampleProps;
 

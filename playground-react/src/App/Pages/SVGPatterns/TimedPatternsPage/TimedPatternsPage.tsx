@@ -1,22 +1,24 @@
 import { useMemo, useState } from "react";
 
 import { SVGDefsSamples } from "@thewaver/ss-components-react";
+import { SVGPatternKnobs } from "@thewaver/ss-playground/App/Knobs/SVGPatterns.const";
 import { toGroupEntriesWithNoSample } from "@thewaver/ss-playground/App/PageComponents/SampleGroups/SampleGroups.const";
 import type { WithNoSample } from "@thewaver/ss-playground/App/PageComponents/SampleGroups/SampleGroups.types";
+import {
+    DEFAULT_EXAMPLE_PATH,
+    EXAMPLE_NAMES,
+} from "@thewaver/ss-playground/App/Pages/SVGPatterns/TimedPatternsPage/TimedPatternsPage.const";
 
-import { SVGPatternKnobs } from "../../../Knobs/SVGPatterns.const";
 import { PageExamples } from "../../../PageComponents/Examples/Examples";
 import { PageGroupedSelectField, PageNumberField, PageSelectField } from "../../../PageComponents/Field/Field";
 import { PageProp } from "../../../PageComponents/Prop/Prop";
 import { PagePropsPanel } from "../../../PageComponents/PropsPanel/PropsPanel";
-import { GROUPPED_TIMED_PATTERNS } from "../SVGPatterns.const";
-import type { TimedPatternExampleProps } from "../SVGPatterns.types";
 import { PageSVGPatternsProps } from "../SVGPatternsProps";
+import { GROUPPED_TIMED_PATTERNS } from "../SVGPatternsReact.const";
+import type { TimedPatternExampleProps } from "../SVGPatternsReact.types";
 import { DefaultExample } from "./Examples/Default";
 
 const TIMED_PATTERN_GROUPS = toGroupEntriesWithNoSample(GROUPPED_TIMED_PATTERNS);
-
-const DEFAULT_EXAMPLE_PATH = "/src/App/Pages/SVGPatterns/TimedPatternsPage/Examples/Default.tsx";
 
 export const TimedPatternsPage = () => {
     const [configKey, setConfigKey] = useState<WithNoSample<SVGDefsSamples.Pattern.Timed.SampleKey>>(
@@ -45,7 +47,7 @@ export const TimedPatternsPage = () => {
     const examples = [
         {
             key: "default",
-            name: "Default",
+            name: EXAMPLE_NAMES.default,
             component: () => <DefaultExample {...commonProps} />,
             path: DEFAULT_EXAMPLE_PATH,
         },

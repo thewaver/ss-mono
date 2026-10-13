@@ -2,7 +2,7 @@
     import { SlotText, SlotTextReels } from "@thewaver/ss-components-svelte";
     import * as styles from "@thewaver/ss-playground/App/Pages/SlotTextPage/SlotTextPage.css";
 
-    import type { SlotTextReelsExampleProps } from "../SlotTextPage.types";
+    import type { SlotTextReelsExampleProps } from "../SlotTextPageSvelte.types";
 
     const DIGIT_SIZE = { width: 34, height: 52 };
 

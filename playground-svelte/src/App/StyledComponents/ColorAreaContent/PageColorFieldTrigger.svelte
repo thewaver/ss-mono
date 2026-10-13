@@ -4,7 +4,7 @@
     import * as styles from "@thewaver/ss-playground/App/StyledComponents/ColorAreaContent/ColorAreaContent.css";
 
     import { getLayerClass } from "../Layer/Layer.context";
-    import type { ColorFieldTriggerProps } from "./ColorAreaContent.types";
+    import type { ColorFieldTriggerProps } from "./ColorAreaContentSvelte.types";
 
     let props: ColorFieldTriggerProps & { children?: Snippet } = $props();
 

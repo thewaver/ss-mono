@@ -1,14 +1,7 @@
 import type { ReactNode } from "react";
 
-import type {
-    Toast,
-    ToastState,
-    ToastsAlignment,
-    ToastsAriaLive,
-    ToastsDir,
-    ToastsOverflow,
-} from "@thewaver/ss-components";
-import type { CSSMargin, Size2d, SwipeDirection } from "@thewaver/ss-utils";
+import type { BaseToastsProps, Toast, ToastState } from "@thewaver/ss-components";
+import type { Size2d, SwipeDirection } from "@thewaver/ss-utils";
 
 export type ToastRenderer<T> = (
     toast: Toast<T>,
@@ -52,44 +45,9 @@ export type ToastsItemProps<T> = {
     renderToast: ToastRenderer<T>;
 };
 
-export type ToastsProps<T> = {
-    /** Names the toast region for assistive technology. */
-    ariaLabel: string;
-    /** How insistently new toasts are announced — politely, after whatever is being read, or immediately. */
-    ariaLive?: ToastsAriaLive;
-    /** A key that moves focus into the toast region, so a reader can reach a toast without hunting for it. */
-    hotkey?: string;
-    /** Which corner or edge of the screen the toasts gather at. */
-    alignment?: ToastsAlignment;
-    /** Which way the stack grows, and so whether a new toast joins at the near end or the far one. */
-    dir?: ToastsDir;
-    /** The space between one toast and the next. */
-    gap?: number;
-    /** How far the stack is held off the edges of the screen. */
-    margins?: CSSMargin;
-    /** What happens once the limit is reached: the oldest toast is dismissed, or the newest waits its turn. */
-    overflow?: ToastsOverflow;
-    /** How long a toast takes to arrive, to leave, and to slide when the stack shifts. */
-    transitionDurationMs?: number;
-    /**
-     * Whether a toast can be swiped off screen. Defaults to `true`. The swipe runs towards the edge the stack sits on
-     * — sideways for a stack against the left or right, up or down for one centered along the top or bottom — and a
-     * stack in the middle of the screen cannot be swiped. A committed swipe removes the toast from `toasts`, as
-     * its timer does, and its countdown is held while the swipe is under way. The toast is not moved for you:
-     * `ToastState` hands the painter the direction and the distance to draw.
-     *
-     * A swipe is a drag, and WCAG 2.5.7 requires anything done by dragging to be possible with a single pointer
-     * without one. The close control the painter draws is that route, so a toast that can be swiped must paint one.
-     */
-    isDismissableOnSwipe?: boolean;
-    /** How many toasts may be on screen at once. Leave it out and they all show. */
-    limit?: number;
+export type ToastsProps<T> = BaseToastsProps<T> & {
     /** The toasts on screen, with their setter. It is the only thing that adds or removes one. */
     toasts: readonly [Toast<T>[], (toasts: Toast<T>[]) => void];
-    /**
-     * Builds the sentence a toast is announced with, for a toast whose visible text does not read well out of context.
-     */
-    computeAnnouncement?: (toast: Toast<T>) => string;
     /** Draws one toast. */
     renderToast: ToastRenderer<T>;
 };

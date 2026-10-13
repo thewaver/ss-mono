@@ -1,5 +1,5 @@
 <script lang="ts">
-    import { SVGDefsSamples, Shape } from "@thewaver/ss-components-svelte";
+    import { Shape, SVGDefsSampleConfigs, SVGDefsSamples } from "@thewaver/ss-components-svelte";
     import {
         NO_SAMPLE_KEY,
         computeNoSampleDefs,
@@ -7,7 +7,7 @@
     import * as styles from "@thewaver/ss-playground/App/Pages/SVGPatterns/SVGPatterns.css";
     import { ShapeConst } from "@thewaver/ss-utils";
 
-    import type { TimedPatternExampleProps } from "../../SVGPatterns.types";
+    import type { TimedPatternExampleProps } from "../../SVGPatternsSvelte.types";
 
     let props: TimedPatternExampleProps = $props();
 
@@ -21,7 +21,7 @@
     computeFillDefs={(size, element) => {
         if (props.configKey === NO_SAMPLE_KEY) return computeNoSampleDefs(props.colors, "fill");
 
-        return SVGDefsSamples.Pattern.Timed.SAMPLE_CONFIGS[props.configKey].computeSVGDefs(`fill-${id}`, undefined, element, {
+        return SVGDefsSampleConfigs.Pattern.Timed.SAMPLE_CONFIGS[props.configKey].computeSVGDefs(`fill-${id}`, undefined, element, {
             getSize: () => size,
             cellSize: props.cellSize,
             animationDurationMs: props.animationDurationMs,

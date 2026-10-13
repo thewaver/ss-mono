@@ -3,7 +3,7 @@ import type { PropsWithChildren } from "react";
 import * as styles from "@thewaver/ss-playground/App/StyledComponents/TextFieldContent/TextFieldContent.css";
 
 import { useLayerClass } from "../Layer/Layer.context";
-import type { TextFieldPlaceholderProps } from "./TextFieldPlaceholder.types";
+import type { TextFieldPlaceholderProps } from "./TextFieldPlaceholderReact.types";
 
 export const PageTextFieldPlaceholder = (props: PropsWithChildren<TextFieldPlaceholderProps>) => {
     const layerClass = useLayerClass();

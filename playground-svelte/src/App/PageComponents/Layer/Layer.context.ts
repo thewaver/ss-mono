@@ -1,6 +1,6 @@
 import { createContext } from "svelte";
 
-import type { LayerContextType } from "./Layer.context.types";
+import type { LayerContextType } from "./Layer.contextSvelte.types";
 
 const [getContext, setContext, hasContext] = createContext<LayerContextType>();
 

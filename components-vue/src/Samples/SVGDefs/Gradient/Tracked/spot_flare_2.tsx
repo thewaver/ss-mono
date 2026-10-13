@@ -4,9 +4,9 @@ import {
     type GradientFlareOpts,
     type SVGDefsColors,
     SVGDefsUtils,
-    TrackedGradientDefaults,
     type TrackedGradientElementDefs,
 } from "@thewaver/ss-components";
+import { SpotFlare2Const, SpotFlareConst } from "@thewaver/ss-components/internal";
 import { MathUtils } from "@thewaver/ss-utils";
 
 import { PointerTrackerVueUtils } from "../../../../Abstracts/PointerTracker/PointerTrackerVue.utils";
@@ -39,16 +39,9 @@ const GHOSTS: FlareGhost[] = [
     { reach: 1.6, scale: 0.58, alpha: 0.07, colorKey: "secondary", isRing: true },
 ];
 
-const DISC_STOPS = [45, 78];
-const DISC_ALPHA_RATIOS = [1, 0.3];
-const RING_STOPS = [55, 82, 92];
-const RING_ALPHA_RATIOS = [0.12, 1, 0.2];
-
-const DEFAULTS = TrackedGradientDefaults.SPOT_FLARE_DEFAULTS;
-
 const toGhostColor = (color: string, alpha: number, opts?: GradientFlareOpts) =>
-    `hsl(from ${color} h calc(s * ${opts?.ghostSaturation ?? DEFAULTS.ghostSaturation}) calc(l * ${
-        opts?.ghostLuminosity ?? DEFAULTS.ghostLuminosity
+    `hsl(from ${color} h calc(s * ${opts?.ghostSaturation ?? SpotFlare2Const.DEFAULTS.ghostSaturation}) calc(l * ${
+        opts?.ghostLuminosity ?? SpotFlare2Const.DEFAULTS.ghostLuminosity
     }) / ${alpha})`;
 
 const computeGhostColors = (ghost: FlareGhost, color: string, fade: number, opts?: GradientFlareOpts) => {
@@ -57,17 +50,32 @@ const computeGhostColors = (ghost: FlareGhost, color: string, fade: number, opts
     if (ghost.isRing) {
         return [
             { value: toGhostColor(color, 0, opts) },
-            { value: toGhostColor(color, alpha * RING_ALPHA_RATIOS[0], opts), stop: RING_STOPS[0] },
-            { value: toGhostColor(color, alpha * RING_ALPHA_RATIOS[1], opts), stop: RING_STOPS[1] },
-            { value: toGhostColor(color, alpha * RING_ALPHA_RATIOS[2], opts), stop: RING_STOPS[2] },
+            {
+                value: toGhostColor(color, alpha * SpotFlareConst.RING_ALPHA_RATIOS[0], opts),
+                stop: SpotFlareConst.RING_STOPS[0],
+            },
+            {
+                value: toGhostColor(color, alpha * SpotFlareConst.RING_ALPHA_RATIOS[1], opts),
+                stop: SpotFlareConst.RING_STOPS[1],
+            },
+            {
+                value: toGhostColor(color, alpha * SpotFlareConst.RING_ALPHA_RATIOS[2], opts),
+                stop: SpotFlareConst.RING_STOPS[2],
+            },
             { value: toGhostColor(color, 0, opts), stop: 100 },
         ];
     }
 
     return [
-        { value: toGhostColor(color, alpha * DISC_ALPHA_RATIOS[0], opts) },
-        { value: toGhostColor(color, alpha * DISC_ALPHA_RATIOS[0], opts), stop: DISC_STOPS[0] },
-        { value: toGhostColor(color, alpha * DISC_ALPHA_RATIOS[1], opts), stop: DISC_STOPS[1] },
+        { value: toGhostColor(color, alpha * SpotFlareConst.DISC_ALPHA_RATIOS[0], opts) },
+        {
+            value: toGhostColor(color, alpha * SpotFlareConst.DISC_ALPHA_RATIOS[0], opts),
+            stop: SpotFlareConst.DISC_STOPS[0],
+        },
+        {
+            value: toGhostColor(color, alpha * SpotFlareConst.DISC_ALPHA_RATIOS[1], opts),
+            stop: SpotFlareConst.DISC_STOPS[1],
+        },
         { value: toGhostColor(color, 0, opts), stop: 100 },
     ];
 };
@@ -85,18 +93,19 @@ const FlareSpot = defineComponent(
 
             return SVGGradientDefsVueUtils.computeRadialGradient({
                 id: props.id,
-                elementSize: (props.opts?.circular ?? DEFAULTS.circular) ? props.defs.getSize() : undefined,
+                elementSize:
+                    (props.opts?.circular ?? SpotFlare2Const.DEFAULTS.circular) ? props.defs.getSize() : undefined,
                 origin: reading.value.boxRatio,
-                scale: props.opts?.glowScale ?? DEFAULTS.glowScale,
+                scale: props.opts?.glowScale ?? SpotFlare2Const.DEFAULTS.glowScale,
                 colors: [
                     { value: `rgb(from ${color} r g b / 1)` },
                     {
-                        value: `rgb(from ${color} r g b / ${props.opts?.coreAlpha ?? DEFAULTS.coreAlpha})`,
-                        stop: props.opts?.coreStop ?? DEFAULTS.coreStop,
+                        value: `rgb(from ${color} r g b / ${props.opts?.coreAlpha ?? SpotFlare2Const.DEFAULTS.coreAlpha})`,
+                        stop: props.opts?.coreStop ?? SpotFlare2Const.DEFAULTS.coreStop,
                     },
                     {
-                        value: `rgb(from ${color} r g b / ${props.opts?.falloffAlpha ?? DEFAULTS.falloffAlpha})`,
-                        stop: props.opts?.falloffStop ?? DEFAULTS.falloffStop,
+                        value: `rgb(from ${color} r g b / ${props.opts?.falloffAlpha ?? SpotFlare2Const.DEFAULTS.falloffAlpha})`,
+                        stop: props.opts?.falloffStop ?? SpotFlare2Const.DEFAULTS.falloffStop,
                     },
                     { value: `rgb(from ${color} r g b / 0)`, stop: 100 },
                 ],
@@ -117,14 +126,15 @@ const FlareGhostGradient = defineComponent(
         return () => {
             const ratio = reading.value.boxRatio;
             const growth = MathUtils.lerp(
-                props.opts?.ghostNearGrowth ?? DEFAULTS.ghostNearGrowth,
-                props.opts?.ghostFarGrowth ?? DEFAULTS.ghostFarGrowth,
+                props.opts?.ghostNearGrowth ?? SpotFlare2Const.DEFAULTS.ghostNearGrowth,
+                props.opts?.ghostFarGrowth ?? SpotFlare2Const.DEFAULTS.ghostFarGrowth,
                 MathUtils.clamp01(Math.hypot(ratio.x - 0.5, ratio.y - 0.5) * 2),
             );
 
             return SVGGradientDefsVueUtils.computeRadialGradient({
                 id: props.id,
-                elementSize: (props.opts?.circular ?? DEFAULTS.circular) ? props.defs.getSize() : undefined,
+                elementSize:
+                    (props.opts?.circular ?? SpotFlare2Const.DEFAULTS.circular) ? props.defs.getSize() : undefined,
                 origin: {
                     x: ratio.x + (0.5 - ratio.x) * props.ghost.reach,
                     y: ratio.y + (0.5 - ratio.y) * props.ghost.reach,

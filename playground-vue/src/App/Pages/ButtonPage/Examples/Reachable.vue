@@ -6,7 +6,7 @@ import type { InteractionTooltipDefs } from "@thewaver/ss-components-vue";
 
 import PageButtonContent from "../../../StyledComponents/ButtonContent/ButtonContent.vue";
 import PageTooltipContent from "../../../StyledComponents/TooltipContent/TooltipContent.vue";
-import type { ButtonExampleProps } from "../ButtonPage.types";
+import type { ButtonExampleProps } from "../ButtonPageVue.types";
 
 type Props = ButtonExampleProps;
 

@@ -14,3 +14,15 @@ export const toNearestPaletteColor = (value: string) => {
         return distance(candidate) < distance(closest) ? candidate : closest;
     }, PALETTE[0]);
 };
+
+export const EXAMPLE_NAMES = {
+    default: "Default",
+    compact: "Compact",
+    snapping: "Snapping setter",
+    disabled: "Disabled",
+    reachable: "Disabled + reachable",
+    errored: "Error",
+    label: "In a Label",
+};
+
+export const EXAMPLES_ROOT = "/src/App/Pages/ColorInputPage/Examples";

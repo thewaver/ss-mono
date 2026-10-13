@@ -10,7 +10,7 @@ import PageCheckField from "../../../PageComponents/Field/PageCheckField.vue";
 import PageSelectField from "../../../PageComponents/Field/PageSelectField.vue";
 import PageMeasureBox from "../../../PageComponents/MeasureBox/MeasureBox.vue";
 import PageProp from "../../../PageComponents/Prop/Prop.vue";
-import type { MosaicSharedProps } from "../Mosaics.types";
+import type { MosaicSharedProps } from "../MosaicsVue.types";
 import ImagesExample from "./Examples/Images.vue";
 
 const props = defineProps<MosaicSharedProps>();

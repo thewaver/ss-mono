@@ -6,13 +6,12 @@ import {
     TileBoardUtils,
     TileBoardStyles as styles,
 } from "@thewaver/ss-components";
+import { TileBoardConst } from "@thewaver/ss-components/internal";
 import { Index2d } from "@thewaver/ss-utils";
 
 import { InteractionWrapper } from "../../Primitives/InteractionWrapper/InteractionWrapper";
 import { access } from "../../Utils/propUtils";
 import type { TileBoardProps, TileBoardTileProps } from "./TileBoardSolid.types";
-
-const FIRST_ARIA_INDEX = 1;
 
 const TileBoardTile = (props: TileBoardTileProps) => {
     const getIsDisabled = () => access(props.flags).isDisabled ?? false;
@@ -174,7 +173,7 @@ export const TileBoard = (props: TileBoardProps) => {
                                     ? undefined
                                     : () => props.computeTileAriaLabel!(tile)
                             }
-                            colIndex={col + FIRST_ARIA_INDEX}
+                            colIndex={col + TileBoardConst.FIRST_ARIA_INDEX}
                             size={() => getGeometry().size}
                             clipPath={() => TileBoardUtils.getClipPath(getGeometry().points)}
                             renderContent={(getFlags) => props.renderTile(getTile, getFlags)}
@@ -208,7 +207,7 @@ export const TileBoard = (props: TileBoardProps) => {
                         <div
                             class={styles.tileBoardRow}
                             role="row"
-                            aria-rowindex={rowIndex + FIRST_ARIA_INDEX}
+                            aria-rowindex={rowIndex + TileBoardConst.FIRST_ARIA_INDEX}
                             style={{
                                 left: `${TileBoardUtils.getRowOrigin(rowIndex, getLayout(), getGap()).x}px`,
                                 top: `${TileBoardUtils.getRowOrigin(rowIndex, getLayout(), getGap()).y}px`,

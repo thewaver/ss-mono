@@ -3,7 +3,7 @@ import { LABELS, ORDER, STEPPER_GAP } from "@thewaver/ss-playground/App/Pages/St
 
 import { PageStepConnector, PageStepContent } from "../../../StyledComponents/StepContent/StepContent";
 import { PageTooltipContent } from "../../../StyledComponents/TooltipContent/TooltipContent";
-import type { StepperExampleProps } from "../StepperPage.types";
+import type { StepperExampleProps } from "../StepperPageSolid.types";
 
 const FAILURE_REASON = "The card was declined, so this step has to be repeated before the order can be reviewed.";
 const LOCKED_REASON = "Review opens once payment succeeds, so there is nothing to look at here yet.";

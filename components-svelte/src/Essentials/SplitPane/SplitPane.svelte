@@ -5,6 +5,7 @@
         SplitPaneUtils,
         SplitPaneStyles as styles,
     } from "@thewaver/ss-components";
+    import { SplitPaneConst } from "@thewaver/ss-components/internal";
 
     import { ElementObserverSvelteUtils } from "../../Abstracts/ElementObserver/ElementObserverSvelte.utils.svelte.js";
     import { NavigatorSvelteUtils } from "../../Abstracts/Navigator/NavigatorSvelte.utils.svelte.js";
@@ -13,15 +14,12 @@
 
     type GutterPointerEvent = PointerEvent & { currentTarget: HTMLButtonElement };
 
-    const NO_GUTTER_DRAGGING = -1;
-    const PERCENT = 100;
-
     let { ratios: storedRatios = $bindable(), ...props }: SplitPaneProps = $props();
 
     const paneIdPrefix = $props.id();
 
     let root = $state<HTMLDivElement>();
-    let draggingIndex = $state(NO_GUTTER_DRAGGING);
+    let draggingIndex = $state(SplitPaneConst.NO_GUTTER_DRAGGING);
     let collapsedBoundaries = $state.raw<SplitPaneCollapsedBoundaries>({});
 
     let hasDragged = false;
@@ -117,7 +115,7 @@
         if (draggingIndex !== index) return;
 
         e.currentTarget.releasePointerCapture(e.pointerId);
-        draggingIndex = NO_GUTTER_DRAGGING;
+        draggingIndex = SplitPaneConst.NO_GUTTER_DRAGGING;
 
         if (hasDragged) return;
 
@@ -137,7 +135,7 @@
     const handleGutterPointerCancel = (index: number) => {
         if (draggingIndex !== index) return;
 
-        draggingIndex = NO_GUTTER_DRAGGING;
+        draggingIndex = SplitPaneConst.NO_GUTTER_DRAGGING;
     };
 
     const handleGutterKeyDown = (e: KeyboardEvent, index: number) => {
@@ -187,9 +185,9 @@
                 aria-controls={getPaneId(index - 1)}
                 aria-label={props.panes[index - 1].gutterAriaLabel}
                 aria-disabled={isDisabled || undefined}
-                aria-valuenow={Math.round(getBoundary(index - 1) * PERCENT)}
-                aria-valuemin={Math.round(limits.floor * PERCENT)}
-                aria-valuemax={Math.round(limits.ceiling * PERCENT)}
+                aria-valuenow={Math.round(getBoundary(index - 1) * SplitPaneConst.PERCENT)}
+                aria-valuemin={Math.round(limits.floor * SplitPaneConst.PERCENT)}
+                aria-valuemax={Math.round(limits.ceiling * SplitPaneConst.PERCENT)}
                 onpointerdown={(e) => handleGutterPointerDown(e, index - 1)}
                 onpointermove={(e) => handleGutterPointerMove(e, index - 1)}
                 onpointerup={(e) => handleGutterPointerUp(e, index - 1)}

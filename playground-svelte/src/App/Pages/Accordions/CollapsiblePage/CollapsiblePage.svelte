@@ -4,8 +4,10 @@
     import FilledExample from "./Examples/Filled.svelte";
     import PanelExample from "./Examples/Panel.svelte";
     import SidewaysExample from "./Examples/Sideways.svelte";
-
-    const EXAMPLES_ROOT = "/src/App/Pages/Accordions/CollapsiblePage/Examples";
+    import {
+    EXAMPLE_NAMES,
+    EXAMPLES_ROOT,
+} from "@thewaver/ss-playground/App/Pages/Accordions/CollapsiblePage/CollapsiblePage.const";
 
     let panelExpanded = $state(false);
     let filledExpanded = $state(false);
@@ -14,7 +16,7 @@
     const examples: ExampleDefs[] = [
         {
             key: "panel",
-            name: "A single panel, no heading",
+            name: EXAMPLE_NAMES.panel,
             readout: () =>
                 `expanded: ${panelExpanded} — one trigger and one panel, with none of the group behavior an accordion adds`,
             component: panelExample,
@@ -22,7 +24,7 @@
         },
         {
             key: "unheld",
-            name: "Nobody holding the state",
+            name: EXAMPLE_NAMES.unheld,
             readout: () =>
                 "no signal passed — the collapsible keeps whether it is open itself, so the page has nothing to show here",
             component: unheldExample,
@@ -30,7 +32,7 @@
         },
         {
             key: "filled",
-            name: "Filling its container, built on first open",
+            name: EXAMPLE_NAMES.filled,
             readout: () =>
                 `expanded: ${filledExpanded} — the panel's contents are not built until it is opened, and are kept once they are`,
             component: filledExample,
@@ -38,7 +40,7 @@
         },
         {
             key: "sideways",
-            name: "Opening to the side",
+            name: EXAMPLE_NAMES.sideways,
             readout: () =>
                 `expanded: ${sidewaysExpanded} — the panel grows its width instead of its height, and its contents keep theirs`,
             component: sidewaysExample,

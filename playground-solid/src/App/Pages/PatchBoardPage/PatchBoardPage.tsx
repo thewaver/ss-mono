@@ -7,15 +7,20 @@ import {
     BOARD_WIDTH,
     CHAIN_LINKS,
     CHAIN_NODES,
+    EXAMPLES_ROOT,
+    EXAMPLE_NAMES,
     MAX_ZOOM,
     MIN_ZOOM,
     MIXER_LINKS,
     MIXER_NODES,
+    NOTHING_DONE,
     PAN_LINKS,
     PAN_NODES,
+    PERCENT,
     RACK_LINKS,
     RACK_NODES,
     STARTING_ZOOM,
+    WIDE_SPAN,
 } from "@thewaver/ss-playground/App/Pages/PatchBoardPage/PatchBoardPage.const";
 import { MathUtils } from "@thewaver/ss-utils";
 
@@ -30,12 +35,6 @@ import { PanExample } from "./Examples/Pan";
 import { RackExample } from "./Examples/Rack";
 import { ZoomExample } from "./Examples/Zoom";
 import type { PatchBoardExampleProps } from "./PatchBoardPage.types";
-
-const EXAMPLES_ROOT = "/src/App/Pages/PatchBoardPage/Examples";
-
-const WIDE_SPAN = 2;
-const PERCENT = 100;
-const NOTHING_DONE = "nothing yet";
 
 export const PatchBoardPage = () => {
     const [getSocketSize, setSocketSize] = createSignal(PATCH_BOARD_DEFAULTS.socketSize);
@@ -77,7 +76,7 @@ export const PatchBoardPage = () => {
         return [
             {
                 key: "chain",
-                name: "Signal chain",
+                name: EXAMPLE_NAMES.chain,
                 span: WIDE_SPAN,
                 readout: () =>
                     `${chainLinksSignal[0]().length} cables, last: ${getChainAction()} — the gate's second input is disabled, so a cable aimed at it is refused`,
@@ -97,7 +96,7 @@ export const PatchBoardPage = () => {
             },
             {
                 key: "mixer",
-                name: "Mixing desk",
+                name: EXAMPLE_NAMES.mixer,
                 span: WIDE_SPAN,
                 readout: () =>
                     `${mixerLinksSignal[0]().length} cables, last: ${getMixerAction()} — a standing board, sockets on the top and bottom edges; only the desk may feed the amp, so a source aimed straight at it is refused`,
@@ -117,7 +116,7 @@ export const PatchBoardPage = () => {
             },
             {
                 key: "rack",
-                name: "Effects rack",
+                name: EXAMPLE_NAMES.rack,
                 span: WIDE_SPAN,
                 readout: () =>
                     `${rackLinksSignal[0]().length} cables, last: ${getRackAction()} — a node lands on the grid as it is dragged, and an arrow key takes it to the next grid point; a cable that would feed a signal back to where it came from, such as the reverb into the delay's feedback, is refused`,
@@ -137,7 +136,7 @@ export const PatchBoardPage = () => {
             },
             {
                 key: "pan",
-                name: "Panned board",
+                name: EXAMPLE_NAMES.pan,
                 span: WIDE_SPAN,
                 readout: () =>
                     `${panLinksSignal[0]().length} cables, last: ${getPanAction()} — the board is wider and taller than its window, so scroll to pan; a node carried with the arrow keys brings the window with it`,
@@ -157,7 +156,7 @@ export const PatchBoardPage = () => {
             },
             {
                 key: "zoom",
-                name: "Zoomed board",
+                name: EXAMPLE_NAMES.zoom,
                 span: WIDE_SPAN,
                 readout: () =>
                     `${zoomLinksSignal[0]().length} cables at ${Math.round(getZoom() * PERCENT)}%, last: ${getZoomAction()} — the board is scaled with a CSS transform, and a drag still lands under the pointer`,

@@ -8,8 +8,8 @@ import PageGlideFloater from "../../../StyledComponents/GlideFloater/PageGlideFl
 import PagePopoverSurface from "../../../StyledComponents/PopoverSurface/PopoverSurface.vue";
 import PageSelectContent from "../../../StyledComponents/SelectContent/SelectContent.vue";
 import PageSelectOptionContent from "../../../StyledComponents/SelectOptionContent/SelectOptionContent.vue";
-import { PLACEHOLDER } from "../SelectPage.const";
 import type { SelectRoutesExampleProps } from "../SelectPage.types";
+import { PLACEHOLDER } from "../SelectPageVue.const";
 
 type Props = SelectRoutesExampleProps;
 

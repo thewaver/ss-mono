@@ -11,8 +11,8 @@ import PageSelectContent, {
     computePageSelectTextStyle,
 } from "../../../StyledComponents/SelectContent/SelectContent.vue";
 import PageSelectOptionContent from "../../../StyledComponents/SelectOptionContent/SelectOptionContent.vue";
-import { PLACEHOLDER, QUERY_PADDING } from "../SelectPage.const";
 import type { Delivery } from "../SelectPage.types";
+import { PLACEHOLDER, QUERY_PADDING } from "../SelectPageVue.const";
 
 type Props = {
     "value": Delivery | undefined;

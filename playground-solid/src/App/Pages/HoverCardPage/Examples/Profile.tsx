@@ -6,7 +6,7 @@ import knightProfile from "@thewaver/ss-playground/App/knight_profile.webp";
 
 import { PageButtonContent } from "../../../StyledComponents/ButtonContent/ButtonContent";
 import { PageHoverCardContent } from "../../../StyledComponents/HoverCardContent/HoverCardContent";
-import type { HoverCardExampleProps } from "../HoverCardPage.types";
+import type { HoverCardExampleProps } from "../HoverCardPageSolid.types";
 
 type Props = HoverCardExampleProps;
 

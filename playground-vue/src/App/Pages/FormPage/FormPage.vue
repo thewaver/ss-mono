@@ -1,12 +1,12 @@
 <script setup lang="ts">
 import { shallowRef } from "vue";
 
+import { EXAMPLES_ROOT, EXAMPLE_NAMES } from "@thewaver/ss-playground/App/Pages/FormPage/FormPage.const";
+
 import type { ExampleDefs } from "../../PageComponents/Examples/Examples.types";
 import PageExamples from "../../PageComponents/Examples/PageExamples.vue";
 import FocusOnErrorExample from "./Examples/FocusOnError.vue";
 import SignUpExample from "./Examples/SignUp.vue";
-
-const EXAMPLES_ROOT = "/src/App/Pages/FormPage/Examples";
 
 const email = shallowRef("");
 const password = shallowRef("");
@@ -40,13 +40,13 @@ const resetFocus = () => {
 const examples: ExampleDefs[] = [
     {
         key: "reportsValidity",
-        name: "A form that reports its own validity",
+        name: EXAMPLE_NAMES.reportsValidity,
         readout: () => `outcome: ${outcome.value}`,
         path: `${EXAMPLES_ROOT}/SignUp.vue`,
     },
     {
         key: "focusOnError",
-        name: "Submitting moves focus to the first error",
+        name: EXAMPLE_NAMES.focusOnError,
         readout: () =>
             `outcome: ${focusOutcome.value} — the handler runs either way, and afterwards focus lands on the first field reporting an error`,
         path: `${EXAMPLES_ROOT}/FocusOnError.vue`,

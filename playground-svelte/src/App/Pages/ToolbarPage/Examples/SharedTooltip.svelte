@@ -7,7 +7,7 @@
     import PageMenuTriggerContent from "../../../StyledComponents/MenuTriggerContent/MenuTriggerContent.svelte";
     import PageTooltipContent from "../../../StyledComponents/TooltipContent/TooltipContent.svelte";
     import { renderToolbarOverflowItem, renderToolbarPopup } from "../ToolbarPage.const.svelte";
-    import type { ToolbarExampleProps } from "../ToolbarPage.types";
+    import type { ToolbarExampleProps } from "../ToolbarPageSvelte.types";
 
     const PLACEMENT: AnchorPlacement = { x: "center", y: "top_out" };
 

@@ -2,13 +2,12 @@ import type { ParentProps } from "solid-js";
 import { createMemo, createSignal } from "solid-js";
 
 import { LIGHT_CATCHER_DEFAULTS, PointerEffectsUtils, LightCatcherStyles as styles } from "@thewaver/ss-components";
+import { LightCatcherConst } from "@thewaver/ss-components/internal";
 
 import { PointerTrackerSolidUtils } from "../../../Abstracts/PointerTracker/PointerTrackerSolid.utils";
 import { SmootherSolidUtils } from "../../../Abstracts/Smoother/SmootherSolid.utils";
 import { access } from "../../../Utils/propUtils";
 import type { LightCatcherProps } from "./LightCatcherSolid.types";
-
-const NO_STRENGTH = 0;
 
 export const LightCatcher = (props: ParentProps<LightCatcherProps>) => {
     const [getRef, setRef] = createSignal<HTMLElement>();
@@ -30,7 +29,7 @@ export const LightCatcher = (props: ParentProps<LightCatcherProps>) => {
 
     const getStrength = createMemo(() =>
         getIsResting()
-            ? NO_STRENGTH
+            ? LightCatcherConst.NO_STRENGTH
             : PointerEffectsUtils.computeEdgeStrength(
                   getReading(),
                   access(props.lightRangePx) ?? LIGHT_CATCHER_DEFAULTS.lightRangePx,

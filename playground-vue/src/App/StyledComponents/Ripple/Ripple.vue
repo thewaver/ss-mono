@@ -1,12 +1,10 @@
 <script setup lang="ts">
 import { onUnmounted, shallowRef, watch } from "vue";
 
+import { RATIO_TO_PERCENT, RIPPLE_DURATION_MS } from "@thewaver/ss-playground/App/StyledComponents/Ripple/Ripple.const";
 import * as styles from "@thewaver/ss-playground/App/StyledComponents/Ripple/Ripple.css";
 
-import type { RippleMark, RippleProps } from "./Ripple.types";
-
-const RIPPLE_DURATION_MS = 600;
-const RATIO_TO_PERCENT = 100;
+import type { RippleMark, RippleProps } from "./RippleVue.types";
 
 const props = defineProps<RippleProps>();
 

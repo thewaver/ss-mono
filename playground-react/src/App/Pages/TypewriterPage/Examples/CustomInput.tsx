@@ -3,7 +3,7 @@ import { useEffect, useState } from "react";
 import { Typewriter } from "@thewaver/ss-components-react";
 import { FunctionUtils } from "@thewaver/ss-utils";
 
-import type { TypewriterExampleProps } from "../TypewriterPage.types";
+import type { TypewriterExampleProps } from "../TypewriterPageReact.types";
 
 type Props = TypewriterExampleProps & {
     text: string;

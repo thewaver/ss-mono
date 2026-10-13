@@ -15,9 +15,11 @@
     import PointerExample from "./Examples/Pointer.svelte";
     import WaveExample from "./Examples/Wave.svelte";
     import type { ProximityTextExampleProps } from "./ProximityTextPageSvelte.types";
-
-    const EXAMPLES_ROOT = "/src/App/Pages/ProximityTextPage/Examples";
-    const WIDE_SPAN = 2;
+    import {
+    EXAMPLE_NAMES,
+    EXAMPLES_ROOT,
+    WIDE_SPAN,
+} from "@thewaver/ss-playground/App/Pages/ProximityTextPage/ProximityTextPage.const";
 
     let reachPx = $state(PROXIMITY_TEXT_DEFAULTS.reachPx);
     let isDisabled = $state(ProximityTextKnobs.STARTING_IS_DISABLED);
@@ -27,7 +29,7 @@
     const examples: ExampleDefs[] = [
         {
             key: "pointer",
-            name: "Following the pointer",
+            name: EXAMPLE_NAMES.pointer,
             span: WIDE_SPAN,
             readout: () =>
                 "each letter plays its keyframes held at how near the pointer is; the lines were wrapped for every letter at its heaviest, so the spare room sits at the end of each line while they rest",
@@ -36,7 +38,7 @@
         },
         {
             key: "wave",
-            name: "A weight wave",
+            name: EXAMPLE_NAMES.wave,
             span: WIDE_SPAN,
             readout: () =>
                 "a point supplied in place of the pointer, moved across the line on a clock; Stop is the way to halt it that a motion running on its own owes the reader",
@@ -45,7 +47,7 @@
         },
         {
             key: "painted",
-            name: "Painted",
+            name: EXAMPLE_NAMES.painted,
             span: WIDE_SPAN,
             readout: () =>
                 "PaintedText inside draws the letters; each grows and pushes the rest of its line along, as plain text does, while the line breaks stay put",
@@ -54,7 +56,7 @@
         },
         {
             key: "barrel",
-            name: "Inside a barrel",
+            name: EXAMPLE_NAMES.barrel,
             span: WIDE_SPAN,
             readout: () =>
                 "a point fixed to the middle of the box and measured up and down only, so every letter on a line answers it alike: a line closes up as it reaches the middle and spreads apart again towards either edge, its keyframes running from spread to closed; the lines were wrapped with every letter at its widest, which here is the first frame, so no word jumps from one line to the next as they spread",

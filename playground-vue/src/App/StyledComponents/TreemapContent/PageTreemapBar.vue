@@ -2,7 +2,7 @@
 import * as styles from "@thewaver/ss-playground/App/StyledComponents/TreemapContent/TreemapContent.css";
 
 import { useLayerClass } from "../Layer/Layer.context";
-import type { PageTreemapBarProps } from "./TreemapContent.types";
+import type { PageTreemapBarProps } from "./TreemapContentVue.types";
 
 defineProps<PageTreemapBarProps>();
 

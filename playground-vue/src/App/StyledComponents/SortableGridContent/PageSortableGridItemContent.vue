@@ -2,13 +2,12 @@
 import { computed } from "vue";
 
 import type { SortableGridGeometry } from "@thewaver/ss-components-vue";
+import { NAMED_WIDTH } from "@thewaver/ss-playground/App/StyledComponents/SortableGridContent/SortableGridContent.const";
 import * as styles from "@thewaver/ss-playground/App/StyledComponents/SortableGridContent/SortableGridContent.css";
 import { assignInlineVars } from "@vanilla-extract/dynamic";
 
 import { useLayerClass } from "../Layer/Layer.context";
-import type { SortableGridItemContentProps } from "./SortableGridContent.types";
-
-const NAMED_WIDTH = 2;
+import type { SortableGridItemContentProps } from "./SortableGridContentVue.types";
 
 const getBox = (geometry: SortableGridGeometry) => ({
     width: Math.max(...geometry.contour.map((point) => point.x)),

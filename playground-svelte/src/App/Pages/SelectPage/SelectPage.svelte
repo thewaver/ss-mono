@@ -28,11 +28,13 @@
     } from "./SelectPage.const.svelte";
     import type { Airport, Delivery } from "./SelectPage.types";
     import VirtualizedExampleWrapper from "./VirtualizedExampleWrapper.svelte";
-
-    const PAGE_SIZE = 40;
-    const PAGED_TOTAL = 500;
-    const PAGE_DELAY_MS = 600;
-    const EXAMPLES_ROOT = "/src/App/Pages/SelectPage/Examples";
+    import {
+    EXAMPLE_NAMES,
+    EXAMPLES_ROOT,
+    PAGE_DELAY_MS,
+    PAGE_SIZE,
+    PAGED_TOTAL,
+} from "@thewaver/ss-playground/App/Pages/SelectPage/SelectPage.const";
 
     const fetchRoutes = (offset: number) =>
         new Promise<SelectOption<Delivery>[]>((resolve) => {
@@ -178,21 +180,21 @@
     const examples: ExampleDefs[] = [
         {
             key: "default",
-            name: "Default",
+            name: EXAMPLE_NAMES.default,
             readout: () => `value: ${defaultValue ?? "undefined"}`,
             component: defaultExample,
             path: `${EXAMPLES_ROOT}/Countries.svelte`,
         },
         {
             key: "preselected",
-            name: "Preselected",
+            name: EXAMPLE_NAMES.preselected,
             readout: () => `value: ${preselectedValue ?? "undefined"} — reopening highlights it`,
             component: preselectedExample,
             path: `${EXAMPLES_ROOT}/Countries.svelte`,
         },
         {
             key: "clearable",
-            name: "Clearable",
+            name: EXAMPLE_NAMES.clearable,
             readout: () =>
                 `value: ${clearableValue ?? "undefined"} | last change: ${clearableChange} — the clear control is its own tab stop after the field, drawn only while something is picked`,
             component: clearableExample,
@@ -200,14 +202,14 @@
         },
         {
             key: "recordValues",
-            name: "Record values",
+            name: EXAMPLE_NAMES.recordValues,
             readout: () => `value: ${recordValue?.code ?? "undefined"}`,
             component: recordValuesExample,
             path: `${EXAMPLES_ROOT}/Airports.svelte`,
         },
         {
             key: "titleDescription",
-            name: "Title and description",
+            name: EXAMPLE_NAMES.titleDescription,
             readout: () =>
                 `value: ${deliveryValue?.name ?? "undefined"} — the descriptions wrap, so no two rows are the same height`,
             component: titleDescriptionExample,
@@ -215,35 +217,35 @@
         },
         {
             key: "optionGroups",
-            name: "Option groups",
+            name: EXAMPLE_NAMES.optionGroups,
             readout: () => `value: ${groupedValue ?? "undefined"} — arrows cross group boundaries and skip Finland`,
             component: optionGroupsExample,
             path: `${EXAMPLES_ROOT}/Countries.svelte`,
         },
         {
             key: "disabledOptions",
-            name: "Disabled options",
+            name: EXAMPLE_NAMES.disabledOptions,
             readout: () => `value: ${disabledOptionValue ?? "undefined"} — arrows skip Denmark and Finland`,
             component: disabledOptionsExample,
             path: `${EXAMPLES_ROOT}/Countries.svelte`,
         },
         {
             key: "disabledOptionsReachable",
-            name: "Disabled options + reachable",
+            name: EXAMPLE_NAMES.disabledOptionsReachable,
             readout: () => `value: ${reachableOptionValue ?? "undefined"} — arrows stop on them, hover explains why`,
             component: disabledOptionsReachableExample,
             path: `${EXAMPLES_ROOT}/Countries.svelte`,
         },
         {
             key: "scrollingList",
-            name: "Scrolling list",
+            name: EXAMPLE_NAMES.scrollingList,
             readout: () => `value: ${longValue ?? "undefined"} — Home and End reach both ends`,
             component: scrollingListExample,
             path: `${EXAMPLES_ROOT}/Hours.svelte`,
         },
         {
             key: "virtualized",
-            name: "Virtualized",
+            name: EXAMPLE_NAMES.virtualized,
             readout: () =>
                 `${stressCount.toLocaleString("en-GB")} options — ${
                     openMs === undefined
@@ -255,7 +257,7 @@
         },
         {
             key: "virtualizedGroups",
-            name: "Virtualized, in groups",
+            name: EXAMPLE_NAMES.virtualizedGroups,
             readout: () =>
                 `${stressCount.toLocaleString("en-GB")} options in ${Math.ceil(stressCount / STRESS_GROUP_SIZE).toLocaleString("en-GB")} groups — ${
                     isGroupedStressOpen ? "open" : "closed"
@@ -265,7 +267,7 @@
         },
         {
             key: "onDemand",
-            name: "Loaded on demand",
+            name: EXAMPLE_NAMES.onDemand,
             readout: () =>
                 `${pagedRoutes.length} of ${PAGED_TOTAL} routes fetched${
                     isFetching ? ", another batch in flight" : ""
@@ -275,7 +277,7 @@
         },
         {
             key: "autocomplete",
-            name: "Autocomplete",
+            name: EXAMPLE_NAMES.autocomplete,
             readout: () =>
                 `value: ${filterValue?.code ?? "undefined"} | query: "${filterQuery}" — ${filteredAirports.length} of ${AIRPORTS.length} shown; the page matches on city or code, which only it knows about`,
             component: autocompleteExample,
@@ -283,7 +285,7 @@
         },
         {
             key: "autocompleteOnDemand",
-            name: "Autocomplete, loaded on demand",
+            name: EXAMPLE_NAMES.autocompleteOnDemand,
             readout: () =>
                 `value: ${searchValue?.name ?? "undefined"} | query: "${searchQuery}" — ${searchResults.length} of ${searchTotal} matches held${
                     isSearching ? ", asking the server" : ""
@@ -293,28 +295,28 @@
         },
         {
             key: "errored",
-            name: "Error",
+            name: EXAMPLE_NAMES.errored,
             readout: () => `value: ${erroredValue ?? "undefined"} — required, nothing picked yet`,
             component: erroredExample,
             path: `${EXAMPLES_ROOT}/Countries.svelte`,
         },
         {
             key: "disabled",
-            name: "Disabled",
+            name: EXAMPLE_NAMES.disabled,
             readout: () => `value: ${disabledValue ?? "undefined"}`,
             component: disabledExample,
             path: `${EXAMPLES_ROOT}/Countries.svelte`,
         },
         {
             key: "reachable",
-            name: "Disabled + reachable",
+            name: EXAMPLE_NAMES.reachable,
             readout: () => `value: ${reachableValue ?? "undefined"}`,
             component: reachableExample,
             path: `${EXAMPLES_ROOT}/Reachable.svelte`,
         },
         {
             key: "label",
-            name: "In a Label",
+            name: EXAMPLE_NAMES.label,
             readout: () => `value: ${labeledValue ?? "undefined"} — the caption opens the list`,
             component: labelExample,
             path: `${EXAMPLES_ROOT}/Labeled.svelte`,

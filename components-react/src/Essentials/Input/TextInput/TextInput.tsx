@@ -1,6 +1,7 @@
 import { useCallback, useId, useMemo, useState } from "react";
 
 import { ListboxUtils } from "@thewaver/ss-components";
+import { TextInputConst } from "@thewaver/ss-components/internal";
 
 import { Popover } from "../../../Primitives/Popover/Popover";
 import { TextField } from "../../../Primitives/TextField/TextField";
@@ -9,9 +10,6 @@ import { ListboxOptions } from "../Listbox/Listbox";
 import { ListboxReactUtils } from "../Listbox/ListboxReact.utils";
 import type { SelectOption } from "../Select/Select.types";
 import type { TextInputProps } from "./TextInput.types";
-
-const EMPTY_SELECTION: never[] = [];
-const NO_AUTOCOMPLETE = "off";
 
 export const TextInput = <T = string,>(props: TextInputProps<T>) => {
     const listboxId = useId();
@@ -25,7 +23,9 @@ export const TextInput = <T = string,>(props: TextInputProps<T>) => {
 
     const options = useMemo(
         (): SelectOption<T>[] =>
-            props.suggestions === undefined ? EMPTY_SELECTION : props.suggestions.map((value) => ({ value })),
+            props.suggestions === undefined
+                ? TextInputConst.EMPTY_SELECTION
+                : props.suggestions.map((value) => ({ value })),
         [props.suggestions],
     );
 
@@ -46,7 +46,7 @@ export const TextInput = <T = string,>(props: TextInputProps<T>) => {
         isHighlightExplicit: true,
         listboxId,
         options,
-        selectedOptions: EMPTY_SELECTION,
+        selectedOptions: TextInputConst.EMPTY_SELECTION,
         isDisabled: isRefused,
         isOpen,
         isFilterable: true,
@@ -89,7 +89,7 @@ export const TextInput = <T = string,>(props: TextInputProps<T>) => {
                 {...props}
                 element={"input"}
                 ref={setFieldRef}
-                autoComplete={props.autoComplete ?? (hasSuggestions ? NO_AUTOCOMPLETE : undefined)}
+                autoComplete={props.autoComplete ?? (hasSuggestions ? TextInputConst.NO_AUTOCOMPLETE : undefined)}
                 ariaAttributes={
                     hasSuggestions
                         ? ListboxUtils.computeComboboxAttributes({

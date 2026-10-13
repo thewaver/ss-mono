@@ -2,7 +2,14 @@
 import { shallowRef } from "vue";
 
 import type { SortableItem } from "@thewaver/ss-components-vue";
-import { BOARD, CHEAP_ONLY, HAND, QUEUE } from "@thewaver/ss-playground/App/Pages/SortablePage/SortablePage.const";
+import {
+    BOARD,
+    CHEAP_ONLY,
+    EXAMPLES_ROOT,
+    EXAMPLE_NAMES,
+    HAND,
+    QUEUE,
+} from "@thewaver/ss-playground/App/Pages/SortablePage/SortablePage.const";
 import type { Card } from "@thewaver/ss-playground/App/Pages/SortablePage/SortablePage.types";
 
 import type { ExampleDefs } from "../../PageComponents/Examples/Examples.types";
@@ -12,8 +19,6 @@ import CardsExample from "./Examples/Cards.vue";
 import PairExample from "./Examples/Pair.vue";
 import RightToLeftExample from "./Examples/RightToLeft.vue";
 import RingExample from "./Examples/Ring.vue";
-
-const EXAMPLES_ROOT = "/src/App/Pages/SortablePage/Examples";
 
 const names = (items: SortableItem<Card>[]) => items.map((item) => item.value.name).join(", ") || "empty";
 
@@ -36,54 +41,54 @@ const ring = shallowRef<SortableItem<Card>[]>(QUEUE);
 const examples: ExampleDefs[] = [
     {
         key: "reorder",
-        name: "Reordering one list",
+        name: EXAMPLE_NAMES.reorder,
         readout: () =>
             `order: ${names(queue.value)} — Second is disabled, so arrows skip it and it cannot be picked up`,
         path: `${EXAMPLES_ROOT}/Cards.vue`,
     },
     {
         key: "row",
-        name: "Laid out in a row",
+        name: EXAMPLE_NAMES.row,
         readout: () => `order: ${names(row.value)} — left and right walk it, because the direction decides the keys`,
         path: `${EXAMPLES_ROOT}/Cards.vue`,
     },
     {
         key: "rightToLeft",
-        name: "A row in a right-to-left box",
+        name: EXAMPLE_NAMES.rightToLeft,
         readout: () =>
             `order: ${names(rightToLeft.value)} — the box around the row sets dir="rtl", so the cards run from the right and a carried card moves on to a later place with the left arrow`,
         path: `${EXAMPLES_ROOT}/RightToLeft.vue`,
     },
     {
         key: "ring",
-        name: "Reordering round a ring",
+        name: EXAMPLE_NAMES.ring,
         readout: () =>
             `order: ${names(ring.value)} — dropping picks the nearest place rather than comparing one axis, because a ring has no axis to compare`,
         path: `${EXAMPLES_ROOT}/Ring.vue`,
     },
     {
         key: "pair",
-        name: "Between two lists",
+        name: EXAMPLE_NAMES.pair,
         readout: () => `hand: ${names(hand.value)} | board: ${names(board.value)}`,
         path: `${EXAMPLES_ROOT}/Pair.vue`,
     },
     {
         key: "picky",
-        name: "A list that refuses some cards",
+        name: EXAMPLE_NAMES.picky,
         readout: () =>
             `hand: ${names(pickyHand.value)} | board: ${names(pickyBoard.value)} — the board takes nothing costing more than ${CHEAP_ONLY}`,
         path: `${EXAMPLES_ROOT}/Pair.vue`,
     },
     {
         key: "locked",
-        name: "A list that takes nothing",
+        name: EXAMPLE_NAMES.locked,
         readout: () =>
             `hand: ${names(lockedHand.value)} | board: ${names(lockedBoard.value)} — the board can be reordered but accepts nothing from outside`,
         path: `${EXAMPLES_ROOT}/Pair.vue`,
     },
     {
         key: "disabled",
-        name: "Disabled",
+        name: EXAMPLE_NAMES.disabled,
         readout: () => `order: ${names(disabled.value)} — nothing moves, by pointer or by key`,
         path: `${EXAMPLES_ROOT}/Cards.vue`,
     },

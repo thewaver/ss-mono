@@ -2,7 +2,7 @@
     import * as styles from "@thewaver/ss-playground/App/StyledComponents/TimePickerTrigger/TimePickerTrigger.css";
 
     import { getLayerClass } from "../Layer/Layer.context";
-    import type { TimePickerTriggerProps } from "./TimePickerTrigger.types";
+    import type { TimePickerTriggerProps } from "./TimePickerTriggerSvelte.types";
 
     let props: TimePickerTriggerProps = $props();
 

@@ -1,17 +1,19 @@
 import { useMemo, useState } from "react";
 
+import {
+    EXAMPLES_ROOT,
+    EXAMPLE_NAMES,
+} from "@thewaver/ss-playground/App/Pages/Mosaics/ElementMosaicPage/ElementMosaicPage.const";
 import { MOSAIC_EXTENT, TILES } from "@thewaver/ss-playground/App/Pages/Mosaics/Mosaics.const";
 
 import { PageExamples } from "../../../PageComponents/Examples/Examples";
 import { PageMeasureBox } from "../../../PageComponents/MeasureBox/MeasureBox";
-import type { MosaicSharedProps } from "../Mosaics.types";
 import { useMosaicsControls } from "../Mosaics.utils";
 import { PageMosaicsPanel } from "../MosaicsPanel";
-import type { WalkedExampleWrapperProps } from "./ElementMosaicPage.types";
+import type { MosaicSharedProps } from "../MosaicsReact.types";
+import type { WalkedExampleWrapperProps } from "./ElementMosaicPageReact.types";
 import { ElementsExample } from "./Examples/Elements";
 import { WalkedExample } from "./Examples/Walked";
-
-const EXAMPLES_ROOT = "/src/App/Pages/Mosaics/ElementMosaicPage/Examples";
 
 const ElementsExampleWrapper = (props: MosaicSharedProps) => {
     const items = useMemo(() => TILES.slice(0, props.itemCount), [props.itemCount]);
@@ -69,7 +71,7 @@ export const ElementMosaicPage = () => {
     const examples = [
         {
             key: "elements",
-            name: "Elements the consumer sizes",
+            name: EXAMPLE_NAMES.elements,
             readout: () =>
                 "every tile is handed its own width and height, and the arrangement only decides where each one goes",
             component: () => <ElementsExampleWrapper {...controls.sharedProps} />,
@@ -77,7 +79,7 @@ export const ElementMosaicPage = () => {
         },
         {
             key: "walked",
-            name: "One tab stop, walked by the arrow keys",
+            name: EXAMPLE_NAMES.walked,
             readout: () =>
                 `${pickedNames.length ? `grown: ${pickedNames.join(", ")}` : "nothing grown"} — Tab in, then Left and Right follow the reading order, Up and Down go to the tile below or above, and Enter, Space or a press grows or shrinks a tile so the rest re-pack around it`,
             component: () => (

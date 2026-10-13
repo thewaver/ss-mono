@@ -1,14 +1,14 @@
 <script setup lang="ts">
 import { shallowRef } from "vue";
 
+import { EXAMPLES_ROOT, EXAMPLE_NAMES } from "@thewaver/ss-playground/App/Pages/ModalPage/ModalPage.const";
+
 import type { ExampleDefs } from "../../PageComponents/Examples/Examples.types";
 import PageExamples from "../../PageComponents/Examples/PageExamples.vue";
 import DefaultExample from "./Examples/Default.vue";
 import DestructiveConfirmationExample from "./Examples/DestructiveConfirmation.vue";
 import LayeredExample from "./Examples/Layered.vue";
 import TextOnlyExample from "./Examples/TextOnly.vue";
-
-const EXAMPLES_ROOT = "/src/App/Pages/ModalPage/Examples";
 
 const modalVisibility = shallowRef(false);
 const destructiveVisibility = shallowRef(false);
@@ -21,27 +21,27 @@ const outcome = shallowRef("nothing decided yet");
 const examples: ExampleDefs[] = [
     {
         key: "default",
-        name: "Default",
+        name: EXAMPLE_NAMES.default,
         readout: () => `open: ${modalVisibility.value} — Escape and an overlay click both dismiss it`,
         path: `${EXAMPLES_ROOT}/Default.vue`,
     },
     {
         key: "destructiveConfirmation",
-        name: "Destructive confirmation",
+        name: EXAMPLE_NAMES.destructiveConfirmation,
         readout: () =>
             `open: ${destructiveVisibility.value} | outcome: ${outcome.value} — the alertdialog role, a required focus target, and neither overlay nor Escape dismissal`,
         path: `${EXAMPLES_ROOT}/DestructiveConfirmation.vue`,
     },
     {
         key: "layered",
-        name: "A popup inside it",
+        name: EXAMPLE_NAMES.layered,
         readout: () =>
             `open: ${layeredVisibility.value} | country: ${layeredValue.value ?? "undefined"} — Escape closes the innermost layer only`,
         path: `${EXAMPLES_ROOT}/Layered.vue`,
     },
     {
         key: "textOnly",
-        name: "Nothing focusable inside",
+        name: EXAMPLE_NAMES.textOnly,
         readout: () =>
             `open: ${textOnlyVisibility.value} — with nothing to focus inside, the dialog takes focus itself`,
         path: `${EXAMPLES_ROOT}/TextOnly.vue`,

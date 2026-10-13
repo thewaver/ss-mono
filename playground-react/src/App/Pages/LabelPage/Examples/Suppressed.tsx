@@ -2,7 +2,7 @@ import { Checkbox, Label } from "@thewaver/ss-components-react";
 
 import { PageCheckboxContent } from "../../../StyledComponents/CheckboxContent/CheckboxContent";
 import { PageLabelCaption } from "../../../StyledComponents/LabelCaption/LabelCaption";
-import type { LabelExampleProps } from "../LabelPage.types";
+import type { LabelExampleProps } from "../LabelPageReact.types";
 
 type Props = LabelExampleProps;
 

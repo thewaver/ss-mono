@@ -4,7 +4,7 @@
     import * as styles from "@thewaver/ss-playground/App/StyledComponents/NavMenuContent/NavMenuContent.css";
 
     import { getLayerClass } from "../Layer/Layer.context";
-    import type { NavMenuTriggerProps } from "./NavMenuContent.types";
+    import type { NavMenuTriggerProps } from "./NavMenuContentSvelte.types";
 
     let props: NavMenuTriggerProps & { children?: Snippet } = $props();
 

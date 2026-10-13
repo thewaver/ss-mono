@@ -3,21 +3,19 @@ import { useState } from "react";
 import type { FlipCardAxis, FlipCardTurnDirection } from "@thewaver/ss-components-react";
 import { FLIP_CARD_AXES, FLIP_CARD_DEFAULTS } from "@thewaver/ss-components-react";
 import { FlipCardKnobs } from "@thewaver/ss-playground/App/Knobs/FlipCards.const";
+import {
+    AXIS_LABELS,
+    EXAMPLES_ROOT,
+    EXAMPLE_NAMES,
+    FIELD_WIDTH,
+    SELECT_WIDTH,
+} from "@thewaver/ss-playground/App/Pages/FlipCardPage/FlipCardPage.const";
 
 import { PageExamples } from "../../PageComponents/Examples/Examples";
 import { PageNumberField, PageSelectField } from "../../PageComponents/Field/Field";
 import { PageProp } from "../../PageComponents/Prop/Prop";
 import { PagePropsPanel } from "../../PageComponents/PropsPanel/PropsPanel";
 import { PressedExample } from "./Examples/Pressed";
-
-const AXIS_LABELS: Record<FlipCardAxis, string> = {
-    row: "About the upright axis",
-    column: "About the horizontal axis",
-};
-
-const FIELD_WIDTH = 110;
-const SELECT_WIDTH = 220;
-const EXAMPLES_ROOT = "/src/App/Pages/FlipCardPage/Examples";
 
 export const FlipCardPage = () => {
     const [axis, setAxis] = useState<FlipCardAxis>(FLIP_CARD_DEFAULTS.axis);
@@ -30,7 +28,7 @@ export const FlipCardPage = () => {
     const examples = [
         {
             key: "pressed",
-            name: "Turned toward the edge pressed",
+            name: EXAMPLE_NAMES.pressed,
             readout: () => {
                 const side = pressedFlippedState[0] ? "back" : "front";
 

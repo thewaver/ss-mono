@@ -3,7 +3,7 @@ import type { TabLinkProps } from "@thewaver/ss-components-solid";
 import { LINK_TABS, ROW_TAB_GAP } from "@thewaver/ss-playground/App/Pages/TabsPage/TabsPage.const";
 
 import { PageTabContent, PageTabFloater, PageTabGutter } from "../../../StyledComponents/TabContent/TabContent";
-import type { TabsExampleProps } from "../TabsPage.types";
+import type { TabsExampleProps } from "../TabsPageSolid.types";
 
 const PageTabLink = (props: TabLinkProps) => <a {...props} data-link-component />;
 

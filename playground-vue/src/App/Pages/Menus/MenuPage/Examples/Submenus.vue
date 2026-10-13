@@ -5,8 +5,8 @@ import { POPOVER_SURFACE_INSET } from "@thewaver/ss-playground/App/StyledCompone
 import PageGlideFloater from "../../../../StyledComponents/GlideFloater/PageGlideFloater.vue";
 import PageMenuTriggerContent from "../../../../StyledComponents/MenuTriggerContent/MenuTriggerContent.vue";
 import MenuActionItem from "../MenuActionItem.vue";
-import { NESTED_ACTIONS } from "../MenuPage.const";
-import type { MenuExampleProps } from "../MenuPage.types";
+import { NESTED_ACTIONS } from "../MenuPageVue.const";
+import type { MenuExampleProps } from "../MenuPageVue.types";
 import MenuPopup from "../MenuPopup.vue";
 
 type Props = MenuExampleProps;

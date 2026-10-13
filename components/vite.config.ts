@@ -16,7 +16,7 @@ export default defineConfig({
         sourcemap: true,
         cssCodeSplit: false,
         lib: {
-            entry: "src/index.ts",
+            entry: { index: "src/index.ts", internal: "src/internal.ts" },
             formats: ["es"],
             cssFileName: "index",
         },

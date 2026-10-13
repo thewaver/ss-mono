@@ -9,7 +9,7 @@ import knight from "@thewaver/ss-playground/App/knight.webp";
 
 import { PageMeasureBox } from "../../../PageComponents/MeasureBox/MeasureBox";
 import { PageControlButtonContent } from "../../../StyledComponents/ControlButtonContent/ControlButtonContent";
-import type { TypewriterComplexExampleProps } from "../TypewriterPage.types";
+import type { TypewriterComplexExampleProps } from "../TypewriterPageSolid.types";
 
 type Props = TypewriterComplexExampleProps;
 

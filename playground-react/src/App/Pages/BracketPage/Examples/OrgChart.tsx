@@ -2,8 +2,8 @@ import { Bracket } from "@thewaver/ss-components-react";
 import type { BracketNode } from "@thewaver/ss-components-react";
 import * as styles from "@thewaver/ss-playground/App/Pages/BracketPage/BracketPage.css";
 
-import { branch, renderBracketNode, seed } from "../BracketPage.const";
 import type { BracketExampleProps } from "../BracketPage.types";
+import { branch, renderBracketNode, seed } from "../BracketPageReact.const";
 
 const NODE_SIZE = { width: 88, height: 40 };
 

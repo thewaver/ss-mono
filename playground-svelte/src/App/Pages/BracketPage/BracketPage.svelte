@@ -25,20 +25,21 @@
     import PageProp from "../../PageComponents/Prop/Prop.svelte";
     import PagePropsPanel from "../../PageComponents/PropsPanel/PagePropsPanel.svelte";
     import PageBeam from "../../StyledComponents/Beam/PageBeam.svelte";
-    import { BEAM_PATHS, NOTHING_PICKED, computeRouteSpan, toConnectorBoard } from "./BracketPage.const";
+    import { BEAM_PATHS, NOTHING_PICKED, computeRouteSpan, toConnectorBoard } from "./BracketPageSvelte.const";
     import type { BracketExampleProps } from "./BracketPage.types";
     import FamilyExample from "./Examples/Family.svelte";
     import KnockoutExample from "./Examples/Knockout.svelte";
     import OrgChartExample from "./Examples/OrgChart.svelte";
     import SkillTreeExample from "./Examples/SkillTree.svelte";
-
-    const EXAMPLES_ROOT = "/src/App/Pages/BracketPage/Examples";
-
-    const CONNECTOR_RADIUS = 14;
-    const CONNECTOR_WIDTH = 2;
-    const ROUTE_CONNECTOR_WIDTH = 3;
-    const WIDE_SPAN = 2;
-    const NO_MOTION_DURATION_MS = 0;
+    import {
+    CONNECTOR_RADIUS,
+    CONNECTOR_WIDTH,
+    EXAMPLE_NAMES,
+    EXAMPLES_ROOT,
+    NO_MOTION_DURATION_MS,
+    ROUTE_CONNECTOR_WIDTH,
+    WIDE_SPAN,
+} from "@thewaver/ss-playground/App/Pages/BracketPage/BracketPage.const";
 
     let layerGap = $state(BRACKET_DEFAULTS.layerGap);
     let crossGap = $state(BRACKET_DEFAULTS.crossGap);
@@ -80,7 +81,7 @@
     const examples: ExampleDefs[] = [
         {
             key: "knockout",
-            name: "Knockout",
+            name: EXAMPLE_NAMES.knockout,
             span: WIDE_SPAN,
             readout: () =>
                 `picked: ${picked} — a full draw with its rounds named, every node feeding exactly two, and one seed withdrawn so the walk steps past it; focus a seed and its road to the final lights up`,
@@ -89,7 +90,7 @@
         },
         {
             key: "orgChart",
-            name: "Org chart",
+            name: EXAMPLE_NAMES.orgChart,
             span: WIDE_SPAN,
             readout: () =>
                 "an uneven tree: three under one node, two under another, one that goes no further — a parent still lands between the outermost of the nodes it holds, whichever way round the board is turned",
@@ -98,7 +99,7 @@
         },
         {
             key: "skillTree",
-            name: "Skill tree",
+            name: EXAMPLE_NAMES.skillTree,
             readout: () =>
                 "a chain of single children, which is what a bye looks like — each one level with the last, under headers that turn with the board",
             component: skillTreeExample,
@@ -106,7 +107,7 @@
         },
         {
             key: "family",
-            name: "One family at a time",
+            name: EXAMPLE_NAMES.family,
             span: WIDE_SPAN,
             readout: () =>
                 `showing: ${family} — the whole draw stays mounted and a camera frames one family at a time: what the focused node feeds, it with all its siblings, and what feeds them; walk on with the arrows, or page through with the buttons without leaving them, and the camera pans and zooms to fit; Zoom out fits the whole draw, and Zoom in goes back to the family`,

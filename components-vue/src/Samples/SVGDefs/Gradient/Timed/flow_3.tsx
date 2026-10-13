@@ -1,19 +1,16 @@
-import { type CycleColorKey, type GradientBandedCycleOpts, SVGDefsUtils } from "@thewaver/ss-components";
+import { type GradientBandedCycleOpts, SVGDefsUtils } from "@thewaver/ss-components";
+import { Flow3Const } from "@thewaver/ss-components/internal";
 
 import { SVGGradientDefsVueUtils } from "../../../../Generators/SVGDefs/SVGGradients/SVGGradientDefsVue.utils";
 import { SVGAnimations } from "../../SVGAnimations.const";
 import type { TimedGradientConfig } from "../../SVGDefsVue.types";
 import { SVGDefsVueUtils } from "../../SVGDefsVue.utils";
 
-const CYCLE_KEYS: CycleColorKey[] = ["primary", "secondary", "tertiary"];
-const SMOOTH_REPEATS = 2;
-const BANDED_REPEATS = 4;
-
 export const flow_3 = (opts?: GradientBandedCycleOpts): TimedGradientConfig => ({
     computeSVGDefs: (id, __, ___, defs) => {
         const stopKeys = SVGDefsUtils.getCycleStopKeys(
-            CYCLE_KEYS,
-            opts?.bands ?? (opts?.banded ? BANDED_REPEATS : SMOOTH_REPEATS),
+            Flow3Const.CYCLE_KEYS,
+            opts?.bands ?? (opts?.banded ? Flow3Const.BANDED_REPEATS : Flow3Const.SMOOTH_REPEATS),
         );
 
         return [

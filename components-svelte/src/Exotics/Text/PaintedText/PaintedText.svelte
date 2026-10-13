@@ -10,6 +10,7 @@
         TrailUtils,
         PaintedTextStyles as styles,
     } from "@thewaver/ss-components";
+    import { PaintedTextConst } from "@thewaver/ss-components/internal";
 
     import { InteractionTrackerSvelteUtils } from "../../../Abstracts/InteractionTracker/InteractionTrackerSvelte.utils.svelte.js";
     import { getLetterDriverContext } from "../../../Abstracts/LetterDriver/LetterDriver.context.js";
@@ -19,13 +20,8 @@
     import { toStyle } from "../../../Utils/styleUtils.js";
     import type { PaintedTextController, PaintedTextProps } from "./PaintedText.types.js";
 
-    const MASK_PADDING_SIDES = 2;
-    const NO_OFFSET = 0;
-    const NO_LENGTH = 0;
-    const NO_PROGRESS = 0;
-
     let {
-        progress = $bindable(NO_PROGRESS),
+        progress = $bindable(PaintedTextConst.NO_PROGRESS),
         playback = $bindable(PAINTED_TEXT_DEFAULTS.playback),
         ...props
     }: PaintedTextProps = $props();
@@ -137,7 +133,7 @@
     const origin = $derived(getOrigin());
     const pathLength = $derived(getLayoutState().pathLength);
     const startOffset = $derived(progress * pathLength);
-    const isSliding = $derived(isOnPath && playback && !getIsPageHidden() && pathLength > NO_LENGTH);
+    const isSliding = $derived(isOnPath && playback && !getIsPageHidden() && pathLength > PaintedTextConst.NO_LENGTH);
 
     $effect(() => {
         void props.path;
@@ -183,7 +179,7 @@
     const offset = $derived.by(() => {
         getRegistryState();
 
-        return driver && root ? driver.registry.getOffset(root) : NO_OFFSET;
+        return driver && root ? driver.registry.getOffset(root) : PaintedTextConst.NO_OFFSET;
     });
 
     const isPerLetter = $derived(!!driver?.getIsAnimating());
@@ -360,15 +356,15 @@
                     maskUnits="userSpaceOnUse"
                     x={origin.x - maskPadding}
                     y={origin.y - maskPadding}
-                    width={width + maskPadding * MASK_PADDING_SIDES}
-                    height={height + maskPadding * MASK_PADDING_SIDES}
+                    width={width + maskPadding * PaintedTextConst.MASK_PADDING_SIDES}
+                    height={height + maskPadding * PaintedTextConst.MASK_PADDING_SIDES}
                 >
                     {#if strokePaint.maskKind === "outside"}
                         <rect
                             x={origin.x - maskPadding}
                             y={origin.y - maskPadding}
-                            width={width + maskPadding * MASK_PADDING_SIDES}
-                            height={height + maskPadding * MASK_PADDING_SIDES}
+                            width={width + maskPadding * PaintedTextConst.MASK_PADDING_SIDES}
+                            height={height + maskPadding * PaintedTextConst.MASK_PADDING_SIDES}
                             fill="white"
                         />
                     {/if}

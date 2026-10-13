@@ -3,31 +3,27 @@ import { useId } from "react";
 
 import type { PlacementSector } from "@thewaver/ss-components-react";
 import { PlacementUtils } from "@thewaver/ss-components-react";
+import {
+    FULL_TURN,
+    HALF,
+    HALF_TURN,
+    LABEL_TYPE_RATIO,
+    NO_TILT,
+    PIP_PATH,
+    PIP_SIDE_STYLES,
+    QUARTER_TURN,
+    UPSIDE_DOWN_FROM,
+    UPSIDE_DOWN_TO,
+} from "@thewaver/ss-playground/App/StyledComponents/WheelContent/WheelContent.const";
 import * as styles from "@thewaver/ss-playground/App/StyledComponents/WheelContent/WheelContent.css";
 
 import { useLayerClass } from "../Layer/Layer.context";
 import type {
     PageWheelCardProps,
     PageWheelPipProps,
-    PageWheelPipSide,
     PageWheelSpinProps,
     PageWheelWedgeProps,
-} from "./WheelContent.types";
-
-const LABEL_TYPE_RATIO = 0.14;
-const NO_TILT = 0;
-const HALF = 0.5;
-const QUARTER_TURN = 90;
-const UPSIDE_DOWN_FROM = 90;
-const UPSIDE_DOWN_TO = 270;
-const HALF_TURN = 180;
-const FULL_TURN = 360;
-const PIP_PATH = "M 2 2 H 18 L 10 18 Z";
-
-const PIP_SIDE_STYLES: Record<PageWheelPipSide, string> = {
-    top: styles.wheelPipTop,
-    left: styles.wheelPipLeft,
-};
+} from "./WheelContentReact.types";
 
 const toLabelTilt = (wedgeAngle: number, sector: PlacementSector | undefined) => {
     if (!sector) return NO_TILT;

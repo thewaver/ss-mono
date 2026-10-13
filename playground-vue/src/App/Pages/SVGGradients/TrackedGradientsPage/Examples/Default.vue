@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import type { TrackedGradientExampleProps } from "../../SVGGradients.types";
+import type { TrackedGradientExampleProps } from "../../SVGGradientsVue.types";
 import TrackedShape from "./TrackedShape.vue";
 
 type Props = TrackedGradientExampleProps;

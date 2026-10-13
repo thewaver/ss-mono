@@ -2,7 +2,7 @@
 import * as styles from "@thewaver/ss-playground/App/StyledComponents/NumberInputStepperContent/NumberInputStepperContent.css";
 
 import { useLayerClass } from "../Layer/Layer.context";
-import type { NumberInputStepperContentProps } from "./NumberInputStepperContent.types";
+import type { NumberInputStepperContentProps } from "./NumberInputStepperContentVue.types";
 
 defineProps<NumberInputStepperContentProps>();
 

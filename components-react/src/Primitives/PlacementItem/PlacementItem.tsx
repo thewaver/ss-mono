@@ -1,12 +1,11 @@
 import { type CSSProperties, useLayoutEffect, useRef, useState } from "react";
 
 import { PLACEMENT_ITEM_DEFAULTS, PlacementItemStyles, PlacementItemUtils } from "@thewaver/ss-components";
+import { PlacementItemConst } from "@thewaver/ss-components/internal";
 
 import { useElement } from "../../Utils/refUtils";
 import { usePlacementBoxContext } from "../PlacementBox/PlacementBox.context";
 import type { PlacementItemProps } from "./PlacementItem.types";
-
-const NO_TRANSITION_MS = 0;
 
 export const PlacementItem = (props: PlacementItemProps) => {
     const context = usePlacementBoxContext();
@@ -23,7 +22,7 @@ export const PlacementItem = (props: PlacementItemProps) => {
 
     if (placement !== previousPlacement) {
         setPreviousPlacement(placement);
-        setIsGliding(context.getTransitionDurationMs() > NO_TRANSITION_MS);
+        setIsGliding(context.getTransitionDurationMs() > PlacementItemConst.NO_TRANSITION_MS);
     }
 
     useLayoutEffect(() => {

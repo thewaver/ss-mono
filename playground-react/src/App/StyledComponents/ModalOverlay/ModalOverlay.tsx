@@ -1,6 +1,6 @@
 import * as styles from "@thewaver/ss-playground/App/StyledComponents/ModalOverlay/ModalOverlay.css";
 
-import type { ModalOverlayProps } from "./ModalOverlay.types";
+import type { ModalOverlayProps } from "./ModalOverlayReact.types";
 
 export const PageModalOverlay = (props: ModalOverlayProps) => {
     return (

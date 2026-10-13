@@ -4,6 +4,15 @@ import { shallowRef } from "vue";
 import { Button } from "@thewaver/ss-components-vue";
 import type { Step } from "@thewaver/ss-components-vue";
 import { StepperKnobs } from "@thewaver/ss-playground/App/Knobs/Steppers.const";
+import { STATE_WORDS } from "@thewaver/ss-playground/App/Pages/StepperPage/StepperPage.const";
+import {
+    EXAMPLES_ROOT,
+    EXAMPLE_NAMES,
+    STARTING_DETAILED,
+    STARTING_FAILED,
+    STARTING_LINEAR,
+    STARTING_STACKED,
+} from "@thewaver/ss-playground/App/Pages/StepperPage/StepperPage.const";
 import { LABELS, ORDER } from "@thewaver/ss-playground/App/Pages/StepperPage/StepperSteps.const";
 import type { StepValue } from "@thewaver/ss-playground/App/Pages/StepperPage/StepperSteps.types";
 
@@ -13,20 +22,13 @@ import PageCheckField from "../../PageComponents/Field/PageCheckField.vue";
 import PageProp from "../../PageComponents/Prop/Prop.vue";
 import PagePropsPanel from "../../PageComponents/PropsPanel/PagePropsPanel.vue";
 import PageButtonContent from "../../StyledComponents/ButtonContent/ButtonContent.vue";
-import type { PageStepState } from "../../StyledComponents/StepContent/StepContent.types";
+import type { PageStepState } from "../../StyledComponents/StepContent/StepContentVue.types";
 import ArcExample from "./Examples/Arc.vue";
 import BareExample from "./Examples/Bare.vue";
 import DetailedExample from "./Examples/Detailed.vue";
 import FailedExample from "./Examples/Failed.vue";
 import LinearExample from "./Examples/Linear.vue";
 import StackedExample from "./Examples/Stacked.vue";
-import { STATE_WORDS } from "./StepperPage.const";
-
-const STARTING_LINEAR: StepValue = "address";
-const STARTING_FAILED: StepValue = "payment";
-const STARTING_STACKED: StepValue = "address";
-const STARTING_DETAILED: StepValue = "payment";
-const EXAMPLES_ROOT = "/src/App/Pages/StepperPage/Examples";
 
 const isFreeNavigation = shallowRef(StepperKnobs.STARTING_IS_FREE_NAVIGATION);
 
@@ -70,41 +72,41 @@ const describe = (step: Step<StepValue, PageStepState>, index: number) =>
 const examples: ExampleDefs[] = [
     {
         key: "stacked",
-        name: "Stacked",
+        name: EXAMPLE_NAMES.stacked,
         readout: () => `current: ${stackedCurrent.value} — the same steps down the page`,
         path: `${EXAMPLES_ROOT}/Stacked.vue`,
     },
     {
         key: "detailed",
-        name: "Steps that carry their own content",
+        name: EXAMPLE_NAMES.detailed,
         readout: () =>
             `current: ${detailedCurrent.value} — each step holds a body beside the connector, so the line runs past the content rather than stopping at it`,
         path: `${EXAMPLES_ROOT}/Detailed.vue`,
     },
     {
         key: "linear",
-        name: "Linear",
+        name: EXAMPLE_NAMES.linear,
         readout: () =>
             `current: ${linearCurrent.value} — only the steps behind you can be pressed, unless free navigation is on`,
         path: `${EXAMPLES_ROOT}/Linear.vue`,
     },
     {
         key: "failed",
-        name: "A step that failed",
+        name: EXAMPLE_NAMES.failed,
         readout: () =>
             `current: ${failedCurrent.value} — the failed step is reachable by keyboard so its tooltip can be read, and its name carries the state as words`,
         path: `${EXAMPLES_ROOT}/Failed.vue`,
     },
     {
         key: "bare",
-        name: "No connector",
+        name: EXAMPLE_NAMES.bare,
         readout: () => "the connector slot is optional, so a bare strip renders nothing between the steps",
         path: `${EXAMPLES_ROOT}/Bare.vue`,
     },
     {
         key: "arc",
         span: 2,
-        name: "The same steps, bent along an arc",
+        name: EXAMPLE_NAMES.arc,
         readout: () =>
             `current: ${arcCurrent.value} — one layout function, and the run between two steps follows the curve they sit on rather than cutting across it`,
         path: `${EXAMPLES_ROOT}/Arc.vue`,

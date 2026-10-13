@@ -9,7 +9,7 @@ import * as styles from "@thewaver/ss-playground/App/Pages/TabsPage/TabsPage.css
 
 import { PageTabPanel } from "../../../PageComponents/TabPanel/TabPanel";
 import { PageTabContent, PageTabFloater } from "../../../StyledComponents/TabContent/TabContent";
-import type { TabsExampleProps } from "../TabsPage.types";
+import type { TabsExampleProps } from "../TabsPageSolid.types";
 
 type Props = TabsExampleProps;
 

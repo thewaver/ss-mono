@@ -9,10 +9,12 @@
     import PageProp from "../../PageComponents/Prop/Prop.svelte";
     import PagePropsPanel from "../../PageComponents/PropsPanel/PagePropsPanel.svelte";
     import TypedExample from "./Examples/Typed.svelte";
-
-    const CALENDAR_FIELD_WIDTH = 180;
-    const CALENDAR_IDS = DateValueUtils.getCalendarIds();
-    const EXAMPLES_ROOT = "/src/App/Pages/DateInputPage/Examples";
+    import {
+    CALENDAR_FIELD_WIDTH,
+    CALENDAR_IDS,
+    EXAMPLE_NAMES,
+    EXAMPLES_ROOT,
+} from "@thewaver/ss-playground/App/Pages/DateInputPage/DateInputPage.const";
 
     const describe = (value: DateValue | undefined) => (value ? DateValueUtils.toIso(value) : "none");
 
@@ -25,14 +27,14 @@
     const examples: ExampleDefs[] = [
         {
             key: "typed",
-            name: "Typed only",
+            name: EXAMPLE_NAMES.typed,
             readout: () => `value: ${describe(typedValue)} — a half-typed or impossible date leaves this value alone`,
             component: typedExample,
             path: `${EXAMPLES_ROOT}/Typed.svelte`,
         },
         {
             key: "locale",
-            name: "Day first",
+            name: EXAMPLE_NAMES.locale,
             readout: () =>
                 `value: ${describe(localeValue)} — dd/mm/yyyy, and the separators are the mask's rather than yours to type`,
             component: localeExample,
@@ -40,7 +42,7 @@
         },
         {
             key: "era",
-            name: "Before the common era",
+            name: EXAMPLE_NAMES.era,
             readout: () =>
                 `value: ${describe(eraValue)} — the era is a control in the leading slot, offering whatever the calendar reports`,
             component: eraExample,

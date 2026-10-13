@@ -2,7 +2,7 @@ import { access } from "@thewaver/ss-components-solid";
 import * as styles from "@thewaver/ss-playground/App/StyledComponents/TimePickerTrigger/TimePickerTrigger.css";
 
 import { useLayerClass } from "../Layer/Layer.context";
-import type { TimePickerTriggerProps } from "./TimePickerTrigger.types";
+import type { TimePickerTriggerProps } from "./TimePickerTriggerSolid.types";
 
 export const PageTimePickerTrigger = (props: TimePickerTriggerProps) => {
     const getLayerClass = useLayerClass();

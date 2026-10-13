@@ -4,7 +4,7 @@
 
     import { renderPageHighlightFloater } from "../../../../StyledComponents/GlideFloater/GlideFloater.const.svelte";
     import { ACTIONS, renderMenuItem, renderMenuPopup } from "../MenuPage.const.svelte";
-    import type { MenuExampleProps } from "../MenuPage.types";
+    import type { MenuExampleProps } from "../MenuPageSvelte.types";
 
     type Props = MenuExampleProps;
 

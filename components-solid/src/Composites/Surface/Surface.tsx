@@ -2,15 +2,15 @@ import { type ParentProps, createMemo } from "solid-js";
 import { Dynamic } from "solid-js/web";
 
 import { SurfaceUtils, SurfaceStyles as styles } from "@thewaver/ss-components";
-import { ShapeConst, Size2d, StringUtils } from "@thewaver/ss-utils";
+import { SurfaceConst } from "@thewaver/ss-components/internal";
+import { ShapeConst, StringUtils } from "@thewaver/ss-utils";
 import { assignInlineVars } from "@vanilla-extract/dynamic";
 
 import { Shape } from "../../Exotics/Shape/Shape";
 import { access } from "../../Utils/propUtils";
 import type { SurfaceProps } from "./SurfaceSolid.types";
 
-const MOCK_SIZE: Size2d = { width: 0, height: 0 };
-const MOCK_GET_SIZE = () => MOCK_SIZE;
+const MOCK_GET_SIZE = () => SurfaceConst.MOCK_SIZE;
 const MOCK_GET_REF = () => undefined;
 
 const SurfaceSVG = (props: ParentProps<SurfaceProps>) => {

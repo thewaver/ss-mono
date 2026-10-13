@@ -1,15 +1,15 @@
 <script setup lang="ts">
 import { computed, shallowRef } from "vue";
 
+import { PaintedTextKnobs } from "@thewaver/ss-playground/App/Knobs/PaintedTexts.const";
 import { MEASURE_BOX_PADDING } from "@thewaver/ss-playground/App/PageComponents/MeasureBox/MeasureBox.css";
 
-import { PaintedTextKnobs } from "../../Knobs/PaintedTexts.const";
 import PageExampleKnobs from "../../PageComponents/ExampleKnobs/PageExampleKnobs.vue";
 import PageNumberField from "../../PageComponents/Field/PageNumberField.vue";
 import PageMeasureBox from "../../PageComponents/MeasureBox/MeasureBox.vue";
 import PageProp from "../../PageComponents/Prop/Prop.vue";
 import HeadingExample from "./Examples/Heading.vue";
-import type { PaintedTextExampleProps, PaintedTextExampleWrapperProps } from "./PaintedTextPage.types";
+import type { PaintedTextExampleProps, PaintedTextExampleWrapperProps } from "./PaintedTextPageVue.types";
 
 const props = defineProps<PaintedTextExampleWrapperProps>();
 

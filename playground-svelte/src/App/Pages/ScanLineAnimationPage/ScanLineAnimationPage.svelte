@@ -31,6 +31,10 @@
     import StressTestWrapper from "./StressTestWrapper.svelte";
     import SurgeExampleWrapper from "./SurgeExampleWrapper.svelte";
     import WaveExampleWrapper from "./WaveExampleWrapper.svelte";
+    import {
+    EXAMPLE_NAMES,
+    EXAMPLES_ROOT,
+} from "@thewaver/ss-playground/App/Pages/ScanLineAnimationPage/ScanLineAnimationPage.const";
 
     const extractOptionGroupWord = (key: string) => key.replace(/^_/, "").match(/^[a-z]+/)?.[0] ?? key;
 
@@ -48,7 +52,6 @@
     };
 
     const GROUPPED_WEIGHTS = groupOptions(CellAnimationWeights.ORIGIN_FREE_WEIGHT_TYPES);
-    const EXAMPLES_ROOT = "/src/App/Pages/ScanLineAnimationPage/Examples";
 
     let playback = $state(true);
 
@@ -75,79 +78,79 @@
     const examples: ExampleDefs[] = [
         {
             key: "glitch",
-            name: "Glitch",
+            name: EXAMPLE_NAMES.glitch,
             component: glitchExample,
             path: `${EXAMPLES_ROOT}/Glitch.svelte`,
         },
         {
             key: "surge",
-            name: "Surge",
+            name: EXAMPLE_NAMES.surge,
             component: surgeExample,
             path: `${EXAMPLES_ROOT}/Surge.svelte`,
         },
         {
             key: "snake",
-            name: "Snake",
+            name: EXAMPLE_NAMES.snake,
             component: snakeExample,
             path: `${EXAMPLES_ROOT}/Snake.svelte`,
         },
         {
             key: "split",
-            name: "Split",
+            name: EXAMPLE_NAMES.split,
             component: splitExample,
             path: `${EXAMPLES_ROOT}/Split.svelte`,
         },
         {
             key: "brightness",
-            name: "Brightness",
+            name: EXAMPLE_NAMES.brightness,
             component: brightnessExample,
             path: `${EXAMPLES_ROOT}/Brightness.svelte`,
         },
         {
             key: "grayscale",
-            name: "Grayscale",
+            name: EXAMPLE_NAMES.grayscale,
             component: grayscaleExample,
             path: `${EXAMPLES_ROOT}/Grayscale.svelte`,
         },
         {
             key: "hue",
-            name: "Hue",
+            name: EXAMPLE_NAMES.hue,
             component: hueExample,
             path: `${EXAMPLES_ROOT}/Hue.svelte`,
         },
         {
             key: "_wave",
-            name: "_Wave",
+            name: EXAMPLE_NAMES._wave,
             component: waveExample,
             path: `${EXAMPLES_ROOT}/_Wave.svelte`,
         },
         {
             key: "_roll",
-            name: "_Roll",
+            name: EXAMPLE_NAMES._roll,
             component: rollExample,
             path: `${EXAMPLES_ROOT}/_Roll.svelte`,
         },
         {
             key: "_dropout",
-            name: "_Dropout",
+            name: EXAMPLE_NAMES._dropout,
             component: dropoutExample,
             path: `${EXAMPLES_ROOT}/_Dropout.svelte`,
         },
         {
             key: "_interlace",
-            name: "_Interlace",
+            name: EXAMPLE_NAMES._interlace,
             component: interlaceExample,
             path: `${EXAMPLES_ROOT}/_Interlace.svelte`,
         },
         {
             key: "_skew",
-            name: "_Skew",
+            name: EXAMPLE_NAMES._skew,
             component: skewExample,
             path: `${EXAMPLES_ROOT}/_Skew.svelte`,
         },
         {
             key: "stressTest",
-            name: "Stress Test",
+            name: EXAMPLE_NAMES.stressTest,
             component: stressTestExample,
         },
     ];

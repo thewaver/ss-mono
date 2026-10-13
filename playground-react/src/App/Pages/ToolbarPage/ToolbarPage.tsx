@@ -3,6 +3,12 @@ import { useEffect, useRef, useState } from "react";
 
 import { ElementObserverReactUtils, TOOLBAR_DEFAULTS } from "@thewaver/ss-components-react";
 import { ToolbarKnobs } from "@thewaver/ss-playground/App/Knobs/Toolbars.const";
+import {
+    EXAMPLES_ROOT,
+    EXAMPLE_NAMES,
+    NO_WIDTH,
+    WIDE_SPAN,
+} from "@thewaver/ss-playground/App/Pages/ToolbarPage/ToolbarPage.const";
 import * as styles from "@thewaver/ss-playground/App/Pages/ToolbarPage/ToolbarPage.css";
 
 import { PageExamples } from "../../PageComponents/Examples/Examples";
@@ -15,13 +21,8 @@ import { PaletteExample } from "./Examples/Palette";
 import { PressedExample } from "./Examples/Pressed";
 import { RefusingExample } from "./Examples/Refusing";
 import { SharedTooltipExample } from "./Examples/SharedTooltip";
-import { NOTHING_RUN } from "./ToolbarPage.const";
-import type { ToolbarExampleProps } from "./ToolbarPage.types";
-
-const EXAMPLES_ROOT = "/src/App/Pages/ToolbarPage/Examples";
-
-const NO_WIDTH = 0;
-const WIDE_SPAN = 2;
+import { NOTHING_RUN } from "./ToolbarPageReact.const";
+import type { ToolbarExampleProps } from "./ToolbarPageReact.types";
 
 type ResizableBarProps = PropsWithChildren<{
     width: number;
@@ -62,7 +63,7 @@ export const ToolbarPage = () => {
     const examples = [
         {
             key: "default",
-            name: "Default",
+            name: EXAMPLE_NAMES.default,
             span: WIDE_SPAN,
             readout: () => `last run: ${lastRun} — drag the right edge and the row's tail moves into the menu`,
             component: () => (
@@ -74,7 +75,7 @@ export const ToolbarPage = () => {
         },
         {
             key: "refusing",
-            name: "Refusing",
+            name: EXAMPLE_NAMES.refusing,
             span: WIDE_SPAN,
             readout: () =>
                 "Share never collapses, so it is the last one standing; Print is never in the row; Rename is disabled, so the arrows step past it",
@@ -87,7 +88,7 @@ export const ToolbarPage = () => {
         },
         {
             key: "pressed",
-            name: "Pressed",
+            name: EXAMPLE_NAMES.pressed,
             span: WIDE_SPAN,
             readout: () =>
                 `pressed: ${pressedValues[0].join(", ") || "nothing"} — each action stays down until pressed again, and one that collapses is a checkbox in the menu, checked from the same list`,
@@ -100,7 +101,7 @@ export const ToolbarPage = () => {
         },
         {
             key: "sharedTooltip",
-            name: "One tooltip for the row",
+            name: EXAMPLE_NAMES.sharedTooltip,
             span: WIDE_SPAN,
             readout: () =>
                 "a single tooltip whose anchor is whichever action is under the pointer or holds focus; moving along the row carries the tooltip with it instead of hiding one and showing the next, and its description moves with it; Clear is disabled and has no hint, so it gets no tooltip",
@@ -113,7 +114,7 @@ export const ToolbarPage = () => {
         },
         {
             key: "palette",
-            name: "A ring of tools",
+            name: EXAMPLE_NAMES.palette,
             readout: () =>
                 `last run: ${lastRun} — a layout sizes the bar itself, so nothing runs out of room and the overflow menu has nothing to hold`,
             component: () => <PaletteExample {...commonProps} />,

@@ -2,15 +2,12 @@ import type { Snippet } from "svelte";
 import type { Attachment } from "svelte/attachments";
 
 import type {
+    BaseSortableProps,
     InteractionFlags,
-    PlacementLayoutFn,
-    ProximityEffectFn,
-    SortableAnnouncements,
     SortableFlags,
     SortableItemFlags,
     SortableItemRecord,
     SortableOrientation,
-    SortableTransfer,
 } from "@thewaver/ss-components";
 
 import type {
@@ -57,54 +54,17 @@ export type SortableItemSlotProps = {
     onFocus: () => void;
 };
 
-export type SortableProps<T> = Omit<InteractionWrapperProps<SortableFlags>, "renderControl" | "extraFlags"> & {
-    /**
-     * Identifies the list, so two lists can tell their own items from each other's when something is dragged between
-     * them.
-     */
-    groupId: string;
-    /** Names the list for assistive technology. */
-    ariaLabel: string;
-    /**
-     * Everything the list says aloud while an item is moved, and the key hints and place names those announcements
-     * are built from. There is no default: every word a reader hears comes from here.
-     */
-    announcements: SortableAnnouncements;
-    /**
-     * What an item is called when it is announced, so a reader hears it named as something that moves rather than as
-     * a plain list item. Defaults to "sortable item".
-     */
-    itemRoleDescription?: string;
-    /** Whether the items run across the page or down it. */
-    orientation?: SortableOrientation;
-    /** The space between items. */
-    gap?: number;
-    /** Freezes the list as it stands: items still show, but none can be moved. */
-    isLocked?: boolean;
-    /** Draws the line showing where a carried item would land. */
-    renderMarker?: Snippet<[orientation: SortableOrientation]>;
-    /**
-     * The items, in their current order. Bind it with `bind:items`: it is the only thing that reorders them, and the
-     * list writes it when an item is moved.
-     */
-    items: SortableItem<T>[];
-    /** Arranges the items, for a list that is something other than a straight run. */
-    computeLayout?: PlacementLayoutFn;
-    /** What the items do as the pointer nears them. */
-    computeEffect?: ProximityEffectFn;
-    /** The key one item is told apart by, which is what lets an item keep its identity as it moves. */
-    computeItemKey: (value: T) => string;
-    /** Names one item for assistive technology. */
-    computeItemLabel: (value: T) => string;
-    /**
-     * Whether this list will take an item offered to it, and from which list, so a list can refuse what does not
-     * belong.
-     */
-    computeCanAccept?: (value: T, fromLabel: string) => boolean;
-    /** Draws one item. */
-    renderItem: Snippet<[item: SortableItem<T>, flags: InteractionFlags<SortableItemFlags>]>;
-    /** Draws the item being carried, which follows the pointer rather than sitting in the list. */
-    renderCarried?: Snippet<[item: SortableItem<T>]>;
-    /** Runs when an item is moved, here or to another list. */
-    onTransfer?: (transfer: SortableTransfer<T>) => void;
-};
+export type SortableProps<T> = Omit<InteractionWrapperProps<SortableFlags>, "renderControl" | "extraFlags"> &
+    BaseSortableProps<T> & {
+        /** Draws the line showing where a carried item would land. */
+        renderMarker?: Snippet<[orientation: SortableOrientation]>;
+        /**
+         * The items, in their current order. Bind it with `bind:items`: it is the only thing that reorders them, and the
+         * list writes it when an item is moved.
+         */
+        items: SortableItem<T>[];
+        /** Draws one item. */
+        renderItem: Snippet<[item: SortableItem<T>, flags: InteractionFlags<SortableItemFlags>]>;
+        /** Draws the item being carried, which follows the pointer rather than sitting in the list. */
+        renderCarried?: Snippet<[item: SortableItem<T>]>;
+    };

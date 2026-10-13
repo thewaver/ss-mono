@@ -5,10 +5,10 @@
     import { Collapsible } from "@thewaver/ss-components-svelte";
     import * as styles from "@thewaver/ss-playground/App/App.css";
 
-    import { DEPENDENCY_GROUPS, DEPENDENCY_SECTIONS, EMPTY_DEPENDENCY_NAMES, LIST_PAGELESS_COMPONENTS } from "./App.const";
+    import { DEPENDENCY_GROUPS, DEPENDENCY_SECTIONS, EMPTY_DEPENDENCY_NAMES, LIST_PAGELESS_COMPONENTS } from "./AppSvelte.const";
     import { COMPONENT_CONFIGS, toPageHref } from "./App.router";
     import PageRouterLink from "./PageComponents/RouterLink/RouterLink.svelte";
-    import type { PageViewKey } from "./PageComponents/ViewTabs/ViewTabs.types";
+    import type { PageViewKey } from "./PageComponents/ViewTabs/ViewTabsSvelte.types";
     import { getLayerClass } from "./StyledComponents/Layer/Layer.context";
 
     const CONFIGS_BY_KEY = new Map(COMPONENT_CONFIGS.map((config) => [config.name.toLowerCase(), config]));

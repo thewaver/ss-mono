@@ -8,8 +8,7 @@
     import MixedExample from "./Examples/Mixed.svelte";
     import ReachableExample from "./Examples/Reachable.svelte";
     import RefusedWriteExample from "./Examples/RefusedWrite.svelte";
-
-    const EXAMPLES_ROOT = "/src/App/Pages/CheckboxPage/Examples";
+    import { EXAMPLE_NAMES, EXAMPLES_ROOT } from "@thewaver/ss-playground/App/Pages/CheckboxPage/CheckboxPage.const";
 
     let defaultChecked = $state(false);
     let decoratedChecked = $state(true);
@@ -33,21 +32,21 @@
     const examples: ExampleDefs[] = [
         {
             key: "default",
-            name: "Default",
+            name: EXAMPLE_NAMES.default,
             readout: () => `checked: ${defaultChecked}`,
             component: defaultExample,
             path: `${EXAMPLES_ROOT}/Default.svelte`,
         },
         {
             key: "decorated",
-            name: "Decorated",
+            name: EXAMPLE_NAMES.decorated,
             readout: () => `checked: ${decoratedChecked}`,
             component: decoratedExample,
             path: `${EXAMPLES_ROOT}/Decorated.svelte`,
         },
         {
             key: "mixed",
-            name: "Mixed",
+            name: EXAMPLE_NAMES.mixed,
             readout: () =>
                 `mixed: ${isAllMixed} | all: ${allChecked} | children: ${firstChildChecked}, ${secondChildChecked}`,
             component: mixedExample,
@@ -55,7 +54,7 @@
         },
         {
             key: "refusedWrite",
-            name: "Refused write",
+            name: EXAMPLE_NAMES.refusedWrite,
             readout: () =>
                 `email: ${emailChecked} | sms: ${smsChecked} — whichever is the last one on refuses to go off`,
             component: refusedWriteExample,
@@ -63,21 +62,21 @@
         },
         {
             key: "disabled",
-            name: "Disabled",
+            name: EXAMPLE_NAMES.disabled,
             readout: () => `checked: ${disabledChecked}`,
             component: disabledExample,
             path: `${EXAMPLES_ROOT}/Disabled.svelte`,
         },
         {
             key: "reachable",
-            name: "Disabled + reachable",
+            name: EXAMPLE_NAMES.reachable,
             readout: () => `checked: ${reachableChecked}`,
             component: reachableExample,
             path: `${EXAMPLES_ROOT}/Reachable.svelte`,
         },
         {
             key: "errored",
-            name: "Error",
+            name: EXAMPLE_NAMES.errored,
             readout: () => `checked: ${erroredChecked}`,
             component: erroredExample,
             path: `${EXAMPLES_ROOT}/Errored.svelte`,

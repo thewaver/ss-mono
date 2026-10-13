@@ -4,10 +4,11 @@
     import * as styles from "@thewaver/ss-playground/App/StyledComponents/SelectGroupContent/SelectGroupContent.css";
 
     import { getLayerClass } from "../Layer/Layer.context";
-    import type { SelectGroupContentProps } from "./SelectGroupContent.types";
-
-    const CHECKED_MARK = "✓";
-    const MIXED_MARK = "–";
+    import type { SelectGroupContentProps } from "./SelectGroupContentSvelte.types";
+    import {
+        CHECKED_MARK,
+        MIXED_MARK,
+    } from "@thewaver/ss-playground/App/StyledComponents/SelectGroupContent/SelectGroupContent.const";
 
     let props: SelectGroupContentProps & { children?: Snippet } = $props();
 

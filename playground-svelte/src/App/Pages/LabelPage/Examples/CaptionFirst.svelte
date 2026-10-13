@@ -3,7 +3,7 @@
 
     import PageLabelCaption from "../../../StyledComponents/LabelCaption/LabelCaption.svelte";
     import PageToggleContent from "../../../StyledComponents/ToggleContent/ToggleContent.svelte";
-    import type { LabelExampleProps } from "../LabelPage.types";
+    import type { LabelExampleProps } from "../LabelPageSvelte.types";
 
     type Props = LabelExampleProps;
 

@@ -8,11 +8,11 @@
     import { ShapeConst } from "@thewaver/ss-utils";
 
     import { getLayerClass } from "../Layer/Layer.context";
-    import type { PageFormationItemProps } from "./FormationContent.types";
-
-    const EDGE_THICKNESSES = [2];
-    const STROKE_GEOM = [{ thicknesses: EDGE_THICKNESSES }];
-    const FILL_OPACITY = 0.75;
+    import type { PageFormationItemProps } from "./FormationContentSvelte.types";
+    import {
+        FILL_OPACITY,
+        STROKE_GEOM,
+    } from "@thewaver/ss-playground/App/StyledComponents/FormationContent/FormationContent.const";
 
     let props: PageFormationItemProps & { children?: Snippet } = $props();
 

@@ -4,6 +4,11 @@ import { shallowRef } from "vue";
 import { TextArea } from "@thewaver/ss-components-vue";
 import { MEASURE_BOX_PADDING } from "@thewaver/ss-playground/App/PageComponents/MeasureBox/MeasureBox.css";
 import {
+    CUSTOM_TEXT_MAX_ROWS,
+    CUSTOM_TEXT_MIN_ROWS,
+    CUSTOM_TEXT_WIDTH,
+} from "@thewaver/ss-playground/App/Pages/TypewriterPage/TypewriterPage.const";
+import {
     FIELD_GAP,
     FIELD_PADDING,
 } from "@thewaver/ss-playground/App/StyledComponents/TextFieldContent/TextFieldContent.css";
@@ -14,11 +19,7 @@ import PageTextFieldContent, {
 } from "../../StyledComponents/TextFieldContent/TextFieldContent.vue";
 import PageTextFieldPlaceholder from "../../StyledComponents/TextFieldPlaceholder/TextFieldPlaceholder.vue";
 import CustomInputExample from "./Examples/CustomInput.vue";
-import type { TypewriterExampleWrapperProps } from "./TypewriterPage.types";
-
-const CUSTOM_TEXT_WIDTH = 320;
-const CUSTOM_TEXT_MIN_ROWS = 6;
-const CUSTOM_TEXT_MAX_ROWS = 12;
+import type { TypewriterExampleWrapperProps } from "./TypewriterPageVue.types";
 
 defineProps<TypewriterExampleWrapperProps>();
 

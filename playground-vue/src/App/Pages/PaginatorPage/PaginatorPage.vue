@@ -3,6 +3,12 @@ import { computed, shallowRef } from "vue";
 
 import { PAGINATOR_DEFAULTS } from "@thewaver/ss-components-vue";
 import { PaginatorKnobs } from "@thewaver/ss-playground/App/Knobs/Paginators.const";
+import {
+    COUNT_FIELD_WIDTH,
+    EXAMPLES_ROOT,
+    EXAMPLE_NAMES,
+    STARTING_PAGE,
+} from "@thewaver/ss-playground/App/Pages/PaginatorPage/PaginatorPage.const";
 
 import type { ExampleDefs } from "../../PageComponents/Examples/Examples.types";
 import PageExamples from "../../PageComponents/Examples/PageExamples.vue";
@@ -15,11 +21,7 @@ import EndsExample from "./Examples/Ends.vue";
 import LinkComponentExample from "./Examples/LinkComponent.vue";
 import LinksExample from "./Examples/Links.vue";
 import StepsExample from "./Examples/Steps.vue";
-import type { PaginatorExampleProps } from "./PaginatorPage.types";
-
-const STARTING_PAGE = 1;
-const COUNT_FIELD_WIDTH = 90;
-const EXAMPLES_ROOT = "/src/App/Pages/PaginatorPage/Examples";
+import type { PaginatorExampleProps } from "./PaginatorPageVue.types";
 
 const pageCount = shallowRef(PaginatorKnobs.STARTING_PAGE_COUNT);
 const siblingCount = shallowRef(PAGINATOR_DEFAULTS.siblingCount);
@@ -42,35 +44,35 @@ const commonProps = computed<Omit<PaginatorExampleProps, "page" | "onPageChange"
 const examples: ExampleDefs[] = [
     {
         key: "steps",
-        name: "Previous and next",
+        name: EXAMPLE_NAMES.steps,
         readout: () =>
             `page ${stepPage.value} of ${pageCount.value} — the gaps name the pages they stand for, and a gap standing for one page is spelled as that page instead`,
         path: `${EXAMPLES_ROOT}/Steps.vue`,
     },
     {
         key: "ends",
-        name: "Jumps to either end",
+        name: EXAMPLE_NAMES.ends,
         readout: () =>
             `page ${endPage.value} of ${pageCount.value} — first and previous go quiet together on page one, and next and last on the final page`,
         path: `${EXAMPLES_ROOT}/Ends.vue`,
     },
     {
         key: "links",
-        name: "Pages that are links",
+        name: EXAMPLE_NAMES.links,
         readout: () =>
             `page ${linkPage.value} of ${pageCount.value} — the consumer knows the address shape, so it computes the href from the page the library worked out`,
         path: `${EXAMPLES_ROOT}/Links.vue`,
     },
     {
         key: "linkComponent",
-        name: "Links through a component",
+        name: EXAMPLE_NAMES.linkComponent,
         readout: () =>
             `page ${customLinkPage.value} of ${pageCount.value} — the same links rendered by a consumer's own link component`,
         path: `${EXAMPLES_ROOT}/LinkComponent.vue`,
     },
     {
         key: "dial",
-        name: "The same row, round half a dial",
+        name: EXAMPLE_NAMES.dial,
         readout: () =>
             `page ${dialPage.value} of ${pageCount.value} — one layout function, and the steps, pages and gaps become wedges in the order they already had`,
         path: `${EXAMPLES_ROOT}/Dial.vue`,

@@ -1,7 +1,7 @@
 import * as styles from "@thewaver/ss-playground/App/StyledComponents/RangeKnob/RangeKnob.css";
 
 import { useLayerClass } from "../Layer/Layer.context";
-import type { RangeKnobProps } from "./RangeKnob.types";
+import type { RangeKnobProps } from "./RangeKnobReact.types";
 
 export const PageRangeKnob = (props: RangeKnobProps) => {
     const layerClass = useLayerClass();

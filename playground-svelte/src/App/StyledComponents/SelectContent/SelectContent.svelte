@@ -15,7 +15,7 @@
     import type { Snippet } from "svelte";
 
     import { getLayerClass } from "../Layer/Layer.context";
-    import type { SelectContentProps } from "./SelectContent.types";
+    import type { SelectContentProps } from "./SelectContentSvelte.types";
 
     let props: SelectContentProps & { children?: Snippet } = $props();
 

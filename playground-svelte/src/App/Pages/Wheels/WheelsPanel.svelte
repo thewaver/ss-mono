@@ -1,7 +1,7 @@
 <script lang="ts">
     import { FIELD_WIDTH, SPIN_STYLE_KEYS } from "@thewaver/ss-playground/App/Pages/Wheels/Wheels.const";
 
-    import { WheelKnobs } from "../../Knobs/Wheels.const";
+    import { WheelKnobs } from "@thewaver/ss-playground/App/Knobs/Wheels.const";
     import PageCheckField from "../../PageComponents/Field/PageCheckField.svelte";
     import PageNumberField from "../../PageComponents/Field/PageNumberField.svelte";
     import PageSelectField from "../../PageComponents/Field/PageSelectField.svelte";

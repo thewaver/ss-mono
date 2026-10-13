@@ -2,34 +2,13 @@
 import { useId } from "vue";
 
 import { Shape } from "@thewaver/ss-components-vue";
+import { STRESS_ITEMS } from "@thewaver/ss-playground/App/Pages/ShapePage/ShapePage.const";
 import * as styles from "@thewaver/ss-playground/App/Pages/ShapePage/ShapePage.css";
 import { ShapeConst, type Size2d } from "@thewaver/ss-utils";
 
 import StressTest from "../../PageComponents/StressTest/StressTest.vue";
-import type { StressTestDefs } from "../../PageComponents/StressTest/StressText.types";
-import { computeShapeFillDefs, computeShapeStrokeDefs } from "./ShapePage.const";
 import type { ShapeExampleProps } from "./ShapePage.types";
-
-const STRESS_ITEMS: (StressTestDefs & { size: number })[] = [
-    {
-        count: 40,
-        cols: 8,
-        gap: 20,
-        size: 160,
-    },
-    {
-        count: 160,
-        cols: 16,
-        gap: 10,
-        size: 80,
-    },
-    {
-        count: 640,
-        cols: 32,
-        gap: 5,
-        size: 40,
-    },
-];
+import { computeShapeFillDefs, computeShapeStrokeDefs } from "./ShapePageVue.const";
 
 const props = defineProps<ShapeExampleProps>();
 

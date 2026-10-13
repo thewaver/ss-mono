@@ -2,18 +2,19 @@ import type { ParentProps } from "solid-js";
 import { Show } from "solid-js";
 
 import { access } from "@thewaver/ss-components-solid";
+import {
+    BRANCH_MARKER,
+    DESCRIPTION_ONLY_MARKER,
+    INDENT_PER_DEPTH,
+    INNER_RANK_DEPTH,
+    LEAF_MARKER,
+    ROOT_RANK_DEPTH,
+} from "@thewaver/ss-playground/App/StyledComponents/TreeNodeContent/TreeNodeContent.const";
 import * as styles from "@thewaver/ss-playground/App/StyledComponents/TreeNodeContent/TreeNodeContent.css";
 import { themeVars } from "@thewaver/ss-playground/App/Theme.css";
 
 import { useLayerClass } from "../Layer/Layer.context";
-import type { TreeNodeContentProps, TreeNodePendingProps } from "./TreeNodeContent.types";
-
-const INDENT_PER_DEPTH = 20;
-const BRANCH_MARKER = "▶";
-const LEAF_MARKER = "•";
-const DESCRIPTION_ONLY_MARKER = "·";
-const ROOT_RANK_DEPTH = 0;
-const INNER_RANK_DEPTH = 1;
+import type { TreeNodeContentProps, TreeNodePendingProps } from "./TreeNodeContentSolid.types";
 
 export const PageTreeNodeContent = (props: ParentProps<TreeNodeContentProps>) => {
     const getLayerClass = useLayerClass();

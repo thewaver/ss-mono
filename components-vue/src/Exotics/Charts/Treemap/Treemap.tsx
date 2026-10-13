@@ -8,6 +8,7 @@ import {
     type TreemapTransition,
     TreemapUtils,
 } from "@thewaver/ss-components";
+import { TreemapConst } from "@thewaver/ss-components/internal";
 
 import { ElementObserverVueUtils } from "../../../Abstracts/ElementObserver/ElementObserverVue.utils";
 import { watchAfterRender } from "../../../Utils/effectUtils";
@@ -15,11 +16,6 @@ import { callSlot, declareProps, useTwoWay } from "../../../Utils/propUtils";
 import { toElement } from "../../../Utils/refUtils";
 import type { SlotsContext } from "../../../Utils/typeUtils";
 import type { TreemapProps, TreemapSlots } from "./Treemap.types";
-
-const NOTHING = 0;
-const HIDDEN = 0;
-const SHOWN = 1;
-const NEXT = 1;
 
 type TreemapZoomState<T> = {
     branch: TreemapNode<T>;
@@ -53,7 +49,7 @@ export const Treemap = defineComponent(
             branch: branch.value,
             cameFrom: undefined,
             transition: undefined,
-            generation: NOTHING,
+            generation: TreemapConst.NOTHING,
         });
 
         watch(branch, (next) => {
@@ -69,7 +65,7 @@ export const Treemap = defineComponent(
                     size.value,
                     props.zoomDurationMs ?? TREEMAP_DEFAULTS.zoomDurationMs,
                 ),
-                generation: current.generation + NEXT,
+                generation: current.generation + TreemapConst.NEXT,
             };
         });
 
@@ -111,7 +107,10 @@ export const Treemap = defineComponent(
                 });
 
                 if (transition.zoom === "in") {
-                    const fade = layerRef.value?.animate([{ opacity: HIDDEN }, { opacity: SHOWN }], timing);
+                    const fade = layerRef.value?.animate(
+                        [{ opacity: TreemapConst.HIDDEN }, { opacity: TreemapConst.SHOWN }],
+                        timing,
+                    );
 
                     if (fade) animations.push(fade);
                 }
@@ -151,7 +150,10 @@ export const Treemap = defineComponent(
             );
 
             const fade = layer.animate(
-                [{ opacity: SHOWN }, { opacity: transition.zoom === "in" ? SHOWN : HIDDEN }],
+                [
+                    { opacity: TreemapConst.SHOWN },
+                    { opacity: transition.zoom === "in" ? TreemapConst.SHOWN : TreemapConst.HIDDEN },
+                ],
                 timing,
             );
 

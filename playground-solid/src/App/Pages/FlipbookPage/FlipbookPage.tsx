@@ -3,18 +3,19 @@ import { createMemo, createSignal } from "solid-js";
 import { FLIPBOOK_DEFAULTS, FlipbookUtils, MediaQueryMonitorSolidUtils } from "@thewaver/ss-components-solid";
 import { FlipbookKnobs } from "@thewaver/ss-playground/App/Knobs/Flipbooks.const";
 import { computeFlipbookSpreadAnnouncement } from "@thewaver/ss-playground/App/PageComponents/Announcements/Announcements.const";
-import { FLIPBOOK_PAGES } from "@thewaver/ss-playground/App/Pages/FlipbookPage/FlipbookPage.const";
+import {
+    EXAMPLES_ROOT,
+    EXAMPLE_NAMES,
+    FIELD_WIDTH,
+    FLIPBOOK_PAGES,
+    NO_MOTION_DURATION_MS,
+} from "@thewaver/ss-playground/App/Pages/FlipbookPage/FlipbookPage.const";
 
 import { PageExamples } from "../../PageComponents/Examples/Examples";
 import { PageNumberField } from "../../PageComponents/Field/Field";
 import { PageProp } from "../../PageComponents/Prop/Prop";
 import { PagePropsPanel } from "../../PageComponents/PropsPanel/PropsPanel";
 import { BookExample } from "./Examples/Book";
-
-const NO_MOTION_DURATION_MS = 0;
-
-const FIELD_WIDTH = 110;
-const EXAMPLES_ROOT = "/src/App/Pages/FlipbookPage/Examples";
 
 export const FlipbookPage = () => {
     const [getTransitionDurationMs, setTransitionDurationMs] = createSignal(FLIPBOOK_DEFAULTS.transitionDurationMs);
@@ -28,7 +29,7 @@ export const FlipbookPage = () => {
     const getExamples = createMemo(() => [
         {
             key: "book",
-            name: "A book of twelve pages",
+            name: EXAMPLE_NAMES.book,
             readout: () => {
                 const count = FLIPBOOK_PAGES.length;
                 const pages = FlipbookUtils.getShowingPages(indexSignal[0](), count);

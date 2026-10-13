@@ -3,9 +3,7 @@
     import { type Point2d, Size2d } from "@thewaver/ss-utils";
 
     import type { PagePaintAreaGroupProps } from "./PaintAreaGroup.types";
-
-    const NO_SIZE = { width: 0, height: 0 };
-    const UNSCALED = 1;
+    import { NO_SIZE, UNSCALED } from "@thewaver/ss-playground/App/PageComponents/PaintAreaGroup/PaintAreaGroup.const";
 
     let props: PagePaintAreaGroupProps = $props();
 

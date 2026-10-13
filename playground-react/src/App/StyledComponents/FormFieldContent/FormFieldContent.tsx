@@ -3,7 +3,7 @@ import type { PropsWithChildren } from "react";
 import * as styles from "@thewaver/ss-playground/App/StyledComponents/FormFieldContent/FormFieldContent.css";
 
 import { useLayerClass } from "../Layer/Layer.context";
-import type { FormFieldMessageProps } from "./FormFieldContent.types";
+import type { FormFieldMessageProps } from "./FormFieldContentReact.types";
 
 export const PageFormFieldCaption = (props: PropsWithChildren) => {
     const layerClass = useLayerClass();

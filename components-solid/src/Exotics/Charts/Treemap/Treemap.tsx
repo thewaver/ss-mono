@@ -9,16 +9,13 @@ import {
     TreemapUtils,
     TreemapStyles as styles,
 } from "@thewaver/ss-components";
+import { TreemapConst } from "@thewaver/ss-components/internal";
 import type { Rect } from "@thewaver/ss-utils";
 
 import { ElementObserverSolidUtils } from "../../../Abstracts/ElementObserver/ElementObserverSolid.utils";
 import { SignalMirrorSolidUtils } from "../../../Abstracts/SignalMirror/SignalMirrorSolid.utils";
 import { access } from "../../../Utils/propUtils";
 import type { TreemapProps } from "./TreemapSolid.types";
-
-const NOTHING = 0;
-const HIDDEN = 0;
-const SHOWN = 1;
 
 export const Treemap = <T,>(props: TreemapProps<T>) => {
     const itemRefs = new Map<TreemapNode<T>, HTMLElement>();
@@ -34,7 +31,7 @@ export const Treemap = <T,>(props: TreemapProps<T>) => {
 
     const getSize = ElementObserverSolidUtils.createBorderBoxSizeObserver(getRootRef);
 
-    const getFull = createMemo((): Rect => ({ x: NOTHING, y: NOTHING, ...getSize() }));
+    const getFull = createMemo((): Rect => ({ x: TreemapConst.NOTHING, y: TreemapConst.NOTHING, ...getSize() }));
 
     const getRootNode = createMemo(() => access(props.root));
 
@@ -108,7 +105,8 @@ export const Treemap = <T,>(props: TreemapProps<T>) => {
             itemRefs.get(tile.node)?.animate([TreemapUtils.toBox(from), TreemapUtils.toBox(tile.rect)], timing);
         });
 
-        if (transition.zoom === "in") getLayerRef()?.animate([{ opacity: HIDDEN }, { opacity: SHOWN }], timing);
+        if (transition.zoom === "in")
+            getLayerRef()?.animate([{ opacity: TreemapConst.HIDDEN }, { opacity: TreemapConst.SHOWN }], timing);
     };
 
     const animateLeaving = (transition: TreemapTransition<T>, layer: HTMLElement, items: HTMLElement[]) => {
@@ -125,7 +123,10 @@ export const Treemap = <T,>(props: TreemapProps<T>) => {
         });
 
         const fade = layer.animate(
-            [{ opacity: SHOWN }, { opacity: transition.zoom === "in" ? SHOWN : HIDDEN }],
+            [
+                { opacity: TreemapConst.SHOWN },
+                { opacity: transition.zoom === "in" ? TreemapConst.SHOWN : TreemapConst.HIDDEN },
+            ],
             timing,
         );
 
@@ -231,7 +232,7 @@ export const Treemap = <T,>(props: TreemapProps<T>) => {
                                     const getIsBranch = createMemo(() => TreemapUtils.getIsBranch(node, getWeights()));
                                     const getState = (): TreemapTileState => ({
                                         rect: getTile()?.rect ?? getFull(),
-                                        weight: getTile()?.weight ?? NOTHING,
+                                        weight: getTile()?.weight ?? TreemapConst.NOTHING,
                                         isBranch: getIsBranch(),
                                         isLeaving: false,
                                     });

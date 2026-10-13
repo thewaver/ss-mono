@@ -2,7 +2,7 @@
     import { Staircase, StaircaseIndents } from "@thewaver/ss-components-svelte";
 
     import PageStaircaseStep from "../../../StyledComponents/StaircaseContent/StaircaseContent.svelte";
-    import type { StaircaseExampleProps } from "../StaircasePage.types";
+    import type { StaircaseExampleProps } from "../StaircasePageSvelte.types";
 
     type Props = StaircaseExampleProps;
 

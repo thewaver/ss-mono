@@ -1,12 +1,15 @@
 import { useState } from "react";
 
+import {
+    EXAMPLES_ROOT,
+    EXAMPLE_NAMES,
+} from "@thewaver/ss-playground/App/Pages/Wheels/DrumWheelPage/DrumWheelPage.const";
+
 import { PageExamples } from "../../../PageComponents/Examples/Examples";
 import { useWheelsControls } from "../Wheels.utils";
 import { PageWheelsPanel } from "../WheelsPanel";
 import { OverExample } from "./Examples/Over";
 import { SidewaysExample } from "./Examples/Sideways";
-
-const EXAMPLES_ROOT = "/src/App/Pages/Wheels/DrumWheelPage/Examples";
 
 export const DrumWheelPage = () => {
     const controls = useWheelsControls();
@@ -23,7 +26,7 @@ export const DrumWheelPage = () => {
     const examples = [
         {
             key: "sideways",
-            name: "Turning sideways",
+            name: EXAMPLE_NAMES.sideways,
             component: () => (
                 <SidewaysExample
                     {...controls.sharedProps}
@@ -36,7 +39,7 @@ export const DrumWheelPage = () => {
         },
         {
             key: "reel",
-            name: "Turning over",
+            name: EXAMPLE_NAMES.reel,
             component: () => (
                 <OverExample
                     {...controls.sharedProps}

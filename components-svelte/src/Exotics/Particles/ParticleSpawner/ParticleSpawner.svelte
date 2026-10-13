@@ -10,6 +10,7 @@
         ParticleSpawnerUtils,
         ParticleSpawnerStyles as styles,
     } from "@thewaver/ss-components";
+    import { ParticleSpawnerConst } from "@thewaver/ss-components/internal";
     import { Rect } from "@thewaver/ss-utils";
 
     import { ElementObserverSvelteUtils } from "../../../Abstracts/ElementObserver/ElementObserverSvelte.utils.svelte.js";
@@ -17,9 +18,6 @@
     import { MediaQueryMonitorSvelteUtils } from "../../../Abstracts/MediaQueryMonitor/MediaQueryMonitorSvelte.utils.svelte.js";
     import { readStore } from "../../../Utils/storeUtils.js";
     import type { ParticleSpawnerProps } from "./ParticleSpawner.types.js";
-
-    const FIRST_STAGE = 0;
-    const NOT_STARTED = 0;
 
     let { playback = $bindable(true), ...props }: ParticleSpawnerProps = $props();
 
@@ -34,7 +32,7 @@
     const patterns = $derived(JSON.parse(patternsKey) as ParticleSpawnIterationPattern[]);
 
     let root = $state<HTMLDivElement>();
-    let stage = $state.raw({ index: FIRST_STAGE });
+    let stage = $state.raw({ index: ParticleSpawnerConst.FIRST_STAGE });
     let rootRect = $state.raw<Rect>();
 
     const elements = new Map<number, HTMLElement>();
@@ -93,7 +91,7 @@
         void patterns;
 
         untrack(() => {
-            stage = { index: FIRST_STAGE };
+            stage = { index: ParticleSpawnerConst.FIRST_STAGE };
         });
     });
 
@@ -137,7 +135,7 @@
 <div bind:this={root} class={styles.particleSpawnerRoot} role="presentation" aria-hidden="true">
     {#each getParticles() as particle (particle.id)}
         <div class={styles.particleSpawnerItem} {@attach attachParticle(particle.id)}>
-            {@render props.renderParticle(particle.index, ts.get(particle.id) ?? NOT_STARTED)}
+            {@render props.renderParticle(particle.index, ts.get(particle.id) ?? ParticleSpawnerConst.NOT_STARTED)}
         </div>
     {/each}
 </div>

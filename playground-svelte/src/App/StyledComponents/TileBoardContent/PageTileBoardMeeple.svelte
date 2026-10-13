@@ -2,9 +2,10 @@
     import * as styles from "@thewaver/ss-playground/App/StyledComponents/TileBoardContent/TileBoardContent.css";
 
     import { getLayerClass } from "../Layer/Layer.context";
-    import type { PageTileBoardMeepleProps } from "./TileBoardContent.types";
-
-    const MEEPLE_WIDTH_RATIO = 0.56;
+    import type { PageTileBoardMeepleProps } from "./TileBoardContentSvelte.types";
+    import {
+        MEEPLE_WIDTH_RATIO,
+    } from "@thewaver/ss-playground/App/StyledComponents/TileBoardContent/TileBoardContent.const";
 
     let props: PageTileBoardMeepleProps = $props();
 

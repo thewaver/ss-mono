@@ -1,6 +1,7 @@
 import { type KeyboardEvent, useEffect, useLayoutEffect, useRef, useState } from "react";
 
 import { CARD_STACK_DEFAULTS, CardStackStyles, CardStackUtils } from "@thewaver/ss-components";
+import { CardStackConst } from "@thewaver/ss-components/internal";
 import { StoreUtils } from "@thewaver/ss-utils";
 
 import { InteractionTrackerReactUtils } from "../../Abstracts/InteractionTracker/InteractionTrackerReact.utils";
@@ -9,18 +10,13 @@ import { useLatest } from "../../Utils/refUtils";
 import { useStore } from "../../Utils/storeUtils";
 import type { CardStackControls, CardStackProps } from "./CardStack.types";
 
-const MIN_MOUNTED_COUNT = 1;
-const FIRST_INDEX = 0;
-const TOP_DEPTH = 0;
-const FALLBACK_AXIS = "horizontal";
-
 type ControlsSnapshot = { topIndex: number; isEmpty: boolean };
 
 const getIsSameSnapshot = (first: ControlsSnapshot, second: ControlsSnapshot) =>
     first.topIndex === second.topIndex && first.isEmpty === second.isEmpty;
 
 export const CardStack = <T,>(props: CardStackProps<T>) => {
-    const [topIndex, setTopIndex] = SignalMirrorReactUtils.useOptionalState(props.topIndex, FIRST_INDEX);
+    const [topIndex, setTopIndex] = SignalMirrorReactUtils.useOptionalState(props.topIndex, CardStackConst.FIRST_INDEX);
 
     const pileRef = useRef<HTMLDivElement | null>(null);
     const detachedRef = useRef<HTMLDivElement | null>(null);
@@ -33,7 +29,10 @@ export const CardStack = <T,>(props: CardStackProps<T>) => {
     const cards = props.cards;
     const commitRatio = props.commitRatio ?? CARD_STACK_DEFAULTS.commitRatio;
     const transitionDurationMs = props.transitionDurationMs ?? CARD_STACK_DEFAULTS.transitionDurationMs;
-    const mountedCount = Math.max(props.mountedCount ?? CARD_STACK_DEFAULTS.mountedCount, MIN_MOUNTED_COUNT);
+    const mountedCount = Math.max(
+        props.mountedCount ?? CARD_STACK_DEFAULTS.mountedCount,
+        CardStackConst.MIN_MOUNTED_COUNT,
+    );
     const cardGap = props.cardGap ?? CARD_STACK_DEFAULTS.cardGap;
     const funnelRatio = props.funnelRatio ?? CARD_STACK_DEFAULTS.funnelRatio;
     const pileSide = props.pileSide ?? CARD_STACK_DEFAULTS.pileSide;
@@ -70,7 +69,7 @@ export const CardStack = <T,>(props: CardStackProps<T>) => {
     const isSwipeDisabled = isDisabled || isEmpty || allowedDirections.length === 0;
 
     const axial = InteractionTrackerReactUtils.useAxialSwipe(swipeAxis ? pileRef : detachedRef, isSwipeDisabled, {
-        axis: swipeAxis ?? FALLBACK_AXIS,
+        axis: swipeAxis ?? CardStackConst.FALLBACK_AXIS,
         commitRatio,
         onSwipe: (ratio) => pile.push(swipeAxis === "vertical" ? { x: 0, y: ratio } : { x: ratio, y: 0 }),
         onSwipeEnd: pile.release,
@@ -125,7 +124,7 @@ export const CardStack = <T,>(props: CardStackProps<T>) => {
             onKeyDown={onKeyDown}
         >
             {mounted.map((entry, depth) => {
-                const isTop = depth === TOP_DEPTH;
+                const isTop = depth === CardStackConst.TOP_DEPTH;
 
                 return (
                     <div

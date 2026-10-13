@@ -4,7 +4,7 @@ import { computed } from "vue";
 import { MOSAIC_EXTENT, TILES } from "@thewaver/ss-playground/App/Pages/Mosaics/Mosaics.const";
 
 import PageMeasureBox from "../../../PageComponents/MeasureBox/MeasureBox.vue";
-import type { MosaicSharedProps } from "../Mosaics.types";
+import type { MosaicSharedProps } from "../MosaicsVue.types";
 import ElementsExample from "./Examples/Elements.vue";
 
 const props = defineProps<MosaicSharedProps>();

@@ -13,3 +13,10 @@ export const TOPPINGS_WITH_SOLD_OUT: Topping[] = [
     ...TOPPINGS,
     { value: "anchovies", label: "Anchovies (sold out)", isSoldOut: true },
 ];
+
+export const EXAMPLE_NAMES = {
+    default: "Default",
+    selectAll: "With a select-all box",
+};
+
+export const EXAMPLES_ROOT = "/src/App/Pages/CheckboxGroupPage/Examples";

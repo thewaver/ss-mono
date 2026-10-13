@@ -3,7 +3,7 @@ import type { PropsWithChildren } from "react";
 import * as styles from "@thewaver/ss-playground/App/StyledComponents/SpotlightPopup/SpotlightPopup.css";
 
 import { PageLayer } from "../../PageComponents/Layer/Layer";
-import type { SpotlightPopupProps } from "./SpotlightPopup.types";
+import type { SpotlightPopupProps } from "./SpotlightPopupReact.types";
 
 export const PageSpotlightPopup = (props: PropsWithChildren<SpotlightPopupProps>) => {
     return (

@@ -1,6 +1,7 @@
 import { type ComponentPublicInstance, type SlotsType, defineComponent, shallowRef } from "vue";
 
 import { SATELLITE_DEFAULTS, SatelliteStyles, SatelliteUtils } from "@thewaver/ss-components";
+import { SatelliteConst } from "@thewaver/ss-components/internal";
 
 import { ElementObserverVueUtils } from "../../../Abstracts/ElementObserver/ElementObserverVue.utils";
 import { declareProps } from "../../../Utils/propUtils";
@@ -8,12 +9,6 @@ import { toElement } from "../../../Utils/refUtils";
 import type { SlotsContext } from "../../../Utils/typeUtils";
 import type { SatelliteDefs, SatelliteProps, SatelliteSlots } from "./Satellite.types";
 
-const BEHIND_Z_INDEX = 0;
-const SUBJECT_Z_INDEX = 1;
-const FRONT_Z_INDEX = 2;
-const NOTHING = 0;
-const UNMEASURED = { width: 0, height: 0 };
-const UNPLACED = { x: 0, y: 0 };
 const NO_SATELLITES: SatelliteDefs[] = [];
 
 const toPixels = (values: object) =>
@@ -25,7 +20,7 @@ export const Satellite = defineComponent(
         const satelliteRefs = shallowRef<Array<HTMLElement | undefined>>([]);
 
         const getSatellites = () => props.satellites ?? NO_SATELLITES;
-        const getHasSatellites = () => getSatellites().length > NOTHING;
+        const getHasSatellites = () => getSatellites().length > SatelliteConst.NOTHING;
 
         const subjectSize = ElementObserverVueUtils.useBorderBoxSize(subjectRef, () => !getHasSatellites());
 
@@ -66,7 +61,7 @@ export const Satellite = defineComponent(
             const layout = SatelliteUtils.computeLayout(
                 subjectSize.value,
                 satellites.map((satellite, index) => ({
-                    size: satelliteSizes.value[index] ?? UNMEASURED,
+                    size: satelliteSizes.value[index] ?? SatelliteConst.UNMEASURED,
                     placement: satellite.placement ?? SATELLITE_DEFAULTS.placement,
                     offset: satellite.offset ?? SATELLITE_DEFAULTS.offset,
                 })),
@@ -74,12 +69,16 @@ export const Satellite = defineComponent(
 
             return (
                 <div class={SatelliteStyles.satelliteRoot} style={toPixels(layout.padding)}>
-                    <div ref={subjectRef} class={SatelliteStyles.satelliteSubject} style={{ zIndex: SUBJECT_Z_INDEX }}>
+                    <div
+                        ref={subjectRef}
+                        class={SatelliteStyles.satelliteSubject}
+                        style={{ zIndex: SatelliteConst.SUBJECT_Z_INDEX }}
+                    >
                         {slots.default?.()}
                     </div>
 
                     {satellites.map((satellite, index) => {
-                        const offset = layout.satelliteOffsets[index] ?? UNPLACED;
+                        const offset = layout.satelliteOffsets[index] ?? SatelliteConst.UNPLACED;
 
                         return (
                             <div
@@ -91,8 +90,8 @@ export const Satellite = defineComponent(
                                     top: `${offset.y}px`,
                                     zIndex:
                                         (satellite.isBehindSubject ?? SATELLITE_DEFAULTS.isBehindSubject)
-                                            ? BEHIND_Z_INDEX
-                                            : FRONT_Z_INDEX,
+                                            ? SatelliteConst.BEHIND_Z_INDEX
+                                            : SatelliteConst.FRONT_Z_INDEX,
                                 }}
                             >
                                 {satellite.renderSatellite()}

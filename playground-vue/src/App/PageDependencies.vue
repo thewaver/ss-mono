@@ -4,10 +4,10 @@ import { computed, shallowRef, watch } from "vue";
 import { Collapsible } from "@thewaver/ss-components-vue";
 import * as styles from "@thewaver/ss-playground/App/App.css";
 
-import { DEPENDENCY_GROUPS, DEPENDENCY_SECTIONS, EMPTY_DEPENDENCY_NAMES } from "./App.const";
 import { AppUtils } from "./App.utils";
+import { DEPENDENCY_GROUPS, DEPENDENCY_SECTIONS, EMPTY_DEPENDENCY_NAMES } from "./AppVue.const";
 import PageRouterLink from "./PageComponents/RouterLink/RouterLink.vue";
-import type { PageViewKey } from "./PageComponents/ViewTabs/ViewTabs.types";
+import type { PageViewKey } from "./PageComponents/ViewTabs/ViewTabsVue.types";
 import { useLayerClass } from "./StyledComponents/Layer/Layer.context";
 
 const props = defineProps<{ name: string; view: PageViewKey }>();

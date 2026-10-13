@@ -4,7 +4,7 @@
     import { Typewriter } from "@thewaver/ss-components-svelte";
     import { FunctionUtils } from "@thewaver/ss-utils";
 
-    import type { TypewriterExampleProps } from "../TypewriterPage.types";
+    import type { TypewriterExampleProps } from "../TypewriterPageSvelte.types";
 
     type Props = TypewriterExampleProps & {
         text: string;

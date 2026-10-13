@@ -1,12 +1,7 @@
 import { defineComponent } from "vue";
 
-import {
-    type GradientBandOpts,
-    SVGDefsUtils,
-    TrackedGradientDefaults,
-    type TrackedGradientElementDefs,
-} from "@thewaver/ss-components";
-import type { Size2d } from "@thewaver/ss-utils";
+import { type GradientBandOpts, SVGDefsUtils, type TrackedGradientElementDefs } from "@thewaver/ss-components";
+import { BandDiag1Const } from "@thewaver/ss-components/internal";
 
 import { PointerTrackerVueUtils } from "../../../../Abstracts/PointerTracker/PointerTrackerVue.utils";
 import { SVGGradientDefsVueUtils } from "../../../../Generators/SVGDefs/SVGGradients/SVGGradientDefsVue.utils";
@@ -21,10 +16,6 @@ type DiagonalBandGradientProps = {
     opts?: GradientBandOpts;
 };
 
-const BAND_SPAN: Size2d = { width: 0.8, height: 0.8 };
-
-const DEFAULTS = TrackedGradientDefaults.BAND_DIAGONAL_DEFAULTS;
-
 const DiagonalBandGradient = defineComponent(
     (props: DiagonalBandGradientProps) => {
         const { reading } = PointerTrackerVueUtils.usePointerReading(
@@ -34,21 +25,21 @@ const DiagonalBandGradient = defineComponent(
         );
 
         return () => {
-            const angle = props.opts?.bandAngle ?? DEFAULTS.bandAngle;
+            const angle = props.opts?.bandAngle ?? BandDiag1Const.DEFAULTS.bandAngle;
             const travel =
                 SVGDefsUtils.projectBoxRatioOntoAngle(reading.value.boxRatio, angle) *
-                (props.opts?.bandTravel ?? DEFAULTS.bandTravel);
+                (props.opts?.bandTravel ?? BandDiag1Const.DEFAULTS.bandTravel);
 
             return SVGGradientDefsVueUtils.computeLinearGradient({
                 id: props.id,
                 colors: SVGDefsUtils.getFalloffStops(props.defs.colors.primary, {
-                    coreStop: props.opts?.coreStop ?? DEFAULTS.coreStop,
-                    coreAlpha: props.opts?.coreAlpha ?? DEFAULTS.coreAlpha,
-                    falloffSpread: props.opts?.falloffSpread ?? DEFAULTS.falloffSpread,
-                    falloffAlpha: props.opts?.falloffAlpha ?? DEFAULTS.falloffAlpha,
+                    coreStop: props.opts?.coreStop ?? BandDiag1Const.DEFAULTS.coreStop,
+                    coreAlpha: props.opts?.coreAlpha ?? BandDiag1Const.DEFAULTS.coreAlpha,
+                    falloffSpread: props.opts?.falloffSpread ?? BandDiag1Const.DEFAULTS.falloffSpread,
+                    falloffAlpha: props.opts?.falloffAlpha ?? BandDiag1Const.DEFAULTS.falloffAlpha,
                 }),
                 angle,
-                scale: BAND_SPAN,
+                scale: BandDiag1Const.BAND_SPAN,
                 offset: SVGDefsUtils.offsetDiagonally(travel, angle),
             });
         };

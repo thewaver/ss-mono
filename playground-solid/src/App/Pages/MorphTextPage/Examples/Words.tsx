@@ -7,7 +7,7 @@ import * as styles from "@thewaver/ss-playground/App/Pages/MorphTextPage/MorphTe
 import { CONTROL_GLYPHS } from "@thewaver/ss-playground/App/StyledComponents/ControlButtonContent/ControlButtonContent.const";
 
 import { PageControlButtonContent } from "../../../StyledComponents/ControlButtonContent/ControlButtonContent";
-import type { MorphTextExampleProps } from "../MorphTextPage.types";
+import type { MorphTextExampleProps } from "../MorphTextPageSolid.types";
 
 type Props = MorphTextExampleProps;
 

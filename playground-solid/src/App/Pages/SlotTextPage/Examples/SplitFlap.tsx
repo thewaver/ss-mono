@@ -1,7 +1,7 @@
 import { SlotText } from "@thewaver/ss-components-solid";
 import * as styles from "@thewaver/ss-playground/App/Pages/SlotTextPage/SlotTextPage.css";
 
-import type { SlotTextExampleProps } from "../SlotTextPage.types";
+import type { SlotTextExampleProps } from "../SlotTextPageSolid.types";
 
 const CHARACTER_SIZE = { width: 34, height: 52 };
 

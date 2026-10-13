@@ -1,6 +1,6 @@
 import { createContext, useContext } from "react";
 
-import type { LayerContextType } from "./Layer.context.types";
+import type { LayerContextType } from "./Layer.contextReact.types";
 
 const LayerContext = createContext<LayerContextType | undefined>(undefined);
 

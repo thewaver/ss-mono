@@ -2,7 +2,7 @@
 import * as styles from "@thewaver/ss-playground/App/StyledComponents/SortableContent/SortableContent.css";
 
 import { useLayerClass } from "../Layer/Layer.context";
-import type { SortableSurfaceProps } from "./SortableContent.types";
+import type { SortableSurfaceProps } from "./SortableContentVue.types";
 
 defineProps<SortableSurfaceProps>();
 

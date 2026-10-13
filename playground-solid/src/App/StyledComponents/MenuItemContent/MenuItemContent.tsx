@@ -2,14 +2,15 @@ import type { ParentProps } from "solid-js";
 import { Show } from "solid-js";
 
 import { access } from "@thewaver/ss-components-solid";
+import {
+    CHECKED_MARK,
+    PICKED_MARK,
+    SUBMENU_MARK,
+} from "@thewaver/ss-playground/App/StyledComponents/MenuItemContent/MenuItemContent.const";
 import * as styles from "@thewaver/ss-playground/App/StyledComponents/MenuItemContent/MenuItemContent.css";
 
 import { useLayerClass } from "../Layer/Layer.context";
-import type { MenuItemContentProps } from "./MenuItemContent.types";
-
-const SUBMENU_MARK = "›";
-const CHECKED_MARK = "✓";
-const PICKED_MARK = "●";
+import type { MenuItemContentProps } from "./MenuItemContentSolid.types";
 
 export const PageMenuItemContent = (props: ParentProps<MenuItemContentProps>) => {
     const getLayerClass = useLayerClass();

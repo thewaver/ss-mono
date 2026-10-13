@@ -1,6 +1,6 @@
 import { useId } from "react";
 
-import { PaintedText, ProximityText, SVGDefsSamples } from "@thewaver/ss-components-react";
+import { PaintedText, ProximityText, SVGDefsSampleConfigs, SVGDefsSamples } from "@thewaver/ss-components-react";
 import * as styles from "@thewaver/ss-playground/App/Pages/ProximityTextPage/ProximityTextPage.css";
 
 import type { ProximityTextExampleProps } from "../ProximityTextPageReact.types";
@@ -18,7 +18,7 @@ export const PaintedExample = (props: Props) => {
             <ProximityText reachPx={props.reachPx} isDisabled={props.isDisabled}>
                 <PaintedText
                     computeFillDefs={(size, element) =>
-                        SVGDefsSamples.Gradient.Timed.toConfig({ family: "flow_diag_3" }).computeSVGDefs(
+                        SVGDefsSampleConfigs.Gradient.Timed.toConfig({ family: "flow_diag_3" }).computeSVGDefs(
                             `fill-${id}`,
                             undefined,
                             element,

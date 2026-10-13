@@ -4,12 +4,12 @@ import {
     CLOCK_DEFAULTS,
     type ClockColumn,
     type ClockRenderProps,
-    type ClockSteps,
     ClockStyles,
     type ClockUnit,
     ClockUtils,
     PopoverUtils,
 } from "@thewaver/ss-components";
+import { ClockConst } from "@thewaver/ss-components/internal";
 import type { TimeValue } from "@thewaver/ss-utils";
 
 import { NavigatorVueUtils } from "../../../Abstracts/Navigator/NavigatorVue.utils";
@@ -23,8 +23,6 @@ import { callSlot, declareProps, useTwoWay } from "../../../Utils/propUtils";
 import { toElement } from "../../../Utils/refUtils";
 import type { SlotsContext } from "../../../Utils/typeUtils";
 import type { ClockOptionProps, ClockProps, ClockSlots } from "./Clock.types";
-
-const NO_CLOCK_STEPS: ClockSteps = {};
 
 const toOptionKey = (unit: ClockUnit, index: number) => `${unit}:${index}`;
 
@@ -93,7 +91,7 @@ export const Clock = defineComponent(
                 units.value,
                 base.value,
                 getIsTwelveHour(),
-                props.steps ?? NO_CLOCK_STEPS,
+                props.steps ?? ClockConst.NO_CLOCK_STEPS,
                 meridiemNames.value,
             ),
         );

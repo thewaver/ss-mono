@@ -2,7 +2,7 @@ import { PlacementLayoutUtils, Radio, RadioGroup } from "@thewaver/ss-components
 import type { ArcDefs } from "@thewaver/ss-components-react";
 
 import { PageRadioStarCell, PageRadioStarContent } from "../../../StyledComponents/RadioStarContent/RadioStarContent";
-import type { RadioRatingExampleProps } from "../RadioPage.types";
+import type { RadioRatingExampleProps } from "../RadioPageReact.types";
 
 const RATING_OPTIONS = [1, 2, 3, 4, 5];
 

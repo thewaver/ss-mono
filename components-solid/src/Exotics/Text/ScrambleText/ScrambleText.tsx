@@ -8,14 +8,13 @@ import {
     ScrambleTextUtils,
     ScrambleTextStyles as styles,
 } from "@thewaver/ss-components";
+import { ScrambleTextConst } from "@thewaver/ss-components/internal";
 
 import { LetterDriverContextProvider } from "../../../Abstracts/LetterDriver/LetterDriver.context";
 import type { LetterDriverContextType } from "../../../Abstracts/LetterDriver/LetterDriverSolid.context.types";
 import { access } from "../../../Utils/propUtils";
 import { accessStore } from "../../../Utils/storeUtils";
 import type { ScrambleTextProps } from "./ScrambleTextSolid.types";
-
-const NO_DELAY = 0;
 
 export const ScrambleText = (props: ParentProps<ScrambleTextProps>) => {
     const registry = LetterDriverUtils.createRegistry();
@@ -42,7 +41,7 @@ export const ScrambleText = (props: ParentProps<ScrambleTextProps>) => {
         () => access(props.settleDurationMs) ?? SCRAMBLE_TEXT_DEFAULTS.settleDurationMs,
     );
 
-    const getSettleDelayMs = createMemo(() => access(props.settleDelayMs) ?? NO_DELAY);
+    const getSettleDelayMs = createMemo(() => access(props.settleDelayMs) ?? ScrambleTextConst.NO_DELAY);
 
     const getChurnDurationMs = createMemo(() => access(props.churnDurationMs));
 

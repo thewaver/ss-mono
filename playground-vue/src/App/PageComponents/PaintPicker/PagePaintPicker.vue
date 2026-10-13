@@ -6,8 +6,8 @@ import PageSelectField from "../Field/PageSelectField.vue";
 import PageKnobs from "../Knobs/Knobs.vue";
 import PageProp from "../Prop/Prop.vue";
 import PagePropsPanel from "../PropsPanel/PagePropsPanel.vue";
-import { PAINT_KINDS, PAINT_KIND_LABELS, SAMPLE_GROUPS, getPaintDefaults, getPaintKnobs } from "./PaintPicker.const";
-import type { PagePaintPickerProps, PaintKind } from "./PaintPicker.types";
+import { PAINT_KINDS, PAINT_KIND_LABELS, SAMPLE_GROUPS, getPaintDefaults, getPaintKnobs } from "./PaintPickerVue.const";
+import type { PagePaintPickerProps, PaintKind } from "./PaintPickerVue.types";
 
 const props = defineProps<PagePaintPickerProps>();
 

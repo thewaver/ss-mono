@@ -4,7 +4,7 @@
     import { ShapeConst } from "@thewaver/ss-utils";
 
     import PagePaintAreaGroup from "../../../PageComponents/PaintAreaGroup/PaintAreaGroup.svelte";
-    import { computeShapeFillDefs, computeShapeStrokeDefs } from "../ShapePage.const";
+    import { computeShapeFillDefs, computeShapeStrokeDefs } from "../ShapePageSvelte.const";
     import type { ShapeExampleProps } from "../ShapePage.types";
 
     const CELL_COUNT = 4;

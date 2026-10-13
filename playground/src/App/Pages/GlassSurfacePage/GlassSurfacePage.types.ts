@@ -1,0 +1,24 @@
+import type { SVGDefsColors, SVGDefsSamples } from "@thewaver/ss-components";
+
+import type { WithNoSample } from "../../PageComponents/SampleGroups/SampleGroups.types";
+
+export type BaseGlassSurfaceExampleValues = {
+    borderRadius: number;
+    borderWidth: number;
+    strokeConfigKey: WithNoSample<SVGDefsSamples.Gradient.Tracked.SampleKey>;
+    strokeConfigDefs: Record<string, number | boolean>;
+    colors: SVGDefsColors;
+    blurWidth?: number;
+    blurRadius: number;
+    noiseFrequency: number;
+    noiseOctaves: number;
+    rippleScale: number;
+    tintColor: string;
+    tintOpacity: number;
+    lightHeight: number;
+    surfaceScale: number;
+    specularConstant: number;
+    specularExponent: number;
+};
+
+export type BaseGlassSurfaceExampleProps = BaseGlassSurfaceExampleValues;

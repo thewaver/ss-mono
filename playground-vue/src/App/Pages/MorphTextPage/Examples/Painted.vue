@@ -12,9 +12,9 @@ import * as styles from "@thewaver/ss-playground/App/Pages/MorphTextPage/MorphTe
 import { CONTROL_GLYPHS } from "@thewaver/ss-playground/App/StyledComponents/ControlButtonContent/ControlButtonContent.const";
 import type { Size2d } from "@thewaver/ss-utils";
 
-import { computePaintDefs } from "../../../PageComponents/PaintPicker/PaintPicker.const";
+import { computePaintDefs } from "../../../PageComponents/PaintPicker/PaintPickerVue.const";
 import PageControlButtonContent from "../../../StyledComponents/ControlButtonContent/ControlButtonContent.vue";
-import type { MorphTextExampleProps } from "../MorphTextPage.types";
+import type { MorphTextExampleProps } from "../MorphTextPageVue.types";
 
 const PAINT_SETTINGS = { colors: SVGDefsSamples.SAMPLE_COLORS, ...MORPH_PAINT_TIMING };
 

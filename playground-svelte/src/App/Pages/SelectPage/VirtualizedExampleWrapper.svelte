@@ -6,8 +6,7 @@
     import PageProp from "../../PageComponents/Prop/Prop.svelte";
     import VirtualizedExample from "./Examples/Virtualized.svelte";
     import type { SelectVirtualizedExampleProps } from "./SelectPage.types";
-
-    const STRESS_COUNT_FIELD_WIDTH = 120;
+    import { STRESS_COUNT_FIELD_WIDTH } from "@thewaver/ss-playground/App/Pages/SelectPage/SelectPage.const";
 
     type Props = SelectVirtualizedExampleProps & {
         count: number;

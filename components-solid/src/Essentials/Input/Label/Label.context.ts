@@ -1,19 +1,9 @@
 import { createContext, useContext } from "solid-js";
 
-import type { LabelContextType } from "@thewaver/ss-components";
+import { type LabelContextType, UNLABELED_CONTEXT } from "@thewaver/ss-components";
 
 const LabelContext = createContext<LabelContextType>();
 
 export const LabelContextProvider = LabelContext.Provider;
-
-export const LABEL_CONTEXT: LabelContextType = {
-    getIsLabeled: () => true,
-    getLabelId: () => undefined,
-};
-
-const UNLABELED_CONTEXT: LabelContextType = {
-    getIsLabeled: () => false,
-    getLabelId: () => undefined,
-};
 
 export const useLabelContext = (): LabelContextType => useContext(LabelContext) ?? UNLABELED_CONTEXT;

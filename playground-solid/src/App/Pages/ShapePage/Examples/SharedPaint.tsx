@@ -5,8 +5,8 @@ import * as styles from "@thewaver/ss-playground/App/Pages/ShapePage/ShapePage.c
 import { ShapeConst } from "@thewaver/ss-utils";
 
 import { PagePaintAreaGroup } from "../../../PageComponents/PaintAreaGroup/PaintAreaGroup";
-import { computeShapeFillDefs, computeShapeStrokeDefs } from "../ShapePage.const";
 import type { ShapeExampleProps } from "../ShapePage.types";
+import { computeShapeFillDefs, computeShapeStrokeDefs } from "../ShapePageSolid.const";
 
 const CELL_COUNT = 4;
 

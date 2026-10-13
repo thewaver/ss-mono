@@ -2,7 +2,7 @@
 import * as styles from "@thewaver/ss-playground/App/StyledComponents/BreadcrumbContent/BreadcrumbContent.css";
 
 import { useLayerClass } from "../Layer/Layer.context";
-import type { BreadcrumbContentProps } from "./BreadcrumbContent.types";
+import type { BreadcrumbContentProps } from "./BreadcrumbContentVue.types";
 
 defineProps<BreadcrumbContentProps>();
 

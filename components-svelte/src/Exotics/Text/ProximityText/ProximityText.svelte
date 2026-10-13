@@ -11,6 +11,7 @@
         ViewportUtils,
         ProximityTextStyles as styles,
     } from "@thewaver/ss-components";
+    import { ProximityTextConst } from "@thewaver/ss-components/internal";
     import { type Rect, StringUtils } from "@thewaver/ss-utils";
     import { assignInlineVars } from "@vanilla-extract/dynamic";
 
@@ -23,18 +24,14 @@
     import { toStyle } from "../../../Utils/styleUtils.js";
     import type { ProximityTextProps } from "./ProximityText.types.js";
 
-    const RESTING_STRENGTH = 0;
-    const NO_TIME = 0;
-    const DATA_PREFIX = "data-";
-
     const ROOT_STYLE = toStyle(
-        assignInlineVars({ [LetterDriverStyles.letterDriverTimeVar]: LetterDriverUtils.getTimeValue(NO_TIME) }),
+        assignInlineVars({ [LetterDriverStyles.letterDriverTimeVar]: LetterDriverUtils.getTimeValue(ProximityTextConst.NO_TIME) }),
     );
 
     const toDataAttributes = (dataset: DOMStringMap) =>
         Object.fromEntries(
             Object.entries(dataset).map(([key, value]) => [
-                `${DATA_PREFIX}${StringUtils.camelToKebabCase(key)}`,
+                `${ProximityTextConst.DATA_PREFIX}${StringUtils.camelToKebabCase(key)}`,
                 value,
             ]),
         );
@@ -117,7 +114,7 @@
         LetterDriverUtils.computeAnimationStyle(
             ProximityTextUtils.toLetterAnimation(
                 animationNames[index],
-                isResting ? RESTING_STRENGTH : (strengths[index] ?? RESTING_STRENGTH),
+                isResting ? ProximityTextConst.RESTING_STRENGTH : (strengths[index] ?? ProximityTextConst.RESTING_STRENGTH),
             ),
             LetterDriverStyles.letterDriverTimeVar,
         );
@@ -164,7 +161,7 @@
 
     const getLetterState = (index: number): LetterState => ({
         isHidden: false,
-        animation: ProximityTextUtils.toLetterAnimation(animationNames[index], strengths[index] ?? RESTING_STRENGTH),
+        animation: ProximityTextUtils.toLetterAnimation(animationNames[index], strengths[index] ?? ProximityTextConst.RESTING_STRENGTH),
     });
 
     setLetterDriverContext({

@@ -3,6 +3,18 @@ import { computed, shallowRef, useModel, watch } from "vue";
 
 import { Radio, RadioGroup, TextInput } from "@thewaver/ss-components-vue";
 import {
+    ALPHA_MAX,
+    ALPHA_STEP,
+    CHANNEL_FIELD_WIDTH,
+    CHANNEL_MAX,
+    HEX_FIELD_WIDTH,
+    HSL_CHANNELS,
+    HUE_MAX,
+    PERCENT,
+    RGB_CHANNELS,
+    SPACES,
+} from "@thewaver/ss-playground/App/PageComponents/ColorChannels/ColorChannels.const";
+import {
     FIELD_GAP,
     FIELD_PADDING,
 } from "@thewaver/ss-playground/App/StyledComponents/TextFieldContent/TextFieldContent.css";
@@ -17,17 +29,6 @@ import PageTextFieldContent, {
 } from "../../StyledComponents/TextFieldContent/TextFieldContent.vue";
 import PageNumberField from "../Field/PageNumberField.vue";
 import type { PageColorChannelsProps } from "./ColorChannels.types";
-
-const SPACES: Color.ValueSpace[] = ["rgba", "hsla", "hexa"];
-const RGB_CHANNELS = ["r", "g", "b"] as const;
-const HSL_CHANNELS = ["s", "l"] as const;
-const CHANNEL_FIELD_WIDTH = 76;
-const HEX_FIELD_WIDTH = 150;
-const CHANNEL_MAX = 255;
-const HUE_MAX = 360;
-const PERCENT = 100;
-const ALPHA_STEP = 0.01;
-const ALPHA_MAX = 1;
 
 const props = defineProps<PageColorChannelsProps>();
 

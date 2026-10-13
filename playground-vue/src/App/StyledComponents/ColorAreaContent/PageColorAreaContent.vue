@@ -1,11 +1,10 @@
 <script setup lang="ts">
+import { PERCENT } from "@thewaver/ss-playground/App/StyledComponents/ColorAreaContent/ColorAreaContent.const";
 import * as styles from "@thewaver/ss-playground/App/StyledComponents/ColorAreaContent/ColorAreaContent.css";
 import { assignInlineVars } from "@vanilla-extract/dynamic";
 
 import { useLayerClass } from "../Layer/Layer.context";
-import type { ColorAreaContentProps } from "./ColorAreaContent.types";
-
-const PERCENT = 100;
+import type { ColorAreaContentProps } from "./ColorAreaContentVue.types";
 
 defineProps<ColorAreaContentProps>();
 

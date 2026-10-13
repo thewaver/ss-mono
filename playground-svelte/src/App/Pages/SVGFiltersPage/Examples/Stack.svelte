@@ -3,7 +3,7 @@
     import * as styles from "@thewaver/ss-playground/App/Pages/SVGFiltersPage/SVGFiltersPage.css";
 
     import PageFilterStage from "../../../StyledComponents/SVGFiltersContent/SVGFiltersContent.svelte";
-    import { applyStep } from "../SVGFiltersPage.const";
+    import { applyStep } from "../SVGFiltersPageSvelte.const";
     import type { SVGFiltersStackExampleProps } from "../SVGFiltersPage.types";
     import StepList from "./StepList.svelte";
 

@@ -4,7 +4,7 @@
     import * as styles from "@thewaver/ss-playground/App/StyledComponents/TagInputContent/TagInputContent.css";
 
     import { getLayerClass } from "../Layer/Layer.context";
-    import type { TagContentProps } from "./TagInputContent.types";
+    import type { TagContentProps } from "./TagInputContentSvelte.types";
 
     let props: TagContentProps & { children?: Snippet } = $props();
 

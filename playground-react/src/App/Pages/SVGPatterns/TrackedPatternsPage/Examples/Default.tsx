@@ -1,6 +1,6 @@
 import { useId } from "react";
 
-import { SVGDefsSamples, Shape } from "@thewaver/ss-components-react";
+import { SVGDefsSampleConfigs, SVGDefsSamples, Shape } from "@thewaver/ss-components-react";
 import {
     NO_SAMPLE_KEY,
     computeNoSampleDefs,
@@ -8,7 +8,7 @@ import {
 import * as styles from "@thewaver/ss-playground/App/Pages/SVGPatterns/SVGPatterns.css";
 import { ShapeConst } from "@thewaver/ss-utils";
 
-import type { TrackedPatternExampleProps } from "../../SVGPatterns.types";
+import type { TrackedPatternExampleProps } from "../../SVGPatternsReact.types";
 
 export const DefaultExample = ({ configKey, configDefs, colors, cellSize, blurWidth }: TrackedPatternExampleProps) => {
     const id = useId();
@@ -19,7 +19,7 @@ export const DefaultExample = ({ configKey, configDefs, colors, cellSize, blurWi
             computeFillDefs={(size, element) => {
                 if (configKey === NO_SAMPLE_KEY) return computeNoSampleDefs(colors, "fill");
 
-                return SVGDefsSamples.Pattern.Tracked.toConfig({
+                return SVGDefsSampleConfigs.Pattern.Tracked.toConfig({
                     family: configKey,
                     defs: configDefs,
                 } as SVGDefsSamples.Pattern.Tracked.Entry).computeSVGDefs(`fill-${id}`, undefined, element, {

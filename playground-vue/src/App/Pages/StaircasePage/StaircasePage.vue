@@ -4,6 +4,13 @@ import { computed, shallowRef } from "vue";
 import { STAIRCASE_DEFAULTS, STAIRCASE_DIRS, StaircaseIndents } from "@thewaver/ss-components-vue";
 import type { StaircaseDir } from "@thewaver/ss-components-vue";
 import { StaircaseKnobs } from "@thewaver/ss-playground/App/Knobs/Staircases.const";
+import {
+    EXAMPLES_ROOT,
+    EXAMPLE_NAMES,
+    FIELD_WIDTH,
+    STAGES,
+    STAIRCASE_WIDTH,
+} from "@thewaver/ss-playground/App/Pages/StaircasePage/StaircasePage.const";
 
 import type { ExampleDefs } from "../../PageComponents/Examples/Examples.types";
 import PageExamples from "../../PageComponents/Examples/PageExamples.vue";
@@ -13,24 +20,7 @@ import PageMeasureBox from "../../PageComponents/MeasureBox/MeasureBox.vue";
 import PageProp from "../../PageComponents/Prop/Prop.vue";
 import PagePropsPanel from "../../PageComponents/PropsPanel/PagePropsPanel.vue";
 import DefaultExample from "./Examples/Default.vue";
-import type { StaircaseExampleProps } from "./StaircasePage.types";
-
-const FIELD_WIDTH = 110;
-const STAIRCASE_WIDTH = 340;
-const EXAMPLES_ROOT = "/src/App/Pages/StaircasePage/Examples";
-
-const STAGES = [
-    "Visitors",
-    "Signed up",
-    "Activated",
-    "Subscribed",
-    "Renewed",
-    "Advocates",
-    "Champions",
-    "Partners",
-    "Investors",
-    "Founders",
-];
+import type { StaircaseExampleProps } from "./StaircasePageVue.types";
 
 const stepCount = shallowRef(StaircaseKnobs.STARTING_STEP_COUNT);
 const indent = shallowRef(StaircaseKnobs.STARTING_INDENT);
@@ -51,7 +41,7 @@ const commonProps = computed<StaircaseExampleProps>(() => ({
 const examples: ExampleDefs[] = [
     {
         key: "default",
-        name: "Default",
+        name: EXAMPLE_NAMES.default,
         path: `${EXAMPLES_ROOT}/Default.vue`,
     },
 ];

@@ -4,8 +4,8 @@ import { renderPageHighlightFloater } from "../../../StyledComponents/GlideFloat
 import { PageLabelCaption } from "../../../StyledComponents/LabelCaption/LabelCaption";
 import { PageSelectContent } from "../../../StyledComponents/SelectContent/SelectContent";
 import { PageSelectOptionContent } from "../../../StyledComponents/SelectOptionContent/SelectOptionContent";
-import { COUNTRIES, PLACEHOLDER, renderSelectPopup } from "../SelectPage.const";
 import type { SelectExampleProps } from "../SelectPage.types";
+import { COUNTRIES, PLACEHOLDER, renderSelectPopup } from "../SelectPageSolid.const";
 
 const LABEL_GAP = 5;
 

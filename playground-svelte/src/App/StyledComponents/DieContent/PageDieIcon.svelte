@@ -1,9 +1,8 @@
 <script lang="ts">
     import * as styles from "@thewaver/ss-playground/App/StyledComponents/DieContent/DieContent.css";
 
-    import type { PageDieIconProps } from "./DieContent.types";
-
-    const ICON_SHARE = 0.5;
+    import type { PageDieIconProps } from "./DieContentSvelte.types";
+    import { ICON_SHARE } from "@thewaver/ss-playground/App/StyledComponents/DieContent/DieContent.const";
 
     let props: PageDieIconProps = $props();
 </script>

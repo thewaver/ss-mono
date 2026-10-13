@@ -3,6 +3,11 @@ import { computed, shallowRef } from "vue";
 
 import { SHADOW_CASTER_DEFAULTS } from "@thewaver/ss-components-vue";
 import { ShadowCasterKnobs } from "@thewaver/ss-playground/App/Knobs/ShadowCasters.const";
+import {
+    EXAMPLES_ROOT,
+    EXAMPLE_NAMES,
+    FIELD_WIDTH,
+} from "@thewaver/ss-playground/App/Pages/PointerEffects/ShadowCasterPage/ShadowCasterPage.const";
 
 import type { ExampleDefs } from "../../../PageComponents/Examples/Examples.types";
 import PageExamples from "../../../PageComponents/Examples/PageExamples.vue";
@@ -14,10 +19,6 @@ import PagePropsPanel from "../../../PageComponents/PropsPanel/PagePropsPanel.vu
 import BadgeExample from "./Examples/Badge.vue";
 import CardExample from "./Examples/Card.vue";
 import type { ShadowCasterExampleProps } from "./ShadowCasterPageVue.types";
-
-const EXAMPLES_ROOT = "/src/App/Pages/PointerEffects/ShadowCasterPage/Examples";
-
-const FIELD_WIDTH = 110;
 
 const isDisabled = shallowRef(ShadowCasterKnobs.STARTING_IS_DISABLED);
 const smoothingMs = shallowRef(SHADOW_CASTER_DEFAULTS.smoothingMs);
@@ -48,13 +49,13 @@ const commonProps = computed<ShadowCasterExampleProps>(() => ({
 const examples: ExampleDefs[] = [
     {
         key: "card",
-        name: "Card",
+        name: EXAMPLE_NAMES.card,
         readout: () => "the shadow is thrown away from the pointer, and lengthens and softens as the pointer retreats",
         path: `${EXAMPLES_ROOT}/Card.vue`,
     },
     {
         key: "badge",
-        name: "Cut shape",
+        name: EXAMPLE_NAMES.badge,
         readout: () =>
             "the same wrapper over a clipped star — the shadow traces the shape rather than the box around it",
         path: `${EXAMPLES_ROOT}/Badge.vue`,

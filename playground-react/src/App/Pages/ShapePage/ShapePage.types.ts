@@ -1,7 +1,7 @@
 import type { SVGDefsColors, SVGDefsSamples, ShapeProps } from "@thewaver/ss-components-react";
 import type { ShapeConst, Size2d } from "@thewaver/ss-utils";
 
-import type { Paint } from "../../PageComponents/PaintPicker/PaintPicker.types";
+import type { Paint } from "../../PageComponents/PaintPicker/PaintPickerReact.types";
 
 export type ShapeExampleProps = Pick<ShapeProps, "lameExponents" | "joinRadii"> & {
     shouldClipChildren?: boolean;

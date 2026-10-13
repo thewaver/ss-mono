@@ -1,17 +1,18 @@
 <script setup lang="ts">
 import type { ToastState, ToastsDir } from "@thewaver/ss-components-vue";
 import { Button } from "@thewaver/ss-components-vue";
+import {
+    PERCENT,
+    PILE_MIN_SCALE,
+    PILE_PEEK,
+    PILE_SCALE_STEP,
+    POSITION_OFFSET,
+} from "@thewaver/ss-playground/App/StyledComponents/ToastContent/ToastContent.const";
 import * as styles from "@thewaver/ss-playground/App/StyledComponents/ToastContent/ToastContent.css";
 
 import PageLayer from "../../PageComponents/Layer/Layer.vue";
 import PageButtonContent from "../ButtonContent/ButtonContent.vue";
-import type { ToastContentProps } from "./ToastContent.types";
-
-const POSITION_OFFSET = 1;
-const PILE_PEEK = 14;
-const PILE_SCALE_STEP = 0.04;
-const PILE_MIN_SCALE = 0.8;
-const PERCENT = 100;
+import type { ToastContentProps } from "./ToastContentVue.types";
 
 const computePileShift = (state: ToastState, dir: ToastsDir, gap: number) => {
     const isColumn = dir === "column" || dir === "column-reverse";

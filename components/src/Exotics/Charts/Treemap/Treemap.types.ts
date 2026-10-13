@@ -45,3 +45,17 @@ export type TreemapTileState = {
     /** Whether the tile is on its way out during a zoom rather than part of the level being shown. */
     isLeaving: boolean;
 };
+
+export type BaseTreemapValues<T> = {
+    /** Names the treemap for assistive technology. */
+    ariaLabel: string;
+    /** How long a zoom takes. `0` jumps straight to the new level, which is the route for reduced motion. */
+    zoomDurationMs?: number;
+    /**
+     * The whole tree. A leaf's area comes from its `weight` and a branch's from the total of its children, so a weight
+     * set on a branch is ignored. A child weighing nothing gets no tile.
+     */
+    root: TreemapNode<T>;
+};
+
+export type BaseTreemapProps<T> = BaseTreemapValues<T>;

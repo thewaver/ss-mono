@@ -13,16 +13,6 @@
     import { readStore } from "../../Utils/storeUtils.js";
     import type { WraparoundProps } from "./Wraparound.types.js";
 
-    const KEY_SEPARATOR = ",";
-
-    const toKey = (tile: WraparoundTile) => `${tile.column}${KEY_SEPARATOR}${tile.row}`;
-
-    const fromKey = (key: string): WraparoundTile => {
-        const [column, row] = key.split(KEY_SEPARATOR).map(Number);
-
-        return { column, row };
-    };
-
     let { playback = $bindable(true), ...props }: WraparoundProps = $props();
 
     let root = $state<HTMLDivElement>();
@@ -73,7 +63,7 @@
     let lastCopyKeys: string[] = [];
 
     const copyKeys = $derived.by(() => {
-        const keys = WraparoundUtils.computeTiles(getOffset(), getTileSize(), getViewportSize(), maxCopies).map(toKey);
+        const keys = WraparoundUtils.computeTiles(getOffset(), getTileSize(), getViewportSize(), maxCopies).map(WraparoundUtils.toTileKey);
         const isSame =
             keys.length === lastCopyKeys.length && keys.every((key, index) => key === lastCopyKeys[index]);
 
@@ -104,8 +94,8 @@
         {#each copyKeys as key (key)}
             <div
                 class={styles.wraparoundTile}
-                style:transform={toTileTransform(fromKey(key))}
-                style:visibility={key === toKey(getOriginalTile()) ? "hidden" : undefined}
+                style:transform={toTileTransform(WraparoundUtils.fromTileKey(key))}
+                style:visibility={key === WraparoundUtils.toTileKey(getOriginalTile()) ? "hidden" : undefined}
                 aria-hidden="true"
                 inert
             >

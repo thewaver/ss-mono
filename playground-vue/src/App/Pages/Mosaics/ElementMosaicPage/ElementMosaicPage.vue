@@ -1,6 +1,10 @@
 <script setup lang="ts">
 import { shallowRef } from "vue";
 
+import {
+    EXAMPLES_ROOT,
+    EXAMPLE_NAMES,
+} from "@thewaver/ss-playground/App/Pages/Mosaics/ElementMosaicPage/ElementMosaicPage.const";
 import { TILES } from "@thewaver/ss-playground/App/Pages/Mosaics/Mosaics.const";
 
 import type { ExampleDefs } from "../../../PageComponents/Examples/Examples.types";
@@ -9,8 +13,6 @@ import { useMosaicsControls } from "../Mosaics.utils";
 import PageMosaicsPanel from "../MosaicsPanel.vue";
 import ElementsExampleWrapper from "./ElementsExampleWrapper.vue";
 import WalkedExampleWrapper from "./WalkedExampleWrapper.vue";
-
-const EXAMPLES_ROOT = "/src/App/Pages/Mosaics/ElementMosaicPage/Examples";
 
 const controls = useMosaicsControls();
 
@@ -31,14 +33,14 @@ const sharedProps = controls.sharedProps;
 const examples: ExampleDefs[] = [
     {
         key: "elements",
-        name: "Elements the consumer sizes",
+        name: EXAMPLE_NAMES.elements,
         readout: () =>
             "every tile is handed its own width and height, and the arrangement only decides where each one goes",
         path: `${EXAMPLES_ROOT}/Elements.vue`,
     },
     {
         key: "walked",
-        name: "One tab stop, walked by the arrow keys",
+        name: EXAMPLE_NAMES.walked,
         readout: () =>
             `${pickedNames.value.length ? `grown: ${pickedNames.value.join(", ")}` : "nothing grown"} — Tab in, then Left and Right follow the reading order, Up and Down go to the tile below or above, and Enter, Space or a press grows or shrinks a tile so the rest re-pack around it`,
         path: `${EXAMPLES_ROOT}/Walked.vue`,

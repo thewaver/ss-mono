@@ -3,7 +3,7 @@ import type { Snippet } from "svelte";
 import type { SVGDefsColors, SVGDefsSamples, ShapeProps } from "@thewaver/ss-components-svelte";
 import type { ShapeConst, Size2d } from "@thewaver/ss-utils";
 
-import type { Paint } from "../../PageComponents/PaintPicker/PaintPicker.types";
+import type { Paint } from "../../PageComponents/PaintPicker/PaintPickerSvelte.types";
 
 export type ShapeExampleProps = Pick<ShapeProps, "lameExponents" | "joinRadii"> & {
     shouldClipChildren?: boolean;

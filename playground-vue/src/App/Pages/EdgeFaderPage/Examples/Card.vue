@@ -2,7 +2,7 @@
 import { EdgeFader } from "@thewaver/ss-components-vue";
 import * as styles from "@thewaver/ss-playground/App/Pages/EdgeFaderPage/EdgeFaderPage.css";
 
-import type { EdgeFaderExampleProps } from "../EdgeFaderPage.types";
+import type { EdgeFaderExampleProps } from "../EdgeFaderPageVue.types";
 
 type Props = EdgeFaderExampleProps;
 

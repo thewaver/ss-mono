@@ -7,9 +7,10 @@ import type {
     CellAnimationBreakpointOpts,
     _ScanlineHorizontalDropoutOpts,
 } from "@thewaver/ss-components-vue";
+import { ScanlineAnimationKeyframeKnobs } from "@thewaver/ss-playground/App/Knobs/ScanlineAnimationKeyframes.const";
 import { ScanlineAnimationKnobs } from "@thewaver/ss-playground/App/Knobs/ScanlineAnimations.const";
+import { IMAGE_CONTAINER_SIZE } from "@thewaver/ss-playground/App/Pages/ScanLineAnimationPage/ScanLineAnimationPage.const";
 
-import { ScanlineAnimationKeyframeKnobs } from "../../Knobs/ScanlineAnimationKeyframes.const";
 import PageExampleKnobs from "../../PageComponents/ExampleKnobs/PageExampleKnobs.vue";
 import PageKnobs from "../../PageComponents/Knobs/Knobs.vue";
 import PageMeasureBox from "../../PageComponents/MeasureBox/MeasureBox.vue";
@@ -17,8 +18,6 @@ import DirInput from "./DirInput.vue";
 import DropoutExample from "./Examples/_Dropout.vue";
 import type { ScanlineAnimationExampleProps } from "./ScanlineAnimationPage.types";
 import SmoothnessInput from "./SmoothnessInput.vue";
-
-const IMAGE_CONTAINER_SIZE = 360;
 
 const props = defineProps<ScanlineAnimationExampleProps>();
 

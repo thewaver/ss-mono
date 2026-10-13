@@ -11,7 +11,7 @@ import PageInlineEditContent from "../../../StyledComponents/InlineEditContent/I
 import PageTextFieldContent, {
     computePageTextFieldTextStyle,
 } from "../../../StyledComponents/TextFieldContent/TextFieldContent.vue";
-import type { TextInputEditableExampleProps } from "../TextInputPage.types";
+import type { TextInputEditableExampleProps } from "../TextInputPageVue.types";
 
 type Props = TextInputEditableExampleProps;
 

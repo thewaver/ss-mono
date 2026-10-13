@@ -3,6 +3,19 @@ import { computed, shallowRef } from "vue";
 
 import { Button, SPLIT_PANE_DEFAULTS } from "@thewaver/ss-components-vue";
 import { SplitPaneKnobs } from "@thewaver/ss-playground/App/Knobs/SplitPanes.const";
+import {
+    EXAMPLES_ROOT,
+    EXAMPLE_NAMES,
+    GUTTER_FIELD_WIDTH,
+    PERCENT,
+    STARTING_BOUNDED,
+    STARTING_COLUMN,
+    STARTING_COMPARE,
+    STARTING_CRAMPED,
+    STARTING_PAIR,
+    STARTING_RIGHT_TO_LEFT,
+    STARTING_TRIPLE,
+} from "@thewaver/ss-playground/App/Pages/SplitPanePage/SplitPanePage.const";
 
 import type { ExampleDefs } from "../../PageComponents/Examples/Examples.types";
 import PageExamples from "../../PageComponents/Examples/PageExamples.vue";
@@ -19,18 +32,6 @@ import RightToLeftExample from "./Examples/RightToLeft.vue";
 import StackedExample from "./Examples/Stacked.vue";
 import TripleExample from "./Examples/Triple.vue";
 import type { SplitPaneExampleProps } from "./SplitPanePage.types";
-
-const GUTTER_FIELD_WIDTH = 90;
-const PERCENT = 100;
-const EXAMPLES_ROOT = "/src/App/Pages/SplitPanePage/Examples";
-
-const STARTING_PAIR = [0.3, 0.7];
-const STARTING_RIGHT_TO_LEFT = [0.3, 0.7];
-const STARTING_BOUNDED = [0.3, 0.7];
-const STARTING_CRAMPED = [0.5, 0.5];
-const STARTING_TRIPLE = [0.25, 0.5, 0.25];
-const STARTING_COLUMN = [0.4, 0.6];
-const STARTING_COMPARE = [0.5, 0.5];
 
 const percent = (ratios: number[]) => ratios.map((ratio) => `${Math.round(ratio * PERCENT)}%`).join(" / ");
 
@@ -63,46 +64,46 @@ const commonProps = computed((): Pick<SplitPaneExampleProps, "gutterSize" | "isD
 const examples: ExampleDefs[] = [
     {
         key: "pair",
-        name: "Two panes",
+        name: EXAMPLE_NAMES.pair,
         readout: () => `ratios: ${percent(pair.value)} — drag the gutter or arrow it with the keyboard`,
         path: `${EXAMPLES_ROOT}/Pair.vue`,
     },
     {
         key: "rightToLeft",
-        name: "In a right-to-left box",
+        name: EXAMPLE_NAMES.rightToLeft,
         readout: () =>
             `ratios: ${percent(rightToLeft.value)} — the box around the panes sets dir="rtl", so the first pane sits on the right and the gutter follows the pointer and the arrow keys from that side`,
         path: `${EXAMPLES_ROOT}/RightToLeft.vue`,
     },
     {
         key: "bounded",
-        name: "Bounded panes",
+        name: EXAMPLE_NAMES.bounded,
         readout: () =>
             `ratios: ${percent(bounded.value)} — the first pane is held between 120px and 220px whatever the ratio says`,
         path: `${EXAMPLES_ROOT}/Bounded.vue`,
     },
     {
         key: "triple",
-        name: "Three panes",
+        name: EXAMPLE_NAMES.triple,
         readout: () => `ratios: ${percent(triple.value)} — a gutter moves its two neighbors and nothing else`,
         path: `${EXAMPLES_ROOT}/Triple.vue`,
     },
     {
         key: "stacked",
-        name: "Stacked",
+        name: EXAMPLE_NAMES.stacked,
         readout: () => `ratios: ${percent(column.value)} — the same control on the other axis`,
         path: `${EXAMPLES_ROOT}/Stacked.vue`,
     },
     {
         key: "compare",
-        name: "Two pictures",
+        name: EXAMPLE_NAMES.compare,
         readout: () =>
             `ratios: ${percent(compare.value)} — both pictures are drawn at the full width of the frame, so the gutter wipes between them instead of squeezing them`,
         path: `${EXAMPLES_ROOT}/Compare.vue`,
     },
     {
         key: "cramped",
-        name: "Minimums that do not fit",
+        name: EXAMPLE_NAMES.cramped,
         readout: () =>
             `minimums of 250px and 400px in a box too narrow for both — grid honors the floors and lets the row overflow, which is the behavior this control inherits rather than fights`,
         path: `${EXAMPLES_ROOT}/Cramped.vue`,

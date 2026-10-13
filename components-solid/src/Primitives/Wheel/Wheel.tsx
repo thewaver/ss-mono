@@ -9,6 +9,7 @@ import {
     type WheelWedgeState,
     WheelStyles as styles,
 } from "@thewaver/ss-components";
+import { WheelConst } from "@thewaver/ss-components/internal";
 
 import { MediaQueryMonitorSolidUtils } from "../../Abstracts/MediaQueryMonitor/MediaQueryMonitorSolid.utils";
 import { PointerTrackerSolidUtils } from "../../Abstracts/PointerTracker/PointerTrackerSolid.utils";
@@ -16,8 +17,6 @@ import { RotatorSolidUtils } from "../../Abstracts/Rotator/RotatorSolid.utils";
 import { access } from "../../Utils/propUtils";
 import { Barrel } from "../Barrel/Barrel";
 import type { WheelController, WheelProps } from "./WheelSolid.types";
-
-const FIRST_WEDGE = 0;
 
 export const Wheel = <T,>(props: WheelProps<T>) => {
     const getWedgeCount = createMemo(() => access(props.wedges).length);
@@ -107,7 +106,7 @@ export const Wheel = <T,>(props: WheelProps<T>) => {
         face,
         isSelected: index === getSelectedIndex(),
         angle: getWedgeAngle(index),
-        placement: getLayout()?.placements[FIRST_WEDGE],
+        placement: getLayout()?.placements[WheelConst.FIRST_WEDGE],
     });
 
     const controller: WheelController = {

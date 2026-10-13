@@ -11,7 +11,7 @@
     import PagePaginatorPage from "../../../StyledComponents/PaginatorContent/PagePaginatorPage.svelte";
     import PagePaginatorPanel from "../../../StyledComponents/PaginatorContent/PagePaginatorPanel.svelte";
     import PagePaginatorStep from "../../../StyledComponents/PaginatorContent/PagePaginatorStep.svelte";
-    import type { PaginatorExampleProps } from "../PaginatorPage.types";
+    import type { PaginatorExampleProps } from "../PaginatorPageSvelte.types";
 
     const PAGINATOR_GAP = 5;
 

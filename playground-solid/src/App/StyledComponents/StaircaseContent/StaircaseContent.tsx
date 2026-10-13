@@ -3,7 +3,7 @@ import type { ParentProps } from "solid-js";
 import { access } from "@thewaver/ss-components-solid";
 import * as styles from "@thewaver/ss-playground/App/StyledComponents/StaircaseContent/StaircaseContent.css";
 
-import type { PageStaircaseStepProps } from "./StaircaseContent.types";
+import type { PageStaircaseStepProps } from "./StaircaseContentSolid.types";
 
 export const PageStaircaseStep = (props: ParentProps<PageStaircaseStepProps>) => {
     return (

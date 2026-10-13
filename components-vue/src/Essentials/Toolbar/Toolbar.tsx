@@ -2,15 +2,13 @@ import { type ComponentPublicInstance, type SlotsType, computed, defineComponent
 
 import {
     DismisserUtils,
-    type InteractionSizing,
     type MenuItemFlags,
-    type MenuItemKind,
-    type MenuTriggerRole,
     MenuUtils,
     TOOLBAR_DEFAULTS,
     ToolbarStyles,
     ToolbarUtils,
 } from "@thewaver/ss-components";
+import { PlacementConst, ToolbarConst } from "@thewaver/ss-components/internal";
 
 import { ElementObserverVueUtils } from "../../Abstracts/ElementObserver/ElementObserverVue.utils";
 import { NavigatorVueUtils } from "../../Abstracts/Navigator/NavigatorVue.utils";
@@ -37,13 +35,6 @@ import type {
     ToolbarProps,
     ToolbarSlots,
 } from "./Toolbar.types";
-
-const OVERFLOW_STOP = ToolbarUtils.OVERFLOW_STOP;
-const NO_RADIO_GROUP: never[] = [];
-const ROW_SIZING: InteractionSizing = "fit-content";
-const PLACED_SIZING: InteractionSizing = "fill";
-const PRESSED_ITEM_KIND: MenuItemKind = "checkbox";
-const WORD_ROLE: MenuTriggerRole = "menuitem";
 
 export const ToolbarComposite = defineComponent(
     <T,>(props: ToolbarCompositeProps<T>, { slots }: SlotsContext<ToolbarCompositeSlots<T>>) => {
@@ -117,7 +108,7 @@ export const ToolbarComposite = defineComponent(
         const focusStop = (stop: number) => {
             focusedStop.value = stop;
 
-            if (stop === OVERFLOW_STOP) overflowRef.value?.focus();
+            if (stop === ToolbarConst.OVERFLOW_STOP) overflowRef.value?.focus();
             else itemElements.value[stop]?.focus();
         };
 
@@ -204,9 +195,9 @@ export const ToolbarComposite = defineComponent(
         const pressAction = (value: T) => {
             if (props.role === "toolbar" && props.pressedValues !== undefined) {
                 pressedValues.value = MenuUtils.computeNextChecked(
-                    pressedValues.value ?? NO_RADIO_GROUP,
-                    { value, kind: PRESSED_ITEM_KIND },
-                    NO_RADIO_GROUP,
+                    pressedValues.value ?? ToolbarConst.NO_RADIO_GROUP,
+                    { value, kind: ToolbarConst.PRESSED_ITEM_KIND },
+                    ToolbarConst.NO_RADIO_GROUP,
                 );
             }
 
@@ -214,7 +205,7 @@ export const ToolbarComposite = defineComponent(
         };
 
         const getSizingAt = (index: number) =>
-            layout.value?.placements[index] === undefined ? ROW_SIZING : PLACED_SIZING;
+            layout.value?.placements[index] === undefined ? PlacementConst.ROW_SIZING : PlacementConst.PLACED_SIZING;
 
         const getCheckedProps = () => ({
             "checked": checked.value,
@@ -267,7 +258,7 @@ export const ToolbarComposite = defineComponent(
                     onUpdate:visibility={(isOpen: boolean) => setStopOpen(index, isOpen)}
                     {...getCheckedProps()}
                     submenuOffset={menuProps.submenuOffset}
-                    triggerRole={WORD_ROLE}
+                    triggerRole={ToolbarConst.WORD_ROLE}
                     onActivate={props.onActivate}
                 >
                     {
@@ -355,9 +346,9 @@ export const ToolbarComposite = defineComponent(
                             }}
                             items={overflowItems.value}
                             ariaLabel={props.overflowAriaLabel}
-                            isTabbable={rovingStop.value === OVERFLOW_STOP}
-                            visibility={openStop.value === OVERFLOW_STOP}
-                            onUpdate:visibility={(isOpen: boolean) => setStopOpen(OVERFLOW_STOP, isOpen)}
+                            isTabbable={rovingStop.value === ToolbarConst.OVERFLOW_STOP}
+                            visibility={openStop.value === ToolbarConst.OVERFLOW_STOP}
+                            onUpdate:visibility={(isOpen: boolean) => setStopOpen(ToolbarConst.OVERFLOW_STOP, isOpen)}
                             {...(isMenubar
                                 ? getCheckedProps()
                                 : {
@@ -367,7 +358,7 @@ export const ToolbarComposite = defineComponent(
                                       },
                                   })}
                             submenuOffset={props.role === "menubar" ? props.submenuOffset : undefined}
-                            triggerRole={isMenubar ? WORD_ROLE : undefined}
+                            triggerRole={isMenubar ? ToolbarConst.WORD_ROLE : undefined}
                             onActivate={props.onActivate}
                         >
                             {

@@ -5,9 +5,15 @@ import {
     type GradientSmearSampleOpts,
     type SVGDefsColors,
     SVGDefsUtils,
-    TrackedGradientDefaults,
     type TrackedGradientElementDefs,
 } from "@thewaver/ss-components";
+import {
+    SpotConst,
+    SpotSmear3Const,
+    SpotSmearConst,
+    TrackedGradientSampleConst,
+    TrailStampConst,
+} from "@thewaver/ss-components/internal";
 import { Color, MathUtils, type Point2d, Point2dUtils } from "@thewaver/ss-utils";
 
 import { PointerTrackerVueUtils } from "../../../../Abstracts/PointerTracker/PointerTrackerVue.utils";
@@ -40,34 +46,16 @@ type SpotSmearProps = {
     opts?: GradientSmearSampleOpts;
 };
 
-const STAMP_COUNT = Math.ceil(1000 / 60) * 2;
-const STAMP_INTERVAL_MS = Math.ceil(1000 / 60);
-const TRAIL_LIFETIME_MS = STAMP_COUNT * STAMP_INTERVAL_MS;
-const MOTION_STEP_RATIO = 0.002;
-const COLOR_KEYS: (keyof SVGDefsColors)[] = ["primary", "secondary", "tertiary"];
-const MOTION_GRACE_MS = STAMP_INTERVAL_MS * 2;
-
-const RESTING_ORIGIN: Point2d = { x: 0.5, y: 0.5 };
-const RESTING_HEADING = 0;
-const NO_STRETCH = 1;
-const NO_SPEED = 0;
-const FULL_AGE_RATIO = 1;
-const FULL_ALPHA = 1;
-const NO_FADE = 0;
-const NO_STAMPS: (TrailStamp | undefined)[] = Array.from({ length: STAMP_COUNT }, () => undefined);
-
-const DEFAULTS = TrackedGradientDefaults.SPOT_SMEAR_CYCLING_DEFAULTS;
-
-const RENDERED_ELSEWHERE = () => undefined;
+const NO_STAMPS: (TrailStamp | undefined)[] = Array.from({ length: TrailStampConst.STAMP_COUNT }, () => undefined);
 
 const getStampId = (id: string, index: number) => `gradient${index + 2}-${id}`;
 
 const getCycleColor = (colors: SVGDefsColors, atMs: number, opts?: GradientSmearSampleOpts) => {
-    const cycleMs = opts?.cycleMs ?? DEFAULTS.cycleMs;
-    const phase = ((atMs % cycleMs) / cycleMs) * COLOR_KEYS.length;
+    const cycleMs = opts?.cycleMs ?? SpotSmear3Const.DEFAULTS.cycleMs;
+    const phase = ((atMs % cycleMs) / cycleMs) * SpotSmear3Const.COLOR_KEYS.length;
     const index = Math.floor(phase);
-    const from = colors[COLOR_KEYS[index % COLOR_KEYS.length]];
-    const to = colors[COLOR_KEYS[(index + 1) % COLOR_KEYS.length]];
+    const from = colors[SpotSmear3Const.COLOR_KEYS[index % SpotSmear3Const.COLOR_KEYS.length]];
+    const to = colors[SpotSmear3Const.COLOR_KEYS[(index + 1) % SpotSmear3Const.COLOR_KEYS.length]];
 
     if (!Color.Hex.isHex(from) || !Color.Hex.isHex(to)) return from;
 
@@ -77,36 +65,40 @@ const getCycleColor = (colors: SVGDefsColors, atMs: number, opts?: GradientSmear
 const computePoolColors = (color: string, alpha: number, opts?: GradientFalloffOpts) => [
     { value: `rgb(from ${color} r g b / ${alpha})` },
     {
-        value: `rgb(from ${color} r g b / ${alpha * (opts?.coreAlpha ?? DEFAULTS.coreAlpha)})`,
-        stop: opts?.coreStop ?? DEFAULTS.coreStop,
+        value: `rgb(from ${color} r g b / ${alpha * (opts?.coreAlpha ?? SpotSmear3Const.DEFAULTS.coreAlpha)})`,
+        stop: opts?.coreStop ?? SpotSmear3Const.DEFAULTS.coreStop,
     },
     {
-        value: `rgb(from ${color} r g b / ${alpha * (opts?.falloffAlpha ?? DEFAULTS.falloffAlpha)})`,
-        stop: opts?.falloffStop ?? DEFAULTS.falloffStop,
+        value: `rgb(from ${color} r g b / ${alpha * (opts?.falloffAlpha ?? SpotSmear3Const.DEFAULTS.falloffAlpha)})`,
+        stop: opts?.falloffStop ?? SpotSmear3Const.DEFAULTS.falloffStop,
     },
     { value: `rgb(from ${color} r g b / 0)`, stop: 100 },
 ];
 
-const clock = SVGDefsUtils.createClock(TRAIL_LIFETIME_MS);
+const clock = SVGDefsUtils.createClock(TrailStampConst.TRAIL_LIFETIME_MS);
 
 const getAgeRatio = (stamp: TrailStamp | undefined, frameMs: number) =>
-    stamp ? MathUtils.clamp01((frameMs - stamp.bornMs) / TRAIL_LIFETIME_MS) : FULL_AGE_RATIO;
+    stamp
+        ? MathUtils.clamp01((frameMs - stamp.bornMs) / TrailStampConst.TRAIL_LIFETIME_MS)
+        : TrackedGradientSampleConst.FULL_AGE_RATIO;
 
 const getStampAlpha = (stamp: TrailStamp | undefined, frameMs: number, opts?: GradientSmearSampleOpts) =>
     (stamp?.fade ?? 0) *
-    (opts?.trailAlpha ?? DEFAULTS.trailAlpha) *
-    (1 - getAgeRatio(stamp, frameMs)) ** (opts?.trailDecay ?? DEFAULTS.trailDecay);
+    (opts?.trailAlpha ?? SpotSmear3Const.DEFAULTS.trailAlpha) *
+    (1 - getAgeRatio(stamp, frameMs)) ** (opts?.trailDecay ?? SpotSmear3Const.DEFAULTS.trailDecay);
 
 const getStampAspect = (stamp: TrailStamp | undefined) => {
-    const stretch = stamp?.stretch ?? NO_STRETCH;
+    const stretch = stamp?.stretch ?? SpotSmearConst.NO_STRETCH;
 
-    return { width: stretch, height: NO_STRETCH / stretch };
+    return { width: stretch, height: SpotSmearConst.NO_STRETCH / stretch };
 };
 
 const getColorKey = (ageRatio: number, opts?: GradientSmearSampleOpts) => {
-    const band = Math.floor((ageRatio / (opts?.ageColorSpan ?? DEFAULTS.ageColorSpan)) * COLOR_KEYS.length);
+    const band = Math.floor(
+        (ageRatio / (opts?.ageColorSpan ?? SpotSmear3Const.DEFAULTS.ageColorSpan)) * SpotSmear3Const.COLOR_KEYS.length,
+    );
 
-    return COLOR_KEYS[Math.min(band, COLOR_KEYS.length - 1)];
+    return SpotSmear3Const.COLOR_KEYS[Math.min(band, SpotSmear3Const.COLOR_KEYS.length - 1)];
 };
 
 const computeStampColors = (
@@ -136,7 +128,7 @@ const SpotSmear = defineComponent(
             lastOrigin: undefined,
             lastMovedMs: undefined,
             lastTravel: undefined,
-            speed: NO_SPEED,
+            speed: SpotSmearConst.NO_SPEED,
             bornTick: undefined,
         };
 
@@ -148,22 +140,28 @@ const SpotSmear = defineComponent(
             const lastOrigin = motion.lastOrigin;
             const travel = lastOrigin && { x: origin.x - lastOrigin.x, y: origin.y - lastOrigin.y };
             const step = travel && Point2dUtils.getLength(travel);
-            const isMoving = step !== undefined && step > MOTION_STEP_RATIO;
+            const isMoving = step !== undefined && step > SpotConst.MOTION_STEP_RATIO;
 
             motion.lastOrigin = origin;
-            motion.speed += ((step ?? NO_SPEED) - motion.speed) * (opts?.smearSmoothing ?? DEFAULTS.smearSmoothing);
+            motion.speed +=
+                ((step ?? SpotSmearConst.NO_SPEED) - motion.speed) *
+                (opts?.smearSmoothing ?? SpotSmear3Const.DEFAULTS.smearSmoothing);
 
-            if (fade > NO_FADE && (isCycling || isMoving)) clock.keepAwake();
+            if (fade > TrackedGradientSampleConst.NO_FADE && (isCycling || isMoving)) clock.keepAwake();
 
             if (isMoving) {
                 motion.lastMovedMs = performance.now();
                 motion.lastTravel = travel;
             }
 
-            const tick = Math.floor(frameMs.value / STAMP_INTERVAL_MS);
+            const tick = Math.floor(frameMs.value / TrailStampConst.STAMP_INTERVAL_MS);
 
             if (tick === motion.bornTick) return;
-            if (motion.lastMovedMs === undefined || performance.now() - motion.lastMovedMs > MOTION_GRACE_MS) return;
+            if (
+                motion.lastMovedMs === undefined ||
+                performance.now() - motion.lastMovedMs > TrailStampConst.MOTION_GRACE_MS
+            )
+                return;
 
             motion.bornTick = tick;
 
@@ -171,22 +169,25 @@ const SpotSmear = defineComponent(
                 origin,
                 fade,
                 bornMs: frameMs.value,
-                heading: motion.lastTravel ? Point2dUtils.getAngle(motion.lastTravel) : RESTING_HEADING,
+                heading: motion.lastTravel ? Point2dUtils.getAngle(motion.lastTravel) : SpotSmearConst.RESTING_HEADING,
                 stretch: MathUtils.lerp(
-                    NO_STRETCH,
-                    opts?.smearMax ?? DEFAULTS.smearMax,
-                    MathUtils.clamp01(motion.speed / (opts?.smearFullStepRatio ?? DEFAULTS.smearFullStepRatio)),
+                    SpotSmearConst.NO_STRETCH,
+                    opts?.smearMax ?? SpotSmear3Const.DEFAULTS.smearMax,
+                    MathUtils.clamp01(
+                        motion.speed / (opts?.smearFullStepRatio ?? SpotSmear3Const.DEFAULTS.smearFullStepRatio),
+                    ),
                 ),
             };
 
-            stamps[tick % STAMP_COUNT] = stamp;
+            stamps[tick % TrailStampConst.STAMP_COUNT] = stamp;
         });
 
         return () => {
             const isCycling = Boolean(props.opts?.cycles);
 
-            const elementSize = (props.opts?.circular ?? DEFAULTS.circular) ? props.defs.getSize() : undefined;
-            const scale = props.opts?.glowScale ?? DEFAULTS.glowScale;
+            const elementSize =
+                (props.opts?.circular ?? SpotSmear3Const.DEFAULTS.circular) ? props.defs.getSize() : undefined;
+            const scale = props.opts?.glowScale ?? SpotSmear3Const.DEFAULTS.glowScale;
 
             return (
                 <>
@@ -198,20 +199,20 @@ const SpotSmear = defineComponent(
                         colors: isCycling
                             ? computePoolColors(
                                   getCycleColor(props.defs.colors, frameMs.value, props.opts),
-                                  FULL_ALPHA,
+                                  TrailStampConst.FULL_ALPHA,
                                   props.opts,
                               )
-                            : computePoolColors(props.defs.colors.primary, FULL_ALPHA, props.opts),
+                            : computePoolColors(props.defs.colors.primary, TrailStampConst.FULL_ALPHA, props.opts),
                     })}
                     {stamps.map((stamp, index) => (
                         <Fragment key={index}>
                             {SVGGradientDefsVueUtils.computeRadialGradient({
                                 id: getStampId(props.id, index),
                                 elementSize,
-                                origin: stamp?.origin ?? RESTING_ORIGIN,
+                                origin: stamp?.origin ?? SpotConst.RESTING_ORIGIN,
                                 scale,
                                 aspect: getStampAspect(stamp),
-                                angle: stamp?.heading ?? RESTING_HEADING,
+                                angle: stamp?.heading ?? SpotSmearConst.RESTING_HEADING,
                                 colors: computeStampColors(stamp, props.defs.colors, frameMs.value, props.opts),
                             })}
                         </Fragment>
@@ -239,10 +240,10 @@ export const spot_smear_3 = (opts?: GradientSmearSampleOpts): TrackedGradientCon
                 },
                 filter: sharedBlur,
             },
-            ...Array.from({ length: STAMP_COUNT }, (_unused, index) => ({
+            ...Array.from({ length: TrailStampConst.STAMP_COUNT }, (_unused, index) => ({
                 gradientOrPattern: {
                     id: getStampId(id, index),
-                    renderDefsElement: RENDERED_ELSEWHERE,
+                    renderDefsElement: TrackedGradientSampleConst.RENDERED_ELSEWHERE,
                 },
                 filter: sharedBlurRef,
             })),

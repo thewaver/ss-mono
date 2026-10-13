@@ -2,11 +2,13 @@
     import { AUDIO_SWITCHER_DEFAULTS } from "@thewaver/ss-components-svelte";
     import { AudioSwitcherKnobs } from "@thewaver/ss-playground/App/Knobs/AudioSwitchers.const";
     import {
-        FIELD_WIDTH,
-        PERCENT,
-        TRACKS,
-        TRACK_NAMES,
-    } from "@thewaver/ss-playground/App/Pages/AudioSwitcherPage/AudioSwitcherPage.const";
+    EXAMPLE_NAMES,
+    EXAMPLES_ROOT,
+    FIELD_WIDTH,
+    PERCENT,
+    TRACK_NAMES,
+    TRACKS,
+} from "@thewaver/ss-playground/App/Pages/AudioSwitcherPage/AudioSwitcherPage.const";
 
     import type { ExampleDefs } from "../../PageComponents/Examples/Examples.types";
     import PageExamples from "../../PageComponents/Examples/PageExamples.svelte";
@@ -15,8 +17,6 @@
     import PageProp from "../../PageComponents/Prop/Prop.svelte";
     import PagePropsPanel from "../../PageComponents/PropsPanel/PagePropsPanel.svelte";
     import DefaultExample from "./Examples/Default.svelte";
-
-    const EXAMPLES_ROOT = "/src/App/Pages/AudioSwitcherPage/Examples";
 
     let crossfadeMs = $state(AudioSwitcherKnobs.STARTING_CROSSFADE_MS);
     let volumePercent = $state(AUDIO_SWITCHER_DEFAULTS.volume * PERCENT);
@@ -29,7 +29,7 @@
     const examples: ExampleDefs[] = [
         {
             key: "default",
-            name: "Crossfading between two loops",
+            name: EXAMPLE_NAMES.default,
             readout: () =>
                 `${trackName} — ${playback ? "playing" : "stopped"}; nothing sounds until you ask, because a source arriving at mount does not start on its own — every switch after that does`,
             component: defaultExample,

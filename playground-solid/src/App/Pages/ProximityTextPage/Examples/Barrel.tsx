@@ -4,7 +4,8 @@ import { ElementObserverSolidUtils, ProximityText } from "@thewaver/ss-component
 import type { PointSource } from "@thewaver/ss-components-solid";
 import { ProximityTextKnobs } from "@thewaver/ss-playground/App/Knobs/ProximityTexts.const";
 import * as styles from "@thewaver/ss-playground/App/Pages/ProximityTextPage/ProximityTextPage.css";
-import type { ProximityTextExampleProps } from "@thewaver/ss-playground/App/Pages/ProximityTextPage/ProximityTextPage.types";
+
+import type { ProximityTextExampleProps } from "../ProximityTextPageSolid.types";
 
 const TEXT =
     "The universe keeps on expanding, stretching space in every direction with a quiet and steady motion. Galaxies drift apart across distances too large to picture, carried by a flow that began in the first instant. What was once one dense and burning point has opened into a wide and growing expanse, and every line here closes up as it reaches the middle and spreads out again past it, as though read from inside a turning barrel.";

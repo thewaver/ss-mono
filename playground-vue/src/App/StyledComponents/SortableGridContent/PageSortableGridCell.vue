@@ -2,7 +2,7 @@
 import * as styles from "@thewaver/ss-playground/App/StyledComponents/SortableGridContent/SortableGridContent.css";
 
 import { useLayerClass } from "../Layer/Layer.context";
-import type { SortableGridCellProps } from "./SortableGridContent.types";
+import type { SortableGridCellProps } from "./SortableGridContentVue.types";
 
 defineProps<SortableGridCellProps>();
 

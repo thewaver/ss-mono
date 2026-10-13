@@ -2,7 +2,17 @@ import { createMemo, createSignal } from "solid-js";
 
 import { CURRENCY_INPUT_DEFAULTS } from "@thewaver/ss-components-solid";
 import { CurrencyInputKnobs } from "@thewaver/ss-playground/App/Knobs/CurrencyInputs.const";
-import { BUDGET_MAX } from "@thewaver/ss-playground/App/Pages/CurrencyInputPage/CurrencyInputPage.const";
+import {
+    BUDGET_MAX,
+    EXAMPLES_ROOT,
+    EXAMPLE_NAMES,
+    LOCALE_FIELD_WIDTH,
+    LOCALE_GROUPING,
+    STARTING_ADJUSTMENT,
+    STARTING_BIG,
+    STARTING_BUDGET,
+    STARTING_PRICE,
+} from "@thewaver/ss-playground/App/Pages/CurrencyInputPage/CurrencyInputPage.const";
 
 import { PageExamples } from "../../PageComponents/Examples/Examples";
 import { PageCheckField, PageSelectField } from "../../PageComponents/Field/Field";
@@ -13,14 +23,6 @@ import { BoundedExample } from "./Examples/Bounded";
 import { DefaultExample } from "./Examples/Default";
 import { SymbolExample } from "./Examples/Symbol";
 
-const LOCALE_FIELD_WIDTH = 120;
-const LOCALE_GROUPING = "locale";
-const EXAMPLES_ROOT = "/src/App/Pages/CurrencyInputPage/Examples";
-
-const STARTING_PRICE = 1234.56;
-const STARTING_BUDGET = 4999.99;
-const STARTING_BIG = 9876543210.12;
-const STARTING_ADJUSTMENT = -250.5;
 const describe = (value: number | undefined) => (value === undefined ? "none" : `${value}`);
 
 const describeGrouping = (sizes: number[] | undefined) =>
@@ -49,7 +51,7 @@ export const CurrencyInputPage = () => {
         return [
             {
                 key: "default",
-                name: "Default",
+                name: EXAMPLE_NAMES.default,
                 readout: () =>
                     `value: ${describe(priceSignal[0]())} — digits fill from the right, and the separators are the field's rather than yours to type`,
                 component: () => <DefaultExample {...commonProps} value={priceSignal} />,
@@ -57,14 +59,14 @@ export const CurrencyInputPage = () => {
             },
             {
                 key: "empty",
-                name: "Empty",
+                name: EXAMPLE_NAMES.empty,
                 readout: () => `value: ${describe(emptySignal[0]())} — an empty field has no value at all`,
                 component: () => <DefaultExample {...commonProps} value={emptySignal} ariaLabel={"Amount"} />,
                 path: `${EXAMPLES_ROOT}/Default.tsx`,
             },
             {
                 key: "symbol",
-                name: "With a symbol",
+                name: EXAMPLE_NAMES.symbol,
                 readout: () =>
                     `value: ${describe(priceSignal[0]())} — the currency is paint in a slot, since the library holds no currencies`,
                 component: () => <SymbolExample {...commonProps} value={priceSignal} />,
@@ -72,7 +74,7 @@ export const CurrencyInputPage = () => {
             },
             {
                 key: "bounded",
-                name: "Bounded",
+                name: EXAMPLE_NAMES.bounded,
                 readout: () =>
                     `value: ${describe(budgetSignal[0]())} — at most ${BUDGET_MAX}, and going over is refused as it is typed`,
                 component: () => <BoundedExample {...commonProps} value={budgetSignal} />,
@@ -80,7 +82,7 @@ export const CurrencyInputPage = () => {
             },
             {
                 key: "negative",
-                name: "Signed",
+                name: EXAMPLE_NAMES.negative,
                 readout: () =>
                     `value: ${describe(negativeSignal[0]())} — a minus is only accepted where the field was told to hold one`,
                 component: () => (
@@ -90,7 +92,7 @@ export const CurrencyInputPage = () => {
             },
             {
                 key: "big",
-                name: "Many groups",
+                name: EXAMPLE_NAMES.big,
                 readout: () =>
                     `value: ${describe(bigSignal[0]())} — the group count grows with the value, which a fixed pattern cannot do`,
                 component: () => <DefaultExample {...commonProps} value={bigSignal} ariaLabel={"Large amount"} />,

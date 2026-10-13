@@ -7,8 +7,8 @@ import { POPOVER_SURFACE_INSET } from "@thewaver/ss-playground/App/StyledCompone
 import PageGlideFloater from "../../../../StyledComponents/GlideFloater/PageGlideFloater.vue";
 import PageMenuTriggerContent from "../../../../StyledComponents/MenuTriggerContent/MenuTriggerContent.vue";
 import MenuDestinationItem from "../MenuDestinationItem.vue";
-import { DESTINATIONS } from "../MenuPage.const";
-import type { Destination, MenuCascaderExampleProps } from "../MenuPage.types";
+import { DESTINATIONS } from "../MenuPageVue.const";
+import type { Destination, MenuCascaderExampleProps } from "../MenuPageVue.types";
 import MenuPopup from "../MenuPopup.vue";
 
 const PATH_SEPARATOR = " / ";

@@ -1,6 +1,11 @@
 import type { ParentProps } from "solid-js";
 
 import { access } from "@thewaver/ss-components-solid";
+import {
+    HUE_MAX,
+    HUE_THUMB_SIZE,
+    PERCENT,
+} from "@thewaver/ss-playground/App/StyledComponents/ColorAreaContent/ColorAreaContent.const";
 import * as styles from "@thewaver/ss-playground/App/StyledComponents/ColorAreaContent/ColorAreaContent.css";
 import { assignInlineVars } from "@vanilla-extract/dynamic";
 
@@ -10,9 +15,7 @@ import type {
     ColorFieldTriggerProps,
     ColorSwatchProps,
     HueSliderProps,
-} from "./ColorAreaContent.types";
-
-const PERCENT = 100;
+} from "./ColorAreaContentSolid.types";
 
 export const PageColorAreaContent = (props: ColorAreaContentProps) => {
     const getLayerClass = useLayerClass();
@@ -39,9 +42,6 @@ export const PageColorAreaContent = (props: ColorAreaContentProps) => {
         </div>
     );
 };
-
-const HUE_THUMB_SIZE = 18;
-const HUE_MAX = 360;
 
 export const PageHueSlider = (props: HueSliderProps) => {
     const getLayerClass = useLayerClass();

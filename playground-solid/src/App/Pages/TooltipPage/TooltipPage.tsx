@@ -4,6 +4,11 @@ import type { AnchorHPlacement, AnchorVPlacement } from "@thewaver/ss-components
 import { ANCHOR_H_PLACEMENTS, ANCHOR_V_PLACEMENTS, TOOLTIP_DEFAULTS } from "@thewaver/ss-components-solid";
 import { TooltipKnobs } from "@thewaver/ss-playground/App/Knobs/Tooltips.const";
 import {
+    EXAMPLES_ROOT,
+    EXAMPLE_NAMES,
+    FIELD_WIDTH,
+} from "@thewaver/ss-playground/App/Pages/TooltipPage/TooltipPage.const";
+import {
     TOOLTIP_ARROWS,
     TOOLTIP_ARROW_LABELS,
     TOOLTIP_HOVER_DELAY_MS,
@@ -20,11 +25,7 @@ import { PagePropsPanel } from "../../PageComponents/PropsPanel/PropsPanel";
 import { DefaultExample } from "./Examples/Default";
 import { RichExample } from "./Examples/Rich";
 import { WordExample } from "./Examples/Word";
-import type { TooltipExampleProps } from "./TooltipPage.types";
-
-const EXAMPLES_ROOT = "/src/App/Pages/TooltipPage/Examples";
-
-const FIELD_WIDTH = 110;
+import type { TooltipExampleProps } from "./TooltipPageSolid.types";
 
 export const TooltipPage = () => {
     const [getHPlacement, setHPlacement] = createSignal<AnchorHPlacement>(TooltipKnobs.STARTING_H_PLACEMENT);
@@ -61,7 +62,7 @@ export const TooltipPage = () => {
         return [
             {
                 key: "default",
-                name: "On a control of your own",
+                name: EXAMPLE_NAMES.default,
                 readout: () =>
                     "the button is a plain one, not the library's — the tooltip is handed its element and wires the hover, the focus and the Escape itself",
                 component: () => <DefaultExample {...commonProps} />,
@@ -69,7 +70,7 @@ export const TooltipPage = () => {
             },
             {
                 key: "word",
-                name: "On something that is not a control",
+                name: EXAMPLE_NAMES.word,
                 readout: () =>
                     "any element with a ref can carry one; this word was given a tab stop of its own, without which the tooltip would be reachable by pointer alone",
                 component: () => <WordExample {...commonProps} />,
@@ -77,7 +78,7 @@ export const TooltipPage = () => {
             },
             {
                 key: "rich",
-                name: "More than a line",
+                name: EXAMPLE_NAMES.rich,
                 readout: () => "the content is whatever you render, and the anchoring is unchanged by how tall it is",
                 component: () => <RichExample {...commonProps} />,
                 path: `${EXAMPLES_ROOT}/Rich.tsx`,

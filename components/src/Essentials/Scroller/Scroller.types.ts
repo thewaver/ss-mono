@@ -18,3 +18,14 @@ export type ScrollerMetrics = {
     visible: number;
     total: number;
 };
+
+export type BaseScrollerValues = {
+    /** The space between items. */
+    gap?: number;
+    /** How much room is left at the ends of the run, so the first and last items are not flush against the edge. */
+    padding?: number;
+    /** Where the scroll controls sit. */
+    buttonPlacement?: ScrollerButtonPlacement;
+};
+
+export type BaseScrollerProps = BaseScrollerValues;

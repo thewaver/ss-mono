@@ -1,7 +1,6 @@
 import { type SlotsType, type VNodeChild, computed, defineComponent, h } from "vue";
 
 import {
-    type InteractionSizing,
     PAGINATOR_DEFAULTS,
     type PaginatorGapEntry,
     type PaginatorPageEntry,
@@ -11,6 +10,7 @@ import {
     PaginatorStyles,
     PaginatorUtils,
 } from "@thewaver/ss-components";
+import { PlacementConst } from "@thewaver/ss-components/internal";
 
 import { InteractionWrapper } from "../../Primitives/InteractionWrapper/InteractionWrapper";
 import type {
@@ -22,9 +22,6 @@ import { PlacementItem } from "../../Primitives/PlacementItem/PlacementItem";
 import { callSlot, declareProps } from "../../Utils/propUtils";
 import type { SlotsContext } from "../../Utils/typeUtils";
 import type { PaginatorItemProps, PaginatorProps, PaginatorSlots } from "./Paginator.types";
-
-const ROW_SIZING: InteractionSizing = "fit-content";
-const PLACED_SIZING: InteractionSizing = "fill";
 
 const PaginatorItem = defineComponent(
     <TExtra extends object>(
@@ -146,7 +143,7 @@ export const Paginator = defineComponent(
                     index,
                     <InteractionWrapper
                         key={index}
-                        sizing={placement === undefined ? ROW_SIZING : PLACED_SIZING}
+                        sizing={placement === undefined ? PlacementConst.ROW_SIZING : PlacementConst.PLACED_SIZING}
                         isDisabled={isStepDisabled}
                         extraFlags={{ step, targetPage, placement }}
                     >
@@ -183,7 +180,7 @@ export const Paginator = defineComponent(
                     index,
                     <InteractionWrapper
                         key={index}
-                        sizing={placement === undefined ? ROW_SIZING : PLACED_SIZING}
+                        sizing={placement === undefined ? PlacementConst.ROW_SIZING : PlacementConst.PLACED_SIZING}
                         isDisabled={isDisabled}
                         extraFlags={{ page: entry.page, isCurrent, placement }}
                     >

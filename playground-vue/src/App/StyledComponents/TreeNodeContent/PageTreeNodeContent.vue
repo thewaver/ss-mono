@@ -1,14 +1,15 @@
 <script setup lang="ts">
+import {
+    BRANCH_MARKER,
+    DESCRIPTION_ONLY_MARKER,
+    INDENT_PER_DEPTH,
+    LEAF_MARKER,
+} from "@thewaver/ss-playground/App/StyledComponents/TreeNodeContent/TreeNodeContent.const";
 import * as styles from "@thewaver/ss-playground/App/StyledComponents/TreeNodeContent/TreeNodeContent.css";
 import { themeVars } from "@thewaver/ss-playground/App/Theme.css";
 
 import { useLayerClass } from "../Layer/Layer.context";
-import type { TreeNodeContentProps } from "./TreeNodeContent.types";
-
-const INDENT_PER_DEPTH = 20;
-const BRANCH_MARKER = "▶";
-const LEAF_MARKER = "•";
-const DESCRIPTION_ONLY_MARKER = "·";
+import type { TreeNodeContentProps } from "./TreeNodeContentVue.types";
 
 withDefaults(defineProps<TreeNodeContentProps>(), { hasExamples: true });
 

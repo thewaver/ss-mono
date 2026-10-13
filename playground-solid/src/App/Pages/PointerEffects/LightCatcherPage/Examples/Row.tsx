@@ -2,7 +2,8 @@ import { For } from "solid-js";
 
 import { LightCatcher } from "@thewaver/ss-components-solid";
 import * as styles from "@thewaver/ss-playground/App/Pages/PointerEffects/LightCatcherPage/LightCatcherPage.css";
-import type { LightCatcherExampleProps } from "@thewaver/ss-playground/App/Pages/PointerEffects/LightCatcherPage/LightCatcherPage.types";
+
+import type { LightCatcherExampleProps } from "../LightCatcherPageSolid.types";
 
 const LAMPS = [1, 2, 3, 4, 5];
 

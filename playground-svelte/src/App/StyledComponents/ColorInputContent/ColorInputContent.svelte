@@ -2,7 +2,7 @@
     import * as styles from "@thewaver/ss-playground/App/StyledComponents/ColorInputContent/ColorInputContent.css";
 
     import { getLayerClass } from "../Layer/Layer.context";
-    import type { ColorInputContentProps } from "./ColorInputContent.types";
+    import type { ColorInputContentProps } from "./ColorInputContentSvelte.types";
 
     let props: ColorInputContentProps = $props();
 

@@ -5,7 +5,7 @@
 
     import PageScrollerButton from "../../../PageComponents/ScrollerButton/ScrollerButton.svelte";
     import PageButtonContent from "../../../StyledComponents/ButtonContent/ButtonContent.svelte";
-    import type { ScrollerExampleProps } from "../ScrollerPage.types";
+    import type { ScrollerExampleProps } from "../ScrollerPageSvelte.types";
 
     const SCROLLER_GAP = 10;
 

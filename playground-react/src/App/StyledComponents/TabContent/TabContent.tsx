@@ -3,7 +3,7 @@ import type { PropsWithChildren } from "react";
 import * as styles from "@thewaver/ss-playground/App/StyledComponents/TabContent/TabContent.css";
 
 import { useLayerClass } from "../Layer/Layer.context";
-import type { TabCellProps, TabContentProps, TabDecorationProps, TabFloaterProps } from "./TabContent.types";
+import type { TabCellProps, TabContentProps, TabDecorationProps, TabFloaterProps } from "./TabContentReact.types";
 
 export const PageTabContent = (props: PropsWithChildren<TabContentProps>) => {
     const layerClass = useLayerClass();

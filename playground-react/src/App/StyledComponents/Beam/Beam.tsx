@@ -1,15 +1,14 @@
 import { useEffect, useLayoutEffect, useRef, useState } from "react";
 
 import {
+    NO_LENGTH,
     computeBeamLengthPx,
     computeBeamMotion,
     observeBeamLength,
 } from "@thewaver/ss-playground/App/StyledComponents/Beam/Beam.const";
 import * as styles from "@thewaver/ss-playground/App/StyledComponents/Beam/Beam.css";
 
-import type { PageBeamProps } from "./Beam.types";
-
-const NO_LENGTH = 0;
+import type { PageBeamProps } from "./BeamReact.types";
 
 export const PageBeam = (props: PageBeamProps) => {
     const pathRef = useRef<SVGPathElement>(null);

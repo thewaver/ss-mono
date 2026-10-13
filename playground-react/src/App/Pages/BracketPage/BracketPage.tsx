@@ -10,6 +10,15 @@ import {
 import type { BracketConnectorDefs, BracketOrientation, BracketRootSide } from "@thewaver/ss-components-react";
 import { BracketKnobs } from "@thewaver/ss-playground/App/Knobs/Brackets.const";
 import {
+    CONNECTOR_RADIUS,
+    CONNECTOR_WIDTH,
+    EXAMPLES_ROOT,
+    EXAMPLE_NAMES,
+    NO_MOTION_DURATION_MS,
+    ROUTE_CONNECTOR_WIDTH,
+    WIDE_SPAN,
+} from "@thewaver/ss-playground/App/Pages/BracketPage/BracketPage.const";
+import {
     CONNECTOR_FROM_COLOR,
     CONNECTOR_TO_COLOR,
     ROUTE_FROM_COLOR,
@@ -22,20 +31,12 @@ import { PageMeasureBox } from "../../PageComponents/MeasureBox/MeasureBox";
 import { PageProp } from "../../PageComponents/Prop/Prop";
 import { PagePropsPanel } from "../../PageComponents/PropsPanel/PropsPanel";
 import { PageBeam } from "../../StyledComponents/Beam/Beam";
-import { BEAM_PATHS, NOTHING_PICKED, computeRouteSpan, toConnectorBoard } from "./BracketPage.const";
 import type { BracketExampleProps } from "./BracketPage.types";
+import { BEAM_PATHS, NOTHING_PICKED, computeRouteSpan, toConnectorBoard } from "./BracketPageReact.const";
 import { FamilyExample } from "./Examples/Family";
 import { KnockoutExample } from "./Examples/Knockout";
 import { OrgChartExample } from "./Examples/OrgChart";
 import { SkillTreeExample } from "./Examples/SkillTree";
-
-const EXAMPLES_ROOT = "/src/App/Pages/BracketPage/Examples";
-
-const CONNECTOR_RADIUS = 14;
-const CONNECTOR_WIDTH = 2;
-const ROUTE_CONNECTOR_WIDTH = 3;
-const WIDE_SPAN = 2;
-const NO_MOTION_DURATION_MS = 0;
 
 export const BracketPage = () => {
     const [layerGap, setLayerGap] = useState(BRACKET_DEFAULTS.layerGap);
@@ -99,7 +100,7 @@ export const BracketPage = () => {
     const examples = [
         {
             key: "knockout",
-            name: "Knockout",
+            name: EXAMPLE_NAMES.knockout,
             span: WIDE_SPAN,
             readout: () =>
                 `picked: ${picked} — a full draw with its rounds named, every node feeding exactly two, and one seed withdrawn so the walk steps past it; focus a seed and its road to the final lights up`,
@@ -112,7 +113,7 @@ export const BracketPage = () => {
         },
         {
             key: "orgChart",
-            name: "Org chart",
+            name: EXAMPLE_NAMES.orgChart,
             span: WIDE_SPAN,
             readout: () =>
                 "an uneven tree: three under one node, two under another, one that goes no further — a parent still lands between the outermost of the nodes it holds, whichever way round the board is turned",
@@ -125,7 +126,7 @@ export const BracketPage = () => {
         },
         {
             key: "skillTree",
-            name: "Skill tree",
+            name: EXAMPLE_NAMES.skillTree,
             readout: () =>
                 "a chain of single children, which is what a bye looks like — each one level with the last, under headers that turn with the board",
             component: () => (
@@ -137,7 +138,7 @@ export const BracketPage = () => {
         },
         {
             key: "family",
-            name: "One family at a time",
+            name: EXAMPLE_NAMES.family,
             span: WIDE_SPAN,
             readout: () =>
                 `showing: ${family} — the whole draw stays mounted and a camera frames one family at a time: what the focused node feeds, it with all its siblings, and what feeds them; walk on with the arrows, or page through with the buttons without leaving them, and the camera pans and zooms to fit; Zoom out fits the whole draw, and Zoom in goes back to the family`,

@@ -9,6 +9,7 @@ import { assignInlineVars } from "@vanilla-extract/dynamic";
 
 import { PageMeasureBox } from "../../../PageComponents/MeasureBox/MeasureBox";
 import { PageControlButtonContent } from "../../../StyledComponents/ControlButtonContent/ControlButtonContent";
+import type { BracketFamilyExampleProps } from "../BracketPage.types";
 import {
     branch,
     computeBracketPinnedLayerHeader,
@@ -16,8 +17,7 @@ import {
     describeFamily,
     renderBracketNode,
     seed,
-} from "../BracketPage.const";
-import type { BracketFamilyExampleProps } from "../BracketPage.types";
+} from "../BracketPageSolid.const";
 
 const NODE_SIZE = { width: 96, height: 34 };
 const ROUND_NAMES = ["Final", "Semifinals", "Quarterfinals", "Entrants"];

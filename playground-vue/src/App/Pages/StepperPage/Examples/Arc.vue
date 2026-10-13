@@ -7,7 +7,7 @@ import type { StepValue } from "@thewaver/ss-playground/App/Pages/StepperPage/St
 import PageStepArcCell from "../../../StyledComponents/StepContent/PageStepArcCell.vue";
 import PageStepArcConnector from "../../../StyledComponents/StepContent/PageStepArcConnector.vue";
 import PageStepContent from "../../../StyledComponents/StepContent/PageStepContent.vue";
-import type { StepperExampleProps } from "../StepperPage.types";
+import type { StepperExampleProps } from "../StepperPageVue.types";
 
 const ARC_DEFS: ArcDefs = {
     curveHeightRatio: 1,

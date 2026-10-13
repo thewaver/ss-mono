@@ -1,10 +1,9 @@
 <script setup lang="ts">
+import { DEFAULT_ALIGN } from "@thewaver/ss-playground/App/StyledComponents/TableContent/TableContent.const";
 import * as styles from "@thewaver/ss-playground/App/StyledComponents/TableContent/TableContent.css";
 
 import { useLayerClass } from "../Layer/Layer.context";
-import type { TableAlign, TableCellContentProps } from "./TableContent.types";
-
-const DEFAULT_ALIGN: TableAlign = "start";
+import type { TableCellContentProps } from "./TableContentVue.types";
 
 defineProps<TableCellContentProps>();
 

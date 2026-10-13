@@ -22,9 +22,10 @@
     import { assignInlineVars } from "@vanilla-extract/dynamic";
 
     import { getLayerClass } from "../Layer/Layer.context";
-    import type { SortableGridItemContentProps } from "./SortableGridContent.types";
-
-    const NAMED_WIDTH = 2;
+    import type { SortableGridItemContentProps } from "./SortableGridContentSvelte.types";
+    import {
+        NAMED_WIDTH,
+    } from "@thewaver/ss-playground/App/StyledComponents/SortableGridContent/SortableGridContent.const";
 
     let props: SortableGridItemContentProps = $props();
 

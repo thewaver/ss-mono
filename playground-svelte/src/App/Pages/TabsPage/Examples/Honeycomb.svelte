@@ -13,7 +13,7 @@
     import PageTabCell from "../../../StyledComponents/TabContent/PageTabCell.svelte";
     import PageTabHexFloater from "../../../StyledComponents/TabContent/PageTabHexFloater.svelte";
     import PageTabHexHighlightFloater from "../../../StyledComponents/TabContent/PageTabHexHighlightFloater.svelte";
-    import type { TabsExampleProps } from "../TabsPage.types";
+    import type { TabsExampleProps } from "../TabsPageSvelte.types";
 
     const HONEYCOMB_DEFS: HoneycombDefs = { perRow: 3, gapRatio: 0 };
 

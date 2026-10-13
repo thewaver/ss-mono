@@ -5,7 +5,7 @@ import type { AnchorPlacement, SatelliteDefs } from "@thewaver/ss-components-sol
 import type { Point2d } from "@thewaver/ss-utils";
 
 import { PageSatellitePill, PageSatelliteSubject } from "../../../StyledComponents/SatelliteContent/SatelliteContent";
-import type { SatelliteBadgeCorner, SatelliteBadgeExampleProps } from "../SatellitePage.types";
+import type { SatelliteBadgeCorner, SatelliteBadgeExampleProps } from "../SatellitePageSolid.types";
 
 const PLACEMENTS: Record<SatelliteBadgeCorner, AnchorPlacement> = {
     top_left: { x: "left_in", y: "top_in" },

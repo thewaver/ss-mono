@@ -1,4 +1,5 @@
-import { type GradientHandOpts, SVGDefsUtils, TrackedGradientDefaults } from "@thewaver/ss-components";
+import { type GradientHandOpts, SVGDefsUtils } from "@thewaver/ss-components";
+import { Hand1Const } from "@thewaver/ss-components/internal";
 import { SVGUtils } from "@thewaver/ss-utils";
 
 import { PointerTrackerSolidUtils } from "../../../../Abstracts/PointerTracker/PointerTrackerSolid.utils";
@@ -6,11 +7,6 @@ import { SVGClipPath } from "../../../../Generators/SVGDefs/SVGClipPaths/SVGClip
 import { SVGGradientDefsSolidUtils } from "../../../../Generators/SVGDefs/SVGGradients/SVGGradientDefsSolid.utils";
 import type { TrackedGradientConfig } from "../../SVGDefsSolid.types";
 import { SVGDefsSolidUtils } from "../../SVGDefsSolid.utils";
-
-const QUARTER_TURN = 90;
-const HALF_TURN = 180;
-
-const DEFAULTS = TrackedGradientDefaults.HAND_DEFAULTS;
 
 const NO_REF = () => undefined;
 
@@ -37,11 +33,11 @@ export const hand_1 = (opts?: GradientHandOpts): TrackedGradientConfig => ({
 
                     return SVGGradientDefsSolidUtils.computeLinearGradient({
                         id: `gradient1-${id}`,
-                        angle: () => getReading().angle + QUARTER_TURN,
+                        angle: () => getReading().angle + Hand1Const.QUARTER_TURN,
                         colors: () =>
                             computeSweepColors(
                                 defs.colors.primary,
-                                (opts?.peakAlpha ?? DEFAULTS.peakAlpha) *
+                                (opts?.peakAlpha ?? Hand1Const.DEFAULTS.peakAlpha) *
                                     SVGDefsUtils.getPointerFade(getReading(), getIsPointerPresent()),
                             ),
                     });
@@ -60,8 +56,10 @@ export const hand_1 = (opts?: GradientHandOpts): TrackedGradientConfig => ({
                         <SVGClipPath id={`clip1-${id}`}>
                             <path
                                 d={SVGUtils.getArcPath(
-                                    opts?.sweepArc ?? DEFAULTS.sweepArc,
-                                    getReading().angle - HALF_TURN - (opts?.sweepArc ?? DEFAULTS.sweepArc) * 0.5,
+                                    opts?.sweepArc ?? Hand1Const.DEFAULTS.sweepArc,
+                                    getReading().angle -
+                                        Hand1Const.HALF_TURN -
+                                        (opts?.sweepArc ?? Hand1Const.DEFAULTS.sweepArc) * 0.5,
                                 )}
                             />
                         </SVGClipPath>

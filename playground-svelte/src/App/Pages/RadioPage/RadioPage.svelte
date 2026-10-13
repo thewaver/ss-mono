@@ -10,10 +10,12 @@
     import ReachableExample from "./Examples/Reachable.svelte";
     import RightToLeftExample from "./Examples/RightToLeft.svelte";
     import SegmentedExample from "./Examples/Segmented.svelte";
-    import type { SizeValue } from "./RadioPage.types";
-
-    const STARTING_RATING = 3;
-    const EXAMPLES_ROOT = "/src/App/Pages/RadioPage/Examples";
+    import type { SizeValue } from "./RadioPageSvelte.types";
+    import {
+    EXAMPLE_NAMES,
+    EXAMPLES_ROOT,
+    STARTING_RATING,
+} from "@thewaver/ss-playground/App/Pages/RadioPage/RadioPage.const";
 
     let defaultValue = $state<SizeValue | undefined>(undefined);
     let rightToLeftValue = $state<SizeValue | undefined>(undefined);
@@ -30,14 +32,14 @@
     const examples: ExampleDefs[] = [
         {
             key: "default",
-            name: "Default",
+            name: EXAMPLE_NAMES.default,
             readout: () => `value: ${defaultValue}`,
             component: defaultExample,
             path: `${EXAMPLES_ROOT}/Default.svelte`,
         },
         {
             key: "rightToLeft",
-            name: "In a right-to-left box",
+            name: EXAMPLE_NAMES.rightToLeft,
             readout: () =>
                 `value: ${rightToLeftValue} — the box around the radios sets dir="rtl", so they run from the right and the left arrow moves on to the next one, while up and down keep their meaning`,
             component: rightToLeftExample,
@@ -45,49 +47,49 @@
         },
         {
             key: "segmented",
-            name: "Segmented",
+            name: EXAMPLE_NAMES.segmented,
             readout: () => `value: ${segmentedValue}`,
             component: segmentedExample,
             path: `${EXAMPLES_ROOT}/Segmented.svelte`,
         },
         {
             key: "rating",
-            name: "Rating",
+            name: EXAMPLE_NAMES.rating,
             readout: () => `value: ${ratingValue}`,
             component: ratingExample,
             path: `${EXAMPLES_ROOT}/Rating.svelte`,
         },
         {
             key: "arc",
-            name: "Rating, bent into an arc",
+            name: EXAMPLE_NAMES.arc,
             readout: () => `value: ${arcValue} — the same radios, placed by a layout instead of laid in a row`,
             component: arcExample,
             path: `${EXAMPLES_ROOT}/Arc.svelte`,
         },
         {
             key: "decorated",
-            name: "Decorated",
+            name: EXAMPLE_NAMES.decorated,
             readout: () => `value: ${decoratedValue}`,
             component: decoratedExample,
             path: `${EXAMPLES_ROOT}/Decorated.svelte`,
         },
         {
             key: "disabled",
-            name: "Disabled",
+            name: EXAMPLE_NAMES.disabled,
             readout: () => `value: ${disabledValue}`,
             component: disabledExample,
             path: `${EXAMPLES_ROOT}/Disabled.svelte`,
         },
         {
             key: "reachable",
-            name: "Disabled + reachable",
+            name: EXAMPLE_NAMES.reachable,
             readout: () => `value: ${reachableValue}`,
             component: reachableExample,
             path: `${EXAMPLES_ROOT}/Reachable.svelte`,
         },
         {
             key: "errored",
-            name: "Error",
+            name: EXAMPLE_NAMES.errored,
             readout: () => `value: ${erroredValue}`,
             component: erroredExample,
             path: `${EXAMPLES_ROOT}/Errored.svelte`,

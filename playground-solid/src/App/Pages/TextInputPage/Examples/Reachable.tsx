@@ -9,7 +9,7 @@ import {
     computePageTextFieldTextStyle,
 } from "../../../StyledComponents/TextFieldContent/TextFieldContent";
 import { PageTooltipContent } from "../../../StyledComponents/TooltipContent/TooltipContent";
-import type { TextInputExampleProps } from "../TextInputPage.types";
+import type { TextInputExampleProps } from "../TextInputPageSolid.types";
 
 type Props = TextInputExampleProps;
 

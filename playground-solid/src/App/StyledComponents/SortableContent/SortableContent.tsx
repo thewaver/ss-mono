@@ -5,7 +5,7 @@ import { access } from "@thewaver/ss-components-solid";
 import * as styles from "@thewaver/ss-playground/App/StyledComponents/SortableContent/SortableContent.css";
 
 import { useLayerClass } from "../Layer/Layer.context";
-import type { SortableItemContentProps, SortableMarkerProps, SortableSurfaceProps } from "./SortableContent.types";
+import type { SortableItemContentProps, SortableMarkerProps, SortableSurfaceProps } from "./SortableContentSolid.types";
 
 export const PageSortableItemContent = (props: ParentProps<SortableItemContentProps>) => {
     const getLayerClass = useLayerClass();

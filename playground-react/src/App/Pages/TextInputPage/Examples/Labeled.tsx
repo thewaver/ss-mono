@@ -9,7 +9,7 @@ import {
     PageTextFieldContent,
     computePageTextFieldTextStyle,
 } from "../../../StyledComponents/TextFieldContent/TextFieldContent";
-import type { TextInputExampleProps } from "../TextInputPage.types";
+import type { TextInputExampleProps } from "../TextInputPageReact.types";
 
 const LABEL_GAP = 5;
 

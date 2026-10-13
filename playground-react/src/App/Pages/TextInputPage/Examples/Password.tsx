@@ -10,7 +10,7 @@ import {
     computePageTextFieldTextStyle,
 } from "../../../StyledComponents/TextFieldContent/TextFieldContent";
 import { PageTextFieldPlaceholder } from "../../../StyledComponents/TextFieldPlaceholder/TextFieldPlaceholder";
-import type { TextInputPasswordExampleProps } from "../TextInputPage.types";
+import type { TextInputPasswordExampleProps } from "../TextInputPageReact.types";
 
 type Props = TextInputPasswordExampleProps;
 

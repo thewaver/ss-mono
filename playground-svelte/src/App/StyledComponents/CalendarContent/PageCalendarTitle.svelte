@@ -4,7 +4,7 @@
     import * as styles from "@thewaver/ss-playground/App/StyledComponents/CalendarContent/CalendarContent.css";
 
     import { getLayerClass } from "../Layer/Layer.context";
-    import type { CalendarTitleProps } from "./CalendarContent.types";
+    import type { CalendarTitleProps } from "./CalendarContentSvelte.types";
 
     let props: CalendarTitleProps & { children?: Snippet } = $props();
 

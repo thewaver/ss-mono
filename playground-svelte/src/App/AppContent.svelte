@@ -22,7 +22,7 @@
         toBaseRoute,
     } from "@thewaver/ss-playground/App/PageComponents/ViewTabs/ViewTabs.const";
 
-    import { MENU_CONFIGS, MENU_EDGE, MENU_ID, SEARCH_FIELD_WIDTH } from "./App.const";
+    import { MENU_CONFIGS, MENU_EDGE, MENU_ID, SEARCH_FIELD_WIDTH } from "./AppSvelte.const";
     import {
         COMPONENT_CONFIGS_BY_ROUTE,
         GALLERY_ROUTE,
@@ -41,23 +41,20 @@
     import PageLayer from "./PageComponents/Layer/Layer.svelte";
     import PageNavLink from "./PageComponents/NavLink/NavLink.svelte";
     import PageNavLinkGroup from "./PageComponents/NavLink/PageNavLinkGroup.svelte";
-    import type { ViewportAnchor } from "./PageComponents/NavSettings/NavSettings.types";
+    import type { ViewportAnchor } from "./PageComponents/NavSettings/NavSettingsSvelte.types";
     import PageNavSettings from "./PageComponents/NavSettings/PageNavSettings.svelte";
     import PagePreview from "./PageComponents/Preview/Preview.svelte";
     import PageRouterLink from "./PageComponents/RouterLink/RouterLink.svelte";
     import PageSidebarToggle from "./PageComponents/SidebarToggle/SidebarToggle.svelte";
     import PageViewTabs from "./PageComponents/ViewTabs/PageViewTabs.svelte";
-    import type { PageViewKey } from "./PageComponents/ViewTabs/ViewTabs.types";
+    import type { PageViewKey } from "./PageComponents/ViewTabs/ViewTabsSvelte.types";
     import PageDependencies from "./PageDependencies.svelte";
     import { renderPageHighlightFloater } from "./StyledComponents/GlideFloater/GlideFloater.const.svelte";
     import PageTooltipContent from "./StyledComponents/TooltipContent/TooltipContent.svelte";
     import PageTreeNodeContent from "./StyledComponents/TreeNodeContent/PageTreeNodeContent.svelte";
+    import { NAV_PREVIEW_ARROW, NAV_PREVIEW_OFFSET, NAV_PREVIEW_PLACEMENT } from "@thewaver/ss-playground/App/App.const";
 
     const getIsMenuFaded = (phase: SidebarPhase) => phase === "collapsing" || phase === "collapsed";
-
-    const NAV_PREVIEW_PLACEMENT: AnchorPlacement = { x: "right_out", y: "center" };
-    const NAV_PREVIEW_OFFSET = { x: 10, y: 0 };
-    const NAV_PREVIEW_ARROW = "triangle";
 
     const NAV_PREVIEW_TOOLTIP_DEFS: InteractionTooltipDefs<TreeNodeRenderProps<MenuNodeConfig>> = {
         placement: NAV_PREVIEW_PLACEMENT,

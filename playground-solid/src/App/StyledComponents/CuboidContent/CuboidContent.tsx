@@ -4,7 +4,7 @@ import { access } from "@thewaver/ss-components-solid";
 import * as styles from "@thewaver/ss-playground/App/StyledComponents/CuboidContent/CuboidContent.css";
 
 import { useLayerClass } from "../Layer/Layer.context";
-import type { CuboidFaceProps } from "./CuboidContent.types";
+import type { CuboidFaceProps } from "./CuboidContentSolid.types";
 
 export const PageCuboidFace = (props: CuboidFaceProps) => {
     const getLayerClass = useLayerClass();

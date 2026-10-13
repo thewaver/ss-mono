@@ -1,15 +1,15 @@
 import { For, createSignal, onMount } from "solid-js";
 
-import { Button, CardStack } from "@thewaver/ss-components-solid";
+import { Button, CardStack, access } from "@thewaver/ss-components-solid";
 import type { CardStackControls } from "@thewaver/ss-components-solid";
 import { computeCardTilt } from "@thewaver/ss-playground/App/Pages/CardStackPage/CardStackPage.const";
 import * as styles from "@thewaver/ss-playground/App/Pages/CardStackPage/CardStackPage.css";
-import type { CardStackEndlessExampleProps } from "@thewaver/ss-playground/App/Pages/CardStackPage/CardStackPage.types";
 import { CONTROL_GLYPHS } from "@thewaver/ss-playground/App/StyledComponents/ControlButtonContent/ControlButtonContent.const";
 import type { SwipeDirection } from "@thewaver/ss-utils";
 
 import { PageMeasureBox } from "../../../PageComponents/MeasureBox/MeasureBox";
 import { PageControlButtonContent } from "../../../StyledComponents/ControlButtonContent/ControlButtonContent";
+import type { CardStackEndlessExampleProps } from "../CardStackExamplesSolid.types";
 
 const DIRECTIONS: SwipeDirection[] = ["left", "right"];
 const DIRECTION_GLYPHS: Record<SwipeDirection, string> = {
@@ -72,7 +72,7 @@ export const EndlessExample = (props: Props) => {
                             style={{
                                 "transform": `rotate(${computeCardTilt(getState())}deg)`,
                                 "opacity": getState().leavingTo === undefined ? SHOWN : GONE,
-                                "transition-duration": `${props.transitionDurationMs()}ms`,
+                                "transition-duration": `${access(props.transitionDurationMs)}ms`,
                             }}
                         >
                             {getState().card}

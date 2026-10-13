@@ -1,19 +1,19 @@
-import type { BinarySwitchCbs, BinarySwitchFlags, BinarySwitchState } from "@thewaver/ss-components";
+import type { BaseBinarySwitchValues, BinarySwitchCbs, BinarySwitchFlags } from "@thewaver/ss-components";
 
-import type { AccessorProps, SignalSource } from "../../Utils/typeUtils";
+import type { AccessorProps, AccessorValues, SignalSource } from "../../Utils/typeUtils";
 import type {
     InteractionControlProps,
     InteractionWrapperProps,
 } from "../InteractionWrapper/InteractionWrapperSolid.types";
 
-export type BinarySwitchElementProps = AccessorProps<
-    BinarySwitchCbs & InteractionControlProps<BinarySwitchFlags> & BinarySwitchState
->;
+export type BinarySwitchElementProps = AccessorValues<BaseBinarySwitchValues> &
+    BinarySwitchCbs &
+    AccessorProps<Omit<InteractionControlProps<BinarySwitchFlags>, "ariaLabel">>;
 
 export type BinarySwitchProps = Omit<InteractionWrapperProps<BinarySwitchFlags>, "renderControl" | "extraFlags"> &
-    AccessorProps<
-        BinarySwitchCbs & Pick<InteractionControlProps<BinarySwitchFlags>, "id" | "renderContent"> & BinarySwitchState
-    >;
+    AccessorValues<BaseBinarySwitchValues> &
+    BinarySwitchCbs &
+    AccessorProps<Pick<InteractionControlProps<BinarySwitchFlags>, "id" | "renderContent">>;
 
 export type BinarySwitchPresetProps = Omit<BinarySwitchProps, "type" | "isSwitch" | "isChecked"> &
     AccessorProps<{

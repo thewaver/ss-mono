@@ -4,12 +4,11 @@
     import { FunctionUtils } from "@thewaver/ss-utils";
     import type { Size2d } from "@thewaver/ss-utils";
 
-    import { FIXED_ANCHOR_RATIO } from "./App.const";
+    import { FIXED_ANCHOR_RATIO } from "./AppSvelte.const";
     import AppContent from "./AppContent.svelte";
-    import { DEFAULT_VIEWPORT_ANCHOR } from "./PageComponents/NavSettings/NavSettings.const";
-    import type { ViewportAnchor } from "./PageComponents/NavSettings/NavSettings.types";
-
-    const SCREEN_HEIGHT = window.screen.height;
+    import { DEFAULT_VIEWPORT_ANCHOR } from "@thewaver/ss-playground/App/PageComponents/NavSettings/NavSettings.const";
+    import type { ViewportAnchor } from "./PageComponents/NavSettings/NavSettingsSvelte.types";
+    import { SCREEN_HEIGHT } from "@thewaver/ss-playground/App/App.const";
 
     const getWindowInnerSize = () => ({ width: window.innerWidth, height: window.innerHeight });
 

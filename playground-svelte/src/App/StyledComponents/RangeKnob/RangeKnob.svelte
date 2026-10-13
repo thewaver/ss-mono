@@ -2,7 +2,7 @@
     import * as styles from "@thewaver/ss-playground/App/StyledComponents/RangeKnob/RangeKnob.css";
 
     import { getLayerClass } from "../Layer/Layer.context";
-    import type { RangeKnobProps } from "./RangeKnob.types";
+    import type { RangeKnobProps } from "./RangeKnobSvelte.types";
 
     let props: RangeKnobProps = $props();
 

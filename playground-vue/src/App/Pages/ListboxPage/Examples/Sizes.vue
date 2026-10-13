@@ -2,11 +2,11 @@
 import { useModel } from "vue";
 
 import { Listbox } from "@thewaver/ss-components-vue";
+import { SIZES } from "@thewaver/ss-playground/App/Pages/ListboxPage/ListboxPage.const";
 
 import PageGlideFloater from "../../../StyledComponents/GlideFloater/PageGlideFloater.vue";
 import PageListboxSurface from "../../../StyledComponents/ListboxSurface/ListboxSurface.vue";
 import PageSelectOptionContent from "../../../StyledComponents/SelectOptionContent/SelectOptionContent.vue";
-import { SIZES } from "../ListboxPage.const";
 import type { ListboxExampleProps } from "../ListboxPage.types";
 
 type Props = ListboxExampleProps;

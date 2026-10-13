@@ -1,9 +1,10 @@
 import type { MouseEvent, ReactNode } from "react";
 
 import type {
+    BaseColorInputCbs,
+    BaseColorInputValues,
     ColorAreaRenderProps,
     ColorInputRenderProps,
-    ColorInputState,
     InteractionFlags,
     RangeRenderProps,
 } from "@thewaver/ss-components";
@@ -14,9 +15,7 @@ import type {
     InteractionWrapperProps,
 } from "../../../Primitives/InteractionWrapper/InteractionWrapper.types";
 
-export type ColorInputCbs = {
-    /** Runs as the color changes, with the value written in the notation the field was handed. */
-    onInput?: (value: string) => void;
+export type ColorInputCbs = BaseColorInputCbs & {
     /** Runs when the pointer arrives over the field. */
     onMouseEnter?: (e: MouseEvent<HTMLButtonElement>) => void;
     /** Runs when the pointer leaves the field. */
@@ -25,7 +24,7 @@ export type ColorInputCbs = {
 
 export type ColorInputFieldProps = ColorInputCbs &
     InteractionControlProps<ColorInputRenderProps> &
-    Pick<ColorInputState, "ariaLabel"> & {
+    Pick<BaseColorInputValues, "ariaLabel"> & {
         /** Identifies the picker, so the field can point at it. */
         popupId: string;
         /** Whether the picker is open. */
@@ -37,7 +36,7 @@ export type ColorInputFieldProps = ColorInputCbs &
 export type ColorInputProps = Omit<InteractionWrapperProps<ColorInputRenderProps>, "renderControl" | "extraFlags"> &
     ColorInputCbs &
     Pick<InteractionControlProps<ColorInputRenderProps>, "id" | "renderContent"> &
-    ColorInputState & {
+    BaseColorInputValues & {
         /**
          * The color, and how to change it. It is the only thing that changes it, and the field writes back in the
          * notation it was handed — a hex stays a hex.

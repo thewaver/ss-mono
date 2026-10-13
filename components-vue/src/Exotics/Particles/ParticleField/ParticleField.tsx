@@ -6,6 +6,7 @@ import {
     ParticleFieldStyles,
     ParticleFieldUtils,
 } from "@thewaver/ss-components";
+import { ParticleFieldConst } from "@thewaver/ss-components/internal";
 import { type Index2d, MathUtils } from "@thewaver/ss-utils";
 
 import { ElementObserverVueUtils } from "../../../Abstracts/ElementObserver/ElementObserverVue.utils";
@@ -14,10 +15,6 @@ import { watchAfterRender } from "../../../Utils/effectUtils";
 import { callSlot, declareProps, useTwoWay } from "../../../Utils/propUtils";
 import type { SlotsContext } from "../../../Utils/typeUtils";
 import type { ParticleFieldProps, ParticleFieldSlots } from "./ParticleField.types";
-
-const NO_PROGRESS = 0;
-const FIRST_ITERATION = 0;
-const NO_WEIGHTS: number[][] = [];
 
 export const ParticleField = defineComponent(
     (props: ParticleFieldProps, { slots }: SlotsContext<ParticleFieldSlots>) => {
@@ -35,8 +32,8 @@ export const ParticleField = defineComponent(
         const isPageHidden = InteractionTrackerVueUtils.usePageHidden();
 
         const isPlaying = useTwoWay(props, "playback", true);
-        const progress = useTwoWay(props, "progress", NO_PROGRESS);
-        const currentIteration = shallowRef(FIRST_ITERATION);
+        const progress = useTwoWay(props, "progress", ParticleFieldConst.NO_PROGRESS);
+        const currentIteration = shallowRef(ParticleFieldConst.FIRST_ITERATION);
 
         const rootSize = ElementObserverVueUtils.useBorderBoxSize(rootRef);
 
@@ -58,7 +55,7 @@ export const ParticleField = defineComponent(
             ParticleFieldUtils.computeCells(
                 cellCount.value,
                 rootSize.value,
-                props.computeCellWeights?.(cellCount.value) ?? NO_WEIGHTS,
+                props.computeCellWeights?.(cellCount.value) ?? ParticleFieldConst.NO_WEIGHTS,
                 contour.value,
             ),
         );
@@ -99,8 +96,8 @@ export const ParticleField = defineComponent(
             if (CellAnimationUtils.getIsSameCount(drawnCount, count)) return;
 
             drawnCount = count;
-            currentIteration.value = FIRST_ITERATION;
-            progress.value = NO_PROGRESS;
+            currentIteration.value = ParticleFieldConst.FIRST_ITERATION;
+            progress.value = ParticleFieldConst.NO_PROGRESS;
         });
 
         const animateBodies = () => {

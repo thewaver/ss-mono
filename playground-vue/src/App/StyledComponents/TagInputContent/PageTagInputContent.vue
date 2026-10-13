@@ -3,7 +3,7 @@ import * as styles from "@thewaver/ss-playground/App/StyledComponents/TagInputCo
 import * as fieldStyles from "@thewaver/ss-playground/App/StyledComponents/TextFieldContent/TextFieldContent.css";
 
 import { useLayerClass } from "../Layer/Layer.context";
-import type { TagInputContentProps } from "./TagInputContent.types";
+import type { TagInputContentProps } from "./TagInputContentVue.types";
 
 defineProps<TagInputContentProps>();
 

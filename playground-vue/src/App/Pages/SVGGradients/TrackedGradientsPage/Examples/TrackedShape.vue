@@ -1,16 +1,16 @@
 <script setup lang="ts">
 import { useId } from "vue";
 
-import { SVGDefsSamples, Shape } from "@thewaver/ss-components-vue";
+import { SVGDefsSampleConfigs, SVGDefsSamples, Shape } from "@thewaver/ss-components-vue";
 import {
     NO_SAMPLE_KEY,
     computeNoSampleDefs,
 } from "@thewaver/ss-playground/App/PageComponents/SampleGroups/SampleGroups.const";
+import { STROKE_THICKNESS } from "@thewaver/ss-playground/App/Pages/SVGGradients/SVGGradients.const";
 import * as styles from "@thewaver/ss-playground/App/Pages/SVGGradients/SVGGradients.css";
 import { ShapeConst, type Size2d } from "@thewaver/ss-utils";
 
-import { STROKE_THICKNESS } from "../../SVGGradients.const";
-import type { TrackedGradientExampleProps } from "../../SVGGradients.types";
+import type { TrackedGradientExampleProps } from "../../SVGGradientsVue.types";
 
 type Props = TrackedGradientExampleProps & {
     boxClass?: string;
@@ -27,7 +27,7 @@ const computePoints = (size: Size2d) => ShapeConst.getDefaultShapePoints("square
 const computeDefs = (size: Size2d, element: HTMLElement | undefined) => {
     if (props.configKey === NO_SAMPLE_KEY) return computeNoSampleDefs(props.colors, props.paintKind);
 
-    return SVGDefsSamples.Gradient.Tracked.toConfig({
+    return SVGDefsSampleConfigs.Gradient.Tracked.toConfig({
         family: props.configKey,
         defs: props.configDefs,
     } as SVGDefsSamples.Gradient.Tracked.Entry).computeSVGDefs(

@@ -8,6 +8,13 @@ import {
     ShapeRevealUtils,
     Toggle,
 } from "@thewaver/ss-components-react";
+import {
+    PAGE_VIEW_OPTIONS,
+    THEME_FIELD_ID,
+    THEME_OPTIONS,
+    VIEWPORT_ANCHOR_OPTIONS,
+} from "@thewaver/ss-playground/App/PageComponents/NavSettings/NavSettings.const";
+import { NO_MOTION_DURATION_MS } from "@thewaver/ss-playground/App/PageComponents/NavSettings/NavSettings.const";
 import { PLAYGROUND_THEMES } from "@thewaver/ss-playground/App/Theme.css";
 
 import {
@@ -20,15 +27,12 @@ import { PageExampleKnobsButton } from "../ExampleKnobs/ExampleKnobs";
 import { PageSelectField } from "../Field/Field";
 import { OWN_FRAMEWORK } from "../FrameworkMenu/FrameworkMenu.const";
 import { PageProp } from "../Prop/Prop";
-import { PAGE_VIEW_OPTIONS, THEME_FIELD_ID, THEME_OPTIONS, VIEWPORT_ANCHOR_OPTIONS } from "./NavSettings.const";
 import type {
     PageNavSettingsChoiceProps,
     PageNavSettingsProps,
     PlaygroundTheme,
     ViewportAnchor,
-} from "./NavSettings.types";
-
-const NO_MOTION_DURATION_MS = 0;
+} from "./NavSettingsReact.types";
 
 const computeViewportAnchorLabel = (anchor: ViewportAnchor) =>
     VIEWPORT_ANCHOR_OPTIONS.find((option) => option.value === anchor)?.label ?? String(anchor);

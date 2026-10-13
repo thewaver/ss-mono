@@ -1,5 +1,6 @@
 <script setup lang="ts">
-import { ShapeKnobs } from "../../Knobs/Shapes.const";
+import { ShapeKnobs } from "@thewaver/ss-playground/App/Knobs/Shapes.const";
+
 import PageExampleKnobs from "../../PageComponents/ExampleKnobs/PageExampleKnobs.vue";
 import TextWrapExample from "./Examples/TextWrap.vue";
 import ShapeGeometryKnobs, { useShapeGeometry } from "./ShapeGeometryKnobs.vue";

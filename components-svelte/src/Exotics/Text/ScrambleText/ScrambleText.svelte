@@ -8,12 +8,11 @@
         ScrambleTextUtils,
         ScrambleTextStyles as styles,
     } from "@thewaver/ss-components";
+    import { ScrambleTextConst } from "@thewaver/ss-components/internal";
 
     import { setLetterDriverContext } from "../../../Abstracts/LetterDriver/LetterDriver.context.js";
     import { readStore } from "../../../Utils/storeUtils.js";
     import type { ScrambleTextController, ScrambleTextProps } from "./ScrambleText.types.js";
-
-    const NO_DELAY = 0;
 
     let props: ScrambleTextProps = $props();
 
@@ -28,7 +27,7 @@
     const glyphSets = $derived(characters.map((character) => Array.from(computeGlyphs(character))));
 
     const settleDurationMs = $derived(props.settleDurationMs ?? SCRAMBLE_TEXT_DEFAULTS.settleDurationMs);
-    const settleDelayMs = $derived(props.settleDelayMs ?? NO_DELAY);
+    const settleDelayMs = $derived(props.settleDelayMs ?? ScrambleTextConst.NO_DELAY);
     const scrambleIntervalMs = $derived(props.scrambleIntervalMs ?? SCRAMBLE_TEXT_DEFAULTS.scrambleIntervalMs);
 
     const settleTimes = $derived(

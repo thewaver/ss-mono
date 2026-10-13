@@ -4,7 +4,7 @@ import { useId } from "vue";
 import * as styles from "@thewaver/ss-playground/App/StyledComponents/CirclePackingContent/CirclePackingContent.css";
 
 import { useLayerClass } from "../Layer/Layer.context";
-import type { PageCirclePackingCircleProps } from "./CirclePackingContent.types";
+import type { PageCirclePackingCircleProps } from "./CirclePackingContentVue.types";
 
 defineProps<PageCirclePackingCircleProps>();
 

@@ -2,17 +2,18 @@
 import { computed, shallowRef } from "vue";
 
 import { Button } from "@thewaver/ss-components-vue";
+import {
+    NOTHING_TO_RESET,
+    SAMPLE_SELECTOR_ALONE,
+} from "@thewaver/ss-playground/App/PageComponents/PropsPanel/PropsPanel.const";
 import * as styles from "@thewaver/ss-playground/App/PageComponents/PropsPanel/PropsPanel.css";
 
 import PageButtonContent from "../../StyledComponents/ButtonContent/ButtonContent.vue";
-import { provideFieldReset } from "../Field/Field.context";
+import { provideFieldReset } from "../Field/FieldVue.context";
 import { useIsPreview } from "../Preview/Preview.context";
 import PageProp from "../Prop/Prop.vue";
 import { providePropsPanelContext } from "./PropsPanel.context";
-import type { PagePropsPanelProps } from "./PropsPanel.types";
-
-const NOTHING_TO_RESET = 0;
-const SAMPLE_SELECTOR_ALONE = 1;
+import type { PagePropsPanelProps } from "./PropsPanelVue.types";
 
 const props = defineProps<PagePropsPanelProps>();
 

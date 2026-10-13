@@ -14,11 +14,12 @@
     import PageProp from "../../PageComponents/Prop/Prop.svelte";
     import PagePropsPanel from "../../PageComponents/PropsPanel/PagePropsPanel.svelte";
     import LibraryExample from "./Examples/Library.svelte";
-
-    const EXAMPLES_ROOT = "/src/App/Pages/CirclePackingPage/Examples";
-
-    const NO_MOTION_DURATION_MS = 0;
-    const WIDE_SPAN = 2;
+    import {
+    EXAMPLE_NAMES,
+    EXAMPLES_ROOT,
+    NO_MOTION_DURATION_MS,
+    WIDE_SPAN,
+} from "@thewaver/ss-playground/App/Pages/CirclePackingPage/CirclePackingPage.const";
 
     let padding = $state(CIRCLE_PACKING_DEFAULTS.padding);
     let zoomDurationMs = $state(CIRCLE_PACKING_DEFAULTS.zoomDurationMs);
@@ -36,7 +37,7 @@
     const examples: ExampleDefs[] = [
         {
             key: "library",
-            name: "This library, by lines of code",
+            name: EXAMPLE_NAMES.library,
             span: WIDE_SPAN,
             readout: () =>
                 `showing ${showing} — press a circle with circles inside it to zoom into it, anywhere else to go back to the top, or Escape to go up one level`,

@@ -1,5 +1,11 @@
 import { createMemo, createSignal } from "solid-js";
 
+import {
+    EXAMPLES_ROOT,
+    EXAMPLE_NAMES,
+    STARTING_RATING,
+} from "@thewaver/ss-playground/App/Pages/RadioPage/RadioPage.const";
+
 import { PageExamples } from "../../PageComponents/Examples/Examples";
 import { ArcExample } from "./Examples/Arc";
 import { DecoratedExample } from "./Examples/Decorated";
@@ -10,10 +16,7 @@ import { RatingExample } from "./Examples/Rating";
 import { ReachableExample } from "./Examples/Reachable";
 import { RightToLeftExample } from "./Examples/RightToLeft";
 import { SegmentedExample } from "./Examples/Segmented";
-import type { SizeValue } from "./RadioPage.types";
-
-const STARTING_RATING = 3;
-const EXAMPLES_ROOT = "/src/App/Pages/RadioPage/Examples";
+import type { SizeValue } from "./RadioPageSolid.types";
 
 export const RadioPage = () => {
     const defaultSignal = createSignal<SizeValue | undefined>(undefined);
@@ -31,14 +34,14 @@ export const RadioPage = () => {
     const getExamples = createMemo(() => [
         {
             key: "default",
-            name: "Default",
+            name: EXAMPLE_NAMES.default,
             readout: () => `value: ${defaultSignal[0]()}`,
             component: () => <DefaultExample value={defaultSignal} />,
             path: `${EXAMPLES_ROOT}/Default.tsx`,
         },
         {
             key: "rightToLeft",
-            name: "In a right-to-left box",
+            name: EXAMPLE_NAMES.rightToLeft,
             readout: () =>
                 `value: ${rightToLeftSignal[0]()} — the box around the radios sets dir="rtl", so they run from the right and the left arrow moves on to the next one, while up and down keep their meaning`,
             component: () => <RightToLeftExample value={rightToLeftSignal} />,
@@ -46,49 +49,49 @@ export const RadioPage = () => {
         },
         {
             key: "segmented",
-            name: "Segmented",
+            name: EXAMPLE_NAMES.segmented,
             readout: () => `value: ${segmentedSignal[0]()}`,
             component: () => <SegmentedExample value={segmentedSignal} />,
             path: `${EXAMPLES_ROOT}/Segmented.tsx`,
         },
         {
             key: "rating",
-            name: "Rating",
+            name: EXAMPLE_NAMES.rating,
             readout: () => `value: ${ratingSignal[0]()}`,
             component: () => <RatingExample value={ratingSignal} hovered={hoveredRatingSignal} />,
             path: `${EXAMPLES_ROOT}/Rating.tsx`,
         },
         {
             key: "arc",
-            name: "Rating, bent into an arc",
+            name: EXAMPLE_NAMES.arc,
             readout: () => `value: ${arcSignal[0]()} — the same radios, placed by a layout instead of laid in a row`,
             component: () => <ArcExample value={arcSignal} hovered={hoveredArcSignal} />,
             path: `${EXAMPLES_ROOT}/Arc.tsx`,
         },
         {
             key: "decorated",
-            name: "Decorated",
+            name: EXAMPLE_NAMES.decorated,
             readout: () => `value: ${decoratedSignal[0]()}`,
             component: () => <DecoratedExample value={decoratedSignal} />,
             path: `${EXAMPLES_ROOT}/Decorated.tsx`,
         },
         {
             key: "disabled",
-            name: "Disabled",
+            name: EXAMPLE_NAMES.disabled,
             readout: () => `value: ${disabledSignal[0]()}`,
             component: () => <DisabledExample value={disabledSignal} />,
             path: `${EXAMPLES_ROOT}/Disabled.tsx`,
         },
         {
             key: "reachable",
-            name: "Disabled + reachable",
+            name: EXAMPLE_NAMES.reachable,
             readout: () => `value: ${reachableSignal[0]()}`,
             component: () => <ReachableExample value={reachableSignal} />,
             path: `${EXAMPLES_ROOT}/Reachable.tsx`,
         },
         {
             key: "errored",
-            name: "Error",
+            name: EXAMPLE_NAMES.errored,
             readout: () => `value: ${erroredSignal[0]()}`,
             component: () => <ErroredExample value={erroredSignal} />,
             path: `${EXAMPLES_ROOT}/Errored.tsx`,

@@ -4,7 +4,7 @@
 
     import PageLayer from "../../../../PageComponents/Layer/Layer.svelte";
     import PageMenuTriggerContent from "../../../../StyledComponents/MenuTriggerContent/MenuTriggerContent.svelte";
-    import type { FanMenuExampleProps } from "../FanMenuPage.types";
+    import type { FanMenuExampleProps } from "../FanMenuPageSvelte.types";
 
     const BACK_MARK = "‹";
     const SUBMENU_MARK = "›";

@@ -1,6 +1,12 @@
 <script setup lang="ts">
 import { shallowRef } from "vue";
 
+import {
+    EXAMPLES_ROOT,
+    EXAMPLE_NAMES,
+    STARTING_RATING,
+} from "@thewaver/ss-playground/App/Pages/RadioPage/RadioPage.const";
+
 import type { ExampleDefs } from "../../PageComponents/Examples/Examples.types";
 import PageExamples from "../../PageComponents/Examples/PageExamples.vue";
 import ArcExample from "./Examples/Arc.vue";
@@ -12,10 +18,7 @@ import RatingExample from "./Examples/Rating.vue";
 import ReachableExample from "./Examples/Reachable.vue";
 import RightToLeftExample from "./Examples/RightToLeft.vue";
 import SegmentedExample from "./Examples/Segmented.vue";
-import type { SizeValue } from "./RadioPage.types";
-
-const STARTING_RATING = 3;
-const EXAMPLES_ROOT = "/src/App/Pages/RadioPage/Examples";
+import type { SizeValue } from "./RadioPageVue.types";
 
 const defaultValue = shallowRef<SizeValue | undefined>(undefined);
 const rightToLeftValue = shallowRef<SizeValue | undefined>(undefined);
@@ -32,56 +35,56 @@ const erroredValue = shallowRef<SizeValue | undefined>(undefined);
 const examples: ExampleDefs[] = [
     {
         key: "default",
-        name: "Default",
+        name: EXAMPLE_NAMES.default,
         readout: () => `value: ${defaultValue.value}`,
         path: `${EXAMPLES_ROOT}/Default.vue`,
     },
     {
         key: "rightToLeft",
-        name: "In a right-to-left box",
+        name: EXAMPLE_NAMES.rightToLeft,
         readout: () =>
             `value: ${rightToLeftValue.value} — the box around the radios sets dir="rtl", so they run from the right and the left arrow moves on to the next one, while up and down keep their meaning`,
         path: `${EXAMPLES_ROOT}/RightToLeft.vue`,
     },
     {
         key: "segmented",
-        name: "Segmented",
+        name: EXAMPLE_NAMES.segmented,
         readout: () => `value: ${segmentedValue.value}`,
         path: `${EXAMPLES_ROOT}/Segmented.vue`,
     },
     {
         key: "rating",
-        name: "Rating",
+        name: EXAMPLE_NAMES.rating,
         readout: () => `value: ${ratingValue.value}`,
         path: `${EXAMPLES_ROOT}/Rating.vue`,
     },
     {
         key: "arc",
-        name: "Rating, bent into an arc",
+        name: EXAMPLE_NAMES.arc,
         readout: () => `value: ${arcValue.value} — the same radios, placed by a layout instead of laid in a row`,
         path: `${EXAMPLES_ROOT}/Arc.vue`,
     },
     {
         key: "decorated",
-        name: "Decorated",
+        name: EXAMPLE_NAMES.decorated,
         readout: () => `value: ${decoratedValue.value}`,
         path: `${EXAMPLES_ROOT}/Decorated.vue`,
     },
     {
         key: "disabled",
-        name: "Disabled",
+        name: EXAMPLE_NAMES.disabled,
         readout: () => `value: ${disabledValue.value}`,
         path: `${EXAMPLES_ROOT}/Disabled.vue`,
     },
     {
         key: "reachable",
-        name: "Disabled + reachable",
+        name: EXAMPLE_NAMES.reachable,
         readout: () => `value: ${reachableValue.value}`,
         path: `${EXAMPLES_ROOT}/Reachable.vue`,
     },
     {
         key: "errored",
-        name: "Error",
+        name: EXAMPLE_NAMES.errored,
         readout: () => `value: ${erroredValue.value}`,
         path: `${EXAMPLES_ROOT}/Errored.vue`,
     },

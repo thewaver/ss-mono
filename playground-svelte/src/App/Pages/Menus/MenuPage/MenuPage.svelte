@@ -23,9 +23,8 @@
         ZOOM_STEPS,
         ZOOM_STEP_PERCENT,
     } from "./MenuPage.const.svelte";
-    import type { Action } from "./MenuPage.types";
-
-    const EXAMPLES_ROOT = "/src/App/Pages/Menus/MenuPage/Examples";
+    import type { Action } from "./MenuPageSvelte.types";
+    import { EXAMPLE_NAMES, EXAMPLES_ROOT } from "@thewaver/ss-playground/App/Pages/Menus/MenuPage/MenuPage.const";
 
     let lastAction = $state(NOTHING_RUN);
     let lastDisabledAction = $state(NOTHING_RUN);
@@ -55,14 +54,14 @@
     const examples: ExampleDefs[] = [
         {
             key: "default",
-            name: "Default",
+            name: EXAMPLE_NAMES.default,
             readout: () => `${lastAction} — activating an item closes the menu`,
             component: defaultExample,
             path: `${EXAMPLES_ROOT}/Default.svelte`,
         },
         {
             key: "glide",
-            name: "A gliding highlight",
+            name: EXAMPLE_NAMES.glide,
             readout: () =>
                 `${lastGlideAction} — the items paint no highlight of their own; one marker glides to whichever item the pointer or the arrows are on`,
             component: glideExample,
@@ -70,7 +69,7 @@
         },
         {
             key: "driven",
-            name: "Driven from outside",
+            name: EXAMPLE_NAMES.driven,
             readout: () =>
                 `${lastDrivenAction} — the menu is ${drivenVisibility ? "open" : "closed"}, and it is anchored to the toggle rather than to its own trigger`,
             component: drivenExample,
@@ -78,7 +77,7 @@
         },
         {
             key: "context",
-            name: "Opened by a right-click",
+            name: EXAMPLE_NAMES.context,
             readout: () =>
                 `${lastContextAction} — the menu opens where the pointer was, and there is no trigger button anywhere`,
             component: contextExample,
@@ -86,7 +85,7 @@
         },
         {
             key: "staysOpen",
-            name: "Commands worth repeating",
+            name: EXAMPLE_NAMES.staysOpen,
             readout: () =>
                 `zoom: ${zoomPercent}% — Zoom in and Zoom out leave the menu open so they can be pressed again, and Reset zoom closes it`,
             component: staysOpenExample,
@@ -94,28 +93,28 @@
         },
         {
             key: "disabledItems",
-            name: "Disabled items",
+            name: EXAMPLE_NAMES.disabledItems,
             readout: () => `${lastDisabledAction} — arrows skip Paste and Duplicate`,
             component: disabledItemsExample,
             path: `${EXAMPLES_ROOT}/Default.svelte`,
         },
         {
             key: "disabledItemsReachable",
-            name: "Disabled items + reachable",
+            name: EXAMPLE_NAMES.disabledItemsReachable,
             readout: () => `${lastReachableAction} — arrows stop on Paste, hover explains why`,
             component: disabledItemsReachableExample,
             path: `${EXAMPLES_ROOT}/Default.svelte`,
         },
         {
             key: "submenus",
-            name: "Submenus",
+            name: EXAMPLE_NAMES.submenus,
             readout: () => `${lastNestedAction} — ArrowRight steps in, ArrowLeft steps back out`,
             component: submenusExample,
             path: `${EXAMPLES_ROOT}/Submenus.svelte`,
         },
         {
             key: "cascader",
-            name: "Cascader",
+            name: EXAMPLE_NAMES.cascader,
             readout: () =>
                 `path: [${cascaderPath.join(", ")}] — the trigger shows the path picked so far, and only a leaf writes it; a branch just opens the next level`,
             component: cascaderExample,
@@ -123,7 +122,7 @@
         },
         {
             key: "rightToLeft",
-            name: "Submenus in a right-to-left box",
+            name: EXAMPLE_NAMES.rightToLeft,
             readout: () =>
                 `${lastRightToLeftAction} — the box around the trigger sets dir="rtl", so a submenu opens on the left, ArrowLeft steps in and ArrowRight steps back out`,
             component: rightToLeftExample,
@@ -131,35 +130,35 @@
         },
         {
             key: "placedAbove",
-            name: "Placed above",
+            name: EXAMPLE_NAMES.placedAbove,
             readout: () => `${lastFlippedAction} — the surface flips its own transform`,
             component: placedAboveExample,
             path: `${EXAMPLES_ROOT}/PlacedAbove.svelte`,
         },
         {
             key: "scrollingList",
-            name: "Scrolling list",
+            name: EXAMPLE_NAMES.scrollingList,
             readout: () => `${lastLayerAction} — Home and End reach both ends`,
             component: scrollingListExample,
             path: `${EXAMPLES_ROOT}/Default.svelte`,
         },
         {
             key: "stateful",
-            name: "Rows that hold a state",
+            name: EXAMPLE_NAMES.stateful,
             readout: () => `${lastViewAction} — ticked: [${viewChecked.map((action) => action.name).join(", ")}]`,
             component: statefulExample,
             path: `${EXAMPLES_ROOT}/Stateful.svelte`,
         },
         {
             key: "disabled",
-            name: "Disabled",
+            name: EXAMPLE_NAMES.disabled,
             readout: () => "the trigger neither opens nor takes focus",
             component: disabledExample,
             path: `${EXAMPLES_ROOT}/Disabled.svelte`,
         },
         {
             key: "reachable",
-            name: "Disabled + reachable",
+            name: EXAMPLE_NAMES.reachable,
             readout: () => "focusable so the tooltip can be read, but the menu must not open",
             component: reachableExample,
             path: `${EXAMPLES_ROOT}/Reachable.svelte`,

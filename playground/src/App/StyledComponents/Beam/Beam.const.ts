@@ -38,3 +38,5 @@ export const observeBeamLength = (path: SVGPathElement, onLengthPx: (lengthPx: n
 
     return () => observer.disconnect();
 };
+
+export const NO_LENGTH = 0;

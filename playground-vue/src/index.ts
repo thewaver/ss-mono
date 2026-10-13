@@ -2,6 +2,7 @@ import { createApp } from "vue";
 import type { RouteRecordRaw } from "vue-router";
 import { createRouter, createWebHistory } from "vue-router";
 
+import { MENU_DESCRIPTIONS } from "@thewaver/ss-playground/App/MenuDescriptions.const";
 import { toPageViewRoute } from "@thewaver/ss-playground/App/PageComponents/ViewTabs/ViewTabs.const";
 import { PLAYGROUND_THEMES } from "@thewaver/ss-playground/App/Theme.css";
 
@@ -19,7 +20,7 @@ const PAGE_ROUTES: RouteRecordRaw[] = AppUtils.COMPONENT_CONFIGS.flatMap((config
         {
             path: toPageViewRoute(route, "docs"),
             component: () => import("./App/PageComponents/DocsView/PageDocsView.vue"),
-            props: { name: config.name, description: config.description },
+            props: { name: config.name, description: MENU_DESCRIPTIONS[config.name] },
         },
     ];
 });

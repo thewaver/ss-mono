@@ -16,8 +16,8 @@ import {
     PageSortableMarker,
     PageSortableSurface,
 } from "../../../StyledComponents/SortableContent/SortableContent";
-import { applyStep } from "../SVGFiltersPage.const";
 import type { SVGFiltersStackExampleProps } from "../SVGFiltersPage.types";
+import { applyStep } from "../SVGFiltersPageReact.const";
 
 const FILTER_ID = "svgFiltersStack";
 const GROUP_ID = "svgFiltersSteps";

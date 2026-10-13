@@ -19,7 +19,7 @@
     import PageLayer from "../../../PageComponents/Layer/Layer.svelte";
     import PageNavMenuTrigger from "../../../StyledComponents/NavMenuContent/NavMenuContent.svelte";
     import PagePopoverSurface from "../../../StyledComponents/PopoverSurface/PopoverSurface.svelte";
-    import type { NavFlyoutProps } from "../HoverCardPage.types";
+    import type { NavFlyoutProps } from "../HoverCardPageSvelte.types";
 
     const FLYOUT_PLACEMENT: AnchorPlacement = { x: "left_in", y: "bottom_out" };
     const FLYOUT_OFFSET = { x: 0, y: 6 };

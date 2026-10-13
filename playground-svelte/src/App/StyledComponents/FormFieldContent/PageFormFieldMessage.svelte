@@ -4,7 +4,7 @@
     import * as styles from "@thewaver/ss-playground/App/StyledComponents/FormFieldContent/FormFieldContent.css";
 
     import { getLayerClass } from "../Layer/Layer.context";
-    import type { FormFieldMessageProps } from "./FormFieldContent.types";
+    import type { FormFieldMessageProps } from "./FormFieldContentSvelte.types";
 
     let props: FormFieldMessageProps & { children?: Snippet } = $props();
 

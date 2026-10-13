@@ -7,6 +7,7 @@ import {
     SVGDefsUtils,
     TrackedGradientDefaults,
 } from "@thewaver/ss-components";
+import { PixelTrailConst, TrackedGradientSampleConst } from "@thewaver/ss-components/internal";
 import type { Index2d, Point2d, Size2d } from "@thewaver/ss-utils";
 
 import { PointerTrackerSolidUtils } from "../../../../Abstracts/PointerTracker/PointerTrackerSolid.utils";
@@ -19,16 +20,14 @@ type PixelTrailStamp = Index2d & {
     bornMs: number;
 };
 
-const STAMP_COUNT = 48;
-const GRACE_MS = 100;
-const NO_FADE = 0;
-const EMPTY_STAMPS: (PixelTrailStamp | undefined)[] = Array.from({ length: STAMP_COUNT }, () => undefined);
-
-const CYCLING_DEFAULTS = TrackedGradientDefaults.PIXEL_TRAIL_CYCLING_DEFAULTS;
+const EMPTY_STAMPS: (PixelTrailStamp | undefined)[] = Array.from(
+    { length: PixelTrailConst.STAMP_COUNT },
+    () => undefined,
+);
 
 const NO_REF = () => undefined;
 
-const clock = SVGDefsSolidUtils.createClock(GRACE_MS);
+const clock = SVGDefsSolidUtils.createClock(PixelTrailConst.GRACE_MS);
 
 const getIsInside = (ratio: Point2d) => ratio.x >= 0 && ratio.x <= 1 && ratio.y >= 0 && ratio.y <= 1;
 
@@ -51,7 +50,8 @@ const createPixelTrail = (
         const reading = getReading();
         const size = getSize();
         const isLaying =
-            getIsInside(reading.boxRatio) && SVGDefsUtils.getPointerFade(reading, getIsPointerPresent()) > NO_FADE;
+            getIsInside(reading.boxRatio) &&
+            SVGDefsUtils.getPointerFade(reading, getIsPointerPresent()) > TrackedGradientSampleConst.NO_FADE;
         const point = { x: reading.boxRatio.x * size.width, y: reading.boxRatio.y * size.height };
         const laid = isLaying ? SVGDefsUtils.computePixelTrailCells(lastPoint, point, squareSize) : [];
 
@@ -67,7 +67,7 @@ const createPixelTrail = (
 
         for (const cell of laid) {
             next[nextSlot] = { ...cell, bornMs: nowMs };
-            nextSlot = (nextSlot + 1) % STAMP_COUNT;
+            nextSlot = (nextSlot + 1) % PixelTrailConst.STAMP_COUNT;
         }
 
         setStamps(next);
@@ -85,8 +85,8 @@ export const createPixelTrailSample =
             const squareSize = opts?.squareSize ?? defaults.squareSize;
             const squareAlpha = opts?.squareAlpha ?? defaults.squareAlpha;
             const trailMs = opts?.trailMs ?? defaults.trailMs;
-            const cycleMs = opts?.cycleMs ?? CYCLING_DEFAULTS.cycleMs;
-            const ageColorSpan = opts?.ageColorSpan ?? CYCLING_DEFAULTS.ageColorSpan;
+            const cycleMs = opts?.cycleMs ?? PixelTrailConst.CYCLING_DEFAULTS.cycleMs;
+            const ageColorSpan = opts?.ageColorSpan ?? PixelTrailConst.CYCLING_DEFAULTS.ageColorSpan;
 
             const { getReading, getIsPointerPresent } = PointerTrackerSolidUtils.create(
                 getRef ?? NO_REF,
@@ -133,7 +133,7 @@ export const createPixelTrailSample =
 
             return [
                 { color: SVGDefsUtils.getBaseBorderColor(defs) },
-                ...Array.from({ length: STAMP_COUNT }, (_unused, index) => ({
+                ...Array.from({ length: PixelTrailConst.STAMP_COUNT }, (_unused, index) => ({
                     gradientOrPattern: {
                         id: `gradient${index + 1}-${id}`,
                         renderDefsElement: () =>

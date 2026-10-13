@@ -1,8 +1,8 @@
 <script setup lang="ts">
-import PagePaginatorWedge from "./PagePaginatorWedge.vue";
-import type { PaginatorDialGapContentProps } from "./PaginatorContent.types";
+import { GAP_MARK } from "@thewaver/ss-playground/App/StyledComponents/PaginatorContent/PaginatorContent.const";
 
-const GAP_MARK = "…";
+import PagePaginatorWedge from "./PagePaginatorWedge.vue";
+import type { PaginatorDialGapContentProps } from "./PaginatorContentVue.types";
 
 defineProps<PaginatorDialGapContentProps>();
 </script>

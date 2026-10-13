@@ -12,10 +12,11 @@
     import BadgeExample from "./Examples/Badge.svelte";
     import CardExample from "./Examples/Card.svelte";
     import type { ShadowCasterExampleProps } from "./ShadowCasterPageSvelte.types";
-
-    const EXAMPLES_ROOT = "/src/App/Pages/PointerEffects/ShadowCasterPage/Examples";
-
-    const FIELD_WIDTH = 110;
+    import {
+    EXAMPLE_NAMES,
+    EXAMPLES_ROOT,
+    FIELD_WIDTH,
+} from "@thewaver/ss-playground/App/Pages/PointerEffects/ShadowCasterPage/ShadowCasterPage.const";
 
     let isDisabled = $state(ShadowCasterKnobs.STARTING_IS_DISABLED);
     let smoothingMs = $state(SHADOW_CASTER_DEFAULTS.smoothingMs);
@@ -46,7 +47,7 @@
     const examples: ExampleDefs[] = [
         {
             key: "card",
-            name: "Card",
+            name: EXAMPLE_NAMES.card,
             readout: () =>
                 "the shadow is thrown away from the pointer, and lengthens and softens as the pointer retreats",
             component: cardExample,
@@ -54,7 +55,7 @@
         },
         {
             key: "badge",
-            name: "Cut shape",
+            name: EXAMPLE_NAMES.badge,
             readout: () =>
                 "the same wrapper over a clipped star — the shadow traces the shape rather than the box around it",
             component: badgeExample,

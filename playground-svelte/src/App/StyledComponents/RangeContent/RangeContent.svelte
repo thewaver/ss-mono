@@ -3,9 +3,10 @@
     import * as styles from "@thewaver/ss-playground/App/StyledComponents/RangeContent/RangeContent.css";
 
     import { getLayerClass } from "../Layer/Layer.context";
-    import type { RangeContentProps } from "./RangeContent.types";
-
-    const DEFAULT_RANGE_CONTENT_LENGTH = styles.RANGE_LENGTH;
+    import type { RangeContentProps } from "./RangeContentSvelte.types";
+    import {
+        DEFAULT_RANGE_CONTENT_LENGTH,
+    } from "@thewaver/ss-playground/App/StyledComponents/RangeContent/RangeContent.const";
 
     const travel = (ratio: number) => `calc(${ratio} * (100% - ${styles.RANGE_THUMB_SIZE}px))`;
 

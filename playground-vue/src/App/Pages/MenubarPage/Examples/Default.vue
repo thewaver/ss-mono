@@ -6,8 +6,8 @@ import { POPOVER_SURFACE_INSET } from "@thewaver/ss-playground/App/StyledCompone
 
 import PageMenuTriggerContent from "../../../StyledComponents/MenuTriggerContent/MenuTriggerContent.vue";
 import MenubarItem from "../MenubarItem.vue";
-import { WORDS } from "../MenubarPage.const";
 import type { MenubarExampleProps } from "../MenubarPage.types";
+import { WORDS } from "../MenubarPageVue.const";
 import MenubarPopup from "../MenubarPopup.vue";
 
 type Props = MenubarExampleProps;

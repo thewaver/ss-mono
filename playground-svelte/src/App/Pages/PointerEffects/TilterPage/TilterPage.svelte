@@ -12,11 +12,12 @@
     import CardExample from "./Examples/Card.svelte";
     import PhotoExample from "./Examples/Photo.svelte";
     import type { TilterExampleProps } from "./TilterPageSvelte.types";
-
-    const EXAMPLES_ROOT = "/src/App/Pages/PointerEffects/TilterPage/Examples";
-
-    const FIELD_WIDTH = 110;
-    const BOX_HEIGHT = 240;
+    import {
+    BOX_HEIGHT,
+    EXAMPLE_NAMES,
+    EXAMPLES_ROOT,
+    FIELD_WIDTH,
+} from "@thewaver/ss-playground/App/Pages/PointerEffects/TilterPage/TilterPage.const";
 
     let isDisabled = $state(TilterKnobs.STARTING_IS_DISABLED);
     let smoothingMs = $state(TILTER_DEFAULTS.smoothingMs);
@@ -41,7 +42,7 @@
     const examples: ExampleDefs[] = [
         {
             key: "card",
-            name: "Card with a sheen",
+            name: EXAMPLE_NAMES.card,
             readout: () =>
                 "the surface leans away from the pointer and the highlight runs the other way, which is what reads as a reflection",
             component: cardExample,
@@ -49,7 +50,7 @@
         },
         {
             key: "photo",
-            name: "Picture, no sheen",
+            name: EXAMPLE_NAMES.photo,
             readout: () => "the same wrapper with the sheen slot left out — nothing is painted over the content",
             component: photoExample,
             path: `${EXAMPLES_ROOT}/Photo.svelte`,

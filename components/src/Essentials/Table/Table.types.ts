@@ -111,3 +111,45 @@ export type TableKeyCommand =
     | { kind: "move_column"; to: number }
     | { kind: "activate_row"; rowIndex: number }
     | { kind: "pick_row"; rowIndex: number; gesture: SelectionGesture };
+
+export type BaseTableValues<T> = {
+    /**
+     * Names the table for assistive technology. It is required because nothing else can name it, and a page with two
+     * unnamed grids gives a reader no way to tell them apart.
+     */
+    ariaLabel: string;
+    /** Whether rows cannot be selected, one can be, or many can be. */
+    selectionMode?: TableSelectionMode;
+    /** How far one press of an arrow key resizes a column, for resizing without a pointer. */
+    resizeStepPx?: number;
+    /** How many rows Page Up and Page Down move by. */
+    pageRows?: number;
+    /**
+     * How wide the grab area between two columns is. It is a hit target rather than a visible width, so it can be wider
+     * than the line that is drawn.
+     */
+    resizerWidthPx?: number;
+    /** Turns the table off, so nothing in it sorts, resizes, reorders or selects. */
+    isDisabled?: boolean;
+    /** The rows, in the order they are shown. */
+    rows: T[];
+};
+
+export type BaseTableCbs<T> = {
+    /**
+     * Guesses how tall a row will be before it is drawn, which is what lets a long table render only what is on screen.
+     */
+    computeEstimatedRowHeight?: (index: number) => number;
+    /** Runs when the reader sorts by a different column, or reverses the one it is sorted by. */
+    onSortChange?: (sort: TableSort | undefined) => void;
+    /** Runs when the reader moves a column. */
+    onOrderChange?: (order: string[]) => void;
+    /** Names one row for assistive technology, so a reader hears what the row is rather than its number. */
+    computeRowAriaLabel?: (row: T, index: number) => string;
+    /** Runs when a row is activated, by pointer or by key. */
+    onRowActivate?: (row: T, index: number) => void;
+    /** Runs when the selection changes. */
+    onSelectionChange?: (rows: T[]) => void;
+};
+
+export type BaseTableProps<T> = BaseTableValues<T> & BaseTableCbs<T>;

@@ -7,7 +7,7 @@
     import PageSelectField from "../../PageComponents/Field/PageSelectField.svelte";
     import PageProp from "../../PageComponents/Prop/Prop.svelte";
     import PagePropsPanel from "../../PageComponents/PropsPanel/PagePropsPanel.svelte";
-    import type { MosaicsControls } from "./Mosaics.types";
+    import type { MosaicsControls } from "./MosaicsSvelte.types";
 
     type Props = {
         controls: MosaicsControls;

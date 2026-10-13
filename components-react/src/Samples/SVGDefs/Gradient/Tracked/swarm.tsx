@@ -7,6 +7,7 @@ import {
     TrackedGradientDefaults,
     type TrackedGradientElementDefs,
 } from "@thewaver/ss-components";
+import { SwarmConst, TrackedGradientSampleConst } from "@thewaver/ss-components/internal";
 import { MathUtils, type Point2d } from "@thewaver/ss-utils";
 
 import { PointerTrackerReactUtils } from "../../../../Abstracts/PointerTracker/PointerTrackerReact.utils";
@@ -29,16 +30,7 @@ type TracersProps = {
     opts?: GradientSwarmSampleOpts;
 };
 
-const SETTLE_MS = 1500;
-const RESTING_POINT: Point2d = { x: 0.5, y: 0.5 };
-const STILL: Point2d = { x: 0, y: 0 };
-const NO_FADE = 0;
-
-const CYCLING_DEFAULTS = TrackedGradientDefaults.SWARM_CYCLING_DEFAULTS;
-
-const RENDERED_ELSEWHERE = () => undefined;
-
-const clock = SVGDefsUtils.createClock(SETTLE_MS);
+const clock = SVGDefsUtils.createClock(SwarmConst.SETTLE_MS);
 
 const getGradientId = (id: string, tracer: number, index: number) => `gradient-${tracer}-${index}-${id}`;
 
@@ -64,8 +56,8 @@ const Tracers = (props: TracersProps) => {
     const wanderMs = props.opts?.wanderMs ?? props.defaults.wanderMs;
 
     const [motion] = useState<SwarmMotion>(() => ({
-        chains: Array.from({ length: count }, () => Array.from({ length }, () => RESTING_POINT)),
-        velocities: Array.from({ length: count }, () => STILL),
+        chains: Array.from({ length: count }, () => Array.from({ length }, () => SwarmConst.RESTING_POINT)),
+        velocities: Array.from({ length: count }, () => SwarmConst.STILL),
         lastMs: undefined,
     }));
 
@@ -74,7 +66,8 @@ const Tracers = (props: TracersProps) => {
 
         motion.lastMs = frameMs;
 
-        if (SVGDefsUtils.getPointerFade(reading, isPointerPresent) > NO_FADE) clock.keepAwake();
+        if (SVGDefsUtils.getPointerFade(reading, isPointerPresent) > TrackedGradientSampleConst.NO_FADE)
+            clock.keepAwake();
 
         if (elapsedMs <= 0) return;
 
@@ -103,7 +96,7 @@ const Tracers = (props: TracersProps) => {
     }, [frameMs, reading, isPointerPresent]);
 
     const fade = SVGDefsUtils.getPointerFade(reading, isPointerPresent);
-    const cycleMs = props.opts?.cycles ? (props.opts.cycleMs ?? CYCLING_DEFAULTS.cycleMs) : undefined;
+    const cycleMs = props.opts?.cycles ? (props.opts.cycleMs ?? SwarmConst.CYCLING_DEFAULTS.cycleMs) : undefined;
     const elementSize = (props.opts?.circular ?? props.defaults.circular) ? props.defs.getSize() : undefined;
     const spotAlpha = props.opts?.spotAlpha ?? props.defaults.spotAlpha;
     const spotScale = props.opts?.spotScale ?? props.defaults.spotScale;
@@ -173,7 +166,7 @@ export const createSwarmSample =
                                           opts={opts}
                                       />
                                   )
-                                : RENDERED_ELSEWHERE,
+                                : TrackedGradientSampleConst.RENDERED_ELSEWHERE,
                         },
                         filter: isFirst ? sharedBlur : sharedBlurRef,
                     };

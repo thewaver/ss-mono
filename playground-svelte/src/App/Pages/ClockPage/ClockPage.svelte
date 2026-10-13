@@ -10,8 +10,7 @@
     import type { ExampleDefs } from "../../PageComponents/Examples/Examples.types";
     import PageExamples from "../../PageComponents/Examples/PageExamples.svelte";
     import DefaultExample from "./Examples/Default.svelte";
-
-    const EXAMPLES_ROOT = "/src/App/Pages/ClockPage/Examples";
+    import { EXAMPLE_NAMES, EXAMPLES_ROOT } from "@thewaver/ss-playground/App/Pages/ClockPage/ClockPage.const";
 
     const describeTime = (value: TimeValue | undefined) => (value ? TimeUtils.toIso(value) : "none");
 
@@ -22,7 +21,7 @@
     const examples: ExampleDefs[] = [
         {
             key: "default",
-            name: "One column per unit",
+            name: EXAMPLE_NAMES.default,
             readout: () =>
                 `value: ${describeTime(defaultValue)} — picking an hour and picking a minute are two independent choices, so no column has to list every time of day`,
             component: defaultExample,
@@ -30,7 +29,7 @@
         },
         {
             key: "twelve",
-            name: "Twelve hour",
+            name: EXAMPLE_NAMES.twelve,
             readout: () =>
                 `value: ${describeTime(twelveHourValue)} — am and pm become a column of their own, and the value stays 24-hour`,
             component: twelveExample,
@@ -38,7 +37,7 @@
         },
         {
             key: "bounded",
-            name: "Coarser, and bounded",
+            name: EXAMPLE_NAMES.bounded,
             readout: () =>
                 `value: ${describeTime(boundedValue)} — quarter hours only, inside ${TimeUtils.toIso(OPENING_TIME)} to ${TimeUtils.toIso(CLOSING_TIME)}`,
             component: boundedExample,

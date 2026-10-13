@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { computed, shallowRef, useModel } from "vue";
 
+import { IMAGE_CONTAINER_SIZE } from "@thewaver/ss-playground/App/Pages/CellAnimationPage/CellAnimationPage.const";
 import * as styles from "@thewaver/ss-playground/App/Pages/CellAnimationPage/CellAnimationPage.css";
 import knight_profile from "@thewaver/ss-playground/App/knight_profile.webp";
 
@@ -11,8 +12,6 @@ import PagePlaybackScrubber from "../../PageComponents/PlaybackScrubber/Playback
 import PageProp from "../../PageComponents/Prop/Prop.vue";
 import type { CellAnimationExampleProps } from "./CellAnimationPage.types";
 import DefaultExample from "./Examples/Default.vue";
-
-const IMAGE_CONTAINER_SIZE = 480;
 
 type Props = CellAnimationExampleProps & {
     "progress": number;

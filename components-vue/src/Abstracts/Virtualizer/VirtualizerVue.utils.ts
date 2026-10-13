@@ -20,16 +20,13 @@ import {
     observeElementOffset,
 } from "@tanstack/virtual-core";
 import { type VirtualizerRow, VirtualizerUtils } from "@thewaver/ss-components";
+import { VirtualizerConst } from "@thewaver/ss-components/internal";
 
 import { watchAfterRender } from "../../Utils/effectUtils";
 import { toElement } from "../../Utils/refUtils";
 
 /** No pinned rows. */
-const NO_PINNED_ROWS: number[] = [];
-
 /** No rows to draw, shared so a disabled window does not hand out a new list each time. */
-const NO_ROWS: VirtualizerRow[] = [];
-
 /**
  * The Vue side of `VirtualizerUtils`: drawing only the rows of a long list that are on screen, over TanStack's
  * framework-free `virtual-core`.
@@ -117,7 +114,7 @@ export namespace VirtualizerVueUtils {
         });
 
         const computeOptions = (): VirtualizerOptions<HTMLElement, HTMLElement> => {
-            const pinnedRows = toValue(opts.pinnedRows) ?? NO_PINNED_ROWS;
+            const pinnedRows = toValue(opts.pinnedRows) ?? VirtualizerConst.NO_PINNED_ROWS;
 
             return {
                 count: toValue(count),
@@ -175,7 +172,7 @@ export namespace VirtualizerVueUtils {
 
         return {
             isLive: computed(() => !getIsDisabled() && isFollowing.value),
-            rows: computed(() => (getIsDisabled() ? NO_ROWS : rows.value)),
+            rows: computed(() => (getIsDisabled() ? VirtualizerConst.NO_ROWS : rows.value)),
             totalSize: computed(() => (getIsDisabled() ? 0 : totalSize.value)),
             getRowStart: (row: VirtualizerRow) => row.start - scrollMargin.value,
             measureRow: (index: number) => (target: Element | ComponentPublicInstance | null) => {

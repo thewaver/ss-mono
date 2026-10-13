@@ -1,6 +1,6 @@
 import { RIGHT_TO_LEFT_TABS } from "@thewaver/ss-playground/App/Pages/TabsPage/TabsPage.const";
 
-import type { TabsExampleProps } from "../TabsPage.types";
+import type { TabsExampleProps } from "../TabsPageSolid.types";
 import { RowExample } from "./Row";
 
 type Props = TabsExampleProps;

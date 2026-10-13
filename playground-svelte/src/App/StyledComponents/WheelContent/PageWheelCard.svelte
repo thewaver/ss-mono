@@ -4,7 +4,7 @@
     import * as styles from "@thewaver/ss-playground/App/StyledComponents/WheelContent/WheelContent.css";
 
     import { getLayerClass } from "../Layer/Layer.context";
-    import type { PageWheelCardProps } from "./WheelContent.types";
+    import type { PageWheelCardProps } from "./WheelContentSvelte.types";
 
     let props: PageWheelCardProps & { children?: Snippet } = $props();
 

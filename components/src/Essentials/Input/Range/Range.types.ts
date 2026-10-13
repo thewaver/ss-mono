@@ -27,7 +27,7 @@ export type RangeThumbsDefs = {
     getValues: () => number[];
     getScale: () => RangeScale;
     getIsDisabled: () => boolean;
-    getComputeValueAtPoint: () => RangeState["computeValueAtPoint"];
+    getComputeValueAtPoint: () => BaseRangeCbs["computeValueAtPoint"];
     getElement: (index: number) => HTMLElement | undefined;
     setValue: (index: number, value: number) => void;
     setActiveThumb: (index: number) => void;
@@ -50,8 +50,8 @@ export type RangeRenderProps = {
     focusVisibleThumb?: number;
 };
 
-export type RangeCbs = {
-    /** Runs as the thumbs move. */
+export type BaseRangeCbs = {
+    /** Runs as the thumbs move, with every thumb's value. */
     onInput?: (values: number[]) => void;
     /**
      * Runs once a change is finished: when a drag lets go, and after every key press, since each press is a whole
@@ -59,19 +59,6 @@ export type RangeCbs = {
      * that meets an end of the track, changed nothing and reports nothing.
      */
     onChangeEnd?: (values: number[]) => void;
-    /** Runs when the pointer arrives over the track. */
-    onMouseEnter?: (e: MouseEvent) => void;
-    /** Runs when the pointer leaves the track. */
-    onMouseLeave?: (e: MouseEvent) => void;
-};
-
-export type RangeState = {
-    /** The field's name when it is submitted as part of a form. A range with two ends submits them as `<name>-start` and `<name>-end`. */
-    name?: string;
-    /** Names the range for assistive technology. */
-    ariaLabel?: string;
-    /** Names each thumb separately, for a range whose ends mean different things. */
-    thumbLabels?: string[];
     /**
      * What a thumb's value should be read out as, where the bare number would not mean anything — a price rather
      * than a figure, a weekday rather than its index. It is handed the value and which thumb holds it, counted from
@@ -91,6 +78,22 @@ export type RangeState = {
      * `RangeUtils.computeAngularValue` is the formula for a knob.
      */
     computeValueAtPoint?: (point: Point2d, rect: DOMRect) => number;
+};
+
+export type RangeCbs = BaseRangeCbs & {
+    /** Runs when the pointer arrives over the track. */
+    onMouseEnter?: (e: MouseEvent) => void;
+    /** Runs when the pointer leaves the track. */
+    onMouseLeave?: (e: MouseEvent) => void;
+};
+
+export type BaseRangeValues = {
+    /** The field's name when it is submitted as part of a form. A range with two ends submits them as `<name>-start` and `<name>-end`. */
+    name?: string;
+    /** Names the range for assistive technology. */
+    ariaLabel?: string;
+    /** Names each thumb separately, for a range whose ends mean different things. */
+    thumbLabels?: string[];
     /** Whether a value has to be given. It is announced and not enforced, because the library validates nothing. */
     isRequired?: boolean;
     /** Whether the track runs across the page or down it. */
@@ -104,3 +107,5 @@ export type RangeState = {
     /** How large a thumb is. The track reserves room for it so the ends stay reachable. */
     thumbSize?: number;
 };
+
+export type BaseRangeProps = BaseRangeValues & BaseRangeCbs;

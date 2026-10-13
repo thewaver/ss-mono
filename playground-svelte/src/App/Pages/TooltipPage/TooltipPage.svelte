@@ -21,11 +21,12 @@
     import DefaultExample from "./Examples/Default.svelte";
     import RichExample from "./Examples/Rich.svelte";
     import WordExample from "./Examples/Word.svelte";
-    import type { TooltipExampleProps } from "./TooltipPage.types";
-
-    const EXAMPLES_ROOT = "/src/App/Pages/TooltipPage/Examples";
-
-    const FIELD_WIDTH = 110;
+    import type { TooltipExampleProps } from "./TooltipPageSvelte.types";
+    import {
+    EXAMPLE_NAMES,
+    EXAMPLES_ROOT,
+    FIELD_WIDTH,
+} from "@thewaver/ss-playground/App/Pages/TooltipPage/TooltipPage.const";
 
     let hPlacement = $state<AnchorHPlacement>(TooltipKnobs.STARTING_H_PLACEMENT);
     let vPlacement = $state<AnchorVPlacement>(TooltipKnobs.STARTING_V_PLACEMENT);
@@ -60,7 +61,7 @@
     const examples: ExampleDefs[] = [
         {
             key: "default",
-            name: "On a control of your own",
+            name: EXAMPLE_NAMES.default,
             readout: () =>
                 "the button is a plain one, not the library's — the tooltip is handed its element and wires the hover, the focus and the Escape itself",
             component: defaultExample,
@@ -68,7 +69,7 @@
         },
         {
             key: "word",
-            name: "On something that is not a control",
+            name: EXAMPLE_NAMES.word,
             readout: () =>
                 "any element with a ref can carry one; this word was given a tab stop of its own, without which the tooltip would be reachable by pointer alone",
             component: wordExample,
@@ -76,7 +77,7 @@
         },
         {
             key: "rich",
-            name: "More than a line",
+            name: EXAMPLE_NAMES.rich,
             readout: () => "the content is whatever you render, and the anchoring is unchanged by how tall it is",
             component: richExample,
             path: `${EXAMPLES_ROOT}/Rich.svelte`,

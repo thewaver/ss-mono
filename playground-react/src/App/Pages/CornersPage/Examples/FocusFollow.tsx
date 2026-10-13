@@ -5,7 +5,7 @@ import * as styles from "@thewaver/ss-playground/App/Pages/CornersPage/CornersPa
 import type { Rect } from "@thewaver/ss-utils";
 
 import { PageButtonContent } from "../../../StyledComponents/ButtonContent/ButtonContent";
-import type { CornersExampleProps } from "../CornersPage.types";
+import type { CornersExampleProps } from "../CornersPageReact.types";
 
 type Props = CornersExampleProps;
 

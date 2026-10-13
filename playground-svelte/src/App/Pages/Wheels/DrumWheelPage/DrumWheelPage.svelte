@@ -5,8 +5,10 @@
     import PageWheelsPanel from "../WheelsPanel.svelte";
     import OverExample from "./Examples/Over.svelte";
     import SidewaysExample from "./Examples/Sideways.svelte";
-
-    const EXAMPLES_ROOT = "/src/App/Pages/Wheels/DrumWheelPage/Examples";
+    import {
+    EXAMPLE_NAMES,
+    EXAMPLES_ROOT,
+} from "@thewaver/ss-playground/App/Pages/Wheels/DrumWheelPage/DrumWheelPage.const";
 
     const controls = createWheelsControls();
 
@@ -22,7 +24,7 @@
     const examples: ExampleDefs[] = [
         {
             key: "sideways",
-            name: "Turning sideways",
+            name: EXAMPLE_NAMES.sideways,
             component: sidewaysExample,
             readout: getReadout(
                 () => sidewaysMarkedIndex,
@@ -32,7 +34,7 @@
         },
         {
             key: "reel",
-            name: "Turning over",
+            name: EXAMPLE_NAMES.reel,
             component: overExample,
             readout: getReadout(
                 () => reelMarkedIndex,

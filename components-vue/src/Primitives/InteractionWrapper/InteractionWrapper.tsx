@@ -6,6 +6,7 @@ import {
     InteractionTrackerUtils,
     InteractionWrapperStyles,
 } from "@thewaver/ss-components";
+import { InteractionWrapperConst } from "@thewaver/ss-components/internal";
 
 import { InteractionTrackerVueUtils } from "../../Abstracts/InteractionTracker/InteractionTrackerVue.utils";
 import { useSharedTooltipContext } from "../../Essentials/Overlays/SharedTooltip/SharedTooltip.context";
@@ -17,8 +18,6 @@ import { callSlot, declareProps } from "../../Utils/propUtils";
 import { exposeElement, toElement } from "../../Utils/refUtils";
 import type { SlotsContext } from "../../Utils/typeUtils";
 import type { InteractionWrapperProps, InteractionWrapperSlots } from "./InteractionWrapper.types";
-
-const NO_EXTRA_FLAGS = {};
 
 export const InteractionWrapper = defineComponent(
     <TExtra extends object = {}>(
@@ -56,7 +55,7 @@ export const InteractionWrapper = defineComponent(
             isDisabled: getIsDisabled(),
             isPressed: props.isPressed,
             hasError: props.hasError,
-            ...((props.extraFlags ?? NO_EXTRA_FLAGS) as TExtra),
+            ...((props.extraFlags ?? InteractionWrapperConst.NO_EXTRA_FLAGS) as TExtra),
         });
 
         const getTooltipDefs = (): SharedTooltipDefs | undefined => {

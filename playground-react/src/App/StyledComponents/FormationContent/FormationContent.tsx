@@ -1,17 +1,17 @@
 import type { PropsWithChildren } from "react";
 
 import { Shape } from "@thewaver/ss-components-react";
+import {
+    FILL_OPACITY,
+    STROKE_GEOM,
+} from "@thewaver/ss-playground/App/StyledComponents/FormationContent/FormationContent.const";
 import * as styles from "@thewaver/ss-playground/App/StyledComponents/FormationContent/FormationContent.css";
 import { layerVars } from "@thewaver/ss-playground/App/StyledComponents/Layer/Layer.css";
 import { themeVars } from "@thewaver/ss-playground/App/Theme.css";
 import { ShapeConst } from "@thewaver/ss-utils";
 
 import { useLayerClass } from "../Layer/Layer.context";
-import type { PageFormationItemProps } from "./FormationContent.types";
-
-const EDGE_THICKNESSES = [2];
-const STROKE_GEOM = [{ thicknesses: EDGE_THICKNESSES }];
-const FILL_OPACITY = 0.75;
+import type { PageFormationItemProps } from "./FormationContentReact.types";
 
 export const PageFormationItem = (props: PropsWithChildren<PageFormationItemProps>) => {
     const layerClass = useLayerClass();

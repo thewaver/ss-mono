@@ -9,17 +9,18 @@
     import PagePropsPanel from "../../PageComponents/PropsPanel/PagePropsPanel.svelte";
     import PosterExample from "./Examples/Poster.svelte";
     import StackExample from "./Examples/Stack.svelte";
-
-    const EXAMPLES_ROOT = "/src/App/Pages/FittedTextPage/Examples";
-
-    const WIDE_SPAN = 2;
+    import {
+    EXAMPLE_NAMES,
+    EXAMPLES_ROOT,
+    WIDE_SPAN,
+} from "@thewaver/ss-playground/App/Pages/FittedTextPage/FittedTextPage.const";
 
     let lineHeightRatio = $state(FITTED_TEXT_DEFAULTS.lineHeightRatio);
 
     const examples: ExampleDefs[] = [
         {
             key: "poster",
-            name: "A poster",
+            name: EXAMPLE_NAMES.poster,
             span: WIDE_SPAN,
             readout: () =>
                 "every line is scaled to the full width, then the stack shrinks as one until it fits the height, so the shortest line comes out the largest; resize the window and it fits again",
@@ -28,7 +29,7 @@
         },
         {
             key: "stack",
-            name: "A narrow box",
+            name: EXAMPLE_NAMES.stack,
             readout: () =>
                 "in a box this narrow the width runs out before the height does, so nothing has to shrink to fit and the lines keep their full-width sizes",
             component: stackExample,

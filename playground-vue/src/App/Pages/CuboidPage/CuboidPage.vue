@@ -4,6 +4,12 @@ import { computed, shallowRef } from "vue";
 import type { CuboidController } from "@thewaver/ss-components-vue";
 import { CUBOID_DEFAULTS, CuboidUtils, MediaQueryMonitorVueUtils } from "@thewaver/ss-components-vue";
 import { CuboidKnobs } from "@thewaver/ss-playground/App/Knobs/Cuboids.const";
+import {
+    EXAMPLES_ROOT,
+    EXAMPLE_NAMES,
+    FIELD_WIDTH,
+    NO_MOTION_DURATION_MS,
+} from "@thewaver/ss-playground/App/Pages/CuboidPage/CuboidPage.const";
 
 import type { ExampleDefs } from "../../PageComponents/Examples/Examples.types";
 import PageExamples from "../../PageComponents/Examples/PageExamples.vue";
@@ -13,11 +19,6 @@ import PagePropsPanel from "../../PageComponents/PropsPanel/PagePropsPanel.vue";
 import DefaultExample from "./Examples/Default.vue";
 import UprightExampleWrapper from "./UprightExampleWrapper.vue";
 import WanderingExampleWrapper from "./WanderingExampleWrapper.vue";
-
-const NO_MOTION_DURATION_MS = 0;
-
-const FIELD_WIDTH = 110;
-const EXAMPLES_ROOT = "/src/App/Pages/CuboidPage/Examples";
 
 const width = shallowRef(CuboidKnobs.STARTING_WIDTH);
 const height = shallowRef(CuboidKnobs.STARTING_HEIGHT);
@@ -45,21 +46,21 @@ const size = computed(() => ({ width: width.value, height: height.value, depth: 
 const examples: ExampleDefs[] = [
     {
         key: "default",
-        name: "Six faces, two turns",
+        name: EXAMPLE_NAMES.default,
         readout: () =>
             `${CuboidUtils.getFacingFromTurns(yaw.value, pitch.value)} — across ${yaw.value}, up ${pitch.value}; the two counts are quarter turns rather than a face, so the box always takes the way it was pushed`,
         path: `${EXAMPLES_ROOT}/Default.vue`,
     },
     {
         key: "wandering",
-        name: "Turning to a neighbor on its own",
+        name: EXAMPLE_NAMES.wandering,
         readout: () =>
             `${CuboidUtils.getFacingFromTurns(wanderingYaw.value, wanderingPitch.value)} — every tick takes one quarter turn at random, discarding the ones that would leave the same face in view or turn back to the face it just left, so the box only ever moves on to a new face sharing an edge with this one`,
         path: `${EXAMPLES_ROOT}/Wandering.vue`,
     },
     {
         key: "upright",
-        name: "Upright, by name, and by hand",
+        name: EXAMPLE_NAMES.upright,
         readout: () =>
             `${uprightFacing.value ?? "front"} — across ${uprightYaw.value}, up ${uprightPitch.value}; the counts only record the presses here, so the box keeps its own orientation and the face names ask it for the shortest way round`,
         path: `${EXAMPLES_ROOT}/Upright.vue`,

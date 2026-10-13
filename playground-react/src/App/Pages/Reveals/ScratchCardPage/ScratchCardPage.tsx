@@ -2,6 +2,14 @@ import { useMemo, useState } from "react";
 
 import { SCRATCH_CARD_DEFAULTS } from "@thewaver/ss-components-react";
 import { ScratchCardKnobs } from "@thewaver/ss-playground/App/Knobs/ScratchCards.const";
+import {
+    EXAMPLES_ROOT,
+    EXAMPLE_NAMES,
+    FIRST_WINDOW,
+    NOTHING_SCRATCHED,
+    RATIO_DIGITS,
+    WINDOW_COUNT,
+} from "@thewaver/ss-playground/App/Pages/Reveals/ScratchCardPage/ScratchCardPage.const";
 import { ShapeConst, type Size2d } from "@thewaver/ss-utils";
 
 import { PageExamples } from "../../../PageComponents/Examples/Examples";
@@ -16,14 +24,7 @@ import type {
     ExampleProgress,
     ScratchCardExampleProps,
     ScratchCardWindowsExampleProps,
-} from "./ScratchCardPage.types";
-
-const EXAMPLES_ROOT = "/src/App/Pages/Reveals/ScratchCardPage/Examples";
-
-const RATIO_DIGITS = 2;
-const NOTHING_SCRATCHED = 0;
-const WINDOW_COUNT = 3;
-const FIRST_WINDOW = 1;
+} from "./ScratchCardPageReact.types";
 
 const applyScratch = (progress: ExampleProgress, ratio: number): ExampleProgress => ({
     ratio,
@@ -97,21 +98,21 @@ export const ScratchCardPage = () => {
     const examples = [
         {
             key: "ticket",
-            name: "Ticket",
+            name: EXAMPLE_NAMES.ticket,
             readout: () => describe("ticket", "keep going"),
             component: () => <TicketExample {...exampleProps("ticket")} />,
             path: `${EXAMPLES_ROOT}/Ticket.tsx`,
         },
         {
             key: "frosted",
-            name: "Frosted",
+            name: EXAMPLE_NAMES.frosted,
             readout: () => describe("frosted", "what is under it sharpens as the frost goes"),
             component: () => <FrostedExample {...exampleProps("frosted")} />,
             path: `${EXAMPLES_ROOT}/Frosted.tsx`,
         },
         {
             key: "windows",
-            name: "Ticket with windows",
+            name: EXAMPLE_NAMES.windows,
             readout: describeWindows,
             component: () => <WindowsExample {...windowsProps} />,
             path: `${EXAMPLES_ROOT}/Windows.tsx`,

@@ -7,9 +7,8 @@
     import DisabledExample from "./Examples/Disabled.svelte";
     import LabelPerRadioExample from "./Examples/LabelPerRadio.svelte";
     import SuppressedExample from "./Examples/Suppressed.svelte";
-    import type { PlanValue } from "./LabelPage.types";
-
-    const EXAMPLES_ROOT = "/src/App/Pages/LabelPage/Examples";
+    import type { PlanValue } from "./LabelPageSvelte.types";
+    import { EXAMPLE_NAMES, EXAMPLES_ROOT } from "@thewaver/ss-playground/App/Pages/LabelPage/LabelPage.const";
 
     let checked = $state(false);
     let toggleChecked = $state(true);
@@ -21,42 +20,42 @@
     const examples: ExampleDefs[] = [
         {
             key: "checkbox",
-            name: "Checkbox",
+            name: EXAMPLE_NAMES.checkbox,
             readout: () => `checked: ${checked}`,
             component: checkboxExample,
             path: `${EXAMPLES_ROOT}/CheckboxLabel.svelte`,
         },
         {
             key: "toggleCaptionFirst",
-            name: "Toggle, caption first",
+            name: EXAMPLE_NAMES.toggleCaptionFirst,
             readout: () => `on: ${toggleChecked}`,
             component: captionFirstExample,
             path: `${EXAMPLES_ROOT}/CaptionFirst.svelte`,
         },
         {
             key: "column",
-            name: "Column",
+            name: EXAMPLE_NAMES.column,
             readout: () => `checked: ${columnChecked}`,
             component: columnExample,
             path: `${EXAMPLES_ROOT}/Column.svelte`,
         },
         {
             key: "labelPerRadio",
-            name: "One label per radio",
+            name: EXAMPLE_NAMES.labelPerRadio,
             readout: () => `value: ${plan}`,
             component: labelPerRadioExample,
             path: `${EXAMPLES_ROOT}/LabelPerRadio.svelte`,
         },
         {
             key: "suppressed",
-            name: "Suppressed aria-label",
+            name: EXAMPLE_NAMES.suppressed,
             readout: () => `checked: ${suppressedChecked} — the caption wins, and the console says so`,
             component: suppressedExample,
             path: `${EXAMPLES_ROOT}/Suppressed.svelte`,
         },
         {
             key: "disabled",
-            name: "Disabled",
+            name: EXAMPLE_NAMES.disabled,
             readout: () => `checked: ${disabledChecked}`,
             component: disabledExample,
             path: `${EXAMPLES_ROOT}/Disabled.svelte`,

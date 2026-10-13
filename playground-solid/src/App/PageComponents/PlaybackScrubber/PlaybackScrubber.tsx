@@ -1,15 +1,16 @@
 import { createSignal } from "solid-js";
 
 import { Button, ElementObserverSolidUtils, Range } from "@thewaver/ss-components-solid";
+import {
+    PERCENT,
+    SLIDER_STEP,
+} from "@thewaver/ss-playground/App/PageComponents/PlaybackScrubber/PlaybackScrubber.const";
 import * as styles from "@thewaver/ss-playground/App/PageComponents/PlaybackScrubber/PlaybackScrubber.css";
 import { CONTROL_GLYPHS } from "@thewaver/ss-playground/App/StyledComponents/ControlButtonContent/ControlButtonContent.const";
 
 import { PageControlButtonContent } from "../../StyledComponents/ControlButtonContent/ControlButtonContent";
 import { PageRangeContent } from "../../StyledComponents/RangeContent/RangeContent";
 import type { PagePlaybackScrubberProps } from "./PlaybackScrubber.types";
-
-const PERCENT = 100;
-const SLIDER_STEP = 1;
 
 export const PagePlaybackScrubber = (props: PagePlaybackScrubberProps) => {
     const [getSliderSlotRef, setSliderSlotRef] = createSignal<HTMLElement>();

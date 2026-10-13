@@ -7,7 +7,8 @@ import {
     TrackedGradientDefaults,
     type TrackedGradientElementDefs,
 } from "@thewaver/ss-components";
-import { MathUtils, type Point2d } from "@thewaver/ss-utils";
+import { SwarmConst, TrackedGradientSampleConst } from "@thewaver/ss-components/internal";
+import { MathUtils } from "@thewaver/ss-utils";
 
 import { PointerTrackerVueUtils } from "../../../../Abstracts/PointerTracker/PointerTrackerVue.utils";
 import { SVGGradientDefsVueUtils } from "../../../../Generators/SVGDefs/SVGGradients/SVGGradientDefsVue.utils";
@@ -26,16 +27,7 @@ type SwarmProps = {
     opts?: GradientSwarmSampleOpts;
 };
 
-const SETTLE_MS = 1500;
-const RESTING_POINT: Point2d = { x: 0.5, y: 0.5 };
-const STILL: Point2d = { x: 0, y: 0 };
-const NO_FADE = 0;
-
-const CYCLING_DEFAULTS = TrackedGradientDefaults.SWARM_CYCLING_DEFAULTS;
-
-const RENDERED_ELSEWHERE = () => undefined;
-
-const clock = SVGDefsUtils.createClock(SETTLE_MS);
+const clock = SVGDefsUtils.createClock(SwarmConst.SETTLE_MS);
 
 const getSpotCount = (defaults: SwarmDefaults, opts?: GradientSwarmSampleOpts) => opts?.spotCount ?? defaults.spotCount;
 
@@ -43,7 +35,7 @@ const getTailLength = (defaults: SwarmDefaults, opts?: GradientSwarmSampleOpts) 
     opts?.tailLength ?? defaults.tailLength;
 
 const getCycleMs = (opts?: GradientSwarmSampleOpts) =>
-    opts?.cycles ? (opts.cycleMs ?? CYCLING_DEFAULTS.cycleMs) : undefined;
+    opts?.cycles ? (opts.cycleMs ?? SwarmConst.CYCLING_DEFAULTS.cycleMs) : undefined;
 
 const getGradientId = (id: string, tracer: number, index: number) => `gradient-${tracer}-${index}-${id}`;
 
@@ -52,7 +44,7 @@ const getTracers = (count: number) => Array.from({ length: count }, (_unused, tr
 const getStampIndexes = (length: number) => Array.from({ length }, (_unused, stamp) => length - 1 - stamp);
 
 const createChains = (count: number, length: number) =>
-    Array.from({ length: count }, () => Array.from({ length }, () => RESTING_POINT));
+    Array.from({ length: count }, () => Array.from({ length }, () => SwarmConst.RESTING_POINT));
 
 const Swarm = defineComponent(
     (props: SwarmProps) => {
@@ -66,7 +58,7 @@ const Swarm = defineComponent(
             createChains(getSpotCount(props.defaults, props.opts), getTailLength(props.defaults, props.opts)),
         );
 
-        let velocities = chains.value.map(() => STILL);
+        let velocities = chains.value.map(() => SwarmConst.STILL);
         let lastMs: number | undefined;
 
         watch([frameMs, reading, isPointerPresent], ([nowMs, current, isPresent]) => {
@@ -81,11 +73,11 @@ const Swarm = defineComponent(
 
             lastMs = nowMs;
 
-            if (SVGDefsUtils.getPointerFade(current, isPresent) > NO_FADE) clock.keepAwake();
+            if (SVGDefsUtils.getPointerFade(current, isPresent) > TrackedGradientSampleConst.NO_FADE) clock.keepAwake();
 
             if (chains.value.length !== count || chains.value[0]?.length !== length) {
                 chains.value = createChains(count, length);
-                velocities = chains.value.map(() => STILL);
+                velocities = chains.value.map(() => SwarmConst.STILL);
             }
 
             if (stepMs <= 0) return;
@@ -190,7 +182,7 @@ export const createSwarmSample =
                                           opts={opts}
                                       />
                                   )
-                                : RENDERED_ELSEWHERE,
+                                : TrackedGradientSampleConst.RENDERED_ELSEWHERE,
                         },
                         filter: isFirst ? sharedBlur : sharedBlurRef,
                     };

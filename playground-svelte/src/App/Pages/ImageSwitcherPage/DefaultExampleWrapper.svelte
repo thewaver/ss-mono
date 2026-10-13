@@ -3,8 +3,7 @@
 
     import PageMeasureBox from "../../PageComponents/MeasureBox/MeasureBox.svelte";
     import DefaultExample from "./Examples/Default.svelte";
-
-    const IMAGE_CONTAINER_SIZE = 480;
+    import { IMAGE_CONTAINER_SIZE } from "@thewaver/ss-playground/App/Pages/ImageSwitcherPage/ImageSwitcherPage.const";
 
     let props: ImageSwitcherProps = $props();
 </script>

@@ -10,3 +10,9 @@ export const TRACK_NAMES = TRACKS.map((track) => track.name);
 
 export const PERCENT = 100;
 export const FIELD_WIDTH = 130;
+
+export const EXAMPLE_NAMES = {
+    default: "Crossfading between two loops",
+};
+
+export const EXAMPLES_ROOT = "/src/App/Pages/AudioSwitcherPage/Examples";

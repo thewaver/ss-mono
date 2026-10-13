@@ -3,7 +3,7 @@ import type { PropsWithChildren } from "react";
 import * as styles from "@thewaver/ss-playground/App/StyledComponents/MosaicContent/MosaicContent.css";
 
 import { useLayerClass } from "../Layer/Layer.context";
-import type { PageMosaicLinkProps, PageMosaicTileProps } from "./MosaicContent.types";
+import type { PageMosaicLinkProps, PageMosaicTileProps } from "./MosaicContentReact.types";
 
 export const PageMosaicTile = (props: PropsWithChildren<PageMosaicTileProps>) => {
     const layerClass = useLayerClass();

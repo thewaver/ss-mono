@@ -7,7 +7,7 @@ import PageGlideFloater from "../../../StyledComponents/GlideFloater/PageGlideFl
 import PageListboxSurface from "../../../StyledComponents/ListboxSurface/ListboxSurface.vue";
 import PageSelectGroupContent from "../../../StyledComponents/SelectGroupContent/SelectGroupContent.vue";
 import PageSelectOptionContent from "../../../StyledComponents/SelectOptionContent/SelectOptionContent.vue";
-import { GROUPED_COUNTRIES } from "../../SelectPage/SelectPage.const";
+import { GROUPED_COUNTRIES } from "../../SelectPage/SelectPageVue.const";
 import type { MultiListboxExampleProps } from "../ListboxPage.types";
 
 type Props = MultiListboxExampleProps;

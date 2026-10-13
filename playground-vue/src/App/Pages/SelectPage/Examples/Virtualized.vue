@@ -9,8 +9,8 @@ import PageGlideFloater from "../../../StyledComponents/GlideFloater/PageGlideFl
 import PageSelectContent from "../../../StyledComponents/SelectContent/SelectContent.vue";
 import PageSelectGroupContent from "../../../StyledComponents/SelectGroupContent/SelectGroupContent.vue";
 import PageSelectOptionContent from "../../../StyledComponents/SelectOptionContent/SelectOptionContent.vue";
-import { PLACEHOLDER } from "../SelectPage.const";
 import type { Delivery, SelectVirtualizedExampleProps } from "../SelectPage.types";
+import { PLACEHOLDER } from "../SelectPageVue.const";
 import SelectPopup from "../SelectPopup.vue";
 
 const STRESS_OPTION_HEIGHT = 100;

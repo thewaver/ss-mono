@@ -4,7 +4,7 @@ import { useModel } from "vue";
 import { Radio, RadioGroup } from "@thewaver/ss-components-vue";
 
 import PageRadioStarContent from "../../../StyledComponents/RadioStarContent/PageRadioStarContent.vue";
-import type { RadioRatingExampleProps } from "../RadioPage.types";
+import type { RadioRatingExampleProps } from "../RadioPageVue.types";
 
 const RATING_OPTIONS = [1, 2, 3, 4, 5];
 

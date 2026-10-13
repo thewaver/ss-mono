@@ -4,6 +4,13 @@ import { computed, shallowRef, watch } from "vue";
 import { FrameRateMonitorVueUtils } from "@thewaver/ss-components-vue";
 import type { SelectOption } from "@thewaver/ss-components-vue";
 import { SelectKnobs } from "@thewaver/ss-playground/App/Knobs/Selects.const";
+import {
+    EXAMPLES_ROOT,
+    EXAMPLE_NAMES,
+    PAGED_TOTAL,
+    PAGE_DELAY_MS,
+    PAGE_SIZE,
+} from "@thewaver/ss-playground/App/Pages/SelectPage/SelectPage.const";
 
 import type { ExampleDefs } from "../../PageComponents/Examples/Examples.types";
 import PageExamples from "../../PageComponents/Examples/PageExamples.vue";
@@ -17,6 +24,7 @@ import HoursExample from "./Examples/Hours.vue";
 import LabeledExample from "./Examples/Labeled.vue";
 import OnDemandExample from "./Examples/OnDemand.vue";
 import ReachableExample from "./Examples/Reachable.vue";
+import type { Airport, Delivery } from "./SelectPage.types";
 import {
     AIRPORTS,
     COUNTRIES_WITH_DISABLED,
@@ -25,14 +33,8 @@ import {
     STRESS_GROUP_SIZE,
     createStressDeliveries,
     createStressDeliveryGroups,
-} from "./SelectPage.const";
-import type { Airport, Delivery } from "./SelectPage.types";
+} from "./SelectPageVue.const";
 import VirtualizedExampleWrapper from "./VirtualizedExampleWrapper.vue";
-
-const PAGE_SIZE = 40;
-const PAGED_TOTAL = 500;
-const PAGE_DELAY_MS = 600;
-const EXAMPLES_ROOT = "/src/App/Pages/SelectPage/Examples";
 
 const fetchRoutes = (offset: number) =>
     new Promise<SelectOption<Delivery>[]>((resolve) => {
@@ -187,63 +189,63 @@ const searchMore = () => {
 const examples: ExampleDefs[] = [
     {
         key: "default",
-        name: "Default",
+        name: EXAMPLE_NAMES.default,
         readout: () => `value: ${defaultValue.value ?? "undefined"}`,
         path: `${EXAMPLES_ROOT}/Countries.vue`,
     },
     {
         key: "preselected",
-        name: "Preselected",
+        name: EXAMPLE_NAMES.preselected,
         readout: () => `value: ${preselectedValue.value ?? "undefined"} — reopening highlights it`,
         path: `${EXAMPLES_ROOT}/Countries.vue`,
     },
     {
         key: "clearable",
-        name: "Clearable",
+        name: EXAMPLE_NAMES.clearable,
         readout: () =>
             `value: ${clearableValue.value ?? "undefined"} | last change: ${clearableChange.value} — the clear control is its own tab stop after the field, drawn only while something is picked`,
         path: `${EXAMPLES_ROOT}/Clearable.vue`,
     },
     {
         key: "recordValues",
-        name: "Record values",
+        name: EXAMPLE_NAMES.recordValues,
         readout: () => `value: ${recordValue.value?.code ?? "undefined"}`,
         path: `${EXAMPLES_ROOT}/Airports.vue`,
     },
     {
         key: "titleDescription",
-        name: "Title and description",
+        name: EXAMPLE_NAMES.titleDescription,
         readout: () =>
             `value: ${deliveryValue.value?.name ?? "undefined"} — the descriptions wrap, so no two rows are the same height`,
         path: `${EXAMPLES_ROOT}/Deliveries.vue`,
     },
     {
         key: "optionGroups",
-        name: "Option groups",
+        name: EXAMPLE_NAMES.optionGroups,
         readout: () => `value: ${groupedValue.value ?? "undefined"} — arrows cross group boundaries and skip Finland`,
         path: `${EXAMPLES_ROOT}/Countries.vue`,
     },
     {
         key: "disabledOptions",
-        name: "Disabled options",
+        name: EXAMPLE_NAMES.disabledOptions,
         readout: () => `value: ${disabledOptionValue.value ?? "undefined"} — arrows skip Denmark and Finland`,
         path: `${EXAMPLES_ROOT}/Countries.vue`,
     },
     {
         key: "disabledOptionsReachable",
-        name: "Disabled options + reachable",
+        name: EXAMPLE_NAMES.disabledOptionsReachable,
         readout: () => `value: ${reachableOptionValue.value ?? "undefined"} — arrows stop on them, hover explains why`,
         path: `${EXAMPLES_ROOT}/Countries.vue`,
     },
     {
         key: "scrollingList",
-        name: "Scrolling list",
+        name: EXAMPLE_NAMES.scrollingList,
         readout: () => `value: ${longValue.value ?? "undefined"} — Home and End reach both ends`,
         path: `${EXAMPLES_ROOT}/Hours.vue`,
     },
     {
         key: "virtualized",
-        name: "Virtualized",
+        name: EXAMPLE_NAMES.virtualized,
         readout: () =>
             `${stressCount.value.toLocaleString("en-GB")} options — ${
                 openMs.value === undefined
@@ -254,7 +256,7 @@ const examples: ExampleDefs[] = [
     },
     {
         key: "virtualizedGroups",
-        name: "Virtualized, in groups",
+        name: EXAMPLE_NAMES.virtualizedGroups,
         readout: () =>
             `${stressCount.value.toLocaleString("en-GB")} options in ${Math.ceil(stressCount.value / STRESS_GROUP_SIZE).toLocaleString("en-GB")} groups — ${
                 isGroupedStressOpen.value ? "open" : "closed"
@@ -263,7 +265,7 @@ const examples: ExampleDefs[] = [
     },
     {
         key: "onDemand",
-        name: "Loaded on demand",
+        name: EXAMPLE_NAMES.onDemand,
         readout: () =>
             `${pagedRoutes.value.length} of ${PAGED_TOTAL} routes fetched${
                 isFetching.value ? ", another batch in flight" : ""
@@ -272,14 +274,14 @@ const examples: ExampleDefs[] = [
     },
     {
         key: "autocomplete",
-        name: "Autocomplete",
+        name: EXAMPLE_NAMES.autocomplete,
         readout: () =>
             `value: ${filterValue.value?.code ?? "undefined"} | query: "${filterQuery.value}" — ${filteredAirports.value.length} of ${AIRPORTS.length} shown; the page matches on city or code, which only it knows about`,
         path: `${EXAMPLES_ROOT}/Autocomplete.vue`,
     },
     {
         key: "autocompleteOnDemand",
-        name: "Autocomplete, loaded on demand",
+        name: EXAMPLE_NAMES.autocompleteOnDemand,
         readout: () =>
             `value: ${searchValue.value?.name ?? "undefined"} | query: "${searchQuery.value}" — ${searchResults.value.length} of ${searchTotal.value} matches held${
                 isSearching.value ? ", asking the server" : ""
@@ -288,25 +290,25 @@ const examples: ExampleDefs[] = [
     },
     {
         key: "errored",
-        name: "Error",
+        name: EXAMPLE_NAMES.errored,
         readout: () => `value: ${erroredValue.value ?? "undefined"} — required, nothing picked yet`,
         path: `${EXAMPLES_ROOT}/Countries.vue`,
     },
     {
         key: "disabled",
-        name: "Disabled",
+        name: EXAMPLE_NAMES.disabled,
         readout: () => `value: ${disabledValue.value ?? "undefined"}`,
         path: `${EXAMPLES_ROOT}/Countries.vue`,
     },
     {
         key: "reachable",
-        name: "Disabled + reachable",
+        name: EXAMPLE_NAMES.reachable,
         readout: () => `value: ${reachableValue.value ?? "undefined"}`,
         path: `${EXAMPLES_ROOT}/Reachable.vue`,
     },
     {
         key: "label",
-        name: "In a Label",
+        name: EXAMPLE_NAMES.label,
         readout: () => `value: ${labeledValue.value ?? "undefined"} — the caption opens the list`,
         path: `${EXAMPLES_ROOT}/Labeled.vue`,
     },

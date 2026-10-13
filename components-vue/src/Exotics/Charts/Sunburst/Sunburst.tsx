@@ -8,6 +8,7 @@ import {
     SunburstUtils,
     TreemapUtils,
 } from "@thewaver/ss-components";
+import { SunburstConst } from "@thewaver/ss-components/internal";
 
 import { ElementObserverVueUtils } from "../../../Abstracts/ElementObserver/ElementObserverVue.utils";
 import { watchAfterRender } from "../../../Utils/effectUtils";
@@ -16,13 +17,6 @@ import { toElement } from "../../../Utils/refUtils";
 import { useStore } from "../../../Utils/storeUtils";
 import type { SlotsContext } from "../../../Utils/typeUtils";
 import type { SunburstProps, SunburstSlots } from "./Sunburst.types";
-
-const NOTHING = 0;
-const SETTLED = 1;
-const NEXT = 1;
-const HALF = 0.5;
-const CENTER_RINGS = 1;
-const EMPTY_SPAN: SunburstSpan = { start: 0, end: 0, inner: 0, outer: 0 };
 
 type SunburstZoomState<T> = {
     branch: SunburstNode<T>;
@@ -44,7 +38,7 @@ export const Sunburst = defineComponent(
         const progress = useStore(zoomClock);
         const size = ElementObserverVueUtils.useBorderBoxSize(rootRef);
 
-        const getRingCount = () => Math.max(SETTLED, props.ringCount ?? SUNBURST_DEFAULTS.ringCount);
+        const getRingCount = () => Math.max(SunburstConst.SETTLED, props.ringCount ?? SUNBURST_DEFAULTS.ringCount);
 
         const weights = computed(() => TreemapUtils.computeWeights(props.root));
         const spans = computed(() => SunburstUtils.computeSpans(props.root, weights.value));
@@ -59,13 +53,13 @@ export const Sunburst = defineComponent(
             branch: branch.value,
             cameFrom: undefined,
             fromViews: new Map(),
-            generation: NOTHING,
+            generation: SunburstConst.NOTHING,
         });
 
         const computeShownView = (node: SunburstNode<T>, center: SunburstNode<T>) =>
             SunburstUtils.computeShownSpan(
-                spans.value.get(node) ?? EMPTY_SPAN,
-                spans.value.get(center) ?? EMPTY_SPAN,
+                spans.value.get(node) ?? SunburstConst.EMPTY_SPAN,
+                spans.value.get(center) ?? SunburstConst.EMPTY_SPAN,
                 zoom.value.fromViews.get(node),
                 progress.value,
             );
@@ -77,27 +71,27 @@ export const Sunburst = defineComponent(
                 branch: next,
                 cameFrom: current.branch,
                 fromViews: new Map(allNodes.value.map((node) => [node, computeShownView(node, current.branch)])),
-                generation: current.generation + NEXT,
+                generation: current.generation + SunburstConst.NEXT,
             };
         });
 
-        const centerSpan = computed(() => spans.value.get(branch.value) ?? EMPTY_SPAN);
+        const centerSpan = computed(() => spans.value.get(branch.value) ?? SunburstConst.EMPTY_SPAN);
 
         const targetViews = computed(
             () =>
                 new Map(
                     allNodes.value.map((node) => [
                         node,
-                        SunburstUtils.computeView(spans.value.get(node) ?? EMPTY_SPAN, centerSpan.value),
+                        SunburstUtils.computeView(spans.value.get(node) ?? SunburstConst.EMPTY_SPAN, centerSpan.value),
                     ]),
                 ),
         );
 
         const getIsVisibleAtTarget = (node: SunburstNode<T>) =>
-            SunburstUtils.getIsVisible(targetViews.value.get(node) ?? EMPTY_SPAN, getRingCount());
+            SunburstUtils.getIsVisible(targetViews.value.get(node) ?? SunburstConst.EMPTY_SPAN, getRingCount());
 
         const getIsVisibleAtStart = (node: SunburstNode<T>) =>
-            SunburstUtils.getIsVisible(zoom.value.fromViews.get(node) ?? EMPTY_SPAN, getRingCount());
+            SunburstUtils.getIsVisible(zoom.value.fromViews.get(node) ?? SunburstConst.EMPTY_SPAN, getRingCount());
 
         const stops = computed(() =>
             allNodes.value.filter(
@@ -123,7 +117,7 @@ export const Sunburst = defineComponent(
         onScopeDispose(zoomClock.stop);
 
         watchAfterRender([() => zoom.value.generation], ([generation]) => {
-            if (generation === NOTHING) return;
+            if (generation === SunburstConst.NOTHING) return;
 
             zoomClock.start(props.zoomDurationMs ?? SUNBURST_DEFAULTS.zoomDurationMs);
         });
@@ -168,8 +162,8 @@ export const Sunburst = defineComponent(
         return () => {
             const side = Math.min(size.value.width, size.value.height);
             const ringCount = getRingCount();
-            const ringWidth = (side * HALF) / (ringCount + CENTER_RINGS);
-            const isZooming = progress.value < SETTLED;
+            const ringWidth = (side * SunburstConst.HALF) / (ringCount + SunburstConst.CENTER_RINGS);
+            const isZooming = progress.value < SunburstConst.SETTLED;
 
             const renderedNodes = allNodes.value.filter(
                 (node) => getIsVisibleAtTarget(node) || (isZooming && getIsVisibleAtStart(node)),
@@ -179,7 +173,7 @@ export const Sunburst = defineComponent(
                 <div ref={rootRef} class={SunburstStyles.sunburstRoot} tabindex={-1} onKeydown={handleKeyDown}>
                     <svg
                         class={SunburstStyles.sunburstCanvas}
-                        viewBox={`${-side * HALF} ${-side * HALF} ${side} ${side}`}
+                        viewBox={`${-side * SunburstConst.HALF} ${-side * SunburstConst.HALF} ${side} ${side}`}
                         role="list"
                         aria-label={props.ariaLabel}
                     >
@@ -224,9 +218,9 @@ export const Sunburst = defineComponent(
                                             node,
                                             state: {
                                                 ...SunburstUtils.toArc(computeShownView(node, branch.value), ringWidth),
-                                                weight: weights.value.get(node) ?? NOTHING,
+                                                weight: weights.value.get(node) ?? SunburstConst.NOTHING,
                                                 isBranch,
-                                                ring: (targetViews.value.get(node) ?? EMPTY_SPAN).inner,
+                                                ring: (targetViews.value.get(node) ?? SunburstConst.EMPTY_SPAN).inner,
                                             },
                                         })}
                                     </g>

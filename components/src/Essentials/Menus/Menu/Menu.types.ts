@@ -1,7 +1,9 @@
-import type { Point2d, Rect } from "@thewaver/ss-utils";
+import type { Point2d, Rect, Size2d } from "@thewaver/ss-utils";
 
+import type { AnchorPlacement } from "../../../Abstracts/Anchor/Anchor.types";
 import type { NavigatorDirection } from "../../../Abstracts/Navigator/Navigator.types";
-import type { PlacementLayout } from "../../../Abstracts/Placement/Placement.types";
+import type { PlacementLayout, PlacementLayoutFn } from "../../../Abstracts/Placement/Placement.types";
+import type { ProximityEffectFn } from "../../../Abstracts/Proximity/Proximity.types";
 import type { ViewportContextType } from "../../../Abstracts/Viewport/Viewport.context.types";
 
 export type MenuFlags = {
@@ -93,3 +95,100 @@ export type MenuRun<TItem> = {
     items: TItem[];
     isRadioGroup: boolean;
 };
+
+export type BaseMenuValues = {
+    /** How much room the menu is given to lay its items out in. */
+    layoutSize?: string;
+    /** Identifies the menu, so the trigger can point at it. */
+    id?: string;
+    /** Names the menu for assistive technology. */
+    ariaLabel?: string;
+    /** Where the menu sits against its trigger. */
+    placement?: AnchorPlacement;
+    /** How far the menu is held clear of its trigger. */
+    offset?: Point2d;
+    /**
+     * Where a submenu sits against the item that opens it. Left out, a submenu opens beside its item on
+     * the side the opening arrow points to: the right, or the left where the menu's trigger sits in
+     * right-to-left text. Given, it is used as it stands in either direction.
+     */
+    submenuPlacement?: AnchorPlacement;
+    /** How far a submenu is held clear of the item that opens it. */
+    submenuOffset?: Point2d;
+    /** Whether a submenu replaces the level that opened it or stacks beside it. */
+    submenuMode?: MenuSubmenuMode;
+    /** What opens a submenu — hovering its item, or picking it. */
+    submenuOpensOn?: MenuSubmenuTrigger;
+    /** Whether holding the trigger down opens the menu, rather than needing a full click. */
+    opensOnHold?: boolean;
+    /**
+     * The role the trigger announces, written on the button that takes focus rather than on the box around it.
+     * Left out, the trigger is a button. A menubar passes `menuitem`, because every child of a menubar has to be
+     * one, and the trigger still announces the menu it opens and whether that menu is open.
+     */
+    triggerRole?: MenuTriggerRole;
+    /** Screen room to stay out of, for a consumer with a fixed header or sidebar the menu must not slide under. */
+    reservedScreenSize?: Size2d;
+    /** How long the menu takes to fade in and out. */
+    transitionDurationMs?: number;
+    /** How long the highlight's marker takes to slide from one item to the next, and to fade. */
+    floaterTransitionDurationMs?: number;
+};
+
+export type BaseMenuCbs<T> = {
+    /** Arranges the items, for a menu that is something other than a vertical list. */
+    computeLayout?: PlacementLayoutFn;
+    /** What the items do as the pointer nears them. */
+    computeEffect?: ProximityEffectFn;
+    /** Runs when an item is picked. */
+    onActivate: (value: T) => void;
+};
+
+export type BaseMenuProps<T> = BaseMenuValues & BaseMenuCbs<T>;
+
+export type BaseContextMenuValues = {
+    /** Names the menu for assistive technology. */
+    ariaLabel: string;
+    /**
+     * Names the region for assistive technology.
+     *
+     * The region is a tab stop, so it has to say what it is — and its own name cannot be the menu's, which
+     * describes what the menu offers rather than what the region holds.
+     */
+    regionAriaLabel: string;
+    /** Turns the menu off, so right-clicking the region does nothing out of the ordinary. */
+    isDisabled?: boolean;
+    /** Where the menu sits against the point it was opened at. */
+    placement?: AnchorPlacement;
+    /** How far the menu is held clear of the point it was opened at. */
+    offset?: Point2d;
+    /**
+     * Where a submenu sits against the item that opens it. Left out, a submenu opens beside its item on the
+     * side the opening arrow points to: the right, or the left where the region sits in right-to-left
+     * text. Given, it is used as it stands in either direction.
+     */
+    submenuPlacement?: AnchorPlacement;
+    /** How far a submenu is held clear of the item that opens it. */
+    submenuOffset?: Point2d;
+    /** Whether a submenu replaces the level that opened it or stacks beside it. */
+    submenuMode?: MenuSubmenuMode;
+    /** What opens a submenu — hovering its item, or picking it. */
+    submenuOpensOn?: MenuSubmenuTrigger;
+    /** Screen room to stay out of, for a consumer with a fixed header or sidebar the menu must not slide under. */
+    reservedScreenSize?: Size2d;
+    /** How long the menu takes to fade in and out. */
+    transitionDurationMs?: number;
+    /** How long the highlight's marker takes to slide from one item to the next, and to fade. */
+    floaterTransitionDurationMs?: number;
+};
+
+export type BaseContextMenuCbs<T> = {
+    /** Arranges the items, for a menu that is something other than a vertical list. */
+    computeLayout?: PlacementLayoutFn;
+    /** What the items do as the pointer nears them. */
+    computeEffect?: ProximityEffectFn;
+    /** Runs when an item is picked. */
+    onActivate: (value: T) => void;
+};
+
+export type BaseContextMenuProps<T> = BaseContextMenuValues & BaseContextMenuCbs<T>;

@@ -5,8 +5,8 @@ import { PaintedText } from "@thewaver/ss-components-vue";
 import * as styles from "@thewaver/ss-playground/App/Pages/PaintedTextPage/PaintedTextPage.css";
 import type { Size2d } from "@thewaver/ss-utils";
 
-import { computeSampleDefs } from "../PaintedTextPage.const";
-import type { PaintedTextExampleProps } from "../PaintedTextPage.types";
+import { computeSampleDefs } from "../PaintedTextPageVue.const";
+import type { PaintedTextExampleProps } from "../PaintedTextPageVue.types";
 
 type Props = PaintedTextExampleProps & {
     text: string;

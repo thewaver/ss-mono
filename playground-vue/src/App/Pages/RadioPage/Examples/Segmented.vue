@@ -2,12 +2,12 @@
 import { useModel } from "vue";
 
 import { Radio, RadioGroup } from "@thewaver/ss-components-vue";
+import { SIZE_OPTIONS } from "@thewaver/ss-playground/App/Pages/RadioPage/RadioPage.const";
 
 import PageRadioSegmentContent from "../../../StyledComponents/RadioSegmentContent/PageRadioSegmentContent.vue";
 import PageRadioSegmentFloater from "../../../StyledComponents/RadioSegmentContent/PageRadioSegmentFloater.vue";
 import PageRadioSegmentGroup from "../../../StyledComponents/RadioSegmentContent/PageRadioSegmentGroup.vue";
-import { SIZE_OPTIONS } from "../RadioPage.const";
-import type { RadioExampleProps } from "../RadioPage.types";
+import type { RadioExampleProps } from "../RadioPageVue.types";
 
 type Props = RadioExampleProps;
 

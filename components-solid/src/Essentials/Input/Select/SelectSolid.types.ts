@@ -2,6 +2,8 @@ import type { Accessor, JSX } from "solid-js";
 
 import type {
     AnchorPlacement,
+    BaseSelectCbs,
+    BaseSelectValues,
     ButtonFlags,
     InteractionFlags,
     SelectFlags,
@@ -12,7 +14,6 @@ import type {
     SelectOptionRecord,
     SelectRowRecord,
 } from "@thewaver/ss-components";
-import type { CSSPadding, Point2d, Size2d } from "@thewaver/ss-utils";
 
 import type {
     InteractionControlProps,
@@ -20,7 +21,7 @@ import type {
     InteractionWrapperProps,
 } from "../../../Primitives/InteractionWrapper/InteractionWrapperSolid.types";
 import type { TextFieldTextStyle } from "../../../Primitives/TextField/TextFieldSolid.types";
-import type { AccessorProps, MaybeAccessor, SignalSource } from "../../../Utils/typeUtils";
+import type { AccessorProps, AccessorValues, MaybeAccessor, SignalSource } from "../../../Utils/typeUtils";
 
 export type SelectOption<T, TTooltipDefs = InteractionTooltipDefs<SelectOptionFlags>> = SelectOptionRecord<
     T,
@@ -36,78 +37,45 @@ export type SelectItem<T, TTooltipDefs = InteractionTooltipDefs<SelectOptionFlag
 
 export type SelectRow<T, TTooltipDefs = InteractionTooltipDefs<SelectOptionFlags>> = SelectRowRecord<T, TTooltipDefs>;
 
-export type SelectFieldProps = AccessorProps<
-    InteractionControlProps<SelectFlags> & {
-        /** Identifies the list the field opens, so the field can point at it. */
-        listboxId: string;
-        /** Whether a value has to be given. It is announced and not enforced, because the library validates nothing. */
-        isRequired?: boolean;
-        /**
-         * Identifies the option the keyboard is currently on, which is how the reader is told what is highlighted
-         * without focus leaving the field.
-         */
-        activeOptionId: string | undefined;
-        /** Whether typing in the field narrows the list rather than jumping to a match. */
-        isFilterable: boolean;
-        /** What the reader has typed to narrow the list by. */
-        query: string;
-        /** How far the field's text is inset, so it clears whatever the consumer has drawn inside the field. */
-        textInset: JSX.CSSProperties;
-        /** Styles the field's text against its current state. */
-        computeTextStyle?: (getFlags: () => InteractionFlags<SelectFlags>) => TextFieldTextStyle;
-        /** Runs when the field is activated and the list should open or close. */
-        onToggle: () => void;
-        /** Runs on a key pressed while the field has focus, which is what walks and picks from the list. */
-        onKeyDown: (e: KeyboardEvent) => void;
-        /** Runs as the reader types into a filterable field. */
-        onQueryInput: (query: string) => void;
-    }
->;
+export type SelectFieldProps = AccessorValues<Pick<BaseSelectValues, "ariaLabel" | "isRequired">> &
+    AccessorProps<
+        Omit<InteractionControlProps<SelectFlags>, "ariaLabel"> & {
+            /** Identifies the list the field opens, so the field can point at it. */
+            listboxId: string;
+            /**
+             * Identifies the option the keyboard is currently on, which is how the reader is told what is highlighted
+             * without focus leaving the field.
+             */
+            activeOptionId: string | undefined;
+            /** Whether typing in the field narrows the list rather than jumping to a match. */
+            isFilterable: boolean;
+            /** What the reader has typed to narrow the list by. */
+            query: string;
+            /** How far the field's text is inset, so it clears whatever the consumer has drawn inside the field. */
+            textInset: JSX.CSSProperties;
+            /** Styles the field's text against its current state. */
+            computeTextStyle?: (getFlags: () => InteractionFlags<SelectFlags>) => TextFieldTextStyle;
+            /** Runs when the field is activated and the list should open or close. */
+            onToggle: () => void;
+            /** Runs on a key pressed while the field has focus, which is what walks and picks from the list. */
+            onKeyDown: (e: KeyboardEvent) => void;
+            /** Runs as the reader types into a filterable field. */
+            onQueryInput: (query: string) => void;
+        }
+    >;
 
 export type SelectCompositeProps<T> = Omit<InteractionWrapperProps<SelectFlags>, "renderControl" | "extraFlags"> &
+    AccessorValues<BaseSelectValues> &
+    BaseSelectCbs &
     AccessorProps<{
-        /** Identifies the select, and is what the field and list compose their own ids from. */
-        id?: string;
-        /** Names the select for assistive technology. */
-        ariaLabel?: string;
-        /**
-         * Names the popup list for assistive technology, written as its `aria-label`. Left out, the list is named after
-         * the `Label` the select sits in, or after the field when there is none. The `Label` fallback reads everything
-         * inside the label, the field's current text included, so pass this where the list's name should be exactly the
-         * caption.
-         */
-        listAriaLabel?: string;
-        /** Whether a value has to be given. It is announced and not enforced, because the library validates nothing. */
-        isRequired?: boolean;
-        /** Where the list sits against the field. */
-        placement?: AnchorPlacement;
-        /** How far the list is held clear of the field. */
-        offset?: Point2d;
-        /** Screen room to stay out of, for a consumer with a fixed header or sidebar the list must not slide under. */
-        reservedScreenSize?: Size2d;
-        /** How long the list takes to fade in and out. */
-        transitionDurationMs?: number;
-        /** How much room is left inside the field, around its text. */
-        padding?: CSSPadding | number;
         /** Whether more than one option can be picked at a time. */
         isMultiple?: boolean;
-        /** Whether there are more options to come, so the list can say so rather than looking finished. */
-        hasMoreOptions?: boolean;
         /** Styles the field's text against its current state. */
         computeTextStyle?: (getFlags: () => InteractionFlags<SelectFlags>) => TextFieldTextStyle;
         /** Whether the list is open. It is the only thing that opens or closes it. */
         visibility?: SignalSource<boolean>;
         /** What the reader has typed to narrow the list by. It is the only thing that changes the query. */
         query?: SignalSource<string>;
-        /**
-         * Guesses how tall an option will be before it is drawn, which is what lets a long list render only what is on
-         * screen.
-         */
-        computeEstimatedOptionHeight?: (index: number) => number;
-        /** Guesses how tall a group heading will be before it is drawn, for the same reason. */
-        computeEstimatedGroupHeight?: (index: number) => number;
-        /** How long either marker takes to slide from one option to the next, and to fade. */
-        floaterTransitionDurationMs?: number;
         /**
          * Draws the marker that slides to the selected option in the open list, behind it. The fade is handed in rather
          * than applied: the marker fades out when nothing is selected, and in a list that only draws what is on screen
@@ -139,10 +107,6 @@ export type SelectCompositeProps<T> = Omit<InteractionWrapperProps<SelectFlags>,
             getPlacement: () => AnchorPlacement,
             getFlags: () => InteractionFlags<SelectFlags>,
         ) => JSX.Element;
-        /** Runs when the reader reaches the end of the list, for a consumer fetching more options as they scroll. */
-        onReachEnd?: () => void;
-        /** Names the clear control for assistive technology, where what it draws has no text of its own. */
-        clearAriaLabel?: string;
         /**
          * Draws a control inside the field that empties it, and is handed that control's own state. It is drawn only
          * while something is picked, sits after the field as a tab stop of its own, and pressing it empties the value,

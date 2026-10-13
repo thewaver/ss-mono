@@ -2,6 +2,12 @@ import { createMemo, createSignal } from "solid-js";
 
 import { LENS_DEFAULTS } from "@thewaver/ss-components-solid";
 import { LensKnobs } from "@thewaver/ss-playground/App/Knobs/Lenses.const";
+import {
+    EXAMPLES_ROOT,
+    EXAMPLE_NAMES,
+    FIELD_WIDTH,
+    SHAPE_FIELD_WIDTH,
+} from "@thewaver/ss-playground/App/Pages/Reveals/LensPage/LensPage.const";
 import type { RevealShape } from "@thewaver/ss-playground/App/Pages/Reveals/RevealPage/RevealPage.types";
 import { ShapeConst, type Size2d } from "@thewaver/ss-utils";
 
@@ -11,10 +17,6 @@ import { PageProp } from "../../../PageComponents/Prop/Prop";
 import { PagePropsPanel } from "../../../PageComponents/PropsPanel/PropsPanel";
 import { PhotoExample } from "./Examples/Photo";
 import { PrintExample } from "./Examples/Print";
-
-const EXAMPLES_ROOT = "/src/App/Pages/Reveals/LensPage/Examples";
-const FIELD_WIDTH = 110;
-const SHAPE_FIELD_WIDTH = 170;
 
 export const LensPage = () => {
     const [getZoom, setZoom] = createSignal(LENS_DEFAULTS.zoom);
@@ -46,14 +48,14 @@ export const LensPage = () => {
         return [
             {
                 key: "photo",
-                name: "Photo",
+                name: EXAMPLE_NAMES.photo,
                 readout: () => "a picture drawn larger inside a window that follows the pointer",
                 component: () => <PhotoExample {...commonProps} computePoints={getComputePoints()} />,
                 path: `${EXAMPLES_ROOT}/Photo.tsx`,
             },
             {
                 key: "print",
-                name: "Small print",
+                name: EXAMPLE_NAMES.print,
                 readout: () => "the word under the middle of the lens is the word under the pointer",
                 component: () => <PrintExample {...commonProps} computePoints={getComputePoints()} />,
                 path: `${EXAMPLES_ROOT}/Print.tsx`,

@@ -21,6 +21,7 @@ import {
     ShapeLayerUtils,
     TrailUtils,
 } from "@thewaver/ss-components";
+import { PaintedTextConst } from "@thewaver/ss-components/internal";
 import { StringUtils } from "@thewaver/ss-utils";
 
 import { InteractionTrackerVueUtils } from "../../../Abstracts/InteractionTracker/InteractionTrackerVue.utils";
@@ -32,12 +33,6 @@ import { declareProps, useTwoWay } from "../../../Utils/propUtils";
 import { useStore } from "../../../Utils/storeUtils";
 import type { SlotsContext } from "../../../Utils/typeUtils";
 import type { PaintedTextController, PaintedTextProps, PaintedTextSlots } from "./PaintedText.types";
-
-const MASK_PADDING_SIDES = 2;
-const NO_OFFSET = 0;
-const NO_LENGTH = 0;
-const NO_PROGRESS = 0;
-const NO_REGISTRY = LetterDriverUtils.createRegistry();
 
 const toVueStyle = (style: Record<string, unknown>) =>
     Object.fromEntries(
@@ -73,7 +68,7 @@ export const PaintedText = defineComponent(
 
         const driver = useLetterDriverContext();
 
-        const progress = useTwoWay(props, "progress", NO_PROGRESS);
+        const progress = useTwoWay(props, "progress", PaintedTextConst.NO_PROGRESS);
         const isPlaying = useTwoWay(props, "playback", PAINTED_TEXT_DEFAULTS.playback);
 
         const isPageHidden = InteractionTrackerVueUtils.usePageHidden();
@@ -84,7 +79,8 @@ export const PaintedText = defineComponent(
         const sourceRef = shallowRef<HTMLDivElement>();
         const layoutRef = shallowRef<HTMLDivElement>();
 
-        const getOffset = () => (driver && rootRef.value ? driver.registry.getOffset(rootRef.value) : NO_OFFSET);
+        const getOffset = () =>
+            driver && rootRef.value ? driver.registry.getOffset(rootRef.value) : PaintedTextConst.NO_OFFSET;
 
         const getComputePushingAnimationName = () => {
             const computeName = driver?.getComputePushingAnimationName?.();
@@ -107,7 +103,7 @@ export const PaintedText = defineComponent(
         const state = useStore(layout);
         const restLetters = useStore(layout, (value) => value.restLetters);
         const origin = useStore(layout, (value) => value.origin);
-        const registryState = useStore(driver?.registry ?? NO_REGISTRY);
+        const registryState = useStore(driver?.registry ?? PaintedTextConst.NO_REGISTRY);
 
         let registration: LetterRegistration | undefined;
 
@@ -154,7 +150,7 @@ export const PaintedText = defineComponent(
                 props.path !== undefined &&
                 isPlaying.value &&
                 !isPageHidden.value &&
-                state.value.pathLength > NO_LENGTH,
+                state.value.pathLength > PaintedTextConst.NO_LENGTH,
         );
 
         watchAfterRender([() => props.path, getIsFittedToPath], () => {
@@ -388,15 +384,15 @@ export const PaintedText = defineComponent(
                                     maskUnits="userSpaceOnUse"
                                     x={origin.value.x - maskPadding}
                                     y={origin.value.y - maskPadding}
-                                    width={width + maskPadding * MASK_PADDING_SIDES}
-                                    height={height + maskPadding * MASK_PADDING_SIDES}
+                                    width={width + maskPadding * PaintedTextConst.MASK_PADDING_SIDES}
+                                    height={height + maskPadding * PaintedTextConst.MASK_PADDING_SIDES}
                                 >
                                     {strokePaint.maskKind === "outside" && (
                                         <rect
                                             x={origin.value.x - maskPadding}
                                             y={origin.value.y - maskPadding}
-                                            width={width + maskPadding * MASK_PADDING_SIDES}
-                                            height={height + maskPadding * MASK_PADDING_SIDES}
+                                            width={width + maskPadding * PaintedTextConst.MASK_PADDING_SIDES}
+                                            height={height + maskPadding * PaintedTextConst.MASK_PADDING_SIDES}
                                             fill="white"
                                         />
                                     )}

@@ -4,7 +4,7 @@
 
     import PageBreadcrumbContent from "../../../StyledComponents/BreadcrumbContent/PageBreadcrumbContent.svelte";
     import PageBreadcrumbSeparator from "../../../StyledComponents/BreadcrumbContent/PageBreadcrumbSeparator.svelte";
-    import type { BreadcrumbsExampleProps } from "../BreadcrumbsPage.types";
+    import type { BreadcrumbsExampleProps } from "../BreadcrumbsPageSvelte.types";
 
     type Props = BreadcrumbsExampleProps;
 

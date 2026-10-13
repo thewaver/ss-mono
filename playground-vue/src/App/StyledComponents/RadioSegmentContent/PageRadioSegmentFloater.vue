@@ -2,7 +2,7 @@
 import * as styles from "@thewaver/ss-playground/App/StyledComponents/RadioSegmentContent/RadioSegmentContent.css";
 
 import { useLayerClass } from "../Layer/Layer.context";
-import type { RadioSegmentFloaterProps } from "./RadioSegmentContent.types";
+import type { RadioSegmentFloaterProps } from "./RadioSegmentContentVue.types";
 
 defineProps<RadioSegmentFloaterProps>();
 

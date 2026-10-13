@@ -4,7 +4,7 @@ import { access } from "@thewaver/ss-components-solid";
 import * as styles from "@thewaver/ss-playground/App/StyledComponents/MosaicContent/MosaicContent.css";
 
 import { useLayerClass } from "../Layer/Layer.context";
-import type { PageMosaicLinkProps, PageMosaicTileProps } from "./MosaicContent.types";
+import type { PageMosaicLinkProps, PageMosaicTileProps } from "./MosaicContentSolid.types";
 
 export const PageMosaicTile = (props: ParentProps<PageMosaicTileProps>) => {
     const getLayerClass = useLayerClass();

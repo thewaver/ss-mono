@@ -201,6 +201,36 @@ the expensive part once a first component is ported end to end, this is the opti
 out, with each framework's view spreading them onto its own elements. That keeps a single Zag machine
 adoptable later for one control where it wins, without the rest of the library changing shape to fit.
 
+**Anything a framework package holds that touches no framework belongs in the core**, even when only the framework
+views call it: a measurement, a string builder, a default context value, an equality check. The user's call, taken
+on DRY grounds after a sweep found such helpers copied into all four framework packages — `Bracket`'s connector
+geometry, `Label`'s and `FormField`'s default contexts, the element observers' equality helpers and empty results,
+and `Wraparound`'s tile keys. The test is what the code reaches, not where it is used: only a line that renders,
+reacts or reads a framework's context stays behind.
+
+**A component's private constants live behind `@thewaver/ss-components/internal`, as `<Component>Const`.** The user's
+calls. About 380 constants declared at the top of component files — `ROW_SIZING`, `EMPTY_SELECTION`, a sample's
+timings — were identical in every framework that had them. Exporting them from the core's index was rejected because
+every framework package re-exports that index, so each would have become public API, and several names collide
+across components. So the core has a second entry, `src/internal.ts`, built and type-declared beside `index.ts` and
+listed in the package's `exports` as `./internal`; framework packages import from it and do not re-export it. Each
+component's constants sit in a namespace named for it with the suffix `Const` (`RadioConst`, `HandTrail1Const`), in
+`<Component>.internal.const.ts` beside its other core files — one file per sample folder for the samples. Every place
+that maps `@thewaver/ss-components` to source (each `tsconfig.json` and each Vite and Vitest alias) maps the
+`/internal` path too, listed before the bare name, since the bare-name alias points at a file and would swallow the
+subpath.
+
+**Constants repeated across components are merged only where they are one mechanism.** The user's call over
+merging every repeat or none. Merged: the tracked gradient samples' `NO_FADE`, `RENDERED_ELSEWHERE` and
+`FULL_AGE_RATIO` (`TrackedGradientSampleConst`); the trail-stamp timings shared by the hand trails, spot smears and
+spot trails (`TrailStampConst`); the pointer-following spots' resting point and motion step (`SpotConst`); each
+numbered sample family's shared numbers (`HandTrailConst`, `SpotRippleConst`, `SpotSmearConst`, `SpotFlareConst`);
+and the "placed entries fill, unplaced ones fit" sizing of the six controls that take a layout (`PlacementConst`).
+Left with their component, because only the numbers agree: `NOTHING`, `NEXT`, `HALF`, `PERCENT`, `NO_PROGRESS`,
+`EMPTY_SELECTION`, `DEFAULT_MARGINS`, each timed pattern's `CELL_COUNT`, each sample's `COLOR_KEYS` and `DEFAULTS`, and
+comet's and swarm's settle values. Merging those would tie together tunings that only happen to match. The few
+constants typed with a type declared inside a sample file (`NO_STAMPS` and its stamp types) stayed in the sample.
+
 **What already crosses frameworks unchanged is the styling**: vanilla-extract compiles to plain class names
 and a stylesheet. What does not is `Abstracts/`, several of which create Solid signals at module scope
 (`Navigator.utils.ts`'s direction version, for one) — pulling those out of Solid is the first work.
@@ -394,6 +424,31 @@ while, then retired whole (_"The gallery is gone"_, above).
 - **Which files are shared was decided by what they reach**, as for the library: a `.tsx`, a context, or anything
   importing `solid-js`, the Solid router, a Solid-only library name, or another Solid file, followed to a fixed
   point, stayed Solid. So a page's `.types.ts` built on `AccessorProps` is Solid, and the React app writes its own.
+  **A file that reaches a framework package only for names the core also exports is shared**, importing them from
+  `@thewaver/ss-components`: the rule above read the package name rather than what was taken from it, and so left
+  seventeen `Knobs/` files copied into all four apps, identical but for that import line. All seventeen moved, on the
+  user's call that keeping one copy matters more than the lines it saves; five of them could follow only once the
+  sample names they type against left the framework packages (_"`SVGDefsSamples` is data, `SVGDefsSampleConfigs` is
+  drawing"_). No app has a `Knobs/` folder of its own now. The small unions a moved file needed went to the shared
+  half beside their page (`PaintKind.types.ts`, `SVGDefsSourceSizes.const.ts`,
+  `SVGGradientsPaintKind.types.ts`, `SatelliteBadgeCorner.types.ts`, `ToastOptions.types.ts`,
+  `TypewriterTextEffect.types.ts`), and each app's own `.types.ts` re-exports them so its other importers are untouched.
+- **The menu's descriptions are written once**, in `playground/src/App/MenuDescriptions.const.ts`, keyed by the
+  entry's name, which is unique across the whole tree. Each app's `MENU_CONFIGS` keeps only names, nesting and page
+  components, and the Gallery's section text and the Docs view's lead read the description by name. The four copies
+  had already drifted once: `SlotText`'s text was updated for letters in Solid and left describing digits only in the
+  other three, though all four turn letters.
+- **An app file that shares a path with a shared-half file carries its framework's name**: `ButtonPageReact.types.ts`
+  beside the shared `ButtonPage.types.ts`, as the library's Solid package writes `XSolid.types.ts`. The source view keys
+  both folders by path, so two files at one path collide and one hides the other. The user accepted it as imperfect
+  but acceptable when the Playground's constants and types were de-duplicated, which renamed 577 app files at once.
+  Example props follow the library's `Base…Values` / `Base…Cbs` shape, and Solid examples read every value through
+  `access(…)`, never by calling the prop. `MenuBranchConfig`, `MenuNodeConfig` and the Gallery types stay per app,
+  the user's call: they differ only by the page component's type, and sharing them would add a type parameter to
+  every use.
+- **An example's name is written once too**, in its page's shared `<Page>.const.ts` as `EXAMPLE_NAMES`, keyed by the
+  example's key, and every app's examples list reads `name: EXAMPLE_NAMES.<key>`. The object is per page because keys
+  are unique only within a page. A mistyped or missing key is a compile error in every app.
 - **`playground-solid/` and `playground-react/` mirror each other path for path**, so the switch between them only
   swaps the prefix, and a spec written against one finds the same page, example and `data-*` keys in the other.
   The React app's Vite server refuses `solid-js`, the Solid router and `@thewaver/ss-components-solid`.
@@ -3609,6 +3664,16 @@ Asked for by the user: a props table was half the story, and for an abstract —
 none of it. The view now covers every export of the library entry except `.const` files and
 everything under `Samples/` and `Utils/`, grouped as Props, Components, Context, Utilities, Classes and Types,
 in that order, with an empty group left out.
+
+**A type built from other named types lists only its own members, and names the rest.** The user's rule, for every
+type: when `B = A & { … }`, B's table never repeats A's rows; A has its own table. So the builder reads a type alias
+written as an intersection part by part — a part holding an inline `{ … }` gives rows, any other part is shown above
+the table as "Also has everything in …", linked to that type's table on this page or on its own page. `AccessorProps`
+and `AccessorValues` are looked through when they wrap an intersection, since each applies to every member alike, and
+`Omit`, `Pick` and the other wrappers link to the type they wrap. A type with no rows of its own, such as
+`BaseXProps = BaseXValues & BaseXCbs`, shows its heading and that line and no table. A bare alias of a type from
+outside the library stays an alias row, so `Record<string, number>` does not become an empty table. The rule came
+with the shared `Base<Component>Props`, which would otherwise have shown every prop up to three times per page.
 
 **An export belongs to the unit its folder names**, by the same `getUnitName` the dependency map uses, so the
 two agree on what a unit is. **A props type is the one exception: `XProps` goes to unit `X` when there is one.**
@@ -7583,8 +7648,8 @@ expected `true` and now expects `location`.
 **A link with an `href` is a real anchor; without one it is a button that does the same thing** — `Tab<T>`'s
 terms, as `Tree` and `Breadcrumbs` follow them. An anchor keeps middle-click, open-in-new-tab and copy-link,
 none of which a click handler can give. The click is intercepted only when the target exists: then the default
-is cancelled, the target is scrolled to `block: "start"` (so a consumer's `scroll-margin-top` is honored) and
-focused with `preventScroll`. With no target yet the anchor follows its fragment as any link would. There is no
+is cancelled, the target is scrolled to the top of the box it scrolls in (honoring a consumer's `scroll-margin-top`;
+see _"The line is drawn inside the box the targets scroll in"_ below) and focused with `preventScroll`. With no target yet the anchor follows its fragment as any link would. There is no
 `linkComponent`, which `Tabs` takes because an `<a>` reloads a routed application: a fragment link does not, and
 the click is cancelled before a router sees it.
 
@@ -7646,6 +7711,26 @@ box that has not been scrolled at all never counts as at its end, so a page that
 rule rather than marking its last section on load. This lives in the shared observer, so every framework has it.
 Padding the bottom of the page instead was rejected: it puts most of a screen of blank space under every article,
 and every consumer would have to know to add it.
+
+**The line is drawn inside the box the targets scroll in, not across the window.** The user's call, made when the
+Playground's two tall examples were to be replaced by one in a 320-high scrolling box. With the line at a share of the
+window's height, an article scrolling in a panel of its own was followed only by coincidence: a panel below the line
+never marked past its first section, and one straddling it marked at a point that moved as the page scrolled. So
+`observeCurrentIndex` takes the box it already found for the end rule, keeps the part of it inside the viewport, and
+puts the line `offsetRatio` of the way down that. When the targets scroll with the document the box is the window and
+nothing changed. The Playground's Docs pages scroll in a panel whose top is the window's top, so nothing moved there. A
+consequence worth knowing: a first heading sitting at the very top of its box is above the line at once, so it is
+marked before any scroll — which is right, since it is what the reader is looking at.
+
+**Pressing a link scrolls only that box.** `scrollIntoView` scrolls every scrolling ancestor, so the page jumped
+until the box's top met the window's. Its `container: "nearest"` option is the clean answer and is Chromium-only
+(caniuse lists no Firefox or Safari support), so `TableOfContentsUtils.goToTarget` works out the `scrollTop` itself
+when the box is not the document's scroller: the distance between the two on-screen tops, divided back out of any
+scaled ancestor by the box's on-screen height over its laid-out one, less the target's `scroll-margin-top` and the
+box's `scroll-padding-top`, which is what `scrollIntoView` honors. `scrollTo` with no `behavior` keeps the box's own
+`scroll-behavior`. When the box is the document, `scrollIntoView` is used unchanged. The cost: a table of contents
+whose box is scrolled out of sight scrolls inside it without bringing it on screen — a table of contents sits beside
+its article, so the case was judged not worth a second scroll.
 
 **A pressed link holds the mark until the reader does something of their own.** The end rule alone still marks the
 wrong link when the second-to-last one is pressed, since both headings are then on screen and the last wins. So
@@ -12529,6 +12614,18 @@ carry their own `SAMPLE_CONFIGS` and `SampleKey`, and a `Pattern.Tracked` would 
 ever wanted. `TimedGradientElementDefs` is the old gradient payload; `TrackedGradientElementDefs` is that
 minus the animation fields, which makes it a strict subset — a consumer holding the timed payload can call
 either, and nothing had to branch to keep that true.
+
+**`SVGDefsSamples` is data, `SVGDefsSampleConfigs` is drawing.** The user's call, on the ground that a lookup is
+plain TypeScript and has no reason to be framework-specific. The registry was written four times, once per framework
+package, identical but for an import line, because its tables pointed at the sample files that draw. It is split by
+that line. `SVGDefsSamples` moved to the core's `Samples/SVGDefs/SVGDefs.const.ts` and keeps every data member at the
+path it had — the sample colors, the `Iteration` table, each sub-registry's `SAMPLE_ENTRIES`, `Entry`, `SampleKey` and
+`SAMPLE_KEYS` — so a key typed against it reads the same from any package, and the Playground's knobs could become
+shared. Timed patterns have no entries, so their names are a list of their own there. Each framework package keeps
+`SVGDefsSampleConfigs`, holding only what draws — `Pattern.Timed.SAMPLE_CONFIGS` and the three `SAMPLE_FACTORIES`
+with their `toConfig` — and each of those tables `satisfies` a record over the core's `SampleKey`, so a framework
+missing a sample, or carrying one the core does not name, fails to compile. A framework package still re-exports
+`SVGDefsSamples` through its `export *` from the core, so a consumer reaches both names from one import.
 
 **The folders mirror the namespaces, because the left nav mirrors the folders.** `Samples/SVGDefs/Gradient`
 holds `Timed` and `Tracked` directories, and the menu's SVGGradients entry became a branch with a
@@ -19640,7 +19737,7 @@ standing still until hovered to after this first pass.
 its knob signals start as they would on the page, and the page components that read `useIsPreview()` strip it down:
 `PageExamples` draws only its first item's demo, bare, and `PagePropsPanel`, `PagePropsGroups` and `PagePropsDivider`
 draw nothing. Nothing is written per page, so the order of a page's examples decides its tile. `PREVIEW_EXCLUDED_PAGES`
-in `App.const.tsx` leaves a page out of the gallery and the nav preview without touching its page; it holds `TableOfContents` and `ViewportWrapper`, which are too tall to read at tile size, and both media switchers, `AudioSwitcher` and `ImageSwitcher` — all four the user's call. The list was kept, at their request, after it first carried `ShapeReveal`.
+in `App.const.tsx` leaves a page out of the gallery and the nav preview without touching its page; it holds `ViewportWrapper`, which is too tall to read at tile size, and both media switchers, `AudioSwitcher` and `ImageSwitcher` — all three the user's call. `TableOfContents` was on it until its page's examples became one outline in a 320-high scrolling box, which fits a tile. The list was kept, at their request, after it first carried `ShapeReveal`.
 
 **A tile mounts only while on screen**, and is taken down when it leaves, so its state resets on the way back.
 
@@ -19649,7 +19746,7 @@ positions, anchored popups and measurements inside all know the scale, and popup
 canvas is 600 wide and at least 400 tall, chosen by eye against how small a 960-wide canvas made text; the height
 grows to the example's natural height plus padding, so a tall example is shrunk to fit rather than cut off. Width
 does not grow, so an example wider than 520 still clips at the side (`Table`), and a very tall one comes out small
-(which is why `TableOfContents` and `ViewportWrapper` are excluded).
+(which is why `ViewportWrapper` is excluded).
 
 **An example is centered by its own natural width, and anything meant to fill says so with a width.** The preview
 centers the page's wrapper and the demo's children, which shrinks each example to its content. That is right for a

@@ -4,6 +4,11 @@ import { computed, shallowRef } from "vue";
 import type { ImageSwitcherProps } from "@thewaver/ss-components-vue";
 import { IMAGE_SWITCHER_DEFAULTS } from "@thewaver/ss-components-vue";
 import { ImageSwitcherKnobs } from "@thewaver/ss-playground/App/Knobs/ImageSwitchers.const";
+import {
+    EXAMPLE_NAMES,
+    MISSING_SRC,
+    SOURCE_ALTS,
+} from "@thewaver/ss-playground/App/Pages/ImageSwitcherPage/ImageSwitcherPage.const";
 import * as styles from "@thewaver/ss-playground/App/Pages/ImageSwitcherPage/ImageSwitcherPage.css";
 import type { SourceType } from "@thewaver/ss-playground/App/Pages/ImageSwitcherPage/ImageSwitcherPage.types";
 import knight_date from "@thewaver/ss-playground/App/knight_date.webp";
@@ -17,19 +22,10 @@ import PageProp from "../../PageComponents/Prop/Prop.vue";
 import PagePropsPanel from "../../PageComponents/PropsPanel/PagePropsPanel.vue";
 import DefaultExampleWrapper from "./DefaultExampleWrapper.vue";
 
-const MISSING_SRC = "missing_image.webp";
-
 const SOURCE_URLS: Record<SourceType, string | undefined> = {
     profile: knight_profile,
     date: knight_date,
     missing_file: MISSING_SRC,
-    none: undefined,
-};
-
-const SOURCE_ALTS: Record<SourceType, string | undefined> = {
-    profile: "A knight in profile",
-    date: "A knight on a date",
-    missing_file: "A picture that will not load",
     none: undefined,
 };
 
@@ -57,7 +53,7 @@ const commonProps = computed<ImageSwitcherProps>(() => ({
 const examples: ExampleDefs[] = [
     {
         key: "default",
-        name: "Default",
+        name: EXAMPLE_NAMES.default,
         readout: () => `loads: ${loadCount.value} | last loaded: ${loadedName.value}`,
         path: DEFAULT_EXAMPLE_PATH,
     },

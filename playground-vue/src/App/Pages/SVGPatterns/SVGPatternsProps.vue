@@ -1,12 +1,12 @@
 <script setup lang="ts">
 import type { SVGDefsColors } from "@thewaver/ss-components-vue";
+import { SVGPatternKnobs } from "@thewaver/ss-playground/App/Knobs/SVGPatterns.const";
 import * as styles from "@thewaver/ss-playground/App/Pages/SVGPatterns/SVGPatterns.css";
 
-import { SVGPatternKnobs } from "../../Knobs/SVGPatterns.const";
 import PageColorField from "../../PageComponents/Field/PageColorField.vue";
 import PageNumberField from "../../PageComponents/Field/PageNumberField.vue";
 import PageProp from "../../PageComponents/Prop/Prop.vue";
-import type { SVGPatternsControls } from "./SVGPatterns.types";
+import type { SVGPatternsControls } from "./SVGPatternsVue.types";
 
 type Props = {
     controls: SVGPatternsControls;

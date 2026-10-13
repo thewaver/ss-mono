@@ -1,11 +1,13 @@
 <svelte:options namespace="svg" />
 
 <script lang="ts">
+    import { BracketConnectorPaths } from "@thewaver/ss-components";
+
     import type { BracketConnectorElementProps } from "./BracketConnectorsSvelte.types.js";
 
     let props: BracketConnectorElementProps = $props();
 
-    const gradientId = $derived(`bracketConnector-${props.paint.defs.id}`);
+    const gradientId = $derived(BracketConnectorPaths.getGradientId(props.paint.defs));
 </script>
 
 <g>
@@ -26,7 +28,7 @@
     <path
         d={props.d}
         fill="none"
-        stroke={`url(#${gradientId})`}
+        stroke={BracketConnectorPaths.getStroke(props.paint.defs)}
         stroke-width={props.paint.width}
         stroke-linecap="round"
         stroke-linejoin="round"

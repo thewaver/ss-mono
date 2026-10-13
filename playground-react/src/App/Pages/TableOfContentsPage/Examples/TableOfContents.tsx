@@ -9,7 +9,7 @@ import {
 import * as styles from "@thewaver/ss-playground/App/Pages/TableOfContentsPage/TableOfContentsPage.css";
 
 import { PageTableOfContentsContent } from "../../../StyledComponents/TableOfContentsContent/TableOfContentsContent";
-import type { TableOfContentsExampleProps } from "../TableOfContentsPage.types";
+import type { TableOfContentsExampleProps } from "../TableOfContentsPageReact.types";
 
 const TOP_DEPTH = 0;
 
@@ -74,7 +74,7 @@ export const TableOfContentsExample = (props: Props) => {
                                 {section.title}
                             </Heading>
 
-                            <p>{section.text}</p>
+                            <p className={styles.tocText}>{section.text}</p>
                         </section>
                     );
                 })}

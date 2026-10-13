@@ -10,8 +10,8 @@ import type { Size2d } from "@thewaver/ss-utils";
 
 import PageMeasureBox from "../../../PageComponents/MeasureBox/MeasureBox.vue";
 import PageControlButtonContent from "../../../StyledComponents/ControlButtonContent/ControlButtonContent.vue";
-import { computeSampleDefs } from "../PaintedTextPage.const";
-import type { PaintedTextBoxedExampleProps } from "../PaintedTextPage.types";
+import { computeSampleDefs } from "../PaintedTextPageVue.const";
+import type { PaintedTextBoxedExampleProps } from "../PaintedTextPageVue.types";
 
 type Props = PaintedTextBoxedExampleProps & {
     computeAnimationName: (character: string, index: number, count: number) => string;

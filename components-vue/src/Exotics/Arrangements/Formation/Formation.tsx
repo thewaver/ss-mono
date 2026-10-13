@@ -1,16 +1,13 @@
 import { type SlotsType, computed, defineComponent } from "vue";
 
-import { FORMATION_DEFAULTS, type PlacementRect } from "@thewaver/ss-components";
+import { FORMATION_DEFAULTS } from "@thewaver/ss-components";
+import { FormationConst } from "@thewaver/ss-components/internal";
 
 import { PlacementBox } from "../../../Primitives/PlacementBox/PlacementBox";
 import { PlacementItem } from "../../../Primitives/PlacementItem/PlacementItem";
 import { callSlot, declareProps } from "../../../Utils/propUtils";
 import type { SlotsContext } from "../../../Utils/typeUtils";
 import type { FormationProps, FormationSlots } from "./Formation.types";
-
-const EMPTY_PLACEMENT: PlacementRect = { topShare: 0, leftShare: 0, widthShare: 0, heightShare: 0 };
-const FIRST_OCCURRENCE = 0;
-const NEXT = 1;
 
 export const Formation = defineComponent(
     <T,>(props: FormationProps<T>, { slots }: SlotsContext<FormationSlots<T>>) => {
@@ -45,16 +42,16 @@ export const Formation = defineComponent(
                     transitionDurationMs={transitionDurationMs}
                 >
                     {props.items.map((item, index) => {
-                        const occurrence = occurrences.get(item) ?? FIRST_OCCURRENCE;
-                        const placement = layout.value.placements[index] ?? EMPTY_PLACEMENT;
+                        const occurrence = occurrences.get(item) ?? FormationConst.FIRST_OCCURRENCE;
+                        const placement = layout.value.placements[index] ?? FormationConst.EMPTY_PLACEMENT;
 
-                        occurrences.set(item, occurrence + NEXT);
+                        occurrences.set(item, occurrence + FormationConst.NEXT);
 
                         return (
                             <PlacementItem
                                 key={`${itemIds.get(item)}:${occurrence}`}
                                 placement={placement}
-                                stackAt={props.isStackedInReverse ? count - index : index + NEXT}
+                                stackAt={props.isStackedInReverse ? count - index : index + FormationConst.NEXT}
                                 transitionDelayMs={index * transitionDelayMs}
                             >
                                 {callSlot(slots.renderItem, { item, state: { index, itemCount: count, placement } })}

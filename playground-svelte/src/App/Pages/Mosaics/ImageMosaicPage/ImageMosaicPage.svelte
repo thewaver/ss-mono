@@ -4,15 +4,17 @@
     import { createMosaicsControls } from "../Mosaics.utils.svelte";
     import PageMosaicsPanel from "../MosaicsPanel.svelte";
     import ImagesExampleWrapper from "./ImagesExampleWrapper.svelte";
-
-    const EXAMPLES_ROOT = "/src/App/Pages/Mosaics/ImageMosaicPage/Examples";
+    import {
+    EXAMPLE_NAMES,
+    EXAMPLES_ROOT,
+} from "@thewaver/ss-playground/App/Pages/Mosaics/ImageMosaicPage/ImageMosaicPage.const";
 
     const controls = createMosaicsControls();
 
     const examples: ExampleDefs[] = [
         {
             key: "images",
-            name: "Images the component sizes",
+            name: EXAMPLE_NAMES.images,
             readout: () =>
                 "each row is scaled to fill the fixed side exactly, so the only size asked for is the shape the finished mosaic should come out closest to",
             component: imagesExample,

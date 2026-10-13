@@ -21,6 +21,7 @@ import {
     TreeUtils,
     TypeaheadUtils,
 } from "@thewaver/ss-components";
+import { TreeConst } from "@thewaver/ss-components/internal";
 
 import { FloaterVueUtils } from "../../Abstracts/Floater/FloaterVue.utils";
 import { NavigatorVueUtils } from "../../Abstracts/Navigator/NavigatorVue.utils";
@@ -39,8 +40,6 @@ import { toElement } from "../../Utils/refUtils";
 import type { SlotsContext } from "../../Utils/typeUtils";
 import { TooltipVueUtils } from "../Overlays/Tooltip/TooltipVue.utils";
 import type { TreeNodeItemProps, TreeProps, TreeRow, TreeSlots } from "./Tree.types";
-
-const EMPTY_PINNED_ROWS: number[] = [];
 
 const TreeNodeItem = defineComponent(
     (props: TreeNodeItemProps, { slots }: SlotsContext<InteractionControlSlots<TreeNodeRenderProps>>) =>
@@ -146,7 +145,7 @@ export const Tree = defineComponent(
         const rowWindow = VirtualizerVueUtils.useRowWindow(sizerRef, () => flatRows.value.length, {
             isDisabled: () => !getIsVirtualized(),
             computeEstimatedSize: (index) => props.computeEstimatedNodeHeight?.(index) ?? 0,
-            pinnedRows: () => (rovingRow.value === undefined ? EMPTY_PINNED_ROWS : [rovingRow.value.index]),
+            pinnedRows: () => (rovingRow.value === undefined ? TreeConst.EMPTY_PINNED_ROWS : [rovingRow.value.index]),
         });
 
         const layout = computed(() =>

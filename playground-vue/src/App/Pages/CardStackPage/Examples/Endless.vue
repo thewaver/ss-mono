@@ -10,7 +10,7 @@ import type { SwipeDirection } from "@thewaver/ss-utils";
 
 import PageMeasureBox from "../../../PageComponents/MeasureBox/MeasureBox.vue";
 import PageControlButtonContent from "../../../StyledComponents/ControlButtonContent/ControlButtonContent.vue";
-import type { CardStackEndlessExampleProps } from "../CardStackExamples.types";
+import type { CardStackEndlessExampleProps } from "../CardStackExamplesVue.types";
 
 const DIRECTIONS: SwipeDirection[] = ["left", "right"];
 const DIRECTION_GLYPHS: Record<SwipeDirection, string> = {

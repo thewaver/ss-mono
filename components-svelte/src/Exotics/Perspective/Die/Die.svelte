@@ -2,20 +2,18 @@
     import { untrack } from "svelte";
 
     import { BarrelUtils, DIE_DEFAULTS, DieUtils, DieStyles as styles } from "@thewaver/ss-components";
+    import { DieConst } from "@thewaver/ss-components/internal";
 
     import { RollerSvelteUtils } from "../../../Abstracts/Roller/RollerSvelte.utils.svelte.js";
     import type { DieController, DieProps } from "./Die.types.js";
 
-    const HALF = 0.5;
-    const FIRST_FACE = 0;
-
-    let { face = $bindable(FIRST_FACE), autoSpin = $bindable(true), ...props }: DieProps = $props();
+    let { face = $bindable(DieConst.FIRST_FACE), autoSpin = $bindable(true), ...props }: DieProps = $props();
 
     let root = $state<HTMLDivElement>();
 
     const size = $derived(props.size);
     const reservedSize = $derived(DieUtils.getReservedSize(size));
-    const geometry = $derived(DieUtils.computeFaceGeometry(props.shape, size * HALF));
+    const geometry = $derived(DieUtils.computeFaceGeometry(props.shape, size * DieConst.HALF));
     const isMovable = $derived(props.isMovable ?? DIE_DEFAULTS.isMovable);
     const isSeeThrough = $derived(props.isSeeThrough ?? DIE_DEFAULTS.isSeeThrough);
 
@@ -24,7 +22,7 @@
         () => false,
         {
             getFaces: () => geometry,
-            getRadius: () => size * HALF,
+            getRadius: () => size * DieConst.HALF,
             getRollDurationMs: () => props.rollDurationMs,
             getSettleDurationMs: () => props.settleDurationMs,
             getRestDurationMs: () => props.restDurationMs,

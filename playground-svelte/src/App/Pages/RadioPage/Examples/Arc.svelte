@@ -4,7 +4,7 @@
 
     import PageRadioStarCell from "../../../StyledComponents/RadioStarContent/PageRadioStarCell.svelte";
     import PageRadioStarContent from "../../../StyledComponents/RadioStarContent/PageRadioStarContent.svelte";
-    import type { RadioRatingExampleProps } from "../RadioPage.types";
+    import type { RadioRatingExampleProps } from "../RadioPageSvelte.types";
 
     const RATING_OPTIONS = [1, 2, 3, 4, 5];
 

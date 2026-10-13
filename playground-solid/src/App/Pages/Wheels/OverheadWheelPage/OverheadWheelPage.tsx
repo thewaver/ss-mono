@@ -1,15 +1,17 @@
 import { createMemo, createSignal } from "solid-js";
 
+import {
+    EXAMPLES_ROOT,
+    EXAMPLE_NAMES,
+    FLAT_WHEEL_SIZE,
+} from "@thewaver/ss-playground/App/Pages/Wheels/OverheadWheelPage/OverheadWheelPage.const";
+
 import { PageExamples } from "../../../PageComponents/Examples/Examples";
 import { PageMeasureBox } from "../../../PageComponents/MeasureBox/MeasureBox";
 import type { WheelExampleProps } from "../Wheels.types";
 import { createWheelsControls } from "../Wheels.utils";
 import { PageWheelsPanel } from "../WheelsPanel";
 import { OverheadExample } from "./Examples/Overhead";
-
-const EXAMPLES_ROOT = "/src/App/Pages/Wheels/OverheadWheelPage/Examples";
-
-const FLAT_WHEEL_SIZE = 340;
 
 const OverheadExampleWrapper = (props: WheelExampleProps) => {
     return (
@@ -29,7 +31,7 @@ export const OverheadWheelPage = () => {
     const getExamples = createMemo(() => [
         {
             key: "overhead",
-            name: "Overhead",
+            name: EXAMPLE_NAMES.overhead,
             component: () => (
                 <OverheadExampleWrapper
                     {...controls.getSharedProps()}

@@ -20,6 +20,7 @@ import {
     type TypewriterUpdateCause,
     TypewriterUtils,
 } from "@thewaver/ss-components";
+import { TypewriterConst } from "@thewaver/ss-components/internal";
 import { StringUtils } from "@thewaver/ss-utils";
 import { assignInlineVars } from "@vanilla-extract/dynamic";
 
@@ -30,22 +31,20 @@ import { useLatest, useStableList } from "../../../Utils/refUtils";
 import { useStore } from "../../../Utils/storeUtils";
 import type { TypewriterController, TypewriterProps } from "./Typewriter.types";
 
-const BEFORE_FIRST = TypewriterUtils.CARET_BEFORE_FIRST;
-const CUSTOM_PROPERTY_PREFIX = "--";
-const DATA_PREFIX = "data-";
-const NO_PROGRESS = 0;
-
 const toReactStyle = (style: Record<string, unknown>) =>
     Object.fromEntries(
         Object.entries(style).map(([key, value]) => [
-            key.startsWith(CUSTOM_PROPERTY_PREFIX) ? key : StringUtils.kebabToCamelCase(key),
+            key.startsWith(TypewriterConst.CUSTOM_PROPERTY_PREFIX) ? key : StringUtils.kebabToCamelCase(key),
             value,
         ]),
     ) as CSSProperties;
 
 const toDataAttributes = (dataset: DOMStringMap) =>
     Object.fromEntries(
-        Object.entries(dataset).map(([key, value]) => [`${DATA_PREFIX}${StringUtils.camelToKebabCase(key)}`, value]),
+        Object.entries(dataset).map(([key, value]) => [
+            `${TypewriterConst.DATA_PREFIX}${StringUtils.camelToKebabCase(key)}`,
+            value,
+        ]),
     );
 
 const joinClasses = (...classes: (string | false | undefined)[]) => classes.filter(Boolean).join(" ");
@@ -58,7 +57,10 @@ export const Typewriter = (props: TypewriterProps) => {
     const mode = props.mode ?? TYPEWRITER_DEFAULTS.mode;
     const isErasing = mode === "erase";
 
-    const [progress, setProgressState] = SignalMirrorReactUtils.useOptionalState(props.progress, NO_PROGRESS);
+    const [progress, setProgressState] = SignalMirrorReactUtils.useOptionalState(
+        props.progress,
+        TypewriterConst.NO_PROGRESS,
+    );
     const [isPlaying, setIsPlayingState] = SignalMirrorReactUtils.useOptionalState(props.playback, true);
 
     const progressRef = useLatest(progress);
@@ -335,13 +337,13 @@ export const Typewriter = (props: TypewriterProps) => {
 
                 {!isDriven && state.segments.length > 0 && (
                     <div className={TypewriterStyles.typewriterTextWrap} style={{ width: `${state.width ?? 0}px` }}>
-                        {caretIndex === BEFORE_FIRST && props.renderCaret?.()}
+                        {caretIndex === TypewriterConst.BEFORE_FIRST && props.renderCaret?.()}
 
                         {state.segments.map((segment, index) => (
                             <Fragment key={index}>{renderSegment(segment)}</Fragment>
                         ))}
 
-                        {!isAnimating && caretIndex !== BEFORE_FIRST && props.renderCaret?.()}
+                        {!isAnimating && caretIndex !== TypewriterConst.BEFORE_FIRST && props.renderCaret?.()}
                     </div>
                 )}
             </div>

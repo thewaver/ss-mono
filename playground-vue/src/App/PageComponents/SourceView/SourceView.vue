@@ -3,6 +3,11 @@ import { computed, shallowRef, watch } from "vue";
 
 import { Accordion, Scroller, Tabs, useViewportContext } from "@thewaver/ss-components-vue";
 import type { AccordionItem, Tab } from "@thewaver/ss-components-vue";
+import {
+    MODAL_MARGIN_HEIGHT,
+    SECTION_GAP,
+    TAB_GAP,
+} from "@thewaver/ss-playground/App/PageComponents/SourceView/SourceView.const";
 import * as styles from "@thewaver/ss-playground/App/PageComponents/SourceView/SourceView.css";
 import { FOCUS_RING_WIDTH } from "@thewaver/ss-playground/App/Theme.css";
 
@@ -14,12 +19,8 @@ import PageTabGutter from "../../StyledComponents/TabContent/PageTabGutter.vue";
 import PageCodeBox from "../CodeBox/CodeBox.vue";
 import PageScrollerButton from "../ScrollerButton/ScrollerButton.vue";
 import PageTabPanel from "../TabPanel/TabPanel.vue";
-import type { SourceGroup, SourceViewProps } from "./SourceView.types";
 import { SourceViewUtils } from "./SourceView.utils";
-
-const TAB_GAP = 10;
-const SECTION_GAP = 5;
-const MODAL_MARGIN_HEIGHT = 80;
+import type { SourceGroup, SourceViewProps } from "./SourceViewVue.types";
 
 const getTabId = (name: string) => `source-tab-${name}`;
 

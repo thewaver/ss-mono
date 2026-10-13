@@ -5,7 +5,7 @@
 
     import PageSatellitePill from "../../../StyledComponents/SatelliteContent/PageSatellitePill.svelte";
     import PageSatelliteSubject from "../../../StyledComponents/SatelliteContent/PageSatelliteSubject.svelte";
-    import type { SatelliteBadgeCorner, SatelliteBadgeExampleProps } from "../SatellitePage.types";
+    import type { SatelliteBadgeCorner, SatelliteBadgeExampleProps } from "../SatellitePageSvelte.types";
 
     const PLACEMENTS: Record<SatelliteBadgeCorner, AnchorPlacement> = {
         "top_left": { x: "left_in", y: "top_in" },

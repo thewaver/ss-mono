@@ -1,11 +1,12 @@
 import { Fragment, defineComponent, shallowRef } from "vue";
 
+import { type GradientRippleSampleOpts, SVGDefsUtils, type TrackedGradientElementDefs } from "@thewaver/ss-components";
 import {
-    type GradientRippleSampleOpts,
-    SVGDefsUtils,
-    TrackedGradientDefaults,
-    type TrackedGradientElementDefs,
-} from "@thewaver/ss-components";
+    SpotConst,
+    SpotRipple1Const,
+    SpotRippleConst,
+    TrackedGradientSampleConst,
+} from "@thewaver/ss-components/internal";
 import { EasingUtils, MathUtils, type Point2d, Point2dUtils } from "@thewaver/ss-utils";
 
 import { PointerTrackerVueUtils } from "../../../../Abstracts/PointerTracker/PointerTrackerVue.utils";
@@ -34,31 +35,19 @@ type SpotRipplesProps = {
     opts?: GradientRippleSampleOpts;
 };
 
-const RIPPLE_LIFETIME_MS = 700;
-const CREST_OUTER_LIMIT = 99;
-const MOTION_STEP_RATIO = 0.002;
-
-const RESTING_ORIGIN: Point2d = { x: 0.5, y: 0.5 };
-const FULL_AGE_RATIO = 1;
-const NO_FADE = 0;
-const NO_TRAVEL = 0;
-const FIRST_MILESTONE = 0;
-
-const DEFAULTS = TrackedGradientDefaults.SPOT_RIPPLE_DEFAULTS;
-
-const RENDERED_ELSEWHERE = () => undefined;
-
 const getRippleId = (id: string, index: number) => `gradient${index + 2}-${id}`;
 
-const clock = SVGDefsUtils.createClock(RIPPLE_LIFETIME_MS);
+const clock = SVGDefsUtils.createClock(SpotRippleConst.RIPPLE_LIFETIME_MS);
 
 const getAgeRatio = (ripple: Ripple | undefined, frameMs: number) =>
-    ripple ? MathUtils.clamp01((frameMs - ripple.bornMs) / RIPPLE_LIFETIME_MS) : FULL_AGE_RATIO;
+    ripple
+        ? MathUtils.clamp01((frameMs - ripple.bornMs) / SpotRippleConst.RIPPLE_LIFETIME_MS)
+        : TrackedGradientSampleConst.FULL_AGE_RATIO;
 
 const getRippleScale = (ageRatio: number, opts?: GradientRippleSampleOpts) =>
     MathUtils.lerp(
-        opts?.rippleStartScale ?? DEFAULTS.rippleStartScale,
-        opts?.rippleEndScale ?? DEFAULTS.rippleEndScale,
+        opts?.rippleStartScale ?? SpotRipple1Const.DEFAULTS.rippleStartScale,
+        opts?.rippleEndScale ?? SpotRipple1Const.DEFAULTS.rippleEndScale,
         EasingUtils.easeOutCubic(ageRatio),
     );
 
@@ -70,20 +59,23 @@ const computeRippleColors = (
 ) => {
     const alpha =
         (ripple?.fade ?? 0) *
-        (opts?.rippleAlpha ?? DEFAULTS.rippleAlpha) *
-        (1 - ageRatio) ** (opts?.rippleDecay ?? DEFAULTS.rippleDecay);
+        (opts?.rippleAlpha ?? SpotRipple1Const.DEFAULTS.rippleAlpha) *
+        (1 - ageRatio) ** (opts?.rippleDecay ?? SpotRipple1Const.DEFAULTS.rippleDecay);
     const spread = MathUtils.lerp(
-        opts?.crestSpreadStart ?? DEFAULTS.crestSpreadStart,
-        opts?.crestSpreadEnd ?? DEFAULTS.crestSpreadEnd,
+        opts?.crestSpreadStart ?? SpotRipple1Const.DEFAULTS.crestSpreadStart,
+        opts?.crestSpreadEnd ?? SpotRipple1Const.DEFAULTS.crestSpreadEnd,
         EasingUtils.easeOutCubic(ageRatio),
     );
-    const crestStop = opts?.crestStop ?? DEFAULTS.crestStop;
+    const crestStop = opts?.crestStop ?? SpotRipple1Const.DEFAULTS.crestStop;
 
     return [
         { value: `rgb(from ${color} r g b / 0)` },
         { value: `rgb(from ${color} r g b / 0)`, stop: crestStop - spread },
         { value: `rgb(from ${color} r g b / ${alpha})`, stop: crestStop },
-        { value: `rgb(from ${color} r g b / 0)`, stop: Math.min(crestStop + spread, CREST_OUTER_LIMIT) },
+        {
+            value: `rgb(from ${color} r g b / 0)`,
+            stop: Math.min(crestStop + spread, SpotRippleConst.CREST_OUTER_LIMIT),
+        },
         { value: `rgb(from ${color} r g b / 0)`, stop: 100 },
     ];
 };
@@ -98,12 +90,12 @@ const SpotRipples = defineComponent(
             () => props.defs.getPointSource?.(),
         );
         const frameMs = SVGDefsVueUtils.useFrameMs(clock);
-        const rippleCount = props.opts?.rippleCount ?? DEFAULTS.rippleCount;
+        const rippleCount = props.opts?.rippleCount ?? SpotRipple1Const.DEFAULTS.rippleCount;
         const ripples = shallowRef(getNoRipples(rippleCount));
         const motion: RippleMotion = {
             lastOrigin: undefined,
-            travel: NO_TRAVEL,
-            bornMilestone: FIRST_MILESTONE,
+            travel: SpotRippleConst.NO_TRAVEL,
+            bornMilestone: SpotRippleConst.FIRST_MILESTONE,
         };
 
         watchAfterRender([frameMs, reading, isPointerPresent], () => {
@@ -115,14 +107,14 @@ const SpotRipples = defineComponent(
 
             motion.lastOrigin = origin;
 
-            if (step === undefined || step <= MOTION_STEP_RATIO) return;
+            if (step === undefined || step <= SpotConst.MOTION_STEP_RATIO) return;
 
             motion.travel += step;
 
-            if (fade > NO_FADE) clock.keepAwake();
+            if (fade > TrackedGradientSampleConst.NO_FADE) clock.keepAwake();
 
             const milestone = Math.floor(
-                motion.travel / (props.opts?.rippleSpacingRatio ?? DEFAULTS.rippleSpacingRatio),
+                motion.travel / (props.opts?.rippleSpacingRatio ?? SpotRipple1Const.DEFAULTS.rippleSpacingRatio),
             );
 
             if (milestone === motion.bornMilestone) return;
@@ -136,7 +128,8 @@ const SpotRipples = defineComponent(
         });
 
         return () => {
-            const elementSize = (props.opts?.circular ?? DEFAULTS.circular) ? props.defs.getSize() : undefined;
+            const elementSize =
+                (props.opts?.circular ?? SpotRipple1Const.DEFAULTS.circular) ? props.defs.getSize() : undefined;
             const color = props.defs.colors.primary;
 
             return (
@@ -145,12 +138,12 @@ const SpotRipples = defineComponent(
                         id: `gradient1-${props.id}`,
                         elementSize,
                         origin: reading.value.boxRatio,
-                        scale: props.opts?.sourceScale ?? DEFAULTS.sourceScale,
+                        scale: props.opts?.sourceScale ?? SpotRipple1Const.DEFAULTS.sourceScale,
                         colors: [
                             { value: `rgb(from ${color} r g b / 1)` },
                             {
-                                value: `rgb(from ${color} r g b / ${props.opts?.sourceAlpha ?? DEFAULTS.sourceAlpha})`,
-                                stop: props.opts?.sourceStop ?? DEFAULTS.sourceStop,
+                                value: `rgb(from ${color} r g b / ${props.opts?.sourceAlpha ?? SpotRipple1Const.DEFAULTS.sourceAlpha})`,
+                                stop: props.opts?.sourceStop ?? SpotRipple1Const.DEFAULTS.sourceStop,
                             },
                             { value: `rgb(from ${color} r g b / 0)`, stop: 100 },
                         ],
@@ -163,7 +156,7 @@ const SpotRipples = defineComponent(
                                 {SVGGradientDefsVueUtils.computeRadialGradient({
                                     id: getRippleId(props.id, index),
                                     elementSize,
-                                    origin: ripple?.origin ?? RESTING_ORIGIN,
+                                    origin: ripple?.origin ?? SpotConst.RESTING_ORIGIN,
                                     scale: getRippleScale(ageRatio, props.opts),
                                     colors: computeRippleColors(ripple, color, ageRatio, props.opts),
                                 })}
@@ -193,10 +186,10 @@ export const spot_ripple_1 = (opts?: GradientRippleSampleOpts): TrackedGradientC
                 },
                 filter: sharedBlur,
             },
-            ...Array.from({ length: opts?.rippleCount ?? DEFAULTS.rippleCount }, (_unused, index) => ({
+            ...Array.from({ length: opts?.rippleCount ?? SpotRipple1Const.DEFAULTS.rippleCount }, (_unused, index) => ({
                 gradientOrPattern: {
                     id: getRippleId(id, index),
-                    renderDefsElement: RENDERED_ELSEWHERE,
+                    renderDefsElement: TrackedGradientSampleConst.RENDERED_ELSEWHERE,
                 },
                 filter: sharedBlurRef,
                 blend: true,

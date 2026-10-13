@@ -1,4 +1,4 @@
-import type { BinarySwitchCbs, BinarySwitchFlags, BinarySwitchState } from "@thewaver/ss-components";
+import type { BaseBinarySwitchValues, BinarySwitchCbs, BinarySwitchFlags } from "@thewaver/ss-components";
 
 import type {
     InteractionControlProps,
@@ -7,14 +7,14 @@ import type {
     InteractionWrapperSlots,
 } from "../InteractionWrapper/InteractionWrapper.types";
 
-export type { BinarySwitchCbs, BinarySwitchState };
-
-export type BinarySwitchElementProps = BinarySwitchCbs & InteractionControlProps<BinarySwitchFlags> & BinarySwitchState;
+export type BinarySwitchElementProps = BaseBinarySwitchValues &
+    BinarySwitchCbs &
+    InteractionControlProps<BinarySwitchFlags>;
 
 export type BinarySwitchProps = Omit<InteractionWrapperProps<BinarySwitchFlags>, "extraFlags"> &
+    BaseBinarySwitchValues &
     BinarySwitchCbs &
-    Pick<InteractionControlProps<BinarySwitchFlags>, "id"> &
-    BinarySwitchState;
+    Pick<InteractionControlProps<BinarySwitchFlags>, "id">;
 
 export type BinarySwitchSlots = Pick<InteractionWrapperSlots<BinarySwitchFlags>, "renderDecoration"> &
     InteractionControlSlots<BinarySwitchFlags>;

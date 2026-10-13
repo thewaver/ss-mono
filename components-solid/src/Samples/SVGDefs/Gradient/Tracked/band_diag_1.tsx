@@ -1,14 +1,10 @@
-import { type GradientBandOpts, SVGDefsUtils, TrackedGradientDefaults } from "@thewaver/ss-components";
-import type { Size2d } from "@thewaver/ss-utils";
+import { type GradientBandOpts, SVGDefsUtils } from "@thewaver/ss-components";
+import { BandDiag1Const } from "@thewaver/ss-components/internal";
 
 import { PointerTrackerSolidUtils } from "../../../../Abstracts/PointerTracker/PointerTrackerSolid.utils";
 import { SVGGradientDefsSolidUtils } from "../../../../Generators/SVGDefs/SVGGradients/SVGGradientDefsSolid.utils";
 import type { TrackedGradientConfig } from "../../SVGDefsSolid.types";
 import { SVGDefsSolidUtils } from "../../SVGDefsSolid.utils";
-
-const BAND_SPAN: Size2d = { width: 0.8, height: 0.8 };
-
-const DEFAULTS = TrackedGradientDefaults.BAND_DIAGONAL_DEFAULTS;
 
 const NO_REF = () => undefined;
 
@@ -27,22 +23,22 @@ export const band_diag_1 = (opts?: GradientBandOpts): TrackedGradientConfig => (
                         defs.getPointSource,
                     );
 
-                    const angle = opts?.bandAngle ?? DEFAULTS.bandAngle;
+                    const angle = opts?.bandAngle ?? BandDiag1Const.DEFAULTS.bandAngle;
 
                     const getTravel = () =>
                         SVGDefsUtils.projectBoxRatioOntoAngle(getReading().boxRatio, angle) *
-                        (opts?.bandTravel ?? DEFAULTS.bandTravel);
+                        (opts?.bandTravel ?? BandDiag1Const.DEFAULTS.bandTravel);
 
                     return SVGGradientDefsSolidUtils.computeLinearGradient({
                         id: `gradient1-${id}`,
                         colors: SVGDefsUtils.getFalloffStops(defs.colors.primary, {
-                            coreStop: opts?.coreStop ?? DEFAULTS.coreStop,
-                            coreAlpha: opts?.coreAlpha ?? DEFAULTS.coreAlpha,
-                            falloffSpread: opts?.falloffSpread ?? DEFAULTS.falloffSpread,
-                            falloffAlpha: opts?.falloffAlpha ?? DEFAULTS.falloffAlpha,
+                            coreStop: opts?.coreStop ?? BandDiag1Const.DEFAULTS.coreStop,
+                            coreAlpha: opts?.coreAlpha ?? BandDiag1Const.DEFAULTS.coreAlpha,
+                            falloffSpread: opts?.falloffSpread ?? BandDiag1Const.DEFAULTS.falloffSpread,
+                            falloffAlpha: opts?.falloffAlpha ?? BandDiag1Const.DEFAULTS.falloffAlpha,
                         }),
                         angle,
-                        scale: BAND_SPAN,
+                        scale: BandDiag1Const.BAND_SPAN,
                         offset: () => SVGDefsUtils.offsetDiagonally(getTravel(), angle),
                     });
                 },

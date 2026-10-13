@@ -2,7 +2,7 @@
 import * as styles from "@thewaver/ss-playground/App/StyledComponents/SelectOptionContent/SelectOptionContent.css";
 
 import { useLayerClass } from "../Layer/Layer.context";
-import type { FrameworkMenuItemProps } from "./FrameworkMenuContent.types";
+import type { FrameworkMenuItemProps } from "./FrameworkMenuContentVue.types";
 
 defineProps<FrameworkMenuItemProps>();
 

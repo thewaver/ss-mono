@@ -2,15 +2,14 @@
 import { computed, onBeforeUnmount, shallowRef, watch, watchEffect } from "vue";
 
 import {
+    NO_LENGTH,
     computeBeamLengthPx,
     computeBeamMotion,
     observeBeamLength,
 } from "@thewaver/ss-playground/App/StyledComponents/Beam/Beam.const";
 import * as styles from "@thewaver/ss-playground/App/StyledComponents/Beam/Beam.css";
 
-import type { PageBeamProps } from "./Beam.types";
-
-const NO_LENGTH = 0;
+import type { PageBeamProps } from "./BeamVue.types";
 
 const props = defineProps<PageBeamProps>();
 

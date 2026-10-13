@@ -9,13 +9,20 @@ import {
     ProximityEffects,
 } from "@thewaver/ss-components-solid";
 import type { PlacementLayoutEntry, ProximityEffectEntry } from "@thewaver/ss-components-solid";
+import { FormationKnobs } from "@thewaver/ss-playground/App/Knobs/Formations.const";
+import { PlacementLayoutKnobs } from "@thewaver/ss-playground/App/Knobs/PlacementLayouts.const";
+import { ProximityEffectKnobs } from "@thewaver/ss-playground/App/Knobs/ProximityEffects.const";
 import { NO_SAMPLE_KEY } from "@thewaver/ss-playground/App/PageComponents/SampleGroups/SampleGroups.const";
 import type { WithNoSample } from "@thewaver/ss-playground/App/PageComponents/SampleGroups/SampleGroups.types";
+import {
+    EXAMPLES_ROOT,
+    EXAMPLE_NAMES,
+    FIELD_WIDTH,
+    FORMATION_WIDTH,
+    NAMES,
+} from "@thewaver/ss-playground/App/Pages/FormationPage/FormationPage.const";
 import { ShapeConst } from "@thewaver/ss-utils";
 
-import { FormationKnobs } from "../../Knobs/Formations.const";
-import { PlacementLayoutKnobs } from "../../Knobs/PlacementLayouts.const";
-import { ProximityEffectKnobs } from "../../Knobs/ProximityEffects.const";
 import { PageExamples } from "../../PageComponents/Examples/Examples";
 import { PageCheckField, PageNumberField, PageSelectField } from "../../PageComponents/Field/Field";
 import { PageKnobs } from "../../PageComponents/Knobs/Knobs";
@@ -24,26 +31,7 @@ import { PageMeasureBox } from "../../PageComponents/MeasureBox/MeasureBox";
 import { PageProp } from "../../PageComponents/Prop/Prop";
 import { PagePropsDivider, PagePropsGroups, PagePropsPanel } from "../../PageComponents/PropsPanel/PropsPanel";
 import { DefaultExample } from "./Examples/Default";
-import type { FormationExampleProps } from "./FormationPage.types";
-
-const FIELD_WIDTH = 130;
-const FORMATION_WIDTH = 380;
-const EXAMPLES_ROOT = "/src/App/Pages/FormationPage/Examples";
-
-const NAMES = [
-    "Aurora",
-    "Basalt",
-    "Cinder",
-    "Drift",
-    "Ember",
-    "Fathom",
-    "Glimmer",
-    "Hollow",
-    "Iris",
-    "Jetty",
-    "Kelp",
-    "Loam",
-];
+import type { FormationExampleProps } from "./FormationPageSolid.types";
 
 const DefaultExampleWrapper = (props: FormationExampleProps) => {
     return (
@@ -123,7 +111,7 @@ export const FormationPage = () => {
         return [
             {
                 key: "default",
-                name: "Default",
+                name: EXAMPLE_NAMES.default,
                 component: () => <DefaultExampleWrapper {...commonProps} />,
                 path: `${EXAMPLES_ROOT}/Default.tsx`,
             },

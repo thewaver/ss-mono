@@ -10,8 +10,7 @@
     import type { ExampleDefs } from "../../PageComponents/Examples/Examples.types";
     import PageExamples from "../../PageComponents/Examples/PageExamples.svelte";
     import ClockedExample from "./Examples/Clocked.svelte";
-
-    const EXAMPLES_ROOT = "/src/App/Pages/TimePickerPage/Examples";
+    import { EXAMPLE_NAMES, EXAMPLES_ROOT } from "@thewaver/ss-playground/App/Pages/TimePickerPage/TimePickerPage.const";
 
     const describeTime = (value: TimeValue | undefined) => (value ? TimeUtils.toIso(value) : "none");
 
@@ -22,7 +21,7 @@
     const examples: ExampleDefs[] = [
         {
             key: "clocked",
-            name: "With a clock",
+            name: EXAMPLE_NAMES.clocked,
             readout: () =>
                 `value: ${describeTime(clocked)} — one column per unit, so typing and picking cover the same times`,
             component: clockedExample,
@@ -30,7 +29,7 @@
         },
         {
             key: "clockedTwelve",
-            name: "Twelve hour, with a clock",
+            name: EXAMPLE_NAMES.clockedTwelve,
             readout: () =>
                 `value: ${describeTime(clockedTwelve)} — the am/pm control and the clock trigger share the trailing slot`,
             component: clockedTwelveExample,
@@ -38,7 +37,7 @@
         },
         {
             key: "booking",
-            name: "Every fifteen minutes",
+            name: EXAMPLE_NAMES.booking,
             readout: () =>
                 `value: ${describeTime(booking)} — a coarser minute column, still inside ${TimeUtils.toIso(OPENING_TIME)} to ${TimeUtils.toIso(CLOSING_TIME)}`,
             component: bookingExample,

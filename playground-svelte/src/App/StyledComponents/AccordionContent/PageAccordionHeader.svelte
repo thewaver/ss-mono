@@ -4,7 +4,7 @@
     import * as styles from "@thewaver/ss-playground/App/StyledComponents/AccordionContent/AccordionContent.css";
 
     import { getLayerClass } from "../Layer/Layer.context";
-    import type { AccordionHeaderProps } from "./AccordionContent.types";
+    import type { AccordionHeaderProps } from "./AccordionContentSvelte.types";
 
     let props: AccordionHeaderProps & { children?: Snippet } = $props();
 

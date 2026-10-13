@@ -1,16 +1,11 @@
 import { useRef, useState } from "react";
 
 import { SATELLITE_DEFAULTS, SatelliteStyles, SatelliteUtils } from "@thewaver/ss-components";
+import { SatelliteConst } from "@thewaver/ss-components/internal";
 
 import { ElementObserverReactUtils } from "../../../Abstracts/ElementObserver/ElementObserverReact.utils";
 import type { SatelliteDefs, SatelliteProps } from "./Satellite.types";
 
-const BEHIND_Z_INDEX = 0;
-const SUBJECT_Z_INDEX = 1;
-const FRONT_Z_INDEX = 2;
-const NOTHING = 0;
-const UNMEASURED = { width: 0, height: 0 };
-const UNPLACED = { x: 0, y: 0 };
 const NO_SATELLITES: SatelliteDefs[] = [];
 
 export const Satellite = (props: SatelliteProps) => {
@@ -19,7 +14,7 @@ export const Satellite = (props: SatelliteProps) => {
     const [satelliteRefs, setSatelliteRefs] = useState<Array<HTMLElement | undefined>>([]);
 
     const satellites = props.satellites ?? NO_SATELLITES;
-    const hasSatellites = satellites.length > NOTHING;
+    const hasSatellites = satellites.length > SatelliteConst.NOTHING;
 
     const subjectSize = ElementObserverReactUtils.useBorderBoxSize(subjectRef, !hasSatellites);
 
@@ -56,7 +51,7 @@ export const Satellite = (props: SatelliteProps) => {
     const layout = SatelliteUtils.computeLayout(
         subjectSize,
         satellites.map((satellite, index) => ({
-            size: satelliteSizes[index] ?? UNMEASURED,
+            size: satelliteSizes[index] ?? SatelliteConst.UNMEASURED,
             placement: satellite.placement ?? SATELLITE_DEFAULTS.placement,
             offset: satellite.offset ?? SATELLITE_DEFAULTS.offset,
         })),
@@ -64,12 +59,16 @@ export const Satellite = (props: SatelliteProps) => {
 
     return (
         <div className={SatelliteStyles.satelliteRoot} style={layout.padding}>
-            <div ref={subjectRef} className={SatelliteStyles.satelliteSubject} style={{ zIndex: SUBJECT_Z_INDEX }}>
+            <div
+                ref={subjectRef}
+                className={SatelliteStyles.satelliteSubject}
+                style={{ zIndex: SatelliteConst.SUBJECT_Z_INDEX }}
+            >
                 {props.children}
             </div>
 
             {satellites.map((satellite, index) => {
-                const offset = layout.satelliteOffsets[index] ?? UNPLACED;
+                const offset = layout.satelliteOffsets[index] ?? SatelliteConst.UNPLACED;
 
                 return (
                     <div
@@ -81,8 +80,8 @@ export const Satellite = (props: SatelliteProps) => {
                             top: `${offset.y}px`,
                             zIndex:
                                 (satellite.isBehindSubject ?? SATELLITE_DEFAULTS.isBehindSubject)
-                                    ? BEHIND_Z_INDEX
-                                    : FRONT_Z_INDEX,
+                                    ? SatelliteConst.BEHIND_Z_INDEX
+                                    : SatelliteConst.FRONT_Z_INDEX,
                         }}
                     >
                         {satellite.renderSatellite()}

@@ -1,6 +1,7 @@
 import { Show, createMemo, createSignal, createUniqueId } from "solid-js";
 
 import { ListboxUtils } from "@thewaver/ss-components";
+import { TextInputConst } from "@thewaver/ss-components/internal";
 
 import { Popover } from "../../../Primitives/Popover/Popover";
 import { TextField } from "../../../Primitives/TextField/TextField";
@@ -9,9 +10,6 @@ import { ListboxOptions } from "../Listbox/Listbox";
 import { ListboxSolidUtils } from "../Listbox/ListboxSolid.utils";
 import type { SelectOption } from "../Select/SelectSolid.types";
 import type { TextInputProps } from "./TextInputSolid.types";
-
-const EMPTY_SELECTION: never[] = [];
-const NO_AUTOCOMPLETE = "off";
 
 export const TextInput = <T = string,>(props: TextInputProps<T>) => {
     const listboxId = createUniqueId();
@@ -26,7 +24,9 @@ export const TextInput = <T = string,>(props: TextInputProps<T>) => {
     );
 
     const getOptions = createMemo((): SelectOption<T>[] =>
-        props.suggestions === undefined ? EMPTY_SELECTION : access(props.suggestions).map((value) => ({ value })),
+        props.suggestions === undefined
+            ? TextInputConst.EMPTY_SELECTION
+            : access(props.suggestions).map((value) => ({ value })),
     );
 
     const getIsOpen = createMemo(() => getIsWanted() && !getIsRefused() && getOptions().length > 0);
@@ -56,7 +56,7 @@ export const TextInput = <T = string,>(props: TextInputProps<T>) => {
         isHighlightExplicit: true,
         getListboxId: () => listboxId,
         getOptions,
-        getSelectedOptions: () => EMPTY_SELECTION,
+        getSelectedOptions: () => TextInputConst.EMPTY_SELECTION,
         getIsDisabled: getIsRefused,
         getIsOpen,
         getIsFilterable: () => true,
@@ -84,7 +84,7 @@ export const TextInput = <T = string,>(props: TextInputProps<T>) => {
                     setFieldRef(element);
                     props.ref?.(element);
                 }}
-                autoComplete={props.autoComplete ?? (getHasSuggestions() ? NO_AUTOCOMPLETE : undefined)}
+                autoComplete={props.autoComplete ?? (getHasSuggestions() ? TextInputConst.NO_AUTOCOMPLETE : undefined)}
                 ariaAttributes={() =>
                     getHasSuggestions()
                         ? ListboxUtils.computeComboboxAttributes({

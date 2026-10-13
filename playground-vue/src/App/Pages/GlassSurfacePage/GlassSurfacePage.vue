@@ -4,16 +4,16 @@ import { computed, shallowRef } from "vue";
 import type { SVGDefsColors } from "@thewaver/ss-components-vue";
 import { DEFAULT_GLASS_DEFS, SVGDefsSamples, TrackedGradientDefaults } from "@thewaver/ss-components-vue";
 import { GlassSurfaceKnobs } from "@thewaver/ss-playground/App/Knobs/GlassSurfaces.const";
-import {
-    NO_SAMPLE_KEY,
-    splitEntriesIntoGroups,
-    toGroupEntriesWithNoSample,
-} from "@thewaver/ss-playground/App/PageComponents/SampleGroups/SampleGroups.const";
+import { TrackedGradientKnobs } from "@thewaver/ss-playground/App/Knobs/TrackedGradients.const";
+import { NO_SAMPLE_KEY } from "@thewaver/ss-playground/App/PageComponents/SampleGroups/SampleGroups.const";
 import type { WithNoSample } from "@thewaver/ss-playground/App/PageComponents/SampleGroups/SampleGroups.types";
+import {
+    EXAMPLE_NAMES,
+    STROKE_GROUPS,
+} from "@thewaver/ss-playground/App/Pages/GlassSurfacePage/GlassSurfacePage.const";
 import * as styles from "@thewaver/ss-playground/App/Pages/GlassSurfacePage/GlassSurfacePage.css";
 import { BORDER_RADIUS_FULL } from "@thewaver/ss-playground/App/Theme.const";
 
-import { TrackedGradientKnobs } from "../../Knobs/TrackedGradients.const";
 import type { ExampleDefs } from "../../PageComponents/Examples/Examples.types";
 import PageExamples from "../../PageComponents/Examples/PageExamples.vue";
 import PageColorField from "../../PageComponents/Field/PageColorField.vue";
@@ -26,11 +26,7 @@ import PagePropsDivider from "../../PageComponents/PropsPanel/PagePropsDivider.v
 import PagePropsGroups from "../../PageComponents/PropsPanel/PagePropsGroups.vue";
 import PagePropsPanel from "../../PageComponents/PropsPanel/PagePropsPanel.vue";
 import DefaultExample from "./Examples/Default.vue";
-import type { GlassSurfaceExampleProps } from "./GlassSurfacePage.types";
-
-const GROUPPED_GRADIENTS = splitEntriesIntoGroups(SVGDefsSamples.Gradient.Tracked.SAMPLE_ENTRIES);
-
-const STROKE_GROUPS = toGroupEntriesWithNoSample(GROUPPED_GRADIENTS);
+import type { GlassSurfaceExampleProps } from "./GlassSurfacePageVue.types";
 
 const DEFAULT_EXAMPLE_PATH = "/src/App/Pages/GlassSurfacePage/Examples/Default.vue";
 
@@ -96,7 +92,7 @@ const setStrokeConfigDef = (key: string, value: number | boolean) => {
 const examples: ExampleDefs[] = [
     {
         key: "default",
-        name: "Default",
+        name: EXAMPLE_NAMES.default,
         path: DEFAULT_EXAMPLE_PATH,
     },
 ];

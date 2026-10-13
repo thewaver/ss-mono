@@ -1,13 +1,12 @@
 import { For, createMemo } from "solid-js";
 
-import { FORMATION_DEFAULTS, type PlacementRect } from "@thewaver/ss-components";
+import { FORMATION_DEFAULTS } from "@thewaver/ss-components";
+import { FormationConst } from "@thewaver/ss-components/internal";
 
 import { PlacementBox } from "../../../Primitives/PlacementBox/PlacementBox";
 import { PlacementItem } from "../../../Primitives/PlacementItem/PlacementItem";
 import { access } from "../../../Utils/propUtils";
 import type { FormationProps } from "./FormationSolid.types";
-
-const EMPTY_PLACEMENT: PlacementRect = { topShare: 0, leftShare: 0, widthShare: 0, heightShare: 0 };
 
 export const Formation = <T,>(props: FormationProps<T>) => {
     const getItemCount = createMemo(() => access(props.items).length);
@@ -22,7 +21,7 @@ export const Formation = <T,>(props: FormationProps<T>) => {
         () => access(props.transitionDelayMs) ?? FORMATION_DEFAULTS.transitionDelayMs,
     );
 
-    const getPlacement = (index: number) => getLayout().placements[index] ?? EMPTY_PLACEMENT;
+    const getPlacement = (index: number) => getLayout().placements[index] ?? FormationConst.EMPTY_PLACEMENT;
 
     const getStackAt = (index: number) => (access(props.isStackedInReverse) ? getItemCount() - index : index + 1);
 

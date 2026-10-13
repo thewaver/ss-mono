@@ -2,12 +2,12 @@
     import type { SVGDefsColors } from "@thewaver/ss-components-svelte";
     import * as styles from "@thewaver/ss-playground/App/Pages/SVGGradients/SVGGradients.css";
 
-    import { SVGGradientKnobs } from "../../Knobs/SVGGradients.const";
+    import { SVGGradientKnobs } from "@thewaver/ss-playground/App/Knobs/SVGGradients.const";
     import PageColorField from "../../PageComponents/Field/PageColorField.svelte";
     import PageNumberField from "../../PageComponents/Field/PageNumberField.svelte";
     import PageSelectField from "../../PageComponents/Field/PageSelectField.svelte";
     import PageProp from "../../PageComponents/Prop/Prop.svelte";
-    import type { SVGGradientsControls } from "./SVGGradients.types";
+    import type { SVGGradientsControls } from "./SVGGradientsSvelte.types";
 
     type Props = {
         controls: SVGGradientsControls;

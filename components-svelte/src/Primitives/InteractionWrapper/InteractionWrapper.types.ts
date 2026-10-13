@@ -2,13 +2,7 @@ import type { Snippet } from "svelte";
 import type { Attachment } from "svelte/attachments";
 import type { AriaRole } from "svelte/elements";
 
-import type {
-    AnchorPlacement,
-    ExternalInteractionFlags,
-    InteractionActivation,
-    InteractionFlags,
-    InteractionSizing,
-} from "@thewaver/ss-components";
+import type { AnchorPlacement, BaseInteractionWrapperProps, InteractionFlags } from "@thewaver/ss-components";
 import type { ShapeArrowAim } from "@thewaver/ss-utils";
 
 import type { TooltipProps } from "../../Essentials/Overlays/Tooltip/Tooltip.types.js";
@@ -53,49 +47,14 @@ export type InteractionTooltipDefs<TExtra extends object = {}> = Omit<TooltipPro
     >;
 };
 
-export type InteractionWrapperProps<TExtra extends object = {}> = ExternalInteractionFlags & {
+export type InteractionWrapperProps<TExtra extends object = {}> = BaseInteractionWrapperProps<TExtra> & {
     /** The ARIA role the control reports, where it is something other than what its markup implies. */
     role?: AriaRole;
-    /** Whether the control takes only the room its content needs, or fills what it is given. */
-    sizing?: InteractionSizing;
-    /**
-     * The smallest width the control may shrink to. It exists so a control stays large enough to be hit accurately,
-     * rather than for layout.
-     */
-    minWidth?: number;
-    /** The smallest height the control may shrink to, for the same reason as the width. */
-    minHeight?: number;
-    /**
-     * Keeps a disabled control reachable by keyboard, so a reader learns it exists, hears that it is disabled, and
-     * reads its tooltip if it has one. Only means anything while the control is disabled.
-     */
-    isReachableWhenDisabled?: boolean;
-    /**
-     * Lets a disabled control take focus without putting it in the tab order, for a control reached by something
-     * other than tabbing. Only means anything while the control is disabled.
-     */
-    isFocusableWhenDisabled?: boolean;
-    /**
-     * Whether the control is reachable by tabbing at all. Switch it off for a control inside a group that manages
-     * its own walk, where the group is the one tab stop.
-     */
-    isTabbable?: boolean;
     /**
      * The control's element, for a consumer that has to measure or focus it. Bind it with `bind:ref`; it reads
      * `undefined` until the element exists and again once it is gone.
      */
     ref?: HTMLElement;
-    /**
-     * Extra state to merge into the flags handed to every render snippet, so a control can paint against something
-     * the wrapper knows nothing about.
-     */
-    extraFlags?: TExtra;
-    /**
-     * Runs when the control is activated, by pointer or by key. It is told how far the control was dragged and how
-     * many presses have landed since mount, a count that goes up by one each time — a change in it is what lets a
-     * repeated press restart an effect that is already running.
-     */
-    onActivation?: (activation: InteractionActivation) => void;
     /**
      * A tooltip for the control, anchored and shown by the wrapper. On a disabled control kept reachable, it is where
      * the reason for the disabling can be read.

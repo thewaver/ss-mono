@@ -1,6 +1,12 @@
 <script setup lang="ts">
 import { shallowRef } from "vue";
 
+import {
+    EXAMPLES_ROOT,
+    EXAMPLE_NAMES,
+    PERCENT,
+} from "@thewaver/ss-playground/App/Pages/SlideButtonPage/SlideButtonPage.const";
+
 import type { ExampleDefs } from "../../PageComponents/Examples/Examples.types";
 import PageExamples from "../../PageComponents/Examples/PageExamples.vue";
 import DefaultExample from "./Examples/Default.vue";
@@ -11,9 +17,6 @@ import HeldExample from "./Examples/Held.vue";
 import HoldOnlyExample from "./Examples/HoldOnly.vue";
 import ReachableExample from "./Examples/Reachable.vue";
 import SlideOnlyExample from "./Examples/SlideOnly.vue";
-
-const EXAMPLES_ROOT = "/src/App/Pages/SlideButtonPage/Examples";
-const PERCENT = 100;
 
 const sends = shallowRef(0);
 const progress = shallowRef(0);
@@ -28,53 +31,53 @@ const holdOnlySends = shallowRef(0);
 const examples: ExampleDefs[] = [
     {
         key: "default",
-        name: "Default",
+        name: EXAMPLE_NAMES.default,
         readout: () =>
             `activations: ${sends.value} — progress ${Math.round(progress.value * PERCENT)}%, which the owner reads while the gesture is still running`,
         path: `${EXAMPLES_ROOT}/Default.vue`,
     },
     {
         key: "described",
-        name: "Described by its field",
+        name: EXAMPLE_NAMES.described,
         readout: () =>
             `activations: ${describedSends.value} — the hint under the control is what a screen reader reads after its name, so the gesture is stated before anyone has to guess it`,
         path: `${EXAMPLES_ROOT}/Described.vue`,
     },
     {
         key: "slideOnly",
-        name: "Slide only",
+        name: EXAMPLE_NAMES.slideOnly,
         readout: () =>
             `activations: ${slideOnlySends.value} — a held press does nothing here, so carrying the thumb is the only pointer route, and a held Enter still confirms`,
         path: `${EXAMPLES_ROOT}/SlideOnly.vue`,
     },
     {
         key: "holdOnly",
-        name: "Hold only",
+        name: EXAMPLE_NAMES.holdOnly,
         readout: () =>
             `activations: ${holdOnlySends.value} — dragging the thumb does nothing here, so a stray drag cannot reach the action, and a held press or a held Enter both can`,
         path: `${EXAMPLES_ROOT}/HoldOnly.vue`,
     },
     {
         key: "held",
-        name: "Held at the end by the owner",
+        name: EXAMPLE_NAMES.held,
         readout: () => `armed: ${isArmed.value}`,
         path: `${EXAMPLES_ROOT}/Held.vue`,
     },
     {
         key: "disabled",
-        name: "Disabled",
+        name: EXAMPLE_NAMES.disabled,
         readout: () => `activations: ${disabledSends.value}`,
         path: `${EXAMPLES_ROOT}/Disabled.vue`,
     },
     {
         key: "reachable",
-        name: "Disabled + reachable",
+        name: EXAMPLE_NAMES.reachable,
         readout: () => `activations: ${reachableSends.value}`,
         path: `${EXAMPLES_ROOT}/Reachable.vue`,
     },
     {
         key: "errored",
-        name: "Error",
+        name: EXAMPLE_NAMES.errored,
         readout: () => `hasError: ${hasError.value}`,
         path: `${EXAMPLES_ROOT}/Errored.vue`,
     },

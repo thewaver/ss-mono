@@ -1,19 +1,8 @@
 import type { ReactNode } from "react";
 
-import type { IcicleCellState, IcicleNode } from "@thewaver/ss-components";
+import type { BaseIcicleProps, IcicleCellState, IcicleNode } from "@thewaver/ss-components";
 
-export type IcicleProps<T> = {
-    /** Names the icicle for assistive technology. */
-    ariaLabel: string;
-    /** How many columns fit across the icicle: the one in view and the levels under it. */
-    columnCount?: number;
-    /** How long a zoom takes. `0` jumps straight to the new view, which is the route for reduced motion. */
-    zoomDurationMs?: number;
-    /**
-     * The whole tree. A leaf's height comes from its `weight` and a branch's from the total of its children, so a
-     * weight set on a branch is ignored. A child weighing nothing gets no cell.
-     */
-    root: IcicleNode<T>;
+export type IcicleProps<T> = BaseIcicleProps<T> & {
     /**
      * The node in view, filling the first column from top to bottom, and how to change it. Both sides write it: the
      * icicle when a cell is activated — any cell, a leaf included — when the cell in view is activated again, which

@@ -1,7 +1,8 @@
 import { Tilter } from "@thewaver/ss-components-solid";
 import * as styles from "@thewaver/ss-playground/App/Pages/PointerEffects/TilterPage/TilterPage.css";
-import type { TilterExampleProps } from "@thewaver/ss-playground/App/Pages/PointerEffects/TilterPage/TilterPage.types";
 import knight from "@thewaver/ss-playground/App/knight_profile.webp";
+
+import type { TilterExampleProps } from "../TilterPageSolid.types";
 
 type Props = TilterExampleProps;
 

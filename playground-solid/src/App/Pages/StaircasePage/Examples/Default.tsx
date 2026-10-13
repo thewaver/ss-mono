@@ -1,7 +1,7 @@
 import { Staircase, StaircaseIndents, access } from "@thewaver/ss-components-solid";
 
 import { PageStaircaseStep } from "../../../StyledComponents/StaircaseContent/StaircaseContent";
-import type { StaircaseExampleProps } from "../StaircasePage.types";
+import type { StaircaseExampleProps } from "../StaircasePageSolid.types";
 
 type Props = StaircaseExampleProps;
 

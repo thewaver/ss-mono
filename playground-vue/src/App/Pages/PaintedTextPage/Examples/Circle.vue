@@ -9,8 +9,8 @@ import type { Size2d } from "@thewaver/ss-utils";
 
 import PageMeasureBox from "../../../PageComponents/MeasureBox/MeasureBox.vue";
 import PageControlButtonContent from "../../../StyledComponents/ControlButtonContent/ControlButtonContent.vue";
-import { computeSampleDefs } from "../PaintedTextPage.const";
-import type { PaintedTextCircleExampleProps } from "../PaintedTextPage.types";
+import { computeSampleDefs } from "../PaintedTextPageVue.const";
+import type { PaintedTextCircleExampleProps } from "../PaintedTextPageVue.types";
 
 const RING_TEXT = "PAINTED TEXT • ROUND A CIRCLE • ";
 

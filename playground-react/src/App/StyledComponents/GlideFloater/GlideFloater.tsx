@@ -3,7 +3,7 @@ import type { PropsWithChildren } from "react";
 import * as styles from "@thewaver/ss-playground/App/StyledComponents/GlideFloater/GlideFloater.css";
 
 import { useLayerClass } from "../Layer/Layer.context";
-import type { GlideFloaterProps, GlideLabelProps } from "./GlideFloater.types";
+import type { GlideFloaterProps, GlideLabelProps } from "./GlideFloaterReact.types";
 
 export const PageGlideFloater = (props: GlideFloaterProps) => {
     const layerClass = useLayerClass();

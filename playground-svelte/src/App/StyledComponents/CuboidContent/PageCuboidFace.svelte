@@ -2,7 +2,7 @@
     import * as styles from "@thewaver/ss-playground/App/StyledComponents/CuboidContent/CuboidContent.css";
 
     import { getLayerClass } from "../Layer/Layer.context";
-    import type { CuboidFaceProps } from "./CuboidContent.types";
+    import type { CuboidFaceProps } from "./CuboidContentSvelte.types";
 
     let props: CuboidFaceProps = $props();
 

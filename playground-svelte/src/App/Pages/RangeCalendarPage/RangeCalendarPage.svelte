@@ -21,10 +21,12 @@
     import PagePropsPanel from "../../PageComponents/PropsPanel/PagePropsPanel.svelte";
     import BoundedExample from "./Examples/Bounded.svelte";
     import DefaultExample from "./Examples/Default.svelte";
-
-    const CALENDAR_FIELD_WIDTH = 180;
-    const CALENDAR_IDS = DateValueUtils.getCalendarIds();
-    const EXAMPLES_ROOT = "/src/App/Pages/RangeCalendarPage/Examples";
+    import {
+    CALENDAR_FIELD_WIDTH,
+    CALENDAR_IDS,
+    EXAMPLE_NAMES,
+    EXAMPLES_ROOT,
+} from "@thewaver/ss-playground/App/Pages/RangeCalendarPage/RangeCalendarPage.const";
 
     const describe = (value: DateValueRange | undefined) =>
         value ? `${DateValueUtils.toIso(value.start)} to ${DateValueUtils.toIso(value.end)}` : "none";
@@ -44,14 +46,14 @@
     const examples: ExampleDefs[] = [
         {
             key: "default",
-            name: "Default",
+            name: EXAMPLE_NAMES.default,
             readout: () => `value: ${describe(defaultValue)}`,
             component: defaultExample,
             path: `${EXAMPLES_ROOT}/Default.svelte`,
         },
         {
             key: "bounded",
-            name: "Bounded",
+            name: EXAMPLE_NAMES.bounded,
             readout: () =>
                 `min ${DateValueUtils.toIso(MIN_DATE)}, max ${DateValueUtils.toIso(MAX_DATE)} — value: ${describe(boundedValue)}`,
             component: boundedExample,

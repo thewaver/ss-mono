@@ -2,6 +2,8 @@ import { useState } from "react";
 
 import {
     AUTOMATIC_TABS,
+    EXAMPLES_ROOT,
+    EXAMPLE_NAMES,
     HOVER_PILL_TABS,
     REACHABLE_TABS,
 } from "@thewaver/ss-playground/App/Pages/TabsPage/TabsPage.const";
@@ -15,8 +17,6 @@ import { LinkComponentExample } from "./Examples/LinkComponent";
 import { LinksExample } from "./Examples/Links";
 import { RightToLeftExample } from "./Examples/RightToLeft";
 import { RowExample } from "./Examples/Row";
-
-const EXAMPLES_ROOT = "/src/App/Pages/TabsPage/Examples";
 
 export const TabsPage = () => {
     const [rowValue, setRowValue] = useState("Render");
@@ -35,7 +35,7 @@ export const TabsPage = () => {
         {
             key: "row",
             span: 2,
-            name: "A row of tabs",
+            name: EXAMPLE_NAMES.row,
             readout: () => `selected: ${rowValue}`,
             component: () => <RowExample selectedValue={rowValue} onSelectionChange={setRowValue} />,
             path: `${EXAMPLES_ROOT}/Row.tsx`,
@@ -43,7 +43,7 @@ export const TabsPage = () => {
         {
             key: "column",
             span: 2,
-            name: "A column of tabs",
+            name: EXAMPLE_NAMES.column,
             readout: () => `selected: ${columnValue}`,
             component: () => <ColumnExample selectedValue={columnValue} onSelectionChange={setColumnValue} />,
             path: `${EXAMPLES_ROOT}/Column.tsx`,
@@ -51,7 +51,7 @@ export const TabsPage = () => {
         {
             key: "automatic",
             span: 2,
-            name: "Arrows that select as they move",
+            name: EXAMPLE_NAMES.automatic,
             readout: () =>
                 `selected: ${autoValue} — an arrow both moves the focus and takes the selection with it, which suits a panel that is already loaded`,
             component: () => (
@@ -68,7 +68,7 @@ export const TabsPage = () => {
         {
             key: "hoverPill",
             span: 2,
-            name: "A pill that follows the pointer",
+            name: EXAMPLE_NAMES.hoverPill,
             readout: () =>
                 `selected: ${hoverPillValue} — the underline stays on the selected tab while a second marker glides to whichever tab the pointer or the focus is on`,
             component: () => (
@@ -85,7 +85,7 @@ export const TabsPage = () => {
         {
             key: "reachable",
             span: 2,
-            name: "A disabled tab the arrows still reach",
+            name: EXAMPLE_NAMES.reachable,
             readout: () =>
                 `selected: ${reachableValue} — Metrics is disabled but stays in the arrow walk, so focus lands on it and a reader hears that it is unavailable; pressing it still selects nothing`,
             component: () => (
@@ -101,7 +101,7 @@ export const TabsPage = () => {
         {
             key: "rightToLeft",
             span: 2,
-            name: "Tabs in a right-to-left box",
+            name: EXAMPLE_NAMES.rightToLeft,
             readout: () =>
                 `selected: ${rightToLeftValue} — the box around the tabs sets dir="rtl", so they run from the right and the left arrow moves on to the next tab`,
             component: () => (
@@ -112,7 +112,7 @@ export const TabsPage = () => {
         {
             key: "honeycomb",
             span: 2,
-            name: "A honeycomb of tabs",
+            name: EXAMPLE_NAMES.honeycomb,
             readout: () =>
                 `selected: ${honeycombValue} — the same tab list, placed by a layout that has no angle in it at all`,
             component: () => <HoneycombExample selectedValue={honeycombValue} onSelectionChange={setHoneycombValue} />,
@@ -120,14 +120,14 @@ export const TabsPage = () => {
         },
         {
             key: "links",
-            name: "Tabs that are links",
+            name: EXAMPLE_NAMES.links,
             readout: () => `selected: ${linkValue} — every tab carries an href, so each one is an anchor`,
             component: () => <LinksExample selectedValue={linkValue} onSelectionChange={setLinkValue} />,
             path: `${EXAMPLES_ROOT}/Links.tsx`,
         },
         {
             key: "linkComponent",
-            name: "Links through a component",
+            name: EXAMPLE_NAMES.linkComponent,
             readout: () => `selected: ${customLinkValue} — the same tabs rendered by a consumer's own link component`,
             component: () => (
                 <LinkComponentExample selectedValue={customLinkValue} onSelectionChange={setCustomLinkValue} />
@@ -136,7 +136,7 @@ export const TabsPage = () => {
         },
         {
             key: "clearable",
-            name: "A selection that can be cleared",
+            name: EXAMPLE_NAMES.clearable,
             readout: () =>
                 `selected: ${clearableValue ?? "nothing"} — the floater plays itself out over ${CLEARABLE_TRANSITION_DURATION_MS}ms when the selection goes, and plays itself back in when one returns`,
             component: () => (
@@ -150,7 +150,7 @@ export const TabsPage = () => {
         },
         {
             key: "disabled",
-            name: "Every tab disabled",
+            name: EXAMPLE_NAMES.disabled,
             readout: () => `selected: ${disabledValue} — nothing can move it, so no tab holds the tab stop`,
             component: () => <AllDisabledExample selectedValue={disabledValue} onSelectionChange={setDisabledValue} />,
             path: `${EXAMPLES_ROOT}/AllDisabled.tsx`,

@@ -12,6 +12,15 @@ import type {
     SortableGridSpot,
 } from "@thewaver/ss-components-solid";
 import { SORTABLE_GRID_ANNOUNCEMENTS } from "@thewaver/ss-playground/App/PageComponents/Announcements/Announcements.const";
+import {
+    CELL_SIZE,
+    GRID_GAP,
+    PACK_COLUMNS,
+    PACK_ROWS,
+    computeGearHue,
+    computeGearKey,
+    computeGearLabel,
+} from "@thewaver/ss-playground/App/Pages/SortableGridPage/SortableGridPage.const";
 import * as styles from "@thewaver/ss-playground/App/Pages/SortableGridPage/SortableGridPage.css";
 import type { Gear } from "@thewaver/ss-playground/App/Pages/SortableGridPage/SortableGridPage.types";
 import { CONTROL_GLYPHS } from "@thewaver/ss-playground/App/StyledComponents/ControlButtonContent/ControlButtonContent.const";
@@ -23,16 +32,7 @@ import {
     PageSortableGridLanding,
     PageSortableGridSurface,
 } from "../../../StyledComponents/SortableGridContent/SortableGridContent";
-import type { SortableGridPaint } from "../../../StyledComponents/SortableGridContent/SortableGridContent.types";
-import {
-    CELL_SIZE,
-    GRID_GAP,
-    PACK_COLUMNS,
-    PACK_ROWS,
-    computeGearHue,
-    computeGearKey,
-    computeGearLabel,
-} from "../SortableGridPage.const";
+import type { SortableGridPaint } from "../../../StyledComponents/SortableGridContent/SortableGridContentSolid.types";
 
 type Props = {
     groupId: string;

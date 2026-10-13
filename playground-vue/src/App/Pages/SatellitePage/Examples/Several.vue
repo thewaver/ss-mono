@@ -6,7 +6,7 @@ import type { SatelliteDefs } from "@thewaver/ss-components-vue";
 
 import PageSatelliteBadge from "../../../StyledComponents/SatelliteContent/PageSatelliteBadge.vue";
 import PageSatelliteSubject from "../../../StyledComponents/SatelliteContent/PageSatelliteSubject.vue";
-import type { SatelliteExampleProps } from "../SatellitePage.types";
+import type { SatelliteExampleProps } from "../SatellitePageVue.types";
 
 const CORNER_SIZE = 48;
 const SIDE_SIZE = 72;

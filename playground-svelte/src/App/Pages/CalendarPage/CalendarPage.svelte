@@ -3,13 +3,18 @@
     import { CALENDAR_DEFAULTS, DateValueUtils } from "@thewaver/ss-components-svelte";
     import { CalendarKnobs } from "@thewaver/ss-playground/App/Knobs/Calendars.const";
     import {
-        MAX_DATE,
-        MAX_YEAR,
-        MIN_DATE,
-        MIN_YEAR,
-        TODAY,
-        WEEK_START_LABELS,
-    } from "@thewaver/ss-playground/App/Pages/CalendarPage/CalendarPage.const";
+    CALENDAR_FIELD_WIDTH,
+    CALENDAR_IDS,
+    EXAMPLE_NAMES,
+    EXAMPLES_ROOT,
+    MAX_DATE,
+    MAX_YEAR,
+    MIN_DATE,
+    MIN_YEAR,
+    TODAY,
+    WEEK_START_LABELS,
+    WEEK_STARTS,
+} from "@thewaver/ss-playground/App/Pages/CalendarPage/CalendarPage.const";
 
     import type { ExampleDefs } from "../../PageComponents/Examples/Examples.types";
     import PageExamples from "../../PageComponents/Examples/PageExamples.svelte";
@@ -22,11 +27,6 @@
     import RightToLeftExample from "./Examples/RightToLeft.svelte";
     import WeekdaysExample from "./Examples/Weekdays.svelte";
     import YearPickerExample from "./Examples/YearPicker.svelte";
-
-    const CALENDAR_FIELD_WIDTH = 180;
-    const EXAMPLES_ROOT = "/src/App/Pages/CalendarPage/Examples";
-    const CALENDAR_IDS = DateValueUtils.getCalendarIds();
-    const WEEK_STARTS: DateValueWeekStart[] = [...CalendarKnobs.WEEK_STARTS];
 
     const describe = (value: DateValue | undefined) => (value ? DateValueUtils.toIso(value) : "none");
 
@@ -62,28 +62,28 @@
     const examples: ExampleDefs[] = [
         {
             key: "default",
-            name: "Default",
+            name: EXAMPLE_NAMES.default,
             readout: () => `value: ${describe(defaultValue)} — month: ${describe(defaultMonth.get())}`,
             component: defaultExample,
             path: `${EXAMPLES_ROOT}/Default.svelte`,
         },
         {
             key: "bounded",
-            name: "Bounded",
+            name: EXAMPLE_NAMES.bounded,
             readout: () => `min ${describe(MIN_DATE)}, max ${describe(MAX_DATE)} — value: ${describe(rangedValue)}`,
             component: boundedExample,
             path: `${EXAMPLES_ROOT}/Bounded.svelte`,
         },
         {
             key: "weekdays",
-            name: "Weekdays only",
+            name: EXAMPLE_NAMES.weekdays,
             readout: () => `week starts on ${WEEK_START_LABELS[weekStartsOn]} — value: ${describe(weekdaysValue)}`,
             component: weekdaysExample,
             path: `${EXAMPLES_ROOT}/Weekdays.svelte`,
         },
         {
             key: "rightToLeft",
-            name: "In a right-to-left box",
+            name: EXAMPLE_NAMES.rightToLeft,
             readout: () =>
                 `value: ${describe(rightToLeftValue)} — the box around the calendar sets dir="rtl", so each week runs from the right and the right arrow moves to the day before`,
             component: rightToLeftExample,
@@ -91,7 +91,7 @@
         },
         {
             key: "monthPicker",
-            name: "Month picker",
+            name: EXAMPLE_NAMES.monthPicker,
             readout: () =>
                 `value: ${describe(monthPickerValue)} — precision="month": the grid holds the year's months, a pick sets the first of the month, and the page keys step a year`,
             component: monthPickerExample,
@@ -99,7 +99,7 @@
         },
         {
             key: "yearPicker",
-            name: "Year picker",
+            name: EXAMPLE_NAMES.yearPicker,
             readout: () =>
                 `value: ${describe(yearPickerValue)} — precision="year": twelve years to a page, bounded to ${MIN_YEAR.year}–${MAX_YEAR.year}, and a pick sets the first day of the year`,
             component: yearPickerExample,

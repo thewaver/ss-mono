@@ -12,3 +12,13 @@ export const FLIPBOOK_PAGES = [
     { heading: "The end", text: "Nothing is left on the right but the back cover." },
     { heading: "Back cover", text: "Turn back to read it again." },
 ];
+
+export const EXAMPLE_NAMES = {
+    book: "A book of twelve pages",
+};
+
+export const NO_MOTION_DURATION_MS = 0;
+
+export const FIELD_WIDTH = 110;
+
+export const EXAMPLES_ROOT = "/src/App/Pages/FlipbookPage/Examples";

@@ -3,7 +3,7 @@ import type { PropsWithChildren } from "react";
 import * as styles from "@thewaver/ss-playground/App/StyledComponents/CalendarContent/CalendarContent.css";
 
 import { useLayerClass } from "../Layer/Layer.context";
-import type { CalendarCaptionFieldsProps, CalendarDayProps, CalendarTitleProps } from "./CalendarContent.types";
+import type { CalendarCaptionFieldsProps, CalendarDayProps, CalendarTitleProps } from "./CalendarContentReact.types";
 
 export const PageCalendarDay = (props: CalendarDayProps) => {
     const layerClass = useLayerClass();

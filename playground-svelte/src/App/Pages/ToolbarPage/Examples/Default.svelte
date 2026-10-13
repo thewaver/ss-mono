@@ -5,7 +5,7 @@
     import PageButtonContent from "../../../StyledComponents/ButtonContent/ButtonContent.svelte";
     import PageMenuTriggerContent from "../../../StyledComponents/MenuTriggerContent/MenuTriggerContent.svelte";
     import { renderToolbarOverflowItem, renderToolbarPopup } from "../ToolbarPage.const.svelte";
-    import type { ToolbarExampleProps } from "../ToolbarPage.types";
+    import type { ToolbarExampleProps } from "../ToolbarPageSvelte.types";
 
     const ACTIONS: ToolbarAction<string>[] = [
         { value: "Bold" },

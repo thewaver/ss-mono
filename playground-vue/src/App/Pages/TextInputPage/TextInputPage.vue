@@ -1,7 +1,13 @@
 <script setup lang="ts">
 import { computed, shallowRef } from "vue";
 
-import { CITIES, PIN_LENGTH, QUANTITY_STEP } from "@thewaver/ss-playground/App/Pages/TextInputPage/TextInputPage.const";
+import {
+    CITIES,
+    EXAMPLES_ROOT,
+    EXAMPLE_NAMES,
+    PIN_LENGTH,
+    QUANTITY_STEP,
+} from "@thewaver/ss-playground/App/Pages/TextInputPage/TextInputPage.const";
 
 import type { ExampleDefs } from "../../PageComponents/Examples/Examples.types";
 import PageExamples from "../../PageComponents/Examples/PageExamples.vue";
@@ -18,8 +24,6 @@ import ReachableExample from "./Examples/Reachable.vue";
 import ReadOnlyExample from "./Examples/ReadOnly.vue";
 import RefusingSetterExample from "./Examples/RefusingSetter.vue";
 import TransformingSetterExample from "./Examples/TransformingSetter.vue";
-
-const EXAMPLES_ROOT = "/src/App/Pages/TextInputPage/Examples";
 
 const defaultValue = shallowRef("");
 const passwordValue = shallowRef("");
@@ -48,81 +52,81 @@ const citySuggestions = computed(() => {
 const examples: ExampleDefs[] = [
     {
         key: "default",
-        name: "Default",
+        name: EXAMPLE_NAMES.default,
         readout: () => `value: "${defaultValue.value}"`,
         path: `${EXAMPLES_ROOT}/Default.vue`,
     },
     {
         key: "transformingSetter",
-        name: "Transforming setter",
+        name: EXAMPLE_NAMES.transformingSetter,
         readout: () => `value: "${codeValue.value}" — type lowercase mid-string, the caret must not jump`,
         path: `${EXAMPLES_ROOT}/TransformingSetter.vue`,
     },
     {
         key: "refusingSetter",
-        name: "Refusing setter",
+        name: EXAMPLE_NAMES.refusingSetter,
         readout: () => `value: "${pinValue.value}" — letters are refused, ${PIN_LENGTH} digits max`,
         path: `${EXAMPLES_ROOT}/RefusingSetter.vue`,
     },
     {
         key: "suggestions",
-        name: "Suggestions",
+        name: EXAMPLE_NAMES.suggestions,
         readout: () =>
             `value: "${cityValue.value}" — ${citySuggestions.value.length} suggested; any text is kept, and Enter only picks once the arrows have moved into the list`,
         path: `${EXAMPLES_ROOT}/Cities.vue`,
     },
     {
         key: "editable",
-        name: "Edit in place",
+        name: EXAMPLE_NAMES.editable,
         readout: () =>
             `value: "${editableValue.value}" | editing: ${isEditing.value} — Enter or leaving keeps the edit, Escape puts the old text back`,
         path: `${EXAMPLES_ROOT}/Editable.vue`,
     },
     {
         key: "password",
-        name: "Password",
+        name: EXAMPLE_NAMES.password,
         readout: () => `value: "${passwordValue.value}" | revealed: ${isRevealed.value}`,
         path: `${EXAMPLES_ROOT}/Password.vue`,
     },
     {
         key: "bothAdornments",
-        name: "Both adornments",
+        name: EXAMPLE_NAMES.bothAdornments,
         readout: () => `value: "${amountValue.value}"`,
         path: `${EXAMPLES_ROOT}/BothAdornments.vue`,
     },
     {
         key: "number",
-        name: "Number",
+        name: EXAMPLE_NAMES.number,
         readout: () => `value: "${quantityValue.value}" — arrows step by ${QUANTITY_STEP}, no spinner buttons`,
         path: `${EXAMPLES_ROOT}/NumberField.vue`,
     },
     {
         key: "readOnly",
-        name: "Read-only",
+        name: EXAMPLE_NAMES.readOnly,
         readout: () => `value: "${readOnlyValue.value}" — selectable and copyable, never editable`,
         path: `${EXAMPLES_ROOT}/ReadOnly.vue`,
     },
     {
         key: "disabled",
-        name: "Disabled",
+        name: EXAMPLE_NAMES.disabled,
         readout: () => `value: "${disabledValue.value}"`,
         path: `${EXAMPLES_ROOT}/Disabled.vue`,
     },
     {
         key: "reachable",
-        name: "Disabled + reachable",
+        name: EXAMPLE_NAMES.reachable,
         readout: () => `value: "${reachableValue.value}"`,
         path: `${EXAMPLES_ROOT}/Reachable.vue`,
     },
     {
         key: "errored",
-        name: "Error",
+        name: EXAMPLE_NAMES.errored,
         readout: () => `value: "${erroredValue.value}"`,
         path: `${EXAMPLES_ROOT}/Errored.vue`,
     },
     {
         key: "label",
-        name: "In a Label",
+        name: EXAMPLE_NAMES.label,
         readout: () => `value: "${labeledValue.value}"`,
         path: `${EXAMPLES_ROOT}/Labeled.vue`,
     },

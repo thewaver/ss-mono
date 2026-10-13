@@ -5,8 +5,8 @@ import { MathUtils } from "@thewaver/ss-utils";
 
 import { renderPageHighlightFloater } from "../../../StyledComponents/GlideFloater/GlideFloater";
 import { PageTreeNodeContent } from "../../../StyledComponents/TreeNodeContent/TreeNodeContent";
-import { FILES } from "../TreePage.const";
 import type { TreeLeaningExampleProps } from "../TreePage.types";
+import { FILES } from "../TreePageSolid.const";
 
 const REACH_ITEMS = 2.5;
 const SHIFT_PERCENT = 8;

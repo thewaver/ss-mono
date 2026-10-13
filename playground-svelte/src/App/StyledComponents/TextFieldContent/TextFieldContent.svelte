@@ -13,7 +13,7 @@
 
 <script lang="ts">
     import { getLayerClass } from "../Layer/Layer.context";
-    import type { TextFieldContentProps } from "./TextFieldContent.types";
+    import type { TextFieldContentProps } from "./TextFieldContentSvelte.types";
 
     let props: TextFieldContentProps = $props();
 

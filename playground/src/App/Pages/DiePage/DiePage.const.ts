@@ -35,3 +35,18 @@ export const ICON_CLOUD_STEPS = [
     { direction: "down" as const, id: "dieCloudDown", label: "Spin down" },
     { direction: "right" as const, id: "dieCloudRight", label: "Spin right" },
 ];
+
+export const EXAMPLE_NAMES = {
+    tabletop: "Tabletop die",
+    iconCloud: "Icon cloud",
+};
+
+export const EXAMPLES_ROOT = "/src/App/Pages/DiePage/Examples";
+
+export const DIE_SIZE = 160;
+
+export const CLOUD_SIZE = 240;
+
+export const NO_MOTION_DURATION_MS = 0;
+
+export const FIRST_NUMBER = 1;

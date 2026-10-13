@@ -5,7 +5,7 @@ import { Button, LiveAnnouncerUtils } from "@thewaver/ss-components-vue";
 
 import PageControlRow from "../../../PageComponents/ControlRow/PageControlRow.vue";
 import PageButtonContent from "../../../StyledComponents/ButtonContent/ButtonContent.vue";
-import type { ButtonCopyExampleProps } from "../ButtonPage.types";
+import type { ButtonCopyExampleProps } from "../ButtonPageVue.types";
 
 const COPIED_MS = 2000;
 const COPIED_ANNOUNCEMENT = "Copied to the clipboard";

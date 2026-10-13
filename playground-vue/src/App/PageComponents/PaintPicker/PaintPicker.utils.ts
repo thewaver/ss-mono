@@ -1,7 +1,7 @@
 import { computed, shallowRef } from "vue";
 
-import { STARTING_KEYS } from "./PaintPicker.const";
-import type { PaintKind, PaintSampleKey, PaintSampleKind, PaintSlot } from "./PaintPicker.types";
+import { STARTING_KEYS } from "./PaintPickerVue.const";
+import type { PaintKind, PaintSampleKey, PaintSampleKind, PaintSlot } from "./PaintPickerVue.types";
 
 type ConfigDefs = Record<string, Record<string, number | boolean>>;
 

@@ -1,14 +1,13 @@
 import { type SlotsType, defineComponent, shallowRef } from "vue";
 
 import { LIGHT_CATCHER_DEFAULTS, LightCatcherStyles, PointerEffectsUtils } from "@thewaver/ss-components";
+import { LightCatcherConst } from "@thewaver/ss-components/internal";
 
 import { PointerTrackerVueUtils } from "../../../Abstracts/PointerTracker/PointerTrackerVue.utils";
 import { SmootherVueUtils } from "../../../Abstracts/Smoother/SmootherVue.utils";
 import { declareProps } from "../../../Utils/propUtils";
 import type { SlotsContext } from "../../../Utils/typeUtils";
 import type { LightCatcherProps, LightCatcherSlots } from "./LightCatcher.types";
-
-const NO_STRENGTH = 0;
 
 export const LightCatcher = defineComponent(
     (props: LightCatcherProps, { slots }: SlotsContext<LightCatcherSlots>) => {
@@ -33,7 +32,7 @@ export const LightCatcher = defineComponent(
 
                 return [
                     isResting
-                        ? NO_STRENGTH
+                        ? LightCatcherConst.NO_STRENGTH
                         : PointerEffectsUtils.computeEdgeStrength(
                               reading.value,
                               props.lightRangePx ?? LIGHT_CATCHER_DEFAULTS.lightRangePx,

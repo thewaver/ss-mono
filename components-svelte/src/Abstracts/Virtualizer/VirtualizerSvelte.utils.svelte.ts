@@ -9,11 +9,10 @@ import {
     measureElement,
     observeElementOffset,
 } from "@tanstack/virtual-core";
-import { type VirtualizerRow, VirtualizerUtils } from "@thewaver/ss-components";
+import { VirtualizerUtils } from "@thewaver/ss-components";
+import { VirtualizerConst } from "@thewaver/ss-components/internal";
 
 import type { VirtualizerRowWindow, VirtualizerRowWindowOpts } from "./VirtualizerSvelte.types.js";
-
-const NO_ROWS: VirtualizerRow[] = [];
 
 /**
  * Draws only the rows of a long list that are on screen.
@@ -171,7 +170,7 @@ export namespace VirtualizerSvelteUtils {
             });
         });
 
-        const visibleRows = $derived(opts.getIsDisabled() ? NO_ROWS : rows);
+        const visibleRows = $derived(opts.getIsDisabled() ? VirtualizerConst.NO_ROWS : rows);
 
         const totalSize = $derived(opts.getIsDisabled() ? 0 : virtualTotalSize);
 

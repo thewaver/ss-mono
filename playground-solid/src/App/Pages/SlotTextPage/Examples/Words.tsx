@@ -2,7 +2,7 @@ import { SlotText, access } from "@thewaver/ss-components-solid";
 import { WORD_LETTERS } from "@thewaver/ss-playground/App/Pages/SlotTextPage/SlotTextPage.const";
 import * as styles from "@thewaver/ss-playground/App/Pages/SlotTextPage/SlotTextPage.css";
 
-import type { SlotTextWordsExampleProps } from "../SlotTextPage.types";
+import type { SlotTextWordsExampleProps } from "../SlotTextPageSolid.types";
 
 const CHARACTER_SIZE = { width: 34, height: 52 };
 

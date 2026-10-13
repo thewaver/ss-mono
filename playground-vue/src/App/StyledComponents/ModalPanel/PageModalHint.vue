@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import * as styles from "@thewaver/ss-playground/App/StyledComponents/ModalPanel/ModalPanel.css";
 
-import type { ModalHintProps } from "./ModalPanel.types";
+import type { ModalHintProps } from "./ModalPanelVue.types";
 
 defineProps<ModalHintProps>();
 </script>

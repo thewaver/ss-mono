@@ -1,11 +1,12 @@
 <script setup lang="ts">
+import {
+    CHECKED_MARK,
+    MIXED_MARK,
+} from "@thewaver/ss-playground/App/StyledComponents/SelectGroupContent/SelectGroupContent.const";
 import * as styles from "@thewaver/ss-playground/App/StyledComponents/SelectGroupContent/SelectGroupContent.css";
 
 import { useLayerClass } from "../Layer/Layer.context";
-import type { SelectGroupContentProps } from "./SelectGroupContent.types";
-
-const CHECKED_MARK = "✓";
-const MIXED_MARK = "–";
+import type { SelectGroupContentProps } from "./SelectGroupContentVue.types";
 
 defineProps<SelectGroupContentProps>();
 

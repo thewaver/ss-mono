@@ -5,7 +5,7 @@ import {
     PageBreadcrumbContent,
     PageBreadcrumbSeparator,
 } from "../../../StyledComponents/BreadcrumbContent/BreadcrumbContent";
-import type { BreadcrumbsExampleProps } from "../BreadcrumbsPage.types";
+import type { BreadcrumbsExampleProps } from "../BreadcrumbsPageSolid.types";
 
 type Props = BreadcrumbsExampleProps;
 

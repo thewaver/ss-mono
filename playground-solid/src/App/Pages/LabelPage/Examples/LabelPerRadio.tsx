@@ -4,7 +4,7 @@ import { Label, Radio, RadioGroup } from "@thewaver/ss-components-solid";
 
 import { PageLabelCaption } from "../../../StyledComponents/LabelCaption/LabelCaption";
 import { PageRadioContent } from "../../../StyledComponents/RadioContent/RadioContent";
-import type { LabelRadioExampleProps, PlanValue } from "../LabelPage.types";
+import type { LabelRadioExampleProps, PlanValue } from "../LabelPageSolid.types";
 
 const GAP = 20;
 

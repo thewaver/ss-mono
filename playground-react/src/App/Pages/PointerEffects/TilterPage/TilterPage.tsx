@@ -2,6 +2,12 @@ import { useState } from "react";
 
 import { TILTER_DEFAULTS } from "@thewaver/ss-components-react";
 import { TilterKnobs } from "@thewaver/ss-playground/App/Knobs/Tilters.const";
+import {
+    BOX_HEIGHT,
+    EXAMPLES_ROOT,
+    EXAMPLE_NAMES,
+    FIELD_WIDTH,
+} from "@thewaver/ss-playground/App/Pages/PointerEffects/TilterPage/TilterPage.const";
 
 import { PageExamples } from "../../../PageComponents/Examples/Examples";
 import { PageCheckField, PageNumberField } from "../../../PageComponents/Field/Field";
@@ -11,11 +17,6 @@ import { PagePropsPanel } from "../../../PageComponents/PropsPanel/PropsPanel";
 import { CardExample } from "./Examples/Card";
 import { PhotoExample } from "./Examples/Photo";
 import type { TilterExampleProps } from "./TilterPageReact.types";
-
-const EXAMPLES_ROOT = "/src/App/Pages/PointerEffects/TilterPage/Examples";
-
-const FIELD_WIDTH = 110;
-const BOX_HEIGHT = 240;
 
 export const TilterPage = () => {
     const [isDisabled, setIsDisabled] = useState(TilterKnobs.STARTING_IS_DISABLED);
@@ -41,7 +42,7 @@ export const TilterPage = () => {
     const examples = [
         {
             key: "card",
-            name: "Card with a sheen",
+            name: EXAMPLE_NAMES.card,
             readout: () =>
                 "the surface leans away from the pointer and the highlight runs the other way, which is what reads as a reflection",
             component: () => (
@@ -53,7 +54,7 @@ export const TilterPage = () => {
         },
         {
             key: "photo",
-            name: "Picture, no sheen",
+            name: EXAMPLE_NAMES.photo,
             readout: () => "the same wrapper with the sheen slot left out — nothing is painted over the content",
             component: () => (
                 <PageMeasureBox isFilling height={BOX_HEIGHT}>

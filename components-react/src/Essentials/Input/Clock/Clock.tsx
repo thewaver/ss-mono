@@ -4,19 +4,17 @@ import {
     CLOCK_DEFAULTS,
     type ClockColumn,
     type ClockRenderProps,
-    type ClockSteps,
     ClockStyles,
     type ClockUnit,
     ClockUtils,
     PopoverUtils,
 } from "@thewaver/ss-components";
+import { ClockConst } from "@thewaver/ss-components/internal";
 import type { TimeValue } from "@thewaver/ss-utils";
 
 import { NavigatorReactUtils } from "../../../Abstracts/Navigator/NavigatorReact.utils";
 import { InteractionWrapper } from "../../../Primitives/InteractionWrapper/InteractionWrapper";
 import type { ClockOptionProps, ClockProps } from "./Clock.types";
-
-const NO_CLOCK_STEPS: ClockSteps = {};
 
 const toOptionKey = (unit: ClockUnit, index: number) => `${unit}:${index}`;
 
@@ -65,7 +63,13 @@ export const Clock = (props: ClockProps) => {
     const base = ClockUtils.computeBase(value, now, hasSeconds, props.minValue, props.maxValue);
     const units = ClockUtils.getUnits(hasSeconds, isTwelveHour);
     const meridiemNames = useMemo(() => ClockUtils.getMeridiemNames(props.locale), [props.locale]);
-    const columns = ClockUtils.getColumns(units, base, isTwelveHour, props.steps ?? NO_CLOCK_STEPS, meridiemNames);
+    const columns = ClockUtils.getColumns(
+        units,
+        base,
+        isTwelveHour,
+        props.steps ?? ClockConst.NO_CLOCK_STEPS,
+        meridiemNames,
+    );
 
     const rovingTime = highlighted ?? base;
     const rovingUnit = ClockUtils.resolveRovingUnit(highlightedUnit, units);

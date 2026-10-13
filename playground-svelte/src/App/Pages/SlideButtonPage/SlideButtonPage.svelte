@@ -9,9 +9,11 @@
     import HoldOnlyExample from "./Examples/HoldOnly.svelte";
     import ReachableExample from "./Examples/Reachable.svelte";
     import SlideOnlyExample from "./Examples/SlideOnly.svelte";
-
-    const EXAMPLES_ROOT = "/src/App/Pages/SlideButtonPage/Examples";
-    const PERCENT = 100;
+    import {
+    EXAMPLE_NAMES,
+    EXAMPLES_ROOT,
+    PERCENT,
+} from "@thewaver/ss-playground/App/Pages/SlideButtonPage/SlideButtonPage.const";
 
     let sends = $state(0);
     let progress = $state(0);
@@ -26,7 +28,7 @@
     const examples: ExampleDefs[] = [
         {
             key: "default",
-            name: "Default",
+            name: EXAMPLE_NAMES.default,
             readout: () =>
                 `activations: ${sends} — progress ${Math.round(progress * PERCENT)}%, which the owner reads while the gesture is still running`,
             component: defaultExample,
@@ -34,7 +36,7 @@
         },
         {
             key: "described",
-            name: "Described by its field",
+            name: EXAMPLE_NAMES.described,
             readout: () =>
                 `activations: ${describedSends} — the hint under the control is what a screen reader reads after its name, so the gesture is stated before anyone has to guess it`,
             component: describedExample,
@@ -42,7 +44,7 @@
         },
         {
             key: "slideOnly",
-            name: "Slide only",
+            name: EXAMPLE_NAMES.slideOnly,
             readout: () =>
                 `activations: ${slideOnlySends} — a held press does nothing here, so carrying the thumb is the only pointer route, and a held Enter still confirms`,
             component: slideOnlyExample,
@@ -50,7 +52,7 @@
         },
         {
             key: "holdOnly",
-            name: "Hold only",
+            name: EXAMPLE_NAMES.holdOnly,
             readout: () =>
                 `activations: ${holdOnlySends} — dragging the thumb does nothing here, so a stray drag cannot reach the action, and a held press or a held Enter both can`,
             component: holdOnlyExample,
@@ -58,28 +60,28 @@
         },
         {
             key: "held",
-            name: "Held at the end by the owner",
+            name: EXAMPLE_NAMES.held,
             readout: () => `armed: ${isArmed}`,
             component: heldExample,
             path: `${EXAMPLES_ROOT}/Held.svelte`,
         },
         {
             key: "disabled",
-            name: "Disabled",
+            name: EXAMPLE_NAMES.disabled,
             readout: () => `activations: ${disabledSends}`,
             component: disabledExample,
             path: `${EXAMPLES_ROOT}/Disabled.svelte`,
         },
         {
             key: "reachable",
-            name: "Disabled + reachable",
+            name: EXAMPLE_NAMES.reachable,
             readout: () => `activations: ${reachableSends}`,
             component: reachableExample,
             path: `${EXAMPLES_ROOT}/Reachable.svelte`,
         },
         {
             key: "errored",
-            name: "Error",
+            name: EXAMPLE_NAMES.errored,
             readout: () => `hasError: ${hasError}`,
             component: erroredExample,
             path: `${EXAMPLES_ROOT}/Errored.svelte`,

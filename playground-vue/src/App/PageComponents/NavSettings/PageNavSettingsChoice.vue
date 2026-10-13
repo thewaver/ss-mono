@@ -6,7 +6,7 @@ import { Radio, RadioGroup } from "@thewaver/ss-components-vue";
 import PageRadioSegmentContent from "../../StyledComponents/RadioSegmentContent/PageRadioSegmentContent.vue";
 import PageRadioSegmentFloater from "../../StyledComponents/RadioSegmentContent/PageRadioSegmentFloater.vue";
 import PageRadioSegmentGroup from "../../StyledComponents/RadioSegmentContent/PageRadioSegmentGroup.vue";
-import type { PageNavSettingsChoiceProps } from "./NavSettings.types";
+import type { PageNavSettingsChoiceProps } from "./NavSettingsVue.types";
 
 const props = defineProps<PageNavSettingsChoiceProps<T>>();
 

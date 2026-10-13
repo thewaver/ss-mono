@@ -1,13 +1,12 @@
 import type { CSSProperties, PropsWithChildren } from "react";
 
 import { SurfaceStyles, SurfaceUtils } from "@thewaver/ss-components";
-import { ShapeConst, type Size2d } from "@thewaver/ss-utils";
+import { SurfaceConst } from "@thewaver/ss-components/internal";
+import { ShapeConst } from "@thewaver/ss-utils";
 import { assignInlineVars } from "@vanilla-extract/dynamic";
 
 import { Shape } from "../../Exotics/Shape/Shape";
 import type { SurfaceProps } from "./Surface.types";
-
-const MOCK_SIZE: Size2d = { width: 0, height: 0 };
 
 const toPixels = (values: object) =>
     Object.fromEntries(Object.entries(values).map(([key, value]) => [key, `${value}px`])) as CSSProperties;
@@ -29,8 +28,8 @@ const SurfaceSVG = (props: PropsWithChildren<SurfaceProps>) => {
 };
 
 const SurfaceDiv = (props: PropsWithChildren<SurfaceProps>) => {
-    const fillColorDef = SurfaceUtils.findColorDef(props.computeFillDefs?.(MOCK_SIZE, undefined));
-    const strokeColorDef = SurfaceUtils.findColorDef(props.computeStrokeDefs?.(MOCK_SIZE, undefined));
+    const fillColorDef = SurfaceUtils.findColorDef(props.computeFillDefs?.(SurfaceConst.MOCK_SIZE, undefined));
+    const strokeColorDef = SurfaceUtils.findColorDef(props.computeStrokeDefs?.(SurfaceConst.MOCK_SIZE, undefined));
 
     return (
         <div
@@ -62,8 +61,8 @@ const SurfaceDiv = (props: PropsWithChildren<SurfaceProps>) => {
 
 export const Surface = (props: PropsWithChildren<SurfaceProps>) =>
     SurfaceUtils.getIsComplex(
-        props.computeFillDefs?.(MOCK_SIZE, undefined),
-        props.computeStrokeDefs?.(MOCK_SIZE, undefined),
+        props.computeFillDefs?.(SurfaceConst.MOCK_SIZE, undefined),
+        props.computeStrokeDefs?.(SurfaceConst.MOCK_SIZE, undefined),
         props.lameExponents,
     ) ? (
         <SurfaceSVG {...props} />

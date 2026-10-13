@@ -1,20 +1,18 @@
 import type { Accessor, JSX } from "solid-js";
 
 import type {
-    CarouselLabels,
-    CarouselOrientation,
+    BaseCarouselCbs,
+    BaseCarouselValues,
     CarouselPickRenderProps,
-    CarouselPlacementFn,
     CarouselRotationFlags,
     CarouselSlideState,
-    CarouselState,
     CarouselStep,
     CarouselStepRenderProps,
     InteractionFlags,
 } from "@thewaver/ss-components";
 
 import type { InteractionControlProps } from "../../Primitives/InteractionWrapper/InteractionWrapperSolid.types";
-import type { AccessorProps, MaybeAccessor, SignalSource } from "../../Utils/typeUtils";
+import type { AccessorProps, AccessorValues, SignalSource } from "../../Utils/typeUtils";
 
 export type CarouselControlProps = AccessorProps<
     InteractionControlProps & {
@@ -36,8 +34,6 @@ export type CarouselControls = {
 };
 
 export type CarouselSlots<T> = {
-    /** The slides, in the order they are shown. */
-    slides: MaybeAccessor<T[]>;
     /**
      * Which slide is showing. Writing it moves the carousel there, gliding the short way round on one that loops.
      * While `progress` is written from outside, it follows whichever slide is nearest.
@@ -74,29 +70,11 @@ export type CarouselSlots<T> = {
      * them.
      */
     renderControls?: (controls: CarouselControls) => JSX.Element;
-    /** Runs when a different slide comes up. */
-    onIndexChange?: (index: number) => void;
 };
 
-export type CarouselProps<T> = AccessorProps<
-    CarouselState &
-        CarouselLabels & {
-            /** Which way the slides run, which is the way the carousel is swiped. */
-            orientation?: CarouselOrientation;
-        }
-> &
+export type CarouselProps<T> = AccessorValues<BaseCarouselValues<T>> &
+    BaseCarouselCbs &
     CarouselSlots<T> & {
-        /**
-         * Where each slide is drawn, from how far it is from the one showing. It is handed the slide's distance —
-         * counted in slides, fractional while the carousel moves, and the short way round when it loops — with the
-         * carousel's box, and answers with the transforms and filters that put the slide there, as a proximity effect
-         * does. `CarouselPlacementUtils` ships the track, the drum, cover flow, a depth wave, a cylinder, a stack of
-         * folders and a hinge, each tunable; a rule of the consumer's own is any function of the same shape. Every
-         * slide fills the carousel's box before it is placed, and the box clips them. A press on a slide drawn beside
-         * the one showing brings it up, worked out from where the press landed rather than from which slide is on
-         * top; the pickers stay the keyboard's way to do the same.
-         */
-        computePlacement: CarouselPlacementFn;
         /**
          * Draws the back of a slide, for a placement that turns slides over: the drum, the hinge. The back faces the
          * other way from the front, so whichever way the slide is turned shows the right one; it is hidden from

@@ -5,6 +5,7 @@ import type { SVGDisplacementChannel, SVGFilterMethod, SortableItem } from "@the
 import { SVGFilterKnobs } from "@thewaver/ss-playground/App/Knobs/SVGFilters.const";
 import { APPLIED_STEPS } from "@thewaver/ss-playground/App/Pages/SVGFiltersPage/SVGFilterSteps.const";
 import type { SVGFiltersStep } from "@thewaver/ss-playground/App/Pages/SVGFiltersPage/SVGFilterSteps.types";
+import { EXAMPLES_ROOT, EXAMPLE_NAMES } from "@thewaver/ss-playground/App/Pages/SVGFiltersPage/SVGFiltersPage.const";
 import { SUBJECT_SIZE } from "@thewaver/ss-playground/App/StyledComponents/SVGFiltersContent/SVGFiltersContent.css";
 
 import { PageExampleKnobs } from "../../PageComponents/ExampleKnobs/ExampleKnobs";
@@ -20,8 +21,6 @@ import { StackExample } from "./Examples/Stack";
 import { ToneExample } from "./Examples/Tone";
 import { TurbulenceExample } from "./Examples/Turbulence";
 import type { SVGFiltersExampleProps } from "./SVGFiltersPage.types";
-
-const EXAMPLES_ROOT = "/src/App/Pages/SVGFiltersPage/Examples";
 
 const names = (items: SortableItem<SVGFiltersStep>[]) => items.map((item) => item.value.name).join(" → ") || "nothing";
 
@@ -482,43 +481,43 @@ export const SVGFiltersPage = () => {
     const examples = [
         {
             key: "blur",
-            name: "Blur",
+            name: EXAMPLE_NAMES.blur,
             component: () => <BlurExampleWrapper {...commonProps} />,
             path: `${EXAMPLES_ROOT}/Blur.tsx`,
         },
         {
             key: "dropShadow",
-            name: "Drop shadow",
+            name: EXAMPLE_NAMES.dropShadow,
             component: () => <DropShadowExampleWrapper {...commonProps} />,
             path: `${EXAMPLES_ROOT}/DropShadow.tsx`,
         },
         {
             key: "turbulence",
-            name: "Turbulence",
+            name: EXAMPLE_NAMES.turbulence,
             component: () => <TurbulenceExampleWrapper {...commonProps} />,
             path: `${EXAMPLES_ROOT}/Turbulence.tsx`,
         },
         {
             key: "hue",
-            name: "Hue",
+            name: EXAMPLE_NAMES.hue,
             component: () => <HueExampleWrapper {...commonProps} />,
             path: `${EXAMPLES_ROOT}/Hue.tsx`,
         },
         {
             key: "tone",
-            name: "Tone",
+            name: EXAMPLE_NAMES.tone,
             component: () => <ToneExampleWrapper {...commonProps} />,
             path: `${EXAMPLES_ROOT}/Tone.tsx`,
         },
         {
             key: "pixelate",
-            name: "Pixelate",
+            name: EXAMPLE_NAMES.pixelate,
             component: () => <PixelateExampleWrapper {...commonProps} />,
             path: `${EXAMPLES_ROOT}/Pixelate.tsx`,
         },
         {
             key: "stack",
-            name: "Four at once",
+            name: EXAMPLE_NAMES.stack,
             readout: () =>
                 method === "chain"
                     ? `${names(appliedState[0])} — chained, so each one is handed what the one before it produced and the order is the effect`

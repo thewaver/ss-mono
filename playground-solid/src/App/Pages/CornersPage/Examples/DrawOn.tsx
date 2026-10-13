@@ -5,7 +5,7 @@ import * as styles from "@thewaver/ss-playground/App/Pages/CornersPage/CornersPa
 import { EasingUtils, MathUtils } from "@thewaver/ss-utils";
 
 import { PageControlButtonContent } from "../../../StyledComponents/ControlButtonContent/ControlButtonContent";
-import type { CornersExampleProps } from "../CornersPage.types";
+import type { CornersExampleProps } from "../CornersPageSolid.types";
 
 type Props = CornersExampleProps;
 

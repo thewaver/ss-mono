@@ -1,13 +1,8 @@
 import type { Snippet } from "svelte";
 
-import type { Size2d } from "@thewaver/ss-utils";
+import type { BaseViewportWrapperProps } from "@thewaver/ss-components";
 
-export type ViewportWrapperProps = {
-    /**
-     * The size everything inside is laid out against. The contents are scaled to the real window from it, so a layout
-     * can be written once at one size.
-     */
-    size: Size2d;
+export type ViewportWrapperProps = BaseViewportWrapperProps & {
     /** What is laid out inside the viewport, at its design size. */
     children?: Snippet;
 };

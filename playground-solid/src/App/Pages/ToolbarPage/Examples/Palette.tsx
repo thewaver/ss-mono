@@ -3,8 +3,8 @@ import type { ArcDefs, ToolbarAction } from "@thewaver/ss-components-solid";
 
 import { PageButtonContent } from "../../../StyledComponents/ButtonContent/ButtonContent";
 import { PageMenuTriggerContent } from "../../../StyledComponents/MenuTriggerContent/MenuTriggerContent";
-import { renderToolbarOverflowItem, renderToolbarPopup } from "../ToolbarPage.const";
-import type { ToolbarExampleProps } from "../ToolbarPage.types";
+import { renderToolbarOverflowItem, renderToolbarPopup } from "../ToolbarPageSolid.const";
+import type { ToolbarExampleProps } from "../ToolbarPageSolid.types";
 
 const ACTIONS: ToolbarAction<string>[] = [
     { value: "Select" },

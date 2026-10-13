@@ -1,12 +1,11 @@
 import { useEffect, useLayoutEffect, useMemo, useRef, useState } from "react";
 
 import { BarrelUtils, DIE_DEFAULTS, DieStyles, DieUtils, type RollerPhase } from "@thewaver/ss-components";
+import { DieConst } from "@thewaver/ss-components/internal";
 import { StoreUtils } from "@thewaver/ss-utils";
 
 import { RollerReactUtils } from "../../../Abstracts/Roller/RollerReact.utils";
 import type { DieController, DieProps } from "./Die.types";
-
-const HALF = 0.5;
 
 type DieSnapshot = {
     currentFace: number;
@@ -30,11 +29,14 @@ export const Die = (props: DieProps) => {
 
     const rootRef = useRef<HTMLDivElement | null>(null);
     const reservedSize = DieUtils.getReservedSize(size);
-    const geometry = useMemo(() => DieUtils.computeFaceGeometry(props.shape, size * HALF), [props.shape, size]);
+    const geometry = useMemo(
+        () => DieUtils.computeFaceGeometry(props.shape, size * DieConst.HALF),
+        [props.shape, size],
+    );
 
     const roller = RollerReactUtils.useRoller(rootRef, false, {
         faces: geometry,
-        radius: size * HALF,
+        radius: size * DieConst.HALF,
         targetFace: props.face,
         isAutoSpinEnabled: props.autoSpin?.[0],
         rollDurationMs: props.rollDurationMs,

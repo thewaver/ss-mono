@@ -2,6 +2,11 @@ import { useState } from "react";
 
 import { CARD_STACK_DEFAULTS, CARD_STACK_PILE_SIDES } from "@thewaver/ss-components-react";
 import { CardStackKnobs } from "@thewaver/ss-playground/App/Knobs/CardStacks.const";
+import {
+    EXAMPLES_ROOT,
+    EXAMPLE_NAMES,
+    FIELD_WIDTH,
+} from "@thewaver/ss-playground/App/Pages/CardStackPage/CardStackPage.const";
 import type { SwipeDirection } from "@thewaver/ss-utils";
 
 import { PageExamples } from "../../PageComponents/Examples/Examples";
@@ -10,10 +15,6 @@ import { PageProp } from "../../PageComponents/Prop/Prop";
 import { PagePropsPanel } from "../../PageComponents/PropsPanel/PropsPanel";
 import { DeckExample } from "./Examples/Deck";
 import { EndlessExample } from "./Examples/Endless";
-
-const EXAMPLES_ROOT = "/src/App/Pages/CardStackPage/Examples";
-
-const FIELD_WIDTH = 110;
 
 export const CardStackPage = () => {
     const [isDisabled, setIsDisabled] = useState(CardStackKnobs.STARTING_IS_DISABLED);
@@ -33,7 +34,7 @@ export const CardStackPage = () => {
     const examples = [
         {
             key: "deck",
-            name: "Deck of cards",
+            name: EXAMPLE_NAMES.deck,
             readout: () => {
                 if (isEmpty) return "the pile is empty — deal again to put every card back";
 
@@ -63,7 +64,7 @@ export const CardStackPage = () => {
         },
         {
             key: "endless",
-            name: "A deck that never runs out",
+            name: EXAMPLE_NAMES.endless,
             readout: () => {
                 if (!lastEndlessSend)
                     return "left or right only — an upward push springs back, and on a touch screen it scrolls the page instead";

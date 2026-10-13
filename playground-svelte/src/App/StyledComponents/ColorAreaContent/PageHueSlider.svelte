@@ -4,10 +4,11 @@
     import { assignInlineVars } from "@vanilla-extract/dynamic";
 
     import { getLayerClass } from "../Layer/Layer.context";
-    import type { HueSliderProps } from "./ColorAreaContent.types";
-
-    const HUE_THUMB_SIZE = 18;
-    const HUE_MAX = 360;
+    import type { HueSliderProps } from "./ColorAreaContentSvelte.types";
+    import {
+        HUE_MAX,
+        HUE_THUMB_SIZE,
+    } from "@thewaver/ss-playground/App/StyledComponents/ColorAreaContent/ColorAreaContent.const";
 
     let props: HueSliderProps = $props();
 

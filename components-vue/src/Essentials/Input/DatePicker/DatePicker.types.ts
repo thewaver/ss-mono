@@ -1,53 +1,20 @@
 import type { Ref, VNodeChild } from "vue";
 
-import type {
-    AnchorPlacement,
-    CalendarPrecision,
-    DateValue,
-    DateValueWeekStart,
-    InteractionFlags,
-    PopupTriggerFlags,
-} from "@thewaver/ss-components";
-import type { Point2d } from "@thewaver/ss-utils";
+import type { BaseDatePickerProps, DateValue, InteractionFlags, PopupTriggerFlags } from "@thewaver/ss-components";
 
 import type { CalendarDayRenderer, CalendarWeekdayRenderer } from "../Calendar/Calendar.types";
 import type { DateInputProps, DateInputSlots } from "../DateInput/DateInput.types";
 
-export type DatePickerProps = DateInputProps & {
-    /** Where the calendar sits against the field. */
-    "placement"?: AnchorPlacement;
-    /** How far the calendar is held clear of the field. */
-    "offset"?: Point2d;
-    /** How long the calendar takes to fade in and out. */
-    "popupTransitionDurationMs"?: number;
-    /** Names the calendar for assistive technology. */
-    "calendarLabel": string;
-    /** Which day begins a week, which decides the order of the column headings. */
-    "weekStartsOn"?: DateValueWeekStart;
-    /**
-     * What one cell of the popup's calendar holds — days, months or years — and so what a pick there sets.
-     * It is handed to the calendar as it stands; the field still takes a whole date.
-     */
-    "precision"?: CalendarPrecision;
-    /** Whether one day can be picked, for rules a plain earliest and latest cannot express. */
-    "computeIsDayDisabled"?: (day: DateValue) => boolean;
-    /**
-     * Whether the calendar is open, which is what `v-model:visibility` binds. Left unbound, the picker keeps its own.
-     * It is the only thing that opens or closes it.
-     */
-    "visibility"?: boolean;
-    /** Receives the calendar opening or closing. */
-    "onUpdate:visibility"?: (isOpen: boolean) => void;
-    /**
-     * The trigger's own element id, for a consumer that has to reach it from a label or a test.
-     *
-     * It is separate from the field's `id` because the two are different elements now that the component
-     * owns the trigger.
-     */
-    "triggerId"?: string;
-    /** Names the control that opens the calendar. */
-    "triggerAriaLabel": string;
-};
+export type DatePickerProps = DateInputProps &
+    BaseDatePickerProps & {
+        /**
+         * Whether the calendar is open, which is what `v-model:visibility` binds. Left unbound, the picker keeps its own.
+         * It is the only thing that opens or closes it.
+         */
+        "visibility"?: boolean;
+        /** Receives the calendar opening or closing. */
+        "onUpdate:visibility"?: (isOpen: boolean) => void;
+    };
 
 export type DatePickerSlots = Omit<DateInputSlots, "renderTrailing"> & {
     /**

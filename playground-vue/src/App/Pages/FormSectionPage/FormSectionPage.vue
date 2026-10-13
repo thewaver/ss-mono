@@ -1,12 +1,12 @@
 <script setup lang="ts">
 import { shallowRef } from "vue";
 
+import { EXAMPLES_ROOT, EXAMPLE_NAMES } from "@thewaver/ss-playground/App/Pages/FormSectionPage/FormSectionPage.const";
+
 import type { ExampleDefs } from "../../PageComponents/Examples/Examples.types";
 import PageExamples from "../../PageComponents/Examples/PageExamples.vue";
 import NestedExample from "./Examples/Nested.vue";
 import SectionsExample from "./Examples/Sections.vue";
-
-const EXAMPLES_ROOT = "/src/App/Pages/FormSectionPage/Examples";
 
 const email = shallowRef("");
 const password = shallowRef("");
@@ -29,14 +29,14 @@ const reset = () => {
 const examples: ExampleDefs[] = [
     {
         key: "sections",
-        name: "Sections with their own validity",
+        name: EXAMPLE_NAMES.sections,
         readout: () =>
             `outcome: ${outcome.value} — each field reports to its own section, and the form hears one answer per section rather than one per field`,
         path: `${EXAMPLES_ROOT}/Sections.vue`,
     },
     {
         key: "nested",
-        name: "A section inside a section",
+        name: EXAMPLE_NAMES.nested,
         readout: () =>
             `outcome: ${nestedOutcome.value} — the payment section answers to the delivery section, which answers to the form, so the verdict travels up two levels rather than one`,
         path: `${EXAMPLES_ROOT}/Nested.vue`,

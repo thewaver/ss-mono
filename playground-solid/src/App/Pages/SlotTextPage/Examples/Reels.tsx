@@ -1,7 +1,7 @@
 import { SlotText, SlotTextReels, access } from "@thewaver/ss-components-solid";
 import * as styles from "@thewaver/ss-playground/App/Pages/SlotTextPage/SlotTextPage.css";
 
-import type { SlotTextReelsExampleProps } from "../SlotTextPage.types";
+import type { SlotTextReelsExampleProps } from "../SlotTextPageSolid.types";
 
 const DIGIT_SIZE = { width: 34, height: 52 };
 

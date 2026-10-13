@@ -5,7 +5,7 @@
     import PageMenuItemContent from "../../../../StyledComponents/MenuItemContent/MenuItemContent.svelte";
     import PageMenuTriggerContent from "../../../../StyledComponents/MenuTriggerContent/MenuTriggerContent.svelte";
     import { ACTIONS, renderMenuPopup } from "../MenuPage.const.svelte";
-    import type { MenuExampleProps } from "../MenuPage.types";
+    import type { MenuExampleProps } from "../MenuPageSvelte.types";
 
     type Props = MenuExampleProps;
 

@@ -1,9 +1,8 @@
 import type { AnchorHTMLAttributes, Component, VNodeChild } from "vue";
 
 import type {
+    BaseTreeProps,
     InteractionFlags,
-    PlacementLayoutFn,
-    ProximityEffectFn,
     TreeNodeRecord,
     TreeNodeRenderProps,
     TreeRecordRow,
@@ -38,30 +37,14 @@ export type TreeNodeItemProps = InteractionControlProps<TreeNodeRenderProps> & {
     onActivate: () => void;
 };
 
-export type TreeProps<T> = {
-    /**
-     * Names the tree for assistive technology. It is required because nothing else can name it, and a reader landing
-     * on an unnamed tree is told only that it is one.
-     */
-    "ariaLabel": string;
+export type TreeProps<T> = BaseTreeProps<T> & {
     /**
      * The component to draw navigating nodes with, for a tree of links rather than of choices. Its `$el` is what the
      * tree focuses and listens on.
      */
     "linkComponent"?: Component<TreeLinkProps>;
-    /**
-     * Guesses how tall a node will be before it is drawn, which is what lets a long tree render only what is on
-     * screen.
-     */
-    "computeEstimatedNodeHeight"?: (index: number) => number;
-    /** How long either marker takes to slide from one node to the next, and to fade. */
-    "floaterTransitionDurationMs"?: number;
     /** The nodes, as a tree rather than a flat list. */
     "nodes": TreeNode<T>[];
-    /** Arranges the nodes, for a tree drawn as something other than an indented run. */
-    "computeLayout"?: PlacementLayoutFn;
-    /** What the nodes do as the pointer nears them. */
-    "computeEffect"?: ProximityEffectFn;
     /**
      * Which node is selected. Both sides write it: the tree when a node is activated, the consumer to select one from
      * outside. Leave it out and the tree keeps the selection itself, starting with nothing selected. A node activated
@@ -81,8 +64,6 @@ export type TreeProps<T> = {
     "onUpdate:expanded"?: (value: T[]) => void;
     /** The text a node is found by when the reader types, where that is not its visible text. */
     "computeCustomText"?: (node: TreeNode<T>) => string;
-    /** Runs when a different node is selected. */
-    "onSelectionChange"?: (value: T) => void;
 };
 
 export type TreeSlots<T> = {

@@ -2,7 +2,7 @@
     import * as styles from "@thewaver/ss-playground/App/StyledComponents/MeridiemToggleContent/MeridiemToggleContent.css";
 
     import { getLayerClass } from "../Layer/Layer.context";
-    import type { MeridiemToggleContentProps } from "./MeridiemToggleContent.types";
+    import type { MeridiemToggleContentProps } from "./MeridiemToggleContentSvelte.types";
 
     let props: MeridiemToggleContentProps = $props();
 

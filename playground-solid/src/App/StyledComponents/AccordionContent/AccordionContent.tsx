@@ -4,7 +4,7 @@ import { access } from "@thewaver/ss-components-solid";
 import * as styles from "@thewaver/ss-playground/App/StyledComponents/AccordionContent/AccordionContent.css";
 
 import { useLayerClass } from "../Layer/Layer.context";
-import type { AccordionHeaderProps, AccordionPanelProps } from "./AccordionContent.types";
+import type { AccordionHeaderProps, AccordionPanelProps } from "./AccordionContentSolid.types";
 
 export const PageAccordionHeader = (props: ParentProps<AccordionHeaderProps>) => {
     const getLayerClass = useLayerClass();

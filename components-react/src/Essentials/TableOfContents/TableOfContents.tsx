@@ -1,13 +1,13 @@
 import { type MouseEvent, useEffect, useLayoutEffect, useMemo, useRef, useState } from "react";
 
 import {
-    type InteractionSizing,
     TABLE_OF_CONTENTS_DEFAULTS,
     type TableOfContentsFlags,
     type TableOfContentsLink,
     TableOfContentsStyles,
     TableOfContentsUtils,
 } from "@thewaver/ss-components";
+import { PlacementConst } from "@thewaver/ss-components/internal";
 
 import { ElementObserverReactUtils } from "../../Abstracts/ElementObserver/ElementObserverReact.utils";
 import { InteractionWrapper } from "../../Primitives/InteractionWrapper/InteractionWrapper";
@@ -15,9 +15,6 @@ import { PlacementBox } from "../../Primitives/PlacementBox/PlacementBox";
 import { PlacementItem } from "../../Primitives/PlacementItem/PlacementItem";
 import { useLatest, useStableList } from "../../Utils/refUtils";
 import type { TableOfContentsItemProps, TableOfContentsProps } from "./TableOfContents.types";
-
-const ROW_SIZING: InteractionSizing = "fit-content";
-const PLACED_SIZING: InteractionSizing = "fill";
 
 const TableOfContentsItem = <T,>(props: TableOfContentsItemProps<T>) => {
     const handleClick = (e: MouseEvent<HTMLElement>) => {
@@ -101,7 +98,7 @@ export const TableOfContents = <T,>(props: TableOfContentsProps<T>) => {
 
         return (
             <InteractionWrapper<TableOfContentsFlags>
-                sizing={placement === undefined ? ROW_SIZING : PLACED_SIZING}
+                sizing={placement === undefined ? PlacementConst.ROW_SIZING : PlacementConst.PLACED_SIZING}
                 extraFlags={{ isCurrent: currentIndex === index }}
                 renderControl={(setElementRef, flags) => (
                     <TableOfContentsItem

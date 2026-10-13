@@ -7,6 +7,7 @@ import {
     SegmentedInputUtils,
     TextSyncUtils,
 } from "@thewaver/ss-components";
+import { SegmentedInputConst } from "@thewaver/ss-components/internal";
 
 import { TextField } from "../../../Primitives/TextField/TextField";
 import type { TextFieldSlots } from "../../../Primitives/TextField/TextField.types";
@@ -15,8 +16,6 @@ import { callSlot, declareProps, forwardProps, useTwoWay } from "../../../Utils/
 import { exposeElement, toElement } from "../../../Utils/refUtils";
 import type { SlotsContext } from "../../../Utils/typeUtils";
 import type { SegmentedInputProps, SegmentedInputSlots } from "./SegmentedInput.types";
-
-const NO_SELECTION: SegmentedInputSelection = { start: 0, end: 0 };
 
 export const SegmentedInput = defineComponent(
     (props: SegmentedInputProps, { slots, expose }: SlotsContext<SegmentedInputSlots>) => {
@@ -27,7 +26,7 @@ export const SegmentedInput = defineComponent(
 
         exposeElement(expose, () => element.value);
 
-        const selection = shallowRef(NO_SELECTION);
+        const selection = shallowRef(SegmentedInputConst.NO_SELECTION);
 
         const getCellCount = () => Math.max(0, props.cellCount);
 

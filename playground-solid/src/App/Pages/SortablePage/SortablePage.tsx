@@ -1,7 +1,14 @@
 import { createMemo, createSignal } from "solid-js";
 
 import type { SortableItem } from "@thewaver/ss-components-solid";
-import { BOARD, CHEAP_ONLY, HAND, QUEUE } from "@thewaver/ss-playground/App/Pages/SortablePage/SortablePage.const";
+import {
+    BOARD,
+    CHEAP_ONLY,
+    EXAMPLES_ROOT,
+    EXAMPLE_NAMES,
+    HAND,
+    QUEUE,
+} from "@thewaver/ss-playground/App/Pages/SortablePage/SortablePage.const";
 import type { Card } from "@thewaver/ss-playground/App/Pages/SortablePage/SortablePage.types";
 
 import { PageExamples } from "../../PageComponents/Examples/Examples";
@@ -10,8 +17,6 @@ import { CardsExample } from "./Examples/Cards";
 import { PairExample } from "./Examples/Pair";
 import { RightToLeftExample } from "./Examples/RightToLeft";
 import { RingExample } from "./Examples/Ring";
-
-const EXAMPLES_ROOT = "/src/App/Pages/SortablePage/Examples";
 
 const names = (items: SortableItem<Card>[]) => items.map((item) => item.value.name).join(", ") || "empty";
 
@@ -35,7 +40,7 @@ export const SortablePage = () => {
     const getExamples = createMemo(() => [
         {
             key: "reorder",
-            name: "Reordering one list",
+            name: EXAMPLE_NAMES.reorder,
             readout: () =>
                 `order: ${names(queueSignal[0]())} — Second is disabled, so arrows skip it and it cannot be picked up`,
             component: () => (
@@ -47,7 +52,7 @@ export const SortablePage = () => {
         },
         {
             key: "row",
-            name: "Laid out in a row",
+            name: EXAMPLE_NAMES.row,
             readout: () =>
                 `order: ${names(rowSignal[0]())} — left and right walk it, because the direction decides the keys`,
             component: () => (
@@ -65,7 +70,7 @@ export const SortablePage = () => {
         },
         {
             key: "rightToLeft",
-            name: "A row in a right-to-left box",
+            name: EXAMPLE_NAMES.rightToLeft,
             readout: () =>
                 `order: ${names(rightToLeftSignal[0]())} — the box around the row sets dir="rtl", so the cards run from the right and a carried card moves on to a later place with the left arrow`,
             component: () => <RightToLeftExample items={rightToLeftSignal} />,
@@ -73,7 +78,7 @@ export const SortablePage = () => {
         },
         {
             key: "ring",
-            name: "Reordering round a ring",
+            name: EXAMPLE_NAMES.ring,
             readout: () =>
                 `order: ${names(ringSignal[0]())} — dropping picks the nearest place rather than comparing one axis, because a ring has no axis to compare`,
             component: () => (
@@ -85,14 +90,14 @@ export const SortablePage = () => {
         },
         {
             key: "pair",
-            name: "Between two lists",
+            name: EXAMPLE_NAMES.pair,
             readout: () => `hand: ${names(handSignal[0]())} | board: ${names(boardSignal[0]())}`,
             component: () => <PairExample groupId={"pair"} hand={handSignal} board={boardSignal} />,
             path: `${EXAMPLES_ROOT}/Pair.tsx`,
         },
         {
             key: "picky",
-            name: "A list that refuses some cards",
+            name: EXAMPLE_NAMES.picky,
             readout: () =>
                 `hand: ${names(pickyHandSignal[0]())} | board: ${names(pickyBoardSignal[0]())} — the board takes nothing costing more than ${CHEAP_ONLY}`,
             component: () => (
@@ -107,7 +112,7 @@ export const SortablePage = () => {
         },
         {
             key: "locked",
-            name: "A list that takes nothing",
+            name: EXAMPLE_NAMES.locked,
             readout: () =>
                 `hand: ${names(lockedHandSignal[0]())} | board: ${names(lockedBoardSignal[0]())} — the board can be reordered but accepts nothing from outside`,
             component: () => (
@@ -122,7 +127,7 @@ export const SortablePage = () => {
         },
         {
             key: "disabled",
-            name: "Disabled",
+            name: EXAMPLE_NAMES.disabled,
             readout: () => `order: ${names(disabledSignal[0]())} — nothing moves, by pointer or by key`,
             component: () => (
                 <PageSortableRoom>

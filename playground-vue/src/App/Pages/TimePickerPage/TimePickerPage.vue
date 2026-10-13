@@ -6,14 +6,13 @@ import {
     CLOSING_TIME,
     OPENING_TIME,
 } from "@thewaver/ss-playground/App/Pages/DatePickerPage/DatePickerPage.const";
+import { EXAMPLES_ROOT, EXAMPLE_NAMES } from "@thewaver/ss-playground/App/Pages/TimePickerPage/TimePickerPage.const";
 import { TimeUtils } from "@thewaver/ss-utils";
 import type { TimeValue } from "@thewaver/ss-utils";
 
 import type { ExampleDefs } from "../../PageComponents/Examples/Examples.types";
 import PageExamples from "../../PageComponents/Examples/PageExamples.vue";
 import ClockedExample from "./Examples/Clocked.vue";
-
-const EXAMPLES_ROOT = "/src/App/Pages/TimePickerPage/Examples";
 
 const describeTime = (value: TimeValue | undefined) => (value ? TimeUtils.toIso(value) : "none");
 
@@ -24,21 +23,21 @@ const bookingTime = shallowRef<TimeValue | undefined>({ hour: 10, minute: 15 });
 const examples: ExampleDefs[] = [
     {
         key: "clocked",
-        name: "With a clock",
+        name: EXAMPLE_NAMES.clocked,
         readout: () =>
             `value: ${describeTime(clockedTime.value)} — one column per unit, so typing and picking cover the same times`,
         path: `${EXAMPLES_ROOT}/Clocked.vue`,
     },
     {
         key: "clockedTwelve",
-        name: "Twelve hour, with a clock",
+        name: EXAMPLE_NAMES.clockedTwelve,
         readout: () =>
             `value: ${describeTime(clockedTwelveTime.value)} — the am/pm control and the clock trigger share the trailing slot`,
         path: `${EXAMPLES_ROOT}/Clocked.vue`,
     },
     {
         key: "booking",
-        name: "Every fifteen minutes",
+        name: EXAMPLE_NAMES.booking,
         readout: () =>
             `value: ${describeTime(bookingTime.value)} — a coarser minute column, still inside ${TimeUtils.toIso(OPENING_TIME)} to ${TimeUtils.toIso(CLOSING_TIME)}`,
         path: `${EXAMPLES_ROOT}/Clocked.vue`,

@@ -7,7 +7,7 @@
     import PageTabContent from "../../../StyledComponents/TabContent/PageTabContent.svelte";
     import PageTabFloater from "../../../StyledComponents/TabContent/PageTabFloater.svelte";
     import PageTabGutter from "../../../StyledComponents/TabContent/PageTabGutter.svelte";
-    import type { ScrollerTabbedExampleProps } from "../ScrollerPage.types";
+    import type { ScrollerTabbedExampleProps } from "../ScrollerPageSvelte.types";
 
     const SCROLLER_GAP = 10;
     const TAB_GAP = 10;

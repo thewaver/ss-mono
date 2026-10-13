@@ -4,7 +4,7 @@
     import * as styles from "@thewaver/ss-playground/App/StyledComponents/PopoverSurface/PopoverSurface.css";
 
     import { getLayerClass } from "../Layer/Layer.context";
-    import type { PopoverSurfaceProps } from "./PopoverSurface.types";
+    import type { PopoverSurfaceProps } from "./PopoverSurfaceSvelte.types";
 
     let props: PopoverSurfaceProps & { children?: Snippet } = $props();
 

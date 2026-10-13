@@ -3,7 +3,7 @@
 
     import * as styles from "@thewaver/ss-playground/App/StyledComponents/MenuTriggerContent/MenuTriggerContent.css";
 
-    import type { MenuTriggerContentProps } from "./MenuTriggerContent.types";
+    import type { MenuTriggerContentProps } from "./MenuTriggerContentSvelte.types";
 
     let props: MenuTriggerContentProps & { children?: Snippet } = $props();
 </script>

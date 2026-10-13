@@ -1,7 +1,7 @@
 import * as styles from "@thewaver/ss-playground/App/StyledComponents/ColorInputContent/ColorInputContent.css";
 
 import { useLayerClass } from "../Layer/Layer.context";
-import type { ColorInputContentProps } from "./ColorInputContent.types";
+import type { ColorInputContentProps } from "./ColorInputContentReact.types";
 
 export const PageColorInputContent = (props: ColorInputContentProps) => {
     const layerClass = useLayerClass();

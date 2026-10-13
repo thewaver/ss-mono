@@ -10,15 +10,11 @@
         CuboidUtils,
         CuboidStyles as styles,
     } from "@thewaver/ss-components";
+    import { CuboidConst } from "@thewaver/ss-components/internal";
     import type { Matrix3d } from "@thewaver/ss-utils";
 
     import { InteractionTrackerSvelteUtils } from "../../../Abstracts/InteractionTracker/InteractionTrackerSvelte.utils.svelte.js";
     import type { CuboidController, CuboidProps } from "./Cuboid.types.js";
-
-    const NO_DURATION = 0;
-    const DRAG_COMMIT_RATIO = 0.5;
-
-    const NO_TURNS: CuboidTurns = { yaw: 0, pitch: 0 };
 
     let { yaw = $bindable(), pitch = $bindable(), ...props }: CuboidProps = $props();
 
@@ -29,7 +25,7 @@
 
     let perspective = $state<HTMLDivElement>();
     let body = $state<HTMLDivElement>();
-    let dragTurns = $state.raw(NO_TURNS);
+    let dragTurns = $state.raw(CuboidConst.NO_TURNS);
     let orientation = $state.raw(
         CuboidUtils.standUpright(CuboidUtils.getCountedOrientation(untrack(() => yaw), untrack(() => pitch))),
     );
@@ -57,7 +53,7 @@
                 const counted = CuboidUtils.getCountedOrientation(next.yaw, next.pitch);
 
                 orientation = CuboidUtils.standUpright(counted);
-                settle(from, next.isUpright ? orientation : counted, NO_TURNS);
+                settle(from, next.isUpright ? orientation : counted, CuboidConst.NO_TURNS);
             } else if (next.isUpright) {
                 const turns = { yaw: next.yaw - tracked.yaw, pitch: next.pitch - tracked.pitch };
 
@@ -73,7 +69,7 @@
         () => perspective ?? undefined,
         () => !isDraggable,
         {
-            getCommitRatio: () => DRAG_COMMIT_RATIO,
+            getCommitRatio: () => CuboidConst.DRAG_COMMIT_RATIO,
             onSwipe: (travel) => {
                 if (isUpright) CuboidUtils.stopSettling(body ?? undefined);
 
@@ -85,11 +81,11 @@
                 const previousYaw = yaw;
                 const previousPitch = pitch;
 
-                dragTurns = NO_TURNS;
+                dragTurns = CuboidConst.NO_TURNS;
                 yaw = previousYaw + turns.yaw;
                 pitch = previousPitch + turns.pitch;
 
-                if (from && yaw === previousYaw && pitch === previousPitch) settle(from, orientation, NO_TURNS);
+                if (from && yaw === previousYaw && pitch === previousPitch) settle(from, orientation, CuboidConst.NO_TURNS);
             },
         },
     );
@@ -135,7 +131,7 @@
             bind:this={body}
             class={styles.cuboidBody}
             style:transform={CuboidUtils.getBodyTransform(isUpright, orientation, yaw, pitch, dragTurns, size)}
-            style:transition-duration={`${isUpright || getIsSwiping() ? NO_DURATION : transitionDurationMs}ms`}
+            style:transition-duration={`${isUpright || getIsSwiping() ? CuboidConst.NO_DURATION : transitionDurationMs}ms`}
         >
             {#each CUBOID_FACES as face (face)}
                 {@const isShowing = face === facing}

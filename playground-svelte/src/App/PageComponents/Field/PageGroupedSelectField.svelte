@@ -9,11 +9,9 @@
     import PageSelectContent from "../../StyledComponents/SelectContent/SelectContent.svelte";
     import PageSelectGroupContent from "../../StyledComponents/SelectGroupContent/SelectGroupContent.svelte";
     import PageSelectOptionContent from "../../StyledComponents/SelectOptionContent/SelectOptionContent.svelte";
-    import { useFieldReset } from "./Field.context";
-    import type { PageGroupedSelectFieldProps } from "./Field.types";
-
-    const DEFAULT_SELECT_FIELD_WIDTH = 150;
-    const EMPTY_TEXT = "";
+    import { useFieldReset } from "./FieldSvelte.context";
+    import type { PageGroupedSelectFieldProps } from "./FieldSvelte.types";
+    import { DEFAULT_SELECT_FIELD_WIDTH, EMPTY_TEXT } from "@thewaver/ss-playground/App/PageComponents/Field/Field.const";
 
     let props: PageGroupedSelectFieldProps<T> = $props();
 

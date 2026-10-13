@@ -16,7 +16,6 @@ import {
     CarrierUtils,
     type CarrierZone,
     type CarryMode,
-    type InteractionSizing,
     PlacementUtils,
     SORTABLE_DEFAULTS,
     type SortableFlags,
@@ -25,6 +24,7 @@ import {
     SortableUtils,
     ViewportUtils,
 } from "@thewaver/ss-components";
+import { PlacementConst } from "@thewaver/ss-components/internal";
 import type { Point2d, Size2d } from "@thewaver/ss-utils";
 
 import { CarrierVueUtils } from "../../Abstracts/Carrier/CarrierVue.utils";
@@ -47,8 +47,6 @@ import type {
     SortableProps,
     SortableSlots,
 } from "./Sortable.types";
-
-const PLACED_SIZING: InteractionSizing = "fill";
 
 const SortableItemSlot = defineComponent(
     (props: SortableItemSlotProps, { slots }: SlotsContext<SortableItemSlotSlots>) =>
@@ -393,7 +391,11 @@ export const Sortable = defineComponent(
             const element = (
                 <InteractionWrapper
                     sizing={
-                        placement !== undefined ? PLACED_SIZING : orientation === "horizontal" ? "fit-content" : "fill"
+                        placement !== undefined
+                            ? PlacementConst.PLACED_SIZING
+                            : orientation === "horizontal"
+                              ? "fit-content"
+                              : "fill"
                     }
                     isDisabled={item.isDisabled ?? false}
                     isReachableWhenDisabled={item.isReachableWhenDisabled ?? false}

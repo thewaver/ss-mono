@@ -2,15 +2,14 @@ import { createEffect, createMemo, createSignal, onCleanup } from "solid-js";
 
 import { access } from "@thewaver/ss-components-solid";
 import {
+    NO_LENGTH,
     computeBeamLengthPx,
     computeBeamMotion,
     observeBeamLength,
 } from "@thewaver/ss-playground/App/StyledComponents/Beam/Beam.const";
 import * as styles from "@thewaver/ss-playground/App/StyledComponents/Beam/Beam.css";
 
-import type { PageBeamProps } from "./Beam.types";
-
-const NO_LENGTH = 0;
+import type { PageBeamProps } from "./BeamSolid.types";
 
 export const PageBeam = (props: PageBeamProps) => {
     const [getRef, setRef] = createSignal<SVGPathElement>();

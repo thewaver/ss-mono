@@ -9,6 +9,7 @@ import {
     NavigatorUtils,
     TreemapUtils,
 } from "@thewaver/ss-components";
+import { IcicleConst } from "@thewaver/ss-components/internal";
 
 import { ElementObserverVueUtils } from "../../../Abstracts/ElementObserver/ElementObserverVue.utils";
 import { watchAfterRender } from "../../../Utils/effectUtils";
@@ -17,11 +18,6 @@ import { toElement } from "../../../Utils/refUtils";
 import { useStore } from "../../../Utils/storeUtils";
 import type { SlotsContext } from "../../../Utils/typeUtils";
 import type { IcicleProps, IcicleSlots } from "./Icicle.types";
-
-const NOTHING = 0;
-const SETTLED = 1;
-const NEXT = 1;
-const EMPTY_SPAN: IcicleSpan = { start: 0, end: 0, column: 0 };
 
 type IcicleZoomState<T> = {
     focus: IcicleNode<T>;
@@ -43,7 +39,7 @@ export const Icicle = defineComponent(
         const progress = useStore(zoomClock);
         const size = ElementObserverVueUtils.useBorderBoxSize(rootRef);
 
-        const getColumnCount = () => Math.max(SETTLED, props.columnCount ?? ICICLE_DEFAULTS.columnCount);
+        const getColumnCount = () => Math.max(IcicleConst.SETTLED, props.columnCount ?? ICICLE_DEFAULTS.columnCount);
 
         const weights = computed(() => TreemapUtils.computeWeights(props.root));
         const spans = computed(() => IcicleUtils.computeSpans(props.root, weights.value));
@@ -59,13 +55,13 @@ export const Icicle = defineComponent(
             focus: focus.value,
             cameFrom: undefined,
             fromViews: new Map(),
-            generation: NOTHING,
+            generation: IcicleConst.NOTHING,
         });
 
         const computeShownView = (node: IcicleNode<T>, center: IcicleNode<T>) =>
             IcicleUtils.computeShownSpan(
-                spans.value.get(node) ?? EMPTY_SPAN,
-                spans.value.get(center) ?? EMPTY_SPAN,
+                spans.value.get(node) ?? IcicleConst.EMPTY_SPAN,
+                spans.value.get(center) ?? IcicleConst.EMPTY_SPAN,
                 zoom.value.fromViews.get(node),
                 progress.value,
             );
@@ -77,27 +73,27 @@ export const Icicle = defineComponent(
                 focus: next,
                 cameFrom: current.focus,
                 fromViews: new Map(allNodes.value.map((node) => [node, computeShownView(node, current.focus)])),
-                generation: current.generation + NEXT,
+                generation: current.generation + IcicleConst.NEXT,
             };
         });
 
-        const focusSpan = computed(() => spans.value.get(focus.value) ?? EMPTY_SPAN);
+        const focusSpan = computed(() => spans.value.get(focus.value) ?? IcicleConst.EMPTY_SPAN);
 
         const targetViews = computed(
             () =>
                 new Map(
                     allNodes.value.map((node) => [
                         node,
-                        IcicleUtils.computeView(spans.value.get(node) ?? EMPTY_SPAN, focusSpan.value),
+                        IcicleUtils.computeView(spans.value.get(node) ?? IcicleConst.EMPTY_SPAN, focusSpan.value),
                     ]),
                 ),
         );
 
         const getIsVisibleAtTarget = (node: IcicleNode<T>) =>
-            IcicleUtils.getIsVisible(targetViews.value.get(node) ?? EMPTY_SPAN, getColumnCount());
+            IcicleUtils.getIsVisible(targetViews.value.get(node) ?? IcicleConst.EMPTY_SPAN, getColumnCount());
 
         const getIsVisibleAtStart = (node: IcicleNode<T>) =>
-            IcicleUtils.getIsVisible(zoom.value.fromViews.get(node) ?? EMPTY_SPAN, getColumnCount());
+            IcicleUtils.getIsVisible(zoom.value.fromViews.get(node) ?? IcicleConst.EMPTY_SPAN, getColumnCount());
 
         const stops = computed(() => allNodes.value.filter(getIsVisibleAtTarget));
 
@@ -127,7 +123,7 @@ export const Icicle = defineComponent(
         onScopeDispose(zoomClock.stop);
 
         watchAfterRender([() => zoom.value.generation], ([generation]) => {
-            if (generation === NOTHING) return;
+            if (generation === IcicleConst.NOTHING) return;
 
             zoomClock.start(props.zoomDurationMs ?? ICICLE_DEFAULTS.zoomDurationMs);
         });
@@ -172,7 +168,7 @@ export const Icicle = defineComponent(
             const next = IcicleUtils.computeStep(
                 step,
                 roving,
-                stops.value.map((node) => ({ node, span: targetViews.value.get(node) ?? EMPTY_SPAN })),
+                stops.value.map((node) => ({ node, span: targetViews.value.get(node) ?? IcicleConst.EMPTY_SPAN })),
                 (node) => parents.value.get(node),
             );
 
@@ -183,7 +179,7 @@ export const Icicle = defineComponent(
         };
 
         return () => {
-            const isZooming = progress.value < SETTLED;
+            const isZooming = progress.value < IcicleConst.SETTLED;
             const columnCount = getColumnCount();
 
             const renderedNodes = allNodes.value.filter(
@@ -229,7 +225,7 @@ export const Icicle = defineComponent(
                                             node,
                                             state: {
                                                 rect,
-                                                weight: weights.value.get(node) ?? NOTHING,
+                                                weight: weights.value.get(node) ?? IcicleConst.NOTHING,
                                                 isBranch: TreemapUtils.getIsBranch(node, weights.value),
                                                 isFocus: node === focus.value,
                                                 isInView,

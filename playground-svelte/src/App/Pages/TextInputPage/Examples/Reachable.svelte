@@ -9,7 +9,7 @@
         computePageTextFieldTextStyle,
     } from "../../../StyledComponents/TextFieldContent/TextFieldContent.svelte";
     import PageTooltipContent from "../../../StyledComponents/TooltipContent/TooltipContent.svelte";
-    import type { TextInputExampleProps } from "../TextInputPage.types";
+    import type { TextInputExampleProps } from "../TextInputPageSvelte.types";
 
     type Props = TextInputExampleProps;
 

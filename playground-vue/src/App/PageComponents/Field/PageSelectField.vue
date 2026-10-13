@@ -2,16 +2,14 @@
 import { computed } from "vue";
 
 import { Select } from "@thewaver/ss-components-vue";
+import { DEFAULT_SELECT_FIELD_WIDTH, EMPTY_TEXT } from "@thewaver/ss-playground/App/PageComponents/Field/Field.const";
 
 import PageGlideFloater from "../../StyledComponents/GlideFloater/PageGlideFloater.vue";
 import PagePopoverSurface from "../../StyledComponents/PopoverSurface/PopoverSurface.vue";
 import PageSelectContent from "../../StyledComponents/SelectContent/SelectContent.vue";
 import PageSelectOptionContent from "../../StyledComponents/SelectOptionContent/SelectOptionContent.vue";
-import { useFieldReset } from "./Field.context";
-import type { PageSelectFieldProps } from "./Field.types";
-
-const DEFAULT_SELECT_FIELD_WIDTH = 150;
-const EMPTY_TEXT = "";
+import { useFieldReset } from "./FieldVue.context";
+import type { PageSelectFieldProps } from "./FieldVue.types";
 
 const props = defineProps<PageSelectFieldProps<T>>();
 

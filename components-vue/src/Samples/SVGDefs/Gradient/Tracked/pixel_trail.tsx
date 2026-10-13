@@ -7,6 +7,7 @@ import {
     TrackedGradientDefaults,
     type TrackedGradientElementDefs,
 } from "@thewaver/ss-components";
+import { PixelTrailConst, TrackedGradientSampleConst } from "@thewaver/ss-components/internal";
 import type { Index2d, Point2d, Size2d } from "@thewaver/ss-utils";
 
 import { PointerTrackerVueUtils } from "../../../../Abstracts/PointerTracker/PointerTrackerVue.utils";
@@ -31,18 +32,14 @@ type PixelTrailProps = {
     opts?: GradientPixelTrailSampleOpts;
 };
 
-const STAMP_COUNT = 48;
-const GRACE_MS = 100;
-const NO_FADE = 0;
-const EMPTY_STAMPS: (PixelTrailStamp | undefined)[] = Array.from({ length: STAMP_COUNT }, () => undefined);
+const EMPTY_STAMPS: (PixelTrailStamp | undefined)[] = Array.from(
+    { length: PixelTrailConst.STAMP_COUNT },
+    () => undefined,
+);
 const NO_SQUARE = { x: 0, y: 0, width: 0, height: 0 };
 const NO_COLORS = [{ value: "transparent" }, { value: "transparent", stop: 100 }];
 
-const CYCLING_DEFAULTS = TrackedGradientDefaults.PIXEL_TRAIL_CYCLING_DEFAULTS;
-
-const RENDERED_ELSEWHERE = () => undefined;
-
-const clock = SVGDefsUtils.createClock(GRACE_MS);
+const clock = SVGDefsUtils.createClock(PixelTrailConst.GRACE_MS);
 
 const getGradientId = (id: string, index: number) => `gradient${index + 1}-${id}`;
 
@@ -77,7 +74,9 @@ const PixelTrail = defineComponent(
             const size = props.defs.getSize();
             const squareSize = props.opts?.squareSize ?? props.defaults.squareSize;
             const trailMs = props.opts?.trailMs ?? props.defaults.trailMs;
-            const isLaying = getIsInside(current.boxRatio) && SVGDefsUtils.getPointerFade(current, isPresent) > NO_FADE;
+            const isLaying =
+                getIsInside(current.boxRatio) &&
+                SVGDefsUtils.getPointerFade(current, isPresent) > TrackedGradientSampleConst.NO_FADE;
             const point = { x: current.boxRatio.x * size.width, y: current.boxRatio.y * size.height };
             const laid = isLaying ? SVGDefsUtils.computePixelTrailCells(lastPoint, point, squareSize) : [];
 
@@ -91,7 +90,7 @@ const PixelTrail = defineComponent(
 
             for (const cell of laid) {
                 next[nextSlot] = { ...cell, bornMs: nowMs };
-                nextSlot = (nextSlot + 1) % STAMP_COUNT;
+                nextSlot = (nextSlot + 1) % PixelTrailConst.STAMP_COUNT;
             }
 
             stamps.value = next;
@@ -102,8 +101,8 @@ const PixelTrail = defineComponent(
             const squareSize = props.opts?.squareSize ?? props.defaults.squareSize;
             const squareAlpha = props.opts?.squareAlpha ?? props.defaults.squareAlpha;
             const trailMs = props.opts?.trailMs ?? props.defaults.trailMs;
-            const cycleMs = props.opts?.cycleMs ?? CYCLING_DEFAULTS.cycleMs;
-            const ageColorSpan = props.opts?.ageColorSpan ?? CYCLING_DEFAULTS.ageColorSpan;
+            const cycleMs = props.opts?.cycleMs ?? PixelTrailConst.CYCLING_DEFAULTS.cycleMs;
+            const ageColorSpan = props.opts?.ageColorSpan ?? PixelTrailConst.CYCLING_DEFAULTS.ageColorSpan;
 
             const getColor = (stamp: PixelTrailStamp) => {
                 if (props.opts?.cycles) {
@@ -165,7 +164,7 @@ export const createPixelTrailSample =
 
             return [
                 { color: SVGDefsUtils.getBaseBorderColor(defs) },
-                ...Array.from({ length: STAMP_COUNT }, (_unused, index) => ({
+                ...Array.from({ length: PixelTrailConst.STAMP_COUNT }, (_unused, index) => ({
                     gradientOrPattern: {
                         id: getGradientId(id, index),
                         renderDefsElement:
@@ -180,11 +179,11 @@ export const createPixelTrailSample =
                                           opts={opts}
                                       />
                                   )
-                                : RENDERED_ELSEWHERE,
+                                : TrackedGradientSampleConst.RENDERED_ELSEWHERE,
                     },
                     clipPath: {
                         id: getClipId(id, index),
-                        renderDefsElement: RENDERED_ELSEWHERE,
+                        renderDefsElement: TrackedGradientSampleConst.RENDERED_ELSEWHERE,
                     },
                     filter: index === 0 ? sharedBlur : sharedBlurRef,
                 })),

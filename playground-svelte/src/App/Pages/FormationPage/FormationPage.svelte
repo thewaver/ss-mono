@@ -11,9 +11,9 @@
     import type { WithNoSample } from "@thewaver/ss-playground/App/PageComponents/SampleGroups/SampleGroups.types";
     import { ShapeConst } from "@thewaver/ss-utils";
 
-    import { FormationKnobs } from "../../Knobs/Formations.const";
-    import { PlacementLayoutKnobs } from "../../Knobs/PlacementLayouts.const";
-    import { ProximityEffectKnobs } from "../../Knobs/ProximityEffects.const";
+    import { FormationKnobs } from "@thewaver/ss-playground/App/Knobs/Formations.const";
+    import { PlacementLayoutKnobs } from "@thewaver/ss-playground/App/Knobs/PlacementLayouts.const";
+    import { ProximityEffectKnobs } from "@thewaver/ss-playground/App/Knobs/ProximityEffects.const";
     import type { ExampleDefs } from "../../PageComponents/Examples/Examples.types";
     import PageExamples from "../../PageComponents/Examples/PageExamples.svelte";
     import PageCheckField from "../../PageComponents/Field/PageCheckField.svelte";
@@ -26,10 +26,13 @@
     import PagePropsGroups from "../../PageComponents/PropsPanel/PagePropsGroups.svelte";
     import PagePropsPanel from "../../PageComponents/PropsPanel/PagePropsPanel.svelte";
     import DefaultExampleWrapper from "./DefaultExampleWrapper.svelte";
-    import type { FormationExampleProps } from "./FormationPage.types";
-
-    const FIELD_WIDTH = 130;
-    const EXAMPLES_ROOT = "/src/App/Pages/FormationPage/Examples";
+    import type { FormationExampleProps } from "./FormationPageSvelte.types";
+    import {
+    EXAMPLE_NAMES,
+    EXAMPLES_ROOT,
+    FIELD_WIDTH,
+    NO_DEFS,
+} from "@thewaver/ss-playground/App/Pages/FormationPage/FormationPage.const";
 
     const NAMES = [
         "Aurora",
@@ -45,8 +48,6 @@
         "Kelp",
         "Loam",
     ];
-
-    const NO_DEFS: Record<string, number | boolean> = {};
 
     let itemCount = $state(FormationKnobs.STARTING_ITEM_COUNT);
     let skippedCount = $state(FormationKnobs.MIN_SKIPPED_COUNT);
@@ -103,7 +104,7 @@
     const examples: ExampleDefs[] = [
         {
             key: "default",
-            name: "Default",
+            name: EXAMPLE_NAMES.default,
             component: defaultExample,
             path: `${EXAMPLES_ROOT}/Default.svelte`,
         },

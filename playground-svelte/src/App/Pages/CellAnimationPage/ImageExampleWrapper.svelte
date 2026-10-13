@@ -9,8 +9,7 @@
     import PageProp from "../../PageComponents/Prop/Prop.svelte";
     import type { CellAnimationExampleProps } from "./CellAnimationPage.types";
     import DefaultExample from "./Examples/Default.svelte";
-
-    const IMAGE_CONTAINER_SIZE = 480;
+    import { IMAGE_CONTAINER_SIZE } from "@thewaver/ss-playground/App/Pages/CellAnimationPage/CellAnimationPage.const";
 
     type Props = CellAnimationExampleProps & { progress: number };
 

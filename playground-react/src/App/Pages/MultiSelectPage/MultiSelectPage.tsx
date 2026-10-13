@@ -1,14 +1,13 @@
 import { useMemo, useState } from "react";
 
 import { SelectUtils } from "@thewaver/ss-components-react";
+import { EXAMPLES_ROOT, EXAMPLE_NAMES } from "@thewaver/ss-playground/App/Pages/MultiSelectPage/MultiSelectPage.const";
 
 import { PageExamples } from "../../PageComponents/Examples/Examples";
-import { GROUPED_COUNTRIES } from "../SelectPage/SelectPage.const";
+import { GROUPED_COUNTRIES } from "../SelectPage/SelectPageReact.const";
 import { MultiSelectClearableExample } from "./Examples/MultiSelectClearable";
 import { MultiSelectCountriesExample } from "./Examples/MultiSelectCountries";
 import { MultiSelectGroupedExample } from "./Examples/MultiSelectGrouped";
-
-const EXAMPLES_ROOT = "/src/App/Pages/MultiSelectPage/Examples";
 
 export const MultiSelectPage = () => {
     const countriesState = useState<string[]>(["Denmark"]);
@@ -39,14 +38,14 @@ export const MultiSelectPage = () => {
     const examples = [
         {
             key: "multiSelect",
-            name: "Many at once",
+            name: EXAMPLE_NAMES.multiSelect,
             readout: () => `values: [${countriesState[0].join(", ")}] — picking keeps the list open`,
             component: () => <MultiSelectCountriesExample values={countriesState} />,
             path: `${EXAMPLES_ROOT}/MultiSelectCountries.tsx`,
         },
         {
             key: "multiSelectGrouped",
-            name: "Grouped, with a query",
+            name: EXAMPLE_NAMES.multiSelectGrouped,
             readout: () =>
                 `values: [${groupedState[0].join(", ")}] | query: "${query}" — the page drops groups it has emptied`,
             component: () => (
@@ -56,7 +55,7 @@ export const MultiSelectPage = () => {
         },
         {
             key: "multiSelectClearable",
-            name: "Clearable",
+            name: EXAMPLE_NAMES.multiSelectClearable,
             readout: () =>
                 `values: [${clearableState[0].join(", ")}] | last change: ${clearableChange} — the clear control empties every pick at once`,
             component: () => (

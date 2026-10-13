@@ -2,14 +2,16 @@
 import { computed, shallowRef } from "vue";
 
 import { type SVGDefsColors, SVGDefsSamples, TrackedGradientDefaults } from "@thewaver/ss-components-vue";
-import {
-    NO_SAMPLE_KEY,
-    toGroupEntriesWithNoSample,
-} from "@thewaver/ss-playground/App/PageComponents/SampleGroups/SampleGroups.const";
+import { SVGGradientKnobs } from "@thewaver/ss-playground/App/Knobs/SVGGradients.const";
+import { TrackedGradientKnobs } from "@thewaver/ss-playground/App/Knobs/TrackedGradients.const";
+import { NO_SAMPLE_KEY } from "@thewaver/ss-playground/App/PageComponents/SampleGroups/SampleGroups.const";
 import type { WithNoSample } from "@thewaver/ss-playground/App/PageComponents/SampleGroups/SampleGroups.types";
+import {
+    EXAMPLES_ROOT,
+    EXAMPLE_NAMES,
+    TRACKED_GRADIENT_GROUPS,
+} from "@thewaver/ss-playground/App/Pages/SVGGradients/TrackedGradientsPage/TrackedGradientsPage.const";
 
-import { SVGGradientKnobs } from "../../../Knobs/SVGGradients.const";
-import { TrackedGradientKnobs } from "../../../Knobs/TrackedGradients.const";
 import type { ExampleDefs } from "../../../PageComponents/Examples/Examples.types";
 import PageExamples from "../../../PageComponents/Examples/PageExamples.vue";
 import PageGroupedSelectField from "../../../PageComponents/Field/PageGroupedSelectField.vue";
@@ -19,17 +21,16 @@ import PageProp from "../../../PageComponents/Prop/Prop.vue";
 import PagePropsDivider from "../../../PageComponents/PropsPanel/PagePropsDivider.vue";
 import PagePropsGroups from "../../../PageComponents/PropsPanel/PagePropsGroups.vue";
 import PagePropsPanel from "../../../PageComponents/PropsPanel/PagePropsPanel.vue";
-import { GROUPPED_TRACKED_GRADIENTS } from "../SVGGradients.const";
-import type { SVGGradientsControls, SVGGradientsPaintKind, TrackedGradientExampleProps } from "../SVGGradients.types";
 import PageSVGGradientsProps from "../SVGGradientsProps.vue";
+import type {
+    SVGGradientsControls,
+    SVGGradientsPaintKind,
+    TrackedGradientExampleProps,
+} from "../SVGGradientsVue.types";
 import ContinuityExample from "./Examples/Continuity.vue";
 import DefaultExample from "./Examples/Default.vue";
 import ScreenOverlayExample from "./Examples/ScreenOverlay.vue";
 import SharedExample from "./Examples/Shared.vue";
-
-const EXAMPLES_ROOT = "/src/App/Pages/SVGGradients/TrackedGradientsPage/Examples";
-
-const TRACKED_GRADIENT_GROUPS = toGroupEntriesWithNoSample(GROUPPED_TRACKED_GRADIENTS);
 
 const configKey = shallowRef<WithNoSample<SVGDefsSamples.Gradient.Tracked.SampleKey>>(
     SVGGradientKnobs.STARTING_TRACKED_GRADIENT_KEY,
@@ -78,25 +79,25 @@ const setConfigDef = (key: string, value: number | boolean) => {
 const examples: ExampleDefs[] = [
     {
         key: "default",
-        name: "Default",
+        name: EXAMPLE_NAMES.default,
         path: `${EXAMPLES_ROOT}/Default.vue`,
     },
     {
         key: "continuity",
-        name: "Continuity",
+        name: EXAMPLE_NAMES.continuity,
         readout: () => "four boxes, each reading the pointer against its own — a pool spans them, a hand does not",
         path: `${EXAMPLES_ROOT}/Continuity.vue`,
     },
     {
         key: "shared",
-        name: "Shared",
+        name: EXAMPLE_NAMES.shared,
         readout: () =>
             "the same four boxes, now reading the pointer against the group and painting one gradient laid across all of it, so each box shows its own part of a single picture",
         path: `${EXAMPLES_ROOT}/Shared.vue`,
     },
     {
         key: "screenOverlay",
-        name: "A screen overlay",
+        name: EXAMPLE_NAMES.screenOverlay,
         readout: () =>
             "the gradient on a layer over the whole window, following the pointer everywhere; clicks pass through it, a button in the top-right corner closes it, and its sizes are a quarter of what the knobs say, since the box it fills is the whole window",
         path: `${EXAMPLES_ROOT}/ScreenOverlay.vue`,

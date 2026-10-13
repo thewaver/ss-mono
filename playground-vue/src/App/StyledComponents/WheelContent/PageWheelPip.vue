@@ -1,15 +1,12 @@
 <script setup lang="ts">
+import {
+    PIP_PATH,
+    PIP_SIDE_STYLES,
+} from "@thewaver/ss-playground/App/StyledComponents/WheelContent/WheelContent.const";
 import * as styles from "@thewaver/ss-playground/App/StyledComponents/WheelContent/WheelContent.css";
 
 import { useLayerClass } from "../Layer/Layer.context";
-import type { PageWheelPipProps, PageWheelPipSide } from "./WheelContent.types";
-
-const PIP_PATH = "M 2 2 H 18 L 10 18 Z";
-
-const PIP_SIDE_STYLES: Record<PageWheelPipSide, string> = {
-    top: styles.wheelPipTop,
-    left: styles.wheelPipLeft,
-};
+import type { PageWheelPipProps } from "./WheelContentVue.types";
 
 defineProps<PageWheelPipProps>();
 

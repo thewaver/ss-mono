@@ -5,7 +5,7 @@
     import PageFormFieldCaption from "../../../StyledComponents/FormFieldContent/PageFormFieldCaption.svelte";
     import PageFormFieldMessage from "../../../StyledComponents/FormFieldContent/PageFormFieldMessage.svelte";
     import PageSlideButtonContent from "../../../StyledComponents/SlideButtonContent/SlideButtonContent.svelte";
-    import type { SlideButtonExampleProps } from "../SlideButtonPage.types";
+    import type { SlideButtonExampleProps } from "../SlideButtonPageSvelte.types";
 
     const HINT = "Hold the button, or slide it all the way, to send.";
 

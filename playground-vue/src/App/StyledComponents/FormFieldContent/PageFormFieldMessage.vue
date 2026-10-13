@@ -2,7 +2,7 @@
 import * as styles from "@thewaver/ss-playground/App/StyledComponents/FormFieldContent/FormFieldContent.css";
 
 import { useLayerClass } from "../Layer/Layer.context";
-import type { FormFieldMessageProps } from "./FormFieldContent.types";
+import type { FormFieldMessageProps } from "./FormFieldContentVue.types";
 
 defineProps<FormFieldMessageProps>();
 

@@ -3,7 +3,7 @@
     import * as styles from "@thewaver/ss-playground/App/Pages/CornersPage/CornersPage.css";
 
     import PageButtonContent from "../../../StyledComponents/ButtonContent/ButtonContent.svelte";
-    import type { CornersExampleProps } from "../CornersPage.types";
+    import type { CornersExampleProps } from "../CornersPageSvelte.types";
 
     type Props = CornersExampleProps;
 

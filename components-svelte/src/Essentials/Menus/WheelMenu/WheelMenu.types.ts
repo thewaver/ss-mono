@@ -1,6 +1,6 @@
 import type { Snippet } from "svelte";
 
-import type { BandDefs, InteractionFlags, MenuItemFlags } from "@thewaver/ss-components";
+import type { BaseWheelMenuProps, InteractionFlags, MenuItemFlags } from "@thewaver/ss-components";
 
 import type { MenuItem, MenuProps } from "../Menu/Menu.types.js";
 
@@ -21,24 +21,15 @@ export type WheelMenuCloserDefs = {
     renderContent: Snippet<[flags: InteractionFlags<MenuItemFlags>]>;
 };
 
-export type WheelMenuProps<T> = Omit<MenuProps<T>, "items" | "checked" | "computeLayout"> & {
-    /** How much of the circle the items are spread over. */
-    spreadDegrees?: number;
-    /** How much of the middle is left empty, which is where the close control sits. */
-    holeRadius?: number;
-    /** How thick one level's band is. */
-    bandWidth?: number;
-    /** The space between one level's band and the next. */
-    levelGap?: number;
-    /** The items, in the order they sit round the wheel. */
-    items: WheelMenuItem<T>[];
-    /**
-     * Which values are currently checked, for the checkbox and radio items among them. Bind it with `bind:checked`;
-     * the menu writes it when a checkbox or radio item is picked.
-     */
-    checked?: T[];
-    /** How the items sit on their band, for the parts of the arrangement the wheel does not decide itself. */
-    layoutDefs?: Omit<BandDefs, "holeRatio" | "spreadDegrees" | "computeItemArcs">;
-    /** The control in the hole that closes the menu. */
-    closerDefs?: WheelMenuCloserDefs;
-};
+export type WheelMenuProps<T> = Omit<MenuProps<T>, "items" | "checked" | "computeLayout"> &
+    BaseWheelMenuProps & {
+        /** The items, in the order they sit round the wheel. */
+        items: WheelMenuItem<T>[];
+        /**
+         * Which values are currently checked, for the checkbox and radio items among them. Bind it with `bind:checked`;
+         * the menu writes it when a checkbox or radio item is picked.
+         */
+        checked?: T[];
+        /** The control in the hole that closes the menu. */
+        closerDefs?: WheelMenuCloserDefs;
+    };

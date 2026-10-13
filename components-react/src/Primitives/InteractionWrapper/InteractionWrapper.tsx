@@ -6,6 +6,7 @@ import {
     InteractionTrackerUtils,
     InteractionWrapperStyles,
 } from "@thewaver/ss-components";
+import { InteractionWrapperConst } from "@thewaver/ss-components/internal";
 
 import { InteractionTrackerReactUtils } from "../../Abstracts/InteractionTracker/InteractionTrackerReact.utils";
 import { useSharedTooltipContext } from "../../Essentials/Overlays/SharedTooltip/SharedTooltip.context";
@@ -13,8 +14,6 @@ import { Tooltip } from "../../Essentials/Overlays/Tooltip/Tooltip";
 import type { TooltipProps } from "../../Essentials/Overlays/Tooltip/Tooltip.types";
 import { useElement, useLatest } from "../../Utils/refUtils";
 import type { InteractionWrapperProps } from "./InteractionWrapper.types";
-
-const NO_EXTRA_FLAGS = {};
 
 export const InteractionWrapper = <TExtra extends object = {}>(props: InteractionWrapperProps<TExtra>) => {
     const elementRef = useRef<HTMLElement | null>(null);
@@ -46,7 +45,7 @@ export const InteractionWrapper = <TExtra extends object = {}>(props: Interactio
         isDisabled,
         isPressed: props.isPressed,
         hasError: props.hasError,
-        ...((props.extraFlags ?? NO_EXTRA_FLAGS) as TExtra),
+        ...((props.extraFlags ?? InteractionWrapperConst.NO_EXTRA_FLAGS) as TExtra),
     };
 
     const setElementRef = useCallback(

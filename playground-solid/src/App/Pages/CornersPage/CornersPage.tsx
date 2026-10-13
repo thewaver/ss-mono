@@ -3,28 +3,23 @@ import { createMemo, createSignal } from "solid-js";
 import type { CornerKey } from "@thewaver/ss-components-solid";
 import { CORNERS_DEFAULTS, CORNERS_KEYS } from "@thewaver/ss-components-solid";
 import { CornerKnobs } from "@thewaver/ss-playground/App/Knobs/Corners.const";
+import {
+    CORNER_LABELS,
+    EXAMPLES_ROOT,
+    EXAMPLE_NAMES,
+    FIELD_WIDTH,
+} from "@thewaver/ss-playground/App/Pages/CornersPage/CornersPage.const";
 
 import { PageExamples } from "../../PageComponents/Examples/Examples";
 import { PageCheckField, PageColorField, PageNumberField } from "../../PageComponents/Field/Field";
 import { PageProp } from "../../PageComponents/Prop/Prop";
 import { PagePropsPanel } from "../../PageComponents/PropsPanel/PropsPanel";
-import type { CornersExampleProps } from "./CornersPage.types";
+import type { CornersExampleProps } from "./CornersPageSolid.types";
 import { ControlExample } from "./Examples/Control";
 import { DefaultExample } from "./Examples/Default";
 import { DrawOnExample } from "./Examples/DrawOn";
 import { FocusFollowExample } from "./Examples/FocusFollow";
 import { OverlayExample } from "./Examples/Overlay";
-
-const EXAMPLES_ROOT = "/src/App/Pages/CornersPage/Examples";
-
-const CORNER_LABELS: Record<CornerKey, string> = {
-    top_left: "Top left",
-    top_right: "Top right",
-    bottom_left: "Bottom left",
-    bottom_right: "Bottom right",
-};
-
-const FIELD_WIDTH = 110;
 
 export const CornersPage = () => {
     const [getColor, setColor] = createSignal(CornerKnobs.STARTING_COLOR);
@@ -57,7 +52,7 @@ export const CornersPage = () => {
         return [
             {
                 key: "default",
-                name: "Around a box",
+                name: EXAMPLE_NAMES.default,
                 readout: () =>
                     "each bracket is a single polygon rather than two rules, so the arm lengths and the thickness are numbers rather than a border pretending to be one",
                 component: () => <DefaultExample {...commonProps} />,
@@ -65,7 +60,7 @@ export const CornersPage = () => {
             },
             {
                 key: "control",
-                name: "As a control's decoration",
+                name: EXAMPLE_NAMES.control,
                 readout: () =>
                     "press it — the color transitions rather than switching, which is the whole reason the component owns a duration",
                 component: () => <ControlExample {...commonProps} />,
@@ -73,7 +68,7 @@ export const CornersPage = () => {
             },
             {
                 key: "overlay",
-                name: "Over content it does not own",
+                name: EXAMPLE_NAMES.overlay,
                 readout: () =>
                     "the button underneath still takes a press, because the layer carrying the brackets refuses the pointer and says nothing to a screen reader",
                 component: () => <OverlayExample {...commonProps} />,
@@ -81,7 +76,7 @@ export const CornersPage = () => {
             },
             {
                 key: "focusFollow",
-                name: "Following focus and hover",
+                name: EXAMPLE_NAMES.focusFollow,
                 readout: () =>
                     "one set of marks glides to whichever control is hovered or reached by the keyboard, around the control's own focus ring rather than instead of it — and jumps rather than glides under reduced motion",
                 component: () => <FocusFollowExample {...commonProps} />,
@@ -89,7 +84,7 @@ export const CornersPage = () => {
             },
             {
                 key: "drawOn",
-                name: "Drawn on",
+                name: EXAMPLE_NAMES.drawOn,
                 readout: () =>
                     "the arm length grows from nothing as the marks appear, so they draw out of each corner — at full length at once under reduced motion",
                 component: () => <DrawOnExample {...commonProps} />,

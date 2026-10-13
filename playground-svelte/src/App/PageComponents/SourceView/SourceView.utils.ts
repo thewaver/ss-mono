@@ -1,11 +1,17 @@
 import svelte from "shiki/langs/svelte.mjs";
 
+import {
+    CORE_GLOB_ROOT,
+    CORE_PACKAGE,
+    PAGES_ROOT,
+    SHOW_PAGE_SCAFFOLDING,
+    SIBLING_SUFFIXES,
+    STYLED_COMPONENTS_ROOT,
+    THEME_STEM,
+} from "@thewaver/ss-playground/App/PageComponents/SourceView/SourceView.const";
 import { getDefaultHighlighterConfig, highlighter } from "@thewaver/ss-playground/shiki";
 
-import type { SourceFile, SourceGroup } from "./SourceView.types";
-
-const CORE_PACKAGE = "@thewaver/ss-playground/";
-const CORE_GLOB_ROOT = "../../../../../playground/src/";
+import type { SourceFile, SourceGroup } from "./SourceViewSvelte.types";
 
 const APP_MODULES = import.meta.glob<string>("/src/**/*.{ts,svelte}", {
     query: "?source",
@@ -24,19 +30,12 @@ const SOURCE_MODULES: Record<string, () => Promise<string>> = {
     ...APP_MODULES,
 };
 
-const APP_ROOT = "/src/App";
-const PAGES_ROOT = `${APP_ROOT}/Pages/`;
-const STYLED_COMPONENTS_ROOT = `${APP_ROOT}/StyledComponents/`;
-const THEME_STEM = `${APP_ROOT}/Theme`;
 const SOURCE_EXTENSIONS = [".svelte", ".ts"];
-const SIBLING_SUFFIXES = [".types.ts", ".css.ts"];
 const FILE_KIND_ORDER = [".svelte", ".ts", ".const.ts", ".utils.ts", ".types.ts", ".css.ts"];
 const IMPORT_PATTERN = /^\s*import\b[^;]*?["']([^"']+)["']\s*;?\s*$/gm;
 const SPLIT_COMPONENT_PATTERN = /\/Page[A-Z][^/]*\.svelte$/;
 const FILE_KIND_PATTERN = /(\.(const|utils|types|css))?\.(svelte|ts)$/;
 const SVELTE_LANGUAGE = "svelte";
-
-const SHOW_PAGE_SCAFFOLDING = true;
 
 const getFileName = (path: string) => path.slice(path.lastIndexOf("/") + 1);
 

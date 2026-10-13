@@ -1,7 +1,7 @@
 import { Button, access } from "@thewaver/ss-components-solid";
 
 import { PageMeridiemToggleContent } from "../../StyledComponents/MeridiemToggleContent/MeridiemToggleContent";
-import type { MeridiemToggleProps } from "./MeridiemToggle.types";
+import type { MeridiemToggleProps } from "./MeridiemToggleSolid.types";
 
 export const PageMeridiemToggle = (props: MeridiemToggleProps) => {
     return (

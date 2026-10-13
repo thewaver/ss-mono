@@ -2,7 +2,7 @@
 import * as styles from "@thewaver/ss-playground/App/StyledComponents/SatelliteContent/SatelliteContent.css";
 
 import { useLayerClass } from "../Layer/Layer.context";
-import type { PageSatelliteBadgeProps } from "./SatelliteContent.types";
+import type { PageSatelliteBadgeProps } from "./SatelliteContentVue.types";
 
 defineProps<PageSatelliteBadgeProps>();
 

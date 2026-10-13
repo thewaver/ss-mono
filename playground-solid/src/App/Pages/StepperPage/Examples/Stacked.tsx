@@ -2,7 +2,7 @@ import { Stepper } from "@thewaver/ss-components-solid";
 import { LABELS, ORDER, STEPPER_GAP } from "@thewaver/ss-playground/App/Pages/StepperPage/StepperSteps.const";
 
 import { PageStepConnector, PageStepContent } from "../../../StyledComponents/StepContent/StepContent";
-import type { StepperExampleProps } from "../StepperPage.types";
+import type { StepperExampleProps } from "../StepperPageSolid.types";
 
 type Props = StepperExampleProps;
 

@@ -8,8 +8,8 @@ import { CONTROL_GLYPHS } from "@thewaver/ss-playground/App/StyledComponents/Con
 
 import { PageMeasureBox } from "../../../PageComponents/MeasureBox/MeasureBox";
 import { PageControlButtonContent } from "../../../StyledComponents/ControlButtonContent/ControlButtonContent";
-import { computeSampleDefs } from "../PaintedTextPage.const";
-import type { PaintedTextBoxedExampleProps } from "../PaintedTextPage.types";
+import { computeSampleDefs } from "../PaintedTextPageSolid.const";
+import type { PaintedTextBoxedExampleProps } from "../PaintedTextPageSolid.types";
 
 export const ScrambledExample = (props: PaintedTextBoxedExampleProps) => {
     const id = createUniqueId();

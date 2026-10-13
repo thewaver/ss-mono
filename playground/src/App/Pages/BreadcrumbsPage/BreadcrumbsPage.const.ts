@@ -11,3 +11,14 @@ export const TRAIL: { value: CrumbValue; label: string }[] = [
 ];
 
 export const labelOf = (value: CrumbValue) => TRAIL.find((entry) => entry.value === value)!.label;
+
+export const EXAMPLE_NAMES = {
+    default: "Default",
+    bare: "No separator",
+    linked: "Crumbs that are links",
+    linkComponent: "Links through a component",
+};
+
+export const DEPTH_FIELD_WIDTH = 90;
+
+export const EXAMPLES_ROOT = "/src/App/Pages/BreadcrumbsPage/Examples";

@@ -4,8 +4,11 @@ import { useRoute, useRouter } from "vue-router";
 
 import { Tabs } from "@thewaver/ss-components-vue";
 import {
+    EXAMPLES_VIEW,
     PAGE_VIEW_KEYS,
     PAGE_VIEW_LABELS,
+    TAB_GAP,
+    TAB_ORIENTATION,
     toPageViewKey,
     toPageViewRoute,
 } from "@thewaver/ss-playground/App/PageComponents/ViewTabs/ViewTabs.const";
@@ -15,11 +18,7 @@ import PageTabContent from "../../StyledComponents/TabContent/PageTabContent.vue
 import PageTabFloater from "../../StyledComponents/TabContent/PageTabFloater.vue";
 import PageTabGutter from "../../StyledComponents/TabContent/PageTabGutter.vue";
 import PageViewTabLink from "./PageViewTabLink.vue";
-import type { PageViewKey, PageViewTabsProps } from "./ViewTabs.types";
-
-const TAB_GAP = 20;
-const TAB_ORIENTATION = "horizontal";
-const EXAMPLES_VIEW: PageViewKey = "examples";
+import type { PageViewKey, PageViewTabsProps } from "./ViewTabsVue.types";
 
 const props = defineProps<PageViewTabsProps>();
 

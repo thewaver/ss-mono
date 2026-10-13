@@ -2,12 +2,11 @@
 import { computed, shallowRef, watch } from "vue";
 
 import { ElementObserverVueUtils } from "@thewaver/ss-components-vue";
+import { NO_WIDTH } from "@thewaver/ss-playground/App/Pages/ToolbarPage/ToolbarPage.const";
 import * as styles from "@thewaver/ss-playground/App/Pages/ToolbarPage/ToolbarPage.css";
 
 import { useLayerClass } from "../../StyledComponents/Layer/Layer.context";
-import type { ResizableBarProps } from "./ToolbarPage.types";
-
-const NO_WIDTH = 0;
+import type { ResizableBarProps } from "./ToolbarPageVue.types";
 
 const props = defineProps<ResizableBarProps>();
 

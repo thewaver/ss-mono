@@ -3,14 +3,15 @@
     import * as styles from "@thewaver/ss-playground/App/PageComponents/PropsPanel/PropsPanel.css";
 
     import PageButtonContent from "../../StyledComponents/ButtonContent/ButtonContent.svelte";
-    import { setFieldResetContext } from "../Field/Field.context";
+    import { setFieldResetContext } from "../Field/FieldSvelte.context";
     import { getIsPreview } from "../Preview/Preview.context";
     import PageProp from "../Prop/Prop.svelte";
     import { setPropsPanelContext } from "./PropsPanel.context";
-    import type { PagePropsPanelProps } from "./PropsPanel.types";
-
-    const NOTHING_TO_RESET = 0;
-    const SAMPLE_SELECTOR_ALONE = 1;
+    import type { PagePropsPanelProps } from "./PropsPanelSvelte.types";
+    import {
+        NOTHING_TO_RESET,
+        SAMPLE_SELECTOR_ALONE,
+    } from "@thewaver/ss-playground/App/PageComponents/PropsPanel/PropsPanel.const";
 
     let props: PagePropsPanelProps = $props();
 

@@ -1,9 +1,13 @@
 import type { JSX } from "solid-js";
 
-import type { SegmentedInputCellRenderProps } from "@thewaver/ss-components";
+import type {
+    BaseSegmentedInputCbs,
+    BaseSegmentedInputValues,
+    SegmentedInputCellRenderProps,
+} from "@thewaver/ss-components";
 
 import type { TextFieldPresetProps } from "../../../Primitives/TextField/TextFieldSolid.types";
-import type { AccessorProps } from "../../../Utils/typeUtils";
+import type { AccessorValues } from "../../../Utils/typeUtils";
 
 export type SegmentedInputProps = Omit<
     TextFieldPresetProps,
@@ -21,18 +25,8 @@ export type SegmentedInputProps = Omit<
     | "renderLeading"
     | "renderTrailing"
 > &
-    AccessorProps<{
-        /** How many cells the field has, which is also the most characters its value can hold. */
-        cellCount: number;
-        /** The space between two cells, in pixels. */
-        gap?: number;
-        /**
-         * Answers whether one character may be typed or pasted into the field. A refused character is dropped
-         * wherever it appears, so a pasted `123-456` lands as its six digits. Left out, only the digits `0` to `9` are
-         * taken; a field that takes more should also say so through `inputMode`, which otherwise asks a phone for its
-         * digit keyboard.
-         */
-        computeIsAllowed?: (char: string) => boolean;
+    AccessorValues<BaseSegmentedInputValues> &
+    BaseSegmentedInputCbs & {
         /**
          * Draws one cell. It is handed the character in that cell, where it sits, whether the caret is in it and
          * whether it is selected, beside the field's own state — so the caret, the selection and the focus ring are
@@ -40,4 +34,4 @@ export type SegmentedInputProps = Omit<
          * technology, which reads the field's value instead.
          */
         renderCell: (getCell: () => SegmentedInputCellRenderProps) => JSX.Element;
-    }>;
+    };

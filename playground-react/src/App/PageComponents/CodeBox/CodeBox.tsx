@@ -1,6 +1,6 @@
 import * as styles from "@thewaver/ss-playground/App/PageComponents/CodeBox/CodeBox.css";
 
-import type { PageCodeBoxProps } from "./CodeBox.types";
+import type { PageCodeBoxProps } from "./CodeBoxReact.types";
 
 export const PageCodeBox = (props: PageCodeBoxProps) => {
     return (

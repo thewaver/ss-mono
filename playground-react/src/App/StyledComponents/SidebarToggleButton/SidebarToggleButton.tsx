@@ -1,10 +1,11 @@
+import {
+    OPEN_TOWARDS_LEFT,
+    OPEN_TOWARDS_RIGHT,
+} from "@thewaver/ss-playground/App/StyledComponents/SidebarToggleButton/SidebarToggleButton.const";
 import * as styles from "@thewaver/ss-playground/App/StyledComponents/SidebarToggleButton/SidebarToggleButton.css";
 
 import { useLayerClass } from "../Layer/Layer.context";
 import type { SidebarToggleButtonProps } from "./SidebarToggleButton.types";
-
-const OPEN_TOWARDS_RIGHT = "›";
-const OPEN_TOWARDS_LEFT = "‹";
 
 export const PageSidebarToggleButton = (props: SidebarToggleButtonProps) => {
     const { flags, edge, isExpanded, ...others } = props;

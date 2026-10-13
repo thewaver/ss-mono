@@ -25,12 +25,20 @@ import type {
     _ScanlineHorizontalSkewOpts,
     _ScanlineHorizontalWaveOpts,
 } from "@thewaver/ss-components-react";
+import { ScanlineAnimationKeyframeKnobs } from "@thewaver/ss-playground/App/Knobs/ScanlineAnimationKeyframes.const";
 import { ScanlineAnimationKnobs } from "@thewaver/ss-playground/App/Knobs/ScanlineAnimations.const";
+import {
+    EXAMPLES_ROOT,
+    EXAMPLE_NAMES,
+    IMAGE_CONTAINER_SIZE,
+    STRESS_ITEMS,
+    STRESS_LINE_COUNT,
+    WEIGHT_ORIGIN,
+} from "@thewaver/ss-playground/App/Pages/ScanLineAnimationPage/ScanLineAnimationPage.const";
 import * as styles from "@thewaver/ss-playground/App/Pages/ScanLineAnimationPage/ScanlineAnimationPage.css";
 import knight from "@thewaver/ss-playground/App/knight.webp";
 import type { Index2d } from "@thewaver/ss-utils";
 
-import { ScanlineAnimationKeyframeKnobs } from "../../Knobs/ScanlineAnimationKeyframes.const";
 import { PageExampleKnobs } from "../../PageComponents/ExampleKnobs/ExampleKnobs";
 import { PageExamples } from "../../PageComponents/Examples/Examples";
 import {
@@ -45,7 +53,6 @@ import { PageMeasureBox } from "../../PageComponents/MeasureBox/MeasureBox";
 import { PageProp } from "../../PageComponents/Prop/Prop";
 import { PagePropsPanel } from "../../PageComponents/PropsPanel/PropsPanel";
 import { StressTest } from "../../PageComponents/StressTest/StressTest";
-import type { StressTestDefs } from "../../PageComponents/StressTest/StressText.types";
 import { BrightnessExample } from "./Examples/Brightness";
 import { GlitchExample } from "./Examples/Glitch";
 import { GrayscaleExample } from "./Examples/Grayscale";
@@ -59,44 +66,6 @@ import { RollExample } from "./Examples/_Roll";
 import { SkewExample } from "./Examples/_Skew";
 import { WaveExample } from "./Examples/_Wave";
 import type { ScanlineAnimationExampleProps } from "./ScanlineAnimationPage.types";
-
-const IMAGE_CONTAINER_SIZE = 360;
-
-const STRESS_LINE_COUNT = 120;
-const STRESS_ITEMS: (StressTestDefs & { size: number; kind: "transform" | "filter" })[] = (
-    ["transform", "filter"] as const
-)
-    .map((kind) => [
-        {
-            count: 4 * 3,
-            cols: 4,
-            gap: 10,
-            size: STRESS_LINE_COUNT,
-            kind,
-        },
-        {
-            count: 6 * 4,
-            cols: 6,
-            gap: 10,
-            size: STRESS_LINE_COUNT,
-            kind,
-        },
-        {
-            count: 8 * 6,
-            cols: 8,
-            gap: 10,
-            size: STRESS_LINE_COUNT,
-            kind,
-        },
-        {
-            count: 12 * 6,
-            cols: 12,
-            gap: 10,
-            size: STRESS_LINE_COUNT,
-            kind,
-        },
-    ])
-    .flat();
 
 const extractOptionGroupWord = (key: string) => key.replace(/^_/, "").match(/^[a-z]+/)?.[0] ?? key;
 
@@ -114,8 +83,6 @@ const groupOptions = <T extends string>(keys: readonly T[]) => {
 };
 
 const GROUPPED_WEIGHTS = groupOptions(CellAnimationWeights.ORIGIN_FREE_WEIGHT_TYPES);
-const EXAMPLES_ROOT = "/src/App/Pages/ScanLineAnimationPage/Examples";
-const WEIGHT_ORIGIN = { row: 0, col: 0 };
 
 const pickStressKeyframes = (kind: "transform" | "filter") => {
     const random = Math.random() * 3;
@@ -674,79 +641,79 @@ export const ScanlineAnimationPage = () => {
     const examples = [
         {
             key: "glitch",
-            name: "Glitch",
+            name: EXAMPLE_NAMES.glitch,
             component: () => <GlitchExampleWrapper {...commonProps} />,
             path: `${EXAMPLES_ROOT}/Glitch.tsx`,
         },
         {
             key: "surge",
-            name: "Surge",
+            name: EXAMPLE_NAMES.surge,
             component: () => <SurgeExampleWrapper {...commonProps} />,
             path: `${EXAMPLES_ROOT}/Surge.tsx`,
         },
         {
             key: "snake",
-            name: "Snake",
+            name: EXAMPLE_NAMES.snake,
             component: () => <SnakeExampleWrapper {...commonProps} />,
             path: `${EXAMPLES_ROOT}/Snake.tsx`,
         },
         {
             key: "split",
-            name: "Split",
+            name: EXAMPLE_NAMES.split,
             component: () => <SplitExampleWrapper {...commonProps} />,
             path: `${EXAMPLES_ROOT}/Split.tsx`,
         },
         {
             key: "brightness",
-            name: "Brightness",
+            name: EXAMPLE_NAMES.brightness,
             component: () => <BrightnessExampleWrapper {...commonProps} />,
             path: `${EXAMPLES_ROOT}/Brightness.tsx`,
         },
         {
             key: "grayscale",
-            name: "Grayscale",
+            name: EXAMPLE_NAMES.grayscale,
             component: () => <GrayscaleExampleWrapper {...commonProps} />,
             path: `${EXAMPLES_ROOT}/Grayscale.tsx`,
         },
         {
             key: "hue",
-            name: "Hue",
+            name: EXAMPLE_NAMES.hue,
             component: () => <HueExampleWrapper {...commonProps} />,
             path: `${EXAMPLES_ROOT}/Hue.tsx`,
         },
         {
             key: "_wave",
-            name: "_Wave",
+            name: EXAMPLE_NAMES._wave,
             component: () => <WaveExampleWrapper {...commonProps} />,
             path: `${EXAMPLES_ROOT}/_Wave.tsx`,
         },
         {
             key: "_roll",
-            name: "_Roll",
+            name: EXAMPLE_NAMES._roll,
             component: () => <RollExampleWrapper {...commonProps} />,
             path: `${EXAMPLES_ROOT}/_Roll.tsx`,
         },
         {
             key: "_dropout",
-            name: "_Dropout",
+            name: EXAMPLE_NAMES._dropout,
             component: () => <DropoutExampleWrapper {...commonProps} />,
             path: `${EXAMPLES_ROOT}/_Dropout.tsx`,
         },
         {
             key: "_interlace",
-            name: "_Interlace",
+            name: EXAMPLE_NAMES._interlace,
             component: () => <InterlaceExampleWrapper {...commonProps} />,
             path: `${EXAMPLES_ROOT}/_Interlace.tsx`,
         },
         {
             key: "_skew",
-            name: "_Skew",
+            name: EXAMPLE_NAMES._skew,
             component: () => <SkewExampleWrapper {...commonProps} />,
             path: `${EXAMPLES_ROOT}/_Skew.tsx`,
         },
         {
             key: "stressTest",
-            name: "Stress Test",
+            name: EXAMPLE_NAMES.stressTest,
             component: () => <StressTestWrapper {...commonProps} />,
         },
     ];

@@ -3,6 +3,13 @@ import { computed, shallowRef } from "vue";
 
 import { Button } from "@thewaver/ss-components-vue";
 import { TagInputKnobs } from "@thewaver/ss-playground/App/Knobs/TagInputs.const";
+import {
+    CROWDED_TAGS,
+    EXAMPLES_ROOT,
+    EXAMPLE_NAMES,
+    NARROW_WIDTH,
+    STARTING_TAGS,
+} from "@thewaver/ss-playground/App/Pages/TagInputPage/TagInputPage.const";
 
 import type { ExampleDefs } from "../../PageComponents/Examples/Examples.types";
 import PageExamples from "../../PageComponents/Examples/PageExamples.vue";
@@ -14,25 +21,6 @@ import CrowdedExample from "./Examples/Crowded.vue";
 import DefaultExample from "./Examples/Default.vue";
 import UniqueExample from "./Examples/Unique.vue";
 import type { TagInputExampleProps } from "./TagInputPage.types";
-
-const NARROW_WIDTH = 240;
-const EXAMPLES_ROOT = "/src/App/Pages/TagInputPage/Examples";
-
-const STARTING_TAGS = ["solid", "vanilla-extract"];
-const CROWDED_TAGS = [
-    "solid",
-    "vanilla-extract",
-    "playwright",
-    "typescript",
-    "vite",
-    "eslint",
-    "prettier",
-    "vitest",
-    "aria",
-    "tokens",
-    "signals",
-    "stores",
-];
 
 const isDisabled = shallowRef(TagInputKnobs.STARTING_IS_DISABLED);
 const hasError = shallowRef(TagInputKnobs.STARTING_HAS_ERROR);
@@ -57,25 +45,25 @@ const commonProps = computed<Omit<TagInputExampleProps, "value" | "onUpdate:valu
 const examples: ExampleDefs[] = [
     {
         key: "default",
-        name: "Default",
+        name: EXAMPLE_NAMES.default,
         readout: () => `tags: ${defaultTags.value.join(", ") || "none"}`,
         path: `${EXAMPLES_ROOT}/Default.vue`,
     },
     {
         key: "empty",
-        name: "Empty",
+        name: EXAMPLE_NAMES.empty,
         readout: () => `tags: ${emptyTags.value.join(", ") || "none"}`,
         path: `${EXAMPLES_ROOT}/Default.vue`,
     },
     {
         key: "unique",
-        name: "Refusing duplicates",
+        name: EXAMPLE_NAMES.unique,
         readout: () => `tags: ${uniqueTags.value.join(", ") || "none"} — the same word twice is refused`,
         path: `${EXAMPLES_ROOT}/Unique.vue`,
     },
     {
         key: "crowded",
-        name: "Crowded and narrow",
+        name: EXAMPLE_NAMES.crowded,
         readout: () => `${crowdedTags.value.length} tags in ${NARROW_WIDTH}px — they wrap and the box grows with them`,
         path: `${EXAMPLES_ROOT}/Crowded.vue`,
     },

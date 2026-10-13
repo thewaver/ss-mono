@@ -1,10 +1,10 @@
 import type { Ref, VNodeChild } from "vue";
 
 import type {
+    BaseColorInputValues,
     ColorAreaRenderProps,
     ColorInputCbs,
     ColorInputRenderProps,
-    ColorInputState,
     InteractionFlags,
     RangeRenderProps,
 } from "@thewaver/ss-components";
@@ -21,7 +21,7 @@ export type { ColorInputCbs };
 
 export type ColorInputFieldProps = ColorInputCbs &
     InteractionControlProps<ColorInputRenderProps> &
-    Pick<ColorInputState, "ariaLabel"> & {
+    Pick<BaseColorInputValues, "ariaLabel"> & {
         /** Identifies the picker, so the field can point at it. */
         popupId: string;
         /** Whether the picker is open. */
@@ -33,7 +33,7 @@ export type ColorInputFieldProps = ColorInputCbs &
 export type ColorInputProps = Omit<InteractionWrapperProps<ColorInputRenderProps>, "extraFlags"> &
     ColorInputCbs &
     Pick<InteractionControlProps<ColorInputRenderProps>, "id"> &
-    ColorInputState & {
+    BaseColorInputValues & {
         /**
          * The color. It is the only thing that changes it, and the field writes back in the notation it was handed —
          * a hex stays a hex.

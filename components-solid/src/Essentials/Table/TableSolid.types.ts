@@ -1,15 +1,16 @@
 import type { Accessor, JSX } from "solid-js";
 
 import type {
+    BaseTableCbs,
+    BaseTableValues,
     TableAnnouncements,
     TableCellRenderProps,
     TableColumnDefs,
     TableColumnRenderProps,
-    TableSelectionMode,
     TableSort,
 } from "@thewaver/ss-components";
 
-import type { AccessorProps, MaybeAccessor, SignalSource } from "../../Utils/typeUtils";
+import type { AccessorProps, AccessorValues, MaybeAccessor, SignalSource } from "../../Utils/typeUtils";
 
 export type TableColumn<T> = TableColumnDefs<T> & {
     /**
@@ -39,54 +40,22 @@ export type TableOrderProps =
       };
 
 export type TableProps<T> = TableOrderProps &
+    AccessorValues<BaseTableValues<T>> &
+    BaseTableCbs<T> &
     AccessorProps<{
-        /**
-         * Names the table for assistive technology. It is required because nothing else can name it, and a page with two
-         * unnamed grids gives a reader no way to tell them apart.
-         */
-        ariaLabel: string;
-        /** Whether rows cannot be selected, one can be, or many can be. */
-        selectionMode?: TableSelectionMode;
-        /** How far one press of an arrow key resizes a column, for resizing without a pointer. */
-        resizeStepPx?: number;
-        /** How many rows Page Up and Page Down move by. */
-        pageRows?: number;
-        /**
-         * How wide the grab area between two columns is. It is a hit target rather than a visible width, so it can be wider
-         * than the line that is drawn.
-         */
-        resizerWidthPx?: number;
-        /** Turns the table off, so nothing in it sorts, resizes, reorders or selects. */
-        isDisabled?: boolean;
         /** Which column the table is sorted by and which way. It is the only thing that sorts it. */
         sort?: SignalSource<TableSort | undefined>;
         /** How wide each column is, by column id. It is the only thing that resizes them. */
         widths?: SignalSource<Record<string, number>>;
-        /**
-         * Guesses how tall a row will be before it is drawn, which is what lets a long table render only what is on screen.
-         */
-        computeEstimatedRowHeight?: (index: number) => number;
         /** Draws the grab handle between two columns. */
         renderResizer?: (getRenderProps: () => TableColumnRenderProps) => JSX.Element;
         /** Draws the line showing where a dragged column would land. */
         renderMarker?: () => JSX.Element;
-        /** Runs when the reader sorts by a different column, or reverses the one it is sorted by. */
-        onSortChange?: (sort: TableSort | undefined) => void;
-        /** Runs when the reader moves a column. */
-        onOrderChange?: (order: string[]) => void;
     }> & {
         /** The columns, each carrying its own id and how it is drawn. */
         columns: MaybeAccessor<TableColumn<T>[]>;
-        /** The rows, in the order they are shown. */
-        rows: MaybeAccessor<T[]>;
         /** Which rows are selected. It is the only thing that selects them. */
         selection?: SignalSource<T[]>;
-        /** Names one row for assistive technology, so a reader hears what the row is rather than its number. */
-        computeRowAriaLabel?: (row: T, index: number) => string;
-        /** Runs when a row is activated, by pointer or by key. */
-        onRowActivate?: (row: T, index: number) => void;
-        /** Runs when the selection changes. */
-        onSelectionChange?: (rows: T[]) => void;
     };
 
 export type TableHeaderControlProps = {

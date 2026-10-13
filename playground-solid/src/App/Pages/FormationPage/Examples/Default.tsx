@@ -3,7 +3,7 @@ import { createMemo } from "solid-js";
 import { Formation, PlacementLayoutUtils, ProximityEffectUtils, access } from "@thewaver/ss-components-solid";
 
 import { PageFormationItem } from "../../../StyledComponents/FormationContent/FormationContent";
-import type { FormationExampleProps } from "../FormationPage.types";
+import type { FormationExampleProps } from "../FormationPageSolid.types";
 
 type Props = FormationExampleProps;
 

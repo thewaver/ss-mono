@@ -10,6 +10,12 @@ import {
     TODAY,
     WEEK_START_LABELS,
 } from "@thewaver/ss-playground/App/Pages/CalendarPage/CalendarPage.const";
+import {
+    CALENDAR_FIELD_WIDTH,
+    CALENDAR_IDS,
+    EXAMPLES_ROOT,
+    EXAMPLE_NAMES,
+} from "@thewaver/ss-playground/App/Pages/RangeCalendarPage/RangeCalendarPage.const";
 
 import type { ExampleDefs } from "../../PageComponents/Examples/Examples.types";
 import PageExamples from "../../PageComponents/Examples/PageExamples.vue";
@@ -18,10 +24,6 @@ import PageProp from "../../PageComponents/Prop/Prop.vue";
 import PagePropsPanel from "../../PageComponents/PropsPanel/PagePropsPanel.vue";
 import BoundedExample from "./Examples/Bounded.vue";
 import DefaultExample from "./Examples/Default.vue";
-
-const CALENDAR_FIELD_WIDTH = 180;
-const CALENDAR_IDS = DateValueUtils.getCalendarIds();
-const EXAMPLES_ROOT = "/src/App/Pages/RangeCalendarPage/Examples";
 
 const describe = (value: DateValueRange | undefined) =>
     value ? `${DateValueUtils.toIso(value.start)} to ${DateValueUtils.toIso(value.end)}` : "none";
@@ -49,13 +51,13 @@ const boundedMonth = useMonthState(calendarId);
 const examples: ExampleDefs[] = [
     {
         key: "default",
-        name: "Default",
+        name: EXAMPLE_NAMES.default,
         readout: () => `value: ${describe(defaultValue.value)}`,
         path: `${EXAMPLES_ROOT}/Default.vue`,
     },
     {
         key: "bounded",
-        name: "Bounded",
+        name: EXAMPLE_NAMES.bounded,
         readout: () =>
             `min ${DateValueUtils.toIso(MIN_DATE)}, max ${DateValueUtils.toIso(MAX_DATE)} — value: ${describe(boundedValue.value)}`,
         path: `${EXAMPLES_ROOT}/Bounded.vue`,

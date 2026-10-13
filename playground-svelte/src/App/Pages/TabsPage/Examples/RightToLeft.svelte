@@ -1,7 +1,7 @@
 <script lang="ts">
     import { RIGHT_TO_LEFT_TABS } from "@thewaver/ss-playground/App/Pages/TabsPage/TabsPage.const";
 
-    import type { TabsExampleProps } from "../TabsPage.types";
+    import type { TabsExampleProps } from "../TabsPageSvelte.types";
     import RowExample from "./Row.svelte";
 
     type Props = TabsExampleProps;

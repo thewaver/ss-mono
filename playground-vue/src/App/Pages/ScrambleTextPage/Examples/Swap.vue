@@ -7,7 +7,7 @@ import * as styles from "@thewaver/ss-playground/App/Pages/ScrambleTextPage/Scra
 
 import PageMeasureBox from "../../../PageComponents/MeasureBox/MeasureBox.vue";
 import PageControlButtonContent from "../../../StyledComponents/ControlButtonContent/ControlButtonContent.vue";
-import type { ScrambleTextExampleProps } from "../ScrambleTextPage.types";
+import type { ScrambleTextExampleProps } from "../ScrambleTextPageVue.types";
 
 const STATUSES = ["CONNECTING", "HANDSHAKE", "AUTHORIZED", "STREAMING", "IDLE"];
 const BOX_WIDTH = 320;

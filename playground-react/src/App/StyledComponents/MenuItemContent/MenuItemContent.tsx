@@ -1,13 +1,14 @@
 import type { PropsWithChildren } from "react";
 
+import {
+    CHECKED_MARK,
+    PICKED_MARK,
+    SUBMENU_MARK,
+} from "@thewaver/ss-playground/App/StyledComponents/MenuItemContent/MenuItemContent.const";
 import * as styles from "@thewaver/ss-playground/App/StyledComponents/MenuItemContent/MenuItemContent.css";
 
 import { useLayerClass } from "../Layer/Layer.context";
-import type { MenuItemContentProps } from "./MenuItemContent.types";
-
-const SUBMENU_MARK = "›";
-const CHECKED_MARK = "✓";
-const PICKED_MARK = "●";
+import type { MenuItemContentProps } from "./MenuItemContentReact.types";
 
 export const PageMenuItemContent = (props: PropsWithChildren<MenuItemContentProps>) => {
     const layerClass = useLayerClass();

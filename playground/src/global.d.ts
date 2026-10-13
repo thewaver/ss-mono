@@ -30,6 +30,11 @@ declare module "virtual:component-api" {
         isAccessor: boolean;
     };
 
+    export type ApiInclude = {
+        text: string;
+        target?: { unit: string; group: ApiGroupKind; table: string };
+    };
+
     export type ApiTable = {
         kind: ApiTableKind;
         name: string;
@@ -37,6 +42,7 @@ declare module "virtual:component-api" {
         description: string;
         isDocumented: boolean;
         entries: ApiEntry[];
+        includes: ApiInclude[];
     };
 
     export type ApiGroup = {

@@ -2,19 +2,16 @@
     import { untrack } from "svelte";
 
     import { TRAIL_DEFAULTS, TrailUtils, TrailStyles as styles } from "@thewaver/ss-components";
+    import { TrailConst } from "@thewaver/ss-components/internal";
     import { MathUtils } from "@thewaver/ss-utils";
 
     import { InteractionTrackerSvelteUtils } from "../../Abstracts/InteractionTracker/InteractionTrackerSvelte.utils.svelte.js";
     import type { TrailController, TrailProps } from "./Trail.types.js";
 
-    const NO_LENGTH = 0;
-    const NO_PROGRESS = 0;
-    const NO_OFFSET = 0;
-
-    let { progress = $bindable(NO_PROGRESS), playback = $bindable(true), ...props }: TrailProps = $props();
+    let { progress = $bindable(TrailConst.NO_PROGRESS), playback = $bindable(true), ...props }: TrailProps = $props();
 
     let path = $state<SVGPathElement>();
-    let pathLength = $state(NO_LENGTH);
+    let pathLength = $state(TrailConst.NO_LENGTH);
 
     const getIsPageHidden = InteractionTrackerSvelteUtils.trackPageHidden();
 
@@ -25,14 +22,14 @@
     const followerOffsets = $derived(props.followerOffsets ?? TRAIL_DEFAULTS.followerOffsets);
     const runExtent = $derived(TrailUtils.getRunExtent(followerOffsets, isLooping));
 
-    const isRunning = $derived(playback && !isDisabled && !getIsPageHidden() && pathLength > NO_LENGTH);
+    const isRunning = $derived(playback && !isDisabled && !getIsPageHidden() && pathLength > TrailConst.NO_LENGTH);
 
     $effect(() => {
         const element = path;
 
         void props.path;
 
-        pathLength = element ? element.getTotalLength() : NO_LENGTH;
+        pathLength = element ? element.getTotalLength() : TrailConst.NO_LENGTH;
     });
 
     const computePlace = (offset: number) =>
@@ -43,7 +40,7 @@
         );
 
     const places = $derived(followerOffsets.map(computePlace));
-    const place = $derived(computePlace(NO_OFFSET));
+    const place = $derived(computePlace(TrailConst.NO_OFFSET));
 
     const controller: TrailController = {
         getPlace: () => place,

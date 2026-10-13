@@ -1,39 +1,25 @@
 <script lang="ts">
     import { TABLE_OF_CONTENTS_DEFAULTS } from "@thewaver/ss-components-svelte";
     import {
-        OUTLINE_SECTIONS,
-        SECTIONS,
-    } from "@thewaver/ss-playground/App/Pages/TableOfContentsPage/TableOfContentsPage.const";
-    import type { TableOfContentsSection } from "@thewaver/ss-playground/App/Pages/TableOfContentsPage/TableOfContentsSection.types";
+    EXAMPLE_NAMES,
+    EXAMPLES_ROOT,
+    PERCENT,
+    SECTIONS,
+} from "@thewaver/ss-playground/App/Pages/TableOfContentsPage/TableOfContentsPage.const";
 
     import type { ExampleDefs } from "../../PageComponents/Examples/Examples.types";
     import PageExamples from "../../PageComponents/Examples/PageExamples.svelte";
     import TableOfContentsExample from "./Examples/TableOfContents.svelte";
 
-    const EXAMPLES_ROOT = "/src/App/Pages/TableOfContentsPage/Examples";
-    const PERCENT = 100;
-
-    const titleOf = (sections: TableOfContentsSection[], id: string | undefined) =>
-        sections.find((section) => section.id === id)?.title ?? "none";
-
     let current = $state<string | undefined>();
-    let outlineCurrent = $state<string | undefined>();
 
     const examples: ExampleDefs[] = [
         {
             key: "tableOfContents",
-            name: "Following the page",
+            name: EXAMPLE_NAMES.tableOfContents,
             readout: () =>
-                `current: ${titleOf(SECTIONS, current)} — the last heading whose top has scrolled past a line ${TABLE_OF_CONTENTS_DEFAULTS.offsetRatio * PERCENT}% of the way down the window, and pressing a link scrolls to its heading and focuses it`,
+                `current: ${SECTIONS.find((section) => section.id === current)?.title ?? "none"} — the last heading whose top has scrolled past a line ${TABLE_OF_CONTENTS_DEFAULTS.offsetRatio * PERCENT}% of the way down the box it scrolls in. Pressing a link scrolls only that box to its heading and focuses it, and each link's depth is indented by the painter while the list stays flat for the keyboard and a screen reader`,
             component: tableOfContentsExample,
-            path: `${EXAMPLES_ROOT}/TableOfContents.svelte`,
-        },
-        {
-            key: "outline",
-            name: "Sub-sections indented under their section",
-            readout: () =>
-                `current: ${titleOf(OUTLINE_SECTIONS, outlineCurrent)} — each link carries a depth the painter indents by, and the list stays flat for the keyboard and a screen reader`,
-            component: outlineExample,
             path: `${EXAMPLES_ROOT}/TableOfContents.svelte`,
         },
     ];
@@ -42,21 +28,11 @@
 {#snippet tableOfContentsExample()}
     <TableOfContentsExample
         sections={SECTIONS}
-        ariaLabel={"On this page"}
+        ariaLabel={"Outline"}
         onCurrentChange={(id) => {
             current = id;
         }}
     />
 {/snippet}
 
-{#snippet outlineExample()}
-    <TableOfContentsExample
-        sections={OUTLINE_SECTIONS}
-        ariaLabel={"Outline"}
-        onCurrentChange={(id) => {
-            outlineCurrent = id;
-        }}
-    />
-{/snippet}
-
-<PageExamples items={examples} layout={"flow"} />
+<PageExamples items={examples} minColumnWidth={520} />

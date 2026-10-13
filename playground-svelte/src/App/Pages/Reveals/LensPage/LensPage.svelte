@@ -14,10 +14,12 @@
     import PhotoExample from "./Examples/Photo.svelte";
     import PrintExample from "./Examples/Print.svelte";
     import type { LensExampleProps } from "./LensPage.types";
-
-    const EXAMPLES_ROOT = "/src/App/Pages/Reveals/LensPage/Examples";
-    const FIELD_WIDTH = 110;
-    const SHAPE_FIELD_WIDTH = 170;
+    import {
+    EXAMPLE_NAMES,
+    EXAMPLES_ROOT,
+    FIELD_WIDTH,
+    SHAPE_FIELD_WIDTH,
+} from "@thewaver/ss-playground/App/Pages/Reveals/LensPage/LensPage.const";
 
     let zoom = $state(LENS_DEFAULTS.zoom);
     let radius = $state(LENS_DEFAULTS.radius);
@@ -51,14 +53,14 @@
     const examples: ExampleDefs[] = [
         {
             key: "photo",
-            name: "Photo",
+            name: EXAMPLE_NAMES.photo,
             readout: () => "a picture drawn larger inside a window that follows the pointer",
             component: photoExample,
             path: `${EXAMPLES_ROOT}/Photo.svelte`,
         },
         {
             key: "print",
-            name: "Small print",
+            name: EXAMPLE_NAMES.print,
             readout: () => "the word under the middle of the lens is the word under the pointer",
             component: printExample,
             path: `${EXAMPLES_ROOT}/Print.svelte`,

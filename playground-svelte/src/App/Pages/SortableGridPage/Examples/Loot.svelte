@@ -13,7 +13,7 @@
     import PageSortableItemContent from "../../../StyledComponents/SortableContent/PageSortableItemContent.svelte";
     import PageSortableMarker from "../../../StyledComponents/SortableContent/PageSortableMarker.svelte";
     import PageSortableSurface from "../../../StyledComponents/SortableContent/PageSortableSurface.svelte";
-    import { GRID_GAP, computeGearKey, computeGearLabel } from "../SortableGridPage.const";
+    import { GRID_GAP, computeGearKey, computeGearLabel } from "@thewaver/ss-playground/App/Pages/SortableGridPage/SortableGridPage.const";
     import InventoryExample from "./Inventory.svelte";
 
     type Props = {

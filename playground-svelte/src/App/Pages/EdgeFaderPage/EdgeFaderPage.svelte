@@ -12,8 +12,7 @@
     import ColumnExample from "./Examples/Column.svelte";
     import GridExample from "./Examples/Grid.svelte";
     import StripExample from "./Examples/Strip.svelte";
-
-    const EXAMPLES_ROOT = "/src/App/Pages/EdgeFaderPage/Examples";
+    import { EXAMPLE_NAMES, EXAMPLES_ROOT } from "@thewaver/ss-playground/App/Pages/EdgeFaderPage/EdgeFaderPage.const";
 
     let size = $state(EDGE_FADER_DEFAULTS.size);
     let isScrollAware = $state(EDGE_FADER_DEFAULTS.isScrollAware);
@@ -27,28 +26,28 @@
     const examples: ExampleDefs[] = [
         {
             key: "column",
-            name: "Top and bottom",
+            name: EXAMPLE_NAMES.column,
             readout: () => `a scrolling column — ${modeText}`,
             component: columnExample,
             path: `${EXAMPLES_ROOT}/Column.svelte`,
         },
         {
             key: "strip",
-            name: "Left and right",
+            name: EXAMPLE_NAMES.strip,
             readout: () => `a scrolling strip — ${modeText}`,
             component: stripExample,
             path: `${EXAMPLES_ROOT}/Strip.svelte`,
         },
         {
             key: "grid",
-            name: "All four sides",
+            name: EXAMPLE_NAMES.grid,
             readout: () => `scrolls both ways, and the two fades meet in the corners — ${modeText}`,
             component: gridExample,
             path: `${EXAMPLES_ROOT}/Grid.svelte`,
         },
         {
             key: "card",
-            name: "Something that does not scroll",
+            name: EXAMPLE_NAMES.card,
             readout: () =>
                 isScrollAware
                     ? "nothing is out of view, so nothing fades"

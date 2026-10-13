@@ -4,7 +4,7 @@
     import { MOSAIC_GAP } from "@thewaver/ss-playground/App/Pages/WraparoundPage/WraparoundPage.const";
     import * as styles from "@thewaver/ss-playground/App/Pages/WraparoundPage/WraparoundPage.css";
 
-    import type { WraparoundExampleProps } from "../WraparoundPage.types";
+    import type { WraparoundExampleProps } from "../WraparoundPageSvelte.types";
 
     type Props = WraparoundExampleProps;
 

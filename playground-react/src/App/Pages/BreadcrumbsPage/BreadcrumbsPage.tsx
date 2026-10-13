@@ -4,21 +4,23 @@ import type { Breadcrumb } from "@thewaver/ss-components-react";
 import { Button } from "@thewaver/ss-components-react";
 import { BreadcrumbKnobs } from "@thewaver/ss-playground/App/Knobs/Breadcrumbs.const";
 import type { CrumbValue } from "@thewaver/ss-playground/App/Pages/BreadcrumbsPage/BreadcrumbTrail.types";
-import { TRAIL } from "@thewaver/ss-playground/App/Pages/BreadcrumbsPage/BreadcrumbsPage.const";
+import {
+    DEPTH_FIELD_WIDTH,
+    EXAMPLES_ROOT,
+    EXAMPLE_NAMES,
+    TRAIL,
+} from "@thewaver/ss-playground/App/Pages/BreadcrumbsPage/BreadcrumbsPage.const";
 
 import { PageExamples } from "../../PageComponents/Examples/Examples";
 import { PageCheckField, PageNumberField } from "../../PageComponents/Field/Field";
 import { PageProp } from "../../PageComponents/Prop/Prop";
 import { PagePropsPanel } from "../../PageComponents/PropsPanel/PropsPanel";
 import { PageButtonContent } from "../../StyledComponents/ButtonContent/ButtonContent";
-import type { BreadcrumbsExampleProps } from "./BreadcrumbsPage.types";
+import type { BreadcrumbsExampleProps } from "./BreadcrumbsPageReact.types";
 import { BareExample } from "./Examples/Bare";
 import { LinkComponentExample } from "./Examples/LinkComponent";
 import { LinkedExample } from "./Examples/Linked";
 import { TrailExample } from "./Examples/Trail";
-
-const DEPTH_FIELD_WIDTH = 90;
-const EXAMPLES_ROOT = "/src/App/Pages/BreadcrumbsPage/Examples";
 
 export const BreadcrumbsPage = () => {
     const [depth, setDepth] = useState(BreadcrumbKnobs.STARTING_DEPTH);
@@ -57,7 +59,7 @@ export const BreadcrumbsPage = () => {
     const examples = [
         {
             key: "default",
-            name: "Default",
+            name: EXAMPLE_NAMES.default,
             readout: () =>
                 `pressed: ${pressed ?? "nothing yet"} — pressing a crumb moves the page there, so the trail behind it is the whole trail; Reset puts it back`,
             component: () => (
@@ -73,14 +75,14 @@ export const BreadcrumbsPage = () => {
         },
         {
             key: "bare",
-            name: "No separator",
+            name: EXAMPLE_NAMES.bare,
             readout: () => "a trail with nothing between the crumbs, since the separator slot is optional",
             component: () => <BareExample {...commonProps} />,
             path: `${EXAMPLES_ROOT}/Bare.tsx`,
         },
         {
             key: "linked",
-            name: "Crumbs that are links",
+            name: EXAMPLE_NAMES.linked,
             readout: () => `pressed: ${linkPressed ?? "nothing yet"} — an href makes a crumb an anchor`,
             component: () => (
                 <LinkedExample
@@ -95,7 +97,7 @@ export const BreadcrumbsPage = () => {
         },
         {
             key: "linkComponent",
-            name: "Links through a component",
+            name: EXAMPLE_NAMES.linkComponent,
             readout: () => "the same links rendered by a consumer's own link component",
             component: () => <LinkComponentExample crumbs={linkCrumbs} />,
             path: `${EXAMPLES_ROOT}/LinkComponent.tsx`,

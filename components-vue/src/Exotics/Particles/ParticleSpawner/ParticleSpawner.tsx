@@ -7,6 +7,7 @@ import {
     ParticleSpawnerStyles,
     ParticleSpawnerUtils,
 } from "@thewaver/ss-components";
+import { ParticleSpawnerConst } from "@thewaver/ss-components/internal";
 
 import { ElementObserverVueUtils } from "../../../Abstracts/ElementObserver/ElementObserverVue.utils";
 import { InteractionTrackerVueUtils } from "../../../Abstracts/InteractionTracker/InteractionTrackerVue.utils";
@@ -17,9 +18,6 @@ import { toElement } from "../../../Utils/refUtils";
 import { useStore } from "../../../Utils/storeUtils";
 import type { SlotsContext } from "../../../Utils/typeUtils";
 import type { ParticleSpawnerProps, ParticleSpawnerSlots } from "./ParticleSpawner.types";
-
-const FIRST_STAGE = 0;
-const NOT_STARTED = 0;
 
 export const ParticleSpawner = defineComponent(
     (props: ParticleSpawnerProps, { slots }: SlotsContext<ParticleSpawnerSlots>) => {
@@ -38,8 +36,8 @@ export const ParticleSpawner = defineComponent(
         const ts = new Map<number, number>();
 
         const isPlaying = useTwoWay(props, "playback", true);
-        const stage = shallowRef({ index: FIRST_STAGE });
-        const frame = shallowRef(NOT_STARTED);
+        const stage = shallowRef({ index: ParticleSpawnerConst.FIRST_STAGE });
+        const frame = shallowRef(ParticleSpawnerConst.NOT_STARTED);
 
         const isPageHidden = InteractionTrackerVueUtils.usePageHidden();
         const isWindowVisible = computed(() => !isPageHidden.value);
@@ -86,7 +84,7 @@ export const ParticleSpawner = defineComponent(
         onScopeDispose(engine.stop);
 
         watchAfterRender([getParticleCount, getSpawnDelayMs, patterns], () => {
-            stage.value = { index: FIRST_STAGE };
+            stage.value = { index: ParticleSpawnerConst.FIRST_STAGE };
         });
 
         const pattern = computed(() => patterns.value[stage.value.index]);

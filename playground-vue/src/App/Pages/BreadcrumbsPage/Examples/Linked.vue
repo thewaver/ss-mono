@@ -4,7 +4,7 @@ import { BREADCRUMBS_GAP, labelOf } from "@thewaver/ss-playground/App/Pages/Brea
 
 import PageBreadcrumbContent from "../../../StyledComponents/BreadcrumbContent/PageBreadcrumbContent.vue";
 import PageBreadcrumbSeparator from "../../../StyledComponents/BreadcrumbContent/PageBreadcrumbSeparator.vue";
-import type { BreadcrumbsExampleProps } from "../BreadcrumbsPage.types";
+import type { BreadcrumbsExampleProps } from "../BreadcrumbsPageVue.types";
 
 type Props = BreadcrumbsExampleProps;
 

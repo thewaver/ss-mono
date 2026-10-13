@@ -3,7 +3,7 @@ import { MosaicImages } from "@thewaver/ss-playground/App/Pages/Mosaics/ImageMos
 import { MOSAIC_GAP } from "@thewaver/ss-playground/App/Pages/WraparoundPage/WraparoundPage.const";
 import * as styles from "@thewaver/ss-playground/App/Pages/WraparoundPage/WraparoundPage.css";
 
-import type { WraparoundExampleProps } from "../WraparoundPage.types";
+import type { WraparoundExampleProps } from "../WraparoundPageReact.types";
 
 type Props = WraparoundExampleProps;
 

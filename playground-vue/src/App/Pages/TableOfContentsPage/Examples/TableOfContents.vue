@@ -10,7 +10,7 @@ import {
 import * as styles from "@thewaver/ss-playground/App/Pages/TableOfContentsPage/TableOfContentsPage.css";
 
 import PageTableOfContentsContent from "../../../StyledComponents/TableOfContentsContent/TableOfContentsContent.vue";
-import type { TableOfContentsExampleProps } from "../TableOfContentsPage.types";
+import type { TableOfContentsExampleProps } from "../TableOfContentsPageVue.types";
 
 const TOP_DEPTH = 0;
 
@@ -76,7 +76,7 @@ const setHeadingRef = (index: number, element: Element | ComponentPublicInstance
                     {{ section.title }}
                 </component>
 
-                <p>{{ section.text }}</p>
+                <p :class="styles.tocText">{{ section.text }}</p>
             </section>
         </article>
     </div>

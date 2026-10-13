@@ -13,7 +13,7 @@ import {
     PagePaginatorDialStep,
     PagePaginatorPanel,
 } from "../../../StyledComponents/PaginatorContent/PaginatorContent";
-import type { PaginatorExampleProps } from "../PaginatorPage.types";
+import type { PaginatorExampleProps } from "../PaginatorPageSolid.types";
 
 const DIAL_STEPS: PaginatorStep[] = ["first", "previous", "next", "last"];
 

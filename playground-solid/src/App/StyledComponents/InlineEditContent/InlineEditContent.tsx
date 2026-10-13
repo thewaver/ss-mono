@@ -4,7 +4,7 @@ import { access } from "@thewaver/ss-components-solid";
 import * as styles from "@thewaver/ss-playground/App/StyledComponents/InlineEditContent/InlineEditContent.css";
 
 import { useLayerClass } from "../Layer/Layer.context";
-import type { InlineEditContentProps } from "./InlineEditContent.types";
+import type { InlineEditContentProps } from "./InlineEditContentSolid.types";
 
 export const PageInlineEditContent = (props: ParentProps<InlineEditContentProps>) => {
     const getLayerClass = useLayerClass();

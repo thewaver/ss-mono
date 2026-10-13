@@ -9,6 +9,7 @@ import {
     TypewriterUtils,
     TypewriterStyles as styles,
 } from "@thewaver/ss-components";
+import { TypewriterConst } from "@thewaver/ss-components/internal";
 import { assignInlineVars } from "@vanilla-extract/dynamic";
 
 import { LetterDriverContextProvider } from "../../../Abstracts/LetterDriver/LetterDriver.context";
@@ -18,13 +19,13 @@ import { access } from "../../../Utils/propUtils";
 import { accessStore } from "../../../Utils/storeUtils";
 import type { TypewriterProps } from "./TypewriterSolid.types";
 
-const BEFORE_FIRST = TypewriterUtils.CARET_BEFORE_FIRST;
-const NO_PROGRESS = 0;
-
 export const Typewriter = (props: ParentProps<TypewriterProps>) => {
     const [getContainerRef, setContainerRef] = createSignal<HTMLElement>();
 
-    const [getProgress, setProgress] = SignalMirrorSolidUtils.createOptional(() => props.progress, NO_PROGRESS);
+    const [getProgress, setProgress] = SignalMirrorSolidUtils.createOptional(
+        () => props.progress,
+        TypewriterConst.NO_PROGRESS,
+    );
     const [getIsPlaying, setIsPlaying] = SignalMirrorSolidUtils.createOptional(() => props.playback, true);
 
     const getComputeAnimationName = () => props.computeAnimationName ?? TYPEWRITER_DEFAULTS.computeAnimationName;
@@ -231,7 +232,7 @@ export const Typewriter = (props: ParentProps<TypewriterProps>) => {
 
                 {!getIsDriven() && !!getIndexedSegments().length && (
                     <div class={styles.typewriterTextWrap} style={{ width: `${getWidth() ?? 0}px` }}>
-                        <Show when={getCaretIndex() === BEFORE_FIRST}>{props.renderCaret?.()}</Show>
+                        <Show when={getCaretIndex() === TypewriterConst.BEFORE_FIRST}>{props.renderCaret?.()}</Show>
 
                         <For each={getIndexedSegments()}>
                             {(segment) => {
@@ -322,7 +323,7 @@ export const Typewriter = (props: ParentProps<TypewriterProps>) => {
                             }}
                         </For>
 
-                        <Show when={!getIsAnimating() && getCaretIndex() !== BEFORE_FIRST}>
+                        <Show when={!getIsAnimating() && getCaretIndex() !== TypewriterConst.BEFORE_FIRST}>
                             {props.renderCaret?.()}
                         </Show>
                     </div>

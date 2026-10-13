@@ -3,7 +3,7 @@
 
     import * as styles from "@thewaver/ss-playground/App/StyledComponents/FrameworkMenuContent/FrameworkMenuContent.css";
 
-    import type { FrameworkMenuTriggerProps } from "./FrameworkMenuContent.types";
+    import type { FrameworkMenuTriggerProps } from "./FrameworkMenuContentSvelte.types";
 
     let props: FrameworkMenuTriggerProps & { children?: Snippet } = $props();
 </script>

@@ -2,7 +2,7 @@
     import * as styles from "@thewaver/ss-playground/App/StyledComponents/ClockContent/ClockContent.css";
 
     import { getLayerClass } from "../Layer/Layer.context";
-    import type { ClockOptionProps } from "./ClockContent.types";
+    import type { ClockOptionProps } from "./ClockContentSvelte.types";
 
     let props: ClockOptionProps = $props();
 

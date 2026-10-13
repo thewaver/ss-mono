@@ -2,6 +2,11 @@ import { Show, createEffect, createMemo, createSignal } from "solid-js";
 
 import { Accordion, Scroller, Tabs, access, useViewportContext } from "@thewaver/ss-components-solid";
 import type { AccordionItem, Tab } from "@thewaver/ss-components-solid";
+import {
+    MODAL_MARGIN_HEIGHT,
+    SECTION_GAP,
+    TAB_GAP,
+} from "@thewaver/ss-playground/App/PageComponents/SourceView/SourceView.const";
 import * as styles from "@thewaver/ss-playground/App/PageComponents/SourceView/SourceView.css";
 import { FOCUS_RING_WIDTH } from "@thewaver/ss-playground/App/Theme.css";
 
@@ -10,12 +15,8 @@ import { PageTabContent, PageTabFloater, PageTabGutter } from "../../StyledCompo
 import { PageCodeBox } from "../CodeBox/CodeBox";
 import { PageScrollerButton } from "../ScrollerButton/ScrollerButton";
 import { PageTabPanel } from "../TabPanel/TabPanel";
-import type { SourceGroup, SourceViewProps } from "./SourceView.types";
 import { SourceViewUtils } from "./SourceView.utils";
-
-const TAB_GAP = 10;
-const SECTION_GAP = 5;
-const MODAL_MARGIN_HEIGHT = 80;
+import type { SourceGroup, SourceViewProps } from "./SourceViewSolid.types";
 
 const getTabId = (name: string) => `source-tab-${name}`;
 

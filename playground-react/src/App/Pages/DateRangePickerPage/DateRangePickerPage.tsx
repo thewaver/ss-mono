@@ -3,15 +3,17 @@ import { useState } from "react";
 import type { DateValueCalendarId, DateValueRange } from "@thewaver/ss-components-react";
 import { DATE_INPUT_DEFAULTS, DateValueUtils } from "@thewaver/ss-components-react";
 import { MAX_DATE, MIN_DATE } from "@thewaver/ss-playground/App/Pages/CalendarPage/CalendarPage.const";
+import {
+    CALENDAR_FIELD_WIDTH,
+    EXAMPLES_ROOT,
+    EXAMPLE_NAMES,
+} from "@thewaver/ss-playground/App/Pages/DateRangePickerPage/DateRangePickerPage.const";
 
 import { PageExamples } from "../../PageComponents/Examples/Examples";
 import { PageSelectField } from "../../PageComponents/Field/Field";
 import { PageProp } from "../../PageComponents/Prop/Prop";
 import { PagePropsPanel } from "../../PageComponents/PropsPanel/PropsPanel";
 import { PickedExample } from "./Examples/Picked";
-
-const CALENDAR_FIELD_WIDTH = 180;
-const EXAMPLES_ROOT = "/src/App/Pages/DateRangePickerPage/Examples";
 
 const describe = (value: DateValueRange | undefined) =>
     value ? `${DateValueUtils.toIso(value.start)} to ${DateValueUtils.toIso(value.end)}` : "none";
@@ -25,14 +27,14 @@ export const DateRangePickerPage = () => {
     const examples = [
         {
             key: "picked",
-            name: "Two fields, one value",
+            name: EXAMPLE_NAMES.picked,
             readout: () => `value: ${describe(defaultValue[0])}`,
             component: () => <PickedExample value={defaultValue} calendar={calendarId} itemKey={"picked"} />,
             path: `${EXAMPLES_ROOT}/Picked.tsx`,
         },
         {
             key: "bounded",
-            name: "Bounded",
+            name: EXAMPLE_NAMES.bounded,
             readout: () =>
                 `min ${DateValueUtils.toIso(MIN_DATE)}, max ${DateValueUtils.toIso(MAX_DATE)} — value: ${describe(boundedValue[0])}`,
             component: () => (

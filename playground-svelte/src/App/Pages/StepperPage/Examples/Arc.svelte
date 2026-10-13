@@ -6,7 +6,7 @@
     import PageStepArcCell from "../../../StyledComponents/StepContent/PageStepArcCell.svelte";
     import PageStepArcConnector from "../../../StyledComponents/StepContent/PageStepArcConnector.svelte";
     import PageStepContent from "../../../StyledComponents/StepContent/PageStepContent.svelte";
-    import type { StepperExampleProps } from "../StepperPage.types";
+    import type { StepperExampleProps } from "../StepperPageSvelte.types";
 
     const ARC_DEFS: ArcDefs = {
         curveHeightRatio: 1,

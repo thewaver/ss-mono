@@ -7,6 +7,7 @@ import {
     TrackedGradientDefaults,
     type TrackedGradientElementDefs,
 } from "@thewaver/ss-components";
+import { CometConst, TrackedGradientSampleConst } from "@thewaver/ss-components/internal";
 import { MathUtils, type Point2d } from "@thewaver/ss-utils";
 
 import { PointerTrackerReactUtils } from "../../../../Abstracts/PointerTracker/PointerTrackerReact.utils";
@@ -29,21 +30,11 @@ type CometsProps = {
     opts?: GradientCometSampleOpts;
 };
 
-const PACE_BY_COMET = [1, 0.7, 0.5];
-const SETTLE_MS = 1500;
-const RESTING_POINT: Point2d = { x: 0.5, y: 0.5 };
-const STILL: Point2d = { x: 0, y: 0 };
-const NO_FADE = 0;
-
-const CYCLING_DEFAULTS = TrackedGradientDefaults.COMET_CYCLING_DEFAULTS;
-
-const RENDERED_ELSEWHERE = () => undefined;
-
-const clock = SVGDefsUtils.createClock(SETTLE_MS);
+const clock = SVGDefsUtils.createClock(CometConst.SETTLE_MS);
 
 const getGradientId = (id: string, comet: number, index: number) => `gradient-${comet}-${index}-${id}`;
 
-const getCometOrder = () => PACE_BY_COMET.map((_unused, comet) => comet).reverse();
+const getCometOrder = () => CometConst.PACE_BY_COMET.map((_unused, comet) => comet).reverse();
 
 const getStampOrder = (length: number) => Array.from({ length }, (_unused, stamp) => length - 1 - stamp);
 
@@ -62,8 +53,8 @@ const Comets = (props: CometsProps) => {
     const follow = props.opts?.followStiffness ?? props.defaults.followStiffness;
 
     const [motion] = useState<CometMotion>(() => ({
-        chains: PACE_BY_COMET.map(() => Array.from({ length }, () => RESTING_POINT)),
-        velocities: PACE_BY_COMET.map(() => STILL),
+        chains: CometConst.PACE_BY_COMET.map(() => Array.from({ length }, () => CometConst.RESTING_POINT)),
+        velocities: CometConst.PACE_BY_COMET.map(() => CometConst.STILL),
         lastMs: undefined,
     }));
 
@@ -72,7 +63,8 @@ const Comets = (props: CometsProps) => {
 
         motion.lastMs = frameMs;
 
-        if (SVGDefsUtils.getPointerFade(reading, isPointerPresent) > NO_FADE) clock.keepAwake();
+        if (SVGDefsUtils.getPointerFade(reading, isPointerPresent) > TrackedGradientSampleConst.NO_FADE)
+            clock.keepAwake();
 
         if (elapsedMs <= 0) return;
 
@@ -82,7 +74,7 @@ const Comets = (props: CometsProps) => {
                 motion.velocities[comet],
                 reading.boxRatio,
                 elapsedMs,
-                stiffness * PACE_BY_COMET[comet],
+                stiffness * CometConst.PACE_BY_COMET[comet],
                 damping,
             );
 
@@ -93,7 +85,7 @@ const Comets = (props: CometsProps) => {
     }, [frameMs, reading, isPointerPresent]);
 
     const fade = SVGDefsUtils.getPointerFade(reading, isPointerPresent);
-    const cycleMs = props.opts?.cycles ? (props.opts.cycleMs ?? CYCLING_DEFAULTS.cycleMs) : undefined;
+    const cycleMs = props.opts?.cycles ? (props.opts.cycleMs ?? CometConst.CYCLING_DEFAULTS.cycleMs) : undefined;
     const elementSize = (props.opts?.circular ?? props.defaults.circular) ? props.defs.getSize() : undefined;
     const headAlpha = props.opts?.headAlpha ?? props.defaults.headAlpha;
     const headScale = props.opts?.headScale ?? props.defaults.headScale;
@@ -106,7 +98,7 @@ const Comets = (props: CometsProps) => {
                     props.defs.colors,
                     props.colorKeys,
                     comet,
-                    PACE_BY_COMET.length,
+                    CometConst.PACE_BY_COMET.length,
                     frameMs,
                     cycleMs,
                 );
@@ -162,7 +154,7 @@ export const createCometSample =
                                           opts={opts}
                                       />
                                   )
-                                : RENDERED_ELSEWHERE,
+                                : TrackedGradientSampleConst.RENDERED_ELSEWHERE,
                         },
                         filter: isFirst ? sharedBlur : sharedBlurRef,
                     };

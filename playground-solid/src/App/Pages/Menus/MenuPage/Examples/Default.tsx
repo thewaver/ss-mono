@@ -3,8 +3,8 @@ import type { MaybeAccessor, MenuItem } from "@thewaver/ss-components-solid";
 
 import { renderPageHighlightFloater } from "../../../../StyledComponents/GlideFloater/GlideFloater";
 import { PageMenuTriggerContent } from "../../../../StyledComponents/MenuTriggerContent/MenuTriggerContent";
-import { ACTIONS, renderMenuItem, renderMenuPopup } from "../MenuPage.const";
-import type { Action, MenuExampleProps } from "../MenuPage.types";
+import { ACTIONS, renderMenuItem, renderMenuPopup } from "../MenuPageSolid.const";
+import type { Action, MenuExampleProps } from "../MenuPageSolid.types";
 
 type Props = MenuExampleProps & { items?: MaybeAccessor<MenuItem<Action>[]>; caption?: MaybeAccessor<string> };
 

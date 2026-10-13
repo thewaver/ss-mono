@@ -4,6 +4,12 @@ import { computed, shallowRef } from "vue";
 import { ICICLE_DEFAULTS, MediaQueryMonitorVueUtils, TreemapUtils } from "@thewaver/ss-components-vue";
 import type { IcicleNode } from "@thewaver/ss-components-vue";
 import { IcicleKnobs } from "@thewaver/ss-playground/App/Knobs/Icicles.const";
+import {
+    EXAMPLES_ROOT,
+    EXAMPLE_NAMES,
+    NO_MOTION_DURATION_MS,
+    WIDE_SPAN,
+} from "@thewaver/ss-playground/App/Pages/IciclePage/IciclePage.const";
 import { LIBRARY } from "@thewaver/ss-playground/App/Pages/TreemapPage/TreemapPage.const";
 
 import type { ExampleDefs } from "../../PageComponents/Examples/Examples.types";
@@ -12,11 +18,6 @@ import PageNumberField from "../../PageComponents/Field/PageNumberField.vue";
 import PageProp from "../../PageComponents/Prop/Prop.vue";
 import PagePropsPanel from "../../PageComponents/PropsPanel/PagePropsPanel.vue";
 import LibraryExample from "./Examples/Library.vue";
-
-const EXAMPLES_ROOT = "/src/App/Pages/IciclePage/Examples";
-
-const NO_MOTION_DURATION_MS = 0;
-const WIDE_SPAN = 2;
 
 const columnCount = shallowRef(ICICLE_DEFAULTS.columnCount);
 const zoomDurationMs = shallowRef(ICICLE_DEFAULTS.zoomDurationMs);
@@ -32,7 +33,7 @@ const showing = computed(() =>
 const examples: ExampleDefs[] = [
     {
         key: "library",
-        name: "This library, by lines of code",
+        name: EXAMPLE_NAMES.library,
         span: WIDE_SPAN,
         readout: () =>
             `showing ${showing.value} — press any cell to bring it to the left at full height, the leftmost cell or Escape to go back up; the arrows walk up and down a column and across to a parent or its children`,

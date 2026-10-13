@@ -10,14 +10,15 @@ import type {
     TreeNodeRenderProps,
 } from "@thewaver/ss-components-vue";
 import * as styles from "@thewaver/ss-playground/App/App.css";
+import { MENU_DESCRIPTIONS } from "@thewaver/ss-playground/App/MenuDescriptions.const";
 import { PAGE_VIEW_KEYS, toPageViewRoute } from "@thewaver/ss-playground/App/PageComponents/ViewTabs/ViewTabs.const";
 import { StringUtils } from "@thewaver/ss-utils";
 
-import { DEPENDENCY_GROUPS, LIST_PAGELESS_COMPONENTS, MENU_CONFIGS, PREVIEW_EXCLUDED_PAGES } from "./App.const";
 import type { ComponentConfig, MenuBranchConfig, MenuNodeConfig } from "./App.types";
+import { DEPENDENCY_GROUPS, LIST_PAGELESS_COMPONENTS, MENU_CONFIGS, PREVIEW_EXCLUDED_PAGES } from "./AppVue.const";
 import PageLayer from "./PageComponents/Layer/Layer.vue";
 import PagePreview from "./PageComponents/Preview/Preview.vue";
-import type { PageViewKey } from "./PageComponents/ViewTabs/ViewTabs.types";
+import type { PageViewKey } from "./PageComponents/ViewTabs/ViewTabsVue.types";
 import type { GallerySection } from "./Pages/GalleryPage/GalleryPage.types";
 import PageTooltipContent from "./StyledComponents/TooltipContent/TooltipContent.vue";
 
@@ -139,7 +140,7 @@ export namespace AppUtils {
 
     export const GALLERY_SECTIONS: GallerySection[] = VISIBLE_MENU_CONFIGS.map((category) => ({
         name: category.name,
-        description: category.description,
+        description: MENU_DESCRIPTIONS[category.name],
         items: flattenConfigs([category]).flatMap((config) =>
             getHasPreview(config)
                 ? [

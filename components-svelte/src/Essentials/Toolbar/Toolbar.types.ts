@@ -1,13 +1,13 @@
 import type { Snippet } from "svelte";
 
 import type {
+    BaseToolbarButtonsProps,
+    BaseToolbarMenusProps,
+    BaseToolbarSharedProps,
     InteractionFlags,
     MenuFlags,
-    PlacementLayoutFn,
-    ProximityEffectFn,
     ToolbarActionRecord,
 } from "@thewaver/ss-components";
-import type { Point2d } from "@thewaver/ss-utils";
 
 import type { InteractionTooltipDefs } from "../../Primitives/InteractionWrapper/InteractionWrapper.types.js";
 import type { MenuItem, MenuRenderItem, MenuRenderPopup } from "../Menus/Menu/Menu.types.js";
@@ -22,29 +22,12 @@ export type MenubarAction<T> = ToolbarActionRecord<T, never> & {
     items: MenuItem<T>[];
 };
 
-export type ToolbarSharedProps<T> = {
-    /** The space between actions. */
-    gap?: number;
-    /** Names the bar for assistive technology. The role requires a name, so there is no way to leave it out. */
-    ariaLabel: string;
-    /** Names the overflow menu for assistive technology. */
-    overflowAriaLabel?: string;
-    /** Arranges the actions, for a bar that is something other than a straight run. */
-    computeLayout?: PlacementLayoutFn;
-    /** What the actions do as the pointer nears them. */
-    computeEffect?: ProximityEffectFn;
+export type ToolbarSharedProps<T> = BaseToolbarSharedProps<T> & {
     /** Draws the control that opens the overflow menu. */
     renderOverflowTrigger: Snippet<[flags: InteractionFlags<MenuFlags>]>;
-    /** Runs when an action is activated, whether from the bar or from the overflow menu. */
-    onActivate: (value: T) => void;
 };
 
-export type ToolbarButtonsProps<T> = {
-    /**
-     * What the bar is and what its actions are. A toolbar's actions are buttons; a menubar's are words that each open
-     * a menu. It is fixed by the preset, which is why neither `Toolbar` nor `Menubar` takes it.
-     */
-    role: "toolbar";
+export type ToolbarButtonsProps<T> = BaseToolbarButtonsProps & {
     /** The actions, in the order they are shown. Whatever does not fit moves into the overflow menu. */
     actions: ToolbarAction<T>[];
     /**
@@ -66,12 +49,7 @@ export type ToolbarButtonsProps<T> = {
     renderOverflowPopup: MenuRenderPopup;
 };
 
-export type ToolbarMenusProps<T> = {
-    /**
-     * What the bar is and what its actions are. A toolbar's actions are buttons; a menubar's are words that each open
-     * a menu. It is fixed by the preset, which is why neither `Toolbar` nor `Menubar` takes it.
-     */
-    role: "menubar";
+export type ToolbarMenusProps<T> = BaseToolbarMenusProps & {
     /**
      * The words, in the order they are shown, each carrying the menu it opens. Whatever does not fit moves into the
      * overflow menu, where a word becomes an item whose submenu is its menu.
@@ -83,8 +61,6 @@ export type ToolbarMenusProps<T> = {
      * overflow menu.
      */
     checked?: T[];
-    /** How far a submenu is held clear of the item that opens it, in every menu the bar opens. */
-    submenuOffset?: Point2d;
     /** Draws one word. It is told whether that word's menu is open. */
     renderAction: Snippet<[action: MenubarAction<T>, flags: InteractionFlags<MenuFlags>]>;
     /** Draws one item, in every menu the bar opens, the overflow menu included. */

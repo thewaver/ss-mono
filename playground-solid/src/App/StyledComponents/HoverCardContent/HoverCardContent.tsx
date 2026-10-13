@@ -4,7 +4,7 @@ import { access } from "@thewaver/ss-components-solid";
 import * as styles from "@thewaver/ss-playground/App/StyledComponents/HoverCardContent/HoverCardContent.css";
 
 import { PageLayer } from "../../PageComponents/Layer/Layer";
-import type { HoverCardContentProps } from "./HoverCardContent.types";
+import type { HoverCardContentProps } from "./HoverCardContentSolid.types";
 
 export const PageHoverCardContent = (props: ParentProps<HoverCardContentProps>) => {
     return (

@@ -19,7 +19,7 @@
     import knight_profile from "@thewaver/ss-playground/App/knight_profile.webp";
     import type { Index2d } from "@thewaver/ss-utils";
 
-    import { CellAnimationKnobs } from "../../Knobs/CellAnimations.const";
+    import { CellAnimationKnobs } from "@thewaver/ss-playground/App/Knobs/CellAnimations.const";
     import type { ExampleDefs } from "../../PageComponents/Examples/Examples.types";
     import PageExamples from "../../PageComponents/Examples/PageExamples.svelte";
     import PageCheckField from "../../PageComponents/Field/PageCheckField.svelte";
@@ -34,12 +34,14 @@
     import ImageExampleWrapper from "./ImageExampleWrapper.svelte";
     import PatternExampleWrapper from "./PatternExampleWrapper.svelte";
     import StressTestWrapper from "./StressTestWrapper.svelte";
+    import {
+    DRAWN_SOURCE_PATH,
+    EXAMPLE_NAMES,
+    PERCENT,
+} from "@thewaver/ss-playground/App/Pages/CellAnimationPage/CellAnimationPage.const";
 
     const DEFAULT_EXAMPLE_PATH = "/src/App/Pages/CellAnimationPage/Examples/Default.svelte";
     const WIPE_EXAMPLE_PATH = "/src/App/Pages/CellAnimationPage/Examples/Wipe.svelte";
-    const DRAWN_SOURCE_PATH = "/src/App/PageComponents/SVGDefsSources/SVGDefsSources.const.ts";
-
-    const PERCENT = 100;
 
     const extractOptionGroupWord = (key: string) => key.replace(/^_/, "").match(/^[a-z]+/)?.[0] ?? key;
 
@@ -93,7 +95,7 @@
     const examples: ExampleDefs[] = [
         {
             key: "image",
-            name: "A photograph, sliced",
+            name: EXAMPLE_NAMES.image,
             readout: () =>
                 `${Math.round(imageProgress * PERCENT)}% through the pass, ${imagePlayback ? "running" : "stopped"} — the progress signal is written by the component while it plays, and writing it moves the pass there`,
             component: imageExample,
@@ -101,7 +103,7 @@
         },
         {
             key: "gradient",
-            name: "A gradient, drawn in place",
+            name: EXAMPLE_NAMES.gradient,
             readout: () =>
                 "the Shape page's own gradients, serialized into a source — the start and the pause a script would have timed are written into the markup instead, so they run at the same length and rhythm as the cells",
             component: gradientExample,
@@ -109,7 +111,7 @@
         },
         {
             key: "pattern",
-            name: "A pattern, drawn in place",
+            name: EXAMPLE_NAMES.pattern,
             readout: () =>
                 "the same for the patterns, which flow on without a pause — a repeating fill has no beat to be out of step with",
             component: patternExample,
@@ -117,7 +119,7 @@
         },
         {
             key: "wipe",
-            name: "A screen wipe",
+            name: EXAMPLE_NAMES.wipe,
             readout: () =>
                 "a solid-color picture fixed over the whole viewport, its cells growing in by the chosen weight and going back out after a hold; the lozenge is each cell turned 45° and grown past its box until it covers it, and there is no circle, since a cell can only be transformed and filtered, not reshaped",
             component: wipeExample,
@@ -125,7 +127,7 @@
         },
         {
             key: "stressTest",
-            name: "Stress Test",
+            name: EXAMPLE_NAMES.stressTest,
             component: stressTestExample,
         },
     ];

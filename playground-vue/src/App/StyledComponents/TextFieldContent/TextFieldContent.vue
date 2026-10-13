@@ -13,7 +13,7 @@ export const computePageTextFieldTextStyle = (flags: InteractionFlags): TextFiel
 
 <script setup lang="ts">
 import { useLayerClass } from "../Layer/Layer.context";
-import type { TextFieldContentProps } from "./TextFieldContent.types";
+import type { TextFieldContentProps } from "./TextFieldContentVue.types";
 
 defineProps<TextFieldContentProps>();
 

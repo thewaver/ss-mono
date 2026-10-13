@@ -1,7 +1,7 @@
 import type { Snippet } from "svelte";
 
 import type {
-    SelectionMode,
+    BaseTableProps,
     TableAnnouncements,
     TableCellRenderProps,
     TableColumnDefs,
@@ -40,63 +40,30 @@ export type TableOrderProps =
           order?: undefined;
       };
 
-export type TableProps<T> = TableOrderProps & {
-    /**
-     * Names the table for assistive technology. It is required because nothing else can name it, and a page with two
-     * unnamed grids gives a reader no way to tell them apart.
-     */
-    ariaLabel: string;
-    /** Whether rows cannot be selected, one can be, or many can be. */
-    selectionMode?: SelectionMode;
-    /** How far one press of an arrow key resizes a column, for resizing without a pointer. */
-    resizeStepPx?: number;
-    /** How many rows Page Up and Page Down move by. */
-    pageRows?: number;
-    /**
-     * How wide the grab area between two columns is. It is a hit target rather than a visible width, so it can be wider
-     * than the line that is drawn.
-     */
-    resizerWidthPx?: number;
-    /** Turns the table off, so nothing in it sorts, resizes, reorders or selects. */
-    isDisabled?: boolean;
-    /**
-     * Which column the table is sorted by and which way. Bind it with `bind:sort` to drive or follow it; the table
-     * writes it when the reader sorts. Left unbound, the table keeps its own, starting unsorted.
-     */
-    sort?: TableSort;
-    /**
-     * How wide each column is, by column id. Bind it with `bind:widths`: it is the only thing that resizes them, and a
-     * table without it has no resizable columns.
-     */
-    widths?: Record<string, number>;
-    /**
-     * Guesses how tall a row will be before it is drawn, which is what lets a long table render only what is on screen.
-     */
-    computeEstimatedRowHeight?: (index: number) => number;
-    /** Draws the grab handle between two columns. */
-    renderResizer?: Snippet<[renderProps: TableColumnRenderProps]>;
-    /** Draws the line showing where a dragged column would land. */
-    renderMarker?: Snippet;
-    /** Runs when the reader sorts by a different column, or reverses the one it is sorted by. */
-    onSortChange?: (sort: TableSort | undefined) => void;
-    /** Runs when the reader moves a column. */
-    onOrderChange?: (order: string[]) => void;
-    /** The columns, each carrying its own id and how it is drawn. */
-    columns: TableColumn<T>[];
-    /** The rows, in the order they are shown. */
-    rows: T[];
-    /**
-     * Which rows are selected. Bind it with `bind:selection`: it is the only thing that selects them, and a table
-     * without it selects nothing unless `selectionMode` says otherwise, in which case it keeps its own.
-     */
-    selection?: T[];
-    /** Names one row for assistive technology, so a reader hears what the row is rather than its number. */
-    computeRowAriaLabel?: (row: T, index: number) => string;
-    /** Runs when a row is activated, by pointer or by key. */
-    onRowActivate?: (row: T, index: number) => void;
-    /** Runs when the selection changes. */
-    onSelectionChange?: (rows: T[]) => void;
-};
+export type TableProps<T> = TableOrderProps &
+    BaseTableProps<T> & {
+        /**
+         * Which column the table is sorted by and which way. Bind it with `bind:sort` to drive or follow it; the table
+         * writes it when the reader sorts. Left unbound, the table keeps its own, starting unsorted.
+         */
+        sort?: TableSort;
+        /**
+         * How wide each column is, by column id. Bind it with `bind:widths`: it is the only thing that resizes them, and a
+         * table without it has no resizable columns.
+         */
+        widths?: Record<string, number>;
+        /** Draws the grab handle between two columns. */
+        renderResizer?: Snippet<[renderProps: TableColumnRenderProps]>;
+        /** Draws the line showing where a dragged column would land. */
+        renderMarker?: Snippet;
+        /** The columns, each carrying its own id and how it is drawn. */
+        columns: TableColumn<T>[];
+        /**
+         * Which rows are selected. Bind it with `bind:selection`: it is the only thing that selects them, and a table
+         * without it selects nothing unless `selectionMode` says otherwise, in which case it keeps its own.
+         */
+        selection?: T[];
+    };
 
 export type TableHeaderCellProps<T> = {
     /** The column whose header this is. */

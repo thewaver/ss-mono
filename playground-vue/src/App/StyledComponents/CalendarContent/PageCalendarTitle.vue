@@ -2,7 +2,7 @@
 import * as styles from "@thewaver/ss-playground/App/StyledComponents/CalendarContent/CalendarContent.css";
 
 import { useLayerClass } from "../Layer/Layer.context";
-import type { CalendarTitleProps } from "./CalendarContent.types";
+import type { CalendarTitleProps } from "./CalendarContentVue.types";
 
 defineProps<CalendarTitleProps>();
 

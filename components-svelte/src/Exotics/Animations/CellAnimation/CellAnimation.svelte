@@ -6,6 +6,7 @@
         CellAnimationUtils,
         CellAnimationStyles as styles,
     } from "@thewaver/ss-components";
+    import { CellAnimationConst } from "@thewaver/ss-components/internal";
     import type { Index2d } from "@thewaver/ss-utils";
     import { assignInlineVars } from "@vanilla-extract/dynamic";
 
@@ -15,11 +16,7 @@
     import { toStyle } from "../../../Utils/styleUtils.js";
     import type { CellAnimationProps } from "./CellAnimation.types.js";
 
-    const NO_PROGRESS = 0;
-    const FIRST_ITERATION = 0;
-    const NO_WEIGHTS: number[][] = [];
-
-    let { playback = $bindable(true), progress = $bindable(NO_PROGRESS), ...props }: CellAnimationProps = $props();
+    let { playback = $bindable(true), progress = $bindable(CellAnimationConst.NO_PROGRESS), ...props }: CellAnimationProps = $props();
 
     const durationMs = $derived(props.animationDurationMs ?? CELL_ANIMATION_DEFAULTS.animationDurationMs);
     const iterationCount = $derived(props.animationIterationCount ?? CELL_ANIMATION_DEFAULTS.animationIterationCount);
@@ -32,7 +29,7 @@
     let root = $state<HTMLDivElement>();
     let img = $state<HTMLImageElement>();
     let container = $state<HTMLDivElement>();
-    let currentIteration = $state(FIRST_ITERATION);
+    let currentIteration = $state(CellAnimationConst.FIRST_ITERATION);
 
     const getIsPageHidden = InteractionTrackerSvelteUtils.trackPageHidden();
 
@@ -50,7 +47,7 @@
         return next;
     });
 
-    const weights = $derived(props.computeCellWeights?.(cellCount) ?? NO_WEIGHTS);
+    const weights = $derived(props.computeCellWeights?.(cellCount) ?? CellAnimationConst.NO_WEIGHTS);
     const columnEdges = $derived(CellAnimationUtils.computeEdges(getRootSize().width, cellCount.col));
     const rowEdges = $derived(CellAnimationUtils.computeEdges(getRootSize().height, cellCount.row));
     const cellDefs = $derived(CellAnimationUtils.computeCellDefs(cellCount, weights));
@@ -63,8 +60,8 @@
     watchChange(
         () => props.src,
         () => {
-            currentIteration = FIRST_ITERATION;
-            progress = NO_PROGRESS;
+            currentIteration = CellAnimationConst.FIRST_ITERATION;
+            progress = CellAnimationConst.NO_PROGRESS;
         },
     );
 

@@ -3,3 +3,10 @@ export type DocsTableOfContentsEntry = {
     title: string;
     depth: number;
 };
+
+export type BasePageDocsViewValues = {
+    name: string;
+    description: string;
+};
+
+export type BasePageDocsViewProps = BasePageDocsViewValues;

@@ -2,7 +2,7 @@
 import * as styles from "@thewaver/ss-playground/App/StyledComponents/SunburstContent/SunburstContent.css";
 
 import { useLayerClass } from "../Layer/Layer.context";
-import type { PageSunburstHubProps } from "./SunburstContent.types";
+import type { PageSunburstHubProps } from "./SunburstContentVue.types";
 
 defineProps<PageSunburstHubProps>();
 

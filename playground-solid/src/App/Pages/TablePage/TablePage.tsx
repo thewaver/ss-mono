@@ -1,6 +1,7 @@
 import { createMemo, createSignal } from "solid-js";
 
 import type { TableSort } from "@thewaver/ss-components-solid";
+import { EXAMPLES_ROOT, EXAMPLE_NAMES } from "@thewaver/ss-playground/App/Pages/TablePage/TablePage.const";
 
 import { PageExamples } from "../../PageComponents/Examples/Examples";
 import { ConsumerSortedExample } from "./Examples/ConsumerSorted";
@@ -10,10 +11,8 @@ import { ReorderableExample } from "./Examples/Reorderable";
 import { ResizableExample } from "./Examples/Resizable";
 import { SingleSelectionExample } from "./Examples/SingleSelection";
 import { VirtualizedExample } from "./Examples/Virtualized";
-import { STRESS_PART_COUNT, createStressParts } from "./TablePage.const";
 import type { Part } from "./TablePage.types";
-
-const EXAMPLES_ROOT = "/src/App/Pages/TablePage/Examples";
+import { STRESS_PART_COUNT, createStressParts } from "./TablePageSolid.const";
 
 const spellSort = (sort: TableSort | undefined) =>
     sort === undefined ? "unsorted" : `${sort.columnId} ${sort.direction}`;
@@ -49,7 +48,7 @@ export const TablePage = () => {
         {
             key: "default",
             span: 2,
-            name: "Default",
+            name: EXAMPLE_NAMES.default,
             readout: () =>
                 `sort: ${spellSort(defaultSortSignal[0]())} | selected: ${spellSelection(defaultSelectionSignal[0]())} — one tab stop for the whole grid, then arrows walk cell to cell and Space picks a row`,
             component: () => <PartsExample sort={defaultSortSignal} selection={defaultSelectionSignal} />,
@@ -57,7 +56,7 @@ export const TablePage = () => {
         },
         {
             key: "singleSelection",
-            name: "One row at a time",
+            name: EXAMPLE_NAMES.singleSelection,
             readout: () =>
                 `selected: ${spellSelection(singleSelectionSignal[0]())} — the same grid with room for one row in the selection, so picking a second drops the first`,
             component: () => <SingleSelectionExample sort={singleSortSignal} selection={singleSelectionSignal} />,
@@ -66,7 +65,7 @@ export const TablePage = () => {
         {
             key: "resizable",
             span: 2,
-            name: "Resizable columns",
+            name: EXAMPLE_NAMES.resizable,
             readout: () =>
                 `widths: ${JSON.stringify(resizableWidthsSignal[0]())} — drag a column's right edge, or focus a header cell and hold Ctrl with the left and right arrows`,
             component: () => (
@@ -81,7 +80,7 @@ export const TablePage = () => {
         {
             key: "reorderable",
             span: 2,
-            name: "Reorderable columns",
+            name: EXAMPLE_NAMES.reorderable,
             readout: () =>
                 `order: ${reorderableOrderSignal[0]().join(", ") || "as declared"} — drag a header sideways, or focus a header cell and hold Shift with the left and right arrows`,
             component: () => (
@@ -95,7 +94,7 @@ export const TablePage = () => {
         },
         {
             key: "consumerSorted",
-            name: "Sorted by the page",
+            name: EXAMPLE_NAMES.consumerSorted,
             readout: () =>
                 `sort: ${spellSort(consumerSortSignal[0]())} — no column carries a comparator, so the table reports the sort and the page is what reorders the rows`,
             component: () => <ConsumerSortedExample sort={consumerSortSignal} selection={consumerSelectionSignal} />,
@@ -104,7 +103,7 @@ export const TablePage = () => {
         {
             key: "virtualized",
             span: 2,
-            name: "Virtualized",
+            name: EXAMPLE_NAMES.virtualized,
             readout: () =>
                 `${STRESS_PART_COUNT.toLocaleString("en-GB")} rows, ${stressSelectionSignal[0]().length} selected | sort: ${spellSort(stressSortSignal[0]())} — the header stays put, and only the rows on screen exist`,
             component: () => (
@@ -118,7 +117,7 @@ export const TablePage = () => {
         },
         {
             key: "disabled",
-            name: "Disabled",
+            name: EXAMPLE_NAMES.disabled,
             readout: () =>
                 `sort: ${spellSort(disabledSortSignal[0]())} — nothing sorts, nothing selects, and every cell still reads out to a screen reader`,
             component: () => <DisabledExample sort={disabledSortSignal} selection={disabledSelectionSignal} />,

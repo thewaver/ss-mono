@@ -2,7 +2,7 @@
     import * as styles from "@thewaver/ss-playground/App/StyledComponents/TrailContent/TrailContent.css";
 
     import { getLayerClass } from "../Layer/Layer.context";
-    import type { PageTrailMarkerProps } from "./TrailContent.types";
+    import type { PageTrailMarkerProps } from "./TrailContentSvelte.types";
 
     let props: PageTrailMarkerProps = $props();
 

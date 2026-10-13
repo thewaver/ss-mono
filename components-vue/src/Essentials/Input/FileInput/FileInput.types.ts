@@ -1,4 +1,4 @@
-import type { FileInputCbs, FileInputRenderProps, FileInputState } from "@thewaver/ss-components";
+import type { BaseFileInputValues, FileInputCbs, FileInputRenderProps } from "@thewaver/ss-components";
 
 import type {
     InteractionControlProps,
@@ -11,13 +11,13 @@ export type { FileInputCbs };
 
 export type FileInputElementProps = Omit<FileInputCbs, "onReject"> &
     InteractionControlProps<FileInputRenderProps> &
-    Omit<FileInputState, "maxFiles" | "maxSizeBytes"> &
+    Omit<BaseFileInputValues, "maxFiles" | "maxSizeBytes"> &
     Pick<FileInputRenderProps, "files">;
 
 export type FileInputProps = Omit<InteractionWrapperProps<FileInputRenderProps>, "extraFlags"> &
     FileInputCbs &
     Pick<InteractionControlProps<FileInputRenderProps>, "id"> &
-    FileInputState & {
+    BaseFileInputValues & {
         /** The chosen files. It is the only thing that changes them. */
         "files": File[];
         /** Receives the chosen files whenever a pick or a drop changes them, which is what `v-model:files` binds. */

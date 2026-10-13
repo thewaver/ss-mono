@@ -1,5 +1,5 @@
 <script lang="ts">
-    import type { RadioOptionalExampleProps } from "../RadioPage.types";
+    import type { RadioOptionalExampleProps } from "../RadioPageSvelte.types";
     import DefaultExample from "./Default.svelte";
 
     type Props = RadioOptionalExampleProps;

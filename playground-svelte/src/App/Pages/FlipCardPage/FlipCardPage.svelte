@@ -10,15 +10,17 @@
     import PageProp from "../../PageComponents/Prop/Prop.svelte";
     import PagePropsPanel from "../../PageComponents/PropsPanel/PagePropsPanel.svelte";
     import PressedExample from "./Examples/Pressed.svelte";
+    import {
+    EXAMPLE_NAMES,
+    EXAMPLES_ROOT,
+    FIELD_WIDTH,
+    SELECT_WIDTH,
+} from "@thewaver/ss-playground/App/Pages/FlipCardPage/FlipCardPage.const";
 
     const AXIS_LABELS: Record<FlipCardAxis, string> = {
         row: "About the upright axis",
         column: "About the horizontal axis",
     };
-
-    const FIELD_WIDTH = 110;
-    const SELECT_WIDTH = 220;
-    const EXAMPLES_ROOT = "/src/App/Pages/FlipCardPage/Examples";
 
     let axis = $state<FlipCardAxis>(FLIP_CARD_DEFAULTS.axis);
     let transitionDurationMs = $state(FLIP_CARD_DEFAULTS.transitionDurationMs);
@@ -30,7 +32,7 @@
     const examples: ExampleDefs[] = [
         {
             key: "pressed",
-            name: "Turned toward the edge pressed",
+            name: EXAMPLE_NAMES.pressed,
             readout: () => {
                 const side = pressedFlipped ? "back" : "front";
 

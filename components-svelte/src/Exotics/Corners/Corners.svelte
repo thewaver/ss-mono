@@ -2,15 +2,14 @@
     import type { Snippet } from "svelte";
 
     import { CORNERS_DEFAULTS, CornerUtils, CornersStyles as styles } from "@thewaver/ss-components";
+    import { CornersConst } from "@thewaver/ss-components/internal";
 
     import { toStyle } from "../../Utils/styleUtils.js";
     import type { CornersProps } from "./Corners.types.js";
 
-    const DEFAULT_COLOR = "currentColor";
-
     let props: CornersProps & { children?: Snippet } = $props();
 
-    const color = $derived(props.color ?? DEFAULT_COLOR);
+    const color = $derived(props.color ?? CornersConst.DEFAULT_COLOR);
     const transitionDurationMs = $derived(props.transitionDurationMs ?? CORNERS_DEFAULTS.transitionDurationMs);
     const cornerLength = $derived(props.cornerLength ?? CORNERS_DEFAULTS.cornerLength);
     const strokeThickness = $derived(props.strokeThickness ?? CORNERS_DEFAULTS.strokeThickness);

@@ -2,14 +2,13 @@
 import { computed, onScopeDispose, shallowRef } from "vue";
 
 import { ViewportWrapper } from "@thewaver/ss-components-vue";
+import { SCREEN_HEIGHT } from "@thewaver/ss-playground/App/App.const";
 import * as styles from "@thewaver/ss-playground/App/App.css";
+import { DEFAULT_VIEWPORT_ANCHOR } from "@thewaver/ss-playground/App/PageComponents/NavSettings/NavSettings.const";
 import { FunctionUtils, type Size2d } from "@thewaver/ss-utils";
 
-import { FIXED_ANCHOR_RATIO } from "./App.const";
-import { DEFAULT_VIEWPORT_ANCHOR } from "./PageComponents/NavSettings/NavSettings.const";
-import type { ViewportAnchor } from "./PageComponents/NavSettings/NavSettings.types";
-
-const SCREEN_HEIGHT = window.screen.height;
+import { FIXED_ANCHOR_RATIO } from "./AppVue.const";
+import type { ViewportAnchor } from "./PageComponents/NavSettings/NavSettingsVue.types";
 
 const getWindowInnerSize = () => ({ width: window.innerWidth, height: window.innerHeight });
 

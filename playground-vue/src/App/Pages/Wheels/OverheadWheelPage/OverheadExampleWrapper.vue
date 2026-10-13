@@ -1,11 +1,11 @@
 <script setup lang="ts">
 import { useModel } from "vue";
 
+import { FLAT_WHEEL_SIZE } from "@thewaver/ss-playground/App/Pages/Wheels/OverheadWheelPage/OverheadWheelPage.const";
+
 import PageMeasureBox from "../../../PageComponents/MeasureBox/MeasureBox.vue";
 import type { WheelExampleProps } from "../Wheels.types";
 import OverheadExample from "./Examples/Overhead.vue";
-
-const FLAT_WHEEL_SIZE = 340;
 
 const props = defineProps<WheelExampleProps>();
 

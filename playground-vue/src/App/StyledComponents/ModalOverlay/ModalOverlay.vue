@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import * as styles from "@thewaver/ss-playground/App/StyledComponents/ModalOverlay/ModalOverlay.css";
 
-import type { ModalOverlayProps } from "./ModalOverlay.types";
+import type { ModalOverlayProps } from "./ModalOverlayVue.types";
 
 defineProps<ModalOverlayProps>();
 </script>

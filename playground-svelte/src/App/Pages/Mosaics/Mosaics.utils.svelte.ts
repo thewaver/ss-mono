@@ -1,7 +1,7 @@
 import { MOSAIC_DEFAULTS, type MosaicSizeAnchor } from "@thewaver/ss-components-svelte";
 import { MosaicKnobs } from "@thewaver/ss-playground/App/Knobs/Mosaics.const";
 
-import type { MosaicsControls } from "./Mosaics.types";
+import type { MosaicsControls } from "./MosaicsSvelte.types";
 
 export const createMosaicsControls = (): MosaicsControls => {
     let itemCount = $state(MosaicKnobs.STARTING_ITEM_COUNT);

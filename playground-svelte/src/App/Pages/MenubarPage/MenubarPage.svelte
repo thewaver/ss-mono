@@ -10,8 +10,7 @@
     import MenubarFrame from "./MenubarFrame.svelte";
     import { NOTHING_PICKED, VIEW_DEFAULTS } from "./MenubarPage.const.svelte";
     import type { MenubarEntry } from "./MenubarPage.types";
-
-    const EXAMPLES_ROOT = "/src/App/Pages/MenubarPage/Examples";
+    import { EXAMPLE_NAMES, EXAMPLES_ROOT } from "@thewaver/ss-playground/App/Pages/MenubarPage/MenubarPage.const";
 
     let barWidth = $state(MenubarKnobs.STARTING_BAR_WIDTH);
     let lastPicked = $state(NOTHING_PICKED);
@@ -20,7 +19,7 @@
     const examples: ExampleDefs[] = [
         {
             key: "default",
-            name: "File, Edit and View",
+            name: EXAMPLE_NAMES.default,
             readout: () =>
                 `last picked: ${lastPicked} — with a menu open, the left and right arrows close it and open the next one; narrow the bar and a word becomes a submenu of the overflow menu`,
             component: defaultExample,

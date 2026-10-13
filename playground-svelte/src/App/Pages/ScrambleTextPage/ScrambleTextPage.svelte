@@ -17,11 +17,12 @@
     import HeadlineExample from "./Examples/Headline.svelte";
     import SequentialExample from "./Examples/Sequential.svelte";
     import SwapExample from "./Examples/Swap.svelte";
-    import type { ScrambleTextExampleProps } from "./ScrambleTextPage.types";
-
-    const EXAMPLES_ROOT = "/src/App/Pages/ScrambleTextPage/Examples";
-
-    const NO_MOTION_DURATION_MS = 0;
+    import type { ScrambleTextExampleProps } from "./ScrambleTextPageSvelte.types";
+    import {
+    EXAMPLE_NAMES,
+    EXAMPLES_ROOT,
+    NO_MOTION_DURATION_MS,
+} from "@thewaver/ss-playground/App/Pages/ScrambleTextPage/ScrambleTextPage.const";
 
     let settleDurationMs = $state(SCRAMBLE_TEXT_DEFAULTS.settleDurationMs);
     let scrambleIntervalMs = $state(SCRAMBLE_TEXT_DEFAULTS.scrambleIntervalMs);
@@ -46,14 +47,14 @@
     const examples: ExampleDefs[] = [
         {
             key: "headline",
-            name: "Headline",
+            name: EXAMPLE_NAMES.headline,
             readout: () => "a restart asked for mid-run throws away the run in progress and plays again from the start",
             component: headlineExample,
             path: `${EXAMPLES_ROOT}/Headline.svelte`,
         },
         {
             key: "sequential",
-            name: "Sequential",
+            name: EXAMPLE_NAMES.sequential,
             readout: () =>
                 "one character at a time, each churning inside its own window and landing before the next starts — which needs a run several times longer than a whole-line churn, or there is no time to see anything happen",
             component: sequentialExample,
@@ -61,14 +62,14 @@
         },
         {
             key: "swap",
-            name: "Swap",
+            name: EXAMPLE_NAMES.swap,
             readout: () => "nothing asks for a restart here — changing the text is what starts the run",
             component: swapExample,
             path: `${EXAMPLES_ROOT}/Swap.svelte`,
         },
         {
             key: "changedOnly",
-            name: "Changed Only",
+            name: EXAMPLE_NAMES.changedOnly,
             readout: () =>
                 "only what differs from the last text scrambles, and the characters an insertion pushes along stay put",
             component: changedOnlyExample,

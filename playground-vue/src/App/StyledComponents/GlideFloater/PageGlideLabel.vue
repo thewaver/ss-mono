@@ -2,7 +2,7 @@
 import * as styles from "@thewaver/ss-playground/App/StyledComponents/GlideFloater/GlideFloater.css";
 
 import { useLayerClass } from "../Layer/Layer.context";
-import type { GlideLabelProps } from "./GlideFloater.types";
+import type { GlideLabelProps } from "./GlideFloaterVue.types";
 
 defineProps<GlideLabelProps>();
 

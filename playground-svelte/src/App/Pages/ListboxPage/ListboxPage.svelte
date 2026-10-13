@@ -5,8 +5,7 @@
     import GlideExample from "./Examples/Glide.svelte";
     import GroupedExample from "./Examples/Grouped.svelte";
     import SizesExample from "./Examples/Sizes.svelte";
-
-    const EXAMPLES_ROOT = "/src/App/Pages/ListboxPage/Examples";
+    import { EXAMPLE_NAMES, EXAMPLES_ROOT } from "@thewaver/ss-playground/App/Pages/ListboxPage/ListboxPage.const";
 
     let single = $state<string | undefined>("Portugal");
     let multiple = $state.raw<string[]>(["Denmark"]);
@@ -16,7 +15,7 @@
     const examples: ExampleDefs[] = [
         {
             key: "single",
-            name: "One value",
+            name: EXAMPLE_NAMES.single,
             readout: () =>
                 `value: ${single ?? "undefined"} — one tab stop; the arrows move focus between options and stop on Denmark and Finland, which hover explains`,
             component: singleExample,
@@ -24,7 +23,7 @@
         },
         {
             key: "multiple",
-            name: "Several values, in groups",
+            name: EXAMPLE_NAMES.multiple,
             readout: () =>
                 `values: [${multiple.join(", ")}] — Enter or Space picks and drops, the arrows skip Finland and cross groups`,
             component: multipleExample,
@@ -32,7 +31,7 @@
         },
         {
             key: "horizontalRightToLeft",
-            name: "Horizontal, right to left",
+            name: EXAMPLE_NAMES.horizontalRightToLeft,
             readout: () =>
                 `value: ${size ?? "undefined"} — the left arrow moves forward in a right-to-left page, and L is skipped`,
             component: sizesExample,
@@ -40,7 +39,7 @@
         },
         {
             key: "glide",
-            name: "Gliding markers",
+            name: EXAMPLE_NAMES.glide,
             readout: () =>
                 `value: ${glide ?? "undefined"} — one tinted marker sits on the picked option and a second glides to whichever option the pointer or the arrows are on`,
             component: glideExample,

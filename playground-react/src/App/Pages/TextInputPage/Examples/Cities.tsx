@@ -10,8 +10,8 @@ import {
     computePageTextFieldTextStyle,
 } from "../../../StyledComponents/TextFieldContent/TextFieldContent";
 import { PageTextFieldPlaceholder } from "../../../StyledComponents/TextFieldPlaceholder/TextFieldPlaceholder";
-import { renderSelectPopup } from "../../SelectPage/SelectPage.const";
-import type { TextInputCitiesExampleProps } from "../TextInputPage.types";
+import { renderSelectPopup } from "../../SelectPage/SelectPageReact.const";
+import type { TextInputCitiesExampleProps } from "../TextInputPageReact.types";
 
 type Props = TextInputCitiesExampleProps;
 

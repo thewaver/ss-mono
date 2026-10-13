@@ -12,7 +12,7 @@ import * as styles from "@thewaver/ss-playground/App/Pages/TabsPage/TabsPage.css
 import { PageTabPanel } from "../../../PageComponents/TabPanel/TabPanel";
 import { PageGlideFloater } from "../../../StyledComponents/GlideFloater/GlideFloater";
 import { PageTabContent, PageTabFloater, PageTabGutter } from "../../../StyledComponents/TabContent/TabContent";
-import type { TabsExampleProps } from "../TabsPage.types";
+import type { TabsExampleProps } from "../TabsPageSolid.types";
 
 const DEFAULT_ID_PREFIX = "row";
 

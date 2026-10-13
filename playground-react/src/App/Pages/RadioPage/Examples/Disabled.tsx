@@ -1,8 +1,8 @@
 import { Radio, RadioGroup } from "@thewaver/ss-components-react";
+import { RADIO_GROUP_GAP, SIZE_OPTIONS } from "@thewaver/ss-playground/App/Pages/RadioPage/RadioPage.const";
 
 import { PageRadioContent } from "../../../StyledComponents/RadioContent/RadioContent";
-import { RADIO_GROUP_GAP, SIZE_OPTIONS } from "../RadioPage.const";
-import type { RadioExampleProps } from "../RadioPage.types";
+import type { RadioExampleProps } from "../RadioPageReact.types";
 
 type Props = RadioExampleProps;
 

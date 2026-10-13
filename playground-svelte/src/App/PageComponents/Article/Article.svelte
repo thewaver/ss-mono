@@ -5,7 +5,7 @@
 
     import PageCodeBox from "../CodeBox/CodeBox.svelte";
     import PageLayer from "../Layer/Layer.svelte";
-    import type { PageArticleProps } from "./Article.types";
+    import type { PageArticleProps } from "@thewaver/ss-playground/App/PageComponents/Article/Article.types";
 
     let props: PageArticleProps = $props();
 </script>

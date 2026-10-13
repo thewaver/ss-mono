@@ -4,7 +4,7 @@
     import * as styles from "@thewaver/ss-playground/App/StyledComponents/SortableContent/SortableContent.css";
 
     import { getLayerClass } from "../Layer/Layer.context";
-    import type { SortableItemContentProps } from "./SortableContent.types";
+    import type { SortableItemContentProps } from "./SortableContentSvelte.types";
 
     let props: SortableItemContentProps & { children?: Snippet } = $props();
 

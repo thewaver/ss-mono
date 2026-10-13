@@ -2,6 +2,11 @@ import { useState } from "react";
 
 import { SHADOW_CASTER_DEFAULTS } from "@thewaver/ss-components-react";
 import { ShadowCasterKnobs } from "@thewaver/ss-playground/App/Knobs/ShadowCasters.const";
+import {
+    EXAMPLES_ROOT,
+    EXAMPLE_NAMES,
+    FIELD_WIDTH,
+} from "@thewaver/ss-playground/App/Pages/PointerEffects/ShadowCasterPage/ShadowCasterPage.const";
 
 import { PageExamples } from "../../../PageComponents/Examples/Examples";
 import { PageCheckField, PageColorField, PageNumberField } from "../../../PageComponents/Field/Field";
@@ -10,10 +15,6 @@ import { PagePropsPanel } from "../../../PageComponents/PropsPanel/PropsPanel";
 import { BadgeExample } from "./Examples/Badge";
 import { CardExample } from "./Examples/Card";
 import type { ShadowCasterExampleProps } from "./ShadowCasterPageReact.types";
-
-const EXAMPLES_ROOT = "/src/App/Pages/PointerEffects/ShadowCasterPage/Examples";
-
-const FIELD_WIDTH = 110;
 
 export const ShadowCasterPage = () => {
     const [isDisabled, setIsDisabled] = useState(ShadowCasterKnobs.STARTING_IS_DISABLED);
@@ -45,7 +46,7 @@ export const ShadowCasterPage = () => {
     const examples = [
         {
             key: "card",
-            name: "Card",
+            name: EXAMPLE_NAMES.card,
             readout: () =>
                 "the shadow is thrown away from the pointer, and lengthens and softens as the pointer retreats",
             component: () => <CardExample {...commonProps} />,
@@ -53,7 +54,7 @@ export const ShadowCasterPage = () => {
         },
         {
             key: "badge",
-            name: "Cut shape",
+            name: EXAMPLE_NAMES.badge,
             readout: () =>
                 "the same wrapper over a clipped star — the shadow traces the shape rather than the box around it",
             component: () => <BadgeExample {...commonProps} />,

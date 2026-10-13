@@ -5,7 +5,7 @@ import type { StepValue } from "@thewaver/ss-playground/App/Pages/StepperPage/St
 
 import PageStepConnector from "../../../StyledComponents/StepContent/PageStepConnector.vue";
 import PageStepContent from "../../../StyledComponents/StepContent/PageStepContent.vue";
-import type { StepperExampleProps } from "../StepperPage.types";
+import type { StepperExampleProps } from "../StepperPageVue.types";
 
 type Props = StepperExampleProps;
 

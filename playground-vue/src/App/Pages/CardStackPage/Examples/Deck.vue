@@ -10,7 +10,7 @@ import type { SwipeDirection } from "@thewaver/ss-utils";
 
 import PageMeasureBox from "../../../PageComponents/MeasureBox/MeasureBox.vue";
 import PageControlButtonContent from "../../../StyledComponents/ControlButtonContent/ControlButtonContent.vue";
-import type { CardStackDeckExampleProps } from "../CardStackExamples.types";
+import type { CardStackDeckExampleProps } from "../CardStackExamplesVue.types";
 
 const CARDS = ["Ace", "King", "Queen", "Jack", "Ten", "Nine", "Eight", "Seven", "Six", "Five", "Four", "Three", "Two"];
 const DIRECTIONS: SwipeDirection[] = ["left", "right", "up", "down"];

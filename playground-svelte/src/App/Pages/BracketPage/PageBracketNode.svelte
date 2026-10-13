@@ -1,8 +1,7 @@
 <script lang="ts">
     import type { BracketNode, BracketNodeState } from "@thewaver/ss-components-svelte";
     import * as styles from "@thewaver/ss-playground/App/Pages/BracketPage/BracketPage.css";
-
-    const ROOT_LAYER = 0;
+    import { ROOT_LAYER } from "@thewaver/ss-playground/App/Pages/BracketPage/BracketPage.const";
 
     let props: { node: BracketNode<string>; state: BracketNodeState } = $props();
 </script>

@@ -1,11 +1,11 @@
 import { useState } from "react";
 
+import { EXAMPLES_ROOT, EXAMPLE_NAMES } from "@thewaver/ss-playground/App/Pages/FormSectionPage/FormSectionPage.const";
+
 import { PageExamples } from "../../PageComponents/Examples/Examples";
 import { NestedExample } from "./Examples/Nested";
 import { SectionsExample } from "./Examples/Sections";
 import type { FormSectionsExampleProps } from "./FormSectionPage.types";
-
-const EXAMPLES_ROOT = "/src/App/Pages/FormSectionPage/Examples";
 
 export const FormSectionPage = () => {
     const emailState = useState("");
@@ -33,7 +33,7 @@ export const FormSectionPage = () => {
     const examples = [
         {
             key: "sections",
-            name: "Sections with their own validity",
+            name: EXAMPLE_NAMES.sections,
             readout: () =>
                 `outcome: ${outcome} — each field reports to its own section, and the form hears one answer per section rather than one per field`,
             component: () => <SectionsExample {...sectionsProps} />,
@@ -41,7 +41,7 @@ export const FormSectionPage = () => {
         },
         {
             key: "nested",
-            name: "A section inside a section",
+            name: EXAMPLE_NAMES.nested,
             readout: () =>
                 `outcome: ${nestedOutcome} — the payment section answers to the delivery section, which answers to the form, so the verdict travels up two levels rather than one`,
             component: () => (

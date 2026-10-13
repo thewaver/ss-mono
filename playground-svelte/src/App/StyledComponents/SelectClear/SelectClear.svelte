@@ -2,7 +2,7 @@
     import * as styles from "@thewaver/ss-playground/App/StyledComponents/SelectClear/SelectClear.css";
 
     import { getLayerClass } from "../Layer/Layer.context";
-    import type { SelectClearProps } from "./SelectClear.types";
+    import type { SelectClearProps } from "./SelectClearSvelte.types";
 
     let props: SelectClearProps = $props();
 

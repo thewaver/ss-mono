@@ -6,7 +6,7 @@
 
     import { getLayerClass } from "../Layer/Layer.context";
     import { INDENT_PER_DEPTH, LEAF_MARKER } from "./PageTreeNodeContent.svelte";
-    import type { TreeNodePendingProps } from "./TreeNodeContent.types";
+    import type { TreeNodePendingProps } from "./TreeNodeContentSvelte.types";
 
     let props: TreeNodePendingProps & { children?: Snippet } = $props();
 

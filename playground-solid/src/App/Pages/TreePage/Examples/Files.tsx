@@ -3,8 +3,8 @@ import type { MaybeAccessor, TreeNode } from "@thewaver/ss-components-solid";
 
 import { renderPageHighlightFloater } from "../../../StyledComponents/GlideFloater/GlideFloater";
 import { PageTreeNodeContent } from "../../../StyledComponents/TreeNodeContent/TreeNodeContent";
-import { FILES } from "../TreePage.const";
 import type { TreeExampleProps } from "../TreePage.types";
+import { FILES } from "../TreePageSolid.const";
 
 type Props = Partial<TreeExampleProps> & { nodes?: MaybeAccessor<TreeNode<string>[]> };
 

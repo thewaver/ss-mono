@@ -3,8 +3,8 @@ import { Bracket } from "@thewaver/ss-components-vue";
 import type { BracketNode } from "@thewaver/ss-components-vue";
 import * as styles from "@thewaver/ss-playground/App/Pages/BracketPage/BracketPage.css";
 
-import { branch, seed } from "../BracketPage.const";
 import type { BracketExampleProps } from "../BracketPage.types";
+import { branch, seed } from "../BracketPageVue.const";
 import PageBracketLayerHeader from "../PageBracketLayerHeader.vue";
 import PageBracketNode from "../PageBracketNode.vue";
 

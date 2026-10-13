@@ -7,7 +7,7 @@ import * as styles from "@thewaver/ss-playground/App/Pages/ScrambleTextPage/Scra
 
 import PageMeasureBox from "../../../PageComponents/MeasureBox/MeasureBox.vue";
 import PageControlButtonContent from "../../../StyledComponents/ControlButtonContent/ControlButtonContent.vue";
-import type { ScrambleTextExampleProps } from "../ScrambleTextPage.types";
+import type { ScrambleTextExampleProps } from "../ScrambleTextPageVue.types";
 
 const BUILDS = ["Build 1.4.2 ready", "Build 1.4.3 ready", "Build 1.4.3 RC1 ready", "Build 1.5.0 ready"];
 const BOX_WIDTH = 320;

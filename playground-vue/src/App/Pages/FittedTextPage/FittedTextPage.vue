@@ -3,6 +3,11 @@ import { shallowRef } from "vue";
 
 import { FITTED_TEXT_DEFAULTS } from "@thewaver/ss-components-vue";
 import { FittedTextKnobs } from "@thewaver/ss-playground/App/Knobs/FittedTexts.const";
+import {
+    EXAMPLES_ROOT,
+    EXAMPLE_NAMES,
+    WIDE_SPAN,
+} from "@thewaver/ss-playground/App/Pages/FittedTextPage/FittedTextPage.const";
 
 import type { ExampleDefs } from "../../PageComponents/Examples/Examples.types";
 import PageExamples from "../../PageComponents/Examples/PageExamples.vue";
@@ -12,16 +17,12 @@ import PagePropsPanel from "../../PageComponents/PropsPanel/PagePropsPanel.vue";
 import PosterExample from "./Examples/Poster.vue";
 import StackExample from "./Examples/Stack.vue";
 
-const EXAMPLES_ROOT = "/src/App/Pages/FittedTextPage/Examples";
-
-const WIDE_SPAN = 2;
-
 const lineHeightRatio = shallowRef(FITTED_TEXT_DEFAULTS.lineHeightRatio);
 
 const examples: ExampleDefs[] = [
     {
         key: "poster",
-        name: "A poster",
+        name: EXAMPLE_NAMES.poster,
         span: WIDE_SPAN,
         readout: () =>
             "every line is scaled to the full width, then the stack shrinks as one until it fits the height, so the shortest line comes out the largest; resize the window and it fits again",
@@ -29,7 +30,7 @@ const examples: ExampleDefs[] = [
     },
     {
         key: "stack",
-        name: "A narrow box",
+        name: EXAMPLE_NAMES.stack,
         readout: () =>
             "in a box this narrow the width runs out before the height does, so nothing has to shrink to fit and the lines keep their full-width sizes",
         path: `${EXAMPLES_ROOT}/Stack.vue`,

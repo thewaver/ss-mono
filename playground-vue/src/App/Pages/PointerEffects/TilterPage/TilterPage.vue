@@ -3,6 +3,12 @@ import { computed, shallowRef } from "vue";
 
 import { TILTER_DEFAULTS } from "@thewaver/ss-components-vue";
 import { TilterKnobs } from "@thewaver/ss-playground/App/Knobs/Tilters.const";
+import {
+    BOX_HEIGHT,
+    EXAMPLES_ROOT,
+    EXAMPLE_NAMES,
+    FIELD_WIDTH,
+} from "@thewaver/ss-playground/App/Pages/PointerEffects/TilterPage/TilterPage.const";
 
 import type { ExampleDefs } from "../../../PageComponents/Examples/Examples.types";
 import PageExamples from "../../../PageComponents/Examples/PageExamples.vue";
@@ -14,11 +20,6 @@ import PagePropsPanel from "../../../PageComponents/PropsPanel/PagePropsPanel.vu
 import CardExample from "./Examples/Card.vue";
 import PhotoExample from "./Examples/Photo.vue";
 import type { TilterExampleProps } from "./TilterPageVue.types";
-
-const EXAMPLES_ROOT = "/src/App/Pages/PointerEffects/TilterPage/Examples";
-
-const FIELD_WIDTH = 110;
-const BOX_HEIGHT = 240;
 
 const isDisabled = shallowRef(TilterKnobs.STARTING_IS_DISABLED);
 const smoothingMs = shallowRef(TILTER_DEFAULTS.smoothingMs);
@@ -43,14 +44,14 @@ const commonProps = computed<TilterExampleProps>(() => ({
 const examples: ExampleDefs[] = [
     {
         key: "card",
-        name: "Card with a sheen",
+        name: EXAMPLE_NAMES.card,
         readout: () =>
             "the surface leans away from the pointer and the highlight runs the other way, which is what reads as a reflection",
         path: `${EXAMPLES_ROOT}/Card.vue`,
     },
     {
         key: "photo",
-        name: "Picture, no sheen",
+        name: EXAMPLE_NAMES.photo,
         readout: () => "the same wrapper with the sheen slot left out — nothing is painted over the content",
         path: `${EXAMPLES_ROOT}/Photo.vue`,
     },

@@ -2,15 +2,14 @@ import type { JSX } from "solid-js";
 
 import type {
     AnchorPlacement,
-    ExternalInteractionFlags,
-    InteractionActivation,
+    BaseInteractionWrapperCbs,
+    BaseInteractionWrapperValues,
     InteractionFlags,
-    InteractionSizing,
 } from "@thewaver/ss-components";
 import type { ShapeArrowAim } from "@thewaver/ss-utils";
 
 import type { TooltipProps } from "../../Essentials/Overlays/Tooltip/TooltipSolid.types";
-import type { AccessorProps, MaybeAccessor } from "../../Utils/typeUtils";
+import type { AccessorValues, MaybeAccessor } from "../../Utils/typeUtils";
 
 export type InteractionControlProps<TExtra extends object = {}> = {
     /**
@@ -46,65 +45,28 @@ export type InteractionTooltipDefs<TExtra extends object = {}> = Omit<TooltipPro
     ) => JSX.Element;
 };
 
-export type InteractionWrapperProps<TExtra extends object = {}> = AccessorProps<
-    ExternalInteractionFlags & {
+export type InteractionWrapperProps<TExtra extends object = {}> = AccessorValues<BaseInteractionWrapperValues<TExtra>> &
+    BaseInteractionWrapperCbs & {
         /** The ARIA role the control reports, where it is something other than what its markup implies. */
-        role?: JSX.AriaAttributes["role"];
-        /** Whether the control takes only the room its content needs, or fills what it is given. */
-        sizing?: InteractionSizing;
-        /**
-         * The smallest width the control may shrink to. It exists so a control stays large enough to be hit
-         * accurately, rather than for layout.
-         */
-        minWidth?: number;
-        /** The smallest height the control may shrink to, for the same reason as the width. */
-        minHeight?: number;
-        /**
-         * Keeps a disabled control reachable by keyboard, so a reader learns it exists, hears that it is disabled,
-         * and reads its tooltip if it has one. Only means anything while the control is disabled.
-         */
-        isReachableWhenDisabled?: boolean;
-        /**
-         * Lets a disabled control take focus without putting it in the tab order, for a control reached by
-         * something other than tabbing. Only means anything while the control is disabled.
-         */
-        isFocusableWhenDisabled?: boolean;
-        /**
-         * Whether the control is reachable by tabbing at all. Switch it off for a control inside a group
-         * that manages its own walk, where the group is the one tab stop.
-         */
-        isTabbable?: boolean;
+        role?: MaybeAccessor<JSX.AriaAttributes["role"]>;
         /** Receives the element once it exists, for a consumer that has to measure or focus it. */
         ref?: (element: HTMLElement) => void;
-    }
-> & {
-    /**
-     * Extra state to merge into the flags handed to every render callback, so a control can paint against
-     * something the wrapper knows nothing about.
-     */
-    extraFlags?: MaybeAccessor<TExtra>;
-    /**
-     * Runs when the control is activated, by pointer or by key. It is told how far the control was dragged
-     * and how many presses have landed since mount, a count that goes up by one each time — a change in it is
-     * what lets a repeated press restart an effect that is already running.
-     */
-    onActivation?: (activation: InteractionActivation) => void;
-    /**
-     * A tooltip for the control, anchored and shown by the wrapper. On a disabled control kept reachable, it is
-     * where the reason for the disabling can be read.
-     */
-    tooltipDefs?: MaybeAccessor<InteractionTooltipDefs<TExtra> | undefined>;
-    /**
-     * Draws anything that sits alongside the control rather than inside it — a ripple, a focus ring, a badge
-     * — so the painted control does not have to make room for it.
-     */
-    renderDecoration?: (getFlags: () => InteractionFlags<TExtra>) => JSX.Element;
-    /**
-     * Draws the element the wrapper drives. It is handed the ref setter, which has to reach the real
-     * interactive element: that is what the wrapper listens on, anchors tooltips to, and puts ARIA on.
-     */
-    renderControl: (
-        setElementRef: (element: HTMLElement) => void,
-        getFlags: () => InteractionFlags<TExtra>,
-    ) => JSX.Element;
-};
+        /**
+         * A tooltip for the control, anchored and shown by the wrapper. On a disabled control kept reachable, it is
+         * where the reason for the disabling can be read.
+         */
+        tooltipDefs?: MaybeAccessor<InteractionTooltipDefs<TExtra> | undefined>;
+        /**
+         * Draws anything that sits alongside the control rather than inside it — a ripple, a focus ring, a badge
+         * — so the painted control does not have to make room for it.
+         */
+        renderDecoration?: (getFlags: () => InteractionFlags<TExtra>) => JSX.Element;
+        /**
+         * Draws the element the wrapper drives. It is handed the ref setter, which has to reach the real
+         * interactive element: that is what the wrapper listens on, anchors tooltips to, and puts ARIA on.
+         */
+        renderControl: (
+            setElementRef: (element: HTMLElement) => void,
+            getFlags: () => InteractionFlags<TExtra>,
+        ) => JSX.Element;
+    };

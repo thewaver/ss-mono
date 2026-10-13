@@ -1,28 +1,25 @@
 import { useState } from "react";
 
 import { SVGDefsSamples, TimedGradientDefaults } from "@thewaver/ss-components-react";
-import {
-    NO_SAMPLE_KEY,
-    toGroupEntriesWithNoSample,
-} from "@thewaver/ss-playground/App/PageComponents/SampleGroups/SampleGroups.const";
+import { SVGGradientKnobs } from "@thewaver/ss-playground/App/Knobs/SVGGradients.const";
+import { TimedGradientKnobs } from "@thewaver/ss-playground/App/Knobs/TimedGradients.const";
+import { NO_SAMPLE_KEY } from "@thewaver/ss-playground/App/PageComponents/SampleGroups/SampleGroups.const";
 import type { WithNoSample } from "@thewaver/ss-playground/App/PageComponents/SampleGroups/SampleGroups.types";
+import {
+    DEFAULT_EXAMPLE_PATH,
+    EXAMPLE_NAMES,
+    TIMED_GRADIENT_GROUPS,
+} from "@thewaver/ss-playground/App/Pages/SVGGradients/TimedGradientsPage/TimedGradientsPage.const";
 
-import { SVGGradientKnobs } from "../../../Knobs/SVGGradients.const";
-import { TimedGradientKnobs } from "../../../Knobs/TimedGradients.const";
 import { PageExamples } from "../../../PageComponents/Examples/Examples";
 import { PageGroupedSelectField, PageNumberField, PageSelectField } from "../../../PageComponents/Field/Field";
 import { PageKnobs } from "../../../PageComponents/Knobs/Knobs";
 import type { Knob } from "../../../PageComponents/Knobs/Knobs.types";
 import { PageProp } from "../../../PageComponents/Prop/Prop";
 import { PagePropsDivider, PagePropsGroups, PagePropsPanel } from "../../../PageComponents/PropsPanel/PropsPanel";
-import { GROUPPED_TIMED_GRADIENTS } from "../SVGGradients.const";
-import type { SVGGradientsPaintKind, TimedGradientExampleProps } from "../SVGGradients.types";
 import { PageSVGGradientsProps } from "../SVGGradientsProps";
+import type { SVGGradientsPaintKind, TimedGradientExampleProps } from "../SVGGradientsReact.types";
 import { DefaultExample } from "./Examples/Default";
-
-const DEFAULT_EXAMPLE_PATH = "/src/App/Pages/SVGGradients/TimedGradientsPage/Examples/Default.tsx";
-
-const TIMED_GRADIENT_GROUPS = toGroupEntriesWithNoSample(GROUPPED_TIMED_GRADIENTS);
 
 export const TimedGradientsPage = () => {
     const [configKey, setConfigKey] = useState<WithNoSample<SVGDefsSamples.Gradient.Timed.SampleKey>>(
@@ -58,7 +55,7 @@ export const TimedGradientsPage = () => {
     const examples = [
         {
             key: "default",
-            name: "Default",
+            name: EXAMPLE_NAMES.default,
             component: () => <DefaultExample {...commonProps} />,
             path: DEFAULT_EXAMPLE_PATH,
         },

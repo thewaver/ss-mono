@@ -1,6 +1,6 @@
 import type { Snippet } from "svelte";
 
-import type { TypewriterMode, TypewriterUpdateCause } from "@thewaver/ss-components";
+import type { BaseTypewriterProps, TypewriterUpdateCause } from "@thewaver/ss-components";
 
 export type TypewriterController = {
     /**
@@ -22,37 +22,9 @@ export type TypewriterController = {
     update: (cause: TypewriterUpdateCause) => boolean;
 };
 
-export type TypewriterProps = {
+export type TypewriterProps = BaseTypewriterProps & {
     /** The text to type, with whatever markup, links and images it carries. It is measured, then redrawn. */
     children?: Snippet;
-    /**
-     * Names the keyframes one character arrives with, from the character itself, where it falls among all of them
-     * from `0`, and how many there are — so every A can play one animation, odd letters another, and letters can fly
-     * outward from the middle. An image or other whole element is passed as `"\uFFFC"` and a line break the text
-     * holds as `"\n"`; a break the wrapping inserted is not a character and is never asked about. Return the same
-     * name every time for one animation throughout. A change in the names it gives for the same text starts the
-     * typing again.
-     */
-    computeAnimationName?: (character: string, index: number, count: number) => string;
-    /** How long one character takes to arrive. */
-    animationDurationMs?: number;
-    /** How long each character waits after the one before it, which is what makes the text type rather than appear. */
-    animationDelayMs?: number;
-    /** How long to wait before the first character arrives. */
-    initialAnimationDelayMs?: number;
-    /**
-     * Whether the characters arrive or leave. `erase` runs each character's animation backwards, last character
-     * first, and leaves the text hidden once it ends, whatever the animation's first frame draws. Changing it
-     * starts a run, so a phrase can be typed, held and erased by switching it from `onAnimationEnd`.
-     */
-    mode?: TypewriterMode;
-    /**
-     * Decides the order the characters arrive in, as a weight per character from `0` for the first to `1` for
-     * the last; an image or a line break counts as one. The whole run takes the character count times
-     * `animationDelayMs`, and each character starts at its weight's share of it. Erasing reverses the weights.
-     * Leave it out for left to right.
-     */
-    computeCharacterWeights?: (count: number) => number[];
     /**
      * Draws a caret after the character that arrived most recently, or before the one leaving while erasing.
      * It is placed from the same progress the characters are drawn from, so it cannot drift from the text, and
@@ -62,10 +34,6 @@ export type TypewriterProps = {
      * `aria-hidden="true"`.
      */
     renderCaret?: Snippet;
-    /** Starts the typing again when the text is re-laid out, for text that reflows as the window changes. */
-    resetAnimationOnLayout?: boolean;
-    /** Starts the typing again when the text itself changes. */
-    resetAnimationOnContent?: boolean;
     /**
      * How far the typing has gone, `0` for nothing yet and `1` for every character in place.
      *
@@ -84,6 +52,4 @@ export type TypewriterProps = {
     playback?: boolean;
     /** Hands the consumer a controller once the text is up, for replaying it from outside. */
     onMount?: (controller: TypewriterController) => void;
-    /** Runs once a playing run has every character in place. Moving `progress` to the end from outside does not. */
-    onAnimationEnd?: () => void;
 };

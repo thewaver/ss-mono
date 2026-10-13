@@ -6,21 +6,6 @@ import { type Bounds, type Point2d, Rect, Size2d } from "@thewaver/ss-utils";
 
 import { useViewportContext } from "../Viewport/Viewport.context";
 
-/** Shared empty result, so a disabled observer does not hand out a new array each time. */
-const EMPTY_SIZES: Size2d[] = [];
-
-/** Shared empty result, so a disabled observer does not hand out a new array each time. */
-const EMPTY_RECTS: (Rect | undefined)[] = [];
-
-/** Whether two size lists match entry for entry. */
-const isSameSizeList = (a: Size2d[], b: Size2d[]) =>
-    a.length === b.length && a.every((size, index) => Size2d.isSame(size, b[index]));
-
-/** Whether two rect lists match entry for entry, an entry missing on both sides counting as a match. */
-const isSameRectList = (a: (Rect | undefined)[], b: (Rect | undefined)[]) =>
-    a.length === b.length &&
-    a.every((rect, index) => (rect === undefined ? b[index] === undefined : Rect.isSame(rect, b[index])));
-
 /**
  * The Solid side of {@link ElementObserverUtils}: each observer as an accessor in and an accessor out, torn down on
  * cleanup.
@@ -71,13 +56,15 @@ export namespace ElementObserverSolidUtils {
         getRefs: Accessor<Array<HTMLElement | undefined>>,
         getIsDisabled?: Accessor<boolean>,
     ) => {
-        const [getSizes, setSizes] = createSignal<Size2d[]>(EMPTY_SIZES, { equals: isSameSizeList });
+        const [getSizes, setSizes] = createSignal<Size2d[]>(ElementObserverUtils.EMPTY_SIZES, {
+            equals: ElementObserverUtils.isSameSizeList,
+        });
 
         createEffect(() => {
             const refs = getRefs();
 
             if (getIsDisabled?.()) {
-                setSizes(EMPTY_SIZES);
+                setSizes(ElementObserverUtils.EMPTY_SIZES);
 
                 return;
             }
@@ -200,7 +187,9 @@ export namespace ElementObserverSolidUtils {
         getIsVisible: Accessor<boolean>,
     ) => {
         const viewportContext = useViewportContext();
-        const [getRects, setRects] = createSignal<(Rect | undefined)[]>(EMPTY_RECTS, { equals: isSameRectList });
+        const [getRects, setRects] = createSignal<(Rect | undefined)[]>(ElementObserverUtils.EMPTY_RECTS, {
+            equals: ElementObserverUtils.isSameRectList,
+        });
 
         onMount(() => {
             setRects(ElementObserverUtils.measureViewportRects(getRefs(), viewportContext));
@@ -222,7 +211,7 @@ export namespace ElementObserverSolidUtils {
      *
      * @param getRefs The elements to follow, in reading order. A missing entry is kept in place and never current.
      * @param getIsDisabled Pass `true` to stop following. Omitted means always on.
-     * @param opts.getOffsetRatio Where the line sits, as a share of the viewport's height from its top. Defaults to
+     * @param opts.getOffsetRatio Where the line sits, as a share of the scrolling box's visible height from its top. Defaults to
      * `CURRENT_INDEX_OBSERVER_DEFAULTS.offsetRatio`.
      * @returns The current element's index, or `undefined` while none has passed the line and while disabled.
      */

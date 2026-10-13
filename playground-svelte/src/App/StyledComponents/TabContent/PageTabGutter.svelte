@@ -2,7 +2,7 @@
     import * as styles from "@thewaver/ss-playground/App/StyledComponents/TabContent/TabContent.css";
 
     import { getLayerClass } from "../Layer/Layer.context";
-    import type { TabDecorationProps } from "./TabContent.types";
+    import type { TabDecorationProps } from "./TabContentSvelte.types";
 
     let props: TabDecorationProps = $props();
 

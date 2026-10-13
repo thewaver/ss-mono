@@ -4,7 +4,7 @@ import { access } from "@thewaver/ss-components-solid";
 import * as styles from "@thewaver/ss-playground/App/StyledComponents/ModalPanel/ModalPanel.css";
 
 import { PageLayer } from "../../PageComponents/Layer/Layer";
-import type { ModalHintProps, ModalPanelProps } from "./ModalPanel.types";
+import type { ModalHintProps, ModalPanelProps } from "./ModalPanelSolid.types";
 
 export const PageModalPanel = (props: ParentProps<ModalPanelProps>) => {
     return (

@@ -1,4 +1,3 @@
-export type ProximityTextExampleProps = {
-    reachPx: number;
-    isDisabled: boolean;
-};
+import type { BaseProximityTextExampleProps } from "@thewaver/ss-playground/App/Pages/ProximityTextPage/ProximityTextPage.types";
+
+export type ProximityTextExampleProps = BaseProximityTextExampleProps;

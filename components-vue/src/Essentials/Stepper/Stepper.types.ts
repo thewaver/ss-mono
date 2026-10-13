@@ -1,13 +1,11 @@
 import type { VNodeChild } from "vue";
 
 import type {
+    BaseStepperProps,
     InteractionFlags,
-    PlacementLayoutFn,
-    ProximityEffectFn,
     Step,
     StepperConnectorDefs,
     StepperFlags,
-    StepperOrientation,
 } from "@thewaver/ss-components";
 
 import type {
@@ -22,30 +20,12 @@ export type StepperItemProps<TValue, TState> = Omit<InteractionControlProps<Step
     onSelect: (value: TValue) => void;
 };
 
-export type StepperProps<TValue, TState> = {
-    /** Whether the steps run across the page or down it. */
-    orientation?: StepperOrientation;
-    /** The space between steps. */
-    gap?: number;
-    /** Names the stepper for assistive technology. */
-    ariaLabel?: string;
-    /** The steps, in the order they are worked through. */
-    steps: Step<TValue, TState>[];
-    /** Which step is current. It is the only thing that moves the stepper on. */
-    currentValue: TValue | undefined;
-    /** Arranges the steps, for a stepper that is something other than a straight run. */
-    computeLayout?: PlacementLayoutFn;
-    /** What the steps do as the pointer nears them. */
-    computeEffect?: ProximityEffectFn;
-    /** Names one step for assistive technology, where its visible text is not enough on its own. */
-    computeStepAriaLabel: (step: Step<TValue, TState>, index: number) => string;
+export type StepperProps<TValue, TState> = BaseStepperProps<TValue, TState> & {
     /** A tooltip for one step, usually to explain why it cannot be reached yet. */
     computeTooltipDefs?: (
         step: Step<TValue, TState>,
         index: number,
     ) => InteractionTooltipDefs<StepperFlags> | undefined;
-    /** Runs when a different step becomes current. */
-    onCurrentChange?: (value: TValue) => void;
 };
 
 export type StepperSlots<TValue, TState> = {

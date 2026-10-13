@@ -1,13 +1,13 @@
 <script lang="ts">
     import { MEASURE_BOX_PADDING } from "@thewaver/ss-playground/App/PageComponents/MeasureBox/MeasureBox.css";
 
-    import { PaintedTextKnobs } from "../../Knobs/PaintedTexts.const";
+    import { PaintedTextKnobs } from "@thewaver/ss-playground/App/Knobs/PaintedTexts.const";
     import PageExampleKnobs from "../../PageComponents/ExampleKnobs/PageExampleKnobs.svelte";
     import PageNumberField from "../../PageComponents/Field/PageNumberField.svelte";
     import PageMeasureBox from "../../PageComponents/MeasureBox/MeasureBox.svelte";
     import PageProp from "../../PageComponents/Prop/Prop.svelte";
     import HeadingExample from "./Examples/Heading.svelte";
-    import type { PaintedTextExampleWrapperProps } from "./PaintedTextPage.types";
+    import type { PaintedTextExampleWrapperProps } from "./PaintedTextPageSvelte.types";
 
     let { width, ...props }: PaintedTextExampleWrapperProps = $props();
 

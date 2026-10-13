@@ -6,8 +6,8 @@
 
     import PageMeasureBox from "../../../PageComponents/MeasureBox/MeasureBox.svelte";
     import PageControlButtonContent from "../../../StyledComponents/ControlButtonContent/ControlButtonContent.svelte";
-    import { computeSampleDefs } from "../PaintedTextPage.const";
-    import type { PaintedTextCircleExampleProps } from "../PaintedTextPage.types";
+    import { computeSampleDefs } from "../PaintedTextPageSvelte.const";
+    import type { PaintedTextCircleExampleProps } from "../PaintedTextPageSvelte.types";
 
     const RING_TEXT = "PAINTED TEXT • ROUND A CIRCLE • ";
 

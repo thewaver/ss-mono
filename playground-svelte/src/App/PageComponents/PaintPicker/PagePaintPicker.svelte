@@ -10,8 +10,8 @@
         SAMPLE_GROUPS,
         getPaintDefaults,
         getPaintKnobs,
-    } from "./PaintPicker.const";
-    import type { PagePaintPickerProps } from "./PaintPicker.types";
+    } from "./PaintPickerSvelte.const";
+    import type { PagePaintPickerProps } from "./PaintPickerSvelte.types";
 
     let props: PagePaintPickerProps = $props();
 

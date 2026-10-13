@@ -2,7 +2,7 @@ import { Label, Toggle } from "@thewaver/ss-components-react";
 
 import { PageLabelCaption } from "../../../StyledComponents/LabelCaption/LabelCaption";
 import { PageToggleContent } from "../../../StyledComponents/ToggleContent/ToggleContent";
-import type { LabelExampleProps } from "../LabelPage.types";
+import type { LabelExampleProps } from "../LabelPageReact.types";
 
 type Props = LabelExampleProps;
 

@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import PageMenuItemContent from "../../../StyledComponents/MenuItemContent/MenuItemContent.vue";
-import type { MenuDestinationItemProps } from "./MenuPage.types";
+import type { MenuDestinationItemProps } from "./MenuPageVue.types";
 
 defineProps<MenuDestinationItemProps>();
 </script>

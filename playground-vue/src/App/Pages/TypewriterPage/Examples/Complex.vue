@@ -10,7 +10,7 @@ import knight from "@thewaver/ss-playground/App/knight.webp";
 
 import PageMeasureBox from "../../../PageComponents/MeasureBox/MeasureBox.vue";
 import PageControlButtonContent from "../../../StyledComponents/ControlButtonContent/ControlButtonContent.vue";
-import type { TypewriterComplexExampleProps } from "../TypewriterPage.types";
+import type { TypewriterComplexExampleProps } from "../TypewriterPageVue.types";
 
 type Props = TypewriterComplexExampleProps;
 

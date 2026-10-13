@@ -1,15 +1,13 @@
 import { Show, createSignal } from "solid-js";
 
-import { type InteractionSizing, InteractionTrackerUtils } from "@thewaver/ss-components";
+import { InteractionTrackerUtils } from "@thewaver/ss-components";
+import { PlacementConst } from "@thewaver/ss-components/internal";
 
 import { BinarySwitch } from "../../../Primitives/BinarySwitch/BinarySwitch";
 import { PlacementItem } from "../../../Primitives/PlacementItem/PlacementItem";
 import { access } from "../../../Utils/propUtils";
 import { useRadioGroupContext } from "../RadioGroup/RadioGroup.context";
 import type { RadioProps } from "./RadioSolid.types";
-
-const ROW_SIZING: InteractionSizing = "fit-content";
-const PLACED_SIZING: InteractionSizing = "fill";
 
 export const Radio = <T,>(props: RadioProps<T>) => {
     const getValue = () => access(props.value);
@@ -44,7 +42,11 @@ export const Radio = <T,>(props: RadioProps<T>) => {
             ref={setElementRef}
             type={"radio"}
             name={context.getName}
-            sizing={() => (getPlacement() === undefined ? (access(props.sizing) ?? ROW_SIZING) : PLACED_SIZING)}
+            sizing={() =>
+                getPlacement() === undefined
+                    ? (access(props.sizing) ?? PlacementConst.ROW_SIZING)
+                    : PlacementConst.PLACED_SIZING
+            }
             isChecked={() => context.getValue() === (getValue() as unknown)}
             isTabbable={() => context.computeIsTabbable(getValue())}
             onChange={(isChecked) => {

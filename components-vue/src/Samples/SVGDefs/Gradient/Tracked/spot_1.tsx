@@ -1,11 +1,7 @@
 import { defineComponent } from "vue";
 
-import {
-    type GradientSpotOpts,
-    SVGDefsUtils,
-    TrackedGradientDefaults,
-    type TrackedGradientElementDefs,
-} from "@thewaver/ss-components";
+import { type GradientSpotOpts, SVGDefsUtils, type TrackedGradientElementDefs } from "@thewaver/ss-components";
+import { Spot1Const } from "@thewaver/ss-components/internal";
 
 import { PointerTrackerVueUtils } from "../../../../Abstracts/PointerTracker/PointerTrackerVue.utils";
 import { SVGGradientDefsVueUtils } from "../../../../Generators/SVGDefs/SVGGradients/SVGGradientDefsVue.utils";
@@ -20,8 +16,6 @@ type SpotGradientProps = {
     opts?: GradientSpotOpts;
 };
 
-const DEFAULTS = TrackedGradientDefaults.SPOT_DEFAULTS;
-
 const SpotGradient = defineComponent(
     (props: SpotGradientProps) => {
         const { reading } = PointerTrackerVueUtils.usePointerReading(
@@ -35,18 +29,18 @@ const SpotGradient = defineComponent(
 
             return SVGGradientDefsVueUtils.computeRadialGradient({
                 id: props.id,
-                elementSize: (props.opts?.circular ?? DEFAULTS.circular) ? props.defs.getSize() : undefined,
+                elementSize: (props.opts?.circular ?? Spot1Const.DEFAULTS.circular) ? props.defs.getSize() : undefined,
                 origin: reading.value.boxRatio,
-                scale: props.opts?.glowScale ?? DEFAULTS.glowScale,
+                scale: props.opts?.glowScale ?? Spot1Const.DEFAULTS.glowScale,
                 colors: [
                     { value: `rgb(from ${color} r g b / 1)` },
                     {
-                        value: `rgb(from ${color} r g b / ${props.opts?.coreAlpha ?? DEFAULTS.coreAlpha})`,
-                        stop: props.opts?.coreStop ?? DEFAULTS.coreStop,
+                        value: `rgb(from ${color} r g b / ${props.opts?.coreAlpha ?? Spot1Const.DEFAULTS.coreAlpha})`,
+                        stop: props.opts?.coreStop ?? Spot1Const.DEFAULTS.coreStop,
                     },
                     {
-                        value: `rgb(from ${color} r g b / ${props.opts?.falloffAlpha ?? DEFAULTS.falloffAlpha})`,
-                        stop: props.opts?.falloffStop ?? DEFAULTS.falloffStop,
+                        value: `rgb(from ${color} r g b / ${props.opts?.falloffAlpha ?? Spot1Const.DEFAULTS.falloffAlpha})`,
+                        stop: props.opts?.falloffStop ?? Spot1Const.DEFAULTS.falloffStop,
                     },
                     { value: `rgb(from ${color} r g b / 0)`, stop: 100 },
                 ],

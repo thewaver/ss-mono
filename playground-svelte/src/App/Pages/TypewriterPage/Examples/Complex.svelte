@@ -8,7 +8,7 @@
 
     import PageMeasureBox from "../../../PageComponents/MeasureBox/MeasureBox.svelte";
     import PageControlButtonContent from "../../../StyledComponents/ControlButtonContent/ControlButtonContent.svelte";
-    import type { TypewriterComplexExampleProps } from "../TypewriterPage.types";
+    import type { TypewriterComplexExampleProps } from "../TypewriterPageSvelte.types";
 
     type Props = TypewriterComplexExampleProps;
 

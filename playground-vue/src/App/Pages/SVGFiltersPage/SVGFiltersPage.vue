@@ -6,6 +6,7 @@ import type { SVGFilterMethod, SortableItem } from "@thewaver/ss-components-vue"
 import { SVGFilterKnobs } from "@thewaver/ss-playground/App/Knobs/SVGFilters.const";
 import { APPLIED_STEPS } from "@thewaver/ss-playground/App/Pages/SVGFiltersPage/SVGFilterSteps.const";
 import type { SVGFiltersStep } from "@thewaver/ss-playground/App/Pages/SVGFiltersPage/SVGFilterSteps.types";
+import { EXAMPLES_ROOT, EXAMPLE_NAMES } from "@thewaver/ss-playground/App/Pages/SVGFiltersPage/SVGFiltersPage.const";
 import { SUBJECT_SIZE } from "@thewaver/ss-playground/App/StyledComponents/SVGFiltersContent/SVGFiltersContent.css";
 
 import type { ExampleDefs } from "../../PageComponents/Examples/Examples.types";
@@ -22,8 +23,6 @@ import PixelateExampleWrapper from "./PixelateExampleWrapper.vue";
 import type { SVGFiltersExampleProps } from "./SVGFiltersPage.types";
 import ToneExampleWrapper from "./ToneExampleWrapper.vue";
 import TurbulenceExampleWrapper from "./TurbulenceExampleWrapper.vue";
-
-const EXAMPLES_ROOT = "/src/App/Pages/SVGFiltersPage/Examples";
 
 const names = (items: SortableItem<SVGFiltersStep>[]) => items.map((item) => item.value.name).join(" → ") || "nothing";
 
@@ -43,37 +42,37 @@ const commonProps = computed<SVGFiltersExampleProps>(() => ({
 const examples: ExampleDefs[] = [
     {
         key: "blur",
-        name: "Blur",
+        name: EXAMPLE_NAMES.blur,
         path: `${EXAMPLES_ROOT}/Blur.vue`,
     },
     {
         key: "dropShadow",
-        name: "Drop shadow",
+        name: EXAMPLE_NAMES.dropShadow,
         path: `${EXAMPLES_ROOT}/DropShadow.vue`,
     },
     {
         key: "turbulence",
-        name: "Turbulence",
+        name: EXAMPLE_NAMES.turbulence,
         path: `${EXAMPLES_ROOT}/Turbulence.vue`,
     },
     {
         key: "hue",
-        name: "Hue",
+        name: EXAMPLE_NAMES.hue,
         path: `${EXAMPLES_ROOT}/Hue.vue`,
     },
     {
         key: "tone",
-        name: "Tone",
+        name: EXAMPLE_NAMES.tone,
         path: `${EXAMPLES_ROOT}/Tone.vue`,
     },
     {
         key: "pixelate",
-        name: "Pixelate",
+        name: EXAMPLE_NAMES.pixelate,
         path: `${EXAMPLES_ROOT}/Pixelate.vue`,
     },
     {
         key: "stack",
-        name: "Four at once",
+        name: EXAMPLE_NAMES.stack,
         readout: () =>
             method.value === "chain"
                 ? `${names(applied.value)} — chained, so each one is handed what the one before it produced and the order is the effect`

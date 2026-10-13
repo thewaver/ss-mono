@@ -14,12 +14,13 @@
     } from "@thewaver/ss-playground/App/PageComponents/DocsView/DocsView.utils";
 
     import PageTableOfContentsContent from "../../StyledComponents/TableOfContentsContent/TableOfContentsContent.svelte";
-    import type { PageDocsViewProps } from "./DocsView.types";
+    import type { PageDocsViewProps } from "./DocsViewSvelte.types";
     import PageDocsTable from "./PageDocsTable.svelte";
-
-    const TABLE_OF_CONTENTS_LABEL = "On this page";
-    const TABLE_OF_CONTENTS_GAP = 4;
-    const MIN_TABLE_OF_CONTENTS_LINKS = 2;
+    import {
+        MIN_TABLE_OF_CONTENTS_LINKS,
+        TABLE_OF_CONTENTS_GAP,
+        TABLE_OF_CONTENTS_LABEL,
+    } from "@thewaver/ss-playground/App/PageComponents/DocsView/DocsView.const";
 
     const GROUP_TITLES: Record<ApiGroupKind, string> = {
         props: "Props",
@@ -89,6 +90,7 @@
                         {#each group.tables as table, index (`${table.name}-${index}`)}
                             <PageDocsTable
                                 {table}
+                                unit={props.name}
                                 headingId={toDocsTableId(group.kind, table.name)}
                                 attachHeading={attachHeading(toDocsTableId(group.kind, table.name))}
                             />

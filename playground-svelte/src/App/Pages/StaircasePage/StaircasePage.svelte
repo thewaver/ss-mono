@@ -10,10 +10,12 @@
     import PageProp from "../../PageComponents/Prop/Prop.svelte";
     import PagePropsPanel from "../../PageComponents/PropsPanel/PagePropsPanel.svelte";
     import DefaultExampleWrapper from "./DefaultExampleWrapper.svelte";
-    import type { StaircaseExampleProps } from "./StaircasePage.types";
-
-    const FIELD_WIDTH = 110;
-    const EXAMPLES_ROOT = "/src/App/Pages/StaircasePage/Examples";
+    import type { StaircaseExampleProps } from "./StaircasePageSvelte.types";
+    import {
+    EXAMPLE_NAMES,
+    EXAMPLES_ROOT,
+    FIELD_WIDTH,
+} from "@thewaver/ss-playground/App/Pages/StaircasePage/StaircasePage.const";
 
     const STAGES = [
         "Visitors",
@@ -47,7 +49,7 @@
     const examples: ExampleDefs[] = [
         {
             key: "default",
-            name: "Default",
+            name: EXAMPLE_NAMES.default,
             component: defaultExample,
             path: `${EXAMPLES_ROOT}/Default.svelte`,
         },

@@ -2,6 +2,7 @@ import { Show, createEffect, createMemo, createSignal, createUniqueId, on, onCle
 import { Portal } from "solid-js/web";
 
 import { HoverIntentUtils, TOOLTIP_DEFAULTS, TooltipUtils, TooltipStyles as styles } from "@thewaver/ss-components";
+import { TooltipConst } from "@thewaver/ss-components/internal";
 import { assignInlineVars } from "@vanilla-extract/dynamic";
 
 import { AnchorSolidUtils } from "../../../Abstracts/Anchor/AnchorSolid.utils";
@@ -11,8 +12,6 @@ import { HoverIntentSolidUtils } from "../../../Abstracts/HoverIntent/HoverInten
 import { useViewportContext } from "../../../Abstracts/Viewport/Viewport.context";
 import { access } from "../../../Utils/propUtils";
 import type { TooltipProps } from "./TooltipSolid.types";
-
-const TOOLTIP_DELAY_GROUP = HoverIntentUtils.createDelayGroup();
 
 export const Tooltip = (props: TooltipProps) => {
     const viewportContext = useViewportContext();
@@ -28,7 +27,7 @@ export const Tooltip = (props: TooltipProps) => {
     const [getContentRef, setLocalContentRef] = createSignal<HTMLElement>();
 
     const hoverIntent = HoverIntentSolidUtils.create(() => access(props.anchorRef), [getShouldShow, setShouldShow], {
-        delayGroup: TOOLTIP_DELAY_GROUP,
+        delayGroup: TooltipConst.TOOLTIP_DELAY_GROUP,
         getPanelRef: getContentRef,
         getHoverShowDelayMs: () => access(props.hoverShowDelayMs) ?? TOOLTIP_DEFAULTS.hoverShowDelayMs,
         getSkipDelayWindowMs: () => access(props.skipDelayWindowMs) ?? TOOLTIP_DEFAULTS.skipDelayWindowMs,

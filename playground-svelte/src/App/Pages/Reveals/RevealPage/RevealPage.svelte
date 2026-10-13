@@ -15,10 +15,12 @@
     import PromptExample from "./Examples/Prompt.svelte";
     import TorchExample from "./Examples/Torch.svelte";
     import type { RevealExampleProps } from "./RevealExample.types";
-
-    const EXAMPLES_ROOT = "/src/App/Pages/Reveals/RevealPage/Examples";
-    const FIELD_WIDTH = 110;
-    const SHAPE_FIELD_WIDTH = 170;
+    import {
+    EXAMPLE_NAMES,
+    EXAMPLES_ROOT,
+    FIELD_WIDTH,
+    SHAPE_FIELD_WIDTH,
+} from "@thewaver/ss-playground/App/Pages/Reveals/RevealPage/RevealPage.const";
 
     let radius = $state(REVEAL_DEFAULTS.radius);
     let shape = $state<RevealShape>(RevealKnobs.STARTING_SHAPE);
@@ -50,21 +52,21 @@
     const examples: ExampleDefs[] = [
         {
             key: "torch",
-            name: "Torch",
+            name: EXAMPLE_NAMES.torch,
             readout: () => "an opaque cover with a hole cut where the pointer is",
             component: torchExample,
             path: `${EXAMPLES_ROOT}/Torch.svelte`,
         },
         {
             key: "frosted",
-            name: "Frosted",
+            name: EXAMPLE_NAMES.frosted,
             readout: () => "the cover blurs rather than hides, so the hole sharpens instead of uncovering",
             component: frostedExample,
             path: `${EXAMPLES_ROOT}/Frosted.svelte`,
         },
         {
             key: "prompt",
-            name: "Cover that knows",
+            name: EXAMPLE_NAMES.prompt,
             readout: () => "the cover is told whether a reveal is happening, and says something different",
             component: promptExample,
             path: `${EXAMPLES_ROOT}/Prompt.svelte`,

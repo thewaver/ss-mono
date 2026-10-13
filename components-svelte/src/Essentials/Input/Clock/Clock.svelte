@@ -2,25 +2,14 @@
     import { untrack } from "svelte";
     import { on } from "svelte/events";
 
-    import {
-        CLOCK_DEFAULTS,
-        type ClockColumn,
-        type ClockRenderProps,
-        type ClockSteps,
-        type ClockUnit,
-        ClockUtils,
-        type InteractionFlags,
-        PopoverUtils,
-        ClockStyles as styles,
-    } from "@thewaver/ss-components";
+    import { CLOCK_DEFAULTS, type ClockColumn, type ClockRenderProps, type ClockUnit, ClockUtils, type InteractionFlags, PopoverUtils, ClockStyles as styles } from "@thewaver/ss-components";
+    import { ClockConst } from "@thewaver/ss-components/internal";
     import type { TimeValue } from "@thewaver/ss-utils";
 
     import { NavigatorSvelteUtils } from "../../../Abstracts/Navigator/NavigatorSvelte.utils.svelte.js";
     import InteractionWrapper from "../../../Primitives/InteractionWrapper/InteractionWrapper.svelte";
     import type { ClockProps } from "./Clock.types.js";
     import ClockOptionControl from "./ClockOptionControl.svelte";
-
-    const NO_CLOCK_STEPS: ClockSteps = {};
 
     const toOptionKey = (unit: ClockUnit, index: number) => `${unit}:${index}`;
 
@@ -46,7 +35,7 @@
     const units = $derived(ClockUtils.getUnits(hasSeconds, isTwelveHour));
     const meridiemNames = $derived(ClockUtils.getMeridiemNames(props.locale));
     const columns = $derived(
-        ClockUtils.getColumns(units, base, isTwelveHour, props.steps ?? NO_CLOCK_STEPS, meridiemNames),
+        ClockUtils.getColumns(units, base, isTwelveHour, props.steps ?? ClockConst.NO_CLOCK_STEPS, meridiemNames),
     );
 
     const rovingTime = $derived(highlighted ?? base);

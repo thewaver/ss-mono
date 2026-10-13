@@ -4,7 +4,7 @@
     import * as styles from "@thewaver/ss-playground/App/StyledComponents/TabContent/TabContent.css";
 
     import { getLayerClass } from "../Layer/Layer.context";
-    import type { TabContentProps } from "./TabContent.types";
+    import type { TabContentProps } from "./TabContentSvelte.types";
 
     let props: TabContentProps & { children?: Snippet } = $props();
 

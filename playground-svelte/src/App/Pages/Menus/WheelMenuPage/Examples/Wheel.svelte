@@ -5,7 +5,7 @@
 
     import PageLayer from "../../../../PageComponents/Layer/Layer.svelte";
     import PageMenuTriggerContent from "../../../../StyledComponents/MenuTriggerContent/MenuTriggerContent.svelte";
-    import type { WheelMenuExampleProps } from "../WheelMenuPage.types";
+    import type { WheelMenuExampleProps } from "../WheelMenuPageSvelte.types";
     import WedgeDefs from "./WedgeDefs.svelte";
 
     const HALF = 0.5;

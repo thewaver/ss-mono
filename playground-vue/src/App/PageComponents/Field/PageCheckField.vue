@@ -2,8 +2,8 @@
 import { Toggle } from "@thewaver/ss-components-vue";
 
 import PageToggleContent from "../../StyledComponents/ToggleContent/ToggleContent.vue";
-import { useFieldReset } from "./Field.context";
-import type { PageCheckFieldProps } from "./Field.types";
+import { useFieldReset } from "./FieldVue.context";
+import type { PageCheckFieldProps } from "./FieldVue.types";
 
 const props = defineProps<PageCheckFieldProps>();
 

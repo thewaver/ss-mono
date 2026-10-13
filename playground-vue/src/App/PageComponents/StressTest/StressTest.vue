@@ -9,7 +9,7 @@ import PageButtonContent from "../../StyledComponents/ButtonContent/ButtonConten
 import PageModalOverlay from "../../StyledComponents/ModalOverlay/ModalOverlay.vue";
 import PageModalPanel from "../../StyledComponents/ModalPanel/PageModalPanel.vue";
 import PagePropsPanel from "../PropsPanel/PagePropsPanel.vue";
-import type { StressTestProps, StressTestSlots } from "./StressText.types";
+import type { StressTestProps, StressTestSlots } from "./StressTextVue.types";
 
 const props = defineProps<StressTestProps>();
 

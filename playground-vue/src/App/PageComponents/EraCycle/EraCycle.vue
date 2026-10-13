@@ -2,11 +2,10 @@
 import { computed } from "vue";
 
 import { Button } from "@thewaver/ss-components-vue";
+import { SINGLE_ERA } from "@thewaver/ss-playground/App/PageComponents/EraCycle/EraCycle.const";
 
 import PageEraCycleContent from "../../StyledComponents/EraCycleContent/EraCycleContent.vue";
-import type { EraCycleProps } from "./EraCycle.types";
-
-const SINGLE_ERA = 1;
+import type { EraCycleProps } from "./EraCycleVue.types";
 
 const props = defineProps<EraCycleProps>();
 

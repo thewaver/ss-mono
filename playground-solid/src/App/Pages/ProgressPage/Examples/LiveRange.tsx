@@ -1,7 +1,7 @@
 import { Progress, access } from "@thewaver/ss-components-solid";
 
 import { PageProgressContent } from "../../../StyledComponents/ProgressContent/ProgressContent";
-import type { ProgressExampleProps } from "../ProgressPage.types";
+import type { ProgressExampleProps } from "../ProgressPageSolid.types";
 
 const BYTES_PER_KB = 1000;
 

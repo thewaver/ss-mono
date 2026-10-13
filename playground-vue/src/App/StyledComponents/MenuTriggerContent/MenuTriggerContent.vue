@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import * as styles from "@thewaver/ss-playground/App/StyledComponents/MenuTriggerContent/MenuTriggerContent.css";
 
-import type { MenuTriggerContentProps } from "./MenuTriggerContent.types";
+import type { MenuTriggerContentProps } from "./MenuTriggerContentVue.types";
 
 defineProps<MenuTriggerContentProps>();
 </script>

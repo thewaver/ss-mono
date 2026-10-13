@@ -1,6 +1,7 @@
 import { defineComponent } from "vue";
 
 import { SVGDefsUtils, type TimedPatternElementDefs } from "@thewaver/ss-components";
+import { CircleG2Const } from "@thewaver/ss-components/internal";
 import { MathUtils } from "@thewaver/ss-utils";
 
 import { declareProps } from "../../../../Utils/propUtils";
@@ -9,8 +10,6 @@ import { SVGDefsVueUtils } from "../../SVGDefsVue.utils";
 import { SVGPatterns } from "../../SVGPatterns.const";
 
 type PatternElementProps = { id: string; defs: TimedPatternElementDefs };
-
-const CELL_COUNT = { rows: 8, cols: 8 };
 
 const PatternElement = defineComponent(
     (props: PatternElementProps) => {
@@ -22,7 +21,7 @@ const PatternElement = defineComponent(
 
             return SVGPatterns.computeGridPattern(
                 `pattern1-${props.id}`,
-                CELL_COUNT,
+                CircleG2Const.CELL_COUNT,
                 cellSize,
                 (cellId, index, cellCount, isSplit) => {
                     const isEven = MathUtils.isEven(index.col + index.row);

@@ -1,14 +1,20 @@
 import { useId, useState } from "react";
 import { createPortal } from "react-dom";
 
-import { Button, SVGDefsSamples, Shape, TrackedGradientDefaults } from "@thewaver/ss-components-react";
+import {
+    Button,
+    SVGDefsSampleConfigs,
+    SVGDefsSamples,
+    Shape,
+    TrackedGradientDefaults,
+} from "@thewaver/ss-components-react";
+import { TrackedGradientKnobs } from "@thewaver/ss-playground/App/Knobs/TrackedGradients.const";
 import { NO_SAMPLE_KEY } from "@thewaver/ss-playground/App/PageComponents/SampleGroups/SampleGroups.const";
 import * as styles from "@thewaver/ss-playground/App/Pages/SVGGradients/SVGGradients.css";
 import { ShapeConst, type Size2d } from "@thewaver/ss-utils";
 
-import { TrackedGradientKnobs } from "../../../../Knobs/TrackedGradients.const";
 import { PageButtonContent } from "../../../../StyledComponents/ButtonContent/ButtonContent";
-import type { TrackedGradientExampleProps } from "../../SVGGradients.types";
+import type { TrackedGradientExampleProps } from "../../SVGGradientsReact.types";
 
 export const ScreenOverlayExample = (props: TrackedGradientExampleProps) => {
     const id = useId();
@@ -29,7 +35,7 @@ export const ScreenOverlayExample = (props: TrackedGradientExampleProps) => {
             ]),
         );
 
-        return SVGDefsSamples.Gradient.Tracked.toConfig({
+        return SVGDefsSampleConfigs.Gradient.Tracked.toConfig({
             family: key,
             defs: { ...values, ...scaledValues },
         } as SVGDefsSamples.Gradient.Tracked.Entry)

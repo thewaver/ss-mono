@@ -7,6 +7,7 @@ import {
     HoverCardUtils,
     HoverIntentUtils,
 } from "@thewaver/ss-components";
+import { HoverCardConst } from "@thewaver/ss-components/internal";
 import { assignInlineVars } from "@vanilla-extract/dynamic";
 
 import { HoverIntentVueUtils } from "../../../Abstracts/HoverIntent/HoverIntentVue.utils";
@@ -17,8 +18,6 @@ import { callSlot, declareProps, useTwoWay } from "../../../Utils/propUtils";
 import { toElement } from "../../../Utils/refUtils";
 import type { SlotsContext } from "../../../Utils/typeUtils";
 import type { HoverCardProps, HoverCardSlots } from "./HoverCard.types";
-
-const HOVER_CARD_DELAY_GROUP = HoverIntentUtils.createDelayGroup();
 
 export const HoverCard = defineComponent(
     (props: HoverCardProps, { slots }: SlotsContext<HoverCardSlots>) => {
@@ -31,7 +30,7 @@ export const HoverCard = defineComponent(
         const getCardRef = () => document.getElementById(cardId) ?? undefined;
 
         const hoverIntent = HoverIntentVueUtils.useHoverIntent(() => props.anchorRef, isOpen, {
-            delayGroup: HOVER_CARD_DELAY_GROUP,
+            delayGroup: HoverCardConst.HOVER_CARD_DELAY_GROUP,
             panelRef,
             hoverShowDelayMs: () => props.hoverShowDelayMs ?? HOVER_CARD_DEFAULTS.hoverShowDelayMs,
             skipDelayWindowMs: () => props.skipDelayWindowMs ?? HOVER_CARD_DEFAULTS.skipDelayWindowMs,

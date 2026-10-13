@@ -4,7 +4,7 @@
     import * as styles from "@thewaver/ss-playground/App/StyledComponents/CarouselContent/CarouselContent.css";
 
     import { getLayerClass } from "../Layer/Layer.context";
-    import type { CarouselSlideProps } from "./CarouselContent.types";
+    import type { CarouselSlideProps } from "./CarouselContentSvelte.types";
 
     let props: CarouselSlideProps & { children?: Snippet } = $props();
 

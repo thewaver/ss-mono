@@ -2,7 +2,7 @@
     import { FileInput } from "@thewaver/ss-components-svelte";
 
     import PageFileInputContent from "../../StyledComponents/FileInputContent/FileInputContent.svelte";
-    import type { PageFileFieldProps } from "./Field.types";
+    import type { PageFileFieldProps } from "./FieldSvelte.types";
 
     let props: PageFileFieldProps = $props();
 

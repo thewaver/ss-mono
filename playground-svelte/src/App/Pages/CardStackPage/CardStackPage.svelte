@@ -12,10 +12,11 @@
     import PagePropsPanel from "../../PageComponents/PropsPanel/PagePropsPanel.svelte";
     import DeckExample from "./Examples/Deck.svelte";
     import EndlessExample from "./Examples/Endless.svelte";
-
-    const EXAMPLES_ROOT = "/src/App/Pages/CardStackPage/Examples";
-
-    const FIELD_WIDTH = 110;
+    import {
+    EXAMPLE_NAMES,
+    EXAMPLES_ROOT,
+    FIELD_WIDTH,
+} from "@thewaver/ss-playground/App/Pages/CardStackPage/CardStackPage.const";
 
     let isDisabled = $state(CardStackKnobs.STARTING_IS_DISABLED);
     let commitRatio = $state(CARD_STACK_DEFAULTS.commitRatio);
@@ -34,7 +35,7 @@
     const examples: ExampleDefs[] = [
         {
             key: "deck",
-            name: "Deck of cards",
+            name: EXAMPLE_NAMES.deck,
             readout: () => {
                 if (isEmpty) return "the pile is empty — deal again to put every card back";
 
@@ -47,7 +48,7 @@
         },
         {
             key: "endless",
-            name: "A deck that never runs out",
+            name: EXAMPLE_NAMES.endless,
             readout: () => {
                 if (!lastEndlessSend)
                     return "left or right only — an upward push springs back, and on a touch screen it scrolls the page instead";

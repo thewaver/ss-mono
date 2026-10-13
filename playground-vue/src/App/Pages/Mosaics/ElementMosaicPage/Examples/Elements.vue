@@ -2,7 +2,7 @@
 import { ElementMosaic } from "@thewaver/ss-components-vue";
 
 import PageMosaicTile from "../../../../StyledComponents/MosaicContent/PageMosaicTile.vue";
-import type { ElementsExampleProps } from "../ElementMosaicPage.types";
+import type { ElementsExampleProps } from "../ElementMosaicPageVue.types";
 
 type Props = ElementsExampleProps;
 

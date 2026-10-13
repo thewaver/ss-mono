@@ -13,19 +13,29 @@ import {
     useViewportContext,
 } from "@thewaver/ss-components-react";
 import type {
-    AnchorPlacement,
     InteractionTooltipDefs,
     SidebarPhase,
     TreeNode,
     TreeNodeRenderProps,
 } from "@thewaver/ss-components-react";
+import {
+    GALLERY_NAME_SEPARATOR,
+    GALLERY_ROUTE,
+    GETTING_STARTED_ROUTE,
+    NAV_PREVIEW_ARROW,
+    NAV_PREVIEW_OFFSET,
+    NAV_PREVIEW_PLACEMENT,
+    SCREEN_HEIGHT,
+} from "@thewaver/ss-playground/App/App.const";
 import * as styles from "@thewaver/ss-playground/App/App.css";
 import { LAYOUT } from "@thewaver/ss-playground/App/Layout.const";
+import { MENU_DESCRIPTIONS } from "@thewaver/ss-playground/App/MenuDescriptions.const";
 import { IS_BUILD_PROGRESS_SHOWN } from "@thewaver/ss-playground/App/PageComponents/BuildProgress/BuildProgress.utils";
 import {
     restoreRootSlash,
     toRouterBase,
 } from "@thewaver/ss-playground/App/PageComponents/FrameworkSwitch/FrameworkSwitch.const";
+import { DEFAULT_VIEWPORT_ANCHOR } from "@thewaver/ss-playground/App/PageComponents/NavSettings/NavSettings.const";
 import {
     DEFAULT_PAGE_VIEW,
     PAGE_VIEW_KEYS,
@@ -34,6 +44,7 @@ import {
 } from "@thewaver/ss-playground/App/PageComponents/ViewTabs/ViewTabs.const";
 import { FunctionUtils, Size2d, StringUtils } from "@thewaver/ss-utils";
 
+import type { ComponentConfig, MenuBranchConfig, MenuNodeConfig } from "./App.types";
 import {
     DEPENDENCY_GROUPS,
     DEPENDENCY_SECTIONS,
@@ -45,21 +56,19 @@ import {
     MENU_ID,
     PREVIEW_EXCLUDED_PAGES,
     SEARCH_FIELD_WIDTH,
-} from "./App.const";
-import type { ComponentConfig, MenuBranchConfig, MenuNodeConfig } from "./App.types";
+} from "./AppReact.const";
 import { PageBuildProgress } from "./PageComponents/BuildProgress/BuildProgress";
 import { PageTextField } from "./PageComponents/Field/Field";
 import { PageFrameworkMenu } from "./PageComponents/FrameworkMenu/FrameworkMenu";
 import { PageLayer } from "./PageComponents/Layer/Layer";
 import { PageNavLink, PageNavLinkGroup } from "./PageComponents/NavLink/NavLink";
 import { PageNavSettings } from "./PageComponents/NavSettings/NavSettings";
-import { DEFAULT_VIEWPORT_ANCHOR } from "./PageComponents/NavSettings/NavSettings.const";
-import type { ViewportAnchor } from "./PageComponents/NavSettings/NavSettings.types";
+import type { ViewportAnchor } from "./PageComponents/NavSettings/NavSettingsReact.types";
 import { PagePreview } from "./PageComponents/Preview/Preview";
 import { PageRouterLink } from "./PageComponents/RouterLink/RouterLink";
 import { PageSidebarToggle } from "./PageComponents/SidebarToggle/SidebarToggle";
 import { PageViewTabs } from "./PageComponents/ViewTabs/ViewTabs";
-import type { PageViewKey } from "./PageComponents/ViewTabs/ViewTabs.types";
+import type { PageViewKey } from "./PageComponents/ViewTabs/ViewTabsReact.types";
 import type { GallerySection } from "./Pages/GalleryPage/GalleryPage.types";
 import { renderPageHighlightFloater } from "./StyledComponents/GlideFloater/GlideFloater";
 import { useLayerClass } from "./StyledComponents/Layer/Layer.context";
@@ -81,13 +90,6 @@ const PageGettingStartedPage = lazy(() =>
 const PageGalleryPage = lazy(() =>
     import("./Pages/GalleryPage/GalleryPage").then((module) => ({ default: module.GalleryPage })),
 );
-
-const GETTING_STARTED_ROUTE = "/getting-started";
-const GALLERY_ROUTE = "/gallery";
-const GALLERY_NAME_SEPARATOR = " / ";
-const NAV_PREVIEW_PLACEMENT: AnchorPlacement = { x: "right_out", y: "center" };
-const NAV_PREVIEW_OFFSET = { x: 10, y: 0 };
-const NAV_PREVIEW_ARROW = "triangle";
 
 const getIsBranchConfig = (node: MenuNodeConfig): node is MenuBranchConfig => "children" in node;
 
@@ -189,7 +191,7 @@ const toGalleryName = (config: ComponentConfig) =>
 
 const GALLERY_SECTIONS: GallerySection[] = VISIBLE_MENU_CONFIGS.map((category) => ({
     name: category.name,
-    description: category.description,
+    description: MENU_DESCRIPTIONS[category.name],
     items: flattenConfigs([category]).flatMap((config) =>
         getHasPreview(config)
             ? [{ name: toGalleryName(config), href: componentToRouteName(config.name), component: config.component }]
@@ -591,8 +593,6 @@ export function AppContent(props: { viewportAnchor: readonly [ViewportAnchor, (v
     );
 }
 
-const SCREEN_HEIGHT = window.screen.height;
-
 const getWindowInnerSize = () => ({ width: window.innerWidth, height: window.innerHeight });
 
 export function App() {
@@ -661,7 +661,9 @@ export function App() {
                                 />
                                 <Route
                                     path={"docs"}
-                                    element={<PageDocsView name={config.name} description={config.description} />}
+                                    element={
+                                        <PageDocsView name={config.name} description={MENU_DESCRIPTIONS[config.name]} />
+                                    }
                                 />
                             </Route>
                         ))}

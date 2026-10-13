@@ -8,9 +8,11 @@
     import PageExamples from "../../PageComponents/Examples/PageExamples.svelte";
     import PairedExample from "./Examples/Paired.svelte";
     import PickedExample from "./Examples/Picked.svelte";
-
-    const EXAMPLES_ROOT = "/src/App/Pages/DateTimePickerPage/Examples";
-    const NOON = { hour: 12, minute: 0 };
+    import {
+    EXAMPLE_NAMES,
+    EXAMPLES_ROOT,
+    NOON,
+} from "@thewaver/ss-playground/App/Pages/DateTimePickerPage/DateTimePickerPage.const";
 
     const describe = (value: DateTimeValue | undefined) =>
         value
@@ -25,28 +27,28 @@
     const examples: ExampleDefs[] = [
         {
             key: "paired",
-            name: "Two fields, one value",
+            name: EXAMPLE_NAMES.paired,
             readout: () => `value: ${describe(emptyValue)}`,
             component: pairedExample,
             path: `${EXAMPLES_ROOT}/Paired.svelte`,
         },
         {
             key: "picked",
-            name: "One control, both popups",
+            name: EXAMPLE_NAMES.picked,
             readout: () => `value: ${describe(pickedValue)}`,
             component: pickedExample,
             path: `${EXAMPLES_ROOT}/Picked.svelte`,
         },
         {
             key: "twelveHour",
-            name: "Twelve hour, with seconds",
+            name: EXAMPLE_NAMES.twelveHour,
             readout: () => `value: ${describe(twelveHourValue)}`,
             component: twelveHourExample,
             path: `${EXAMPLES_ROOT}/Picked.svelte`,
         },
         {
             key: "seeded",
-            name: "Starting from a value",
+            name: EXAMPLE_NAMES.seeded,
             readout: () =>
                 `value: ${describe(seededValue)} — seconds of day: ${
                     seededValue ? TimeUtils.getSecondOfDay(seededValue.time) : 0

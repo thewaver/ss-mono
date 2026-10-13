@@ -14,3 +14,17 @@ export const DROP_ZONE_REASON_TEXT: Record<FileInputRejectReason, string> = {
     size: `larger than ${DROP_ZONE_MAX_KILOBYTES} KB`,
     type: "not an image",
 };
+
+export const EXAMPLE_NAMES = {
+    default: "Default",
+    multiple: "Multiple",
+    images: "Accepting images only",
+    rejectingSetter: "Rejecting setter",
+    disabled: "Disabled",
+    reachable: "Disabled + reachable",
+    errored: "Error",
+    label: "In a Label",
+    dropZone: "Drop area with limits",
+};
+
+export const EXAMPLES_ROOT = "/src/App/Pages/FileInputPage/Examples";

@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { computed, useId } from "vue";
 
-import { SVGDefsSamples, Shape } from "@thewaver/ss-components-vue";
+import { SVGDefsSampleConfigs, SVGDefsSamples, Shape } from "@thewaver/ss-components-vue";
 import {
     NO_SAMPLE_KEY,
     computeNoSampleDefs,
@@ -9,7 +9,7 @@ import {
 import * as styles from "@thewaver/ss-playground/App/Pages/SVGPatterns/SVGPatterns.css";
 import { ShapeConst, type Size2d } from "@thewaver/ss-utils";
 
-import type { TimedPatternExampleProps } from "../../SVGPatterns.types";
+import type { TimedPatternExampleProps } from "../../SVGPatternsVue.types";
 
 type Props = TimedPatternExampleProps;
 
@@ -24,7 +24,7 @@ const computePoints = (size: Size2d) => ShapeConst.getDefaultShapePoints("square
 const computeFillDefs = (size: Size2d, element: HTMLElement | undefined) => {
     if (props.configKey === NO_SAMPLE_KEY) return computeNoSampleDefs(props.colors, "fill");
 
-    return SVGDefsSamples.Pattern.Timed.SAMPLE_CONFIGS[props.configKey].computeSVGDefs(
+    return SVGDefsSampleConfigs.Pattern.Timed.SAMPLE_CONFIGS[props.configKey].computeSVGDefs(
         `fill-${id}`,
         undefined,
         element,

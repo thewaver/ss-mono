@@ -10,6 +10,15 @@ import type {
     SortableGridSpot,
 } from "@thewaver/ss-components-vue";
 import { SORTABLE_GRID_ANNOUNCEMENTS } from "@thewaver/ss-playground/App/PageComponents/Announcements/Announcements.const";
+import {
+    CELL_SIZE,
+    GRID_GAP,
+    PACK_COLUMNS,
+    PACK_ROWS,
+    computeGearHue,
+    computeGearKey,
+    computeGearLabel,
+} from "@thewaver/ss-playground/App/Pages/SortableGridPage/SortableGridPage.const";
 import * as styles from "@thewaver/ss-playground/App/Pages/SortableGridPage/SortableGridPage.css";
 import type { Gear } from "@thewaver/ss-playground/App/Pages/SortableGridPage/SortableGridPage.types";
 import { CONTROL_GLYPHS } from "@thewaver/ss-playground/App/StyledComponents/ControlButtonContent/ControlButtonContent.const";
@@ -19,16 +28,7 @@ import PageSortableGridCell from "../../../StyledComponents/SortableGridContent/
 import PageSortableGridItemContent from "../../../StyledComponents/SortableGridContent/PageSortableGridItemContent.vue";
 import PageSortableGridLanding from "../../../StyledComponents/SortableGridContent/PageSortableGridLanding.vue";
 import PageSortableGridSurface from "../../../StyledComponents/SortableGridContent/PageSortableGridSurface.vue";
-import type { SortableGridPaint } from "../../../StyledComponents/SortableGridContent/SortableGridContent.types";
-import {
-    CELL_SIZE,
-    GRID_GAP,
-    PACK_COLUMNS,
-    PACK_ROWS,
-    computeGearHue,
-    computeGearKey,
-    computeGearLabel,
-} from "../SortableGridPage.const";
+import type { SortableGridPaint } from "../../../StyledComponents/SortableGridContent/SortableGridContentVue.types";
 
 type Props = {
     "groupId": string;

@@ -1,5 +1,9 @@
 <script lang="ts">
-    import { PALETTE } from "@thewaver/ss-playground/App/Pages/ColorInputPage/ColorInputPage.const";
+    import {
+    EXAMPLE_NAMES,
+    EXAMPLES_ROOT,
+    PALETTE,
+} from "@thewaver/ss-playground/App/Pages/ColorInputPage/ColorInputPage.const";
 
     import type { ExampleDefs } from "../../PageComponents/Examples/Examples.types";
     import PageExamples from "../../PageComponents/Examples/PageExamples.svelte";
@@ -10,8 +14,6 @@
     import LabeledExample from "./Examples/Labeled.svelte";
     import ReachableExample from "./Examples/Reachable.svelte";
     import SnappingExample from "./Examples/Snapping.svelte";
-
-    const EXAMPLES_ROOT = "/src/App/Pages/ColorInputPage/Examples";
 
     let defaultValue = $state("#3366ff");
     let compactValue = $state("#3366ff");
@@ -24,49 +26,49 @@
     const examples: ExampleDefs[] = [
         {
             key: "default",
-            name: "Default",
+            name: EXAMPLE_NAMES.default,
             readout: () => `value: ${defaultValue} — the swatch is the painter's, not the browser's`,
             component: defaultExample,
             path: `${EXAMPLES_ROOT}/Default.svelte`,
         },
         {
             key: "compact",
-            name: "Compact",
+            name: EXAMPLE_NAMES.compact,
             readout: () => `value: ${compactValue} — swatch only, no hex readout`,
             component: compactExample,
             path: `${EXAMPLES_ROOT}/Compact.svelte`,
         },
         {
             key: "snapping",
-            name: "Snapping setter",
+            name: EXAMPLE_NAMES.snapping,
             readout: () => `value: ${snappingValue} — snapped to the nearest of four`,
             component: snappingExample,
             path: `${EXAMPLES_ROOT}/Snapping.svelte`,
         },
         {
             key: "disabled",
-            name: "Disabled",
+            name: EXAMPLE_NAMES.disabled,
             readout: () => `value: ${disabledValue}`,
             component: disabledExample,
             path: `${EXAMPLES_ROOT}/Disabled.svelte`,
         },
         {
             key: "reachable",
-            name: "Disabled + reachable",
+            name: EXAMPLE_NAMES.reachable,
             readout: () => `value: ${reachableValue}`,
             component: reachableExample,
             path: `${EXAMPLES_ROOT}/Reachable.svelte`,
         },
         {
             key: "errored",
-            name: "Error",
+            name: EXAMPLE_NAMES.errored,
             readout: () => `value: ${erroredValue} — black is not a brand color`,
             component: erroredExample,
             path: `${EXAMPLES_ROOT}/Errored.svelte`,
         },
         {
             key: "label",
-            name: "In a Label",
+            name: EXAMPLE_NAMES.label,
             readout: () => `value: ${labeledValue} — the caption opens the picker`,
             component: labelExample,
             path: `${EXAMPLES_ROOT}/Labeled.svelte`,

@@ -1,4 +1,4 @@
-import { type Page, expect, test } from "@playwright/test";
+import { type Locator, type Page, expect, test } from "@playwright/test";
 
 const VIEW_TABS = "[data-view-tabs]";
 const DOCS = '[data-view="docs"]';
@@ -39,6 +39,33 @@ test("each tab carries its view into the URL, and a deep link lands on it", asyn
 });
 
 /**
+ * A type built from other named types lists only its own members, and names the rest above its table as links. So
+ * a prop the component shares with the other frameworks is not in the component's props table but in the table of
+ * the shared type that declares it, one or two links away. This follows those links on the same page until it finds
+ * the table holding a row for `prop`, and answers that row.
+ */
+const findDeclaredRow = async (page: Page, table: string, prop: string, depth = 3): Promise<Locator | undefined> => {
+    const row = page.locator(table).locator(`[data-api-row="${prop}"]`);
+
+    if (await row.count()) return row;
+    if (depth === 0) return undefined;
+
+    const hrefs = await page
+        .locator(`${table} [data-api-includes] a`)
+        .evaluateAll((links) => links.map((link) => link.getAttribute("href") ?? ""));
+
+    for (const href of hrefs.filter((candidate) => candidate.startsWith("#"))) {
+        const section = page.locator(`[id="${href.slice(1)}"]`).locator("xpath=..");
+        const name = await section.getAttribute("data-api-table");
+        const found = name ? await findDeclaredRow(page, `[data-api-table="${name}"]`, prop, depth - 1) : undefined;
+
+        if (found) return found;
+    }
+
+    return undefined;
+};
+
+/**
  * The table is read off the published type rather than written by hand, so the assertion is that it agrees
  * with the type — a prop the type declares is present, carries the type text the source declares, and its
  * name carries a question mark exactly when the type makes it optional. Nothing here pins how many rows there are: props get added, and a count
@@ -56,7 +83,9 @@ test("the props table is the published type, not a transcription of it @solid", 
         "and marked required by a name with no question mark, since the type does not make it optional",
     ).toHaveText("renderTab");
 
-    const optional = page.locator(TABS_PROPS).locator('[data-api-row="tabGap"]');
+    const declared = await findDeclaredRow(page, TABS_PROPS, "tabGap");
+    expect(declared, "the props table leads to the table that declares the shared prop").toBeDefined();
+    const optional = declared!;
     await expect(optional, "an optional prop is marked by its name rather than in the type column").toContainText(
         "tabGap?",
     );
@@ -82,7 +111,9 @@ test("the props table is the published type, not a transcription of it @react", 
         "and marked required by a name with no question mark, since the type does not make it optional",
     ).toHaveText("renderTab");
 
-    const optional = page.locator(TABS_PROPS).locator('[data-api-row="tabGap"]');
+    const declared = await findDeclaredRow(page, TABS_PROPS, "tabGap");
+    expect(declared, "the props table leads to the table that declares the shared prop").toBeDefined();
+    const optional = declared!;
     await expect(optional, "an optional prop is marked by its name rather than in the type column").toContainText(
         "tabGap?",
     );
@@ -106,7 +137,9 @@ test("the props table is the published type, not a transcription of it @svelte",
         "and marked required by a name with no question mark, since the type does not make it optional",
     ).toHaveText("renderTab");
 
-    const optional = page.locator(TABS_PROPS).locator('[data-api-row="tabGap"]');
+    const declared = await findDeclaredRow(page, TABS_PROPS, "tabGap");
+    expect(declared, "the props table leads to the table that declares the shared prop").toBeDefined();
+    const optional = declared!;
     await expect(optional, "an optional prop is marked by its name rather than in the type column").toContainText(
         "tabGap?",
     );
@@ -131,7 +164,9 @@ test("the props table is the published type, not a transcription of it @vue", as
         "and marked required by a name with no question mark, since the type does not make it optional",
     ).toHaveText("renderTab");
 
-    const optional = page.locator(TABS_PROPS).locator('[data-api-row="tabGap"]');
+    const declared = await findDeclaredRow(page, TABS_PROPS, "tabGap");
+    expect(declared, "the props table leads to the table that declares the shared prop").toBeDefined();
+    const optional = declared!;
     await expect(optional, "an optional prop is marked by its name rather than in the type column").toContainText(
         "tabGap?",
     );

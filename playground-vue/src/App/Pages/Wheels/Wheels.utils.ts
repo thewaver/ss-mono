@@ -1,13 +1,13 @@
 import { computed, shallowRef } from "vue";
 
 import { MediaQueryMonitorVueUtils } from "@thewaver/ss-components-vue";
+import { WheelKnobs } from "@thewaver/ss-playground/App/Knobs/Wheels.const";
 import {
     INDEFINITE_REST_DURATION_MS,
     PRIZES,
     SPIN_STYLES,
 } from "@thewaver/ss-playground/App/Pages/Wheels/Wheels.const";
 
-import { WheelKnobs } from "../../Knobs/Wheels.const";
 import type { WheelSharedProps, WheelSpinStyleKey, WheelsControls } from "./Wheels.types";
 
 export const useWheelsControls = (): WheelsControls => {

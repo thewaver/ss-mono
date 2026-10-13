@@ -4,7 +4,7 @@
     import * as styles from "@thewaver/ss-playground/App/StyledComponents/FlipCardContent/FlipCardContent.css";
 
     import { getLayerClass } from "../Layer/Layer.context";
-    import type { FlipCardFaceProps } from "./FlipCardContent.types";
+    import type { FlipCardFaceProps } from "./FlipCardContentSvelte.types";
 
     let props: FlipCardFaceProps & { children?: Snippet } = $props();
 

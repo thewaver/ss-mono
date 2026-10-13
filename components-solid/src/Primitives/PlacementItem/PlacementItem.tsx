@@ -1,12 +1,11 @@
 import { createComputed, createEffect, createMemo, createSignal, on } from "solid-js";
 
 import { PLACEMENT_ITEM_DEFAULTS, PlacementItemUtils, PlacementItemStyles as styles } from "@thewaver/ss-components";
+import { PlacementItemConst } from "@thewaver/ss-components/internal";
 
 import { access } from "../../Utils/propUtils";
 import { usePlacementBoxContext } from "../PlacementBox/PlacementBox.context";
 import type { PlacementItemProps } from "./PlacementItemSolid.types";
-
-const NO_TRANSITION_MS = 0;
 
 const toBoxStyle = (values: ReturnType<typeof PlacementItemUtils.computeStyleValues>) => ({
     "left": values.left,
@@ -36,7 +35,7 @@ export const PlacementItem = (props: PlacementItemProps) => {
     createComputed(
         on(
             () => access(props.placement),
-            () => setIsGliding(context.getTransitionDurationMs() > NO_TRANSITION_MS),
+            () => setIsGliding(context.getTransitionDurationMs() > PlacementItemConst.NO_TRANSITION_MS),
             { defer: true },
         ),
     );

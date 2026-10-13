@@ -5,7 +5,7 @@ import { access } from "@thewaver/ss-components-solid";
 import * as styles from "@thewaver/ss-playground/App/StyledComponents/SelectOptionContent/SelectOptionContent.css";
 
 import { useLayerClass } from "../Layer/Layer.context";
-import type { SelectOptionContentProps } from "./SelectOptionContent.types";
+import type { SelectOptionContentProps } from "./SelectOptionContentSolid.types";
 
 export const PageSelectOptionContent = (props: ParentProps<SelectOptionContentProps>) => {
     const getLayerClass = useLayerClass();

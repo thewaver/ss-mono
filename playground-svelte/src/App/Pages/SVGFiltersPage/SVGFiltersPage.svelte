@@ -20,8 +20,7 @@
     import type { SVGFiltersExampleProps } from "./SVGFiltersPage.types";
     import ToneExampleWrapper from "./ToneExampleWrapper.svelte";
     import TurbulenceExampleWrapper from "./TurbulenceExampleWrapper.svelte";
-
-    const EXAMPLES_ROOT = "/src/App/Pages/SVGFiltersPage/Examples";
+    import { EXAMPLE_NAMES, EXAMPLES_ROOT } from "@thewaver/ss-playground/App/Pages/SVGFiltersPage/SVGFiltersPage.const";
 
     const names = (items: SortableItem<SVGFiltersStep>[]) =>
         items.map((item) => item.value.name).join(" → ") || "nothing";
@@ -42,43 +41,43 @@
     const examples: ExampleDefs[] = [
         {
             key: "blur",
-            name: "Blur",
+            name: EXAMPLE_NAMES.blur,
             component: blurExample,
             path: `${EXAMPLES_ROOT}/Blur.svelte`,
         },
         {
             key: "dropShadow",
-            name: "Drop shadow",
+            name: EXAMPLE_NAMES.dropShadow,
             component: dropShadowExample,
             path: `${EXAMPLES_ROOT}/DropShadow.svelte`,
         },
         {
             key: "turbulence",
-            name: "Turbulence",
+            name: EXAMPLE_NAMES.turbulence,
             component: turbulenceExample,
             path: `${EXAMPLES_ROOT}/Turbulence.svelte`,
         },
         {
             key: "hue",
-            name: "Hue",
+            name: EXAMPLE_NAMES.hue,
             component: hueExample,
             path: `${EXAMPLES_ROOT}/Hue.svelte`,
         },
         {
             key: "tone",
-            name: "Tone",
+            name: EXAMPLE_NAMES.tone,
             component: toneExample,
             path: `${EXAMPLES_ROOT}/Tone.svelte`,
         },
         {
             key: "pixelate",
-            name: "Pixelate",
+            name: EXAMPLE_NAMES.pixelate,
             component: pixelateExample,
             path: `${EXAMPLES_ROOT}/Pixelate.svelte`,
         },
         {
             key: "stack",
-            name: "Four at once",
+            name: EXAMPLE_NAMES.stack,
             readout: () =>
                 method === "chain"
                     ? `${names(applied)} — chained, so each one is handed what the one before it produced and the order is the effect`

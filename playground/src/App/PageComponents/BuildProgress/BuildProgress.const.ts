@@ -9,3 +9,5 @@ export const BUILD_PROGRESS_READING = "reading the library";
 export const BUILD_PROGRESS_DISMISS_LABEL = "Hide the build progress";
 
 export const BUILD_PROGRESS_HEIGHT = 32;
+
+export const PERCENT = 100;

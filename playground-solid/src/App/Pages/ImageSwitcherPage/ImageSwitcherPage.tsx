@@ -3,6 +3,13 @@ import { createMemo, createSignal } from "solid-js";
 import type { ImageSwitcherProps } from "@thewaver/ss-components-solid";
 import { IMAGE_SWITCHER_DEFAULTS } from "@thewaver/ss-components-solid";
 import { ImageSwitcherKnobs } from "@thewaver/ss-playground/App/Knobs/ImageSwitchers.const";
+import {
+    DEFAULT_EXAMPLE_PATH,
+    EXAMPLE_NAMES,
+    IMAGE_CONTAINER_SIZE,
+    MISSING_SRC,
+    SOURCE_ALTS,
+} from "@thewaver/ss-playground/App/Pages/ImageSwitcherPage/ImageSwitcherPage.const";
 import * as styles from "@thewaver/ss-playground/App/Pages/ImageSwitcherPage/ImageSwitcherPage.css";
 import type { SourceType } from "@thewaver/ss-playground/App/Pages/ImageSwitcherPage/ImageSwitcherPage.types";
 import knight_date from "@thewaver/ss-playground/App/knight_date.webp";
@@ -15,24 +22,12 @@ import { PageProp } from "../../PageComponents/Prop/Prop";
 import { PagePropsPanel } from "../../PageComponents/PropsPanel/PropsPanel";
 import { DefaultExample } from "./Examples/Default";
 
-const IMAGE_CONTAINER_SIZE = 480;
-const MISSING_SRC = "missing_image.webp";
-
 const SOURCE_URLS: Record<SourceType, string | undefined> = {
     profile: knight_profile,
     date: knight_date,
     missing_file: MISSING_SRC,
     none: undefined,
 };
-
-const SOURCE_ALTS: Record<SourceType, string | undefined> = {
-    profile: "A knight in profile",
-    date: "A knight on a date",
-    missing_file: "A picture that will not load",
-    none: undefined,
-};
-
-const DEFAULT_EXAMPLE_PATH = "/src/App/Pages/ImageSwitcherPage/Examples/Default.tsx";
 
 const DefaultExampleWrapper = (props: ImageSwitcherProps) => {
     return (
@@ -72,7 +67,7 @@ export const ImageSwitcherPage = () => {
         return [
             {
                 key: "default",
-                name: "Default",
+                name: EXAMPLE_NAMES.default,
                 readout: () => `loads: ${getLoadCount()} | last loaded: ${getLoadedName()}`,
                 component: () => <DefaultExampleWrapper {...commonProps} />,
                 path: DEFAULT_EXAMPLE_PATH,

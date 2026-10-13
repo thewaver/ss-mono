@@ -1,15 +1,9 @@
-import {
-    type PatternProximityOpts,
-    SVGDefsUtils,
-    TrackedPatternDefaults,
-    TrackedPatternUtils,
-} from "@thewaver/ss-components";
+import { type PatternProximityOpts, SVGDefsUtils, TrackedPatternUtils } from "@thewaver/ss-components";
+import { LozengeDFade2Const } from "@thewaver/ss-components/internal";
 import { MathUtils, ShapeConst, ShapeUtils } from "@thewaver/ss-utils";
 
 import type { TrackedPatternConfig } from "../../SVGDefsSolid.types";
 import { SVGPatterns } from "../../SVGPatterns.const";
-
-const DEFAULTS = TrackedPatternDefaults.FADE_DEFAULTS;
 
 export const lozenge_d_fade_2 = (opts?: PatternProximityOpts): TrackedPatternConfig => ({
     computeSVGDefs: (id, __, getRef, defs) => {
@@ -32,7 +26,7 @@ export const lozenge_d_fade_2 = (opts?: PatternProximityOpts): TrackedPatternCon
                                 `pattern1-${id}`,
                                 getRef,
                                 defs,
-                                TrackedPatternUtils.resolveOpts(opts, DEFAULTS),
+                                TrackedPatternUtils.resolveOpts(opts, LozengeDFade2Const.DEFAULTS),
                                 (cellId, index, isSplit, getLevel) => (
                                     <use
                                         id={cellId}

@@ -14,8 +14,10 @@
     import PageProp from "../../PageComponents/Prop/Prop.svelte";
     import PagePropsPanel from "../../PageComponents/PropsPanel/PagePropsPanel.svelte";
     import DefaultExampleWrapper from "./DefaultExampleWrapper.svelte";
-
-    const MISSING_SRC = "missing_image.webp";
+    import {
+    EXAMPLE_NAMES,
+    MISSING_SRC,
+} from "@thewaver/ss-playground/App/Pages/ImageSwitcherPage/ImageSwitcherPage.const";
 
     const SOURCE_URLS: Record<SourceType, string | undefined> = {
         profile: knight_profile,
@@ -55,7 +57,7 @@
     const examples: ExampleDefs[] = [
         {
             key: "default",
-            name: "Default",
+            name: EXAMPLE_NAMES.default,
             readout: () => `loads: ${loadCount} | last loaded: ${loadedName}`,
             component: defaultExample,
             path: DEFAULT_EXAMPLE_PATH,

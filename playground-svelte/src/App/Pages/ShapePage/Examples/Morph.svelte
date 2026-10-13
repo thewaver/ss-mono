@@ -5,7 +5,7 @@
     import type { Point2d, Size2d } from "@thewaver/ss-utils";
 
     import PageControlButtonContent from "../../../StyledComponents/ControlButtonContent/ControlButtonContent.svelte";
-    import { computeShapeFillDefs, computeShapeStrokeDefs } from "../ShapePage.const";
+    import { computeShapeFillDefs, computeShapeStrokeDefs } from "../ShapePageSvelte.const";
     import type { ShapeExampleProps } from "../ShapePage.types";
 
     const MORPH_SIZE = 240;

@@ -11,6 +11,7 @@ import {
 
 import type { MosaicItemState } from "@thewaver/ss-components";
 import { MOSAIC_DEFAULTS, MosaicStyles, MosaicUtils, NavigatorUtils } from "@thewaver/ss-components";
+import { MosaicConst } from "@thewaver/ss-components/internal";
 import type { Rect } from "@thewaver/ss-utils";
 
 import { ElementObserverVueUtils } from "../../Abstracts/ElementObserver/ElementObserverVue.utils";
@@ -20,10 +21,6 @@ import { callSlot, declareProps } from "../../Utils/propUtils";
 import { toElement, useStableList } from "../../Utils/refUtils";
 import type { SlotsContext } from "../../Utils/typeUtils";
 import type { MosaicProps, MosaicSlots } from "./Mosaic.types";
-
-const EMPTY_RECT: Rect = { x: 0, y: 0, width: 0, height: 0 };
-const NOT_PLACED = -1;
-const NO_TRANSITION_MS = 0;
 
 type MosaicTileProps = Pick<MosaicProps, "isItemSized"> & {
     slot: object;
@@ -59,7 +56,7 @@ const MosaicTile = defineComponent(
             ([isPlaced]) => {
                 const from = shownRect;
                 const tile = tileRef.value;
-                const rect = props.rect ?? EMPTY_RECT;
+                const rect = props.rect ?? MosaicConst.EMPTY_RECT;
 
                 shownRect = isPlaced ? rect : undefined;
 
@@ -88,7 +85,7 @@ const MosaicTile = defineComponent(
 
         return () => {
             const isPlaced = props.rect !== undefined;
-            const rect = props.rect ?? EMPTY_RECT;
+            const rect = props.rect ?? MosaicConst.EMPTY_RECT;
 
             const state: MosaicItemState = {
                 index: props.index,
@@ -164,7 +161,7 @@ export const Mosaic = defineComponent(
         const getIsWalked = () => props.onActivate !== undefined;
 
         const prefersReducedMotion = MediaQueryMonitorVueUtils.useReducedMotion(
-            () => getTransitionDurationMs() <= NO_TRANSITION_MS,
+            () => getTransitionDurationMs() <= MosaicConst.NO_TRANSITION_MS,
         );
 
         const rootRef = shallowRef<HTMLDivElement>();
@@ -297,7 +294,9 @@ export const Mosaic = defineComponent(
         return () => {
             const isWalked = getIsWalked();
             const isRepack = lastAnchoredExtent === layout.value.anchoredExtent;
-            const glideDurationMs = prefersReducedMotion.value ? NO_TRANSITION_MS : getTransitionDurationMs();
+            const glideDurationMs = prefersReducedMotion.value
+                ? MosaicConst.NO_TRANSITION_MS
+                : getTransitionDurationMs();
 
             return (
                 <div
@@ -309,7 +308,7 @@ export const Mosaic = defineComponent(
                     onKeydown={handleKeyDown}
                 >
                     {slotOrder.value.map((slot, readingIndex) => {
-                        const index = indexBySlot.value.get(slot) ?? NOT_PLACED;
+                        const index = indexBySlot.value.get(slot) ?? MosaicConst.NOT_PLACED;
 
                         return (
                             <MosaicTile

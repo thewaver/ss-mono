@@ -11,6 +11,7 @@ import {
     ViewportUtils,
     ProximityTextStyles as styles,
 } from "@thewaver/ss-components";
+import { ProximityTextConst } from "@thewaver/ss-components/internal";
 import type { Rect } from "@thewaver/ss-utils";
 import { assignInlineVars } from "@vanilla-extract/dynamic";
 
@@ -22,9 +23,6 @@ import { useViewportContext } from "../../../Abstracts/Viewport/Viewport.context
 import { access } from "../../../Utils/propUtils";
 import { accessStore } from "../../../Utils/storeUtils";
 import type { ProximityTextProps } from "./ProximityTextSolid.types";
-
-const RESTING_STRENGTH = 0;
-const NO_TIME = 0;
 
 export const ProximityText = (props: ParentProps<ProximityTextProps>) => {
     const viewportContext = useViewportContext();
@@ -110,7 +108,9 @@ export const ProximityText = (props: ParentProps<ProximityTextProps>) => {
         LetterDriverUtils.computeAnimationStyle(
             ProximityTextUtils.toLetterAnimation(
                 getAnimationNames()[index],
-                isResting ? RESTING_STRENGTH : (getStrengths()[index] ?? RESTING_STRENGTH),
+                isResting
+                    ? ProximityTextConst.RESTING_STRENGTH
+                    : (getStrengths()[index] ?? ProximityTextConst.RESTING_STRENGTH),
             ),
             LetterDriverStyles.letterDriverTimeVar,
         );
@@ -150,7 +150,7 @@ export const ProximityText = (props: ParentProps<ProximityTextProps>) => {
         isHidden: false,
         animation: ProximityTextUtils.toLetterAnimation(
             getAnimationNames()[index],
-            getStrengths()[index] ?? RESTING_STRENGTH,
+            getStrengths()[index] ?? ProximityTextConst.RESTING_STRENGTH,
         ),
     });
 
@@ -234,7 +234,9 @@ export const ProximityText = (props: ParentProps<ProximityTextProps>) => {
                 ref={setRootRef}
                 class={styles.proximityTextRoot}
                 style={assignInlineVars({
-                    [LetterDriverStyles.letterDriverTimeVar]: LetterDriverUtils.getTimeValue(NO_TIME),
+                    [LetterDriverStyles.letterDriverTimeVar]: LetterDriverUtils.getTimeValue(
+                        ProximityTextConst.NO_TIME,
+                    ),
                 })}
             >
                 <div

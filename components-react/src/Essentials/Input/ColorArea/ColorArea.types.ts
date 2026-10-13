@@ -1,6 +1,11 @@
 import type { MouseEvent } from "react";
 
-import type { ColorAreaAxis, ColorAreaRenderProps, ColorAreaState } from "@thewaver/ss-components";
+import type {
+    BaseColorAreaCbs,
+    BaseColorAreaValues,
+    ColorAreaAxis,
+    ColorAreaRenderProps,
+} from "@thewaver/ss-components";
 import type { Color } from "@thewaver/ss-utils";
 
 import type {
@@ -8,9 +13,7 @@ import type {
     InteractionWrapperProps,
 } from "../../../Primitives/InteractionWrapper/InteractionWrapper.types";
 
-export type ColorAreaCbs = {
-    /** Runs as the color changes. */
-    onInput?: (hsv: Color.HSVA) => void;
+export type ColorAreaCbs = BaseColorAreaCbs & {
     /** Runs when the pointer arrives over the square. */
     onMouseEnter?: (e: MouseEvent<HTMLDivElement>) => void;
     /** Runs when the pointer leaves the square. */
@@ -19,8 +22,8 @@ export type ColorAreaCbs = {
 
 export type ColorAreaElementProps = ColorAreaCbs &
     InteractionControlProps<ColorAreaRenderProps> &
-    Required<Omit<ColorAreaState, "name" | "ariaLabel">> &
-    Pick<ColorAreaState, "name" | "ariaLabel"> & {
+    Required<Omit<BaseColorAreaValues, "name" | "ariaLabel">> &
+    Pick<BaseColorAreaValues, "name" | "ariaLabel"> & {
         /** The color the square is currently on. */
         hsv: Color.HSVA;
         /** Whether the square can be reached by tabbing. */
@@ -43,7 +46,7 @@ export type ColorAreaElementProps = ColorAreaCbs &
 export type ColorAreaProps = Omit<InteractionWrapperProps<ColorAreaRenderProps>, "renderControl" | "extraFlags"> &
     ColorAreaCbs &
     Pick<InteractionControlProps<ColorAreaRenderProps>, "id" | "renderContent"> &
-    ColorAreaState & {
+    BaseColorAreaValues & {
         /** The color, and how to change it. It is the only thing that changes it. */
         hsv: readonly [Color.HSVA, (hsv: Color.HSVA) => void];
     };

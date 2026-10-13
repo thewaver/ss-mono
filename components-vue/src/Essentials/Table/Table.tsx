@@ -10,6 +10,7 @@ import type {
     VirtualizerRow,
 } from "@thewaver/ss-components";
 import { CarrierUtils, LiveAnnouncerUtils, TABLE_DEFAULTS, TableStyles, TableUtils } from "@thewaver/ss-components";
+import { TableConst } from "@thewaver/ss-components/internal";
 import type { Index2d } from "@thewaver/ss-utils";
 import { assignInlineVars } from "@vanilla-extract/dynamic";
 
@@ -22,16 +23,6 @@ import { callSlot, declareProps, useTwoWay } from "../../Utils/propUtils";
 import type { SlotsContext } from "../../Utils/typeUtils";
 import { provideTableHeaderContext, useTableHeaderContext } from "./Table.context";
 import type { TableColumn, TableHeaderReorderSlots, TableHeaderSortSlots, TableProps, TableSlots } from "./Table.types";
-
-const HEADER_ROW_INDEX = TableUtils.HEADER_ROW_INDEX;
-const FIRST_ARIA_INDEX = TableUtils.FIRST_ARIA_INDEX;
-
-const NO_RESIZING = "";
-
-const EMPTY_PINNED_ROWS: number[] = [];
-const EMPTY_WIDTHS: Record<string, number> = {};
-const EMPTY_ORDER: string[] = [];
-const EMPTY_SELECTION: never[] = [];
 
 type TableHeaderCellProps<T> = {
     column: TableColumn<T>;
@@ -95,7 +86,7 @@ const TableHeaderCell = defineComponent(
                 id={props.cellId}
                 class={TableStyles.tableCell}
                 role="columnheader"
-                aria-colindex={props.columnIndex + FIRST_ARIA_INDEX}
+                aria-colindex={props.columnIndex + TableConst.FIRST_ARIA_INDEX}
                 aria-sort={TableUtils.computeAriaSort(props.column, props.renderProps.sortDirection)}
                 aria-disabled={props.isDisabled || undefined}
                 aria-describedby={props.isReorderable ? props.hintId : undefined}
@@ -151,10 +142,10 @@ export const Table = defineComponent(
         let resizeStart = { x: 0, width: 0, hasDragged: false };
         let hasCarriedClick = false;
 
-        const focusedCell = shallowRef<Index2d>({ row: HEADER_ROW_INDEX, col: 0 });
+        const focusedCell = shallowRef<Index2d>({ row: TableConst.HEADER_ROW_INDEX, col: 0 });
         const hoveredRow = shallowRef<number>();
         const hoveredColumn = shallowRef<number>();
-        const resizingColumnId = shallowRef(NO_RESIZING);
+        const resizingColumnId = shallowRef(TableConst.NO_RESIZING);
 
         const storedSort = useTwoWay(props, "sort", undefined, { keepsOwnValue: false });
         const storedWidths = useTwoWay(props, "widths", undefined, { keepsOwnValue: false });
@@ -170,14 +161,16 @@ export const Table = defineComponent(
         const getResizeStepPx = () => props.resizeStepPx ?? TABLE_DEFAULTS.resizeStepPx;
         const getIsOrdered = () => props.order !== undefined;
 
-        const widths = computed(() => storedWidths.value ?? EMPTY_WIDTHS);
-        const selected = computed<T[]>(() => storedSelection.value ?? EMPTY_SELECTION);
+        const widths = computed(() => storedWidths.value ?? TableConst.EMPTY_WIDTHS);
+        const selected = computed<T[]>(() => storedSelection.value ?? TableConst.EMPTY_SELECTION);
 
         const selectionMode = computed(() =>
             TableUtils.getSelectionMode(props.selectionMode, props.selection !== undefined),
         );
 
-        const columnOrder = computed(() => TableUtils.getColumnOrder(props.columns, storedOrder.value ?? EMPTY_ORDER));
+        const columnOrder = computed(() =>
+            TableUtils.getColumnOrder(props.columns, storedOrder.value ?? TableConst.EMPTY_ORDER),
+        );
 
         const columns = computed(() => TableUtils.getReordered(props.columns, columnOrder.value));
 
@@ -203,7 +196,7 @@ export const Table = defineComponent(
         const getDataRow = (layoutRow: number) => rowOrder.value?.[layoutRow] ?? layoutRow;
 
         const pinnedRows = computed(() =>
-            rovingRow.value === HEADER_ROW_INDEX ? EMPTY_PINNED_ROWS : [rovingRow.value - 1],
+            rovingRow.value === TableConst.HEADER_ROW_INDEX ? TableConst.EMPTY_PINNED_ROWS : [rovingRow.value - 1],
         );
 
         const rowWindow = VirtualizerVueUtils.useRowWindow(bodyRef, () => rows.value.length, {
@@ -219,7 +212,7 @@ export const Table = defineComponent(
         const focusCell = (cell: Index2d) => {
             focusedCell.value = cell;
 
-            if (cell.row > HEADER_ROW_INDEX && rowWindow.isLive.value) rowWindow.scrollToRow(cell.row - 1);
+            if (cell.row > TableConst.HEADER_ROW_INDEX && rowWindow.isLive.value) rowWindow.scrollToRow(cell.row - 1);
 
             document.getElementById(getCellId(cell))?.focus();
         };
@@ -253,7 +246,7 @@ export const Table = defineComponent(
 
         const getCurrentWidth = (column: TableColumn<T>, columnIndex: number) =>
             TableUtils.getColumnWidth(column, widths.value) ??
-            document.getElementById(getCellId({ row: HEADER_ROW_INDEX, col: columnIndex }))?.offsetWidth ??
+            document.getElementById(getCellId({ row: TableConst.HEADER_ROW_INDEX, col: columnIndex }))?.offsetWidth ??
             0;
 
         const getIsResizable = (column: TableColumn<T>) => (column.isResizable ?? false) && props.widths !== undefined;
@@ -295,7 +288,7 @@ export const Table = defineComponent(
 
             resizer.releasePointerCapture(e.pointerId);
 
-            resizingColumnId.value = NO_RESIZING;
+            resizingColumnId.value = TableConst.NO_RESIZING;
 
             if (resizeStart.hasDragged) return;
 
@@ -332,7 +325,9 @@ export const Table = defineComponent(
 
         const getHeaderRects = () =>
             columns.value.reduce<DOMRect[]>((acc, _unused, columnIndex) => {
-                const element = document.getElementById(getCellId({ row: HEADER_ROW_INDEX, col: columnIndex }));
+                const element = document.getElementById(
+                    getCellId({ row: TableConst.HEADER_ROW_INDEX, col: columnIndex }),
+                );
 
                 if (element) acc.push(element.getBoundingClientRect());
 
@@ -424,7 +419,7 @@ export const Table = defineComponent(
                 if (!getIsReorderable(columns.value[columnIndex])) return;
 
                 startCarry(columnIndex, "tap");
-                focusCell({ row: HEADER_ROW_INDEX, col: columnIndex });
+                focusCell({ row: TableConst.HEADER_ROW_INDEX, col: columnIndex });
 
                 return;
             }
@@ -432,7 +427,7 @@ export const Table = defineComponent(
             if (CarrierUtils.getCarryMode() === "drag") return;
 
             const rect = document
-                .getElementById(getCellId({ row: HEADER_ROW_INDEX, col: columnIndex }))
+                .getElementById(getCellId({ row: TableConst.HEADER_ROW_INDEX, col: columnIndex }))
                 ?.getBoundingClientRect();
 
             if (rect) CarrierUtils.aimAtPoint(rect.left + rect.width * 0.5, rect.top + rect.height * 0.5);
@@ -473,7 +468,7 @@ export const Table = defineComponent(
             if (command.kind === "move_column") {
                 if (!moveColumn(from.col, command.to)) return;
 
-                focusCell({ row: HEADER_ROW_INDEX, col: command.to });
+                focusCell({ row: TableConst.HEADER_ROW_INDEX, col: command.to });
 
                 LiveAnnouncerUtils.announce(
                     props.announcements!.computeColumnMoved(column.header, command.to, grid.value.colCount),
@@ -548,7 +543,7 @@ export const Table = defineComponent(
                 onPointermove={(e) => handleResizerPointerMove(e, column)}
                 onPointerup={(e) => handleResizerPointerUp(e, column, columnIndex)}
                 onPointercancel={() => {
-                    if (resizingColumnId.value === column.id) resizingColumnId.value = NO_RESIZING;
+                    if (resizingColumnId.value === column.id) resizingColumnId.value = TableConst.NO_RESIZING;
                 }}
                 onClick={(e) => e.stopPropagation()}
             >
@@ -561,7 +556,7 @@ export const Table = defineComponent(
                 key={rowIndex}
                 class={virtualRow ? [TableStyles.tableRow, TableStyles.tableWindowedRow] : TableStyles.tableRow}
                 role="row"
-                aria-rowindex={rowIndex + 1 + FIRST_ARIA_INDEX}
+                aria-rowindex={rowIndex + 1 + TableConst.FIRST_ARIA_INDEX}
                 aria-selected={selectionMode.value === "none" ? undefined : selectedRows.value.has(row)}
                 aria-label={props.computeRowAriaLabel?.(row, rowIndex)}
                 style={virtualRow ? { transform: `translateY(${rowWindow.getRowStart(virtualRow)}px)` } : undefined}
@@ -582,7 +577,7 @@ export const Table = defineComponent(
                             id={getCellId(cell)}
                             class={TableStyles.tableCell}
                             role="gridcell"
-                            aria-colindex={columnIndex + FIRST_ARIA_INDEX}
+                            aria-colindex={columnIndex + TableConst.FIRST_ARIA_INDEX}
                             aria-disabled={getIsDisabled() || undefined}
                             tabindex={getIsRoving(cell) ? 0 : -1}
                             onClick={(e) => handleCellClick(e, cell)}
@@ -595,7 +590,7 @@ export const Table = defineComponent(
         );
 
         const renderHeaderCell = (column: TableColumn<T>, columnIndex: number) => {
-            const cell = { row: HEADER_ROW_INDEX, col: columnIndex };
+            const cell = { row: TableConst.HEADER_ROW_INDEX, col: columnIndex };
             const renderProps = getColumnRenderProps(columnIndex);
             const columnCount = columns.value.length;
 
@@ -674,7 +669,7 @@ export const Table = defineComponent(
                     onKeydown={handleKeyDown}
                 >
                     <div ref={headerRef} class={TableStyles.tableHeader} role="rowgroup">
-                        <div class={TableStyles.tableRow} role="row" aria-rowindex={FIRST_ARIA_INDEX}>
+                        <div class={TableStyles.tableRow} role="row" aria-rowindex={TableConst.FIRST_ARIA_INDEX}>
                             {columns.value.map(renderHeaderCell)}
                         </div>
                     </div>

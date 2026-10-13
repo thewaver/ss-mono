@@ -14,12 +14,13 @@
     import PageCodeBox from "../CodeBox/CodeBox.svelte";
     import PageScrollerButton from "../ScrollerButton/ScrollerButton.svelte";
     import PageTabPanel from "../TabPanel/TabPanel.svelte";
-    import type { SourceGroup, SourceViewProps } from "./SourceView.types";
+    import type { SourceGroup, SourceViewProps } from "./SourceViewSvelte.types";
     import { SourceViewUtils } from "./SourceView.utils";
-
-    const TAB_GAP = 10;
-    const SECTION_GAP = 5;
-    const MODAL_MARGIN_HEIGHT = 80;
+    import {
+        MODAL_MARGIN_HEIGHT,
+        SECTION_GAP,
+        TAB_GAP,
+    } from "@thewaver/ss-playground/App/PageComponents/SourceView/SourceView.const";
 
     const getTabId = (name: string) => `source-tab-${name}`;
 

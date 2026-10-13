@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import PageLayer from "../../PageComponents/Layer/Layer.vue";
 import PagePopoverSurface from "../../StyledComponents/PopoverSurface/PopoverSurface.vue";
-import type { ToolbarPopupProps } from "./ToolbarPage.types";
+import type { ToolbarPopupProps } from "./ToolbarPageVue.types";
 
 defineProps<ToolbarPopupProps>();
 </script>

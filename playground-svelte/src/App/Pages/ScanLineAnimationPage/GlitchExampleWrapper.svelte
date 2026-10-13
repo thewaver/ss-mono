@@ -7,8 +7,9 @@
     import PageProp from "../../PageComponents/Prop/Prop.svelte";
     import GlitchExample from "./Examples/Glitch.svelte";
     import type { ScanlineAnimationExampleProps } from "./ScanlineAnimationPage.types";
-
-    const IMAGE_CONTAINER_SIZE = 360;
+    import {
+        IMAGE_CONTAINER_SIZE,
+    } from "@thewaver/ss-playground/App/Pages/ScanLineAnimationPage/ScanLineAnimationPage.const";
 
     let { playback = $bindable(), ...props }: ScanlineAnimationExampleProps = $props();
 

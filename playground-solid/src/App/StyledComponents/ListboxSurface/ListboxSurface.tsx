@@ -4,7 +4,7 @@ import { access } from "@thewaver/ss-components-solid";
 import * as styles from "@thewaver/ss-playground/App/StyledComponents/ListboxSurface/ListboxSurface.css";
 
 import { useLayerClass } from "../Layer/Layer.context";
-import type { ListboxSurfaceProps } from "./ListboxSurface.types";
+import type { ListboxSurfaceProps } from "./ListboxSurfaceSolid.types";
 
 export const PageListboxSurface = (props: ParentProps<ListboxSurfaceProps>) => {
     const getLayerClass = useLayerClass();

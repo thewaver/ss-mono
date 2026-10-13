@@ -1,14 +1,13 @@
 <script lang="ts">
     import * as typewriterStyles from "@thewaver/ss-playground/App/Pages/TypewriterPage/TypewriterPage.css";
 
-    import { PaintedTextKnobs } from "../../Knobs/PaintedTexts.const";
+    import { PaintedTextKnobs } from "@thewaver/ss-playground/App/Knobs/PaintedTexts.const";
     import PageExampleKnobs from "../../PageComponents/ExampleKnobs/PageExampleKnobs.svelte";
     import PageSelectField from "../../PageComponents/Field/PageSelectField.svelte";
     import PageProp from "../../PageComponents/Prop/Prop.svelte";
     import TypedExample from "./Examples/Typed.svelte";
-    import type { PaintedTextExampleWrapperProps } from "./PaintedTextPage.types";
-
-    const ARRIVAL_EFFECTS = ["fade", "scale", "glow", "drop", "slide"] as const;
+    import type { PaintedTextExampleWrapperProps } from "./PaintedTextPageSvelte.types";
+    import { ARRIVAL_EFFECTS } from "@thewaver/ss-playground/App/Pages/PaintedTextPage/PaintedTextPage.const";
 
     type ArrivalEffect = (typeof ARRIVAL_EFFECTS)[number];
 

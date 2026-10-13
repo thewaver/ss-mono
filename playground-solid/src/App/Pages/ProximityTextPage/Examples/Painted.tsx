@@ -1,8 +1,9 @@
 import { createUniqueId } from "solid-js";
 
-import { PaintedText, ProximityText, SVGDefsSamples } from "@thewaver/ss-components-solid";
+import { PaintedText, ProximityText, SVGDefsSampleConfigs, SVGDefsSamples } from "@thewaver/ss-components-solid";
 import * as styles from "@thewaver/ss-playground/App/Pages/ProximityTextPage/ProximityTextPage.css";
-import type { ProximityTextExampleProps } from "@thewaver/ss-playground/App/Pages/ProximityTextPage/ProximityTextPage.types";
+
+import type { ProximityTextExampleProps } from "../ProximityTextPageSolid.types";
 
 type Props = ProximityTextExampleProps;
 
@@ -17,7 +18,7 @@ export const PaintedExample = (props: Props) => {
             <ProximityText reachPx={props.reachPx} isDisabled={props.isDisabled}>
                 <PaintedText
                     computeFillDefs={(getSize, getRef) =>
-                        SVGDefsSamples.Gradient.Timed.toConfig({ family: "flow_diag_3" }).computeSVGDefs(
+                        SVGDefsSampleConfigs.Gradient.Timed.toConfig({ family: "flow_diag_3" }).computeSVGDefs(
                             `fill-${id}`,
                             undefined,
                             getRef,

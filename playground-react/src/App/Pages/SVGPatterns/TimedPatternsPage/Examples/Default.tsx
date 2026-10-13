@@ -1,6 +1,6 @@
 import { useId } from "react";
 
-import { SVGDefsSamples, Shape } from "@thewaver/ss-components-react";
+import { SVGDefsSampleConfigs, SVGDefsSamples, Shape } from "@thewaver/ss-components-react";
 import {
     NO_SAMPLE_KEY,
     computeNoSampleDefs,
@@ -8,7 +8,7 @@ import {
 import * as styles from "@thewaver/ss-playground/App/Pages/SVGPatterns/SVGPatterns.css";
 import { ShapeConst } from "@thewaver/ss-utils";
 
-import type { TimedPatternExampleProps } from "../../SVGPatterns.types";
+import type { TimedPatternExampleProps } from "../../SVGPatternsReact.types";
 
 export const DefaultExample = ({
     configKey,
@@ -28,7 +28,7 @@ export const DefaultExample = ({
             computeFillDefs={(size, element) => {
                 if (configKey === NO_SAMPLE_KEY) return computeNoSampleDefs(colors, "fill");
 
-                return SVGDefsSamples.Pattern.Timed.SAMPLE_CONFIGS[configKey].computeSVGDefs(
+                return SVGDefsSampleConfigs.Pattern.Timed.SAMPLE_CONFIGS[configKey].computeSVGDefs(
                     `fill-${id}`,
                     undefined,
                     element,

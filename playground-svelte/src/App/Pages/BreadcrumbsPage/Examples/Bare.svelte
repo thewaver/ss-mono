@@ -3,7 +3,7 @@
     import { BREADCRUMBS_GAP, labelOf } from "@thewaver/ss-playground/App/Pages/BreadcrumbsPage/BreadcrumbsPage.const";
 
     import PageBreadcrumbContent from "../../../StyledComponents/BreadcrumbContent/PageBreadcrumbContent.svelte";
-    import type { BreadcrumbsExampleProps } from "../BreadcrumbsPage.types";
+    import type { BreadcrumbsExampleProps } from "../BreadcrumbsPageSvelte.types";
 
     type Props = BreadcrumbsExampleProps;
 

@@ -1,10 +1,5 @@
-import {
-    type GradientBandOpts,
-    type PointSource,
-    SVGDefsUtils,
-    TrackedGradientDefaults,
-} from "@thewaver/ss-components";
-import type { Size2d } from "@thewaver/ss-utils";
+import { type GradientBandOpts, type PointSource, SVGDefsUtils } from "@thewaver/ss-components";
+import { Band1v1Const } from "@thewaver/ss-components/internal";
 
 import { PointerTrackerReactUtils } from "../../../../Abstracts/PointerTracker/PointerTrackerReact.utils";
 import { SVGGradientDefsReactUtils } from "../../../../Generators/SVGDefs/SVGGradients/SVGGradientDefsReact.utils";
@@ -22,29 +17,25 @@ type BandGradientProps = {
     opts?: GradientBandOpts;
 };
 
-const BAND_SPAN: Size2d = { width: 0.7, height: 0.7 };
-
-const DEFAULTS = TrackedGradientDefaults.BAND_BLEND_DEFAULTS;
-
 const getBandColors = (color: string, opts?: GradientBandOpts) =>
     SVGDefsUtils.getFalloffStops(color, {
-        coreStop: opts?.coreStop ?? DEFAULTS.coreStop,
-        coreAlpha: opts?.coreAlpha ?? DEFAULTS.coreAlpha,
-        falloffSpread: opts?.falloffSpread ?? DEFAULTS.falloffSpread,
-        falloffAlpha: opts?.falloffAlpha ?? DEFAULTS.falloffAlpha,
+        coreStop: opts?.coreStop ?? Band1v1Const.DEFAULTS.coreStop,
+        coreAlpha: opts?.coreAlpha ?? Band1v1Const.DEFAULTS.coreAlpha,
+        falloffSpread: opts?.falloffSpread ?? Band1v1Const.DEFAULTS.falloffSpread,
+        falloffAlpha: opts?.falloffAlpha ?? Band1v1Const.DEFAULTS.falloffAlpha,
     });
 
 const BandGradient = (props: BandGradientProps) => {
     const ref = SVGDefsReactUtils.useElementRef(props.element);
     const { reading } = PointerTrackerReactUtils.usePointerReading(ref, false, props.source);
 
-    const travel = (reading.boxRatio[props.axis] - 0.5) * (props.opts?.bandTravel ?? DEFAULTS.bandTravel);
+    const travel = (reading.boxRatio[props.axis] - 0.5) * (props.opts?.bandTravel ?? Band1v1Const.DEFAULTS.bandTravel);
 
     return SVGGradientDefsReactUtils.computeLinearGradient({
         id: props.id,
         colors: getBandColors(props.color, props.opts),
         angle: props.axis === "x" ? 0 : 90,
-        scale: BAND_SPAN,
+        scale: Band1v1Const.BAND_SPAN,
         offset: props.axis === "x" ? { x: travel, y: 0 } : { x: 0, y: travel },
     });
 };

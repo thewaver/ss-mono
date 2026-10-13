@@ -2,14 +2,15 @@
 import { computed, shallowRef } from "vue";
 
 import { type SVGDefsColors, SVGDefsSamples, TrackedPatternDefaults } from "@thewaver/ss-components-vue";
-import {
-    NO_SAMPLE_KEY,
-    toGroupEntriesWithNoSample,
-} from "@thewaver/ss-playground/App/PageComponents/SampleGroups/SampleGroups.const";
+import { SVGPatternKnobs } from "@thewaver/ss-playground/App/Knobs/SVGPatterns.const";
+import { TrackedPatternKnobs } from "@thewaver/ss-playground/App/Knobs/TrackedPatterns.const";
+import { NO_SAMPLE_KEY } from "@thewaver/ss-playground/App/PageComponents/SampleGroups/SampleGroups.const";
 import type { WithNoSample } from "@thewaver/ss-playground/App/PageComponents/SampleGroups/SampleGroups.types";
+import {
+    EXAMPLE_NAMES,
+    TRACKED_PATTERN_GROUPS,
+} from "@thewaver/ss-playground/App/Pages/SVGPatterns/TrackedPatternsPage/TrackedPatternsPage.const";
 
-import { SVGPatternKnobs } from "../../../Knobs/SVGPatterns.const";
-import { TrackedPatternKnobs } from "../../../Knobs/TrackedPatterns.const";
 import type { ExampleDefs } from "../../../PageComponents/Examples/Examples.types";
 import PageExamples from "../../../PageComponents/Examples/PageExamples.vue";
 import PageGroupedSelectField from "../../../PageComponents/Field/PageGroupedSelectField.vue";
@@ -19,12 +20,9 @@ import PageProp from "../../../PageComponents/Prop/Prop.vue";
 import PagePropsDivider from "../../../PageComponents/PropsPanel/PagePropsDivider.vue";
 import PagePropsGroups from "../../../PageComponents/PropsPanel/PagePropsGroups.vue";
 import PagePropsPanel from "../../../PageComponents/PropsPanel/PagePropsPanel.vue";
-import { GROUPPED_TRACKED_PATTERNS } from "../SVGPatterns.const";
-import type { SVGPatternsControls, TrackedPatternExampleProps } from "../SVGPatterns.types";
 import PageSVGPatternsProps from "../SVGPatternsProps.vue";
+import type { SVGPatternsControls, TrackedPatternExampleProps } from "../SVGPatternsVue.types";
 import DefaultExample from "./Examples/Default.vue";
-
-const TRACKED_PATTERN_GROUPS = toGroupEntriesWithNoSample(GROUPPED_TRACKED_PATTERNS);
 
 const DEFAULT_EXAMPLE_PATH = "/src/App/Pages/SVGPatterns/TrackedPatternsPage/Examples/Default.vue";
 
@@ -77,7 +75,7 @@ const setConfigDef = (key: string, value: number | boolean) => {
 const examples: ExampleDefs[] = [
     {
         key: "default",
-        name: "Default",
+        name: EXAMPLE_NAMES.default,
         readout: () =>
             "drag the corner to resize the box: drawn as one tile, the cell count follows the size; tiled, the copies appear and all of them react",
         path: DEFAULT_EXAMPLE_PATH,

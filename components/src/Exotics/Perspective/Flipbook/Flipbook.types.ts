@@ -115,3 +115,10 @@ export type FlipbookLabels = {
     /** What one page is called when it is announced, so a reader hears page rather than group. Defaults to "page". */
     pageRoleDescription?: string;
 };
+
+export type BaseFlipbookValues<T> = {
+    /** The pages, in reading order: the first is the front cover and, when there is an even number, the last is the back. */
+    pages: T[];
+};
+
+export type BaseFlipbookProps<T> = FlipbookState & FlipbookLabels & BaseFlipbookValues<T>;

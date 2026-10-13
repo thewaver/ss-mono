@@ -10,8 +10,8 @@ import { assignInlineVars } from "@vanilla-extract/dynamic";
 
 import PageMeasureBox from "../../../PageComponents/MeasureBox/MeasureBox.vue";
 import PageControlButtonContent from "../../../StyledComponents/ControlButtonContent/ControlButtonContent.vue";
-import { branch, computeFamilySteps, describeFamily, seed } from "../BracketPage.const";
 import type { BracketFamilyExampleProps } from "../BracketPage.types";
+import { branch, computeFamilySteps, describeFamily, seed } from "../BracketPageVue.const";
 import PageBracketLayerHeader from "../PageBracketLayerHeader.vue";
 import PageBracketNode from "../PageBracketNode.vue";
 

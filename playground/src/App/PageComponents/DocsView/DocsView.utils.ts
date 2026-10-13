@@ -1,6 +1,10 @@
-import type { ApiGroup, ApiGroupKind } from "virtual:component-api";
+import type { ApiGroup, ApiGroupKind, ApiInclude } from "virtual:component-api";
+
+import { StringUtils } from "@thewaver/ss-utils";
 
 import { getDefaultHighlighterConfig, highlighter } from "../../../shiki";
+import { toOwnAppHref } from "../FrameworkSwitch/FrameworkSwitch.const";
+import { toPageViewRoute } from "../ViewTabs/ViewTabs.const";
 import type { DocsTableOfContentsEntry } from "./DocsView.types";
 
 const WRAPPER_PATTERN = /<\/?pre[^>]*>|<\/?code[^>]*>/g;
@@ -20,6 +24,22 @@ export const loadApiGroups = async (name: string): Promise<ApiGroup[]> => {
 export const toDocsGroupId = (kind: ApiGroupKind) => `docs-${kind}`;
 
 export const toDocsTableId = (kind: ApiGroupKind, name: string) => `docs-${kind}-${name}`;
+
+export const DOCS_INCLUDES_LEAD = "Also has everything in ";
+
+export const DOCS_INCLUDES_SEPARATOR = ", ";
+
+export const toDocsIncludeHref = (include: ApiInclude, unit: string) => {
+    if (!include.target) return undefined;
+
+    const fragment = `#${toDocsTableId(include.target.group, include.target.table)}`;
+
+    if (include.target.unit.toLowerCase() === unit.toLowerCase()) return fragment;
+
+    const route = toPageViewRoute(`/${StringUtils.camelToKebabCase(include.target.unit)}`, "docs");
+
+    return toOwnAppHref(`${route}${fragment}`);
+};
 
 export const toDocsTableOfContents = (
     groups: ApiGroup[],

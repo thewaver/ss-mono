@@ -3,11 +3,11 @@ import { h, useModel } from "vue";
 
 import { Radio, RadioGroup } from "@thewaver/ss-components-vue";
 import type { InteractionTooltipDefs } from "@thewaver/ss-components-vue";
+import { RADIO_GROUP_GAP, SIZE_OPTIONS } from "@thewaver/ss-playground/App/Pages/RadioPage/RadioPage.const";
 
 import PageRadioContent from "../../../StyledComponents/RadioContent/RadioContent.vue";
 import PageTooltipContent from "../../../StyledComponents/TooltipContent/TooltipContent.vue";
-import { RADIO_GROUP_GAP, SIZE_OPTIONS } from "../RadioPage.const";
-import type { RadioExampleProps } from "../RadioPage.types";
+import type { RadioExampleProps } from "../RadioPageVue.types";
 
 const REACHABLE_VALUE = "medium";
 

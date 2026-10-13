@@ -2,18 +2,19 @@ import type { PropsWithChildren } from "react";
 import { useMemo, useState } from "react";
 
 import { Button } from "@thewaver/ss-components-react";
+import {
+    NOTHING_TO_RESET,
+    SAMPLE_SELECTOR_ALONE,
+} from "@thewaver/ss-playground/App/PageComponents/PropsPanel/PropsPanel.const";
 import * as styles from "@thewaver/ss-playground/App/PageComponents/PropsPanel/PropsPanel.css";
 
 import { PageButtonContent } from "../../StyledComponents/ButtonContent/ButtonContent";
-import type { FieldResetRegistry } from "../Field/Field.context";
-import { FieldResetProvider } from "../Field/Field.context";
+import type { FieldResetRegistry } from "../Field/FieldReact.context";
+import { FieldResetProvider } from "../Field/FieldReact.context";
 import { useIsPreview } from "../Preview/Preview.context";
 import { PageProp } from "../Prop/Prop";
 import { PropsPanelContextProvider } from "./PropsPanel.context";
-import type { PagePropsPanelProps } from "./PropsPanel.types";
-
-const NOTHING_TO_RESET = 0;
-const SAMPLE_SELECTOR_ALONE = 1;
+import type { PagePropsPanelProps } from "./PropsPanelReact.types";
 
 export const PagePropsGroups = (props: PropsWithChildren) => {
     if (useIsPreview()) return null;

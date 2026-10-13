@@ -1,6 +1,7 @@
 import { useState } from "react";
 
 import { TreeKnobs } from "@thewaver/ss-playground/App/Knobs/Trees.const";
+import { EXAMPLES_ROOT, EXAMPLE_NAMES } from "@thewaver/ss-playground/App/Pages/TreePage/TreePage.const";
 
 import { PageExampleKnobs } from "../../PageComponents/ExampleKnobs/ExampleKnobs";
 import { PageExamples } from "../../PageComponents/Examples/Examples";
@@ -16,6 +17,7 @@ import { RadialExample } from "./Examples/Radial";
 import { RecordValuesExample } from "./Examples/RecordValues";
 import { RightToLeftExample } from "./Examples/RightToLeft";
 import { VirtualizedExample } from "./Examples/Virtualized";
+import type { Asset, TreeExampleProps } from "./TreePage.types";
 import {
     FILES_WITH_DISABLED,
     FILES_WITH_REACHABLE,
@@ -23,10 +25,7 @@ import {
     STRESS_BRANCH_COUNT,
     STRESS_LEAF_COUNT,
     createStressFiles,
-} from "./TreePage.const";
-import type { Asset, TreeExampleProps } from "./TreePage.types";
-
-const EXAMPLES_ROOT = "/src/App/Pages/TreePage/Examples";
+} from "./TreePageReact.const";
 
 const LeaningExampleWrapper = (props: TreeExampleProps) => {
     const [falloff, setFalloff] = useState(TreeKnobs.STARTING_FALLOFF);
@@ -99,7 +98,7 @@ export const TreePage = () => {
     const examples = [
         {
             key: "default",
-            name: "Default",
+            name: EXAMPLE_NAMES.default,
             readout: () =>
                 `value: ${defaultState[0] ?? "undefined"} | expanded: ${JSON.stringify(defaultExpandedState[0])} — right opens a branch, left closes it or climbs to the parent`,
             component: () => <FilesExample value={defaultState} expanded={defaultExpandedState} />,
@@ -107,7 +106,7 @@ export const TreePage = () => {
         },
         {
             key: "collapsed",
-            name: "Everything collapsed",
+            name: EXAMPLE_NAMES.collapsed,
             readout: () =>
                 `value: ${collapsedState[0] ?? "undefined"} | expanded: ${JSON.stringify(collapsedExpandedState[0])} — asterisk opens every branch at the level focus is on`,
             component: () => <FilesExample value={collapsedState} expanded={collapsedExpandedState} />,
@@ -115,7 +114,7 @@ export const TreePage = () => {
         },
         {
             key: "rightToLeft",
-            name: "In a right-to-left box",
+            name: EXAMPLE_NAMES.rightToLeft,
             readout: () =>
                 `value: ${rightToLeftState[0] ?? "undefined"} | expanded: ${JSON.stringify(rightToLeftExpandedState[0])} — the box around the tree sets dir="rtl", so left opens a branch and right closes it or climbs to the parent`,
             component: () => <RightToLeftExample value={rightToLeftState} expanded={rightToLeftExpandedState} />,
@@ -123,7 +122,7 @@ export const TreePage = () => {
         },
         {
             key: "unheld",
-            name: "Nobody holding the state",
+            name: EXAMPLE_NAMES.unheld,
             readout: () =>
                 "no signals passed — the tree keeps the selection and the open branches itself; a picked node is still marked selected and is still the tree's one tab stop",
             component: () => <FilesExample />,
@@ -131,7 +130,7 @@ export const TreePage = () => {
         },
         {
             key: "disabled",
-            name: "Disabled nodes",
+            name: EXAMPLE_NAMES.disabled,
             readout: () =>
                 `value: ${disabledState[0] ?? "undefined"} — arrows skip index.ts and Lib, while what is inside Lib stays reachable`,
             component: () => (
@@ -141,7 +140,7 @@ export const TreePage = () => {
         },
         {
             key: "reachable",
-            name: "Disabled nodes + reachable",
+            name: EXAMPLE_NAMES.reachable,
             readout: () =>
                 `value: ${reachableState[0] ?? "undefined"} — arrows stop on node_modules, hover explains why, and nothing opens it`,
             component: () => (
@@ -151,7 +150,7 @@ export const TreePage = () => {
         },
         {
             key: "outside",
-            name: "Collapsed from outside",
+            name: EXAMPLE_NAMES.outside,
             readout: () =>
                 `expanded: ${JSON.stringify(outsideExpandedState[0])} — press the button, then focus a row inside Lib before the delay elapses; focus must land on Lib rather than on the page body`,
             component: () => <OutsideExample value={outsideState} expanded={outsideExpandedState} />,
@@ -159,7 +158,7 @@ export const TreePage = () => {
         },
         {
             key: "links",
-            name: "Nodes that are links",
+            name: EXAMPLE_NAMES.links,
             readout: () =>
                 `value: ${linkState[0] ?? "undefined"} — every leaf carries an href, so each one is an anchor and the branches stay plain`,
             component: () => <LinksExample value={linkState} expanded={linkExpandedState} />,
@@ -167,7 +166,7 @@ export const TreePage = () => {
         },
         {
             key: "linkComponent",
-            name: "Links through a component",
+            name: EXAMPLE_NAMES.linkComponent,
             readout: () =>
                 `value: ${customLinkState[0] ?? "undefined"} — the same nodes rendered by a consumer's own link component`,
             component: () => <LinkComponentExample value={customLinkState} expanded={customLinkExpandedState} />,
@@ -175,7 +174,7 @@ export const TreePage = () => {
         },
         {
             key: "lazy",
-            name: "Branches that arrive later",
+            name: EXAMPLE_NAMES.lazy,
             readout: () =>
                 `expanded: ${JSON.stringify(lazyExpandedState[0])} — packages and docs say they have children before they have them`,
             component: () => <LazyExample value={lazyState} expanded={lazyExpandedState} />,
@@ -183,7 +182,7 @@ export const TreePage = () => {
         },
         {
             key: "virtualized",
-            name: "Virtualized",
+            name: EXAMPLE_NAMES.virtualized,
             readout: () =>
                 `${(STRESS_BRANCH_COUNT * (STRESS_LEAF_COUNT + 1)).toLocaleString("en-GB")} rows when everything is open — expanded: ${stressExpandedState[0].length} branches, value: ${stressState[0] ?? "undefined"}`,
             component: () => (
@@ -193,7 +192,7 @@ export const TreePage = () => {
         },
         {
             key: "leaning",
-            name: "Leaning toward the pointer",
+            name: EXAMPLE_NAMES.leaning,
             readout: () =>
                 `selected: ${leaningState[0] ?? "nothing"} — a column layout with a proximity effect: each node shifts and brightens by how near the pointer is, and the painter keeps the selected one lit, since an effect is not told which node is current`,
             component: () => <LeaningExampleWrapper value={leaningState} expanded={leaningExpandedState} />,
@@ -202,7 +201,7 @@ export const TreePage = () => {
         {
             key: "radial",
             span: 2,
-            name: "A tree drawn outward",
+            name: EXAMPLE_NAMES.radial,
             readout: () =>
                 `value: ${radialState[0] ?? "undefined"} — the layout is told which node each node hangs from, so children share the slice their parent was given, and every rank sits a ring further out whoever it hangs from`,
             component: () => <RadialExample value={radialState} expanded={radialExpandedState} />,
@@ -210,7 +209,7 @@ export const TreePage = () => {
         },
         {
             key: "recordValues",
-            name: "Record values",
+            name: EXAMPLE_NAMES.recordValues,
             readout: () =>
                 `value: ${recordState[0]?.name ?? "undefined"} | expanded: ${recordExpandedState[0].length} branch(es) — the value is the record itself, not a name`,
             component: () => <RecordValuesExample value={recordState} expanded={recordExpandedState} />,

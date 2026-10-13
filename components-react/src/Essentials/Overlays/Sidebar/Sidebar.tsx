@@ -8,6 +8,7 @@ import {
     SidebarStyles,
     SidebarUtils,
 } from "@thewaver/ss-components";
+import { SidebarConst } from "@thewaver/ss-components/internal";
 
 import { DismisserReactUtils } from "../../../Abstracts/Dismisser/DismisserReact.utils";
 import { ElementFaderReactUtils } from "../../../Abstracts/ElementFader/ElementFaderReact.utils";
@@ -15,8 +16,6 @@ import { ElevationReactUtils } from "../../../Abstracts/Elevation/ElevationReact
 import { HoverIntentReactUtils } from "../../../Abstracts/HoverIntent/HoverIntentReact.utils";
 import { useElement, useLatest } from "../../../Utils/refUtils";
 import type { SidebarProps } from "./Sidebar.types";
-
-const NO_SKIP_WINDOW_MS = 0;
 
 export const Sidebar = (props: SidebarProps) => {
     const rootRef = useRef<HTMLDivElement | null>(null);
@@ -65,7 +64,7 @@ export const Sidebar = (props: SidebarProps) => {
         delayGroup,
         panelRef: noPanelRef,
         hoverShowDelayMs: props.hoverShowDelayMs ?? SIDEBAR_DEFAULTS.hoverShowDelayMs,
-        skipDelayWindowMs: NO_SKIP_WINDOW_MS,
+        skipDelayWindowMs: SidebarConst.NO_SKIP_WINDOW_MS,
         isHeld: () => SidebarUtils.getHasOpenPopupOutside(rootRef.current ?? undefined),
         isTouchIgnored: true,
     });

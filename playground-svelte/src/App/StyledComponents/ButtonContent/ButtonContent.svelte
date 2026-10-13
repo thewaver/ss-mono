@@ -3,7 +3,7 @@
 
     import * as styles from "@thewaver/ss-playground/App/StyledComponents/ButtonContent/ButtonContent.css";
 
-    import type { ButtonContentProps } from "./ButtonContent.types";
+    import type { ButtonContentProps } from "./ButtonContentSvelte.types";
 
     let props: ButtonContentProps & { children?: Snippet } = $props();
 </script>

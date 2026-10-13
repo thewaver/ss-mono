@@ -4,7 +4,7 @@ import { access } from "@thewaver/ss-components-solid";
 import * as styles from "@thewaver/ss-playground/App/StyledComponents/SidebarContent/SidebarContent.css";
 
 import { PageLayer } from "../../PageComponents/Layer/Layer";
-import type { SidebarFadeProps, SidebarFrameProps, SidebarSurfaceProps } from "./SidebarContent.types";
+import type { SidebarFadeProps, SidebarFrameProps, SidebarSurfaceProps } from "./SidebarContentSolid.types";
 
 export const PageSidebarFrame = (props: ParentProps<SidebarFrameProps>) => (
     <div class={[styles.sidebarFrame, styles.sidebarFrameVariants[access(props.edge)]].join(" ")}>{props.children}</div>

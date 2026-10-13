@@ -1,14 +1,13 @@
 import { For, Show, createEffect, createMemo, createSignal, on, onCleanup, onMount, untrack } from "solid-js";
 
 import { CELL_ANIMATION_DEFAULTS, CellAnimationUtils, CellAnimationStyles as styles } from "@thewaver/ss-components";
+import { CellAnimationConst } from "@thewaver/ss-components/internal";
 import { type Index2d, Size2d } from "@thewaver/ss-utils";
 import { assignInlineVars } from "@vanilla-extract/dynamic";
 
 import { SignalMirrorSolidUtils } from "../../../Abstracts/SignalMirror/SignalMirrorSolid.utils";
 import { access } from "../../../Utils/propUtils";
 import type { CellAnimationProps } from "./CellAnimationSolid.types";
-
-const NO_PROGRESS = 0;
 
 export const CellAnimation = (props: CellAnimationProps) => {
     const getAnimationDurationMs = createMemo(
@@ -32,7 +31,10 @@ export const CellAnimation = (props: CellAnimationProps) => {
     const [getContainerRef, setContainerRef] = createSignal<HTMLElement>();
     const [getIsWindowVisible, setIsWindowVisible] = createSignal(true);
     const [getIsPlaying] = SignalMirrorSolidUtils.createOptional(() => props.playback, true);
-    const [getProgress, setProgress] = SignalMirrorSolidUtils.createOptional(() => props.progress, NO_PROGRESS);
+    const [getProgress, setProgress] = SignalMirrorSolidUtils.createOptional(
+        () => props.progress,
+        CellAnimationConst.NO_PROGRESS,
+    );
     const [getCellRefs, setCellRefs] = createSignal<HTMLElement[]>([], { equals: false });
     const [getCurrentIteration, setCurrentIteration] = createSignal(0);
     const [getRootSize, setRootSize] = createSignal<Size2d>({ width: 0, height: 0 }, { equals: Size2d.isSame });
@@ -80,7 +82,7 @@ export const CellAnimation = (props: CellAnimationProps) => {
             getSource,
             () => {
                 setCurrentIteration(0);
-                setProgress(NO_PROGRESS);
+                setProgress(CellAnimationConst.NO_PROGRESS);
             },
             { defer: true },
         ),

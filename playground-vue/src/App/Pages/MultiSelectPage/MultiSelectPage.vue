@@ -2,15 +2,14 @@
 import { computed, shallowRef } from "vue";
 
 import { SelectUtils } from "@thewaver/ss-components-vue";
+import { EXAMPLES_ROOT, EXAMPLE_NAMES } from "@thewaver/ss-playground/App/Pages/MultiSelectPage/MultiSelectPage.const";
 
 import type { ExampleDefs } from "../../PageComponents/Examples/Examples.types";
 import PageExamples from "../../PageComponents/Examples/PageExamples.vue";
-import { GROUPED_COUNTRIES } from "../SelectPage/SelectPage.const";
+import { GROUPED_COUNTRIES } from "../SelectPage/SelectPageVue.const";
 import MultiSelectClearableExample from "./Examples/MultiSelectClearable.vue";
 import MultiSelectCountriesExample from "./Examples/MultiSelectCountries.vue";
 import MultiSelectGroupedExample from "./Examples/MultiSelectGrouped.vue";
-
-const EXAMPLES_ROOT = "/src/App/Pages/MultiSelectPage/Examples";
 
 const countries = shallowRef<string[]>(["Denmark"]);
 const grouped = shallowRef<string[]>([]);
@@ -38,20 +37,20 @@ const filteredGroups = computed(() => {
 const examples: ExampleDefs[] = [
     {
         key: "multiSelect",
-        name: "Many at once",
+        name: EXAMPLE_NAMES.multiSelect,
         readout: () => `values: [${countries.value.join(", ")}] — picking keeps the list open`,
         path: `${EXAMPLES_ROOT}/MultiSelectCountries.vue`,
     },
     {
         key: "multiSelectGrouped",
-        name: "Grouped, with a query",
+        name: EXAMPLE_NAMES.multiSelectGrouped,
         readout: () =>
             `values: [${grouped.value.join(", ")}] | query: "${query.value}" — the page drops groups it has emptied`,
         path: `${EXAMPLES_ROOT}/MultiSelectGrouped.vue`,
     },
     {
         key: "multiSelectClearable",
-        name: "Clearable",
+        name: EXAMPLE_NAMES.multiSelectClearable,
         readout: () =>
             `values: [${clearable.value.join(", ")}] | last change: ${clearableChange.value} — the clear control empties every pick at once`,
         path: `${EXAMPLES_ROOT}/MultiSelectClearable.vue`,

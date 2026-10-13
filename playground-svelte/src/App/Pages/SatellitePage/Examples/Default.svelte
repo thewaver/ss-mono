@@ -3,7 +3,7 @@
 
     import PageSatelliteBadge from "../../../StyledComponents/SatelliteContent/PageSatelliteBadge.svelte";
     import PageSatelliteSubject from "../../../StyledComponents/SatelliteContent/PageSatelliteSubject.svelte";
-    import type { SatelliteDefaultExampleProps } from "../SatellitePage.types";
+    import type { SatelliteDefaultExampleProps } from "../SatellitePageSvelte.types";
 
     type Props = SatelliteDefaultExampleProps;
 

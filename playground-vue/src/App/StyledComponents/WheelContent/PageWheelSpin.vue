@@ -2,7 +2,7 @@
 import * as styles from "@thewaver/ss-playground/App/StyledComponents/WheelContent/WheelContent.css";
 
 import { useLayerClass } from "../Layer/Layer.context";
-import type { PageWheelSpinProps } from "./WheelContent.types";
+import type { PageWheelSpinProps } from "./WheelContentVue.types";
 
 defineProps<PageWheelSpinProps>();
 

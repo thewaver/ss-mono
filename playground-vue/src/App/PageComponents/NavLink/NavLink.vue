@@ -3,7 +3,7 @@ import * as styles from "@thewaver/ss-playground/App/StyledComponents/NavLinkCon
 
 import { useLayerClass } from "../../StyledComponents/Layer/Layer.context";
 import PageRouterLink from "../RouterLink/RouterLink.vue";
-import type { PageNavLinkProps } from "./NavLink.types";
+import type { PageNavLinkProps } from "./NavLinkVue.types";
 
 defineProps<PageNavLinkProps>();
 

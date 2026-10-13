@@ -3,7 +3,7 @@
 
     import * as styles from "@thewaver/ss-playground/App/StyledComponents/ModalPanel/ModalPanel.css";
 
-    import type { ModalHintProps } from "./ModalPanel.types";
+    import type { ModalHintProps } from "./ModalPanelSvelte.types";
 
     let props: ModalHintProps & { children?: Snippet } = $props();
 </script>

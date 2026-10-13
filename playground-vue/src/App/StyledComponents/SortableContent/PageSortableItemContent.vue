@@ -2,7 +2,7 @@
 import * as styles from "@thewaver/ss-playground/App/StyledComponents/SortableContent/SortableContent.css";
 
 import { useLayerClass } from "../Layer/Layer.context";
-import type { SortableItemContentProps } from "./SortableContent.types";
+import type { SortableItemContentProps } from "./SortableContentVue.types";
 
 defineProps<SortableItemContentProps>();
 

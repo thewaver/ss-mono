@@ -4,7 +4,21 @@ import { computed, shallowRef } from "vue";
 import { Button, SLOT_TEXT_DEFAULTS, SlotTextReels } from "@thewaver/ss-components-vue";
 import type { SlotTextLetterRoute, SlotTextMechanism } from "@thewaver/ss-components-vue";
 import { SlotTextKnobs } from "@thewaver/ss-playground/App/Knobs/SlotTexts.const";
-import { WORDS } from "@thewaver/ss-playground/App/Pages/SlotTextPage/SlotTextPage.const";
+import {
+    EXAMPLES_ROOT,
+    EXAMPLE_NAMES,
+    FIELD_WIDTH,
+    FIRST,
+    GROUP_SIZE,
+    REEL_DIGITS,
+    REEL_PAD,
+    REEL_RANGE,
+    SMALL_STEP,
+    STARTING_REEL_VALUE,
+    STEPS,
+    WORDS,
+    ZERO,
+} from "@thewaver/ss-playground/App/Pages/SlotTextPage/SlotTextPage.const";
 import * as styles from "@thewaver/ss-playground/App/Pages/SlotTextPage/SlotTextPage.css";
 
 import PageExampleKnobs from "../../PageComponents/ExampleKnobs/PageExampleKnobs.vue";
@@ -20,26 +34,7 @@ import CounterExample from "./Examples/Counter.vue";
 import ReelsExample from "./Examples/Reels.vue";
 import SplitFlapExample from "./Examples/SplitFlap.vue";
 import WordsExample from "./Examples/Words.vue";
-import type { SlotTextExampleProps } from "./SlotTextPage.types";
-
-const EXAMPLES_ROOT = "/src/App/Pages/SlotTextPage/Examples";
-
-const ZERO = 0;
-const SMALL_STEP = 1;
-const BIG_STEP = 137;
-const GROUP_SIZE = 3;
-const FIRST = 0;
-const REEL_DIGITS = 4;
-const REEL_PAD = "0";
-const REEL_RANGE = 10 ** REEL_DIGITS;
-const STARTING_REEL_VALUE = 7;
-const FIELD_WIDTH = 130;
-
-const STEPS = [
-    { id: "stepDown", flapId: "flapStepDown", label: `take ${SMALL_STEP}`, delta: -SMALL_STEP },
-    { id: "stepUp", flapId: "flapStepUp", label: `add ${SMALL_STEP}`, delta: SMALL_STEP },
-    { id: "jumpUp", flapId: "flapJumpUp", label: `add ${BIG_STEP}`, delta: BIG_STEP },
-];
+import type { SlotTextExampleProps } from "./SlotTextPageVue.types";
 
 const group = (value: number) => {
     const digits = String(Math.abs(value));
@@ -88,28 +83,28 @@ const commonProps = computed<SlotTextExampleProps>(() => ({
 const examples: ExampleDefs[] = [
     {
         key: "counter",
-        name: "Counter",
+        name: EXAMPLE_NAMES.counter,
         readout: () =>
             "every column that has to carry waits for the one to its right, a column going nine to zero keeps turning forward rather than rewinding, and crossing zero turns the whole number back the other way, and a digit or separator arriving or going grows in or shrinks away while it fades",
         path: `${EXAMPLES_ROOT}/Counter.vue`,
     },
     {
         key: "reels",
-        name: "Reels",
+        name: EXAMPLE_NAMES.reels,
         readout: () =>
             "every column spins at once and stops in the order its reel gives, taking extra whole turns on the way; with less motion asked for it only turns as far as its digit needs",
         path: `${EXAMPLES_ROOT}/Reels.vue`,
     },
     {
         key: "splitFlap",
-        name: "Departures board",
+        name: EXAMPLE_NAMES.splitFlap,
         readout: () =>
             "the counter's number on flaps: each column drops one flap after another through every digit between the old one and the new, the top half of the digit going falling to uncover the bottom half of the digit coming; a column that carries waits for the one to its right, and a column whose digit has not changed does not flip",
         path: `${EXAMPLES_ROOT}/SplitFlap.vue`,
     },
     {
         key: "words",
-        name: "Words, a letter at a time",
+        name: EXAMPLE_NAMES.words,
         readout: () =>
             `showing: ${WORDS[wordIndex.value].trim()} — every letter is a column of its own that turns through the alphabet to its next letter, with the words padded by spaces so no column comes or goes; forward always goes on round, as a departures board does, and shortest takes the nearer way`,
         path: `${EXAMPLES_ROOT}/Words.vue`,

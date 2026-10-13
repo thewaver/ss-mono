@@ -3,8 +3,8 @@ import type { TreeNode } from "@thewaver/ss-components-react";
 
 import { renderPageHighlightFloater } from "../../../StyledComponents/GlideFloater/GlideFloater";
 import { PageTreeNodeContent } from "../../../StyledComponents/TreeNodeContent/TreeNodeContent";
-import { FILES } from "../TreePage.const";
 import type { TreeExampleProps } from "../TreePage.types";
+import { FILES } from "../TreePageReact.const";
 
 type Props = Partial<TreeExampleProps> & { nodes?: TreeNode<string>[] };
 

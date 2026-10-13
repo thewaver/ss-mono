@@ -1,6 +1,7 @@
-import { Tilter } from "@thewaver/ss-components-solid";
+import { Tilter, access } from "@thewaver/ss-components-solid";
 import * as styles from "@thewaver/ss-playground/App/Pages/PointerEffects/TilterPage/TilterPage.css";
-import type { TilterExampleProps } from "@thewaver/ss-playground/App/Pages/PointerEffects/TilterPage/TilterPage.types";
+
+import type { TilterExampleProps } from "../TilterPageSolid.types";
 
 const SHEEN_ANGLE_DEGREES = 115;
 
@@ -19,8 +20,8 @@ export const CardExample = (props: Props) => {
                 <div
                     class={styles.sheen}
                     style={{
-                        "opacity": props.sheenOpacity() * getState().strength,
-                        "background-image": `linear-gradient(${SHEEN_ANGLE_DEGREES}deg, transparent ${getState().sheenPosition - props.sheenSpreadPercent()}%, rgb(255 255 255 / 0.5) ${getState().sheenPosition}%, transparent ${getState().sheenPosition + props.sheenSpreadPercent()}%)`,
+                        "opacity": access(props.sheenOpacity) * getState().strength,
+                        "background-image": `linear-gradient(${SHEEN_ANGLE_DEGREES}deg, transparent ${getState().sheenPosition - access(props.sheenSpreadPercent)}%, rgb(255 255 255 / 0.5) ${getState().sheenPosition}%, transparent ${getState().sheenPosition + access(props.sheenSpreadPercent)}%)`,
                     }}
                 />
             )}

@@ -6,6 +6,7 @@
     import type { ExampleDefs } from "../../PageComponents/Examples/Examples.types";
     import PageExamples from "../../PageComponents/Examples/PageExamples.svelte";
     import DefaultExample from "./Examples/Default.svelte";
+    import { EXAMPLE_NAMES, EXAMPLES_ROOT } from "@thewaver/ss-playground/App/Pages/SidebarPage/SidebarPage.const";
 
     type SidebarVariant = {
         key: string;
@@ -16,11 +17,9 @@
         note: string;
     };
 
-    const EXAMPLES_ROOT = "/src/App/Pages/SidebarPage/Examples";
-
     const PUSH: SidebarVariant = {
         key: "push",
-        name: "Pushing its neighbor",
+        name: EXAMPLE_NAMES.push,
         edge: "left",
         layout: "push",
         isExpandedOnHover: false,
@@ -28,7 +27,7 @@
     };
     const OVERLAY: SidebarVariant = {
         key: "overlay",
-        name: "Over its neighbor, from the right",
+        name: EXAMPLE_NAMES.overlay,
         edge: "right",
         layout: "overlay",
         isExpandedOnHover: false,
@@ -36,7 +35,7 @@
     };
     const HOVER: SidebarVariant = {
         key: "hover",
-        name: "Expanding on hover",
+        name: EXAMPLE_NAMES.hover,
         edge: "left",
         layout: "overlay",
         isExpandedOnHover: true,

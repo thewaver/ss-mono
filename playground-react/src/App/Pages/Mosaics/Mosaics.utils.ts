@@ -3,7 +3,7 @@ import { useState } from "react";
 import { MOSAIC_DEFAULTS, type MosaicSizeAnchor } from "@thewaver/ss-components-react";
 import { MosaicKnobs } from "@thewaver/ss-playground/App/Knobs/Mosaics.const";
 
-import type { MosaicsControls } from "./Mosaics.types";
+import type { MosaicsControls } from "./MosaicsReact.types";
 
 export const useMosaicsControls = (): MosaicsControls => {
     const itemCountState = useState(MosaicKnobs.STARTING_ITEM_COUNT);

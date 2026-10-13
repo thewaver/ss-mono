@@ -1,13 +1,12 @@
 <script lang="ts">
     import { SLIDE_BUTTON_DEFAULTS, type SlideButtonRenderProps } from "@thewaver/ss-components";
+    import { SlideButtonConst } from "@thewaver/ss-components/internal";
 
     import InteractionWrapper from "../../../Primitives/InteractionWrapper/InteractionWrapper.svelte";
     import type { SlideButtonProps } from "./SlideButton.types.js";
     import SlideButtonElement from "./SlideButtonElement.svelte";
 
-    const RATIO_MIN = 0;
-
-    let { progress = $bindable(RATIO_MIN), ref = $bindable(), ...props }: SlideButtonProps = $props();
+    let { progress = $bindable(SlideButtonConst.RATIO_MIN), ref = $bindable(), ...props }: SlideButtonProps = $props();
 
     let isDragging = $state(false);
     let isHolding = $state(false);

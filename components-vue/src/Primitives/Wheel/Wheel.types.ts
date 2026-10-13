@@ -1,18 +1,12 @@
 import type { VNodeChild } from "vue";
 
 import type {
-    PlacementLayoutFn,
-    PointSource,
-    ProximityEffectFn,
+    BaseDrumWheelProps,
+    BaseOverheadWheelProps,
+    BaseWheelProps,
     RotatorPhase,
-    RotatorSpinDefs,
-    WheelAxis,
-    WheelLabels,
-    WheelState,
-    WheelVariant,
     WheelWedgeState,
 } from "@thewaver/ss-components";
-import type { Size2d } from "@thewaver/ss-utils";
 
 export type WheelController = {
     /** Which wedge is at the marker right now, which moves while the wheel turns. */
@@ -29,11 +23,7 @@ export type WheelController = {
     spin: () => boolean;
 };
 
-export type WheelContentProps<T> = {
-    /** The wedges, in the order they sit round the wheel. */
-    "wedges": T[];
-    /** How long the wheel waits between steps while turning on its own. Leave it out and it stands still until spun. */
-    "idleDelayMs"?: number;
+export type WheelContentProps = {
     /**
      * Which wedge the wheel is heading for. Changing it turns the wheel to that wedge, unless a spin is already
      * under way, in which case the change is ignored. It is not the only thing that moves the wheel: a spin
@@ -51,14 +41,6 @@ export type WheelContentProps<T> = {
     "autoSpin"?: boolean;
     /** Receives the wheel starting or stopping its own turning, which is what `v-model:autoSpin` binds. */
     "onUpdate:autoSpin"?: (isAutoSpinning: boolean) => void;
-    /** Chooses which wedge a spin should land on. It may answer later, so the result can come from a server. */
-    "computeSpinTarget": () => number | Promise<number>;
-    /** How a spin to a given wedge should run — how many turns, and on what curve. */
-    "computeSpinDefs"?: (index: number, wedgeCount: number) => RotatorSpinDefs;
-    /** Runs when a different wedge reaches the marker, including while the wheel is still turning. */
-    "onSelectedWedgeChange"?: (index: number) => void;
-    /** Runs once a spin has finished and settled. */
-    "onSpinEnd"?: (index: number) => void;
     /**
      * Hands the consumer a controller once the wheel is up, for spinning it from outside. Its getters read the
      * wheel's reactive state, so a template or a `computed` calling one follows it.
@@ -76,57 +58,10 @@ export type WheelBackSlot<T> = {
     renderWedgeBack: (props: { wedge: T; state: WheelWedgeState }) => VNodeChild;
 };
 
-export type WheelProps<T> = WheelState &
-    WheelLabels &
-    WheelContentProps<T> & {
-        /** Which of the wheel's looks this is. */
-        variant: WheelVariant;
-        /** Which way round the wheel turns. */
-        axis?: WheelAxis;
-        /** How large one wedge is. */
-        wedgeSize?: Size2d;
-        /** Where the marker sits, in degrees, which is the point a spin lands a wedge on. */
-        markerDegrees?: number;
-        /**
-         * The point to follow instead of the pointer.
-         *
-         * A fraction across a box — the wheel's own, or the element named in the source — so a light moving across a
-         * banner can be handed to every card under it and each answers to the same spot. While the source has no point
-         * every wedge rests, as it does when the pointer leaves the window. Left out, the pointer is followed.
-         */
-        pointSource?: PointSource;
-        /** Arranges the wedges, for a wheel that is something other than an even ring. */
-        computeLayout?: PlacementLayoutFn;
-        /** What the wedges do as the pointer nears them. */
-        computeEffect?: ProximityEffectFn;
-    };
+export type WheelProps<T> = BaseWheelProps<T> & WheelContentProps;
 
-export type OverheadWheelProps<T> = WheelState &
-    WheelLabels &
-    WheelContentProps<T> & {
-        /** Where the marker sits, in degrees, which is the point a spin lands a wedge on. */
-        markerDegrees?: number;
-        /**
-         * The point to follow instead of the pointer.
-         *
-         * A fraction across a box — the wheel's own, or the element named in the source — so a light moving across a
-         * banner can be handed to every card under it and each answers to the same spot. While the source has no point
-         * every wedge rests, as it does when the pointer leaves the window. Left out, the pointer is followed.
-         */
-        pointSource?: PointSource;
-        /** Arranges the wedges, for a wheel that is something other than an even ring. */
-        computeLayout?: PlacementLayoutFn;
-        /** What the wedges do as the pointer nears them. */
-        computeEffect?: ProximityEffectFn;
-    };
+export type OverheadWheelProps<T> = BaseOverheadWheelProps<T> & WheelContentProps;
 
-export type DrumWheelProps<T> = WheelState &
-    WheelLabels &
-    WheelContentProps<T> & {
-        /** Which way round the wheel turns. */
-        axis?: WheelAxis;
-        /** How large one wedge is. */
-        wedgeSize: Size2d;
-    };
+export type DrumWheelProps<T> = BaseDrumWheelProps<T> & WheelContentProps;
 
 export type DrumWheelSlots<T> = WheelSlots<T> & WheelBackSlot<T>;

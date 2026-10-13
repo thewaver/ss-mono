@@ -7,6 +7,7 @@ import type {
     ScanlineHorizontalBrightnessOpts,
 } from "@thewaver/ss-components-vue";
 import { ScanlineAnimationKnobs } from "@thewaver/ss-playground/App/Knobs/ScanlineAnimations.const";
+import { IMAGE_CONTAINER_SIZE } from "@thewaver/ss-playground/App/Pages/ScanLineAnimationPage/ScanLineAnimationPage.const";
 
 import PageExampleKnobs from "../../PageComponents/ExampleKnobs/PageExampleKnobs.vue";
 import PageMeasureBox from "../../PageComponents/MeasureBox/MeasureBox.vue";
@@ -14,8 +15,6 @@ import DirInput from "./DirInput.vue";
 import BrightnessExample from "./Examples/Brightness.vue";
 import type { ScanlineAnimationExampleProps } from "./ScanlineAnimationPage.types";
 import SmoothnessInput from "./SmoothnessInput.vue";
-
-const IMAGE_CONTAINER_SIZE = 360;
 
 const props = defineProps<ScanlineAnimationExampleProps>();
 

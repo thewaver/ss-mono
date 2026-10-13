@@ -3,7 +3,16 @@ import { shallowRef } from "vue";
 
 import type { DateValue, DateValueCalendarId } from "@thewaver/ss-components-vue";
 import { DATE_INPUT_DEFAULTS, DateValueUtils } from "@thewaver/ss-components-vue";
-import { MAX_DATE, MIN_DATE } from "@thewaver/ss-playground/App/Pages/DatePickerPage/DatePickerPage.const";
+import {
+    CALENDAR_FIELD_WIDTH,
+    CALENDAR_IDS,
+    EXAMPLES_ROOT,
+    EXAMPLE_NAMES,
+    MAX_DATE,
+    MIN_DATE,
+    WEEKEND_OFFSET,
+    WEEK_STARTS_ON_MONDAY,
+} from "@thewaver/ss-playground/App/Pages/DatePickerPage/DatePickerPage.const";
 
 import type { ExampleDefs } from "../../PageComponents/Examples/Examples.types";
 import PageExamples from "../../PageComponents/Examples/PageExamples.vue";
@@ -11,12 +20,6 @@ import PageSelectField from "../../PageComponents/Field/PageSelectField.vue";
 import PageProp from "../../PageComponents/Prop/Prop.vue";
 import PagePropsPanel from "../../PageComponents/PropsPanel/PagePropsPanel.vue";
 import PickedExample from "./Examples/Picked.vue";
-
-const CALENDAR_FIELD_WIDTH = 180;
-const CALENDAR_IDS = DateValueUtils.getCalendarIds();
-const WEEK_STARTS_ON_MONDAY = 1;
-const WEEKEND_OFFSET = 5;
-const EXAMPLES_ROOT = "/src/App/Pages/DatePickerPage/Examples";
 
 const describe = (value: DateValue | undefined) => (value ? DateValueUtils.toIso(value) : "none");
 
@@ -32,27 +35,27 @@ const month = shallowRef<DateValue | undefined>();
 const examples: ExampleDefs[] = [
     {
         key: "picked",
-        name: "With a calendar",
+        name: EXAMPLE_NAMES.picked,
         readout: () => `value: ${describe(picked.value)} — typing and picking write the same signal`,
         path: `${EXAMPLES_ROOT}/Picked.vue`,
     },
     {
         key: "bounded",
-        name: "Bounded",
+        name: EXAMPLE_NAMES.bounded,
         readout: () =>
             `value: ${describe(bounded.value)} — ${DateValueUtils.toIso(MIN_DATE)} to ${DateValueUtils.toIso(MAX_DATE)}, typed or picked`,
         path: `${EXAMPLES_ROOT}/Picked.vue`,
     },
     {
         key: "weekdays",
-        name: "Weekdays only",
+        name: EXAMPLE_NAMES.weekdays,
         readout: () =>
             `value: ${describe(weekday.value)} — the calendar refuses a weekend, and typing one reports it as an error`,
         path: `${EXAMPLES_ROOT}/Picked.vue`,
     },
     {
         key: "monthPrecision",
-        name: "Picking a month",
+        name: EXAMPLE_NAMES.monthPrecision,
         readout: () =>
             `value: ${describe(month.value)} — precision="month" is handed to the calendar, so a pick there sets the first of the month; the field still takes a whole date`,
         path: `${EXAMPLES_ROOT}/Picked.vue`,

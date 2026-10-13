@@ -3,7 +3,7 @@
 
     import PageCheckboxContent from "../../../StyledComponents/CheckboxContent/CheckboxContent.svelte";
     import PageLabelCaption from "../../../StyledComponents/LabelCaption/LabelCaption.svelte";
-    import type { LabelExampleProps } from "../LabelPage.types";
+    import type { LabelExampleProps } from "../LabelPageSvelte.types";
 
     type Props = LabelExampleProps;
 

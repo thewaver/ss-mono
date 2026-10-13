@@ -2,7 +2,7 @@
 import * as styles from "@thewaver/ss-playground/App/StyledComponents/SidebarContent/SidebarContent.css";
 
 import PageLayer from "../../PageComponents/Layer/Layer.vue";
-import type { SidebarSurfaceProps } from "./SidebarContent.types";
+import type { SidebarSurfaceProps } from "./SidebarContentVue.types";
 
 defineProps<SidebarSurfaceProps>();
 </script>

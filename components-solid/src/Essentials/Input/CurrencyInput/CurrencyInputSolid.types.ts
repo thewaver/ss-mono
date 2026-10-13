@@ -1,5 +1,7 @@
+import type { BaseCurrencyInputValues } from "@thewaver/ss-components";
+
 import type { TextFieldProps } from "../../../Primitives/TextField/TextFieldSolid.types";
-import type { AccessorProps, MaybeAccessor, SignalSource } from "../../../Utils/typeUtils";
+import type { AccessorValues, SignalSource } from "../../../Utils/typeUtils";
 
 export type CurrencyInputProps = Omit<
     TextFieldProps,
@@ -18,18 +20,7 @@ export type CurrencyInputProps = Omit<
     | "onInput"
     | "onBlur"
 > &
-    AccessorProps<{
-        /** How many digits are kept after the decimal separator. */
-        decimals?: number;
-        /**
-         * Which country's conventions the amount is written in, which decides the separators and where the symbol sits.
-         */
-        locale?: string;
-        /** Whether negative amounts can be entered. */
-        hasSign?: boolean;
+    AccessorValues<BaseCurrencyInputValues> & {
         /** The amount. It is the only thing that changes it. */
         value: SignalSource<number | undefined>;
-    }> & {
-        /** How the digits before the decimal point are grouped. Leave it out for the locale's own grouping. */
-        groupSizes?: MaybeAccessor<number[] | undefined>;
     };

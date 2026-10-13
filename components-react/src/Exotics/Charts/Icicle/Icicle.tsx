@@ -9,16 +9,12 @@ import {
     NavigatorUtils,
     TreemapUtils,
 } from "@thewaver/ss-components";
+import { IcicleConst } from "@thewaver/ss-components/internal";
 
 import { ElementObserverReactUtils } from "../../../Abstracts/ElementObserver/ElementObserverReact.utils";
 import { SignalMirrorReactUtils } from "../../../Abstracts/SignalMirror/SignalMirrorReact.utils";
 import { useStore } from "../../../Utils/storeUtils";
 import type { IcicleProps } from "./Icicle.types";
-
-const NOTHING = 0;
-const SETTLED = 1;
-const NEXT = 1;
-const EMPTY_SPAN: IcicleSpan = { start: 0, end: 0, column: 0 };
 
 type IcicleZoomState<T> = {
     focus: IcicleNode<T>;
@@ -37,7 +33,7 @@ export const Icicle = <T,>(props: IcicleProps<T>) => {
 
     const progress = useStore(zoomClock);
     const size = ElementObserverReactUtils.useBorderBoxSize(rootRef);
-    const columnCount = Math.max(SETTLED, props.columnCount ?? ICICLE_DEFAULTS.columnCount);
+    const columnCount = Math.max(IcicleConst.SETTLED, props.columnCount ?? ICICLE_DEFAULTS.columnCount);
     const zoomDurationMs = props.zoomDurationMs ?? ICICLE_DEFAULTS.zoomDurationMs;
 
     const weights = useMemo(() => TreemapUtils.computeWeights(props.root), [props.root]);
@@ -54,13 +50,13 @@ export const Icicle = <T,>(props: IcicleProps<T>) => {
         focus,
         cameFrom: undefined,
         fromViews: new Map(),
-        generation: NOTHING,
+        generation: IcicleConst.NOTHING,
     }));
 
     const computeShownView = (node: IcicleNode<T>, center: IcicleNode<T>) =>
         IcicleUtils.computeShownSpan(
-            spans.get(node) ?? EMPTY_SPAN,
-            spans.get(center) ?? EMPTY_SPAN,
+            spans.get(node) ?? IcicleConst.EMPTY_SPAN,
+            spans.get(center) ?? IcicleConst.EMPTY_SPAN,
             zoom.fromViews.get(node),
             progress,
         );
@@ -70,25 +66,30 @@ export const Icicle = <T,>(props: IcicleProps<T>) => {
             focus,
             cameFrom: zoom.focus,
             fromViews: new Map(allNodes.map((node) => [node, computeShownView(node, zoom.focus)])),
-            generation: zoom.generation + NEXT,
+            generation: zoom.generation + IcicleConst.NEXT,
         });
     }
 
-    const focusSpan = spans.get(focus) ?? EMPTY_SPAN;
+    const focusSpan = spans.get(focus) ?? IcicleConst.EMPTY_SPAN;
 
     const targetViews = useMemo(
         () =>
-            new Map(allNodes.map((node) => [node, IcicleUtils.computeView(spans.get(node) ?? EMPTY_SPAN, focusSpan)])),
+            new Map(
+                allNodes.map((node) => [
+                    node,
+                    IcicleUtils.computeView(spans.get(node) ?? IcicleConst.EMPTY_SPAN, focusSpan),
+                ]),
+            ),
         [allNodes, spans, focusSpan],
     );
 
-    const isZooming = progress < SETTLED;
+    const isZooming = progress < IcicleConst.SETTLED;
 
     const getIsVisibleAtTarget = (node: IcicleNode<T>) =>
-        IcicleUtils.getIsVisible(targetViews.get(node) ?? EMPTY_SPAN, columnCount);
+        IcicleUtils.getIsVisible(targetViews.get(node) ?? IcicleConst.EMPTY_SPAN, columnCount);
 
     const getIsVisibleAtStart = (node: IcicleNode<T>) =>
-        IcicleUtils.getIsVisible(zoom.fromViews.get(node) ?? EMPTY_SPAN, columnCount);
+        IcicleUtils.getIsVisible(zoom.fromViews.get(node) ?? IcicleConst.EMPTY_SPAN, columnCount);
 
     const renderedNodes = allNodes.filter(
         (node) => getIsVisibleAtTarget(node) || (isZooming && getIsVisibleAtStart(node)),
@@ -120,7 +121,7 @@ export const Icicle = <T,>(props: IcicleProps<T>) => {
     useEffect(() => zoomClock.stop, [zoomClock]);
 
     useLayoutEffect(() => {
-        if (zoom.generation === NOTHING) return;
+        if (zoom.generation === IcicleConst.NOTHING) return;
 
         zoomClock.start(zoomDurationMs);
     }, [zoom.generation]);
@@ -161,7 +162,7 @@ export const Icicle = <T,>(props: IcicleProps<T>) => {
         const next = IcicleUtils.computeStep(
             step,
             rovingNode,
-            stops.map((node) => ({ node, span: targetViews.get(node) ?? EMPTY_SPAN })),
+            stops.map((node) => ({ node, span: targetViews.get(node) ?? IcicleConst.EMPTY_SPAN })),
             (node) => parents.get(node),
         );
 
@@ -204,7 +205,7 @@ export const Icicle = <T,>(props: IcicleProps<T>) => {
                             >
                                 {props.renderCell(node, {
                                     rect,
-                                    weight: weights.get(node) ?? NOTHING,
+                                    weight: weights.get(node) ?? IcicleConst.NOTHING,
                                     isBranch: TreemapUtils.getIsBranch(node, weights),
                                     isFocus: node === focus,
                                     isInView,

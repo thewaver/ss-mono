@@ -8,14 +8,14 @@
     } from "@thewaver/ss-components-svelte";
     import * as styles from "@thewaver/ss-playground/App/Pages/PaintedTextPage/PaintedTextPage.css";
 
-    import { PaintedTextKnobs } from "../../Knobs/PaintedTexts.const";
+    import { PaintedTextKnobs } from "@thewaver/ss-playground/App/Knobs/PaintedTexts.const";
     import type { ExampleDefs } from "../../PageComponents/Examples/Examples.types";
     import PageExamples from "../../PageComponents/Examples/PageExamples.svelte";
     import PageColorField from "../../PageComponents/Field/PageColorField.svelte";
     import PageNumberField from "../../PageComponents/Field/PageNumberField.svelte";
     import PageSelectField from "../../PageComponents/Field/PageSelectField.svelte";
     import PagePaintPicker from "../../PageComponents/PaintPicker/PagePaintPicker.svelte";
-    import { getIsUsingKind } from "../../PageComponents/PaintPicker/PaintPicker.const";
+    import { getIsUsingKind } from "../../PageComponents/PaintPicker/PaintPickerSvelte.const";
     import { createPaintSlot } from "../../PageComponents/PaintPicker/PaintPicker.utils.svelte";
     import PageProp from "../../PageComponents/Prop/Prop.svelte";
     import PagePropsDivider from "../../PageComponents/PropsPanel/PagePropsDivider.svelte";
@@ -25,14 +25,15 @@
     import CustomInputExampleWrapper from "./CustomInputExampleWrapper.svelte";
     import ScrambledExample from "./Examples/Scrambled.svelte";
     import HeadingExampleWrapper from "./HeadingExampleWrapper.svelte";
-    import type { PaintedTextExampleWrapperProps } from "./PaintedTextPage.types";
+    import type { PaintedTextExampleWrapperProps } from "./PaintedTextPageSvelte.types";
     import ParagraphExampleWrapper from "./ParagraphExampleWrapper.svelte";
     import TypedExampleWrapper from "./TypedExampleWrapper.svelte";
     import WaveExampleWrapper from "./WaveExampleWrapper.svelte";
-
-    const EXAMPLES_ROOT = "/src/App/Pages/PaintedTextPage/Examples";
-
-    const PERCENT = 100;
+    import {
+    EXAMPLE_NAMES,
+    EXAMPLES_ROOT,
+    PERCENT,
+} from "@thewaver/ss-playground/App/Pages/PaintedTextPage/PaintedTextPage.const";
 
     const fill = createPaintSlot(PaintedTextKnobs.STARTING_FILL_PAINT_KIND, PaintedTextKnobs.STARTING_KEYS);
     const stroke = createPaintSlot(PaintedTextKnobs.STARTING_STROKE_PAINT_KIND, PaintedTextKnobs.STARTING_KEYS);
@@ -76,13 +77,13 @@
     const examples: ExampleDefs[] = [
         {
             key: "heading",
-            name: "Heading",
+            name: EXAMPLE_NAMES.heading,
             component: headingExample,
             path: `${EXAMPLES_ROOT}/Heading.svelte`,
         },
         {
             key: "paragraph",
-            name: "Paragraph",
+            name: EXAMPLE_NAMES.paragraph,
             readout: () =>
                 "the text wraps where Typewriter would wrap it, the paint is sized to the whole block so one gradient runs across every line, and the image, the icon and the link are carried into the drawing",
             component: paragraphExample,
@@ -90,7 +91,7 @@
         },
         {
             key: "customInput",
-            name: "Custom Input",
+            name: EXAMPLE_NAMES.customInput,
             readout: () =>
                 "the text box drives the painted text directly: every change to what it holds is laid out and painted again, line breaks included",
             component: customInputExample,
@@ -98,7 +99,7 @@
         },
         {
             key: "typed",
-            name: "Typed",
+            name: EXAMPLE_NAMES.typed,
             readout: () =>
                 "a Typewriter around two painted texts: it decides when each letter arrives and how, the painted texts decide where the letters sit and what paints them, and the two share one run in reading order",
             component: typedExample,
@@ -106,7 +107,7 @@
         },
         {
             key: "scrambled",
-            name: "Scrambled",
+            name: EXAMPLE_NAMES.scrambled,
             readout: () =>
                 "a ScrambleText around a painted text: it decides which glyph each letter shows while it churns, and the painted text draws that glyph, painted, in the letter's place",
             component: scrambledExample,
@@ -114,7 +115,7 @@
         },
         {
             key: "circle",
-            name: "Round a circle",
+            name: EXAMPLE_NAMES.circle,
             readout: () =>
                 `${getPercent(circleProgress)} round the circle, ${circlePlaying ? "turning" : "stopped"} — the browser sets every letter along the path, the paint runs across the ring as one, and what slides past the end comes round from the start`,
             component: circleExample,
@@ -122,7 +123,7 @@
         },
         {
             key: "wave",
-            name: "Along a wave",
+            name: EXAMPLE_NAMES.wave,
             readout: () =>
                 `${getPercent(waveProgress)} along the wave, ${wavePlaying ? "sliding" : "stopped"} — any path will do, and on an open one the text leaves at the far end as it comes back in at the near one`,
             component: waveExample,

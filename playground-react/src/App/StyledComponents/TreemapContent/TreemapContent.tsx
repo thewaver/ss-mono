@@ -1,9 +1,8 @@
+import { WORD_START } from "@thewaver/ss-playground/App/StyledComponents/TreemapContent/TreemapContent.const";
 import * as styles from "@thewaver/ss-playground/App/StyledComponents/TreemapContent/TreemapContent.css";
 
 import { useLayerClass } from "../Layer/Layer.context";
-import type { PageTreemapBarProps, PageTreemapTileProps } from "./TreemapContent.types";
-
-const WORD_START = /(?=[A-Z][^A-Z])/g;
+import type { PageTreemapBarProps, PageTreemapTileProps } from "./TreemapContentReact.types";
 
 export const PageTreemapTile = (props: PageTreemapTileProps) => {
     const layerClass = useLayerClass();

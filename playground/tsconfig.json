@@ -4,6 +4,7 @@
         "allowImportingTsExtensions": true,
         "types": ["node"],
         "paths": {
+            "@thewaver/ss-components/internal": ["../components/src/internal.ts"],
             "@thewaver/ss-components": ["../components/src/index.ts"],
             "@thewaver/ss-utils": ["../utils/src/index.ts"]
         }

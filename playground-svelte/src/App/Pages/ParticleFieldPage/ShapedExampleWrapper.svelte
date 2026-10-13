@@ -9,8 +9,7 @@
     import PageProp from "../../PageComponents/Prop/Prop.svelte";
     import ShapedExample from "./Examples/Shaped.svelte";
     import type { ParticleFieldExampleProps } from "./ParticleFieldPage.types";
-
-    const SHAPED_BOX_SIZE = 320;
+    import { SHAPED_BOX_SIZE } from "@thewaver/ss-playground/App/Pages/ParticleFieldPage/ParticleFieldPage.const";
 
     let { playback = $bindable(), ...props }: ParticleFieldExampleProps = $props();
 

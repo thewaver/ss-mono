@@ -2,7 +2,7 @@ import { ElementMosaic, access } from "@thewaver/ss-components-solid";
 import { PICKED_GROWTH } from "@thewaver/ss-playground/App/Pages/Mosaics/Mosaics.const";
 
 import { PageMosaicTile } from "../../../../StyledComponents/MosaicContent/MosaicContent";
-import type { WalkedExampleProps } from "../ElementMosaicPage.types";
+import type { WalkedExampleProps } from "../ElementMosaicPageSolid.types";
 
 type Props = WalkedExampleProps;
 

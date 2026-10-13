@@ -6,6 +6,7 @@ import {
     CardStackUtils,
     CardStackStyles as styles,
 } from "@thewaver/ss-components";
+import { CardStackConst } from "@thewaver/ss-components/internal";
 import type { SwipeDirection } from "@thewaver/ss-utils";
 
 import { InteractionTrackerSolidUtils } from "../../Abstracts/InteractionTracker/InteractionTrackerSolid.utils";
@@ -14,12 +15,11 @@ import { access } from "../../Utils/propUtils";
 import { accessStore } from "../../Utils/storeUtils";
 import type { CardStackControls, CardStackProps } from "./CardStackSolid.types";
 
-const MIN_MOUNTED_COUNT = 1;
-const FIRST_INDEX = 0;
-const TOP_DEPTH = 0;
-
 export const CardStack = <T,>(props: CardStackProps<T>) => {
-    const [getTopIndex, setTopIndex] = SignalMirrorSolidUtils.createOptional(() => props.topIndex, FIRST_INDEX);
+    const [getTopIndex, setTopIndex] = SignalMirrorSolidUtils.createOptional(
+        () => props.topIndex,
+        CardStackConst.FIRST_INDEX,
+    );
 
     const [getPileRef, setPileRef] = createSignal<HTMLElement>();
 
@@ -32,7 +32,7 @@ export const CardStack = <T,>(props: CardStackProps<T>) => {
     );
 
     const getMountedCount = createMemo(() =>
-        Math.max(access(props.mountedCount) ?? CARD_STACK_DEFAULTS.mountedCount, MIN_MOUNTED_COUNT),
+        Math.max(access(props.mountedCount) ?? CARD_STACK_DEFAULTS.mountedCount, CardStackConst.MIN_MOUNTED_COUNT),
     );
 
     const getCardGap = createMemo(() => access(props.cardGap) ?? CARD_STACK_DEFAULTS.cardGap);
@@ -143,7 +143,7 @@ export const CardStack = <T,>(props: CardStackProps<T>) => {
         >
             <For each={getMountedIndices()}>
                 {(index, getDepth) => {
-                    const getIsTop = createMemo(() => getDepth() === TOP_DEPTH);
+                    const getIsTop = createMemo(() => getDepth() === CardStackConst.TOP_DEPTH);
 
                     const getState = createMemo((): CardStackCardState<T> => ({
                         card: getCards()[index],

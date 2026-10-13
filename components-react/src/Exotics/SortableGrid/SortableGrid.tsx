@@ -20,12 +20,12 @@ import {
     type SortableGridItemFlags,
     type SortableGridPlace,
     type SortableGridShape,
-    type SortableGridSpot,
     SortableGridStyles,
     SortableGridUtils,
     SortableUtils,
     ViewportUtils,
 } from "@thewaver/ss-components";
+import { SortableGridConst } from "@thewaver/ss-components/internal";
 import { type Point2d, StoreUtils } from "@thewaver/ss-utils";
 
 import { CarrierReactUtils } from "../../Abstracts/Carrier/CarrierReact.utils";
@@ -41,8 +41,6 @@ import type {
     SortableGridItemSlotProps,
     SortableGridProps,
 } from "./SortableGrid.types";
-
-const NO_BLOCKED_SPOTS: SortableGridSpot[] = [];
 
 const SortableGridItemSlot = (props: SortableGridItemSlotProps) => {
     const isDisabled = props.flags.isDisabled ?? false;
@@ -125,7 +123,9 @@ export const SortableGrid = <T,>(props: SortableGridProps<T>) => {
     const cells = SortableGridUtils.getSpots(columns, rows);
     const computeIsSpotBlocked = props.computeIsSpotBlocked;
     const blockedSpots =
-        computeIsSpotBlocked === undefined ? NO_BLOCKED_SPOTS : cells.filter((spot) => computeIsSpotBlocked(spot));
+        computeIsSpotBlocked === undefined
+            ? SortableGridConst.NO_BLOCKED_SPOTS
+            : cells.filter((spot) => computeIsSpotBlocked(spot));
 
     const getSpan = (count: number) => SortableGridUtils.getSpan(count, cellSize, gap);
     const getOffset = (cell: number) => SortableGridUtils.getOffset(cell, cellSize, gap);

@@ -1,7 +1,7 @@
 import * as styles from "@thewaver/ss-playground/App/StyledComponents/DatePickerTrigger/DatePickerTrigger.css";
 
 import { useLayerClass } from "../Layer/Layer.context";
-import type { DatePickerTriggerProps } from "./DatePickerTrigger.types";
+import type { DatePickerTriggerProps } from "./DatePickerTriggerReact.types";
 
 export const PageDatePickerTrigger = (props: DatePickerTriggerProps) => {
     const layerClass = useLayerClass();

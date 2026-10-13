@@ -10,6 +10,7 @@ import {
     SlotTextUtils,
     SpineUtils,
 } from "@thewaver/ss-components";
+import { SlotTextConst } from "@thewaver/ss-components/internal";
 import type { Size2d } from "@thewaver/ss-utils";
 
 import { MediaQueryMonitorReactUtils } from "../../../Abstracts/MediaQueryMonitor/MediaQueryMonitorReact.utils";
@@ -18,11 +19,6 @@ import { Spine } from "../../../Primitives/Spine/Spine";
 import { useLatest } from "../../../Utils/refUtils";
 import { useStore } from "../../../Utils/storeUtils";
 import type { SlotTextProps } from "./SlotText.types";
-
-const RESTING_ANGLE = 0;
-const NO_DELAY = 0;
-const FIRST = 0;
-const HIDDEN_FACE = { ariaLabel: "", isHidden: true };
 
 type SlotProps = {
     phase: SlotTextSlotPhase;
@@ -114,7 +110,7 @@ const SlotTextFlapColumn = (props: FlapColumnProps) => {
             faceSize={props.characterSize}
             faceRoleDescription=""
             computeFaceAngle={SpineUtils.leaves}
-            computeFaceDefs={() => HIDDEN_FACE}
+            computeFaceDefs={() => SlotTextConst.HIDDEN_FACE}
             renderFace={(leaf, _index, side) => (
                 <div
                     className={[
@@ -210,8 +206,8 @@ export const SlotText = (props: SlotTextProps) => {
             return {
                 ...current,
                 turningSlots,
-                angles: current.angles.slice(FIRST, index),
-                columnWheels: current.columnWheels.slice(FIRST, index),
+                angles: current.angles.slice(SlotTextConst.FIRST, index),
+                columnWheels: current.columnWheels.slice(SlotTextConst.FIRST, index),
             };
         });
 
@@ -268,10 +264,10 @@ export const SlotText = (props: SlotTextProps) => {
                         {mechanism === "split_flap" ? (
                             <SlotTextFlapColumn
                                 target={SlotTextUtils.getFlapPosition(
-                                    board.angles[wheelIndex] ?? RESTING_ANGLE,
+                                    board.angles[wheelIndex] ?? SlotTextConst.RESTING_ANGLE,
                                     faces.length,
                                 )}
-                                delayMs={board.delays[wheelIndex] ?? NO_DELAY}
+                                delayMs={board.delays[wheelIndex] ?? SlotTextConst.NO_DELAY}
                                 durationMs={board.durations[wheelIndex] ?? turnDurationMs}
                                 faces={faces}
                                 characterSize={characterSize}
@@ -284,11 +280,11 @@ export const SlotText = (props: SlotTextProps) => {
                                     axis="column"
                                     hasBacks={false}
                                     faceSize={characterSize}
-                                    angle={board.angles[wheelIndex] ?? RESTING_ANGLE}
+                                    angle={board.angles[wheelIndex] ?? SlotTextConst.RESTING_ANGLE}
                                     transitionDurationMs={board.durations[wheelIndex] ?? turnDurationMs}
-                                    transitionDelayMs={board.delays[wheelIndex] ?? NO_DELAY}
+                                    transitionDelayMs={board.delays[wheelIndex] ?? SlotTextConst.NO_DELAY}
                                     faceRoleDescription=""
-                                    computeFaceDefs={() => HIDDEN_FACE}
+                                    computeFaceDefs={() => SlotTextConst.HIDDEN_FACE}
                                     renderFace={(face) => (
                                         <div className={SlotTextStyles.slotTextFace}>
                                             {renderTurningFace(face, flags)}

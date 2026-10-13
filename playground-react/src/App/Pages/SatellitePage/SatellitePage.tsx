@@ -2,8 +2,13 @@ import { useMemo, useState } from "react";
 
 import { ANCHOR_H_PLACEMENTS, ANCHOR_V_PLACEMENTS, SATELLITE_DEFAULTS } from "@thewaver/ss-components-react";
 import type { AnchorHPlacement, AnchorVPlacement } from "@thewaver/ss-components-react";
+import { SatelliteKnobs } from "@thewaver/ss-playground/App/Knobs/Satellites.const";
+import {
+    EXAMPLES_ROOT,
+    EXAMPLE_NAMES,
+    FIELD_WIDTH,
+} from "@thewaver/ss-playground/App/Pages/SatellitePage/SatellitePage.const";
 
-import { SatelliteKnobs } from "../../Knobs/Satellites.const";
 import { PageExampleKnobs } from "../../PageComponents/ExampleKnobs/ExampleKnobs";
 import { PageExamples } from "../../PageComponents/Examples/Examples";
 import { PageCheckField, PageNumberField, PageSelectField } from "../../PageComponents/Field/Field";
@@ -13,10 +18,7 @@ import { PagePropsPanel } from "../../PageComponents/PropsPanel/PropsPanel";
 import { BadgeExample } from "./Examples/Badge";
 import { DefaultExample } from "./Examples/Default";
 import { SeveralExample } from "./Examples/Several";
-import type { SatelliteBadgeCorner, SatelliteExampleProps } from "./SatellitePage.types";
-
-const FIELD_WIDTH = 110;
-const EXAMPLES_ROOT = "/src/App/Pages/SatellitePage/Examples";
+import type { SatelliteBadgeCorner, SatelliteExampleProps } from "./SatellitePageReact.types";
 
 export const SatellitePage = () => {
     const [hPlacement, setHPlacement] = useState<AnchorHPlacement>(SatelliteKnobs.STARTING_H_PLACEMENT);
@@ -44,7 +46,7 @@ export const SatellitePage = () => {
     const examples = [
         {
             key: "default",
-            name: "Default",
+            name: EXAMPLE_NAMES.default,
             readout: () => "one satellite, moved through every placement; the dashed box is what the pair takes up",
             component: () => (
                 <>
@@ -174,7 +176,7 @@ export const SatellitePage = () => {
         },
         {
             key: "several",
-            name: "Several satellites",
+            name: EXAMPLE_NAMES.several,
             readout: () =>
                 "a corner badge, one hanging off the left and one tucked behind the bottom edge — each side of the box grows by the furthest any of them reaches",
             component: () => (
@@ -186,7 +188,7 @@ export const SatellitePage = () => {
         },
         {
             key: "badge",
-            name: "Badge",
+            name: EXAMPLE_NAMES.badge,
             readout: () =>
                 "a count pinned inside a corner and pushed out past it by the same amount on both axes, so a longer number grows the badge inward and the overhang never changes",
             component: () => (

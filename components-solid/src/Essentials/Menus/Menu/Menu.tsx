@@ -9,6 +9,7 @@ import {
     FloaterStyles as floaterStyles,
     MenuStyles as styles,
 } from "@thewaver/ss-components";
+import { MenuConst } from "@thewaver/ss-components/internal";
 import { Point2d, Rect } from "@thewaver/ss-utils";
 
 import { FloaterSolidUtils } from "../../../Abstracts/Floater/FloaterSolid.utils";
@@ -30,12 +31,6 @@ import type {
     MenuProps,
     MenuTriggerProps,
 } from "./MenuSolid.types";
-
-const EMPTY_CHECKED: never[] = [];
-
-const ROOT_PATH: number[] = [];
-const NO_PARENT_EXTENT = 0;
-const PRIMARY_BUTTON = 0;
 
 const createPointerPointReader = () => {
     onCleanup(MenuUtils.observePointerPoint());
@@ -433,7 +428,7 @@ const MenuLevel = <T,>(props: MenuLevelProps<T>): JSX.Element => {
                                 isOpen={getIsSubmenuOpen}
                                 direction={props.direction}
                                 path={() => [...access(props.path), index]}
-                                parentExtent={() => getLayout()?.extent ?? NO_PARENT_EXTENT}
+                                parentExtent={() => getLayout()?.extent ?? MenuConst.NO_PARENT_EXTENT}
                                 rootExtent={() => getRootExtent()}
                                 layoutSize={props.layoutSize}
                                 parentPlacement={getRect}
@@ -599,7 +594,7 @@ export const Menu = <T,>(props: MenuProps<T>) => {
         setFlickOrigin(() => undefined);
     };
 
-    const getCheckedValues = createMemo(() => props.checked?.[0]() ?? EMPTY_CHECKED);
+    const getCheckedValues = createMemo(() => props.checked?.[0]() ?? MenuConst.EMPTY_CHECKED);
 
     const pick = (item: MenuItem<T>, radioGroupValues: T[]) => {
         const kind = MenuUtils.getKind(item);
@@ -615,7 +610,7 @@ export const Menu = <T,>(props: MenuProps<T>) => {
     };
 
     const handleTriggerPress = (e: PointerEvent) => {
-        if (!getIsHoldable() || e.button !== PRIMARY_BUTTON || getIsOpen()) return;
+        if (!getIsHoldable() || e.button !== MenuConst.PRIMARY_BUTTON || getIsOpen()) return;
 
         isTogglePrevented = true;
 
@@ -682,9 +677,9 @@ export const Menu = <T,>(props: MenuProps<T>) => {
                         items={props.items}
                         isOpen={getIsOpen}
                         direction={getDirection}
-                        path={ROOT_PATH}
-                        parentExtent={NO_PARENT_EXTENT}
-                        rootExtent={NO_PARENT_EXTENT}
+                        path={MenuConst.ROOT_PATH}
+                        parentExtent={MenuConst.NO_PARENT_EXTENT}
+                        rootExtent={MenuConst.NO_PARENT_EXTENT}
                         layoutSize={props.layoutSize}
                         initialHighlightPosition={getInitialHighlightPosition}
                         anchorRef={() => access(props.anchorRef) ?? getTriggerRef()}
@@ -742,7 +737,7 @@ export const ContextMenu = <T,>(props: ContextMenuProps<T>) => {
         setIsOpen(false);
     };
 
-    const getCheckedValues = createMemo(() => props.checked?.[0]() ?? EMPTY_CHECKED);
+    const getCheckedValues = createMemo(() => props.checked?.[0]() ?? MenuConst.EMPTY_CHECKED);
 
     const pick = (item: MenuItem<T>, radioGroupValues: T[]) => {
         const kind = MenuUtils.getKind(item);
@@ -802,9 +797,9 @@ export const ContextMenu = <T,>(props: ContextMenuProps<T>) => {
                 items={props.items}
                 isOpen={getIsOpen}
                 direction={getDirection}
-                path={ROOT_PATH}
-                parentExtent={NO_PARENT_EXTENT}
-                rootExtent={NO_PARENT_EXTENT}
+                path={MenuConst.ROOT_PATH}
+                parentExtent={MenuConst.NO_PARENT_EXTENT}
+                rootExtent={MenuConst.NO_PARENT_EXTENT}
                 layoutSize={undefined}
                 anchorRef={getRegionRef}
                 anchorRect={getAnchorRect}

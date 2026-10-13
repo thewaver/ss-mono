@@ -7,8 +7,7 @@
     import PageProp from "../../PageComponents/Prop/Prop.svelte";
     import type { CuboidExampleProps } from "./CuboidPage.types";
     import WanderingExample from "./Examples/Wandering.svelte";
-
-    const FIELD_WIDTH = 110;
+    import { FIELD_WIDTH } from "@thewaver/ss-playground/App/Pages/CuboidPage/CuboidPage.const";
 
     type Props = CuboidExampleProps;
 

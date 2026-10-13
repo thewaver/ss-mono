@@ -2,15 +2,10 @@ import { useState } from "react";
 
 import { SortableGridUtils } from "@thewaver/ss-components-react";
 import type { SortableGridItem } from "@thewaver/ss-components-react";
-import type { Gear } from "@thewaver/ss-playground/App/Pages/SortableGridPage/SortableGridPage.types";
-
-import { PageExamples } from "../../PageComponents/Examples/Examples";
-import { InventoryExample } from "./Examples/Inventory";
-import { LootExample } from "./Examples/Loot";
-import { PairExample } from "./Examples/Pair";
 import {
     ARROWS,
     ARROW_IDS,
+    EXAMPLES_ROOT,
     LOOT,
     PACK,
     PACK_COLUMNS,
@@ -23,9 +18,14 @@ import {
     TURNS_COLUMNS,
     TURNS_ROWS,
     computeIsWall,
-} from "./SortableGridPage.const";
+} from "@thewaver/ss-playground/App/Pages/SortableGridPage/SortableGridPage.const";
+import { EXAMPLE_NAMES } from "@thewaver/ss-playground/App/Pages/SortableGridPage/SortableGridPage.const";
+import type { Gear } from "@thewaver/ss-playground/App/Pages/SortableGridPage/SortableGridPage.types";
 
-const EXAMPLES_ROOT = "/src/App/Pages/SortableGridPage/Examples";
+import { PageExamples } from "../../PageComponents/Examples/Examples";
+import { InventoryExample } from "./Examples/Inventory";
+import { LootExample } from "./Examples/Loot";
+import { PairExample } from "./Examples/Pair";
 
 const filled = (items: SortableGridItem<Gear>[]) =>
     items.reduce((cells, item) => cells + SortableGridUtils.getItemShape(item).cells.length, 0);
@@ -64,7 +64,7 @@ export const SortableGridPage = () => {
     const examples = [
         {
             key: "pack",
-            name: "One grid",
+            name: EXAMPLE_NAMES.pack,
             readout: () =>
                 `${room(packState[0], PACK_COLUMNS, PACK_ROWS)} — the page binds R and Shift with R to the two turn commands, and the wheel to the same pair`,
             component: () => (
@@ -81,7 +81,7 @@ export const SortableGridPage = () => {
         },
         {
             key: "turns",
-            name: "An L turns two ways",
+            name: EXAMPLE_NAMES.turns,
             readout: () =>
                 `${spots(turnsState[0])} — clockwise puts the hook's arm where the flint is and is refused, counterclockwise fits`,
             component: () => (
@@ -100,7 +100,7 @@ export const SortableGridPage = () => {
         },
         {
             key: "cells",
-            name: "Painted cell by cell",
+            name: EXAMPLE_NAMES.cells,
             readout: () =>
                 `${room(cellsPackState[0], PACK_COLUMNS, PACK_ROWS)} — the same items, drawn as their own squares instead of one clipped shape`,
             component: () => (
@@ -117,7 +117,7 @@ export const SortableGridPage = () => {
         },
         {
             key: "pair",
-            name: "Between two grids",
+            name: EXAMPLE_NAMES.pair,
             readout: () =>
                 `pack: ${room(pairPackState[0], PACK_COLUMNS, PACK_ROWS)} | stash: ${room(stashState[0], STASH_COLUMNS, STASH_ROWS)}`,
             span: 2,
@@ -134,7 +134,7 @@ export const SortableGridPage = () => {
         },
         {
             key: "picky",
-            name: "A grid that refuses most gear",
+            name: EXAMPLE_NAMES.picky,
             readout: () => `quiver: ${spots(quiverState[0])} — the quiver takes arrows and nothing else`,
             span: 2,
             component: () => (
@@ -152,7 +152,7 @@ export const SortableGridPage = () => {
         },
         {
             key: "locked",
-            name: "A grid that takes nothing",
+            name: EXAMPLE_NAMES.locked,
             readout: () =>
                 `stash: ${spots(lockedStashState[0])} — it can be rearranged from inside but accepts nothing from outside`,
             span: 2,
@@ -170,7 +170,7 @@ export const SortableGridPage = () => {
         },
         {
             key: "loot",
-            name: "From a list into a grid",
+            name: EXAMPLE_NAMES.loot,
             readout: () =>
                 `ground: ${
                     lootState[0].map((item) => item.value.name).join(", ") || "empty"
@@ -181,7 +181,7 @@ export const SortableGridPage = () => {
         },
         {
             key: "walls",
-            name: "Walls, and a tidy-up",
+            name: EXAMPLE_NAMES.walls,
             readout: () =>
                 `${spots(walledState[0])} — nothing lands on a hatched cell, and Tidy up pulls everything upward`,
             component: () => (
@@ -199,7 +199,7 @@ export const SortableGridPage = () => {
         },
         {
             key: "dashboard",
-            name: "Packed after every move",
+            name: EXAMPLE_NAMES.dashboard,
             readout: () => `${spots(dashboardState[0])} — each drop is followed by compact(), so no hole stays open`,
             component: () => (
                 <InventoryExample
@@ -215,7 +215,7 @@ export const SortableGridPage = () => {
         },
         {
             key: "disabled",
-            name: "Disabled",
+            name: EXAMPLE_NAMES.disabled,
             readout: () => `${spots(disabledState[0])} — nothing moves, by pointer or by key`,
             component: () => (
                 <InventoryExample

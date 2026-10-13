@@ -1,6 +1,6 @@
-import { EasingUtils, Point2d, Point2dUtils } from "@thewaver/ss-utils";
-import type { EasingFn } from "@thewaver/ss-utils";
+import { type EasingFn, EasingUtils, Point2d, Point2dUtils } from "@thewaver/ss-utils";
 
+import type { StressTestDefs } from "../../PageComponents/StressTest/StressText.types";
 import type {
     IterationPattern,
     IterationPatternFn,
@@ -435,3 +435,38 @@ const continuous: IterationPatternFn = () => [{ count: 1, beginDelayMs: NO_PAUSE
 export const ITERATION_PATTERNS: Record<IterationPattern, IterationPatternFn> = { burst, intermittent, continuous };
 
 export const ITERATION_PATTERN_KEYS = Object.keys(ITERATION_PATTERNS) as IterationPattern[];
+
+export const EXAMPLE_NAMES = {
+    singleTarget: "Single target",
+    vertical: "Vertical",
+    diagonal: "Diagonal",
+    movingTarget: "Moving target",
+    radial: "Radial (1 spawner, many targets)",
+    manyToOne: "Many to one (many spawners, 1 target)",
+    burst: "Burst on press",
+    roundTrip: "Round trip (a relay on arrival)",
+    multipleTargets: "Multiple targets",
+    grid: "N spawners x M targets",
+    stressTest: "Stress Test",
+};
+
+export const EXAMPLES_ROOT = "/src/App/Pages/ParticleSpawnerPage/Examples";
+
+export const FIELD_WIDTH = 130;
+
+export const NO_TRAVEL_DEFS: Record<string, number | boolean> = {};
+
+export const BOX_WIDTH = 420;
+
+export const BOX_HEIGHT = 260;
+
+export const STRESS_BOX_WIDTH = 120;
+
+export const STRESS_BOX_HEIGHT = 80;
+
+export const STRESS_ITEMS: (StressTestDefs & { width: number; height: number })[] = [
+    { count: 8, cols: 4, gap: 10, width: STRESS_BOX_WIDTH, height: STRESS_BOX_HEIGHT },
+    { count: 24, cols: 6, gap: 8, width: STRESS_BOX_WIDTH, height: STRESS_BOX_HEIGHT },
+    { count: 48, cols: 8, gap: 6, width: STRESS_BOX_WIDTH, height: STRESS_BOX_HEIGHT },
+    { count: 96, cols: 12, gap: 4, width: STRESS_BOX_WIDTH, height: STRESS_BOX_HEIGHT },
+];

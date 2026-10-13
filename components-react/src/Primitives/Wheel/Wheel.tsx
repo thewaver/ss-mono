@@ -9,6 +9,7 @@ import {
     WheelUtils,
     type WheelWedgeState,
 } from "@thewaver/ss-components";
+import { WheelConst } from "@thewaver/ss-components/internal";
 import { StoreUtils } from "@thewaver/ss-utils";
 
 import { MediaQueryMonitorReactUtils } from "../../Abstracts/MediaQueryMonitor/MediaQueryMonitorReact.utils";
@@ -16,8 +17,6 @@ import { PointerTrackerReactUtils } from "../../Abstracts/PointerTracker/Pointer
 import { RotatorReactUtils } from "../../Abstracts/Rotator/RotatorReact.utils";
 import { Barrel } from "../Barrel/Barrel";
 import type { WheelController, WheelProps } from "./Wheel.types";
-
-const FIRST_WEDGE = 0;
 
 type WheelSnapshot = {
     currentIndex: number;
@@ -109,7 +108,7 @@ export const Wheel = <T,>(props: WheelProps<T>) => {
         face,
         isSelected: index === selectedIndex,
         angle: getWedgeAngle(index),
-        placement: layout?.placements[FIRST_WEDGE],
+        placement: layout?.placements[WheelConst.FIRST_WEDGE],
     });
 
     const snapshot: WheelSnapshot = {

@@ -7,28 +7,6 @@ import { watchAfterRender } from "../../Utils/effectUtils";
 import { useStableList } from "../../Utils/refUtils";
 import { useViewportContext } from "../Viewport/Viewport.context";
 
-/** Nothing measured yet. */
-const NO_SIZE: Size2d = { width: 0, height: 0 };
-
-/** Shared empty result, so a disabled observer does not hand out a new array each time. */
-const EMPTY_SIZES: Size2d[] = [];
-
-/** Shared empty result, so an observer with nothing measured does not hand out a new array each time. */
-const EMPTY_RECTS: (Rect | undefined)[] = [];
-
-/** Whether two size lists match entry for entry. */
-const isSameSizeList = (a: Size2d[], b: Size2d[]) =>
-    a.length === b.length && a.every((size, index) => Size2d.isSame(size, b[index]));
-
-/** Whether two rect lists match entry for entry, an entry missing on both sides counting as a match. */
-const isSameRectList = (a: (Rect | undefined)[], b: (Rect | undefined)[]) =>
-    a.length === b.length &&
-    a.every((rect, index) => (rect === undefined ? b[index] === undefined : Rect.isSame(rect, b[index])));
-
-/** Whether two optional rects match, two missing ones counting as a match. */
-const isSameRect = (a: Rect | undefined, b: Rect | undefined) =>
-    a === undefined ? b === undefined : b !== undefined && Rect.isSame(a, b);
-
 /** A ref whose setter keeps the old value when the new one is the same by `isSame`, so nothing re-renders. */
 const useDedupedRef = <T>(initial: T, isSame: (a: T, b: T) => boolean) => {
     const value = shallowRef(initial);
@@ -60,7 +38,7 @@ export namespace ElementObserverVueUtils {
         ref: MaybeRefOrGetter<HTMLElement | null | undefined>,
         isDisabled: MaybeRefOrGetter<boolean> = false,
     ) => {
-        const [size, setSize] = useDedupedRef(NO_SIZE, Size2d.isSame);
+        const [size, setSize] = useDedupedRef(ElementObserverUtils.NO_SIZE, Size2d.isSame);
 
         watchAfterRender([() => toValue(ref), () => toValue(isDisabled)], ([element, isOff]) =>
             element && !isOff ? ElementObserverUtils.observeBorderBoxSize(element, setSize) : undefined,
@@ -82,11 +60,11 @@ export namespace ElementObserverVueUtils {
         isDisabled: MaybeRefOrGetter<boolean> = false,
     ) => {
         const stableElements = useStableList(() => toValue(elements));
-        const [sizes, setSizes] = useDedupedRef(EMPTY_SIZES, isSameSizeList);
+        const [sizes, setSizes] = useDedupedRef(ElementObserverUtils.EMPTY_SIZES, ElementObserverUtils.isSameSizeList);
 
         watchAfterRender([stableElements, () => toValue(isDisabled)], ([list, isOff]) => {
             if (isOff) {
-                setSizes(EMPTY_SIZES);
+                setSizes(ElementObserverUtils.EMPTY_SIZES);
 
                 return;
             }
@@ -161,7 +139,7 @@ export namespace ElementObserverVueUtils {
         },
     ) => {
         const viewportContext = useViewportContext();
-        const [rect, setRect] = useDedupedRef<Rect | undefined>(undefined, isSameRect);
+        const [rect, setRect] = useDedupedRef<Rect | undefined>(undefined, ElementObserverUtils.isSameRect);
 
         const getPadding = () => toValue(opts?.padding) ?? 0;
         const getOffset = () => toValue(opts?.offset) ?? { x: 0, y: 0 };
@@ -203,7 +181,7 @@ export namespace ElementObserverVueUtils {
     ) => {
         const viewportContext = useViewportContext();
         const stableElements = useStableList(() => toValue(elements));
-        const [rects, setRects] = useDedupedRef(EMPTY_RECTS, isSameRectList);
+        const [rects, setRects] = useDedupedRef(ElementObserverUtils.EMPTY_RECTS, ElementObserverUtils.isSameRectList);
 
         watchAfterRender([stableElements], ([list]) => {
             setRects(ElementObserverUtils.measureViewportRects(list, viewportContext));
@@ -223,7 +201,7 @@ export namespace ElementObserverVueUtils {
      *
      * @param elements The elements to follow, in reading order. A missing entry is never current.
      * @param isDisabled Pass `true` to stop following.
-     * @param opts.offsetRatio Where the line sits, as a share of the viewport's height from its top.
+     * @param opts.offsetRatio Where the line sits, as a share of the scrolling box's visible height from its top.
      * @returns A ref of the current element's index, or `undefined` while none has passed the line and while
      * disabled.
      */

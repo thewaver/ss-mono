@@ -3,7 +3,7 @@ import type { ParentProps } from "solid-js";
 import { access } from "@thewaver/ss-components-solid";
 import * as styles from "@thewaver/ss-playground/App/StyledComponents/ButtonContent/ButtonContent.css";
 
-import type { ButtonContentProps } from "./ButtonContent.types";
+import type { ButtonContentProps } from "./ButtonContentSolid.types";
 
 export const PageButtonContent = (props: ParentProps<ButtonContentProps>) => {
     return (

@@ -2,7 +2,7 @@
 import * as styles from "@thewaver/ss-playground/App/StyledComponents/PatchBoardContent/PatchBoardContent.css";
 
 import { useLayerClass } from "../Layer/Layer.context";
-import type { PagePatchNodeProps } from "./PatchBoardContent.types";
+import type { PagePatchNodeProps } from "./PatchBoardContentVue.types";
 
 defineProps<PagePatchNodeProps>();
 

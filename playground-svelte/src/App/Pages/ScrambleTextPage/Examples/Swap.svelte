@@ -5,7 +5,7 @@
 
     import PageMeasureBox from "../../../PageComponents/MeasureBox/MeasureBox.svelte";
     import PageControlButtonContent from "../../../StyledComponents/ControlButtonContent/ControlButtonContent.svelte";
-    import type { ScrambleTextExampleProps } from "../ScrambleTextPage.types";
+    import type { ScrambleTextExampleProps } from "../ScrambleTextPageSvelte.types";
 
     const STATUSES = ["CONNECTING", "HANDSHAKE", "AUTHORIZED", "STREAMING", "IDLE"];
     const BOX_WIDTH = 320;

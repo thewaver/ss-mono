@@ -1,7 +1,7 @@
 import { ElementMosaic } from "@thewaver/ss-components-react";
 
 import { PageMosaicTile } from "../../../../StyledComponents/MosaicContent/MosaicContent";
-import type { ElementsExampleProps } from "../ElementMosaicPage.types";
+import type { ElementsExampleProps } from "../ElementMosaicPageReact.types";
 
 type Props = ElementsExampleProps;
 

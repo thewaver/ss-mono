@@ -5,6 +5,9 @@ import type { BracketConnectorPathFn } from "./BracketConnectors.types";
 
 const HALF = 0.5;
 const MIN_BEND_DROP = 1;
+const ARROW_LENGTH = 9;
+const ARROW_HALF_WIDTH = 5;
+const BALL_RADIUS = 4;
 
 const getAlong = (point: Point2d, defs: BracketConnectorDefs) =>
     defs.orientation === "horizontal" ? point.x : point.y;
@@ -18,6 +21,35 @@ const at = (along: number, across: number, defs: BracketConnectorDefs) =>
 export namespace BracketConnectorPaths {
     export const getSpine = (defs: BracketConnectorDefs) =>
         (getAlong(defs.from, defs) + getAlong(defs.to, defs)) * HALF;
+
+    export const getGradientId = (defs: BracketConnectorDefs) => `bracketConnector-${defs.id}`;
+
+    export const getStroke = (defs: BracketConnectorDefs) => `url(#${getGradientId(defs)})`;
+
+    export const getBallRadius = (width: number) => BALL_RADIUS + width * HALF;
+
+    export const getArrowPoints = (defs: BracketConnectorDefs) => {
+        const isHorizontal = defs.orientation === "horizontal";
+        const spine = getSpine(defs);
+        const tip = defs.from;
+        const along = Math.sign(isHorizontal ? tip.x - spine : tip.y - spine);
+        const back = {
+            x: isHorizontal ? tip.x - along * ARROW_LENGTH : tip.x,
+            y: isHorizontal ? tip.y : tip.y - along * ARROW_LENGTH,
+        };
+
+        const wing = isHorizontal
+            ? [
+                  { x: back.x, y: back.y - ARROW_HALF_WIDTH },
+                  { x: back.x, y: back.y + ARROW_HALF_WIDTH },
+              ]
+            : [
+                  { x: back.x - ARROW_HALF_WIDTH, y: back.y },
+                  { x: back.x + ARROW_HALF_WIDTH, y: back.y },
+              ];
+
+        return [tip, ...wing].map((point) => `${point.x},${point.y}`).join(" ");
+    };
 
     export const elbow: BracketConnectorPathFn = (defs) => {
         const spine = getSpine(defs);

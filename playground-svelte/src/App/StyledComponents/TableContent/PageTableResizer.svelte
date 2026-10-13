@@ -2,7 +2,7 @@
     import * as styles from "@thewaver/ss-playground/App/StyledComponents/TableContent/TableContent.css";
 
     import { getLayerClass } from "../Layer/Layer.context";
-    import type { TableResizerProps } from "./TableContent.types";
+    import type { TableResizerProps } from "./TableContentSvelte.types";
 
     let props: TableResizerProps = $props();
 

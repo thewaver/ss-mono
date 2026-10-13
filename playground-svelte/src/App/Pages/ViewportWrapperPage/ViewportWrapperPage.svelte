@@ -16,9 +16,17 @@
     import PageSelectContent from "../../StyledComponents/SelectContent/SelectContent.svelte";
     import PageSelectOptionContent from "../../StyledComponents/SelectOptionContent/SelectOptionContent.svelte";
     import PageToastContent from "../../StyledComponents/ToastContent/ToastContent.svelte";
-    import type { ToastDefs } from "../../StyledComponents/ToastContent/ToastContent.types";
+    import type { ToastDefs } from "../../StyledComponents/ToastContent/ToastContentSvelte.types";
     import PageTooltipContent from "../../StyledComponents/TooltipContent/TooltipContent.svelte";
     import ViewportReadout from "./ViewportReadout.svelte";
+    import {
+    EXAMPLE_NAMES,
+    INNER_TOAST_GAP,
+    INNER_TOAST_MARGIN,
+    INNER_TOAST_MESSAGE,
+    PERCENT,
+    SCROLL_SIZE,
+} from "@thewaver/ss-playground/App/Pages/ViewportWrapperPage/ViewportWrapperPage.const";
 
     const COUNTRIES: SelectOption<string>[] = [
         { value: "Belgium" },
@@ -34,13 +42,6 @@
         { value: "Portugal" },
         { value: "Sweden" },
     ];
-
-    const PERCENT = 100;
-
-    const SCROLL_SIZE = { width: styles.HOST_SIZE, height: styles.HOST_SIZE };
-    const INNER_TOAST_GAP = 10;
-    const INNER_TOAST_MARGIN = 10;
-    const INNER_TOAST_MESSAGE = "Raised inside the square.";
 
     const TOOLTIP_DEFS = {
         placement: { x: "center", y: "top_out" } as const,
@@ -66,12 +67,12 @@
     const items: VariantDefs[] = [
         {
             key: "roaming",
-            name: "A control roaming the viewport",
+            name: EXAMPLE_NAMES.roaming,
             component: roamingVariant,
         },
         {
             key: "scrolled",
-            name: "An anchor inside a scrolled box",
+            name: EXAMPLE_NAMES.scrolled,
             component: scrolledVariant,
         },
     ];

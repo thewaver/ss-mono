@@ -3,7 +3,7 @@
     import { CONTROL_GLYPHS } from "@thewaver/ss-playground/App/StyledComponents/ControlButtonContent/ControlButtonContent.const";
 
     import PageControlButtonContent from "../ControlButtonContent/ControlButtonContent.svelte";
-    import type { CarouselStepProps } from "./CarouselContent.types";
+    import type { CarouselStepProps } from "./CarouselContentSvelte.types";
 
     const STEP_GLYPHS: Record<CarouselStep, string> = {
         previous: CONTROL_GLYPHS.previous,

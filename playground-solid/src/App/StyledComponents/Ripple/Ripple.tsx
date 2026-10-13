@@ -1,12 +1,10 @@
 import { For, createEffect, createSignal, onCleanup } from "solid-js";
 
 import { access } from "@thewaver/ss-components-solid";
+import { RATIO_TO_PERCENT, RIPPLE_DURATION_MS } from "@thewaver/ss-playground/App/StyledComponents/Ripple/Ripple.const";
 import * as styles from "@thewaver/ss-playground/App/StyledComponents/Ripple/Ripple.css";
 
-import type { RippleMark, RippleProps } from "./Ripple.types";
-
-const RIPPLE_DURATION_MS = 600;
-const RATIO_TO_PERCENT = 100;
+import type { RippleMark, RippleProps } from "./RippleSolid.types";
 
 export const PageRipple = (props: RippleProps) => {
     const [getMarks, setMarks] = createSignal<RippleMark[]>([]);

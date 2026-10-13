@@ -1,13 +1,10 @@
 <script lang="ts">
     import { SVGDefsSamples, TimedGradientDefaults } from "@thewaver/ss-components-svelte";
-    import {
-        NO_SAMPLE_KEY,
-        toGroupEntriesWithNoSample,
-    } from "@thewaver/ss-playground/App/PageComponents/SampleGroups/SampleGroups.const";
+    import { NO_SAMPLE_KEY } from "@thewaver/ss-playground/App/PageComponents/SampleGroups/SampleGroups.const";
     import type { WithNoSample } from "@thewaver/ss-playground/App/PageComponents/SampleGroups/SampleGroups.types";
 
-    import { SVGGradientKnobs } from "../../../Knobs/SVGGradients.const";
-    import { TimedGradientKnobs } from "../../../Knobs/TimedGradients.const";
+    import { SVGGradientKnobs } from "@thewaver/ss-playground/App/Knobs/SVGGradients.const";
+    import { TimedGradientKnobs } from "@thewaver/ss-playground/App/Knobs/TimedGradients.const";
     import type { ExampleDefs } from "../../../PageComponents/Examples/Examples.types";
     import PageExamples from "../../../PageComponents/Examples/PageExamples.svelte";
     import PageGroupedSelectField from "../../../PageComponents/Field/PageGroupedSelectField.svelte";
@@ -19,14 +16,15 @@
     import PagePropsDivider from "../../../PageComponents/PropsPanel/PagePropsDivider.svelte";
     import PagePropsGroups from "../../../PageComponents/PropsPanel/PagePropsGroups.svelte";
     import PagePropsPanel from "../../../PageComponents/PropsPanel/PagePropsPanel.svelte";
-    import { GROUPPED_TIMED_GRADIENTS } from "../SVGGradients.const";
-    import type { SVGGradientsPaintKind, TimedGradientExampleProps } from "../SVGGradients.types";
+    import type { SVGGradientsPaintKind, TimedGradientExampleProps } from "../SVGGradientsSvelte.types";
     import PageSVGGradientsProps from "../SVGGradientsProps.svelte";
     import DefaultExample from "./Examples/Default.svelte";
+    import {
+    EXAMPLE_NAMES,
+    TIMED_GRADIENT_GROUPS,
+} from "@thewaver/ss-playground/App/Pages/SVGGradients/TimedGradientsPage/TimedGradientsPage.const";
 
     const DEFAULT_EXAMPLE_PATH = "/src/App/Pages/SVGGradients/TimedGradientsPage/Examples/Default.svelte";
-
-    const TIMED_GRADIENT_GROUPS = toGroupEntriesWithNoSample(GROUPPED_TIMED_GRADIENTS);
 
     let configKey = $state<WithNoSample<SVGDefsSamples.Gradient.Timed.SampleKey>>(
         SVGGradientKnobs.STARTING_TIMED_GRADIENT_KEY,
@@ -61,7 +59,7 @@
     const examples: ExampleDefs[] = [
         {
             key: "default",
-            name: "Default",
+            name: EXAMPLE_NAMES.default,
             component: defaultExample,
             path: DEFAULT_EXAMPLE_PATH,
         },

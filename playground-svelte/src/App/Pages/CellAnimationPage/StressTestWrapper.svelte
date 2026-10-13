@@ -1,14 +1,15 @@
 <script lang="ts">
-    import type { Index2d } from "@thewaver/ss-utils";
 
     import PageMeasureBox from "../../PageComponents/MeasureBox/MeasureBox.svelte";
     import StressTest from "../../PageComponents/StressTest/StressTest.svelte";
-    import type { StressTestDefs } from "../../PageComponents/StressTest/StressText.types";
+    import type { StressTestDefs } from "../../PageComponents/StressTest/StressTextSvelte.types";
     import type { CellAnimationSourcedExampleProps } from "./CellAnimationPage.types";
     import DefaultExample from "./Examples/Default.svelte";
+    import {
+        STRESS_CELL_COUNT,
+        STRESS_ITEM_SIZE,
+    } from "@thewaver/ss-playground/App/Pages/CellAnimationPage/CellAnimationPage.const";
 
-    const STRESS_CELL_COUNT: Index2d = { row: 11, col: 11 };
-    const STRESS_ITEM_SIZE = 120;
     const STRESS_ITEMS: (StressTestDefs & { size: number })[] = [
         {
             count: 4 * 3,

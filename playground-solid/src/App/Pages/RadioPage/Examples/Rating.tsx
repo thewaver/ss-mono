@@ -3,7 +3,7 @@ import { For } from "solid-js";
 import { Radio, RadioGroup } from "@thewaver/ss-components-solid";
 
 import { PageRadioStarContent } from "../../../StyledComponents/RadioStarContent/RadioStarContent";
-import type { RadioRatingExampleProps } from "../RadioPage.types";
+import type { RadioRatingExampleProps } from "../RadioPageSolid.types";
 
 const RATING_OPTIONS = [1, 2, 3, 4, 5];
 

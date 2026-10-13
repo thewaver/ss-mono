@@ -5,10 +5,15 @@ import {
     type SVGDefsColors,
     SVGDefsUtils,
     type SVGGradientColor,
-    TrackedGradientDefaults,
     type TrackedGradientElementDefs,
 } from "@thewaver/ss-components";
-import { Color, MathUtils, SVGUtils, type Size2d } from "@thewaver/ss-utils";
+import {
+    HandTrail2Const,
+    HandTrailConst,
+    TrackedGradientSampleConst,
+    TrailStampConst,
+} from "@thewaver/ss-components/internal";
+import { Color, MathUtils, SVGUtils } from "@thewaver/ss-utils";
 
 import { PointerTrackerReactUtils } from "../../../../Abstracts/PointerTracker/PointerTrackerReact.utils";
 import { SVGClipPath } from "../../../../Generators/SVGDefs/SVGClipPaths/SVGClipPath";
@@ -35,44 +40,24 @@ type HandTrailProps = {
     opts?: GradientHandTrailOpts;
 };
 
-const SWEEP_SPAN: Size2d = { width: 0.7, height: 0.7 };
-const QUARTER_TURN = 90;
-const HALF_TURN = 180;
-const FULL_TURN = 360;
-
-const STAMP_COUNT = Math.ceil(1000 / 60) * 2;
-const STAMP_INTERVAL_MS = Math.ceil(1000 / 60);
-const TRAIL_LIFETIME_MS = STAMP_COUNT * STAMP_INTERVAL_MS;
-const MOTION_TURN_DEGREES = 0.25;
-const COLOR_KEYS: (keyof SVGDefsColors)[] = ["primary", "secondary"];
-const MOTION_GRACE_MS = STAMP_INTERVAL_MS * 2;
-
-const RESTING_ANGLE = 0;
-const FULL_AGE_RATIO = 1;
-const FULL_ALPHA = 1;
-const NO_FADE = 0;
-const NO_STAMPS: (HandStamp | undefined)[] = Array.from({ length: STAMP_COUNT }, () => undefined);
-
-const DEFAULTS = TrackedGradientDefaults.HAND_TRAIL_CYCLING_DEFAULTS;
-
-const RENDERED_ELSEWHERE = () => undefined;
+const NO_STAMPS: (HandStamp | undefined)[] = Array.from({ length: TrailStampConst.STAMP_COUNT }, () => undefined);
 
 const getStampId = (id: string, index: number) => `${index + 2}-${id}`;
 
 const getShortestTurn = (from: number, to: number) => {
-    const gap = (((to - from) % FULL_TURN) + FULL_TURN) % FULL_TURN;
+    const gap = (((to - from) % HandTrailConst.FULL_TURN) + HandTrailConst.FULL_TURN) % HandTrailConst.FULL_TURN;
 
-    return gap > HALF_TURN ? gap - FULL_TURN : gap;
+    return gap > HandTrailConst.HALF_TURN ? gap - HandTrailConst.FULL_TURN : gap;
 };
 
-const getSweepRotation = (angle: number, arc: number) => angle - HALF_TURN - arc * 0.5;
+const getSweepRotation = (angle: number, arc: number) => angle - HandTrailConst.HALF_TURN - arc * 0.5;
 
 const getCycleColor = (colors: SVGDefsColors, atMs: number, opts?: GradientHandTrailOpts) => {
-    const cycleMs = opts?.cycleMs ?? DEFAULTS.cycleMs;
-    const phase = ((atMs % cycleMs) / cycleMs) * COLOR_KEYS.length;
+    const cycleMs = opts?.cycleMs ?? HandTrail2Const.DEFAULTS.cycleMs;
+    const phase = ((atMs % cycleMs) / cycleMs) * HandTrail2Const.COLOR_KEYS.length;
     const index = Math.floor(phase);
-    const from = colors[COLOR_KEYS[index % COLOR_KEYS.length]];
-    const to = colors[COLOR_KEYS[(index + 1) % COLOR_KEYS.length]];
+    const from = colors[HandTrail2Const.COLOR_KEYS[index % HandTrail2Const.COLOR_KEYS.length]];
+    const to = colors[HandTrail2Const.COLOR_KEYS[(index + 1) % HandTrail2Const.COLOR_KEYS.length]];
 
     if (!Color.Hex.isHex(from) || !Color.Hex.isHex(to)) return from;
 
@@ -85,20 +70,24 @@ const computeSweepColors = (color: string, alpha: number) => [
     { value: `rgb(from ${color} r g b / 0)` },
 ];
 
-const clock = SVGDefsUtils.createClock(TRAIL_LIFETIME_MS);
+const clock = SVGDefsUtils.createClock(TrailStampConst.TRAIL_LIFETIME_MS);
 
 const getAgeRatio = (stamp: HandStamp | undefined, frameMs: number) =>
-    stamp ? MathUtils.clamp01((frameMs - stamp.bornMs) / TRAIL_LIFETIME_MS) : FULL_AGE_RATIO;
+    stamp
+        ? MathUtils.clamp01((frameMs - stamp.bornMs) / TrailStampConst.TRAIL_LIFETIME_MS)
+        : TrackedGradientSampleConst.FULL_AGE_RATIO;
 
 const getStampAlpha = (stamp: HandStamp | undefined, frameMs: number, opts?: GradientHandTrailOpts) =>
     (stamp?.fade ?? 0) *
-    (opts?.trailAlpha ?? DEFAULTS.trailAlpha) *
-    (1 - getAgeRatio(stamp, frameMs)) ** (opts?.trailDecay ?? DEFAULTS.trailDecay);
+    (opts?.trailAlpha ?? HandTrail2Const.DEFAULTS.trailAlpha) *
+    (1 - getAgeRatio(stamp, frameMs)) ** (opts?.trailDecay ?? HandTrail2Const.DEFAULTS.trailDecay);
 
 const getColorKey = (ageRatio: number, opts?: GradientHandTrailOpts) => {
-    const band = Math.floor((ageRatio / (opts?.ageColorSpan ?? DEFAULTS.ageColorSpan)) * COLOR_KEYS.length);
+    const band = Math.floor(
+        (ageRatio / (opts?.ageColorSpan ?? HandTrail2Const.DEFAULTS.ageColorSpan)) * HandTrail2Const.COLOR_KEYS.length,
+    );
 
-    return COLOR_KEYS[Math.min(band, COLOR_KEYS.length - 1)];
+    return HandTrail2Const.COLOR_KEYS[Math.min(band, HandTrail2Const.COLOR_KEYS.length - 1)];
 };
 
 const computeStampColors = (
@@ -118,8 +107,8 @@ const renderSweep = (id: string, angle: number, colors: SVGGradientColor[], swee
     <>
         {SVGGradientDefsReactUtils.computeLinearGradient({
             id: `gradient${id}`,
-            angle: angle + QUARTER_TURN,
-            scale: SWEEP_SPAN,
+            angle: angle + HandTrailConst.QUARTER_TURN,
+            scale: HandTrailConst.SWEEP_SPAN,
             colors,
         })}
         <SVGClipPath id={`clip${id}`}>
@@ -146,27 +135,31 @@ const HandTrail = (props: HandTrailProps) => {
         const angle = reading.angle;
         const fade = SVGDefsUtils.getPointerFade(reading, isPointerPresent);
         const turn = motion.lastAngle !== undefined ? Math.abs(getShortestTurn(motion.lastAngle, angle)) : undefined;
-        const isTurning = turn !== undefined && turn > MOTION_TURN_DEGREES;
+        const isTurning = turn !== undefined && turn > HandTrailConst.MOTION_TURN_DEGREES;
 
         motion.lastAngle = angle;
 
-        if (fade > NO_FADE && (isCycling || isTurning)) clock.keepAwake();
+        if (fade > TrackedGradientSampleConst.NO_FADE && (isCycling || isTurning)) clock.keepAwake();
 
         if (isTurning) motion.lastTurnedMs = performance.now();
 
-        const tick = Math.floor(frameMs / STAMP_INTERVAL_MS);
+        const tick = Math.floor(frameMs / TrailStampConst.STAMP_INTERVAL_MS);
 
         if (tick === motion.bornTick) return;
-        if (motion.lastTurnedMs === undefined || performance.now() - motion.lastTurnedMs > MOTION_GRACE_MS) return;
+        if (
+            motion.lastTurnedMs === undefined ||
+            performance.now() - motion.lastTurnedMs > TrailStampConst.MOTION_GRACE_MS
+        )
+            return;
 
         motion.bornTick = tick;
 
         const stamp = { angle, fade, bornMs: frameMs };
 
-        stamps[tick % STAMP_COUNT] = stamp;
+        stamps[tick % TrailStampConst.STAMP_COUNT] = stamp;
     }, [frameMs, reading, isPointerPresent, isCycling]);
 
-    const sweepArc = props.opts?.sweepArc ?? DEFAULTS.sweepArc;
+    const sweepArc = props.opts?.sweepArc ?? HandTrail2Const.DEFAULTS.sweepArc;
 
     return (
         <>
@@ -175,7 +168,7 @@ const HandTrail = (props: HandTrailProps) => {
                 reading.angle,
                 computeSweepColors(
                     getCycleColor(props.defs.colors, frameMs, props.opts),
-                    FULL_ALPHA * SVGDefsUtils.getPointerFade(reading, isPointerPresent),
+                    TrailStampConst.FULL_ALPHA * SVGDefsUtils.getPointerFade(reading, isPointerPresent),
                 ),
                 sweepArc,
             )}
@@ -183,7 +176,7 @@ const HandTrail = (props: HandTrailProps) => {
                 <Fragment key={index}>
                     {renderSweep(
                         getStampId(props.id, index),
-                        stamp?.angle ?? RESTING_ANGLE,
+                        stamp?.angle ?? HandTrailConst.RESTING_ANGLE,
                         computeStampColors(stamp, props.defs.colors, frameMs, props.opts),
                         sweepArc,
                     )}
@@ -209,18 +202,18 @@ export const hand_trail_2 = (opts?: GradientHandTrailOpts): TrackedGradientConfi
                 },
                 clipPath: {
                     id: `clip1-${id}`,
-                    renderDefsElement: RENDERED_ELSEWHERE,
+                    renderDefsElement: TrackedGradientSampleConst.RENDERED_ELSEWHERE,
                 },
                 filter: sharedBlur,
             },
-            ...Array.from({ length: STAMP_COUNT }, (_unused, index) => ({
+            ...Array.from({ length: TrailStampConst.STAMP_COUNT }, (_unused, index) => ({
                 gradientOrPattern: {
                     id: `gradient${getStampId(id, index)}`,
-                    renderDefsElement: RENDERED_ELSEWHERE,
+                    renderDefsElement: TrackedGradientSampleConst.RENDERED_ELSEWHERE,
                 },
                 clipPath: {
                     id: `clip${getStampId(id, index)}`,
-                    renderDefsElement: RENDERED_ELSEWHERE,
+                    renderDefsElement: TrackedGradientSampleConst.RENDERED_ELSEWHERE,
                 },
                 filter: sharedBlurRef,
             })),

@@ -2,7 +2,7 @@
     import { Button } from "@thewaver/ss-components-svelte";
 
     import PageMeridiemToggleContent from "../../StyledComponents/MeridiemToggleContent/MeridiemToggleContent.svelte";
-    import type { MeridiemToggleProps } from "./MeridiemToggle.types";
+    import type { MeridiemToggleProps } from "./MeridiemToggleSvelte.types";
 
     let props: MeridiemToggleProps = $props();
 </script>

@@ -1,5 +1,4 @@
 <script lang="ts">
-    import { untrack } from "svelte";
 
     import {
         SLOT_TEXT_DEFAULTS,
@@ -8,6 +7,8 @@
         SlotTextUtils,
         SlotTextStyles as styles,
     } from "@thewaver/ss-components";
+    import { untrack } from "svelte";
+    import { SlotTextConst } from "@thewaver/ss-components/internal";
 
     import { MediaQueryMonitorSvelteUtils } from "../../../Abstracts/MediaQueryMonitor/MediaQueryMonitorSvelte.utils.svelte.js";
     import Barrel from "../../../Primitives/Barrel/Barrel.svelte";
@@ -15,11 +16,6 @@
     import type { SlotTextProps } from "./SlotText.types.js";
     import SlotTextFlapColumn from "./SlotTextFlapColumn.svelte";
     import SlotTextSlot from "./SlotTextSlot.svelte";
-
-    const RESTING_ANGLE = 0;
-    const NO_DELAY = 0;
-    const FIRST = 0;
-    const HIDDEN_FACE = { ariaLabel: "", isHidden: true };
 
     let props: SlotTextProps = $props();
 
@@ -119,8 +115,8 @@
         board = {
             ...board,
             turningSlots,
-            angles: board.angles.slice(FIRST, index),
-            columnWheels: board.columnWheels.slice(FIRST, index),
+            angles: board.angles.slice(SlotTextConst.FIRST, index),
+            columnWheels: board.columnWheels.slice(SlotTextConst.FIRST, index),
         };
     };
 
@@ -174,8 +170,8 @@
                     {/if}
                 {/snippet}
                 <SlotTextFlapColumn
-                    target={SlotTextUtils.getFlapPosition(board.angles[wheelIndex] ?? RESTING_ANGLE, faces.length)}
-                    delayMs={board.delays[wheelIndex] ?? NO_DELAY}
+                    target={SlotTextUtils.getFlapPosition(board.angles[wheelIndex] ?? SlotTextConst.RESTING_ANGLE, faces.length)}
+                    delayMs={board.delays[wheelIndex] ?? SlotTextConst.NO_DELAY}
                     durationMs={board.durations[wheelIndex] ?? turnDurationMs}
                     {faces}
                     {characterSize}
@@ -188,11 +184,11 @@
                         axis="column"
                         hasBacks={false}
                         faceSize={characterSize}
-                        angle={board.angles[wheelIndex] ?? RESTING_ANGLE}
+                        angle={board.angles[wheelIndex] ?? SlotTextConst.RESTING_ANGLE}
                         transitionDurationMs={board.durations[wheelIndex] ?? turnDurationMs}
-                        transitionDelayMs={board.delays[wheelIndex] ?? NO_DELAY}
+                        transitionDelayMs={board.delays[wheelIndex] ?? SlotTextConst.NO_DELAY}
                         faceRoleDescription=""
-                        computeFaceDefs={() => HIDDEN_FACE}
+                        computeFaceDefs={() => SlotTextConst.HIDDEN_FACE}
                     >
                         {#snippet renderFace(face: string)}
                             <div class={styles.slotTextFace}>

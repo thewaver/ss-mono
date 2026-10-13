@@ -1,16 +1,15 @@
 <script lang="ts">
     import { ShapeLayerUtils, ShapeStyles as styles } from "@thewaver/ss-components";
+    import { ShapeConst } from "@thewaver/ss-components/internal";
     import { Size2d } from "@thewaver/ss-utils";
 
     import Markup from "../../Utils/Markup.svelte";
     import type { ShapeProps } from "./Shape.types.js";
 
-    const INITIAL_SIZE: Size2d = { width: 0, height: 0 };
-
     let props: ShapeProps = $props();
 
     let root = $state<HTMLDivElement>();
-    let rootSize = $state.raw(INITIAL_SIZE);
+    let rootSize = $state.raw(ShapeConst.INITIAL_SIZE);
 
     $effect(() => {
         const element = root;

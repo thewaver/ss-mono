@@ -10,7 +10,6 @@ export type { TagInputCbs } from "./Essentials/Input/TagInput/TagInput.types.js"
 export type { TimeInputMeridiem } from "./Essentials/Input/TimeInput/TimeInput.types.js";
 export type { PaintedTextController } from "./Exotics/Text/PaintedText/PaintedText.types.js";
 export type { TypewriterController } from "./Exotics/Text/Typewriter/Typewriter.types.js";
-export type { BinarySwitchCbs, BinarySwitchState } from "./Primitives/BinarySwitch/BinarySwitch.types.js";
 export type { CarouselState } from "./Essentials/Carousel/Carousel.types.js";
 
 export * from "./Abstracts/Anchor/AnchorSvelte.utils.svelte.js";

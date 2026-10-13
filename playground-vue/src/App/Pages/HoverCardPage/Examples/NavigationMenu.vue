@@ -3,7 +3,7 @@ import { useModel } from "vue";
 
 import * as styles from "@thewaver/ss-playground/App/Pages/HoverCardPage/HoverCardPage.css";
 
-import type { NavMenuEntry, NavigationMenuExampleProps } from "../HoverCardPage.types";
+import type { NavMenuEntry, NavigationMenuExampleProps } from "../HoverCardPageVue.types";
 import NavFlyout from "./NavFlyout.vue";
 
 const ENTRIES: NavMenuEntry[] = [

@@ -17,11 +17,21 @@ import type {
     CellAnimationPlaybackOpts,
     WeightOpts,
 } from "@thewaver/ss-components-react";
+import { CellAnimationKnobs } from "@thewaver/ss-playground/App/Knobs/CellAnimations.const";
+import {
+    DEFAULT_EXAMPLE_PATH,
+    DRAWN_SOURCE_PATH,
+    EXAMPLE_NAMES,
+    IMAGE_CONTAINER_SIZE,
+    PERCENT,
+    STRESS_CELL_COUNT,
+    STRESS_ITEMS,
+    WIPE_EXAMPLE_PATH,
+} from "@thewaver/ss-playground/App/Pages/CellAnimationPage/CellAnimationPage.const";
 import * as styles from "@thewaver/ss-playground/App/Pages/CellAnimationPage/CellAnimationPage.css";
 import knight_profile from "@thewaver/ss-playground/App/knight_profile.webp";
 import type { Index2d, Size2d } from "@thewaver/ss-utils";
 
-import { CellAnimationKnobs } from "../../Knobs/CellAnimations.const";
 import { PageExampleKnobs } from "../../PageComponents/ExampleKnobs/ExampleKnobs";
 import { PageExamples } from "../../PageComponents/Examples/Examples";
 import {
@@ -35,48 +45,11 @@ import { PageMeasureBox } from "../../PageComponents/MeasureBox/MeasureBox";
 import { PagePlaybackScrubber } from "../../PageComponents/PlaybackScrubber/PlaybackScrubber";
 import { PageProp } from "../../PageComponents/Prop/Prop";
 import { PagePropsPanel } from "../../PageComponents/PropsPanel/PropsPanel";
-import { SVGDefsSources } from "../../PageComponents/SVGDefsSources/SVGDefsSources.const";
+import { SVGDefsSources } from "../../PageComponents/SVGDefsSources/SVGDefsSourcesReact.const";
 import { StressTest } from "../../PageComponents/StressTest/StressTest";
-import type { StressTestDefs } from "../../PageComponents/StressTest/StressText.types";
 import type { CellAnimationExampleProps, CellAnimationSourcedExampleProps } from "./CellAnimationPage.types";
 import { DefaultExample } from "./Examples/Default";
 import { WipeExample } from "./Examples/Wipe";
-
-const IMAGE_CONTAINER_SIZE = 480;
-const STRESS_CELL_COUNT: Index2d = { row: 11, col: 11 };
-const STRESS_ITEM_SIZE = 120;
-const STRESS_ITEMS: (StressTestDefs & { size: number })[] = [
-    {
-        count: 4 * 3,
-        cols: 4,
-        gap: 10,
-        size: STRESS_ITEM_SIZE,
-    },
-    {
-        count: 6 * 4,
-        cols: 6,
-        gap: 10,
-        size: STRESS_ITEM_SIZE,
-    },
-    {
-        count: 8 * 6,
-        cols: 8,
-        gap: 10,
-        size: STRESS_ITEM_SIZE,
-    },
-    {
-        count: 12 * 6,
-        cols: 12,
-        gap: 10,
-        size: STRESS_ITEM_SIZE,
-    },
-];
-
-const DEFAULT_EXAMPLE_PATH = "/src/App/Pages/CellAnimationPage/Examples/Default.tsx";
-const WIPE_EXAMPLE_PATH = "/src/App/Pages/CellAnimationPage/Examples/Wipe.tsx";
-const DRAWN_SOURCE_PATH = "/src/App/PageComponents/SVGDefsSources/SVGDefsSources.const.ts";
-
-const PERCENT = 100;
 
 const computeContainerWidth = (size: Size2d) => (IMAGE_CONTAINER_SIZE * size.width) / Math.max(size.width, size.height);
 
@@ -325,7 +298,7 @@ export const CellAnimationPage = () => {
     const examples = [
         {
             key: "image",
-            name: "A photograph, sliced",
+            name: EXAMPLE_NAMES.image,
             readout: () =>
                 `${Math.round(imageProgress[0] * PERCENT)}% through the pass, ${imagePlayback[0] ? "running" : "stopped"} — the progress signal is written by the component while it plays, and writing it moves the pass there`,
             component: () => <ImageExampleWrapper {...commonProps} playback={imagePlayback} progress={imageProgress} />,
@@ -333,7 +306,7 @@ export const CellAnimationPage = () => {
         },
         {
             key: "gradient",
-            name: "A gradient, drawn in place",
+            name: EXAMPLE_NAMES.gradient,
             readout: () =>
                 "the Shape page's own gradients, serialized into a source — the start and the pause a script would have timed are written into the markup instead, so they run at the same length and rhythm as the cells",
             component: () => <GradientExampleWrapper {...commonProps} />,
@@ -341,7 +314,7 @@ export const CellAnimationPage = () => {
         },
         {
             key: "pattern",
-            name: "A pattern, drawn in place",
+            name: EXAMPLE_NAMES.pattern,
             readout: () =>
                 "the same for the patterns, which flow on without a pause — a repeating fill has no beat to be out of step with",
             component: () => <PatternExampleWrapper {...commonProps} />,
@@ -349,7 +322,7 @@ export const CellAnimationPage = () => {
         },
         {
             key: "wipe",
-            name: "A screen wipe",
+            name: EXAMPLE_NAMES.wipe,
             readout: () =>
                 "a solid-color picture fixed over the whole viewport, its cells growing in by the chosen weight and going back out after a hold; the lozenge is each cell turned 45° and grown past its box until it covers it, and there is no circle, since a cell can only be transformed and filtered, not reshaped",
             component: () => <WipeExample {...commonProps} />,
@@ -357,7 +330,7 @@ export const CellAnimationPage = () => {
         },
         {
             key: "stressTest",
-            name: "Stress Test",
+            name: EXAMPLE_NAMES.stressTest,
             component: () => <StressTestWrapper {...commonProps} src={knight_profile} />,
         },
     ];

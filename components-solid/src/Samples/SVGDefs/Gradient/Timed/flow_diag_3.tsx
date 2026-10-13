@@ -1,6 +1,7 @@
 import { Show, createMemo } from "solid-js";
 
-import { type CycleColorKey, type GradientBandedCycleOpts, SVGDefsUtils } from "@thewaver/ss-components";
+import { type GradientBandedCycleOpts, SVGDefsUtils } from "@thewaver/ss-components";
+import { FlowDiag3Const } from "@thewaver/ss-components/internal";
 import { AngleUtils, SVGUtils } from "@thewaver/ss-utils";
 
 import { SVGGradientDefsSolidUtils } from "../../../../Generators/SVGDefs/SVGGradients/SVGGradientDefsSolid.utils";
@@ -8,16 +9,13 @@ import { SVGAnimations } from "../../SVGAnimations.const";
 import type { TimedGradientConfig } from "../../SVGDefsSolid.types";
 import { SVGDefsSolidUtils } from "../../SVGDefsSolid.utils";
 
-const CYCLE_KEYS: CycleColorKey[] = ["primary", "secondary", "tertiary"];
-const SMOOTH_REPEATS = 2;
-const BANDED_REPEATS = 4;
 const SCALE = { width: 2, height: 2 };
 
 export const flow_diag_3 = (opts?: GradientBandedCycleOpts): TimedGradientConfig => ({
     computeSVGDefs: (id, __, ___, defs) => {
         const stopKeys = SVGDefsUtils.getCycleStopKeys(
-            CYCLE_KEYS,
-            opts?.bands ?? (opts?.banded ? BANDED_REPEATS : SMOOTH_REPEATS),
+            FlowDiag3Const.CYCLE_KEYS,
+            opts?.bands ?? (opts?.banded ? FlowDiag3Const.BANDED_REPEATS : FlowDiag3Const.SMOOTH_REPEATS),
         );
 
         return [

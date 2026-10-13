@@ -1,20 +1,17 @@
 import type { Accessor, JSX } from "solid-js";
 
 import type {
-    PlacementLayoutFn,
-    PointSource,
-    ProximityEffectFn,
+    BaseDrumWheelCbs,
+    BaseDrumWheelValues,
+    BaseOverheadWheelCbs,
+    BaseOverheadWheelValues,
+    BaseWheelCbs,
+    BaseWheelValues,
     RotatorPhase,
-    RotatorSpinDefs,
-    WheelAxis,
-    WheelLabels,
-    WheelState,
-    WheelVariant,
     WheelWedgeState,
 } from "@thewaver/ss-components";
-import type { Size2d } from "@thewaver/ss-utils";
 
-import type { AccessorProps, MaybeAccessor, SignalSource } from "../../Utils/typeUtils";
+import type { AccessorValues, SignalSource } from "../../Utils/typeUtils";
 
 export type WheelController = {
     /** Which wedge is at the marker right now, which moves while the wheel turns. */
@@ -32,10 +29,6 @@ export type WheelController = {
 };
 
 export type WheelSlots<T> = {
-    /** The wedges, in the order they sit round the wheel. */
-    wedges: MaybeAccessor<T[]>;
-    /** How long the wheel waits between steps while turning on its own. Leave it out and it stands still until spun. */
-    idleDelayMs?: MaybeAccessor<number | undefined>;
     /**
      * Which wedge the wheel is heading for. Writing it turns the wheel to that wedge, unless a spin is already
      * under way, in which case the write is ignored. It is not the only thing that moves the wheel: a spin
@@ -47,83 +40,23 @@ export type WheelSlots<T> = {
     targetIndex?: SignalSource<number>;
     /** Whether the wheel is turning on its own. It is the only thing that starts or stops it. */
     autoSpin?: SignalSource<boolean>;
-    /** Chooses which wedge a spin should land on. It may answer later, so the result can come from a server. */
-    computeSpinTarget: () => number | Promise<number>;
-    /** How a spin to a given wedge should run — how many turns, and on what curve. */
-    computeSpinDefs?: (index: number, wedgeCount: number) => RotatorSpinDefs;
     /** Draws one wedge. It is handed where the wedge stands relative to the marker. */
     renderWedge: (getWedge: Accessor<T>, getState: Accessor<WheelWedgeState>) => JSX.Element;
-    /** Runs when a different wedge reaches the marker, including while the wheel is still turning. */
-    onSelectedWedgeChange?: (index: number) => void;
-    /** Runs once a spin has finished and settled. */
-    onSpinEnd?: (index: number) => void;
     /** Hands the consumer a controller once the wheel is up, for spinning it from outside. */
     onMount?: (controller: WheelController) => void;
 };
 
-export type WheelProps<T> = AccessorProps<
-    WheelState &
-        WheelLabels & {
-            /** Which of the wheel's looks this is. */
-            variant: WheelVariant;
-            /** Which way round the wheel turns. */
-            axis?: WheelAxis;
-            /** How large one wedge is. */
-            wedgeSize?: Size2d;
-            /** Where the marker sits, in degrees, which is the point a spin lands a wedge on. */
-            markerDegrees?: number;
-            /**
-             * The point to follow instead of the pointer.
-             *
-             * A fraction across a box — the wheel's own, or the element named in the source — so a light moving
-             * across a banner can be handed to every card under it and each answers to the same spot. While the source has
-             * no point every wedge rests, as it does when the pointer leaves the window. Left out, the pointer is
-             * followed.
-             */
-            pointSource?: PointSource;
-        }
-> &
+export type WheelProps<T> = AccessorValues<BaseWheelValues<T>> &
+    BaseWheelCbs &
     WheelSlots<T> & {
-        /** Arranges the wedges, for a wheel that is something other than an even ring. */
-        computeLayout?: PlacementLayoutFn;
-        /** What the wedges do as the pointer nears them. */
-        computeEffect?: ProximityEffectFn;
         /** Draws the back of a wedge, for a look where wedges turn over. */
         renderWedgeBack?: (getWedge: Accessor<T>, getState: Accessor<WheelWedgeState>) => JSX.Element;
     };
 
-export type OverheadWheelProps<T> = AccessorProps<
-    WheelState &
-        WheelLabels & {
-            /** Where the marker sits, in degrees, which is the point a spin lands a wedge on. */
-            markerDegrees?: number;
-            /**
-             * The point to follow instead of the pointer.
-             *
-             * A fraction across a box — the wheel's own, or the element named in the source — so a light moving
-             * across a banner can be handed to every card under it and each answers to the same spot. While the source has
-             * no point every wedge rests, as it does when the pointer leaves the window. Left out, the pointer is
-             * followed.
-             */
-            pointSource?: PointSource;
-        }
-> &
-    WheelSlots<T> & {
-        /** Arranges the wedges, for a wheel that is something other than an even ring. */
-        computeLayout?: PlacementLayoutFn;
-        /** What the wedges do as the pointer nears them. */
-        computeEffect?: ProximityEffectFn;
-    };
+export type OverheadWheelProps<T> = AccessorValues<BaseOverheadWheelValues<T>> & BaseOverheadWheelCbs & WheelSlots<T>;
 
-export type DrumWheelProps<T> = AccessorProps<
-    WheelState &
-        WheelLabels & {
-            /** Which way round the wheel turns. */
-            axis?: WheelAxis;
-            /** How large one wedge is. */
-            wedgeSize: Size2d;
-        }
-> &
+export type DrumWheelProps<T> = AccessorValues<BaseDrumWheelValues<T>> &
+    BaseDrumWheelCbs &
     WheelSlots<T> & {
         /** Draws the back of a wedge, for a look where wedges turn over. */
         renderWedgeBack: (getWedge: Accessor<T>, getState: Accessor<WheelWedgeState>) => JSX.Element;

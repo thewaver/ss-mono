@@ -2,6 +2,10 @@ import { createMemo, createSignal } from "solid-js";
 
 import { access } from "@thewaver/ss-components-solid";
 import { ImageMosaicKnobs } from "@thewaver/ss-playground/App/Knobs/ImageMosaics.const";
+import {
+    EXAMPLES_ROOT,
+    EXAMPLE_NAMES,
+} from "@thewaver/ss-playground/App/Pages/Mosaics/ImageMosaicPage/ImageMosaicPage.const";
 import { MosaicImages } from "@thewaver/ss-playground/App/Pages/Mosaics/ImageMosaicPage/MosaicImages.const";
 import { FIELD_WIDTH, MOSAIC_EXTENT } from "@thewaver/ss-playground/App/Pages/Mosaics/Mosaics.const";
 
@@ -10,12 +14,10 @@ import { PageExamples } from "../../../PageComponents/Examples/Examples";
 import { PageCheckField, PageSelectField } from "../../../PageComponents/Field/Field";
 import { PageMeasureBox } from "../../../PageComponents/MeasureBox/MeasureBox";
 import { PageProp } from "../../../PageComponents/Prop/Prop";
-import type { MosaicSharedProps } from "../Mosaics.types";
 import { createMosaicsControls } from "../Mosaics.utils";
 import { PageMosaicsPanel } from "../MosaicsPanel";
+import type { MosaicSharedProps } from "../MosaicsSolid.types";
 import { ImagesExample } from "./Examples/Images";
-
-const EXAMPLES_ROOT = "/src/App/Pages/Mosaics/ImageMosaicPage/Examples";
 
 const ImagesExampleWrapper = (props: MosaicSharedProps) => {
     const [getShapeKey, setShapeKey] = createSignal<MosaicImages.SampleShapeKey>(ImageMosaicKnobs.STARTING_SHAPE_KEY);
@@ -70,7 +72,7 @@ export const ImageMosaicPage = () => {
     const getExamples = createMemo(() => [
         {
             key: "images",
-            name: "Images the component sizes",
+            name: EXAMPLE_NAMES.images,
             readout: () =>
                 "each row is scaled to fill the fixed side exactly, so the only size asked for is the shape the finished mosaic should come out closest to",
             component: () => <ImagesExampleWrapper {...controls.getSharedProps()} />,

@@ -1,4 +1,6 @@
 import type { FlatRow } from "../../Abstracts/Flattener/Flattener.types";
+import type { PlacementLayoutFn } from "../../Abstracts/Placement/Placement.types";
+import type { ProximityEffectFn } from "../../Abstracts/Proximity/Proximity.types";
 
 export type TreeNodeRenderProps<T = unknown> = {
     /**
@@ -40,3 +42,29 @@ export type TreeKeyAction<T, TTooltipDefs> =
     | { kind: "collapse"; row: TreeRecordRow<T, TTooltipDefs> }
     | { kind: "activate"; row: TreeRecordRow<T, TTooltipDefs> }
     | { kind: "click"; row: TreeRecordRow<T, TTooltipDefs> };
+
+export type BaseTreeValues = {
+    /**
+     * Names the tree for assistive technology. It is required because nothing else can name it, and a reader landing
+     * on an unnamed tree is told only that it is one.
+     */
+    ariaLabel: string;
+    /** How long either marker takes to slide from one node to the next, and to fade. */
+    floaterTransitionDurationMs?: number;
+};
+
+export type BaseTreeCbs<T> = {
+    /** Arranges the nodes, for a tree drawn as something other than an indented run. */
+    computeLayout?: PlacementLayoutFn;
+    /** What the nodes do as the pointer nears them. */
+    computeEffect?: ProximityEffectFn;
+    /**
+     * Guesses how tall a node will be before it is drawn, which is what lets a long tree render only what is on
+     * screen.
+     */
+    computeEstimatedNodeHeight?: (index: number) => number;
+    /** Runs when a different node is selected. */
+    onSelectionChange?: (value: T) => void;
+};
+
+export type BaseTreeProps<T> = BaseTreeValues & BaseTreeCbs<T>;

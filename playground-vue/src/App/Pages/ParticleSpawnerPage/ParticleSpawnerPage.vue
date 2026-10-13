@@ -2,9 +2,16 @@
 import { computed, shallowRef } from "vue";
 
 import { PARTICLE_SPAWNER_DEFAULTS } from "@thewaver/ss-components-vue";
+import { ParticleSpawnerKnobs } from "@thewaver/ss-playground/App/Knobs/ParticleSpawners.const";
 import {
+    BOX_HEIGHT,
+    BOX_WIDTH,
+    EXAMPLES_ROOT,
+    EXAMPLE_NAMES,
+    FIELD_WIDTH,
     ITERATION_PATTERNS,
     ITERATION_PATTERN_KEYS,
+    NO_TRAVEL_DEFS,
     TRAVEL_EASING_FNS,
     TRAVEL_EASING_KEYS,
     TRAVEL_PATTERN_FACTORIES,
@@ -12,7 +19,6 @@ import {
     applyOvershoot,
 } from "@thewaver/ss-playground/App/Pages/ParticleSpawnerPage/ParticleSpawnerPage.const";
 
-import { ParticleSpawnerKnobs } from "../../Knobs/ParticleSpawners.const";
 import type { ExampleDefs } from "../../PageComponents/Examples/Examples.types";
 import PageExamples from "../../PageComponents/Examples/PageExamples.vue";
 import PageCheckField from "../../PageComponents/Field/PageCheckField.vue";
@@ -41,13 +47,6 @@ import type {
     TravelEasingKey,
 } from "./ParticleSpawnerPage.types";
 import StressTestWrapper from "./StressTestWrapper.vue";
-
-const EXAMPLES_ROOT = "/src/App/Pages/ParticleSpawnerPage/Examples";
-const FIELD_WIDTH = 130;
-const BOX_WIDTH = 420;
-const BOX_HEIGHT = 260;
-
-const NO_TRAVEL_DEFS: Record<string, number | boolean> = {};
 
 const particleCount = shallowRef(ParticleSpawnerKnobs.STARTING_PARTICLE_COUNT);
 const travelDurationMs = shallowRef(PARTICLE_SPAWNER_DEFAULTS.travelDurationMs);
@@ -103,57 +102,57 @@ const setTravelDef = (key: string, value: number | boolean) => {
 const examples: ExampleDefs[] = [
     {
         key: "singleTarget",
-        name: "Single target",
+        name: EXAMPLE_NAMES.singleTarget,
         path: `${EXAMPLES_ROOT}/SingleTarget.vue`,
     },
     {
         key: "vertical",
-        name: "Vertical",
+        name: EXAMPLE_NAMES.vertical,
         path: `${EXAMPLES_ROOT}/Vertical.vue`,
     },
     {
         key: "diagonal",
-        name: "Diagonal",
+        name: EXAMPLE_NAMES.diagonal,
         path: `${EXAMPLES_ROOT}/Diagonal.vue`,
     },
     {
         key: "movingTarget",
-        name: "Moving target",
+        name: EXAMPLE_NAMES.movingTarget,
         path: `${EXAMPLES_ROOT}/MovingTarget.vue`,
     },
     {
         key: "radial",
-        name: "Radial (1 spawner, many targets)",
+        name: EXAMPLE_NAMES.radial,
         path: `${EXAMPLES_ROOT}/Radial.vue`,
     },
     {
         key: "manyToOne",
-        name: "Many to one (many spawners, 1 target)",
+        name: EXAMPLE_NAMES.manyToOne,
         path: `${EXAMPLES_ROOT}/ManyToOne.vue`,
     },
     {
         key: "burst",
-        name: "Burst on press",
+        name: EXAMPLE_NAMES.burst,
         path: `${EXAMPLES_ROOT}/Burst.vue`,
     },
     {
         key: "roundTrip",
-        name: "Round trip (a relay on arrival)",
+        name: EXAMPLE_NAMES.roundTrip,
         path: `${EXAMPLES_ROOT}/RoundTrip.vue`,
     },
     {
         key: "multipleTargets",
-        name: "Multiple targets",
+        name: EXAMPLE_NAMES.multipleTargets,
         path: `${EXAMPLES_ROOT}/MultipleTargets.vue`,
     },
     {
         key: "grid",
-        name: "N spawners x M targets",
+        name: EXAMPLE_NAMES.grid,
         path: `${EXAMPLES_ROOT}/Grid.vue`,
     },
     {
         key: "stressTest",
-        name: "Stress Test",
+        name: EXAMPLE_NAMES.stressTest,
     },
 ];
 </script>

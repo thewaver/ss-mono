@@ -5,8 +5,13 @@ import {
     type GradientSpotTrailOpts,
     type PointerReading,
     SVGDefsUtils,
-    TrackedGradientDefaults,
 } from "@thewaver/ss-components";
+import {
+    SpotConst,
+    SpotTrail1Const,
+    TrackedGradientSampleConst,
+    TrailStampConst,
+} from "@thewaver/ss-components/internal";
 import { MathUtils, type Point2d, Point2dUtils } from "@thewaver/ss-utils";
 
 import { PointerTrackerSolidUtils } from "../../../../Abstracts/PointerTracker/PointerTrackerSolid.utils";
@@ -20,35 +25,22 @@ type TrailStamp = {
     bornMs: number;
 };
 
-const STAMP_COUNT = Math.ceil(1000 / 60) * 2;
-const STAMP_INTERVAL_MS = Math.ceil(1000 / 60);
-const TRAIL_LIFETIME_MS = STAMP_COUNT * STAMP_INTERVAL_MS;
-const MOTION_STEP_RATIO = 0.002;
-const MOTION_GRACE_MS = STAMP_INTERVAL_MS * 2;
-
-const RESTING_ORIGIN: Point2d = { x: 0.5, y: 0.5 };
-const FULL_AGE_RATIO = 1;
-const FULL_ALPHA = 1;
-const NO_FADE = 0;
-
-const DEFAULTS = TrackedGradientDefaults.SPOT_TRAIL_DEFAULTS;
-
 const NO_REF = () => undefined;
 
 const computePoolColors = (color: string, alpha: number, opts?: GradientFalloffOpts) => [
     { value: `rgb(from ${color} r g b / ${alpha})` },
     {
-        value: `rgb(from ${color} r g b / ${alpha * (opts?.coreAlpha ?? DEFAULTS.coreAlpha)})`,
-        stop: opts?.coreStop ?? DEFAULTS.coreStop,
+        value: `rgb(from ${color} r g b / ${alpha * (opts?.coreAlpha ?? SpotTrail1Const.DEFAULTS.coreAlpha)})`,
+        stop: opts?.coreStop ?? SpotTrail1Const.DEFAULTS.coreStop,
     },
     {
-        value: `rgb(from ${color} r g b / ${alpha * (opts?.falloffAlpha ?? DEFAULTS.falloffAlpha)})`,
-        stop: opts?.falloffStop ?? DEFAULTS.falloffStop,
+        value: `rgb(from ${color} r g b / ${alpha * (opts?.falloffAlpha ?? SpotTrail1Const.DEFAULTS.falloffAlpha)})`,
+        stop: opts?.falloffStop ?? SpotTrail1Const.DEFAULTS.falloffStop,
     },
     { value: `rgb(from ${color} r g b / 0)`, stop: 100 },
 ];
 
-const clock = SVGDefsSolidUtils.createClock(TRAIL_LIFETIME_MS);
+const clock = SVGDefsSolidUtils.createClock(TrailStampConst.TRAIL_LIFETIME_MS);
 
 const createTrailStamp = (
     index: number,
@@ -73,16 +65,16 @@ const createTrailStamp = (
 
         lastOrigin = origin;
 
-        if (step !== undefined && step > MOTION_STEP_RATIO) {
+        if (step !== undefined && step > SpotConst.MOTION_STEP_RATIO) {
             lastMovedMs = performance.now();
 
-            if (fade > NO_FADE) clock.keepAwake();
+            if (fade > TrackedGradientSampleConst.NO_FADE) clock.keepAwake();
         }
 
-        const tick = Math.floor(nowMs / STAMP_INTERVAL_MS);
+        const tick = Math.floor(nowMs / TrailStampConst.STAMP_INTERVAL_MS);
 
-        if (tick % STAMP_COUNT !== index || tick === bornTick) return;
-        if (lastMovedMs === undefined || performance.now() - lastMovedMs > MOTION_GRACE_MS) return;
+        if (tick % TrailStampConst.STAMP_COUNT !== index || tick === bornTick) return;
+        if (lastMovedMs === undefined || performance.now() - lastMovedMs > TrailStampConst.MOTION_GRACE_MS) return;
 
         bornTick = tick;
 
@@ -92,16 +84,18 @@ const createTrailStamp = (
     const getAgeRatio = () => {
         const stamp = getStamp();
 
-        return stamp ? MathUtils.clamp01((clock.getFrameMs() - stamp.bornMs) / TRAIL_LIFETIME_MS) : FULL_AGE_RATIO;
+        return stamp
+            ? MathUtils.clamp01((clock.getFrameMs() - stamp.bornMs) / TrailStampConst.TRAIL_LIFETIME_MS)
+            : TrackedGradientSampleConst.FULL_AGE_RATIO;
     };
 
     const getAlpha = () =>
         (getStamp()?.fade ?? 0) *
-        (opts?.trailAlpha ?? DEFAULTS.trailAlpha) *
-        (1 - getAgeRatio()) ** (opts?.trailDecay ?? DEFAULTS.trailDecay);
+        (opts?.trailAlpha ?? SpotTrail1Const.DEFAULTS.trailAlpha) *
+        (1 - getAgeRatio()) ** (opts?.trailDecay ?? SpotTrail1Const.DEFAULTS.trailDecay);
 
     return {
-        getOrigin: () => getStamp()?.origin ?? RESTING_ORIGIN,
+        getOrigin: () => getStamp()?.origin ?? SpotConst.RESTING_ORIGIN,
         getColors: (color: string) => computePoolColors(color, getAlpha(), opts),
     };
 };
@@ -127,16 +121,19 @@ export const spot_trail_1 = (opts?: GradientSpotTrailOpts): TrackedGradientConfi
                     renderDefsElement: () => {
                         return SVGGradientDefsSolidUtils.computeRadialGradient({
                             id: `gradient1-${id}`,
-                            elementSize: (opts?.circular ?? DEFAULTS.circular) ? () => defs.getSize() : undefined,
+                            elementSize:
+                                (opts?.circular ?? SpotTrail1Const.DEFAULTS.circular)
+                                    ? () => defs.getSize()
+                                    : undefined,
                             origin: () => getReading().boxRatio,
-                            scale: opts?.glowScale ?? DEFAULTS.glowScale,
-                            colors: computePoolColors(defs.colors.primary, FULL_ALPHA, opts),
+                            scale: opts?.glowScale ?? SpotTrail1Const.DEFAULTS.glowScale,
+                            colors: computePoolColors(defs.colors.primary, TrailStampConst.FULL_ALPHA, opts),
                         });
                     },
                 },
                 filter: sharedBlur,
             },
-            ...Array.from({ length: STAMP_COUNT }, (_unused, index) => ({
+            ...Array.from({ length: TrailStampConst.STAMP_COUNT }, (_unused, index) => ({
                 gradientOrPattern: {
                     id: `gradient${index + 2}-${id}`,
                     renderDefsElement: () => {
@@ -144,9 +141,12 @@ export const spot_trail_1 = (opts?: GradientSpotTrailOpts): TrackedGradientConfi
 
                         return SVGGradientDefsSolidUtils.computeRadialGradient({
                             id: `gradient${index + 2}-${id}`,
-                            elementSize: (opts?.circular ?? DEFAULTS.circular) ? () => defs.getSize() : undefined,
+                            elementSize:
+                                (opts?.circular ?? SpotTrail1Const.DEFAULTS.circular)
+                                    ? () => defs.getSize()
+                                    : undefined,
                             origin: stamp.getOrigin,
-                            scale: opts?.glowScale ?? DEFAULTS.glowScale,
+                            scale: opts?.glowScale ?? SpotTrail1Const.DEFAULTS.glowScale,
                             colors: () => stamp.getColors(defs.colors.primary),
                         });
                     },

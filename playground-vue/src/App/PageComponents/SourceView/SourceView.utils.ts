@@ -1,18 +1,21 @@
 import vue from "shiki/langs/vue.mjs";
 
+import {
+    CORE_GLOB_ROOT,
+    CORE_MODULES,
+    CORE_PACKAGE,
+    IMPORT_PATTERN,
+    PAGES_ROOT,
+    SHOW_PAGE_SCAFFOLDING,
+    SIBLING_SUFFIXES,
+    STYLED_COMPONENTS_ROOT,
+    THEME_STEM,
+} from "@thewaver/ss-playground/App/PageComponents/SourceView/SourceView.const";
 import { getDefaultHighlighterConfig, highlighter } from "@thewaver/ss-playground/shiki";
 
-import type { SourceFile, SourceGroup } from "./SourceView.types";
-
-const CORE_PACKAGE = "@thewaver/ss-playground/";
-const CORE_GLOB_ROOT = "../../../../../playground/src/";
+import type { SourceFile, SourceGroup } from "./SourceViewVue.types";
 
 const APP_MODULES = import.meta.glob<string>("/src/**/*.{ts,vue}", {
-    query: "?source",
-    import: "default",
-});
-
-const CORE_MODULES = import.meta.glob<string>("../../../../../playground/src/**/*.{ts,tsx}", {
     query: "?source",
     import: "default",
 });
@@ -24,18 +27,10 @@ const SOURCE_MODULES: Record<string, () => Promise<string>> = {
     ...APP_MODULES,
 };
 
-const APP_ROOT = "/src/App";
-const PAGES_ROOT = `${APP_ROOT}/Pages/`;
-const STYLED_COMPONENTS_ROOT = `${APP_ROOT}/StyledComponents/`;
-const THEME_STEM = `${APP_ROOT}/Theme`;
 const COMPONENT_EXTENSION = ".vue";
 const SOURCE_EXTENSIONS = ["", COMPONENT_EXTENSION, ".ts"];
-const SIBLING_SUFFIXES = [".types.ts", ".css.ts"];
 const FILE_KIND_ORDER = [COMPONENT_EXTENSION, ".ts", ".const.ts", ".utils.ts", ".types.ts", ".css.ts"];
 const SPLIT_COMPONENT_PATTERN = /\/Page[A-Z]\w*\.vue$/;
-const IMPORT_PATTERN = /^import\b[^;]*?["']([^"']+)["']\s*;?\s*$/gm;
-
-const SHOW_PAGE_SCAFFOLDING = true;
 
 const VUE_LANGUAGE = highlighter.loadLanguage(vue);
 

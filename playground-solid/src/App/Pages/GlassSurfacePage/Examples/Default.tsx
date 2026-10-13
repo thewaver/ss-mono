@@ -1,6 +1,12 @@
 import { createSignal, createUniqueId } from "solid-js";
 
-import { GlassSurface, InteractionTrackerSolidUtils, SVGDefsSamples, access } from "@thewaver/ss-components-solid";
+import {
+    GlassSurface,
+    InteractionTrackerSolidUtils,
+    SVGDefsSampleConfigs,
+    SVGDefsSamples,
+    access,
+} from "@thewaver/ss-components-solid";
 import {
     NO_SAMPLE_KEY,
     computeNoSampleDefs,
@@ -10,7 +16,7 @@ import knight from "@thewaver/ss-playground/App/knight.webp";
 import { CSSUtils, type Point2d } from "@thewaver/ss-utils";
 import { assignInlineVars } from "@vanilla-extract/dynamic";
 
-import type { GlassSurfaceExampleProps } from "../GlassSurfacePage.types";
+import type { GlassSurfaceExampleProps } from "../GlassSurfacePageSolid.types";
 
 const STARTING_RATIO: Point2d = { x: 0.5, y: 0.5 };
 const HALF_PANE = styles.paneSize * 0.5;
@@ -74,7 +80,7 @@ export const DefaultExample = ({
 
                         if (strokeKey === NO_SAMPLE_KEY) return computeNoSampleDefs(access(colors), "stroke");
 
-                        return SVGDefsSamples.Gradient.Tracked.toConfig({
+                        return SVGDefsSampleConfigs.Gradient.Tracked.toConfig({
                             family: strokeKey,
                             defs: access(strokeConfigDefs),
                         } as SVGDefsSamples.Gradient.Tracked.Entry).computeSVGDefs(`stroke-${id}`, undefined, getRef, {

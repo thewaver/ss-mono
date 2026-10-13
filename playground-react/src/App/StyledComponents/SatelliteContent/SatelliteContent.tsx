@@ -3,7 +3,7 @@ import type { PropsWithChildren } from "react";
 import * as styles from "@thewaver/ss-playground/App/StyledComponents/SatelliteContent/SatelliteContent.css";
 
 import { useLayerClass } from "../Layer/Layer.context";
-import type { PageSatelliteBadgeProps, PageSatelliteSubjectProps } from "./SatelliteContent.types";
+import type { PageSatelliteBadgeProps, PageSatelliteSubjectProps } from "./SatelliteContentReact.types";
 
 export const PageSatelliteSubject = (props: PropsWithChildren<PageSatelliteSubjectProps>) => {
     const layerClass = useLayerClass();

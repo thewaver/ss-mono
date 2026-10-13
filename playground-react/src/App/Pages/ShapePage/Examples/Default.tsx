@@ -5,8 +5,8 @@ import { InteractionTrackerReactUtils, Shape } from "@thewaver/ss-components-rea
 import * as styles from "@thewaver/ss-playground/App/Pages/ShapePage/ShapePage.css";
 import { ShapeConst, ShapeUtils, StringUtils } from "@thewaver/ss-utils";
 
-import { computeShapeFillDefs, computeShapeStrokeDefs } from "../ShapePage.const";
 import type { ShapeExampleProps } from "../ShapePage.types";
+import { computeShapeFillDefs, computeShapeStrokeDefs } from "../ShapePageReact.const";
 
 const toReactStyle = (style: object): CSSProperties =>
     Object.fromEntries(Object.entries(style).map(([key, value]) => [StringUtils.kebabToCamelCase(key), value]));

@@ -1,22 +1,21 @@
 import type { Routes } from "sv-router";
 import { createRouter } from "sv-router";
 
+import { GALLERY_NAME_SEPARATOR, GALLERY_ROUTE, GETTING_STARTED_ROUTE } from "@thewaver/ss-playground/App/App.const";
+import { MENU_DESCRIPTIONS } from "@thewaver/ss-playground/App/MenuDescriptions.const";
 import { toRouterBase } from "@thewaver/ss-playground/App/PageComponents/FrameworkSwitch/FrameworkSwitch.const";
 import { toPageViewRoute } from "@thewaver/ss-playground/App/PageComponents/ViewTabs/ViewTabs.const";
 import { StringUtils } from "@thewaver/ss-utils";
 
-import { MENU_CONFIGS, PREVIEW_EXCLUDED_PAGES } from "./App.const";
 import type { ComponentConfig, MenuBranchConfig, MenuNodeConfig } from "./App.types";
+import { MENU_CONFIGS, PREVIEW_EXCLUDED_PAGES } from "./AppSvelte.const";
 import DocsRedirect from "./DocsRedirect.svelte";
-import type { PageViewKey } from "./PageComponents/ViewTabs/ViewTabs.types";
+import type { PageViewKey } from "./PageComponents/ViewTabs/ViewTabsSvelte.types";
 import type { GalleryItem, GallerySection } from "./Pages/GalleryPage/GalleryPage.types";
 
+export { GETTING_STARTED_ROUTE, GALLERY_ROUTE } from "@thewaver/ss-playground/App/App.const";
+
 export const getIsBranchConfig = (node: MenuNodeConfig): node is MenuBranchConfig => "children" in node;
-
-const GALLERY_NAME_SEPARATOR = " / ";
-
-export const GETTING_STARTED_ROUTE = "/getting-started";
-export const GALLERY_ROUTE = "/gallery";
 
 export const componentToRouteName = (name: string) => `/${StringUtils.camelToKebabCase(name)}`;
 
@@ -49,7 +48,7 @@ const toGalleryItems = (nodes: MenuNodeConfig[], trail: string[]): GalleryItem[]
 export const GALLERY_SECTIONS: GallerySection[] = MENU_CONFIGS.filter((category) => !category.hidden)
     .map((category) => ({
         name: category.name,
-        description: category.description,
+        description: MENU_DESCRIPTIONS[category.name],
         items: toGalleryItems(category.children, []),
     }))
     .filter((section) => section.items.length > 0);

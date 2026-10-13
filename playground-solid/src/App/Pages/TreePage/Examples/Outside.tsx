@@ -4,8 +4,8 @@ import { PageControlColumn } from "../../../PageComponents/ControlRow/ControlRow
 import { PageControlButtonContent } from "../../../StyledComponents/ControlButtonContent/ControlButtonContent";
 import { renderPageHighlightFloater } from "../../../StyledComponents/GlideFloater/GlideFloater";
 import { PageTreeNodeContent } from "../../../StyledComponents/TreeNodeContent/TreeNodeContent";
-import { FILES, OUTSIDE_COLLAPSE_DELAY_MS } from "../TreePage.const";
 import type { TreeExampleProps } from "../TreePage.types";
+import { FILES, OUTSIDE_COLLAPSE_DELAY_MS } from "../TreePageSolid.const";
 
 type Props = TreeExampleProps;
 

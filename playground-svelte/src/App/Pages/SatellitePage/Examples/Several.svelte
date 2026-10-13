@@ -4,7 +4,7 @@
 
     import PageSatelliteBadge from "../../../StyledComponents/SatelliteContent/PageSatelliteBadge.svelte";
     import PageSatelliteSubject from "../../../StyledComponents/SatelliteContent/PageSatelliteSubject.svelte";
-    import type { SatelliteExampleProps } from "../SatellitePage.types";
+    import type { SatelliteExampleProps } from "../SatellitePageSvelte.types";
 
     const CORNER_SIZE = 48;
     const SIDE_SIZE = 72;

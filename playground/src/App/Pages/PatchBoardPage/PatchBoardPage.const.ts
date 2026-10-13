@@ -196,3 +196,19 @@ export const MIN_ZOOM = 0.5;
 export const MAX_ZOOM = 2;
 export const ZOOM_STEP = 0.25;
 export const STARTING_ZOOM = 1;
+
+export const EXAMPLE_NAMES = {
+    chain: "Signal chain",
+    mixer: "Mixing desk",
+    rack: "Effects rack",
+    pan: "Panned board",
+    zoom: "Zoomed board",
+};
+
+export const EXAMPLES_ROOT = "/src/App/Pages/PatchBoardPage/Examples";
+
+export const WIDE_SPAN = 2;
+
+export const PERCENT = 100;
+
+export const NOTHING_DONE = "nothing yet";

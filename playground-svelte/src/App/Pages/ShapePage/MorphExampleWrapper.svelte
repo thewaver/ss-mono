@@ -1,5 +1,5 @@
 <script lang="ts">
-    import { ShapeKnobs } from "../../Knobs/Shapes.const";
+    import { ShapeKnobs } from "@thewaver/ss-playground/App/Knobs/Shapes.const";
     import PageExampleKnobs from "../../PageComponents/ExampleKnobs/PageExampleKnobs.svelte";
     import PageNumberField from "../../PageComponents/Field/PageNumberField.svelte";
     import PageProp from "../../PageComponents/Prop/Prop.svelte";

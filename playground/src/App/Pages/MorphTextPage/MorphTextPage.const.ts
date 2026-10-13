@@ -9,3 +9,12 @@ export const MORPH_PAINT_TIMING = {
     iterationConfigKey: "constant" as const,
     cellSize: { width: 24, height: 24 },
 };
+
+export const EXAMPLE_NAMES = {
+    words: "Words in turn",
+    painted: "Painted text",
+};
+
+export const EXAMPLES_ROOT = "/src/App/Pages/MorphTextPage/Examples";
+
+export const NO_MOTION_DURATION_MS = 0;

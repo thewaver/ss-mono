@@ -2,7 +2,13 @@
     import { FLIPBOOK_DEFAULTS, FlipbookUtils, MediaQueryMonitorSvelteUtils } from "@thewaver/ss-components-svelte";
     import { FlipbookKnobs } from "@thewaver/ss-playground/App/Knobs/Flipbooks.const";
     import { computeFlipbookSpreadAnnouncement } from "@thewaver/ss-playground/App/PageComponents/Announcements/Announcements.const";
-    import { FLIPBOOK_PAGES } from "@thewaver/ss-playground/App/Pages/FlipbookPage/FlipbookPage.const";
+    import {
+    EXAMPLE_NAMES,
+    EXAMPLES_ROOT,
+    FIELD_WIDTH,
+    FLIPBOOK_PAGES,
+    NO_MOTION_DURATION_MS,
+} from "@thewaver/ss-playground/App/Pages/FlipbookPage/FlipbookPage.const";
 
     import type { ExampleDefs } from "../../PageComponents/Examples/Examples.types";
     import PageExamples from "../../PageComponents/Examples/PageExamples.svelte";
@@ -10,11 +16,6 @@
     import PageProp from "../../PageComponents/Prop/Prop.svelte";
     import PagePropsPanel from "../../PageComponents/PropsPanel/PagePropsPanel.svelte";
     import BookExample from "./Examples/Book.svelte";
-
-    const NO_MOTION_DURATION_MS = 0;
-
-    const FIELD_WIDTH = 110;
-    const EXAMPLES_ROOT = "/src/App/Pages/FlipbookPage/Examples";
 
     let transitionDurationMs = $state(FLIPBOOK_DEFAULTS.transitionDurationMs);
     let index = $state(0);
@@ -26,7 +27,7 @@
     const examples: ExampleDefs[] = [
         {
             key: "book",
-            name: "A book of twelve pages",
+            name: EXAMPLE_NAMES.book,
             readout: () => {
                 const count = FLIPBOOK_PAGES.length;
                 const pages = FlipbookUtils.getShowingPages(index, count);

@@ -5,7 +5,7 @@ import { Checkbox, Label } from "@thewaver/ss-components-vue";
 
 import PageCheckboxContent from "../../../StyledComponents/CheckboxContent/CheckboxContent.vue";
 import PageLabelCaption from "../../../StyledComponents/LabelCaption/LabelCaption.vue";
-import type { LabelExampleProps } from "../LabelPage.types";
+import type { LabelExampleProps } from "../LabelPageVue.types";
 
 type Props = LabelExampleProps;
 

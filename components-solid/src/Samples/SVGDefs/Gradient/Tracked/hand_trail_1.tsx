@@ -1,12 +1,13 @@
 import { createEffect, createSignal } from "solid-js";
 
+import { type GradientHandTrailOpts, type PointerReading, SVGDefsUtils } from "@thewaver/ss-components";
 import {
-    type GradientHandTrailOpts,
-    type PointerReading,
-    SVGDefsUtils,
-    TrackedGradientDefaults,
-} from "@thewaver/ss-components";
-import { MathUtils, SVGUtils, type Size2d } from "@thewaver/ss-utils";
+    HandTrail1Const,
+    HandTrailConst,
+    TrackedGradientSampleConst,
+    TrailStampConst,
+} from "@thewaver/ss-components/internal";
+import { MathUtils, SVGUtils } from "@thewaver/ss-utils";
 
 import { PointerTrackerSolidUtils } from "../../../../Abstracts/PointerTracker/PointerTrackerSolid.utils";
 import { SVGClipPath } from "../../../../Generators/SVGDefs/SVGClipPaths/SVGClipPath";
@@ -20,33 +21,15 @@ type HandStamp = {
     bornMs: number;
 };
 
-const SWEEP_SPAN: Size2d = { width: 0.7, height: 0.7 };
-const QUARTER_TURN = 90;
-const HALF_TURN = 180;
-const FULL_TURN = 360;
-
-const STAMP_COUNT = Math.ceil(1000 / 60) * 2;
-const STAMP_INTERVAL_MS = Math.ceil(1000 / 60);
-const TRAIL_LIFETIME_MS = STAMP_COUNT * STAMP_INTERVAL_MS;
-const MOTION_TURN_DEGREES = 0.25;
-const MOTION_GRACE_MS = STAMP_INTERVAL_MS * 2;
-
-const RESTING_ANGLE = 0;
-const FULL_AGE_RATIO = 1;
-const FULL_ALPHA = 1;
-const NO_FADE = 0;
-
-const DEFAULTS = TrackedGradientDefaults.HAND_TRAIL_DEFAULTS;
-
 const NO_REF = () => undefined;
 
 const getShortestTurn = (from: number, to: number) => {
-    const gap = (((to - from) % FULL_TURN) + FULL_TURN) % FULL_TURN;
+    const gap = (((to - from) % HandTrailConst.FULL_TURN) + HandTrailConst.FULL_TURN) % HandTrailConst.FULL_TURN;
 
-    return gap > HALF_TURN ? gap - FULL_TURN : gap;
+    return gap > HandTrailConst.HALF_TURN ? gap - HandTrailConst.FULL_TURN : gap;
 };
 
-const getSweepRotation = (angle: number, arc: number) => angle - HALF_TURN - arc * 0.5;
+const getSweepRotation = (angle: number, arc: number) => angle - HandTrailConst.HALF_TURN - arc * 0.5;
 
 const computeSweepColors = (color: string, alpha: number) => [
     { value: `rgb(from ${color} r g b / 0)` },
@@ -54,7 +37,7 @@ const computeSweepColors = (color: string, alpha: number) => [
     { value: `rgb(from ${color} r g b / 0)` },
 ];
 
-const clock = SVGDefsSolidUtils.createClock(TRAIL_LIFETIME_MS);
+const clock = SVGDefsSolidUtils.createClock(TrailStampConst.TRAIL_LIFETIME_MS);
 
 const createHandStamp = (
     index: number,
@@ -79,16 +62,16 @@ const createHandStamp = (
 
         lastAngle = angle;
 
-        if (turn !== undefined && turn > MOTION_TURN_DEGREES) {
+        if (turn !== undefined && turn > HandTrailConst.MOTION_TURN_DEGREES) {
             lastTurnedMs = performance.now();
 
-            if (fade > NO_FADE) clock.keepAwake();
+            if (fade > TrackedGradientSampleConst.NO_FADE) clock.keepAwake();
         }
 
-        const tick = Math.floor(nowMs / STAMP_INTERVAL_MS);
+        const tick = Math.floor(nowMs / TrailStampConst.STAMP_INTERVAL_MS);
 
-        if (tick % STAMP_COUNT !== index || tick === bornTick) return;
-        if (lastTurnedMs === undefined || performance.now() - lastTurnedMs > MOTION_GRACE_MS) return;
+        if (tick % TrailStampConst.STAMP_COUNT !== index || tick === bornTick) return;
+        if (lastTurnedMs === undefined || performance.now() - lastTurnedMs > TrailStampConst.MOTION_GRACE_MS) return;
 
         bornTick = tick;
 
@@ -98,16 +81,18 @@ const createHandStamp = (
     const getAgeRatio = () => {
         const stamp = getStamp();
 
-        return stamp ? MathUtils.clamp01((clock.getFrameMs() - stamp.bornMs) / TRAIL_LIFETIME_MS) : FULL_AGE_RATIO;
+        return stamp
+            ? MathUtils.clamp01((clock.getFrameMs() - stamp.bornMs) / TrailStampConst.TRAIL_LIFETIME_MS)
+            : TrackedGradientSampleConst.FULL_AGE_RATIO;
     };
 
     const getAlpha = () =>
         (getStamp()?.fade ?? 0) *
-        (opts?.trailAlpha ?? DEFAULTS.trailAlpha) *
-        (1 - getAgeRatio()) ** (opts?.trailDecay ?? DEFAULTS.trailDecay);
+        (opts?.trailAlpha ?? HandTrail1Const.DEFAULTS.trailAlpha) *
+        (1 - getAgeRatio()) ** (opts?.trailDecay ?? HandTrail1Const.DEFAULTS.trailDecay);
 
     return {
-        getAngle: () => getStamp()?.angle ?? RESTING_ANGLE,
+        getAngle: () => getStamp()?.angle ?? HandTrailConst.RESTING_ANGLE,
         getColors: (color: string) => computeSweepColors(color, getAlpha()),
     };
 };
@@ -133,12 +118,13 @@ export const hand_trail_1 = (opts?: GradientHandTrailOpts): TrackedGradientConfi
                     renderDefsElement: () => {
                         return SVGGradientDefsSolidUtils.computeLinearGradient({
                             id: `gradient1-${id}`,
-                            angle: () => getReading().angle + QUARTER_TURN,
-                            scale: SWEEP_SPAN,
+                            angle: () => getReading().angle + HandTrailConst.QUARTER_TURN,
+                            scale: HandTrailConst.SWEEP_SPAN,
                             colors: () =>
                                 computeSweepColors(
                                     defs.colors.primary,
-                                    FULL_ALPHA * SVGDefsUtils.getPointerFade(getReading(), getIsPointerPresent()),
+                                    TrailStampConst.FULL_ALPHA *
+                                        SVGDefsUtils.getPointerFade(getReading(), getIsPointerPresent()),
                                 ),
                         });
                     },
@@ -150,8 +136,11 @@ export const hand_trail_1 = (opts?: GradientHandTrailOpts): TrackedGradientConfi
                             <SVGClipPath id={`clip1-${id}`}>
                                 <path
                                     d={SVGUtils.getArcPath(
-                                        opts?.sweepArc ?? DEFAULTS.sweepArc,
-                                        getSweepRotation(getReading().angle, opts?.sweepArc ?? DEFAULTS.sweepArc),
+                                        opts?.sweepArc ?? HandTrail1Const.DEFAULTS.sweepArc,
+                                        getSweepRotation(
+                                            getReading().angle,
+                                            opts?.sweepArc ?? HandTrail1Const.DEFAULTS.sweepArc,
+                                        ),
                                     )}
                                 />
                             </SVGClipPath>
@@ -160,7 +149,7 @@ export const hand_trail_1 = (opts?: GradientHandTrailOpts): TrackedGradientConfi
                 },
                 filter: sharedBlur,
             },
-            ...Array.from({ length: STAMP_COUNT }, (_unused, index) => {
+            ...Array.from({ length: TrailStampConst.STAMP_COUNT }, (_unused, index) => {
                 const stampId = `${index + 2}-${id}`;
 
                 let shared: ReturnType<typeof createHandStamp> | undefined;
@@ -175,8 +164,8 @@ export const hand_trail_1 = (opts?: GradientHandTrailOpts): TrackedGradientConfi
 
                             return SVGGradientDefsSolidUtils.computeLinearGradient({
                                 id: `gradient${stampId}`,
-                                angle: () => stamp.getAngle() + QUARTER_TURN,
-                                scale: SWEEP_SPAN,
+                                angle: () => stamp.getAngle() + HandTrailConst.QUARTER_TURN,
+                                scale: HandTrailConst.SWEEP_SPAN,
                                 colors: () => stamp.getColors(defs.colors.primary),
                             });
                         },
@@ -190,8 +179,11 @@ export const hand_trail_1 = (opts?: GradientHandTrailOpts): TrackedGradientConfi
                                 <SVGClipPath id={`clip${stampId}`}>
                                     <path
                                         d={SVGUtils.getArcPath(
-                                            opts?.sweepArc ?? DEFAULTS.sweepArc,
-                                            getSweepRotation(stamp.getAngle(), opts?.sweepArc ?? DEFAULTS.sweepArc),
+                                            opts?.sweepArc ?? HandTrail1Const.DEFAULTS.sweepArc,
+                                            getSweepRotation(
+                                                stamp.getAngle(),
+                                                opts?.sweepArc ?? HandTrail1Const.DEFAULTS.sweepArc,
+                                            ),
                                         )}
                                     />
                                 </SVGClipPath>

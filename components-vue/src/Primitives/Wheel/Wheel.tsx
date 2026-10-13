@@ -8,6 +8,7 @@ import {
     WheelUtils,
     type WheelWedgeState,
 } from "@thewaver/ss-components";
+import { WheelConst } from "@thewaver/ss-components/internal";
 
 import { MediaQueryMonitorVueUtils } from "../../Abstracts/MediaQueryMonitor/MediaQueryMonitorVue.utils";
 import { PointerTrackerVueUtils } from "../../Abstracts/PointerTracker/PointerTrackerVue.utils";
@@ -18,8 +19,6 @@ import type { SlotsContext } from "../../Utils/typeUtils";
 import { Barrel } from "../Barrel/Barrel";
 import type { BarrelSlots } from "../Barrel/Barrel.types";
 import type { WheelBackSlot, WheelController, WheelProps, WheelSlots } from "./Wheel.types";
-
-const FIRST_WEDGE = 0;
 
 export const Wheel = defineComponent(
     <T,>(props: WheelProps<T>, { slots }: SlotsContext<WheelSlots<T> & Partial<WheelBackSlot<T>>>) => {
@@ -97,7 +96,7 @@ export const Wheel = defineComponent(
             face,
             isSelected: index === selectedIndex.value,
             angle: getWedgeAngle(index),
-            placement: layout.value?.placements[FIRST_WEDGE],
+            placement: layout.value?.placements[WheelConst.FIRST_WEDGE],
         });
 
         const controller: WheelController = {

@@ -1,7 +1,7 @@
 import { Button } from "@thewaver/ss-components-react";
 
 import { PageButtonContent } from "../../../StyledComponents/ButtonContent/ButtonContent";
-import type { ButtonExampleProps } from "../ButtonPage.types";
+import type { ButtonExampleProps } from "../ButtonPageReact.types";
 
 const SAVE_DURATION_MS = 1000;
 

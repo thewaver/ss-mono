@@ -3,6 +3,12 @@ import { computed, shallowRef } from "vue";
 
 import { LENS_DEFAULTS } from "@thewaver/ss-components-vue";
 import { LensKnobs } from "@thewaver/ss-playground/App/Knobs/Lenses.const";
+import {
+    EXAMPLES_ROOT,
+    EXAMPLE_NAMES,
+    FIELD_WIDTH,
+    SHAPE_FIELD_WIDTH,
+} from "@thewaver/ss-playground/App/Pages/Reveals/LensPage/LensPage.const";
 import type { RevealShape } from "@thewaver/ss-playground/App/Pages/Reveals/RevealPage/RevealPage.types";
 import { ShapeConst, type Size2d } from "@thewaver/ss-utils";
 
@@ -16,10 +22,6 @@ import PagePropsPanel from "../../../PageComponents/PropsPanel/PagePropsPanel.vu
 import PhotoExample from "./Examples/Photo.vue";
 import PrintExample from "./Examples/Print.vue";
 import type { LensExampleProps } from "./LensPage.types";
-
-const EXAMPLES_ROOT = "/src/App/Pages/Reveals/LensPage/Examples";
-const FIELD_WIDTH = 110;
-const SHAPE_FIELD_WIDTH = 170;
 
 const zoom = shallowRef(LENS_DEFAULTS.zoom);
 const radius = shallowRef(LENS_DEFAULTS.radius);
@@ -53,13 +55,13 @@ const commonProps = computed<LensExampleProps>(() => ({
 const examples: ExampleDefs[] = [
     {
         key: "photo",
-        name: "Photo",
+        name: EXAMPLE_NAMES.photo,
         readout: () => "a picture drawn larger inside a window that follows the pointer",
         path: `${EXAMPLES_ROOT}/Photo.vue`,
     },
     {
         key: "print",
-        name: "Small print",
+        name: EXAMPLE_NAMES.print,
         readout: () => "the word under the middle of the lens is the word under the pointer",
         path: `${EXAMPLES_ROOT}/Print.vue`,
     },

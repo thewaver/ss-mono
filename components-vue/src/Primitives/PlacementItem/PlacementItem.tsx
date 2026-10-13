@@ -1,14 +1,13 @@
 import { type SlotsType, defineComponent, shallowRef, watch } from "vue";
 
 import { PLACEMENT_ITEM_DEFAULTS, PlacementItemStyles, PlacementItemUtils } from "@thewaver/ss-components";
+import { PlacementItemConst } from "@thewaver/ss-components/internal";
 
 import { watchAfterRender } from "../../Utils/effectUtils";
 import { declareProps } from "../../Utils/propUtils";
 import type { SlotsContext } from "../../Utils/typeUtils";
 import { usePlacementBoxContext } from "../PlacementBox/PlacementBox.context";
 import type { PlacementItemProps, PlacementItemSlots } from "./PlacementItem.types";
-
-const NO_TRANSITION_MS = 0;
 
 export const PlacementItem = defineComponent(
     (props: PlacementItemProps, { slots }: SlotsContext<PlacementItemSlots>) => {
@@ -21,7 +20,7 @@ export const PlacementItem = defineComponent(
         watch(
             () => props.placement,
             () => {
-                isGliding.value = context.getTransitionDurationMs() > NO_TRANSITION_MS;
+                isGliding.value = context.getTransitionDurationMs() > PlacementItemConst.NO_TRANSITION_MS;
             },
         );
 

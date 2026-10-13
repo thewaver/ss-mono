@@ -1,18 +1,19 @@
 <script setup lang="ts">
 import { shallowRef, useId } from "vue";
 
+import {
+    EXAMPLES_ROOT,
+    EXAMPLE_NAMES,
+    STARTING_DISABLED_HSV,
+    STARTING_HSV,
+    STARTING_PICKER_HSV,
+} from "@thewaver/ss-playground/App/Pages/ColorAreaPage/ColorAreaPage.const";
 import { Color } from "@thewaver/ss-utils";
 
 import type { ExampleDefs } from "../../PageComponents/Examples/Examples.types";
 import PageExamples from "../../PageComponents/Examples/PageExamples.vue";
 import DropdownExample from "./Examples/Dropdown.vue";
 import SurfaceExample from "./Examples/Surface.vue";
-
-const EXAMPLES_ROOT = "/src/App/Pages/ColorAreaPage/Examples";
-
-const STARTING_HSV: Color.HSVA = { h: 210, s: 70, v: 90, a: 1 };
-const STARTING_PICKER_HSV: Color.HSVA = { h: 90, s: 50, v: 80, a: 1 };
-const STARTING_DISABLED_HSV: Color.HSVA = { h: 0, s: 60, v: 60, a: 1 };
 
 const popupId = useId();
 
@@ -25,20 +26,20 @@ const hue = shallowRef(STARTING_PICKER_HSV.h);
 const examples: ExampleDefs[] = [
     {
         key: "bare",
-        name: "The surface alone",
+        name: EXAMPLE_NAMES.bare,
         readout: () =>
             `hsv: ${Math.round(bare.value.h)}° ${Math.round(bare.value.s)}% ${Math.round(bare.value.v)}% — hex: ${Color.HSV.toHex(bare.value)}`,
         path: `${EXAMPLES_ROOT}/Surface.vue`,
     },
     {
         key: "dropdown",
-        name: "In a dropdown, replacing the OS dialog",
+        name: EXAMPLE_NAMES.dropdown,
         readout: () => `${Color.HSVA.toHexa(picker.value)} — open: ${isOpen.value}`,
         path: `${EXAMPLES_ROOT}/Dropdown.vue`,
     },
     {
         key: "disabled",
-        name: "Disabled",
+        name: EXAMPLE_NAMES.disabled,
         readout: () => "the drag is not attached at all, so nothing moves",
         path: `${EXAMPLES_ROOT}/Surface.vue`,
     },

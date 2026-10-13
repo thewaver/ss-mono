@@ -7,8 +7,8 @@ import type { TreeNode } from "@thewaver/ss-components-vue";
 import PageGlideFloater from "../../../StyledComponents/GlideFloater/PageGlideFloater.vue";
 import PageTreeNodeContent from "../../../StyledComponents/TreeNodeContent/PageTreeNodeContent.vue";
 import PageTreeNodePending from "../../../StyledComponents/TreeNodeContent/PageTreeNodePending.vue";
-import { REMOTE_CHILDREN, REMOTE_LOAD_DELAY_MS, REMOTE_ROOT } from "../TreePage.const";
 import type { TreeExampleProps } from "../TreePage.types";
+import { REMOTE_CHILDREN, REMOTE_LOAD_DELAY_MS, REMOTE_ROOT } from "../TreePageVue.const";
 
 type Props = TreeExampleProps;
 

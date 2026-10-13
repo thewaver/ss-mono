@@ -1,48 +1,24 @@
 import type { JSX } from "solid-js";
 
 import type {
-    AnchorPlacement,
-    ClockSteps,
+    BaseTimePickerCbs,
+    BaseTimePickerValues,
     InteractionFlags,
     PopupTriggerFlags,
     TextFieldFlags,
     TimeInputMeridiem,
 } from "@thewaver/ss-components";
-import type { Point2d, TimeValue } from "@thewaver/ss-utils";
 
-import type { AccessorProps, SignalSource } from "../../../Utils/typeUtils";
+import type { AccessorProps, AccessorValues, SignalSource } from "../../../Utils/typeUtils";
 import type { ClockColumnRenderer, ClockOptionRenderer, ClockUnitRenderer } from "../Clock/ClockSolid.types";
 import type { TimeInputProps } from "../TimeInput/TimeInputSolid.types";
 
 export type TimePickerProps = Omit<TimeInputProps, "renderTrailing"> &
+    AccessorValues<BaseTimePickerValues> &
+    BaseTimePickerCbs &
     AccessorProps<{
-        /** Where the clock sits against the field. */
-        placement?: AnchorPlacement;
-        /** How far the clock is held clear of the field. */
-        offset?: Point2d;
-        /** How long the clock takes to fade in and out. */
-        popupTransitionDurationMs?: number;
-        /** Names the clock for assistive technology. */
-        clockLabel: string;
-        /** Which country's conventions the times are written in. */
-        locale?: string;
-        /** How far apart the offered times are, per unit. */
-        clockSteps?: ClockSteps;
-        /** The space between the clock's columns. */
-        clockGap?: number;
-        /** Whether one time can be picked, for rules a plain earliest and latest cannot express. */
-        computeIsTimeDisabled?: (time: TimeValue) => boolean;
         /** Whether the clock is open. It is the only thing that opens or closes it. */
         visibility?: SignalSource<boolean>;
-        /**
-         * The trigger's own element id, for a consumer that has to reach it from a label or a test.
-         *
-         * It is separate from the field's `id` because the two are different elements now that the component
-         * owns the trigger.
-         */
-        triggerId?: string;
-        /** Names the control that opens the clock. */
-        triggerAriaLabel: string;
         /**
          * Draws whatever else sits after the field's text, before the control that opens the clock.
          *

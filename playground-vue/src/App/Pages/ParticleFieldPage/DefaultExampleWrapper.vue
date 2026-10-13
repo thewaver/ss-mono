@@ -1,15 +1,13 @@
 <script setup lang="ts">
 import { computed, useModel } from "vue";
 
+import { BOX_HEIGHT, BOX_WIDTH } from "@thewaver/ss-playground/App/Pages/ParticleFieldPage/ParticleFieldPage.const";
 import * as styles from "@thewaver/ss-playground/App/Pages/ParticleFieldPage/ParticleFieldPage.css";
 
 import PageMeasureBox from "../../PageComponents/MeasureBox/MeasureBox.vue";
 import PagePlaybackScrubber from "../../PageComponents/PlaybackScrubber/PlaybackScrubber.vue";
 import DefaultExample from "./Examples/Default.vue";
 import type { ParticleFieldExampleProps } from "./ParticleFieldPage.types";
-
-const BOX_WIDTH = 320;
-const BOX_HEIGHT = 320;
 
 type Props = Omit<ParticleFieldExampleProps, "playback" | "onUpdate:playback"> & {
     "progress": number;

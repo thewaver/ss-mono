@@ -2,7 +2,7 @@
 import * as styles from "@thewaver/ss-playground/App/StyledComponents/MosaicContent/MosaicContent.css";
 
 import { useLayerClass } from "../Layer/Layer.context";
-import type { PageMosaicTileProps } from "./MosaicContent.types";
+import type { PageMosaicTileProps } from "./MosaicContentVue.types";
 
 defineProps<PageMosaicTileProps>();
 

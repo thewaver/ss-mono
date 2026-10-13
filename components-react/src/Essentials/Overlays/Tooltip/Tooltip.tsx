@@ -2,6 +2,7 @@ import { type CSSProperties, useEffect, useId, useRef, useState } from "react";
 import { createPortal } from "react-dom";
 
 import { HoverIntentUtils, TOOLTIP_DEFAULTS, TooltipStyles, TooltipUtils } from "@thewaver/ss-components";
+import { TooltipConst } from "@thewaver/ss-components/internal";
 import { assignInlineVars } from "@vanilla-extract/dynamic";
 
 import { AnchorReactUtils } from "../../../Abstracts/Anchor/AnchorReact.utils";
@@ -11,8 +12,6 @@ import { HoverIntentReactUtils } from "../../../Abstracts/HoverIntent/HoverInten
 import { useViewportContext } from "../../../Abstracts/Viewport/Viewport.context";
 import { useLatest } from "../../../Utils/refUtils";
 import type { TooltipProps } from "./Tooltip.types";
-
-const TOOLTIP_DELAY_GROUP = HoverIntentUtils.createDelayGroup();
 
 export const Tooltip = (props: TooltipProps) => {
     const viewportContext = useViewportContext();
@@ -27,7 +26,7 @@ export const Tooltip = (props: TooltipProps) => {
     const transitionDurationMs = props.transitionDurationMs ?? TOOLTIP_DEFAULTS.transitionDurationMs;
 
     const hoverIntent = HoverIntentReactUtils.useHoverIntent(anchorRef, shownState, {
-        delayGroup: TOOLTIP_DELAY_GROUP,
+        delayGroup: TooltipConst.TOOLTIP_DELAY_GROUP,
         panelRef: contentRef,
         hoverShowDelayMs: props.hoverShowDelayMs ?? TOOLTIP_DEFAULTS.hoverShowDelayMs,
         skipDelayWindowMs: props.skipDelayWindowMs ?? TOOLTIP_DEFAULTS.skipDelayWindowMs,

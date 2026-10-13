@@ -5,6 +5,11 @@ import type { AnchorHPlacement, AnchorVPlacement } from "@thewaver/ss-components
 import { ANCHOR_H_PLACEMENTS, ANCHOR_V_PLACEMENTS, TOOLTIP_DEFAULTS } from "@thewaver/ss-components-vue";
 import { TooltipKnobs } from "@thewaver/ss-playground/App/Knobs/Tooltips.const";
 import {
+    EXAMPLES_ROOT,
+    EXAMPLE_NAMES,
+    FIELD_WIDTH,
+} from "@thewaver/ss-playground/App/Pages/TooltipPage/TooltipPage.const";
+import {
     TOOLTIP_ARROWS,
     TOOLTIP_ARROW_LABELS,
     TOOLTIP_HOVER_DELAY_MS,
@@ -23,11 +28,7 @@ import PagePropsPanel from "../../PageComponents/PropsPanel/PagePropsPanel.vue";
 import DefaultExample from "./Examples/Default.vue";
 import RichExample from "./Examples/Rich.vue";
 import WordExample from "./Examples/Word.vue";
-import type { TooltipExampleProps } from "./TooltipPage.types";
-
-const EXAMPLES_ROOT = "/src/App/Pages/TooltipPage/Examples";
-
-const FIELD_WIDTH = 110;
+import type { TooltipExampleProps } from "./TooltipPageVue.types";
 
 const hPlacement = shallowRef<AnchorHPlacement>(TooltipKnobs.STARTING_H_PLACEMENT);
 const vPlacement = shallowRef<AnchorVPlacement>(TooltipKnobs.STARTING_V_PLACEMENT);
@@ -62,21 +63,21 @@ const commonProps = computed<TooltipExampleProps>(() => ({
 const examples: ExampleDefs[] = [
     {
         key: "default",
-        name: "On a control of your own",
+        name: EXAMPLE_NAMES.default,
         readout: () =>
             "the button is a plain one, not the library's — the tooltip is handed its element and wires the hover, the focus and the Escape itself",
         path: `${EXAMPLES_ROOT}/Default.vue`,
     },
     {
         key: "word",
-        name: "On something that is not a control",
+        name: EXAMPLE_NAMES.word,
         readout: () =>
             "any element with a ref can carry one; this word was given a tab stop of its own, without which the tooltip would be reachable by pointer alone",
         path: `${EXAMPLES_ROOT}/Word.vue`,
     },
     {
         key: "rich",
-        name: "More than a line",
+        name: EXAMPLE_NAMES.rich,
         readout: () => "the content is whatever you render, and the anchoring is unchanged by how tall it is",
         path: `${EXAMPLES_ROOT}/Rich.vue`,
     },

@@ -16,9 +16,11 @@
     import type { ParticleFieldExampleProps } from "./ParticleFieldPage.types";
     import ShapedExampleWrapper from "./ShapedExampleWrapper.svelte";
     import StressTestWrapper from "./StressTestWrapper.svelte";
-
-    const EXAMPLES_ROOT = "/src/App/Pages/ParticleFieldPage/Examples";
-    const PERCENT = 100;
+    import {
+    EXAMPLE_NAMES,
+    EXAMPLES_ROOT,
+    PERCENT,
+} from "@thewaver/ss-playground/App/Pages/ParticleFieldPage/ParticleFieldPage.const";
 
     const extractOptionGroupWord = (key: string) => key.replace(/^_/, "").match(/^[a-z]+/)?.[0] ?? key;
 
@@ -69,7 +71,7 @@
     const examples: ExampleDefs[] = [
         {
             key: "default",
-            name: "The whole box",
+            name: EXAMPLE_NAMES.default,
             readout: () =>
                 `${Math.round(progress * PERCENT)}% through the pass, ${defaultPlayback ? "running" : "stopped"} — the progress signal is written by the field while it plays, and writing it moves the pass there`,
             component: defaultExample,
@@ -77,7 +79,7 @@
         },
         {
             key: "shaped",
-            name: "Inside a shape",
+            name: EXAMPLE_NAMES.shaped,
             readout: () =>
                 "the same field, limited to one of the built-in shapes Shape draws; a cell whose center falls outside it never spawns",
             component: shapedExample,
@@ -85,7 +87,7 @@
         },
         {
             key: "stressTest",
-            name: "Stress Test",
+            name: EXAMPLE_NAMES.stressTest,
             component: stressTestExample,
         },
     ];

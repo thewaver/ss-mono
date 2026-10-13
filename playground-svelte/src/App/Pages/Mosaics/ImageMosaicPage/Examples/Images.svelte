@@ -3,7 +3,7 @@
     import { MosaicImages } from "@thewaver/ss-playground/App/Pages/Mosaics/ImageMosaicPage/MosaicImages.const";
 
     import PageMosaicLink from "../../../../StyledComponents/MosaicContent/PageMosaicLink.svelte";
-    import type { ImagesExampleProps } from "../ImageMosaicPage.types";
+    import type { ImagesExampleProps } from "../ImageMosaicPageSvelte.types";
 
     type Props = ImagesExampleProps;
 

@@ -4,7 +4,7 @@
     import * as styles from "@thewaver/ss-playground/App/StyledComponents/RadioContent/RadioContent.css";
 
     import { getLayerClass } from "../Layer/Layer.context";
-    import type { RadioContentProps } from "./RadioContent.types";
+    import type { RadioContentProps } from "./RadioContentSvelte.types";
 
     let props: RadioContentProps & { children?: Snippet } = $props();
 

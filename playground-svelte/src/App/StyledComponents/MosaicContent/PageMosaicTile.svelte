@@ -4,7 +4,7 @@
     import * as styles from "@thewaver/ss-playground/App/StyledComponents/MosaicContent/MosaicContent.css";
 
     import { getLayerClass } from "../Layer/Layer.context";
-    import type { PageMosaicTileProps } from "./MosaicContent.types";
+    import type { PageMosaicTileProps } from "./MosaicContentSvelte.types";
 
     let props: PageMosaicTileProps & { children?: Snippet } = $props();
 

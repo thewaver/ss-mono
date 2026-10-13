@@ -5,7 +5,7 @@ import { Button, Corners } from "@thewaver/ss-components-vue";
 import * as styles from "@thewaver/ss-playground/App/Pages/CornersPage/CornersPage.css";
 
 import PageButtonContent from "../../../StyledComponents/ButtonContent/ButtonContent.vue";
-import type { CornersExampleProps } from "../CornersPage.types";
+import type { CornersExampleProps } from "../CornersPageVue.types";
 
 type Props = CornersExampleProps;
 

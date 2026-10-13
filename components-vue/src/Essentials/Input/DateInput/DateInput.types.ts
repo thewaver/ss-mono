@@ -1,10 +1,8 @@
 import type { VNodeChild } from "vue";
 
 import type {
-    DateInputFormat,
-    DateInputPart,
+    BaseDateInputProps,
     DateValue,
-    DateValueCalendarId,
     DateValueEra,
     InteractionFlags,
     TextFieldFlags,
@@ -40,27 +38,13 @@ export type DateInputProps = Omit<
     | "step"
     | "onInput"
     | "onBlur"
-> & {
-    /** The earliest date that can be entered. */
-    "minValue"?: DateValue;
-    /** The latest date that can be entered. */
-    "maxValue"?: DateValue;
-    /** The order and separators the date is written in. */
-    "format"?: DateInputFormat;
-    /** Which calendar system the date is read and written in. */
-    "calendar"?: DateValueCalendarId;
-    /** Which country's conventions decide the default format and names. */
-    "locale"?: string;
-    /**
-     * The letters that stand for each part of the date in the format hint handed to `renderPlaceholder`. The
-     * field puts them in the order the format writes the parts and joins them with its separator.
-     */
-    "partHints": Record<DateInputPart, string>;
-    /** The date, which is what `v-model:value` binds. It is the only thing that changes it. */
-    "value": DateValue | undefined;
-    /** Receives the date once what is typed makes a whole one, and `undefined` once the field is emptied. */
-    "onUpdate:value"?: (value: DateValue | undefined) => void;
-};
+> &
+    BaseDateInputProps & {
+        /** The date, which is what `v-model:value` binds. It is the only thing that changes it. */
+        "value": DateValue | undefined;
+        /** Receives the date once what is typed makes a whole one, and `undefined` once the field is emptied. */
+        "onUpdate:value"?: (value: DateValue | undefined) => void;
+    };
 
 export type DateInputSlots = Omit<TextFieldSlots, "renderLeading"> & {
     /** Draws whatever sits before the field's text, inside the field, and is handed the era the year counts within. */

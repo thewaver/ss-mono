@@ -8,6 +8,7 @@ import {
     TextFieldUtils,
     SelectStyles as styles,
 } from "@thewaver/ss-components";
+import { SelectConst } from "@thewaver/ss-components/internal";
 import { CSSUtils, StringUtils } from "@thewaver/ss-utils";
 
 import { SignalMirrorSolidUtils } from "../../../Abstracts/SignalMirror/SignalMirrorSolid.utils";
@@ -22,9 +23,6 @@ import { LabelSolidUtils } from "../Label/LabelSolid.utils";
 import { ListboxOptions } from "../Listbox/Listbox";
 import { ListboxSolidUtils } from "../Listbox/ListboxSolid.utils";
 import type { SelectCompositeProps, SelectFieldProps, SelectProps } from "./SelectSolid.types";
-
-const EMPTY_QUERY = "";
-const EMPTY_SELECTION: never[] = [];
 
 const SelectField = (props: SelectFieldProps) => {
     const getAriaLabel = LabelSolidUtils.resolveAriaLabel(
@@ -139,9 +137,9 @@ export const SelectComposite = <T,>(props: SelectCompositeProps<T>) => {
 
     const getIsFilterable = createMemo(() => props.query !== undefined);
 
-    const getQuery = createMemo(() => props.query?.[0]() ?? EMPTY_QUERY);
+    const getQuery = createMemo(() => props.query?.[0]() ?? SelectConst.EMPTY_QUERY);
 
-    const getIsFiltering = createMemo(() => getQuery() !== EMPTY_QUERY);
+    const getIsFiltering = createMemo(() => getQuery() !== SelectConst.EMPTY_QUERY);
 
     const getSpreadPadding = createMemo(() =>
         TextFieldUtils.resolvePadding(access(props.padding) ?? SELECT_DEFAULTS.padding),
@@ -196,7 +194,7 @@ export const SelectComposite = <T,>(props: SelectCompositeProps<T>) => {
     createEffect(() => {
         if (!SelectUtils.getIsQueryClearDue(getIsOpen(), getHasPopoverSettled(), getQuery())) return;
 
-        props.query?.[1](EMPTY_QUERY);
+        props.query?.[1](SelectConst.EMPTY_QUERY);
     });
 
     const renderOptions = () => (
@@ -313,7 +311,7 @@ export const Select = <T,>(props: SelectProps<T>) => {
             (option) => option.value === selectedValue,
         );
 
-        return selectedOption ? [selectedOption] : EMPTY_SELECTION;
+        return selectedOption ? [selectedOption] : SelectConst.EMPTY_SELECTION;
     });
 
     return (

@@ -1,15 +1,13 @@
 import { type Accessor, Index, type JSX, Show, createEffect, createMemo, createSignal } from "solid-js";
 
 import {
-    type InteractionSizing,
     type MenuItemFlags,
-    type MenuItemKind,
-    type MenuTriggerRole,
     MenuUtils,
     TOOLBAR_DEFAULTS,
     ToolbarUtils,
     ToolbarStyles as styles,
 } from "@thewaver/ss-components";
+import { PlacementConst, ToolbarConst } from "@thewaver/ss-components/internal";
 
 import { ElementObserverSolidUtils } from "../../Abstracts/ElementObserver/ElementObserverSolid.utils";
 import { NavigatorSolidUtils } from "../../Abstracts/Navigator/NavigatorSolid.utils";
@@ -28,13 +26,6 @@ import type {
     ToolbarMenusProps,
     ToolbarProps,
 } from "./ToolbarSolid.types";
-
-const OVERFLOW_STOP = ToolbarUtils.OVERFLOW_STOP;
-const NO_RADIO_GROUP: never[] = [];
-const ROW_SIZING: InteractionSizing = "fit-content";
-const PLACED_SIZING: InteractionSizing = "fill";
-const PRESSED_ITEM_KIND: MenuItemKind = "checkbox";
-const WORD_ROLE: MenuTriggerRole = "menuitem";
 
 export const ToolbarComposite = <T,>(props: ToolbarCompositeProps<T>) => {
     const [getRootRef, setRootRef] = createSignal<HTMLElement>();
@@ -113,7 +104,7 @@ export const ToolbarComposite = <T,>(props: ToolbarCompositeProps<T>) => {
     const focusStop = (stop: number) => {
         setFocusedStop(stop);
 
-        if (stop === OVERFLOW_STOP) getOverflowRef()?.focus();
+        if (stop === ToolbarConst.OVERFLOW_STOP) getOverflowRef()?.focus();
         else getItemRefs()[stop]?.focus();
     };
 
@@ -122,7 +113,7 @@ export const ToolbarComposite = <T,>(props: ToolbarCompositeProps<T>) => {
         (isOpen) => setOpenStop((open) => ToolbarUtils.computeNextOpenStop(open, stop, isOpen)),
     ];
 
-    const overflowVisibility = createStopVisibility(OVERFLOW_STOP);
+    const overflowVisibility = createStopVisibility(ToolbarConst.OVERFLOW_STOP);
 
     createEffect(() => {
         const focused = getFocusedStop();
@@ -186,8 +177,8 @@ export const ToolbarComposite = <T,>(props: ToolbarCompositeProps<T>) => {
             pressedValuesSignal[1](
                 MenuUtils.computeNextChecked(
                     pressedValuesSignal[0](),
-                    { value, kind: PRESSED_ITEM_KIND },
-                    NO_RADIO_GROUP,
+                    { value, kind: ToolbarConst.PRESSED_ITEM_KIND },
+                    ToolbarConst.NO_RADIO_GROUP,
                 ),
             );
         }
@@ -195,7 +186,8 @@ export const ToolbarComposite = <T,>(props: ToolbarCompositeProps<T>) => {
         props.onActivate(value);
     };
 
-    const getSizingAt = (index: number) => (getPlacementAt(index) === undefined ? ROW_SIZING : PLACED_SIZING);
+    const getSizingAt = (index: number) =>
+        getPlacementAt(index) === undefined ? PlacementConst.ROW_SIZING : PlacementConst.PLACED_SIZING;
 
     const renderButton = (
         buttonProps: ToolbarButtonsProps<T>,
@@ -239,7 +231,7 @@ export const ToolbarComposite = <T,>(props: ToolbarCompositeProps<T>) => {
                 visibility={visibility}
                 checked={menuProps.checked}
                 submenuOffset={menuProps.submenuOffset}
-                triggerRole={WORD_ROLE}
+                triggerRole={ToolbarConst.WORD_ROLE}
                 ref={(element) => setItemRef(index, element)}
                 renderContent={(getFlags) => menuProps.renderAction(getWord, getFlags)}
                 renderItem={menuProps.renderItem}
@@ -305,11 +297,11 @@ export const ToolbarComposite = <T,>(props: ToolbarCompositeProps<T>) => {
                 <Menu
                     items={getOverflowItems}
                     ariaLabel={props.overflowAriaLabel}
-                    isTabbable={() => getRovingStop() === OVERFLOW_STOP}
+                    isTabbable={() => getRovingStop() === ToolbarConst.OVERFLOW_STOP}
                     visibility={overflowVisibility}
                     checked={props.role === "menubar" ? props.checked : props.pressedValues}
                     submenuOffset={props.role === "menubar" ? props.submenuOffset : undefined}
-                    triggerRole={props.role === "menubar" ? WORD_ROLE : undefined}
+                    triggerRole={props.role === "menubar" ? ToolbarConst.WORD_ROLE : undefined}
                     ref={setOverflowRef}
                     renderContent={props.renderOverflowTrigger}
                     renderItem={props.role === "menubar" ? props.renderItem : props.renderOverflowItem}

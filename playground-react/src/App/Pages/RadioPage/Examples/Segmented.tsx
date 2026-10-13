@@ -1,12 +1,12 @@
 import { Radio, RadioGroup } from "@thewaver/ss-components-react";
+import { SIZE_OPTIONS } from "@thewaver/ss-playground/App/Pages/RadioPage/RadioPage.const";
 
 import {
     PageRadioSegmentContent,
     PageRadioSegmentFloater,
     PageRadioSegmentGroup,
 } from "../../../StyledComponents/RadioSegmentContent/RadioSegmentContent";
-import { SIZE_OPTIONS } from "../RadioPage.const";
-import type { RadioExampleProps } from "../RadioPage.types";
+import type { RadioExampleProps } from "../RadioPageReact.types";
 
 type Props = RadioExampleProps;
 

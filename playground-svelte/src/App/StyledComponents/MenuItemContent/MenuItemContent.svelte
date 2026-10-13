@@ -4,11 +4,12 @@
     import * as styles from "@thewaver/ss-playground/App/StyledComponents/MenuItemContent/MenuItemContent.css";
 
     import { getLayerClass } from "../Layer/Layer.context";
-    import type { MenuItemContentProps } from "./MenuItemContent.types";
-
-    const SUBMENU_MARK = "›";
-    const CHECKED_MARK = "✓";
-    const PICKED_MARK = "●";
+    import type { MenuItemContentProps } from "./MenuItemContentSvelte.types";
+    import {
+        CHECKED_MARK,
+        PICKED_MARK,
+        SUBMENU_MARK,
+    } from "@thewaver/ss-playground/App/StyledComponents/MenuItemContent/MenuItemContent.const";
 
     let props: MenuItemContentProps & { children?: Snippet } = $props();
 

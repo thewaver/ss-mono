@@ -5,8 +5,8 @@ import { renderPageHighlightFloater } from "../../../StyledComponents/GlideFloat
 import { PagePopoverSurface } from "../../../StyledComponents/PopoverSurface/PopoverSurface";
 import { PageSelectContent } from "../../../StyledComponents/SelectContent/SelectContent";
 import { PageSelectOptionContent } from "../../../StyledComponents/SelectOptionContent/SelectOptionContent";
-import { PLACEHOLDER } from "../SelectPage.const";
 import type { SelectRoutesExampleProps } from "../SelectPage.types";
+import { PLACEHOLDER } from "../SelectPageReact.const";
 
 type Props = SelectRoutesExampleProps;
 

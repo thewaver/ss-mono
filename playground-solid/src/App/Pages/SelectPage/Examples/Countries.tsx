@@ -5,8 +5,8 @@ import { renderPageHighlightFloater } from "../../../StyledComponents/GlideFloat
 import { PageSelectContent } from "../../../StyledComponents/SelectContent/SelectContent";
 import { PageSelectGroupContent } from "../../../StyledComponents/SelectGroupContent/SelectGroupContent";
 import { PageSelectOptionContent } from "../../../StyledComponents/SelectOptionContent/SelectOptionContent";
-import { COUNTRIES, PLACEHOLDER, renderSelectPopup } from "../SelectPage.const";
 import type { SelectExampleProps } from "../SelectPage.types";
+import { COUNTRIES, PLACEHOLDER, renderSelectPopup } from "../SelectPageSolid.const";
 
 type Props = SelectExampleProps & {
     isDisabled?: MaybeAccessor<boolean>;
@@ -19,7 +19,7 @@ export const CountriesExample = (props: Props) => {
         <Select
             renderHighlightFloater={renderPageHighlightFloater}
             value={props.value}
-            options={props.options ?? (() => COUNTRIES)}
+            options={() => access(props.options) ?? COUNTRIES}
             isDisabled={props.isDisabled}
             hasError={props.hasError}
             ariaLabel={"Country"}

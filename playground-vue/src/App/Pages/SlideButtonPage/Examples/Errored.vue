@@ -3,7 +3,7 @@ import { SlideButton } from "@thewaver/ss-components-vue";
 import { SLIDE_BUTTON_THUMB_SIZE } from "@thewaver/ss-playground/App/StyledComponents/SlideButtonContent/SlideButtonContent.css";
 
 import PageSlideButtonContent from "../../../StyledComponents/SlideButtonContent/SlideButtonContent.vue";
-import type { SlideButtonErroredExampleProps } from "../SlideButtonPage.types";
+import type { SlideButtonErroredExampleProps } from "../SlideButtonPageVue.types";
 
 type Props = SlideButtonErroredExampleProps;
 

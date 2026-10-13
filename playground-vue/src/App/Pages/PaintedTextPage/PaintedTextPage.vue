@@ -8,17 +8,22 @@ import {
     type SVGDefsColors,
     SVGDefsSamples,
 } from "@thewaver/ss-components-vue";
+import { PaintedTextKnobs } from "@thewaver/ss-playground/App/Knobs/PaintedTexts.const";
+import {
+    EXAMPLES_ROOT,
+    EXAMPLE_NAMES,
+    PERCENT,
+} from "@thewaver/ss-playground/App/Pages/PaintedTextPage/PaintedTextPage.const";
 import * as styles from "@thewaver/ss-playground/App/Pages/PaintedTextPage/PaintedTextPage.css";
 
-import { PaintedTextKnobs } from "../../Knobs/PaintedTexts.const";
 import type { ExampleDefs } from "../../PageComponents/Examples/Examples.types";
 import PageExamples from "../../PageComponents/Examples/PageExamples.vue";
 import PageColorField from "../../PageComponents/Field/PageColorField.vue";
 import PageNumberField from "../../PageComponents/Field/PageNumberField.vue";
 import PageSelectField from "../../PageComponents/Field/PageSelectField.vue";
 import PagePaintPicker from "../../PageComponents/PaintPicker/PagePaintPicker.vue";
-import { getIsUsingKind } from "../../PageComponents/PaintPicker/PaintPicker.const";
 import { usePaintSlot } from "../../PageComponents/PaintPicker/PaintPicker.utils";
+import { getIsUsingKind } from "../../PageComponents/PaintPicker/PaintPickerVue.const";
 import PageProp from "../../PageComponents/Prop/Prop.vue";
 import PagePropsDivider from "../../PageComponents/PropsPanel/PagePropsDivider.vue";
 import PagePropsGroups from "../../PageComponents/PropsPanel/PagePropsGroups.vue";
@@ -27,14 +32,10 @@ import CircleExampleWrapper from "./CircleExampleWrapper.vue";
 import CustomInputExampleWrapper from "./CustomInputExampleWrapper.vue";
 import ScrambledExample from "./Examples/Scrambled.vue";
 import HeadingExampleWrapper from "./HeadingExampleWrapper.vue";
-import type { PaintedTextExampleWrapperProps } from "./PaintedTextPage.types";
+import type { PaintedTextExampleWrapperProps } from "./PaintedTextPageVue.types";
 import ParagraphExampleWrapper from "./ParagraphExampleWrapper.vue";
 import TypedExampleWrapper from "./TypedExampleWrapper.vue";
 import WaveExampleWrapper from "./WaveExampleWrapper.vue";
-
-const EXAMPLES_ROOT = "/src/App/Pages/PaintedTextPage/Examples";
-
-const PERCENT = 100;
 
 const fill = usePaintSlot(PaintedTextKnobs.STARTING_FILL_PAINT_KIND, PaintedTextKnobs.STARTING_KEYS);
 const stroke = usePaintSlot(PaintedTextKnobs.STARTING_STROKE_PAINT_KIND, PaintedTextKnobs.STARTING_KEYS);
@@ -84,47 +85,47 @@ const setColor = (key: keyof SVGDefsColors, value: string) => {
 const examples: ExampleDefs[] = [
     {
         key: "heading",
-        name: "Heading",
+        name: EXAMPLE_NAMES.heading,
         path: `${EXAMPLES_ROOT}/Heading.vue`,
     },
     {
         key: "paragraph",
-        name: "Paragraph",
+        name: EXAMPLE_NAMES.paragraph,
         readout: () =>
             "the text wraps where Typewriter would wrap it, the paint is sized to the whole block so one gradient runs across every line, and the image, the icon and the link are carried into the drawing",
         path: `${EXAMPLES_ROOT}/Paragraph.vue`,
     },
     {
         key: "customInput",
-        name: "Custom Input",
+        name: EXAMPLE_NAMES.customInput,
         readout: () =>
             "the text box drives the painted text directly: every change to what it holds is laid out and painted again, line breaks included",
         path: `${EXAMPLES_ROOT}/CustomInput.vue`,
     },
     {
         key: "typed",
-        name: "Typed",
+        name: EXAMPLE_NAMES.typed,
         readout: () =>
             "a Typewriter around two painted texts: it decides when each letter arrives and how, the painted texts decide where the letters sit and what paints them, and the two share one run in reading order",
         path: `${EXAMPLES_ROOT}/Typed.vue`,
     },
     {
         key: "scrambled",
-        name: "Scrambled",
+        name: EXAMPLE_NAMES.scrambled,
         readout: () =>
             "a ScrambleText around a painted text: it decides which glyph each letter shows while it churns, and the painted text draws that glyph, painted, in the letter's place",
         path: `${EXAMPLES_ROOT}/Scrambled.vue`,
     },
     {
         key: "circle",
-        name: "Round a circle",
+        name: EXAMPLE_NAMES.circle,
         readout: () =>
             `${getPercent(circleProgress.value)} round the circle, ${isCirclePlaying.value ? "turning" : "stopped"} — the browser sets every letter along the path, the paint runs across the ring as one, and what slides past the end comes round from the start`,
         path: `${EXAMPLES_ROOT}/Circle.vue`,
     },
     {
         key: "wave",
-        name: "Along a wave",
+        name: EXAMPLE_NAMES.wave,
         readout: () =>
             `${getPercent(waveProgress.value)} along the wave, ${isWavePlaying.value ? "sliding" : "stopped"} — any path will do, and on an open one the text leaves at the far end as it comes back in at the near one`,
         path: `${EXAMPLES_ROOT}/Wave.vue`,

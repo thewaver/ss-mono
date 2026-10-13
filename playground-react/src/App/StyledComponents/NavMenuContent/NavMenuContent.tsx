@@ -3,7 +3,7 @@ import type { PropsWithChildren } from "react";
 import * as styles from "@thewaver/ss-playground/App/StyledComponents/NavMenuContent/NavMenuContent.css";
 
 import { useLayerClass } from "../Layer/Layer.context";
-import type { NavMenuTriggerProps } from "./NavMenuContent.types";
+import type { NavMenuTriggerProps } from "./NavMenuContentReact.types";
 
 export const PageNavMenuTrigger = (props: PropsWithChildren<NavMenuTriggerProps>) => {
     const layerClass = useLayerClass();

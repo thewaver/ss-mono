@@ -3,7 +3,7 @@
 
     import * as styles from "@thewaver/ss-playground/App/StyledComponents/SidebarContent/SidebarContent.css";
 
-    import type { SidebarFadeProps } from "./SidebarContent.types";
+    import type { SidebarFadeProps } from "./SidebarContentSvelte.types";
 
     let props: SidebarFadeProps & { children?: Snippet } = $props();
 </script>

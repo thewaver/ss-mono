@@ -12,3 +12,10 @@ export const RICH_TOUR_STEPS: TourStep[] = [
     { title: "The basket", text: "What you added lands here, with a count beside it." },
     { title: "Checkout", text: "When you are ready, this is where you would pay." },
 ];
+
+export const EXAMPLE_NAMES = {
+    tour: "A tour with a step the reader does",
+    guide: "Guide",
+};
+
+export const EXAMPLES_ROOT = "/src/App/Pages/Spotlights/SpotlightGuidePage/Examples";

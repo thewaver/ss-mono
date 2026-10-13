@@ -3,8 +3,8 @@ import { Select } from "@thewaver/ss-components-solid";
 import { renderPageHighlightFloater } from "../../../StyledComponents/GlideFloater/GlideFloater";
 import { PageSelectContent } from "../../../StyledComponents/SelectContent/SelectContent";
 import { PageSelectOptionContent } from "../../../StyledComponents/SelectOptionContent/SelectOptionContent";
-import { AIRPORTS, PLACEHOLDER, renderSelectPopup } from "../SelectPage.const";
 import type { SelectAirportExampleProps } from "../SelectPage.types";
+import { AIRPORTS, PLACEHOLDER, renderSelectPopup } from "../SelectPageSolid.const";
 
 type Props = SelectAirportExampleProps;
 

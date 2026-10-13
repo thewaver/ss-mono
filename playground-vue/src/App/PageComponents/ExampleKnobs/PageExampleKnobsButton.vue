@@ -1,8 +1,15 @@
 <script setup lang="ts">
 import { type ComponentPublicInstance, computed, h, shallowRef, useId } from "vue";
 
-import type { AnchorPlacement, DismisserReason, InteractionTooltipDefs } from "@thewaver/ss-components-vue";
+import type { DismisserReason, InteractionTooltipDefs } from "@thewaver/ss-components-vue";
 import { InteractionWrapper, Popover, PopupTrigger, toElement } from "@thewaver/ss-components-vue";
+import {
+    KNOBS_MARK,
+    KNOBS_OFFSET,
+    KNOBS_PLACEMENT,
+    TOOLTIP_OFFSET,
+    TOOLTIP_PLACEMENT,
+} from "@thewaver/ss-playground/App/PageComponents/ExampleKnobs/ExampleKnobs.const";
 import * as styles from "@thewaver/ss-playground/App/PageComponents/ExampleKnobs/ExampleKnobs.css";
 import * as examplesStyles from "@thewaver/ss-playground/App/PageComponents/Examples/Examples.css";
 
@@ -10,12 +17,6 @@ import PageTooltipContent from "../../StyledComponents/TooltipContent/TooltipCon
 import PageLayer from "../Layer/Layer.vue";
 import PagePropsPanel from "../PropsPanel/PagePropsPanel.vue";
 import type { PageExampleKnobsButtonProps, PageExampleKnobsButtonSlots } from "./ExampleKnobs.types";
-
-const KNOBS_PLACEMENT: AnchorPlacement = { x: "right_out", y: "top_in" };
-const KNOBS_OFFSET = { x: 10, y: 0 };
-const KNOBS_MARK = "⚙";
-const TOOLTIP_PLACEMENT: AnchorPlacement = { x: "center", y: "top_out" };
-const TOOLTIP_OFFSET = { x: 0, y: 10 };
 
 const props = defineProps<PageExampleKnobsButtonProps>();
 

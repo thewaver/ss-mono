@@ -1,9 +1,11 @@
 <script lang="ts">
     import {
-        CITIES,
-        PIN_LENGTH,
-        QUANTITY_STEP,
-    } from "@thewaver/ss-playground/App/Pages/TextInputPage/TextInputPage.const";
+    CITIES,
+    EXAMPLE_NAMES,
+    EXAMPLES_ROOT,
+    PIN_LENGTH,
+    QUANTITY_STEP,
+} from "@thewaver/ss-playground/App/Pages/TextInputPage/TextInputPage.const";
 
     import type { ExampleDefs } from "../../PageComponents/Examples/Examples.types";
     import PageExamples from "../../PageComponents/Examples/PageExamples.svelte";
@@ -20,8 +22,6 @@
     import ReadOnlyExample from "./Examples/ReadOnly.svelte";
     import RefusingSetterExample from "./Examples/RefusingSetter.svelte";
     import TransformingSetterExample from "./Examples/TransformingSetter.svelte";
-
-    const EXAMPLES_ROOT = "/src/App/Pages/TextInputPage/Examples";
 
     let defaultValue = $state("");
     let passwordValue = $state("");
@@ -50,28 +50,28 @@
     const examples: ExampleDefs[] = [
         {
             key: "default",
-            name: "Default",
+            name: EXAMPLE_NAMES.default,
             readout: () => `value: "${defaultValue}"`,
             component: defaultExample,
             path: `${EXAMPLES_ROOT}/Default.svelte`,
         },
         {
             key: "transformingSetter",
-            name: "Transforming setter",
+            name: EXAMPLE_NAMES.transformingSetter,
             readout: () => `value: "${codeValue}" — type lowercase mid-string, the caret must not jump`,
             component: transformingSetterExample,
             path: `${EXAMPLES_ROOT}/TransformingSetter.svelte`,
         },
         {
             key: "refusingSetter",
-            name: "Refusing setter",
+            name: EXAMPLE_NAMES.refusingSetter,
             readout: () => `value: "${pinValue}" — letters are refused, ${PIN_LENGTH} digits max`,
             component: refusingSetterExample,
             path: `${EXAMPLES_ROOT}/RefusingSetter.svelte`,
         },
         {
             key: "suggestions",
-            name: "Suggestions",
+            name: EXAMPLE_NAMES.suggestions,
             readout: () =>
                 `value: "${cityValue}" — ${citySuggestions.length} suggested; any text is kept, and Enter only picks once the arrows have moved into the list`,
             component: citiesExample,
@@ -79,7 +79,7 @@
         },
         {
             key: "editable",
-            name: "Edit in place",
+            name: EXAMPLE_NAMES.editable,
             readout: () =>
                 `value: "${editableValue}" | editing: ${isEditing} — Enter or leaving keeps the edit, Escape puts the old text back`,
             component: editableExample,
@@ -87,56 +87,56 @@
         },
         {
             key: "password",
-            name: "Password",
+            name: EXAMPLE_NAMES.password,
             readout: () => `value: "${passwordValue}" | revealed: ${isRevealed}`,
             component: passwordExample,
             path: `${EXAMPLES_ROOT}/Password.svelte`,
         },
         {
             key: "bothAdornments",
-            name: "Both adornments",
+            name: EXAMPLE_NAMES.bothAdornments,
             readout: () => `value: "${amountValue}"`,
             component: bothAdornmentsExample,
             path: `${EXAMPLES_ROOT}/BothAdornments.svelte`,
         },
         {
             key: "number",
-            name: "Number",
+            name: EXAMPLE_NAMES.number,
             readout: () => `value: "${quantityValue}" — arrows step by ${QUANTITY_STEP}, no spinner buttons`,
             component: numberFieldExample,
             path: `${EXAMPLES_ROOT}/NumberField.svelte`,
         },
         {
             key: "readOnly",
-            name: "Read-only",
+            name: EXAMPLE_NAMES.readOnly,
             readout: () => `value: "${readOnlyValue}" — selectable and copyable, never editable`,
             component: readOnlyExample,
             path: `${EXAMPLES_ROOT}/ReadOnly.svelte`,
         },
         {
             key: "disabled",
-            name: "Disabled",
+            name: EXAMPLE_NAMES.disabled,
             readout: () => `value: "${disabledValue}"`,
             component: disabledExample,
             path: `${EXAMPLES_ROOT}/Disabled.svelte`,
         },
         {
             key: "reachable",
-            name: "Disabled + reachable",
+            name: EXAMPLE_NAMES.reachable,
             readout: () => `value: "${reachableValue}"`,
             component: reachableExample,
             path: `${EXAMPLES_ROOT}/Reachable.svelte`,
         },
         {
             key: "errored",
-            name: "Error",
+            name: EXAMPLE_NAMES.errored,
             readout: () => `value: "${erroredValue}"`,
             component: erroredExample,
             path: `${EXAMPLES_ROOT}/Errored.svelte`,
         },
         {
             key: "label",
-            name: "In a Label",
+            name: EXAMPLE_NAMES.label,
             readout: () => `value: "${labeledValue}"`,
             component: labeledExample,
             path: `${EXAMPLES_ROOT}/Labeled.svelte`,

@@ -1,4 +1,4 @@
-import type { RadioOptionalExampleProps } from "../RadioPage.types";
+import type { RadioOptionalExampleProps } from "../RadioPageReact.types";
 import { DefaultExample } from "./Default";
 
 type Props = RadioOptionalExampleProps;

@@ -1,11 +1,12 @@
 <script setup lang="ts">
+import {
+    INNER_RANK_DEPTH,
+    ROOT_RANK_DEPTH,
+} from "@thewaver/ss-playground/App/StyledComponents/TreeNodeContent/TreeNodeContent.const";
 import * as styles from "@thewaver/ss-playground/App/StyledComponents/TreeNodeContent/TreeNodeContent.css";
 
 import { useLayerClass } from "../Layer/Layer.context";
-import type { TreeNodeContentProps } from "./TreeNodeContent.types";
-
-const ROOT_RANK_DEPTH = 0;
-const INNER_RANK_DEPTH = 1;
+import type { TreeNodeContentProps } from "./TreeNodeContentVue.types";
 
 defineProps<TreeNodeContentProps>();
 

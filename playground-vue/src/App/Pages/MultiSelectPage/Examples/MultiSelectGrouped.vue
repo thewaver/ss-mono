@@ -12,7 +12,7 @@ import PageSelectContent, {
 } from "../../../StyledComponents/SelectContent/SelectContent.vue";
 import PageSelectGroupContent from "../../../StyledComponents/SelectGroupContent/SelectGroupContent.vue";
 import PageSelectOptionContent from "../../../StyledComponents/SelectOptionContent/SelectOptionContent.vue";
-import { PLACEHOLDER, QUERY_PADDING } from "../../SelectPage/SelectPage.const";
+import { PLACEHOLDER, QUERY_PADDING } from "../../SelectPage/SelectPageVue.const";
 
 type Props = {
     "values": string[];

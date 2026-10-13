@@ -2,10 +2,11 @@
     import * as styles from "@thewaver/ss-playground/App/StyledComponents/PaginatorContent/PaginatorContent.css";
 
     import { getLayerClass } from "../Layer/Layer.context";
-    import type { PaginatorPanelProps } from "./PaginatorContent.types";
-
-    const PAGE_SIZE = 3;
-    const FIRST_PAGE = 1;
+    import type { PaginatorPanelProps } from "./PaginatorContentSvelte.types";
+    import {
+        FIRST_PAGE,
+        PAGE_SIZE,
+    } from "@thewaver/ss-playground/App/StyledComponents/PaginatorContent/PaginatorContent.const";
 
     const RESULTS = [
         "Aurora",

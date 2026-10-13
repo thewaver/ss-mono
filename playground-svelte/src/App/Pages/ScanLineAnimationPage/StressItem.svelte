@@ -1,5 +1,5 @@
 <script lang="ts" module>
-    import type { StressTestDefs } from "../../PageComponents/StressTest/StressText.types";
+    import type { StressTestDefs } from "../../PageComponents/StressTest/StressTextSvelte.types";
 
     const STRESS_LINE_COUNT = 120;
 
@@ -52,8 +52,7 @@
 
     import PageMeasureBox from "../../PageComponents/MeasureBox/MeasureBox.svelte";
     import type { ScanlineAnimationExampleProps } from "./ScanlineAnimationPage.types";
-
-    const WEIGHT_ORIGIN = { row: 0, col: 0 };
+    import { WEIGHT_ORIGIN } from "@thewaver/ss-playground/App/Pages/ScanLineAnimationPage/ScanLineAnimationPage.const";
 
     const pickStressKeyframes = (kind: "transform" | "filter") => {
         const random = Math.random() * 3;

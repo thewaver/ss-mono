@@ -13,7 +13,7 @@ import PageTextFieldContent, {
     computePageTextFieldTextStyle,
 } from "../../../StyledComponents/TextFieldContent/TextFieldContent.vue";
 import PageTextFieldPlaceholder from "../../../StyledComponents/TextFieldPlaceholder/TextFieldPlaceholder.vue";
-import type { City, TextInputCitiesExampleProps } from "../TextInputPage.types";
+import type { City, TextInputCitiesExampleProps } from "../TextInputPageVue.types";
 
 type Props = TextInputCitiesExampleProps;
 

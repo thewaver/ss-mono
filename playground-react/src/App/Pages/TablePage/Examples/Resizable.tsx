@@ -4,8 +4,8 @@ import { Table } from "@thewaver/ss-components-react";
 import * as styles from "@thewaver/ss-playground/App/Pages/TablePage/TablePage.css";
 
 import { PageTableResizer } from "../../../StyledComponents/TableContent/TableContent";
-import { PARTS, createPartColumns } from "../TablePage.const";
 import type { TableExampleProps } from "../TablePage.types";
+import { PARTS, createPartColumns } from "../TablePageReact.const";
 
 type Props = TableExampleProps & {
     widths: readonly [Record<string, number>, (widths: Record<string, number>) => void];

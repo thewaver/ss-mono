@@ -23,6 +23,7 @@ import {
     ShapeLayerUtils,
     TrailUtils,
 } from "@thewaver/ss-components";
+import { PaintedTextConst } from "@thewaver/ss-components/internal";
 import { StringUtils } from "@thewaver/ss-utils";
 
 import { InteractionTrackerReactUtils } from "../../../Abstracts/InteractionTracker/InteractionTrackerReact.utils";
@@ -33,12 +34,6 @@ import { PaintAreaContextProvider } from "../../../Generators/SVGDefs/SVGGradien
 import { useElement, useLatest } from "../../../Utils/refUtils";
 import { useStore } from "../../../Utils/storeUtils";
 import type { PaintedTextController, PaintedTextProps } from "./PaintedText.types";
-
-const MASK_PADDING_SIDES = 2;
-const NO_OFFSET = 0;
-const NO_LENGTH = 0;
-const NO_PROGRESS = 0;
-const NO_REGISTRY = LetterDriverUtils.createRegistry();
 
 type LayerAttributes = SVGProps<SVGTextElement> & SVGProps<SVGGElement>;
 
@@ -80,7 +75,10 @@ export const PaintedText = (props: PaintedTextProps) => {
 
     const driver = useLetterDriverContext();
 
-    const [progress, setProgressState] = SignalMirrorReactUtils.useOptionalState(props.progress, NO_PROGRESS);
+    const [progress, setProgressState] = SignalMirrorReactUtils.useOptionalState(
+        props.progress,
+        PaintedTextConst.NO_PROGRESS,
+    );
     const [isPlaying] = SignalMirrorReactUtils.useOptionalState(props.playback, PAINTED_TEXT_DEFAULTS.playback);
 
     const isPageHidden = InteractionTrackerReactUtils.usePageHidden();
@@ -109,7 +107,8 @@ export const PaintedText = (props: PaintedTextProps) => {
             ? (character, index) =>
                   computePushingName(
                       character,
-                      (rootRef.current ? driver.registry.getOffset(rootRef.current) : NO_OFFSET) + index,
+                      (rootRef.current ? driver.registry.getOffset(rootRef.current) : PaintedTextConst.NO_OFFSET) +
+                          index,
                       driver.registry.get().characters.length,
                   )
             : undefined;
@@ -137,7 +136,7 @@ export const PaintedText = (props: PaintedTextProps) => {
     const descent = useStore(layout, (state) => state.descent);
 
     const startOffset = progress * pathLength;
-    const isSliding = isOnPath && isPlaying && !isPageHidden && pathLength > NO_LENGTH;
+    const isSliding = isOnPath && isPlaying && !isPageHidden && pathLength > PaintedTextConst.NO_LENGTH;
 
     const setProgress = (value: number) => {
         progressRef.current = value;
@@ -146,7 +145,7 @@ export const PaintedText = (props: PaintedTextProps) => {
 
     const latest = useLatest({ lapDurationMs, setProgress });
 
-    useStore(driver?.registry ?? NO_REGISTRY, (state) => state.entries);
+    useStore(driver?.registry ?? PaintedTextConst.NO_REGISTRY, (state) => state.entries);
 
     const isUpdatePendingRef = useRef(false);
     const [, requestMeasure] = useReducer((count: number) => count + 1, 0);
@@ -254,7 +253,7 @@ export const PaintedText = (props: PaintedTextProps) => {
     const fillDefs = PaintedTextUtils.resolveFillDefs(props.computeFillDefs?.(size, rootElement), strokeDefs);
     const maskPadding = strokePaint.drawnWidth;
 
-    const offset = driver && rootRef.current ? driver.registry.getOffset(rootRef.current) : NO_OFFSET;
+    const offset = driver && rootRef.current ? driver.registry.getOffset(rootRef.current) : PaintedTextConst.NO_OFFSET;
     const isPerLetter = !!driver?.isAnimating;
 
     const pushingStyles = computePushingName
@@ -420,15 +419,15 @@ export const PaintedText = (props: PaintedTextProps) => {
                             maskUnits="userSpaceOnUse"
                             x={origin.x - maskPadding}
                             y={origin.y - maskPadding}
-                            width={width + maskPadding * MASK_PADDING_SIDES}
-                            height={height + maskPadding * MASK_PADDING_SIDES}
+                            width={width + maskPadding * PaintedTextConst.MASK_PADDING_SIDES}
+                            height={height + maskPadding * PaintedTextConst.MASK_PADDING_SIDES}
                         >
                             {strokePaint.maskKind === "outside" && (
                                 <rect
                                     x={origin.x - maskPadding}
                                     y={origin.y - maskPadding}
-                                    width={width + maskPadding * MASK_PADDING_SIDES}
-                                    height={height + maskPadding * MASK_PADDING_SIDES}
+                                    width={width + maskPadding * PaintedTextConst.MASK_PADDING_SIDES}
+                                    height={height + maskPadding * PaintedTextConst.MASK_PADDING_SIDES}
                                     fill="white"
                                 />
                             )}

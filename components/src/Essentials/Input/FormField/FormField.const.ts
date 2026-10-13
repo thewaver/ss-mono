@@ -1,3 +1,4 @@
+import type { FormFieldContextType } from "./FormField.context.types";
 import type { FormFieldOrientation } from "./FormField.types";
 
 export const FORM_FIELD_DEFAULTS = {
@@ -6,3 +7,9 @@ export const FORM_FIELD_DEFAULTS = {
 };
 
 export const FORM_FIELD_ORIENTATIONS: readonly FormFieldOrientation[] = ["vertical", "horizontal"];
+
+export const UNDESCRIBED_CONTEXT: FormFieldContextType = {
+    getDescriptionId: () => undefined,
+    registerControl: () => undefined,
+    unregisterControl: () => undefined,
+};

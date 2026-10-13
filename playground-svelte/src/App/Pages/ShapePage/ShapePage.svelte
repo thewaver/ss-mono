@@ -4,14 +4,14 @@
     import * as styles from "@thewaver/ss-playground/App/Pages/ShapePage/ShapePage.css";
     import { assignInlineVars } from "@vanilla-extract/dynamic";
 
-    import { ShapeKnobs } from "../../Knobs/Shapes.const";
+    import { ShapeKnobs } from "@thewaver/ss-playground/App/Knobs/Shapes.const";
     import type { ExampleDefs } from "../../PageComponents/Examples/Examples.types";
     import PageExamples from "../../PageComponents/Examples/PageExamples.svelte";
     import PageColorField from "../../PageComponents/Field/PageColorField.svelte";
     import PageNumberField from "../../PageComponents/Field/PageNumberField.svelte";
     import PageSelectField from "../../PageComponents/Field/PageSelectField.svelte";
     import PagePaintPicker from "../../PageComponents/PaintPicker/PagePaintPicker.svelte";
-    import { getIsUsingKind } from "../../PageComponents/PaintPicker/PaintPicker.const";
+    import { getIsUsingKind } from "../../PageComponents/PaintPicker/PaintPickerSvelte.const";
     import { createPaintSlot } from "../../PageComponents/PaintPicker/PaintPicker.utils.svelte";
     import PageProp from "../../PageComponents/Prop/Prop.svelte";
     import PagePropsDivider from "../../PageComponents/PropsPanel/PagePropsDivider.svelte";
@@ -23,8 +23,8 @@
     import type { ShapeExampleProps } from "./ShapePage.types";
     import StressTestWrapper from "./StressTestWrapper.svelte";
     import TextWrapExampleWrapper from "./TextWrapExampleWrapper.svelte";
+    import { EXAMPLE_NAMES, EXAMPLES_ROOT } from "@thewaver/ss-playground/App/Pages/ShapePage/ShapePage.const";
 
-    const EXAMPLES_ROOT = "/src/App/Pages/ShapePage/Examples";
     const DEFAULT_EXAMPLE_PATH = `${EXAMPLES_ROOT}/Default.svelte`;
 
     let blurWidth = $state(ShapeKnobs.STARTING_BLUR_WIDTH);
@@ -61,13 +61,13 @@
     const examples: ExampleDefs[] = [
         {
             key: "default",
-            name: "Default",
+            name: EXAMPLE_NAMES.default,
             component: defaultExample,
             path: DEFAULT_EXAMPLE_PATH,
         },
         {
             key: "morph",
-            name: "Morph",
+            name: EXAMPLE_NAMES.morph,
             readout: () =>
                 "one number from 0 to 1 is read inside computePoints and blends two contours of twice the star-point count each, their corner radii and their exponents with them; under reduced motion the press jumps straight to the other shape",
             component: morphExample,
@@ -75,7 +75,7 @@
         },
         {
             key: "sharedPaint",
-            name: "Shared Paint",
+            name: EXAMPLE_NAMES.sharedPaint,
             readout: () =>
                 "four shapes painted by one fill and one stroke laid across the whole group, so each shows its own part of a single picture; resize any of them and the picture stretches to the new group",
             component: sharedPaintExample,
@@ -83,7 +83,7 @@
         },
         {
             key: "textWrap",
-            name: "Text Wrap",
+            name: EXAMPLE_NAMES.textWrap,
             readout: () =>
                 "the shape writes its contour as shape-outside, so floating it is all the page does for the text to follow the edge",
             component: textWrapExample,
@@ -91,7 +91,7 @@
         },
         {
             key: "stressTest",
-            name: "Stress Test",
+            name: EXAMPLE_NAMES.stressTest,
             component: stressTestExample,
         },
     ];

@@ -4,7 +4,7 @@ import { FOCUS_RING_WIDTH } from "@thewaver/ss-playground/App/Theme.css";
 
 import { PageScrollerButton } from "../../../PageComponents/ScrollerButton/ScrollerButton";
 import { PageButtonContent } from "../../../StyledComponents/ButtonContent/ButtonContent";
-import type { ScrollerExampleProps } from "../ScrollerPage.types";
+import type { ScrollerExampleProps } from "../ScrollerPageReact.types";
 
 const SCROLLER_GAP = 10;
 

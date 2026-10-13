@@ -1,6 +1,6 @@
 import type { KeyboardEvent, MouseEvent, ReactNode, RefObject } from "react";
 
-import type { InteractionFlags, TagInputFlags, TagInputState } from "@thewaver/ss-components";
+import type { BaseTagInputCbs, BaseTagInputValues, InteractionFlags, TagInputFlags } from "@thewaver/ss-components";
 
 import type {
     InteractionControlProps,
@@ -8,16 +8,7 @@ import type {
 } from "../../../Primitives/InteractionWrapper/InteractionWrapper.types";
 import type { TextFieldTextStyle } from "../../../Primitives/TextField/TextField.types";
 
-export type TagInputCbs = {
-    /**
-     * Turns what was typed into a tag, or refuses it by answering with nothing — which is where trimming, lower-casing
-     * and rejecting duplicates live.
-     */
-    computeTag?: (text: string) => string | undefined;
-    /** Names one tag for assistive technology, so a reader hears what removing it would do. */
-    computeTagAriaLabel?: (tag: string) => string;
-    /** Runs when a tag is added or removed. */
-    onTagsChange?: (tags: string[]) => void;
+export type TagInputCbs = BaseTagInputCbs & {
     /** Runs when the pointer arrives over the field. */
     onMouseEnter?: (e: MouseEvent<HTMLDivElement>) => void;
     /** Runs when the pointer leaves the field. */
@@ -27,7 +18,7 @@ export type TagInputCbs = {
 export type TagInputProps = Omit<InteractionWrapperProps<TagInputFlags>, "renderControl" | "extraFlags" | "role"> &
     TagInputCbs &
     Pick<InteractionControlProps<TagInputFlags>, "id" | "renderContent"> &
-    TagInputState & {
+    BaseTagInputValues & {
         /** The tags, and how to change them. It is the only thing that adds or removes one. */
         value: readonly [string[], (tags: string[]) => void];
         /** What is currently typed but not yet turned into a tag, and how to change it. */

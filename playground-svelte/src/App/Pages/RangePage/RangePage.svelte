@@ -13,9 +13,7 @@
     import ReachableExample from "./Examples/Reachable.svelte";
     import SteppedExample from "./Examples/Stepped.svelte";
     import VerticalExample from "./Examples/Vertical.svelte";
-
-    const STEP_COUNT = 5;
-    const EXAMPLES_ROOT = "/src/App/Pages/RangePage/Examples";
+    import { EXAMPLE_NAMES, EXAMPLES_ROOT, STEP_COUNT } from "@thewaver/ss-playground/App/Pages/RangePage/RangePage.const";
 
     let volume = $state(40);
     let steps = $state(3);
@@ -34,28 +32,28 @@
     const examples: ExampleDefs[] = [
         {
             key: "default",
-            name: "Default",
+            name: EXAMPLE_NAMES.default,
             readout: () => `value: ${volume}`,
             component: defaultExample,
             path: `${EXAMPLES_ROOT}/Default.svelte`,
         },
         {
             key: "stepped",
-            name: "Stepped",
+            name: EXAMPLE_NAMES.stepped,
             readout: () => `value: ${steps} of ${STEP_COUNT}`,
             component: steppedExample,
             path: `${EXAMPLES_ROOT}/Stepped.svelte`,
         },
         {
             key: "pair",
-            name: "Pair",
+            name: EXAMPLE_NAMES.pair,
             readout: () => `start: ${price.start} | end: ${price.end}`,
             component: pairExample,
             path: `${EXAMPLES_ROOT}/Pair.svelte`,
         },
         {
             key: "priceRange",
-            name: "Price range, read as prices",
+            name: EXAMPLE_NAMES.priceRange,
             readout: () =>
                 `start: ${budget.start} | end: ${budget.end} | settled: ${settledBudget} — each thumb reads its value as a price, and "settled" changes only when a drag lets go or a key is pressed`,
             component: priceExample,
@@ -63,14 +61,14 @@
         },
         {
             key: "vertical",
-            name: "Vertical",
+            name: EXAMPLE_NAMES.vertical,
             readout: () => `single: ${vertical} | pair: ${verticalPair.start}–${verticalPair.end}`,
             component: verticalExample,
             path: `${EXAMPLES_ROOT}/Vertical.svelte`,
         },
         {
             key: "knob",
-            name: "Knob",
+            name: EXAMPLE_NAMES.knob,
             readout: () =>
                 `value: ${knob} — computeValueAtPoint reads the pointer by its angle round the center, so dragging turns it; the arrow keys still step it`,
             component: knobExample,
@@ -78,14 +76,14 @@
         },
         {
             key: "disabled",
-            name: "Disabled",
+            name: EXAMPLE_NAMES.disabled,
             readout: () => `value: ${disabled}`,
             component: disabledExample,
             path: `${EXAMPLES_ROOT}/Disabled.svelte`,
         },
         {
             key: "disabledPair",
-            name: "Disabled pair",
+            name: EXAMPLE_NAMES.disabledPair,
             readout: () =>
                 `start: ${disabledPair.start} | end: ${disabledPair.end} — both thumbs must be out of the tab order`,
             component: disabledPairExample,
@@ -93,14 +91,14 @@
         },
         {
             key: "reachable",
-            name: "Disabled + reachable",
+            name: EXAMPLE_NAMES.reachable,
             readout: () => `value: ${reachable}`,
             component: reachableExample,
             path: `${EXAMPLES_ROOT}/Reachable.svelte`,
         },
         {
             key: "errored",
-            name: "Error",
+            name: EXAMPLE_NAMES.errored,
             readout: () => `value: ${errored}`,
             component: erroredExample,
             path: `${EXAMPLES_ROOT}/Errored.svelte`,

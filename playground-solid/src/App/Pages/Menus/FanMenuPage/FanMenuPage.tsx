@@ -1,14 +1,15 @@
 import { createMemo, createSignal } from "solid-js";
 
 import type { MenuItem } from "@thewaver/ss-components-solid";
+import {
+    EXAMPLES_ROOT,
+    EXAMPLE_NAMES,
+    NOTHING_RUN,
+} from "@thewaver/ss-playground/App/Pages/Menus/FanMenuPage/FanMenuPage.const";
 
 import { PageExamples } from "../../../PageComponents/Examples/Examples";
 import { FanExample } from "./Examples/Fan";
-import type { FanAction } from "./FanMenuPage.types";
-
-const EXAMPLES_ROOT = "/src/App/Pages/Menus/FanMenuPage/Examples";
-
-const NOTHING_RUN = "nothing run yet";
+import type { FanAction } from "./FanMenuPageSolid.types";
 
 const ACTIONS: MenuItem<FanAction>[] = [
     { value: { name: "Cut", shortcut: "Ctrl+X" } },
@@ -45,7 +46,7 @@ export const FanMenuPage = () => {
     const getExamples = createMemo(() => [
         {
             key: "default",
-            name: "Default",
+            name: EXAMPLE_NAMES.default,
             readout: () =>
                 `${getLastAction()} — a narrow arc opening sideways, the shape a combat menu uses: upright labels reading outward from the thing that opened them`,
             component: () => (
@@ -55,7 +56,7 @@ export const FanMenuPage = () => {
         },
         {
             key: "submenus",
-            name: "Submenus",
+            name: EXAMPLE_NAMES.submenus,
             readout: () =>
                 `${getLastNestedAction()} — a level replaces the one before it rather than stacking beside it, and the row at the top is the item you came in through`,
             component: () => (

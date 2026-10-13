@@ -1,7 +1,17 @@
 <script lang="ts">
     import { CURRENCY_INPUT_DEFAULTS } from "@thewaver/ss-components-svelte";
     import { CurrencyInputKnobs } from "@thewaver/ss-playground/App/Knobs/CurrencyInputs.const";
-    import { BUDGET_MAX } from "@thewaver/ss-playground/App/Pages/CurrencyInputPage/CurrencyInputPage.const";
+    import {
+    BUDGET_MAX,
+    EXAMPLE_NAMES,
+    EXAMPLES_ROOT,
+    LOCALE_FIELD_WIDTH,
+    LOCALE_GROUPING,
+    STARTING_ADJUSTMENT,
+    STARTING_BIG,
+    STARTING_BUDGET,
+    STARTING_PRICE,
+} from "@thewaver/ss-playground/App/Pages/CurrencyInputPage/CurrencyInputPage.const";
 
     import type { ExampleDefs } from "../../PageComponents/Examples/Examples.types";
     import PageExamples from "../../PageComponents/Examples/PageExamples.svelte";
@@ -14,14 +24,6 @@
     import DefaultExample from "./Examples/Default.svelte";
     import SymbolExample from "./Examples/Symbol.svelte";
 
-    const LOCALE_FIELD_WIDTH = 120;
-    const LOCALE_GROUPING = "locale";
-    const EXAMPLES_ROOT = "/src/App/Pages/CurrencyInputPage/Examples";
-
-    const STARTING_PRICE = 1234.56;
-    const STARTING_BUDGET = 4999.99;
-    const STARTING_BIG = 9876543210.12;
-    const STARTING_ADJUSTMENT = -250.5;
     const describe = (value: number | undefined) => (value === undefined ? "none" : `${value}`);
 
     const describeGrouping = (sizes: number[] | undefined) =>
@@ -48,7 +50,7 @@
     const examples: ExampleDefs[] = [
         {
             key: "default",
-            name: "Default",
+            name: EXAMPLE_NAMES.default,
             readout: () =>
                 `value: ${describe(price)} — digits fill from the right, and the separators are the field's rather than yours to type`,
             component: defaultExample,
@@ -56,14 +58,14 @@
         },
         {
             key: "empty",
-            name: "Empty",
+            name: EXAMPLE_NAMES.empty,
             readout: () => `value: ${describe(empty)} — an empty field has no value at all`,
             component: emptyExample,
             path: `${EXAMPLES_ROOT}/Default.svelte`,
         },
         {
             key: "symbol",
-            name: "With a symbol",
+            name: EXAMPLE_NAMES.symbol,
             readout: () =>
                 `value: ${describe(price)} — the currency is paint in a slot, since the library holds no currencies`,
             component: symbolExample,
@@ -71,7 +73,7 @@
         },
         {
             key: "bounded",
-            name: "Bounded",
+            name: EXAMPLE_NAMES.bounded,
             readout: () =>
                 `value: ${describe(budget)} — at most ${BUDGET_MAX}, and going over is refused as it is typed`,
             component: boundedExample,
@@ -79,7 +81,7 @@
         },
         {
             key: "negative",
-            name: "Signed",
+            name: EXAMPLE_NAMES.negative,
             readout: () =>
                 `value: ${describe(negative)} — a minus is only accepted where the field was told to hold one`,
             component: negativeExample,
@@ -87,7 +89,7 @@
         },
         {
             key: "big",
-            name: "Many groups",
+            name: EXAMPLE_NAMES.big,
             readout: () =>
                 `value: ${describe(big)} — the group count grows with the value, which a fixed pattern cannot do`,
             component: bigExample,

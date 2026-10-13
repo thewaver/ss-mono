@@ -1,14 +1,20 @@
 <script setup lang="ts">
 import { shallowRef, useId } from "vue";
 
-import { Button, SVGDefsSamples, Shape, TrackedGradientDefaults } from "@thewaver/ss-components-vue";
+import {
+    Button,
+    SVGDefsSampleConfigs,
+    SVGDefsSamples,
+    Shape,
+    TrackedGradientDefaults,
+} from "@thewaver/ss-components-vue";
+import { TrackedGradientKnobs } from "@thewaver/ss-playground/App/Knobs/TrackedGradients.const";
 import { NO_SAMPLE_KEY } from "@thewaver/ss-playground/App/PageComponents/SampleGroups/SampleGroups.const";
 import * as styles from "@thewaver/ss-playground/App/Pages/SVGGradients/SVGGradients.css";
 import { ShapeConst, type Size2d } from "@thewaver/ss-utils";
 
-import { TrackedGradientKnobs } from "../../../../Knobs/TrackedGradients.const";
 import PageButtonContent from "../../../../StyledComponents/ButtonContent/ButtonContent.vue";
-import type { TrackedGradientExampleProps } from "../../SVGGradients.types";
+import type { TrackedGradientExampleProps } from "../../SVGGradientsVue.types";
 
 const props = defineProps<TrackedGradientExampleProps>();
 
@@ -40,7 +46,7 @@ const computeDefs = (size: Size2d, element: HTMLElement | undefined) => {
         ]),
     );
 
-    return SVGDefsSamples.Gradient.Tracked.toConfig({
+    return SVGDefsSampleConfigs.Gradient.Tracked.toConfig({
         family: key,
         defs: { ...values, ...scaledValues },
     } as SVGDefsSamples.Gradient.Tracked.Entry)

@@ -2,20 +2,20 @@
 import { computed, shallowRef } from "vue";
 
 import { TextArea } from "@thewaver/ss-components-vue";
+import { PaintedTextKnobs } from "@thewaver/ss-playground/App/Knobs/PaintedTexts.const";
 import { MEASURE_BOX_PADDING } from "@thewaver/ss-playground/App/PageComponents/MeasureBox/MeasureBox.css";
 import {
     FIELD_GAP,
     FIELD_PADDING,
 } from "@thewaver/ss-playground/App/StyledComponents/TextFieldContent/TextFieldContent.css";
 
-import { PaintedTextKnobs } from "../../Knobs/PaintedTexts.const";
 import PageMeasureBox from "../../PageComponents/MeasureBox/MeasureBox.vue";
 import PageTextFieldContent, {
     computePageTextFieldTextStyle,
 } from "../../StyledComponents/TextFieldContent/TextFieldContent.vue";
 import PageTextFieldPlaceholder from "../../StyledComponents/TextFieldPlaceholder/TextFieldPlaceholder.vue";
 import CustomInputExample from "./Examples/CustomInput.vue";
-import type { PaintedTextExampleProps, PaintedTextExampleWrapperProps } from "./PaintedTextPage.types";
+import type { PaintedTextExampleProps, PaintedTextExampleWrapperProps } from "./PaintedTextPageVue.types";
 
 const props = defineProps<PaintedTextExampleWrapperProps>();
 

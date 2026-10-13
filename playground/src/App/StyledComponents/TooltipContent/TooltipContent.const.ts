@@ -1,5 +1,9 @@
-import { type ShapeArrowTemplate, ShapeConst } from "@thewaver/ss-utils";
+import type { PartialGlassDefs } from "@thewaver/ss-components";
+import { CSSUtils, type ShapeArrowTemplate, ShapeConst } from "@thewaver/ss-utils";
 
+import { BORDER_RADIUS_FULL } from "../../Theme.const";
+
+import { themeVars } from "../../Theme.css";
 import { tooltipRevealVariants } from "./TooltipContent.css";
 
 export const TOOLTIP_HOVER_DELAY_MS = 300;
@@ -38,3 +42,12 @@ export const TOOLTIP_ARROW_TEMPLATES: Record<
         baseEnd: { x: -width * 0.5, y: 0 },
     }),
 };
+
+export const BORDER_RADII = CSSUtils.spreadRadius(BORDER_RADIUS_FULL);
+
+export const GLASS_DEFS: PartialGlassDefs = {
+    tint: { color: themeVars.color.surface.dark, opacity: 1 },
+    sheen: { specularConstant: 0 },
+};
+
+export const JOIN_RADII = [BORDER_RADIUS_FULL];

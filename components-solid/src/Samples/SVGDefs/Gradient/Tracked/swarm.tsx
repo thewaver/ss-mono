@@ -7,6 +7,7 @@ import {
     SVGDefsUtils,
     TrackedGradientDefaults,
 } from "@thewaver/ss-components";
+import { SwarmConst, TrackedGradientSampleConst } from "@thewaver/ss-components/internal";
 import { MathUtils, type Point2d } from "@thewaver/ss-utils";
 
 import { PointerTrackerSolidUtils } from "../../../../Abstracts/PointerTracker/PointerTrackerSolid.utils";
@@ -14,16 +15,9 @@ import { SVGGradientDefsSolidUtils } from "../../../../Generators/SVGDefs/SVGGra
 import type { TrackedGradientConfig } from "../../SVGDefsSolid.types";
 import { SVGDefsSolidUtils } from "../../SVGDefsSolid.utils";
 
-const SETTLE_MS = 1500;
-const RESTING_POINT: Point2d = { x: 0.5, y: 0.5 };
-const STILL: Point2d = { x: 0, y: 0 };
-const NO_FADE = 0;
-
-const CYCLING_DEFAULTS = TrackedGradientDefaults.SWARM_CYCLING_DEFAULTS;
-
 const NO_REF = () => undefined;
 
-const clock = SVGDefsSolidUtils.createClock(SETTLE_MS);
+const clock = SVGDefsSolidUtils.createClock(SwarmConst.SETTLE_MS);
 
 const createTracers = (
     getReading: () => PointerReading,
@@ -40,10 +34,10 @@ const createTracers = (
     const wanderMs = opts?.wanderMs ?? defaults.wanderMs;
 
     const [getChains, setChains] = createSignal<Point2d[][]>(
-        Array.from({ length: count }, () => Array.from({ length }, () => RESTING_POINT)),
+        Array.from({ length: count }, () => Array.from({ length }, () => SwarmConst.RESTING_POINT)),
     );
 
-    const velocities = Array.from({ length: count }, () => STILL);
+    const velocities = Array.from({ length: count }, () => SwarmConst.STILL);
 
     let lastMs: number | undefined;
 
@@ -56,7 +50,8 @@ const createTracers = (
 
         lastMs = nowMs;
 
-        if (SVGDefsUtils.getPointerFade(reading, getIsPointerPresent()) > NO_FADE) clock.keepAwake();
+        if (SVGDefsUtils.getPointerFade(reading, getIsPointerPresent()) > TrackedGradientSampleConst.NO_FADE)
+            clock.keepAwake();
 
         if (frameMs <= 0) return;
 
@@ -91,7 +86,7 @@ export const createSwarmSample =
             const count = opts?.spotCount ?? defaults.spotCount;
             const length = opts?.tailLength ?? defaults.tailLength;
             const spotScale = opts?.spotScale ?? defaults.spotScale;
-            const cycleMs = opts?.cycles ? (opts.cycleMs ?? CYCLING_DEFAULTS.cycleMs) : undefined;
+            const cycleMs = opts?.cycles ? (opts.cycleMs ?? SwarmConst.CYCLING_DEFAULTS.cycleMs) : undefined;
             const tracers = Array.from({ length: count }, (_unused, tracer) => count - 1 - tracer);
 
             const { getReading, getIsPointerPresent } = PointerTrackerSolidUtils.create(
@@ -105,7 +100,7 @@ export const createSwarmSample =
             const getFade = () => SVGDefsUtils.getPointerFade(getReading(), getIsPointerPresent());
 
             const getColor = (tracer: number) => {
-                if (cycleMs && getFade() > NO_FADE) clock.keepAwake();
+                if (cycleMs && getFade() > TrackedGradientSampleConst.NO_FADE) clock.keepAwake();
 
                 return SVGDefsUtils.computeTracerColor(
                     defs.colors,

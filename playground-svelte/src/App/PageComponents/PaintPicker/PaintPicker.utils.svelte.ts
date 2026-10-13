@@ -1,5 +1,5 @@
-import { STARTING_KEYS } from "./PaintPicker.const";
-import type { PaintKind, PaintSampleKey, PaintSampleKind, PaintSlot } from "./PaintPicker.types";
+import { STARTING_KEYS } from "./PaintPickerSvelte.const";
+import type { PaintKind, PaintSampleKey, PaintSampleKind, PaintSlot } from "./PaintPickerSvelte.types";
 
 type ConfigDefs = Record<string, Record<string, number | boolean>>;
 

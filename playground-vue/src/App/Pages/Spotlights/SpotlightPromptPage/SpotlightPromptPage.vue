@@ -1,11 +1,14 @@
 <script setup lang="ts">
 import { shallowRef } from "vue";
 
+import {
+    EXAMPLES_ROOT,
+    EXAMPLE_NAMES,
+} from "@thewaver/ss-playground/App/Pages/Spotlights/SpotlightPromptPage/SpotlightPromptPage.const";
+
 import type { ExampleDefs } from "../../../PageComponents/Examples/Examples.types";
 import PageExamples from "../../../PageComponents/Examples/PageExamples.vue";
 import PromptExample from "./Examples/Prompt.vue";
-
-const EXAMPLES_ROOT = "/src/App/Pages/Spotlights/SpotlightPromptPage/Examples";
 
 const bought = shallowRef(0);
 
@@ -14,7 +17,7 @@ const visibility = shallowRef(false);
 const examples: ExampleDefs[] = [
     {
         key: "prompt",
-        name: "Prompt",
+        name: EXAMPLE_NAMES.prompt,
         readout: () => `bought: ${bought.value} — nothing else on the page answers until you do`,
         path: `${EXAMPLES_ROOT}/Prompt.vue`,
     },

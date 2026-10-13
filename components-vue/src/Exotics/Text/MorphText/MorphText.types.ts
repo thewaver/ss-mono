@@ -1,21 +1,8 @@
 import type { VNodeChild } from "vue";
 
-export type MorphTextProps = {
-    /**
-     * The text to show. Changing it melts the old text into the new one; cycling through words is the consumer's
-     * timer.
-     */
-    text: string;
-    /**
-     * How long one morph takes. `0` swaps the text at once, which is the way to honor a request for reduced motion.
-     * A change part-way through a morph starts again from the text that was arriving.
-     */
-    morphDurationMs?: number;
-    /** The most either copy is blurred while they cross, in pixels. More blur melts more of the shapes together. */
-    maxBlurPx?: number;
-    /** Runs once a morph has finished, with the text it arrived at. */
-    onMorphEnd?: (text: string) => void;
-};
+import type { BaseMorphTextProps } from "@thewaver/ss-components";
+
+export type MorphTextProps = BaseMorphTextProps;
 
 export type MorphTextSlots = {
     /**

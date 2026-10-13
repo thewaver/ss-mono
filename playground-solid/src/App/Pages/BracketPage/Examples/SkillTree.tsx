@@ -2,8 +2,8 @@ import { Bracket, access } from "@thewaver/ss-components-solid";
 import type { BracketNode } from "@thewaver/ss-components-solid";
 import * as styles from "@thewaver/ss-playground/App/Pages/BracketPage/BracketPage.css";
 
-import { branch, computeBracketLayerHeader, renderBracketNode, seed } from "../BracketPage.const";
 import type { BracketExampleProps } from "../BracketPage.types";
+import { branch, computeBracketLayerHeader, renderBracketNode, seed } from "../BracketPageSolid.const";
 
 const NODE_SIZE = { width: 80, height: 36 };
 const TIER_NAMES = ["Tier 4", "Tier 3", "Tier 2", "Tier 1"];

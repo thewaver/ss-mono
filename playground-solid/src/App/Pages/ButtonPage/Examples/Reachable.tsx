@@ -2,7 +2,7 @@ import { Button } from "@thewaver/ss-components-solid";
 
 import { PageButtonContent } from "../../../StyledComponents/ButtonContent/ButtonContent";
 import { PageTooltipContent } from "../../../StyledComponents/TooltipContent/TooltipContent";
-import type { ButtonExampleProps } from "../ButtonPage.types";
+import type { ButtonExampleProps } from "../ButtonPageSolid.types";
 
 type Props = ButtonExampleProps;
 

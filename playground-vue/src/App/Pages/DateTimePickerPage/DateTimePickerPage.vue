@@ -4,15 +4,17 @@ import { shallowRef } from "vue";
 import type { DateTimeValue } from "@thewaver/ss-components-vue";
 import { DateTimeValueUtils, DateValueUtils } from "@thewaver/ss-components-vue";
 import { TODAY } from "@thewaver/ss-playground/App/Pages/DatePickerPage/DatePickerPage.const";
+import {
+    EXAMPLES_ROOT,
+    EXAMPLE_NAMES,
+    NOON,
+} from "@thewaver/ss-playground/App/Pages/DateTimePickerPage/DateTimePickerPage.const";
 import { TimeUtils } from "@thewaver/ss-utils";
 
 import type { ExampleDefs } from "../../PageComponents/Examples/Examples.types";
 import PageExamples from "../../PageComponents/Examples/PageExamples.vue";
 import PairedExample from "./Examples/Paired.vue";
 import PickedExample from "./Examples/Picked.vue";
-
-const EXAMPLES_ROOT = "/src/App/Pages/DateTimePickerPage/Examples";
-const NOON = { hour: 12, minute: 0 };
 
 const describe = (value: DateTimeValue | undefined) =>
     value
@@ -27,25 +29,25 @@ const twelveHourValue = shallowRef<DateTimeValue | undefined>();
 const examples: ExampleDefs[] = [
     {
         key: "paired",
-        name: "Two fields, one value",
+        name: EXAMPLE_NAMES.paired,
         readout: () => `value: ${describe(emptyValue.value)}`,
         path: `${EXAMPLES_ROOT}/Paired.vue`,
     },
     {
         key: "picked",
-        name: "One control, both popups",
+        name: EXAMPLE_NAMES.picked,
         readout: () => `value: ${describe(pickedValue.value)}`,
         path: `${EXAMPLES_ROOT}/Picked.vue`,
     },
     {
         key: "twelveHour",
-        name: "Twelve hour, with seconds",
+        name: EXAMPLE_NAMES.twelveHour,
         readout: () => `value: ${describe(twelveHourValue.value)}`,
         path: `${EXAMPLES_ROOT}/Picked.vue`,
     },
     {
         key: "seeded",
-        name: "Starting from a value",
+        name: EXAMPLE_NAMES.seeded,
         readout: () =>
             `value: ${describe(seededValue.value)} — seconds of day: ${
                 seededValue.value ? TimeUtils.getSecondOfDay(seededValue.value.time) : 0

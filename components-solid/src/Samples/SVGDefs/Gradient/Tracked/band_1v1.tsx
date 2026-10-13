@@ -1,23 +1,19 @@
-import { type GradientBandOpts, SVGDefsUtils, TrackedGradientDefaults } from "@thewaver/ss-components";
-import type { Size2d } from "@thewaver/ss-utils";
+import { type GradientBandOpts, SVGDefsUtils } from "@thewaver/ss-components";
+import { Band1v1Const } from "@thewaver/ss-components/internal";
 
 import { PointerTrackerSolidUtils } from "../../../../Abstracts/PointerTracker/PointerTrackerSolid.utils";
 import { SVGGradientDefsSolidUtils } from "../../../../Generators/SVGDefs/SVGGradients/SVGGradientDefsSolid.utils";
 import type { TrackedGradientConfig } from "../../SVGDefsSolid.types";
 import { SVGDefsSolidUtils } from "../../SVGDefsSolid.utils";
 
-const BAND_SPAN: Size2d = { width: 0.7, height: 0.7 };
-
-const DEFAULTS = TrackedGradientDefaults.BAND_BLEND_DEFAULTS;
-
 const NO_REF = () => undefined;
 
 const getBandColors = (color: string, opts?: GradientBandOpts) =>
     SVGDefsUtils.getFalloffStops(color, {
-        coreStop: opts?.coreStop ?? DEFAULTS.coreStop,
-        coreAlpha: opts?.coreAlpha ?? DEFAULTS.coreAlpha,
-        falloffSpread: opts?.falloffSpread ?? DEFAULTS.falloffSpread,
-        falloffAlpha: opts?.falloffAlpha ?? DEFAULTS.falloffAlpha,
+        coreStop: opts?.coreStop ?? Band1v1Const.DEFAULTS.coreStop,
+        coreAlpha: opts?.coreAlpha ?? Band1v1Const.DEFAULTS.coreAlpha,
+        falloffSpread: opts?.falloffSpread ?? Band1v1Const.DEFAULTS.falloffSpread,
+        falloffAlpha: opts?.falloffAlpha ?? Band1v1Const.DEFAULTS.falloffAlpha,
     });
 
 export const band_1v1 = (opts?: GradientBandOpts): TrackedGradientConfig => ({
@@ -43,9 +39,11 @@ export const band_1v1 = (opts?: GradientBandOpts): TrackedGradientConfig => ({
                             id: `gradient1-${id}`,
                             colors: getBandColors(defs.colors.primary, opts),
                             angle: 0,
-                            scale: BAND_SPAN,
+                            scale: Band1v1Const.BAND_SPAN,
                             offset: () => ({
-                                x: (getReading().boxRatio.x - 0.5) * (opts?.bandTravel ?? DEFAULTS.bandTravel),
+                                x:
+                                    (getReading().boxRatio.x - 0.5) *
+                                    (opts?.bandTravel ?? Band1v1Const.DEFAULTS.bandTravel),
                                 y: 0,
                             }),
                         });
@@ -68,10 +66,12 @@ export const band_1v1 = (opts?: GradientBandOpts): TrackedGradientConfig => ({
                             id: `gradient2-${id}`,
                             colors: getBandColors(defs.colors.secondary, opts),
                             angle: 90,
-                            scale: BAND_SPAN,
+                            scale: Band1v1Const.BAND_SPAN,
                             offset: () => ({
                                 x: 0,
-                                y: (getReading().boxRatio.y - 0.5) * (opts?.bandTravel ?? DEFAULTS.bandTravel),
+                                y:
+                                    (getReading().boxRatio.y - 0.5) *
+                                    (opts?.bandTravel ?? Band1v1Const.DEFAULTS.bandTravel),
                             }),
                         });
                     },

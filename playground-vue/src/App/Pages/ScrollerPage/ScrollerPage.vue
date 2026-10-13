@@ -3,6 +3,12 @@ import { computed, shallowRef } from "vue";
 
 import type { Tab } from "@thewaver/ss-components-vue";
 import { ScrollerKnobs } from "@thewaver/ss-playground/App/Knobs/Scrollers.const";
+import {
+    EXAMPLES_ROOT,
+    EXAMPLE_NAMES,
+    MONTHS,
+    PERCENT,
+} from "@thewaver/ss-playground/App/Pages/ScrollerPage/ScrollerPage.const";
 import * as styles from "@thewaver/ss-playground/App/Pages/ScrollerPage/ScrollerPage.css";
 
 import type { ExampleDefs } from "../../PageComponents/Examples/Examples.types";
@@ -13,24 +19,6 @@ import PagePropsPanel from "../../PageComponents/PropsPanel/PagePropsPanel.vue";
 import ChipsExample from "./Examples/Chips.vue";
 import FocusableChildrenExample from "./Examples/FocusableChildren.vue";
 import TabbedExample from "./Examples/Tabbed.vue";
-
-const EXAMPLES_ROOT = "/src/App/Pages/ScrollerPage/Examples";
-const PERCENT = 100;
-
-const MONTHS = [
-    "January",
-    "February",
-    "March",
-    "April",
-    "May",
-    "June",
-    "July",
-    "August",
-    "September",
-    "October",
-    "November",
-    "December",
-];
 
 const itemCount = shallowRef(ScrollerKnobs.STARTING_ITEM_COUNT);
 const selectedMonth = shallowRef(MONTHS[0]);
@@ -43,33 +31,33 @@ const monthTabs = computed((): Tab<string>[] => MONTHS.slice(0, itemCount.value)
 const examples: ExampleDefs[] = [
     {
         key: "split",
-        name: "One button at each end",
+        name: EXAMPLE_NAMES.split,
         readout: () =>
             `${itemCount.value} items, ${Math.round(progress.value * PERCENT)}% along — the buttons stop at the ends rather than wrapping round, and leave altogether once everything fits`,
         path: `${EXAMPLES_ROOT}/Chips.vue`,
     },
     {
         key: "bothButtonsEnd",
-        name: "Both buttons at the end",
+        name: EXAMPLE_NAMES.bothButtonsEnd,
         readout: () => "the same control with its buttons together instead of split",
         path: `${EXAMPLES_ROOT}/Chips.vue`,
     },
     {
         key: "bothButtonsStart",
-        name: "Both buttons at the start",
+        name: EXAMPLE_NAMES.bothButtonsStart,
         readout: () => "and the same pair on the other side",
         path: `${EXAMPLES_ROOT}/Chips.vue`,
     },
     {
         key: "tabbed",
-        name: "Focus reveals what it lands on",
+        name: EXAMPLE_NAMES.tabbed,
         readout: () =>
             `selected: ${selectedMonth.value} — a tab already fully in view does not move the strip, and one cut off by the edge scrolls into view whole`,
         path: `${EXAMPLES_ROOT}/Tabbed.vue`,
     },
     {
         key: "focusableChildren",
-        name: "Focusable children of any kind",
+        name: EXAMPLE_NAMES.focusableChildren,
         readout: () => "the track holds whatever it is given, and tabbing through pulls the strip along",
         path: `${EXAMPLES_ROOT}/FocusableChildren.vue`,
     },

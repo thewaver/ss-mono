@@ -9,6 +9,7 @@
         SidebarUtils,
         SidebarStyles as styles,
     } from "@thewaver/ss-components";
+    import { SidebarConst } from "@thewaver/ss-components/internal";
 
     import { DismisserSvelteUtils } from "../../../Abstracts/Dismisser/DismisserSvelte.utils.svelte.js";
     import { ElementFaderSvelteUtils } from "../../../Abstracts/ElementFader/ElementFaderSvelte.utils.svelte.js";
@@ -16,8 +17,6 @@
     import { HoverIntentSvelteUtils } from "../../../Abstracts/HoverIntent/HoverIntentSvelte.utils.svelte.js";
     import { watchChange } from "../../../Utils/effectUtils.svelte.js";
     import type { SidebarProps } from "./Sidebar.types.js";
-
-    const NO_SKIP_WINDOW_MS = 0;
 
     let { expanded = $bindable(false), ...props }: SidebarProps = $props();
 
@@ -67,7 +66,7 @@
             delayGroup: HoverIntentUtils.createDelayGroup(),
             getPanelRef: () => undefined,
             getHoverShowDelayMs: () => props.hoverShowDelayMs ?? SIDEBAR_DEFAULTS.hoverShowDelayMs,
-            getSkipDelayWindowMs: () => NO_SKIP_WINDOW_MS,
+            getSkipDelayWindowMs: () => SidebarConst.NO_SKIP_WINDOW_MS,
             getIsHeld,
             isTouchIgnored: true,
         },

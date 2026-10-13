@@ -38,7 +38,7 @@ export type FileInputRenderProps = {
     isDragOver: boolean;
 };
 
-export type FileInputCbs = {
+export type BaseFileInputCbs = {
     /** Runs when the chosen files change. */
     onChange?: (files: File[]) => void;
     /**
@@ -48,13 +48,16 @@ export type FileInputCbs = {
      * sentence, so what a reader is told about it is the consumer's to write.
      */
     onReject?: (rejections: FileInputRejection[]) => void;
+};
+
+export type FileInputCbs = BaseFileInputCbs & {
     /** Runs when the pointer arrives over the control. */
     onMouseEnter?: (e: MouseEvent) => void;
     /** Runs when the pointer leaves the control. */
     onMouseLeave?: (e: MouseEvent) => void;
 };
 
-export type FileInputState = {
+export type BaseFileInputValues = {
     /** The field's name when it is submitted as part of a form. */
     name?: string;
     /** Names the control for assistive technology. */
@@ -79,4 +82,6 @@ export type FileInputState = {
     maxSizeBytes?: number;
 };
 
-export type FileInputLimits = Pick<FileInputState, "accept" | "isMultiple" | "maxFiles" | "maxSizeBytes">;
+export type FileInputLimits = Pick<BaseFileInputValues, "accept" | "isMultiple" | "maxFiles" | "maxSizeBytes">;
+
+export type BaseFileInputProps = BaseFileInputValues & BaseFileInputCbs;

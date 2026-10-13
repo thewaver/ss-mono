@@ -8,6 +8,7 @@ import {
     type CuboidTurns,
     CuboidUtils,
 } from "@thewaver/ss-components";
+import { CuboidConst } from "@thewaver/ss-components/internal";
 import type { Matrix3d } from "@thewaver/ss-utils";
 
 import { InteractionTrackerVueUtils } from "../../../Abstracts/InteractionTracker/InteractionTrackerVue.utils";
@@ -15,11 +16,6 @@ import { watchAfterRender } from "../../../Utils/effectUtils";
 import { callSlot, declareProps, useTwoWay } from "../../../Utils/propUtils";
 import type { SlotsContext } from "../../../Utils/typeUtils";
 import type { CuboidController, CuboidProps, CuboidSlots } from "./Cuboid.types";
-
-const NO_DURATION = 0;
-const DRAG_COMMIT_RATIO = 0.5;
-
-const NO_TURNS: CuboidTurns = { yaw: 0, pitch: 0 };
 
 type PendingSettle = { from: Matrix3d | undefined; to: Matrix3d; turns: CuboidTurns };
 
@@ -37,7 +33,7 @@ export const Cuboid = defineComponent(
 
         let pendingSettle: PendingSettle | undefined;
 
-        const dragTurns = shallowRef(NO_TURNS);
+        const dragTurns = shallowRef(CuboidConst.NO_TURNS);
         const orientation = shallowRef(
             CuboidUtils.standUpright(CuboidUtils.getCountedOrientation(yaw.value, pitch.value)),
         );
@@ -49,7 +45,7 @@ export const Cuboid = defineComponent(
                 const counted = CuboidUtils.getCountedOrientation(nextYaw, nextPitch);
 
                 orientation.value = CuboidUtils.standUpright(counted);
-                pendingSettle = { from, to: isUpright ? orientation.value : counted, turns: NO_TURNS };
+                pendingSettle = { from, to: isUpright ? orientation.value : counted, turns: CuboidConst.NO_TURNS };
             } else if (isUpright) {
                 const turns = { yaw: nextYaw - lastYaw, pitch: nextPitch - lastPitch };
 
@@ -80,7 +76,7 @@ export const Cuboid = defineComponent(
         onUpdated(settlePending);
 
         const { isSwiping } = InteractionTrackerVueUtils.useFreeSwipe(perspectiveRef, () => !getIsDraggable(), {
-            commitRatio: DRAG_COMMIT_RATIO,
+            commitRatio: CuboidConst.DRAG_COMMIT_RATIO,
             onSwipe: (travel) => {
                 const isUpright = getIsUpright();
 
@@ -92,10 +88,10 @@ export const Cuboid = defineComponent(
                 const turns = CuboidUtils.getReleaseTurns(direction, dragTurns.value);
                 const from = getIsUpright() ? CuboidUtils.readDrawnOrientation(bodyRef.value) : undefined;
 
-                dragTurns.value = NO_TURNS;
+                dragTurns.value = CuboidConst.NO_TURNS;
 
                 if (turns.yaw === 0 && turns.pitch === 0) {
-                    if (from) pendingSettle = { from, to: orientation.value, turns: NO_TURNS };
+                    if (from) pendingSettle = { from, to: orientation.value, turns: CuboidConst.NO_TURNS };
 
                     return;
                 }
@@ -158,7 +154,7 @@ export const Cuboid = defineComponent(
                                     dragTurns.value,
                                     size,
                                 ),
-                                transitionDuration: `${isUpright || isSwiping.value ? NO_DURATION : getTransitionDurationMs()}ms`,
+                                transitionDuration: `${isUpright || isSwiping.value ? CuboidConst.NO_DURATION : getTransitionDurationMs()}ms`,
                             }}
                         >
                             {CUBOID_FACES.map((face) => {

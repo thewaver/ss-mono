@@ -8,7 +8,7 @@ import { CONTROL_GLYPHS } from "@thewaver/ss-playground/App/StyledComponents/Con
 
 import { PageMeasureBox } from "../../../PageComponents/MeasureBox/MeasureBox";
 import { PageControlButtonContent } from "../../../StyledComponents/ControlButtonContent/ControlButtonContent";
-import type { TypewriterPhrasesExampleProps } from "../TypewriterPage.types";
+import type { TypewriterPhrasesExampleProps } from "../TypewriterPageReact.types";
 
 const LEAD = "We build";
 const PHRASES = ["websites", "apps", "games"];

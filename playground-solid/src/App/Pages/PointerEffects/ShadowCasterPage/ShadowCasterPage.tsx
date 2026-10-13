@@ -2,7 +2,11 @@ import { createMemo, createSignal } from "solid-js";
 
 import { SHADOW_CASTER_DEFAULTS } from "@thewaver/ss-components-solid";
 import { ShadowCasterKnobs } from "@thewaver/ss-playground/App/Knobs/ShadowCasters.const";
-import type { ShadowCasterExampleProps } from "@thewaver/ss-playground/App/Pages/PointerEffects/ShadowCasterPage/ShadowCasterPage.types";
+import {
+    EXAMPLES_ROOT,
+    EXAMPLE_NAMES,
+    FIELD_WIDTH,
+} from "@thewaver/ss-playground/App/Pages/PointerEffects/ShadowCasterPage/ShadowCasterPage.const";
 
 import { PageExamples } from "../../../PageComponents/Examples/Examples";
 import { PageCheckField, PageColorField, PageNumberField } from "../../../PageComponents/Field/Field";
@@ -10,10 +14,7 @@ import { PageProp } from "../../../PageComponents/Prop/Prop";
 import { PagePropsPanel } from "../../../PageComponents/PropsPanel/PropsPanel";
 import { BadgeExample } from "./Examples/Badge";
 import { CardExample } from "./Examples/Card";
-
-const EXAMPLES_ROOT = "/src/App/Pages/PointerEffects/ShadowCasterPage/Examples";
-
-const FIELD_WIDTH = 110;
+import type { ShadowCasterExampleProps } from "./ShadowCasterPageSolid.types";
 
 export const ShadowCasterPage = () => {
     const [getIsDisabled, setIsDisabled] = createSignal(ShadowCasterKnobs.STARTING_IS_DISABLED);
@@ -46,7 +47,7 @@ export const ShadowCasterPage = () => {
         return [
             {
                 key: "card",
-                name: "Card",
+                name: EXAMPLE_NAMES.card,
                 readout: () =>
                     "the shadow is thrown away from the pointer, and lengthens and softens as the pointer retreats",
                 component: () => <CardExample {...commonProps} />,
@@ -54,7 +55,7 @@ export const ShadowCasterPage = () => {
             },
             {
                 key: "badge",
-                name: "Cut shape",
+                name: EXAMPLE_NAMES.badge,
                 readout: () =>
                     "the same wrapper over a clipped star — the shadow traces the shape rather than the box around it",
                 component: () => <BadgeExample {...commonProps} />,

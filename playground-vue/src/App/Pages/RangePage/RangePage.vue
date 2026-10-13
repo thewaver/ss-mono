@@ -2,6 +2,7 @@
 import { shallowRef } from "vue";
 
 import type { RangeValues } from "@thewaver/ss-components-vue";
+import { EXAMPLES_ROOT, EXAMPLE_NAMES, STEP_COUNT } from "@thewaver/ss-playground/App/Pages/RangePage/RangePage.const";
 
 import type { ExampleDefs } from "../../PageComponents/Examples/Examples.types";
 import PageExamples from "../../PageComponents/Examples/PageExamples.vue";
@@ -15,9 +16,6 @@ import PriceExample from "./Examples/Price.vue";
 import ReachableExample from "./Examples/Reachable.vue";
 import SteppedExample from "./Examples/Stepped.vue";
 import VerticalExample from "./Examples/Vertical.vue";
-
-const STEP_COUNT = 5;
-const EXAMPLES_ROOT = "/src/App/Pages/RangePage/Examples";
 
 const volume = shallowRef(40);
 const steps = shallowRef(3);
@@ -36,64 +34,64 @@ const disabledPair = shallowRef<RangeValues>({ start: 35, end: 65 });
 const examples: ExampleDefs[] = [
     {
         key: "default",
-        name: "Default",
+        name: EXAMPLE_NAMES.default,
         readout: () => `value: ${volume.value}`,
         path: `${EXAMPLES_ROOT}/Default.vue`,
     },
     {
         key: "stepped",
-        name: "Stepped",
+        name: EXAMPLE_NAMES.stepped,
         readout: () => `value: ${steps.value} of ${STEP_COUNT}`,
         path: `${EXAMPLES_ROOT}/Stepped.vue`,
     },
     {
         key: "pair",
-        name: "Pair",
+        name: EXAMPLE_NAMES.pair,
         readout: () => `start: ${price.value.start} | end: ${price.value.end}`,
         path: `${EXAMPLES_ROOT}/Pair.vue`,
     },
     {
         key: "priceRange",
-        name: "Price range, read as prices",
+        name: EXAMPLE_NAMES.priceRange,
         readout: () =>
             `start: ${budget.value.start} | end: ${budget.value.end} | settled: ${settledBudget.value} — each thumb reads its value as a price, and "settled" changes only when a drag lets go or a key is pressed`,
         path: `${EXAMPLES_ROOT}/Price.vue`,
     },
     {
         key: "vertical",
-        name: "Vertical",
+        name: EXAMPLE_NAMES.vertical,
         readout: () => `single: ${vertical.value} | pair: ${verticalPair.value.start}–${verticalPair.value.end}`,
         path: `${EXAMPLES_ROOT}/Vertical.vue`,
     },
     {
         key: "knob",
-        name: "Knob",
+        name: EXAMPLE_NAMES.knob,
         readout: () =>
             `value: ${knob.value} — computeValueAtPoint reads the pointer by its angle round the center, so dragging turns it; the arrow keys still step it`,
         path: `${EXAMPLES_ROOT}/Knob.vue`,
     },
     {
         key: "disabled",
-        name: "Disabled",
+        name: EXAMPLE_NAMES.disabled,
         readout: () => `value: ${disabled.value}`,
         path: `${EXAMPLES_ROOT}/Disabled.vue`,
     },
     {
         key: "disabledPair",
-        name: "Disabled pair",
+        name: EXAMPLE_NAMES.disabledPair,
         readout: () =>
             `start: ${disabledPair.value.start} | end: ${disabledPair.value.end} — both thumbs must be out of the tab order`,
         path: `${EXAMPLES_ROOT}/DisabledPair.vue`,
     },
     {
         key: "reachable",
-        name: "Disabled + reachable",
+        name: EXAMPLE_NAMES.reachable,
         readout: () => `value: ${reachable.value}`,
         path: `${EXAMPLES_ROOT}/Reachable.vue`,
     },
     {
         key: "errored",
-        name: "Error",
+        name: EXAMPLE_NAMES.errored,
         readout: () => `value: ${errored.value}`,
         path: `${EXAMPLES_ROOT}/Errored.vue`,
     },

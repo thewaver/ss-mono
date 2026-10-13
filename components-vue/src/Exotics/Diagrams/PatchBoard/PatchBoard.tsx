@@ -25,6 +25,7 @@ import {
     PatchBoardUtils,
     PlacementUtils,
 } from "@thewaver/ss-components";
+import { PatchBoardConst } from "@thewaver/ss-components/internal";
 
 import { CarrierVueUtils } from "../../../Abstracts/Carrier/CarrierVue.utils";
 import { LabelVueUtils } from "../../../Essentials/Input/Label/LabelVue.utils";
@@ -35,9 +36,6 @@ import { callSlot, declareProps, useTwoWay } from "../../../Utils/propUtils";
 import { toElement } from "../../../Utils/refUtils";
 import type { SlotsContext } from "../../../Utils/typeUtils";
 import type { PatchBoardProps, PatchBoardSlots } from "./PatchBoard.types";
-
-const NOTHING = 0;
-const FULL_WIDTH = 1;
 
 export const PatchBoard = defineComponent(
     <T,>(props: PatchBoardProps<T>, { slots }: SlotsContext<PatchBoardSlots<T>>) => {
@@ -133,7 +131,7 @@ export const PatchBoard = defineComponent(
             const stopKeys = PatchBoardUtils.getStopKeys(placements.value);
             const focused = focusedStop.value;
 
-            return focused !== undefined && stopKeys.includes(focused) ? focused : stopKeys[NOTHING];
+            return focused !== undefined && stopKeys.includes(focused) ? focused : stopKeys[PatchBoardConst.NOTHING];
         });
 
         watchAfterRender([], () => LiveAnnouncerUtils.reserve("polite"));
@@ -200,10 +198,12 @@ export const PatchBoard = defineComponent(
                     class={PatchBoardStyles.patchBoardSocketHolder}
                     style={{
                         left: PlacementUtils.toContainerWidth(
-                            (placed?.point.x ?? NOTHING) - (placement?.spot.x ?? NOTHING),
+                            (placed?.point.x ?? PatchBoardConst.NOTHING) -
+                                (placement?.spot.x ?? PatchBoardConst.NOTHING),
                         ),
                         top: PlacementUtils.toContainerWidth(
-                            (placed?.point.y ?? NOTHING) - (placement?.spot.y ?? NOTHING),
+                            (placed?.point.y ?? PatchBoardConst.NOTHING) -
+                                (placement?.spot.y ?? PatchBoardConst.NOTHING),
                         ),
                         width: PlacementUtils.toContainerWidth(socketSize),
                         height: PlacementUtils.toContainerWidth(socketSize),
@@ -349,7 +349,7 @@ export const PatchBoard = defineComponent(
                     </div>
                     <svg
                         class={PatchBoardStyles.patchBoardCables}
-                        viewBox={`0 0 ${FULL_WIDTH} ${props.heightRatio}`}
+                        viewBox={`0 0 ${PatchBoardConst.FULL_WIDTH} ${props.heightRatio}`}
                         aria-hidden="true"
                     >
                         {cableDefs.map((defs) => (

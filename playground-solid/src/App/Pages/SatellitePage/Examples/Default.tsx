@@ -1,7 +1,7 @@
 import { Satellite, access } from "@thewaver/ss-components-solid";
 
 import { PageSatelliteBadge, PageSatelliteSubject } from "../../../StyledComponents/SatelliteContent/SatelliteContent";
-import type { SatelliteDefaultExampleProps } from "../SatellitePage.types";
+import type { SatelliteDefaultExampleProps } from "../SatellitePageSolid.types";
 
 type Props = SatelliteDefaultExampleProps;
 

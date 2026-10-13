@@ -5,8 +5,8 @@ import * as styles from "@thewaver/ss-playground/App/Pages/PaintedTextPage/Paint
 import knight from "@thewaver/ss-playground/App/knight.webp";
 import testFile from "@thewaver/ss-playground/App/test.svg?raw";
 
-import { computeSampleDefs } from "../PaintedTextPage.const";
-import type { PaintedTextExampleProps } from "../PaintedTextPage.types";
+import { computeSampleDefs } from "../PaintedTextPageReact.const";
+import type { PaintedTextExampleProps } from "../PaintedTextPageReact.types";
 
 const TEST_ICON = testFile.slice(testFile.indexOf("<svg"));
 

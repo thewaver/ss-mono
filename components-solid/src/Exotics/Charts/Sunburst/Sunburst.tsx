@@ -9,18 +9,13 @@ import {
     TreemapUtils,
     SunburstStyles as styles,
 } from "@thewaver/ss-components";
+import { SunburstConst } from "@thewaver/ss-components/internal";
 
 import { ElementObserverSolidUtils } from "../../../Abstracts/ElementObserver/ElementObserverSolid.utils";
 import { SignalMirrorSolidUtils } from "../../../Abstracts/SignalMirror/SignalMirrorSolid.utils";
 import { access } from "../../../Utils/propUtils";
 import { accessStore } from "../../../Utils/storeUtils";
 import type { SunburstProps } from "./SunburstSolid.types";
-
-const NOTHING = 0;
-const SETTLED = 1;
-const HALF = 0.5;
-const CENTER_RINGS = 1;
-const EMPTY_SPAN: SunburstSpan = { start: 0, end: 0, inner: 0, outer: 0 };
 
 export const Sunburst = <T,>(props: SunburstProps<T>) => {
     const arcRefs = new Map<SunburstNode<T>, SVGGElement>();
@@ -41,9 +36,13 @@ export const Sunburst = <T,>(props: SunburstProps<T>) => {
 
     const getSide = createMemo(() => Math.min(getSize().width, getSize().height));
 
-    const getRingCount = createMemo(() => Math.max(SETTLED, access(props.ringCount) ?? SUNBURST_DEFAULTS.ringCount));
+    const getRingCount = createMemo(() =>
+        Math.max(SunburstConst.SETTLED, access(props.ringCount) ?? SUNBURST_DEFAULTS.ringCount),
+    );
 
-    const getRingWidth = createMemo(() => (getSide() * HALF) / (getRingCount() + CENTER_RINGS));
+    const getRingWidth = createMemo(
+        () => (getSide() * SunburstConst.HALF) / (getRingCount() + SunburstConst.CENTER_RINGS),
+    );
 
     const getZoomDurationMs = createMemo(() => access(props.zoomDurationMs) ?? SUNBURST_DEFAULTS.zoomDurationMs);
 
@@ -63,20 +62,23 @@ export const Sunburst = <T,>(props: SunburstProps<T>) => {
     const getBranch = createMemo(() => TreemapUtils.resolveBranch(getHeldBranch(), getRootNode(), getWeights()));
 
     const getTargetViews = createMemo(() => {
-        const center = getSpans().get(getBranch()) ?? EMPTY_SPAN;
+        const center = getSpans().get(getBranch()) ?? SunburstConst.EMPTY_SPAN;
 
         return new Map(
-            getAllNodes().map((node) => [node, SunburstUtils.computeView(getSpans().get(node) ?? EMPTY_SPAN, center)]),
+            getAllNodes().map((node) => [
+                node,
+                SunburstUtils.computeView(getSpans().get(node) ?? SunburstConst.EMPTY_SPAN, center),
+            ]),
         );
     });
 
-    const getIsZooming = createMemo(() => getProgress() < SETTLED);
+    const getIsZooming = createMemo(() => getProgress() < SunburstConst.SETTLED);
 
     const getIsVisibleAtTarget = (node: SunburstNode<T>) =>
-        SunburstUtils.getIsVisible(getTargetViews().get(node) ?? EMPTY_SPAN, getRingCount());
+        SunburstUtils.getIsVisible(getTargetViews().get(node) ?? SunburstConst.EMPTY_SPAN, getRingCount());
 
     const getIsVisibleAtStart = (node: SunburstNode<T>) =>
-        SunburstUtils.getIsVisible(getFromViews().get(node) ?? EMPTY_SPAN, getRingCount());
+        SunburstUtils.getIsVisible(getFromViews().get(node) ?? SunburstConst.EMPTY_SPAN, getRingCount());
 
     const getRenderedNodes = createMemo(() =>
         getAllNodes().filter((node) => getIsVisibleAtTarget(node) || (getIsZooming() && getIsVisibleAtStart(node))),
@@ -90,8 +92,8 @@ export const Sunburst = <T,>(props: SunburstProps<T>) => {
 
     const computeShownView = (node: SunburstNode<T>, center: SunburstNode<T>) =>
         SunburstUtils.computeShownSpan(
-            getSpans().get(node) ?? EMPTY_SPAN,
-            getSpans().get(center) ?? EMPTY_SPAN,
+            getSpans().get(node) ?? SunburstConst.EMPTY_SPAN,
+            getSpans().get(center) ?? SunburstConst.EMPTY_SPAN,
             getFromViews().get(node),
             getProgress(),
         );
@@ -168,7 +170,7 @@ export const Sunburst = <T,>(props: SunburstProps<T>) => {
         <div ref={setRootRef} class={styles.sunburstRoot} tabindex={-1} onKeyDown={handleKeyDown}>
             <svg
                 class={styles.sunburstCanvas}
-                viewBox={`${-getSide() * HALF} ${-getSide() * HALF} ${getSide()} ${getSide()}`}
+                viewBox={`${-getSide() * SunburstConst.HALF} ${-getSide() * SunburstConst.HALF} ${getSide()} ${getSide()}`}
                 role="list"
                 aria-label={access(props.ariaLabel)}
             >
@@ -177,11 +179,11 @@ export const Sunburst = <T,>(props: SunburstProps<T>) => {
                         const getIsBranch = createMemo(() => TreemapUtils.getIsBranch(node, getWeights()));
                         const getIsLeaving = createMemo(() => !getIsVisibleAtTarget(node));
                         const getState = (): SunburstArcState => {
-                            const target = getTargetViews().get(node) ?? EMPTY_SPAN;
+                            const target = getTargetViews().get(node) ?? SunburstConst.EMPTY_SPAN;
 
                             return {
                                 ...SunburstUtils.toArc(getCurrentView(node), getRingWidth()),
-                                weight: getWeights().get(node) ?? NOTHING,
+                                weight: getWeights().get(node) ?? SunburstConst.NOTHING,
                                 isBranch: getIsBranch(),
                                 ring: target.inner,
                             };

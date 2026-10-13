@@ -3,6 +3,11 @@ import { computed, shallowRef } from "vue";
 
 import { MORPH_TEXT_DEFAULTS, MediaQueryMonitorVueUtils } from "@thewaver/ss-components-vue";
 import { MorphTextKnobs } from "@thewaver/ss-playground/App/Knobs/MorphTexts.const";
+import {
+    EXAMPLES_ROOT,
+    EXAMPLE_NAMES,
+    NO_MOTION_DURATION_MS,
+} from "@thewaver/ss-playground/App/Pages/MorphTextPage/MorphTextPage.const";
 
 import type { ExampleDefs } from "../../PageComponents/Examples/Examples.types";
 import PageExamples from "../../PageComponents/Examples/PageExamples.vue";
@@ -11,10 +16,6 @@ import PageProp from "../../PageComponents/Prop/Prop.vue";
 import PagePropsPanel from "../../PageComponents/PropsPanel/PagePropsPanel.vue";
 import PaintedExample from "./Examples/Painted.vue";
 import WordsExample from "./Examples/Words.vue";
-
-const EXAMPLES_ROOT = "/src/App/Pages/MorphTextPage/Examples";
-
-const NO_MOTION_DURATION_MS = 0;
 
 const morphDurationMs = shallowRef(MORPH_TEXT_DEFAULTS.morphDurationMs);
 const maxBlurPx = shallowRef(MORPH_TEXT_DEFAULTS.maxBlurPx);
@@ -31,14 +32,14 @@ const commonProps = computed(() => ({
 const examples: ExampleDefs[] = [
     {
         key: "words",
-        name: "Words in turn",
+        name: EXAMPLE_NAMES.words,
         readout: () =>
             `showing: ${word.value} — the page changes the word on a timer and the text melts into the next; Pause stops the cycle`,
         path: `${EXAMPLES_ROOT}/Words.vue`,
     },
     {
         key: "painted",
-        name: "Painted text",
+        name: EXAMPLE_NAMES.painted,
         readout: () =>
             `showing: ${paintedWord.value} — each copy is a PaintedText with a moving gradient, and the melt still works because the filter sits on the morph's own box`,
         path: `${EXAMPLES_ROOT}/Painted.vue`,

@@ -1,13 +1,3 @@
-export type ShadowCasterExampleProps = {
-    isDisabled: boolean;
-    activeRangePx: number;
-    smoothingMs: number;
-    lightRangePx: number;
-    maxThrowPx: number;
-    minBlurPx: number;
-    maxBlurPx: number;
-    maxOpacity: number;
-    minOpacity: number;
-    restingOpacity: number;
-    color: string;
-};
+import type { BaseShadowCasterExampleProps } from "@thewaver/ss-playground/App/Pages/PointerEffects/ShadowCasterPage/ShadowCasterPage.types";
+
+export type ShadowCasterExampleProps = BaseShadowCasterExampleProps;

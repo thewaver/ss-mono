@@ -1,13 +1,13 @@
 import { type SlotsType, computed, defineComponent, shallowRef, watch } from "vue";
 
 import {
-    type InteractionSizing,
     TABLE_OF_CONTENTS_DEFAULTS,
     type TableOfContentsFlags,
     type TableOfContentsLink,
     TableOfContentsStyles,
     TableOfContentsUtils,
 } from "@thewaver/ss-components";
+import { PlacementConst } from "@thewaver/ss-components/internal";
 
 import { ElementObserverVueUtils } from "../../Abstracts/ElementObserver/ElementObserverVue.utils";
 import { InteractionWrapper } from "../../Primitives/InteractionWrapper/InteractionWrapper";
@@ -22,9 +22,6 @@ import { callSlot, declareProps } from "../../Utils/propUtils";
 import { useStableList } from "../../Utils/refUtils";
 import type { SlotsContext } from "../../Utils/typeUtils";
 import type { TableOfContentsItemProps, TableOfContentsProps, TableOfContentsSlots } from "./TableOfContents.types";
-
-const ROW_SIZING: InteractionSizing = "fit-content";
-const PLACED_SIZING: InteractionSizing = "fill";
 
 const TableOfContentsItem = defineComponent(
     <T,>(props: TableOfContentsItemProps<T>, { slots }: SlotsContext<InteractionControlSlots<TableOfContentsFlags>>) =>
@@ -125,7 +122,7 @@ export const TableOfContents = defineComponent(
 
                 return (
                     <InteractionWrapper
-                        sizing={placement === undefined ? ROW_SIZING : PLACED_SIZING}
+                        sizing={placement === undefined ? PlacementConst.ROW_SIZING : PlacementConst.PLACED_SIZING}
                         extraFlags={{ isCurrent: currentIndex.value === index }}
                     >
                         {

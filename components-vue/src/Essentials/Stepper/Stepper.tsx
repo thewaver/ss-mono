@@ -1,13 +1,7 @@
 import { type SlotsType, type VNodeChild, computed, defineComponent } from "vue";
 
-import {
-    type InteractionSizing,
-    STEPPER_DEFAULTS,
-    type Step,
-    type StepperFlags,
-    StepperStyles,
-    StepperUtils,
-} from "@thewaver/ss-components";
+import { STEPPER_DEFAULTS, type Step, type StepperFlags, StepperStyles, StepperUtils } from "@thewaver/ss-components";
+import { PlacementConst } from "@thewaver/ss-components/internal";
 
 import { InteractionWrapper } from "../../Primitives/InteractionWrapper/InteractionWrapper";
 import type {
@@ -20,9 +14,6 @@ import { watchAfterRender } from "../../Utils/effectUtils";
 import { callSlot, declareProps } from "../../Utils/propUtils";
 import type { SlotsContext } from "../../Utils/typeUtils";
 import type { StepperItemProps, StepperProps, StepperSlots } from "./Stepper.types";
-
-const ROW_SIZING: InteractionSizing = "fit-content";
-const PLACED_SIZING: InteractionSizing = "fill";
 
 const StepperItem = defineComponent(
     <TValue, TState>(
@@ -87,7 +78,11 @@ export const Stepper = defineComponent(
 
                 return (
                     <InteractionWrapper
-                        sizing={currentLayout?.placements[index] === undefined ? ROW_SIZING : PLACED_SIZING}
+                        sizing={
+                            currentLayout?.placements[index] === undefined
+                                ? PlacementConst.ROW_SIZING
+                                : PlacementConst.PLACED_SIZING
+                        }
                         isDisabled={!(step.isNavigable ?? false)}
                         isReachableWhenDisabled={tooltipDefs !== undefined}
                         isFocusableWhenDisabled={step.isReachableWhenDisabled ?? false}

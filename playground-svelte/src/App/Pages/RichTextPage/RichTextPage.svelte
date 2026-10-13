@@ -2,12 +2,14 @@
     import { RICH_TEXT_DEFAULTS, TextArea } from "@thewaver/ss-components-svelte";
     import { MEASURE_BOX_PADDING } from "@thewaver/ss-playground/App/PageComponents/MeasureBox/MeasureBox.css";
     import {
-        FIELD_WIDTH,
-        MAX_ROWS,
-        MIN_ROWS,
-        PREVIEW_WIDTH,
-        STARTING_CONTENT,
-    } from "@thewaver/ss-playground/App/Pages/RichTextPage/RichTextPage.const";
+    EXAMPLE_NAMES,
+    EXAMPLES_ROOT,
+    FIELD_WIDTH,
+    MAX_ROWS,
+    MIN_ROWS,
+    PREVIEW_WIDTH,
+    STARTING_CONTENT,
+} from "@thewaver/ss-playground/App/Pages/RichTextPage/RichTextPage.const";
     import * as styles from "@thewaver/ss-playground/App/Pages/RichTextPage/RichTextPage.css";
     import {
         FIELD_GAP,
@@ -30,39 +32,37 @@
     import GlossaryExample from "./Examples/Glossary.svelte";
     import LinksExample from "./Examples/Links.svelte";
 
-    const EXAMPLES_ROOT = "/src/App/Pages/RichTextPage/Examples";
-
     let content = $state(STARTING_CONTENT);
     let removeOtherTags = $state(RICH_TEXT_DEFAULTS.removeOtherTags);
 
     const examples: ExampleDefs[] = [
         {
             key: "defaultTags",
-            name: "Default Tags",
+            name: EXAMPLE_NAMES.defaultTags,
             component: defaultTagsExample,
             path: `${EXAMPLES_ROOT}/DefaultTags.svelte`,
         },
         {
             key: "customTags",
-            name: "Custom Tags",
+            name: EXAMPLE_NAMES.customTags,
             component: customTagsExample,
             path: `${EXAMPLES_ROOT}/CustomTags.svelte`,
         },
         {
             key: "glossary",
-            name: "Glossary",
+            name: EXAMPLE_NAMES.glossary,
             component: glossaryExample,
             path: `${EXAMPLES_ROOT}/Glossary.svelte`,
         },
         {
             key: "links",
-            name: "Links",
+            name: EXAMPLE_NAMES.links,
             component: linksExample,
             path: `${EXAMPLES_ROOT}/Links.svelte`,
         },
         {
             key: "customInput",
-            name: "Custom Input",
+            name: EXAMPLE_NAMES.customInput,
             component: customInputExample,
             path: `${EXAMPLES_ROOT}/CustomInput.svelte`,
         },

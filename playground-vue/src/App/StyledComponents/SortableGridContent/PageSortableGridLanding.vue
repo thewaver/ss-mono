@@ -3,7 +3,7 @@ import type { SortableGridGeometry } from "@thewaver/ss-components-vue";
 import * as styles from "@thewaver/ss-playground/App/StyledComponents/SortableGridContent/SortableGridContent.css";
 
 import { useLayerClass } from "../Layer/Layer.context";
-import type { SortableGridLandingProps } from "./SortableGridContent.types";
+import type { SortableGridLandingProps } from "./SortableGridContentVue.types";
 
 const getBox = (geometry: SortableGridGeometry) => ({
     width: Math.max(...geometry.contour.map((point) => point.x)),

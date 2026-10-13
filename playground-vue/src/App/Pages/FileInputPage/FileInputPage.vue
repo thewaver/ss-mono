@@ -4,6 +4,8 @@ import { shallowRef } from "vue";
 import type { FileInputRejection } from "@thewaver/ss-components-vue";
 import {
     DROP_ZONE_REASON_TEXT,
+    EXAMPLES_ROOT,
+    EXAMPLE_NAMES,
     MAX_ATTACHMENT_BYTES,
 } from "@thewaver/ss-playground/App/Pages/FileInputPage/FileInputPage.const";
 
@@ -18,8 +20,6 @@ import LabeledExample from "./Examples/Labeled.vue";
 import MultipleExample from "./Examples/Multiple.vue";
 import ReachableExample from "./Examples/Reachable.vue";
 import RejectingSetterExample from "./Examples/RejectingSetter.vue";
-
-const EXAMPLES_ROOT = "/src/App/Pages/FileInputPage/Examples";
 
 const describe = (files: File[]) => (files.length ? files.map((file) => file.name).join(", ") : "none");
 
@@ -44,56 +44,56 @@ const dropZoneRejections = shallowRef<FileInputRejection[]>([]);
 const examples: ExampleDefs[] = [
     {
         key: "default",
-        name: "Default",
+        name: EXAMPLE_NAMES.default,
         readout: () => `files: ${describe(defaultFiles.value)}`,
         path: `${EXAMPLES_ROOT}/Default.vue`,
     },
     {
         key: "multiple",
-        name: "Multiple",
+        name: EXAMPLE_NAMES.multiple,
         readout: () => `files: ${describe(multipleFiles.value)}`,
         path: `${EXAMPLES_ROOT}/Multiple.vue`,
     },
     {
         key: "images",
-        name: "Accepting images only",
+        name: EXAMPLE_NAMES.images,
         readout: () => `files: ${describe(imagesFiles.value)} — accept is a filter, never a guarantee`,
         path: `${EXAMPLES_ROOT}/Images.vue`,
     },
     {
         key: "rejectingSetter",
-        name: "Rejecting setter",
+        name: EXAMPLE_NAMES.rejectingSetter,
         readout: () =>
             `files: ${describe(rejectingFiles.value)}${rejection.value ? ` — ${rejection.value}` : ` — anything over ${MAX_ATTACHMENT_BYTES} bytes is refused`}`,
         path: `${EXAMPLES_ROOT}/RejectingSetter.vue`,
     },
     {
         key: "disabled",
-        name: "Disabled",
+        name: EXAMPLE_NAMES.disabled,
         readout: () => `files: ${describe(disabledFiles.value)}`,
         path: `${EXAMPLES_ROOT}/Disabled.vue`,
     },
     {
         key: "reachable",
-        name: "Disabled + reachable",
+        name: EXAMPLE_NAMES.reachable,
         readout: () => `files: ${describe(reachableFiles.value)}`,
         path: `${EXAMPLES_ROOT}/Reachable.vue`,
     },
     {
         key: "errored",
-        name: "Error",
+        name: EXAMPLE_NAMES.errored,
         readout: () => `files: ${describe(erroredFiles.value)} — required, nothing picked yet`,
         path: `${EXAMPLES_ROOT}/Errored.vue`,
     },
     {
         key: "label",
-        name: "In a Label",
+        name: EXAMPLE_NAMES.label,
         readout: () => `files: ${describe(labeledFiles.value)} — the caption opens the dialog`,
         path: `${EXAMPLES_ROOT}/Labeled.vue`,
     },
     {
         key: "dropZone",
-        name: "Drop area with limits",
+        name: EXAMPLE_NAMES.dropZone,
         readout: () =>
             `files: ${describe(dropZoneFiles.value)} — refused: ${describeRejections(dropZoneRejections.value)}`,
         path: `${EXAMPLES_ROOT}/DropZone.vue`,

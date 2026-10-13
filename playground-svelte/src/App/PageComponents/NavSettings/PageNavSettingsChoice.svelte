@@ -4,7 +4,7 @@
     import PageRadioSegmentContent from "../../StyledComponents/RadioSegmentContent/PageRadioSegmentContent.svelte";
     import PageRadioSegmentFloater from "../../StyledComponents/RadioSegmentContent/PageRadioSegmentFloater.svelte";
     import PageRadioSegmentGroup from "../../StyledComponents/RadioSegmentContent/PageRadioSegmentGroup.svelte";
-    import type { PageNavSettingsChoiceProps } from "./NavSettings.types";
+    import type { PageNavSettingsChoiceProps } from "./NavSettingsSvelte.types";
 
     let { value = $bindable(), ...props }: PageNavSettingsChoiceProps<T> = $props();
 </script>

@@ -1,5 +1,7 @@
 import { useEffect, useState } from "react";
 
+import { EXAMPLES_ROOT, EXAMPLE_NAMES } from "@thewaver/ss-playground/App/Pages/CheckboxPage/CheckboxPage.const";
+
 import { PageExamples } from "../../PageComponents/Examples/Examples";
 import { DecoratedExample } from "./Examples/Decorated";
 import { DefaultExample } from "./Examples/Default";
@@ -8,8 +10,6 @@ import { ErroredExample } from "./Examples/Errored";
 import { MixedExample } from "./Examples/Mixed";
 import { ReachableExample } from "./Examples/Reachable";
 import { RefusedWriteExample } from "./Examples/RefusedWrite";
-
-const EXAMPLES_ROOT = "/src/App/Pages/CheckboxPage/Examples";
 
 export const CheckboxPage = () => {
     const defaultState = useState(false);
@@ -38,21 +38,21 @@ export const CheckboxPage = () => {
     const examples = [
         {
             key: "default",
-            name: "Default",
+            name: EXAMPLE_NAMES.default,
             readout: () => `checked: ${defaultState[0]}`,
             component: () => <DefaultExample checked={defaultState} />,
             path: `${EXAMPLES_ROOT}/Default.tsx`,
         },
         {
             key: "decorated",
-            name: "Decorated",
+            name: EXAMPLE_NAMES.decorated,
             readout: () => `checked: ${decoratedState[0]}`,
             component: () => <DecoratedExample checked={decoratedState} />,
             path: `${EXAMPLES_ROOT}/Decorated.tsx`,
         },
         {
             key: "mixed",
-            name: "Mixed",
+            name: EXAMPLE_NAMES.mixed,
             readout: () =>
                 `mixed: ${isAllMixed} | all: ${allState[0]} | children: ${firstChildState[0]}, ${secondChildState[0]}`,
             component: () => (
@@ -67,7 +67,7 @@ export const CheckboxPage = () => {
         },
         {
             key: "refusedWrite",
-            name: "Refused write",
+            name: EXAMPLE_NAMES.refusedWrite,
             readout: () =>
                 `email: ${emailState[0]} | sms: ${smsState[0]} — whichever is the last one on refuses to go off`,
             component: () => <RefusedWriteExample email={emailState} sms={smsState} />,
@@ -75,21 +75,21 @@ export const CheckboxPage = () => {
         },
         {
             key: "disabled",
-            name: "Disabled",
+            name: EXAMPLE_NAMES.disabled,
             readout: () => `checked: ${disabledState[0]}`,
             component: () => <DisabledExample checked={disabledState} />,
             path: `${EXAMPLES_ROOT}/Disabled.tsx`,
         },
         {
             key: "reachable",
-            name: "Disabled + reachable",
+            name: EXAMPLE_NAMES.reachable,
             readout: () => `checked: ${reachableState[0]}`,
             component: () => <ReachableExample checked={reachableState} />,
             path: `${EXAMPLES_ROOT}/Reachable.tsx`,
         },
         {
             key: "errored",
-            name: "Error",
+            name: EXAMPLE_NAMES.errored,
             readout: () => `checked: ${erroredState[0]}`,
             component: () => <ErroredExample checked={erroredState} />,
             path: `${EXAMPLES_ROOT}/Errored.tsx`,

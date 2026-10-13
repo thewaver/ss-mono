@@ -2,9 +2,16 @@ import { createMemo, createSignal } from "solid-js";
 import { createStore } from "solid-js/store";
 
 import { PARTICLE_SPAWNER_DEFAULTS } from "@thewaver/ss-components-solid";
+import { ParticleSpawnerKnobs } from "@thewaver/ss-playground/App/Knobs/ParticleSpawners.const";
 import {
+    BOX_HEIGHT,
+    BOX_WIDTH,
+    EXAMPLES_ROOT,
+    EXAMPLE_NAMES,
+    FIELD_WIDTH,
     ITERATION_PATTERNS,
     ITERATION_PATTERN_KEYS,
+    STRESS_ITEMS,
     TRAVEL_EASING_FNS,
     TRAVEL_EASING_KEYS,
     TRAVEL_PATTERN_FACTORIES,
@@ -12,7 +19,6 @@ import {
     applyOvershoot,
 } from "@thewaver/ss-playground/App/Pages/ParticleSpawnerPage/ParticleSpawnerPage.const";
 
-import { ParticleSpawnerKnobs } from "../../Knobs/ParticleSpawners.const";
 import { PageExamples } from "../../PageComponents/Examples/Examples";
 import { PageCheckField, PageNumberField, PageSelectField } from "../../PageComponents/Field/Field";
 import { PageKnobs } from "../../PageComponents/Knobs/Knobs";
@@ -20,7 +26,6 @@ import { PageMeasureBox } from "../../PageComponents/MeasureBox/MeasureBox";
 import { PageProp } from "../../PageComponents/Prop/Prop";
 import { PagePropsDivider, PagePropsGroups, PagePropsPanel } from "../../PageComponents/PropsPanel/PropsPanel";
 import { StressTest } from "../../PageComponents/StressTest/StressTest";
-import type { StressTestDefs } from "../../PageComponents/StressTest/StressText.types";
 import { BurstExample } from "./Examples/Burst";
 import { DiagonalExample } from "./Examples/Diagonal";
 import { GridExample } from "./Examples/Grid";
@@ -37,21 +42,6 @@ import type {
     ParticleTravelPattern,
     TravelEasingKey,
 } from "./ParticleSpawnerPage.types";
-
-const EXAMPLES_ROOT = "/src/App/Pages/ParticleSpawnerPage/Examples";
-const FIELD_WIDTH = 130;
-const BOX_WIDTH = 420;
-const BOX_HEIGHT = 260;
-
-const STRESS_BOX_WIDTH = 120;
-const STRESS_BOX_HEIGHT = 80;
-
-const STRESS_ITEMS: (StressTestDefs & { width: number; height: number })[] = [
-    { count: 8, cols: 4, gap: 10, width: STRESS_BOX_WIDTH, height: STRESS_BOX_HEIGHT },
-    { count: 24, cols: 6, gap: 8, width: STRESS_BOX_WIDTH, height: STRESS_BOX_HEIGHT },
-    { count: 48, cols: 8, gap: 6, width: STRESS_BOX_WIDTH, height: STRESS_BOX_HEIGHT },
-    { count: 96, cols: 12, gap: 4, width: STRESS_BOX_WIDTH, height: STRESS_BOX_HEIGHT },
-];
 
 const StressTestWrapper = (props: ParticleSpawnerExampleProps) => {
     const modalPlayback = createSignal(true);
@@ -130,7 +120,7 @@ export const ParticleSpawnerPage = () => {
         return [
             {
                 key: "singleTarget",
-                name: "Single target",
+                name: EXAMPLE_NAMES.singleTarget,
                 component: () => (
                     <PageMeasureBox width={() => BOX_WIDTH} height={() => BOX_HEIGHT}>
                         <SingleTargetExample {...commonProps} />
@@ -140,7 +130,7 @@ export const ParticleSpawnerPage = () => {
             },
             {
                 key: "vertical",
-                name: "Vertical",
+                name: EXAMPLE_NAMES.vertical,
                 component: () => (
                     <PageMeasureBox width={() => BOX_WIDTH} height={() => BOX_HEIGHT}>
                         <VerticalExample {...commonProps} />
@@ -150,7 +140,7 @@ export const ParticleSpawnerPage = () => {
             },
             {
                 key: "diagonal",
-                name: "Diagonal",
+                name: EXAMPLE_NAMES.diagonal,
                 component: () => (
                     <PageMeasureBox width={() => BOX_WIDTH} height={() => BOX_HEIGHT}>
                         <DiagonalExample {...commonProps} />
@@ -160,7 +150,7 @@ export const ParticleSpawnerPage = () => {
             },
             {
                 key: "movingTarget",
-                name: "Moving target",
+                name: EXAMPLE_NAMES.movingTarget,
                 component: () => (
                     <PageMeasureBox width={() => BOX_WIDTH} height={() => BOX_HEIGHT}>
                         <MovingTargetExample {...commonProps} />
@@ -170,7 +160,7 @@ export const ParticleSpawnerPage = () => {
             },
             {
                 key: "radial",
-                name: "Radial (1 spawner, many targets)",
+                name: EXAMPLE_NAMES.radial,
                 component: () => (
                     <PageMeasureBox width={() => BOX_WIDTH} height={() => BOX_HEIGHT}>
                         <RadialExample {...commonProps} />
@@ -180,7 +170,7 @@ export const ParticleSpawnerPage = () => {
             },
             {
                 key: "manyToOne",
-                name: "Many to one (many spawners, 1 target)",
+                name: EXAMPLE_NAMES.manyToOne,
                 component: () => (
                     <PageMeasureBox width={() => BOX_WIDTH} height={() => BOX_HEIGHT}>
                         <ManyToOneExample {...commonProps} />
@@ -190,7 +180,7 @@ export const ParticleSpawnerPage = () => {
             },
             {
                 key: "burst",
-                name: "Burst on press",
+                name: EXAMPLE_NAMES.burst,
                 component: () => (
                     <PageMeasureBox width={() => BOX_WIDTH} height={() => BOX_HEIGHT}>
                         <BurstExample {...commonProps} />
@@ -200,7 +190,7 @@ export const ParticleSpawnerPage = () => {
             },
             {
                 key: "roundTrip",
-                name: "Round trip (a relay on arrival)",
+                name: EXAMPLE_NAMES.roundTrip,
                 component: () => (
                     <PageMeasureBox width={() => BOX_WIDTH} height={() => BOX_HEIGHT}>
                         <RoundTripExample {...commonProps} />
@@ -210,7 +200,7 @@ export const ParticleSpawnerPage = () => {
             },
             {
                 key: "multipleTargets",
-                name: "Multiple targets",
+                name: EXAMPLE_NAMES.multipleTargets,
                 component: () => (
                     <PageMeasureBox width={() => BOX_WIDTH} height={() => BOX_HEIGHT}>
                         <MultipleTargetsExample {...commonProps} />
@@ -220,7 +210,7 @@ export const ParticleSpawnerPage = () => {
             },
             {
                 key: "grid",
-                name: "N spawners x M targets",
+                name: EXAMPLE_NAMES.grid,
                 component: () => (
                     <PageMeasureBox width={() => BOX_WIDTH} height={() => BOX_HEIGHT}>
                         <GridExample {...commonProps} />
@@ -230,7 +220,7 @@ export const ParticleSpawnerPage = () => {
             },
             {
                 key: "stressTest",
-                name: "Stress Test",
+                name: EXAMPLE_NAMES.stressTest,
                 component: () => <StressTestWrapper {...commonProps} />,
             },
         ];

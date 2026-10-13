@@ -9,10 +9,11 @@
     import PagePropsPanel from "../../PageComponents/PropsPanel/PagePropsPanel.svelte";
     import PaintedExample from "./Examples/Painted.svelte";
     import WordsExample from "./Examples/Words.svelte";
-
-    const EXAMPLES_ROOT = "/src/App/Pages/MorphTextPage/Examples";
-
-    const NO_MOTION_DURATION_MS = 0;
+    import {
+    EXAMPLE_NAMES,
+    EXAMPLES_ROOT,
+    NO_MOTION_DURATION_MS,
+} from "@thewaver/ss-playground/App/Pages/MorphTextPage/MorphTextPage.const";
 
     let morphDurationMs = $state(MORPH_TEXT_DEFAULTS.morphDurationMs);
     let maxBlurPx = $state(MORPH_TEXT_DEFAULTS.maxBlurPx);
@@ -29,7 +30,7 @@
     const examples: ExampleDefs[] = [
         {
             key: "words",
-            name: "Words in turn",
+            name: EXAMPLE_NAMES.words,
             readout: () =>
                 `showing: ${word} — the page changes the word on a timer and the text melts into the next; Pause stops the cycle`,
             component: wordsExample,
@@ -37,7 +38,7 @@
         },
         {
             key: "painted",
-            name: "Painted text",
+            name: EXAMPLE_NAMES.painted,
             readout: () =>
                 `showing: ${paintedWord} — each copy is a PaintedText with a moving gradient, and the melt still works because the filter sits on the morph's own box`,
             component: paintedExample,

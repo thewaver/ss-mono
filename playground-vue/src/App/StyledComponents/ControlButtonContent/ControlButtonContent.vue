@@ -2,7 +2,7 @@
 import * as styles from "@thewaver/ss-playground/App/StyledComponents/ControlButtonContent/ControlButtonContent.css";
 
 import { useLayerClass } from "../Layer/Layer.context";
-import type { ControlButtonContentProps } from "./ControlButtonContent.types";
+import type { ControlButtonContentProps } from "./ControlButtonContentVue.types";
 
 defineProps<ControlButtonContentProps>();
 

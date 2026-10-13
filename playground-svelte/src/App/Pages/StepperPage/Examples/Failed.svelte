@@ -5,7 +5,7 @@
     import PageStepConnector from "../../../StyledComponents/StepContent/PageStepConnector.svelte";
     import PageStepContent from "../../../StyledComponents/StepContent/PageStepContent.svelte";
     import PageTooltipContent from "../../../StyledComponents/TooltipContent/TooltipContent.svelte";
-    import type { StepperExampleProps } from "../StepperPage.types";
+    import type { StepperExampleProps } from "../StepperPageSvelte.types";
 
     const FAILURE_REASON = "The card was declined, so this step has to be repeated before the order can be reviewed.";
     const LOCKED_REASON = "Review opens once payment succeeds, so there is nothing to look at here yet.";

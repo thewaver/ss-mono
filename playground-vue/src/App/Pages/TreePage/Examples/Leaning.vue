@@ -8,8 +8,8 @@ import { MathUtils } from "@thewaver/ss-utils";
 
 import PageGlideFloater from "../../../StyledComponents/GlideFloater/PageGlideFloater.vue";
 import PageTreeNodeContent from "../../../StyledComponents/TreeNodeContent/PageTreeNodeContent.vue";
-import { FILES } from "../TreePage.const";
 import type { TreeLeaningExampleProps } from "../TreePage.types";
+import { FILES } from "../TreePageVue.const";
 
 const REACH_ITEMS = 2.5;
 const SHIFT_PERCENT = 8;

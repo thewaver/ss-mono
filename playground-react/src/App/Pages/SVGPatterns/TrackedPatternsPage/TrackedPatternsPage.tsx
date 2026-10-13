@@ -1,28 +1,25 @@
 import { useMemo, useState } from "react";
 
 import { SVGDefsSamples, TrackedPatternDefaults } from "@thewaver/ss-components-react";
-import {
-    NO_SAMPLE_KEY,
-    toGroupEntriesWithNoSample,
-} from "@thewaver/ss-playground/App/PageComponents/SampleGroups/SampleGroups.const";
+import { SVGPatternKnobs } from "@thewaver/ss-playground/App/Knobs/SVGPatterns.const";
+import { TrackedPatternKnobs } from "@thewaver/ss-playground/App/Knobs/TrackedPatterns.const";
+import { NO_SAMPLE_KEY } from "@thewaver/ss-playground/App/PageComponents/SampleGroups/SampleGroups.const";
 import type { WithNoSample } from "@thewaver/ss-playground/App/PageComponents/SampleGroups/SampleGroups.types";
+import {
+    DEFAULT_EXAMPLE_PATH,
+    EXAMPLE_NAMES,
+    TRACKED_PATTERN_GROUPS,
+} from "@thewaver/ss-playground/App/Pages/SVGPatterns/TrackedPatternsPage/TrackedPatternsPage.const";
 
-import { SVGPatternKnobs } from "../../../Knobs/SVGPatterns.const";
-import { TrackedPatternKnobs } from "../../../Knobs/TrackedPatterns.const";
 import { PageExamples } from "../../../PageComponents/Examples/Examples";
 import { PageGroupedSelectField } from "../../../PageComponents/Field/Field";
 import { PageKnobs } from "../../../PageComponents/Knobs/Knobs";
 import type { Knob } from "../../../PageComponents/Knobs/Knobs.types";
 import { PageProp } from "../../../PageComponents/Prop/Prop";
 import { PagePropsDivider, PagePropsGroups, PagePropsPanel } from "../../../PageComponents/PropsPanel/PropsPanel";
-import { GROUPPED_TRACKED_PATTERNS } from "../SVGPatterns.const";
-import type { TrackedPatternExampleProps } from "../SVGPatterns.types";
 import { PageSVGPatternsProps } from "../SVGPatternsProps";
+import type { TrackedPatternExampleProps } from "../SVGPatternsReact.types";
 import { DefaultExample } from "./Examples/Default";
-
-const TRACKED_PATTERN_GROUPS = toGroupEntriesWithNoSample(GROUPPED_TRACKED_PATTERNS);
-
-const DEFAULT_EXAMPLE_PATH = "/src/App/Pages/SVGPatterns/TrackedPatternsPage/Examples/Default.tsx";
 
 export const TrackedPatternsPage = () => {
     const [configKey, setConfigKey] = useState<WithNoSample<SVGDefsSamples.Pattern.Tracked.SampleKey>>(
@@ -55,7 +52,7 @@ export const TrackedPatternsPage = () => {
     const examples = [
         {
             key: "default",
-            name: "Default",
+            name: EXAMPLE_NAMES.default,
             readout: () =>
                 "drag the corner to resize the box: drawn as one tile, the cell count follows the size; tiled, the copies appear and all of them react",
             component: () => <DefaultExample {...commonProps} />,

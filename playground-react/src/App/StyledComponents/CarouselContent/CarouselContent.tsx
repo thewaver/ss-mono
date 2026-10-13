@@ -1,6 +1,6 @@
 import type { PropsWithChildren } from "react";
 
-import type { CarouselStep } from "@thewaver/ss-components-react";
+import { STEP_GLYPHS } from "@thewaver/ss-playground/App/StyledComponents/CarouselContent/CarouselContent.const";
 import * as styles from "@thewaver/ss-playground/App/StyledComponents/CarouselContent/CarouselContent.css";
 import { CONTROL_GLYPHS } from "@thewaver/ss-playground/App/StyledComponents/ControlButtonContent/ControlButtonContent.const";
 
@@ -11,12 +11,7 @@ import type {
     CarouselRotationProps,
     CarouselSlideProps,
     CarouselStepProps,
-} from "./CarouselContent.types";
-
-const STEP_GLYPHS: Record<CarouselStep, string> = {
-    previous: CONTROL_GLYPHS.previous,
-    next: CONTROL_GLYPHS.next,
-};
+} from "./CarouselContentReact.types";
 
 export const PageCarouselSlide = (props: PropsWithChildren<CarouselSlideProps>) => {
     const layerClass = useLayerClass();

@@ -8,6 +8,7 @@ import {
     SidebarUtils,
     SidebarStyles as styles,
 } from "@thewaver/ss-components";
+import { SidebarConst } from "@thewaver/ss-components/internal";
 
 import { DismisserSolidUtils } from "../../../Abstracts/Dismisser/DismisserSolid.utils";
 import { ElementFaderSolidUtils } from "../../../Abstracts/ElementFader/ElementFaderSolid.utils";
@@ -16,8 +17,6 @@ import { HoverIntentSolidUtils } from "../../../Abstracts/HoverIntent/HoverInten
 import { SignalMirrorSolidUtils } from "../../../Abstracts/SignalMirror/SignalMirrorSolid.utils";
 import { access } from "../../../Utils/propUtils";
 import type { SidebarProps } from "./SidebarSolid.types";
-
-const NO_SKIP_WINDOW_MS = 0;
 
 export const Sidebar = (props: SidebarProps) => {
     const expandedSignal = SignalMirrorSolidUtils.createOptional(() => props.expanded, false);
@@ -74,7 +73,7 @@ export const Sidebar = (props: SidebarProps) => {
             delayGroup: HoverIntentUtils.createDelayGroup(),
             getPanelRef: () => undefined,
             getHoverShowDelayMs: () => access(props.hoverShowDelayMs) ?? SIDEBAR_DEFAULTS.hoverShowDelayMs,
-            getSkipDelayWindowMs: () => NO_SKIP_WINDOW_MS,
+            getSkipDelayWindowMs: () => SidebarConst.NO_SKIP_WINDOW_MS,
             getIsHeld,
             isTouchIgnored: true,
         },

@@ -32,3 +32,19 @@ export type CirclePackingCircleState = {
     /** How deep the circle's node is, counting the root's children as one. */
     depth: number;
 };
+
+export type BaseCirclePackingValues<T> = {
+    /** Names the circle packing for assistive technology. */
+    ariaLabel: string;
+    /** The space left between neighboring circles and around the inside of their parent, in pixels. */
+    padding?: number;
+    /** How long a zoom takes. `0` jumps straight to the new view, which is the route for reduced motion. */
+    zoomDurationMs?: number;
+    /**
+     * The whole tree. A leaf's area comes from its `weight` and a branch is packed around its children, so a weight set
+     * on a branch is ignored. A child weighing nothing gets no circle.
+     */
+    root: CirclePackingNode<T>;
+};
+
+export type BaseCirclePackingProps<T> = BaseCirclePackingValues<T>;

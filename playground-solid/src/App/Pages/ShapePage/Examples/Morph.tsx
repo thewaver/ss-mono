@@ -7,8 +7,8 @@ import { EasingUtils, MathUtils, Point2dUtils } from "@thewaver/ss-utils";
 import type { Point2d, Size2d } from "@thewaver/ss-utils";
 
 import { PageControlButtonContent } from "../../../StyledComponents/ControlButtonContent/ControlButtonContent";
-import { computeShapeFillDefs, computeShapeStrokeDefs } from "../ShapePage.const";
 import type { ShapeExampleProps } from "../ShapePage.types";
+import { computeShapeFillDefs, computeShapeStrokeDefs } from "../ShapePageSolid.const";
 
 const MORPH_SIZE = 240;
 const MORPH_DURATION_MS = 900;

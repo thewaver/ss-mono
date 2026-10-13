@@ -7,7 +7,7 @@ import PageScrollerButton from "../../../PageComponents/ScrollerButton/ScrollerB
 import PageTabContent from "../../../StyledComponents/TabContent/PageTabContent.vue";
 import PageTabFloater from "../../../StyledComponents/TabContent/PageTabFloater.vue";
 import PageTabGutter from "../../../StyledComponents/TabContent/PageTabGutter.vue";
-import type { ScrollerTabbedExampleProps } from "../ScrollerPage.types";
+import type { ScrollerTabbedExampleProps } from "../ScrollerPageVue.types";
 
 const SCROLLER_GAP = 10;
 const TAB_GAP = 10;

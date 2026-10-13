@@ -6,28 +6,6 @@ import { type Bounds, type Point2d, Rect, Size2d } from "@thewaver/ss-utils";
 import { useElement, useLatest, useStableList } from "../../Utils/refUtils";
 import { useViewportContext } from "../Viewport/Viewport.context";
 
-/** Nothing measured yet. */
-const NO_SIZE: Size2d = { width: 0, height: 0 };
-
-/** Shared empty result, so a disabled observer does not hand out a new array each render. */
-const EMPTY_SIZES: Size2d[] = [];
-
-/** Shared empty result, so an observer with nothing measured does not hand out a new array each render. */
-const EMPTY_RECTS: (Rect | undefined)[] = [];
-
-/** Whether two size lists match entry for entry. */
-const isSameSizeList = (a: Size2d[], b: Size2d[]) =>
-    a.length === b.length && a.every((size, index) => Size2d.isSame(size, b[index]));
-
-/** Whether two rect lists match entry for entry, an entry missing on both sides counting as a match. */
-const isSameRectList = (a: (Rect | undefined)[], b: (Rect | undefined)[]) =>
-    a.length === b.length &&
-    a.every((rect, index) => (rect === undefined ? b[index] === undefined : Rect.isSame(rect, b[index])));
-
-/** Whether two optional rects match, two missing ones counting as a match. */
-const isSameRect = (a: Rect | undefined, b: Rect | undefined) =>
-    a === undefined ? b === undefined : b !== undefined && Rect.isSame(a, b);
-
 /** A state whose setter keeps the old value when the new one is the same by `isSame`, so nothing re-renders. */
 const useDedupedState = <T>(initial: T, isSame: (a: T, b: T) => boolean) => {
     const [value, setValue] = useState(initial);
@@ -51,7 +29,7 @@ export namespace ElementObserverReactUtils {
      */
     export const useBorderBoxSize = (ref: RefObject<HTMLElement | null>, isDisabled = false) => {
         const element = useElement(ref);
-        const [size, setSize] = useDedupedState(NO_SIZE, Size2d.isSame);
+        const [size, setSize] = useDedupedState(ElementObserverUtils.NO_SIZE, Size2d.isSame);
 
         useLayoutEffect(
             () => (element && !isDisabled ? ElementObserverUtils.observeBorderBoxSize(element, setSize) : undefined),
@@ -71,11 +49,14 @@ export namespace ElementObserverReactUtils {
      */
     export const useBorderBoxSizes = (elements: Array<HTMLElement | undefined>, isDisabled = false) => {
         const stableElements = useStableList(elements);
-        const [sizes, setSizes] = useDedupedState(EMPTY_SIZES, isSameSizeList);
+        const [sizes, setSizes] = useDedupedState(
+            ElementObserverUtils.EMPTY_SIZES,
+            ElementObserverUtils.isSameSizeList,
+        );
 
         useLayoutEffect(() => {
             if (isDisabled) {
-                setSizes(EMPTY_SIZES);
+                setSizes(ElementObserverUtils.EMPTY_SIZES);
 
                 return;
             }
@@ -139,7 +120,7 @@ export namespace ElementObserverReactUtils {
         const viewportContext = useViewportContext();
         const element = useElement(ref);
         const latest = useLatest(opts);
-        const [rect, setRect] = useDedupedState<Rect | undefined>(undefined, isSameRect);
+        const [rect, setRect] = useDedupedState<Rect | undefined>(undefined, ElementObserverUtils.isSameRect);
 
         useLayoutEffect(() => {
             if (!element) return;
@@ -170,7 +151,10 @@ export namespace ElementObserverReactUtils {
     export const useViewportRects = (elements: Array<HTMLElement | undefined>, isVisible: boolean) => {
         const viewportContext = useViewportContext();
         const stableElements = useStableList(elements);
-        const [rects, setRects] = useDedupedState(EMPTY_RECTS, isSameRectList);
+        const [rects, setRects] = useDedupedState(
+            ElementObserverUtils.EMPTY_RECTS,
+            ElementObserverUtils.isSameRectList,
+        );
 
         useLayoutEffect(() => {
             setRects(ElementObserverUtils.measureViewportRects(stableElements, viewportContext));
@@ -190,7 +174,7 @@ export namespace ElementObserverReactUtils {
      *
      * @param elements The elements to follow, in reading order. A missing entry is never current.
      * @param isDisabled Pass `true` to stop following.
-     * @param opts.offsetRatio Where the line sits, as a share of the viewport's height from its top.
+     * @param opts.offsetRatio Where the line sits, as a share of the scrolling box's visible height from its top.
      * @returns The current element's index, or `undefined` while none has passed the line and while disabled.
      */
     export const useCurrentIndex = (

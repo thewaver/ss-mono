@@ -27,16 +27,19 @@ export type ColorInputRenderProps = {
     isUnreadable: boolean;
 };
 
-export type ColorInputCbs = {
-    /** Runs as the color changes. */
+export type BaseColorInputCbs = {
+    /** Runs as the color changes, with the value written in the notation the field was handed. */
     onInput?: (value: string) => void;
+};
+
+export type ColorInputCbs = BaseColorInputCbs & {
     /** Runs when the pointer arrives over the field. */
     onMouseEnter?: (e: MouseEvent) => void;
     /** Runs when the pointer leaves the field. */
     onMouseLeave?: (e: MouseEvent) => void;
 };
 
-export type ColorInputState = {
+export type BaseColorInputValues = {
     /** The field's name when it is submitted as part of a form. */
     name?: string;
     /** Names the color input for assistive technology. */
@@ -59,3 +62,5 @@ export type ColorInputState = {
     /** How long the picker takes to fade in and out. */
     transitionDurationMs?: number;
 };
+
+export type BaseColorInputProps = BaseColorInputValues & BaseColorInputCbs;

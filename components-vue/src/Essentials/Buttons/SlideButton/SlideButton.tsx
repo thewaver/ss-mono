@@ -6,6 +6,7 @@ import {
     SlideButtonStyles,
     SlideButtonUtils,
 } from "@thewaver/ss-components";
+import { SlideButtonConst } from "@thewaver/ss-components/internal";
 
 import { InteractionTrackerVueUtils } from "../../../Abstracts/InteractionTracker/InteractionTrackerVue.utils";
 import { InteractionWrapper } from "../../../Primitives/InteractionWrapper/InteractionWrapper";
@@ -21,8 +22,6 @@ import type { SlotsContext } from "../../../Utils/typeUtils";
 import { FormFieldVueUtils } from "../../Input/FormField/FormFieldVue.utils";
 import { LabelVueUtils } from "../../Input/Label/LabelVue.utils";
 import type { SlideButtonElementProps, SlideButtonProps, SlideButtonSlots } from "./SlideButton.types";
-
-const RATIO_MIN = 0;
 
 const SlideButtonElement = defineComponent(
     (props: SlideButtonElementProps, { slots }: SlotsContext<InteractionControlSlots<SlideButtonRenderProps>>) => {
@@ -129,7 +128,7 @@ const SlideButtonElement = defineComponent(
 
 export const SlideButton = defineComponent(
     (props: SlideButtonProps, { slots, expose }: SlotsContext<SlideButtonSlots>) => {
-        const progressRatio = useTwoWay(props, "progress", RATIO_MIN);
+        const progressRatio = useTwoWay(props, "progress", SlideButtonConst.RATIO_MIN);
 
         const controlRef = shallowRef<HTMLElement>();
         const isDragging = shallowRef(false);

@@ -5,7 +5,7 @@ import { FIELD_WIDTH } from "@thewaver/ss-playground/App/Pages/Mosaics/Mosaics.c
 import { PageNumberField, PageSelectField } from "../../PageComponents/Field/Field";
 import { PageProp } from "../../PageComponents/Prop/Prop";
 import { PagePropsPanel } from "../../PageComponents/PropsPanel/PropsPanel";
-import type { MosaicsControls } from "./Mosaics.types";
+import type { MosaicsControls } from "./MosaicsReact.types";
 
 type Props = {
     controls: MosaicsControls;

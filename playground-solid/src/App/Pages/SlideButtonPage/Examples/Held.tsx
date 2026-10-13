@@ -5,7 +5,7 @@ import { SLIDE_BUTTON_THUMB_SIZE } from "@thewaver/ss-playground/App/StyledCompo
 import { PageControlColumn } from "../../../PageComponents/ControlRow/ControlRow";
 import { PageControlButtonContent } from "../../../StyledComponents/ControlButtonContent/ControlButtonContent";
 import { PageSlideButtonContent } from "../../../StyledComponents/SlideButtonContent/SlideButtonContent";
-import type { SlideButtonHeldExampleProps } from "../SlideButtonPage.types";
+import type { SlideButtonHeldExampleProps } from "../SlideButtonPageSolid.types";
 
 type Props = SlideButtonHeldExampleProps;
 

@@ -3,24 +3,28 @@ import type { ApiGroupKind, ApiTableKind } from "virtual:component-api";
 
 import { TableOfContents, access } from "@thewaver/ss-components-solid";
 import type { TableOfContentsLink } from "@thewaver/ss-components-solid";
+import {
+    MIN_TABLE_OF_CONTENTS_LINKS,
+    NO_DESCRIPTION,
+    TABLE_OF_CONTENTS_GAP,
+    TABLE_OF_CONTENTS_LABEL,
+    USE_COLUMN,
+} from "@thewaver/ss-playground/App/PageComponents/DocsView/DocsView.const";
 import * as styles from "@thewaver/ss-playground/App/PageComponents/DocsView/DocsView.css";
 import type { DocsTableOfContentsEntry } from "@thewaver/ss-playground/App/PageComponents/DocsView/DocsView.types";
 import {
+    DOCS_INCLUDES_LEAD,
+    DOCS_INCLUDES_SEPARATOR,
     loadApiGroups,
     toDocsGroupId,
+    toDocsIncludeHref,
     toDocsTableId,
     toDocsTableOfContents,
     toHighlightedType,
 } from "@thewaver/ss-playground/App/PageComponents/DocsView/DocsView.utils";
 
 import { PageTableOfContentsContent } from "../../StyledComponents/TableOfContentsContent/TableOfContentsContent";
-import type { PageDocsTableProps, PageDocsViewProps } from "./DocsView.types";
-
-const NO_DESCRIPTION = "Not written yet.";
-const USE_COLUMN = "Use";
-const TABLE_OF_CONTENTS_LABEL = "On this page";
-const TABLE_OF_CONTENTS_GAP = 4;
-const MIN_TABLE_OF_CONTENTS_LINKS = 2;
+import type { PageDocsTableProps, PageDocsViewProps } from "./DocsViewSolid.types";
 
 const GROUP_TITLES: Record<ApiGroupKind, string> = {
     props: "Props",
@@ -42,7 +46,7 @@ const PageDocsTable = (props: PageDocsTableProps) => {
     const getTable = () => access(props.table);
 
     return (
-        <div class={styles.docsSection}>
+        <div class={styles.docsSection} data-api-table={getTable().name}>
             <Show when={getTable().heading}>
                 <h3 ref={props.headingRef} id={access(props.headingId)} class={styles.docsTableTitle}>
                     {getTable().heading}
@@ -53,48 +57,73 @@ const PageDocsTable = (props: PageDocsTableProps) => {
                 <p class={styles.docsDescription}>{getTable().description}</p>
             </Show>
 
-            <div class={styles.docsTableScroller}>
-                <table class={styles.docsTable} data-api-table={getTable().name}>
-                    <thead>
-                        <tr>
-                            <For each={TABLE_COLUMNS[getTable().kind]}>
-                                {(column) => <th class={styles.docsHeadCell}>{column}</th>}
-                            </For>
-                            <Show when={getTable().isDocumented}>
-                                <th class={styles.docsHeadCell}>{USE_COLUMN}</th>
-                            </Show>
-                        </tr>
-                    </thead>
+            <Show when={getTable().includes.length}>
+                <p class={styles.docsDescription} data-api-includes>
+                    {DOCS_INCLUDES_LEAD}
+                    <For each={getTable().includes}>
+                        {(include, getIndex) => (
+                            <>
+                                {getIndex() ? DOCS_INCLUDES_SEPARATOR : ""}
+                                <Show
+                                    when={toDocsIncludeHref(include, access(props.unit))}
+                                    fallback={<code>{include.text}</code>}
+                                >
+                                    {(getHref) => (
+                                        <a href={getHref()}>
+                                            <code>{include.text}</code>
+                                        </a>
+                                    )}
+                                </Show>
+                            </>
+                        )}
+                    </For>
+                </p>
+            </Show>
 
-                    <tbody>
-                        <For each={getTable().entries}>
-                            {(entry) => (
-                                <tr data-api-row={entry.name}>
-                                    <td class={styles.docsNameCell}>
-                                        {entry.name}
-                                        <Show when={entry.isOptional}>
-                                            <span class={styles.docsOptional}>{"?"}</span>
-                                        </Show>
-                                    </td>
+            <Show when={getTable().entries.length}>
+                <div class={styles.docsTableScroller}>
+                    <table class={styles.docsTable}>
+                        <thead>
+                            <tr>
+                                <For each={TABLE_COLUMNS[getTable().kind]}>
+                                    {(column) => <th class={styles.docsHeadCell}>{column}</th>}
+                                </For>
+                                <Show when={getTable().isDocumented}>
+                                    <th class={styles.docsHeadCell}>{USE_COLUMN}</th>
+                                </Show>
+                            </tr>
+                        </thead>
 
-                                    <td class={styles.docsTypeCell} innerHTML={toHighlightedType(entry.type)} />
-
-                                    <Show when={getTable().isDocumented}>
-                                        <td class={styles.docsCell}>
-                                            <Show
-                                                when={entry.description}
-                                                fallback={<span class={styles.docsPending}>{NO_DESCRIPTION}</span>}
-                                            >
-                                                {entry.description}
+                        <tbody>
+                            <For each={getTable().entries}>
+                                {(entry) => (
+                                    <tr data-api-row={entry.name}>
+                                        <td class={styles.docsNameCell}>
+                                            {entry.name}
+                                            <Show when={entry.isOptional}>
+                                                <span class={styles.docsOptional}>{"?"}</span>
                                             </Show>
                                         </td>
-                                    </Show>
-                                </tr>
-                            )}
-                        </For>
-                    </tbody>
-                </table>
-            </div>
+
+                                        <td class={styles.docsTypeCell} innerHTML={toHighlightedType(entry.type)} />
+
+                                        <Show when={getTable().isDocumented}>
+                                            <td class={styles.docsCell}>
+                                                <Show
+                                                    when={entry.description}
+                                                    fallback={<span class={styles.docsPending}>{NO_DESCRIPTION}</span>}
+                                                >
+                                                    {entry.description}
+                                                </Show>
+                                            </td>
+                                        </Show>
+                                    </tr>
+                                )}
+                            </For>
+                        </tbody>
+                    </table>
+                </div>
+            </Show>
         </div>
     );
 };
@@ -145,6 +174,7 @@ export const PageDocsView = (props: PageDocsViewProps) => {
                                             {(table) => (
                                                 <PageDocsTable
                                                     table={table}
+                                                    unit={access(props.name)}
                                                     headingId={toDocsTableId(group.kind, table.name)}
                                                     headingRef={setHeadingRef(toDocsTableId(group.kind, table.name))}
                                                 />

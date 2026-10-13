@@ -1,6 +1,8 @@
 <script setup lang="ts">
 import { shallowRef } from "vue";
 
+import { COPY_TEXT, EXAMPLES_ROOT, EXAMPLE_NAMES } from "@thewaver/ss-playground/App/Pages/ButtonPage/ButtonPage.const";
+
 import type { ExampleDefs } from "../../PageComponents/Examples/Examples.types";
 import PageExamples from "../../PageComponents/Examples/PageExamples.vue";
 import CopyExample from "./Examples/Copy.vue";
@@ -10,9 +12,6 @@ import DisabledExample from "./Examples/Disabled.vue";
 import ErroredExample from "./Examples/Errored.vue";
 import PendingExample from "./Examples/Pending.vue";
 import ReachableExample from "./Examples/Reachable.vue";
-
-const COPY_TEXT = "npm install @thewaver/ss-components";
-const EXAMPLES_ROOT = "/src/App/Pages/ButtonPage/Examples";
 
 const clicks = shallowRef(0);
 const toggleOn = shallowRef(false);
@@ -25,44 +24,44 @@ const copies = shallowRef(0);
 const examples: ExampleDefs[] = [
     {
         key: "default",
-        name: "Default",
+        name: EXAMPLE_NAMES.default,
         readout: () => `clicks: ${clicks.value}`,
         path: `${EXAMPLES_ROOT}/Default.vue`,
     },
     {
         key: "decorated",
-        name: "Decorated",
+        name: EXAMPLE_NAMES.decorated,
         readout: () => `pressed: ${toggleOn.value}`,
         path: `${EXAMPLES_ROOT}/Decorated.vue`,
     },
     {
         key: "disabled",
-        name: "Disabled",
+        name: EXAMPLE_NAMES.disabled,
         readout: () => `clicks: ${disabledClicks.value}`,
         path: `${EXAMPLES_ROOT}/Disabled.vue`,
     },
     {
         key: "reachable",
-        name: "Disabled + reachable",
+        name: EXAMPLE_NAMES.reachable,
         readout: () => `clicks: ${reachableClicks.value}`,
         path: `${EXAMPLES_ROOT}/Reachable.vue`,
     },
     {
         key: "errored",
-        name: "Error",
+        name: EXAMPLE_NAMES.errored,
         readout: () => `hasError: ${hasError.value}`,
         path: `${EXAMPLES_ROOT}/Errored.vue`,
     },
     {
         key: "pending",
-        name: "Pending",
+        name: EXAMPLE_NAMES.pending,
         readout: () =>
             `saves: ${saves.value} — the handler answers with a promise that takes a second, and presses that land before it settles are ignored`,
         path: `${EXAMPLES_ROOT}/Pending.vue`,
     },
     {
         key: "copy",
-        name: "Copy to the clipboard",
+        name: EXAMPLE_NAMES.copy,
         readout: () =>
             `copies: ${copies.value} — the handler answers with the clipboard's own promise, so the button is pending while it writes, then says Copied for two seconds and announces it`,
         path: `${EXAMPLES_ROOT}/Copy.vue`,

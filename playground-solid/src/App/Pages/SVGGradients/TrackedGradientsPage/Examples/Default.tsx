@@ -1,15 +1,15 @@
 import { createUniqueId } from "solid-js";
 
-import { SVGDefsSamples, Shape, access } from "@thewaver/ss-components-solid";
+import { SVGDefsSampleConfigs, SVGDefsSamples, Shape, access } from "@thewaver/ss-components-solid";
 import {
     NO_SAMPLE_KEY,
     computeNoSampleDefs,
 } from "@thewaver/ss-playground/App/PageComponents/SampleGroups/SampleGroups.const";
+import { STROKE_THICKNESS } from "@thewaver/ss-playground/App/Pages/SVGGradients/SVGGradients.const";
 import * as styles from "@thewaver/ss-playground/App/Pages/SVGGradients/SVGGradients.css";
 import { ShapeConst, type Size2d } from "@thewaver/ss-utils";
 
-import { STROKE_THICKNESS } from "../../SVGGradients.const";
-import type { TrackedGradientExampleProps } from "../../SVGGradients.types";
+import type { TrackedGradientExampleProps } from "../../SVGGradientsSolid.types";
 
 type Props = TrackedGradientExampleProps & {
     boxClass?: string;
@@ -34,7 +34,7 @@ export const TrackedShape = ({
 
         if (key === NO_SAMPLE_KEY) return computeNoSampleDefs(access(colors), access(paintKind));
 
-        return SVGDefsSamples.Gradient.Tracked.toConfig({
+        return SVGDefsSampleConfigs.Gradient.Tracked.toConfig({
             family: key,
             defs: access(configDefs),
         } as SVGDefsSamples.Gradient.Tracked.Entry).computeSVGDefs(

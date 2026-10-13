@@ -3,7 +3,7 @@ import type { PropsWithChildren } from "react";
 import * as styles from "@thewaver/ss-playground/App/StyledComponents/SplitPaneContent/SplitPaneContent.css";
 
 import { useLayerClass } from "../Layer/Layer.context";
-import type { SplitPaneCompareProps, SplitPaneGutterProps } from "./SplitPaneContent.types";
+import type { SplitPaneCompareProps, SplitPaneGutterProps } from "./SplitPaneContentReact.types";
 
 export const PageSplitPaneGutter = (props: SplitPaneGutterProps) => {
     const layerClass = useLayerClass();

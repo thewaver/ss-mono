@@ -2,12 +2,15 @@
     import type { ApiTableKind } from "virtual:component-api";
 
     import * as styles from "@thewaver/ss-playground/App/PageComponents/DocsView/DocsView.css";
-    import { toHighlightedType } from "@thewaver/ss-playground/App/PageComponents/DocsView/DocsView.utils";
+    import {
+        DOCS_INCLUDES_LEAD,
+        DOCS_INCLUDES_SEPARATOR,
+        toDocsIncludeHref,
+        toHighlightedType,
+    } from "@thewaver/ss-playground/App/PageComponents/DocsView/DocsView.utils";
 
-    import type { PageDocsTableProps } from "./DocsView.types";
-
-    const NO_DESCRIPTION = "Not written yet.";
-    const USE_COLUMN = "Use";
+    import type { PageDocsTableProps } from "./DocsViewSvelte.types";
+    import { NO_DESCRIPTION, USE_COLUMN } from "@thewaver/ss-playground/App/PageComponents/DocsView/DocsView.const";
 
     const TABLE_COLUMNS: Record<ApiTableKind, [name: string, type: string]> = {
         props: ["Prop", "Type"],
@@ -21,7 +24,7 @@
     const table = $derived(props.table);
 </script>
 
-<div class={styles.docsSection}>
+<div class={styles.docsSection} data-api-table={table.name}>
     {#if table.heading}
         <h3 {@attach props.attachHeading} id={props.headingId} class={styles.docsTableTitle}>{table.heading}</h3>
     {/if}
@@ -30,8 +33,19 @@
         <p class={styles.docsDescription}>{table.description}</p>
     {/if}
 
+    {#if table.includes.length}
+        <p class={styles.docsDescription} data-api-includes>
+            {DOCS_INCLUDES_LEAD}{#each table.includes as include, index (include.text)}{index
+                    ? DOCS_INCLUDES_SEPARATOR
+                    : ""}{#if toDocsIncludeHref(include, props.unit)}<a href={toDocsIncludeHref(include, props.unit)}
+                        ><code>{include.text}</code></a
+                    >{:else}<code>{include.text}</code>{/if}{/each}
+        </p>
+    {/if}
+
+    {#if table.entries.length}
     <div class={styles.docsTableScroller}>
-        <table class={styles.docsTable} data-api-table={table.name}>
+        <table class={styles.docsTable}>
             <thead>
                 <tr>
                     {#each TABLE_COLUMNS[table.kind] as column (column)}
@@ -66,4 +80,5 @@
             </tbody>
         </table>
     </div>
+    {/if}
 </div>

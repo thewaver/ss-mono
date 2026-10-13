@@ -8,7 +8,7 @@
 
     import PageMeasureBox from "../../../PageComponents/MeasureBox/MeasureBox.svelte";
     import PageControlButtonContent from "../../../StyledComponents/ControlButtonContent/ControlButtonContent.svelte";
-    import type { CardStackDeckExampleProps } from "../CardStackExamples.types";
+    import type { CardStackDeckExampleProps } from "../CardStackExamplesSvelte.types";
 
     const CARDS = [
         "Ace",

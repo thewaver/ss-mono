@@ -7,7 +7,8 @@ import {
     TrackedGradientDefaults,
     type TrackedGradientElementDefs,
 } from "@thewaver/ss-components";
-import { MathUtils, type Point2d } from "@thewaver/ss-utils";
+import { CometConst, TrackedGradientSampleConst } from "@thewaver/ss-components/internal";
+import { MathUtils } from "@thewaver/ss-utils";
 
 import { PointerTrackerVueUtils } from "../../../../Abstracts/PointerTracker/PointerTrackerVue.utils";
 import { SVGGradientDefsVueUtils } from "../../../../Generators/SVGDefs/SVGGradients/SVGGradientDefsVue.utils";
@@ -26,31 +27,22 @@ type CometsProps = {
     opts?: GradientCometSampleOpts;
 };
 
-const PACE_BY_COMET = [1, 0.7, 0.5];
-const SETTLE_MS = 1500;
-const RESTING_POINT: Point2d = { x: 0.5, y: 0.5 };
-const STILL: Point2d = { x: 0, y: 0 };
-const NO_FADE = 0;
-
-const CYCLING_DEFAULTS = TrackedGradientDefaults.COMET_CYCLING_DEFAULTS;
-
-const RENDERED_ELSEWHERE = () => undefined;
-
-const clock = SVGDefsUtils.createClock(SETTLE_MS);
+const clock = SVGDefsUtils.createClock(CometConst.SETTLE_MS);
 
 const getTailLength = (defaults: CometDefaults, opts?: GradientCometSampleOpts) =>
     opts?.tailLength ?? defaults.tailLength;
 
 const getCycleMs = (opts?: GradientCometSampleOpts) =>
-    opts?.cycles ? (opts.cycleMs ?? CYCLING_DEFAULTS.cycleMs) : undefined;
+    opts?.cycles ? (opts.cycleMs ?? CometConst.CYCLING_DEFAULTS.cycleMs) : undefined;
 
 const getGradientId = (id: string, comet: number, index: number) => `gradient-${comet}-${index}-${id}`;
 
-const getComets = () => PACE_BY_COMET.map((_unused, comet) => comet).reverse();
+const getComets = () => CometConst.PACE_BY_COMET.map((_unused, comet) => comet).reverse();
 
 const getStampIndexes = (length: number) => Array.from({ length }, (_unused, stamp) => length - 1 - stamp);
 
-const createChains = (length: number) => PACE_BY_COMET.map(() => Array.from({ length }, () => RESTING_POINT));
+const createChains = (length: number) =>
+    CometConst.PACE_BY_COMET.map(() => Array.from({ length }, () => CometConst.RESTING_POINT));
 
 const Comets = defineComponent(
     (props: CometsProps) => {
@@ -62,7 +54,7 @@ const Comets = defineComponent(
         const frameMs = SVGDefsVueUtils.useFrameMs(clock);
         const chains = shallowRef(createChains(getTailLength(props.defaults, props.opts)));
 
-        let velocities = PACE_BY_COMET.map(() => STILL);
+        let velocities = CometConst.PACE_BY_COMET.map(() => CometConst.STILL);
         let lastMs: number | undefined;
 
         watch([frameMs, reading, isPointerPresent], ([nowMs, current, isPresent]) => {
@@ -74,11 +66,11 @@ const Comets = defineComponent(
 
             lastMs = nowMs;
 
-            if (SVGDefsUtils.getPointerFade(current, isPresent) > NO_FADE) clock.keepAwake();
+            if (SVGDefsUtils.getPointerFade(current, isPresent) > TrackedGradientSampleConst.NO_FADE) clock.keepAwake();
 
             if (chains.value[0].length !== length) {
                 chains.value = createChains(length);
-                velocities = PACE_BY_COMET.map(() => STILL);
+                velocities = CometConst.PACE_BY_COMET.map(() => CometConst.STILL);
             }
 
             if (stepMs <= 0) return;
@@ -89,7 +81,7 @@ const Comets = defineComponent(
                     velocities[comet],
                     current.boxRatio,
                     stepMs,
-                    stiffness * PACE_BY_COMET[comet],
+                    stiffness * CometConst.PACE_BY_COMET[comet],
                     damping,
                 );
 
@@ -110,7 +102,7 @@ const Comets = defineComponent(
                     props.defs.colors,
                     props.colorKeys,
                     comet,
-                    PACE_BY_COMET.length,
+                    CometConst.PACE_BY_COMET.length,
                     frameMs.value,
                     cycleMs,
                 );
@@ -180,7 +172,7 @@ export const createCometSample =
                                           opts={opts}
                                       />
                                   )
-                                : RENDERED_ELSEWHERE,
+                                : TrackedGradientSampleConst.RENDERED_ELSEWHERE,
                         },
                         filter: isFirst ? sharedBlur : sharedBlurRef,
                     };

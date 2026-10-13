@@ -1,6 +1,7 @@
 import { type SlotsType, computed, defineComponent, shallowRef } from "vue";
 
 import { CURRENCY_INPUT_DEFAULTS, CurrencyInputUtils, TextSyncUtils } from "@thewaver/ss-components";
+import { CurrencyInputConst } from "@thewaver/ss-components/internal";
 
 import { MaskedFieldVueUtils } from "../../../Abstracts/MaskedField/MaskedFieldVue.utils";
 import { TextField } from "../../../Primitives/TextField/TextField";
@@ -10,8 +11,6 @@ import { declareProps, forwardProps, useTwoWay } from "../../../Utils/propUtils"
 import { exposeElement, toElement } from "../../../Utils/refUtils";
 import type { SlotsContext } from "../../../Utils/typeUtils";
 import type { CurrencyInputProps } from "./CurrencyInput.types";
-
-const EMPTY_TEXT = "";
 
 export const CurrencyInput = defineComponent(
     (props: CurrencyInputProps, { slots, expose }: SlotsContext<TextFieldSlots>) => {
@@ -48,7 +47,7 @@ export const CurrencyInput = defineComponent(
         });
 
         watchAfterRender([() => props.locale, () => props.groupSizes?.join(","), getDecimals, getHasSign], () => {
-            const spelling = value.value === undefined ? EMPTY_TEXT : field.formatValue(value.value);
+            const spelling = value.value === undefined ? CurrencyInputConst.EMPTY_TEXT : field.formatValue(value.value);
 
             if (spelling === field.text.value) return;
 

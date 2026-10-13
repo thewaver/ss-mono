@@ -1,14 +1,13 @@
 import { type SlotsType, computed, defineComponent, shallowRef } from "vue";
 
 import { PointerEffectsUtils, TILTER_DEFAULTS, TilterStyles } from "@thewaver/ss-components";
+import { TilterConst } from "@thewaver/ss-components/internal";
 
 import { PointerTrackerVueUtils } from "../../../Abstracts/PointerTracker/PointerTrackerVue.utils";
 import { SmootherVueUtils } from "../../../Abstracts/Smoother/SmootherVue.utils";
 import { callSlot, declareProps } from "../../../Utils/propUtils";
 import type { SlotsContext } from "../../../Utils/typeUtils";
 import type { TilterProps, TilterSlots } from "./Tilter.types";
-
-const NO_LEAN = 0;
 
 export const Tilter = defineComponent(
     (props: TilterProps, { slots }: SlotsContext<TilterSlots>) => {
@@ -38,7 +37,7 @@ export const Tilter = defineComponent(
                 PointerEffectsUtils.computeLeanTargets(
                     boxRatio.value,
                     isResting.value
-                        ? NO_LEAN
+                        ? TilterConst.NO_LEAN
                         : PointerEffectsUtils.computeEdgeStrength(
                               reading.value,
                               props.tiltRangePx ?? TILTER_DEFAULTS.tiltRangePx,

@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { EXAMPLES_ROOT, EXAMPLE_NAMES } from "@thewaver/ss-playground/App/Pages/SurfacePage/SurfacePage.const";
 import * as styles from "@thewaver/ss-playground/App/Pages/SurfacePage/SurfacePage.css";
 
 import type { ExampleDefs } from "../../PageComponents/Examples/Examples.types";
@@ -7,22 +8,20 @@ import AvatarExample from "./Examples/Avatar/Avatar.vue";
 import BannerExample from "./Examples/Banner/Banner.vue";
 import CardExample from "./Examples/Card/Card.vue";
 
-const EXAMPLES_ROOT = "/src/App/Pages/SurfacePage/Examples";
-
 const EXAMPLES: ExampleDefs[] = [
     {
         key: "avatar",
-        name: "Avatar",
+        name: EXAMPLE_NAMES.avatar,
         path: `${EXAMPLES_ROOT}/Avatar/Avatar.vue`,
     },
     {
         key: "banner",
-        name: "Banner",
+        name: EXAMPLE_NAMES.banner,
         path: `${EXAMPLES_ROOT}/Banner/Banner.vue`,
     },
     {
         key: "card",
-        name: "Card",
+        name: EXAMPLE_NAMES.card,
         path: `${EXAMPLES_ROOT}/Card/Card.vue`,
     },
 ];

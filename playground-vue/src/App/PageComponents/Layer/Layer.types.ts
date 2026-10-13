@@ -1,4 +1,4 @@
-import type { LayerLevel } from "./Layer.context.types";
+import type { LayerLevel } from "./Layer.contextVue.types";
 
 export type PageLayerProps = {
     level: LayerLevel;

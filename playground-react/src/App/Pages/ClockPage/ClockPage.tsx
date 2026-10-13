@@ -1,5 +1,6 @@
 import { useState } from "react";
 
+import { EXAMPLES_ROOT, EXAMPLE_NAMES } from "@thewaver/ss-playground/App/Pages/ClockPage/ClockPage.const";
 import {
     BOOKING_STEPS,
     CLOSING_TIME,
@@ -11,8 +12,6 @@ import type { TimeValue } from "@thewaver/ss-utils";
 import { PageExamples } from "../../PageComponents/Examples/Examples";
 import { DefaultExample } from "./Examples/Default";
 
-const EXAMPLES_ROOT = "/src/App/Pages/ClockPage/Examples";
-
 const describeTime = (value: TimeValue | undefined) => (value ? TimeUtils.toIso(value) : "none");
 
 export const ClockPage = () => {
@@ -23,7 +22,7 @@ export const ClockPage = () => {
     const examples = [
         {
             key: "default",
-            name: "One column per unit",
+            name: EXAMPLE_NAMES.default,
             readout: () =>
                 `value: ${describeTime(defaultState[0])} — picking an hour and picking a minute are two independent choices, so no column has to list every time of day`,
             component: () => <DefaultExample value={defaultState} ariaLabel={"Appointment time"} />,
@@ -31,7 +30,7 @@ export const ClockPage = () => {
         },
         {
             key: "twelve",
-            name: "Twelve hour",
+            name: EXAMPLE_NAMES.twelve,
             readout: () =>
                 `value: ${describeTime(twelveHourState[0])} — am and pm become a column of their own, and the value stays 24-hour`,
             component: () => <DefaultExample value={twelveHourState} isTwelveHour={true} ariaLabel={"Call time"} />,
@@ -39,7 +38,7 @@ export const ClockPage = () => {
         },
         {
             key: "bounded",
-            name: "Coarser, and bounded",
+            name: EXAMPLE_NAMES.bounded,
             readout: () =>
                 `value: ${describeTime(boundedState[0])} — quarter hours only, inside ${TimeUtils.toIso(OPENING_TIME)} to ${TimeUtils.toIso(CLOSING_TIME)}`,
             component: () => (

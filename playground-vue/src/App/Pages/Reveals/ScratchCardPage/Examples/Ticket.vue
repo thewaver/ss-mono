@@ -8,7 +8,7 @@ import { CONTROL_GLYPHS } from "@thewaver/ss-playground/App/StyledComponents/Con
 
 import PageMeasureBox from "../../../../PageComponents/MeasureBox/MeasureBox.vue";
 import PageControlButtonContent from "../../../../StyledComponents/ControlButtonContent/ControlButtonContent.vue";
-import type { ScratchCardExampleProps } from "../ScratchCardPage.types";
+import type { ScratchCardExampleProps } from "../ScratchCardPageVue.types";
 
 const CARD_WIDTH = 360;
 const PRIZE = "★ 10 000 ★";

@@ -5,7 +5,7 @@
 
     import PageMeasureBox from "../../../PageComponents/MeasureBox/MeasureBox.svelte";
     import PageControlButtonContent from "../../../StyledComponents/ControlButtonContent/ControlButtonContent.svelte";
-    import type { ScrambleTextExampleProps } from "../ScrambleTextPage.types";
+    import type { ScrambleTextExampleProps } from "../ScrambleTextPageSvelte.types";
 
     const BUILDS = ["Build 1.4.2 ready", "Build 1.4.3 ready", "Build 1.4.3 RC1 ready", "Build 1.5.0 ready"];
     const BOX_WIDTH = 320;

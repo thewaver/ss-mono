@@ -7,8 +7,8 @@ import * as styles from "@thewaver/ss-playground/App/Pages/TreePage/TreePage.css
 import { AngleUtils } from "@thewaver/ss-utils";
 
 import PageTreeRadialNode from "../../../StyledComponents/TreeNodeContent/PageTreeRadialNode.vue";
-import { RANKS } from "../TreePage.const";
 import type { TreeExampleProps } from "../TreePage.types";
+import { RANKS } from "../TreePageVue.const";
 
 const RADIAL_DEFS = { innerRadius: 88, ringGap: 96, itemWidth: 88, itemHeight: 88, spreadDegrees: 360 };
 

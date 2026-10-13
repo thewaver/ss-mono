@@ -3,7 +3,7 @@ import { Listbox } from "@thewaver/ss-components-solid";
 import { renderPageHighlightFloater } from "../../../StyledComponents/GlideFloater/GlideFloater";
 import { PageListboxSurface } from "../../../StyledComponents/ListboxSurface/ListboxSurface";
 import { PageSelectOptionContent } from "../../../StyledComponents/SelectOptionContent/SelectOptionContent";
-import { COUNTRIES_WITH_REACHABLE } from "../../SelectPage/SelectPage.const";
+import { COUNTRIES_WITH_REACHABLE } from "../../SelectPage/SelectPageSolid.const";
 import type { ListboxExampleProps } from "../ListboxPage.types";
 
 type Props = ListboxExampleProps;

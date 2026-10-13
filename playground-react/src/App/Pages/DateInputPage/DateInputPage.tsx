@@ -2,6 +2,12 @@ import { useState } from "react";
 
 import type { DateValue, DateValueCalendarId } from "@thewaver/ss-components-react";
 import { DATE_INPUT_DEFAULTS, DateValueUtils } from "@thewaver/ss-components-react";
+import {
+    CALENDAR_FIELD_WIDTH,
+    CALENDAR_IDS,
+    EXAMPLES_ROOT,
+    EXAMPLE_NAMES,
+} from "@thewaver/ss-playground/App/Pages/DateInputPage/DateInputPage.const";
 import { CAESAR, TODAY } from "@thewaver/ss-playground/App/Pages/DatePickerPage/DatePickerPage.const";
 
 import { PageExamples } from "../../PageComponents/Examples/Examples";
@@ -9,10 +15,6 @@ import { PageSelectField } from "../../PageComponents/Field/Field";
 import { PageProp } from "../../PageComponents/Prop/Prop";
 import { PagePropsPanel } from "../../PageComponents/PropsPanel/PropsPanel";
 import { TypedExample } from "./Examples/Typed";
-
-const CALENDAR_FIELD_WIDTH = 180;
-const CALENDAR_IDS = DateValueUtils.getCalendarIds();
-const EXAMPLES_ROOT = "/src/App/Pages/DateInputPage/Examples";
 
 const describe = (value: DateValue | undefined) => (value ? DateValueUtils.toIso(value) : "none");
 
@@ -26,7 +28,7 @@ export const DateInputPage = () => {
     const examples = [
         {
             key: "typed",
-            name: "Typed only",
+            name: EXAMPLE_NAMES.typed,
             readout: () =>
                 `value: ${describe(typedState[0])} — a half-typed or impossible date leaves this value alone`,
             component: () => <TypedExample value={typedState} calendar={calendarId} ariaLabel={"Start date"} />,
@@ -34,7 +36,7 @@ export const DateInputPage = () => {
         },
         {
             key: "locale",
-            name: "Day first",
+            name: EXAMPLE_NAMES.locale,
             readout: () =>
                 `value: ${describe(localeState[0])} — dd/mm/yyyy, and the separators are the mask's rather than yours to type`,
             component: () => (
@@ -49,7 +51,7 @@ export const DateInputPage = () => {
         },
         {
             key: "era",
-            name: "Before the common era",
+            name: EXAMPLE_NAMES.era,
             readout: () =>
                 `value: ${describe(eraState[0])} — the era is a control in the leading slot, offering whatever the calendar reports`,
             component: () => <TypedExample value={eraState} calendar={calendarId} ariaLabel={"Historical date"} />,

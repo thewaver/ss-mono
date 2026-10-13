@@ -1,6 +1,8 @@
 import { createMemo, createSignal } from "solid-js";
 
 import {
+    EXAMPLES_ROOT,
+    EXAMPLE_NAMES,
     ONE_TIME_CODE_LENGTH,
     RECOVERY_CODE_LENGTH,
 } from "@thewaver/ss-playground/App/Pages/SegmentedInputPage/SegmentedInputPage.const";
@@ -9,8 +11,6 @@ import { PageExamples } from "../../PageComponents/Examples/Examples";
 import { OneTimeCodeExample } from "./Examples/OneTimeCode";
 import { RecoveryCodeExample } from "./Examples/RecoveryCode";
 
-const EXAMPLES_ROOT = "/src/App/Pages/SegmentedInputPage/Examples";
-
 export const SegmentedInputPage = () => {
     const oneTimeCodeSignal = createSignal("");
     const recoveryCodeSignal = createSignal("");
@@ -18,7 +18,7 @@ export const SegmentedInputPage = () => {
     const getExamples = createMemo(() => [
         {
             key: "oneTimeCode",
-            name: "One-time code",
+            name: EXAMPLE_NAMES.oneTimeCode,
             readout: () =>
                 `value: "${oneTimeCodeSignal[0]()}" — ${ONE_TIME_CODE_LENGTH} digits in one field; press a cell to put the caret there`,
             component: () => <OneTimeCodeExample value={oneTimeCodeSignal} />,
@@ -26,7 +26,7 @@ export const SegmentedInputPage = () => {
         },
         {
             key: "recoveryCode",
-            name: "Letters and digits",
+            name: EXAMPLE_NAMES.recoveryCode,
             readout: () =>
                 `value: "${recoveryCodeSignal[0]()}" — ${RECOVERY_CODE_LENGTH} cells taking letters and digits, anything else refused`,
             component: () => <RecoveryCodeExample value={recoveryCodeSignal} />,

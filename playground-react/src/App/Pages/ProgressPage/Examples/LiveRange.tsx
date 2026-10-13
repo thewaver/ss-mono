@@ -1,7 +1,7 @@
 import { Progress } from "@thewaver/ss-components-react";
 
 import { PageProgressContent } from "../../../StyledComponents/ProgressContent/ProgressContent";
-import type { ProgressExampleProps } from "../ProgressPage.types";
+import type { ProgressExampleProps } from "../ProgressPageReact.types";
 
 const BYTES_PER_KB = 1000;
 

@@ -7,6 +7,7 @@ import {
     HoverCardUtils,
     HoverIntentUtils,
 } from "@thewaver/ss-components";
+import { HoverCardConst } from "@thewaver/ss-components/internal";
 import { assignInlineVars } from "@vanilla-extract/dynamic";
 
 import { HoverIntentReactUtils } from "../../../Abstracts/HoverIntent/HoverIntentReact.utils";
@@ -14,8 +15,6 @@ import { SignalMirrorReactUtils } from "../../../Abstracts/SignalMirror/SignalMi
 import { Popover } from "../../../Primitives/Popover/Popover";
 import { useLatest } from "../../../Utils/refUtils";
 import type { HoverCardProps } from "./HoverCard.types";
-
-const HOVER_CARD_DELAY_GROUP = HoverIntentUtils.createDelayGroup();
 
 export const HoverCard = (props: HoverCardProps) => {
     const cardId = useId();
@@ -31,7 +30,7 @@ export const HoverCard = (props: HoverCardProps) => {
     const getCardRef = () => document.getElementById(cardId) ?? undefined;
 
     const hoverIntent = HoverIntentReactUtils.useHoverIntent(anchorRef, openState, {
-        delayGroup: HOVER_CARD_DELAY_GROUP,
+        delayGroup: HoverCardConst.HOVER_CARD_DELAY_GROUP,
         panelRef,
         hoverShowDelayMs: props.hoverShowDelayMs ?? HOVER_CARD_DEFAULTS.hoverShowDelayMs,
         skipDelayWindowMs: props.skipDelayWindowMs ?? HOVER_CARD_DEFAULTS.skipDelayWindowMs,

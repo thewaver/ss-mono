@@ -1,6 +1,8 @@
 <script setup lang="ts">
 import { shallowRef } from "vue";
 
+import { EXAMPLES_ROOT, EXAMPLE_NAMES } from "@thewaver/ss-playground/App/Pages/LabelPage/LabelPage.const";
+
 import type { ExampleDefs } from "../../PageComponents/Examples/Examples.types";
 import PageExamples from "../../PageComponents/Examples/PageExamples.vue";
 import CaptionFirstExample from "./Examples/CaptionFirst.vue";
@@ -9,9 +11,7 @@ import ColumnExample from "./Examples/Column.vue";
 import DisabledExample from "./Examples/Disabled.vue";
 import LabelPerRadioExample from "./Examples/LabelPerRadio.vue";
 import SuppressedExample from "./Examples/Suppressed.vue";
-import type { PlanValue } from "./LabelPage.types";
-
-const EXAMPLES_ROOT = "/src/App/Pages/LabelPage/Examples";
+import type { PlanValue } from "./LabelPageVue.types";
 
 const checked = shallowRef(false);
 const toggleOn = shallowRef(true);
@@ -23,37 +23,37 @@ const plan = shallowRef<PlanValue>("free");
 const examples: ExampleDefs[] = [
     {
         key: "checkbox",
-        name: "Checkbox",
+        name: EXAMPLE_NAMES.checkbox,
         readout: () => `checked: ${checked.value}`,
         path: `${EXAMPLES_ROOT}/CheckboxLabel.vue`,
     },
     {
         key: "toggleCaptionFirst",
-        name: "Toggle, caption first",
+        name: EXAMPLE_NAMES.toggleCaptionFirst,
         readout: () => `on: ${toggleOn.value}`,
         path: `${EXAMPLES_ROOT}/CaptionFirst.vue`,
     },
     {
         key: "column",
-        name: "Column",
+        name: EXAMPLE_NAMES.column,
         readout: () => `checked: ${columnChecked.value}`,
         path: `${EXAMPLES_ROOT}/Column.vue`,
     },
     {
         key: "labelPerRadio",
-        name: "One label per radio",
+        name: EXAMPLE_NAMES.labelPerRadio,
         readout: () => `value: ${plan.value}`,
         path: `${EXAMPLES_ROOT}/LabelPerRadio.vue`,
     },
     {
         key: "suppressed",
-        name: "Suppressed aria-label",
+        name: EXAMPLE_NAMES.suppressed,
         readout: () => `checked: ${suppressedChecked.value} — the caption wins, and the console says so`,
         path: `${EXAMPLES_ROOT}/Suppressed.vue`,
     },
     {
         key: "disabled",
-        name: "Disabled",
+        name: EXAMPLE_NAMES.disabled,
         readout: () => `checked: ${disabledChecked.value}`,
         path: `${EXAMPLES_ROOT}/Disabled.vue`,
     },

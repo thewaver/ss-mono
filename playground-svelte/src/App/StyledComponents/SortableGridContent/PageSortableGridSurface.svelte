@@ -2,7 +2,7 @@
     import * as styles from "@thewaver/ss-playground/App/StyledComponents/SortableGridContent/SortableGridContent.css";
 
     import { getLayerClass } from "../Layer/Layer.context";
-    import type { SortableGridSurfaceProps } from "./SortableGridContent.types";
+    import type { SortableGridSurfaceProps } from "./SortableGridContentSvelte.types";
 
     let props: SortableGridSurfaceProps = $props();
 

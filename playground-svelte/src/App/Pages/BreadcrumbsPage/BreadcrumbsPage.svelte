@@ -3,7 +3,12 @@
     import { Button } from "@thewaver/ss-components-svelte";
     import { BreadcrumbKnobs } from "@thewaver/ss-playground/App/Knobs/Breadcrumbs.const";
     import type { CrumbValue } from "@thewaver/ss-playground/App/Pages/BreadcrumbsPage/BreadcrumbTrail.types";
-    import { TRAIL } from "@thewaver/ss-playground/App/Pages/BreadcrumbsPage/BreadcrumbsPage.const";
+    import {
+    DEPTH_FIELD_WIDTH,
+    EXAMPLE_NAMES,
+    EXAMPLES_ROOT,
+    TRAIL,
+} from "@thewaver/ss-playground/App/Pages/BreadcrumbsPage/BreadcrumbsPage.const";
 
     import type { ExampleDefs } from "../../PageComponents/Examples/Examples.types";
     import PageExamples from "../../PageComponents/Examples/PageExamples.svelte";
@@ -12,14 +17,11 @@
     import PageProp from "../../PageComponents/Prop/Prop.svelte";
     import PagePropsPanel from "../../PageComponents/PropsPanel/PagePropsPanel.svelte";
     import PageButtonContent from "../../StyledComponents/ButtonContent/ButtonContent.svelte";
-    import type { BreadcrumbsExampleProps } from "./BreadcrumbsPage.types";
+    import type { BreadcrumbsExampleProps } from "./BreadcrumbsPageSvelte.types";
     import BareExample from "./Examples/Bare.svelte";
     import LinkComponentExample from "./Examples/LinkComponent.svelte";
     import LinkedExample from "./Examples/Linked.svelte";
     import TrailExample from "./Examples/Trail.svelte";
-
-    const DEPTH_FIELD_WIDTH = 90;
-    const EXAMPLES_ROOT = "/src/App/Pages/BreadcrumbsPage/Examples";
 
     let depth = $state(BreadcrumbKnobs.STARTING_DEPTH);
     let isDisabled = $state(BreadcrumbKnobs.STARTING_IS_DISABLED);
@@ -54,7 +56,7 @@
     const examples: ExampleDefs[] = [
         {
             key: "default",
-            name: "Default",
+            name: EXAMPLE_NAMES.default,
             readout: () =>
                 `pressed: ${pressed ?? "nothing yet"} — pressing a crumb moves the page there, so the trail behind it is the whole trail; Reset puts it back`,
             component: defaultExample,
@@ -62,21 +64,21 @@
         },
         {
             key: "bare",
-            name: "No separator",
+            name: EXAMPLE_NAMES.bare,
             readout: () => "a trail with nothing between the crumbs, since the separator slot is optional",
             component: bareExample,
             path: `${EXAMPLES_ROOT}/Bare.svelte`,
         },
         {
             key: "linked",
-            name: "Crumbs that are links",
+            name: EXAMPLE_NAMES.linked,
             readout: () => `pressed: ${linkPressed ?? "nothing yet"} — an href makes a crumb an anchor`,
             component: linkedExample,
             path: `${EXAMPLES_ROOT}/Linked.svelte`,
         },
         {
             key: "linkComponent",
-            name: "Links through a component",
+            name: EXAMPLE_NAMES.linkComponent,
             readout: () => "the same links rendered by a consumer's own link component",
             component: linkComponentExample,
             path: `${EXAMPLES_ROOT}/LinkComponent.svelte`,

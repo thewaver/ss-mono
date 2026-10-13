@@ -1,21 +1,11 @@
 import type { Accessor, JSX } from "solid-js";
 
-import type { StaircaseDir, StaircaseStepDefs, StaircaseStepState } from "@thewaver/ss-components";
+import type { BaseStaircaseCbs, BaseStaircaseValues, StaircaseStepState } from "@thewaver/ss-components";
 
-import type { AccessorProps, MaybeAccessor } from "../../../Utils/typeUtils";
+import type { AccessorValues } from "../../../Utils/typeUtils";
 
-export type StaircaseProps<T> = AccessorProps<{
-    /** How far one step is set in from the one before it. */
-    indent: number;
-    /** The space between one step and the next. */
-    gap?: number;
-    /** Which way the staircase runs. */
-    dir?: StaircaseDir;
-    /** How far one step is indented, for a run that does not step evenly. */
-    computeStepIndent?: (defs: StaircaseStepDefs) => number;
-}> & {
-    /** The steps, in the order they are shown. */
-    steps: MaybeAccessor<T[]>;
-    /** Draws one step, and is told where it sits in the run. */
-    renderStep: (getStep: Accessor<T>, getState: Accessor<StaircaseStepState>) => JSX.Element;
-};
+export type StaircaseProps<T> = AccessorValues<BaseStaircaseValues<T>> &
+    BaseStaircaseCbs & {
+        /** Draws one step, and is told where it sits in the run. */
+        renderStep: (getStep: Accessor<T>, getState: Accessor<StaircaseStepState>) => JSX.Element;
+    };

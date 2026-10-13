@@ -15,7 +15,7 @@
     import PageTabContent from "../../../StyledComponents/TabContent/PageTabContent.svelte";
     import PageTabFloater from "../../../StyledComponents/TabContent/PageTabFloater.svelte";
     import PageTabGutter from "../../../StyledComponents/TabContent/PageTabGutter.svelte";
-    import type { TabsExampleProps } from "../TabsPage.types";
+    import type { TabsExampleProps } from "../TabsPageSvelte.types";
 
     const DEFAULT_ID_PREFIX = "row";
 

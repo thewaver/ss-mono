@@ -3,14 +3,16 @@ import { useState } from "react";
 import type { DateTimeValue } from "@thewaver/ss-components-react";
 import { DateTimeValueUtils, DateValueUtils } from "@thewaver/ss-components-react";
 import { TODAY } from "@thewaver/ss-playground/App/Pages/DatePickerPage/DatePickerPage.const";
+import {
+    EXAMPLES_ROOT,
+    EXAMPLE_NAMES,
+    NOON,
+} from "@thewaver/ss-playground/App/Pages/DateTimePickerPage/DateTimePickerPage.const";
 import { TimeUtils } from "@thewaver/ss-utils";
 
 import { PageExamples } from "../../PageComponents/Examples/Examples";
 import { PairedExample } from "./Examples/Paired";
 import { PickedExample } from "./Examples/Picked";
-
-const EXAMPLES_ROOT = "/src/App/Pages/DateTimePickerPage/Examples";
-const NOON = { hour: 12, minute: 0 };
 
 const describe = (value: DateTimeValue | undefined) =>
     value
@@ -26,21 +28,21 @@ export const DateTimePickerPage = () => {
     const examples = [
         {
             key: "paired",
-            name: "Two fields, one value",
+            name: EXAMPLE_NAMES.paired,
             readout: () => `value: ${describe(emptyValue[0])}`,
             component: () => <PairedExample value={emptyValue} />,
             path: `${EXAMPLES_ROOT}/Paired.tsx`,
         },
         {
             key: "picked",
-            name: "One control, both popups",
+            name: EXAMPLE_NAMES.picked,
             readout: () => `value: ${describe(pickedValue[0])}`,
             component: () => <PickedExample value={pickedValue} itemKey={"picked"} />,
             path: `${EXAMPLES_ROOT}/Picked.tsx`,
         },
         {
             key: "twelveHour",
-            name: "Twelve hour, with seconds",
+            name: EXAMPLE_NAMES.twelveHour,
             readout: () => `value: ${describe(twelveHourValue[0])}`,
             component: () => (
                 <PickedExample value={twelveHourValue} itemKey={"twelveHour"} isTwelveHour={true} hasSeconds={true} />
@@ -49,7 +51,7 @@ export const DateTimePickerPage = () => {
         },
         {
             key: "seeded",
-            name: "Starting from a value",
+            name: EXAMPLE_NAMES.seeded,
             readout: () =>
                 `value: ${describe(seededValue[0])} — seconds of day: ${
                     seededValue[0] ? TimeUtils.getSecondOfDay(seededValue[0].time) : 0

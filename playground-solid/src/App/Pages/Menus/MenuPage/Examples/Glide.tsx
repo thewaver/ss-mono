@@ -3,8 +3,8 @@ import { Menu } from "@thewaver/ss-components-solid";
 import { PageGlideFloater } from "../../../../StyledComponents/GlideFloater/GlideFloater";
 import { PageMenuItemContent } from "../../../../StyledComponents/MenuItemContent/MenuItemContent";
 import { PageMenuTriggerContent } from "../../../../StyledComponents/MenuTriggerContent/MenuTriggerContent";
-import { ACTIONS, renderMenuPopup } from "../MenuPage.const";
-import type { MenuExampleProps } from "../MenuPage.types";
+import { ACTIONS, renderMenuPopup } from "../MenuPageSolid.const";
+import type { MenuExampleProps } from "../MenuPageSolid.types";
 
 type Props = MenuExampleProps;
 

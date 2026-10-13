@@ -6,9 +6,10 @@
     import PageControlButtonContent from "../../StyledComponents/ControlButtonContent/ControlButtonContent.svelte";
     import PageRangeContent from "../../StyledComponents/RangeContent/RangeContent.svelte";
     import type { PagePlaybackScrubberProps } from "./PlaybackScrubber.types";
-
-    const PERCENT = 100;
-    const SLIDER_STEP = 1;
+    import {
+        PERCENT,
+        SLIDER_STEP,
+    } from "@thewaver/ss-playground/App/PageComponents/PlaybackScrubber/PlaybackScrubber.const";
 
     let { playback = $bindable(), progress = $bindable(), ...props }: PagePlaybackScrubberProps = $props();
 

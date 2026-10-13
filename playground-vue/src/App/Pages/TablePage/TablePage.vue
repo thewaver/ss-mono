@@ -2,6 +2,7 @@
 import { shallowRef } from "vue";
 
 import type { TableSort } from "@thewaver/ss-components-vue";
+import { EXAMPLES_ROOT, EXAMPLE_NAMES } from "@thewaver/ss-playground/App/Pages/TablePage/TablePage.const";
 
 import type { ExampleDefs } from "../../PageComponents/Examples/Examples.types";
 import PageExamples from "../../PageComponents/Examples/PageExamples.vue";
@@ -12,10 +13,8 @@ import ReorderableExample from "./Examples/Reorderable.vue";
 import ResizableExample from "./Examples/Resizable.vue";
 import SingleSelectionExample from "./Examples/SingleSelection.vue";
 import VirtualizedExample from "./Examples/Virtualized.vue";
-import { STRESS_PART_COUNT, createStressParts } from "./TablePage.const";
 import type { Part } from "./TablePage.types";
-
-const EXAMPLES_ROOT = "/src/App/Pages/TablePage/Examples";
+import { STRESS_PART_COUNT, createStressParts } from "./TablePageVue.const";
 
 const spellSort = (sort: TableSort | undefined) =>
     sort === undefined ? "unsorted" : `${sort.columnId} ${sort.direction}`;
@@ -50,14 +49,14 @@ const examples: ExampleDefs[] = [
     {
         key: "default",
         span: 2,
-        name: "Default",
+        name: EXAMPLE_NAMES.default,
         readout: () =>
             `sort: ${spellSort(defaultSort.value)} | selected: ${spellSelection(defaultSelection.value)} — one tab stop for the whole grid, then arrows walk cell to cell and Space picks a row`,
         path: `${EXAMPLES_ROOT}/Parts.vue`,
     },
     {
         key: "singleSelection",
-        name: "One row at a time",
+        name: EXAMPLE_NAMES.singleSelection,
         readout: () =>
             `selected: ${spellSelection(singleSelection.value)} — the same grid with room for one row in the selection, so picking a second drops the first`,
         path: `${EXAMPLES_ROOT}/SingleSelection.vue`,
@@ -65,7 +64,7 @@ const examples: ExampleDefs[] = [
     {
         key: "resizable",
         span: 2,
-        name: "Resizable columns",
+        name: EXAMPLE_NAMES.resizable,
         readout: () =>
             `widths: ${JSON.stringify(resizableWidths.value)} — drag a column's right edge, or focus a header cell and hold Ctrl with the left and right arrows`,
         path: `${EXAMPLES_ROOT}/Resizable.vue`,
@@ -73,14 +72,14 @@ const examples: ExampleDefs[] = [
     {
         key: "reorderable",
         span: 2,
-        name: "Reorderable columns",
+        name: EXAMPLE_NAMES.reorderable,
         readout: () =>
             `order: ${reorderableOrder.value.join(", ") || "as declared"} — drag a header sideways, or focus a header cell and hold Shift with the left and right arrows`,
         path: `${EXAMPLES_ROOT}/Reorderable.vue`,
     },
     {
         key: "consumerSorted",
-        name: "Sorted by the page",
+        name: EXAMPLE_NAMES.consumerSorted,
         readout: () =>
             `sort: ${spellSort(consumerSort.value)} — no column carries a comparator, so the table reports the sort and the page is what reorders the rows`,
         path: `${EXAMPLES_ROOT}/ConsumerSorted.vue`,
@@ -88,14 +87,14 @@ const examples: ExampleDefs[] = [
     {
         key: "virtualized",
         span: 2,
-        name: "Virtualized",
+        name: EXAMPLE_NAMES.virtualized,
         readout: () =>
             `${STRESS_PART_COUNT.toLocaleString("en-GB")} rows, ${stressSelection.value.length} selected | sort: ${spellSort(stressSort.value)} — the header stays put, and only the rows on screen exist`,
         path: `${EXAMPLES_ROOT}/Virtualized.vue`,
     },
     {
         key: "disabled",
-        name: "Disabled",
+        name: EXAMPLE_NAMES.disabled,
         readout: () =>
             `sort: ${spellSort(disabledSort.value)} — nothing sorts, nothing selects, and every cell still reads out to a screen reader`,
         path: `${EXAMPLES_ROOT}/Disabled.vue`,

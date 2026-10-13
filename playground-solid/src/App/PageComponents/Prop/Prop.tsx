@@ -2,18 +2,19 @@ import type { ParentProps } from "solid-js";
 import { Show, createSignal } from "solid-js";
 
 import { Button, access } from "@thewaver/ss-components-solid";
+import {
+    EMPTY_TEXT,
+    HINT_OFFSET,
+    HINT_PLACEMENT,
+    SINGLE_FIELD,
+} from "@thewaver/ss-playground/App/PageComponents/Prop/Prop.const";
 import * as styles from "@thewaver/ss-playground/App/PageComponents/Prop/Prop.css";
 
 import { PagePropHintBadge } from "../../StyledComponents/PropHintBadge/PropHintBadge";
 import { PageTooltipContent } from "../../StyledComponents/TooltipContent/TooltipContent";
-import { FieldDefaultProvider } from "../Field/Field.context";
+import { FieldDefaultProvider } from "../Field/FieldSolid.context";
 import { usePropsPanelContext } from "../PropsPanel/PropsPanel.context";
 import type { PagePropProps } from "./Prop.types";
-
-const HINT_PLACEMENT = { x: "center", y: "top_out" } as const;
-const HINT_OFFSET = { x: 0, y: 10 };
-const EMPTY_TEXT = "";
-const SINGLE_FIELD = 1;
 
 const toDefaultText = (value: unknown) => {
     if (typeof value === "boolean") return value ? "on" : "off";

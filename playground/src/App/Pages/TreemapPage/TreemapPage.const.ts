@@ -221,3 +221,13 @@ export const LIBRARY: TreemapNode<string> = branch(
     leaf("Utils", 112),
     leaf("src files", 1127),
 );
+
+export const EXAMPLE_NAMES = {
+    library: "This library, by lines of code",
+};
+
+export const EXAMPLES_ROOT = "/src/App/Pages/TreemapPage/Examples";
+
+export const NO_MOTION_DURATION_MS = 0;
+
+export const WIDE_SPAN = 2;

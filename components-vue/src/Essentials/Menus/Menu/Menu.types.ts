@@ -2,6 +2,8 @@ import type { VNodeChild } from "vue";
 
 import type {
     AnchorPlacement,
+    BaseContextMenuProps,
+    BaseMenuProps,
     InteractionFlags,
     MenuFlags,
     MenuHighlightPosition,
@@ -240,70 +242,29 @@ export type MenuEntryProps<T> = {
     onRegister?: (index: number, element: HTMLElement) => () => void;
 };
 
-export type MenuProps<T> = Omit<InteractionWrapperProps<MenuFlags>, "extraFlags"> & {
-    /** How much room the menu is given to lay its items out in. */
-    "layoutSize"?: string;
-    /** Identifies the menu, so the trigger can point at it. */
-    "id"?: string;
-    /** Names the menu for assistive technology. */
-    "ariaLabel"?: string;
-    /** Where the menu sits against its trigger. */
-    "placement"?: AnchorPlacement;
-    /** How far the menu is held clear of its trigger. */
-    "offset"?: Point2d;
-    /**
-     * Where a submenu sits against the item that opens it. Left out, a submenu opens beside its item on
-     * the side the opening arrow points to: the right, or the left where the menu's trigger sits in
-     * right-to-left text. Given, it is used as it stands in either direction.
-     */
-    "submenuPlacement"?: AnchorPlacement;
-    /** How far a submenu is held clear of the item that opens it. */
-    "submenuOffset"?: Point2d;
-    /** Whether a submenu replaces the level that opened it or stacks beside it. */
-    "submenuMode"?: MenuSubmenuMode;
-    /** What opens a submenu — hovering its item, or picking it. */
-    "submenuOpensOn"?: MenuSubmenuTrigger;
-    /** Whether holding the trigger down opens the menu, rather than needing a full click. */
-    "opensOnHold"?: boolean;
-    /**
-     * The role the trigger announces, written on the button that takes focus rather than on the box around it.
-     * Left out, the trigger is a button. A menubar passes `menuitem`, because every child of a menubar has to be
-     * one, and the trigger still announces the menu it opens and whether that menu is open.
-     */
-    "triggerRole"?: MenuTriggerRole;
-    /** Screen room to stay out of, for a consumer with a fixed header or sidebar the menu must not slide under. */
-    "reservedScreenSize"?: Size2d;
-    /** How long the menu takes to fade in and out. */
-    "transitionDurationMs"?: number;
-    /** How long the highlight's marker takes to slide from one item to the next, and to fade. */
-    "floaterTransitionDurationMs"?: number;
-    /**
-     * Whether the menu is open. It is the only thing that opens or closes it; the menu writes `false` when it is
-     * dismissed or an item is picked. Left out, the menu keeps its own.
-     */
-    "visibility"?: boolean;
-    /** Receives the menu opening or closing itself, which is what `v-model:visibility` binds. */
-    "onUpdate:visibility"?: (isOpen: boolean) => void;
-    /** The element the menu is positioned against, where that is not the trigger itself. */
-    "anchorRef"?: HTMLElement;
-    /** The items, in the order they are shown. Items carrying children are what make submenus. */
-    "items": MenuItem<T>[];
-    /**
-     * Which values are currently checked, for the checkbox and radio items among them. Left out, no item is ever
-     * checked.
-     */
-    "checked"?: T[];
-    /** Receives the values checked after a checkbox or radio item is picked, which is what `v-model:checked` binds. */
-    "onUpdate:checked"?: (checked: T[]) => void;
-    /** Arranges the items, for a menu that is something other than a vertical list. */
-    "computeLayout"?: PlacementLayoutFn;
-    /** What the items do as the pointer nears them. */
-    "computeEffect"?: ProximityEffectFn;
-    /** The text an item is found by when the reader types, where that is not its visible text. */
-    "computeCustomText"?: (item: MenuItem<T>) => string;
-    /** Runs when an item is picked. */
-    "onActivate": (value: T) => void;
-};
+export type MenuProps<T> = Omit<InteractionWrapperProps<MenuFlags>, "extraFlags"> &
+    BaseMenuProps<T> & {
+        /**
+         * Whether the menu is open. It is the only thing that opens or closes it; the menu writes `false` when it is
+         * dismissed or an item is picked. Left out, the menu keeps its own.
+         */
+        "visibility"?: boolean;
+        /** Receives the menu opening or closing itself, which is what `v-model:visibility` binds. */
+        "onUpdate:visibility"?: (isOpen: boolean) => void;
+        /** The element the menu is positioned against, where that is not the trigger itself. */
+        "anchorRef"?: HTMLElement;
+        /** The items, in the order they are shown. Items carrying children are what make submenus. */
+        "items": MenuItem<T>[];
+        /**
+         * Which values are currently checked, for the checkbox and radio items among them. Left out, no item is ever
+         * checked.
+         */
+        "checked"?: T[];
+        /** Receives the values checked after a checkbox or radio item is picked, which is what `v-model:checked` binds. */
+        "onUpdate:checked"?: (checked: T[]) => void;
+        /** The text an item is found by when the reader types, where that is not its visible text. */
+        "computeCustomText"?: (item: MenuItem<T>) => string;
+    };
 
 export type MenuSlots<T> = Pick<InteractionWrapperSlots<MenuFlags>, "renderDecoration"> &
     MenuItemsSlots<T> & {
@@ -311,40 +272,7 @@ export type MenuSlots<T> = Pick<InteractionWrapperSlots<MenuFlags>, "renderDecor
         renderContent: (flags: InteractionFlags<MenuFlags>) => VNodeChild;
     };
 
-export type ContextMenuProps<T> = {
-    /** Names the menu for assistive technology. */
-    "ariaLabel": string;
-    /**
-     * Names the region for assistive technology.
-     *
-     * The region is a tab stop, so it has to say what it is — and its own name cannot be the menu's, which
-     * describes what the menu offers rather than what the region holds.
-     */
-    "regionAriaLabel": string;
-    /** Turns the menu off, so right-clicking the region does nothing out of the ordinary. */
-    "isDisabled"?: boolean;
-    /** Where the menu sits against the point it was opened at. */
-    "placement"?: AnchorPlacement;
-    /** How far the menu is held clear of the point it was opened at. */
-    "offset"?: Point2d;
-    /**
-     * Where a submenu sits against the item that opens it. Left out, a submenu opens beside its item on the
-     * side the opening arrow points to: the right, or the left where the region sits in right-to-left
-     * text. Given, it is used as it stands in either direction.
-     */
-    "submenuPlacement"?: AnchorPlacement;
-    /** How far a submenu is held clear of the item that opens it. */
-    "submenuOffset"?: Point2d;
-    /** Whether a submenu replaces the level that opened it or stacks beside it. */
-    "submenuMode"?: MenuSubmenuMode;
-    /** What opens a submenu — hovering its item, or picking it. */
-    "submenuOpensOn"?: MenuSubmenuTrigger;
-    /** Screen room to stay out of, for a consumer with a fixed header or sidebar the menu must not slide under. */
-    "reservedScreenSize"?: Size2d;
-    /** How long the menu takes to fade in and out. */
-    "transitionDurationMs"?: number;
-    /** How long the highlight's marker takes to slide from one item to the next, and to fade. */
-    "floaterTransitionDurationMs"?: number;
+export type ContextMenuProps<T> = BaseContextMenuProps<T> & {
     /** Whether the menu is open. It is the only thing that opens or closes it. Left out, the menu keeps its own. */
     "visibility"?: boolean;
     /** Receives the menu opening or closing itself, which is what `v-model:visibility` binds. */
@@ -358,14 +286,8 @@ export type ContextMenuProps<T> = {
     "checked"?: T[];
     /** Receives the values checked after a checkbox or radio item is picked, which is what `v-model:checked` binds. */
     "onUpdate:checked"?: (checked: T[]) => void;
-    /** Arranges the items, for a menu that is something other than a vertical list. */
-    "computeLayout"?: PlacementLayoutFn;
-    /** What the items do as the pointer nears them. */
-    "computeEffect"?: ProximityEffectFn;
     /** The text an item is found by when the reader types, where that is not its visible text. */
     "computeCustomText"?: (item: MenuItem<T>) => string;
-    /** Runs when an item is picked. */
-    "onActivate": (value: T) => void;
 };
 
 export type ContextMenuSlots<T> = MenuItemsSlots<T> & {

@@ -15,11 +15,12 @@
     import ForeignExample from "./Examples/Foreign.svelte";
     import InFormExample from "./Examples/InForm.svelte";
     import type { FormFieldExampleProps } from "./FormFieldPage.types";
-
-    const EXAMPLES_ROOT = "/src/App/Pages/FormFieldPage/Examples";
-
-    const FIELD_WIDTH = 110;
-    const MESSAGE_WIDTH = 240;
+    import {
+    EXAMPLE_NAMES,
+    EXAMPLES_ROOT,
+    FIELD_WIDTH,
+    MESSAGE_WIDTH,
+} from "@thewaver/ss-playground/App/Pages/FormFieldPage/FormFieldPage.const";
 
     let orientation = $state<FormFieldOrientation>(FORM_FIELD_DEFAULTS.orientation);
     let gap = $state(FORM_FIELD_DEFAULTS.gap);
@@ -40,7 +41,7 @@
     const examples: ExampleDefs[] = [
         {
             key: "default",
-            name: "Around a control of the library's",
+            name: EXAMPLE_NAMES.default,
             readout: () =>
                 message.length > 0
                     ? "the message has an id of its own and the control inside is pointed at it, without either of them being told the other's name"
@@ -50,7 +51,7 @@
         },
         {
             key: "foreign",
-            name: "Around a control it has never seen",
+            name: EXAMPLE_NAMES.foreign,
             readout: () =>
                 "a plain input, which knows nothing about any of this — one call to FormFieldSvelteUtils.resolveAriaDescribedBy gets it the same wiring the library's own controls get for free",
             component: foreignExample,
@@ -58,7 +59,7 @@
         },
         {
             key: "inForm",
-            name: "Inside a form",
+            name: EXAMPLE_NAMES.inForm,
             readout: () =>
                 "turn the error on — the field tells the form, and the form's own validity is what disables the button; nothing here reads the other's state directly",
             component: inFormExample,

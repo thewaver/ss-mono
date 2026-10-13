@@ -1,10 +1,9 @@
 <script setup lang="ts">
+import { WORD_START } from "@thewaver/ss-playground/App/StyledComponents/TreemapContent/TreemapContent.const";
 import * as styles from "@thewaver/ss-playground/App/StyledComponents/TreemapContent/TreemapContent.css";
 
 import { useLayerClass } from "../Layer/Layer.context";
-import type { PageTreemapTileProps } from "./TreemapContent.types";
-
-const WORD_START = /(?=[A-Z][^A-Z])/g;
+import type { PageTreemapTileProps } from "./TreemapContentVue.types";
 
 defineProps<PageTreemapTileProps>();
 

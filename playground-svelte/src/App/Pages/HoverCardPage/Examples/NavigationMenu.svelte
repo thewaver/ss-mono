@@ -1,7 +1,7 @@
 <script lang="ts">
     import * as styles from "@thewaver/ss-playground/App/Pages/HoverCardPage/HoverCardPage.css";
 
-    import type { NavMenuEntry, NavigationMenuExampleProps } from "../HoverCardPage.types";
+    import type { NavMenuEntry, NavigationMenuExampleProps } from "../HoverCardPageSvelte.types";
     import NavFlyout from "./NavFlyout.svelte";
 
     const ENTRIES: NavMenuEntry[] = [

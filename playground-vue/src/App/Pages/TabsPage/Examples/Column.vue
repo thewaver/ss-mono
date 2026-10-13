@@ -11,7 +11,7 @@ import * as styles from "@thewaver/ss-playground/App/Pages/TabsPage/TabsPage.css
 import PageTabPanel from "../../../PageComponents/TabPanel/TabPanel.vue";
 import PageTabContent from "../../../StyledComponents/TabContent/PageTabContent.vue";
 import PageTabFloater from "../../../StyledComponents/TabContent/PageTabFloater.vue";
-import type { TabsExampleProps } from "../TabsPage.types";
+import type { TabsExampleProps } from "../TabsPageVue.types";
 
 type Props = TabsExampleProps;
 

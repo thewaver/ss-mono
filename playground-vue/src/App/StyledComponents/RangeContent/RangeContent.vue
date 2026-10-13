@@ -1,12 +1,11 @@
 <script setup lang="ts">
 import { computed } from "vue";
 
+import { DEFAULT_RANGE_CONTENT_LENGTH } from "@thewaver/ss-playground/App/StyledComponents/RangeContent/RangeContent.const";
 import * as styles from "@thewaver/ss-playground/App/StyledComponents/RangeContent/RangeContent.css";
 
 import { useLayerClass } from "../Layer/Layer.context";
-import type { RangeContentProps } from "./RangeContent.types";
-
-const DEFAULT_RANGE_CONTENT_LENGTH = styles.RANGE_LENGTH;
+import type { RangeContentProps } from "./RangeContentVue.types";
 
 const travel = (ratio: number) => `calc(${ratio} * (100% - ${styles.RANGE_THUMB_SIZE}px))`;
 

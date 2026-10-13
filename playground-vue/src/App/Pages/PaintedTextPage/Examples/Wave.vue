@@ -9,8 +9,8 @@ import type { Size2d } from "@thewaver/ss-utils";
 
 import PageMeasureBox from "../../../PageComponents/MeasureBox/MeasureBox.vue";
 import PageControlButtonContent from "../../../StyledComponents/ControlButtonContent/ControlButtonContent.vue";
-import { computeSampleDefs } from "../PaintedTextPage.const";
-import type { PaintedTextPathExampleProps } from "../PaintedTextPage.types";
+import { computeSampleDefs } from "../PaintedTextPageVue.const";
+import type { PaintedTextPathExampleProps } from "../PaintedTextPageVue.types";
 
 const WAVE_PATH = "M 0 60 C 45 0 90 0 135 60 S 225 120 270 60 S 360 0 405 60 S 495 120 540 60";
 const WAVE_TEXT = "Riding the wave, round and round • ";

@@ -4,7 +4,7 @@ import { access } from "@thewaver/ss-components-solid";
 import * as styles from "@thewaver/ss-playground/App/StyledComponents/SatelliteContent/SatelliteContent.css";
 
 import { useLayerClass } from "../Layer/Layer.context";
-import type { PageSatelliteBadgeProps, PageSatelliteSubjectProps } from "./SatelliteContent.types";
+import type { PageSatelliteBadgeProps, PageSatelliteSubjectProps } from "./SatelliteContentSolid.types";
 
 export const PageSatelliteSubject = (props: ParentProps<PageSatelliteSubjectProps>) => {
     const getLayerClass = useLayerClass();

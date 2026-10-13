@@ -2,6 +2,13 @@ import { createMemo, createSignal } from "solid-js";
 
 import { Button } from "@thewaver/ss-components-solid";
 import { TagInputKnobs } from "@thewaver/ss-playground/App/Knobs/TagInputs.const";
+import {
+    CROWDED_TAGS,
+    EXAMPLES_ROOT,
+    EXAMPLE_NAMES,
+    NARROW_WIDTH,
+    STARTING_TAGS,
+} from "@thewaver/ss-playground/App/Pages/TagInputPage/TagInputPage.const";
 
 import { PageExamples } from "../../PageComponents/Examples/Examples";
 import { PageCheckField } from "../../PageComponents/Field/Field";
@@ -12,25 +19,6 @@ import { CrowdedExample } from "./Examples/Crowded";
 import { DefaultExample } from "./Examples/Default";
 import { UniqueExample } from "./Examples/Unique";
 import type { TagInputExampleProps } from "./TagInputPage.types";
-
-const NARROW_WIDTH = 240;
-const EXAMPLES_ROOT = "/src/App/Pages/TagInputPage/Examples";
-
-const STARTING_TAGS = ["solid", "vanilla-extract"];
-const CROWDED_TAGS = [
-    "solid",
-    "vanilla-extract",
-    "playwright",
-    "typescript",
-    "vite",
-    "eslint",
-    "prettier",
-    "vitest",
-    "aria",
-    "tokens",
-    "signals",
-    "stores",
-];
 
 export const TagInputPage = () => {
     const [getIsDisabled, setIsDisabled] = createSignal(TagInputKnobs.STARTING_IS_DISABLED);
@@ -57,28 +45,28 @@ export const TagInputPage = () => {
         return [
             {
                 key: "default",
-                name: "Default",
+                name: EXAMPLE_NAMES.default,
                 readout: () => `tags: ${defaultSignal[0]().join(", ") || "none"}`,
                 component: () => <DefaultExample {...commonProps} value={defaultSignal} />,
                 path: `${EXAMPLES_ROOT}/Default.tsx`,
             },
             {
                 key: "empty",
-                name: "Empty",
+                name: EXAMPLE_NAMES.empty,
                 readout: () => `tags: ${emptySignal[0]().join(", ") || "none"}`,
                 component: () => <DefaultExample {...commonProps} value={emptySignal} ariaLabel={"Empty topics"} />,
                 path: `${EXAMPLES_ROOT}/Default.tsx`,
             },
             {
                 key: "unique",
-                name: "Refusing duplicates",
+                name: EXAMPLE_NAMES.unique,
                 readout: () => `tags: ${uniqueSignal[0]().join(", ") || "none"} — the same word twice is refused`,
                 component: () => <UniqueExample {...commonProps} value={uniqueSignal} />,
                 path: `${EXAMPLES_ROOT}/Unique.tsx`,
             },
             {
                 key: "crowded",
-                name: "Crowded and narrow",
+                name: EXAMPLE_NAMES.crowded,
                 readout: () =>
                     `${crowdedSignal[0]().length} tags in ${NARROW_WIDTH}px — they wrap and the box grows with them`,
                 component: () => <CrowdedExample {...commonProps} value={crowdedSignal} />,

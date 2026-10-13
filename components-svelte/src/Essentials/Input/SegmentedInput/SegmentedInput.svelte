@@ -8,17 +8,16 @@
         TextSyncUtils,
         SegmentedInputStyles as styles,
     } from "@thewaver/ss-components";
+    import { SegmentedInputConst } from "@thewaver/ss-components/internal";
 
     import TextField from "../../../Primitives/TextField/TextField.svelte";
     import type { SegmentedInputProps } from "./SegmentedInput.types.js";
-
-    const NO_SELECTION: SegmentedInputSelection = { start: 0, end: 0 };
 
     let { value = $bindable(), ref = $bindable(), ...props }: SegmentedInputProps = $props();
 
     let cells = $state<(HTMLDivElement | null | undefined)[]>([]);
 
-    let selection = $state.raw(NO_SELECTION);
+    let selection = $state.raw(SegmentedInputConst.NO_SELECTION);
 
     const element = $derived(ref as HTMLInputElement | undefined);
     const cellCount = $derived(Math.max(0, props.cellCount));

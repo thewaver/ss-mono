@@ -2,6 +2,7 @@
 import { computed, shallowRef, useModel } from "vue";
 
 import { ParticleFieldKnobs } from "@thewaver/ss-playground/App/Knobs/ParticleFields.const";
+import { SHAPED_BOX_SIZE } from "@thewaver/ss-playground/App/Pages/ParticleFieldPage/ParticleFieldPage.const";
 import { ShapeConst } from "@thewaver/ss-utils";
 
 import PageExampleKnobs from "../../PageComponents/ExampleKnobs/PageExampleKnobs.vue";
@@ -11,8 +12,6 @@ import PageMeasureBox from "../../PageComponents/MeasureBox/MeasureBox.vue";
 import PageProp from "../../PageComponents/Prop/Prop.vue";
 import ShapedExample from "./Examples/Shaped.vue";
 import type { ParticleFieldExampleProps } from "./ParticleFieldPage.types";
-
-const SHAPED_BOX_SIZE = 320;
 
 const props = defineProps<ParticleFieldExampleProps>();
 

@@ -23,3 +23,21 @@ export const CITIES = [
     { name: "Tampere", country: "Finland" },
     { name: "Tartu", country: "Estonia" },
 ];
+
+export const EXAMPLE_NAMES = {
+    default: "Default",
+    transformingSetter: "Transforming setter",
+    refusingSetter: "Refusing setter",
+    suggestions: "Suggestions",
+    editable: "Edit in place",
+    password: "Password",
+    bothAdornments: "Both adornments",
+    number: "Number",
+    readOnly: "Read-only",
+    disabled: "Disabled",
+    reachable: "Disabled + reachable",
+    errored: "Error",
+    label: "In a Label",
+};
+
+export const EXAMPLES_ROOT = "/src/App/Pages/TextInputPage/Examples";

@@ -2,6 +2,7 @@ import { createMemo, createSignal } from "solid-js";
 
 import { EDGE_FADER_DEFAULTS } from "@thewaver/ss-components-solid";
 import { EdgeFaderKnobs } from "@thewaver/ss-playground/App/Knobs/EdgeFaders.const";
+import { EXAMPLES_ROOT, EXAMPLE_NAMES } from "@thewaver/ss-playground/App/Pages/EdgeFaderPage/EdgeFaderPage.const";
 
 import { PageExamples } from "../../PageComponents/Examples/Examples";
 import { PageCheckField, PageNumberField } from "../../PageComponents/Field/Field";
@@ -11,8 +12,6 @@ import { CardExample } from "./Examples/Card";
 import { ColumnExample } from "./Examples/Column";
 import { GridExample } from "./Examples/Grid";
 import { StripExample } from "./Examples/Strip";
-
-const EXAMPLES_ROOT = "/src/App/Pages/EdgeFaderPage/Examples";
 
 export const EdgeFaderPage = () => {
     const [getSize, setSize] = createSignal(EDGE_FADER_DEFAULTS.size);
@@ -26,28 +25,28 @@ export const EdgeFaderPage = () => {
     const getExamples = createMemo(() => [
         {
             key: "column",
-            name: "Top and bottom",
+            name: EXAMPLE_NAMES.column,
             readout: () => `a scrolling column — ${getModeText()}`,
             component: () => <ColumnExample size={getSize} isScrollAware={getIsScrollAware} />,
             path: `${EXAMPLES_ROOT}/Column.tsx`,
         },
         {
             key: "strip",
-            name: "Left and right",
+            name: EXAMPLE_NAMES.strip,
             readout: () => `a scrolling strip — ${getModeText()}`,
             component: () => <StripExample size={getSize} isScrollAware={getIsScrollAware} />,
             path: `${EXAMPLES_ROOT}/Strip.tsx`,
         },
         {
             key: "grid",
-            name: "All four sides",
+            name: EXAMPLE_NAMES.grid,
             readout: () => `scrolls both ways, and the two fades meet in the corners — ${getModeText()}`,
             component: () => <GridExample size={getSize} isScrollAware={getIsScrollAware} />,
             path: `${EXAMPLES_ROOT}/Grid.tsx`,
         },
         {
             key: "card",
-            name: "Something that does not scroll",
+            name: EXAMPLE_NAMES.card,
             readout: () =>
                 getIsScrollAware()
                     ? "nothing is out of view, so nothing fades"

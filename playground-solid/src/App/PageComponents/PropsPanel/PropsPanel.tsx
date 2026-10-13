@@ -2,17 +2,18 @@ import type { ParentProps } from "solid-js";
 import { Show, createSignal } from "solid-js";
 
 import { Button, access } from "@thewaver/ss-components-solid";
+import {
+    NOTHING_TO_RESET,
+    SAMPLE_SELECTOR_ALONE,
+} from "@thewaver/ss-playground/App/PageComponents/PropsPanel/PropsPanel.const";
 import * as styles from "@thewaver/ss-playground/App/PageComponents/PropsPanel/PropsPanel.css";
 
 import { PageButtonContent } from "../../StyledComponents/ButtonContent/ButtonContent";
-import { FieldResetProvider } from "../Field/Field.context";
+import { FieldResetProvider } from "../Field/FieldSolid.context";
 import { useIsPreview } from "../Preview/Preview.context";
 import { PageProp } from "../Prop/Prop";
 import { PropsPanelContextProvider } from "./PropsPanel.context";
-import type { PagePropsPanelProps } from "./PropsPanel.types";
-
-const NOTHING_TO_RESET = 0;
-const SAMPLE_SELECTOR_ALONE = 1;
+import type { PagePropsPanelProps } from "./PropsPanelSolid.types";
 
 export const PagePropsGroups = (props: ParentProps) => {
     if (useIsPreview()) return null;

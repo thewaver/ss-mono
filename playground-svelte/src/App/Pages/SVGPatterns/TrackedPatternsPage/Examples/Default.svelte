@@ -1,5 +1,5 @@
 <script lang="ts">
-    import { SVGDefsSamples, Shape } from "@thewaver/ss-components-svelte";
+    import { Shape, SVGDefsSampleConfigs, SVGDefsSamples } from "@thewaver/ss-components-svelte";
     import {
         NO_SAMPLE_KEY,
         computeNoSampleDefs,
@@ -7,7 +7,7 @@
     import * as styles from "@thewaver/ss-playground/App/Pages/SVGPatterns/SVGPatterns.css";
     import { ShapeConst } from "@thewaver/ss-utils";
 
-    import type { TrackedPatternExampleProps } from "../../SVGPatterns.types";
+    import type { TrackedPatternExampleProps } from "../../SVGPatternsSvelte.types";
 
     let props: TrackedPatternExampleProps = $props();
 
@@ -19,7 +19,7 @@
     computeFillDefs={(size, element) => {
         if (props.configKey === NO_SAMPLE_KEY) return computeNoSampleDefs(props.colors, "fill");
 
-        return SVGDefsSamples.Pattern.Tracked.toConfig({
+        return SVGDefsSampleConfigs.Pattern.Tracked.toConfig({
             family: props.configKey,
             defs: props.configDefs,
         } as SVGDefsSamples.Pattern.Tracked.Entry).computeSVGDefs(`fill-${id}`, undefined, element, {

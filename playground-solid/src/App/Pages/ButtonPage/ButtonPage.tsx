@@ -1,5 +1,7 @@
 import { createMemo, createSignal } from "solid-js";
 
+import { COPY_TEXT, EXAMPLES_ROOT, EXAMPLE_NAMES } from "@thewaver/ss-playground/App/Pages/ButtonPage/ButtonPage.const";
+
 import { PageExamples } from "../../PageComponents/Examples/Examples";
 import { CopyExample } from "./Examples/Copy";
 import { DecoratedExample } from "./Examples/Decorated";
@@ -8,9 +10,6 @@ import { DisabledExample } from "./Examples/Disabled";
 import { ErroredExample } from "./Examples/Errored";
 import { PendingExample } from "./Examples/Pending";
 import { ReachableExample } from "./Examples/Reachable";
-
-const COPY_TEXT = "npm install @thewaver/ss-components";
-const EXAMPLES_ROOT = "/src/App/Pages/ButtonPage/Examples";
 
 export const ButtonPage = () => {
     const [getClicks, setClicks] = createSignal(0);
@@ -24,7 +23,7 @@ export const ButtonPage = () => {
     const getExamples = createMemo(() => [
         {
             key: "default",
-            name: "Default",
+            name: EXAMPLE_NAMES.default,
             readout: () => `clicks: ${getClicks()}`,
             component: () => (
                 <DefaultExample
@@ -37,7 +36,7 @@ export const ButtonPage = () => {
         },
         {
             key: "decorated",
-            name: "Decorated",
+            name: EXAMPLE_NAMES.decorated,
             readout: () => `pressed: ${getToggleOn()}`,
             component: () => (
                 <DecoratedExample
@@ -51,7 +50,7 @@ export const ButtonPage = () => {
         },
         {
             key: "disabled",
-            name: "Disabled",
+            name: EXAMPLE_NAMES.disabled,
             readout: () => `clicks: ${getDisabledClicks()}`,
             component: () => (
                 <DisabledExample
@@ -64,7 +63,7 @@ export const ButtonPage = () => {
         },
         {
             key: "reachable",
-            name: "Disabled + reachable",
+            name: EXAMPLE_NAMES.reachable,
             readout: () => `clicks: ${getReachableClicks()}`,
             component: () => (
                 <ReachableExample
@@ -77,7 +76,7 @@ export const ButtonPage = () => {
         },
         {
             key: "errored",
-            name: "Error",
+            name: EXAMPLE_NAMES.errored,
             readout: () => `hasError: ${getHasError()}`,
             component: () => (
                 <ErroredExample
@@ -91,7 +90,7 @@ export const ButtonPage = () => {
         },
         {
             key: "pending",
-            name: "Pending",
+            name: EXAMPLE_NAMES.pending,
             readout: () =>
                 `saves: ${getSaves()} — the handler answers with a promise that takes a second, and presses that land before it settles are ignored`,
             component: () => (
@@ -105,7 +104,7 @@ export const ButtonPage = () => {
         },
         {
             key: "copy",
-            name: "Copy to the clipboard",
+            name: EXAMPLE_NAMES.copy,
             readout: () =>
                 `copies: ${getCopies()} — the handler answers with the clipboard's own promise, so the button is pending while it writes, then says Copied for two seconds and announces it`,
             component: () => (

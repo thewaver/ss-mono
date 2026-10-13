@@ -1,15 +1,14 @@
 <script lang="ts">
     import { Shape } from "@thewaver/ss-components-svelte";
     import * as styles from "@thewaver/ss-playground/App/StyledComponents/TileBoardContent/TileBoardContent.css";
-    import { FOCUS_RING_WIDTH, themeVars } from "@thewaver/ss-playground/App/Theme.css";
+    import { themeVars } from "@thewaver/ss-playground/App/Theme.css";
 
     import { getLayerClass } from "../Layer/Layer.context";
-    import type { PageTileBoardTileProps } from "./TileBoardContent.types";
-
-    const EDGE_THICKNESSES = [1];
-    const FOCUS_THICKNESSES = [FOCUS_RING_WIDTH];
-    const EDGE_STROKE_GEOM = [{ thicknesses: EDGE_THICKNESSES }];
-    const FOCUS_STROKE_GEOM = [{ thicknesses: FOCUS_THICKNESSES }];
+    import type { PageTileBoardTileProps } from "./TileBoardContentSvelte.types";
+    import {
+        EDGE_STROKE_GEOM,
+        FOCUS_STROKE_GEOM,
+    } from "@thewaver/ss-playground/App/StyledComponents/TileBoardContent/TileBoardContent.const";
 
     let props: PageTileBoardTileProps = $props();
 

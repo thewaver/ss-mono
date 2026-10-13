@@ -10,6 +10,7 @@ import {
     type SpineSide,
     SpineUtils,
 } from "@thewaver/ss-components";
+import { FlipbookConst } from "@thewaver/ss-components/internal";
 
 import { InteractionTrackerVueUtils } from "../../../Abstracts/InteractionTracker/InteractionTrackerVue.utils";
 import { InteractionWrapper } from "../../../Primitives/InteractionWrapper/InteractionWrapper";
@@ -24,8 +25,6 @@ import { callSlot, declareProps, useTwoWay } from "../../../Utils/propUtils";
 import { useStore } from "../../../Utils/storeUtils";
 import type { SlotsContext } from "../../../Utils/typeUtils";
 import type { FlipbookControlProps, FlipbookControls, FlipbookProps, FlipbookSlots } from "./Flipbook.types";
-
-const FIRST_SPREAD = 0;
 
 const FlipbookControl = defineComponent(
     (props: FlipbookControlProps, { slots }: SlotsContext<InteractionControlSlots<FlipbookStepRenderProps>>) =>
@@ -65,7 +64,7 @@ export const Flipbook = defineComponent(
 
         const bookRef = shallowRef<HTMLDivElement>();
 
-        const index = useTwoWay(props, "index", FIRST_SPREAD);
+        const index = useTwoWay(props, "index", FlipbookConst.FIRST_SPREAD);
 
         const getPageCount = () => props.pages.length;
         const getIsDisabled = () => props.isDisabled ?? false;

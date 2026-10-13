@@ -5,7 +5,7 @@ import { Button, Corners, type InteractionActivation } from "@thewaver/ss-compon
 import { PageButtonContent } from "../../../StyledComponents/ButtonContent/ButtonContent";
 import { PageRipple } from "../../../StyledComponents/Ripple/Ripple";
 import { PageTooltipContent } from "../../../StyledComponents/TooltipContent/TooltipContent";
-import type { ButtonPressedExampleProps } from "../ButtonPage.types";
+import type { ButtonPressedExampleProps } from "../ButtonPageSolid.types";
 
 type Props = ButtonPressedExampleProps;
 

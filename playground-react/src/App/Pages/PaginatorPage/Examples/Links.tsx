@@ -11,7 +11,7 @@ import {
     PagePaginatorPanel,
     PagePaginatorStep,
 } from "../../../StyledComponents/PaginatorContent/PaginatorContent";
-import type { PaginatorExampleProps } from "../PaginatorPage.types";
+import type { PaginatorExampleProps } from "../PaginatorPageReact.types";
 
 const PAGINATOR_GAP = 5;
 

@@ -5,7 +5,7 @@ import { Tooltip } from "@thewaver/ss-components-vue";
 import * as styles from "@thewaver/ss-playground/App/Pages/TooltipPage/TooltipPage.css";
 
 import PageTooltipContent from "../../../StyledComponents/TooltipContent/TooltipContent.vue";
-import type { TooltipExampleProps } from "../TooltipPage.types";
+import type { TooltipExampleProps } from "../TooltipPageVue.types";
 
 type Props = TooltipExampleProps;
 

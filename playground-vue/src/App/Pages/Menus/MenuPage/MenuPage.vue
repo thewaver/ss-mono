@@ -1,6 +1,8 @@
 <script setup lang="ts">
 import { shallowRef } from "vue";
 
+import { EXAMPLES_ROOT, EXAMPLE_NAMES } from "@thewaver/ss-playground/App/Pages/Menus/MenuPage/MenuPage.const";
+
 import type { ExampleDefs } from "../../../PageComponents/Examples/Examples.types";
 import PageExamples from "../../../PageComponents/Examples/PageExamples.vue";
 import CascaderExample from "./Examples/Cascader.vue";
@@ -24,10 +26,8 @@ import {
     ZOOM_RESET_PERCENT,
     ZOOM_STEPS,
     ZOOM_STEP_PERCENT,
-} from "./MenuPage.const";
-import type { Action } from "./MenuPage.types";
-
-const EXAMPLES_ROOT = "/src/App/Pages/Menus/MenuPage/Examples";
+} from "./MenuPageVue.const";
+import type { Action } from "./MenuPageVue.types";
 
 const lastAction = shallowRef(NOTHING_RUN);
 const lastDisabledAction = shallowRef(NOTHING_RUN);
@@ -57,97 +57,97 @@ const lastViewAction = shallowRef(NOTHING_RUN);
 const examples: ExampleDefs[] = [
     {
         key: "default",
-        name: "Default",
+        name: EXAMPLE_NAMES.default,
         readout: () => `${lastAction.value} — activating an item closes the menu`,
         path: `${EXAMPLES_ROOT}/Default.vue`,
     },
     {
         key: "glide",
-        name: "A gliding highlight",
+        name: EXAMPLE_NAMES.glide,
         readout: () =>
             `${lastGlideAction.value} — the items paint no highlight of their own; one marker glides to whichever item the pointer or the arrows are on`,
         path: `${EXAMPLES_ROOT}/Glide.vue`,
     },
     {
         key: "driven",
-        name: "Driven from outside",
+        name: EXAMPLE_NAMES.driven,
         readout: () =>
             `${lastDrivenAction.value} — the menu is ${drivenVisibility.value ? "open" : "closed"}, and it is anchored to the toggle rather than to its own trigger`,
         path: `${EXAMPLES_ROOT}/Driven.vue`,
     },
     {
         key: "context",
-        name: "Opened by a right-click",
+        name: EXAMPLE_NAMES.context,
         readout: () =>
             `${lastContextAction.value} — the menu opens where the pointer was, and there is no trigger button anywhere`,
         path: `${EXAMPLES_ROOT}/ContextArea.vue`,
     },
     {
         key: "staysOpen",
-        name: "Commands worth repeating",
+        name: EXAMPLE_NAMES.staysOpen,
         readout: () =>
             `zoom: ${zoomPercent.value}% — Zoom in and Zoom out leave the menu open so they can be pressed again, and Reset zoom closes it`,
         path: `${EXAMPLES_ROOT}/Default.vue`,
     },
     {
         key: "disabledItems",
-        name: "Disabled items",
+        name: EXAMPLE_NAMES.disabledItems,
         readout: () => `${lastDisabledAction.value} — arrows skip Paste and Duplicate`,
         path: `${EXAMPLES_ROOT}/Default.vue`,
     },
     {
         key: "disabledItemsReachable",
-        name: "Disabled items + reachable",
+        name: EXAMPLE_NAMES.disabledItemsReachable,
         readout: () => `${lastReachableAction.value} — arrows stop on Paste, hover explains why`,
         path: `${EXAMPLES_ROOT}/Default.vue`,
     },
     {
         key: "submenus",
-        name: "Submenus",
+        name: EXAMPLE_NAMES.submenus,
         readout: () => `${lastNestedAction.value} — ArrowRight steps in, ArrowLeft steps back out`,
         path: `${EXAMPLES_ROOT}/Submenus.vue`,
     },
     {
         key: "cascader",
-        name: "Cascader",
+        name: EXAMPLE_NAMES.cascader,
         readout: () =>
             `path: [${cascaderPath.value.join(", ")}] — the trigger shows the path picked so far, and only a leaf writes it; a branch just opens the next level`,
         path: `${EXAMPLES_ROOT}/Cascader.vue`,
     },
     {
         key: "rightToLeft",
-        name: "Submenus in a right-to-left box",
+        name: EXAMPLE_NAMES.rightToLeft,
         readout: () =>
             `${lastRightToLeftAction.value} — the box around the trigger sets dir="rtl", so a submenu opens on the left, ArrowLeft steps in and ArrowRight steps back out`,
         path: `${EXAMPLES_ROOT}/RightToLeft.vue`,
     },
     {
         key: "placedAbove",
-        name: "Placed above",
+        name: EXAMPLE_NAMES.placedAbove,
         readout: () => `${lastFlippedAction.value} — the surface flips its own transform`,
         path: `${EXAMPLES_ROOT}/PlacedAbove.vue`,
     },
     {
         key: "scrollingList",
-        name: "Scrolling list",
+        name: EXAMPLE_NAMES.scrollingList,
         readout: () => `${lastLayerAction.value} — Home and End reach both ends`,
         path: `${EXAMPLES_ROOT}/Default.vue`,
     },
     {
         key: "stateful",
-        name: "Rows that hold a state",
+        name: EXAMPLE_NAMES.stateful,
         readout: () => `${lastViewAction.value} — ticked: [${view.value.map((action) => action.name).join(", ")}]`,
         path: `${EXAMPLES_ROOT}/Stateful.vue`,
     },
     {
         key: "disabled",
-        name: "Disabled",
+        name: EXAMPLE_NAMES.disabled,
         readout: () => "the trigger neither opens nor takes focus",
         path: `${EXAMPLES_ROOT}/Disabled.vue`,
     },
     {
         key: "reachable",
-        name: "Disabled + reachable",
+        name: EXAMPLE_NAMES.reachable,
         readout: () => "focusable so the tooltip can be read, but the menu must not open",
         path: `${EXAMPLES_ROOT}/Reachable.vue`,
     },

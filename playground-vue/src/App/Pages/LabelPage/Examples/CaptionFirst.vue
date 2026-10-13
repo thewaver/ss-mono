@@ -5,7 +5,7 @@ import { Label, Toggle } from "@thewaver/ss-components-vue";
 
 import PageLabelCaption from "../../../StyledComponents/LabelCaption/LabelCaption.vue";
 import PageToggleContent from "../../../StyledComponents/ToggleContent/ToggleContent.vue";
-import type { LabelExampleProps } from "../LabelPage.types";
+import type { LabelExampleProps } from "../LabelPageVue.types";
 
 type Props = LabelExampleProps;
 

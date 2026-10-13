@@ -1,15 +1,17 @@
 import { createMemo, createSignal } from "solid-js";
 
+import {
+    EXAMPLES_ROOT,
+    EXAMPLE_NAMES,
+    STARTING_EXTRA_LINES,
+} from "@thewaver/ss-playground/App/Pages/Accordions/AccordionPage/AccordionPage.const";
+
 import { PageExamples } from "../../../PageComponents/Examples/Examples";
 import { DeferredExample } from "./Examples/Deferred";
 import { GrowingExample } from "./Examples/Growing";
 import { RowExample } from "./Examples/Row";
 import { ScrolledExample } from "./Examples/Scrolled";
 import { SectionsExample } from "./Examples/Sections";
-
-const EXAMPLES_ROOT = "/src/App/Pages/Accordions/AccordionPage/Examples";
-
-const STARTING_EXTRA_LINES = 0;
 
 export const AccordionPage = () => {
     const multiSignal = createSignal<string[]>(["Shipping"]);
@@ -26,14 +28,14 @@ export const AccordionPage = () => {
     const getExamples = createMemo(() => [
         {
             key: "multi",
-            name: "Many open at once",
+            name: EXAMPLE_NAMES.multi,
             readout: () => `expanded: ${JSON.stringify(multiSignal[0]())}`,
             component: () => <SectionsExample expanded={multiSignal} />,
             path: `${EXAMPLES_ROOT}/Sections.tsx`,
         },
         {
             key: "unheld",
-            name: "Nobody holding the state",
+            name: EXAMPLE_NAMES.unheld,
             readout: () =>
                 "no signal passed — the accordion keeps which sections are open itself, so the page has nothing to show here",
             component: () => <SectionsExample />,
@@ -41,14 +43,14 @@ export const AccordionPage = () => {
         },
         {
             key: "single",
-            name: "One at a time",
+            name: EXAMPLE_NAMES.single,
             readout: () => `expanded: ${JSON.stringify(singleSignal[0]())} — the component keeps at most one`,
             component: () => <SectionsExample expanded={singleSignal} isSingleExpand={true} />,
             path: `${EXAMPLES_ROOT}/Sections.tsx`,
         },
         {
             key: "required",
-            name: "One at a time, and always one",
+            name: EXAMPLE_NAMES.required,
             readout: () =>
                 `expanded: ${JSON.stringify(requiredSignal[0]())} — pressing the open header does nothing, because the only way out of a section is into another one`,
             component: () => (
@@ -58,7 +60,7 @@ export const AccordionPage = () => {
         },
         {
             key: "growing",
-            name: "Content that grows while open",
+            name: EXAMPLE_NAMES.growing,
             readout: () => `extra lines: ${getExtraLines()} — the panel follows its content without reopening`,
             component: () => (
                 <GrowingExample
@@ -73,7 +75,7 @@ export const AccordionPage = () => {
         },
         {
             key: "deferred",
-            name: "Panels built on first open",
+            name: EXAMPLE_NAMES.deferred,
             readout: () =>
                 `built: ${JSON.stringify(getBuilt())} — a section's content is not in the page until it is opened once, and stays there afterwards`,
             component: () => (
@@ -86,7 +88,7 @@ export const AccordionPage = () => {
         },
         {
             key: "scrolled",
-            name: "Inside a box that scrolls",
+            name: EXAMPLE_NAMES.scrolled,
             readout: () =>
                 `expanded: ${JSON.stringify(scrolledSignal[0]())} — opening a section below the fold brings it up`,
             component: () => <ScrolledExample expanded={scrolledSignal} />,
@@ -94,7 +96,7 @@ export const AccordionPage = () => {
         },
         {
             key: "row",
-            name: "Side by side",
+            name: EXAMPLE_NAMES.row,
             span: 2,
             readout: () =>
                 `expanded: ${JSON.stringify(rowSignal[0]())} — the panels sit in a row and open in width; the left and right arrows walk the headers, and the new panel's content slides in from the side the person moved toward`,

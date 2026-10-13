@@ -1,15 +1,9 @@
-import {
-    type PatternProximityOpts,
-    SVGDefsUtils,
-    TrackedPatternDefaults,
-    TrackedPatternUtils,
-} from "@thewaver/ss-components";
+import { type PatternProximityOpts, SVGDefsUtils, TrackedPatternUtils } from "@thewaver/ss-components";
+import { TriangleTTrail2Const } from "@thewaver/ss-components/internal";
 import { MathUtils, ShapeConst, ShapeUtils } from "@thewaver/ss-utils";
 
 import type { TrackedPatternConfig } from "../../SVGDefsSolid.types";
 import { SVGPatterns } from "../../SVGPatterns.const";
-
-const DEFAULTS = TrackedPatternDefaults.TRAIL_DEFAULTS;
 
 export const triangle_t_trail_2 = (opts?: PatternProximityOpts): TrackedPatternConfig => ({
     computeSVGDefs: (id, __, getRef, defs) => {
@@ -40,7 +34,7 @@ export const triangle_t_trail_2 = (opts?: PatternProximityOpts): TrackedPatternC
                                 `pattern1-${id}`,
                                 getRef,
                                 defs,
-                                TrackedPatternUtils.resolveOpts(opts, DEFAULTS),
+                                TrackedPatternUtils.resolveOpts(opts, TriangleTTrail2Const.DEFAULTS),
                                 (cellId, index, isSplit, getLevel) => {
                                     const isEven = MathUtils.isEven(index.col + index.row);
 

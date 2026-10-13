@@ -1,6 +1,8 @@
 import { createMemo, createSignal } from "solid-js";
 
 import {
+    EXAMPLES_ROOT,
+    EXAMPLE_NAMES,
     LONG_TEXT,
     MAX_ROWS,
     MIN_ROWS,
@@ -17,8 +19,6 @@ import { LabeledExample } from "./Examples/Labeled";
 import { ReachableExample } from "./Examples/Reachable";
 import { ReadOnlyExample } from "./Examples/ReadOnly";
 
-const EXAMPLES_ROOT = "/src/App/Pages/TextAreaPage/Examples";
-
 export const TextAreaPage = () => {
     const fixedSignal = createSignal("");
     const growingSignal = createSignal("");
@@ -32,14 +32,14 @@ export const TextAreaPage = () => {
     const getExamples = createMemo(() => [
         {
             key: "fixedHeight",
-            name: "Fixed height",
+            name: EXAMPLE_NAMES.fixedHeight,
             readout: () => `length: ${fixedSignal[0]().length} — the painter sizes the box and it stays put`,
             component: () => <FixedHeightExample value={fixedSignal} />,
             path: `${EXAMPLES_ROOT}/FixedHeight.tsx`,
         },
         {
             key: "autoSizing",
-            name: "Auto-sizing",
+            name: EXAMPLE_NAMES.autoSizing,
             readout: () =>
                 `length: ${growingSignal[0]().length} — grows from ${MIN_ROWS} rows with no ceiling, so it never scrolls`,
             component: () => <AutoSizingExample value={growingSignal} />,
@@ -47,42 +47,42 @@ export const TextAreaPage = () => {
         },
         {
             key: "autoSizingCapped",
-            name: "Auto-sizing, capped",
+            name: EXAMPLE_NAMES.autoSizingCapped,
             readout: () => `length: ${cappedSignal[0]().length} — stops growing at ${MAX_ROWS} rows and scrolls`,
             component: () => <AutoSizingCappedExample value={cappedSignal} />,
             path: `${EXAMPLES_ROOT}/AutoSizingCapped.tsx`,
         },
         {
             key: "readOnly",
-            name: "Read-only",
+            name: EXAMPLE_NAMES.readOnly,
             readout: () => `length: ${readOnlySignal[0]().length} — selectable and copyable, never editable`,
             component: () => <ReadOnlyExample value={readOnlySignal} />,
             path: `${EXAMPLES_ROOT}/ReadOnly.tsx`,
         },
         {
             key: "disabled",
-            name: "Disabled",
+            name: EXAMPLE_NAMES.disabled,
             readout: () => `length: ${disabledSignal[0]().length}`,
             component: () => <DisabledExample value={disabledSignal} />,
             path: `${EXAMPLES_ROOT}/Disabled.tsx`,
         },
         {
             key: "reachable",
-            name: "Disabled + reachable",
+            name: EXAMPLE_NAMES.reachable,
             readout: () => `length: ${reachableSignal[0]().length}`,
             component: () => <ReachableExample value={reachableSignal} />,
             path: `${EXAMPLES_ROOT}/Reachable.tsx`,
         },
         {
             key: "errored",
-            name: "Error",
+            name: EXAMPLE_NAMES.errored,
             readout: () => `length: ${erroredSignal[0]().length} — fewer than ${REVIEW_LIMIT} characters is an error`,
             component: () => <ErroredExample value={erroredSignal} />,
             path: `${EXAMPLES_ROOT}/Errored.tsx`,
         },
         {
             key: "label",
-            name: "In a Label",
+            name: EXAMPLE_NAMES.label,
             readout: () => `length: ${labeledSignal[0]().length}`,
             component: () => <LabeledExample value={labeledSignal} />,
             path: `${EXAMPLES_ROOT}/Labeled.tsx`,

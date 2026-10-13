@@ -8,15 +8,11 @@ import {
     type TreemapTransition,
     TreemapUtils,
 } from "@thewaver/ss-components";
+import { TreemapConst } from "@thewaver/ss-components/internal";
 
 import { ElementObserverReactUtils } from "../../../Abstracts/ElementObserver/ElementObserverReact.utils";
 import { SignalMirrorReactUtils } from "../../../Abstracts/SignalMirror/SignalMirrorReact.utils";
 import type { TreemapProps } from "./Treemap.types";
-
-const NOTHING = 0;
-const HIDDEN = 0;
-const SHOWN = 1;
-const NEXT = 1;
 
 type TreemapZoomState<T> = {
     branch: TreemapNode<T>;
@@ -49,7 +45,7 @@ export const Treemap = <T,>(props: TreemapProps<T>) => {
         branch,
         cameFrom: undefined,
         transition: undefined,
-        generation: NOTHING,
+        generation: TreemapConst.NOTHING,
     }));
 
     if (zoom.branch !== branch) {
@@ -57,7 +53,7 @@ export const Treemap = <T,>(props: TreemapProps<T>) => {
             branch,
             cameFrom: zoom.branch,
             transition: TreemapUtils.computeTransition(branch, zoom.branch, weights, size, zoomDurationMs),
-            generation: zoom.generation + NEXT,
+            generation: zoom.generation + TreemapConst.NEXT,
         });
     }
 
@@ -97,7 +93,10 @@ export const Treemap = <T,>(props: TreemapProps<T>) => {
             });
 
             if (transition.zoom === "in") {
-                const fade = layerRef.current?.animate([{ opacity: HIDDEN }, { opacity: SHOWN }], timing);
+                const fade = layerRef.current?.animate(
+                    [{ opacity: TreemapConst.HIDDEN }, { opacity: TreemapConst.SHOWN }],
+                    timing,
+                );
 
                 if (fade) animations.push(fade);
             }
@@ -138,7 +137,10 @@ export const Treemap = <T,>(props: TreemapProps<T>) => {
         );
 
         const fade = layer.animate(
-            [{ opacity: SHOWN }, { opacity: transition.zoom === "in" ? SHOWN : HIDDEN }],
+            [
+                { opacity: TreemapConst.SHOWN },
+                { opacity: transition.zoom === "in" ? TreemapConst.SHOWN : TreemapConst.HIDDEN },
+            ],
             timing,
         );
 

@@ -2,7 +2,7 @@
 import { Progress } from "@thewaver/ss-components-vue";
 
 import PageProgressContent from "../../../StyledComponents/ProgressContent/ProgressContent.vue";
-import type { ProgressExampleProps } from "../ProgressPage.types";
+import type { ProgressExampleProps } from "../ProgressPageVue.types";
 
 const BYTES_PER_KB = 1000;
 

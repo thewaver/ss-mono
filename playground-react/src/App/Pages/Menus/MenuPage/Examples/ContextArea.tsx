@@ -2,8 +2,8 @@ import { ContextMenu } from "@thewaver/ss-components-react";
 import * as styles from "@thewaver/ss-playground/App/Pages/Menus/MenuPage/MenuPage.css";
 
 import { renderPageHighlightFloater } from "../../../../StyledComponents/GlideFloater/GlideFloater";
-import { ACTIONS, renderMenuItem, renderMenuPopup } from "../MenuPage.const";
-import type { MenuExampleProps } from "../MenuPage.types";
+import { ACTIONS, renderMenuItem, renderMenuPopup } from "../MenuPageReact.const";
+import type { MenuExampleProps } from "../MenuPageReact.types";
 
 type Props = MenuExampleProps;
 

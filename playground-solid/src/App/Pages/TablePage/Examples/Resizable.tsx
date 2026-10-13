@@ -5,8 +5,8 @@ import { Table } from "@thewaver/ss-components-solid";
 import * as styles from "@thewaver/ss-playground/App/Pages/TablePage/TablePage.css";
 
 import { PageTableResizer } from "../../../StyledComponents/TableContent/TableContent";
-import { PARTS, createPartColumns } from "../TablePage.const";
 import type { TableExampleProps } from "../TablePage.types";
+import { PARTS, createPartColumns } from "../TablePageSolid.const";
 
 type Props = TableExampleProps & { widths: Signal<Record<string, number>> };
 

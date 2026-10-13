@@ -1,5 +1,7 @@
 import { useEffect, useState } from "react";
 
+import { EXAMPLES_ROOT, EXAMPLE_NAMES } from "@thewaver/ss-playground/App/Pages/TogglePage/TogglePage.const";
+
 import { PageExamples } from "../../PageComponents/Examples/Examples";
 import { DecoratedExample } from "./Examples/Decorated";
 import { DefaultExample } from "./Examples/Default";
@@ -7,8 +9,6 @@ import { DisabledExample } from "./Examples/Disabled";
 import { ErroredExample } from "./Examples/Errored";
 import { MixedExample } from "./Examples/Mixed";
 import { ReachableExample } from "./Examples/Reachable";
-
-const EXAMPLES_ROOT = "/src/App/Pages/TogglePage/Examples";
 
 export const TogglePage = () => {
     const defaultState = useState(false);
@@ -32,21 +32,21 @@ export const TogglePage = () => {
     const examples = [
         {
             key: "default",
-            name: "Default",
+            name: EXAMPLE_NAMES.default,
             readout: () => `on: ${defaultState[0]}`,
             component: () => <DefaultExample checked={defaultState} />,
             path: `${EXAMPLES_ROOT}/Default.tsx`,
         },
         {
             key: "decorated",
-            name: "Decorated",
+            name: EXAMPLE_NAMES.decorated,
             readout: () => `on: ${decoratedState[0]}`,
             component: () => <DecoratedExample checked={decoratedState} />,
             path: `${EXAMPLES_ROOT}/Decorated.tsx`,
         },
         {
             key: "mixed",
-            name: "Mixed",
+            name: EXAMPLE_NAMES.mixed,
             readout: () =>
                 `mixed: ${isAllMixed} | all: ${allState[0]} | children: ${firstChildState[0]}, ${secondChildState[0]}`,
             component: () => (
@@ -61,21 +61,21 @@ export const TogglePage = () => {
         },
         {
             key: "disabled",
-            name: "Disabled",
+            name: EXAMPLE_NAMES.disabled,
             readout: () => `on: ${disabledState[0]}`,
             component: () => <DisabledExample checked={disabledState} />,
             path: `${EXAMPLES_ROOT}/Disabled.tsx`,
         },
         {
             key: "reachable",
-            name: "Disabled + reachable",
+            name: EXAMPLE_NAMES.reachable,
             readout: () => `on: ${reachableState[0]}`,
             component: () => <ReachableExample checked={reachableState} />,
             path: `${EXAMPLES_ROOT}/Reachable.tsx`,
         },
         {
             key: "errored",
-            name: "Error",
+            name: EXAMPLE_NAMES.errored,
             readout: () => `on: ${erroredState[0]}`,
             component: () => <ErroredExample checked={erroredState} />,
             path: `${EXAMPLES_ROOT}/Errored.tsx`,

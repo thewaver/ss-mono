@@ -1,6 +1,6 @@
 import type { VNodeChild } from "vue";
 
-import type { InteractionFlags, TagInputCbs, TagInputFlags, TagInputState } from "@thewaver/ss-components";
+import type { BaseTagInputValues, InteractionFlags, TagInputCbs, TagInputFlags } from "@thewaver/ss-components";
 
 import type {
     InteractionControlProps,
@@ -15,7 +15,7 @@ export type { TagInputCbs };
 export type TagInputProps = Omit<InteractionWrapperProps<TagInputFlags>, "extraFlags" | "role"> &
     TagInputCbs &
     Pick<InteractionControlProps<TagInputFlags>, "id"> &
-    TagInputState & {
+    BaseTagInputValues & {
         /** The tags. It is the only thing that adds or removes one. */
         "value": string[];
         /** Receives the tags whenever one is added or removed, which is what `v-model:value` binds. */

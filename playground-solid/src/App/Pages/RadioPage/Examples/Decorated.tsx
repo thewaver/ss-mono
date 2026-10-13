@@ -1,10 +1,10 @@
 import { For } from "solid-js";
 
 import { Corners, Radio, RadioGroup } from "@thewaver/ss-components-solid";
+import { RADIO_GROUP_GAP, SIZE_OPTIONS } from "@thewaver/ss-playground/App/Pages/RadioPage/RadioPage.const";
 
 import { PageRadioContent } from "../../../StyledComponents/RadioContent/RadioContent";
-import { RADIO_GROUP_GAP, SIZE_OPTIONS } from "../RadioPage.const";
-import type { RadioExampleProps } from "../RadioPage.types";
+import type { RadioExampleProps } from "../RadioPageSolid.types";
 
 const CORNER_LENGTH = { width: 8, height: 8 };
 const STROKE_THICKNESS = 2;

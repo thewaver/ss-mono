@@ -2,22 +2,21 @@
     import type { Snippet } from "svelte";
 
     import { SurfaceUtils, SurfaceStyles as styles } from "@thewaver/ss-components";
-    import { ShapeConst, type Size2d } from "@thewaver/ss-utils";
+    import { SurfaceConst } from "@thewaver/ss-components/internal";
+    import { ShapeConst } from "@thewaver/ss-utils";
     import { assignInlineVars } from "@vanilla-extract/dynamic";
 
     import Shape from "../../Exotics/Shape/Shape.svelte";
     import { type StyleRecord, toStyle } from "../../Utils/styleUtils.js";
     import type { SurfaceProps } from "./Surface.types.js";
 
-    const MOCK_SIZE: Size2d = { width: 0, height: 0 };
-
     let props: SurfaceProps & { children?: Snippet } = $props();
 
     const toPixels = (values: object): StyleRecord =>
         Object.fromEntries(Object.entries(values).map(([key, value]) => [key, `${value}px`]));
 
-    const mockFillDefs = $derived(props.computeFillDefs?.(MOCK_SIZE, undefined));
-    const mockStrokeDefs = $derived(props.computeStrokeDefs?.(MOCK_SIZE, undefined));
+    const mockFillDefs = $derived(props.computeFillDefs?.(SurfaceConst.MOCK_SIZE, undefined));
+    const mockStrokeDefs = $derived(props.computeStrokeDefs?.(SurfaceConst.MOCK_SIZE, undefined));
 
     const isComplex = $derived(SurfaceUtils.getIsComplex(mockFillDefs, mockStrokeDefs, props.lameExponents));
 

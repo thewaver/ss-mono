@@ -1,11 +1,10 @@
 <script lang="ts">
     import { LIGHT_CATCHER_DEFAULTS, PointerEffectsUtils, LightCatcherStyles as styles } from "@thewaver/ss-components";
+    import { LightCatcherConst } from "@thewaver/ss-components/internal";
 
     import { PointerTrackerSvelteUtils } from "../../../Abstracts/PointerTracker/PointerTrackerSvelte.utils.svelte.js";
     import { SmootherSvelteUtils } from "../../../Abstracts/Smoother/SmootherSvelte.utils.svelte.js";
     import type { LightCatcherProps } from "./LightCatcher.types.js";
-
-    const NO_STRENGTH = 0;
 
     let props: LightCatcherProps = $props();
 
@@ -30,7 +29,7 @@
 
     const strength = $derived(
         isResting
-            ? NO_STRENGTH
+            ? LightCatcherConst.NO_STRENGTH
             : PointerEffectsUtils.computeEdgeStrength(
                   pointer.getReading(),
                   props.lightRangePx ?? LIGHT_CATCHER_DEFAULTS.lightRangePx,

@@ -2,7 +2,7 @@
     import { ANCHOR_H_PLACEMENTS, ANCHOR_V_PLACEMENTS, SATELLITE_DEFAULTS } from "@thewaver/ss-components-svelte";
     import type { AnchorHPlacement, AnchorVPlacement } from "@thewaver/ss-components-svelte";
 
-    import { SatelliteKnobs } from "../../Knobs/Satellites.const";
+    import { SatelliteKnobs } from "@thewaver/ss-playground/App/Knobs/Satellites.const";
     import PageExampleKnobs from "../../PageComponents/ExampleKnobs/PageExampleKnobs.svelte";
     import type { ExampleDefs } from "../../PageComponents/Examples/Examples.types";
     import PageExamples from "../../PageComponents/Examples/PageExamples.svelte";
@@ -15,10 +15,12 @@
     import BadgeExample from "./Examples/Badge.svelte";
     import DefaultExample from "./Examples/Default.svelte";
     import SeveralExample from "./Examples/Several.svelte";
-    import type { SatelliteBadgeCorner, SatelliteExampleProps } from "./SatellitePage.types";
-
-    const FIELD_WIDTH = 110;
-    const EXAMPLES_ROOT = "/src/App/Pages/SatellitePage/Examples";
+    import type { SatelliteBadgeCorner, SatelliteExampleProps } from "./SatellitePageSvelte.types";
+    import {
+    EXAMPLE_NAMES,
+    EXAMPLES_ROOT,
+    FIELD_WIDTH,
+} from "@thewaver/ss-playground/App/Pages/SatellitePage/SatellitePage.const";
 
     let hPlacement = $state<AnchorHPlacement>(SatelliteKnobs.STARTING_H_PLACEMENT);
     let vPlacement = $state<AnchorVPlacement>(SatelliteKnobs.STARTING_V_PLACEMENT);
@@ -45,14 +47,14 @@
     const examples: ExampleDefs[] = [
         {
             key: "default",
-            name: "Default",
+            name: EXAMPLE_NAMES.default,
             readout: () => "one satellite, moved through every placement; the dashed box is what the pair takes up",
             component: defaultExample,
             path: `${EXAMPLES_ROOT}/Default.svelte`,
         },
         {
             key: "several",
-            name: "Several satellites",
+            name: EXAMPLE_NAMES.several,
             readout: () =>
                 "a corner badge, one hanging off the left and one tucked behind the bottom edge — each side of the box grows by the furthest any of them reaches",
             component: severalExample,
@@ -60,7 +62,7 @@
         },
         {
             key: "badge",
-            name: "Badge",
+            name: EXAMPLE_NAMES.badge,
             readout: () =>
                 "a count pinned inside a corner and pushed out past it by the same amount on both axes, so a longer number grows the badge inward and the overhang never changes",
             component: badgeExample,

@@ -3,6 +3,7 @@ import { computed, shallowRef } from "vue";
 
 import { EDGE_FADER_DEFAULTS } from "@thewaver/ss-components-vue";
 import { EdgeFaderKnobs } from "@thewaver/ss-playground/App/Knobs/EdgeFaders.const";
+import { EXAMPLES_ROOT, EXAMPLE_NAMES } from "@thewaver/ss-playground/App/Pages/EdgeFaderPage/EdgeFaderPage.const";
 
 import type { ExampleDefs } from "../../PageComponents/Examples/Examples.types";
 import PageExamples from "../../PageComponents/Examples/PageExamples.vue";
@@ -14,8 +15,6 @@ import CardExample from "./Examples/Card.vue";
 import ColumnExample from "./Examples/Column.vue";
 import GridExample from "./Examples/Grid.vue";
 import StripExample from "./Examples/Strip.vue";
-
-const EXAMPLES_ROOT = "/src/App/Pages/EdgeFaderPage/Examples";
 
 const size = shallowRef(EDGE_FADER_DEFAULTS.size);
 const isScrollAware = shallowRef(EDGE_FADER_DEFAULTS.isScrollAware);
@@ -29,25 +28,25 @@ const modeText = computed(() =>
 const examples: ExampleDefs[] = [
     {
         key: "column",
-        name: "Top and bottom",
+        name: EXAMPLE_NAMES.column,
         readout: () => `a scrolling column — ${modeText.value}`,
         path: `${EXAMPLES_ROOT}/Column.vue`,
     },
     {
         key: "strip",
-        name: "Left and right",
+        name: EXAMPLE_NAMES.strip,
         readout: () => `a scrolling strip — ${modeText.value}`,
         path: `${EXAMPLES_ROOT}/Strip.vue`,
     },
     {
         key: "grid",
-        name: "All four sides",
+        name: EXAMPLE_NAMES.grid,
         readout: () => `scrolls both ways, and the two fades meet in the corners — ${modeText.value}`,
         path: `${EXAMPLES_ROOT}/Grid.vue`,
     },
     {
         key: "card",
-        name: "Something that does not scroll",
+        name: EXAMPLE_NAMES.card,
         readout: () =>
             isScrollAware.value
                 ? "nothing is out of view, so nothing fades"

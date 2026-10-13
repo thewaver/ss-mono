@@ -3,7 +3,7 @@ import { ImageMosaic } from "@thewaver/ss-components-vue";
 import { MosaicImages } from "@thewaver/ss-playground/App/Pages/Mosaics/ImageMosaicPage/MosaicImages.const";
 
 import PageMosaicLink from "../../../../StyledComponents/MosaicContent/PageMosaicLink.vue";
-import type { ImagesExampleProps } from "../ImageMosaicPage.types";
+import type { ImagesExampleProps } from "../ImageMosaicPageVue.types";
 
 type Props = ImagesExampleProps;
 

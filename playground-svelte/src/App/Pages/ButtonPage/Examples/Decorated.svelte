@@ -4,7 +4,7 @@
     import PageButtonContent from "../../../StyledComponents/ButtonContent/ButtonContent.svelte";
     import PageRipple from "../../../StyledComponents/Ripple/Ripple.svelte";
     import PageTooltipContent from "../../../StyledComponents/TooltipContent/TooltipContent.svelte";
-    import type { ButtonPressedExampleProps } from "../ButtonPage.types";
+    import type { ButtonPressedExampleProps } from "../ButtonPageSvelte.types";
 
     type Props = ButtonPressedExampleProps;
 

@@ -3,7 +3,7 @@
 
     import * as styles from "@thewaver/ss-playground/App/StyledComponents/StaircaseContent/StaircaseContent.css";
 
-    import type { PageStaircaseStepProps } from "./StaircaseContent.types";
+    import type { PageStaircaseStepProps } from "./StaircaseContentSvelte.types";
 
     let props: PageStaircaseStepProps & { children?: Snippet } = $props();
 </script>

@@ -1,35 +1,22 @@
 import type { MouseEvent } from "react";
 
-import type { RangeRenderProps, RangeState, RangeValues } from "@thewaver/ss-components";
+import type { BaseRangeCbs, BaseRangeValues, RangeRenderProps, RangeValues } from "@thewaver/ss-components";
 
 import type {
     InteractionControlProps,
     InteractionWrapperProps,
 } from "../../../Primitives/InteractionWrapper/InteractionWrapper.types";
 
-export type RangeCbs = {
-    /** Runs as the thumbs move, with every thumb's value. */
-    onInput?: (values: number[]) => void;
-    /**
-     * Runs once a change is finished: when a drag lets go, and after every key press, since each press is a whole
-     * change of its own. It is handed every thumb's value, as `onInput` is. A drag that ends where it began, or a key
-     * that meets an end of the track, changed nothing and reports nothing.
-     */
-    onChangeEnd?: (values: number[]) => void;
+export type RangeCbs = BaseRangeCbs & {
     /** Runs when the pointer arrives over the track. */
     onMouseEnter?: (e: MouseEvent<HTMLInputElement>) => void;
     /** Runs when the pointer leaves the track. */
     onMouseLeave?: (e: MouseEvent<HTMLInputElement>) => void;
 };
 
-type RangeRequiredState = Required<
-    Omit<RangeState, "name" | "ariaLabel" | "thumbLabels" | "computeValueText" | "computeValueAtPoint" | "isRequired">
->;
+type RangeRequiredState = Required<Omit<BaseRangeValues, "name" | "ariaLabel" | "thumbLabels" | "isRequired">>;
 
-type RangeOptionalState = Pick<
-    RangeState,
-    "name" | "ariaLabel" | "thumbLabels" | "computeValueText" | "computeValueAtPoint" | "isRequired"
->;
+type RangeOptionalState = Pick<BaseRangeValues, "name" | "ariaLabel" | "thumbLabels" | "isRequired">;
 
 export type RangeElementProps = RangeCbs &
     InteractionControlProps<RangeRenderProps> &
@@ -48,7 +35,7 @@ export type RangeElementProps = RangeCbs &
 export type RangeProps = Omit<InteractionWrapperProps<RangeRenderProps>, "renderControl" | "extraFlags"> &
     RangeCbs &
     Pick<InteractionControlProps<RangeRenderProps>, "id" | "renderContent"> &
-    RangeState & {
+    BaseRangeValues & {
         /** The value, and how to change it. It is the only thing that moves the thumb. Give this or `range`. */
         value?: readonly [number, (value: number) => void];
         /**

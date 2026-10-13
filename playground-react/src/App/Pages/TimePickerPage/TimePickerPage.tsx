@@ -5,13 +5,12 @@ import {
     CLOSING_TIME,
     OPENING_TIME,
 } from "@thewaver/ss-playground/App/Pages/DatePickerPage/DatePickerPage.const";
+import { EXAMPLES_ROOT, EXAMPLE_NAMES } from "@thewaver/ss-playground/App/Pages/TimePickerPage/TimePickerPage.const";
 import { TimeUtils } from "@thewaver/ss-utils";
 import type { TimeValue } from "@thewaver/ss-utils";
 
 import { PageExamples } from "../../PageComponents/Examples/Examples";
 import { ClockedExample } from "./Examples/Clocked";
-
-const EXAMPLES_ROOT = "/src/App/Pages/TimePickerPage/Examples";
 
 const describeTime = (value: TimeValue | undefined) => (value ? TimeUtils.toIso(value) : "none");
 
@@ -23,7 +22,7 @@ export const TimePickerPage = () => {
     const examples = [
         {
             key: "clocked",
-            name: "With a clock",
+            name: EXAMPLE_NAMES.clocked,
             readout: () =>
                 `value: ${describeTime(clockedState[0])} — one column per unit, so typing and picking cover the same times`,
             component: () => <ClockedExample value={clockedState} itemKey={"clocked"} ariaLabel={"Appointment time"} />,
@@ -31,7 +30,7 @@ export const TimePickerPage = () => {
         },
         {
             key: "clockedTwelve",
-            name: "Twelve hour, with a clock",
+            name: EXAMPLE_NAMES.clockedTwelve,
             readout: () =>
                 `value: ${describeTime(clockedTwelveState[0])} — the am/pm control and the clock trigger share the trailing slot`,
             component: () => (
@@ -46,7 +45,7 @@ export const TimePickerPage = () => {
         },
         {
             key: "booking",
-            name: "Every fifteen minutes",
+            name: EXAMPLE_NAMES.booking,
             readout: () =>
                 `value: ${describeTime(bookingState[0])} — a coarser minute column, still inside ${TimeUtils.toIso(OPENING_TIME)} to ${TimeUtils.toIso(CLOSING_TIME)}`,
             component: () => (

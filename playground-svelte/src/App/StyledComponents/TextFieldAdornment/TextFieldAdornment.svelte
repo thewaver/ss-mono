@@ -4,7 +4,7 @@
     import * as styles from "@thewaver/ss-playground/App/StyledComponents/TextFieldAdornment/TextFieldAdornment.css";
 
     import { getLayerClass } from "../Layer/Layer.context";
-    import type { TextFieldAdornmentProps } from "./TextFieldAdornment.types";
+    import type { TextFieldAdornmentProps } from "./TextFieldAdornmentSvelte.types";
 
     let props: TextFieldAdornmentProps & { children?: Snippet } = $props();
 

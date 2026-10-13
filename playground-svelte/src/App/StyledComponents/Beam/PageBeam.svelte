@@ -4,15 +4,14 @@
     import { untrack } from "svelte";
 
     import {
-        computeBeamLengthPx,
-        computeBeamMotion,
-        observeBeamLength,
-    } from "@thewaver/ss-playground/App/StyledComponents/Beam/Beam.const";
+    computeBeamLengthPx,
+    computeBeamMotion,
+    NO_LENGTH,
+    observeBeamLength,
+} from "@thewaver/ss-playground/App/StyledComponents/Beam/Beam.const";
     import * as styles from "@thewaver/ss-playground/App/StyledComponents/Beam/Beam.css";
 
-    import type { PageBeamProps } from "./Beam.types";
-
-    const NO_LENGTH = 0;
+    import type { PageBeamProps } from "./BeamSvelte.types";
 
     let props: PageBeamProps = $props();
 

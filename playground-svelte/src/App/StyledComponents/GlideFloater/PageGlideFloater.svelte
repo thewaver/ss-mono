@@ -2,7 +2,7 @@
     import * as styles from "@thewaver/ss-playground/App/StyledComponents/GlideFloater/GlideFloater.css";
 
     import { getLayerClass } from "../Layer/Layer.context";
-    import type { GlideFloaterProps } from "./GlideFloater.types";
+    import type { GlideFloaterProps } from "./GlideFloaterSvelte.types";
 
     let props: GlideFloaterProps = $props();
 

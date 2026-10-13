@@ -8,15 +8,6 @@ import { CURRENT_INDEX_OBSERVER_DEFAULTS } from "./ElementObserver.const";
 /** How far short of its end a scroller may stop and still count as scrolled to the end, for fractional layouts. */
 const SCROLL_END_TOLERANCE_PX = 1;
 
-/** Whether two size lists match entry for entry. */
-const isSameSizeList = (a: Size2d[], b: Size2d[]) =>
-    a.length === b.length && a.every((size, index) => Size2d.isSame(size, b[index]));
-
-/** Whether two rect lists match entry for entry, an entry missing on both sides counting as a match. */
-const isSameRectList = (a: (Rect | undefined)[], b: (Rect | undefined)[]) =>
-    a.length === b.length &&
-    a.every((rect, index) => (rect === undefined ? b[index] === undefined : Rect.isSame(rect, b[index])));
-
 /** The share of an element's passage across a stretch of screen it has covered, `0`–`1`. */
 const toPassageProgress = (top: number, height: number, spanHeight: number) => {
     const passage = spanHeight + height;
@@ -47,6 +38,15 @@ const findScroller = (elements: Array<HTMLElement | undefined>) => {
     if (!last) return undefined;
 
     return VirtualizerUtils.findScrollParent(last) ?? last.ownerDocument.scrollingElement ?? undefined;
+};
+
+/** The top edge of what a scroller shows, in a viewport's own coordinates, never above the viewport's. */
+const measureVisibleTop = (scroller: Element, viewportContext: ViewportContextType) => {
+    if (scroller === scroller.ownerDocument.scrollingElement) return 0;
+
+    const rect = ViewportUtils.getAdjustedBoundingClientRect(scroller, viewportContext);
+
+    return Math.max(0, rect.y + scroller.clientTop);
 };
 
 /** The bottom edge of what a scroller shows, in a viewport's own coordinates, never below the viewport's. */
@@ -132,6 +132,55 @@ const observePassageProgress = (
  * that leaves them alone wakes nothing downstream.
  */
 export namespace ElementObserverUtils {
+    /**
+     * The size of an element that has not been measured yet: zero by zero.
+     *
+     * One shared object, so a framework's observer can start from it and compare against it without making a new
+     * one each time.
+     */
+    export const NO_SIZE: Size2d = { width: 0, height: 0 };
+
+    /**
+     * The result of a size list observer that is watching nothing, shared so a disabled observer does not hand out a
+     * new array each time it reports.
+     */
+    export const EMPTY_SIZES: Size2d[] = [];
+
+    /**
+     * The result of a rect list observer that has measured nothing, shared so it does not hand out a new array each
+     * time it reports.
+     */
+    export const EMPTY_RECTS: (Rect | undefined)[] = [];
+
+    /**
+     * Whether two size lists match entry for entry.
+     *
+     * The equality the size list observers report through, so a re-measurement that changes no number wakes nothing.
+     *
+     * @returns `true` when both lists have the same length and every pair of sizes is the same.
+     */
+    export const isSameSizeList = (a: Size2d[], b: Size2d[]) =>
+        a.length === b.length && a.every((size, index) => Size2d.isSame(size, b[index]));
+
+    /**
+     * Whether two optional rects match.
+     *
+     * @returns `true` when both are missing, or both are present and the same rect.
+     */
+    export const isSameRect = (a: Rect | undefined, b: Rect | undefined) =>
+        a === undefined ? b === undefined : b !== undefined && Rect.isSame(a, b);
+
+    /**
+     * Whether two rect lists match entry for entry.
+     *
+     * The equality the rect list observers report through. A list keeps an entry in place for an element that is
+     * missing, so an entry missing on both sides counts as a match.
+     *
+     * @returns `true` when both lists have the same length and every pair matches by {@link isSameRect}.
+     */
+    export const isSameRectList = (a: (Rect | undefined)[], b: (Rect | undefined)[]) =>
+        a.length === b.length && a.every((rect, index) => isSameRect(rect, b[index]));
+
     /**
      * Watches an element's size, borders and padding included.
      *
@@ -349,22 +398,24 @@ export namespace ElementObserverUtils {
     /**
      * Follows which of a list of elements the reader has scrolled to, in viewport coordinates.
      *
-     * A line is drawn across the viewport at `offsetRatio` of its height from the top, and the current element is
-     * the last one whose top has passed it, by {@link ElementObserverUtils.computeCurrentIndex}. It is re-read on
-     * every scroll, anywhere in the document, and on every resize, which is what a table of contents marking
-     * the section in view needs.
+     * A line is drawn across the box the elements scroll in, at `offsetRatio` of the height it shows from its top, and
+     * the current element is the last one whose top has passed it, by {@link ElementObserverUtils.computeCurrentIndex}.
+     * The box is the nearest ancestor of the last element that scrolls, or the document's own scroller when none does,
+     * and only the part of it inside the viewport counts — so an article scrolling in a panel of its own is followed
+     * by where its headings sit in that panel, wherever the panel is on the page. It is re-read on every scroll,
+     * anywhere in the document, and on every resize, which is what a table of contents marking the section in view
+     * needs.
      *
-     * Near the end of a page whose last sections are shorter than the stretch below the line, their tops would never
-     * reach it, so once the box the elements scroll in is scrolled all the way down — {@link computeIsScrolledToEnd} —
-     * the line drops to the bottom of what that box shows, and the last element on screen is current. The box is the
-     * nearest ancestor of the last element that scrolls, or the document's own scroller when none does.
+     * Near the end of a box whose last sections are shorter than the stretch below the line, their tops would never
+     * reach it, so once the box is scrolled all the way down — {@link computeIsScrolledToEnd} — the line drops to the
+     * bottom of what it shows, and the last element on screen is current.
      *
      * @param elements The elements to follow, in reading order. A missing entry is kept in place and never current.
      * @param viewportContext The viewport they are drawn in.
      * @param onIndex Called with the current element's index, or `undefined` while none has passed the line —
      * straight away, and whenever it changes.
-     * @param opts.offsetRatio Where the line sits, as a share of the viewport's height from its top. Defaults to
-     * `CURRENT_INDEX_OBSERVER_DEFAULTS.offsetRatio`.
+     * @param opts.offsetRatio Where the line sits, as a share of the scrolling box's visible height from its top.
+     * Defaults to `CURRENT_INDEX_OBSERVER_DEFAULTS.offsetRatio`.
      * @returns The function that stops following.
      */
     export const observeCurrentIndex = (
@@ -378,11 +429,13 @@ export namespace ElementObserverUtils {
 
         return followScroll(() => {
             const scroller = findScroller(elements);
-            const offsetLine = viewportContext.getSize().height * offsetRatio;
+            const visibleTop = scroller ? measureVisibleTop(scroller, viewportContext) : 0;
+            const visibleBottom = scroller
+                ? measureVisibleBottom(scroller, viewportContext)
+                : viewportContext.getSize().height;
+            const offsetLine = visibleTop + (visibleBottom - visibleTop) * offsetRatio;
             const line =
-                scroller && computeIsScrolledToEnd(scroller)
-                    ? Math.max(offsetLine, measureVisibleBottom(scroller, viewportContext))
-                    : offsetLine;
+                scroller && computeIsScrolledToEnd(scroller) ? Math.max(offsetLine, visibleBottom) : offsetLine;
             const tops = elements.map((element) =>
                 element ? ViewportUtils.getAdjustedBoundingClientRect(element, viewportContext).y : undefined,
             );

@@ -5,8 +5,8 @@ import { Table } from "@thewaver/ss-components-vue";
 import * as styles from "@thewaver/ss-playground/App/Pages/TablePage/TablePage.css";
 
 import PageTableResizer from "../../../StyledComponents/TableContent/PageTableResizer.vue";
-import { PARTS, createPartColumns } from "../TablePage.const";
 import type { TableExampleProps } from "../TablePage.types";
+import { PARTS, createPartColumns } from "../TablePageVue.const";
 
 type Props = TableExampleProps & {
     "widths": Record<string, number>;

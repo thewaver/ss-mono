@@ -1,3 +1,3 @@
-import type { TableHeaderContentProps } from "../../StyledComponents/TableContent/TableContent.types";
+import type { TableHeaderContentProps } from "../../StyledComponents/TableContent/TableContentReact.types";
 
 export type PageTableHeaderProps = TableHeaderContentProps;

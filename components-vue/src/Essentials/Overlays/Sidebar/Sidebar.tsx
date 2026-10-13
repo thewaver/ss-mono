@@ -8,6 +8,7 @@ import {
     SidebarStyles,
     SidebarUtils,
 } from "@thewaver/ss-components";
+import { SidebarConst } from "@thewaver/ss-components/internal";
 
 import { DismisserVueUtils } from "../../../Abstracts/Dismisser/DismisserVue.utils";
 import { ElementFaderVueUtils } from "../../../Abstracts/ElementFader/ElementFaderVue.utils";
@@ -17,8 +18,6 @@ import { watchAfterRender } from "../../../Utils/effectUtils";
 import { callSlot, declareProps, useTwoWay } from "../../../Utils/propUtils";
 import type { SlotsContext } from "../../../Utils/typeUtils";
 import type { SidebarProps, SidebarSlots } from "./Sidebar.types";
-
-const NO_SKIP_WINDOW_MS = 0;
 
 export const Sidebar = defineComponent(
     (props: SidebarProps, { slots }: SlotsContext<SidebarSlots>) => {
@@ -63,7 +62,7 @@ export const Sidebar = defineComponent(
                 delayGroup,
                 panelRef: undefined,
                 hoverShowDelayMs: () => props.hoverShowDelayMs ?? SIDEBAR_DEFAULTS.hoverShowDelayMs,
-                skipDelayWindowMs: NO_SKIP_WINDOW_MS,
+                skipDelayWindowMs: SidebarConst.NO_SKIP_WINDOW_MS,
                 isHeld: () => SidebarUtils.getHasOpenPopupOutside(rootRef.value),
                 isTouchIgnored: true,
             },

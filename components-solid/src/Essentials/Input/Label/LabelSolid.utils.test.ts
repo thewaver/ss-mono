@@ -1,7 +1,9 @@
 import { createRoot } from "solid-js";
 import { afterEach, describe, expect, it, vi } from "vitest";
 
-import { LABEL_CONTEXT, LabelContextProvider } from "./Label.context";
+import { LABEL_CONTEXT } from "@thewaver/ss-components";
+
+import { LabelContextProvider } from "./Label.context";
 import { LabelSolidUtils } from "./LabelSolid.utils";
 
 const resolveOutsideLabel = (getAriaLabel?: () => string) => {

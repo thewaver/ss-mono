@@ -3,6 +3,12 @@ import { shallowRef } from "vue";
 
 import type { DateValue, DateValueCalendarId } from "@thewaver/ss-components-vue";
 import { DATE_INPUT_DEFAULTS, DateValueUtils } from "@thewaver/ss-components-vue";
+import {
+    CALENDAR_FIELD_WIDTH,
+    CALENDAR_IDS,
+    EXAMPLES_ROOT,
+    EXAMPLE_NAMES,
+} from "@thewaver/ss-playground/App/Pages/DateInputPage/DateInputPage.const";
 import { CAESAR, TODAY } from "@thewaver/ss-playground/App/Pages/DatePickerPage/DatePickerPage.const";
 
 import type { ExampleDefs } from "../../PageComponents/Examples/Examples.types";
@@ -11,10 +17,6 @@ import PageSelectField from "../../PageComponents/Field/PageSelectField.vue";
 import PageProp from "../../PageComponents/Prop/Prop.vue";
 import PagePropsPanel from "../../PageComponents/PropsPanel/PagePropsPanel.vue";
 import TypedExample from "./Examples/Typed.vue";
-
-const CALENDAR_FIELD_WIDTH = 180;
-const CALENDAR_IDS = DateValueUtils.getCalendarIds();
-const EXAMPLES_ROOT = "/src/App/Pages/DateInputPage/Examples";
 
 const describe = (value: DateValue | undefined) => (value ? DateValueUtils.toIso(value) : "none");
 
@@ -27,20 +29,20 @@ const era = shallowRef<DateValue | undefined>(CAESAR);
 const examples: ExampleDefs[] = [
     {
         key: "typed",
-        name: "Typed only",
+        name: EXAMPLE_NAMES.typed,
         readout: () => `value: ${describe(typed.value)} — a half-typed or impossible date leaves this value alone`,
         path: `${EXAMPLES_ROOT}/Typed.vue`,
     },
     {
         key: "locale",
-        name: "Day first",
+        name: EXAMPLE_NAMES.locale,
         readout: () =>
             `value: ${describe(locale.value)} — dd/mm/yyyy, and the separators are the mask's rather than yours to type`,
         path: `${EXAMPLES_ROOT}/Typed.vue`,
     },
     {
         key: "era",
-        name: "Before the common era",
+        name: EXAMPLE_NAMES.era,
         readout: () =>
             `value: ${describe(era.value)} — the era is a control in the leading slot, offering whatever the calendar reports`,
         path: `${EXAMPLES_ROOT}/Typed.vue`,

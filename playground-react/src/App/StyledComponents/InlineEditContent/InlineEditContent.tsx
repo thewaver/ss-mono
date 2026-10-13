@@ -3,7 +3,7 @@ import type { PropsWithChildren } from "react";
 import * as styles from "@thewaver/ss-playground/App/StyledComponents/InlineEditContent/InlineEditContent.css";
 
 import { useLayerClass } from "../Layer/Layer.context";
-import type { InlineEditContentProps } from "./InlineEditContent.types";
+import type { InlineEditContentProps } from "./InlineEditContentReact.types";
 
 export const PageInlineEditContent = (props: PropsWithChildren<InlineEditContentProps>) => {
     const layerClass = useLayerClass();

@@ -14,6 +14,7 @@ import {
     TileBoardStyles,
     TileBoardUtils,
 } from "@thewaver/ss-components";
+import { TileBoardConst } from "@thewaver/ss-components/internal";
 import { Index2d } from "@thewaver/ss-utils";
 
 import { InteractionWrapper } from "../../Primitives/InteractionWrapper/InteractionWrapper";
@@ -26,8 +27,6 @@ import { callSlot, declareProps } from "../../Utils/propUtils";
 import { toElement } from "../../Utils/refUtils";
 import type { SlotsContext } from "../../Utils/typeUtils";
 import type { TileBoardProps, TileBoardSlots, TileBoardTileProps } from "./TileBoard.types";
-
-const FIRST_ARIA_INDEX = 1;
 
 const TileBoardTile = defineComponent(
     (props: TileBoardTileProps, { slots }: SlotsContext<InteractionControlSlots<TileBoardRenderProps>>) => {
@@ -217,7 +216,7 @@ export const TileBoard = defineComponent(
                                         id={`${boardId}-tile-${key}`}
                                         flags={flags}
                                         ariaLabel={props.computeTileAriaLabel?.(tile)}
-                                        colIndex={col + FIRST_ARIA_INDEX}
+                                        colIndex={col + TileBoardConst.FIRST_ARIA_INDEX}
                                         size={geometry.size}
                                         clipPath={clipPath}
                                         onActivate={() => activateTile(tile)}
@@ -270,7 +269,7 @@ export const TileBoard = defineComponent(
                                     key={rowIndex}
                                     class={TileBoardStyles.tileBoardRow}
                                     role="row"
-                                    aria-rowindex={rowIndex + FIRST_ARIA_INDEX}
+                                    aria-rowindex={rowIndex + TileBoardConst.FIRST_ARIA_INDEX}
                                     style={{ left: `${origin.x}px`, top: `${origin.y}px` }}
                                 >
                                     {Array.from(

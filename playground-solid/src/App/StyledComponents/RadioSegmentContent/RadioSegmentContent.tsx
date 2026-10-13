@@ -4,7 +4,7 @@ import { access } from "@thewaver/ss-components-solid";
 import * as styles from "@thewaver/ss-playground/App/StyledComponents/RadioSegmentContent/RadioSegmentContent.css";
 
 import { useLayerClass } from "../Layer/Layer.context";
-import type { RadioSegmentContentProps, RadioSegmentFloaterProps } from "./RadioSegmentContent.types";
+import type { RadioSegmentContentProps, RadioSegmentFloaterProps } from "./RadioSegmentContentSolid.types";
 
 export const PageRadioSegmentGroup = (props: ParentProps) => {
     const getLayerClass = useLayerClass();

@@ -8,9 +8,9 @@ import type { StepValue } from "@thewaver/ss-playground/App/Pages/StepperPage/St
 
 import PageStepConnector from "../../../StyledComponents/StepContent/PageStepConnector.vue";
 import PageStepContent from "../../../StyledComponents/StepContent/PageStepContent.vue";
-import type { PageStepState } from "../../../StyledComponents/StepContent/StepContent.types";
+import type { PageStepState } from "../../../StyledComponents/StepContent/StepContentVue.types";
 import PageTooltipContent from "../../../StyledComponents/TooltipContent/TooltipContent.vue";
-import type { StepperExampleProps } from "../StepperPage.types";
+import type { StepperExampleProps } from "../StepperPageVue.types";
 
 const FAILURE_REASON = "The card was declined, so this step has to be repeated before the order can be reviewed.";
 const LOCKED_REASON = "Review opens once payment succeeds, so there is nothing to look at here yet.";

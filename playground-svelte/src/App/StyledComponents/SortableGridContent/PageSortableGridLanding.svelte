@@ -3,7 +3,7 @@
 
     import { getLayerClass } from "../Layer/Layer.context";
     import { getPoints, getViewBox } from "./PageSortableGridItemContent.svelte";
-    import type { SortableGridLandingProps } from "./SortableGridContent.types";
+    import type { SortableGridLandingProps } from "./SortableGridContentSvelte.types";
 
     let props: SortableGridLandingProps = $props();
 

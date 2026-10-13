@@ -25,6 +25,7 @@ import {
     TrailUtils,
     PaintedTextStyles as styles,
 } from "@thewaver/ss-components";
+import { PaintedTextConst } from "@thewaver/ss-components/internal";
 import { Size2d } from "@thewaver/ss-utils";
 
 import { InteractionTrackerSolidUtils } from "../../../Abstracts/InteractionTracker/InteractionTrackerSolid.utils";
@@ -36,10 +37,6 @@ import { access } from "../../../Utils/propUtils";
 import { accessStore } from "../../../Utils/storeUtils";
 import type { PaintedTextProps } from "./PaintedTextSolid.types";
 
-const NO_OFFSET = 0;
-const NO_LENGTH = 0;
-const NO_PROGRESS = 0;
-const MASK_PADDING_SIDES = 2;
 const EMPTY_STYLE = {};
 
 type LayerAttributes = Record<string, unknown>;
@@ -50,7 +47,10 @@ export const PaintedText = (props: ParentProps<PaintedTextProps>) => {
 
     const driver = useLetterDriverContext();
 
-    const [getProgress, setProgress] = SignalMirrorSolidUtils.createOptional(() => props.progress, NO_PROGRESS);
+    const [getProgress, setProgress] = SignalMirrorSolidUtils.createOptional(
+        () => props.progress,
+        PaintedTextConst.NO_PROGRESS,
+    );
     const [getIsPlaying] = SignalMirrorSolidUtils.createOptional(() => props.playback, PAINTED_TEXT_DEFAULTS.playback);
 
     const getIsPageHidden = InteractionTrackerSolidUtils.trackPageHidden();
@@ -109,7 +109,7 @@ export const PaintedText = (props: ParentProps<PaintedTextProps>) => {
     const getStartOffset = () => getProgress() * getPathLength();
 
     const getIsSliding = createMemo(
-        () => getIsOnPath() && getIsPlaying() && !getIsPageHidden() && getPathLength() > NO_LENGTH,
+        () => getIsOnPath() && getIsPlaying() && !getIsPageHidden() && getPathLength() > PaintedTextConst.NO_LENGTH,
     );
 
     const getSize = createMemo(() => ({ width: getWidth(), height: getHeight() }), undefined, {
@@ -125,7 +125,7 @@ export const PaintedText = (props: ParentProps<PaintedTextProps>) => {
 
         getRegistryEntries();
 
-        return driver && root ? driver.registry.getOffset(root) : NO_OFFSET;
+        return driver && root ? driver.registry.getOffset(root) : PaintedTextConst.NO_OFFSET;
     };
 
     const getIsPerLetter = () => !!driver?.getIsAnimating();
@@ -428,15 +428,15 @@ export const PaintedText = (props: ParentProps<PaintedTextProps>) => {
                                 maskUnits="userSpaceOnUse"
                                 x={getOrigin().x - getMaskPadding()}
                                 y={getOrigin().y - getMaskPadding()}
-                                width={getWidth() + getMaskPadding() * MASK_PADDING_SIDES}
-                                height={getHeight() + getMaskPadding() * MASK_PADDING_SIDES}
+                                width={getWidth() + getMaskPadding() * PaintedTextConst.MASK_PADDING_SIDES}
+                                height={getHeight() + getMaskPadding() * PaintedTextConst.MASK_PADDING_SIDES}
                             >
                                 {getMaskKind() === "outside" && (
                                     <rect
                                         x={getOrigin().x - getMaskPadding()}
                                         y={getOrigin().y - getMaskPadding()}
-                                        width={getWidth() + getMaskPadding() * MASK_PADDING_SIDES}
-                                        height={getHeight() + getMaskPadding() * MASK_PADDING_SIDES}
+                                        width={getWidth() + getMaskPadding() * PaintedTextConst.MASK_PADDING_SIDES}
+                                        height={getHeight() + getMaskPadding() * PaintedTextConst.MASK_PADDING_SIDES}
                                         fill="white"
                                     />
                                 )}

@@ -4,7 +4,7 @@
     import * as styles from "@thewaver/ss-playground/App/StyledComponents/SatelliteContent/SatelliteContent.css";
 
     import { getLayerClass } from "../Layer/Layer.context";
-    import type { PageSatelliteSubjectProps } from "./SatelliteContent.types";
+    import type { PageSatelliteSubjectProps } from "./SatelliteContentSvelte.types";
 
     let props: PageSatelliteSubjectProps & { children?: Snippet } = $props();
 

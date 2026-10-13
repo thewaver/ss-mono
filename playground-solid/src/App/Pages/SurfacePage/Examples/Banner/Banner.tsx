@@ -1,13 +1,13 @@
 import { createUniqueId } from "solid-js";
 
-import { SVGDefsSamples, Surface } from "@thewaver/ss-components-solid";
+import { SVGDefsSampleConfigs, Surface } from "@thewaver/ss-components-solid";
 import type { SurfaceProps } from "@thewaver/ss-components-solid";
 import * as styles from "@thewaver/ss-playground/App/Pages/SurfacePage/Examples/Banner/Banner.css";
 import knight from "@thewaver/ss-playground/App/knight.webp";
 import { CSSUtils, type Size2d } from "@thewaver/ss-utils";
 
 const computeDefs = (getSize: () => Size2d, getRef: () => HTMLElement | undefined, id: string) =>
-    SVGDefsSamples.Gradient.Timed.toConfig({ family: "flow_diag_2", defs: { banded: true } }).computeSVGDefs(
+    SVGDefsSampleConfigs.Gradient.Timed.toConfig({ family: "flow_diag_2", defs: { banded: true } }).computeSVGDefs(
         id,
         undefined,
         getRef,

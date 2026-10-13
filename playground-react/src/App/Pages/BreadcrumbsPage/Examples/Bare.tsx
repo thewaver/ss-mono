@@ -2,7 +2,7 @@ import { Breadcrumbs } from "@thewaver/ss-components-react";
 import { BREADCRUMBS_GAP, labelOf } from "@thewaver/ss-playground/App/Pages/BreadcrumbsPage/BreadcrumbsPage.const";
 
 import { PageBreadcrumbContent } from "../../../StyledComponents/BreadcrumbContent/BreadcrumbContent";
-import type { BreadcrumbsExampleProps } from "../BreadcrumbsPage.types";
+import type { BreadcrumbsExampleProps } from "../BreadcrumbsPageReact.types";
 
 type Props = BreadcrumbsExampleProps;
 

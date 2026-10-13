@@ -4,7 +4,7 @@ import { computed } from "vue";
 import { Formation, PlacementLayoutUtils, ProximityEffectUtils } from "@thewaver/ss-components-vue";
 
 import PageFormationItem from "../../../StyledComponents/FormationContent/FormationContent.vue";
-import type { FormationExampleProps } from "../FormationPage.types";
+import type { FormationExampleProps } from "../FormationPageVue.types";
 
 type Props = FormationExampleProps;
 

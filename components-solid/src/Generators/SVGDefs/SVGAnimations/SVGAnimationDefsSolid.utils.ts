@@ -2,8 +2,7 @@ import type { JSX } from "solid-js";
 import { createMemo, createSignal, onCleanup } from "solid-js";
 
 import { type SVGAnimationDefs, SVGAnimationDefsUtils } from "@thewaver/ss-components";
-
-const FIRST_PATTERN_INDEX = 0;
+import { SVGAnimationDefsConst } from "@thewaver/ss-components/internal";
 
 /** The Solid side of {@link SVGAnimationDefsUtils}: an animation's schedule as attributes to spread. */
 export namespace SVGAnimationDefsSolidUtils {
@@ -47,7 +46,9 @@ export namespace SVGAnimationDefsSolidUtils {
             },
             fill: "freeze",
             get begin() {
-                return SVGAnimationDefsUtils.getIsPageClocked(getPatterns()[FIRST_PATTERN_INDEX]) ? "0s" : "indefinite";
+                return SVGAnimationDefsUtils.getIsPageClocked(getPatterns()[SVGAnimationDefsConst.FIRST_PATTERN_INDEX])
+                    ? "0s"
+                    : "indefinite";
             },
             ref: (el: SVGAnimateElement) => {
                 onCleanup(scheduler.attach(el));

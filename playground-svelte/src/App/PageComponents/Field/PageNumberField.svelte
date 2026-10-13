@@ -9,10 +9,9 @@
         computePageTextFieldTextStyle,
     } from "../../StyledComponents/TextFieldContent/TextFieldContent.svelte";
     import PageNumberInputStepper from "../NumberInputStepper/NumberInputStepper.svelte";
-    import { useFieldReset } from "./Field.context";
-    import type { PageNumberFieldProps } from "./Field.types";
-
-    const DEFAULT_NUMBER_FIELD_WIDTH = 100;
+    import { useFieldReset } from "./FieldSvelte.context";
+    import type { PageNumberFieldProps } from "./FieldSvelte.types";
+    import { DEFAULT_NUMBER_FIELD_WIDTH } from "@thewaver/ss-playground/App/PageComponents/Field/Field.const";
 
     let props: PageNumberFieldProps = $props();
 

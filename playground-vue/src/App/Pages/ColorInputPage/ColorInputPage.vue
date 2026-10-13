@@ -1,7 +1,11 @@
 <script setup lang="ts">
 import { shallowRef } from "vue";
 
-import { PALETTE } from "@thewaver/ss-playground/App/Pages/ColorInputPage/ColorInputPage.const";
+import {
+    EXAMPLES_ROOT,
+    EXAMPLE_NAMES,
+    PALETTE,
+} from "@thewaver/ss-playground/App/Pages/ColorInputPage/ColorInputPage.const";
 
 import type { ExampleDefs } from "../../PageComponents/Examples/Examples.types";
 import PageExamples from "../../PageComponents/Examples/PageExamples.vue";
@@ -12,8 +16,6 @@ import ErroredExample from "./Examples/Errored.vue";
 import LabeledExample from "./Examples/Labeled.vue";
 import ReachableExample from "./Examples/Reachable.vue";
 import SnappingExample from "./Examples/Snapping.vue";
-
-const EXAMPLES_ROOT = "/src/App/Pages/ColorInputPage/Examples";
 
 const defaultValue = shallowRef("#3366ff");
 const compactValue = shallowRef("#3366ff");
@@ -26,43 +28,43 @@ const labeledValue = shallowRef("#ff0055");
 const examples: ExampleDefs[] = [
     {
         key: "default",
-        name: "Default",
+        name: EXAMPLE_NAMES.default,
         readout: () => `value: ${defaultValue.value} — the swatch is the painter's, not the browser's`,
         path: `${EXAMPLES_ROOT}/Default.vue`,
     },
     {
         key: "compact",
-        name: "Compact",
+        name: EXAMPLE_NAMES.compact,
         readout: () => `value: ${compactValue.value} — swatch only, no hex readout`,
         path: `${EXAMPLES_ROOT}/Compact.vue`,
     },
     {
         key: "snapping",
-        name: "Snapping setter",
+        name: EXAMPLE_NAMES.snapping,
         readout: () => `value: ${snappingValue.value} — snapped to the nearest of four`,
         path: `${EXAMPLES_ROOT}/Snapping.vue`,
     },
     {
         key: "disabled",
-        name: "Disabled",
+        name: EXAMPLE_NAMES.disabled,
         readout: () => `value: ${disabledValue.value}`,
         path: `${EXAMPLES_ROOT}/Disabled.vue`,
     },
     {
         key: "reachable",
-        name: "Disabled + reachable",
+        name: EXAMPLE_NAMES.reachable,
         readout: () => `value: ${reachableValue.value}`,
         path: `${EXAMPLES_ROOT}/Reachable.vue`,
     },
     {
         key: "errored",
-        name: "Error",
+        name: EXAMPLE_NAMES.errored,
         readout: () => `value: ${erroredValue.value} — black is not a brand color`,
         path: `${EXAMPLES_ROOT}/Errored.vue`,
     },
     {
         key: "label",
-        name: "In a Label",
+        name: EXAMPLE_NAMES.label,
         readout: () => `value: ${labeledValue.value} — the caption opens the picker`,
         path: `${EXAMPLES_ROOT}/Labeled.vue`,
     },

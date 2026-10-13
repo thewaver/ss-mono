@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import PageMenuItemContent from "../../StyledComponents/MenuItemContent/MenuItemContent.vue";
-import type { ToolbarOverflowItemProps } from "./ToolbarPage.types";
+import type { ToolbarOverflowItemProps } from "./ToolbarPageVue.types";
 
 defineProps<ToolbarOverflowItemProps>();
 </script>

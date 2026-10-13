@@ -4,7 +4,7 @@
     import { EasingUtils, MathUtils } from "@thewaver/ss-utils";
 
     import PageControlButtonContent from "../../../StyledComponents/ControlButtonContent/ControlButtonContent.svelte";
-    import type { CornersExampleProps } from "../CornersPage.types";
+    import type { CornersExampleProps } from "../CornersPageSvelte.types";
 
     type Props = CornersExampleProps;
 

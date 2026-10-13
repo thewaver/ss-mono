@@ -2,6 +2,8 @@
 import { shallowRef } from "vue";
 
 import {
+    EXAMPLES_ROOT,
+    EXAMPLE_NAMES,
     LONG_TEXT,
     MAX_ROWS,
     MIN_ROWS,
@@ -19,8 +21,6 @@ import LabeledExample from "./Examples/Labeled.vue";
 import ReachableExample from "./Examples/Reachable.vue";
 import ReadOnlyExample from "./Examples/ReadOnly.vue";
 
-const EXAMPLES_ROOT = "/src/App/Pages/TextAreaPage/Examples";
-
 const fixedValue = shallowRef("");
 const growingValue = shallowRef("");
 const cappedValue = shallowRef(LONG_TEXT);
@@ -33,50 +33,50 @@ const labeledValue = shallowRef("");
 const examples: ExampleDefs[] = [
     {
         key: "fixedHeight",
-        name: "Fixed height",
+        name: EXAMPLE_NAMES.fixedHeight,
         readout: () => `length: ${fixedValue.value.length} — the painter sizes the box and it stays put`,
         path: `${EXAMPLES_ROOT}/FixedHeight.vue`,
     },
     {
         key: "autoSizing",
-        name: "Auto-sizing",
+        name: EXAMPLE_NAMES.autoSizing,
         readout: () =>
             `length: ${growingValue.value.length} — grows from ${MIN_ROWS} rows with no ceiling, so it never scrolls`,
         path: `${EXAMPLES_ROOT}/AutoSizing.vue`,
     },
     {
         key: "autoSizingCapped",
-        name: "Auto-sizing, capped",
+        name: EXAMPLE_NAMES.autoSizingCapped,
         readout: () => `length: ${cappedValue.value.length} — stops growing at ${MAX_ROWS} rows and scrolls`,
         path: `${EXAMPLES_ROOT}/AutoSizingCapped.vue`,
     },
     {
         key: "readOnly",
-        name: "Read-only",
+        name: EXAMPLE_NAMES.readOnly,
         readout: () => `length: ${readOnlyValue.value.length} — selectable and copyable, never editable`,
         path: `${EXAMPLES_ROOT}/ReadOnly.vue`,
     },
     {
         key: "disabled",
-        name: "Disabled",
+        name: EXAMPLE_NAMES.disabled,
         readout: () => `length: ${disabledValue.value.length}`,
         path: `${EXAMPLES_ROOT}/Disabled.vue`,
     },
     {
         key: "reachable",
-        name: "Disabled + reachable",
+        name: EXAMPLE_NAMES.reachable,
         readout: () => `length: ${reachableValue.value.length}`,
         path: `${EXAMPLES_ROOT}/Reachable.vue`,
     },
     {
         key: "errored",
-        name: "Error",
+        name: EXAMPLE_NAMES.errored,
         readout: () => `length: ${erroredValue.value.length} — fewer than ${REVIEW_LIMIT} characters is an error`,
         path: `${EXAMPLES_ROOT}/Errored.vue`,
     },
     {
         key: "label",
-        name: "In a Label",
+        name: EXAMPLE_NAMES.label,
         readout: () => `length: ${labeledValue.value.length}`,
         path: `${EXAMPLES_ROOT}/Labeled.vue`,
     },

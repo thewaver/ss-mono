@@ -11,16 +11,7 @@ import { useStore } from "../../Utils/storeUtils";
 import type { SlotsContext } from "../../Utils/typeUtils";
 import type { WraparoundProps, WraparoundSlots } from "./Wraparound.types";
 
-const KEY_SEPARATOR = ",";
 const ORIGINAL_KEY = "original";
-
-const toKey = (tile: WraparoundTile) => `${tile.column}${KEY_SEPARATOR}${tile.row}`;
-
-const fromKey = (key: string): WraparoundTile => {
-    const [column, row] = key.split(KEY_SEPARATOR).map(Number);
-
-    return { column, row };
-};
 
 export const Wraparound = defineComponent(
     (props: WraparoundProps, { slots }: SlotsContext<WraparoundSlots>) => {
@@ -73,12 +64,12 @@ export const Wraparound = defineComponent(
                 tileSize.value,
                 viewportSize.value,
                 props.maxCopies ?? WRAPAROUND_DEFAULTS.maxCopies,
-            ).map(toKey),
+            ).map(WraparoundUtils.toTileKey),
         );
 
         return () => {
             const size = tileSize.value;
-            const originalKey = toKey(originalTile.value);
+            const originalKey = WraparoundUtils.toTileKey(originalTile.value);
 
             const toTileTransform = (tile: WraparoundTile) =>
                 `translate(${tile.column * size.width}px, ${tile.row * size.height}px)`;
@@ -113,7 +104,7 @@ export const Wraparound = defineComponent(
                                 key={key}
                                 class={WraparoundStyles.wraparoundTile}
                                 style={{
-                                    transform: toTileTransform(fromKey(key)),
+                                    transform: toTileTransform(WraparoundUtils.fromTileKey(key)),
                                     visibility: key === originalKey ? "hidden" : undefined,
                                 }}
                                 aria-hidden="true"

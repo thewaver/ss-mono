@@ -4,8 +4,8 @@ import { useModel } from "vue";
 import { Table } from "@thewaver/ss-components-vue";
 import * as styles from "@thewaver/ss-playground/App/Pages/TablePage/TablePage.css";
 
-import { PARTS, createPartColumns } from "../TablePage.const";
 import type { TableExampleProps } from "../TablePage.types";
+import { PARTS, createPartColumns } from "../TablePageVue.const";
 
 const props = defineProps<TableExampleProps>();
 

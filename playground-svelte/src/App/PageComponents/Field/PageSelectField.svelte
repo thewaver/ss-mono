@@ -8,11 +8,9 @@
     import PagePopoverSurface from "../../StyledComponents/PopoverSurface/PopoverSurface.svelte";
     import PageSelectContent from "../../StyledComponents/SelectContent/SelectContent.svelte";
     import PageSelectOptionContent from "../../StyledComponents/SelectOptionContent/SelectOptionContent.svelte";
-    import { useFieldReset } from "./Field.context";
-    import type { PageSelectFieldProps } from "./Field.types";
-
-    const DEFAULT_SELECT_FIELD_WIDTH = 150;
-    const EMPTY_TEXT = "";
+    import { useFieldReset } from "./FieldSvelte.context";
+    import type { PageSelectFieldProps } from "./FieldSvelte.types";
+    import { DEFAULT_SELECT_FIELD_WIDTH, EMPTY_TEXT } from "@thewaver/ss-playground/App/PageComponents/Field/Field.const";
 
     let props: PageSelectFieldProps<T> = $props();
 

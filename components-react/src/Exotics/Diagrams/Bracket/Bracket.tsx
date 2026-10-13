@@ -21,12 +21,12 @@ import {
     NavigatorUtils,
     TreemapUtils,
 } from "@thewaver/ss-components";
+import { BracketConst } from "@thewaver/ss-components/internal";
 
 import { SignalMirrorReactUtils } from "../../../Abstracts/SignalMirror/SignalMirrorReact.utils";
 import { useStore } from "../../../Utils/storeUtils";
 import type { BracketProps } from "./Bracket.types";
 
-const NOTHING = 0;
 const NEXT = 1;
 
 type BracketGlide = {
@@ -65,7 +65,9 @@ export const Bracket = <T,>(props: BracketProps<T>) => {
         crossGap: props.crossGap ?? BRACKET_DEFAULTS.crossGap,
         orientation,
         rootSide,
-        headerExtent: props.renderLayerHeader ? (props.layerHeaderSize ?? BRACKET_DEFAULTS.layerHeaderSize) : NOTHING,
+        headerExtent: props.renderLayerHeader
+            ? (props.layerHeaderSize ?? BRACKET_DEFAULTS.layerHeaderSize)
+            : BracketConst.NOTHING,
     });
 
     const focusedId = hasFocus ? lastFocusedId : undefined;
@@ -85,7 +87,7 @@ export const Bracket = <T,>(props: BracketProps<T>) => {
         anchorId,
         isFamilyView,
         from: undefined,
-        generation: NOTHING,
+        generation: BracketConst.NOTHING,
     }));
 
     if (glide.anchorId !== anchorId || glide.isFamilyView !== isFamilyView) {
@@ -126,7 +128,7 @@ export const Bracket = <T,>(props: BracketProps<T>) => {
     useEffect(() => glideClock.stop, [glideClock]);
 
     useLayoutEffect(() => {
-        if (glide.generation === NOTHING) return;
+        if (glide.generation === BracketConst.NOTHING) return;
 
         glideClock.start(transitionDurationMs);
     }, [glide.generation]);

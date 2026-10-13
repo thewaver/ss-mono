@@ -2,7 +2,7 @@
 import * as styles from "@thewaver/ss-playground/App/StyledComponents/TabContent/TabContent.css";
 
 import { useLayerClass } from "../Layer/Layer.context";
-import type { TabDecorationProps } from "./TabContent.types";
+import type { TabDecorationProps } from "./TabContentVue.types";
 
 defineProps<TabDecorationProps>();
 

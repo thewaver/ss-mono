@@ -1,9 +1,8 @@
 <script setup lang="ts">
+import { ROOT_LAYER } from "@thewaver/ss-playground/App/Pages/BracketPage/BracketPage.const";
 import * as styles from "@thewaver/ss-playground/App/Pages/BracketPage/BracketPage.css";
 
 import type { PageBracketNodeProps } from "./BracketPage.types";
-
-const ROOT_LAYER = 0;
 
 defineProps<PageBracketNodeProps>();
 </script>

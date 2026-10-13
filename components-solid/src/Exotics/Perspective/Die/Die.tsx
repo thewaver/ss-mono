@@ -1,12 +1,11 @@
 import { Index, createMemo, createSignal, onMount } from "solid-js";
 
 import { BarrelUtils, DIE_DEFAULTS, DieUtils, DieStyles as styles } from "@thewaver/ss-components";
+import { DieConst } from "@thewaver/ss-components/internal";
 
 import { RollerSolidUtils } from "../../../Abstracts/Roller/RollerSolid.utils";
 import { access } from "../../../Utils/propUtils";
 import type { DieController, DieProps } from "./DieSolid.types";
-
-const HALF = 0.5;
 
 export const Die = (props: DieProps) => {
     const [getRootRef, setRootRef] = createSignal<HTMLElement>();
@@ -17,7 +16,7 @@ export const Die = (props: DieProps) => {
 
     const getReservedSize = createMemo(() => DieUtils.getReservedSize(getSize()));
 
-    const getGeometry = createMemo(() => DieUtils.computeFaceGeometry(getShape(), getSize() * HALF));
+    const getGeometry = createMemo(() => DieUtils.computeFaceGeometry(getShape(), getSize() * DieConst.HALF));
 
     const getIsMovable = createMemo(() => access(props.isMovable) ?? DIE_DEFAULTS.isMovable);
 
@@ -25,7 +24,7 @@ export const Die = (props: DieProps) => {
 
     const roller = RollerSolidUtils.createRoller(getRootRef, () => false, {
         faces: getGeometry,
-        radius: () => getSize() * HALF,
+        radius: () => getSize() * DieConst.HALF,
         rollDurationMs: props.rollDurationMs,
         settleDurationMs: props.settleDurationMs,
         restDurationMs: props.restDurationMs,

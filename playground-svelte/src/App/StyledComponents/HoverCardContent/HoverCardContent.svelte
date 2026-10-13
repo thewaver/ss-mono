@@ -4,7 +4,7 @@
     import * as styles from "@thewaver/ss-playground/App/StyledComponents/HoverCardContent/HoverCardContent.css";
 
     import PageLayer from "../../PageComponents/Layer/Layer.svelte";
-    import type { HoverCardContentProps } from "./HoverCardContent.types";
+    import type { HoverCardContentProps } from "./HoverCardContentSvelte.types";
 
     let props: HoverCardContentProps & { children?: Snippet } = $props();
 </script>

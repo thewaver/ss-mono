@@ -21,14 +21,13 @@ import {
     NavigatorUtils,
     TreemapUtils,
 } from "@thewaver/ss-components";
+import { BracketConst } from "@thewaver/ss-components/internal";
 
 import { callSlot, declareProps, useTwoWay } from "../../../Utils/propUtils";
 import { toElement } from "../../../Utils/refUtils";
 import { useStore } from "../../../Utils/storeUtils";
 import type { SlotsContext } from "../../../Utils/typeUtils";
 import type { BracketProps, BracketSlots } from "./Bracket.types";
-
-const NOTHING = 0;
 
 export const Bracket = defineComponent(
     <T,>(props: BracketProps<T>, { slots }: SlotsContext<BracketSlots<T>>) => {
@@ -65,7 +64,7 @@ export const Bracket = defineComponent(
                 rootSide: getRootSide(),
                 headerExtent: slots.renderLayerHeader
                     ? (props.layerHeaderSize ?? BRACKET_DEFAULTS.layerHeaderSize)
-                    : NOTHING,
+                    : BracketConst.NOTHING,
             });
 
         const focusedId = computed(() => (hasFocus.value ? lastFocusedId.value : undefined));

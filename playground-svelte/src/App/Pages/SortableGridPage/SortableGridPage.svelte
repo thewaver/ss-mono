@@ -9,23 +9,23 @@
     import LootExample from "./Examples/Loot.svelte";
     import PairExample from "./Examples/Pair.svelte";
     import {
-        ARROWS,
-        ARROW_IDS,
-        LOOT,
-        PACK,
-        PACK_COLUMNS,
-        PACK_ROWS,
-        SCATTERED,
-        STASH,
-        STASH_COLUMNS,
-        STASH_ROWS,
-        TURNS,
-        TURNS_COLUMNS,
-        TURNS_ROWS,
-        computeIsWall,
-    } from "./SortableGridPage.const";
-
-    const EXAMPLES_ROOT = "/src/App/Pages/SortableGridPage/Examples";
+    ARROW_IDS,
+    ARROWS,
+    computeIsWall,
+    EXAMPLES_ROOT,
+    LOOT,
+    PACK,
+    PACK_COLUMNS,
+    PACK_ROWS,
+    SCATTERED,
+    STASH,
+    STASH_COLUMNS,
+    STASH_ROWS,
+    TURNS,
+    TURNS_COLUMNS,
+    TURNS_ROWS,
+} from "@thewaver/ss-playground/App/Pages/SortableGridPage/SortableGridPage.const";
+    import { EXAMPLE_NAMES } from "@thewaver/ss-playground/App/Pages/SortableGridPage/SortableGridPage.const";
 
     const filled = (items: SortableGridItem<Gear>[]) =>
         items.reduce((cells, item) => cells + SortableGridUtils.getItemShape(item).cells.length, 0);
@@ -63,7 +63,7 @@
     const examples: ExampleDefs[] = [
         {
             key: "pack",
-            name: "One grid",
+            name: EXAMPLE_NAMES.pack,
             readout: () =>
                 `${room(pack, PACK_COLUMNS, PACK_ROWS)} — the page binds R and Shift with R to the two turn commands, and the wheel to the same pair`,
             component: packExample,
@@ -71,7 +71,7 @@
         },
         {
             key: "turns",
-            name: "An L turns two ways",
+            name: EXAMPLE_NAMES.turns,
             readout: () =>
                 `${spots(turns)} — clockwise puts the hook's arm where the flint is and is refused, counterclockwise fits`,
             component: turnsExample,
@@ -79,7 +79,7 @@
         },
         {
             key: "cells",
-            name: "Painted cell by cell",
+            name: EXAMPLE_NAMES.cells,
             readout: () =>
                 `${room(cellsPack, PACK_COLUMNS, PACK_ROWS)} — the same items, drawn as their own squares instead of one clipped shape`,
             component: cellsExample,
@@ -87,7 +87,7 @@
         },
         {
             key: "pair",
-            name: "Between two grids",
+            name: EXAMPLE_NAMES.pair,
             readout: () =>
                 `pack: ${room(pairPack, PACK_COLUMNS, PACK_ROWS)} | stash: ${room(stash, STASH_COLUMNS, STASH_ROWS)}`,
             span: 2,
@@ -96,7 +96,7 @@
         },
         {
             key: "picky",
-            name: "A grid that refuses most gear",
+            name: EXAMPLE_NAMES.picky,
             readout: () => `quiver: ${spots(quiver)} — the quiver takes arrows and nothing else`,
             span: 2,
             component: pickyExample,
@@ -104,7 +104,7 @@
         },
         {
             key: "locked",
-            name: "A grid that takes nothing",
+            name: EXAMPLE_NAMES.locked,
             readout: () =>
                 `stash: ${spots(lockedStash)} — it can be rearranged from inside but accepts nothing from outside`,
             span: 2,
@@ -113,7 +113,7 @@
         },
         {
             key: "loot",
-            name: "From a list into a grid",
+            name: EXAMPLE_NAMES.loot,
             readout: () =>
                 `ground: ${
                     loot.map((item) => item.value.name).join(", ") || "empty"
@@ -124,21 +124,21 @@
         },
         {
             key: "walls",
-            name: "Walls, and a tidy-up",
+            name: EXAMPLE_NAMES.walls,
             readout: () => `${spots(walled)} — nothing lands on a hatched cell, and Tidy up pulls everything upward`,
             component: wallsExample,
             path: `${EXAMPLES_ROOT}/Inventory.svelte`,
         },
         {
             key: "dashboard",
-            name: "Packed after every move",
+            name: EXAMPLE_NAMES.dashboard,
             readout: () => `${spots(dashboard)} — each drop is followed by compact(), so no hole stays open`,
             component: dashboardExample,
             path: `${EXAMPLES_ROOT}/Inventory.svelte`,
         },
         {
             key: "disabled",
-            name: "Disabled",
+            name: EXAMPLE_NAMES.disabled,
             readout: () => `${spots(disabled)} — nothing moves, by pointer or by key`,
             component: disabledExample,
             path: `${EXAMPLES_ROOT}/Inventory.svelte`,

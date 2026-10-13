@@ -21,6 +21,7 @@ import {
     FloaterStyles as floaterStyles,
     ListboxStyles as styles,
 } from "@thewaver/ss-components";
+import { ListboxConst } from "@thewaver/ss-components/internal";
 
 import { ElementObserverSolidUtils } from "../../../Abstracts/ElementObserver/ElementObserverSolid.utils";
 import { FloaterSolidUtils } from "../../../Abstracts/Floater/FloaterSolid.utils";
@@ -37,8 +38,6 @@ import type {
     ListboxProps,
 } from "./ListboxSolid.types";
 import { ListboxSolidUtils } from "./ListboxSolid.utils";
-
-const EMPTY_SELECTION: never[] = [];
 
 const ListboxOptionItem = (props: ListboxOptionItemProps) => {
     const [getElementRef, setElementRef] = createSignal<HTMLElement>();
@@ -491,7 +490,7 @@ export const Listbox = <T,>(props: ListboxProps<T>) => {
             (option) => option.value === selectedValue,
         );
 
-        return selectedOption ? [selectedOption] : EMPTY_SELECTION;
+        return selectedOption ? [selectedOption] : ListboxConst.EMPTY_SELECTION;
     });
 
     return (

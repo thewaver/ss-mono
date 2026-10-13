@@ -3,6 +3,12 @@ import { createMemo, createSignal } from "solid-js";
 import type { FormFieldOrientation } from "@thewaver/ss-components-solid";
 import { FORM_FIELD_DEFAULTS, FORM_FIELD_ORIENTATIONS } from "@thewaver/ss-components-solid";
 import { FormFieldKnobs } from "@thewaver/ss-playground/App/Knobs/FormFields.const";
+import {
+    EXAMPLES_ROOT,
+    EXAMPLE_NAMES,
+    FIELD_WIDTH,
+    MESSAGE_WIDTH,
+} from "@thewaver/ss-playground/App/Pages/FormFieldPage/FormFieldPage.const";
 
 import { PageExamples } from "../../PageComponents/Examples/Examples";
 import { PageCheckField, PageNumberField, PageSelectField, PageTextField } from "../../PageComponents/Field/Field";
@@ -12,11 +18,6 @@ import { DefaultExample } from "./Examples/Default";
 import { ForeignExample } from "./Examples/Foreign";
 import { InFormExample } from "./Examples/InForm";
 import type { FormFieldExampleProps } from "./FormFieldPage.types";
-
-const EXAMPLES_ROOT = "/src/App/Pages/FormFieldPage/Examples";
-
-const FIELD_WIDTH = 110;
-const MESSAGE_WIDTH = 240;
 
 export const FormFieldPage = () => {
     const [getOrientation, setOrientation] = createSignal<FormFieldOrientation>(FORM_FIELD_DEFAULTS.orientation);
@@ -39,7 +40,7 @@ export const FormFieldPage = () => {
         return [
             {
                 key: "default",
-                name: "Around a control of the library's",
+                name: EXAMPLE_NAMES.default,
                 readout: () =>
                     getMessage().length > 0
                         ? "the message has an id of its own and the control inside is pointed at it, without either of them being told the other's name"
@@ -49,7 +50,7 @@ export const FormFieldPage = () => {
             },
             {
                 key: "foreign",
-                name: "Around a control it has never seen",
+                name: EXAMPLE_NAMES.foreign,
                 readout: () =>
                     "a plain input, which knows nothing about any of this — one call to FormFieldSolidUtils.resolveAriaDescribedBy gets it the same wiring the library's own controls get for free",
                 component: () => <ForeignExample {...commonProps} value={foreignSignal} />,
@@ -57,7 +58,7 @@ export const FormFieldPage = () => {
             },
             {
                 key: "inForm",
-                name: "Inside a form",
+                name: EXAMPLE_NAMES.inForm,
                 readout: () =>
                     "turn the error on — the field tells the form, and the form's own validity is what disables the button; nothing here reads the other's state directly",
                 component: () => <InFormExample {...commonProps} value={formSignal} />,

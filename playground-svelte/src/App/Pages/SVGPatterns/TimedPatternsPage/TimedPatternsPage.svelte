@@ -3,7 +3,7 @@
     import { toGroupEntriesWithNoSample } from "@thewaver/ss-playground/App/PageComponents/SampleGroups/SampleGroups.const";
     import type { WithNoSample } from "@thewaver/ss-playground/App/PageComponents/SampleGroups/SampleGroups.types";
 
-    import { SVGPatternKnobs } from "../../../Knobs/SVGPatterns.const";
+    import { SVGPatternKnobs } from "@thewaver/ss-playground/App/Knobs/SVGPatterns.const";
     import type { ExampleDefs } from "../../../PageComponents/Examples/Examples.types";
     import PageExamples from "../../../PageComponents/Examples/PageExamples.svelte";
     import PageGroupedSelectField from "../../../PageComponents/Field/PageGroupedSelectField.svelte";
@@ -11,10 +11,11 @@
     import PageSelectField from "../../../PageComponents/Field/PageSelectField.svelte";
     import PageProp from "../../../PageComponents/Prop/Prop.svelte";
     import PagePropsPanel from "../../../PageComponents/PropsPanel/PagePropsPanel.svelte";
-    import { GROUPPED_TIMED_PATTERNS } from "../SVGPatterns.const";
-    import type { TimedPatternExampleProps } from "../SVGPatterns.types";
+    import { GROUPPED_TIMED_PATTERNS } from "../SVGPatternsSvelte.const";
+    import type { TimedPatternExampleProps } from "../SVGPatternsSvelte.types";
     import PageSVGPatternsProps from "../SVGPatternsProps.svelte";
     import DefaultExample from "./Examples/Default.svelte";
+    import { EXAMPLE_NAMES } from "@thewaver/ss-playground/App/Pages/SVGPatterns/TimedPatternsPage/TimedPatternsPage.const";
 
     const TIMED_PATTERN_GROUPS = toGroupEntriesWithNoSample(GROUPPED_TIMED_PATTERNS);
 
@@ -43,7 +44,7 @@
     const examples: ExampleDefs[] = [
         {
             key: "default",
-            name: "Default",
+            name: EXAMPLE_NAMES.default,
             component: defaultExample,
             path: DEFAULT_EXAMPLE_PATH,
         },

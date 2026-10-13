@@ -6,6 +6,7 @@ import {
     SlideButtonStyles,
     SlideButtonUtils,
 } from "@thewaver/ss-components";
+import { SlideButtonConst } from "@thewaver/ss-components/internal";
 
 import { InteractionTrackerReactUtils } from "../../../Abstracts/InteractionTracker/InteractionTrackerReact.utils";
 import { SignalMirrorReactUtils } from "../../../Abstracts/SignalMirror/SignalMirrorReact.utils";
@@ -15,8 +16,6 @@ import { useStore } from "../../../Utils/storeUtils";
 import { FormFieldReactUtils } from "../../Input/FormField/FormFieldReact.utils";
 import { LabelReactUtils } from "../../Input/Label/LabelReact.utils";
 import type { SlideButtonElementProps, SlideButtonProps } from "./SlideButton.types";
-
-const RATIO_MIN = 0;
 
 const SlideButtonElement = (props: SlideButtonElementProps) => {
     const ariaLabel = LabelReactUtils.useAriaLabel(props.ariaLabel);
@@ -111,7 +110,10 @@ const SlideButtonElement = (props: SlideButtonElementProps) => {
 };
 
 export const SlideButton = (props: SlideButtonProps) => {
-    const [progressRatio, setProgressRatio] = SignalMirrorReactUtils.useOptionalState(props.progress, RATIO_MIN);
+    const [progressRatio, setProgressRatio] = SignalMirrorReactUtils.useOptionalState(
+        props.progress,
+        SlideButtonConst.RATIO_MIN,
+    );
     const [isDragging, setIsDragging] = useState(false);
     const [isHolding, setIsHolding] = useState(false);
 

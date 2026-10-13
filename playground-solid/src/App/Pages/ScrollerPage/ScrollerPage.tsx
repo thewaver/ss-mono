@@ -2,6 +2,12 @@ import { createMemo, createSignal } from "solid-js";
 
 import type { Tab } from "@thewaver/ss-components-solid";
 import { ScrollerKnobs } from "@thewaver/ss-playground/App/Knobs/Scrollers.const";
+import {
+    EXAMPLES_ROOT,
+    EXAMPLE_NAMES,
+    MONTHS,
+    PERCENT,
+} from "@thewaver/ss-playground/App/Pages/ScrollerPage/ScrollerPage.const";
 import * as styles from "@thewaver/ss-playground/App/Pages/ScrollerPage/ScrollerPage.css";
 
 import { PageExamples } from "../../PageComponents/Examples/Examples";
@@ -11,24 +17,6 @@ import { PagePropsPanel } from "../../PageComponents/PropsPanel/PropsPanel";
 import { ChipsExample } from "./Examples/Chips";
 import { FocusableChildrenExample } from "./Examples/FocusableChildren";
 import { TabbedExample } from "./Examples/Tabbed";
-
-const EXAMPLES_ROOT = "/src/App/Pages/ScrollerPage/Examples";
-const PERCENT = 100;
-
-const MONTHS = [
-    "January",
-    "February",
-    "March",
-    "April",
-    "May",
-    "June",
-    "July",
-    "August",
-    "September",
-    "October",
-    "November",
-    "December",
-];
 
 export const ScrollerPage = () => {
     const [getItemCount, setItemCount] = createSignal(ScrollerKnobs.STARTING_ITEM_COUNT);
@@ -44,7 +32,7 @@ export const ScrollerPage = () => {
     const getExamples = createMemo(() => [
         {
             key: "split",
-            name: "One button at each end",
+            name: EXAMPLE_NAMES.split,
             readout: () =>
                 `${getItemCount()} items, ${Math.round(progressSignal[0]() * PERCENT)}% along — the buttons stop at the ends rather than wrapping round, and leave altogether once everything fits`,
             component: () => <ChipsExample labels={getLabels} progress={progressSignal} />,
@@ -52,21 +40,21 @@ export const ScrollerPage = () => {
         },
         {
             key: "bothButtonsEnd",
-            name: "Both buttons at the end",
+            name: EXAMPLE_NAMES.bothButtonsEnd,
             readout: () => "the same control with its buttons together instead of split",
             component: () => <ChipsExample labels={getLabels} buttonPlacement={"end"} />,
             path: `${EXAMPLES_ROOT}/Chips.tsx`,
         },
         {
             key: "bothButtonsStart",
-            name: "Both buttons at the start",
+            name: EXAMPLE_NAMES.bothButtonsStart,
             readout: () => "and the same pair on the other side",
             component: () => <ChipsExample labels={getLabels} buttonPlacement={"start"} />,
             path: `${EXAMPLES_ROOT}/Chips.tsx`,
         },
         {
             key: "tabbed",
-            name: "Focus reveals what it lands on",
+            name: EXAMPLE_NAMES.tabbed,
             readout: () =>
                 `selected: ${getSelectedMonth()} — a tab already fully in view does not move the strip, and one cut off by the edge scrolls into view whole`,
             component: () => (
@@ -80,7 +68,7 @@ export const ScrollerPage = () => {
         },
         {
             key: "focusableChildren",
-            name: "Focusable children of any kind",
+            name: EXAMPLE_NAMES.focusableChildren,
             readout: () => "the track holds whatever it is given, and tabbing through pulls the strip along",
             component: () => <FocusableChildrenExample labels={getLabels} />,
             path: `${EXAMPLES_ROOT}/FocusableChildren.tsx`,

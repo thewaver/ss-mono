@@ -1,13 +1,11 @@
 import { useLayoutEffect, useMemo, useRef, useState } from "react";
 
 import { ElementMosaicStyles, MosaicUtils } from "@thewaver/ss-components";
-import type { Size2d } from "@thewaver/ss-utils";
+import { ElementMosaicConst } from "@thewaver/ss-components/internal";
 
 import { ElementObserverReactUtils } from "../../../Abstracts/ElementObserver/ElementObserverReact.utils";
 import { Mosaic } from "../../../Primitives/Mosaic/Mosaic";
 import type { ElementMosaicProps } from "./ElementMosaic.types";
-
-const EMPTY_SIZE: Size2d = { width: 0, height: 0 };
 
 export const ElementMosaic = <T,>(props: ElementMosaicProps<T>) => {
     const elementsByIndex = useRef(new Map<number, HTMLElement>());
@@ -25,7 +23,7 @@ export const ElementMosaic = <T,>(props: ElementMosaicProps<T>) => {
     const measuredSizes = ElementObserverReactUtils.useBorderBoxSizes(itemElements);
 
     const sizes = useMemo(
-        () => Array.from({ length: itemCount }, (_, index) => measuredSizes[index] ?? EMPTY_SIZE),
+        () => Array.from({ length: itemCount }, (_, index) => measuredSizes[index] ?? ElementMosaicConst.EMPTY_SIZE),
         [itemCount, measuredSizes],
     );
 

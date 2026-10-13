@@ -4,7 +4,7 @@
     import * as styles from "@thewaver/ss-playground/App/StyledComponents/TextFieldContent/TextFieldContent.css";
 
     import { getLayerClass } from "../Layer/Layer.context";
-    import type { TextFieldPlaceholderProps } from "./TextFieldPlaceholder.types";
+    import type { TextFieldPlaceholderProps } from "./TextFieldPlaceholderSvelte.types";
 
     let props: TextFieldPlaceholderProps & { children?: Snippet } = $props();
 

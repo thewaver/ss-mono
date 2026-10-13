@@ -1,7 +1,7 @@
 import { Staircase, StaircaseIndents } from "@thewaver/ss-components-react";
 
 import { PageStaircaseStep } from "../../../StyledComponents/StaircaseContent/StaircaseContent";
-import type { StaircaseExampleProps } from "../StaircasePage.types";
+import type { StaircaseExampleProps } from "../StaircasePageReact.types";
 
 type Props = StaircaseExampleProps;
 

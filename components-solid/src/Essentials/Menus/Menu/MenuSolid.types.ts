@@ -2,6 +2,10 @@ import type { Accessor, JSX } from "solid-js";
 
 import type {
     AnchorPlacement,
+    BaseContextMenuCbs,
+    BaseContextMenuValues,
+    BaseMenuCbs,
+    BaseMenuValues,
     InteractionFlags,
     MenuFlags,
     MenuHighlightPosition,
@@ -22,7 +26,7 @@ import type {
     InteractionTooltipDefs,
     InteractionWrapperProps,
 } from "../../../Primitives/InteractionWrapper/InteractionWrapperSolid.types";
-import type { AccessorProps, MaybeAccessor, SignalSource } from "../../../Utils/typeUtils";
+import type { AccessorProps, AccessorValues, MaybeAccessor, SignalSource } from "../../../Utils/typeUtils";
 
 export type MenuItem<T> = {
     value: T;
@@ -46,7 +50,7 @@ export type MenuItem<T> = {
 };
 
 export type MenuTriggerProps = AccessorProps<
-    InteractionControlProps<MenuFlags> & {
+    Omit<InteractionControlProps<MenuFlags>, "ariaLabel"> & {
         /** Identifies the menu this trigger opens, so the trigger can point at it. */
         menuId: string;
         /** The role the trigger announces, written on the element that takes focus. */
@@ -61,6 +65,8 @@ export type MenuTriggerProps = AccessorProps<
          * Runs on a key pressed while the trigger has focus, so the arrow keys can open the menu into its first item.
          */
         onKeyDown: (e: KeyboardEvent) => void;
+        /** Names the trigger for assistive technology, for a trigger whose painter draws a glyph rather than text. */
+        ariaLabel?: string;
     }
 >;
 
@@ -99,10 +105,6 @@ export type MenuRenderPopup = (
 export type MenuLevelProps<T> = AccessorProps<{
     /** Identifies this level of the menu, so its items and its parent can point at it. */
     id: string;
-    /** Points at the element whose text names this level, which for a submenu is the item that opened it. */
-    labelledBy?: string;
-    /** Names this level for assistive technology, where no element already does. */
-    ariaLabel?: string;
     /** Whether this level is open. */
     isOpen: boolean;
     /**
@@ -116,8 +118,6 @@ export type MenuLevelProps<T> = AccessorProps<{
     parentExtent: number;
     /** How wide the first level is, which is what the whole chain is scaled against. */
     rootExtent: number;
-    /** How much room the level is given to lay its items out in. */
-    layoutSize?: string;
     /**
      * Which item is highlighted when the level opens — the first, the last, or none — so a menu opened with the up
      * arrow starts at the bottom.
@@ -127,28 +127,16 @@ export type MenuLevelProps<T> = AccessorProps<{
     anchorRef: HTMLElement | undefined;
     /** The element that opened this level, which is where focus goes back to when it closes. */
     triggerRef: HTMLElement | undefined;
-    /** Where this level sits against its anchor. */
-    placement?: AnchorPlacement;
-    /** How far this level is held clear of its anchor. */
-    offset?: Point2d;
     /** Where a submenu of this level sits against the item that opens it. */
     submenuPlacement: AnchorPlacement;
-    /** How far a submenu of this level is held clear of the item that opens it. */
-    submenuOffset?: Point2d;
     /** Whether a submenu replaces the level that opened it or stacks beside it. */
     submenuMode: MenuSubmenuMode;
     /** What opens a submenu — hovering its item, or picking it. */
     submenuOpensOn: MenuSubmenuTrigger;
-    /** Screen room to stay out of, for a consumer with a fixed header or sidebar the menu must not slide under. */
-    reservedScreenSize?: Size2d;
-    /** How long this level takes to fade in and out. */
-    transitionDurationMs?: number;
     /** The interaction state of the item that opened this level, so the level can answer to it. */
     openerFlags: InteractionFlags<MenuFlags>;
     /** Draws the surface this level's items sit on. */
     renderPopup: MenuRenderPopup;
-    /** How long the highlight's marker takes to slide from one item to the next, and to fade. */
-    floaterTransitionDurationMs?: number;
     /**
      * Draws the marker that slides to the highlighted item — the one the pointer or the arrow keys are on — behind it,
      * in this menu and in every submenu. The fade is handed in rather than applied: the marker fades out while nothing
@@ -160,13 +148,6 @@ export type MenuLevelProps<T> = AccessorProps<{
     /** Runs when this level is dismissed from outside — a press elsewhere, focus leaving, or Escape. */
     onDismiss: () => void;
 }> & {
-    /**
-     * A rectangle to position against instead of the anchor's own, for a level that should sit against part of its
-     * anchor.
-     */
-    anchorRect?: MaybeAccessor<Rect | undefined>;
-    /** Where the item that opened this level was placed, which a nested layout needs in order to grow out of it. */
-    parentPlacement?: MaybeAccessor<PlacementRect | undefined>;
     /** The item that opened this level, where one did. */
     openerItem?: MaybeAccessor<MenuItem<T> | undefined>;
     /** Where the pointer is, for a menu that answers to aim rather than to what the pointer is over. */
@@ -181,8 +162,6 @@ export type MenuLevelProps<T> = AccessorProps<{
     computeEffect?: ProximityEffectFn;
     /** The text an item is found by when the reader types, where that is not its visible text. */
     computeCustomText?: (item: MenuItem<T>) => string;
-    /** Where a flick gesture started, which is what a menu picks by direction rather than by position uses. */
-    flickOrigin?: MaybeAccessor<Point2d | undefined>;
     /** Draws one item. */
     renderItem: MenuRenderItem<T>;
     /**
@@ -199,52 +178,75 @@ export type MenuLevelProps<T> = AccessorProps<{
      * click can tell an ordinary release on the trigger from one that will never be followed up.
      */
     onFlickEnd?: (releasedOn: Node | undefined) => void;
-};
-
-export type MenuProps<T> = Omit<InteractionWrapperProps<MenuFlags>, "renderControl" | "extraFlags"> &
-    AccessorProps<{
-        /** How much room the menu is given to lay its items out in. */
-        layoutSize?: string;
-        /** Identifies the menu, so the trigger can point at it. */
-        id?: string;
-        /** Names the menu for assistive technology. */
+} & AccessorProps<{
+        /**
+         * A rectangle to position against instead of the anchor's own, for a level that should sit against part of its
+         * anchor.
+         */
+        anchorRect?: Rect;
+        /** Where the item that opened this level was placed, which a nested layout needs in order to grow out of it. */
+        parentPlacement?: PlacementRect;
+        /** Where a flick gesture started, which is what a menu picks by direction rather than by position uses. */
+        flickOrigin?: Point2d;
+        /** Points at the element whose text names this level, which for a submenu is the item that opened it. */
+        labelledBy?: string;
+        /** Names this level for assistive technology, where no element already does. */
         ariaLabel?: string;
-        /** Where the menu sits against its trigger. */
+        /** How much room the level is given to lay its items out in. */
+        layoutSize?: string;
+        /** Where this level sits against its anchor. */
         placement?: AnchorPlacement;
-        /** How far the menu is held clear of its trigger. */
+        /** How far this level is held clear of its anchor. */
         offset?: Point2d;
-        /**
-         * Where a submenu sits against the item that opens it. Left out, a submenu opens beside its item on
-         * the side the opening arrow points to: the right, or the left where the menu's trigger sits in
-         * right-to-left text. Given, it is used as it stands in either direction.
-         */
-        submenuPlacement?: AnchorPlacement;
-        /** How far a submenu is held clear of the item that opens it. */
+        /** How far a submenu of this level is held clear of the item that opens it. */
         submenuOffset?: Point2d;
-        /** Whether a submenu replaces the level that opened it or stacks beside it. */
-        submenuMode?: MenuSubmenuMode;
-        /** What opens a submenu — hovering its item, or picking it. */
-        submenuOpensOn?: MenuSubmenuTrigger;
-        /** Whether holding the trigger down opens the menu, rather than needing a full click. */
-        opensOnHold?: boolean;
-        /**
-         * The role the trigger announces, written on the button that takes focus rather than on the box around it.
-         * Left out, the trigger is a button. A menubar passes `menuitem`, because every child of a menubar has to be
-         * one, and the trigger still announces the menu it opens and whether that menu is open.
-         */
-        triggerRole?: MenuTriggerRole;
         /** Screen room to stay out of, for a consumer with a fixed header or sidebar the menu must not slide under. */
         reservedScreenSize?: Size2d;
-        /** How long the menu takes to fade in and out. */
+        /** How long this level takes to fade in and out. */
         transitionDurationMs?: number;
+        /** How long the highlight's marker takes to slide from one item to the next, and to fade. */
+        floaterTransitionDurationMs?: number;
+    }>;
+
+export type MenuProps<T> = Omit<InteractionWrapperProps<MenuFlags>, "renderControl" | "extraFlags"> &
+    AccessorValues<BaseMenuValues> &
+    BaseMenuCbs<T> &
+    AccessorProps<{
         /** Whether the menu is open. It is the only thing that opens or closes it. */
         visibility?: SignalSource<boolean>;
         /** Draws the trigger. It is handed the interaction state, including whether the menu it opens is showing. */
         renderContent: (getFlags: () => InteractionFlags<MenuFlags>) => JSX.Element;
         /** Draws the surface the items sit on. */
         renderPopup: MenuRenderPopup;
-        /** How long the highlight's marker takes to slide from one item to the next, and to fade. */
-        floaterTransitionDurationMs?: number;
+        /**
+         * Draws the marker that slides to the highlighted item — the one the pointer or the arrow keys are on — behind it,
+         * in this menu and in every submenu. The fade is handed in rather than applied: the marker fades out while nothing
+         * is highlighted.
+         */
+        renderHighlightFloater?: (
+            getVisibilityTarget: () => 0 | 1,
+            getTransitionDurationMs: () => number,
+        ) => JSX.Element;
+        /** The element the menu is positioned against, where that is not the trigger itself. */
+        anchorRef?: HTMLElement;
+    }> & {
+        /** The items, in the order they are shown. Items carrying children are what make submenus. */
+        items: MaybeAccessor<MenuItem<T>[]>;
+        /** Which values are currently checked, for the checkbox and radio items among them. */
+        checked?: SignalSource<T[]>;
+        /** The text an item is found by when the reader types, where that is not its visible text. */
+        computeCustomText?: (item: MenuItem<T>) => string;
+        /** Draws one item. */
+        renderItem: MenuRenderItem<T>;
+    };
+
+export type ContextMenuProps<T> = AccessorValues<BaseContextMenuValues> &
+    BaseContextMenuCbs<T> &
+    AccessorProps<{
+        /** Whether the menu is open. It is the only thing that opens or closes it. */
+        visibility?: SignalSource<boolean>;
+        /** Draws the surface the items sit on. */
+        renderPopup: MenuRenderPopup;
         /**
          * Draws the marker that slides to the highlighted item — the one the pointer or the arrow keys are on — behind it,
          * in this menu and in every submenu. The fade is handed in rather than applied: the marker fades out while nothing
@@ -255,90 +257,21 @@ export type MenuProps<T> = Omit<InteractionWrapperProps<MenuFlags>, "renderContr
             getTransitionDurationMs: () => number,
         ) => JSX.Element;
     }> & {
-        /** The element the menu is positioned against, where that is not the trigger itself. */
-        anchorRef?: MaybeAccessor<HTMLElement | undefined>;
-        /** The items, in the order they are shown. Items carrying children are what make submenus. */
+        /**
+         * Draws the region a right-click opens the menu over.
+         *
+         * The component renders the element itself rather than taking a ref to the consumer's, because it has to
+         * put a `tabindex` and a role on it: a region with no focusable content can never receive the ContextMenu
+         * key, so before this a plain box of text had no keyboard route to its own menu at all (2.1.1, Level A).
+         * Everything drawn inside it is the consumer's.
+         */
+        renderRegion: () => JSX.Element;
+        /** The items, in the order they are shown. */
         items: MaybeAccessor<MenuItem<T>[]>;
         /** Which values are currently checked, for the checkbox and radio items among them. */
         checked?: SignalSource<T[]>;
-        /** Arranges the items, for a menu that is something other than a vertical list. */
-        computeLayout?: PlacementLayoutFn;
-        /** What the items do as the pointer nears them. */
-        computeEffect?: ProximityEffectFn;
         /** The text an item is found by when the reader types, where that is not its visible text. */
         computeCustomText?: (item: MenuItem<T>) => string;
         /** Draws one item. */
         renderItem: MenuRenderItem<T>;
-        /** Runs when an item is picked. */
-        onActivate: (value: T) => void;
     };
-
-export type ContextMenuProps<T> = AccessorProps<{
-    /** Names the menu for assistive technology. */
-    ariaLabel: string;
-    /**
-     * Names the region for assistive technology.
-     *
-     * The region is a tab stop, so it has to say what it is — and its own name cannot be the menu's, which
-     * describes what the menu offers rather than what the region holds.
-     */
-    regionAriaLabel: string;
-    /** Turns the menu off, so right-clicking the region does nothing out of the ordinary. */
-    isDisabled?: boolean;
-    /** Where the menu sits against the point it was opened at. */
-    placement?: AnchorPlacement;
-    /** How far the menu is held clear of the point it was opened at. */
-    offset?: Point2d;
-    /**
-     * Where a submenu sits against the item that opens it. Left out, a submenu opens beside its item on the
-     * side the opening arrow points to: the right, or the left where the region sits in right-to-left
-     * text. Given, it is used as it stands in either direction.
-     */
-    submenuPlacement?: AnchorPlacement;
-    /** How far a submenu is held clear of the item that opens it. */
-    submenuOffset?: Point2d;
-    /** Whether a submenu replaces the level that opened it or stacks beside it. */
-    submenuMode?: MenuSubmenuMode;
-    /** What opens a submenu — hovering its item, or picking it. */
-    submenuOpensOn?: MenuSubmenuTrigger;
-    /** Screen room to stay out of, for a consumer with a fixed header or sidebar the menu must not slide under. */
-    reservedScreenSize?: Size2d;
-    /** How long the menu takes to fade in and out. */
-    transitionDurationMs?: number;
-    /** Whether the menu is open. It is the only thing that opens or closes it. */
-    visibility?: SignalSource<boolean>;
-    /** Draws the surface the items sit on. */
-    renderPopup: MenuRenderPopup;
-    /** How long the highlight's marker takes to slide from one item to the next, and to fade. */
-    floaterTransitionDurationMs?: number;
-    /**
-     * Draws the marker that slides to the highlighted item — the one the pointer or the arrow keys are on — behind it,
-     * in this menu and in every submenu. The fade is handed in rather than applied: the marker fades out while nothing
-     * is highlighted.
-     */
-    renderHighlightFloater?: (getVisibilityTarget: () => 0 | 1, getTransitionDurationMs: () => number) => JSX.Element;
-}> & {
-    /**
-     * Draws the region a right-click opens the menu over.
-     *
-     * The component renders the element itself rather than taking a ref to the consumer's, because it has to
-     * put a `tabindex` and a role on it: a region with no focusable content can never receive the ContextMenu
-     * key, so before this a plain box of text had no keyboard route to its own menu at all (2.1.1, Level A).
-     * Everything drawn inside it is the consumer's.
-     */
-    renderRegion: () => JSX.Element;
-    /** The items, in the order they are shown. */
-    items: MaybeAccessor<MenuItem<T>[]>;
-    /** Which values are currently checked, for the checkbox and radio items among them. */
-    checked?: SignalSource<T[]>;
-    /** Arranges the items, for a menu that is something other than a vertical list. */
-    computeLayout?: PlacementLayoutFn;
-    /** What the items do as the pointer nears them. */
-    computeEffect?: ProximityEffectFn;
-    /** The text an item is found by when the reader types, where that is not its visible text. */
-    computeCustomText?: (item: MenuItem<T>) => string;
-    /** Draws one item. */
-    renderItem: MenuRenderItem<T>;
-    /** Runs when an item is picked. */
-    onActivate: (value: T) => void;
-};

@@ -11,7 +11,7 @@
     import PageTabPanel from "../../../PageComponents/TabPanel/TabPanel.svelte";
     import PageTabContent from "../../../StyledComponents/TabContent/PageTabContent.svelte";
     import PageTabFloater from "../../../StyledComponents/TabContent/PageTabFloater.svelte";
-    import type { TabsExampleProps } from "../TabsPage.types";
+    import type { TabsExampleProps } from "../TabsPageSvelte.types";
 
     type Props = TabsExampleProps;
 

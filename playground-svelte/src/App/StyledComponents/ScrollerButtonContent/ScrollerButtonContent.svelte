@@ -2,7 +2,7 @@
     import * as styles from "@thewaver/ss-playground/App/StyledComponents/ScrollerButtonContent/ScrollerButtonContent.css";
 
     import { getLayerClass } from "../Layer/Layer.context";
-    import type { ScrollerButtonContentProps } from "./ScrollerButtonContent.types";
+    import type { ScrollerButtonContentProps } from "./ScrollerButtonContentSvelte.types";
 
     let props: ScrollerButtonContentProps = $props();
 

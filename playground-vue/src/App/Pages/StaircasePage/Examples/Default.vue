@@ -3,7 +3,7 @@ import { Staircase, StaircaseIndents } from "@thewaver/ss-components-vue";
 import type { StaircaseStepDefs } from "@thewaver/ss-components-vue";
 
 import PageStaircaseStep from "../../../StyledComponents/StaircaseContent/StaircaseContent.vue";
-import type { StaircaseExampleProps } from "../StaircasePage.types";
+import type { StaircaseExampleProps } from "../StaircasePageVue.types";
 
 type Props = StaircaseExampleProps;
 

@@ -16,6 +16,7 @@ import {
     ScratchCardUtils,
     ScratchCardStyles as styles,
 } from "@thewaver/ss-components";
+import { ScratchCardConst } from "@thewaver/ss-components/internal";
 import { assignInlineVars } from "@vanilla-extract/dynamic";
 
 import { ElementObserverSolidUtils } from "../../../Abstracts/ElementObserver/ElementObserverSolid.utils";
@@ -24,17 +25,14 @@ import { PointerTrackerSolidUtils } from "../../../Abstracts/PointerTracker/Poin
 import { access } from "../../../Utils/propUtils";
 import type { ScratchCardProps } from "./ScratchCardSolid.types";
 
-const NOTHING_RUBBED = 0;
-const NO_PATH = "";
-
 export const ScratchCard = (props: ScratchCardProps) => {
     const maskId = createUniqueId();
 
     const [getRootRef, setRootRef] = createSignal<HTMLElement>();
     const [getCoverRef, setCoverRef] = createSignal<HTMLElement>();
     const [getPathRef, setPathRef] = createSignal<SVGPathElement>();
-    const [getPath, setPath] = createSignal(NO_PATH);
-    const [getClearedRatio, setClearedRatio] = createSignal(NOTHING_RUBBED);
+    const [getPath, setPath] = createSignal(ScratchCardConst.NO_PATH);
+    const [getClearedRatio, setClearedRatio] = createSignal(ScratchCardConst.NOTHING_RUBBED);
     const [getIsClearing, setIsClearing] = createSignal(false);
     const [getIsCleared, setIsCleared] = createSignal(false);
 
@@ -73,8 +71,8 @@ export const ScratchCard = (props: ScratchCardProps) => {
         scheduler.reset();
         setIsClearing(false);
         setIsCleared(false);
-        setPath(NO_PATH);
-        setClearedRatio(NOTHING_RUBBED);
+        setPath(ScratchCardConst.NO_PATH);
+        setClearedRatio(ScratchCardConst.NOTHING_RUBBED);
     };
 
     const controller = createMemo(() => ({

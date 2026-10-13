@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import PageMenuItemContent from "../../../StyledComponents/MenuItemContent/MenuItemContent.vue";
-import type { MenuActionItemProps } from "./MenuPage.types";
+import type { MenuActionItemProps } from "./MenuPageVue.types";
 
 defineProps<MenuActionItemProps>();
 </script>

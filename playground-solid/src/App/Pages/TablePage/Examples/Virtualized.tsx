@@ -4,8 +4,8 @@ import type { MaybeAccessor } from "@thewaver/ss-components-solid";
 import { Table } from "@thewaver/ss-components-solid";
 import * as styles from "@thewaver/ss-playground/App/Pages/TablePage/TablePage.css";
 
-import { createPartColumns } from "../TablePage.const";
 import type { Part, TableExampleProps } from "../TablePage.types";
+import { createPartColumns } from "../TablePageSolid.const";
 
 const ESTIMATED_ROW_HEIGHT = 29;
 

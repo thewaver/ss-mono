@@ -1,4 +1,4 @@
-import type { ColorAreaAxis, ColorAreaCbs, ColorAreaRenderProps, ColorAreaState } from "@thewaver/ss-components";
+import type { BaseColorAreaValues, ColorAreaAxis, ColorAreaCbs, ColorAreaRenderProps } from "@thewaver/ss-components";
 import type { Color } from "@thewaver/ss-utils";
 
 import type {
@@ -12,8 +12,8 @@ export type { ColorAreaCbs };
 
 export type ColorAreaElementProps = ColorAreaCbs &
     InteractionControlProps<ColorAreaRenderProps> &
-    Required<Omit<ColorAreaState, "name" | "ariaLabel">> &
-    Pick<ColorAreaState, "name" | "ariaLabel"> & {
+    Required<Omit<BaseColorAreaValues, "name" | "ariaLabel">> &
+    Pick<BaseColorAreaValues, "name" | "ariaLabel"> & {
         /** The color the square is currently on. */
         hsv: Color.HSVA;
         /** Whether the square can be reached by tabbing. */
@@ -36,7 +36,7 @@ export type ColorAreaElementProps = ColorAreaCbs &
 export type ColorAreaProps = Omit<InteractionWrapperProps<ColorAreaRenderProps>, "extraFlags"> &
     ColorAreaCbs &
     Pick<InteractionControlProps<ColorAreaRenderProps>, "id"> &
-    ColorAreaState & {
+    BaseColorAreaValues & {
         /** The color. It is the only thing that changes it. */
         "hsv": Color.HSVA;
         /** Receives the color as it changes, which is what `v-model:hsv` binds. */

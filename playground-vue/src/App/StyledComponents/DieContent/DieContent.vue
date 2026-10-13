@@ -1,10 +1,9 @@
 <script setup lang="ts">
+import { LABEL_SHARE } from "@thewaver/ss-playground/App/StyledComponents/DieContent/DieContent.const";
 import * as styles from "@thewaver/ss-playground/App/StyledComponents/DieContent/DieContent.css";
 
 import { useLayerClass } from "../Layer/Layer.context";
-import type { PageDieFaceProps } from "./DieContent.types";
-
-const LABEL_SHARE = 0.35;
+import type { PageDieFaceProps } from "./DieContentVue.types";
 
 defineProps<PageDieFaceProps>();
 

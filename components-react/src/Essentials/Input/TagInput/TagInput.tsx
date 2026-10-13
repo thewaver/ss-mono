@@ -7,6 +7,7 @@ import {
     TagInputStyles,
     TagInputUtils,
 } from "@thewaver/ss-components";
+import { TagInputConst } from "@thewaver/ss-components/internal";
 
 import { NavigatorReactUtils } from "../../../Abstracts/Navigator/NavigatorReact.utils";
 import { SignalMirrorReactUtils } from "../../../Abstracts/SignalMirror/SignalMirrorReact.utils";
@@ -14,8 +15,6 @@ import { InteractionWrapper } from "../../../Primitives/InteractionWrapper/Inter
 import { FormFieldReactUtils } from "../FormField/FormFieldReact.utils";
 import { LabelReactUtils } from "../Label/LabelReact.utils";
 import type { TagInputFieldElementProps, TagInputProps } from "./TagInput.types";
-
-const EMPTY_TEXT = "";
 
 const TagInputFieldElement = (props: TagInputFieldElementProps) => {
     const { fieldRef, ref } = props;
@@ -60,7 +59,7 @@ export const TagInput = (props: TagInputProps) => {
 
     const direction = NavigatorReactUtils.useDirection(fieldRef);
 
-    const [text, setText] = SignalMirrorReactUtils.useOptionalState(props.text, EMPTY_TEXT);
+    const [text, setText] = SignalMirrorReactUtils.useOptionalState(props.text, TagInputConst.EMPTY_TEXT);
 
     const isDisabled = props.isDisabled ?? false;
     const isEmpty = text.length < 1;
@@ -85,7 +84,7 @@ export const TagInput = (props: TagInputProps) => {
         if (!tag) return;
 
         setTags([...tags, tag]);
-        setText(EMPTY_TEXT);
+        setText(TagInputConst.EMPTY_TEXT);
     };
 
     const removeTag = (index: number) => {

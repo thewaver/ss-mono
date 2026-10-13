@@ -4,7 +4,7 @@ import { access } from "@thewaver/ss-components-solid";
 import * as styles from "@thewaver/ss-playground/App/StyledComponents/RadioStarContent/RadioStarContent.css";
 
 import { useLayerClass } from "../Layer/Layer.context";
-import type { RadioStarContentProps } from "./RadioStarContent.types";
+import type { RadioStarContentProps } from "./RadioStarContentSolid.types";
 
 export const PageRadioStarContent = (props: RadioStarContentProps) => {
     const getLayerClass = useLayerClass();

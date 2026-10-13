@@ -3,7 +3,7 @@ import type { PropsWithChildren } from "react";
 import * as styles from "@thewaver/ss-playground/App/StyledComponents/DrawerPanel/DrawerPanel.css";
 
 import { PageLayer } from "../../PageComponents/Layer/Layer";
-import type { DrawerPanelProps } from "./DrawerPanel.types";
+import type { DrawerPanelProps } from "./DrawerPanelReact.types";
 
 export const PageDrawerPanel = (props: PropsWithChildren<DrawerPanelProps>) => {
     return (

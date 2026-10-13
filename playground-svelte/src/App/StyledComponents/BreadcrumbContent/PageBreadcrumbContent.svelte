@@ -4,7 +4,7 @@
     import * as styles from "@thewaver/ss-playground/App/StyledComponents/BreadcrumbContent/BreadcrumbContent.css";
 
     import { getLayerClass } from "../Layer/Layer.context";
-    import type { BreadcrumbContentProps } from "./BreadcrumbContent.types";
+    import type { BreadcrumbContentProps } from "./BreadcrumbContentSvelte.types";
 
     let props: BreadcrumbContentProps & { children?: Snippet } = $props();
 

@@ -21,6 +21,7 @@ import {
     TreeUtils,
     TypeaheadUtils,
 } from "@thewaver/ss-components";
+import { TreeConst } from "@thewaver/ss-components/internal";
 
 import { FloaterReactUtils } from "../../Abstracts/Floater/FloaterReact.utils";
 import { NavigatorReactUtils } from "../../Abstracts/Navigator/NavigatorReact.utils";
@@ -33,8 +34,6 @@ import { PlacementItem } from "../../Primitives/PlacementItem/PlacementItem";
 import { useElement } from "../../Utils/refUtils";
 import { TooltipReactUtils } from "../Overlays/Tooltip/TooltipReact.utils";
 import type { TreeNodeItemProps, TreeProps, TreeRow } from "./Tree.types";
-
-const EMPTY_PINNED_ROWS: number[] = [];
 
 const TREE_ITEM_SELECTOR = '[role="treeitem"]';
 
@@ -121,7 +120,7 @@ export const Tree = <T,>(props: TreeProps<T>) => {
     const rowWindow = VirtualizerReactUtils.useRowWindow(sizerRef, flatRows.length, {
         isDisabled: !isVirtualized,
         computeEstimatedSize: (index) => props.computeEstimatedNodeHeight?.(index) ?? 0,
-        pinnedRows: rovingRow === undefined ? EMPTY_PINNED_ROWS : [rovingRow.index],
+        pinnedRows: rovingRow === undefined ? TreeConst.EMPTY_PINNED_ROWS : [rovingRow.index],
     });
 
     const computeLayout = props.computeLayout;

@@ -1,5 +1,5 @@
 <script lang="ts">
-    import type { MenuExampleProps } from "../MenuPage.types";
+    import type { MenuExampleProps } from "../MenuPageSvelte.types";
     import SubmenusExample from "./Submenus.svelte";
 
     type Props = MenuExampleProps;

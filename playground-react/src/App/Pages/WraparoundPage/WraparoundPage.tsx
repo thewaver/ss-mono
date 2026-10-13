@@ -2,7 +2,12 @@ import { useState } from "react";
 
 import { MediaQueryMonitorReactUtils, WRAPAROUND_DEFAULTS } from "@thewaver/ss-components-react";
 import { WraparoundKnobs } from "@thewaver/ss-playground/App/Knobs/Wraparounds.const";
-import { NOTHING_PRESSED } from "@thewaver/ss-playground/App/Pages/WraparoundPage/WraparoundPage.const";
+import {
+    EXAMPLES_ROOT,
+    EXAMPLE_NAMES,
+    NOTHING_PRESSED,
+    NO_DRIFT_PX_PER_SECOND,
+} from "@thewaver/ss-playground/App/Pages/WraparoundPage/WraparoundPage.const";
 
 import { PageExamples } from "../../PageComponents/Examples/Examples";
 import { PageNumberField } from "../../PageComponents/Field/Field";
@@ -11,10 +16,6 @@ import { PagePropsPanel } from "../../PageComponents/PropsPanel/PropsPanel";
 import { GridExample } from "./Examples/Grid";
 import { MarqueeExample } from "./Examples/Marquee";
 import { MosaicExample } from "./Examples/Mosaic";
-
-const EXAMPLES_ROOT = "/src/App/Pages/WraparoundPage/Examples";
-
-const NO_DRIFT_PX_PER_SECOND = 0;
 
 export const WraparoundPage = () => {
     const [mosaicPressed, setMosaicPressed] = useState(NOTHING_PRESSED);
@@ -30,7 +31,7 @@ export const WraparoundPage = () => {
         {
             key: "mosaic",
             span: 2,
-            name: "A mosaic that never ends",
+            name: EXAMPLE_NAMES.mosaic,
             readout: () =>
                 `opened: ${mosaicPressed} — drag and let go to send it coasting, or use the wheel; with the window focused the arrows and page keys move it and Home brings it back, and tabbing into the pictures brings the one focused into view`,
             component: () => <MosaicExample onPress={setMosaicPressed} />,
@@ -39,7 +40,7 @@ export const WraparoundPage = () => {
         {
             key: "grid",
             span: 2,
-            name: "Content smaller than the window",
+            name: EXAMPLE_NAMES.grid,
             readout: () =>
                 `pressed: ${gridPressed} — six buttons, copied until the window is full; only one set can be tabbed to or read out, and pressing any copy presses the real button`,
             component: () => <GridExample onPress={setGridPressed} />,
@@ -48,7 +49,7 @@ export const WraparoundPage = () => {
         {
             key: "marquee",
             span: 2,
-            name: "Marquee",
+            name: EXAMPLE_NAMES.marquee,
             readout: () =>
                 prefersReducedMotion
                     ? "reduced motion is on, so the strip stays still"

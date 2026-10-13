@@ -1,13 +1,12 @@
 import type { PropsWithChildren } from "react";
 
 import { CORNERS_DEFAULTS, CornerUtils, CornersStyles } from "@thewaver/ss-components";
+import { CornersConst } from "@thewaver/ss-components/internal";
 
 import type { CornersProps } from "./Corners.types";
 
-const DEFAULT_COLOR = "currentColor";
-
 export const Corners = (props: PropsWithChildren<CornersProps>) => {
-    const color = props.color ?? DEFAULT_COLOR;
+    const color = props.color ?? CornersConst.DEFAULT_COLOR;
     const transitionDurationMs = props.transitionDurationMs ?? CORNERS_DEFAULTS.transitionDurationMs;
     const cornerLength = props.cornerLength ?? CORNERS_DEFAULTS.cornerLength;
     const strokeThickness = props.strokeThickness ?? CORNERS_DEFAULTS.strokeThickness;

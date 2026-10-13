@@ -2,9 +2,8 @@
     import * as styles from "@thewaver/ss-playground/App/StyledComponents/FileDropZoneContent/FileDropZoneContent.css";
 
     import { getLayerClass } from "../Layer/Layer.context";
-    import type { FileDropZoneContentProps } from "./FileDropZoneContent.types";
-
-    const NO_FILES = "none picked";
+    import type { FileDropZoneContentProps } from "./FileDropZoneContentSvelte.types";
+    import { NO_FILES } from "@thewaver/ss-playground/App/StyledComponents/FileDropZoneContent/FileDropZoneContent.const";
 
     let props: FileDropZoneContentProps = $props();
 

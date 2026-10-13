@@ -4,6 +4,12 @@ import { computed, shallowRef } from "vue";
 import type { CornerKey } from "@thewaver/ss-components-vue";
 import { CORNERS_DEFAULTS, CORNERS_KEYS } from "@thewaver/ss-components-vue";
 import { CornerKnobs } from "@thewaver/ss-playground/App/Knobs/Corners.const";
+import {
+    CORNER_LABELS,
+    EXAMPLES_ROOT,
+    EXAMPLE_NAMES,
+    FIELD_WIDTH,
+} from "@thewaver/ss-playground/App/Pages/CornersPage/CornersPage.const";
 
 import type { ExampleDefs } from "../../PageComponents/Examples/Examples.types";
 import PageExamples from "../../PageComponents/Examples/PageExamples.vue";
@@ -12,23 +18,12 @@ import PageColorField from "../../PageComponents/Field/PageColorField.vue";
 import PageNumberField from "../../PageComponents/Field/PageNumberField.vue";
 import PageProp from "../../PageComponents/Prop/Prop.vue";
 import PagePropsPanel from "../../PageComponents/PropsPanel/PagePropsPanel.vue";
-import type { CornersExampleProps } from "./CornersPage.types";
+import type { CornersExampleProps } from "./CornersPageVue.types";
 import ControlExample from "./Examples/Control.vue";
 import DefaultExample from "./Examples/Default.vue";
 import DrawOnExample from "./Examples/DrawOn.vue";
 import FocusFollowExample from "./Examples/FocusFollow.vue";
 import OverlayExample from "./Examples/Overlay.vue";
-
-const EXAMPLES_ROOT = "/src/App/Pages/CornersPage/Examples";
-
-const CORNER_LABELS: Record<CornerKey, string> = {
-    top_left: "Top left",
-    top_right: "Top right",
-    bottom_left: "Bottom left",
-    bottom_right: "Bottom right",
-};
-
-const FIELD_WIDTH = 110;
 
 const color = shallowRef(CornerKnobs.STARTING_COLOR);
 const lengthAcross = shallowRef(CornerKnobs.STARTING_LENGTH);
@@ -58,35 +53,35 @@ const commonProps = computed<CornersExampleProps>(() => ({
 const examples: ExampleDefs[] = [
     {
         key: "default",
-        name: "Around a box",
+        name: EXAMPLE_NAMES.default,
         readout: () =>
             "each bracket is a single polygon rather than two rules, so the arm lengths and the thickness are numbers rather than a border pretending to be one",
         path: `${EXAMPLES_ROOT}/Default.vue`,
     },
     {
         key: "control",
-        name: "As a control's decoration",
+        name: EXAMPLE_NAMES.control,
         readout: () =>
             "press it — the color transitions rather than switching, which is the whole reason the component owns a duration",
         path: `${EXAMPLES_ROOT}/Control.vue`,
     },
     {
         key: "overlay",
-        name: "Over content it does not own",
+        name: EXAMPLE_NAMES.overlay,
         readout: () =>
             "the button underneath still takes a press, because the layer carrying the brackets refuses the pointer and says nothing to a screen reader",
         path: `${EXAMPLES_ROOT}/Overlay.vue`,
     },
     {
         key: "focusFollow",
-        name: "Following focus and hover",
+        name: EXAMPLE_NAMES.focusFollow,
         readout: () =>
             "one set of marks glides to whichever control is hovered or reached by the keyboard, around the control's own focus ring rather than instead of it — and jumps rather than glides under reduced motion",
         path: `${EXAMPLES_ROOT}/FocusFollow.vue`,
     },
     {
         key: "drawOn",
-        name: "Drawn on",
+        name: EXAMPLE_NAMES.drawOn,
         readout: () =>
             "the arm length grows from nothing as the marks appear, so they draw out of each corner — at full length at once under reduced motion",
         path: `${EXAMPLES_ROOT}/DrawOn.vue`,

@@ -1,11 +1,10 @@
 <script lang="ts">
     import { PointerEffectsUtils, TILTER_DEFAULTS, TilterStyles as styles } from "@thewaver/ss-components";
+    import { TilterConst } from "@thewaver/ss-components/internal";
 
     import { PointerTrackerSvelteUtils } from "../../../Abstracts/PointerTracker/PointerTrackerSvelte.utils.svelte.js";
     import { SmootherSvelteUtils } from "../../../Abstracts/Smoother/SmootherSvelte.utils.svelte.js";
     import type { TilterProps } from "./Tilter.types.js";
-
-    const NO_LEAN = 0;
 
     let props: TilterProps = $props();
 
@@ -32,7 +31,7 @@
 
     const strength = $derived(
         isResting
-            ? NO_LEAN
+            ? TilterConst.NO_LEAN
             : PointerEffectsUtils.computeEdgeStrength(
                   pointer.getReading(),
                   props.tiltRangePx ?? TILTER_DEFAULTS.tiltRangePx,

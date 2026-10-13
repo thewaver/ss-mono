@@ -4,15 +4,13 @@
     import * as styles from "@thewaver/ss-playground/App/Pages/ShapePage/ShapePage.css";
     import { ShapeConst } from "@thewaver/ss-utils";
 
-    import { ShapeKnobs } from "../../Knobs/Shapes.const";
+    import { ShapeKnobs } from "@thewaver/ss-playground/App/Knobs/Shapes.const";
     import PageCheckField from "../../PageComponents/Field/PageCheckField.svelte";
     import PageNumberField from "../../PageComponents/Field/PageNumberField.svelte";
     import PageSelectField from "../../PageComponents/Field/PageSelectField.svelte";
     import PageProp from "../../PageComponents/Prop/Prop.svelte";
     import type { ShapeExampleGeometry, ShapeGeometryProps } from "./ShapePage.types";
-
-    const CORNER_FIELD_WIDTH = 80;
-    const MAX_CORNER_COLUMNS = 6;
+    import { CORNER_FIELD_WIDTH, MAX_CORNER_COLUMNS } from "@thewaver/ss-playground/App/Pages/ShapePage/ShapePage.const";
 
     const spreadCornerValue = (previous: number[], index: number, value: number, hasIndividualCorners: boolean) => {
         if (!hasIndividualCorners) return previous.map(() => value);

@@ -1,11 +1,12 @@
 <script setup lang="ts">
+import {
+    NO_FILES,
+    PICK_FILE_MARK,
+} from "@thewaver/ss-playground/App/StyledComponents/FileInputContent/FileInputContent.const";
 import * as styles from "@thewaver/ss-playground/App/StyledComponents/FileInputContent/FileInputContent.css";
 
 import { useLayerClass } from "../Layer/Layer.context";
-import type { FileInputContentProps } from "./FileInputContent.types";
-
-const NO_FILES = "none picked";
-const PICK_FILE_MARK = "⬆️";
+import type { FileInputContentProps } from "./FileInputContentVue.types";
 
 defineProps<FileInputContentProps>();
 

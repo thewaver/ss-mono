@@ -1,17 +1,8 @@
 import type { Snippet } from "svelte";
 
-import type { CheckboxGroupController, CheckboxGroupOrientation } from "@thewaver/ss-components";
+import type { BaseCheckboxGroupProps, CheckboxGroupController } from "@thewaver/ss-components";
 
-export type CheckboxGroupProps<T> = {
-    /**
-     * Names the group for assistive technology. Required, because a set of boxes read without it is heard as a run of
-     * unrelated choices.
-     */
-    ariaLabel: string;
-    /** Whether the boxes run across the page or down it. */
-    orientation?: CheckboxGroupOrientation;
-    /** The space between the boxes. */
-    gap?: number;
+export type CheckboxGroupProps<T> = BaseCheckboxGroupProps & {
     /**
      * Which members are ticked, as the list of their values. Bind it with `bind:value`. A `Checkbox` inside the group
      * that is given a `value` is ticked when that value is in the list, and pressing it adds or removes it. Leave it

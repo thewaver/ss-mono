@@ -2,6 +2,7 @@ import type { CSSProperties, VNodeChild } from "vue";
 
 import type {
     AnchorPlacement,
+    BaseSelectProps,
     ButtonFlags,
     SelectOptionRecord as CoreSelectOption,
     SelectOptionGroupRecord as CoreSelectOptionGroup,
@@ -11,7 +12,6 @@ import type {
     SelectGroupFlags,
     SelectOptionFlags,
 } from "@thewaver/ss-components";
-import type { CSSPadding, Point2d, Size2d } from "@thewaver/ss-utils";
 
 import type {
     InteractionControlProps,
@@ -57,76 +57,39 @@ export type SelectFieldProps = InteractionControlProps<SelectFlags> & {
     onQueryInput: (query: string) => void;
 };
 
-export type SelectCompositeProps<T> = Omit<InteractionWrapperProps<SelectFlags>, "extraFlags"> & {
-    /** Identifies the select, and is what the field and list compose their own ids from. */
-    "id"?: string;
-    /** Names the select for assistive technology. */
-    "ariaLabel"?: string;
-    /**
-     * Names the popup list for assistive technology, written as its `aria-label`. Left out, the list is named after
-     * the `Label` the select sits in, or after the field when there is none. The `Label` fallback reads everything
-     * inside the label, the field's current text included, so pass this where the list's name should be exactly the
-     * caption.
-     */
-    "listAriaLabel"?: string;
-    /** Whether a value has to be given. It is announced and not enforced, because the library validates nothing. */
-    "isRequired"?: boolean;
-    /** Where the list sits against the field. */
-    "placement"?: AnchorPlacement;
-    /** How far the list is held clear of the field. */
-    "offset"?: Point2d;
-    /** Screen room to stay out of, for a consumer with a fixed header or sidebar the list must not slide under. */
-    "reservedScreenSize"?: Size2d;
-    /** How long the list takes to fade in and out. */
-    "transitionDurationMs"?: number;
-    /** How much room is left inside the field, around its text. */
-    "padding"?: CSSPadding | number;
-    /** Whether more than one option can be picked at a time. */
-    "isMultiple"?: boolean;
-    /** Whether there are more options to come, so the list can say so rather than looking finished. */
-    "hasMoreOptions"?: boolean;
-    /** Styles the field's text against its current state. */
-    "computeTextStyle"?: (flags: InteractionFlags<SelectFlags>) => TextFieldTextStyle;
-    /**
-     * Whether the list is open, which is what `v-model:visibility` binds. Left unbound, the select keeps its own. It
-     * is the only thing that opens or closes it.
-     */
-    "visibility"?: boolean;
-    /** Receives the list opening or closing. */
-    "onUpdate:visibility"?: (isOpen: boolean) => void;
-    /**
-     * What the reader has typed to narrow the list by, which is what `v-model:query` binds. Given, the field becomes
-     * a text field that filters; left out, typing jumps to a match. It is the only thing that changes it.
-     */
-    "query"?: string;
-    /** Receives what the reader types into a filterable field. */
-    "onUpdate:query"?: (query: string) => void;
-    /**
-     * Guesses how tall an option will be before it is drawn, which is what lets a long list render only what is on
-     * screen.
-     */
-    "computeEstimatedOptionHeight"?: (index: number) => number;
-    /** Guesses how tall a group heading will be before it is drawn, for the same reason. */
-    "computeEstimatedGroupHeight"?: (index: number) => number;
-    /** How long either marker takes to slide from one option to the next, and to fade. */
-    "floaterTransitionDurationMs"?: number;
-    /** Runs when the reader reaches the end of the list, for a consumer fetching more options as they scroll. */
-    "onReachEnd"?: () => void;
-    /** Names the clear control for assistive technology, where what it draws has no text of its own. */
-    "clearAriaLabel"?: string;
-    /** The options, in the order they are shown. An entry carrying children becomes a group. */
-    "options": SelectItem<T>[];
-    /** Which options are currently picked. */
-    "selectedOptions": SelectOption<T>[];
-    /** Whether a given value counts as picked, for a consumer whose values are not compared by identity. */
-    "computeIsSelected": (value: T) => boolean;
-    /** The text an option is found by when the reader types, where that is not its visible text. */
-    "computeCustomText"?: (option: SelectOption<T>) => string;
-    /** Runs when an option is picked. */
-    "onPick": (value: T) => void;
-    /** Runs when the clear control is pressed, to empty whatever is picked. */
-    "onClear": () => void;
-};
+export type SelectCompositeProps<T> = Omit<InteractionWrapperProps<SelectFlags>, "extraFlags"> &
+    BaseSelectProps & {
+        /** Whether more than one option can be picked at a time. */
+        "isMultiple"?: boolean;
+        /** Styles the field's text against its current state. */
+        "computeTextStyle"?: (flags: InteractionFlags<SelectFlags>) => TextFieldTextStyle;
+        /**
+         * Whether the list is open, which is what `v-model:visibility` binds. Left unbound, the select keeps its own. It
+         * is the only thing that opens or closes it.
+         */
+        "visibility"?: boolean;
+        /** Receives the list opening or closing. */
+        "onUpdate:visibility"?: (isOpen: boolean) => void;
+        /**
+         * What the reader has typed to narrow the list by, which is what `v-model:query` binds. Given, the field becomes
+         * a text field that filters; left out, typing jumps to a match. It is the only thing that changes it.
+         */
+        "query"?: string;
+        /** Receives what the reader types into a filterable field. */
+        "onUpdate:query"?: (query: string) => void;
+        /** The options, in the order they are shown. An entry carrying children becomes a group. */
+        "options": SelectItem<T>[];
+        /** Which options are currently picked. */
+        "selectedOptions": SelectOption<T>[];
+        /** Whether a given value counts as picked, for a consumer whose values are not compared by identity. */
+        "computeIsSelected": (value: T) => boolean;
+        /** The text an option is found by when the reader types, where that is not its visible text. */
+        "computeCustomText"?: (option: SelectOption<T>) => string;
+        /** Runs when an option is picked. */
+        "onPick": (value: T) => void;
+        /** Runs when the clear control is pressed, to empty whatever is picked. */
+        "onClear": () => void;
+    };
 
 export type SelectPresetSlots<T> = Pick<InteractionWrapperSlots<SelectFlags>, "renderDecoration"> & {
     /**

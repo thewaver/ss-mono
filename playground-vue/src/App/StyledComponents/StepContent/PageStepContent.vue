@@ -1,16 +1,9 @@
 <script setup lang="ts">
+import { MARKER_GLYPHS } from "@thewaver/ss-playground/App/StyledComponents/StepContent/StepContent.const";
 import * as styles from "@thewaver/ss-playground/App/StyledComponents/StepContent/StepContent.css";
 
 import { useLayerClass } from "../Layer/Layer.context";
-import type { StepContentProps } from "./StepContent.types";
-
-const MARKER_GLYPHS = {
-    done: "✓",
-    current: "",
-    failed: "!",
-    skipped: "–",
-    ahead: "",
-} as const;
+import type { StepContentProps } from "./StepContentVue.types";
 
 defineProps<StepContentProps>();
 

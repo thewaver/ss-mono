@@ -2,7 +2,7 @@
 import * as styles from "@thewaver/ss-playground/App/StyledComponents/MosaicContent/MosaicContent.css";
 
 import { useLayerClass } from "../Layer/Layer.context";
-import type { PageMosaicLinkProps } from "./MosaicContent.types";
+import type { PageMosaicLinkProps } from "./MosaicContentVue.types";
 
 defineProps<PageMosaicLinkProps>();
 

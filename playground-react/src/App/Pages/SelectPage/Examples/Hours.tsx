@@ -3,8 +3,8 @@ import { Select } from "@thewaver/ss-components-react";
 import { renderPageHighlightFloater } from "../../../StyledComponents/GlideFloater/GlideFloater";
 import { PageSelectContent } from "../../../StyledComponents/SelectContent/SelectContent";
 import { PageSelectOptionContent } from "../../../StyledComponents/SelectOptionContent/SelectOptionContent";
-import { HOURS, PLACEHOLDER, renderSelectPopup } from "../SelectPage.const";
 import type { SelectExampleProps } from "../SelectPage.types";
+import { HOURS, PLACEHOLDER, renderSelectPopup } from "../SelectPageReact.const";
 
 type Props = SelectExampleProps;
 

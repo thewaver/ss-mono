@@ -7,7 +7,7 @@
     import PageModalOverlay from "../../StyledComponents/ModalOverlay/ModalOverlay.svelte";
     import PageModalPanel from "../../StyledComponents/ModalPanel/PageModalPanel.svelte";
     import PagePropsPanel from "../PropsPanel/PagePropsPanel.svelte";
-    import type { StressTestProps } from "./StressText.types";
+    import type { StressTestProps } from "./StressTextSvelte.types";
 
     let props: StressTestProps = $props();
 

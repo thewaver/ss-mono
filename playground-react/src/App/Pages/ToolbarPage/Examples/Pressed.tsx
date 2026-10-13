@@ -4,8 +4,8 @@ import * as styles from "@thewaver/ss-playground/App/Pages/ToolbarPage/ToolbarPa
 
 import { PageButtonContent } from "../../../StyledComponents/ButtonContent/ButtonContent";
 import { PageMenuTriggerContent } from "../../../StyledComponents/MenuTriggerContent/MenuTriggerContent";
-import { renderToolbarOverflowItem, renderToolbarPopup } from "../ToolbarPage.const";
-import type { ToolbarPressedExampleProps } from "../ToolbarPage.types";
+import { renderToolbarOverflowItem, renderToolbarPopup } from "../ToolbarPageReact.const";
+import type { ToolbarPressedExampleProps } from "../ToolbarPageReact.types";
 
 const ACTIONS: ToolbarAction<string>[] = [{ value: "Bold" }, { value: "Italic" }, { value: "Underline" }];
 

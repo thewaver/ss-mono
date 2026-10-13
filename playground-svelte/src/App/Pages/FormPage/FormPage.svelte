@@ -3,8 +3,7 @@
     import PageExamples from "../../PageComponents/Examples/PageExamples.svelte";
     import FocusOnErrorExample from "./Examples/FocusOnError.svelte";
     import SignUpExample from "./Examples/SignUp.svelte";
-
-    const EXAMPLES_ROOT = "/src/App/Pages/FormPage/Examples";
+    import { EXAMPLE_NAMES, EXAMPLES_ROOT } from "@thewaver/ss-playground/App/Pages/FormPage/FormPage.const";
 
     let email = $state("");
     let password = $state("");
@@ -20,14 +19,14 @@
     const examples: ExampleDefs[] = [
         {
             key: "reportsValidity",
-            name: "A form that reports its own validity",
+            name: EXAMPLE_NAMES.reportsValidity,
             readout: () => `outcome: ${outcome}`,
             component: signUpExample,
             path: `${EXAMPLES_ROOT}/SignUp.svelte`,
         },
         {
             key: "focusOnError",
-            name: "Submitting moves focus to the first error",
+            name: EXAMPLE_NAMES.focusOnError,
             readout: () =>
                 `outcome: ${focusOutcome} — the handler runs either way, and afterwards focus lands on the first field reporting an error`,
             component: focusOnErrorExample,

@@ -119,3 +119,52 @@ export type SortableGridTransfer<T> = {
     fromSpot?: SortableGridSpot;
     toSpot: SortableGridSpot;
 };
+
+export type BaseSortableGridValues = {
+    /**
+     * Identifies the grid, so two grids can tell their own items from each other's when something is dragged between
+     * them.
+     */
+    groupId: string;
+    /** Names the grid for assistive technology. */
+    ariaLabel: string;
+    /**
+     * Everything the grid says aloud while an item is moved, and the key hints and spot names those announcements are
+     * built from. There is no default: every word a reader hears comes from here.
+     */
+    announcements: SortableGridAnnouncements;
+    /** How many cells across the grid is. */
+    columns: number;
+    /** How many cells down the grid is. */
+    rows: number;
+    /** How large one cell is. */
+    cellSize: number;
+    /** The space between cells. */
+    gap?: number;
+    /** Freezes the grid as it stands: items still show, but none can be moved. */
+    isLocked?: boolean;
+    /** Whether an item can be turned on the spot as well as moved. */
+    isTurnable?: boolean;
+};
+
+export type BaseSortableGridCbs<T> = {
+    /**
+     * Whether a cell is blocked, which is a wall: no item lands on it or overlaps it, an item arriving from elsewhere
+     * is put clear of it, the arrow keys step a carried item over it, and `renderCell` is told so it can be drawn.
+     * Every cell is open when this is left out.
+     */
+    computeIsSpotBlocked?: (spot: SortableGridSpot) => boolean;
+    /** The key one item is told apart by, which is what lets an item keep its identity as it moves. */
+    computeItemKey: (value: T) => string;
+    /** Names one item for assistive technology. */
+    computeItemLabel: (value: T) => string;
+    /**
+     * Whether this grid will take an item offered to it, and from which grid, so a grid can refuse what does not
+     * belong.
+     */
+    computeCanAccept?: (value: T, fromLabel: string) => boolean;
+    /** Runs when an item is moved, here or to another grid. */
+    onTransfer?: (transfer: SortableGridTransfer<T>) => void;
+};
+
+export type BaseSortableGridProps<T> = BaseSortableGridValues & BaseSortableGridCbs<T>;

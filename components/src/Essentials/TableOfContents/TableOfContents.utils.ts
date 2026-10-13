@@ -1,3 +1,4 @@
+import { VirtualizerUtils } from "../../Abstracts/Virtualizer/Virtualizer.utils";
 import type { TableOfContentsLink } from "./TableOfContents.types";
 
 /** The attribute that makes a heading focusable without putting it in the tab order. */
@@ -8,6 +9,26 @@ const PROGRAMMATIC_TAB_INDEX = "-1";
 
 /** What the reader does to move about a page of their own accord: a wheel, a touch, a key, a press. */
 const READER_INPUT_EVENTS = ["wheel", "touchstart", "keydown", "pointerdown"] as const;
+
+/** A computed length in pixels as a number, with anything that is not one — `auto` among them — read as `0`. */
+const toPixels = (value: string) => parseFloat(value) || 0;
+
+/**
+ * The `scrollTop` that puts a target's top at the top of the box it scrolls in, less the target's `scroll-margin-top`
+ * and the box's `scroll-padding-top`.
+ *
+ * Measured from the two elements' on-screen boxes, which a scaled ancestor shrinks; the distance between them is put
+ * back into the box's own pixels by the box's on-screen height over its laid-out one.
+ */
+const computeScrollTopFor = (target: HTMLElement, scroller: HTMLElement) => {
+    const scrollerRect = scroller.getBoundingClientRect();
+    const scale = scroller.offsetHeight > 0 ? scrollerRect.height / scroller.offsetHeight : 1;
+    const distance = (target.getBoundingClientRect().top - scrollerRect.top) / scale - scroller.clientTop;
+    const margin = toPixels(getComputedStyle(target).scrollMarginTop);
+    const padding = toPixels(getComputedStyle(scroller).scrollPaddingTop);
+
+    return scroller.scrollTop + distance - margin - padding;
+};
 
 /**
  * The part of a table of contents that is not about drawing it: which section is current, and taking the reader to
@@ -52,14 +73,27 @@ export namespace TableOfContentsUtils {
     };
 
     /**
-     * Takes the reader to a link's section: its target is scrolled to the top of the view and given focus.
+     * Takes the reader to a link's section: its target is scrolled to the top of the box it scrolls in and given
+     * focus.
      *
+     * Only that box moves. `scrollIntoView` scrolls every scrolling ancestor, so an article in a panel of its own would
+     * also drag the page until the panel's top met the window's; the option that limits it to the nearest box is not
+     * supported everywhere, so the scroll is worked out here instead. The target's `scroll-margin-top` and the box's
+     * `scroll-padding-top` are honored as `scrollIntoView` would honor them, and the box's own `scroll-behavior`
+     * decides whether it animates. When the target scrolls with the document itself, `scrollIntoView` is used as is.
      * Focus is moved without a second scroll, so the target lands where the first one put it.
      *
      * @param target The element the link leads to.
      */
     export const goToTarget = (target: HTMLElement) => {
-        target.scrollIntoView({ block: "start" });
+        const scroller = VirtualizerUtils.findScrollParent(target);
+
+        if (!scroller || scroller === target.ownerDocument.scrollingElement) {
+            target.scrollIntoView({ block: "start" });
+        } else {
+            scroller.scrollTo({ top: computeScrollTopFor(target, scroller) });
+        }
+
         target.focus({ preventScroll: true });
     };
 

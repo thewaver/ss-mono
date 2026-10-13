@@ -5,8 +5,8 @@ import { SVGFilterDefsFactory } from "@thewaver/ss-components-vue";
 import * as styles from "@thewaver/ss-playground/App/Pages/SVGFiltersPage/SVGFiltersPage.css";
 
 import PageFilterStage from "../../../StyledComponents/SVGFiltersContent/SVGFiltersContent.vue";
-import { applyStep } from "../SVGFiltersPage.const";
 import type { SVGFiltersStackExampleProps } from "../SVGFiltersPage.types";
+import { applyStep } from "../SVGFiltersPageVue.const";
 import StepList from "./StepList.vue";
 
 const FILTER_ID = "svgFiltersStack";

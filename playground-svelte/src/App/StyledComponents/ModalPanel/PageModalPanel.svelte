@@ -4,7 +4,7 @@
     import * as styles from "@thewaver/ss-playground/App/StyledComponents/ModalPanel/ModalPanel.css";
 
     import PageLayer from "../../PageComponents/Layer/Layer.svelte";
-    import type { ModalPanelProps } from "./ModalPanel.types";
+    import type { ModalPanelProps } from "./ModalPanelSvelte.types";
 
     let props: ModalPanelProps & { children?: Snippet } = $props();
 </script>

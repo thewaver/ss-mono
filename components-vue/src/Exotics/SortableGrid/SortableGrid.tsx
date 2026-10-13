@@ -20,12 +20,12 @@ import {
     type SortableGridItemFlags,
     type SortableGridPlace,
     type SortableGridShape,
-    type SortableGridSpot,
     SortableGridStyles,
     SortableGridUtils,
     SortableUtils,
     ViewportUtils,
 } from "@thewaver/ss-components";
+import { SortableGridConst } from "@thewaver/ss-components/internal";
 import type { Point2d } from "@thewaver/ss-utils";
 
 import { CarrierVueUtils } from "../../Abstracts/Carrier/CarrierVue.utils";
@@ -49,8 +49,6 @@ import type {
     SortableGridProps,
     SortableGridSlots,
 } from "./SortableGrid.types";
-
-const NO_BLOCKED_SPOTS: SortableGridSpot[] = [];
 
 const SortableGridItemSlot = defineComponent(
     (props: SortableGridItemSlotProps, { slots }: SlotsContext<SortableGridItemSlotSlots>) =>
@@ -152,7 +150,7 @@ export const SortableGrid = defineComponent(
             const computeIsSpotBlocked = props.computeIsSpotBlocked;
 
             return computeIsSpotBlocked === undefined
-                ? NO_BLOCKED_SPOTS
+                ? SortableGridConst.NO_BLOCKED_SPOTS
                 : cells.value.filter((spot) => computeIsSpotBlocked(spot));
         });
 

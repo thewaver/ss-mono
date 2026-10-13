@@ -5,8 +5,8 @@ import type { TreeNode } from "@thewaver/ss-components-react";
 
 import { renderPageHighlightFloater } from "../../../StyledComponents/GlideFloater/GlideFloater";
 import { PageTreeNodeContent, PageTreeNodePending } from "../../../StyledComponents/TreeNodeContent/TreeNodeContent";
-import { REMOTE_CHILDREN, REMOTE_LOAD_DELAY_MS, REMOTE_ROOT } from "../TreePage.const";
 import type { TreeExampleProps } from "../TreePage.types";
+import { REMOTE_CHILDREN, REMOTE_LOAD_DELAY_MS, REMOTE_ROOT } from "../TreePageReact.const";
 
 type Props = TreeExampleProps;
 

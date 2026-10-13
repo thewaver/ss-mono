@@ -3,7 +3,7 @@
     import * as styles from "@thewaver/ss-playground/App/StyledComponents/StepContent/StepContent.css";
 
     import { getLayerClass } from "../Layer/Layer.context";
-    import type { StepArcConnectorProps } from "./StepContent.types";
+    import type { StepArcConnectorProps } from "./StepContentSvelte.types";
 
     let props: StepArcConnectorProps = $props();
 

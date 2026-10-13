@@ -4,6 +4,8 @@ import { computed, shallowRef } from "vue";
 import { AUDIO_SWITCHER_DEFAULTS } from "@thewaver/ss-components-vue";
 import { AudioSwitcherKnobs } from "@thewaver/ss-playground/App/Knobs/AudioSwitchers.const";
 import {
+    EXAMPLES_ROOT,
+    EXAMPLE_NAMES,
     FIELD_WIDTH,
     PERCENT,
     TRACKS,
@@ -18,8 +20,6 @@ import PageProp from "../../PageComponents/Prop/Prop.vue";
 import PagePropsPanel from "../../PageComponents/PropsPanel/PagePropsPanel.vue";
 import DefaultExample from "./Examples/Default.vue";
 
-const EXAMPLES_ROOT = "/src/App/Pages/AudioSwitcherPage/Examples";
-
 const crossfadeMs = shallowRef(AudioSwitcherKnobs.STARTING_CROSSFADE_MS);
 const volumePercent = shallowRef(AUDIO_SWITCHER_DEFAULTS.volume * PERCENT);
 const trackName = shallowRef(TRACKS[0].name);
@@ -31,7 +31,7 @@ const src = computed(() => TRACKS.find((track) => track.name === trackName.value
 const examples: ExampleDefs[] = [
     {
         key: "default",
-        name: "Crossfading between two loops",
+        name: EXAMPLE_NAMES.default,
         readout: () =>
             `${trackName.value} — ${playback.value ? "playing" : "stopped"}; nothing sounds until you ask, because a source arriving at mount does not start on its own — every switch after that does`,
         path: `${EXAMPLES_ROOT}/Default.vue`,

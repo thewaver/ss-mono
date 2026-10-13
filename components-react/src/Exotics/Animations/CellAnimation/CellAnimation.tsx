@@ -1,6 +1,7 @@
 import { type CSSProperties, useEffect, useLayoutEffect, useMemo, useRef, useState } from "react";
 
 import { CELL_ANIMATION_DEFAULTS, CellAnimationStyles, CellAnimationUtils } from "@thewaver/ss-components";
+import { CellAnimationConst } from "@thewaver/ss-components/internal";
 import { assignInlineVars } from "@vanilla-extract/dynamic";
 
 import { ElementObserverReactUtils } from "../../../Abstracts/ElementObserver/ElementObserverReact.utils";
@@ -8,10 +9,6 @@ import { InteractionTrackerReactUtils } from "../../../Abstracts/InteractionTrac
 import { SignalMirrorReactUtils } from "../../../Abstracts/SignalMirror/SignalMirrorReact.utils";
 import { useLatest } from "../../../Utils/refUtils";
 import type { CellAnimationProps } from "./CellAnimation.types";
-
-const NO_PROGRESS = 0;
-const FIRST_ITERATION = 0;
-const NO_WEIGHTS: number[][] = [];
 
 export const CellAnimation = (props: CellAnimationProps) => {
     const durationMs = props.animationDurationMs ?? CELL_ANIMATION_DEFAULTS.animationDurationMs;
@@ -27,8 +24,11 @@ export const CellAnimation = (props: CellAnimationProps) => {
     const isPageHidden = InteractionTrackerReactUtils.usePageHidden();
 
     const [isPlaying] = SignalMirrorReactUtils.useOptionalState(props.playback, true);
-    const [progress, setProgressState] = SignalMirrorReactUtils.useOptionalState(props.progress, NO_PROGRESS);
-    const [currentIteration, setCurrentIterationState] = useState(FIRST_ITERATION);
+    const [progress, setProgressState] = SignalMirrorReactUtils.useOptionalState(
+        props.progress,
+        CellAnimationConst.NO_PROGRESS,
+    );
+    const [currentIteration, setCurrentIterationState] = useState(CellAnimationConst.FIRST_ITERATION);
 
     const rootSize = ElementObserverReactUtils.useBorderBoxSize(imgRef);
 
@@ -50,7 +50,7 @@ export const CellAnimation = (props: CellAnimationProps) => {
     const cellCount = CellAnimationUtils.computeCellCount(props.cellCount, rootSize);
 
     const weights = useMemo(
-        () => props.computeCellWeights?.(cellCount) ?? NO_WEIGHTS,
+        () => props.computeCellWeights?.(cellCount) ?? CellAnimationConst.NO_WEIGHTS,
         [props.computeCellWeights, cellCount.col, cellCount.row],
     );
 
@@ -88,8 +88,8 @@ export const CellAnimation = (props: CellAnimationProps) => {
         if (drawnSrcRef.current === props.src) return;
 
         drawnSrcRef.current = props.src;
-        latest.current.setCurrentIteration(FIRST_ITERATION);
-        latest.current.setProgress(NO_PROGRESS);
+        latest.current.setCurrentIteration(CellAnimationConst.FIRST_ITERATION);
+        latest.current.setProgress(CellAnimationConst.NO_PROGRESS);
     }, [props.src]);
 
     useLayoutEffect(() => {

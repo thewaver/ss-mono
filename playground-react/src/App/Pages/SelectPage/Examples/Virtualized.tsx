@@ -5,8 +5,8 @@ import { renderPageHighlightFloater } from "../../../StyledComponents/GlideFloat
 import { PageSelectContent } from "../../../StyledComponents/SelectContent/SelectContent";
 import { PageSelectGroupContent } from "../../../StyledComponents/SelectGroupContent/SelectGroupContent";
 import { PageSelectOptionContent } from "../../../StyledComponents/SelectOptionContent/SelectOptionContent";
-import { PLACEHOLDER, renderSelectPopup } from "../SelectPage.const";
 import type { SelectVirtualizedExampleProps } from "../SelectPage.types";
+import { PLACEHOLDER, renderSelectPopup } from "../SelectPageReact.const";
 
 const STRESS_OPTION_HEIGHT = 100;
 const STRESS_GROUP_HEIGHT = 32;

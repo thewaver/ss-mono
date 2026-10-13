@@ -9,7 +9,7 @@ import { CONTROL_GLYPHS } from "@thewaver/ss-playground/App/StyledComponents/Con
 
 import PageMeasureBox from "../../../PageComponents/MeasureBox/MeasureBox.vue";
 import PageControlButtonContent from "../../../StyledComponents/ControlButtonContent/ControlButtonContent.vue";
-import type { TypewriterPhrasesExampleProps } from "../TypewriterPage.types";
+import type { TypewriterPhrasesExampleProps } from "../TypewriterPageVue.types";
 
 const LEAD = "We build";
 const PHRASES = ["websites", "apps", "games"];

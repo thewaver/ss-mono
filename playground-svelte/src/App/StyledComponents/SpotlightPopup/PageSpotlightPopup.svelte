@@ -4,7 +4,7 @@
     import * as styles from "@thewaver/ss-playground/App/StyledComponents/SpotlightPopup/SpotlightPopup.css";
 
     import PageLayer from "../../PageComponents/Layer/Layer.svelte";
-    import type { SpotlightPopupProps } from "./SpotlightPopup.types";
+    import type { SpotlightPopupProps } from "./SpotlightPopupSvelte.types";
 
     let props: SpotlightPopupProps & { children?: Snippet } = $props();
 </script>

@@ -2,9 +2,8 @@
     import * as styles from "@thewaver/ss-playground/App/StyledComponents/ProgressContent/ProgressContent.css";
 
     import { getLayerClass } from "../Layer/Layer.context";
-    import type { ProgressContentProps } from "./ProgressContent.types";
-
-    const PERCENT = 100;
+    import type { ProgressContentProps } from "./ProgressContentSvelte.types";
+    import { PERCENT } from "@thewaver/ss-playground/App/StyledComponents/ProgressContent/ProgressContent.const";
 
     let props: ProgressContentProps = $props();
 

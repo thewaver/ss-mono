@@ -2,7 +2,7 @@
     import * as styles from "@thewaver/ss-playground/App/StyledComponents/PatchBoardContent/PatchBoardContent.css";
 
     import { getLayerClass } from "../Layer/Layer.context";
-    import type { PagePatchSocketProps } from "./PatchBoardContent.types";
+    import type { PagePatchSocketProps } from "./PatchBoardContentSvelte.types";
 
     let props: PagePatchSocketProps = $props();
 

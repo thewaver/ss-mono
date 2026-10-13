@@ -2,6 +2,11 @@ import { useMemo, useState } from "react";
 
 import { HOVER_CARD_DEFAULTS } from "@thewaver/ss-components-react";
 import { HoverCardKnobs } from "@thewaver/ss-playground/App/Knobs/HoverCards.const";
+import {
+    EXAMPLES_ROOT,
+    EXAMPLE_NAMES,
+    FIELD_WIDTH,
+} from "@thewaver/ss-playground/App/Pages/HoverCardPage/HoverCardPage.const";
 
 import { PageExamples } from "../../PageComponents/Examples/Examples";
 import { PageNumberField } from "../../PageComponents/Field/Field";
@@ -9,11 +14,7 @@ import { PageProp } from "../../PageComponents/Prop/Prop";
 import { PagePropsPanel } from "../../PageComponents/PropsPanel/PropsPanel";
 import { NavigationMenuExample } from "./Examples/NavigationMenu";
 import { ProfileExample } from "./Examples/Profile";
-import type { HoverCardExampleProps, NavigationMenuExampleProps } from "./HoverCardPage.types";
-
-const EXAMPLES_ROOT = "/src/App/Pages/HoverCardPage/Examples";
-
-const FIELD_WIDTH = 110;
+import type { HoverCardExampleProps, NavigationMenuExampleProps } from "./HoverCardPageReact.types";
 
 export const HoverCardPage = () => {
     const [offsetY, setOffsetY] = useState(HoverCardKnobs.STARTING_OFFSET_Y);
@@ -47,7 +48,7 @@ export const HoverCardPage = () => {
     const examples = [
         {
             key: "profile",
-            name: "A profile card",
+            name: EXAMPLE_NAMES.profile,
             readout: () =>
                 `open: ${visibilityState[0]}, following: ${followingState[0]} — rest on the name, or tab to it and wait, then Tab again to reach the button and the link; Escape brings focus back to the name`,
             component: () => <ProfileExample {...commonProps} />,
@@ -55,7 +56,7 @@ export const HoverCardPage = () => {
         },
         {
             key: "navigation",
-            name: "A navigation menu",
+            name: EXAMPLE_NAMES.navigation,
             readout: () =>
                 `open: ${openKeyState[0] ?? "none"} — each flyout is a popup trigger over a popover, opened by a press or by resting on it through the same hover engine; only one is open at a time`,
             component: () => <NavigationMenuExample {...navigationProps} />,

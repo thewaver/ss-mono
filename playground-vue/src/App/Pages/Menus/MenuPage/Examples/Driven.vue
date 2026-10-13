@@ -7,8 +7,8 @@ import PageControlButtonContent from "../../../../StyledComponents/ControlButton
 import PageGlideFloater from "../../../../StyledComponents/GlideFloater/PageGlideFloater.vue";
 import PageMenuTriggerContent from "../../../../StyledComponents/MenuTriggerContent/MenuTriggerContent.vue";
 import MenuActionItem from "../MenuActionItem.vue";
-import { ACTIONS } from "../MenuPage.const";
-import type { MenuDrivenExampleProps } from "../MenuPage.types";
+import { ACTIONS } from "../MenuPageVue.const";
+import type { MenuDrivenExampleProps } from "../MenuPageVue.types";
 import MenuPopup from "../MenuPopup.vue";
 
 type Props = MenuDrivenExampleProps;

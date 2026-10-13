@@ -2,6 +2,9 @@ import { MathUtils, type Point2d, Point2dUtils, type Size2d, StoreUtils } from "
 
 import type { WraparoundPlane, WraparoundPlaneOpts, WraparoundPlaneState, WraparoundTile } from "./Wraparound.types";
 
+/** What joins a cell's column and row in its key. */
+const TILE_KEY_SEPARATOR = ",";
+
 /** How far the pointer must travel before a press counts as a drag rather than a tap. */
 const DRAG_SLOP_PX = 4;
 
@@ -86,6 +89,29 @@ const revealAlong = (position: number, extent: number, period: number, view: num
  * nearest the window, so tabbing to an item brings the item itself into view.
  */
 export namespace WraparoundUtils {
+    /**
+     * A cell of the grid as a string, for keying the copies a framework draws.
+     *
+     * Two cells give the same key exactly when they are the same cell, so a copy keyed by it survives a move that
+     * keeps its cell on screen. {@link fromTileKey} reads it back.
+     *
+     * @param tile The cell.
+     * @returns The column and row, joined.
+     */
+    export const toTileKey = (tile: WraparoundTile) => `${tile.column}${TILE_KEY_SEPARATOR}${tile.row}`;
+
+    /**
+     * The cell a key from {@link toTileKey} names.
+     *
+     * @param key A key {@link toTileKey} made.
+     * @returns The cell.
+     */
+    export const fromTileKey = (key: string): WraparoundTile => {
+        const [column, row] = key.split(TILE_KEY_SEPARATOR).map(Number);
+
+        return { column, row };
+    };
+
     /**
      * Where a cell of the grid sits in the window.
      *

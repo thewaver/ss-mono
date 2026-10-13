@@ -4,7 +4,7 @@ import { shallowRef } from "vue";
 import { FileInput } from "@thewaver/ss-components-vue";
 
 import PageFileInputContent from "../../StyledComponents/FileInputContent/FileInputContent.vue";
-import type { PageFileFieldProps } from "./Field.types";
+import type { PageFileFieldProps } from "./FieldVue.types";
 
 const props = defineProps<PageFileFieldProps>();
 

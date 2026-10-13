@@ -12,8 +12,7 @@
     import * as styles from "@thewaver/ss-playground/App/StyledComponents/NavLinkContent/NavLinkContent.css";
 
     import { renderPageHighlightFloater } from "../../StyledComponents/GlideFloater/GlideFloater.const.svelte";
-
-    const LINK_SELECTOR = "a";
+    import { LINK_SELECTOR } from "@thewaver/ss-playground/App/PageComponents/NavLink/NavLink.const";
 
     const transitionDurationMs = TREE_DEFAULTS.floaterTransitionDurationMs;
 

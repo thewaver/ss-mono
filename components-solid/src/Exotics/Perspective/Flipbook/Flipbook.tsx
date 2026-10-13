@@ -11,6 +11,7 @@ import {
     SpineUtils,
     FlipbookStyles as styles,
 } from "@thewaver/ss-components";
+import { FlipbookConst } from "@thewaver/ss-components/internal";
 
 import { InteractionTrackerSolidUtils } from "../../../Abstracts/InteractionTracker/InteractionTrackerSolid.utils";
 import { SignalMirrorSolidUtils } from "../../../Abstracts/SignalMirror/SignalMirrorSolid.utils";
@@ -19,8 +20,6 @@ import { Spine } from "../../../Primitives/Spine/Spine";
 import { access } from "../../../Utils/propUtils";
 import { accessStore } from "../../../Utils/storeUtils";
 import type { FlipbookControlProps, FlipbookControls, FlipbookProps } from "./FlipbookSolid.types";
-
-const FIRST_SPREAD = 0;
 
 const FlipbookControl = (props: FlipbookControlProps) => {
     const getIsDisabled = () => access(props.flags).isDisabled ?? false;
@@ -48,7 +47,7 @@ export const Flipbook = <T,>(props: FlipbookProps<T>) => {
 
     const [getBookRef, setBookRef] = createSignal<HTMLElement>();
 
-    const [getIndex, setIndex] = SignalMirrorSolidUtils.createOptional(() => props.index, FIRST_SPREAD);
+    const [getIndex, setIndex] = SignalMirrorSolidUtils.createOptional(() => props.index, FlipbookConst.FIRST_SPREAD);
 
     const getPages = createMemo(() => access(props.pages));
 

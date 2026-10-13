@@ -2,7 +2,7 @@
 import * as styles from "@thewaver/ss-playground/App/StyledComponents/EraCycleContent/EraCycleContent.css";
 
 import { useLayerClass } from "../Layer/Layer.context";
-import type { EraCycleContentProps } from "./EraCycleContent.types";
+import type { EraCycleContentProps } from "./EraCycleContentVue.types";
 
 defineProps<EraCycleContentProps>();
 

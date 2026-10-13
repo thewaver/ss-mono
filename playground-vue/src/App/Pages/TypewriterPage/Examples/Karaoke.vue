@@ -9,7 +9,7 @@ import { CONTROL_GLYPHS } from "@thewaver/ss-playground/App/StyledComponents/Con
 import PageMeasureBox from "../../../PageComponents/MeasureBox/MeasureBox.vue";
 import PageControlButtonContent from "../../../StyledComponents/ControlButtonContent/ControlButtonContent.vue";
 import PageRangeContent from "../../../StyledComponents/RangeContent/RangeContent.vue";
-import type { TypewriterKaraokeExampleProps } from "../TypewriterPage.types";
+import type { TypewriterKaraokeExampleProps } from "../TypewriterPageVue.types";
 
 const LYRIC = "Twinkle, twinkle, little star";
 const PERCENT = 100;

@@ -3,7 +3,7 @@ import type { PropsWithChildren } from "react";
 import * as styles from "@thewaver/ss-playground/App/StyledComponents/BreadcrumbContent/BreadcrumbContent.css";
 
 import { useLayerClass } from "../Layer/Layer.context";
-import type { BreadcrumbContentProps } from "./BreadcrumbContent.types";
+import type { BreadcrumbContentProps } from "./BreadcrumbContentReact.types";
 
 export const PageBreadcrumbContent = (props: PropsWithChildren<BreadcrumbContentProps>) => {
     const layerClass = useLayerClass();

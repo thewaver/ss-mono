@@ -1,6 +1,12 @@
 import { useMemo, useState } from "react";
 
-import { CITIES, PIN_LENGTH, QUANTITY_STEP } from "@thewaver/ss-playground/App/Pages/TextInputPage/TextInputPage.const";
+import {
+    CITIES,
+    EXAMPLES_ROOT,
+    EXAMPLE_NAMES,
+    PIN_LENGTH,
+    QUANTITY_STEP,
+} from "@thewaver/ss-playground/App/Pages/TextInputPage/TextInputPage.const";
 
 import { PageExamples } from "../../PageComponents/Examples/Examples";
 import { BothAdornmentsExample } from "./Examples/BothAdornments";
@@ -16,8 +22,6 @@ import { ReachableExample } from "./Examples/Reachable";
 import { ReadOnlyExample } from "./Examples/ReadOnly";
 import { RefusingSetterExample } from "./Examples/RefusingSetter";
 import { TransformingSetterExample } from "./Examples/TransformingSetter";
-
-const EXAMPLES_ROOT = "/src/App/Pages/TextInputPage/Examples";
 
 export const TextInputPage = () => {
     const defaultState = useState("");
@@ -47,28 +51,28 @@ export const TextInputPage = () => {
     const examples = [
         {
             key: "default",
-            name: "Default",
+            name: EXAMPLE_NAMES.default,
             readout: () => `value: "${defaultState[0]}"`,
             component: () => <DefaultExample value={defaultState} />,
             path: `${EXAMPLES_ROOT}/Default.tsx`,
         },
         {
             key: "transformingSetter",
-            name: "Transforming setter",
+            name: EXAMPLE_NAMES.transformingSetter,
             readout: () => `value: "${codeState[0]}" — type lowercase mid-string, the caret must not jump`,
             component: () => <TransformingSetterExample value={codeState} />,
             path: `${EXAMPLES_ROOT}/TransformingSetter.tsx`,
         },
         {
             key: "refusingSetter",
-            name: "Refusing setter",
+            name: EXAMPLE_NAMES.refusingSetter,
             readout: () => `value: "${pinState[0]}" — letters are refused, ${PIN_LENGTH} digits max`,
             component: () => <RefusingSetterExample value={pinState} />,
             path: `${EXAMPLES_ROOT}/RefusingSetter.tsx`,
         },
         {
             key: "suggestions",
-            name: "Suggestions",
+            name: EXAMPLE_NAMES.suggestions,
             readout: () =>
                 `value: "${cityState[0]}" — ${citySuggestions.length} suggested; any text is kept, and Enter only picks once the arrows have moved into the list`,
             component: () => <CitiesExample value={cityState} suggestions={citySuggestions} />,
@@ -76,7 +80,7 @@ export const TextInputPage = () => {
         },
         {
             key: "editable",
-            name: "Edit in place",
+            name: EXAMPLE_NAMES.editable,
             readout: () =>
                 `value: "${editableState[0]}" | editing: ${editingState[0]} — Enter or leaving keeps the edit, Escape puts the old text back`,
             component: () => <EditableExample value={editableState} editing={editingState} />,
@@ -84,56 +88,56 @@ export const TextInputPage = () => {
         },
         {
             key: "password",
-            name: "Password",
+            name: EXAMPLE_NAMES.password,
             readout: () => `value: "${passwordState[0]}" | revealed: ${revealState[0]}`,
             component: () => <PasswordExample value={passwordState} reveal={revealState} />,
             path: `${EXAMPLES_ROOT}/Password.tsx`,
         },
         {
             key: "bothAdornments",
-            name: "Both adornments",
+            name: EXAMPLE_NAMES.bothAdornments,
             readout: () => `value: "${amountState[0]}"`,
             component: () => <BothAdornmentsExample value={amountState} />,
             path: `${EXAMPLES_ROOT}/BothAdornments.tsx`,
         },
         {
             key: "number",
-            name: "Number",
+            name: EXAMPLE_NAMES.number,
             readout: () => `value: "${quantityState[0]}" — arrows step by ${QUANTITY_STEP}, no spinner buttons`,
             component: () => <NumberFieldExample value={quantityState} />,
             path: `${EXAMPLES_ROOT}/NumberField.tsx`,
         },
         {
             key: "readOnly",
-            name: "Read-only",
+            name: EXAMPLE_NAMES.readOnly,
             readout: () => `value: "${readOnlyState[0]}" — selectable and copyable, never editable`,
             component: () => <ReadOnlyExample value={readOnlyState} />,
             path: `${EXAMPLES_ROOT}/ReadOnly.tsx`,
         },
         {
             key: "disabled",
-            name: "Disabled",
+            name: EXAMPLE_NAMES.disabled,
             readout: () => `value: "${disabledState[0]}"`,
             component: () => <DisabledExample value={disabledState} />,
             path: `${EXAMPLES_ROOT}/Disabled.tsx`,
         },
         {
             key: "reachable",
-            name: "Disabled + reachable",
+            name: EXAMPLE_NAMES.reachable,
             readout: () => `value: "${reachableState[0]}"`,
             component: () => <ReachableExample value={reachableState} />,
             path: `${EXAMPLES_ROOT}/Reachable.tsx`,
         },
         {
             key: "errored",
-            name: "Error",
+            name: EXAMPLE_NAMES.errored,
             readout: () => `value: "${erroredState[0]}"`,
             component: () => <ErroredExample value={erroredState} />,
             path: `${EXAMPLES_ROOT}/Errored.tsx`,
         },
         {
             key: "label",
-            name: "In a Label",
+            name: EXAMPLE_NAMES.label,
             readout: () => `value: "${labeledState[0]}"`,
             component: () => <LabeledExample value={labeledState} />,
             path: `${EXAMPLES_ROOT}/Labeled.tsx`,

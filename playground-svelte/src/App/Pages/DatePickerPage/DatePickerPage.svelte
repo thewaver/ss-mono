@@ -1,7 +1,16 @@
 <script lang="ts">
     import type { DateValue, DateValueCalendarId } from "@thewaver/ss-components-svelte";
     import { DATE_INPUT_DEFAULTS, DateValueUtils } from "@thewaver/ss-components-svelte";
-    import { MAX_DATE, MIN_DATE } from "@thewaver/ss-playground/App/Pages/DatePickerPage/DatePickerPage.const";
+    import {
+    CALENDAR_FIELD_WIDTH,
+    CALENDAR_IDS,
+    EXAMPLE_NAMES,
+    EXAMPLES_ROOT,
+    MAX_DATE,
+    MIN_DATE,
+    WEEK_STARTS_ON_MONDAY,
+    WEEKEND_OFFSET,
+} from "@thewaver/ss-playground/App/Pages/DatePickerPage/DatePickerPage.const";
 
     import type { ExampleDefs } from "../../PageComponents/Examples/Examples.types";
     import PageExamples from "../../PageComponents/Examples/PageExamples.svelte";
@@ -9,12 +18,6 @@
     import PageProp from "../../PageComponents/Prop/Prop.svelte";
     import PagePropsPanel from "../../PageComponents/PropsPanel/PagePropsPanel.svelte";
     import PickedExample from "./Examples/Picked.svelte";
-
-    const CALENDAR_FIELD_WIDTH = 180;
-    const CALENDAR_IDS = DateValueUtils.getCalendarIds();
-    const WEEK_STARTS_ON_MONDAY = 1;
-    const WEEKEND_OFFSET = 5;
-    const EXAMPLES_ROOT = "/src/App/Pages/DatePickerPage/Examples";
 
     const describe = (value: DateValue | undefined) => (value ? DateValueUtils.toIso(value) : "none");
 
@@ -31,14 +34,14 @@
     const examples: ExampleDefs[] = [
         {
             key: "picked",
-            name: "With a calendar",
+            name: EXAMPLE_NAMES.picked,
             readout: () => `value: ${describe(pickedValue)} — typing and picking write the same signal`,
             component: pickedExample,
             path: `${EXAMPLES_ROOT}/Picked.svelte`,
         },
         {
             key: "bounded",
-            name: "Bounded",
+            name: EXAMPLE_NAMES.bounded,
             readout: () =>
                 `value: ${describe(boundedValue)} — ${DateValueUtils.toIso(MIN_DATE)} to ${DateValueUtils.toIso(MAX_DATE)}, typed or picked`,
             component: boundedExample,
@@ -46,7 +49,7 @@
         },
         {
             key: "weekdays",
-            name: "Weekdays only",
+            name: EXAMPLE_NAMES.weekdays,
             readout: () =>
                 `value: ${describe(weekdayValue)} — the calendar refuses a weekend, and typing one reports it as an error`,
             component: weekdaysExample,
@@ -54,7 +57,7 @@
         },
         {
             key: "monthPrecision",
-            name: "Picking a month",
+            name: EXAMPLE_NAMES.monthPrecision,
             readout: () =>
                 `value: ${describe(monthValue)} — precision="month" is handed to the calendar, so a pick there sets the first of the month; the field still takes a whole date`,
             component: monthPrecisionExample,

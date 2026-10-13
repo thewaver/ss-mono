@@ -4,7 +4,13 @@ import { computed, shallowRef } from "vue";
 import { FLIPBOOK_DEFAULTS, FlipbookUtils, MediaQueryMonitorVueUtils } from "@thewaver/ss-components-vue";
 import { FlipbookKnobs } from "@thewaver/ss-playground/App/Knobs/Flipbooks.const";
 import { computeFlipbookSpreadAnnouncement } from "@thewaver/ss-playground/App/PageComponents/Announcements/Announcements.const";
-import { FLIPBOOK_PAGES } from "@thewaver/ss-playground/App/Pages/FlipbookPage/FlipbookPage.const";
+import {
+    EXAMPLES_ROOT,
+    EXAMPLE_NAMES,
+    FIELD_WIDTH,
+    FLIPBOOK_PAGES,
+    NO_MOTION_DURATION_MS,
+} from "@thewaver/ss-playground/App/Pages/FlipbookPage/FlipbookPage.const";
 
 import type { ExampleDefs } from "../../PageComponents/Examples/Examples.types";
 import PageExamples from "../../PageComponents/Examples/PageExamples.vue";
@@ -12,11 +18,6 @@ import PageNumberField from "../../PageComponents/Field/PageNumberField.vue";
 import PageProp from "../../PageComponents/Prop/Prop.vue";
 import PagePropsPanel from "../../PageComponents/PropsPanel/PagePropsPanel.vue";
 import BookExample from "./Examples/Book.vue";
-
-const NO_MOTION_DURATION_MS = 0;
-
-const FIELD_WIDTH = 110;
-const EXAMPLES_ROOT = "/src/App/Pages/FlipbookPage/Examples";
 
 const transitionDurationMs = shallowRef(FLIPBOOK_DEFAULTS.transitionDurationMs);
 const index = shallowRef(0);
@@ -30,7 +31,7 @@ const turnDurationMs = computed(() =>
 const examples: ExampleDefs[] = [
     {
         key: "book",
-        name: "A book of twelve pages",
+        name: EXAMPLE_NAMES.book,
         readout: () => {
             const count = FLIPBOOK_PAGES.length;
             const pages = FlipbookUtils.getShowingPages(index.value, count);

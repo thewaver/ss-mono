@@ -1,22 +1,20 @@
 import type { Accessor, JSX } from "solid-js";
 
 import type {
+    BaseSortableCbs,
+    BaseSortableValues,
     InteractionFlags,
-    PlacementLayoutFn,
-    ProximityEffectFn,
-    SortableAnnouncements,
     SortableFlags,
     SortableItemFlags,
     SortableItemRecord,
     SortableOrientation,
-    SortableTransfer,
 } from "@thewaver/ss-components";
 
 import type {
     InteractionTooltipDefs,
     InteractionWrapperProps,
 } from "../../Primitives/InteractionWrapper/InteractionWrapperSolid.types";
-import type { AccessorProps, SignalSource } from "../../Utils/typeUtils";
+import type { AccessorProps, AccessorValues, SignalSource } from "../../Utils/typeUtils";
 
 export type SortableItem<T> = SortableItemRecord<T, InteractionTooltipDefs<SortableItemFlags>>;
 
@@ -58,48 +56,14 @@ export type SortableItemSlotProps = AccessorProps<{
 }>;
 
 export type SortableProps<T> = Omit<InteractionWrapperProps<SortableFlags>, "renderControl" | "extraFlags"> &
+    AccessorValues<BaseSortableValues> &
+    BaseSortableCbs<T> &
     AccessorProps<{
-        /**
-         * Identifies the list, so two lists can tell their own items from each other's when something is dragged
-         * between them.
-         */
-        groupId: string;
-        /** Names the list for assistive technology. */
-        ariaLabel: string;
-        /**
-         * Everything the list says aloud while an item is moved, and the key hints and place names those
-         * announcements are built from. There is no default: every word a reader hears comes from here.
-         */
-        announcements: SortableAnnouncements;
-        /**
-         * What an item is called when it is announced, so a reader hears it named as something that moves rather
-         * than as a plain list item. Defaults to "sortable item".
-         */
-        itemRoleDescription?: string;
-        /** Whether the items run across the page or down it. */
-        orientation?: SortableOrientation;
-        /** The space between items. */
-        gap?: number;
-        /** Freezes the list as it stands: items still show, but none can be moved. */
-        isLocked?: boolean;
         /** Draws the line showing where a carried item would land. */
         renderMarker?: (getOrientation: () => SortableOrientation) => JSX.Element;
     }> & {
         /** The items, in their current order. It is the only thing that reorders them. */
         items: SignalSource<SortableItem<T>[]>;
-        /** Arranges the items, for a list that is something other than a straight run. */
-        computeLayout?: PlacementLayoutFn;
-        /** What the items do as the pointer nears them. */
-        computeEffect?: ProximityEffectFn;
-        /** The key one item is told apart by, which is what lets an item keep its identity as it moves. */
-        computeItemKey: (value: T) => string;
-        /** Names one item for assistive technology. */
-        computeItemLabel: (value: T) => string;
-        /**
-         * Whether this list will take an item offered to it, and from which list, so a list can refuse what does not
-         * belong.
-         */
-        computeCanAccept?: (value: T, fromLabel: string) => boolean;
         /** Draws one item. */
         renderItem: (
             getItem: Accessor<SortableItem<T>>,
@@ -107,6 +71,4 @@ export type SortableProps<T> = Omit<InteractionWrapperProps<SortableFlags>, "ren
         ) => JSX.Element;
         /** Draws the item being carried, which follows the pointer rather than sitting in the list. */
         renderCarried?: (getItem: Accessor<SortableItem<T>>) => JSX.Element;
-        /** Runs when an item is moved, here or to another list. */
-        onTransfer?: (transfer: SortableTransfer<T>) => void;
     };

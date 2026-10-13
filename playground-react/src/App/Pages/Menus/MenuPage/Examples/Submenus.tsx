@@ -3,8 +3,8 @@ import { POPOVER_SURFACE_INSET } from "@thewaver/ss-playground/App/StyledCompone
 
 import { renderPageHighlightFloater } from "../../../../StyledComponents/GlideFloater/GlideFloater";
 import { PageMenuTriggerContent } from "../../../../StyledComponents/MenuTriggerContent/MenuTriggerContent";
-import { NESTED_ACTIONS, renderMenuItem, renderMenuPopup } from "../MenuPage.const";
-import type { MenuExampleProps } from "../MenuPage.types";
+import { NESTED_ACTIONS, renderMenuItem, renderMenuPopup } from "../MenuPageReact.const";
+import type { MenuExampleProps } from "../MenuPageReact.types";
 
 type Props = MenuExampleProps;
 

@@ -1,12 +1,12 @@
 import { For, Match, Switch } from "solid-js";
 
+import type { PageArticleProps } from "@thewaver/ss-playground/App/PageComponents/Article/Article.types";
 import * as styles from "@thewaver/ss-playground/App/Pages/AboutPage/AboutPage.css";
 import type { AboutInline } from "@thewaver/ss-playground/App/Pages/AboutPage/AboutPage.types";
 import { AboutPageUtils } from "@thewaver/ss-playground/App/Pages/AboutPage/AboutPage.utils";
 
 import { PageCodeBox } from "../CodeBox/CodeBox";
 import { PageLayer } from "../Layer/Layer";
-import type { PageArticleProps } from "./Article.types";
 
 const renderInline = (inline: AboutInline) =>
     typeof inline === "string" ? inline : <a href={inline.href}>{inline.text}</a>;

@@ -6,6 +6,7 @@
         TagInputUtils,
         TagInputStyles as styles,
     } from "@thewaver/ss-components";
+    import { TagInputConst } from "@thewaver/ss-components/internal";
 
     import { NavigatorSvelteUtils } from "../../../Abstracts/Navigator/NavigatorSvelte.utils.svelte.js";
     import InteractionWrapper from "../../../Primitives/InteractionWrapper/InteractionWrapper.svelte";
@@ -14,9 +15,7 @@
     import { LabelSvelteUtils } from "../Label/LabelSvelte.utils.svelte.js";
     import type { TagInputProps } from "./TagInput.types.js";
 
-    const EMPTY_TEXT = "";
-
-    let { value = $bindable(), text = $bindable(EMPTY_TEXT), ref = $bindable(), ...props }: TagInputProps = $props();
+    let { value = $bindable(), text = $bindable(TagInputConst.EMPTY_TEXT), ref = $bindable(), ...props }: TagInputProps = $props();
 
     const getAriaLabel = LabelSvelteUtils.resolveAriaLabel(() => props.ariaLabel);
     const getAriaDescribedBy = FormFieldSvelteUtils.resolveAriaDescribedBy();
@@ -52,7 +51,7 @@
         if (!tag) return;
 
         setTags([...value, tag]);
-        text = EMPTY_TEXT;
+        text = TagInputConst.EMPTY_TEXT;
     };
 
     const removeTag = (index: number) => {

@@ -7,8 +7,8 @@ import PageGlideFloater from "../../../StyledComponents/GlideFloater/PageGlideFl
 import PageSelectClear from "../../../StyledComponents/SelectClear/SelectClear.vue";
 import PageSelectContent from "../../../StyledComponents/SelectContent/SelectContent.vue";
 import PageSelectOptionContent from "../../../StyledComponents/SelectOptionContent/SelectOptionContent.vue";
-import { COUNTRIES, PLACEHOLDER, QUERY_PADDING } from "../SelectPage.const";
 import type { SelectClearableExampleProps } from "../SelectPage.types";
+import { COUNTRIES, PLACEHOLDER, QUERY_PADDING } from "../SelectPageVue.const";
 import SelectPopup from "../SelectPopup.vue";
 
 type Props = SelectClearableExampleProps;

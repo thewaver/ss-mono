@@ -1,15 +1,14 @@
 import { Shape } from "@thewaver/ss-components-react";
+import {
+    EDGE_STROKE_GEOM,
+    FOCUS_STROKE_GEOM,
+    MEEPLE_WIDTH_RATIO,
+} from "@thewaver/ss-playground/App/StyledComponents/TileBoardContent/TileBoardContent.const";
 import * as styles from "@thewaver/ss-playground/App/StyledComponents/TileBoardContent/TileBoardContent.css";
-import { FOCUS_RING_WIDTH, themeVars } from "@thewaver/ss-playground/App/Theme.css";
+import { themeVars } from "@thewaver/ss-playground/App/Theme.css";
 
 import { useLayerClass } from "../Layer/Layer.context";
-import type { PageTileBoardMeepleProps, PageTileBoardTileProps } from "./TileBoardContent.types";
-
-const EDGE_THICKNESSES = [1];
-const FOCUS_THICKNESSES = [FOCUS_RING_WIDTH];
-const EDGE_STROKE_GEOM = [{ thicknesses: EDGE_THICKNESSES }];
-const FOCUS_STROKE_GEOM = [{ thicknesses: FOCUS_THICKNESSES }];
-const MEEPLE_WIDTH_RATIO = 0.56;
+import type { PageTileBoardMeepleProps, PageTileBoardTileProps } from "./TileBoardContentReact.types";
 
 export const PageTileBoardTile = (props: PageTileBoardTileProps) => {
     const layerClass = useLayerClass();

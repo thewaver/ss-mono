@@ -4,13 +4,14 @@
 
     import PageLayer from "../../PageComponents/Layer/Layer.svelte";
     import PageButtonContent from "../ButtonContent/ButtonContent.svelte";
-    import type { ToastContentProps } from "./ToastContent.types";
-
-    const POSITION_OFFSET = 1;
-    const PILE_PEEK = 14;
-    const PILE_SCALE_STEP = 0.04;
-    const PILE_MIN_SCALE = 0.8;
-    const PERCENT = 100;
+    import type { ToastContentProps } from "./ToastContentSvelte.types";
+    import {
+        PERCENT,
+        PILE_MIN_SCALE,
+        PILE_PEEK,
+        PILE_SCALE_STEP,
+        POSITION_OFFSET,
+    } from "@thewaver/ss-playground/App/StyledComponents/ToastContent/ToastContent.const";
 
     const computePileShift = (state: ToastState, dir: ToastsDir, gap: number) => {
         const isColumn = dir === "column" || dir === "column-reverse";

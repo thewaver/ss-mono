@@ -6,7 +6,7 @@ import { Listbox } from "@thewaver/ss-components-vue";
 import PageGlideFloater from "../../../StyledComponents/GlideFloater/PageGlideFloater.vue";
 import PageListboxSurface from "../../../StyledComponents/ListboxSurface/ListboxSurface.vue";
 import PageSelectOptionContent from "../../../StyledComponents/SelectOptionContent/SelectOptionContent.vue";
-import { COUNTRIES_WITH_REACHABLE } from "../../SelectPage/SelectPage.const";
+import { COUNTRIES_WITH_REACHABLE } from "../../SelectPage/SelectPageVue.const";
 import type { ListboxExampleProps } from "../ListboxPage.types";
 
 type Props = ListboxExampleProps;

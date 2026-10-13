@@ -18,6 +18,7 @@ import {
     ProximityTextUtils,
     ViewportUtils,
 } from "@thewaver/ss-components";
+import { ProximityTextConst } from "@thewaver/ss-components/internal";
 import { type Rect, StringUtils } from "@thewaver/ss-utils";
 import { assignInlineVars } from "@vanilla-extract/dynamic";
 
@@ -32,23 +33,22 @@ import { useStore } from "../../../Utils/storeUtils";
 import type { SlotsContext } from "../../../Utils/typeUtils";
 import type { ProximityTextProps, ProximityTextSlots } from "./ProximityText.types";
 
-const RESTING_STRENGTH = 0;
-const NO_TIME = 0;
-const CUSTOM_PROPERTY_PREFIX = "--";
-const DATA_PREFIX = "data-";
 const NO_BOX: Rect = { x: 0, y: 0, width: 0, height: 0 };
 
 const toVueStyle = (style: Record<string, unknown>) =>
     Object.fromEntries(
         Object.entries(style).map(([key, value]) => [
-            key.startsWith(CUSTOM_PROPERTY_PREFIX) ? key : StringUtils.kebabToCamelCase(key),
+            key.startsWith(ProximityTextConst.CUSTOM_PROPERTY_PREFIX) ? key : StringUtils.kebabToCamelCase(key),
             value,
         ]),
     ) as CSSProperties;
 
 const toDataAttributes = (dataset: DOMStringMap) =>
     Object.fromEntries(
-        Object.entries(dataset).map(([key, value]) => [`${DATA_PREFIX}${StringUtils.camelToKebabCase(key)}`, value]),
+        Object.entries(dataset).map(([key, value]) => [
+            `${ProximityTextConst.DATA_PREFIX}${StringUtils.camelToKebabCase(key)}`,
+            value,
+        ]),
     );
 
 export const ProximityText = defineComponent(
@@ -133,7 +133,9 @@ export const ProximityText = defineComponent(
         const computeLetterAnimation = (index: number, isResting: boolean) =>
             ProximityTextUtils.toLetterAnimation(
                 animationNames.value[index],
-                isResting ? RESTING_STRENGTH : (strengths.value[index] ?? RESTING_STRENGTH),
+                isResting
+                    ? ProximityTextConst.RESTING_STRENGTH
+                    : (strengths.value[index] ?? ProximityTextConst.RESTING_STRENGTH),
             );
 
         const measureRest = () => {
@@ -282,7 +284,9 @@ export const ProximityText = defineComponent(
                     ref={rootRef}
                     class={ProximityTextStyles.proximityTextRoot}
                     style={assignInlineVars({
-                        [LetterDriverStyles.letterDriverTimeVar]: LetterDriverUtils.getTimeValue(NO_TIME),
+                        [LetterDriverStyles.letterDriverTimeVar]: LetterDriverUtils.getTimeValue(
+                            ProximityTextConst.NO_TIME,
+                        ),
                     })}
                 >
                     <div

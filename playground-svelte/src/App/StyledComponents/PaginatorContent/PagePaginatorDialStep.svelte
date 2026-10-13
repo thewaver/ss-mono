@@ -1,7 +1,7 @@
 <script lang="ts">
     import { STEP_GLYPHS } from "./PagePaginatorStep.svelte";
     import PagePaginatorWedge from "./PagePaginatorWedge.svelte";
-    import type { PaginatorStepContentProps } from "./PaginatorContent.types";
+    import type { PaginatorStepContentProps } from "./PaginatorContentSvelte.types";
 
     let props: PaginatorStepContentProps = $props();
 </script>

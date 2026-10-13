@@ -24,6 +24,7 @@ import {
     TimelineUtils,
     TimelineStyles as styles,
 } from "@thewaver/ss-components";
+import { TimelineConst } from "@thewaver/ss-components/internal";
 import type { Point2d } from "@thewaver/ss-utils";
 
 import { CarrierSolidUtils } from "../../../Abstracts/Carrier/CarrierSolid.utils";
@@ -32,14 +33,6 @@ import { SignalMirrorSolidUtils } from "../../../Abstracts/SignalMirror/SignalMi
 import { InteractionWrapper } from "../../../Primitives/InteractionWrapper/InteractionWrapper";
 import { access } from "../../../Utils/propUtils";
 import type { TimelineController, TimelineItemProps, TimelineProps } from "./TimelineSolid.types";
-
-const DEFAULT_FOCUS_RATIO = 0.5;
-const MIN_VIEW_SHARE = 0.001;
-const PERCENT = 100;
-const NOTHING = 0;
-const FIRST_ARIA_POSITION = 1;
-const ROVING_TAB_INDEX = 0;
-const NO_MARKERS: number[] = [];
 
 const TimelineItem = (props: TimelineItemProps) => {
     const getIsDisabled = () => props.flags.isDisabled ?? false;
@@ -77,14 +70,14 @@ export const Timeline = <T,>(props: TimelineProps<T>) => {
     const [getHeldEdge, setHeldEdge] = createSignal<TimelineEdge>("end");
 
     let isFocusFollowing = false;
-    let edgeGrabOffset = NOTHING;
+    let edgeGrabOffset = TimelineConst.NOTHING;
 
     const getSize = ElementObserverSolidUtils.createBorderBoxSizeObserver(getRootRef);
 
     const getRange = createMemo(() => access(props.range));
 
     const getMinViewExtent = createMemo(
-        () => access(props.minViewExtent) ?? TimelineUtils.getExtent(getRange()) * MIN_VIEW_SHARE,
+        () => access(props.minViewExtent) ?? TimelineUtils.getExtent(getRange()) * TimelineConst.MIN_VIEW_SHARE,
     );
 
     const viewSignal = SignalMirrorSolidUtils.createOptional(() => props.view, untrack(getRange));
@@ -206,7 +199,9 @@ export const Timeline = <T,>(props: TimelineProps<T>) => {
 
     const getTicks = createMemo(() => TimelineUtils.computeTicks(getView(), getSteps()));
 
-    const getMarkers = createMemo(() => TimelineUtils.computeMarkers(access(props.markers) ?? NO_MARKERS, getView()));
+    const getMarkers = createMemo(() =>
+        TimelineUtils.computeMarkers(access(props.markers) ?? TimelineConst.NO_MARKERS, getView()),
+    );
 
     const setItemRef = (index: number, element: HTMLElement) => {
         itemRefs.set(index, element);
@@ -225,7 +220,7 @@ export const Timeline = <T,>(props: TimelineProps<T>) => {
                 TimelineUtils.zoomView(
                     getView(),
                     factor,
-                    focusRatio ?? DEFAULT_FOCUS_RATIO,
+                    focusRatio ?? TimelineConst.DEFAULT_FOCUS_RATIO,
                     getRange(),
                     getMinViewExtent(),
                 ),
@@ -245,7 +240,7 @@ export const Timeline = <T,>(props: TimelineProps<T>) => {
         if (!isFocusFollowing || element === undefined) return;
 
         isFocusFollowing = false;
-        element.tabIndex = ROVING_TAB_INDEX;
+        element.tabIndex = TimelineConst.ROVING_TAB_INDEX;
         element.focus();
     });
 
@@ -281,7 +276,7 @@ export const Timeline = <T,>(props: TimelineProps<T>) => {
 
         if (element === undefined) return;
 
-        element.tabIndex = ROVING_TAB_INDEX;
+        element.tabIndex = TimelineConst.ROVING_TAB_INDEX;
         element.focus();
     };
 
@@ -291,7 +286,9 @@ export const Timeline = <T,>(props: TimelineProps<T>) => {
         const span = getSpans()[index];
 
         edgeGrabOffset =
-            from === undefined ? NOTHING : TimelineUtils.toValue(getPointerRatio(from.x), getView()) - span[edge];
+            from === undefined
+                ? TimelineConst.NOTHING
+                : TimelineUtils.toValue(getPointerRatio(from.x), getView()) - span[edge];
 
         setHeldEdge(edge);
 
@@ -466,7 +463,7 @@ export const Timeline = <T,>(props: TimelineProps<T>) => {
                     top: `${getBox().top}px`,
                     height: `${getBox().height}px`,
                 }}
-                aria-posinset={getPlacement().order + FIRST_ARIA_POSITION}
+                aria-posinset={getPlacement().order + TimelineConst.FIRST_ARIA_POSITION}
                 aria-setsize={getItems().length}
             >
                 <InteractionWrapper
@@ -537,7 +534,10 @@ export const Timeline = <T,>(props: TimelineProps<T>) => {
             <div class={styles.timelineTicks} aria-hidden="true">
                 <Index each={getTicks()}>
                     {(getTick) => (
-                        <div class={styles.timelineTick} style={{ left: `${getTick().ratio * PERCENT}%` }}>
+                        <div
+                            class={styles.timelineTick}
+                            style={{ left: `${getTick().ratio * TimelineConst.PERCENT}%` }}
+                        >
                             {props.renderTick?.(getTick)}
                         </div>
                     )}
@@ -557,7 +557,10 @@ export const Timeline = <T,>(props: TimelineProps<T>) => {
             <div class={styles.timelineMarkers} aria-hidden="true">
                 <Index each={getMarkers()}>
                     {(getMarker, index) => (
-                        <div class={styles.timelineMarker} style={{ left: `${getMarker().ratio * PERCENT}%` }}>
+                        <div
+                            class={styles.timelineMarker}
+                            style={{ left: `${getMarker().ratio * TimelineConst.PERCENT}%` }}
+                        >
                             {props.renderMarker?.(getMarker, index)}
                         </div>
                     )}

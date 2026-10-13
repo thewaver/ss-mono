@@ -1,6 +1,7 @@
 import { computed, defineComponent, shallowRef } from "vue";
 
 import { CELL_ANIMATION_DEFAULTS, CellAnimationStyles, CellAnimationUtils } from "@thewaver/ss-components";
+import { CellAnimationConst } from "@thewaver/ss-components/internal";
 import type { Index2d } from "@thewaver/ss-utils";
 import { assignInlineVars } from "@vanilla-extract/dynamic";
 
@@ -9,10 +10,6 @@ import { InteractionTrackerVueUtils } from "../../../Abstracts/InteractionTracke
 import { watchAfterRender } from "../../../Utils/effectUtils";
 import { declareProps, useTwoWay } from "../../../Utils/propUtils";
 import type { CellAnimationProps } from "./CellAnimation.types";
-
-const NO_PROGRESS = 0;
-const FIRST_ITERATION = 0;
-const NO_WEIGHTS: number[][] = [];
 
 export const CellAnimation = defineComponent(
     (props: CellAnimationProps) => {
@@ -29,8 +26,8 @@ export const CellAnimation = defineComponent(
         const isPageHidden = InteractionTrackerVueUtils.usePageHidden();
 
         const isPlaying = useTwoWay(props, "playback", true);
-        const progress = useTwoWay(props, "progress", NO_PROGRESS);
-        const currentIteration = shallowRef(FIRST_ITERATION);
+        const progress = useTwoWay(props, "progress", CellAnimationConst.NO_PROGRESS);
+        const currentIteration = shallowRef(CellAnimationConst.FIRST_ITERATION);
 
         const rootSize = ElementObserverVueUtils.useBorderBoxSize(imgRef);
         const rootWidth = computed(() => rootSize.value.width);
@@ -42,7 +39,7 @@ export const CellAnimation = defineComponent(
             return previous && CellAnimationUtils.getIsSameCount(previous, next) ? previous : next;
         });
 
-        const weights = computed(() => props.computeCellWeights?.(cellCount.value) ?? NO_WEIGHTS);
+        const weights = computed(() => props.computeCellWeights?.(cellCount.value) ?? CellAnimationConst.NO_WEIGHTS);
 
         const columnEdges = computed(() => CellAnimationUtils.computeEdges(rootWidth.value, cellCount.value.col));
 
@@ -72,8 +69,8 @@ export const CellAnimation = defineComponent(
             if (drawnSrc === src) return;
 
             drawnSrc = src;
-            currentIteration.value = FIRST_ITERATION;
-            progress.value = NO_PROGRESS;
+            currentIteration.value = CellAnimationConst.FIRST_ITERATION;
+            progress.value = CellAnimationConst.NO_PROGRESS;
         });
 
         watchAfterRender([progress, evaluationDefs, areCellsMounted], ([currentProgress, defs, isMounted]) => {

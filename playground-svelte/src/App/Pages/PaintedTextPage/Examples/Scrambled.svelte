@@ -7,8 +7,8 @@
 
     import PageMeasureBox from "../../../PageComponents/MeasureBox/MeasureBox.svelte";
     import PageControlButtonContent from "../../../StyledComponents/ControlButtonContent/ControlButtonContent.svelte";
-    import { computeSampleDefs } from "../PaintedTextPage.const";
-    import type { PaintedTextBoxedExampleProps } from "../PaintedTextPage.types";
+    import { computeSampleDefs } from "../PaintedTextPageSvelte.const";
+    import type { PaintedTextBoxedExampleProps } from "../PaintedTextPageSvelte.types";
 
     let props: PaintedTextBoxedExampleProps = $props();
 

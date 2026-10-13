@@ -1,7 +1,7 @@
 import type { AccessorProps, SVGDefsColors, SVGDefsSamples, ShapeProps } from "@thewaver/ss-components-solid";
 import type { ShapeConst, Size2d } from "@thewaver/ss-utils";
 
-import type { Paint } from "../../PageComponents/PaintPicker/PaintPicker.types";
+import type { Paint } from "../../PageComponents/PaintPicker/PaintPickerSolid.types";
 
 export type ShapeExampleProps = Pick<ShapeProps, "lameExponents" | "joinRadii"> &
     AccessorProps<{

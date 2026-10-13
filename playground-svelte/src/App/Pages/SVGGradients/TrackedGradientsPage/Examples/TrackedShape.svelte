@@ -1,5 +1,5 @@
 <script lang="ts">
-    import { SVGDefsSamples, Shape } from "@thewaver/ss-components-svelte";
+    import { Shape, SVGDefsSampleConfigs, SVGDefsSamples } from "@thewaver/ss-components-svelte";
     import {
         NO_SAMPLE_KEY,
         computeNoSampleDefs,
@@ -7,8 +7,8 @@
     import * as styles from "@thewaver/ss-playground/App/Pages/SVGGradients/SVGGradients.css";
     import { ShapeConst, type Size2d } from "@thewaver/ss-utils";
 
-    import { STROKE_THICKNESS } from "../../SVGGradients.const";
-    import type { TrackedGradientExampleProps } from "../../SVGGradients.types";
+    import { STROKE_THICKNESS } from "@thewaver/ss-playground/App/Pages/SVGGradients/SVGGradients.const";
+    import type { TrackedGradientExampleProps } from "../../SVGGradientsSvelte.types";
 
     type Props = TrackedGradientExampleProps & {
         boxClass?: string;
@@ -23,7 +23,7 @@
     const computeDefs = (size: Size2d, element: HTMLElement | undefined) => {
         if (props.configKey === NO_SAMPLE_KEY) return computeNoSampleDefs(props.colors, props.paintKind);
 
-        return SVGDefsSamples.Gradient.Tracked.toConfig({
+        return SVGDefsSampleConfigs.Gradient.Tracked.toConfig({
             family: props.configKey,
             defs: props.configDefs,
         } as SVGDefsSamples.Gradient.Tracked.Entry).computeSVGDefs(`${props.paintKind}-${id}`, undefined, props.groupElement ?? element, {

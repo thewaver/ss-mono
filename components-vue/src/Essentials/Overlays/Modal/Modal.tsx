@@ -1,6 +1,7 @@
 import { type SlotsType, Teleport, defineComponent, shallowRef } from "vue";
 
 import { FocusManagerUtils, MODAL_DEFAULTS, ModalStyles, ModalUtils } from "@thewaver/ss-components";
+import { ModalConst } from "@thewaver/ss-components/internal";
 import { CSSUtils, GestureUtils } from "@thewaver/ss-utils";
 
 import { DismisserVueUtils } from "../../../Abstracts/Dismisser/DismisserVue.utils";
@@ -12,8 +13,6 @@ import { watchAfterRender } from "../../../Utils/effectUtils";
 import { callSlot, declareProps, useTwoWay } from "../../../Utils/propUtils";
 import type { SlotsContext } from "../../../Utils/typeUtils";
 import type { ModalProps, ModalSlots } from "./Modal.types";
-
-const DEFAULT_MARGINS = CSSUtils.spreadMargin(0);
 
 export const Modal = defineComponent(
     (props: ModalProps, { slots }: SlotsContext<ModalSlots>) => {
@@ -112,7 +111,7 @@ export const Modal = defineComponent(
 
             const transitionDurationMs = getTransitionDurationMs();
             const alignment = getAlignment();
-            const margins = props.margins ?? DEFAULT_MARGINS;
+            const margins = props.margins ?? ModalConst.DEFAULT_MARGINS;
             const maxSize = ModalUtils.computeMaxSize(margins);
             const visibilityTarget = fader.transitionTarget.value;
 

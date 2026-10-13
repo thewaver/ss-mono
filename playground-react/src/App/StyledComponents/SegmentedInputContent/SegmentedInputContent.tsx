@@ -2,7 +2,7 @@ import * as styles from "@thewaver/ss-playground/App/StyledComponents/SegmentedI
 import * as fieldStyles from "@thewaver/ss-playground/App/StyledComponents/TextFieldContent/TextFieldContent.css";
 
 import { useLayerClass } from "../Layer/Layer.context";
-import type { SegmentedInputCellProps } from "./SegmentedInputContent.types";
+import type { SegmentedInputCellProps } from "./SegmentedInputContentReact.types";
 
 export const PageSegmentedInputCell = (props: SegmentedInputCellProps) => {
     const layerClass = useLayerClass();

@@ -3,9 +3,10 @@
 
     import { getLayerClass } from "../Layer/Layer.context";
     import type { SidebarToggleButtonProps } from "./SidebarToggleButton.types";
-
-    const OPEN_TOWARDS_RIGHT = "›";
-    const OPEN_TOWARDS_LEFT = "‹";
+    import {
+        OPEN_TOWARDS_LEFT,
+        OPEN_TOWARDS_RIGHT,
+    } from "@thewaver/ss-playground/App/StyledComponents/SidebarToggleButton/SidebarToggleButton.const";
 
     let { ref = $bindable(), flags, edge, isExpanded, ...others }: SidebarToggleButtonProps = $props();
 

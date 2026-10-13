@@ -2,7 +2,7 @@
 import * as styles from "@thewaver/ss-playground/App/StyledComponents/AccordionContent/AccordionContent.css";
 
 import { useLayerClass } from "../Layer/Layer.context";
-import type { AccordionPanelProps } from "./AccordionContent.types";
+import type { AccordionPanelProps } from "./AccordionContentVue.types";
 
 defineProps<AccordionPanelProps>();
 

@@ -1,12 +1,13 @@
 <script setup lang="ts">
+import {
+    INDENT_PER_DEPTH,
+    LEAF_MARKER,
+} from "@thewaver/ss-playground/App/StyledComponents/TreeNodeContent/TreeNodeContent.const";
 import * as styles from "@thewaver/ss-playground/App/StyledComponents/TreeNodeContent/TreeNodeContent.css";
 import { themeVars } from "@thewaver/ss-playground/App/Theme.css";
 
 import { useLayerClass } from "../Layer/Layer.context";
-import type { TreeNodePendingProps } from "./TreeNodeContent.types";
-
-const INDENT_PER_DEPTH = 20;
-const LEAF_MARKER = "•";
+import type { TreeNodePendingProps } from "./TreeNodeContentVue.types";
 
 defineProps<TreeNodePendingProps>();
 

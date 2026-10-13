@@ -3,7 +3,7 @@ import type { PropsWithChildren } from "react";
 import * as styles from "@thewaver/ss-playground/App/StyledComponents/HoverCardContent/HoverCardContent.css";
 
 import { PageLayer } from "../../PageComponents/Layer/Layer";
-import type { HoverCardContentProps } from "./HoverCardContent.types";
+import type { HoverCardContentProps } from "./HoverCardContentReact.types";
 
 export const PageHoverCardContent = (props: PropsWithChildren<HoverCardContentProps>) => {
     return (

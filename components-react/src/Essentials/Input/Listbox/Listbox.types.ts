@@ -1,6 +1,7 @@
 import type { ReactNode } from "react";
 
 import type {
+    BaseListboxProps,
     InteractionFlags,
     ListboxFocusModel,
     ListboxOrientation,
@@ -113,36 +114,9 @@ export type ListboxOptionsProps<T> = {
     renderGroup?: (group: SelectOptionGroup<T>, flags: SelectGroupFlags) => ReactNode;
 };
 
-export type ListboxCompositeProps<T> = {
-    /** Identifies the list, and is what each option composes its own id from. Left out, one is generated. */
-    id?: string;
-    /** Names the list for assistive technology. A listbox has to be named, so this cannot be left out. */
-    ariaLabel: string;
-    /**
-     * Whether the list refuses every pick. Its options are drawn and announced as unavailable, and none of them is a
-     * tab stop.
-     */
-    isDisabled?: boolean;
-    /**
-     * Which way the options run, and so which arrows walk them. A horizontal list follows the page's text direction,
-     * so in a right-to-left layout the left arrow moves forward.
-     */
-    orientation?: ListboxOrientation;
+export type ListboxCompositeProps<T> = BaseListboxProps & {
     /** Whether more than one option can be picked at a time. */
     isMultiple?: boolean;
-    /** Whether there are more options to come, so the list can say so rather than looking finished. */
-    hasMoreOptions?: boolean;
-    /** Runs when the reader reaches the end of the list, for a consumer fetching more options as they scroll. */
-    onReachEnd?: () => void;
-    /**
-     * Guesses how tall an option will be before it is drawn, which is what lets a long list render only what is on
-     * screen. The list has to sit inside something that scrolls. Only a vertical list is windowed.
-     */
-    computeEstimatedOptionHeight?: (index: number) => number;
-    /** Guesses how tall a group heading will be before it is drawn, for the same reason. */
-    computeEstimatedGroupHeight?: (index: number) => number;
-    /** How long either marker takes to slide from one option to the next, and to fade. */
-    floaterTransitionDurationMs?: number;
     /**
      * Draws the marker that slides to the selected option, behind it. The fade is handed in rather than applied: the
      * marker fades out when nothing is selected, and in a list that only draws what is on screen it fades out while

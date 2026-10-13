@@ -3,6 +3,14 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import { FrameRateMonitorReactUtils } from "@thewaver/ss-components-react";
 import type { SelectOption } from "@thewaver/ss-components-react";
 import { SelectKnobs } from "@thewaver/ss-playground/App/Knobs/Selects.const";
+import {
+    EXAMPLES_ROOT,
+    EXAMPLE_NAMES,
+    PAGED_TOTAL,
+    PAGE_DELAY_MS,
+    PAGE_SIZE,
+    STRESS_COUNT_FIELD_WIDTH,
+} from "@thewaver/ss-playground/App/Pages/SelectPage/SelectPage.const";
 
 import { PageExampleKnobs } from "../../PageComponents/ExampleKnobs/ExampleKnobs";
 import { PageExamples } from "../../PageComponents/Examples/Examples";
@@ -19,6 +27,7 @@ import { LabeledExample } from "./Examples/Labeled";
 import { OnDemandExample } from "./Examples/OnDemand";
 import { ReachableExample } from "./Examples/Reachable";
 import { VirtualizedExample } from "./Examples/Virtualized";
+import type { Airport, Delivery, SelectVirtualizedExampleProps } from "./SelectPage.types";
 import {
     AIRPORTS,
     COUNTRIES_WITH_DISABLED,
@@ -27,14 +36,7 @@ import {
     STRESS_GROUP_SIZE,
     createStressDeliveries,
     createStressDeliveryGroups,
-} from "./SelectPage.const";
-import type { Airport, Delivery, SelectVirtualizedExampleProps } from "./SelectPage.types";
-
-const PAGE_SIZE = 40;
-const PAGED_TOTAL = 500;
-const PAGE_DELAY_MS = 600;
-const STRESS_COUNT_FIELD_WIDTH = 120;
-const EXAMPLES_ROOT = "/src/App/Pages/SelectPage/Examples";
+} from "./SelectPageReact.const";
 
 const fetchRoutes = (offset: number) =>
     new Promise<SelectOption<Delivery>[]>((resolve) => {
@@ -212,21 +214,21 @@ export const SelectPage = () => {
     const examples = [
         {
             key: "default",
-            name: "Default",
+            name: EXAMPLE_NAMES.default,
             readout: () => `value: ${defaultState[0] ?? "undefined"}`,
             component: () => <CountriesExample value={defaultState} />,
             path: `${EXAMPLES_ROOT}/Countries.tsx`,
         },
         {
             key: "preselected",
-            name: "Preselected",
+            name: EXAMPLE_NAMES.preselected,
             readout: () => `value: ${preselectedState[0] ?? "undefined"} — reopening highlights it`,
             component: () => <CountriesExample value={preselectedState} />,
             path: `${EXAMPLES_ROOT}/Countries.tsx`,
         },
         {
             key: "clearable",
-            name: "Clearable",
+            name: EXAMPLE_NAMES.clearable,
             readout: () =>
                 `value: ${clearableState[0] ?? "undefined"} | last change: ${clearableChange} — the clear control is its own tab stop after the field, drawn only while something is picked`,
             component: () => (
@@ -241,14 +243,14 @@ export const SelectPage = () => {
         },
         {
             key: "recordValues",
-            name: "Record values",
+            name: EXAMPLE_NAMES.recordValues,
             readout: () => `value: ${recordState[0]?.code ?? "undefined"}`,
             component: () => <AirportsExample value={recordState} />,
             path: `${EXAMPLES_ROOT}/Airports.tsx`,
         },
         {
             key: "titleDescription",
-            name: "Title and description",
+            name: EXAMPLE_NAMES.titleDescription,
             readout: () =>
                 `value: ${deliveryState[0]?.name ?? "undefined"} — the descriptions wrap, so no two rows are the same height`,
             component: () => <DeliveriesExample value={deliveryState} />,
@@ -256,35 +258,35 @@ export const SelectPage = () => {
         },
         {
             key: "optionGroups",
-            name: "Option groups",
+            name: EXAMPLE_NAMES.optionGroups,
             readout: () => `value: ${groupedState[0] ?? "undefined"} — arrows cross group boundaries and skip Finland`,
             component: () => <CountriesExample value={groupedState} options={GROUPED_COUNTRIES} hasGroups={true} />,
             path: `${EXAMPLES_ROOT}/Countries.tsx`,
         },
         {
             key: "disabledOptions",
-            name: "Disabled options",
+            name: EXAMPLE_NAMES.disabledOptions,
             readout: () => `value: ${disabledOptionState[0] ?? "undefined"} — arrows skip Denmark and Finland`,
             component: () => <CountriesExample value={disabledOptionState} options={COUNTRIES_WITH_DISABLED} />,
             path: `${EXAMPLES_ROOT}/Countries.tsx`,
         },
         {
             key: "disabledOptionsReachable",
-            name: "Disabled options + reachable",
+            name: EXAMPLE_NAMES.disabledOptionsReachable,
             readout: () => `value: ${reachableOptionState[0] ?? "undefined"} — arrows stop on them, hover explains why`,
             component: () => <CountriesExample value={reachableOptionState} options={COUNTRIES_WITH_REACHABLE} />,
             path: `${EXAMPLES_ROOT}/Countries.tsx`,
         },
         {
             key: "scrollingList",
-            name: "Scrolling list",
+            name: EXAMPLE_NAMES.scrollingList,
             readout: () => `value: ${longState[0] ?? "undefined"} — Home and End reach both ends`,
             component: () => <HoursExample value={longState} />,
             path: `${EXAMPLES_ROOT}/Hours.tsx`,
         },
         {
             key: "virtualized",
-            name: "Virtualized",
+            name: EXAMPLE_NAMES.virtualized,
             readout: () =>
                 `${stressCount.toLocaleString("en-GB")} options — ${
                     openMs === undefined
@@ -307,7 +309,7 @@ export const SelectPage = () => {
         },
         {
             key: "virtualizedGroups",
-            name: "Virtualized, in groups",
+            name: EXAMPLE_NAMES.virtualizedGroups,
             readout: () =>
                 `${stressCount.toLocaleString("en-GB")} options in ${Math.ceil(stressCount / STRESS_GROUP_SIZE).toLocaleString("en-GB")} groups — ${
                     groupedStressVisibility[0] ? "open" : "closed"
@@ -325,7 +327,7 @@ export const SelectPage = () => {
         },
         {
             key: "onDemand",
-            name: "Loaded on demand",
+            name: EXAMPLE_NAMES.onDemand,
             readout: () =>
                 `${pagedRoutes.length} of ${PAGED_TOTAL} routes fetched${
                     isFetching ? ", another batch in flight" : ""
@@ -343,7 +345,7 @@ export const SelectPage = () => {
         },
         {
             key: "autocomplete",
-            name: "Autocomplete",
+            name: EXAMPLE_NAMES.autocomplete,
             readout: () =>
                 `value: ${filterState[0]?.code ?? "undefined"} | query: "${filterQuery}" — ${filteredAirports.length} of ${AIRPORTS.length} shown; the page matches on city or code, which only it knows about`,
             component: () => (
@@ -353,7 +355,7 @@ export const SelectPage = () => {
         },
         {
             key: "autocompleteOnDemand",
-            name: "Autocomplete, loaded on demand",
+            name: EXAMPLE_NAMES.autocompleteOnDemand,
             readout: () =>
                 `value: ${searchState[0]?.name ?? "undefined"} | query: "${searchQuery}" — ${searchResults.length} of ${searchTotal} matches held${
                     isSearching ? ", asking the server" : ""
@@ -377,28 +379,28 @@ export const SelectPage = () => {
         },
         {
             key: "errored",
-            name: "Error",
+            name: EXAMPLE_NAMES.errored,
             readout: () => `value: ${erroredState[0] ?? "undefined"} — required, nothing picked yet`,
             component: () => <CountriesExample value={erroredState} hasError={erroredState[0] === undefined} />,
             path: `${EXAMPLES_ROOT}/Countries.tsx`,
         },
         {
             key: "disabled",
-            name: "Disabled",
+            name: EXAMPLE_NAMES.disabled,
             readout: () => `value: ${disabledState[0] ?? "undefined"}`,
             component: () => <CountriesExample value={disabledState} isDisabled={true} />,
             path: `${EXAMPLES_ROOT}/Countries.tsx`,
         },
         {
             key: "reachable",
-            name: "Disabled + reachable",
+            name: EXAMPLE_NAMES.reachable,
             readout: () => `value: ${reachableState[0] ?? "undefined"}`,
             component: () => <ReachableExample value={reachableState} />,
             path: `${EXAMPLES_ROOT}/Reachable.tsx`,
         },
         {
             key: "label",
-            name: "In a Label",
+            name: EXAMPLE_NAMES.label,
             readout: () => `value: ${labeledState[0] ?? "undefined"} — the caption opens the list`,
             component: () => <LabeledExample value={labeledState} />,
             path: `${EXAMPLES_ROOT}/Labeled.tsx`,

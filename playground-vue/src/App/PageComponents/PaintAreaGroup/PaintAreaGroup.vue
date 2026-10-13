@@ -2,12 +2,10 @@
 import { onBeforeUnmount, onMounted, shallowRef } from "vue";
 
 import { PaintAreaProvider } from "@thewaver/ss-components-vue";
+import { NO_SIZE, UNSCALED } from "@thewaver/ss-playground/App/PageComponents/PaintAreaGroup/PaintAreaGroup.const";
 import { type Point2d, Size2d } from "@thewaver/ss-utils";
 
 import type { PagePaintAreaGroupCell, PagePaintAreaGroupProps } from "./PaintAreaGroup.types";
-
-const NO_SIZE = { width: 0, height: 0 };
-const UNSCALED = 1;
 
 defineProps<PagePaintAreaGroupProps>();
 

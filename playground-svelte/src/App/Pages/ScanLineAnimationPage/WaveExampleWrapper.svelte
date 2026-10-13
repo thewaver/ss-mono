@@ -3,7 +3,7 @@
     import type { CellAnimationBreakpointOpts, _ScanlineHorizontalWaveOpts } from "@thewaver/ss-components-svelte";
     import { ScanlineAnimationKnobs } from "@thewaver/ss-playground/App/Knobs/ScanlineAnimations.const";
 
-    import { ScanlineAnimationKeyframeKnobs } from "../../Knobs/ScanlineAnimationKeyframes.const";
+    import { ScanlineAnimationKeyframeKnobs } from "@thewaver/ss-playground/App/Knobs/ScanlineAnimationKeyframes.const";
     import PageExampleKnobs from "../../PageComponents/ExampleKnobs/PageExampleKnobs.svelte";
     import PageKnobs from "../../PageComponents/Knobs/Knobs.svelte";
     import type { Knob } from "../../PageComponents/Knobs/Knobs.types";
@@ -12,8 +12,9 @@
     import WaveExample from "./Examples/_Wave.svelte";
     import type { ScanlineAnimationExampleProps } from "./ScanlineAnimationPage.types";
     import SmoothnessInput from "./SmoothnessInput.svelte";
-
-    const IMAGE_CONTAINER_SIZE = 360;
+    import {
+        IMAGE_CONTAINER_SIZE,
+    } from "@thewaver/ss-playground/App/Pages/ScanLineAnimationPage/ScanLineAnimationPage.const";
 
     let { playback = $bindable(), ...props }: ScanlineAnimationExampleProps = $props();
 

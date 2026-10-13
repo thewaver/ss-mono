@@ -1,44 +1,8 @@
 import type { CSSProperties, VNodeChild } from "vue";
 
-import type { PointSource } from "@thewaver/ss-components";
-import type { Point2d, Size2d } from "@thewaver/ss-utils";
+import type { BaseRevealProps } from "@thewaver/ss-components";
 
-export type RevealProps = {
-    /** How large the window that follows the pointer is. */
-    radius?: number;
-    /** How far the window's corners are rounded. */
-    joinRadii?: number[];
-    /** How square or how pinched the window's rounded corners are. */
-    lameExponents?: number[];
-    /** How gradually the window fades into what is still covered. */
-    softness?: number;
-    /**
-     * How far one press of an arrow key moves the window, in pixels.
-     *
-     * The reveal is one Tab stop: reaching it from the keyboard opens the window at the center, the arrow keys
-     * move it from there, held inside the element, and it closes again when focus leaves. An arrow pressed while
-     * the pointer is over the element picks the window up from where the pointer left it, and moving the
-     * pointer over it hands the window back.
-     */
-    stepSize?: number;
-    /** Stops the window following the pointer or the keyboard, leaving what is underneath covered. */
-    isDisabled?: boolean;
-    /**
-     * The point to follow instead of the pointer.
-     *
-     * A fraction across a box — the reveal's own, or the element named in the source — so a light moving across a
-     * banner can be handed to every card under it and each answers to the same spot. While the source has no point the
-     * window closes, as it does when the pointer leaves the window. Left out, the pointer is followed.
-     */
-    pointSource?: PointSource;
-    /**
-     * Names the reveal for assistive technology. It is required because the reveal is focusable, and a focusable
-     * element with no name is announced as nothing at all.
-     */
-    ariaLabel: string;
-    /** The contour of the window, worked out from the element's size. */
-    computePoints?: (size: Size2d) => Point2d[];
-};
+export type RevealProps = BaseRevealProps;
 
 export type RevealSlots = {
     /** Draws what is underneath, waiting to be revealed. */

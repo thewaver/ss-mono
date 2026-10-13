@@ -2,6 +2,12 @@ import { useMemo, useState } from "react";
 
 import { REVEAL_DEFAULTS } from "@thewaver/ss-components-react";
 import { RevealKnobs } from "@thewaver/ss-playground/App/Knobs/Reveals.const";
+import {
+    EXAMPLES_ROOT,
+    EXAMPLE_NAMES,
+    FIELD_WIDTH,
+    SHAPE_FIELD_WIDTH,
+} from "@thewaver/ss-playground/App/Pages/Reveals/RevealPage/RevealPage.const";
 import type { RevealShape } from "@thewaver/ss-playground/App/Pages/Reveals/RevealPage/RevealPage.types";
 import { ShapeConst, type Size2d } from "@thewaver/ss-utils";
 
@@ -13,10 +19,6 @@ import { FrostedExample } from "./Examples/Frosted";
 import { PromptExample } from "./Examples/Prompt";
 import { TorchExample } from "./Examples/Torch";
 import type { RevealExampleProps } from "./RevealExample.types";
-
-const EXAMPLES_ROOT = "/src/App/Pages/Reveals/RevealPage/Examples";
-const FIELD_WIDTH = 110;
-const SHAPE_FIELD_WIDTH = 170;
 
 export const RevealPage = () => {
     const [radius, setRadius] = useState(REVEAL_DEFAULTS.radius);
@@ -47,21 +49,21 @@ export const RevealPage = () => {
     const examples = [
         {
             key: "torch",
-            name: "Torch",
+            name: EXAMPLE_NAMES.torch,
             readout: () => "an opaque cover with a hole cut where the pointer is",
             component: () => <TorchExample {...commonProps} />,
             path: `${EXAMPLES_ROOT}/Torch.tsx`,
         },
         {
             key: "frosted",
-            name: "Frosted",
+            name: EXAMPLE_NAMES.frosted,
             readout: () => "the cover blurs rather than hides, so the hole sharpens instead of uncovering",
             component: () => <FrostedExample {...commonProps} />,
             path: `${EXAMPLES_ROOT}/Frosted.tsx`,
         },
         {
             key: "prompt",
-            name: "Cover that knows",
+            name: EXAMPLE_NAMES.prompt,
             readout: () => "the cover is told whether a reveal is happening, and says something different",
             component: () => <PromptExample {...commonProps} />,
             path: `${EXAMPLES_ROOT}/Prompt.tsx`,

@@ -1,12 +1,11 @@
 import { useEffect, useMemo } from "react";
 
 import { CURRENCY_INPUT_DEFAULTS, CurrencyInputUtils, TextSyncUtils } from "@thewaver/ss-components";
+import { CurrencyInputConst } from "@thewaver/ss-components/internal";
 
 import { MaskedFieldReactUtils } from "../../../Abstracts/MaskedField/MaskedFieldReact.utils";
 import { TextField } from "../../../Primitives/TextField/TextField";
 import type { CurrencyInputProps } from "./CurrencyInput.types";
-
-const EMPTY_TEXT = "";
 
 export const CurrencyInput = (props: CurrencyInputProps) => {
     const [value, setValue] = props.value;
@@ -40,7 +39,7 @@ export const CurrencyInput = (props: CurrencyInputProps) => {
     });
 
     const [text, typeText] = field.text;
-    const spelling = value === undefined ? EMPTY_TEXT : field.formatValue(value);
+    const spelling = value === undefined ? CurrencyInputConst.EMPTY_TEXT : field.formatValue(value);
 
     useEffect(() => {
         if (spelling === text) return;

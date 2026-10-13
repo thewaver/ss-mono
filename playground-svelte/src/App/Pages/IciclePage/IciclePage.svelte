@@ -10,11 +10,12 @@
     import PageProp from "../../PageComponents/Prop/Prop.svelte";
     import PagePropsPanel from "../../PageComponents/PropsPanel/PagePropsPanel.svelte";
     import LibraryExample from "./Examples/Library.svelte";
-
-    const EXAMPLES_ROOT = "/src/App/Pages/IciclePage/Examples";
-
-    const NO_MOTION_DURATION_MS = 0;
-    const WIDE_SPAN = 2;
+    import {
+    EXAMPLE_NAMES,
+    EXAMPLES_ROOT,
+    NO_MOTION_DURATION_MS,
+    WIDE_SPAN,
+} from "@thewaver/ss-playground/App/Pages/IciclePage/IciclePage.const";
 
     let columnCount = $state(ICICLE_DEFAULTS.columnCount);
     let zoomDurationMs = $state(ICICLE_DEFAULTS.zoomDurationMs);
@@ -28,7 +29,7 @@
     const examples: ExampleDefs[] = [
         {
             key: "library",
-            name: "This library, by lines of code",
+            name: EXAMPLE_NAMES.library,
             span: WIDE_SPAN,
             readout: () =>
                 `showing ${showing} — press any cell to bring it to the left at full height, the leftmost cell or Escape to go back up; the arrows walk up and down a column and across to a parent or its children`,

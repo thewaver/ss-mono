@@ -1,11 +1,12 @@
 <script setup lang="ts">
+import {
+    LABEL_HIDDEN,
+    LABEL_SHOWN,
+} from "@thewaver/ss-playground/App/StyledComponents/CirclePackingContent/CirclePackingContent.const";
 import * as styles from "@thewaver/ss-playground/App/StyledComponents/CirclePackingContent/CirclePackingContent.css";
 
 import { useLayerClass } from "../Layer/Layer.context";
-import type { PageCirclePackingLabelProps } from "./CirclePackingContent.types";
-
-const LABEL_SHOWN = 1;
-const LABEL_HIDDEN = 0;
+import type { PageCirclePackingLabelProps } from "./CirclePackingContentVue.types";
 
 defineProps<PageCirclePackingLabelProps>();
 

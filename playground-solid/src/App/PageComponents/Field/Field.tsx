@@ -14,6 +14,11 @@ import {
 } from "@thewaver/ss-components-solid";
 import { COLOR_INPUT_LABELS } from "@thewaver/ss-playground/App/PageComponents/Announcements/Announcements.const";
 import {
+    DEFAULT_NUMBER_FIELD_WIDTH,
+    DEFAULT_SELECT_FIELD_WIDTH,
+    EMPTY_TEXT,
+} from "@thewaver/ss-playground/App/PageComponents/Field/Field.const";
+import {
     FIELD_GAP,
     FIELD_PADDING,
     FIELD_STEPPER_PADDING,
@@ -34,7 +39,7 @@ import { PageTextFieldPlaceholder } from "../../StyledComponents/TextFieldPlaceh
 import { PageToggleContent } from "../../StyledComponents/ToggleContent/ToggleContent";
 import { pageColorPickerSlots } from "../ColorPicker/ColorPicker";
 import { PageNumberInputStepper } from "../NumberInputStepper/NumberInputStepper";
-import { useFieldReset } from "./Field.context";
+import { useFieldReset } from "./FieldSolid.context";
 import type {
     PageCheckFieldProps,
     PageColorFieldProps,
@@ -43,11 +48,7 @@ import type {
     PageNumberFieldProps,
     PageSelectFieldProps,
     PageTextFieldProps,
-} from "./Field.types";
-
-const DEFAULT_NUMBER_FIELD_WIDTH = 100;
-const DEFAULT_SELECT_FIELD_WIDTH = 150;
-const EMPTY_TEXT = "";
+} from "./FieldSolid.types";
 
 const renderFieldPopup = (
     renderOptions: () => JSX.Element,

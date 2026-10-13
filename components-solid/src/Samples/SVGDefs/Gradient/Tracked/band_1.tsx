@@ -1,14 +1,10 @@
-import { type GradientBandOpts, SVGDefsUtils, TrackedGradientDefaults } from "@thewaver/ss-components";
-import type { Size2d } from "@thewaver/ss-utils";
+import { type GradientBandOpts, SVGDefsUtils } from "@thewaver/ss-components";
+import { Band1Const } from "@thewaver/ss-components/internal";
 
 import { PointerTrackerSolidUtils } from "../../../../Abstracts/PointerTracker/PointerTrackerSolid.utils";
 import { SVGGradientDefsSolidUtils } from "../../../../Generators/SVGDefs/SVGGradients/SVGGradientDefsSolid.utils";
 import type { TrackedGradientConfig } from "../../SVGDefsSolid.types";
 import { SVGDefsSolidUtils } from "../../SVGDefsSolid.utils";
-
-const BAND_SPAN: Size2d = { width: 0.8, height: 0.8 };
-
-const DEFAULTS = TrackedGradientDefaults.BAND_DEFAULTS;
 
 const NO_REF = () => undefined;
 
@@ -30,16 +26,16 @@ export const band_1 = (opts?: GradientBandOpts): TrackedGradientConfig => ({
                     return SVGGradientDefsSolidUtils.computeLinearGradient({
                         id: `gradient1-${id}`,
                         angle: 0,
-                        scale: BAND_SPAN,
+                        scale: Band1Const.BAND_SPAN,
                         offset: () => ({
-                            x: (getReading().boxRatio.x - 0.5) * (opts?.bandTravel ?? DEFAULTS.bandTravel),
+                            x: (getReading().boxRatio.x - 0.5) * (opts?.bandTravel ?? Band1Const.DEFAULTS.bandTravel),
                             y: 0,
                         }),
                         colors: SVGDefsUtils.getFalloffStops(defs.colors.primary, {
-                            coreStop: opts?.coreStop ?? DEFAULTS.coreStop,
-                            coreAlpha: opts?.coreAlpha ?? DEFAULTS.coreAlpha,
-                            falloffSpread: opts?.falloffSpread ?? DEFAULTS.falloffSpread,
-                            falloffAlpha: opts?.falloffAlpha ?? DEFAULTS.falloffAlpha,
+                            coreStop: opts?.coreStop ?? Band1Const.DEFAULTS.coreStop,
+                            coreAlpha: opts?.coreAlpha ?? Band1Const.DEFAULTS.coreAlpha,
+                            falloffSpread: opts?.falloffSpread ?? Band1Const.DEFAULTS.falloffSpread,
+                            falloffAlpha: opts?.falloffAlpha ?? Band1Const.DEFAULTS.falloffAlpha,
                         }),
                     });
                 },

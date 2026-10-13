@@ -2,7 +2,7 @@
     import { CONTROL_GLYPHS } from "@thewaver/ss-playground/App/StyledComponents/ControlButtonContent/ControlButtonContent.const";
 
     import PageControlButtonContent from "../ControlButtonContent/ControlButtonContent.svelte";
-    import type { CarouselRotationProps } from "./CarouselContent.types";
+    import type { CarouselRotationProps } from "./CarouselContentSvelte.types";
 
     let props: CarouselRotationProps = $props();
 </script>

@@ -4,7 +4,7 @@ import { onBeforeUnmount, shallowRef, watch } from "vue";
 import { Typewriter } from "@thewaver/ss-components-vue";
 import { FunctionUtils } from "@thewaver/ss-utils";
 
-import type { TypewriterExampleProps } from "../TypewriterPage.types";
+import type { TypewriterExampleProps } from "../TypewriterPageVue.types";
 
 const TEXT_SETTLE_MS = 500;
 

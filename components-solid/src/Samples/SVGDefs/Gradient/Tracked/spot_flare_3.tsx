@@ -1,9 +1,5 @@
-import {
-    type GradientFlareOpts,
-    type SVGDefsColors,
-    SVGDefsUtils,
-    TrackedGradientDefaults,
-} from "@thewaver/ss-components";
+import { type GradientFlareOpts, type SVGDefsColors, SVGDefsUtils } from "@thewaver/ss-components";
+import { SpotFlare3Const, SpotFlareConst } from "@thewaver/ss-components/internal";
 import { MathUtils } from "@thewaver/ss-utils";
 
 import { PointerTrackerSolidUtils } from "../../../../Abstracts/PointerTracker/PointerTrackerSolid.utils";
@@ -29,18 +25,11 @@ const GHOSTS: FlareGhost[] = [
     { reach: 2, scale: 0.26, alpha: 0.13, colorKey: "tertiary" },
 ];
 
-const DISC_STOPS = [45, 78];
-const DISC_ALPHA_RATIOS = [1, 0.3];
-const RING_STOPS = [55, 82, 92];
-const RING_ALPHA_RATIOS = [0.12, 1, 0.2];
-
-const DEFAULTS = TrackedGradientDefaults.SPOT_FLARE_DEFAULTS;
-
 const NO_REF = () => undefined;
 
 const toGhostColor = (color: string, alpha: number, opts?: GradientFlareOpts) =>
-    `hsl(from ${color} h calc(s * ${opts?.ghostSaturation ?? DEFAULTS.ghostSaturation}) calc(l * ${
-        opts?.ghostLuminosity ?? DEFAULTS.ghostLuminosity
+    `hsl(from ${color} h calc(s * ${opts?.ghostSaturation ?? SpotFlare3Const.DEFAULTS.ghostSaturation}) calc(l * ${
+        opts?.ghostLuminosity ?? SpotFlare3Const.DEFAULTS.ghostLuminosity
     }) / ${alpha})`;
 
 const computeGhostColors = (ghost: FlareGhost, color: string, fade: number, opts?: GradientFlareOpts) => {
@@ -49,17 +38,32 @@ const computeGhostColors = (ghost: FlareGhost, color: string, fade: number, opts
     if (ghost.isRing) {
         return [
             { value: toGhostColor(color, 0, opts) },
-            { value: toGhostColor(color, alpha * RING_ALPHA_RATIOS[0], opts), stop: RING_STOPS[0] },
-            { value: toGhostColor(color, alpha * RING_ALPHA_RATIOS[1], opts), stop: RING_STOPS[1] },
-            { value: toGhostColor(color, alpha * RING_ALPHA_RATIOS[2], opts), stop: RING_STOPS[2] },
+            {
+                value: toGhostColor(color, alpha * SpotFlareConst.RING_ALPHA_RATIOS[0], opts),
+                stop: SpotFlareConst.RING_STOPS[0],
+            },
+            {
+                value: toGhostColor(color, alpha * SpotFlareConst.RING_ALPHA_RATIOS[1], opts),
+                stop: SpotFlareConst.RING_STOPS[1],
+            },
+            {
+                value: toGhostColor(color, alpha * SpotFlareConst.RING_ALPHA_RATIOS[2], opts),
+                stop: SpotFlareConst.RING_STOPS[2],
+            },
             { value: toGhostColor(color, 0, opts), stop: 100 },
         ];
     }
 
     return [
-        { value: toGhostColor(color, alpha * DISC_ALPHA_RATIOS[0], opts) },
-        { value: toGhostColor(color, alpha * DISC_ALPHA_RATIOS[0], opts), stop: DISC_STOPS[0] },
-        { value: toGhostColor(color, alpha * DISC_ALPHA_RATIOS[1], opts), stop: DISC_STOPS[1] },
+        { value: toGhostColor(color, alpha * SpotFlareConst.DISC_ALPHA_RATIOS[0], opts) },
+        {
+            value: toGhostColor(color, alpha * SpotFlareConst.DISC_ALPHA_RATIOS[0], opts),
+            stop: SpotFlareConst.DISC_STOPS[0],
+        },
+        {
+            value: toGhostColor(color, alpha * SpotFlareConst.DISC_ALPHA_RATIOS[1], opts),
+            stop: SpotFlareConst.DISC_STOPS[1],
+        },
         { value: toGhostColor(color, 0, opts), stop: 100 },
     ];
 };
@@ -85,18 +89,21 @@ export const spot_flare_3 = (opts?: GradientFlareOpts): TrackedGradientConfig =>
 
                         return SVGGradientDefsSolidUtils.computeRadialGradient({
                             id: `gradient1-${id}`,
-                            elementSize: (opts?.circular ?? DEFAULTS.circular) ? () => defs.getSize() : undefined,
+                            elementSize:
+                                (opts?.circular ?? SpotFlare3Const.DEFAULTS.circular)
+                                    ? () => defs.getSize()
+                                    : undefined,
                             origin: () => getReading().boxRatio,
-                            scale: opts?.glowScale ?? DEFAULTS.glowScale,
+                            scale: opts?.glowScale ?? SpotFlare3Const.DEFAULTS.glowScale,
                             colors: [
                                 { value: `rgb(from ${defs.colors.primary} r g b / 1)` },
                                 {
-                                    value: `rgb(from ${defs.colors.primary} r g b / ${opts?.coreAlpha ?? DEFAULTS.coreAlpha})`,
-                                    stop: opts?.coreStop ?? DEFAULTS.coreStop,
+                                    value: `rgb(from ${defs.colors.primary} r g b / ${opts?.coreAlpha ?? SpotFlare3Const.DEFAULTS.coreAlpha})`,
+                                    stop: opts?.coreStop ?? SpotFlare3Const.DEFAULTS.coreStop,
                                 },
                                 {
-                                    value: `rgb(from ${defs.colors.primary} r g b / ${opts?.falloffAlpha ?? DEFAULTS.falloffAlpha})`,
-                                    stop: opts?.falloffStop ?? DEFAULTS.falloffStop,
+                                    value: `rgb(from ${defs.colors.primary} r g b / ${opts?.falloffAlpha ?? SpotFlare3Const.DEFAULTS.falloffAlpha})`,
+                                    stop: opts?.falloffStop ?? SpotFlare3Const.DEFAULTS.falloffStop,
                                 },
                                 { value: `rgb(from ${defs.colors.primary} r g b / 0)`, stop: 100 },
                             ],
@@ -120,15 +127,18 @@ export const spot_flare_3 = (opts?: GradientFlareOpts): TrackedGradientConfig =>
                             const distance = MathUtils.clamp01(Math.hypot(ratio.x - 0.5, ratio.y - 0.5) * 2);
 
                             return MathUtils.lerp(
-                                opts?.ghostNearGrowth ?? DEFAULTS.ghostNearGrowth,
-                                opts?.ghostFarGrowth ?? DEFAULTS.ghostFarGrowth,
+                                opts?.ghostNearGrowth ?? SpotFlare3Const.DEFAULTS.ghostNearGrowth,
+                                opts?.ghostFarGrowth ?? SpotFlare3Const.DEFAULTS.ghostFarGrowth,
                                 distance,
                             );
                         };
 
                         return SVGGradientDefsSolidUtils.computeRadialGradient({
                             id: `gradient${index + 2}-${id}`,
-                            elementSize: (opts?.circular ?? DEFAULTS.circular) ? () => defs.getSize() : undefined,
+                            elementSize:
+                                (opts?.circular ?? SpotFlare3Const.DEFAULTS.circular)
+                                    ? () => defs.getSize()
+                                    : undefined,
                             origin: () => ({
                                 x: getReading().boxRatio.x + (0.5 - getReading().boxRatio.x) * ghost.reach,
                                 y: getReading().boxRatio.y + (0.5 - getReading().boxRatio.y) * ghost.reach,

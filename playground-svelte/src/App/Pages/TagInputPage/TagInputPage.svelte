@@ -12,11 +12,13 @@
     import DefaultExample from "./Examples/Default.svelte";
     import UniqueExample from "./Examples/Unique.svelte";
     import type { TagInputExampleProps } from "./TagInputPage.types";
+    import {
+    EXAMPLE_NAMES,
+    EXAMPLES_ROOT,
+    NARROW_WIDTH,
+    STARTING_TAGS,
+} from "@thewaver/ss-playground/App/Pages/TagInputPage/TagInputPage.const";
 
-    const NARROW_WIDTH = 240;
-    const EXAMPLES_ROOT = "/src/App/Pages/TagInputPage/Examples";
-
-    const STARTING_TAGS = ["solid", "vanilla-extract"];
     const CROWDED_TAGS = [
         "solid",
         "vanilla-extract",
@@ -55,28 +57,28 @@
     const examples: ExampleDefs[] = [
         {
             key: "default",
-            name: "Default",
+            name: EXAMPLE_NAMES.default,
             readout: () => `tags: ${defaultValue.join(", ") || "none"}`,
             component: defaultExample,
             path: `${EXAMPLES_ROOT}/Default.svelte`,
         },
         {
             key: "empty",
-            name: "Empty",
+            name: EXAMPLE_NAMES.empty,
             readout: () => `tags: ${emptyValue.join(", ") || "none"}`,
             component: emptyExample,
             path: `${EXAMPLES_ROOT}/Default.svelte`,
         },
         {
             key: "unique",
-            name: "Refusing duplicates",
+            name: EXAMPLE_NAMES.unique,
             readout: () => `tags: ${uniqueValue.join(", ") || "none"} — the same word twice is refused`,
             component: uniqueExample,
             path: `${EXAMPLES_ROOT}/Unique.svelte`,
         },
         {
             key: "crowded",
-            name: "Crowded and narrow",
+            name: EXAMPLE_NAMES.crowded,
             readout: () => `${crowdedValue.length} tags in ${NARROW_WIDTH}px — they wrap and the box grows with them`,
             component: crowdedExample,
             path: `${EXAMPLES_ROOT}/Crowded.svelte`,

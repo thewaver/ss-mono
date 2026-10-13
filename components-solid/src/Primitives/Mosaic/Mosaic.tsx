@@ -1,16 +1,13 @@
 import { For, createComputed, createEffect, createMemo, createSignal, on, onCleanup, untrack } from "solid-js";
 
 import { MOSAIC_DEFAULTS, MosaicUtils, NavigatorUtils, MosaicStyles as styles } from "@thewaver/ss-components";
+import { MosaicConst } from "@thewaver/ss-components/internal";
 import type { Rect } from "@thewaver/ss-utils";
 
 import { ElementObserverSolidUtils } from "../../Abstracts/ElementObserver/ElementObserverSolid.utils";
 import { MediaQueryMonitorSolidUtils } from "../../Abstracts/MediaQueryMonitor/MediaQueryMonitorSolid.utils";
 import { access } from "../../Utils/propUtils";
 import type { MosaicProps } from "./MosaicSolid.types";
-
-const EMPTY_RECT: Rect = { x: 0, y: 0, width: 0, height: 0 };
-const NOT_PLACED = -1;
-const NO_TRANSITION_MS = 0;
 
 export const Mosaic = (props: MosaicProps) => {
     const getSizeAnchor = createMemo(() => access(props.sizeAnchor) ?? MOSAIC_DEFAULTS.sizeAnchor);
@@ -22,10 +19,11 @@ export const Mosaic = (props: MosaicProps) => {
     );
 
     const getPrefersReducedMotion = MediaQueryMonitorSolidUtils.createReducedMotion(
-        () => getTransitionDurationMs() <= NO_TRANSITION_MS,
+        () => getTransitionDurationMs() <= MosaicConst.NO_TRANSITION_MS,
     );
 
-    const getGlideDurationMs = () => (getPrefersReducedMotion() ? NO_TRANSITION_MS : getTransitionDurationMs());
+    const getGlideDurationMs = () =>
+        getPrefersReducedMotion() ? MosaicConst.NO_TRANSITION_MS : getTransitionDurationMs();
 
     const getIsWalked = () => props.onActivate !== undefined;
 
@@ -159,9 +157,9 @@ export const Mosaic = (props: MosaicProps) => {
         >
             <For each={getSlotOrder()}>
                 {(slot, getReadingIndex) => {
-                    const getIndex = createMemo(() => getIndexBySlot().get(slot) ?? NOT_PLACED);
+                    const getIndex = createMemo(() => getIndexBySlot().get(slot) ?? MosaicConst.NOT_PLACED);
                     const getIsPlaced = createMemo(() => getRectByIndex().has(getIndex()));
-                    const getRect = createMemo(() => getRectByIndex().get(getIndex()) ?? EMPTY_RECT);
+                    const getRect = createMemo(() => getRectByIndex().get(getIndex()) ?? MosaicConst.EMPTY_RECT);
 
                     const [getIsFocusVisible, setIsFocusVisible] = createSignal(false);
 

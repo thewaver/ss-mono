@@ -4,8 +4,10 @@
     import { createWheelsControls } from "../Wheels.utils.svelte";
     import PageWheelsPanel from "../WheelsPanel.svelte";
     import OverheadExampleWrapper from "./OverheadExampleWrapper.svelte";
-
-    const EXAMPLES_ROOT = "/src/App/Pages/Wheels/OverheadWheelPage/Examples";
+    import {
+    EXAMPLE_NAMES,
+    EXAMPLES_ROOT,
+} from "@thewaver/ss-playground/App/Pages/Wheels/OverheadWheelPage/OverheadWheelPage.const";
 
     const controls = createWheelsControls();
 
@@ -16,7 +18,7 @@
     const examples: ExampleDefs[] = [
         {
             key: "overhead",
-            name: "Overhead",
+            name: EXAMPLE_NAMES.overhead,
             component: overheadExample,
             readout: () =>
                 `under the marker: ${controls.wedges[markedIndex] ?? "nothing"} — heading for: ${controls.wedges[targetIndex] ?? "nothing"}`,

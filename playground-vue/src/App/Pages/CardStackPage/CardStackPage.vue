@@ -3,6 +3,11 @@ import { shallowRef } from "vue";
 
 import { CARD_STACK_DEFAULTS, CARD_STACK_PILE_SIDES, type CardStackPileSide } from "@thewaver/ss-components-vue";
 import { CardStackKnobs } from "@thewaver/ss-playground/App/Knobs/CardStacks.const";
+import {
+    EXAMPLES_ROOT,
+    EXAMPLE_NAMES,
+    FIELD_WIDTH,
+} from "@thewaver/ss-playground/App/Pages/CardStackPage/CardStackPage.const";
 import type { SwipeDirection } from "@thewaver/ss-utils";
 
 import type { ExampleDefs } from "../../PageComponents/Examples/Examples.types";
@@ -14,10 +19,6 @@ import PageProp from "../../PageComponents/Prop/Prop.vue";
 import PagePropsPanel from "../../PageComponents/PropsPanel/PagePropsPanel.vue";
 import DeckExample from "./Examples/Deck.vue";
 import EndlessExample from "./Examples/Endless.vue";
-
-const EXAMPLES_ROOT = "/src/App/Pages/CardStackPage/Examples";
-
-const FIELD_WIDTH = 110;
 
 const isDisabled = shallowRef(CardStackKnobs.STARTING_IS_DISABLED);
 const commitRatio = shallowRef(CARD_STACK_DEFAULTS.commitRatio);
@@ -41,7 +42,7 @@ const deal = () => {
 const examples: ExampleDefs[] = [
     {
         key: "deck",
-        name: "Deck of cards",
+        name: EXAMPLE_NAMES.deck,
         readout: () => {
             if (isEmpty.value) return "the pile is empty — deal again to put every card back";
 
@@ -53,7 +54,7 @@ const examples: ExampleDefs[] = [
     },
     {
         key: "endless",
-        name: "A deck that never runs out",
+        name: EXAMPLE_NAMES.endless,
         readout: () => {
             if (!lastEndlessSend.value)
                 return "left or right only — an upward push springs back, and on a touch screen it scrolls the page instead";

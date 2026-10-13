@@ -1,14 +1,8 @@
 <script setup lang="ts">
-import type { CarouselStep } from "@thewaver/ss-components-vue";
-import { CONTROL_GLYPHS } from "@thewaver/ss-playground/App/StyledComponents/ControlButtonContent/ControlButtonContent.const";
+import { STEP_GLYPHS } from "@thewaver/ss-playground/App/StyledComponents/CarouselContent/CarouselContent.const";
 
 import PageControlButtonContent from "../ControlButtonContent/ControlButtonContent.vue";
-import type { CarouselStepProps } from "./CarouselContent.types";
-
-const STEP_GLYPHS: Record<CarouselStep, string> = {
-    previous: CONTROL_GLYPHS.previous,
-    next: CONTROL_GLYPHS.next,
-};
+import type { CarouselStepProps } from "./CarouselContentVue.types";
 
 defineProps<CarouselStepProps>();
 </script>

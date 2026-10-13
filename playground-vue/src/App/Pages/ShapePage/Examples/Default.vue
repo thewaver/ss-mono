@@ -5,8 +5,8 @@ import { InteractionTrackerVueUtils, Shape } from "@thewaver/ss-components-vue";
 import * as styles from "@thewaver/ss-playground/App/Pages/ShapePage/ShapePage.css";
 import { type Point2d, ShapeConst, ShapeUtils, type Size2d } from "@thewaver/ss-utils";
 
-import { computeShapeFillDefs, computeShapeStrokeDefs } from "../ShapePage.const";
 import type { ShapeExampleProps } from "../ShapePage.types";
+import { computeShapeFillDefs, computeShapeStrokeDefs } from "../ShapePageVue.const";
 
 type Props = ShapeExampleProps;
 

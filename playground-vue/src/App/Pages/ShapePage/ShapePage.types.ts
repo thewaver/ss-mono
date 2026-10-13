@@ -3,7 +3,7 @@ import type { ShallowRef } from "vue";
 import type { SVGDefsColors, SVGDefsSamples, ShapeProps } from "@thewaver/ss-components-vue";
 import type { ShapeConst, Size2d } from "@thewaver/ss-utils";
 
-import type { Paint } from "../../PageComponents/PaintPicker/PaintPicker.types";
+import type { Paint } from "../../PageComponents/PaintPicker/PaintPickerVue.types";
 
 export type ShapeExampleProps = Pick<ShapeProps, "lameExponents" | "joinRadii"> & {
     shouldClipChildren?: boolean;

@@ -11,7 +11,7 @@ import {
     PageTextFieldContent,
     computePageTextFieldTextStyle,
 } from "../../../StyledComponents/TextFieldContent/TextFieldContent";
-import type { TextInputEditableExampleProps } from "../TextInputPage.types";
+import type { TextInputEditableExampleProps } from "../TextInputPageReact.types";
 
 type Props = TextInputEditableExampleProps;
 

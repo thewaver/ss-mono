@@ -4,8 +4,8 @@ import { renderPageHighlightFloater } from "../../../StyledComponents/GlideFloat
 import { PageSelectContent } from "../../../StyledComponents/SelectContent/SelectContent";
 import { PageSelectOptionContent } from "../../../StyledComponents/SelectOptionContent/SelectOptionContent";
 import { PageTooltipContent } from "../../../StyledComponents/TooltipContent/TooltipContent";
-import { COUNTRIES, PLACEHOLDER, renderSelectPopup } from "../SelectPage.const";
 import type { SelectExampleProps } from "../SelectPage.types";
+import { COUNTRIES, PLACEHOLDER, renderSelectPopup } from "../SelectPageReact.const";
 
 type Props = SelectExampleProps;
 

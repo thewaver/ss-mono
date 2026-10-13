@@ -2,11 +2,11 @@
     import type { SVGDefsColors } from "@thewaver/ss-components-svelte";
     import * as styles from "@thewaver/ss-playground/App/Pages/SVGPatterns/SVGPatterns.css";
 
-    import { SVGPatternKnobs } from "../../Knobs/SVGPatterns.const";
+    import { SVGPatternKnobs } from "@thewaver/ss-playground/App/Knobs/SVGPatterns.const";
     import PageColorField from "../../PageComponents/Field/PageColorField.svelte";
     import PageNumberField from "../../PageComponents/Field/PageNumberField.svelte";
     import PageProp from "../../PageComponents/Prop/Prop.svelte";
-    import type { SVGPatternsControls } from "./SVGPatterns.types";
+    import type { SVGPatternsControls } from "./SVGPatternsSvelte.types";
 
     type Props = {
         controls: SVGPatternsControls;

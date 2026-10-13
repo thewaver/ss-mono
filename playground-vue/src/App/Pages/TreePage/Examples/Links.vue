@@ -5,8 +5,8 @@ import { Tree } from "@thewaver/ss-components-vue";
 
 import PageGlideFloater from "../../../StyledComponents/GlideFloater/PageGlideFloater.vue";
 import PageTreeNodeContent from "../../../StyledComponents/TreeNodeContent/PageTreeNodeContent.vue";
-import { DOCS } from "../TreePage.const";
 import type { TreeExampleProps } from "../TreePage.types";
+import { DOCS } from "../TreePageVue.const";
 
 type Props = TreeExampleProps;
 

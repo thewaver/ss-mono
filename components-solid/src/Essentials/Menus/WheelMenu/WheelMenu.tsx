@@ -19,7 +19,7 @@ export const WheelMenu = <T,>(props: WheelMenuProps<T>) => {
             holeRadius: access(props.holeRadius),
             bandWidth: access(props.bandWidth),
             levelGap: access(props.levelGap),
-            layoutDefs: props.layoutDefs,
+            layoutDefs: access(props.layoutDefs),
             hasCloser: props.closerDefs !== undefined,
         });
 

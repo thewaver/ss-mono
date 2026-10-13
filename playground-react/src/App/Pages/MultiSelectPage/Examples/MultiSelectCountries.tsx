@@ -3,7 +3,7 @@ import { MultiSelect } from "@thewaver/ss-components-react";
 import { renderPageHighlightFloater } from "../../../StyledComponents/GlideFloater/GlideFloater";
 import { PageSelectContent } from "../../../StyledComponents/SelectContent/SelectContent";
 import { PageSelectOptionContent } from "../../../StyledComponents/SelectOptionContent/SelectOptionContent";
-import { COUNTRIES, PLACEHOLDER, renderSelectPopup } from "../../SelectPage/SelectPage.const";
+import { COUNTRIES, PLACEHOLDER, renderSelectPopup } from "../../SelectPage/SelectPageReact.const";
 
 type Props = {
     values: readonly [string[], (values: string[]) => void];

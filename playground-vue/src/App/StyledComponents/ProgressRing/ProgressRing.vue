@@ -1,16 +1,17 @@
 <script setup lang="ts">
 import { computed } from "vue";
 
+import {
+    CIRCUMFERENCE,
+    HALF,
+    INDETERMINATE_ARC,
+    PERCENT,
+    RADIUS,
+} from "@thewaver/ss-playground/App/StyledComponents/ProgressRing/ProgressRing.const";
 import * as styles from "@thewaver/ss-playground/App/StyledComponents/ProgressRing/ProgressRing.css";
 
 import { useLayerClass } from "../Layer/Layer.context";
-import type { ProgressRingProps } from "./ProgressRing.types";
-
-const PERCENT = 100;
-const HALF = 0.5;
-const INDETERMINATE_ARC = 0.25;
-const RADIUS = (styles.RING_SIZE - styles.RING_STROKE) * HALF;
-const CIRCUMFERENCE = 2 * Math.PI * RADIUS;
+import type { ProgressRingProps } from "./ProgressRingVue.types";
 
 const props = defineProps<ProgressRingProps>();
 

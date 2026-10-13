@@ -6,8 +6,8 @@ import { renderPageHighlightFloater } from "../../../StyledComponents/GlideFloat
 import { PagePopoverSurface } from "../../../StyledComponents/PopoverSurface/PopoverSurface";
 import { PageSelectContent, computePageSelectTextStyle } from "../../../StyledComponents/SelectContent/SelectContent";
 import { PageSelectOptionContent } from "../../../StyledComponents/SelectOptionContent/SelectOptionContent";
-import { PLACEHOLDER, QUERY_PADDING } from "../SelectPage.const";
 import type { Airport } from "../SelectPage.types";
+import { PLACEHOLDER, QUERY_PADDING } from "../SelectPageReact.const";
 
 type Props = {
     value: readonly [Airport | undefined, (value: Airport | undefined) => void];

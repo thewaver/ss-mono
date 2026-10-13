@@ -5,8 +5,7 @@
     import DestructiveConfirmationExample from "./Examples/DestructiveConfirmation.svelte";
     import LayeredExample from "./Examples/Layered.svelte";
     import TextOnlyExample from "./Examples/TextOnly.svelte";
-
-    const EXAMPLES_ROOT = "/src/App/Pages/ModalPage/Examples";
+    import { EXAMPLE_NAMES, EXAMPLES_ROOT } from "@thewaver/ss-playground/App/Pages/ModalPage/ModalPage.const";
 
     let modalVisibility = $state(false);
     let destructiveVisibility = $state(false);
@@ -19,14 +18,14 @@
     const examples: ExampleDefs[] = [
         {
             key: "default",
-            name: "Default",
+            name: EXAMPLE_NAMES.default,
             readout: () => `open: ${modalVisibility} — Escape and an overlay click both dismiss it`,
             component: defaultExample,
             path: `${EXAMPLES_ROOT}/Default.svelte`,
         },
         {
             key: "destructiveConfirmation",
-            name: "Destructive confirmation",
+            name: EXAMPLE_NAMES.destructiveConfirmation,
             readout: () =>
                 `open: ${destructiveVisibility} | outcome: ${outcome} — the alertdialog role, a required focus target, and neither overlay nor Escape dismissal`,
             component: destructiveConfirmationExample,
@@ -34,7 +33,7 @@
         },
         {
             key: "layered",
-            name: "A popup inside it",
+            name: EXAMPLE_NAMES.layered,
             readout: () =>
                 `open: ${layeredVisibility} | country: ${layeredValue ?? "undefined"} — Escape closes the innermost layer only`,
             component: layeredExample,
@@ -42,7 +41,7 @@
         },
         {
             key: "textOnly",
-            name: "Nothing focusable inside",
+            name: EXAMPLE_NAMES.textOnly,
             readout: () => `open: ${textOnlyVisibility} — with nothing to focus inside, the dialog takes focus itself`,
             component: textOnlyExample,
             path: `${EXAMPLES_ROOT}/TextOnly.svelte`,

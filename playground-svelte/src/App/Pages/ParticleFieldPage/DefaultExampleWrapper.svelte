@@ -5,9 +5,7 @@
     import PagePlaybackScrubber from "../../PageComponents/PlaybackScrubber/PlaybackScrubber.svelte";
     import DefaultExample from "./Examples/Default.svelte";
     import type { ParticleFieldExampleProps } from "./ParticleFieldPage.types";
-
-    const BOX_WIDTH = 320;
-    const BOX_HEIGHT = 320;
+    import { BOX_HEIGHT, BOX_WIDTH } from "@thewaver/ss-playground/App/Pages/ParticleFieldPage/ParticleFieldPage.const";
 
     type Props = Omit<ParticleFieldExampleProps, "playback"> & {
         progress: number;

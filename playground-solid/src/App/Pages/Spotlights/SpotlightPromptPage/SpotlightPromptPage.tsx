@@ -1,9 +1,12 @@
 import { createMemo, createSignal } from "solid-js";
 
+import {
+    EXAMPLES_ROOT,
+    EXAMPLE_NAMES,
+} from "@thewaver/ss-playground/App/Pages/Spotlights/SpotlightPromptPage/SpotlightPromptPage.const";
+
 import { PageExamples } from "../../../PageComponents/Examples/Examples";
 import { PromptExample } from "./Examples/Prompt";
-
-const EXAMPLES_ROOT = "/src/App/Pages/Spotlights/SpotlightPromptPage/Examples";
 
 export const SpotlightPromptPage = () => {
     const [getBought, setBought] = createSignal(0);
@@ -13,7 +16,7 @@ export const SpotlightPromptPage = () => {
     const getExamples = createMemo(() => [
         {
             key: "prompt",
-            name: "Prompt",
+            name: EXAMPLE_NAMES.prompt,
             readout: () => `bought: ${getBought()} — nothing else on the page answers until you do`,
             component: () => (
                 <PromptExample

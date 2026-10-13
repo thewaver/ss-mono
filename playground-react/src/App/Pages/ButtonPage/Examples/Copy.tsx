@@ -4,7 +4,7 @@ import { Button, LiveAnnouncerUtils } from "@thewaver/ss-components-react";
 
 import { PageControlRow } from "../../../PageComponents/ControlRow/ControlRow";
 import { PageButtonContent } from "../../../StyledComponents/ButtonContent/ButtonContent";
-import type { ButtonCopyExampleProps } from "../ButtonPage.types";
+import type { ButtonCopyExampleProps } from "../ButtonPageReact.types";
 
 const COPIED_MS = 2000;
 const COPIED_ANNOUNCEMENT = "Copied to the clipboard";

@@ -2,7 +2,7 @@
 import * as styles from "@thewaver/ss-playground/App/StyledComponents/SpotlightPopup/SpotlightPopup.css";
 
 import PageLayer from "../../PageComponents/Layer/Layer.vue";
-import type { SpotlightPopupProps } from "./SpotlightPopup.types";
+import type { SpotlightPopupProps } from "./SpotlightPopupVue.types";
 
 defineProps<SpotlightPopupProps>();
 </script>

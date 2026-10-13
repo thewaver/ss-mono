@@ -1,18 +1,11 @@
 import { type ParentProps, Show } from "solid-js";
 
 import { PlacementUtils, access } from "@thewaver/ss-components-solid";
+import { MARKER_GLYPHS } from "@thewaver/ss-playground/App/StyledComponents/StepContent/StepContent.const";
 import * as styles from "@thewaver/ss-playground/App/StyledComponents/StepContent/StepContent.css";
 
 import { useLayerClass } from "../Layer/Layer.context";
-import type { StepArcConnectorProps, StepConnectorProps, StepContentProps } from "./StepContent.types";
-
-const MARKER_GLYPHS = {
-    done: "✓",
-    current: "",
-    failed: "!",
-    skipped: "–",
-    ahead: "",
-} as const;
+import type { StepArcConnectorProps, StepConnectorProps, StepContentProps } from "./StepContentSolid.types";
 
 export const PageStepContent = (props: ParentProps<StepContentProps>) => {
     const getLayerClass = useLayerClass();

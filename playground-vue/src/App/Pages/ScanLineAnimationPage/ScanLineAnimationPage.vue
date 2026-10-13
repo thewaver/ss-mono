@@ -8,6 +8,10 @@ import {
 } from "@thewaver/ss-components-vue";
 import type { ScanlineAnimationOrientation } from "@thewaver/ss-components-vue";
 import { ScanlineAnimationKnobs } from "@thewaver/ss-playground/App/Knobs/ScanlineAnimations.const";
+import {
+    EXAMPLES_ROOT,
+    EXAMPLE_NAMES,
+} from "@thewaver/ss-playground/App/Pages/ScanLineAnimationPage/ScanLineAnimationPage.const";
 import * as styles from "@thewaver/ss-playground/App/Pages/ScanLineAnimationPage/ScanlineAnimationPage.css";
 import knight from "@thewaver/ss-playground/App/knight.webp";
 
@@ -50,7 +54,6 @@ const groupOptions = <T extends string>(keys: readonly T[]) => {
 };
 
 const GROUPPED_WEIGHTS = groupOptions(CellAnimationWeights.ORIGIN_FREE_WEIGHT_TYPES);
-const EXAMPLES_ROOT = "/src/App/Pages/ScanLineAnimationPage/Examples";
 
 const playback = shallowRef(true);
 
@@ -81,67 +84,67 @@ const commonProps = computed<ScanlineAnimationExampleProps>(() => ({
 const examples: ExampleDefs[] = [
     {
         key: "glitch",
-        name: "Glitch",
+        name: EXAMPLE_NAMES.glitch,
         path: `${EXAMPLES_ROOT}/Glitch.vue`,
     },
     {
         key: "surge",
-        name: "Surge",
+        name: EXAMPLE_NAMES.surge,
         path: `${EXAMPLES_ROOT}/Surge.vue`,
     },
     {
         key: "snake",
-        name: "Snake",
+        name: EXAMPLE_NAMES.snake,
         path: `${EXAMPLES_ROOT}/Snake.vue`,
     },
     {
         key: "split",
-        name: "Split",
+        name: EXAMPLE_NAMES.split,
         path: `${EXAMPLES_ROOT}/Split.vue`,
     },
     {
         key: "brightness",
-        name: "Brightness",
+        name: EXAMPLE_NAMES.brightness,
         path: `${EXAMPLES_ROOT}/Brightness.vue`,
     },
     {
         key: "grayscale",
-        name: "Grayscale",
+        name: EXAMPLE_NAMES.grayscale,
         path: `${EXAMPLES_ROOT}/Grayscale.vue`,
     },
     {
         key: "hue",
-        name: "Hue",
+        name: EXAMPLE_NAMES.hue,
         path: `${EXAMPLES_ROOT}/Hue.vue`,
     },
     {
         key: "_wave",
-        name: "_Wave",
+        name: EXAMPLE_NAMES._wave,
         path: `${EXAMPLES_ROOT}/_Wave.vue`,
     },
     {
         key: "_roll",
-        name: "_Roll",
+        name: EXAMPLE_NAMES._roll,
         path: `${EXAMPLES_ROOT}/_Roll.vue`,
     },
     {
         key: "_dropout",
-        name: "_Dropout",
+        name: EXAMPLE_NAMES._dropout,
         path: `${EXAMPLES_ROOT}/_Dropout.vue`,
     },
     {
         key: "_interlace",
-        name: "_Interlace",
+        name: EXAMPLE_NAMES._interlace,
         path: `${EXAMPLES_ROOT}/_Interlace.vue`,
     },
     {
         key: "_skew",
-        name: "_Skew",
+        name: EXAMPLE_NAMES._skew,
         path: `${EXAMPLES_ROOT}/_Skew.vue`,
     },
     {
         key: "stressTest",
-        name: "Stress Test",
+        name: EXAMPLE_NAMES.stressTest,
     },
 ];
 </script>
