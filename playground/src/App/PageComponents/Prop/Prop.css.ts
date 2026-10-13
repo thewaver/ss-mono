@@ -21,7 +21,7 @@ export const propScopeVariants = styleVariants({
             color: layerVars.contrast,
             backgroundColor: [
                 themeVars.color.background.dark,
-                `rgb(from ${themeVars.color.background.dark} r g b / 75%)`,
+                `hsl(from ${themeVars.color.background.dark} h calc(s * 0.25) l / 50%)`,
             ],
         },
     ],
@@ -31,7 +31,7 @@ export const propScopeVariants = styleVariants({
             color: layerVars.contrast,
             backgroundColor: [
                 themeVars.color.background.light,
-                `rgb(from ${themeVars.color.background.light} r g b / 75%)`,
+                `hsl(from ${themeVars.color.background.light} h calc(s * 0.25) l / 50%)`,
             ],
         },
     ],
@@ -39,7 +39,10 @@ export const propScopeVariants = styleVariants({
         propScopeBase,
         {
             color: layerVars.contrast,
-            backgroundColor: [themeVars.color.surface.dark, `rgb(from ${themeVars.color.surface.dark} r g b / 75%)`],
+            backgroundColor: [
+                themeVars.color.surface.dark,
+                `hsl(from ${themeVars.color.surface.dark}  h calc(s * 0.25) l / 50%)`,
+            ],
         },
     ],
     unknown: {},
