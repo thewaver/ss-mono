@@ -64,8 +64,15 @@ test("the window is a named region with one real copy of the content, and the re
     ).toHaveCount(realButtons);
 });
 
+/**
+ * The tests that point the mouse at the window scroll it into view first: the demo sits low on the page, and where
+ * exactly is the page's layout, not anything these tests are about.
+ */
 test("pressing a copy presses the matching real button", async ({ page }) => {
     const copyButton = page.locator(`${copies(GRID)} button`).nth(4);
+
+    await copyButton.scrollIntoViewIfNeeded();
+
     const name = (await copyButton.textContent())!.trim();
     const box = (await copyButton.boundingBox())!;
 
@@ -83,6 +90,8 @@ test(
     "a drag moves the content and lets it coast on, and does not press what it started on",
     { tag: "@solo" },
     async ({ page }) => {
+        await page.locator(region(GRID)).scrollIntoViewIfNeeded();
+
         const before = await planeOffset(page, GRID);
         const box = (await page.locator(region(GRID)).boundingBox())!;
 
@@ -103,6 +112,8 @@ test(
 );
 
 test("the wheel moves the content", async ({ page }) => {
+    await page.locator(region(GRID)).scrollIntoViewIfNeeded();
+
     const before = await planeOffset(page, GRID);
     const box = (await page.locator(region(GRID)).boundingBox())!;
 
