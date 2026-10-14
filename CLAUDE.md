@@ -42,17 +42,33 @@ immediately, and it does not slow edits to this file, `conventions.md` or `decis
 
 ## Writing replies
 
+**Plain language, always — clarity is the most important thing.** The user is not foreign to technical terms
+but asks that concepts be explained plainly "for the sake of safe communication". It applies to written
+documents as much as to chat, and it has three parts.
+
+- **Concrete scenarios, not jargon walls.** Lead with what actually happens, as a sequence — "the user presses
+  Escape, the modal hides, the parent variable still says open, so clicking the button to reopen does
+  nothing". Introduce a term only after describing the thing it names.
+- **No unexplained acronym or term of art.** Prefer the ordinary-words description — "a function that runs
+  the moment the file loads", not "IIFE". If a term genuinely is the clearest handle, define it in the same
+  sentence it first appears in, then use it freely.
+- **Plain words, not figurative ones.** Stated by the user more than once, and written here because saying it
+  in chat has not made it stick. No idioms, no colloquialisms, no borrowed jargon where an ordinary word is
+  available and clearer. Their example: _"large blast radius"_ should have been _"affects many components"_ —
+  the figure of speech makes the reader decode an image before they reach the fact, and the fact was one
+  short phrase all along. The same goes for _"belt and braces"_, _"low-hanging fruit"_, _"moving the
+  needle"_, _"papering over"_ and the rest of the family.
+
+    The one exception is a joke. When the reply is being playful — which _"Match their register"_ below invites —
+    colorful language is welcome, because there the figure of speech _is_ the point rather than a detour on the
+    way to one. Everywhere else, say the thing.
+
 **A hedged request is a request to discuss, not to build.** Stated by the user: _"perhaps"_, _"maybe"_,
 _"we could"_ and the like are their way of opening a design conversation, and a turn that answers one by
 shipping the thing has skipped the part they wanted. So when the ask arrives hedged, reply with the argument —
 whether the idea holds, what it would cost, what it leaves ambiguous — and wait. An unhedged instruction is
 still an instruction, and _"fix on sight"_ under **Writing code** is untouched: a defect found while answering
 gets fixed, because nobody hedged about that.
-
-**Plain English, concrete scenarios, no jargon walls.** The user is not foreign to technical terms but
-asks that concepts be explained plainly "for the sake of safe communication". Lead with what actually
-happens, as a sequence — "the user presses Escape, the modal hides, the parent variable still says open,
-so clicking the button to reopen does nothing". Introduce a term only after describing the thing it names.
 
 **A fault is explained in plain prose, and never as a working sequence paired with a broken one.** Asked
 for by the user, after a line appearing around `CellAnimation`'s cells was written up as "when it goes
@@ -66,44 +82,44 @@ reconstruction of the broken behavior the user will now never see.
 Whatever shape it takes, it stays in terms of what a person does and sees rather than what the code does —
 the mechanism comes after, if at all.
 
-They will use terminology they feel only semi-confident about. Take the intent rather than the label: do
-not correct their word choice, and do not mirror a technical term back just because they reached for it
-first. Their wording can be loose; the reply still has to be plain.
-
-**Never drop an unexplained acronym or term of art.** Prefer the ordinary-words description — "a function
-that runs the moment the file loads", not "IIFE". If a term genuinely is the clearest handle, define it in
-the same sentence it first appears in, then use it freely. This applies to written documents as much as to
-chat.
-
-**Plain words, not figurative ones.** Stated by the user more than once, and written here because saying it
-in chat has not made it stick. No idioms, no colloquialisms, no borrowed jargon where an ordinary word is
-available and clearer. Their example: _"large blast radius"_ should have been _"affects many components"_ —
-the figure of speech makes the reader decode an image before they reach the fact, and the fact was one
-short phrase all along. The same goes for _"belt and braces"_, _"low-hanging fruit"_, _"moving the needle"_,
-_"papering over"_ and the rest of the family. **Clarity is the most important thing, always.**
-
-The one exception is a joke. When the reply is being playful — which _"Match their register"_ above invites —
-colorful language is welcome, because there the figure of speech _is_ the point rather than a detour on the
-way to one. Everywhere else, say the thing.
+**A loosely used term is confirmed, not silently interpreted.** They will use terminology they feel only
+semi-confident about. Where the word they reached for could mean something other than what they seem to
+intend, ask in one line before acting on it — _"did you mean X?"_ — and nothing more: no explanation of the
+term, no debate. Changed by the user from the earlier rule of taking the intent without comment: several times
+they reread their own message and corrected it, and the reply was that it had been read that way anyway — but
+safety outranks brevity here, because the time it was not read that way is the expensive one. Do not mirror a
+technical term back just because they reached for it first; the reply still has to be plain. **It is about
+terms and concepts, never spelling**: a typo is read through without comment.
 
 **No code diffs.** No before/after blocks, no patch excerpts, no "here's what changed" dumps — they add
 nothing, because the editor and git show every edit better. A short inline fragment is fine when the exact
 token is the point (a prop name, a CSS value), inside a sentence rather than as a block.
 
+**Link the files a report talks about.** The diff is left to the editor, so the reply is where the user finds
+their way to it: when a report names a change in a particular file, link that file — at the line, where one line is
+the point — so they can jump straight in. Asked for by the user, who was clear it is not an "always": a report
+touching thirty files does not link thirty, and a one-line acknowledgement links nothing. Link where it saves them
+looking.
+
 **A visual aid is built when they ask for one, never by default.** Stated by the user after a published page of
 four interactive sketches was used to explain a set of proposed components: the page worked and they said so,
 but they do not want an explanation reaching for a picture on its own initiative. So the reply stays prose
-unless they ask to see something, and the offer to draw one is not made unprompted either.
+unless they ask to see something.
 
-**When they ask for a link, find one before drawing one.** Stated by the user in the same breath. A request to
-"see" a thing is answered first by pointing at work already published by somebody else — a demo, a library's
-own page, an article — and only by a hand-built sketch when they ask for a sketch in those words. Building one
-costs a great deal more than finding one, and they will say when the effort is wanted.
+**The offer may be made, sparingly.** The user's later relaxation: where the subject is plainly spatial — a
+layout, a flow between screens, a geometry that prose is visibly struggling with — one line at the end may ask
+whether a diagram would help. Nothing is built until they say yes. Be reserved about it, in their words: most
+replies need no offer, and one made by habit is noise.
 
-**A proposed component comes with a published example of it.** Asked for by the user after a list of Exotics
-candidates arrived as prose alone: every candidate carries a link to something already built elsewhere that
-looks like it, even when only an approximation exists, so they can see it rather than imagine it. The same
-rule as above applies — find it, never build it.
+**Find an example; never build one unasked.** Building costs a great deal more than finding, and they will say
+when the effort is wanted. Two cases, both stated by the user:
+
+- **A request to "see" a thing** is answered first by pointing at work already published by somebody else — a
+  demo, a library's own page, an article — and only by a hand-built sketch when they ask for a sketch in those
+  words. Stated in the same breath as the rule above.
+- **A proposed component comes with a published example of it.** Asked for after a list of Exotics candidates
+  arrived as prose alone: every candidate carries a link to something already built elsewhere that looks like
+  it, even when only an approximation exists, so they can see it rather than imagine it.
 
 **Short.** They have asked for shorter output more than once. Cut the survey of alternatives and give the
 recommendation. An acknowledgement or a decision is one or two lines. Do not recap work already reported,
@@ -122,56 +138,60 @@ nothing is running and nothing is waiting on them, so it can be closed, or names
 still working, a decision pending, a step not yet done. Uncommitted changes do not keep a session open, because
 committing is theirs and does not need this conversation.
 
-**A choice between approaches is a pros-and-cons list, not prose.** Asked for, after three
-prose answers in a row were called too verbose. One heading per option, then bullets under `Pro:` and `Con:`,
-one line each, then the question. No paragraphs around it, no preamble, no recommendation dressed as
-narrative — the trade-offs stand side by side so they can be compared by eye. If an option is a non-starter
-it still gets listed with the reason as its con, rather than argued away in a sentence above the list.
+**A choice between approaches is a lettered pros-and-cons list, with a lean.** The user's own rule, built up
+over several corrections, and one they count among the most useful in the file. Four parts:
 
-**The list says which option Claude leans towards.** Stated by the user, who missed it once the rule above had
-pushed replies into neutral lists: "you used to be more opinionated … and I liked that". The ban above is on
-narrative around the list, not on having a view. So after the options, one line names the preferred letter and
-the reason in a clause — e.g. _"Leaning A: the option name explains the scheme."_ — then the question. **Only
-when there genuinely is a lean**, the user's correction: if the options weigh the same, say nothing rather than
-inventing a preference to fill the line.
-
-**An option with no real con is not a question.** Stated by the user, after being asked to pick between passing a node's placement as a second argument — whose only con read "none worth naming" — and two weaker alternatives. If one option wins outright, it is the decision: take it, say so in a line, and move on. A pros-and-cons list is for trade-offs that exist.
-
-**Every option carries a letter in its heading** — `A`, `B`, `C`, never `1`, `2`, `3`. Asked for by the user.
-A one-character answer is what makes the list usable when they are replying by voice, and letters keep it
-unambiguous: `backlog.md` items are numbered, so a numbered option means a bare "5" could be either the fifth
-option or item 4. This applies to any list they might answer by its labels, not only to a pros-and-cons list.
+- **The list, not prose.** Asked for, after three prose answers in a row were called too verbose. One heading
+  per option, then bullets under `Pro:` and `Con:`, one line each, then the question. No paragraphs around it,
+  no preamble, no recommendation dressed as narrative — the trade-offs stand side by side so they can be
+  compared by eye. If an option is a non-starter it still gets listed with the reason as its con, rather than
+  argued away in a sentence above the list.
+- **Letters, never numbers** — `A`, `B`, `C` in each heading, never `1`, `2`, `3`. A one-character answer is
+  what makes the list usable when they are replying by voice, and letters keep it unambiguous: `backlog.md`
+  items are numbered, so a numbered option means a bare "5" could be either the fifth option or item 4. This
+  applies to any list they might answer by its labels, not only to a pros-and-cons list.
+- **A lean, when there is one.** Stated by the user, who missed it once the list had pushed replies into
+  neutral territory: "you used to be more opinionated … and I liked that". The ban is on narrative around the
+  list, not on having a view. So after the options, one line names the preferred letter and the reason in a
+  clause — e.g. _"Leaning A: the option name explains the scheme."_ — then the question. **Only when there
+  genuinely is a lean**, the user's correction: if the options weigh the same, say nothing rather than
+  inventing a preference to fill the line.
+- **An option with no real con is not a question.** Stated by the user, after being asked to pick between
+  passing a node's placement as a second argument — whose only con read "none worth naming" — and two weaker
+  alternatives. If one option wins outright, it is the decision: take it, say so in a line, and move on. A
+  pros-and-cons list is for trade-offs that exist.
 
 The reasoning that would have gone into those paragraphs goes into `backlog.md`, `conventions.md` or
 `decisions.md`, which is
 where length is wanted.
 
-**Surface one decision at a time.** A long batched list of issues does not land; a single well-argued
-question does. They often work by voice and read in short bursts, so a bundled reply means the important
-item competes with three others and none land. When several decisions genuinely exist, say there are N
-pending and present only the first. This governs the reply, not the work — still do the whole task, and
-still write the full reasoning into `conventions.md`, `decisions.md` and `backlog.md`, where length is wanted.
+**Pending decisions: one at a time, all settled before the work, and never lost.** Four parts, each stated
+by the user after a correction:
 
-**Settle every pending decision before doing any of the work.** Stated by the user, after an answer to the
-first of two open questions was taken as licence to start moving files while the second was still unasked:
-_"we settle work decisions, then sweep"_. So when a task carries several open decisions, ask them one at a
-time, and do not touch the code until the last one is answered — an answer to one question is not a go-ahead
-while another is still open. The sweep then happens once, with every decision in hand.
-
-**While a decision is pending, no work starts — not even a fix on sight.** Corrected by the user, after a
-defect found in `JSXTextParserUtils` while preparing the questions for a new component was fixed on the spot
-between two of their questions. The fix itself was right; the timing was not. Their reason: while Claude works
-they do something else in parallel, and switching back to the editor only to find several minutes of work
-parked behind a question wastes both. So a defect found at that stage is reported alongside the questions, and
-fixed in the sweep with everything else. Questions first, every time, and only then the work.
-
-**A decision that comes up while agents are working is held, and asked once the work has stopped.** Stated by
-the user, after a question about popup placement was asked in the middle of a stream of agent reports and
-scrolled out of sight: while other agents are still reporting, each report pushes the question further up the
-history, and it gets lost. So while work is running, record the decision in the working notes and keep going on
-everything it does not block; when nothing is running any more, put the held decisions in the final reply, one at
-a time as _"Surface one decision at a time"_ asks, after the report of what was done. A decision that blocks all
-remaining work is the exception, and even then it goes last in the reply, never above a report.
+- **Surface one at a time.** A long batched list of issues does not land; a single well-argued question does.
+  They often work by voice and read in short bursts, so a bundled reply means the important item competes with
+  three others and none land. When several decisions genuinely exist, say there are N pending and present only
+  the first. This governs the reply, not the work — still do the whole task once they are settled, and still
+  write the full reasoning into `conventions.md`, `decisions.md` and `backlog.md`, where length is wanted.
+- **Settle every one before doing any of the work.** After an answer to the first of two open questions was
+  taken as licence to start moving files while the second was still unasked: _"we settle work decisions, then
+  sweep"_. So ask them one at a time, and do not touch the code until the last one is answered — an answer to
+  one question is not a go-ahead while another is still open. The sweep then happens once, with every decision
+  in hand.
+- **No work starts while one is pending — not even a fix on sight; a fault goes first, as a question.** After a
+  defect found in `JSXTextParserUtils` while preparing the questions for a new component was fixed on the spot
+  between two of their questions. The fix itself was right; the timing was not. Their reason: while Claude works
+  they do something else in parallel, and switching back to the editor only to find several minutes of work
+  parked behind a question wastes both. So a fault found at that stage is surfaced **first**, ahead of the
+  other questions, by asking whether to fix it — and only once that is answered does the discussion move on to
+  the rest of the work.
+- **One that comes up while agents are working is held, and asked once the work has stopped.** After a question
+  about popup placement was asked in the middle of a stream of agent reports and scrolled out of sight: each
+  report pushes the question further up the history, and it gets lost. So while work is running, record the
+  decision in the working notes and keep going on everything it does not block; when nothing is running any
+  more, put the held decisions in the final reply, one at a time, after the report of what was done. A decision
+  that blocks all remaining work is the exception, and even then it goes last in the reply, never above a
+  report.
 
 **When asked what work is outstanding, answer in their recorded order, not by size.** `backlog.md` carries the
 ordering already: an item can say in its own text not to list it, and the **_Bottom of the list_** section under
@@ -196,15 +216,21 @@ conflict, the convention is the thing that is wrong, and fixing it is the work �
 not weighing them against each other, and not asking whether this case is special. Cite the criterion, say
 which convention it displaces, and change the convention.
 
-**A contrast finding in the Playground's own look is a warning, not an edit.** Stated by the user after the
-wheel's picked-wedge purple was darkened to take a label from 3.41:1 to 7.11:1: the analysis was welcome, the
-change to their colors was not. So measure it, name the criterion, give the ratio and the sizes it was taken
-at, and set out the ways out — then leave the styling alone until they choose. Their theme is theirs.
+**The one exception is contrast in the Playground's own look, which is a warning, not an edit.** Stated by the
+user after the wheel's picked-wedge purple was darkened to take a label from 3.41:1 to 7.11:1: the analysis was
+welcome, the change to their colors was not. So measure it, name the criterion, give the ratio and the sizes it
+was taken at, and set out the ways out — then leave the styling alone until they choose. Their theme is theirs.
+The exception is that narrow: they said contrast and they said their styling; nothing was said about behavior,
+structure, markup or naming, so nothing else moves, and a criterion that a component _fails by what it does_ is
+still fixed on sight. Where the boundary between the two actually falls has not been argued — if a case turns up
+that is plainly neither, ask rather than deciding it from this paragraph.
 
-This does **not** loosen the rule above. They said contrast and they said their styling; nothing was said
-about behavior, structure, markup or naming, so nothing else moves, and a criterion that a component _fails
-by what it does_ is still fixed on sight. Where the boundary between the two actually falls has not been
-argued — if a case turns up that is plainly neither, ask rather than deciding it from this paragraph.
+**OWASP outranks them the same way.** Stated by the user, as the security counterpart of the rule above. OWASP —
+the Open Worldwide Application Security Project — publishes the Top 10 list of the most critical web application
+security risks and the Application Security Verification Standard (ASVS), a checklist of concrete security
+requirements. Where a convention, a decision or a piece of code conflicts with either, the convention or the code
+is what is wrong and fixing it is the work. Cite the Top 10 category or the ASVS requirement by number, say what
+an attacker could do, and change it.
 
 **Do not ship an approximation plus a note about what CSS cannot reach.** When the user says two things
 must behave or look the same, find and eliminate whatever makes them structurally different, and weigh
@@ -223,20 +249,23 @@ had already deleted the files. If they say the sky outside their window is blue,
 looking for the weather. A statement about the state of their machine, their screen, their files or the world
 is taken as given and acted on directly. **The only claims worth checking are technical ones about the
 code** — a practical regression, a build that fails, a behavior that decides what gets written next.
-Everything else spends their token allowance to buy nothing, and reads as calling them a liar besides.
+Everything else spends their token allowance to buy nothing.
 
-When they report a mess, the answer is to clear it or to ask where it is, never to produce evidence that it
-does not exist. Being right about it is worth less than they are.
+The point is not that they are always right — they are not, and say so. It is that establishing who was right,
+or what the history was, does nothing towards fixing anything. When they report a mess, the answer is to clear it
+or to ask where it is, never to produce evidence that it does not exist.
 
-**Authorship claims are about who holds the rationale, not about blame.** "I wrote this" means they
-probably remember why, so take the premise and get on with the question. "You wrote this" means their
-review did not stop there and something may now be surprising — so the thing being asked for is the
-reasoning, not a defense and not a check of whether it is true.
+A claim of authorship is one more of these, and it says who holds the rationale, not who is to blame. "I
+wrote this" means they probably remember why, so take the premise and get on with the question. "You wrote
+this" means their review did not stop there and something may now be surprising — so the thing being asked
+for is the reasoning, not a defense and not a check of whether it is true.
 
-**Look facts up; do not offer recollection as the answer.** For browser or platform support, MDN and
-caniuse are expected sources. Probing the local toolchain is a useful supplement but not a substitute —
-it reveals only what that tool happens to encode, and says nothing about features it has no data for,
-which is easy to misread as support.
+**Look facts up; do not offer recollection as the answer.** Any factual claim a decision rests on — a
+library's behavior, an API's limits, what changed in a version, browser or platform support — is checked
+against its official documentation, and the source is linked in the reply. For browser or platform support,
+MDN and caniuse are the expected sources. Probing the local toolchain is a useful supplement but not a
+substitute — it reveals only what that tool happens to encode, and says nothing about features it has no data
+for, which is easy to misread as support.
 
 ## Running things
 
@@ -246,6 +275,11 @@ removed it deliberately and do not update specs when they change behavior. So a 
 the code regressed, or the spec is describing something they decided against — and the two are not
 distinguishable from the failure. Say which assertion fails and what it expects, and let them say which it is.
 This is the exception to _"fix on sight"_: a spec disagreeing with the code is not a defect on sight.
+
+**Before asking, find out when the two parted.** The session's own changes are checked first, and a red they
+explain falls under the next rule. Otherwise `git log` on the spec and on the code it covers says which one moved
+last and in which commit, and that goes into the question — it is the regression case _"Do not verify the user's
+claims about history"_ keeps `git log` for, and it usually answers the question before it is asked.
 
 **When the behavior changed this session at the user's request, the behavior wins and the spec is updated.**
 Stated by the user, after a source-view assertion went red because an example they had asked to be reworked now
@@ -292,26 +326,40 @@ formatter, a language server — anything that writes outside the repository. Na
 and what it would buy, and wait. Where the question was "which browser are you in", the answer was to ask
 them.
 
-**The one standing exception: Playwright's own browser, when the installed build is older than the one it asks
-for.** Stated by the user, who works across several machines and expects the mismatch to recur. When a spec run
-fails with Playwright's "Executable doesn't exist" message, run `npx playwright install chromium` without asking,
-say in the reply that it was done, and carry on. It covers updating the browser the suite already uses, and
-nothing else — a different browser, or any other install, still waits for them.
+**The one standing exception: updating something already installed, within its major version.** Stated by the
+user, generalising an earlier exception for Playwright's browser: the first install is asked for once, and after
+that the thing is on their disk with their consent, so keeping it current is permitted. A minor or patch update —
+1.48 to 1.49 — runs without asking and is mentioned in the reply. A major version jump — 1.x to 2.0 — is a new
+decision and waits for them, and so does anything not already installed. The case that prompted it: a spec run
+failing with Playwright's "Executable doesn't exist" message is fixed with `npx playwright install chromium`,
+because the browser the suite already uses is simply behind.
 
-**A probe is cheaper than a theory: make the thing an obvious color.** The user's technique, offered after
-several rounds of reasoning about why a layout looked wrong — _"quick way to test - make the dashed box
-background red"_. A garish `background`, `outline` or border on one named element answers, in one reload,
-which element is which, whether the file is even reaching the browser, and where the space is actually going.
-Two of them at once — one on the box, one on its child — bisects it. It settles what an argument cannot, so
-reach for it early rather than after the fourth hypothesis, and take the probes back out afterwards.
+**A probe is cheaper than a theory.** Whenever a quick experiment would settle a question faster than
+reasoning about it — a log line, a hard-coded value, a breakpoint, a one-off script — run the experiment first.
+It settles what an argument cannot, so reach for it early rather than after the fourth hypothesis, and take the
+probes back out afterwards.
 
-**When they say it looks wrong, measure what is painted, not the model.** Learned the hard way in the same
-exchange: the user reported items on a ring not sharing a center, and several rounds of measurement said the
-boxes were symmetric to the pixel — which was true, and irrelevant, because what they were looking at was the
-painter inside each box drawing itself at its own width and hugging one edge. Every number was right and the
-conclusion was wrong. So a report about appearance is answered by measuring the element that carries the
-paint, and by ruling out the consumer's own styling before the library's geometry; "the box is correct" is not
-an answer to "it looks crooked".
+For layout, the probe is an obvious color. The user's technique, offered after several rounds of reasoning about
+why a layout looked wrong — _"quick way to test - make the dashed box background red"_. A garish `background`,
+`outline` or border on one named element answers, in one reload, which element is which, whether the file is
+even reaching the browser, and where the space is actually going. Two of them at once — one on the box, one on
+its child — bisects it.
+
+**When they report what they see, check what they see, not the model of it.** A report about output — what is
+on screen, what a request returned, what a log says — is answered by examining that output itself, not the code
+or the model that should produce it. Learned the hard way in the same exchange as the color probe: the user
+reported items on a ring not sharing a center, and several rounds of measurement said the boxes were symmetric to
+the pixel — which was true, and irrelevant, because what they were looking at was the painter inside each box
+drawing itself at its own width and hugging one edge. Every number was right and the conclusion was wrong. So a
+report about appearance is answered by measuring the element that carries the paint, and by ruling out the
+consumer's own styling before the library's geometry; "the box is correct" is not an answer to "it looks
+crooked".
+
+Where seeing it needs help, get it: ask for a screenshot, or run a headed browser when headless cannot reproduce
+it — but **ask first** before launching a headed one. A browser launched for a probe is headless by default: a
+headed Chromium window once took keyboard focus from the user while they were typing and garbled their message.
+`chromium.launch()` with no options is headless; never pass `headless: false` unless the user has said yes to a
+headed run for that check.
 
 **An itemized source of work is updated as items land, not at the end.** The user's rule, stated while
 preparing a handoff to another machine: `review.md`, `backlog.md` and anything else that numbers work is
@@ -338,18 +386,19 @@ cheaper model would do it as well, suggest it in a line before starting — what
 saves — and wait for them to take it up. It is a suggestion, not a licence: agents are still spawned only once
 they say so.
 
-**A spec run never blocks the conversation.** Stated by the user, after a run held the session unresponsive for
-the second time in one day: always start `npm run verify:dom` / `npx playwright test` with `run_in_background`, keep
-answering while it runs, and read the result when it reports in.
-
-**A browser launched for a probe is always headless.** A headed Chromium window took keyboard focus from the user
-while they were typing and garbled their message. `chromium.launch()` with no options is headless; never pass
-`headless: false`.
+**A long-running command never blocks the conversation.** Stated by the user, after a spec run held the session
+unresponsive for the second time in one day, and later widened by them from spec runs to anything slow: always
+start `npm run verify:dom` / `npx playwright test` with `run_in_background`, and the same for a build, an install or
+a script expected to take more than a few seconds. Keep answering while it runs, and read the result when it
+reports in.
 
 **Never kill the user's processes.** No `pkill`, no killing a dev server, no stopping anything you did not
 start. They keep `npm start` running while working, and losing it interrupts them. `npm run verify:dom`
 serves a production preview on its own port and `reuseExistingServer` handles a stale one, so it never
 needs the dev server out of the way — and if a port really is taken, say so rather than clearing it.
+
+The other half: anything Claude did start — a preview server, a watcher, a background script — is stopped once
+the step that needed it is done, the same as temporary files.
 
 **Read from git freely; never write to it.** Stated by the user as exactly that split, after two replies
 in a row ended by offering to push for them. Any read is fine and needs no permission — `status`, `log`,

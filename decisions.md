@@ -1659,8 +1659,7 @@ the other pages copy. Taken on Claude's judgment under the unsupervised port.
   nothing reads the new value in between today.
 - **A PatchBoard socket's wrapper is `sizing="fill"`**, in both frameworks. Its width used to come from
   `patchBoardSocketHolder > *` beating the wrapper's fit-content width only by stylesheet order, and through `core.ts`
-  that order flips — so the React socket was 4px wide and every cable ended off center. **A style that wins by
-  stylesheet order is a hazard across the two builds**, which load the same `.css.ts` files in different orders.
+  that order flips — so the React socket was 4px wide and every cable ended off center.
 - **A React `CardStack` keys its cards by their index in `cards`**, so a card coming up the pile keeps its element and
   eases into place; the Solid `For` builds every card afresh as the pile moves, since it is handed new entry objects, so
   there the cards jump. A small visible difference between the two, left as it is.
@@ -2191,10 +2190,8 @@ step while reporting another.
 field**, because they are the whole of what is easy to get wrong — midnight reads as 12 am and noon as 12 pm,
 so the mapping is `hour % 12` in neither direction and no type catches the mistake.
 
-**`StringUtils.applyTextTransform` capitalizes on `(?<![\p{L}\p{N}])\p{L}` rather than `\b`.** `\b` is
-ASCII-only: it sees no boundary before "état" and one _inside_ it, giving "éTat". Matching a letter with no
-letter or digit before it behaves the same way for ASCII and keeps accented words intact. **Do not simplify
-this back to `\b`.**
+**`StringUtils.applyTextTransform` capitalizes on `(?<![\p{L}\p{N}])\p{L}` rather than `\b`**, so "état"
+capitalizes as "État". **Do not simplify this back to `\b`.**
 
 **`IOUtils.downloadJson` revokes its object URL immediately.** Without the revoke the blob is pinned in memory
 for the lifetime of the page.
@@ -3110,13 +3107,6 @@ brought every keystroke into range before storing it, and the mirror then wrote 
 the text — so with a floor of 100, pressing `5` to begin `500` left `100` in the field and the `0`s appended
 to that. It also reported twice, once through the mirror's setter and once through `NumberInput`'s `onInput`.
 Both are gone and the adapter now guards nothing, because the control does.
-
-**The general rule is that an owner may not correct a value a control reports mid-gesture.** A mirror is two
-sides that both write: the control writes what was typed, the owner writes what it decided to store, and
-anything the owner changes on the way in comes back over the text on the way out. Clamping, rounding and
-normalizing are one shape here, and none of them is safe per keystroke. Where a control defines the moment a
-value settles, a correction belongs at that moment or nowhere — and a control that can be handed a reading it
-refuses should refuse it itself, rather than leaving every owner to remember not to.
 
 **The step ladder counts from `min`, not from zero**, matching a native number field: a value on a rung
 moves a whole step, one between rungs snaps to the next rung in the direction of travel. `computeStep`
@@ -4134,13 +4124,10 @@ the measured `offsetWidth` the placement math reads nor anything painted, and a 
 zero rather than eating into the tooltip.
 
 **The bridge sits beneath the content, at `z-index: -1` inside a root that is `isolation: isolate`.** It spans
-the whole root plus the gap, and an absolutely positioned box with no `z-index` paints — and so hit-tests —
-above every static child of its parent. `HoverCard`'s panel had the same bridge, and a plain `<a>` in the
+the whole root plus the gap. `HoverCard`'s panel had the same bridge without the index, and a plain `<a>` in the
 profile card could not be clicked: the pseudo-element took the press. The `Follow` button beside it worked only
 because `InteractionWrapper`'s root is positioned and comes later in the tree, and the navigation flyout only
-because its surface carries a `transform`. Isolating the root keeps the `-1` from sinking below the root's own
-background into whatever stacking context is outside. `Tooltip`, `HoverCard` and the Playground's flyout all
-take it.
+because its surface carries a `transform`. `Tooltip`, `HoverCard` and the Playground's flyout all take it.
 
 **Leaving is judged by where the pointer is going, not by a timer.** `mouseleave` carries `relatedTarget`,
 so the anchor ignores a leave into the tooltip and the tooltip ignores a leave into the anchor. A grace
@@ -4777,10 +4764,8 @@ still draws no header of its own.
 `pointer-events: none` on its root, which looked sufficient and was not — `pointer-events` is inherited, but
 every option sets `pointer-events: all` explicitly (it has to, to beat `interactionRoot`'s `none`), and an
 explicit value on a descendant beats an inherited one. So a click aimed at whatever sat under a closing
-popup was swallowed by an option of a list already visually gone. `inert` disables an entire subtree for
-pointer events, focus and the accessibility tree regardless of descendants; `FocusManagerUtils.isReachable` already
-tests `[inert]`, so support was assumed all along. **General rule: `pointer-events` on an ancestor cannot
-switch off a subtree, only `inert` can.**
+popup was swallowed by an option of a list already visually gone. `FocusManagerUtils.isReachable` already
+tests `[inert]`, so support was assumed all along.
 
 **Behaviors a `Select` guarantees, to re-check after touching it** — none visible in markup, and the last
 two were wrong once: `Enter` on a reachable-disabled option changes nothing and leaves the popup open;
@@ -5032,16 +5017,9 @@ its own opener, so the pointer can be sitting on the X without ever having gone 
 reports that as a fresh `mouseenter` the moment anything else changes the layout — opening a submenu with
 `ArrowRight` fired one, which closed the submenu that had just opened. A pointer that never moved was undoing
 a keystroke. `Menu` now keeps the point of the last real `pointermove` for as long as it exists, and a hover
-is acted on only when its own point differs from that one: an enter the pointer caused arrives **before** the
-move that follows it, so it never matches the point on record, while an enter nothing caused matches it
-exactly. `movementX` was checked first and is zero in both cases, so it cannot tell them apart.
-
-**"The same point" has to mean within a pixel, not equal.** The two events report the same position at
-different precisions — a `pointermove` gives 959.98 where the `mouseover` that preceded it gives 959 — so an
-equality test on rounded numbers lets the stray enter through whenever the fraction rounds the other way. It
-is a real defect rather than a fussy one: it decides whether a submenu opened by the keyboard survives. The
-cost of the tolerance is that a hover which crosses into another item on a sub-pixel step is dropped, which
-no pointer a person is holding can do.
+is acted on only when its own point differs from that one by more than a pixel — a `pointermove` gives 959.98
+where the `mouseover` before it gives 959. The cost of the tolerance is that a hover which crosses into another
+item on a sub-pixel step is dropped, which no pointer a person is holding can do.
 
 **The guard is on every item, not only on the closer.** The same fault is already recorded against a menu
 that lands under the pointer that opened it — six specs failed on a highlight one item too far down — so a
@@ -5720,13 +5698,13 @@ item and an absent pointer are different things to an effect that answers on rem
 runs out.** Past the reach the push saturates at its full value, which is right for a row — everything beyond
 the growing item shifts outward and the row gets longer — and ruinous for a loop, where the two directions travel
 round and pile into each other at the far side. The first answer was a flag: test whether the run closes and
-refuse to push when it does. The user's correction is better and is the house pattern — `createRing` already
-clamps a spread to a turn and a hole ratio to one, and the falloff clamps nearness — so this is a clamp too.
+refuse to push when it does. The user's correction was a clamp, as `createRing` already clamps a spread to a turn
+and a hole ratio to one, and the falloff clamps nearness.
 `PlacementUtils.getRunSlack` reports how much of a turning run's circle is still free, counting the run's own
 width as occupied along with the turn its items cover, and the push is capped at half of it, the two ends
 spreading in opposite directions and each taking a share.
 
-**What that buys is a continuum rather than a switch**, which is the part the flag could not express. A
+**What that buys is a continuum rather than a switch.** A
 half-turn arc has room to spare and is untouched; at two hundred and eighty degrees the push comes down to
 about half what was asked for; at three hundred and forty there is nothing left and it grows in place. A ring
 is simply the end of that curve, so there is no closed case to detect and `isClosedRun` is gone. It also means
@@ -5845,8 +5823,7 @@ appeared, and it reports that as a fresh `mouseenter` — so a wheel, which open
 handed the highlight to the close control in its hole before anybody had touched anything.
 
 **The machinery to tell the two apart was already there and was only half-used.** `createPointerPointReader`
-exists because "a menu whose items are laid out may cover its own opener", and `getIsPointerLed` is the test:
-a real enter arrives with coordinates that differ from the last movement, an invented one matches. It gated
+exists because "a menu whose items are laid out may cover its own opener", and `getIsPointerLed` is the test. It gated
 whether a submenu opened and not whether the highlight moved, which reads as an oversight rather than a
 decision. `hoverIndex` now returns early for an enter nothing caused.
 
@@ -6602,23 +6579,20 @@ with children opens them when it is activated. Leaving was `ArrowLeft`, and is n
 single band and closes the wheel only from the root. Both are scoped to a laid-out menu, so no straight menu
 changed: there `ArrowRight` and `ArrowLeft` still open and close, because there they mean something.
 
-**`Escape` had to be stopped from reaching the dismisser, and `stopPropagation` was not enough.** Solid
-delegates `keydown` at the document root, so the menu's handler and `Dismisser`'s listener are both on
-`document` — a call that stops the event traveling further does nothing to a listener already attached to the
-same node. `stopImmediatePropagation` is what a level needs to keep a dismissal to itself.
+**`Escape` had to be stopped from reaching the dismisser, and `stopPropagation` was not enough**, because the
+menu's handler and `Dismisser`'s listener are both on `document`. A level calls `stopImmediatePropagation` to
+keep a dismissal to itself.
 
 ### A group's radios are ordered by the document, and only once every one of them has reported
 
 `RadioGroup` sorts its registered entries by `compareDocumentPosition`, which is how the roving walk and the
 floater find their order. The comparator answered "equal" for any pair whose element had not arrived yet,
-which makes it inconsistent — and `Array.prototype.sort` given an inconsistent comparator may return any
-permutation at all, including a reversed one.
+which makes it inconsistent.
 
 **It stayed invisible until a placement was looked up by that order.** A walk and a floater recover on the
 next render; a placement does not, because the index is what decides which radio is drawn where. The user saw
-a rating arc fill from the wrong end, which is that permutation. The memo now returns the registration order
-until every entry has an element and sorts only then, so the comparator is never asked a question it cannot
-answer.
+a rating arc fill from the wrong end. The memo now returns the registration order until every entry has an
+element and sorts only then.
 
 ### Five more controls take a layout, and each one broke something different
 
@@ -6841,13 +6815,10 @@ item that owns it, so a level unmounts with its parent for free and the anchor i
 handed the flags of whatever opened it — the trigger's for the root, the parent item's for a submenu.
 Disjoint flag types would have forced a union every consumer had to narrow.
 
-**A key is handled by the level it was pressed in, and the check has to be explicit because Solid
-re-dispatches delegated events through the component tree rather than the DOM tree.** The levels are
-portalled siblings, so nothing bubbles between them in the page — but `keydown` is delegated, and Solid walks
-a portal back to the component that rendered it, so a key pressed three levels deep ran every ancestor
-level's handler: `Escape` collapsed two levels and `ArrowLeft` closed the menu outright. Each level now
-ignores a keydown whose target is not its own popup root. Stopping propagation would have worked and was
-rejected: it would swallow the key for anything outside the menu that listens.
+**A key is handled by the level it was pressed in, and the check has to be explicit.** The levels are
+portalled siblings, so nothing bubbles between them in the page, yet a key pressed three levels deep ran every
+ancestor level's handler: `Escape` collapsed two levels and `ArrowLeft` closed the menu outright. Each level now
+ignores a keydown whose target is not its own popup root.
 
 **A blur dismisses only when focus has left the whole tree**, identified by id prefix — every level's id
 derives from the root's. The previous `relatedTarget === trigger` guard cannot generalize, because closing a
@@ -6969,17 +6940,13 @@ inside the callback. So on a page that stops producing frames — a backgrounded
 never leaves: `getIsVisible` stays true, the `<Show>` stays mounted, and the focus trap stays with it.
 
 It now schedules the same idempotent `commit` from both a frame and a 100ms timer, whichever arrives first,
-canceling the loser. The frame wins wherever frames exist; where they do not, the state machine advances
-without an animation, which is correct on a page that is not painting.
+canceling the loser.
 
 ### `ElementFader`: the end of a transition is the browser's answer, not the duration
 
 **The duration was doing two jobs and was only right for one of them.** It says how long the stylesheet
 animates for, which is what decides when the element may be unmounted — and it was also being used to decide
-when the element has _stopped moving_, which is a different question. A timer set to the duration is a guess
-about a machine that may be busy: it fires on its own schedule whether or not the transition it is timing has
-caught up. Anything that then measures, scrolls to or unmounts the element is acting on a layout that is
-still changing, and the result differs from one run to the next.
+when the element has _stopped moving_, which is a different question.
 
 **`Collapsible` is where it surfaced and where it was worst.** It waits for the flag, then scrolls the opened
 section into view — and the two `scrollIntoView` calls a frame apart are what an earlier session added when
@@ -6990,18 +6957,12 @@ scroll position it settled on differed between runs of the same click.
 **`getRef` is now given the outermost element the library owns, and the transition is over when
 `element.getAnimations({ subtree: true })` all report finished.** The subtree matters because the animated
 element is usually not the library's: a popup's shell belongs to the library and the thing that fades belongs
-to whoever painted it, so watching only the shell would watch nothing. `Animation.finished` is a promise per
-animation, and `Promise.allSettled` over them covers the cancel case, which rejects.
+to whoever painted it.
 
-**The timer stays, as the backstop rather than the decision.** Three cases need it: an element that animates
-nothing at all, one carrying an endless animation whose promise never resolves, and a caller with no ref to
-hand over. When real animations are being watched the timer is armed for the duration plus
-`BACKSTOP_GRACE_MS`, so it cannot fire first and call a running transition finished; with nothing to watch it
-is armed for exactly the duration, which is what every caller had before.
-
-**A generation counter guards the settle.** A fade reversed mid-flight starts a second wait while the first
-one's promise is still outstanding, and without the counter the older wait would resolve and report the newer
-transition finished.
+**The timer stays, as the backstop rather than the decision.** While real animations are being watched it is
+armed for the duration plus `BACKSTOP_GRACE_MS`; with nothing to watch it is armed for exactly the duration,
+which is what every caller had before. A generation counter guards the settle against a fade reversed
+mid-flight.
 
 **Every consumer was given a ref rather than only the one that showed the fault.** The user's call, and the
 reason is that the flag decides when a `Modal` unmounts and hands focus back, when a `Toasts` item is removed,
@@ -7192,7 +7153,7 @@ contents change layout with the size they are given.
 **It docks to any of the four edges, and its two sizes are `collapsedSize` and `expandedSize`.** It started with
 left and right only, and grew top and bottom for the Playground's build progress strip. The props were
 `collapsedWidth` and `expandedWidth`, which would have named a height on a sidebar docked to the top, and
-_"`width` and `height` mean a length"_ in `conventions.md` reserves those words for what they say. A second pair,
+_"A grid index names its space and its axis"_ in `conventions.md` reserves those words for what they say. A second pair,
 `collapsedHeight` and `expandedHeight`, was the other way out and was rejected: only one pair means anything for a
 given edge, so both would have to be optional, and leaving out the right pair would compile and draw a sidebar of
 no size. `Size` here is the length measured out from the docked edge, the way `gutterSize` and `laneSize` already
@@ -7518,8 +7479,8 @@ nothing declines a word, leaving the text in the field to be edited rather than 
 `interactionRoot` sets `pointer-events: none` and each part turns it back on for itself (`buttonElement` does,
 `textFieldElement` does); `tagInputField` did
 not, so the field could not be clicked, focused or typed into and the control read as a box of tags with no
-text entry. Every spec passed throughout, because `fill()` writes the element directly and never asks whether
-a person could have reached it — the click path is now asserted, and that is the general lesson. The root
+text entry. Every spec passed throughout, because they wrote the field's value with `fill()`; the click path is
+now asserted. The root
 turns pointer events on too, with `cursor: text` and a `pointerdown` that focuses the field when the press
 landed on the root itself, so the padding around the tags behaves like the padding of any text box.
 
@@ -7944,12 +7905,10 @@ plain one, and so on.
   spawner keep it.
 - In the grey Default theme there is no hue to rotate, so there the two are the same color.
 
-**`Theme.const.ts` holds data only, and must not import anything at runtime.** Every app's `vite.config.ts` imports
-it to paint the loading screen, and a config file is loaded before Vite's aliases exist, so a value import of
-`@thewaver/ss-utils` there resolves to the package's built `dist` — which is git-ignored, and which a fresh machine
-or the Vercel deploy has not built. The secondary pick and the rainbow, which need `Color` at runtime, therefore
-live in `Theme.css.ts`, which vanilla-extract compiles with the full Vite config, aliases included, so it reaches
-`utils/src`. `Theme.const.ts` imports `Color` as a type only, which is erased before it runs.
+**`Theme.const.ts` holds data only, and must not import anything at runtime**, because every app's
+`vite.config.ts` imports it to paint the loading screen. The secondary pick and the rainbow, which need `Color` at
+runtime, therefore live in `Theme.css.ts`, which vanilla-extract compiles with the full Vite config, so it reaches
+`utils/src`. `Theme.const.ts` imports `Color` as a type only.
 
 **Turning a primary into CSS strings is `toCssFamily` in `Theme.utils.ts`, and it is written out by hand rather than
 calling `Color.HSL.toCss`.** The landing page's `vite.config.ts` needs each framework's primary as CSS to color its
@@ -8089,12 +8048,9 @@ the same trick for this component. Two things the SVG must do: declare `xmlns`, 
 `height`, because the invisible anchor takes the box's aspect ratio from the image's intrinsic size — a
 400×200 source at `width: 100%` in a 300px box measures 300×150, exactly as a photograph would.
 
-**The cell's background URL is quoted, and that is what makes a drawn source work at all.** `encodeURIComponent`
-escapes the quotes in the markup but leaves parentheses alone, and every interesting SVG has them — `hsl(...)`,
-`rgb(...)`, an internal `url(#id)` reference. An unquoted CSS `url()` cannot take a literal parenthesis, so the
-whole declaration is dropped: measured, **zero** cells painted a background while the anchor still sized the box
-correctly, which is the failure that looks like the animation having broken rather than the source. Quoting the
-value costs nothing for a path or a `blob:` URL and is what makes the drawn case reachable.
+**The cell's background URL is quoted, and that is what makes a drawn source work at all.** Unquoted, measured,
+**zero** cells painted a background while the anchor still sized the box correctly, which is the failure that looks
+like the animation having broken rather than the source.
 
 **The Playground shows three source kinds as three examples, each owning the one setting only it can
 answer.** A photograph is picked per example rather than per page — `ScanlineAnimationPage`'s arrangement —
@@ -8270,10 +8226,9 @@ wrong string. `assignAnimationProps` always assigns both properties, so a frame 
 filter clears the previous one, and it zips each value against `CSSConst.ANIMATION_UNITS[key]`, one entry per
 function argument.
 
-**A component that computes a `z-index` owes the page a stacking context.** Cells carry a per-cell
-`z-index` from weight so earlier ones layer above later ones while they overlap; without
-`isolation: isolate` on the container those values escape into the nearest ancestor stacking context. In the
-Playground they landed in the stress test modal's context and painted over its FPS counter.
+**The cell container carries `isolation: isolate`.** Cells carry a per-cell `z-index` from weight so earlier
+ones layer above later ones while they overlap. Before the container isolated them, those values landed in the
+Playground's stress test modal and painted over its FPS counter.
 
 ### The animation sample collections: `fromZones`, and why a fifth circle is not worth adding
 
@@ -8741,9 +8696,9 @@ as the application. It reports upward once its exit has finished and the contain
 The first version cleared a timeout at the top of the effect and measured elapsed time only when pausing, so
 the clock restarted from full whenever the effect re-ran — and it re-ran on every array change, because it
 read whether the entry was exiting. Three toasts raised together therefore dismissed one and reset the other
-two, indefinitely. Arming inside the effect and subtracting the elapsed time in its cleanup makes the
-arithmetic correct regardless of _why_ the effect re-runs, and shrinks the dependency set to the duration and
-whether it is paused. Found by driving the page, invisible to every type and DOM assertion.
+two, indefinitely. It now arms inside the effect and subtracts the elapsed time in its cleanup, with a dependency
+set of the duration and whether it is paused. Found by driving the page, invisible to every type and DOM
+assertion.
 
 **Pausing is region-wide and forced.** Hovering or focusing anywhere in the region holds every countdown;
 there is no prop to switch it off. Focus is the half that matters — a toast must not vanish out from under
@@ -10124,13 +10079,11 @@ dragged, and nothing in the DOM showed it. The role already states the intent, s
 because a form that only sometimes carries alpha is a form you cannot type into; `Color.toNotation` is what
 drops to six digits for an opaque hex, which is the spelling `ColorInput` writes back when a hex value arrived.
 
-**A two-way mirror must track only its own source, and this cost two bugs to learn.** The Playground's picker
-mirrors the hue into a `Signal<number>` for the slider, and both directions originally read the other side's
-value inside the effect. That makes the pair fight: picking a color elsewhere re-ran the hue-to-picker
-direction, which found the hue signal still holding the previous hue and wrote that stale hue over the new
-color — so typing a hex produced a different color entirely. The guard on the far side has to be read
-`untrack`ed. The same shape broke the hex field twice over: an effect refreshing the field's text while
-tracking the picker overwrote what was being typed. The fourth mirror in the Playground and the first two to
+**The Playground's color mirrors cost two bugs.** The picker mirrors the hue into a `Signal<number>` for the
+slider, and both directions originally read the other side's value inside the effect: picking a color elsewhere
+re-ran the hue-to-picker direction, which wrote the previous hue over the new color — so typing a hex produced a
+different color entirely. The same shape broke the hex field twice over: an effect refreshing the field's text
+while tracking the picker overwrote what was being typed. The fourth mirror in the Playground and the first two to
 go wrong, which is the argument for extracting it.
 
 **A hex field owns its text until it is left.** Three and four digit hex forms parse, so a half-typed value
@@ -10566,14 +10519,13 @@ An effect that focuses the roving option had its early return _above_ the line t
 on the first run — when nothing inside the clock has focus yet — the effect finished without ever subscribing
 to the highlight and never ran again. Focus then stayed on whichever option it started on while the highlight
 walked away. `Calendar`'s equivalent reads its roving day above the guard and is correct by accident of
-ordering. **Read every signal an effect depends on before the first `return`.**
+ordering.
 
 And the whole column re-rendered on every value change, destroying the focused option and dropping focus to
 the body. The column's children expression read `getColumn().unit`, and the column object is rebuilt whenever
 the base time changes, so the expression re-ran and called `renderColumn` again — a fresh `Index`, fresh
 elements. A `createMemo` over the unit stops it: the memo only notifies when the string actually changes,
-which for a given column is never. **A slot called inside a reactive expression is re-invoked whenever
-anything that expression reads changes, so what it reads has to be narrowed to what it actually needs.**
+which for a given column is never.
 
 ### Controls: `TimePicker`, and the trailing slot carrying two controls
 
@@ -10839,8 +10791,7 @@ write, which is what lets a field hold `7.` or a half-typed date while the numbe
 two halves.
 
 **Each direction reads the far side `untrack`ed**, which is the whole reason this is worth extracting: the two
-color-picker bugs were both a mirror whose guard tracked the other side, so an unrelated change re-ran it and
-wrote a stale half back.
+color-picker bugs were both a mirror whose guard tracked the other side.
 
 **It converts only when the value changes, so a half-written inner value survives.** Typing `7.0` into a
 field mirroring a number leaves the text alone, because the number did not change — the rule the hex and date
@@ -10978,13 +10929,10 @@ each is portaled and placed from window pixels — the lit element's rect, the p
 `Viewport` the cover, the highlight, the guide's popup and the carried item were all drawn off by the scroll. Inside a
 `Viewport` they measure the same to the pixel as before.
 
-**A highlighted row is revealed by `PopoverUtils.revealWithin`, never by `scrollIntoView`.** A menu highlights its first
-or last item the moment it opens, while the popup is still hidden at the portal's top-left corner waiting for its
-position; `scrollIntoView` moves every scrollable ancestor, the document included, so the page jumped to the top.
-`revealWithin(element, root)` moves only the scrollers from the element up to `root`, by the least that shows it, and
-works in each scroller's layout pixels so a scaled viewport does not throw it off. It needs no placement, so it runs as
-early as the highlight does, and nothing outside `root` can move — including a viewport's own `overflow: hidden` host,
-which `scrollIntoView` would scroll too. `MenuUtils.revealItem` finds the item's `role="menu"` popup and calls it;
+**A highlighted row is revealed by `PopoverUtils.revealWithin`.** A menu highlights its first or last item the moment
+it opens, while the popup is still hidden at the portal's top-left corner waiting for its position, and
+`scrollIntoView` there jumped the page to the top. `revealWithin(element, root)` needs no placement, so it runs as
+early as the highlight does, and it leaves the viewport's own `overflow: hidden` host alone. `MenuUtils.revealItem` finds the item's `role="menu"` popup and calls it;
 `Clock` calls it with its own root, since it is drawn both inline and inside `TimePicker`'s popup, and an inline clock
 below the fold scrolled the page to itself on mount in the same way. **A `Listbox` option goes through
 `ListboxUtils.revealOption`, which splits on where focus sits.** Under `"active_descendant"` — the lists `Select` and
@@ -12233,17 +12181,12 @@ layer. No feature detection anywhere, and none is possible — `CSS.supports` re
 
 **The layers sit at negative z-index inside a stacking context the component makes for itself, and both
 halves of that are load-bearing.** They must paint below the tint and the sheen, which `Shape` renders at
-`z-index: -1`, so they are lower still at `-3` and `-2`. But a negative-z child of an element that forms no
-stacking context is hoisted to the nearest ancestor that does, and paints in that ancestor's _negative_ step
-— before the ancestor's own in-flow content. The backdrop it then samples is empty, and the effect silently
-does nothing, which is exactly what the first build did. Wrapping `Shape` in a `position: relative;
-z-index: 0` div contains the negative-z children in a context of the component's own, so everything outside
-the component has already painted by the time they do.
-
-**`isolation: isolate` would have made a stacking context too, and would have broken it again.** Isolating
-blending forms a Backdrop Root, and a backdrop root is the boundary of what `backdrop-filter` can see — the
-page behind the component would have been outside it. A bare `z-index: 0` stacking context forms no such
-boundary, which is why it is the one used.
+`z-index: -1`, so they are lower still at `-3` and `-2`. The first build had no stacking context of its own, so
+they were hoisted to an ancestor, painted before its in-flow content, sampled an empty backdrop and silently did
+nothing. Wrapping `Shape` in a `position: relative; z-index: 0` div contains the negative-z children in a
+context of the component's own, so everything outside the component has already painted by the time they do.
+It is `z-index: 0` rather than `isolation: isolate` because the backdrop has to see the page behind the
+component.
 
 **The ripple samples outside the pane, so the displacement is faded to nothing at the edges.**
 `feDisplacementMap` at scale _k_ reaches up to _k_/2 pixels away, and for a `backdrop-filter` those pixels are
@@ -12266,9 +12209,7 @@ of zero — and `computeFilterPrimitives` then returns nothing at all, so no `<f
 names it by id anyway is pointing at something that does not exist, and Chromium does not treat that as a
 no-op: the pane grew a dark ring hugging its rim, which reads as an edge artifact and is nothing of the sort.
 `GlassSurface` now renders each backdrop layer only when its filter exists, which is also why the blur layer
-disappears at a blur radius of zero rather than sitting there forming a stacking context for nothing. The
-general trap is worth naming: **anything referencing a factory-built filter by id has to account for the
-factory having built nothing**, because the id is composed independently of whether the filter was emitted.
+disappears at a blur radius of zero rather than sitting there forming a stacking context for nothing.
 
 **The shadow moved anyway, and for a second reason.** It now paints on an overlay sibling that comes _after_
 the glass in paint order rather than on a wrapper that comes before it, which keeps it out of the backdrop
@@ -13573,15 +13514,13 @@ either way, which is what a pointer-driven one needs.
 
 ### A sample registry and the machinery that runs it are separate modules
 
-The rule: **a module a consumer imports for behavior may not import the samples.** Machinery takes the sample
-itself; the registry that maps a name to a sample is its own export in the `.const.ts`, and only code driven by
-a runtime string — the Playground's dropdowns — touches it.
+**The samples' machinery takes the sample itself**; the registry that maps a name to a sample is its own export in
+the `.const.ts`, and only code driven by a runtime string — the Playground's dropdowns — touches it.
 
 **Why file layout alone did not achieve this.** The samples were already one file each, and that made no
 difference to what a consumer pays for: `CellAnimationWeights.const.ts` imported all sixty back into a
-`Record<WeightType, WeightFn>` and `computeCellWeights` looked its entry up by a string. A bundler cannot know
-which string arrives, so it keeps every entry — the lookup table, not the file count, is what defeats
-tree-shaking. Splitting the registries was for the source-view tabs and remains justified on that ground alone.
+`Record<WeightType, WeightFn>` and `computeCellWeights` looked its entry up by a string. Splitting the registries
+was for the source-view tabs and remains justified on that ground alone.
 
 **What moved.** `computeCellWeights` (with its private `normalizeWeights` / `makeWeightsUnique`) went to
 `CellAnimationWeights.utils.ts` and now takes a `WeightFn`. `computeAnimation` went to
@@ -13594,7 +13533,8 @@ competing: the forwarder lives in the module that already costs the whole collec
 registry keeps the ergonomic call, and anyone who wants one sample imports the sample and the utils module.
 
 **Measured, bundled with esbuild, minified / gzipped.** Weights: 19.4K / 6.0K for the registry path against
-5.7K / 2.5K for one sample. Keyframes: 27.3K / 7.1K against 13.7K / 4.8K.
+5.7K / 2.5K for one sample. Keyframes: 27.3K / 7.1K against 13.7K / 4.8K. Both figures include each utils
+namespace whole.
 
 **Two shapes needed nothing.** `SVGDefs` was already correct — `SVGDefs.const.ts` holds only `SAMPLE_COLORS`
 and the three `SAMPLE_CONFIGS` registries, no sample imports the registry, and every helper the samples use
@@ -13604,10 +13544,6 @@ registries left whole under the split rule — `CellAnimation/Zones`, `CellAnima
 define their samples inline in the same file, so there is no lighter path to offer without
 splitting them, which _"a registry is only split when a tab of it would be unreadable"_ already decided
 against.
-
-**A `namespace` compiles to one object, so it is opaque to tree-shaking.** This is why the utils modules are
-the right home for machinery and the wrong home for a collection: everything in one is kept together. The
-measurement above already includes each utils namespace whole.
 
 ### Controls: `Paginator`, where the arithmetic is the component
 
@@ -14113,17 +14049,12 @@ observer on the box and its children, and a mutation observer to pick up childre
 animations can produce the same fade with no script; that route was not taken, and its browser support was not
 looked into when this was built.
 
-**A box that scrolls with nothing focusable inside becomes a tab stop.** WCAG 2.1.1: a keyboard user has to be
-able to scroll it, and with nothing inside to land on, Tab passes straight over it in browsers that do not make
-such boxes reachable on their own. Chrome does now make them reachable, and this copies that rule rather than
-inventing one: the box takes `tabindex="0"` only while it overflows and holds nothing
-`FocusManagerUtils.getFirstFocusableChild` can find. When something inside is focusable, tabbing to it already
-scrolls the box, so a second stop would be noise. A mutation observer over the whole subtree, filtered to the
-attributes that change focusability, keeps the answer current. The user left this call to Claude's judgement.
+**A box that scrolls with nothing focusable inside becomes a tab stop.** "Nothing focusable" is whatever
+`FocusManagerUtils.getFirstFocusableChild` cannot find, and a mutation observer over the whole subtree, filtered to
+the attributes that change focusability, keeps the answer current. The user left this call to Claude's judgement.
 
-**`ariaLabel` is optional, and names the box only while it scrolls.** Given, the scrolling box is `role="region"`
-with that name; not given, it is still reachable, only unnamed. Making it required, as _"A role that requires a
-name makes the prop that names it required"_ would suggest, would have charged every non-scrolling use for a role
+**`ariaLabel` is optional, and names the box only while it scrolls.** Making it required, as _"A role that requires
+a name makes the prop that names it required"_ would suggest, would have charged every non-scrolling use for a role
 it never takes; the role is applied only when the name exists, so the convention is not broken.
 
 **The fade drops while the box has keyboard focus.** The mask clips everything outside the box, which is exactly
@@ -15226,13 +15157,11 @@ The user's suggestion, made while looking at `Reveal`, and taken as the option t
 The first build cut the screen into the eight rectangles around the highlighted element and rendered the
 consumer's overlay into every one of them, so the hole was a genuine gap in the DOM.
 
-**A mask decides what is painted and nothing else, so it cannot replace the eight boxes on its own.** Hit
-testing does not read `mask-image`: a single masked overlay looks right and then swallows every click over
-the hole, which breaks `prompt` — the mode whose whole promise is that the highlighted control is still
-usable — and makes the dark area of a `hint` include the one place a click must pass through. So the paint
-and the pointer are now two layers rather than one: an overlay carrying the mask, `pointer-events: none`, and
-a transparent blocker under it carrying a `clip-path` with the same rectangle cut out. `clip-path` **does**
-take a region out of hit testing, which is what makes the blocker a real hole rather than a painted one.
+**A mask cannot replace the eight boxes on its own.** A single masked overlay looks right and then swallows
+every click over the hole, which breaks `prompt` — the mode whose whole promise is that the highlighted control
+is still usable — and makes the dark area of a `hint` include the one place a click must pass through. So the
+paint and the pointer are now two layers rather than one: an overlay carrying the mask, `pointer-events: none`,
+and a transparent blocker under it carrying a `clip-path` with the same rectangle cut out.
 
 **The blocker is transparent on purpose, and that is what keeps it out of the browser bug.** Chromium handles
 `clip-path` and filters on the same element badly; the masked layer is where the `backdrop-filter` lives and it
@@ -15514,10 +15443,7 @@ the same motion described directly. `idleDelayMs` keeps its meaning exactly — 
 — so the panel knob still reads the way it did. It also means the turn stops where it is when idling ends,
 rather than running on to the step it had already committed to.
 
-**The spin carries a starvation fallback and the idle turn does not, and the split is the point.** A page that
-is not painting — a background tab, a throttled window — hands out no frames, so a loop built on them alone
-stops advancing while timers carry on. `ElementFader` already answered this once, and the answer here is the
-same shape: `turnTo` arms a `setTimeout` for the duration plus `FRAME_STARVATION_SLACK_MS` beside the frame
+**The spin carries a starvation fallback and the idle turn does not, and the split is the point.** `turnTo` arms a `setTimeout` for the duration plus `FRAME_STARVATION_SLACK_MS` beside the frame
 loop, and whichever arrives first lands the angle and runs the arrival. Without it a visitor who starts a spin
 and switches tabs comes back to a wheel stopped part-way round, no prize announced, `onSpinEnd` never fired
 and the spin control disabled for good. The idle turn gets no such fallback, deliberately: it owes nobody an
@@ -16273,7 +16199,7 @@ Index keys would make a removal hand every later tile its neighbor's contents, w
 
 **A tile's index comes from its key, never from the layout.** `ElementMosaic` measures its elements by index. An index derived from reading order would feed the measurement that decides the reading order, which is a cycle.
 
-**Focus is put back after a reorder.** Moving a focused element with `insertBefore` removes it first, and the HTML removal steps then drop its focus. So the element holding focus is noted before the reorder and refocused afterwards, with `preventScroll`.
+**Focus is put back after a reorder.** The tiles are reordered with `insertBefore`, so the element holding focus is noted before the reorder and refocused afterwards, with `preventScroll`.
 
 ### `Mosaic`: the keyboard walk is opt-in, named, and follows what the eye sees
 
@@ -16934,9 +16860,8 @@ positioned over it. The box is therefore always the width of the answer, no meas
 noise is free to be wider or narrower than what is under it.
 
 **`color: transparent` rather than `visibility: hidden`, and the difference is the whole accessibility
-story.** A hidden element leaves the accessibility tree, so a screen reader would have had nothing but the
-noise to read. Transparent text is still rendered and still announced, so the real string is what reaches
-assistive technology from the first frame, and every noise glyph carries `aria-hidden="true"`. The spec
+story.** The real string is what reaches assistive technology from the first frame, and every noise glyph
+carries `aria-hidden="true"`. The spec
 checks this as a relationship — the text read out mid-churn equals the text read out once it has settled —
 rather than by naming the demo's copy.
 
@@ -17839,14 +17764,11 @@ nothing at all — which is exactly how it was reported. `position: absolute` wi
 item rects takes the marker out of the geometry it is describing, and `computeMarkerIndex` converts the
 settled index back into the gap it should sit in.
 
-**A drag ends with a click the browser sends unasked, and it has to be swallowed.** Press and release on one
-spot is a click; press, move and release is a click as well, on the nearest common ancestor. The first build
+**A drag ends with a click the browser sends unasked, and it has to be swallowed.** The first build
 let it reach the handler that picks an item up, so releasing a drag immediately picked the same item back up
 in tap-to-place mode: it stayed dimmed, the list stayed lit, and every later press was answered by a state
 machine the user did not know was running. `trackAxialSwipe` had already met this and its answer is copied — a
-capture-phase `click` listener on the list root that swallows exactly one click after a pointer gesture. Worth
-holding onto as the general shape: **any gesture built on pointer events owes the click a decision**, because
-the browser will send one whether or not the gesture wanted it.
+capture-phase `click` listener on the list root that swallows exactly one click after a pointer gesture.
 
 **`renderCarried` is handed the item and nothing else.** The user's call, and the reasoning is theirs: a
 consumer may want the card under the cursor, or a stroke, or a box, or a count, so what to draw cannot be
@@ -18184,11 +18106,7 @@ reported success, printed no warning, and emitted **none** of `TileBoard.css.ts`
 file. Every rule in it vanished: the rows stopped being positioned, so the board collapsed into one column of
 overlapping tiles, and the hit layer stopped taking the pointer, so the consumer's paint took presses again
 and nothing could be clicked. Bisected by removing the one line and rebuilding, which brought all seven rules
-back. **The lesson is about the failure mode rather than the property: a `.css.ts` file can disappear whole,
-with a green build, and the first symptom is a component that looks unstyled rather than a build error.** If
-a component suddenly has no styles at all, check its own stylesheet is in the bundle before looking anywhere
-else — grep the built CSS for one of its class names. `z-index: 0` opens the same stacking context and emits
-fine.
+back. `z-index: 0` opens the same stacking context and emits fine.
 
 **Both Playground examples put their pieces on that layer**, one piece or several, and the piece stands on
 the tile's middle rather than being centerd on it: `translate(-50%, -100%)` puts its base on the point
@@ -19065,9 +18983,8 @@ recording because every other roving component in the library builds all of its 
 meet this.
 
 **A pan that captures the pointer eats the press it started with, and that is why the gesture belongs
-inside.** Taking pointer capture on `pointerdown` — the obvious way to keep receiving moves once the pointer
-leaves the box — redirects the whole rest of the gesture, `click` included, to the capturing element: the
-first Playground version panned correctly and no block could ever be pressed. The settlement is that capture
+inside.** The first Playground version took pointer capture on `pointerdown`, panned correctly, and no block
+could ever be pressed. The settlement is that capture
 is taken **only once the pointer has traveled four pixels**, the same slop `Carrier` uses. A press that
 stays put never captures, so its click reaches the block; a drag captures, and its click is then delivered to
 the root instead, which is exactly the behavior wanted and costs no flag to suppress. This is one rule, it

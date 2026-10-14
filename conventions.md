@@ -79,6 +79,19 @@ for over `x * (2 / 3)` — doubling is exact, so there is one rounding rather th
 `SortableGrid`, and a constant's name has to agree with its value. `const HALF = 2`, used as
 `forward * HALF > count`, was correct arithmetic under a name that said the opposite.
 
+### At an edge value, clamp the input and keep one formula
+
+When a calculation misbehaves at the end of its range — a spread that reaches a whole turn, a push that runs out of
+room, a ratio that passes one — the first fix that comes to mind is a branch: detect the edge case and do
+something different there. A branch makes the output jump at the boundary, because two formulas rarely agree
+exactly where they meet, and the jump is plain to anyone dragging a slider across it. It also adds a flag or a
+mode every reader has to keep in mind.
+
+**Clamp instead.** Limit the input to the range where the one formula is right and let that formula run to the
+edge. The output then changes smoothly up to the limit and stays there, and the edge case is the end of the curve
+rather than a separate rule. A caller who wants what the branch used to give asks for it through the inputs that
+already exist, rather than by landing on a particular value.
+
 ### `aria-hidden` is always written with a value
 
 `aria-hidden` in JSX with no value renders `aria-hidden=""`, and an empty string is **not** a true value:
@@ -91,6 +104,28 @@ It was written bare in 37 places across both trees, against 17 written properly,
 the Playground paints — the tree's `▶`, the select's `✓`, a drag handle's `⠿` — was being announced next to
 the text it decorates. **Write `aria-hidden="true"`.** The same holds for any other true/false ARIA
 attribute: give it the string.
+
+### A `<button>` always states its `type`
+
+Stated by the user. A `<button>` with no `type` is a submit button, so the moment one ends up inside a `<form>` —
+a consumer's form, a dialog that grows one, a field wrapped by somebody else — pressing it submits the form and
+reloads the page. Nothing about the button changed; its surroundings did, which is why the bug shows up far from
+where the button was written. Write `type="button"` on every button that is not meant to submit, and
+`type="submit"` on the one that is. Every raw `<button>` in the component packages and the Playgrounds already
+does.
+
+### A style reuses an existing painter first, the theme second, and its own values last
+
+Stated by the user. Before a Playground example, page or sample paints anything, it looks for a painter in
+`StyledComponents` that already draws that kind of thing and uses it; failing that, it builds from `themeVars`
+(_"A Playground style names a theme token, never repeats its number"_); only when neither fits does it write a
+painter or a value of its own. A painter written for one example is a second answer to a question the design
+already settled, and the two drift.
+
+**A design that asks for an exception is argued before it is built.** First, whether an existing painter or style
+already covers it; failing that, whether the new look can join the design as a common variation — a variant of the
+existing painter, a new token — that other places could also use. A true one-off is the last resort, and the
+argument for it is made to the user before any code is written.
 
 ### An event handler prop is bound once, so reading a signal in it rebuilds the element
 
@@ -115,6 +150,157 @@ applies to a `ref` callback, which also runs inside the insert's tracking scope.
 **A string-valued memo is safe and does not need the treatment**, because a memo that recomputes to an equal
 string notifies nobody — so binding on a stable key costs nothing. It is the object-valued and array-valued
 reads that bite, since a fresh object is never equal to the last one.
+
+**A render callback called inside a reactive expression is the same trap one step removed.** A slot written as
+`{renderItem(getRow().kind)}` is called again every time anything that expression reads changes, and each call
+builds fresh elements, so whatever held focus is destroyed and focus falls to the body. Reading `getRow()` here
+subscribes the expression to the whole row object, which is rebuilt whenever anything about the row moves,
+although the callback only needs one string from it. **Narrow what the expression reads to what the callback
+needs**: put the read behind a `createMemo` that yields the string, which notifies only when the string itself
+changes, and the slot is called again only when it has something new to draw.
+
+### An effect reads everything it depends on before its first early return
+
+Solid learns what an effect depends on by noting which signals it reads while it runs, and it learns nothing
+else. An effect that returns early before reading a signal has not subscribed to that signal on that run. So if
+the very first run returns early — because what it waits for is not ready yet — and the signal it was going to
+read comes after the return, the effect never runs again, and nothing reports it. It looks like an effect that
+was simply never written.
+
+**Read every signal the effect depends on at the top, then decide whether to return.** Reading into a local and
+testing the local afterwards costs nothing, and the set of dependencies no longer depends on which branch the
+first run happened to take. An effect that reads its dependencies after its guard works only while the guard
+happens to pass on the first run, which is correct by accident of ordering rather than by design.
+
+### An effect that keeps two values in step reads the other side untracked
+
+A mirror keeps two values in step with two effects, one copying the first into the second and one copying back,
+often converting on the way — a color into its hue, a number into the text of a field. Each effect must depend
+on its own source and nothing else. If the effect copying the first value also reads the second — to compare,
+or to skip a write that would change nothing — then a change to the second value made by anything else re-runs
+it, and it writes the first value, which has not caught up yet, back over the change. The person sees what they
+just typed or picked replaced with an older value, or with a different value entirely.
+
+**So read the far side with `untrack`**, Solid's way of reading a signal without becoming dependent on it. The
+comparison still sees the current value, but a change on that side no longer re-runs the effect. The same holds
+for an effect that refreshes a text field from a value: if it tracks anything that changes while the person is
+typing, it overwrites what is being typed.
+
+### A frequently changing value is passed as a getter, and read only after a cheap test says it is needed
+
+A view that updates only what read a value — Solid, Svelte, Vue's computed values — is fast because of that, and
+it is also why the order of reads matters. When many instances each read a value that changes on every pointer
+move, every one of them is subscribed to every move, even when only one of them uses it. A helper that takes the
+value as an argument has already read it, at the call site, before it can check whether this instance needs it.
+
+**Hand over a getter rather than the value, and call it only once a cheap test has passed** — is this the item
+on top, is this the item under the pointer. The instances that fail the test never read the value and are never
+told it changed. A view that re-renders everything anyway, such as React, passes a getter returning the value it
+already has, and loses nothing.
+
+### A timer that must survive its effect re-running is armed in the effect and settled in its cleanup
+
+An effect re-runs whenever anything it read changes, not only when the thing its timer is about changes. A
+countdown that clears its timeout at the top of the effect and starts a fresh one restarts from full on every
+re-run, so an unrelated change — another entry arriving in the same list — postpones it indefinitely.
+
+**Arm the timer inside the effect for the time that is left, and in `onCleanup` clear it and subtract the time
+that passed since it was armed.** `onCleanup` is Solid's hook that runs just before the effect runs again or is
+disposed. The remaining time is then right whatever made the effect re-run, and the effect can depend on only
+what genuinely changes the countdown — its duration and whether it is paused.
+
+### Solid delegates events at the document, and that changes what stopping one does
+
+For common events such as `click`, `pointerover` and `keydown`, Solid does not attach a listener to each element.
+It attaches one listener to the document and, when an event arrives, walks from the target upward itself, calling
+each handler it finds — this is called event delegation. Two consequences follow, and both look like a handler
+misbehaving.
+
+**`stopPropagation` cannot keep an event from another listener on the document.** The delegated handler and any
+other listener attached to the document sit on the same node, and stopping propagation only keeps the event from
+reaching further nodes. To keep it from a listener on the same node, call `stopImmediatePropagation`, which also
+skips the remaining listeners there, or have the other listener check `event.target` and ignore what is not its
+own.
+
+**A delegated event travels up the component tree, not the document tree, so it crosses portals.** An element
+rendered through a portal sits elsewhere in the document, but Solid walks from it back to the component that
+declared it. A key pressed in a popup several levels deep therefore reaches every enclosing popup's handler, and a
+pointer arriving on a portalled panel reaches the handlers of the control that rendered it, although neither
+contains the target in the page. A handler that must answer only for its own content checks that `event.target`
+is inside its own root. Stopping propagation instead would hide the event from everything else that listens.
+
+### A key from outside the code is looked up as an object's own key
+
+A plain object used as a lookup table already answers to names it never declared: every object inherits
+`constructor`, `toString`, `hasOwnProperty` and the rest from its prototype, the shared object it falls back to
+for any name it does not hold itself. So `table[name]`, with a `name` that came from a person, from content or
+from a consumer, finds a built-in function when the name happens to be `constructor`, and the code treats it as
+an entry. **Wherever the key comes from outside the code, check it with `Object.hasOwn(table, name)` before
+reading**, so only keys somebody actually wrote are found.
+
+### A sort comparator answers every pair consistently, so sort only once every item can be compared
+
+`Array.prototype.sort` assumes its comparator is consistent: if a comes before b and b before c, then a comes
+before c, and "equal" means the two are interchangeable. Given a comparator that breaks this, the language leaves
+the result to the engine, and the order that comes back can be anything at all, the exact reverse included. The
+usual way to break it is a fallback — answering "equal" for any pair where one item lacks what the comparison
+needs, such as an element that has not mounted yet. An item equal to everything while ordered against nothing
+makes the comparator inconsistent.
+
+**So sort only once every item can be compared, and keep the order the items arrived in until then.** A
+comparator is never asked a question it cannot answer. The fault is easy to miss because anything that recovers
+on the next render hides it; it shows the moment the order decides something that does not.
+
+### Word boundaries in text are found with Unicode letter classes, never `\b`
+
+`\b` in a JavaScript regular expression is defined by ASCII word characters — `A` to `Z`, `a` to `z`, the digits
+and the underscore — with or without the `u` flag. Every other letter counts as a non-word character, so in
+"état" `\b` sees no boundary before the `é` and one inside the word after it, and capitalizing the first letter
+after a boundary gives "éTat". **Find boundaries with Unicode property classes instead** — `\p{L}` for any letter
+and `\p{N}` for any digit, under the `u` flag — for example a letter with no letter or digit before it,
+`(?<![\p{L}\p{N}])\p{L}`. It behaves exactly as `\b` does on ASCII text and keeps every other script intact.
+
+### An optional feature costs nothing until it is asked for
+
+A component offering an optional behavior — a measured indicator, a reaction to the pointer, a reduced-motion
+query — does none of the work for it while the option is unset: no observer attached, no listener subscribed,
+nothing computed. Otherwise the cost is paid by every instance on every page, and the ones paying it are exactly
+those that did not want it; a form holding twenty of a control pays twenty times for a feature none of them shows.
+
+**Guard the work on the option, and only the work.** The effect that measures returns early when nothing will be
+drawn from the measurement, but anything else on the same path — a reference the keyboard needs to move focus,
+say — stays unconditional, because confusing the optional half with the required half breaks the required one.
+And a helper that has to be set up before anybody knows whether it will be used offers a way to be set up without
+starting.
+
+### Code imported for behavior never imports a string-keyed table of variants
+
+Tree-shaking is the bundler's removal of code that is imported but never used, and it works only on what it can
+see is unused when it builds. A table mapping names to variants — `{ line: lineFn, spiral: spiralFn, … }` — looked
+up by a string defeats it: the bundler cannot know which string will arrive, so it keeps every entry, and a
+consumer who wanted one variant pays for all of them. Putting each variant in a file of its own changes nothing
+while the table still imports them all; the table, not the file count, is what keeps them.
+
+**So the machinery takes the variant itself, not its name, and the table is a separate export.** A consumer who
+wants one variant imports it and the machinery and gets nothing else. Only code that genuinely holds a name at run
+time — a dropdown, a saved setting — imports the table, and a convenience call taking a name lives beside the
+table, where the whole collection is already paid for.
+
+**A TypeScript `namespace` compiles to one object, so it is all or nothing in the same way.** Importing one member
+keeps them all. A namespace is a fine home for machinery, whose parts are used together, and the wrong home for a
+collection of variants, which is chosen from.
+
+### A file the Vite config imports holds plain data, and imports workspace packages as types only
+
+`vite.config.ts` is loaded and run before Vite has set anything up, so the path aliases the config itself defines
+do not exist yet while it loads. A runtime import there of a sibling package in the same workspace resolves the
+ordinary way, to that package's built output — which is usually ignored by version control and absent on a fresh
+clone or a deploy server — rather than to the source the alias would have pointed at. The build then works on the
+machine that happened to build the package first and fails everywhere else.
+
+**So anything the config imports holds plain data, and imports a workspace package only with `import type`**, which
+is erased before the file runs. Code that needs the package at run time lives in a file Vite compiles itself,
+where the aliases are in place.
 
 ### A rotation and a centering offset on one element have to be ordered, or the element leaves its point
 
@@ -199,6 +385,20 @@ from memory.
 **Say what it said even when it changes nothing**, in the reply and in the entry: "checked 2.5.7, the
 existing route conforms" is worth a line, since otherwise nobody can tell a criterion that was
 considered from one never opened.
+
+### Consult OWASP before settling anything that handles input, identity, data or secrets, and say what it said
+
+Asked for by the user, as the security counterpart of the rule above, and it holds for the same reason: a security
+requirement is a fact about the outside world, and none of the ownership arguments recorded here would ever produce
+one. OWASP — the Open Worldwide Application Security Project — publishes the Top 10 list of the most critical web
+application security risks and the Application Security Verification Standard (ASVS), a checklist of concrete
+requirements. Where this library touches that ground — a parser turning a consumer's string into markup, a
+URL handed to an `href`, anything a consumer passes that ends up in the DOM — look it up first.
+
+**Cite the Top 10 category or the ASVS requirement by number and quote the requirement**, and **say what it said
+even when it changes nothing**: "checked ASVS 5.3.3, output is already encoded for its context" is worth a line, or
+nobody can tell a requirement considered from one never opened. Where it conflicts with a convention, `CLAUDE.md`'s
+_"OWASP outranks them the same way"_ decides it.
 
 ### An accessibility mistake the library can detect is warned about, never blocked or filled in
 
@@ -472,6 +672,21 @@ prop, with nothing telling the consumer they lost it. `SplitPane`'s gutter had n
 somebody happened to name the pane beside it; `TimePicker`, `DatePicker` and `ColorInput` already did the right
 thing for their popups, so this is the existing practice written down rather than a new one.
 
+### An id in markup that can render more than once is unique in the document
+
+An `id` is looked up across the whole document, so a reference to one — `url(#…)` in SVG paint, `aria-labelledby`,
+`aria-controls`, a label's `for` — resolves to the first element carrying it. Markup that can appear more than once
+on a page — a component, a painter, a set of SVG definitions — builds its ids from something unique to that
+instance, such as a `createUniqueId()` value joined to whatever local key tells its parts apart. An id unique only
+within one instance passes every check made with one instance on the page and is wrong on a page with two, where
+the second quietly points at the first one's element and draws its geometry or reads out its name.
+
+**Nothing references a generated id unless its target was rendered.** An id is usually composed independently of
+whether the thing it names was emitted — a filter built from no primitives, a description with no text, a
+definition skipped at a setting of zero. A reference to an id that names nothing is not a harmless no-op: a missing
+filter can paint artifacts of its own, and a missing description leaves an attribute pointing at nothing. So the
+reference is written only when its target exists, and both are decided by the same condition.
+
 ### A role that requires a name makes the prop that names it required
 
 WCAG 4.1.2 says a component's name is exposed to assistive technology, and ARIA lists the roles whose name may
@@ -520,14 +735,15 @@ the public side, and it is exported now — which makes all seven `.context.ts` 
 outside a box rather than throwing, which is right for `PlacementItem` and a trap for a consumer who does not
 expect it — so its block says so. A doc block is part of the export, not an optional extra.
 
-### A prop default is stated once, in the component's `.const.ts`, and the Playground imports it
+### A default is stated once, and everything else imports it
 
-The user's rule, and the fault that prompted it: a component held its defaults as private module constants,
-the Playground page wrote its own copies to seed the knobs, and nothing tied the two together. Nothing
-complains when they drift, so a page can paint one number while a consumer who passes nothing gets another.
-It is the same argument that gave the tracked gradients one home for theirs, one level up.
+If a default is written in two places, the copies drift apart and nothing complains. The user's rule, and the
+fault that prompted it: a component held its defaults as private module constants, the Playground page wrote its
+own copies to seed the knobs, and nothing tied the two together — so a page could paint one number while a
+consumer who passed nothing got another. It is the same argument that gave the tracked gradients one home for
+theirs, one level up.
 
-**Every prop default lives in `<Component>.const.ts` as one exported object keyed by prop name** —
+**In this repo, every prop default lives in `<Component>.const.ts` as one exported object keyed by prop name** —
 `TILTER_DEFAULTS = { maxTiltDegrees: 15, ... }` — the component reads
 `access(props.maxTiltDegrees) ?? TILTER_DEFAULTS.maxTiltDegrees`, the barrel exports the file, and a page
 seeds its signal off the same object. A constant that is not a prop default stays private in the component,
@@ -855,20 +1071,6 @@ Shortcut: **if calling `fn(x())` would lose a subscription the callee needs, pas
 `InteractionTrackerUtils.wrapElement(ref, disabled, opts)`, `FocusManagerUtils.autoFocus(ref, visible)`,
 `ElementFader(visible, opts)`, `FrameRateMonitorUtils.create(disabled, opts)`.
 
-**A run of tuning numbers becomes a defs object; genuine operands stay positional.** The user's rule, taken
-over naming each number with a local constant. A function taking `(pos, count, origin, 4, 0, 1, 2, 3)` gives a
-reader nothing to check the order against, and the names it lands on are only visible at the declaration — so
-`radar` and `spiral` take `{ quadrantsPerSection, clockDownMul, clockRightMul, clockUpMul, clockLeftMul }`, and
-`ripple` keeps its two computed operands positional and takes `{ periodCells, travelRatio }` as defs.
-
-The boundary is what the numbers _are_, not how many there are. Operands with self-describing names stay
-positional — `greatestCommonDivisor({ a, b })` would be worse than what it replaced. It is the same argument as
-_"One aggregated object per painter"_, applied to a utility rather than to a render callback.
-
-**A defs object on a per-call path is hoisted, not built at the call site.** These weight functions run once per
-cell per frame, so each sample declares its defs as a module-level `const` and passes it by reference. The
-readability is the point; the allocation is not part of the price.
-
 **An observer's name carries its coordinate space**, because the wrong one fails silently — it returns
 a plausible number wrong by the `Viewport` scale factor. `createViewportRectObserver` polls on
 `requestAnimationFrame` and reports position **and** size through
@@ -910,6 +1112,19 @@ A component's own contribution keeps its own name under this test, independently
 a boolean-only extras type stays `*Flags` even where the merged object the painter actually receives is a
 `*RenderProps`, because the merged type is a different type and gets named on its own merits.
 
+**The same argument reaches a utility: a run of tuning numbers becomes a defs object, and genuine operands stay
+positional.** The user's rule, taken over naming each number with a local constant. A function taking
+`(pos, count, origin, 4, 0, 1, 2, 3)` gives a reader nothing to check the order against, and the names it lands on are only visible at the declaration — so
+`radar` and `spiral` take `{ quadrantsPerSection, clockDownMul, clockRightMul, clockUpMul, clockLeftMul }`, and
+`ripple` keeps its two computed operands positional and takes `{ periodCells, travelRatio }` as defs.
+
+The boundary is what the numbers _are_, not how many there are. Operands with self-describing names stay
+positional — `greatestCommonDivisor({ a, b })` would be worse than what it replaced.
+
+**A defs object on a per-call path is hoisted, not built at the call site.** These weight functions run once per
+cell per frame, so each sample declares its defs as a module-level `const` and passes it by reference. The
+readability is the point; the allocation is not part of the price.
+
 ### A grid index names its space and its axis, never `x` and `y`
 
 Stated by the user. Anywhere a row-and-column index reaches a consumer it names both which axis it counts and
@@ -937,9 +1152,8 @@ This is the same rule as _"an observer's name carries its coordinate space"_ abo
 of a continuous one, and it exists for the same reason: the wrong one fails silently, returning a number that
 looks right.
 
-### `width` and `height` mean a length, pixels unless the name says otherwise; a tally of cells is a count
-
-Stated by the user. A pair counting rows and columns is **`{ rowCount, colCount }`**, or an `Index2d` named at
+**`width` and `height` mean a length, pixels unless the name says otherwise; a tally of cells is a count** — the
+same rule again, for sizes rather than positions. Stated by the user. A pair counting rows and columns is **`{ rowCount, colCount }`**, or an `Index2d` named at
 the call site for what it tallies. `width` and `height` are reserved for lengths, never counts.
 
 **A length in any unit but pixels carries its unit in the name.** Chosen by the user over two alternatives:
@@ -1047,9 +1261,10 @@ reachable = isDisabled && ((isReachableWhenDisabled && tooltipDefs !== undefined
 ```
 
 Deriving the mode from `getTooltipDefs` presence _alone_ was rejected, and the distinction generalizes:
-**presence as a trigger fails invisibly** — add hover text and disabled semantics change under you —
-while **presence as a guard fails toward the safe default**, only when a prop was explicitly set, and is
-findable with a warning. The third clause exists because a focusable `aria-disabled` control with
+**do not change behavior because an unrelated option happens to be set; require an explicit switch.** Changing
+it because an option is present fails invisibly — add hover text and disabled semantics change under you. Using
+that presence only as a check on an explicit switch fails toward the safe default, only when a prop was
+explicitly set, and is findable with a warning. The third clause exists because a focusable `aria-disabled` control with
 nothing to reveal is worse than one skipped by the tab order. Two cases it knowingly shuts out, each
 earning its own prop if it shows up: an explanation living elsewhere on the page (inline error,
 validation summary) needing only `aria-describedby`, and composite widgets where skipping disabled items
@@ -1083,7 +1298,7 @@ field is absent on most options, so the group forwards
 crashes the spread into `Tooltip`. Reading the value makes the honest form the only form, and it types
 as `Accessor<InteractionTooltipDefs<TExtra> | undefined>`.
 
-**Presence as a guard survives where it is load-bearing, which is the opt-in.**
+**The explicit switch survives where it is load-bearing, which is the opt-in.**
 `getIsReachableWhenDisabled` is still an explicit prop and still carries "only when asked". The
 `console.warn` for reachability-without-a-tooltip stays presence-based on purpose: it catches the
 authoring mistake it was written for and stays quiet for a group that forwards both fields
@@ -1289,9 +1504,9 @@ keeps it in `*Utils` rather than the `Anchor` / `ElementFader` family.
 **Two options, both because a caller was already gating on them.** `orientation` decides which arrows step —
 `"horizontal"` or `"vertical"` for `Tabs` by its `orientation`, `"both"` for `RadioGroup`, `"vertical"` for
 `Select` and `Menu`, where the horizontal arrows must stay with the caret. It defaults to `"vertical"`, the
-narrowest: a default
-that ignores a key is recoverable, one that hijacks `ArrowLeft` inside a text field is a bug. `hasEdgeKeys`
-gates `Home` / `End`.
+narrowest, because **when unsure, a default should do less, not more**: a default that ignores a key is fixed by
+setting the option, while one that takes `ArrowLeft` away from a text field breaks something nobody asked it to
+touch. `hasEdgeKeys` gates `Home` / `End`.
 
 **What did not move is the part that is genuinely per-control.** `Select`'s "a closed list opens on an arrow
 without moving the highlight" stays in `Select`. The rule: the `Abstract` answers _which position is next_,
@@ -1362,6 +1577,33 @@ existed so an "in" placement could paint _under_ the button that opened it, and 
 that at all — the `Viewport`'s portal is `z-index: 10` above page content, so everything in it clears every
 anchor. Getting that effect would mean raising the anchor above the portal while its layer is open, which is
 the library writing a `z-index` onto a consumer's element.
+
+### A component that sets `z-index` on its own parts makes its own stacking context
+
+A `z-index` is compared only with others inside the same stacking context — a group of elements the browser layers
+as one unit — and an element that is merely `position: relative` does not start one. So the indices a component
+gives its own parts — a hovered item lifted over its neighbors, cells layered over one another, an indicator tucked
+behind the items — escape to the nearest ancestor that does start one and are compared with whatever else lives
+there: a dialog's own counter, a consumer's sibling element, a page header. The parts then paint over things
+outside the component, or under them, and the consumer could only fix that by outranking a number the library chose,
+which means knowing an internal that may change.
+
+**So the component's root starts a stacking context**, and every index it assigns orders its own parts and stops at
+its edge. `isolation: isolate` does that and nothing else; `z-index: 0` on a positioned root does it too, but also
+places the root among its siblings, which is the consumer's business.
+
+**A layer that paints behind the content sits at a negative `z-index` inside that context.** An absolutely
+positioned layer with no index paints, and so takes presses, above every unpositioned sibling, so a background
+layer or a hover bridge put there swallows clicks meant for the content. At `-1` it goes beneath them, and because
+the root starts a stacking context, `-1` stops at the root's own background instead of sinking below whatever lies
+behind the component.
+
+**A `backdrop-filter` layer is the exception.** A backdrop filter can see only as far as its nearest Backdrop Root,
+an ancestor that bounds what backdrop filters beneath it may sample, and `isolation: isolate`, `clip-path` and
+`mask` each make one. Any of those on an ancestor of the layer leaves the page behind outside what the layer can
+see, and the effect silently does nothing. There the stacking context is started with `position: relative;
+z-index: 0`, which makes no Backdrop Root, and a layer that needs clipping clips itself rather than sitting inside a
+clipping wrapper.
 
 ### A popup opened from inside a popup is not outside it
 
@@ -1454,6 +1696,11 @@ stating that something is held which it cannot show, the only honest reading of 
 Truncating the digit run, clamping the value or dropping a sign each produce a _different_ well-formed value
 the field would parse straight back, so the corruption survives a round trip with nothing raised.
 
+**It reaches past display.** The user widened it: anywhere a value is converted into a form that cannot hold it — a
+storage format, an API payload, a file, a serialized string — the conversion fails loudly rather than approximating.
+The same three moves, truncate, clamp and drop a sign, produce the same well-formed wrong value on the way out as on
+the way to the screen, and the corruption lands somewhere nobody is looking.
+
 Written down after exactly that: the old signed-year `DateValue` accepted any year, `toIso` spelled one outside
 0..9999 in expanded form, and `DateInput`'s four digit slots laid the longer run into the mask regardless —
 pushing every later part along, so 15 August 44 BC read as `0440-81-5`.
@@ -1472,6 +1719,20 @@ loss.
 target calendar cannot hold the date, and says nothing. Left alone by the user with the cost
 of fixing it written out; it sits in `backlog.md` under _"Accepted limits"_, and is named here so the rule
 above is not read as absolute.
+
+### A text field corrects a value only when it is committed, never on each keystroke
+
+Clamping, rounding or normalizing a value while it is being typed makes values impossible to type: with a minimum
+of 40, the `5` that begins `50` becomes `40` before the `0` arrives. The same happens one level out, when the owner
+of a field's value corrects what the field reports and writes the result back. A two-way value has two sides that
+both write — the field writes what was typed, the owner writes what it decided to keep — so whatever the owner
+changes on the way in lands over the text on the way out, at the next keystroke.
+
+**So a correction belongs at the moment the value is committed — the field losing focus, Enter — or nowhere.**
+Until then, a half-typed value the rules refuse stays in the text and is not reported, so the owner keeps the last
+value that was allowed instead of hearing every value in between. A step taken with an arrow key or a button is a
+complete gesture in itself and is corrected at once. **A control that can be handed a value it refuses refuses it
+itself**, so that no owner has to remember not to correct.
 
 ### A popup's open state is private until a consumer asks for it
 
@@ -1550,6 +1811,35 @@ owns the animation.
 two-way signal. Restart, rewind, re-measure — commands, and an `onMount` handle. Two of the four components needed
 both, so the controller shape is not a legacy to be finished off.
 
+### An animation something waits on is backed by a timer, and a transition's end is asked of the browser
+
+A page that is not painting — a tab in the background, a minimized or throttled window — stops delivering animation
+frames, the `requestAnimationFrame` callbacks a frame loop advances on, while timers carry on running, slowed but
+not stopped. Anything driven by frames alone stops where it is. Where the animation is decoration, that is right.
+Where something waits on it — a dialog that unmounts and hands focus back when its fade ends, a spin that announces
+its result, a zoom that removes the level it is leaving — the state is left half-changed for good, and the person
+comes back to a page that no longer responds.
+
+**So whatever must finish runs beside a timer, and whichever arrives first completes it.** The frame wins wherever
+frames exist; where they do not, the state moves on without the animation, which is correct on a page nobody is
+looking at. The completion must be safe to run twice, and the one that loses is canceled. An animation that owes
+nobody an answer — an idle turn, a looping flourish — gets no timer, because doing work on a page nobody can see is
+worse than doing nothing.
+
+**When a CSS transition has ended is asked of the browser, not computed from its duration.** A timer set to the
+duration is a guess about a machine that may be busy: it fires on its own schedule whether or not the transition
+has caught up, and anything that then measures, scrolls to or removes the element acts on a layout still moving,
+differently from one run to the next. The browser knows the answer: the transition is over when every animation in
+the element's subtree, `element.getAnimations({ subtree: true })`, has finished. The subtree matters because the
+thing that animates is often a consumer's element inside the library's own. A canceled animation rejects its
+`finished` promise, so wait with `Promise.allSettled`.
+
+**The timer stays as the backstop.** It covers an element that animates nothing, an endless animation whose promise
+never settles, and a caller with no element to ask, and while real animations are being watched it is armed for the
+duration plus a margin, so it cannot call a running transition finished. A transition reversed part-way starts a
+second wait while the first is still outstanding; a counter each wait checks before reporting keeps the older one
+from declaring the newer one done.
+
 ### A popup's anchor is also its dismiss root, which is what lets a consumer's own button toggle it
 
 Settled, finishing what `visibility` started. `Menu` takes an optional `getAnchorRef` and
@@ -1569,6 +1859,92 @@ an element, so `Popover` takes an `anchorRect` — a rect standing in for an ele
 `ContextMenu` hands it the point that was right-clicked, or the focused element's rect when the ContextMenu key or
 Shift+F10 opened it. A rect is nothing anyone can press, so it is not a dismiss root; the component's own region
 is. See `decisions.md`, _"`ContextMenu`: the same menu, opened by a right-click at a point"_.
+
+### A pointer gesture swallows the click that ends a drag, and takes pointer capture only past a small movement
+
+The browser sends a `click` after every press and release, including one where the pointer moved in between —
+press, move and release is still a click, delivered to the nearest element both ends share. So a gesture built on
+pointer events owes that click a decision. Left alone, it reaches whatever handler a press would, and a drag ends by
+also doing what a tap does: picking the item back up, opening it, toggling it. **Swallow exactly one click after a
+gesture that moved**, with a `click` listener in the capture phase on the gesture's root.
+
+**Pointer capture is taken only once the pointer has moved past a small threshold**, a few pixels. Capture —
+`setPointerCapture`, which sends every later event of that pointer to one element wherever the pointer goes — is
+the obvious way to keep receiving moves after the pointer leaves the box, but it also sends the gesture's click to
+the capturing element. Taken on `pointerdown`, it means a plain press never reaches the thing pressed. Taken past the
+threshold, a press that stays put is an ordinary click on its target, and a drag's click goes to the root, where it
+does no harm.
+
+### A hover the pointer did not cause is ignored
+
+The browser re-tests what is under a resting pointer whenever the layout changes beneath it — a popup opening over
+it, a list scrolling, an item growing — and reports the result as a fresh `mouseenter` or `mouseover`, though
+nobody moved anything. A control that acts on every enter then moves its highlight, opens or closes a submenu, or
+undoes a keystroke, all by itself. It is most common where a popup opens on top of the control that opened it.
+
+**So a hover counts only if the pointer moved to cause it.** Keep the position of the last real `pointermove`. An
+enter the pointer caused arrives before the move that carried it there is reported, so its point differs from the
+one on record; an enter nothing caused reports exactly the point already on record. Compare within a pixel rather
+than for equality, because the two events report the same position at different precision. `movementX` cannot tell
+them apart; it reads zero in both cases.
+
+### Moving a focused element in the document drops its focus, so put it back
+
+Reordering elements by moving them — `insertBefore`, `append`, anything that takes a node out and puts it back
+elsewhere — removes the node first, and removing an element that holds focus sends focus to the body. Nothing
+visible happens to the element, and the next key the person presses goes nowhere. **A component that reorders its
+own children notes which one holds focus before the move and focuses it again afterwards**, with `preventScroll`
+so that restoring focus does not also scroll the page.
+
+### A box that scrolls with nothing focusable inside is itself focusable while it overflows
+
+WCAG 2.1.1 Keyboard asks that everything a pointer can do, a keyboard can do, and scrolling is one of those things.
+A keyboard user scrolls a box by focusing something in it; a box holding only text and images has nothing to focus,
+and Tab passes straight over it in browsers that do not make such a box focusable on their own. Recent Chrome does,
+and this copies its rule rather than inventing one.
+
+**While the box overflows and holds nothing focusable, it takes `tabindex="0"`.** When something inside is
+focusable, tabbing to it already scrolls the box, so a second stop would be noise; when the content fits, there is
+nothing to scroll. Both conditions change as the content and the size change, so the answer is kept current by
+observing both.
+
+**It takes `role="region"` only when it has a name.** A region is one of the roles that require a name (_"A role
+that requires a name makes the prop that names it required"_), so the role arrives with the name, and a box given
+no name is still reachable, only unnamed.
+
+### A subtree is disabled with `inert`, not `pointer-events: none`
+
+`pointer-events: none` on an ancestor looks as though it switches off everything inside it, and it does not. The
+property is inherited, and an inherited value applies only where a descendant says nothing: any descendant that
+sets `pointer-events` itself takes presses again, and controls often have to set it, to undo some ancestor's
+`none`. A fading popup switched off this way still swallows a click aimed at whatever lies under it. It also leaves
+focus and the accessibility tree alone, so the subtree is still reachable by keyboard and still read out.
+
+**`inert` disables the whole subtree for the pointer, for focus and for the accessibility tree, whatever its
+descendants declare.** Use it for any part of the page that is present but not operable right now.
+
+### Text meant only for screen readers is transparent or visually hidden, never `visibility: hidden` or `display: none`
+
+`visibility: hidden` and `display: none` take an element out of the accessibility tree as well as out of sight, so
+text hidden that way is not read out either. Text that has to reach a screen reader without being seen — the real
+string under an animated decoration, a name for an icon — is either painted `color: transparent`, which keeps it in
+the layout and in the tree, or hidden with the visually-hidden pattern, a one-pixel clipped box taken out of the
+flow, which keeps it in the tree and out of the layout. Whatever is drawn over it in its place carries
+`aria-hidden="true"`, so the two are not read out together.
+
+### An item is revealed by scrolling only the scrollers between it and its container, never with `scrollIntoView`
+
+`scrollIntoView` scrolls every scrollable ancestor until the element shows — the document included, and any
+container whose `overflow: hidden` was meant to keep it still. Revealing the highlighted row of a popup that has not
+been positioned yet jumps the whole page to wherever the popup is waiting, and revealing an inline item below the
+fold scrolls the page to it the moment it mounts. **Walk instead from the item up to the container that owns it,
+scrolling each scroller on the way by the least that shows the item, and stop at the container.** Nothing outside
+it can move. Work in each scroller's own layout pixels rather than screen pixels, so a scaled ancestor does not
+throw the arithmetic off.
+
+**The one exception is an item that itself holds focus among scrollers the component does not own.** The browser
+would have scrolled to it on focus had focus not been moved with `preventScroll`, so there `scrollIntoView` does
+what the platform would have done.
 
 ## Layout and styling
 
@@ -1750,6 +2126,53 @@ now a flex box `AXIS_HEIGHT` tall, and the treemap's breadcrumb bar aligns its i
   left padding against `20px` on the right is deliberate — the icon on that side carries a different visual
   weight from the text, and the smaller padding balances it.
 
+### An element positioned from a measurement is kept out of the layout the measurement reads
+
+An element placed by measuring other elements — an insertion marker between two items, an indicator behind the
+chosen one, a piece that leans toward the pointer — must not change the boxes it measures. Put in the flow between
+two items, a marker pushes every item after it along; the next measurement reads the pushed positions, the answer
+changes, the marker moves, and the answer changes back. It oscillates for as long as the input lasts and usually
+reads as a control that paints nothing at all. The same loop forms when an element moves the box its own reading is
+taken from: each reading starts from where the last one put it, and the motion wanders.
+
+**So position it out of the flow — `position: absolute`, with the offset computed from the measured rects — or
+measure something it cannot move**: the layout at rest rather than the live one, or a still container rather than
+the element transformed inside it.
+
+### A mask changes what is painted, not what can be clicked
+
+`mask-image` and the `mask` shorthand hide parts of an element from view, but hit testing — the browser's decision
+about which element a press lands on — ignores them. A hole masked out of an overlay looks like a hole and still
+swallows every click over it. `clip-path` does take the clipped-away region out of hit testing. **So a layer that
+has to let presses through a hole uses `clip-path`**, or splits the work in two: a painted layer carrying the mask
+with `pointer-events: none`, and a transparent layer under it carrying a `clip-path` with the same hole cut out,
+which is what actually lets the pointer through.
+
+### A data URI in a CSS `url()` is quoted
+
+An unquoted CSS `url(…)` cannot hold an unescaped parenthesis, quote or space. A data URI holding an SVG almost
+always has parentheses in it — `hsl(…)`, `rgb(…)`, an internal `url(#id)` — and `encodeURIComponent` leaves
+parentheses alone. Unquoted, the declaration is invalid and the browser drops all of it without a word: the element
+simply has no background, which looks like something else having broken. **Write `url("…")`**, with the value's own
+double quotes encoded; quoting costs nothing for an ordinary path or a `blob:` URL.
+
+### A style never wins by stylesheet order alone
+
+When two rules of equal specificity set the same property, the one loaded later wins. That order belongs to the
+build, not to the code: two bundles of the same style files — two entry points, two framework builds, a chunk
+loaded late — can load them in different orders, and the winner flips with neither rule changed. **So a rule that
+has to beat another wins by specificity, by sitting on an element the other does not reach, or because the other
+does not set the property at all — never by coming further down.**
+
+### A vanilla-extract stylesheet can drop out of the build whole, with no error
+
+A `.css.ts` file — a vanilla-extract stylesheet, compiled to plain CSS at build time — can be left out of the output
+entirely while the build reports success and prints no warning. Every rule in it disappears at once, and the first
+sign is a component that looks unstyled or falls apart rather than a failed build. **So when a component suddenly
+has no styles at all, check that its stylesheet reached the bundle before looking anywhere else**: search the built
+CSS for one of its class names. If it is missing, remove declarations one at a time and rebuild until it comes back;
+a single declaration can be enough to cause it.
+
 ## Testing
 
 ### A measured rect and a written offset are in different spaces inside a `Viewport`
@@ -1769,6 +2192,11 @@ spec can drive the interaction, assert the geometry and pass, while the same cod
 every real machine. `Sortable`'s landing marker was placed from rect differences and written as a `top`,
 landed at a fraction of where it belonged, and every check of it passed. The spec that catches it forces
 `window.screen.height` away from the window's height in an init script so the scale is not 1.
+
+**The scale is one case of a wider rule**, widened by the user: wherever the test environment differs from a real
+one in a way the code depends on — scale, timezone, locale, screen size, input device — the spec forces the
+real-world condition rather than trusting the default, because the default is exactly the setting under which the
+bug cannot show.
 
 **The rule: divide by `viewportContext.getScale()` on the way from a measurement to a written offset, or
 measure in layout space to begin with** — `offsetWidth` / `offsetHeight` / `offsetTop`, or
@@ -1921,9 +2349,11 @@ re-blessed wholesale by any change.
   moment anyone fixes the bug, which is the point — both candidate fixes change output across every affected
   weight, so the test is re-blessed as part of the fix rather than quietly surviving it.
 
-### A green unit run is not a typechecked one
+### Work is not reported done until the type check passes
 
-`vitest` transforms with esbuild, which strips types without checking them, so a test file can hold a real
+Run `tsc --noEmit` on every package the work touched (`npm run typecheck -w components` for the core) before
+handing over, not just the tests —
+a green unit run is not a typechecked one. `vitest` transforms with esbuild, which strips types without checking them, so a test file can hold a real
 type error and still report a pass. Two of the layout tests written in one sitting passed 955 assertions
 while `PlacementRect` was undefined in one and an optional `angle` was handed to a matcher expecting a number
 in the other — neither of which the run could see.
@@ -2027,9 +2457,11 @@ because there the string is the thing under test; and a name the **library** own
 `ColorInput`'s own default hue label, for instance — is contract too. Between those and the keys, no locator in `e2e/` now
 reads a string the Playground wrote as furniture.
 
-### A spec never counts the examples on a page
+### A spec never counts things that can change for editorial reasons
 
-Stated by the user, after an assertion pinning the number of radio groups on the Radio page at seven went red
+The examples on a page are the case it was written for, and the rule reaches further, widened by the user: a menu's
+entries, a list of tiles, any collection somebody may add to or trim without touching a behavior is not a number a
+spec pins. Stated by the user, after an assertion pinning the number of radio groups on the Radio page at seven went red
 because a new example had been added: a guard like that should never exist in any spec, because examples are
 fluid. Anybody may add one, split one or drop one without touching a behavior, so a census answers "has
 somebody added an example" in the same red as "has something broken" — the caption fault on another axis, and
@@ -2048,6 +2480,22 @@ six weeks of seven days in a calendar, goes red only when that demo's data or th
 changes, which is the red worth having. This rule is about counting across a page, where what is being counted
 is editorial. Where a spec genuinely needs to know a page has examples at all, `toBeGreaterThan(0)` is the
 form, which is what `playgroundExamples.spec.ts` already does.
+
+### A test enters input the way a person does
+
+A test that writes a field's value straight into the element — Playwright's `fill()`, or setting `.value` from
+script — never asks whether a person could have got there. It passes against a field that cannot be clicked, cannot
+be focused, or has something painted over it, because the write goes around all of that. **So a test enters text by
+clicking the field and then typing**, which fails exactly where a person would.
+
+### A rendering fix checked only headless is not checked
+
+A headless browser, and any browser run without graphics acceleration, draws on the software path: filters,
+backdrop effects, masks and compositing go through a different renderer from the one a real window uses on the GPU.
+The two disagree in both directions — a fault can show under one and not the other, and a fix can look perfect
+under software rendering and fail in a real window. **So a fix to how something is drawn, as opposed to where it
+sits or what it does, is unverified until it has been looked at in a real, GPU-accelerated browser window.** A
+screenshot taken by the test runner is evidence about the software path and nothing more.
 
 ## US English everywhere
 
