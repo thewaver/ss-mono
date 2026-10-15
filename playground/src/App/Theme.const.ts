@@ -150,13 +150,13 @@ export const REACT_THEME_VALUES = {
         ...SHARED_THEME_VALUES.color,
         primary: REACT_PRIMARY,
         background: {
-            dark: "hsl(240, 20%, 5%)",
-            light: "hsl(210, 20%, 15%)",
+            dark: "hsl(240, 10%, 10%)",
+            light: "hsl(210, 15%, 20%)",
             contrast: "hsl(210, 100%, 95%)",
         },
         surface: {
             dark: "hsl(0, 10%, 10%)",
-            light: "hsl(30, 10%, 15%)",
+            light: "hsl(30, 15%, 20%)",
             contrast: "hsl(30, 100%, 95%)",
         },
         control: {
@@ -182,13 +182,13 @@ export const SOLID_THEME_VALUES = {
         ...SHARED_THEME_VALUES.color,
         primary: SOLID_PRIMARY,
         background: {
-            dark: "hsl(0, 20%, 5%)",
-            light: "hsl(30, 20%, 15%)",
+            dark: "hsl(0, 10%, 10%)",
+            light: "hsl(30, 15%, 20%)",
             contrast: "hsl(30, 100%, 95%)",
         },
         surface: {
             dark: "hsl(240, 10%, 10%)",
-            light: "hsl(210, 10%, 15%)",
+            light: "hsl(210, 15%, 20%)",
             contrast: "hsl(210, 100%, 95%)",
         },
         control: {
@@ -214,13 +214,13 @@ export const SVELTE_THEME_VALUES = {
         ...SHARED_THEME_VALUES.color,
         primary: SVELTE_PRIMARY,
         background: {
-            dark: "hsl(300, 20%, 5%)",
-            light: "hsl(270, 20%, 15%)",
+            dark: "hsl(300, 10%, 10%)",
+            light: "hsl(270, 15%, 20%)",
             contrast: "hsl(270, 100%, 95%)",
         },
         surface: {
             dark: "hsl(0, 10%, 10%)",
-            light: "hsl(30, 10%, 15%)",
+            light: "hsl(30, 15%, 20%)",
             contrast: "hsl(30, 100%, 95%)",
         },
         control: {
@@ -246,13 +246,13 @@ export const VUE_THEME_VALUES = {
         ...SHARED_THEME_VALUES.color,
         primary: VUE_PRIMARY,
         background: {
-            dark: "hsl(0, 20%, 5%)",
-            light: "hsl(30, 20%, 15%)",
+            dark: "hsl(0, 10%, 10%)",
+            light: "hsl(30, 15%, 20%)",
             contrast: "hsl(30, 100%, 95%)",
         },
         surface: {
             dark: "hsl(120, 10%, 10%)",
-            light: "hsl(90, 10%, 15%)",
+            light: "hsl(90, 15%, 20%)",
             contrast: "hsl(90, 100%, 95%)",
         },
         control: {

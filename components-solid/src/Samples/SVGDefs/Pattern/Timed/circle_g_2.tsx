@@ -1,6 +1,7 @@
 import { SVGDefsUtils } from "@thewaver/ss-components";
 import { MathUtils } from "@thewaver/ss-utils";
 
+import { SVGAnimationDefsSolidUtils } from "../../../../Generators/SVGDefs/SVGAnimations/SVGAnimationDefsSolid.utils";
 import type { TimedPatternConfig } from "../../SVGDefsSolid.types";
 import { SVGPatterns } from "../../SVGPatterns.const";
 
@@ -15,8 +16,13 @@ export const circle_g_2: TimedPatternConfig = {
             {
                 gradientOrPattern: {
                     id: `pattern1-${id}`,
-                    renderDefsElement: () =>
-                        SVGPatterns.computeGridPattern(
+                    renderDefsElement: () => {
+                        const animateDefs = SVGAnimationDefsSolidUtils.createAnimateDefs({
+                            ...defs,
+                            animationDurationMs: defs.animationDurationMs * 4,
+                        });
+
+                        return SVGPatterns.computeGridPattern(
                             `pattern1-${id}`,
                             cellCount,
                             cellSize,
@@ -49,13 +55,13 @@ export const circle_g_2: TimedPatternConfig = {
                                                 .split(";")
                                                 .map((v) => `${Number(v) * r}`)
                                                 .join(";")}
-                                            dur={`${defs.animationDurationMs * 4}ms`}
-                                            repeatCount="indefinite"
+                                            {...animateDefs()}
                                         />
                                     </circle>
                                 );
                             },
-                        ),
+                        );
+                    },
                 },
             },
         ];

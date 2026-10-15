@@ -4,6 +4,7 @@
     import { SVGDefsUtils, type TimedPatternElementDefs } from "@thewaver/ss-components";
     import { MathUtils } from "@thewaver/ss-utils";
 
+    import { SVGAnimationDefsSvelteUtils } from "../../../../Generators/SVGDefs/SVGAnimations/SVGAnimationDefsSvelte.utils.svelte.js";
     import Markup from "../../../../Utils/Markup.svelte";
     import { markup } from "../../../../Utils/markupUtils.js";
     import type { TimedPatternConfig } from "../../SVGDefsSvelte.types.js";
@@ -36,6 +37,11 @@
 
     const getSplitValues = SVGDefsSvelteUtils.createSplitValues();
 
+    const animate = SVGAnimationDefsSvelteUtils.createAnimateDefs(() => ({
+        ...props.defs,
+        animationDurationMs: props.defs.animationDurationMs * 4,
+    }));
+
     const pattern = $derived.by(() => {
         const cellSize = props.defs.cellSize;
         const r = Math.min(cellSize.width, cellSize.height) * 0.5;
@@ -63,7 +69,7 @@
                         .split(";")
                         .map((v) => `${Number(v) * r}`)
                         .join(";"),
-                    dur: `${props.defs.animationDurationMs * 4}ms`,
+                    animate,
                 });
             },
         );

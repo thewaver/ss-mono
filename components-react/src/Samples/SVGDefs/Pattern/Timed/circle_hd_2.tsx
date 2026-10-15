@@ -2,12 +2,17 @@ import { SVGDefsUtils, type TimedPatternElementDefs } from "@thewaver/ss-compone
 import { CircleHd2Const } from "@thewaver/ss-components/internal";
 import { MathUtils } from "@thewaver/ss-utils";
 
+import { SVGAnimationDefsReactUtils } from "../../../../Generators/SVGDefs/SVGAnimations/SVGAnimationDefsReact.utils";
 import type { TimedPatternConfig } from "../../SVGDefsReact.types";
 import { SVGDefsReactUtils } from "../../SVGDefsReact.utils";
 import { SVGPatterns } from "../../SVGPatterns.const";
 
 const PatternElement = (props: { id: string; defs: TimedPatternElementDefs }) => {
     const getSplitValues = SVGDefsReactUtils.useSplitValues();
+    const animate = SVGAnimationDefsReactUtils.useAnimateDefs({
+        ...props.defs,
+        animationDurationMs: props.defs.animationDurationMs * 4,
+    });
     const cellSize = props.defs.cellSize;
     const r = Math.min(cellSize.width, cellSize.height) * 0.5;
 
@@ -34,13 +39,13 @@ const PatternElement = (props: { id: string; defs: TimedPatternElementDefs }) =>
                     }
                 >
                     <animate
+                        key={animate.key}
                         attributeName="r"
                         values={values
                             .split(";")
                             .map((v) => `${Number(v) * r}`)
                             .join(";")}
-                        dur={`${props.defs.animationDurationMs * 4}ms`}
-                        repeatCount="indefinite"
+                        {...animate.attributes}
                     />
                 </circle>
             );

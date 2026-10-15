@@ -4,6 +4,7 @@
     import { SVGDefsUtils, type TimedPatternElementDefs } from "@thewaver/ss-components";
     import { MathUtils, ShapeUtils } from "@thewaver/ss-utils";
 
+    import { SVGAnimationDefsSvelteUtils } from "../../../../Generators/SVGDefs/SVGAnimations/SVGAnimationDefsSvelte.utils.svelte.js";
     import Markup from "../../../../Utils/Markup.svelte";
     import { markup } from "../../../../Utils/markupUtils.js";
     import type { TimedPatternConfig } from "../../SVGDefsSvelte.types.js";
@@ -36,6 +37,11 @@
 
     const getSplitValues = SVGDefsSvelteUtils.createSplitValues();
 
+    const animate = SVGAnimationDefsSvelteUtils.createAnimateDefs(() => ({
+        ...props.defs,
+        animationDurationMs: props.defs.animationDurationMs * 4,
+    }));
+
     const pattern = $derived(
         SVGPatterns.computeLayoutPattern(
             "triangle_rtl",
@@ -57,7 +63,7 @@
                               ? props.defs.colors.primary
                               : props.defs.colors.secondary,
                     values,
-                    dur: `${props.defs.animationDurationMs * 4}ms`,
+                    animate,
                 });
             },
         ),

@@ -4,6 +4,7 @@ import { SVGDefsUtils, type TimedPatternElementDefs } from "@thewaver/ss-compone
 import { TriangleT2Const } from "@thewaver/ss-components/internal";
 import { MathUtils, ShapeConst, ShapeUtils } from "@thewaver/ss-utils";
 
+import { SVGAnimationDefsVueUtils } from "../../../../Generators/SVGDefs/SVGAnimations/SVGAnimationDefsVue.utils";
 import { declareProps } from "../../../../Utils/propUtils";
 import type { TimedPatternConfig } from "../../SVGDefsVue.types";
 import { SVGDefsVueUtils } from "../../SVGDefsVue.utils";
@@ -14,6 +15,10 @@ type PatternElementProps = { id: string; defs: TimedPatternElementDefs };
 const PatternElement = defineComponent(
     (props: PatternElementProps) => {
         const getSplitValues = SVGDefsVueUtils.useSplitValues();
+        const animate = SVGAnimationDefsVueUtils.useAnimateDefs(() => ({
+            ...props.defs,
+            animationDurationMs: props.defs.animationDurationMs * 4,
+        }));
 
         return () => {
             const cellSize = props.defs.cellSize;
@@ -50,10 +55,10 @@ const PatternElement = defineComponent(
                                     }
                                 >
                                     <animate
+                                        key={animate.key.value}
                                         attributeName="fill-opacity"
                                         values={values}
-                                        dur={`${props.defs.animationDurationMs * 4}ms`}
-                                        repeatCount="indefinite"
+                                        {...animate.attributes.value}
                                     />
                                 </use>
                             );

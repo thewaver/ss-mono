@@ -1,6 +1,7 @@
 import { SVGDefsUtils } from "@thewaver/ss-components";
 import { MathUtils, ShapeConst, ShapeUtils } from "@thewaver/ss-utils";
 
+import { SVGAnimationDefsSolidUtils } from "../../../../Generators/SVGDefs/SVGAnimations/SVGAnimationDefsSolid.utils";
 import type { TimedPatternConfig } from "../../SVGDefsSolid.types";
 import { SVGPatterns } from "../../SVGPatterns.const";
 
@@ -28,48 +29,54 @@ export const triangle_s_2: TimedPatternConfig = {
             {
                 gradientOrPattern: {
                     id: `pattern1-${id}`,
-                    renderDefsElement: () => (
-                        <>
-                            {rightTriangle}
-                            {leftTriangle}
-                            {SVGPatterns.computeTriangleSidewaysPattern(
-                                `pattern1-${id}`,
-                                cellCount,
-                                cellSize,
-                                (cellId, index, cellCount, isSplit) => {
-                                    const isEven = MathUtils.isEven(index.col + index.row);
-                                    const shapeId = isEven ? `${id}-triangle-right` : `${id}-triangle-left`;
-                                    const values = SVGDefsUtils.getRandomValuesWithSplitControl(
-                                        splitValuesCache,
-                                        index,
-                                        cellCount,
-                                        isSplit,
-                                    );
+                    renderDefsElement: () => {
+                        const animateDefs = SVGAnimationDefsSolidUtils.createAnimateDefs({
+                            ...defs,
+                            animationDurationMs: defs.animationDurationMs * 4,
+                        });
 
-                                    return (
-                                        <use
-                                            id={cellId}
-                                            href={`#${shapeId}`}
-                                            fill={
-                                                SVGDefsUtils.DEBUG_SEAMS && isSplit
-                                                    ? defs.colors.tertiary
-                                                    : isEven
-                                                      ? defs.colors.primary
-                                                      : defs.colors.secondary
-                                            }
-                                        >
-                                            <animate
-                                                attributeName="fill-opacity"
-                                                values={values}
-                                                dur={`${defs.animationDurationMs * 4}ms`}
-                                                repeatCount="indefinite"
-                                            />
-                                        </use>
-                                    );
-                                },
-                            )}
-                        </>
-                    ),
+                        return (
+                            <>
+                                {rightTriangle}
+                                {leftTriangle}
+                                {SVGPatterns.computeTriangleSidewaysPattern(
+                                    `pattern1-${id}`,
+                                    cellCount,
+                                    cellSize,
+                                    (cellId, index, cellCount, isSplit) => {
+                                        const isEven = MathUtils.isEven(index.col + index.row);
+                                        const shapeId = isEven ? `${id}-triangle-right` : `${id}-triangle-left`;
+                                        const values = SVGDefsUtils.getRandomValuesWithSplitControl(
+                                            splitValuesCache,
+                                            index,
+                                            cellCount,
+                                            isSplit,
+                                        );
+
+                                        return (
+                                            <use
+                                                id={cellId}
+                                                href={`#${shapeId}`}
+                                                fill={
+                                                    SVGDefsUtils.DEBUG_SEAMS && isSplit
+                                                        ? defs.colors.tertiary
+                                                        : isEven
+                                                          ? defs.colors.primary
+                                                          : defs.colors.secondary
+                                                }
+                                            >
+                                                <animate
+                                                    attributeName="fill-opacity"
+                                                    values={values}
+                                                    {...animateDefs()}
+                                                />
+                                            </use>
+                                        );
+                                    },
+                                )}
+                            </>
+                        );
+                    },
                 },
             },
         ];

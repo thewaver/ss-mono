@@ -7,5 +7,7 @@
 </script>
 
 <circle id={props.id} r={props.r} cx={props.cx} cy={props.cy} fill={props.fill}>
-    <animate attributeName="r" values={props.values} dur={props.dur} repeatCount="indefinite" />
+    {#key props.animate.getKey()}
+        <animate attributeName="r" values={props.values} {...props.animate.getAttributes()} />
+    {/key}
 </circle>

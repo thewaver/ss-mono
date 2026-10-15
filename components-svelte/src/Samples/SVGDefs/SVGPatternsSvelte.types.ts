@@ -1,5 +1,6 @@
 import type { SVGPatternCellCount, SVGPatternCellIndex } from "@thewaver/ss-components";
 
+import type { SVGAnimationDefsSvelteUtils } from "../../Generators/SVGDefs/SVGAnimations/SVGAnimationDefsSvelte.utils.svelte.js";
 import type { SvelteMarkup } from "../../Utils/typeUtils.js";
 
 export type SVGPatternCellRenderer = (
@@ -27,10 +28,14 @@ export type SVGPatternCircleCellProps = {
     cy: number;
     /** The circle's color. */
     fill: string;
-    /** The radii it steps through, joined with `;`, repeating for as long as it is drawn. */
+    /** The radii it steps through in one pass, joined with `;`. */
     values: string;
-    /** How long one pass through `values` takes, as an SVG clock value such as `2000ms`. */
-    dur: string;
+    /**
+     * The schedule the animation runs on, from {@link SVGAnimationDefsSvelteUtils.createAnimateDefs}: how long one pass
+     * takes and how the passes repeat. The pattern makes it once and hands the same one to every cell, so all of them
+     * repeat, pause and stop together.
+     */
+    animate: ReturnType<typeof SVGAnimationDefsSvelteUtils.createAnimateDefs>;
 };
 
 export type SVGPatternUseCellProps = {
@@ -40,10 +45,10 @@ export type SVGPatternUseCellProps = {
     href: string;
     /** The shape's color. */
     fill: string;
-    /** The opacities it steps through, joined with `;`, repeating for as long as it is drawn. */
+    /** The opacities it steps through in one pass, joined with `;`. */
     values: string;
-    /** How long one pass through `values` takes, as an SVG clock value such as `2000ms`. */
-    dur: string;
+    /** The schedule the animation runs on, as {@link SVGPatternCircleCellProps.animate}. */
+    animate: ReturnType<typeof SVGAnimationDefsSvelteUtils.createAnimateDefs>;
 };
 
 export type SVGPatternTrackedCircleCellProps = {

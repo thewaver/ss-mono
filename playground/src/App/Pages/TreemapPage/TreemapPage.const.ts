@@ -210,7 +210,7 @@ export const LIBRARY: TreemapNode<string> = branch(
             "SVGDefs",
             branch("Gradient", leaf("Timed", 3452), leaf("Tracked", 3791), leaf("Gradient files", 184)),
             leaf("Iteration", 56),
-            branch("Pattern", leaf("Timed", 974), leaf("Tracked", 853), leaf("Pattern files", 249)),
+            branch("Pattern", leaf("Timed", 1055), leaf("Tracked", 853), leaf("Pattern files", 249)),
             leaf("SVGDefs files", 1928),
         ),
         branch("ScanlineAnimation", leaf("Keyframes", 259)),
@@ -221,3 +221,13 @@ export const LIBRARY: TreemapNode<string> = branch(
     leaf("Utils", 116),
     leaf("src files", 1208),
 );
+
+export const EXAMPLE_NAMES = {
+    library: "This library, by lines of code",
+};
+
+export const EXAMPLES_ROOT = "/src/App/Pages/TreemapPage/Examples";
+
+export const NO_MOTION_DURATION_MS = 0;
+
+export const WIDE_SPAN = 2;

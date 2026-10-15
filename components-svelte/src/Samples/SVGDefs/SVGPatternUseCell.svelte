@@ -7,5 +7,7 @@
 </script>
 
 <use id={props.id} href={props.href} fill={props.fill}>
-    <animate attributeName="fill-opacity" values={props.values} dur={props.dur} repeatCount="indefinite" />
+    {#key props.animate.getKey()}
+        <animate attributeName="fill-opacity" values={props.values} {...props.animate.getAttributes()} />
+    {/key}
 </use>

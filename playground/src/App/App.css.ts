@@ -27,7 +27,6 @@ export const appContent = style({
     flex: 1,
     minHeight: 0,
     width: "100%",
-    backgroundImage: toBackdropGradient(themeVars.color.background.light, themeVars.color.background.dark),
 });
 
 export const leftMenu = style({
@@ -138,6 +137,7 @@ export const pageColumn = style({
     padding: layoutVars.pageMargin,
     overflowY: "auto",
     scrollbarGutter: "stable",
+    backgroundImage: toBackdropGradient(themeVars.color.background.light, themeVars.color.background.dark),
 });
 
 globalStyle(`${pageColumn} > *`, {
