@@ -16,6 +16,7 @@ import {
     type SVGLightSourceDefs,
     type SVGLightSurfaceDefs,
     type SVGPixelateFilterDefs,
+    type SVGRGBSplitFilterDefs,
     type SVGSaturationFilterDefs,
     type SVGSpecularLightingFilterDefs,
     type SVGTurbulenceFilterDefs,
@@ -376,6 +377,78 @@ export class SVGFilterDefsFactory {
             >
                 {custom}
             </feColorMatrix>
+        );
+
+        return this;
+    };
+
+    /**
+     * Pulls the graphic apart into its red, green and blue, each shifted by its own offset.
+     *
+     * Where the three still overlap the original colors come back exactly, and where they have drifted apart each
+     * edge grows colored fringes. Additive mixing, the default, draws them in red, green and blue, as light reads on
+     * a dark ground; subtractive mixing draws them in cyan, magenta and yellow, as ink reads on a light one. Opaque
+     * content comes back unchanged with nothing shifted; content that is partly see-through comes back somewhat more
+     * opaque. The values are read each time the filter is rendered, so a component that renders again as they change
+     * has the existing elements follow in place; `maxOffset` is what the region is grown by: the furthest any offset
+     * will go on either axis. Left out, the region fits the offsets as first given. Skipped when nothing is shifted
+     * and no `maxOffset` is given.
+     *
+     * @param defs The shift for each channel in user units, how the three are put back together, and how far any of
+     * them may go.
+     * @param custom Content placed inside the final blend, for animating it.
+     * @returns The factory, for the next call.
+     */
+    public addRGBSplitFilter = (defs: SVGRGBSplitFilterDefs, custom?: VNodeChild) => {
+        const key = this.registry.addRGBSplit(defs);
+
+        if (key === undefined) return this;
+
+        const keys = SVGFilterDefsUtils.resolveRGBSplit(key);
+        const shifts = [defs.red, defs.green, defs.blue];
+        const [red, green, blue] = keys.channels;
+        const blendMode = SVGFilterDefsUtils.getRGBSplitBlendMode(defs.colorMixing);
+
+        this.filterPrimitives[key] = (srcIn: string) => (
+            <>
+                {keys.channels.map((channel, index) => (
+                    <Fragment key={channel.kept}>
+                        <feColorMatrix
+                            in={srcIn}
+                            type="matrix"
+                            values={SVGFilterDefsUtils.computeRGBSplitMatrix(index, defs.colorMixing)}
+                            color-interpolation-filters={SVGFilterDefs.COLOR_SPACE}
+                            result={channel.kept}
+                        />
+
+                        <feOffset
+                            in={channel.kept}
+                            dx={shifts[index].x}
+                            dy={shifts[index].y}
+                            color-interpolation-filters={SVGFilterDefs.COLOR_SPACE}
+                            result={channel.shifted}
+                        />
+                    </Fragment>
+                ))}
+
+                <feBlend
+                    in={red.shifted}
+                    in2={green.shifted}
+                    mode={blendMode}
+                    color-interpolation-filters={SVGFilterDefs.COLOR_SPACE}
+                    result={keys.redGreen}
+                />
+
+                <feBlend
+                    in={keys.redGreen}
+                    in2={blue.shifted}
+                    mode={blendMode}
+                    color-interpolation-filters={SVGFilterDefs.COLOR_SPACE}
+                    result={key}
+                >
+                    {custom}
+                </feBlend>
+            </>
         );
 
         return this;

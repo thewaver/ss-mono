@@ -281,3 +281,39 @@ describe("computeHitIndex", () => {
         expect(CarouselUtils.computeHitIndex([rect(0, 10)], { x: 50, y: 50 })).toBeUndefined();
     });
 });
+
+describe("getCopyCount", () => {
+    it("draws every slide once on a carousel that stops at its ends, for a rule with no reach, and below two slides", () => {
+        expect(CarouselUtils.getCopyCount(4, 4, false)).toBe(1);
+        expect(CarouselUtils.getCopyCount(4, undefined, true)).toBe(1);
+        expect(CarouselUtils.getCopyCount(1, 4, true)).toBe(1);
+    });
+
+    it("repeats the list until the ring holds the reach on both sides of the slide showing", () => {
+        expect(CarouselUtils.getCopyCount(4, 4, true)).toBe(3);
+        expect(CarouselUtils.getCopyCount(4, 1, true)).toBe(1);
+        expect(CarouselUtils.getCopyCount(9, 4, true)).toBe(1);
+    });
+});
+
+describe("followCopies", () => {
+    it("is the position itself while the slides are drawn once", () => {
+        expect(CarouselUtils.followCopies(7, 2.5, 4, 1)).toBe(2.5);
+    });
+
+    it("stays on the copy nearest where the ring was, so a lap carries the ring on instead of back", () => {
+        expect(CarouselUtils.followCopies(3.9, 0.1, 4, 3)).toBeCloseTo(4.1);
+        expect(CarouselUtils.followCopies(7.9, 0.1, 4, 3)).toBeCloseTo(8.1);
+    });
+
+    it("comes round the ring itself, the short way", () => {
+        expect(CarouselUtils.followCopies(11.9, 0.1, 4, 3)).toBeCloseTo(0.1);
+    });
+});
+
+describe("getNearestCopy", () => {
+    it("picks the copy of the slide nearest where the ring is", () => {
+        expect(CarouselUtils.getNearestCopy(1, 7.6, 4, 3)).toBe(9);
+        expect(CarouselUtils.getNearestCopy(1, 0.2, 4, 3)).toBe(1);
+    });
+});

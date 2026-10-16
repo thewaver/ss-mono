@@ -19,6 +19,7 @@ export const PageKnobs = (props: PageKnobsProps) => {
                             {(getNumberKnob) => (
                                 <PageNumberField
                                     value={() => Number(getValue(key))}
+                                    resetValue={() => Number(props.defaults()[key])}
                                     min={() => getNumberKnob().min}
                                     max={() => getNumberKnob().max}
                                     step={() => getNumberKnob().step}
@@ -32,6 +33,7 @@ export const PageKnobs = (props: PageKnobsProps) => {
                         <Match when={knob.kind === "check"}>
                             <PageCheckField
                                 value={() => Boolean(getValue(key))}
+                                resetValue={() => Boolean(props.defaults()[key])}
                                 ariaLabel={knob.label}
                                 onChange={(value) => props.onInput(key, value)}
                             />

@@ -14,8 +14,8 @@ export const createCarouselsControls = (): CarouselsControls => {
     let isLooping = $state(CAROUSEL_DEFAULTS.isLooping);
     let placement = $state<CarouselPlacements.SampleKey>(CarouselKnobs.STARTING_PLACEMENT);
 
-    const computePlacement = $derived(
-        CarouselPlacementUtils.toPlacementFn(CarouselPlacements.SAMPLE_PLACEMENTS[placement]),
+    const placementRule = $derived(
+        CarouselPlacementUtils.toPlacementRule(CarouselPlacements.SAMPLE_PLACEMENTS[placement]),
     );
 
     const slides = $derived(TITLES.slice(0, slideCount));
@@ -25,7 +25,7 @@ export const createCarouselsControls = (): CarouselsControls => {
         isDisabled,
         orientation,
         frameClasses: styles.slideFrames[PLACEMENT_FRAMES[placement] ?? "whole"][orientation],
-        computePlacement,
+        placement: placementRule,
     });
 
     return {

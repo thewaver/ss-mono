@@ -290,6 +290,87 @@ export namespace CarouselUtils {
     };
 
     /**
+     * How many times the slides are drawn round a looping carousel, so its placement rule finds a slide at every
+     * distance it reaches, on both sides at once.
+     *
+     * A ring has room for `reach` slides either side of the one showing only when it holds at least `2 × reach + 1`;
+     * with fewer, the slide furthest round has to swap from one end to the other while it is still drawn. The whole
+     * list is repeated rather than single slides, so every slide keeps the same neighbors in every copy.
+     *
+     * @param count How many slides there are.
+     * @param reach How far either side the rule draws — see `CarouselPlacementRule.reach`.
+     * @param isLooping Whether the carousel loops.
+     * @returns How many times the list is drawn: `1` on a carousel that does not loop, with fewer than two slides, or
+     * for a rule with no reach.
+     */
+    export const getCopyCount = (count: number, reach: number | undefined, isLooping: boolean) =>
+        !isLooping || reach === undefined || count < MIN_ROTATABLE_COUNT
+            ? 1
+            : Math.max(1, Math.ceil((2 * reach + 1) / count));
+
+    /**
+     * Where a looping carousel is round its ring of copies, following its position as it moves.
+     *
+     * The position runs round one lap of the real slides, so on its own it cannot say which copy of the slide showing
+     * is in front. This keeps to the copy nearest where the ring was, so the ring turns on continuously as the
+     * position comes round a lap instead of jumping back to its first copy.
+     *
+     * @param previous Where the ring was, or `undefined` before it had been placed.
+     * @param position Where the carousel is, from {@link toPosition}, as it is drawn.
+     * @param count How many slides there are.
+     * @param copies How many times the list is drawn, from {@link getCopyCount}.
+     * @returns A position counted in slides round the ring of `count × copies`.
+     */
+    export const followCopies = (previous: number | undefined, position: number, count: number, copies: number) => {
+        if (copies <= 1 || previous === undefined) return position;
+
+        const ring = count * copies;
+        let nearest = position;
+        let nearestGap = Infinity;
+
+        for (let copy = 0; copy < copies; copy++) {
+            const candidate = position + copy * count;
+            const gap = Math.abs(getDistance(candidate, previous, ring, true));
+
+            if (gap < nearestGap) {
+                nearest = candidate;
+                nearestGap = gap;
+            }
+        }
+
+        return nearest;
+    };
+
+    /**
+     * Which place round the ring of copies shows a slide, when the slides are drawn more than once.
+     *
+     * Of the copies of the slide, the one nearest where the ring is — the one a glide to that slide is heading for.
+     *
+     * @param index The slide, counting the real ones from zero.
+     * @param ringPosition Where the ring is, from {@link followCopies}.
+     * @param count How many slides there are.
+     * @param copies How many times the list is drawn.
+     * @returns The place round the ring, from `0` to `count × copies - 1`.
+     */
+    export const getNearestCopy = (index: number, ringPosition: number, count: number, copies: number) => {
+        const ring = count * copies;
+        let nearest = index;
+        let nearestGap = Infinity;
+
+        for (let copy = 0; copy < copies; copy++) {
+            const place = index + copy * count;
+            const gap = Math.abs(getDistance(place, ringPosition, ring, true));
+
+            if (gap < nearestGap) {
+                nearest = place;
+                nearestGap = gap;
+            }
+        }
+
+        return nearest;
+    };
+
+    /**
      * Which slide a position is nearest to, which is the slide counted as showing.
      *
      * @param position Where the carousel is, from {@link toPosition}.

@@ -10,6 +10,7 @@
     useFieldReset(
         () => props.value,
         (value) => props.onChange(value),
+        () => props.resetValue,
     );
 </script>
 

@@ -37,7 +37,9 @@ export * from "./Exotics/Particles/ParticleSpawner/ParticleSpawner.internal.cons
 export * from "./Exotics/Perspective/Cuboid/Cuboid.internal.const";
 export * from "./Exotics/Perspective/Die/Die.internal.const";
 export * from "./Exotics/Perspective/Flipbook/Flipbook.internal.const";
+export * from "./Exotics/Perspective/InfiniteCorridor/InfiniteCorridor.internal.const";
 export * from "./Exotics/PointerEffects/LightCatcher/LightCatcher.internal.const";
+export * from "./Exotics/PointerEffects/RGBSplitter/RGBSplitter.internal.const";
 export * from "./Exotics/PointerEffects/Tilter/Tilter.internal.const";
 export * from "./Exotics/Reveals/ScratchCard/ScratchCard.internal.const";
 export * from "./Exotics/Shape/Shape.internal.const";

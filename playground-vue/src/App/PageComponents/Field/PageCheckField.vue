@@ -7,7 +7,11 @@ import type { PageCheckFieldProps } from "./FieldVue.types";
 
 const props = defineProps<PageCheckFieldProps>();
 
-useFieldReset(props.value, (value) => props.onChange(value));
+useFieldReset(
+    props.value,
+    (value) => props.onChange(value),
+    () => props.resetValue,
+);
 </script>
 
 <template>

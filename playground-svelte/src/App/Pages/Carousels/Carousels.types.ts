@@ -1,4 +1,4 @@
-import type { CarouselOrientation, CarouselPlacementFn, CarouselPlacements } from "@thewaver/ss-components-svelte";
+import type { CarouselOrientation, CarouselPlacementRule, CarouselPlacements } from "@thewaver/ss-components-svelte";
 import type { SlideFrameClasses } from "@thewaver/ss-playground/App/Pages/Carousels/Carousels.types";
 
 export type CarouselExampleProps = {
@@ -9,7 +9,7 @@ export type CarouselExampleProps = {
     autoplayDelayMs?: number;
     index: number;
     playback?: boolean;
-    computePlacement: CarouselPlacementFn;
+    placement: CarouselPlacementRule;
     frameClasses: SlideFrameClasses;
 };
 

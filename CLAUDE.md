@@ -513,6 +513,11 @@ measurements the code does not show. Raise the judgment call separately, in one 
 answer. When merging two implementations that disagree on a constant, keep both behaviors — a parameter
 with per-call-site defaults — rather than picking a winner.
 
+**A default or a knob's step is a round number, never an odd fraction.** Stated by the user, after a corridor item's
+height came out as `0.42` with a knob stepping by `0.02`: a ratio defaults to a multiple of `0.05` and steps by `0.05`
+or `0.1`, and the same goes for any value a new component or Playground knob starts at. An arbitrary-looking fraction
+reads as a measured value when it was only a guess, which is exactly the kind of number the next rule protects.
+
 **Treat anything measured as the user's call.** Cache sizes, thresholds, epsilons and similar tuned values
 are decisions backed by benchmarks you cannot see. Flag a concern; do not change one unsupervised.
 

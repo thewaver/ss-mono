@@ -3,7 +3,7 @@ import type { Accessor, Signal } from "solid-js";
 import type {
     AccessorProps,
     CarouselOrientation,
-    CarouselPlacementFn,
+    CarouselPlacementRule,
     CarouselPlacements,
 } from "@thewaver/ss-components-solid";
 import type { SlideFrameClasses } from "@thewaver/ss-playground/App/Pages/Carousels/Carousels.types";
@@ -16,9 +16,10 @@ export type CarouselExampleProps = AccessorProps<{
     autoplayDelayMs?: number;
     index: Signal<number>;
     playback?: Signal<boolean>;
-    computePlacement: CarouselPlacementFn;
     frameClasses: SlideFrameClasses;
-}>;
+}> & {
+    placement: CarouselPlacementRule;
+};
 
 export type CarouselSharedProps = Omit<CarouselExampleProps, "index" | "autoplayDelayMs" | "playback">;
 

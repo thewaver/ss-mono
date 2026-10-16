@@ -1417,6 +1417,56 @@ commitment, and an entry that already carries the user's verdict is recorded her
 not put to them twice. An entry leaves this section in one of two directions: upward into a numbered item, which is the user's
 decision to take, or into `conventions.md` / `decisions.md` if building it settles something.
 
+### A button that burns away into ash or smoke
+
+Raised by the user while looking at Framer's
+[Particle Button](https://www.framer.com/marketplace/components/particle-button/), which draws its button into a 2D
+canvas and scatters the pixels. Breaking a live element into pieces that look like it needs a picture of it, which is
+what item 1 is waiting on. **The user's point: if the pieces are ash or smoke, nothing needs to know what the original
+looks like.** So the effect becomes two layers, with no picture at all:
+
+- **The content fades away behind a moving edge**, a mask swept across it in a chosen direction, as `Reveal`,
+  `ShapeReveal` and the cell and scanline animations already sweep masks.
+- **Particles are released along that edge as it passes** and drift off, as `ParticleSpawner` and `ParticleField`
+  already release and move particles, with the moving edge as the place they come from.
+
+**Particles come only from where the content is painted**, the user's addition, so none rise out of a transparent
+corner. That too needs no picture, only the page's own structure: the browser reports the box of every line of text,
+an element with a visible background or border paints its box less its rounded corners, an element painting nothing
+is skipped, and an SVG shape can be asked whether a point lies inside its fill or stroke. It is approximate by
+agreement — inside an image or a gradient transparency cannot be seen, so the whole box counts as painted.
+
+What it leaves open: the particles are generic, taking at most a colour read from the content's computed style, so
+they suit ash and smoke but not pieces that keep the label's shape; rebuilding is the same played backwards, the mask
+closing and particles flying in to the edge; while dissolved the content has to be out of reach as well as out of
+sight, and under reduced motion the particles are skipped and it simply fades. It would be a component of its own, a
+wrapper, and item 1 still stands for effects that need the real picture. Nothing has been decided about building it.
+
+### A scattered layout for `InfiniteCorridor`, done differently
+
+The corridor first had a third layout that strewed items over both walls at different heights and sizes, each drawn
+from the item's index and a seed. **The user's verdict: taken out, to be rethought later in a fairly different way.**
+What that way is has not been discussed.
+
+### Lines that stretch into shares of the height as the page scrolls
+
+From Framer's [TypeShift](https://www.framer.com/marketplace/components/typeshift/) (live demo:
+[periphi-typeshift.framer.website](https://periphi-typeshift.framer.website/)). A phrase is set one word per line, every
+line stretched to the full width of the box, as `FittedText` does. The first word starts out filling the whole height,
+its letters drawn tall and thin. As the page scrolls, the next word appears at the bottom almost flat and grows, while
+the words above give up height to make room, until every word holds an equal share. The letters are stretched out of
+shape rather than resized.
+
+**What the library already has.** The width fitting is `FittedText`'s, and turning a scroll position into a number from
+`0` to `1` is `ElementObserver`'s, both for the window and for a scrolling box. The new part is only the height shares
+and the order in which each word arrives.
+
+**How it would be built, if it were.** A text component of its own taking the lines and a `progress`, rather than a
+setting on `FittedText`: `FittedText` promises that letters keep their shape, and stretching them is the opposite
+promise.
+
+**The user's verdict: deferred.** They lean towards a component of its own, but are not convinced the effect earns one.
+
 ### Publishing Exotics as a package of their own
 
 The idea was that someone already using another library for everyday controls might want only the Exotics. **The
@@ -1648,15 +1698,6 @@ Codrops' list whose rows bring up a picture that follows the pointer
 **Deferred, not turned down: an ASCII picture**, an image redrawn live as text characters
 ([Codrops](https://tympanus.net/codrops/2026/09/04/beyond-the-luminance-ramp-a-shape-aware-ascii-renderer-in-three-js/)).
 It shares its first step with _"Weights read off the source image"_ under the animation sample collections.
-
-**Deferred, not turned down: backgrounds drawn by the graphics card.** React Bits' Ghost Fibers
-([link](https://reactbits.dev/backgrounds/ghost-fibers)), Strands ([link](https://reactbits.dev/animations/strands))
-and Aero Shards ([link](https://reactbits.dev/backgrounds/aero-shards)) are pictures computed pixel by pixel by
-small programs run on the graphics card, called shaders — the first two through the OGL package, the third through
-WebGPU and about two thousand lines. Nothing in this library draws that way. The user's call: "stick to what we
-already have the foundation for". If it is reopened, the shape that was put to them was one component running a
-shader across a box with the backgrounds as shader samples, in plain WebGL without a package, and with `playback`
-from the start, since anything moving for more than five seconds owes WCAG 2.2.2 a way to stop it.
 
 **What the comparison showed.** Most of Fancy Components is one of this library's components with a different
 setting — about twenty of its text components are what `Typewriter` does — and the user's verdict on the whole

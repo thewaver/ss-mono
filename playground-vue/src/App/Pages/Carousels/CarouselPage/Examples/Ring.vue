@@ -21,7 +21,7 @@ const props = defineProps<Props>();
 
 const index = useModel(props, "index");
 
-const computeRingPlacement = CarouselPlacementUtils.createPaddleWheel({
+const ringPlacement = CarouselPlacementUtils.createPaddleWheel({
     perspectivePx: CarouselKnobs.RING_PERSPECTIVE_PX,
 });
 
@@ -32,6 +32,10 @@ const progress = shallowRef(0);
 const prefersReducedMotion = MediaQueryMonitorVueUtils.useReducedMotion();
 
 const isTurning = shallowRef(!prefersReducedMotion.value);
+
+watch(prefersReducedMotion, (isReduced) => {
+    if (isReduced) isTurning.value = false;
+});
 
 const toggleTurning = () => {
     isTurning.value = !isTurning.value;
@@ -68,7 +72,7 @@ watch(
                 <Carousel
                     v-model:index="index"
                     v-model:progress="progress"
-                    :compute-placement="computeRingPlacement"
+                    :placement="ringPlacement"
                     :slides="slides"
                     :is-disabled="isDisabled"
                     :orientation="orientation"

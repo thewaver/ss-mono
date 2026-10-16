@@ -13,7 +13,7 @@ type Props = CarouselExampleProps;
 export const NoControlsExample = (props: Props) => {
     return (
         <Carousel
-            computePlacement={props.computePlacement}
+            placement={props.placement}
             slides={props.slides}
             index={props.index}
             isDisabled={props.isDisabled}

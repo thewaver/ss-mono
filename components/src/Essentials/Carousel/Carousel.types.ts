@@ -88,6 +88,20 @@ export type CarouselPlacement = {
 
 export type CarouselPlacementFn = (defs: CarouselPlacementDefs) => CarouselPlacement;
 
+export type CarouselPlacementRule = {
+    /** Where one slide is drawn, from its distance and the carousel's box. */
+    place: CarouselPlacementFn;
+    /**
+     * The furthest distance, either side of the slide showing, at which the rule still draws anything.
+     *
+     * On a looping carousel with too few slides to fill that many places each side, the slides are repeated round
+     * the ring until they do, so the slide furthest round never swaps from one end to the other in sight. The copies
+     * show the same content, are as hidden from the keyboard and from screen readers as any slide that is not showing,
+     * and pressing one brings up its original. Left out, the slides are drawn once each, whatever the count.
+     */
+    reach?: number;
+};
+
 export type CarouselRotationFlags = {
     isPlaying: boolean;
     isHeld: boolean;
@@ -147,16 +161,17 @@ export type BaseCarouselValues<T> = CarouselState &
 
 export type BaseCarouselCbs = Omit<CarouselLabels, "roleDescription" | "slideRoleDescription"> & {
     /**
-     * Where each slide is drawn, from how far it is from the one showing. It is handed the slide's distance —
-     * counted in slides, fractional while the carousel moves, and the short way round when it loops — with the
-     * carousel's box, and answers with the transforms and filters that put the slide there, as a proximity effect
-     * does. `CarouselPlacementUtils` ships the track, the drum, cover flow, a depth wave, a cylinder, a stack of
-     * folders and a hinge, each tunable; a rule of the consumer's own is any function of the same shape. Every
-     * slide fills the carousel's box before it is placed, and the box clips them. A press on a slide drawn beside
-     * the one showing brings it up, worked out from where the press landed rather than from which slide is on
-     * top; the pickers stay the keyboard's way to do the same.
+     * Where each slide is drawn, from how far it is from the one showing. Its `place` is handed the slide's
+     * distance — counted in slides, fractional while the carousel moves, and the short way round when it loops —
+     * with the carousel's box, and answers with the transforms and filters that put the slide there, as a proximity
+     * effect does; its `reach` says how far either side it draws, so too few slides on a looping carousel are
+     * repeated to fill it. `CarouselPlacementUtils` ships the track, the drum, cover flow, a depth wave, a cylinder,
+     * a stack of folders, a hinge, a concertina and a paddle wheel, each tunable; a rule of the consumer's own is any
+     * object of the same shape. Every slide fills the carousel's box before it is placed, and the box clips them. A
+     * press on a slide drawn beside the one showing brings it up, worked out from where the press landed rather than
+     * from which slide is on top; the pickers stay the keyboard's way to do the same.
      */
-    computePlacement: CarouselPlacementFn;
+    placement: CarouselPlacementRule;
     /** Runs when a different slide comes up. */
     onIndexChange?: (index: number) => void;
 };

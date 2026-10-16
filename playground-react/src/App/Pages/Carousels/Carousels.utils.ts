@@ -21,8 +21,8 @@ export const useCarouselsControls = (): CarouselsControls => {
     const [isDisabled] = isDisabledState;
     const [placement] = placementState;
 
-    const computePlacement = useMemo(
-        () => CarouselPlacementUtils.toPlacementFn(CarouselPlacements.SAMPLE_PLACEMENTS[placement]),
+    const placementRule = useMemo(
+        () => CarouselPlacementUtils.toPlacementRule(CarouselPlacements.SAMPLE_PLACEMENTS[placement]),
         [placement],
     );
 
@@ -33,10 +33,10 @@ export const useCarouselsControls = (): CarouselsControls => {
             slides,
             isDisabled,
             orientation,
-            computePlacement,
+            placement: placementRule,
             frameClasses: styles.slideFrames[PLACEMENT_FRAMES[placement] ?? "whole"][orientation],
         }),
-        [slides, isDisabled, orientation, computePlacement, placement],
+        [slides, isDisabled, orientation, placementRule, placement],
     );
 
     return {

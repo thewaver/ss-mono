@@ -3,12 +3,13 @@ import { MathUtils } from "@thewaver/ss-utils";
 import type {
     CarouselPlacement,
     CarouselPlacementDefs,
-    CarouselPlacementFn,
+    CarouselPlacementRule,
 } from "../../Essentials/Carousel/Carousel.types";
 import { SpineUtils } from "../../Primitives/Spine/Spine.utils";
 import { CarouselPlacementDefaults } from "./CarouselPlacements.const";
 import type {
     CarouselPlacementEntry,
+    ConcertinaPlacementDefs,
     CoverFlowPlacementDefs,
     CylinderPlacementDefs,
     DepthWavePlacementDefs,
@@ -55,27 +56,31 @@ const toVisibility = (distance: number, visibleDistance: number) =>
 /**
  * The placement rules this library ships for `Carousel`, as factories a consumer can tune or take as they are.
  *
- * A rule is a function from one slide's distance to where it is drawn — see `CarouselPlacementFn`. Every rule here
+ * A rule places one slide from its distance and says how far either side it draws — see `CarouselPlacementRule`. Every rule here
  * reads the carousel's box for its lengths, so it fits a carousel of any size, and the way the carousel runs, so each
  * works across and up and down. Distances arrive fractional while the carousel moves, so every rule is continuous in
- * them.
+ * them. Each says how far either side of the slide showing it draws, so a looping carousel with too few slides repeats
+ * them until that many fit; the paddle wheel spreads however many slides there are round its turn, so it says nothing.
  */
 export namespace CarouselPlacementUtils {
     /**
      * Slides in a line, each one box along from the last: a slide strip.
      *
      * @param defs `gapRatio`, the space between two slides as a share of the box.
-     * @returns The rule, ready to hand to `computePlacement`.
+     * @returns The rule, ready to hand to `placement`.
      */
-    export const createTrack = (defs?: TrackPlacementDefs): CarouselPlacementFn => {
+    export const createTrack = (defs?: TrackPlacementDefs): CarouselPlacementRule => {
         const gapRatio = defs?.gapRatio ?? CarouselPlacementDefaults.TRACK_DEFAULTS.gapRatio;
 
-        return (placementDefs) => {
-            const along = placementDefs.distance * (WHOLE + gapRatio) * PERCENT;
+        return {
+            reach: WHOLE,
+            place: (placementDefs) => {
+                const along = placementDefs.distance * (WHOLE + gapRatio) * PERCENT;
 
-            return {
-                effect: placementDefs.orientation === "horizontal" ? { translateX: along } : { translateY: along },
-            };
+                return {
+                    effect: placementDefs.orientation === "horizontal" ? { translateX: along } : { translateY: along },
+                };
+            },
         };
     };
 
@@ -98,32 +103,35 @@ export namespace CarouselPlacementUtils {
      *
      * @param defs `perspectivePx`, how far away the viewer sits; `faceCount`, how many faces the drum has, or `0`
      * for one per slide; `faceRatio`, how long each face is as a share of the box.
-     * @returns The rule, ready to hand to `computePlacement`.
+     * @returns The rule, ready to hand to `placement`.
      */
-    export const createDrum = (defs?: DrumPlacementDefs): CarouselPlacementFn => {
+    export const createDrum = (defs?: DrumPlacementDefs): CarouselPlacementRule => {
         const perspectivePx = defs?.perspectivePx ?? CarouselPlacementDefaults.DRUM_DEFAULTS.perspectivePx;
         const faceCount = defs?.faceCount ?? CarouselPlacementDefaults.DRUM_DEFAULTS.faceCount;
         const faceRatio = defs?.faceRatio ?? CarouselPlacementDefaults.DRUM_DEFAULTS.faceRatio;
 
-        return (placementDefs) => {
-            const along = getAlong(placementDefs);
-            const isFixed = faceCount > 0;
-            const count = Math.max(isFixed ? faceCount : placementDefs.count, SMALLEST_RING);
-            const angle = (placementDefs.distance * FULL_TURN_DEGREES) / count;
-            const radius = (along * faceRatio * HALF) / Math.tan(Math.PI / count);
-            const radians = toRadians(angle);
-            const alongPercent = along > 0 ? ((radius * Math.sin(radians)) / along) * PERCENT : 0;
-            const isPastHalfTurn = isFixed && Math.abs(placementDefs.distance) > count * HALF;
+        return {
+            reach: faceCount > 0 ? Math.floor(faceCount * HALF) : WHOLE,
+            place: (placementDefs) => {
+                const along = getAlong(placementDefs);
+                const isFixed = faceCount > 0;
+                const count = Math.max(isFixed ? faceCount : placementDefs.count, SMALLEST_RING);
+                const angle = (placementDefs.distance * FULL_TURN_DEGREES) / count;
+                const radius = (along * faceRatio * HALF) / Math.tan(Math.PI / count);
+                const radians = toRadians(angle);
+                const alongPercent = along > 0 ? ((radius * Math.sin(radians)) / along) * PERCENT : 0;
+                const isPastHalfTurn = isFixed && Math.abs(placementDefs.distance) > count * HALF;
 
-            return {
-                effect: {
-                    perspective: perspectivePx,
-                    translate3d: toTranslation(placementDefs, alongPercent, radius * (Math.cos(radians) - WHOLE)),
-                    ...toTurn(placementDefs, angle),
-                    ...(isPastHalfTurn ? { opacity: 0 } : {}),
-                },
-                layer: Math.cos(radians),
-            };
+                return {
+                    effect: {
+                        perspective: perspectivePx,
+                        translate3d: toTranslation(placementDefs, alongPercent, radius * (Math.cos(radians) - WHOLE)),
+                        ...toTurn(placementDefs, angle),
+                        ...(isPastHalfTurn ? { opacity: 0 } : {}),
+                    },
+                    layer: Math.cos(radians),
+                };
+            },
         };
     };
 
@@ -137,9 +145,9 @@ export namespace CarouselPlacementUtils {
      * @param defs `spacingRatio` between side slides and `gapRatio` beside the one showing, both shares of the box;
      * `angleDegrees` the side slides turn by; `depthPx` how far back they stand; `perspectivePx` how far away the
      * viewer sits; `visibleDistance` how many slides either side stay drawn before the rest fade.
-     * @returns The rule, ready to hand to `computePlacement`.
+     * @returns The rule, ready to hand to `placement`.
      */
-    export const createCoverFlow = (defs?: CoverFlowPlacementDefs): CarouselPlacementFn => {
+    export const createCoverFlow = (defs?: CoverFlowPlacementDefs): CarouselPlacementRule => {
         const base = CarouselPlacementDefaults.COVER_FLOW_DEFAULTS;
         const spacingRatio = defs?.spacingRatio ?? base.spacingRatio;
         const gapRatio = defs?.gapRatio ?? base.gapRatio;
@@ -148,19 +156,22 @@ export namespace CarouselPlacementUtils {
         const perspectivePx = defs?.perspectivePx ?? base.perspectivePx;
         const visibleDistance = defs?.visibleDistance ?? base.visibleDistance;
 
-        return (placementDefs) => {
-            const { distance } = placementDefs;
-            const near = MathUtils.clamp(distance, -WHOLE, WHOLE);
-            const alongPercent = (distance * spacingRatio + near * gapRatio) * PERCENT;
+        return {
+            reach: Math.ceil(visibleDistance) + WHOLE,
+            place: (placementDefs) => {
+                const { distance } = placementDefs;
+                const near = MathUtils.clamp(distance, -WHOLE, WHOLE);
+                const alongPercent = (distance * spacingRatio + near * gapRatio) * PERCENT;
 
-            return {
-                effect: {
-                    perspective: perspectivePx,
-                    translate3d: toTranslation(placementDefs, alongPercent, -Math.abs(near) * depthPx),
-                    ...toTurn(placementDefs, -near * angleDegrees),
-                    opacity: toVisibility(distance, visibleDistance),
-                },
-            };
+                return {
+                    effect: {
+                        perspective: perspectivePx,
+                        translate3d: toTranslation(placementDefs, alongPercent, -Math.abs(near) * depthPx),
+                        ...toTurn(placementDefs, -near * angleDegrees),
+                        opacity: toVisibility(distance, visibleDistance),
+                    },
+                };
+            },
         };
     };
 
@@ -174,9 +185,9 @@ export namespace CarouselPlacementUtils {
      * @param defs `spacingRatio` between slides as a share of the box; `depthPx` how far back each step sinks;
      * `tiltDegrees` how far each step turns; `perspectivePx` how far away the viewer sits; `visibleDistance` how many
      * slides either side stay drawn.
-     * @returns The rule, ready to hand to `computePlacement`.
+     * @returns The rule, ready to hand to `placement`.
      */
-    export const createDepthWave = (defs?: DepthWavePlacementDefs): CarouselPlacementFn => {
+    export const createDepthWave = (defs?: DepthWavePlacementDefs): CarouselPlacementRule => {
         const base = CarouselPlacementDefaults.DEPTH_WAVE_DEFAULTS;
         const spacingRatio = defs?.spacingRatio ?? base.spacingRatio;
         const depthPx = defs?.depthPx ?? base.depthPx;
@@ -184,21 +195,24 @@ export namespace CarouselPlacementUtils {
         const perspectivePx = defs?.perspectivePx ?? base.perspectivePx;
         const visibleDistance = defs?.visibleDistance ?? base.visibleDistance;
 
-        return (placementDefs) => {
-            const { distance } = placementDefs;
+        return {
+            reach: Math.ceil(visibleDistance) + WHOLE,
+            place: (placementDefs) => {
+                const { distance } = placementDefs;
 
-            return {
-                effect: {
-                    perspective: perspectivePx,
-                    translate3d: toTranslation(
-                        placementDefs,
-                        distance * spacingRatio * PERCENT,
-                        -Math.abs(distance) * depthPx,
-                    ),
-                    ...toTurn(placementDefs, -distance * tiltDegrees),
-                    opacity: toVisibility(distance, visibleDistance),
-                },
-            };
+                return {
+                    effect: {
+                        perspective: perspectivePx,
+                        translate3d: toTranslation(
+                            placementDefs,
+                            distance * spacingRatio * PERCENT,
+                            -Math.abs(distance) * depthPx,
+                        ),
+                        ...toTurn(placementDefs, -distance * tiltDegrees),
+                        opacity: toVisibility(distance, visibleDistance),
+                    },
+                };
+            },
         };
     };
 
@@ -213,29 +227,32 @@ export namespace CarouselPlacementUtils {
      *
      * @param defs `stepDegrees`, how far round the cylinder one slide reaches; `perspectivePx` how far away the
      * viewer sits.
-     * @returns The rule, ready to hand to `computePlacement`.
+     * @returns The rule, ready to hand to `placement`.
      */
-    export const createCylinder = (defs?: CylinderPlacementDefs): CarouselPlacementFn => {
+    export const createCylinder = (defs?: CylinderPlacementDefs): CarouselPlacementRule => {
         const base = CarouselPlacementDefaults.CYLINDER_DEFAULTS;
         const stepDegrees = defs?.stepDegrees ?? base.stepDegrees;
         const perspectivePx = defs?.perspectivePx ?? base.perspectivePx;
 
-        return (placementDefs) => {
-            const along = getAlong(placementDefs);
-            const angle = placementDefs.distance * stepDegrees;
-            const radians = toRadians(angle);
-            const radius = (along * HALF) / Math.sin(toRadians(stepDegrees) * HALF);
-            const alongPercent = along > 0 ? ((radius * Math.sin(radians)) / along) * PERCENT : 0;
+        return {
+            reach: Math.ceil(QUARTER_TURN_DEGREES / stepDegrees),
+            place: (placementDefs) => {
+                const along = getAlong(placementDefs);
+                const angle = placementDefs.distance * stepDegrees;
+                const radians = toRadians(angle);
+                const radius = (along * HALF) / Math.sin(toRadians(stepDegrees) * HALF);
+                const alongPercent = along > 0 ? ((radius * Math.sin(radians)) / along) * PERCENT : 0;
 
-            return {
-                effect: {
-                    perspective: perspectivePx,
-                    translate3d: toTranslation(placementDefs, alongPercent, radius * (WHOLE - Math.cos(radians))),
-                    ...toTurn(placementDefs, -angle),
-                    opacity: Math.abs(angle) < QUARTER_TURN_DEGREES ? PERCENT : 0,
-                },
-                layer: -Math.abs(placementDefs.distance),
-            };
+                return {
+                    effect: {
+                        perspective: perspectivePx,
+                        translate3d: toTranslation(placementDefs, alongPercent, radius * (WHOLE - Math.cos(radians))),
+                        ...toTurn(placementDefs, -angle),
+                        opacity: Math.abs(angle) < QUARTER_TURN_DEGREES ? PERCENT : 0,
+                    },
+                    layer: -Math.abs(placementDefs.distance),
+                };
+            },
         };
     };
 
@@ -248,39 +265,42 @@ export namespace CarouselPlacementUtils {
      *
      * @param defs `offsetRatio`, how far each folder behind rises as a share of the box; `scaleStep` how much smaller
      * each is; `visibleDistance` how many stay drawn behind the front one.
-     * @returns The rule, ready to hand to `computePlacement`.
+     * @returns The rule, ready to hand to `placement`.
      */
-    export const createFolders = (defs?: FoldersPlacementDefs): CarouselPlacementFn => {
+    export const createFolders = (defs?: FoldersPlacementDefs): CarouselPlacementRule => {
         const base = CarouselPlacementDefaults.FOLDERS_DEFAULTS;
         const offsetRatio = defs?.offsetRatio ?? base.offsetRatio;
         const scaleStep = defs?.scaleStep ?? base.scaleStep;
         const visibleDistance = defs?.visibleDistance ?? base.visibleDistance;
 
-        return ({ distance, count, isLooping }): CarouselPlacement => {
-            if (distance < 0 && distance > -WHOLE) {
+        return {
+            reach: Math.ceil(visibleDistance) + WHOLE,
+            place: ({ distance, count, isLooping }): CarouselPlacement => {
+                if (distance < 0 && distance > -WHOLE) {
+                    return {
+                        effect: {
+                            translateY: -distance * LEAVING_DROP_RATIO * PERCENT,
+                            opacity: (WHOLE + distance) * PERCENT,
+                        },
+                        layer: WHOLE,
+                    };
+                }
+
+                const behind = distance < 0 && isLooping ? distance + count : distance;
+
+                if (behind < 0) return { effect: { opacity: 0 } };
+
+                const scale = Math.max(WHOLE - behind * scaleStep, 0) * PERCENT;
+
                 return {
                     effect: {
-                        translateY: -distance * LEAVING_DROP_RATIO * PERCENT,
-                        opacity: (WHOLE + distance) * PERCENT,
+                        translateY: -behind * offsetRatio * PERCENT,
+                        scale: [scale, scale],
+                        opacity: toVisibility(behind, visibleDistance),
                     },
-                    layer: WHOLE,
+                    layer: -behind,
                 };
-            }
-
-            const behind = distance < 0 && isLooping ? distance + count : distance;
-
-            if (behind < 0) return { effect: { opacity: 0 } };
-
-            const scale = Math.max(WHOLE - behind * scaleStep, 0) * PERCENT;
-
-            return {
-                effect: {
-                    translateY: -behind * offsetRatio * PERCENT,
-                    scale: [scale, scale],
-                    opacity: toVisibility(behind, visibleDistance),
-                },
-                layer: -behind,
-            };
+            },
         };
     };
 
@@ -297,44 +317,129 @@ export namespace CarouselPlacementUtils {
      * @param defs `offsetRatio`, how far each waiting card peeks above the one in front as a share of the box;
      * `depthPx` how far back each stands; `perspectivePx` how far away the viewer sits; `visibleDistance` how many
      * stay drawn behind.
-     * @returns The rule, ready to hand to `computePlacement`.
+     * @returns The rule, ready to hand to `placement`.
      */
-    export const createHinge = (defs?: HingePlacementDefs): CarouselPlacementFn => {
+    export const createHinge = (defs?: HingePlacementDefs): CarouselPlacementRule => {
         const base = CarouselPlacementDefaults.HINGE_DEFAULTS;
         const offsetRatio = defs?.offsetRatio ?? base.offsetRatio;
         const depthPx = defs?.depthPx ?? base.depthPx;
         const perspectivePx = defs?.perspectivePx ?? base.perspectivePx;
         const visibleDistance = defs?.visibleDistance ?? base.visibleDistance;
 
-        return ({ distance, index, count }): CarouselPlacement => {
-            if (distance < 0) {
+        return {
+            reach: Math.max(Math.ceil(visibleDistance) + WHOLE, FLIPPED_FADE_DISTANCE),
+            place: ({ distance, index, count }): CarouselPlacement => {
+                if (distance < 0) {
+                    return {
+                        effect: {
+                            perspective: perspectivePx,
+                            ...SpineUtils.getTurn(LEVEL_SPINE, SpineUtils.leaves({ distance, index, count })),
+                            opacity: MathUtils.clamp01(FLIPPED_FADE_DISTANCE + distance) * PERCENT,
+                        },
+                        origin: BOTTOM_EDGE,
+                        layer: WHOLE + distance,
+                        axis: "column",
+                    };
+                }
+
                 return {
                     effect: {
                         perspective: perspectivePx,
-                        ...SpineUtils.getTurn(LEVEL_SPINE, SpineUtils.leaves({ distance, index, count })),
-                        opacity: MathUtils.clamp01(FLIPPED_FADE_DISTANCE + distance) * PERCENT,
+                        translate3d: [0, -distance * offsetRatio * PERCENT, -distance * depthPx],
+                        opacity: toVisibility(distance, visibleDistance),
                     },
                     origin: BOTTOM_EDGE,
-                    layer: WHOLE + distance,
+                    layer: -distance,
                     axis: "column",
                 };
-            }
-
-            return {
-                effect: {
-                    perspective: perspectivePx,
-                    translate3d: [0, -distance * offsetRatio * PERCENT, -distance * depthPx],
-                    opacity: toVisibility(distance, visibleDistance),
-                },
-                origin: BOTTOM_EDGE,
-                layer: -distance,
-                axis: "column",
-            };
+            },
         };
     };
 
     /** {@link createHinge} with its defaults. */
     export const hinge = createHinge();
+
+    /**
+     * A concertina: the slide showing lies flat, facing the viewer, and the rest fold back and forth either side of it
+     * like an accordion's bellows seen from the front, each one's edges meeting its neighbors'.
+     *
+     * Every slide folds the same way each time, the way a crease in paper does: slides at even positions turn one way
+     * and slides at odd positions the other, so on one step the folds beside the slide showing go away from the viewer
+     * and on the next they come towards it. Stepping only unfolds the slide arriving in the middle and folds the one
+     * leaving it; the rest keep their angle and slide along. A slide's place is worked out by walking the fold from the
+     * middle of the box out to it, so neighbors meet at every distance, fractional ones included. A looping carousel
+     * with an odd number of slides cannot alternate all the way round, so two slides meeting at the wrap fold the same
+     * way, which sits on the far side from the slide showing. Every slide is shrunk to `faceRatio` of the box, so the
+     * folds either side fit inside it rather than running off its edges, and the slide's content needs no narrower
+     * frame of its own.
+     *
+     * @param defs `angleDegrees`, how far each folded slide turns; `faceRatio`, how long each slide is as a share of the
+     * box; `perspectivePx`, how far away the viewer sits; `visibleDistance`, how many slides either side stay drawn
+     * before the rest fade.
+     * @returns The rule, ready to hand to `placement`.
+     */
+    export const createConcertina = (defs?: ConcertinaPlacementDefs): CarouselPlacementRule => {
+        const base = CarouselPlacementDefaults.CONCERTINA_DEFAULTS;
+        const angleDegrees = defs?.angleDegrees ?? base.angleDegrees;
+        const faceRatio = defs?.faceRatio ?? base.faceRatio;
+        const perspectivePx = defs?.perspectivePx ?? base.perspectivePx;
+        const visibleDistance = defs?.visibleDistance ?? base.visibleDistance;
+        const scale = faceRatio * PERCENT;
+
+        const toFoldDegrees = (distance: number, index: number, count: number) => {
+            const wrapped = ((index % count) + count) % count;
+            const direction = wrapped % 2 === 0 ? WHOLE : -WHOLE;
+
+            return direction * angleDegrees * MathUtils.clamp01(Math.abs(distance));
+        };
+
+        return {
+            reach: Math.ceil(visibleDistance) + WHOLE,
+            place: (placementDefs): CarouselPlacement => {
+                const { distance, index, count } = placementDefs;
+                const along = getAlong(placementDefs);
+                const face = along * faceRatio;
+                const steps = Math.round(distance);
+                const step = Math.sign(steps);
+                const anchorDistance = distance - steps;
+
+                let alongPx = 0;
+                let depthPx = 0;
+
+                for (let walked = 0; walked <= Math.abs(steps); walked++) {
+                    const slideDistance = anchorDistance + walked * step;
+                    const radians = toRadians(toFoldDegrees(slideDistance, index - steps + walked * step, count));
+                    const isAnchor = walked === 0;
+                    const isLast = walked === Math.abs(steps);
+                    const share =
+                        isAnchor && isLast
+                            ? anchorDistance
+                            : isAnchor
+                              ? step * HALF + anchorDistance
+                              : isLast
+                                ? step * HALF
+                                : step;
+
+                    alongPx += share * face * Math.cos(radians);
+                    depthPx -= share * face * Math.sin(radians);
+                }
+
+                return {
+                    effect: {
+                        perspective: perspectivePx,
+                        translate3d: toTranslation(placementDefs, along > 0 ? (alongPx / along) * PERCENT : 0, depthPx),
+                        ...toTurn(placementDefs, toFoldDegrees(distance, index, count)),
+                        scale: [scale, scale],
+                        opacity: toVisibility(distance, visibleDistance),
+                    },
+                    layer: face > 0 ? depthPx / face : 0,
+                };
+            },
+        };
+    };
+
+    /** {@link createConcertina} with its defaults. */
+    export const concertina = createConcertina();
 
     /**
      * A paddle wheel: slides standing round a spine through the middle of the carousel's box, spaced evenly, each
@@ -348,22 +453,24 @@ export namespace CarouselPlacementUtils {
      *
      * @param defs `spanDegrees`, how far round the wheel the slides reach between them; `perspectivePx` how far away the
      * viewer sits.
-     * @returns The rule, ready to hand to `computePlacement`.
+     * @returns The rule, ready to hand to `placement`.
      */
-    export const createPaddleWheel = (defs?: PaddleWheelPlacementDefs): CarouselPlacementFn => {
+    export const createPaddleWheel = (defs?: PaddleWheelPlacementDefs): CarouselPlacementRule => {
         const base = CarouselPlacementDefaults.PADDLE_WHEEL_DEFAULTS;
         const perspectivePx = defs?.perspectivePx ?? base.perspectivePx;
         const computeAngle = SpineUtils.createRadial({ spanDegrees: defs?.spanDegrees ?? base.spanDegrees });
 
-        return ({ distance, index, count, orientation }): CarouselPlacement => {
-            const axis = orientation === "horizontal" ? "row" : "column";
-            const angle = computeAngle({ distance, index, count });
+        return {
+            place: ({ distance, index, count, orientation }): CarouselPlacement => {
+                const axis = orientation === "horizontal" ? "row" : "column";
+                const angle = computeAngle({ distance, index, count });
 
-            return {
-                effect: { perspective: perspectivePx, ...SpineUtils.getTurn(axis, angle) },
-                layer: SpineUtils.getLeadDepth(angle),
-                axis,
-            };
+                return {
+                    effect: { perspective: perspectivePx, ...SpineUtils.getTurn(axis, angle) },
+                    layer: SpineUtils.getLeadDepth(angle),
+                    axis,
+                };
+            },
         };
     };
 
@@ -374,9 +481,9 @@ export namespace CarouselPlacementUtils {
      * The rule a sample entry names, built with the entry's own tuning.
      *
      * @param entry One of the samples, or any entry of the same shape.
-     * @returns The rule, ready to hand to `computePlacement`.
+     * @returns The rule, ready to hand to `placement`.
      */
-    export const toPlacementFn = (entry: CarouselPlacementEntry): CarouselPlacementFn => {
+    export const toPlacementRule = (entry: CarouselPlacementEntry): CarouselPlacementRule => {
         switch (entry.family) {
             case "track":
                 return createTrack(entry.defs);
@@ -392,6 +499,8 @@ export namespace CarouselPlacementUtils {
                 return createFolders(entry.defs);
             case "hinge":
                 return createHinge(entry.defs);
+            case "concertina":
+                return createConcertina(entry.defs);
             case "paddle_wheel":
                 return createPaddleWheel(entry.defs);
         }

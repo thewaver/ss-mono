@@ -16,8 +16,8 @@ export const createCarouselsControls = (): CarouselsControls => {
     const isLoopingSignal = createSignal(CAROUSEL_DEFAULTS.isLooping);
     const placementSignal = createSignal<CarouselPlacements.SampleKey>(CarouselKnobs.STARTING_PLACEMENT);
 
-    const getComputePlacement = createMemo(() =>
-        CarouselPlacementUtils.toPlacementFn(CarouselPlacements.SAMPLE_PLACEMENTS[placementSignal[0]()]),
+    const getPlacement = createMemo(() =>
+        CarouselPlacementUtils.toPlacementRule(CarouselPlacements.SAMPLE_PLACEMENTS[placementSignal[0]()]),
     );
 
     const getSlides = createMemo(() => TITLES.slice(0, slideCountSignal[0]()));
@@ -28,8 +28,8 @@ export const createCarouselsControls = (): CarouselsControls => {
         orientation: orientationSignal[0],
         frameClasses: () =>
             styles.slideFrames[PLACEMENT_FRAMES[placementSignal[0]()] ?? "whole"][orientationSignal[0]()],
-        get computePlacement() {
-            return getComputePlacement();
+        get placement() {
+            return getPlacement();
         },
     }));
 

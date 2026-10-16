@@ -58,6 +58,16 @@ export type SVGColorFilterDefs = {
     b: number;
 };
 
+export type SVGColorMixing = "additive" | "subtractive";
+
+export type SVGRGBSplitFilterDefs = {
+    red: Point2d;
+    green: Point2d;
+    blue: Point2d;
+    colorMixing?: SVGColorMixing;
+    maxOffset?: number;
+};
+
 export type SVGPointLightDefs = {
     kind: "point";
     x: number;
@@ -107,6 +117,7 @@ export type SVGFilterPrimitiveKind =
     | "contrast"
     | "inversion"
     | "color"
+    | "rgb_split"
     | "pixelate"
     | "specular_lighting"
     | "diffuse_lighting";

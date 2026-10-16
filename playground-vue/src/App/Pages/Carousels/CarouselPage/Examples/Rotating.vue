@@ -30,7 +30,7 @@ const playback = useModel(props, "playback");
     <Carousel
         v-model:index="index"
         v-model:playback="playback"
-        :compute-placement="computePlacement"
+        :placement="placement"
         :slides="slides"
         :is-disabled="isDisabled"
         :is-looping="isLooping"

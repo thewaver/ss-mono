@@ -19,16 +19,17 @@ export const FieldResetProvider = FieldResetContext.Provider;
 
 export const FieldDefaultProvider = FieldDefaultContext.Provider;
 
-export const useFieldReset = <T>(value: T, apply: (value: T) => void) => {
+export const useFieldReset = <T>(value: T, apply: (value: T) => void, resetValue?: T) => {
     const registry = useContext(FieldResetContext);
     const defaults = useContext(FieldDefaultContext);
 
     const [initial] = useState(value);
     const latestApply = useLatest(apply);
+    const latestResetValue = useLatest(resetValue);
 
     useEffect(() => {
         const stopReporting = defaults?.report(initial);
-        const stopRegistering = registry?.register(() => latestApply.current(initial));
+        const stopRegistering = registry?.register(() => latestApply.current(latestResetValue.current ?? initial));
 
         return () => {
             stopRegistering?.();

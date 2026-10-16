@@ -18,14 +18,14 @@ export const setFieldResetContext = (registry: FieldResetRegistry) => setResetCo
 
 export const setFieldDefaultContext = (registry: FieldDefaultRegistry) => setDefaultContext(registry);
 
-export const useFieldReset = <T>(getValue: () => T, apply: (value: T) => void) => {
+export const useFieldReset = <T>(getValue: () => T, apply: (value: T) => void, getResetValue?: () => T | undefined) => {
     const registry = hasResetContext() ? getResetContext() : undefined;
     const defaults = hasDefaultContext() ? getDefaultContext() : undefined;
 
     onMount(() => {
         const initial = untrack(getValue);
         const stopReporting = defaults?.report(initial);
-        const stopRegistering = registry?.register(() => apply(initial));
+        const stopRegistering = registry?.register(() => apply(untrack(() => getResetValue?.()) ?? initial));
 
         return () => {
             stopRegistering?.();

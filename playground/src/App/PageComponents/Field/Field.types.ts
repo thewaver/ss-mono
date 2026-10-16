@@ -1,6 +1,7 @@
 export type BasePageNumberFieldValues = {
     id?: string;
     value: number;
+    resetValue?: number;
     min?: number;
     max?: number;
     step?: number;
@@ -32,6 +33,7 @@ export type BasePageTextFieldProps = BasePageTextFieldValues & BasePageTextField
 
 export type BasePageCheckFieldValues = {
     value: boolean;
+    resetValue?: boolean;
     isDisabled?: boolean;
     ariaLabel?: string;
 };

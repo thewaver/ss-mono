@@ -242,6 +242,8 @@ export { default as DatePicker } from "./Essentials/Input/DatePicker/DatePicker.
 export type * from "./Essentials/Input/DatePicker/DatePicker.types.js";
 export { default as LightCatcher } from "./Exotics/PointerEffects/LightCatcher/LightCatcher.svelte";
 export type * from "./Exotics/PointerEffects/LightCatcher/LightCatcher.types.js";
+export { default as RGBSplitter } from "./Exotics/PointerEffects/RGBSplitter/RGBSplitter.svelte";
+export type * from "./Exotics/PointerEffects/RGBSplitter/RGBSplitter.types.js";
 export { default as ShadowCaster } from "./Exotics/PointerEffects/ShadowCaster/ShadowCaster.svelte";
 export type * from "./Exotics/PointerEffects/ShadowCaster/ShadowCaster.types.js";
 export { default as Tilter } from "./Exotics/PointerEffects/Tilter/Tilter.svelte";
@@ -254,6 +256,8 @@ export { default as FlipCard } from "./Exotics/Perspective/FlipCard/FlipCard.sve
 export type * from "./Exotics/Perspective/FlipCard/FlipCard.types.js";
 export { default as Flipbook } from "./Exotics/Perspective/Flipbook/Flipbook.svelte";
 export type * from "./Exotics/Perspective/Flipbook/Flipbook.types.js";
+export { default as InfiniteCorridor } from "./Exotics/Perspective/InfiniteCorridor/InfiniteCorridor.svelte";
+export type * from "./Exotics/Perspective/InfiniteCorridor/InfiniteCorridor.types.js";
 export { default as DateRangePicker } from "./Essentials/Input/DateRangePicker/DateRangePicker.svelte";
 export type * from "./Essentials/Input/DateRangePicker/DateRangePicker.types.js";
 export { default as Reveal } from "./Exotics/Reveals/Reveal/Reveal.svelte";

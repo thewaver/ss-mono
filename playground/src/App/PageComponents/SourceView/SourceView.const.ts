@@ -2,10 +2,16 @@ export const CORE_PACKAGE = "@thewaver/ss-playground/";
 
 export const CORE_GLOB_ROOT = "../../../../../playground/src/";
 
-export const CORE_MODULES = import.meta.glob<string>("../../../../../playground/src/**/*.{ts,tsx}", {
-    query: "?source",
-    import: "default",
-});
+const CORE_MODULES_BASE = "file:///src/App/PageComponents/SourceView/";
+
+export const CORE_MODULES: Record<string, () => Promise<string>> = Object.fromEntries(
+    Object.entries(
+        import.meta.glob<string>("../../../../../playground/src/**/*.{ts,tsx}", {
+            query: "?source",
+            import: "default",
+        }),
+    ).map(([path, load]) => [new URL(path, CORE_MODULES_BASE).pathname, load]),
+);
 
 export const APP_ROOT = "/src/App";
 

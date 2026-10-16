@@ -63,15 +63,30 @@
         CarouselUtils.getIsSwipeDisabled(props.renderControls !== undefined, isDisabled, count),
     );
 
-    const getDistance = (slideIndex: number) =>
-        CarouselUtils.getDistance(slideIndex, drawnPosition, count, isLooping);
+    const copies = $derived(CarouselUtils.getCopyCount(count, props.placement.reach, isLooping));
+    const ringCount = $derived(count * copies);
+    const ringPlaces = $derived(Array.from({ length: ringCount }, (_, place) => place));
+
+    let followedRing: number | undefined;
+
+    const ringPosition = $derived.by(() => {
+        followedRing = CarouselUtils.followCopies(followedRing, drawnPosition, count, copies);
+
+        return followedRing;
+    });
+
+    const currentPlace = $derived(CarouselUtils.getNearestCopy(currentIndex, ringPosition, count, copies));
+
+    const toIndex = (place: number) => place % Math.max(count, 1);
+
+    const getDistance = (place: number) => CarouselUtils.getDistance(place, ringPosition, ringCount, isLooping);
 
     const placements = $derived(
-        props.slides.map((_, slideIndex) =>
-            props.computePlacement({
-                distance: getDistance(slideIndex),
-                index: slideIndex,
-                count,
+        ringPlaces.map((place) =>
+            props.placement.place({
+                distance: getDistance(place),
+                index: place,
+                count: ringCount,
                 size: getSize(),
                 orientation,
                 isLooping,
@@ -160,12 +175,12 @@
 
     const getSlideLabel = (slideIndex: number) => props.computeSlideLabel(slideIndex, count);
 
-    const getSlideState = (slideIndex: number, face: CarouselFace): CarouselSlideState => ({
-        index: slideIndex,
+    const getSlideState = (place: number, face: CarouselFace): CarouselSlideState => ({
+        index: toIndex(place),
         count,
-        distance: getDistance(slideIndex),
+        distance: getDistance(place),
         face,
-        isCurrent: slideIndex === currentIndex,
+        isCurrent: place === currentPlace,
     });
 
     let placedIndex: number | undefined;
@@ -258,41 +273,41 @@
     const handleViewportClick = (e: MouseEvent) => {
         if (isPressDisabled) return;
 
-        const shownIndex = currentIndex;
-        const getDrawn = (slideIndex: number) => faceRefs[slideIndex]?.firstElementChild ?? faceRefs[slideIndex];
+        const shownPlace = currentPlace;
+        const getDrawn = (place: number) => faceRefs[place]?.firstElementChild ?? faceRefs[place];
 
-        if (getDrawn(shownIndex)?.contains(e.target as Node)) return;
+        if (getDrawn(shownPlace)?.contains(e.target as Node)) return;
 
-        const rects = faceRefs.map((_face, slideIndex) =>
-            slideIndex !== shownIndex && placements[slideIndex]?.effect.opacity !== HIDDEN_OPACITY
-                ? getDrawn(slideIndex)?.getBoundingClientRect()
+        const rects = faceRefs.map((_face, place) =>
+            place !== shownPlace && placements[place]?.effect.opacity !== HIDDEN_OPACITY
+                ? getDrawn(place)?.getBoundingClientRect()
                 : undefined,
         );
         const hit = CarouselUtils.computeHitIndex(rects, { x: e.clientX, y: e.clientY });
 
-        if (hit !== undefined) goTo(hit);
+        if (hit !== undefined) goTo(toIndex(hit));
     };
 
     const setStyle = (element: HTMLElement, style: Record<string, string>) => {
         for (const [name, value] of Object.entries(style)) element.style.setProperty(name, value);
     };
 
-    const attachFace = (slideIndex: number) => (element: HTMLElement) => {
-        faceRefs[slideIndex] = element;
+    const attachFace = (place: number) => (element: HTMLElement) => {
+        faceRefs[place] = element;
 
         return () => {
-            faceRefs[slideIndex] = undefined;
+            faceRefs[place] = undefined;
         };
     };
 
-    const attachPlacement = (slideIndex: number) => (element: HTMLElement) => {
-        const placement = placements[slideIndex];
+    const attachPlacement = (place: number) => (element: HTMLElement) => {
+        const placement = placements[place];
 
-        if (placement) setStyle(element, CarouselUtils.toSlideStyle(placement, getDistance(slideIndex)));
+        if (placement) setStyle(element, CarouselUtils.toSlideStyle(placement, getDistance(place)));
     };
 
-    const attachBack = (slideIndex: number) => (element: HTMLElement) => {
-        const placement = placements[slideIndex];
+    const attachBack = (place: number) => (element: HTMLElement) => {
+        const placement = placements[place];
 
         if (!placement) return;
 
@@ -385,30 +400,31 @@
         {@attach (element) => on(element, "click", handleViewportClick)}
         class={styles.carouselViewport}
     >
-        {#each props.slides as item, slideIndex (slideIndex)}
+        {#each ringPlaces as place (place)}
+            {@const item = props.slides[toIndex(place)]}
             <div
-                {@attach attachPlacement(slideIndex)}
+                {@attach attachPlacement(place)}
                 class={styles.carouselSlide}
                 role="group"
                 aria-roledescription={slideRoleDescription}
-                aria-label={getSlideLabel(slideIndex)}
-                aria-hidden={slideIndex !== currentIndex ? "true" : undefined}
-                inert={slideIndex !== currentIndex}
+                aria-label={getSlideLabel(toIndex(place))}
+                aria-hidden={place !== currentPlace ? "true" : undefined}
+                inert={place !== currentPlace}
             >
                 <div
-                    {@attach attachFace(slideIndex)}
+                    {@attach attachFace(place)}
                     class={[styles.carouselFace, props.renderSlideBack && styles.carouselFaceTurnable]}
                 >
-                    {@render props.renderSlide(item, getSlideState(slideIndex, "front"))}
+                    {@render props.renderSlide(item, getSlideState(place, "front"))}
                 </div>
 
                 {#if props.renderSlideBack}
                     <div
-                        {@attach attachBack(slideIndex)}
+                        {@attach attachBack(place)}
                         class={[styles.carouselFace, styles.carouselFaceTurnable]}
                         aria-hidden="true"
                     >
-                        {@render props.renderSlideBack(item, getSlideState(slideIndex, "back"))}
+                        {@render props.renderSlideBack(item, getSlideState(place, "back"))}
                     </div>
                 {/if}
             </div>

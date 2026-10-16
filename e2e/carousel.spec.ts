@@ -48,11 +48,24 @@ const pickOption = async (page: import("@playwright/test").Page, key: string, na
     await page.locator('[role="listbox"] [role="option"]', { hasText: name }).click();
 };
 
+/**
+ * A looping carousel with too few slides for its placement draws the list more than once, so the slides on the page
+ * are counted by the labels they carry rather than by the elements: every copy names the slide it repeats.
+ */
 test("the region and every slide say what they are, beyond what their roles alone convey", async ({ page }) => {
     await expect(page.locator(region(MANUAL))).toHaveAttribute("role", "region");
     await expect(page.locator(region(MANUAL))).toHaveAttribute("aria-label", "Sampler");
 
-    await expect(page.locator(slide(MANUAL))).toHaveCount(4);
+    const labels = await page
+        .locator(slide(MANUAL))
+        .evaluateAll((slides) => slides.map((element) => element.getAttribute("aria-label")));
+
+    expect([...new Set(labels)].toSorted(), "the slides drawn name the four slides and nothing else").toEqual([
+        "1 of 4",
+        "2 of 4",
+        "3 of 4",
+        "4 of 4",
+    ]);
     await expect(page.locator(slide(MANUAL)).first()).toHaveAttribute("role", "group");
     await expect(page.locator(slide(MANUAL)).first()).toHaveAttribute("aria-label", "1 of 4");
 
@@ -61,13 +74,15 @@ test("the region and every slide say what they are, beyond what their roles alon
 
 test("the slides that are off screen are out of reach rather than merely out of sight", async ({ page }) => {
     const offScreen = page.locator(`${slide(MANUAL)}[aria-hidden="true"]`);
+    const drawn = await page.locator(slide(MANUAL)).count();
 
-    await expect(offScreen, "three of the four are away, however much of them the placement still shows").toHaveCount(
-        3,
-    );
+    await expect(
+        offScreen,
+        "every slide drawn but the current one is away, however much of it still shows",
+    ).toHaveCount(drawn - 1);
     await expect(offScreen.first()).toHaveAttribute("inert", "");
     await expect(
-        page.locator(slide(MANUAL)).first(),
+        page.locator(`${slide(MANUAL)}:not([aria-hidden="true"])`),
         "and the one on screen is neither hidden nor inert",
     ).not.toHaveAttribute("inert");
 });

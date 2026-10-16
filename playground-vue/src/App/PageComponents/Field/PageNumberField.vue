@@ -15,7 +15,11 @@ import type { PageNumberFieldProps } from "./FieldVue.types";
 
 const props = defineProps<PageNumberFieldProps>();
 
-useFieldReset(props.value, (value) => props.onInput(value));
+useFieldReset(
+    props.value,
+    (value) => props.onInput(value),
+    () => props.resetValue,
+);
 
 const value = SignalMirrorVueUtils.useValueMirror<number | undefined>(
     () => props.value,

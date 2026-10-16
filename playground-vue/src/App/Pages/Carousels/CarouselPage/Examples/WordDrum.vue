@@ -12,7 +12,7 @@ import * as styles from "@thewaver/ss-playground/App/Pages/Carousels/Carousels.c
 
 import type { CarouselExampleProps } from "../../Carousels.types";
 
-const computeWordDrumPlacement = CarouselPlacementUtils.createDrum({
+const wordDrumPlacement = CarouselPlacementUtils.createDrum({
     faceCount: CarouselKnobs.WORD_DRUM_FACE_COUNT,
     faceRatio: CarouselKnobs.WORD_DRUM_FACE_RATIO,
     perspectivePx: CarouselKnobs.WORD_DRUM_PERSPECTIVE_PX,
@@ -36,7 +36,7 @@ const progress = ElementObserverVueUtils.useScrollContainerProgress(runwayRef, b
             <div :class="styles.wordDrumSlot">
                 <Carousel
                     v-model:index="index"
-                    :compute-placement="computeWordDrumPlacement"
+                    :placement="wordDrumPlacement"
                     :slides="CarouselKnobs.WORD_DRUM_WORDS"
                     :progress="progress"
                     :is-looping="false"

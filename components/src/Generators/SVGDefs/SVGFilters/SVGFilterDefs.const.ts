@@ -1,4 +1,5 @@
 import type {
+    SVGColorMixing,
     SVGDisplacementChannel,
     SVGFilterMethod,
     SVGLightSurfaceDefs,
@@ -15,6 +16,8 @@ export namespace SVGFilterDefs {
 
     export const DISPLACEMENT_CHANNELS: readonly SVGDisplacementChannel[] = ["R", "G", "B", "A"];
 
+    export const COLOR_MIXINGS: readonly SVGColorMixing[] = ["additive", "subtractive"];
+
     export const COLOR_SPACE = "sRGB";
 
     export const NEUTRAL_DISPLACEMENT_COLOR = "#808080";
@@ -26,6 +29,7 @@ export namespace SVGFilterDefs {
 
 export const SVG_FILTER_DEFAULTS = {
     method: "isolate" as SVGFilterMethod,
+    colorMixing: "additive" as SVGColorMixing,
     turbulence: {
         type: "fractalNoise",
         numOctaves: 1,

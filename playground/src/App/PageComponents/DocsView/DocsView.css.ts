@@ -82,7 +82,7 @@ export const docsEmpty = style({
 
 export const docsTableScroller = style({
     overflowX: "auto",
-    backgroundColor: [themeVars.color.background.dark, `rgba(from ${themeVars.color.background.dark} r g b / 75%)`],
+    backgroundColor: [themeVars.color.background.dark, `rgba(from ${themeVars.color.background.dark} r g b / 50%)`],
     borderRadius: themeVars.borderRadius.full,
     boxShadow: themeVars.shadow.small,
 });

@@ -137,7 +137,7 @@ export const pageColumn = style({
     padding: layoutVars.pageMargin,
     overflowY: "auto",
     scrollbarGutter: "stable",
-    backgroundImage: toBackdropGradient(themeVars.color.background.light, themeVars.color.background.dark),
+    backgroundImage: toBackdropGradient(themeVars.color.background.dark, themeVars.color.background.light),
 });
 
 globalStyle(`${pageColumn} > *`, {

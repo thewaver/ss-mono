@@ -24,6 +24,7 @@ const getValue = (key: string) => props.values[key] ?? props.defaults[key];
         <PageNumberField
             v-if="knob.kind === 'number'"
             :value="Number(getValue(key))"
+            :reset-value="Number(defaults[key])"
             :min="knob.min"
             :max="knob.max"
             :step="knob.step"
@@ -35,6 +36,7 @@ const getValue = (key: string) => props.values[key] ?? props.defaults[key];
         <PageCheckField
             v-else
             :value="Boolean(getValue(key))"
+            :reset-value="Boolean(defaults[key])"
             :ariaLabel="knob.label"
             @change="(value: boolean) => props.onInput(key, value)"
         />

@@ -92,6 +92,20 @@ export const Carousel = defineComponent(
 
         const getDrawnPosition = () => position.value - swipeRatio.value;
 
+        const copies = computed(() => CarouselUtils.getCopyCount(count.value, props.placement.reach, getIsLooping()));
+
+        const ringCount = computed(() => count.value * copies.value);
+
+        const ringPosition = computed<number>((previous) =>
+            CarouselUtils.followCopies(previous, getDrawnPosition(), count.value, copies.value),
+        );
+
+        const currentPlace = computed(() =>
+            CarouselUtils.getNearestCopy(currentIndex.value, ringPosition.value, count.value, copies.value),
+        );
+
+        const toIndex = (place: number) => place % Math.max(count.value, 1);
+
         const getIsPressDisabled = () =>
             CarouselUtils.getIsSwipeDisabled(slots.renderControls !== undefined, getIsDisabled(), count.value);
 
@@ -250,15 +264,15 @@ export const Carousel = defineComponent(
 
         const getSlideLabel = (slideIndex: number) => props.computeSlideLabel(slideIndex, count.value);
 
-        const getDistance = (slideIndex: number) =>
-            CarouselUtils.getDistance(slideIndex, getDrawnPosition(), count.value, getIsLooping());
+        const getDistance = (place: number) =>
+            CarouselUtils.getDistance(place, ringPosition.value, ringCount.value, getIsLooping());
 
-        const getSlideState = (slideIndex: number, face: CarouselFace): CarouselSlideState => ({
-            index: slideIndex,
+        const getSlideState = (place: number, face: CarouselFace): CarouselSlideState => ({
+            index: toIndex(place),
             count: count.value,
-            distance: getDistance(slideIndex),
+            distance: getDistance(place),
             face,
-            isCurrent: slideIndex === currentIndex.value,
+            isCurrent: place === currentPlace.value,
         });
 
         const renderStepControl = (step: CarouselStep): VNodeChild => {
@@ -350,19 +364,19 @@ export const Carousel = defineComponent(
         const handleViewportClick = (e: MouseEvent) => {
             if (getIsPressDisabled()) return;
 
-            const current = currentIndex.value;
-            const getDrawn = (slideIndex: number) => faceRefs[slideIndex]?.firstElementChild ?? faceRefs[slideIndex];
+            const current = currentPlace.value;
+            const getDrawn = (place: number) => faceRefs[place]?.firstElementChild ?? faceRefs[place];
 
             if (getDrawn(current)?.contains(e.target as Node)) return;
 
-            const rects = faceRefs.map((_face, slideIndex) =>
-                slideIndex !== current && placements[slideIndex]?.effect.opacity !== CarouselConst.HIDDEN_OPACITY
-                    ? getDrawn(slideIndex)?.getBoundingClientRect()
+            const rects = faceRefs.map((_face, place) =>
+                place !== current && placements[place]?.effect.opacity !== CarouselConst.HIDDEN_OPACITY
+                    ? getDrawn(place)?.getBoundingClientRect()
                     : undefined,
             );
             const hit = CarouselUtils.computeHitIndex(rects, { x: e.clientX, y: e.clientY });
 
-            if (hit !== undefined) goTo(hit);
+            if (hit !== undefined) goTo(toIndex(hit));
         };
 
         return () => {
@@ -380,38 +394,39 @@ export const Carousel = defineComponent(
                 renderRotationControl,
             };
 
-            const renderSlide = (slide: T, slideIndex: number) => {
-                const distance = getDistance(slideIndex);
-                const placement = props.computePlacement({
+            const renderSlide = (place: number) => {
+                const slide = props.slides[toIndex(place)];
+                const distance = getDistance(place);
+                const placement = props.placement.place({
                     distance,
-                    index: slideIndex,
-                    count: count.value,
+                    index: place,
+                    count: ringCount.value,
                     size: size.value,
                     orientation,
                     isLooping: getIsLooping(),
                 });
-                const isCurrent = slideIndex === currentIndex.value;
+                const isCurrent = place === currentPlace.value;
 
-                placements[slideIndex] = placement;
+                placements[place] = placement;
 
                 return (
                     <div
-                        key={slideIndex}
+                        key={place}
                         class={CarouselStyles.carouselSlide}
                         style={CarouselUtils.toSlideStyle(placement, distance)}
                         role="group"
                         aria-roledescription={slideRoleDescription}
-                        aria-label={getSlideLabel(slideIndex)}
+                        aria-label={getSlideLabel(toIndex(place))}
                         aria-hidden={isCurrent ? undefined : "true"}
                         inert={!isCurrent}
                     >
                         <div
                             ref={(element) => {
-                                faceRefs[slideIndex] = element instanceof HTMLElement ? element : undefined;
+                                faceRefs[place] = element instanceof HTMLElement ? element : undefined;
                             }}
                             class={[CarouselStyles.carouselFace, isTurnable && CarouselStyles.carouselFaceTurnable]}
                         >
-                            {callSlot(slots.renderSlide, { slide, state: getSlideState(slideIndex, "front") })}
+                            {callSlot(slots.renderSlide, { slide, state: getSlideState(place, "front") })}
                         </div>
 
                         {isTurnable && (
@@ -424,15 +439,15 @@ export const Carousel = defineComponent(
                                 }}
                                 aria-hidden="true"
                             >
-                                {callSlot(slots.renderSlideBack, { slide, state: getSlideState(slideIndex, "back") })}
+                                {callSlot(slots.renderSlideBack, { slide, state: getSlideState(place, "back") })}
                             </div>
                         )}
                     </div>
                 );
             };
 
-            faceRefs.length = count.value;
-            placements.length = count.value;
+            faceRefs.length = ringCount.value;
+            placements.length = ringCount.value;
 
             return (
                 <div
@@ -444,7 +459,7 @@ export const Carousel = defineComponent(
                     aria-label={props.ariaLabel}
                 >
                     <div ref={viewportRef} class={CarouselStyles.carouselViewport} onClick={handleViewportClick}>
-                        {props.slides.map((slide, slideIndex) => renderSlide(slide, slideIndex))}
+                        {Array.from({ length: ringCount.value }, (_, place) => renderSlide(place))}
                     </div>
 
                     {callSlot(slots.renderControls, controls)}
@@ -476,7 +491,7 @@ export const Carousel = defineComponent(
             "onUpdate:progress": null,
             "onIndexChange": null,
             "orientation": null,
-            "computePlacement": null,
+            "placement": null,
         }),
     },
 );

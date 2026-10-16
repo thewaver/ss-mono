@@ -18,7 +18,7 @@ export const provideFieldReset = (registry: FieldResetRegistry) => provide(FIELD
 
 export const provideFieldDefault = (registry: FieldDefaultRegistry) => provide(FIELD_DEFAULT_KEY, registry);
 
-export const useFieldReset = <T>(value: T, apply: (value: T) => void) => {
+export const useFieldReset = <T>(value: T, apply: (value: T) => void, getResetValue?: () => T | undefined) => {
     const registry = inject(FIELD_RESET_KEY, undefined);
     const defaults = inject(FIELD_DEFAULT_KEY, undefined);
 
@@ -29,7 +29,7 @@ export const useFieldReset = <T>(value: T, apply: (value: T) => void) => {
 
     onMounted(() => {
         stopReporting = defaults?.report(initial);
-        stopRegistering = registry?.register(() => apply(initial));
+        stopRegistering = registry?.register(() => apply(getResetValue?.() ?? initial));
     });
 
     onBeforeUnmount(() => {

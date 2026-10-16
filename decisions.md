@@ -1606,7 +1606,7 @@ the other pages copy. Taken on Claude's judgment under the unsupervised port.
 
 ### Porting: the animations, particles, trail, pointer effects and reveals
 
-- **`LightCatcher`, `ShadowCaster` and `Tilter` share one `PointerEffectsUtils`** in the parent `PointerEffects` folder,
+- **`LightCatcher`, `RGBSplitter`, `ShadowCaster` and `Tilter` share one `PointerEffectsUtils`** in the parent `PointerEffects` folder,
   which held no namespace of its own, since they share the resting rule and the edge falloff; its functions apply each
   component's defaults, so either view passes its props straight through. **`CellAnimationUtils.runPasses` is the one
   pass clock** that `CellAnimation` and `ParticleField` each used to carry a copy of; `TrailUtils.run`,
@@ -2466,6 +2466,13 @@ value up to the enclosing `PageProp` through a second context declared beside th
 defaults by hand was rejected: half of them are expressions rather than literals, and a hand-copied number
 goes stale silently the first time a starting value is tuned. Reporting it means the tooltip cannot disagree
 with what Reset does, because both read the same capture.
+
+**A field whose value outlives it is reset to the value it is told, not the one it mounted with.** A layout's knobs
+are held per layout in a store, so switching layouts and back rebuilds the fields with whatever was last set, and the
+capture made Reset restore that: an item height set to `0.45` stayed `0.45` after a round trip through another layout,
+on InfiniteCorridor's page and on Formation's, in all four Playgrounds. `PageNumberField` and `PageCheckField` now take
+a `resetValue`, read when Reset is pressed, and `PageKnobs` hands each one the layout's default; a field without one
+keeps restoring its capture.
 
 The context lives in `PageComponents/Field/Field.context.ts` rather than beside `PageProp`, which puts the
 registry next to the code that already computes the value it carries.
@@ -14168,7 +14175,7 @@ could be expressed the way the rest of the library is. The first build had two p
 
 **What was missing is a slide placed by its distance from the current one.** Counted in slides, fractional while
 moving, and measured the short way round when looping (`CarouselUtils.getDistance`). A placement rule,
-`computePlacement`, takes that distance with the carousel's box and answers in `Proximity` effects' vocabulary —
+`placement`, takes that distance with the carousel's box and answers in `Proximity` effects' vocabulary —
 transform and filter values, opacity among them — plus an `origin` to turn about, a `layer` to stack by and the `axis`
 a turned slide shows its back about. **The shell is public as `Carousel`, with the rule required**, and the seven
 arrangements are ready-made rules in `CarouselPlacementUtils`, shipped and tuned the way `ProximityEffectUtils`
@@ -14215,11 +14222,192 @@ owes WCAG 2.2.2 a way to stop it.
 `Primitives/`; the two presets and their Playground pages were deleted, and its page-less entry in the Playground's
 `Primitives` section went, since it has a page of its own and the two collided on one route.
 
-### `Exotics/PointerEffects`: three wrappers that restyle their content by where the pointer is
+### `Carousel`'s concertina: an accordion's bellows seen from the front
 
-`Tilter`, `ShadowCaster` and `LightCatcher` are one family and now sit in one folder, in the library and in
+Asked for by the user as a zig-zag arrangement: the slide showing lies flat and facing the viewer, and the rest fold back
+and forth either side of it. Named `concertina` because `accordion` is already the library's disclosure panel; `bellows`
+was the better-known word and `zigzag` the plainest, and the user took `concertina` for being the one that means folded
+back and forth.
+
+**Each slide keeps one fold direction, by whether its position is even or odd.** The user's call, over folds that always
+leave the slide showing the same way round. Fixed folds are what a real concertina does, and they make a step calm:
+only the slide arriving in the middle unfolds and the one leaving folds, while every other slide keeps its angle and
+slides along. Folds kept relative to the slide showing would flip every folded slide through flat on every step. The
+cost accepted is that the folds beside the slide showing go away from the viewer on one step and come towards it on the
+next.
+
+**It needs nothing new from `Carousel`.** A slide's place is a fold walked from the middle of the box out to it, one
+slide at a time, and every slide on that walk is known from the placed slide's own distance and position: its angle is
+its fold direction times how far it is from flat, which only the slides within one step of the middle are. So
+neighbors meet at every fractional distance, and the rule stays a function of one slide like the others. A looping
+carousel with an odd number of slides cannot alternate all the way round; the two slides meeting at the wrap fold the
+same way, on the far side from the slide showing, rather than one of them changing direction as it travels.
+
+**It shrinks every slide to `faceRatio` of the box, with a scale, where the drum leaves the face's size to the
+consumer.** The first build used the whole box and showed only the middle slide: the folds lay outside the box and were
+clipped. Shrinking the slide itself means the consumer's content needs no narrower frame of its own and the fold's
+arithmetic and the drawn slide cannot disagree about how wide a face is.
+
+### `Carousel`: too few slides are repeated, as far as the rule says it reaches
+
+Found on the concertina with the Playground's four looping slides: each slide was drawn once, so the slide furthest
+round sat at one end and, on a step, crossed to the other end in a single frame while still on screen. The drum showed
+the same class of fault with fewer than three slides, kept from it only by `SMALLEST_RING` leaving a face empty, and
+the user's point was that other rules would carry it too, so it is fixed once in `Carousel`.
+
+**A rule is `{ place, reach }`, and the rule is what says how far it reaches.** The user's call, over a minimum count
+the consumer would set and a fixed number of repeats. Only the rule knows its geometry, so a consumer never has to work
+out how many slides the concertina or the drum needs. The object over a `reach` property hung on the function, also the
+user's call: a consumer who wraps a built-in rule in a function of their own to adjust it would drop the property
+without noticing, and the jump would come back. `reach` is the furthest distance at which the rule still draws
+anything, so it counts the slide fading out beyond `visibleDistance`; a rule without one is drawn once per slide, which
+is what the paddle wheel wants, since it spreads however many slides there are round its turn.
+
+**The whole list is repeated, never single slides, and only on a looping carousel.** `getCopyCount` gives the fewest
+repeats that make the ring hold `2 × reach + 1` slides, so every slide keeps the same neighbors in every copy. The rule
+is handed the ring — each copy's place and the ring's length — so the drum closes into a full ring of copies and the
+concertina folds every place, while the content and every count the consumer sees are the real slides': `renderSlide`'s
+state, the labels, the pickers and the steps. A carousel that stops at its ends has no ring to fill.
+
+**The ring follows the position rather than replacing it.** `progress` and the position still run round one lap of the
+real slides. `followCopies` keeps the ring on whichever copy is nearest where it was, so the ring turns on through
+every lap instead of snapping back to its first copy, and `getNearestCopy` picks which copy of the slide showing is the
+front one. Copies are as hidden from the keyboard and from screen readers as any slide that is not showing, so they add
+nothing to what assistive technology meets. What they do add is the slide's content drawn more than once, which is
+harmless for pictures and text and is the accepted cost for anything that changes by itself inside a slide.
+
+**Each framework follows the ring the way it already follows a value built on its own last one**: Solid a memo reading
+its previous value, React state adjusted during render, Vue a `computed` reading its previous value, and Svelte a plain
+variable a `$derived.by` writes as it reads — the shapes recorded under porting for `Carousel`'s accumulated turn.
+
+**Pressing a copy picks its original, and the glide goes the short way round the real slides.** So a press on a copy
+three places to the right of four slides glides one place to the left, bringing up an identical copy from that side.
+
+### `InfiniteCorridor`: looking down a corridor of items, walked by a progress from outside
+
+Asked for by the user from two published Framer components, one with a tidy row on each wall moved by scrolling and one
+with pictures strewn over both walls and a switch between moving by itself and moving with the scroll. Both
+arrangements are layouts here, and both kinds of motion are the consumer's.
+
+**A component of its own rather than two `Carousel` arrangements.** The user's call. A carousel has one current slide
+and keeps the rest out of the keyboard and out of a screen reader; in a corridor every picture is equal and nothing
+sits in front, so the carousel's rule would leave one picture reachable at a time. `Wraparound` was the other
+candidate and was set aside because it repeats one measured block of content across a flat grid, where a corridor
+places separate items on two walls in perspective.
+
+**The name says it never ends.** The user's `InfiniteCorridor`, over `Corridor`: `Wraparound` already says in its own
+name that it comes round again, and `Corridor` says nothing about it. It holds while the corridor always loops, which
+it does — a progress outside `0` to `1` comes round, and `1` is the start again.
+
+**It has no motion of its own; `progress` is the position.** The user's call, in the library's usual shape: scroll, a
+clock, a random source or anything else writes it. So the pause WCAG 2.2.2 asks for is the consumer's, as it is for
+the carousel's turning ring, and the Playground's clock example carries a Play/Pause button and starts paused under
+reduced motion.
+
+**The layout is a rule, as a carousel's arrangement is: `{ place, reach, viewDistance }`.** `place` answers from a
+drawn item's distance down the corridor with its size, its offset in pixels, its turn, the perspective and its
+opacity. `walls` packs one row on each wall at eye level, its items taking turns between the walls by their slot.
+**`walls` is one layout with an angle rather than two layouts.** The user's two reference pictures — items flat against
+the walls like a maze seen from inside, and items turned towards the viewer in two angled stacks — are the two ends of
+`angleDegrees`, since the spacing down the corridor follows the angle and packs items edge to edge at whatever angle
+they stand. The angle was then split into `nearAngleDegrees` and `farAngleDegrees`, both `75`, the user's call so a
+consumer can turn the near items differently from the far ones; the angle turns evenly between them down the drawn
+length, and an item's depth is the running total of the spacing up to it, worked out in closed form, so neighbours
+still meet. **A first `scatter` layout, items strewn over both walls at drawn heights and sizes, was taken out** by the
+user, to be rethought differently later; nothing else depended on it. **The walls stand at the box's edges level with the viewer, and `farWidthRatio` sets how far apart they
+look at the end of what is drawn**, the two joined evenly in between; the user's correction of a first build whose one
+width moved both ends together, so a narrow corridor pulled the near rooms in from the edges instead of tapering. **The
+width is as it looks on screen, not as it stands in depth**: the second build set the far width in depth, the
+perspective shrank it again, `1` did not keep the walls at the edges and the walls met near `0.15`. Each item's wall
+position is now grown by the reverse of the perspective at its own depth, so `1` keeps the walls at the box's edges
+all the way down — where the rooms further back stand directly behind the nearest ones — and `0` brings them together. Every
+item's box is centered on the corridor's middle before it is moved, so the per-item perspective
+gives the whole corridor one vanishing point, the way the carousel's slides share theirs.
+
+**Too few items are repeated, and the copy nearest the viewer is the real one.** The user's call, over drawing each
+item once and over `Wraparound`'s moving original. The repeats are the carousel's (`followCopies`), but the ring is
+measured forwards: an item is behind the viewer only within one place of having passed, so the ring needs room for the
+reach plus one, not twice the reach. When the real copy passes behind, the next one along takes over, and anything
+focused in it loses focus as it leaves the view.
+
+**Focus brings an item into view by moving the corridor and writing `progress` back.** The user's call, over leaving
+items out of view unreachable: a scrolling box scrolls to what takes focus inside it, and so does this. A page driving
+it from a scroll position follows by scrolling to the progress written, as the Playground's scrolled example does. An
+item counts as in view from half the layout's `viewDistance` out to twice it; `walls` brings a focused item to the front
+of its wall, since anything further back stands partly behind the items in front of it.
+
+**It glides the copy that took focus, by its own distance, never the short way round.** The first build glided the
+item the short way, and going backwards brought another copy round from behind the viewer, which became the real one
+mid-glide and took focus away from the element holding it. Moving the focused copy by its own distance keeps it the
+nearest all the way.
+
+**Its own writes coming back do not stop the glide.** A page scrolling to each progress reads the scroll back a frame
+or two later, in whole pixels and moved by whatever else nudges the box, and the first build took the very first of
+those as someone else taking over and stopped on the first frame. `getIsEcho` counts anything within a hundredth of a
+lap of the last few writes as the corridor's own.
+
+### `InfiniteCorridor`'s tube: items lining a ring of sides, upright towards the centre
+
+From Framer's 3D SpatialGallery, a WebGL tunnel of pictures round its axis. Named `tube` by the user, since a tunnel can
+be square, lozenge-shaped or a half-circle. It is a third layout rather than a shape setting on the component: the walls
+were always a tube with two positions round it.
+
+**Each item lines the tube's side, facing the middle, with its top towards the far end.** The user's call, from a
+screenshot of the effect: on screen every item then stands upright towards the centre — upright below the middle, on
+its side to the right, upside down above. The placement grew a `rollDegrees`, round the corridor's axis, and a
+`tiltDegrees`, leaning back about the item's level line, both left out by `walls`; the transform moves,
+rolls, leans, then turns. The tube is a ring of flat sides, `12` by default, rather than a smooth circle, because every
+item is flat. **Its `farWidthRatio` is the size of the hole at the far end**, as it looks on screen, the user's call
+once the setting turned out to do nothing for the tube: the near ring stays at the box's edges and each ring's radius is
+grown by the reverse of the perspective at its depth, as the walls' width is, with each item widened to match so the
+ring stays closed. **Rings always touch**: each item runs from its own ring's edge to the next ring's, stretched to that
+length and leaned to follow the taper, the user's call after a narrow far end left dark bands between rings that each
+lay flat at one radius.
+
+**A steady spin is an angle the consumer turns, not a clock in the layout.** The user asked for a rotation speed
+independent of travelling down the tube, and picked it over the twist when the two seemed to compete; both remain,
+since the twist turns each ring by its depth and the spin turns the whole tube. `spinDegrees` is how far the whole tube
+is turned, and the Playground's Rotation speed turns it on a clock, the way the carousel's turning ring is driven from
+its example, so the component keeps no timer of its own and the pause WCAG 2.2.2 asks for stays the consumer's; the
+Playground starts it at `0`. The page shows each layout's own settings the way Formation does — a knob list per family,
+held per layout, every setting of the layout shown, the layout and its settings in a row of their own above the
+corridor's own settings — with Rotation speed added for the tube, since the spin is driven rather than set.
+
+**`minSkipCount` and `maxSkipCount` leave empty slots, and every slot keeps its size.** The user's definition, for the
+walls and the tube, first as one count and then split into a range drawn per item, the user's call, from the item's
+index and a seed, so a copy has its original's gap:
+the walls are a run of slots taking turns left and right, so a skip of `1` puts every item on the left wall and `2`
+alternates walls with gaps; the tube's slots run round each ring, so a skip of `2` leaves two empty sides after each item
+and the gaps carry on into the next ring. Both layouts work in slots — an item's slot is its place times one plus the
+skip — and convert their reach, view distance and behind distance back to items, using the narrowest gap for how far
+they reach and the middle one for where a focused item lands. With a range, an item's slot is the sum of the gaps
+before it, worked out once per item count and ring length, and a position between two items runs evenly across the
+first one's gap; so the layout is handed the real item count beside the ring. The tube's whole-ring rule became a
+function of that count — the list is repeated until items and gaps together fill whole rings — since the slots one lap
+takes depend on which items there are.
+
+**The walls' depth is `visibleCards`, counted in card lengths along one wall.** Asked for by the user as the walls'
+counterpart of the tube's rings drawn, once the item count turned out to change only how many different items repeat.
+It replaced a `visibleDistance` counted in slots across both walls, which took two slots to make one card length and
+read as half what it said; the layout converts it back to slots, empty ones included.
+
+**Rings, not one corkscrew.** The user's call, over items each a little further round and further down than the one
+before. A ring holds one item per side at fixed positions and a twist turns each ring further round as it comes towards
+the viewer; the cost is that the drawn items must fill whole rings, so the layout says `placeMultiple` and the corridor
+repeats the list until it divides — 16 items in rings of 12 are drawn 192 times at the defaults, which is the heaviest
+page this component makes. The layout also says `behindDistance` of a whole ring, so a ring passes the viewer whole
+instead of losing one item at a time to the far end.
+
+**The real copy is the nearest one ahead of the viewer, never one behind.** Written for the copies decision and
+first built including the item just passing by; with a whole ring allowed behind, that put most real items out of
+sight. A focused item is brought no further than one item count down the corridor, since its next copy towards the
+viewer would otherwise take over once it arrived.
+
+### `Exotics/PointerEffects`: four wrappers that restyle their content by where the pointer is
+
+`Tilter`, `ShadowCaster`, `LightCatcher` and `RGBSplitter` are one family and now sit in one folder, in the library and in
 the Playground's tree. Each wraps arbitrary content, reads the pointer against its own box, and changes one
-thing about how that content looks: it leans, it throws a shadow, or it brightens.
+thing about how that content looks: it leans, it throws a shadow, it brightens, or it splits into its channels.
 
 **The name was chosen over `Responders` and `Surfaces`, and its cost was known.** `Responders` reads better in
 the tree — a plural agent noun beside three agent nouns — but says nothing about the pointer, and most of the
@@ -14326,6 +14514,72 @@ silently ignored. The cost accepted is that lightness alone means also passing `
 toward white by `l`. It keeps the effect on the one `filter` property the family is defined by, needs no extra
 element over the content, and the chain is left off entirely while lightness is at `0`, so a consumer who
 never touches it pays for no inverts.
+
+### `RGBSplitter`: the channels pull apart by distance, in directions drawn at random
+
+Asked for by the user as a pointer effect that splits an element into its red, green and blue and shifts each by its
+own amount. The name was theirs, taken over `ChannelSplitter`, `Glitcher` and `Prism` as the most technically exact.
+
+**The pointer sets how far, never which way.** The user's call, over two options where the pointer's direction steered
+the split. When the split opens, each channel draws a random target anywhere inside a circle of radius `maxOffsetPx` —
+spread evenly over its area, so a diagonal goes no further than a straight shift — and keeps it while the split shows.
+The draw happens again the next time it opens, so no two approaches tear the content the same way.
+
+**"Opens" means the strength rises from nothing**, not the pointer crossing one named range. The strength is `0`
+outside `activeRangePx` (resting) and at or beyond `splitRangePx` (the ramp has run out), and the user's "when the pointer
+hits the threshold" is whichever of the two the pointer crosses on the way in. Keying the draw to the strength
+covers both without asking the consumer which one they meant. The targets are a memo over that yes-or-no, so they are
+redrawn only when it flips.
+
+**The strength is measured from the center, as `ShadowCaster`'s is and unlike `LightCatcher`'s.** Stated by the user:
+proximity to the center controls how wide the split is, so it is full only dead on the middle and keeps growing as
+the pointer crosses the content. `PointerEffectsUtils.computeCenterStrength` is that ramp, beside the edge one.
+
+**The eased value is the shift itself, not the strength**, so when the pointer comes back while the split is still
+closing, the channels glide from where they are onto the new targets instead of jumping to them.
+
+**It is an SVG filter, because CSS has none that separates channels.** The step lives in the filter builder as
+`addRGBSplitFilter`, so anything built with the builder can use it: each channel is kept through a color matrix, shifted
+with `feOffset`, and the three are blended back. `addColorChannelFilter` was the obvious thing to reuse and was not
+enough: it can keep one channel, but only by emptying the other two, which is half of what the mixing below needs. The
+builder's own two assembly modes could not do it — `chain` feeds one step into the next and
+`isolate` stacks results with `feMerge`, which only lays one copy over another — so the split is one step that takes
+one picture in and gives one out, with its intermediate results private, like the noise displacement.
+
+**The offsets are accessors, so the filter is built once and its `feOffset` attributes follow in place.** Rebuilding
+the filter on every pointer move would replace its elements every frame. Because the registry decides the region
+before any offset is known, `maxOffset` is passed separately as the furthest any channel will go, and the component
+rebuilds the filter only when `maxOffsetPx` changes. Without a known element size the region falls back to the
+builder's `-50% / 200%`.
+
+**`colorMixing` exists because a filter cannot see the ground behind it.** Where one copy has drifted away from the
+other two, the filter has to invent the missing channels. Screening copies that hold one channel on black invents
+zeros: red, green and blue fringes, right on a dark ground and dark smudges on a light one. Multiplying copies that
+hold one channel on white invents ones: cyan, magenta and yellow fringes, right on a light ground and pale glows on a
+dark one. Both come back to the original exactly where the copies overlap. Found by rendering the first build, which
+only screened, on a white page. The user named the values `"additive"` and `"subtractive"` over `"light"` /
+`"pigment"`, which reads as "for a light page", and over `"RGB"` / `"CMY"`, which would sit badly inside a component
+called `RGBSplitter`; the prop is `colorMixing` because it explains itself. The builder defaults to additive, since it
+has no element to look at.
+
+**Left out, the mixing follows `color-scheme`, as a smarter baseline than a fixed default.** The user's call, with the
+prop still there to override it: `dark` is additive, `light` subtractive, `light dark` follows the system setting
+through `prefers-color-scheme`, and `normal` — what a page that sets nothing has — is subtractive, because the browser
+then draws its default light colors. The system setting is read only where the page itself declared it follows it, so
+this does not cut across the reduced-motion entry's rule that the library leaves preferences to the consumer. The
+computed value is the declared one, not the resolved one, which is why `light dark` needs the media query at all
+([MDN](https://developer.mozilla.org/en-US/docs/Web/CSS/color-scheme)). It is read each time the split opens, through
+`PointerEffectsUtils.openSplit` alongside the random targets, because nothing announces a change to `color-scheme`, and
+a theme switched while the pointer was away is then picked up on the way back in. Its cost is a dark site that never
+declares `color-scheme` getting the light-ground look — the case the prop is for.
+
+**Its page shows a photo and a headline, and no row.** The user's call after trying both: random directions drawn per
+item make a row read as noise rather than as one effect, and a primary-colored card had no red in it to split off. The
+photo has all three channels.
+
+**With nothing shifted the filter is not written at all.** Blending three copies by their opacity draws a partly
+see-through pixel — the soft edge of a letter — somewhat more opaque than the original, even with every channel in
+place. Dropping the filter at zero keeps the resting content exactly as painted and costs nothing while it rests.
 
 ### `ShadowCaster`: a wrapper, and a filter rather than a box shadow
 
@@ -14705,6 +14959,17 @@ sitting later in the document at the same level.
 **A page's description lives on its tab config.** The title under which a page renders comes from `TAB_CONFIGS`
 in `App.tsx`, so the sentence under it does too — one place, one entry per page, and a page without a component
 keeps neither.
+
+### The shared list of Playground files is named from the Playground's own root
+
+`SourceView.const.ts` in `playground/` holds the one `import.meta.glob` over the framework-free half, which the Solid,
+React and Vue viewers merge with their own. **A glob names its files relative to the file the call is written in**,
+so once the call moved into the shared folder its names came out as `../../Pages/…`, while each viewer still cut a fixed
+`../../../../../playground/src/` off the front, as it had when the call sat in its own folder. Every shared file was
+then filed under a wrong name, and the source view lost the stylesheets an example imports. The shared file now resolves
+each name against its own folder and hands the list out as `/src/App/…`, the form the viewers' own globs use, so a
+viewer merges it as it is and nothing downstream depends on where the call is written. Svelte keeps a glob of its own,
+since it reads `.ts` only, and still cuts `CORE_GLOB_ROOT`.
 
 ### Turning a page's variants into examples, settled on the four `Exotics` pages
 

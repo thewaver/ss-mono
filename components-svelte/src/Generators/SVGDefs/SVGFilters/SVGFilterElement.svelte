@@ -177,6 +177,45 @@
                 color-interpolation-filters={SVGFilterDefs.COLOR_SPACE}
                 result={primitive.key}
             />
+        {:else if primitive.kind === "rgb_split"}
+            {@const keys = SVGFilterDefsUtils.resolveRGBSplit(primitive.key)}
+            {@const shifts = [primitive.defs.red, primitive.defs.green, primitive.defs.blue]}
+            {#each keys.channels as channel, index (index)}
+                {@const shift = shifts[index]()}
+                <feColorMatrix
+                    in={input.srcIn}
+                    type="matrix"
+                    values={SVGFilterDefsUtils.computeRGBSplitMatrix(index, primitive.defs.colorMixing?.())}
+                    color-interpolation-filters={SVGFilterDefs.COLOR_SPACE}
+                    result={channel.kept}
+                />
+
+                <feOffset
+                    in={channel.kept}
+                    dx={shift.x}
+                    dy={shift.y}
+                    color-interpolation-filters={SVGFilterDefs.COLOR_SPACE}
+                    result={channel.shifted}
+                />
+            {/each}
+
+            <feBlend
+                in={keys.channels[0].shifted}
+                in2={keys.channels[1].shifted}
+                mode={SVGFilterDefsUtils.getRGBSplitBlendMode(primitive.defs.colorMixing?.())}
+                color-interpolation-filters={SVGFilterDefs.COLOR_SPACE}
+                result={keys.redGreen}
+            />
+
+            <feBlend
+                in={keys.redGreen}
+                in2={keys.channels[2].shifted}
+                mode={SVGFilterDefsUtils.getRGBSplitBlendMode(primitive.defs.colorMixing?.())}
+                color-interpolation-filters={SVGFilterDefs.COLOR_SPACE}
+                result={primitive.key}
+            >
+                <Markup markup={primitive.custom} />
+            </feBlend>
         {:else if primitive.kind === "diffuse_lighting"}
             {@render lightSurface(primitive.defs.surface, `${primitive.key}_surface`)}
 

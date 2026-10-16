@@ -22,7 +22,7 @@
 
     type Props = Pick<CarouselExampleProps, "slides" | "index" | "isDisabled" | "orientation">;
 
-    const computeRingPlacement = CarouselPlacementUtils.createPaddleWheel({
+    const ringPlacement = CarouselPlacementUtils.createPaddleWheel({
         perspectivePx: CarouselKnobs.RING_PERSPECTIVE_PX,
     });
 
@@ -60,7 +60,7 @@
     <div class={styles.ringFrame}>
         <div class={styles.ringSlot}>
             <Carousel
-                computePlacement={computeRingPlacement}
+                placement={ringPlacement}
                 slides={props.slides}
                 bind:index
                 bind:progress

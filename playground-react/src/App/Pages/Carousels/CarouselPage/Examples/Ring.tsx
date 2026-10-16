@@ -14,7 +14,7 @@ import { PageCarouselSlide } from "../../../../StyledComponents/CarouselContent/
 import { PageControlButtonContent } from "../../../../StyledComponents/ControlButtonContent/ControlButtonContent";
 import type { CarouselExampleProps } from "../../Carousels.types";
 
-const computeRingPlacement = CarouselPlacementUtils.createPaddleWheel({
+const ringPlacement = CarouselPlacementUtils.createPaddleWheel({
     perspectivePx: CarouselKnobs.RING_PERSPECTIVE_PX,
 });
 
@@ -54,7 +54,7 @@ export const RingExample = (props: Props) => {
             <div className={styles.ringFrame}>
                 <div className={styles.ringSlot}>
                     <Carousel
-                        computePlacement={computeRingPlacement}
+                        placement={ringPlacement}
                         slides={props.slides}
                         index={props.index}
                         progress={[progress, setProgress]}

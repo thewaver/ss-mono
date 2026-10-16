@@ -54,7 +54,7 @@ export const LIBRARY: TreemapNode<string> = branch(
         branch("Accordions", leaf("Accordion", 438), leaf("Collapsible", 410)),
         leaf("Breadcrumbs", 216),
         branch("Buttons", leaf("Button", 199), leaf("SlideButton", 520)),
-        leaf("Carousel", 1166),
+        leaf("Carousel", 1284),
         leaf("EdgeFader", 296),
         leaf("Form", 163),
         branch(
@@ -129,13 +129,21 @@ export const LIBRARY: TreemapNode<string> = branch(
         branch("Diagrams", leaf("Bracket", 1339), leaf("PatchBoard", 1941), leaf("Timeline", 1830)),
         branch("Mosaics", leaf("ElementMosaic", 79), leaf("ImageMosaic", 212)),
         branch("Particles", leaf("ParticleField", 609), leaf("ParticleSpawner", 625)),
-        branch("Perspective", leaf("Cuboid", 1042), leaf("Die", 608), leaf("FlipCard", 279), leaf("Flipbook", 774)),
+        branch(
+            "Perspective",
+            leaf("Cuboid", 1042),
+            leaf("Die", 608),
+            leaf("FlipCard", 279),
+            leaf("Flipbook", 774),
+            leaf("InfiniteCorridor", 571),
+        ),
         branch(
             "PointerEffects",
             leaf("LightCatcher", 157),
+            leaf("RGBSplitter", 185),
             leaf("ShadowCaster", 166),
             leaf("Tilter", 204),
-            leaf("PointerEffects files", 236),
+            leaf("PointerEffects files", 342),
         ),
         branch("Reveals", leaf("Lens", 288), leaf("Reveal", 362), leaf("ScratchCard", 671)),
         leaf("Shape", 351),
@@ -158,12 +166,13 @@ export const LIBRARY: TreemapNode<string> = branch(
     ),
     branch(
         "Generators",
-        leaf("CarouselPlacements", 533),
+        leaf("CarouselPlacements", 659),
         leaf("CellAnimationBreakpoints", 141),
         leaf("CellAnimationKeyframes", 231),
         leaf("CellAnimationPlayback", 134),
         leaf("CellAnimationWeights", 616),
         leaf("CellAnimationZones", 129),
+        leaf("CorridorLayouts", 409),
         leaf("PlacementLayouts", 732),
         leaf("ProximityEffects", 232),
         branch(
@@ -171,7 +180,7 @@ export const LIBRARY: TreemapNode<string> = branch(
             leaf("PaintArea", 41),
             leaf("SVGAnimations", 279),
             leaf("SVGClipPaths", 17),
-            leaf("SVGFilters", 1047),
+            leaf("SVGFilters", 1219),
             leaf("SVGGradients", 348),
             leaf("SVGPatterns", 83),
             leaf("SVGDefs files", 25),
@@ -195,7 +204,7 @@ export const LIBRARY: TreemapNode<string> = branch(
     branch(
         "Samples",
         branch("Bracket", leaf("Connectors", 207)),
-        branch("Carousel", leaf("Placements", 18)),
+        branch("Carousel", leaf("Placements", 19)),
         branch(
             "CellAnimation",
             branch("Keyframes", leaf("Samples", 1286), leaf("Keyframes files", 378)),
@@ -203,6 +212,7 @@ export const LIBRARY: TreemapNode<string> = branch(
             branch("Weights", leaf("Samples", 917), leaf("Weights files", 252)),
         ),
         branch("Die", leaf("Shapes", 81)),
+        branch("InfiniteCorridor", leaf("Layouts", 12)),
         branch("PatchBoard", leaf("Snaps", 12)),
         branch("Placement", leaf("Layouts", 18)),
         branch("Proximity", leaf("Effects", 13)),
@@ -219,7 +229,7 @@ export const LIBRARY: TreemapNode<string> = branch(
         branch("Staircase", leaf("Indents", 49)),
     ),
     leaf("Utils", 116),
-    leaf("src files", 1208),
+    leaf("src files", 1225),
 );
 
 export const EXAMPLE_NAMES = {

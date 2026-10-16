@@ -1,4 +1,5 @@
 import type {
+    ConcertinaPlacementDefs,
     CoverFlowPlacementDefs,
     CylinderPlacementDefs,
     DepthWavePlacementDefs,
@@ -55,6 +56,13 @@ export namespace CarouselPlacementDefaults {
         visibleDistance: 4,
     };
 
+    export const CONCERTINA_DEFAULTS: Required<ConcertinaPlacementDefs> = {
+        angleDegrees: 75,
+        faceRatio: 0.55,
+        perspectivePx: 1200,
+        visibleDistance: 3,
+    };
+
     export const PADDLE_WHEEL_DEFAULTS: Required<PaddleWheelPlacementDefs> = {
         spanDegrees: 360,
         perspectivePx: 1000,
@@ -68,6 +76,7 @@ export namespace CarouselPlacementDefaults {
         cylinder: CYLINDER_DEFAULTS,
         folders: FOLDERS_DEFAULTS,
         hinge: HINGE_DEFAULTS,
+        concertina: CONCERTINA_DEFAULTS,
         paddle_wheel: PADDLE_WHEEL_DEFAULTS,
     };
 }

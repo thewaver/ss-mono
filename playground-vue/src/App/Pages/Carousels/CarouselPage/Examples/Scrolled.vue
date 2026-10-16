@@ -30,7 +30,7 @@ const progress = ElementObserverVueUtils.useScrollContainerProgress(runwayRef, b
         <div :class="styles.scrollPinned">
             <Carousel
                 v-model:index="index"
-                :compute-placement="computePlacement"
+                :placement="placement"
                 :slides="slides"
                 :progress="progress"
                 :is-looping="false"

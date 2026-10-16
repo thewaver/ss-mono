@@ -16,8 +16,8 @@ export const useCarouselsControls = (): CarouselsControls => {
     const isLooping = shallowRef(CAROUSEL_DEFAULTS.isLooping);
     const placement = shallowRef<CarouselPlacements.SampleKey>(CarouselKnobs.STARTING_PLACEMENT);
 
-    const computePlacement = computed(() =>
-        CarouselPlacementUtils.toPlacementFn(CarouselPlacements.SAMPLE_PLACEMENTS[placement.value]),
+    const placementRule = computed(() =>
+        CarouselPlacementUtils.toPlacementRule(CarouselPlacements.SAMPLE_PLACEMENTS[placement.value]),
     );
 
     const slides = computed(() => TITLES.slice(0, slideCount.value));
@@ -27,7 +27,7 @@ export const useCarouselsControls = (): CarouselsControls => {
         isDisabled: isDisabled.value,
         orientation: orientation.value,
         frameClasses: styles.slideFrames[PLACEMENT_FRAMES[placement.value] ?? "whole"][orientation.value],
-        computePlacement: computePlacement.value,
+        placement: placementRule.value,
     }));
 
     return {

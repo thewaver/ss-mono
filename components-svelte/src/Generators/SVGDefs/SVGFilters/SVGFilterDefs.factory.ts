@@ -17,7 +17,7 @@ import {
 
 import { markup } from "../../../Utils/markupUtils.js";
 import type { SvelteMarkup } from "../../../Utils/typeUtils.js";
-import type { SVGFilterPrimitive } from "./SVGFilterDefsSvelte.types.js";
+import type { SVGFilterPrimitive, SVGRGBSplitFilterSvelteDefs } from "./SVGFilterDefsSvelte.types.js";
 import SVGFilterElement from "./SVGFilterElement.svelte";
 
 /**
@@ -253,6 +253,35 @@ export class SVGFilterDefsFactory {
                 custom,
             };
         }
+
+        return this;
+    };
+
+    /**
+     * Pulls the graphic apart into its red, green and blue, each shifted by its own offset.
+     *
+     * Where the three still overlap the original colors come back exactly, and where they have drifted apart each
+     * edge grows colored fringes. Additive mixing, the default, draws them in red, green and blue, as light reads on
+     * a dark ground; subtractive mixing draws them in cyan, magenta and yellow, as ink reads on a light one. Opaque
+     * content comes back unchanged with nothing shifted; content that is partly see-through comes back somewhat more
+     * opaque. The offsets and the mixing are getters, which the rendered filter follows in place, so `maxOffset` is
+     * what the region is grown by: the furthest any offset will go on either axis. Left out, the region fits the
+     * offsets as first given. Skipped when nothing is shifted and no `maxOffset` is given.
+     *
+     * @param defs The shift for each channel in user units, how the three are put back together, and how far any of
+     * them may go.
+     * @param custom Content placed inside the final blend, for animating it.
+     * @returns The factory, for the next call.
+     */
+    public addRGBSplitFilter = (defs: SVGRGBSplitFilterSvelteDefs, custom?: SvelteMarkup) => {
+        const key = this.registry.addRGBSplit({
+            red: defs.red(),
+            green: defs.green(),
+            blue: defs.blue(),
+            maxOffset: defs.maxOffset,
+        });
+
+        if (key !== undefined) this.primitives[key] = { kind: "rgb_split", key, defs, custom };
 
         return this;
     };

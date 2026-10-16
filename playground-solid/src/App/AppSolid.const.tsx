@@ -54,6 +54,10 @@ const EdgeFaderPage = lazyPage(() => import("./Pages/EdgeFaderPage/EdgeFaderPage
 const FileInputPage = lazyPage(() => import("./Pages/FileInputPage/FileInputPage"), "FileInputPage");
 const FlipCardPage = lazyPage(() => import("./Pages/FlipCardPage/FlipCardPage"), "FlipCardPage");
 const FlipbookPage = lazyPage(() => import("./Pages/FlipbookPage/FlipbookPage"), "FlipbookPage");
+const InfiniteCorridorPage = lazyPage(
+    () => import("./Pages/InfiniteCorridorPage/InfiniteCorridorPage"),
+    "InfiniteCorridorPage",
+);
 const FormFieldPage = lazyPage(() => import("./Pages/FormFieldPage/FormFieldPage"), "FormFieldPage");
 const FormPage = lazyPage(() => import("./Pages/FormPage/FormPage"), "FormPage");
 const FormSectionPage = lazyPage(() => import("./Pages/FormSectionPage/FormSectionPage"), "FormSectionPage");
@@ -91,6 +95,10 @@ const PatchBoardPage = lazyPage(() => import("./Pages/PatchBoardPage/PatchBoardP
 const LightCatcherPage = lazyPage(
     () => import("./Pages/PointerEffects/LightCatcherPage/LightCatcherPage"),
     "LightCatcherPage",
+);
+const RGBSplitterPage = lazyPage(
+    () => import("./Pages/PointerEffects/RGBSplitterPage/RGBSplitterPage"),
+    "RGBSplitterPage",
 );
 const ShadowCasterPage = lazyPage(
     () => import("./Pages/PointerEffects/ShadowCasterPage/ShadowCasterPage"),
@@ -726,6 +734,10 @@ export const MENU_CONFIGS: MenuBranchConfig[] = [
                         name: "Flipbook",
                         component: () => <FlipbookPage />,
                     },
+                    {
+                        name: "InfiniteCorridor",
+                        component: () => <InfiniteCorridorPage />,
+                    },
                 ],
             },
             {
@@ -734,6 +746,10 @@ export const MENU_CONFIGS: MenuBranchConfig[] = [
                     {
                         name: "LightCatcher",
                         component: () => <LightCatcherPage />,
+                    },
+                    {
+                        name: "RGBSplitter",
+                        component: () => <RGBSplitterPage />,
                     },
                     {
                         name: "ShadowCaster",

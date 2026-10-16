@@ -12,7 +12,7 @@ export const themeLoading = ({ light, dark, contrast }: ThemeBackground): Plugin
         {
             tag: "style",
             injectTo: "head",
-            children: `#root:empty { position: fixed; inset: 0; display: flex; align-items: center; justify-content: center; font-family: system-ui, sans-serif; font-size: 20px; color: ${contrast}; background-image: ${toBackdropGradient(light, dark)}; } #root:empty::before { content: "${LOADING_TEXT}"; }`,
+            children: `#root:empty { position: fixed; inset: 0; display: flex; align-items: center; justify-content: center; font-family: system-ui, sans-serif; font-size: 20px; color: ${contrast}; background-image: ${toBackdropGradient(dark, light)}; } #root:empty::before { content: "${LOADING_TEXT}"; }`,
         },
     ],
 });

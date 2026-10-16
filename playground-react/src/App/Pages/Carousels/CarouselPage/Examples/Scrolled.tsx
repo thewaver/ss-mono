@@ -25,7 +25,7 @@ export const ScrolledExample = (props: Props) => {
         <div ref={boxRef} id={"carouselScrollBox"} className={styles.scrollBox}>
             <div className={styles.scrollPinned}>
                 <Carousel
-                    computePlacement={props.computePlacement}
+                    placement={props.placement}
                     slides={props.slides}
                     index={props.index}
                     progress={[progress, IGNORE]}

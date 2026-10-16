@@ -1,6 +1,7 @@
 import { Color, MathUtils, type Point2d, Point2dUtils } from "@thewaver/ss-utils";
 
 import type { PointerReading } from "../../Abstracts/PointerTracker/PointerTracker.types";
+import type { SVGColorMixing } from "../../Generators/SVGDefs/SVGFilters/SVGFilterDefs.types";
 import { LIGHT_CATCHER_DEFAULTS } from "./LightCatcher/LightCatcher.const";
 import { SHADOW_CASTER_DEFAULTS } from "./ShadowCaster/ShadowCaster.const";
 import type { TilterState } from "./Tilter/Tilter.types";
@@ -15,10 +16,15 @@ const FULL_SWING = 2;
 const PERCENT = 100;
 const SHEEN_OVERTRAVEL = 1.6;
 const FALLBACK_COLOR: Color.HSVA = { h: 0, s: 0, v: 0, a: 1 };
+const FULL_TURN_DEGREES = 360;
+const RGB_CHANNEL_COUNT = 3;
+const AXES_PER_SHIFT = 2;
+const NO_SHIFT = 0;
+const DARK_SCHEME_QUERY = "(prefers-color-scheme: dark)";
 
 /**
- * The arithmetic behind the three pointer effects — `LightCatcher`, `ShadowCaster` and `Tilter` — which each turn a
- * pointer reading into a CSS value on a wrapper.
+ * The arithmetic behind the four pointer effects — `LightCatcher`, `RGBSplitter`, `ShadowCaster` and `Tilter` — which
+ * each turn a pointer reading into a CSS value on a wrapper.
  *
  * They share the rule for when an effect rests and the falloff that makes it fade as the pointer walks away; the
  * rest is each effect's own sum. Every function takes the reading as `PointerTrackerUtils.observe` reports it, so a
@@ -61,6 +67,20 @@ export namespace PointerEffectsUtils {
 
         return MathUtils.clamp01((rangePx - distance) / (rangePx - edgeDistance));
     };
+
+    /**
+     * How strongly an effect answers the pointer, fading from the element's center out to a range.
+     *
+     * Unlike {@link computeEdgeStrength} it keeps growing on the element, so the effect is only at full strength with
+     * the pointer dead on the center.
+     *
+     * @param reading Where the pointer is relative to the element.
+     * @param rangePx How far from the center the effect reaches.
+     * @returns `1` at the center, falling evenly to `0` at the range and beyond. A range of `0` or less gives `0`
+     * everywhere.
+     */
+    export const computeCenterStrength = (reading: PointerReading, rangePx: number) =>
+        rangePx <= 0 ? NO_STRENGTH : MathUtils.clamp01(FULL_STRENGTH - reading.distance / rangePx);
 
     /**
      * The CSS filter `LightCatcher` writes for a given strength of light.
@@ -225,6 +245,92 @@ export namespace PointerEffectsUtils {
             isResting,
         };
     };
+
+    /**
+     * Where `RGBSplitter`'s red, green and blue each head when the split opens, as fractions of the furthest shift.
+     *
+     * Each is drawn at random from anywhere inside a circle of radius `1`, spread evenly over its area, so a diagonal
+     * shift can go no further than a straight one and the three seldom land close together.
+     *
+     * @param random A source of numbers from `0` up to `1`. Left out, `Math.random`.
+     * @returns Red, green and blue, in that order.
+     */
+    export const pickSplitTargets = (random: () => number = Math.random): Point2d[] =>
+        Array.from({ length: RGB_CHANNEL_COUNT }, () =>
+            Point2dUtils.polarToCartesian(Math.sqrt(random()), random() * FULL_TURN_DEGREES),
+        );
+
+    /**
+     * How `RGBSplitter` should mix its channels for a `color-scheme` value, when the consumer has not said.
+     *
+     * Additive fringes read on a dark ground and subtractive ones on a light ground, and `color-scheme` is where a page
+     * says which it is. `dark` alone is additive and `light` alone subtractive. Both together mean the page follows the
+     * system setting, so that decides. Neither — `normal`, the value a page that sets nothing has — is subtractive,
+     * since the browser then draws its default light colors. `only` and any other word are ignored.
+     *
+     * @param colorScheme A computed `color-scheme` value.
+     * @param isSystemDark Whether the system asks for dark colors.
+     */
+    export const resolveColorMixing = (colorScheme: string, isSystemDark: boolean): SVGColorMixing => {
+        const words = colorScheme.split(/\s+/);
+        const isDark = words.includes("dark");
+        const isLight = words.includes("light");
+
+        if (isDark && isLight) return isSystemDark ? "additive" : "subtractive";
+
+        return isDark ? "additive" : "subtractive";
+    };
+
+    /**
+     * Where `RGBSplitter`'s channels head and how they mix, settled each time the split opens.
+     *
+     * The mixing is read from the element's computed `color-scheme` through {@link resolveColorMixing} at that moment
+     * rather than once, since nothing announces a change to it, so a theme switched while the pointer was away is
+     * picked up on the way back in.
+     *
+     * @param element The element whose `color-scheme` is read. Left out, the mixing is subtractive.
+     * @param random A source of numbers from `0` up to `1`, for {@link pickSplitTargets}. Left out, `Math.random`.
+     * @returns The targets from {@link pickSplitTargets}, and the mixing to use when the consumer has not chosen one.
+     */
+    export const openSplit = (element: HTMLElement | undefined, random: () => number = Math.random) => ({
+        targets: pickSplitTargets(random),
+        colorMixing: element
+            ? resolveColorMixing(getComputedStyle(element).colorScheme, matchMedia(DARK_SCHEME_QUERY).matches)
+            : resolveColorMixing("", false),
+    });
+
+    /**
+     * How far `RGBSplitter`'s channels should be shifted, before easing.
+     *
+     * @param targets Where each channel heads, from {@link pickSplitTargets}.
+     * @param strength How strongly the content answers, from {@link computeCenterStrength}, or `0` at rest.
+     * @param maxOffsetPx The furthest any channel is shifted, at full strength.
+     * @returns `[redX, redY, greenX, greenY, blueX, blueY]` in pixels, as the list a smoother follows.
+     */
+    export const computeSplitTargets = (targets: Point2d[], strength: number, maxOffsetPx: number): number[] =>
+        targets.flatMap((target) => [target.x * strength * maxOffsetPx, target.y * strength * maxOffsetPx]);
+
+    /**
+     * One channel's shift, read out of the eased list.
+     *
+     * @param split The shifts, as {@link computeSplitTargets} returns them and after easing.
+     * @param index `0` for red, `1` for green, `2` for blue.
+     * @returns The shift in pixels.
+     */
+    export const getSplitShift = (split: number[], index: number): Point2d => ({
+        x: split[index * AXES_PER_SHIFT] ?? NO_SHIFT,
+        y: split[index * AXES_PER_SHIFT + 1] ?? NO_SHIFT,
+    });
+
+    /**
+     * Whether any channel is shifted at all, so the filter is worth writing.
+     *
+     * Leaving the filter off with nothing shifted keeps the resting content exactly as painted, since the split
+     * draws see-through pixels somewhat more opaque even with every channel in place.
+     *
+     * @param split The shifts, as {@link computeSplitTargets} returns them and after easing.
+     */
+    export const getIsSplit = (split: number[]) => split.some((value) => value !== NO_SHIFT);
 
     /**
      * The transform `Tilter` writes on its surface.

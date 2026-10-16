@@ -1,5 +1,4 @@
 import {
-    CORE_GLOB_ROOT,
     CORE_MODULES,
     CORE_PACKAGE,
     FILE_KIND_ORDER,
@@ -21,9 +20,7 @@ const APP_MODULES = import.meta.glob<string>("/src/**/*.{ts,tsx}", {
 });
 
 const SOURCE_MODULES: Record<string, () => Promise<string>> = {
-    ...Object.fromEntries(
-        Object.entries(CORE_MODULES).map(([path, load]) => [`/src/${path.slice(CORE_GLOB_ROOT.length)}`, load]),
-    ),
+    ...CORE_MODULES,
     ...APP_MODULES,
 };
 

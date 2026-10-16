@@ -2,14 +2,15 @@ import type { CarouselPlacementEntry } from "../../../Generators/CarouselPlaceme
 
 export namespace CarouselPlacements {
     export const SAMPLE_PLACEMENTS = {
-        track: { family: "track" },
-        drum: { family: "drum" },
+        concertina: { family: "concertina" },
         cover_flow: { family: "cover_flow" },
-        depth_wave: { family: "depth_wave" },
         cylinder: { family: "cylinder" },
+        depth_wave: { family: "depth_wave" },
+        drum: { family: "drum" },
         folders: { family: "folders" },
         hinge: { family: "hinge" },
         paddle_wheel: { family: "paddle_wheel" },
+        track: { family: "track" },
     } satisfies Record<string, CarouselPlacementEntry>;
 
     export type SampleKey = keyof typeof SAMPLE_PLACEMENTS;

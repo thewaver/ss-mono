@@ -69,6 +69,7 @@ export const PageNumberField = (props: PageNumberFieldProps) => {
     useFieldReset(
         () => access(props.value),
         (value) => props.onInput(value),
+        () => access(props.resetValue),
     );
 
     const valueSignal = SignalMirrorSolidUtils.createValueMirror<number | undefined>(
@@ -210,6 +211,7 @@ export const PageCheckField = (props: PageCheckFieldProps) => {
     useFieldReset(
         () => access(props.value),
         (value) => props.onChange(value),
+        () => access(props.resetValue),
     );
 
     return (

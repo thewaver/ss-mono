@@ -17,6 +17,7 @@
         {#if knob.kind === "number"}
             <PageNumberField
                 value={Number(getValue(key))}
+                resetValue={Number(props.defaults[key])}
                 min={knob.min}
                 max={knob.max}
                 step={knob.step}
@@ -27,6 +28,7 @@
         {:else}
             <PageCheckField
                 value={Boolean(getValue(key))}
+                resetValue={Boolean(props.defaults[key])}
                 ariaLabel={knob.label}
                 onChange={(value) => props.onInput(key, value)}
             />

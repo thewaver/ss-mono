@@ -45,6 +45,7 @@ const EdgeFaderPage = () => import("./Pages/EdgeFaderPage/EdgeFaderPage.vue");
 const FileInputPage = () => import("./Pages/FileInputPage/FileInputPage.vue");
 const FlipCardPage = () => import("./Pages/FlipCardPage/FlipCardPage.vue");
 const FlipbookPage = () => import("./Pages/FlipbookPage/FlipbookPage.vue");
+const InfiniteCorridorPage = () => import("./Pages/InfiniteCorridorPage/InfiniteCorridorPage.vue");
 const FormFieldPage = () => import("./Pages/FormFieldPage/FormFieldPage.vue");
 const FormPage = () => import("./Pages/FormPage/FormPage.vue");
 const FormSectionPage = () => import("./Pages/FormSectionPage/FormSectionPage.vue");
@@ -74,6 +75,7 @@ const ParticleFieldPage = () => import("./Pages/ParticleFieldPage/ParticleFieldP
 const ParticleSpawnerPage = () => import("./Pages/ParticleSpawnerPage/ParticleSpawnerPage.vue");
 const PatchBoardPage = () => import("./Pages/PatchBoardPage/PatchBoardPage.vue");
 const LightCatcherPage = () => import("./Pages/PointerEffects/LightCatcherPage/LightCatcherPage.vue");
+const RGBSplitterPage = () => import("./Pages/PointerEffects/RGBSplitterPage/RGBSplitterPage.vue");
 const ShadowCasterPage = () => import("./Pages/PointerEffects/ShadowCasterPage/ShadowCasterPage.vue");
 const TilterPage = () => import("./Pages/PointerEffects/TilterPage/TilterPage.vue");
 const PreviewPage = () => import("./Pages/PreviewPage/PreviewPage.vue");
@@ -669,6 +671,10 @@ export const MENU_CONFIGS: MenuBranchConfig[] = [
                         name: "Flipbook",
                         component: FlipbookPage,
                     },
+                    {
+                        name: "InfiniteCorridor",
+                        component: InfiniteCorridorPage,
+                    },
                 ],
             },
             {
@@ -677,6 +683,10 @@ export const MENU_CONFIGS: MenuBranchConfig[] = [
                     {
                         name: "LightCatcher",
                         component: LightCatcherPage,
+                    },
+                    {
+                        name: "RGBSplitter",
+                        component: RGBSplitterPage,
                     },
                     {
                         name: "ShadowCaster",

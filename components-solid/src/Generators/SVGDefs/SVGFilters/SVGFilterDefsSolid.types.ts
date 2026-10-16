@@ -4,6 +4,7 @@ import type {
     SVGDistantLightDefs,
     SVGLightSurfaceDefs,
     SVGPointLightDefs,
+    SVGRGBSplitFilterDefs,
     SVGSpecularLightingFilterDefs,
 } from "@thewaver/ss-components";
 
@@ -28,3 +29,6 @@ export type SVGSpecularLightingFilterSolidDefs = SVGBaseLightingFilterSolidDefs 
 
 export type SVGDiffuseLightingFilterSolidDefs = SVGBaseLightingFilterSolidDefs &
     AccessorProps<Omit<SVGDiffuseLightingFilterDefs, keyof SVGBaseLightingFilterDefs>>;
+
+export type SVGRGBSplitFilterSolidDefs = AccessorProps<Omit<SVGRGBSplitFilterDefs, "maxOffset">> &
+    Pick<SVGRGBSplitFilterDefs, "maxOffset">;

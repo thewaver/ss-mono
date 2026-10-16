@@ -22,7 +22,7 @@
 </script>
 
 <Carousel
-    computePlacement={props.computePlacement}
+    placement={props.placement}
     slides={props.slides}
     bind:index
     isDisabled={props.isDisabled}

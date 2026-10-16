@@ -191,3 +191,80 @@ describe("pixelate", () => {
         expect(new Set(Object.values(resolved.keys)).size).toBe(Object.keys(resolved.keys).length);
     });
 });
+
+describe("RGB split", () => {
+    const rows = (matrix: string) => matrix.split(" ").map(Number);
+    const still = { x: 0, y: 0 };
+
+    it("is left out when nothing is shifted and no reach is given, and kept when either is", () => {
+        const registry = SVGFilterDefsUtils.createRegistry("f");
+
+        expect(registry.addRGBSplit({ red: still, green: still, blue: still })).toBeUndefined();
+        expect(registry.addRGBSplit({ red: still, green: still, blue: still, maxOffset: 0 })).toBeUndefined();
+        expect(registry.addRGBSplit({ red: { x: 1, y: 0 }, green: still, blue: still })).toBe("f_rgb_split_0");
+        expect(registry.addRGBSplit({ red: still, green: still, blue: still, maxOffset: 10 })).toBe("f_rgb_split_1");
+    });
+
+    it("grows the region by the given reach, or by the longest shift on either axis without one", () => {
+        const given = SVGFilterDefsUtils.createRegistry("f");
+
+        given.addRGBSplit({ red: { x: 1, y: 0 }, green: still, blue: still, maxOffset: 10 });
+
+        const fitted = SVGFilterDefsUtils.createRegistry("g");
+
+        fitted.addRGBSplit({ red: { x: 1, y: 0 }, green: { x: 0, y: -4 }, blue: still });
+
+        const size = { width: 100, height: 50 };
+
+        expect(given.computeAssembly({ elementSize: size })?.region).toEqual({
+            filterUnits: "userSpaceOnUse",
+            x: "-10px",
+            y: "-10px",
+            width: "120px",
+            height: "70px",
+        });
+        expect(fitted.computeAssembly({ elementSize: size })?.region).toEqual({
+            filterUnits: "userSpaceOnUse",
+            x: "-4px",
+            y: "-4px",
+            width: "108px",
+            height: "58px",
+        });
+    });
+
+    it("names six private results and the blend of two, none of them repeated", () => {
+        const keys = SVGFilterDefsUtils.resolveRGBSplit("f_rgb_split_0");
+        const names = [...keys.channels.flatMap((channel) => [channel.kept, channel.shifted]), keys.redGreen];
+
+        expect(keys.channels).toHaveLength(3);
+        expect(new Set(names).size).toBe(7);
+        names.forEach((name) => expect(name.startsWith("f_rgb_split_0")).toBe(true));
+    });
+
+    it("keeps one channel in additive mixing by emptying the other two, opacity untouched", () => {
+        expect(rows(SVGFilterDefsUtils.computeRGBSplitMatrix(0, "additive"))).toEqual([
+            1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0,
+        ]);
+        expect(rows(SVGFilterDefsUtils.computeRGBSplitMatrix(2, "additive"))).toEqual([
+            0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 1, 0,
+        ]);
+    });
+
+    it("keeps one channel in subtractive mixing by filling the other two with full intensity", () => {
+        expect(rows(SVGFilterDefsUtils.computeRGBSplitMatrix(1, "subtractive"))).toEqual([
+            0, 0, 0, 0, 1, 0, 1, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 1, 0,
+        ]);
+    });
+
+    it("mixes additively when no mixing is given", () => {
+        expect(SVGFilterDefsUtils.computeRGBSplitMatrix(0, undefined)).toBe(
+            SVGFilterDefsUtils.computeRGBSplitMatrix(0, "additive"),
+        );
+        expect(SVGFilterDefsUtils.getRGBSplitBlendMode(undefined)).toBe("screen");
+    });
+
+    it("screens additive copies back together and multiplies subtractive ones", () => {
+        expect(SVGFilterDefsUtils.getRGBSplitBlendMode("additive")).toBe("screen");
+        expect(SVGFilterDefsUtils.getRGBSplitBlendMode("subtractive")).toBe("multiply");
+    });
+});

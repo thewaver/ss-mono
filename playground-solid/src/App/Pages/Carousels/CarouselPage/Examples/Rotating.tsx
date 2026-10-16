@@ -31,7 +31,7 @@ const renderBar = (controls: CarouselControls) => (
 export const RotatingExample = (props: Props) => {
     return (
         <Carousel
-            computePlacement={props.computePlacement}
+            placement={props.placement}
             slides={props.slides}
             index={props.index}
             playback={props.playback}

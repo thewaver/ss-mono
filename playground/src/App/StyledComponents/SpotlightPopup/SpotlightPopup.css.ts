@@ -8,7 +8,7 @@ export const spotlightPopup = style({
     gap: themeVars.spacing.full,
     width: 280,
     color: themeVars.color.surface.contrast,
-    backgroundImage: `linear-gradient(45deg, ${themeVars.color.surface.dark}, ${themeVars.color.surface.light})`,
+    backgroundColor: themeVars.color.surface.dark,
     borderRadius: themeVars.borderRadius.full,
     padding: themeVars.spacing.double,
     boxShadow: themeVars.shadow.large,

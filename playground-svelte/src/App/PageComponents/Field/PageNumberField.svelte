@@ -18,6 +18,7 @@
     useFieldReset(
         () => props.value,
         (value) => props.onInput(value),
+        () => props.resetValue,
     );
 
     const [getValue, setValue] = SignalMirrorSvelteUtils.createValueMirror<number | undefined>(

@@ -29,7 +29,7 @@ const renderBar = (controls: CarouselControls) => (
 export const SteppedExample = (props: Props) => {
     return (
         <Carousel
-            computePlacement={props.computePlacement}
+            placement={props.placement}
             slides={props.slides}
             index={props.index}
             isDisabled={props.isDisabled}

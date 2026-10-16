@@ -10,7 +10,7 @@
 
     import type { CarouselExampleProps } from "../../Carousels.types";
 
-    const computeWordDrumPlacement = CarouselPlacementUtils.createDrum({
+    const wordDrumPlacement = CarouselPlacementUtils.createDrum({
         faceCount: CarouselKnobs.WORD_DRUM_FACE_COUNT,
         faceRatio: CarouselKnobs.WORD_DRUM_FACE_RATIO,
         perspectivePx: CarouselKnobs.WORD_DRUM_PERSPECTIVE_PX,
@@ -33,7 +33,7 @@
     <div class={styles.scrollPinned}>
         <div class={styles.wordDrumSlot}>
             <Carousel
-                computePlacement={computeWordDrumPlacement}
+                placement={wordDrumPlacement}
                 slides={CarouselKnobs.WORD_DRUM_WORDS}
                 bind:index
                 progress={getProgress()}

@@ -18,7 +18,7 @@ export const FieldResetProvider = FieldResetContext.Provider;
 
 export const FieldDefaultProvider = FieldDefaultContext.Provider;
 
-export const useFieldReset = <T>(getValue: () => T, apply: (value: T) => void) => {
+export const useFieldReset = <T>(getValue: () => T, apply: (value: T) => void, getResetValue?: () => T | undefined) => {
     const registry = useContext(FieldResetContext);
     const defaults = useContext(FieldDefaultContext);
 
@@ -29,6 +29,6 @@ export const useFieldReset = <T>(getValue: () => T, apply: (value: T) => void) =
 
         if (registry === undefined) return;
 
-        onCleanup(registry.register(() => apply(initial)));
+        onCleanup(registry.register(() => apply(untrack(() => getResetValue?.()) ?? initial)));
     });
 };

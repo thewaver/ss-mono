@@ -27,7 +27,7 @@
 <div bind:this={boxRef} id={"carouselScrollBox"} class={styles.scrollBox}>
     <div class={styles.scrollPinned}>
         <Carousel
-            computePlacement={props.computePlacement}
+            placement={props.placement}
             slides={props.slides}
             bind:index
             progress={getProgress()}

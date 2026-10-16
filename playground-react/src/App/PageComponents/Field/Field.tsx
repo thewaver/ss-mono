@@ -65,7 +65,7 @@ const renderFieldPopup = (
 );
 
 export const PageNumberField = (props: PageNumberFieldProps) => {
-    useFieldReset(props.value, (value) => props.onInput(value));
+    useFieldReset(props.value, (value) => props.onInput(value), props.resetValue);
 
     const valueState = SignalMirrorReactUtils.useValueMirror<number | undefined>(props.value, (value) => {
         if (value === undefined) return;
@@ -191,7 +191,7 @@ export const PageGroupedSelectField = <T,>(props: PageGroupedSelectFieldProps<T>
 };
 
 export const PageCheckField = (props: PageCheckFieldProps) => {
-    useFieldReset(props.value, (value) => props.onChange(value));
+    useFieldReset(props.value, (value) => props.onChange(value), props.resetValue);
 
     return (
         <Toggle

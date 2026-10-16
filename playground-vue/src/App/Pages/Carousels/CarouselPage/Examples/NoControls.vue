@@ -22,7 +22,7 @@ const index = useModel(props, "index");
 <template>
     <Carousel
         v-model:index="index"
-        :compute-placement="computePlacement"
+        :placement="placement"
         :slides="slides"
         :is-disabled="isDisabled"
         :orientation="orientation"

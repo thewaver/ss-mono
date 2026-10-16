@@ -4,6 +4,7 @@ import { SVG_FILTER_DEFAULTS } from "./SVGFilterDefs.const";
 import type {
     SVGBrightnessFilterDefs,
     SVGColorFilterDefs,
+    SVGColorMixing,
     SVGContrastFilterDefs,
     SVGDropShadowFilterDefs,
     SVGFilterAssembly,
@@ -15,6 +16,7 @@ import type {
     SVGHueRotationFilterDefs,
     SVGInversionFilterDefs,
     SVGPixelateFilterDefs,
+    SVGRGBSplitFilterDefs,
     SVGSaturationFilterDefs,
     SVGTurbulenceFilterDefs,
 } from "./SVGFilterDefs.types";
@@ -29,6 +31,14 @@ const FALLBACK_FILTER_REGION: SVGFilterRegion = {
 const SOURCE_GRAPHIC = "SourceGraphic";
 const EDGE_FADE_BLUR_RATIO = 0.5;
 const BLUR_REACH_SIGMAS = 3;
+const RGB_CHANNEL_COUNT = 3;
+const MATRIX_ROW_LENGTH = 5;
+const ALPHA_ROW = "0 0 0 1 0";
+const RGB_SPLIT_FILLS: Record<SVGColorMixing, number> = { additive: 0, subtractive: 1 };
+const RGB_SPLIT_BLEND_MODES: Record<SVGColorMixing, "screen" | "multiply"> = {
+    additive: "screen",
+    subtractive: "multiply",
+};
 
 /** A color matrix scaling red, green and blue by their own factors and adding a constant to each. */
 const computeChannelMatrix = (r: number, g: number, b: number, intercept: number) =>
@@ -48,11 +58,11 @@ export namespace SVGFilterDefsUtils {
      * it would not, so a caller can pass settings straight through from a control without checking them first:
      * a drop shadow with neither blur nor offset, a blur whose deviation is `0` or less, a displacement whose scale
      * is `0`, a hue turn of `0`, a saturation, brightness or contrast of `1`, an inversion of `0`, channel
-     * multipliers that are all `1`, and a specular constant of `0` or less (it defaults to `1`). Diffuse lighting is
-     * always kept. A kept effect is given a result name built from the filter's id and counted per kind, so two
+     * multipliers that are all `1`, an RGB split with nothing shifted and no `maxOffset` to shift by, and a specular
+     * constant of `0` or less (it defaults to `1`). Diffuse lighting is always kept. A kept effect is given a result name built from the filter's id and counted per kind, so two
      * filters on one page never read each other's results, and its reach past the element's box is remembered for
-     * the region: three deviations for a blur, plus the longer offset for a shadow, and half the scale either way
-     * for a displacement. A pixelation of one pixel or less changes nothing and is not kept.
+     * the region: three deviations for a blur, plus the longer offset for a shadow, half the scale either way for a
+     * displacement, and for an RGB split its `maxOffset`, or the longest shift on either axis when that is left out. A pixelation of one pixel or less changes nothing and is not kept.
      *
      * `computeAssembly` says how the kept effects are put together. The method decides what each effect is
      * applied to. `"isolate"`, the default, applies every effect to the original graphic and lays all the results
@@ -110,6 +120,17 @@ export namespace SVGFilterDefsUtils {
             addInversion: (defs: SVGInversionFilterDefs) => (defs.amount === 0 ? undefined : add("inversion")),
             addColorChannel: (defs: SVGColorFilterDefs) =>
                 defs.r === 1 && defs.g === 1 && defs.b === 1 ? undefined : add("color"),
+            addRGBSplit: (defs: SVGRGBSplitFilterDefs) => {
+                const reach =
+                    defs.maxOffset ??
+                    Math.max(
+                        ...[defs.red, defs.green, defs.blue].map((shift) =>
+                            Math.max(Math.abs(shift.x), Math.abs(shift.y)),
+                        ),
+                    );
+
+                return reach <= 0 ? undefined : add("rgb_split", reach);
+            },
             addPixelate: (defs: SVGPixelateFilterDefs) => (defs.size <= 1 ? undefined : add("pixelate")),
             addSpecularLighting: (specularConstant: number | undefined) =>
                 (specularConstant ?? SVG_FILTER_DEFAULTS.specularConstant) <= 0 ? undefined : add("specular_lighting"),
@@ -203,6 +224,61 @@ export namespace SVGFilterDefsUtils {
      */
     export const computeColorChannelMatrix = (defs: SVGColorFilterDefs) =>
         computeChannelMatrix(defs.r, defs.g, defs.b, 0);
+
+    /**
+     * The names of every intermediate result the RGB split's primitives write.
+     *
+     * The graphic is copied three times, each copy keeping one of red, green and blue through
+     * {@link computeRGBSplitMatrix}, so a caller shifts each copy on its own and blends the three back together with
+     * {@link getRGBSplitBlendMode}.
+     *
+     * @param key The result name {@link createRegistry}'s `addRGBSplit` answered, which every intermediate result is
+     * named from.
+     * @returns For red, green and blue in that order, the names of its kept and shifted copies, then the name of the
+     * red and green copies blended together.
+     */
+    export const resolveRGBSplit = (key: string) => ({
+        channels: Array.from({ length: RGB_CHANNEL_COUNT }, (_, index) => ({
+            kept: `${key}_${index}_kept`,
+            shifted: `${key}_${index}_shifted`,
+        })),
+        redGreen: `${key}_red_green`,
+    });
+
+    /**
+     * The color matrix that keeps one channel of the graphic for the RGB split, leaving opacity alone.
+     *
+     * Additive mixing empties the other two channels, so the copy is that channel's light on black; subtractive
+     * mixing fills them, so the copy is the ink that takes away only that channel, on white. Either way, three copies
+     * still lying on top of one another blend back into the original colors.
+     *
+     * @param channelIndex `0` for red, `1` for green, `2` for blue.
+     * @param colorMixing How the three copies are put back together. Left out, `SVG_FILTER_DEFAULTS.colorMixing`.
+     */
+    export const computeRGBSplitMatrix = (channelIndex: number, colorMixing: SVGColorMixing | undefined) => {
+        const fill = RGB_SPLIT_FILLS[colorMixing ?? SVG_FILTER_DEFAULTS.colorMixing];
+        const rows = Array.from({ length: RGB_CHANNEL_COUNT }, (_, row) =>
+            Array.from({ length: MATRIX_ROW_LENGTH }, (_, column) =>
+                row === channelIndex ? (column === row ? 1 : 0) : column === MATRIX_ROW_LENGTH - 1 ? fill : 0,
+            ).join(" "),
+        );
+
+        return [...rows, ALPHA_ROW].join(" ");
+    };
+
+    /**
+     * The blend mode that puts the RGB split's three copies back together.
+     *
+     * Screening adds light, so additive copies come back to the original and drift apart into red, green and blue
+     * fringes, which read on a dark ground. Multiplying layers inks, so subtractive copies come back the same and
+     * drift apart into cyan, magenta and yellow fringes, which read on a light one. Opacity is combined the same way
+     * in both, which is exact for opaque content: a pixel the original painted part see-through comes back somewhat
+     * more opaque, since each copy carries that pixel's full opacity.
+     *
+     * @param colorMixing How the three copies are put back together. Left out, `SVG_FILTER_DEFAULTS.colorMixing`.
+     */
+    export const getRGBSplitBlendMode = (colorMixing: SVGColorMixing | undefined) =>
+        RGB_SPLIT_BLEND_MODES[colorMixing ?? SVG_FILTER_DEFAULTS.colorMixing];
 
     /**
      * Everything the noise-displacement pair of primitives carries, with the defaults filled in.

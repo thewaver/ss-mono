@@ -11,4 +11,4 @@ export const toCssFamily = (family: ColorFamily) => ({
     contrast: toHslCss(family.contrast),
 });
 
-export const toBackdropGradient = (light: string, dark: string) => `linear-gradient(135deg, ${light}, ${dark})`;
+export const toBackdropGradient = (dark: string, light: string) => `linear-gradient(315deg, ${dark}, ${light})`;
