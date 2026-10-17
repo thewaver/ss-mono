@@ -28,6 +28,21 @@ const panelOf = async (page: Page, toggle: Locator) => page.locator(`#${await to
 
 const activeText = (page: Page) => page.evaluate(() => document.activeElement?.textContent?.trim() ?? "");
 
+/** The bar's highlight marker. The panel's is portaled out of the example, so this finds the bar's alone. */
+const barHighlightIn = (page: Page, scope: string) => page.locator(`${scope} [data-floater="highlight"]`);
+
+/** Whether one element's box takes in the whole of another's, give or take a rounding pixel. */
+const covers = async (outer: Locator, inner: Locator) => {
+    const a = await outer.boundingBox();
+    const b = await inner.boundingBox();
+
+    if (!a || !b) return false;
+
+    return (
+        a.x <= b.x + 1 && a.y <= b.y + 1 && a.x + a.width >= b.x + b.width - 1 && a.y + a.height >= b.y + b.height - 1
+    );
+};
+
 test.beforeEach(async ({ page }) => {
     await page.goto("/flyout-menu");
     await expect(linkIn(page, SHOP, "Clothing")).toBeVisible();
@@ -74,6 +89,40 @@ test("moving the pointer to the next entry moves the one panel there", async ({ 
     await expect((await panelOf(page, homeware)).locator("a", { hasText: "Shirts" }), "with its own links").toHaveCount(
         0,
     );
+});
+
+/**
+ * Someone who hovers an entry and then clicks its toggle means to open it, so the click must not close what the hover
+ * opened: it keeps the panel and moves focus in, as a click on a closed toggle does.
+ */
+test("pressing the toggle of a panel that hover opened keeps it open and moves focus in", async ({ page }) => {
+    const toggle = toggleIn(page, SHOP, "Clothing");
+
+    await linkIn(page, SHOP, "Clothing").hover();
+    await expect(toggle).toHaveAttribute("aria-expanded", "true");
+
+    await toggle.click();
+
+    await expect(toggle, "the panel stays open").toHaveAttribute("aria-expanded", "true");
+    await expect.poll(() => activeText(page), "and focus goes to its first link").toBe("Shirts");
+
+    await toggle.click();
+
+    await expect(toggle, "a second press closes it").toHaveAttribute("aria-expanded", "false");
+});
+
+/**
+ * An entry is two tab stops but reads as one thing, so one marker sits behind both its link and its toggle rather
+ * than each lighting its own background.
+ */
+test("the bar's highlight sits behind the hovered entry's link and toggle together", async ({ page }) => {
+    const highlight = barHighlightIn(page, SHOP);
+
+    await toggleIn(page, SHOP, "Homeware").hover();
+
+    await expect.poll(() => covers(highlight, linkIn(page, SHOP, "Homeware")), "it covers the link").toBe(true);
+    await expect.poll(() => covers(highlight, toggleIn(page, SHOP, "Homeware")), "and the toggle").toBe(true);
+    expect(await covers(highlight, linkIn(page, SHOP, "Clothing")), "and not the entry beside it").toBe(false);
 });
 
 test("tabbing along the bar stops on each link and toggle and opens nothing", async ({ page }) => {
@@ -172,22 +221,15 @@ test("entries that do not fit collapse into a last entry, each keeping its link 
     ).toBeVisible();
 });
 
-/**
- * The panel is reopened from the keyboard rather than with a second click: the pointer travelling back to the toggle
- * crosses the entry, and so soon after a panel closed, hover reopens it at once — the click would then land on an
- * open panel and close it. What is asked here is only whether the followed link is marked.
- */
 test("following a link marks it as the current page", async ({ page }) => {
     const toggle = toggleIn(page, SHOP, "Clothing");
 
-    await toggle.focus();
-    await page.keyboard.press("Enter");
+    await toggle.click();
     await expect(toggle).toHaveAttribute("aria-expanded", "true");
     await (await panelOf(page, toggle)).locator("a", { hasText: "Shoes" }).click();
     await expect(toggle).toHaveAttribute("aria-expanded", "false");
 
-    await toggle.focus();
-    await page.keyboard.press("Enter");
+    await toggle.click();
     await expect(toggle).toHaveAttribute("aria-expanded", "true");
 
     const shoes = (await panelOf(page, toggle)).locator("a", { hasText: "Shoes" });

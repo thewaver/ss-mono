@@ -10,14 +10,7 @@ const layerClass = useLayerClass();
 </script>
 
 <template>
-    <span
-        :class="[
-            styles.flyoutMenuLink,
-            layerClass,
-            flags.isHovered && styles.isHovered,
-            flags.isCurrent && styles.isCurrent,
-        ]"
-    >
+    <span :class="[styles.flyoutMenuLink, layerClass, flags.isCurrent && styles.isCurrent]">
         <slot />
     </span>
 </template>

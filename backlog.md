@@ -64,7 +64,6 @@ reading.
 30. A long list reopened onto a far-down selection settles a frame or two late in Solid and Svelte — _open_
 31. `Die`'s step buttons and arrow keys fall into a loop of two or three faces — _open, no fix chosen_
 32. A wide arrow vanishes at a corner, and a nearly-as-wide one becomes a sliver — _open, the user is analysing it_
-33. `FlyoutMenu` — two behaviors decided, not yet built — _decided, not yet built_
 
 ### Build order
 
@@ -1306,39 +1305,6 @@ The library is unchanged, so a consumer's wide arrow still vanishes there. The u
 before choosing a fix. The one put to them and not taken yet: limit how far a side may be extended, and past that
 end the side at its base corner and run straight back to the contour along the arrow's direction, which never
 vanishes but gives a wide corner arrow a short straight neck.
-
-## 33. `FlyoutMenu` — two behaviors decided, not yet built
-
-Both settled with the user; neither needs asking again. Build them in Solid first, as usual, then port to React, Vue
-and Svelte and extend `e2e/flyoutMenu.spec.ts`.
-
-**A press on a toggle whose panel hover opened keeps the panel open.** Today it closes it: hover the Clothing link
-until its panel opens, then click the arrow beside it, and the panel vanishes, because to the toggle the panel was
-already open — someone who hovers and then clicks to open it sees it disappear. The user's call: the press keeps it
-open and moves focus to the panel's first link, as a press on a closed toggle does; a second press closes it. So the
-component remembers whether the open panel was opened by hover or by a press (a signal beside `isPressOpened`, set when
-`setIsOpenFromHover` opens it, cleared by any press). `toggle(index)` on the open entry turns a hover-opened panel into
-a press-opened one — focus goes in, the panel stays — and only closes one that was already press-opened. The spec gets
-a case: hover an entry until its toggle says `aria-expanded="true"`, click the toggle, and assert it is still expanded
-and focus is on the panel's first link. The current-page test reopens with the keyboard only because of this; once it
-is built it can click again.
-
-**One background across an entry's link and toggle**, the user's pick over two matched ones, because an entry reads as
-one thing though it is two tab stops. Today each painter lights its own background on its own hover, so they come on
-one after the other and at different sizes. The library tells both painters about the whole entry by growing the two
-flag types in `FlyoutMenu.types.ts`:
-
-- `FlyoutMenuLinkFlags` gains `isEntryHovered` (the pointer is over the entry, on the link or its toggle; always `false`
-  inside a panel), `isOpen` (the entry's panel is open, or inside the overflow panel whether its links are shown), and
-  `hasToggle` (a toggle sits straight after the link).
-- `FlyoutMenuToggleFlags` gains `isEntryHovered` and `hasLink` (a link sits straight before it; `false` on the overflow
-  entry's toggle).
-
-Entry hover is tracked by `pointerenter` and `pointerleave` on the bar's `<li>` (one index at a time), and on each
-collapsed entry's row inside the overflow panel. It is a visual flag only, so it does not go through the hover engine.
-In the Playground, both painters light their background while `isHovered || isEntryHovered || isOpen`, the link
-squares its right corners when `hasToggle` and the toggle its left corners when `hasLink`, so the two meet as one
-rectangle, and both take one shared height constant so their edges line up. Each control keeps its own focus ring.
 
 ## Accepted limits
 

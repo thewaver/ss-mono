@@ -1,9 +1,7 @@
 import { style } from "@vanilla-extract/css";
 
 import { themeVars } from "../../Theme.css";
-import { layerVars } from "../Layer/Layer.css";
 
-export const isHovered = style({});
 export const isCurrent = style({});
 export const isOpen = style({});
 
@@ -12,12 +10,8 @@ export const flyoutMenuLink = style({
     padding: `${themeVars.spacing.half} ${themeVars.spacing.full}`,
     borderRadius: themeVars.borderRadius.half,
     whiteSpace: "nowrap",
-    transition: `background-color ${themeVars.animation.duration}`,
 
     selectors: {
-        [`&.${isHovered}`]: {
-            backgroundColor: `rgb(from ${layerVars.contrast} r g b / 10%)`,
-        },
         [`&.${isCurrent}`]: {
             color: themeVars.color.primary.main,
             fontWeight: "bold",
@@ -36,13 +30,6 @@ export const flyoutMenuToggle = style({
     padding: `${themeVars.spacing.half} ${themeVars.spacing.half}`,
     borderRadius: themeVars.borderRadius.half,
     cursor: "pointer",
-    transition: `background-color ${themeVars.animation.duration}`,
-
-    selectors: {
-        [`&.${isHovered}, &.${isOpen}`]: {
-            backgroundColor: `rgb(from ${layerVars.contrast} r g b / 10%)`,
-        },
-    },
 });
 
 export const flyoutMenuOverflowToggle = style([

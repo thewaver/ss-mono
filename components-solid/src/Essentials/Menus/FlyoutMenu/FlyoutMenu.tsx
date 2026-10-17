@@ -27,7 +27,9 @@ import {
     type HoverIntentHandle,
     HoverIntentUtils,
     type InteractionFlags,
+    InteractionTrackerUtils,
     OverflowUtils,
+    FloaterStyles as floaterStyles,
     FlyoutMenuStyles as styles,
 } from "@thewaver/ss-components";
 import { assignInlineVars } from "@vanilla-extract/dynamic";
@@ -36,6 +38,7 @@ import { AnchorSolidUtils } from "../../../Abstracts/Anchor/AnchorSolid.utils";
 import { DismisserSolidUtils } from "../../../Abstracts/Dismisser/DismisserSolid.utils";
 import { ElementFaderSolidUtils } from "../../../Abstracts/ElementFader/ElementFaderSolid.utils";
 import { ElementObserverSolidUtils } from "../../../Abstracts/ElementObserver/ElementObserverSolid.utils";
+import { FloaterSolidUtils } from "../../../Abstracts/Floater/FloaterSolid.utils";
 import { HoverIntentSolidUtils } from "../../../Abstracts/HoverIntent/HoverIntentSolid.utils";
 import { useViewportContext } from "../../../Abstracts/Viewport/Viewport.context";
 import { InteractionWrapper } from "../../../Primitives/InteractionWrapper/InteractionWrapper";
@@ -63,6 +66,7 @@ export const FlyoutMenu = <T,>(props: FlyoutMenuProps<T>) => {
     const toggleRefs = new Map<number, HTMLElement>();
     const hoverIntents = new Map<number, HoverIntentHandle>();
 
+    const [getRootRef, setRootRef] = createSignal<HTMLElement>();
     const [getListRef, setListRef] = createSignal<HTMLElement>();
     const [getEntryRefs, setEntryRefs] = createSignal<(HTMLElement | undefined)[]>([]);
     const [getOverflowRef, setOverflowRef] = createSignal<HTMLElement>();
@@ -71,6 +75,11 @@ export const FlyoutMenu = <T,>(props: FlyoutMenuProps<T>) => {
     const [getOpenIndex, setOpenIndex] = createSignal<number>();
     const [getShownIndex, setShownIndex] = createSignal<number>();
     const [getIsPressOpened, setIsPressOpened] = createSignal(false);
+    const [getIsHoverOpened, setIsHoverOpened] = createSignal(false);
+    const [getHoveredIndex, setHoveredIndex] = createSignal<number>();
+    const [getFocusVisibleIndex, setFocusVisibleIndex] = createSignal<number>();
+    const [getHoveredItem, setHoveredItem] = createSignal<HTMLElement>();
+    const [getFocusVisibleItem, setFocusVisibleItem] = createSignal<HTMLElement>();
     const [getIsGliding, setIsGliding] = createSignal(false);
     const [getExpandedValues, setExpandedValues] = createSignal<T[]>([]);
 
@@ -150,6 +159,50 @@ export const FlyoutMenu = <T,>(props: FlyoutMenuProps<T>) => {
 
     const getBridge = createMemo(() => HoverIntentUtils.computeBridgeInsets(getPlacement(), access(props.offset)));
 
+    const getFloaterTransitionDurationMs = createMemo(
+        () => access(props.floaterTransitionDurationMs) ?? FLYOUT_MENU_DEFAULTS.floaterTransitionDurationMs,
+    );
+
+    const getHighlightedEntry = () => {
+        const index = getHoveredIndex() ?? getOpenIndex() ?? getFocusVisibleIndex();
+
+        return index === undefined ? undefined : getEntryElement(index);
+    };
+
+    const entryFloater = FloaterSolidUtils.create({
+        getIsEnabled: () => props.renderHighlightFloater !== undefined,
+        getContainer: getRootRef,
+        getTarget: getHighlightedEntry,
+        getTransitionDurationMs: getFloaterTransitionDurationMs,
+    });
+
+    const panelFloater = FloaterSolidUtils.create({
+        getIsEnabled: () => props.renderHighlightFloater !== undefined,
+        getContainer: getLinksRef,
+        getTarget: () => getHoveredItem() ?? getFocusVisibleItem(),
+        getTransitionDurationMs: getFloaterTransitionDurationMs,
+    });
+
+    const findEntryIndex = (target: EventTarget | null | undefined) => {
+        const entry = target instanceof Element ? target.closest(`.${styles.flyoutMenuEntry}`) : null;
+
+        if (!(entry instanceof HTMLElement)) return undefined;
+        if (entry === getOverflowRef()) return OVERFLOW_INDEX;
+
+        const index = getEntryRefs().indexOf(entry);
+
+        return index === -1 ? undefined : index;
+    };
+
+    const findPanelItem = (target: EventTarget | null | undefined) => {
+        const item = target instanceof Element ? target.closest(`.${styles.flyoutMenuPanelItem}`) : null;
+
+        return item instanceof HTMLElement ? item : undefined;
+    };
+
+    const readFocusVisible = (target: EventTarget | null) =>
+        target instanceof HTMLElement && InteractionTrackerUtils.computeIsFocusVisible(target) ? target : undefined;
+
     const close = () => {
         const index = getOpenIndex();
 
@@ -162,14 +215,16 @@ export const FlyoutMenu = <T,>(props: FlyoutMenuProps<T>) => {
         if (isOpen && FlyoutMenuUtils.getIsHoverSwitchRefused(getOpenIndex(), index, getHasFocusInside())) return;
 
         if (isOpen) setIsPressOpened(false);
+        if (isOpen && getOpenIndex() !== index) setIsHoverOpened(true);
 
         setOpenIndex((open) => FlyoutMenuUtils.computeNextOpenIndex(open, index, isOpen));
     };
 
     const toggle = (index: number) => {
-        const isOpen = getOpenIndex() !== index;
+        const isOpen = getOpenIndex() !== index || getIsHoverOpened();
 
         hoverIntents.get(index)?.cancel();
+        setIsHoverOpened(false);
         setIsPressOpened(isOpen);
         setOpenIndex((open) => FlyoutMenuUtils.computeNextOpenIndex(open, index, isOpen));
     };
@@ -221,6 +276,13 @@ export const FlyoutMenu = <T,>(props: FlyoutMenuProps<T>) => {
     });
 
     createEffect(
+        on(getShownIndex, () => {
+            setHoveredItem(undefined);
+            setFocusVisibleItem(undefined);
+        }),
+    );
+
+    createEffect(
         on(
             getShownIndex,
             (index, previous) => {
@@ -242,7 +304,7 @@ export const FlyoutMenu = <T,>(props: FlyoutMenuProps<T>) => {
         if (!getIsPressOpened() || getOpenIndex() === undefined || !panel || !getPosition()) return;
 
         setIsPressOpened(false);
-        FocusManagerUtils.getFirstFocusableChild(panel)?.focus({ preventScroll: true });
+        FlyoutMenuUtils.focusFirstLinkAfterPress(panel);
     });
 
     createEffect(() => {
@@ -321,7 +383,7 @@ export const FlyoutMenu = <T,>(props: FlyoutMenuProps<T>) => {
 
     const renderLinkList = (links: FlyoutMenuLinkRecord<T>[], id?: string) => (
         <ul id={id} class={styles.flyoutMenuPanelList}>
-            <For each={links}>{(link) => <li>{renderLink(() => link)}</li>}</For>
+            <For each={links}>{(link) => <li class={styles.flyoutMenuPanelItem}>{renderLink(() => link)}</li>}</For>
         </ul>
     );
 
@@ -332,7 +394,7 @@ export const FlyoutMenu = <T,>(props: FlyoutMenuProps<T>) => {
 
         return (
             <li class={styles.flyoutMenuPanelEntry}>
-                <div class={styles.flyoutMenuPanelRow}>
+                <div class={[styles.flyoutMenuPanelRow, styles.flyoutMenuPanelItem].join(" ")}>
                     {renderLink(() => entry)}
 
                     <Show when={FlyoutMenuUtils.getHasPanel(entry)}>
@@ -358,8 +420,30 @@ export const FlyoutMenu = <T,>(props: FlyoutMenuProps<T>) => {
         );
     };
 
+    const renderFloater = (floater: ReturnType<typeof FloaterSolidUtils.create>) => (
+        <Show when={floater.getIsRendered()}>
+            <div
+                ref={floater.setRef}
+                class={floaterStyles.floater}
+                style={{ ...floater.getBounds(), "transition-duration": `${getFloaterTransitionDurationMs()}ms` }}
+            >
+                {props.renderHighlightFloater?.(floater.getVisibilityTarget, getFloaterTransitionDurationMs)}
+            </div>
+        </Show>
+    );
+
     const renderPanelLinks = () => (
-        <div ref={setLinksRef} class={styles.flyoutMenuPanelLinks}>
+        <div
+            ref={setLinksRef}
+            class={styles.flyoutMenuPanelLinks}
+            onPointerOver={(e) => setHoveredItem(findPanelItem(e.target))}
+            onPointerLeave={() => setHoveredItem(undefined)}
+            onFocusIn={(e) => setFocusVisibleItem(findPanelItem(readFocusVisible(e.target)))}
+            onFocusOut={() => setFocusVisibleItem(undefined)}
+            onKeyDown={() => setFocusVisibleItem(findPanelItem(readFocusVisible(document.activeElement)))}
+        >
+            {renderFloater(panelFloater)}
+
             {renderPanelLinkList()}
         </div>
     );
@@ -407,11 +491,18 @@ export const FlyoutMenu = <T,>(props: FlyoutMenuProps<T>) => {
     createHoverIntent(OVERFLOW_INDEX, getHasOverflow);
 
     return (
-        <nav class={styles.flyoutMenuRoot} aria-label={access(props.ariaLabel)}>
+        <nav ref={setRootRef} class={styles.flyoutMenuRoot} aria-label={access(props.ariaLabel)}>
+            {renderFloater(entryFloater)}
+
             <ul
                 ref={setListRef}
                 class={styles.flyoutMenuList}
                 style={{ gap: `${getGap()}px`, visibility: getHasMeasured() ? undefined : "hidden" }}
+                onPointerOver={(e) => setHoveredIndex(findEntryIndex(e.target))}
+                onPointerLeave={() => setHoveredIndex(undefined)}
+                onFocusIn={(e) => setFocusVisibleIndex(findEntryIndex(readFocusVisible(e.target)))}
+                onFocusOut={() => setFocusVisibleIndex(undefined)}
+                onKeyDown={() => setFocusVisibleIndex(findEntryIndex(readFocusVisible(document.activeElement)))}
             >
                 <Index each={getEntries()}>{renderEntry}</Index>
 

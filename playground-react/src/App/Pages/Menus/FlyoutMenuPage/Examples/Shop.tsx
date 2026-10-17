@@ -8,6 +8,7 @@ import {
     PageFlyoutMenuOverflowToggle,
     PageFlyoutMenuToggle,
 } from "../../../../StyledComponents/FlyoutMenuContent/FlyoutMenuContent";
+import { renderPageHighlightFloater } from "../../../../StyledComponents/GlideFloater/GlideFloater";
 import { PagePopoverSurface } from "../../../../StyledComponents/PopoverSurface/PopoverSurface";
 import type { FlyoutMenuExampleProps } from "../FlyoutMenuPageReact.types";
 
@@ -28,6 +29,7 @@ export const ShopExample = (props: Props) => (
         renderOverflowToggle={(flags) => (
             <PageFlyoutMenuOverflowToggle flags={flags}>{OVERFLOW_CAPTION}</PageFlyoutMenuOverflowToggle>
         )}
+        renderHighlightFloater={renderPageHighlightFloater}
         renderPanel={(renderLinks, visibilityTarget, transitionDurationMs, placement, size) => (
             <PageLayer level={2}>
                 <PagePopoverSurface

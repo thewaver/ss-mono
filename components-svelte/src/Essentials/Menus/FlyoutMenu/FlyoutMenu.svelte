@@ -6,6 +6,7 @@
     import {
         type DismisserReason,
         FLYOUT_MENU_DEFAULTS,
+        FloaterStyles as floaterStyles,
         type FlyoutMenuEntryRecord,
         FlyoutMenuStyles as styles,
         FlyoutMenuUtils,
@@ -13,6 +14,7 @@
         HoverCardUtils,
         type HoverIntentHandle,
         HoverIntentUtils,
+        InteractionTrackerUtils,
         OverflowUtils,
     } from "@thewaver/ss-components";
     import { assignInlineVars } from "@vanilla-extract/dynamic";
@@ -21,6 +23,7 @@
     import { DismisserSvelteUtils } from "../../../Abstracts/Dismisser/DismisserSvelte.utils.svelte.js";
     import { ElementFaderSvelteUtils } from "../../../Abstracts/ElementFader/ElementFaderSvelte.utils.svelte.js";
     import { ElementObserverSvelteUtils } from "../../../Abstracts/ElementObserver/ElementObserverSvelte.utils.svelte.js";
+    import { FloaterSvelteUtils } from "../../../Abstracts/Floater/FloaterSvelte.utils.svelte.js";
     import { HoverIntentSvelteUtils } from "../../../Abstracts/HoverIntent/HoverIntentSvelte.utils.svelte.js";
     import { getViewportContext } from "../../../Abstracts/Viewport/Viewport.context.js";
     import { watchChange } from "../../../Utils/effectUtils.svelte.js";
@@ -44,6 +47,7 @@
     const toggleRefs = new Map<number, HTMLElement>();
     const hoverIntents = new Map<number, HoverIntentHandle>();
 
+    let rootRef = $state<HTMLElement>();
     let listRef = $state<HTMLElement>();
     let entryElements = $state.raw<(HTMLElement | undefined)[]>([]);
     let overflowElement = $state<HTMLElement>();
@@ -52,6 +56,11 @@
     let openIndex = $state<number>();
     let shownIndex = $state<number>();
     let isPressOpened = $state(false);
+    let isHoverOpened = $state(false);
+    let hoveredIndex = $state<number>();
+    let focusVisibleIndex = $state<number>();
+    let hoveredItem = $state<HTMLElement>();
+    let focusVisibleItem = $state<HTMLElement>();
     let isGliding = $state(false);
     let expandedValues = $state.raw<T[]>([]);
 
@@ -60,6 +69,9 @@
     const transitionDurationMs = $derived(props.transitionDurationMs ?? FLYOUT_MENU_DEFAULTS.transitionDurationMs);
     const hoverShowDelayMs = $derived(props.hoverShowDelayMs ?? FLYOUT_MENU_DEFAULTS.hoverShowDelayMs);
     const skipDelayWindowMs = $derived(props.skipDelayWindowMs ?? FLYOUT_MENU_DEFAULTS.skipDelayWindowMs);
+    const floaterTransitionDurationMs = $derived(
+        props.floaterTransitionDurationMs ?? FLYOUT_MENU_DEFAULTS.floaterTransitionDurationMs,
+    );
 
     const getListSize = ElementObserverSvelteUtils.createBorderBoxSizeObserver(() => listRef ?? undefined);
     const getEntrySizes = ElementObserverSvelteUtils.createBorderBoxSizeListObserver(() => entryElements);
@@ -130,6 +142,44 @@
 
     const bridge = $derived(HoverIntentUtils.computeBridgeInsets(position.getPlacement(), props.offset));
 
+    const entryFloater = FloaterSvelteUtils.create({
+        getIsEnabled: () => props.renderHighlightFloater !== undefined,
+        getContainer: () => rootRef ?? undefined,
+        getTarget: () => {
+            const index = hoveredIndex ?? openIndex ?? focusVisibleIndex;
+
+            return index === undefined ? undefined : getEntryElement(index);
+        },
+        getTransitionDurationMs: () => floaterTransitionDurationMs,
+    });
+
+    const panelFloater = FloaterSvelteUtils.create({
+        getIsEnabled: () => props.renderHighlightFloater !== undefined,
+        getContainer: () => linksRef ?? undefined,
+        getTarget: () => hoveredItem ?? focusVisibleItem,
+        getTransitionDurationMs: () => floaterTransitionDurationMs,
+    });
+
+    const findEntryIndex = (target: EventTarget | null | undefined) => {
+        const entry = target instanceof Element ? target.closest(`.${styles.flyoutMenuEntry}`) : null;
+
+        if (!(entry instanceof HTMLElement)) return undefined;
+        if (entry === overflowElement) return OVERFLOW_INDEX;
+
+        const index = entryElements.indexOf(entry);
+
+        return index === -1 ? undefined : index;
+    };
+
+    const findPanelItem = (target: EventTarget | null | undefined) => {
+        const item = target instanceof Element ? target.closest(`.${styles.flyoutMenuPanelItem}`) : null;
+
+        return item instanceof HTMLElement ? item : undefined;
+    };
+
+    const readFocusVisible = (target: EventTarget | null) =>
+        target instanceof HTMLElement && InteractionTrackerUtils.computeIsFocusVisible(target) ? target : undefined;
+
     const close = () => {
         if (openIndex !== undefined) hoverIntents.get(openIndex)?.cancel();
 
@@ -140,14 +190,16 @@
         if (isOpen && FlyoutMenuUtils.getIsHoverSwitchRefused(openIndex, index, getHasFocusInside())) return;
 
         if (isOpen) isPressOpened = false;
+        if (isOpen && openIndex !== index) isHoverOpened = true;
 
         openIndex = FlyoutMenuUtils.computeNextOpenIndex(openIndex, index, isOpen);
     };
 
     const toggle = (index: number) => {
-        const isOpen = openIndex !== index;
+        const isOpen = openIndex !== index || isHoverOpened;
 
         hoverIntents.get(index)?.cancel();
+        isHoverOpened = false;
         isPressOpened = isOpen;
         openIndex = FlyoutMenuUtils.computeNextOpenIndex(openIndex, index, isOpen);
     };
@@ -199,6 +251,14 @@
         isGliding = false;
     });
 
+    watchChange(
+        () => shownIndex,
+        () => {
+            hoveredItem = undefined;
+            focusVisibleItem = undefined;
+        },
+    );
+
     let settleGlide: ReturnType<typeof setTimeout> | undefined;
 
     watchChange(
@@ -223,7 +283,7 @@
         if (!isPressOpened || openIndex === undefined || !panel || !position.getPosition()) return;
 
         isPressOpened = false;
-        FocusManagerUtils.getFirstFocusableChild(panel)?.focus({ preventScroll: true });
+        FlyoutMenuUtils.focusFirstLinkAfterPress(panel);
     });
 
     $effect(() => {
@@ -259,6 +319,50 @@
         },
     });
 
+    const attachEntryTracking: Attachment<HTMLElement> = (element) => {
+        const stops = [
+            on(element, "pointerover", (e) => {
+                hoveredIndex = findEntryIndex(e.target);
+            }),
+            on(element, "pointerleave", () => {
+                hoveredIndex = undefined;
+            }),
+            on(element, "focusin", (e) => {
+                focusVisibleIndex = findEntryIndex(readFocusVisible(e.target));
+            }),
+            on(element, "focusout", () => {
+                focusVisibleIndex = undefined;
+            }),
+            on(element, "keydown", () => {
+                focusVisibleIndex = findEntryIndex(readFocusVisible(document.activeElement));
+            }),
+        ];
+
+        return () => stops.forEach((stop) => stop());
+    };
+
+    const attachItemTracking: Attachment<HTMLElement> = (element) => {
+        const stops = [
+            on(element, "pointerover", (e) => {
+                hoveredItem = findPanelItem(e.target);
+            }),
+            on(element, "pointerleave", () => {
+                hoveredItem = undefined;
+            }),
+            on(element, "focusin", (e) => {
+                focusVisibleItem = findPanelItem(readFocusVisible(e.target));
+            }),
+            on(element, "focusout", () => {
+                focusVisibleItem = undefined;
+            }),
+            on(element, "keydown", () => {
+                focusVisibleItem = findPanelItem(readFocusVisible(document.activeElement));
+            }),
+        ];
+
+        return () => stops.forEach((stop) => stop());
+    };
+
     const attachPanelKeys: Attachment<HTMLElement> = (element) =>
         on(element, "keydown", (e) =>
             HoverCardUtils.handleCardKeyDown(e, toggleRefs.get(shownIndex ?? OVERFLOW_INDEX), element),
@@ -283,8 +387,22 @@
     );
 </script>
 
+{#snippet floaterView(floater: ReturnType<typeof FloaterSvelteUtils.create>)}
+    {#if floater.getIsRendered()}
+        <div
+            {@attach floater.attachRef}
+            class={floaterStyles.floater}
+            style={toStyle(floater.getBounds(), { transitionDuration: `${floaterTransitionDurationMs}ms` })}
+        >
+            {@render props.renderHighlightFloater?.(floater.getVisibilityTarget(), floaterTransitionDurationMs)}
+        </div>
+    {/if}
+{/snippet}
+
 {#snippet panelLinks()}
-    <div bind:this={linksRef} class={styles.flyoutMenuPanelLinks}>
+    <div bind:this={linksRef} {@attach attachItemTracking} class={styles.flyoutMenuPanelLinks}>
+        {@render floaterView(panelFloater)}
+
         {#if shownIndex === OVERFLOW_INDEX}
             <ul class={styles.flyoutMenuPanelList}>
                 {#each collapsedEntries as entry (entry)}
@@ -311,9 +429,12 @@
     </div>
 {/snippet}
 
-<nav class={styles.flyoutMenuRoot} aria-label={props.ariaLabel}>
+<nav bind:this={rootRef} class={styles.flyoutMenuRoot} aria-label={props.ariaLabel}>
+    {@render floaterView(entryFloater)}
+
     <ul
         bind:this={listRef}
+        {@attach attachEntryTracking}
         class={styles.flyoutMenuList}
         style:gap={`${gap}px`}
         style:visibility={hasMeasured ? undefined : "hidden"}

@@ -15,7 +15,6 @@
     class={[
         styles.flyoutMenuLink,
         layerClass,
-        props.flags.isHovered && styles.isHovered,
         props.flags.isCurrent && styles.isCurrent,
     ]}
 >

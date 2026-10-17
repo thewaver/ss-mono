@@ -15,7 +15,6 @@ export const PageFlyoutMenuLink = (props: ParentProps<FlyoutMenuLinkProps>) => {
             class={styles.flyoutMenuLink}
             classList={{
                 [getLayerClass()]: true,
-                [styles.isHovered]: access(props.flags).isHovered,
                 [styles.isCurrent]: access(props.flags).isCurrent,
             }}
         >
@@ -32,7 +31,6 @@ export const PageFlyoutMenuToggle = (props: FlyoutMenuToggleProps) => {
             class={styles.flyoutMenuToggle}
             classList={{
                 [getLayerClass()]: true,
-                [styles.isHovered]: access(props.flags).isHovered,
                 [styles.isOpen]: access(props.flags).isOpen,
             }}
         >
@@ -51,7 +49,6 @@ export const PageFlyoutMenuOverflowToggle = (props: ParentProps<FlyoutMenuToggle
             class={styles.flyoutMenuOverflowToggle}
             classList={{
                 [getLayerClass()]: true,
-                [styles.isHovered]: access(props.flags).isHovered,
                 [styles.isOpen]: access(props.flags).isOpen,
             }}
         >

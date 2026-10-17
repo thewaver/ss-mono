@@ -7,6 +7,7 @@ import PageLayer from "../../../../PageComponents/Layer/Layer.vue";
 import PageFlyoutMenuLink from "../../../../StyledComponents/FlyoutMenuContent/PageFlyoutMenuLink.vue";
 import PageFlyoutMenuOverflowToggle from "../../../../StyledComponents/FlyoutMenuContent/PageFlyoutMenuOverflowToggle.vue";
 import PageFlyoutMenuToggle from "../../../../StyledComponents/FlyoutMenuContent/PageFlyoutMenuToggle.vue";
+import PageGlideFloater from "../../../../StyledComponents/GlideFloater/PageGlideFloater.vue";
 import PagePopoverSurface from "../../../../StyledComponents/PopoverSurface/PopoverSurface.vue";
 import type { FlyoutMenuExampleProps } from "../FlyoutMenuPageVue.types";
 
@@ -34,6 +35,10 @@ defineProps<FlyoutMenuExampleProps>();
 
         <template #renderOverflowToggle="flags">
             <PageFlyoutMenuOverflowToggle :flags="flags">{{ OVERFLOW_CAPTION }}</PageFlyoutMenuOverflowToggle>
+        </template>
+
+        <template #renderHighlightFloater="floater">
+            <PageGlideFloater kind="highlight" v-bind="floater" />
         </template>
 
         <template #renderPanel="{ renderLinks, visibilityTarget, transitionDurationMs, placement, size }">

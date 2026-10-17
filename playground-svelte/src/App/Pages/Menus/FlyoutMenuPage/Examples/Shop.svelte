@@ -7,6 +7,7 @@
     import PageFlyoutMenuLink from "../../../../StyledComponents/FlyoutMenuContent/PageFlyoutMenuLink.svelte";
     import PageFlyoutMenuOverflowToggle from "../../../../StyledComponents/FlyoutMenuContent/PageFlyoutMenuOverflowToggle.svelte";
     import PageFlyoutMenuToggle from "../../../../StyledComponents/FlyoutMenuContent/PageFlyoutMenuToggle.svelte";
+    import { renderPageHighlightFloater } from "../../../../StyledComponents/GlideFloater/GlideFloater.const.svelte";
     import PagePopoverSurface from "../../../../StyledComponents/PopoverSurface/PopoverSurface.svelte";
     import type { FlyoutMenuExampleProps } from "../FlyoutMenuPageSvelte.types";
 
@@ -22,6 +23,7 @@
     hoverShowDelayMs={props.hoverShowDelayMs}
     transitionDurationMs={props.transitionDurationMs}
     computeToggleLabel={(value) => `${value} submenu`}
+    renderHighlightFloater={renderPageHighlightFloater}
 >
     {#snippet renderLink(link, flags)}
         <PageFlyoutMenuLink {flags}>{link.value}</PageFlyoutMenuLink>

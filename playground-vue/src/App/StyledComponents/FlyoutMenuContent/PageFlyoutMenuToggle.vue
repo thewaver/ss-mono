@@ -11,14 +11,7 @@ const layerClass = useLayerClass();
 </script>
 
 <template>
-    <span
-        :class="[
-            styles.flyoutMenuToggle,
-            layerClass,
-            flags.isHovered && styles.isHovered,
-            flags.isOpen && styles.isOpen,
-        ]"
-    >
+    <span :class="[styles.flyoutMenuToggle, layerClass, flags.isOpen && styles.isOpen]">
         <span :class="styles.flyoutMenuChevron" aria-hidden="true">{{ FLYOUT_MENU_CHEVRON }}</span>
     </span>
 </template>

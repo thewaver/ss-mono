@@ -5315,6 +5315,29 @@ unconditionally, which would pull focus back to the toggle when Tab carries it o
 pointer drifting over another entry never swaps the links out from under the keyboard. The tutorial does not cover it;
 it follows from its "closes when focus leaves".
 
+**A press on the toggle of a panel that hover opened keeps it open**, the user's call: someone who hovers and then
+clicks to open sees the panel vanish otherwise. The component remembers whether the open panel came from a hover — set
+only when a hover changes which entry is open, so a press-opened panel the pointer re-enters stays press-opened — and
+any press clears it. A press on a hover-opened panel turns it into a press-opened one and puts focus inside; only a
+press on a press-opened panel closes it. **Focus goes in a frame later** (`FlyoutMenuUtils.focusFirstLinkAfterPress`):
+the toggle answers on pointer down and the browser focuses the pressed button on the mouse down after it, so on a panel
+already open — nothing to position, so nothing to wait for — focus moved in at once was taken straight back. Refusing
+the button's `mousedown`, as `Popover` does, was not taken: the second press, the one that closes, would then leave
+focus in the closing panel instead of on the toggle.
+
+**An entry's link and toggle light up as one, under a highlight floater**, the user's call: an entry reads as one
+thing though it is two tab stops, and the first build — telling both painters about the whole entry so each could
+light its own half, with squared corners and a shared height — was replaced once they pointed at the floater `Tree` and
+`Menu` already use. The bar's floater sits behind the whole `<li>`, so the link and the toggle need nothing special,
+and it slides between entries as the panel does. It follows the hovered entry, else the one whose panel is open, else
+the one keyboard focus is visibly on. **Every open panel has its own floater too** — the user's words, and how `Menu`
+does it per level — following the hovered link, else the visibly focused one; in the overflow panel a collapsed entry's
+row, link and toggle together, is one item, and so is each link in a list it expands. One `renderHighlightFloater`
+draws both. The bar's floater is drawn in the `nav` rather than the `ul`, because a `div` is not allowed as a child of a
+list; the panel's is drawn in the links wrapper. The panel's items are found by a marker class rather than by index,
+since the overflow panel nests lists, and the hovered item is dropped whenever the panel's links change, so the floater
+never follows an element that has gone.
+
 **`aria-expanded` sits on the toggle only.** The tutorial puts it on the link as well; the APG's hybrid example puts it
 on the button alone, and a link announcing "expanded" would suggest that activating it toggles something, when it
 navigates.
@@ -5333,7 +5356,8 @@ than storing it, since a stored copy lands a render late and a press on another 
 focus the previous entry's first link. The nested lists in the overflow panel take ids built from the panel's id and
 the entry's position in React and Vue, where `useId` cannot run per entry; Solid and Svelte make a fresh one each.
 Svelte attaches the panel's key listener with `svelte/events` rather than `onkeydown`, because Svelte's accessibility
-check warns about a key listener on an element with no role and the only way to silence it is a comment. React and
+check warns about a key listener on an element with no role and the only way to silence it is a comment. The bar's and the panel's pointer and focus listeners, which feed the highlight floaters, are attached the same
+way for the same reason. React and
 Svelte portal the panel element itself where Solid's `Portal` wraps it in one more `div` — the same difference Tooltip
 already has. Inside the `nav` and inside the panel, the elements, classes, roles and aria attributes are the same in
 all four, which is what lets one spec cover them.

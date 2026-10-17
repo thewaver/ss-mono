@@ -16,7 +16,6 @@
     class={[
         styles.flyoutMenuOverflowToggle,
         layerClass,
-        props.flags.isHovered && styles.isHovered,
         props.flags.isOpen && styles.isOpen,
     ]}
 >

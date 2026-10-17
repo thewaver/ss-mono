@@ -1,3 +1,4 @@
+import { FocusManagerUtils } from "../../../Abstracts/FocusManager/FocusManager.utils";
 import type { FlyoutMenuEntryRecord } from "./FlyoutMenu.types";
 
 /** No links at all. */
@@ -69,4 +70,18 @@ export namespace FlyoutMenuUtils {
      */
     export const computeCollapsedEntries = <T>(entries: FlyoutMenuEntryRecord<T>[], collapsedIndexes: number[]) =>
         collapsedIndexes.map((index) => entries[index]);
+
+    /**
+     * Moves focus to the panel's first link once the press that asked for it has finished.
+     *
+     * A toggle answers a press on pointer down, and the browser then moves focus to the pressed button on the mouse down
+     * that follows, so focus moved into the panel straight away is taken back at once. That is what happens when the
+     * press lands on a panel already open, which has no positioning to wait for. Waiting a frame lets the press settle
+     * first. A panel that has closed or gone by then is inert or detached, and the move does nothing.
+     *
+     * @param panel The panel's element.
+     */
+    export const focusFirstLinkAfterPress = (panel: HTMLElement) => {
+        requestAnimationFrame(() => FocusManagerUtils.getFirstFocusableChild(panel)?.focus({ preventScroll: true }));
+    };
 }

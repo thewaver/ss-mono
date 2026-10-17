@@ -14,7 +14,6 @@
     class={[
         styles.flyoutMenuToggle,
         layerClass,
-        props.flags.isHovered && styles.isHovered,
         props.flags.isOpen && styles.isOpen,
     ]}
 >

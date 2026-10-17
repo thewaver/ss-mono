@@ -33,7 +33,7 @@ export const LIBRARY: TreemapNode<string> = branch(
         leaf("MaskedField", 225),
         leaf("MediaQueryMonitor", 165),
         leaf("Navigator", 326),
-        leaf("Overflow", 112),
+        leaf("Overflow", 116),
         leaf("Placement", 756),
         leaf("PointerTracker", 326),
         leaf("Proximity", 345),
@@ -94,7 +94,7 @@ export const LIBRARY: TreemapNode<string> = branch(
         ),
         branch("MediaSwitchers", leaf("AudioSwitcher", 296), leaf("ImageSwitcher", 187)),
         leaf("Menubar", 7),
-        branch("Menus", leaf("FanMenu", 62), leaf("FlyoutMenu", 794), leaf("Menu", 2122), leaf("WheelMenu", 270)),
+        branch("Menus", leaf("FanMenu", 62), leaf("FlyoutMenu", 915), leaf("Menu", 2125), leaf("WheelMenu", 270)),
         branch(
             "Overlays",
             leaf("Drawer", 26),

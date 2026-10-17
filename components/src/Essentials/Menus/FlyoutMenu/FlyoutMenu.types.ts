@@ -56,6 +56,8 @@ export type BaseFlyoutMenuValues = {
     offset?: Point2d;
     /** How long the panel takes to fade in and out, and to glide from one entry to the next. */
     transitionDurationMs?: number;
+    /** How long the highlight's marker takes to slide from one entry or link to the next, and to fade. */
+    floaterTransitionDurationMs?: number;
     /**
      * How long the pointer has to rest on an entry before its panel opens, so sweeping across the bar does not open a
      * panel per entry. Set it to `0` to open on hover at once.

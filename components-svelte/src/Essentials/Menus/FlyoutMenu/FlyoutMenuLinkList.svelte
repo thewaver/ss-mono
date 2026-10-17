@@ -9,7 +9,7 @@
 
 <ul id={props.id} class={styles.flyoutMenuPanelList}>
     {#each props.links as link (link)}
-        <li>
+        <li class={styles.flyoutMenuPanelItem}>
             <FlyoutMenuLink
                 {link}
                 linkComponent={props.linkComponent}

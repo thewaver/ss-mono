@@ -11,12 +11,7 @@ export const PageFlyoutMenuLink = (props: PropsWithChildren<FlyoutMenuLinkProps>
 
     return (
         <span
-            className={[
-                styles.flyoutMenuLink,
-                layerClass,
-                props.flags.isHovered && styles.isHovered,
-                props.flags.isCurrent && styles.isCurrent,
-            ]
+            className={[styles.flyoutMenuLink, layerClass, props.flags.isCurrent && styles.isCurrent]
                 .filter(Boolean)
                 .join(" ")}
         >
@@ -30,12 +25,7 @@ export const PageFlyoutMenuToggle = (props: FlyoutMenuToggleProps) => {
 
     return (
         <span
-            className={[
-                styles.flyoutMenuToggle,
-                layerClass,
-                props.flags.isHovered && styles.isHovered,
-                props.flags.isOpen && styles.isOpen,
-            ]
+            className={[styles.flyoutMenuToggle, layerClass, props.flags.isOpen && styles.isOpen]
                 .filter(Boolean)
                 .join(" ")}
         >
@@ -51,12 +41,7 @@ export const PageFlyoutMenuOverflowToggle = (props: PropsWithChildren<FlyoutMenu
 
     return (
         <span
-            className={[
-                styles.flyoutMenuOverflowToggle,
-                layerClass,
-                props.flags.isHovered && styles.isHovered,
-                props.flags.isOpen && styles.isOpen,
-            ]
+            className={[styles.flyoutMenuOverflowToggle, layerClass, props.flags.isOpen && styles.isOpen]
                 .filter(Boolean)
                 .join(" ")}
         >

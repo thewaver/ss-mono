@@ -60,6 +60,13 @@ export type FlyoutMenuProps<T> = BaseFlyoutMenuProps<T> & {
      */
     renderOverflowToggle: (flags: InteractionFlags<FlyoutMenuToggleFlags>) => ReactNode;
     /**
+     * Draws the marker that slides behind the highlighted item: on the bar, the hovered entry, else the one whose
+     * panel is open, else the one keyboard focus is on; in the panel, the hovered link, else the focused one. An
+     * entry's link and toggle sit under one marker, so they light up as one. Called once for the bar and once for the
+     * panel. Leave it out and no marker is drawn.
+     */
+    renderHighlightFloater?: (visibilityTarget: 0 | 1, transitionDurationMs: number) => ReactNode;
+    /**
      * Draws the panel around its links. The fade is handed in rather than applied, so the consumer decides what
      * fading looks like; the placement comes with it for a caller that wants to point an arrow at the entry.
      *

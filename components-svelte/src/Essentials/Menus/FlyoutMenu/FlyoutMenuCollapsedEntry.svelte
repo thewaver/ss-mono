@@ -23,7 +23,7 @@
 {/snippet}
 
 <li class={styles.flyoutMenuPanelEntry}>
-    <div class={styles.flyoutMenuPanelRow}>
+    <div class={[styles.flyoutMenuPanelRow, styles.flyoutMenuPanelItem]}>
         <FlyoutMenuLink
             link={props.entry}
             linkComponent={props.linkComponent}

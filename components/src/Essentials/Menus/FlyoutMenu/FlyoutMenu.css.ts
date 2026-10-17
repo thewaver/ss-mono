@@ -8,6 +8,8 @@ export const bridgeBottomVar = createVar();
 export const bridgeLeftVar = createVar();
 
 export const flyoutMenuRoot = style({
+    position: "relative",
+    isolation: "isolate",
     display: "flex",
     width: "100%",
     minWidth: 0,
@@ -71,8 +73,12 @@ export const flyoutMenuPanel = style({
 });
 
 export const flyoutMenuPanelLinks = style({
+    position: "relative",
+    isolation: "isolate",
     width: "max-content",
 });
+
+export const flyoutMenuPanelItem = style({});
 
 export const flyoutMenuPanelList = style({
     display: "flex",

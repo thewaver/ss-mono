@@ -17,6 +17,7 @@ import {
 import {
     type DismisserReason,
     FLYOUT_MENU_DEFAULTS,
+    FloaterStyles,
     type FlyoutMenuEntryRecord,
     type FlyoutMenuLinkFlags,
     type FlyoutMenuLinkRecord,
@@ -28,6 +29,7 @@ import {
     type HoverIntentHandle,
     HoverIntentUtils,
     type InteractionFlags,
+    InteractionTrackerUtils,
     OverflowUtils,
 } from "@thewaver/ss-components";
 import { assignInlineVars } from "@vanilla-extract/dynamic";
@@ -36,6 +38,7 @@ import { AnchorVueUtils } from "../../../Abstracts/Anchor/AnchorVue.utils";
 import { DismisserVueUtils } from "../../../Abstracts/Dismisser/DismisserVue.utils";
 import { ElementFaderVueUtils } from "../../../Abstracts/ElementFader/ElementFaderVue.utils";
 import { ElementObserverVueUtils } from "../../../Abstracts/ElementObserver/ElementObserverVue.utils";
+import { FloaterVueUtils } from "../../../Abstracts/Floater/FloaterVue.utils";
 import { HoverIntentVueUtils } from "../../../Abstracts/HoverIntent/HoverIntentVue.utils";
 import { useViewportContext } from "../../../Abstracts/Viewport/Viewport.context";
 import { InteractionWrapper } from "../../../Primitives/InteractionWrapper/InteractionWrapper";
@@ -69,6 +72,7 @@ export const FlyoutMenu = defineComponent(
         const hoverIntents = new Map<number, HoverIntentHandle>();
         const entryScopes: EffectScope[] = [];
 
+        const rootRef = shallowRef<HTMLElement>();
         const listRef = shallowRef<HTMLElement>();
         const entryElements = shallowRef<(HTMLElement | undefined)[]>([]);
         const overflowRef = shallowRef<HTMLElement>();
@@ -77,6 +81,11 @@ export const FlyoutMenu = defineComponent(
         const openIndex = shallowRef<number>();
         const shownIndex = shallowRef<number>();
         const isPressOpened = shallowRef(false);
+        const isHoverOpened = shallowRef(false);
+        const hoveredIndex = shallowRef<number>();
+        const focusVisibleIndex = shallowRef<number>();
+        const hoveredItem = shallowRef<HTMLElement>();
+        const focusVisibleItem = shallowRef<HTMLElement>();
         const isGliding = shallowRef(false);
         const expandedValues = shallowRef<T[]>([]);
 
@@ -156,6 +165,47 @@ export const FlyoutMenu = defineComponent(
 
         const bridge = computed(() => HoverIntentUtils.computeBridgeInsets(placement.value, props.offset));
 
+        const getFloaterTransitionDurationMs = () =>
+            props.floaterTransitionDurationMs ?? FLYOUT_MENU_DEFAULTS.floaterTransitionDurationMs;
+
+        const entryFloater = FloaterVueUtils.useFloater({
+            isEnabled: () => slots.renderHighlightFloater !== undefined,
+            container: rootRef,
+            target: () => {
+                const index = hoveredIndex.value ?? openIndex.value ?? focusVisibleIndex.value;
+
+                return index === undefined ? undefined : getEntryElement(index);
+            },
+            transitionDurationMs: getFloaterTransitionDurationMs,
+        });
+
+        const panelFloater = FloaterVueUtils.useFloater({
+            isEnabled: () => slots.renderHighlightFloater !== undefined,
+            container: linksRef,
+            target: () => hoveredItem.value ?? focusVisibleItem.value,
+            transitionDurationMs: getFloaterTransitionDurationMs,
+        });
+
+        const findEntryIndex = (target: EventTarget | null | undefined) => {
+            const entry = target instanceof Element ? target.closest(`.${FlyoutMenuStyles.flyoutMenuEntry}`) : null;
+
+            if (!(entry instanceof HTMLElement)) return undefined;
+            if (entry === overflowRef.value) return OVERFLOW_INDEX;
+
+            const index = entryElements.value.indexOf(entry);
+
+            return index === -1 ? undefined : index;
+        };
+
+        const findPanelItem = (target: EventTarget | null | undefined) => {
+            const item = target instanceof Element ? target.closest(`.${FlyoutMenuStyles.flyoutMenuPanelItem}`) : null;
+
+            return item instanceof HTMLElement ? item : undefined;
+        };
+
+        const readFocusVisible = (target: EventTarget | null) =>
+            target instanceof HTMLElement && InteractionTrackerUtils.computeIsFocusVisible(target) ? target : undefined;
+
         const close = () => {
             const index = openIndex.value;
 
@@ -168,14 +218,16 @@ export const FlyoutMenu = defineComponent(
             if (isOpen && FlyoutMenuUtils.getIsHoverSwitchRefused(openIndex.value, index, getHasFocusInside())) return;
 
             if (isOpen) isPressOpened.value = false;
+            if (isOpen && openIndex.value !== index) isHoverOpened.value = true;
 
             openIndex.value = FlyoutMenuUtils.computeNextOpenIndex(openIndex.value, index, isOpen);
         };
 
         const toggle = (index: number) => {
-            const isOpen = openIndex.value !== index;
+            const isOpen = openIndex.value !== index || isHoverOpened.value;
 
             hoverIntents.get(index)?.cancel();
+            isHoverOpened.value = false;
             isPressOpened.value = isOpen;
             openIndex.value = FlyoutMenuUtils.computeNextOpenIndex(openIndex.value, index, isOpen);
         };
@@ -254,6 +306,11 @@ export const FlyoutMenu = defineComponent(
             isGliding.value = false;
         });
 
+        watch(shownIndex, () => {
+            hoveredItem.value = undefined;
+            focusVisibleItem.value = undefined;
+        });
+
         watch(shownIndex, (index, previous, onCleanup) => {
             if (index === undefined || previous === undefined || !fader.isVisible.value) return;
 
@@ -270,7 +327,7 @@ export const FlyoutMenu = defineComponent(
             if (!isPressed || open === undefined || !panel || !current) return;
 
             isPressOpened.value = false;
-            FocusManagerUtils.getFirstFocusableChild(panel)?.focus({ preventScroll: true });
+            FlyoutMenuUtils.focusFirstLinkAfterPress(panel);
         });
 
         watchAfterRender([openIndex, hasOverflow, cut], ([open, isOverflowing]) => {
@@ -370,7 +427,9 @@ export const FlyoutMenu = defineComponent(
         const renderLinkList = (links: FlyoutMenuLinkRecord<T>[], id?: string) => (
             <ul id={id} class={FlyoutMenuStyles.flyoutMenuPanelList}>
                 {links.map((link, index) => (
-                    <li key={index}>{renderLink(link)}</li>
+                    <li key={index} class={FlyoutMenuStyles.flyoutMenuPanelItem}>
+                        {renderLink(link)}
+                    </li>
                 ))}
             </ul>
         );
@@ -382,7 +441,7 @@ export const FlyoutMenu = defineComponent(
 
             return (
                 <li key={position} class={FlyoutMenuStyles.flyoutMenuPanelEntry}>
-                    <div class={FlyoutMenuStyles.flyoutMenuPanelRow}>
+                    <div class={[FlyoutMenuStyles.flyoutMenuPanelRow, FlyoutMenuStyles.flyoutMenuPanelItem]}>
                         {renderLink(entry)}
 
                         {hasPanel &&
@@ -413,13 +472,49 @@ export const FlyoutMenu = defineComponent(
                 renderLinkList(props.entries[shownIndex.value ?? OVERFLOW_INDEX]?.links ?? [])
             );
 
+        const renderFloater = (floater: ReturnType<typeof FloaterVueUtils.useFloater>) => {
+            const floaterTransitionDurationMs = getFloaterTransitionDurationMs();
+
+            return (
+                floater.isRendered.value && (
+                    <div
+                        ref={floater.setRef}
+                        class={FloaterStyles.floater}
+                        style={{ ...floater.bounds.value, transitionDuration: `${floaterTransitionDurationMs}ms` }}
+                    >
+                        {callSlot(slots.renderHighlightFloater, {
+                            visibilityTarget: floater.visibilityTarget.value,
+                            transitionDurationMs: floaterTransitionDurationMs,
+                        })}
+                    </div>
+                )
+            );
+        };
+
         const renderPanelLinks = () => (
             <div
                 ref={(target) => {
                     linksRef.value = toElement(target);
                 }}
                 class={FlyoutMenuStyles.flyoutMenuPanelLinks}
+                onPointerover={(e: PointerEvent) => {
+                    hoveredItem.value = findPanelItem(e.target);
+                }}
+                onPointerleave={() => {
+                    hoveredItem.value = undefined;
+                }}
+                onFocusin={(e: FocusEvent) => {
+                    focusVisibleItem.value = findPanelItem(readFocusVisible(e.target));
+                }}
+                onFocusout={() => {
+                    focusVisibleItem.value = undefined;
+                }}
+                onKeydown={() => {
+                    focusVisibleItem.value = findPanelItem(readFocusVisible(document.activeElement));
+                }}
             >
+                {renderFloater(panelFloater)}
+
                 {renderPanelLinkList()}
             </div>
         );
@@ -456,13 +551,36 @@ export const FlyoutMenu = defineComponent(
             const open = openIndex.value;
 
             return (
-                <nav class={FlyoutMenuStyles.flyoutMenuRoot} aria-label={props.ariaLabel}>
+                <nav
+                    ref={(target) => {
+                        rootRef.value = toElement(target);
+                    }}
+                    class={FlyoutMenuStyles.flyoutMenuRoot}
+                    aria-label={props.ariaLabel}
+                >
+                    {renderFloater(entryFloater)}
+
                     <ul
                         ref={(target) => {
                             listRef.value = toElement(target);
                         }}
                         class={FlyoutMenuStyles.flyoutMenuList}
                         style={{ gap: `${getGap()}px`, visibility: hasMeasured.value ? undefined : "hidden" }}
+                        onPointerover={(e: PointerEvent) => {
+                            hoveredIndex.value = findEntryIndex(e.target);
+                        }}
+                        onPointerleave={() => {
+                            hoveredIndex.value = undefined;
+                        }}
+                        onFocusin={(e: FocusEvent) => {
+                            focusVisibleIndex.value = findEntryIndex(readFocusVisible(e.target));
+                        }}
+                        onFocusout={() => {
+                            focusVisibleIndex.value = undefined;
+                        }}
+                        onKeydown={() => {
+                            focusVisibleIndex.value = findEntryIndex(readFocusVisible(document.activeElement));
+                        }}
                     >
                         {props.entries.map(renderEntry)}
 
@@ -544,6 +662,7 @@ export const FlyoutMenu = defineComponent(
             placement: null,
             offset: null,
             transitionDurationMs: null,
+            floaterTransitionDurationMs: null,
             hoverShowDelayMs: null,
             skipDelayWindowMs: null,
             computeToggleLabel: null,
