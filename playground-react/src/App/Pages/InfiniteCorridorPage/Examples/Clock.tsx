@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 
 import { Button, InfiniteCorridor, MediaQueryMonitorReactUtils } from "@thewaver/ss-components-react";
 import { InfiniteCorridorKnobs } from "@thewaver/ss-playground/App/Knobs/InfiniteCorridors.const";
@@ -10,6 +10,7 @@ import { PageExampleKnobs } from "../../../PageComponents/ExampleKnobs/ExampleKn
 import { PageNumberField } from "../../../PageComponents/Field/Field";
 import { PageProp } from "../../../PageComponents/Prop/Prop";
 import { PageControlButtonContent } from "../../../StyledComponents/ControlButtonContent/ControlButtonContent";
+import { useSpinDegrees } from "../InfiniteCorridorPage.utils";
 import type { InfiniteCorridorExampleProps } from "../InfiniteCorridorPageReact.types";
 import { Room } from "./Room";
 
@@ -49,13 +50,17 @@ export const ClockExample = (props: Props) => {
         return () => cancelAnimationFrame(frameId);
     }, [isWalking, lapMs]);
 
+    const spinDegrees = useSpinDegrees(props.spinDegreesPerSecond, isWalking);
+
+    const layout = useMemo(() => props.toLayout(spinDegrees), [props.toLayout, spinDegrees]);
+
     return (
         <>
             <div className={styles.stage}>
                 <div className={styles.frame}>
                     <InfiniteCorridor
                         items={props.items}
-                        layout={props.layout}
+                        layout={layout}
                         progress={[progress, setProgress]}
                         glideDurationMs={props.glideDurationMs}
                         ariaLabel={"Walking corridor"}

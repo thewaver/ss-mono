@@ -1,5 +1,5 @@
 <script module lang="ts">
-    import { Corners } from "@thewaver/ss-components-svelte";
+    import { CornerHighlight } from "@thewaver/ss-components-svelte";
     import * as styles from "@thewaver/ss-playground/App/Pages/Spotlights/Spotlights.css";
 
     export { renderHighlight, renderOverlay };
@@ -14,5 +14,5 @@
 {/snippet}
 
 {#snippet renderHighlight(visibilityTarget: 0 | 1)}
-    <Corners color={visibilityTarget === 1 ? "yellow" : "transparent"} />
+    <CornerHighlight color={visibilityTarget === 1 ? "yellow" : "transparent"} />
 {/snippet}

@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { useModel } from "vue";
 
-import { Corners, Radio, RadioGroup } from "@thewaver/ss-components-vue";
+import { CornerHighlight, Radio, RadioGroup } from "@thewaver/ss-components-vue";
 import { RADIO_GROUP_GAP, SIZE_OPTIONS } from "@thewaver/ss-playground/App/Pages/RadioPage/RadioPage.const";
 
 import PageRadioContent from "../../../StyledComponents/RadioContent/RadioContent.vue";
@@ -25,7 +25,7 @@ const value = useModel(props, "value");
             </template>
 
             <template #renderDecoration="flags">
-                <Corners
+                <CornerHighlight
                     :color="flags.checkedState === true ? 'yellow' : 'transparent'"
                     :corner-length="CORNER_LENGTH"
                     :stroke-thickness="STROKE_THICKNESS"

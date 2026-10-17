@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { shallowRef } from "vue";
+import { computed, shallowRef } from "vue";
 
 import { ElementObserverVueUtils, InfiniteCorridor } from "@thewaver/ss-components-vue";
 import { InfiniteCorridorKnobs } from "@thewaver/ss-playground/App/Knobs/InfiniteCorridors.const";
@@ -9,12 +9,13 @@ import * as styles from "@thewaver/ss-playground/App/Pages/InfiniteCorridorPage/
 import PageExampleKnobs from "../../../PageComponents/ExampleKnobs/PageExampleKnobs.vue";
 import PageNumberField from "../../../PageComponents/Field/PageNumberField.vue";
 import PageProp from "../../../PageComponents/Prop/Prop.vue";
+import { useSpinDegrees } from "../InfiniteCorridorPage.utils";
 import type { InfiniteCorridorExampleProps } from "../InfiniteCorridorPageVue.types";
 import Room from "./Room.vue";
 
 type Props = InfiniteCorridorExampleProps;
 
-defineProps<Props>();
+const props = defineProps<Props>();
 
 const boxRef = shallowRef<HTMLElement>();
 const runwayRef = shallowRef<HTMLElement>();
@@ -27,6 +28,10 @@ const scrollTo = (next: number) => {
 
     if (box) box.scrollTop = next * (box.scrollHeight - box.clientHeight);
 };
+
+const spinDegrees = useSpinDegrees(() => props.spinDegreesPerSecond, true);
+
+const layout = computed(() => props.toLayout(spinDegrees.value));
 </script>
 
 <template>

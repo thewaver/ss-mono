@@ -590,7 +590,7 @@ Every abstract is now split along the lines above; these are the recurring shape
 - **`Glass`'s filter builders** return markup through `Generators/SVGDefs`, which is JSX; they moved to
   `GlassSolidUtils`, and the geometry and ids stayed. `Glass` was at first left out of `core.ts`, because its
   description type borrowed Solid-flavored gradient types from `Generators/SVGDefs`; it rejoined once the generators
-  were split (_"Porting: the SVG generators, `Shape`, `Surface`, `GlassSurface`, `Corners` and `Glass`"_), and
+  were split (_"Porting: the SVG generators, `Shape`, `Surface`, `GlassSurface`, `CornerHighlight` and `Glass`"_), and
   `GlassReactUtils` is the React side of the builders.
 
 **Every abstract has its React side, written ahead of the components that will use it.** The user's call,
@@ -1378,7 +1378,7 @@ the other pages copy. Taken on Claude's judgment under the unsupervised port.
 - **A core type is reused in React where its documentation reads true for both**; `CarouselState` is redeclared on
   the React side only because its documentation names `playback`.
 
-### Porting: the SVG generators, `Shape`, `Surface`, `GlassSurface`, `Corners` and `Glass`
+### Porting: the SVG generators, `Shape`, `Surface`, `GlassSurface`, `CornerHighlight` and `Glass`
 
 - **One SVG defs record, generic in the core**: `SVGDefsOf<TElement>` in `SVGDefs.types.ts`, with Solid's `SVGDefs` as
   `SVGDefsOf<JSX.Element>` in `SVGDefsSolid.types.ts` and React's as `SVGDefsOf<ReactNode>` under the same name in the
@@ -1804,11 +1804,16 @@ under which — both are claims about level — so the other layer had to be nam
 against `Exotics` is the ones you need against the ones you might want, and it makes no claim to be the
 bottom of the stack, which leaves `Primitives` underneath it uncontested.
 
-**`Corners` is an `Exotic` rather than an `Essential`.** Nothing in the library uses it — the five
+**`CornerHighlight` is an `Exotic` rather than an `Essential`.** Nothing in the library uses it — the five
 Playground pages that draw it are painters of the Playground's own — so the shared-body test that sent the
 other three to `Primitives` does not catch it. It renders DOM and it is public, which rules out `Abstracts`
 too. What it is, is a decoration with a look of its own, which is what `Exotics` holds. The user's call, and
 it took a page with it.
+
+**It was `Corners` until `CornerPin` arrived.** The user renamed it to `CornerHighlight` once the two sat side by side
+in `Exotics`: a bare `Corners` read as the general case of anything to do with corners, and the new name says what it
+draws them for. Its props, styles and Playground page took the new name with it; `CornerKey` belongs to neither and
+lives in `Abstracts/QuadWarp`.
 
 **`AudioSwitcher` renders nothing and is still an `Essential`.** It returns null — not a wrapper, not an
 empty box, no elements at all — so it fails the page test twice over: there is nothing to look at, and the
@@ -3988,7 +3993,7 @@ judge its mirror, whose offset has the opposite sign.
 it; `out` means beside it. Choosing between them is the consumer stating a relationship, not a hint — a
 tooltip that hops from inside its anchor to outside has changed what it means. So `left_in` may become
 `right_in` and `left_out` may become `right_out`, and nothing else. `center` may fall back to either `in`,
-since a centerd layer already overlaps.
+since a centered layer already overlaps.
 
 The cost is measured: when an anchor is itself clipped by the viewport there are cases where no `in`
 placement fits and an `out` one would have. All of them require the anchor to be partly off-screen.
@@ -4897,7 +4902,7 @@ are drawn at, which is what makes a submenu concentric with the level above it.
   nothing. `Popover` gained `isTransparentToPointer` and the placed items re-enable themselves. The fix
   silently did nothing at first because the new style was declared _above_ `popoverRoot` and lost on source
   order; both are a single class, so the later one wins.
-- **It must not be nudged.** A ring is centerd on its invoker, and `Anchor` moving it to keep it on screen
+- **It must not be nudged.** A ring is centered on its invoker, and `Anchor` moving it to keep it on screen
   breaks exactly that. `getIsPinned` skips both adjustments it makes — choosing a safe placement from the
   family, and clamping into the viewport bands.
 - **Pinned means it has to close.** A layer that does not follow its anchor is pointing at nothing once the
@@ -5198,7 +5203,7 @@ start is chosen so it sits inside that spread rather than being squashed to fit.
 radius several times the root's, so the same angle there is a far longer arc — which is how a two-item
 submenu ended up sprawled across a half-circle. Below the root each wedge asks for a target arc _length_
 instead, converted to an angle at that band's radius, so a wedge is about the same size however deep it is.
-The block is then centerd on the wedge that opened it, which is the thing that makes three bands legible.
+The block is then centered on the wedge that opened it, which is the thing that makes three bands legible.
 
 **Where the pieces live.** `components/src/Essentials/Menus` holds `Menu` and `WheelMenu`; the Playground
 mirrors it under `Pages/Menus` and the left-hand nav groups them. The arc factory itself is sample code
@@ -5889,7 +5894,7 @@ fault that a snapped arc could not nest — there is nothing left to snap.
 
 **A sector still carries the point it turns about.** That came out of snapping and outlived it: a painter is
 handed a `PlacementRect` rather than the layout, so a wedge drawn about the middle of the box would be drawn
-about the wrong point whenever the box is not centerd on the circle. `getSectorPath` prefers an explicit
+about the wrong point whenever the box is not centered on the circle. `getSectorPath` prefers an explicit
 argument, then the sector's own, then the middle.
 
 ### The arc can be flattened or stretched, and spaces its items along the curve
@@ -5929,7 +5934,7 @@ would read as uneven in a way they never do on a circle.
 
 The user's call, on a finding that came out of painting a wheel's wedges with a gradient. Putting an SVG
 gradient definition inside the wheel's popup was enough to make the browser re-run hit-testing as the popup
-appeared, and it reports that as a fresh `mouseenter` — so a wheel, which opens centerd on its own trigger,
+appeared, and it reports that as a fresh `mouseenter` — so a wheel, which opens centered on its own trigger,
 handed the highlight to the close control in its hole before anybody had touched anything.
 
 **The highlight moves on `pointermove`, not on an enter.** A pointer standing still never sends one, so whatever
@@ -5998,12 +6003,12 @@ is the one a consumer is looking at when they tune it, and every band beyond it 
 An open run puts an item on each end, so `N` items make `N - 1` gaps; a closed loop makes `N`. The arc used
 to hold both and swap between them the moment the spread reached a whole turn, which moved two things at
 once — the spacing, because the gap count changed, and the whole arrangement's rotation, because an open run
-is centerd on the facing direction while a closed one puts its first item there. Six items over 350° left
+is centered on the facing direction while a closed one puts its first item there. Six items over 350° left
 five gaps of 70° and a 10° seam; a nudge to 360 made every gap 60° and turned the ring by half a step. The
 user described the second half as going from an upright hexagon to a sideways one.
 
 **The arc has no closed case now.** Its spread is clamped to `360 * (N - 1) / N`, the widest run whose own
-gaps already measure a full turn divided by `N`, and the run is centerd on the facing direction at every
+gaps already measure a full turn divided by `N`, and the run is centered on the facing direction at every
 spread. Past the cap nothing changes at all: with six items, 300°, 350°, 360° and 450° all place the same
 six points. A full ring is still reachable — at the cap the seam equals every other gap, which is what a
 ring is — it simply cannot be asked for as `360` and land somewhere different.
@@ -6023,16 +6028,16 @@ put.
 ### The ring starts from the same place at every spread, a whole turn included
 
 The band had a second rule for a whole turn: below one, the run was laid symmetrically about straight up;
-at exactly one, the first wedge was centerd there instead. Nothing else jumped — the wedge width and the
+at exactly one, the first wedge was centered there instead. Nothing else jumped — the wedge width and the
 hole both close smoothly, 55.33° and 13° at 350, 56.98° and 3.1° at 359.9 — but the arrangement turned by
 half a wedge at the last degree of the knob.
 
-**There is one rule now: the run is centerd on the reference at every spread.** The user's, put as "why
+**There is one rule now: the run is centered on the reference at every spread.** The user's, put as "why
 don't we simply always start positioning from X regardless of the full angle being 60, 360 or
 366000000000". The whole-turn branch is gone, and the spread is clamped to a whole turn so a number past one
 means one. Six items at 359.9 and at 360 place the same wedges.
 
-**What it gives up is a wedge centerd at twelve o'clock on a whole wheel.** Centring the run there puts a
+**What it gives up is a wedge centered at twelve o'clock on a whole wheel.** Centering the run there puts a
 wedge boundary at the top when the item count is even and a wedge middle when it is odd. That was the whole
 reason for the branch, and a consumer wanting the old look asks for it by turning the ring rather than by
 falling into a different formula — the same answer the arc reached.
@@ -6112,7 +6117,7 @@ turning the knob left the band sliding across itself instead of along itself. Th
 were declared, defaulted and never read at all — `band_diag_1`'s travel, and the travel on the second gradient
 of `band_1v1`.
 
-**The travel is one rule now, `projectBoxRatioOntoAngle`.** The centerd pointer ratio is projected onto the
+**The travel is one rule now, `projectBoxRatioOntoAngle`.** The centered pointer ratio is projected onto the
 band's axis and divided by `|cos| + |sin|`, which is the largest that projection can reach inside the box. So
 a drag from one corner to the opposite one moves the band by the whole of its travel knob whatever angle it
 sits at, rather than by a factor that grows and shrinks with the angle.
@@ -6444,7 +6449,7 @@ picked wedge at rotation zero — wherever the layout happens to put its first p
 to be under the marker; it used to be, by accident.
 
 **The accident was the ring's whole-turn branch, which was removed on purpose.** A full-turn ring used to
-centre its _first_ wedge on the facing direction; it now centres the _run_ there, so on eight wedges the first
+center its _first_ wedge on the facing direction; it now centers the _run_ there, so on eight wedges the first
 one starts at the bottom and a wedge boundary sits at twelve o'clock. That change is right and stays — the
 entry two along argues it — and this is the consumer that was leaning on the old formula.
 
@@ -6608,8 +6613,8 @@ in the quarters they used to be — and `cliffStepRatio`, the step from one lead
 def. It is the one that cannot break anything: a cliff grows downward and `toFittedLayout` measures the
 height afterwards.
 
-The old `1.75`-quarter base constant is gone, though. It was the centring, worked out once by hand; the
-leader is now placed from the shift ratios so a cliff sits centerd in its box, which comes out at exactly the
+The old `1.75`-quarter base constant is gone, though. It was the centering, worked out once by hand; the
+leader is now placed from the shift ratios so a cliff sits centered in its box, which comes out at exactly the
 same `0.4375`.
 
 **Hexagons still overlap and that is where it rests.** Tiling them wants second across by half and third back
@@ -6667,7 +6672,7 @@ An item in the middle is `index === 0 ? a circle : a wedge`. Neither needs the p
 
 **So `createRing` takes an item count and answers with one ring.** It has no notion of depth, of a parent, or
 of a root, and `path`, `parentExtent` and `parentPlacement` no longer reach it. What it gained instead is
-`facingDegrees`, the same knob the arc has: where the run is centerd. That one number replaced the aiming
+`facingDegrees`, the same knob the arc has: where the run is centered. That one number replaced the aiming
 branch, because aiming a submenu at its opener is just facing the opener's mid-angle.
 
 `wedgeArc` went with the nesting. It only ever sized wedges on a level that was not the root, and there is no
@@ -7171,7 +7176,7 @@ and one prop meaning a string union on one component and a record on another is 
 trap.
 
 **`Drawer` narrows to four edges and adds nothing else**: `DrawerEdge` drops `"center"`, and `getEdge` is
-required where `getAlignment` was optional. An edge-attached dialog that could be centerd is not a drawer.
+required where `getAlignment` was optional. An edge-attached dialog that could be centered is not a drawer.
 
 **`AlertDialog` was a preset that earned nothing.** It set `role="alertdialog"`, required
 `getInitialFocusRef` and turned overlay-click dismissal off — three props already public on `Modal`, and no
@@ -8385,7 +8390,7 @@ a name that described neither the shape nor the family.
 
 **What `frameNearest` costs is worth knowing before it is judged, because the clamp hides it.** Everything
 outside the square that fits inside the grid lands below zero and is clamped, so all of it starts at the same
-moment: measured on a twenty-one by seven grid with a centerd origin, forty-nine of a hundred and forty-seven
+moment: measured on a twenty-one by seven grid with a centered origin, forty-nine of a hundred and forty-seven
 cells carry the ramp and the other ninety-eight arrive together. On a square grid it is identical to
 `frameFarthest`. It is here because the user asked for the nearest-edge member by name, having been told first
 what it does to a wide grid.
@@ -8407,7 +8412,7 @@ banded a wide grid's stretched entries across rings the ramp does not follow.
 **Handedness is an axis of an existing family, not a family of its own.** `_sweepCw` and `_sweepCcw` were a
 second implementation of the thing `radar` already does — one arm turning about the origin — and measured, with
 the origin at a corner they and `radar_single` order the hundred and twenty-one cells identically to within a
-rounding error, so nothing on the page could tell them apart. At a centerd origin they do differ, but only in
+rounding error, so nothing on the page could tell them apart. At a centered origin they do differ, but only in
 which ray the arm starts from and which way it turns: `radar_single` starts at six o'clock and turns
 counter-clockwise, `_sweepCw` starts at twelve and turns clockwise. Sweep also spaces the arm by true angle
 where radar spaces it by how far round the square ring a cell sits, which is a few percent of one cell's start
@@ -8492,7 +8497,7 @@ the origin's column, and every row sweeps the same way. The frontier that gives 
 the two terms compound, not because anything measures a radius. It is therefore a band family and does take a
 diagonal member — the caution about rings never applied to it.
 
-**Its diagonal member was built, measured and deleted, on `zigzag`'s ratio.** With a centerd origin, `oval_row`
+**Its diagonal member was built, measured and deleted, on `zigzag`'s ratio.** With a centered origin, `oval_row`
 differs from `line_row` by up to 0.167 on eleven by eleven and 0.250 on twenty-one by seven, while the diagonal
 member differed from `line_diagonal_down` by 0.091 and 0.071 — the second figure worse, because a wide grid has
 few rows and many diagonal bands. That is the same 0.091 that had both `zigzagDiagonal` entries deleted, so
@@ -8604,7 +8609,7 @@ four members are two directions times two handednesses rather than four position
 quadrants would be invented here rather than read off the names.
 
 **A diagonal family needs the four axis zones as well as the four quadrants.** The quadrants leave out every
-cell sharing a row or a column with the origin, which on an odd grid with a centerd origin is a cross of
+cell sharing a row or a column with the origin, which on an odd grid with a centered origin is a cross of
 twenty-one cells out of a hundred and twenty-one — enough to look broken if they all fall through to the
 fallback. `roll_quadrant` maps each axis to the quadrant member clockwise after it, and only the origin cell
 itself reaches the fallback. A family with a center member — `pop` has `pop_center` — needs no axis entries,
@@ -10691,9 +10696,9 @@ every icon button carry a clip-rect idiom the consumer had to know.
 ### The 0..1 guarantee belongs to `computeCellWeights`, not to each formula
 
 Three formulas leave the range a weight is defined on, and always for the same reason: they are built for
-whole-number distances, and a centerd origin on an even count makes the farthest bound a half-integer. `spiral`
+whole-number distances, and a centered origin on an even count makes the farthest bound a half-integer. `spiral`
 subtracts its raw result from 1 and divides, so a result below 1 lifts the weight above it. `radar` divides by
-`maxWeight - 1`, and measured on an eight-by-eight grid with a centerd origin `radar_single` reached -0.019,
+`maxWeight - 1`, and measured on an eight-by-eight grid with a centered origin `radar_single` reached -0.019,
 `radar_double` -0.038 and `radar_quad` -0.083. `checkered_convergent` reached -0.071 on the same grid and -0.25 on
 every cell of a two-by-two.
 
@@ -10943,7 +10948,7 @@ component does not define a viewport so much as establish one, so it is the half
 viewports stack, `getScale` is the parent's times its own and `composeScaledRect` exists only to carry a rect
 up through a stack of them, and screens do not do that. `View` and `ViewBox` read best of all and `viewBox` is
 even the right SVG term for scaling contents into a coordinate box — but the library writes `viewBox` as an
-attribute fifteen times, in `Shape`, `Bracket`, `Corners` and `PatchBoard` among others, so a file could carry
+attribute fifteen times, in `Shape`, `Bracket`, `CornerHighlight` and `PatchBoard` among others, so a file could carry
 both spellings a few lines apart. `ViewportBox` says the container twice, since a `-port` is already an
 aperture. **`Wrapper` won on being ordinary**: it is standard component vocabulary, and `InteractionWrapper`
 is already the library's suffix for a component whose whole job is to go round something and give it a
@@ -11008,7 +11013,7 @@ Settled, from three defects seen on `ViewportPage`.
 anchor.** Three things could give: the layer's size, its distance from the anchor, or the part of it you can
 see. The library gives up the last. `AnchorUtils.getBand` gives an `out` placement only the space between the
 anchor and the edge it faces, and `clampToBand` pins the edge touching the anchor, letting the far edge run
-past the viewport where `overflow: hidden` cuts it. An `in` or centerd placement is deliberately over the
+past the viewport where `overflow: hidden` cuts it. An `in` or centered placement is deliberately over the
 anchor and gets the whole viewport.
 
 Pinning the other end — `Math.max(band.start, ...)` in both directions, the obvious clamp — is what makes a
@@ -11880,7 +11885,7 @@ follows the radius of the element it is drawn on, which is the `treeitem` rather
 page that paints a circle owns making the ring round.
 
 **The same square also catches presses meant for whatever is drawn beside the circle, so rounding it is not only
-about the ring.** The Sunburst page's centre button is a square box around a round hub, and the first ring's arcs
+about the ring.** The Sunburst page's center button is a square box around a round hub, and the first ring's arcs
 reach into its corners: a press on the inner edge of an arc landed on the button instead, which at any level below
 the root went back out rather than in. The page now rounds both the button (a `globalStyle` on the `button` that
 `:has()` the hub painter) and its own positioned wrapper, since an element with a `border-radius` takes no presses
@@ -12812,7 +12817,7 @@ call, and the renaming is the point of it: a numbered key with no qualifier read
 so the base case has to be the one that earns it.
 
 **What each one does with the reading.** `band_1` is a vertical band whose center follows the pointer's
-horizontal position. `spot_1` is a radial pool centerd on the pointer. `band_diag_1` is a band fixed
+horizontal position. `spot_1` is a radial pool centered on the pointer. `band_diag_1` is a band fixed
 at 45° whose center slides along that diagonal by the pointer's projection onto it, so the tilt never changes
 and only the position does. `band_1v1` is two bands, one horizontal and one vertical,
 each following its own axis of the pointer, so they cross where the pointer is and the crossing is the
@@ -13097,7 +13102,7 @@ read correctly.
 **The clamp was the thing making it look stuck.** Pinning `boxRatio` to 0 – 1 holds the band against the
 edge for as long as the pointer is anywhere outside, so every version of the fade had to hide a band that
 was still there. Removing the clamp is the whole fix, and it also means an untouched page shows the band
-centerd, exactly as `spot_1` shows its pool centerd.
+centered, exactly as `spot_1` shows its pool centered.
 
 **Every tracked sample reads from the colors bag, and brightness comes from luminosity rather than from white.**
 The first build painted every core white on the reasoning that a highlight is the color of the light; the
@@ -13279,7 +13284,7 @@ to a pie slice and is not worth fighting.
 
 ### The trails leave stamps behind and fade them where they lie
 
-**What they draw.** A pool centerd on the pointer, and behind it `STAMP_COUNT` radial stamps laid down along
+**What they draw.** A pool centered on the pointer, and behind it `STAMP_COUNT` radial stamps laid down along
 the path the pointer took. Each stamp is a frozen position: it is written once, and from then on it dims in
 place until it is overwritten. The pointer therefore leaves a smear behind it that fades away over
 `STAMP_COUNT * STAMP_INTERVAL_MS`, and a pointer holding still shows only the pool. The numbers are the
@@ -14071,7 +14076,7 @@ control. The real carousel is `Carousel`, which has since been built.
 **The track holds arbitrary children, and that is the user's call.** It renders nothing and types nothing: the
 consumer's markup goes in as `children` and comes out untouched. A list of records — `Tabs`' shape — was
 rejected because the first consumer is a `Tabs`, which would then have been rendered twice over, and because
-everything the component needs it can measure. Focus centring works by watching for focus reaching **any**
+everything the component needs it can measure. Focus centering works by watching for focus reaching **any**
 descendant. Paging lands on item boundaries by reading the track's own child elements, and where there is only
 one child — the `Tabs` case — the rule degrades to a full page with no special case, because there is no
 boundary inside the page to prefer.
@@ -14079,13 +14084,13 @@ boundary inside the page to prefer.
 **It never claims the arrow keys.** A `Tabs` inside it already walks its tabs with them, and two owners of one
 key is a bug found later rather than sooner. The component listens; it never moves focus itself.
 
-**A focused child is revealed, not centerd, and the pointer counts the same as the keyboard.** Settled with the
-user after the first attempt centerd on keyboard focus alone: an item already fully in view does not move the
-strip, and one cut off by an edge scrolls by the least that shows it whole. Centring is worse in both
+**A focused child is revealed, not centered, and the pointer counts the same as the keyboard.** Settled with the
+user after the first attempt centered on keyboard focus alone: an item already fully in view does not move the
+strip, and one cut off by an edge scrolls by the least that shows it whole. Centering is worse in both
 directions — it drags a half-clicked item out from under the cursor, and it moves the strip when nothing needed
 moving. Distinguishing pointer from keyboard was my patch for the first of those and it bought a second
 behavior to remember; revealing removes the cause instead, so one rule covers both. What it gives up is the
-look-ahead a centerd item has: a child revealed at an edge sits flush against it, with nothing of the next one
+look-ahead a centered item has: a child revealed at an edge sits flush against it, with nothing of the next one
 showing.
 
 **It renders no `<button>`, which is the `NumberInput` shape rather than the `Tabs` one.** `renderButton` is
@@ -14438,7 +14443,7 @@ clock, a random source or anything else writes it. So the pause WCAG 2.2.2 asks 
 the carousel's turning ring, and the Playground's clock example carries a Play/Pause button and starts paused under
 reduced motion.
 
-**The layout is a rule, as a carousel's arrangement is: `{ place, reach, viewDistance }`.** `place` answers from a
+**The layout is a rule, as a carousel's arrangement is: `{ place, reach, focusDistance }`.** `place` answers from a
 drawn item's distance down the corridor with its size, its offset in pixels, its turn, the perspective and its
 opacity. `walls` packs one row on each wall at eye level, its items taking turns between the walls by their slot.
 **`walls` is one layout with an angle rather than two layouts.** The user's two reference pictures — items flat against
@@ -14467,7 +14472,7 @@ focused in it loses focus as it leaves the view.
 **Focus brings an item into view by moving the corridor and writing `progress` back.** The user's call, over leaving
 items out of view unreachable: a scrolling box scrolls to what takes focus inside it, and so does this. A page driving
 it from a scroll position follows by scrolling to the progress written, as the Playground's scrolled example does. An
-item counts as in view from half the layout's `viewDistance` out to twice it; `walls` brings a focused item to the front
+item counts as in view from half the layout's `focusDistance` out to twice it; `walls` brings a focused item to the front
 of its wall, since anything further back stands partly behind the items in front of it.
 
 **It glides the copy that took focus, by its own distance, never the short way round.** The first build glided the
@@ -14480,30 +14485,58 @@ or two later, in whole pixels and moved by whatever else nudges the box, and the
 those as someone else taking over and stopped on the first frame. `getIsEcho` counts anything within a hundredth of a
 lap of the last few writes as the corridor's own.
 
-### `InfiniteCorridor`'s tube: items lining a ring of sides, upright towards the centre
+### `InfiniteCorridor`'s tube: items lining a ring of sides, upright towards the center
 
 From Framer's 3D SpatialGallery, a WebGL tunnel of pictures round its axis. Named `tube` by the user, since a tunnel can
 be square, lozenge-shaped or a half-circle. It is a third layout rather than a shape setting on the component: the walls
 were always a tube with two positions round it.
 
 **Each item lines the tube's side, facing the middle, with its top towards the far end.** The user's call, from a
-screenshot of the effect: on screen every item then stands upright towards the centre — upright below the middle, on
+screenshot of the effect: on screen every item then stands upright towards the center — upright below the middle, on
 its side to the right, upside down above. The placement grew a `rollDegrees`, round the corridor's axis, and a
 `tiltDegrees`, leaning back about the item's level line, both left out by `walls`; the transform moves,
 rolls, leans, then turns. The tube is a ring of flat sides, `12` by default, rather than a smooth circle, because every
 item is flat. **Its `farWidthRatio` is the size of the hole at the far end**, as it looks on screen, the user's call
 once the setting turned out to do nothing for the tube: the near ring stays at the box's edges and each ring's radius is
 grown by the reverse of the perspective at its depth, as the walls' width is, with each item widened to match so the
-ring stays closed. **Rings always touch**: each item runs from its own ring's edge to the next ring's, stretched to that
-length and leaned to follow the taper, the user's call after a narrow far end left dark bands between rings that each
-lay flat at one radius.
+ring stays closed. **That growing stops at both ends of what is drawn**: past `visibleRings` the radius holds and
+the tube carries on as a plain tube shrinking to its vanishing point, and behind the viewer it holds at the near ring
+and widens as it passes. Grown all the way, every ring past the far end sat at the hole's size on screen, so an item's
+near and far edges landed on one circle, its pinned corners lay on a line, and the fully opaque ring at the limit was
+drawn as garbage; the passing ring flattened onto the box's edge the same way. **Rings always touch**: each item runs from its own ring's edge to the next ring's, the user's call
+after a narrow far end left dark bands between rings that each lay flat at one radius.
+
+**Each item's four corners are pinned, through `QuadWarpUtils`, rather than the item being moved and turned.** The
+user's call, which is where `CornerPin` came from. The first build stretched a rectangle to the average width of its
+two edges and leaned it to follow the taper; the right shape between two rings of different size is a trapezoid, so a
+rectangle stuck out at one end and fell short at the other, and with a twist the next ring's item did not start where
+this one ended. `CorridorLayoutUtils.computeTubeCorners` places the four corners where the side crosses its own ring
+and the next, each edge turned by its own ring's twist, leans them about the item's middle line by `tiltDegrees`, and
+projects them the way `perspective()` would; `InfiniteCorridorUtils.toItemStyle` stretches the item onto them with
+`QuadWarpUtils.toTransform`. So neighbors share corner points exactly, round the ring and on to the next. With a twist
+the far edge is turned further than the near one, so the four points are no longer on one flat surface in depth; the
+item is drawn as the flat shape the four points make on screen, which is what makes the corkscrew close. A placement is
+therefore one of two shapes, `InfiniteCorridorTurnedPlacement` (the walls) or `InfiniteCorridorPinnedPlacement` (the
+tube), told apart by whether it carries `corners`; both names carry the distinguishing word, since neither is the
+general case. An item with a corner level with the viewer or behind cannot be projected, so its corners are
+`undefined` and it is hidden, which the fade already does by then at every default.
+
+**Every tube item is laid out at the nearest ring's size, and pinning does all the shrinking.** Found by the user, who
+guessed it from the far ring looking wrong after the geometry was right: each item was laid out at its own true size,
+under forty pixels wide by the third ring, so a label spilled out of the box and a painter's rounded corners ate most
+of its width — and pinning stretches whatever spills along with the box, so the overlap read as wrong corners. Laid
+out at one size, a far item is an exact smaller copy of a near one, content included.
 
 **A steady spin is an angle the consumer turns, not a clock in the layout.** The user asked for a rotation speed
 independent of travelling down the tube, and picked it over the twist when the two seemed to compete; both remain,
 since the twist turns each ring by its depth and the spin turns the whole tube. `spinDegrees` is how far the whole tube
 is turned, and the Playground's Rotation speed turns it on a clock, the way the carousel's turning ring is driven from
 its example, so the component keeps no timer of its own and the pause WCAG 2.2.2 asks for stays the consumer's; the
-Playground starts it at `0`. The page shows each layout's own settings the way Formation does — a knob list per family,
+Playground starts it at `0`. **Each example runs its own spin clock**, the page handing down only the speed and a way to
+build the layout at an angle: the Clock example's Pause has to stop everything that moves in it, the spin included, and
+a single clock on the page could not stop for one example without stopping the other.
+
+The page shows each layout's own settings the way Formation does — a knob list per family,
 held per layout, every setting of the layout shown, the layout and its settings in a row of their own above the
 corridor's own settings — with Rotation speed added for the tube, since the spin is driven rather than set.
 
@@ -14513,7 +14546,7 @@ index and a seed, so a copy has its original's gap:
 the walls are a run of slots taking turns left and right, so a skip of `1` puts every item on the left wall and `2`
 alternates walls with gaps; the tube's slots run round each ring, so a skip of `2` leaves two empty sides after each item
 and the gaps carry on into the next ring. Both layouts work in slots — an item's slot is its place times one plus the
-skip — and convert their reach, view distance and behind distance back to items, using the narrowest gap for how far
+skip — and convert their reach, focus distance and behind distance back to items, using the narrowest gap for how far
 they reach and the middle one for where a focused item lands. With a range, an item's slot is the sum of the gaps
 before it, worked out once per item count and ring length, and a position between two items runs evenly across the
 first one's gap; so the layout is handed the real item count beside the ring. The tube's whole-ring rule became a
@@ -14532,10 +14565,62 @@ repeats the list until it divides — 16 items in rings of 12 are drawn 192 time
 page this component makes. The layout also says `behindDistance` of a whole ring, so a ring passes the viewer whole
 instead of losing one item at a time to the far end.
 
+**Where a focused item is brought is `focusDistance`, and the tube's is `focusRings`.** The user's call, taken over
+renaming only the labels: it was `viewDistance` on the layout rule and on the walls, and `viewRings` on the tube, which
+said nothing about focus and read too close to `visibleRings`, the rings drawn. One idea gets one name at every level, so
+the rule's member moved with the two layouts' settings. **The tube's width level with the viewer is `nearWidthRatio`**,
+which was `radiusRatio`; same number, now stated as a width so it pairs with `farWidthRatio`.
+
 **The real copy is the nearest one ahead of the viewer, never one behind.** Written for the copies decision and
 first built including the item just passing by; with a whole ring allowed behind, that put most real items out of
 sight. A focused item is brought no further than one item count down the corridor, since its next copy towards the
 viewer would otherwise take over once it arrived.
+
+### `CornerPin`: four grips that pin a wrapper's corners, over an abstract that does the arithmetic
+
+Asked for by the user as two pieces: an abstract that works out the math, and a component that draws four corner grips
+and stretches its content through it. The tube was the first consumer of the abstract and the reason for both.
+
+**The name is the effect's industry name.** After Effects calls exactly this Corner Pin. The user's first word was
+`Skewer`, set aside because CSS's `skew` only makes parallelograms and this makes any four-sided shape. The abstract
+is `QuadWarp`, `QuadWarpUtils`, the user's name for it: sharing `CornerPin` would have put two units of one name in the
+Playground, whose dependency map is keyed by name, so the component's page would never have listed the abstract it
+stands on.
+
+**The arithmetic is a projective map onto four points, written as a `matrix3d`.** `QuadWarpUtils.toTransform` solves
+the map from the unit square onto the four corners (Heckbert's square-to-quad form) and scales it by the element's own
+size, so it needs `transform-origin: 0 0`. The content is a flat sheet seen in perspective: straight lines stay straight
+and nothing can bend it, a limit the user accepted when the effect was put to them. A shape whose corners do not all
+turn the same way cannot be drawn, so the transform is `undefined` for it.
+
+**Corners are shares of the box, `0` to `1` on each axis.** The user's call, over pixels: a resting shape is written
+without measuring anything, and resizing the box carries the corners with it. `QuadWarpUtils.RESTING_CORNERS` is the
+untouched box. `corners` is two-way, written back by every route that moves a grip.
+
+**A corner may go past the box's edges by `reachRatio`, default `0.5`, and stops short of folding.** The user's call, so
+the content can be stretched as well as squeezed. Folding is the one thing the math cannot draw, so `clampMove` moves
+the corner along its straight path and stops it where any corner would come within a margin of lying on the line
+between its neighbors; each of the three turns a moved corner affects is linear in its position, which is what makes
+the stopping point exact rather than searched for. An already folded shape is never folded further.
+
+**The route without dragging is tap a grip, then tap where it goes.** WCAG 2.5.7 asks that dragging can be done with a
+single pointer and no drag, and a keyboard route does not count towards it. The user's call, over handing out commands
+for the consumer to wire, because the library ships the accessible route itself. While a grip is picked a catcher
+covers the box widened by the reach, so the second tap lands anywhere a corner may go; it exists only from the pick to
+the put-down, so it takes no presses at any other time. Tapping the picked grip again, or Escape, puts it down.
+
+**The keyboard and a screen reader reach each corner as two sliders, across and down — eight tab stops.** `ColorArea`'s
+shape, a hidden range input per axis, and the standing rule that a control holding several values is one tab stop per
+value (_"An enabled multi-element control stays one tab stop per element"_): a corner is two values, and one control
+cannot honestly carry two. The names are the consumer's, `gripLabels`, and each axis reads out as a percentage.
+
+**The grips are painted by the consumer**, `renderGrip`, told which corner, where it is, whether it is picked or being
+dragged, and which axis shows keyboard focus. The box is the content's own size at rest; the stretched content spills
+past it, which is the rule for anything turning under perspective.
+
+**`CornerKey` moved into the abstract.** `CornerHighlight` had declared the same four values for its own corner marks; two
+names for one idea would have read as two ideas, so both components now take it from `Abstracts/QuadWarp`. The export
+name is unchanged.
 
 ### `Exotics/PointerEffects`: four wrappers that restyle their content by where the pointer is
 
@@ -15157,7 +15242,7 @@ been the same choice asked four times.
 **Furniture that only one direction needs is still sized for both, so a card does not resize when a knob
 changes.** The user's objection, and it is about the page rather than the component: the box round each
 carousel demo was `height: 320` for a column and nothing for a row, so switching direction made every card
-jump. It is one fixed height for both now, with the demo centerd in it — a row carousel leaves slack under
+jump. It is one fixed height for both now, with the demo centered in it — a row carousel leaves slack under
 itself and a column one fills it, and the card stays put either way. The first three corrections: `Formation`'s pair differed only in `getIsStackedInReverse`,
 `Satellite`'s first two only in `getIsBehindSubject`, and `Staircase`'s only in `getDir`, and each was first
 built as two example files with the value written into each. Every one of them is now a single example with
@@ -15227,7 +15312,7 @@ a marker a spec asking for "the first button in this card" found the `</>` butto
 instead of the control it meant — which is how a color-dropdown test came to assert against a code listing.
 
 **That marker is `display: contents`, and the first attempt at it broke six pages.** It was given
-`PageVariants`' demo box — a centerd flex row — which changed how every card lays its own contents out: the
+`PageVariants`' demo box — a centered flex row — which changed how every card lays its own contents out: the
 pages that were already on `PageExamples` had always put a demo's children straight into the card's column, so
 `CellAnimation` and `ScanlineAnimation` suddenly showed their local props panels **beside** their demos rather
 than below. A marker exists to be found by a selector, not to lay anything out, so it generates no box at all.
@@ -15343,7 +15428,7 @@ flush with anything, because there is nothing to be flush with.
 
 **`grid` centers its demo rather than stretching it, and a demo that must fill says so itself.** The card was
 a column that stretched its children, which was invisible while cards hugged their content and became a demo
-pinned to the left edge once they did not. The demo slot is now a centerd row. The alternative — keep
+pinned to the left edge once they did not. The demo slot is now a centered row. The alternative — keep
 stretching and have the fixed-size demos center themselves — was rejected by the user: it leaves the rule in
 each demo's CSS, where a new example forgets it silently. Nothing had to be swept in for the change, because
 a demo that has to fill already declares its own width and a declared width still fills a flex line:
@@ -15685,9 +15770,9 @@ offset reaches it. Confirmed by the user as working as designed.
 
 **The offset is a nudge in screen space, and that differs from `Anchor` on purpose.** For a floating layer the
 offset means a **gap**, so `AnchorUtils.getHPlacementOffset` signs it by the placement and discards it entirely
-on a centerd axis. A consumer placing a badge is aligning it rather than clearing a gutter, and "nudge it two
+on a centered axis. A consumer placing a badge is aligning it rather than clearing a gutter, and "nudge it two
 to the right" must not become "two to the left" because the placement flipped, nor be silently dropped because
-the axis is centerd. So `computeLayout` adds the offset raw. Stated because the two components share the
+the axis is centered. So `computeLayout` adds the offset raw. Stated because the two components share the
 placement type and disagree here.
 
 **With no satellite there is no wrapper.** `satellites` is optional, and the component renders its children
@@ -16786,7 +16871,7 @@ it was asked for rather than the thing that got built, which was put to them alo
 for now. Recorded so the same list is not put to them twice; a better name is still welcome, but it has to be
 one nobody has already turned down.
 
-**A node sits centerd between the outermost of the nodes that feed it, and that propagates upward.** The mean
+**A node sits centered between the outermost of the nodes that feed it, and that propagates upward.** The mean
 of the first and last child rather than of all of them, so an uneven fan-out still lands the parent between
 the ends instead of being dragged toward whichever side has more children — the org chart example is three
 children under one node, two under another and one leaf, and exists to show exactly that. A node with one
@@ -16801,7 +16886,7 @@ arithmetic knowing about any of them, and it is what the unit tests can check wi
 arithmetic runs in layers and rows; `orientation` decides which screen axis each of those two is, and
 `rootSide` decides which end of the layer axis the root sits at. So a knockout draw is horizontal with the
 root at the end, an org chart is vertical with the root at the start, and nothing about the tree walk or the
-centring changes between them. The Playground's org chart is **pinned** upright rather than following the
+centering changes between them. The Playground's org chart is **pinned** upright rather than following the
 page's controls, because that is what an org chart is; the other two examples follow the controls, which is
 what makes the pair of them worth having. Only two functions know about the screen at all — the one that turns a layer
 and a row into a `left` and a `top`, and the one that writes a connector point.
@@ -17078,7 +17163,7 @@ scratched, so the set is empty for the whole gesture: the preview vanished on th
 could never be observed true, making the flag in the signature a lie. The second sized the wrapper to the
 bounding box of the cells the brush covered, which meant **the brush changed size as the pointer crossed from
 one cell into the next** — the user's report. Both mistakes are the same one: deriving the brush from the grid.
-The brush is a property of the props. Its box is `2 × brushRadius` centerd exactly on the pointer, and what
+The brush is a property of the props. Its box is `2 × brushRadius` centered exactly on the pointer, and what
 actually comes off is allowed to differ, because the difference is sampling and the user said so explicitly.
 
 **It takes `Reveal`'s shape props, and they drive the rub as well as the drawing.** `computePoints`,
@@ -17678,7 +17763,7 @@ the thing rests, not of where it has already been dragged to.
 versions multiplied a unit direction by a constant scaled by the falloff, which is wrong in the way that is
 easiest to miss: the falloff is strongest at the center, so the button jumped its full travel towards a pointer
 sitting almost on top of it and only snapped back to nothing at the exact center, where the direction
-degenerates. Reported by the user as the button not being centerd when the pointer is. The reading was not at
+degenerates. Reported by the user as the button not being centered when the pointer is. The reading was not at
 fault — the readout on the same page shows `distance: 0px` at the element's own center — the arithmetic on top
 of it was.
 Taking `distance × follow ratio × pull` gives the behavior the name promises: nothing at the center, and a
@@ -17810,7 +17895,7 @@ growing shifts its neighbor sideways, which changes that neighbor's distance fro
 moved, which changes its size, which shifts the next one. The reading is taken as a ratio of the row's own
 box — which never changes, because the tiles are absolutely positioned inside it — and the resting centers
 are arithmetic rather than measurements. The row is then laid out by accumulating the grown widths and
-centring the result, so the whole row breathes symmetrically around the pointer.
+centering the result, so the whole row breathes symmetrically around the pointer.
 
 **Its footprint is the magnified spread, not the resting one.** Seven tiles at rest is 204px and the same
 seven at full magnification is 285px, so a box sized to the resting row has tiles hanging out of it. The
@@ -18508,7 +18593,7 @@ and nothing could be clicked. Bisected by removing the one line and rebuilding, 
 back. `z-index: 0` opens the same stacking context and emits fine.
 
 **Both Playground examples put their pieces on that layer**, one piece or several, and the piece stands on
-the tile's middle rather than being centerd on it: `translate(-50%, -100%)` puts its base on the point
+the tile's middle rather than being centered on it: `translate(-50%, -100%)` puts its base on the point
 `getTileCenter` returns, which is how a piece on a board is drawn. The board is unaware of any of it.
 
 #### `taper` leans the board away, and the browser draws it through one matrix
@@ -19249,7 +19334,7 @@ count under `SortableGrid`, one component along.
 #### What the first review of `Trail` and `PatchBoard` found
 
 **The traveler was not on its path, and the transform order was why.** Reported by the user against the
-circuit demo. The rule is in `conventions.md` under _"A rotation and a centring offset on one element have to
+circuit demo. The rule is in `conventions.md` under _"A rotation and a centering offset on one element have to
 be ordered"_ — the half-its-own-size shift that centers the traveler was being turned along with it, so the
 box swung off the curve wherever the direction was not straight. Their guess was `Viewport` scaling and it was
 not: the whole subtree scales together, and the traveler and the path stay in step at any scale. What made it
@@ -20001,7 +20086,7 @@ wants to paint a sortable indicator with its direction and a reorder affordance 
 those already belong.
 
 **It improves the 2.5.8 position rather than worsening it.** Target Size (Minimum) is also Level AA and wants a
-24 CSS pixel circle centred on each undersized target to clear the others. The resizer is 8px wide and sat
+24 CSS pixel circle centered on each undersized target to clear the others. The resizer is 8px wide and sat
 inside a clickable header, so **2.5.8 failed before this**. Taking the header out of the target set is what
 makes the resizer defensible. The three targets now sharing a cell are a spacing constraint the consumer owns,
 documented on the builtins.

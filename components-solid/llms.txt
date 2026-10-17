@@ -24,7 +24,7 @@ SpotlightHint, SpotlightPrompt, SplitPane, Stepper, Table, Tabs, TagInput, TextA
 TimeInput, TimePicker, Toasts, Toggle, Toolbar, Tooltip, Tree, ViewportWrapper, WheelMenu.
 
 ### Exotics — visual and motion effects
-Bracket, CellAnimation, Corners, Cuboid, ElementMosaic, ImageMosaic, FlipCard, Formation,
+Bracket, CellAnimation, CornerHighlight, Cuboid, ElementMosaic, ImageMosaic, FlipCard, Formation,
 SlotText, PaintedText, ParticleSpawner, PatchBoard, Reveal, RichText, Satellite, ScanlineAnimation,
 ScrambleText, ScratchCard, Shape, SortableGrid, Staircase, TileBoard, Timeline,
 Trail, Typewriter, DrumWheel, OverheadWheel.

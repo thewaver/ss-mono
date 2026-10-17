@@ -264,7 +264,7 @@ describe("ShapeUtils.setupPaths", () => {
         }
     });
 
-    it("points each normal outwards, away from the centre", () => {
+    it("points each normal outwards, away from the center", () => {
         const result = ShapeUtils.setupPaths(SQUARE, [0]);
 
         // Edge 0 runs along the top of the square, so its outward normal points up.

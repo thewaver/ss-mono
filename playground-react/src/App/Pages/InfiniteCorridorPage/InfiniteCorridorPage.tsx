@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from "react";
+import { useCallback, useMemo, useState } from "react";
 
 import {
     CorridorLayoutDefaults,
@@ -27,8 +27,6 @@ import { ClockExample } from "./Examples/Clock";
 import { ScrolledExample } from "./Examples/Scrolled";
 import type { InfiniteCorridorExampleProps } from "./InfiniteCorridorPageReact.types";
 
-const MS_PER_SECOND = 1000;
-const FULL_TURN = 360;
 const NO_DEFS: Record<string, number | boolean> = {};
 
 export const InfiniteCorridorPage = () => {
@@ -39,7 +37,6 @@ export const InfiniteCorridorPage = () => {
     const [spinDegreesPerSecond, setSpinDegreesPerSecond] = useState(
         CorridorLayoutKnobs.STARTING_SPIN_DEGREES_PER_SECOND,
     );
-    const [spinDegrees, setSpinDegrees] = useState(0);
     const [layoutDefs, setLayoutDefs] = useState<Record<string, Record<string, number | boolean>>>({});
 
     const family = CorridorLayouts.SAMPLE_LAYOUTS[layoutKey].family;
@@ -47,34 +44,13 @@ export const InfiniteCorridorPage = () => {
     const defaults = CorridorLayoutDefaults.DEFAULTS_BY_FAMILY[family] as Record<string, unknown>;
     const defs = layoutDefs[layoutKey] ?? NO_DEFS;
 
-    useEffect(() => {
-        if (family !== "tube" || spinDegreesPerSecond === 0) return;
-
-        let frameId: number;
-        let lastMs = performance.now();
-
-        const spin = () => {
-            const nowMs = performance.now();
-
-            setSpinDegrees(
-                (degrees) => (degrees + ((nowMs - lastMs) / MS_PER_SECOND) * spinDegreesPerSecond) % FULL_TURN,
-            );
-            lastMs = nowMs;
-            frameId = requestAnimationFrame(spin);
-        };
-
-        frameId = requestAnimationFrame(spin);
-
-        return () => cancelAnimationFrame(frameId);
-    }, [family, spinDegreesPerSecond]);
-
-    const layout = useMemo(
-        () =>
+    const toLayout = useCallback(
+        (spinDegrees: number) =>
             CorridorLayoutUtils.toLayoutRule({
                 family,
                 defs: { spinDegrees, ...defs },
             } as unknown as CorridorLayoutEntry),
-        [family, spinDegrees, defs],
+        [family, defs],
     );
 
     const items = useMemo(() => Array.from({ length: itemCount }, (_, index) => toRoomName(index)), [itemCount]);
@@ -83,7 +59,8 @@ export const InfiniteCorridorPage = () => {
         items,
         glideDurationMs,
         startingLapMs: InfiniteCorridorKnobs.STARTING_LAP_MS_BY_FAMILY[family],
-        layout,
+        spinDegreesPerSecond: family === "tube" ? spinDegreesPerSecond : 0,
+        toLayout,
     };
 
     const examples = [
@@ -113,7 +90,7 @@ export const InfiniteCorridorPage = () => {
                         itemKey={"layout"}
                         label={"Layout"}
                         hint={
-                            "Where the items stand: walls is one row on each wall, from flat against it to turned towards the viewer, and tube lines the inside of a ring of sides, every item upright towards the centre. Choosing one brings its own knobs with it."
+                            "Where the items stand: walls is one row on each wall, from flat against it to turned towards the viewer, and tube lines the inside of a ring of sides, every item upright towards the center. Choosing one brings its own knobs with it."
                         }
                     >
                         <PageSelectField

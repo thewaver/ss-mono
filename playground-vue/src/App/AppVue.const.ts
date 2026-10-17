@@ -32,7 +32,8 @@ const CirclePackingPage = () => import("./Pages/CirclePackingPage/CirclePackingP
 const ClockPage = () => import("./Pages/ClockPage/ClockPage.vue");
 const ColorAreaPage = () => import("./Pages/ColorAreaPage/ColorAreaPage.vue");
 const ColorInputPage = () => import("./Pages/ColorInputPage/ColorInputPage.vue");
-const CornersPage = () => import("./Pages/CornersPage/CornersPage.vue");
+const CornerHighlightPage = () => import("./Pages/CornerHighlightPage/CornerHighlightPage.vue");
+const CornerPinPage = () => import("./Pages/CornerPinPage/CornerPinPage.vue");
 const CuboidPage = () => import("./Pages/CuboidPage/CuboidPage.vue");
 const CurrencyInputPage = () => import("./Pages/CurrencyInputPage/CurrencyInputPage.vue");
 const DateInputPage = () => import("./Pages/DateInputPage/DateInputPage.vue");
@@ -611,8 +612,8 @@ export const MENU_CONFIGS: MenuBranchConfig[] = [
                 ],
             },
             {
-                name: "Corners",
-                component: CornersPage,
+                name: "CornerHighlight",
+                component: CornerHighlightPage,
             },
             {
                 name: "Diagrams",
@@ -660,6 +661,10 @@ export const MENU_CONFIGS: MenuBranchConfig[] = [
             {
                 name: "Perspective",
                 children: [
+                    {
+                        name: "CornerPin",
+                        component: CornerPinPage,
+                    },
                     {
                         name: "Cuboid",
                         component: CuboidPage,

@@ -14,6 +14,7 @@
     import PageNumberField from "../../../PageComponents/Field/PageNumberField.svelte";
     import PageProp from "../../../PageComponents/Prop/Prop.svelte";
     import PageControlButtonContent from "../../../StyledComponents/ControlButtonContent/ControlButtonContent.svelte";
+    import { createSpinDegrees } from "../InfiniteCorridorPage.utils.svelte";
     import type { InfiniteCorridorExampleProps } from "../InfiniteCorridorPageSvelte.types";
     import Room from "./Room.svelte";
 
@@ -54,13 +55,20 @@
 
         return () => cancelAnimationFrame(frameId);
     });
+
+    const getSpinDegrees = createSpinDegrees(
+        () => props.spinDegreesPerSecond,
+        () => isWalking,
+    );
+
+    const layout = $derived(props.toLayout(getSpinDegrees()));
 </script>
 
 <div class={styles.stage}>
     <div class={styles.frame}>
         <InfiniteCorridor
             items={props.items}
-            layout={props.layout}
+            {layout}
             bind:progress
             glideDurationMs={props.glideDurationMs}
             ariaLabel={"Walking corridor"}

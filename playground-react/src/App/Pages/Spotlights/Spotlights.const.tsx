@@ -1,4 +1,4 @@
-import { Corners } from "@thewaver/ss-components-react";
+import { CornerHighlight } from "@thewaver/ss-components-react";
 import type { SpotlightOverlayRenderer } from "@thewaver/ss-components-react";
 import * as styles from "@thewaver/ss-playground/App/Pages/Spotlights/Spotlights.css";
 
@@ -13,5 +13,5 @@ export const renderOverlay: SpotlightOverlayRenderer = (visibilityTarget, transi
 );
 
 export const renderHighlight = (visibilityTarget: 0 | 1) => (
-    <Corners color={visibilityTarget === 1 ? "yellow" : "transparent"} />
+    <CornerHighlight color={visibilityTarget === 1 ? "yellow" : "transparent"} />
 );

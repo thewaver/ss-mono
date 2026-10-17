@@ -1,5 +1,5 @@
 <script lang="ts">
-    import { Corners, Toggle } from "@thewaver/ss-components-svelte";
+    import { CornerHighlight, Toggle } from "@thewaver/ss-components-svelte";
 
     import PageToggleContent from "../../../StyledComponents/ToggleContent/ToggleContent.svelte";
     import type { ToggleExampleProps } from "../TogglePage.types";
@@ -18,7 +18,7 @@
     {/snippet}
 
     {#snippet renderDecoration(flags)}
-        <Corners
+        <CornerHighlight
             color={flags.isPressed ? "yellow" : "transparent"}
             cornerLength={CORNER_LENGTH}
             strokeThickness={STROKE_THICKNESS}

@@ -21,7 +21,7 @@ describe("Rect", () => {
 });
 
 describe("RectUtils.fit", () => {
-    it("scales to fit and centres the leftover room", () => {
+    it("scales to fit and centers the leftover room", () => {
         expect(RectUtils.fit({ width: 100, height: 50 }, { width: 200, height: 200 })).toEqual({
             x: 0,
             y: 50,
@@ -41,7 +41,7 @@ describe("RectUtils.fit", () => {
         });
     });
 
-    it("centres horizontally when height is the limiting side", () => {
+    it("centers horizontally when height is the limiting side", () => {
         expect(RectUtils.fit({ width: 50, height: 100 }, { width: 200, height: 200 })).toEqual({
             x: 50,
             y: 0,
@@ -142,7 +142,7 @@ describe("RectUtils.hasAnyCornerInside", () => {
 });
 
 describe("RectUtils.getEdgePointTowards", () => {
-    // A 100x60 box centred on the origin: it reaches 50 sideways and 30 up and down.
+    // A 100x60 box centered on the origin: it reaches 50 sideways and 30 up and down.
     const rect = { x: -50, y: -30, width: 100, height: 60 };
 
     it("leaves through the side the point lies towards", () => {
@@ -178,11 +178,11 @@ describe("RectUtils.getEdgePointTowards", () => {
         expect(RectUtils.getEdgePointTowards(offset, { x: 150, y: 1000 })).toEqual({ x: 150, y: 160 });
     });
 
-    it("has no direction to leave in at the centre, so it reports the right-hand edge", () => {
+    it("has no direction to leave in at the center, so it reports the right-hand edge", () => {
         expect(RectUtils.getEdgePointTowards(rect, { x: 0, y: 0 })).toEqual({ x: 50, y: 0 });
     });
 
-    it("reports the centre of a rectangle with no size", () => {
+    it("reports the center of a rectangle with no size", () => {
         expect(RectUtils.getEdgePointTowards({ x: 5, y: 5, width: 0, height: 0 }, { x: 50, y: 50 })).toEqual({
             x: 5,
             y: 5,

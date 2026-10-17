@@ -1,5 +1,8 @@
 import { MathUtils } from "@thewaver/ss-utils";
+import type { Point2d, Size2d } from "@thewaver/ss-utils";
 
+import type { QuadWarpCorners } from "../../../Abstracts/QuadWarp/QuadWarp.types";
+import { QuadWarpUtils } from "../../../Abstracts/QuadWarp/QuadWarp.utils";
 import { CarouselUtils } from "../../../Essentials/Carousel/Carousel.utils";
 import type { InfiniteCorridorPlacement } from "./InfiniteCorridor.types";
 
@@ -10,8 +13,23 @@ const IN_VIEW_FAR_FACTOR = 2;
 const LAYER_RESOLUTION = 100;
 const ECHO_TOLERANCE = 0.01;
 const ECHO_MEMORY = 4;
+const HIDDEN = "0";
+const CENTERED_ORIGIN = "50% 50%";
+const CORNER_ORIGIN = "0 0";
 
 const wrap = (value: number, length: number) => ((value % length) + length) % length;
+
+/** Corners measured from the middle of the box, measured instead from the top left of an item centered there. */
+const toItemCorners = (corners: QuadWarpCorners, size: Size2d): QuadWarpCorners => {
+    const shift = (point: Point2d) => ({ x: point.x + size.width * HALF, y: point.y + size.height * HALF });
+
+    return {
+        top_left: shift(corners.top_left),
+        top_right: shift(corners.top_right),
+        bottom_right: shift(corners.bottom_right),
+        bottom_left: shift(corners.bottom_left),
+    };
+};
 
 const greatestCommonDivisor = (a: number, b: number): number => (b === 0 ? a : greatestCommonDivisor(b, a % b));
 
@@ -146,30 +164,30 @@ export namespace InfiniteCorridorUtils {
     /**
      * How far down the corridor a focused item is brought, held short of where a nearer copy would take over.
      *
-     * Copies of an item stand one item count apart, so with fewer items than the layout's view distance the item's
+     * Copies of an item stand one item count apart, so with fewer items than the layout's focus distance the item's
      * next copy towards the viewer would be the real one once the item got there; the distance is held below the item
      * count.
      *
-     * @param viewDistance The layout's — see `InfiniteCorridorLayoutRule.viewDistance`.
+     * @param focusDistance The layout's — see `InfiniteCorridorLayoutRule.focusDistance`.
      * @param count How many items there are.
      */
-    export const getViewDistance = (viewDistance: number, count: number) =>
-        Math.min(viewDistance, Math.max(count - 1, 0));
+    export const getFocusDistance = (focusDistance: number, count: number) =>
+        Math.min(focusDistance, Math.max(count - 1, 0));
 
     /**
      * Whether an item stands where a viewer can see it well enough that focusing it need not move the corridor.
      *
-     * That is from half the view distance out to twice it: nearer, it is at the very edge of the view or passing by;
+     * That is from half the focus distance out to twice it: nearer, it is at the very edge of the view or passing by;
      * further, it is small with distance.
      *
      * @param distance How far down the corridor the item is.
-     * @param viewDistance Where a focused item is brought, from {@link getViewDistance}.
+     * @param focusDistance Where a focused item is brought, from {@link getFocusDistance}.
      */
-    export const getIsInView = (distance: number, viewDistance: number) =>
-        distance >= viewDistance * HALF && distance <= viewDistance * IN_VIEW_FAR_FACTOR;
+    export const getIsInView = (distance: number, focusDistance: number) =>
+        distance >= focusDistance * HALF && distance <= focusDistance * IN_VIEW_FAR_FACTOR;
 
     /**
-     * Where the corridor has to be for one drawn item to stand at the view distance.
+     * Where the corridor has to be for one drawn item to stand at the focus distance.
      *
      * It moves the very copy that took focus, by its own distance, rather than whichever copy of the item is nearest
      * the short way round: going the short way can bring another copy round from behind the viewer, which then becomes
@@ -177,11 +195,11 @@ export namespace InfiniteCorridorUtils {
      *
      * @param position Where the corridor is, from {@link toPosition}.
      * @param distance How far down the corridor the copy that took focus stands, from {@link getDistance}.
-     * @param viewDistance Where it should end up, from {@link getViewDistance}.
+     * @param focusDistance Where it should end up, from {@link getFocusDistance}.
      * @returns The position to glide to, which may lie past either end of the lap.
      */
-    export const getGlideTarget = (position: number, distance: number, viewDistance: number) =>
-        position + distance - viewDistance;
+    export const getGlideTarget = (position: number, distance: number, focusDistance: number) =>
+        position + distance - focusDistance;
 
     /**
      * Remembers a progress the corridor wrote, keeping only the last few.
@@ -215,25 +233,49 @@ export namespace InfiniteCorridorUtils {
      * The CSS that puts one drawn item where its placement says.
      *
      * Every item's box is centered on the corridor's middle before it is moved, so every item turns about and looks
-     * from the same point, and the perspective gives the whole corridor one vanishing point. Nearer items stack over
-     * further ones.
+     * from the same point, and the perspective gives the whole corridor one vanishing point. An item whose placement
+     * pins its corners is stretched onto them instead, through `QuadWarpUtils.toTransform`, and is hidden when they
+     * cannot be drawn. Nearer items stack over further ones.
      *
      * @param placement What the layout answered for the item.
      * @param distance How far down the corridor the item is, which decides its stacking.
-     * @returns `width`, `height`, the margins that center it, `transform`, `opacity` and `z-index`, as dashed CSS
-     * properties. The item is moved, then rolled round the corridor's axis, then leaned back, then turned.
+     * @returns `width`, `height`, the margins that center it, `transform-origin`, `transform`, `opacity` and
+     * `z-index`, as dashed CSS properties. A turned item is moved, then rolled round the corridor's axis, then leaned
+     * back, then turned.
      */
     export const toItemStyle = (placement: InfiniteCorridorPlacement, distance: number) => {
-        const { size, offset } = placement;
+        const { size } = placement;
 
-        return {
+        const box = {
             "width": `${size.width}px`,
             "height": `${size.height}px`,
             "margin-left": `${-size.width * HALF}px`,
             "margin-top": `${-size.height * HALF}px`,
+        };
+
+        const layer = `${Math.round(-distance * LAYER_RESOLUTION)}`;
+
+        if ("corners" in placement) {
+            const transform =
+                placement.corners && QuadWarpUtils.toTransform(size, toItemCorners(placement.corners, size));
+
+            return {
+                ...box,
+                "transform-origin": CORNER_ORIGIN,
+                "transform": transform ?? "none",
+                "opacity": transform ? `${MathUtils.clamp01(placement.opacity)}` : HIDDEN,
+                "z-index": layer,
+            };
+        }
+
+        const { offset } = placement;
+
+        return {
+            ...box,
+            "transform-origin": CENTERED_ORIGIN,
             "transform": `perspective(${placement.perspectivePx}px) translate3d(${offset.x}px, ${offset.y}px, ${offset.z}px) rotateZ(${placement.rollDegrees ?? NO_TURN}deg) rotateX(${placement.tiltDegrees ?? NO_TURN}deg) rotateY(${placement.turnDegrees}deg)`,
             "opacity": `${MathUtils.clamp01(placement.opacity)}`,
-            "z-index": `${Math.round(-distance * LAYER_RESOLUTION)}`,
+            "z-index": layer,
         };
     };
 }

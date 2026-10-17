@@ -1,5 +1,6 @@
 import { describe, expect, it } from "vitest";
 
+import { QuadWarpUtils } from "../../../Abstracts/QuadWarp/QuadWarp.utils";
 import { InfiniteCorridorUtils } from "./InfiniteCorridor.utils";
 
 describe("toPosition and toProgress", () => {
@@ -64,13 +65,13 @@ describe("getRealPlace", () => {
     });
 });
 
-describe("getViewDistance and getIsInView", () => {
-    it("holds the view distance below the item count, where the next copy would take over", () => {
-        expect(InfiniteCorridorUtils.getViewDistance(4, 16)).toBe(4);
-        expect(InfiniteCorridorUtils.getViewDistance(24, 16)).toBe(15);
+describe("getFocusDistance and getIsInView", () => {
+    it("holds the focus distance below the item count, where the next copy would take over", () => {
+        expect(InfiniteCorridorUtils.getFocusDistance(4, 16)).toBe(4);
+        expect(InfiniteCorridorUtils.getFocusDistance(24, 16)).toBe(15);
     });
 
-    it("counts an item as in view from half the view distance out to twice it", () => {
+    it("counts an item as in view from half the focus distance out to twice it", () => {
         expect(InfiniteCorridorUtils.getIsInView(2, 4)).toBe(true);
         expect(InfiniteCorridorUtils.getIsInView(8, 4)).toBe(true);
         expect(InfiniteCorridorUtils.getIsInView(1.9, 4)).toBe(false);
@@ -112,7 +113,7 @@ describe("toItemStyle", () => {
         opacity: 1.5,
     };
 
-    it("centres the item on the corridor's middle by its own size", () => {
+    it("centers the item on the corridor's middle by its own size", () => {
         const style = InfiniteCorridorUtils.toItemStyle(placement, 2);
 
         expect(style["margin-left"]).toBe("-50px");
@@ -128,5 +129,33 @@ describe("toItemStyle", () => {
         const far = Number(InfiniteCorridorUtils.toItemStyle(placement, 5)["z-index"]);
 
         expect(near).toBeGreaterThan(far);
+    });
+
+    describe("with its corners pinned", () => {
+        const size = { width: 100, height: 60 };
+
+        const pinned = {
+            size,
+            corners: {
+                top_left: { x: -50, y: -30 },
+                top_right: { x: 50, y: -30 },
+                bottom_right: { x: 50, y: 30 },
+                bottom_left: { x: -50, y: 30 },
+            },
+            opacity: 1,
+        };
+
+        it("stretches the item from its own top left, so corners at its resting place leave it where it is", () => {
+            const style = InfiniteCorridorUtils.toItemStyle(pinned, 2);
+
+            expect(style["transform-origin"]).toBe("0 0");
+            expect(style.transform).toBe(
+                QuadWarpUtils.toTransform(size, QuadWarpUtils.toPixels(QuadWarpUtils.RESTING_CORNERS, size)),
+            );
+        });
+
+        it("hides an item whose corners cannot be drawn", () => {
+            expect(InfiniteCorridorUtils.toItemStyle({ ...pinned, corners: undefined }, 2).opacity).toBe("0");
+        });
     });
 });

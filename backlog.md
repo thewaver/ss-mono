@@ -358,7 +358,7 @@ See `decisions.md` for what the diff example settled.
 **Covered only through a consumer**, which is worth distinguishing from uncovered because it decides
 whether a spec is worth writing: `Popover` through `Select` and `Menu`, `Radio` through
 `radioGroup.spec.ts`, `Checkbox` through `binarySwitch.spec.ts`, `MultiSelect` through
-`select.spec.ts`, `Corners` and `Viewport` through whatever page happens to mount them,
+`select.spec.ts`, `CornerHighlight` and `Viewport` through whatever page happens to mount them,
 `InteractionWrapper` through every control.
 
 **What a page that stops painting costs is now measured rather than guessed, and the answer split the two

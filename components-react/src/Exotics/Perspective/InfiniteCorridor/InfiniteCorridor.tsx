@@ -55,7 +55,7 @@ export const InfiniteCorridor = <T,>(props: InfiniteCorridorProps<T>) => {
         [placeCount, copies, count],
     );
 
-    const viewDistance = InfiniteCorridorUtils.getViewDistance(layout.viewDistance, count);
+    const focusDistance = InfiniteCorridorUtils.getFocusDistance(layout.focusDistance, count);
 
     const toIndex = (place: number) => place % Math.max(count, 1);
 
@@ -76,7 +76,7 @@ export const InfiniteCorridor = <T,>(props: InfiniteCorridorProps<T>) => {
 
         stopGlideRef.current = CarouselUtils.glide({
             from,
-            to: InfiniteCorridorUtils.getGlideTarget(from, getDistance(place), viewDistance),
+            to: InfiniteCorridorUtils.getGlideTarget(from, getDistance(place), focusDistance),
             durationMs: props.glideDurationMs ?? INFINITE_CORRIDOR_DEFAULTS.glideDurationMs,
             onFrame: (next) => {
                 const written = InfiniteCorridorUtils.toProgress(next, count);
@@ -104,7 +104,7 @@ export const InfiniteCorridor = <T,>(props: InfiniteCorridorProps<T>) => {
     const handleFocus = (e: FocusEvent<HTMLDivElement>) => {
         const place = itemRefs.current.findIndex((element) => element?.contains(e.target as Node));
 
-        if (place < 0 || InfiniteCorridorUtils.getIsInView(getDistance(place), viewDistance)) return;
+        if (place < 0 || InfiniteCorridorUtils.getIsInView(getDistance(place), focusDistance)) return;
 
         glideTo(place);
     };

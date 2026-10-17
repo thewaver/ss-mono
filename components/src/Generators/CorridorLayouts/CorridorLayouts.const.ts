@@ -12,7 +12,7 @@ export namespace CorridorLayoutDefaults {
         farAngleDegrees: 75,
         perspectivePx: 900,
         visibleCards: 4,
-        viewDistance: 1,
+        focusDistance: 1,
     };
 
     export const TUBE_DEFAULTS: Required<TubeLayoutDefs> = {
@@ -20,7 +20,7 @@ export namespace CorridorLayoutDefaults {
         minSkipCount: 0,
         maxSkipCount: 0,
         seed: 0,
-        radiusRatio: 1,
+        nearWidthRatio: 1,
         farWidthRatio: 0.1,
         depthRatio: 1,
         tiltDegrees: 90,
@@ -28,7 +28,7 @@ export namespace CorridorLayoutDefaults {
         spinDegrees: 0,
         perspectivePx: 900,
         visibleRings: 3,
-        viewRings: 1.5,
+        focusRings: 1.5,
     };
 
     export const DEFAULTS_BY_FAMILY = {

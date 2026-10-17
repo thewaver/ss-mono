@@ -30,15 +30,12 @@
     import ScrolledExample from "./Examples/Scrolled.svelte";
     import type { InfiniteCorridorExampleProps } from "./InfiniteCorridorPageSvelte.types";
 
-    const MS_PER_SECOND = 1000;
-    const FULL_TURN = 360;
     const NO_DEFS = {};
 
     let layoutKey = $state<CorridorLayouts.SampleKey>(InfiniteCorridorKnobs.STARTING_LAYOUT);
     let itemCount = $state(InfiniteCorridorKnobs.STARTING_ITEM_COUNT);
     let glideDurationMs = $state(INFINITE_CORRIDOR_DEFAULTS.glideDurationMs);
     let spinDegreesPerSecond = $state(CorridorLayoutKnobs.STARTING_SPIN_DEGREES_PER_SECOND);
-    let spinDegrees = $state(0);
     let layoutDefs = $state.raw<Record<string, Record<string, number | boolean>>>({});
 
     const family = $derived(CorridorLayouts.SAMPLE_LAYOUTS[layoutKey].family);
@@ -46,33 +43,11 @@
     const defaults = $derived(CorridorLayoutDefaults.DEFAULTS_BY_FAMILY[family] as Record<string, unknown>);
     const defs = $derived(layoutDefs[layoutKey] ?? NO_DEFS);
 
-    $effect(() => {
-        const degreesPerSecond = spinDegreesPerSecond;
-
-        if (family !== "tube" || degreesPerSecond === 0) return;
-
-        let frameId: number;
-        let lastMs = performance.now();
-
-        const spin = () => {
-            const nowMs = performance.now();
-
-            spinDegrees = (spinDegrees + ((nowMs - lastMs) / MS_PER_SECOND) * degreesPerSecond) % FULL_TURN;
-            lastMs = nowMs;
-            frameId = requestAnimationFrame(spin);
-        };
-
-        frameId = requestAnimationFrame(spin);
-
-        return () => cancelAnimationFrame(frameId);
-    });
-
-    const layout = $derived(
+    const toLayout = (spinDegrees: number) =>
         CorridorLayoutUtils.toLayoutRule({
             family,
             defs: { spinDegrees, ...defs },
-        } as unknown as CorridorLayoutEntry),
-    );
+        } as unknown as CorridorLayoutEntry);
 
     const items = $derived(Array.from({ length: itemCount }, (_, index) => toRoomName(index)));
 
@@ -80,7 +55,8 @@
         items,
         glideDurationMs,
         startingLapMs: InfiniteCorridorKnobs.STARTING_LAP_MS_BY_FAMILY[family],
-        layout,
+        spinDegreesPerSecond: family === "tube" ? spinDegreesPerSecond : 0,
+        toLayout,
     });
 
     const examples: ExampleDefs[] = [
@@ -117,7 +93,7 @@
             itemKey={"layout"}
             label={"Layout"}
             hint={
-                "Where the items stand: walls is one row on each wall, from flat against it to turned towards the viewer, and tube lines the inside of a ring of sides, every item upright towards the centre. Choosing one brings its own knobs with it."
+                "Where the items stand: walls is one row on each wall, from flat against it to turned towards the viewer, and tube lines the inside of a ring of sides, every item upright towards the center. Choosing one brings its own knobs with it."
             }
         >
             <PageSelectField

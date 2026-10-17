@@ -42,7 +42,6 @@ export const room = style({
     "height": "100%",
     "padding": themeVars.spacing.full,
     "border": "none",
-    "borderRadius": themeVars.borderRadius.full,
     "color": "white",
     "fontSize": themeVars.fontSize.small,
     "textAlign": "center",

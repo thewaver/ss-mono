@@ -27,7 +27,7 @@ export * from "./Exotics/Charts/CirclePacking/CirclePacking.internal.const";
 export * from "./Exotics/Charts/Icicle/Icicle.internal.const";
 export * from "./Exotics/Charts/Sunburst/Sunburst.internal.const";
 export * from "./Exotics/Charts/Treemap/Treemap.internal.const";
-export * from "./Exotics/Corners/Corners.internal.const";
+export * from "./Exotics/CornerHighlight/CornerHighlight.internal.const";
 export * from "./Exotics/Diagrams/Bracket/Bracket.internal.const";
 export * from "./Exotics/Diagrams/PatchBoard/PatchBoard.internal.const";
 export * from "./Exotics/Diagrams/Timeline/Timeline.internal.const";

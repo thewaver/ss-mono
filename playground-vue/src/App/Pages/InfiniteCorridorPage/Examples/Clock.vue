@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { shallowRef, watch } from "vue";
+import { computed, shallowRef, watch } from "vue";
 
 import { Button, InfiniteCorridor, MediaQueryMonitorVueUtils } from "@thewaver/ss-components-vue";
 import { InfiniteCorridorKnobs } from "@thewaver/ss-playground/App/Knobs/InfiniteCorridors.const";
@@ -11,6 +11,7 @@ import PageExampleKnobs from "../../../PageComponents/ExampleKnobs/PageExampleKn
 import PageNumberField from "../../../PageComponents/Field/PageNumberField.vue";
 import PageProp from "../../../PageComponents/Prop/Prop.vue";
 import PageControlButtonContent from "../../../StyledComponents/ControlButtonContent/ControlButtonContent.vue";
+import { useSpinDegrees } from "../InfiniteCorridorPage.utils";
 import type { InfiniteCorridorExampleProps } from "../InfiniteCorridorPageVue.types";
 import Room from "./Room.vue";
 
@@ -59,6 +60,10 @@ watch(
     },
     { immediate: true },
 );
+
+const spinDegrees = useSpinDegrees(() => props.spinDegreesPerSecond, isWalking);
+
+const layout = computed(() => props.toLayout(spinDegrees.value));
 
 const toggleWalking = () => {
     isWalking.value = !isWalking.value;

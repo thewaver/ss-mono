@@ -1,6 +1,6 @@
 import { createSignal } from "solid-js";
 
-import { Button, Corners, type InteractionActivation } from "@thewaver/ss-components-solid";
+import { Button, CornerHighlight, type InteractionActivation } from "@thewaver/ss-components-solid";
 
 import { PageButtonContent } from "../../../StyledComponents/ButtonContent/ButtonContent";
 import { PageRipple } from "../../../StyledComponents/Ripple/Ripple";
@@ -19,7 +19,7 @@ export const DecoratedExample = (props: Props) => {
             onActivation={setActivation}
             renderDecoration={(getFlags) => (
                 <>
-                    <Corners color={() => (getFlags().isPressed ? "yellow" : "transparent")} />
+                    <CornerHighlight color={() => (getFlags().isPressed ? "yellow" : "transparent")} />
                     <PageRipple activation={getActivation} color={"yellow"} />
                 </>
             )}

@@ -31,7 +31,8 @@ const CirclePackingPage = () => import("./Pages/CirclePackingPage/CirclePackingP
 const ClockPage = () => import("./Pages/ClockPage/ClockPage.svelte");
 const ColorAreaPage = () => import("./Pages/ColorAreaPage/ColorAreaPage.svelte");
 const ColorInputPage = () => import("./Pages/ColorInputPage/ColorInputPage.svelte");
-const CornersPage = () => import("./Pages/CornersPage/CornersPage.svelte");
+const CornerHighlightPage = () => import("./Pages/CornerHighlightPage/CornerHighlightPage.svelte");
+const CornerPinPage = () => import("./Pages/CornerPinPage/CornerPinPage.svelte");
 const CuboidPage = () => import("./Pages/CuboidPage/CuboidPage.svelte");
 const CurrencyInputPage = () => import("./Pages/CurrencyInputPage/CurrencyInputPage.svelte");
 const DateInputPage = () => import("./Pages/DateInputPage/DateInputPage.svelte");
@@ -610,8 +611,8 @@ export const MENU_CONFIGS: MenuBranchConfig[] = [
                 ],
             },
             {
-                name: "Corners",
-                component: CornersPage,
+                name: "CornerHighlight",
+                component: CornerHighlightPage,
             },
             {
                 name: "Diagrams",
@@ -659,6 +660,10 @@ export const MENU_CONFIGS: MenuBranchConfig[] = [
             {
                 name: "Perspective",
                 children: [
+                    {
+                        name: "CornerPin",
+                        component: CornerPinPage,
+                    },
                     {
                         name: "Cuboid",
                         component: CuboidPage,

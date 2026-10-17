@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { useModel } from "vue";
 
-import { Checkbox, Corners } from "@thewaver/ss-components-vue";
+import { Checkbox, CornerHighlight } from "@thewaver/ss-components-vue";
 
 import PageCheckboxContent from "../../../StyledComponents/CheckboxContent/CheckboxContent.vue";
 import type { CheckboxExampleProps } from "../CheckboxPage.types";
@@ -23,7 +23,7 @@ const checked = useModel(props, "checked");
         </template>
 
         <template #renderDecoration="flags">
-            <Corners
+            <CornerHighlight
                 :color="flags.isPressed ? 'yellow' : 'transparent'"
                 :corner-length="CORNER_LENGTH"
                 :stroke-thickness="STROKE_THICKNESS"

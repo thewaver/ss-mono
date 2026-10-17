@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { useModel } from "vue";
 
-import { Corners, Toggle } from "@thewaver/ss-components-vue";
+import { CornerHighlight, Toggle } from "@thewaver/ss-components-vue";
 
 import PageToggleContent from "../../../StyledComponents/ToggleContent/ToggleContent.vue";
 import type { ToggleExampleProps } from "../TogglePage.types";
@@ -23,7 +23,7 @@ const checked = useModel(props, "checked");
         </template>
 
         <template #renderDecoration="flags">
-            <Corners
+            <CornerHighlight
                 :color="flags.isPressed ? 'yellow' : 'transparent'"
                 :corner-length="CORNER_LENGTH"
                 :stroke-thickness="STROKE_THICKNESS"

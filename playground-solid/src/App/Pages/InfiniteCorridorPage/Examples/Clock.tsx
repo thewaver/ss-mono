@@ -1,4 +1,4 @@
-import { createEffect, createSignal, on, onCleanup } from "solid-js";
+import { createEffect, createMemo, createSignal, on, onCleanup } from "solid-js";
 
 import { Button, InfiniteCorridor, MediaQueryMonitorSolidUtils, access } from "@thewaver/ss-components-solid";
 import { InfiniteCorridorKnobs } from "@thewaver/ss-playground/App/Knobs/InfiniteCorridors.const";
@@ -10,6 +10,7 @@ import { PageExampleKnobs } from "../../../PageComponents/ExampleKnobs/ExampleKn
 import { PageNumberField } from "../../../PageComponents/Field/Field";
 import { PageProp } from "../../../PageComponents/Prop/Prop";
 import { PageControlButtonContent } from "../../../StyledComponents/ControlButtonContent/ControlButtonContent";
+import { createSpinDegrees } from "../InfiniteCorridorPage.utils";
 import type { InfiniteCorridorExampleProps } from "../InfiniteCorridorPageSolid.types";
 import { Room } from "./Room";
 
@@ -47,13 +48,17 @@ export const ClockExample = (props: Props) => {
         onCleanup(() => cancelAnimationFrame(frameId));
     });
 
+    const getSpinDegrees = createSpinDegrees(() => access(props.spinDegreesPerSecond), getIsWalking);
+
+    const getLayout = createMemo(() => props.toLayout(getSpinDegrees()));
+
     return (
         <>
             <div class={styles.stage}>
                 <div class={styles.frame}>
                     <InfiniteCorridor
                         items={props.items}
-                        layout={props.layout}
+                        layout={getLayout()}
                         progress={[getProgress, setProgress]}
                         glideDurationMs={props.glideDurationMs}
                         ariaLabel={"Walking corridor"}

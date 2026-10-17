@@ -1,5 +1,5 @@
 <script lang="ts">
-    import { Button, Corners, type InteractionActivation } from "@thewaver/ss-components-svelte";
+    import { Button, CornerHighlight, type InteractionActivation } from "@thewaver/ss-components-svelte";
 
     import PageButtonContent from "../../../StyledComponents/ButtonContent/ButtonContent.svelte";
     import PageRipple from "../../../StyledComponents/Ripple/Ripple.svelte";
@@ -31,7 +31,7 @@
     {/snippet}
 
     {#snippet renderDecoration(flags)}
-        <Corners color={flags.isPressed ? "yellow" : "transparent"} />
+        <CornerHighlight color={flags.isPressed ? "yellow" : "transparent"} />
         <PageRipple {activation} color={"yellow"} />
     {/snippet}
 </Button>

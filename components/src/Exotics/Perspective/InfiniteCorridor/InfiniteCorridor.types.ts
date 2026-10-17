@@ -1,5 +1,7 @@
 import type { Size2d } from "@thewaver/ss-utils";
 
+import type { QuadWarpCorners } from "../../../Abstracts/QuadWarp/QuadWarp.types";
+
 export type InfiniteCorridorItemState = {
     /** Which item this is, counting the real ones from zero. */
     index: number;
@@ -29,7 +31,20 @@ export type InfiniteCorridorLayoutDefs = {
     size: Size2d;
 };
 
-export type InfiniteCorridorPlacement = {
+export type InfiniteCorridorPinnedPlacement = {
+    /** How large the item is laid out, in pixels, before it is stretched onto its corners. */
+    size: Size2d;
+    /**
+     * Where the item's four corners are drawn, in pixels on screen from the middle of the box, already seen in
+     * perspective — see `QuadWarpUtils`. Neighbors given the same corner points meet exactly. `undefined` where the
+     * item cannot be drawn, such as with a corner level with the viewer or behind them, and the item is then hidden.
+     */
+    corners: QuadWarpCorners | undefined;
+    /** How much of the item shows, `0` to `1`. */
+    opacity: number;
+};
+
+export type InfiniteCorridorTurnedPlacement = {
     /** How large the item is drawn, in pixels, before the perspective shrinks it. */
     size: Size2d;
     /** Where the item's middle sits, in pixels from the middle of the box: across, down, and towards the viewer. */
@@ -52,6 +67,8 @@ export type InfiniteCorridorPlacement = {
     opacity: number;
 };
 
+export type InfiniteCorridorPlacement = InfiniteCorridorTurnedPlacement | InfiniteCorridorPinnedPlacement;
+
 export type InfiniteCorridorLayoutRule = {
     /** Where one item is drawn, from how far down the corridor it is. */
     place: (defs: InfiniteCorridorLayoutDefs) => InfiniteCorridorPlacement;
@@ -64,7 +81,7 @@ export type InfiniteCorridorLayoutRule = {
      * How far down the corridor an item is put when it is brought into view, which happens when it takes focus from
      * further away or from behind the viewer.
      */
-    viewDistance: number;
+    focusDistance: number;
     /**
      * How far behind the viewer an item is still drawn before it comes round to the far end, in items. A layout that
      * places items in rings says a whole ring, so a ring passes the viewer together rather than leaving one item at a

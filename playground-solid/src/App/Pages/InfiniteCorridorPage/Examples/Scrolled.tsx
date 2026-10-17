@@ -1,6 +1,6 @@
-import { createSignal } from "solid-js";
+import { createMemo, createSignal } from "solid-js";
 
-import { ElementObserverSolidUtils, InfiniteCorridor } from "@thewaver/ss-components-solid";
+import { ElementObserverSolidUtils, InfiniteCorridor, access } from "@thewaver/ss-components-solid";
 import { InfiniteCorridorKnobs } from "@thewaver/ss-playground/App/Knobs/InfiniteCorridors.const";
 import { FIELD_WIDTH } from "@thewaver/ss-playground/App/Pages/InfiniteCorridorPage/InfiniteCorridorPage.const";
 import * as styles from "@thewaver/ss-playground/App/Pages/InfiniteCorridorPage/InfiniteCorridorPage.css";
@@ -8,6 +8,7 @@ import * as styles from "@thewaver/ss-playground/App/Pages/InfiniteCorridorPage/
 import { PageExampleKnobs } from "../../../PageComponents/ExampleKnobs/ExampleKnobs";
 import { PageNumberField } from "../../../PageComponents/Field/Field";
 import { PageProp } from "../../../PageComponents/Prop/Prop";
+import { createSpinDegrees } from "../InfiniteCorridorPage.utils";
 import type { InfiniteCorridorExampleProps } from "../InfiniteCorridorPageSolid.types";
 import { Room } from "./Room";
 
@@ -26,13 +27,20 @@ export const ScrolledExample = (props: Props) => {
         if (box) box.scrollTop = progress * (box.scrollHeight - box.clientHeight);
     };
 
+    const getSpinDegrees = createSpinDegrees(
+        () => access(props.spinDegreesPerSecond),
+        () => true,
+    );
+
+    const getLayout = createMemo(() => props.toLayout(getSpinDegrees()));
+
     return (
         <>
             <div ref={setBoxRef} class={styles.scrollBox}>
                 <div class={styles.scrollPinned}>
                     <InfiniteCorridor
                         items={props.items}
-                        layout={props.layout}
+                        layout={getLayout()}
                         progress={[getProgress, scrollTo]}
                         glideDurationMs={props.glideDurationMs}
                         ariaLabel={"Scrolled corridor"}

@@ -1,8 +1,10 @@
-import { MathUtils } from "@thewaver/ss-utils";
+import { MathUtils, Point3d } from "@thewaver/ss-utils";
 
+import type { QuadWarpCorners } from "../../Abstracts/QuadWarp/QuadWarp.types";
+import { QuadWarpUtils } from "../../Abstracts/QuadWarp/QuadWarp.utils";
 import type { InfiniteCorridorLayoutRule } from "../../Exotics/Perspective/InfiniteCorridor/InfiniteCorridor.types";
 import { CorridorLayoutDefaults } from "./CorridorLayouts.const";
-import type { CorridorLayoutEntry, TubeLayoutDefs, WallsLayoutDefs } from "./CorridorLayouts.types";
+import type { CorridorLayoutEntry, TubeCornerDefs, TubeLayoutDefs, WallsLayoutDefs } from "./CorridorLayouts.types";
 
 const WHOLE = 1;
 const HALF = 0.5;
@@ -15,10 +17,39 @@ const SEED_STRIDE = 977;
 const DRAW_STRIDE = 7;
 const SKIP_DRAW = 1;
 const SLOTS_PER_CARD_LENGTH = 2;
+const LEFT_SIDE = 1;
+const RIGHT_SIDE = -1;
+const CORNER_SHARE = 0.25;
 
 const toRadians = (degrees: number) => (degrees * Math.PI) / HALF_TURN_DEGREES;
 
 const greatestCommonDivisor = (a: number, b: number): number => (b === 0 ? a : greatestCommonDivisor(b, a % b));
+
+/** Where a ring's vertex stands, `side` half a side's turn either way of the side's middle, round the tube's axis. */
+const toTubeVertex = (radius: number, depth: number, rollDegrees: number, side: number, sideRadians: number) => {
+    const angle = toRadians(rollDegrees) + side * sideRadians;
+
+    return { x: -radius * Math.sin(angle), y: radius * Math.cos(angle), z: depth };
+};
+
+/** A point turned by `radians` about a line through `center` running along the unit direction `axis`. */
+const rotateAbout = (point: Point3d, center: Point3d, axis: Point3d, radians: number): Point3d => {
+    const arm = Point3d.sub(point, center);
+    const cos = Math.cos(radians);
+    const sin = Math.sin(radians);
+    const along = (axis.x * arm.x + axis.y * arm.y + axis.z * arm.z) * (WHOLE - cos);
+    const across = {
+        x: axis.y * arm.z - axis.z * arm.y,
+        y: axis.z * arm.x - axis.x * arm.z,
+        z: axis.x * arm.y - axis.y * arm.x,
+    };
+
+    return {
+        x: center.x + arm.x * cos + across.x * sin + axis.x * along,
+        y: center.y + arm.y * cos + across.y * sin + axis.y * along,
+        z: center.z + arm.z * cos + across.z * sin + axis.z * along,
+    };
+};
 
 /** Which wall a slot is on: even slots on the left, odd ones on the right, so the walls take turns. */
 const toSide = (slot: number) => (slot % 2 === 0 ? -WHOLE : WHOLE);
@@ -169,7 +200,7 @@ export namespace CorridorLayoutUtils {
      * `nearAngleDegrees` and `farAngleDegrees`, how far each item turns from facing the viewer level with the viewer
      * and at the end of what is drawn, turning evenly between; `perspectivePx`, how far away the viewer sits;
      * `visibleCards`, how many card lengths each wall runs from the nearest to the farthest before items fade, empty
-     * slots included; `viewDistance`, how many slots down a focused item is brought.
+     * slots included; `focusDistance`, how many slots down a focused item is brought.
      * @returns The layout, ready to hand to `layout`.
      */
     export const createWalls = (defs?: WallsLayoutDefs): InfiniteCorridorLayoutRule => {
@@ -191,7 +222,7 @@ export namespace CorridorLayoutUtils {
 
         return {
             reach: Math.ceil((Math.ceil(visibleDistance) + WHOLE) / slots.fewestStride) + WHOLE,
-            viewDistance: (defs?.viewDistance ?? base.viewDistance) / slots.meanStride,
+            focusDistance: (defs?.focusDistance ?? base.focusDistance) / slots.meanStride,
             place: ({ distance, place, placeCount, count, size }) => {
                 const slot = slots.getSlot(place, count, placeCount);
                 const slotDistance = slot - slots.getSlot(place - distance, count, placeCount);
@@ -229,28 +260,87 @@ export namespace CorridorLayoutUtils {
     export const walls = createWalls();
 
     /**
+     * Where one item lining a tube has its four corners on screen, so it can be pinned there and meet its neighbors
+     * edge to edge.
+     *
+     * The tube is a ring of flat sides, and the item covers one side from where it crosses one ring, its near edge, to
+     * where it crosses the next, its far edge, with its top towards the far end. Each edge is turned round the axis by
+     * its own roll, so a twist that turns each ring further than the one behind it carries on smoothly from one item
+     * to the next. The item is then leaned about its own level middle line, `0` lying along the side and a quarter turn
+     * back standing upright facing the viewer, and seen in perspective.
+     *
+     * @param defs `sides`, how many sides a ring has; `nearRadius` and `farRadius`, how far each edge's ring stands
+     * from the axis, in pixels; `nearDepth` and `farDepth`, how far each edge is towards the viewer, in pixels, below
+     * `0` going away; `nearRollDegrees` and `farRollDegrees`, how far each edge is turned round the axis, clockwise as
+     * seen by the viewer, `0` putting the side's middle straight below the axis; `leanDegrees`, how far the item leans
+     * back off the side towards the viewer; `perspectivePx`, how far away the viewer sits.
+     * @returns The corners in pixels on screen from the middle of the box, or `undefined` when any of them is level
+     * with the viewer or behind them.
+     */
+    export const computeTubeCorners = (defs: TubeCornerDefs): QuadWarpCorners | undefined => {
+        const sideRadians = Math.PI / defs.sides;
+        const near = (side: number) =>
+            toTubeVertex(defs.nearRadius, defs.nearDepth, defs.nearRollDegrees, side, sideRadians);
+        const far = (side: number) =>
+            toTubeVertex(defs.farRadius, defs.farDepth, defs.farRollDegrees, side, sideRadians);
+        const lying = {
+            top_left: far(LEFT_SIDE),
+            top_right: far(RIGHT_SIDE),
+            bottom_right: near(RIGHT_SIDE),
+            bottom_left: near(LEFT_SIDE),
+        };
+        const center = Point3d.mul(
+            Point3d.add(
+                Point3d.add(lying.top_left, lying.top_right),
+                Point3d.add(lying.bottom_right, lying.bottom_left),
+            ),
+            Point3d.spread(CORNER_SHARE),
+        );
+        const rightward = Point3d.sub(
+            Point3d.add(lying.top_right, lying.bottom_right),
+            Point3d.add(lying.top_left, lying.bottom_left),
+        );
+        const length = Math.hypot(rightward.x, rightward.y, rightward.z);
+        const axis = length > 0 ? Point3d.mul(rightward, Point3d.spread(WHOLE / length)) : { x: WHOLE, y: 0, z: 0 };
+        const radians = toRadians(defs.leanDegrees);
+        const toScreen = (point: Point3d) =>
+            QuadWarpUtils.project(rotateAbout(point, center, axis, radians), defs.perspectivePx);
+        const corners = {
+            top_left: toScreen(lying.top_left),
+            top_right: toScreen(lying.top_right),
+            bottom_right: toScreen(lying.bottom_right),
+            bottom_left: toScreen(lying.bottom_left),
+        };
+
+        if (!corners.top_left || !corners.top_right || !corners.bottom_right || !corners.bottom_left) return undefined;
+
+        return corners as QuadWarpCorners;
+    };
+
+    /**
      * Items lining the inside of a tube, ring after ring, each facing the middle with its top towards the far end, so
-     * on screen every item stands upright towards the centre: the one below the middle upright, the one on the right
+     * on screen every item stands upright towards the center: the one below the middle upright, the one on the right
      * on its side, the one above upside down.
      *
-     * The tube is a ring of flat sides rather than a smooth circle, since every item is flat. Each item runs from its
-     * own ring's edge to the next ring's, stretched to that length and leaned to follow the taper, so the rings always
-     * touch however the tube narrows or widens. Items fill a ring in order, one per side, each followed by a gap of
+     * The tube is a ring of flat sides rather than a smooth circle, since every item is flat. Each item's four corners
+     * are pinned where its side crosses its own ring and the next — see {@link computeTubeCorners} — so it meets its
+     * neighbors edge to edge round the ring and on to the next ring, however the tube narrows, widens or twists.
+     * Items fill a ring in order, one per side, each followed by a gap of
      * empty sides drawn between `minSkipCount` and `maxSkipCount`, the gaps carrying on into the next ring; the drawn
      * items are repeated until items and gaps together fill whole rings, and a ring passes the viewer whole before it
      * comes round to the far end. A twist turns each ring further round as it comes towards the viewer, which bends the
      * rings into a corkscrew that turns as the corridor moves.
      *
      * @param defs `sides`, how many sides one ring has, at least `3`; `minSkipCount` and `maxSkipCount`, the fewest and
-     * most empty sides after an item; `seed`, which of the many drawings of the gaps this is; `radiusRatio`, how far the
-     * tube's sides stand from its axis level with the viewer, as a share of half the box's longer side; `farWidthRatio`,
+     * most empty sides after an item; `seed`, which of the many drawings of the gaps this is; `nearWidthRatio`, how wide
+     * the tube is level with the viewer, as a share of the box's longer side; `farWidthRatio`,
      * how wide the tube looks at the far end as a share of its near width, so `1` keeps it the same width all the way
      * down and `0` closes it to a point; `depthRatio`, how long each item runs down the tube as a share of its width
      * level with the viewer; `tiltDegrees`, how far each item leans back from facing the viewer, `90` lying along the
      * tube's side; `twistDegrees`, how far each ring turns round from the one behind it; `spinDegrees`, how far the whole
      * tube is turned round its axis, which a consumer turns on a clock to spin it steadily whatever the corridor's
      * position; `perspectivePx`, how far away the viewer sits; `visibleRings`, how many rings stay drawn before they
-     * fade; `viewRings`, how many rings down the tube a focused item is brought.
+     * fade; `focusRings`, how many rings down the tube a focused item is brought.
      * @returns The layout, ready to hand to `layout`.
      */
     export const createTube = (defs?: TubeLayoutDefs): InfiniteCorridorLayoutRule => {
@@ -261,7 +351,7 @@ export namespace CorridorLayoutUtils {
             defs?.maxSkipCount ?? base.maxSkipCount,
             defs?.seed ?? base.seed,
         );
-        const radiusRatio = defs?.radiusRatio ?? base.radiusRatio;
+        const nearWidthRatio = defs?.nearWidthRatio ?? base.nearWidthRatio;
         const farWidthRatio = defs?.farWidthRatio ?? base.farWidthRatio;
         const depthRatio = defs?.depthRatio ?? base.depthRatio;
         const tiltDegrees = defs?.tiltDegrees ?? base.tiltDegrees;
@@ -273,7 +363,7 @@ export namespace CorridorLayoutUtils {
 
         return {
             reach: Math.ceil(((Math.ceil(visibleRings) + WHOLE) * sides + sides) / slots.fewestStride),
-            viewDistance: ((defs?.viewRings ?? base.viewRings) * sides) / slots.meanStride,
+            focusDistance: ((defs?.focusRings ?? base.focusRings) * sides) / slots.meanStride,
             behindDistance: Math.ceil(sides / slots.fewestStride),
             placeMultiple: (count) => (count * sides) / greatestCommonDivisor(slots.getLapSlots(count), sides),
             place: ({ distance, place, placeCount, count, size }) => {
@@ -281,32 +371,32 @@ export namespace CorridorLayoutUtils {
                 const slotDistance = slot - slots.getSlot(place - distance, count, placeCount);
                 const around = slot % sides;
                 const ring = (slotDistance - around) / sides;
-                const nearRadius = Math.max(size.width, size.height) * HALF * radiusRatio;
+                const nearRadius = Math.max(size.width, size.height) * HALF * nearWidthRatio;
                 const step = 2 * nearRadius * Math.sin(sideRadians) * depthRatio;
                 const toRadius = (edge: number) =>
                     nearRadius *
                     MathUtils.lerp(WHOLE, farWidthRatio, MathUtils.clamp01(edge / visibleRings)) *
-                    ((perspectivePx + edge * step) / perspectivePx);
+                    ((perspectivePx + MathUtils.clamp(edge, 0, visibleRings) * step) / perspectivePx);
                 const nearEdge = toRadius(ring);
                 const farEdge = toRadius(ring + WHOLE);
-                const inward = (nearEdge - farEdge) * Math.cos(sideRadians);
-                const apothem = ((nearEdge + farEdge) / 2) * Math.cos(sideRadians);
-                const width = (nearEdge + farEdge) * Math.sin(sideRadians);
-                const rollDegrees = (around * FULL_TURN_DEGREES) / sides + ring * twistDegrees + spinDegrees;
-                const roll = toRadians(rollDegrees);
-                const slantDegrees = (Math.atan2(step, inward) * HALF_TURN_DEGREES) / Math.PI;
+                const nearestEdge = toRadius(0);
+                const nextEdge = toRadius(WHOLE);
+                const inward = (nearestEdge - nextEdge) * Math.cos(sideRadians);
+                const sideRollDegrees = (around * FULL_TURN_DEGREES) / sides + spinDegrees;
 
                 return {
-                    size: { width, height: Math.hypot(step, inward) },
-                    offset: {
-                        x: -apothem * Math.sin(roll),
-                        y: apothem * Math.cos(roll),
-                        z: -(ring + HALF) * step,
-                    },
-                    turnDegrees: 0,
-                    rollDegrees,
-                    tiltDegrees: slantDegrees + tiltDegrees - QUARTER_TURN_DEGREES,
-                    perspectivePx,
+                    size: { width: (nearestEdge + nextEdge) * Math.sin(sideRadians), height: Math.hypot(step, inward) },
+                    corners: computeTubeCorners({
+                        sides,
+                        nearRadius: nearEdge,
+                        farRadius: farEdge,
+                        nearDepth: -ring * step,
+                        farDepth: -(ring + WHOLE) * step,
+                        nearRollDegrees: sideRollDegrees + ring * twistDegrees,
+                        farRollDegrees: sideRollDegrees + (ring + WHOLE) * twistDegrees,
+                        leanDegrees: tiltDegrees - QUARTER_TURN_DEGREES,
+                        perspectivePx,
+                    }),
                     opacity: Math.min(MathUtils.clamp01(WHOLE + ring), MathUtils.clamp01(visibleRings + WHOLE - ring)),
                 };
             },

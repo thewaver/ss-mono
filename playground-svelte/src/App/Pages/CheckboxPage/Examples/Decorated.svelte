@@ -1,5 +1,5 @@
 <script lang="ts">
-    import { Checkbox, Corners } from "@thewaver/ss-components-svelte";
+    import { Checkbox, CornerHighlight } from "@thewaver/ss-components-svelte";
 
     import PageCheckboxContent from "../../../StyledComponents/CheckboxContent/CheckboxContent.svelte";
     import type { CheckboxExampleProps } from "../CheckboxPage.types";
@@ -18,7 +18,7 @@
     {/snippet}
 
     {#snippet renderDecoration(flags)}
-        <Corners
+        <CornerHighlight
             color={flags.isPressed ? "yellow" : "transparent"}
             cornerLength={CORNER_LENGTH}
             strokeThickness={STROKE_THICKNESS}

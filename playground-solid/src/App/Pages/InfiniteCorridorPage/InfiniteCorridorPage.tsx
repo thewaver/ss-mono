@@ -1,4 +1,4 @@
-import { Show, createEffect, createMemo, createSignal, onCleanup } from "solid-js";
+import { Show, createMemo, createSignal } from "solid-js";
 import { createStore } from "solid-js/store";
 
 import {
@@ -28,9 +28,6 @@ import { ClockExample } from "./Examples/Clock";
 import { ScrolledExample } from "./Examples/Scrolled";
 import type { InfiniteCorridorExampleProps } from "./InfiniteCorridorPageSolid.types";
 
-const MS_PER_SECOND = 1000;
-const FULL_TURN = 360;
-
 export const InfiniteCorridorPage = () => {
     const [getLayoutKey, setLayoutKey] = createSignal<CorridorLayouts.SampleKey>(InfiniteCorridorKnobs.STARTING_LAYOUT);
     const [getItemCount, setItemCount] = createSignal(InfiniteCorridorKnobs.STARTING_ITEM_COUNT);
@@ -39,7 +36,6 @@ export const InfiniteCorridorPage = () => {
     const [getSpinDegreesPerSecond, setSpinDegreesPerSecond] = createSignal(
         CorridorLayoutKnobs.STARTING_SPIN_DEGREES_PER_SECOND,
     );
-    const [getSpinDegrees, setSpinDegrees] = createSignal(0);
     const [layoutDefs, setLayoutDefs] = createStore<Record<string, Record<string, number | boolean>>>({});
 
     const getFamily = () => CorridorLayouts.SAMPLE_LAYOUTS[getLayoutKey()].family;
@@ -47,33 +43,11 @@ export const InfiniteCorridorPage = () => {
     const getDefaults = () => CorridorLayoutDefaults.DEFAULTS_BY_FAMILY[getFamily()] as Record<string, unknown>;
     const getDefs = () => layoutDefs[getLayoutKey()] ?? {};
 
-    createEffect(() => {
-        const degreesPerSecond = getSpinDegreesPerSecond();
-
-        if (getFamily() !== "tube" || degreesPerSecond === 0) return;
-
-        let frameId: number;
-        let lastMs = performance.now();
-
-        const spin = () => {
-            const nowMs = performance.now();
-
-            setSpinDegrees((degrees) => (degrees + ((nowMs - lastMs) / MS_PER_SECOND) * degreesPerSecond) % FULL_TURN);
-            lastMs = nowMs;
-            frameId = requestAnimationFrame(spin);
-        };
-
-        frameId = requestAnimationFrame(spin);
-
-        onCleanup(() => cancelAnimationFrame(frameId));
-    });
-
-    const getLayout = createMemo(() =>
+    const toLayout = (spinDegrees: number) =>
         CorridorLayoutUtils.toLayoutRule({
             family: getFamily(),
-            defs: { spinDegrees: getSpinDegrees(), ...getDefs() },
-        } as unknown as CorridorLayoutEntry),
-    );
+            defs: { spinDegrees, ...getDefs() },
+        } as unknown as CorridorLayoutEntry);
 
     const getItems = createMemo(() => Array.from({ length: getItemCount() }, (_, index) => toRoomName(index)));
 
@@ -82,9 +56,8 @@ export const InfiniteCorridorPage = () => {
             items: getItems,
             glideDurationMs: getGlideDurationMs,
             startingLapMs: () => InfiniteCorridorKnobs.STARTING_LAP_MS_BY_FAMILY[getFamily()],
-            get layout() {
-                return getLayout();
-            },
+            spinDegreesPerSecond: () => (getFamily() === "tube" ? getSpinDegreesPerSecond() : 0),
+            toLayout,
         };
 
         return [
@@ -115,7 +88,7 @@ export const InfiniteCorridorPage = () => {
                         key={"layout"}
                         label={"Layout"}
                         hint={
-                            "Where the items stand: walls is one row on each wall, from flat against it to turned towards the viewer, and tube lines the inside of a ring of sides, every item upright towards the centre. Choosing one brings its own knobs with it."
+                            "Where the items stand: walls is one row on each wall, from flat against it to turned towards the viewer, and tube lines the inside of a ring of sides, every item upright towards the center. Choosing one brings its own knobs with it."
                         }
                     >
                         <PageSelectField

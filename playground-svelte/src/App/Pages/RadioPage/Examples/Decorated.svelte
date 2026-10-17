@@ -1,5 +1,5 @@
 <script lang="ts">
-    import { Corners, Radio, RadioGroup } from "@thewaver/ss-components-svelte";
+    import { CornerHighlight, Radio, RadioGroup } from "@thewaver/ss-components-svelte";
 
     import PageRadioContent from "../../../StyledComponents/RadioContent/RadioContent.svelte";
     import { RADIO_GROUP_GAP, SIZE_OPTIONS } from "@thewaver/ss-playground/App/Pages/RadioPage/RadioPage.const";
@@ -21,7 +21,7 @@
             {/snippet}
 
             {#snippet renderDecoration(flags)}
-                <Corners
+                <CornerHighlight
                     color={flags.checkedState === true ? "yellow" : "transparent"}
                     cornerLength={CORNER_LENGTH}
                     strokeThickness={STROKE_THICKNESS}

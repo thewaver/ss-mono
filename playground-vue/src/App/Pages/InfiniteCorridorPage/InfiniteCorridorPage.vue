@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed, shallowRef, watch } from "vue";
+import { computed, shallowRef } from "vue";
 
 import {
     CorridorLayoutDefaults,
@@ -32,15 +32,11 @@ import ClockExample from "./Examples/Clock.vue";
 import ScrolledExample from "./Examples/Scrolled.vue";
 import type { InfiniteCorridorExampleProps } from "./InfiniteCorridorPageVue.types";
 
-const MS_PER_SECOND = 1000;
-const FULL_TURN = 360;
-
 const layoutKey = shallowRef<CorridorLayouts.SampleKey>(InfiniteCorridorKnobs.STARTING_LAYOUT);
 const itemCount = shallowRef(InfiniteCorridorKnobs.STARTING_ITEM_COUNT);
 const glideDurationMs = shallowRef(INFINITE_CORRIDOR_DEFAULTS.glideDurationMs);
 
 const spinDegreesPerSecond = shallowRef(CorridorLayoutKnobs.STARTING_SPIN_DEGREES_PER_SECOND);
-const spinDegrees = shallowRef(0);
 const layoutDefs = shallowRef<Record<string, Record<string, number | boolean>>>({});
 
 const family = computed(() => CorridorLayouts.SAMPLE_LAYOUTS[layoutKey.value].family);
@@ -48,35 +44,11 @@ const knobs = computed(() => CorridorLayoutKnobs.KNOBS_BY_FAMILY[family.value] a
 const defaults = computed(() => CorridorLayoutDefaults.DEFAULTS_BY_FAMILY[family.value] as Record<string, unknown>);
 const defs = computed(() => layoutDefs.value[layoutKey.value] ?? {});
 
-watch(
-    [spinDegreesPerSecond, family],
-    ([degreesPerSecond, pickedFamily], _previous, onCleanup) => {
-        if (pickedFamily !== "tube" || degreesPerSecond === 0) return;
-
-        let frameId: number;
-        let lastMs = performance.now();
-
-        const spin = () => {
-            const nowMs = performance.now();
-
-            spinDegrees.value = (spinDegrees.value + ((nowMs - lastMs) / MS_PER_SECOND) * degreesPerSecond) % FULL_TURN;
-            lastMs = nowMs;
-            frameId = requestAnimationFrame(spin);
-        };
-
-        frameId = requestAnimationFrame(spin);
-
-        onCleanup(() => cancelAnimationFrame(frameId));
-    },
-    { immediate: true },
-);
-
-const layout = computed(() =>
+const toLayout = (spinDegrees: number) =>
     CorridorLayoutUtils.toLayoutRule({
         family: family.value,
-        defs: { spinDegrees: spinDegrees.value, ...defs.value },
-    } as unknown as CorridorLayoutEntry),
-);
+        defs: { spinDegrees, ...defs.value },
+    } as unknown as CorridorLayoutEntry);
 
 const items = computed(() => Array.from({ length: itemCount.value }, (_, index) => toRoomName(index)));
 
@@ -84,7 +56,8 @@ const commonProps = computed<InfiniteCorridorExampleProps>(() => ({
     items: items.value,
     glideDurationMs: glideDurationMs.value,
     startingLapMs: InfiniteCorridorKnobs.STARTING_LAP_MS_BY_FAMILY[family.value],
-    layout: layout.value,
+    spinDegreesPerSecond: family.value === "tube" ? spinDegreesPerSecond.value : 0,
+    toLayout,
 }));
 
 const setLayoutDef = (key: string, value: number | boolean) => {
@@ -118,7 +91,7 @@ const examples: ExampleDefs[] = [
             <PageProp
                 item-key="layout"
                 label="Layout"
-                hint="Where the items stand: walls is one row on each wall, from flat against it to turned towards the viewer, and tube lines the inside of a ring of sides, every item upright towards the centre. Choosing one brings its own knobs with it."
+                hint="Where the items stand: walls is one row on each wall, from flat against it to turned towards the viewer, and tube lines the inside of a ring of sides, every item upright towards the center. Choosing one brings its own knobs with it."
             >
                 <PageSelectField
                     :value="layoutKey"

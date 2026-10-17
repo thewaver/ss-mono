@@ -1,6 +1,6 @@
 import { useState } from "react";
 
-import { Button, Corners, type InteractionActivation } from "@thewaver/ss-components-react";
+import { Button, CornerHighlight, type InteractionActivation } from "@thewaver/ss-components-react";
 
 import { PageButtonContent } from "../../../StyledComponents/ButtonContent/ButtonContent";
 import { PageRipple } from "../../../StyledComponents/Ripple/Ripple";
@@ -19,7 +19,7 @@ export const DecoratedExample = (props: Props) => {
             onActivation={setActivation}
             renderDecoration={(flags) => (
                 <>
-                    <Corners color={flags.isPressed ? "yellow" : "transparent"} />
+                    <CornerHighlight color={flags.isPressed ? "yellow" : "transparent"} />
                     <PageRipple activation={activation} color={"yellow"} />
                 </>
             )}

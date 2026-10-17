@@ -1,4 +1,4 @@
-import { Corners, Toggle } from "@thewaver/ss-components-solid";
+import { CornerHighlight, Toggle } from "@thewaver/ss-components-solid";
 
 import { PageToggleContent } from "../../../StyledComponents/ToggleContent/ToggleContent";
 import type { ToggleExampleProps } from "../TogglePage.types";
@@ -15,7 +15,7 @@ export const DecoratedExample = (props: Props) => (
         isPressed={props.checked[0]}
         renderContent={(getFlags) => <PageToggleContent flags={getFlags} />}
         renderDecoration={(getFlags) => (
-            <Corners
+            <CornerHighlight
                 color={() => (getFlags().isPressed ? "yellow" : "transparent")}
                 cornerLength={CORNER_LENGTH}
                 strokeThickness={STROKE_THICKNESS}

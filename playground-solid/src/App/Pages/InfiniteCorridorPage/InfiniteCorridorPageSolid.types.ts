@@ -2,5 +2,5 @@ import type { AccessorValues, InfiniteCorridorLayoutRule } from "@thewaver/ss-co
 import type { BaseInfiniteCorridorExampleValues } from "@thewaver/ss-playground/App/Pages/InfiniteCorridorPage/InfiniteCorridorPage.types";
 
 export type InfiniteCorridorExampleProps = AccessorValues<BaseInfiniteCorridorExampleValues> & {
-    layout: InfiniteCorridorLayoutRule;
+    toLayout: (spinDegrees: number) => InfiniteCorridorLayoutRule;
 };

@@ -35,7 +35,11 @@ const CirclePackingPage = lazyPage(() => import("./Pages/CirclePackingPage/Circl
 const ClockPage = lazyPage(() => import("./Pages/ClockPage/ClockPage"), "ClockPage");
 const ColorAreaPage = lazyPage(() => import("./Pages/ColorAreaPage/ColorAreaPage"), "ColorAreaPage");
 const ColorInputPage = lazyPage(() => import("./Pages/ColorInputPage/ColorInputPage"), "ColorInputPage");
-const CornersPage = lazyPage(() => import("./Pages/CornersPage/CornersPage"), "CornersPage");
+const CornerHighlightPage = lazyPage(
+    () => import("./Pages/CornerHighlightPage/CornerHighlightPage"),
+    "CornerHighlightPage",
+);
+const CornerPinPage = lazyPage(() => import("./Pages/CornerPinPage/CornerPinPage"), "CornerPinPage");
 const CuboidPage = lazyPage(() => import("./Pages/CuboidPage/CuboidPage"), "CuboidPage");
 const CurrencyInputPage = lazyPage(() => import("./Pages/CurrencyInputPage/CurrencyInputPage"), "CurrencyInputPage");
 const DateInputPage = lazyPage(() => import("./Pages/DateInputPage/DateInputPage"), "DateInputPage");
@@ -674,8 +678,8 @@ export const MENU_CONFIGS: MenuBranchConfig[] = [
                 ],
             },
             {
-                name: "Corners",
-                component: () => <CornersPage />,
+                name: "CornerHighlight",
+                component: () => <CornerHighlightPage />,
             },
             {
                 name: "Diagrams",
@@ -723,6 +727,10 @@ export const MENU_CONFIGS: MenuBranchConfig[] = [
             {
                 name: "Perspective",
                 children: [
+                    {
+                        name: "CornerPin",
+                        component: () => <CornerPinPage />,
+                    },
                     {
                         name: "Cuboid",
                         component: () => <CuboidPage />,

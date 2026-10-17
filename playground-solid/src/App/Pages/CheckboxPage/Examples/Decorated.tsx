@@ -1,4 +1,4 @@
-import { Checkbox, Corners } from "@thewaver/ss-components-solid";
+import { Checkbox, CornerHighlight } from "@thewaver/ss-components-solid";
 
 import { PageCheckboxContent } from "../../../StyledComponents/CheckboxContent/CheckboxContent";
 import type { CheckboxExampleProps } from "../CheckboxPage.types";
@@ -15,7 +15,7 @@ export const DecoratedExample = (props: Props) => (
         isPressed={props.checked[0]}
         renderContent={(getFlags) => <PageCheckboxContent flags={getFlags} />}
         renderDecoration={(getFlags) => (
-            <Corners
+            <CornerHighlight
                 color={() => (getFlags().isPressed ? "yellow" : "transparent")}
                 cornerLength={CORNER_LENGTH}
                 strokeThickness={STROKE_THICKNESS}

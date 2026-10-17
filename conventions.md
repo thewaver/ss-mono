@@ -1386,7 +1386,7 @@ in-flow child is a flex item rather than an inline-block with descender slack, a
 
 That `!important` is not defensive habit either. The Playground carries
 `input[type="checkbox"] { margin-block: 10px }`, and element-plus-attribute outranks the `margin: 0` in
-`Checkbox.css.ts` — so a 20×20 checkbox sat in a 20×40 root and `Corners` drew a decoration twice the
+`Checkbox.css.ts` — so a 20×20 checkbox sat in a 20×40 root and `CornerHighlight` drew a decoration twice the
 height of the control. That route is closed now the input is absolutely positioned, but the rule still
 earns its place: it now guards the painter's margin, and the failure would look identical. Spacing
 belongs outside the wrapper; a painter wanting inner space uses padding.

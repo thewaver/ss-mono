@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { h, shallowRef } from "vue";
 
-import { Button, Corners, type InteractionActivation } from "@thewaver/ss-components-vue";
+import { Button, CornerHighlight, type InteractionActivation } from "@thewaver/ss-components-vue";
 import type { InteractionTooltipDefs } from "@thewaver/ss-components-vue";
 
 import PageButtonContent from "../../../StyledComponents/ButtonContent/ButtonContent.vue";
@@ -36,7 +36,7 @@ const tooltipDefs: InteractionTooltipDefs = {
         </template>
 
         <template #renderDecoration="flags">
-            <Corners :color="flags.isPressed ? 'yellow' : 'transparent'" />
+            <CornerHighlight :color="flags.isPressed ? 'yellow' : 'transparent'" />
             <PageRipple :activation="activation" color="yellow" />
         </template>
     </Button>

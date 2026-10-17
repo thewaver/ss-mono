@@ -31,6 +31,20 @@ const transformsOf = (page: Page, scope: string) =>
         .locator(items(scope))
         .evaluateAll((elements) => elements.map((element) => (element as HTMLElement).style.transform));
 
+const setSpeed = async (page: Page, degreesPerSecond: number) => {
+    const speed = page.locator(field("spinDegreesPerSecond"));
+
+    await speed.click();
+    await page.keyboard.press("ControlOrMeta+a");
+    await page.keyboard.type(String(degreesPerSecond));
+    await speed.blur();
+};
+
+const originsOf = (page: Page, scope: string) =>
+    page
+        .locator(items(scope))
+        .evaluateAll((elements) => elements.map((element) => (element as HTMLElement).style.transformOrigin));
+
 const pickLayout = async (page: Page, name: string) => {
     await page.locator(`${prop("layout")} [role="combobox"]`).click();
     await page.getByRole("option", { name, exact: true }).click();
@@ -156,8 +170,115 @@ test("the clock walks the corridor until it is paused", async ({ page }) => {
     expect((await transformsOf(page, CLOCK)).join("|"), "nothing moves once paused").toBe(paused);
 });
 
+/**
+ * The tube pins each item's four corners instead of turning a centered box, so its items are drawn from their own
+ * top-left with a full matrix. Which numbers that matrix holds is not asked: only that tube items are drawn this way
+ * and walls items are not.
+ */
+test("a tube draws its items by pinned corners, and walls does not", async ({ page }) => {
+    const drawnBy = async () => {
+        const origins = await originsOf(page, SCROLLED);
+        const transforms = await transformsOf(page, SCROLLED);
+
+        return {
+            origins: new Set(origins),
+            pinned: transforms.filter((transform) => transform.startsWith("matrix3d")),
+        };
+    };
+
+    const walls = await drawnBy();
+
+    await pickLayout(page, "tube");
+    await expect.poll(async () => (await drawnBy()).pinned.length).toBeGreaterThan(0);
+
+    const tube = await drawnBy();
+
+    expect(walls.pinned, "walls turns centered boxes").toHaveLength(0);
+    expect(tube.origins.size, "every tube item turns about one and the same point").toBe(1);
+    expect([...tube.origins][0], "which is not the center walls items turn about").not.toBe([...walls.origins][0]);
+});
+
+/**
+ * The tube's spin runs on a clock the page owns, and that clock belongs to the Clock example's Walk/Pause button as
+ * much as the walking does: pausing has to stop the spin too, not only the walk down the corridor.
+ */
+test("pausing the clock stops a spinning tube as well", async ({ page }) => {
+    await pickLayout(page, "tube");
+    await setSpeed(page, 90);
+    await page.locator(CLOCK).scrollIntoViewIfNeeded();
+
+    const first = (await transformsOf(page, CLOCK)).join("|");
+
+    await expect.poll(async () => (await transformsOf(page, CLOCK)).join("|")).not.toBe(first);
+
+    await page.locator(`${CLOCK} button[aria-label="Pause"]`).click();
+
+    const paused = (await transformsOf(page, CLOCK)).join("|");
+
+    await page.waitForTimeout(300);
+    expect((await transformsOf(page, CLOCK)).join("|"), "nothing moves once paused, the spin included").toBe(paused);
+});
+
+/**
+ * Pinned corners shared by neighbors are what keep a tube watertight: where one item ends the next begins. Each
+ * visible item's four corners are mapped to the corridor's own layout space (its box's place plus its matrix applied
+ * to the box's corners), and at least one pair of different items has a corner in the same place.
+ */
+test("neighboring tube items share corner points", async ({ page }) => {
+    await pickLayout(page, "tube");
+
+    await expect
+        .poll(async () => (await transformsOf(page, SCROLLED)).some((t) => t.startsWith("matrix3d")))
+        .toBe(true);
+
+    const corners = await page.locator(items(SCROLLED)).evaluateAll((elements) =>
+        elements
+            .map((element) => element as HTMLElement)
+            .filter((element) => element.style.transform.startsWith("matrix3d") && element.style.opacity !== "0")
+            .map((element) => {
+                const matrix = new DOMMatrix(element.style.transform);
+                const width = element.offsetWidth;
+                const height = element.offsetHeight;
+
+                return [
+                    [0, 0],
+                    [width, 0],
+                    [width, height],
+                    [0, height],
+                ].map(([x, y]) => {
+                    const mapped = matrix.transformPoint(new DOMPoint(x, y, 0, 1));
+
+                    return [element.offsetLeft + mapped.x / mapped.w, element.offsetTop + mapped.y / mapped.w];
+                });
+            }),
+    );
+
+    const TOLERANCE = 1;
+    const isShared = corners.some((first, index) =>
+        corners
+            .slice(index + 1)
+            .some((second) => first.some((a) => second.some((b) => Math.hypot(a[0] - b[0], a[1] - b[1]) <= TOLERANCE))),
+    );
+
+    expect(corners.length, "more than one item is drawn").toBeGreaterThan(1);
+    expect(isShared).toBe(true);
+});
+
 test.describe("with reduced motion asked for", () => {
     test.use({ reducedMotion: "reduce" });
+
+    test("a spinning tube does not move either until the clock is walked", async ({ page }) => {
+        await pickLayout(page, "tube");
+        await setSpeed(page, 90);
+        await page.locator(CLOCK).scrollIntoViewIfNeeded();
+
+        await expect(page.locator(`${CLOCK} button[aria-label="Walk"]`)).toHaveCount(1);
+
+        const first = (await transformsOf(page, CLOCK)).join("|");
+
+        await page.waitForTimeout(300);
+        expect((await transformsOf(page, CLOCK)).join("|"), "the spin is paused with the walk").toBe(first);
+    });
 
     test("the clock starts paused", async ({ page }) => {
         await page.locator(CLOCK).scrollIntoViewIfNeeded();

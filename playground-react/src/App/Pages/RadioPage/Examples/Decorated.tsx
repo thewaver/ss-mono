@@ -1,4 +1,4 @@
-import { Corners, Radio, RadioGroup } from "@thewaver/ss-components-react";
+import { CornerHighlight, Radio, RadioGroup } from "@thewaver/ss-components-react";
 import { RADIO_GROUP_GAP, SIZE_OPTIONS } from "@thewaver/ss-playground/App/Pages/RadioPage/RadioPage.const";
 
 import { PageRadioContent } from "../../../StyledComponents/RadioContent/RadioContent";
@@ -18,7 +18,7 @@ export const DecoratedExample = (props: Props) => (
                 ariaLabel={option.label}
                 renderContent={(flags) => <PageRadioContent flags={flags}>{option.label}</PageRadioContent>}
                 renderDecoration={(flags) => (
-                    <Corners
+                    <CornerHighlight
                         color={flags.checkedState === true ? "yellow" : "transparent"}
                         cornerLength={CORNER_LENGTH}
                         strokeThickness={STROKE_THICKNESS}

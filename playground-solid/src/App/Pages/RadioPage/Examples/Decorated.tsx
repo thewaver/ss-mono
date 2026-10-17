@@ -1,6 +1,6 @@
 import { For } from "solid-js";
 
-import { Corners, Radio, RadioGroup } from "@thewaver/ss-components-solid";
+import { CornerHighlight, Radio, RadioGroup } from "@thewaver/ss-components-solid";
 import { RADIO_GROUP_GAP, SIZE_OPTIONS } from "@thewaver/ss-playground/App/Pages/RadioPage/RadioPage.const";
 
 import { PageRadioContent } from "../../../StyledComponents/RadioContent/RadioContent";
@@ -20,7 +20,7 @@ export const DecoratedExample = (props: Props) => (
                     ariaLabel={() => option.label}
                     renderContent={(getFlags) => <PageRadioContent flags={getFlags}>{option.label}</PageRadioContent>}
                     renderDecoration={(getFlags) => (
-                        <Corners
+                        <CornerHighlight
                             color={() => (getFlags().checkedState === true ? "yellow" : "transparent")}
                             cornerLength={CORNER_LENGTH}
                             strokeThickness={STROKE_THICKNESS}

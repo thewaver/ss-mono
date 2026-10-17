@@ -7,6 +7,7 @@
     import PageExampleKnobs from "../../../PageComponents/ExampleKnobs/PageExampleKnobs.svelte";
     import PageNumberField from "../../../PageComponents/Field/PageNumberField.svelte";
     import PageProp from "../../../PageComponents/Prop/Prop.svelte";
+    import { createSpinDegrees } from "../InfiniteCorridorPage.utils.svelte";
     import type { InfiniteCorridorExampleProps } from "../InfiniteCorridorPageSvelte.types";
     import Room from "./Room.svelte";
 
@@ -26,13 +27,20 @@
     const scrollTo = (progress: number) => {
         if (boxRef) boxRef.scrollTop = progress * (boxRef.scrollHeight - boxRef.clientHeight);
     };
+
+    const getSpinDegrees = createSpinDegrees(
+        () => props.spinDegreesPerSecond,
+        () => true,
+    );
+
+    const layout = $derived(props.toLayout(getSpinDegrees()));
 </script>
 
 <div bind:this={boxRef} class={styles.scrollBox}>
     <div class={styles.scrollPinned}>
         <InfiniteCorridor
             items={props.items}
-            layout={props.layout}
+            {layout}
             bind:progress={getProgress, scrollTo}
             glideDurationMs={props.glideDurationMs}
             ariaLabel={"Scrolled corridor"}

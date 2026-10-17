@@ -9,7 +9,7 @@ export type WallsLayoutDefs = {
     farAngleDegrees?: number;
     perspectivePx?: number;
     visibleCards?: number;
-    viewDistance?: number;
+    focusDistance?: number;
 };
 
 export type TubeLayoutDefs = {
@@ -17,7 +17,7 @@ export type TubeLayoutDefs = {
     minSkipCount?: number;
     maxSkipCount?: number;
     seed?: number;
-    radiusRatio?: number;
+    nearWidthRatio?: number;
     farWidthRatio?: number;
     depthRatio?: number;
     tiltDegrees?: number;
@@ -25,7 +25,19 @@ export type TubeLayoutDefs = {
     spinDegrees?: number;
     perspectivePx?: number;
     visibleRings?: number;
-    viewRings?: number;
+    focusRings?: number;
+};
+
+export type TubeCornerDefs = {
+    sides: number;
+    nearRadius: number;
+    farRadius: number;
+    nearDepth: number;
+    farDepth: number;
+    nearRollDegrees: number;
+    farRollDegrees: number;
+    leanDegrees: number;
+    perspectivePx: number;
 };
 
 export type CorridorLayoutEntry =

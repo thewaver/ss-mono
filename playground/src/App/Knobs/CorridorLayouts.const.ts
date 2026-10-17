@@ -76,9 +76,9 @@ export namespace CorridorLayoutKnobs {
             max: 3000,
             step: 50,
         },
-        viewDistance: {
+        focusDistance: {
             kind: "number",
-            label: "View distance",
+            label: "Focus distance",
             hint: "How many slots down the corridor a room is brought when it is tabbed to from out of view.",
             min: 0,
             max: 10,
@@ -103,6 +103,14 @@ export namespace CorridorLayoutKnobs {
             max: 20,
             step: 1,
         },
+        nearWidthRatio: {
+            kind: "number",
+            label: "Near width",
+            hint: "How wide the tube is level with the viewer, as a share of the box's longer side. 1 puts its sides at the box's edges; above it they start outside the box.",
+            min: 0.2,
+            max: 2,
+            step: 0.05,
+        },
         farWidthRatio: {
             kind: "number",
             label: "Far width",
@@ -126,14 +134,6 @@ export namespace CorridorLayoutKnobs {
             min: 0,
             max: 11,
             step: 1,
-        },
-        radiusRatio: {
-            kind: "number",
-            label: "Radius",
-            hint: "How far the tube's sides stand from its axis level with the viewer, as a share of half the box's longer side.",
-            min: 0.2,
-            max: 2,
-            step: 0.05,
         },
         depthRatio: {
             kind: "number",
@@ -167,9 +167,9 @@ export namespace CorridorLayoutKnobs {
             max: 3000,
             step: 50,
         },
-        viewRings: {
+        focusRings: {
             kind: "number",
-            label: "View rings",
+            label: "Focus rings",
             hint: "How many rings down the tube a room is brought when it is tabbed to from out of view.",
             min: 0,
             max: 10,

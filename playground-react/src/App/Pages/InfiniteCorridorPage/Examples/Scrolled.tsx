@@ -1,4 +1,4 @@
-import { useRef, useState } from "react";
+import { useMemo, useRef, useState } from "react";
 
 import { ElementObserverReactUtils, InfiniteCorridor } from "@thewaver/ss-components-react";
 import { InfiniteCorridorKnobs } from "@thewaver/ss-playground/App/Knobs/InfiniteCorridors.const";
@@ -8,6 +8,7 @@ import * as styles from "@thewaver/ss-playground/App/Pages/InfiniteCorridorPage/
 import { PageExampleKnobs } from "../../../PageComponents/ExampleKnobs/ExampleKnobs";
 import { PageNumberField } from "../../../PageComponents/Field/Field";
 import { PageProp } from "../../../PageComponents/Prop/Prop";
+import { useSpinDegrees } from "../InfiniteCorridorPage.utils";
 import type { InfiniteCorridorExampleProps } from "../InfiniteCorridorPageReact.types";
 import { Room } from "./Room";
 
@@ -26,13 +27,17 @@ export const ScrolledExample = (props: Props) => {
         if (box) box.scrollTop = value * (box.scrollHeight - box.clientHeight);
     };
 
+    const spinDegrees = useSpinDegrees(props.spinDegreesPerSecond, true);
+
+    const layout = useMemo(() => props.toLayout(spinDegrees), [props.toLayout, spinDegrees]);
+
     return (
         <>
             <div ref={boxRef} className={styles.scrollBox}>
                 <div className={styles.scrollPinned}>
                     <InfiniteCorridor
                         items={props.items}
-                        layout={props.layout}
+                        layout={layout}
                         progress={[progress, scrollTo]}
                         glideDurationMs={props.glideDurationMs}
                         ariaLabel={"Scrolled corridor"}

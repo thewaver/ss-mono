@@ -41,7 +41,7 @@ describe("SVGUtils.getLinearCoords", () => {
         expect(coords.x2).toBeCloseTo(1.5, 10);
     });
 
-    it("shifts the centre by the offset", () => {
+    it("shifts the center by the offset", () => {
         const coords = SVGUtils.getLinearCoords({ offset: { x: 0.25, y: -0.25 } });
 
         expect(coords.x1).toBeCloseTo(0.25, 10);
@@ -49,7 +49,7 @@ describe("SVGUtils.getLinearCoords", () => {
         expect(coords.y1).toBeCloseTo(0.25, 10);
     });
 
-    it("stays centred on the midpoint whatever the angle", () => {
+    it("stays centered on the midpoint whatever the angle", () => {
         for (const angle of [0, 37, 90, 180, 300]) {
             const coords = SVGUtils.getLinearCoords({ angle });
 
