@@ -42,8 +42,8 @@ export const DateRangePickerPage = () => {
                     value={boundedValue}
                     calendar={getCalendarId}
                     key={"bounded"}
-                    minValue={() => MIN_DATE}
-                    maxValue={() => MAX_DATE}
+                    minValue={MIN_DATE}
+                    maxValue={MAX_DATE}
                 />
             ),
             path: `${EXAMPLES_ROOT}/Picked.tsx`,
@@ -61,7 +61,7 @@ export const DateRangePickerPage = () => {
                     <PageSelectField
                         value={getCalendarId}
                         values={DateValueUtils.getCalendarIds}
-                        width={() => CALENDAR_FIELD_WIDTH}
+                        width={CALENDAR_FIELD_WIDTH}
                         ariaLabel={"Calendar system"}
                         onChange={(id) => setCalendarId(() => id)}
                     />

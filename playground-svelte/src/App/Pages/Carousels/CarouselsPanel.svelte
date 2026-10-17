@@ -63,7 +63,7 @@
     {#if props.hasDelay}
         <PageProp
             itemKey={"delayMs"}
-            label={"RotatorUtils delay (ms)"}
+            label={"Transition delay (ms)"}
             hint={"How long a slide is held before the carousel moves to the next one on its own."}
         >
             <PageNumberField
@@ -72,13 +72,31 @@
                 max={CarouselKnobs.MAX_DELAY_MS}
                 step={CarouselKnobs.DELAY_STEP_MS}
                 width={FIELD_WIDTH}
-                ariaLabel={"RotatorUtils delay in milliseconds"}
+                ariaLabel={"Transition delay in milliseconds"}
                 onInput={(value) => {
                     controls.delay = value;
                 }}
             />
         </PageProp>
     {/if}
+
+    <PageProp
+        itemKey={"transitionDurationMs"}
+        label={"Transition duration (ms)"}
+        hint={"How long the move from one slide to the next takes. At 0 the carousel jumps straight there."}
+    >
+        <PageNumberField
+            value={controls.transitionDuration}
+            min={CarouselKnobs.MIN_TRANSITION_MS}
+            max={CarouselKnobs.MAX_TRANSITION_MS}
+            step={CarouselKnobs.TRANSITION_STEP_MS}
+            width={FIELD_WIDTH}
+            ariaLabel={"Transition duration in milliseconds"}
+            onInput={(value) => {
+                controls.transitionDuration = value;
+            }}
+        />
+    </PageProp>
 
     <PageProp
         itemKey={"orientation"}

@@ -31,7 +31,7 @@ export const AutocompleteOnDemandExample = (props: Props) => {
             options={props.options}
             hasMoreOptions={props.hasMore}
             ariaLabel={"Route"}
-            padding={() => QUERY_PADDING}
+            padding={QUERY_PADDING}
             computeTextStyle={computePageSelectTextStyle}
             renderContent={(getSelectedOption, getFlags) => (
                 <PageSelectContent flags={getFlags}>{getSelectedOption()?.value.name ?? PLACEHOLDER}</PageSelectContent>

@@ -107,9 +107,9 @@ export const TrailPage = () => {
                 >
                     <PageNumberField
                         value={getDurationMs}
-                        min={() => TrailKnobs.MIN_DURATION_MS}
-                        max={() => TrailKnobs.MAX_DURATION_MS}
-                        step={() => TrailKnobs.DURATION_STEP_MS}
+                        min={TrailKnobs.MIN_DURATION_MS}
+                        max={TrailKnobs.MAX_DURATION_MS}
+                        step={TrailKnobs.DURATION_STEP_MS}
                         ariaLabel={"Lap duration in milliseconds"}
                         onInput={setDurationMs}
                     />

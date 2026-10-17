@@ -28,7 +28,7 @@ export const LayeredExample = (props: Props) => (
 
         <Modal
             visibility={props.visibility}
-            ariaLabelledBy={() => LAYERED_TITLE_ID}
+            ariaLabelledBy={LAYERED_TITLE_ID}
             renderOverlay={(getVisibilityTarget, getTransitionDurationMs) => (
                 <PageModalOverlay
                     visibilityTarget={getVisibilityTarget}
@@ -42,7 +42,7 @@ export const LayeredExample = (props: Props) => (
                     <Select
                         renderHighlightFloater={renderPageHighlightFloater}
                         value={props.value}
-                        options={() => COUNTRIES}
+                        options={COUNTRIES}
                         ariaLabel={"Country"}
                         renderContent={(getSelectedOption, getFlags) => (
                             <PageSelectContent flags={getFlags}>

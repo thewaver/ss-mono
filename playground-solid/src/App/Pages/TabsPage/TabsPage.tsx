@@ -57,7 +57,7 @@ export const TabsPage = () => {
             component: () => (
                 <RowExample
                     selectedValue={getAutoValue}
-                    tabs={() => AUTOMATIC_TABS}
+                    tabs={AUTOMATIC_TABS}
                     idPrefix={"automatic"}
                     hasAutoActivation={true}
                     onSelectionChange={setAutoValue}
@@ -74,7 +74,7 @@ export const TabsPage = () => {
             component: () => (
                 <RowExample
                     selectedValue={getHoverPillValue}
-                    tabs={() => HOVER_PILL_TABS}
+                    tabs={HOVER_PILL_TABS}
                     idPrefix={"hoverPill"}
                     hasHoverPill={true}
                     onSelectionChange={setHoverPillValue}
@@ -91,7 +91,7 @@ export const TabsPage = () => {
             component: () => (
                 <RowExample
                     selectedValue={getReachableValue}
-                    tabs={() => REACHABLE_TABS}
+                    tabs={REACHABLE_TABS}
                     idPrefix={"reachable"}
                     onSelectionChange={setReachableValue}
                 />

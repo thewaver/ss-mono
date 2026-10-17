@@ -26,7 +26,7 @@ export const LibraryExample = (props: Props) => {
     return (
         <div class={styles.frame}>
             <Icicle<string>
-                root={() => LIBRARY}
+                root={LIBRARY}
                 focus={props.focus}
                 columnCount={props.columnCount}
                 zoomDurationMs={props.zoomDurationMs}

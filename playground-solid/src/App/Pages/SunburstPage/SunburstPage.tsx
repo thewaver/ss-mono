@@ -56,9 +56,9 @@ export const SunburstPage = () => {
                 >
                     <PageNumberField
                         value={getRingCount}
-                        min={() => SunburstKnobs.MIN_RING_COUNT}
-                        max={() => SunburstKnobs.MAX_RING_COUNT}
-                        step={() => SunburstKnobs.RING_COUNT_STEP}
+                        min={SunburstKnobs.MIN_RING_COUNT}
+                        max={SunburstKnobs.MAX_RING_COUNT}
+                        step={SunburstKnobs.RING_COUNT_STEP}
                         ariaLabel={"Rings"}
                         onInput={setRingCount}
                     />
@@ -73,9 +73,9 @@ export const SunburstPage = () => {
                 >
                     <PageNumberField
                         value={getZoomDurationMs}
-                        min={() => SunburstKnobs.MIN_ZOOM_DURATION_MS}
-                        max={() => SunburstKnobs.MAX_ZOOM_DURATION_MS}
-                        step={() => SunburstKnobs.ZOOM_DURATION_STEP_MS}
+                        min={SunburstKnobs.MIN_ZOOM_DURATION_MS}
+                        max={SunburstKnobs.MAX_ZOOM_DURATION_MS}
+                        step={SunburstKnobs.ZOOM_DURATION_STEP_MS}
                         isDisabled={getPrefersReducedMotion}
                         ariaLabel={"Zoom duration in milliseconds"}
                         onInput={setZoomDurationMs}

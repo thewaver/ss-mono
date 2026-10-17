@@ -149,8 +149,8 @@ export const ColorInput = (props: ColorInputProps) => {
                 value={hueSignal}
                 sizing={"fill"}
                 isDisabled={getIsDisabled}
-                max={() => ColorInputUtils.HUE_MAX}
-                step={() => ColorInputUtils.HUE_STEP}
+                max={ColorInputUtils.HUE_MAX}
+                step={ColorInputUtils.HUE_STEP}
                 ariaLabel={props.hueLabel}
                 renderContent={props.renderHue}
             />

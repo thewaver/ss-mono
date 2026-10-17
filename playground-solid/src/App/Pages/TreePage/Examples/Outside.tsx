@@ -13,7 +13,7 @@ export const OutsideExample = (props: Props) => (
     <PageControlColumn>
         <Tree
             renderHighlightFloater={renderPageHighlightFloater}
-            nodes={() => FILES}
+            nodes={FILES}
             value={props.value}
             expanded={props.expanded}
             ariaLabel={"Repository, collapsed from outside"}

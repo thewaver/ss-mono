@@ -50,7 +50,7 @@ export const WheelExample = (props: WheelMenuExampleProps) => {
                 layoutDefs={props.layoutDefs}
                 holeRadius={() => access(props.holeRadius) ?? WHEEL_HOLE_RADIUS}
                 bandWidth={() => access(props.bandWidth) ?? WHEEL_BAND_WIDTH}
-                levelGap={() => WHEEL_LEVEL_GAP}
+                levelGap={WHEEL_LEVEL_GAP}
                 placement={() => ({ x: "center", y: "center" })}
                 closerDefs={{
                     ariaLabel: "Close the wheel",

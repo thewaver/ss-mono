@@ -53,7 +53,7 @@ export const PressedExample = (props: Props) => {
             <FlipCard
                 flipped={props.flipped}
                 axis={props.axis}
-                size={() => CARD_SIZE}
+                size={CARD_SIZE}
                 transitionDurationMs={props.transitionDurationMs}
                 turnDirection={getTurnDirection}
                 peekRatio={getPeekRatio}
@@ -86,9 +86,9 @@ export const PressedExample = (props: Props) => {
                     id={"peek"}
                     sizing={"fill"}
                     ariaLabel={"Peek at the other side"}
-                    min={() => NO_PEEK}
-                    max={() => PERCENT}
-                    step={() => PEEK_STEP}
+                    min={NO_PEEK}
+                    max={PERCENT}
+                    step={PEEK_STEP}
                     value={[
                         () => Math.round(getPeekRatio() * PERCENT),
                         (value: number) => setPeekRatio(value / PERCENT),

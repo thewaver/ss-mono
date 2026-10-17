@@ -11,6 +11,7 @@ import type { CarouselsControls } from "./Carousels.types";
 export const useCarouselsControls = (): CarouselsControls => {
     const slideCount = shallowRef(CarouselKnobs.STARTING_SLIDE_COUNT);
     const delay = shallowRef(CarouselKnobs.STARTING_DELAY_MS);
+    const transitionDuration = shallowRef(CAROUSEL_DEFAULTS.transitionDurationMs);
     const orientation = shallowRef<CarouselOrientation>(CAROUSEL_DEFAULTS.orientation);
     const isDisabled = shallowRef(CarouselKnobs.STARTING_IS_DISABLED);
     const isLooping = shallowRef(CAROUSEL_DEFAULTS.isLooping);
@@ -26,6 +27,7 @@ export const useCarouselsControls = (): CarouselsControls => {
         slides: slides.value,
         isDisabled: isDisabled.value,
         orientation: orientation.value,
+        transitionDurationMs: transitionDuration.value,
         frameClasses: styles.slideFrames[PLACEMENT_FRAMES[placement.value] ?? "whole"][orientation.value],
         placement: placementRule.value,
     }));
@@ -33,11 +35,11 @@ export const useCarouselsControls = (): CarouselsControls => {
     return {
         slideCount,
         delay,
+        transitionDuration,
         orientation,
         isDisabled,
         isLooping,
         placement,
-        slides,
         sharedProps,
     };
 };

@@ -92,7 +92,7 @@ const StressTestWrapper = (props: ScanlineAnimationExampleProps) => {
             <div>{"120 lines"}</div>
 
             <StressTest
-                configs={() => STRESS_ITEMS}
+                configs={STRESS_ITEMS}
                 onHideModal={() => {
                     props.playback[1](true);
                 }}
@@ -125,7 +125,7 @@ const StressTestWrapper = (props: ScanlineAnimationExampleProps) => {
                             <ScanlineAnimation
                                 {...props}
                                 playback={modalPlayback}
-                                lineCount={() => STRESS_LINE_COUNT}
+                                lineCount={STRESS_LINE_COUNT}
                                 animationIterationDelayMs={0}
                                 computeCellWeights={(count) =>
                                     CellAnimationWeights.computeCellWeights(
@@ -162,9 +162,9 @@ const SmoothnessInput = (props: { getter: () => number; setter: (value: number) 
         >
             <PageNumberField
                 value={props.getter}
-                min={() => ScanlineAnimationKnobs.MIN_SMOOTHNESS}
-                max={() => ScanlineAnimationKnobs.MAX_SMOOTHNESS}
-                step={() => ScanlineAnimationKnobs.SMOOTHNESS_STEP}
+                min={ScanlineAnimationKnobs.MIN_SMOOTHNESS}
+                max={ScanlineAnimationKnobs.MAX_SMOOTHNESS}
+                step={ScanlineAnimationKnobs.SMOOTHNESS_STEP}
                 ariaLabel={"Smoothness"}
                 onInput={props.setter}
             />
@@ -184,7 +184,7 @@ const DirInput = (props: {
         >
             <PageSelectField
                 value={props.getter}
-                values={() => CellAnimationBreakpoints.DIRECTIONS}
+                values={CellAnimationBreakpoints.DIRECTIONS}
                 ariaLabel={"Direction"}
                 onChange={props.setter}
             />
@@ -197,7 +197,7 @@ const GlitchExampleWrapper = (props: ScanlineAnimationExampleProps) => {
 
     return (
         <>
-            <PageMeasureBox width={() => IMAGE_CONTAINER_SIZE}>
+            <PageMeasureBox width={IMAGE_CONTAINER_SIZE}>
                 <GlitchExample {...props} keyframeOpts={() => keyframeOpts} />
             </PageMeasureBox>
 
@@ -205,9 +205,9 @@ const GlitchExampleWrapper = (props: ScanlineAnimationExampleProps) => {
                 <PageProp key={"count"} label={"Count"} hint={"How many glitch bursts happen over one pass."}>
                     <PageNumberField
                         value={() => keyframeOpts.count!}
-                        min={() => ScanlineAnimationKnobs.MIN_GLITCH_COUNT}
-                        max={() => ScanlineAnimationKnobs.MAX_GLITCH_COUNT}
-                        step={() => ScanlineAnimationKnobs.GLITCH_COUNT_STEP}
+                        min={ScanlineAnimationKnobs.MIN_GLITCH_COUNT}
+                        max={ScanlineAnimationKnobs.MAX_GLITCH_COUNT}
+                        step={ScanlineAnimationKnobs.GLITCH_COUNT_STEP}
                         ariaLabel={"Count"}
                         onInput={(value) => setKeyframeOpts("count", value)}
                     />
@@ -220,9 +220,9 @@ const GlitchExampleWrapper = (props: ScanlineAnimationExampleProps) => {
                 >
                     <PageNumberField
                         value={() => keyframeOpts.shiftPercent!}
-                        min={() => ScanlineAnimationKnobs.MIN_SHIFT_PERCENT}
-                        max={() => ScanlineAnimationKnobs.MAX_SHIFT_PERCENT}
-                        step={() => ScanlineAnimationKnobs.SHIFT_PERCENT_STEP}
+                        min={ScanlineAnimationKnobs.MIN_SHIFT_PERCENT}
+                        max={ScanlineAnimationKnobs.MAX_SHIFT_PERCENT}
+                        step={ScanlineAnimationKnobs.SHIFT_PERCENT_STEP}
                         ariaLabel={"Shift percent"}
                         onInput={(value) => setKeyframeOpts("shiftPercent", value)}
                     />
@@ -237,9 +237,9 @@ const GlitchExampleWrapper = (props: ScanlineAnimationExampleProps) => {
                 >
                     <PageNumberField
                         value={() => keyframeOpts.chunkyness}
-                        min={() => ScanlineAnimationKnobs.MIN_CHUNKYNESS}
-                        max={() => ScanlineAnimationKnobs.MAX_CHUNKYNESS}
-                        step={() => ScanlineAnimationKnobs.CHUNKYNESS_STEP}
+                        min={ScanlineAnimationKnobs.MIN_CHUNKYNESS}
+                        max={ScanlineAnimationKnobs.MAX_CHUNKYNESS}
+                        step={ScanlineAnimationKnobs.CHUNKYNESS_STEP}
                         ariaLabel={"Chunkyness"}
                         onInput={(value) => setKeyframeOpts("chunkyness", value)}
                     />
@@ -257,7 +257,7 @@ const SurgeExampleWrapper = (props: ScanlineAnimationExampleProps) => {
 
     return (
         <>
-            <PageMeasureBox width={() => IMAGE_CONTAINER_SIZE}>
+            <PageMeasureBox width={IMAGE_CONTAINER_SIZE}>
                 <SurgeExample
                     {...props}
                     keyframeOpts={() => keyframeOpts as ScanlineHorizontalStretchOpts}
@@ -291,7 +291,7 @@ const SnakeExampleWrapper = (props: ScanlineAnimationExampleProps) => {
 
     return (
         <>
-            <PageMeasureBox width={() => IMAGE_CONTAINER_SIZE}>
+            <PageMeasureBox width={IMAGE_CONTAINER_SIZE}>
                 <SnakeExample
                     {...props}
                     keyframeOpts={() => keyframeOpts as ScanlineHorizontalSnakeOpts}
@@ -325,7 +325,7 @@ const SplitExampleWrapper = (props: ScanlineAnimationExampleProps) => {
 
     return (
         <>
-            <PageMeasureBox width={() => IMAGE_CONTAINER_SIZE}>
+            <PageMeasureBox width={IMAGE_CONTAINER_SIZE}>
                 <SplitExample
                     {...props}
                     keyframeOpts={() => keyframeOpts as ScanlineHorizontalSplitOpts}
@@ -359,7 +359,7 @@ const BrightnessExampleWrapper = (props: ScanlineAnimationExampleProps) => {
 
     return (
         <>
-            <PageMeasureBox width={() => IMAGE_CONTAINER_SIZE}>
+            <PageMeasureBox width={IMAGE_CONTAINER_SIZE}>
                 <BrightnessExample {...props} keyframeOpts={() => keyframeOpts} breakpointOpts={() => breakpointOpts} />
             </PageMeasureBox>
 
@@ -382,7 +382,7 @@ const GrayscaleExampleWrapper = (props: ScanlineAnimationExampleProps) => {
 
     return (
         <>
-            <PageMeasureBox width={() => IMAGE_CONTAINER_SIZE}>
+            <PageMeasureBox width={IMAGE_CONTAINER_SIZE}>
                 <GrayscaleExample {...props} keyframeOpts={() => keyframeOpts} breakpointOpts={() => breakpointOpts} />
             </PageMeasureBox>
 
@@ -405,7 +405,7 @@ const HueExampleWrapper = (props: ScanlineAnimationExampleProps) => {
 
     return (
         <>
-            <PageMeasureBox width={() => IMAGE_CONTAINER_SIZE}>
+            <PageMeasureBox width={IMAGE_CONTAINER_SIZE}>
                 <HueExample {...props} keyframeOpts={() => keyframeOpts} breakpointOpts={() => breakpointOpts} />
             </PageMeasureBox>
 
@@ -428,7 +428,7 @@ const WaveExampleWrapper = (props: ScanlineAnimationExampleProps) => {
 
     return (
         <>
-            <PageMeasureBox width={() => IMAGE_CONTAINER_SIZE}>
+            <PageMeasureBox width={IMAGE_CONTAINER_SIZE}>
                 <WaveExample
                     {...props}
                     keyframeOpts={() => keyframeOpts as _ScanlineHorizontalWaveOpts}
@@ -462,7 +462,7 @@ const RollExampleWrapper = (props: ScanlineAnimationExampleProps) => {
 
     return (
         <>
-            <PageMeasureBox width={() => IMAGE_CONTAINER_SIZE}>
+            <PageMeasureBox width={IMAGE_CONTAINER_SIZE}>
                 <RollExample
                     {...props}
                     keyframeOpts={() => keyframeOpts as _ScanlineHorizontalRollOpts}
@@ -496,7 +496,7 @@ const DropoutExampleWrapper = (props: ScanlineAnimationExampleProps) => {
 
     return (
         <>
-            <PageMeasureBox width={() => IMAGE_CONTAINER_SIZE}>
+            <PageMeasureBox width={IMAGE_CONTAINER_SIZE}>
                 <DropoutExample
                     {...props}
                     keyframeOpts={() => keyframeOpts as _ScanlineHorizontalDropoutOpts}
@@ -530,7 +530,7 @@ const InterlaceExampleWrapper = (props: ScanlineAnimationExampleProps) => {
 
     return (
         <>
-            <PageMeasureBox width={() => IMAGE_CONTAINER_SIZE}>
+            <PageMeasureBox width={IMAGE_CONTAINER_SIZE}>
                 <InterlaceExample
                     {...props}
                     keyframeOpts={() => keyframeOpts as _ScanlineHorizontalInterlaceOpts}
@@ -564,7 +564,7 @@ const SkewExampleWrapper = (props: ScanlineAnimationExampleProps) => {
 
     return (
         <>
-            <PageMeasureBox width={() => IMAGE_CONTAINER_SIZE}>
+            <PageMeasureBox width={IMAGE_CONTAINER_SIZE}>
                 <SkewExample
                     {...props}
                     keyframeOpts={() => keyframeOpts as _ScanlineHorizontalSkewOpts}
@@ -720,7 +720,7 @@ export const ScanlineAnimationPage = () => {
                 >
                     <PageGroupedSelectField
                         value={getWeightType}
-                        groups={() => GROUPPED_WEIGHTS}
+                        groups={GROUPPED_WEIGHTS}
                         ariaLabel={"Weight"}
                         onChange={(weight) => setWeightType(() => weight)}
                     />
@@ -735,9 +735,9 @@ export const ScanlineAnimationPage = () => {
                 >
                     <PageNumberField
                         value={getLineCount}
-                        min={() => ScanlineAnimationKnobs.MIN_LINE_COUNT}
-                        max={() => ScanlineAnimationKnobs.MAX_LINE_COUNT}
-                        step={() => ScanlineAnimationKnobs.LINE_COUNT_STEP}
+                        min={ScanlineAnimationKnobs.MIN_LINE_COUNT}
+                        max={ScanlineAnimationKnobs.MAX_LINE_COUNT}
+                        step={ScanlineAnimationKnobs.LINE_COUNT_STEP}
                         ariaLabel={"Line count"}
                         onInput={setLineCount}
                     />
@@ -752,7 +752,7 @@ export const ScanlineAnimationPage = () => {
                 >
                     <PageSelectField
                         value={getOrientation}
-                        values={() => SCANLINE_ANIMATION_ORIENTATIONS}
+                        values={SCANLINE_ANIMATION_ORIENTATIONS}
                         ariaLabel={"Orientation"}
                         onChange={(orientation) => setOrientation(() => orientation)}
                     />
@@ -765,9 +765,9 @@ export const ScanlineAnimationPage = () => {
                 >
                     <PageNumberField
                         value={getAnimationDurationMs}
-                        min={() => ScanlineAnimationKnobs.MIN_DURATION_MS}
-                        max={() => ScanlineAnimationKnobs.MAX_DURATION_MS}
-                        step={() => ScanlineAnimationKnobs.DURATION_STEP_MS}
+                        min={ScanlineAnimationKnobs.MIN_DURATION_MS}
+                        max={ScanlineAnimationKnobs.MAX_DURATION_MS}
+                        step={ScanlineAnimationKnobs.DURATION_STEP_MS}
                         ariaLabel={"Animation duration"}
                         onInput={setAnimationDurationMs}
                     />
@@ -780,9 +780,9 @@ export const ScanlineAnimationPage = () => {
                 >
                     <PageNumberField
                         value={getAnimationIterationDelayMs}
-                        min={() => ScanlineAnimationKnobs.MIN_ITERATION_DELAY_MS}
-                        max={() => ScanlineAnimationKnobs.MAX_DURATION_MS}
-                        step={() => ScanlineAnimationKnobs.DURATION_STEP_MS}
+                        min={ScanlineAnimationKnobs.MIN_ITERATION_DELAY_MS}
+                        max={ScanlineAnimationKnobs.MAX_DURATION_MS}
+                        step={ScanlineAnimationKnobs.DURATION_STEP_MS}
                         ariaLabel={"Iteration delay"}
                         onInput={setAnimationIterationDelayMs}
                     />

@@ -5,8 +5,6 @@ import * as styles from "@thewaver/ss-playground/App/Pages/Accordions/Accordions
 import { useLayerClass } from "../../../../StyledComponents/Layer/Layer.context";
 import type { AccordionExampleProps } from "../../Accordions.types";
 
-const GAP = 5;
-
 const PANEL_BODIES: Record<string, string> = {
     Mountains: "Cold air, long views and a path that only goes up.",
     Coast: "Salt, wind and a horizon that never quite arrives.",
@@ -34,7 +32,8 @@ export const RowExample = (props: Props) => {
             sizing={"fit-content"}
             isSingleExpand={true}
             isExpandRequired={true}
-            gap={GAP}
+            gap={props.gap}
+            transitionDurationMs={props.transitionDurationMs}
             renderHeader={(item, flags) => (
                 <div
                     className={[styles.rowStrip, layerClass, flags.isHovered && styles.rowStripHovered]
@@ -48,6 +47,7 @@ export const RowExample = (props: Props) => {
                 <div
                     className={[
                         styles.rowPanel,
+                        layerClass,
                         visibilityTarget === 1 && moveDirection === "forward" && styles.rowPanelEnterForward,
                         visibilityTarget === 1 && moveDirection === "backward" && styles.rowPanelEnterBackward,
                     ]
@@ -59,8 +59,6 @@ export const RowExample = (props: Props) => {
                         animationDuration: `${transitionDurationMs}ms`,
                     }}
                 >
-                    <strong>{item.value}</strong>
-
                     <div>{PANEL_BODIES[item.value]}</div>
                 </div>
             )}

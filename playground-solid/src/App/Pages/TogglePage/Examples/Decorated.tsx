@@ -17,8 +17,8 @@ export const DecoratedExample = (props: Props) => (
         renderDecoration={(getFlags) => (
             <Corners
                 color={() => (getFlags().isPressed ? "yellow" : "transparent")}
-                cornerLength={() => CORNER_LENGTH}
-                strokeThickness={() => STROKE_THICKNESS}
+                cornerLength={CORNER_LENGTH}
+                strokeThickness={STROKE_THICKNESS}
             />
         )}
     />

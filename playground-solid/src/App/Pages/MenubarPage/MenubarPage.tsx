@@ -46,9 +46,9 @@ export const MenubarPage = () => {
                 >
                     <PageNumberField
                         value={getBarWidth}
-                        min={() => MenubarKnobs.MIN_BAR_WIDTH}
-                        max={() => MenubarKnobs.MAX_BAR_WIDTH}
-                        step={() => MenubarKnobs.BAR_WIDTH_STEP}
+                        min={MenubarKnobs.MIN_BAR_WIDTH}
+                        max={MenubarKnobs.MAX_BAR_WIDTH}
+                        step={MenubarKnobs.BAR_WIDTH_STEP}
                         ariaLabel={"Bar width in pixels"}
                         onInput={setBarWidth}
                     />

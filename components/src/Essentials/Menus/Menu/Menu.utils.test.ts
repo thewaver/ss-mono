@@ -250,11 +250,55 @@ describe("getTriggerOpenPosition", () => {
     });
 });
 
-describe("getIsPointerLed", () => {
-    it("tells an enter at the pointer's last point from one somewhere new", () => {
-        expect(MenuUtils.getIsPointerLed(undefined, { x: 5, y: 5 })).toBe(true);
-        expect(MenuUtils.getIsPointerLed({ x: 5, y: 5 }, { x: 5.5, y: 5 })).toBe(false);
-        expect(MenuUtils.getIsPointerLed({ x: 5, y: 5 }, { x: 7, y: 5 })).toBe(true);
+describe("createOpeningHoverGuard", () => {
+    const AT_OPEN = { x: 5, y: 5 };
+    const itemAt = (index: number | undefined) => () => index;
+
+    it("holds back the item the level opened under until the pointer comes back to it from elsewhere", () => {
+        const guard = MenuUtils.createOpeningHoverGuard();
+
+        guard.open(AT_OPEN);
+
+        expect(guard.getIsHoverable(2, itemAt(2)), "the item under the pointer at opening").toBe(false);
+        expect(guard.getIsHoverable(1, itemAt(2)), "any other item").toBe(true);
+
+        guard.enter(2, AT_OPEN);
+
+        expect(guard.getIsHoverable(2, itemAt(2)), "a twitch on it is its first movement, so it stays held").toBe(
+            false,
+        );
+
+        guard.enter(2, { x: 40, y: 5 });
+
+        expect(guard.getIsHoverable(2, itemAt(2)), "once the pointer has moved elsewhere and returned").toBe(true);
+    });
+
+    it("looks the item up once, on the first movement after opening", () => {
+        const guard = MenuUtils.createOpeningHoverGuard();
+        let lookups = 0;
+        const counted = () => {
+            lookups++;
+
+            return 0;
+        };
+
+        guard.open(AT_OPEN);
+        guard.getIsHoverable(0, counted);
+        guard.getIsHoverable(1, counted);
+
+        expect(lookups).toBe(1);
+    });
+
+    it("holds nothing back when the pointer's point is unknown, and starts over on every opening", () => {
+        const guard = MenuUtils.createOpeningHoverGuard();
+
+        guard.open(undefined);
+
+        expect(guard.getIsHoverable(0, itemAt(0))).toBe(true);
+
+        guard.open(AT_OPEN);
+
+        expect(guard.getIsHoverable(0, itemAt(0))).toBe(false);
     });
 });
 

@@ -90,8 +90,8 @@ export const PageNumberField = (props: PageNumberFieldProps) => {
             step={props.step}
             isDisabled={props.isDisabled}
             ariaLabel={props.ariaLabel}
-            padding={() => FIELD_STEPPER_PADDING}
-            gap={() => FIELD_GAP}
+            padding={FIELD_STEPPER_PADDING}
+            gap={FIELD_GAP}
             computeTextStyle={computePageTextFieldTextStyle}
             renderContent={(getFlags) => (
                 <PageTextFieldContent
@@ -115,8 +115,8 @@ export const PageTextField = (props: PageTextFieldProps) => {
             value={[() => access(props.value), props.onInput]}
             isDisabled={props.isDisabled}
             ariaLabel={props.ariaLabel}
-            padding={() => FIELD_PADDING}
-            gap={() => FIELD_GAP}
+            padding={FIELD_PADDING}
+            gap={FIELD_GAP}
             computeTextStyle={computePageTextFieldTextStyle}
             renderContent={(getFlags) => <PageTextFieldContent flags={getFlags} width={props.width} />}
             renderPlaceholder={

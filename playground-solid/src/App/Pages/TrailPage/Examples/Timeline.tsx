@@ -44,9 +44,9 @@ export const TimelineExample = (props: Props) => {
                     id={"timelineScrubber"}
                     sizing={"fill"}
                     ariaLabel={"Position along the path"}
-                    min={() => 0}
-                    max={() => PERCENT}
-                    step={() => SLIDER_STEP}
+                    min={0}
+                    max={PERCENT}
+                    step={SLIDER_STEP}
                     value={[
                         () => Math.round(progressSignal[0]() * PERCENT),
                         (value: number) => getController()?.seek(value / PERCENT),

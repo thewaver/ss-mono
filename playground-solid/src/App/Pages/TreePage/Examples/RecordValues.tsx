@@ -10,7 +10,7 @@ type Props = TreeRecordExampleProps;
 export const RecordValuesExample = (props: Props) => (
     <Tree
         renderHighlightFloater={renderPageHighlightFloater}
-        nodes={() => ASSETS}
+        nodes={ASSETS}
         value={props.value}
         expanded={props.expanded}
         ariaLabel={"Assets"}

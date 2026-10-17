@@ -56,7 +56,7 @@ const DefaultExampleWrapper = (
 ) => {
     return (
         <div class={styles.stack}>
-            <PageMeasureBox width={() => BOX_WIDTH} height={() => BOX_HEIGHT}>
+            <PageMeasureBox width={BOX_WIDTH} height={BOX_HEIGHT}>
                 <DefaultExample {...props} playback={props.ownPlayback} progress={props.progress} />
             </PageMeasureBox>
 
@@ -76,7 +76,7 @@ const ShapedExampleWrapper = (props: ParticleFieldExampleProps) => {
 
     return (
         <>
-            <PageMeasureBox width={() => SHAPED_BOX_SIZE} height={() => SHAPED_BOX_SIZE}>
+            <PageMeasureBox width={SHAPED_BOX_SIZE} height={SHAPED_BOX_SIZE}>
                 <ShapedExample {...props} shapeKind={getShapeKind} joinRadius={getJoinRadius} />
             </PageMeasureBox>
 
@@ -88,7 +88,7 @@ const ShapedExampleWrapper = (props: ParticleFieldExampleProps) => {
                 >
                     <PageSelectField
                         value={getShapeKind}
-                        values={() => ShapeConst.DEFAULT_SHAPES}
+                        values={ShapeConst.DEFAULT_SHAPES}
                         ariaLabel={"Shape"}
                         onChange={(kind) => setShapeKind(() => kind)}
                     />
@@ -101,9 +101,9 @@ const ShapedExampleWrapper = (props: ParticleFieldExampleProps) => {
                 >
                     <PageNumberField
                         value={getJoinRadius}
-                        min={() => ParticleFieldKnobs.MIN_JOIN_RADIUS}
-                        max={() => ParticleFieldKnobs.MAX_JOIN_RADIUS}
-                        step={() => ParticleFieldKnobs.JOIN_RADIUS_STEP}
+                        min={ParticleFieldKnobs.MIN_JOIN_RADIUS}
+                        max={ParticleFieldKnobs.MAX_JOIN_RADIUS}
+                        step={ParticleFieldKnobs.JOIN_RADIUS_STEP}
                         ariaLabel={"Corner radius"}
                         onInput={setJoinRadius}
                     />
@@ -121,7 +121,7 @@ const StressTestWrapper = (props: ParticleFieldExampleProps) => {
             <div>{`${STRESS_CELL_COUNT.col} x ${STRESS_CELL_COUNT.row} cells`}</div>
 
             <StressTest
-                configs={() => STRESS_ITEMS}
+                configs={STRESS_ITEMS}
                 onShowModal={() => props.playback[1](false)}
                 onHideModal={() => props.playback[1](true)}
                 renderLabel={(getConfigIndex) => `Render ${STRESS_ITEMS[getConfigIndex()].count} fields`}
@@ -130,7 +130,7 @@ const StressTestWrapper = (props: ParticleFieldExampleProps) => {
                         width={() => STRESS_ITEMS[getConfigIndex()].size}
                         height={() => STRESS_ITEMS[getConfigIndex()].size}
                     >
-                        <DefaultExample {...props} playback={modalPlayback} cellCount={() => STRESS_CELL_COUNT} />
+                        <DefaultExample {...props} playback={modalPlayback} cellCount={STRESS_CELL_COUNT} />
                     </PageMeasureBox>
                 )}
             />
@@ -214,9 +214,9 @@ export const ParticleFieldPage = () => {
                 >
                     <PageNumberField
                         value={getSpawnChance}
-                        min={() => ParticleFieldKnobs.MIN_SPAWN_CHANCE}
-                        max={() => ParticleFieldKnobs.MAX_SPAWN_CHANCE}
-                        step={() => ParticleFieldKnobs.SPAWN_CHANCE_STEP}
+                        min={ParticleFieldKnobs.MIN_SPAWN_CHANCE}
+                        max={ParticleFieldKnobs.MAX_SPAWN_CHANCE}
+                        step={ParticleFieldKnobs.SPAWN_CHANCE_STEP}
                         ariaLabel={"Spawn chance"}
                         onInput={setSpawnChance}
                     />
@@ -230,17 +230,17 @@ export const ParticleFieldPage = () => {
                     <div class={styles.valueList}>
                         <PageNumberField
                             value={() => cellCount.col}
-                            min={() => ParticleFieldKnobs.MIN_CELL_COUNT}
-                            max={() => ParticleFieldKnobs.MAX_CELL_COUNT}
-                            step={() => ParticleFieldKnobs.CELL_COUNT_STEP}
+                            min={ParticleFieldKnobs.MIN_CELL_COUNT}
+                            max={ParticleFieldKnobs.MAX_CELL_COUNT}
+                            step={ParticleFieldKnobs.CELL_COUNT_STEP}
                             ariaLabel={"Columns"}
                             onInput={(value) => setCellCount("col", value)}
                         />
                         <PageNumberField
                             value={() => cellCount.row}
-                            min={() => ParticleFieldKnobs.MIN_CELL_COUNT}
-                            max={() => ParticleFieldKnobs.MAX_CELL_COUNT}
-                            step={() => ParticleFieldKnobs.CELL_COUNT_STEP}
+                            min={ParticleFieldKnobs.MIN_CELL_COUNT}
+                            max={ParticleFieldKnobs.MAX_CELL_COUNT}
+                            step={ParticleFieldKnobs.CELL_COUNT_STEP}
                             ariaLabel={"Rows"}
                             onInput={(value) => setCellCount("row", value)}
                         />
@@ -256,7 +256,7 @@ export const ParticleFieldPage = () => {
                 >
                     <PageSelectField
                         value={getOriginType}
-                        values={() => CellAnimationOrigins.ORIGIN_TYPES}
+                        values={CellAnimationOrigins.ORIGIN_TYPES}
                         isDisabled={() => !CellAnimationWeights.isOriginAware(getWeightType())}
                         ariaLabel={"Origin"}
                         onChange={(origin) => setOriginType(() => origin)}
@@ -272,7 +272,7 @@ export const ParticleFieldPage = () => {
                 >
                     <PageGroupedSelectField
                         value={getWeightType}
-                        groups={() => GROUPPED_WEIGHTS}
+                        groups={GROUPPED_WEIGHTS}
                         ariaLabel={"Weight"}
                         onChange={(weight) => setWeightType(() => weight)}
                     />
@@ -287,7 +287,7 @@ export const ParticleFieldPage = () => {
                 >
                     <PageGroupedSelectField
                         value={getAnimationType}
-                        groups={() => GROUPPED_ANIMATIONS}
+                        groups={GROUPPED_ANIMATIONS}
                         ariaLabel={"Animation"}
                         onChange={(anim) => setAnimationType(() => anim)}
                     />
@@ -302,9 +302,9 @@ export const ParticleFieldPage = () => {
                 >
                     <PageNumberField
                         value={getHoldShare}
-                        min={() => ParticleFieldKnobs.MIN_HOLD_SHARE}
-                        max={() => ParticleFieldKnobs.MAX_HOLD_SHARE}
-                        step={() => ParticleFieldKnobs.HOLD_SHARE_STEP}
+                        min={ParticleFieldKnobs.MIN_HOLD_SHARE}
+                        max={ParticleFieldKnobs.MAX_HOLD_SHARE}
+                        step={ParticleFieldKnobs.HOLD_SHARE_STEP}
                         ariaLabel={"Hold share"}
                         onInput={setHoldShare}
                     />
@@ -329,9 +329,9 @@ export const ParticleFieldPage = () => {
                 >
                     <PageNumberField
                         value={getDurationMs}
-                        min={() => ParticleFieldKnobs.MIN_DURATION_MS}
-                        max={() => ParticleFieldKnobs.MAX_DURATION_MS}
-                        step={() => ParticleFieldKnobs.DURATION_STEP_MS}
+                        min={ParticleFieldKnobs.MIN_DURATION_MS}
+                        max={ParticleFieldKnobs.MAX_DURATION_MS}
+                        step={ParticleFieldKnobs.DURATION_STEP_MS}
                         ariaLabel={"Duration"}
                         onInput={setDurationMs}
                     />
@@ -344,9 +344,9 @@ export const ParticleFieldPage = () => {
                 >
                     <PageNumberField
                         value={getLifetimeMs}
-                        min={() => ParticleFieldKnobs.MIN_LIFETIME_MS}
-                        max={() => ParticleFieldKnobs.MAX_LIFETIME_MS}
-                        step={() => ParticleFieldKnobs.DURATION_STEP_MS}
+                        min={ParticleFieldKnobs.MIN_LIFETIME_MS}
+                        max={ParticleFieldKnobs.MAX_LIFETIME_MS}
+                        step={ParticleFieldKnobs.DURATION_STEP_MS}
                         ariaLabel={"Lifetime"}
                         onInput={setLifetimeMs}
                     />
@@ -359,9 +359,9 @@ export const ParticleFieldPage = () => {
                 >
                     <PageNumberField
                         value={getIterationDelayMs}
-                        min={() => ParticleFieldKnobs.MIN_ITERATION_DELAY_MS}
-                        max={() => ParticleFieldKnobs.MAX_ITERATION_DELAY_MS}
-                        step={() => ParticleFieldKnobs.DURATION_STEP_MS}
+                        min={ParticleFieldKnobs.MIN_ITERATION_DELAY_MS}
+                        max={ParticleFieldKnobs.MAX_ITERATION_DELAY_MS}
+                        step={ParticleFieldKnobs.DURATION_STEP_MS}
                         ariaLabel={"Iteration delay"}
                         onInput={setIterationDelayMs}
                     />

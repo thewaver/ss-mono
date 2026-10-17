@@ -47,7 +47,7 @@ export const CardExample = () => {
                     <div class={styles.surfaceCntent}>
                         <Preview
                             expanded={expandedSignal}
-                            collapsedHeight={() => COLLAPSED_HEIGHT}
+                            collapsedHeight={COLLAPSED_HEIGHT}
                             renderContent={() => (
                                 <div class={styles.bios}>
                                     <div class={styles.bio}>

@@ -29,11 +29,11 @@ export const EndsExample = (props: Props) => {
                 siblingCount={props.siblingCount}
                 boundaryCount={props.boundaryCount}
                 isDisabled={props.isDisabled}
-                gap={() => PAGINATOR_GAP}
+                gap={PAGINATOR_GAP}
                 ariaLabel={"Results with end jumps"}
                 computePageLabel={computePaginatorPageLabel}
                 computeStepLabel={computePaginatorStepLabel}
-                steps={() => END_STEPS}
+                steps={END_STEPS}
                 onPageChange={props.onPageChange}
                 renderPage={(_getEntry, getRenderProps) => <PagePaginatorPage renderProps={getRenderProps} />}
                 renderGap={(getEntry) => <PagePaginatorGap entry={getEntry} />}

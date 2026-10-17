@@ -18,7 +18,7 @@ export const ReorderableExample = (props: Props) => {
         <div class={styles.tableFrameShort}>
             <Table
                 columns={getColumns}
-                rows={() => PARTS}
+                rows={PARTS}
                 sort={props.sort}
                 selection={props.selection}
                 order={props.order}

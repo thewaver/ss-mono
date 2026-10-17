@@ -39,6 +39,11 @@ const slideFromEnd = keyframes({
     },
 });
 
+export const growingButtons = style({
+    display: "flex",
+    gap: themeVars.spacing.full,
+});
+
 export const rowStrip = style({
     display: "flex",
     alignItems: "center",
@@ -69,6 +74,8 @@ export const rowPanel = style({
     width: ROW_PANEL_WIDTH,
     height: ROW_HEIGHT,
     padding: themeVars.spacing.double,
+    borderRadius: themeVars.borderRadius.half,
+    backgroundColor: layerVars.main,
     fontSize: themeVars.fontSize.small,
 });
 

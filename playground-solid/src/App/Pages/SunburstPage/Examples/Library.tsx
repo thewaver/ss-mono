@@ -40,7 +40,7 @@ export const LibraryExample = (props: Props) => {
     return (
         <div class={styles.frame}>
             <Sunburst<string>
-                root={() => LIBRARY}
+                root={LIBRARY}
                 branch={props.branch}
                 ringCount={props.ringCount}
                 zoomDurationMs={props.zoomDurationMs}

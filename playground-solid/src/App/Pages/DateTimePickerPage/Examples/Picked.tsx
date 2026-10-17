@@ -55,11 +55,11 @@ export const PickedExample = (props: Props) => {
             clockLabel={"Choose a time"}
             partHints={DATE_PART_HINTS}
             segmentHints={TIME_SEGMENT_HINTS}
-            locale={() => LOCALE}
-            padding={() => FIELD_STEPPER_PADDING}
-            gap={() => FIELD_GAP}
+            locale={LOCALE}
+            padding={FIELD_STEPPER_PADDING}
+            gap={FIELD_GAP}
             computeTextStyle={computePageTextFieldTextStyle}
-            renderContent={(getFlags) => <PageTextFieldContent flags={getFlags} width={() => FIELD_WIDTH} />}
+            renderContent={(getFlags) => <PageTextFieldContent flags={getFlags} width={FIELD_WIDTH} />}
             renderPlaceholder={(getFlags, hint) => (
                 <PageTextFieldPlaceholder flags={getFlags}>{hint}</PageTextFieldPlaceholder>
             )}
@@ -71,7 +71,7 @@ export const PickedExample = (props: Props) => {
             renderWeekday={(name) => <PageCalendarWeekday>{name}</PageCalendarWeekday>}
             renderPopup={(renderCalendar, monthSignal) => (
                 <PageCalendarFrame>
-                    <PageCalendarCaption month={monthSignal} key={props.key} locale={() => LOCALE} />
+                    <PageCalendarCaption month={monthSignal} key={props.key} locale={LOCALE} />
 
                     {renderCalendar()}
                 </PageCalendarFrame>

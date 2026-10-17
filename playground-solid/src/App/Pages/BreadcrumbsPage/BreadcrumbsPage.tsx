@@ -113,10 +113,10 @@ export const BreadcrumbsPage = () => {
                 >
                     <PageNumberField
                         value={getDepth}
-                        min={() => BreadcrumbKnobs.MIN_DEPTH}
-                        max={() => BreadcrumbKnobs.MAX_DEPTH}
-                        step={() => BreadcrumbKnobs.DEPTH_STEP}
-                        width={() => DEPTH_FIELD_WIDTH}
+                        min={BreadcrumbKnobs.MIN_DEPTH}
+                        max={BreadcrumbKnobs.MAX_DEPTH}
+                        step={BreadcrumbKnobs.DEPTH_STEP}
+                        width={DEPTH_FIELD_WIDTH}
                         ariaLabel={"Depth"}
                         onInput={setDepth}
                     />

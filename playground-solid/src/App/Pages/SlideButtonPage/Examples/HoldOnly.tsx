@@ -10,9 +10,9 @@ const HOLD_DURATION_MS = 2000;
 
 export const HoldOnlyExample = (props: Props) => (
     <SlideButton
-        mode={() => "hold"}
-        holdDurationMs={() => HOLD_DURATION_MS}
-        thumbSize={() => SLIDE_BUTTON_THUMB_SIZE}
+        mode={"hold"}
+        holdDurationMs={HOLD_DURATION_MS}
+        thumbSize={SLIDE_BUTTON_THUMB_SIZE}
         renderContent={(getRenderProps) => (
             <PageSlideButtonContent renderProps={getRenderProps}>Hold to send</PageSlideButtonContent>
         )}

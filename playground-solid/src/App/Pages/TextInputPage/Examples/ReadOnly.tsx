@@ -15,8 +15,8 @@ type Props = TextInputExampleProps;
 export const ReadOnlyExample = (props: Props) => (
     <TextInput
         value={props.value}
-        padding={() => FIELD_PADDING}
-        gap={() => FIELD_GAP}
+        padding={FIELD_PADDING}
+        gap={FIELD_GAP}
         isReadOnly={true}
         ariaLabel={"Read-only field"}
         computeTextStyle={computePageTextFieldTextStyle}

@@ -12,7 +12,7 @@ export const SplitFlapExample = (props: Props) => {
         <SlotText
             text={props.text}
             mechanism={"split_flap"}
-            characterSize={() => CHARACTER_SIZE}
+            characterSize={CHARACTER_SIZE}
             turnDurationMs={props.turnDurationMs}
             turnDelayMs={props.turnDelayMs}
             ariaLabel={"Departures"}

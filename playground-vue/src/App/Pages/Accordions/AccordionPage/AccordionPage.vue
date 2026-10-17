@@ -1,19 +1,28 @@
 <script setup lang="ts">
 import { shallowRef } from "vue";
 
+import { COLLAPSIBLE_DEFAULTS } from "@thewaver/ss-components-vue";
+import { AccordionKnobs } from "@thewaver/ss-playground/App/Knobs/Accordions.const";
 import {
     EXAMPLES_ROOT,
     EXAMPLE_NAMES,
+    FIELD_WIDTH,
     STARTING_EXTRA_LINES,
 } from "@thewaver/ss-playground/App/Pages/Accordions/AccordionPage/AccordionPage.const";
 
 import type { ExampleDefs } from "../../../PageComponents/Examples/Examples.types";
 import PageExamples from "../../../PageComponents/Examples/PageExamples.vue";
+import PageNumberField from "../../../PageComponents/Field/PageNumberField.vue";
+import PageProp from "../../../PageComponents/Prop/Prop.vue";
+import PagePropsPanel from "../../../PageComponents/PropsPanel/PagePropsPanel.vue";
 import DeferredExample from "./Examples/Deferred.vue";
 import GrowingExample from "./Examples/Growing.vue";
 import RowExample from "./Examples/Row.vue";
 import ScrolledExample from "./Examples/Scrolled.vue";
 import SectionsExample from "./Examples/Sections.vue";
+
+const gap = shallowRef(AccordionKnobs.STARTING_GAP);
+const transitionDurationMs = shallowRef(COLLAPSIBLE_DEFAULTS.transitionDurationMs);
 
 const multi = shallowRef<string[]>(["Shipping"]);
 const single = shallowRef<string[]>([]);
@@ -90,37 +99,90 @@ const examples: ExampleDefs[] = [
 </script>
 
 <template>
+    <PagePropsPanel scope="global">
+        <PageProp item-key="gap" label="Gap (px)" hint="The space between sections.">
+            <PageNumberField
+                :value="gap"
+                :min="AccordionKnobs.MIN_GAP"
+                :max="AccordionKnobs.MAX_GAP"
+                :step="AccordionKnobs.GAP_STEP"
+                :width="FIELD_WIDTH"
+                ariaLabel="Gap in pixels"
+                @input="(value: number) => (gap = value)"
+            />
+        </PageProp>
+
+        <PageProp
+            item-key="transitionDurationMs"
+            label="Transition duration (ms)"
+            hint="How long a section takes to open and close. At 0 it opens and closes at once."
+        >
+            <PageNumberField
+                :value="transitionDurationMs"
+                :min="AccordionKnobs.MIN_TRANSITION_MS"
+                :max="AccordionKnobs.MAX_TRANSITION_MS"
+                :step="AccordionKnobs.TRANSITION_STEP_MS"
+                :width="FIELD_WIDTH"
+                ariaLabel="Transition duration in milliseconds"
+                @input="(value: number) => (transitionDurationMs = value)"
+            />
+        </PageProp>
+    </PagePropsPanel>
+
     <PageExamples :items="examples">
         <template #multi>
-            <SectionsExample v-model:expanded="multi" />
+            <SectionsExample :gap="gap" :transition-duration-ms="transitionDurationMs" v-model:expanded="multi" />
         </template>
 
         <template #unheld>
-            <SectionsExample />
+            <SectionsExample :gap="gap" :transition-duration-ms="transitionDurationMs" />
         </template>
 
         <template #single>
-            <SectionsExample v-model:expanded="single" is-single-expand />
+            <SectionsExample
+                :gap="gap"
+                :transition-duration-ms="transitionDurationMs"
+                v-model:expanded="single"
+                is-single-expand
+            />
         </template>
 
         <template #required>
-            <SectionsExample v-model:expanded="required" is-single-expand is-expand-required />
+            <SectionsExample
+                :gap="gap"
+                :transition-duration-ms="transitionDurationMs"
+                v-model:expanded="required"
+                is-single-expand
+                is-expand-required
+            />
         </template>
 
         <template #growing>
-            <GrowingExample v-model:expanded="growing" :extra-lines="extraLines" @add-line="extraLines++" />
+            <GrowingExample
+                :gap="gap"
+                :transition-duration-ms="transitionDurationMs"
+                v-model:expanded="growing"
+                :extra-lines="extraLines"
+                @add-line="extraLines++"
+                @clear-lines="extraLines = STARTING_EXTRA_LINES"
+            />
         </template>
 
         <template #deferred>
-            <DeferredExample v-model:expanded="deferred" @build="build" />
+            <DeferredExample
+                :gap="gap"
+                :transition-duration-ms="transitionDurationMs"
+                v-model:expanded="deferred"
+                @build="build"
+            />
         </template>
 
         <template #scrolled>
-            <ScrolledExample v-model:expanded="scrolled" />
+            <ScrolledExample :gap="gap" :transition-duration-ms="transitionDurationMs" v-model:expanded="scrolled" />
         </template>
 
         <template #row>
-            <RowExample v-model:expanded="row" />
+            <RowExample :gap="gap" :transition-duration-ms="transitionDurationMs" v-model:expanded="row" />
         </template>
     </PageExamples>
 </template>

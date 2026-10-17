@@ -17,8 +17,8 @@ type Props = TextInputExampleProps;
 export const BothAdornmentsExample = (props: Props) => (
     <TextInput
         value={props.value}
-        padding={() => FIELD_PADDING}
-        gap={() => FIELD_GAP}
+        padding={FIELD_PADDING}
+        gap={FIELD_GAP}
         ariaLabel={"Amount"}
         inputMode={"decimal"}
         computeTextStyle={computePageTextFieldTextStyle}

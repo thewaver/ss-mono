@@ -19,12 +19,12 @@ export const ReachableExample = (props: Props) => (
         value={props.value}
         isDisabled={true}
         isReachableWhenDisabled={true}
-        padding={() => FIELD_PADDING}
-        gap={() => FIELD_GAP}
+        padding={FIELD_PADDING}
+        gap={FIELD_GAP}
         ariaLabel={"Disabled but reachable notes"}
         computeTextStyle={computePageTextFieldTextStyle}
         renderContent={(getFlags) => (
-            <PageTextFieldContent flags={getFlags} width={() => FIELD_WIDTH} height={() => FIXED_HEIGHT} />
+            <PageTextFieldContent flags={getFlags} width={FIELD_WIDTH} height={FIXED_HEIGHT} />
         )}
         tooltipDefs={() => ({
             placement: () => ({ x: "center", y: "top_out" }),

@@ -9,10 +9,10 @@
 
     const PANEL_WIDTH = 220;
 
-    let { expanded = $bindable(false) }: Props = $props();
+    let { expanded = $bindable(false), ...props }: Props = $props();
 </script>
 
-<Collapsible bind:expanded sizing={"fit-content"} side={"right"}>
+<Collapsible transitionDurationMs={props.transitionDurationMs} bind:expanded sizing={"fit-content"} side={"right"}>
     {#snippet renderTrigger(flags)}
         <PageAccordionHeader {flags}>{flags.isExpanded ? "Less" : "More"}</PageAccordionHeader>
     {/snippet}

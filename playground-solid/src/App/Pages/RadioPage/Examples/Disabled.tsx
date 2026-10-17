@@ -9,7 +9,7 @@ import type { RadioExampleProps } from "../RadioPageSolid.types";
 type Props = RadioExampleProps;
 
 export const DisabledExample = (props: Props) => (
-    <RadioGroup value={props.value} ariaLabel={"Disabled size"} gap={() => RADIO_GROUP_GAP}>
+    <RadioGroup value={props.value} ariaLabel={"Disabled size"} gap={RADIO_GROUP_GAP}>
         <For each={SIZE_OPTIONS}>
             {(option) => (
                 <Radio

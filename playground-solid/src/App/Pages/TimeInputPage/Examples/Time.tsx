@@ -34,10 +34,10 @@ export const TimeExample = (props: Props) => {
             maxValue={props.maxValue}
             ariaLabel={props.ariaLabel}
             segmentHints={TIME_SEGMENT_HINTS}
-            padding={() => FIELD_STEPPER_PADDING}
-            gap={() => FIELD_GAP}
+            padding={FIELD_STEPPER_PADDING}
+            gap={FIELD_GAP}
             computeTextStyle={computePageTextFieldTextStyle}
-            renderContent={(getFlags) => <PageTextFieldContent flags={getFlags} width={() => FIELD_WIDTH} />}
+            renderContent={(getFlags) => <PageTextFieldContent flags={getFlags} width={FIELD_WIDTH} />}
             renderPlaceholder={(getFlags, hint) => (
                 <PageTextFieldPlaceholder flags={getFlags}>{hint}</PageTextFieldPlaceholder>
             )}

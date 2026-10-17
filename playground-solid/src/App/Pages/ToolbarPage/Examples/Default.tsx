@@ -21,7 +21,7 @@ type Props = ToolbarExampleProps;
 export const DefaultExample = (props: Props) => {
     return (
         <Toolbar
-            actions={() => ACTIONS}
+            actions={ACTIONS}
             gap={props.gap}
             ariaLabel={"Formatting"}
             overflowAriaLabel={"More formatting actions"}

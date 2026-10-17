@@ -80,10 +80,10 @@ export const RevealPage = () => {
                 >
                     <PageNumberField
                         value={getRadius}
-                        min={() => RevealKnobs.MIN_RADIUS}
-                        max={() => RevealKnobs.MAX_RADIUS}
-                        step={() => RevealKnobs.RADIUS_STEP}
-                        width={() => FIELD_WIDTH}
+                        min={RevealKnobs.MIN_RADIUS}
+                        max={RevealKnobs.MAX_RADIUS}
+                        step={RevealKnobs.RADIUS_STEP}
+                        width={FIELD_WIDTH}
                         ariaLabel={"Radius"}
                         onInput={setRadius}
                     />
@@ -96,8 +96,8 @@ export const RevealPage = () => {
                 >
                     <PageSelectField
                         value={getShape}
-                        values={() => RevealKnobs.SHAPES}
-                        width={() => SHAPE_FIELD_WIDTH}
+                        values={RevealKnobs.SHAPES}
+                        width={SHAPE_FIELD_WIDTH}
                         ariaLabel={"Shape"}
                         onChange={(shape) => setShape(() => shape)}
                     />
@@ -112,10 +112,10 @@ export const RevealPage = () => {
                 >
                     <PageNumberField
                         value={getJoinRadius}
-                        min={() => RevealKnobs.MIN_JOIN_RADIUS}
-                        max={() => RevealKnobs.MAX_JOIN_RADIUS}
-                        step={() => RevealKnobs.JOIN_RADIUS_STEP}
-                        width={() => FIELD_WIDTH}
+                        min={RevealKnobs.MIN_JOIN_RADIUS}
+                        max={RevealKnobs.MAX_JOIN_RADIUS}
+                        step={RevealKnobs.JOIN_RADIUS_STEP}
+                        width={FIELD_WIDTH}
                         ariaLabel={"Corner radius"}
                         onInput={setJoinRadius}
                     />
@@ -130,10 +130,10 @@ export const RevealPage = () => {
                 >
                     <PageNumberField
                         value={getLameExponent}
-                        min={() => RevealKnobs.MIN_LAME_EXPONENT}
-                        max={() => RevealKnobs.MAX_LAME_EXPONENT}
-                        step={() => RevealKnobs.LAME_EXPONENT_STEP}
-                        width={() => FIELD_WIDTH}
+                        min={RevealKnobs.MIN_LAME_EXPONENT}
+                        max={RevealKnobs.MAX_LAME_EXPONENT}
+                        step={RevealKnobs.LAME_EXPONENT_STEP}
+                        width={FIELD_WIDTH}
                         ariaLabel={"Corner style"}
                         onInput={setLameExponent}
                     />
@@ -146,10 +146,10 @@ export const RevealPage = () => {
                 >
                     <PageNumberField
                         value={getSoftness}
-                        min={() => RevealKnobs.MIN_SOFTNESS}
-                        max={() => RevealKnobs.MAX_SOFTNESS}
-                        step={() => RevealKnobs.SOFTNESS_STEP}
-                        width={() => FIELD_WIDTH}
+                        min={RevealKnobs.MIN_SOFTNESS}
+                        max={RevealKnobs.MAX_SOFTNESS}
+                        step={RevealKnobs.SOFTNESS_STEP}
+                        width={FIELD_WIDTH}
                         ariaLabel={"Clear fraction"}
                         onInput={setSoftness}
                     />
@@ -164,10 +164,10 @@ export const RevealPage = () => {
                 >
                     <PageNumberField
                         value={getStepSize}
-                        min={() => RevealKnobs.MIN_STEP_SIZE}
-                        max={() => RevealKnobs.MAX_STEP_SIZE}
-                        step={() => RevealKnobs.STEP_SIZE_STEP}
-                        width={() => FIELD_WIDTH}
+                        min={RevealKnobs.MIN_STEP_SIZE}
+                        max={RevealKnobs.MAX_STEP_SIZE}
+                        step={RevealKnobs.STEP_SIZE_STEP}
+                        width={FIELD_WIDTH}
                         ariaLabel={"Step size in pixels"}
                         onInput={setStepSize}
                     />

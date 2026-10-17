@@ -11,7 +11,7 @@ type Props = MenuExampleProps;
 export const SubmenusExample = (props: Props) => (
     <Menu
         renderHighlightFloater={renderPageHighlightFloater}
-        items={() => NESTED_ACTIONS}
+        items={NESTED_ACTIONS}
         ariaLabel={"File actions"}
         submenuOffset={() => ({ x: POPOVER_SURFACE_INSET, y: -POPOVER_SURFACE_INSET })}
         renderContent={(getFlags) => <PageMenuTriggerContent flags={getFlags}>File</PageMenuTriggerContent>}

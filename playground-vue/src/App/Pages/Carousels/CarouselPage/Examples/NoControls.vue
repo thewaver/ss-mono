@@ -26,6 +26,7 @@ const index = useModel(props, "index");
         :slides="slides"
         :is-disabled="isDisabled"
         :orientation="orientation"
+        :transition-duration-ms="transitionDurationMs"
         ariaLabel="Bare sampler"
         :compute-slide-label="computePositionLabel"
         :compute-step-label="computeCarouselStepLabel"

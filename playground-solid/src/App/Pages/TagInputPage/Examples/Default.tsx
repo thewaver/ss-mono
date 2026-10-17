@@ -21,9 +21,9 @@ export const DefaultExample = (props: Props) => {
         <TagInput
             value={props.value}
             ariaLabel={() => access(props.ariaLabel) ?? "Topics"}
-            gap={() => FIELD_GAP}
-            padding={() => FIELD_PADDING}
-            minHeight={() => FIELD_HEIGHT}
+            gap={FIELD_GAP}
+            padding={FIELD_PADDING}
+            minHeight={FIELD_HEIGHT}
             isDisabled={props.isDisabled}
             hasError={props.hasError}
             computeTextStyle={computePageTextFieldTextStyle}

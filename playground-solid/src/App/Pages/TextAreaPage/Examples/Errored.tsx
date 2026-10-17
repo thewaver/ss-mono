@@ -22,15 +22,13 @@ export const ErroredExample = (props: Props) => (
     <TextArea
         value={props.value}
         isAutoSizing={true}
-        minRows={() => MIN_ROWS}
-        maxRows={() => MAX_ROWS}
+        minRows={MIN_ROWS}
+        maxRows={MAX_ROWS}
         hasError={() => props.value[0]().length < REVIEW_LIMIT}
-        padding={() => FIELD_PADDING}
-        gap={() => FIELD_GAP}
+        padding={FIELD_PADDING}
+        gap={FIELD_GAP}
         ariaLabel={"Review"}
         computeTextStyle={computePageTextFieldTextStyle}
-        renderContent={(getFlags) => (
-            <PageTextFieldContent flags={getFlags} width={() => FIELD_WIDTH} isStretched={true} />
-        )}
+        renderContent={(getFlags) => <PageTextFieldContent flags={getFlags} width={FIELD_WIDTH} isStretched={true} />}
     />
 );

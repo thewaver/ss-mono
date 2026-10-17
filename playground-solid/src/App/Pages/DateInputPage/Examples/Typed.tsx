@@ -31,14 +31,14 @@ export const TypedExample = (props: Props) => {
         <DateInput
             value={props.value}
             calendar={props.calendar}
-            locale={() => LOCALE}
+            locale={LOCALE}
             format={props.format}
             ariaLabel={props.ariaLabel}
             partHints={DATE_PART_HINTS}
-            padding={() => FIELD_STEPPER_PADDING}
-            gap={() => FIELD_GAP}
+            padding={FIELD_STEPPER_PADDING}
+            gap={FIELD_GAP}
             computeTextStyle={computePageTextFieldTextStyle}
-            renderContent={(getFlags) => <PageTextFieldContent flags={getFlags} width={() => FIELD_WIDTH} />}
+            renderContent={(getFlags) => <PageTextFieldContent flags={getFlags} width={FIELD_WIDTH} />}
             renderPlaceholder={(getFlags, hint) => (
                 <PageTextFieldPlaceholder flags={getFlags}>{hint}</PageTextFieldPlaceholder>
             )}

@@ -30,7 +30,7 @@ export const SequentialExample = (props: Props) => {
 
     return (
         <div class={styles.stack}>
-            <PageMeasureBox width={() => BOX_WIDTH} padding={() => MEASURE_BOX_PADDING}>
+            <PageMeasureBox width={BOX_WIDTH} padding={MEASURE_BOX_PADDING}>
                 <div class={styles.headline}>
                     <ScrambleText
                         text={LINE}

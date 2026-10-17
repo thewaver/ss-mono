@@ -65,7 +65,7 @@ export const PagePaintPicker = (props: PagePaintPickerProps) => {
             <PageProp key={`${props.name}Kind`} label={props.label} hint={props.hint}>
                 <PageSelectField
                     value={props.paintSlot.getKind}
-                    values={() => PAINT_KINDS}
+                    values={PAINT_KINDS}
                     computeLabel={(kind) => PAINT_KIND_LABELS[kind]}
                     ariaLabel={props.label}
                     onChange={props.paintSlot.setKind}

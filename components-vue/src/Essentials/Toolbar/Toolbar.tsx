@@ -4,6 +4,7 @@ import {
     DismisserUtils,
     type MenuItemFlags,
     MenuUtils,
+    OverflowUtils,
     TOOLBAR_DEFAULTS,
     ToolbarStyles,
     ToolbarUtils,
@@ -67,8 +68,8 @@ export const ToolbarComposite = defineComponent(
 
         const cut = computed(() =>
             layout.value !== undefined
-                ? ToolbarUtils.computeUncut(props.actions.length)
-                : ToolbarUtils.computeCut({
+                ? OverflowUtils.computeUncut(props.actions.length)
+                : OverflowUtils.computeCut({
                       widths: itemSizes.value.map((size) => size.width),
                       collapses: props.actions.map((action: ToolbarAction<T>) => action.collapse ?? "auto"),
                       available: rootSize.value.width,
@@ -276,7 +277,7 @@ export const ToolbarComposite = defineComponent(
             const currentLayout = layout.value;
             const isMenubar = getIsMenubar();
             const isOverflowing = hasOverflow.value;
-            const hasMeasured = ToolbarUtils.computeHasMeasured(
+            const hasMeasured = OverflowUtils.computeHasMeasured(
                 currentLayout !== undefined,
                 rootSize.value.width,
                 itemSizes.value.length,

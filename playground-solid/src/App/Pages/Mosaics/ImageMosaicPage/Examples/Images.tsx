@@ -16,7 +16,7 @@ export const ImagesExample = ({ shapeKey, isDecorated, ...otherProps }: Props) =
             renderItem={(renderImage, getState) =>
                 access(isDecorated) ? (
                     <PageMosaicLink
-                        href={() => MOSAIC_ROUTE}
+                        href={MOSAIC_ROUTE}
                         caption={() => `${getState().readingIndex + 1} of ${getState().itemCount}`}
                     >
                         {renderImage()}

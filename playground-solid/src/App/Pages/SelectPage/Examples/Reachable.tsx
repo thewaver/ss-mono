@@ -14,7 +14,7 @@ export const ReachableExample = (props: Props) => {
         <Select
             renderHighlightFloater={renderPageHighlightFloater}
             value={props.value}
-            options={() => COUNTRIES}
+            options={COUNTRIES}
             isDisabled={true}
             isReachableWhenDisabled={true}
             ariaLabel={"Country"}

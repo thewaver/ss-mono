@@ -20,6 +20,8 @@ export const playgroundSource = (): Plugin => ({
 
         const path = id.slice(SOURCE_PREFIX.length, -SOURCE_SUFFIX.length);
 
+        this.addWatchFile(path);
+
         return `export default ${JSON.stringify(await readFile(path, "utf8"))};`;
     },
 });

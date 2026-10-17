@@ -22,8 +22,8 @@ export const SkillTreeExample = (props: Props) => {
     return (
         <div class={styles.board}>
             <Bracket
-                root={() => SKILLS}
-                nodeSize={() => NODE_SIZE}
+                root={SKILLS}
+                nodeSize={NODE_SIZE}
                 layerGap={props.layerGap}
                 crossGap={props.crossGap}
                 orientation={props.orientation}

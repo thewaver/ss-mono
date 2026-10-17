@@ -13,10 +13,10 @@ export const MultiSelectClearableExample = (props: Props) => (
     <MultiSelect
         renderHighlightFloater={renderPageHighlightFloater}
         values={props.values}
-        options={() => COUNTRIES}
+        options={COUNTRIES}
         ariaLabel={"Countries"}
         clearAriaLabel={"Clear countries"}
-        padding={() => QUERY_PADDING}
+        padding={QUERY_PADDING}
         renderContent={(getSelectedOptions, getFlags) => (
             <PageSelectContent flags={getFlags} hasClearSpace={true}>
                 {getSelectedOptions().length

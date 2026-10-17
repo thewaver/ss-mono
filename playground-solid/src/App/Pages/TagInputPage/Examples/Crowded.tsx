@@ -23,9 +23,9 @@ export const CrowdedExample = (props: Props) => {
             <TagInput
                 value={props.value}
                 ariaLabel={"Crowded topics"}
-                gap={() => FIELD_GAP}
-                padding={() => FIELD_PADDING}
-                minHeight={() => FIELD_HEIGHT}
+                gap={FIELD_GAP}
+                padding={FIELD_PADDING}
+                minHeight={FIELD_HEIGHT}
                 isDisabled={props.isDisabled}
                 hasError={props.hasError}
                 computeTextStyle={computePageTextFieldTextStyle}

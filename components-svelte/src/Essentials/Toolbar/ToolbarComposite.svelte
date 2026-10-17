@@ -9,9 +9,10 @@
         type MenuItemKind,
         type MenuTriggerRole,
         MenuUtils,
+        OverflowUtils,
         TOOLBAR_DEFAULTS,
-        ToolbarUtils,
         ToolbarStyles as styles,
+        ToolbarUtils,
     } from "@thewaver/ss-components";
 
     import { ElementObserverSvelteUtils } from "../../Abstracts/ElementObserver/ElementObserverSvelte.utils.svelte.js";
@@ -75,13 +76,13 @@
     const direction = NavigatorSvelteUtils.createDirection(() => root ?? undefined);
 
     const hasMeasured = $derived(
-        ToolbarUtils.computeHasMeasured(isPlaced, getRootSize().width, getItemSizes().length, actionCount),
+        OverflowUtils.computeHasMeasured(isPlaced, getRootSize().width, getItemSizes().length, actionCount),
     );
 
     const cut = $derived(
         isPlaced
-            ? ToolbarUtils.computeUncut(actions.length)
-            : ToolbarUtils.computeCut({
+            ? OverflowUtils.computeUncut(actions.length)
+            : OverflowUtils.computeCut({
                   widths: getItemSizes().map((size) => size.width),
                   collapses: actions.map((action) => action.collapse ?? "auto"),
                   available: getRootSize().width,

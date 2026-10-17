@@ -32,6 +32,7 @@ const index = useModel(props, "index");
         :is-disabled="isDisabled"
         :is-looping="isLooping"
         :orientation="orientation"
+        :transition-duration-ms="transitionDurationMs"
         :gap="CAROUSEL_GAP"
         ariaLabel="Sampler"
         :compute-slide-label="computePositionLabel"

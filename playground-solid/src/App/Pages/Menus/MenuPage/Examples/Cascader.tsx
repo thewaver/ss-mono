@@ -21,7 +21,7 @@ export const CascaderExample = (props: Props) => {
     return (
         <Menu
             renderHighlightFloater={renderPageHighlightFloater}
-            items={() => DESTINATIONS}
+            items={DESTINATIONS}
             ariaLabel={() => `Destination: ${getPathText()}`}
             submenuOffset={() => ({ x: POPOVER_SURFACE_INSET, y: -POPOVER_SURFACE_INSET })}
             renderContent={(getFlags) => (

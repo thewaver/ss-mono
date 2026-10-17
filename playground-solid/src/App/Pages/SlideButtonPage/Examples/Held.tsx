@@ -14,7 +14,7 @@ export const HeldExample = (props: Props) => {
         <PageControlColumn>
             <SlideButton
                 isPressed={props.isArmed}
-                thumbSize={() => SLIDE_BUTTON_THUMB_SIZE}
+                thumbSize={SLIDE_BUTTON_THUMB_SIZE}
                 renderContent={(getRenderProps) => (
                     <PageSlideButtonContent renderProps={getRenderProps}>Slide or hold to arm</PageSlideButtonContent>
                 )}

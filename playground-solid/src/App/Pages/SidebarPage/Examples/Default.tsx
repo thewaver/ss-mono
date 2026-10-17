@@ -29,12 +29,12 @@ export const DefaultExample = (props: Props) => {
                 id={() => sidebarId}
                 edge={props.edge}
                 layout={props.layout}
-                collapsedSize={() => COLLAPSED_WIDTH}
-                expandedSize={() => EXPANDED_WIDTH}
+                collapsedSize={COLLAPSED_WIDTH}
+                expandedSize={EXPANDED_WIDTH}
                 isExpandedOnHover={props.isExpandedOnHover}
                 expanded={props.expanded}
                 renderContent={(getPhase, getTransitionDurationMs) => (
-                    <PageSidebarSurface width={() => EXPANDED_WIDTH}>
+                    <PageSidebarSurface width={EXPANDED_WIDTH}>
                         <PageSidebarToggle
                             sidebarId={() => sidebarId}
                             edge={props.edge}

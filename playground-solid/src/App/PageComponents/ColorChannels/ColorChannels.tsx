@@ -99,8 +99,8 @@ export const PageColorChannels = (props: PageColorChannelsProps) => {
                             <PageNumberField
                                 value={() => Math.round(getRgba()[channel])}
                                 min={0}
-                                max={() => CHANNEL_MAX}
-                                width={() => CHANNEL_FIELD_WIDTH}
+                                max={CHANNEL_MAX}
+                                width={CHANNEL_FIELD_WIDTH}
                                 id={() => `channel${channel.toUpperCase()}`}
                                 ariaLabel={() => `Red green blue channel ${channel}`}
                                 onInput={(value) => setRgbaChannel(channel, value)}
@@ -113,9 +113,9 @@ export const PageColorChannels = (props: PageColorChannelsProps) => {
                             value={getAlpha}
                             id={"channelA"}
                             min={0}
-                            max={() => ALPHA_MAX}
-                            step={() => ALPHA_STEP}
-                            width={() => CHANNEL_FIELD_WIDTH}
+                            max={ALPHA_MAX}
+                            step={ALPHA_STEP}
+                            width={CHANNEL_FIELD_WIDTH}
                             ariaLabel={"Alpha"}
                             onInput={setAlpha}
                         />
@@ -129,8 +129,8 @@ export const PageColorChannels = (props: PageColorChannelsProps) => {
                         <PageNumberField
                             value={() => Math.round(getHsla().h)}
                             min={0}
-                            max={() => HUE_MAX}
-                            width={() => CHANNEL_FIELD_WIDTH}
+                            max={HUE_MAX}
+                            width={CHANNEL_FIELD_WIDTH}
                             id={"channelH"}
                             ariaLabel={"Hue channel"}
                             onInput={(value) => setHslaChannel("h", value)}
@@ -142,8 +142,8 @@ export const PageColorChannels = (props: PageColorChannelsProps) => {
                             <PageNumberField
                                 value={() => Math.round(getHsla()[channel])}
                                 min={0}
-                                max={() => PERCENT}
-                                width={() => CHANNEL_FIELD_WIDTH}
+                                max={PERCENT}
+                                width={CHANNEL_FIELD_WIDTH}
                                 id={() => `channel${channel.toUpperCase()}`}
                                 ariaLabel={() => `Hue saturation lightness channel ${channel}`}
                                 onInput={(value) => setHslaChannel(channel, value)}
@@ -156,9 +156,9 @@ export const PageColorChannels = (props: PageColorChannelsProps) => {
                             value={getAlpha}
                             id={"channelA"}
                             min={0}
-                            max={() => ALPHA_MAX}
-                            step={() => ALPHA_STEP}
-                            width={() => CHANNEL_FIELD_WIDTH}
+                            max={ALPHA_MAX}
+                            step={ALPHA_STEP}
+                            width={CHANNEL_FIELD_WIDTH}
                             ariaLabel={"Alpha"}
                             onInput={setAlpha}
                         />
@@ -173,11 +173,11 @@ export const PageColorChannels = (props: PageColorChannelsProps) => {
                             value={hexSignal}
                             id={"channelHexa"}
                             ariaLabel={"Hex with alpha"}
-                            padding={() => FIELD_PADDING}
-                            gap={() => FIELD_GAP}
+                            padding={FIELD_PADDING}
+                            gap={FIELD_GAP}
                             computeTextStyle={computePageTextFieldTextStyle}
                             renderContent={(getFlags) => (
-                                <PageTextFieldContent flags={getFlags} width={() => HEX_FIELD_WIDTH} />
+                                <PageTextFieldContent flags={getFlags} width={HEX_FIELD_WIDTH} />
                             )}
                         />
                     </PageColorChannel>

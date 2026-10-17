@@ -17,7 +17,12 @@ const expanded = useModel(props, "expanded");
 </script>
 
 <template>
-    <Collapsible v-model:expanded="expanded" sizing="fit-content" side="right">
+    <Collapsible
+        :transition-duration-ms="transitionDurationMs"
+        v-model:expanded="expanded"
+        sizing="fit-content"
+        side="right"
+    >
         <template #renderTrigger="flags">
             <PageAccordionHeader :flags="flags">{{ flags.isExpanded ? "Less" : "More" }}</PageAccordionHeader>
         </template>

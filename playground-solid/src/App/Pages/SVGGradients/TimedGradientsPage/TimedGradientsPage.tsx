@@ -117,9 +117,9 @@ export const TimedGradientsPage = () => {
                     >
                         <PageNumberField
                             value={getAnimationDurationMs}
-                            min={() => SVGGradientKnobs.MIN_DURATION_MS}
-                            max={() => SVGGradientKnobs.MAX_DURATION_MS}
-                            step={() => SVGGradientKnobs.DURATION_STEP_MS}
+                            min={SVGGradientKnobs.MIN_DURATION_MS}
+                            max={SVGGradientKnobs.MAX_DURATION_MS}
+                            step={SVGGradientKnobs.DURATION_STEP_MS}
                             ariaLabel={"Animation duration"}
                             onInput={setAnimationDurationMs}
                         />
@@ -132,7 +132,7 @@ export const TimedGradientsPage = () => {
                     >
                         <PageSelectField
                             value={getIterationConfigKey}
-                            values={() => SVGDefsSamples.Iteration.SAMPLE_KEYS}
+                            values={SVGDefsSamples.Iteration.SAMPLE_KEYS}
                             ariaLabel={"Iteration pattern"}
                             onChange={(config) => setIterationConfigKey(() => config)}
                         />

@@ -10,7 +10,7 @@ type Props = SlideButtonExampleProps & { progress?: Signal<number> };
 
 export const DefaultExample = (props: Props) => (
     <SlideButton
-        thumbSize={() => SLIDE_BUTTON_THUMB_SIZE}
+        thumbSize={SLIDE_BUTTON_THUMB_SIZE}
         progress={props.progress}
         renderContent={(getRenderProps) => (
             <PageSlideButtonContent renderProps={getRenderProps}>Slide or hold to send</PageSlideButtonContent>

@@ -6,8 +6,6 @@
     import { getLayerClass } from "../../../../StyledComponents/Layer/Layer.context";
     import type { AccordionExampleProps } from "../../Accordions.types";
 
-    const GAP = 5;
-
     const PANEL_BODIES: Record<string, string> = {
         Mountains: "Cold air, long views and a path that only goes up.",
         Coast: "Salt, wind and a horizon that never quite arrives.",
@@ -24,7 +22,7 @@
 
     type Props = AccordionExampleProps;
 
-    let { expanded = $bindable([]) }: Props = $props();
+    let { expanded = $bindable([]), ...props }: Props = $props();
 
     const layerClass = $derived.by(getLayerClass());
 </script>
@@ -36,7 +34,8 @@
     sizing={"fit-content"}
     isSingleExpand={true}
     isExpandRequired={true}
-    gap={GAP}
+    gap={props.gap}
+    transitionDurationMs={props.transitionDurationMs}
 >
     {#snippet renderHeader(item, flags)}
         <div class={[styles.rowStrip, layerClass, flags.isHovered && styles.rowStripHovered]}>
@@ -48,6 +47,7 @@
         <div
             class={[
                 styles.rowPanel,
+                layerClass,
                 visibilityTarget === 1 && moveDirection === "forward" && styles.rowPanelEnterForward,
                 visibilityTarget === 1 && moveDirection === "backward" && styles.rowPanelEnterBackward,
             ]}
@@ -55,8 +55,6 @@
             style:transition={`opacity ${transitionDurationMs}ms`}
             style:animation-duration={`${transitionDurationMs}ms`}
         >
-            <strong>{item.value}</strong>
-
             <div>{PANEL_BODIES[item.value]}</div>
         </div>
     {/snippet}

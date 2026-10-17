@@ -144,8 +144,8 @@ export const SlotTextPage = () => {
                             >
                                 <PageSelectField
                                     value={getReelKey}
-                                    values={() => SlotTextReels.SAMPLE_KEYS}
-                                    width={() => FIELD_WIDTH}
+                                    values={SlotTextReels.SAMPLE_KEYS}
+                                    width={FIELD_WIDTH}
                                     ariaLabel={"Reel"}
                                     onChange={(key) => setReelKey(() => key)}
                                 />
@@ -214,8 +214,8 @@ export const SlotTextPage = () => {
                             >
                                 <PageSelectField
                                     value={getWordMechanism}
-                                    values={() => SlotTextKnobs.MECHANISMS}
-                                    width={() => FIELD_WIDTH}
+                                    values={SlotTextKnobs.MECHANISMS}
+                                    width={FIELD_WIDTH}
                                     ariaLabel={"Mechanism"}
                                     onChange={(mechanism) => setWordMechanism(() => mechanism)}
                                 />
@@ -230,8 +230,8 @@ export const SlotTextPage = () => {
                             >
                                 <PageSelectField
                                     value={getLetterRoute}
-                                    values={() => SlotTextKnobs.LETTER_ROUTES}
-                                    width={() => FIELD_WIDTH}
+                                    values={SlotTextKnobs.LETTER_ROUTES}
+                                    width={FIELD_WIDTH}
                                     ariaLabel={"Letter route"}
                                     onChange={(route) => setLetterRoute(() => route)}
                                 />
@@ -256,9 +256,9 @@ export const SlotTextPage = () => {
                 >
                     <PageNumberField
                         value={getValue}
-                        min={() => SlotTextKnobs.MIN_VALUE}
-                        max={() => SlotTextKnobs.MAX_VALUE}
-                        step={() => SMALL_STEP}
+                        min={SlotTextKnobs.MIN_VALUE}
+                        max={SlotTextKnobs.MAX_VALUE}
+                        step={SMALL_STEP}
                         ariaLabel={"Value"}
                         onInput={setValue}
                     />
@@ -271,9 +271,9 @@ export const SlotTextPage = () => {
                 >
                     <PageNumberField
                         value={getTurnMs}
-                        min={() => SlotTextKnobs.MIN_TURN_MS}
-                        max={() => SlotTextKnobs.MAX_TURN_MS}
-                        step={() => SlotTextKnobs.TURN_STEP_MS}
+                        min={SlotTextKnobs.MIN_TURN_MS}
+                        max={SlotTextKnobs.MAX_TURN_MS}
+                        step={SlotTextKnobs.TURN_STEP_MS}
                         ariaLabel={"Turn duration in milliseconds"}
                         onInput={setTurnMs}
                     />
@@ -288,9 +288,9 @@ export const SlotTextPage = () => {
                 >
                     <PageNumberField
                         value={getTurnDelayMs}
-                        min={() => SlotTextKnobs.MIN_CASCADE_MS}
-                        max={() => SlotTextKnobs.MAX_CASCADE_MS}
-                        step={() => SlotTextKnobs.CASCADE_STEP_MS}
+                        min={SlotTextKnobs.MIN_CASCADE_MS}
+                        max={SlotTextKnobs.MAX_CASCADE_MS}
+                        step={SlotTextKnobs.CASCADE_STEP_MS}
                         ariaLabel={"Turn delay in milliseconds"}
                         onInput={setTurnDelayMs}
                     />

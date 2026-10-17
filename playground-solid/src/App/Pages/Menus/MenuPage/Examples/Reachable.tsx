@@ -8,7 +8,7 @@ import { ACTIONS, renderMenuItem, renderMenuPopup } from "../MenuPageSolid.const
 export const ReachableExample = () => (
     <Menu
         renderHighlightFloater={renderPageHighlightFloater}
-        items={() => ACTIONS}
+        items={ACTIONS}
         isDisabled={true}
         isReachableWhenDisabled={true}
         ariaLabel={"Edit actions"}

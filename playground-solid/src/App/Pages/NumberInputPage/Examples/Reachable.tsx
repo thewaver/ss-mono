@@ -20,11 +20,11 @@ export const ReachableExample = (props: Props) => (
         value={props.value}
         isDisabled={true}
         isReachableWhenDisabled={true}
-        padding={() => FIELD_STEPPER_PADDING}
-        gap={() => FIELD_GAP}
+        padding={FIELD_STEPPER_PADDING}
+        gap={FIELD_GAP}
         ariaLabel={"Disabled but reachable amount"}
         computeTextStyle={computePageTextFieldTextStyle}
-        renderContent={(getFlags) => <PageTextFieldContent flags={getFlags} width={() => FIELD_WIDTH} />}
+        renderContent={(getFlags) => <PageTextFieldContent flags={getFlags} width={FIELD_WIDTH} />}
         renderTrailing={(getFlags, stepper) => <PageNumberInputStepper flags={getFlags} stepper={stepper} />}
         tooltipDefs={() => ({
             placement: () => ({ x: "center", y: "top_out" }),

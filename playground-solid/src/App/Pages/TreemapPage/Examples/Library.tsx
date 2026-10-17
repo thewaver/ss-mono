@@ -45,7 +45,7 @@ export const LibraryExample = (props: Props) => {
 
             <div class={styles.chart}>
                 <Treemap<string>
-                    root={() => LIBRARY}
+                    root={LIBRARY}
                     branch={props.branch}
                     zoomDurationMs={props.zoomDurationMs}
                     ariaLabel={"The library's source, by lines of code"}

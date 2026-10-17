@@ -123,7 +123,8 @@ const MenuItemView = defineComponent(
 
                         props.onActivate();
                     }}
-                    onMouseenter={(e) => props.onHover({ x: e.clientX, y: e.clientY })}
+                    onPointermove={() => props.onHover()}
+                    onPointerenter={() => props.onEnter()}
                 >
                     {callSlot(slots.renderContent, props.flags)}
                 </div>
@@ -140,6 +141,7 @@ const MenuItemView = defineComponent(
             isRegion: Boolean,
             onActivate: null,
             onHover: null,
+            onEnter: null,
         }),
     },
 );
@@ -204,7 +206,8 @@ const MenuEntry = defineComponent(
                                     flags={flags}
                                     isRegion={placement?.sector !== undefined}
                                     onActivate={() => props.onActivate(index)}
-                                    onHover={(point) => props.onHover(index, point)}
+                                    onHover={() => props.onHover(index)}
+                                    onEnter={() => props.onEnter(index)}
                                 >
                                     {
                                         {
@@ -278,6 +281,7 @@ const MenuEntry = defineComponent(
             rootExtent: null,
             onActivate: null,
             onHover: null,
+            onEnter: null,
             onSubmenuClose: null,
             onRegister: null,
         }),
@@ -315,6 +319,16 @@ const MenuLevel = defineComponent(
         );
 
         const entries = computed(() => MenuUtils.computeEntries(props.items, props.openerItem, props.submenuMode));
+
+        const openingHover = MenuUtils.createOpeningHoverGuard();
+
+        watch(
+            () => props.isOpen,
+            (isOpen) => {
+                if (isOpen) openingHover.open(MenuUtils.getPointerPoint());
+            },
+            { immediate: true },
+        );
 
         const navigable = computed(() => MenuUtils.computeNavigableIndexes(entries.value));
 
@@ -392,6 +406,7 @@ const MenuLevel = defineComponent(
                         style={{
                             ...highlightFloater.bounds.value,
                             transitionDuration: `${floaterTransitionDurationMs}ms`,
+                            zIndex: MenuUtils.computeFloaterStackAt(layout.value !== undefined, entries.value.length),
                         }}
                     >
                         {callSlot(slots.renderHighlightFloater, {
@@ -404,6 +419,11 @@ const MenuLevel = defineComponent(
         };
 
         const getItemId = (index: number) => `${props.id}-item-${index}`;
+
+        const findIndexAt = (point: Point2d) =>
+            MenuUtils.findIndexAtPoint(point, entries.value.length, (index) =>
+                document.getElementById(getItemId(index)),
+            );
 
         const computeItemText = (index: number) =>
             props.computeCustomText?.(entries.value[index]) ??
@@ -436,9 +456,9 @@ const MenuLevel = defineComponent(
             return index;
         };
 
-        const hoverIndex = (index: number, point: Point2d) => {
+        const hoverIndex = (index: number) => {
             if (!navigable.value.includes(index)) return;
-            if (!MenuUtils.getIsPointerLed(MenuUtils.getPointerPoint(), point)) return;
+            if (!openingHover.getIsHoverable(index, findIndexAt)) return;
 
             const value = entries.value[index].value;
 
@@ -548,6 +568,7 @@ const MenuLevel = defineComponent(
                     rootExtent={rootExtent.value}
                     onActivate={activateIndex}
                     onHover={hoverIndex}
+                    onEnter={(index: number) => openingHover.enter(index, MenuUtils.getPointerPoint())}
                     onSubmenuClose={() => {
                         openValue.value = undefined;
                     }}
@@ -562,7 +583,11 @@ const MenuLevel = defineComponent(
             );
 
             return placement ? (
-                <PlacementItem key={index} placement={placement} stackAt={index + 1}>
+                <PlacementItem
+                    key={index}
+                    placement={placement}
+                    stackAt={MenuUtils.computeStackAt(index, highlightedIndex.value, entries.value.length)}
+                >
                     {{ default: () => element }}
                 </PlacementItem>
             ) : (

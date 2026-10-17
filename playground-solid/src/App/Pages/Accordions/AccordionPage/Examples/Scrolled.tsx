@@ -8,8 +8,6 @@ import {
 } from "../../../../StyledComponents/AccordionContent/AccordionContent";
 import type { AccordionExampleProps } from "../../Accordions.types";
 
-const GAP = 5;
-
 const SECTION_BODIES: Record<string, string[]> = {
     Shipping: ["Orders leave the warehouse within two working days.", "Tracking arrives by email."],
     Returns: ["Thirty days, unopened, receipt or order number."],
@@ -39,10 +37,11 @@ type Props = AccordionExampleProps;
 export const ScrolledExample = (props: Props) => (
     <div class={styles.scrollBox} data-scroll-box>
         <Accordion
-            items={() => ITEMS}
+            items={ITEMS}
             expanded={props.expanded}
             isScrolledIntoViewOnExpand={true}
-            gap={() => GAP}
+            gap={props.gap}
+            transitionDurationMs={props.transitionDurationMs}
             renderHeader={(getItem, getFlags) => (
                 <PageAccordionHeader flags={getFlags}>{getItem().value}</PageAccordionHeader>
             )}

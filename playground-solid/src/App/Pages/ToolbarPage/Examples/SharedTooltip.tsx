@@ -36,7 +36,7 @@ type Props = ToolbarExampleProps;
 export const SharedTooltipExample = (props: Props) => (
     <SharedTooltip>
         <Toolbar
-            actions={() => ACTIONS}
+            actions={ACTIONS}
             gap={props.gap}
             ariaLabel={"Editing"}
             overflowAriaLabel={"More editing actions"}

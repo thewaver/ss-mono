@@ -11,7 +11,7 @@ type Props = MenuExampleProps;
 export const GlideExample = (props: Props) => {
     return (
         <Menu
-            items={() => ACTIONS}
+            items={ACTIONS}
             ariaLabel={"Edit actions, gliding"}
             renderContent={(getFlags) => <PageMenuTriggerContent flags={getFlags}>{"Edit"}</PageMenuTriggerContent>}
             renderItem={(getItem, getFlags) => (

@@ -60,11 +60,11 @@ export const PickedExample = (props: Props) => {
             ariaLabel={"Date"}
             calendarLabel={"Choose a date"}
             partHints={DATE_PART_HINTS}
-            locale={() => LOCALE}
-            padding={() => FIELD_STEPPER_PADDING}
-            gap={() => FIELD_GAP}
+            locale={LOCALE}
+            padding={FIELD_STEPPER_PADDING}
+            gap={FIELD_GAP}
             computeTextStyle={computePageTextFieldTextStyle}
-            renderContent={(getFlags) => <PageTextFieldContent flags={getFlags} width={() => FIELD_WIDTH} />}
+            renderContent={(getFlags) => <PageTextFieldContent flags={getFlags} width={FIELD_WIDTH} />}
             renderPlaceholder={(getFlags, hint) => (
                 <PageTextFieldPlaceholder flags={getFlags}>{hint}</PageTextFieldPlaceholder>
             )}
@@ -91,7 +91,7 @@ export const PickedExample = (props: Props) => {
                 <PageCalendarFrame>
                     <Show
                         when={getIsMonthPrecision()}
-                        fallback={<PageCalendarCaption month={monthSignal} key={props.key} locale={() => LOCALE} />}
+                        fallback={<PageCalendarCaption month={monthSignal} key={props.key} locale={LOCALE} />}
                     >
                         <PageCalendarPagedCaption
                             key={props.key}

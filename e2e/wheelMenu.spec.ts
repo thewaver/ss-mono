@@ -123,6 +123,50 @@ test("clicking the close control shuts the wheel and runs nothing", async ({ pag
     expect(await activeMatches(page, trigger("wheel")), "and focus goes back to the opener it covered").toBe(true);
 });
 
+/**
+ * A wheel opens centered on its trigger, so the pointer that pressed the trigger is sitting on the close control
+ * the moment the wheel appears. Hover follows the pointer moving, so the smallest twitch there would hand the close
+ * control the highlight the wheel opened with. The item a level opens under ignores the pointer until the pointer
+ * has left it once, as a desktop context menu ignores the item it appeared under — so a twitch keeps the first
+ * wedge, a trip out to a wedge and back reaches the close control as usual, and pressing it never needed the hover.
+ */
+test("the close control the wheel opens under waits for the pointer to leave it before it takes the hover", async ({
+    page,
+}) => {
+    const box = (await page.locator(trigger("wheel")).boundingBox())!;
+    const center = { x: box.x + box.width * 0.5, y: box.y + box.height * 0.5 };
+
+    await page.mouse.click(center.x, center.y);
+    await openedLevel(page, 0);
+    expect(await highlightAt(page, 0), "a wheel opens onto its first wedge").toContain("Cut");
+
+    await page.mouse.move(center.x + 1, center.y + 1);
+    await page.mouse.move(center.x + 2, center.y);
+    expect(await highlightAt(page, 0), "a twitch over the close control leaves the first wedge chosen").toContain(
+        "Cut",
+    );
+
+    await itemAt(page, 0, "Copy").hover();
+    await page.mouse.move(center.x, center.y);
+    expect(
+        await page.locator(MENU).nth(0).getAttribute("aria-activedescendant"),
+        "once the pointer has been away, coming back to the hole chooses it",
+    ).toBe(await closerOf(page, 0).getAttribute("id"));
+});
+
+test("pressing the close control the wheel opened under closes it without a hover first", async ({ page }) => {
+    const box = (await page.locator(trigger("wheel")).boundingBox())!;
+    const center = { x: box.x + box.width * 0.5, y: box.y + box.height * 0.5 };
+
+    await page.mouse.click(center.x, center.y);
+    await openedLevel(page, 0);
+
+    await page.mouse.click(center.x + 1, center.y);
+
+    await expect(page.locator(MENU)).toHaveCount(0);
+    expect(await readout(page, "wheel")).toContain(NOTHING_RUN);
+});
+
 test("hovering the hole drops the bands below it, the same as hovering a wedge with nothing under it", async ({
     page,
 }) => {

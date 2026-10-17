@@ -12,7 +12,7 @@ export const StackedExample = (props: Props) => {
             steps={props.steps}
             currentValue={props.currentValue}
             orientation={"vertical"}
-            gap={() => STEPPER_GAP}
+            gap={STEPPER_GAP}
             ariaLabel={"Stacked checkout"}
             computeStepAriaLabel={props.computeStepAriaLabel}
             onCurrentChange={props.onCurrentChange}

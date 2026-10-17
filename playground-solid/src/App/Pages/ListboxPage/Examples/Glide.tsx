@@ -11,7 +11,7 @@ export const GlideExample = (props: Props) => (
     <PageListboxSurface>
         <Listbox
             value={props.value}
-            options={() => COUNTRIES_WITH_REACHABLE}
+            options={COUNTRIES_WITH_REACHABLE}
             ariaLabel={"Shipping country, gliding"}
             renderOption={(getOption, getFlags) => (
                 <PageGlideLabel

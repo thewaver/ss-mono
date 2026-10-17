@@ -22,14 +22,14 @@ type Props = NumberInputExampleProps;
 export const SteppedClampedExample = (props: Props) => (
     <NumberInput
         value={props.value}
-        min={() => QUANTITY_MIN}
-        max={() => QUANTITY_MAX}
-        step={() => QUANTITY_STEP}
-        padding={() => FIELD_STEPPER_PADDING}
-        gap={() => FIELD_GAP}
+        min={QUANTITY_MIN}
+        max={QUANTITY_MAX}
+        step={QUANTITY_STEP}
+        padding={FIELD_STEPPER_PADDING}
+        gap={FIELD_GAP}
         ariaLabel={"Quantity"}
         computeTextStyle={computePageTextFieldTextStyle}
-        renderContent={(getFlags) => <PageTextFieldContent flags={getFlags} width={() => FIELD_WIDTH} />}
+        renderContent={(getFlags) => <PageTextFieldContent flags={getFlags} width={FIELD_WIDTH} />}
         renderTrailing={(getFlags, stepper) => <PageNumberInputStepper flags={getFlags} stepper={stepper} />}
     />
 );

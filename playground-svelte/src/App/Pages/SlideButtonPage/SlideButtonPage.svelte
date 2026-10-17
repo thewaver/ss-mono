@@ -1,4 +1,5 @@
 <script lang="ts">
+    import * as styles from "@thewaver/ss-playground/App/Pages/SlideButtonPage/SlideButtonPage.css";
     import type { ExampleDefs } from "../../PageComponents/Examples/Examples.types";
     import PageExamples from "../../PageComponents/Examples/PageExamples.svelte";
     import DefaultExample from "./Examples/Default.svelte";
@@ -90,12 +91,14 @@
 </script>
 
 {#snippet defaultExample()}
-    <DefaultExample
-        bind:progress
-        onActivate={() => {
-            sends += 1;
-        }}
-    />
+    <div class={styles.stage}>
+        <DefaultExample
+            bind:progress
+            onActivate={() => {
+                sends += 1;
+            }}
+        />
+    </div>
 {/snippet}
 
 {#snippet describedExample()}
@@ -107,56 +110,68 @@
 {/snippet}
 
 {#snippet slideOnlyExample()}
-    <SlideOnlyExample
-        onActivate={() => {
-            slideOnlySends += 1;
-        }}
-    />
+    <div class={styles.stage}>
+        <SlideOnlyExample
+            onActivate={() => {
+                slideOnlySends += 1;
+            }}
+        />
+    </div>
 {/snippet}
 
 {#snippet holdOnlyExample()}
-    <HoldOnlyExample
-        onActivate={() => {
-            holdOnlySends += 1;
-        }}
-    />
+    <div class={styles.stage}>
+        <HoldOnlyExample
+            onActivate={() => {
+                holdOnlySends += 1;
+            }}
+        />
+    </div>
 {/snippet}
 
 {#snippet heldExample()}
-    <HeldExample
-        {isArmed}
-        onActivate={() => {
-            isArmed = true;
-        }}
-        onReset={() => {
-            isArmed = false;
-        }}
-    />
+    <div class={styles.stage}>
+        <HeldExample
+            {isArmed}
+            onActivate={() => {
+                isArmed = true;
+            }}
+            onReset={() => {
+                isArmed = false;
+            }}
+        />
+    </div>
 {/snippet}
 
 {#snippet disabledExample()}
-    <DisabledExample
-        onActivate={() => {
-            disabledSends += 1;
-        }}
-    />
+    <div class={styles.stage}>
+        <DisabledExample
+            onActivate={() => {
+                disabledSends += 1;
+            }}
+        />
+    </div>
 {/snippet}
 
 {#snippet reachableExample()}
-    <ReachableExample
-        onActivate={() => {
-            reachableSends += 1;
-        }}
-    />
+    <div class={styles.stage}>
+        <ReachableExample
+            onActivate={() => {
+                reachableSends += 1;
+            }}
+        />
+    </div>
 {/snippet}
 
 {#snippet erroredExample()}
-    <ErroredExample
-        {hasError}
-        onActivate={() => {
-            hasError = !hasError;
-        }}
-    />
+    <div class={styles.stage}>
+        <ErroredExample
+            {hasError}
+            onActivate={() => {
+                hasError = !hasError;
+            }}
+        />
+    </div>
 {/snippet}
 
 <PageExamples items={examples} />

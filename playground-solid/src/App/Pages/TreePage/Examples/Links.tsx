@@ -10,7 +10,7 @@ type Props = TreeExampleProps;
 export const LinksExample = (props: Props) => (
     <Tree
         renderHighlightFloater={renderPageHighlightFloater}
-        nodes={() => DOCS}
+        nodes={DOCS}
         value={props.value}
         expanded={props.expanded}
         ariaLabel={"Documentation"}

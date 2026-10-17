@@ -80,7 +80,7 @@ const ImageExampleWrapper = (props: CellAnimationExampleProps & { progress: Sign
     return (
         <>
             <div class={styles.stack}>
-                <PageMeasureBox width={() => IMAGE_CONTAINER_SIZE}>
+                <PageMeasureBox width={IMAGE_CONTAINER_SIZE}>
                     <DefaultExample {...props} src={getSrc} />
                 </PageMeasureBox>
 
@@ -148,7 +148,7 @@ const GradientExampleWrapper = (props: CellAnimationExampleProps) => {
                 >
                     <PageSelectField
                         value={getKey}
-                        values={() => SVGDefsSources.GRADIENT_KEYS}
+                        values={SVGDefsSources.GRADIENT_KEYS}
                         ariaLabel={"Gradient"}
                         onChange={(key) => setKey(() => key)}
                     />
@@ -163,7 +163,7 @@ const GradientExampleWrapper = (props: CellAnimationExampleProps) => {
                 >
                     <PageSelectField
                         value={getRatio}
-                        values={() => SVGDefsSources.SOURCE_RATIOS}
+                        values={SVGDefsSources.SOURCE_RATIOS}
                         ariaLabel={"Gradient ratio"}
                         onChange={(ratio) => setRatio(() => ratio)}
                     />
@@ -209,7 +209,7 @@ const PatternExampleWrapper = (props: CellAnimationExampleProps) => {
                 >
                     <PageSelectField
                         value={getKey}
-                        values={() => SVGDefsSources.PATTERN_KEYS}
+                        values={SVGDefsSources.PATTERN_KEYS}
                         ariaLabel={"Pattern"}
                         onChange={(key) => setKey(() => key)}
                     />
@@ -224,7 +224,7 @@ const PatternExampleWrapper = (props: CellAnimationExampleProps) => {
                 >
                     <PageSelectField
                         value={getRatio}
-                        values={() => SVGDefsSources.SOURCE_RATIOS}
+                        values={SVGDefsSources.SOURCE_RATIOS}
                         ariaLabel={"Pattern ratio"}
                         onChange={(ratio) => setRatio(() => ratio)}
                     />
@@ -242,7 +242,7 @@ const StressTestWrapper = (props: CellAnimationSourcedExampleProps) => {
             <div>{`${STRESS_CELL_COUNT.col} x ${STRESS_CELL_COUNT.row} cells`}</div>
 
             <StressTest
-                configs={() => STRESS_ITEMS}
+                configs={STRESS_ITEMS}
                 onHideModal={() => {
                     props.playback[1](true);
                 }}
@@ -255,7 +255,7 @@ const StressTestWrapper = (props: CellAnimationSourcedExampleProps) => {
                         width={() => STRESS_ITEMS[getConfigIndex()].size}
                         height={() => STRESS_ITEMS[getConfigIndex()].size}
                     >
-                        <DefaultExample {...props} playback={modalPlayback} cellCount={() => STRESS_CELL_COUNT} />
+                        <DefaultExample {...props} playback={modalPlayback} cellCount={STRESS_CELL_COUNT} />
                     </PageMeasureBox>
                 )}
             />
@@ -369,17 +369,17 @@ export const CellAnimationPage = () => {
                     <div class={styles.valueList}>
                         <PageNumberField
                             value={() => cellCount.col}
-                            min={() => CellAnimationKnobs.MIN_CELL_COUNT}
-                            max={() => CellAnimationKnobs.MAX_CELL_COUNT}
-                            step={() => CellAnimationKnobs.CELL_COUNT_STEP}
+                            min={CellAnimationKnobs.MIN_CELL_COUNT}
+                            max={CellAnimationKnobs.MAX_CELL_COUNT}
+                            step={CellAnimationKnobs.CELL_COUNT_STEP}
                             ariaLabel={"Columns"}
                             onInput={(value) => setCellCount("col", value)}
                         />
                         <PageNumberField
                             value={() => cellCount.row}
-                            min={() => CellAnimationKnobs.MIN_CELL_COUNT}
-                            max={() => CellAnimationKnobs.MAX_CELL_COUNT}
-                            step={() => CellAnimationKnobs.CELL_COUNT_STEP}
+                            min={CellAnimationKnobs.MIN_CELL_COUNT}
+                            max={CellAnimationKnobs.MAX_CELL_COUNT}
+                            step={CellAnimationKnobs.CELL_COUNT_STEP}
                             ariaLabel={"Rows"}
                             onInput={(value) => setCellCount("row", value)}
                         />
@@ -395,7 +395,7 @@ export const CellAnimationPage = () => {
                 >
                     <PageSelectField
                         value={getOriginType}
-                        values={() => CellAnimationOrigins.ORIGIN_TYPES}
+                        values={CellAnimationOrigins.ORIGIN_TYPES}
                         isDisabled={() => !CellAnimationWeights.isOriginAware(getWeightType())}
                         ariaLabel={"Origin"}
                         onChange={(origin) => setOriginType(() => origin)}
@@ -411,7 +411,7 @@ export const CellAnimationPage = () => {
                 >
                     <PageGroupedSelectField
                         value={getWeightType}
-                        groups={() => GROUPPED_WEIGHTS}
+                        groups={GROUPPED_WEIGHTS}
                         ariaLabel={"Weight"}
                         onChange={(weight) => setWeightType(() => weight)}
                     />
@@ -452,7 +452,7 @@ export const CellAnimationPage = () => {
                 >
                     <PageGroupedSelectField
                         value={getAnimationType}
-                        groups={() => GROUPPED_ANIMATIONS}
+                        groups={GROUPPED_ANIMATIONS}
                         ariaLabel={"Animation"}
                         onChange={(anim) => setAnimationType(() => anim)}
                     />
@@ -465,7 +465,7 @@ export const CellAnimationPage = () => {
                 >
                     <PageSelectField
                         value={() => breakpointOpts.dir!}
-                        values={() => CellAnimationBreakpoints.DIRECTIONS}
+                        values={CellAnimationBreakpoints.DIRECTIONS}
                         ariaLabel={"Direction"}
                         onChange={(dir) => setBreakpointOpts("dir", dir)}
                     />
@@ -478,7 +478,7 @@ export const CellAnimationPage = () => {
                 >
                     <PageSelectField
                         value={() => breakpointOpts.easing!}
-                        values={() => CellAnimationBreakpoints.EASINGS}
+                        values={CellAnimationBreakpoints.EASINGS}
                         ariaLabel={"Easing"}
                         onChange={(easing) => setBreakpointOpts("easing", easing)}
                     />
@@ -493,9 +493,9 @@ export const CellAnimationPage = () => {
                 >
                     <PageNumberField
                         value={() => breakpointOpts.smoothness!}
-                        min={() => CellAnimationKnobs.MIN_SMOOTHNESS}
-                        max={() => CellAnimationKnobs.MAX_SMOOTHNESS}
-                        step={() => CellAnimationKnobs.SMOOTHNESS_STEP}
+                        min={CellAnimationKnobs.MIN_SMOOTHNESS}
+                        max={CellAnimationKnobs.MAX_SMOOTHNESS}
+                        step={CellAnimationKnobs.SMOOTHNESS_STEP}
                         ariaLabel={"Smoothness"}
                         onInput={(value) => setBreakpointOpts("smoothness", value)}
                     />
@@ -508,9 +508,9 @@ export const CellAnimationPage = () => {
                 >
                     <PageNumberField
                         value={getAnimationDurationMs}
-                        min={() => CellAnimationKnobs.MIN_DURATION_MS}
-                        max={() => CellAnimationKnobs.MAX_DURATION_MS}
-                        step={() => CellAnimationKnobs.DURATION_STEP_MS}
+                        min={CellAnimationKnobs.MIN_DURATION_MS}
+                        max={CellAnimationKnobs.MAX_DURATION_MS}
+                        step={CellAnimationKnobs.DURATION_STEP_MS}
                         ariaLabel={"Animation duration"}
                         onInput={setAnimationDurationMs}
                     />
@@ -523,9 +523,9 @@ export const CellAnimationPage = () => {
                 >
                     <PageNumberField
                         value={getAnimationIterationDelayMs}
-                        min={() => CellAnimationKnobs.MIN_ITERATION_DELAY_MS}
-                        max={() => CellAnimationKnobs.MAX_ITERATION_DELAY_MS}
-                        step={() => CellAnimationKnobs.DURATION_STEP_MS}
+                        min={CellAnimationKnobs.MIN_ITERATION_DELAY_MS}
+                        max={CellAnimationKnobs.MAX_ITERATION_DELAY_MS}
+                        step={CellAnimationKnobs.DURATION_STEP_MS}
                         ariaLabel={"Iteration delay"}
                         onInput={setAnimationIterationDelayMs}
                     />
@@ -538,9 +538,9 @@ export const CellAnimationPage = () => {
                 >
                     <PageNumberField
                         value={getAnimationIterationCount}
-                        min={() => CellAnimationKnobs.MIN_ITERATION_COUNT}
-                        max={() => CellAnimationKnobs.MAX_ITERATION_COUNT}
-                        step={() => CellAnimationKnobs.CELL_COUNT_STEP}
+                        min={CellAnimationKnobs.MIN_ITERATION_COUNT}
+                        max={CellAnimationKnobs.MAX_ITERATION_COUNT}
+                        step={CellAnimationKnobs.CELL_COUNT_STEP}
                         ariaLabel={"Iteration count"}
                         onInput={setAnimationIterationCount}
                     />
@@ -555,7 +555,7 @@ export const CellAnimationPage = () => {
                 >
                     <PageSelectField
                         value={getFinalFrame}
-                        values={() => CELL_ANIMATION_FINAL_FRAMES}
+                        values={CELL_ANIMATION_FINAL_FRAMES}
                         isDisabled={() => getAnimationIterationCount() === CellAnimationKnobs.ENDLESS_ITERATION_COUNT}
                         ariaLabel={"Final frame"}
                         onChange={(frame) => setFinalFrame(() => frame)}
@@ -571,7 +571,7 @@ export const CellAnimationPage = () => {
                 >
                     <PageSelectField
                         value={() => playbackOpts.dir!}
-                        values={() => CellAnimationPlayback.DIRECTIONS}
+                        values={CellAnimationPlayback.DIRECTIONS}
                         ariaLabel={"Playback direction"}
                         onChange={(dir) => setPlaybackOpts("dir", dir)}
                     />
@@ -586,9 +586,9 @@ export const CellAnimationPage = () => {
                 >
                     <PageNumberField
                         value={() => playbackOpts.holdMs!}
-                        min={() => CellAnimationKnobs.MIN_HOLD_MS}
-                        max={() => CellAnimationKnobs.MAX_HOLD_MS}
-                        step={() => CellAnimationKnobs.DURATION_STEP_MS}
+                        min={CellAnimationKnobs.MIN_HOLD_MS}
+                        max={CellAnimationKnobs.MAX_HOLD_MS}
+                        step={CellAnimationKnobs.DURATION_STEP_MS}
                         isDisabled={() => !CellAnimationPlaybackUtils.isRoundTrip(playbackOpts.dir)}
                         ariaLabel={"Hold at far end"}
                         onInput={(value) => setPlaybackOpts("holdMs", value)}

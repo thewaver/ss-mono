@@ -46,10 +46,10 @@ const WanderingExampleWrapper = (props: CuboidExampleProps) => {
                 >
                     <PageNumberField
                         value={getTurnIntervalMs}
-                        min={() => CuboidKnobs.MIN_TURN_INTERVAL_MS}
-                        max={() => CuboidKnobs.MAX_TURN_INTERVAL_MS}
-                        step={() => CuboidKnobs.TURN_INTERVAL_STEP_MS}
-                        width={() => FIELD_WIDTH}
+                        min={CuboidKnobs.MIN_TURN_INTERVAL_MS}
+                        max={CuboidKnobs.MAX_TURN_INTERVAL_MS}
+                        step={CuboidKnobs.TURN_INTERVAL_STEP_MS}
+                        width={FIELD_WIDTH}
                         isDisabled={() => !getIsTurning()}
                         ariaLabel={"Turn interval in milliseconds"}
                         onInput={setTurnIntervalMs}
@@ -168,10 +168,10 @@ export const CuboidPage = () => {
                 <PageProp key={"width"} label={"Width (px)"} hint={"How wide the box is."}>
                     <PageNumberField
                         value={getWidth}
-                        min={() => CuboidKnobs.MIN_EXTENT}
-                        max={() => CuboidKnobs.MAX_EXTENT}
-                        step={() => CuboidKnobs.EXTENT_STEP}
-                        width={() => FIELD_WIDTH}
+                        min={CuboidKnobs.MIN_EXTENT}
+                        max={CuboidKnobs.MAX_EXTENT}
+                        step={CuboidKnobs.EXTENT_STEP}
+                        width={FIELD_WIDTH}
                         ariaLabel={"Width in pixels"}
                         onInput={setWidth}
                     />
@@ -180,10 +180,10 @@ export const CuboidPage = () => {
                 <PageProp key={"height"} label={"Height (px)"} hint={"How tall the box is."}>
                     <PageNumberField
                         value={getHeight}
-                        min={() => CuboidKnobs.MIN_EXTENT}
-                        max={() => CuboidKnobs.MAX_EXTENT}
-                        step={() => CuboidKnobs.EXTENT_STEP}
-                        width={() => FIELD_WIDTH}
+                        min={CuboidKnobs.MIN_EXTENT}
+                        max={CuboidKnobs.MAX_EXTENT}
+                        step={CuboidKnobs.EXTENT_STEP}
+                        width={FIELD_WIDTH}
                         ariaLabel={"Height in pixels"}
                         onInput={setHeight}
                     />
@@ -192,10 +192,10 @@ export const CuboidPage = () => {
                 <PageProp key={"depth"} label={"Depth (px)"} hint={"How deep the box is, front face to back face."}>
                     <PageNumberField
                         value={getDepth}
-                        min={() => CuboidKnobs.MIN_EXTENT}
-                        max={() => CuboidKnobs.MAX_EXTENT}
-                        step={() => CuboidKnobs.EXTENT_STEP}
-                        width={() => FIELD_WIDTH}
+                        min={CuboidKnobs.MIN_EXTENT}
+                        max={CuboidKnobs.MAX_EXTENT}
+                        step={CuboidKnobs.EXTENT_STEP}
+                        width={FIELD_WIDTH}
                         ariaLabel={"Depth in pixels"}
                         onInput={setDepth}
                     />
@@ -210,10 +210,10 @@ export const CuboidPage = () => {
                 >
                     <PageNumberField
                         value={getTransitionDurationMs}
-                        min={() => CuboidKnobs.MIN_DURATION_MS}
-                        max={() => CuboidKnobs.MAX_DURATION_MS}
-                        step={() => CuboidKnobs.DURATION_STEP_MS}
-                        width={() => FIELD_WIDTH}
+                        min={CuboidKnobs.MIN_DURATION_MS}
+                        max={CuboidKnobs.MAX_DURATION_MS}
+                        step={CuboidKnobs.DURATION_STEP_MS}
+                        width={FIELD_WIDTH}
                         isDisabled={getPrefersReducedMotion}
                         ariaLabel={"Turn duration in milliseconds"}
                         onInput={setTransitionDurationMs}

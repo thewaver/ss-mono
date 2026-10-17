@@ -86,10 +86,10 @@ export const ShadowCasterPage = () => {
                 >
                     <PageNumberField
                         value={getSmoothingMs}
-                        min={() => ShadowCasterKnobs.MIN_SMOOTHING_MS}
-                        max={() => ShadowCasterKnobs.MAX_SMOOTHING_MS}
-                        step={() => ShadowCasterKnobs.SMOOTHING_STEP_MS}
-                        width={() => FIELD_WIDTH}
+                        min={ShadowCasterKnobs.MIN_SMOOTHING_MS}
+                        max={ShadowCasterKnobs.MAX_SMOOTHING_MS}
+                        step={ShadowCasterKnobs.SMOOTHING_STEP_MS}
+                        width={FIELD_WIDTH}
                         ariaLabel={"Smoothing in milliseconds"}
                         onInput={setSmoothingMs}
                     />
@@ -104,10 +104,10 @@ export const ShadowCasterPage = () => {
                 >
                     <PageNumberField
                         value={getActiveRangePx}
-                        min={() => ShadowCasterKnobs.MIN_ACTIVE_RANGE_PX}
-                        max={() => ShadowCasterKnobs.MAX_ACTIVE_RANGE_PX}
-                        step={() => ShadowCasterKnobs.ACTIVE_RANGE_STEP_PX}
-                        width={() => FIELD_WIDTH}
+                        min={ShadowCasterKnobs.MIN_ACTIVE_RANGE_PX}
+                        max={ShadowCasterKnobs.MAX_ACTIVE_RANGE_PX}
+                        step={ShadowCasterKnobs.ACTIVE_RANGE_STEP_PX}
+                        width={FIELD_WIDTH}
                         ariaLabel={"Active range in pixels"}
                         onInput={setActiveRangePx}
                     />
@@ -120,10 +120,10 @@ export const ShadowCasterPage = () => {
                 >
                     <PageNumberField
                         value={getLightRangePx}
-                        min={() => ShadowCasterKnobs.MIN_LIGHT_RANGE_PX}
-                        max={() => ShadowCasterKnobs.MAX_LIGHT_RANGE_PX}
-                        step={() => ShadowCasterKnobs.LIGHT_RANGE_STEP_PX}
-                        width={() => FIELD_WIDTH}
+                        min={ShadowCasterKnobs.MIN_LIGHT_RANGE_PX}
+                        max={ShadowCasterKnobs.MAX_LIGHT_RANGE_PX}
+                        step={ShadowCasterKnobs.LIGHT_RANGE_STEP_PX}
+                        width={FIELD_WIDTH}
                         ariaLabel={"Light range in pixels"}
                         onInput={setLightRangePx}
                     />
@@ -136,10 +136,10 @@ export const ShadowCasterPage = () => {
                 >
                     <PageNumberField
                         value={getMaxThrowPx}
-                        min={() => ShadowCasterKnobs.MIN_THROW_PX}
-                        max={() => ShadowCasterKnobs.MAX_THROW_PX}
-                        step={() => ShadowCasterKnobs.THROW_STEP_PX}
-                        width={() => FIELD_WIDTH}
+                        min={ShadowCasterKnobs.MIN_THROW_PX}
+                        max={ShadowCasterKnobs.MAX_THROW_PX}
+                        step={ShadowCasterKnobs.THROW_STEP_PX}
+                        width={FIELD_WIDTH}
                         ariaLabel={"Maximum throw in pixels"}
                         onInput={setMaxThrowPx}
                     />
@@ -152,10 +152,10 @@ export const ShadowCasterPage = () => {
                 >
                     <PageNumberField
                         value={getMinBlurPx}
-                        min={() => ShadowCasterKnobs.MIN_BLUR_PX}
-                        max={() => ShadowCasterKnobs.MAX_BLUR_PX}
-                        step={() => ShadowCasterKnobs.BLUR_STEP_PX}
-                        width={() => FIELD_WIDTH}
+                        min={ShadowCasterKnobs.MIN_BLUR_PX}
+                        max={ShadowCasterKnobs.MAX_BLUR_PX}
+                        step={ShadowCasterKnobs.BLUR_STEP_PX}
+                        width={FIELD_WIDTH}
                         ariaLabel={"Near blur in pixels"}
                         onInput={setMinBlurPx}
                     />
@@ -168,10 +168,10 @@ export const ShadowCasterPage = () => {
                 >
                     <PageNumberField
                         value={getMaxBlurPx}
-                        min={() => ShadowCasterKnobs.MIN_BLUR_PX}
-                        max={() => ShadowCasterKnobs.MAX_BLUR_PX}
-                        step={() => ShadowCasterKnobs.BLUR_STEP_PX}
-                        width={() => FIELD_WIDTH}
+                        min={ShadowCasterKnobs.MIN_BLUR_PX}
+                        max={ShadowCasterKnobs.MAX_BLUR_PX}
+                        step={ShadowCasterKnobs.BLUR_STEP_PX}
+                        width={FIELD_WIDTH}
                         ariaLabel={"Far blur in pixels"}
                         onInput={setMaxBlurPx}
                     />
@@ -184,10 +184,10 @@ export const ShadowCasterPage = () => {
                 >
                     <PageNumberField
                         value={getMaxOpacity}
-                        min={() => ShadowCasterKnobs.MIN_OPACITY}
-                        max={() => ShadowCasterKnobs.MAX_OPACITY}
-                        step={() => ShadowCasterKnobs.OPACITY_STEP}
-                        width={() => FIELD_WIDTH}
+                        min={ShadowCasterKnobs.MIN_OPACITY}
+                        max={ShadowCasterKnobs.MAX_OPACITY}
+                        step={ShadowCasterKnobs.OPACITY_STEP}
+                        width={FIELD_WIDTH}
                         ariaLabel={"Near opacity"}
                         onInput={setMaxOpacity}
                     />
@@ -202,10 +202,10 @@ export const ShadowCasterPage = () => {
                 >
                     <PageNumberField
                         value={getMinOpacity}
-                        min={() => ShadowCasterKnobs.MIN_OPACITY}
-                        max={() => ShadowCasterKnobs.MAX_OPACITY}
-                        step={() => ShadowCasterKnobs.OPACITY_STEP}
-                        width={() => FIELD_WIDTH}
+                        min={ShadowCasterKnobs.MIN_OPACITY}
+                        max={ShadowCasterKnobs.MAX_OPACITY}
+                        step={ShadowCasterKnobs.OPACITY_STEP}
+                        width={FIELD_WIDTH}
                         ariaLabel={"Far opacity"}
                         onInput={setMinOpacity}
                     />
@@ -218,10 +218,10 @@ export const ShadowCasterPage = () => {
                 >
                     <PageNumberField
                         value={getRestingOpacity}
-                        min={() => ShadowCasterKnobs.MIN_OPACITY}
-                        max={() => ShadowCasterKnobs.MAX_OPACITY}
-                        step={() => ShadowCasterKnobs.OPACITY_STEP}
-                        width={() => FIELD_WIDTH}
+                        min={ShadowCasterKnobs.MIN_OPACITY}
+                        max={ShadowCasterKnobs.MAX_OPACITY}
+                        step={ShadowCasterKnobs.OPACITY_STEP}
+                        width={FIELD_WIDTH}
                         ariaLabel={"Resting opacity"}
                         onInput={setRestingOpacity}
                     />

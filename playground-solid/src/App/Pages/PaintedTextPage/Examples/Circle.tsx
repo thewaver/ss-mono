@@ -25,7 +25,7 @@ export const CircleExample = (props: Props) => {
 
     return (
         <div class={styles.stack}>
-            <PageMeasureBox padding={() => MEASURE_BOX_PADDING}>
+            <PageMeasureBox padding={MEASURE_BOX_PADDING}>
                 <div class={styles.ringText}>
                     <PaintedText
                         path={getPath}

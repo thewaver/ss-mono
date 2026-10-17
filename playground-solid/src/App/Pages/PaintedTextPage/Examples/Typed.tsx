@@ -27,12 +27,12 @@ export const TypedExample = (props: Props) => {
 
     return (
         <div class={styles.stack}>
-            <PageMeasureBox width={props.width} padding={() => MEASURE_BOX_PADDING}>
+            <PageMeasureBox width={props.width} padding={MEASURE_BOX_PADDING}>
                 <div class={styles.fill}>
                     <Typewriter
                         computeAnimationName={props.computeAnimationName}
-                        animationDelayMs={() => 40}
-                        animationDurationMs={() => 400}
+                        animationDelayMs={40}
+                        animationDurationMs={400}
                         renderCaret={() => (
                             <span
                                 class={styles.caret}

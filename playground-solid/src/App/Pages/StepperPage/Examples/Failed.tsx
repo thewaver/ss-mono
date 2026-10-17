@@ -17,7 +17,7 @@ export const FailedExample = (props: Props) => {
         <Stepper
             steps={props.steps}
             currentValue={props.currentValue}
-            gap={() => STEPPER_GAP}
+            gap={STEPPER_GAP}
             ariaLabel={"Checkout with a failure"}
             computeStepAriaLabel={props.computeStepAriaLabel}
             computeTooltipDefs={(step) => {

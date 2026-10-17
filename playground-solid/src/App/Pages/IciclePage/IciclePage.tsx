@@ -56,9 +56,9 @@ export const IciclePage = () => {
                 >
                     <PageNumberField
                         value={getColumnCount}
-                        min={() => IcicleKnobs.MIN_COLUMN_COUNT}
-                        max={() => IcicleKnobs.MAX_COLUMN_COUNT}
-                        step={() => IcicleKnobs.COLUMN_COUNT_STEP}
+                        min={IcicleKnobs.MIN_COLUMN_COUNT}
+                        max={IcicleKnobs.MAX_COLUMN_COUNT}
+                        step={IcicleKnobs.COLUMN_COUNT_STEP}
                         ariaLabel={"Columns"}
                         onInput={setColumnCount}
                     />
@@ -73,9 +73,9 @@ export const IciclePage = () => {
                 >
                     <PageNumberField
                         value={getZoomDurationMs}
-                        min={() => IcicleKnobs.MIN_ZOOM_DURATION_MS}
-                        max={() => IcicleKnobs.MAX_ZOOM_DURATION_MS}
-                        step={() => IcicleKnobs.ZOOM_DURATION_STEP_MS}
+                        min={IcicleKnobs.MIN_ZOOM_DURATION_MS}
+                        max={IcicleKnobs.MAX_ZOOM_DURATION_MS}
+                        step={IcicleKnobs.ZOOM_DURATION_STEP_MS}
                         isDisabled={getPrefersReducedMotion}
                         ariaLabel={"Zoom duration in milliseconds"}
                         onInput={setZoomDurationMs}

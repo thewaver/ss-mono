@@ -20,7 +20,7 @@ export const LibraryExample = (props: Props) => {
         <div class={styles.frame}>
             <PageCirclePackingFrame>
                 <CirclePacking<string>
-                    root={() => LIBRARY}
+                    root={LIBRARY}
                     branch={props.branch}
                     padding={props.padding}
                     zoomDurationMs={props.zoomDurationMs}

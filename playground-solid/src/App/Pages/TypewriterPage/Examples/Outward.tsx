@@ -43,8 +43,8 @@ export const OutwardExample = () => {
                     playback={[() => false, () => undefined]}
                     computeAnimationName={computeAnimationName}
                     computeCharacterWeights={ScrambleTextWeights.SAMPLE_WEIGHTS.from_middle}
-                    animationDelayMs={() => CHARACTER_DELAY_MS}
-                    animationDurationMs={() => CHARACTER_DURATION_MS}
+                    animationDelayMs={CHARACTER_DELAY_MS}
+                    animationDurationMs={CHARACTER_DURATION_MS}
                 >
                     {TEXT}
                 </Typewriter>

@@ -10,7 +10,7 @@ type Props = MenubarExampleProps;
 export const DefaultExample = (props: Props) => {
     return (
         <Menubar
-            actions={() => WORDS}
+            actions={WORDS}
             ariaLabel={"Editor"}
             overflowAriaLabel={"More menus"}
             checked={props.checked}

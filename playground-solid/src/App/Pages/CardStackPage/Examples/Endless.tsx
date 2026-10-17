@@ -53,7 +53,7 @@ export const EndlessExample = (props: Props) => {
 
     return (
         <div class={styles.deckStage}>
-            <PageMeasureBox isFilling height={() => BOX_HEIGHT}>
+            <PageMeasureBox isFilling height={BOX_HEIGHT}>
                 <CardStack<string>
                     cards={getCards}
                     allowedDirections={DIRECTIONS}

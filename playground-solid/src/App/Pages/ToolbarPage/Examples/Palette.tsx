@@ -35,7 +35,7 @@ export const PaletteExample = (props: Props) => {
     return (
         <div style={{ width: PALETTE_WIDTH }}>
             <Toolbar
-                actions={() => ACTIONS}
+                actions={ACTIONS}
                 ariaLabel={"Tools"}
                 overflowAriaLabel={"More tools"}
                 computeLayout={PALETTE_LAYOUT}

@@ -14,10 +14,10 @@ export const ClearableExample = (props: Props) => {
         <Select
             renderHighlightFloater={renderPageHighlightFloater}
             value={props.value}
-            options={() => COUNTRIES}
+            options={COUNTRIES}
             ariaLabel={"Country"}
             clearAriaLabel={"Clear country"}
-            padding={() => QUERY_PADDING}
+            padding={QUERY_PADDING}
             renderContent={(getSelectedOption, getFlags) => (
                 <PageSelectContent flags={getFlags} hasClearSpace={true}>
                     {getSelectedOption()?.value ?? PLACEHOLDER}

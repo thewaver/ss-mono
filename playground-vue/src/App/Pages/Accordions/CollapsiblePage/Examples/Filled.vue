@@ -17,7 +17,12 @@ const expanded = useModel(props, "expanded");
 </script>
 
 <template>
-    <Collapsible v-model:expanded="expanded" sizing="fill" is-panel-built-on-expand>
+    <Collapsible
+        :transition-duration-ms="transitionDurationMs"
+        v-model:expanded="expanded"
+        sizing="fill"
+        is-panel-built-on-expand
+    >
         <template #renderTrigger="flags">
             <PageAccordionHeader :flags="flags">{{
                 flags.isExpanded ? "Hide the delivery notes" : "Show the delivery notes"

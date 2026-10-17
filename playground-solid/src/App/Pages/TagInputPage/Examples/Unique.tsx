@@ -20,9 +20,9 @@ export const UniqueExample = (props: Props) => {
         <TagInput
             value={props.value}
             ariaLabel={"Unique topics"}
-            gap={() => FIELD_GAP}
-            padding={() => FIELD_PADDING}
-            minHeight={() => FIELD_HEIGHT}
+            gap={FIELD_GAP}
+            padding={FIELD_PADDING}
+            minHeight={FIELD_HEIGHT}
             isDisabled={props.isDisabled}
             hasError={props.hasError}
             computeTextStyle={computePageTextFieldTextStyle}

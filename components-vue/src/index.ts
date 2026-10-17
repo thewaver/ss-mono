@@ -155,6 +155,8 @@ export * from "./Essentials/Overlays/Toasts/Toasts";
 export type * from "./Essentials/Overlays/Toasts/Toasts.types";
 export * from "./Essentials/Menus/FanMenu/FanMenu";
 export type * from "./Essentials/Menus/FanMenu/FanMenu.types";
+export * from "./Essentials/Menus/FlyoutMenu/FlyoutMenu";
+export type * from "./Essentials/Menus/FlyoutMenu/FlyoutMenu.types";
 export * from "./Essentials/Menus/WheelMenu/WheelMenu";
 export type * from "./Essentials/Menus/WheelMenu/WheelMenu.types";
 export * from "./Primitives/Spotlight/Spotlight";

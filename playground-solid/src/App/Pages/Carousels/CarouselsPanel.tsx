@@ -36,8 +36,8 @@ export const PageCarouselsPanel = (props: Props) => {
                 >
                     <PageSelectField
                         value={controls.placement[0]}
-                        values={() => CarouselPlacements.SAMPLE_KEYS}
-                        width={() => PLACEMENT_FIELD_WIDTH}
+                        values={CarouselPlacements.SAMPLE_KEYS}
+                        width={PLACEMENT_FIELD_WIDTH}
                         ariaLabel={"Placement"}
                         onChange={(placement) => controls.placement[1](() => placement)}
                     />
@@ -47,10 +47,10 @@ export const PageCarouselsPanel = (props: Props) => {
             <PageProp key={"slideCount"} label={"Slide count"} hint={"How many slides the carousel holds."}>
                 <PageNumberField
                     value={controls.slideCount[0]}
-                    min={() => CarouselKnobs.MIN_SLIDE_COUNT}
-                    max={() => CarouselKnobs.MAX_SLIDE_COUNT}
-                    step={() => CarouselKnobs.SLIDE_COUNT_STEP}
-                    width={() => FIELD_WIDTH}
+                    min={CarouselKnobs.MIN_SLIDE_COUNT}
+                    max={CarouselKnobs.MAX_SLIDE_COUNT}
+                    step={CarouselKnobs.SLIDE_COUNT_STEP}
+                    width={FIELD_WIDTH}
                     ariaLabel={"Slide count"}
                     onInput={controls.slideCount[1]}
                 />
@@ -59,20 +59,36 @@ export const PageCarouselsPanel = (props: Props) => {
             <Show when={props.hasDelay}>
                 <PageProp
                     key={"delayMs"}
-                    label={"RotatorUtils delay (ms)"}
+                    label={"Transition delay (ms)"}
                     hint={"How long a slide is held before the carousel moves to the next one on its own."}
                 >
                     <PageNumberField
                         value={controls.delay[0]}
-                        min={() => CarouselKnobs.MIN_DELAY_MS}
-                        max={() => CarouselKnobs.MAX_DELAY_MS}
-                        step={() => CarouselKnobs.DELAY_STEP_MS}
-                        width={() => FIELD_WIDTH}
-                        ariaLabel={"RotatorUtils delay in milliseconds"}
+                        min={CarouselKnobs.MIN_DELAY_MS}
+                        max={CarouselKnobs.MAX_DELAY_MS}
+                        step={CarouselKnobs.DELAY_STEP_MS}
+                        width={FIELD_WIDTH}
+                        ariaLabel={"Transition delay in milliseconds"}
                         onInput={controls.delay[1]}
                     />
                 </PageProp>
             </Show>
+
+            <PageProp
+                key={"transitionDurationMs"}
+                label={"Transition duration (ms)"}
+                hint={"How long the move from one slide to the next takes. At 0 the carousel jumps straight there."}
+            >
+                <PageNumberField
+                    value={controls.transitionDuration[0]}
+                    min={CarouselKnobs.MIN_TRANSITION_MS}
+                    max={CarouselKnobs.MAX_TRANSITION_MS}
+                    step={CarouselKnobs.TRANSITION_STEP_MS}
+                    width={FIELD_WIDTH}
+                    ariaLabel={"Transition duration in milliseconds"}
+                    onInput={controls.transitionDuration[1]}
+                />
+            </PageProp>
 
             <PageProp
                 key={"orientation"}
@@ -81,9 +97,9 @@ export const PageCarouselsPanel = (props: Props) => {
             >
                 <PageSelectField
                     value={controls.orientation[0]}
-                    values={() => CAROUSEL_ORIENTATIONS}
+                    values={CAROUSEL_ORIENTATIONS}
                     computeLabel={(orientation) => ORIENTATION_LABELS[orientation]}
-                    width={() => ORIENTATION_FIELD_WIDTH}
+                    width={ORIENTATION_FIELD_WIDTH}
                     ariaLabel={"Orientation"}
                     onChange={(orientation) => controls.orientation[1](() => orientation)}
                 />

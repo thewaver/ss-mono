@@ -72,13 +72,13 @@ export const PageSourceView = (props: SourceViewProps) => {
             >
                 <div class={styles.sourceViewTabs}>
                     <Scroller
-                        gap={() => TAB_GAP}
-                        padding={() => FOCUS_RING_WIDTH}
+                        gap={TAB_GAP}
+                        padding={FOCUS_RING_WIDTH}
                         renderButton={(getStep, stepper) => <PageScrollerButton step={getStep} stepper={stepper} />}
                     >
                         <Tabs
                             orientation={"horizontal"}
-                            tabGap={() => TAB_GAP}
+                            tabGap={TAB_GAP}
                             ariaLabel={"Source files"}
                             tabs={getTabs}
                             selectedValue={getSelectedGroup}
@@ -112,7 +112,7 @@ export const PageSourceView = (props: SourceViewProps) => {
                         <Accordion
                             items={getItems}
                             expanded={expandedSignal}
-                            gap={() => SECTION_GAP}
+                            gap={SECTION_GAP}
                             renderHeader={(getItem, getFlags) => (
                                 <PageAccordionHeader flags={getFlags}>{getItem().value}</PageAccordionHeader>
                             )}

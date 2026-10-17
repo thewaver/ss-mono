@@ -19,11 +19,11 @@ export const UnitExample = (props: Props) => (
     <NumberInput
         value={props.value}
         min={0}
-        padding={() => FIELD_STEPPER_PADDING}
-        gap={() => FIELD_GAP}
+        padding={FIELD_STEPPER_PADDING}
+        gap={FIELD_GAP}
         ariaLabel={"Width"}
         computeTextStyle={computePageTextFieldTextStyle}
-        renderContent={(getFlags) => <PageTextFieldContent flags={getFlags} width={() => FIELD_WIDTH} />}
+        renderContent={(getFlags) => <PageTextFieldContent flags={getFlags} width={FIELD_WIDTH} />}
         renderTrailing={(getFlags, stepper) => (
             <>
                 <PageTextFieldAdornment flags={getFlags}>px</PageTextFieldAdornment>

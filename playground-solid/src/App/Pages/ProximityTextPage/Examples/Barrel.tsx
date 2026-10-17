@@ -38,7 +38,7 @@ export const BarrelExample = (props: Props) => {
             <div ref={setTextRef} class={styles.barrelText}>
                 <ProximityText
                     computeAnimationName={() => styles.barrelSpacing}
-                    reachPx={() => ProximityTextKnobs.BARREL_REACH_PX}
+                    reachPx={ProximityTextKnobs.BARREL_REACH_PX}
                     distanceAxis={() => "vertical"}
                     isDisabled={props.isDisabled}
                     pointSource={getPointSource}

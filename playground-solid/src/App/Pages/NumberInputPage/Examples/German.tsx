@@ -21,13 +21,13 @@ type Props = NumberInputExampleProps;
 export const GermanExample = (props: Props) => (
     <NumberInput
         value={props.value}
-        locale={() => GERMAN_LOCALE}
-        step={() => AMOUNT_STEP}
-        padding={() => FIELD_STEPPER_PADDING}
-        gap={() => FIELD_GAP}
+        locale={GERMAN_LOCALE}
+        step={AMOUNT_STEP}
+        padding={FIELD_STEPPER_PADDING}
+        gap={FIELD_GAP}
         ariaLabel={"Amount"}
         computeTextStyle={computePageTextFieldTextStyle}
-        renderContent={(getFlags) => <PageTextFieldContent flags={getFlags} width={() => FIELD_WIDTH} />}
+        renderContent={(getFlags) => <PageTextFieldContent flags={getFlags} width={FIELD_WIDTH} />}
         renderTrailing={(getFlags, stepper) => <PageNumberInputStepper flags={getFlags} stepper={stepper} />}
     />
 );

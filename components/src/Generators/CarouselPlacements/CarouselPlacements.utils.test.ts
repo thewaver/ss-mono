@@ -125,7 +125,7 @@ describe("folders", () => {
 
 describe("hinge", () => {
     it("flips a card down about its bottom edge as it is left behind, showing its back", () => {
-        const flipping = CarouselPlacementUtils.hinge.place(at(-0.5));
+        const flipping = CarouselPlacementUtils.hinge.place(at(-0.5, { orientation: "vertical" }));
 
         expect(flipping.effect.rotateX).toBe(-90);
         expect(flipping.origin).toEqual({ x: 0.5, y: 1 });

@@ -25,7 +25,7 @@ export const MultiSelectGroupedExample = (props: Props) => {
             query={props.query}
             options={props.options}
             ariaLabel={"Countries"}
-            padding={() => QUERY_PADDING}
+            padding={QUERY_PADDING}
             computeTextStyle={computePageSelectTextStyle}
             renderContent={(getSelectedOptions, getFlags) => (
                 <PageSelectContent flags={getFlags}>

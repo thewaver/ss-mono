@@ -7,6 +7,8 @@ export const treeRoot = style({
 
 export const treeNode = style({
     width: "100%",
+    color: "inherit !important",
+    textDecoration: "none !important",
     cursor: "pointer",
     pointerEvents: "all",
 

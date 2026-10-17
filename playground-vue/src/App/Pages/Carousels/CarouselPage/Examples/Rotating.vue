@@ -35,6 +35,7 @@ const playback = useModel(props, "playback");
         :is-disabled="isDisabled"
         :is-looping="isLooping"
         :orientation="orientation"
+        :transition-duration-ms="transitionDurationMs"
         :autoplay-delay-ms="autoplayDelayMs"
         :gap="CAROUSEL_GAP"
         ariaLabel="Rotating sampler"

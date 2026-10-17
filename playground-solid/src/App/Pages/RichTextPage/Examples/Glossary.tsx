@@ -31,7 +31,7 @@ const GlossaryTerm = (props: ParentProps<TermProps>) => {
                 anchorRef={getAnchorRef}
                 placement={TOOLTIP_PLACEMENT}
                 offset={TOOLTIP_OFFSET}
-                hoverShowDelayMs={() => TOOLTIP_HOVER_DELAY_MS}
+                hoverShowDelayMs={TOOLTIP_HOVER_DELAY_MS}
                 renderContent={(getVisibilityTarget, getTransitionDurationMs) => (
                     <PageTooltipContent
                         visibilityTarget={getVisibilityTarget}

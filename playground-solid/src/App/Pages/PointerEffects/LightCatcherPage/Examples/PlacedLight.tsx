@@ -53,12 +53,12 @@ export const PlacedLightExample = (props: Props) => {
                     id={"placedLightSlider"}
                     sizing={"fill"}
                     ariaLabel={"Where the light is across the row"}
-                    min={() => 0}
-                    max={() => PERCENT}
-                    step={() => SLIDER_STEP}
+                    min={0}
+                    max={PERCENT}
+                    step={SLIDER_STEP}
                     value={[getPercent, setPercent]}
                     renderContent={(getRenderProps) => (
-                        <PageRangeContent renderProps={getRenderProps} length={() => SLIDER_LENGTH} />
+                        <PageRangeContent renderProps={getRenderProps} length={SLIDER_LENGTH} />
                     )}
                 />
             </div>

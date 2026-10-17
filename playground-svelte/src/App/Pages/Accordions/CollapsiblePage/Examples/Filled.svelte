@@ -9,10 +9,10 @@
 
     const NOTES = ["Signed for on arrival", "Left with a neighbor", "Returned to the depot"];
 
-    let { expanded = $bindable(false) }: Props = $props();
+    let { expanded = $bindable(false), ...props }: Props = $props();
 </script>
 
-<Collapsible bind:expanded sizing={"fill"} isPanelBuiltOnExpand={true}>
+<Collapsible transitionDurationMs={props.transitionDurationMs} bind:expanded sizing={"fill"} isPanelBuiltOnExpand={true}>
     {#snippet renderTrigger(flags)}
         <PageAccordionHeader {flags}>
             {flags.isExpanded ? "Hide the delivery notes" : "Show the delivery notes"}

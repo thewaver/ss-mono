@@ -11,6 +11,7 @@ import type { CarouselsControls } from "./Carousels.types";
 export const useCarouselsControls = (): CarouselsControls => {
     const slideCountState = useState(CarouselKnobs.STARTING_SLIDE_COUNT);
     const delayState = useState(CarouselKnobs.STARTING_DELAY_MS);
+    const transitionDurationState = useState(CAROUSEL_DEFAULTS.transitionDurationMs);
     const orientationState = useState<CarouselOrientation>(CAROUSEL_DEFAULTS.orientation);
     const isDisabledState = useState(CarouselKnobs.STARTING_IS_DISABLED);
     const isLoopingState = useState(CAROUSEL_DEFAULTS.isLooping);
@@ -18,6 +19,7 @@ export const useCarouselsControls = (): CarouselsControls => {
 
     const [slideCount] = slideCountState;
     const [orientation] = orientationState;
+    const [transitionDuration] = transitionDurationState;
     const [isDisabled] = isDisabledState;
     const [placement] = placementState;
 
@@ -33,21 +35,22 @@ export const useCarouselsControls = (): CarouselsControls => {
             slides,
             isDisabled,
             orientation,
+            transitionDurationMs: transitionDuration,
             placement: placementRule,
             frameClasses: styles.slideFrames[PLACEMENT_FRAMES[placement] ?? "whole"][orientation],
         }),
-        [slides, isDisabled, orientation, placementRule, placement],
+        [slides, isDisabled, orientation, transitionDuration, placementRule, placement],
     );
 
     return {
         slideCountState,
         delay: delayState,
+        transitionDuration: transitionDurationState,
         orientation: orientationState,
         isDisabled: isDisabledState,
         isLooping: isLoopingState,
         placement: placementState,
         slideCount,
-        slides,
         sharedProps,
     };
 };

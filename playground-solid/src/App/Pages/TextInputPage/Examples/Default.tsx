@@ -16,8 +16,8 @@ type Props = TextInputExampleProps;
 export const DefaultExample = (props: Props) => (
     <TextInput
         value={props.value}
-        padding={() => FIELD_PADDING}
-        gap={() => FIELD_GAP}
+        padding={FIELD_PADDING}
+        gap={FIELD_GAP}
         ariaLabel={"Your name"}
         computeTextStyle={computePageTextFieldTextStyle}
         renderContent={(getFlags) => <PageTextFieldContent flags={getFlags} />}

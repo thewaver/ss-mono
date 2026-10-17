@@ -74,8 +74,8 @@ export const PageExampleKnobsButton = (props: PageExampleKnobsButtonProps) => {
                 ariaAttributes={() => ({ "aria-label": getLabel() })}
                 isOpen={getIsOpen}
                 anchorRef={getTriggerRef}
-                placement={() => KNOBS_PLACEMENT}
-                offset={() => KNOBS_OFFSET}
+                placement={KNOBS_PLACEMENT}
+                offset={KNOBS_OFFSET}
                 hasAutoFocus={true}
                 onDismiss={handleDismiss}
                 renderContent={(getVisibilityTarget, getTransitionDurationMs) => (

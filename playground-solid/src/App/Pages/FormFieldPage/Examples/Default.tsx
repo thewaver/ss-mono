@@ -39,12 +39,10 @@ export const DefaultExample = (props: Props) => {
                         value={props.value}
                         hasError={() => getState().hasError}
                         isRequired={() => getState().isRequired}
-                        padding={() => FIELD_PADDING}
-                        gap={() => FIELD_GAP}
+                        padding={FIELD_PADDING}
+                        gap={FIELD_GAP}
                         computeTextStyle={computePageTextFieldTextStyle}
-                        renderContent={(getFlags) => (
-                            <PageTextFieldContent flags={getFlags} width={() => CONTROL_WIDTH} />
-                        )}
+                        renderContent={(getFlags) => <PageTextFieldContent flags={getFlags} width={CONTROL_WIDTH} />}
                     />
                 )}
             />

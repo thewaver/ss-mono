@@ -6,7 +6,7 @@ const RATIO = 0.75;
 
 export const FillingContainerExample = () => (
     <Progress
-        value={() => RATIO}
+        value={RATIO}
         ariaLabel={"Full width progress"}
         renderContent={(getState) => <PageProgressContent state={getState} />}
     />

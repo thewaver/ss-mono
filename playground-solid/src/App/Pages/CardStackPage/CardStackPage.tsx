@@ -112,10 +112,10 @@ export const CardStackPage = () => {
                 >
                     <PageNumberField
                         value={getCommitRatio}
-                        min={() => CardStackKnobs.MIN_COMMIT_RATIO}
-                        max={() => CardStackKnobs.MAX_COMMIT_RATIO}
-                        step={() => CardStackKnobs.COMMIT_RATIO_STEP}
-                        width={() => FIELD_WIDTH}
+                        min={CardStackKnobs.MIN_COMMIT_RATIO}
+                        max={CardStackKnobs.MAX_COMMIT_RATIO}
+                        step={CardStackKnobs.COMMIT_RATIO_STEP}
+                        width={FIELD_WIDTH}
                         ariaLabel={"Commit ratio"}
                         onInput={setCommitRatio}
                     />
@@ -128,10 +128,10 @@ export const CardStackPage = () => {
                 >
                     <PageNumberField
                         value={getTransitionDurationMs}
-                        min={() => CardStackKnobs.MIN_DURATION_MS}
-                        max={() => CardStackKnobs.MAX_DURATION_MS}
-                        step={() => CardStackKnobs.DURATION_STEP_MS}
-                        width={() => FIELD_WIDTH}
+                        min={CardStackKnobs.MIN_DURATION_MS}
+                        max={CardStackKnobs.MAX_DURATION_MS}
+                        step={CardStackKnobs.DURATION_STEP_MS}
+                        width={FIELD_WIDTH}
                         ariaLabel={"Duration in milliseconds"}
                         onInput={setTransitionDurationMs}
                     />
@@ -144,10 +144,10 @@ export const CardStackPage = () => {
                 >
                     <PageNumberField
                         value={getMountedCount}
-                        min={() => CardStackKnobs.MIN_MOUNTED_COUNT}
-                        max={() => CardStackKnobs.MAX_MOUNTED_COUNT}
-                        step={() => CardStackKnobs.MOUNTED_COUNT_STEP}
-                        width={() => FIELD_WIDTH}
+                        min={CardStackKnobs.MIN_MOUNTED_COUNT}
+                        max={CardStackKnobs.MAX_MOUNTED_COUNT}
+                        step={CardStackKnobs.MOUNTED_COUNT_STEP}
+                        width={FIELD_WIDTH}
                         ariaLabel={"Mounted cards"}
                         onInput={setMountedCount}
                     />
@@ -162,10 +162,10 @@ export const CardStackPage = () => {
                 >
                     <PageNumberField
                         value={getCardGap}
-                        min={() => CardStackKnobs.MIN_CARD_GAP}
-                        max={() => CardStackKnobs.MAX_CARD_GAP}
-                        step={() => CardStackKnobs.CARD_GAP_STEP}
-                        width={() => FIELD_WIDTH}
+                        min={CardStackKnobs.MIN_CARD_GAP}
+                        max={CardStackKnobs.MAX_CARD_GAP}
+                        step={CardStackKnobs.CARD_GAP_STEP}
+                        width={FIELD_WIDTH}
                         ariaLabel={"Card gap in pixels"}
                         onInput={setCardGap}
                     />
@@ -180,10 +180,10 @@ export const CardStackPage = () => {
                 >
                     <PageNumberField
                         value={getFunnelRatio}
-                        min={() => CardStackKnobs.MIN_FUNNEL_RATIO}
-                        max={() => CardStackKnobs.MAX_FUNNEL_RATIO}
-                        step={() => CardStackKnobs.FUNNEL_RATIO_STEP}
-                        width={() => FIELD_WIDTH}
+                        min={CardStackKnobs.MIN_FUNNEL_RATIO}
+                        max={CardStackKnobs.MAX_FUNNEL_RATIO}
+                        step={CardStackKnobs.FUNNEL_RATIO_STEP}
+                        width={FIELD_WIDTH}
                         ariaLabel={"Funnel"}
                         onInput={setFunnelRatio}
                     />
@@ -196,7 +196,7 @@ export const CardStackPage = () => {
                 >
                     <PageSelectField
                         value={getPileSide}
-                        values={() => CARD_STACK_PILE_SIDES}
+                        values={CARD_STACK_PILE_SIDES}
                         ariaLabel={"Pile side"}
                         onChange={(side) => setPileSide(() => side)}
                     />

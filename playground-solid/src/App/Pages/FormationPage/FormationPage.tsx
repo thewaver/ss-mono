@@ -35,7 +35,7 @@ import type { FormationExampleProps } from "./FormationPageSolid.types";
 
 const DefaultExampleWrapper = (props: FormationExampleProps) => {
     return (
-        <PageMeasureBox width={() => FORMATION_WIDTH}>
+        <PageMeasureBox width={FORMATION_WIDTH}>
             <DefaultExample {...props} />
         </PageMeasureBox>
     );
@@ -131,8 +131,8 @@ export const FormationPage = () => {
                     >
                         <PageSelectField
                             value={getLayoutKey}
-                            values={() => PlacementLayouts.SAMPLE_KEYS}
-                            width={() => FIELD_WIDTH}
+                            values={PlacementLayouts.SAMPLE_KEYS}
+                            width={FIELD_WIDTH}
                             ariaLabel={"Arrangement"}
                             onChange={(key) => setLayoutKey(() => key)}
                         />
@@ -159,8 +159,8 @@ export const FormationPage = () => {
                     >
                         <PageSelectField
                             value={getEffectKey}
-                            values={() => FormationKnobs.EFFECT_KEYS}
-                            width={() => FIELD_WIDTH}
+                            values={FormationKnobs.EFFECT_KEYS}
+                            width={FIELD_WIDTH}
                             ariaLabel={"Pointer effect"}
                             onChange={(key) => setEffectKey(() => key)}
                         />
@@ -183,10 +183,10 @@ export const FormationPage = () => {
                     <PageProp key={"itemCount"} label={"Items"} hint={"How many items the arrangement holds."}>
                         <PageNumberField
                             value={getItemCount}
-                            min={() => FormationKnobs.MIN_ITEM_COUNT}
-                            max={() => FormationKnobs.MAX_ITEM_COUNT}
-                            step={() => FormationKnobs.ITEM_COUNT_STEP}
-                            width={() => FIELD_WIDTH}
+                            min={FormationKnobs.MIN_ITEM_COUNT}
+                            max={FormationKnobs.MAX_ITEM_COUNT}
+                            step={FormationKnobs.ITEM_COUNT_STEP}
+                            width={FIELD_WIDTH}
                             ariaLabel={"Items"}
                             onInput={setItemCount}
                         />
@@ -201,10 +201,10 @@ export const FormationPage = () => {
                     >
                         <PageNumberField
                             value={getSkippedCount}
-                            min={() => FormationKnobs.MIN_SKIPPED_COUNT}
+                            min={FormationKnobs.MIN_SKIPPED_COUNT}
                             max={() => NAMES.length - FormationKnobs.MIN_ITEM_COUNT}
-                            step={() => FormationKnobs.ITEM_COUNT_STEP}
-                            width={() => FIELD_WIDTH}
+                            step={FormationKnobs.ITEM_COUNT_STEP}
+                            width={FIELD_WIDTH}
                             ariaLabel={"Skip from the start"}
                             onInput={setSkippedCount}
                         />
@@ -227,8 +227,8 @@ export const FormationPage = () => {
                     <PageProp key={"shapeKind"} label={"Item shape"} hint={"The contour each item is cut to."}>
                         <PageSelectField
                             value={getShapeKind}
-                            values={() => ShapeConst.DEFAULT_SHAPES}
-                            width={() => FIELD_WIDTH}
+                            values={ShapeConst.DEFAULT_SHAPES}
+                            width={FIELD_WIDTH}
                             ariaLabel={"Item shape"}
                             onChange={(shape) => setShapeKind(() => shape)}
                         />
@@ -243,10 +243,10 @@ export const FormationPage = () => {
                     >
                         <PageNumberField
                             value={getTransitionDurationMs}
-                            min={() => FormationKnobs.MIN_DURATION_MS}
-                            max={() => FormationKnobs.MAX_DURATION_MS}
-                            step={() => FormationKnobs.DURATION_STEP_MS}
-                            width={() => FIELD_WIDTH}
+                            min={FormationKnobs.MIN_DURATION_MS}
+                            max={FormationKnobs.MAX_DURATION_MS}
+                            step={FormationKnobs.DURATION_STEP_MS}
+                            width={FIELD_WIDTH}
                             ariaLabel={"Glide duration in milliseconds"}
                             onInput={setTransitionDurationMs}
                         />
@@ -259,10 +259,10 @@ export const FormationPage = () => {
                     >
                         <PageNumberField
                             value={getTransitionDelayMs}
-                            min={() => FormationKnobs.MIN_STAGGER_MS}
-                            max={() => FormationKnobs.MAX_STAGGER_MS}
-                            step={() => FormationKnobs.STAGGER_STEP_MS}
-                            width={() => FIELD_WIDTH}
+                            min={FormationKnobs.MIN_STAGGER_MS}
+                            max={FormationKnobs.MAX_STAGGER_MS}
+                            step={FormationKnobs.STAGGER_STEP_MS}
+                            width={FIELD_WIDTH}
                             ariaLabel={"Transition delay in milliseconds"}
                             onInput={setTransitionDelayMs}
                         />

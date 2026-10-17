@@ -112,7 +112,8 @@ const MenuItemView = (props: MenuItemViewProps) => {
 
                 props.onActivate();
             }}
-            onMouseEnter={(e) => props.onHover({ x: e.clientX, y: e.clientY })}
+            onPointerMove={() => props.onHover()}
+            onPointerEnter={() => props.onEnter()}
         >
             {props.renderContent(props.flags)}
         </div>
@@ -167,7 +168,8 @@ const MenuEntry = <T,>(props: MenuEntryProps<T>) => {
                         isRegion={placement?.sector !== undefined}
                         renderContent={(itemFlags) => level.renderItem(item, itemFlags, placement)}
                         onActivate={() => props.onActivate(index)}
-                        onHover={(point) => props.onHover(index, point)}
+                        onHover={() => props.onHover(index)}
+                        onEnter={() => props.onEnter(index)}
                     />
 
                     {props.hasSubmenu && (
@@ -222,6 +224,7 @@ const MenuLevel = <T,>(props: MenuLevelProps<T>) => {
     const layoutRootRef = useRef<HTMLElement | null>(null);
 
     const typeahead = TypeaheadReactUtils.useBuffer();
+    const [openingHover] = useState(MenuUtils.createOpeningHoverGuard);
 
     const hasBackEntry = MenuUtils.getHasBackEntry(props.submenuMode, props.openerItem !== undefined);
     const isCovered = props.submenuMode === "replace" && (openValue !== undefined || isCoveredWhileClosing);
@@ -273,6 +276,13 @@ const MenuLevel = <T,>(props: MenuLevelProps<T>) => {
 
     const getItemId = (index: number) => `${props.id}-item-${index}`;
 
+    const findIndexAt = (point: Point2d) =>
+        MenuUtils.findIndexAtPoint(point, entries.length, (index) => document.getElementById(getItemId(index)));
+
+    useEffect(() => {
+        if (props.isOpen) openingHover.open(MenuUtils.getPointerPoint());
+    }, [props.isOpen, openingHover]);
+
     const activeItemId = highlightedIndex === undefined ? undefined : getItemId(highlightedIndex);
 
     const [itemsElement, setItemsElement] = useState<HTMLDivElement | null>(null);
@@ -301,7 +311,11 @@ const MenuLevel = <T,>(props: MenuLevelProps<T>) => {
             <div
                 ref={highlightFloater.ref}
                 className={FloaterStyles.floater}
-                style={{ ...highlightFloater.bounds, transitionDuration: `${floaterTransitionDurationMs}ms` }}
+                style={{
+                    ...highlightFloater.bounds,
+                    transitionDuration: `${floaterTransitionDurationMs}ms`,
+                    zIndex: MenuUtils.computeFloaterStackAt(isLaidOut, entries.length),
+                }}
             >
                 {props.renderHighlightFloater?.(highlightFloater.visibilityTarget, floaterTransitionDurationMs)}
             </div>
@@ -340,9 +354,9 @@ const MenuLevel = <T,>(props: MenuLevelProps<T>) => {
         return index;
     };
 
-    const hoverIndex = (index: number, point: Point2d) => {
+    const hoverIndex = (index: number) => {
         if (!navigable.includes(index)) return;
-        if (!MenuUtils.getIsPointerLed(MenuUtils.getPointerPoint(), point)) return;
+        if (!openingHover.getIsHoverable(index, findIndexAt)) return;
 
         const value = entries[index].value;
 
@@ -450,12 +464,17 @@ const MenuLevel = <T,>(props: MenuLevelProps<T>) => {
                 rootExtent={rootExtent}
                 onActivate={activateIndex}
                 onHover={hoverIndex}
+                onEnter={(index) => openingHover.enter(index, MenuUtils.getPointerPoint())}
                 onSubmenuClose={() => setOpenValue(undefined)}
             />
         );
 
         return placement ? (
-            <PlacementItem key={index} placement={placement} stackAt={index + 1}>
+            <PlacementItem
+                key={index}
+                placement={placement}
+                stackAt={MenuUtils.computeStackAt(index, highlightedIndex, entries.length)}
+            >
                 {element}
             </PlacementItem>
         ) : (

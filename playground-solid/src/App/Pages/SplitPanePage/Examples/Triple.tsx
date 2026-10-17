@@ -14,7 +14,7 @@ export const TripleExample = (props: Props) => {
     return (
         <PageSplitPaneFrame>
             <SplitPane
-                panes={() => TRIPLE}
+                panes={TRIPLE}
                 ratios={props.ratios}
                 gutterSize={props.gutterSize}
                 isDisabled={props.isDisabled}

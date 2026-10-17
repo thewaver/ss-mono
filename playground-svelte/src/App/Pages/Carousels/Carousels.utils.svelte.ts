@@ -9,6 +9,7 @@ import type { CarouselsControls } from "./Carousels.types";
 export const createCarouselsControls = (): CarouselsControls => {
     let slideCount = $state(CarouselKnobs.STARTING_SLIDE_COUNT);
     let delay = $state(CarouselKnobs.STARTING_DELAY_MS);
+    let transitionDuration = $state(CAROUSEL_DEFAULTS.transitionDurationMs);
     let orientation = $state<CarouselOrientation>(CAROUSEL_DEFAULTS.orientation);
     let isDisabled = $state(CarouselKnobs.STARTING_IS_DISABLED);
     let isLooping = $state(CAROUSEL_DEFAULTS.isLooping);
@@ -24,6 +25,7 @@ export const createCarouselsControls = (): CarouselsControls => {
         slides,
         isDisabled,
         orientation,
+        transitionDurationMs: transitionDuration,
         frameClasses: styles.slideFrames[PLACEMENT_FRAMES[placement] ?? "whole"][orientation],
         placement: placementRule,
     });
@@ -40,6 +42,12 @@ export const createCarouselsControls = (): CarouselsControls => {
         },
         set delay(value) {
             delay = value;
+        },
+        get transitionDuration() {
+            return transitionDuration;
+        },
+        set transitionDuration(value) {
+            transitionDuration = value;
         },
         get orientation() {
             return orientation;
@@ -64,9 +72,6 @@ export const createCarouselsControls = (): CarouselsControls => {
         },
         set placement(value) {
             placement = value;
-        },
-        get slides() {
-            return slides;
         },
         get sharedProps() {
             return sharedProps;

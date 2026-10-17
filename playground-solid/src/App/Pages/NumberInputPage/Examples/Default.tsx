@@ -18,11 +18,11 @@ type Props = NumberInputExampleProps;
 export const DefaultExample = (props: Props) => (
     <NumberInput
         value={props.value}
-        padding={() => FIELD_STEPPER_PADDING}
-        gap={() => FIELD_GAP}
+        padding={FIELD_STEPPER_PADDING}
+        gap={FIELD_GAP}
         ariaLabel={"How many"}
         computeTextStyle={computePageTextFieldTextStyle}
-        renderContent={(getFlags) => <PageTextFieldContent flags={getFlags} width={() => FIELD_WIDTH} />}
+        renderContent={(getFlags) => <PageTextFieldContent flags={getFlags} width={FIELD_WIDTH} />}
         renderPlaceholder={(getFlags) => <PageTextFieldPlaceholder flags={getFlags}>How many</PageTextFieldPlaceholder>}
         renderTrailing={(getFlags, stepper) => <PageNumberInputStepper flags={getFlags} stepper={stepper} />}
     />

@@ -50,7 +50,7 @@ export const GuideExample = (props: Props) => {
 
             <SpotlightGuide
                 elementRef={() => stepRefs[access(props.step)]}
-                padding={() => PADDING}
+                padding={PADDING}
                 ariaLabel={"Product tour"}
                 announcement={() =>
                     `Step ${access(props.step) + 1} of ${TOUR_STEPS.length}. ${TOUR_STEPS[access(props.step)].title}.`

@@ -156,7 +156,7 @@ export const PagePaginatorDialGap = (props: PaginatorDialGapContentProps) => {
     return (
         <Show when={access(props.placement)}>
             {(getPlacement) => (
-                <PagePaginatorWedge placement={getPlacement} isDisabled={() => true}>
+                <PagePaginatorWedge placement={getPlacement} isDisabled={true}>
                     <span title={`Pages ${access(props.entry).from} to ${access(props.entry).to}`}>{GAP_MARK}</span>
                 </PagePaginatorWedge>
             )}

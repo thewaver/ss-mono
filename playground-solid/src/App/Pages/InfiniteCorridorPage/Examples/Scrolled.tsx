@@ -57,10 +57,10 @@ export const ScrolledExample = (props: Props) => {
                 >
                     <PageNumberField
                         value={getScrollLength}
-                        min={() => InfiniteCorridorKnobs.MIN_SCROLL_LENGTH}
-                        max={() => InfiniteCorridorKnobs.MAX_SCROLL_LENGTH}
-                        step={() => InfiniteCorridorKnobs.SCROLL_LENGTH_STEP}
-                        width={() => FIELD_WIDTH}
+                        min={InfiniteCorridorKnobs.MIN_SCROLL_LENGTH}
+                        max={InfiniteCorridorKnobs.MAX_SCROLL_LENGTH}
+                        step={InfiniteCorridorKnobs.SCROLL_LENGTH_STEP}
+                        width={FIELD_WIDTH}
                         ariaLabel={"Scroll length in box heights"}
                         onInput={setScrollLength}
                     />

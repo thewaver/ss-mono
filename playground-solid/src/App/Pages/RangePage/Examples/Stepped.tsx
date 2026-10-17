@@ -14,10 +14,10 @@ export const SteppedExample = (props: Props) => (
     <Range
         value={props.value}
         ariaLabel={"Difficulty"}
-        min={() => MIN}
-        max={() => MAX}
-        step={() => STEP}
-        thumbSize={() => RANGE_THUMB_SIZE}
+        min={MIN}
+        max={MAX}
+        step={STEP}
+        thumbSize={RANGE_THUMB_SIZE}
         renderContent={(getRenderProps) => <PageRangeContent renderProps={getRenderProps} />}
     />
 );

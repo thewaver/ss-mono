@@ -20,13 +20,13 @@ type Props = TextInputExampleProps;
 export const NumberFieldExample = (props: Props) => (
     <TextInput
         value={props.value}
-        padding={() => FIELD_PADDING}
-        gap={() => FIELD_GAP}
+        padding={FIELD_PADDING}
+        gap={FIELD_GAP}
         type={"number"}
         ariaLabel={"Quantity"}
-        min={() => QUANTITY_MIN}
-        max={() => QUANTITY_MAX}
-        step={() => QUANTITY_STEP}
+        min={QUANTITY_MIN}
+        max={QUANTITY_MAX}
+        step={QUANTITY_STEP}
         computeTextStyle={computePageTextFieldTextStyle}
         renderContent={(getFlags) => <PageTextFieldContent flags={getFlags} />}
     />

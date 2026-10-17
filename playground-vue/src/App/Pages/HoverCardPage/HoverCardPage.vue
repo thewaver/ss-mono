@@ -14,7 +14,6 @@ import PageExamples from "../../PageComponents/Examples/PageExamples.vue";
 import PageNumberField from "../../PageComponents/Field/PageNumberField.vue";
 import PageProp from "../../PageComponents/Prop/Prop.vue";
 import PagePropsPanel from "../../PageComponents/PropsPanel/PagePropsPanel.vue";
-import NavigationMenuExample from "./Examples/NavigationMenu.vue";
 import ProfileExample from "./Examples/Profile.vue";
 
 const offsetY = shallowRef(HoverCardKnobs.STARTING_OFFSET_Y);
@@ -25,7 +24,6 @@ const skipDelayWindowMs = shallowRef(HOVER_CARD_DEFAULTS.skipDelayWindowMs);
 
 const visibility = shallowRef(false);
 const following = shallowRef(false);
-const openKey = shallowRef<string | undefined>();
 
 const offset = computed(() => ({ x: 0, y: offsetY.value }));
 
@@ -36,13 +34,6 @@ const examples: ExampleDefs[] = [
         readout: () =>
             `open: ${visibility.value}, following: ${following.value} — rest on the name, or tab to it and wait, then Tab again to reach the button and the link; Escape brings focus back to the name`,
         path: `${EXAMPLES_ROOT}/Profile.vue`,
-    },
-    {
-        key: "navigation",
-        name: EXAMPLE_NAMES.navigation,
-        readout: () =>
-            `open: ${openKey.value ?? "none"} — each flyout is a popup trigger over a popover, opened by a press or by resting on it through the same hover engine; only one is open at a time`,
-        path: `${EXAMPLES_ROOT}/NavigationMenu.vue`,
     },
 ];
 </script>
@@ -96,7 +87,7 @@ const examples: ExampleDefs[] = [
         <PageProp
             item-key="hoverShowDelayMs"
             label="Hover delay (ms)"
-            hint="How long the pointer has to rest on the anchor before the card or a flyout opens. Leave before then and nothing opens."
+            hint="How long the pointer has to rest on the anchor before the card opens. Leave before then and nothing opens."
         >
             <PageNumberField
                 :value="hoverShowDelayMs"
@@ -112,7 +103,7 @@ const examples: ExampleDefs[] = [
         <PageProp
             item-key="skipDelayWindowMs"
             label="Skip window (ms)"
-            hint="How soon after one closes a hover opens the next at once. Open one flyout, then move to the other."
+            hint="How soon after a card has closed a hover opens one again at once, without waiting out the hover delay."
         >
             <PageNumberField
                 :value="skipDelayWindowMs"
@@ -134,14 +125,6 @@ const examples: ExampleDefs[] = [
                 :offset="offset"
                 :transition-duration-ms="transitionDurationMs"
                 :focus-show-delay-ms="focusShowDelayMs"
-                :hover-show-delay-ms="hoverShowDelayMs"
-                :skip-delay-window-ms="skipDelayWindowMs"
-            />
-        </template>
-
-        <template #navigation>
-            <NavigationMenuExample
-                v-model:openKey="openKey"
                 :hover-show-delay-ms="hoverShowDelayMs"
                 :skip-delay-window-ms="skipDelayWindowMs"
             />

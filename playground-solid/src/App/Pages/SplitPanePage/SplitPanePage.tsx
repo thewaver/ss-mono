@@ -128,10 +128,10 @@ export const SplitPanePage = () => {
                 >
                     <PageNumberField
                         value={getGutterSize}
-                        min={() => SplitPaneKnobs.MIN_GUTTER}
-                        max={() => SplitPaneKnobs.MAX_GUTTER}
-                        step={() => SplitPaneKnobs.GUTTER_STEP}
-                        width={() => GUTTER_FIELD_WIDTH}
+                        min={SplitPaneKnobs.MIN_GUTTER}
+                        max={SplitPaneKnobs.MAX_GUTTER}
+                        step={SplitPaneKnobs.GUTTER_STEP}
+                        width={GUTTER_FIELD_WIDTH}
                         ariaLabel={"Gutter size in pixels"}
                         onInput={setGutterSize}
                     />

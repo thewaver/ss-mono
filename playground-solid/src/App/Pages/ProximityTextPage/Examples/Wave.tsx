@@ -46,7 +46,7 @@ export const WaveExample = (props: Props) => {
 
     return (
         <div class={styles.stack}>
-            <PageMeasureBox width={() => ProximityTextKnobs.BOX_WIDTH} padding={() => MEASURE_BOX_PADDING}>
+            <PageMeasureBox width={ProximityTextKnobs.BOX_WIDTH} padding={MEASURE_BOX_PADDING}>
                 <div class={styles.variableText}>
                     <ProximityText
                         reachPx={props.reachPx}

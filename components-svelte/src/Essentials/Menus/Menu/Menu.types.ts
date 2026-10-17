@@ -84,8 +84,10 @@ export type MenuItemViewProps = InteractionControlProps<MenuItemFlags> & {
     isRegion: boolean;
     /** Runs when this item is picked. */
     onActivate: () => void;
-    /** Runs when the pointer moves onto this item, which is what opens a submenu on hover. */
-    onHover: (point: Point2d) => void;
+    /** Runs when the pointer moves over this item, which is what opens a submenu on hover. */
+    onHover: () => void;
+    /** Runs when the pointer enters this item. */
+    onEnter: () => void;
 };
 
 export type MenuRenderItem<T> = Snippet<
@@ -227,8 +229,10 @@ export type MenuEntryProps<T> = {
     rootExtent: number;
     /** Runs when the entry is picked. */
     onActivate: (index: number) => void;
-    /** Runs when the pointer moves onto the entry, with where it arrived. */
-    onHover: (index: number, point: Point2d) => void;
+    /** Runs when the pointer moves over the entry. */
+    onHover: (index: number) => void;
+    /** Runs when the pointer enters the entry. */
+    onEnter: (index: number) => void;
     /** Runs when the entry's submenu closes in the ordinary way. */
     onSubmenuClose: () => void;
     /**

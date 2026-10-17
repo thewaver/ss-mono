@@ -13,7 +13,7 @@ export const LinkedExample = (props: Props) => {
     return (
         <Breadcrumbs
             crumbs={props.crumbs}
-            gap={() => BREADCRUMBS_GAP}
+            gap={BREADCRUMBS_GAP}
             ariaLabel={"Linked trail"}
             onSelect={props.onSelect}
             renderCrumb={(getCrumb, getFlags) => (

@@ -19,7 +19,7 @@ export const DrivenExample = (props: Props) => {
                 renderHighlightFloater={renderPageHighlightFloater}
                 visibility={props.visibility}
                 anchorRef={getAnchorRef}
-                items={() => ACTIONS}
+                items={ACTIONS}
                 ariaLabel={"Edit actions"}
                 renderContent={(getFlags) => <PageMenuTriggerContent flags={getFlags}>Edit</PageMenuTriggerContent>}
                 renderItem={renderMenuItem}

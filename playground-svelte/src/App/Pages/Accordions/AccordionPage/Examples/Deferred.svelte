@@ -6,8 +6,6 @@
     import type { AccordionDeferredExampleProps } from "../../Accordions.types";
     import DeferredPanel from "./DeferredPanel.svelte";
 
-    const GAP = 5;
-
     const ITEMS: AccordionItem<string>[] = [{ value: "Shipping" }, { value: "Returns" }, { value: "Warranty" }];
 
     type Props = AccordionDeferredExampleProps;
@@ -15,7 +13,7 @@
     let { expanded = $bindable([]), ...props }: Props = $props();
 </script>
 
-<Accordion items={ITEMS} bind:expanded isPanelBuiltOnExpand={true} gap={GAP}>
+<Accordion items={ITEMS} bind:expanded isPanelBuiltOnExpand={true} gap={props.gap} transitionDurationMs={props.transitionDurationMs}>
     {#snippet renderHeader(item, flags)}
         <PageAccordionHeader {flags}>{item.value}</PageAccordionHeader>
     {/snippet}

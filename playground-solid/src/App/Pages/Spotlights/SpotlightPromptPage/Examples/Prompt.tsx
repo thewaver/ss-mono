@@ -35,7 +35,7 @@ export const PromptExample = (props: Props) => {
 
             <SpotlightPrompt
                 elementRef={getAnchorRef}
-                padding={() => PADDING}
+                padding={PADDING}
                 visibility={props.visibility}
                 renderHighlight={renderHighlight}
                 renderOverlay={renderOverlay}

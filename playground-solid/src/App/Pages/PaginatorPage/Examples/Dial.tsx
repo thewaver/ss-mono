@@ -37,7 +37,7 @@ export const DialExample = (props: Props) => {
                         ariaLabel={"Results round a dial"}
                         computePageLabel={computePaginatorPageLabel}
                         computeStepLabel={computePaginatorStepLabel}
-                        steps={() => DIAL_STEPS}
+                        steps={DIAL_STEPS}
                         computeLayout={DIAL_LAYOUT}
                         onPageChange={props.onPageChange}
                         renderPage={(_getEntry, getRenderProps) => (

@@ -27,7 +27,7 @@ export const DefaultExample = (props: Props) => {
         <PageClockFrame>
             <Clock
                 value={props.value}
-                locale={() => LOCALE}
+                locale={LOCALE}
                 ariaLabel={props.ariaLabel}
                 isTwelveHour={props.isTwelveHour}
                 hasSeconds={props.hasSeconds}

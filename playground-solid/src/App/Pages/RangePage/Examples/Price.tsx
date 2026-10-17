@@ -18,10 +18,10 @@ export const PriceExample = (props: Props) => (
         id={"price"}
         ariaLabel={"Price range"}
         thumbLabels={() => ["Lowest price", "Highest price"]}
-        min={() => MIN}
-        max={() => MAX}
-        step={() => STEP}
-        thumbSize={() => RANGE_THUMB_SIZE}
+        min={MIN}
+        max={MAX}
+        step={STEP}
+        thumbSize={RANGE_THUMB_SIZE}
         computeValueText={(value) => PRICE_FORMAT.format(value)}
         renderContent={(getRenderProps) => <PageRangeContent renderProps={getRenderProps} />}
         onChangeEnd={props.onChangeEnd}

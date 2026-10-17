@@ -6,8 +6,6 @@
     import PageAccordionPanel from "../../../../StyledComponents/AccordionContent/PageAccordionPanel.svelte";
     import type { AccordionExampleProps } from "../../Accordions.types";
 
-    const GAP = 5;
-
     const SECTION_BODIES: Record<string, string[]> = {
         Shipping: ["Orders leave the warehouse within two working days.", "Tracking arrives by email."],
         Returns: ["Thirty days, unopened, receipt or order number."],
@@ -35,7 +33,8 @@
     bind:expanded
     isSingleExpand={props.isSingleExpand}
     isExpandRequired={props.isExpandRequired}
-    gap={GAP}
+    gap={props.gap}
+    transitionDurationMs={props.transitionDurationMs}
 >
     {#snippet renderHeader(item, flags)}
         <PageAccordionHeader {flags}>{item.value}</PageAccordionHeader>

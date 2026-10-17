@@ -37,7 +37,7 @@ export const LeaningExample = (props: Props) => {
     return (
         <Tree
             renderHighlightFloater={renderPageHighlightFloater}
-            nodes={() => FILES}
+            nodes={FILES}
             value={props.value}
             expanded={props.expanded}
             ariaLabel={"Leaning repository"}

@@ -8,8 +8,6 @@ import PageAccordionHeader from "../../../../StyledComponents/AccordionContent/P
 import type { AccordionDeferredExampleProps } from "../../Accordions.types";
 import DeferredPanel from "./DeferredPanel.vue";
 
-const GAP = 5;
-
 const ITEMS: AccordionItem<string>[] = [{ value: "Shipping" }, { value: "Returns" }, { value: "Warranty" }];
 
 type Props = AccordionDeferredExampleProps;
@@ -20,7 +18,13 @@ const expanded = useModel(props, "expanded");
 </script>
 
 <template>
-    <Accordion v-model:expanded="expanded" :items="ITEMS" is-panel-built-on-expand :gap="GAP">
+    <Accordion
+        v-model:expanded="expanded"
+        :items="ITEMS"
+        is-panel-built-on-expand
+        :gap="gap"
+        :transition-duration-ms="transitionDurationMs"
+    >
         <template #renderHeader="{ item, flags }">
             <PageAccordionHeader :flags="flags">{{ item.value }}</PageAccordionHeader>
         </template>

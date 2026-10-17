@@ -14,7 +14,7 @@ export const GroupedExample = (props: Props) => (
         <MultiListbox
             renderHighlightFloater={renderPageHighlightFloater}
             values={props.values}
-            options={() => GROUPED_COUNTRIES}
+            options={GROUPED_COUNTRIES}
             ariaLabel={"Countries to ship to"}
             renderGroup={(getGroup, getFlags) => (
                 <PageSelectGroupContent flags={getFlags}>{getGroup().label}</PageSelectGroupContent>

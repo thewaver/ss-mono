@@ -14,15 +14,15 @@ type Props = RangeCalendarExampleProps;
 export const BoundedExample = (props: Props) => {
     return (
         <PageCalendarFrame>
-            <PageCalendarCaption month={props.month} key={"bounded"} locale={() => LOCALE} />
+            <PageCalendarCaption month={props.month} key={"bounded"} locale={LOCALE} />
 
             <RangeCalendar
                 value={props.value}
                 month={props.month}
-                today={() => TODAY}
-                locale={() => LOCALE}
-                minValue={() => MIN_DATE}
-                maxValue={() => MAX_DATE}
+                today={TODAY}
+                locale={LOCALE}
+                minValue={MIN_DATE}
+                maxValue={MAX_DATE}
                 weekStartsOn={props.weekStartsOn}
                 ariaLabel={"Choose a date range within the bounds"}
                 renderDay={(_unused, getRenderProps) => <PageCalendarDay renderProps={getRenderProps} />}

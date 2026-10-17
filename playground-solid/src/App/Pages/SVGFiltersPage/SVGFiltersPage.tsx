@@ -39,9 +39,9 @@ const BlurExampleWrapper = (props: SVGFiltersExampleProps) => {
                 >
                     <PageNumberField
                         value={getStdDeviation}
-                        min={() => SVGFilterKnobs.Blur.MIN_DEVIATION}
-                        max={() => SVGFilterKnobs.Blur.MAX_DEVIATION}
-                        step={() => SVGFilterKnobs.Blur.DEVIATION_STEP}
+                        min={SVGFilterKnobs.Blur.MIN_DEVIATION}
+                        max={SVGFilterKnobs.Blur.MAX_DEVIATION}
+                        step={SVGFilterKnobs.Blur.DEVIATION_STEP}
                         ariaLabel={"Standard deviation"}
                         onInput={setStdDeviation}
                     />
@@ -77,8 +77,8 @@ const DropShadowExampleWrapper = (props: SVGFiltersExampleProps) => {
                 >
                     <PageNumberField
                         value={getDx}
-                        min={() => SVGFilterKnobs.DropShadow.MIN_OFFSET}
-                        max={() => SVGFilterKnobs.DropShadow.MAX_OFFSET}
+                        min={SVGFilterKnobs.DropShadow.MIN_OFFSET}
+                        max={SVGFilterKnobs.DropShadow.MAX_OFFSET}
                         ariaLabel={"Offset x"}
                         onInput={setDx}
                     />
@@ -91,8 +91,8 @@ const DropShadowExampleWrapper = (props: SVGFiltersExampleProps) => {
                 >
                     <PageNumberField
                         value={getDy}
-                        min={() => SVGFilterKnobs.DropShadow.MIN_OFFSET}
-                        max={() => SVGFilterKnobs.DropShadow.MAX_OFFSET}
+                        min={SVGFilterKnobs.DropShadow.MIN_OFFSET}
+                        max={SVGFilterKnobs.DropShadow.MAX_OFFSET}
                         ariaLabel={"Offset y"}
                         onInput={setDy}
                     />
@@ -105,9 +105,9 @@ const DropShadowExampleWrapper = (props: SVGFiltersExampleProps) => {
                 >
                     <PageNumberField
                         value={getStdDeviation}
-                        min={() => SVGFilterKnobs.DropShadow.MIN_DEVIATION}
-                        max={() => SVGFilterKnobs.DropShadow.MAX_DEVIATION}
-                        step={() => SVGFilterKnobs.DropShadow.DEVIATION_STEP}
+                        min={SVGFilterKnobs.DropShadow.MIN_DEVIATION}
+                        max={SVGFilterKnobs.DropShadow.MAX_DEVIATION}
+                        step={SVGFilterKnobs.DropShadow.DEVIATION_STEP}
                         ariaLabel={"Shadow standard deviation"}
                         onInput={setStdDeviation}
                     />
@@ -124,9 +124,9 @@ const DropShadowExampleWrapper = (props: SVGFiltersExampleProps) => {
                 >
                     <PageNumberField
                         value={getFloodOpacity}
-                        min={() => SVGFilterKnobs.DropShadow.MIN_OPACITY}
-                        max={() => SVGFilterKnobs.DropShadow.MAX_OPACITY}
-                        step={() => SVGFilterKnobs.DropShadow.OPACITY_STEP}
+                        min={SVGFilterKnobs.DropShadow.MIN_OPACITY}
+                        max={SVGFilterKnobs.DropShadow.MAX_OPACITY}
+                        step={SVGFilterKnobs.DropShadow.OPACITY_STEP}
                         ariaLabel={"Flood opacity"}
                         onInput={setFloodOpacity}
                     />
@@ -175,7 +175,7 @@ const TurbulenceExampleWrapper = (props: SVGFiltersExampleProps) => {
                 >
                     <PageSelectField
                         value={getType}
-                        values={() => SVGFilterDefs.TURBULENCE_TYPES}
+                        values={SVGFilterDefs.TURBULENCE_TYPES}
                         ariaLabel={"Type"}
                         onChange={(type) => setType(() => type)}
                     />
@@ -188,9 +188,9 @@ const TurbulenceExampleWrapper = (props: SVGFiltersExampleProps) => {
                 >
                     <PageNumberField
                         value={getFrequencyX}
-                        min={() => SVGFilterKnobs.Turbulence.MIN_FREQUENCY}
-                        max={() => SVGFilterKnobs.Turbulence.MAX_FREQUENCY}
-                        step={() => SVGFilterKnobs.Turbulence.FREQUENCY_STEP}
+                        min={SVGFilterKnobs.Turbulence.MIN_FREQUENCY}
+                        max={SVGFilterKnobs.Turbulence.MAX_FREQUENCY}
+                        step={SVGFilterKnobs.Turbulence.FREQUENCY_STEP}
                         ariaLabel={"Base frequency x"}
                         onInput={setFrequencyX}
                     />
@@ -203,9 +203,9 @@ const TurbulenceExampleWrapper = (props: SVGFiltersExampleProps) => {
                 >
                     <PageNumberField
                         value={getFrequencyY}
-                        min={() => SVGFilterKnobs.Turbulence.MIN_FREQUENCY}
-                        max={() => SVGFilterKnobs.Turbulence.MAX_FREQUENCY}
-                        step={() => SVGFilterKnobs.Turbulence.FREQUENCY_STEP}
+                        min={SVGFilterKnobs.Turbulence.MIN_FREQUENCY}
+                        max={SVGFilterKnobs.Turbulence.MAX_FREQUENCY}
+                        step={SVGFilterKnobs.Turbulence.FREQUENCY_STEP}
                         ariaLabel={"Base frequency y"}
                         onInput={setFrequencyY}
                     />
@@ -218,8 +218,8 @@ const TurbulenceExampleWrapper = (props: SVGFiltersExampleProps) => {
                 >
                     <PageNumberField
                         value={getScale}
-                        min={() => SVGFilterKnobs.Turbulence.MIN_SCALE}
-                        max={() => SVGFilterKnobs.Turbulence.MAX_SCALE}
+                        min={SVGFilterKnobs.Turbulence.MIN_SCALE}
+                        max={SVGFilterKnobs.Turbulence.MAX_SCALE}
                         ariaLabel={"Scale"}
                         onInput={setScale}
                     />
@@ -232,8 +232,8 @@ const TurbulenceExampleWrapper = (props: SVGFiltersExampleProps) => {
                 >
                     <PageNumberField
                         value={getOctaves}
-                        min={() => SVGFilterKnobs.Turbulence.MIN_OCTAVES}
-                        max={() => SVGFilterKnobs.Turbulence.MAX_OCTAVES}
+                        min={SVGFilterKnobs.Turbulence.MIN_OCTAVES}
+                        max={SVGFilterKnobs.Turbulence.MAX_OCTAVES}
                         ariaLabel={"Octaves"}
                         onInput={setOctaves}
                     />
@@ -248,8 +248,8 @@ const TurbulenceExampleWrapper = (props: SVGFiltersExampleProps) => {
                 >
                     <PageNumberField
                         value={getSeed}
-                        min={() => SVGFilterKnobs.Turbulence.MIN_SEED}
-                        max={() => SVGFilterKnobs.Turbulence.MAX_SEED}
+                        min={SVGFilterKnobs.Turbulence.MIN_SEED}
+                        max={SVGFilterKnobs.Turbulence.MAX_SEED}
                         ariaLabel={"Seed"}
                         onInput={setSeed}
                     />
@@ -262,7 +262,7 @@ const TurbulenceExampleWrapper = (props: SVGFiltersExampleProps) => {
                 >
                     <PageSelectField
                         value={getXChannel}
-                        values={() => SVGFilterDefs.DISPLACEMENT_CHANNELS}
+                        values={SVGFilterDefs.DISPLACEMENT_CHANNELS}
                         ariaLabel={"X channel"}
                         onChange={(channel) => setXChannel(() => channel)}
                     />
@@ -275,7 +275,7 @@ const TurbulenceExampleWrapper = (props: SVGFiltersExampleProps) => {
                 >
                     <PageSelectField
                         value={getYChannel}
-                        values={() => SVGFilterDefs.DISPLACEMENT_CHANNELS}
+                        values={SVGFilterDefs.DISPLACEMENT_CHANNELS}
                         ariaLabel={"Y channel"}
                         onChange={(channel) => setYChannel(() => channel)}
                     />
@@ -304,9 +304,9 @@ const HueExampleWrapper = (props: SVGFiltersExampleProps) => {
                 >
                     <PageNumberField
                         value={getDeg}
-                        min={() => SVGFilterKnobs.Hue.MIN_DEG}
-                        max={() => SVGFilterKnobs.Hue.MAX_DEG}
-                        step={() => SVGFilterKnobs.Hue.DEG_STEP}
+                        min={SVGFilterKnobs.Hue.MIN_DEG}
+                        max={SVGFilterKnobs.Hue.MAX_DEG}
+                        step={SVGFilterKnobs.Hue.DEG_STEP}
                         ariaLabel={"Hue rotation"}
                         onInput={setDeg}
                     />
@@ -319,9 +319,9 @@ const HueExampleWrapper = (props: SVGFiltersExampleProps) => {
                 >
                     <PageNumberField
                         value={getSaturation}
-                        min={() => SVGFilterKnobs.Hue.MIN_AMOUNT}
-                        max={() => SVGFilterKnobs.Hue.MAX_AMOUNT}
-                        step={() => SVGFilterKnobs.Hue.AMOUNT_STEP}
+                        min={SVGFilterKnobs.Hue.MIN_AMOUNT}
+                        max={SVGFilterKnobs.Hue.MAX_AMOUNT}
+                        step={SVGFilterKnobs.Hue.AMOUNT_STEP}
                         ariaLabel={"Saturation"}
                         onInput={setSaturation}
                     />
@@ -336,9 +336,9 @@ const HueExampleWrapper = (props: SVGFiltersExampleProps) => {
                 >
                     <PageNumberField
                         value={getRed}
-                        min={() => SVGFilterKnobs.Hue.MIN_CHANNEL}
-                        max={() => SVGFilterKnobs.Hue.MAX_CHANNEL}
-                        step={() => SVGFilterKnobs.Hue.CHANNEL_STEP}
+                        min={SVGFilterKnobs.Hue.MIN_CHANNEL}
+                        max={SVGFilterKnobs.Hue.MAX_CHANNEL}
+                        step={SVGFilterKnobs.Hue.CHANNEL_STEP}
                         ariaLabel={"Red"}
                         onInput={setRed}
                     />
@@ -353,9 +353,9 @@ const HueExampleWrapper = (props: SVGFiltersExampleProps) => {
                 >
                     <PageNumberField
                         value={getGreen}
-                        min={() => SVGFilterKnobs.Hue.MIN_CHANNEL}
-                        max={() => SVGFilterKnobs.Hue.MAX_CHANNEL}
-                        step={() => SVGFilterKnobs.Hue.CHANNEL_STEP}
+                        min={SVGFilterKnobs.Hue.MIN_CHANNEL}
+                        max={SVGFilterKnobs.Hue.MAX_CHANNEL}
+                        step={SVGFilterKnobs.Hue.CHANNEL_STEP}
                         ariaLabel={"Green"}
                         onInput={setGreen}
                     />
@@ -370,9 +370,9 @@ const HueExampleWrapper = (props: SVGFiltersExampleProps) => {
                 >
                     <PageNumberField
                         value={getBlue}
-                        min={() => SVGFilterKnobs.Hue.MIN_CHANNEL}
-                        max={() => SVGFilterKnobs.Hue.MAX_CHANNEL}
-                        step={() => SVGFilterKnobs.Hue.CHANNEL_STEP}
+                        min={SVGFilterKnobs.Hue.MIN_CHANNEL}
+                        max={SVGFilterKnobs.Hue.MAX_CHANNEL}
+                        step={SVGFilterKnobs.Hue.CHANNEL_STEP}
                         ariaLabel={"Blue"}
                         onInput={setBlue}
                     />
@@ -399,9 +399,9 @@ const ToneExampleWrapper = (props: SVGFiltersExampleProps) => {
                 >
                     <PageNumberField
                         value={getBrightness}
-                        min={() => SVGFilterKnobs.Tone.MIN_AMOUNT}
-                        max={() => SVGFilterKnobs.Tone.MAX_AMOUNT}
-                        step={() => SVGFilterKnobs.Tone.AMOUNT_STEP}
+                        min={SVGFilterKnobs.Tone.MIN_AMOUNT}
+                        max={SVGFilterKnobs.Tone.MAX_AMOUNT}
+                        step={SVGFilterKnobs.Tone.AMOUNT_STEP}
                         ariaLabel={"Brightness"}
                         onInput={setBrightness}
                     />
@@ -414,9 +414,9 @@ const ToneExampleWrapper = (props: SVGFiltersExampleProps) => {
                 >
                     <PageNumberField
                         value={getContrast}
-                        min={() => SVGFilterKnobs.Tone.MIN_AMOUNT}
-                        max={() => SVGFilterKnobs.Tone.MAX_AMOUNT}
-                        step={() => SVGFilterKnobs.Tone.AMOUNT_STEP}
+                        min={SVGFilterKnobs.Tone.MIN_AMOUNT}
+                        max={SVGFilterKnobs.Tone.MAX_AMOUNT}
+                        step={SVGFilterKnobs.Tone.AMOUNT_STEP}
                         ariaLabel={"Contrast"}
                         onInput={setContrast}
                     />
@@ -429,9 +429,9 @@ const ToneExampleWrapper = (props: SVGFiltersExampleProps) => {
                 >
                     <PageNumberField
                         value={getInversion}
-                        min={() => SVGFilterKnobs.Tone.MIN_INVERSION}
-                        max={() => SVGFilterKnobs.Tone.MAX_INVERSION}
-                        step={() => SVGFilterKnobs.Tone.INVERSION_STEP}
+                        min={SVGFilterKnobs.Tone.MIN_INVERSION}
+                        max={SVGFilterKnobs.Tone.MAX_INVERSION}
+                        step={SVGFilterKnobs.Tone.INVERSION_STEP}
                         ariaLabel={"Inversion"}
                         onInput={setInversion}
                     />
@@ -458,9 +458,9 @@ const PixelateExampleWrapper = (props: SVGFiltersExampleProps) => {
                 >
                     <PageNumberField
                         value={getSize}
-                        min={() => SVGFilterKnobs.Pixelate.MIN_SIZE}
-                        max={() => SVGFilterKnobs.Pixelate.MAX_SIZE}
-                        step={() => SVGFilterKnobs.Pixelate.SIZE_STEP}
+                        min={SVGFilterKnobs.Pixelate.MIN_SIZE}
+                        max={SVGFilterKnobs.Pixelate.MAX_SIZE}
+                        step={SVGFilterKnobs.Pixelate.SIZE_STEP}
                         ariaLabel={"Square size in pixels"}
                         onInput={setSize}
                     />
@@ -547,7 +547,7 @@ export const SVGFiltersPage = () => {
                 >
                     <PageSelectField
                         value={getMethod}
-                        values={() => SVGFilterDefs.METHODS}
+                        values={SVGFilterDefs.METHODS}
                         ariaLabel={"Method"}
                         onChange={(method) => setMethod(() => method)}
                     />

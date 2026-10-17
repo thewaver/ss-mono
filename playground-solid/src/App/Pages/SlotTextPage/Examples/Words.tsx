@@ -17,7 +17,7 @@ export const WordsExample = (props: Props) => {
             letters={WORD_LETTERS}
             letterRoute={props.letterRoute}
             mechanism={props.mechanism}
-            characterSize={() => CHARACTER_SIZE}
+            characterSize={CHARACTER_SIZE}
             turnDurationMs={props.turnDurationMs}
             turnDelayMs={props.turnDelayMs}
             ariaLabel={"Destination"}

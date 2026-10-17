@@ -134,9 +134,9 @@ export const ToolbarPage = () => {
                 >
                     <PageNumberField
                         value={getBarWidth}
-                        min={() => ToolbarKnobs.MIN_BAR_WIDTH}
-                        max={() => ToolbarKnobs.MAX_BAR_WIDTH}
-                        step={() => ToolbarKnobs.BAR_WIDTH_STEP}
+                        min={ToolbarKnobs.MIN_BAR_WIDTH}
+                        max={ToolbarKnobs.MAX_BAR_WIDTH}
+                        step={ToolbarKnobs.BAR_WIDTH_STEP}
                         ariaLabel={"Bar width in pixels"}
                         onInput={setBarWidth}
                     />
@@ -145,9 +145,9 @@ export const ToolbarPage = () => {
                 <PageProp key={"gap"} label={"Gap (px)"} hint={"The space left between items on the bar."}>
                     <PageNumberField
                         value={getGap}
-                        min={() => ToolbarKnobs.MIN_GAP}
-                        max={() => ToolbarKnobs.MAX_GAP}
-                        step={() => ToolbarKnobs.GAP_STEP}
+                        min={ToolbarKnobs.MIN_GAP}
+                        max={ToolbarKnobs.MAX_GAP}
+                        step={ToolbarKnobs.GAP_STEP}
                         ariaLabel={"Gap in pixels"}
                         onInput={setGap}
                     />

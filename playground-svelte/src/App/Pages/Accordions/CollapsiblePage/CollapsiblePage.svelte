@@ -1,13 +1,22 @@
 <script lang="ts">
+    import { COLLAPSIBLE_DEFAULTS } from "@thewaver/ss-components-svelte";
+    import { AccordionKnobs } from "@thewaver/ss-playground/App/Knobs/Accordions.const";
+
     import type { ExampleDefs } from "../../../PageComponents/Examples/Examples.types";
     import PageExamples from "../../../PageComponents/Examples/PageExamples.svelte";
+    import PageNumberField from "../../../PageComponents/Field/PageNumberField.svelte";
+    import PageProp from "../../../PageComponents/Prop/Prop.svelte";
+    import PagePropsPanel from "../../../PageComponents/PropsPanel/PagePropsPanel.svelte";
     import FilledExample from "./Examples/Filled.svelte";
     import PanelExample from "./Examples/Panel.svelte";
     import SidewaysExample from "./Examples/Sideways.svelte";
     import {
     EXAMPLE_NAMES,
     EXAMPLES_ROOT,
+    FIELD_WIDTH,
 } from "@thewaver/ss-playground/App/Pages/Accordions/CollapsiblePage/CollapsiblePage.const";
+
+    let transitionDurationMs = $state(COLLAPSIBLE_DEFAULTS.transitionDurationMs);
 
     let panelExpanded = $state(false);
     let filledExpanded = $state(false);
@@ -50,19 +59,39 @@
 </script>
 
 {#snippet panelExample()}
-    <PanelExample bind:expanded={panelExpanded} />
+    <PanelExample {transitionDurationMs} bind:expanded={panelExpanded} />
 {/snippet}
 
 {#snippet unheldExample()}
-    <PanelExample />
+    <PanelExample {transitionDurationMs} />
 {/snippet}
 
 {#snippet filledExample()}
-    <FilledExample bind:expanded={filledExpanded} />
+    <FilledExample {transitionDurationMs} bind:expanded={filledExpanded} />
 {/snippet}
 
 {#snippet sidewaysExample()}
-    <SidewaysExample bind:expanded={sidewaysExpanded} />
+    <SidewaysExample {transitionDurationMs} bind:expanded={sidewaysExpanded} />
 {/snippet}
+
+<PagePropsPanel scope={"global"}>
+    <PageProp
+        itemKey={"transitionDurationMs"}
+        label={"Transition duration (ms)"}
+        hint={"How long the panel takes to open and close. At 0 it opens and closes at once."}
+    >
+        <PageNumberField
+            value={transitionDurationMs}
+            min={AccordionKnobs.MIN_TRANSITION_MS}
+            max={AccordionKnobs.MAX_TRANSITION_MS}
+            step={AccordionKnobs.TRANSITION_STEP_MS}
+            width={FIELD_WIDTH}
+            ariaLabel={"Transition duration in milliseconds"}
+            onInput={(value) => {
+                transitionDurationMs = value;
+            }}
+        />
+    </PageProp>
+</PagePropsPanel>
 
 <PageExamples items={examples} />

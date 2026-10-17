@@ -15,7 +15,7 @@ export const RightToLeftExample = (props: Props) => {
         <div dir={"rtl"}>
             <PageSplitPaneFrame>
                 <SplitPane
-                    panes={() => RIGHT_TO_LEFT}
+                    panes={RIGHT_TO_LEFT}
                     ratios={props.ratios}
                     gutterSize={props.gutterSize}
                     isDisabled={props.isDisabled}

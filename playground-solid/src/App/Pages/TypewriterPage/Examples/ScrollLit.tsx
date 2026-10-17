@@ -29,8 +29,8 @@ export const ScrollLitExample = () => {
                     progress={[getLit, () => undefined]}
                     playback={[() => false, () => undefined]}
                     computeAnimationName={() => styles.typewriterLight}
-                    animationDelayMs={() => CHARACTER_DELAY_MS}
-                    animationDurationMs={() => CHARACTER_DURATION_MS}
+                    animationDelayMs={CHARACTER_DELAY_MS}
+                    animationDurationMs={CHARACTER_DURATION_MS}
                 >
                     {TEXT}
                 </Typewriter>

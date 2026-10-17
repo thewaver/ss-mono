@@ -1,6 +1,12 @@
 <script lang="ts">
+    import { COLLAPSIBLE_DEFAULTS } from "@thewaver/ss-components-svelte";
+    import { AccordionKnobs } from "@thewaver/ss-playground/App/Knobs/Accordions.const";
+
     import type { ExampleDefs } from "../../../PageComponents/Examples/Examples.types";
     import PageExamples from "../../../PageComponents/Examples/PageExamples.svelte";
+    import PageNumberField from "../../../PageComponents/Field/PageNumberField.svelte";
+    import PageProp from "../../../PageComponents/Prop/Prop.svelte";
+    import PagePropsPanel from "../../../PageComponents/PropsPanel/PagePropsPanel.svelte";
     import DeferredExample from "./Examples/Deferred.svelte";
     import GrowingExample from "./Examples/Growing.svelte";
     import RowExample from "./Examples/Row.svelte";
@@ -9,8 +15,12 @@
     import {
     EXAMPLE_NAMES,
     EXAMPLES_ROOT,
+    FIELD_WIDTH,
     STARTING_EXTRA_LINES,
 } from "@thewaver/ss-playground/App/Pages/Accordions/AccordionPage/AccordionPage.const";
+
+    let gap = $state(AccordionKnobs.STARTING_GAP);
+    let transitionDurationMs = $state(COLLAPSIBLE_DEFAULTS.transitionDurationMs);
 
     let multiExpanded = $state.raw<string[]>(["Shipping"]);
     let singleExpanded = $state.raw<string[]>([]);
@@ -90,33 +100,36 @@
 </script>
 
 {#snippet multiExample()}
-    <SectionsExample bind:expanded={multiExpanded} />
+    <SectionsExample {gap} {transitionDurationMs} bind:expanded={multiExpanded} />
 {/snippet}
 
 {#snippet unheldExample()}
-    <SectionsExample />
+    <SectionsExample {gap} {transitionDurationMs} />
 {/snippet}
 
 {#snippet singleExample()}
-    <SectionsExample bind:expanded={singleExpanded} isSingleExpand={true} />
+    <SectionsExample {gap} {transitionDurationMs} bind:expanded={singleExpanded} isSingleExpand={true} />
 {/snippet}
 
 {#snippet requiredExample()}
-    <SectionsExample bind:expanded={requiredExpanded} isSingleExpand={true} isExpandRequired={true} />
+    <SectionsExample {gap} {transitionDurationMs} bind:expanded={requiredExpanded} isSingleExpand={true} isExpandRequired={true} />
 {/snippet}
 
 {#snippet growingExample()}
-    <GrowingExample
+    <GrowingExample {gap} {transitionDurationMs}
         bind:expanded={growingExpanded}
         {extraLines}
         onAddLine={() => {
             extraLines += 1;
         }}
+        onClearLines={() => {
+            extraLines = STARTING_EXTRA_LINES;
+        }}
     />
 {/snippet}
 
 {#snippet deferredExample()}
-    <DeferredExample
+    <DeferredExample {gap} {transitionDurationMs}
         bind:expanded={deferredExpanded}
         onBuild={(value) => {
             built = built.includes(value) ? built : [...built, value];
@@ -125,11 +138,45 @@
 {/snippet}
 
 {#snippet scrolledExample()}
-    <ScrolledExample bind:expanded={scrolledExpanded} />
+    <ScrolledExample {gap} {transitionDurationMs} bind:expanded={scrolledExpanded} />
 {/snippet}
 
 {#snippet rowExample()}
-    <RowExample bind:expanded={rowExpanded} />
+    <RowExample {gap} {transitionDurationMs} bind:expanded={rowExpanded} />
 {/snippet}
+
+<PagePropsPanel scope={"global"}>
+    <PageProp itemKey={"gap"} label={"Gap (px)"} hint={"The space between sections."}>
+        <PageNumberField
+            value={gap}
+            min={AccordionKnobs.MIN_GAP}
+            max={AccordionKnobs.MAX_GAP}
+            step={AccordionKnobs.GAP_STEP}
+            width={FIELD_WIDTH}
+            ariaLabel={"Gap in pixels"}
+            onInput={(value) => {
+                gap = value;
+            }}
+        />
+    </PageProp>
+
+    <PageProp
+        itemKey={"transitionDurationMs"}
+        label={"Transition duration (ms)"}
+        hint={"How long a section takes to open and close. At 0 it opens and closes at once."}
+    >
+        <PageNumberField
+            value={transitionDurationMs}
+            min={AccordionKnobs.MIN_TRANSITION_MS}
+            max={AccordionKnobs.MAX_TRANSITION_MS}
+            step={AccordionKnobs.TRANSITION_STEP_MS}
+            width={FIELD_WIDTH}
+            ariaLabel={"Transition duration in milliseconds"}
+            onInput={(value) => {
+                transitionDurationMs = value;
+            }}
+        />
+    </PageProp>
+</PagePropsPanel>
 
 <PageExamples items={examples} />

@@ -1,17 +1,13 @@
 <script lang="ts">
-    import { CarouselKnobs } from "@thewaver/ss-playground/App/Knobs/Carousels.const";
-
     import type { ExampleDefs } from "../../../PageComponents/Examples/Examples.types";
     import PageExamples from "../../../PageComponents/Examples/PageExamples.svelte";
     import PageCarouselBox from "../../../StyledComponents/CarouselContent/PageCarouselBox.svelte";
     import { createCarouselsControls } from "../Carousels.utils.svelte";
     import PageCarouselsPanel from "../CarouselsPanel.svelte";
     import NoControlsExample from "./Examples/NoControls.svelte";
-    import RingExample from "./Examples/Ring.svelte";
     import RotatingExample from "./Examples/Rotating.svelte";
     import ScrolledExample from "./Examples/Scrolled.svelte";
     import SteppedExample from "./Examples/Stepped.svelte";
-    import WordDrumExample from "./Examples/WordDrum.svelte";
     import {
     EXAMPLE_NAMES,
     EXAMPLES_ROOT,
@@ -24,8 +20,6 @@
     let rotatingPlaying = $state(true);
     let barelessIndex = $state(0);
     let scrolledIndex = $state(0);
-    let ringIndex = $state(0);
-    let wordDrumIndex = $state(0);
 
     const isLooping = $derived(controls.isLooping);
 
@@ -47,14 +41,6 @@
             path: `${EXAMPLES_ROOT}/Rotating.svelte`,
         },
         {
-            key: "noControls",
-            name: EXAMPLE_NAMES.noControls,
-            readout: () =>
-                `slide ${barelessIndex + 1} of ${controls.slideCount} — nothing is drawn beside the slides, so the surrounding page owns the buttons through the signal it shares`,
-            component: noControlsExample,
-            path: `${EXAMPLES_ROOT}/NoControls.svelte`,
-        },
-        {
             key: "scrolled",
             name: EXAMPLE_NAMES.scrolled,
             readout: () =>
@@ -63,20 +49,12 @@
             path: `${EXAMPLES_ROOT}/Scrolled.svelte`,
         },
         {
-            key: "ring",
-            name: EXAMPLE_NAMES.ring,
+            key: "noControls",
+            name: EXAMPLE_NAMES.noControls,
             readout: () =>
-                `slide ${ringIndex + 1} of ${controls.slideCount} — the paddle wheel rule, the slides standing round an upright spine with each painting only the half away from it, the spine set flush with the box's right edge so only the half turning outward shows, with its progress written on a clock for a continuous turn; Stop is the way to halt it that a turn running on its own owes the reader`,
-            component: ringExample,
-            path: `${EXAMPLES_ROOT}/Ring.svelte`,
-        },
-        {
-            key: "wordDrum",
-            name: EXAMPLE_NAMES.wordDrum,
-            readout: () =>
-                `word ${wordDrumIndex + 1} of ${CarouselKnobs.WORD_DRUM_WORDS.length} — a drum of a fixed number of faces, each a quarter of the box, with a word on each face near the front, its progress written by the box's scroll; scrolling rolls the next word up, and the faces past the first and last word stay empty`,
-            component: wordDrumExample,
-            path: `${EXAMPLES_ROOT}/WordDrum.svelte`,
+                `slide ${barelessIndex + 1} of ${controls.slideCount} — nothing is drawn beside the slides, so the surrounding page owns the buttons through the signal it shares`,
+            component: noControlsExample,
+            path: `${EXAMPLES_ROOT}/NoControls.svelte`,
         },
     ];
 </script>
@@ -107,19 +85,6 @@
 
 {#snippet scrolledExample()}
     <ScrolledExample {...controls.sharedProps} bind:index={scrolledIndex} />
-{/snippet}
-
-{#snippet ringExample()}
-    <RingExample
-        slides={controls.slides}
-        bind:index={ringIndex}
-        isDisabled={controls.isDisabled}
-        orientation={controls.orientation}
-    />
-{/snippet}
-
-{#snippet wordDrumExample()}
-    <WordDrumExample bind:index={wordDrumIndex} isDisabled={controls.isDisabled} />
 {/snippet}
 
 <PageCarouselsPanel {controls} hasPlacement={true} hasDelay={true} hasLooping={true} />

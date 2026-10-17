@@ -107,10 +107,10 @@ export const CornersPage = () => {
                 >
                     <PageNumberField
                         value={getLengthAcross}
-                        min={() => CornerKnobs.MIN_LENGTH}
-                        max={() => CornerKnobs.MAX_LENGTH}
-                        step={() => CornerKnobs.LENGTH_STEP}
-                        width={() => FIELD_WIDTH}
+                        min={CornerKnobs.MIN_LENGTH}
+                        max={CornerKnobs.MAX_LENGTH}
+                        step={CornerKnobs.LENGTH_STEP}
+                        width={FIELD_WIDTH}
                         ariaLabel={"Arm across"}
                         onInput={setLengthAcross}
                     />
@@ -123,10 +123,10 @@ export const CornersPage = () => {
                 >
                     <PageNumberField
                         value={getLengthDown}
-                        min={() => CornerKnobs.MIN_LENGTH}
-                        max={() => CornerKnobs.MAX_LENGTH}
-                        step={() => CornerKnobs.LENGTH_STEP}
-                        width={() => FIELD_WIDTH}
+                        min={CornerKnobs.MIN_LENGTH}
+                        max={CornerKnobs.MAX_LENGTH}
+                        step={CornerKnobs.LENGTH_STEP}
+                        width={FIELD_WIDTH}
                         ariaLabel={"Arm down"}
                         onInput={setLengthDown}
                     />
@@ -139,10 +139,10 @@ export const CornersPage = () => {
                 >
                     <PageNumberField
                         value={getStrokeThickness}
-                        min={() => CornerKnobs.MIN_THICKNESS}
-                        max={() => CornerKnobs.MAX_THICKNESS}
-                        step={() => CornerKnobs.THICKNESS_STEP}
-                        width={() => FIELD_WIDTH}
+                        min={CornerKnobs.MIN_THICKNESS}
+                        max={CornerKnobs.MAX_THICKNESS}
+                        step={CornerKnobs.THICKNESS_STEP}
+                        width={FIELD_WIDTH}
                         ariaLabel={"Thickness"}
                         onInput={setStrokeThickness}
                     />
@@ -157,10 +157,10 @@ export const CornersPage = () => {
                 >
                     <PageNumberField
                         value={getTransitionDurationMs}
-                        min={() => CornerKnobs.MIN_DURATION}
-                        max={() => CornerKnobs.MAX_DURATION}
-                        step={() => CornerKnobs.DURATION_STEP}
-                        width={() => FIELD_WIDTH}
+                        min={CornerKnobs.MIN_DURATION}
+                        max={CornerKnobs.MAX_DURATION}
+                        step={CornerKnobs.DURATION_STEP}
+                        width={FIELD_WIDTH}
                         ariaLabel={"Fade in milliseconds"}
                         onInput={setTransitionDurationMs}
                     />

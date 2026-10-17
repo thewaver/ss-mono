@@ -98,9 +98,9 @@ export const TooltipPage = () => {
                 >
                     <PageSelectField
                         value={getReveal}
-                        values={() => TOOLTIP_REVEALS}
+                        values={TOOLTIP_REVEALS}
                         computeLabel={(reveal) => TOOLTIP_REVEAL_LABELS[reveal]}
-                        width={() => FIELD_WIDTH}
+                        width={FIELD_WIDTH}
                         ariaLabel={"Reveal"}
                         onChange={(reveal) => setReveal(() => reveal)}
                     />
@@ -115,9 +115,9 @@ export const TooltipPage = () => {
                 >
                     <PageSelectField
                         value={getArrow}
-                        values={() => TOOLTIP_ARROWS}
+                        values={TOOLTIP_ARROWS}
                         computeLabel={(arrow) => TOOLTIP_ARROW_LABELS[arrow]}
-                        width={() => FIELD_WIDTH}
+                        width={FIELD_WIDTH}
                         ariaLabel={"Arrow"}
                         onChange={(arrow) => setArrow(() => arrow)}
                     />
@@ -133,10 +133,10 @@ export const TooltipPage = () => {
                     >
                         <PageNumberField
                             value={getArrowWidth}
-                            min={() => TooltipKnobs.MIN_ARROW_SIZE}
-                            max={() => TooltipKnobs.MAX_ARROW_SIZE}
-                            step={() => TooltipKnobs.ARROW_SIZE_STEP}
-                            width={() => FIELD_WIDTH}
+                            min={TooltipKnobs.MIN_ARROW_SIZE}
+                            max={TooltipKnobs.MAX_ARROW_SIZE}
+                            step={TooltipKnobs.ARROW_SIZE_STEP}
+                            width={FIELD_WIDTH}
                             ariaLabel={"Arrow width"}
                             onInput={setArrowWidth}
                         />
@@ -151,10 +151,10 @@ export const TooltipPage = () => {
                     >
                         <PageNumberField
                             value={getArrowLength}
-                            min={() => TooltipKnobs.MIN_ARROW_SIZE}
-                            max={() => TooltipKnobs.MAX_ARROW_SIZE}
-                            step={() => TooltipKnobs.ARROW_SIZE_STEP}
-                            width={() => FIELD_WIDTH}
+                            min={TooltipKnobs.MIN_ARROW_SIZE}
+                            max={TooltipKnobs.MAX_ARROW_SIZE}
+                            step={TooltipKnobs.ARROW_SIZE_STEP}
+                            width={FIELD_WIDTH}
                             ariaLabel={"Arrow length"}
                             onInput={setArrowLength}
                         />
@@ -170,8 +170,8 @@ export const TooltipPage = () => {
                 >
                     <PageSelectField
                         value={getHPlacement}
-                        values={() => ANCHOR_H_PLACEMENTS}
-                        width={() => FIELD_WIDTH}
+                        values={ANCHOR_H_PLACEMENTS}
+                        width={FIELD_WIDTH}
                         ariaLabel={"Placement across"}
                         onChange={(placement) => setHPlacement(() => placement)}
                     />
@@ -186,8 +186,8 @@ export const TooltipPage = () => {
                 >
                     <PageSelectField
                         value={getVPlacement}
-                        values={() => ANCHOR_V_PLACEMENTS}
-                        width={() => FIELD_WIDTH}
+                        values={ANCHOR_V_PLACEMENTS}
+                        width={FIELD_WIDTH}
                         ariaLabel={"Placement down"}
                         onChange={(placement) => setVPlacement(() => placement)}
                     />
@@ -200,10 +200,10 @@ export const TooltipPage = () => {
                 >
                     <PageNumberField
                         value={getOffsetX}
-                        min={() => TooltipKnobs.MIN_OFFSET}
-                        max={() => TooltipKnobs.MAX_OFFSET}
-                        step={() => TooltipKnobs.OFFSET_STEP}
-                        width={() => FIELD_WIDTH}
+                        min={TooltipKnobs.MIN_OFFSET}
+                        max={TooltipKnobs.MAX_OFFSET}
+                        step={TooltipKnobs.OFFSET_STEP}
+                        width={FIELD_WIDTH}
                         ariaLabel={"Offset across"}
                         onInput={setOffsetX}
                     />
@@ -216,10 +216,10 @@ export const TooltipPage = () => {
                 >
                     <PageNumberField
                         value={getOffsetY}
-                        min={() => TooltipKnobs.MIN_OFFSET}
-                        max={() => TooltipKnobs.MAX_OFFSET}
-                        step={() => TooltipKnobs.OFFSET_STEP}
-                        width={() => FIELD_WIDTH}
+                        min={TooltipKnobs.MIN_OFFSET}
+                        max={TooltipKnobs.MAX_OFFSET}
+                        step={TooltipKnobs.OFFSET_STEP}
+                        width={FIELD_WIDTH}
                         ariaLabel={"Offset down"}
                         onInput={setOffsetY}
                     />
@@ -232,10 +232,10 @@ export const TooltipPage = () => {
                 >
                     <PageNumberField
                         value={getTransitionDurationMs}
-                        min={() => TooltipKnobs.MIN_DURATION}
-                        max={() => TooltipKnobs.MAX_DURATION}
-                        step={() => TooltipKnobs.DURATION_STEP}
-                        width={() => FIELD_WIDTH}
+                        min={TooltipKnobs.MIN_DURATION}
+                        max={TooltipKnobs.MAX_DURATION}
+                        step={TooltipKnobs.DURATION_STEP}
+                        width={FIELD_WIDTH}
                         ariaLabel={"Reveal in milliseconds"}
                         onInput={setTransitionDurationMs}
                     />
@@ -248,10 +248,10 @@ export const TooltipPage = () => {
                 >
                     <PageNumberField
                         value={getFocusShowDelayMs}
-                        min={() => TooltipKnobs.MIN_DURATION}
-                        max={() => TooltipKnobs.MAX_DURATION}
-                        step={() => TooltipKnobs.DURATION_STEP}
-                        width={() => FIELD_WIDTH}
+                        min={TooltipKnobs.MIN_DURATION}
+                        max={TooltipKnobs.MAX_DURATION}
+                        step={TooltipKnobs.DURATION_STEP}
+                        width={FIELD_WIDTH}
                         ariaLabel={"Focus delay in milliseconds"}
                         onInput={setFocusShowDelayMs}
                     />
@@ -266,10 +266,10 @@ export const TooltipPage = () => {
                 >
                     <PageNumberField
                         value={getHoverShowDelayMs}
-                        min={() => TooltipKnobs.MIN_DURATION}
-                        max={() => TooltipKnobs.MAX_DURATION}
-                        step={() => TooltipKnobs.DURATION_STEP}
-                        width={() => FIELD_WIDTH}
+                        min={TooltipKnobs.MIN_DURATION}
+                        max={TooltipKnobs.MAX_DURATION}
+                        step={TooltipKnobs.DURATION_STEP}
+                        width={FIELD_WIDTH}
                         ariaLabel={"Hover delay in milliseconds"}
                         onInput={setHoverShowDelayMs}
                     />
@@ -284,10 +284,10 @@ export const TooltipPage = () => {
                 >
                     <PageNumberField
                         value={getSkipDelayWindowMs}
-                        min={() => TooltipKnobs.MIN_DURATION}
-                        max={() => TooltipKnobs.MAX_DURATION}
-                        step={() => TooltipKnobs.DURATION_STEP}
-                        width={() => FIELD_WIDTH}
+                        min={TooltipKnobs.MIN_DURATION}
+                        max={TooltipKnobs.MAX_DURATION}
+                        step={TooltipKnobs.DURATION_STEP}
+                        width={FIELD_WIDTH}
                         ariaLabel={"Skip window in milliseconds"}
                         onInput={setSkipDelayWindowMs}
                     />

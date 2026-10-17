@@ -58,6 +58,7 @@ const LabelPage = () => import("./Pages/LabelPage/LabelPage.vue");
 const ListboxPage = () => import("./Pages/ListboxPage/ListboxPage.vue");
 const MenubarPage = () => import("./Pages/MenubarPage/MenubarPage.vue");
 const FanMenuPage = () => import("./Pages/Menus/FanMenuPage/FanMenuPage.vue");
+const FlyoutMenuPage = () => import("./Pages/Menus/FlyoutMenuPage/FlyoutMenuPage.vue");
 const MenuPage = () => import("./Pages/Menus/MenuPage/MenuPage.vue");
 const WheelMenuPage = () => import("./Pages/Menus/WheelMenuPage/WheelMenuPage.vue");
 const ModalPage = () => import("./Pages/ModalPage/ModalPage.vue");
@@ -436,6 +437,10 @@ export const MENU_CONFIGS: MenuBranchConfig[] = [
                     {
                         name: "FanMenu",
                         component: FanMenuPage,
+                    },
+                    {
+                        name: "FlyoutMenu",
+                        component: FlyoutMenuPage,
                     },
                     {
                         name: "Menu",

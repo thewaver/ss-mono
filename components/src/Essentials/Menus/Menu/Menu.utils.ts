@@ -62,8 +62,6 @@ const CONTEXT_MENU_KEY = "ContextMenu";
 const CONTEXT_MENU_FALLBACK_KEY = "F10";
 /** Where a `contextmenu` event raised from the keyboard claims the pointer was. */
 const ORIGIN_COORDINATE = 0;
-/** How far apart two readings may be, in pixels, and still be the pointer staying put. */
-const SAME_POINT_PX = 1;
 /** How far a flick has to travel before it picks anything, as a share of the layout's width. */
 const FLICK_TRAVEL_RATIO = 0.1;
 /** A box with no width, which nothing can be measured against. */
@@ -298,6 +296,34 @@ export namespace MenuUtils {
         getHasSubmenu(entries, index, hasBackEntry) && !entries[index].isDisabled;
 
     /**
+     * Where a placed entry sits in the stack, for a menu whose layout lets its entries overlap.
+     *
+     * Each entry covers the one before it, and the highlighted entry is lifted above them all and above the highlight
+     * floater, which {@link MenuUtils.computeFloaterStackAt} puts just beneath it — so the item under the pointer or the
+     * arrow keys is never hidden by a neighbor, and neither is the floater painting it.
+     *
+     * @param index The entry's position.
+     * @param highlightedIndex The highlighted entry's position, from {@link MenuUtils.computeHighlightedIndex}.
+     * @param count How many entries the level has.
+     * @returns The stacking order to hand `PlacementItem`, from `1`.
+     */
+    export const computeStackAt = (index: number, highlightedIndex: number | undefined, count: number) =>
+        index === highlightedIndex ? count + 2 : index + 1;
+
+    /**
+     * Where the highlight floater sits in the stack.
+     *
+     * Unplaced entries sit side by side and never overlap, so the floater stays behind them all, as its stylesheet
+     * puts it. Placed entries can overlap, and a floater behind them all would be covered by the highlighted entry's
+     * neighbors; there it sits above every entry but the highlighted one, from {@link MenuUtils.computeStackAt}.
+     *
+     * @param isLaidOut Whether the level places its entries with a layout.
+     * @param count How many entries the level has.
+     * @returns The stacking order to write on the floater, or `undefined` to leave the stylesheet's.
+     */
+    export const computeFloaterStackAt = (isLaidOut: boolean, count: number) => (isLaidOut ? count + 1 : undefined);
+
+    /**
      * Which entry is highlighted.
      *
      * The entry holding the highlighted value, while the walk can reach it. With nothing highlighted yet the
@@ -449,22 +475,81 @@ export namespace MenuUtils {
     };
 
     /**
-     * Whether a pointer entering an entry was the pointer moving there.
+     * Keeps the item a level opened under from taking the hover until the pointer has left it once.
      *
-     * The browser re-runs hit-testing whenever something changes under a cursor that is standing still, and
-     * reports the result as a fresh enter. Such an enter arrives at the point the pointer last moved to; a real
-     * one arrives somewhere else. With no point on record every enter counts as real.
+     * A level moves its highlight on `pointermove`, which a pointer standing still never sends, so a level appearing
+     * under a still pointer highlights nothing by itself. What is left is the pointer twitching: a wheel opens with
+     * its close control under the pointer, and the smallest movement would hand that control the highlight. So the
+     * item drawn at the point the pointer had when the level opened ignores the pointer moving over it until the
+     * pointer has been somewhere else and come back, the way a desktop context menu ignores the item it appeared
+     * under. Pressing that item still works, and the keyboard is untouched.
      *
-     * @param lastPoint Where the pointer last moved to, from {@link MenuUtils.getPointerPoint}.
-     * @param eventPoint Where the enter says the pointer is.
+     * Coming back is read from the pointer entering the item after it has moved since the level opened. Leaving is
+     * not enough to wait for: a pointer that never moved while the level appeared was never over the item as far as
+     * the browser knows, so one sweep straight off it reports no leave, and the item would stay held for good. A
+     * twitch over the item is its first movement, so its enter arrives with the pointer still at the opening point.
+     *
+     * The item is looked up on the first movement after opening rather than at opening, since by then the level has
+     * been placed; where items overlap, the one drawn on top is the one at the point.
+     *
+     * @returns `open`, to call each time the level opens with the pointer's point from
+     * {@link MenuUtils.getPointerPoint}; `getIsHoverable`, which answers for one item and is handed a function that
+     * finds the item at a point, such as {@link MenuUtils.findIndexAtPoint}; and `enter`, to call when the pointer
+     * enters an item, with the pointer's point from {@link MenuUtils.getPointerPoint} at that moment.
      */
-    export const getIsPointerLed = (lastPoint: Point2d | undefined, eventPoint: Point2d) =>
-        lastPoint === undefined ||
-        Math.abs(lastPoint.x - eventPoint.x) >= SAME_POINT_PX ||
-        Math.abs(lastPoint.y - eventPoint.y) >= SAME_POINT_PX;
+    export const createOpeningHoverGuard = () => {
+        let openPoint: Point2d | undefined;
+        let restingIndex: number | undefined;
+        let isResolved = true;
+
+        return {
+            open: (point: Point2d | undefined) => {
+                openPoint = point;
+                restingIndex = undefined;
+                isResolved = point === undefined;
+            },
+            getIsHoverable: (index: number, findIndexAt: (point: Point2d) => number | undefined) => {
+                if (!isResolved) {
+                    isResolved = true;
+                    restingIndex = openPoint === undefined ? undefined : findIndexAt(openPoint);
+                }
+
+                return index !== restingIndex;
+            },
+            enter: (index: number, point: Point2d | undefined) => {
+                if (index !== restingIndex || openPoint === undefined) return;
+
+                if (point === undefined || point.x !== openPoint.x || point.y !== openPoint.y) restingIndex = undefined;
+            },
+        };
+    };
 
     /**
-     * Starts keeping the pointer's last point on record, for {@link MenuUtils.getIsPointerLed}.
+     * Which of a level's items is drawn at a point, the one on top where they overlap.
+     *
+     * @param point The point, in the viewport's coordinates.
+     * @param count How many items the level has.
+     * @param getElement The element of the item at a position.
+     * @returns The item's position, or `undefined` when no item is drawn there.
+     */
+    export const findIndexAtPoint = (
+        point: Point2d,
+        count: number,
+        getElement: (index: number) => HTMLElement | null | undefined,
+    ) => {
+        const hit = document.elementFromPoint(point.x, point.y);
+
+        if (!hit) return undefined;
+
+        for (let index = 0; index < count; index++) {
+            if (getElement(index)?.contains(hit)) return index;
+        }
+
+        return undefined;
+    };
+
+    /**
+     * Starts keeping the pointer's last point on record, for {@link MenuUtils.createOpeningHoverGuard}.
      *
      * One document listener serves every menu on the page; it goes, and the point is forgotten, once the last
      * reader stops.

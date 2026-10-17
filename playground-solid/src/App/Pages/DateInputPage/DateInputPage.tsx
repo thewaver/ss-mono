@@ -69,7 +69,7 @@ export const DateInputPage = () => {
                     <PageSelectField
                         value={getCalendarId}
                         values={DateValueUtils.getCalendarIds}
-                        width={() => CALENDAR_FIELD_WIDTH}
+                        width={CALENDAR_FIELD_WIDTH}
                         ariaLabel={"Calendar"}
                         onChange={(id) => setCalendarId(() => id)}
                     />

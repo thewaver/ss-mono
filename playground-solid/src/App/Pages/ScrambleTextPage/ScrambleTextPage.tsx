@@ -100,9 +100,9 @@ export const ScrambleTextPage = () => {
                 >
                     <PageNumberField
                         value={getSettleDurationMs}
-                        min={() => ScrambleTextKnobs.MIN_SETTLE_DURATION_MS}
-                        max={() => ScrambleTextKnobs.MAX_SETTLE_DURATION_MS}
-                        step={() => ScrambleTextKnobs.SETTLE_DURATION_STEP_MS}
+                        min={ScrambleTextKnobs.MIN_SETTLE_DURATION_MS}
+                        max={ScrambleTextKnobs.MAX_SETTLE_DURATION_MS}
+                        step={ScrambleTextKnobs.SETTLE_DURATION_STEP_MS}
                         isDisabled={getPrefersReducedMotion}
                         ariaLabel={"Settle duration in milliseconds"}
                         onInput={setSettleDurationMs}
@@ -118,9 +118,9 @@ export const ScrambleTextPage = () => {
                 >
                     <PageNumberField
                         value={getScrambleIntervalMs}
-                        min={() => ScrambleTextKnobs.MIN_SCRAMBLE_INTERVAL_MS}
-                        max={() => ScrambleTextKnobs.MAX_SCRAMBLE_INTERVAL_MS}
-                        step={() => ScrambleTextKnobs.SCRAMBLE_INTERVAL_STEP_MS}
+                        min={ScrambleTextKnobs.MIN_SCRAMBLE_INTERVAL_MS}
+                        max={ScrambleTextKnobs.MAX_SCRAMBLE_INTERVAL_MS}
+                        step={ScrambleTextKnobs.SCRAMBLE_INTERVAL_STEP_MS}
                         ariaLabel={"Scramble interval in milliseconds"}
                         onInput={setScrambleIntervalMs}
                     />
@@ -135,7 +135,7 @@ export const ScrambleTextPage = () => {
                 >
                     <PageSelectField
                         value={getGlyphSet}
-                        values={() => ScrambleTextKnobs.GLYPH_SETS}
+                        values={ScrambleTextKnobs.GLYPH_SETS}
                         ariaLabel={"Glyphs"}
                         onChange={(glyphSet) => setGlyphSet(() => glyphSet)}
                     />
@@ -150,7 +150,7 @@ export const ScrambleTextPage = () => {
                 >
                     <PageSelectField
                         value={getSettleOrder}
-                        values={() => ScrambleTextKnobs.SETTLE_ORDERS}
+                        values={ScrambleTextKnobs.SETTLE_ORDERS}
                         ariaLabel={"Settle order"}
                         onChange={(settleOrder) => setSettleOrder(() => settleOrder)}
                     />

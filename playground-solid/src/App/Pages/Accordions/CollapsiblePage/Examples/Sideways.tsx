@@ -12,6 +12,7 @@ const PANEL_WIDTH = 220;
 
 export const SidewaysExample = (props: Props) => (
     <Collapsible
+        transitionDurationMs={props.transitionDurationMs}
         expanded={props.expanded}
         sizing={"fit-content"}
         side={"right"}

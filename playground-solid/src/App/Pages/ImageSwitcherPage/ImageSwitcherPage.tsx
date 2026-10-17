@@ -31,7 +31,7 @@ const SOURCE_URLS: Record<SourceType, string | undefined> = {
 
 const DefaultExampleWrapper = (props: ImageSwitcherProps) => {
     return (
-        <PageMeasureBox width={() => IMAGE_CONTAINER_SIZE} height={() => IMAGE_CONTAINER_SIZE}>
+        <PageMeasureBox width={IMAGE_CONTAINER_SIZE} height={IMAGE_CONTAINER_SIZE}>
             <DefaultExample {...props} />
         </PageMeasureBox>
     );
@@ -85,7 +85,7 @@ export const ImageSwitcherPage = () => {
                 >
                     <PageSelectField
                         value={getSourceType}
-                        values={() => ImageSwitcherKnobs.SOURCE_TYPES}
+                        values={ImageSwitcherKnobs.SOURCE_TYPES}
                         ariaLabel={"Source"}
                         onChange={(sourceType) => setSourceType(() => sourceType)}
                     />
@@ -98,9 +98,9 @@ export const ImageSwitcherPage = () => {
                 >
                     <PageNumberField
                         value={getTransitionDurationMs}
-                        min={() => ImageSwitcherKnobs.MIN_DURATION_MS}
-                        max={() => ImageSwitcherKnobs.MAX_DURATION_MS}
-                        step={() => ImageSwitcherKnobs.DURATION_STEP_MS}
+                        min={ImageSwitcherKnobs.MIN_DURATION_MS}
+                        max={ImageSwitcherKnobs.MAX_DURATION_MS}
+                        step={ImageSwitcherKnobs.DURATION_STEP_MS}
                         ariaLabel={"Transition duration"}
                         onInput={setTransitionDurationMs}
                     />

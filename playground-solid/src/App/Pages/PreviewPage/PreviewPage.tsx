@@ -23,11 +23,7 @@ export const PreviewPage = () => {
             name: EXAMPLE_NAMES.long,
             readout: () => `expanded: ${longSignal[0]()} — the control appears because there is something behind it`,
             component: () => (
-                <TextExample
-                    expanded={longSignal}
-                    collapsedHeight={() => COLLAPSED_HEIGHT}
-                    paragraphs={() => LONG_PARAGRAPHS}
-                />
+                <TextExample expanded={longSignal} collapsedHeight={COLLAPSED_HEIGHT} paragraphs={LONG_PARAGRAPHS} />
             ),
             path: `${EXAMPLES_ROOT}/Text.tsx`,
         },
@@ -36,9 +32,7 @@ export const PreviewPage = () => {
             name: EXAMPLE_NAMES.unheld,
             readout: () =>
                 "no signal passed — the preview keeps whether it is expanded itself, so the page has nothing to show here",
-            component: () => (
-                <TextExample collapsedHeight={() => COLLAPSED_HEIGHT} paragraphs={() => LONG_PARAGRAPHS} />
-            ),
+            component: () => <TextExample collapsedHeight={COLLAPSED_HEIGHT} paragraphs={LONG_PARAGRAPHS} />,
             path: `${EXAMPLES_ROOT}/Text.tsx`,
         },
         {
@@ -46,11 +40,7 @@ export const PreviewPage = () => {
             name: EXAMPLE_NAMES.short,
             readout: () => `expanded: ${shortSignal[0]()} — same component, same height, no control and no fade at all`,
             component: () => (
-                <TextExample
-                    expanded={shortSignal}
-                    collapsedHeight={() => COLLAPSED_HEIGHT}
-                    paragraphs={() => SHORT_PARAGRAPHS}
-                />
+                <TextExample expanded={shortSignal} collapsedHeight={COLLAPSED_HEIGHT} paragraphs={SHORT_PARAGRAPHS} />
             ),
             path: `${EXAMPLES_ROOT}/Text.tsx`,
         },
@@ -62,8 +52,8 @@ export const PreviewPage = () => {
             component: () => (
                 <ScrolledExample
                     expanded={scrolledSignal}
-                    collapsedHeight={() => COLLAPSED_HEIGHT}
-                    paragraphs={() => LONG_PARAGRAPHS}
+                    collapsedHeight={COLLAPSED_HEIGHT}
+                    paragraphs={LONG_PARAGRAPHS}
                 />
             ),
             path: `${EXAMPLES_ROOT}/Scrolled.tsx`,

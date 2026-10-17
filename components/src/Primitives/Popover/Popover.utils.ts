@@ -19,12 +19,30 @@ const getRevealShift = (viewStart: number, viewSize: number, itemStart: number, 
  */
 const REVEAL_PASSES = 2;
 
-/** Moves one scroller by the least that shows `element`, converting the painted distance into its layout pixels. */
+/**
+ * One side of a scroller's `scroll-padding`, in its layout pixels.
+ *
+ * `scroll-padding` is the room a scroller keeps clear when it brings something into view, which is how
+ * `scrollIntoView` reads it; a scroller with padding of its own sets it to match, so the first item revealed brings
+ * the padding above it back into view too. `auto` and anything not in pixels count as none.
+ */
+const getScrollPadding = (value: string) => (value.endsWith("px") ? Number.parseFloat(value) : 0);
+
+/**
+ * Moves one scroller by the least that shows `element` clear of the scroller's `scroll-padding`, converting the
+ * painted distance into its layout pixels.
+ */
 const revealIn = (scroller: HTMLElement, element: HTMLElement) => {
     const canScrollX = scroller.scrollWidth > scroller.clientWidth;
     const canScrollY = scroller.scrollHeight > scroller.clientHeight;
 
     if ((!canScrollX && !canScrollY) || scroller.offsetWidth === 0) return;
+
+    const style = getComputedStyle(scroller);
+    const padLeft = getScrollPadding(style.scrollPaddingLeft);
+    const padRight = getScrollPadding(style.scrollPaddingRight);
+    const padTop = getScrollPadding(style.scrollPaddingTop);
+    const padBottom = getScrollPadding(style.scrollPaddingBottom);
 
     for (let pass = 0; pass < REVEAL_PASSES; pass++) {
         const scrollerRect = scroller.getBoundingClientRect();
@@ -32,17 +50,17 @@ const revealIn = (scroller: HTMLElement, element: HTMLElement) => {
         const scale = scrollerRect.width / scroller.offsetWidth;
 
         if (canScrollX) {
-            const viewStart = scrollerRect.left + scroller.clientLeft * scale;
+            const viewStart = scrollerRect.left + (scroller.clientLeft + padLeft) * scale;
+            const viewSize = (scroller.clientWidth - padLeft - padRight) * scale;
 
-            scroller.scrollLeft +=
-                getRevealShift(viewStart, scroller.clientWidth * scale, elementRect.left, elementRect.width) / scale;
+            scroller.scrollLeft += getRevealShift(viewStart, viewSize, elementRect.left, elementRect.width) / scale;
         }
 
         if (canScrollY) {
-            const viewStart = scrollerRect.top + scroller.clientTop * scale;
+            const viewStart = scrollerRect.top + (scroller.clientTop + padTop) * scale;
+            const viewSize = (scroller.clientHeight - padTop - padBottom) * scale;
 
-            scroller.scrollTop +=
-                getRevealShift(viewStart, scroller.clientHeight * scale, elementRect.top, elementRect.height) / scale;
+            scroller.scrollTop += getRevealShift(viewStart, viewSize, elementRect.top, elementRect.height) / scale;
         }
     }
 };

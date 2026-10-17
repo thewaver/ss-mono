@@ -12,7 +12,7 @@ const STROKE_THICKNESS = 2;
 type Props = RadioExampleProps;
 
 export const DecoratedExample = (props: Props) => (
-    <RadioGroup value={props.value} ariaLabel={"Decorated size"} gap={() => RADIO_GROUP_GAP}>
+    <RadioGroup value={props.value} ariaLabel={"Decorated size"} gap={RADIO_GROUP_GAP}>
         <For each={SIZE_OPTIONS}>
             {(option) => (
                 <Radio
@@ -22,8 +22,8 @@ export const DecoratedExample = (props: Props) => (
                     renderDecoration={(getFlags) => (
                         <Corners
                             color={() => (getFlags().checkedState === true ? "yellow" : "transparent")}
-                            cornerLength={() => CORNER_LENGTH}
-                            strokeThickness={() => STROKE_THICKNESS}
+                            cornerLength={CORNER_LENGTH}
+                            strokeThickness={STROKE_THICKNESS}
                         />
                     )}
                 />

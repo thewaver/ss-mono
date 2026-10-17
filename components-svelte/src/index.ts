@@ -172,6 +172,8 @@ export { default as Toasts } from "./Essentials/Overlays/Toasts/Toasts.svelte";
 export type * from "./Essentials/Overlays/Toasts/Toasts.types.js";
 export { default as FanMenu } from "./Essentials/Menus/FanMenu/FanMenu.svelte";
 export type * from "./Essentials/Menus/FanMenu/FanMenu.types.js";
+export { default as FlyoutMenu } from "./Essentials/Menus/FlyoutMenu/FlyoutMenu.svelte";
+export type * from "./Essentials/Menus/FlyoutMenu/FlyoutMenu.types.js";
 export { default as WheelMenu } from "./Essentials/Menus/WheelMenu/WheelMenu.svelte";
 export type * from "./Essentials/Menus/WheelMenu/WheelMenu.types.js";
 export { default as Spotlight } from "./Primitives/Spotlight/Spotlight.svelte";

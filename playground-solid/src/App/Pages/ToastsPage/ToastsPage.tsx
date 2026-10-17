@@ -67,7 +67,7 @@ export const ToastsPage = () => {
                 >
                     <PageSelectField
                         value={getAlignment}
-                        values={() => TOASTS_ALIGNMENTS}
+                        values={TOASTS_ALIGNMENTS}
                         ariaLabel={"Alignment"}
                         onChange={(alignment) => setAlignment(() => alignment)}
                     />
@@ -82,7 +82,7 @@ export const ToastsPage = () => {
                 >
                     <PageSelectField
                         value={getDir}
-                        values={() => TOASTS_DIRS}
+                        values={TOASTS_DIRS}
                         ariaLabel={"Dir"}
                         onChange={(dir) => setDir(() => dir)}
                     />
@@ -95,7 +95,7 @@ export const ToastsPage = () => {
                 >
                     <PageSelectField
                         value={getLimit}
-                        values={() => ToastKnobs.LIMITS}
+                        values={ToastKnobs.LIMITS}
                         ariaLabel={"Limit"}
                         computeLabel={(limit) => (limit === NO_LIMIT ? "none" : `${limit}`)}
                         onChange={setLimit}
@@ -111,7 +111,7 @@ export const ToastsPage = () => {
                 >
                     <PageSelectField
                         value={getOverflow}
-                        values={() => TOASTS_OVERFLOWS}
+                        values={TOASTS_OVERFLOWS}
                         ariaLabel={"Overflow"}
                         onChange={(overflow) => setOverflow(() => overflow)}
                     />
@@ -124,7 +124,7 @@ export const ToastsPage = () => {
                 >
                     <PageSelectField
                         value={getDurationMs}
-                        values={() => ToastKnobs.DURATIONS_MS}
+                        values={ToastKnobs.DURATIONS_MS}
                         ariaLabel={"Duration"}
                         computeLabel={(durationMs) => (durationMs === STICKY ? "sticky" : `${durationMs}ms`)}
                         onChange={setDurationMs}
@@ -134,7 +134,7 @@ export const ToastsPage = () => {
                 <PageProp key={"animation"} label={"Animation"} hint={"How a toast arrives and leaves."}>
                     <PageSelectField
                         value={getAnimation}
-                        values={() => ToastKnobs.ANIMATIONS}
+                        values={ToastKnobs.ANIMATIONS}
                         ariaLabel={"Animation"}
                         onChange={(animation) => setAnimation(() => animation)}
                     />
@@ -149,7 +149,7 @@ export const ToastsPage = () => {
                 >
                     <PageSelectField
                         value={getStacking}
-                        values={() => ToastKnobs.STACKINGS}
+                        values={ToastKnobs.STACKINGS}
                         ariaLabel={"Stacking"}
                         onChange={(stacking) => setStacking(() => stacking)}
                     />
@@ -158,8 +158,8 @@ export const ToastsPage = () => {
                 <PageProp key={"gap"} label={"Gap (px)"} hint={"The space between one toast and the next."}>
                     <PageNumberField
                         value={getGap}
-                        min={() => ToastKnobs.MIN_GAP}
-                        max={() => ToastKnobs.MAX_GAP}
+                        min={ToastKnobs.MIN_GAP}
+                        max={ToastKnobs.MAX_GAP}
                         ariaLabel={"Gap in pixels"}
                         onInput={setGap}
                     />
@@ -172,8 +172,8 @@ export const ToastsPage = () => {
                 >
                     <PageNumberField
                         value={getMargin}
-                        min={() => ToastKnobs.MIN_MARGIN}
-                        max={() => ToastKnobs.MAX_MARGIN}
+                        min={ToastKnobs.MIN_MARGIN}
+                        max={ToastKnobs.MAX_MARGIN}
                         ariaLabel={"Margin in pixels"}
                         onInput={setMargin}
                     />
@@ -186,9 +186,9 @@ export const ToastsPage = () => {
                 >
                     <PageNumberField
                         value={getTransitionDurationMs}
-                        min={() => ToastKnobs.MIN_TRANSITION_DURATION_MS}
-                        max={() => ToastKnobs.MAX_TRANSITION_DURATION_MS}
-                        step={() => ToastKnobs.TRANSITION_DURATION_STEP_MS}
+                        min={ToastKnobs.MIN_TRANSITION_DURATION_MS}
+                        max={ToastKnobs.MAX_TRANSITION_DURATION_MS}
+                        step={ToastKnobs.TRANSITION_DURATION_STEP_MS}
                         ariaLabel={"Transition duration"}
                         onInput={setTransitionDurationMs}
                     />

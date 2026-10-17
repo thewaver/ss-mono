@@ -439,8 +439,8 @@ export function AppContent(props: RouteSectionProps & { viewportAnchor: SignalPa
 
             <div class={styles.appContent}>
                 <Sidebar
-                    id={() => MENU_ID}
-                    edge={() => MENU_EDGE}
+                    id={MENU_ID}
+                    edge={MENU_EDGE}
                     collapsedSize={() => getMenuGutter() + LAYOUT.menuCollapsedWidth}
                     expandedSize={() => getMenuGutter() + LAYOUT.menuExpandedWidth}
                     isExpandedOnHover={getIsMenuAutoHidden}
@@ -455,8 +455,8 @@ export function AppContent(props: RouteSectionProps & { viewportAnchor: SignalPa
                                 <div class={styles.leftMenuContent}>
                                     <div class={styles.searchContainer}>
                                         <PageSidebarToggle
-                                            sidebarId={() => MENU_ID}
-                                            edge={() => MENU_EDGE}
+                                            sidebarId={MENU_ID}
+                                            edge={MENU_EDGE}
                                             isExpanded={menuExpandedSignal[0]}
                                             isDisabled={() => !getIsMenuHideable()}
                                             ariaLabel={() =>
@@ -498,7 +498,7 @@ export function AppContent(props: RouteSectionProps & { viewportAnchor: SignalPa
                                         >
                                             <PageTextField
                                                 value={getSearchTerm}
-                                                width={() => SEARCH_FIELD_WIDTH}
+                                                width={SEARCH_FIELD_WIDTH}
                                                 placeholder={"Search"}
                                                 ariaLabel={"Search components"}
                                                 onInput={setSearchTerm}

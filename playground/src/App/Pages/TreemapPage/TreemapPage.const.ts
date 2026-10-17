@@ -33,6 +33,7 @@ export const LIBRARY: TreemapNode<string> = branch(
         leaf("MaskedField", 225),
         leaf("MediaQueryMonitor", 165),
         leaf("Navigator", 326),
+        leaf("Overflow", 112),
         leaf("Placement", 756),
         leaf("PointerTracker", 326),
         leaf("Proximity", 345),
@@ -54,7 +55,7 @@ export const LIBRARY: TreemapNode<string> = branch(
         branch("Accordions", leaf("Accordion", 438), leaf("Collapsible", 410)),
         leaf("Breadcrumbs", 216),
         branch("Buttons", leaf("Button", 199), leaf("SlideButton", 520)),
-        leaf("Carousel", 1284),
+        leaf("Carousel", 1282),
         leaf("EdgeFader", 296),
         leaf("Form", 163),
         branch(
@@ -93,7 +94,7 @@ export const LIBRARY: TreemapNode<string> = branch(
         ),
         branch("MediaSwitchers", leaf("AudioSwitcher", 296), leaf("ImageSwitcher", 187)),
         leaf("Menubar", 7),
-        branch("Menus", leaf("FanMenu", 62), leaf("Menu", 2039), leaf("WheelMenu", 270)),
+        branch("Menus", leaf("FanMenu", 62), leaf("FlyoutMenu", 794), leaf("Menu", 2122), leaf("WheelMenu", 270)),
         branch(
             "Overlays",
             leaf("Drawer", 26),
@@ -115,8 +116,8 @@ export const LIBRARY: TreemapNode<string> = branch(
         leaf("Table", 1570),
         leaf("TableOfContents", 458),
         leaf("Tabs", 569),
-        leaf("Toolbar", 851),
-        leaf("Tree", 961),
+        leaf("Toolbar", 745),
+        leaf("Tree", 963),
         leaf("ViewportWrapper", 237),
     ),
     branch(
@@ -135,12 +136,12 @@ export const LIBRARY: TreemapNode<string> = branch(
             leaf("Die", 608),
             leaf("FlipCard", 279),
             leaf("Flipbook", 774),
-            leaf("InfiniteCorridor", 571),
+            leaf("InfiniteCorridor", 566),
         ),
         branch(
             "PointerEffects",
             leaf("LightCatcher", 157),
-            leaf("RGBSplitter", 185),
+            leaf("RGBSplitter", 183),
             leaf("ShadowCaster", 166),
             leaf("Tilter", 204),
             leaf("PointerEffects files", 342),
@@ -166,13 +167,13 @@ export const LIBRARY: TreemapNode<string> = branch(
     ),
     branch(
         "Generators",
-        leaf("CarouselPlacements", 659),
+        leaf("CarouselPlacements", 682),
         leaf("CellAnimationBreakpoints", 141),
         leaf("CellAnimationKeyframes", 231),
         leaf("CellAnimationPlayback", 134),
         leaf("CellAnimationWeights", 616),
         leaf("CellAnimationZones", 129),
-        leaf("CorridorLayouts", 409),
+        leaf("CorridorLayouts", 405),
         leaf("PlacementLayouts", 732),
         leaf("ProximityEffects", 232),
         branch(
@@ -194,7 +195,7 @@ export const LIBRARY: TreemapNode<string> = branch(
         leaf("Mosaic", 1177),
         leaf("PlacementBox", 276),
         leaf("PlacementItem", 248),
-        leaf("Popover", 385),
+        leaf("Popover", 403),
         leaf("PopupTrigger", 85),
         leaf("Spine", 345),
         leaf("Spotlight", 457),
@@ -229,7 +230,7 @@ export const LIBRARY: TreemapNode<string> = branch(
         branch("Staircase", leaf("Indents", 49)),
     ),
     leaf("Utils", 116),
-    leaf("src files", 1225),
+    leaf("src files", 1233),
 );
 
 export const EXAMPLE_NAMES = {

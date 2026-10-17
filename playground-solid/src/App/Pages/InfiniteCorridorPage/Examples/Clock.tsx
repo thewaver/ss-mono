@@ -87,10 +87,10 @@ export const ClockExample = (props: Props) => {
                     <PageNumberField
                         value={getLapMs}
                         resetValue={() => access(props.startingLapMs)}
-                        min={() => InfiniteCorridorKnobs.MIN_LAP_MS}
-                        max={() => InfiniteCorridorKnobs.MAX_LAP_MS}
-                        step={() => InfiniteCorridorKnobs.LAP_STEP_MS}
-                        width={() => FIELD_WIDTH}
+                        min={InfiniteCorridorKnobs.MIN_LAP_MS}
+                        max={InfiniteCorridorKnobs.MAX_LAP_MS}
+                        step={InfiniteCorridorKnobs.LAP_STEP_MS}
+                        width={FIELD_WIDTH}
                         ariaLabel={"Lap duration in milliseconds"}
                         onInput={setLapMs}
                     />

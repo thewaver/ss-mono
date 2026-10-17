@@ -7,7 +7,7 @@ import { ACTIONS, renderMenuItem, renderMenuPopup } from "../MenuPageSolid.const
 export const DisabledExample = () => (
     <Menu
         renderHighlightFloater={renderPageHighlightFloater}
-        items={() => ACTIONS}
+        items={ACTIONS}
         isDisabled={true}
         ariaLabel={"Edit actions"}
         renderContent={(getFlags) => <PageMenuTriggerContent flags={getFlags}>Edit</PageMenuTriggerContent>}

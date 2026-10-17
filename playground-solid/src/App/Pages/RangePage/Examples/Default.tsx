@@ -10,7 +10,7 @@ export const DefaultExample = (props: Props) => (
     <Range
         value={props.value}
         ariaLabel={"Volume"}
-        thumbSize={() => RANGE_THUMB_SIZE}
+        thumbSize={RANGE_THUMB_SIZE}
         renderContent={(getRenderProps) => <PageRangeContent renderProps={getRenderProps} />}
     />
 );

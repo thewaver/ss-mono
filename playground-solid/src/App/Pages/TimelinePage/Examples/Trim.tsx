@@ -50,22 +50,22 @@ export const TrimExample = (props: Props) => {
     return (
         <PageTimelineFrame>
             <PageTimelineRow>
-                <PageTimelineLanes names={() => TRIM_TRACKS} laneSize={() => LANE_SIZE} laneGap={() => LANE_GAP} />
+                <PageTimelineLanes names={TRIM_TRACKS} laneSize={LANE_SIZE} laneGap={LANE_GAP} />
 
                 <PageTimelineTrack>
                     <Timeline<Clip>
-                        range={() => REEL}
+                        range={REEL}
                         items={clipsSignal[0]}
-                        laneSize={() => LANE_SIZE}
-                        axisSize={() => AXIS_HEIGHT}
-                        laneGap={() => LANE_GAP}
+                        laneSize={LANE_SIZE}
+                        axisSize={AXIS_HEIGHT}
+                        laneGap={LANE_GAP}
                         laneCount={() => TRIM_TRACKS.length}
-                        tickSteps={() => SECOND_STEPS}
+                        tickSteps={SECOND_STEPS}
                         isPannable={props.isPannable}
                         isZoomable={props.isZoomable}
                         isDisabled={props.isDisabled}
                         view={props.view}
-                        edgeAnnouncements={() => EDGE_ANNOUNCEMENTS}
+                        edgeAnnouncements={EDGE_ANNOUNCEMENTS}
                         ariaLabel={"Clips to trim"}
                         computeSpan={(clip) => ({ start: clip.from, end: clip.to })}
                         computeLane={(clip) => clip.track}

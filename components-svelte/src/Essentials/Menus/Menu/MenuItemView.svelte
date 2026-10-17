@@ -26,7 +26,8 @@
 
         props.onActivate();
     }}
-    onmouseenter={(e) => props.onHover({ x: e.clientX, y: e.clientY })}
+    onpointermove={() => props.onHover()}
+    onpointerenter={() => props.onEnter()}
 >
     {@render props.renderContent(props.flags)}
 </div>

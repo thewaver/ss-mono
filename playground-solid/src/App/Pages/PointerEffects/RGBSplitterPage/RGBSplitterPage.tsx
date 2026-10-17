@@ -51,7 +51,7 @@ export const RGBSplitterPage = () => {
                 readout: () =>
                     "the channels pull apart as the pointer heads for the middle — leave and come back, and each takes a new direction",
                 component: () => (
-                    <PageMeasureBox isFilling height={() => BOX_HEIGHT}>
+                    <PageMeasureBox isFilling height={BOX_HEIGHT}>
                         <PhotoExample {...commonProps} />
                     </PageMeasureBox>
                 ),
@@ -62,7 +62,7 @@ export const RGBSplitterPage = () => {
                 name: EXAMPLE_NAMES.headline,
                 readout: () => "type on a transparent ground, so the fringes fall straight onto the page",
                 component: () => (
-                    <PageMeasureBox isFilling height={() => BOX_HEIGHT}>
+                    <PageMeasureBox isFilling height={BOX_HEIGHT}>
                         <HeadlineExample {...commonProps} />
                     </PageMeasureBox>
                 ),
@@ -93,10 +93,10 @@ export const RGBSplitterPage = () => {
                 >
                     <PageNumberField
                         value={getSmoothingMs}
-                        min={() => RGBSplitterKnobs.MIN_SMOOTHING_MS}
-                        max={() => RGBSplitterKnobs.MAX_SMOOTHING_MS}
-                        step={() => RGBSplitterKnobs.SMOOTHING_STEP_MS}
-                        width={() => FIELD_WIDTH}
+                        min={RGBSplitterKnobs.MIN_SMOOTHING_MS}
+                        max={RGBSplitterKnobs.MAX_SMOOTHING_MS}
+                        step={RGBSplitterKnobs.SMOOTHING_STEP_MS}
+                        width={FIELD_WIDTH}
                         ariaLabel={"Smoothing in milliseconds"}
                         onInput={setSmoothingMs}
                     />
@@ -111,10 +111,10 @@ export const RGBSplitterPage = () => {
                 >
                     <PageNumberField
                         value={getActiveRangePx}
-                        min={() => RGBSplitterKnobs.MIN_ACTIVE_RANGE_PX}
-                        max={() => RGBSplitterKnobs.MAX_ACTIVE_RANGE_PX}
-                        step={() => RGBSplitterKnobs.ACTIVE_RANGE_STEP_PX}
-                        width={() => FIELD_WIDTH}
+                        min={RGBSplitterKnobs.MIN_ACTIVE_RANGE_PX}
+                        max={RGBSplitterKnobs.MAX_ACTIVE_RANGE_PX}
+                        step={RGBSplitterKnobs.ACTIVE_RANGE_STEP_PX}
+                        width={FIELD_WIDTH}
                         ariaLabel={"Active range in pixels"}
                         onInput={setActiveRangePx}
                     />
@@ -127,10 +127,10 @@ export const RGBSplitterPage = () => {
                 >
                     <PageNumberField
                         value={getSplitRangePx}
-                        min={() => RGBSplitterKnobs.MIN_SPLIT_RANGE_PX}
-                        max={() => RGBSplitterKnobs.MAX_SPLIT_RANGE_PX}
-                        step={() => RGBSplitterKnobs.SPLIT_RANGE_STEP_PX}
-                        width={() => FIELD_WIDTH}
+                        min={RGBSplitterKnobs.MIN_SPLIT_RANGE_PX}
+                        max={RGBSplitterKnobs.MAX_SPLIT_RANGE_PX}
+                        step={RGBSplitterKnobs.SPLIT_RANGE_STEP_PX}
+                        width={FIELD_WIDTH}
                         ariaLabel={"Split range in pixels"}
                         onInput={setSplitRangePx}
                     />
@@ -145,10 +145,10 @@ export const RGBSplitterPage = () => {
                 >
                     <PageNumberField
                         value={getMaxOffsetPx}
-                        min={() => RGBSplitterKnobs.MIN_OFFSET_PX}
-                        max={() => RGBSplitterKnobs.MAX_OFFSET_PX}
-                        step={() => RGBSplitterKnobs.OFFSET_STEP_PX}
-                        width={() => FIELD_WIDTH}
+                        min={RGBSplitterKnobs.MIN_OFFSET_PX}
+                        max={RGBSplitterKnobs.MAX_OFFSET_PX}
+                        step={RGBSplitterKnobs.OFFSET_STEP_PX}
+                        width={FIELD_WIDTH}
                         ariaLabel={"Maximum offset in pixels"}
                         onInput={setMaxOffsetPx}
                     />
@@ -163,7 +163,7 @@ export const RGBSplitterPage = () => {
                 >
                     <PageSelectField
                         value={getColorMixingChoice}
-                        values={() => RGBSplitterKnobs.COLOR_MIXING_CHOICES}
+                        values={RGBSplitterKnobs.COLOR_MIXING_CHOICES}
                         ariaLabel={"Color mixing"}
                         onChange={setColorMixingChoice}
                     />

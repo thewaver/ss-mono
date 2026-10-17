@@ -18,13 +18,11 @@ export const ReadOnlyExample = (props: Props) => (
         value={props.value}
         isReadOnly={true}
         isAutoSizing={true}
-        minRows={() => MIN_ROWS}
-        padding={() => FIELD_PADDING}
-        gap={() => FIELD_GAP}
+        minRows={MIN_ROWS}
+        padding={FIELD_PADDING}
+        gap={FIELD_GAP}
         ariaLabel={"Read-only notes"}
         computeTextStyle={computePageTextFieldTextStyle}
-        renderContent={(getFlags) => (
-            <PageTextFieldContent flags={getFlags} width={() => FIELD_WIDTH} isStretched={true} />
-        )}
+        renderContent={(getFlags) => <PageTextFieldContent flags={getFlags} width={FIELD_WIDTH} isStretched={true} />}
     />
 );

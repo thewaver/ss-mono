@@ -16,7 +16,7 @@ export const LinkComponentExample = (props: Props) => {
     return (
         <Breadcrumbs
             crumbs={props.crumbs}
-            gap={() => BREADCRUMBS_GAP}
+            gap={BREADCRUMBS_GAP}
             ariaLabel={"Routed trail"}
             linkComponent={PageBreadcrumbLink}
             renderCrumb={(getCrumb, getFlags) => (

@@ -52,9 +52,9 @@ export const TimePickerPage = () => {
                 <ClockedExample
                     value={bookingSignal}
                     key={"booking"}
-                    clockSteps={() => BOOKING_STEPS}
-                    minValue={() => OPENING_TIME}
-                    maxValue={() => CLOSING_TIME}
+                    clockSteps={BOOKING_STEPS}
+                    minValue={OPENING_TIME}
+                    maxValue={CLOSING_TIME}
                     ariaLabel={"Booking time"}
                 />
             ),

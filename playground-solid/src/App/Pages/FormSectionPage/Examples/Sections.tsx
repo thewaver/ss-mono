@@ -31,10 +31,10 @@ const renderTextField = (signal: Signal<string>, getHasError?: () => boolean) =>
     <TextInput
         value={signal}
         hasError={getHasError}
-        padding={() => FIELD_PADDING}
-        gap={() => FIELD_GAP}
+        padding={FIELD_PADDING}
+        gap={FIELD_GAP}
         computeTextStyle={computePageTextFieldTextStyle}
-        renderContent={(getFlags) => <PageTextFieldContent flags={getFlags} width={() => FIELD_WIDTH} />}
+        renderContent={(getFlags) => <PageTextFieldContent flags={getFlags} width={FIELD_WIDTH} />}
     />
 );
 
@@ -107,7 +107,7 @@ export const SectionsExample = (props: Props) => {
 
                     <PageFormButtons>
                         <Button
-                            id={() => "sectionsSubmit"}
+                            id={"sectionsSubmit"}
                             isDisabled={() => !getState().isValid}
                             type={"submit"}
                             renderContent={(getFlags) => <PageButtonContent flags={getFlags}>Create</PageButtonContent>}

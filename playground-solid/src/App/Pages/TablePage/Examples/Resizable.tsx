@@ -17,7 +17,7 @@ export const ResizableExample = (props: Props) => {
         <div class={styles.tableFrameShort}>
             <Table
                 columns={getColumns}
-                rows={() => PARTS}
+                rows={PARTS}
                 sort={props.sort}
                 selection={props.selection}
                 widths={props.widths}

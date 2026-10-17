@@ -1,17 +1,16 @@
 import type { Point2d } from "@thewaver/ss-utils";
 
 import type { NavigatorDirection } from "../../Abstracts/Navigator/Navigator.types";
+import type { OverflowCollapse } from "../../Abstracts/Overflow/Overflow.types";
 import type { PlacementLayoutFn } from "../../Abstracts/Placement/Placement.types";
 import type { ProximityEffectFn } from "../../Abstracts/Proximity/Proximity.types";
 import type { MenuItemKind } from "../Menus/Menu/Menu.types";
 
 export type ToolbarRole = "toolbar" | "menubar";
 
-export type ToolbarCollapse = "auto" | "never" | "always";
-
 export type ToolbarActionRecord<T, TTooltipDefs = unknown> = {
     value: T;
-    collapse?: ToolbarCollapse;
+    collapse?: OverflowCollapse;
     isDisabled?: boolean;
     /**
      * Keeps this action in the arrow-key walk while it is disabled, so focus can land on it and a reader hears its name
@@ -24,19 +23,6 @@ export type ToolbarActionRecord<T, TTooltipDefs = unknown> = {
      * same tooltip, so what an action says about itself does not depend on whether it fitted.
      */
     tooltipDefs?: TTooltipDefs;
-};
-
-export type ToolbarCutDefs = {
-    widths: number[];
-    collapses: ToolbarCollapse[];
-    available: number;
-    overflowWidth: number;
-    gap: number;
-};
-
-export type ToolbarCut = {
-    shownIndexes: number[];
-    collapsedIndexes: number[];
 };
 
 export type ToolbarOverflowSource<T, TItem, TTooltipDefs = unknown> = ToolbarActionRecord<T, TTooltipDefs> & {

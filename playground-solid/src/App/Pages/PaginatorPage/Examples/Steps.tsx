@@ -26,7 +26,7 @@ export const StepsExample = (props: Props) => {
                 siblingCount={props.siblingCount}
                 boundaryCount={props.boundaryCount}
                 isDisabled={props.isDisabled}
-                gap={() => PAGINATOR_GAP}
+                gap={PAGINATOR_GAP}
                 ariaLabel={"Results"}
                 computePageLabel={computePaginatorPageLabel}
                 computeStepLabel={computePaginatorStepLabel}

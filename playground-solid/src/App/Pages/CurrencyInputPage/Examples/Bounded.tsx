@@ -20,15 +20,15 @@ export const BoundedExample = (props: Props) => {
     return (
         <CurrencyInput
             value={props.value}
-            max={() => BUDGET_MAX}
+            max={BUDGET_MAX}
             ariaLabel={"Budget"}
-            padding={() => FIELD_STEPPER_PADDING}
-            gap={() => FIELD_GAP}
+            padding={FIELD_STEPPER_PADDING}
+            gap={FIELD_GAP}
             locale={props.locale}
             decimals={props.decimals}
             groupSizes={props.groupSizes}
             computeTextStyle={computePageTextFieldTextStyle}
-            renderContent={(getFlags) => <PageTextFieldContent flags={getFlags} width={() => FIELD_WIDTH} />}
+            renderContent={(getFlags) => <PageTextFieldContent flags={getFlags} width={FIELD_WIDTH} />}
             renderPlaceholder={(getFlags, hint) => (
                 <PageTextFieldPlaceholder flags={getFlags}>{hint}</PageTextFieldPlaceholder>
             )}

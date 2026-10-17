@@ -442,13 +442,12 @@ test.describe("a menu opened by a right-click", () => {
  * A hover the pointer did not cause must not move the highlight. The browser re-runs hit-testing whenever
  * anything changes under a stationary cursor and reports the result as a fresh `mouseenter`, so a menu that
  * covers its own opener — a wheel is centered on its trigger — would otherwise open and immediately hand the
- * highlight to whatever happens to sit beneath the pointer. `Menu` tells the two apart by the point on
- * record: a real enter arrives with coordinates that differ from the last movement, an invented one matches.
+ * highlight to whatever happens to sit beneath the pointer. `Menu` moves its highlight on the pointer moving
+ * over an item, which a stationary pointer never reports, so an enter on its own changes nothing.
  *
  * There is no real interaction that produces the invented kind on demand — it depends on what the browser
- * decides to re-test and when — so this dispatches one, with the coordinates the pointer actually last had,
- * which is exactly the shape the guard is written to recognize. The second half is the control: the same
- * item, entered properly, does move the highlight.
+ * decides to re-test and when — so this dispatches one, with the coordinates the pointer actually last had.
+ * The second half is the control: the same item, moved onto properly, does take the highlight.
  */
 const enterWithoutMoving = (page: Page, item: Locator, at: { x: number; y: number }) =>
     item.evaluate((element, point) => {
@@ -477,6 +476,29 @@ test("a hover nothing caused leaves the highlight where it is", async ({ page })
 
     await other.hover();
     expect(await highlightAt(page, 0), "and moving there for real still moves it").toContain("Duplicate");
+});
+
+/**
+ * A slow pointer moves the highlight as surely as a fast one. The first guard against invented hovers compared
+ * an enter's point with the last movement's and took anything closer than a pixel for the pointer standing still,
+ * but the enter reports whole pixels and a movement does not, so a pointer creeping across a boundary a fraction
+ * of a pixel at a time was ignored and the highlight lagged behind it. The walk here moves well under a pixel per
+ * step, which is what a slow hand on a high-resolution mouse produces.
+ */
+test("a pointer creeping onto the next item takes the highlight with it", async ({ page }) => {
+    await openedWithHighlight(page, "default");
+
+    const from = (await itemAt(page, 0, "Copy").boundingBox())!;
+    const to = (await itemAt(page, 0, "Paste").boundingBox())!;
+    const start = { x: from.x + from.width * 0.5, y: from.y + from.height * 0.5 };
+    const end = { x: to.x + to.width * 0.5, y: to.y + to.height * 0.5 };
+    const steps = Math.ceil(Math.hypot(end.x - start.x, end.y - start.y) * 4);
+
+    await page.mouse.move(start.x, start.y);
+    expect(await highlightAt(page, 0)).toContain("Copy");
+
+    await page.mouse.move(end.x, end.y, { steps });
+    expect(await highlightAt(page, 0), "the highlight followed the pointer across").toContain("Paste");
 });
 
 /**

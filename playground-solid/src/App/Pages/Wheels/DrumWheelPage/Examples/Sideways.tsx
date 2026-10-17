@@ -32,7 +32,7 @@ export const SidewaysExample = ({ wedges, ...otherProps }: Props) => {
                         {...otherProps}
                         wedges={getWedges}
                         axis={"row"}
-                        wedgeSize={() => WEDGE_SIZE}
+                        wedgeSize={WEDGE_SIZE}
                         ariaLabel={"Prize drum, turning sideways"}
                         computeSpinTarget={() => pickPrizeIndex(getWedges().length)}
                         computeWedgeLabel={(index) => `${getWedges()[index]}, ${index + 1} of ${getWedges().length}`}

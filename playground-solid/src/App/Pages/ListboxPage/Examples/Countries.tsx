@@ -13,7 +13,7 @@ export const CountriesExample = (props: Props) => (
         <Listbox
             renderHighlightFloater={renderPageHighlightFloater}
             value={props.value}
-            options={() => COUNTRIES_WITH_REACHABLE}
+            options={COUNTRIES_WITH_REACHABLE}
             ariaLabel={"Shipping country"}
             renderOption={(getOption, getFlags) => (
                 <PageSelectOptionContent isGliding flags={getFlags}>

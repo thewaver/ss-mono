@@ -1882,11 +1882,16 @@ it, a list scrolling, an item growing — and reports the result as a fresh `mou
 nobody moved anything. A control that acts on every enter then moves its highlight, opens or closes a submenu, or
 undoes a keystroke, all by itself. It is most common where a popup opens on top of the control that opened it.
 
-**So a hover counts only if the pointer moved to cause it.** Keep the position of the last real `pointermove`. An
-enter the pointer caused arrives before the move that carried it there is reported, so its point differs from the
-one on record; an enter nothing caused reports exactly the point already on record. Compare within a pixel rather
-than for equality, because the two events report the same position at different precision. `movementX` cannot tell
-them apart; it reads zero in both cases.
+**So a hover counts only if the pointer moved to cause it, and that is read from `pointermove`, not from an
+enter.** A pointer standing still never sends a `pointermove`, whatever the browser re-tests under it, so acting on
+the movement over an item rather than on the enter into it leaves nothing to tell apart. The first answer kept the
+enter and compared its point with the last movement's, within a pixel; it ignored slow movement, because an enter
+reports whole pixels and a movement reports fractions, so a pointer creeping across a boundary looked like one
+standing still. `movementX` cannot tell them apart either; it reads zero in both cases.
+
+**What remains is the item a popup opened on top of**: the smallest twitch is real movement over it. Where that
+matters, the item drawn under the pointer when the popup opened ignores the pointer until it has moved elsewhere and
+come back, as a desktop context menu does — `MenuUtils.createOpeningHoverGuard` for menus.
 
 ### Moving a focused element in the document drops its focus, so put it back
 

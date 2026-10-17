@@ -6,6 +6,7 @@ export type CarouselExampleProps = {
     isDisabled: boolean;
     isLooping?: boolean;
     orientation: CarouselOrientation;
+    transitionDurationMs: number;
     autoplayDelayMs?: number;
     index: number;
     playback?: boolean;
@@ -18,10 +19,10 @@ export type CarouselSharedProps = Omit<CarouselExampleProps, "index" | "autoplay
 export type CarouselsControls = {
     slideCount: number;
     delay: number;
+    transitionDuration: number;
     orientation: CarouselOrientation;
     isDisabled: boolean;
     isLooping: boolean;
     placement: CarouselPlacements.SampleKey;
-    readonly slides: string[];
     readonly sharedProps: CarouselSharedProps;
 };

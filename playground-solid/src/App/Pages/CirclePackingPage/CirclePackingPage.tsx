@@ -56,9 +56,9 @@ export const CirclePackingPage = () => {
                 >
                     <PageNumberField
                         value={getPadding}
-                        min={() => CirclePackingKnobs.MIN_PADDING}
-                        max={() => CirclePackingKnobs.MAX_PADDING}
-                        step={() => CirclePackingKnobs.PADDING_STEP}
+                        min={CirclePackingKnobs.MIN_PADDING}
+                        max={CirclePackingKnobs.MAX_PADDING}
+                        step={CirclePackingKnobs.PADDING_STEP}
                         ariaLabel={"Padding in pixels"}
                         onInput={setPadding}
                     />
@@ -73,9 +73,9 @@ export const CirclePackingPage = () => {
                 >
                     <PageNumberField
                         value={getZoomDurationMs}
-                        min={() => CirclePackingKnobs.MIN_ZOOM_DURATION_MS}
-                        max={() => CirclePackingKnobs.MAX_ZOOM_DURATION_MS}
-                        step={() => CirclePackingKnobs.ZOOM_DURATION_STEP_MS}
+                        min={CirclePackingKnobs.MIN_ZOOM_DURATION_MS}
+                        max={CirclePackingKnobs.MAX_ZOOM_DURATION_MS}
+                        step={CirclePackingKnobs.ZOOM_DURATION_STEP_MS}
                         isDisabled={getPrefersReducedMotion}
                         ariaLabel={"Zoom duration in milliseconds"}
                         onInput={setZoomDurationMs}

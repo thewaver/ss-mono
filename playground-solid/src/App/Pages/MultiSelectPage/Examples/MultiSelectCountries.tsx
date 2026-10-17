@@ -15,7 +15,7 @@ export const MultiSelectCountriesExample = (props: Props) => (
     <MultiSelect
         renderHighlightFloater={renderPageHighlightFloater}
         values={props.values}
-        options={() => COUNTRIES}
+        options={COUNTRIES}
         ariaLabel={"Countries"}
         renderContent={(getSelectedOptions, getFlags) => (
             <PageSelectContent flags={getFlags}>

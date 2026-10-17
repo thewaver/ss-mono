@@ -113,8 +113,8 @@ export const CurrencyInputPage = () => {
                 >
                     <PageSelectField
                         value={getLocale}
-                        values={() => CurrencyInputKnobs.LOCALES}
-                        width={() => LOCALE_FIELD_WIDTH}
+                        values={CurrencyInputKnobs.LOCALES}
+                        width={LOCALE_FIELD_WIDTH}
                         ariaLabel={"Locale"}
                         onChange={(locale) => setLocale(() => locale)}
                     />
@@ -127,7 +127,7 @@ export const CurrencyInputPage = () => {
                 >
                     <PageSelectField
                         value={getDecimals}
-                        values={() => CurrencyInputKnobs.DECIMALS}
+                        values={CurrencyInputKnobs.DECIMALS}
                         ariaLabel={"Decimals"}
                         onChange={setDecimals}
                     />
@@ -150,7 +150,7 @@ export const CurrencyInputPage = () => {
                 >
                     <PageSelectField
                         value={getGrouping}
-                        values={() => CurrencyInputKnobs.GROUPINGS}
+                        values={CurrencyInputKnobs.GROUPINGS}
                         computeLabel={describeGrouping}
                         ariaLabel={"Grouping"}
                         onChange={(sizes) => setGrouping(() => sizes)}

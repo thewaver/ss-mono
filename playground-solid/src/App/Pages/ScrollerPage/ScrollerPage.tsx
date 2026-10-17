@@ -81,9 +81,9 @@ export const ScrollerPage = () => {
                 <PageProp key={"itemCount"} label={"Item count"} hint={"How many items sit in the scrolling strip."}>
                     <PageNumberField
                         value={getItemCount}
-                        min={() => ScrollerKnobs.MIN_ITEM_COUNT}
-                        max={() => ScrollerKnobs.MAX_ITEM_COUNT}
-                        step={() => ScrollerKnobs.ITEM_COUNT_STEP}
+                        min={ScrollerKnobs.MIN_ITEM_COUNT}
+                        max={ScrollerKnobs.MAX_ITEM_COUNT}
+                        step={ScrollerKnobs.ITEM_COUNT_STEP}
                         ariaLabel={"Item count"}
                         onInput={setItemCount}
                     />
@@ -96,9 +96,9 @@ export const ScrollerPage = () => {
                 >
                     <PageNumberField
                         value={() => Math.round(progressSignal[0]() * PERCENT)}
-                        min={() => ScrollerKnobs.MIN_POSITION}
-                        max={() => PERCENT}
-                        step={() => ScrollerKnobs.POSITION_STEP}
+                        min={ScrollerKnobs.MIN_POSITION}
+                        max={PERCENT}
+                        step={ScrollerKnobs.POSITION_STEP}
                         ariaLabel={"First strip position"}
                         onInput={(value) => progressSignal[1](value / PERCENT)}
                     />

@@ -11,7 +11,7 @@ export const ReelsExample = (props: Props) => {
     return (
         <SlotText
             text={props.text}
-            characterSize={() => DIGIT_SIZE}
+            characterSize={DIGIT_SIZE}
             ariaLabel={"Slot machine"}
             computeReel={(digitIndex, digitCount) =>
                 SlotTextReels.SAMPLE_REELS[access(props.reelKey)](digitIndex, digitCount)

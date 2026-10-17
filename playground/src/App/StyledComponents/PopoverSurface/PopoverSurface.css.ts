@@ -24,6 +24,7 @@ export const popoverSurface = style({
     maxHeight: 220,
     overflowY: "auto",
     padding: SURFACE_PADDING,
+    scrollPadding: SURFACE_PADDING,
     color: layerVars.contrast,
     boxShadow: themeVars.shadow.medium,
     border: `${SURFACE_BORDER}px solid rgb(from ${layerVars.contrast} r g b / 25%)`,

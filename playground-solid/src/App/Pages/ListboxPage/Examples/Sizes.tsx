@@ -14,7 +14,7 @@ export const SizesExample = (props: Props) => (
             <Listbox
                 renderHighlightFloater={renderPageHighlightFloater}
                 value={props.value}
-                options={() => SIZES}
+                options={SIZES}
                 orientation={"horizontal"}
                 ariaLabel={"Size"}
                 renderOption={(getOption, getFlags) => (

@@ -12,7 +12,7 @@ export const DeliveriesExample = (props: Props) => (
     <Select
         renderHighlightFloater={renderPageHighlightFloater}
         value={props.value}
-        options={() => DELIVERIES}
+        options={DELIVERIES}
         ariaLabel={"Delivery"}
         renderContent={(getSelectedOption, getFlags) => (
             <PageSelectContent flags={getFlags}>{getSelectedOption()?.value.name ?? PLACEHOLDER}</PageSelectContent>

@@ -9,7 +9,7 @@ const LABEL_GAP = 5;
 type Props = FileInputExampleProps;
 
 export const LabeledExample = (props: Props) => (
-    <Label orientation={"vertical"} gap={() => LABEL_GAP}>
+    <Label orientation={"vertical"} gap={LABEL_GAP}>
         <PageLabelCaption>Contract</PageLabelCaption>
 
         <FileInput

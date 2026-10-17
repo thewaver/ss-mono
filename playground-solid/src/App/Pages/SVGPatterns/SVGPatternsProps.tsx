@@ -20,9 +20,9 @@ export const PageSVGPatternsProps = (props: Props) => {
             <PageProp key={"cellSize"} label={"Cell Size (px)"} hint={"How large one cell of the pattern is."}>
                 <PageNumberField
                     value={controls.cellSize[0]}
-                    min={() => SVGPatternKnobs.MIN_CELL_SIZE}
-                    max={() => SVGPatternKnobs.MAX_CELL_SIZE}
-                    step={() => SVGPatternKnobs.CELL_SIZE_STEP}
+                    min={SVGPatternKnobs.MIN_CELL_SIZE}
+                    max={SVGPatternKnobs.MAX_CELL_SIZE}
+                    step={SVGPatternKnobs.CELL_SIZE_STEP}
                     ariaLabel={"Cell size"}
                     onInput={controls.cellSize[1]}
                 />
@@ -53,9 +53,9 @@ export const PageSVGPatternsProps = (props: Props) => {
             >
                 <PageNumberField
                     value={controls.blurWidth[0]}
-                    min={() => SVGPatternKnobs.MIN_BLUR_WIDTH}
-                    max={() => SVGPatternKnobs.MAX_BLUR_WIDTH}
-                    step={() => SVGPatternKnobs.BLUR_WIDTH_STEP}
+                    min={SVGPatternKnobs.MIN_BLUR_WIDTH}
+                    max={SVGPatternKnobs.MAX_BLUR_WIDTH}
+                    step={SVGPatternKnobs.BLUR_WIDTH_STEP}
                     ariaLabel={"Blur width"}
                     onInput={controls.blurWidth[1]}
                 />

@@ -27,7 +27,7 @@ export const PageFrameworkMenu = () => {
 
     return (
         <Menu
-            items={() => FRAMEWORK_ITEMS}
+            items={FRAMEWORK_ITEMS}
             ariaLabel={"Framework"}
             checked={[() => [OWN_FRAMEWORK], () => {}]}
             renderContent={(getFlags) => (

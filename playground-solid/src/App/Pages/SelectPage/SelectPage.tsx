@@ -84,10 +84,10 @@ const VirtualizedExampleWrapper = (
                 >
                     <PageNumberField
                         value={props.count}
-                        min={() => SelectKnobs.MIN_STRESS_COUNT}
-                        max={() => SelectKnobs.MAX_STRESS_COUNT}
-                        step={() => SelectKnobs.STRESS_COUNT_STEP}
-                        width={() => STRESS_COUNT_FIELD_WIDTH}
+                        min={SelectKnobs.MIN_STRESS_COUNT}
+                        max={SelectKnobs.MAX_STRESS_COUNT}
+                        step={SelectKnobs.STRESS_COUNT_STEP}
+                        width={STRESS_COUNT_FIELD_WIDTH}
                         ariaLabel={"Option count"}
                         onInput={props.onCountChange}
                     />
@@ -253,16 +253,14 @@ export const SelectPage = () => {
             name: EXAMPLE_NAMES.optionGroups,
             readout: () =>
                 `value: ${groupedSignal[0]() ?? "undefined"} — arrows cross group boundaries and skip Finland`,
-            component: () => (
-                <CountriesExample value={groupedSignal} options={() => GROUPED_COUNTRIES} hasGroups={true} />
-            ),
+            component: () => <CountriesExample value={groupedSignal} options={GROUPED_COUNTRIES} hasGroups={true} />,
             path: `${EXAMPLES_ROOT}/Countries.tsx`,
         },
         {
             key: "disabledOptions",
             name: EXAMPLE_NAMES.disabledOptions,
             readout: () => `value: ${disabledOptionSignal[0]() ?? "undefined"} — arrows skip Denmark and Finland`,
-            component: () => <CountriesExample value={disabledOptionSignal} options={() => COUNTRIES_WITH_DISABLED} />,
+            component: () => <CountriesExample value={disabledOptionSignal} options={COUNTRIES_WITH_DISABLED} />,
             path: `${EXAMPLES_ROOT}/Countries.tsx`,
         },
         {
@@ -270,9 +268,7 @@ export const SelectPage = () => {
             name: EXAMPLE_NAMES.disabledOptionsReachable,
             readout: () =>
                 `value: ${reachableOptionSignal[0]() ?? "undefined"} — arrows stop on them, hover explains why`,
-            component: () => (
-                <CountriesExample value={reachableOptionSignal} options={() => COUNTRIES_WITH_REACHABLE} />
-            ),
+            component: () => <CountriesExample value={reachableOptionSignal} options={COUNTRIES_WITH_REACHABLE} />,
             path: `${EXAMPLES_ROOT}/Countries.tsx`,
         },
         {

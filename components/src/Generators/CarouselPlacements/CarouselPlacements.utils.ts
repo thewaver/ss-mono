@@ -26,9 +26,9 @@ const HALF = 0.5;
 const FULL_TURN_DEGREES = 360;
 const HALF_TURN_DEGREES = 180;
 const QUARTER_TURN_DEGREES = 90;
-const LEVEL_SPINE = "column";
 const SMALLEST_RING = 3;
 const BOTTOM_EDGE = { x: 0.5, y: 1 };
+const LEFT_EDGE = { x: 0, y: 0.5 };
 const LEAVING_DROP_RATIO = 0.6;
 const FLIPPED_FADE_DISTANCE = 2;
 
@@ -41,6 +41,14 @@ const getAlong = (defs: CarouselPlacementDefs) =>
 /** A translation along the way the carousel runs, as `translate3d`'s three values: a share of the box each way, then depth. */
 const toTranslation = (defs: CarouselPlacementDefs, alongPercent: number, depthPx: number) =>
     defs.orientation === "horizontal" ? [alongPercent, 0, depthPx] : [0, alongPercent, depthPx];
+
+/**
+ * A translation towards the side a stack of waiting slides peeks out on, as `translate3d`'s three values: above the box
+ * on a carousel running up and down, and to its right, where the next slides come from, on one running across. A
+ * negative share moves the other way, which is where a slide leaving the stack goes.
+ */
+const toStackTranslation = (defs: CarouselPlacementDefs, aheadPercent: number, depthPx: number) =>
+    defs.orientation === "horizontal" ? [aheadPercent, 0, depthPx] : [0, -aheadPercent, depthPx];
 
 /**
  * A turn about the axis across the way the carousel runs, so a slide on the far side of the middle faces back towards
@@ -263,6 +271,9 @@ export namespace CarouselPlacementUtils {
      * A stack of folders: the slide showing in front, the ones to come rising behind it, each a little smaller. The
      * front one drops away and fades as the carousel moves on, and on a looping carousel it goes to the back.
      *
+     * On a carousel running across, the stack is the same turned a quarter turn: the folders to come peek out to the
+     * right, and the front one leaves to the left.
+     *
      * @param defs `offsetRatio`, how far each folder behind rises as a share of the box; `scaleStep` how much smaller
      * each is; `visibleDistance` how many stay drawn behind the front one.
      * @returns The rule, ready to hand to `placement`.
@@ -275,11 +286,13 @@ export namespace CarouselPlacementUtils {
 
         return {
             reach: Math.ceil(visibleDistance) + WHOLE,
-            place: ({ distance, count, isLooping }): CarouselPlacement => {
+            place: (placementDefs): CarouselPlacement => {
+                const { distance, count, isLooping } = placementDefs;
+
                 if (distance < 0 && distance > -WHOLE) {
                     return {
                         effect: {
-                            translateY: -distance * LEAVING_DROP_RATIO * PERCENT,
+                            translate3d: toStackTranslation(placementDefs, distance * LEAVING_DROP_RATIO * PERCENT, 0),
                             opacity: (WHOLE + distance) * PERCENT,
                         },
                         layer: WHOLE,
@@ -294,7 +307,7 @@ export namespace CarouselPlacementUtils {
 
                 return {
                     effect: {
-                        translateY: -behind * offsetRatio * PERCENT,
+                        translate3d: toStackTranslation(placementDefs, behind * offsetRatio * PERCENT, 0),
                         scale: [scale, scale],
                         opacity: toVisibility(behind, visibleDistance),
                     },
@@ -312,7 +325,9 @@ export namespace CarouselPlacementUtils {
      * and the one left behind turns over towards the viewer and lies face down, showing its back.
      *
      * The card turning over is a leaf on a level spine, as a wall calendar's page is: it turns by
-     * `SpineUtils.leaves` about its bottom edge.
+     * `SpineUtils.leaves` about its bottom edge. On a carousel running across, the spine is upright instead, as a
+     * book's is: the card turns over its left edge and lies face down to the left, and the ones to come peek out to
+     * the right.
      *
      * @param defs `offsetRatio`, how far each waiting card peeks above the one in front as a share of the box;
      * `depthPx` how far back each stands; `perspectivePx` how far away the viewer sits; `visibleDistance` how many
@@ -328,29 +343,37 @@ export namespace CarouselPlacementUtils {
 
         return {
             reach: Math.max(Math.ceil(visibleDistance) + WHOLE, FLIPPED_FADE_DISTANCE),
-            place: ({ distance, index, count }): CarouselPlacement => {
+            place: (placementDefs): CarouselPlacement => {
+                const { distance, index, count, orientation } = placementDefs;
+                const axis = orientation === "horizontal" ? "row" : "column";
+                const origin = orientation === "horizontal" ? LEFT_EDGE : BOTTOM_EDGE;
+
                 if (distance < 0) {
                     return {
                         effect: {
                             perspective: perspectivePx,
-                            ...SpineUtils.getTurn(LEVEL_SPINE, SpineUtils.leaves({ distance, index, count })),
+                            ...SpineUtils.getTurn(axis, SpineUtils.leaves({ distance, index, count })),
                             opacity: MathUtils.clamp01(FLIPPED_FADE_DISTANCE + distance) * PERCENT,
                         },
-                        origin: BOTTOM_EDGE,
+                        origin,
                         layer: WHOLE + distance,
-                        axis: "column",
+                        axis,
                     };
                 }
 
                 return {
                     effect: {
                         perspective: perspectivePx,
-                        translate3d: [0, -distance * offsetRatio * PERCENT, -distance * depthPx],
+                        translate3d: toStackTranslation(
+                            placementDefs,
+                            distance * offsetRatio * PERCENT,
+                            -distance * depthPx,
+                        ),
                         opacity: toVisibility(distance, visibleDistance),
                     },
-                    origin: BOTTOM_EDGE,
+                    origin,
                     layer: -distance,
-                    axis: "column",
+                    axis,
                 };
             },
         };
@@ -446,8 +469,8 @@ export namespace CarouselPlacementUtils {
      * swung out to its own angle the way `Spine` swings its faces.
      *
      * Every slide is the whole box turned about its middle line, so the slide has to paint only its leading half — the
-     * right half on a carousel running across, the top half on one running up and down — with a gap at the spine for
-     * the wheel's hollow core, and its back the other half. The slides lying flat on either side face the viewer
+     * right half on a carousel running across, the top half on one running up and down — and its back the other half,
+     * leaving a gap at the spine if the wheel should have a hollow core. The slides lying flat on either side face the viewer
      * widest, the ones pointing at the viewer are seen edge-on, and the perspective draws the far ones smaller. The
      * painted halves never cross, so the nearer one is stacked over the further.
      *

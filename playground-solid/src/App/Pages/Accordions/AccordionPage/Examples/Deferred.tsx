@@ -9,8 +9,6 @@ import {
 } from "../../../../StyledComponents/AccordionContent/AccordionContent";
 import type { AccordionDeferredExampleProps } from "../../Accordions.types";
 
-const GAP = 5;
-
 const SECTION_BODIES: Record<string, string[]> = {
     Shipping: ["Orders leave the warehouse within two working days.", "Tracking arrives by email."],
     Returns: ["Thirty days, unopened, receipt or order number."],
@@ -24,10 +22,11 @@ type Props = AccordionDeferredExampleProps;
 export const DeferredExample = (props: Props) => {
     return (
         <Accordion
-            items={() => ITEMS}
+            items={ITEMS}
             expanded={props.expanded}
             isPanelBuiltOnExpand={true}
-            gap={() => GAP}
+            gap={props.gap}
+            transitionDurationMs={props.transitionDurationMs}
             renderHeader={(getItem, getFlags) => (
                 <PageAccordionHeader flags={getFlags}>{getItem().value}</PageAccordionHeader>
             )}

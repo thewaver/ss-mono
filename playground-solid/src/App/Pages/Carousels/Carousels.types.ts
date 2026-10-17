@@ -13,6 +13,7 @@ export type CarouselExampleProps = AccessorProps<{
     isDisabled: boolean;
     isLooping?: boolean;
     orientation: CarouselOrientation;
+    transitionDurationMs: number;
     autoplayDelayMs?: number;
     index: Signal<number>;
     playback?: Signal<boolean>;
@@ -26,11 +27,11 @@ export type CarouselSharedProps = Omit<CarouselExampleProps, "index" | "autoplay
 export type CarouselsControls = {
     slideCount: Signal<number>;
     delay: Signal<number>;
+    transitionDuration: Signal<number>;
     orientation: Signal<CarouselOrientation>;
     isDisabled: Signal<boolean>;
     isLooping: Signal<boolean>;
     placement: Signal<CarouselPlacements.SampleKey>;
     getSlideCount: Accessor<number>;
-    getSlides: Accessor<string[]>;
     getSharedProps: Accessor<CarouselSharedProps>;
 };

@@ -5,7 +5,6 @@ import { activeMatches, demo, readout } from "./helpers";
 const ANCHOR = `${demo("profile")} button`;
 const BEFORE_ANCHOR = "#profileSource";
 const CARD = '[role="dialog"]';
-const FLYOUT_TRIGGER = `${demo("navigation")} [aria-haspopup="dialog"]`;
 
 /**
  * Longer than the hover wait and the focus wait the page starts with, plus the fade. Only ever spent to show
@@ -121,6 +120,25 @@ test("the pointer can cross the gap onto the card, and leaving both closes it", 
     await expect(page.locator(CARD), "leaving both for good takes it away").toHaveCount(0);
 });
 
+const FOLLOWING_ID = "afterProfileExample";
+
+/**
+ * Puts a control on the page straight after the profile example, so there is always something for Tab past the card
+ * to go on to. The page's own content after the example is whatever the Playground happens to hold, and with nothing
+ * there the browser wraps to the top of the page, from the name as much as from the card.
+ */
+const placeControlAfterExample = (page: Page) =>
+    page.evaluate(
+        ({ selector, id }) => {
+            const button = document.createElement("button");
+
+            button.id = id;
+            button.textContent = id;
+            document.querySelector(selector)!.after(button);
+        },
+        { selector: demo("profile"), id: FOLLOWING_ID },
+    );
+
 /**
  * The card is portaled to the end of the document, so without help the next Tab after the anchor would land on
  * whatever follows the anchor on the page and the card's controls could only be reached by a pointer. Tab is
@@ -131,6 +149,7 @@ test("the pointer can cross the gap onto the card, and leaving both closes it", 
 test("Tab from the name moves into the card, through its controls, and on to what follows the name", async ({
     page,
 }) => {
+    await placeControlAfterExample(page);
     await openedByKeyboard(page);
 
     await page.keyboard.press("Tab");
@@ -156,16 +175,11 @@ test("Tab from the name moves into the card, through its controls, and on to wha
 
     await page.keyboard.press("Tab");
     expect(await isFocusInsideCard(page), "Tab past the last control leaves the card").toBe(false);
+
     expect(
-        await page.evaluate(
-            (selector) =>
-                (document.querySelector(selector)!.compareDocumentPosition(document.activeElement!) &
-                    Node.DOCUMENT_POSITION_FOLLOWING) !==
-                0,
-            ANCHOR,
-        ),
+        await page.evaluate(() => document.activeElement?.id),
         "for whatever follows the name on the page, not for the top of the document",
-    ).toBe(true);
+    ).toBe(FOLLOWING_ID);
     await expect(page.locator(CARD), "and with both focus and pointer gone, the card closes").toHaveCount(0);
 });
 
@@ -225,48 +239,4 @@ test("Escape with focus on the name closes the card and leaves focus where it wa
     await page.keyboard.press("Escape");
     await expect(page.locator(CARD), "Escape closes the card from the name too").toHaveCount(0);
     expect(await activeMatches(page, ANCHOR), "and focus stays on the name").toBe(true);
-});
-
-/**
- * The navigation example is a popup trigger over a popover, sharing the hover engine: a press opens a flyout
- * and moves focus into it, and one shared "which is open" value keeps a second flyout from opening beside the
- * first, since hovering another trigger never passes through the dismiss layer.
- */
-test("a press opens a flyout and moves focus into it", async ({ page }) => {
-    const trigger = page.locator(FLYOUT_TRIGGER).first();
-
-    await expect(trigger, "a flyout trigger starts closed").toHaveAttribute("aria-expanded", "false");
-
-    await trigger.click();
-
-    await expect(page.locator(CARD), "pressing it opens its flyout").toHaveCount(1);
-    await expect(trigger, "and the trigger says so").toHaveAttribute("aria-expanded", "true");
-    expect(await page.locator(CARD).getAttribute("aria-label"), "the flyout carries a name of its own").toBeTruthy();
-    await expect.poll(() => isFocusInsideCard(page), "and focus moves into it, since a press asked for it").toBe(true);
-});
-
-test("opening a second flyout closes the first, so only one is ever open", async ({ page }) => {
-    const first = page.locator(FLYOUT_TRIGGER).nth(0);
-    const second = page.locator(FLYOUT_TRIGGER).nth(1);
-
-    await first.click();
-    await expect(first).toHaveAttribute("aria-expanded", "true");
-
-    await second.click();
-
-    await expect(second, "pressing the second trigger opens its flyout").toHaveAttribute("aria-expanded", "true");
-    await expect(first, "and closes the first").toHaveAttribute("aria-expanded", "false");
-    await expect(page.locator(CARD), "so one flyout is on the page, not two").toHaveCount(1);
-});
-
-test("Escape closes a pressed-open flyout", async ({ page }) => {
-    const trigger = page.locator(FLYOUT_TRIGGER).first();
-
-    await trigger.click();
-    await expect.poll(() => isFocusInsideCard(page)).toBe(true);
-
-    await page.keyboard.press("Escape");
-
-    await expect(page.locator(CARD), "Escape closes the flyout").toHaveCount(0);
-    await expect(trigger, "and the trigger says it is closed").toHaveAttribute("aria-expanded", "false");
 });

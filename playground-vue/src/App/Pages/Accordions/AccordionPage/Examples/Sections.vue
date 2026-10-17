@@ -8,8 +8,6 @@ import PageAccordionHeader from "../../../../StyledComponents/AccordionContent/P
 import PageAccordionPanel from "../../../../StyledComponents/AccordionContent/PageAccordionPanel.vue";
 import type { AccordionExampleProps } from "../../Accordions.types";
 
-const GAP = 5;
-
 const SECTION_BODIES: Record<string, string[]> = {
     Shipping: ["Orders leave the warehouse within two working days.", "Tracking arrives by email."],
     Returns: ["Thirty days, unopened, receipt or order number."],
@@ -40,7 +38,8 @@ const expanded = useModel(props, "expanded");
         :items="ITEMS"
         :is-single-expand="isSingleExpand"
         :is-expand-required="isExpandRequired"
-        :gap="GAP"
+        :gap="gap"
+        :transition-duration-ms="transitionDurationMs"
     >
         <template #renderHeader="{ item, flags }">
             <PageAccordionHeader :flags="flags">{{ item.value }}</PageAccordionHeader>

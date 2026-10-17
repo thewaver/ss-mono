@@ -68,7 +68,7 @@ const HeadingExampleWrapper = ({ width, ...props }: ExampleWrapperProps) => {
 
     return (
         <>
-            <PageMeasureBox width={width} padding={() => MEASURE_BOX_PADDING}>
+            <PageMeasureBox width={width} padding={MEASURE_BOX_PADDING}>
                 <HeadingExample
                     {...props}
                     fontSize={getFontSize}
@@ -81,9 +81,9 @@ const HeadingExampleWrapper = ({ width, ...props }: ExampleWrapperProps) => {
                 <PageProp key={"fontSize"} label={"Font size (px)"} hint={"How large the letters are."}>
                     <PageNumberField
                         value={getFontSize}
-                        min={() => PaintedTextKnobs.MIN_FONT_SIZE}
-                        max={() => PaintedTextKnobs.MAX_FONT_SIZE}
-                        step={() => PaintedTextKnobs.FONT_SIZE_STEP}
+                        min={PaintedTextKnobs.MIN_FONT_SIZE}
+                        max={PaintedTextKnobs.MAX_FONT_SIZE}
+                        step={PaintedTextKnobs.FONT_SIZE_STEP}
                         ariaLabel={"Font size in pixels"}
                         onInput={setFontSize}
                     />
@@ -98,9 +98,9 @@ const HeadingExampleWrapper = ({ width, ...props }: ExampleWrapperProps) => {
                 >
                     <PageNumberField
                         value={getLineHeight}
-                        min={() => PaintedTextKnobs.MIN_LINE_HEIGHT}
-                        max={() => PaintedTextKnobs.MAX_LINE_HEIGHT}
-                        step={() => PaintedTextKnobs.LINE_HEIGHT_STEP}
+                        min={PaintedTextKnobs.MIN_LINE_HEIGHT}
+                        max={PaintedTextKnobs.MAX_LINE_HEIGHT}
+                        step={PaintedTextKnobs.LINE_HEIGHT_STEP}
                         ariaLabel={"Line height"}
                         onInput={setLineHeight}
                     />
@@ -109,9 +109,9 @@ const HeadingExampleWrapper = ({ width, ...props }: ExampleWrapperProps) => {
                 <PageProp key={"fontWeight"} label={"Font weight"} hint={"How heavy the letters are, from 100 to 900."}>
                     <PageNumberField
                         value={getFontWeight}
-                        min={() => PaintedTextKnobs.MIN_FONT_WEIGHT}
-                        max={() => PaintedTextKnobs.MAX_FONT_WEIGHT}
-                        step={() => PaintedTextKnobs.FONT_WEIGHT_STEP}
+                        min={PaintedTextKnobs.MIN_FONT_WEIGHT}
+                        max={PaintedTextKnobs.MAX_FONT_WEIGHT}
+                        step={PaintedTextKnobs.FONT_WEIGHT_STEP}
                         ariaLabel={"Font weight"}
                         onInput={setFontWeight}
                     />
@@ -122,7 +122,7 @@ const HeadingExampleWrapper = ({ width, ...props }: ExampleWrapperProps) => {
 };
 
 const ParagraphExampleWrapper = ({ width, ...props }: ExampleWrapperProps) => (
-    <PageMeasureBox width={width} padding={() => MEASURE_BOX_PADDING}>
+    <PageMeasureBox width={width} padding={MEASURE_BOX_PADDING}>
         <ParagraphExample {...props} />
     </PageMeasureBox>
 );
@@ -135,16 +135,16 @@ const CustomInputExampleWrapper = ({ width, ...props }: ExampleWrapperProps) => 
             <TextArea
                 value={textSignal}
                 isAutoSizing={true}
-                minRows={() => PaintedTextKnobs.CUSTOM_TEXT_MIN_ROWS}
-                maxRows={() => PaintedTextKnobs.CUSTOM_TEXT_MAX_ROWS}
-                padding={() => FIELD_PADDING}
-                gap={() => FIELD_GAP}
+                minRows={PaintedTextKnobs.CUSTOM_TEXT_MIN_ROWS}
+                maxRows={PaintedTextKnobs.CUSTOM_TEXT_MAX_ROWS}
+                padding={FIELD_PADDING}
+                gap={FIELD_GAP}
                 ariaLabel={"Custom text"}
                 computeTextStyle={computePageTextFieldTextStyle}
                 renderContent={(getFlags) => (
                     <PageTextFieldContent
                         flags={getFlags}
-                        width={() => PaintedTextKnobs.CUSTOM_TEXT_WIDTH}
+                        width={PaintedTextKnobs.CUSTOM_TEXT_WIDTH}
                         isStretched={true}
                     />
                 )}
@@ -155,7 +155,7 @@ const CustomInputExampleWrapper = ({ width, ...props }: ExampleWrapperProps) => 
                 )}
             />
 
-            <PageMeasureBox width={width} padding={() => MEASURE_BOX_PADDING}>
+            <PageMeasureBox width={width} padding={MEASURE_BOX_PADDING}>
                 <CustomInputExample {...props} text={textSignal[0]} />
             </PageMeasureBox>
         </>
@@ -179,7 +179,7 @@ const TypedExampleWrapper = (props: ExampleWrapperProps) => {
                 >
                     <PageSelectField
                         value={getArrivalEffect}
-                        values={() => ARRIVAL_EFFECTS}
+                        values={ARRIVAL_EFFECTS}
                         ariaLabel={"Arrival effect"}
                         onChange={(effect) => setArrivalEffect(() => effect)}
                     />
@@ -208,9 +208,9 @@ const LapDurationKnob = (props: LapDurationKnobProps) => (
     >
         <PageNumberField
             value={props.value}
-            min={() => PaintedTextKnobs.MIN_LAP_DURATION_MS}
-            max={() => PaintedTextKnobs.MAX_LAP_DURATION_MS}
-            step={() => PaintedTextKnobs.LAP_DURATION_STEP_MS}
+            min={PaintedTextKnobs.MIN_LAP_DURATION_MS}
+            max={PaintedTextKnobs.MAX_LAP_DURATION_MS}
+            step={PaintedTextKnobs.LAP_DURATION_STEP_MS}
             ariaLabel={"Lap duration in milliseconds"}
             onInput={props.onInput}
         />
@@ -239,9 +239,9 @@ const CircleExampleWrapper = (props: PathExampleWrapperProps) => {
                 >
                     <PageNumberField
                         value={getRadius}
-                        min={() => PaintedTextKnobs.MIN_CIRCLE_RADIUS}
-                        max={() => PaintedTextKnobs.MAX_CIRCLE_RADIUS}
-                        step={() => PaintedTextKnobs.CIRCLE_RADIUS_STEP}
+                        min={PaintedTextKnobs.MIN_CIRCLE_RADIUS}
+                        max={PaintedTextKnobs.MAX_CIRCLE_RADIUS}
+                        step={PaintedTextKnobs.CIRCLE_RADIUS_STEP}
                         ariaLabel={"Radius in pixels"}
                         onInput={setRadius}
                     />
@@ -420,9 +420,9 @@ export const PaintedTextPage = () => {
                     >
                         <PageNumberField
                             value={getStrokeWidth}
-                            min={() => PaintedTextKnobs.MIN_STROKE_WIDTH}
-                            max={() => PaintedTextKnobs.MAX_STROKE_WIDTH}
-                            step={() => PaintedTextKnobs.STROKE_WIDTH_STEP}
+                            min={PaintedTextKnobs.MIN_STROKE_WIDTH}
+                            max={PaintedTextKnobs.MAX_STROKE_WIDTH}
+                            step={PaintedTextKnobs.STROKE_WIDTH_STEP}
                             ariaLabel={"Stroke width in pixels"}
                             onInput={setStrokeWidth}
                         />
@@ -437,7 +437,7 @@ export const PaintedTextPage = () => {
                     >
                         <PageSelectField
                             value={getStrokeAlignment}
-                            values={() => PaintedTextKnobs.STROKE_ALIGNMENTS}
+                            values={PaintedTextKnobs.STROKE_ALIGNMENTS}
                             ariaLabel={"Stroke alignment"}
                             onChange={(alignment) => setStrokeAlignment(() => alignment)}
                         />
@@ -470,9 +470,9 @@ export const PaintedTextPage = () => {
                     >
                         <PageNumberField
                             value={getBlurWidth}
-                            min={() => PaintedTextKnobs.MIN_BLUR_WIDTH}
-                            max={() => PaintedTextKnobs.MAX_BLUR_WIDTH}
-                            step={() => PaintedTextKnobs.BLUR_WIDTH_STEP}
+                            min={PaintedTextKnobs.MIN_BLUR_WIDTH}
+                            max={PaintedTextKnobs.MAX_BLUR_WIDTH}
+                            step={PaintedTextKnobs.BLUR_WIDTH_STEP}
                             ariaLabel={"Blur width"}
                             onInput={setBlurWidth}
                         />
@@ -486,9 +486,9 @@ export const PaintedTextPage = () => {
                         >
                             <PageNumberField
                                 value={getAnimationDurationMs}
-                                min={() => PaintedTextKnobs.MIN_DURATION_MS}
-                                max={() => PaintedTextKnobs.MAX_DURATION_MS}
-                                step={() => PaintedTextKnobs.DURATION_STEP_MS}
+                                min={PaintedTextKnobs.MIN_DURATION_MS}
+                                max={PaintedTextKnobs.MAX_DURATION_MS}
+                                step={PaintedTextKnobs.DURATION_STEP_MS}
                                 ariaLabel={"Animation duration"}
                                 onInput={setAnimationDurationMs}
                             />
@@ -501,7 +501,7 @@ export const PaintedTextPage = () => {
                         >
                             <PageSelectField
                                 value={getIterationConfigKey}
-                                values={() => SVGDefsSamples.Iteration.SAMPLE_KEYS}
+                                values={SVGDefsSamples.Iteration.SAMPLE_KEYS}
                                 ariaLabel={"Iteration pattern"}
                                 onChange={(config) => setIterationConfigKey(() => config)}
                             />
@@ -516,9 +516,9 @@ export const PaintedTextPage = () => {
                         >
                             <PageNumberField
                                 value={getCellSize}
-                                min={() => PaintedTextKnobs.MIN_CELL_SIZE}
-                                max={() => PaintedTextKnobs.MAX_CELL_SIZE}
-                                step={() => PaintedTextKnobs.CELL_SIZE_STEP}
+                                min={PaintedTextKnobs.MIN_CELL_SIZE}
+                                max={PaintedTextKnobs.MAX_CELL_SIZE}
+                                step={PaintedTextKnobs.CELL_SIZE_STEP}
                                 ariaLabel={"Pattern cell size"}
                                 onInput={setCellSize}
                             />
@@ -532,9 +532,9 @@ export const PaintedTextPage = () => {
                     >
                         <PageNumberField
                             value={getWidth}
-                            min={() => PaintedTextKnobs.MIN_CONTAINER_WIDTH}
-                            max={() => PaintedTextKnobs.MAX_CONTAINER_WIDTH}
-                            step={() => PaintedTextKnobs.CONTAINER_WIDTH_STEP}
+                            min={PaintedTextKnobs.MIN_CONTAINER_WIDTH}
+                            max={PaintedTextKnobs.MAX_CONTAINER_WIDTH}
+                            step={PaintedTextKnobs.CONTAINER_WIDTH_STEP}
                             ariaLabel={"Container width in pixels"}
                             onInput={setWidth}
                         />

@@ -37,8 +37,8 @@ export const DestructiveConfirmationExample = (props: Props) => {
                 initialFocusRef={getCancelRef}
                 isDismissableOnOverlayClick={false}
                 isDismissableOnEscape={false}
-                ariaLabelledBy={() => ALERT_TITLE_ID}
-                ariaDescribedBy={() => ALERT_BODY_ID}
+                ariaLabelledBy={ALERT_TITLE_ID}
+                ariaDescribedBy={ALERT_BODY_ID}
                 renderOverlay={(getVisibilityTarget, getTransitionDurationMs) => (
                     <PageModalOverlay
                         visibilityTarget={getVisibilityTarget}
@@ -52,7 +52,7 @@ export const DestructiveConfirmationExample = (props: Props) => {
                     >
                         <div id={ALERT_TITLE_ID}>Delete this project?</div>
 
-                        <PageModalHint id={() => ALERT_BODY_ID}>
+                        <PageModalHint id={ALERT_BODY_ID}>
                             Clicking the overlay and pressing Escape both do nothing here — an alert has to be answered.
                         </PageModalHint>
 

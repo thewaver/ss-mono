@@ -12,7 +12,7 @@ export const AirportsExample = (props: Props) => (
     <Select
         renderHighlightFloater={renderPageHighlightFloater}
         value={props.value}
-        options={() => AIRPORTS}
+        options={AIRPORTS}
         ariaLabel={"Airport"}
         renderContent={(getSelectedOption, getFlags) => (
             <PageSelectContent flags={getFlags}>

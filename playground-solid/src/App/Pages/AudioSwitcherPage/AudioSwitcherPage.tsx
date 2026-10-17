@@ -54,8 +54,8 @@ export const AudioSwitcherPage = () => {
                 >
                     <PageSelectField
                         value={getTrackName}
-                        values={() => TRACK_NAMES}
-                        width={() => FIELD_WIDTH}
+                        values={TRACK_NAMES}
+                        width={FIELD_WIDTH}
                         ariaLabel={"Track"}
                         onChange={(name) => setTrackName(() => name)}
                     />
@@ -68,10 +68,10 @@ export const AudioSwitcherPage = () => {
                 >
                     <PageNumberField
                         value={getCrossfadeMs}
-                        min={() => AudioSwitcherKnobs.MIN_CROSSFADE_MS}
-                        max={() => AudioSwitcherKnobs.MAX_CROSSFADE_MS}
-                        step={() => AudioSwitcherKnobs.CROSSFADE_STEP_MS}
-                        width={() => FIELD_WIDTH}
+                        min={AudioSwitcherKnobs.MIN_CROSSFADE_MS}
+                        max={AudioSwitcherKnobs.MAX_CROSSFADE_MS}
+                        step={AudioSwitcherKnobs.CROSSFADE_STEP_MS}
+                        width={FIELD_WIDTH}
                         ariaLabel={"Crossfade in milliseconds"}
                         onInput={setCrossfadeMs}
                     />
@@ -80,10 +80,10 @@ export const AudioSwitcherPage = () => {
                 <PageProp key={"volume"} label={"Volume (%)"} hint={"How loud the playback is."}>
                     <PageNumberField
                         value={getVolumePercent}
-                        min={() => AudioSwitcherKnobs.MIN_VOLUME_PERCENT}
-                        max={() => AudioSwitcherKnobs.MAX_VOLUME_PERCENT}
-                        step={() => AudioSwitcherKnobs.VOLUME_STEP_PERCENT}
-                        width={() => FIELD_WIDTH}
+                        min={AudioSwitcherKnobs.MIN_VOLUME_PERCENT}
+                        max={AudioSwitcherKnobs.MAX_VOLUME_PERCENT}
+                        step={AudioSwitcherKnobs.VOLUME_STEP_PERCENT}
+                        width={FIELD_WIDTH}
                         ariaLabel={"Volume as a percentage"}
                         onInput={setVolumePercent}
                     />

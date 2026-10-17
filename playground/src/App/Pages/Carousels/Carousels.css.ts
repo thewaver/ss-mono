@@ -1,6 +1,5 @@
-import { style } from "@vanilla-extract/css";
+import { globalStyle, style } from "@vanilla-extract/css";
 
-import { CarouselKnobs } from "../../Knobs/Carousels.const";
 import type { SlideFrame, SlideFrameSet } from "./Carousels.types";
 
 import { CAROUSEL_SLIDE_HEIGHT } from "../../StyledComponents/CarouselContent/CarouselContent.css";
@@ -22,52 +21,62 @@ export const slideFrameNarrow = style([
     },
 ]);
 
-const PADDLE_CORE = themeVars.spacing.full;
+const PADDLE_UP_AND_DOWN_EDGE = themeVars.spacing.full;
 const PADDLE_ACROSS_MARGIN = "6%";
-const PADDLE_UP_AND_DOWN_MARGIN = "10%";
+const PADDLE_UP_AND_DOWN_MARGIN = "25%";
+const PADDLE_UP_AND_DOWN_HEIGHT = 200;
 
-const createPaddleFrames = (acrossHeight: number, upAndDownHeight: number): SlideFrameSet => ({
-    horizontal: {
-        front: style([
-            slideFrame,
-            {
-                height: acrossHeight,
-                marginLeft: `calc(50% + ${PADDLE_CORE})`,
-                marginRight: PADDLE_ACROSS_MARGIN,
-                marginBlock: PADDLE_ACROSS_MARGIN,
-            },
-        ]),
-        back: style([
-            slideFrame,
-            {
-                height: acrossHeight,
-                marginRight: `calc(50% + ${PADDLE_CORE})`,
-                marginLeft: PADDLE_ACROSS_MARGIN,
-                marginBlock: PADDLE_ACROSS_MARGIN,
-            },
-        ]),
-    },
-    vertical: {
-        front: style([
-            slideFrame,
-            {
-                height: upAndDownHeight,
-                marginTop: PADDLE_CORE,
-                marginBottom: `calc(${upAndDownHeight}px + ${PADDLE_CORE} * 3)`,
-                marginInline: PADDLE_UP_AND_DOWN_MARGIN,
-            },
-        ]),
-        back: style([
-            slideFrame,
-            {
-                height: upAndDownHeight,
-                marginBottom: PADDLE_CORE,
-                marginTop: `calc(${upAndDownHeight}px + ${PADDLE_CORE} * 3)`,
-                marginInline: PADDLE_UP_AND_DOWN_MARGIN,
-            },
-        ]),
-    },
-});
+const createPaddleFrames = (acrossHeight: number, upAndDownHeight: number): SlideFrameSet => {
+    const upAndDownPanel = `calc(${upAndDownHeight}px / 2 - ${PADDLE_UP_AND_DOWN_EDGE})`;
+    const upAndDownSpine = upAndDownHeight / 2;
+
+    const upAndDownFront = style([
+        slideFrame,
+        {
+            height: upAndDownPanel,
+            marginTop: PADDLE_UP_AND_DOWN_EDGE,
+            marginBottom: upAndDownSpine,
+            marginInline: PADDLE_UP_AND_DOWN_MARGIN,
+        },
+    ]);
+
+    globalStyle(`${upAndDownFront} > *`, { height: "100%" });
+
+    return {
+        horizontal: {
+            front: style([
+                slideFrame,
+                {
+                    height: acrossHeight,
+                    marginLeft: "50%",
+                    marginRight: PADDLE_ACROSS_MARGIN,
+                    marginBlock: PADDLE_ACROSS_MARGIN,
+                },
+            ]),
+            back: style([
+                slideFrame,
+                {
+                    height: acrossHeight,
+                    marginRight: "50%",
+                    marginLeft: PADDLE_ACROSS_MARGIN,
+                    marginBlock: PADDLE_ACROSS_MARGIN,
+                },
+            ]),
+        },
+        vertical: {
+            front: upAndDownFront,
+            back: style([
+                slideFrame,
+                {
+                    height: upAndDownPanel,
+                    marginBottom: PADDLE_UP_AND_DOWN_EDGE,
+                    marginTop: upAndDownSpine,
+                    marginInline: PADDLE_UP_AND_DOWN_MARGIN,
+                },
+            ]),
+        },
+    };
+};
 
 const toUnturnedFrames = (className: string): SlideFrameSet => ({
     horizontal: { front: className, back: className },
@@ -77,10 +86,8 @@ const toUnturnedFrames = (className: string): SlideFrameSet => ({
 export const slideFrames: Record<SlideFrame, SlideFrameSet> = {
     whole: toUnturnedFrames(slideFrame),
     narrow: toUnturnedFrames(slideFrameNarrow),
-    paddle: createPaddleFrames(CAROUSEL_SLIDE_HEIGHT, CAROUSEL_SLIDE_HEIGHT),
+    paddle: createPaddleFrames(CAROUSEL_SLIDE_HEIGHT, PADDLE_UP_AND_DOWN_HEIGHT),
 };
-
-export const ringFrames = createPaddleFrames(CarouselKnobs.RING_PANEL_HEIGHT, CAROUSEL_SLIDE_HEIGHT);
 
 export const scrollBox = style({
     height: SCROLL_BOX_HEIGHT,
@@ -101,45 +108,4 @@ export const scrollPinned = style({
 export const scrollRunway = style({
     height: SCROLL_BOX_HEIGHT * 3,
     marginBlock: SCROLL_BOX_HEIGHT,
-});
-
-export const ringStack = style({
-    display: "flex",
-    flexDirection: "column",
-    gap: themeVars.spacing.full,
-    alignItems: "center",
-    width: "100%",
-});
-
-export const ringFrame = style({
-    display: "flex",
-    justifyContent: "flex-end",
-    alignItems: "center",
-    width: CarouselKnobs.RING_SLOT_WIDTH * 0.5,
-    maxWidth: "100%",
-    overflow: "hidden",
-    paddingBlock: themeVars.spacing.quad,
-});
-
-export const ringSlot = style({
-    flex: "none",
-    width: CarouselKnobs.RING_SLOT_WIDTH,
-    marginRight: -CarouselKnobs.RING_SLOT_WIDTH * 0.5,
-    userSelect: "none",
-});
-
-export const wordDrumSlot = style({
-    width: "100%",
-    height: CarouselKnobs.WORD_DRUM_SLOT_HEIGHT,
-    userSelect: "none",
-});
-
-export const wordDrumWord = style({
-    display: "flex",
-    justifyContent: "center",
-    alignItems: "center",
-    width: "100%",
-    height: CarouselKnobs.WORD_DRUM_SLOT_HEIGHT,
-    fontSize: themeVars.fontSize.xLarge,
-    fontWeight: "bold",
 });

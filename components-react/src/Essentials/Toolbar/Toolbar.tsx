@@ -1,6 +1,13 @@
 import { type KeyboardEvent, useEffect, useLayoutEffect, useMemo, useRef, useState } from "react";
 
-import { type MenuItemFlags, MenuUtils, TOOLBAR_DEFAULTS, ToolbarStyles, ToolbarUtils } from "@thewaver/ss-components";
+import {
+    type MenuItemFlags,
+    MenuUtils,
+    OverflowUtils,
+    TOOLBAR_DEFAULTS,
+    ToolbarStyles,
+    ToolbarUtils,
+} from "@thewaver/ss-components";
 import { PlacementConst, ToolbarConst } from "@thewaver/ss-components/internal";
 
 import { ElementObserverReactUtils } from "../../Abstracts/ElementObserver/ElementObserverReact.utils";
@@ -45,13 +52,13 @@ export const ToolbarComposite = <T,>(props: ToolbarCompositeProps<T>) => {
 
     const direction = NavigatorReactUtils.useDirection(rootRef);
 
-    const hasMeasured = ToolbarUtils.computeHasMeasured(isPlaced, rootSize.width, itemSizes.length, actionCount);
+    const hasMeasured = OverflowUtils.computeHasMeasured(isPlaced, rootSize.width, itemSizes.length, actionCount);
 
     const cut = useMemo(
         () =>
             isPlaced
-                ? ToolbarUtils.computeUncut(actions.length)
-                : ToolbarUtils.computeCut({
+                ? OverflowUtils.computeUncut(actions.length)
+                : OverflowUtils.computeCut({
                       widths: itemSizes.map((size) => size.width),
                       collapses: actions.map((action) => action.collapse ?? "auto"),
                       available: rootSize.width,

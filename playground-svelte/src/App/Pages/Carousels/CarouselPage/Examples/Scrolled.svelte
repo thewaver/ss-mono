@@ -34,6 +34,7 @@
             isLooping={false}
             isDisabled={props.isDisabled}
             orientation={props.orientation}
+            transitionDurationMs={props.transitionDurationMs}
             ariaLabel={"Scrolled sampler"}
             computeSlideLabel={computePositionLabel}
             computeStepLabel={computeCarouselStepLabel}

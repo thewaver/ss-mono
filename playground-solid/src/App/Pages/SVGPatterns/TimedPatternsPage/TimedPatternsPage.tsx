@@ -79,9 +79,9 @@ export const TimedPatternsPage = () => {
                 >
                     <PageNumberField
                         value={getAnimationDurationMs}
-                        min={() => SVGPatternKnobs.MIN_DURATION_MS}
-                        max={() => SVGPatternKnobs.MAX_DURATION_MS}
-                        step={() => SVGPatternKnobs.DURATION_STEP_MS}
+                        min={SVGPatternKnobs.MIN_DURATION_MS}
+                        max={SVGPatternKnobs.MAX_DURATION_MS}
+                        step={SVGPatternKnobs.DURATION_STEP_MS}
                         ariaLabel={"Animation duration"}
                         onInput={setAnimationDurationMs}
                     />
@@ -94,7 +94,7 @@ export const TimedPatternsPage = () => {
                 >
                     <PageSelectField
                         value={getIterationConfigKey}
-                        values={() => SVGDefsSamples.Iteration.SAMPLE_KEYS}
+                        values={SVGDefsSamples.Iteration.SAMPLE_KEYS}
                         ariaLabel={"Iteration pattern"}
                         onChange={(config) => setIterationConfigKey(() => config)}
                     />

@@ -130,9 +130,9 @@ export const ScratchCardPage = () => {
                 >
                     <PageNumberField
                         value={getPrecision}
-                        min={() => ScratchCardKnobs.MIN_PRECISION}
-                        max={() => ScratchCardKnobs.MAX_PRECISION}
-                        step={() => ScratchCardKnobs.PRECISION_STEP}
+                        min={ScratchCardKnobs.MIN_PRECISION}
+                        max={ScratchCardKnobs.MAX_PRECISION}
+                        step={ScratchCardKnobs.PRECISION_STEP}
                         ariaLabel={"Precision"}
                         onInput={setPrecision}
                     />
@@ -145,9 +145,9 @@ export const ScratchCardPage = () => {
                 >
                     <PageNumberField
                         value={getBrushRadius}
-                        min={() => ScratchCardKnobs.MIN_BRUSH_RADIUS}
-                        max={() => ScratchCardKnobs.MAX_BRUSH_RADIUS}
-                        step={() => ScratchCardKnobs.BRUSH_STEP}
+                        min={ScratchCardKnobs.MIN_BRUSH_RADIUS}
+                        max={ScratchCardKnobs.MAX_BRUSH_RADIUS}
+                        step={ScratchCardKnobs.BRUSH_STEP}
                         ariaLabel={"Brush radius in pixels"}
                         onInput={setBrushRadius}
                     />
@@ -156,7 +156,7 @@ export const ScratchCardPage = () => {
                 <PageProp key={"brushShape"} label={"Brush shape"} hint={"The contour of the patch a stroke clears."}>
                     <PageSelectField
                         value={getBrushShape}
-                        values={() => ScratchCardKnobs.BRUSH_SHAPES}
+                        values={ScratchCardKnobs.BRUSH_SHAPES}
                         ariaLabel={"Brush shape"}
                         onChange={(shape) => setBrushShape(() => shape)}
                     />
@@ -169,9 +169,9 @@ export const ScratchCardPage = () => {
                 >
                     <PageNumberField
                         value={getSoftness}
-                        min={() => ScratchCardKnobs.MIN_SOFTNESS}
-                        max={() => ScratchCardKnobs.MAX_SOFTNESS}
-                        step={() => ScratchCardKnobs.SOFTNESS_STEP}
+                        min={ScratchCardKnobs.MIN_SOFTNESS}
+                        max={ScratchCardKnobs.MAX_SOFTNESS}
+                        step={ScratchCardKnobs.SOFTNESS_STEP}
                         ariaLabel={"Edge softness"}
                         onInput={setSoftness}
                     />
@@ -184,9 +184,9 @@ export const ScratchCardPage = () => {
                 >
                     <PageNumberField
                         value={getThreshold}
-                        min={() => ScratchCardKnobs.MIN_THRESHOLD}
-                        max={() => ScratchCardKnobs.MAX_THRESHOLD}
-                        step={() => ScratchCardKnobs.THRESHOLD_STEP}
+                        min={ScratchCardKnobs.MIN_THRESHOLD}
+                        max={ScratchCardKnobs.MAX_THRESHOLD}
+                        step={ScratchCardKnobs.THRESHOLD_STEP}
                         ariaLabel={"Clear threshold"}
                         onInput={setThreshold}
                     />

@@ -17,8 +17,8 @@ type Props = TextInputExampleProps;
 export const RefusingSetterExample = (props: Props) => (
     <TextInput
         value={props.value}
-        padding={() => FIELD_PADDING}
-        gap={() => FIELD_GAP}
+        padding={FIELD_PADDING}
+        gap={FIELD_GAP}
         ariaLabel={"PIN"}
         inputMode={"numeric"}
         hasError={() => props.value[0]().length > 0 && props.value[0]().length < PIN_LENGTH}

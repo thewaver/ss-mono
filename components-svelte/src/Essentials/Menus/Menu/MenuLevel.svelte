@@ -40,6 +40,12 @@
         props.submenuMode === "replace" && (openValue !== undefined || isCoveredWhileClosing),
     );
 
+    const openingHover = MenuUtils.createOpeningHoverGuard();
+
+    $effect(() => {
+        if (props.isOpen) openingHover.open(MenuUtils.getPointerPoint());
+    });
+
     watchChange(
         () => props.isOpen,
         (isOpen) => {
@@ -87,6 +93,9 @@
 
     const getItemId = (index: number) => `${props.id}-item-${index}`;
 
+    const findIndexAt = (point: Point2d) =>
+        MenuUtils.findIndexAtPoint(point, entries.length, (index) => document.getElementById(getItemId(index)));
+
     const activeItemId = $derived(highlightedIndex === undefined ? undefined : getItemId(highlightedIndex));
 
     const computeItemText = (index: number) =>
@@ -120,9 +129,9 @@
         return index;
     };
 
-    const hoverIndex = (index: number, point: Point2d) => {
+    const hoverIndex = (index: number) => {
         if (!navigable.includes(index)) return;
-        if (!MenuUtils.getIsPointerLed(MenuUtils.getPointerPoint(), point)) return;
+        if (!openingHover.getIsHoverable(index, findIndexAt)) return;
 
         const value = entries[index].value;
 
@@ -253,6 +262,7 @@
             {rootExtent}
             onActivate={activateIndex}
             onHover={hoverIndex}
+            onEnter={(index) => openingHover.enter(index, MenuUtils.getPointerPoint())}
             onSubmenuClose={() => {
                 openValue = undefined;
             }}
@@ -261,7 +271,7 @@
     {/snippet}
 
     {#if placement}
-        <PlacementItem {placement} stackAt={index + 1}>
+        <PlacementItem {placement} stackAt={MenuUtils.computeStackAt(index, highlightedIndex, itemCount)}>
             {@render element()}
         </PlacementItem>
     {:else}
@@ -290,7 +300,10 @@
         <div
             {@attach highlightFloater.attachRef}
             class={floaterStyles.floater}
-            style={toStyle(highlightFloater.getBounds(), { transitionDuration: `${floaterTransitionDurationMs}ms` })}
+            style={toStyle(highlightFloater.getBounds(), {
+                transitionDuration: `${floaterTransitionDurationMs}ms`,
+                zIndex: MenuUtils.computeFloaterStackAt(layout !== undefined, itemCount),
+            })}
         >
             {@render props.renderHighlightFloater?.(
                 highlightFloater.getVisibilityTarget(),

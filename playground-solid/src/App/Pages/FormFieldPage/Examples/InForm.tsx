@@ -39,11 +39,11 @@ export const InFormExample = (props: Props) => {
                             <TextInput
                                 value={props.value}
                                 hasError={() => getFieldState().hasError}
-                                padding={() => FIELD_PADDING}
-                                gap={() => FIELD_GAP}
+                                padding={FIELD_PADDING}
+                                gap={FIELD_GAP}
                                 computeTextStyle={computePageTextFieldTextStyle}
                                 renderContent={(getFlags) => (
-                                    <PageTextFieldContent flags={getFlags} width={() => CONTROL_WIDTH} />
+                                    <PageTextFieldContent flags={getFlags} width={CONTROL_WIDTH} />
                                 )}
                             />
                         )}

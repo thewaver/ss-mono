@@ -43,7 +43,7 @@ export const FocusOnErrorExample = (props: Props) => (
                             <Select
                                 renderHighlightFloater={renderPageHighlightFloater}
                                 value={props.plan}
-                                options={() => PLANS}
+                                options={PLANS}
                                 ariaLabel={"Plan"}
                                 isRequired={true}
                                 hasError={() => getFieldState().hasError}
@@ -73,7 +73,7 @@ export const FocusOnErrorExample = (props: Props) => (
                             <MultiSelect
                                 renderHighlightFloater={renderPageHighlightFloater}
                                 values={props.topics}
-                                options={() => TOPICS}
+                                options={TOPICS}
                                 ariaLabel={"Topics"}
                                 isRequired={true}
                                 hasError={() => getFieldState().hasError}

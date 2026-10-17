@@ -1,6 +1,5 @@
 import { useState } from "react";
 
-import { CarouselKnobs } from "@thewaver/ss-playground/App/Knobs/Carousels.const";
 import {
     EXAMPLES_ROOT,
     EXAMPLE_NAMES,
@@ -11,11 +10,9 @@ import { PageCarouselBox } from "../../../StyledComponents/CarouselContent/Carou
 import { useCarouselsControls } from "../Carousels.utils";
 import { PageCarouselsPanel } from "../CarouselsPanel";
 import { NoControlsExample } from "./Examples/NoControls";
-import { RingExample } from "./Examples/Ring";
 import { RotatingExample } from "./Examples/Rotating";
 import { ScrolledExample } from "./Examples/Scrolled";
 import { SteppedExample } from "./Examples/Stepped";
-import { WordDrumExample } from "./Examples/WordDrum";
 
 export const CarouselPage = () => {
     const controls = useCarouselsControls();
@@ -25,8 +22,6 @@ export const CarouselPage = () => {
     const rotatingPlayingState = useState(true);
     const barelessIndexState = useState(0);
     const scrolledIndexState = useState(0);
-    const ringIndexState = useState(0);
-    const wordDrumIndexState = useState(0);
 
     const [isLooping] = controls.isLooping;
 
@@ -62,6 +57,14 @@ export const CarouselPage = () => {
             path: `${EXAMPLES_ROOT}/Rotating.tsx`,
         },
         {
+            key: "scrolled",
+            name: EXAMPLE_NAMES.scrolled,
+            readout: () =>
+                `slide ${scrolledIndexState[0] + 1} of ${controls.slideCount} — scrolling the box writes the carousel's progress, so the slides move with the scroll and the slide showing follows the nearest one`,
+            component: () => <ScrolledExample {...controls.sharedProps} index={scrolledIndexState} />,
+            path: `${EXAMPLES_ROOT}/Scrolled.tsx`,
+        },
+        {
             key: "noControls",
             name: EXAMPLE_NAMES.noControls,
             readout: () =>
@@ -72,37 +75,6 @@ export const CarouselPage = () => {
                 </PageCarouselBox>
             ),
             path: `${EXAMPLES_ROOT}/NoControls.tsx`,
-        },
-        {
-            key: "scrolled",
-            name: EXAMPLE_NAMES.scrolled,
-            readout: () =>
-                `slide ${scrolledIndexState[0] + 1} of ${controls.slideCount} — scrolling the box writes the carousel's progress, so the slides move with the scroll and the slide showing follows the nearest one`,
-            component: () => <ScrolledExample {...controls.sharedProps} index={scrolledIndexState} />,
-            path: `${EXAMPLES_ROOT}/Scrolled.tsx`,
-        },
-        {
-            key: "ring",
-            name: EXAMPLE_NAMES.ring,
-            readout: () =>
-                `slide ${ringIndexState[0] + 1} of ${controls.slideCount} — the paddle wheel rule, the slides standing round an upright spine with each painting only the half away from it, the spine set flush with the box's right edge so only the half turning outward shows, with its progress written on a clock for a continuous turn; Stop is the way to halt it that a turn running on its own owes the reader`,
-            component: () => (
-                <RingExample
-                    slides={controls.slides}
-                    index={ringIndexState}
-                    isDisabled={controls.isDisabled[0]}
-                    orientation={controls.orientation[0]}
-                />
-            ),
-            path: `${EXAMPLES_ROOT}/Ring.tsx`,
-        },
-        {
-            key: "wordDrum",
-            name: EXAMPLE_NAMES.wordDrum,
-            readout: () =>
-                `word ${wordDrumIndexState[0] + 1} of ${CarouselKnobs.WORD_DRUM_WORDS.length} — a drum of a fixed number of faces, each a quarter of the box, with a word on each face near the front, its progress written by the box's scroll; scrolling rolls the next word up, and the faces past the first and last word stay empty`,
-            component: () => <WordDrumExample index={wordDrumIndexState} isDisabled={controls.isDisabled[0]} />,
-            path: `${EXAMPLES_ROOT}/WordDrum.tsx`,
         },
     ];
 

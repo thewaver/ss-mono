@@ -20,7 +20,7 @@ export const WindowsExample = (props: Props) => {
 
     return (
         <div class={styles.stack}>
-            <PageMeasureBox width={() => TICKET_WIDTH}>
+            <PageMeasureBox width={TICKET_WIDTH}>
                 <div class={styles.windows}>
                     <For each={SYMBOLS}>
                         {(symbol, getIndex) => (

@@ -12,7 +12,7 @@ purpose: it answers "what is outstanding", and neither of them is.
 | Section                                                 | Count |
 | ------------------------------------------------------- | ----: |
 | [Missing components](#missing-components)               |     3 |
-| [Blockers and known issues](#blockers-and-known-issues) |    26 |
+| [Blockers and known issues](#blockers-and-known-issues) |    27 |
 | [Deliberately not built](#deliberately-not-built)       |    27 |
 | [Accessibility gaps](#accessibility-gaps)               |     8 |
 | [Planned projects](#planned-projects)                   |     5 |
@@ -38,6 +38,7 @@ Something that misbehaves, or a cost nobody has paid down.
 | #   | Where                            | What happens                                                                                                                                                                                                                                                                                              |
 | --- | -------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | 5   | **What the specs cannot see**    | A green run covers less than it looks: nothing checks appearance, motion-only pages such as `CellAnimation` and `ScanlineAnimation` have no spec, and a callback nothing on the page uses goes untested.                                                                                                  |
+| 33  | **`FlyoutMenu`**                 | **Decided, not yet built.** A click on an arrow whose panel hover opened closes it instead of keeping it open, and an entry's link and arrow light separate hover backgrounds                                                                                                                             |
 | 27  | **Native form submit**           | **Pending decision.** `Select` submits nothing, the date and time fields submit their display text, and `Form` hands `onSubmit` no values. One question, lofted, not discarded                                                                                                                            |
 | 19  | **Every anchored layer**         | **Postponed until browser support exists.** A popup paints where its anchor was one frame ago, so it trails during a scroll                                                                                                                                                                               |
 | 22  | **`GlassSurface`, ripple layer** | **Postponed until the platform catches up.** The rippled edge shows a defect under real GPU rendering that clipping it, however it's clipped, either reproduces or replaces with a different one — a known, unresolved gap in `backdrop-filter` plus `feDisplacementMap`, not particular to this codebase |

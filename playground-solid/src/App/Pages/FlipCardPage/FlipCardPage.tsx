@@ -58,7 +58,7 @@ export const FlipCardPage = () => {
                         value={getAxis}
                         values={FLIP_CARD_AXES}
                         computeLabel={(axis) => AXIS_LABELS[axis]}
-                        width={() => SELECT_WIDTH}
+                        width={SELECT_WIDTH}
                         ariaLabel={"Axis"}
                         onChange={setAxis}
                     />
@@ -71,10 +71,10 @@ export const FlipCardPage = () => {
                 >
                     <PageNumberField
                         value={getTransitionDurationMs}
-                        min={() => FlipCardKnobs.MIN_DURATION_MS}
-                        max={() => FlipCardKnobs.MAX_DURATION_MS}
-                        step={() => FlipCardKnobs.DURATION_STEP_MS}
-                        width={() => FIELD_WIDTH}
+                        min={FlipCardKnobs.MIN_DURATION_MS}
+                        max={FlipCardKnobs.MAX_DURATION_MS}
+                        step={FlipCardKnobs.DURATION_STEP_MS}
+                        width={FIELD_WIDTH}
                         ariaLabel={"Turn duration in milliseconds"}
                         onInput={setTransitionDurationMs}
                     />

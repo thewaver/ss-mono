@@ -35,7 +35,8 @@ export const SteppedExample = (props: Props) => {
             isDisabled={props.isDisabled}
             isLooping={props.isLooping}
             orientation={props.orientation}
-            gap={() => CAROUSEL_GAP}
+            transitionDurationMs={props.transitionDurationMs}
+            gap={CAROUSEL_GAP}
             ariaLabel={"Sampler"}
             computeSlideLabel={computePositionLabel}
             computeStepLabel={computeCarouselStepLabel}

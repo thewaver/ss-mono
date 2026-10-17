@@ -100,7 +100,7 @@ export const TourExample = (props: Props) => {
 
             <SpotlightGuide
                 elementRef={() => getTargets()[getStep()]}
-                padding={() => PADDING}
+                padding={PADDING}
                 ariaLabel={"Shop tour"}
                 announcement={() => `Step ${getStep() + 1} of ${RICH_TOUR_STEPS.length}. ${getCurrent().title}.`}
                 visibility={props.guide}
@@ -149,7 +149,7 @@ export const TourExample = (props: Props) => {
 
             <SpotlightPrompt
                 elementRef={getAddRef}
-                padding={() => PADDING}
+                padding={PADDING}
                 visibility={props.prompt}
                 renderHighlight={renderHighlight}
                 renderOverlay={renderOverlay}

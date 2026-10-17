@@ -25,7 +25,7 @@ export const AutocompleteExample = (props: Props) => {
             query={props.query}
             options={props.options}
             ariaLabel={"Airport"}
-            padding={() => QUERY_PADDING}
+            padding={QUERY_PADDING}
             computeTextStyle={computePageSelectTextStyle}
             renderContent={(getSelectedOption, getFlags) => (
                 <PageSelectContent flags={getFlags}>{getSelectedOption()?.value.city ?? PLACEHOLDER}</PageSelectContent>

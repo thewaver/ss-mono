@@ -21,7 +21,7 @@ type Props = ToolbarExampleProps;
 export const RefusingExample = (props: Props) => {
     return (
         <Toolbar
-            actions={() => ACTIONS}
+            actions={ACTIONS}
             gap={props.gap}
             ariaLabel={"Document"}
             overflowAriaLabel={"More document actions"}

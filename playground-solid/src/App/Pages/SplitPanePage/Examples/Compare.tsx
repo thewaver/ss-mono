@@ -21,7 +21,7 @@ export const CompareExample = (props: Props) => {
     return (
         <PageSplitPaneCompareFrame>
             <SplitPane
-                panes={() => COMPARE}
+                panes={COMPARE}
                 ratios={props.ratios}
                 gutterSize={props.gutterSize}
                 isDisabled={props.isDisabled}

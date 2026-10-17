@@ -73,10 +73,10 @@ export const LensPage = () => {
                 >
                     <PageNumberField
                         value={getZoom}
-                        min={() => LensKnobs.MIN_ZOOM}
-                        max={() => LensKnobs.MAX_ZOOM}
-                        step={() => LensKnobs.ZOOM_STEP}
-                        width={() => FIELD_WIDTH}
+                        min={LensKnobs.MIN_ZOOM}
+                        max={LensKnobs.MAX_ZOOM}
+                        step={LensKnobs.ZOOM_STEP}
+                        width={FIELD_WIDTH}
                         ariaLabel={"Zoom"}
                         onInput={setZoom}
                     />
@@ -85,10 +85,10 @@ export const LensPage = () => {
                 <PageProp key={"radius"} label={"Radius (px)"} hint={"How large the lens that follows the pointer is."}>
                     <PageNumberField
                         value={getRadius}
-                        min={() => LensKnobs.MIN_RADIUS}
-                        max={() => LensKnobs.MAX_RADIUS}
-                        step={() => LensKnobs.RADIUS_STEP}
-                        width={() => FIELD_WIDTH}
+                        min={LensKnobs.MIN_RADIUS}
+                        max={LensKnobs.MAX_RADIUS}
+                        step={LensKnobs.RADIUS_STEP}
+                        width={FIELD_WIDTH}
                         ariaLabel={"Radius"}
                         onInput={setRadius}
                     />
@@ -97,8 +97,8 @@ export const LensPage = () => {
                 <PageProp key={"computePoints"} label={"Shape"} hint={"The contour of the lens."}>
                     <PageSelectField
                         value={getShape}
-                        values={() => LensKnobs.SHAPES}
-                        width={() => SHAPE_FIELD_WIDTH}
+                        values={LensKnobs.SHAPES}
+                        width={SHAPE_FIELD_WIDTH}
                         ariaLabel={"Shape"}
                         onChange={(shape) => setShape(() => shape)}
                     />
@@ -111,10 +111,10 @@ export const LensPage = () => {
                 >
                     <PageNumberField
                         value={getJoinRadius}
-                        min={() => LensKnobs.MIN_JOIN_RADIUS}
-                        max={() => LensKnobs.MAX_JOIN_RADIUS}
-                        step={() => LensKnobs.JOIN_RADIUS_STEP}
-                        width={() => FIELD_WIDTH}
+                        min={LensKnobs.MIN_JOIN_RADIUS}
+                        max={LensKnobs.MAX_JOIN_RADIUS}
+                        step={LensKnobs.JOIN_RADIUS_STEP}
+                        width={FIELD_WIDTH}
                         ariaLabel={"Corner radius"}
                         onInput={setJoinRadius}
                     />
@@ -129,10 +129,10 @@ export const LensPage = () => {
                 >
                     <PageNumberField
                         value={getLameExponent}
-                        min={() => LensKnobs.MIN_LAME_EXPONENT}
-                        max={() => LensKnobs.MAX_LAME_EXPONENT}
-                        step={() => LensKnobs.LAME_EXPONENT_STEP}
-                        width={() => FIELD_WIDTH}
+                        min={LensKnobs.MIN_LAME_EXPONENT}
+                        max={LensKnobs.MAX_LAME_EXPONENT}
+                        step={LensKnobs.LAME_EXPONENT_STEP}
+                        width={FIELD_WIDTH}
                         ariaLabel={"Corner style"}
                         onInput={setLameExponent}
                     />
@@ -145,10 +145,10 @@ export const LensPage = () => {
                 >
                     <PageNumberField
                         value={getSoftness}
-                        min={() => LensKnobs.MIN_SOFTNESS}
-                        max={() => LensKnobs.MAX_SOFTNESS}
-                        step={() => LensKnobs.SOFTNESS_STEP}
-                        width={() => FIELD_WIDTH}
+                        min={LensKnobs.MIN_SOFTNESS}
+                        max={LensKnobs.MAX_SOFTNESS}
+                        step={LensKnobs.SOFTNESS_STEP}
+                        width={FIELD_WIDTH}
                         ariaLabel={"Softness"}
                         onInput={setSoftness}
                     />
@@ -163,10 +163,10 @@ export const LensPage = () => {
                 >
                     <PageNumberField
                         value={getStepSize}
-                        min={() => LensKnobs.MIN_STEP_SIZE}
-                        max={() => LensKnobs.MAX_STEP_SIZE}
-                        step={() => LensKnobs.STEP_SIZE_STEP}
-                        width={() => FIELD_WIDTH}
+                        min={LensKnobs.MIN_STEP_SIZE}
+                        max={LensKnobs.MAX_STEP_SIZE}
+                        step={LensKnobs.STEP_SIZE_STEP}
+                        width={FIELD_WIDTH}
                         ariaLabel={"Step size in pixels"}
                         onInput={setStepSize}
                     />

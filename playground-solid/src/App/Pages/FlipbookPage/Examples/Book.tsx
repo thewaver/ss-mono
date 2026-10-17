@@ -31,7 +31,7 @@ export const BookExample = (props: Props) => (
                 pages={FLIPBOOK_PAGES}
                 index={props.index}
                 transitionDurationMs={props.transitionDurationMs}
-                gap={() => BOOK_GAP}
+                gap={BOOK_GAP}
                 ariaLabel={"A book of hinges"}
                 computePageLabel={computeFlipbookPageLabel}
                 computeSpreadAnnouncement={computeFlipbookSpreadAnnouncement}

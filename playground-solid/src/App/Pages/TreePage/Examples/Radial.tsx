@@ -108,7 +108,7 @@ export const RadialExample = (props: Props) => {
 
             <div style={{ width: getStageWidth() }}>
                 <Tree
-                    nodes={() => RANKS}
+                    nodes={RANKS}
                     value={props.value}
                     expanded={props.expanded}
                     ariaLabel={"Ranks"}

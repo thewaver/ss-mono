@@ -10,9 +10,9 @@ export const AllDisabledExample = (props: Props) => {
     return (
         <Tabs
             orientation={"horizontal"}
-            tabGap={() => ROW_TAB_GAP}
+            tabGap={ROW_TAB_GAP}
             ariaLabel={"Unavailable views"}
-            tabs={() => DISABLED_TABS}
+            tabs={DISABLED_TABS}
             selectedValue={props.selectedValue}
             onSelectionChange={props.onSelectionChange}
             renderGutter={() => <PageTabGutter orientation={"horizontal"} />}

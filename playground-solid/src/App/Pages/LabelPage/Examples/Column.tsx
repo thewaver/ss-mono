@@ -9,7 +9,7 @@ const GAP = 5;
 type Props = LabelExampleProps;
 
 export const ColumnExample = (props: Props) => (
-    <Label orientation={"vertical"} gap={() => GAP}>
+    <Label orientation={"vertical"} gap={GAP}>
         <PageLabelCaption>Stacked</PageLabelCaption>
 
         <Checkbox checked={props.checked} renderContent={(getFlags) => <PageCheckboxContent flags={getFlags} />} />

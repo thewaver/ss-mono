@@ -14,7 +14,7 @@ export const PairExample = (props: Props) => {
     return (
         <PageSplitPaneFrame>
             <SplitPane
-                panes={() => PAIR}
+                panes={PAIR}
                 ratios={props.ratios}
                 gutterSize={props.gutterSize}
                 isDisabled={props.isDisabled}

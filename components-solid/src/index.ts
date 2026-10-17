@@ -145,6 +145,8 @@ export * from "./Essentials/Menubar/Menubar";
 export type * from "./Essentials/Menubar/MenubarSolid.types";
 export * from "./Essentials/Menus/FanMenu/FanMenu";
 export type * from "./Essentials/Menus/FanMenu/FanMenuSolid.types";
+export * from "./Essentials/Menus/FlyoutMenu/FlyoutMenu";
+export type * from "./Essentials/Menus/FlyoutMenu/FlyoutMenuSolid.types";
 export * from "./Essentials/Menus/Menu/Menu";
 export type * from "./Essentials/Menus/Menu/MenuSolid.types";
 export * from "./Essentials/Menus/WheelMenu/WheelMenu";

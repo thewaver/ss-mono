@@ -3,8 +3,6 @@ import { NavigatorUtils } from "../../Abstracts/Navigator/Navigator.utils";
 import type { MenuItemKind } from "../Menus/Menu/Menu.types";
 import type {
     ToolbarActionRecord,
-    ToolbarCut,
-    ToolbarCutDefs,
     ToolbarKeyDefs,
     ToolbarKeyStep,
     ToolbarOverflowDefs,
@@ -12,10 +10,6 @@ import type {
     ToolbarOverflowSource,
 } from "./Toolbar.types";
 
-/** Zero, as a width or a total. */
-const NOTHING = 0;
-/** One item or one gap. */
-const SINGLE = 1;
 /** The fewest stops a walk needs before an arrow has anywhere to go. */
 const WALKABLE_STOPS = 2;
 /** A straight row is walked by the arrows that run along it. */
@@ -38,93 +32,6 @@ export namespace ToolbarUtils {
     /** The stop that stands for the overflow button. */
     export const OVERFLOW_STOP = -1;
     /**
-     * Splits the items into those shown and those collapsed.
-     *
-     * Items are taken in order until the next one would not fit, so the toolbar collapses from the right
-     * and never leaves a hole. Two things get reserved before anything is fitted: the items that must
-     * never collapse, and the overflow button itself — because as soon as one item collapses, the button
-     * appears and takes room that was being counted as free.
-     *
-     * Where nothing is forced to collapse and everything fits, the overflow button is not accounted for
-     * at all, which is what lets a toolbar with room to spare use the whole of it.
-     *
-     * @param defs.widths Each item's measured width, in the order they are drawn.
-     * @param defs.collapses Each item's rule: `"never"` to always show it, `"always"` to always collapse
-     * it, `"auto"` to let it fit if it can. `"auto"` when not given.
-     * @param defs.gap The space between items.
-     * @param defs.available The room the toolbar has.
-     * @param defs.overflowWidth The overflow button's width.
-     * @returns The indices shown, in drawing order, and the indices collapsed.
-     */
-    export const computeCut = (defs: ToolbarCutDefs): ToolbarCut => {
-        const indexes = defs.widths.map((_unused, index) => index);
-        const collapseOf = (index: number) => defs.collapses[index] ?? "auto";
-        const widthOf = (index: number) => defs.widths[index] ?? NOTHING;
-
-        const wholeRow =
-            defs.widths.reduce((total, width) => total + width, NOTHING) +
-            defs.gap * Math.max(defs.widths.length - SINGLE, NOTHING);
-
-        if (!indexes.some((index) => collapseOf(index) === "always") && wholeRow <= defs.available) {
-            return { shownIndexes: indexes, collapsedIndexes: [] };
-        }
-
-        const kept = indexes.filter((index) => collapseOf(index) === "never");
-        const budget = defs.available - defs.overflowWidth;
-
-        let used = kept.reduce((total, index) => total + widthOf(index) + defs.gap, NOTHING);
-
-        const fitted: number[] = [];
-
-        for (const index of indexes) {
-            if (collapseOf(index) !== "auto") continue;
-
-            const next = used + widthOf(index) + defs.gap;
-
-            if (next > budget) break;
-
-            used = next;
-            fitted.push(index);
-        }
-
-        const shownIndexes = [...kept, ...fitted].sort((first, second) => first - second);
-
-        return {
-            shownIndexes,
-            collapsedIndexes: indexes.filter((index) => !shownIndexes.includes(index)),
-        };
-    };
-
-    /**
-     * The cut of a bar that is laid out rather than run in a row: a layout sizes the bar itself, so there is no
-     * width to run out of and every action shows.
-     *
-     * @param count How many actions there are.
-     */
-    export const computeUncut = (count: number): ToolbarCut => ({
-        shownIndexes: Array.from({ length: count }, (_unused, index) => index),
-        collapsedIndexes: [],
-    });
-
-    /**
-     * Whether the bar has measured enough to be drawn.
-     *
-     * A row is hidden until its own width and every action's have arrived, so the first paint does not show
-     * every action at full width before the cut lands. A laid-out bar measures nothing and is drawn at once.
-     *
-     * @param isPlaced Whether the bar is laid out.
-     * @param rootWidth The bar's measured width.
-     * @param measuredCount How many actions have been measured.
-     * @param actionCount How many actions there are.
-     */
-    export const computeHasMeasured = (
-        isPlaced: boolean,
-        rootWidth: number,
-        measuredCount: number,
-        actionCount: number,
-    ) => isPlaced || (rootWidth > NOTHING && measuredCount === actionCount);
-
-    /**
      * The items the overflow menu holds, one per collapsed action.
      *
      * Each carries the action's value, its disabled state and its tooltip, so an action is described once whether
@@ -132,7 +39,7 @@ export namespace ToolbarUtils {
      * pressable toolbar's action becomes a checkbox, so its pressed state reads as checked.
      *
      * @param actions The bar's actions.
-     * @param collapsedIndexes The collapsed ones, from {@link ToolbarUtils.computeCut}.
+     * @param collapsedIndexes The collapsed ones, from {@link OverflowUtils.computeCut}.
      * @param defs.hasSubmenus Whether the actions are menubar words carrying menus.
      * @param defs.isPressable Whether the actions are toggle buttons.
      * @returns The menu items, in the order the actions were collapsed in.
@@ -160,7 +67,7 @@ export namespace ToolbarUtils {
      * The actions in the row the walk can land on: shown, and either enabled or kept reachable while disabled.
      *
      * @param actions The bar's actions.
-     * @param shownIndexes The shown ones, from {@link ToolbarUtils.computeCut}.
+     * @param shownIndexes The shown ones, from {@link OverflowUtils.computeCut}.
      * @returns Their positions, in drawing order. The overflow button is not among them.
      */
     export const computeStops = <T>(actions: ToolbarActionRecord<T>[], shownIndexes: number[]) =>

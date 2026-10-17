@@ -31,7 +31,7 @@ export const CounterExample = (props: Props) => {
     return (
         <SlotText
             text={props.text}
-            characterSize={() => DIGIT_SIZE}
+            characterSize={DIGIT_SIZE}
             turnDurationMs={props.turnDurationMs}
             turnDelayMs={props.turnDelayMs}
             ariaLabel={"Score"}

@@ -19,7 +19,6 @@ const MANUAL = demo("manual");
 const ROTATING = demo("rotating");
 const NO_CONTROLS = demo("noControls");
 const SCROLLED = demo("scrolled");
-const RING = demo("ring");
 
 const region = (scope: string) => `${scope} [aria-roledescription="carousel"]`;
 const slide = (scope: string) => `${scope} [aria-roledescription="slide"]`;
@@ -323,96 +322,6 @@ test("a progress driven by a scroll moves the slides, and the slide showing foll
     await expect
         .poll(() => currentSlide(page, SCROLLED), { message: "scrolled to the end, the last slide is showing" })
         .toBe("4 of 4");
-});
-
-/**
- * The word drum is the scrolled carousel again under the drum rule, run up and down, with words for slides. What it
- * adds is that the scroll rolls the words round the drum rather than sliding them, so a word part-way through the
- * scroll is the one the drum has turned to the front.
- */
-test("scrolling the word drum rolls it round to the last word", async ({ page }) => {
-    const wordReadout = async () => (await readout(page, "wordDrum")).match(/^word (\d+) of (\d+)/)!.slice(1);
-
-    expect((await wordReadout())[0]).toBe("1");
-
-    await page.locator("#wordDrumScrollBox").evaluate((element) => {
-        element.scrollTop = element.scrollHeight;
-    });
-
-    await expect
-        .poll(async () => {
-            const [word, count] = await wordReadout();
-
-            return word === count;
-        }, "scrolled to the end, the last word is at the front")
-        .toBe(true);
-});
-
-/**
- * The word drum has a fixed number of faces rather than one per word, so a long list never crowds it: a word more
- * than half a turn from the front is not drawn, and the faces turning out of sight are the ones the next words arrive
- * on. Not drawn is read as the opacity filter the carousel draws a hidden slide with, which is its own state; which
- * words are far enough away is worked out from the list's two ends, so the test names no face count.
- */
-const hiddenWords = (page: import("@playwright/test").Page) =>
-    page.locator(demo("wordDrum")).evaluate((root) =>
-        [...root.querySelectorAll('[aria-roledescription="slide"]')].map((slide) => {
-            for (let element: Element | null = slide; element && element !== root; element = element.parentElement) {
-                if (getComputedStyle(element).filter.includes("opacity(0)")) return true;
-            }
-
-            return false;
-        }),
-    );
-
-test("a word more than half a turn round the word drum is not drawn, whichever end is at the front", async ({
-    page,
-}) => {
-    const atStart = await hiddenWords(page);
-
-    expect(atStart.at(-1), "with the first word at the front, the last is round the back").toBe(true);
-    expect(atStart.slice(0, 2), "and the front word and the one after it are drawn").toEqual([false, false]);
-
-    await page.locator("#wordDrumScrollBox").evaluate((element) => {
-        element.scrollTop = element.scrollHeight;
-    });
-
-    await expect
-        .poll(
-            async () => {
-                const atEnd = await hiddenWords(page);
-
-                return atEnd[0] === true && atEnd.at(-1) === false && atEnd.at(-2) === false;
-            },
-            { message: "rolled to the last word, the first is round the back" },
-        )
-        .toBe(true);
-});
-
-/**
- * The ring turns on its own, with its progress written on a clock, so WCAG 2.2.2 asks for a way to stop it. The
- * example's own button is that way, and once pressed the turn holds still.
- */
-test("the turning ring stops when its stop control is pressed, and stays stopped", async ({ page }) => {
-    const ringTransform = () =>
-        page
-            .locator(slide(RING))
-            .first()
-            .evaluate((element) => (element as HTMLElement).style.transform);
-
-    const turning = page.locator("#ringTurn");
-
-    if (await page.getByRole("button", { name: "Turn", exact: true }).count()) await turning.click();
-
-    await expect.poll(ringTransform, { message: "it is turning" }).not.toBe(await ringTransform());
-
-    await turning.click();
-
-    const stopped = await ringTransform();
-
-    await page.waitForTimeout(SETTLE_MS);
-
-    expect(await ringTransform(), "nothing turns once it is stopped").toBe(stopped);
 });
 
 /**

@@ -79,9 +79,9 @@ export const WraparoundPage = () => {
                 >
                     <PageNumberField
                         value={getDriftPxPerSecond}
-                        min={() => WraparoundKnobs.MIN_DRIFT_PX_PER_SECOND}
-                        max={() => WraparoundKnobs.MAX_DRIFT_PX_PER_SECOND}
-                        step={() => WraparoundKnobs.DRIFT_STEP_PX_PER_SECOND}
+                        min={WraparoundKnobs.MIN_DRIFT_PX_PER_SECOND}
+                        max={WraparoundKnobs.MAX_DRIFT_PX_PER_SECOND}
+                        step={WraparoundKnobs.DRIFT_STEP_PX_PER_SECOND}
                         isDisabled={getPrefersReducedMotion}
                         ariaLabel={"Marquee speed in pixels per second"}
                         onInput={setDriftPxPerSecond}
@@ -97,9 +97,9 @@ export const WraparoundPage = () => {
                 >
                     <PageNumberField
                         value={getDriftDegrees}
-                        min={() => WraparoundKnobs.MIN_DRIFT_DEGREES}
-                        max={() => WraparoundKnobs.MAX_DRIFT_DEGREES}
-                        step={() => WraparoundKnobs.DRIFT_STEP_DEGREES}
+                        min={WraparoundKnobs.MIN_DRIFT_DEGREES}
+                        max={WraparoundKnobs.MAX_DRIFT_DEGREES}
+                        step={WraparoundKnobs.DRIFT_STEP_DEGREES}
                         ariaLabel={"Marquee direction in degrees"}
                         onInput={setDriftDegrees}
                     />

@@ -79,17 +79,17 @@ export const TracksExample = (props: Props) => {
     return (
         <PageTimelineFrame>
             <PageTimelineRow>
-                <PageTimelineLanes names={() => TRACKS} laneSize={() => LANE_SIZE} laneGap={() => LANE_GAP} />
+                <PageTimelineLanes names={TRACKS} laneSize={LANE_SIZE} laneGap={LANE_GAP} />
 
                 <PageTimelineTrack>
                     <Timeline<Clip>
-                        range={() => REEL}
-                        items={() => CLIPS}
-                        laneSize={() => LANE_SIZE}
-                        axisSize={() => AXIS_HEIGHT}
-                        laneGap={() => LANE_GAP}
+                        range={REEL}
+                        items={CLIPS}
+                        laneSize={LANE_SIZE}
+                        axisSize={AXIS_HEIGHT}
+                        laneGap={LANE_GAP}
                         laneCount={() => TRACKS.length}
-                        tickSteps={() => SECOND_STEPS}
+                        tickSteps={SECOND_STEPS}
                         isPannable={props.isPannable}
                         isZoomable={props.isZoomable}
                         isDisabled={props.isDisabled}

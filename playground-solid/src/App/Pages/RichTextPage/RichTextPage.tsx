@@ -70,14 +70,14 @@ export const RichTextPage = () => {
                     <TextArea
                         value={contentSignal}
                         isAutoSizing={true}
-                        minRows={() => MIN_ROWS}
-                        maxRows={() => MAX_ROWS}
-                        padding={() => FIELD_PADDING}
-                        gap={() => FIELD_GAP}
+                        minRows={MIN_ROWS}
+                        maxRows={MAX_ROWS}
+                        padding={FIELD_PADDING}
+                        gap={FIELD_GAP}
                         ariaLabel={"Tagged text"}
                         computeTextStyle={computePageTextFieldTextStyle}
                         renderContent={(getFlags) => (
-                            <PageTextFieldContent flags={getFlags} width={() => FIELD_WIDTH} isStretched={true} />
+                            <PageTextFieldContent flags={getFlags} width={FIELD_WIDTH} isStretched={true} />
                         )}
                         renderPlaceholder={(getFlags) => (
                             <PageTextFieldPlaceholder flags={getFlags} isTopAligned={true}>
@@ -86,7 +86,7 @@ export const RichTextPage = () => {
                         )}
                     />
 
-                    <PageMeasureBox width={() => PREVIEW_WIDTH} padding={() => MEASURE_BOX_PADDING}>
+                    <PageMeasureBox width={PREVIEW_WIDTH} padding={MEASURE_BOX_PADDING}>
                         <CustomInputExample content={contentSignal[0]} removeOtherTags={getRemoveOtherTags} />
                     </PageMeasureBox>
                 </>

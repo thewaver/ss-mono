@@ -1,4 +1,4 @@
-import { style, styleVariants } from "@vanilla-extract/css";
+import { globalStyle, style, styleVariants } from "@vanilla-extract/css";
 
 import { RAINBOW, RAINBOW_HUES, themeVars } from "../../Theme.css";
 import { layerVars } from "../Layer/Layer.css";
@@ -47,6 +47,10 @@ export const sunburstHub = style({
     fontSize: themeVars.fontSize.xSmall,
     textAlign: "center",
     cursor: "pointer",
+});
+
+globalStyle(`button:has(${sunburstHub})`, {
+    borderRadius: "50%",
 });
 
 export const sunburstHubHovered = style({

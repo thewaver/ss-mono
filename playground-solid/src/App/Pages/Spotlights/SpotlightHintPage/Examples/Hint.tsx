@@ -19,7 +19,7 @@ export const HintExample = (props: Props) => {
 
     return (
         <div class={styles.root}>
-            <PageMeasureBox width={() => styles.HINT_BOX_WIDTH} height={() => styles.HINT_BOX_HEIGHT}>
+            <PageMeasureBox width={styles.HINT_BOX_WIDTH} height={styles.HINT_BOX_HEIGHT}>
                 <For each={Array.from({ length: ANCHOR_COUNT }, (_unused, index) => index)}>
                     {(_unused, getIndex) => (
                         <div
@@ -56,7 +56,7 @@ export const HintExample = (props: Props) => {
 
             <SpotlightHint
                 elementRef={() => anchorRefs[access(props.index)]}
-                padding={() => PADDING}
+                padding={PADDING}
                 visibility={props.visibility}
                 renderHighlight={renderHighlight}
                 renderOverlay={renderOverlay}

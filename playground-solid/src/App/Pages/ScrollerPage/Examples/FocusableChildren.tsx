@@ -14,8 +14,8 @@ export const FocusableChildrenExample = (props: Props) => {
     return (
         <div class={styles.demo}>
             <Scroller
-                gap={() => SCROLLER_GAP}
-                padding={() => FOCUS_RING_WIDTH}
+                gap={SCROLLER_GAP}
+                padding={FOCUS_RING_WIDTH}
                 renderButton={(getStep, stepper) => <PageScrollerButton step={getStep} stepper={stepper} />}
             >
                 {access(props.labels).map((label) => (

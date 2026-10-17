@@ -1,7 +1,6 @@
 <script setup lang="ts">
 import { shallowRef } from "vue";
 
-import { CarouselKnobs } from "@thewaver/ss-playground/App/Knobs/Carousels.const";
 import {
     EXAMPLES_ROOT,
     EXAMPLE_NAMES,
@@ -13,23 +12,19 @@ import PageCarouselBox from "../../../StyledComponents/CarouselContent/PageCarou
 import { useCarouselsControls } from "../Carousels.utils";
 import PageCarouselsPanel from "../PageCarouselsPanel.vue";
 import NoControlsExample from "./Examples/NoControls.vue";
-import RingExample from "./Examples/Ring.vue";
 import RotatingExample from "./Examples/Rotating.vue";
 import ScrolledExample from "./Examples/Scrolled.vue";
 import SteppedExample from "./Examples/Stepped.vue";
-import WordDrumExample from "./Examples/WordDrum.vue";
 
 const controls = useCarouselsControls();
 
-const { isLooping, isDisabled, orientation, sharedProps, delay, slides } = controls;
+const { isLooping, sharedProps, delay } = controls;
 
 const manualIndex = shallowRef(0);
 const rotatingIndex = shallowRef(0);
 const rotatingPlaying = shallowRef(true);
 const barelessIndex = shallowRef(0);
 const scrolledIndex = shallowRef(0);
-const ringIndex = shallowRef(0);
-const wordDrumIndex = shallowRef(0);
 
 const examples: ExampleDefs[] = [
     {
@@ -47,13 +42,6 @@ const examples: ExampleDefs[] = [
         path: `${EXAMPLES_ROOT}/Rotating.vue`,
     },
     {
-        key: "noControls",
-        name: EXAMPLE_NAMES.noControls,
-        readout: () =>
-            `slide ${barelessIndex.value + 1} of ${controls.slideCount.value} — nothing is drawn beside the slides, so the surrounding page owns the buttons through the signal it shares`,
-        path: `${EXAMPLES_ROOT}/NoControls.vue`,
-    },
-    {
         key: "scrolled",
         name: EXAMPLE_NAMES.scrolled,
         readout: () =>
@@ -61,18 +49,11 @@ const examples: ExampleDefs[] = [
         path: `${EXAMPLES_ROOT}/Scrolled.vue`,
     },
     {
-        key: "ring",
-        name: EXAMPLE_NAMES.ring,
+        key: "noControls",
+        name: EXAMPLE_NAMES.noControls,
         readout: () =>
-            `slide ${ringIndex.value + 1} of ${controls.slideCount.value} — the paddle wheel rule, the slides standing round an upright spine with each painting only the half away from it, the spine set flush with the box's right edge so only the half turning outward shows, with its progress written on a clock for a continuous turn; Stop is the way to halt it that a turn running on its own owes the reader`,
-        path: `${EXAMPLES_ROOT}/Ring.vue`,
-    },
-    {
-        key: "wordDrum",
-        name: EXAMPLE_NAMES.wordDrum,
-        readout: () =>
-            `word ${wordDrumIndex.value + 1} of ${CarouselKnobs.WORD_DRUM_WORDS.length} — a drum of a fixed number of faces, each a quarter of the box, with a word on each face near the front, its progress written by the box's scroll; scrolling rolls the next word up, and the faces past the first and last word stay empty`,
-        path: `${EXAMPLES_ROOT}/WordDrum.vue`,
+            `slide ${barelessIndex.value + 1} of ${controls.slideCount.value} — nothing is drawn beside the slides, so the surrounding page owns the buttons through the signal it shares`,
+        path: `${EXAMPLES_ROOT}/NoControls.vue`,
     },
 ];
 </script>
@@ -107,19 +88,6 @@ const examples: ExampleDefs[] = [
 
         <template #scrolled>
             <ScrolledExample v-bind="sharedProps" v-model:index="scrolledIndex" />
-        </template>
-
-        <template #ring>
-            <RingExample
-                v-model:index="ringIndex"
-                :slides="slides"
-                :is-disabled="isDisabled"
-                :orientation="orientation"
-            />
-        </template>
-
-        <template #wordDrum>
-            <WordDrumExample v-model:index="wordDrumIndex" :is-disabled="isDisabled" />
         </template>
     </PageExamples>
 </template>

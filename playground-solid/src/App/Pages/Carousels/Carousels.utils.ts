@@ -11,6 +11,7 @@ import type { CarouselsControls } from "./Carousels.types";
 export const createCarouselsControls = (): CarouselsControls => {
     const slideCountSignal = createSignal(CarouselKnobs.STARTING_SLIDE_COUNT);
     const delaySignal = createSignal(CarouselKnobs.STARTING_DELAY_MS);
+    const transitionDurationSignal = createSignal(CAROUSEL_DEFAULTS.transitionDurationMs);
     const orientationSignal = createSignal<CarouselOrientation>(CAROUSEL_DEFAULTS.orientation);
     const isDisabledSignal = createSignal(CarouselKnobs.STARTING_IS_DISABLED);
     const isLoopingSignal = createSignal(CAROUSEL_DEFAULTS.isLooping);
@@ -26,6 +27,7 @@ export const createCarouselsControls = (): CarouselsControls => {
         slides: getSlides,
         isDisabled: isDisabledSignal[0],
         orientation: orientationSignal[0],
+        transitionDurationMs: transitionDurationSignal[0],
         frameClasses: () =>
             styles.slideFrames[PLACEMENT_FRAMES[placementSignal[0]()] ?? "whole"][orientationSignal[0]()],
         get placement() {
@@ -36,12 +38,12 @@ export const createCarouselsControls = (): CarouselsControls => {
     return {
         slideCount: slideCountSignal,
         delay: delaySignal,
+        transitionDuration: transitionDurationSignal,
         orientation: orientationSignal,
         isDisabled: isDisabledSignal,
         isLooping: isLoopingSignal,
         placement: placementSignal,
         getSlideCount: slideCountSignal[0],
-        getSlides,
         getSharedProps,
     };
 };

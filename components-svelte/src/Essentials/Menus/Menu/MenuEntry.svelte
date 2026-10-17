@@ -65,7 +65,8 @@
             isRegion={props.placement?.sector !== undefined}
             renderContent={itemContent}
             onActivate={() => props.onActivate(props.index)}
-            onHover={(point) => props.onHover(props.index, point)}
+            onHover={() => props.onHover(props.index)}
+            onEnter={() => props.onEnter(props.index)}
         />
 
         {#if props.hasSubmenu}

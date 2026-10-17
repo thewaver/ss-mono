@@ -50,14 +50,14 @@ const CustomInputExampleWrapper = ({ width, ...props }: ExampleWrapperProps) => 
             <TextArea
                 value={textSignal}
                 isAutoSizing={true}
-                minRows={() => CUSTOM_TEXT_MIN_ROWS}
-                maxRows={() => CUSTOM_TEXT_MAX_ROWS}
-                padding={() => FIELD_PADDING}
-                gap={() => FIELD_GAP}
+                minRows={CUSTOM_TEXT_MIN_ROWS}
+                maxRows={CUSTOM_TEXT_MAX_ROWS}
+                padding={FIELD_PADDING}
+                gap={FIELD_GAP}
                 ariaLabel={"Custom text"}
                 computeTextStyle={computePageTextFieldTextStyle}
                 renderContent={(getFlags) => (
-                    <PageTextFieldContent flags={getFlags} width={() => CUSTOM_TEXT_WIDTH} isStretched={true} />
+                    <PageTextFieldContent flags={getFlags} width={CUSTOM_TEXT_WIDTH} isStretched={true} />
                 )}
                 renderPlaceholder={(getFlags) => (
                     <PageTextFieldPlaceholder flags={getFlags} isTopAligned={true}>
@@ -66,7 +66,7 @@ const CustomInputExampleWrapper = ({ width, ...props }: ExampleWrapperProps) => 
                 )}
             />
 
-            <PageMeasureBox width={width} padding={() => MEASURE_BOX_PADDING}>
+            <PageMeasureBox width={width} padding={MEASURE_BOX_PADDING}>
                 <CustomInputExample {...props} text={textSignal[0]} />
             </PageMeasureBox>
         </>
@@ -159,9 +159,9 @@ export const TypewriterPage = () => {
                 >
                     <PageNumberField
                         value={getTextContainerWidth}
-                        min={() => TypewriterKnobs.MIN_CONTAINER_WIDTH}
-                        max={() => TypewriterKnobs.MAX_CONTAINER_WIDTH}
-                        step={() => TypewriterKnobs.CONTAINER_WIDTH_STEP}
+                        min={TypewriterKnobs.MIN_CONTAINER_WIDTH}
+                        max={TypewriterKnobs.MAX_CONTAINER_WIDTH}
+                        step={TypewriterKnobs.CONTAINER_WIDTH_STEP}
                         ariaLabel={"Container width in pixels"}
                         onInput={setTextContainerWidth}
                     />
@@ -174,7 +174,7 @@ export const TypewriterPage = () => {
                 >
                     <PageSelectField
                         value={getTextEffect}
-                        values={() => TEXT_EFFECTS}
+                        values={TEXT_EFFECTS}
                         ariaLabel={"Effect"}
                         onChange={(effect) => setTextEffect(() => effect)}
                     />
@@ -189,7 +189,7 @@ export const TypewriterPage = () => {
                 >
                     <PageSelectField
                         value={getArrivalOrder}
-                        values={() => TypewriterKnobs.ARRIVAL_ORDERS}
+                        values={TypewriterKnobs.ARRIVAL_ORDERS}
                         ariaLabel={"Arrival order"}
                         onChange={(arrivalOrder) => setArrivalOrder(() => arrivalOrder)}
                     />

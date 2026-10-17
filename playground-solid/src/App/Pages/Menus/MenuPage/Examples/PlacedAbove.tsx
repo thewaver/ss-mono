@@ -10,7 +10,7 @@ type Props = MenuExampleProps;
 export const PlacedAboveExample = (props: Props) => (
     <Menu
         renderHighlightFloater={renderPageHighlightFloater}
-        items={() => ACTIONS}
+        items={ACTIONS}
         ariaLabel={"Edit actions"}
         placement={() => ({ x: "left_in", y: "top_out" })}
         renderContent={(getFlags) => <PageMenuTriggerContent flags={getFlags}>Edit</PageMenuTriggerContent>}

@@ -18,14 +18,12 @@ export const AutoSizingExample = (props: Props) => (
     <TextArea
         value={props.value}
         isAutoSizing={true}
-        minRows={() => MIN_ROWS}
-        padding={() => FIELD_PADDING}
-        gap={() => FIELD_GAP}
+        minRows={MIN_ROWS}
+        padding={FIELD_PADDING}
+        gap={FIELD_GAP}
         ariaLabel={"Message"}
         computeTextStyle={computePageTextFieldTextStyle}
-        renderContent={(getFlags) => (
-            <PageTextFieldContent flags={getFlags} width={() => FIELD_WIDTH} isStretched={true} />
-        )}
+        renderContent={(getFlags) => <PageTextFieldContent flags={getFlags} width={FIELD_WIDTH} isStretched={true} />}
         renderPlaceholder={(getFlags) => (
             <PageTextFieldPlaceholder flags={getFlags} isTopAligned={true}>
                 Type across several lines

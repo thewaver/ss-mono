@@ -104,11 +104,11 @@ export const DropdownExample = (props: Props) => {
                             <Range
                                 value={props.hue}
                                 sizing={"fill"}
-                                max={() => HUE_MAX}
+                                max={HUE_MAX}
                                 step={1}
                                 id={"hueSlider"}
                                 ariaLabel={"Hue"}
-                                thumbSize={() => HUE_THUMB_SIZE}
+                                thumbSize={HUE_THUMB_SIZE}
                                 renderContent={(getRenderProps) => <PageHueSlider renderProps={getRenderProps} />}
                             />
                         </PageColorPickerRow>

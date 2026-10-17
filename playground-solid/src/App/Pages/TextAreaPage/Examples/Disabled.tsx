@@ -17,12 +17,12 @@ export const DisabledExample = (props: Props) => (
     <TextArea
         value={props.value}
         isDisabled={true}
-        padding={() => FIELD_PADDING}
-        gap={() => FIELD_GAP}
+        padding={FIELD_PADDING}
+        gap={FIELD_GAP}
         ariaLabel={"Disabled notes"}
         computeTextStyle={computePageTextFieldTextStyle}
         renderContent={(getFlags) => (
-            <PageTextFieldContent flags={getFlags} width={() => FIELD_WIDTH} height={() => FIXED_HEIGHT} />
+            <PageTextFieldContent flags={getFlags} width={FIELD_WIDTH} height={FIXED_HEIGHT} />
         )}
     />
 );

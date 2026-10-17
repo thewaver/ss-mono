@@ -11,7 +11,7 @@ export const BareExample = (props: Props) => {
         <Stepper
             steps={props.steps}
             currentValue={props.currentValue}
-            gap={() => STEPPER_GAP}
+            gap={STEPPER_GAP}
             ariaLabel={"Checkout without connectors"}
             computeStepAriaLabel={props.computeStepAriaLabel}
             onCurrentChange={props.onCurrentChange}

@@ -49,11 +49,11 @@ export const MeetingsExample = (props: Props) => {
         <PageTimelineFrame>
             <PageTimelineTrack>
                 <Timeline<Meeting>
-                    range={() => DAY}
-                    items={() => MEETINGS}
-                    laneSize={() => LANE_SIZE}
-                    axisSize={() => AXIS_HEIGHT}
-                    tickSteps={() => MINUTE_STEPS}
+                    range={DAY}
+                    items={MEETINGS}
+                    laneSize={LANE_SIZE}
+                    axisSize={AXIS_HEIGHT}
+                    tickSteps={MINUTE_STEPS}
                     isPannable={props.isPannable}
                     isZoomable={props.isZoomable}
                     isDisabled={props.isDisabled}

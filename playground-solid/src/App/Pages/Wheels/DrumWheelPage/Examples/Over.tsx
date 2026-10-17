@@ -32,7 +32,7 @@ export const OverExample = ({ wedges, ...otherProps }: Props) => {
                         {...otherProps}
                         wedges={getWedges}
                         axis={"column"}
-                        wedgeSize={() => WEDGE_SIZE}
+                        wedgeSize={WEDGE_SIZE}
                         ariaLabel={"Prize drum, turning over"}
                         computeSpinTarget={() => pickPrizeIndex(getWedges().length)}
                         computeWedgeLabel={(index) => `${getWedges()[index]}, ${index + 1} of ${getWedges().length}`}

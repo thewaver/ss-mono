@@ -251,7 +251,7 @@ export const PatchBoard = <T,>(props: PatchBoardProps<T>) => {
                         >
                             <div class={styles.patchBoardNodeHolder}>
                                 <InteractionWrapper
-                                    sizing={() => "fill"}
+                                    sizing={"fill"}
                                     isDisabled={() => getNode().isDisabled ?? false}
                                     isFocusableWhenDisabled={() => !getIsDisabled()}
                                     isTabbable={() => getRovingStop() === getKey()}
@@ -323,7 +323,7 @@ export const PatchBoard = <T,>(props: PatchBoardProps<T>) => {
                                             }}
                                         >
                                             <InteractionWrapper
-                                                sizing={() => "fill"}
+                                                sizing={"fill"}
                                                 isDisabled={() =>
                                                     (getNode().isDisabled ?? false) || (getSocket().isDisabled ?? false)
                                                 }

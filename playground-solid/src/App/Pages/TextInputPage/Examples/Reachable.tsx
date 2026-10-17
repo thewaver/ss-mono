@@ -16,8 +16,8 @@ type Props = TextInputExampleProps;
 export const ReachableExample = (props: Props) => (
     <TextInput
         value={props.value}
-        padding={() => FIELD_PADDING}
-        gap={() => FIELD_GAP}
+        padding={FIELD_PADDING}
+        gap={FIELD_GAP}
         isDisabled={true}
         isReachableWhenDisabled={true}
         ariaLabel={"Disabled but reachable field"}

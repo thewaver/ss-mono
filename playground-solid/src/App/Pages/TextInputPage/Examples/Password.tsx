@@ -17,8 +17,8 @@ type Props = TextInputPasswordExampleProps;
 export const PasswordExample = (props: Props) => (
     <TextInput
         value={props.value}
-        padding={() => FIELD_PADDING}
-        gap={() => FIELD_GAP}
+        padding={FIELD_PADDING}
+        gap={FIELD_GAP}
         type={() => (props.reveal[0]() ? "text" : "password")}
         ariaLabel={"Password"}
         autoComplete={"current-password"}

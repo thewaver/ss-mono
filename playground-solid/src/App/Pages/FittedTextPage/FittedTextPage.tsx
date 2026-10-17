@@ -50,9 +50,9 @@ export const FittedTextPage = () => {
                 >
                     <PageNumberField
                         value={getLineHeightRatio}
-                        min={() => FittedTextKnobs.MIN_LINE_HEIGHT_RATIO}
-                        max={() => FittedTextKnobs.MAX_LINE_HEIGHT_RATIO}
-                        step={() => FittedTextKnobs.LINE_HEIGHT_RATIO_STEP}
+                        min={FittedTextKnobs.MIN_LINE_HEIGHT_RATIO}
+                        max={FittedTextKnobs.MAX_LINE_HEIGHT_RATIO}
+                        step={FittedTextKnobs.LINE_HEIGHT_RATIO_STEP}
                         ariaLabel={"Line height"}
                         onInput={setLineHeightRatio}
                     />

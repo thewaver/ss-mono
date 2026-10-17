@@ -55,9 +55,9 @@ export const TreemapPage = () => {
                 >
                     <PageNumberField
                         value={getZoomDurationMs}
-                        min={() => TreemapKnobs.MIN_ZOOM_DURATION_MS}
-                        max={() => TreemapKnobs.MAX_ZOOM_DURATION_MS}
-                        step={() => TreemapKnobs.ZOOM_DURATION_STEP_MS}
+                        min={TreemapKnobs.MIN_ZOOM_DURATION_MS}
+                        max={TreemapKnobs.MAX_ZOOM_DURATION_MS}
+                        step={TreemapKnobs.ZOOM_DURATION_STEP_MS}
                         isDisabled={getPrefersReducedMotion}
                         ariaLabel={"Zoom duration in milliseconds"}
                         onInput={setZoomDurationMs}

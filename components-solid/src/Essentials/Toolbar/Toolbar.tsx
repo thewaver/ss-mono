@@ -3,6 +3,7 @@ import { type Accessor, Index, type JSX, Show, createEffect, createMemo, createS
 import {
     type MenuItemFlags,
     MenuUtils,
+    OverflowUtils,
     TOOLBAR_DEFAULTS,
     ToolbarUtils,
     ToolbarStyles as styles,
@@ -63,7 +64,7 @@ export const ToolbarComposite = <T,>(props: ToolbarCompositeProps<T>) => {
     };
 
     const getHasMeasured = createMemo(() =>
-        ToolbarUtils.computeHasMeasured(
+        OverflowUtils.computeHasMeasured(
             getLayout() !== undefined,
             getRootSize().width,
             getItemSizes().length,
@@ -73,14 +74,14 @@ export const ToolbarComposite = <T,>(props: ToolbarCompositeProps<T>) => {
 
     const getCut = createMemo(() =>
         getLayout() === undefined
-            ? ToolbarUtils.computeCut({
+            ? OverflowUtils.computeCut({
                   widths: getItemSizes().map((size) => size.width),
                   collapses: getActions().map((action) => action.collapse ?? "auto"),
                   available: getRootSize().width,
                   overflowWidth: getOverflowSize().width,
                   gap: getGap(),
               })
-            : ToolbarUtils.computeUncut(getActions().length),
+            : OverflowUtils.computeUncut(getActions().length),
     );
 
     const getIsShown = (index: number) => getCut().shownIndexes.includes(index);

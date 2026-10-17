@@ -120,8 +120,8 @@ export const InfiniteCorridorPage = () => {
                     >
                         <PageSelectField
                             value={getLayoutKey}
-                            values={() => CorridorLayouts.SAMPLE_KEYS}
-                            width={() => LAYOUT_FIELD_WIDTH}
+                            values={CorridorLayouts.SAMPLE_KEYS}
+                            width={LAYOUT_FIELD_WIDTH}
                             ariaLabel={"Layout"}
                             onChange={(key) => setLayoutKey(() => key)}
                         />
@@ -147,10 +147,10 @@ export const InfiniteCorridorPage = () => {
                         >
                             <PageNumberField
                                 value={getSpinDegreesPerSecond}
-                                min={() => CorridorLayoutKnobs.MIN_SPIN_DEGREES_PER_SECOND}
-                                max={() => CorridorLayoutKnobs.MAX_SPIN_DEGREES_PER_SECOND}
-                                step={() => CorridorLayoutKnobs.SPIN_STEP_DEGREES_PER_SECOND}
-                                width={() => FIELD_WIDTH}
+                                min={CorridorLayoutKnobs.MIN_SPIN_DEGREES_PER_SECOND}
+                                max={CorridorLayoutKnobs.MAX_SPIN_DEGREES_PER_SECOND}
+                                step={CorridorLayoutKnobs.SPIN_STEP_DEGREES_PER_SECOND}
+                                width={FIELD_WIDTH}
                                 ariaLabel={"Rotation speed in degrees per second"}
                                 onInput={setSpinDegreesPerSecond}
                             />
@@ -170,10 +170,10 @@ export const InfiniteCorridorPage = () => {
                     >
                         <PageNumberField
                             value={getItemCount}
-                            min={() => InfiniteCorridorKnobs.MIN_ITEM_COUNT}
-                            max={() => InfiniteCorridorKnobs.MAX_ITEM_COUNT}
-                            step={() => InfiniteCorridorKnobs.ITEM_COUNT_STEP}
-                            width={() => FIELD_WIDTH}
+                            min={InfiniteCorridorKnobs.MIN_ITEM_COUNT}
+                            max={InfiniteCorridorKnobs.MAX_ITEM_COUNT}
+                            step={InfiniteCorridorKnobs.ITEM_COUNT_STEP}
+                            width={FIELD_WIDTH}
                             ariaLabel={"Item count"}
                             onInput={setItemCount}
                         />
@@ -188,10 +188,10 @@ export const InfiniteCorridorPage = () => {
                     >
                         <PageNumberField
                             value={getGlideDurationMs}
-                            min={() => InfiniteCorridorKnobs.MIN_GLIDE_DURATION_MS}
-                            max={() => InfiniteCorridorKnobs.MAX_GLIDE_DURATION_MS}
-                            step={() => InfiniteCorridorKnobs.GLIDE_DURATION_STEP_MS}
-                            width={() => FIELD_WIDTH}
+                            min={InfiniteCorridorKnobs.MIN_GLIDE_DURATION_MS}
+                            max={InfiniteCorridorKnobs.MAX_GLIDE_DURATION_MS}
+                            step={InfiniteCorridorKnobs.GLIDE_DURATION_STEP_MS}
+                            width={FIELD_WIDTH}
                             ariaLabel={"Glide duration in milliseconds"}
                             onInput={setGlideDurationMs}
                         />

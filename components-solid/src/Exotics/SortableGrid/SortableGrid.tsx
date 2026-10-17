@@ -489,7 +489,7 @@ export const SortableGrid = <T,>(props: SortableGridProps<T>) => {
                                     }}
                                 >
                                     <InteractionWrapper
-                                        sizing={() => "fill"}
+                                        sizing={"fill"}
                                         isDisabled={() => getItem().isDisabled ?? false}
                                         isReachableWhenDisabled={() => getItem().isReachableWhenDisabled ?? false}
                                         isTabbable={() => getRovingIndex() === index}

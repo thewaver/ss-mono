@@ -57,6 +57,7 @@ const LabelPage = () => import("./Pages/LabelPage/LabelPage.svelte");
 const ListboxPage = () => import("./Pages/ListboxPage/ListboxPage.svelte");
 const MenubarPage = () => import("./Pages/MenubarPage/MenubarPage.svelte");
 const FanMenuPage = () => import("./Pages/Menus/FanMenuPage/FanMenuPage.svelte");
+const FlyoutMenuPage = () => import("./Pages/Menus/FlyoutMenuPage/FlyoutMenuPage.svelte");
 const MenuPage = () => import("./Pages/Menus/MenuPage/MenuPage.svelte");
 const WheelMenuPage = () => import("./Pages/Menus/WheelMenuPage/WheelMenuPage.svelte");
 const ModalPage = () => import("./Pages/ModalPage/ModalPage.svelte");
@@ -435,6 +436,10 @@ export const MENU_CONFIGS: MenuBranchConfig[] = [
                     {
                         name: "FanMenu",
                         component: FanMenuPage,
+                    },
+                    {
+                        name: "FlyoutMenu",
+                        component: FlyoutMenuPage,
                     },
                     {
                         name: "Menu",

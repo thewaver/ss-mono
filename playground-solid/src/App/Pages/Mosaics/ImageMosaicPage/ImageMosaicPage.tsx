@@ -45,8 +45,8 @@ const ImagesExampleWrapper = (props: MosaicSharedProps) => {
                 <PageProp key={"shapeKey"} label={"Target shape"} hint={"The contour the tiles are packed into."}>
                     <PageSelectField
                         value={getShapeKey}
-                        values={() => MosaicImages.SAMPLE_SHAPE_KEYS}
-                        width={() => FIELD_WIDTH}
+                        values={MosaicImages.SAMPLE_SHAPE_KEYS}
+                        width={FIELD_WIDTH}
                         ariaLabel={"Target shape"}
                         onChange={(key) => setShapeKey(() => key)}
                     />

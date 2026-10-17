@@ -15,7 +15,7 @@ import { OverheadExample } from "./Examples/Overhead";
 
 const OverheadExampleWrapper = (props: WheelExampleProps) => {
     return (
-        <PageMeasureBox width={() => FLAT_WHEEL_SIZE}>
+        <PageMeasureBox width={FLAT_WHEEL_SIZE}>
             <OverheadExample {...props} />
         </PageMeasureBox>
     );

@@ -38,9 +38,9 @@ export const PagePlaybackScrubber = (props: PagePlaybackScrubberProps) => {
                     id={`${props.id}Progress`}
                     sizing={"fill"}
                     ariaLabel={props.ariaLabel}
-                    min={() => 0}
-                    max={() => PERCENT}
-                    step={() => SLIDER_STEP}
+                    min={0}
+                    max={PERCENT}
+                    step={SLIDER_STEP}
                     value={[
                         () => Math.round(props.progress[0]() * PERCENT),
                         (value: number) => props.progress[1](value / PERCENT),

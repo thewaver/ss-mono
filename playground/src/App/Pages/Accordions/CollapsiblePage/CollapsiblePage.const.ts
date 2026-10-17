@@ -6,3 +6,5 @@ export const EXAMPLE_NAMES = {
 };
 
 export const EXAMPLES_ROOT = "/src/App/Pages/Accordions/CollapsiblePage/Examples";
+
+export const FIELD_WIDTH = 110;

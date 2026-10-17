@@ -24,7 +24,7 @@ export const PageSVGGradientsProps = (props: Props) => {
             >
                 <PageSelectField
                     value={controls.paintKind[0]}
-                    values={() => SVGGradientKnobs.PAINT_KINDS}
+                    values={SVGGradientKnobs.PAINT_KINDS}
                     ariaLabel={"Painted as"}
                     onChange={(kind) => controls.paintKind[1](() => kind)}
                 />
@@ -55,9 +55,9 @@ export const PageSVGGradientsProps = (props: Props) => {
             >
                 <PageNumberField
                     value={controls.blurWidth[0]}
-                    min={() => SVGGradientKnobs.MIN_BLUR_WIDTH}
-                    max={() => SVGGradientKnobs.MAX_BLUR_WIDTH}
-                    step={() => SVGGradientKnobs.BLUR_WIDTH_STEP}
+                    min={SVGGradientKnobs.MIN_BLUR_WIDTH}
+                    max={SVGGradientKnobs.MAX_BLUR_WIDTH}
+                    step={SVGGradientKnobs.BLUR_WIDTH_STEP}
                     ariaLabel={"Blur width"}
                     onInput={controls.blurWidth[1]}
                 />

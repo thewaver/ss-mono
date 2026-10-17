@@ -28,6 +28,7 @@
     isDisabled={props.isDisabled}
     isLooping={props.isLooping}
     orientation={props.orientation}
+    transitionDurationMs={props.transitionDurationMs}
     gap={CAROUSEL_GAP}
     ariaLabel={"Sampler"}
     computeSlideLabel={computePositionLabel}

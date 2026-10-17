@@ -15,10 +15,10 @@ export const ClearableExample = (props: Props) => {
         <PageControlColumn>
             <Tabs
                 orientation={"horizontal"}
-                tabGap={() => ROW_TAB_GAP}
+                tabGap={ROW_TAB_GAP}
                 ariaLabel={"Clearable views"}
-                transitionDurationMs={() => CLEARABLE_TRANSITION_DURATION_MS}
-                tabs={() => CLEARABLE_TABS}
+                transitionDurationMs={CLEARABLE_TRANSITION_DURATION_MS}
+                tabs={CLEARABLE_TABS}
                 selectedValue={props.selectedValue}
                 onSelectionChange={props.onSelectionChange}
                 renderGutter={() => <PageTabGutter orientation={"horizontal"} />}

@@ -14,7 +14,7 @@ type Props = ToolbarPressedExampleProps;
 export const PressedExample = (props: Props) => {
     return (
         <Toolbar
-            actions={() => ACTIONS}
+            actions={ACTIONS}
             gap={props.gap}
             ariaLabel={"Text style"}
             overflowAriaLabel={"More text styles"}

@@ -12,9 +12,8 @@ import { PageExamples } from "../../PageComponents/Examples/Examples";
 import { PageNumberField } from "../../PageComponents/Field/Field";
 import { PageProp } from "../../PageComponents/Prop/Prop";
 import { PagePropsPanel } from "../../PageComponents/PropsPanel/PropsPanel";
-import { NavigationMenuExample } from "./Examples/NavigationMenu";
 import { ProfileExample } from "./Examples/Profile";
-import type { HoverCardExampleProps, NavigationMenuExampleProps } from "./HoverCardPageReact.types";
+import type { HoverCardExampleProps } from "./HoverCardPageReact.types";
 
 export const HoverCardPage = () => {
     const [offsetY, setOffsetY] = useState(HoverCardKnobs.STARTING_OFFSET_Y);
@@ -25,7 +24,6 @@ export const HoverCardPage = () => {
 
     const visibilityState = useState(false);
     const followingState = useState(false);
-    const openKeyState = useState<string | undefined>();
 
     const offset = useMemo(() => ({ x: 0, y: offsetY }), [offsetY]);
 
@@ -39,12 +37,6 @@ export const HoverCardPage = () => {
         following: followingState,
     };
 
-    const navigationProps: NavigationMenuExampleProps = {
-        hoverShowDelayMs,
-        skipDelayWindowMs,
-        openKey: openKeyState,
-    };
-
     const examples = [
         {
             key: "profile",
@@ -53,14 +45,6 @@ export const HoverCardPage = () => {
                 `open: ${visibilityState[0]}, following: ${followingState[0]} — rest on the name, or tab to it and wait, then Tab again to reach the button and the link; Escape brings focus back to the name`,
             component: () => <ProfileExample {...commonProps} />,
             path: `${EXAMPLES_ROOT}/Profile.tsx`,
-        },
-        {
-            key: "navigation",
-            name: EXAMPLE_NAMES.navigation,
-            readout: () =>
-                `open: ${openKeyState[0] ?? "none"} — each flyout is a popup trigger over a popover, opened by a press or by resting on it through the same hover engine; only one is open at a time`,
-            component: () => <NavigationMenuExample {...navigationProps} />,
-            path: `${EXAMPLES_ROOT}/NavigationMenu.tsx`,
         },
     ];
 
@@ -121,7 +105,7 @@ export const HoverCardPage = () => {
                     itemKey={"hoverShowDelayMs"}
                     label={"Hover delay (ms)"}
                     hint={
-                        "How long the pointer has to rest on the anchor before the card or a flyout opens. Leave before then and nothing opens."
+                        "How long the pointer has to rest on the anchor before the card opens. Leave before then and nothing opens."
                     }
                 >
                     <PageNumberField
@@ -139,7 +123,7 @@ export const HoverCardPage = () => {
                     itemKey={"skipDelayWindowMs"}
                     label={"Skip window (ms)"}
                     hint={
-                        "How soon after one closes a hover opens the next at once. Open one flyout, then move to the other."
+                        "How soon after a card has closed a hover opens one again at once, without waiting out the hover delay."
                     }
                 >
                     <PageNumberField

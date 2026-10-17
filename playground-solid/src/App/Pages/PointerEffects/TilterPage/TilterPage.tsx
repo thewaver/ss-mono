@@ -47,7 +47,7 @@ export const TilterPage = () => {
                 readout: () =>
                     "the surface leans away from the pointer and the highlight runs the other way, which is what reads as a reflection",
                 component: () => (
-                    <PageMeasureBox isFilling height={() => BOX_HEIGHT}>
+                    <PageMeasureBox isFilling height={BOX_HEIGHT}>
                         <CardExample {...commonProps} />
                     </PageMeasureBox>
                 ),
@@ -58,7 +58,7 @@ export const TilterPage = () => {
                 name: EXAMPLE_NAMES.photo,
                 readout: () => "the same wrapper with the sheen slot left out — nothing is painted over the content",
                 component: () => (
-                    <PageMeasureBox isFilling height={() => BOX_HEIGHT}>
+                    <PageMeasureBox isFilling height={BOX_HEIGHT}>
                         <PhotoExample {...commonProps} />
                     </PageMeasureBox>
                 ),
@@ -89,10 +89,10 @@ export const TilterPage = () => {
                 >
                     <PageNumberField
                         value={getSmoothingMs}
-                        min={() => TilterKnobs.MIN_SMOOTHING_MS}
-                        max={() => TilterKnobs.MAX_SMOOTHING_MS}
-                        step={() => TilterKnobs.SMOOTHING_STEP_MS}
-                        width={() => FIELD_WIDTH}
+                        min={TilterKnobs.MIN_SMOOTHING_MS}
+                        max={TilterKnobs.MAX_SMOOTHING_MS}
+                        step={TilterKnobs.SMOOTHING_STEP_MS}
+                        width={FIELD_WIDTH}
                         ariaLabel={"Smoothing in milliseconds"}
                         onInput={setSmoothingMs}
                     />
@@ -107,10 +107,10 @@ export const TilterPage = () => {
                 >
                     <PageNumberField
                         value={getActiveRangePx}
-                        min={() => TilterKnobs.MIN_ACTIVE_RANGE_PX}
-                        max={() => TilterKnobs.MAX_ACTIVE_RANGE_PX}
-                        step={() => TilterKnobs.ACTIVE_RANGE_STEP_PX}
-                        width={() => FIELD_WIDTH}
+                        min={TilterKnobs.MIN_ACTIVE_RANGE_PX}
+                        max={TilterKnobs.MAX_ACTIVE_RANGE_PX}
+                        step={TilterKnobs.ACTIVE_RANGE_STEP_PX}
+                        width={FIELD_WIDTH}
                         ariaLabel={"Active range in pixels"}
                         onInput={setActiveRangePx}
                     />
@@ -125,10 +125,10 @@ export const TilterPage = () => {
                 >
                     <PageNumberField
                         value={getTiltRangePx}
-                        min={() => TilterKnobs.MIN_TILT_RANGE_PX}
-                        max={() => TilterKnobs.MAX_TILT_RANGE_PX}
-                        step={() => TilterKnobs.TILT_RANGE_STEP_PX}
-                        width={() => FIELD_WIDTH}
+                        min={TilterKnobs.MIN_TILT_RANGE_PX}
+                        max={TilterKnobs.MAX_TILT_RANGE_PX}
+                        step={TilterKnobs.TILT_RANGE_STEP_PX}
+                        width={FIELD_WIDTH}
                         ariaLabel={"Tilt range in pixels"}
                         onInput={setTiltRangePx}
                     />
@@ -141,10 +141,10 @@ export const TilterPage = () => {
                 >
                     <PageNumberField
                         value={getMaxTiltDegrees}
-                        min={() => TilterKnobs.MIN_TILT_DEGREES}
-                        max={() => TilterKnobs.MAX_TILT_DEGREES}
-                        step={() => TilterKnobs.TILT_STEP_DEGREES}
-                        width={() => FIELD_WIDTH}
+                        min={TilterKnobs.MIN_TILT_DEGREES}
+                        max={TilterKnobs.MAX_TILT_DEGREES}
+                        step={TilterKnobs.TILT_STEP_DEGREES}
+                        width={FIELD_WIDTH}
                         ariaLabel={"Maximum tilt in degrees"}
                         onInput={setMaxTiltDegrees}
                     />
@@ -157,10 +157,10 @@ export const TilterPage = () => {
                 >
                     <PageNumberField
                         value={getPerspectivePx}
-                        min={() => TilterKnobs.MIN_PERSPECTIVE_PX}
-                        max={() => TilterKnobs.MAX_PERSPECTIVE_PX}
-                        step={() => TilterKnobs.PERSPECTIVE_STEP_PX}
-                        width={() => FIELD_WIDTH}
+                        min={TilterKnobs.MIN_PERSPECTIVE_PX}
+                        max={TilterKnobs.MAX_PERSPECTIVE_PX}
+                        step={TilterKnobs.PERSPECTIVE_STEP_PX}
+                        width={FIELD_WIDTH}
                         ariaLabel={"Perspective in pixels"}
                         onInput={setPerspectivePx}
                     />
@@ -173,10 +173,10 @@ export const TilterPage = () => {
                 >
                     <PageNumberField
                         value={getSheenOpacity}
-                        min={() => TilterKnobs.MIN_SHEEN_OPACITY}
-                        max={() => TilterKnobs.MAX_SHEEN_OPACITY}
-                        step={() => TilterKnobs.SHEEN_OPACITY_STEP}
-                        width={() => FIELD_WIDTH}
+                        min={TilterKnobs.MIN_SHEEN_OPACITY}
+                        max={TilterKnobs.MAX_SHEEN_OPACITY}
+                        step={TilterKnobs.SHEEN_OPACITY_STEP}
+                        width={FIELD_WIDTH}
                         ariaLabel={"Sheen opacity"}
                         onInput={setSheenOpacity}
                     />
@@ -189,10 +189,10 @@ export const TilterPage = () => {
                 >
                     <PageNumberField
                         value={getSheenSpreadPercent}
-                        min={() => TilterKnobs.MIN_SHEEN_SPREAD}
-                        max={() => TilterKnobs.MAX_SHEEN_SPREAD}
-                        step={() => TilterKnobs.SHEEN_SPREAD_STEP}
-                        width={() => FIELD_WIDTH}
+                        min={TilterKnobs.MIN_SHEEN_SPREAD}
+                        max={TilterKnobs.MAX_SHEEN_SPREAD}
+                        step={TilterKnobs.SHEEN_SPREAD_STEP}
+                        width={FIELD_WIDTH}
                         ariaLabel={"Sheen spread in percent"}
                         onInput={setSheenSpreadPercent}
                     />

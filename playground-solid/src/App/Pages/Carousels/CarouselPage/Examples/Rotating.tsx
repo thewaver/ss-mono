@@ -38,8 +38,9 @@ export const RotatingExample = (props: Props) => {
             isDisabled={props.isDisabled}
             isLooping={props.isLooping}
             orientation={props.orientation}
+            transitionDurationMs={props.transitionDurationMs}
             autoplayDelayMs={props.autoplayDelayMs}
-            gap={() => CAROUSEL_GAP}
+            gap={CAROUSEL_GAP}
             ariaLabel={"Rotating sampler"}
             computeSlideLabel={computePositionLabel}
             computeStepLabel={computeCarouselStepLabel}

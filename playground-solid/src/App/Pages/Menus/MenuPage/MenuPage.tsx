@@ -95,7 +95,7 @@ export const MenuPage = () => {
             name: EXAMPLE_NAMES.staysOpen,
             readout: () =>
                 `zoom: ${getZoomPercent()}% — Zoom in and Zoom out leave the menu open so they can be pressed again, and Reset zoom closes it`,
-            component: () => <DefaultExample items={() => ZOOM_ACTIONS} caption={"Zoom"} onActivate={applyZoom} />,
+            component: () => <DefaultExample items={ZOOM_ACTIONS} caption={"Zoom"} onActivate={applyZoom} />,
             path: `${EXAMPLES_ROOT}/Default.tsx`,
         },
         {
@@ -104,7 +104,7 @@ export const MenuPage = () => {
             readout: () => `${getLastDisabledAction()} — arrows skip Paste and Duplicate`,
             component: () => (
                 <DefaultExample
-                    items={() => ACTIONS_WITH_DISABLED}
+                    items={ACTIONS_WITH_DISABLED}
                     onActivate={(action) => setLastDisabledAction(action.name)}
                 />
             ),
@@ -116,7 +116,7 @@ export const MenuPage = () => {
             readout: () => `${getLastReachableAction()} — arrows stop on Paste, hover explains why`,
             component: () => (
                 <DefaultExample
-                    items={() => ACTIONS_WITH_REACHABLE}
+                    items={ACTIONS_WITH_REACHABLE}
                     onActivate={(action) => setLastReachableAction(action.name)}
                 />
             ),
@@ -158,7 +158,7 @@ export const MenuPage = () => {
             readout: () => `${getLastLayerAction()} — Home and End reach both ends`,
             component: () => (
                 <DefaultExample
-                    items={() => LAYERS}
+                    items={LAYERS}
                     caption={"Layers"}
                     onActivate={(action) => setLastLayerAction(action.name)}
                 />

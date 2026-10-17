@@ -45,7 +45,7 @@ const StressTestWrapper = (props: ShapeExampleProps) => {
 
     return (
         <StressTest
-            configs={() => STRESS_ITEMS}
+            configs={STRESS_ITEMS}
             renderLabel={(getConfigIndex) => `Render ${STRESS_ITEMS[getConfigIndex()].count} items`}
             renderItem={(getConfigIndex, getItemIndex) => {
                 const getScale = () => STRESS_ITEMS[getConfigIndex()].size / styles.exampleSize;
@@ -118,7 +118,7 @@ const createShapeGeometry = (startingShapeKind: ShapeConst.DefaultShape = ShapeK
             >
                 <PageSelectField
                     value={getShapeKind}
-                    values={() => ShapeConst.DEFAULT_SHAPES}
+                    values={ShapeConst.DEFAULT_SHAPES}
                     ariaLabel={"Shape"}
                     onChange={(shape) => setShapeKind(() => shape)}
                 />
@@ -146,10 +146,10 @@ const createShapeGeometry = (startingShapeKind: ShapeConst.DefaultShape = ShapeK
                         {(_, getIndex) => (
                             <PageNumberField
                                 value={() => getJoinRadii()[getIndex()]}
-                                min={() => ShapeKnobs.MIN_JOIN_RADIUS}
-                                max={() => ShapeKnobs.MAX_JOIN_RADIUS}
-                                step={() => ShapeKnobs.JOIN_RADIUS_STEP}
-                                width={() => CORNER_FIELD_WIDTH}
+                                min={ShapeKnobs.MIN_JOIN_RADIUS}
+                                max={ShapeKnobs.MAX_JOIN_RADIUS}
+                                step={ShapeKnobs.JOIN_RADIUS_STEP}
+                                width={CORNER_FIELD_WIDTH}
                                 id={() => `jointRadius${getIndex() + 1}`}
                                 ariaLabel={() => `Joint radius ${getIndex() + 1}`}
                                 onInput={(value) =>
@@ -175,10 +175,10 @@ const createShapeGeometry = (startingShapeKind: ShapeConst.DefaultShape = ShapeK
                         {(_, getIndex) => (
                             <PageNumberField
                                 value={() => getLameExponents()[getIndex()]}
-                                min={() => ShapeKnobs.MIN_LAME_EXPONENT}
-                                max={() => ShapeKnobs.MAX_LAME_EXPONENT}
-                                step={() => ShapeKnobs.LAME_EXPONENT_STEP}
-                                width={() => CORNER_FIELD_WIDTH}
+                                min={ShapeKnobs.MIN_LAME_EXPONENT}
+                                max={ShapeKnobs.MAX_LAME_EXPONENT}
+                                step={ShapeKnobs.LAME_EXPONENT_STEP}
+                                width={CORNER_FIELD_WIDTH}
                                 ariaLabel={() => `Lamé exponent ${getIndex() + 1}`}
                                 onInput={(value) =>
                                     setLameExponents((prev) =>
@@ -263,9 +263,9 @@ const MorphExampleWrapper = (props: ShapeExampleProps) => {
                 >
                     <PageNumberField
                         value={getStarPoints}
-                        min={() => ShapeKnobs.MIN_STAR_POINTS}
-                        max={() => ShapeKnobs.MAX_STAR_POINTS}
-                        step={() => ShapeKnobs.STAR_POINTS_STEP}
+                        min={ShapeKnobs.MIN_STAR_POINTS}
+                        max={ShapeKnobs.MAX_STAR_POINTS}
+                        step={ShapeKnobs.STAR_POINTS_STEP}
                         ariaLabel={"Star points"}
                         onInput={setStarPoints}
                     />
@@ -401,9 +401,9 @@ export const ShapePage = () => {
                         >
                             <PageNumberField
                                 value={getCellSize}
-                                min={() => ShapeKnobs.MIN_CELL_SIZE}
-                                max={() => ShapeKnobs.MAX_CELL_SIZE}
-                                step={() => ShapeKnobs.CELL_SIZE_STEP}
+                                min={ShapeKnobs.MIN_CELL_SIZE}
+                                max={ShapeKnobs.MAX_CELL_SIZE}
+                                step={ShapeKnobs.CELL_SIZE_STEP}
                                 ariaLabel={"Pattern cell size"}
                                 onInput={setCellSize}
                             />
@@ -435,9 +435,9 @@ export const ShapePage = () => {
                     >
                         <PageNumberField
                             value={getEdgeThickness}
-                            min={() => ShapeKnobs.MIN_EDGE_THICKNESS}
-                            max={() => ShapeKnobs.MAX_EDGE_THICKNESS}
-                            step={() => ShapeKnobs.EDGE_THICKNESS_STEP}
+                            min={ShapeKnobs.MIN_EDGE_THICKNESS}
+                            max={ShapeKnobs.MAX_EDGE_THICKNESS}
+                            step={ShapeKnobs.EDGE_THICKNESS_STEP}
                             ariaLabel={"Stroke thickness"}
                             onInput={setEdgeThickness}
                         />
@@ -450,9 +450,9 @@ export const ShapePage = () => {
                     >
                         <PageNumberField
                             value={getBlurWidth}
-                            min={() => ShapeKnobs.MIN_BLUR_WIDTH}
-                            max={() => ShapeKnobs.MAX_BLUR_WIDTH}
-                            step={() => ShapeKnobs.BLUR_WIDTH_STEP}
+                            min={ShapeKnobs.MIN_BLUR_WIDTH}
+                            max={ShapeKnobs.MAX_BLUR_WIDTH}
+                            step={ShapeKnobs.BLUR_WIDTH_STEP}
                             ariaLabel={"Blur width"}
                             onInput={setBlurWidth}
                         />
@@ -466,9 +466,9 @@ export const ShapePage = () => {
                         >
                             <PageNumberField
                                 value={getAnimationDurationMs}
-                                min={() => ShapeKnobs.MIN_DURATION_MS}
-                                max={() => ShapeKnobs.MAX_DURATION_MS}
-                                step={() => ShapeKnobs.DURATION_STEP_MS}
+                                min={ShapeKnobs.MIN_DURATION_MS}
+                                max={ShapeKnobs.MAX_DURATION_MS}
+                                step={ShapeKnobs.DURATION_STEP_MS}
                                 ariaLabel={"Animation duration"}
                                 onInput={setAnimationDurationMs}
                             />
@@ -481,7 +481,7 @@ export const ShapePage = () => {
                         >
                             <PageSelectField
                                 value={getIterationConfigKey}
-                                values={() => SVGDefsSamples.Iteration.SAMPLE_KEYS}
+                                values={SVGDefsSamples.Iteration.SAMPLE_KEYS}
                                 ariaLabel={"Iteration pattern"}
                                 onChange={(config) => setIterationConfigKey(() => config)}
                             />

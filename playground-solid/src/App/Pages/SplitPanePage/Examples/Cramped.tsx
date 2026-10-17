@@ -17,7 +17,7 @@ export const CrampedExample = (props: Props) => {
         <div style={{ "width": `${CRAMPED_WIDTH}px`, "overflow-x": "auto" }}>
             <PageSplitPaneFrame>
                 <SplitPane
-                    panes={() => CRAMPED}
+                    panes={CRAMPED}
                     ratios={props.ratios}
                     gutterSize={props.gutterSize}
                     isDisabled={props.isDisabled}

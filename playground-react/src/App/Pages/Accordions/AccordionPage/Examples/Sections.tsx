@@ -7,8 +7,6 @@ import {
 } from "../../../../StyledComponents/AccordionContent/AccordionContent";
 import type { AccordionExampleProps } from "../../Accordions.types";
 
-const GAP = 5;
-
 const SECTION_BODIES: Record<string, string[]> = {
     Shipping: ["Orders leave the warehouse within two working days.", "Tracking arrives by email."],
     Returns: ["Thirty days, unopened, receipt or order number."],
@@ -35,7 +33,8 @@ export const SectionsExample = (props: Props) => {
             expanded={props.expanded}
             isSingleExpand={props.isSingleExpand}
             isExpandRequired={props.isExpandRequired}
-            gap={GAP}
+            gap={props.gap}
+            transitionDurationMs={props.transitionDurationMs}
             renderHeader={(item, flags) => <PageAccordionHeader flags={flags}>{item.value}</PageAccordionHeader>}
             renderPanel={(item, visibilityTarget, transitionDurationMs) => (
                 <PageAccordionPanel visibilityTarget={visibilityTarget} transitionDurationMs={transitionDurationMs}>

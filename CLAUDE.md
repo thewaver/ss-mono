@@ -65,7 +65,9 @@ documents as much as to chat, and it has three parts.
 
 **A hedged request is a request to discuss, not to build.** Stated by the user: _"perhaps"_, _"maybe"_,
 _"we could"_ and the like are their way of opening a design conversation, and a turn that answers one by
-shipping the thing has skipped the part they wanted. So when the ask arrives hedged, reply with the argument —
+shipping the thing has skipped the part they wanted. **"Can you …?" is a question too**, the user's correction after
+_"can you defer this to a potato agent?"_ was answered by launching the agent: it asks whether the thing is possible
+and sensible, so the reply says so and waits. So when the ask arrives hedged, reply with the argument —
 whether the idea holds, what it would cost, what it leaves ambiguous — and wait. An unhedged instruction is
 still an instruction, and _"fix on sight"_ under **Writing code** is untouched: a defect found while answering
 gets fixed, because nobody hedged about that.
@@ -421,6 +423,11 @@ shouting.
 say otherwise: implement the change in the library and in `playground-solid` only, then stop and report. Specs and
 the ports to React, Vue and Svelte come after their feedback on the Solid version, not before — they test by hand
 first, and porting or specifying something they are about to change spends the work twice.
+
+**Simple changes skip the pause and go to every framework at once.** Stated by the user, more than once: renaming a
+label, deleting an example, reordering examples and the like leave nothing to test by hand in Solid before porting, so
+they land in all four playgrounds in the same pass. The Solid-first pause is for new behavior, where their feedback can
+change what gets ported.
 
 **When you find something broken and can fix it, fix it — do not stop to ask.** Stated by the user on
 , after two rounds of reporting a date bug and waiting for permission before touching it.

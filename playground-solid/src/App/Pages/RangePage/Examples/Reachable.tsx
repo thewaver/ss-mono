@@ -13,7 +13,7 @@ export const ReachableExample = (props: Props) => (
         ariaLabel={"Disabled but reachable range"}
         isDisabled={true}
         isReachableWhenDisabled={true}
-        thumbSize={() => RANGE_THUMB_SIZE}
+        thumbSize={RANGE_THUMB_SIZE}
         renderContent={(getRenderProps) => <PageRangeContent renderProps={getRenderProps} />}
         tooltipDefs={() => ({
             placement: () => ({ x: "center", y: "top_out" }),

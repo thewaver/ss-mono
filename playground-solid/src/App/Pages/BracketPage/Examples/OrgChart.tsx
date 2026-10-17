@@ -20,8 +20,8 @@ export const OrgChartExample = (props: Props) => {
     return (
         <div class={styles.board}>
             <Bracket
-                root={() => COMPANY}
-                nodeSize={() => NODE_SIZE}
+                root={COMPANY}
+                nodeSize={NODE_SIZE}
                 layerGap={props.layerGap}
                 crossGap={props.crossGap}
                 orientation={props.orientation}

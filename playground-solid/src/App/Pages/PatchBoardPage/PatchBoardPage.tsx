@@ -81,7 +81,7 @@ export const PatchBoardPage = () => {
                 readout: () =>
                     `${chainLinksSignal[0]().length} cables, last: ${getChainAction()} — the gate's second input is disabled, so a cable aimed at it is refused`,
                 component: () => (
-                    <PageMeasureBox width={() => BOARD_WIDTH}>
+                    <PageMeasureBox width={BOARD_WIDTH}>
                         <ChainExample
                             {...commonProps}
                             nodes={chainNodesSignal}
@@ -101,7 +101,7 @@ export const PatchBoardPage = () => {
                 readout: () =>
                     `${mixerLinksSignal[0]().length} cables, last: ${getMixerAction()} — a standing board, sockets on the top and bottom edges; only the desk may feed the amp, so a source aimed straight at it is refused`,
                 component: () => (
-                    <PageMeasureBox width={() => BOARD_WIDTH}>
+                    <PageMeasureBox width={BOARD_WIDTH}>
                         <MixerExample
                             {...commonProps}
                             nodes={mixerNodesSignal}
@@ -189,9 +189,9 @@ export const PatchBoardPage = () => {
                 >
                     <PageNumberField
                         value={getSocketSize}
-                        min={() => PatchBoardKnobs.MIN_SOCKET_SIZE}
-                        max={() => PatchBoardKnobs.MAX_SOCKET_SIZE}
-                        step={() => PatchBoardKnobs.SOCKET_SIZE_STEP}
+                        min={PatchBoardKnobs.MIN_SOCKET_SIZE}
+                        max={PatchBoardKnobs.MAX_SOCKET_SIZE}
+                        step={PatchBoardKnobs.SOCKET_SIZE_STEP}
                         ariaLabel={"Socket size as a fraction of the board's width"}
                         onInput={setSocketSize}
                     />

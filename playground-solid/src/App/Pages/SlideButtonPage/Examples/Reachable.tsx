@@ -11,7 +11,7 @@ export const ReachableExample = (props: Props) => (
     <SlideButton
         isDisabled={true}
         isReachableWhenDisabled={true}
-        thumbSize={() => SLIDE_BUTTON_THUMB_SIZE}
+        thumbSize={SLIDE_BUTTON_THUMB_SIZE}
         renderContent={(getRenderProps) => (
             <PageSlideButtonContent renderProps={getRenderProps}>Slide or hold to send</PageSlideButtonContent>
         )}

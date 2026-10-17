@@ -13,7 +13,7 @@ export const HoursExample = (props: Props) => {
         <Select
             renderHighlightFloater={renderPageHighlightFloater}
             value={props.value}
-            options={() => HOURS}
+            options={HOURS}
             ariaLabel={"Departure hour"}
             renderContent={(getSelectedOption, getFlags) => (
                 <PageSelectContent flags={getFlags}>{getSelectedOption()?.value ?? PLACEHOLDER}</PageSelectContent>

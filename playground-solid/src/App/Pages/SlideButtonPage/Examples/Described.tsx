@@ -14,13 +14,13 @@ type Props = SlideButtonExampleProps;
 
 export const DescribedExample = (props: Props) => (
     <FormField
-        message={() => HINT}
+        message={HINT}
         renderCaption={() => <PageFormFieldCaption>Send the report</PageFormFieldCaption>}
         renderMessage={(getFieldState) => <PageFormFieldMessage state={getFieldState}>{HINT}</PageFormFieldMessage>}
         renderControl={() => (
             <SlideButton
                 ariaLabel={"Send the report"}
-                thumbSize={() => SLIDE_BUTTON_THUMB_SIZE}
+                thumbSize={SLIDE_BUTTON_THUMB_SIZE}
                 renderContent={(getRenderProps) => (
                     <PageSlideButtonContent renderProps={getRenderProps}>Slide or hold to send</PageSlideButtonContent>
                 )}

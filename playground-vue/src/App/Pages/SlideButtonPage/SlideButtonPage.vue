@@ -6,6 +6,7 @@ import {
     EXAMPLE_NAMES,
     PERCENT,
 } from "@thewaver/ss-playground/App/Pages/SlideButtonPage/SlideButtonPage.const";
+import * as styles from "@thewaver/ss-playground/App/Pages/SlideButtonPage/SlideButtonPage.css";
 
 import type { ExampleDefs } from "../../PageComponents/Examples/Examples.types";
 import PageExamples from "../../PageComponents/Examples/PageExamples.vue";
@@ -87,7 +88,9 @@ const examples: ExampleDefs[] = [
 <template>
     <PageExamples :items="examples">
         <template #default>
-            <DefaultExample v-model:progress="progress" @activate="sends++" />
+            <div :class="styles.stage">
+                <DefaultExample v-model:progress="progress" @activate="sends++" />
+            </div>
         </template>
 
         <template #described>
@@ -95,27 +98,39 @@ const examples: ExampleDefs[] = [
         </template>
 
         <template #slideOnly>
-            <SlideOnlyExample @activate="slideOnlySends++" />
+            <div :class="styles.stage">
+                <SlideOnlyExample @activate="slideOnlySends++" />
+            </div>
         </template>
 
         <template #holdOnly>
-            <HoldOnlyExample @activate="holdOnlySends++" />
+            <div :class="styles.stage">
+                <HoldOnlyExample @activate="holdOnlySends++" />
+            </div>
         </template>
 
         <template #held>
-            <HeldExample :is-armed="isArmed" @activate="isArmed = true" @reset="isArmed = false" />
+            <div :class="styles.stage">
+                <HeldExample :is-armed="isArmed" @activate="isArmed = true" @reset="isArmed = false" />
+            </div>
         </template>
 
         <template #disabled>
-            <DisabledExample @activate="disabledSends++" />
+            <div :class="styles.stage">
+                <DisabledExample @activate="disabledSends++" />
+            </div>
         </template>
 
         <template #reachable>
-            <ReachableExample @activate="reachableSends++" />
+            <div :class="styles.stage">
+                <ReachableExample @activate="reachableSends++" />
+            </div>
         </template>
 
         <template #errored>
-            <ErroredExample :has-error="hasError" @activate="hasError = !hasError" />
+            <div :class="styles.stage">
+                <ErroredExample :has-error="hasError" @activate="hasError = !hasError" />
+            </div>
         </template>
     </PageExamples>
 </template>

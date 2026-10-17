@@ -10,7 +10,7 @@ export const RightToLeftExample = (props: Props) => {
         <div dir={"rtl"}>
             <RowExample
                 selectedValue={props.selectedValue}
-                tabs={() => RIGHT_TO_LEFT_TABS}
+                tabs={RIGHT_TO_LEFT_TABS}
                 idPrefix={"rtl"}
                 onSelectionChange={props.onSelectionChange}
             />

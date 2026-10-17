@@ -5,6 +5,7 @@ import {
     EXAMPLE_NAMES,
     PERCENT,
 } from "@thewaver/ss-playground/App/Pages/SlideButtonPage/SlideButtonPage.const";
+import * as styles from "@thewaver/ss-playground/App/Pages/SlideButtonPage/SlideButtonPage.css";
 
 import { PageExamples } from "../../PageComponents/Examples/Examples";
 import { DefaultExample } from "./Examples/Default";
@@ -34,12 +35,14 @@ export const SlideButtonPage = () => {
             readout: () =>
                 `activations: ${sends} — progress ${Math.round(progressState[0] * PERCENT)}%, which the owner reads while the gesture is still running`,
             component: () => (
-                <DefaultExample
-                    progress={progressState}
-                    onActivate={() => {
-                        setSends((prev) => prev + 1);
-                    }}
-                />
+                <div className={styles.stage}>
+                    <DefaultExample
+                        progress={progressState}
+                        onActivate={() => {
+                            setSends((prev) => prev + 1);
+                        }}
+                    />
+                </div>
             ),
             path: `${EXAMPLES_ROOT}/Default.tsx`,
         },
@@ -63,11 +66,13 @@ export const SlideButtonPage = () => {
             readout: () =>
                 `activations: ${slideOnlySends} — a held press does nothing here, so carrying the thumb is the only pointer route, and a held Enter still confirms`,
             component: () => (
-                <SlideOnlyExample
-                    onActivate={() => {
-                        setSlideOnlySends((prev) => prev + 1);
-                    }}
-                />
+                <div className={styles.stage}>
+                    <SlideOnlyExample
+                        onActivate={() => {
+                            setSlideOnlySends((prev) => prev + 1);
+                        }}
+                    />
+                </div>
             ),
             path: `${EXAMPLES_ROOT}/SlideOnly.tsx`,
         },
@@ -77,11 +82,13 @@ export const SlideButtonPage = () => {
             readout: () =>
                 `activations: ${holdOnlySends} — dragging the thumb does nothing here, so a stray drag cannot reach the action, and a held press or a held Enter both can`,
             component: () => (
-                <HoldOnlyExample
-                    onActivate={() => {
-                        setHoldOnlySends((prev) => prev + 1);
-                    }}
-                />
+                <div className={styles.stage}>
+                    <HoldOnlyExample
+                        onActivate={() => {
+                            setHoldOnlySends((prev) => prev + 1);
+                        }}
+                    />
+                </div>
             ),
             path: `${EXAMPLES_ROOT}/HoldOnly.tsx`,
         },
@@ -90,15 +97,17 @@ export const SlideButtonPage = () => {
             name: EXAMPLE_NAMES.held,
             readout: () => `armed: ${isArmed}`,
             component: () => (
-                <HeldExample
-                    isArmed={isArmed}
-                    onActivate={() => {
-                        setIsArmed(true);
-                    }}
-                    onReset={() => {
-                        setIsArmed(false);
-                    }}
-                />
+                <div className={styles.stage}>
+                    <HeldExample
+                        isArmed={isArmed}
+                        onActivate={() => {
+                            setIsArmed(true);
+                        }}
+                        onReset={() => {
+                            setIsArmed(false);
+                        }}
+                    />
+                </div>
             ),
             path: `${EXAMPLES_ROOT}/Held.tsx`,
         },
@@ -107,11 +116,13 @@ export const SlideButtonPage = () => {
             name: EXAMPLE_NAMES.disabled,
             readout: () => `activations: ${disabledSends}`,
             component: () => (
-                <DisabledExample
-                    onActivate={() => {
-                        setDisabledSends((prev) => prev + 1);
-                    }}
-                />
+                <div className={styles.stage}>
+                    <DisabledExample
+                        onActivate={() => {
+                            setDisabledSends((prev) => prev + 1);
+                        }}
+                    />
+                </div>
             ),
             path: `${EXAMPLES_ROOT}/Disabled.tsx`,
         },
@@ -120,11 +131,13 @@ export const SlideButtonPage = () => {
             name: EXAMPLE_NAMES.reachable,
             readout: () => `activations: ${reachableSends}`,
             component: () => (
-                <ReachableExample
-                    onActivate={() => {
-                        setReachableSends((prev) => prev + 1);
-                    }}
-                />
+                <div className={styles.stage}>
+                    <ReachableExample
+                        onActivate={() => {
+                            setReachableSends((prev) => prev + 1);
+                        }}
+                    />
+                </div>
             ),
             path: `${EXAMPLES_ROOT}/Reachable.tsx`,
         },
@@ -133,12 +146,14 @@ export const SlideButtonPage = () => {
             name: EXAMPLE_NAMES.errored,
             readout: () => `hasError: ${hasError}`,
             component: () => (
-                <ErroredExample
-                    hasError={hasError}
-                    onActivate={() => {
-                        setHasError((prev) => !prev);
-                    }}
-                />
+                <div className={styles.stage}>
+                    <ErroredExample
+                        hasError={hasError}
+                        onActivate={() => {
+                            setHasError((prev) => !prev);
+                        }}
+                    />
+                </div>
             ),
             path: `${EXAMPLES_ROOT}/Errored.tsx`,
         },

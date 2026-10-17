@@ -62,9 +62,9 @@ export const MorphTextPage = () => {
                 >
                     <PageNumberField
                         value={getMorphDurationMs}
-                        min={() => MorphTextKnobs.MIN_MORPH_DURATION_MS}
-                        max={() => MorphTextKnobs.MAX_MORPH_DURATION_MS}
-                        step={() => MorphTextKnobs.MORPH_DURATION_STEP_MS}
+                        min={MorphTextKnobs.MIN_MORPH_DURATION_MS}
+                        max={MorphTextKnobs.MAX_MORPH_DURATION_MS}
+                        step={MorphTextKnobs.MORPH_DURATION_STEP_MS}
                         isDisabled={getPrefersReducedMotion}
                         ariaLabel={"Morph duration in milliseconds"}
                         onInput={setMorphDurationMs}
@@ -80,9 +80,9 @@ export const MorphTextPage = () => {
                 >
                     <PageNumberField
                         value={getMaxBlurPx}
-                        min={() => MorphTextKnobs.MIN_MAX_BLUR_PX}
-                        max={() => MorphTextKnobs.MAX_MAX_BLUR_PX}
-                        step={() => MorphTextKnobs.MAX_BLUR_STEP_PX}
+                        min={MorphTextKnobs.MIN_MAX_BLUR_PX}
+                        max={MorphTextKnobs.MAX_MAX_BLUR_PX}
+                        step={MorphTextKnobs.MAX_BLUR_STEP_PX}
                         ariaLabel={"Blur in pixels"}
                         onInput={setMaxBlurPx}
                     />

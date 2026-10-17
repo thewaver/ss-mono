@@ -99,7 +99,7 @@ export const ViewportWrapperPage = () => {
                                     value={[getRoamerX, setRoamerX]}
                                     id={"roamerX"}
                                     ariaLabel={"Horizontal position"}
-                                    thumbSize={() => RANGE_THUMB_SIZE}
+                                    thumbSize={RANGE_THUMB_SIZE}
                                     renderContent={(getRenderProps) => (
                                         <PageRangeContent renderProps={getRenderProps} />
                                     )}
@@ -110,7 +110,7 @@ export const ViewportWrapperPage = () => {
                                     value={[getRoamerY, setRoamerY]}
                                     id={"roamerY"}
                                     ariaLabel={"Vertical position"}
-                                    thumbSize={() => RANGE_THUMB_SIZE}
+                                    thumbSize={RANGE_THUMB_SIZE}
                                     renderContent={(getRenderProps) => (
                                         <PageRangeContent renderProps={getRenderProps} />
                                     )}
@@ -121,10 +121,10 @@ export const ViewportWrapperPage = () => {
                                     value={[getScalePercent, setScalePercent]}
                                     id={"viewportScale"}
                                     ariaLabel={"Viewport scale"}
-                                    min={() => ViewportWrapperKnobs.SCALE_MIN}
-                                    max={() => ViewportWrapperKnobs.SCALE_MAX}
-                                    step={() => ViewportWrapperKnobs.SCALE_STEP}
-                                    thumbSize={() => RANGE_THUMB_SIZE}
+                                    min={ViewportWrapperKnobs.SCALE_MIN}
+                                    max={ViewportWrapperKnobs.SCALE_MAX}
+                                    step={ViewportWrapperKnobs.SCALE_STEP}
+                                    thumbSize={RANGE_THUMB_SIZE}
                                     renderContent={(getRenderProps) => (
                                         <PageRangeContent renderProps={getRenderProps} />
                                     )}
@@ -148,7 +148,7 @@ export const ViewportWrapperPage = () => {
                                         <Select
                                             renderHighlightFloater={renderPageHighlightFloater}
                                             value={[getRoamingValue, setRoamingValue]}
-                                            options={() => COUNTRIES}
+                                            options={COUNTRIES}
                                             id={"roamingCountry"}
                                             ariaLabel={"Roaming country"}
                                             tooltipDefs={() => renderTooltip("My tooltip has the same boundary I do.")}
@@ -237,14 +237,14 @@ export const ViewportWrapperPage = () => {
                             </div>
 
                             <div class={styles.host}>
-                                <ViewportWrapper size={() => SCROLL_SIZE}>
+                                <ViewportWrapper size={SCROLL_SIZE}>
                                     <div class={styles.scrollBox} data-scroll-box>
                                         <div class={styles.scrollFiller} />
 
                                         <Select
                                             renderHighlightFloater={renderPageHighlightFloater}
                                             value={[getScrolledValue, setScrolledValue]}
-                                            options={() => COUNTRIES}
+                                            options={COUNTRIES}
                                             id={"scrolledCountry"}
                                             ariaLabel={"Scrolled country"}
                                             renderContent={(getSelectedOption, getFlags) => (

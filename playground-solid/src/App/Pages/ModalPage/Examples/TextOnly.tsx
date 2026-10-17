@@ -20,7 +20,7 @@ export const TextOnlyExample = (props: Props) => (
 
         <Modal
             visibility={props.visibility}
-            ariaLabelledBy={() => TEXT_ONLY_TITLE_ID}
+            ariaLabelledBy={TEXT_ONLY_TITLE_ID}
             renderOverlay={(getVisibilityTarget, getTransitionDurationMs) => (
                 <PageModalOverlay
                     visibilityTarget={getVisibilityTarget}

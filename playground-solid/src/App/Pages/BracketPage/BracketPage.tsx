@@ -167,7 +167,7 @@ export const BracketPage = () => {
                 >
                     <PageSelectField
                         value={getConnector}
-                        values={() => BracketConnectors.SAMPLE_KEYS}
+                        values={BracketConnectors.SAMPLE_KEYS}
                         ariaLabel={"Connectors"}
                         onChange={(connector) => setConnector(() => connector)}
                     />
@@ -190,7 +190,7 @@ export const BracketPage = () => {
                 >
                     <PageSelectField
                         value={getOrientation}
-                        values={() => BRACKET_ORIENTATIONS}
+                        values={BRACKET_ORIENTATIONS}
                         ariaLabel={"Orientation"}
                         onChange={(orientation) => setOrientation(() => orientation)}
                     />
@@ -203,7 +203,7 @@ export const BracketPage = () => {
                 >
                     <PageSelectField
                         value={getRootSide}
-                        values={() => BRACKET_ROOT_SIDES}
+                        values={BRACKET_ROOT_SIDES}
                         ariaLabel={"Root side"}
                         onChange={(side) => setRootSide(() => side)}
                     />
@@ -212,9 +212,9 @@ export const BracketPage = () => {
                 <PageProp key={"layerGap"} label={"Layer gap (px)"} hint={"The space between one round and the next."}>
                     <PageNumberField
                         value={getLayerGap}
-                        min={() => BracketKnobs.MIN_LAYER_GAP}
-                        max={() => BracketKnobs.MAX_LAYER_GAP}
-                        step={() => BracketKnobs.LAYER_GAP_STEP}
+                        min={BracketKnobs.MIN_LAYER_GAP}
+                        max={BracketKnobs.MAX_LAYER_GAP}
+                        step={BracketKnobs.LAYER_GAP_STEP}
                         ariaLabel={"Layer gap in pixels"}
                         onInput={setLayerGap}
                     />
@@ -227,9 +227,9 @@ export const BracketPage = () => {
                 >
                     <PageNumberField
                         value={getCrossGap}
-                        min={() => BracketKnobs.MIN_CROSS_GAP}
-                        max={() => BracketKnobs.MAX_CROSS_GAP}
-                        step={() => BracketKnobs.CROSS_GAP_STEP}
+                        min={BracketKnobs.MIN_CROSS_GAP}
+                        max={BracketKnobs.MAX_CROSS_GAP}
+                        step={BracketKnobs.CROSS_GAP_STEP}
                         ariaLabel={"Row gap in pixels"}
                         onInput={setCrossGap}
                     />
@@ -244,9 +244,9 @@ export const BracketPage = () => {
                 >
                     <PageNumberField
                         value={getTransitionDurationMs}
-                        min={() => BracketKnobs.MIN_TRANSITION_DURATION_MS}
-                        max={() => BracketKnobs.MAX_TRANSITION_DURATION_MS}
-                        step={() => BracketKnobs.TRANSITION_DURATION_STEP_MS}
+                        min={BracketKnobs.MIN_TRANSITION_DURATION_MS}
+                        max={BracketKnobs.MAX_TRANSITION_DURATION_MS}
+                        step={BracketKnobs.TRANSITION_DURATION_STEP_MS}
                         isDisabled={getPrefersReducedMotion}
                         ariaLabel={"Glide in milliseconds"}
                         onInput={setTransitionDurationMs}

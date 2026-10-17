@@ -21,7 +21,7 @@ import type { StaircaseExampleProps } from "./StaircasePageSolid.types";
 
 const DefaultExampleWrapper = (props: StaircaseExampleProps) => {
     return (
-        <PageMeasureBox width={() => STAIRCASE_WIDTH}>
+        <PageMeasureBox width={STAIRCASE_WIDTH}>
             <DefaultExample {...props} />
         </PageMeasureBox>
     );
@@ -61,10 +61,10 @@ export const StaircasePage = () => {
                 <PageProp key={"stepCount"} label={"Steps"} hint={"How many steps the staircase holds."}>
                     <PageNumberField
                         value={getStepCount}
-                        min={() => StaircaseKnobs.MIN_STEP_COUNT}
-                        max={() => StaircaseKnobs.MAX_STEP_COUNT}
-                        step={() => StaircaseKnobs.STEP_COUNT_STEP}
-                        width={() => FIELD_WIDTH}
+                        min={StaircaseKnobs.MIN_STEP_COUNT}
+                        max={StaircaseKnobs.MAX_STEP_COUNT}
+                        step={StaircaseKnobs.STEP_COUNT_STEP}
+                        width={FIELD_WIDTH}
                         ariaLabel={"Steps"}
                         onInput={setStepCount}
                     />
@@ -77,10 +77,10 @@ export const StaircasePage = () => {
                 >
                     <PageNumberField
                         value={getIndent}
-                        min={() => StaircaseKnobs.MIN_INDENT}
-                        max={() => StaircaseKnobs.MAX_INDENT}
-                        step={() => StaircaseKnobs.INDENT_STEP}
-                        width={() => FIELD_WIDTH}
+                        min={StaircaseKnobs.MIN_INDENT}
+                        max={StaircaseKnobs.MAX_INDENT}
+                        step={StaircaseKnobs.INDENT_STEP}
+                        width={FIELD_WIDTH}
                         ariaLabel={"Indent"}
                         onInput={setIndent}
                     />
@@ -89,10 +89,10 @@ export const StaircasePage = () => {
                 <PageProp key={"gap"} label={"Gap (px)"} hint={"The space between one step and the next."}>
                     <PageNumberField
                         value={getGap}
-                        min={() => StaircaseKnobs.MIN_GAP}
-                        max={() => StaircaseKnobs.MAX_GAP}
-                        step={() => StaircaseKnobs.GAP_STEP}
-                        width={() => FIELD_WIDTH}
+                        min={StaircaseKnobs.MIN_GAP}
+                        max={StaircaseKnobs.MAX_GAP}
+                        step={StaircaseKnobs.GAP_STEP}
+                        width={FIELD_WIDTH}
                         ariaLabel={"Gap"}
                         onInput={setGap}
                     />
@@ -101,8 +101,8 @@ export const StaircasePage = () => {
                 <PageProp key={"dir"} label={"Direction"} hint={"Which way the staircase runs."}>
                     <PageSelectField
                         value={getDir}
-                        values={() => STAIRCASE_DIRS}
-                        width={() => FIELD_WIDTH}
+                        values={STAIRCASE_DIRS}
+                        width={FIELD_WIDTH}
                         ariaLabel={"Direction"}
                         onChange={(dir) => setDir(() => dir)}
                     />
@@ -115,8 +115,8 @@ export const StaircasePage = () => {
                 >
                     <PageSelectField
                         value={getIndentKey}
-                        values={() => StaircaseIndents.SAMPLE_KEYS}
-                        width={() => FIELD_WIDTH}
+                        values={StaircaseIndents.SAMPLE_KEYS}
+                        width={FIELD_WIDTH}
                         ariaLabel={"Indent function"}
                         onChange={(key) => setIndentKey(() => key)}
                     />

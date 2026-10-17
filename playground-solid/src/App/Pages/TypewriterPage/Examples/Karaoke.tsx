@@ -33,14 +33,14 @@ export const KaraokeExample = (props: Props) => {
 
     return (
         <div class={styles.karaokeStack}>
-            <PageMeasureBox width={props.width} padding={() => MEASURE_BOX_PADDING}>
+            <PageMeasureBox width={props.width} padding={MEASURE_BOX_PADDING}>
                 <div class={styles.karaokeLine}>
                     <Typewriter
                         progress={[getProgress, setProgress]}
                         playback={[getIsPlaying, setIsPlaying]}
                         computeAnimationName={() => styles.typewriterSweep}
-                        animationDelayMs={() => CHARACTER_DELAY_MS}
-                        animationDurationMs={() => CHARACTER_DURATION_MS}
+                        animationDelayMs={CHARACTER_DELAY_MS}
+                        animationDurationMs={CHARACTER_DURATION_MS}
                         onAnimationEnd={() => setIsPlaying(false)}
                     >
                         {LYRIC}
@@ -65,12 +65,12 @@ export const KaraokeExample = (props: Props) => {
                     id={"karaokeScrubber"}
                     sizing={"fill"}
                     ariaLabel={"How far the line has been sung"}
-                    min={() => 0}
-                    max={() => PERCENT}
-                    step={() => SLIDER_STEP}
+                    min={0}
+                    max={PERCENT}
+                    step={SLIDER_STEP}
                     value={[() => Math.round(getProgress() * PERCENT), (value: number) => setProgress(value / PERCENT)]}
                     renderContent={(getRenderProps) => (
-                        <PageRangeContent renderProps={getRenderProps} length={() => SLIDER_LENGTH} />
+                        <PageRangeContent renderProps={getRenderProps} length={SLIDER_LENGTH} />
                     )}
                 />
             </div>

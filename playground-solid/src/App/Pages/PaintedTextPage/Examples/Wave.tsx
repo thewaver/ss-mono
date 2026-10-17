@@ -20,7 +20,7 @@ export const WaveExample = (props: Props) => {
 
     return (
         <div class={styles.stack}>
-            <PageMeasureBox width={props.width} padding={() => MEASURE_BOX_PADDING}>
+            <PageMeasureBox width={props.width} padding={MEASURE_BOX_PADDING}>
                 <div class={styles.waveText}>
                     <PaintedText
                         path={WAVE_PATH}

@@ -53,10 +53,10 @@ export const FlipbookPage = () => {
                 >
                     <PageNumberField
                         value={getTransitionDurationMs}
-                        min={() => FlipbookKnobs.MIN_DURATION_MS}
-                        max={() => FlipbookKnobs.MAX_DURATION_MS}
-                        step={() => FlipbookKnobs.DURATION_STEP_MS}
-                        width={() => FIELD_WIDTH}
+                        min={FlipbookKnobs.MIN_DURATION_MS}
+                        max={FlipbookKnobs.MAX_DURATION_MS}
+                        step={FlipbookKnobs.DURATION_STEP_MS}
+                        width={FIELD_WIDTH}
                         isDisabled={getPrefersReducedMotion}
                         ariaLabel={"Turn duration in milliseconds"}
                         onInput={setTransitionDurationMs}

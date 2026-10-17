@@ -13,9 +13,9 @@ export const LinkComponentExample = (props: Props) => {
     return (
         <Tabs
             orientation={"horizontal"}
-            tabGap={() => ROW_TAB_GAP}
+            tabGap={ROW_TAB_GAP}
             ariaLabel={"Routed destinations"}
-            tabs={() => LINK_TABS}
+            tabs={LINK_TABS}
             selectedValue={props.selectedValue}
             onSelectionChange={props.onSelectionChange}
             linkComponent={PageTabLink}

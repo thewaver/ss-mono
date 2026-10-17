@@ -12,7 +12,7 @@ export const DetailedExample = (props: Props) => {
             steps={props.steps}
             currentValue={props.currentValue}
             orientation={"vertical"}
-            gap={() => STEPPER_GAP}
+            gap={STEPPER_GAP}
             ariaLabel={"Checkout with notes"}
             computeStepAriaLabel={props.computeStepAriaLabel}
             onCurrentChange={props.onCurrentChange}

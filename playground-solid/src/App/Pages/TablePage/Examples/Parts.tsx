@@ -13,7 +13,7 @@ export const PartsExample = (props: TableExampleProps) => {
         <div class={styles.tableFrameShort}>
             <Table
                 columns={getColumns}
-                rows={() => PARTS}
+                rows={PARTS}
                 sort={props.sort}
                 selection={props.selection}
                 ariaLabel={"Parts"}

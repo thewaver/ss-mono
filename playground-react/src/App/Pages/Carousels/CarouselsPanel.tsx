@@ -57,7 +57,7 @@ export const PageCarouselsPanel = (props: Props) => {
             {props.hasDelay && (
                 <PageProp
                     itemKey={"delayMs"}
-                    label={"RotatorUtils delay (ms)"}
+                    label={"Transition delay (ms)"}
                     hint={"How long a slide is held before the carousel moves to the next one on its own."}
                 >
                     <PageNumberField
@@ -66,11 +66,27 @@ export const PageCarouselsPanel = (props: Props) => {
                         max={CarouselKnobs.MAX_DELAY_MS}
                         step={CarouselKnobs.DELAY_STEP_MS}
                         width={FIELD_WIDTH}
-                        ariaLabel={"RotatorUtils delay in milliseconds"}
+                        ariaLabel={"Transition delay in milliseconds"}
                         onInput={controls.delay[1]}
                     />
                 </PageProp>
             )}
+
+            <PageProp
+                itemKey={"transitionDurationMs"}
+                label={"Transition duration (ms)"}
+                hint={"How long the move from one slide to the next takes. At 0 the carousel jumps straight there."}
+            >
+                <PageNumberField
+                    value={controls.transitionDuration[0]}
+                    min={CarouselKnobs.MIN_TRANSITION_MS}
+                    max={CarouselKnobs.MAX_TRANSITION_MS}
+                    step={CarouselKnobs.TRANSITION_STEP_MS}
+                    width={FIELD_WIDTH}
+                    ariaLabel={"Transition duration in milliseconds"}
+                    onInput={controls.transitionDuration[1]}
+                />
+            </PageProp>
 
             <PageProp
                 itemKey={"orientation"}

@@ -8,7 +8,7 @@
 
     type Props = AccordionSinglePanelExampleProps;
 
-    let { expanded = $bindable(false) }: Props = $props();
+    let { expanded = $bindable(false), ...props }: Props = $props();
 </script>
 
 <div class={styles.textWithPanel}>
@@ -17,7 +17,7 @@
         scanned.
     </div>
 
-    <Collapsible bind:expanded sizing={"fit-content"}>
+    <Collapsible transitionDurationMs={props.transitionDurationMs} bind:expanded sizing={"fit-content"}>
         {#snippet renderTrigger(flags)}
             <PageAccordionHeader {flags}>{flags.isExpanded ? "Show less" : "Show more"}</PageAccordionHeader>
         {/snippet}

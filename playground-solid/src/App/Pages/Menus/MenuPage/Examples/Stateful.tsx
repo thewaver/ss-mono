@@ -13,7 +13,7 @@ export const StatefulExample = (props: Props) => {
     return (
         <Menu
             renderHighlightFloater={renderPageHighlightFloater}
-            items={() => VIEW_OPTIONS}
+            items={VIEW_OPTIONS}
             ariaLabel={"View options"}
             checked={props.checked}
             renderContent={(getFlags) => <PageMenuTriggerContent flags={getFlags}>View</PageMenuTriggerContent>}

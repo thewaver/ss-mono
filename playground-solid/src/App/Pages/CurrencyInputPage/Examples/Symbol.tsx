@@ -21,13 +21,13 @@ export const SymbolExample = (props: Props) => {
         <CurrencyInput
             value={props.value}
             ariaLabel={"Price with a symbol"}
-            padding={() => FIELD_STEPPER_PADDING}
-            gap={() => FIELD_GAP}
+            padding={FIELD_STEPPER_PADDING}
+            gap={FIELD_GAP}
             locale={props.locale}
             decimals={props.decimals}
             groupSizes={props.groupSizes}
             computeTextStyle={computePageTextFieldTextStyle}
-            renderContent={(getFlags) => <PageTextFieldContent flags={getFlags} width={() => FIELD_WIDTH} />}
+            renderContent={(getFlags) => <PageTextFieldContent flags={getFlags} width={FIELD_WIDTH} />}
             renderPlaceholder={(getFlags, hint) => (
                 <PageTextFieldPlaceholder flags={getFlags}>{hint}</PageTextFieldPlaceholder>
             )}

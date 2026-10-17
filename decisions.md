@@ -5151,6 +5151,19 @@ moment the fade began — the person saw the arc they had left reappear and fade
 `MenuLevel` now remembers, on close, whether it was covered and keeps that until it next opens, so only the
 level that was on screen fades.
 
+**Each card covers the one before it, and the highlighted card is lifted above them all.** The user's rule. A placed
+entry is stacked by `MenuUtils.computeStackAt`: its position plus one, or above the whole level while it is the
+highlighted entry. `InteractionWrapper` already raises a hovered control over its siblings, but inside a
+`PlacementItem` that raise is trapped in the item's own stacking order, so on its own it never brought a fan card
+forward — in devtools it read as hover lowering the card, a `2` against neighbors at `3` to `5`. Lifting the
+highlight rather than the hover covers the arrow keys too, which keeps the item a keyboard user is on from being
+covered by a neighbor (WCAG 2.4.11).
+
+**The highlight floater rises with it.** Its stylesheet puts it behind every item, right for a list whose rows never
+overlap; in a fan the highlighted card has no fill of its own and is painted by the floater, so a lifted card still
+showed its neighbors over its fill and only its label on top. A laid-out level writes the floater's order from
+`MenuUtils.computeFloaterStackAt`, one above every entry and one below the highlighted one.
+
 ### `WheelMenu`: the wheel becomes a component, and `Menu` forgets it ever knew
 
 The user's call, after the wheel's needs started leaking into `Menu`'s item list. A wheel is a menu whose
@@ -5258,6 +5271,72 @@ gone, so `Menu` shifts its layout box until the layout's `origin` — the pivot 
 publishes — lands where the box's center used to. A band's origin is dead center, so nothing about a wheel
 menu moves; a fan's is near its left edge, and it opens rightward because the rule says so rather than
 because of a gap in the geometry.
+
+### `FlyoutMenu`: a site's navigation bar, after the W3C's fly-out menu tutorial
+
+**It follows the W3C's [Fly-out Menus](https://www.w3.org/WAI/tutorials/menus/flyout/) tutorial, the user's call
+after weighing it against the APG's disclosure examples, which leave hover out.** Every entry is a link to its own
+page; an entry with pages under it gets a small toggle button after its link ("button as toggle", the tutorial's
+second approach). Hovering the entry opens its panel; the toggle opens and closes it from the keyboard or a touch,
+and a press puts focus on the panel's first link; tabbing along the bar never opens anything, because a keyboard
+user would otherwise have to step through every panel to reach the next entry — so the hover engine is given no
+focus delay, which is how it opens nothing on focus. Escape closes the panel and puts focus back on the toggle when
+focus was inside it; focus leaving closes it, unless the pointer is still over the entry or the panel.
+
+**It is its own component rather than a mode of `HoverCard`, `Toolbar` or `Menu`.** The user started from a shared
+`HoverCard` and a `SharedHoverCard` wrapper, and dropped it once the pattern was settled: a hover card opens on
+keyboard focus, writes nothing onto its anchor and is announced as a dialog, and the flyout needs the opposite of all
+three. `Toolbar` is one tab stop walked with the arrows and its overflow is a `Menu`; `Menu` and `Menubar` are
+application menus. Site navigation is a list of links where every link is its own tab stop — the APG says so of its
+own example — so a prop on any of them would have been a different component under their name. **What they share is
+underneath**: the hover engine, positioning, the fader, the dismisser, and `HoverCardUtils`' Tab bridging across the
+portal (Shift+Tab from the panel's first link to the toggle, Tab past its last to whatever follows the toggle).
+
+**The name is the tutorial's.** `NavigationMenu` (Radix's name) and `NavBar` were set aside because the user calls the
+Playground's own left tree "LeftNav", and a component shortening to "nav" would make every conversation about
+either ambiguous. `HoverMenu` named the one way in that keyboard and touch users never use.
+
+**One panel serves the whole bar and glides between entries.** One value says which entry is open
+(`FlyoutMenuUtils.computeNextOpenIndex`), so hovering the next entry moves the panel there rather than closing one and
+opening another, and the skip window keeps it up across the move. The panel's position eases on an anchor change while
+it is showing, as `Tooltip`'s does; nothing else that moves it is eased. **The panel's size follows, smoothly, through the consumer.**
+The visible box is the consumer's surface, drawn by `renderPanel`, so the library cannot resize it itself. It draws the
+links at their natural width, measures them, and hands the size to `renderPanel`; the consumer gives the box around the
+links that width and height with a transition and `overflow: hidden`. The size is `undefined` until the first measure,
+so an opening panel starts at its natural size rather than growing out of nothing. The user's call, once asked.
+
+**The panel is drawn by `FlyoutMenu` itself, not by `Popover`.** `Popover` requires a role, and its three — listbox,
+menu, dialog — are all wrong for a list of links under a disclosure button, which the APG gives no role at all; and
+moving between anchors is `Tooltip`'s own work, not `Popover`'s. Building on the layers below, as `Tooltip` does,
+left `Popover` untouched for everyone else. `FocusManagerUtils.focusInto`'s restore was not used either: it restores
+unconditionally, which would pull focus back to the toggle when Tab carries it on to the next entry.
+
+**While focus is inside the open panel, a hover cannot move it** (`FlyoutMenuUtils.getIsHoverSwitchRefused`), so the
+pointer drifting over another entry never swaps the links out from under the keyboard. The tutorial does not cover it;
+it follows from its "closes when focus leaves".
+
+**`aria-expanded` sits on the toggle only.** The tutorial puts it on the link as well; the APG's hybrid example puts it
+on the button alone, and a link announcing "expanded" would suggest that activating it toggles something, when it
+navigates.
+
+**Entries that do not fit collapse into a last "more" entry, by Toolbar's rule** — now `OverflowUtils.computeCut`, moved
+out of `ToolbarUtils` when a second component needed it, with `computeHasMeasured` and `computeUncut`, and
+`ToolbarCollapse` renamed `OverflowCollapse`. Inside the overflow panel each collapsed entry keeps its link and its
+toggle, and the toggle expands its links in place — the user's pick over spelling every link out flat (a long list at
+the widths where the panel matters most) and over dropping them.
+
+**Where the ports differ from Solid, and why it is not drift.** Solid makes one hover intent per entry inside its
+`Index` row. React cannot make hooks in a loop, so an internal `FlyoutMenuEntry` draws each bar `<li>` and holds its
+intent, as `Menu`'s `MenuEntry` does; Vue's setup runs once, so each entry gets its own effect scope, created and stopped
+as the entry count changes; Svelte splits the same way React does. React works out which entry the panel shows rather
+than storing it, since a stored copy lands a render late and a press on another toggle while the panel was open could
+focus the previous entry's first link. The nested lists in the overflow panel take ids built from the panel's id and
+the entry's position in React and Vue, where `useId` cannot run per entry; Solid and Svelte make a fresh one each.
+Svelte attaches the panel's key listener with `svelte/events` rather than `onkeydown`, because Svelte's accessibility
+check warns about a key listener on an element with no role and the only way to silence it is a comment. React and
+Svelte portal the panel element itself where Solid's `Portal` wraps it in one more `div` — the same difference Tooltip
+already has. Inside the `nav` and inside the panel, the elements, classes, roles and aria attributes are the same in
+all four, which is what lets one spec cover them.
 
 ### One factory per arrangement, and defaults that are nobody's example
 
@@ -5829,15 +5908,25 @@ gradient definition inside the wheel's popup was enough to make the browser re-r
 appeared, and it reports that as a fresh `mouseenter` — so a wheel, which opens centerd on its own trigger,
 handed the highlight to the close control in its hole before anybody had touched anything.
 
-**The machinery to tell the two apart was already there and was only half-used.** `createPointerPointReader`
-exists because "a menu whose items are laid out may cover its own opener", and `getIsPointerLed` is the test. It gated
-whether a submenu opened and not whether the highlight moved, which reads as an oversight rather than a
-decision. `hoverIndex` now returns early for an enter nothing caused.
+**The highlight moves on `pointermove`, not on an enter.** A pointer standing still never sends one, so whatever
+the browser re-tests under it, nothing moves the highlight. The first answer kept `mouseenter` and told the two kinds
+apart by the point on record (`getIsPointerLed`): an enter within a pixel of the last movement was taken for the
+pointer standing still. It made hover feel sluggish, and the user caught it by feel — an enter reports whole pixels
+and a movement does not, so a pointer creeping a fraction of a pixel at a time across a boundary was ignored, and a
+slow sweep across a fan left the highlight behind on half its samples. The check and its threshold are gone.
+
+**The item a level opens under waits for the pointer to leave it once.** The user's rule, chosen over exempting only
+a wheel's close control (a special case) and over a dead zone round the opening point (a threshold again). With
+hover on movement, a wheel opening under its own pointer handed the close control the highlight at the smallest
+twitch. `MenuUtils.createOpeningHoverGuard` notes the pointer's point when a level opens — the point recorder stays
+for this, started by the menu's root so it is running before any level opens — finds the item drawn there on the
+first movement, once the level is placed, and ignores that item's hover until the pointer has left it. It is the
+desktop context menu's convention; pressing the item still works, and the keyboard is untouched.
 
 **What proves it is a dispatched event rather than a browser quirk.** No real interaction produces the
 invented kind on demand — it depends on what the browser decides to re-test and when — so `menu.spec.ts`
-dispatches a `mouseenter` carrying the coordinates the pointer actually last had, which is the shape the guard
-is written to recognize, and checks that the same item entered properly still takes the highlight. The demo
+dispatches a `mouseenter` carrying the coordinates the pointer actually last had and checks that the same item
+moved onto properly still takes the highlight; a second case creeps across a boundary in sub-pixel steps. The demo
 keeps its gradient definition in the page rather than in the popup all the same, which is where a definition
 shared by every wedge belongs.
 
@@ -10951,6 +11040,13 @@ with `preventScroll`. Holding the scroll until the popup is placed, as focus wai
 the alternative; it needed the placement handed down to every item, and still let a placed popup that runs past an
 edge scroll whatever clipped it.
 
+**`revealWithin` keeps a scroller's `scroll-padding` clear, as `scrollIntoView` does.** It first revealed only the
+row's own box, so in the Playground's padded popup the last row scrolled the menu to just short of its end and the
+first row brought it back to just short of its top, the padding still hidden. The user reported the second half.
+Honoring `scroll-padding` is what the browser's own reveal does, so the helper's "as `block: "nearest"` does" is
+now true; it is read rather than inferred from `padding`, because padding is not always room the reader should see.
+The Playground's popover surface sets `scroll-padding` to its padding.
+
 ### The date value carries its calendar system, and every bound is asked of it
 
 Settled by the user, choosing to take `@internationalized/date` as a dependency rather than
@@ -11758,6 +11854,14 @@ follows the radius of the element it is drawn on, which is the `treeitem` rather
 `TileBoard` had already met this and answered it the same way — a `globalStyle` selecting the role that
 `:has()` the painter. Nothing about it is the library's: the control owns focus and the page owns paint, so a
 page that paints a circle owns making the ring round.
+
+**The same square also catches presses meant for whatever is drawn beside the circle, so rounding it is not only
+about the ring.** The Sunburst page's centre button is a square box around a round hub, and the first ring's arcs
+reach into its corners: a press on the inner edge of an arc landed on the button instead, which at any level below
+the root went back out rather than in. The page now rounds both the button (a `globalStyle` on the `button` that
+`:has()` the hub painter) and its own positioned wrapper, since an element with a `border-radius` takes no presses
+outside its curve. The Sunburst spec caught it, because a click on an arc aims at the middle of the arc's bounding
+box, and for an arc of the first ring that point falls in the button's corner.
 
 ### Controls: `Button`, and a press that waits for its answer
 
@@ -14212,11 +14316,17 @@ the page, and the click that ends a swipe is already swallowed by the swipe trac
 
 **One `orientation` replaces the track's direction and the drum's `axis`.** It decides the swipe and is handed to the
 rule, which lays its slides across or up and down; what a slide turns over about is the rule's own `axis`, defaulting
-from the orientation, so the hinge can flip cards about the level axis on a carousel that runs across.
+from the orientation.
 
-**The ring that turns by itself and leans toward the pointer is an example, not a feature**: the drum rule inside
-`Tilter`, with `progress` written on a clock for a continuous turn and a Stop button, since a turn running on its own
-owes WCAG 2.2.2 a way to stop it.
+**Every rule follows the orientation, the stacks included.** The folders and the hinge were first written up and down
+only, and the user called that a defect: on a carousel running across, both still moved vertically. Across, each is
+its up-and-down self turned a quarter turn: the waiting stack peeks out to the right, the leaving folder slides off to the left, and the hinge turns its card
+over the left edge about an upright spine, the way a book's page turns. Up and down is unchanged — the waiting stack
+above, the leaving card dropping below.
+
+**Whether a leaving card moves with the swipe or against it is not decided, on purpose.** Up and down, a swipe upward
+brings the next card while the leaving one drops; the user declined to settle that, since platforms let people choose
+which way a swipe scrolls (Apple's natural-scrolling toggle), and would rather the library not make that call for now.
 
 **`Carousel` lives in `Essentials/`.** With no presets built on it, the layering rule puts it there rather than in
 `Primitives/`; the two presets and their Playground pages were deleted, and its page-less entry in the Playground's
@@ -16044,7 +16154,7 @@ The user's idea, its six questions settled with them in `backlog.md` before anyt
 
 **A face fills the whole box but paints half of it, so its unpainted half can catch clicks meant for what lies beneath.** `Flipbook` turns pointer events off on the face and back on for its painted half, in its own stylesheet; every half-painted use of `Spine` meets the same overlap, so it may belong in `Spine` itself.
 
-**The carousel's ring and its hinge rule are built from Spine's geometry.** The ring is the `paddle_wheel` placement family: each slide is the carousel's whole box turned about its middle line by `SpineUtils.radial`, painting only its leading half with a core gap while its back paints the other, stacked by `SpineUtils.getLeadDepth` since half-planes sharing an edge cannot cross. That is Made With GSAP's 3D Wheel Gallery (091) look the user asked for. The ring example's frame was resized for the paddle wheel; its perspective stays at the user's 900 pixels, at which the panels pointing at the viewer may reach past the frame — left for the user to judge by eye. The `hinge` rule's flipping card was already `leaves` about a level spine, so it now calls `SpineUtils.leaves` with identical output; its waiting stack stays its own. The Playground's slide frame became `frameClasses: { front, back }` because a paddle paints half of itself.
+**The carousel's ring and its hinge rule are built from Spine's geometry.** The ring is the `paddle_wheel` placement family: each slide is the carousel's whole box turned about its middle line by `SpineUtils.radial`, painting only its leading half while its back paints the other — flush to the spine in the Playground, the user's call, though a consumer may leave a gap for a hollow core — stacked by `SpineUtils.getLeadDepth` since half-planes sharing an edge cannot cross. That is Made With GSAP's 3D Wheel Gallery (091) look the user asked for. The `hinge` rule's flipping card was already `leaves` about a level spine, so it now calls `SpineUtils.leaves` with identical output; its waiting stack stays its own. The Playground's slide frame became `frameClasses: { front, back }` because a paddle paints half of itself.
 
 **Spine's page is docs only, as every primitive's is.** The paddle wheel is shown on the carousel page and the book is `Flipbook`'s.
 

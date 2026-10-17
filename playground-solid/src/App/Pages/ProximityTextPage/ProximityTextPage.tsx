@@ -35,7 +35,7 @@ export const ProximityTextPage = () => {
                 readout: () =>
                     "each letter plays its keyframes held at how near the pointer is; the lines were wrapped for every letter at its heaviest, so the spare room sits at the end of each line while they rest",
                 component: () => (
-                    <PageMeasureBox width={() => ProximityTextKnobs.BOX_WIDTH} padding={() => MEASURE_BOX_PADDING}>
+                    <PageMeasureBox width={ProximityTextKnobs.BOX_WIDTH} padding={MEASURE_BOX_PADDING}>
                         <PointerExample {...commonProps} />
                     </PageMeasureBox>
                 ),
@@ -57,7 +57,7 @@ export const ProximityTextPage = () => {
                 readout: () =>
                     "PaintedText inside draws the letters; each grows and pushes the rest of its line along, as plain text does, while the line breaks stay put",
                 component: () => (
-                    <PageMeasureBox width={() => ProximityTextKnobs.BOX_WIDTH} padding={() => MEASURE_BOX_PADDING}>
+                    <PageMeasureBox width={ProximityTextKnobs.BOX_WIDTH} padding={MEASURE_BOX_PADDING}>
                         <PaintedExample {...commonProps} />
                     </PageMeasureBox>
                 ),
@@ -70,7 +70,7 @@ export const ProximityTextPage = () => {
                 readout: () =>
                     "a point fixed to the middle of the box and measured up and down only, so every letter on a line answers it alike: a line closes up as it reaches the middle and spreads apart again towards either edge, its keyframes running from spread to closed; the lines were wrapped with every letter at its widest, which here is the first frame, so no word jumps from one line to the next as they spread",
                 component: () => (
-                    <PageMeasureBox width={() => ProximityTextKnobs.BOX_WIDTH}>
+                    <PageMeasureBox width={ProximityTextKnobs.BOX_WIDTH}>
                         <BarrelExample isDisabled={getIsDisabled} />
                     </PageMeasureBox>
                 ),
@@ -89,9 +89,9 @@ export const ProximityTextPage = () => {
                 >
                     <PageNumberField
                         value={getReachPx}
-                        min={() => ProximityTextKnobs.MIN_REACH_PX}
-                        max={() => ProximityTextKnobs.MAX_REACH_PX}
-                        step={() => ProximityTextKnobs.REACH_STEP_PX}
+                        min={ProximityTextKnobs.MIN_REACH_PX}
+                        max={ProximityTextKnobs.MAX_REACH_PX}
+                        step={ProximityTextKnobs.REACH_STEP_PX}
                         ariaLabel={"Reach in pixels"}
                         onInput={setReachPx}
                     />

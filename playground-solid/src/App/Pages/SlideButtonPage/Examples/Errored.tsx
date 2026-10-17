@@ -10,7 +10,7 @@ export const ErroredExample = (props: Props) => {
     return (
         <SlideButton
             hasError={props.hasError}
-            thumbSize={() => SLIDE_BUTTON_THUMB_SIZE}
+            thumbSize={SLIDE_BUTTON_THUMB_SIZE}
             renderContent={(getRenderProps) => (
                 <PageSlideButtonContent renderProps={getRenderProps}>Slide or hold to retry</PageSlideButtonContent>
             )}

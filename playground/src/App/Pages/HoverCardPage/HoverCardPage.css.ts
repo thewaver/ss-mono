@@ -1,12 +1,6 @@
-import { createVar, style } from "@vanilla-extract/css";
+import { style } from "@vanilla-extract/css";
 
-import { layerVars } from "../../StyledComponents/Layer/Layer.css";
 import { themeVars } from "../../Theme.css";
-
-export const bridgeTopVar = createVar();
-export const bridgeRightVar = createVar();
-export const bridgeBottomVar = createVar();
-export const bridgeLeftVar = createVar();
 
 export const sentence = style({});
 
@@ -60,59 +54,4 @@ export const profileActions = style({
     alignItems: "center",
     justifyContent: "space-between",
     gap: themeVars.spacing.full,
-});
-
-export const navList = style({
-    display: "flex",
-    alignItems: "center",
-    gap: themeVars.spacing.half,
-    margin: 0,
-    padding: 0,
-    listStyle: "none",
-});
-
-export const navLink = style({
-    display: "block",
-    padding: `${themeVars.spacing.half} ${themeVars.spacing.full}`,
-    borderRadius: themeVars.borderRadius.half,
-});
-
-export const flyoutPanel = style({
-    position: "relative",
-    isolation: "isolate",
-
-    selectors: {
-        "&::before": {
-            content: '""',
-            position: "absolute",
-            zIndex: -1,
-            top: bridgeTopVar,
-            right: bridgeRightVar,
-            bottom: bridgeBottomVar,
-            left: bridgeLeftVar,
-        },
-    },
-});
-
-export const flyoutList = style({
-    display: "flex",
-    flexDirection: "column",
-    minWidth: 180,
-    margin: 0,
-    padding: 0,
-    listStyle: "none",
-});
-
-export const flyoutLink = style({
-    display: "block",
-    padding: `${themeVars.spacing.half} ${themeVars.spacing.full}`,
-    borderRadius: themeVars.borderRadius.half,
-    whiteSpace: "nowrap",
-    transition: `background-color ${themeVars.animation.duration}`,
-
-    selectors: {
-        "&:hover, &:focus-visible": {
-            backgroundColor: `rgb(from ${layerVars.contrast} r g b / 25%)`,
-        },
-    },
 });

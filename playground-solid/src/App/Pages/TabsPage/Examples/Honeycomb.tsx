@@ -32,7 +32,7 @@ export const HoneycombExample = (props: Props) => {
             <div style={{ width: HONEYCOMB_WIDTH }}>
                 <Tabs
                     ariaLabel={"Honeycomb views"}
-                    tabs={() => HONEYCOMB_TABS}
+                    tabs={HONEYCOMB_TABS}
                     selectedValue={props.selectedValue}
                     computeLayout={HONEYCOMB_LAYOUT}
                     onSelectionChange={props.onSelectionChange}

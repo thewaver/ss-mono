@@ -15,8 +15,8 @@ type Props = TextInputExampleProps;
 export const ErroredExample = (props: Props) => (
     <TextInput
         value={props.value}
-        padding={() => FIELD_PADDING}
-        gap={() => FIELD_GAP}
+        padding={FIELD_PADDING}
+        gap={FIELD_GAP}
         type={"email"}
         hasError={() => !props.value[0]().includes("@")}
         ariaLabel={"Email"}

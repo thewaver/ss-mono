@@ -62,9 +62,9 @@ export const EdgeFaderPage = () => {
                 <PageProp key={"size"} label={"Fade size (px)"} hint={"How far in from each side the fade reaches."}>
                     <PageNumberField
                         value={getSize}
-                        min={() => EdgeFaderKnobs.MIN_SIZE}
-                        max={() => EdgeFaderKnobs.MAX_SIZE}
-                        step={() => EdgeFaderKnobs.SIZE_STEP}
+                        min={EdgeFaderKnobs.MIN_SIZE}
+                        max={EdgeFaderKnobs.MAX_SIZE}
+                        step={EdgeFaderKnobs.SIZE_STEP}
                         ariaLabel={"Fade size"}
                         onInput={setSize}
                     />

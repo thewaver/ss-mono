@@ -11,7 +11,7 @@ export const DisabledExample = (props: Props) => (
         value={props.value}
         ariaLabel={"Disabled range"}
         isDisabled={true}
-        thumbSize={() => RANGE_THUMB_SIZE}
+        thumbSize={RANGE_THUMB_SIZE}
         renderContent={(getRenderProps) => <PageRangeContent renderProps={getRenderProps} />}
     />
 );

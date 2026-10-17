@@ -10,7 +10,7 @@ export const BareExample = (props: Props) => {
     return (
         <Breadcrumbs
             crumbs={props.crumbs}
-            gap={() => BREADCRUMBS_GAP}
+            gap={BREADCRUMBS_GAP}
             ariaLabel={"Trail without separators"}
             renderCrumb={(getCrumb, getFlags) => (
                 <PageBreadcrumbContent flags={getFlags}>{labelOf(getCrumb().value)}</PageBreadcrumbContent>

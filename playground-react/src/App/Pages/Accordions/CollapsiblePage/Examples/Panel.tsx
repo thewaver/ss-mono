@@ -17,6 +17,7 @@ export const PanelExample = (props: Props) => (
         </div>
 
         <Collapsible
+            transitionDurationMs={props.transitionDurationMs}
             expanded={props.expanded}
             sizing={"fit-content"}
             renderTrigger={(flags) => (

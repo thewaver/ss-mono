@@ -92,10 +92,10 @@ export const PaginatorPage = () => {
                 <PageProp key={"pageCount"} label={"Page count"} hint={"How many pages there are to page through."}>
                     <PageNumberField
                         value={getPageCount}
-                        min={() => PaginatorKnobs.MIN_PAGE_COUNT}
-                        max={() => PaginatorKnobs.MAX_PAGE_COUNT}
-                        step={() => PaginatorKnobs.COUNT_STEP}
-                        width={() => COUNT_FIELD_WIDTH}
+                        min={PaginatorKnobs.MIN_PAGE_COUNT}
+                        max={PaginatorKnobs.MAX_PAGE_COUNT}
+                        step={PaginatorKnobs.COUNT_STEP}
+                        width={COUNT_FIELD_WIDTH}
                         ariaLabel={"Page count"}
                         onInput={setPageCount}
                     />
@@ -110,10 +110,10 @@ export const PaginatorPage = () => {
                 >
                     <PageNumberField
                         value={getSiblingCount}
-                        min={() => PaginatorKnobs.MIN_COUNT}
-                        max={() => PaginatorKnobs.MAX_COUNT}
-                        step={() => PaginatorKnobs.COUNT_STEP}
-                        width={() => COUNT_FIELD_WIDTH}
+                        min={PaginatorKnobs.MIN_COUNT}
+                        max={PaginatorKnobs.MAX_COUNT}
+                        step={PaginatorKnobs.COUNT_STEP}
+                        width={COUNT_FIELD_WIDTH}
                         ariaLabel={"Sibling count"}
                         onInput={setSiblingCount}
                     />
@@ -126,10 +126,10 @@ export const PaginatorPage = () => {
                 >
                     <PageNumberField
                         value={getBoundaryCount}
-                        min={() => PaginatorKnobs.MIN_COUNT}
-                        max={() => PaginatorKnobs.MAX_COUNT}
-                        step={() => PaginatorKnobs.COUNT_STEP}
-                        width={() => COUNT_FIELD_WIDTH}
+                        min={PaginatorKnobs.MIN_COUNT}
+                        max={PaginatorKnobs.MAX_COUNT}
+                        step={PaginatorKnobs.COUNT_STEP}
+                        width={COUNT_FIELD_WIDTH}
                         ariaLabel={"Boundary count"}
                         onInput={setBoundaryCount}
                     />

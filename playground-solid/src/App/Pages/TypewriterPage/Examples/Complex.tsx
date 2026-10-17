@@ -18,7 +18,7 @@ export const ComplexExample = (props: Props) => {
 
     return (
         <div class={styles.complexStack}>
-            <PageMeasureBox width={props.width} padding={() => MEASURE_BOX_PADDING}>
+            <PageMeasureBox width={props.width} padding={MEASURE_BOX_PADDING}>
                 <Typewriter
                     computeAnimationName={props.computeAnimationName}
                     computeCharacterWeights={props.computeCharacterWeights}

@@ -32,12 +32,6 @@ import type {
     MenuTriggerProps,
 } from "./MenuSolid.types";
 
-const createPointerPointReader = () => {
-    onCleanup(MenuUtils.observePointerPoint());
-
-    return MenuUtils.getPointerPoint;
-};
-
 const MenuTrigger = (props: MenuTriggerProps) => {
     const getAriaLabel = LabelSolidUtils.resolveAriaLabel(
         props.ariaLabel === undefined ? undefined : () => access(props.ariaLabel)!,
@@ -115,7 +109,8 @@ const MenuItemView = (props: MenuItemViewProps) => {
 
                 props.onActivate();
             }}
-            onMouseEnter={(e) => props.onHover(e)}
+            onPointerMove={() => props.onHover()}
+            onPointerEnter={() => props.onEnter()}
         >
             {props.renderContent(() => access(props.flags))}
         </div>
@@ -129,6 +124,7 @@ const MenuLevel = <T,>(props: MenuLevelProps<T>): JSX.Element => {
     const [getLayoutRootRef, setLayoutRootRef] = createSignal<HTMLElement>();
 
     const typeahead = TypeaheadSolidUtils.createBuffer();
+    const openingHover = MenuUtils.createOpeningHoverGuard();
 
     const getHasBackEntry = () =>
         MenuUtils.getHasBackEntry(access(props.submenuMode), access(props.openerItem) !== undefined);
@@ -176,6 +172,9 @@ const MenuLevel = <T,>(props: MenuLevelProps<T>): JSX.Element => {
             }),
         );
     };
+
+    const findIndexAt = (point: Point2d) =>
+        MenuUtils.findIndexAtPoint(point, getEntries().length, (index) => document.getElementById(getItemId(index)));
 
     const computeItemText = (index: number) =>
         props.computeCustomText?.(getEntries()[index]) ??
@@ -237,6 +236,7 @@ const MenuLevel = <T,>(props: MenuLevelProps<T>): JSX.Element => {
                 style={{
                     ...highlightFloater.getBounds(),
                     "transition-duration": `${getFloaterTransitionDurationMs()}ms`,
+                    "z-index": MenuUtils.computeFloaterStackAt(getLayout() !== undefined, getEntries().length),
                 }}
             >
                 {props.renderHighlightFloater?.(highlightFloater.getVisibilityTarget, getFloaterTransitionDurationMs)}
@@ -255,9 +255,6 @@ const MenuLevel = <T,>(props: MenuLevelProps<T>): JSX.Element => {
         setOpenValue(() => getEntries()[index].value);
     };
 
-    const getIsPointerLed = (e: MouseEvent) =>
-        MenuUtils.getIsPointerLed(props.getPointerPoint(), { x: e.clientX, y: e.clientY });
-
     const flickTo = (point: Point2d) => {
         const index = MenuUtils.computeFlickIndex({
             layout: getLayout(),
@@ -272,9 +269,9 @@ const MenuLevel = <T,>(props: MenuLevelProps<T>): JSX.Element => {
         return index;
     };
 
-    const hoverIndex = (index: number, e: MouseEvent) => {
+    const hoverIndex = (index: number) => {
         if (!getNavigableIndexes().includes(index)) return;
-        if (!getIsPointerLed(e)) return;
+        if (!openingHover.getIsHoverable(index, findIndexAt)) return;
 
         const item = getEntries()[index];
 
@@ -308,6 +305,7 @@ const MenuLevel = <T,>(props: MenuLevelProps<T>): JSX.Element => {
     createEffect(() => {
         if (access(props.isOpen)) {
             setIsCoveredWhileClosing(false);
+            openingHover.open(MenuUtils.getPointerPoint());
 
             return;
         }
@@ -417,7 +415,8 @@ const MenuLevel = <T,>(props: MenuLevelProps<T>): JSX.Element => {
                             isRegion={() => getRect()?.sector !== undefined}
                             renderContent={(getItemFlags) => props.renderItem(getItem, getItemFlags, getRect)}
                             onActivate={() => activateIndex(index)}
-                            onHover={(e) => hoverIndex(index, e)}
+                            onHover={() => hoverIndex(index)}
+                            onEnter={() => openingHover.enter(index, MenuUtils.getPointerPoint())}
                         />
 
                         <Show when={computeHasSubmenu(index)}>
@@ -449,7 +448,6 @@ const MenuLevel = <T,>(props: MenuLevelProps<T>): JSX.Element => {
                                 computeLayout={props.computeLayout}
                                 computeEffect={props.computeEffect}
                                 computeCustomText={props.computeCustomText}
-                                getPointerPoint={props.getPointerPoint}
                                 renderItem={props.renderItem}
                                 renderPopup={props.renderPopup}
                                 floaterTransitionDurationMs={props.floaterTransitionDurationMs}
@@ -471,7 +469,10 @@ const MenuLevel = <T,>(props: MenuLevelProps<T>): JSX.Element => {
         return (
             <Show when={getPlacement()} fallback={element}>
                 {(getRect) => (
-                    <PlacementItem placement={getRect} stackAt={index + 1}>
+                    <PlacementItem
+                        placement={getRect}
+                        stackAt={() => MenuUtils.computeStackAt(index, getHighlightedIndex(), getEntries().length)}
+                    >
                         {element}
                     </PlacementItem>
                 )}
@@ -559,7 +560,8 @@ const MenuLevel = <T,>(props: MenuLevelProps<T>): JSX.Element => {
 export const Menu = <T,>(props: MenuProps<T>) => {
     const fallbackTriggerId = createUniqueId();
     const menuId = createUniqueId();
-    const getPointerPoint = createPointerPointReader();
+
+    onCleanup(MenuUtils.observePointerPoint());
 
     const [getTriggerRef, setTriggerRef] = createSignal<HTMLElement>();
     const [getIsOpen, setIsOpen] = SignalMirrorSolidUtils.createOptional(() => props.visibility, false);
@@ -699,7 +701,6 @@ export const Menu = <T,>(props: MenuProps<T>) => {
                         computeLayout={props.computeLayout}
                         computeEffect={props.computeEffect}
                         computeCustomText={props.computeCustomText}
-                        getPointerPoint={getPointerPoint}
                         flickOrigin={getFlickOrigin}
                         renderItem={props.renderItem}
                         renderPopup={props.renderPopup}
@@ -723,7 +724,8 @@ export const Menu = <T,>(props: MenuProps<T>) => {
 export const ContextMenu = <T,>(props: ContextMenuProps<T>) => {
     const viewportContext = useViewportContext();
     const menuId = createUniqueId();
-    const getPointerPoint = createPointerPointReader();
+
+    onCleanup(MenuUtils.observePointerPoint());
 
     const [getRegionRef, setRegionRef] = createSignal<HTMLElement>();
     const [getAnchorRect, setAnchorRect] = createSignal<Rect | undefined>(undefined, { equals: Rect.isSame });
@@ -819,7 +821,6 @@ export const ContextMenu = <T,>(props: ContextMenuProps<T>) => {
                 computeLayout={props.computeLayout}
                 computeEffect={props.computeEffect}
                 computeCustomText={props.computeCustomText}
-                getPointerPoint={getPointerPoint}
                 renderItem={props.renderItem}
                 renderPopup={props.renderPopup}
                 floaterTransitionDurationMs={props.floaterTransitionDurationMs}

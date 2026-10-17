@@ -159,7 +159,7 @@ export const PageCalendarCaption = (props: PageCalendarCaptionProps) => {
                     <PageSelectField
                         value={() => getMonth().month}
                         values={getMonthValues}
-                        width={() => MONTH_FIELD_WIDTH}
+                        width={MONTH_FIELD_WIDTH}
                         ariaLabel={"Month"}
                         computeLabel={(month) => getMonthNames()[month - 1]}
                         onChange={(month) => jumpTo({ month })}
@@ -167,7 +167,7 @@ export const PageCalendarCaption = (props: PageCalendarCaptionProps) => {
 
                     <PageNumberField
                         value={() => getMonth().year}
-                        width={() => YEAR_FIELD_WIDTH}
+                        width={YEAR_FIELD_WIDTH}
                         ariaLabel={"Year"}
                         onInput={queueYear}
                     />

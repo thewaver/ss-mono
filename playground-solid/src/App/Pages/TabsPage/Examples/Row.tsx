@@ -29,7 +29,7 @@ export const RowExample = (props: Props) => {
         <div class={styles.rowDemo}>
             <Tabs
                 orientation={"horizontal"}
-                tabGap={() => ROW_TAB_GAP}
+                tabGap={ROW_TAB_GAP}
                 ariaLabel={"Example views"}
                 hasAutoActivation={props.hasAutoActivation}
                 tabs={() => access(props.tabs) ?? ROW_TABS}

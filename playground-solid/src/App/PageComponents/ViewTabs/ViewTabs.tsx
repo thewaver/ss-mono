@@ -39,7 +39,7 @@ export const PageViewTabs = (props: PageViewTabsProps) => {
         <div class={styles.viewTabs} data-view-tabs>
             <Tabs
                 orientation={TAB_ORIENTATION}
-                tabGap={() => TAB_GAP}
+                tabGap={TAB_GAP}
                 ariaLabel={"Page views"}
                 tabs={getTabs}
                 selectedValue={getSelected}

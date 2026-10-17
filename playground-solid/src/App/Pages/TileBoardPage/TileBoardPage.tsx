@@ -149,10 +149,10 @@ export const TileBoardPage = () => {
                             >
                                 <PageNumberField
                                     value={getReach}
-                                    min={() => TileBoardKnobs.MIN_REACH}
-                                    max={() => TileBoardKnobs.MAX_REACH}
-                                    step={() => TileBoardKnobs.COUNT_STEP}
-                                    width={() => FIELD_WIDTH}
+                                    min={TileBoardKnobs.MIN_REACH}
+                                    max={TileBoardKnobs.MAX_REACH}
+                                    step={TileBoardKnobs.COUNT_STEP}
+                                    width={FIELD_WIDTH}
                                     ariaLabel={"Reach"}
                                     onInput={setReach}
                                 />
@@ -205,7 +205,7 @@ export const TileBoardPage = () => {
                         {...commonProps}
                         ariaLabel={"Disabled board"}
                         isDisabled={true}
-                        marked={() => NO_MARKS}
+                        marked={NO_MARKS}
                         onTileActivate={toggleMark}
                     />
                 ),
@@ -220,10 +220,10 @@ export const TileBoardPage = () => {
                 <PageProp key={"rows"} label={"Rows"} hint={"How many rows of tiles the board has."}>
                     <PageNumberField
                         value={getRows}
-                        min={() => TileBoardKnobs.MIN_ROWS}
-                        max={() => TileBoardKnobs.MAX_ROWS}
-                        step={() => TileBoardKnobs.COUNT_STEP}
-                        width={() => FIELD_WIDTH}
+                        min={TileBoardKnobs.MIN_ROWS}
+                        max={TileBoardKnobs.MAX_ROWS}
+                        step={TileBoardKnobs.COUNT_STEP}
+                        width={FIELD_WIDTH}
                         ariaLabel={"Rows"}
                         onInput={setRows}
                     />
@@ -232,10 +232,10 @@ export const TileBoardPage = () => {
                 <PageProp key={"cols"} label={"Columns"} hint={"How many tiles sit in a row."}>
                     <PageNumberField
                         value={getCols}
-                        min={() => TileBoardKnobs.MIN_COLS}
-                        max={() => TileBoardKnobs.MAX_COLS}
-                        step={() => TileBoardKnobs.COUNT_STEP}
-                        width={() => FIELD_WIDTH}
+                        min={TileBoardKnobs.MIN_COLS}
+                        max={TileBoardKnobs.MAX_COLS}
+                        step={TileBoardKnobs.COUNT_STEP}
+                        width={FIELD_WIDTH}
                         ariaLabel={"Columns"}
                         onInput={setCols}
                     />
@@ -244,10 +244,10 @@ export const TileBoardPage = () => {
                 <PageProp key={"tileWidth"} label={"Tile width"} hint={"How wide one tile is."}>
                     <PageNumberField
                         value={getTileWidth}
-                        min={() => TileBoardKnobs.MIN_TILE_SIZE}
-                        max={() => TileBoardKnobs.MAX_TILE_SIZE}
-                        step={() => TileBoardKnobs.SIZE_STEP}
-                        width={() => FIELD_WIDTH}
+                        min={TileBoardKnobs.MIN_TILE_SIZE}
+                        max={TileBoardKnobs.MAX_TILE_SIZE}
+                        step={TileBoardKnobs.SIZE_STEP}
+                        width={FIELD_WIDTH}
                         ariaLabel={"Tile width"}
                         onInput={setTileWidth}
                     />
@@ -256,10 +256,10 @@ export const TileBoardPage = () => {
                 <PageProp key={"tileHeight"} label={"Tile height"} hint={"How tall one tile is."}>
                     <PageNumberField
                         value={getTileHeight}
-                        min={() => TileBoardKnobs.MIN_TILE_SIZE}
-                        max={() => TileBoardKnobs.MAX_TILE_SIZE}
-                        step={() => TileBoardKnobs.SIZE_STEP}
-                        width={() => FIELD_WIDTH}
+                        min={TileBoardKnobs.MIN_TILE_SIZE}
+                        max={TileBoardKnobs.MAX_TILE_SIZE}
+                        step={TileBoardKnobs.SIZE_STEP}
+                        width={FIELD_WIDTH}
                         ariaLabel={"Tile height"}
                         onInput={setTileHeight}
                     />
@@ -268,10 +268,10 @@ export const TileBoardPage = () => {
                 <PageProp key={"gap"} label={"Gap"} hint={"The space left between tiles."}>
                     <PageNumberField
                         value={getGap}
-                        min={() => TileBoardKnobs.MIN_GAP}
-                        max={() => TileBoardKnobs.MAX_GAP}
-                        step={() => TileBoardKnobs.COUNT_STEP}
-                        width={() => FIELD_WIDTH}
+                        min={TileBoardKnobs.MIN_GAP}
+                        max={TileBoardKnobs.MAX_GAP}
+                        step={TileBoardKnobs.COUNT_STEP}
+                        width={FIELD_WIDTH}
                         ariaLabel={"Gap"}
                         onInput={setGap}
                     />
@@ -286,8 +286,8 @@ export const TileBoardPage = () => {
                 >
                     <PageSelectField
                         value={getTiling}
-                        values={() => TileBoardKnobs.TILINGS}
-                        width={() => FIELD_WIDTH}
+                        values={TileBoardKnobs.TILINGS}
+                        width={FIELD_WIDTH}
                         ariaLabel={"Tiling"}
                         onChange={(tiling) => setTiling(() => tiling)}
                     />
@@ -314,10 +314,10 @@ export const TileBoardPage = () => {
                 >
                     <PageNumberField
                         value={getTaper}
-                        min={() => TileBoardKnobs.MIN_TAPER}
-                        max={() => TileBoardKnobs.MAX_TAPER}
-                        step={() => TileBoardKnobs.TAPER_STEP}
-                        width={() => FIELD_WIDTH}
+                        min={TileBoardKnobs.MIN_TAPER}
+                        max={TileBoardKnobs.MAX_TAPER}
+                        step={TileBoardKnobs.TAPER_STEP}
+                        width={FIELD_WIDTH}
                         ariaLabel={"Taper"}
                         onInput={setTaper}
                     />

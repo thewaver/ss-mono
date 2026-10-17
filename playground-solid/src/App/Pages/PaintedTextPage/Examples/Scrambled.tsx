@@ -18,9 +18,9 @@ export const ScrambledExample = (props: PaintedTextBoxedExampleProps) => {
 
     return (
         <div class={styles.stack}>
-            <PageMeasureBox width={props.width} padding={() => MEASURE_BOX_PADDING}>
+            <PageMeasureBox width={props.width} padding={MEASURE_BOX_PADDING}>
                 <div class={`${styles.fill} ${styles.typedHeading}`}>
-                    <ScrambleText settleDurationMs={() => 1800} onMount={setController}>
+                    <ScrambleText settleDurationMs={1800} onMount={setController}>
                         <PaintedText
                             computeFillDefs={(getSize, getRef) => computeSampleDefs(props, "fill", id, getSize, getRef)}
                             computeStrokeDefs={(getSize, getRef) =>

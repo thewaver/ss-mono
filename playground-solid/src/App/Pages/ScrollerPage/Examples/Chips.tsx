@@ -19,8 +19,8 @@ export const ChipsExample = (props: Props) => {
     return (
         <div class={styles.demo}>
             <Scroller
-                gap={() => SCROLLER_GAP}
-                padding={() => FOCUS_RING_WIDTH}
+                gap={SCROLLER_GAP}
+                padding={FOCUS_RING_WIDTH}
                 buttonPlacement={props.buttonPlacement}
                 progress={props.progress}
                 renderButton={(getStep, stepper) => <PageScrollerButton step={getStep} stepper={stepper} />}

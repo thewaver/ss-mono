@@ -44,7 +44,7 @@ const LeaningExampleWrapper = (props: TreeExampleProps) => {
                 >
                     <PageSelectField
                         value={getFalloff}
-                        values={() => TreeKnobs.FALLOFFS}
+                        values={TreeKnobs.FALLOFFS}
                         ariaLabel={"Falloff"}
                         onChange={(falloff) => setFalloff(() => falloff)}
                     />
@@ -134,11 +134,7 @@ export const TreePage = () => {
             readout: () =>
                 `value: ${disabledSignal[0]() ?? "undefined"} — arrows skip index.ts and Lib, while what is inside Lib stays reachable`,
             component: () => (
-                <FilesExample
-                    value={disabledSignal}
-                    expanded={disabledExpandedSignal}
-                    nodes={() => FILES_WITH_DISABLED}
-                />
+                <FilesExample value={disabledSignal} expanded={disabledExpandedSignal} nodes={FILES_WITH_DISABLED} />
             ),
             path: `${EXAMPLES_ROOT}/Files.tsx`,
         },
@@ -148,11 +144,7 @@ export const TreePage = () => {
             readout: () =>
                 `value: ${reachableSignal[0]() ?? "undefined"} — arrows stop on node_modules, hover explains why, and nothing opens it`,
             component: () => (
-                <FilesExample
-                    value={reachableSignal}
-                    expanded={reachableExpandedSignal}
-                    nodes={() => FILES_WITH_REACHABLE}
-                />
+                <FilesExample value={reachableSignal} expanded={reachableExpandedSignal} nodes={FILES_WITH_REACHABLE} />
             ),
             path: `${EXAMPLES_ROOT}/Files.tsx`,
         },

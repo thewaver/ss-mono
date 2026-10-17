@@ -7,9 +7,8 @@
     import PageNumberField from "../../PageComponents/Field/PageNumberField.svelte";
     import PageProp from "../../PageComponents/Prop/Prop.svelte";
     import PagePropsPanel from "../../PageComponents/PropsPanel/PagePropsPanel.svelte";
-    import NavigationMenuExample from "./Examples/NavigationMenu.svelte";
     import ProfileExample from "./Examples/Profile.svelte";
-    import type { HoverCardExampleProps, NavigationMenuExampleProps } from "./HoverCardPageSvelte.types";
+    import type { HoverCardExampleProps } from "./HoverCardPageSvelte.types";
     import {
     EXAMPLE_NAMES,
     EXAMPLES_ROOT,
@@ -24,7 +23,6 @@
 
     let visibility = $state(false);
     let following = $state(false);
-    let openKey = $state<string | undefined>();
 
     const offset = $derived({ x: 0, y: offsetY });
 
@@ -32,11 +30,6 @@
         offset,
         transitionDurationMs,
         focusShowDelayMs,
-        hoverShowDelayMs,
-        skipDelayWindowMs,
-    });
-
-    const navigationProps: Omit<NavigationMenuExampleProps, "openKey"> = $derived({
         hoverShowDelayMs,
         skipDelayWindowMs,
     });
@@ -50,23 +43,11 @@
             component: profileExample,
             path: `${EXAMPLES_ROOT}/Profile.svelte`,
         },
-        {
-            key: "navigation",
-            name: EXAMPLE_NAMES.navigation,
-            readout: () =>
-                `open: ${openKey ?? "none"} — each flyout is a popup trigger over a popover, opened by a press or by resting on it through the same hover engine; only one is open at a time`,
-            component: navigationExample,
-            path: `${EXAMPLES_ROOT}/NavigationMenu.svelte`,
-        },
     ];
 </script>
 
 {#snippet profileExample()}
     <ProfileExample {...commonProps} bind:visibility bind:following />
-{/snippet}
-
-{#snippet navigationExample()}
-    <NavigationMenuExample {...navigationProps} bind:openKey />
 {/snippet}
 
 <PagePropsPanel scope={"global"}>
@@ -130,7 +111,7 @@
         itemKey={"hoverShowDelayMs"}
         label={"Hover delay (ms)"}
         hint={
-            "How long the pointer has to rest on the anchor before the card or a flyout opens. Leave before then and nothing opens."
+            "How long the pointer has to rest on the anchor before the card opens. Leave before then and nothing opens."
         }
     >
         <PageNumberField
@@ -150,7 +131,7 @@
         itemKey={"skipDelayWindowMs"}
         label={"Skip window (ms)"}
         hint={
-            "How soon after one closes a hover opens the next at once. Open one flyout, then move to the other."
+            "How soon after a card has closed a hover opens one again at once, without waiting out the hover delay."
         }
     >
         <PageNumberField

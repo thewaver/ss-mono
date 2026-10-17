@@ -16,9 +16,7 @@ export const SurfaceExample = (props: Props) => {
             isDisabled={() => access(props.isDisabled) ?? false}
             ariaLabel={"Saturation and brightness"}
             axisLabels={COLOR_AREA_AXIS_LABELS}
-            renderContent={(getRenderProps) => (
-                <PageColorAreaContent renderProps={getRenderProps} size={() => AREA_SIZE} />
-            )}
+            renderContent={(getRenderProps) => <PageColorAreaContent renderProps={getRenderProps} size={AREA_SIZE} />}
         />
     );
 };

@@ -18,7 +18,7 @@ export const FrostedExample = (props: Props) => {
 
     return (
         <div class={styles.stack}>
-            <PageMeasureBox width={() => CARD_WIDTH}>
+            <PageMeasureBox width={CARD_WIDTH}>
                 <div class={styles.card}>
                     <ScratchCard
                         brushRadius={props.brushRadius}

@@ -77,7 +77,7 @@ export const PhrasesExample = (props: Props) => {
 
     return (
         <div class={styles.phraseStack}>
-            <PageMeasureBox width={props.width} padding={() => MEASURE_BOX_PADDING}>
+            <PageMeasureBox width={props.width} padding={MEASURE_BOX_PADDING}>
                 <div class={styles.phraseLine}>
                     <span>{LEAD}</span>
 

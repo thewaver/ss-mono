@@ -83,8 +83,10 @@ export type MenuItemViewProps = AccessorProps<
         isRegion: boolean;
         /** Runs when this item is picked. */
         onActivate: () => void;
-        /** Runs when the pointer moves onto this item, which is what opens a submenu on hover. */
-        onHover: (e: MouseEvent) => void;
+        /** Runs when the pointer moves over this item, which is what opens a submenu on hover. */
+        onHover: () => void;
+        /** Runs when the pointer enters this item. */
+        onEnter: () => void;
     }
 >;
 
@@ -150,8 +152,6 @@ export type MenuLevelProps<T> = AccessorProps<{
 }> & {
     /** The item that opened this level, where one did. */
     openerItem?: MaybeAccessor<MenuItem<T> | undefined>;
-    /** Where the pointer is, for a menu that answers to aim rather than to what the pointer is over. */
-    getPointerPoint: () => Point2d | undefined;
     /** The items on this level, in the order they are shown. */
     items: MaybeAccessor<MenuItem<T>[]>;
     /** Which values are currently checked, for the checkbox and radio items among them. */

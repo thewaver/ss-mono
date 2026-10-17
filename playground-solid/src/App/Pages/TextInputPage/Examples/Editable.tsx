@@ -79,8 +79,8 @@ export const EditableExample = (props: Props) => {
                         inputRef = element;
                     }}
                     value={draftSignal}
-                    padding={() => FIELD_PADDING}
-                    gap={() => FIELD_GAP}
+                    padding={FIELD_PADDING}
+                    gap={FIELD_GAP}
                     ariaLabel={"Name"}
                     computeTextStyle={computePageTextFieldTextStyle}
                     renderContent={(getFlags) => <PageTextFieldContent flags={getFlags} />}

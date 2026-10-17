@@ -21,14 +21,14 @@ export const DefaultExample = (props: Props) => {
         <CurrencyInput
             value={props.value}
             ariaLabel={() => access(props.ariaLabel) ?? "Price"}
-            padding={() => FIELD_STEPPER_PADDING}
-            gap={() => FIELD_GAP}
+            padding={FIELD_STEPPER_PADDING}
+            gap={FIELD_GAP}
             locale={props.locale}
             decimals={props.decimals}
             groupSizes={props.groupSizes}
             hasSign={props.hasSign}
             computeTextStyle={computePageTextFieldTextStyle}
-            renderContent={(getFlags) => <PageTextFieldContent flags={getFlags} width={() => FIELD_WIDTH} />}
+            renderContent={(getFlags) => <PageTextFieldContent flags={getFlags} width={FIELD_WIDTH} />}
             renderPlaceholder={(getFlags, hint) => (
                 <PageTextFieldPlaceholder flags={getFlags}>{hint}</PageTextFieldPlaceholder>
             )}

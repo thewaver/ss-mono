@@ -10,4 +10,5 @@ export const frame = style({
 export const hub = style({
     position: "absolute",
     display: "flex",
+    borderRadius: "50%",
 });

@@ -48,7 +48,7 @@ const StressTestWrapper = (props: ParticleSpawnerExampleProps) => {
 
     return (
         <StressTest
-            configs={() => STRESS_ITEMS}
+            configs={STRESS_ITEMS}
             onShowModal={() => props.playback[1](false)}
             onHideModal={() => props.playback[1](true)}
             renderLabel={(getConfigIndex) => `Render ${STRESS_ITEMS[getConfigIndex()].count} spawners`}
@@ -122,7 +122,7 @@ export const ParticleSpawnerPage = () => {
                 key: "singleTarget",
                 name: EXAMPLE_NAMES.singleTarget,
                 component: () => (
-                    <PageMeasureBox width={() => BOX_WIDTH} height={() => BOX_HEIGHT}>
+                    <PageMeasureBox width={BOX_WIDTH} height={BOX_HEIGHT}>
                         <SingleTargetExample {...commonProps} />
                     </PageMeasureBox>
                 ),
@@ -132,7 +132,7 @@ export const ParticleSpawnerPage = () => {
                 key: "vertical",
                 name: EXAMPLE_NAMES.vertical,
                 component: () => (
-                    <PageMeasureBox width={() => BOX_WIDTH} height={() => BOX_HEIGHT}>
+                    <PageMeasureBox width={BOX_WIDTH} height={BOX_HEIGHT}>
                         <VerticalExample {...commonProps} />
                     </PageMeasureBox>
                 ),
@@ -142,7 +142,7 @@ export const ParticleSpawnerPage = () => {
                 key: "diagonal",
                 name: EXAMPLE_NAMES.diagonal,
                 component: () => (
-                    <PageMeasureBox width={() => BOX_WIDTH} height={() => BOX_HEIGHT}>
+                    <PageMeasureBox width={BOX_WIDTH} height={BOX_HEIGHT}>
                         <DiagonalExample {...commonProps} />
                     </PageMeasureBox>
                 ),
@@ -152,7 +152,7 @@ export const ParticleSpawnerPage = () => {
                 key: "movingTarget",
                 name: EXAMPLE_NAMES.movingTarget,
                 component: () => (
-                    <PageMeasureBox width={() => BOX_WIDTH} height={() => BOX_HEIGHT}>
+                    <PageMeasureBox width={BOX_WIDTH} height={BOX_HEIGHT}>
                         <MovingTargetExample {...commonProps} />
                     </PageMeasureBox>
                 ),
@@ -162,7 +162,7 @@ export const ParticleSpawnerPage = () => {
                 key: "radial",
                 name: EXAMPLE_NAMES.radial,
                 component: () => (
-                    <PageMeasureBox width={() => BOX_WIDTH} height={() => BOX_HEIGHT}>
+                    <PageMeasureBox width={BOX_WIDTH} height={BOX_HEIGHT}>
                         <RadialExample {...commonProps} />
                     </PageMeasureBox>
                 ),
@@ -172,7 +172,7 @@ export const ParticleSpawnerPage = () => {
                 key: "manyToOne",
                 name: EXAMPLE_NAMES.manyToOne,
                 component: () => (
-                    <PageMeasureBox width={() => BOX_WIDTH} height={() => BOX_HEIGHT}>
+                    <PageMeasureBox width={BOX_WIDTH} height={BOX_HEIGHT}>
                         <ManyToOneExample {...commonProps} />
                     </PageMeasureBox>
                 ),
@@ -182,7 +182,7 @@ export const ParticleSpawnerPage = () => {
                 key: "burst",
                 name: EXAMPLE_NAMES.burst,
                 component: () => (
-                    <PageMeasureBox width={() => BOX_WIDTH} height={() => BOX_HEIGHT}>
+                    <PageMeasureBox width={BOX_WIDTH} height={BOX_HEIGHT}>
                         <BurstExample {...commonProps} />
                     </PageMeasureBox>
                 ),
@@ -192,7 +192,7 @@ export const ParticleSpawnerPage = () => {
                 key: "roundTrip",
                 name: EXAMPLE_NAMES.roundTrip,
                 component: () => (
-                    <PageMeasureBox width={() => BOX_WIDTH} height={() => BOX_HEIGHT}>
+                    <PageMeasureBox width={BOX_WIDTH} height={BOX_HEIGHT}>
                         <RoundTripExample {...commonProps} />
                     </PageMeasureBox>
                 ),
@@ -202,7 +202,7 @@ export const ParticleSpawnerPage = () => {
                 key: "multipleTargets",
                 name: EXAMPLE_NAMES.multipleTargets,
                 component: () => (
-                    <PageMeasureBox width={() => BOX_WIDTH} height={() => BOX_HEIGHT}>
+                    <PageMeasureBox width={BOX_WIDTH} height={BOX_HEIGHT}>
                         <MultipleTargetsExample {...commonProps} />
                     </PageMeasureBox>
                 ),
@@ -212,7 +212,7 @@ export const ParticleSpawnerPage = () => {
                 key: "grid",
                 name: EXAMPLE_NAMES.grid,
                 component: () => (
-                    <PageMeasureBox width={() => BOX_WIDTH} height={() => BOX_HEIGHT}>
+                    <PageMeasureBox width={BOX_WIDTH} height={BOX_HEIGHT}>
                         <GridExample {...commonProps} />
                     </PageMeasureBox>
                 ),
@@ -239,8 +239,8 @@ export const ParticleSpawnerPage = () => {
                     >
                         <PageSelectField
                             value={getTravelPatternKey}
-                            values={() => TRAVEL_PATTERN_KEYS}
-                            width={() => FIELD_WIDTH}
+                            values={TRAVEL_PATTERN_KEYS}
+                            width={FIELD_WIDTH}
                             ariaLabel={"Travel pattern"}
                             onChange={(key) => setTravelPatternKey(() => key)}
                         />
@@ -267,10 +267,10 @@ export const ParticleSpawnerPage = () => {
                     >
                         <PageNumberField
                             value={getParticleCount}
-                            min={() => ParticleSpawnerKnobs.MIN_PARTICLE_COUNT}
-                            max={() => ParticleSpawnerKnobs.MAX_PARTICLE_COUNT}
-                            step={() => ParticleSpawnerKnobs.PARTICLE_COUNT_STEP}
-                            width={() => FIELD_WIDTH}
+                            min={ParticleSpawnerKnobs.MIN_PARTICLE_COUNT}
+                            max={ParticleSpawnerKnobs.MAX_PARTICLE_COUNT}
+                            step={ParticleSpawnerKnobs.PARTICLE_COUNT_STEP}
+                            width={FIELD_WIDTH}
                             ariaLabel={"Particle count"}
                             onInput={setParticleCount}
                         />
@@ -283,10 +283,10 @@ export const ParticleSpawnerPage = () => {
                     >
                         <PageNumberField
                             value={getTravelDurationMs}
-                            min={() => ParticleSpawnerKnobs.MIN_TRAVEL_DURATION_MS}
-                            max={() => ParticleSpawnerKnobs.MAX_TRAVEL_DURATION_MS}
-                            step={() => ParticleSpawnerKnobs.TRAVEL_DURATION_STEP_MS}
-                            width={() => FIELD_WIDTH}
+                            min={ParticleSpawnerKnobs.MIN_TRAVEL_DURATION_MS}
+                            max={ParticleSpawnerKnobs.MAX_TRAVEL_DURATION_MS}
+                            step={ParticleSpawnerKnobs.TRAVEL_DURATION_STEP_MS}
+                            width={FIELD_WIDTH}
                             ariaLabel={"Travel duration in milliseconds"}
                             onInput={setTravelDurationMs}
                         />
@@ -299,10 +299,10 @@ export const ParticleSpawnerPage = () => {
                     >
                         <PageNumberField
                             value={getRestDurationMs}
-                            min={() => ParticleSpawnerKnobs.MIN_RETENTION_MS}
-                            max={() => ParticleSpawnerKnobs.MAX_RETENTION_MS}
-                            step={() => ParticleSpawnerKnobs.RETENTION_STEP_MS}
-                            width={() => FIELD_WIDTH}
+                            min={ParticleSpawnerKnobs.MIN_RETENTION_MS}
+                            max={ParticleSpawnerKnobs.MAX_RETENTION_MS}
+                            step={ParticleSpawnerKnobs.RETENTION_STEP_MS}
+                            width={FIELD_WIDTH}
                             ariaLabel={"Rest duration in milliseconds"}
                             onInput={setRestDurationMs}
                         />
@@ -317,10 +317,10 @@ export const ParticleSpawnerPage = () => {
                     >
                         <PageNumberField
                             value={getSpawnDelayMs}
-                            min={() => ParticleSpawnerKnobs.MIN_SPAWN_DELAY_MS}
-                            max={() => ParticleSpawnerKnobs.MAX_SPAWN_DELAY_MS}
-                            step={() => ParticleSpawnerKnobs.SPAWN_DELAY_STEP_MS}
-                            width={() => FIELD_WIDTH}
+                            min={ParticleSpawnerKnobs.MIN_SPAWN_DELAY_MS}
+                            max={ParticleSpawnerKnobs.MAX_SPAWN_DELAY_MS}
+                            step={ParticleSpawnerKnobs.SPAWN_DELAY_STEP_MS}
+                            width={FIELD_WIDTH}
                             ariaLabel={"Spawn delay in milliseconds"}
                             onInput={setSpawnDelayMs}
                         />
@@ -335,8 +335,8 @@ export const ParticleSpawnerPage = () => {
                     >
                         <PageSelectField
                             value={getIterationPatternKey}
-                            values={() => ITERATION_PATTERN_KEYS}
-                            width={() => FIELD_WIDTH}
+                            values={ITERATION_PATTERN_KEYS}
+                            width={FIELD_WIDTH}
                             ariaLabel={"Iteration pattern"}
                             onChange={(key) => setIterationPatternKey(() => key)}
                         />
@@ -351,10 +351,10 @@ export const ParticleSpawnerPage = () => {
                     >
                         <PageNumberField
                             value={getOvershootPercent}
-                            min={() => ParticleSpawnerKnobs.MIN_OVERSHOOT_PERCENT}
-                            max={() => ParticleSpawnerKnobs.MAX_OVERSHOOT_PERCENT}
-                            step={() => ParticleSpawnerKnobs.OVERSHOOT_PERCENT_STEP}
-                            width={() => FIELD_WIDTH}
+                            min={ParticleSpawnerKnobs.MIN_OVERSHOOT_PERCENT}
+                            max={ParticleSpawnerKnobs.MAX_OVERSHOOT_PERCENT}
+                            step={ParticleSpawnerKnobs.OVERSHOOT_PERCENT_STEP}
+                            width={FIELD_WIDTH}
                             ariaLabel={"Overshoot percent"}
                             onInput={setOvershootPercent}
                         />
@@ -381,8 +381,8 @@ export const ParticleSpawnerPage = () => {
                     >
                         <PageSelectField
                             value={getTravelEasingKey}
-                            values={() => TRAVEL_EASING_KEYS}
-                            width={() => FIELD_WIDTH}
+                            values={TRAVEL_EASING_KEYS}
+                            width={FIELD_WIDTH}
                             ariaLabel={"Travel easing"}
                             onChange={(key) => setTravelEasingKey(() => key)}
                         />

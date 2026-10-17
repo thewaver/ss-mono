@@ -11,7 +11,7 @@ export const PairExample = (props: Props) => (
         range={props.range}
         ariaLabel={"Price range"}
         thumbLabels={() => ["Lowest price", "Highest price"]}
-        thumbSize={() => RANGE_THUMB_SIZE}
+        thumbSize={RANGE_THUMB_SIZE}
         renderContent={(getRenderProps) => <PageRangeContent renderProps={getRenderProps} />}
     />
 );

@@ -36,6 +36,7 @@ const progress = ElementObserverVueUtils.useScrollContainerProgress(runwayRef, b
                 :is-looping="false"
                 :is-disabled="isDisabled"
                 :orientation="orientation"
+                :transition-duration-ms="transitionDurationMs"
                 ariaLabel="Scrolled sampler"
                 :compute-slide-label="computePositionLabel"
                 :compute-step-label="computeCarouselStepLabel"

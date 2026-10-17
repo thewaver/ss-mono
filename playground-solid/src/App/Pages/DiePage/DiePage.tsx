@@ -53,7 +53,7 @@ export const DiePage = () => {
             component: () => (
                 <TabletopExample
                     shape={getShape}
-                    size={() => DIE_SIZE}
+                    size={DIE_SIZE}
                     rollDurationMs={getShownRollDurationMs}
                     settleDurationMs={getShownSettleDurationMs}
                     tumbleCount={getTumbleCount}
@@ -70,7 +70,7 @@ export const DiePage = () => {
             component: () => (
                 <IconCloudExample
                     shape={getShape}
-                    size={() => CLOUD_SIZE}
+                    size={CLOUD_SIZE}
                     idleDelayMs={getCloudIdleDelayMs}
                     settleDurationMs={getShownSettleDurationMs}
                     momentumMs={getShownMomentumMs}
@@ -92,7 +92,7 @@ export const DiePage = () => {
                 >
                     <PageSelectField
                         value={getShapeKey}
-                        values={() => DieShapes.SAMPLE_KEYS}
+                        values={DieShapes.SAMPLE_KEYS}
                         ariaLabel={"Die"}
                         onChange={(key) => setShapeKey(() => key)}
                     />
@@ -105,9 +105,9 @@ export const DiePage = () => {
                 >
                     <PageNumberField
                         value={getRollDurationMs}
-                        min={() => DieKnobs.MIN_ROLL_DURATION_MS}
-                        max={() => DieKnobs.MAX_ROLL_DURATION_MS}
-                        step={() => DieKnobs.ROLL_DURATION_STEP_MS}
+                        min={DieKnobs.MIN_ROLL_DURATION_MS}
+                        max={DieKnobs.MAX_ROLL_DURATION_MS}
+                        step={DieKnobs.ROLL_DURATION_STEP_MS}
                         isDisabled={getPrefersReducedMotion}
                         ariaLabel={"Roll duration in milliseconds"}
                         onInput={setRollDurationMs}
@@ -117,9 +117,9 @@ export const DiePage = () => {
                 <PageProp key={"tumbleCount"} label={"Tumbles"} hint={"How many whole turns a roll makes on its way."}>
                     <PageNumberField
                         value={getTumbleCount}
-                        min={() => DieKnobs.MIN_TUMBLE_COUNT}
-                        max={() => DieKnobs.MAX_TUMBLE_COUNT}
-                        step={() => DieKnobs.TUMBLE_COUNT_STEP}
+                        min={DieKnobs.MIN_TUMBLE_COUNT}
+                        max={DieKnobs.MAX_TUMBLE_COUNT}
+                        step={DieKnobs.TUMBLE_COUNT_STEP}
                         ariaLabel={"Tumbles"}
                         onInput={setTumbleCount}
                     />

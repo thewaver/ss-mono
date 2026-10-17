@@ -14,8 +14,8 @@ export const MosaicExample = (props: Props) => (
             renderContent={() => (
                 <div class={styles.mosaicTile}>
                     <ImageMosaic
-                        sources={() => MosaicImages.SAMPLE_SOURCES}
-                        gap={() => MOSAIC_GAP}
+                        sources={MosaicImages.SAMPLE_SOURCES}
+                        gap={MOSAIC_GAP}
                         sizeAnchor={"width"}
                         targetAspectRatio={() => MosaicImages.SAMPLE_SHAPES.landscape}
                         ariaLabel={"Pictures"}

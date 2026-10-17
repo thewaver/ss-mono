@@ -70,6 +70,7 @@ const LabelPage = lazyPage(() => import("./Pages/LabelPage/LabelPage"), "LabelPa
 const ListboxPage = lazyPage(() => import("./Pages/ListboxPage/ListboxPage"), "ListboxPage");
 const MenubarPage = lazyPage(() => import("./Pages/MenubarPage/MenubarPage"), "MenubarPage");
 const FanMenuPage = lazyPage(() => import("./Pages/Menus/FanMenuPage/FanMenuPage"), "FanMenuPage");
+const FlyoutMenuPage = lazyPage(() => import("./Pages/Menus/FlyoutMenuPage/FlyoutMenuPage"), "FlyoutMenuPage");
 const MenuPage = lazyPage(() => import("./Pages/Menus/MenuPage/MenuPage"), "MenuPage");
 const WheelMenuPage = lazyPage(() => import("./Pages/Menus/WheelMenuPage/WheelMenuPage"), "WheelMenuPage");
 const ModalPage = lazyPage(() => import("./Pages/ModalPage/ModalPage"), "ModalPage");
@@ -499,6 +500,10 @@ export const MENU_CONFIGS: MenuBranchConfig[] = [
                     {
                         name: "FanMenu",
                         component: () => <FanMenuPage />,
+                    },
+                    {
+                        name: "FlyoutMenu",
+                        component: () => <FlyoutMenuPage />,
                     },
                     {
                         name: "Menu",

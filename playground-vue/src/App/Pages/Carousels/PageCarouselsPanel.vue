@@ -53,7 +53,7 @@ const controls = props.controls;
         <PageProp
             v-if="hasDelay"
             item-key="delayMs"
-            label="RotatorUtils delay (ms)"
+            label="Transition delay (ms)"
             hint="How long a slide is held before the carousel moves to the next one on its own."
         >
             <PageNumberField
@@ -62,8 +62,24 @@ const controls = props.controls;
                 :max="CarouselKnobs.MAX_DELAY_MS"
                 :step="CarouselKnobs.DELAY_STEP_MS"
                 :width="FIELD_WIDTH"
-                ariaLabel="RotatorUtils delay in milliseconds"
+                ariaLabel="Transition delay in milliseconds"
                 @input="(value: number) => (controls.delay.value = value)"
+            />
+        </PageProp>
+
+        <PageProp
+            item-key="transitionDurationMs"
+            label="Transition duration (ms)"
+            hint="How long the move from one slide to the next takes. At 0 the carousel jumps straight there."
+        >
+            <PageNumberField
+                :value="controls.transitionDuration.value"
+                :min="CarouselKnobs.MIN_TRANSITION_MS"
+                :max="CarouselKnobs.MAX_TRANSITION_MS"
+                :step="CarouselKnobs.TRANSITION_STEP_MS"
+                :width="FIELD_WIDTH"
+                ariaLabel="Transition duration in milliseconds"
+                @input="(value: number) => (controls.transitionDuration.value = value)"
             />
         </PageProp>
 

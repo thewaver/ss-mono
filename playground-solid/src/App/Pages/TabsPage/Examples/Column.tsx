@@ -19,7 +19,7 @@ export const ColumnExample = (props: Props) => {
             <Tabs
                 orientation={"vertical"}
                 ariaLabel={"Example sections"}
-                tabs={() => COLUMN_TABS}
+                tabs={COLUMN_TABS}
                 selectedValue={props.selectedValue}
                 onSelectionChange={props.onSelectionChange}
                 renderSelectionFloater={(getVisibilityTarget, getTransitionDurationMs) => (

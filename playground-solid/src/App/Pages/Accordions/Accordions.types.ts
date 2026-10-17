@@ -4,6 +4,8 @@ import type { AccessorProps } from "@thewaver/ss-components-solid";
 
 export type AccordionExampleProps = AccessorProps<{
     expanded?: Signal<string[]>;
+    gap: number;
+    transitionDurationMs: number;
 }>;
 
 export type AccordionDeferredExampleProps = AccordionExampleProps & {
@@ -14,8 +16,10 @@ export type AccordionGrowingExampleProps = AccordionExampleProps &
     AccessorProps<{
         extraLines: number;
         onAddLine: () => void;
+        onClearLines: () => void;
     }>;
 
 export type AccordionSinglePanelExampleProps = AccessorProps<{
     expanded?: Signal<boolean>;
+    transitionDurationMs: number;
 }>;

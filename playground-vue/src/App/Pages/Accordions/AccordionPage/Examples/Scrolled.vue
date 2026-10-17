@@ -9,8 +9,6 @@ import PageAccordionHeader from "../../../../StyledComponents/AccordionContent/P
 import PageAccordionPanel from "../../../../StyledComponents/AccordionContent/PageAccordionPanel.vue";
 import type { AccordionExampleProps } from "../../Accordions.types";
 
-const GAP = 5;
-
 const SECTION_BODIES: Record<string, string[]> = {
     Shipping: ["Orders leave the warehouse within two working days.", "Tracking arrives by email."],
     Returns: ["Thirty days, unopened, receipt or order number."],
@@ -44,7 +42,13 @@ const expanded = useModel(props, "expanded");
 
 <template>
     <div :class="styles.scrollBox" data-scroll-box="">
-        <Accordion v-model:expanded="expanded" :items="ITEMS" is-scrolled-into-view-on-expand :gap="GAP">
+        <Accordion
+            v-model:expanded="expanded"
+            :items="ITEMS"
+            is-scrolled-into-view-on-expand
+            :gap="gap"
+            :transition-duration-ms="transitionDurationMs"
+        >
             <template #renderHeader="{ item, flags }">
                 <PageAccordionHeader :flags="flags">{{ item.value }}</PageAccordionHeader>
             </template>

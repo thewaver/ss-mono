@@ -17,19 +17,19 @@ const LABEL_GAP = 5;
 type Props = TextAreaExampleProps;
 
 export const LabeledExample = (props: Props) => (
-    <Label orientation={"vertical"} gap={() => LABEL_GAP}>
+    <Label orientation={"vertical"} gap={LABEL_GAP}>
         <PageLabelCaption>Bio</PageLabelCaption>
 
         <TextArea
             value={props.value}
             isAutoSizing={true}
-            minRows={() => MIN_ROWS}
-            maxRows={() => MAX_ROWS}
-            padding={() => FIELD_PADDING}
-            gap={() => FIELD_GAP}
+            minRows={MIN_ROWS}
+            maxRows={MAX_ROWS}
+            padding={FIELD_PADDING}
+            gap={FIELD_GAP}
             computeTextStyle={computePageTextFieldTextStyle}
             renderContent={(getFlags) => (
-                <PageTextFieldContent flags={getFlags} width={() => FIELD_WIDTH} isStretched={true} />
+                <PageTextFieldContent flags={getFlags} width={FIELD_WIDTH} isStretched={true} />
             )}
         />
     </Label>

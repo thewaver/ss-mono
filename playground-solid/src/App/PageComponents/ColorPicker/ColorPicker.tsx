@@ -13,7 +13,7 @@ import { PageColorChannels } from "../ColorChannels/ColorChannels";
 
 export const pageColorPickerSlots = {
     renderArea: (getRenderProps: Parameters<typeof PageColorAreaContent>[0]["renderProps"]) => (
-        <PageColorAreaContent renderProps={getRenderProps} size={() => AREA_SIZE} />
+        <PageColorAreaContent renderProps={getRenderProps} size={AREA_SIZE} />
     ),
     renderHue: (getRenderProps: Parameters<typeof PageHueSlider>[0]["renderProps"]) => (
         <PageHueSlider renderProps={getRenderProps} />

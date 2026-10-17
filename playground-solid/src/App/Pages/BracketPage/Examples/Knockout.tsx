@@ -26,8 +26,8 @@ export const KnockoutExample = (props: Props) => {
     return (
         <div class={styles.board}>
             <Bracket
-                root={() => DRAW}
-                nodeSize={() => NODE_SIZE}
+                root={DRAW}
+                nodeSize={NODE_SIZE}
                 layerGap={props.layerGap}
                 crossGap={props.crossGap}
                 orientation={props.orientation}

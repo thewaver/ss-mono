@@ -6,7 +6,7 @@ const STALLED_RATIO = 0.62;
 
 export const ErroredExample = () => (
     <Progress
-        value={() => STALLED_RATIO}
+        value={STALLED_RATIO}
         hasError={true}
         ariaLabel={"Failed upload"}
         sizing={"fit-content"}

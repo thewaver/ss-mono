@@ -1,5 +1,6 @@
 import { Accordion, Button, access } from "@thewaver/ss-components-solid";
 import type { AccordionItem } from "@thewaver/ss-components-solid";
+import * as styles from "@thewaver/ss-playground/App/Pages/Accordions/Accordions.css";
 
 import {
     PageAccordionHeader,
@@ -8,8 +9,6 @@ import {
 import { PageButtonContent } from "../../../../StyledComponents/ButtonContent/ButtonContent";
 import type { AccordionGrowingExampleProps } from "../../Accordions.types";
 
-const TRANSITION_DURATION_MS = 400;
-
 const ITEMS: AccordionItem<string>[] = [{ value: "Shipping" }];
 
 type Props = AccordionGrowingExampleProps;
@@ -17,9 +16,10 @@ type Props = AccordionGrowingExampleProps;
 export const GrowingExample = (props: Props) => {
     return (
         <Accordion
-            items={() => ITEMS}
+            items={ITEMS}
             expanded={props.expanded}
-            transitionDurationMs={() => TRANSITION_DURATION_MS}
+            gap={props.gap}
+            transitionDurationMs={props.transitionDurationMs}
             renderHeader={(getItem, getFlags) => (
                 <PageAccordionHeader flags={getFlags}>{getItem().value}</PageAccordionHeader>
             )}
@@ -28,11 +28,23 @@ export const GrowingExample = (props: Props) => {
                     visibilityTarget={getVisibilityTarget}
                     transitionDurationMs={getTransitionDurationMs}
                 >
-                    <Button
-                        id={"addALine"}
-                        renderContent={(getFlags) => <PageButtonContent flags={getFlags}>Add a line</PageButtonContent>}
-                        onClick={props.onAddLine}
-                    />
+                    <div class={styles.growingButtons}>
+                        <Button
+                            id={"addALine"}
+                            renderContent={(getFlags) => (
+                                <PageButtonContent flags={getFlags}>Add a line</PageButtonContent>
+                            )}
+                            onClick={props.onAddLine}
+                        />
+
+                        <Button
+                            id={"clearLines"}
+                            renderContent={(getFlags) => (
+                                <PageButtonContent flags={getFlags}>Clear lines</PageButtonContent>
+                            )}
+                            onClick={props.onClearLines}
+                        />
+                    </div>
 
                     {Array.from({ length: access(props.extraLines) }, (_unused, index) => (
                         <div>Line {index + 1} appeared after the panel was already open.</div>

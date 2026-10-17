@@ -8,8 +8,8 @@ type Props = SlideButtonExampleProps;
 
 export const SlideOnlyExample = (props: Props) => (
     <SlideButton
-        mode={() => "slide"}
-        thumbSize={() => SLIDE_BUTTON_THUMB_SIZE}
+        mode={"slide"}
+        thumbSize={SLIDE_BUTTON_THUMB_SIZE}
         renderContent={(getRenderProps) => (
             <PageSlideButtonContent renderProps={getRenderProps}>Slide to send</PageSlideButtonContent>
         )}

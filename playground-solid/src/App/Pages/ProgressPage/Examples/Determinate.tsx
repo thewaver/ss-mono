@@ -6,7 +6,7 @@ const RATIO = 0.4;
 
 export const DeterminateExample = () => (
     <Progress
-        value={() => RATIO}
+        value={RATIO}
         ariaLabel={"Setup progress"}
         sizing={"fit-content"}
         renderContent={(getState) => <PageProgressContent state={getState} />}

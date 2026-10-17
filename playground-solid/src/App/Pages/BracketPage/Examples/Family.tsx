@@ -152,8 +152,8 @@ export const FamilyExample = (props: Props) => {
                     <div class={styles.familyCamera} style={getCameraStyle()}>
                         <div class={styles.board}>
                             <Bracket
-                                root={() => DRAW}
-                                nodeSize={() => NODE_SIZE}
+                                root={DRAW}
+                                nodeSize={NODE_SIZE}
                                 family={[getFamily, setFamily]}
                                 layerGap={props.layerGap}
                                 crossGap={props.crossGap}

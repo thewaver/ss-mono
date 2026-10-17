@@ -29,7 +29,7 @@ export const LinkComponentExample = (props: Props) => {
                 siblingCount={props.siblingCount}
                 boundaryCount={props.boundaryCount}
                 isDisabled={props.isDisabled}
-                gap={() => PAGINATOR_GAP}
+                gap={PAGINATOR_GAP}
                 ariaLabel={"Routed results"}
                 computePageLabel={computePaginatorPageLabel}
                 computeStepLabel={computePaginatorStepLabel}

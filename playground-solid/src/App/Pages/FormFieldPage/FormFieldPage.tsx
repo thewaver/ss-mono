@@ -77,8 +77,8 @@ export const FormFieldPage = () => {
                 >
                     <PageSelectField
                         value={getOrientation}
-                        values={() => FORM_FIELD_ORIENTATIONS}
-                        width={() => FIELD_WIDTH}
+                        values={FORM_FIELD_ORIENTATIONS}
+                        width={FIELD_WIDTH}
                         ariaLabel={"Orientation"}
                         onChange={(orientation) => setOrientation(() => orientation)}
                     />
@@ -91,10 +91,10 @@ export const FormFieldPage = () => {
                 >
                     <PageNumberField
                         value={getGap}
-                        min={() => FormFieldKnobs.MIN_GAP}
-                        max={() => FormFieldKnobs.MAX_GAP}
-                        step={() => FormFieldKnobs.GAP_STEP}
-                        width={() => FIELD_WIDTH}
+                        min={FormFieldKnobs.MIN_GAP}
+                        max={FormFieldKnobs.MAX_GAP}
+                        step={FormFieldKnobs.GAP_STEP}
+                        width={FIELD_WIDTH}
                         ariaLabel={"Gap in pixels"}
                         onInput={setGap}
                     />
@@ -107,7 +107,7 @@ export const FormFieldPage = () => {
                 >
                     <PageTextField
                         value={getMessage}
-                        width={() => MESSAGE_WIDTH}
+                        width={MESSAGE_WIDTH}
                         placeholder={"No message"}
                         ariaLabel={"Message"}
                         onInput={setMessage}

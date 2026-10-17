@@ -12,6 +12,7 @@ const NOTES = ["Signed for on arrival", "Left with a neighbor", "Returned to the
 
 export const FilledExample = (props: Props) => (
     <Collapsible
+        transitionDurationMs={props.transitionDurationMs}
         expanded={props.expanded}
         sizing={"fill"}
         isPanelBuiltOnExpand={true}

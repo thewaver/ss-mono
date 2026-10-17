@@ -76,7 +76,7 @@ export const WheelMenuPage = () => {
                 <WheelExample
                     caption={"Half"}
                     items={ACTIONS}
-                    spreadDegrees={() => HALF_TURN_DEGREES}
+                    spreadDegrees={HALF_TURN_DEGREES}
                     onActivate={(action) => setLastHalfAction(action.name)}
                 />
             ),
@@ -105,7 +105,7 @@ export const WheelMenuPage = () => {
                 <WheelExample
                     caption={"Half"}
                     items={NESTED_ACTIONS}
-                    spreadDegrees={() => HALF_TURN_DEGREES}
+                    spreadDegrees={HALF_TURN_DEGREES}
                     onActivate={(action) => setLastHalfNestedAction(action.name)}
                 />
             ),
@@ -149,8 +149,8 @@ export const WheelMenuPage = () => {
                 <WheelExample
                     caption={"Wheel"}
                     items={ACTIONS}
-                    holeRadius={() => 64}
-                    bandWidth={() => 120}
+                    holeRadius={64}
+                    bandWidth={120}
                     layoutDefs={{ wedgeGapDegrees: 10 }}
                     onActivate={(action) => setLastTunedAction(action.name)}
                 />
