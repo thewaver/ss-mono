@@ -38,7 +38,7 @@ export namespace RevealUtils {
      * off at it.
      *
      * @param radius Half the window's width and height.
-     * @param softness `0` for a fade as wide as the window, `1` for a hard edge.
+     * @param softness `0` for a hard edge, `1` for a fade as wide as the window.
      * @param computePoints The window's contour, worked out from its size. Left out, a circle.
      * @param joinRadii How far each corner of the contour is rounded, as `Shape` takes it.
      * @param lameExponents How square or pinched each rounded corner is, as `Shape` takes it.
@@ -52,7 +52,7 @@ export namespace RevealUtils {
         lameExponents: number[] | undefined,
     ) => {
         const size = radius * 2;
-        const blur = ((1 - softness) * radius) / BLUR_SPREAD;
+        const blur = (softness * radius) / BLUR_SPREAD;
         const inset = blur * BLUR_MARGIN;
         const side = Math.max(size - inset * 2, 0);
         const points = computePoints?.({ width: side, height: side });

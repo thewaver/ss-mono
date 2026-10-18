@@ -3553,8 +3553,11 @@ readable by a spec without a race.
 Asked for by the user: a page for each abstract, description and dependencies only, no examples. The first
 build left the four that already had pages — `InteractionTracker`, `PointerTracker`, `SVGFilters`,
 `Virtualizer` — with theirs, and the user later closed that gap: **an abstract's entry carries no examples at
-all.** The pages under `SVGDefs` were the one exception while those factories were abstracts; they have since
-moved to `Generators`, so there is none. An abstract is either visible through the component that consumes it or
+all**, with one exception. The pages under `SVGDefs` were an exception while those factories were abstracts; they have
+since moved to `Generators`. **`ShapeReveal` is the exception now**, by the user's choice: its page holds the
+_Theme Cycle_ example, a button that keeps switching the Playground's theme through the reveal. They took it knowing
+it makes `ShapeReveal` the only abstract with examples, rather than putting the button on the `Reveal` page (a
+different component) or in the nav bar. An abstract is either visible through the component that consumes it or
 reports numbers a page of its own would only print back, and its entry is a line of config.
 
 **`ComponentConfig.component` is optional, and an entry without one has no Examples view.** The alternative
@@ -8008,6 +8011,22 @@ lists them in `PLAYGROUND_THEMES`. Each app's entry file applies its own framewo
 _Theme_ select in the nav settings swaps the class on the root element from there. The user asked for it as a
 temporary way to compare the sets side by side, then kept it. The pick is not remembered across reloads, and
 it is not tied to the framework switch, which still picks the other app's own theme when it lands there.
+
+**Which theme is showing is one shared value, because two controls change it.** `PageComponents/Theme` holds it with
+`revealTheme`, which records the pick and reveals it; the nav settings' select and the `ShapeRevealPage`'s _Theme
+Cycle_ example both go through it. When the select kept the pick in its own state, a theme changed by the example left
+the select showing the old one. The value starts at the app's own framework, which is what the entry file applies.
+
+**_Theme Cycle_: what the user chose, and one floor that comes from WCAG.** The button starts and stops the cycle, and
+leaving the page stops it too. Each switch picks a random theme other than the one showing, so every switch is a
+visible change. It grows from the button. The pause is counted from the end of the reveal, not its start, so a short
+pause never cuts a reveal short. Duration and pause are both knobs. **The pause cannot go below `500`ms** because of
+WCAG 2.3.1 _Three Flashes or Below Threshold_: under reduced motion, or at a duration of `0`, every switch repaints the
+whole window at once, and a floor of half a second keeps that at two a second at most. It honors reduced motion the way
+the select does, with a duration of `0`.
+
+**No reset, though the page moves the theme.** _"A demo a visitor can move must be a demo they can put back"_ is about
+state the page owns, and the theme is the app's, with the nav settings' select as its control.
 
 **`secondary` is not set per theme; it is `primary` turned round the hue circle.** `toSecondary` in
 `Theme.css.ts` rotates all four steps of `primary` — `contrast` included — by `90`, `180` and `270` degrees, and
@@ -17249,7 +17268,7 @@ consumer, which is worth knowing before anything is built on it.
 
 **With no lens, the layer is hidden rather than taken out**, so moving the pointer in and out does not rebuild the copy or decode a picture in it again each time. The lens shows whenever the pointer is anywhere on the page, as `Reveal`'s hole does, so it slides in from the edge.
 
-**The defaults are a zoom of 2, a radius of 90, a step of 20 and a softness of 1.** Softness is 1, a hard edge, where `Reveal`'s is 0.45, because a lens reads as glass only if its rim is sharp. Zoom is not clamped: 1 magnifies nothing and below 1 shrinks the copy. A radius of 0 shows no lens.
+**The defaults are a zoom of 2, a radius of 90, a step of 20 and a softness of 0.** Softness is 0, a hard edge, where `Reveal`'s is 0.55, because a lens reads as glass only if its rim is sharp. Zoom is not clamped: 1 magnifies nothing and below 1 shrinks the copy. A radius of 0 shows no lens.
 
 **The keyboard is `Reveal`'s, for the same reason.** WCAG 2.1.1 applies as it does there: what the lens shows depends on where the pointer is, so a keyboard user needs their own way to move it. One Tab stop, `role="group"` and a required `ariaLabel`; the lens opens at the center on `:focus-visible`, the arrows move it by `stepSize` inside the element, and blur closes it.
 
@@ -17948,7 +17967,7 @@ it renders none. The user's call was to keep the category rather than file it wr
 the one Abstract with no component consumer would otherwise be the only thing in the library you cannot look
 at.
 
-**Every Abstract has an entry, and none of them carry examples**; the rule and
+**Every Abstract has an entry, and none of them carry examples except `ShapeReveal`**; the rule, the exception and
 its reasoning are under _"Every abstract has a menu entry, and a page with no examples is a config entry rather
 than a file"_. `Anchor` was the first case argued that way and rejected before the rule was general: it is
 already everywhere — tooltips, menus, selects and the spotlight all position through it, so a page would be a
@@ -18001,10 +18020,14 @@ been an image decode per pointer move. Following the pointer in pixels needs the
 reading deliberately does not carry, so the component observes it with `ElementObserver` — visible now in the
 page's derived dependency row, which is the mechanism working as intended.
 
-**`radius` and `softness` rather than a gradient string.** Softness is the fraction of the radius that is fully
-clear before the mask starts fading back to opaque, so `1` is a hard-edged hole at the full radius and `0` is
-all fade — the drawn shape shrinks as the blur grows, until only the very center comes close to fully clear.
-The Playground labels the field _Clear fraction_ for that reason.
+**`radius` and `softness` rather than a gradient string.** Softness is how much of the radius the fade takes up,
+so `0` is a hard-edged hole at the full radius and `1` is all fade — the drawn shape shrinks as the blur grows,
+until only the very center comes close to fully clear. **It ran the other way at first**, as the fraction left
+clear, so `1` was the hard edge and the Playground labelled the field _Clear fraction_; the descriptions drifted to
+say `0` was hard while the arithmetic did not. The user's call was that the name must mean what it says, so the
+arithmetic was flipped across all three Reveals — `Reveal`, `Lens` and `ScratchCard` — and each default moved to
+keep its look: `Reveal` from `0.45` to `0.55`, `Lens` from `1` to `0`, `ScratchCard` from `0.8` to `0.2`. A
+consumer who had set a value of their own gets the opposite edge, which they accepted as the price.
 Handing the consumer the gradient instead would have made the hole's geometry their arithmetic rather
 than the component's, and `radius` and `softness` name the effect where a gradient string names the mechanism.
 That the hole is a mask is no longer hidden — the paragraph below says why — but building it is still the
@@ -19163,9 +19186,9 @@ From Magic UI's Animated Theme Toggler and Skiper UI's theme transitions.
 
 **The browser's own cross-fade is overridden by script, not by a stylesheet.** By default the browser fades the old snapshot out and the new one in and blends them with `plus-lighter`, which would brighten the inside of the shape; the helper runs one animation on each snapshot holding opacity at 1 and blending at normal, which wins because a script animation comes after the browser's own in the cascade. A `globalStyle` toggled on the root was rejected because the helper would have had to import a `.css.ts` the unit tests cannot load, and because a stylesheet whose exports nobody imports can be dropped from a build, leaving the reveal broken only in production. The animations are cancelled once the transition ends, so a second reveal does not inherit the first one's.
 
-**The shapes are a circle and `Shape`'s default contours, passed as `computePoints`.** The user narrowed this item to the library's default shapes, dropping the animated GIF, the star and custom outlines; a set of animated SVG samples is in `backlog.md` under _Open discussion_. Leaving `computePoints` out gives an exact circle. A contour grows about the average of its corners until its nearest edge clears the farthest viewport corner, so it covers the viewport whichever way it is turned; that overshoots for a long, flat shape, accepted because it holds for every contour without a case per shape. A hard edge is a `clip-path` whose corners each travel in a straight line from the origin. A soft edge is a blurred SVG of the shape used as a mask grown from size 0, so `blur` is a standard deviation in pixels as CSS `blur()` takes it — not `Reveal`'s `softness`, which is a ratio, because one name should not carry two units. The reach is extended by three times the blur so the faded edge clears the viewport.
+**The shapes are a circle and `Shape`'s default contours, passed as `computePoints`.** The user narrowed this item to the library's default shapes, dropping the animated GIF, the star and custom outlines; a set of animated SVG samples is in `backlog.md` under _Open discussion_. Leaving `computePoints` out gives an exact circle. A contour grows about the average of its corners until its nearest edge clears the farthest viewport corner, so it covers the viewport whichever way it is turned; that overshoots for a long, flat shape, accepted because it holds for every contour without a case per shape. A hard edge is a `clip-path` whose corners each travel in a straight line from the origin. A soft edge is a blurred SVG of the shape used as a mask grown from size 0, and its edge is `softness`, the same word and the same direction as the Reveals': `0` is a hard edge and `1` a fade as wide as the distance the shape grows to cover the viewport. It was a `blur` in pixels at first, and the user asked for it to follow `Reveal` once a 20px blur turned out to be invisible on a shape thousands of pixels across: a share of the reach looks the same on any window and from any origin, where a pixel value means less the bigger the screen. The blur is that share of the reach divided by three, since three standard deviations is where a blur fades out, and the reach is extended by the same amount so the faded edge clears the viewport.
 
-**It has no examples page, and its spec went with it.** The user removed the page — a panel switched through a reveal, with knobs for the shape, origin and edge — in all four Playgrounds, leaving a docs entry only: proper consumers are to be written later, and the Playground's theme switch keeps the helper exercised by hand in the meantime. `shapeReveal.spec.ts` drove that page and was deleted with it, so nothing in `e2e/` covers the helper until a consumer brings a page back.
+**Its examples page is the _Theme Cycle_ button.** The user removed an earlier page — a panel switched through a reveal, with knobs for the shape, origin and edge — in all four Playgrounds, and `shapeReveal.spec.ts` went with it. The page came back holding one example, the button that keeps switching the Playground's theme, with knobs for duration, pause, shape and softness; see _"The Playground theme is an example"_ for how it behaves. No spec covers it yet.
 
 **WCAG.** 2.3.3 Animation from Interactions (AAA), "Motion animation triggered by interaction can be disabled": the duration is the way to turn it off. 2.2.2 Pause, Stop, Hide applies to motion that "starts automatically" and "lasts more than five seconds"; a reveal starts from the visitor's own action and runs well under that, so it needs no pause control. Checked 2.3.1 Three Flashes: one reveal per action is not a flash sequence. While a reveal runs the browser draws snapshots over the page, so a press during those few hundred milliseconds lands on nothing; that is the platform, not the helper.
 

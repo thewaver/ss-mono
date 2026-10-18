@@ -1,4 +1,4 @@
-import type { Point2d, Size2d } from "@thewaver/ss-utils";
+import { MathUtils, type Point2d, type Size2d } from "@thewaver/ss-utils";
 
 import { SHAPE_REVEAL_DEFAULTS } from "./ShapeReveal.const";
 import type { ShapeRevealChange, ShapeRevealOpts, ShapeRevealOrigin, ShapeRevealSpot } from "./ShapeReveal.types";
@@ -234,8 +234,9 @@ export namespace ShapeRevealUtils {
      * @param size The viewport's size, in pixels.
      * @param computePoints The shape's contour, as {@link computeOutline} takes it. Left out, a circle; a contour it
      * cannot use falls back to the circle too.
-     * @param blur How soft the edge is, as {@link computeMaskKeyframes} takes it. `0` gives a hard edge through a
-     * `clip-path`, anything more a mask.
+     * @param softness How soft the edge is, from `0`, a hard edge through a `clip-path`, to `1`, a fade as wide as the
+     * distance the shape grows to cover the viewport; anything above `0` is a mask. It is clamped to that range, and
+     * because it is a share of that distance it looks the same on any window and from any origin.
      * @returns Two keyframes that also hold the new page fully opaque and unblended, which is what the browser's own
      * cross-fade would otherwise change.
      */
@@ -243,14 +244,15 @@ export namespace ShapeRevealUtils {
         origin: Point2d,
         size: Size2d,
         computePoints: ((size: Size2d) => Point2d[]) | undefined,
-        blur: number,
+        softness: number,
     ): Keyframe[] => {
-        const softness = Math.max(blur, 0);
-        const coverRadius = computeFarthestDistance(origin, size) + softness * BLUR_REACH;
+        const reach = computeFarthestDistance(origin, size);
+        const blur = (MathUtils.clamp01(softness) * reach) / BLUR_REACH;
+        const coverRadius = reach + blur * BLUR_REACH;
         const outline = computePoints ? computeOutline(computePoints, coverRadius) : undefined;
         const frames =
-            softness > 0
-                ? computeMaskKeyframes(origin, coverRadius, outline, softness)
+            blur > 0
+                ? computeMaskKeyframes(origin, coverRadius, outline, blur)
                 : computeClipKeyframes(origin, coverRadius, outline);
 
         return frames.map((frame) => ({ ...frame, ...SNAPSHOT_STYLE }));
@@ -269,7 +271,8 @@ export namespace ShapeRevealUtils {
      * @param opts Where the shape grows from (`origin`: a named spot, a point in viewport pixels, or an element whose
      * center is used, read before the change runs; the center by default), how long it takes (`durationMs`) and how
      * it eases (`easing`, any CSS easing), the shape (`computePoints`, as `Shape` takes it; a circle when left out)
-     * and how soft its edge is (`blur`, in pixels; a hard edge at `0`). Defaults are in `SHAPE_REVEAL_DEFAULTS`.
+     * and how soft its edge is (`softness`, from `0`, a hard edge, to `1`, as {@link computeKeyframes} takes it).
+     * Defaults are in `SHAPE_REVEAL_DEFAULTS`.
      * @returns A promise that settles once the reveal has finished, with `true` when the change was shown through
      * the shape and `false` when it simply happened. It rejects with the change's own error if the change throws.
      */
@@ -303,7 +306,12 @@ export namespace ShapeRevealUtils {
             easing: opts.easing ?? SHAPE_REVEAL_DEFAULTS.easing,
             fill: "forwards",
         };
-        const keyframes = computeKeyframes(origin, size, opts.computePoints, opts.blur ?? SHAPE_REVEAL_DEFAULTS.blur);
+        const keyframes = computeKeyframes(
+            origin,
+            size,
+            opts.computePoints,
+            opts.softness ?? SHAPE_REVEAL_DEFAULTS.softness,
+        );
 
         const animations = [
             document.documentElement.animate(HOLD_KEYFRAMES, { ...timing, pseudoElement: OLD_PSEUDO_ELEMENT }),

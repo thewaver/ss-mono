@@ -394,6 +394,13 @@ start `npm run verify:dom` / `npx playwright test` with `run_in_background`, and
 a script expected to take more than a few seconds. Keep answering while it runs, and read the result when it
 reports in.
 
+**Run the specs the change touches, never the whole suite by default.** Stated by the user, emphatically: a full
+`npm run verify:dom` across four Playgrounds takes about half an hour, and it was being run after every change. So pick
+the specs by what changed — the routes of the pages edited (grep `e2e/` for the route, per _"A spec belongs to the route
+it visits"_ in `decisions.md`), the specs of any component or abstract whose code moved, and a shared spec such as
+`playgroundExamples.spec.ts` or `sourceView.spec.ts` only when the change reaches what it checks — and pass them to
+`npx playwright test` by name. The full suite runs only when they ask for it.
+
 **Never kill the user's processes.** No `pkill`, no killing a dev server, no stopping anything you did not
 start. They keep `npm start` running while working, and losing it interrupts them. `npm run verify:dom`
 serves a production preview on its own port and `reuseExistingServer` handles a stale one, so it never

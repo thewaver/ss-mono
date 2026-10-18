@@ -150,7 +150,7 @@ export const RevealPage = () => {
                         max={RevealKnobs.MAX_SOFTNESS}
                         step={RevealKnobs.SOFTNESS_STEP}
                         width={FIELD_WIDTH}
-                        ariaLabel={"Clear fraction"}
+                        ariaLabel={"Softness"}
                         onInput={setSoftness}
                     />
                 </PageProp>

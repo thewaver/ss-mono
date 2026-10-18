@@ -101,6 +101,7 @@ const ScrollerPage = () => import("./Pages/ScrollerPage/ScrollerPage.vue");
 const SegmentedInputPage = () => import("./Pages/SegmentedInputPage/SegmentedInputPage.vue");
 const SelectPage = () => import("./Pages/SelectPage/SelectPage.vue");
 const ShapePage = () => import("./Pages/ShapePage/ShapePage.vue");
+const ShapeRevealPage = () => import("./Pages/ShapeRevealPage/ShapeRevealPage.vue");
 const SidebarPage = () => import("./Pages/SidebarPage/SidebarPage.vue");
 const SlideButtonPage = () => import("./Pages/SlideButtonPage/SlideButtonPage.vue");
 const SortableGridPage = () => import("./Pages/SortableGridPage/SortableGridPage.vue");
@@ -214,6 +215,7 @@ export const MENU_CONFIGS: MenuBranchConfig[] = [
             },
             {
                 name: "ShapeReveal",
+                component: ShapeRevealPage,
             },
             {
                 name: "SignalMirror",

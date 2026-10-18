@@ -1,12 +1,7 @@
 <script setup lang="ts">
-import { ref, useModel } from "vue";
+import { useModel } from "vue";
 
-import {
-    MediaQueryMonitorVueUtils,
-    SHAPE_REVEAL_DEFAULTS,
-    ShapeRevealUtils,
-    Toggle,
-} from "@thewaver/ss-components-vue";
+import { MediaQueryMonitorVueUtils, SHAPE_REVEAL_DEFAULTS, Toggle } from "@thewaver/ss-components-vue";
 import {
     PAGE_VIEW_OPTIONS,
     THEME_FIELD_ID,
@@ -14,13 +9,13 @@ import {
     VIEWPORT_ANCHOR_OPTIONS,
 } from "@thewaver/ss-playground/App/PageComponents/NavSettings/NavSettings.const";
 import { NO_MOTION_DURATION_MS } from "@thewaver/ss-playground/App/PageComponents/NavSettings/NavSettings.const";
-import { PLAYGROUND_THEMES } from "@thewaver/ss-playground/App/Theme.css";
 
 import PageToggleContent from "../../StyledComponents/ToggleContent/ToggleContent.vue";
 import PageExampleKnobsButton from "../ExampleKnobs/PageExampleKnobsButton.vue";
 import PageSelectField from "../Field/PageSelectField.vue";
 import { OWN_FRAMEWORK } from "../FrameworkMenu/FrameworkMenu.const";
 import PageProp from "../Prop/Prop.vue";
+import { appliedTheme, revealTheme } from "../Theme/ThemeVue.const";
 import type { PageNavSettingsProps, PlaygroundTheme, ViewportAnchor } from "./NavSettingsVue.types";
 import PageNavSettingsChoice from "./PageNavSettingsChoice.vue";
 
@@ -30,29 +25,16 @@ const computeViewportAnchorLabel = (anchor: ViewportAnchor) =>
 const computeThemeLabel = (theme: PlaygroundTheme) =>
     THEME_OPTIONS.find((option) => option.value === theme)?.label ?? theme;
 
-const findAppliedTheme = () =>
-    THEME_OPTIONS.find((option) => document.documentElement.classList.contains(PLAYGROUND_THEMES[option.value]))
-        ?.value ?? OWN_FRAMEWORK;
-
-const applyTheme = (theme: PlaygroundTheme) => {
-    document.documentElement.classList.remove(...Object.values(PLAYGROUND_THEMES));
-    document.documentElement.classList.add(PLAYGROUND_THEMES[theme]);
-};
-
 const props = defineProps<PageNavSettingsProps>();
 
 const showsDescriptionOnly = useModel(props, "showsDescriptionOnly");
 const pageView = useModel(props, "pageView");
 const viewportAnchor = useModel(props, "viewportAnchor");
 
-const theme = ref<PlaygroundTheme>(findAppliedTheme());
-
 const prefersReducedMotion = MediaQueryMonitorVueUtils.useReducedMotion();
 
 const pickTheme = (nextTheme: PlaygroundTheme) => {
-    theme.value = nextTheme;
-
-    void ShapeRevealUtils.reveal(() => applyTheme(nextTheme), {
+    void revealTheme(nextTheme, {
         origin: document.getElementById(THEME_FIELD_ID) ?? SHAPE_REVEAL_DEFAULTS.origin,
         durationMs: prefersReducedMotion.value ? NO_MOTION_DURATION_MS : SHAPE_REVEAL_DEFAULTS.durationMs,
     });
@@ -115,7 +97,7 @@ const setViewportAnchor = (anchor: ViewportAnchor) => {
             >
                 <PageSelectField
                     :id="THEME_FIELD_ID"
-                    :value="theme"
+                    :value="appliedTheme"
                     :values="THEME_OPTIONS.map((option) => option.value)"
                     :compute-label="computeThemeLabel"
                     ariaLabel="Theme"

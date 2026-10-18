@@ -1,11 +1,10 @@
-import { For, createSignal } from "solid-js";
+import { For } from "solid-js";
 
 import {
     MediaQueryMonitorSolidUtils,
     Radio,
     RadioGroup,
     SHAPE_REVEAL_DEFAULTS,
-    ShapeRevealUtils,
     Toggle,
 } from "@thewaver/ss-components-solid";
 import {
@@ -15,7 +14,6 @@ import {
     VIEWPORT_ANCHOR_OPTIONS,
 } from "@thewaver/ss-playground/App/PageComponents/NavSettings/NavSettings.const";
 import { NO_MOTION_DURATION_MS } from "@thewaver/ss-playground/App/PageComponents/NavSettings/NavSettings.const";
-import { PLAYGROUND_THEMES } from "@thewaver/ss-playground/App/Theme.css";
 
 import {
     PageRadioSegmentContent,
@@ -27,6 +25,7 @@ import { PageExampleKnobsButton } from "../ExampleKnobs/ExampleKnobs";
 import { PageSelectField } from "../Field/Field";
 import { OWN_FRAMEWORK } from "../FrameworkMenu/FrameworkMenu.const";
 import { PageProp } from "../Prop/Prop";
+import { getAppliedTheme, revealTheme } from "../Theme/ThemeSolid.const";
 import type {
     PageNavSettingsChoiceProps,
     PageNavSettingsProps,
@@ -39,15 +38,6 @@ const computeViewportAnchorLabel = (anchor: ViewportAnchor) =>
 
 const computeThemeLabel = (theme: PlaygroundTheme) =>
     THEME_OPTIONS.find((option) => option.value === theme)?.label ?? theme;
-
-const findAppliedTheme = () =>
-    THEME_OPTIONS.find((option) => document.documentElement.classList.contains(PLAYGROUND_THEMES[option.value]))
-        ?.value ?? OWN_FRAMEWORK;
-
-const applyTheme = (theme: PlaygroundTheme) => {
-    document.documentElement.classList.remove(...Object.values(PLAYGROUND_THEMES));
-    document.documentElement.classList.add(PLAYGROUND_THEMES[theme]);
-};
 
 const PageNavSettingsChoice = <T,>(props: PageNavSettingsChoiceProps<T>) => (
     <PageRadioSegmentGroup>
@@ -79,14 +69,10 @@ const PageNavSettingsChoice = <T,>(props: PageNavSettingsChoiceProps<T>) => (
 );
 
 export const PageNavSettings = (props: PageNavSettingsProps) => {
-    const [getTheme, setTheme] = createSignal(findAppliedTheme());
-
     const getPrefersReducedMotion = MediaQueryMonitorSolidUtils.createReducedMotion();
 
     const pickTheme = (theme: PlaygroundTheme) => {
-        setTheme(theme);
-
-        void ShapeRevealUtils.reveal(() => applyTheme(theme), {
+        void revealTheme(theme, {
             origin: document.getElementById(THEME_FIELD_ID) ?? SHAPE_REVEAL_DEFAULTS.origin,
             durationMs: getPrefersReducedMotion() ? NO_MOTION_DURATION_MS : SHAPE_REVEAL_DEFAULTS.durationMs,
         });
@@ -153,7 +139,7 @@ export const PageNavSettings = (props: PageNavSettingsProps) => {
                     >
                         <PageSelectField
                             id={THEME_FIELD_ID}
-                            value={getTheme}
+                            value={getAppliedTheme}
                             values={THEME_OPTIONS.map((option) => option.value)}
                             computeLabel={computeThemeLabel}
                             ariaLabel={"Theme"}

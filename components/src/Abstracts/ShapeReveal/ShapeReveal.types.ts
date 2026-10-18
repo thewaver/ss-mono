@@ -9,7 +9,7 @@ export type ShapeRevealOpts = {
     durationMs?: number;
     easing?: string;
     computePoints?: (size: Size2d) => Point2d[];
-    blur?: number;
+    softness?: number;
 };
 
 export type ShapeRevealChange = () => unknown;

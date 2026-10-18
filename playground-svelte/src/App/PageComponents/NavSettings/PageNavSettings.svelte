@@ -1,17 +1,12 @@
 <script lang="ts">
-    import {
-        MediaQueryMonitorSvelteUtils,
-        SHAPE_REVEAL_DEFAULTS,
-        ShapeRevealUtils,
-        Toggle,
-    } from "@thewaver/ss-components-svelte";
-    import { PLAYGROUND_THEMES } from "@thewaver/ss-playground/App/Theme.css";
+    import { MediaQueryMonitorSvelteUtils, SHAPE_REVEAL_DEFAULTS, Toggle } from "@thewaver/ss-components-svelte";
 
     import PageToggleContent from "../../StyledComponents/ToggleContent/ToggleContent.svelte";
     import PageExampleKnobsButton from "../ExampleKnobs/PageExampleKnobsButton.svelte";
     import PageSelectField from "../Field/PageSelectField.svelte";
     import { OWN_FRAMEWORK } from "../FrameworkMenu/FrameworkMenu.const";
     import PageProp from "../Prop/Prop.svelte";
+    import { getAppliedTheme, revealTheme } from "../Theme/ThemeSvelte.const.svelte";
     import { PAGE_VIEW_OPTIONS, THEME_FIELD_ID, THEME_OPTIONS, VIEWPORT_ANCHOR_OPTIONS } from "@thewaver/ss-playground/App/PageComponents/NavSettings/NavSettings.const";
     import type { PageNavSettingsProps, PlaygroundTheme, ViewportAnchor } from "./NavSettingsSvelte.types";
     import PageNavSettingsChoice from "./PageNavSettingsChoice.svelte";
@@ -23,29 +18,16 @@
     const computeThemeLabel = (theme: PlaygroundTheme) =>
         THEME_OPTIONS.find((option) => option.value === theme)?.label ?? theme;
 
-    const findAppliedTheme = () =>
-        THEME_OPTIONS.find((option) => document.documentElement.classList.contains(PLAYGROUND_THEMES[option.value]))
-            ?.value ?? OWN_FRAMEWORK;
-
-    const applyTheme = (theme: PlaygroundTheme) => {
-        document.documentElement.classList.remove(...Object.values(PLAYGROUND_THEMES));
-        document.documentElement.classList.add(PLAYGROUND_THEMES[theme]);
-    };
-
     let {
         showsDescriptionOnly = $bindable(),
         pageView = $bindable(),
         viewportAnchor = $bindable(),
     }: PageNavSettingsProps = $props();
 
-    let theme = $state<PlaygroundTheme>(findAppliedTheme());
-
     const getPrefersReducedMotion = MediaQueryMonitorSvelteUtils.createReducedMotion();
 
     const pickTheme = (nextTheme: PlaygroundTheme) => {
-        theme = nextTheme;
-
-        void ShapeRevealUtils.reveal(() => applyTheme(nextTheme), {
+        void revealTheme(nextTheme, {
             origin: document.getElementById(THEME_FIELD_ID) ?? SHAPE_REVEAL_DEFAULTS.origin,
             durationMs: getPrefersReducedMotion() ? NO_MOTION_DURATION_MS : SHAPE_REVEAL_DEFAULTS.durationMs,
         });
@@ -102,7 +84,7 @@
     >
         <PageSelectField
             id={THEME_FIELD_ID}
-            value={theme}
+            value={getAppliedTheme()}
             values={THEME_OPTIONS.map((option) => option.value)}
             computeLabel={computeThemeLabel}
             ariaLabel={"Theme"}

@@ -140,7 +140,7 @@ const examples: ExampleDefs[] = [
                 :max="RevealKnobs.MAX_SOFTNESS"
                 :step="RevealKnobs.SOFTNESS_STEP"
                 :width="FIELD_WIDTH"
-                ariaLabel="Clear fraction"
+                ariaLabel="Softness"
                 @input="(value: number) => (softness = value)"
             />
         </PageProp>

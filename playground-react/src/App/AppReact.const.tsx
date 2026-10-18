@@ -149,6 +149,7 @@ const SegmentedInputPage = lazyPage(
 );
 const SelectPage = lazyPage(() => import("./Pages/SelectPage/SelectPage"), "SelectPage");
 const ShapePage = lazyPage(() => import("./Pages/ShapePage/ShapePage"), "ShapePage");
+const ShapeRevealPage = lazyPage(() => import("./Pages/ShapeRevealPage/ShapeRevealPage"), "ShapeRevealPage");
 const SidebarPage = lazyPage(() => import("./Pages/SidebarPage/SidebarPage"), "SidebarPage");
 const SlideButtonPage = lazyPage(() => import("./Pages/SlideButtonPage/SlideButtonPage"), "SlideButtonPage");
 const SortableGridPage = lazyPage(() => import("./Pages/SortableGridPage/SortableGridPage"), "SortableGridPage");
@@ -280,6 +281,7 @@ export const MENU_CONFIGS: MenuBranchConfig[] = [
             },
             {
                 name: "ShapeReveal",
+                component: () => <ShapeRevealPage />,
             },
             {
                 name: "SignalMirror",

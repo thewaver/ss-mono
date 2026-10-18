@@ -104,7 +104,7 @@ describe("computeClearedRatio", () => {
 
 describe("computeBlurDeviation", () => {
     it("is nothing at all when the edge is asked to be perfectly hard", () => {
-        expect(ScratchCardUtils.computeBlurDeviation(30, 1)).toBe(0);
+        expect(ScratchCardUtils.computeBlurDeviation(30, 0)).toBe(0);
     });
 
     it("grows with the brush, so the same softness looks the same at any size", () => {

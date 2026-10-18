@@ -76,7 +76,7 @@ export namespace ScratchCardUtils {
      * @param softness `0` for a hard edge, `1` for as soft as the brush is wide.
      * @returns The blur's standard deviation.
      */
-    export const computeBlurDeviation = (radius: number, softness: number) => ((1 - softness) * radius) / BLUR_SPREAD;
+    export const computeBlurDeviation = (radius: number, softness: number) => (softness * radius) / BLUR_SPREAD;
 
     /**
      * One brush stamp as an SVG path.

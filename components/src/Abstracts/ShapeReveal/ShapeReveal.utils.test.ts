@@ -138,11 +138,28 @@ describe("the frames", () => {
 
     it("use a clip for a hard edge and a mask for a soft one, holding the new page opaque and unblended", () => {
         const hard = ShapeRevealUtils.computeKeyframes(origin, VIEWPORT, SQUARE, 0);
-        const soft = ShapeRevealUtils.computeKeyframes(origin, VIEWPORT, SQUARE, 8);
+        const soft = ShapeRevealUtils.computeKeyframes(origin, VIEWPORT, SQUARE, 0.5);
 
         expect(hard.every((frame) => frame.clipPath !== undefined && frame.maskImage === undefined)).toBe(true);
         expect(soft.every((frame) => frame.maskImage !== undefined && frame.clipPath === undefined)).toBe(true);
         expect([...hard, ...soft].every((frame) => frame.opacity === 1 && frame.mixBlendMode === "normal")).toBe(true);
+    });
+
+    it("scale a soft edge with the distance the shape grows, so the same softness looks the same on any window", () => {
+        const computeBlur = (size: Size2d) => {
+            const [, to] = ShapeRevealUtils.computeKeyframes(
+                { x: size.width * 0.5, y: size.height * 0.5 },
+                size,
+                undefined,
+                0.5,
+            );
+
+            return parseFloat(decodeURIComponent(String(to.maskImage)).match(/blur\(([\d.]+)px\)/)![1]);
+        };
+
+        expect(computeBlur({ width: VIEWPORT.width * 2, height: VIEWPORT.height * 2 })).toBeCloseTo(
+            computeBlur(VIEWPORT) * 2,
+        );
     });
 
     it("fall back to a circle for a contour it cannot use", () => {

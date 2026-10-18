@@ -100,6 +100,7 @@ const ScrollerPage = () => import("./Pages/ScrollerPage/ScrollerPage.svelte");
 const SegmentedInputPage = () => import("./Pages/SegmentedInputPage/SegmentedInputPage.svelte");
 const SelectPage = () => import("./Pages/SelectPage/SelectPage.svelte");
 const ShapePage = () => import("./Pages/ShapePage/ShapePage.svelte");
+const ShapeRevealPage = () => import("./Pages/ShapeRevealPage/ShapeRevealPage.svelte");
 const SidebarPage = () => import("./Pages/SidebarPage/SidebarPage.svelte");
 const SlideButtonPage = () => import("./Pages/SlideButtonPage/SlideButtonPage.svelte");
 const SortableGridPage = () => import("./Pages/SortableGridPage/SortableGridPage.svelte");
@@ -213,6 +214,7 @@ export const MENU_CONFIGS: MenuBranchConfig[] = [
             },
             {
                 name: "ShapeReveal",
+                component: ShapeRevealPage,
             },
             {
                 name: "SignalMirror",

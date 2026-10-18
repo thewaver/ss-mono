@@ -150,7 +150,7 @@
     <PageProp
         itemKey={"softness"}
         label={"Softness"}
-        hint={"How gradually the lens's edge fades into the content around it. 1 gives a hard edge."}
+        hint={"How gradually the lens's edge fades into the content around it. 0 gives a hard edge."}
     >
         <PageNumberField
             value={softness}

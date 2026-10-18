@@ -160,7 +160,7 @@
             max={RevealKnobs.MAX_SOFTNESS}
             step={RevealKnobs.SOFTNESS_STEP}
             width={FIELD_WIDTH}
-            ariaLabel={"Clear fraction"}
+            ariaLabel={"Softness"}
             onInput={(value) => (softness = value)}
         />
     </PageProp>

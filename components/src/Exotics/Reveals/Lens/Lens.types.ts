@@ -32,7 +32,7 @@ export type BaseLensValues = {
     joinRadii?: number[];
     /** How square or how pinched the lens's rounded corners are. */
     lameExponents?: number[];
-    /** How gradually the lens's edge fades into the content around it. `1` gives a hard edge. */
+    /** How gradually the lens's edge fades into the content around it. `0` gives a hard edge. */
     softness?: number;
     /**
      * How far one press of an arrow key moves the lens, in pixels.
