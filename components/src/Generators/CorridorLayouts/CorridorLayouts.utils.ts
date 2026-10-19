@@ -17,6 +17,8 @@ const SEED_STRIDE = 977;
 const DRAW_STRIDE = 7;
 const SKIP_DRAW = 1;
 const SLOTS_PER_CARD_LENGTH = 2;
+const HALF_CARD_SLOTS = SLOTS_PER_CARD_LENGTH * HALF;
+const LEFT_WALL = -1;
 const LEFT_SIDE = 1;
 const RIGHT_SIDE = -1;
 const CORNER_SHARE = 0.25;
@@ -52,7 +54,7 @@ const rotateAbout = (point: Point3d, center: Point3d, axis: Point3d, radians: nu
 };
 
 /** Which wall a slot is on: even slots on the left, odd ones on the right, so the walls take turns. */
-const toSide = (slot: number) => (slot % 2 === 0 ? -WHOLE : WHOLE);
+const toSide = (slot: number) => (slot % 2 === 0 ? LEFT_WALL : WHOLE);
 
 /** Fades an item in as it comes into reach at the far end, and out as it passes the viewer. */
 const toOpacity = (distance: number, visibleDistance: number) =>
@@ -126,24 +128,38 @@ const createSlots = (minSkipCount: number, maxSkipCount: number, seed: number) =
 };
 
 /**
- * How far the wall stands from the corridor's middle at a distance, in the space the item is moved in.
+ * How far a wall leans in towards the corridor's middle as it runs away from the viewer.
  *
- * The width is set as it looks on screen: at the box's own edge level with the viewer, closing evenly to the far width
- * at the end of what is drawn. The perspective shrinks everything by `perspectivePx / (perspectivePx - z)` at depth
- * `z`, so the on-screen width is grown by the reverse of that to find where the wall has to stand to look that wide.
+ * The wall is flat, so its edges are straight lines on screen. It stands at the box's own edge level with the viewer
+ * and leans so that the innermost point drawn at the far end, `farAlong` down the wall and `farInset` in from it, looks
+ * `farWidthRatio` of the box from the same point on the other wall. The perspective shrinks everything by
+ * `perspectivePx / (perspectivePx - z)` at depth `z`; with the wall leaning by `lean`, that point stands
+ * `nearHalfWidth - farAlong * sin(lean) - farInset * cos(lean)` from the middle at depth
+ * `-farAlong * cos(lean) + farInset * sin(lean)`, and setting it on screen to the far width leaves one sum of `sin(lean)`
+ * and `cos(lean)` equal to a fixed number, solved here. A far width too narrow to reach turns the wall as far across as
+ * it can go.
+ *
+ * @returns The lean in radians, below `0` leaning outwards.
  */
-const toHalfWidth = (
+const toWallLean = (
     boxWidth: number,
     farWidthRatio: number,
-    distance: number,
-    visibleDistance: number,
-    depth: number,
+    farAlong: number,
+    farInset: number,
     perspectivePx: number,
-) =>
-    boxWidth *
-    HALF *
-    MathUtils.lerp(WHOLE, farWidthRatio, MathUtils.clamp01(distance / visibleDistance)) *
-    ((perspectivePx - depth) / perspectivePx);
+) => {
+    const nearHalfWidth = boxWidth * HALF;
+    const farHalfWidth = nearHalfWidth * farWidthRatio;
+    const alongShare = farAlong * perspectivePx - farInset * farHalfWidth;
+    const insetShare = farInset * perspectivePx + farAlong * farHalfWidth;
+    const reach = Math.hypot(alongShare, insetShare);
+
+    if (reach <= 0) return 0;
+
+    const share = (nearHalfWidth * perspectivePx * (WHOLE - farWidthRatio)) / reach;
+
+    return Math.asin(MathUtils.clamp(share, -WHOLE, WHOLE)) - Math.atan2(insetShare, alongShare);
+};
 
 /**
  * How far down a wall an item stands when the items' angle changes along it.
@@ -169,11 +185,25 @@ const toPackedLength = (distance: number, nearRadians: number, farRadians: numbe
 };
 
 /**
- * Where an item stands against its wall: its middle pulled in from the wall by half the width it takes up across the
- * corridor, so its outer edge touches the wall whatever its turn.
+ * Where an item stands against its wall: `along` down the wall, its middle pulled in from the wall by half the width it
+ * takes up across it, so its outer edge touches the wall whatever its turn.
  */
-const toWallX = (side: number, halfWidth: number, itemWidth: number, radians: number) =>
-    side * (halfWidth - itemWidth * HALF * Math.cos(radians));
+const toWallOffset = (
+    side: number,
+    nearHalfWidth: number,
+    along: number,
+    lean: number,
+    itemWidth: number,
+    radians: number,
+) => {
+    const inset = itemWidth * HALF * Math.cos(radians);
+
+    return {
+        x: side * (nearHalfWidth - along * Math.sin(lean) - inset * Math.cos(lean)),
+        y: 0,
+        z: -along * Math.cos(lean) + inset * Math.sin(lean),
+    };
+};
 
 /**
  * The layouts this library ships for `InfiniteCorridor`, as factories a consumer can tune or take as they are.
@@ -195,10 +225,14 @@ export namespace CorridorLayoutUtils {
      *
      * @param defs `minSkipCount` and `maxSkipCount`, the fewest and most empty slots after an item; `seed`, which of the
      * many drawings of the gaps this is; `heightRatio`, how tall an item is as a share of the box; `aspectRatio`, its
-     * width over its height; `farWidthRatio`, how wide the corridor looks at the far end as a share of the box, its near
-     * end always standing at the box's edges, so `1` keeps the walls there all the way and `0` brings them together;
-     * `nearAngleDegrees` and `farAngleDegrees`, how far each item turns from facing the viewer level with the viewer
-     * and at the end of what is drawn, turning evenly between; `perspectivePx`, how far away the viewer sits;
+     * width over its height; `farWidthRatio`, how far apart the innermost edges of the last items drawn look as a share
+     * of the box, measured where the last fading item ends, so nothing drawn at the far end comes closer to the middle,
+     * the near end always standing at the box's edges, so `1` keeps the walls there all the way and `0` brings them
+     * together; `nearAngleDegrees` and `farAngleDegrees`, how far each item turns from standing square across its wall,
+     * level with the viewer and at the end of what is drawn, turning evenly between, so `90` lays it flat along the
+     * wall; `staggerRatio`, how far each item on the right wall stands down from the slot before it, `1` half an item
+     * further so the walls take turns and `0` level with it so items on both walls stand side by side; `perspectivePx`,
+     * how far away the viewer sits;
      * `visibleCards`, how many card lengths each wall runs from the nearest to the farthest before items fade, empty
      * slots included; `focusDistance`, how many slots down a focused item is brought.
      * @returns The layout, ready to hand to `layout`.
@@ -215,6 +249,7 @@ export namespace CorridorLayoutUtils {
         const farWidthRatio = defs?.farWidthRatio ?? base.farWidthRatio;
         const nearAngleDegrees = defs?.nearAngleDegrees ?? base.nearAngleDegrees;
         const farAngleDegrees = defs?.farAngleDegrees ?? base.farAngleDegrees;
+        const staggerRatio = defs?.staggerRatio ?? base.staggerRatio;
         const perspectivePx = defs?.perspectivePx ?? base.perspectivePx;
         const visibleDistance = (defs?.visibleCards ?? base.visibleCards) * SLOTS_PER_CARD_LENGTH;
         const nearRadians = toRadians(nearAngleDegrees);
@@ -225,30 +260,36 @@ export namespace CorridorLayoutUtils {
             focusDistance: (defs?.focusDistance ?? base.focusDistance) / slots.meanStride,
             place: ({ distance, place, placeCount, count, size }) => {
                 const slot = slots.getSlot(place, count, placeCount);
-                const slotDistance = slot - slots.getSlot(place - distance, count, placeCount);
+                const side = toSide(Math.round(slot));
+                const slotDistance =
+                    slot -
+                    slots.getSlot(place - distance, count, placeCount) -
+                    (side === LEFT_WALL ? 0 : (WHOLE - staggerRatio) * HALF_CARD_SLOTS);
                 const height = size.height * heightRatio;
                 const width = height * aspectRatio;
-                const side = toSide(Math.round(slot));
                 const angleDegrees = MathUtils.lerp(
                     nearAngleDegrees,
                     farAngleDegrees,
                     MathUtils.clamp01(slotDistance / visibleDistance),
                 );
                 const radians = toRadians(angleDegrees);
-                const depth = -toPackedLength(slotDistance, nearRadians, farRadians, visibleDistance) * HALF * width;
-                const halfWidth = toHalfWidth(
+                const along = toPackedLength(slotDistance, nearRadians, farRadians, visibleDistance) * HALF * width;
+                const farAlong =
+                    toPackedLength(visibleDistance + SLOTS_PER_CARD_LENGTH, nearRadians, farRadians, visibleDistance) *
+                    HALF *
+                    width;
+                const lean = toWallLean(
                     size.width,
                     farWidthRatio,
-                    slotDistance,
-                    visibleDistance,
-                    depth,
+                    farAlong,
+                    width * Math.cos(farRadians),
                     perspectivePx,
                 );
 
                 return {
                     size: { width, height },
-                    offset: { x: toWallX(side, halfWidth, width, radians), y: 0, z: depth },
-                    turnDegrees: -side * angleDegrees,
+                    offset: toWallOffset(side, size.width * HALF, along, lean, width, radians),
+                    turnDegrees: -side * (angleDegrees - (lean * HALF_TURN_DEGREES) / Math.PI),
                     perspectivePx,
                     opacity: toOpacity(slotDistance, visibleDistance),
                 };

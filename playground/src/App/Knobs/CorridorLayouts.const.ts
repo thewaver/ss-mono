@@ -7,7 +7,7 @@ export namespace CorridorLayoutKnobs {
         nearAngleDegrees: {
             kind: "number",
             label: "Near angle (°)",
-            hint: "How far the items level with the viewer turn away from facing it. 90 lays them flat against their wall, like a maze seen from inside; lower turns them towards the viewer, and the items close up into two angled stacks.",
+            hint: "How far the items level with the viewer turn from standing square across their wall. 90 lays them flat along it, like a maze seen from inside; lower turns them out from the wall, and the items close up into two angled stacks.",
             controls: "Sets WallsLayoutDefs.nearAngleDegrees",
             min: 10,
             max: 90,
@@ -16,7 +16,7 @@ export namespace CorridorLayoutKnobs {
         farAngleDegrees: {
             kind: "number",
             label: "Far angle (°)",
-            hint: "How far the items at the end of what is drawn turn away from facing the viewer. The angle turns evenly from the near one to this, and the spacing follows it, so items still meet edge to edge.",
+            hint: "How far the items at the end of what is drawn turn from standing square across their wall. The angle turns evenly from the near one to this, and the spacing follows it, so items still meet edge to edge.",
             controls: "Sets WallsLayoutDefs.farAngleDegrees",
             min: 10,
             max: 90,
@@ -34,11 +34,17 @@ export namespace CorridorLayoutKnobs {
         farWidthRatio: {
             kind: "number",
             label: "Far width",
-            hint: "How wide the corridor looks at its far end, as a share of the box width. Level with the viewer the walls always stand at the box edges: 1 keeps them there all the way down, 0 brings them together.",
+            hint: "How wide a gap the corridor leaves between its walls at the far end, as a share of the box width: nothing drawn there comes closer to the middle. Level with the viewer the walls always stand at the box edges: 1 keeps them there all the way down, 0 brings them together.",
             controls: "Sets WallsLayoutDefs.farWidthRatio",
             min: 0,
             max: 1,
             step: 0.05,
+        },
+        staggerRatio: {
+            kind: "check",
+            label: "Staggered",
+            hint: "Stands each item on the right wall half an item further down than the left one before it, so the walls take turns. Off, the items on both walls stand side by side. With every item on one wall it changes nothing.",
+            controls: "Sets WallsLayoutDefs.staggerRatio to 1 when on and 0 when off",
         },
         minSkipCount: {
             kind: "number",

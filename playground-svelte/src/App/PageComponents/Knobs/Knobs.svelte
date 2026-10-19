@@ -1,4 +1,6 @@
 <script lang="ts">
+    import { toCheckValue } from "@thewaver/ss-playground/App/PageComponents/Knobs/Knobs.utils";
+
     import PageCheckField from "../Field/PageCheckField.svelte";
     import PageNumberField from "../Field/PageNumberField.svelte";
     import PageProp from "../Prop/Prop.svelte";
@@ -30,7 +32,7 @@
                 value={Boolean(getValue(key))}
                 resetValue={Boolean(props.defaults[key])}
                 ariaLabel={knob.label}
-                onChange={(value) => props.onInput(key, value)}
+                onChange={(value) => props.onInput(key, toCheckValue(props.defaults[key], value))}
             />
         {/if}
     </PageProp>

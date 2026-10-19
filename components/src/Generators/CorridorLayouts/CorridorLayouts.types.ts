@@ -7,6 +7,7 @@ export type WallsLayoutDefs = {
     farWidthRatio?: number;
     nearAngleDegrees?: number;
     farAngleDegrees?: number;
+    staggerRatio?: number;
     perspectivePx?: number;
     visibleCards?: number;
     focusDistance?: number;

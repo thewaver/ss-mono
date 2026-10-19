@@ -94,15 +94,78 @@ describe("walls", () => {
         const near = turnedAt(walls, 0, 0);
         const next = turnedAt(walls, 2, 2);
 
-        expect(near.offset.z - next.offset.z).toBeCloseTo(near.size.width * Math.sin(Math.PI / 3), 6);
+        expect(Math.hypot(near.offset.x - next.offset.x, near.offset.z - next.offset.z)).toBeCloseTo(
+            near.size.width * Math.sin(Math.PI / 3),
+            6,
+        );
+    });
+
+    it("lays items flat along a narrowing wall at a right angle, each one starting where the last one ends", () => {
+        const walls = CorridorLayoutUtils.createWalls({ nearAngleDegrees: 90, farAngleDegrees: 90 });
+        const edge = (placement: ReturnType<typeof turnedAt>, end: number) => {
+            const radians = (placement.turnDegrees * Math.PI) / 180;
+            const reach = placement.size.width * 0.5 * end;
+
+            return {
+                x: placement.offset.x + reach * Math.cos(radians),
+                z: placement.offset.z - reach * Math.sin(radians),
+            };
+        };
+        const near = turnedAt(walls, 2, 2);
+        const next = turnedAt(walls, 4, 4);
+
+        expect(edge(near, 1).x).toBeCloseTo(edge(next, -1).x, 6);
+        expect(edge(near, 1).z).toBeCloseTo(edge(next, -1).z, 6);
+        expect(next.offset.x).toBeGreaterThan(near.offset.x);
+    });
+
+    it("keeps everything it draws at the far end at least the far width apart", () => {
+        const farWidthRatio = 0.1;
+        const perspectivePx = 900;
+
+        for (const angle of [90, 60, 30]) {
+            const walls = CorridorLayoutUtils.createWalls({
+                farWidthRatio,
+                perspectivePx,
+                nearAngleDegrees: angle,
+                farAngleDegrees: angle,
+            });
+            let closest = Infinity;
+
+            for (let distance = 0; distance < 20; distance += 0.05) {
+                const placement = turnedAt(walls, distance, 4);
+
+                if (placement.opacity <= 0) continue;
+
+                const radians = (placement.turnDegrees * Math.PI) / 180;
+
+                for (const end of [-1, 1]) {
+                    const reach = placement.size.width * 0.5 * end;
+                    const x = placement.offset.x + reach * Math.cos(radians);
+                    const z = placement.offset.z - reach * Math.sin(radians);
+
+                    closest = Math.min(closest, Math.abs((x * perspectivePx) / (perspectivePx - z)));
+                }
+            }
+
+            expect(closest).toBeGreaterThanOrEqual(BASE.size.width * 0.5 * farWidthRatio - 1e-6);
+        }
+    });
+
+    it("stands the right wall's items level with the left's when not staggered, and half an item behind when it is", () => {
+        const level = CorridorLayoutUtils.createWalls({ staggerRatio: 0 });
+        const staggered = CorridorLayoutUtils.createWalls({ staggerRatio: 1 });
+
+        expect(turnedAt(level, 1, 1).offset.z).toBeCloseTo(turnedAt(level, 0, 0).offset.z, 6);
+        expect(turnedAt(level, 1, 1).offset.x).toBeCloseTo(-turnedAt(level, 0, 0).offset.x, 6);
+        expect(turnedAt(staggered, 1, 1).offset.z).toBeLessThan(turnedAt(staggered, 0, 0).offset.z);
     });
 
     it("turns its items from the near angle to the far one, still going deeper all the way", () => {
         const walls = CorridorLayoutUtils.createWalls({ nearAngleDegrees: 90, farAngleDegrees: 30, visibleCards: 4 });
         const depths = [0, 2, 4, 6, 8, 10].map((distance) => turnedAt(walls, distance, distance).offset.z);
 
-        expect(Math.abs(turnedAt(walls, 0, 0).turnDegrees)).toBe(90);
-        expect(Math.abs(turnedAt(walls, 8, 8).turnDegrees)).toBe(30);
+        expect(turnedAt(walls, 0, 0).turnDegrees - turnedAt(walls, 8, 8).turnDegrees).toBeCloseTo(60, 6);
         depths.slice(1).forEach((depth, index) => expect(depth).toBeLessThan(depths[index]));
     });
 });

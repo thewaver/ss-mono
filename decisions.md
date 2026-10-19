@@ -13044,6 +13044,12 @@ pulls labels and step sizes to call a function that never reads them. **The voca
 kinds**, because two are what the three registries need; it grows when a family needs a select or a color,
 and an unused kind would be dead API.
 
+**A check knob may sit over a number, and then writes `1` when on and `0` when off.** The user's call, with the
+walls' `staggerRatio`: the library takes a ratio so a consumer can stop anywhere between, and the Playground shows
+only its two ends. `KnobFor<number>` therefore admits a `CheckKnob` beside a `NumberKnob`, and every framework's
+`PageKnobs` writes through `toCheckValue`, which answers a number wherever the default is one. A value between the
+ends reads as on.
+
 **Defaults stayed with the family, which is what kills the drift.** `BAND_DEFAULTS`, `ARC_DEFAULTS` and
 their neighbors are exported from the layout factories, and the scanline registry's eight
 `DEFAULT_…_OPTS` moved inside its namespace. The Playground's generic panel seeds from those, so a number
@@ -14506,9 +14512,32 @@ user, to be rethought differently later; nothing else depended on it. **The wall
 look at the end of what is drawn**, the two joined evenly in between; the user's correction of a first build whose one
 width moved both ends together, so a narrow corridor pulled the near rooms in from the edges instead of tapering. **The
 width is as it looks on screen, not as it stands in depth**: the second build set the far width in depth, the
-perspective shrank it again, `1` did not keep the walls at the edges and the walls met near `0.15`. Each item's wall
-position is now grown by the reverse of the perspective at its own depth, so `1` keeps the walls at the box's edges
-all the way down — where the rooms further back stand directly behind the nearest ones — and `0` brings them together. Every
+perspective shrank it again, `1` did not keep the walls at the edges and the walls met near `0.15`. The far end's
+position is grown by the reverse of the perspective at the far end's depth, so `1` keeps the walls at the box's edges
+all the way down — where the rooms further back stand directly behind the nearest ones — and `0` brings them together.
+**Each wall is flat, leaning in from the box's edge so it looks the far width apart at the far end.** The user's
+correction of a build that joined the two evenly in distance and grew each item by the reverse of the perspective at
+its own depth: that bent the wall into a curve, and on screen its top and bottom edges drew a rounded taper. A flat
+wall's edges are straight lines on screen. The lean is solved in closed form from the far width and the wall's length,
+and a far width too narrow to reach in that length turns the wall as far across as it can go. **The far width is the
+gap the last items leave between them, measured at the innermost point anything at the far end is drawn**: the inner
+edge of the last item, where it has finished fading. The user read the setting as a share of the box kept clear, and
+the first flat build measured it at the middle of the last fully drawn item, so that item's far half and the fading
+one beyond it came within a few pixels of meeting at `0.1`. Measuring it where the fading item ends keeps the drawn
+length as it was, rather than finishing the fade earlier. Where the corridor narrows that point is the closest anything
+comes to the middle; where it barely narrows, an angled item near the viewer sticks in further, since it stands at the
+box's edge and reaches in by its own turn. At `1` the wall runs
+through the viewer's eye and is seen edge-on, so items lying flat on it vanish, which no arrangement can avoid.
+**Items are packed along the wall and their angle is measured from it**, so at `90` each lies flat along the wall and
+starts exactly where the one before it ends. The first build kept every item pointing straight down the corridor and
+placed only its middle on the wall, so where the wall narrowed each item's ends stood off it and neighbors stepped in
+and out by tens of pixels; pinning each item's corners, as the tube does, was weighed and set aside, since a turned
+item is drawn exactly once the wall is flat. The cost is that at a low angle the stacks lean with the wall rather than
+facing straight down the corridor. **`staggerRatio` says how far the right wall's items stand behind the left's**:
+`1`, the default, half an item further down than the slot before, so the walls take turns; `0` level with it, so the
+two walls stand side by side. Asked for by the user as a switch, then taken as a ratio in the library with the
+Playground showing it as a switch. Only the right wall moves, by a fixed share of a slot, so the corridor still moves
+smoothly, and with every item on one wall it changes nothing. Every
 item's box is centered on the corridor's middle before it is moved, so the per-item perspective
 gives the whole corridor one vanishing point, the way the carousel's slides share theirs.
 

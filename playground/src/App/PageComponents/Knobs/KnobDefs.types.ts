@@ -17,6 +17,6 @@ export type CheckKnob = {
 
 export type Knob = NumberKnob | CheckKnob;
 
-export type KnobFor<T> = T extends number ? NumberKnob : T extends boolean ? CheckKnob : never;
+export type KnobFor<T> = T extends number ? NumberKnob | CheckKnob : T extends boolean ? CheckKnob : never;
 
 export type Knobs<T> = { [K in keyof T]?: KnobFor<NonNullable<T[K]>> };

@@ -171,6 +171,30 @@ test("the clock walks the corridor until it is paused", async ({ page }) => {
 });
 
 /**
+ * Staggered is a switch in the Playground over a number in the library, so what is asked is only that the switch
+ * reaches the corridor: turning it off moves the items, and turning it back on puts every one where it was. The
+ * scrolled example reads its position back from its box, which can settle a fraction of a pixel away, so "where it
+ * was" allows half a pixel.
+ */
+test("the staggered switch moves the walls and puts them back", async ({ page }) => {
+    const TOLERANCE = 0.5;
+    const numbersOf = async () =>
+        (await transformsOf(page, SCROLLED)).flatMap((transform) => (transform.match(/-?[\d.]+/g) ?? []).map(Number));
+    const furthestFrom = (expected: number[], received: number[]) =>
+        expected.length === received.length
+            ? Math.max(...expected.map((value, index) => Math.abs(value - received[index])))
+            : Infinity;
+    const staggered = page.locator(field("staggerRatio"));
+    const before = await numbersOf();
+
+    await staggered.click();
+    await expect.poll(async () => furthestFrom(before, await numbersOf())).toBeGreaterThan(TOLERANCE);
+
+    await staggered.click();
+    await expect.poll(async () => furthestFrom(before, await numbersOf())).toBeLessThanOrEqual(TOLERANCE);
+});
+
+/**
  * The tube pins each item's four corners instead of turning a centered box, so its items are drawn from their own
  * top-left with a full matrix. Which numbers that matrix holds is not asked: only that tube items are drawn this way
  * and walls items are not.

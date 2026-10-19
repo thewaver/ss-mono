@@ -1,4 +1,6 @@
 <script setup lang="ts">
+import { toCheckValue } from "@thewaver/ss-playground/App/PageComponents/Knobs/Knobs.utils";
+
 import PageCheckField from "../Field/PageCheckField.vue";
 import PageNumberField from "../Field/PageNumberField.vue";
 import PageProp from "../Prop/Prop.vue";
@@ -39,7 +41,7 @@ const getValue = (key: string) => props.values[key] ?? props.defaults[key];
             :value="Boolean(getValue(key))"
             :reset-value="Boolean(defaults[key])"
             :ariaLabel="knob.label"
-            @change="(value: boolean) => props.onInput(key, value)"
+            @change="(value: boolean) => props.onInput(key, toCheckValue(defaults[key], value))"
         />
     </PageProp>
 </template>

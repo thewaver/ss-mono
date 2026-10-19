@@ -34,7 +34,7 @@ export const LIBRARY: TreemapNode<string> = branch(
         leaf("MediaQueryMonitor", 165),
         leaf("Navigator", 326),
         leaf("Overflow", 116),
-        leaf("PanZoom", 804),
+        leaf("PanZoom", 800),
         leaf("Placement", 756),
         leaf("PointerTracker", 326),
         leaf("Proximity", 345),
@@ -129,7 +129,7 @@ export const LIBRARY: TreemapNode<string> = branch(
         leaf("CardStack", 755),
         branch("Charts", leaf("CirclePacking", 931), leaf("Icicle", 605), leaf("Sunburst", 590), leaf("Treemap", 888)),
         leaf("CornerHighlight", 174),
-        branch("Diagrams", leaf("Bracket", 1403), leaf("PatchBoard", 2094), leaf("Timeline", 1580)),
+        branch("Diagrams", leaf("Bracket", 1408), leaf("PatchBoard", 2107), leaf("Timeline", 1583)),
         branch("Mosaics", leaf("ElementMosaic", 79), leaf("ImageMosaic", 212)),
         branch("Particles", leaf("ParticleField", 609), leaf("ParticleSpawner", 625)),
         branch(
@@ -176,7 +176,7 @@ export const LIBRARY: TreemapNode<string> = branch(
         leaf("CellAnimationPlayback", 134),
         leaf("CellAnimationWeights", 616),
         leaf("CellAnimationZones", 129),
-        leaf("CorridorLayouts", 507),
+        leaf("CorridorLayouts", 544),
         leaf("PlacementLayouts", 732),
         leaf("ProximityEffects", 232),
         branch(

@@ -1,3 +1,5 @@
+import { toCheckValue } from "@thewaver/ss-playground/App/PageComponents/Knobs/Knobs.utils";
+
 import { PageCheckField, PageNumberField } from "../Field/Field";
 import { PageProp } from "../Prop/Prop";
 import type { Knob, PageKnobsProps } from "./Knobs.types";
@@ -35,7 +37,7 @@ export const PageKnobs = (props: PageKnobsProps) => {
                             value={Boolean(getValue(key))}
                             resetValue={Boolean(props.defaults[key])}
                             ariaLabel={knob.label}
-                            onChange={(value) => props.onInput(key, value)}
+                            onChange={(value) => props.onInput(key, toCheckValue(props.defaults[key], value))}
                         />
                     )}
                 </PageProp>

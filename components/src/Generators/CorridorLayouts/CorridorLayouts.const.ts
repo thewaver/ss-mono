@@ -10,6 +10,7 @@ export namespace CorridorLayoutDefaults {
         farWidthRatio: 0.2,
         nearAngleDegrees: 75,
         farAngleDegrees: 75,
+        staggerRatio: 1,
         perspectivePx: 900,
         visibleCards: 4,
         focusDistance: 1,
