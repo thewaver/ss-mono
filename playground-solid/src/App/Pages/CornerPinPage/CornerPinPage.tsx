@@ -44,6 +44,7 @@ export const CornerPinPage = () => {
                     hint={
                         "How far past each edge of the box a corner may be taken, as a share of the box. At 0 every corner stays on or inside the box, so the content can only be squeezed; above it, the content can be stretched beyond its own size too."
                     }
+                    controls={"Sets CornerPinProps.reachRatio"}
                 >
                     <PageNumberField
                         value={getReachRatio}

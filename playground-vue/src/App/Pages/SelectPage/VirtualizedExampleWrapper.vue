@@ -27,6 +27,7 @@ const visibility = useModel(props, "visibility");
     <PageExampleKnobs>
         <PageProp
             item-key="stressCount"
+            controls="Sets the number of example options sent to SelectProps.options"
             label="Option count"
             hint="How many options the list holds. Only the ones on screen are rendered, so a very large number should still open instantly."
         >

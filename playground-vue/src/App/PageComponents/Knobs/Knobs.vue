@@ -19,6 +19,7 @@ const getValue = (key: string) => props.values[key] ?? props.defaults[key];
         :item-key="key"
         :label="knob.label"
         :hint="knob.hint"
+        :controls="knob.controls"
         :default-value="defaults[key]"
     >
         <PageNumberField

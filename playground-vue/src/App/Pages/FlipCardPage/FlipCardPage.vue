@@ -46,7 +46,12 @@ const examples: ExampleDefs[] = [
 
 <template>
     <PagePropsPanel scope="global">
-        <PageProp item-key="axis" label="Axis" hint="Which way the card turns over to show its other side.">
+        <PageProp
+            item-key="axis"
+            controls="Sets FlipCardProps.axis"
+            label="Axis"
+            hint="Which way the card turns over to show its other side."
+        >
             <PageSelectField
                 :value="axis"
                 :values="FLIP_CARD_AXES"
@@ -59,6 +64,7 @@ const examples: ExampleDefs[] = [
 
         <PageProp
             item-key="transitionDurationMs"
+            controls="Sets FlipCardProps.transitionDurationMs"
             label="Turn duration (ms)"
             hint="How long one turn from face to face takes."
         >

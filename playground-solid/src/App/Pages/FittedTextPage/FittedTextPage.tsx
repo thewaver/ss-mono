@@ -47,6 +47,7 @@ export const FittedTextPage = () => {
                     hint={
                         "Each line's height as a multiple of its own font size, which is the room the stack is fitted with."
                     }
+                    controls={"Sets FittedTextProps.lineHeightRatio"}
                 >
                     <PageNumberField
                         value={getLineHeightRatio}

@@ -14,7 +14,12 @@ defineProps<WheelsPanelProps>();
 
 <template>
     <PagePropsPanel scope="global">
-        <PageProp item-key="wedgeCount" label="Wedges" hint="How many wedges the wheel is divided into.">
+        <PageProp
+            item-key="wedgeCount"
+            controls="Sets the length of the slice of example prizes sent to WheelProps.wedges"
+            label="Wedges"
+            hint="How many wedges the wheel is divided into."
+        >
             <PageNumberField
                 :value="controls.wedgeCount.value"
                 :min="WheelKnobs.MIN_WEDGE_COUNT"
@@ -28,6 +33,7 @@ defineProps<WheelsPanelProps>();
 
         <PageProp
             item-key="spinDurationMs"
+            controls="Sets WheelProps.spinDurationMs"
             label="Spin duration (ms)"
             hint="How long a spin takes from the moment it is started to the moment it stops."
         >
@@ -44,6 +50,7 @@ defineProps<WheelsPanelProps>();
 
         <PageProp
             item-key="turns"
+            controls="Sets the number of turns in the example's spin, sent to WheelProps.computeSpinDefs"
             label="Turns per spin"
             hint="How many full turns a spin makes before it comes to rest on its wedge."
         >
@@ -60,6 +67,7 @@ defineProps<WheelsPanelProps>();
 
         <PageProp
             item-key="settleDurationMs"
+            controls="Sets WheelProps.settleDurationMs"
             label="Settle duration (ms)"
             hint="How long the wheel takes to ease into its final position once the spin is over."
         >
@@ -76,6 +84,7 @@ defineProps<WheelsPanelProps>();
 
         <PageProp
             item-key="doesResume"
+            controls="Switches WheelProps.restDurationMs between the rest below and never resuming"
             label="Turns again after a spin"
             hint="Lets the wheel start turning by itself again after a spin, instead of standing still."
         >
@@ -88,6 +97,7 @@ defineProps<WheelsPanelProps>();
 
         <PageProp
             item-key="restDurationMs"
+            controls="Sets WheelProps.restDurationMs"
             label="Rest after a spin (ms)"
             hint="How long the wheel stands still after a spin before it resumes. It only applies when it turns again."
         >
@@ -105,6 +115,7 @@ defineProps<WheelsPanelProps>();
 
         <PageProp
             item-key="isIdlingAllowed"
+            controls="Switches WheelProps.idleDelayMs between the delay below and no idling"
             label="Turns by itself"
             hint="Lets the wheel turn slowly on its own while nobody is spinning it."
         >
@@ -117,6 +128,7 @@ defineProps<WheelsPanelProps>();
 
         <PageProp
             item-key="idleDelayMs"
+            controls="Sets WheelProps.idleDelayMs"
             label="Idle step delay (ms)"
             hint="How long the wheel waits between steps of its idle turn. It only applies while idling is on."
         >
@@ -134,6 +146,7 @@ defineProps<WheelsPanelProps>();
 
         <PageProp
             item-key="spinStyleKey"
+            controls="Picks the example's spin curve sent to WheelProps.computeSpinDefs"
             label="Spin style"
             hint="The speed curve a spin follows, which is what makes it feel heavy or snappy."
         >
@@ -148,6 +161,7 @@ defineProps<WheelsPanelProps>();
 
         <PageProp
             item-key="isDisabled"
+            controls="Sets WheelProps.isDisabled"
             label="Disabled"
             hint="Turns the wheel off, so it can neither be spun nor turn by itself."
         >

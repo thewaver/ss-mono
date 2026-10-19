@@ -21,6 +21,7 @@
 <PageExampleKnobs>
     <PageProp
         itemKey={"radius"}
+        controls={"Sets the radius of the example circle sent to PaintedTextProps.path"}
         label={"Radius (px)"}
         hint={"How far the circle the text runs round is from its center."}
     >
@@ -38,6 +39,7 @@
 
     <PageProp
         itemKey={"lapDurationMs"}
+        controls={"Sets PaintedTextProps.lapDurationMs"}
         label={"Lap duration (ms)"}
         hint={"How long the text takes to slide once round the whole length of its path."}
     >
@@ -55,6 +57,7 @@
 
     <PageProp
         itemKey={"isFittedToPath"}
+        controls={"Sets PaintedTextProps.isFittedToPath"}
         label={"Fit to the circle"}
         hint={"Stretches or squeezes the spacing between the letters so the text goes round the circle exactly once, meeting its own start."}
     >

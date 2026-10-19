@@ -22,6 +22,7 @@ const inversion = shallowRef(SVGFilterKnobs.Tone.STARTING_INVERSION);
     <PageExampleKnobs>
         <PageProp
             item-key="brightness"
+            controls="Sets SVGBrightnessFilterDefs.amount"
             label="Brightness"
             hint="How much lighter or darker the picture is. 1 leaves it alone."
         >
@@ -37,6 +38,7 @@ const inversion = shallowRef(SVGFilterKnobs.Tone.STARTING_INVERSION);
 
         <PageProp
             item-key="contrast"
+            controls="Sets SVGContrastFilterDefs.amount"
             label="Contrast"
             hint="How far the lights and darks are pushed apart. 1 leaves it alone."
         >
@@ -52,6 +54,7 @@ const inversion = shallowRef(SVGFilterKnobs.Tone.STARTING_INVERSION);
 
         <PageProp
             item-key="inversion"
+            controls="Sets SVGInversionFilterDefs.amount"
             label="Inversion"
             hint="How far the colors are flipped to their opposites. 0 leaves them alone, 1 fully inverts."
         >

@@ -100,6 +100,7 @@
 <PagePropsPanel scope={"global"}>
     <PageProp
         itemKey={"reveal"}
+        controls={"Picks how the example content drawn by TooltipProps.renderContent appears"}
         label={"Reveal"}
         hint={"How the tooltip appears and goes, which is the drawing's own: the tooltip only says whether it is showing and for how long the change takes."}
     >
@@ -117,6 +118,7 @@
 
     <PageProp
         itemKey={"arrow"}
+        controls={"Picks the arrow on the example content drawn by TooltipProps.renderContent"}
         label={"Arrow"}
         hint={
             "An arrow grown out of the tooltip's body to point at its anchor. It comes out of the side facing the anchor, or out of the nearest corner when the tooltip sits off a corner, and there is none while the tooltip overlaps its anchor. The offset is what makes room for it."
@@ -137,6 +139,7 @@
     {#if arrow !== "none"}
         <PageProp
             itemKey={"arrowWidth"}
+            controls={"Sets the arrow width on the example content drawn by TooltipProps.renderContent"}
             label={"Arrow width (px)"}
             hint={
                 "How wide the arrow is across its base. The lightning bolt spans this much from where its base starts to its tip."
@@ -157,6 +160,7 @@
 
         <PageProp
             itemKey={"arrowLength"}
+            controls={"Sets the arrow length on the example content drawn by TooltipProps.renderContent"}
             label={"Arrow length (px)"}
             hint={
                 "How far the arrow's tip stands off the tooltip. Longer than the offset, and the tip reaches over the anchor."
@@ -178,6 +182,7 @@
 
     <PageProp
         itemKey={"hPlacement"}
+        controls={"Sets TooltipProps.placement.x"}
         label={"Placement across"}
         hint={"Where the tooltip sits across its anchor: inside an edge, centered, or outside it altogether."}
     >
@@ -194,6 +199,7 @@
 
     <PageProp
         itemKey={"vPlacement"}
+        controls={"Sets TooltipProps.placement.y"}
         label={"Placement down"}
         hint={"Where the tooltip sits above or below its anchor: inside an edge, centered, or outside it altogether."}
     >
@@ -210,6 +216,7 @@
 
     <PageProp
         itemKey={"offsetX"}
+        controls={"Sets TooltipProps.offset.x"}
         label={"Offset across (px)"}
         hint={"How far the tooltip is nudged sideways from where the placement put it."}
     >
@@ -228,6 +235,7 @@
 
     <PageProp
         itemKey={"offsetY"}
+        controls={"Sets TooltipProps.offset.y"}
         label={"Offset down (px)"}
         hint={"How far the tooltip is nudged up or down from where the placement put it."}
     >
@@ -246,6 +254,7 @@
 
     <PageProp
         itemKey={"transitionDurationMs"}
+        controls={"Sets TooltipProps.transitionDurationMs"}
         label={"Reveal (ms)"}
         hint={"How long the tooltip takes to appear and to go."}
     >
@@ -264,6 +273,7 @@
 
     <PageProp
         itemKey={"focusShowDelayMs"}
+        controls={"Sets TooltipProps.focusShowDelayMs"}
         label={"Focus delay (ms)"}
         hint={"How long a keyboard focus has to rest on the anchor before the tooltip appears."}
     >
@@ -282,6 +292,7 @@
 
     <PageProp
         itemKey={"hoverShowDelayMs"}
+        controls={"Sets TooltipProps.hoverShowDelayMs"}
         label={"Hover delay (ms)"}
         hint={
             "How long the pointer has to rest on the anchor before the tooltip appears. Leave before then and nothing shows."
@@ -302,6 +313,7 @@
 
     <PageProp
         itemKey={"skipDelayWindowMs"}
+        controls={"Sets TooltipProps.skipDelayWindowMs"}
         label={"Skip window (ms)"}
         hint={
             "How soon after any tooltip closes a hover opens the next one at once. Wait for one tooltip here, then move to its neighbor."

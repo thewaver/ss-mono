@@ -104,6 +104,7 @@ export const RichTextPage = () => {
                     hint={
                         "Strips any tag the editor was not told to keep, rather than leaving it in the markup untouched."
                     }
+                    controls={"Sets RichTextProps.removeOtherTags"}
                 >
                     <PageCheckField
                         value={removeOtherTags}

@@ -1,4 +1,5 @@
 <script lang="ts">
+    import { EXAMPLES_ONLY_PROP } from "@thewaver/ss-playground/App/PageComponents/Prop/Prop.const";
     import { ScrambleTextWeights } from "@thewaver/ss-components-svelte";
     import * as styles from "@thewaver/ss-playground/App/Pages/TypewriterPage/TypewriterPage.css";
 
@@ -124,6 +125,7 @@
     <PagePropsPanel scope={"global"}>
         <PageProp
             itemKey={"textContainerWidth"}
+            controls={EXAMPLES_ONLY_PROP}
             label={"Container width (px)"}
             hint={"How wide the box holding the text is, which decides where the lines wrap as the text is typed."}
         >
@@ -141,6 +143,7 @@
 
         <PageProp
             itemKey={"textEffect"}
+            controls={"Picks the example keyframes sent to TypewriterProps.computeAnimationName"}
             label={"Effect"}
             hint={"How each character arrives: plainly, or with one of the entrance effects."}
         >
@@ -156,6 +159,7 @@
 
         <PageProp
             itemKey={"arrivalOrder"}
+            controls={"Picks the sample weight function sent to TypewriterProps.computeCharacterWeights"}
             label={"Arrival order"}
             hint={"The order the characters arrive in: left to right, from the middle out, scattered, and so on. Erasing runs it backwards. The caret is meant for left to right, and jumps about under the others."}
         >

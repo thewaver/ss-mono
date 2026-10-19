@@ -69,6 +69,9 @@ export const TimedGradientsPage = () => {
                         itemKey={"configKey"}
                         label={"Gradient"}
                         hint={"Which animated gradient is shown. Choosing one brings its own knobs with it."}
+                        controls={
+                            "Picks the sample gradient the example sends to ShapeProps.computeFillDefs or ShapeProps.computeStrokeDefs"
+                        }
                     >
                         <PageGroupedSelectField
                             value={configKey}
@@ -107,6 +110,7 @@ export const TimedGradientsPage = () => {
                         itemKey={"animationDurationMs"}
                         label={"Animation duration (ms)"}
                         hint={"How long one pass of the gradient's animation takes."}
+                        controls={"Sets SVGAnimationDefs.animationDurationMs"}
                     >
                         <PageNumberField
                             value={animationDurationMs}
@@ -122,6 +126,7 @@ export const TimedGradientsPage = () => {
                         itemKey={"iterationConfigKey"}
                         label={"Iteration Pattern"}
                         hint={"How the animation repeats: once, endlessly, or back and forth."}
+                        controls={"Picks the sample iteration that fills SVGAnimationDefs.animationIterationPatterns"}
                     >
                         <PageSelectField
                             value={iterationConfigKey}

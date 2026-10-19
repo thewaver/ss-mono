@@ -86,6 +86,7 @@
 <PagePropsPanel scope={"global"}>
     <PageProp
         itemKey={"driftPxPerSecond"}
+        controls={"Sets WraparoundProps.driftPxPerSecond"}
         label={"Marquee speed (px/s)"}
         hint={"How far the marquee's strip drifts in a second. It is off while the visitor has asked for reduced motion."}
     >
@@ -104,6 +105,7 @@
 
     <PageProp
         itemKey={"driftDegrees"}
+        controls={"Sets WraparoundProps.driftDegrees"}
         label={"Marquee direction (°)"}
         hint={"Which way the marquee's strip drifts: 0 is to the right, 90 down, 180 to the left and 270 up."}
     >

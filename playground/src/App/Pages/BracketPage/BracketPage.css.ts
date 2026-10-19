@@ -1,4 +1,4 @@
-import { createVar, fallbackVar, style } from "@vanilla-extract/css";
+import { style } from "@vanilla-extract/css";
 
 import { layerVars } from "../../StyledComponents/Layer/Layer.css";
 import { themeVars } from "../../Theme.css";
@@ -32,10 +32,6 @@ export const node = style({
 export const nodeOnRoute = style({
     boxShadow: `0 0 0 2px ${themeVars.color.secondary.main}`,
 });
-
-export const headerPinXVar = createVar();
-
-export const headerPinYVar = createVar();
 
 export const layerHeader = style({
     position: "relative",
@@ -80,16 +76,6 @@ export const familyControls = style({
 export const familyFrame = style({
     position: "relative",
     overflow: "hidden",
-});
-
-export const familyCamera = style({
-    width: "max-content",
-    transformOrigin: "0 0",
-});
-
-export const pinnedLayerHeader = style({
-    pointerEvents: "none",
-    transform: `translate(${fallbackVar(headerPinXVar, "0px")}, ${fallbackVar(headerPinYVar, "0px")})`,
 });
 
 export const layerHeaderCurrent = style({

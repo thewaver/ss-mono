@@ -76,6 +76,7 @@ export const FlyoutMenuPage = () => {
                     itemKey={"hoverShowDelayMs"}
                     label={"Hover delay (ms)"}
                     hint={"How long the pointer has to rest on an entry before its panel opens."}
+                    controls={"Sets FlyoutMenuProps.hoverShowDelayMs"}
                 >
                     <PageNumberField
                         value={hoverShowDelayMs}
@@ -92,6 +93,7 @@ export const FlyoutMenuPage = () => {
                     itemKey={"transitionDurationMs"}
                     label={"Transition duration (ms)"}
                     hint={"How long the panel takes to fade, and to glide from one entry to the next."}
+                    controls={"Sets FlyoutMenuProps.transitionDurationMs"}
                 >
                     <PageNumberField
                         value={transitionDurationMs}

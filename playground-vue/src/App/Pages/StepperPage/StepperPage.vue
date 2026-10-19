@@ -118,6 +118,7 @@ const examples: ExampleDefs[] = [
     <PagePropsPanel scope="global">
         <PageProp
             item-key="isFreeNavigation"
+            controls="Sets Step.isNavigable on every example step sent to StepperProps.steps"
             label="Free navigation"
             hint="Lets any step be jumped to directly, instead of making each one be reached in order."
         >
@@ -130,6 +131,7 @@ const examples: ExampleDefs[] = [
 
         <PageProp
             item-key="currentStep"
+            controls="Writes the starting steps back to StepperProps.currentValue"
             label="Current step"
             hint="Puts the examples back to the step they started on."
         >

@@ -11,6 +11,7 @@ import {
 import type { AccessorProps, SignalSource } from "@thewaver/ss-components-solid";
 import { PaintedTextKnobs } from "@thewaver/ss-playground/App/Knobs/PaintedTexts.const";
 import { MEASURE_BOX_PADDING } from "@thewaver/ss-playground/App/PageComponents/MeasureBox/MeasureBox.css";
+import { EXAMPLES_ONLY_PROP } from "@thewaver/ss-playground/App/PageComponents/Prop/Prop.const";
 import {
     ARRIVAL_EFFECTS,
     EXAMPLES_ROOT,
@@ -78,7 +79,12 @@ const HeadingExampleWrapper = ({ width, ...props }: ExampleWrapperProps) => {
             </PageMeasureBox>
 
             <PageExampleKnobs>
-                <PageProp key={"fontSize"} label={"Font size (px)"} hint={"How large the letters are."}>
+                <PageProp
+                    key={"fontSize"}
+                    label={"Font size (px)"}
+                    hint={"How large the letters are."}
+                    controls={"Sets the font size of the example text sent as PaintedText's children"}
+                >
                     <PageNumberField
                         value={getFontSize}
                         min={PaintedTextKnobs.MIN_FONT_SIZE}
@@ -95,6 +101,7 @@ const HeadingExampleWrapper = ({ width, ...props }: ExampleWrapperProps) => {
                     hint={
                         "How tall each line is, as a multiple of the font size, which decides how far apart the lines sit."
                     }
+                    controls={"Sets the line height of the example text sent as PaintedText's children"}
                 >
                     <PageNumberField
                         value={getLineHeight}
@@ -106,7 +113,12 @@ const HeadingExampleWrapper = ({ width, ...props }: ExampleWrapperProps) => {
                     />
                 </PageProp>
 
-                <PageProp key={"fontWeight"} label={"Font weight"} hint={"How heavy the letters are, from 100 to 900."}>
+                <PageProp
+                    key={"fontWeight"}
+                    label={"Font weight"}
+                    hint={"How heavy the letters are, from 100 to 900."}
+                    controls={"Sets the font weight of the example text sent as PaintedText's children"}
+                >
                     <PageNumberField
                         value={getFontWeight}
                         min={PaintedTextKnobs.MIN_FONT_WEIGHT}
@@ -176,6 +188,7 @@ const TypedExampleWrapper = (props: ExampleWrapperProps) => {
                     hint={
                         "How each letter arrives. The keyframes are the Typewriter page's own, played by the painted letters."
                     }
+                    controls={"Picks the example keyframes sent to TypewriterProps.computeAnimationName"}
                 >
                     <PageSelectField
                         value={getArrivalEffect}
@@ -205,6 +218,7 @@ const LapDurationKnob = (props: LapDurationKnobProps) => (
         key={"lapDurationMs"}
         label={"Lap duration (ms)"}
         hint={"How long the text takes to slide once round the whole length of its path."}
+        controls={"Sets PaintedTextProps.lapDurationMs"}
     >
         <PageNumberField
             value={props.value}
@@ -236,6 +250,7 @@ const CircleExampleWrapper = (props: PathExampleWrapperProps) => {
                     key={"radius"}
                     label={"Radius (px)"}
                     hint={"How far the circle the text runs round is from its center."}
+                    controls={"Sets the radius of the example circle sent to PaintedTextProps.path"}
                 >
                     <PageNumberField
                         value={getRadius}
@@ -255,6 +270,7 @@ const CircleExampleWrapper = (props: PathExampleWrapperProps) => {
                     hint={
                         "Stretches or squeezes the spacing between the letters so the text goes round the circle exactly once, meeting its own start."
                     }
+                    controls={"Sets PaintedTextProps.isFittedToPath"}
                 >
                     <PageCheckField
                         value={getIsFittedToPath}
@@ -397,6 +413,7 @@ export const PaintedTextPage = () => {
                     hint={
                         "What paints the letters: a flat color, a pattern, or a gradient that runs on a clock or follows the pointer. For hollow letters, paint them solid and make the background color transparent."
                     }
+                    propPath={"PaintedTextProps.computeFillDefs"}
                 />
 
                 <PagePropsDivider />
@@ -408,6 +425,7 @@ export const PaintedTextPage = () => {
                     hint={
                         "What paints the stroke around the letters: a flat color, a pattern, or a gradient that runs on a clock or follows the pointer."
                     }
+                    propPath={"PaintedTextProps.computeStrokeDefs"}
                 />
 
                 <PagePropsDivider />
@@ -417,6 +435,7 @@ export const PaintedTextPage = () => {
                         key={"strokeWidth"}
                         label={"Stroke width (px)"}
                         hint={"How wide the stroke appears, whichever side of the letter's edge it sits on."}
+                        controls={"Sets PaintedTextProps.strokeWidth"}
                     >
                         <PageNumberField
                             value={getStrokeWidth}
@@ -434,6 +453,7 @@ export const PaintedTextPage = () => {
                         hint={
                             "Where the stroke sits against the edge of each letter: outside keeps the letters their full shape, inside keeps the text its overall size, and center straddles the edge."
                         }
+                        controls={"Sets PaintedTextProps.strokeAlignment"}
                     >
                         <PageSelectField
                             value={getStrokeAlignment}
@@ -448,6 +468,9 @@ export const PaintedTextPage = () => {
                         label={"Colors"}
                         hint={
                             "The colors the fill and the stroke are built from. Each sample uses as many as it needs."
+                        }
+                        controls={
+                            "Sets the colors of the example paints sent to PaintedTextProps.computeFillDefs and PaintedTextProps.computeStrokeDefs"
                         }
                     >
                         <div class={styles.colorList}>
@@ -467,6 +490,9 @@ export const PaintedTextPage = () => {
                         key={"blurWidth"}
                         label={"Blur (px)"}
                         hint={"How far the paint is blurred outward, which is what gives it its glow."}
+                        controls={
+                            "Sets the blur of the example paints sent to PaintedTextProps.computeFillDefs and PaintedTextProps.computeStrokeDefs"
+                        }
                     >
                         <PageNumberField
                             value={getBlurWidth}
@@ -483,6 +509,9 @@ export const PaintedTextPage = () => {
                             key={"animationDurationMs"}
                             label={"Animation duration (ms)"}
                             hint={"How long one pass of the fill or stroke animation takes."}
+                            controls={
+                                "Sets the duration of the example paints sent to PaintedTextProps.computeFillDefs and PaintedTextProps.computeStrokeDefs"
+                            }
                         >
                             <PageNumberField
                                 value={getAnimationDurationMs}
@@ -498,6 +527,9 @@ export const PaintedTextPage = () => {
                             key={"iterationConfigKey"}
                             label={"Iteration Pattern"}
                             hint={"How the animation repeats: once, endlessly, or back and forth."}
+                            controls={
+                                "Picks how the example paints repeat, sent to PaintedTextProps.computeFillDefs and PaintedTextProps.computeStrokeDefs"
+                            }
                         >
                             <PageSelectField
                                 value={getIterationConfigKey}
@@ -513,6 +545,9 @@ export const PaintedTextPage = () => {
                             key={"cellSize"}
                             label={"Pattern Cell Size (px)"}
                             hint={"How large one tile of a pattern is before it repeats."}
+                            controls={
+                                "Sets the tile size of the example paints sent to PaintedTextProps.computeFillDefs and PaintedTextProps.computeStrokeDefs"
+                            }
                         >
                             <PageNumberField
                                 value={getCellSize}
@@ -529,6 +564,7 @@ export const PaintedTextPage = () => {
                         key={"width"}
                         label={"Container width (px)"}
                         hint={"How wide the box holding the text is, which decides where the lines wrap."}
+                        controls={EXAMPLES_ONLY_PROP}
                     >
                         <PageNumberField
                             value={getWidth}

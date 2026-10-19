@@ -74,6 +74,7 @@ export const RGBSplitterPage = () => {
                     hint={
                         "Stops the content answering the pointer and leaves it whole. It is what a page honoring a reduced-motion preference passes."
                     }
+                    controls={"Sets RGBSplitterProps.isDisabled"}
                 >
                     <PageCheckField value={isDisabled} ariaLabel={"Disabled"} onChange={setIsDisabled} />
                 </PageProp>
@@ -84,6 +85,7 @@ export const RGBSplitterPage = () => {
                     hint={
                         "How long the split takes to catch up with the pointer. At 0 it follows exactly; raised, the channels glide apart and back together."
                     }
+                    controls={"Sets RGBSplitterProps.smoothingMs"}
                 >
                     <PageNumberField
                         value={smoothingMs}
@@ -102,6 +104,7 @@ export const RGBSplitterPage = () => {
                     hint={
                         "How near the pointer has to be before the content answers it at all, measured from its center. Outside it the content stays whole."
                     }
+                    controls={"Sets RGBSplitterProps.activeRangePx"}
                 >
                     <PageNumberField
                         value={activeRangePx}
@@ -118,6 +121,7 @@ export const RGBSplitterPage = () => {
                     itemKey={"splitRangePx"}
                     label={"Split range (px)"}
                     hint={"How far the split reaches. Widest with the pointer on the center, closed out here."}
+                    controls={"Sets RGBSplitterProps.splitRangePx"}
                 >
                     <PageNumberField
                         value={splitRangePx}
@@ -136,6 +140,7 @@ export const RGBSplitterPage = () => {
                     hint={
                         "The furthest any one channel is shifted, with the pointer on the center. Each channel picks a random direction and distance within it every time the split opens."
                     }
+                    controls={"Sets RGBSplitterProps.maxOffsetPx"}
                 >
                     <PageNumberField
                         value={maxOffsetPx}
@@ -154,6 +159,7 @@ export const RGBSplitterPage = () => {
                     hint={
                         "How the channels are put back together. Additive fringes are red, green and blue and read on a dark ground; subtractive ones are cyan, magenta and yellow and read on a light one. Left out, it follows the page's color-scheme each time the split opens."
                     }
+                    controls={"Sets RGBSplitterProps.colorMixing, with the color-scheme choice sent as undefined"}
                 >
                     <PageSelectField
                         value={colorMixingChoice}

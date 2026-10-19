@@ -56,6 +56,7 @@ export const FlipCardPage = () => {
                     itemKey={"axis"}
                     label={"Axis"}
                     hint={"Which way the card turns over to show its other side."}
+                    controls={"Sets FlipCardProps.axis"}
                 >
                     <PageSelectField
                         value={axis}
@@ -71,6 +72,7 @@ export const FlipCardPage = () => {
                     itemKey={"transitionDurationMs"}
                     label={"Turn duration (ms)"}
                     hint={"How long one turn from face to face takes."}
+                    controls={"Sets FlipCardProps.transitionDurationMs"}
                 >
                     <PageNumberField
                         value={transitionDurationMs}

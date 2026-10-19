@@ -64,6 +64,7 @@ export const ToastsPage = () => {
                     key={"alignment"}
                     label={"Alignment"}
                     hint={"Which corner or edge of the screen the toasts gather at."}
+                    controls={"Sets ToastsProps.alignment"}
                 >
                     <PageSelectField
                         value={getAlignment}
@@ -79,6 +80,7 @@ export const ToastsPage = () => {
                     hint={
                         "Which way the stack grows from there, and so whether a new toast joins at the top or the bottom."
                     }
+                    controls={"Sets ToastsProps.dir"}
                 >
                     <PageSelectField
                         value={getDir}
@@ -92,6 +94,7 @@ export const ToastsPage = () => {
                     key={"limit"}
                     label={"Limit"}
                     hint={"How many toasts may be on screen at once. Choose none and they all show."}
+                    controls={"Sets ToastsProps.limit, with no limit sent as undefined"}
                 >
                     <PageSelectField
                         value={getLimit}
@@ -108,6 +111,7 @@ export const ToastsPage = () => {
                     hint={
                         "What happens when the limit is reached: the oldest toast is dismissed, or the newest waits its turn."
                     }
+                    controls={"Sets ToastsProps.overflow"}
                 >
                     <PageSelectField
                         value={getOverflow}
@@ -121,6 +125,7 @@ export const ToastsPage = () => {
                     key={"durationMs"}
                     label={"Duration"}
                     hint={"How long a toast stays before it dismisses itself. Sticky ones wait to be closed."}
+                    controls={"Sets Toast.durationMs on each example toast raised"}
                 >
                     <PageSelectField
                         value={getDurationMs}
@@ -131,7 +136,12 @@ export const ToastsPage = () => {
                     />
                 </PageProp>
 
-                <PageProp key={"animation"} label={"Animation"} hint={"How a toast arrives and leaves."}>
+                <PageProp
+                    key={"animation"}
+                    label={"Animation"}
+                    hint={"How a toast arrives and leaves."}
+                    controls={"Picks how the example content drawn by ToastsProps.renderToast arrives and leaves"}
+                >
                     <PageSelectField
                         value={getAnimation}
                         values={ToastKnobs.ANIMATIONS}
@@ -146,6 +156,7 @@ export const ToastsPage = () => {
                     hint={
                         "Whether the toasts sit in a row of their own, or pile up on each other with only the top one fully shown."
                     }
+                    controls={"Picks how the example content drawn by ToastsProps.renderToast stacks"}
                 >
                     <PageSelectField
                         value={getStacking}
@@ -155,7 +166,12 @@ export const ToastsPage = () => {
                     />
                 </PageProp>
 
-                <PageProp key={"gap"} label={"Gap (px)"} hint={"The space between one toast and the next."}>
+                <PageProp
+                    key={"gap"}
+                    label={"Gap (px)"}
+                    hint={"The space between one toast and the next."}
+                    controls={"Sets ToastsProps.gap"}
+                >
                     <PageNumberField
                         value={getGap}
                         min={ToastKnobs.MIN_GAP}
@@ -169,6 +185,7 @@ export const ToastsPage = () => {
                     key={"margin"}
                     label={"Margin (px)"}
                     hint={"How far the stack is held off the edge of the screen."}
+                    controls={"Sets every side of ToastsProps.margins"}
                 >
                     <PageNumberField
                         value={getMargin}
@@ -183,6 +200,7 @@ export const ToastsPage = () => {
                     key={"transitionDurationMs"}
                     label={"Transition duration (ms)"}
                     hint={"How long a toast takes to arrive, to leave, and to slide when the stack shifts."}
+                    controls={"Sets ToastsProps.transitionDurationMs"}
                 >
                     <PageNumberField
                         value={getTransitionDurationMs}

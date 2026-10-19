@@ -79,6 +79,7 @@
 <PagePropsPanel scope={"global"}>
     <PageProp
         itemKey={"zoom"}
+        controls={"Sets LensProps.zoom"}
         label={"Zoom"}
         hint={"How many times larger the content is drawn inside the lens. 1 draws it at its own size."}
     >
@@ -93,7 +94,7 @@
         />
     </PageProp>
 
-    <PageProp itemKey={"radius"} label={"Radius (px)"} hint={"How large the lens that follows the pointer is."}>
+    <PageProp itemKey={"radius"} controls={"Sets LensProps.radius"} label={"Radius (px)"} hint={"How large the lens that follows the pointer is."}>
         <PageNumberField
             value={radius}
             min={LensKnobs.MIN_RADIUS}
@@ -105,7 +106,7 @@
         />
     </PageProp>
 
-    <PageProp itemKey={"computePoints"} label={"Shape"} hint={"The contour of the lens."}>
+    <PageProp itemKey={"computePoints"} controls={"Picks the example contour sent to LensProps.computePoints"} label={"Shape"} hint={"The contour of the lens."}>
         <PageSelectField
             value={shape}
             values={LensKnobs.SHAPES}
@@ -117,6 +118,7 @@
 
     <PageProp
         itemKey={"joinRadii"}
+        controls={"Sets every corner of LensProps.joinRadii"}
         label={"Corner radius (px)"}
         hint={"How far the lens's corners are rounded. A circular lens has no corners, so it is off then."}
     >
@@ -133,6 +135,7 @@
 
     <PageProp
         itemKey={"lameExponents"}
+        controls={"Sets every corner of LensProps.lameExponents"}
         label={"Lamé Exponent"}
         hint={"How square or how pinched the lens's rounded corners are: 2 is a circular round, higher is squarer."}
     >
@@ -149,6 +152,7 @@
 
     <PageProp
         itemKey={"softness"}
+        controls={"Sets LensProps.softness"}
         label={"Softness"}
         hint={"How gradually the lens's edge fades into the content around it. 0 gives a hard edge."}
     >
@@ -165,6 +169,7 @@
 
     <PageProp
         itemKey={"stepSize"}
+        controls={"Sets LensProps.stepSize"}
         label={"Step size (px)"}
         hint={"How far one press of an arrow key moves the lens. Tab to a lens and it opens at the center; the arrow keys move it from there."}
     >
@@ -181,6 +186,7 @@
 
     <PageProp
         itemKey={"isDisabled"}
+        controls={"Sets LensProps.isDisabled"}
         label={"Disabled"}
         hint={"Stops the lens following the pointer or the keyboard, leaving the content as it is."}
     >

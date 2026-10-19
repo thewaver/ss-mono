@@ -22,6 +22,7 @@
 <PageExampleKnobs>
     <PageProp
         itemKey={"isTurning"}
+        controls={"Switches on the example timer that writes CuboidProps.yaw and CuboidProps.pitch"}
         label={"Turns by itself"}
         hint={"Lets the box turn to a new face on its own, without anybody clicking it."}
     >
@@ -36,6 +37,7 @@
 
     <PageProp
         itemKey={"turnIntervalMs"}
+        controls={"Sets how often the example timer writes CuboidProps.yaw and CuboidProps.pitch"}
         label={"Turn every (ms)"}
         hint={
             "How long the box rests on a face before turning to the next one. It only applies while the box turns by itself."

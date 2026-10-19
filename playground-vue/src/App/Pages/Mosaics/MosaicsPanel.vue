@@ -18,6 +18,7 @@ const controls = props.controls;
     <PagePropsPanel scope="global">
         <PageProp
             item-key="itemCount"
+            controls="Sets the length of the slice of example items sent to ElementMosaicProps.items or ImageMosaicProps.sources"
             label="Items"
             hint="How many tiles the mosaic packs. The arrangement is recomputed from scratch each time it changes."
         >
@@ -32,7 +33,7 @@ const controls = props.controls;
             />
         </PageProp>
 
-        <PageProp item-key="gap" label="Gap (px)" hint="The space left between tiles.">
+        <PageProp item-key="gap" controls="Sets MosaicState.gap" label="Gap (px)" hint="The space left between tiles.">
             <PageNumberField
                 :value="controls.gap.value"
                 :min="MosaicKnobs.MIN_GAP"
@@ -46,6 +47,7 @@ const controls = props.controls;
 
         <PageProp
             item-key="sizeAnchor"
+            controls="Sets MosaicState.sizeAnchor"
             label="Fixed side"
             hint="Which side the mosaic takes as given: it fills that one and works the other out from the tiles."
         >
@@ -60,6 +62,7 @@ const controls = props.controls;
 
         <PageProp
             item-key="transitionDurationMs"
+            controls="Sets MosaicState.transitionDurationMs"
             label="Glide (ms)"
             hint="How long a tile takes to glide to its new place when tiles are added, taken out or resized. Resizing the mosaic itself never glides. At 0 tiles move at once, and under reduced motion they always do."
         >

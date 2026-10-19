@@ -87,6 +87,7 @@ const ShapedExampleWrapper = (props: ParticleFieldExampleProps) => {
                     itemKey={"shapeKind"}
                     label={"Shape"}
                     hint={"The area particles may appear in. A cell spawns only when its center is inside it."}
+                    controls={"Picks the example contour sent to ParticleFieldProps.computeShapePoints"}
                 >
                     <PageSelectField
                         value={shapeKind}
@@ -100,6 +101,7 @@ const ShapedExampleWrapper = (props: ParticleFieldExampleProps) => {
                     itemKey={"joinRadius"}
                     label={"Corner radius"}
                     hint={"How far each corner of the area is rounded, as the Shape page rounds them."}
+                    controls={"Sets every corner of ParticleFieldProps.shapeJoinRadii"}
                 >
                     <PageNumberField
                         value={joinRadius}
@@ -208,6 +210,7 @@ export const ParticleFieldPage = () => {
                     hint={
                         "The chance each cell spawns in a given pass. 1 spawns every cell every pass; lower leaves gaps that change from pass to pass. When a cell does spawn is still its weight's call."
                     }
+                    controls={"Sets ParticleFieldProps.spawnChance"}
                 >
                     <PageNumberField
                         value={spawnChance}
@@ -223,6 +226,7 @@ export const ParticleFieldPage = () => {
                     itemKey={"cellCount"}
                     label={"Cell count (cols x rows)"}
                     hint={"How many columns and rows the field is split into. A cell holds one particle at a time."}
+                    controls={"Sets ParticleFieldProps.cellCount"}
                 >
                     <div className={styles.valueList}>
                         <PageNumberField
@@ -250,6 +254,9 @@ export const ParticleFieldPage = () => {
                     hint={
                         "Where in the grid the weights are measured from. It only applies to weights that are measured from a point."
                     }
+                    controls={
+                        "Picks the point the example's weights are measured from, sent to ParticleFieldProps.computeCellWeights"
+                    }
                 >
                     <PageSelectField
                         value={originType}
@@ -266,6 +273,7 @@ export const ParticleFieldPage = () => {
                     hint={
                         "The same weights CellAnimation uses: a heavy cell spawns early in the pass and a light one late."
                     }
+                    controls={"Picks the example's weight function sent to ParticleFieldProps.computeCellWeights"}
                 >
                     <PageGroupedSelectField
                         value={weightType}
@@ -281,6 +289,9 @@ export const ParticleFieldPage = () => {
                     hint={
                         "How a particle appears, played forwards as it arrives and backwards as it leaves: CellAnimation's own keyframes."
                     }
+                    controls={
+                        "Picks the example's particle keyframes sent to ParticleFieldProps.computeParticleAnimation"
+                    }
                 >
                     <PageGroupedSelectField
                         value={animationType}
@@ -295,6 +306,9 @@ export const ParticleFieldPage = () => {
                     label={"Hold (0-1)"}
                     hint={
                         "How much of a particle's life it spends fully shown, between appearing and disappearing. 1 cuts in and out."
+                    }
+                    controls={
+                        "Sets how long the example's particle keyframes hold, sent to ParticleFieldProps.computeParticleAnimation"
                     }
                 >
                     <PageNumberField
@@ -313,6 +327,9 @@ export const ParticleFieldPage = () => {
                     hint={
                         "Places each particle at a random point in its cell rather than at the center, so the grid stops showing."
                     }
+                    controls={
+                        "Decides whether the example's ParticleFieldProps.computeParticlePos scatters each particle inside its cell"
+                    }
                 >
                     <PageCheckField value={isScattered} ariaLabel={"Scatter in cell"} onChange={setIsScattered} />
                 </PageProp>
@@ -323,6 +340,7 @@ export const ParticleFieldPage = () => {
                     hint={
                         "How long one pass over the grid takes, and so the shortest time between two spawns from the same cell."
                     }
+                    controls={"Sets ParticleFieldProps.animationDurationMs"}
                 >
                     <PageNumberField
                         value={durationMs}
@@ -338,6 +356,7 @@ export const ParticleFieldPage = () => {
                     itemKey={"particleLifetimeMs"}
                     label={"Lifetime (ms)"}
                     hint={"How long one particle lives, from appearing to being removed."}
+                    controls={"Sets ParticleFieldProps.particleLifetimeMs"}
                 >
                     <PageNumberField
                         value={lifetimeMs}
@@ -353,6 +372,7 @@ export const ParticleFieldPage = () => {
                     itemKey={"iterationDelayMs"}
                     label={"Iteration delay (ms)"}
                     hint={"How long the field waits between one pass and the next."}
+                    controls={"Sets ParticleFieldProps.animationIterationDelayMs"}
                 >
                     <PageNumberField
                         value={iterationDelayMs}

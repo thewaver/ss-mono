@@ -1,4 +1,5 @@
 <script lang="ts">
+    import { EXAMPLES_ONLY_PROP } from "@thewaver/ss-playground/App/PageComponents/Prop/Prop.const";
     import { ANCHOR_H_PLACEMENTS, ANCHOR_V_PLACEMENTS, SATELLITE_DEFAULTS } from "@thewaver/ss-components-svelte";
     import type { AnchorHPlacement, AnchorVPlacement } from "@thewaver/ss-components-svelte";
 
@@ -79,6 +80,7 @@
     <PageExampleKnobs>
         <PageProp
             itemKey={"hPlacement"}
+            controls={"Sets SatelliteDefs.placement.x"}
             label={"Placement across"}
             hint={"Where the satellite sits across its subject: inside an edge, centered, or outside it altogether."}
         >
@@ -93,6 +95,7 @@
 
         <PageProp
             itemKey={"vPlacement"}
+            controls={"Sets SatelliteDefs.placement.y"}
             label={"Placement down"}
             hint={"Where the satellite sits above or below its subject: inside an edge, centered, or outside it altogether."}
         >
@@ -107,6 +110,7 @@
 
         <PageProp
             itemKey={"offsetX"}
+            controls={"Sets SatelliteDefs.offset.x"}
             label={"Offset across (px)"}
             hint={"How far the satellite is nudged sideways from where the placement put it."}
         >
@@ -123,6 +127,7 @@
 
         <PageProp
             itemKey={"offsetY"}
+            controls={"Sets SatelliteDefs.offset.y"}
             label={"Offset down (px)"}
             hint={"How far the satellite is nudged up or down from where the placement put it."}
         >
@@ -139,6 +144,7 @@
 
         <PageProp
             itemKey={"hasSatellite"}
+            controls={"Switches SatelliteProps.satellites between one satellite and none"}
             label={"Render a satellite"}
             hint={"Whether a satellite is rendered at all, so the subject can be seen with and without one."}
         >
@@ -151,6 +157,7 @@
 
         <PageProp
             itemKey={"badgeSize"}
+            controls={"Sets the size of the example badge drawn by SatelliteDefs.renderSatellite"}
             label={"Satellite size (px)"}
             hint={"How large the satellite itself is."}
         >
@@ -167,6 +174,7 @@
 
         <PageProp
             itemKey={"isBehindSubject"}
+            controls={"Sets SatelliteDefs.isBehindSubject"}
             label={"Behind the subject"}
             hint={"Puts the satellite under the subject rather than over it, so the subject hides whatever overlaps."}
         >
@@ -193,6 +201,7 @@
     <PageExampleKnobs>
         <PageProp
             itemKey={"badgeCorner"}
+            controls={"Picks the corner the example turns into SatelliteDefs.placement and SatelliteDefs.offset"}
             label={"Corner"}
             hint={"Which corner the badge is pinned to; the overhang turns outward with it."}
         >
@@ -207,6 +216,7 @@
 
         <PageProp
             itemKey={"badgeCount"}
+            controls={"Sets the number in the example pill drawn by SatelliteDefs.renderSatellite"}
             label={"Count"}
             hint={"The number on the badge. More digits make it wider, and it grows toward the middle."}
         >
@@ -223,6 +233,7 @@
 
         <PageProp
             itemKey={"badgeOverhang"}
+            controls={"Sets how far the example pushes SatelliteDefs.offset out from the corner"}
             label={"Overhang (px)"}
             hint={"How far the badge pokes out past each of the two edges it is pinned to."}
         >
@@ -242,6 +253,7 @@
 <PagePropsPanel scope={"global"}>
     <PageProp
         itemKey={"subjectWidth"}
+        controls={EXAMPLES_ONLY_PROP}
         label={"Subject width (px)"}
         hint={"How wide the thing the satellite is pinned to is."}
     >
@@ -258,6 +270,7 @@
 
     <PageProp
         itemKey={"subjectHeight"}
+        controls={EXAMPLES_ONLY_PROP}
         label={"Subject height (px)"}
         hint={"How tall the thing the satellite is pinned to is."}
     >

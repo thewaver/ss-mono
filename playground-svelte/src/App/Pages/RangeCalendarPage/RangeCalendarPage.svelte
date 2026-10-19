@@ -81,6 +81,7 @@
 <PagePropsPanel scope={"global"}>
     <PageProp
         itemKey={"calendarId"}
+        controls={"Picks the calendar the example puts on the dates sent to RangeCalendarProps.value"}
         label={"Calendar"}
         hint={"Which calendar system the dates are read and written in, such as Gregorian or Islamic."}
     >
@@ -97,6 +98,7 @@
 
     <PageProp
         itemKey={"weekStartsOn"}
+        controls={"Sets RangeCalendarProps.weekStartsOn"}
         label={"Week starts on"}
         hint={"Which day begins a week, which decides the order of the column headings."}
     >

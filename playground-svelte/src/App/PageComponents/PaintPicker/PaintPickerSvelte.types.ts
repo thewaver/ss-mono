@@ -21,4 +21,5 @@ export type PagePaintPickerProps = {
     name: string;
     label: string;
     hint: string;
+    propPath: string;
 };

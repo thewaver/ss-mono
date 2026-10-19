@@ -21,6 +21,7 @@ const colorKeys = () => Object.keys(props.controls.colors) as (keyof SVGDefsColo
 <template>
     <PageProp
         item-key="paintKind"
+        controls="Picks whether the example sends the gradient to ShapeProps.computeFillDefs or ShapeProps.computeStrokeDefs"
         label="Painted as"
         hint="Whether the gradient paints the inside of the sample shape or only its stroke."
     >
@@ -34,6 +35,7 @@ const colorKeys = () => Object.keys(props.controls.colors) as (keyof SVGDefsColo
 
     <PageProp
         item-key="colors"
+        controls="Sets SVGDefsBaseElementDefs.colors"
         label="Colors"
         hint="The colors the gradient is built from. Each sample uses as many of them as it needs."
     >
@@ -50,6 +52,7 @@ const colorKeys = () => Object.keys(props.controls.colors) as (keyof SVGDefsColo
 
     <PageProp
         item-key="blurWidth"
+        controls="Sets SVGDefsBaseElementDefs.blurWidth"
         label="Blur (px)"
         hint="How far the paint is blurred outward, which is what gives it its glow."
     >

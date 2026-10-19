@@ -52,6 +52,7 @@ export const IciclePage = () => {
                     itemKey={"columnCount"}
                     label={"Columns"}
                     hint={"How many levels fit across at once, counting the one in view."}
+                    controls={"Sets IcicleProps.columnCount"}
                 >
                     <PageNumberField
                         value={columnCount}
@@ -69,6 +70,7 @@ export const IciclePage = () => {
                     hint={
                         "How long a zoom in or out takes. It is off while the visitor has asked for reduced motion, and 0 jumps straight to the new view."
                     }
+                    controls={"Sets IcicleProps.zoomDurationMs"}
                 >
                     <PageNumberField
                         value={zoomDurationMs}

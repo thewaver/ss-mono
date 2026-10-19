@@ -20,6 +20,7 @@
 <PageExampleKnobs>
     <PageProp
         itemKey={"isUpright"}
+        controls={"Sets CuboidProps.isUpright"}
         label={"Stays upright"}
         hint={
             "Every press turns the box a quarter turn about the screen's own axis, as you see it, and the face it lands on is then spun until it reads the right way up. Off, the box goes back to reading the two counts as a pose, where the far side shows upside down once it has been tipped over the top."
@@ -36,6 +37,7 @@
 
     <PageProp
         itemKey={"isDraggable"}
+        controls={"Sets CuboidProps.isDraggable"}
         label={"Draggable"}
         hint={
             "Lets the box be turned by dragging it. It follows the pointer, and on release settles on the nearest face, writing the turns to the same two counts the buttons do."

@@ -13,6 +13,7 @@
 
 <PageProp
     itemKey={"direction"}
+    controls={"Sets CellAnimationBreakpointOpts.dir"}
     label={"Direction"}
     hint={"Which way the sweep travels through the lines, and so which lines go first."}
 >

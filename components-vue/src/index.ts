@@ -23,6 +23,8 @@ export type * from "./Abstracts/LetterDriver/LetterDriver.context.types";
 export * from "./Abstracts/MaskedField/MaskedFieldVue.utils";
 export * from "./Abstracts/MediaQueryMonitor/MediaQueryMonitorVue.utils";
 export * from "./Abstracts/Navigator/NavigatorVue.utils";
+export type * from "./Abstracts/PanZoom/PanZoomVue.types";
+export * from "./Abstracts/PanZoom/PanZoomVue.utils";
 export * from "./Abstracts/PointerTracker/PointerTrackerVue.utils";
 export * from "./Abstracts/Roller/RollerVue.utils";
 export * from "./Abstracts/Rotator/RotatorVue.utils";

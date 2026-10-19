@@ -65,6 +65,7 @@ const examples: ExampleDefs[] = [
         <PagePropsPanel scope="global">
             <PageProp
                 item-key="sourceType"
+                controls="Picks the example picture sent to ImageSwitcherProps.src and ImageSwitcherProps.alt"
                 label="Source"
                 hint="Where the pictures come from, which is what decides how long each one takes to load."
             >
@@ -78,6 +79,7 @@ const examples: ExampleDefs[] = [
 
             <PageProp
                 item-key="transitionDurationMs"
+                controls="Sets ImageSwitcherProps.transitionDurationMs"
                 label="Transition duration (ms)"
                 hint="How long the crossfade from one picture to the next takes."
             >

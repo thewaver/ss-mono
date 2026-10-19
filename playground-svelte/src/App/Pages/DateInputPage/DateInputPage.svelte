@@ -71,6 +71,7 @@
 <PagePropsPanel scope={"global"}>
     <PageProp
         itemKey={"calendarId"}
+        controls={"Sets DateInputProps.calendar"}
         label={"Calendar"}
         hint={"Which calendar system the dates are read and written in, such as Gregorian or Islamic."}
     >

@@ -52,6 +52,7 @@ export const TreemapPage = () => {
                     hint={
                         "How long a zoom in or out takes. It is off while the visitor has asked for reduced motion, and 0 jumps straight to the new level."
                     }
+                    controls={"Sets TreemapProps.zoomDurationMs"}
                 >
                     <PageNumberField
                         value={getZoomDurationMs}

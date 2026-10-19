@@ -1,4 +1,5 @@
 <script lang="ts">
+    import { EXAMPLES_ONLY_PROP } from "@thewaver/ss-playground/App/PageComponents/Prop/Prop.const";
     import { MediaQueryMonitorSvelteUtils, SHAPE_REVEAL_DEFAULTS, Toggle } from "@thewaver/ss-components-svelte";
 
     import PageToggleContent from "../../StyledComponents/ToggleContent/ToggleContent.svelte";
@@ -39,6 +40,7 @@
 {#snippet knobs()}
     <PageProp
         itemKey={"showsDescriptionOnly"}
+        controls={EXAMPLES_ONLY_PROP}
         label={"Show pages without examples"}
         hint={"Lists the pages that have docs but no examples yet, which are hidden otherwise."}
         defaultValue={false}
@@ -52,6 +54,7 @@
 
     <PageProp
         itemKey={"pageView"}
+        controls={EXAMPLES_ONLY_PROP}
         label={"Open pages on"}
         hint={"Which tab a page opens on when it is picked from the list. A page with no examples always opens on its docs."}
         defaultValue={"Examples"}
@@ -61,6 +64,7 @@
 
     <PageProp
         itemKey={"viewportAnchor"}
+        controls={EXAMPLES_ONLY_PROP}
         label={"Viewport anchor"}
         hint={"The height the whole playground is laid out at before it is scaled to fit the window. None lays it out at the window's own size and Auto at the screen's height, both at the window's shape; 1080p and 1440p lay out a fixed 16:9 page of that height, with empty bars around it."}
         defaultValue={"Auto"}
@@ -78,6 +82,7 @@
 
     <PageProp
         itemKey={"theme"}
+        controls={EXAMPLES_ONLY_PROP}
         label={"Theme"}
         hint={"Which color theme the playground is drawn in, independent of the framework it runs in. The new theme is uncovered by a circle growing from this field."}
         defaultValue={computeThemeLabel(OWN_FRAMEWORK)}

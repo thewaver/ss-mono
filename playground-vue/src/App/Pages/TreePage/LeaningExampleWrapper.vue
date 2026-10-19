@@ -24,6 +24,7 @@ const falloff = shallowRef(TreeKnobs.STARTING_FALLOFF);
     <PageExampleKnobs>
         <PageProp
             item-key="falloff"
+            controls="Picks how fast the example effect sent to TreeProps.computeEffect fades with distance"
             label="Falloff"
             hint="How the lean fades with distance from the pointer: smoothly, in a straight line, or sharply, so only the nearest items move."
         >

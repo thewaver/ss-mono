@@ -32,6 +32,7 @@ const floodOpacity = shallowRef(SVGFilterKnobs.DropShadow.STARTING_OPACITY);
     <PageExampleKnobs>
         <PageProp
             item-key="dx"
+            controls="Sets SVGDropShadowFilterDefs.dx"
             label="Offset x"
             hint="How far the shadow is thrown sideways from the shape casting it."
         >
@@ -46,6 +47,7 @@ const floodOpacity = shallowRef(SVGFilterKnobs.DropShadow.STARTING_OPACITY);
 
         <PageProp
             item-key="dy"
+            controls="Sets SVGDropShadowFilterDefs.dy"
             label="Offset y"
             hint="How far the shadow is thrown up or down from the shape casting it."
         >
@@ -60,6 +62,7 @@ const floodOpacity = shallowRef(SVGFilterKnobs.DropShadow.STARTING_OPACITY);
 
         <PageProp
             item-key="shadowStdDeviation"
+            controls="Sets SVGDropShadowFilterDefs.stdDeviation"
             label="Std deviation"
             hint="How soft the shadow's edge is. 0 gives a hard copy of the shape."
         >
@@ -73,7 +76,12 @@ const floodOpacity = shallowRef(SVGFilterKnobs.DropShadow.STARTING_OPACITY);
             />
         </PageProp>
 
-        <PageProp item-key="floodColor" label="Flood color" hint="The color the shadow is painted in.">
+        <PageProp
+            item-key="floodColor"
+            controls="Sets SVGDropShadowFilterDefs.floodColor"
+            label="Flood color"
+            hint="The color the shadow is painted in."
+        >
             <PageColorField
                 :value="floodColor"
                 ariaLabel="Flood color"
@@ -81,7 +89,12 @@ const floodOpacity = shallowRef(SVGFilterKnobs.DropShadow.STARTING_OPACITY);
             />
         </PageProp>
 
-        <PageProp item-key="floodOpacity" label="Flood opacity" hint="How solid the shadow is. 0 hides it entirely.">
+        <PageProp
+            item-key="floodOpacity"
+            controls="Sets SVGDropShadowFilterDefs.floodOpacity"
+            label="Flood opacity"
+            hint="How solid the shadow is. 0 hides it entirely."
+        >
             <PageNumberField
                 :value="floodOpacity"
                 :min="SVGFilterKnobs.DropShadow.MIN_OPACITY"

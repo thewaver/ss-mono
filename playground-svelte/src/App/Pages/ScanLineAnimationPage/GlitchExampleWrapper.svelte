@@ -21,7 +21,7 @@
 </PageMeasureBox>
 
 <PageExampleKnobs>
-    <PageProp itemKey={"count"} label={"Count"} hint={"How many glitch bursts happen over one pass."}>
+    <PageProp itemKey={"count"} controls={"Sets the number of glitch bursts in the example's ScanlineAnimationProps.computeScanlineAnimation"} label={"Count"} hint={"How many glitch bursts happen over one pass."}>
         <PageNumberField
             value={keyframeOpts.count}
             min={ScanlineAnimationKnobs.MIN_GLITCH_COUNT}
@@ -36,6 +36,7 @@
 
     <PageProp
         itemKey={"maxShift"}
+        controls={"Sets how far rows slide in the example's ScanlineAnimationProps.computeScanlineAnimation"}
         label={"Max shift (%)"}
         hint={"How far a line can be thrown sideways at the worst of a burst, as a share of its own width."}
     >
@@ -53,6 +54,7 @@
 
     <PageProp
         itemKey={"chunkyness01"}
+        controls={"Sets how many neighboring rows slide together in the example's ScanlineAnimationProps.computeScanlineAnimation"}
         label={"Chunkyness (0-1)"}
         hint={"How blocky the glitch is: low values throw single lines about, high values throw thick slabs."}
     >

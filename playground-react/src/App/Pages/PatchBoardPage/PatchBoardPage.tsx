@@ -1,7 +1,7 @@
 import { useState } from "react";
 
 import type { PatchBoardLink } from "@thewaver/ss-components-react";
-import { MediaQueryMonitorReactUtils, PATCH_BOARD_DEFAULTS } from "@thewaver/ss-components-react";
+import { MediaQueryMonitorReactUtils, PATCH_BOARD_DEFAULTS, PanZoomUtils } from "@thewaver/ss-components-react";
 import { PatchBoardKnobs } from "@thewaver/ss-playground/App/Knobs/PatchBoards.const";
 import {
     BOARD_WIDTH,
@@ -9,20 +9,18 @@ import {
     CHAIN_NODES,
     EXAMPLES_ROOT,
     EXAMPLE_NAMES,
-    MAX_ZOOM,
-    MIN_ZOOM,
     MIXER_LINKS,
     MIXER_NODES,
     NOTHING_DONE,
     PAN_LINKS,
     PAN_NODES,
+    PAN_SCALE,
+    PAN_STARTING_VIEW,
     PERCENT,
     RACK_LINKS,
     RACK_NODES,
-    STARTING_ZOOM,
     WIDE_SPAN,
 } from "@thewaver/ss-playground/App/Pages/PatchBoardPage/PatchBoardPage.const";
-import { MathUtils } from "@thewaver/ss-utils";
 
 import { PageExamples } from "../../PageComponents/Examples/Examples";
 import { PageCheckField, PageNumberField } from "../../PageComponents/Field/Field";
@@ -33,7 +31,6 @@ import { ChainExample } from "./Examples/Chain";
 import { MixerExample } from "./Examples/Mixer";
 import { PanExample } from "./Examples/Pan";
 import { RackExample } from "./Examples/Rack";
-import { ZoomExample } from "./Examples/Zoom";
 import type { PatchBoardExampleProps } from "./PatchBoardPage.types";
 
 const getLinkWords = (link: PatchBoardLink) =>
@@ -47,8 +44,6 @@ export const PatchBoardPage = () => {
     const [mixerAction, setMixerAction] = useState(NOTHING_DONE);
     const [rackAction, setRackAction] = useState(NOTHING_DONE);
     const [panAction, setPanAction] = useState(NOTHING_DONE);
-    const [zoomAction, setZoomAction] = useState(NOTHING_DONE);
-    const [zoom, setZoom] = useState(STARTING_ZOOM);
 
     const chainNodesState = useState(CHAIN_NODES);
     const chainLinksState = useState(CHAIN_LINKS);
@@ -58,8 +53,7 @@ export const PatchBoardPage = () => {
     const rackLinksState = useState(RACK_LINKS);
     const panNodesState = useState(PAN_NODES);
     const panLinksState = useState(PAN_LINKS);
-    const zoomNodesState = useState(CHAIN_NODES);
-    const zoomLinksState = useState(CHAIN_LINKS);
+    const panViewState = useState(PAN_STARTING_VIEW);
 
     const prefersReducedMotion = MediaQueryMonitorReactUtils.useReducedMotion();
 
@@ -135,43 +129,22 @@ export const PatchBoardPage = () => {
         },
         {
             key: "pan",
-            name: EXAMPLE_NAMES.pan,
+            name: EXAMPLE_NAMES.panZoom,
             span: WIDE_SPAN,
             readout: () =>
-                `${panLinksState[0].length} cables, last: ${panAction} — the board is wider and taller than its window, so scroll to pan; a node carried with the arrow keys brings the window with it`,
+                `${panLinksState[0].length} cables at ${Math.round((PERCENT * PAN_SCALE) / PanZoomUtils.getExtent(panViewState[0].x))}%, last: ${panAction} — the board is laid out at its own width and drawn into a smaller window: drag empty board, use the wheel, pinch or press the buttons to move and zoom it; a node still drags under the pointer, and one carried with the arrow keys brings the window with it`,
             component: () => (
-                <PageMeasureBox>
-                    <PanExample
-                        {...commonProps}
-                        nodes={panNodesState}
-                        links={panLinksState}
-                        onLink={(link) => setPanAction(`connected ${getLinkWords(link)}`)}
-                        onUnlink={(link) => setPanAction(`unplugged ${getLinkWords(link)}`)}
-                        onMove={(nodeKey) => setPanAction(`moved ${nodeKey}`)}
-                    />
-                </PageMeasureBox>
-            ),
-            path: `${EXAMPLES_ROOT}/Pan.tsx`,
-        },
-        {
-            key: "zoom",
-            name: EXAMPLE_NAMES.zoom,
-            span: WIDE_SPAN,
-            readout: () =>
-                `${zoomLinksState[0].length} cables at ${Math.round(zoom * PERCENT)}%, last: ${zoomAction} — the board is scaled with a CSS transform, and a drag still lands under the pointer`,
-            component: () => (
-                <ZoomExample
+                <PanExample
                     {...commonProps}
-                    zoom={zoom}
-                    nodes={zoomNodesState}
-                    links={zoomLinksState}
-                    onZoomChange={(next) => setZoom(MathUtils.clamp(next, MIN_ZOOM, MAX_ZOOM))}
-                    onLink={(link) => setZoomAction(`connected ${getLinkWords(link)}`)}
-                    onUnlink={(link) => setZoomAction(`unplugged ${getLinkWords(link)}`)}
-                    onMove={(nodeKey) => setZoomAction(`moved ${nodeKey}`)}
+                    view={panViewState}
+                    nodes={panNodesState}
+                    links={panLinksState}
+                    onLink={(link) => setPanAction(`connected ${getLinkWords(link)}`)}
+                    onUnlink={(link) => setPanAction(`unplugged ${getLinkWords(link)}`)}
+                    onMove={(nodeKey) => setPanAction(`moved ${nodeKey}`)}
                 />
             ),
-            path: `${EXAMPLES_ROOT}/Zoom.tsx`,
+            path: `${EXAMPLES_ROOT}/Pan.tsx`,
         },
     ];
 
@@ -184,6 +157,7 @@ export const PatchBoardPage = () => {
                     hint={
                         "How large each socket is drawn, as a fraction of the board's width, so a wider board has larger sockets."
                     }
+                    controls={"Sets PatchBoardProps.socketSize"}
                 >
                     <PageNumberField
                         value={socketSize}
@@ -201,6 +175,7 @@ export const PatchBoardPage = () => {
                     hint={
                         "Freezes the wiring as it stands: the cables still show, but none can be dragged, made or pulled out."
                     }
+                    controls={"Sets PatchBoardProps.isLocked"}
                 >
                     <PageCheckField value={isLocked} ariaLabel={"Wiring locked"} onChange={setIsLocked} />
                 </PageProp>
@@ -209,6 +184,7 @@ export const PatchBoardPage = () => {
                     itemKey={"isDisabled"}
                     label={"Disabled"}
                     hint={"Turns the whole board off, so nothing on it responds to the pointer or the keyboard."}
+                    controls={"Sets PatchBoardProps.isDisabled"}
                 >
                     <PageCheckField value={isDisabled} ariaLabel={"Disabled"} onChange={setIsDisabled} />
                 </PageProp>
@@ -219,6 +195,7 @@ export const PatchBoardPage = () => {
                     hint={
                         "Whether a pulse runs along every plugged cable, from the output to the input it feeds. It starts stopped while the visitor has asked for reduced motion."
                     }
+                    controls={"Plays the example beam drawn by PatchBoardProps.renderCable"}
                 >
                     <PageCheckField value={isBeamPlaying} ariaLabel={"Beams moving"} onChange={setIsBeamPlaying} />
                 </PageProp>

@@ -128,6 +128,7 @@ export const FormationPage = () => {
                         hint={
                             "How the items are arranged: a ring, an arc, a row, a honeycomb, and so on. Choosing one brings its own knobs with it."
                         }
+                        controls={"Picks the sample layout sent to FormationProps.computeLayout"}
                     >
                         <PageSelectField
                             value={getLayoutKey}
@@ -156,6 +157,7 @@ export const FormationPage = () => {
                         key={"effectKey"}
                         label={"Pointer effect"}
                         hint={"What the items do as the pointer nears them. Choosing one brings its own knobs with it."}
+                        controls={"Picks the sample effect sent to FormationProps.computeEffect"}
                     >
                         <PageSelectField
                             value={getEffectKey}
@@ -180,7 +182,12 @@ export const FormationPage = () => {
                 <PagePropsDivider />
 
                 <PagePropsPanel scope={"global"}>
-                    <PageProp key={"itemCount"} label={"Items"} hint={"How many items the arrangement holds."}>
+                    <PageProp
+                        key={"itemCount"}
+                        label={"Items"}
+                        hint={"How many items the arrangement holds."}
+                        controls={"Sets the length of the slice of example items sent to FormationProps.items"}
+                    >
                         <PageNumberField
                             value={getItemCount}
                             min={FormationKnobs.MIN_ITEM_COUNT}
@@ -198,6 +205,7 @@ export const FormationPage = () => {
                         hint={
                             "Leaves out that many items from the front of the list, so an item can be taken out from the start rather than the end."
                         }
+                        controls={"Sets where the slice of example items sent to FormationProps.items starts"}
                     >
                         <PageNumberField
                             value={getSkippedCount}
@@ -216,6 +224,7 @@ export const FormationPage = () => {
                         hint={
                             "Puts the first item on top of the pile instead of the last, which shows where two items overlap."
                         }
+                        controls={"Sets FormationProps.isStackedInReverse"}
                     >
                         <PageCheckField
                             value={getIsStackedInReverse}
@@ -224,7 +233,12 @@ export const FormationPage = () => {
                         />
                     </PageProp>
 
-                    <PageProp key={"shapeKind"} label={"Item shape"} hint={"The contour each item is cut to."}>
+                    <PageProp
+                        key={"shapeKind"}
+                        label={"Item shape"}
+                        hint={"The contour each item is cut to."}
+                        controls={"Picks the contour of the example items drawn by FormationProps.renderItem"}
+                    >
                         <PageSelectField
                             value={getShapeKind}
                             values={ShapeConst.DEFAULT_SHAPES}
@@ -240,6 +254,7 @@ export const FormationPage = () => {
                         hint={
                             "How long an item takes to glide to its new place when the arrangement, the item count or a knob changes. At 0 it moves at once, and under reduced motion it always does."
                         }
+                        controls={"Sets FormationProps.transitionDurationMs"}
                     >
                         <PageNumberField
                             value={getTransitionDurationMs}
@@ -256,6 +271,7 @@ export const FormationPage = () => {
                         key={"transitionDelayMs"}
                         label={"Transition delay (ms)"}
                         hint={"How much later each item sets off than the one before it, while gliding is on."}
+                        controls={"Sets FormationProps.transitionDelayMs"}
                     >
                         <PageNumberField
                             value={getTransitionDelayMs}

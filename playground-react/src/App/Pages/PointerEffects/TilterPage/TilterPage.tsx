@@ -74,6 +74,7 @@ export const TilterPage = () => {
                     hint={
                         "Stops the surface following the pointer and leaves it flat. It is what a page honoring a reduced-motion preference passes."
                     }
+                    controls={"Sets TilterProps.isDisabled"}
                 >
                     <PageCheckField value={isDisabled} ariaLabel={"Disabled"} onChange={setIsDisabled} />
                 </PageProp>
@@ -84,6 +85,7 @@ export const TilterPage = () => {
                     hint={
                         "How long the surface takes to catch up with the pointer. At 0 it follows exactly; raised, it lags a quick movement and glides back flat when the pointer leaves."
                     }
+                    controls={"Sets TilterProps.smoothingMs"}
                 >
                     <PageNumberField
                         value={smoothingMs}
@@ -102,6 +104,7 @@ export const TilterPage = () => {
                     hint={
                         "How near the pointer has to be before the surface answers it at all, measured from the area's center. Outside it the surface lies flat."
                     }
+                    controls={"Sets TilterProps.activeRangePx"}
                 >
                     <PageNumberField
                         value={activeRangePx}
@@ -120,6 +123,7 @@ export const TilterPage = () => {
                     hint={
                         "How far from the center the pointer starts to tip the surface. The turn is strongest at the surface's own edge and fades to nothing out at this distance."
                     }
+                    controls={"Sets TilterProps.tiltRangePx"}
                 >
                     <PageNumberField
                         value={tiltRangePx}
@@ -136,6 +140,7 @@ export const TilterPage = () => {
                     itemKey={"maxTiltDegrees"}
                     label={"Max tilt (deg)"}
                     hint={"How far the surface turns when the pointer is at the very edge of the tilted area."}
+                    controls={"Sets TilterProps.maxTiltDegrees"}
                 >
                     <PageNumberField
                         value={maxTiltDegrees}
@@ -152,6 +157,7 @@ export const TilterPage = () => {
                     itemKey={"perspectivePx"}
                     label={"Perspective (px)"}
                     hint={"How near the viewer sits. Smaller is a more violent perspective; larger flattens the turn."}
+                    controls={"Sets TilterProps.perspectivePx"}
                 >
                     <PageNumberField
                         value={perspectivePx}
@@ -168,6 +174,7 @@ export const TilterPage = () => {
                     itemKey={"sheenOpacity"}
                     label={"Sheen opacity"}
                     hint={"How strong the highlight is. It belongs to the page rather than to the component."}
+                    controls={"Sets the opacity of the example sheen drawn by TilterProps.renderSheen"}
                 >
                     <PageNumberField
                         value={sheenOpacity}
@@ -184,6 +191,7 @@ export const TilterPage = () => {
                     itemKey={"sheenSpreadPercent"}
                     label={"Sheen spread (%)"}
                     hint={"How wide the band of highlight is across the surface."}
+                    controls={"Sets the spread of the example sheen drawn by TilterProps.renderSheen"}
                 >
                     <PageNumberField
                         value={sheenSpreadPercent}

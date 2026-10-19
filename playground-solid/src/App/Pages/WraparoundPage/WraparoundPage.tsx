@@ -76,6 +76,7 @@ export const WraparoundPage = () => {
                     hint={
                         "How far the marquee's strip drifts in a second. It is off while the visitor has asked for reduced motion."
                     }
+                    controls={"Sets WraparoundProps.driftPxPerSecond"}
                 >
                     <PageNumberField
                         value={getDriftPxPerSecond}
@@ -94,6 +95,7 @@ export const WraparoundPage = () => {
                     hint={
                         "Which way the marquee's strip drifts: 0 is to the right, 90 down, 180 to the left and 270 up."
                     }
+                    controls={"Sets WraparoundProps.driftDegrees"}
                 >
                     <PageNumberField
                         value={getDriftDegrees}

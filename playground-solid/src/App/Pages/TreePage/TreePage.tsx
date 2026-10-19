@@ -41,6 +41,7 @@ const LeaningExampleWrapper = (props: TreeExampleProps) => {
                     hint={
                         "How the lean fades with distance from the pointer: smoothly, in a straight line, or sharply, so only the nearest items move."
                     }
+                    controls={"Picks how fast the example effect sent to TreeProps.computeEffect fades with distance"}
                 >
                     <PageSelectField
                         value={getFalloff}

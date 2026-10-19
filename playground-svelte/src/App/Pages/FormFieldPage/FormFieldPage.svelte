@@ -83,6 +83,7 @@
 <PagePropsPanel scope={"global"}>
     <PageProp
         itemKey={"orientation"}
+        controls={"Sets FormFieldProps.orientation"}
         label={"Orientation"}
         hint={"Whether the label sits above the control or beside it."}
     >
@@ -97,7 +98,7 @@
         />
     </PageProp>
 
-    <PageProp itemKey={"gap"} label={"Gap (px)"} hint={"The space between the label, the control and the message."}>
+    <PageProp itemKey={"gap"} controls={"Sets FormFieldProps.gap"} label={"Gap (px)"} hint={"The space between the label, the control and the message."}>
         <PageNumberField
             value={gap}
             min={FormFieldKnobs.MIN_GAP}
@@ -113,6 +114,7 @@
 
     <PageProp
         itemKey={"message"}
+        controls={"Sets FormFieldProps.message"}
         label={"Message"}
         hint={"The line shown under the control. Leave it empty and no line is rendered at all."}
     >
@@ -129,6 +131,7 @@
 
     <PageProp
         itemKey={"hasError"}
+        controls={"Sets FormFieldProps.hasError"}
         label={"In error"}
         hint={"Puts the field into its error look and reads the message out as the error rather than as help."}
     >

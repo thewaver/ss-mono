@@ -89,6 +89,7 @@ export const DiePage = () => {
                     key={"shape"}
                     label={"Die"}
                     hint={"Which solid both examples are, from four faces to a hundred."}
+                    controls={"Picks the sample shape sent to DieProps.shape"}
                 >
                     <PageSelectField
                         value={getShapeKey}
@@ -102,6 +103,7 @@ export const DiePage = () => {
                     key={"rollDurationMs"}
                     label={"Roll duration (ms)"}
                     hint={"How long a roll takes to land. It is off while the visitor has asked for reduced motion."}
+                    controls={"Sets DieProps.rollDurationMs"}
                 >
                     <PageNumberField
                         value={getRollDurationMs}
@@ -114,7 +116,12 @@ export const DiePage = () => {
                     />
                 </PageProp>
 
-                <PageProp key={"tumbleCount"} label={"Tumbles"} hint={"How many whole turns a roll makes on its way."}>
+                <PageProp
+                    key={"tumbleCount"}
+                    label={"Tumbles"}
+                    hint={"How many whole turns a roll makes on its way."}
+                    controls={"Sets DieProps.tumbleCount"}
+                >
                     <PageNumberField
                         value={getTumbleCount}
                         min={DieKnobs.MIN_TUMBLE_COUNT}

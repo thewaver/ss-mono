@@ -15,6 +15,7 @@ import {
     type CarrierZone,
     LiveAnnouncerUtils,
     PATCH_BOARD_DEFAULTS,
+    PanZoomUtils,
     type PatchBoardCarry,
     type PatchBoardNode,
     type PatchBoardNodeFlags,
@@ -28,6 +29,8 @@ import {
 import { PatchBoardConst } from "@thewaver/ss-components/internal";
 
 import { CarrierVueUtils } from "../../../Abstracts/Carrier/CarrierVue.utils";
+import { ElementObserverVueUtils } from "../../../Abstracts/ElementObserver/ElementObserverVue.utils";
+import { PanZoomVueUtils } from "../../../Abstracts/PanZoom/PanZoomVue.utils";
 import { LabelVueUtils } from "../../../Essentials/Input/Label/LabelVue.utils";
 import { InteractionWrapper } from "../../../Primitives/InteractionWrapper/InteractionWrapper";
 import type { InteractionWrapperSlots } from "../../../Primitives/InteractionWrapper/InteractionWrapper.types";
@@ -47,6 +50,7 @@ export const PatchBoard = defineComponent(
         const socketHintId = useId();
 
         const rootRef = shallowRef<HTMLDivElement>();
+        const windowRef = shallowRef<HTMLDivElement>();
         const stopRefs = new Map<string, HTMLElement>();
 
         const focusedStop = shallowRef<string>();
@@ -55,6 +59,47 @@ export const PatchBoard = defineComponent(
 
         const getIsDisabled = () => props.isDisabled ?? false;
         const getOrientation = () => props.orientation ?? PATCH_BOARD_DEFAULTS.orientation;
+        const getIsPannable = () => props.isPannable ?? PATCH_BOARD_DEFAULTS.isPannable;
+        const getIsZoomable = () => props.isZoomable ?? PATCH_BOARD_DEFAULTS.isZoomable;
+
+        const windowSize = ElementObserverVueUtils.useBorderBoxSize(windowRef);
+
+        const panZoom = PanZoomVueUtils.use({
+            view: useTwoWay(props, "view"),
+            windowRef: () => windowRef.value,
+            size: windowSize,
+            range: () => PanZoomUtils.toFullView(PatchBoardConst.FULL_WIDTH, props.heightRatio),
+            minWidth: () => PatchBoardConst.FULL_WIDTH / (props.maxScale ?? PATCH_BOARD_DEFAULTS.maxScale),
+            durationMs: () => props.transitionDurationMs ?? PATCH_BOARD_DEFAULTS.transitionDurationMs,
+            isPannable: getIsPannable,
+            isZoomable: getIsZoomable,
+        });
+
+        watchAfterRender([], () => {
+            props.onMount?.(panZoom.controller);
+        });
+
+        const getLayoutWidth = () => props.boardWidth ?? windowSize.value.width;
+
+        const revealStop = (stopKey: string) => {
+            const root = rootRef.value;
+            const element = stopRefs.get(stopKey);
+
+            if (!panZoom.isActive.value || !root || !element) return;
+
+            const board = root.getBoundingClientRect();
+            const stop = element.getBoundingClientRect();
+
+            if (board.width === PatchBoardConst.NOTHING) return;
+
+            panZoom.controller.showArea({
+                x: { start: (stop.left - board.left) / board.width, end: (stop.right - board.left) / board.width },
+                y: { start: (stop.top - board.top) / board.width, end: (stop.bottom - board.top) / board.width },
+            });
+        };
+
+        const getIsOnStop = (target: EventTarget | null) =>
+            [...stopRefs.values()].some((element) => target instanceof Node && element.contains(target));
 
         const carryState = CarrierVueUtils.useCarry();
         const isTargetAllowed = CarrierVueUtils.useIsTargetAllowed();
@@ -63,7 +108,7 @@ export const PatchBoard = defineComponent(
             if (stopKey === undefined) return;
 
             focusedStop.value = stopKey;
-            stopRefs.get(stopKey)?.focus();
+            stopRefs.get(stopKey)?.focus({ preventScroll: panZoom.isActive.value });
         };
 
         const board = PatchBoardUtils.createBoard<T>({
@@ -150,6 +195,12 @@ export const PatchBoard = defineComponent(
 
         watchAfterRender([scrollKey, aimedPlace], ([key]) => {
             if (key === undefined) return;
+
+            if (panZoom.isActive.value) {
+                revealStop(key);
+
+                return;
+            }
 
             stopRefs.get(key)?.scrollIntoView({ block: "nearest", inline: "nearest" });
         });
@@ -238,6 +289,7 @@ export const PatchBoard = defineComponent(
                                         onKeydown={(e) => board.handleStopKeyDown(stopKey, node, placed, e)}
                                         onFocusin={() => {
                                             focusedStop.value = stopKey;
+                                            revealStop(stopKey);
                                         }}
                                     >
                                         {callSlot(slots.renderSocket, { socket, flags })}
@@ -296,6 +348,7 @@ export const PatchBoard = defineComponent(
                                             onKeydown={(e) => board.handleStopKeyDown(nodeKey, node, undefined, e)}
                                             onFocusin={() => {
                                                 focusedStop.value = nodeKey;
+                                                revealStop(nodeKey);
                                             }}
                                         >
                                             {callSlot(slots.renderNode, { node, flags })}
@@ -326,11 +379,26 @@ export const PatchBoard = defineComponent(
                     : undefined,
             );
 
-            return (
+            const isActive = panZoom.isActive.value;
+            let transform: string | undefined;
+
+            if (isActive) {
+                const shown = panZoom.shownView.value;
+                const width = getLayoutWidth();
+                const scale = PanZoomUtils.computeScale(shown, windowSize.value.width) / width;
+
+                transform = `scale(${scale}) translate(${-shown.x.start * width}px, ${-shown.y.start * width}px)`;
+            }
+
+            const boardElement = (
                 <div
                     id={boardId}
                     ref={rootRef}
                     class={PatchBoardStyles.patchBoardRoot}
+                    style={{
+                        width: isActive && props.boardWidth !== undefined ? `${getLayoutWidth()}px` : undefined,
+                        transform,
+                    }}
                     role="group"
                     aria-label={ariaLabel.value}
                     aria-disabled={getIsDisabled() || undefined}
@@ -360,6 +428,37 @@ export const PatchBoard = defineComponent(
                     {nodes.value.map(renderNode)}
                 </div>
             );
+
+            if (!isActive) return boardElement;
+
+            return (
+                <div
+                    ref={windowRef}
+                    class={PatchBoardStyles.patchBoardWindow}
+                    style={{
+                        "aspect-ratio": `${PatchBoardConst.FULL_WIDTH} / ${props.heightRatio}`,
+                        "touch-action": getIsPannable() || getIsZoomable() ? "none" : undefined,
+                        "user-select": getIsPannable() ? "none" : undefined,
+                    }}
+                    onPointerdown={(e: PointerEvent) => {
+                        if (getIsOnStop(e.target)) return;
+
+                        panZoom.gestures.press(e);
+                    }}
+                    onPointermove={(e: PointerEvent) => panZoom.gestures.move(e, e.currentTarget as HTMLElement)}
+                    onPointerup={(e: PointerEvent) => panZoom.gestures.release(e, e.currentTarget as HTMLElement)}
+                    onPointercancel={(e: PointerEvent) => panZoom.gestures.release(e, e.currentTarget as HTMLElement)}
+                    onWheel={(e: WheelEvent) => panZoom.gestures.wheel(e)}
+                    onScroll={(e: Event) => {
+                        const element = e.currentTarget as HTMLElement;
+
+                        element.scrollLeft = PatchBoardConst.NOTHING;
+                        element.scrollTop = PatchBoardConst.NOTHING;
+                    }}
+                >
+                    {boardElement}
+                </div>
+            );
         };
     },
     {
@@ -387,6 +486,14 @@ export const PatchBoard = defineComponent(
             "onLink": null,
             "onUnlink": null,
             "onMove": null,
+            "transitionDurationMs": null,
+            "isPannable": Boolean,
+            "isZoomable": Boolean,
+            "maxScale": null,
+            "boardWidth": null,
+            "view": null,
+            "onUpdate:view": null,
+            "onMount": null,
         }),
     },
 );

@@ -52,6 +52,7 @@ const src = computed(() => SVGDefsSources.computePatternSource(key.value, size.v
     <PageExampleKnobs>
         <PageProp
             item-key="pattern"
+            controls="Picks the pattern drawn into the example picture sent to CellAnimationProps.src"
             label="Pattern"
             hint="Which repeating pattern is rendered into the picture the cells are cut from."
         >
@@ -65,6 +66,7 @@ const src = computed(() => SVGDefsSources.computePatternSource(key.value, size.v
 
         <PageProp
             item-key="patternRatio"
+            controls="Sets the shape of the example picture sent to CellAnimationProps.src"
             label="Ratio"
             hint="The shape of the picture the pattern is drawn into, which decides how the cells are proportioned."
         >

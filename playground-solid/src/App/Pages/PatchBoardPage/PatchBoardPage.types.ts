@@ -1,4 +1,10 @@
-import type { AccessorProps, PatchBoardLink, PatchBoardNode, SignalSource } from "@thewaver/ss-components-solid";
+import type {
+    AccessorProps,
+    PanZoomView,
+    PatchBoardLink,
+    PatchBoardNode,
+    SignalSource,
+} from "@thewaver/ss-components-solid";
 import type { PatchDevice } from "@thewaver/ss-playground/App/Pages/PatchBoardPage/PatchDevice.types";
 
 export type PatchBoardExampleProps = AccessorProps<{
@@ -13,8 +19,6 @@ export type PatchBoardExampleProps = AccessorProps<{
     onMove: (nodeKey: string) => void;
 }>;
 
-export type PatchBoardZoomExampleProps = PatchBoardExampleProps &
-    AccessorProps<{
-        zoom: number;
-        onZoomChange: (zoom: number) => void;
-    }>;
+export type PatchBoardViewExampleProps = PatchBoardExampleProps & {
+    view: SignalSource<PanZoomView>;
+};

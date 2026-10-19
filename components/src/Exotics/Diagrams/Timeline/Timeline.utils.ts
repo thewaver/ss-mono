@@ -1,11 +1,11 @@
 import type { CarrierZone, Carry, CarryPlace } from "../../../Abstracts/Carrier/Carrier.types";
 import { CarrierUtils } from "../../../Abstracts/Carrier/Carrier.utils";
 import { NavigatorUtils } from "../../../Abstracts/Navigator/Navigator.utils";
+import { PanZoomUtils } from "../../../Abstracts/PanZoom/PanZoom.utils";
 import type {
     TimelineEdge,
     TimelineEdgeCarry,
     TimelineEdgeZoneDefs,
-    TimelineGestureDefs,
     TimelineItemBox,
     TimelineKeyAction,
     TimelineMarker,
@@ -36,16 +36,6 @@ const MAX_SNAP_PROBES = 256;
 /** How many times the gap before the next snapped value is halved, which is past the precision of a double. */
 const MAX_HALVINGS = 64;
 
-/** Where a zoom or a pointer reading centers when there is nothing better to go on: the middle. */
-const MIDDLE_RATIO = 0.5;
-/** How much one pixel of wheel travel zooms by, as an exponent, so equal wheel travel is equal zoom either way. */
-const ZOOM_RATE = 0.0015;
-/** How many pointers make a pinch. */
-const PINCH_POINTERS = 2;
-/** How far a press travels before it counts as a pan rather than a press, the same slop `Carrier` uses. */
-const DRAG_SLOP = 4;
-/** The primary mouse button. */
-const PRIMARY_BUTTON = 0;
 /** The key that takes hold of an item's end, while edges are on. */
 const HOLD_KEY = "Enter";
 /** One percent in a ratio. */
@@ -97,116 +87,6 @@ const chooseMajorStep = (step: number, entries: number[], viewExtent: number) =>
  * the same code serves dates, durations, frame counts or anything else laid out along a line.
  */
 export namespace TimelineUtils {
-    /** How much a span covers. */
-    export const getExtent = (span: TimelineSpan) => span.end - span.start;
-
-    /**
-     * Where a value sits in a span, as a fraction.
-     *
-     * @param value The value to place.
-     * @param span The span to place it in.
-     * @returns `0` at the start and `1` at the end, reaching outside that range for a value outside the
-     * span. A span of no extent reports `0` rather than dividing by zero.
-     */
-    export const toRatio = (value: number, span: TimelineSpan) => {
-        const extent = getExtent(span);
-
-        return extent === NOTHING ? NOTHING : (value - span.start) / extent;
-    };
-
-    /**
-     * The value at a fraction along a span.
-     *
-     * @param ratio The fraction.
-     * @param span The span.
-     */
-    export const toValue = (ratio: number, span: TimelineSpan) => span.start + ratio * getExtent(span);
-
-    /**
-     * Holds a view inside the range, keeping it a sensible size.
-     *
-     * The size is settled before the position, so a view wider than the range is shrunk to fit rather
-     * than being left hanging off one end.
-     *
-     * @param view The view to correct.
-     * @param range Everything the timeline covers.
-     * @param minExtent The narrowest the view may get. Itself capped by the range, since a range narrower
-     * than the minimum cannot be honored.
-     */
-    export const clampView = (view: TimelineSpan, range: TimelineSpan, minExtent: number): TimelineSpan => {
-        const available = Math.max(getExtent(range), NOTHING);
-        const extent = Math.min(Math.max(getExtent(view), Math.min(minExtent, available)), available);
-        const start = Math.min(Math.max(view.start, range.start), range.end - extent);
-
-        return { start, end: start + extent };
-    };
-
-    /**
-     * Zooms the view about a point.
-     *
-     * The value under the focus stays under it, which is what makes a scroll-wheel zoom feel anchored to
-     * the pointer rather than to the middle of the screen.
-     *
-     * @param view The view before zooming.
-     * @param factor Below `1` to zoom in, above to zoom out.
-     * @param focusRatio Where the zoom is centered, as a fraction across the view.
-     * @param range Everything the timeline covers.
-     * @param minExtent The narrowest the view may get.
-     */
-    export const zoomView = (
-        view: TimelineSpan,
-        factor: number,
-        focusRatio: number,
-        range: TimelineSpan,
-        minExtent: number,
-    ): TimelineSpan => {
-        const available = Math.max(getExtent(range), NOTHING);
-        const anchor = toValue(focusRatio, view);
-        const extent = Math.min(Math.max(getExtent(view) * factor, Math.min(minExtent, available)), available);
-        const start = anchor - focusRatio * extent;
-
-        return clampView({ start, end: start + extent }, range, extent);
-    };
-
-    /**
-     * Slides the view along.
-     *
-     * @param view The view before panning.
-     * @param ratio How far to move, as a fraction of the view's own width — so a pan means the same
-     * gesture at any zoom.
-     * @param range Everything the timeline covers.
-     */
-    export const panView = (view: TimelineSpan, ratio: number, range: TimelineSpan): TimelineSpan => {
-        const shift = getExtent(view) * ratio;
-
-        return clampView({ start: view.start + shift, end: view.end + shift }, range, getExtent(view));
-    };
-
-    /**
-     * Slides the view just far enough to bring a span into it.
-     *
-     * The view is not zoomed and not centered; it moves the minimum needed, which is what keeps a keyboard
-     * walk through the items from lurching. A span too wide to fit is aligned to its start.
-     *
-     * @param span The span to reveal.
-     * @param view The current view.
-     * @param range Everything the timeline covers.
-     * @returns The view unchanged when the span is already visible.
-     */
-    export const revealView = (span: TimelineSpan, view: TimelineSpan, range: TimelineSpan): TimelineSpan => {
-        const extent = getExtent(view);
-        const shift =
-            span.start < view.start
-                ? span.start - view.start
-                : span.end > view.end
-                  ? Math.min(span.end - view.end, span.start - view.start)
-                  : NOTHING;
-
-        if (shift === NOTHING) return view;
-
-        return clampView({ start: view.start + shift, end: view.end + shift }, range, extent);
-    };
-
     /**
      * Assigns each span to a lane so that no two overlapping spans share one.
      *
@@ -278,8 +158,8 @@ export namespace TimelineUtils {
             index,
             order: position,
             lane: lanes[index],
-            startRatio: toRatio(spans[index].start, view),
-            endRatio: toRatio(spans[index].end, view),
+            startRatio: PanZoomUtils.toRatio(spans[index].start, view),
+            endRatio: PanZoomUtils.toRatio(spans[index].end, view),
             isInView: spans[index].end >= view.start && spans[index].start <= view.end,
         }));
 
@@ -351,7 +231,7 @@ export namespace TimelineUtils {
     export const computeMarkers = (values: number[], view: TimelineSpan): TimelineMarker[] =>
         values.map((value) => ({
             value,
-            ratio: toRatio(value, view),
+            ratio: PanZoomUtils.toRatio(value, view),
             isInView: value >= view.start && value <= view.end,
         }));
 
@@ -486,7 +366,7 @@ export namespace TimelineUtils {
      * step and view cannot produce a runaway list.
      */
     export const computeTicks = (view: TimelineSpan, steps: TimelineStepPair): TimelineTick[] => {
-        const extent = getExtent(view);
+        const extent = PanZoomUtils.getExtent(view);
 
         if (steps.step <= NOTHING || extent <= NOTHING) return [];
 
@@ -505,27 +385,6 @@ export namespace TimelineUtils {
         }
 
         return ticks;
-    };
-
-    /**
-     * Whether a press should be answered at all: any touch or pen, and the primary button of a mouse.
-     *
-     * @param e The press, or anything carrying its `button` and `pointerType`.
-     */
-    export const getIsPrimaryPress = (e: { button: number; pointerType: string }) =>
-        e.button === PRIMARY_BUTTON || e.pointerType !== "mouse";
-
-    /**
-     * Where a pointer sits across the timeline, as a fraction of its width.
-     *
-     * @param clientX The pointer's horizontal position in the window.
-     * @param rect The timeline's box in the window. Missing, or of no width, reads as the middle.
-     * @returns `0` at the left edge and `1` at the right, reaching outside that for a pointer outside the box.
-     */
-    export const computePointerRatio = (clientX: number, rect: { left: number; width: number } | undefined) => {
-        if (rect === undefined || rect.width === NOTHING) return MIDDLE_RATIO;
-
-        return (clientX - rect.left) / rect.width;
     };
 
     /**
@@ -694,109 +553,6 @@ export namespace TimelineUtils {
     };
 
     /**
-     * How much one wheel event zooms by.
-     *
-     * @param deltaY The event's vertical travel. Down zooms out and up zooms in.
-     * @returns The factor to scale the visible extent by.
-     */
-    export const computeWheelFactor = (deltaY: number) => Math.exp(deltaY * ZOOM_RATE);
-
-    /**
-     * Drag to pan, pinch to zoom, and the wheel, for one timeline.
-     *
-     * A press that stays within four pixels of where it went down is left alone, so its click still reaches the
-     * item under it; past that, the pointer is captured and every move pans. Capturing only then is the whole trick:
-     * capture taken on the press would redirect the click as well, and no item could ever be pressed. Two pointers
-     * down make a pinch, which zooms by the change in their gap and pans by the change in their midpoint.
-     *
-     * @param defs Whether each gesture is on, the timeline's width, where a pointer sits across it, and the zoom and
-     * pan commands, all read at the moment a gesture needs them.
-     * @returns Handlers for the timeline root's pointer and wheel events. The move and release handlers take the
-     * root, which is what holds the capture.
-     */
-    export const createGestureTracker = (defs: TimelineGestureDefs) => {
-        const pointerXs = new Map<number, number>();
-
-        let isGrabbing = false;
-        let panFrom: number | undefined;
-        let pinchGap: number | undefined;
-        let pinchCenter: number | undefined;
-
-        const pinch = () => {
-            const [first, second] = [...pointerXs.values()];
-            const gap = Math.abs(second - first);
-            const center = (first + second) * MIDDLE_RATIO;
-
-            if (pinchGap !== undefined && gap > NOTHING && pinchCenter !== undefined) {
-                const ratio = defs.computePointerRatio(center);
-                const width = defs.getWidth();
-
-                if (defs.getIsZoomable()) defs.zoomBy(pinchGap / gap, ratio);
-                if (defs.getIsPannable() && width > NOTHING) defs.panBy((pinchCenter - center) / width);
-            }
-
-            pinchGap = gap;
-            pinchCenter = center;
-        };
-
-        return {
-            press: (e: PointerEvent) => {
-                if (!getIsPrimaryPress(e)) return;
-                if (!defs.getIsPannable() && !defs.getIsZoomable()) return;
-
-                pointerXs.set(e.pointerId, e.clientX);
-                panFrom = pointerXs.size === SINGLE ? e.clientX : undefined;
-                pinchGap = undefined;
-            },
-            move: (e: PointerEvent, element: HTMLElement) => {
-                if (!pointerXs.has(e.pointerId)) return;
-
-                pointerXs.set(e.pointerId, e.clientX);
-
-                if (pointerXs.size >= PINCH_POINTERS) {
-                    pinch();
-
-                    return;
-                }
-
-                if (panFrom === undefined || !defs.getIsPannable()) return;
-
-                const traveled = e.clientX - panFrom;
-
-                if (!isGrabbing && Math.abs(traveled) < DRAG_SLOP) return;
-
-                if (!isGrabbing) {
-                    isGrabbing = true;
-                    element.setPointerCapture(e.pointerId);
-                }
-
-                const width = defs.getWidth();
-
-                if (width > NOTHING) defs.panBy(-traveled / width);
-
-                panFrom = e.clientX;
-            },
-            release: (e: PointerEvent, element: HTMLElement) => {
-                pointerXs.delete(e.pointerId);
-                pinchGap = undefined;
-
-                if (pointerXs.size < PINCH_POINTERS) panFrom = pointerXs.values().next().value;
-
-                if (isGrabbing && pointerXs.size === NOTHING) {
-                    isGrabbing = false;
-                    element.releasePointerCapture(e.pointerId);
-                }
-            },
-            wheel: (e: WheelEvent) => {
-                if (!defs.getIsZoomable()) return;
-
-                e.preventDefault();
-                defs.zoomBy(computeWheelFactor(e.deltaY), defs.computePointerRatio(e.clientX));
-            },
-        };
-    };
-
-    /**
      * The zone a timeline offers its own edge carries.
      *
      * The carried item is an index and the place is the whole proposed span, so the item can be drawn at its new
@@ -826,7 +582,8 @@ export namespace TimelineUtils {
 
                 if (place === undefined) return undefined;
 
-                const value = toValue(defs.computePointerRatio(point.x), defs.getView()) - defs.getGrabOffset();
+                const value =
+                    PanZoomUtils.toValue(defs.computePointerRatio(point.x), defs.getView()) - defs.getGrabOffset();
                 const snapped = defs.computeSnapValue?.(value) ?? value;
 
                 return moveEdge(asSpan(place), defs.getHeldEdge(), snapped, defs.getRange());

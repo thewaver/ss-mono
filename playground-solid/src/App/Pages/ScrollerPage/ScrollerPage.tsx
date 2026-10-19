@@ -78,7 +78,12 @@ export const ScrollerPage = () => {
     return (
         <div class={styles.root}>
             <PagePropsPanel scope={"global"}>
-                <PageProp key={"itemCount"} label={"Item count"} hint={"How many items sit in the scrolling strip."}>
+                <PageProp
+                    key={"itemCount"}
+                    label={"Item count"}
+                    hint={"How many items sit in the scrolling strip."}
+                    controls={"Sets the number of example items sent as Scroller's children"}
+                >
                     <PageNumberField
                         value={getItemCount}
                         min={ScrollerKnobs.MIN_ITEM_COUNT}
@@ -93,6 +98,7 @@ export const ScrollerPage = () => {
                     key={"position"}
                     label={"First strip (%)"}
                     hint={"How far through its run the first strip is scrolled, as a percentage."}
+                    controls={"Sets ScrollerProps.progress, shown as a percentage"}
                 >
                     <PageNumberField
                         value={() => Math.round(progressSignal[0]() * PERCENT)}

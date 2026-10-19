@@ -3,6 +3,7 @@ import { computed, shallowRef } from "vue";
 
 import { PARTICLE_SPAWNER_DEFAULTS } from "@thewaver/ss-components-vue";
 import { ParticleSpawnerKnobs } from "@thewaver/ss-playground/App/Knobs/ParticleSpawners.const";
+import { EXAMPLES_ONLY_PROP } from "@thewaver/ss-playground/App/PageComponents/Prop/Prop.const";
 import {
     BOX_HEIGHT,
     BOX_WIDTH,
@@ -162,6 +163,7 @@ const examples: ExampleDefs[] = [
         <PagePropsPanel scope="sample">
             <PageProp
                 item-key="travelPattern"
+                controls="Picks the example's travel path function sent to ParticleSpawnerProps.computeParticlePos"
                 label="Travel pattern"
                 hint="The path a particle takes from where it starts to where it ends. Choosing one brings its own knobs with it."
             >
@@ -186,7 +188,12 @@ const examples: ExampleDefs[] = [
         <PagePropsDivider />
 
         <PagePropsPanel scope="global">
-            <PageProp item-key="particleCount" label="Particle count" hint="How many particles are sent on each round.">
+            <PageProp
+                item-key="particleCount"
+                controls="Sets ParticleSpawnerProps.particleCount"
+                label="Particle count"
+                hint="How many particles are sent on each round."
+            >
                 <PageNumberField
                     :value="particleCount"
                     :min="ParticleSpawnerKnobs.MIN_PARTICLE_COUNT"
@@ -200,6 +207,7 @@ const examples: ExampleDefs[] = [
 
             <PageProp
                 item-key="travelDurationMs"
+                controls="Sets ParticleSpawnerProps.travelDurationMs"
                 label="Travel (ms)"
                 hint="How long one particle takes to walk its path."
             >
@@ -216,6 +224,7 @@ const examples: ExampleDefs[] = [
 
             <PageProp
                 item-key="restDurationMs"
+                controls="Sets ParticleSpawnerProps.restDurationMs"
                 label="Rest duration (ms)"
                 hint="How long a particle stays put at the end of its path before it disappears."
             >
@@ -232,6 +241,7 @@ const examples: ExampleDefs[] = [
 
             <PageProp
                 item-key="spawnDelayMs"
+                controls="Sets ParticleSpawnerProps.spawnDelayMs"
                 label="Spawn delay (ms)"
                 hint="How long each particle waits after the one before it sets off, which is what staggers them."
             >
@@ -248,6 +258,7 @@ const examples: ExampleDefs[] = [
 
             <PageProp
                 item-key="iterationPattern"
+                controls="Picks the example's list of rounds sent to ParticleSpawnerProps.spawnIterationPatterns"
                 label="Iteration pattern"
                 hint="How the rounds follow each other: in bursts of three with a pause, one at a time with a pause, or without any pause at all."
             >
@@ -262,6 +273,7 @@ const examples: ExampleDefs[] = [
 
             <PageProp
                 item-key="overshootPercent"
+                controls="Sets how far the example's travel path runs past its end, sent to ParticleSpawnerProps.computeParticlePos"
                 label="Overshoot (%)"
                 hint="How far a particle runs past its destination before coming back to it. 0 stops it dead on target."
             >
@@ -278,6 +290,7 @@ const examples: ExampleDefs[] = [
 
             <PageProp
                 item-key="areTargetsHidden"
+                :controls="EXAMPLES_ONLY_PROP"
                 label="Hide targets"
                 hint="Takes the target markers out of sight while leaving them where they are, so the particles still land on them."
             >
@@ -290,6 +303,7 @@ const examples: ExampleDefs[] = [
 
             <PageProp
                 item-key="travelEasing"
+                controls="Picks the speed curve of the example's travel path, sent to ParticleSpawnerProps.computeParticlePos"
                 label="Travel easing"
                 hint="The speed curve a particle follows along its path."
             >

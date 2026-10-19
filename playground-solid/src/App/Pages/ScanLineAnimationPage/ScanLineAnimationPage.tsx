@@ -159,6 +159,7 @@ const SmoothnessInput = (props: { getter: () => number; setter: (value: number) 
             hint={
                 "How much one line's movement overlaps its neighbors'. 0 makes each line wait its turn; 1 blurs them into one sweep."
             }
+            controls={"Sets CellAnimationBreakpointOpts.smoothness"}
         >
             <PageNumberField
                 value={props.getter}
@@ -181,6 +182,7 @@ const DirInput = (props: {
             key={"direction"}
             label={"Direction"}
             hint={"Which way the sweep travels through the lines, and so which lines go first."}
+            controls={"Sets CellAnimationBreakpointOpts.dir"}
         >
             <PageSelectField
                 value={props.getter}
@@ -202,7 +204,14 @@ const GlitchExampleWrapper = (props: ScanlineAnimationExampleProps) => {
             </PageMeasureBox>
 
             <PageExampleKnobs>
-                <PageProp key={"count"} label={"Count"} hint={"How many glitch bursts happen over one pass."}>
+                <PageProp
+                    key={"count"}
+                    label={"Count"}
+                    hint={"How many glitch bursts happen over one pass."}
+                    controls={
+                        "Sets the number of glitch bursts in the example's ScanlineAnimationProps.computeScanlineAnimation"
+                    }
+                >
                     <PageNumberField
                         value={() => keyframeOpts.count!}
                         min={ScanlineAnimationKnobs.MIN_GLITCH_COUNT}
@@ -217,6 +226,9 @@ const GlitchExampleWrapper = (props: ScanlineAnimationExampleProps) => {
                     key={"maxShift"}
                     label={"Max shift (%)"}
                     hint={"How far a line can be thrown sideways at the worst of a burst, as a share of its own width."}
+                    controls={
+                        "Sets how far rows slide in the example's ScanlineAnimationProps.computeScanlineAnimation"
+                    }
                 >
                     <PageNumberField
                         value={() => keyframeOpts.shiftPercent!}
@@ -233,6 +245,9 @@ const GlitchExampleWrapper = (props: ScanlineAnimationExampleProps) => {
                     label={"Chunkyness (0-1)"}
                     hint={
                         "How blocky the glitch is: low values throw single lines about, high values throw thick slabs."
+                    }
+                    controls={
+                        "Sets how many neighboring rows slide together in the example's ScanlineAnimationProps.computeScanlineAnimation"
                     }
                 >
                     <PageNumberField
@@ -709,6 +724,7 @@ export const ScanlineAnimationPage = () => {
                     hint={
                         "Swaps in a picture of your own, so the sweep can be watched against something other than the sample."
                     }
+                    controls={"Picks the example picture sent to ScanlineAnimationProps.src"}
                 >
                     <PageFileField accept={"image/*"} ariaLabel={"Image"} onPick={handleFile} />
                 </PageProp>
@@ -717,6 +733,7 @@ export const ScanlineAnimationPage = () => {
                     key={"weightType"}
                     label={"Weight"}
                     hint={"How each line's turn is decided: its position, a wave, a random draw, and so on."}
+                    controls={"Picks the example's weight function sent to ScanlineAnimationProps.computeCellWeights"}
                 >
                     <PageGroupedSelectField
                         value={getWeightType}
@@ -732,6 +749,7 @@ export const ScanlineAnimationPage = () => {
                     hint={
                         "How many lines the picture is cut into. More lines is a finer sweep and more work per frame."
                     }
+                    controls={"Sets ScanlineAnimationProps.lineCount"}
                 >
                     <PageNumberField
                         value={getLineCount}
@@ -749,6 +767,7 @@ export const ScanlineAnimationPage = () => {
                     hint={
                         "Which way the lines run: rows across the picture, or columns down it. The samples here were written for rows, so on columns they still push sideways and some read their place off the row."
                     }
+                    controls={"Sets ScanlineAnimationProps.orientation"}
                 >
                     <PageSelectField
                         value={getOrientation}
@@ -762,6 +781,7 @@ export const ScanlineAnimationPage = () => {
                     key={"animationDurationMs"}
                     label={"Animation duration (ms)"}
                     hint={"How long one sweep over the whole picture takes."}
+                    controls={"Sets ScanlineAnimationProps.animationDurationMs"}
                 >
                     <PageNumberField
                         value={getAnimationDurationMs}
@@ -777,6 +797,7 @@ export const ScanlineAnimationPage = () => {
                     key={"animationIterationDelayMs"}
                     label={"Iteration delay (ms)"}
                     hint={"How long the picture waits between one sweep and the next."}
+                    controls={"Sets ScanlineAnimationProps.animationIterationDelayMs"}
                 >
                     <PageNumberField
                         value={getAnimationIterationDelayMs}

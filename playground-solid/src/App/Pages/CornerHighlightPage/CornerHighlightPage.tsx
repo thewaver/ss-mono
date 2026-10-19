@@ -98,7 +98,12 @@ export const CornerHighlightPage = () => {
     return (
         <>
             <PagePropsPanel scope={"global"}>
-                <PageProp key={"color"} label={"Color"} hint={"The color the corner marks are drawn in."}>
+                <PageProp
+                    key={"color"}
+                    label={"Color"}
+                    hint={"The color the corner marks are drawn in."}
+                    controls={"Sets CornerHighlightProps.color"}
+                >
                     <PageColorField value={getColor} ariaLabel={"Color"} onInput={setColor} />
                 </PageProp>
 
@@ -106,6 +111,7 @@ export const CornerHighlightPage = () => {
                     key={"cornerLengthWidth"}
                     label={"Arm across (px)"}
                     hint={"How long each corner's horizontal arm is."}
+                    controls={"Sets CornerHighlightProps.cornerLength.width"}
                 >
                     <PageNumberField
                         value={getLengthAcross}
@@ -122,6 +128,7 @@ export const CornerHighlightPage = () => {
                     key={"cornerLengthHeight"}
                     label={"Arm down (px)"}
                     hint={"How long each corner's vertical arm is."}
+                    controls={"Sets CornerHighlightProps.cornerLength.height"}
                 >
                     <PageNumberField
                         value={getLengthDown}
@@ -138,6 +145,7 @@ export const CornerHighlightPage = () => {
                     key={"strokeThickness"}
                     label={"Thickness (px)"}
                     hint={"How thick the corner arms are drawn."}
+                    controls={"Sets CornerHighlightProps.strokeThickness"}
                 >
                     <PageNumberField
                         value={getStrokeThickness}
@@ -156,6 +164,7 @@ export const CornerHighlightPage = () => {
                     hint={
                         "How long the corners take to follow a change of color, which is how the set as a whole fades. The following and drawn-on examples also glide and grow over this time."
                     }
+                    controls={"Sets CornerHighlightProps.transitionDurationMs"}
                 >
                     <PageNumberField
                         value={getTransitionDurationMs}
@@ -173,6 +182,7 @@ export const CornerHighlightPage = () => {
                         key={key}
                         label={CORNER_LABELS[key]}
                         hint={`Whether the ${CORNER_LABELS[key].toLowerCase()} mark is drawn at all.`}
+                        controls={"Adds or removes this corner in CornerHighlightProps.visibleCorners"}
                     >
                         <PageCheckField
                             value={() => getVisibleCorners().has(key)}

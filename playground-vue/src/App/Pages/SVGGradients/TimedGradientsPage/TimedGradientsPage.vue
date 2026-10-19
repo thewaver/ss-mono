@@ -90,6 +90,7 @@ const examples: ExampleDefs[] = [
         <PagePropsPanel scope="sample">
             <PageProp
                 item-key="configKey"
+                controls="Picks the sample gradient the example sends to ShapeProps.computeFillDefs or ShapeProps.computeStrokeDefs"
                 label="Gradient"
                 hint="Which animated gradient is shown. Choosing one brings its own knobs with it."
             >
@@ -111,6 +112,7 @@ const examples: ExampleDefs[] = [
 
             <PageProp
                 item-key="animationDurationMs"
+                controls="Sets SVGAnimationDefs.animationDurationMs"
                 label="Animation duration (ms)"
                 hint="How long one pass of the gradient's animation takes."
             >
@@ -126,6 +128,7 @@ const examples: ExampleDefs[] = [
 
             <PageProp
                 item-key="iterationConfigKey"
+                controls="Picks the sample iteration that fills SVGAnimationDefs.animationIterationPatterns"
                 label="Iteration Pattern"
                 hint="How the animation repeats: once, endlessly, or back and forth."
             >

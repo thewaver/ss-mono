@@ -1,11 +1,12 @@
 import type { PropsWithChildren } from "react";
-import { useState } from "react";
+import { Fragment, useState } from "react";
 
 import { Button } from "@thewaver/ss-components-react";
 import {
     EMPTY_TEXT,
     HINT_OFFSET,
     HINT_PLACEMENT,
+    MEMBER_SEPARATOR,
     SINGLE_FIELD,
 } from "@thewaver/ss-playground/App/PageComponents/Prop/Prop.const";
 import * as styles from "@thewaver/ss-playground/App/PageComponents/Prop/Prop.css";
@@ -24,6 +25,19 @@ const toDefaultText = (value: unknown) => {
 
     return undefined;
 };
+
+const toBreakableText = (text: string) =>
+    text.split(MEMBER_SEPARATOR).map((part, index) => (
+        <Fragment key={index}>
+            {index === 0 ? undefined : (
+                <>
+                    {MEMBER_SEPARATOR}
+                    <wbr />
+                </>
+            )}
+            {part}
+        </Fragment>
+    ));
 
 export const PageProp = (props: PropsWithChildren<PagePropProps>) => {
     const propsPanelScope = usePropsPanelContext();
@@ -64,6 +78,10 @@ export const PageProp = (props: PropsWithChildren<PagePropProps>) => {
                                 transitionDurationMs={transitionDurationMs}
                             >
                                 {props.hint}
+
+                                <div className={styles.propHintControls} data-hint-controls>
+                                    {toBreakableText(props.controls)}
+                                </div>
 
                                 {defaultText && (
                                     <div className={styles.propHintDefault}>{`Default: ${defaultText}`}</div>

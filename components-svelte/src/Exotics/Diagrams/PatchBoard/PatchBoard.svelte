@@ -6,6 +6,7 @@
         CarrierUtils,
         LiveAnnouncerUtils,
         PATCH_BOARD_DEFAULTS,
+        PanZoomUtils,
         type PatchBoardCarry,
         type PatchBoardHandle,
         type PatchBoardNode,
@@ -17,6 +18,8 @@
     } from "@thewaver/ss-components";
 
     import { CarrierSvelteUtils } from "../../../Abstracts/Carrier/CarrierSvelte.utils.svelte.js";
+    import { ElementObserverSvelteUtils } from "../../../Abstracts/ElementObserver/ElementObserverSvelte.utils.svelte.js";
+    import { PanZoomSvelteUtils } from "../../../Abstracts/PanZoom/PanZoomSvelte.utils.svelte.js";
     import { LabelSvelteUtils } from "../../../Essentials/Input/Label/LabelSvelte.utils.svelte.js";
     import InteractionWrapper from "../../../Primitives/InteractionWrapper/InteractionWrapper.svelte";
     import type { PatchBoardProps } from "./PatchBoard.types.js";
@@ -24,7 +27,7 @@
     const NOTHING = 0;
     const FULL_WIDTH = 1;
 
-    let { nodes = $bindable(), links = $bindable(), ...props }: PatchBoardProps<T> = $props();
+    let { nodes = $bindable(), links = $bindable(), view = $bindable(), ...props }: PatchBoardProps<T> = $props();
 
     const boardId = $props.id();
     const nodeHintId = `${boardId}-node-hint`;
@@ -33,6 +36,7 @@
     const stopRefs = new Map<string, HTMLElement>();
 
     let root = $state<HTMLDivElement>();
+    let windowRef = $state<HTMLElement>();
     let focusedStop = $state<string>();
 
     const getAriaLabel = LabelSvelteUtils.resolveAriaLabel(() => props.ariaLabel);
@@ -42,11 +46,67 @@
     const orientation = $derived(props.orientation ?? PATCH_BOARD_DEFAULTS.orientation);
     const socketSize = $derived(props.socketSize ?? PATCH_BOARD_DEFAULTS.socketSize);
 
+    const isPannable = $derived(props.isPannable ?? PATCH_BOARD_DEFAULTS.isPannable);
+    const isZoomable = $derived(props.isZoomable ?? PATCH_BOARD_DEFAULTS.isZoomable);
+
+    const getWindowSize = ElementObserverSvelteUtils.createBorderBoxSizeObserver(() => windowRef);
+
+    const panZoom = PanZoomSvelteUtils.create({
+        getSource: () =>
+            view === undefined
+                ? undefined
+                : [
+                      () => view!,
+                      (next) => {
+                          view = next;
+                      },
+                  ],
+        getWindowRef: () => windowRef,
+        getSize: getWindowSize,
+        getRange: () => PanZoomUtils.toFullView(FULL_WIDTH, props.heightRatio),
+        getMinWidth: () => FULL_WIDTH / (props.maxScale ?? PATCH_BOARD_DEFAULTS.maxScale),
+        getDurationMs: () => props.transitionDurationMs ?? PATCH_BOARD_DEFAULTS.transitionDurationMs,
+        getIsPannable: () => isPannable,
+        getIsZoomable: () => isZoomable,
+    });
+
+    $effect(() => untrack(() => props.onMount?.(panZoom.controller)));
+
+    const layoutWidth = $derived(props.boardWidth ?? getWindowSize().width);
+
+    const boardTransform = $derived.by(() => {
+        if (!panZoom.getIsActive()) return undefined;
+
+        const shownView = panZoom.getShownView();
+        const scale = PanZoomUtils.computeScale(shownView, getWindowSize().width) / layoutWidth;
+
+        return `scale(${scale}) translate(${-shownView.x.start * layoutWidth}px, ${-shownView.y.start * layoutWidth}px)`;
+    });
+
+    const revealStop = (stopKey: string) => {
+        const element = stopRefs.get(stopKey);
+
+        if (!panZoom.getIsActive() || !root || !element) return;
+
+        const board = root.getBoundingClientRect();
+        const stop = element.getBoundingClientRect();
+
+        if (board.width === NOTHING) return;
+
+        panZoom.controller.showArea({
+            x: { start: (stop.left - board.left) / board.width, end: (stop.right - board.left) / board.width },
+            y: { start: (stop.top - board.top) / board.width, end: (stop.bottom - board.top) / board.width },
+        });
+    };
+
+    const getIsOnStop = (target: EventTarget | null) =>
+        [...stopRefs.values()].some((element) => target instanceof Node && element.contains(target));
+
     const focusStop = (stopKey: string | undefined) => {
         if (stopKey === undefined) return;
 
         focusedStop = stopKey;
-        stopRefs.get(stopKey)?.focus();
+        stopRefs.get(stopKey)?.focus({ preventScroll: panZoom.getIsActive() });
     };
 
     const board: PatchBoardHandle<T> = PatchBoardUtils.createBoard<T>({
@@ -152,7 +212,15 @@
 
         if (key === undefined) return;
 
-        untrack(() => stopRefs.get(key)?.scrollIntoView({ block: "nearest", inline: "nearest" }));
+        untrack(() => {
+            if (panZoom.getIsActive()) {
+                revealStop(key);
+
+                return;
+            }
+
+            stopRefs.get(key)?.scrollIntoView({ block: "nearest", inline: "nearest" });
+        });
     });
 
     $effect(() => {
@@ -217,6 +285,7 @@
                     aria-describedby={socketHintId}
                     onfocusin={() => {
                         focusedStop = stopKey;
+                        revealStop(stopKey);
                     }}
                 >
                     {@render props.renderSocket?.(socket, flags)}
@@ -226,81 +295,114 @@
     </div>
 {/snippet}
 
-<div
-    bind:this={root}
-    {@attach (element) => on(element, "click", (e) => board.handleRootClick(e))}
-    id={boardId}
-    class={styles.patchBoardRoot}
-    role="group"
-    aria-label={getAriaLabel()}
-    aria-disabled={isDisabled || undefined}
->
+{#snippet boardRoot()}
     <div
-        class={styles.patchBoardSpacer}
-        style:height={PlacementUtils.toContainerWidth(props.heightRatio)}
-        aria-hidden="true"
-    ></div>
-    <div id={nodeHintId} class={styles.patchBoardHint}>
-        {props.announcements.nodeRestingKeyHint}
-    </div>
-    <div id={socketHintId} class={styles.patchBoardHint}>
-        {props.announcements.socketRestingKeyHint}
-    </div>
-    <svg class={styles.patchBoardCables} viewBox={`0 0 ${FULL_WIDTH} ${props.heightRatio}`} aria-hidden="true">
-        {#each cableDefs as defs (defs.key)}
-            {@render props.renderCable(defs)}
-        {/each}
-    </svg>
-
-    {#each nodes as node (props.computeNodeKey(node.value))}
-        {@const nodeKey = props.computeNodeKey(node.value)}
-        {@const placement = placementByKey.get(nodeKey)}
+        bind:this={root}
+        {@attach (element) => on(element, "click", (e) => board.handleRootClick(e))}
+        id={boardId}
+        class={styles.patchBoardRoot}
+        style:width={panZoom.getIsActive() && props.boardWidth !== undefined ? `${layoutWidth}px` : undefined}
+        style:transform={boardTransform}
+        role="group"
+        aria-label={getAriaLabel()}
+        aria-disabled={isDisabled || undefined}
+    >
         <div
-            class={styles.patchBoardSlot}
-            role="group"
-            style:left={PlacementUtils.toContainerWidth(placement?.spot.x ?? node.spot.x)}
-            style:top={PlacementUtils.toContainerWidth(placement?.spot.y ?? node.spot.y)}
-            style:width={PlacementUtils.toContainerWidth(node.sizeShare.width)}
-            style:height={PlacementUtils.toContainerWidth(node.sizeShare.height)}
-        >
-            <div class={styles.patchBoardNodeHolder}>
-                <InteractionWrapper
-                    sizing="fill"
-                    isDisabled={node.isDisabled ?? false}
-                    isFocusableWhenDisabled={!isDisabled}
-                    isTabbable={rovingStop === nodeKey}
-                    extraFlags={{ isCarried: carriedNodeKey === nodeKey }}
-                >
-                    {#snippet renderControl(attachElement, flags)}
-                        <div
-                            {@attach attachStop(nodeKey)}
-                            {@attach attachElement}
-                            {@attach (element) =>
-                                on(element, "pointerdown", (e) =>
-                                    board.handleNodePointerDown(node, e, e.currentTarget),
-                                )}
-                            {@attach (element) =>
-                                on(element, "click", (e) => board.handleNodeClick(node, e, e.currentTarget))}
-                            {@attach (element) =>
-                                on(element, "keydown", (e) => board.handleStopKeyDown(nodeKey, node, undefined, e))}
-                            class={styles.patchBoardNode}
-                            role="button"
-                            aria-label={props.computeNodeLabel(node.value)}
-                            aria-disabled={(node.isDisabled ?? false) || undefined}
-                            aria-describedby={nodeHintId}
-                            onfocusin={() => {
-                                focusedStop = nodeKey;
-                            }}
-                        >
-                            {@render props.renderNode(node, flags)}
-                        </div>
-                    {/snippet}
-                </InteractionWrapper>
-            </div>
-
-            {#each node.sockets as socket (socket.id)}
-                {@render socketAt(node, nodeKey, socket)}
-            {/each}
+            class={styles.patchBoardSpacer}
+            style:height={PlacementUtils.toContainerWidth(props.heightRatio)}
+            aria-hidden="true"
+        ></div>
+        <div id={nodeHintId} class={styles.patchBoardHint}>
+            {props.announcements.nodeRestingKeyHint}
         </div>
-    {/each}
-</div>
+        <div id={socketHintId} class={styles.patchBoardHint}>
+            {props.announcements.socketRestingKeyHint}
+        </div>
+        <svg class={styles.patchBoardCables} viewBox={`0 0 ${FULL_WIDTH} ${props.heightRatio}`} aria-hidden="true">
+            {#each cableDefs as defs (defs.key)}
+                {@render props.renderCable(defs)}
+            {/each}
+        </svg>
+    
+        {#each nodes as node (props.computeNodeKey(node.value))}
+            {@const nodeKey = props.computeNodeKey(node.value)}
+            {@const placement = placementByKey.get(nodeKey)}
+            <div
+                class={styles.patchBoardSlot}
+                role="group"
+                style:left={PlacementUtils.toContainerWidth(placement?.spot.x ?? node.spot.x)}
+                style:top={PlacementUtils.toContainerWidth(placement?.spot.y ?? node.spot.y)}
+                style:width={PlacementUtils.toContainerWidth(node.sizeShare.width)}
+                style:height={PlacementUtils.toContainerWidth(node.sizeShare.height)}
+            >
+                <div class={styles.patchBoardNodeHolder}>
+                    <InteractionWrapper
+                        sizing="fill"
+                        isDisabled={node.isDisabled ?? false}
+                        isFocusableWhenDisabled={!isDisabled}
+                        isTabbable={rovingStop === nodeKey}
+                        extraFlags={{ isCarried: carriedNodeKey === nodeKey }}
+                    >
+                        {#snippet renderControl(attachElement, flags)}
+                            <div
+                                {@attach attachStop(nodeKey)}
+                                {@attach attachElement}
+                                {@attach (element) =>
+                                    on(element, "pointerdown", (e) =>
+                                        board.handleNodePointerDown(node, e, e.currentTarget),
+                                    )}
+                                {@attach (element) =>
+                                    on(element, "click", (e) => board.handleNodeClick(node, e, e.currentTarget))}
+                                {@attach (element) =>
+                                    on(element, "keydown", (e) => board.handleStopKeyDown(nodeKey, node, undefined, e))}
+                                class={styles.patchBoardNode}
+                                role="button"
+                                aria-label={props.computeNodeLabel(node.value)}
+                                aria-disabled={(node.isDisabled ?? false) || undefined}
+                                aria-describedby={nodeHintId}
+                                onfocusin={() => {
+                                    focusedStop = nodeKey;
+                                    revealStop(nodeKey);
+                                }}
+                            >
+                                {@render props.renderNode(node, flags)}
+                            </div>
+                        {/snippet}
+                    </InteractionWrapper>
+                </div>
+    
+                {#each node.sockets as socket (socket.id)}
+                    {@render socketAt(node, nodeKey, socket)}
+                {/each}
+            </div>
+        {/each}
+    </div>
+{/snippet}
+
+{#if panZoom.getIsActive()}
+    <div
+        bind:this={windowRef}
+        {@attach (element) =>
+            on(element, "pointerdown", (e) => {
+                if (getIsOnStop(e.target)) return;
+
+                panZoom.gestures.press(e);
+            })}
+        {@attach (element) => on(element, "pointermove", (e) => panZoom.gestures.move(e, e.currentTarget))}
+        {@attach (element) => on(element, "pointerup", (e) => panZoom.gestures.release(e, e.currentTarget))}
+        {@attach (element) => on(element, "pointercancel", (e) => panZoom.gestures.release(e, e.currentTarget))}
+        {@attach (element) => on(element, "wheel", (e) => panZoom.gestures.wheel(e), { passive: false })}
+        class={styles.patchBoardWindow}
+        style:aspect-ratio={`${FULL_WIDTH} / ${props.heightRatio}`}
+        style:touch-action={isPannable || isZoomable ? "none" : undefined}
+        style:user-select={isPannable ? "none" : undefined}
+        onscroll={(e) => {
+            e.currentTarget.scrollLeft = NOTHING;
+            e.currentTarget.scrollTop = NOTHING;
+        }}
+    >
+        {@render boardRoot()}
+    </div>
+{:else}
+    {@render boardRoot()}
+{/if}

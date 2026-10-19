@@ -74,6 +74,7 @@ const VirtualizedExampleWrapper = (
                     hint={
                         "How many options the list holds. Only the ones on screen are rendered, so a very large number should still open instantly."
                     }
+                    controls={"Sets the number of example options sent to SelectProps.options"}
                 >
                     <PageNumberField
                         value={props.count}

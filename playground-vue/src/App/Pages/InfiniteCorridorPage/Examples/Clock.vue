@@ -99,6 +99,7 @@ const toggleWalking = () => {
     <PageExampleKnobs>
         <PageProp
             item-key="lapMs"
+            controls="Sets how fast the example clock advances InfiniteCorridorProps.progress"
             label="Lap (ms)"
             hint="How long the clock takes to walk the whole corridor once, past every room and back to the first."
         >

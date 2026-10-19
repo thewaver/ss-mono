@@ -20,6 +20,7 @@ const size = shallowRef(SVGFilterKnobs.Pixelate.STARTING_SIZE);
     <PageExampleKnobs>
         <PageProp
             item-key="pixelSize"
+            controls="Sets SVGPixelateFilterDefs.size"
             label="Square size (px)"
             hint="How wide each square is. Each takes the color at its own middle; 1 leaves the picture alone."
         >

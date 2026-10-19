@@ -133,6 +133,7 @@
 <PagePropsPanel scope={"global"}>
     <PageProp
         itemKey={"precision"}
+        controls={"Sets ScratchCardProps.precision"}
         label={"Precision"}
         hint={"How finely the card measures how much has been scratched off. Finer measurement costs more work each frame."}
     >
@@ -148,6 +149,7 @@
 
     <PageProp
         itemKey={"brushRadius"}
+        controls={"Sets ScratchCardProps.brushRadius"}
         label={"Brush radius (px)"}
         hint={"How large a patch one stroke of the pointer clears."}
     >
@@ -163,6 +165,7 @@
 
     <PageProp
         itemKey={"brushShape"}
+        controls={"Picks the example brush contour sent to ScratchCardProps.computePoints"}
         label={"Brush shape"}
         hint={"The contour of the patch a stroke clears."}
     >
@@ -176,6 +179,7 @@
 
     <PageProp
         itemKey={"softness"}
+        controls={"Sets ScratchCardProps.softness"}
         label={"Edge softness"}
         hint={"How gradually a cleared patch fades into what is still covered. 0 gives a hard edge."}
     >
@@ -191,6 +195,7 @@
 
     <PageProp
         itemKey={"clearThreshold"}
+        controls={"Sets ScratchCardProps.clearThreshold"}
         label={"Clear threshold"}
         hint={"How much of the card has to be scratched off before the rest is cleared for you."}
     >

@@ -77,6 +77,7 @@ export const RevealPage = () => {
                     key={"radius"}
                     label={"Radius (px)"}
                     hint={"How large the window that follows the pointer is."}
+                    controls={"Sets RevealProps.radius"}
                 >
                     <PageNumberField
                         value={getRadius}
@@ -93,6 +94,7 @@ export const RevealPage = () => {
                     key={"computePoints"}
                     label={"Shape"}
                     hint={"The contour of the window that follows the pointer."}
+                    controls={"Picks the example contour sent to RevealProps.computePoints"}
                 >
                     <PageSelectField
                         value={getShape}
@@ -109,6 +111,7 @@ export const RevealPage = () => {
                     hint={
                         "How far the window's corners are rounded. A circular window has no corners, so it is off then."
                     }
+                    controls={"Sets every corner of RevealProps.joinRadii"}
                 >
                     <PageNumberField
                         value={getJoinRadius}
@@ -127,6 +130,7 @@ export const RevealPage = () => {
                     hint={
                         "How square or how pinched the window's rounded corners are: 2 is a circular round, higher is squarer."
                     }
+                    controls={"Sets every corner of RevealProps.lameExponents"}
                 >
                     <PageNumberField
                         value={getLameExponent}
@@ -143,6 +147,7 @@ export const RevealPage = () => {
                     key={"softness"}
                     label={"Softness"}
                     hint={"How gradually the window fades into what is still covered. 0 gives a hard edge."}
+                    controls={"Sets RevealProps.softness"}
                 >
                     <PageNumberField
                         value={getSoftness}
@@ -161,6 +166,7 @@ export const RevealPage = () => {
                     hint={
                         "How far one press of an arrow key moves the window. Tab to a reveal and it opens at the center; the arrow keys move it from there."
                     }
+                    controls={"Sets RevealProps.stepSize"}
                 >
                     <PageNumberField
                         value={getStepSize}
@@ -179,6 +185,7 @@ export const RevealPage = () => {
                     hint={
                         "Stops the window following the pointer or the keyboard, leaving whatever is underneath covered."
                     }
+                    controls={"Sets RevealProps.isDisabled"}
                 >
                     <PageCheckField value={getIsDisabled} ariaLabel={"Disabled"} onChange={setIsDisabled} />
                 </PageProp>

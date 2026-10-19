@@ -1,4 +1,5 @@
 <script lang="ts">
+    import { EXAMPLES_ONLY_PROP } from "@thewaver/ss-playground/App/PageComponents/Prop/Prop.const";
     import { SHAPE_REVEAL_DEFAULTS } from "@thewaver/ss-components-svelte";
     import { ShapeRevealKnobs } from "@thewaver/ss-playground/App/Knobs/ShapeReveals.const";
     import { THEME_OPTIONS } from "@thewaver/ss-playground/App/PageComponents/NavSettings/NavSettings.const";
@@ -62,6 +63,7 @@
 <PagePropsPanel scope={"global"}>
     <PageProp
         itemKey={"durationMs"}
+        controls={"Sets ShapeRevealOpts.durationMs"}
         label={"Duration (ms)"}
         hint={"How long the circle takes to grow over the whole window. 0 switches the theme at once, as does the system's reduced-motion setting."}
     >
@@ -78,6 +80,7 @@
 
     <PageProp
         itemKey={"delayMs"}
+        controls={EXAMPLES_ONLY_PROP}
         label={"Delay (ms)"}
         hint={"How long the new theme stays on screen, once the circle has covered it, before the next."}
     >
@@ -94,6 +97,7 @@
 
     <PageProp
         itemKey={"computePoints"}
+        controls={"Picks the example contour sent to ShapeRevealOpts.computePoints"}
         label={"Shape"}
         hint={"The contour that grows over the window. A circle is what the reveal draws when none is given."}
     >
@@ -108,6 +112,7 @@
 
     <PageProp
         itemKey={"softness"}
+        controls={"Sets ShapeRevealOpts.softness"}
         label={"Softness"}
         hint={"How gradually the growing shape's edge fades, as a share of the distance it grows. 0 gives a hard edge."}
     >

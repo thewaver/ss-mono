@@ -62,6 +62,7 @@ export const EdgeFaderPage = () => {
                     itemKey={"size"}
                     label={"Fade size (px)"}
                     hint={"How far in from each side the fade reaches."}
+                    controls={"Sets EdgeFaderProps.size"}
                 >
                     <PageNumberField
                         value={size}
@@ -77,6 +78,7 @@ export const EdgeFaderPage = () => {
                     itemKey={"isScrollAware"}
                     label={"Scroll-aware"}
                     hint={"Whether a side fades only while there is more to scroll to past it."}
+                    controls={"Sets EdgeFaderProps.isScrollAware"}
                 >
                     <PageCheckField value={isScrollAware} ariaLabel={"Scroll-aware"} onChange={setIsScrollAware} />
                 </PageProp>

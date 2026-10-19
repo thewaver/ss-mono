@@ -21,6 +21,8 @@ export type * from "./Abstracts/MaskedField/MaskedFieldSolid.types";
 export * from "./Abstracts/MaskedField/MaskedFieldSolid.utils";
 export * from "./Abstracts/MediaQueryMonitor/MediaQueryMonitorSolid.utils";
 export * from "./Abstracts/Navigator/NavigatorSolid.utils";
+export type * from "./Abstracts/PanZoom/PanZoomSolid.types";
+export * from "./Abstracts/PanZoom/PanZoomSolid.utils";
 export * from "./Abstracts/PointerTracker/PointerTrackerSolid.utils";
 export type * from "./Abstracts/Roller/RollerSolid.types";
 export * from "./Abstracts/Roller/RollerSolid.utils";

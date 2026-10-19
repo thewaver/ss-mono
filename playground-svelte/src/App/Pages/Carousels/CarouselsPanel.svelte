@@ -31,6 +31,7 @@
     {#if props.hasPlacement}
         <PageProp
             itemKey={"placement"}
+            controls={"Picks the sample placement sent to CarouselProps.placement"}
             label={"Placement"}
             hint={"The rule that says where each slide is drawn from how far it is from the one showing: a strip, a drum, cover flow and the rest."}
         >
@@ -46,7 +47,7 @@
         </PageProp>
     {/if}
 
-    <PageProp itemKey={"slideCount"} label={"Slide count"} hint={"How many slides the carousel holds."}>
+    <PageProp itemKey={"slideCount"} controls={"Sets the length of the slice of example slides sent to CarouselProps.slides"} label={"Slide count"} hint={"How many slides the carousel holds."}>
         <PageNumberField
             value={controls.slideCount}
             min={CarouselKnobs.MIN_SLIDE_COUNT}
@@ -63,6 +64,7 @@
     {#if props.hasDelay}
         <PageProp
             itemKey={"delayMs"}
+            controls={"Sets CarouselProps.autoplayDelayMs"}
             label={"Transition delay (ms)"}
             hint={"How long a slide is held before the carousel moves to the next one on its own."}
         >
@@ -82,6 +84,7 @@
 
     <PageProp
         itemKey={"transitionDurationMs"}
+        controls={"Sets CarouselProps.transitionDurationMs"}
         label={"Transition duration (ms)"}
         hint={"How long the move from one slide to the next takes. At 0 the carousel jumps straight there."}
     >
@@ -100,6 +103,7 @@
 
     <PageProp
         itemKey={"orientation"}
+        controls={"Sets CarouselProps.orientation"}
         label={"Orientation"}
         hint={"Which way the slides run, and so which way the arrows and the arrow keys move."}
     >
@@ -118,6 +122,7 @@
     {#if props.hasLooping}
         <PageProp
             itemKey={"isLooping"}
+            controls={"Sets CarouselProps.isLooping"}
             label={"Looping"}
             hint={
                 "Whether stepping past the last slide comes round to the first. Off, the end controls are disabled, a swipe past an end springs back, and rotation stops on the last slide."
@@ -135,6 +140,7 @@
 
     <PageProp
         itemKey={"isDisabled"}
+        controls={"Sets CarouselProps.isDisabled"}
         label={"Disabled"}
         hint={"Turns the carousel off, so neither its controls nor its swipes do anything."}
     >

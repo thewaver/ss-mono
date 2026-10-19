@@ -53,6 +53,7 @@
 <PagePropsPanel scope={"global"}>
     <PageProp
         itemKey={"offsetY"}
+        controls={"Sets HoverCardProps.offset.y"}
         label={"Offset down (px)"}
         hint={
             "How far the card is held clear of its anchor. The gap is bridged, so the pointer can cross it without losing the card."
@@ -73,6 +74,7 @@
 
     <PageProp
         itemKey={"transitionDurationMs"}
+        controls={"Sets HoverCardProps.transitionDurationMs"}
         label={"Fade (ms)"}
         hint={"How long the card takes to fade in and out."}
     >
@@ -91,6 +93,7 @@
 
     <PageProp
         itemKey={"focusShowDelayMs"}
+        controls={"Sets HoverCardProps.focusShowDelayMs"}
         label={"Focus delay (ms)"}
         hint={"How long a keyboard focus has to rest on the anchor before the card opens."}
     >
@@ -109,6 +112,7 @@
 
     <PageProp
         itemKey={"hoverShowDelayMs"}
+        controls={"Sets HoverCardProps.hoverShowDelayMs"}
         label={"Hover delay (ms)"}
         hint={
             "How long the pointer has to rest on the anchor before the card opens. Leave before then and nothing opens."
@@ -129,6 +133,7 @@
 
     <PageProp
         itemKey={"skipDelayWindowMs"}
+        controls={"Sets HoverCardProps.skipDelayWindowMs"}
         label={"Skip window (ms)"}
         hint={
             "How soon after a card has closed a hover opens one again at once, without waiting out the hover delay."

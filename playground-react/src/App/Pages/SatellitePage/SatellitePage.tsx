@@ -3,6 +3,7 @@ import { useMemo, useState } from "react";
 import { ANCHOR_H_PLACEMENTS, ANCHOR_V_PLACEMENTS, SATELLITE_DEFAULTS } from "@thewaver/ss-components-react";
 import type { AnchorHPlacement, AnchorVPlacement } from "@thewaver/ss-components-react";
 import { SatelliteKnobs } from "@thewaver/ss-playground/App/Knobs/Satellites.const";
+import { EXAMPLES_ONLY_PROP } from "@thewaver/ss-playground/App/PageComponents/Prop/Prop.const";
 import {
     EXAMPLES_ROOT,
     EXAMPLE_NAMES,
@@ -68,6 +69,7 @@ export const SatellitePage = () => {
                             hint={
                                 "Where the satellite sits across its subject: inside an edge, centered, or outside it altogether."
                             }
+                            controls={"Sets SatelliteDefs.placement.x"}
                         >
                             <PageSelectField
                                 value={hPlacement}
@@ -84,6 +86,7 @@ export const SatellitePage = () => {
                             hint={
                                 "Where the satellite sits above or below its subject: inside an edge, centered, or outside it altogether."
                             }
+                            controls={"Sets SatelliteDefs.placement.y"}
                         >
                             <PageSelectField
                                 value={vPlacement}
@@ -98,6 +101,7 @@ export const SatellitePage = () => {
                             itemKey={"offsetX"}
                             label={"Offset across (px)"}
                             hint={"How far the satellite is nudged sideways from where the placement put it."}
+                            controls={"Sets SatelliteDefs.offset.x"}
                         >
                             <PageNumberField
                                 value={offsetX}
@@ -114,6 +118,7 @@ export const SatellitePage = () => {
                             itemKey={"offsetY"}
                             label={"Offset down (px)"}
                             hint={"How far the satellite is nudged up or down from where the placement put it."}
+                            controls={"Sets SatelliteDefs.offset.y"}
                         >
                             <PageNumberField
                                 value={offsetY}
@@ -132,6 +137,7 @@ export const SatellitePage = () => {
                             hint={
                                 "Whether a satellite is rendered at all, so the subject can be seen with and without one."
                             }
+                            controls={"Switches SatelliteProps.satellites between one satellite and none"}
                         >
                             <PageCheckField
                                 value={hasSatellite}
@@ -144,6 +150,7 @@ export const SatellitePage = () => {
                             itemKey={"badgeSize"}
                             label={"Satellite size (px)"}
                             hint={"How large the satellite itself is."}
+                            controls={"Sets the size of the example badge drawn by SatelliteDefs.renderSatellite"}
                         >
                             <PageNumberField
                                 value={badgeSize}
@@ -162,6 +169,7 @@ export const SatellitePage = () => {
                             hint={
                                 "Puts the satellite under the subject rather than over it, so the subject hides whatever overlaps."
                             }
+                            controls={"Sets SatelliteDefs.isBehindSubject"}
                         >
                             <PageCheckField
                                 value={isBehindSubject}
@@ -202,6 +210,9 @@ export const SatellitePage = () => {
                             itemKey={"badgeCorner"}
                             label={"Corner"}
                             hint={"Which corner the badge is pinned to; the overhang turns outward with it."}
+                            controls={
+                                "Picks the corner the example turns into SatelliteDefs.placement and SatelliteDefs.offset"
+                            }
                         >
                             <PageSelectField
                                 value={corner}
@@ -216,6 +227,7 @@ export const SatellitePage = () => {
                             itemKey={"badgeCount"}
                             label={"Count"}
                             hint={"The number on the badge. More digits make it wider, and it grows toward the middle."}
+                            controls={"Sets the number in the example pill drawn by SatelliteDefs.renderSatellite"}
                         >
                             <PageNumberField
                                 value={count}
@@ -232,6 +244,7 @@ export const SatellitePage = () => {
                             itemKey={"badgeOverhang"}
                             label={"Overhang (px)"}
                             hint={"How far the badge pokes out past each of the two edges it is pinned to."}
+                            controls={"Sets how far the example pushes SatelliteDefs.offset out from the corner"}
                         >
                             <PageNumberField
                                 value={overhang}
@@ -257,6 +270,7 @@ export const SatellitePage = () => {
                     itemKey={"subjectWidth"}
                     label={"Subject width (px)"}
                     hint={"How wide the thing the satellite is pinned to is."}
+                    controls={EXAMPLES_ONLY_PROP}
                 >
                     <PageNumberField
                         value={subjectWidth}
@@ -273,6 +287,7 @@ export const SatellitePage = () => {
                     itemKey={"subjectHeight"}
                     label={"Subject height (px)"}
                     hint={"How tall the thing the satellite is pinned to is."}
+                    controls={EXAMPLES_ONLY_PROP}
                 >
                     <PageNumberField
                         value={subjectHeight}

@@ -53,6 +53,7 @@ export const SunburstPage = () => {
                     key={"ringCount"}
                     label={"Rings"}
                     hint={"How many levels are drawn around the middle at once."}
+                    controls={"Sets SunburstProps.ringCount"}
                 >
                     <PageNumberField
                         value={getRingCount}
@@ -70,6 +71,7 @@ export const SunburstPage = () => {
                     hint={
                         "How long a zoom in or out takes. It is off while the visitor has asked for reduced motion, and 0 jumps straight to the new level."
                     }
+                    controls={"Sets SunburstProps.zoomDurationMs"}
                 >
                     <PageNumberField
                         value={getZoomDurationMs}

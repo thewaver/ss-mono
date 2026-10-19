@@ -146,7 +146,7 @@
 {/snippet}
 
 <PagePropsPanel scope={"global"}>
-    <PageProp itemKey={"gap"} label={"Gap (px)"} hint={"The space between sections."}>
+    <PageProp itemKey={"gap"} controls={"Sets AccordionProps.gap"} label={"Gap (px)"} hint={"The space between sections."}>
         <PageNumberField
             value={gap}
             min={AccordionKnobs.MIN_GAP}
@@ -162,6 +162,7 @@
 
     <PageProp
         itemKey={"transitionDurationMs"}
+        controls={"Sets AccordionProps.transitionDurationMs"}
         label={"Transition duration (ms)"}
         hint={"How long a section takes to open and close. At 0 it opens and closes at once."}
     >

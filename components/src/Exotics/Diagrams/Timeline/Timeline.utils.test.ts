@@ -23,62 +23,6 @@ const stopsOf = (spans: TimelineSpan[], disabled: number[] = []) => {
     );
 };
 
-describe("clampView", () => {
-    it("keeps the window inside the range and never wider than it", () => {
-        expect(TimelineUtils.clampView(span(-50, 300), RANGE, 1)).toEqual(span(0, 100));
-    });
-
-    it("slides a window that ran off the end back against it rather than shrinking it", () => {
-        expect(TimelineUtils.clampView(span(90, 130), RANGE, 1)).toEqual(span(60, 100));
-    });
-
-    it("holds the smallest window a consumer asked for", () => {
-        expect(TimelineUtils.clampView(span(50, 50.1), RANGE, 10)).toEqual(span(50, 60));
-    });
-});
-
-describe("zoomView", () => {
-    it("leaves the value under the focus where it was", () => {
-        const zoomed = TimelineUtils.zoomView(span(0, 100), 0.5, 0.25, RANGE, 1);
-
-        expect(zoomed, "a quarter across 0..100 is 25, and it is a quarter across the new window too").toEqual(
-            span(12.5, 62.5),
-        );
-    });
-
-    it("cannot zoom out past the range", () => {
-        expect(TimelineUtils.zoomView(span(20, 40), 100, 0.5, RANGE, 1)).toEqual(span(0, 100));
-    });
-
-    it("cannot zoom in past the smallest window", () => {
-        expect(TimelineUtils.zoomView(span(0, 100), 0.001, 0.5, RANGE, 20)).toEqual(span(40, 60));
-    });
-});
-
-describe("panView", () => {
-    it("moves by a share of what is on screen", () => {
-        expect(TimelineUtils.panView(span(20, 40), 0.5, RANGE)).toEqual(span(30, 50));
-    });
-
-    it("stops at the end of the range with the window the width it was", () => {
-        expect(TimelineUtils.panView(span(80, 100), 0.5, RANGE)).toEqual(span(80, 100));
-    });
-});
-
-describe("revealView", () => {
-    it("does nothing when the span is already on screen", () => {
-        expect(TimelineUtils.revealView(span(25, 30), span(20, 40), RANGE)).toEqual(span(20, 40));
-    });
-
-    it("moves the least it can to bring a span in from the right", () => {
-        expect(TimelineUtils.revealView(span(45, 50), span(20, 40), RANGE)).toEqual(span(30, 50));
-    });
-
-    it("puts a span that is wider than the window against the left edge", () => {
-        expect(TimelineUtils.revealView(span(50, 90), span(20, 40), RANGE)).toEqual(span(50, 70));
-    });
-});
-
 describe("packLanes", () => {
     it("gives overlapping spans their own lane and re-uses a lane once it is free", () => {
         expect(lanesOf(SPANS)).toEqual([0, 1, 0, 0]);
@@ -375,13 +319,6 @@ describe("computeRovingIndex", () => {
         );
 
         expect(TimelineUtils.computeRenderedIndices(placements, 2)).toEqual([0, 1, 2]);
-    });
-});
-
-describe("computePointerRatio", () => {
-    it("reads a pointer as a share of the box, and the middle when there is no box", () => {
-        expect(TimelineUtils.computePointerRatio(150, { left: 100, width: 200 })).toBe(0.25);
-        expect(TimelineUtils.computePointerRatio(150, undefined)).toBe(0.5);
     });
 });
 

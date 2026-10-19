@@ -3,6 +3,7 @@ import { createMemo, createSignal } from "solid-js";
 import { ANCHOR_H_PLACEMENTS, ANCHOR_V_PLACEMENTS, SATELLITE_DEFAULTS } from "@thewaver/ss-components-solid";
 import type { AnchorHPlacement, AnchorVPlacement } from "@thewaver/ss-components-solid";
 import { SatelliteKnobs } from "@thewaver/ss-playground/App/Knobs/Satellites.const";
+import { EXAMPLES_ONLY_PROP } from "@thewaver/ss-playground/App/PageComponents/Prop/Prop.const";
 import {
     EXAMPLES_ROOT,
     EXAMPLE_NAMES,
@@ -68,6 +69,7 @@ export const SatellitePage = () => {
                             hint={
                                 "Where the satellite sits across its subject: inside an edge, centered, or outside it altogether."
                             }
+                            controls={"Sets SatelliteDefs.placement.x"}
                         >
                             <PageSelectField
                                 value={getHPlacement}
@@ -84,6 +86,7 @@ export const SatellitePage = () => {
                             hint={
                                 "Where the satellite sits above or below its subject: inside an edge, centered, or outside it altogether."
                             }
+                            controls={"Sets SatelliteDefs.placement.y"}
                         >
                             <PageSelectField
                                 value={getVPlacement}
@@ -98,6 +101,7 @@ export const SatellitePage = () => {
                             key={"offsetX"}
                             label={"Offset across (px)"}
                             hint={"How far the satellite is nudged sideways from where the placement put it."}
+                            controls={"Sets SatelliteDefs.offset.x"}
                         >
                             <PageNumberField
                                 value={getOffsetX}
@@ -114,6 +118,7 @@ export const SatellitePage = () => {
                             key={"offsetY"}
                             label={"Offset down (px)"}
                             hint={"How far the satellite is nudged up or down from where the placement put it."}
+                            controls={"Sets SatelliteDefs.offset.y"}
                         >
                             <PageNumberField
                                 value={getOffsetY}
@@ -132,6 +137,7 @@ export const SatellitePage = () => {
                             hint={
                                 "Whether a satellite is rendered at all, so the subject can be seen with and without one."
                             }
+                            controls={"Switches SatelliteProps.satellites between one satellite and none"}
                         >
                             <PageCheckField
                                 value={getHasSatellite}
@@ -144,6 +150,7 @@ export const SatellitePage = () => {
                             key={"badgeSize"}
                             label={"Satellite size (px)"}
                             hint={"How large the satellite itself is."}
+                            controls={"Sets the size of the example badge drawn by SatelliteDefs.renderSatellite"}
                         >
                             <PageNumberField
                                 value={getBadgeSize}
@@ -162,6 +169,7 @@ export const SatellitePage = () => {
                             hint={
                                 "Puts the satellite under the subject rather than over it, so the subject hides whatever overlaps."
                             }
+                            controls={"Sets SatelliteDefs.isBehindSubject"}
                         >
                             <PageCheckField
                                 value={getIsBehindSubject}
@@ -207,6 +215,9 @@ export const SatellitePage = () => {
                             key={"badgeCorner"}
                             label={"Corner"}
                             hint={"Which corner the badge is pinned to; the overhang turns outward with it."}
+                            controls={
+                                "Picks the corner the example turns into SatelliteDefs.placement and SatelliteDefs.offset"
+                            }
                         >
                             <PageSelectField
                                 value={getCorner}
@@ -221,6 +232,7 @@ export const SatellitePage = () => {
                             key={"badgeCount"}
                             label={"Count"}
                             hint={"The number on the badge. More digits make it wider, and it grows toward the middle."}
+                            controls={"Sets the number in the example pill drawn by SatelliteDefs.renderSatellite"}
                         >
                             <PageNumberField
                                 value={getCount}
@@ -237,6 +249,7 @@ export const SatellitePage = () => {
                             key={"badgeOverhang"}
                             label={"Overhang (px)"}
                             hint={"How far the badge pokes out past each of the two edges it is pinned to."}
+                            controls={"Sets how far the example pushes SatelliteDefs.offset out from the corner"}
                         >
                             <PageNumberField
                                 value={getOverhang}
@@ -262,6 +275,7 @@ export const SatellitePage = () => {
                     key={"subjectWidth"}
                     label={"Subject width (px)"}
                     hint={"How wide the thing the satellite is pinned to is."}
+                    controls={EXAMPLES_ONLY_PROP}
                 >
                     <PageNumberField
                         value={getSubjectWidth}
@@ -278,6 +292,7 @@ export const SatellitePage = () => {
                     key={"subjectHeight"}
                     label={"Subject height (px)"}
                     hint={"How tall the thing the satellite is pinned to is."}
+                    controls={EXAMPLES_ONLY_PROP}
                 >
                     <PageNumberField
                         value={getSubjectHeight}

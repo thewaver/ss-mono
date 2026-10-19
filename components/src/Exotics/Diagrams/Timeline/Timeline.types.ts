@@ -92,15 +92,6 @@ export type TimelineItemBox = {
     height: number;
 };
 
-export type TimelineGestureDefs = {
-    getIsPannable: () => boolean;
-    getIsZoomable: () => boolean;
-    getWidth: () => number;
-    computePointerRatio: (clientX: number) => number;
-    zoomBy: (factor: number, focusRatio: number) => void;
-    panBy: (ratio: number) => void;
-};
-
 export type TimelineEdgeZoneDefs = {
     getGroupId: () => string;
     getLabel: () => string;

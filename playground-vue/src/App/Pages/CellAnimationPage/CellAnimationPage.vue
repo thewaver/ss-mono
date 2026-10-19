@@ -156,6 +156,7 @@ const examples: ExampleDefs[] = [
         <PagePropsPanel scope="global">
             <PageProp
                 item-key="cellCountCols"
+                controls="Sets CellAnimationProps.cellCount"
                 label="Cell count (cols x rows)"
                 hint="How many columns and rows the picture is cut into. More cells is a finer animation and more work per frame."
             >
@@ -181,6 +182,7 @@ const examples: ExampleDefs[] = [
 
             <PageProp
                 item-key="originType"
+                controls="Picks the point the example's weights are measured from, sent to CellAnimationProps.computeCellWeights"
                 label="Origin"
                 hint="Where in the grid the animation starts from. It only applies to weights that are measured from a point."
             >
@@ -195,6 +197,7 @@ const examples: ExampleDefs[] = [
 
             <PageProp
                 item-key="weightType"
+                controls="Picks the example's weight function sent to CellAnimationProps.computeCellWeights"
                 label="Weight"
                 hint="How each cell's turn is decided: its distance from the origin, a wave, a random draw, and so on."
             >
@@ -208,6 +211,7 @@ const examples: ExampleDefs[] = [
 
             <PageProp
                 item-key="uniqueWeights"
+                controls="Sets WeightOpts.shouldMakeUnique"
                 label="Unique weights"
                 hint="Gives every cell a turn of its own, so no two move together even where the weight would have tied them."
             >
@@ -220,6 +224,7 @@ const examples: ExampleDefs[] = [
 
             <PageProp
                 item-key="normalizeWeights"
+                controls="Sets WeightOpts.shouldNormalize"
                 label="Normalize weights"
                 hint="Spreads the weights out to fill the whole run, so the first cell starts at the beginning and the last ends at the end."
             >
@@ -232,6 +237,7 @@ const examples: ExampleDefs[] = [
 
             <PageProp
                 item-key="animationType"
+                controls="Picks the example's cell keyframes sent to CellAnimationProps.computeCellAnimation"
                 label="Animation"
                 hint="What each cell actually does on its turn: fade, slide, spin, and the rest."
             >
@@ -245,6 +251,7 @@ const examples: ExampleDefs[] = [
 
             <PageProp
                 item-key="direction"
+                controls="Sets CellAnimationBreakpointOpts.dir"
                 label="Direction"
                 hint="Which way the run travels through the weights, and so which cells go first."
             >
@@ -258,6 +265,7 @@ const examples: ExampleDefs[] = [
 
             <PageProp
                 item-key="easing"
+                controls="Sets CellAnimationBreakpointOpts.easing"
                 label="Easing"
                 hint="The speed curve a single cell follows from its start to its finish."
             >
@@ -271,6 +279,7 @@ const examples: ExampleDefs[] = [
 
             <PageProp
                 item-key="smoothness01"
+                controls="Sets CellAnimationBreakpointOpts.smoothness"
                 label="Smoothness (0-1)"
                 hint="How much a cell's own movement overlaps its neighbors'. 0 makes each cell wait its turn; 1 blurs them into one sweep."
             >
@@ -286,6 +295,7 @@ const examples: ExampleDefs[] = [
 
             <PageProp
                 item-key="animationDurationMs"
+                controls="Sets CellAnimationProps.animationDurationMs"
                 label="Animation duration (ms)"
                 hint="How long one pass over the whole grid takes."
             >
@@ -301,6 +311,7 @@ const examples: ExampleDefs[] = [
 
             <PageProp
                 item-key="animationIterationDelayMs"
+                controls="Sets CellAnimationProps.animationIterationDelayMs"
                 label="Iteration delay (ms)"
                 hint="How long the grid waits between one pass and the next."
             >
@@ -316,6 +327,7 @@ const examples: ExampleDefs[] = [
 
             <PageProp
                 item-key="animationIterationCount"
+                controls="Sets CellAnimationProps.animationIterationCount, with -1 sent as Infinity"
                 label="Iteration count (-1 = endless)"
                 hint="How many passes to run. -1 means it never stops, and 0 shows the final frame at once."
             >
@@ -331,6 +343,7 @@ const examples: ExampleDefs[] = [
 
             <PageProp
                 item-key="finalFrame"
+                controls="Sets CellAnimationProps.finalFrame"
                 label="Final frame is"
                 hint="What the grid is left showing once the passes are done. It has nothing to settle on while the run is endless."
             >
@@ -345,6 +358,7 @@ const examples: ExampleDefs[] = [
 
             <PageProp
                 item-key="playbackDir"
+                controls="Sets CellAnimationPlaybackOpts.dir"
                 label="Playback direction"
                 hint="Whether each pass runs one way, or goes out and comes back. Coming back, stack starts with the last cell to arrive and pipe with the first."
             >
@@ -358,6 +372,7 @@ const examples: ExampleDefs[] = [
 
             <PageProp
                 item-key="holdMs"
+                controls="Sets CellAnimationPlaybackOpts.holdMs"
                 label="Hold at far end (ms)"
                 hint="How long the grid rests at the far end before turning back. It only applies to stack and pipe, which come back."
             >

@@ -53,6 +53,7 @@ export const CirclePackingPage = () => {
                     key={"padding"}
                     label={"Padding (px)"}
                     hint={"The space left between neighboring circles and around the inside of their parent."}
+                    controls={"Sets CirclePackingProps.padding"}
                 >
                     <PageNumberField
                         value={getPadding}
@@ -70,6 +71,7 @@ export const CirclePackingPage = () => {
                     hint={
                         "How long a zoom in or out takes. It is off while the visitor has asked for reduced motion, and 0 jumps straight to the new view."
                     }
+                    controls={"Sets CirclePackingProps.zoomDurationMs"}
                 >
                     <PageNumberField
                         value={getZoomDurationMs}

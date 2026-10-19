@@ -58,6 +58,7 @@ const examples: ExampleDefs[] = [
     <PagePropsPanel scope="global">
         <PageProp
             item-key="hoverShowDelayMs"
+            controls="Sets FlyoutMenuProps.hoverShowDelayMs"
             label="Hover delay (ms)"
             hint="How long the pointer has to rest on an entry before its panel opens."
         >
@@ -74,6 +75,7 @@ const examples: ExampleDefs[] = [
 
         <PageProp
             item-key="transitionDurationMs"
+            controls="Sets FlyoutMenuProps.transitionDurationMs"
             label="Transition duration (ms)"
             hint="How long the panel takes to fade, and to glide from one entry to the next."
         >

@@ -147,6 +147,7 @@
 <PagePropsPanel scope={"global"}>
     <PageProp
         itemKey={"gutterSize"}
+        controls={"Sets SplitPaneProps.gutterSize"}
         label={"Gutter size (px)"}
         hint={"How wide the draggable divider between two panes is."}
     >
@@ -165,6 +166,7 @@
 
     <PageProp
         itemKey={"isDisabled"}
+        controls={"Sets SplitPaneProps.isDisabled"}
         label={"Disabled"}
         hint={"Turns the dividers off, so the panes keep the sizes they have."}
     >
@@ -177,7 +179,7 @@
         />
     </PageProp>
 
-    <PageProp itemKey={"ratios"} label={"Ratios"} hint={"Puts the panes back to the sizes they started at."}>
+    <PageProp itemKey={"ratios"} controls={"Writes the starting sizes back to SplitPaneProps.ratios"} label={"Ratios"} hint={"Puts the panes back to the sizes they started at."}>
         <Button
             onClick={async () => {
                 reset();

@@ -86,7 +86,7 @@
 {/snippet}
 
 <PagePropsPanel scope={"global"}>
-    <PageProp itemKey={"shape"} label={"Die"} hint={"Which solid both examples are, from four faces to a hundred."}>
+    <PageProp itemKey={"shape"} controls={"Picks the sample shape sent to DieProps.shape"} label={"Die"} hint={"Which solid both examples are, from four faces to a hundred."}>
         <PageSelectField
             value={shapeKey}
             values={DieShapes.SAMPLE_KEYS}
@@ -99,6 +99,7 @@
 
     <PageProp
         itemKey={"rollDurationMs"}
+        controls={"Sets DieProps.rollDurationMs"}
         label={"Roll duration (ms)"}
         hint={"How long a roll takes to land. It is off while the visitor has asked for reduced motion."}
     >
@@ -115,7 +116,7 @@
         />
     </PageProp>
 
-    <PageProp itemKey={"tumbleCount"} label={"Tumbles"} hint={"How many whole turns a roll makes on its way."}>
+    <PageProp itemKey={"tumbleCount"} controls={"Sets DieProps.tumbleCount"} label={"Tumbles"} hint={"How many whole turns a roll makes on its way."}>
         <PageNumberField
             value={tumbleCount}
             min={DieKnobs.MIN_TUMBLE_COUNT}

@@ -2,6 +2,7 @@
 import { shallowRef } from "vue";
 
 import { MenubarKnobs } from "@thewaver/ss-playground/App/Knobs/Menubars.const";
+import { EXAMPLES_ONLY_PROP } from "@thewaver/ss-playground/App/PageComponents/Prop/Prop.const";
 import { EXAMPLES_ROOT, EXAMPLE_NAMES } from "@thewaver/ss-playground/App/Pages/MenubarPage/MenubarPage.const";
 
 import type { ExampleDefs } from "../../PageComponents/Examples/Examples.types";
@@ -33,6 +34,7 @@ const examples: ExampleDefs[] = [
     <PagePropsPanel scope="global">
         <PageProp
             item-key="barWidth"
+            :controls="EXAMPLES_ONLY_PROP"
             label="Bar width (px)"
             hint="How wide the bar is. Narrow it far enough and words start moving into the overflow menu."
         >

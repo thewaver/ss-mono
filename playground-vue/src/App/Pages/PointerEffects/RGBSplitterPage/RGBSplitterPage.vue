@@ -61,6 +61,7 @@ const examples: ExampleDefs[] = [
     <PagePropsPanel scope="global">
         <PageProp
             item-key="isDisabled"
+            controls="Sets RGBSplitterProps.isDisabled"
             label="Disabled"
             hint="Stops the content answering the pointer and leaves it whole. It is what a page honoring a reduced-motion preference passes."
         >
@@ -73,6 +74,7 @@ const examples: ExampleDefs[] = [
 
         <PageProp
             item-key="smoothingMs"
+            controls="Sets RGBSplitterProps.smoothingMs"
             label="Smoothing (ms)"
             hint="How long the split takes to catch up with the pointer. At 0 it follows exactly; raised, the channels glide apart and back together."
         >
@@ -89,6 +91,7 @@ const examples: ExampleDefs[] = [
 
         <PageProp
             item-key="activeRangePx"
+            controls="Sets RGBSplitterProps.activeRangePx"
             label="Active range (px)"
             hint="How near the pointer has to be before the content answers it at all, measured from its center. Outside it the content stays whole."
         >
@@ -105,6 +108,7 @@ const examples: ExampleDefs[] = [
 
         <PageProp
             item-key="splitRangePx"
+            controls="Sets RGBSplitterProps.splitRangePx"
             label="Split range (px)"
             hint="How far the split reaches. Widest with the pointer on the center, closed out here."
         >
@@ -121,6 +125,7 @@ const examples: ExampleDefs[] = [
 
         <PageProp
             item-key="maxOffsetPx"
+            controls="Sets RGBSplitterProps.maxOffsetPx"
             label="Max offset (px)"
             hint="The furthest any one channel is shifted, with the pointer on the center. Each channel picks a random direction and distance within it every time the split opens."
         >
@@ -137,6 +142,7 @@ const examples: ExampleDefs[] = [
 
         <PageProp
             item-key="colorMixing"
+            controls="Sets RGBSplitterProps.colorMixing, with the color-scheme choice sent as undefined"
             label="Color mixing"
             hint="How the channels are put back together. Additive fringes are red, green and blue and read on a dark ground; subtractive ones are cyan, magenta and yellow and read on a light one. Left out, it follows the page's color-scheme each time the split opens."
         >

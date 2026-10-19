@@ -93,3 +93,48 @@ test("a migrated NumberInput is not brought into range while it is still being t
     await field.blur();
     expect(await inputValue(field), "and leaving is when an out-of-range one is brought in").toBe("10");
 });
+
+/**
+ * Every row of a props panel says what it controls: a prop of the component, a sentence saying how the row reaches one,
+ * or that it is the example's alone. Read as the tooltip of the row's hint button carrying a line of its own with
+ * something in it, on a page whose panel mixes all three kinds; what the line says is the page's copy and is not
+ * checked here.
+ */
+test("every row's hint says what the row controls", async ({ page }) => {
+    await page.goto("/overhead-wheel");
+
+    const rows = page.locator('[data-prop] button[aria-label^="About "]');
+
+    await expect(rows.first()).toBeVisible();
+
+    for (const button of await rows.all()) {
+        await button.focus();
+
+        const line = page.locator('[role="tooltip"] [data-hint-controls]').last();
+
+        await expect(line, `${await button.getAttribute("aria-label")} names what it controls`).toBeVisible();
+        expect((await line.textContent())?.trim().length ?? 0).toBeGreaterThan(0);
+
+        await button.blur();
+    }
+});
+
+/**
+ * A long prop path is allowed to break after each dot, so it wraps inside the tooltip instead of running out of it.
+ * Read as the line's content never being wider than the line itself.
+ */
+test("a long prop path wraps inside the hint rather than running out of it", async ({ page }) => {
+    await page.goto("/accordion");
+
+    const button = page.locator('[data-prop][data-testid="transitionDurationMs"] button[aria-label^="About "]');
+
+    await button.focus();
+
+    const line = page.locator('[role="tooltip"] [data-hint-controls]').last();
+
+    await expect(line).toBeVisible();
+    expect(
+        await line.evaluate((element) => element.scrollWidth <= element.clientWidth + 1),
+        "nothing runs past the edge",
+    ).toBe(true);
+});

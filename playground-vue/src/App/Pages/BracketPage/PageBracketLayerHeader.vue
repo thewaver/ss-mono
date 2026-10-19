@@ -7,7 +7,7 @@ defineProps<PageBracketLayerHeaderProps>();
 </script>
 
 <template>
-    <div :class="[styles.layerHeader, isPinned && styles.pinnedLayerHeader, isCurrent && styles.layerHeaderCurrent]">
+    <div :class="[styles.layerHeader, isCurrent && styles.layerHeaderCurrent]">
         {{ names[layer] }}
     </div>
 </template>

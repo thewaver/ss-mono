@@ -63,7 +63,12 @@ const examples: ExampleDefs[] = [
 
 <template>
     <PagePropsPanel scope="global">
-        <PageProp item-key="configKey" label="Pattern" hint="Which repeating pattern is shown.">
+        <PageProp
+            item-key="configKey"
+            controls="Picks the sample pattern the example sends to ShapeProps.computeFillDefs"
+            label="Pattern"
+            hint="Which repeating pattern is shown."
+        >
             <PageGroupedSelectField
                 :value="configKey"
                 :groups="TIMED_PATTERN_GROUPS"
@@ -76,6 +81,7 @@ const examples: ExampleDefs[] = [
 
         <PageProp
             item-key="animationDurationMs"
+            controls="Sets SVGAnimationDefs.animationDurationMs"
             label="Animation duration (ms)"
             hint="How long one pass of the pattern's animation takes."
         >
@@ -91,6 +97,7 @@ const examples: ExampleDefs[] = [
 
         <PageProp
             item-key="iterationConfigKey"
+            controls="Picks the sample iteration that fills SVGAnimationDefs.animationIterationPatterns"
             label="Iteration Pattern"
             hint="How the animation repeats: once, endlessly, or back and forth."
         >

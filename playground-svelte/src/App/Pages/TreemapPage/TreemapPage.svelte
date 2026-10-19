@@ -45,6 +45,7 @@
 <PagePropsPanel scope={"global"}>
     <PageProp
         itemKey={"zoomDurationMs"}
+        controls={"Sets TreemapProps.zoomDurationMs"}
         label={"Zoom duration (ms)"}
         hint={
             "How long a zoom in or out takes. It is off while the visitor has asked for reduced motion, and 0 jumps straight to the new level."

@@ -2,6 +2,7 @@ import type { PropsWithChildren } from "react";
 import { useMemo, useState } from "react";
 
 import { Button } from "@thewaver/ss-components-react";
+import { EXAMPLES_ONLY_PROP } from "@thewaver/ss-playground/App/PageComponents/Prop/Prop.const";
 import {
     NOTHING_TO_RESET,
     SAMPLE_SELECTOR_ALONE,
@@ -52,6 +53,7 @@ const PagePropsPanelContent = (props: PropsWithChildren<PagePropsPanelProps>) =>
                             itemKey={"resetPanel"}
                             label={"These controls"}
                             hint={"Puts every control in this panel back to the value it started at."}
+                            controls={EXAMPLES_ONLY_PROP}
                         >
                             <Button
                                 renderContent={(flags) => <PageButtonContent flags={flags}>Reset</PageButtonContent>}

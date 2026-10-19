@@ -84,6 +84,7 @@ export const ProximityTextPage = () => {
                     itemKey={"reachPx"}
                     label={"Reach (px)"}
                     hint={"How far from a letter's middle the point still reaches it. Past it, the letter rests."}
+                    controls={"Sets ProximityTextProps.reachPx"}
                 >
                     <PageNumberField
                         value={reachPx}
@@ -101,6 +102,7 @@ export const ProximityTextPage = () => {
                     hint={
                         "Rests every letter and stops following the point. It is what a page honoring a reduced-motion preference passes."
                     }
+                    controls={"Sets ProximityTextProps.isDisabled"}
                 >
                     <PageCheckField value={isDisabled} ariaLabel={"Disabled"} onChange={setIsDisabled} />
                 </PageProp>

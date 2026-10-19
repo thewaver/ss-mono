@@ -33,6 +33,8 @@ export type * from "./Abstracts/LetterDriver/LetterDriver.context.types";
 export * from "./Abstracts/MaskedField/MaskedFieldReact.utils";
 export * from "./Abstracts/MediaQueryMonitor/MediaQueryMonitorReact.utils";
 export * from "./Abstracts/Navigator/NavigatorReact.utils";
+export type * from "./Abstracts/PanZoom/PanZoomReact.types";
+export * from "./Abstracts/PanZoom/PanZoomReact.utils";
 export * from "./Abstracts/PointerTracker/PointerTrackerReact.utils";
 export * from "./Abstracts/Roller/RollerReact.utils";
 export * from "./Abstracts/Rotator/RotatorReact.utils";

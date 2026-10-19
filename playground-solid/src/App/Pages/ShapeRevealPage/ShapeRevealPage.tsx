@@ -3,6 +3,7 @@ import { createMemo, createSignal } from "solid-js";
 import { SHAPE_REVEAL_DEFAULTS } from "@thewaver/ss-components-solid";
 import { ShapeRevealKnobs } from "@thewaver/ss-playground/App/Knobs/ShapeReveals.const";
 import { THEME_OPTIONS } from "@thewaver/ss-playground/App/PageComponents/NavSettings/NavSettings.const";
+import { EXAMPLES_ONLY_PROP } from "@thewaver/ss-playground/App/PageComponents/Prop/Prop.const";
 import {
     EXAMPLES_ROOT,
     EXAMPLE_NAMES,
@@ -62,6 +63,7 @@ export const ShapeRevealPage = () => {
                     hint={
                         "How long the circle takes to grow over the whole window. 0 switches the theme at once, as does the system's reduced-motion setting."
                     }
+                    controls={"Sets ShapeRevealOpts.durationMs"}
                 >
                     <PageNumberField
                         value={getDurationMs}
@@ -78,6 +80,7 @@ export const ShapeRevealPage = () => {
                     key={"delayMs"}
                     label={"Delay (ms)"}
                     hint={"How long the new theme stays on screen, once the circle has covered it, before the next."}
+                    controls={EXAMPLES_ONLY_PROP}
                 >
                     <PageNumberField
                         value={getDelayMs}
@@ -96,6 +99,7 @@ export const ShapeRevealPage = () => {
                     hint={
                         "The contour that grows over the window. A circle is what the reveal draws when none is given."
                     }
+                    controls={"Picks the example contour sent to ShapeRevealOpts.computePoints"}
                 >
                     <PageSelectField
                         value={getShape}
@@ -112,6 +116,7 @@ export const ShapeRevealPage = () => {
                     hint={
                         "How gradually the growing shape's edge fades, as a share of the distance it grows. 0 gives a hard edge."
                     }
+                    controls={"Sets ShapeRevealOpts.softness"}
                 >
                     <PageNumberField
                         value={getSoftness}

@@ -100,7 +100,7 @@ const examples: ExampleDefs[] = [
 
 <template>
     <PagePropsPanel scope="global">
-        <PageProp item-key="gap" label="Gap (px)" hint="The space between sections.">
+        <PageProp item-key="gap" controls="Sets AccordionProps.gap" label="Gap (px)" hint="The space between sections.">
             <PageNumberField
                 :value="gap"
                 :min="AccordionKnobs.MIN_GAP"
@@ -114,6 +114,7 @@ const examples: ExampleDefs[] = [
 
         <PageProp
             item-key="transitionDurationMs"
+            controls="Sets AccordionProps.transitionDurationMs"
             label="Transition duration (ms)"
             hint="How long a section takes to open and close. At 0 it opens and closes at once."
         >

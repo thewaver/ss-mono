@@ -114,6 +114,7 @@ export const CalendarPage = () => {
                     itemKey={"calendarId"}
                     label={"Calendar"}
                     hint={"Which calendar system the dates are read and written in, such as Gregorian or Islamic."}
+                    controls={"Picks the calendar the example puts on the dates sent to CalendarProps.value"}
                 >
                     <PageSelectField
                         value={calendarId}
@@ -128,6 +129,7 @@ export const CalendarPage = () => {
                     itemKey={"weekStartsOn"}
                     label={"Week starts on"}
                     hint={"Which day begins a week, which decides the order of the column headings."}
+                    controls={"Sets CalendarProps.weekStartsOn"}
                 >
                     <PageSelectField
                         value={weekStartsOn}

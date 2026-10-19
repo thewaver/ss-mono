@@ -292,25 +292,6 @@ describe("the family view's rows", () => {
     });
 });
 
-describe("getFoldId", () => {
-    it("folds a node below the family onto the member it feeds into", () => {
-        expect(BracketUtils.getFoldId(ID_OF.A, ID_OF.Final)).toBe(ID_OF["Quarter 1"]);
-        expect(BracketUtils.getFoldId(ID_OF.H, ID_OF.Final)).toBe(ID_OF["Quarter 4"]);
-    });
-
-    it("folds the anchor's parent and every other branch onto the anchor", () => {
-        const anchorId = ID_OF["Semi 1"];
-
-        expect(BracketUtils.getFoldId(ID_OF.Final, anchorId)).toBe(anchorId);
-        expect(BracketUtils.getFoldId(ID_OF["Semi 2"], anchorId)).toBe(anchorId);
-        expect(BracketUtils.getFoldId(ID_OF.E, anchorId)).toBe(anchorId);
-    });
-
-    it("leaves a member where it is", () => {
-        expect(BracketUtils.getFoldId(ID_OF.A, ID_OF["Semi 1"])).toBe(ID_OF.A);
-    });
-});
-
 describe("computeFamilyLayout", () => {
     const spellFamily = (anchorId: string | undefined) =>
         BracketUtils.computeFamilyLayout(DEEP_LAYOUT, anchorId)
@@ -344,147 +325,6 @@ describe("computeFamilyExtent", () => {
             layerCount: 3,
             leafCount: 4,
         });
-    });
-});
-
-describe("computeFamilyArrangement", () => {
-    const extent = BracketUtils.computeFamilyExtent(DEEP_LAYOUT);
-    const geometry = BracketUtils.computeGeometry(extent, {
-        nodeSize: { width: 100, height: 20 },
-        layerGap: 10,
-        crossGap: 4,
-        orientation: "horizontal",
-        rootSide: "end",
-        headerExtent: 24,
-    });
-
-    it("draws the members and folds everyone else, unseen, onto the member they gather on", () => {
-        const arrangement = BracketUtils.computeFamilyArrangement(DEEP_LAYOUT, geometry, extent, ID_OF["Quarter 1"]);
-        const quarter = arrangement.nodes[ID_OF["Quarter 1"]];
-        const final = arrangement.nodes[ID_OF.Final];
-
-        expect(quarter, "a member is drawn and reachable").toMatchObject({ opacity: 1, isFolded: false });
-        expect(final, "the final is folded away").toMatchObject({ opacity: 0, isFolded: true });
-        expect({ left: final.left, top: final.top }, "onto the top of the family").toEqual({
-            left: quarter.left,
-            top: quarter.top,
-        });
-    });
-
-    it("centers a family narrower than the board across it", () => {
-        const arrangement = BracketUtils.computeFamilyArrangement(DEEP_LAYOUT, geometry, extent, ID_OF["Quarter 1"]);
-        const first = arrangement.nodes[ID_OF.A];
-        const second = arrangement.nodes[ID_OF.B];
-        const middle = (first.top + second.top + geometry.crossExtent) * 0.5;
-
-        expect(middle, "two rows sit in the middle of a board four rows tall").toBeCloseTo(
-            geometry.headerExtent + (geometry.boardSize.height - geometry.headerExtent) * 0.5,
-        );
-    });
-
-    it("moves each header over its layer's row, and folds the headers of layers the family does not reach", () => {
-        const arrangement = BracketUtils.computeFamilyArrangement(DEEP_LAYOUT, geometry, extent, ID_OF["Quarter 1"]);
-        const quarters = arrangement.nodes[ID_OF["Quarter 1"]];
-        const leaves = arrangement.nodes[ID_OF.A];
-
-        expect(arrangement.headers[2], "the quarters' header is over the quarters").toMatchObject({
-            left: quarters.left,
-            isFolded: false,
-        });
-        expect(arrangement.headers[3].left, "and the first round's over the first round").toBe(leaves.left);
-        expect(arrangement.headers[0], "the final's is gone").toMatchObject({ opacity: 0, isFolded: true });
-    });
-});
-
-describe("getIsFrameHidden", () => {
-    it("hides a folded frame once it has faded out", () => {
-        expect(BracketUtils.getIsFrameHidden({ left: 0, top: 0, opacity: 0, isFolded: true })).toBe(true);
-    });
-
-    it("keeps an unfolding frame in the picture at the start of its glide, so focus can land on it", () => {
-        expect(BracketUtils.getIsFrameHidden({ left: 0, top: 0, opacity: 0, isFolded: false })).toBe(false);
-    });
-
-    it("keeps a frame still fading out, and hides nothing outside the family view", () => {
-        expect(BracketUtils.getIsFrameHidden({ left: 0, top: 0, opacity: 0.5, isFolded: true })).toBe(false);
-        expect(BracketUtils.getIsFrameHidden(undefined)).toBe(false);
-    });
-});
-
-describe("computeShownArrangement", () => {
-    const frame = (left: number, opacity: number) => ({ left, top: 0, opacity, isFolded: opacity === 0 });
-    const from = {
-        nodes: { a: frame(0, 1), b: frame(0, 1) },
-        headers: [frame(0, 1)],
-        boardSize: { width: 100, height: 50 },
-    };
-    const to = {
-        nodes: { a: frame(100, 0), b: frame(40, 1), c: frame(10, 1) },
-        headers: [frame(50, 0)],
-        boardSize: { width: 300, height: 150 },
-    };
-
-    it("is halfway at half time, and takes whether a node is folded from where it is going", () => {
-        const shown = BracketUtils.computeShownArrangement(from, to, 0.5);
-
-        expect(shown.nodes.a).toEqual({ left: 50, top: 0, opacity: 0.5, isFolded: true });
-        expect(shown.headers[0].left).toBe(25);
-    });
-
-    it("starts a frame it had no start for where it is going", () => {
-        expect(BracketUtils.computeShownArrangement(from, to, 0.5).nodes.c).toEqual(to.nodes.c);
-    });
-
-    it("grows or shrinks the board along with everything on it", () => {
-        expect(BracketUtils.computeShownArrangement(from, to, 0.5).boardSize).toEqual({ width: 200, height: 100 });
-    });
-
-    it("is where it is going once the glide is done, and before any glide", () => {
-        expect(BracketUtils.computeShownArrangement(from, to, 1)).toBe(to);
-        expect(BracketUtils.computeShownArrangement(undefined, to, 0)).toBe(to);
-    });
-
-    it("eases, so it moves less than its share at the start", () => {
-        expect(BracketUtils.computeShownArrangement(from, to, 0.1).nodes.b.left).toBeLessThan(4);
-    });
-});
-
-describe("connectors in the family view", () => {
-    const geometry = BracketUtils.computeGeometry(DEEP_LAYOUT, {
-        nodeSize: { width: 100, height: 20 },
-        layerGap: 10,
-        crossGap: 4,
-        orientation: "horizontal",
-        rootSide: "end",
-        headerExtent: 0,
-    });
-
-    it("runs between where the nodes are drawn, when that is handed over", () => {
-        const frames = Object.fromEntries(
-            DEEP_LAYOUT.placements.map((placement) => [
-                placement.id,
-                { left: 500, top: 300, opacity: 1, isFolded: false },
-            ]),
-        );
-        const connector = BracketUtils.computeConnectors(DEEP_LAYOUT, geometry, "b", undefined, frames)[0];
-
-        expect(connector.from, "every node drawn in one spot puts both ends of every line there").toEqual({
-            x: 500,
-            y: 310,
-        });
-        expect(connector.to).toEqual({ x: 600, y: 310 });
-    });
-
-    it("is drawn as faintly as its fainter end", () => {
-        const frames = {
-            [ID_OF.Final]: { left: 0, top: 0, opacity: 1, isFolded: false },
-            [ID_OF["Semi 1"]]: { left: 0, top: 0, opacity: 0.25, isFolded: true },
-        };
-        const connector = BracketUtils.computeConnectors(DEEP_LAYOUT, geometry, "b", undefined).find(
-            (defs) => defs.childId === ID_OF["Semi 1"],
-        )!;
-
-        expect(BracketUtils.computeConnectorOpacity(frames, connector)).toBe(0.25);
     });
 });
 
@@ -526,21 +366,51 @@ describe("computeFamilyStep", () => {
     });
 });
 
-describe("computeTreeArrangement", () => {
-    it("draws every node where the whole tree puts it, none folded, on the whole tree's board", () => {
-        const layout = BracketUtils.computeLayout(FINAL);
-        const geometry = BracketUtils.computeGeometry(layout, {
-            nodeSize: { width: 80, height: 20 },
-            layerGap: 10,
-            crossGap: 4,
-            orientation: "horizontal",
-            rootSide: "end",
-            headerExtent: 0,
-        });
-        const arrangement = BracketUtils.computeTreeArrangement(layout, geometry);
+describe("framing a family", () => {
+    const DRAW = pair(
+        "Final",
+        pair("Semi 1", pair("Q1", leaf("A"), leaf("B")), pair("Q2", leaf("C"), leaf("D"))),
+        pair("Semi 2", pair("Q3", leaf("E"), leaf("F")), pair("Q4", leaf("G"), leaf("H"))),
+    );
+    const LAYOUT = BracketUtils.computeLayout(DRAW);
+    const GEOMETRY = BracketUtils.computeGeometry(LAYOUT, {
+        nodeSize: { width: 100, height: 30 },
+        layerGap: 40,
+        crossGap: 10,
+        orientation: "horizontal",
+        rootSide: "end",
+        headerExtent: 20,
+    });
+    const ASPECT = 0.5;
 
-        expect(arrangement.boardSize).toEqual(geometry.boardSize);
-        expect(Object.values(arrangement.nodes).every((frame) => !frame.isFolded && frame.opacity === 1)).toBe(true);
-        expect(arrangement.nodes["0.1"]).toMatchObject(BracketUtils.computeInset(geometry, layout.placements[2]));
+    const inView = (anchorId: string | undefined) =>
+        BracketUtils.computeFamilyInView(
+            LAYOUT,
+            GEOMETRY,
+            BracketUtils.computeFamilyView(LAYOUT, GEOMETRY, anchorId),
+            ASPECT,
+        );
+
+    it("finds the family a view was framed on, at every depth", () => {
+        expect(BracketUtils.getFamilyAnchorIds(LAYOUT).map((anchorId) => inView(anchorId)?.anchorId)).toEqual(
+            BracketUtils.getFamilyAnchorIds(LAYOUT),
+        );
+    });
+
+    it("finds no family in a view of the whole board", () => {
+        expect(
+            BracketUtils.computeFamilyInView(LAYOUT, GEOMETRY, BracketUtils.computeWholeView(GEOMETRY), ASPECT),
+        ).toBeUndefined();
+    });
+
+    it("leaves room for the header strip on the edge the headers run along", () => {
+        const view = BracketUtils.computeFamilyView(LAYOUT, GEOMETRY, undefined, 5);
+        const top = Math.min(
+            ...LAYOUT.placements
+                .filter((placement) => BracketUtils.getIsInFamily(placement.id, undefined))
+                .map((placement) => BracketUtils.computeInset(GEOMETRY, placement).top),
+        );
+
+        expect(view.y.start, "the margin and the strip both sit above the top row").toBe(top - 5 - 20);
     });
 });

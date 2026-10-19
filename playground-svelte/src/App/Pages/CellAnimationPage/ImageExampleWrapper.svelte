@@ -29,6 +29,7 @@
 <PageExampleKnobs>
     <PageProp
         itemKey={"image"}
+        controls={"Picks the example picture sent to CellAnimationProps.src"}
         label={"Image"}
         hint={"Swaps in a picture of your own, so the cells can be watched against something other than the sample."}
     >

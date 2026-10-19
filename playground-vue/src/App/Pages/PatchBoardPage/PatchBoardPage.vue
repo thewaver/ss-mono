@@ -2,7 +2,7 @@
 import { shallowRef } from "vue";
 
 import type { PatchBoardLink } from "@thewaver/ss-components-vue";
-import { MediaQueryMonitorVueUtils, PATCH_BOARD_DEFAULTS } from "@thewaver/ss-components-vue";
+import { MediaQueryMonitorVueUtils, PATCH_BOARD_DEFAULTS, PanZoomUtils } from "@thewaver/ss-components-vue";
 import { PatchBoardKnobs } from "@thewaver/ss-playground/App/Knobs/PatchBoards.const";
 import {
     BOARD_WIDTH,
@@ -10,20 +10,18 @@ import {
     CHAIN_NODES,
     EXAMPLES_ROOT,
     EXAMPLE_NAMES,
-    MAX_ZOOM,
-    MIN_ZOOM,
     MIXER_LINKS,
     MIXER_NODES,
     NOTHING_DONE,
     PAN_LINKS,
     PAN_NODES,
+    PAN_SCALE,
+    PAN_STARTING_VIEW,
     PERCENT,
     RACK_LINKS,
     RACK_NODES,
-    STARTING_ZOOM,
     WIDE_SPAN,
 } from "@thewaver/ss-playground/App/Pages/PatchBoardPage/PatchBoardPage.const";
-import { MathUtils } from "@thewaver/ss-utils";
 
 import type { ExampleDefs } from "../../PageComponents/Examples/Examples.types";
 import PageExamples from "../../PageComponents/Examples/PageExamples.vue";
@@ -36,7 +34,6 @@ import ChainExample from "./Examples/Chain.vue";
 import MixerExample from "./Examples/Mixer.vue";
 import PanExample from "./Examples/Pan.vue";
 import RackExample from "./Examples/Rack.vue";
-import ZoomExample from "./Examples/Zoom.vue";
 
 const getLinkWords = (link: PatchBoardLink) =>
     `${link.from.nodeKey} ${link.from.socketId} to ${link.to.nodeKey} ${link.to.socketId}`;
@@ -48,8 +45,7 @@ const chainAction = shallowRef(NOTHING_DONE);
 const mixerAction = shallowRef(NOTHING_DONE);
 const rackAction = shallowRef(NOTHING_DONE);
 const panAction = shallowRef(NOTHING_DONE);
-const zoomAction = shallowRef(NOTHING_DONE);
-const zoom = shallowRef(STARTING_ZOOM);
+const panView = shallowRef(PAN_STARTING_VIEW);
 
 const chainNodes = shallowRef(CHAIN_NODES);
 const chainLinks = shallowRef(CHAIN_LINKS);
@@ -59,8 +55,6 @@ const rackNodes = shallowRef(RACK_NODES);
 const rackLinks = shallowRef(RACK_LINKS);
 const panNodes = shallowRef(PAN_NODES);
 const panLinks = shallowRef(PAN_LINKS);
-const zoomNodes = shallowRef(CHAIN_NODES);
-const zoomLinks = shallowRef(CHAIN_LINKS);
 
 const prefersReducedMotion = MediaQueryMonitorVueUtils.useReducedMotion();
 
@@ -93,19 +87,11 @@ const examples: ExampleDefs[] = [
     },
     {
         key: "pan",
-        name: EXAMPLE_NAMES.pan,
+        name: EXAMPLE_NAMES.panZoom,
         span: WIDE_SPAN,
         readout: () =>
-            `${panLinks.value.length} cables, last: ${panAction.value} — the board is wider and taller than its window, so scroll to pan; a node carried with the arrow keys brings the window with it`,
+            `${panLinks.value.length} cables at ${Math.round((PERCENT * PAN_SCALE) / PanZoomUtils.getExtent(panView.value.x))}%, last: ${panAction.value} — the board is laid out at its own width and drawn into a smaller window: drag empty board, use the wheel, pinch or press the buttons to move and zoom it; a node still drags under the pointer, and one carried with the arrow keys brings the window with it`,
         path: `${EXAMPLES_ROOT}/Pan.vue`,
-    },
-    {
-        key: "zoom",
-        name: EXAMPLE_NAMES.zoom,
-        span: WIDE_SPAN,
-        readout: () =>
-            `${zoomLinks.value.length} cables at ${Math.round(zoom.value * PERCENT)}%, last: ${zoomAction.value} — the board is scaled with a CSS transform, and a drag still lands under the pointer`,
-        path: `${EXAMPLES_ROOT}/Zoom.vue`,
     },
 ];
 </script>
@@ -114,6 +100,7 @@ const examples: ExampleDefs[] = [
     <PagePropsPanel scope="global">
         <PageProp
             item-key="socketSize"
+            controls="Sets PatchBoardProps.socketSize"
             label="Socket size"
             hint="How large each socket is drawn, as a fraction of the board's width, so a wider board has larger sockets."
         >
@@ -129,6 +116,7 @@ const examples: ExampleDefs[] = [
 
         <PageProp
             item-key="isLocked"
+            controls="Sets PatchBoardProps.isLocked"
             label="Wiring locked"
             hint="Freezes the wiring as it stands: the cables still show, but none can be dragged, made or pulled out."
         >
@@ -141,6 +129,7 @@ const examples: ExampleDefs[] = [
 
         <PageProp
             item-key="isDisabled"
+            controls="Sets PatchBoardProps.isDisabled"
             label="Disabled"
             hint="Turns the whole board off, so nothing on it responds to the pointer or the keyboard."
         >
@@ -153,6 +142,7 @@ const examples: ExampleDefs[] = [
 
         <PageProp
             item-key="isBeamPlaying"
+            controls="Plays the example beam drawn by PatchBoardProps.renderCable"
             label="Beams moving"
             hint="Whether a pulse runs along every plugged cable, from the output to the input it feeds. It starts stopped while the visitor has asked for reduced motion."
         >
@@ -214,34 +204,17 @@ const examples: ExampleDefs[] = [
         </template>
 
         <template #pan>
-            <PageMeasureBox>
-                <PanExample
-                    v-model:nodes="panNodes"
-                    v-model:links="panLinks"
-                    :socket-size="socketSize"
-                    :is-locked="isLocked"
-                    :is-disabled="isDisabled"
-                    :is-beam-playing="isBeamPlaying"
-                    @link="(link: PatchBoardLink) => (panAction = `connected ${getLinkWords(link)}`)"
-                    @unlink="(link: PatchBoardLink) => (panAction = `unplugged ${getLinkWords(link)}`)"
-                    @move="(nodeKey: string) => (panAction = `moved ${nodeKey}`)"
-                />
-            </PageMeasureBox>
-        </template>
-
-        <template #zoom>
-            <ZoomExample
-                v-model:nodes="zoomNodes"
-                v-model:links="zoomLinks"
+            <PanExample
+                v-model:nodes="panNodes"
+                v-model:links="panLinks"
+                v-model:view="panView"
                 :socket-size="socketSize"
                 :is-locked="isLocked"
                 :is-disabled="isDisabled"
                 :is-beam-playing="isBeamPlaying"
-                :zoom="zoom"
-                @zoom-change="(next: number) => (zoom = MathUtils.clamp(next, MIN_ZOOM, MAX_ZOOM))"
-                @link="(link: PatchBoardLink) => (zoomAction = `connected ${getLinkWords(link)}`)"
-                @unlink="(link: PatchBoardLink) => (zoomAction = `unplugged ${getLinkWords(link)}`)"
-                @move="(nodeKey: string) => (zoomAction = `moved ${nodeKey}`)"
+                @link="(link: PatchBoardLink) => (panAction = `connected ${getLinkWords(link)}`)"
+                @unlink="(link: PatchBoardLink) => (panAction = `unplugged ${getLinkWords(link)}`)"
+                @move="(nodeKey: string) => (panAction = `moved ${nodeKey}`)"
             />
         </template>
     </PageExamples>

@@ -1,7 +1,15 @@
 import { style } from "@vanilla-extract/css";
 
+export const bracketWindow = style({
+    position: "relative",
+    width: "100%",
+    height: "100%",
+    overflow: "hidden",
+});
+
 export const bracketRoot = style({
     position: "relative",
+    transformOrigin: "0 0",
 });
 
 export const bracketConnectors = style({

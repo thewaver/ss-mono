@@ -67,6 +67,7 @@ const examples: ExampleDefs[] = [
     <PagePropsPanel scope="global">
         <PageProp
             item-key="calendarId"
+            controls="Sets DatePickerProps.calendar"
             label="Calendar"
             hint="Which calendar system the dates are read and written in, such as Gregorian or Islamic."
         >

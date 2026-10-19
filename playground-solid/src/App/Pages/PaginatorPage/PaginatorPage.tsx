@@ -89,7 +89,12 @@ export const PaginatorPage = () => {
     return (
         <>
             <PagePropsPanel scope={"global"}>
-                <PageProp key={"pageCount"} label={"Page count"} hint={"How many pages there are to page through."}>
+                <PageProp
+                    key={"pageCount"}
+                    label={"Page count"}
+                    hint={"How many pages there are to page through."}
+                    controls={"Sets PaginatorProps.pageCount"}
+                >
                     <PageNumberField
                         value={getPageCount}
                         min={PaginatorKnobs.MIN_PAGE_COUNT}
@@ -107,6 +112,7 @@ export const PaginatorPage = () => {
                     hint={
                         "How many pages are shown on each side of the current one before the run is broken by an ellipsis."
                     }
+                    controls={"Sets PaginatorProps.siblingCount"}
                 >
                     <PageNumberField
                         value={getSiblingCount}
@@ -123,6 +129,7 @@ export const PaginatorPage = () => {
                     key={"boundaryCount"}
                     label={"Boundary count"}
                     hint={"How many pages are always shown at each end, however far away the current page is."}
+                    controls={"Sets PaginatorProps.boundaryCount"}
                 >
                     <PageNumberField
                         value={getBoundaryCount}
@@ -139,6 +146,7 @@ export const PaginatorPage = () => {
                     key={"isDisabled"}
                     label={"Disabled"}
                     hint={"Turns the paginator off, so none of its pages or arrows respond."}
+                    controls={"Sets PaginatorProps.isDisabled"}
                 >
                     <PageCheckField value={getIsDisabled} ariaLabel={"Disabled"} onChange={setIsDisabled} />
                 </PageProp>

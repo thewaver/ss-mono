@@ -45,6 +45,8 @@ export namespace ParticleSpawnerKnobs {
                 kind: "number",
                 label: "Arc height min (px)",
                 hint: "The shallowest bow a particle's path may be given. Each particle draws its own between this and the maximum.",
+                controls:
+                    "Sets the lowest arc height of the example's travel path, sent to ParticleSpawnerProps.computeParticlePos",
                 min: -300,
                 max: 300,
                 step: FIELD_WIDTH_KNOB_STEP,
@@ -53,6 +55,8 @@ export namespace ParticleSpawnerKnobs {
                 kind: "number",
                 label: "Arc height max (px)",
                 hint: "The deepest bow a particle's path may be given. Each particle draws its own between the minimum and this.",
+                controls:
+                    "Sets the highest arc height of the example's travel path, sent to ParticleSpawnerProps.computeParticlePos",
                 min: -300,
                 max: 300,
                 step: FIELD_WIDTH_KNOB_STEP,
@@ -63,6 +67,8 @@ export namespace ParticleSpawnerKnobs {
                 kind: "number",
                 label: "Wave amplitude min (px)",
                 hint: "The smallest swing to each side a particle may be given. Each draws its own between this and the maximum.",
+                controls:
+                    "Sets the lowest wave amplitude of the example's travel path, sent to ParticleSpawnerProps.computeParticlePos",
                 min: 0,
                 max: 150,
                 step: FIELD_WIDTH_KNOB_STEP,
@@ -71,6 +77,8 @@ export namespace ParticleSpawnerKnobs {
                 kind: "number",
                 label: "Wave amplitude max (px)",
                 hint: "The largest swing to each side a particle may be given. Each draws its own between the minimum and this.",
+                controls:
+                    "Sets the highest wave amplitude of the example's travel path, sent to ParticleSpawnerProps.computeParticlePos",
                 min: 0,
                 max: 150,
                 step: FIELD_WIDTH_KNOB_STEP,
@@ -79,6 +87,8 @@ export namespace ParticleSpawnerKnobs {
                 kind: "number",
                 label: "Wave cycles min",
                 hint: "The fewest complete waves a particle may make along its path. Each draws its own between this and the maximum.",
+                controls:
+                    "Sets the lowest wave cycles of the example's travel path, sent to ParticleSpawnerProps.computeParticlePos",
                 min: 0.5,
                 max: 6,
                 step: 0.5,
@@ -87,6 +97,8 @@ export namespace ParticleSpawnerKnobs {
                 kind: "number",
                 label: "Wave cycles max",
                 hint: "The most complete waves a particle may make along its path. Each draws its own between the minimum and this.",
+                controls:
+                    "Sets the highest wave cycles of the example's travel path, sent to ParticleSpawnerProps.computeParticlePos",
                 min: 0.5,
                 max: 6,
                 step: 0.5,
@@ -97,6 +109,8 @@ export namespace ParticleSpawnerKnobs {
                 kind: "number",
                 label: "Spiral radius min (px)",
                 hint: "The tightest spiral a particle may be given. Each draws its own between this and the maximum.",
+                controls:
+                    "Sets the lowest spiral radius of the example's travel path, sent to ParticleSpawnerProps.computeParticlePos",
                 min: 0,
                 max: 150,
                 step: FIELD_WIDTH_KNOB_STEP,
@@ -105,6 +119,8 @@ export namespace ParticleSpawnerKnobs {
                 kind: "number",
                 label: "Spiral radius max (px)",
                 hint: "The widest spiral a particle may be given. Each draws its own between the minimum and this.",
+                controls:
+                    "Sets the highest spiral radius of the example's travel path, sent to ParticleSpawnerProps.computeParticlePos",
                 min: 0,
                 max: 150,
                 step: FIELD_WIDTH_KNOB_STEP,
@@ -113,6 +129,8 @@ export namespace ParticleSpawnerKnobs {
                 kind: "number",
                 label: "Spiral turns min",
                 hint: "The fewest turns a particle may make on its way along. Each draws its own between this and the maximum.",
+                controls:
+                    "Sets the lowest spiral turns of the example's travel path, sent to ParticleSpawnerProps.computeParticlePos",
                 min: 0.5,
                 max: 6,
                 step: 0.5,
@@ -121,6 +139,8 @@ export namespace ParticleSpawnerKnobs {
                 kind: "number",
                 label: "Spiral turns max",
                 hint: "The most turns a particle may make on its way along. Each draws its own between the minimum and this.",
+                controls:
+                    "Sets the highest spiral turns of the example's travel path, sent to ParticleSpawnerProps.computeParticlePos",
                 min: 0.5,
                 max: 6,
                 step: 0.5,
@@ -131,6 +151,8 @@ export namespace ParticleSpawnerKnobs {
                 kind: "number",
                 label: "Orbit radius min (px)",
                 hint: "The smallest circle a particle may be sent round. Each draws its own between this and the maximum.",
+                controls:
+                    "Sets the lowest orbit radius of the example's travel path, sent to ParticleSpawnerProps.computeParticlePos",
                 min: 0,
                 max: 150,
                 step: FIELD_WIDTH_KNOB_STEP,
@@ -139,6 +161,8 @@ export namespace ParticleSpawnerKnobs {
                 kind: "number",
                 label: "Orbit radius max (px)",
                 hint: "The largest circle a particle may be sent round. Each draws its own between the minimum and this.",
+                controls:
+                    "Sets the highest orbit radius of the example's travel path, sent to ParticleSpawnerProps.computeParticlePos",
                 min: 0,
                 max: 150,
                 step: FIELD_WIDTH_KNOB_STEP,
@@ -147,6 +171,8 @@ export namespace ParticleSpawnerKnobs {
                 kind: "number",
                 label: "Orbit turns min",
                 hint: "The fewest times a particle may go round. Each draws its own between this and the maximum.",
+                controls:
+                    "Sets the lowest orbit turns of the example's travel path, sent to ParticleSpawnerProps.computeParticlePos",
                 min: 0.5,
                 max: 6,
                 step: 0.5,
@@ -155,6 +181,8 @@ export namespace ParticleSpawnerKnobs {
                 kind: "number",
                 label: "Orbit turns max",
                 hint: "The most times a particle may go round. Each draws its own between the minimum and this.",
+                controls:
+                    "Sets the highest orbit turns of the example's travel path, sent to ParticleSpawnerProps.computeParticlePos",
                 min: 0.5,
                 max: 6,
                 step: 0.5,
@@ -165,6 +193,8 @@ export namespace ParticleSpawnerKnobs {
                 kind: "number",
                 label: "Elbow position min",
                 hint: "The earliest point along the path a particle's bend may sit. Each draws its own between this and the maximum.",
+                controls:
+                    "Sets the lowest elbow position of the example's travel path, sent to ParticleSpawnerProps.computeParticlePos",
                 min: 0,
                 max: 1,
                 step: 0.05,
@@ -173,6 +203,8 @@ export namespace ParticleSpawnerKnobs {
                 kind: "number",
                 label: "Elbow position max",
                 hint: "The latest point along the path a particle's bend may sit. Each draws its own between the minimum and this.",
+                controls:
+                    "Sets the highest elbow position of the example's travel path, sent to ParticleSpawnerProps.computeParticlePos",
                 min: 0,
                 max: 1,
                 step: 0.05,
@@ -181,6 +213,8 @@ export namespace ParticleSpawnerKnobs {
                 kind: "number",
                 label: "Elbow offset min (px)",
                 hint: "The least a particle's bend may be pushed off the straight line. Each draws its own between this and the maximum.",
+                controls:
+                    "Sets the lowest elbow offset of the example's travel path, sent to ParticleSpawnerProps.computeParticlePos",
                 min: -200,
                 max: 200,
                 step: FIELD_WIDTH_KNOB_STEP,
@@ -189,6 +223,8 @@ export namespace ParticleSpawnerKnobs {
                 kind: "number",
                 label: "Elbow offset max (px)",
                 hint: "The most a particle's bend may be pushed off the straight line. Each draws its own between the minimum and this.",
+                controls:
+                    "Sets the highest elbow offset of the example's travel path, sent to ParticleSpawnerProps.computeParticlePos",
                 min: -200,
                 max: 200,
                 step: FIELD_WIDTH_KNOB_STEP,
@@ -199,6 +235,8 @@ export namespace ParticleSpawnerKnobs {
                 kind: "number",
                 label: "Zigzag count min",
                 hint: "The fewest turns a particle's zigzag may have. Each draws its own between this and the maximum.",
+                controls:
+                    "Sets the lowest zigzag count of the example's travel path, sent to ParticleSpawnerProps.computeParticlePos",
                 min: 1,
                 max: 10,
                 step: 1,
@@ -207,6 +245,8 @@ export namespace ParticleSpawnerKnobs {
                 kind: "number",
                 label: "Zigzag count max",
                 hint: "The most turns a particle's zigzag may have. Each draws its own between the minimum and this.",
+                controls:
+                    "Sets the highest zigzag count of the example's travel path, sent to ParticleSpawnerProps.computeParticlePos",
                 min: 1,
                 max: 10,
                 step: 1,
@@ -215,6 +255,8 @@ export namespace ParticleSpawnerKnobs {
                 kind: "number",
                 label: "Zigzag amplitude min (px)",
                 hint: "The shallowest a particle's zigzag may be. Each draws its own between this and the maximum.",
+                controls:
+                    "Sets the lowest zigzag amplitude of the example's travel path, sent to ParticleSpawnerProps.computeParticlePos",
                 min: 0,
                 max: 100,
                 step: FIELD_WIDTH_KNOB_STEP,
@@ -223,6 +265,8 @@ export namespace ParticleSpawnerKnobs {
                 kind: "number",
                 label: "Zigzag amplitude max (px)",
                 hint: "The deepest a particle's zigzag may be. Each draws its own between the minimum and this.",
+                controls:
+                    "Sets the highest zigzag amplitude of the example's travel path, sent to ParticleSpawnerProps.computeParticlePos",
                 min: 0,
                 max: 100,
                 step: FIELD_WIDTH_KNOB_STEP,
@@ -233,6 +277,8 @@ export namespace ParticleSpawnerKnobs {
                 kind: "number",
                 label: "Scatter radius min (px)",
                 hint: "The shortest distance a particle may be thrown before it turns for its target. Each draws its own between this and the maximum.",
+                controls:
+                    "Sets the lowest scatter radius of the example's travel path, sent to ParticleSpawnerProps.computeParticlePos",
                 min: 0,
                 max: 200,
                 step: FIELD_WIDTH_KNOB_STEP,
@@ -241,6 +287,8 @@ export namespace ParticleSpawnerKnobs {
                 kind: "number",
                 label: "Scatter radius max (px)",
                 hint: "The longest distance a particle may be thrown before it turns for its target. Each draws its own between the minimum and this.",
+                controls:
+                    "Sets the highest scatter radius of the example's travel path, sent to ParticleSpawnerProps.computeParticlePos",
                 min: 0,
                 max: 200,
                 step: FIELD_WIDTH_KNOB_STEP,
@@ -249,6 +297,8 @@ export namespace ParticleSpawnerKnobs {
                 kind: "number",
                 label: "Turn point min",
                 hint: "The earliest point of the trip at which a particle may stop flying outwards and head for its target. Each draws its own between this and the maximum.",
+                controls:
+                    "Sets the lowest turn point of the example's travel path, sent to ParticleSpawnerProps.computeParticlePos",
                 min: 0.05,
                 max: 0.9,
                 step: 0.05,
@@ -257,6 +307,8 @@ export namespace ParticleSpawnerKnobs {
                 kind: "number",
                 label: "Turn point max",
                 hint: "The latest point of the trip at which a particle may stop flying outwards and head for its target. Each draws its own between the minimum and this.",
+                controls:
+                    "Sets the highest turn point of the example's travel path, sent to ParticleSpawnerProps.computeParticlePos",
                 min: 0.05,
                 max: 0.9,
                 step: 0.05,

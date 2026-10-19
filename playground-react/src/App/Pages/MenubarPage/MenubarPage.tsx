@@ -2,6 +2,7 @@ import type { PropsWithChildren } from "react";
 import { useState } from "react";
 
 import { MenubarKnobs } from "@thewaver/ss-playground/App/Knobs/Menubars.const";
+import { EXAMPLES_ONLY_PROP } from "@thewaver/ss-playground/App/PageComponents/Prop/Prop.const";
 import { EXAMPLES_ROOT, EXAMPLE_NAMES } from "@thewaver/ss-playground/App/Pages/MenubarPage/MenubarPage.const";
 import * as styles from "@thewaver/ss-playground/App/Pages/MenubarPage/MenubarPage.css";
 
@@ -50,6 +51,7 @@ export const MenubarPage = () => {
                     itemKey={"barWidth"}
                     label={"Bar width (px)"}
                     hint={"How wide the bar is. Narrow it far enough and words start moving into the overflow menu."}
+                    controls={EXAMPLES_ONLY_PROP}
                 >
                     <PageNumberField
                         value={barWidth}

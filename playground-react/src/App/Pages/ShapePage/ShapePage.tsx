@@ -107,6 +107,7 @@ const useShapeGeometry = (startingShapeKind: ShapeConst.DefaultShape = ShapeKnob
                 itemKey={"shapeKind"}
                 label={"Shape"}
                 hint={"The contour the shape is cut to, which also decides how many corners the corner fields offer."}
+                controls={"Picks the example contour sent to ShapeProps.computePoints"}
             >
                 <PageSelectField
                     value={shapeKind}
@@ -120,6 +121,9 @@ const useShapeGeometry = (startingShapeKind: ShapeConst.DefaultShape = ShapeKnob
                 itemKey={"hasIndividualCorners"}
                 label={"Individual corner settings"}
                 hint={"Opens one field per corner instead of one field driving all of them together."}
+                controls={
+                    "Writes the corner fields below into every entry of ShapeProps.joinRadii and ShapeProps.lameExponents at once, or one entry each"
+                }
             >
                 <PageCheckField
                     value={hasIndividualCorners}
@@ -132,6 +136,7 @@ const useShapeGeometry = (startingShapeKind: ShapeConst.DefaultShape = ShapeKnob
                 itemKey={"jointRadiiPx"}
                 label={"Joint Radii (px)"}
                 hint={"How far each corner is rounded. With individual corners off, the first field drives them all."}
+                controls={"Sets ShapeProps.joinRadii"}
             >
                 <div className={styles.valueList} style={{ gridTemplateColumns: templateColumns }}>
                     {pointIterator.map((index) => (
@@ -158,6 +163,7 @@ const useShapeGeometry = (startingShapeKind: ShapeConst.DefaultShape = ShapeKnob
                 hint={
                     "How square or how pinched each rounded corner is: 2 is a circular round, higher is squarer, lower is pinched inward."
                 }
+                controls={"Sets ShapeProps.lameExponents"}
             >
                 <div className={styles.valueList} style={{ gridTemplateColumns: templateColumns }}>
                     {pointIterator.map((index) => (
@@ -206,6 +212,9 @@ const DefaultExampleWrapper = (props: ShapeExampleProps) => {
                     hint={
                         "Cuts whatever is inside the shape to the shape's own contour, instead of letting it spill past."
                     }
+                    controls={
+                        "Decides whether the example's ShapeProps.renderChildren applies the clip path it is handed"
+                    }
                 >
                     <PageCheckField
                         value={shouldClipChildren}
@@ -220,6 +229,7 @@ const DefaultExampleWrapper = (props: ShapeExampleProps) => {
                     hint={
                         "Insets whatever is inside far enough to clear the rounded corners, so text does not run under them."
                     }
+                    controls={"Decides whether the example's ShapeProps.renderChildren pads its content to the contour"}
                 >
                     <PageCheckField
                         value={shouldPadChildren}
@@ -246,6 +256,7 @@ const MorphExampleWrapper = (props: ShapeExampleProps) => {
                     hint={
                         "How many tips the star has. The contour carries twice as many points: one per tip, one per notch between tips."
                     }
+                    controls={"Sets the number of points of the example star sent to ShapeProps.computePoints"}
                 >
                     <PageNumberField
                         value={starPoints}
@@ -364,6 +375,7 @@ export const ShapePage = () => {
                     hint={
                         "What paints the shape's stroke: a flat color, a pattern, or a gradient that runs on a clock or follows the pointer."
                     }
+                    propPath={"ShapeProps.computeStrokeDefs"}
                 />
 
                 <PagePropsDivider />
@@ -375,6 +387,7 @@ export const ShapePage = () => {
                     hint={
                         "What paints the shape's inside: a flat color, a pattern, or a gradient that runs on a clock or follows the pointer."
                     }
+                    propPath={"ShapeProps.computeFillDefs"}
                 />
 
                 <PagePropsDivider />
@@ -385,6 +398,9 @@ export const ShapePage = () => {
                             itemKey={"cellSize"}
                             label={"Pattern Cell Size (px)"}
                             hint={"How large one tile of a pattern is before it repeats."}
+                            controls={
+                                "Sets the tile size of the example paints sent to ShapeProps.computeFillDefs and ShapeProps.computeStrokeDefs"
+                            }
                         >
                             <PageNumberField
                                 value={cellSize}
@@ -401,6 +417,9 @@ export const ShapePage = () => {
                         itemKey={"colors"}
                         label={"Colors"}
                         hint={"The colors the stroke, the fill and the page's own background are painted from."}
+                        controls={
+                            "Sets the colors of the example paints sent to ShapeProps.computeFillDefs and ShapeProps.computeStrokeDefs"
+                        }
                     >
                         <div className={styles.colorList}>
                             {(Object.keys(colors) as (keyof SVGDefsColors)[]).map((key) => (
@@ -418,6 +437,7 @@ export const ShapePage = () => {
                         itemKey={"strokeThicknessPx"}
                         label={"Stroke Thickness (px)"}
                         hint={"How thick the stroke is."}
+                        controls={"Sets the thickness in the example's ShapeProps.strokeGeom"}
                     >
                         <PageNumberField
                             value={edgeThickness}
@@ -433,6 +453,9 @@ export const ShapePage = () => {
                         itemKey={"blurWidth"}
                         label={"Blur (px)"}
                         hint={"How far the stroke is blurred outward, which is what gives it its glow."}
+                        controls={
+                            "Sets the blur of the example paints sent to ShapeProps.computeFillDefs and ShapeProps.computeStrokeDefs"
+                        }
                     >
                         <PageNumberField
                             value={blurWidth}
@@ -450,6 +473,9 @@ export const ShapePage = () => {
                                 itemKey={"animationDurationMs"}
                                 label={"Animation duration (ms)"}
                                 hint={"How long one pass of the stroke or fill animation takes."}
+                                controls={
+                                    "Sets the duration of the example paints sent to ShapeProps.computeFillDefs and ShapeProps.computeStrokeDefs"
+                                }
                             >
                                 <PageNumberField
                                     value={animationDurationMs}
@@ -465,6 +491,9 @@ export const ShapePage = () => {
                                 itemKey={"iterationConfigKey"}
                                 label={"Iteration Pattern"}
                                 hint={"How the animation repeats: once, endlessly, or back and forth."}
+                                controls={
+                                    "Picks how the example paints repeat, sent to ShapeProps.computeFillDefs and ShapeProps.computeStrokeDefs"
+                                }
                             >
                                 <PageSelectField
                                     value={iterationConfigKey}

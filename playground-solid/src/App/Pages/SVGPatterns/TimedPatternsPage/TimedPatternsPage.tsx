@@ -54,7 +54,12 @@ export const TimedPatternsPage = () => {
     return (
         <>
             <PagePropsPanel scope={"global"}>
-                <PageProp key={"configKey"} label={"Pattern"} hint={"Which repeating pattern is shown."}>
+                <PageProp
+                    key={"configKey"}
+                    label={"Pattern"}
+                    hint={"Which repeating pattern is shown."}
+                    controls={"Picks the sample pattern the example sends to ShapeProps.computeFillDefs"}
+                >
                     <PageGroupedSelectField
                         value={getConfigKey}
                         groups={() => toGroupEntriesWithNoSample(GROUPPED_TIMED_PATTERNS)}
@@ -76,6 +81,7 @@ export const TimedPatternsPage = () => {
                     key={"animationDurationMs"}
                     label={"Animation duration (ms)"}
                     hint={"How long one pass of the pattern's animation takes."}
+                    controls={"Sets SVGAnimationDefs.animationDurationMs"}
                 >
                     <PageNumberField
                         value={getAnimationDurationMs}
@@ -91,6 +97,7 @@ export const TimedPatternsPage = () => {
                     key={"iterationConfigKey"}
                     label={"Iteration Pattern"}
                     hint={"How the animation repeats: once, endlessly, or back and forth."}
+                    controls={"Picks the sample iteration that fills SVGAnimationDefs.animationIterationPatterns"}
                 >
                     <PageSelectField
                         value={getIterationConfigKey}

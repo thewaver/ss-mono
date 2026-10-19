@@ -47,7 +47,7 @@
 {/snippet}
 
 <PagePropsPanel scope={"global"}>
-    <PageProp itemKey={"ringCount"} label={"Rings"} hint={"How many levels are drawn around the middle at once."}>
+    <PageProp itemKey={"ringCount"} controls={"Sets SunburstProps.ringCount"} label={"Rings"} hint={"How many levels are drawn around the middle at once."}>
         <PageNumberField
             value={ringCount}
             min={SunburstKnobs.MIN_RING_COUNT}
@@ -62,6 +62,7 @@
 
     <PageProp
         itemKey={"zoomDurationMs"}
+        controls={"Sets SunburstProps.zoomDurationMs"}
         label={"Zoom duration (ms)"}
         hint={"How long a zoom in or out takes. It is off while the visitor has asked for reduced motion, and 0 jumps straight to the new level."}
     >

@@ -80,6 +80,7 @@ export const TagInputPage = () => {
                     itemKey={"isDisabled"}
                     label={"Disabled"}
                     hint={"Turns the field off: no tag can be added, and none can be removed."}
+                    controls={"Sets TagInputProps.isDisabled"}
                 >
                     <PageCheckField value={isDisabled} ariaLabel={"Disabled"} onChange={setIsDisabled} />
                 </PageProp>
@@ -88,6 +89,7 @@ export const TagInputPage = () => {
                     itemKey={"hasError"}
                     label={"Error"}
                     hint={"Puts the field into its error look, without changing what it accepts."}
+                    controls={"Sets TagInputProps.hasError"}
                 >
                     <PageCheckField value={hasError} ariaLabel={"Error"} onChange={setHasError} />
                 </PageProp>
@@ -96,6 +98,7 @@ export const TagInputPage = () => {
                     itemKey={"tags"}
                     label={"Tags"}
                     hint={"Puts the examples back to the tags they started with."}
+                    controls={"Writes the starting tags back to TagInputProps.value"}
                 >
                     <Button
                         renderContent={(flags) => <PageButtonContent flags={flags}>Reset</PageButtonContent>}

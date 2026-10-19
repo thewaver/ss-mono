@@ -167,6 +167,7 @@
     <PageExampleKnobs>
         <PageProp
             itemKey={"reach"}
+            controls={"Sets how far the example lets the piece travel, sent to TileBoardProps.computeIsTileDisabled"}
             label={"Reach"}
             hint={"How many tiles the piece may travel in one move. Tiles out of reach are shown as unavailable."}
         >
@@ -221,7 +222,7 @@
 {/snippet}
 
 <PagePropsPanel scope={"global"}>
-    <PageProp itemKey={"rows"} label={"Rows"} hint={"How many rows of tiles the board has."}>
+    <PageProp itemKey={"rows"} controls={"Sets TileBoardProps.tileCount.row"} label={"Rows"} hint={"How many rows of tiles the board has."}>
         <PageNumberField
             value={rows}
             min={TileBoardKnobs.MIN_ROWS}
@@ -235,7 +236,7 @@
         />
     </PageProp>
 
-    <PageProp itemKey={"cols"} label={"Columns"} hint={"How many tiles sit in a row."}>
+    <PageProp itemKey={"cols"} controls={"Sets TileBoardProps.tileCount.col"} label={"Columns"} hint={"How many tiles sit in a row."}>
         <PageNumberField
             value={cols}
             min={TileBoardKnobs.MIN_COLS}
@@ -249,7 +250,7 @@
         />
     </PageProp>
 
-    <PageProp itemKey={"tileWidth"} label={"Tile width"} hint={"How wide one tile is."}>
+    <PageProp itemKey={"tileWidth"} controls={"Sets TileBoardProps.tileSize.width"} label={"Tile width"} hint={"How wide one tile is."}>
         <PageNumberField
             value={tileWidth}
             min={TileBoardKnobs.MIN_TILE_SIZE}
@@ -263,7 +264,7 @@
         />
     </PageProp>
 
-    <PageProp itemKey={"tileHeight"} label={"Tile height"} hint={"How tall one tile is."}>
+    <PageProp itemKey={"tileHeight"} controls={"Sets TileBoardProps.tileSize.height"} label={"Tile height"} hint={"How tall one tile is."}>
         <PageNumberField
             value={tileHeight}
             min={TileBoardKnobs.MIN_TILE_SIZE}
@@ -277,7 +278,7 @@
         />
     </PageProp>
 
-    <PageProp itemKey={"gap"} label={"Gap"} hint={"The space left between tiles."}>
+    <PageProp itemKey={"gap"} controls={"Sets TileBoardProps.gap"} label={"Gap"} hint={"The space left between tiles."}>
         <PageNumberField
             value={gap}
             min={TileBoardKnobs.MIN_GAP}
@@ -293,6 +294,7 @@
 
     <PageProp
         itemKey={"tiling"}
+        controls={"Sets TileBoardProps.tiling"}
         label={"Tiling"}
         hint={"How the board is tiled. A shape lays that shape whole; the two halves cut each box corner to corner, from the top left down or the top right down, and the two quarters cut a square or a lozenge into four."}
     >
@@ -309,6 +311,7 @@
 
     <PageProp
         itemKey={"hasShortFirstRow"}
+        controls={"Sets TileBoardProps.hasShortFirstRow"}
         label={"Start on the short row"}
         hint={"Starts the offset rows at the top instead of the second row, for shapes that stagger."}
     >
@@ -323,6 +326,7 @@
 
     <PageProp
         itemKey={"taper"}
+        controls={"Sets TileBoardProps.taper"}
         label={"Taper"}
         hint={"How wide the top of the board is drawn, as a fraction of the bottom. Below 1 the board leans away, and a piece shrinks as it moves up it."}
     >

@@ -4,6 +4,7 @@ import { ScrambleTextWeights, TextArea } from "@thewaver/ss-components-solid";
 import type { AccessorProps } from "@thewaver/ss-components-solid";
 import { TypewriterKnobs } from "@thewaver/ss-playground/App/Knobs/Typewriters.const";
 import { MEASURE_BOX_PADDING } from "@thewaver/ss-playground/App/PageComponents/MeasureBox/MeasureBox.css";
+import { EXAMPLES_ONLY_PROP } from "@thewaver/ss-playground/App/PageComponents/Prop/Prop.const";
 import {
     CUSTOM_TEXT_MAX_ROWS,
     CUSTOM_TEXT_MIN_ROWS,
@@ -156,6 +157,7 @@ export const TypewriterPage = () => {
                     hint={
                         "How wide the box holding the text is, which decides where the lines wrap as the text is typed."
                     }
+                    controls={EXAMPLES_ONLY_PROP}
                 >
                     <PageNumberField
                         value={getTextContainerWidth}
@@ -171,6 +173,7 @@ export const TypewriterPage = () => {
                     key={"textEffect"}
                     label={"Effect"}
                     hint={"How each character arrives: plainly, or with one of the entrance effects."}
+                    controls={"Picks the example keyframes sent to TypewriterProps.computeAnimationName"}
                 >
                     <PageSelectField
                         value={getTextEffect}
@@ -186,6 +189,7 @@ export const TypewriterPage = () => {
                     hint={
                         "The order the characters arrive in: left to right, from the middle out, scattered, and so on. Erasing runs it backwards. The caret is meant for left to right, and jumps about under the others."
                     }
+                    controls={"Picks the sample weight function sent to TypewriterProps.computeCharacterWeights"}
                 >
                     <PageSelectField
                         value={getArrivalOrder}

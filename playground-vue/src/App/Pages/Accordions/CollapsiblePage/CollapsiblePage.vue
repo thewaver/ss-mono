@@ -60,6 +60,7 @@ const examples: ExampleDefs[] = [
     <PagePropsPanel scope="global">
         <PageProp
             item-key="transitionDurationMs"
+            controls="Sets CollapsibleProps.transitionDurationMs"
             label="Transition duration (ms)"
             hint="How long the panel takes to open and close. At 0 it opens and closes at once."
         >

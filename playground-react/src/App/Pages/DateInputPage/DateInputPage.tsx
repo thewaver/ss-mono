@@ -66,6 +66,7 @@ export const DateInputPage = () => {
                     itemKey={"calendarId"}
                     label={"Calendar"}
                     hint={"Which calendar system the dates are read and written in, such as Gregorian or Islamic."}
+                    controls={"Sets DateInputProps.calendar"}
                 >
                     <PageSelectField
                         value={calendarId}

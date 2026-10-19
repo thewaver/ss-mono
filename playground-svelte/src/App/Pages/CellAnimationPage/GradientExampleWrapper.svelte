@@ -44,6 +44,7 @@
 <PageExampleKnobs>
     <PageProp
         itemKey={"gradient"}
+        controls={"Picks the gradient drawn into the example picture sent to CellAnimationProps.src"}
         label={"Gradient"}
         hint={"Which animated gradient is rendered into the picture the cells are cut from."}
     >
@@ -59,6 +60,7 @@
 
     <PageProp
         itemKey={"gradientRatio"}
+        controls={"Sets the shape of the example picture sent to CellAnimationProps.src"}
         label={"Ratio"}
         hint={"The shape of the picture the gradient is drawn into, which decides how the cells are proportioned."}
     >

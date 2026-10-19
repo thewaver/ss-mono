@@ -3,12 +3,14 @@ import { computed, shallowRef, watch } from "vue";
 
 import { Bracket, BracketUtils, Button } from "@thewaver/ss-components-vue";
 import type { BracketNode, BracketStep } from "@thewaver/ss-components-vue";
+import { BracketKnobs } from "@thewaver/ss-playground/App/Knobs/Brackets.const";
 import * as styles from "@thewaver/ss-playground/App/Pages/BracketPage/BracketPage.css";
 import { CONTROL_GLYPHS } from "@thewaver/ss-playground/App/StyledComponents/ControlButtonContent/ControlButtonContent.const";
-import { EasingUtils, MathUtils } from "@thewaver/ss-utils";
-import { assignInlineVars } from "@vanilla-extract/dynamic";
 
+import PageExampleKnobs from "../../../PageComponents/ExampleKnobs/PageExampleKnobs.vue";
+import PageCheckField from "../../../PageComponents/Field/PageCheckField.vue";
 import PageMeasureBox from "../../../PageComponents/MeasureBox/MeasureBox.vue";
+import PageProp from "../../../PageComponents/Prop/Prop.vue";
 import PageControlButtonContent from "../../../StyledComponents/ControlButtonContent/ControlButtonContent.vue";
 import type { BracketFamilyExampleProps } from "../BracketPage.types";
 import { branch, computeFamilySteps, describeFamily, seed } from "../BracketPageVue.const";
@@ -19,10 +21,6 @@ const NODE_SIZE = { width: 96, height: 34 };
 const ROUND_NAMES = ["Final", "Semifinals", "Quarterfinals", "Entrants"];
 const ACROSS_HEADER_SIZE = 24;
 const DOWN_HEADER_SIZE = 96;
-const SECTION_MARGIN_PX = 12;
-const WHOLE = 1;
-const HALF = 0.5;
-const NO_DURATION = 0;
 
 const DRAW: BracketNode<string> = branch(
     "Final",
@@ -37,7 +35,7 @@ type Props = BracketFamilyExampleProps;
 const props = defineProps<Props>();
 
 const family = shallowRef<BracketNode<string>>();
-const isZoomedIn = shallowRef(true);
+const isSnapping = shallowRef(BracketKnobs.STARTING_IS_SNAPPING_TO_FAMILY);
 
 const headerSize = computed(() => (props.orientation === "horizontal" ? ACROSS_HEADER_SIZE : DOWN_HEADER_SIZE));
 
@@ -56,82 +54,31 @@ const frameSize = computed(
 
 const treeGeometry = computed(() => BracketUtils.computeGeometry(LAYOUT, geometryOpts.value));
 
-const isHorizontal = computed(() => treeGeometry.value.isHorizontal);
+const computeFamilyView = () =>
+    BracketUtils.computeFamilyView(
+        LAYOUT,
+        treeGeometry.value,
+        BracketUtils.findNodeId(DRAW, LAYOUT, family.value),
+        BracketKnobs.FAMILY_MARGIN,
+    );
 
-const computeSectionBox = () => {
-    const anchorId = BracketUtils.findNodeId(DRAW, LAYOUT, family.value);
-    const insets = LAYOUT.placements
-        .filter((placement) => BracketUtils.getIsInFamily(placement.id, anchorId))
-        .map((placement) => BracketUtils.computeInset(treeGeometry.value, placement));
-    const left =
-        Math.min(...insets.map((inset) => inset.left)) -
-        SECTION_MARGIN_PX -
-        (isHorizontal.value ? 0 : headerSize.value);
-    const top =
-        Math.min(...insets.map((inset) => inset.top)) - SECTION_MARGIN_PX - (isHorizontal.value ? headerSize.value : 0);
-    const right = Math.max(...insets.map((inset) => inset.left)) + NODE_SIZE.width + SECTION_MARGIN_PX;
-    const bottom = Math.max(...insets.map((inset) => inset.top)) + NODE_SIZE.height + SECTION_MARGIN_PX;
+const view = shallowRef(computeFamilyView());
 
-    return { left, top, width: right - left, height: bottom - top };
-};
-
-const targetCamera = computed(() => {
-    const frame = frameSize.value;
-    const box = isZoomedIn.value ? computeSectionBox() : { left: 0, top: 0, ...treeGeometry.value.boardSize };
-    const scale = Math.min(frame.width / box.width, frame.height / box.height, WHOLE);
-
-    return {
-        x: frame.width * HALF - (box.left + box.width * HALF) * scale,
-        y: frame.height * HALF - (box.top + box.height * HALF) * scale,
-        scale,
-    };
-});
-
-const camera = shallowRef(targetCamera.value);
-
-watch(targetCamera, (target, _previous, onCleanup) => {
-    const from = camera.value;
-    const durationMs = props.transitionDurationMs ?? NO_DURATION;
-    const startMs = performance.now();
-
-    if (durationMs <= NO_DURATION) {
-        camera.value = target;
-
-        return;
-    }
-
-    let frameId = requestAnimationFrame(function glide(nowMs) {
-        const ratio = EasingUtils.easeInOutCubic(MathUtils.clamp01((nowMs - startMs) / durationMs));
-
-        camera.value = {
-            x: MathUtils.lerp(from.x, target.x, ratio),
-            y: MathUtils.lerp(from.y, target.y, ratio),
-            scale: MathUtils.lerp(from.scale, target.scale, ratio),
-        };
-
-        if (ratio < WHOLE) frameId = requestAnimationFrame(glide);
-    });
-
-    onCleanup(() => cancelAnimationFrame(frameId));
-});
-
-const cameraStyle = computed(() => {
-    const { x, y, scale } = camera.value;
-    const pin = (offset: number) => `${-offset / scale}px`;
-
-    return {
-        transform: `translate(${x}px, ${y}px) scale(${scale})`,
-        ...assignInlineVars({
-            [styles.headerPinXVar]: isHorizontal.value ? "0px" : pin(x),
-            [styles.headerPinYVar]: isHorizontal.value ? pin(y) : "0px",
-        }),
-    };
-});
+const isZoomedIn = computed(
+    () =>
+        BracketUtils.computeFamilyInView(
+            LAYOUT,
+            treeGeometry.value,
+            view.value,
+            frameSize.value.height / frameSize.value.width,
+            BracketKnobs.FAMILY_MARGIN,
+        ) !== undefined,
+);
 
 const computeStep = (step: BracketStep) => BracketUtils.computeFamilyStep(DRAW, family.value, step);
 
 const toggleZoom = () => {
-    isZoomedIn.value = !isZoomedIn.value;
+    view.value = isZoomedIn.value ? BracketUtils.computeWholeView(treeGeometry.value) : computeFamilyView();
 };
 
 const showStep = (step: BracketStep) => {
@@ -148,39 +95,35 @@ watch(family, (next) => props.onFamilyChange(describeFamily(DRAW.value, next?.va
                 :class="styles.familyFrame"
                 :style="{ width: `${frameSize.width}px`, height: `${frameSize.height}px` }"
             >
-                <div :class="styles.familyCamera" :style="cameraStyle">
-                    <div :class="styles.board">
-                        <Bracket
-                            v-model:family="family"
-                            :root="DRAW"
-                            :node-size="NODE_SIZE"
-                            :layer-gap="layerGap"
-                            :cross-gap="crossGap"
-                            :orientation="orientation"
-                            :root-side="rootSide"
-                            :layer-header-size="headerSize"
-                            ariaLabel="Knockout draw, one family at a time"
-                            @activate="props.onActivate"
-                        >
-                            <template #renderConnector="defs">
-                                <component :is="() => renderConnector(defs)" />
-                            </template>
+                <Bracket
+                    v-model:family="family"
+                    v-model:view="view"
+                    :root="DRAW"
+                    :node-size="NODE_SIZE"
+                    is-following-family
+                    :is-snapping-to-family="isSnapping"
+                    :family-margin="BracketKnobs.FAMILY_MARGIN"
+                    :transition-duration-ms="transitionDurationMs"
+                    :layer-gap="layerGap"
+                    :cross-gap="crossGap"
+                    :orientation="orientation"
+                    :root-side="rootSide"
+                    :layer-header-size="headerSize"
+                    ariaLabel="Knockout draw, one family at a time"
+                    @activate="props.onActivate"
+                >
+                    <template #renderConnector="defs">
+                        <component :is="() => renderConnector(defs)" />
+                    </template>
 
-                            <template #renderNode="{ node, state }">
-                                <PageBracketNode :node="node" :state="state" />
-                            </template>
+                    <template #renderNode="{ node, state }">
+                        <PageBracketNode :node="node" :state="state" />
+                    </template>
 
-                            <template #renderLayerHeader="{ layer, state }">
-                                <PageBracketLayerHeader
-                                    :names="ROUND_NAMES"
-                                    :layer="layer"
-                                    is-pinned
-                                    :is-current="state.isCurrent"
-                                />
-                            </template>
-                        </Bracket>
-                    </div>
-                </div>
+                    <template #renderLayerHeader="{ layer, state }">
+                        <PageBracketLayerHeader :names="ROUND_NAMES" :layer="layer" :is-current="state.isCurrent" />
+                    </template>
+                </Bracket>
             </div>
         </PageMeasureBox>
 
@@ -207,5 +150,20 @@ watch(family, (next) => props.onFamilyChange(describeFamily(DRAW.value, next?.va
                 </template>
             </Button>
         </div>
+
+        <PageExampleKnobs>
+            <PageProp
+                item-key="isSnappingToFamily"
+                controls="Sets BracketProps.isSnappingToFamily"
+                label="Snap to family"
+                hint="Glides the window to frame the family in it once a drag, a pinch or the wheel is over."
+            >
+                <PageCheckField
+                    :value="isSnapping"
+                    ariaLabel="Snap to family"
+                    @change="(value: boolean) => (isSnapping = value)"
+                />
+            </PageProp>
+        </PageExampleKnobs>
     </div>
 </template>

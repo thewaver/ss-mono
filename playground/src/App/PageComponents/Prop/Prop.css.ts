@@ -53,6 +53,13 @@ export const propLabel = style({
     minWidth: 0,
 });
 
+export const propHintControls = style({
+    marginTop: themeVars.spacing.half,
+    fontFamily: "monospace",
+    fontSize: themeVars.fontSize.xSmall,
+    overflowWrap: "break-word",
+});
+
 export const propHintDefault = style({
     marginTop: themeVars.spacing.half,
     fontFamily: "monospace",

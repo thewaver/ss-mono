@@ -46,6 +46,8 @@ export type * from "./Abstracts/Navigator/Navigator.types";
 export * from "./Abstracts/Navigator/Navigator.utils";
 export type * from "./Abstracts/Overflow/Overflow.types";
 export * from "./Abstracts/Overflow/Overflow.utils";
+export type * from "./Abstracts/PanZoom/PanZoom.types";
+export * from "./Abstracts/PanZoom/PanZoom.utils";
 export type * from "./Abstracts/Placement/Placement.types";
 export * from "./Abstracts/Placement/Placement.utils";
 export type * from "./Abstracts/PointerTracker/PointerTracker.types";

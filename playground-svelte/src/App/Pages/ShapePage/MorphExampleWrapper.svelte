@@ -16,6 +16,7 @@
 <PageExampleKnobs>
     <PageProp
         itemKey={"starPoints"}
+        controls={"Sets the number of points of the example star sent to ShapeProps.computePoints"}
         label={"Star points"}
         hint={"How many tips the star has. The contour carries twice as many points: one per tip, one per notch between tips."}
     >

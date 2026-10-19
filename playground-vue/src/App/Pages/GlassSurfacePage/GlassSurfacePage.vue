@@ -103,6 +103,7 @@ const examples: ExampleDefs[] = [
         <PagePropsPanel scope="sample">
             <PageProp
                 item-key="strokeConfigKey"
+                controls="Picks the example border paint sent to GlassSurfaceProps.computeStrokeDefs"
                 label="Border pattern"
                 hint="Which pointer-following gradient lights the panel's edge. Choosing one brings its own knobs with it."
             >
@@ -129,6 +130,7 @@ const examples: ExampleDefs[] = [
         <PagePropsPanel scope="global">
             <PageProp
                 item-key="borderRadius"
+                controls="Sets every corner of GlassSurfaceProps.borderRadii"
                 label="Corner radius (px)"
                 hint="How far the panel's corners are rounded."
             >
@@ -144,6 +146,7 @@ const examples: ExampleDefs[] = [
 
             <PageProp
                 item-key="borderWidth"
+                controls="Sets every side of GlassSurfaceProps.borderWidths"
                 label="Border width (px)"
                 hint="How thick the lit edge around the panel is."
             >
@@ -157,7 +160,12 @@ const examples: ExampleDefs[] = [
                 />
             </PageProp>
 
-            <PageProp item-key="colors" label="Border Colors" hint="The colors the edge light is painted from.">
+            <PageProp
+                item-key="colors"
+                controls="Sets the colors of the example border paint sent to GlassSurfaceProps.computeStrokeDefs"
+                label="Border Colors"
+                hint="The colors the edge light is painted from."
+            >
                 <div :class="styles.colorList">
                     <PageColorField
                         v-for="key in colorKeys"
@@ -171,6 +179,7 @@ const examples: ExampleDefs[] = [
 
             <PageProp
                 item-key="blurWidth"
+                controls="Sets the blur of the example border paint sent to GlassSurfaceProps.computeStrokeDefs"
                 label="Border blur (px)"
                 hint="How far the edge light bleeds outward, which is what makes it glow rather than sit flat."
             >
@@ -186,6 +195,7 @@ const examples: ExampleDefs[] = [
 
             <PageProp
                 item-key="blurRadius"
+                controls="Sets GlassSurfaceProps.glassDefs.backdrop.blurRadius"
                 label="Backdrop blur (px)"
                 hint="How far whatever is behind the panel is blurred as it shows through."
             >
@@ -201,6 +211,7 @@ const examples: ExampleDefs[] = [
 
             <PageProp
                 item-key="noiseFrequency"
+                controls="Sets GlassSurfaceProps.glassDefs.noise.frequency"
                 label="Noise scale"
                 hint="How fine the grain dusted over the glass is. Higher numbers make a tighter grain."
             >
@@ -216,6 +227,7 @@ const examples: ExampleDefs[] = [
 
             <PageProp
                 item-key="noiseOctaves"
+                controls="Sets GlassSurfaceProps.glassDefs.noise.octaves"
                 label="Noise octaves"
                 hint="How many layers of grain are piled up. More layers add fine detail and cost more to draw."
             >
@@ -231,6 +243,7 @@ const examples: ExampleDefs[] = [
 
             <PageProp
                 item-key="rippleScale"
+                controls="Sets GlassSurfaceProps.glassDefs.ripple.scale"
                 label="Ripple bend (px)"
                 hint="How far the glass bends what is behind it, as though it were not quite flat. 0 leaves it looking like a window."
             >
@@ -246,6 +259,7 @@ const examples: ExampleDefs[] = [
 
             <PageProp
                 item-key="lightHeight"
+                controls="Sets GlassSurfaceProps.glassDefs.sheen.lightHeight"
                 label="Light height"
                 hint="How far above the panel the light lighting the sheen is placed. Lower puts it closer and makes the highlight tighter."
             >
@@ -261,6 +275,7 @@ const examples: ExampleDefs[] = [
 
             <PageProp
                 item-key="surfaceScale"
+                controls="Sets GlassSurfaceProps.glassDefs.sheen.surfaceScale"
                 label="Sheen relief"
                 hint="How deep the relief the sheen is shaded against is. 0 leaves the surface flat and kills the highlight."
             >
@@ -276,6 +291,7 @@ const examples: ExampleDefs[] = [
 
             <PageProp
                 item-key="specularConstant"
+                controls="Sets GlassSurfaceProps.glassDefs.sheen.specularConstant"
                 label="Sheen brightness"
                 hint="How strong the sheen highlight is overall."
             >
@@ -291,6 +307,7 @@ const examples: ExampleDefs[] = [
 
             <PageProp
                 item-key="specularExponent"
+                controls="Sets GlassSurfaceProps.glassDefs.sheen.specularExponent"
                 label="Shininess"
                 hint="How tightly the sheen highlight is focused: low is a broad soft gleam, high is a small hard glint."
             >
@@ -306,6 +323,7 @@ const examples: ExampleDefs[] = [
 
             <PageProp
                 item-key="tintOpacity"
+                controls="Sets GlassSurfaceProps.glassDefs.tint.opacity"
                 label="Tint opacity"
                 hint="How strongly the panel is colored. 0 leaves it clear."
             >
@@ -319,7 +337,12 @@ const examples: ExampleDefs[] = [
                 />
             </PageProp>
 
-            <PageProp item-key="tintColor" label="Tint color" hint="The color the panel itself is tinted with.">
+            <PageProp
+                item-key="tintColor"
+                controls="Sets GlassSurfaceProps.glassDefs.tint.color"
+                label="Tint color"
+                hint="The color the panel itself is tinted with."
+            >
                 <PageColorField
                     :value="tintColor"
                     ariaLabel="Tint color"

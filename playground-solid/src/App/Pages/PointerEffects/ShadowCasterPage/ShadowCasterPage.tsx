@@ -73,6 +73,7 @@ export const ShadowCasterPage = () => {
                     hint={
                         "Stops the shadow following the pointer and leaves it at rest. It is what a page honoring a reduced-motion preference passes."
                     }
+                    controls={"Sets ShadowCasterProps.isDisabled"}
                 >
                     <PageCheckField value={getIsDisabled} ariaLabel={"Disabled"} onChange={setIsDisabled} />
                 </PageProp>
@@ -83,6 +84,7 @@ export const ShadowCasterPage = () => {
                     hint={
                         "How long the shadow takes to catch up with the pointer. At 0 it follows exactly; raised, it swings after a quick movement and eases back to rest."
                     }
+                    controls={"Sets ShadowCasterProps.smoothingMs"}
                 >
                     <PageNumberField
                         value={getSmoothingMs}
@@ -101,6 +103,7 @@ export const ShadowCasterPage = () => {
                     hint={
                         "How near the pointer has to be before the shadow answers it at all, measured from the content's center. Outside it the shadow rests."
                     }
+                    controls={"Sets ShadowCasterProps.activeRangePx"}
                 >
                     <PageNumberField
                         value={getActiveRangePx}
@@ -117,6 +120,7 @@ export const ShadowCasterPage = () => {
                     key={"lightRangePx"}
                     label={"Light range (px)"}
                     hint={"How far the pointer's light reaches. Past it the shadow is at its longest and faintest."}
+                    controls={"Sets ShadowCasterProps.lightRangePx"}
                 >
                     <PageNumberField
                         value={getLightRangePx}
@@ -133,6 +137,7 @@ export const ShadowCasterPage = () => {
                     key={"maxThrowPx"}
                     label={"Max throw (px)"}
                     hint={"How far the shadow is thrown once the pointer is out at the edge of the light."}
+                    controls={"Sets ShadowCasterProps.maxThrowPx"}
                 >
                     <PageNumberField
                         value={getMaxThrowPx}
@@ -149,6 +154,7 @@ export const ShadowCasterPage = () => {
                     key={"minBlurPx"}
                     label={"Near blur (px)"}
                     hint={"How soft the shadow is with the pointer on the content."}
+                    controls={"Sets ShadowCasterProps.minBlurPx"}
                 >
                     <PageNumberField
                         value={getMinBlurPx}
@@ -165,6 +171,7 @@ export const ShadowCasterPage = () => {
                     key={"maxBlurPx"}
                     label={"Far blur (px)"}
                     hint={"How soft the shadow is once the pointer is out at the edge of the light."}
+                    controls={"Sets ShadowCasterProps.maxBlurPx"}
                 >
                     <PageNumberField
                         value={getMaxBlurPx}
@@ -181,6 +188,7 @@ export const ShadowCasterPage = () => {
                     key={"maxOpacity"}
                     label={"Near opacity"}
                     hint={"How dark the shadow is with the pointer on the content. It fades as the pointer retreats."}
+                    controls={"Sets ShadowCasterProps.maxOpacity"}
                 >
                     <PageNumberField
                         value={getMaxOpacity}
@@ -199,6 +207,7 @@ export const ShadowCasterPage = () => {
                     hint={
                         "How dark the shadow is once the pointer is out at the edge of the light. Nothing, by default."
                     }
+                    controls={"Sets ShadowCasterProps.minOpacity"}
                 >
                     <PageNumberField
                         value={getMinOpacity}
@@ -215,6 +224,7 @@ export const ShadowCasterPage = () => {
                     key={"restingOpacity"}
                     label={"Resting opacity"}
                     hint={"How dark the shadow is with no pointer near it at all, or with the effect turned off."}
+                    controls={"Sets ShadowCasterProps.restingOpacity"}
                 >
                     <PageNumberField
                         value={getRestingOpacity}
@@ -231,6 +241,7 @@ export const ShadowCasterPage = () => {
                     key={"color"}
                     label={"Color"}
                     hint={"What the shadow is made of. Whatever alpha it carries is replaced by the opacity ramp."}
+                    controls={"Sets ShadowCasterProps.color"}
                 >
                     <PageColorField value={getColor} ariaLabel={"Color"} onInput={setColor} />
                 </PageProp>

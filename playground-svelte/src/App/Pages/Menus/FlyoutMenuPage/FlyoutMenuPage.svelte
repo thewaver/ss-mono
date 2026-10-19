@@ -65,6 +65,7 @@
 <PagePropsPanel scope={"global"}>
     <PageProp
         itemKey={"hoverShowDelayMs"}
+        controls={"Sets FlyoutMenuProps.hoverShowDelayMs"}
         label={"Hover delay (ms)"}
         hint={"How long the pointer has to rest on an entry before its panel opens."}
     >
@@ -83,6 +84,7 @@
 
     <PageProp
         itemKey={"transitionDurationMs"}
+        controls={"Sets FlyoutMenuProps.transitionDurationMs"}
         label={"Transition duration (ms)"}
         hint={"How long the panel takes to fade, and to glide from one entry to the next."}
     >

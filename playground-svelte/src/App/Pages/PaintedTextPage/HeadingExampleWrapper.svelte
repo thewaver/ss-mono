@@ -21,7 +21,7 @@
 </PageMeasureBox>
 
 <PageExampleKnobs>
-    <PageProp itemKey={"fontSize"} label={"Font size (px)"} hint={"How large the letters are."}>
+    <PageProp itemKey={"fontSize"} controls={"Sets the font size of the example text sent as PaintedText's children"} label={"Font size (px)"} hint={"How large the letters are."}>
         <PageNumberField
             value={fontSize}
             min={PaintedTextKnobs.MIN_FONT_SIZE}
@@ -36,6 +36,7 @@
 
     <PageProp
         itemKey={"lineHeight"}
+        controls={"Sets the line height of the example text sent as PaintedText's children"}
         label={"Line height"}
         hint={"How tall each line is, as a multiple of the font size, which decides how far apart the lines sit."}
     >
@@ -51,7 +52,7 @@
         />
     </PageProp>
 
-    <PageProp itemKey={"fontWeight"} label={"Font weight"} hint={"How heavy the letters are, from 100 to 900."}>
+    <PageProp itemKey={"fontWeight"} controls={"Sets the font weight of the example text sent as PaintedText's children"} label={"Font weight"} hint={"How heavy the letters are, from 100 to 900."}>
         <PageNumberField
             value={fontWeight}
             min={PaintedTextKnobs.MIN_FONT_WEIGHT}

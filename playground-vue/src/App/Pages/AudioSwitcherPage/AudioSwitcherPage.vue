@@ -43,6 +43,7 @@ const examples: ExampleDefs[] = [
     <PagePropsPanel scope="global">
         <PageProp
             item-key="track"
+            controls="Picks the example track sent to AudioSwitcherProps.src"
             label="Track"
             hint="Which piece is playing. Changing it is what the switcher crossfades between."
         >
@@ -57,6 +58,7 @@ const examples: ExampleDefs[] = [
 
         <PageProp
             item-key="crossfadeMs"
+            controls="Sets AudioSwitcherProps.crossfadeMs"
             label="Crossfade (ms)"
             hint="How long the old track takes to fade out while the new one fades in."
         >
@@ -71,7 +73,12 @@ const examples: ExampleDefs[] = [
             />
         </PageProp>
 
-        <PageProp item-key="volume" label="Volume (%)" hint="How loud the playback is.">
+        <PageProp
+            item-key="volume"
+            controls="Sets AudioSwitcherProps.volume, sent as a share of 1"
+            label="Volume (%)"
+            hint="How loud the playback is."
+        >
             <PageNumberField
                 :value="volumePercent"
                 :min="AudioSwitcherKnobs.MIN_VOLUME_PERCENT"

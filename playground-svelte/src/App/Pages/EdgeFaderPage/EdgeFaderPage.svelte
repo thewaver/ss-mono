@@ -75,7 +75,7 @@
 {/snippet}
 
 <PagePropsPanel scope={"global"}>
-    <PageProp itemKey={"size"} label={"Fade size (px)"} hint={"How far in from each side the fade reaches."}>
+    <PageProp itemKey={"size"} controls={"Sets EdgeFaderProps.size"} label={"Fade size (px)"} hint={"How far in from each side the fade reaches."}>
         <PageNumberField
             value={size}
             min={EdgeFaderKnobs.MIN_SIZE}
@@ -90,6 +90,7 @@
 
     <PageProp
         itemKey={"isScrollAware"}
+        controls={"Sets EdgeFaderProps.isScrollAware"}
         label={"Scroll-aware"}
         hint={"Whether a side fades only while there is more to scroll to past it."}
     >

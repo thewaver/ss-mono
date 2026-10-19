@@ -95,6 +95,7 @@ export const CardStackPage = () => {
                     itemKey={"isDisabled"}
                     label={"Disabled"}
                     hint={"Turns the stack off, so no card moves by gesture, button or key."}
+                    controls={"Sets CardStackProps.isDisabled"}
                 >
                     <PageCheckField value={isDisabled} ariaLabel={"Disabled"} onChange={setIsDisabled} />
                 </PageProp>
@@ -105,6 +106,7 @@ export const CardStackPage = () => {
                     hint={
                         "How far across the stack a card has to be pushed before it leaves. Let go short of it and it springs back."
                     }
+                    controls={"Sets CardStackProps.commitRatio"}
                 >
                     <PageNumberField
                         value={commitRatio}
@@ -121,6 +123,7 @@ export const CardStackPage = () => {
                     itemKey={"transitionDurationMs"}
                     label={"Duration (ms)"}
                     hint={"How long a card takes to fly out, and how long one that fell short takes to settle back."}
+                    controls={"Sets CardStackProps.transitionDurationMs"}
                 >
                     <PageNumberField
                         value={transitionDurationMs}
@@ -137,6 +140,7 @@ export const CardStackPage = () => {
                     itemKey={"mountedCount"}
                     label={"Mounted cards"}
                     hint={"How many cards are in the document at once, counting the top one."}
+                    controls={"Sets CardStackProps.mountedCount"}
                 >
                     <PageNumberField
                         value={mountedCount}
@@ -155,6 +159,7 @@ export const CardStackPage = () => {
                     hint={
                         "How far apart the cards in the pile sit. The bottom one fills the stack's box, and each card above it is lifted by one more of these."
                     }
+                    controls={"Sets CardStackProps.cardGap"}
                 >
                     <PageNumberField
                         value={cardGap}
@@ -173,6 +178,7 @@ export const CardStackPage = () => {
                     hint={
                         "How much narrower each card is than the one in front of it. The top card is the widest and fills the stack; 0 stacks cards of equal width."
                     }
+                    controls={"Sets CardStackProps.funnelRatio"}
                 >
                     <PageNumberField
                         value={funnelRatio}
@@ -189,6 +195,7 @@ export const CardStackPage = () => {
                     itemKey={"pileSide"}
                     label={"Pile side"}
                     hint={"The edge the cards behind the top one peek out of: below the top card, or above it."}
+                    controls={"Sets CardStackProps.pileSide"}
                 >
                     <PageSelectField
                         value={pileSide}

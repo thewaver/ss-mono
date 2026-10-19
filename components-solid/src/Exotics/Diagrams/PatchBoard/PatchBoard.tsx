@@ -1,8 +1,19 @@
-import { Index, batch, createEffect, createMemo, createSignal, createUniqueId, onCleanup, onMount } from "solid-js";
+import {
+    Index,
+    Show,
+    batch,
+    createEffect,
+    createMemo,
+    createSignal,
+    createUniqueId,
+    onCleanup,
+    onMount,
+} from "solid-js";
 
 import {
     LiveAnnouncerUtils,
     PATCH_BOARD_DEFAULTS,
+    PanZoomUtils,
     type PatchBoardCarry,
     type PatchBoardHandle,
     type PatchBoardNode,
@@ -14,6 +25,8 @@ import {
 import { PatchBoardConst } from "@thewaver/ss-components/internal";
 
 import { CarrierSolidUtils } from "../../../Abstracts/Carrier/CarrierSolid.utils";
+import { ElementObserverSolidUtils } from "../../../Abstracts/ElementObserver/ElementObserverSolid.utils";
+import { PanZoomSolidUtils } from "../../../Abstracts/PanZoom/PanZoomSolid.utils";
 import { LabelSolidUtils } from "../../../Essentials/Input/Label/LabelSolid.utils";
 import { InteractionWrapper } from "../../../Primitives/InteractionWrapper/InteractionWrapper";
 import { access, accessSignal } from "../../../Utils/propUtils";
@@ -30,6 +43,7 @@ export const PatchBoard = <T,>(props: PatchBoardProps<T>) => {
     const socketHintId = createUniqueId();
 
     const [getRootRef, setRootRef] = createSignal<HTMLElement>();
+    const [getWindowRef, setWindowRef] = createSignal<HTMLElement>();
     const [getFocusedStop, setFocusedStop] = createSignal<string>();
 
     const stopRefs = new Map<string, HTMLElement>();
@@ -56,6 +70,59 @@ export const PatchBoard = <T,>(props: PatchBoardProps<T>) => {
 
     const getStepSize = createMemo(() => access(props.stepSize) ?? PATCH_BOARD_DEFAULTS.stepSize);
 
+    const getIsPannable = createMemo(() => access(props.isPannable) ?? PATCH_BOARD_DEFAULTS.isPannable);
+
+    const getIsZoomable = createMemo(() => access(props.isZoomable) ?? PATCH_BOARD_DEFAULTS.isZoomable);
+
+    const getWindowSize = ElementObserverSolidUtils.createBorderBoxSizeObserver(getWindowRef);
+
+    const panZoom = PanZoomSolidUtils.create({
+        getSource: () => props.view,
+        getWindowRef,
+        getSize: getWindowSize,
+        getRange: () => PanZoomUtils.toFullView(PatchBoardConst.FULL_WIDTH, getHeightRatio()),
+        getMinWidth: () => PatchBoardConst.FULL_WIDTH / (access(props.maxScale) ?? PATCH_BOARD_DEFAULTS.maxScale),
+        getDurationMs: () => access(props.transitionDurationMs) ?? PATCH_BOARD_DEFAULTS.transitionDurationMs,
+        getIsPannable,
+        getIsZoomable,
+    });
+
+    onMount(() => {
+        props.onMount?.(panZoom.controller);
+    });
+
+    const getLayoutWidth = createMemo(() => access(props.boardWidth) ?? getWindowSize().width);
+
+    const getBoardTransform = createMemo(() => {
+        if (!panZoom.getIsActive()) return undefined;
+
+        const view = panZoom.getShownView();
+        const width = getLayoutWidth();
+        const scale = PanZoomUtils.computeScale(view, getWindowSize().width) / width;
+
+        return `scale(${scale}) translate(${-view.x.start * width}px, ${-view.y.start * width}px)`;
+    });
+
+    const revealStop = (stopKey: string) => {
+        const root = getRootRef();
+        const element = stopRefs.get(stopKey);
+
+        if (!panZoom.getIsActive() || !root || !element) return;
+
+        const board = root.getBoundingClientRect();
+        const stop = element.getBoundingClientRect();
+
+        if (board.width === PatchBoardConst.NOTHING) return;
+
+        panZoom.controller.showArea({
+            x: { start: (stop.left - board.left) / board.width, end: (stop.right - board.left) / board.width },
+            y: { start: (stop.top - board.top) / board.width, end: (stop.bottom - board.top) / board.width },
+        });
+    };
+
+    const getIsOnStop = (target: EventTarget | null) =>
+        [...stopRefs.values()].some((element) => target instanceof Node && element.contains(target));
+
     const getNodeKey = (node: PatchBoardNode<T>) => props.computeNodeKey(node.value);
 
     const getNodeLabel = (node: PatchBoardNode<T>) => props.computeNodeLabel(node.value);
@@ -64,7 +131,7 @@ export const PatchBoard = <T,>(props: PatchBoardProps<T>) => {
         if (stopKey === undefined) return;
 
         setFocusedStop(stopKey);
-        stopRefs.get(stopKey)?.focus();
+        stopRefs.get(stopKey)?.focus({ preventScroll: panZoom.getIsActive() });
     };
 
     const board: PatchBoardHandle<T> = PatchBoardUtils.createBoard<T>({
@@ -190,6 +257,12 @@ export const PatchBoard = <T,>(props: PatchBoardProps<T>) => {
 
         if (stopKey === undefined) return;
 
+        if (panZoom.getIsActive()) {
+            revealStop(stopKey);
+
+            return;
+        }
+
         stopRefs.get(stopKey)?.scrollIntoView({ block: "nearest", inline: "nearest" });
     });
 
@@ -203,11 +276,18 @@ export const PatchBoard = <T,>(props: PatchBoardProps<T>) => {
         board.cancel();
     });
 
-    return (
+    const renderBoard = () => (
         <div
             id={boardId}
             ref={setRootRef}
             class={styles.patchBoardRoot}
+            style={{
+                width:
+                    panZoom.getIsActive() && access(props.boardWidth) !== undefined
+                        ? `${getLayoutWidth()}px`
+                        : undefined,
+                transform: getBoardTransform(),
+            }}
             role="group"
             aria-label={getAriaLabel()}
             aria-disabled={getIsDisabled() || undefined}
@@ -274,7 +354,10 @@ export const PatchBoard = <T,>(props: PatchBoardProps<T>) => {
                                             onKeyDown={(e) =>
                                                 board.handleStopKeyDown(getKey(), getNode(), undefined, e)
                                             }
-                                            onFocus={() => setFocusedStop(getKey())}
+                                            onFocus={() => {
+                                                setFocusedStop(getKey());
+                                                revealStop(getKey());
+                                            }}
                                         >
                                             {props.renderNode(getNode, getFlags)}
                                         </div>
@@ -359,7 +442,10 @@ export const PatchBoard = <T,>(props: PatchBoardProps<T>) => {
                                                                 e,
                                                             )
                                                         }
-                                                        onFocus={() => setFocusedStop(getStopKey())}
+                                                        onFocus={() => {
+                                                            setFocusedStop(getStopKey());
+                                                            revealStop(getStopKey());
+                                                        }}
                                                     >
                                                         {props.renderSocket?.(getSocket, getFlags)}
                                                     </div>
@@ -374,5 +460,34 @@ export const PatchBoard = <T,>(props: PatchBoardProps<T>) => {
                 }}
             </Index>
         </div>
+    );
+
+    return (
+        <Show when={panZoom.getIsActive()} fallback={renderBoard()}>
+            <div
+                ref={setWindowRef}
+                class={styles.patchBoardWindow}
+                style={{
+                    "aspect-ratio": `${PatchBoardConst.FULL_WIDTH} / ${getHeightRatio()}`,
+                    "touch-action": getIsPannable() || getIsZoomable() ? "none" : undefined,
+                    "user-select": getIsPannable() ? "none" : undefined,
+                }}
+                onPointerDown={(e) => {
+                    if (getIsOnStop(e.target)) return;
+
+                    panZoom.gestures.press(e);
+                }}
+                onPointerMove={(e) => panZoom.gestures.move(e, e.currentTarget)}
+                onPointerUp={(e) => panZoom.gestures.release(e, e.currentTarget)}
+                onPointerCancel={(e) => panZoom.gestures.release(e, e.currentTarget)}
+                onWheel={(e) => panZoom.gestures.wheel(e)}
+                onScroll={(e) => {
+                    e.currentTarget.scrollLeft = PatchBoardConst.NOTHING;
+                    e.currentTarget.scrollTop = PatchBoardConst.NOTHING;
+                }}
+            >
+                {renderBoard()}
+            </div>
+        </Show>
     );
 };

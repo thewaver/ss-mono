@@ -14,6 +14,7 @@ import {
     VIEWPORT_ANCHOR_OPTIONS,
 } from "@thewaver/ss-playground/App/PageComponents/NavSettings/NavSettings.const";
 import { NO_MOTION_DURATION_MS } from "@thewaver/ss-playground/App/PageComponents/NavSettings/NavSettings.const";
+import { EXAMPLES_ONLY_PROP } from "@thewaver/ss-playground/App/PageComponents/Prop/Prop.const";
 
 import {
     PageRadioSegmentContent,
@@ -88,6 +89,7 @@ export const PageNavSettings = (props: PageNavSettingsProps) => {
                         key={"showsDescriptionOnly"}
                         label={"Show pages without examples"}
                         hint={"Lists the pages that have docs but no examples yet, which are hidden otherwise."}
+                        controls={EXAMPLES_ONLY_PROP}
                         defaultValue={false}
                     >
                         <Toggle
@@ -103,6 +105,7 @@ export const PageNavSettings = (props: PageNavSettingsProps) => {
                         hint={
                             "Which tab a page opens on when it is picked from the list. A page with no examples always opens on its docs."
                         }
+                        controls={EXAMPLES_ONLY_PROP}
                         defaultValue={"Examples"}
                     >
                         <PageNavSettingsChoice
@@ -118,6 +121,7 @@ export const PageNavSettings = (props: PageNavSettingsProps) => {
                         hint={
                             "The height the whole playground is laid out at before it is scaled to fit the window. None lays it out at the window's own size and Auto at the screen's height, both at the window's shape; 1080p and 1440p lay out a fixed 16:9 page of that height, with empty bars around it."
                         }
+                        controls={EXAMPLES_ONLY_PROP}
                         defaultValue={"Auto"}
                     >
                         <PageSelectField
@@ -135,6 +139,7 @@ export const PageNavSettings = (props: PageNavSettingsProps) => {
                         hint={
                             "Which color theme the playground is drawn in, independent of the framework it runs in. The new theme is uncovered by a circle growing from this field."
                         }
+                        controls={EXAMPLES_ONLY_PROP}
                         defaultValue={computeThemeLabel(OWN_FRAMEWORK)}
                     >
                         <PageSelectField

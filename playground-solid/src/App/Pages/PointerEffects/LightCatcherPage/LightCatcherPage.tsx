@@ -88,6 +88,7 @@ export const LightCatcherPage = () => {
                     hint={
                         "Stops the surface answering the pointer and leaves it at its resting brightness and lightness. It is what a page honoring a reduced-motion preference passes."
                     }
+                    controls={"Sets LightCatcherProps.isDisabled"}
                 >
                     <PageCheckField value={getIsDisabled} ariaLabel={"Disabled"} onChange={setIsDisabled} />
                 </PageProp>
@@ -98,6 +99,7 @@ export const LightCatcherPage = () => {
                     hint={
                         "How long the light takes to catch up with the pointer. At 0 it follows exactly; raised, it glows on after the pointer and fades behind it."
                     }
+                    controls={"Sets LightCatcherProps.smoothingMs"}
                 >
                     <PageNumberField
                         value={getSmoothingMs}
@@ -116,6 +118,7 @@ export const LightCatcherPage = () => {
                     hint={
                         "How near the pointer has to be before the surface answers it at all, measured from its center. Outside it the surface sits at resting."
                     }
+                    controls={"Sets LightCatcherProps.activeRangePx"}
                 >
                     <PageNumberField
                         value={getActiveRangePx}
@@ -132,6 +135,7 @@ export const LightCatcherPage = () => {
                     key={"lightRangePx"}
                     label={"Light range (px)"}
                     hint={"How far the light reaches. Full brightness at the surface's own edge, resting out here."}
+                    controls={"Sets LightCatcherProps.lightRangePx"}
                 >
                     <PageNumberField
                         value={getLightRangePx}
@@ -148,6 +152,7 @@ export const LightCatcherPage = () => {
                     key={"maxBrightness"}
                     label={"Max brightness"}
                     hint={"How bright the surface is with the pointer on it. 1 is the content exactly as painted."}
+                    controls={"Sets LightCatcherProps.maxBrightness"}
                 >
                     <PageNumberField
                         value={getMaxBrightness}
@@ -166,6 +171,7 @@ export const LightCatcherPage = () => {
                     hint={
                         "How bright the surface is with nothing near it. Below 1 it dims, which turns a row into a spotlight."
                     }
+                    controls={"Sets LightCatcherProps.restingBrightness"}
                 >
                     <PageNumberField
                         value={getRestingBrightness}
@@ -184,6 +190,7 @@ export const LightCatcherPage = () => {
                     hint={
                         "How far the surface fades toward white with the pointer on it. 0 is untouched. Unlike brightness it lifts the dark parts most, and the two stack."
                     }
+                    controls={"Sets LightCatcherProps.maxLightness"}
                 >
                     <PageNumberField
                         value={getMaxLightness}
@@ -200,6 +207,7 @@ export const LightCatcherPage = () => {
                     key={"restingLightness"}
                     label={"Resting lightness"}
                     hint={"How far the surface fades toward white with nothing near it. 0 is untouched."}
+                    controls={"Sets LightCatcherProps.restingLightness"}
                 >
                     <PageNumberField
                         value={getRestingLightness}

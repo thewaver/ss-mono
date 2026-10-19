@@ -19,7 +19,7 @@
 </script>
 
 <PagePropsPanel scope={"global"}>
-    <PageProp itemKey={"wedgeCount"} label={"Wedges"} hint={"How many wedges the wheel is divided into."}>
+    <PageProp itemKey={"wedgeCount"} controls={"Sets the length of the slice of example prizes sent to WheelProps.wedges"} label={"Wedges"} hint={"How many wedges the wheel is divided into."}>
         <PageNumberField
             value={controls.wedgeCount}
             min={WheelKnobs.MIN_WEDGE_COUNT}
@@ -35,6 +35,7 @@
 
     <PageProp
         itemKey={"spinDurationMs"}
+        controls={"Sets WheelProps.spinDurationMs"}
         label={"Spin duration (ms)"}
         hint={"How long a spin takes from the moment it is started to the moment it stops."}
     >
@@ -53,6 +54,7 @@
 
     <PageProp
         itemKey={"turns"}
+        controls={"Sets the number of turns in the example's spin, sent to WheelProps.computeSpinDefs"}
         label={"Turns per spin"}
         hint={"How many full turns a spin makes before it comes to rest on its wedge."}
     >
@@ -71,6 +73,7 @@
 
     <PageProp
         itemKey={"settleDurationMs"}
+        controls={"Sets WheelProps.settleDurationMs"}
         label={"Settle duration (ms)"}
         hint={"How long the wheel takes to ease into its final position once the spin is over."}
     >
@@ -89,6 +92,7 @@
 
     <PageProp
         itemKey={"doesResume"}
+        controls={"Switches WheelProps.restDurationMs between the rest below and never resuming"}
         label={"Turns again after a spin"}
         hint={"Lets the wheel start turning by itself again after a spin, instead of standing still."}
     >
@@ -103,6 +107,7 @@
 
     <PageProp
         itemKey={"restDurationMs"}
+        controls={"Sets WheelProps.restDurationMs"}
         label={"Rest after a spin (ms)"}
         hint={"How long the wheel stands still after a spin before it resumes. It only applies when it turns again."}
     >
@@ -122,6 +127,7 @@
 
     <PageProp
         itemKey={"isIdlingAllowed"}
+        controls={"Switches WheelProps.idleDelayMs between the delay below and no idling"}
         label={"Turns by itself"}
         hint={"Lets the wheel turn slowly on its own while nobody is spinning it."}
     >
@@ -136,6 +142,7 @@
 
     <PageProp
         itemKey={"idleDelayMs"}
+        controls={"Sets WheelProps.idleDelayMs"}
         label={"Idle step delay (ms)"}
         hint={"How long the wheel waits between steps of its idle turn. It only applies while idling is on."}
     >
@@ -155,6 +162,7 @@
 
     <PageProp
         itemKey={"spinStyleKey"}
+        controls={"Picks the example's spin curve sent to WheelProps.computeSpinDefs"}
         label={"Spin style"}
         hint={"The speed curve a spin follows, which is what makes it feel heavy or snappy."}
     >
@@ -171,6 +179,7 @@
 
     <PageProp
         itemKey={"isDisabled"}
+        controls={"Sets WheelProps.isDisabled"}
         label={"Disabled"}
         hint={"Turns the wheel off, so it can neither be spun nor turn by itself."}
     >

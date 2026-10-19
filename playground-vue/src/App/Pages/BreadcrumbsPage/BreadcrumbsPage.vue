@@ -98,6 +98,7 @@ const examples: ExampleDefs[] = [
     <PagePropsPanel scope="global">
         <PageProp
             item-key="depth"
+            controls="Sets the length of the slice of example crumbs sent to BreadcrumbsProps.crumbs"
             label="Depth"
             hint="How many crumbs the trail holds. Past what fits, the middle ones collapse behind a menu."
         >
@@ -114,6 +115,7 @@ const examples: ExampleDefs[] = [
 
         <PageProp
             item-key="isDisabled"
+            controls="Sets Breadcrumb.isDisabled on every example crumb sent to BreadcrumbsProps.crumbs"
             label="Disabled"
             hint="Turns every crumb off. A disabled crumb stays readable and keeps its tooltip."
         >
@@ -126,6 +128,7 @@ const examples: ExampleDefs[] = [
 
         <PageProp
             item-key="trail"
+            controls="Writes the starting depth back to the slice of example crumbs sent to BreadcrumbsProps.crumbs"
             label="Trail"
             hint="Puts the trail back to the crumb it started on, undoing wherever the examples have navigated to."
         >

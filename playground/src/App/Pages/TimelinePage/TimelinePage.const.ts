@@ -50,15 +50,17 @@ export const TRIM_TRACKS = ["Video", "Audio"];
 export const TRIM_CLIPS: Clip[] = CLIPS.filter((clip) => clip.track < TRIM_TRACKS.length);
 
 export const formatClock = (minutes: number) => {
-    const hour = Math.floor(minutes / MINUTES_PER_HOUR);
-    const minute = Math.round(minutes - hour * MINUTES_PER_HOUR);
+    const rounded = Math.round(minutes);
+    const hour = Math.floor(rounded / MINUTES_PER_HOUR);
+    const minute = rounded - hour * MINUTES_PER_HOUR;
 
     return `${hour}:${minute < TENS ? "0" : ""}${minute}`;
 };
 
 export const formatStopwatch = (seconds: number) => {
-    const minute = Math.floor(seconds / MINUTES_PER_HOUR);
-    const second = Math.round(seconds - minute * MINUTES_PER_HOUR);
+    const rounded = Math.round(seconds);
+    const minute = Math.floor(rounded / MINUTES_PER_HOUR);
+    const second = rounded - minute * MINUTES_PER_HOUR;
 
     return `${minute}:${second < TENS ? "0" : ""}${second}`;
 };

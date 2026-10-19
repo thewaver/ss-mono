@@ -110,6 +110,7 @@ export const CurrencyInputPage = () => {
                     hint={
                         "Which country's conventions the amount is written in, which decides the separators and where the symbol sits."
                     }
+                    controls={"Sets CurrencyInputProps.locale"}
                 >
                     <PageSelectField
                         value={getLocale}
@@ -124,6 +125,7 @@ export const CurrencyInputPage = () => {
                     key={"decimals"}
                     label={"Decimals"}
                     hint={"How many digits are kept after the decimal separator."}
+                    controls={"Sets CurrencyInputProps.decimals"}
                 >
                     <PageSelectField
                         value={getDecimals}
@@ -137,6 +139,7 @@ export const CurrencyInputPage = () => {
                     key={"hasSign"}
                     label={"Signed"}
                     hint={"Allows negative amounts to be typed. With it off, a minus sign is rejected."}
+                    controls={"Sets CurrencyInputProps.hasSign"}
                 >
                     <PageCheckField value={getHasSign} ariaLabel={"Signed"} onChange={setHasSign} />
                 </PageProp>
@@ -147,6 +150,7 @@ export const CurrencyInputPage = () => {
                     hint={
                         "How the digits before the decimal point are grouped, such as in threes or in the Indian lakh pattern."
                     }
+                    controls={"Sets CurrencyInputProps.groupSizes"}
                 >
                     <PageSelectField
                         value={getGrouping}

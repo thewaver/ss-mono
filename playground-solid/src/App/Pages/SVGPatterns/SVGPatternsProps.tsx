@@ -17,7 +17,12 @@ export const PageSVGPatternsProps = (props: Props) => {
 
     return (
         <>
-            <PageProp key={"cellSize"} label={"Cell Size (px)"} hint={"How large one cell of the pattern is."}>
+            <PageProp
+                key={"cellSize"}
+                label={"Cell Size (px)"}
+                hint={"How large one cell of the pattern is."}
+                controls={"Sets TimedPatternElementDefs.cellSize or TrackedPatternElementDefs.cellSize"}
+            >
                 <PageNumberField
                     value={controls.cellSize[0]}
                     min={SVGPatternKnobs.MIN_CELL_SIZE}
@@ -32,6 +37,7 @@ export const PageSVGPatternsProps = (props: Props) => {
                 key={"colors"}
                 label={"Colors"}
                 hint={"The colors the pattern is drawn from. Each sample uses as many of them as it needs."}
+                controls={"Sets SVGDefsBaseElementDefs.colors"}
             >
                 <div class={styles.colorList}>
                     <For each={Object.keys(controls.colors)}>
@@ -50,6 +56,7 @@ export const PageSVGPatternsProps = (props: Props) => {
                 key={"blurWidth"}
                 label={"Blur (px)"}
                 hint={"How far the pattern is blurred outward, which is what gives it its glow."}
+                controls={"Sets SVGDefsBaseElementDefs.blurWidth"}
             >
                 <PageNumberField
                     value={controls.blurWidth[0]}

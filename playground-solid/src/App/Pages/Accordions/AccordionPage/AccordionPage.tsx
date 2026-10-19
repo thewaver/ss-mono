@@ -147,7 +147,12 @@ export const AccordionPage = () => {
     return (
         <>
             <PagePropsPanel scope={"global"}>
-                <PageProp key={"gap"} label={"Gap (px)"} hint={"The space between sections."}>
+                <PageProp
+                    key={"gap"}
+                    label={"Gap (px)"}
+                    hint={"The space between sections."}
+                    controls={"Sets AccordionProps.gap"}
+                >
                     <PageNumberField
                         value={getGap}
                         min={AccordionKnobs.MIN_GAP}
@@ -163,6 +168,7 @@ export const AccordionPage = () => {
                     key={"transitionDurationMs"}
                     label={"Transition duration (ms)"}
                     hint={"How long a section takes to open and close. At 0 it opens and closes at once."}
+                    controls={"Sets AccordionProps.transitionDurationMs"}
                 >
                     <PageNumberField
                         value={getTransitionDurationMs}

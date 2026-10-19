@@ -111,6 +111,7 @@ export const BreadcrumbsPage = () => {
                     itemKey={"depth"}
                     label={"Depth"}
                     hint={"How many crumbs the trail holds. Past what fits, the middle ones collapse behind a menu."}
+                    controls={"Sets the length of the slice of example crumbs sent to BreadcrumbsProps.crumbs"}
                 >
                     <PageNumberField
                         value={depth}
@@ -127,6 +128,7 @@ export const BreadcrumbsPage = () => {
                     itemKey={"isDisabled"}
                     label={"Disabled"}
                     hint={"Turns every crumb off. A disabled crumb stays readable and keeps its tooltip."}
+                    controls={"Sets Breadcrumb.isDisabled on every example crumb sent to BreadcrumbsProps.crumbs"}
                 >
                     <PageCheckField value={isDisabled} ariaLabel={"Disabled"} onChange={setIsDisabled} />
                 </PageProp>
@@ -136,6 +138,9 @@ export const BreadcrumbsPage = () => {
                     label={"Trail"}
                     hint={
                         "Puts the trail back to the crumb it started on, undoing wherever the examples have navigated to."
+                    }
+                    controls={
+                        "Writes the starting depth back to the slice of example crumbs sent to BreadcrumbsProps.crumbs"
                     }
                 >
                     <Button

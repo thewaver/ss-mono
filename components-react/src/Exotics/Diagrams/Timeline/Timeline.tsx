@@ -15,6 +15,7 @@ import {
     CarrierUtils,
     type CarryMode,
     LiveAnnouncerUtils,
+    PanZoomUtils,
     TIMELINE_DEFAULTS,
     type TimelineEdge,
     type TimelineItemRenderProps,
@@ -31,6 +32,8 @@ import { SignalMirrorReactUtils } from "../../../Abstracts/SignalMirror/SignalMi
 import { InteractionWrapper } from "../../../Primitives/InteractionWrapper/InteractionWrapper";
 import { useLatest } from "../../../Utils/refUtils";
 import type { TimelineController, TimelineItemProps, TimelineProps } from "./Timeline.types";
+
+const ACROSS_ONLY = { x: true, y: false };
 
 const getIsSameSpan = (a: TimelineSpan, b: TimelineSpan) => a.start === b.start && a.end === b.end;
 
@@ -81,12 +84,12 @@ export const Timeline = <T,>(props: TimelineProps<T>) => {
     const size = ElementObserverReactUtils.useBorderBoxSize(rootRef);
 
     const range = props.range;
-    const minViewExtent = props.minViewExtent ?? TimelineUtils.getExtent(range) * TimelineConst.MIN_VIEW_SHARE;
+    const minViewExtent = props.minViewExtent ?? PanZoomUtils.getExtent(range) * TimelineConst.MIN_VIEW_SHARE;
 
     const [rawView, setRawView] = SignalMirrorReactUtils.useOptionalState(props.view, range);
 
     const view = useMemo(
-        () => TimelineUtils.clampView(rawView, range, minViewExtent),
+        () => PanZoomUtils.clampSpan(rawView, range, minViewExtent),
         [rawView.start, rawView.end, range.start, range.end, minViewExtent],
     );
 
@@ -117,14 +120,17 @@ export const Timeline = <T,>(props: TimelineProps<T>) => {
     const isZoomable = (props.isZoomable ?? true) && !isDisabled;
 
     const steps = TimelineUtils.chooseSteps(
-        TimelineUtils.getExtent(view),
+        PanZoomUtils.getExtent(view),
         size.width,
         props.minTickGap ?? TIMELINE_DEFAULTS.minTickGap,
         props.tickSteps,
     );
 
     const getPointerRatio = (clientX: number) =>
-        TimelineUtils.computePointerRatio(clientX, rootRef.current?.getBoundingClientRect());
+        PanZoomUtils.computePointerRatio(
+            { x: clientX, y: TimelineConst.NOTHING },
+            rootRef.current?.getBoundingClientRect(),
+        ).x;
 
     const zone = CarrierReactUtils.useZone(
         TimelineUtils.createEdgeZone({
@@ -168,7 +174,7 @@ export const Timeline = <T,>(props: TimelineProps<T>) => {
     const ticks = TimelineUtils.computeTicks(view, steps);
     const markers = TimelineUtils.computeMarkers(props.markers ?? TimelineConst.NO_MARKERS, view);
 
-    const latest = useLatest({ range, minViewExtent, setRawView, isPannable, isZoomable, width: size.width });
+    const latest = useLatest({ range, minViewExtent, setRawView, isPannable, isZoomable, size });
 
     const [viewStore] = useState(() => StoreUtils.create(view, { isEqual: getIsSameSpan }));
 
@@ -179,7 +185,7 @@ export const Timeline = <T,>(props: TimelineProps<T>) => {
 
     const [controller] = useState<TimelineController>(() => {
         const setView = (next: TimelineSpan) => {
-            const clamped = TimelineUtils.clampView(next, latest.current.range, latest.current.minViewExtent);
+            const clamped = PanZoomUtils.clampSpan(next, latest.current.range, latest.current.minViewExtent);
 
             if (getIsSameSpan(clamped, viewRef.current)) return false;
 
@@ -193,7 +199,7 @@ export const Timeline = <T,>(props: TimelineProps<T>) => {
             getView: () => viewStore.get(),
             zoomBy: (factor, focusRatio) =>
                 setView(
-                    TimelineUtils.zoomView(
+                    PanZoomUtils.zoomSpan(
                         viewRef.current,
                         factor,
                         focusRatio ?? TimelineConst.DEFAULT_FOCUS_RATIO,
@@ -201,8 +207,8 @@ export const Timeline = <T,>(props: TimelineProps<T>) => {
                         latest.current.minViewExtent,
                     ),
                 ),
-            panBy: (ratio) => setView(TimelineUtils.panView(viewRef.current, ratio, latest.current.range)),
-            showSpan: (span) => setView(TimelineUtils.revealView(span, viewRef.current, latest.current.range)),
+            panBy: (ratio) => setView(PanZoomUtils.panSpan(viewRef.current, ratio, latest.current.range)),
+            showSpan: (span) => setView(PanZoomUtils.revealSpan(span, viewRef.current, latest.current.range)),
             subscribe: viewStore.subscribe,
         };
     });
@@ -212,14 +218,17 @@ export const Timeline = <T,>(props: TimelineProps<T>) => {
     }, [controller]);
 
     const [gestures] = useState(() =>
-        TimelineUtils.createGestureTracker({
+        PanZoomUtils.createGestureTracker({
+            getAxes: () => ACROSS_ONLY,
             getIsPannable: () => latest.current.isPannable,
             getIsZoomable: () => latest.current.isZoomable,
-            getWidth: () => latest.current.width,
-            computePointerRatio: (clientX) =>
-                TimelineUtils.computePointerRatio(clientX, rootRef.current?.getBoundingClientRect()),
-            zoomBy: (factor, focusRatio) => controller.zoomBy(factor, focusRatio),
-            panBy: (ratio) => controller.panBy(ratio),
+            getSize: () => latest.current.size,
+            computePointerRatio: (client) => ({
+                x: PanZoomUtils.computePointerRatio(client, rootRef.current?.getBoundingClientRect()).x,
+                y: TimelineConst.DEFAULT_FOCUS_RATIO,
+            }),
+            zoomBy: (factor, focusRatio) => controller.zoomBy(factor, focusRatio.x),
+            panBy: (ratio) => controller.panBy(ratio.x),
         }),
     );
 
@@ -236,7 +245,7 @@ export const Timeline = <T,>(props: TimelineProps<T>) => {
     const getEdgeCarry = () => (CarrierUtils.getSourceZone() === zone ? CarrierUtils.getCarry() : undefined);
 
     const setView = (next: TimelineSpan) => {
-        const clamped = TimelineUtils.clampView(next, range, minViewExtent);
+        const clamped = PanZoomUtils.clampSpan(next, range, minViewExtent);
 
         if (getIsSameSpan(clamped, viewRef.current)) return;
 
@@ -248,7 +257,7 @@ export const Timeline = <T,>(props: TimelineProps<T>) => {
         isFocusFollowingRef.current = rootRef.current?.contains(document.activeElement) ?? false;
 
         setFocusedIndex(index);
-        setView(TimelineUtils.revealView(spans[index], viewRef.current, range));
+        setView(PanZoomUtils.revealSpan(spans[index], viewRef.current, range));
     };
 
     const activateItem = (index: number) => {
@@ -277,7 +286,7 @@ export const Timeline = <T,>(props: TimelineProps<T>) => {
         edgeGrabOffsetRef.current =
             from === undefined
                 ? TimelineConst.NOTHING
-                : TimelineUtils.toValue(getPointerRatio(from.x), viewRef.current) - span[edge];
+                : PanZoomUtils.toValue(getPointerRatio(from.x), viewRef.current) - span[edge];
 
         setHeldEdge(edge);
 
@@ -296,7 +305,7 @@ export const Timeline = <T,>(props: TimelineProps<T>) => {
 
         const value = place[heldEdgeRef.current];
 
-        setView(TimelineUtils.revealView({ start: value, end: value }, viewRef.current, range));
+        setView(PanZoomUtils.revealSpan({ start: value, end: value }, viewRef.current, range));
     };
 
     const holdEdge = (edge: TimelineEdge) => {
@@ -313,7 +322,7 @@ export const Timeline = <T,>(props: TimelineProps<T>) => {
     };
 
     const handleEdgePointerDown = (index: number, edge: TimelineEdge, e: PointerEvent<HTMLDivElement>) => {
-        if (!TimelineUtils.getIsPrimaryPress(e)) return;
+        if (!PanZoomUtils.getIsPrimaryPress(e)) return;
 
         e.stopPropagation();
 

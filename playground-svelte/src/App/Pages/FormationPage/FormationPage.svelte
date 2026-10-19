@@ -119,6 +119,7 @@
     <PagePropsPanel scope={"sample"}>
         <PageProp
             itemKey={"layoutKey"}
+            controls={"Picks the sample layout sent to FormationProps.computeLayout"}
             label={"Arrangement"}
             hint={
                 "How the items are arranged: a ring, an arc, a row, a honeycomb, and so on. Choosing one brings its own knobs with it."
@@ -151,6 +152,7 @@
     <PagePropsPanel scope={"sample"}>
         <PageProp
             itemKey={"effectKey"}
+            controls={"Picks the sample effect sent to FormationProps.computeEffect"}
             label={"Pointer effect"}
             hint={"What the items do as the pointer nears them. Choosing one brings its own knobs with it."}
         >
@@ -179,7 +181,7 @@
     <PagePropsDivider />
 
     <PagePropsPanel scope={"global"}>
-        <PageProp itemKey={"itemCount"} label={"Items"} hint={"How many items the arrangement holds."}>
+        <PageProp itemKey={"itemCount"} controls={"Sets the length of the slice of example items sent to FormationProps.items"} label={"Items"} hint={"How many items the arrangement holds."}>
             <PageNumberField
                 value={itemCount}
                 min={FormationKnobs.MIN_ITEM_COUNT}
@@ -195,6 +197,7 @@
 
         <PageProp
             itemKey={"skippedCount"}
+            controls={"Sets where the slice of example items sent to FormationProps.items starts"}
             label={"Skip from the start"}
             hint={
                 "Leaves out that many items from the front of the list, so an item can be taken out from the start rather than the end."
@@ -215,6 +218,7 @@
 
         <PageProp
             itemKey={"isStackedInReverse"}
+            controls={"Sets FormationProps.isStackedInReverse"}
             label={"Earlier items in front"}
             hint={"Puts the first item on top of the pile instead of the last, which shows where two items overlap."}
         >
@@ -227,7 +231,7 @@
             />
         </PageProp>
 
-        <PageProp itemKey={"shapeKind"} label={"Item shape"} hint={"The contour each item is cut to."}>
+        <PageProp itemKey={"shapeKind"} controls={"Picks the contour of the example items drawn by FormationProps.renderItem"} label={"Item shape"} hint={"The contour each item is cut to."}>
             <PageSelectField
                 value={shapeKind}
                 values={ShapeConst.DEFAULT_SHAPES}
@@ -241,6 +245,7 @@
 
         <PageProp
             itemKey={"transitionDurationMs"}
+            controls={"Sets FormationProps.transitionDurationMs"}
             label={"Glide (ms)"}
             hint={
                 "How long an item takes to glide to its new place when the arrangement, the item count or a knob changes. At 0 it moves at once, and under reduced motion it always does."
@@ -261,6 +266,7 @@
 
         <PageProp
             itemKey={"transitionDelayMs"}
+            controls={"Sets FormationProps.transitionDelayMs"}
             label={"Transition delay (ms)"}
             hint={"How much later each item sets off than the one before it, while gliding is on."}
         >

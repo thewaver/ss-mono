@@ -10,8 +10,6 @@ export type BracketOrientation = "horizontal" | "vertical";
 
 export type BracketRootSide = "start" | "end";
 
-export type BracketView = "tree" | "family";
-
 export type BracketStep = "to_root" | "to_leaves" | "previous" | "next" | "first" | "last";
 
 export type BracketPlacement = {
@@ -55,19 +53,6 @@ export type BracketBox = {
     top: number;
     width: number;
     height: number;
-};
-
-export type BracketFrame = {
-    left: number;
-    top: number;
-    opacity: number;
-    isFolded: boolean;
-};
-
-export type BracketArrangement = {
-    nodes: Record<string, BracketFrame>;
-    headers: BracketFrame[];
-    boardSize: Size2d;
 };
 
 export type BracketConnectorDefs = {
@@ -124,20 +109,35 @@ export type BaseBracketValues<T> = {
      */
     layerHeaderSize?: number;
     /**
-     * `"tree"` draws every node. `"family"` draws one family at a time and follows focus: the node the focused one
-     * feeds, the focused node with all its siblings, and every node that feeds those siblings. Focusing the root shows
-     * the root and the nodes that feed it, and so does the board before anything has been focused. Focus leaving the
-     * board leaves the family where it was. Every other node folds onto the family member it hangs from, unseen and
-     * out of reach of Tab and a screen reader, and the board keeps the size of the largest family so the page around
-     * it never shifts. Which family shows is `family`.
-     */
-    view?: BracketView;
-    /**
-     * How long the board takes to glide from one family to the next, and between the family view and the tree view
-     * when `view` changes, the board growing or shrinking with it — a consumer scaling the board to fit a frame of
-     * its own gets a zoom. `0` jumps, which is the reduced-motion route.
+     * How long the window takes to glide to a view the consumer or the controller asks for. A drag, the wheel and a
+     * pinch move it at once. `0` jumps, which is the reduced-motion route. Ignored without a view.
      */
     transitionDurationMs?: number;
+    /** Whether a drag over the window moves the view. Ignored without a view, since there is no window to move. */
+    isPannable?: boolean;
+    /** Whether the wheel and a pinch change how much of the board the window shows. Ignored without a view. */
+    isZoomable?: boolean;
+    /**
+     * The closest the window may zoom in, as window pixels per board pixel. `1` stops at the board's own size, and a
+     * view asking for a smaller area is widened to it.
+     */
+    maxScale?: number;
+    /**
+     * Keeps `family` and the view in step. A family that changes — from focus, the keyboard or the consumer — is
+     * framed, gliding there; a drag, the wheel or a pinch that moves the view writes the family it is now showing,
+     * the one whose framed view shares the most with it, without moving the view again. While the view is wider than
+     * any family, `family` is left as it was, so zooming back in returns to it, and no layer is the current round.
+     * Ignored without a view.
+     */
+    isFollowingFamily?: boolean;
+    /**
+     * Glides the view to frame the family in it once a drag or a pinch is let go, or the wheel has rested for a fifth
+     * of a second, and to the whole board when the view was left wider than any family — so a gesture always ends on
+     * one of the two. Ignored without `isFollowingFamily`.
+     */
+    isSnappingToFamily?: boolean;
+    /** The room left around a family when it is framed, in board pixels. Ignored without `isFollowingFamily`. */
+    familyMargin?: number;
     /** The final, with the rounds that feed it hanging off it as children. */
     root: BracketNode<T>;
 };

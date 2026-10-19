@@ -885,3 +885,77 @@ test("the family view's frame keeps one size while the family changes", async ({
 
     expect(await measure(), "sized for the largest family, so nothing shifts").toEqual(resting);
 });
+
+/**
+ * The example turns `isFollowingFamily` and `isSnappingToFamily` on, so the family and the window move together: a
+ * drag carries the family with whatever the window is centered on, live, and letting go frames that family. Read as
+ * the lit round and the framed nodes, never as where the window sits.
+ */
+const dragFrame = async (page: Page, dx: number, dy: number) => {
+    const box = (await page.locator(FAMILY_FRAME).boundingBox())!;
+    const x = box.x + box.width * 0.5;
+    const y = box.y + box.height * 0.5;
+
+    await page.mouse.move(x, y);
+    await page.mouse.down();
+    await page.mouse.move(x + dx, y + dy, { steps: 16 });
+    await page.mouse.up();
+};
+
+const readBoardTransform = (page: Page) =>
+    page
+        .locator(`${FAMILY} [role="group"], ${FAMILY} ul`)
+        .first()
+        .evaluate((element) => {
+            const board = element.closest('[class*="bracketRoot"]') ?? element;
+
+            return getComputedStyle(board).transform;
+        });
+
+test("dragging the window towards the final carries the family with it, and letting go frames the final's", async ({
+    page,
+}) => {
+    await page.locator(FAMILY_FRAME).scrollIntoViewIfNeeded();
+    await page.locator(STAGE_BUTTONS[0]).click();
+    await page.locator(STAGE_BUTTONS[0]).click();
+    await expect
+        .poll(() => litRound(page), { message: "a family out among the early rounds" })
+        .not.toBe(await roundOf(page, "Final"));
+
+    await dragFrame(page, -900, 0);
+
+    await expect
+        .poll(() => litRound(page), { message: "the final's round is lit once the window is over it" })
+        .toBe(await roundOf(page, "Final"));
+    await expectFramed(page, ROOT_FAMILY, "and the final's family is framed");
+});
+
+test("zoomed out, no round is lit and the draw cannot be dragged off center", async ({ page }) => {
+    await page.locator(FAMILY_FRAME).scrollIntoViewIfNeeded();
+    await page.locator(FAMILY_ZOOM).click();
+    await expect.poll(() => framedNodes(page), { message: "the whole draw" }).toEqual([...ALL_NODES].sort());
+    await expect.poll(() => litRound(page), { message: "no round stands out" }).toBeUndefined();
+
+    const resting = await readBoardTransform(page);
+
+    await dragFrame(page, 200, 60);
+    await page.waitForTimeout(SETTLE_MS);
+
+    expect(await readBoardTransform(page), "the drag moved nothing").toBe(resting);
+    expect(await framedNodes(page), "and the whole draw is still framed").toEqual([...ALL_NODES].sort());
+});
+
+test("a wheel zoom that ends wider than any family settles on the whole draw", async ({ page }) => {
+    await page.locator(FAMILY_FRAME).scrollIntoViewIfNeeded();
+
+    const box = (await page.locator(FAMILY_FRAME).boundingBox())!;
+
+    await page.mouse.move(box.x + box.width * 0.5, box.y + box.height * 0.5);
+    await page.mouse.wheel(0, 3000);
+
+    await expect.poll(() => framedNodes(page), { message: "the whole draw" }).toEqual([...ALL_NODES].sort());
+    await expect(page.locator(STAGE_BUTTONS[0]), "and the stage buttons are parked").toHaveAttribute(
+        "aria-disabled",
+        "true",
+    );
+});

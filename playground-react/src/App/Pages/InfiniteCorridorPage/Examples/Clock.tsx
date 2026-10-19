@@ -90,6 +90,7 @@ export const ClockExample = (props: Props) => {
                     hint={
                         "How long the clock takes to walk the whole corridor once, past every room and back to the first."
                     }
+                    controls={"Sets how fast the example clock advances InfiniteCorridorProps.progress"}
                 >
                     <PageNumberField
                         value={lapMs}

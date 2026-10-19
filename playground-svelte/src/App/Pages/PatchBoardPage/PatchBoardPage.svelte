@@ -1,6 +1,6 @@
 <script lang="ts">
     import type { PatchBoardLink, PatchBoardNode } from "@thewaver/ss-components-svelte";
-    import { MediaQueryMonitorSvelteUtils, PATCH_BOARD_DEFAULTS } from "@thewaver/ss-components-svelte";
+    import { MediaQueryMonitorSvelteUtils, PATCH_BOARD_DEFAULTS, PanZoomUtils } from "@thewaver/ss-components-svelte";
     import { PatchBoardKnobs } from "@thewaver/ss-playground/App/Knobs/PatchBoards.const";
     import {
     BOARD_WIDTH,
@@ -8,21 +8,19 @@
     CHAIN_NODES,
     EXAMPLE_NAMES,
     EXAMPLES_ROOT,
-    MAX_ZOOM,
-    MIN_ZOOM,
     MIXER_LINKS,
     MIXER_NODES,
     NOTHING_DONE,
     PAN_LINKS,
     PAN_NODES,
+    PAN_SCALE,
+    PAN_STARTING_VIEW,
     PERCENT,
     RACK_LINKS,
     RACK_NODES,
-    STARTING_ZOOM,
     WIDE_SPAN,
 } from "@thewaver/ss-playground/App/Pages/PatchBoardPage/PatchBoardPage.const";
     import type { PatchDevice } from "@thewaver/ss-playground/App/Pages/PatchBoardPage/PatchDevice.types";
-    import { MathUtils } from "@thewaver/ss-utils";
 
     import type { ExampleDefs } from "../../PageComponents/Examples/Examples.types";
     import PageExamples from "../../PageComponents/Examples/PageExamples.svelte";
@@ -35,7 +33,6 @@
     import MixerExample from "./Examples/Mixer.svelte";
     import PanExample from "./Examples/Pan.svelte";
     import RackExample from "./Examples/Rack.svelte";
-    import ZoomExample from "./Examples/Zoom.svelte";
     import type { PatchBoardExampleProps } from "./PatchBoardPage.types";
 
     const getLinkWords = (link: PatchBoardLink) =>
@@ -48,8 +45,7 @@
     let mixerAction = $state(NOTHING_DONE);
     let rackAction = $state(NOTHING_DONE);
     let panAction = $state(NOTHING_DONE);
-    let zoomAction = $state(NOTHING_DONE);
-    let zoom = $state(STARTING_ZOOM);
+    let panView = $state.raw(PAN_STARTING_VIEW);
 
     let chainNodes = $state.raw<PatchBoardNode<PatchDevice>[]>(CHAIN_NODES);
     let chainLinks = $state.raw<PatchBoardLink[]>(CHAIN_LINKS);
@@ -59,8 +55,6 @@
     let rackLinks = $state.raw<PatchBoardLink[]>(RACK_LINKS);
     let panNodes = $state.raw<PatchBoardNode<PatchDevice>[]>(PAN_NODES);
     let panLinks = $state.raw<PatchBoardLink[]>(PAN_LINKS);
-    let zoomNodes = $state.raw<PatchBoardNode<PatchDevice>[]>(CHAIN_NODES);
-    let zoomLinks = $state.raw<PatchBoardLink[]>(CHAIN_LINKS);
 
     const getPrefersReducedMotion = MediaQueryMonitorSvelteUtils.createReducedMotion();
 
@@ -99,21 +93,12 @@
         },
         {
             key: "pan",
-            name: EXAMPLE_NAMES.pan,
+            name: EXAMPLE_NAMES.panZoom,
             span: WIDE_SPAN,
             readout: () =>
-                `${panLinks.length} cables, last: ${panAction} — the board is wider and taller than its window, so scroll to pan; a node carried with the arrow keys brings the window with it`,
+                `${panLinks.length} cables at ${Math.round((PERCENT * PAN_SCALE) / PanZoomUtils.getExtent(panView.x))}%, last: ${panAction} — the board is laid out at its own width and drawn into a smaller window: drag empty board, use the wheel, pinch or press the buttons to move and zoom it; a node still drags under the pointer, and one carried with the arrow keys brings the window with it`,
             component: panExample,
             path: `${EXAMPLES_ROOT}/Pan.svelte`,
-        },
-        {
-            key: "zoom",
-            name: EXAMPLE_NAMES.zoom,
-            span: WIDE_SPAN,
-            readout: () =>
-                `${zoomLinks.length} cables at ${Math.round(zoom * PERCENT)}%, last: ${zoomAction} — the board is scaled with a CSS transform, and a drag still lands under the pointer`,
-            component: zoomExample,
-            path: `${EXAMPLES_ROOT}/Zoom.svelte`,
         },
     ];
 </script>
@@ -158,34 +143,21 @@
 {/snippet}
 
 {#snippet panExample()}
-    <PageMeasureBox>
-        <PanExample
-            {...commonProps}
-            bind:nodes={panNodes}
-            bind:links={panLinks}
-            onLink={(link) => (panAction = `connected ${getLinkWords(link)}`)}
-            onUnlink={(link) => (panAction = `unplugged ${getLinkWords(link)}`)}
-            onMove={(nodeKey) => (panAction = `moved ${nodeKey}`)}
-        />
-    </PageMeasureBox>
-{/snippet}
-
-{#snippet zoomExample()}
-    <ZoomExample
+    <PanExample
         {...commonProps}
-        {zoom}
-        bind:nodes={zoomNodes}
-        bind:links={zoomLinks}
-        onZoomChange={(next) => (zoom = MathUtils.clamp(next, MIN_ZOOM, MAX_ZOOM))}
-        onLink={(link) => (zoomAction = `connected ${getLinkWords(link)}`)}
-        onUnlink={(link) => (zoomAction = `unplugged ${getLinkWords(link)}`)}
-        onMove={(nodeKey) => (zoomAction = `moved ${nodeKey}`)}
+        bind:view={panView}
+        bind:nodes={panNodes}
+        bind:links={panLinks}
+        onLink={(link) => (panAction = `connected ${getLinkWords(link)}`)}
+        onUnlink={(link) => (panAction = `unplugged ${getLinkWords(link)}`)}
+        onMove={(nodeKey) => (panAction = `moved ${nodeKey}`)}
     />
 {/snippet}
 
 <PagePropsPanel scope={"global"}>
     <PageProp
         itemKey={"socketSize"}
+        controls={"Sets PatchBoardProps.socketSize"}
         label={"Socket size"}
         hint={"How large each socket is drawn, as a fraction of the board's width, so a wider board has larger sockets."}
     >
@@ -203,6 +175,7 @@
 
     <PageProp
         itemKey={"isLocked"}
+        controls={"Sets PatchBoardProps.isLocked"}
         label={"Wiring locked"}
         hint={"Freezes the wiring as it stands: the cables still show, but none can be dragged, made or pulled out."}
     >
@@ -217,6 +190,7 @@
 
     <PageProp
         itemKey={"isDisabled"}
+        controls={"Sets PatchBoardProps.isDisabled"}
         label={"Disabled"}
         hint={"Turns the whole board off, so nothing on it responds to the pointer or the keyboard."}
     >
@@ -231,6 +205,7 @@
 
     <PageProp
         itemKey={"isBeamPlaying"}
+        controls={"Plays the example beam drawn by PatchBoardProps.renderCable"}
         label={"Beams moving"}
         hint={
             "Whether a pulse runs along every plugged cable, from the output to the input it feeds. It starts stopped while the visitor has asked for reduced motion."

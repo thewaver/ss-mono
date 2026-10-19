@@ -53,7 +53,12 @@ export const FlipCardPage = () => {
     return (
         <>
             <PagePropsPanel scope={"global"}>
-                <PageProp key={"axis"} label={"Axis"} hint={"Which way the card turns over to show its other side."}>
+                <PageProp
+                    key={"axis"}
+                    label={"Axis"}
+                    hint={"Which way the card turns over to show its other side."}
+                    controls={"Sets FlipCardProps.axis"}
+                >
                     <PageSelectField
                         value={getAxis}
                         values={FLIP_CARD_AXES}
@@ -68,6 +73,7 @@ export const FlipCardPage = () => {
                     key={"transitionDurationMs"}
                     label={"Turn duration (ms)"}
                     hint={"How long one turn from face to face takes."}
+                    controls={"Sets FlipCardProps.transitionDurationMs"}
                 >
                     <PageNumberField
                         value={getTransitionDurationMs}

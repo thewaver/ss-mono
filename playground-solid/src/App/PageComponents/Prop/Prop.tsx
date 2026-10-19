@@ -6,6 +6,7 @@ import {
     EMPTY_TEXT,
     HINT_OFFSET,
     HINT_PLACEMENT,
+    MEMBER_SEPARATOR,
     SINGLE_FIELD,
 } from "@thewaver/ss-playground/App/PageComponents/Prop/Prop.const";
 import * as styles from "@thewaver/ss-playground/App/PageComponents/Prop/Prop.css";
@@ -23,6 +24,9 @@ const toDefaultText = (value: unknown) => {
 
     return undefined;
 };
+
+const toBreakableText = (text: string) =>
+    text.split(MEMBER_SEPARATOR).flatMap((part, index) => (index === 0 ? [part] : [MEMBER_SEPARATOR, <wbr />, part]));
 
 export const PageProp = (props: ParentProps<PagePropProps>) => {
     const propsPanelScope = usePropsPanelContext();
@@ -62,6 +66,10 @@ export const PageProp = (props: ParentProps<PagePropProps>) => {
                                 transitionDurationMs={getTransitionDurationMs}
                             >
                                 {access(props.hint)}
+
+                                <div class={styles.propHintControls} data-hint-controls>
+                                    {toBreakableText(access(props.controls))}
+                                </div>
 
                                 <Show when={getDefaultText()}>
                                     {(getText) => <div class={styles.propHintDefault}>{`Default: ${getText()}`}</div>}

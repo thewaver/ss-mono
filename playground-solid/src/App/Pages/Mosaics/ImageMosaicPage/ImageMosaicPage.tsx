@@ -42,7 +42,12 @@ const ImagesExampleWrapper = (props: MosaicSharedProps) => {
             </PageMeasureBox>
 
             <PageExampleKnobs>
-                <PageProp key={"shapeKey"} label={"Target shape"} hint={"The contour the tiles are packed into."}>
+                <PageProp
+                    key={"shapeKey"}
+                    label={"Target shape"}
+                    hint={"The contour the tiles are packed into."}
+                    controls={"Picks the sample shape sent to ImageMosaicProps.targetAspectRatio"}
+                >
                     <PageSelectField
                         value={getShapeKey}
                         values={MosaicImages.SAMPLE_SHAPE_KEYS}
@@ -58,6 +63,7 @@ const ImagesExampleWrapper = (props: MosaicSharedProps) => {
                     hint={
                         "Puts each tile in a frame of its own, so the packing can be told apart from the pictures in it."
                     }
+                    controls={"Decides whether the example ImageMosaicProps.renderItem wraps each image"}
                 >
                     <PageCheckField value={getIsDecorated} ariaLabel={"Wrapped"} onChange={setIsDecorated} />
                 </PageProp>

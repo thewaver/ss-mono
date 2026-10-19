@@ -1,4 +1,5 @@
 <script lang="ts">
+    import { EXAMPLES_ONLY_PROP } from "@thewaver/ss-playground/App/PageComponents/Prop/Prop.const";
     import { Button } from "@thewaver/ss-components-svelte";
     import * as styles from "@thewaver/ss-playground/App/PageComponents/PropsPanel/PropsPanel.css";
 
@@ -49,6 +50,7 @@
         {#if resets.length > leastToReset}
             <PageProp
                 itemKey={"resetPanel"}
+                controls={EXAMPLES_ONLY_PROP}
                 label={"These controls"}
                 hint={"Puts every control in this panel back to the value it started at."}
             >

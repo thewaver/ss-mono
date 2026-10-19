@@ -109,6 +109,7 @@ const examples: ExampleDefs[] = [
     <PagePropsPanel scope="global">
         <PageProp
             item-key="calendarId"
+            controls="Picks the calendar the example puts on the dates sent to CalendarProps.value"
             label="Calendar"
             hint="Which calendar system the dates are read and written in, such as Gregorian or Islamic."
         >
@@ -123,6 +124,7 @@ const examples: ExampleDefs[] = [
 
         <PageProp
             item-key="weekStartsOn"
+            controls="Sets CalendarProps.weekStartsOn"
             label="Week starts on"
             hint="Which day begins a week, which decides the order of the column headings."
         >

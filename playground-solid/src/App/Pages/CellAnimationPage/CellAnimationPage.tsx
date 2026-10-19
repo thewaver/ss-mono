@@ -99,6 +99,7 @@ const ImageExampleWrapper = (props: CellAnimationExampleProps & { progress: Sign
                     hint={
                         "Swaps in a picture of your own, so the cells can be watched against something other than the sample."
                     }
+                    controls={"Picks the example picture sent to CellAnimationProps.src"}
                 >
                     <PageFileField
                         accept={"image/*"}
@@ -145,6 +146,7 @@ const GradientExampleWrapper = (props: CellAnimationExampleProps) => {
                     key={"gradient"}
                     label={"Gradient"}
                     hint={"Which animated gradient is rendered into the picture the cells are cut from."}
+                    controls={"Picks the gradient drawn into the example picture sent to CellAnimationProps.src"}
                 >
                     <PageSelectField
                         value={getKey}
@@ -160,6 +162,7 @@ const GradientExampleWrapper = (props: CellAnimationExampleProps) => {
                     hint={
                         "The shape of the picture the gradient is drawn into, which decides how the cells are proportioned."
                     }
+                    controls={"Sets the shape of the example picture sent to CellAnimationProps.src"}
                 >
                     <PageSelectField
                         value={getRatio}
@@ -206,6 +209,7 @@ const PatternExampleWrapper = (props: CellAnimationExampleProps) => {
                     key={"pattern"}
                     label={"Pattern"}
                     hint={"Which repeating pattern is rendered into the picture the cells are cut from."}
+                    controls={"Picks the pattern drawn into the example picture sent to CellAnimationProps.src"}
                 >
                     <PageSelectField
                         value={getKey}
@@ -221,6 +225,7 @@ const PatternExampleWrapper = (props: CellAnimationExampleProps) => {
                     hint={
                         "The shape of the picture the pattern is drawn into, which decides how the cells are proportioned."
                     }
+                    controls={"Sets the shape of the example picture sent to CellAnimationProps.src"}
                 >
                     <PageSelectField
                         value={getRatio}
@@ -365,6 +370,7 @@ export const CellAnimationPage = () => {
                     hint={
                         "How many columns and rows the picture is cut into. More cells is a finer animation and more work per frame."
                     }
+                    controls={"Sets CellAnimationProps.cellCount"}
                 >
                     <div class={styles.valueList}>
                         <PageNumberField
@@ -392,6 +398,9 @@ export const CellAnimationPage = () => {
                     hint={
                         "Where in the grid the animation starts from. It only applies to weights that are measured from a point."
                     }
+                    controls={
+                        "Picks the point the example's weights are measured from, sent to CellAnimationProps.computeCellWeights"
+                    }
                 >
                     <PageSelectField
                         value={getOriginType}
@@ -408,6 +417,7 @@ export const CellAnimationPage = () => {
                     hint={
                         "How each cell's turn is decided: its distance from the origin, a wave, a random draw, and so on."
                     }
+                    controls={"Picks the example's weight function sent to CellAnimationProps.computeCellWeights"}
                 >
                     <PageGroupedSelectField
                         value={getWeightType}
@@ -423,6 +433,7 @@ export const CellAnimationPage = () => {
                     hint={
                         "Gives every cell a turn of its own, so no two move together even where the weight would have tied them."
                     }
+                    controls={"Sets WeightOpts.shouldMakeUnique"}
                 >
                     <PageCheckField
                         value={() => !!weightOpts.shouldMakeUnique}
@@ -437,6 +448,7 @@ export const CellAnimationPage = () => {
                     hint={
                         "Spreads the weights out to fill the whole run, so the first cell starts at the beginning and the last ends at the end."
                     }
+                    controls={"Sets WeightOpts.shouldNormalize"}
                 >
                     <PageCheckField
                         value={() => !!weightOpts.shouldNormalize}
@@ -449,6 +461,7 @@ export const CellAnimationPage = () => {
                     key={"animationType"}
                     label={"Animation"}
                     hint={"What each cell actually does on its turn: fade, slide, spin, and the rest."}
+                    controls={"Picks the example's cell keyframes sent to CellAnimationProps.computeCellAnimation"}
                 >
                     <PageGroupedSelectField
                         value={getAnimationType}
@@ -462,6 +475,7 @@ export const CellAnimationPage = () => {
                     key={"direction"}
                     label={"Direction"}
                     hint={"Which way the run travels through the weights, and so which cells go first."}
+                    controls={"Sets CellAnimationBreakpointOpts.dir"}
                 >
                     <PageSelectField
                         value={() => breakpointOpts.dir!}
@@ -475,6 +489,7 @@ export const CellAnimationPage = () => {
                     key={"easing"}
                     label={"Easing"}
                     hint={"The speed curve a single cell follows from its start to its finish."}
+                    controls={"Sets CellAnimationBreakpointOpts.easing"}
                 >
                     <PageSelectField
                         value={() => breakpointOpts.easing!}
@@ -490,6 +505,7 @@ export const CellAnimationPage = () => {
                     hint={
                         "How much a cell's own movement overlaps its neighbors'. 0 makes each cell wait its turn; 1 blurs them into one sweep."
                     }
+                    controls={"Sets CellAnimationBreakpointOpts.smoothness"}
                 >
                     <PageNumberField
                         value={() => breakpointOpts.smoothness!}
@@ -505,6 +521,7 @@ export const CellAnimationPage = () => {
                     key={"animationDurationMs"}
                     label={"Animation duration (ms)"}
                     hint={"How long one pass over the whole grid takes."}
+                    controls={"Sets CellAnimationProps.animationDurationMs"}
                 >
                     <PageNumberField
                         value={getAnimationDurationMs}
@@ -520,6 +537,7 @@ export const CellAnimationPage = () => {
                     key={"animationIterationDelayMs"}
                     label={"Iteration delay (ms)"}
                     hint={"How long the grid waits between one pass and the next."}
+                    controls={"Sets CellAnimationProps.animationIterationDelayMs"}
                 >
                     <PageNumberField
                         value={getAnimationIterationDelayMs}
@@ -535,6 +553,7 @@ export const CellAnimationPage = () => {
                     key={"animationIterationCount"}
                     label={"Iteration count (-1 = endless)"}
                     hint={"How many passes to run. -1 means it never stops, and 0 shows the final frame at once."}
+                    controls={"Sets CellAnimationProps.animationIterationCount, with -1 sent as Infinity"}
                 >
                     <PageNumberField
                         value={getAnimationIterationCount}
@@ -552,6 +571,7 @@ export const CellAnimationPage = () => {
                     hint={
                         "What the grid is left showing once the passes are done. It has nothing to settle on while the run is endless."
                     }
+                    controls={"Sets CellAnimationProps.finalFrame"}
                 >
                     <PageSelectField
                         value={getFinalFrame}
@@ -568,6 +588,7 @@ export const CellAnimationPage = () => {
                     hint={
                         "Whether each pass runs one way, or goes out and comes back. Coming back, stack starts with the last cell to arrive and pipe with the first."
                     }
+                    controls={"Sets CellAnimationPlaybackOpts.dir"}
                 >
                     <PageSelectField
                         value={() => playbackOpts.dir!}
@@ -583,6 +604,7 @@ export const CellAnimationPage = () => {
                     hint={
                         "How long the grid rests at the far end before turning back. It only applies to stack and pipe, which come back."
                     }
+                    controls={"Sets CellAnimationPlaybackOpts.holdMs"}
                 >
                     <PageNumberField
                         value={() => playbackOpts.holdMs!}

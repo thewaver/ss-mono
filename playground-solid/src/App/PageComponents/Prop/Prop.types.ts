@@ -4,5 +4,6 @@ export type PagePropProps = AccessorProps<{
     key: string;
     label: string;
     hint: string;
+    controls: string;
     defaultValue?: unknown;
 }>;

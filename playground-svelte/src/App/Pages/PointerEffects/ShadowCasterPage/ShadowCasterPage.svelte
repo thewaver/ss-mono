@@ -75,6 +75,7 @@
 <PagePropsPanel scope={"global"}>
     <PageProp
         itemKey={"isDisabled"}
+        controls={"Sets ShadowCasterProps.isDisabled"}
         label={"Disabled"}
         hint={"Stops the shadow following the pointer and leaves it at rest. It is what a page honoring a reduced-motion preference passes."}
     >
@@ -83,6 +84,7 @@
 
     <PageProp
         itemKey={"smoothingMs"}
+        controls={"Sets ShadowCasterProps.smoothingMs"}
         label={"Smoothing (ms)"}
         hint={"How long the shadow takes to catch up with the pointer. At 0 it follows exactly; raised, it swings after a quick movement and eases back to rest."}
     >
@@ -99,6 +101,7 @@
 
     <PageProp
         itemKey={"activeRangePx"}
+        controls={"Sets ShadowCasterProps.activeRangePx"}
         label={"Active range (px)"}
         hint={"How near the pointer has to be before the shadow answers it at all, measured from the content's center. Outside it the shadow rests."}
     >
@@ -115,6 +118,7 @@
 
     <PageProp
         itemKey={"lightRangePx"}
+        controls={"Sets ShadowCasterProps.lightRangePx"}
         label={"Light range (px)"}
         hint={"How far the pointer's light reaches. Past it the shadow is at its longest and faintest."}
     >
@@ -131,6 +135,7 @@
 
     <PageProp
         itemKey={"maxThrowPx"}
+        controls={"Sets ShadowCasterProps.maxThrowPx"}
         label={"Max throw (px)"}
         hint={"How far the shadow is thrown once the pointer is out at the edge of the light."}
     >
@@ -147,6 +152,7 @@
 
     <PageProp
         itemKey={"minBlurPx"}
+        controls={"Sets ShadowCasterProps.minBlurPx"}
         label={"Near blur (px)"}
         hint={"How soft the shadow is with the pointer on the content."}
     >
@@ -163,6 +169,7 @@
 
     <PageProp
         itemKey={"maxBlurPx"}
+        controls={"Sets ShadowCasterProps.maxBlurPx"}
         label={"Far blur (px)"}
         hint={"How soft the shadow is once the pointer is out at the edge of the light."}
     >
@@ -179,6 +186,7 @@
 
     <PageProp
         itemKey={"maxOpacity"}
+        controls={"Sets ShadowCasterProps.maxOpacity"}
         label={"Near opacity"}
         hint={"How dark the shadow is with the pointer on the content. It fades as the pointer retreats."}
     >
@@ -195,6 +203,7 @@
 
     <PageProp
         itemKey={"minOpacity"}
+        controls={"Sets ShadowCasterProps.minOpacity"}
         label={"Far opacity"}
         hint={"How dark the shadow is once the pointer is out at the edge of the light. Nothing, by default."}
     >
@@ -211,6 +220,7 @@
 
     <PageProp
         itemKey={"restingOpacity"}
+        controls={"Sets ShadowCasterProps.restingOpacity"}
         label={"Resting opacity"}
         hint={"How dark the shadow is with no pointer near it at all, or with the effect turned off."}
     >
@@ -227,6 +237,7 @@
 
     <PageProp
         itemKey={"color"}
+        controls={"Sets ShadowCasterProps.color"}
         label={"Color"}
         hint={"What the shadow is made of. Whatever alpha it carries is replaced by the opacity ramp."}
     >

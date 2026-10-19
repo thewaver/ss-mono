@@ -74,6 +74,7 @@ const examples: ExampleDefs[] = [
     <PagePropsPanel scope="global">
         <PageProp
             item-key="isDisabled"
+            controls="Sets TagInputProps.isDisabled"
             label="Disabled"
             hint="Turns the field off: no tag can be added, and none can be removed."
         >
@@ -86,13 +87,19 @@ const examples: ExampleDefs[] = [
 
         <PageProp
             item-key="hasError"
+            controls="Sets TagInputProps.hasError"
             label="Error"
             hint="Puts the field into its error look, without changing what it accepts."
         >
             <PageCheckField :value="hasError" ariaLabel="Error" @change="(value: boolean) => (hasError = value)" />
         </PageProp>
 
-        <PageProp item-key="tags" label="Tags" hint="Puts the examples back to the tags they started with.">
+        <PageProp
+            item-key="tags"
+            controls="Writes the starting tags back to TagInputProps.value"
+            label="Tags"
+            hint="Puts the examples back to the tags they started with."
+        >
             <Button @click="async () => reset()">
                 <template #renderContent="flags">
                     <PageButtonContent :flags="flags">Reset</PageButtonContent>

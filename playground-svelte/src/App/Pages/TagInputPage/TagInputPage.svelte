@@ -105,6 +105,7 @@
 <PagePropsPanel scope={"global"}>
     <PageProp
         itemKey={"isDisabled"}
+        controls={"Sets TagInputProps.isDisabled"}
         label={"Disabled"}
         hint={"Turns the field off: no tag can be added, and none can be removed."}
     >
@@ -119,6 +120,7 @@
 
     <PageProp
         itemKey={"hasError"}
+        controls={"Sets TagInputProps.hasError"}
         label={"Error"}
         hint={"Puts the field into its error look, without changing what it accepts."}
     >
@@ -131,7 +133,7 @@
         />
     </PageProp>
 
-    <PageProp itemKey={"tags"} label={"Tags"} hint={"Puts the examples back to the tags they started with."}>
+    <PageProp itemKey={"tags"} controls={"Writes the starting tags back to TagInputProps.value"} label={"Tags"} hint={"Puts the examples back to the tags they started with."}>
         <Button
             onClick={async () => {
                 reset();

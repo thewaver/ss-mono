@@ -70,7 +70,12 @@ const examples: ExampleDefs[] = [
 
 <template>
     <PagePropsPanel scope="global">
-        <PageProp item-key="width" label="Width (px)" hint="How wide the box is.">
+        <PageProp
+            item-key="width"
+            controls="Sets CuboidProps.size.width"
+            label="Width (px)"
+            hint="How wide the box is."
+        >
             <PageNumberField
                 :value="width"
                 :min="CuboidKnobs.MIN_EXTENT"
@@ -82,7 +87,12 @@ const examples: ExampleDefs[] = [
             />
         </PageProp>
 
-        <PageProp item-key="height" label="Height (px)" hint="How tall the box is.">
+        <PageProp
+            item-key="height"
+            controls="Sets CuboidProps.size.height"
+            label="Height (px)"
+            hint="How tall the box is."
+        >
             <PageNumberField
                 :value="height"
                 :min="CuboidKnobs.MIN_EXTENT"
@@ -94,7 +104,12 @@ const examples: ExampleDefs[] = [
             />
         </PageProp>
 
-        <PageProp item-key="depth" label="Depth (px)" hint="How deep the box is, front face to back face.">
+        <PageProp
+            item-key="depth"
+            controls="Sets CuboidProps.size.depth"
+            label="Depth (px)"
+            hint="How deep the box is, front face to back face."
+        >
             <PageNumberField
                 :value="depth"
                 :min="CuboidKnobs.MIN_EXTENT"
@@ -108,6 +123,7 @@ const examples: ExampleDefs[] = [
 
         <PageProp
             item-key="transitionDurationMs"
+            controls="Sets CuboidProps.transitionDurationMs"
             label="Turn duration (ms)"
             hint="How long one turn from face to face takes, and how long the box takes to settle after a drag. It is off while the visitor has asked for reduced motion."
         >

@@ -54,6 +54,7 @@ const src = computed(() =>
     <PageExampleKnobs>
         <PageProp
             item-key="gradient"
+            controls="Picks the gradient drawn into the example picture sent to CellAnimationProps.src"
             label="Gradient"
             hint="Which animated gradient is rendered into the picture the cells are cut from."
         >
@@ -67,6 +68,7 @@ const src = computed(() =>
 
         <PageProp
             item-key="gradientRatio"
+            controls="Sets the shape of the example picture sent to CellAnimationProps.src"
             label="Ratio"
             hint="The shape of the picture the gradient is drawn into, which decides how the cells are proportioned."
         >

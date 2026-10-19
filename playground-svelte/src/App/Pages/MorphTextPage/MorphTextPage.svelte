@@ -68,6 +68,7 @@
 <PagePropsPanel scope={"global"}>
     <PageProp
         itemKey={"morphDurationMs"}
+        controls={"Sets MorphTextProps.morphDurationMs"}
         label={"Morph duration (ms)"}
         hint={
             "How long one word takes to melt into the next. It is off while the visitor has asked for reduced motion."
@@ -88,6 +89,7 @@
 
     <PageProp
         itemKey={"maxBlurPx"}
+        controls={"Sets MorphTextProps.maxBlurPx"}
         label={"Blur (px)"}
         hint={"The most either word is blurred while they cross. More blur melts more of the letters together."}
     >

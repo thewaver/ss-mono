@@ -1,4 +1,5 @@
 <script lang="ts">
+    import { EXAMPLES_ONLY_PROP } from "@thewaver/ss-playground/App/PageComponents/Prop/Prop.const";
     import { TOOLBAR_DEFAULTS } from "@thewaver/ss-components-svelte";
     import { ToolbarKnobs } from "@thewaver/ss-playground/App/Knobs/Toolbars.const";
 
@@ -115,6 +116,7 @@
 <PagePropsPanel scope={"global"}>
     <PageProp
         itemKey={"barWidth"}
+        controls={EXAMPLES_ONLY_PROP}
         label={"Bar width (px)"}
         hint={"How wide the bar is. Narrow it far enough and items start moving into the overflow menu."}
     >
@@ -128,7 +130,7 @@
         />
     </PageProp>
 
-    <PageProp itemKey={"gap"} label={"Gap (px)"} hint={"The space left between items on the bar."}>
+    <PageProp itemKey={"gap"} controls={"Sets ToolbarProps.gap"} label={"Gap (px)"} hint={"The space left between items on the bar."}>
         <PageNumberField
             value={gap}
             min={ToolbarKnobs.MIN_GAP}

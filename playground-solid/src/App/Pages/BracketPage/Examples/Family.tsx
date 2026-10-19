@@ -1,18 +1,20 @@
-import { For, createEffect, createMemo, createSignal, on, onCleanup, untrack } from "solid-js";
+import { For, createEffect, createMemo, createSignal, untrack } from "solid-js";
 
 import { BRACKET_DEFAULTS, Bracket, BracketUtils, Button, access } from "@thewaver/ss-components-solid";
-import type { BracketNode, BracketStep } from "@thewaver/ss-components-solid";
+import type { BracketNode, BracketStep, PanZoomView } from "@thewaver/ss-components-solid";
+import { BracketKnobs } from "@thewaver/ss-playground/App/Knobs/Brackets.const";
 import * as styles from "@thewaver/ss-playground/App/Pages/BracketPage/BracketPage.css";
 import { CONTROL_GLYPHS } from "@thewaver/ss-playground/App/StyledComponents/ControlButtonContent/ControlButtonContent.const";
-import { EasingUtils, MathUtils } from "@thewaver/ss-utils";
-import { assignInlineVars } from "@vanilla-extract/dynamic";
 
+import { PageExampleKnobs } from "../../../PageComponents/ExampleKnobs/ExampleKnobs";
+import { PageCheckField } from "../../../PageComponents/Field/Field";
 import { PageMeasureBox } from "../../../PageComponents/MeasureBox/MeasureBox";
+import { PageProp } from "../../../PageComponents/Prop/Prop";
 import { PageControlButtonContent } from "../../../StyledComponents/ControlButtonContent/ControlButtonContent";
 import type { BracketFamilyExampleProps } from "../BracketPage.types";
 import {
     branch,
-    computeBracketPinnedLayerHeader,
+    computeBracketCurrentLayerHeader,
     computeFamilySteps,
     describeFamily,
     renderBracketNode,
@@ -23,10 +25,6 @@ const NODE_SIZE = { width: 96, height: 34 };
 const ROUND_NAMES = ["Final", "Semifinals", "Quarterfinals", "Entrants"];
 const ACROSS_HEADER_SIZE = 24;
 const DOWN_HEADER_SIZE = 96;
-const SECTION_MARGIN_PX = 12;
-const WHOLE = 1;
-const HALF = 0.5;
-const NO_DURATION = 0;
 
 const DRAW: BracketNode<string> = branch(
     "Final",
@@ -40,7 +38,7 @@ type Props = BracketFamilyExampleProps;
 
 export const FamilyExample = (props: Props) => {
     const [getFamily, setFamily] = createSignal<BracketNode<string>>();
-    const [getIsZoomedIn, setIsZoomedIn] = createSignal(true);
+    const [getIsSnapping, setIsSnapping] = createSignal(BracketKnobs.STARTING_IS_SNAPPING_TO_FAMILY);
 
     const getHeaderSize = () => (access(props.orientation) === "horizontal" ? ACROSS_HEADER_SIZE : DOWN_HEADER_SIZE);
 
@@ -59,84 +57,23 @@ export const FamilyExample = (props: Props) => {
 
     const getTreeGeometry = createMemo(() => BracketUtils.computeGeometry(LAYOUT, getGeometryOpts()));
 
-    const getIsHorizontal = () => getTreeGeometry().isHorizontal;
+    const getAnchorId = () => BracketUtils.findNodeId(DRAW, LAYOUT, getFamily());
 
-    const getSectionBox = () => {
-        const anchorId = BracketUtils.findNodeId(DRAW, LAYOUT, getFamily());
-        const insets = LAYOUT.placements
-            .filter((placement) => BracketUtils.getIsInFamily(placement.id, anchorId))
-            .map((placement) => BracketUtils.computeInset(getTreeGeometry(), placement));
-        const headerRoom = getHeaderSize();
-        const left =
-            Math.min(...insets.map((inset) => inset.left)) - SECTION_MARGIN_PX - (getIsHorizontal() ? 0 : headerRoom);
-        const top =
-            Math.min(...insets.map((inset) => inset.top)) - SECTION_MARGIN_PX - (getIsHorizontal() ? headerRoom : 0);
-        const right = Math.max(...insets.map((inset) => inset.left)) + NODE_SIZE.width + SECTION_MARGIN_PX;
-        const bottom = Math.max(...insets.map((inset) => inset.top)) + NODE_SIZE.height + SECTION_MARGIN_PX;
+    const computeFamilyView = () =>
+        BracketUtils.computeFamilyView(LAYOUT, getTreeGeometry(), getAnchorId(), BracketKnobs.FAMILY_MARGIN);
 
-        return { left, top, width: right - left, height: bottom - top };
-    };
+    const viewSignal = createSignal<PanZoomView>(untrack(computeFamilyView));
 
-    const getWholeBox = () => ({ left: 0, top: 0, ...getTreeGeometry().boardSize });
-
-    const getTargetCamera = createMemo(() => {
-        const frame = getFrameSize();
-        const box = getIsZoomedIn() ? getSectionBox() : getWholeBox();
-        const scale = Math.min(frame.width / box.width, frame.height / box.height, WHOLE);
-
-        return {
-            x: frame.width * HALF - (box.left + box.width * HALF) * scale,
-            y: frame.height * HALF - (box.top + box.height * HALF) * scale,
-            scale,
-        };
-    });
-
-    const [getCamera, setCamera] = createSignal(untrack(getTargetCamera));
-
-    createEffect(
-        on(
-            getTargetCamera,
-            (target) => {
-                const from = untrack(getCamera);
-                const durationMs = untrack(() => access(props.transitionDurationMs)) ?? NO_DURATION;
-                const startMs = performance.now();
-
-                if (durationMs <= NO_DURATION) {
-                    setCamera(target);
-
-                    return;
-                }
-
-                let frameId = requestAnimationFrame(function glide(nowMs) {
-                    const ratio = EasingUtils.easeInOutCubic(MathUtils.clamp01((nowMs - startMs) / durationMs));
-
-                    setCamera({
-                        x: MathUtils.lerp(from.x, target.x, ratio),
-                        y: MathUtils.lerp(from.y, target.y, ratio),
-                        scale: MathUtils.lerp(from.scale, target.scale, ratio),
-                    });
-
-                    if (ratio < WHOLE) frameId = requestAnimationFrame(glide);
-                });
-
-                onCleanup(() => cancelAnimationFrame(frameId));
-            },
-            { defer: true },
-        ),
+    const getIsZoomedIn = createMemo(
+        () =>
+            BracketUtils.computeFamilyInView(
+                LAYOUT,
+                getTreeGeometry(),
+                viewSignal[0](),
+                getFrameSize().height / getFrameSize().width,
+                BracketKnobs.FAMILY_MARGIN,
+            ) !== undefined,
     );
-
-    const getCameraStyle = () => {
-        const camera = getCamera();
-        const pin = (offset: number) => `${-offset / camera.scale}px`;
-
-        return {
-            transform: `translate(${camera.x}px, ${camera.y}px) scale(${camera.scale})`,
-            ...assignInlineVars({
-                [styles.headerPinXVar]: getIsHorizontal() ? "0px" : pin(camera.x),
-                [styles.headerPinYVar]: getIsHorizontal() ? pin(camera.y) : "0px",
-            }),
-        };
-    };
 
     const computeStep = (step: BracketStep) => BracketUtils.computeFamilyStep(DRAW, getFamily(), step);
 
@@ -149,25 +86,26 @@ export const FamilyExample = (props: Props) => {
                     class={styles.familyFrame}
                     style={{ width: `${getFrameSize().width}px`, height: `${getFrameSize().height}px` }}
                 >
-                    <div class={styles.familyCamera} style={getCameraStyle()}>
-                        <div class={styles.board}>
-                            <Bracket
-                                root={DRAW}
-                                nodeSize={NODE_SIZE}
-                                family={[getFamily, setFamily]}
-                                layerGap={props.layerGap}
-                                crossGap={props.crossGap}
-                                orientation={props.orientation}
-                                rootSide={props.rootSide}
-                                layerHeaderSize={getHeaderSize}
-                                ariaLabel={"Knockout draw, one family at a time"}
-                                onActivate={props.onActivate}
-                                renderConnector={props.renderConnector}
-                                renderNode={renderBracketNode}
-                                renderLayerHeader={computeBracketPinnedLayerHeader(ROUND_NAMES)}
-                            />
-                        </div>
-                    </div>
+                    <Bracket
+                        root={DRAW}
+                        nodeSize={NODE_SIZE}
+                        family={[getFamily, setFamily]}
+                        view={viewSignal}
+                        isFollowingFamily={true}
+                        isSnappingToFamily={getIsSnapping}
+                        familyMargin={BracketKnobs.FAMILY_MARGIN}
+                        transitionDurationMs={props.transitionDurationMs}
+                        layerGap={props.layerGap}
+                        crossGap={props.crossGap}
+                        orientation={props.orientation}
+                        rootSide={props.rootSide}
+                        layerHeaderSize={getHeaderSize}
+                        ariaLabel={"Knockout draw, one family at a time"}
+                        onActivate={props.onActivate}
+                        renderConnector={props.renderConnector}
+                        renderNode={renderBracketNode}
+                        renderLayerHeader={computeBracketCurrentLayerHeader(ROUND_NAMES)}
+                    />
                 </div>
             </PageMeasureBox>
 
@@ -182,7 +120,9 @@ export const FamilyExample = (props: Props) => {
                         />
                     )}
                     onClick={() => {
-                        setIsZoomedIn((isZoomedIn) => !isZoomedIn);
+                        viewSignal[1](
+                            getIsZoomedIn() ? BracketUtils.computeWholeView(getTreeGeometry()) : computeFamilyView(),
+                        );
                     }}
                 />
 
@@ -202,6 +142,17 @@ export const FamilyExample = (props: Props) => {
                     )}
                 </For>
             </div>
+
+            <PageExampleKnobs>
+                <PageProp
+                    key={"isSnappingToFamily"}
+                    label={"Snap to family"}
+                    hint={"Glides the window to frame the family in it once a drag, a pinch or the wheel is over."}
+                    controls={"Sets BracketProps.isSnappingToFamily"}
+                >
+                    <PageCheckField value={getIsSnapping} ariaLabel={"Snap to family"} onChange={setIsSnapping} />
+                </PageProp>
+            </PageExampleKnobs>
         </div>
     );
 };

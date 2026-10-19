@@ -15,7 +15,12 @@ export const PageWheelsPanel = (props: Props) => {
 
     return (
         <PagePropsPanel scope={"global"}>
-            <PageProp key={"wedgeCount"} label={"Wedges"} hint={"How many wedges the wheel is divided into."}>
+            <PageProp
+                key={"wedgeCount"}
+                label={"Wedges"}
+                hint={"How many wedges the wheel is divided into."}
+                controls={"Sets the length of the slice of example prizes sent to WheelProps.wedges"}
+            >
                 <PageNumberField
                     value={controls.wedgeCount[0]}
                     min={WheelKnobs.MIN_WEDGE_COUNT}
@@ -31,6 +36,7 @@ export const PageWheelsPanel = (props: Props) => {
                 key={"spinDurationMs"}
                 label={"Spin duration (ms)"}
                 hint={"How long a spin takes from the moment it is started to the moment it stops."}
+                controls={"Sets WheelProps.spinDurationMs"}
             >
                 <PageNumberField
                     value={controls.spinDuration[0]}
@@ -47,6 +53,7 @@ export const PageWheelsPanel = (props: Props) => {
                 key={"turns"}
                 label={"Turns per spin"}
                 hint={"How many full turns a spin makes before it comes to rest on its wedge."}
+                controls={"Sets the number of turns in the example's spin, sent to WheelProps.computeSpinDefs"}
             >
                 <PageNumberField
                     value={controls.turns[0]}
@@ -63,6 +70,7 @@ export const PageWheelsPanel = (props: Props) => {
                 key={"settleDurationMs"}
                 label={"Settle duration (ms)"}
                 hint={"How long the wheel takes to ease into its final position once the spin is over."}
+                controls={"Sets WheelProps.settleDurationMs"}
             >
                 <PageNumberField
                     value={controls.settleDuration[0]}
@@ -79,6 +87,7 @@ export const PageWheelsPanel = (props: Props) => {
                 key={"doesResume"}
                 label={"Turns again after a spin"}
                 hint={"Lets the wheel start turning by itself again after a spin, instead of standing still."}
+                controls={"Switches WheelProps.restDurationMs between the rest below and never resuming"}
             >
                 <PageCheckField
                     value={controls.doesResume[0]}
@@ -93,6 +102,7 @@ export const PageWheelsPanel = (props: Props) => {
                 hint={
                     "How long the wheel stands still after a spin before it resumes. It only applies when it turns again."
                 }
+                controls={"Sets WheelProps.restDurationMs"}
             >
                 <PageNumberField
                     value={controls.restDuration[0]}
@@ -110,6 +120,7 @@ export const PageWheelsPanel = (props: Props) => {
                 key={"isIdlingAllowed"}
                 label={"Turns by itself"}
                 hint={"Lets the wheel turn slowly on its own while nobody is spinning it."}
+                controls={"Switches WheelProps.idleDelayMs between the delay below and no idling"}
             >
                 <PageCheckField
                     value={controls.isIdlingAllowed[0]}
@@ -122,6 +133,7 @@ export const PageWheelsPanel = (props: Props) => {
                 key={"idleDelayMs"}
                 label={"Idle step delay (ms)"}
                 hint={"How long the wheel waits between steps of its idle turn. It only applies while idling is on."}
+                controls={"Sets WheelProps.idleDelayMs"}
             >
                 <PageNumberField
                     value={controls.idleDelay[0]}
@@ -139,6 +151,7 @@ export const PageWheelsPanel = (props: Props) => {
                 key={"spinStyleKey"}
                 label={"Spin style"}
                 hint={"The speed curve a spin follows, which is what makes it feel heavy or snappy."}
+                controls={"Picks the example's spin curve sent to WheelProps.computeSpinDefs"}
             >
                 <PageSelectField
                     value={controls.spinStyle[0]}
@@ -153,6 +166,7 @@ export const PageWheelsPanel = (props: Props) => {
                 key={"isDisabled"}
                 label={"Disabled"}
                 hint={"Turns the wheel off, so it can neither be spun nor turn by itself."}
+                controls={"Sets WheelProps.isDisabled"}
             >
                 <PageCheckField
                     value={controls.isDisabled[0]}

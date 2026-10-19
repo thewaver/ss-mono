@@ -75,6 +75,7 @@ export const TrackedPatternsPage = () => {
                         key={"configKey"}
                         label={"Pattern"}
                         hint={"Which pointer-following pattern is shown. Choosing one brings its own knobs with it."}
+                        controls={"Picks the sample pattern the example sends to ShapeProps.computeFillDefs"}
                     >
                         <PageGroupedSelectField
                             value={getConfigKey}

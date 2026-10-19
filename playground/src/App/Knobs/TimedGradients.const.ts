@@ -6,16 +6,19 @@ const CYCLES_KNOB: CheckKnob = {
     kind: "check",
     label: "Cycle color",
     hint: "Walks the gradient through the sample's colors as it animates, instead of holding the one it starts on.",
+    controls: "Sets GradientCycleOpts.cycles",
 };
 const BANDED_KNOB: CheckKnob = {
     kind: "check",
     label: "Banded",
     hint: "Draws the flow as hard-edged stripes instead of one smooth blend.",
+    controls: "Sets GradientBandedCycleOpts.banded",
 };
 const STEPS_KNOB: NumberKnob = {
     kind: "number",
     label: "Steps",
     hint: "How many stops the movement is cut into. More steps make the run smoother and cost more to draw.",
+    controls: "Sets GradientStepsOpts.steps",
     min: 4,
     max: 36,
     step: 2,
@@ -24,6 +27,7 @@ const BANDS_KNOB: NumberKnob = {
     kind: "number",
     label: "Bands",
     hint: "How many times the colors repeat across the gradient. More bands make a tighter stripe.",
+    controls: "Sets GradientBandedCycleOpts.bands",
     min: 1,
     max: 16,
     step: 1,

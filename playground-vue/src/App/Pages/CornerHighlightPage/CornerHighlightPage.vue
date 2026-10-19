@@ -95,11 +95,21 @@ const examples: ExampleDefs[] = [
 
 <template>
     <PagePropsPanel scope="global">
-        <PageProp item-key="color" label="Color" hint="The color the corner marks are drawn in.">
+        <PageProp
+            item-key="color"
+            controls="Sets CornerHighlightProps.color"
+            label="Color"
+            hint="The color the corner marks are drawn in."
+        >
             <PageColorField :value="color" ariaLabel="Color" @input="(value: string) => (color = value)" />
         </PageProp>
 
-        <PageProp item-key="cornerLengthWidth" label="Arm across (px)" hint="How long each corner's horizontal arm is.">
+        <PageProp
+            item-key="cornerLengthWidth"
+            controls="Sets CornerHighlightProps.cornerLength.width"
+            label="Arm across (px)"
+            hint="How long each corner's horizontal arm is."
+        >
             <PageNumberField
                 :value="lengthAcross"
                 :min="CornerHighlightKnobs.MIN_LENGTH"
@@ -111,7 +121,12 @@ const examples: ExampleDefs[] = [
             />
         </PageProp>
 
-        <PageProp item-key="cornerLengthHeight" label="Arm down (px)" hint="How long each corner's vertical arm is.">
+        <PageProp
+            item-key="cornerLengthHeight"
+            controls="Sets CornerHighlightProps.cornerLength.height"
+            label="Arm down (px)"
+            hint="How long each corner's vertical arm is."
+        >
             <PageNumberField
                 :value="lengthDown"
                 :min="CornerHighlightKnobs.MIN_LENGTH"
@@ -123,7 +138,12 @@ const examples: ExampleDefs[] = [
             />
         </PageProp>
 
-        <PageProp item-key="strokeThickness" label="Thickness (px)" hint="How thick the corner arms are drawn.">
+        <PageProp
+            item-key="strokeThickness"
+            controls="Sets CornerHighlightProps.strokeThickness"
+            label="Thickness (px)"
+            hint="How thick the corner arms are drawn."
+        >
             <PageNumberField
                 :value="strokeThickness"
                 :min="CornerHighlightKnobs.MIN_THICKNESS"
@@ -137,6 +157,7 @@ const examples: ExampleDefs[] = [
 
         <PageProp
             item-key="transitionDurationMs"
+            controls="Sets CornerHighlightProps.transitionDurationMs"
             label="Fade (ms)"
             hint="How long the corners take to follow a change of color, which is how the set as a whole fades. The following and drawn-on examples also glide and grow over this time."
         >
@@ -157,6 +178,7 @@ const examples: ExampleDefs[] = [
             :item-key="key"
             :label="CORNER_LABELS[key]"
             :hint="`Whether the ${CORNER_LABELS[key].toLowerCase()} mark is drawn at all.`"
+            controls="Adds or removes this corner in CornerHighlightProps.visibleCorners"
         >
             <PageCheckField
                 :value="visibleCorners.has(key)"

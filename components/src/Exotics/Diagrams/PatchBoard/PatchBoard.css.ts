@@ -1,11 +1,18 @@
 import { globalStyle, style } from "@vanilla-extract/css";
 
+export const patchBoardWindow = style({
+    position: "relative",
+    width: "100%",
+    overflow: "hidden",
+});
+
 export const patchBoardRoot = style({
     display: "block",
     position: "relative",
     containerType: "inline-size",
     width: "100%",
     pointerEvents: "all",
+    transformOrigin: "0 0",
 });
 
 export const patchBoardSpacer = style({

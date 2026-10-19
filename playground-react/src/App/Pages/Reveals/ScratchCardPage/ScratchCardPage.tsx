@@ -128,6 +128,7 @@ export const ScratchCardPage = () => {
                     hint={
                         "How finely the card measures how much has been scratched off. Finer measurement costs more work each frame."
                     }
+                    controls={"Sets ScratchCardProps.precision"}
                 >
                     <PageNumberField
                         value={precision}
@@ -143,6 +144,7 @@ export const ScratchCardPage = () => {
                     itemKey={"brushRadius"}
                     label={"Brush radius (px)"}
                     hint={"How large a patch one stroke of the pointer clears."}
+                    controls={"Sets ScratchCardProps.brushRadius"}
                 >
                     <PageNumberField
                         value={brushRadius}
@@ -158,6 +160,7 @@ export const ScratchCardPage = () => {
                     itemKey={"brushShape"}
                     label={"Brush shape"}
                     hint={"The contour of the patch a stroke clears."}
+                    controls={"Picks the example brush contour sent to ScratchCardProps.computePoints"}
                 >
                     <PageSelectField
                         value={brushShape}
@@ -171,6 +174,7 @@ export const ScratchCardPage = () => {
                     itemKey={"softness"}
                     label={"Edge softness"}
                     hint={"How gradually a cleared patch fades into what is still covered. 0 gives a hard edge."}
+                    controls={"Sets ScratchCardProps.softness"}
                 >
                     <PageNumberField
                         value={softness}
@@ -186,6 +190,7 @@ export const ScratchCardPage = () => {
                     itemKey={"clearThreshold"}
                     label={"Clear threshold"}
                     hint={"How much of the card has to be scratched off before the rest is cleared for you."}
+                    controls={"Sets ScratchCardProps.clearThreshold"}
                 >
                     <PageNumberField
                         value={threshold}

@@ -32,6 +32,8 @@ export type * from "./Abstracts/MaskedField/MaskedFieldSvelte.types.js";
 export * from "./Abstracts/MaskedField/MaskedFieldSvelte.utils.svelte.js";
 export * from "./Abstracts/MediaQueryMonitor/MediaQueryMonitorSvelte.utils.svelte.js";
 export * from "./Abstracts/Navigator/NavigatorSvelte.utils.svelte.js";
+export type * from "./Abstracts/PanZoom/PanZoomSvelte.types.js";
+export * from "./Abstracts/PanZoom/PanZoomSvelte.utils.svelte.js";
 export * from "./Abstracts/PointerTracker/PointerTrackerSvelte.utils.svelte.js";
 export type * from "./Abstracts/Roller/RollerSvelte.types.js";
 export * from "./Abstracts/Roller/RollerSvelte.utils.svelte.js";

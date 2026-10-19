@@ -3,6 +3,7 @@ import { computed, shallowRef } from "vue";
 
 import { ScrambleTextWeights } from "@thewaver/ss-components-vue";
 import { TypewriterKnobs } from "@thewaver/ss-playground/App/Knobs/Typewriters.const";
+import { EXAMPLES_ONLY_PROP } from "@thewaver/ss-playground/App/PageComponents/Prop/Prop.const";
 import {
     EXAMPLES_ROOT,
     EXAMPLE_NAMES,
@@ -90,6 +91,7 @@ const examples: ExampleDefs[] = [
         <PagePropsPanel scope="global">
             <PageProp
                 item-key="textContainerWidth"
+                :controls="EXAMPLES_ONLY_PROP"
                 label="Container width (px)"
                 hint="How wide the box holding the text is, which decides where the lines wrap as the text is typed."
             >
@@ -105,6 +107,7 @@ const examples: ExampleDefs[] = [
 
             <PageProp
                 item-key="textEffect"
+                controls="Picks the example keyframes sent to TypewriterProps.computeAnimationName"
                 label="Effect"
                 hint="How each character arrives: plainly, or with one of the entrance effects."
             >
@@ -118,6 +121,7 @@ const examples: ExampleDefs[] = [
 
             <PageProp
                 item-key="arrivalOrder"
+                controls="Picks the sample weight function sent to TypewriterProps.computeCharacterWeights"
                 label="Arrival order"
                 hint="The order the characters arrive in: left to right, from the middle out, scattered, and so on. Erasing runs it backwards. The caret is meant for left to right, and jumps about under the others."
             >

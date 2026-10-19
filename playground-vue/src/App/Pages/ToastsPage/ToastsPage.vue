@@ -100,6 +100,7 @@ const dismissToast = (id: string) => {
         <PagePropsPanel scope="global">
             <PageProp
                 item-key="alignment"
+                controls="Sets ToastsProps.alignment"
                 label="Alignment"
                 hint="Which corner or edge of the screen the toasts gather at."
             >
@@ -113,6 +114,7 @@ const dismissToast = (id: string) => {
 
             <PageProp
                 item-key="dir"
+                controls="Sets ToastsProps.dir"
                 label="Dir"
                 hint="Which way the stack grows from there, and so whether a new toast joins at the top or the bottom."
             >
@@ -126,6 +128,7 @@ const dismissToast = (id: string) => {
 
             <PageProp
                 item-key="limit"
+                controls="Sets ToastsProps.limit, with no limit sent as undefined"
                 label="Limit"
                 hint="How many toasts may be on screen at once. Choose none and they all show."
             >
@@ -140,6 +143,7 @@ const dismissToast = (id: string) => {
 
             <PageProp
                 item-key="overflow"
+                controls="Sets ToastsProps.overflow"
                 label="Overflow"
                 hint="What happens when the limit is reached: the oldest toast is dismissed, or the newest waits its turn."
             >
@@ -153,6 +157,7 @@ const dismissToast = (id: string) => {
 
             <PageProp
                 item-key="durationMs"
+                controls="Sets Toast.durationMs on each example toast raised"
                 label="Duration"
                 hint="How long a toast stays before it dismisses itself. Sticky ones wait to be closed."
             >
@@ -165,7 +170,12 @@ const dismissToast = (id: string) => {
                 />
             </PageProp>
 
-            <PageProp item-key="animation" label="Animation" hint="How a toast arrives and leaves.">
+            <PageProp
+                item-key="animation"
+                controls="Picks how the example content drawn by ToastsProps.renderToast arrives and leaves"
+                label="Animation"
+                hint="How a toast arrives and leaves."
+            >
                 <PageSelectField
                     :value="animation"
                     :values="ToastKnobs.ANIMATIONS"
@@ -176,6 +186,7 @@ const dismissToast = (id: string) => {
 
             <PageProp
                 item-key="stacking"
+                controls="Picks how the example content drawn by ToastsProps.renderToast stacks"
                 label="Stacking"
                 hint="Whether the toasts sit in a row of their own, or pile up on each other with only the top one fully shown."
             >
@@ -187,7 +198,12 @@ const dismissToast = (id: string) => {
                 />
             </PageProp>
 
-            <PageProp item-key="gap" label="Gap (px)" hint="The space between one toast and the next.">
+            <PageProp
+                item-key="gap"
+                controls="Sets ToastsProps.gap"
+                label="Gap (px)"
+                hint="The space between one toast and the next."
+            >
                 <PageNumberField
                     :value="gap"
                     :min="ToastKnobs.MIN_GAP"
@@ -199,6 +215,7 @@ const dismissToast = (id: string) => {
 
             <PageProp
                 item-key="margin"
+                controls="Sets every side of ToastsProps.margins"
                 label="Margin (px)"
                 hint="How far the stack is held off the edge of the screen."
             >
@@ -213,6 +230,7 @@ const dismissToast = (id: string) => {
 
             <PageProp
                 item-key="transitionDurationMs"
+                controls="Sets ToastsProps.transitionDurationMs"
                 label="Transition duration (ms)"
                 hint="How long a toast takes to arrive, to leave, and to slide when the stack shifts."
             >

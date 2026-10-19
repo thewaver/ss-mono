@@ -18,6 +18,7 @@
 <PageExampleKnobs>
     <PageProp
         itemKey={"lapDurationMs"}
+        controls={"Sets PaintedTextProps.lapDurationMs"}
         label={"Lap duration (ms)"}
         hint={"How long the text takes to slide once round the whole length of its path."}
     >

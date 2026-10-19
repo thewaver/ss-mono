@@ -45,6 +45,7 @@
 <PagePropsPanel scope={"global"}>
     <PageProp
         itemKey={"track"}
+        controls={"Picks the example track sent to AudioSwitcherProps.src"}
         label={"Track"}
         hint={"Which piece is playing. Changing it is what the switcher crossfades between."}
     >
@@ -61,6 +62,7 @@
 
     <PageProp
         itemKey={"crossfadeMs"}
+        controls={"Sets AudioSwitcherProps.crossfadeMs"}
         label={"Crossfade (ms)"}
         hint={"How long the old track takes to fade out while the new one fades in."}
     >
@@ -77,7 +79,7 @@
         />
     </PageProp>
 
-    <PageProp itemKey={"volume"} label={"Volume (%)"} hint={"How loud the playback is."}>
+    <PageProp itemKey={"volume"} controls={"Sets AudioSwitcherProps.volume, sent as a share of 1"} label={"Volume (%)"} hint={"How loud the playback is."}>
         <PageNumberField
             value={volumePercent}
             min={AudioSwitcherKnobs.MIN_VOLUME_PERCENT}

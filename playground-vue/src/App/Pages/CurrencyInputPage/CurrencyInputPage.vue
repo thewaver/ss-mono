@@ -98,6 +98,7 @@ const examples: ExampleDefs[] = [
     <PagePropsPanel scope="global">
         <PageProp
             item-key="locale"
+            controls="Sets CurrencyInputProps.locale"
             label="Locale"
             hint="Which country's conventions the amount is written in, which decides the separators and where the symbol sits."
         >
@@ -110,7 +111,12 @@ const examples: ExampleDefs[] = [
             />
         </PageProp>
 
-        <PageProp item-key="decimals" label="Decimals" hint="How many digits are kept after the decimal separator.">
+        <PageProp
+            item-key="decimals"
+            controls="Sets CurrencyInputProps.decimals"
+            label="Decimals"
+            hint="How many digits are kept after the decimal separator."
+        >
             <PageSelectField
                 :value="decimals"
                 :values="CurrencyInputKnobs.DECIMALS"
@@ -121,6 +127,7 @@ const examples: ExampleDefs[] = [
 
         <PageProp
             item-key="hasSign"
+            controls="Sets CurrencyInputProps.hasSign"
             label="Signed"
             hint="Allows negative amounts to be typed. With it off, a minus sign is rejected."
         >
@@ -129,6 +136,7 @@ const examples: ExampleDefs[] = [
 
         <PageProp
             item-key="grouping"
+            controls="Sets CurrencyInputProps.groupSizes"
             label="Grouping"
             hint="How the digits before the decimal point are grouped, such as in threes or in the Indian lakh pattern."
         >

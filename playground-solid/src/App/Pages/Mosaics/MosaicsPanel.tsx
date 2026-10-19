@@ -22,6 +22,9 @@ export const PageMosaicsPanel = (props: Props) => {
                 hint={
                     "How many tiles the mosaic packs. The arrangement is recomputed from scratch each time it changes."
                 }
+                controls={
+                    "Sets the length of the slice of example items sent to ElementMosaicProps.items or ImageMosaicProps.sources"
+                }
             >
                 <PageNumberField
                     value={controls.itemCount[0]}
@@ -34,7 +37,12 @@ export const PageMosaicsPanel = (props: Props) => {
                 />
             </PageProp>
 
-            <PageProp key={"gap"} label={"Gap (px)"} hint={"The space left between tiles."}>
+            <PageProp
+                key={"gap"}
+                label={"Gap (px)"}
+                hint={"The space left between tiles."}
+                controls={"Sets MosaicState.gap"}
+            >
                 <PageNumberField
                     value={controls.gap[0]}
                     min={MosaicKnobs.MIN_GAP}
@@ -50,6 +58,7 @@ export const PageMosaicsPanel = (props: Props) => {
                 key={"sizeAnchor"}
                 label={"Fixed side"}
                 hint={"Which side the mosaic takes as given: it fills that one and works the other out from the tiles."}
+                controls={"Sets MosaicState.sizeAnchor"}
             >
                 <PageSelectField
                     value={controls.sizeAnchor[0]}
@@ -66,6 +75,7 @@ export const PageMosaicsPanel = (props: Props) => {
                 hint={
                     "How long a tile takes to glide to its new place when tiles are added, taken out or resized. Resizing the mosaic itself never glides. At 0 tiles move at once, and under reduced motion they always do."
                 }
+                controls={"Sets MosaicState.transitionDurationMs"}
             >
                 <PageNumberField
                     value={controls.transitionDurationMs[0]}

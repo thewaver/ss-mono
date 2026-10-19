@@ -1,4 +1,4 @@
-import type { PatchBoardLink, PatchBoardNode } from "@thewaver/ss-components";
+import type { PanZoomView, PatchBoardLink, PatchBoardNode } from "@thewaver/ss-components";
 
 import type { PatchDevice } from "./PatchDevice.types";
 
@@ -192,17 +192,16 @@ export const PAN_LINKS: PatchBoardLink[] = [
     { from: { nodeKey: "eq", socketId: "out" }, to: { nodeKey: "compressor", socketId: "in" } },
 ];
 
-export const MIN_ZOOM = 0.5;
-export const MAX_ZOOM = 2;
-export const ZOOM_STEP = 0.25;
-export const STARTING_ZOOM = 1;
+export const PAN_STARTING_VIEW: PanZoomView = {
+    x: { start: 0, end: PAN_SCALE },
+    y: { start: 0, end: PAN_SCALE * PAN_BOARD_HEIGHT_RATIO },
+};
 
 export const EXAMPLE_NAMES = {
     chain: "Signal chain",
     mixer: "Mixing desk",
     rack: "Effects rack",
-    pan: "Panned board",
-    zoom: "Zoomed board",
+    panZoom: "Zoomed and panned board",
 };
 
 export const EXAMPLES_ROOT = "/src/App/Pages/PatchBoardPage/Examples";

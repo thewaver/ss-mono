@@ -23,18 +23,18 @@ const MIXER = "mixer";
 const MIXER_LABEL = "Mixing desk";
 
 /**
- * Where a cable actually ends, in the same space as the socket it should be ending on. The cable is drawn
- * by the Playground as an SVG path, so its far end is `getPointAtLength` at the full length, put through
- * the element's own screen matrix — which is what turns user units into the client space a bounding box is
- * reported in, whatever the `Viewport` around it is scaling by.
+ * Where a cable actually ends — or starts, with `isStart` — in the same space as the socket it should be ending
+ * on. The cable is drawn by the Playground as an SVG path, so its far end is `getPointAtLength` at the full
+ * length and its near end at zero, put through the element's own screen matrix — which is what turns user units
+ * into the client space a bounding box is reported in, whatever the `Viewport` around it is scaling by.
  */
-const cableEnds = (page: Page, key: string, boardLabel: string) =>
+const cableEnds = (page: Page, key: string, boardLabel: string, isStart = false) =>
     page.evaluate(
-        (selector) => {
+        ({ selector, isStart }) => {
             const paths = [...document.querySelectorAll<SVGPathElement>(`${selector} svg path`)];
 
             return paths.map((path) => {
-                const point = path.getPointAtLength(path.getTotalLength());
+                const point = path.getPointAtLength(isStart ? 0 : path.getTotalLength());
                 const matrix = path.getScreenCTM();
 
                 if (!matrix) throw new Error("the cable is not on screen");
@@ -45,7 +45,7 @@ const cableEnds = (page: Page, key: string, boardLabel: string) =>
                 };
             });
         },
-        board(key, boardLabel),
+        { selector: board(key, boardLabel), isStart },
     );
 
 const centerOf = (page: Page, selector: string) =>
@@ -389,107 +389,31 @@ test("a cable aimed at a socket that would close a loop is announced as refused"
 });
 
 /**
- * Zoom. The zoomed board is scaled by a CSS transform on an element around it, and the board takes no scale
- * prop — it converts the pointer against its own measured box, which already includes the transform. So after
- * zooming in, a node dragged by some distance moves by that same distance on screen, and its cable still
- * meets its socket.
- */
-const ZOOM = "zoom";
-const ZOOM_LABEL = "Zoomed chain";
-
-const zoomIn = async (page: Page) => {
-    const root = page.locator(board(ZOOM, ZOOM_LABEL));
-
-    await page.locator(demo(ZOOM)).scrollIntoViewIfNeeded();
-
-    const before = await root.boundingBox();
-
-    await page.locator("#patchBoardZoomIn").click();
-    await waitUntilStill(root);
-
-    const after = await root.boundingBox();
-
-    expect(after?.width ?? 0, "the board is drawn larger after zooming in").toBeGreaterThan(before?.width ?? 0);
-};
-
-test("after zooming in, a dragged node lands under the pointer and its cable stays on its socket", async ({ page }) => {
-    await zoomIn(page);
-
-    const target = socket(ZOOM, "Gate in", ZOOM_LABEL);
-    const box = await page.locator(node(ZOOM, "Gate", ZOOM_LABEL)).boundingBox();
-
-    if (!box) throw new Error("the board has no such node");
-
-    const dx = 50;
-    const dy = -30;
-
-    await page.mouse.move(box.x + box.width * 0.5, box.y + box.height * 0.5);
-    await page.mouse.down();
-    await page.mouse.move(box.x + box.width * 0.5 + dx, box.y + box.height * 0.5 + dy, { steps: 12 });
-    await page.mouse.up();
-
-    const moved = await page.locator(node(ZOOM, "Gate", ZOOM_LABEL)).boundingBox();
-    const after = await centerOf(page, target);
-    const [end] = await cableEnds(page, ZOOM, ZOOM_LABEL);
-
-    expect(Math.abs((moved?.x ?? 0) - box.x - dx), "the node moved across as far as the pointer did").toBeLessThan(2);
-    expect(Math.abs((moved?.y ?? 0) - box.y - dy), "and up as far as the pointer did").toBeLessThan(2);
-    expect(Math.hypot(end.x - after.x, end.y - after.y), "and the cable is still on the socket it was on").toBeLessThan(
-        2,
-    );
-});
-
-/**
- * Wiring goes through the same conversion, so a cable dragged from one socket to another on the zoomed board
- * connects them, and its far end is drawn on the socket it was dropped in.
- */
-test("after zooming in, a cable dragged between sockets connects them and meets the socket", async ({ page }) => {
-    await zoomIn(page);
-
-    const from = await centerOf(page, socket(ZOOM, "Clock tick", ZOOM_LABEL));
-    const to = await centerOf(page, socket(ZOOM, "Lamp signal", ZOOM_LABEL));
-
-    await page.mouse.move(from.x, from.y);
-    await page.mouse.down();
-    await page.mouse.move(to.x, to.y, { steps: 12 });
-    await page.mouse.up();
-
-    expect(await cableCount(page, ZOOM), "the drag left a second cable").toBe(2);
-
-    const ends = await cableEnds(page, ZOOM, ZOOM_LABEL);
-
-    expect(
-        Math.min(...ends.map((end) => Math.hypot(end.x - to.x, end.y - to.y))),
-        "and one cable ends on the lamp's socket",
-    ).toBeLessThan(2);
-});
-
-/**
- * Pan. The panned board is wider than the window it sits in, and the window scrolls. Carrying a node with the
- * keyboard does not move focus, so the browser would not scroll on its own; the board keeps the carried node
- * in view instead. The mic starts at the left edge and is carried right until it is well past where the
- * window ends — and the window has followed it.
+ * Zoom and pan. The board takes a view — the part of itself the window shows — and draws inside a window it scales and
+ * moves itself, laid out at its own width with `boardWidth`. It converts the pointer against its own measured box,
+ * which already includes the transform, so after zooming in a node dragged by some distance moves by that same distance
+ * on screen, and its cable still meets its socket. Where the window has moved to is read as where the board's box sits
+ * against the window's, never as a scale or an offset.
  */
 const PAN = "pan";
 const PAN_LABEL = "Recording chain";
 
-const panView = (page: Page, label: string) =>
+const panState = (page: Page, label: string) =>
     page.evaluate(
         (args) => {
             const root = document.querySelector(args.boardSelector);
+            const window = root?.parentElement;
             const slot = document.querySelector(args.nodeSelector)?.closest('[role="group"]');
 
-            let scroller = root?.parentElement ?? null;
+            if (!root || !window || !slot) throw new Error("the panned board has no window");
 
-            while (scroller && getComputedStyle(scroller).overflowX !== "auto") scroller = scroller.parentElement;
-
-            if (!scroller || !slot) throw new Error("the panned board has no scrolling window");
-
-            const view = scroller.getBoundingClientRect();
+            const view = window.getBoundingClientRect();
+            const board = root.getBoundingClientRect();
             const box = slot.getBoundingClientRect();
 
             return {
-                scrollLeft: scroller.scrollLeft,
+                boardLeft: board.left - view.left,
+                boardWidth: board.width,
                 isInView:
                     box.left >= view.left - 1 &&
                     box.right <= view.right + 1 &&
@@ -500,13 +424,146 @@ const panView = (page: Page, label: string) =>
         { boardSelector: board(PAN, PAN_LABEL), nodeSelector: node(PAN, label, PAN_LABEL) },
     );
 
+/**
+ * Zooms in with the wheel over a node, which keeps that node under the pointer and so inside the window: the window
+ * opens on the left end of a long chain, and most of the board is outside it.
+ */
+const zoomInOn = async (page: Page, label: string) => {
+    const root = page.locator(board(PAN, PAN_LABEL));
+
+    await page.locator(demo(PAN)).scrollIntoViewIfNeeded();
+
+    const before = await root.boundingBox();
+    const box = (await page.locator(node(PAN, label, PAN_LABEL)).boundingBox())!;
+
+    await page.mouse.move(box.x + box.width * 0.5, box.y + box.height * 0.5);
+    await page.mouse.wheel(0, -200);
+    await waitUntilStill(root);
+
+    const after = await root.boundingBox();
+
+    expect(after?.width ?? 0, "the board is drawn larger after zooming in").toBeGreaterThan(before?.width ?? 0);
+};
+
+test("after zooming in, a dragged node lands under the pointer and its cable stays on its socket", async ({ page }) => {
+    await zoomInOn(page, "Mic");
+
+    const target = socket(PAN, "Mic out", PAN_LABEL);
+    const box = await page.locator(node(PAN, "Mic", PAN_LABEL)).boundingBox();
+
+    if (!box) throw new Error("the board has no such node");
+
+    const dx = 40;
+    const dy = 10;
+
+    await page.mouse.move(box.x + box.width * 0.5, box.y + box.height * 0.5);
+    await page.mouse.down();
+    await page.mouse.move(box.x + box.width * 0.5 + dx, box.y + box.height * 0.5 + dy, { steps: 12 });
+    await page.mouse.up();
+
+    const moved = await page.locator(node(PAN, "Mic", PAN_LABEL)).boundingBox();
+    const after = await centerOf(page, target);
+    const ends = await cableEnds(page, PAN, PAN_LABEL, true);
+
+    expect(Math.abs((moved?.x ?? 0) - box.x - dx), "the node moved across as far as the pointer did").toBeLessThan(2);
+    expect(Math.abs((moved?.y ?? 0) - box.y - dy), "and down as far as the pointer did").toBeLessThan(2);
+    expect(
+        Math.min(...ends.map((end) => Math.hypot(end.x - after.x, end.y - after.y))),
+        "and the cable is still on the socket it was on",
+    ).toBeLessThan(2);
+});
+
+/**
+ * Wiring goes through the same conversion, so a cable dragged from one socket to another on a zoomed board connects
+ * them, and its far end is drawn on the socket it was dropped in. Zoomed out until the whole board shows, so both ends
+ * are in the window at once.
+ */
+test("zoomed out, a cable dragged between sockets connects them and meets the socket", async ({ page }) => {
+    const root = page.locator(board(PAN, PAN_LABEL));
+
+    await page.locator(demo(PAN)).scrollIntoViewIfNeeded();
+
+    for (let press = 0; press < 6; press++) await page.locator("#patchBoardZoomOut").click();
+
+    await waitUntilStill(root);
+
+    const before = await cableCount(page, PAN);
+    const from = await centerOf(page, socket(PAN, "Compressor out", PAN_LABEL));
+    const to = await centerOf(page, socket(PAN, "Recorder in", PAN_LABEL));
+
+    await page.mouse.move(from.x, from.y);
+    await page.mouse.down();
+    await page.mouse.move(to.x, to.y, { steps: 12 });
+    await page.mouse.up();
+
+    expect(await cableCount(page, PAN), "the drag left one more cable").toBe(before + 1);
+
+    const ends = await cableEnds(page, PAN, PAN_LABEL);
+
+    expect(
+        Math.min(...ends.map((end) => Math.hypot(end.x - to.x, end.y - to.y))),
+        "and one cable ends on the recorder's socket",
+    ).toBeLessThan(2);
+});
+
+/**
+ * A drag that starts on empty board moves the window; one that starts on a node carries the node and leaves the window
+ * where it was.
+ */
+test("a drag on empty board pans the window, and a drag on a node carries the node instead", async ({ page }) => {
+    await page.locator(demo(PAN)).scrollIntoViewIfNeeded();
+
+    const window = (await page.locator(board(PAN, PAN_LABEL)).evaluate((root) => {
+        const box = root.parentElement!.getBoundingClientRect();
+
+        return { x: box.x, y: box.y, width: box.width, height: box.height };
+    }))!;
+    const start = await panState(page, "Mic");
+
+    await page.mouse.move(window.x + window.width * 0.5, window.y + window.height - 4);
+    await page.mouse.down();
+    await page.mouse.move(window.x + window.width * 0.5 - 120, window.y + window.height - 4, { steps: 12 });
+    await page.mouse.up();
+
+    const panned = await panState(page, "Mic");
+
+    expect(panned.boardLeft, "the board moved left under the window").toBeLessThan(start.boardLeft - 50);
+
+    const box = (await page.locator(node(PAN, "EQ", PAN_LABEL)).boundingBox())!;
+
+    await page.mouse.move(box.x + box.width * 0.5, box.y + box.height * 0.5);
+    await page.mouse.down();
+    await page.mouse.move(box.x + box.width * 0.5 + 30, box.y + box.height * 0.5 + 10, { steps: 8 });
+    await page.mouse.up();
+
+    expect((await panState(page, "Mic")).boardLeft, "the window stayed where it was").toBeCloseTo(panned.boardLeft, 0);
+    expect((await readout(page, PAN)).includes("moved eq"), "and the node was moved").toBe(true);
+});
+
+test("the wheel over the board zooms it", async ({ page }) => {
+    await page.locator(demo(PAN)).scrollIntoViewIfNeeded();
+
+    const start = await panState(page, "Mic");
+    const box = (await page.locator(board(PAN, PAN_LABEL)).boundingBox())!;
+
+    await page.mouse.move(box.x + 40, box.y + 40);
+    await page.mouse.wheel(0, 400);
+    await waitUntilStill(page.locator(board(PAN, PAN_LABEL)));
+
+    expect((await panState(page, "Mic")).boardWidth, "the board is drawn smaller").toBeLessThan(start.boardWidth);
+});
+
+/**
+ * Carrying a node with the keyboard does not move focus, so nothing would bring the window along on its own; the
+ * board keeps the carried node in view instead. The mic starts at the window's left edge and is carried right until
+ * it is well past where the window ended — and the window has followed it.
+ */
 test("a node carried with the keyboard past the edge of the window brings the window with it", async ({ page }) => {
     await page.locator(demo(PAN)).scrollIntoViewIfNeeded();
 
-    const before = await panView(page, "Mic");
+    const before = await panState(page, "Mic");
 
-    expect(before.scrollLeft, "the window starts at the left edge").toBe(0);
-    expect(before.isInView, "with the mic in view").toBe(true);
+    expect(before.isInView, "the mic starts in view").toBe(true);
 
     await page.locator(node(PAN, "Mic", PAN_LABEL)).focus();
     await page.keyboard.press("Enter");
@@ -515,15 +572,15 @@ test("a node carried with the keyboard past the edge of the window brings the wi
 
     await waitUntilStill(page.locator(node(PAN, "Mic", PAN_LABEL)));
 
-    const carried = await panView(page, "Mic");
+    const carried = await panState(page, "Mic");
 
-    expect(carried.scrollLeft, "the window has scrolled to follow").toBeGreaterThan(0);
+    expect(carried.boardLeft, "the window has moved to follow").toBeLessThan(before.boardLeft);
     expect(carried.isInView, "and the carried mic is still inside it").toBe(true);
 
     await page.keyboard.press("Enter");
     await waitUntilStill(page.locator(node(PAN, "Mic", PAN_LABEL)));
 
-    expect((await panView(page, "Mic")).isInView, "where it stays once it is dropped").toBe(true);
+    expect((await panState(page, "Mic")).isInView, "where it stays once it is dropped").toBe(true);
 });
 
 /**

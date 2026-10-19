@@ -47,6 +47,7 @@ const examples: ExampleDefs[] = [
     <PagePropsPanel scope="global">
         <PageProp
             item-key="transitionDurationMs"
+            controls="Sets FlipbookProps.transitionDurationMs"
             label="Turn duration (ms)"
             hint="How long one page takes to turn over. It is off while the visitor has asked for reduced motion, and the pages then turn at once."
         >

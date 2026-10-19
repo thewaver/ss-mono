@@ -116,6 +116,7 @@
     <PagePropsPanel scope={"global"}>
         <PageProp
             itemKey={"removeOtherTags"}
+            controls={"Sets RichTextProps.removeOtherTags"}
             label={"Remove other tags"}
             hint={"Strips any tag the editor was not told to keep, rather than leaving it in the markup untouched."}
         >

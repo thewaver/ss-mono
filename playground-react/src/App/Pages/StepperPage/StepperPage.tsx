@@ -167,6 +167,7 @@ export const StepperPage = () => {
                     itemKey={"isFreeNavigation"}
                     label={"Free navigation"}
                     hint={"Lets any step be jumped to directly, instead of making each one be reached in order."}
+                    controls={"Sets Step.isNavigable on every example step sent to StepperProps.steps"}
                 >
                     <PageCheckField
                         value={isFreeNavigation}
@@ -179,6 +180,7 @@ export const StepperPage = () => {
                     itemKey={"currentStep"}
                     label={"Current step"}
                     hint={"Puts the examples back to the step they started on."}
+                    controls={"Writes the starting steps back to StepperProps.currentValue"}
                 >
                     <Button
                         renderContent={(flags) => <PageButtonContent flags={flags}>Reset</PageButtonContent>}

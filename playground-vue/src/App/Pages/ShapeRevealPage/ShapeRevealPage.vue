@@ -4,6 +4,7 @@ import { computed, shallowRef } from "vue";
 import { SHAPE_REVEAL_DEFAULTS } from "@thewaver/ss-components-vue";
 import { ShapeRevealKnobs } from "@thewaver/ss-playground/App/Knobs/ShapeReveals.const";
 import { THEME_OPTIONS } from "@thewaver/ss-playground/App/PageComponents/NavSettings/NavSettings.const";
+import { EXAMPLES_ONLY_PROP } from "@thewaver/ss-playground/App/PageComponents/Prop/Prop.const";
 import {
     EXAMPLES_ROOT,
     EXAMPLE_NAMES,
@@ -60,6 +61,7 @@ const examples: ExampleDefs[] = [
     <PagePropsPanel scope="global">
         <PageProp
             item-key="durationMs"
+            controls="Sets ShapeRevealOpts.durationMs"
             label="Duration (ms)"
             hint="How long the circle takes to grow over the whole window. 0 switches the theme at once, as does the system's reduced-motion setting."
         >
@@ -76,6 +78,7 @@ const examples: ExampleDefs[] = [
 
         <PageProp
             item-key="delayMs"
+            :controls="EXAMPLES_ONLY_PROP"
             label="Delay (ms)"
             hint="How long the new theme stays on screen, once the circle has covered it, before the next."
         >
@@ -92,6 +95,7 @@ const examples: ExampleDefs[] = [
 
         <PageProp
             item-key="computePoints"
+            controls="Picks the example contour sent to ShapeRevealOpts.computePoints"
             label="Shape"
             hint="The contour that grows over the window. A circle is what the reveal draws when none is given."
         >
@@ -106,6 +110,7 @@ const examples: ExampleDefs[] = [
 
         <PageProp
             item-key="softness"
+            controls="Sets ShapeRevealOpts.softness"
             label="Softness"
             hint="How gradually the growing shape's edge fades, as a share of the distance it grows. 0 gives a hard edge."
         >

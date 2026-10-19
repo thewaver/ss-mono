@@ -42,6 +42,7 @@ const examples: ExampleDefs[] = [
     <PagePropsPanel scope="global">
         <PageProp
             item-key="lineHeightRatio"
+            controls="Sets FittedTextProps.lineHeightRatio"
             label="Line height"
             hint="Each line's height as a multiple of its own font size, which is the room the stack is fitted with."
         >

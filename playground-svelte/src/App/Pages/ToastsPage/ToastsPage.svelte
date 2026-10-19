@@ -86,6 +86,7 @@
     <PagePropsPanel scope={"global"}>
         <PageProp
             itemKey={"alignment"}
+            controls={"Sets ToastsProps.alignment"}
             label={"Alignment"}
             hint={"Which corner or edge of the screen the toasts gather at."}
         >
@@ -101,6 +102,7 @@
 
         <PageProp
             itemKey={"dir"}
+            controls={"Sets ToastsProps.dir"}
             label={"Dir"}
             hint={"Which way the stack grows from there, and so whether a new toast joins at the top or the bottom."}
         >
@@ -116,6 +118,7 @@
 
         <PageProp
             itemKey={"limit"}
+            controls={"Sets ToastsProps.limit, with no limit sent as undefined"}
             label={"Limit"}
             hint={"How many toasts may be on screen at once. Choose none and they all show."}
         >
@@ -132,6 +135,7 @@
 
         <PageProp
             itemKey={"overflow"}
+            controls={"Sets ToastsProps.overflow"}
             label={"Overflow"}
             hint={"What happens when the limit is reached: the oldest toast is dismissed, or the newest waits its turn."}
         >
@@ -147,6 +151,7 @@
 
         <PageProp
             itemKey={"durationMs"}
+            controls={"Sets Toast.durationMs on each example toast raised"}
             label={"Duration"}
             hint={"How long a toast stays before it dismisses itself. Sticky ones wait to be closed."}
         >
@@ -161,7 +166,7 @@
             />
         </PageProp>
 
-        <PageProp itemKey={"animation"} label={"Animation"} hint={"How a toast arrives and leaves."}>
+        <PageProp itemKey={"animation"} controls={"Picks how the example content drawn by ToastsProps.renderToast arrives and leaves"} label={"Animation"} hint={"How a toast arrives and leaves."}>
             <PageSelectField
                 value={animation}
                 values={ToastKnobs.ANIMATIONS}
@@ -174,6 +179,7 @@
 
         <PageProp
             itemKey={"stacking"}
+            controls={"Picks how the example content drawn by ToastsProps.renderToast stacks"}
             label={"Stacking"}
             hint={"Whether the toasts sit in a row of their own, or pile up on each other with only the top one fully shown."}
         >
@@ -187,7 +193,7 @@
             />
         </PageProp>
 
-        <PageProp itemKey={"gap"} label={"Gap (px)"} hint={"The space between one toast and the next."}>
+        <PageProp itemKey={"gap"} controls={"Sets ToastsProps.gap"} label={"Gap (px)"} hint={"The space between one toast and the next."}>
             <PageNumberField
                 value={gap}
                 min={ToastKnobs.MIN_GAP}
@@ -201,6 +207,7 @@
 
         <PageProp
             itemKey={"margin"}
+            controls={"Sets every side of ToastsProps.margins"}
             label={"Margin (px)"}
             hint={"How far the stack is held off the edge of the screen."}
         >
@@ -217,6 +224,7 @@
 
         <PageProp
             itemKey={"transitionDurationMs"}
+            controls={"Sets ToastsProps.transitionDurationMs"}
             label={"Transition duration (ms)"}
             hint={"How long a toast takes to arrive, to leave, and to slide when the stack shifts."}
         >

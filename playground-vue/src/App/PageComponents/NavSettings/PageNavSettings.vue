@@ -9,6 +9,7 @@ import {
     VIEWPORT_ANCHOR_OPTIONS,
 } from "@thewaver/ss-playground/App/PageComponents/NavSettings/NavSettings.const";
 import { NO_MOTION_DURATION_MS } from "@thewaver/ss-playground/App/PageComponents/NavSettings/NavSettings.const";
+import { EXAMPLES_ONLY_PROP } from "@thewaver/ss-playground/App/PageComponents/Prop/Prop.const";
 
 import PageToggleContent from "../../StyledComponents/ToggleContent/ToggleContent.vue";
 import PageExampleKnobsButton from "../ExampleKnobs/PageExampleKnobsButton.vue";
@@ -50,6 +51,7 @@ const setViewportAnchor = (anchor: ViewportAnchor) => {
         <template #renderKnobs>
             <PageProp
                 item-key="showsDescriptionOnly"
+                :controls="EXAMPLES_ONLY_PROP"
                 label="Show pages without examples"
                 hint="Lists the pages that have docs but no examples yet, which are hidden otherwise."
                 :default-value="false"
@@ -63,6 +65,7 @@ const setViewportAnchor = (anchor: ViewportAnchor) => {
 
             <PageProp
                 item-key="pageView"
+                :controls="EXAMPLES_ONLY_PROP"
                 label="Open pages on"
                 hint="Which tab a page opens on when it is picked from the list. A page with no examples always opens on its docs."
                 default-value="Examples"
@@ -76,6 +79,7 @@ const setViewportAnchor = (anchor: ViewportAnchor) => {
 
             <PageProp
                 item-key="viewportAnchor"
+                :controls="EXAMPLES_ONLY_PROP"
                 label="Viewport anchor"
                 hint="The height the whole playground is laid out at before it is scaled to fit the window. None lays it out at the window's own size and Auto at the screen's height, both at the window's shape; 1080p and 1440p lay out a fixed 16:9 page of that height, with empty bars around it."
                 default-value="Auto"
@@ -91,6 +95,7 @@ const setViewportAnchor = (anchor: ViewportAnchor) => {
 
             <PageProp
                 item-key="theme"
+                :controls="EXAMPLES_ONLY_PROP"
                 label="Theme"
                 hint="Which color theme the playground is drawn in, independent of the framework it runs in. The new theme is uncovered by a circle growing from this field."
                 :default-value="computeThemeLabel(OWN_FRAMEWORK)"

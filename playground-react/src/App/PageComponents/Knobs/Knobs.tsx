@@ -16,6 +16,7 @@ export const PageKnobs = (props: PageKnobsProps) => {
                     itemKey={key}
                     label={knob.label}
                     hint={knob.hint}
+                    controls={knob.controls}
                     defaultValue={props.defaults[key]}
                 >
                     {knob.kind === "number" ? (

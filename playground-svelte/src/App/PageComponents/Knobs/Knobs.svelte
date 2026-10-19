@@ -13,7 +13,7 @@
 </script>
 
 {#each toEntries(props.knobs) as [key, knob] (key)}
-    <PageProp itemKey={key} label={knob.label} hint={knob.hint} defaultValue={props.defaults[key]}>
+    <PageProp itemKey={key} label={knob.label} hint={knob.hint} controls={knob.controls} defaultValue={props.defaults[key]}>
         {#if knob.kind === "number"}
             <PageNumberField
                 value={Number(getValue(key))}

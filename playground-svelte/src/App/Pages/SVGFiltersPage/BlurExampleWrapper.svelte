@@ -17,6 +17,7 @@
 <PageExampleKnobs>
     <PageProp
         itemKey={"stdDeviation"}
+        controls={"Sets SVGGaussianBlurFilterDefs.stdDeviation"}
         label={"Std deviation"}
         hint={"How far the blur reaches. 0 leaves the picture sharp."}
     >

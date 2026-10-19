@@ -71,6 +71,7 @@ const examples: ExampleDefs[] = [
     <PagePropsPanel scope="global">
         <PageProp
             item-key="orientation"
+            controls="Sets FormFieldProps.orientation"
             label="Orientation"
             hint="Whether the label sits above the control or beside it."
         >
@@ -83,7 +84,12 @@ const examples: ExampleDefs[] = [
             />
         </PageProp>
 
-        <PageProp item-key="gap" label="Gap (px)" hint="The space between the label, the control and the message.">
+        <PageProp
+            item-key="gap"
+            controls="Sets FormFieldProps.gap"
+            label="Gap (px)"
+            hint="The space between the label, the control and the message."
+        >
             <PageNumberField
                 :value="gap"
                 :min="FormFieldKnobs.MIN_GAP"
@@ -97,6 +103,7 @@ const examples: ExampleDefs[] = [
 
         <PageProp
             item-key="message"
+            controls="Sets FormFieldProps.message"
             label="Message"
             hint="The line shown under the control. Leave it empty and no line is rendered at all."
         >
@@ -111,6 +118,7 @@ const examples: ExampleDefs[] = [
 
         <PageProp
             item-key="hasError"
+            controls="Sets FormFieldProps.hasError"
             label="In error"
             hint="Puts the field into its error look and reads the message out as the error rather than as help."
         >

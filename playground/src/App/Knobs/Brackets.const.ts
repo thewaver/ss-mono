@@ -8,4 +8,6 @@ export namespace BracketKnobs {
     export const MIN_TRANSITION_DURATION_MS = 0;
     export const MAX_TRANSITION_DURATION_MS = 2000;
     export const TRANSITION_DURATION_STEP_MS = 50;
+    export const STARTING_IS_SNAPPING_TO_FAMILY = true;
+    export const FAMILY_MARGIN = 12;
 }

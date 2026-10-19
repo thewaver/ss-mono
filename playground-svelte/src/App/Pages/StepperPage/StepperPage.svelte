@@ -187,6 +187,7 @@
 <PagePropsPanel scope={"global"}>
     <PageProp
         itemKey={"isFreeNavigation"}
+        controls={"Sets Step.isNavigable on every example step sent to StepperProps.steps"}
         label={"Free navigation"}
         hint={"Lets any step be jumped to directly, instead of making each one be reached in order."}
     >
@@ -201,6 +202,7 @@
 
     <PageProp
         itemKey={"currentStep"}
+        controls={"Writes the starting steps back to StepperProps.currentValue"}
         label={"Current step"}
         hint={"Puts the examples back to the step they started on."}
     >

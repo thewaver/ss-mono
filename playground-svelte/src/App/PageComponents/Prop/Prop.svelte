@@ -11,6 +11,7 @@
         EMPTY_TEXT,
         HINT_OFFSET,
         HINT_PLACEMENT,
+        MEMBER_SEPARATOR,
         SINGLE_FIELD,
     } from "@thewaver/ss-playground/App/PageComponents/Prop/Prop.const";
 
@@ -23,6 +24,8 @@
     };
 
     let props: PagePropProps = $props();
+
+    const controlsParts = $derived(props.controls.split(MEMBER_SEPARATOR));
 
     const propsPanelScope = getPropsPanelContext();
 
@@ -71,6 +74,10 @@
 {#snippet hintTooltip(visibilityTarget: 0 | 1, transitionDurationMs: number)}
     <PageTooltipContent {visibilityTarget} {transitionDurationMs}>
         {props.hint}
+
+        <div class={styles.propHintControls} data-hint-controls="">
+            {#each controlsParts as part, index}{#if index > 0}{MEMBER_SEPARATOR}<wbr />{/if}{part}{/each}
+        </div>
 
         {#if defaultText}
             <div class={styles.propHintDefault}>{`Default: ${defaultText}`}</div>

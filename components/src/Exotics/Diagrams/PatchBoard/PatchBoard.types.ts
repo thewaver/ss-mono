@@ -250,7 +250,7 @@ export type BasePatchBoardValues = {
     /**
      * The board's height as a fraction of its width. The board takes whatever width its container gives it and every
      * spot, size and distance on it is a fraction of that width, so this is the one number that says what shape it
-     * is. Zooming is the consumer scaling the board, or giving it more width.
+     * is. Given a view, the window keeps this shape too and the board is zoomed inside it.
      */
     heightRatio: number;
     /** Which way the board runs, which decides where a node's inputs and outputs sit. */
@@ -271,6 +271,30 @@ export type BasePatchBoardValues = {
     isDisabled?: boolean;
     /** Freezes the wiring as it stands: cables still show, but none can be made, moved or pulled out. */
     isLocked?: boolean;
+    /**
+     * How long the window takes to glide to a view the consumer or the controller asks for. A drag, the wheel and a
+     * pinch move it at once. `0` jumps, which is the reduced-motion route. Ignored without a view.
+     */
+    transitionDurationMs?: number;
+    /**
+     * Whether a drag that starts on empty board moves the view. A drag that starts on a node or a socket still carries
+     * it. Ignored without a view, since there is no window to move.
+     */
+    isPannable?: boolean;
+    /** Whether the wheel and a pinch change how much of the board the window shows. Ignored without a view. */
+    isZoomable?: boolean;
+    /**
+     * The closest the window may zoom in, as how many times larger than the whole board fitting the window. `1` never
+     * zooms in past the whole board.
+     */
+    maxScale?: number;
+    /**
+     * How wide the board is laid out, in pixels, while it has a view. The board is drawn at this width and scaled into
+     * the window, so content sized in pixels — a label's font, a node's padding — keeps the proportions it was
+     * designed at, and a view of the whole board shrinks it to fit. Left out, the board is laid out at the window's
+     * own width. Ignored without a view.
+     */
+    boardWidth?: number;
 };
 
 export type BasePatchBoardCbs<T> = {

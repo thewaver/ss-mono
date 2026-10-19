@@ -146,6 +146,9 @@ export const TileBoardPage = () => {
                                 hint={
                                     "How many tiles the piece may travel in one move. Tiles out of reach are shown as unavailable."
                                 }
+                                controls={
+                                    "Sets how far the example lets the piece travel, sent to TileBoardProps.computeIsTileDisabled"
+                                }
                             >
                                 <PageNumberField
                                     value={getReach}
@@ -217,7 +220,12 @@ export const TileBoardPage = () => {
     return (
         <>
             <PagePropsPanel scope={"global"}>
-                <PageProp key={"rows"} label={"Rows"} hint={"How many rows of tiles the board has."}>
+                <PageProp
+                    key={"rows"}
+                    label={"Rows"}
+                    hint={"How many rows of tiles the board has."}
+                    controls={"Sets TileBoardProps.tileCount.row"}
+                >
                     <PageNumberField
                         value={getRows}
                         min={TileBoardKnobs.MIN_ROWS}
@@ -229,7 +237,12 @@ export const TileBoardPage = () => {
                     />
                 </PageProp>
 
-                <PageProp key={"cols"} label={"Columns"} hint={"How many tiles sit in a row."}>
+                <PageProp
+                    key={"cols"}
+                    label={"Columns"}
+                    hint={"How many tiles sit in a row."}
+                    controls={"Sets TileBoardProps.tileCount.col"}
+                >
                     <PageNumberField
                         value={getCols}
                         min={TileBoardKnobs.MIN_COLS}
@@ -241,7 +254,12 @@ export const TileBoardPage = () => {
                     />
                 </PageProp>
 
-                <PageProp key={"tileWidth"} label={"Tile width"} hint={"How wide one tile is."}>
+                <PageProp
+                    key={"tileWidth"}
+                    label={"Tile width"}
+                    hint={"How wide one tile is."}
+                    controls={"Sets TileBoardProps.tileSize.width"}
+                >
                     <PageNumberField
                         value={getTileWidth}
                         min={TileBoardKnobs.MIN_TILE_SIZE}
@@ -253,7 +271,12 @@ export const TileBoardPage = () => {
                     />
                 </PageProp>
 
-                <PageProp key={"tileHeight"} label={"Tile height"} hint={"How tall one tile is."}>
+                <PageProp
+                    key={"tileHeight"}
+                    label={"Tile height"}
+                    hint={"How tall one tile is."}
+                    controls={"Sets TileBoardProps.tileSize.height"}
+                >
                     <PageNumberField
                         value={getTileHeight}
                         min={TileBoardKnobs.MIN_TILE_SIZE}
@@ -265,7 +288,12 @@ export const TileBoardPage = () => {
                     />
                 </PageProp>
 
-                <PageProp key={"gap"} label={"Gap"} hint={"The space left between tiles."}>
+                <PageProp
+                    key={"gap"}
+                    label={"Gap"}
+                    hint={"The space left between tiles."}
+                    controls={"Sets TileBoardProps.gap"}
+                >
                     <PageNumberField
                         value={getGap}
                         min={TileBoardKnobs.MIN_GAP}
@@ -283,6 +311,7 @@ export const TileBoardPage = () => {
                     hint={
                         "How the board is tiled. A shape lays that shape whole; the two halves cut each box corner to corner, from the top left down or the top right down, and the two quarters cut a square or a lozenge into four."
                     }
+                    controls={"Sets TileBoardProps.tiling"}
                 >
                     <PageSelectField
                         value={getTiling}
@@ -297,6 +326,7 @@ export const TileBoardPage = () => {
                     key={"hasShortFirstRow"}
                     label={"Start on the short row"}
                     hint={"Starts the offset rows at the top instead of the second row, for shapes that stagger."}
+                    controls={"Sets TileBoardProps.hasShortFirstRow"}
                 >
                     <PageCheckField
                         value={getHasShortFirstRow}
@@ -311,6 +341,7 @@ export const TileBoardPage = () => {
                     hint={
                         "How wide the top of the board is drawn, as a fraction of the bottom. Below 1 the board leans away, and a piece shrinks as it moves up it."
                     }
+                    controls={"Sets TileBoardProps.taper"}
                 >
                     <PageNumberField
                         value={getTaper}

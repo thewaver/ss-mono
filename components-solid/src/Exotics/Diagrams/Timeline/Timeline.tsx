@@ -17,6 +17,7 @@ import {
     type CarryMode,
     type CarryPlace,
     LiveAnnouncerUtils,
+    PanZoomUtils,
     TIMELINE_DEFAULTS,
     type TimelineEdge,
     type TimelineItemRenderProps,
@@ -33,6 +34,8 @@ import { SignalMirrorSolidUtils } from "../../../Abstracts/SignalMirror/SignalMi
 import { InteractionWrapper } from "../../../Primitives/InteractionWrapper/InteractionWrapper";
 import { access } from "../../../Utils/propUtils";
 import type { TimelineController, TimelineItemProps, TimelineProps } from "./TimelineSolid.types";
+
+const ACROSS_ONLY = { x: true, y: false };
 
 const TimelineItem = (props: TimelineItemProps) => {
     const getIsDisabled = () => props.flags.isDisabled ?? false;
@@ -77,15 +80,15 @@ export const Timeline = <T,>(props: TimelineProps<T>) => {
     const getRange = createMemo(() => access(props.range));
 
     const getMinViewExtent = createMemo(
-        () => access(props.minViewExtent) ?? TimelineUtils.getExtent(getRange()) * TimelineConst.MIN_VIEW_SHARE,
+        () => access(props.minViewExtent) ?? PanZoomUtils.getExtent(getRange()) * TimelineConst.MIN_VIEW_SHARE,
     );
 
     const viewSignal = SignalMirrorSolidUtils.createOptional(() => props.view, untrack(getRange));
 
-    const getView = createMemo(() => TimelineUtils.clampView(viewSignal[0](), getRange(), getMinViewExtent()));
+    const getView = createMemo(() => PanZoomUtils.clampSpan(viewSignal[0](), getRange(), getMinViewExtent()));
 
     const setView = (view: TimelineSpan) => {
-        const next = TimelineUtils.clampView(view, getRange(), getMinViewExtent());
+        const next = PanZoomUtils.clampSpan(view, getRange(), getMinViewExtent());
         const current = untrack(getView);
 
         if (next.start === current.start && next.end === current.end) return false;
@@ -190,7 +193,7 @@ export const Timeline = <T,>(props: TimelineProps<T>) => {
 
     const getSteps = createMemo(() =>
         TimelineUtils.chooseSteps(
-            TimelineUtils.getExtent(getView()),
+            PanZoomUtils.getExtent(getView()),
             getSize().width,
             access(props.minTickGap) ?? TIMELINE_DEFAULTS.minTickGap,
             access(props.tickSteps),
@@ -217,7 +220,7 @@ export const Timeline = <T,>(props: TimelineProps<T>) => {
         getView,
         zoomBy: (factor, focusRatio) =>
             setView(
-                TimelineUtils.zoomView(
+                PanZoomUtils.zoomSpan(
                     getView(),
                     factor,
                     focusRatio ?? TimelineConst.DEFAULT_FOCUS_RATIO,
@@ -225,8 +228,8 @@ export const Timeline = <T,>(props: TimelineProps<T>) => {
                     getMinViewExtent(),
                 ),
             ),
-        panBy: (ratio) => setView(TimelineUtils.panView(getView(), ratio, getRange())),
-        showSpan: (span) => setView(TimelineUtils.revealView(span, getView(), getRange())),
+        panBy: (ratio) => setView(PanZoomUtils.panSpan(getView(), ratio, getRange())),
+        showSpan: (span) => setView(PanZoomUtils.revealSpan(span, getView(), getRange())),
     };
 
     onMount(() => {
@@ -249,7 +252,7 @@ export const Timeline = <T,>(props: TimelineProps<T>) => {
 
         batch(() => {
             setFocusedIndex(index);
-            setView(TimelineUtils.revealView(getSpans()[index], getView(), getRange()));
+            setView(PanZoomUtils.revealSpan(getSpans()[index], getView(), getRange()));
         });
     };
 
@@ -265,9 +268,10 @@ export const Timeline = <T,>(props: TimelineProps<T>) => {
     const getIsZoomable = createMemo(() => (access(props.isZoomable) ?? true) && !getIsDisabled());
 
     const getPointerRatio = (clientX: number) =>
-        TimelineUtils.computePointerRatio(clientX, getRootRef()?.getBoundingClientRect());
-
-    const getWidth = () => getSize().width;
+        PanZoomUtils.computePointerRatio(
+            { x: clientX, y: TimelineConst.NOTHING },
+            getRootRef()?.getBoundingClientRect(),
+        ).x;
 
     const focusItem = (index: number) => {
         const element = itemRefs.get(index);
@@ -288,7 +292,7 @@ export const Timeline = <T,>(props: TimelineProps<T>) => {
         edgeGrabOffset =
             from === undefined
                 ? TimelineConst.NOTHING
-                : TimelineUtils.toValue(getPointerRatio(from.x), getView()) - span[edge];
+                : PanZoomUtils.toValue(getPointerRatio(from.x), getView()) - span[edge];
 
         setHeldEdge(edge);
 
@@ -311,7 +315,7 @@ export const Timeline = <T,>(props: TimelineProps<T>) => {
 
         const value = asSpan(place)[untrack(getHeldEdge)];
 
-        setView(TimelineUtils.revealView({ start: value, end: value }, getView(), getRange()));
+        setView(PanZoomUtils.revealSpan({ start: value, end: value }, getView(), getRange()));
     };
 
     const holdEdge = (edge: TimelineEdge) => {
@@ -328,7 +332,7 @@ export const Timeline = <T,>(props: TimelineProps<T>) => {
     };
 
     const handleEdgePointerDown = (index: number, edge: TimelineEdge, e: PointerEvent) => {
-        if (!TimelineUtils.getIsPrimaryPress(e)) return;
+        if (!PanZoomUtils.getIsPrimaryPress(e)) return;
 
         e.stopPropagation();
 
@@ -355,13 +359,14 @@ export const Timeline = <T,>(props: TimelineProps<T>) => {
         CarrierSolidUtils.end("cancel");
     };
 
-    const gestures = TimelineUtils.createGestureTracker({
+    const gestures = PanZoomUtils.createGestureTracker({
+        getAxes: () => ACROSS_ONLY,
         getIsPannable: () => getIsPannable(),
         getIsZoomable: () => getIsZoomable(),
-        getWidth,
-        computePointerRatio: getPointerRatio,
-        zoomBy: (factor, focusRatio) => controller.zoomBy(factor, focusRatio),
-        panBy: (ratio) => controller.panBy(ratio),
+        getSize,
+        computePointerRatio: (client) => ({ x: getPointerRatio(client.x), y: TimelineConst.DEFAULT_FOCUS_RATIO }),
+        zoomBy: (factor, focusRatio) => controller.zoomBy(factor, focusRatio.x),
+        panBy: (ratio) => controller.panBy(ratio.x),
     });
 
     const handleKeyDown = (e: KeyboardEvent) => {

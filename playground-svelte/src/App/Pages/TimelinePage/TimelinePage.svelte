@@ -108,6 +108,7 @@
 <PagePropsPanel scope={"global"}>
     <PageProp
         itemKey={"isPannable"}
+        controls={"Sets TimelineProps.isPannable"}
         label={"Drag to move"}
         hint={"Lets the timeline be dragged sideways to move through it."}
     >
@@ -122,6 +123,7 @@
 
     <PageProp
         itemKey={"isZoomable"}
+        controls={"Sets TimelineProps.isZoomable"}
         label={"Wheel and pinch to zoom"}
         hint={"Lets the wheel and a pinch change how much of the timeline is in view."}
     >
@@ -136,6 +138,7 @@
 
     <PageProp
         itemKey={"isDisabled"}
+        controls={"Sets TimelineProps.isDisabled"}
         label={"Disabled"}
         hint={"Turns the timeline off, so it neither pans, zooms nor picks."}
     >
@@ -150,6 +153,7 @@
 
     <PageProp
         itemKey={"picked"}
+        controls={"Writes the starting windows back to TimelineProps.view and the starting clips back to TimelineProps.items"}
         label={`Picked: ${picked}`}
         hint={"Puts the examples back to the item they started on, and clears whatever has been picked since."}
     >

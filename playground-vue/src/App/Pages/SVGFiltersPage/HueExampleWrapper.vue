@@ -22,7 +22,12 @@ const blue = shallowRef(SVGFilterKnobs.Hue.STARTING_CHANNEL);
     <HueExample v-bind="props" :deg="deg" :saturation="saturation" :r="red" :g="green" :b="blue" />
 
     <PageExampleKnobs>
-        <PageProp item-key="deg" label="Hue rotation" hint="How far every color is turned round the color wheel.">
+        <PageProp
+            item-key="deg"
+            controls="Sets SVGHueRotationFilterDefs.deg"
+            label="Hue rotation"
+            hint="How far every color is turned round the color wheel."
+        >
             <PageNumberField
                 :value="deg"
                 :min="SVGFilterKnobs.Hue.MIN_DEG"
@@ -35,6 +40,7 @@ const blue = shallowRef(SVGFilterKnobs.Hue.STARTING_CHANNEL);
 
         <PageProp
             item-key="saturation"
+            controls="Sets SVGSaturationFilterDefs.amount"
             label="Saturation"
             hint="How colorful the result is. 0 takes it to gray, above 1 pushes the colors harder."
         >
@@ -50,6 +56,7 @@ const blue = shallowRef(SVGFilterKnobs.Hue.STARTING_CHANNEL);
 
         <PageProp
             item-key="red"
+            controls="Sets SVGColorFilterDefs.r"
             label="Red"
             hint="How much the red channel is scaled on its own, after the hue and saturation have been applied."
         >
@@ -65,6 +72,7 @@ const blue = shallowRef(SVGFilterKnobs.Hue.STARTING_CHANNEL);
 
         <PageProp
             item-key="green"
+            controls="Sets SVGColorFilterDefs.g"
             label="Green"
             hint="How much the green channel is scaled on its own, after the hue and saturation have been applied."
         >
@@ -80,6 +88,7 @@ const blue = shallowRef(SVGFilterKnobs.Hue.STARTING_CHANNEL);
 
         <PageProp
             item-key="blue"
+            controls="Sets SVGColorFilterDefs.b"
             label="Blue"
             hint="How much the blue channel is scaled on its own, after the hue and saturation have been applied."
         >

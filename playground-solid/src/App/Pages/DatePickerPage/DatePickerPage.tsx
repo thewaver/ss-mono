@@ -93,6 +93,7 @@ export const DatePickerPage = () => {
                     key={"calendarId"}
                     label={"Calendar"}
                     hint={"Which calendar system the dates are read and written in, such as Gregorian or Islamic."}
+                    controls={"Sets DatePickerProps.calendar"}
                 >
                     <PageSelectField
                         value={getCalendarId}

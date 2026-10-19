@@ -29,6 +29,7 @@
 <PageExampleKnobs>
     <PageProp
         itemKey={"arrivalEffect"}
+        controls={"Picks the example keyframes sent to TypewriterProps.computeAnimationName"}
         label={"Arrival effect"}
         hint={"How each letter arrives. The keyframes are the Typewriter page's own, played by the painted letters."}
     >

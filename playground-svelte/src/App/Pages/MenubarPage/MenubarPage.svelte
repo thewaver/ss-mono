@@ -1,4 +1,5 @@
 <script lang="ts">
+    import { EXAMPLES_ONLY_PROP } from "@thewaver/ss-playground/App/PageComponents/Prop/Prop.const";
     import { MenubarKnobs } from "@thewaver/ss-playground/App/Knobs/Menubars.const";
 
     import type { ExampleDefs } from "../../PageComponents/Examples/Examples.types";
@@ -42,6 +43,7 @@
 <PagePropsPanel scope={"global"}>
     <PageProp
         itemKey={"barWidth"}
+        controls={EXAMPLES_ONLY_PROP}
         label={"Bar width (px)"}
         hint={"How wide the bar is. Narrow it far enough and words start moving into the overflow menu."}
     >

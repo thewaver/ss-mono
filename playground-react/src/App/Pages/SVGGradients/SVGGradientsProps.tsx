@@ -19,6 +19,9 @@ export const PageSVGGradientsProps = (props: Props) => {
                 itemKey={"paintKind"}
                 label={"Painted as"}
                 hint={"Whether the gradient paints the inside of the sample shape or only its stroke."}
+                controls={
+                    "Picks whether the example sends the gradient to ShapeProps.computeFillDefs or ShapeProps.computeStrokeDefs"
+                }
             >
                 <PageSelectField
                     value={controls.paintKind[0]}
@@ -32,6 +35,7 @@ export const PageSVGGradientsProps = (props: Props) => {
                 itemKey={"colors"}
                 label={"Colors"}
                 hint={"The colors the gradient is built from. Each sample uses as many of them as it needs."}
+                controls={"Sets SVGDefsBaseElementDefs.colors"}
             >
                 <div className={styles.colorList}>
                     {Object.keys(controls.colors).map((key) => (
@@ -49,6 +53,7 @@ export const PageSVGGradientsProps = (props: Props) => {
                 itemKey={"blurWidth"}
                 label={"Blur (px)"}
                 hint={"How far the paint is blurred outward, which is what gives it its glow."}
+                controls={"Sets SVGDefsBaseElementDefs.blurWidth"}
             >
                 <PageNumberField
                     value={controls.blurWidth[0]}

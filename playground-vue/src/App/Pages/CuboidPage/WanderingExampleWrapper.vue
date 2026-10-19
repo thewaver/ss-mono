@@ -34,6 +34,7 @@ const isTurning = shallowRef(CuboidKnobs.STARTING_IS_TURNING);
     <PageExampleKnobs>
         <PageProp
             item-key="isTurning"
+            controls="Switches on the example timer that writes CuboidProps.yaw and CuboidProps.pitch"
             label="Turns by itself"
             hint="Lets the box turn to a new face on its own, without anybody clicking it."
         >
@@ -46,6 +47,7 @@ const isTurning = shallowRef(CuboidKnobs.STARTING_IS_TURNING);
 
         <PageProp
             item-key="turnIntervalMs"
+            controls="Sets how often the example timer writes CuboidProps.yaw and CuboidProps.pitch"
             label="Turn every (ms)"
             hint="How long the box rests on a face before turning to the next one. It only applies while the box turns by itself."
         >

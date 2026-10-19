@@ -1,4 +1,5 @@
 <script lang="ts">
+    import { EXAMPLES_ONLY_PROP } from "@thewaver/ss-playground/App/PageComponents/Prop/Prop.const";
     import {
         MediaQueryMonitorSvelteUtils,
         PAINTED_TEXT_DEFAULTS,
@@ -167,6 +168,7 @@
             name={"fill"}
             label={"Fill"}
             hint={"What paints the letters: a flat color, a pattern, or a gradient that runs on a clock or follows the pointer. For hollow letters, paint them solid and make the background color transparent."}
+            propPath={"PaintedTextProps.computeFillDefs"}
         />
 
         <PagePropsDivider />
@@ -176,6 +178,7 @@
             name={"stroke"}
             label={"Stroke"}
             hint={"What paints the stroke around the letters: a flat color, a pattern, or a gradient that runs on a clock or follows the pointer."}
+            propPath={"PaintedTextProps.computeStrokeDefs"}
         />
 
         <PagePropsDivider />
@@ -183,6 +186,7 @@
         <PagePropsPanel scope={"global"}>
             <PageProp
                 itemKey={"strokeWidth"}
+                controls={"Sets PaintedTextProps.strokeWidth"}
                 label={"Stroke width (px)"}
                 hint={"How wide the stroke appears, whichever side of the letter's edge it sits on."}
             >
@@ -200,6 +204,7 @@
 
             <PageProp
                 itemKey={"strokeAlignment"}
+                controls={"Sets PaintedTextProps.strokeAlignment"}
                 label={"Stroke alignment"}
                 hint={"Where the stroke sits against the edge of each letter: outside keeps the letters their full shape, inside keeps the text its overall size, and center straddles the edge."}
             >
@@ -215,6 +220,7 @@
 
             <PageProp
                 itemKey={"colors"}
+                controls={"Sets the colors of the example paints sent to PaintedTextProps.computeFillDefs and PaintedTextProps.computeStrokeDefs"}
                 label={"Colors"}
                 hint={"The colors the fill and the stroke are built from. Each sample uses as many as it needs."}
             >
@@ -233,6 +239,7 @@
 
             <PageProp
                 itemKey={"blurWidth"}
+                controls={"Sets the blur of the example paints sent to PaintedTextProps.computeFillDefs and PaintedTextProps.computeStrokeDefs"}
                 label={"Blur (px)"}
                 hint={"How far the paint is blurred outward, which is what gives it its glow."}
             >
@@ -251,6 +258,7 @@
             {#if usesTiming}
                 <PageProp
                     itemKey={"animationDurationMs"}
+                    controls={"Sets the duration of the example paints sent to PaintedTextProps.computeFillDefs and PaintedTextProps.computeStrokeDefs"}
                     label={"Animation duration (ms)"}
                     hint={"How long one pass of the fill or stroke animation takes."}
                 >
@@ -268,6 +276,7 @@
 
                 <PageProp
                     itemKey={"iterationConfigKey"}
+                    controls={"Picks how the example paints repeat, sent to PaintedTextProps.computeFillDefs and PaintedTextProps.computeStrokeDefs"}
                     label={"Iteration Pattern"}
                     hint={"How the animation repeats: once, endlessly, or back and forth."}
                 >
@@ -285,6 +294,7 @@
             {#if usesPattern}
                 <PageProp
                     itemKey={"cellSize"}
+                    controls={"Sets the tile size of the example paints sent to PaintedTextProps.computeFillDefs and PaintedTextProps.computeStrokeDefs"}
                     label={"Pattern Cell Size (px)"}
                     hint={"How large one tile of a pattern is before it repeats."}
                 >
@@ -303,6 +313,7 @@
 
             <PageProp
                 itemKey={"width"}
+                controls={EXAMPLES_ONLY_PROP}
                 label={"Container width (px)"}
                 hint={"How wide the box holding the text is, which decides where the lines wrap."}
             >

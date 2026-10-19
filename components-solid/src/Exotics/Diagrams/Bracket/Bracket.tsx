@@ -2,32 +2,32 @@ import {
     For,
     Index,
     Show,
-    createComputed,
+    createEffect,
     createMemo,
-    createRenderEffect,
     createSignal,
     createUniqueId,
     on,
     onCleanup,
+    onMount,
     untrack,
 } from "solid-js";
 
 import {
     BRACKET_DEFAULTS,
     BRACKET_MISSING_PLACEMENT,
-    type BracketArrangement,
     type BracketNode,
     type BracketPlacement,
     BracketUtils,
     NavigatorUtils,
-    TreemapUtils,
+    PanZoomUtils,
     BracketStyles as styles,
 } from "@thewaver/ss-components";
 import { BracketConst } from "@thewaver/ss-components/internal";
 
+import { ElementObserverSolidUtils } from "../../../Abstracts/ElementObserver/ElementObserverSolid.utils";
+import { PanZoomSolidUtils } from "../../../Abstracts/PanZoom/PanZoomSolid.utils";
 import { SignalMirrorSolidUtils } from "../../../Abstracts/SignalMirror/SignalMirrorSolid.utils";
 import { access } from "../../../Utils/propUtils";
-import { accessStore } from "../../../Utils/storeUtils";
 import type { BracketProps } from "./BracketSolid.types";
 
 export const Bracket = <T,>(props: BracketProps<T>) => {
@@ -36,29 +36,13 @@ export const Bracket = <T,>(props: BracketProps<T>) => {
     const [getNodeRefs, setNodeRefs] = createSignal<Record<string, HTMLElement | undefined>>({});
     const [getLastFocusedId, setLastFocusedId] = createSignal<string>();
     const [getHasFocus, setHasFocus] = createSignal(false);
-    const [getGlideFrom, setGlideFrom] = createSignal<BracketArrangement>();
+    const [getWindowRef, setWindowRef] = createSignal<HTMLElement>();
 
-    const glideClock = TreemapUtils.createZoomClock();
-
-    let isStepping = false;
-
-    onCleanup(glideClock.stop);
-
-    const getProgress = accessStore(glideClock);
+    const getWindowSize = ElementObserverSolidUtils.createBorderBoxSizeObserver(getWindowRef);
 
     const getRootNode = createMemo(() => access(props.root));
 
     const getLayout = createMemo(() => BracketUtils.computeLayout(getRootNode()));
-
-    const getIsFamilyView = createMemo(() => (access(props.view) ?? BRACKET_DEFAULTS.view) === "family");
-
-    const getExtent = createMemo(() =>
-        getIsFamilyView() ? BracketUtils.computeFamilyExtent(getLayout()) : getLayout(),
-    );
-
-    const getTransitionDurationMs = createMemo(
-        () => access(props.transitionDurationMs) ?? BRACKET_DEFAULTS.transitionDurationMs,
-    );
 
     const getNodeSize = createMemo(() => access(props.nodeSize));
 
@@ -67,7 +51,7 @@ export const Bracket = <T,>(props: BracketProps<T>) => {
     const getRootSide = createMemo(() => access(props.rootSide) ?? BRACKET_DEFAULTS.rootSide);
 
     const getGeometry = createMemo(() =>
-        BracketUtils.computeGeometry(getExtent(), {
+        BracketUtils.computeGeometry(getLayout(), {
             nodeSize: getNodeSize(),
             layerGap: access(props.layerGap) ?? BRACKET_DEFAULTS.layerGap,
             crossGap: access(props.crossGap) ?? BRACKET_DEFAULTS.crossGap,
@@ -78,6 +62,48 @@ export const Bracket = <T,>(props: BracketProps<T>) => {
                 : BracketConst.NOTHING,
         }),
     );
+
+    const getBoardSize = createMemo(() => getGeometry().boardSize);
+
+    const getIsPannable = createMemo(() => access(props.isPannable) ?? BRACKET_DEFAULTS.isPannable);
+
+    const getIsZoomable = createMemo(() => access(props.isZoomable) ?? BRACKET_DEFAULTS.isZoomable);
+
+    const panZoom = PanZoomSolidUtils.create({
+        getSource: () => props.view,
+        getWindowRef,
+        getSize: getWindowSize,
+        getRange: () => BracketUtils.computeWholeView(getGeometry()),
+        getMinWidth: () => getWindowSize().width / (access(props.maxScale) ?? BRACKET_DEFAULTS.maxScale),
+        getDurationMs: () => access(props.transitionDurationMs) ?? BRACKET_DEFAULTS.transitionDurationMs,
+        getIsPannable,
+        getIsZoomable,
+        getCanCenterEdges: (requested) =>
+            (access(props.isFollowingFamily) ?? BRACKET_DEFAULTS.isFollowingFamily) &&
+            getWindowSize().width > BracketConst.NOTHING &&
+            BracketUtils.computeFamilyInView(
+                getLayout(),
+                getGeometry(),
+                requested,
+                getWindowSize().height / getWindowSize().width,
+                access(props.familyMargin) ?? BRACKET_DEFAULTS.familyMargin,
+            ) !== undefined,
+        onGestureMove: () => followView(),
+        onSettle: () => snapToFamily(),
+    });
+
+    onMount(() => {
+        props.onMount?.(panZoom.controller);
+    });
+
+    const getBoardTransform = createMemo(() => {
+        if (!panZoom.getIsActive()) return undefined;
+
+        const view = panZoom.getShownView();
+        const scale = PanZoomUtils.computeScale(view, getWindowSize().width);
+
+        return `scale(${scale}) translate(${-view.x.start}px, ${-view.y.start}px)`;
+    });
 
     const getFocusedId = createMemo(() => (getHasFocus() ? getLastFocusedId() : undefined));
 
@@ -90,58 +116,125 @@ export const Bracket = <T,>(props: BracketProps<T>) => {
 
     const getCurrentLayer = createMemo(() => BracketUtils.getFamilyLayer(getLayout(), getAnchorId()));
 
+    const getIsFollowingFamily = createMemo(
+        () => panZoom.getIsActive() && (access(props.isFollowingFamily) ?? BRACKET_DEFAULTS.isFollowingFamily),
+    );
+
+    const getFamilyMargin = createMemo(() => access(props.familyMargin) ?? BRACKET_DEFAULTS.familyMargin);
+
+    const computeFamilyInView = () =>
+        BracketUtils.computeFamilyInView(
+            getLayout(),
+            getGeometry(),
+            panZoom.getView(),
+            panZoom.getAspect(),
+            getFamilyMargin(),
+        );
+
+    const getIsFamilyFramed = createMemo(() => !getIsFollowingFamily() || computeFamilyInView() !== undefined);
+
+    let followedFamily: { anchorId: string | undefined } | undefined;
+
+    const setFamilyByAnchor = (anchorId: string | undefined) => {
+        setFamily(() => (anchorId === undefined ? undefined : BracketUtils.findNode(getRootNode(), anchorId)));
+    };
+
+    const frameFamily = (anchorId: string | undefined) => {
+        panZoom.setView(BracketUtils.computeFamilyView(getLayout(), getGeometry(), anchorId, getFamilyMargin()), false);
+    };
+
+    const followView = () => {
+        if (!untrack(getIsFollowingFamily)) return;
+
+        const inView = untrack(computeFamilyInView);
+
+        if (inView === undefined || inView.anchorId === untrack(getAnchorId)) return;
+
+        followedFamily = inView;
+        setFamilyByAnchor(inView.anchorId);
+    };
+
+    const snapToFamily = () => {
+        if (
+            !untrack(getIsFollowingFamily) ||
+            !(access(props.isSnappingToFamily) ?? BRACKET_DEFAULTS.isSnappingToFamily)
+        )
+            return;
+
+        const inView = untrack(computeFamilyInView);
+
+        if (inView === undefined) {
+            panZoom.setView(BracketUtils.computeWholeView(untrack(getGeometry)), false);
+
+            return;
+        }
+
+        followView();
+        frameFamily(inView.anchorId);
+    };
+
+    createEffect(
+        on(
+            [getGeometry, getWindowSize],
+            (_current, previous) => {
+                if (!untrack(getIsFollowingFamily) || previous === undefined) return;
+
+                const [geometry, size] = previous;
+
+                if (size.width <= BracketConst.NOTHING) return;
+
+                const wasFramed =
+                    BracketUtils.computeFamilyInView(
+                        untrack(getLayout),
+                        geometry,
+                        untrack(panZoom.getRequestedView),
+                        size.height / size.width,
+                        untrack(getFamilyMargin),
+                    ) !== undefined;
+
+                if (wasFramed) frameFamily(untrack(getAnchorId));
+            },
+            { defer: true },
+        ),
+    );
+
+    createEffect(
+        on(
+            getAnchorId,
+            (anchorId) => {
+                const followed = followedFamily;
+
+                followedFamily = undefined;
+
+                if (!untrack(getIsFollowingFamily) || (followed !== undefined && followed.anchorId === anchorId))
+                    return;
+
+                frameFamily(anchorId);
+            },
+            { defer: true },
+        ),
+    );
+
     const showFamilyOf = (id: string) => {
         const anchorId = BracketUtils.getFamilyAnchorId(id);
 
         setFamily(() => (anchorId === undefined ? undefined : BracketUtils.findNode(getRootNode(), anchorId)));
     };
 
-    const computeArrangement = (anchorId: string | undefined) =>
-        BracketUtils.computeFamilyArrangement(getLayout(), getGeometry(), getExtent(), anchorId);
-
-    const getTarget = createMemo(() =>
-        getIsFamilyView()
-            ? computeArrangement(getAnchorId())
-            : BracketUtils.computeTreeArrangement(getLayout(), getGeometry()),
-    );
-
-    const getShown = createMemo(() => BracketUtils.computeShownArrangement(getGlideFrom(), getTarget(), getProgress()));
-
-    let lastShown: BracketArrangement | undefined;
-
-    createRenderEffect(() => {
-        lastShown = getShown();
-    });
-
-    createComputed(
-        on(
-            [getAnchorId, getIsFamilyView],
-            ([, isFamilyView], previous) => {
-                const isViewChange = previous !== undefined && previous[1] !== isFamilyView;
-
-                if (!isFamilyView && !isViewChange) return;
-
-                setGlideFrom(lastShown);
-                glideClock.start(untrack(getTransitionDurationMs));
-            },
-            { defer: true },
-        ),
-    );
-
-    const getBoardSize = createMemo(() => getShown().boardSize);
-
-    const getInset = (placement: BracketPlacement) =>
-        getShown().nodes[placement.id] ?? BracketUtils.computeInset(getGeometry(), placement);
+    const getInset = (placement: BracketPlacement) => BracketUtils.computeInset(getGeometry(), placement);
 
     const getHeaderBox = (layer: number) => {
         const box = BracketUtils.computeHeaderBox(getGeometry(), layer);
-        const frame = getShown().headers[layer];
 
-        return frame ? { ...box, left: frame.left, top: frame.top } : box;
+        if (!panZoom.getIsActive()) return box;
+
+        const view = panZoom.getShownView();
+
+        return getGeometry().isHorizontal ? { ...box, top: view.y.start } : { ...box, left: view.x.start };
     };
 
     const getConnectors = createMemo(() =>
-        BracketUtils.computeConnectors(getLayout(), getGeometry(), boardId, getFocusedId(), getShown().nodes),
+        BracketUtils.computeConnectors(getLayout(), getGeometry(), boardId, getFocusedId()),
     );
 
     const getPlacementById = createMemo(
@@ -154,11 +247,7 @@ export const Bracket = <T,>(props: BracketProps<T>) => {
 
     const getStops = createMemo(() => getLayout().placements.filter((placement) => !placement.isDisabled));
 
-    const getUnfoldedStops = createMemo(() =>
-        getStops().filter((placement) => !getTarget()?.nodes[placement.id]?.isFolded),
-    );
-
-    const getRovingId = createMemo(() => BracketUtils.resolveRovingId(getUnfoldedStops(), getLastFocusedId()));
+    const getRovingId = createMemo(() => BracketUtils.resolveRovingId(getStops(), getLastFocusedId()));
 
     const getIsNode = (target: EventTarget | null) =>
         Object.values(getNodeRefs()).some((element) => element !== undefined && element === target);
@@ -168,6 +257,19 @@ export const Bracket = <T,>(props: BracketProps<T>) => {
 
         onCleanup(() => {
             setNodeRefs((previous) => ({ ...previous, [id]: undefined }));
+        });
+    };
+
+    const revealNode = (id: string) => {
+        const placement = getPlacementById().get(id);
+
+        if (!panZoom.getIsActive() || placement === undefined) return;
+
+        const inset = getInset(placement);
+
+        panZoom.controller.showArea({
+            x: { start: inset.left, end: inset.left + getNodeSize().width },
+            y: { start: inset.top, end: inset.top + getNodeSize().height },
         });
     };
 
@@ -199,18 +301,13 @@ export const Bracket = <T,>(props: BracketProps<T>) => {
         if (next === undefined) return;
 
         e.preventDefault();
-        isStepping = true;
-        showFamilyOf(next);
         setLastFocusedId(next);
-        getNodeRefs()[next]?.focus();
-        isStepping = false;
+        getNodeRefs()[next]?.focus({ preventScroll: panZoom.getIsActive() });
     };
 
     const renderItem = (id: string) => {
         const getPlacement = createMemo(() => getPlacementById().get(id) ?? BRACKET_MISSING_PLACEMENT);
         const getIsNodeDisabled = () => getPlacement().isDisabled;
-        const getFrame = () => getShown()?.nodes[id];
-        const getIsFolded = () => getTarget()?.nodes[id]?.isFolded ?? false;
 
         return (
             <li
@@ -220,11 +317,7 @@ export const Bracket = <T,>(props: BracketProps<T>) => {
                     top: `${getInset(getPlacement()).top}px`,
                     width: `${getNodeSize().width}px`,
                     height: `${getNodeSize().height}px`,
-                    opacity: getFrame() === undefined ? undefined : `${getFrame()!.opacity}`,
-                    visibility: BracketUtils.getIsFrameHidden(getFrame()) ? "hidden" : undefined,
                 }}
-                aria-hidden={getIsFolded() ? "true" : undefined}
-                inert={getIsFolded() || undefined}
             >
                 <div
                     ref={(element) => setNodeRef(id, element)}
@@ -236,9 +329,10 @@ export const Bracket = <T,>(props: BracketProps<T>) => {
                         showFamilyOf(id);
                         setLastFocusedId(id);
                         setHasFocus(true);
+                        revealNode(id);
                     }}
                     onBlur={(e) => {
-                        if (isStepping || getIsNode(e.relatedTarget)) return;
+                        if (getIsNode(e.relatedTarget)) return;
 
                         setHasFocus(false);
                     }}
@@ -262,10 +356,14 @@ export const Bracket = <T,>(props: BracketProps<T>) => {
         );
     };
 
-    return (
+    const renderBoard = () => (
         <div
             class={styles.bracketRoot}
-            style={{ width: `${getBoardSize().width}px`, height: `${getBoardSize().height}px` }}
+            style={{
+                width: `${getBoardSize().width}px`,
+                height: `${getBoardSize().height}px`,
+                transform: getBoardTransform(),
+            }}
             role={props.renderLayerHeader ? "group" : undefined}
             aria-label={props.renderLayerHeader ? access(props.ariaLabel) : undefined}
             onKeyDown={handleKeyDown}
@@ -275,21 +373,7 @@ export const Bracket = <T,>(props: BracketProps<T>) => {
                 viewBox={`0 0 ${getBoardSize().width} ${getBoardSize().height}`}
                 aria-hidden="true"
             >
-                <Index each={getConnectors()}>
-                    {(getDefs) => (
-                        <Show when={getShown()} fallback={<>{props.renderConnector?.(getDefs)}</>}>
-                            {(getArrangement) => (
-                                <g
-                                    style={{
-                                        opacity: `${BracketUtils.computeConnectorOpacity(getArrangement().nodes, getDefs())}`,
-                                    }}
-                                >
-                                    {props.renderConnector?.(getDefs)}
-                                </g>
-                            )}
-                        </Show>
-                    )}
-                </Index>
+                <Index each={getConnectors()}>{(getDefs) => <>{props.renderConnector?.(getDefs)}</>}</Index>
             </svg>
 
             <Show
@@ -310,36 +394,25 @@ export const Bracket = <T,>(props: BracketProps<T>) => {
                                     .map((placement) => placement.id),
                             );
 
-                            const getFrame = () => getShown()?.headers[layer];
-                            const getIsFolded = () => getTarget()?.headers[layer]?.isFolded ?? false;
-
                             return (
                                 <>
                                     <div
                                         id={headerId}
                                         class={styles.bracketLayerHeader}
                                         style={{
-                                            left: `${getHeaderBox(layer).left}px`,
-                                            top: `${getHeaderBox(layer).top}px`,
-                                            width: `${getHeaderBox(layer).width}px`,
-                                            height: `${getHeaderBox(layer).height}px`,
-                                            opacity: getFrame() === undefined ? undefined : `${getFrame()!.opacity}`,
-                                            visibility: BracketUtils.getIsFrameHidden(getFrame())
-                                                ? "hidden"
-                                                : undefined,
+                                            "left": `${getHeaderBox(layer).left}px`,
+                                            "top": `${getHeaderBox(layer).top}px`,
+                                            "width": `${getHeaderBox(layer).width}px`,
+                                            "height": `${getHeaderBox(layer).height}px`,
+                                            "pointer-events": panZoom.getIsActive() ? "none" : undefined,
                                         }}
-                                        aria-hidden={getIsFolded() ? "true" : undefined}
                                     >
                                         {getRenderLayerHeader()(layer, () => ({
-                                            isCurrent: getCurrentLayer() === layer,
+                                            isCurrent: getIsFamilyFramed() && getCurrentLayer() === layer,
                                         }))}
                                     </div>
 
-                                    <ul
-                                        class={styles.bracketList}
-                                        aria-labelledby={headerId}
-                                        aria-hidden={getIsFolded() ? "true" : undefined}
-                                    >
+                                    <ul class={styles.bracketList} aria-labelledby={headerId}>
                                         <For each={getLayerNodeIds()}>{renderItem}</For>
                                     </ul>
                                 </>
@@ -349,5 +422,29 @@ export const Bracket = <T,>(props: BracketProps<T>) => {
                 )}
             </Show>
         </div>
+    );
+
+    return (
+        <Show when={panZoom.getIsActive()} fallback={renderBoard()}>
+            <div
+                ref={setWindowRef}
+                class={styles.bracketWindow}
+                style={{
+                    "touch-action": getIsPannable() || getIsZoomable() ? "none" : undefined,
+                    "user-select": getIsPannable() ? "none" : undefined,
+                }}
+                onPointerDown={(e) => panZoom.gestures.press(e)}
+                onPointerMove={(e) => panZoom.gestures.move(e, e.currentTarget)}
+                onPointerUp={(e) => panZoom.gestures.release(e, e.currentTarget)}
+                onPointerCancel={(e) => panZoom.gestures.release(e, e.currentTarget)}
+                onWheel={(e) => panZoom.gestures.wheel(e)}
+                onScroll={(e) => {
+                    e.currentTarget.scrollLeft = BracketConst.NOTHING;
+                    e.currentTarget.scrollTop = BracketConst.NOTHING;
+                }}
+            >
+                {renderBoard()}
+            </div>
+        </Show>
     );
 };

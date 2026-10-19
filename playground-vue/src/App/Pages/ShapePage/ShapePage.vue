@@ -108,6 +108,7 @@ const examples: ExampleDefs[] = [
                 name="stroke"
                 label="Stroke"
                 hint="What paints the shape's stroke: a flat color, a pattern, or a gradient that runs on a clock or follows the pointer."
+                prop-path="ShapeProps.computeStrokeDefs"
             />
 
             <PagePropsDivider />
@@ -117,6 +118,7 @@ const examples: ExampleDefs[] = [
                 name="fill"
                 label="Fill"
                 hint="What paints the shape's inside: a flat color, a pattern, or a gradient that runs on a clock or follows the pointer."
+                prop-path="ShapeProps.computeFillDefs"
             />
 
             <PagePropsDivider />
@@ -125,6 +127,7 @@ const examples: ExampleDefs[] = [
                 <PageProp
                     v-if="usesPattern"
                     item-key="cellSize"
+                    controls="Sets the tile size of the example paints sent to ShapeProps.computeFillDefs and ShapeProps.computeStrokeDefs"
                     label="Pattern Cell Size (px)"
                     hint="How large one tile of a pattern is before it repeats."
                 >
@@ -140,6 +143,7 @@ const examples: ExampleDefs[] = [
 
                 <PageProp
                     item-key="colors"
+                    controls="Sets the colors of the example paints sent to ShapeProps.computeFillDefs and ShapeProps.computeStrokeDefs"
                     label="Colors"
                     hint="The colors the stroke, the fill and the page's own background are painted from."
                 >
@@ -154,7 +158,12 @@ const examples: ExampleDefs[] = [
                     </div>
                 </PageProp>
 
-                <PageProp item-key="strokeThicknessPx" label="Stroke Thickness (px)" hint="How thick the stroke is.">
+                <PageProp
+                    item-key="strokeThicknessPx"
+                    controls="Sets the thickness in the example's ShapeProps.strokeGeom"
+                    label="Stroke Thickness (px)"
+                    hint="How thick the stroke is."
+                >
                     <PageNumberField
                         :value="edgeThickness"
                         :min="ShapeKnobs.MIN_EDGE_THICKNESS"
@@ -167,6 +176,7 @@ const examples: ExampleDefs[] = [
 
                 <PageProp
                     item-key="blurWidth"
+                    controls="Sets the blur of the example paints sent to ShapeProps.computeFillDefs and ShapeProps.computeStrokeDefs"
                     label="Blur (px)"
                     hint="How far the stroke is blurred outward, which is what gives it its glow."
                 >
@@ -183,6 +193,7 @@ const examples: ExampleDefs[] = [
                 <PageProp
                     v-if="usesTiming"
                     item-key="animationDurationMs"
+                    controls="Sets the duration of the example paints sent to ShapeProps.computeFillDefs and ShapeProps.computeStrokeDefs"
                     label="Animation duration (ms)"
                     hint="How long one pass of the stroke or fill animation takes."
                 >
@@ -199,6 +210,7 @@ const examples: ExampleDefs[] = [
                 <PageProp
                     v-if="usesTiming"
                     item-key="iterationConfigKey"
+                    controls="Picks how the example paints repeat, sent to ShapeProps.computeFillDefs and ShapeProps.computeStrokeDefs"
                     label="Iteration Pattern"
                     hint="How the animation repeats: once, endlessly, or back and forth."
                 >

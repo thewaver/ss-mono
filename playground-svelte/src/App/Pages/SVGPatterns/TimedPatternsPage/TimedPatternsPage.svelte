@@ -56,7 +56,7 @@
 {/snippet}
 
 <PagePropsPanel scope={"global"}>
-    <PageProp itemKey={"configKey"} label={"Pattern"} hint={"Which repeating pattern is shown."}>
+    <PageProp itemKey={"configKey"} controls={"Picks the sample pattern the example sends to ShapeProps.computeFillDefs"} label={"Pattern"} hint={"Which repeating pattern is shown."}>
         <PageGroupedSelectField
             value={configKey}
             groups={TIMED_PATTERN_GROUPS}
@@ -76,6 +76,7 @@
 
     <PageProp
         itemKey={"animationDurationMs"}
+        controls={"Sets SVGAnimationDefs.animationDurationMs"}
         label={"Animation duration (ms)"}
         hint={"How long one pass of the pattern's animation takes."}
     >
@@ -91,6 +92,7 @@
 
     <PageProp
         itemKey={"iterationConfigKey"}
+        controls={"Picks the sample iteration that fills SVGAnimationDefs.animationIterationPatterns"}
         label={"Iteration Pattern"}
         hint={"How the animation repeats: once, endlessly, or back and forth."}
     >

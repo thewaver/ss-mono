@@ -115,6 +115,7 @@ const examples: ExampleDefs[] = [
     <PagePropsPanel scope="global">
         <PageProp
             item-key="gutterSize"
+            controls="Sets SplitPaneProps.gutterSize"
             label="Gutter size (px)"
             hint="How wide the draggable divider between two panes is."
         >
@@ -131,6 +132,7 @@ const examples: ExampleDefs[] = [
 
         <PageProp
             item-key="isDisabled"
+            controls="Sets SplitPaneProps.isDisabled"
             label="Disabled"
             hint="Turns the dividers off, so the panes keep the sizes they have."
         >
@@ -141,7 +143,12 @@ const examples: ExampleDefs[] = [
             />
         </PageProp>
 
-        <PageProp item-key="ratios" label="Ratios" hint="Puts the panes back to the sizes they started at.">
+        <PageProp
+            item-key="ratios"
+            controls="Writes the starting sizes back to SplitPaneProps.ratios"
+            label="Ratios"
+            hint="Puts the panes back to the sizes they started at."
+        >
             <Button @click="async () => reset()">
                 <template #renderContent="flags">
                     <PageButtonContent :flags="flags">Reset</PageButtonContent>

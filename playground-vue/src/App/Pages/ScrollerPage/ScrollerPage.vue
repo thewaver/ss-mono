@@ -67,7 +67,12 @@ const examples: ExampleDefs[] = [
 <template>
     <div :class="styles.root">
         <PagePropsPanel scope="global">
-            <PageProp item-key="itemCount" label="Item count" hint="How many items sit in the scrolling strip.">
+            <PageProp
+                item-key="itemCount"
+                controls="Sets the number of example items sent as Scroller's children"
+                label="Item count"
+                hint="How many items sit in the scrolling strip."
+            >
                 <PageNumberField
                     :value="itemCount"
                     :min="ScrollerKnobs.MIN_ITEM_COUNT"
@@ -80,6 +85,7 @@ const examples: ExampleDefs[] = [
 
             <PageProp
                 item-key="position"
+                controls="Sets ScrollerProps.progress, shown as a percentage"
                 label="First strip (%)"
                 hint="How far through its run the first strip is scrolled, as a percentage."
             >

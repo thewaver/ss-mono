@@ -2,6 +2,7 @@ export type NumberKnob = {
     kind: "number";
     label: string;
     hint: string;
+    controls: string;
     min: number;
     max: number;
     step: number;
@@ -11,6 +12,7 @@ export type CheckKnob = {
     kind: "check";
     label: string;
     hint: string;
+    controls: string;
 };
 
 export type Knob = NumberKnob | CheckKnob;

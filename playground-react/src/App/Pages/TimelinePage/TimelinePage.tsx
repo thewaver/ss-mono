@@ -92,6 +92,7 @@ export const TimelinePage = () => {
                     itemKey={"isPannable"}
                     label={"Drag to move"}
                     hint={"Lets the timeline be dragged sideways to move through it."}
+                    controls={"Sets TimelineProps.isPannable"}
                 >
                     <PageCheckField value={isPannable} ariaLabel={"Drag to move"} onChange={setIsPannable} />
                 </PageProp>
@@ -100,6 +101,7 @@ export const TimelinePage = () => {
                     itemKey={"isZoomable"}
                     label={"Wheel and pinch to zoom"}
                     hint={"Lets the wheel and a pinch change how much of the timeline is in view."}
+                    controls={"Sets TimelineProps.isZoomable"}
                 >
                     <PageCheckField value={isZoomable} ariaLabel={"Wheel and pinch to zoom"} onChange={setIsZoomable} />
                 </PageProp>
@@ -108,6 +110,7 @@ export const TimelinePage = () => {
                     itemKey={"isDisabled"}
                     label={"Disabled"}
                     hint={"Turns the timeline off, so it neither pans, zooms nor picks."}
+                    controls={"Sets TimelineProps.isDisabled"}
                 >
                     <PageCheckField value={isDisabled} ariaLabel={"Disabled"} onChange={setIsDisabled} />
                 </PageProp>
@@ -117,6 +120,9 @@ export const TimelinePage = () => {
                     label={`Picked: ${picked}`}
                     hint={
                         "Puts the examples back to the item they started on, and clears whatever has been picked since."
+                    }
+                    controls={
+                        "Writes the starting windows back to TimelineProps.view and the starting clips back to TimelineProps.items"
                     }
                 >
                     <Button

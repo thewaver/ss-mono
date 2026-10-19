@@ -134,7 +134,7 @@
 {/snippet}
 
 <PagePropsPanel scope={"global"}>
-    <PageProp itemKey={"pageCount"} label={"Page count"} hint={"How many pages there are to page through."}>
+    <PageProp itemKey={"pageCount"} controls={"Sets PaginatorProps.pageCount"} label={"Page count"} hint={"How many pages there are to page through."}>
         <PageNumberField
             value={pageCount}
             min={PaginatorKnobs.MIN_PAGE_COUNT}
@@ -150,6 +150,7 @@
 
     <PageProp
         itemKey={"siblingCount"}
+        controls={"Sets PaginatorProps.siblingCount"}
         label={"Sibling count"}
         hint={"How many pages are shown on each side of the current one before the run is broken by an ellipsis."}
     >
@@ -168,6 +169,7 @@
 
     <PageProp
         itemKey={"boundaryCount"}
+        controls={"Sets PaginatorProps.boundaryCount"}
         label={"Boundary count"}
         hint={"How many pages are always shown at each end, however far away the current page is."}
     >
@@ -186,6 +188,7 @@
 
     <PageProp
         itemKey={"isDisabled"}
+        controls={"Sets PaginatorProps.isDisabled"}
         label={"Disabled"}
         hint={"Turns the paginator off, so none of its pages or arrows respond."}
     >

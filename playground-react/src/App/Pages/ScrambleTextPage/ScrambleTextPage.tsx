@@ -88,6 +88,7 @@ export const ScrambleTextPage = () => {
                     hint={
                         "How long the text takes to go from all scrambled to fully settled. It is off while the visitor has asked for reduced motion."
                     }
+                    controls={"Sets ScrambleTextProps.settleDurationMs"}
                 >
                     <PageNumberField
                         value={settleDurationMs}
@@ -106,6 +107,7 @@ export const ScrambleTextPage = () => {
                     hint={
                         "How often an unsettled character is swapped for another. Shorter intervals make a busier churn."
                     }
+                    controls={"Sets ScrambleTextProps.scrambleIntervalMs"}
                 >
                     <PageNumberField
                         value={scrambleIntervalMs}
@@ -123,6 +125,7 @@ export const ScrambleTextPage = () => {
                     hint={
                         "Which characters the unsettled positions are drawn from. Matched churns a digit among digits and a letter among letters of its own case."
                     }
+                    controls={"Picks the sample glyph function sent to ScrambleTextProps.computeGlyphs"}
                 >
                     <PageSelectField
                         value={glyphSet}
@@ -138,6 +141,7 @@ export const ScrambleTextPage = () => {
                     hint={
                         "The order the characters settle in: left to right, from the middle out, at random, and so on."
                     }
+                    controls={"Picks the sample weight function sent to ScrambleTextProps.computeCharacterWeights"}
                 >
                     <PageSelectField
                         value={settleOrder}

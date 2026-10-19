@@ -68,7 +68,12 @@ const examples: ExampleDefs[] = [
 
 <template>
     <PagePropsPanel scope="global">
-        <PageProp item-key="shape" label="Die" hint="Which solid both examples are, from four faces to a hundred.">
+        <PageProp
+            item-key="shape"
+            controls="Picks the sample shape sent to DieProps.shape"
+            label="Die"
+            hint="Which solid both examples are, from four faces to a hundred."
+        >
             <PageSelectField
                 :value="shapeKey"
                 :values="DieShapes.SAMPLE_KEYS"
@@ -79,6 +84,7 @@ const examples: ExampleDefs[] = [
 
         <PageProp
             item-key="rollDurationMs"
+            controls="Sets DieProps.rollDurationMs"
             label="Roll duration (ms)"
             hint="How long a roll takes to land. It is off while the visitor has asked for reduced motion."
         >
@@ -93,7 +99,12 @@ const examples: ExampleDefs[] = [
             />
         </PageProp>
 
-        <PageProp item-key="tumbleCount" label="Tumbles" hint="How many whole turns a roll makes on its way.">
+        <PageProp
+            item-key="tumbleCount"
+            controls="Sets DieProps.tumbleCount"
+            label="Tumbles"
+            hint="How many whole turns a roll makes on its way."
+        >
             <PageNumberField
                 :value="tumbleCount"
                 :min="DieKnobs.MIN_TUMBLE_COUNT"

@@ -1,11 +1,11 @@
-import { EasingUtils, MathUtils, type Point2d } from "@thewaver/ss-utils";
+import type { Point2d } from "@thewaver/ss-utils";
 
+import type { PanZoomView } from "../../../Abstracts/PanZoom/PanZoom.types";
+import { PanZoomUtils } from "../../../Abstracts/PanZoom/PanZoom.utils";
 import type {
-    BracketArrangement,
     BracketBox,
     BracketConnectorDefs,
     BracketExtent,
-    BracketFrame,
     BracketGeometry,
     BracketGeometryOpts,
     BracketLayout,
@@ -26,12 +26,12 @@ const NOTHING = 0;
 const SINGLE = 1;
 /** Halfway, for centering a match between its two feeders. */
 const HALF = 0.5;
+/** How much wider than a framed family a view may be and still count as framing it, against rounding. */
+const FRAME_SLACK = 1.001;
 /** What separates a child's position from its parent's id. */
 const ID_SEPARATOR = ".";
 /** What `lastIndexOf` answers when the root's id has no separator in it. */
 const NOT_FOUND = -1;
-/** Fully drawn, as an opacity and as a glide's progress. */
-const SHOWN = 1;
 
 /**
  * Places the matches of a knockout bracket, and moves a cursor around it.
@@ -284,9 +284,6 @@ export namespace BracketUtils {
      * @param geometry What {@link computeGeometry} answered for it.
      * @param boardId Unique to this board in the document, so the connector ids it prefixes are too.
      * @param focusedId The match that holds focus, or `undefined` for none.
-     * @param frames Where each match is drawn right now, when that is not where the layout puts it — the family
-     * view's {@link computeShownArrangement}, mid-glide or settled. Left out, every match is where
-     * {@link computeInset} puts it.
      * @returns One connector per match that feeds another, running from the middle of the parent's edge facing its
      * children to the middle of the child's edge facing the root, so no line passes under a box. Each says whether
      * its child is on the route from the focused match to the final, and those on the route come last, so a renderer
@@ -297,13 +294,12 @@ export namespace BracketUtils {
         geometry: BracketGeometry,
         boardId: string,
         focusedId: string | undefined,
-        frames?: Record<string, BracketFrame>,
     ): BracketConnectorDefs[] => {
         const toPoint = (along: number, across: number): Point2d =>
             geometry.isHorizontal ? { x: along, y: across } : { x: across, y: along };
 
         const getAnchor = (placement: BracketPlacement, isTowardRoot: boolean) => {
-            const inset = frames?.[placement.id] ?? computeInset(geometry, placement);
+            const inset = computeInset(geometry, placement);
             const along = geometry.isHorizontal ? inset.left : inset.top;
             const across = geometry.isHorizontal ? inset.top : inset.left;
 
@@ -499,25 +495,6 @@ export namespace BracketUtils {
     };
 
     /**
-     * The family member a node outside the family is folded onto.
-     *
-     * A node folds onto the nearest member on its way to the root, so whatever hangs below the family's last row
-     * gathers on the node it feeds. A node with no member on its way to the root — the anchor's own parent, or a
-     * cousin's branch — gathers on the anchor, the top of the family.
-     *
-     * @param id The node to fold.
-     * @param anchorId What {@link getFamilyAnchorId} answered.
-     * @returns The node's own id when it is a member, which is where it stays.
-     */
-    export const getFoldId = (id: string, anchorId: string | undefined) => {
-        for (let current: string | undefined = id; current !== undefined; current = getParentId(current)) {
-            if (getIsInFamily(current, anchorId)) return current;
-        }
-
-        return anchorId ?? ROOT_ID;
-    };
-
-    /**
      * Places one family on its own, as though it were the whole tree.
      *
      * @param layout What {@link computeLayout} answered for the whole tree.
@@ -556,23 +533,30 @@ export namespace BracketUtils {
     };
 
     /**
-     * How many layers and rows the family view's board needs to hold every family the tree has.
+     * Every family the tree has, each named as {@link getFamilyAnchorId} names it.
      *
-     * Sizing the board for the largest family rather than the one showing keeps it the same size while focus moves,
+     * @param layout What {@link computeLayout} answered.
+     * @returns `undefined` for the root's own family, then the id of every match that has matches feeding it, in
+     * the layout's order.
+     */
+    export const getFamilyAnchorIds = (layout: BracketLayout): (string | undefined)[] => [
+        undefined,
+        ...layout.placements
+            .filter((placement) => placement.childIds.length > NOTHING)
+            .map((placement) => placement.id),
+    ];
+
+    /**
+     * How many layers and rows a board needs to hold every family the tree has, laid out on its own.
+     *
+     * Sizing a window for the largest family rather than the one showing keeps it the same size while focus moves,
      * so nothing on the page around it shifts.
      *
      * @param layout What {@link computeLayout} answered.
      * @returns The most layers and the most rows of any family, to hand to {@link computeGeometry}.
      */
-    export const computeFamilyExtent = (layout: BracketLayout): BracketExtent => {
-        const anchors = [
-            undefined,
-            ...layout.placements
-                .filter((placement) => placement.childIds.length > NOTHING)
-                .map((placement) => placement.id),
-        ];
-
-        return anchors.reduce<BracketExtent>(
+    export const computeFamilyExtent = (layout: BracketLayout): BracketExtent =>
+        getFamilyAnchorIds(layout).reduce<BracketExtent>(
             (extent, anchorId) => {
                 const family = computeFamilyLayout(layout, anchorId);
 
@@ -583,150 +567,108 @@ export namespace BracketUtils {
             },
             { layerCount: NOTHING, leafCount: NOTHING },
         );
-    };
 
     /**
-     * Where every node and every layer header sits while one family shows.
+     * The view that shows the whole board.
      *
-     * @param layout What {@link computeLayout} answered for the whole tree.
-     * @param geometry What {@link computeGeometry} answered for {@link computeFamilyExtent}'s extent.
-     * @param extent What {@link computeFamilyExtent} answered.
-     * @param anchorId What {@link getFamilyAnchorId} answered.
-     * @returns A frame per node id and one per layer of the whole tree. Members are drawn where
-     * {@link computeFamilyLayout} puts them, centered across the board when the family is narrower than it, and every
-     * other node sits on the member {@link getFoldId} names with nothing drawn. A header shows when its layer is one
-     * of the family's rows and sits over it; any other header sits over the nearest row, with nothing drawn.
+     * @param geometry What {@link computeGeometry} answered for the whole tree.
+     * @returns The board, corner to corner, in pixels, to hand to the board's `view`.
      */
-    export const computeFamilyArrangement = (
-        layout: BracketLayout,
-        geometry: BracketGeometry,
-        extent: BracketExtent,
-        anchorId: string | undefined,
-    ): BracketArrangement => {
-        const family = computeFamilyLayout(layout, anchorId);
-        const baseLayer = findPlacement(layout.placements, anchorId ?? ROOT_ID)?.layer ?? FIRST_LAYER;
-        const shift = (extent.leafCount - family.leafCount) * HALF;
-        const insets = new Map(
-            family.placements.map((placement) => [
-                placement.id,
-                computeInset(geometry, { ...placement, cross: placement.cross + shift }),
-            ]),
-        );
-        const lastSlot = Math.max(FIRST_LAYER, extent.layerCount - SINGLE);
-
-        const nodes = Object.fromEntries(
-            layout.placements.map((placement): [string, BracketFrame] => {
-                const inset = insets.get(placement.id);
-
-                if (inset) return [placement.id, { ...inset, opacity: SHOWN, isFolded: false }];
-
-                const fold = insets.get(getFoldId(placement.id, anchorId)) ?? { left: NOTHING, top: NOTHING };
-
-                return [placement.id, { ...fold, opacity: NOTHING, isFolded: true }];
-            }),
-        );
-
-        const headers = Array.from({ length: layout.layerCount }, (_unused, layer): BracketFrame => {
-            const slot = layer - baseLayer;
-            const isShown = slot >= FIRST_LAYER && slot < family.layerCount;
-            const box = computeHeaderBox(geometry, MathUtils.clamp(slot, FIRST_LAYER, lastSlot));
-
-            return { left: box.left, top: box.top, opacity: isShown ? SHOWN : NOTHING, isFolded: !isShown };
-        });
-
-        return { nodes, headers, boardSize: geometry.boardSize };
-    };
-
-    /**
-     * Where everything sits in the tree view, as an arrangement the family view can glide to and from.
-     *
-     * Every node and every header is drawn where the whole tree puts it, none folded, and the board is the whole
-     * tree's size. Handing the tree view an arrangement of its own is what lets a change of view glide like a change
-     * of family: from what is on screen to this, the board growing or shrinking with it.
-     *
-     * @param layout What {@link computeLayout} answered.
-     * @param geometry What {@link computeGeometry} answered for the whole layout.
-     */
-    export const computeTreeArrangement = (layout: BracketLayout, geometry: BracketGeometry): BracketArrangement => ({
-        nodes: Object.fromEntries(
-            layout.placements.map((placement): [string, BracketFrame] => [
-                placement.id,
-                { ...computeInset(geometry, placement), opacity: SHOWN, isFolded: false },
-            ]),
-        ),
-        headers: Array.from({ length: layout.layerCount }, (_unused, layer): BracketFrame => {
-            const box = computeHeaderBox(geometry, layer);
-
-            return { left: box.left, top: box.top, opacity: SHOWN, isFolded: false };
-        }),
-        boardSize: geometry.boardSize,
+    export const computeWholeView = (geometry: BracketGeometry): PanZoomView => ({
+        x: { start: NOTHING, end: geometry.boardSize.width },
+        y: { start: NOTHING, end: geometry.boardSize.height },
     });
 
     /**
-     * Where everything is drawn partway through a glide from one arrangement to another.
+     * The view that frames one family, centered on its middle round.
      *
-     * @param from Where the glide began — what was on screen at that moment, even if that was itself partway through
-     * another glide. `undefined` before the first glide.
-     * @param to What {@link computeFamilyArrangement} answered for the family now showing, or
-     * {@link computeTreeArrangement} for the tree view.
-     * @param progress How far through the glide's time, `0` to `1`.
-     * @returns Every frame moved and faded along the way between its two ends, and the board's size with them, slow
-     * at the start and the finish and fastest in the middle. Whether a frame is folded takes its new value as the glide starts, whatever its opacity
-     * is doing, so focus and a screen reader never wait for the picture. A frame `from` does not have appears where
-     * it is going. `to` itself once the glide has finished.
+     * Along the rounds, the view is centered on the family's middle row and reaches as far each way as the family's
+     * furthest row, so a family with no row on one side — the root's own, whose middle row is the final itself — is
+     * framed with the final in the middle and room to spare where a row would be. Across, it is the box around the
+     * family's members and, along the edge the layer headers run on, room for the strip, since the board pins its
+     * headers to the window's edge and a header would otherwise sit over the family's first match. The board fits
+     * whatever it is handed to its window's shape, so this is the least that has to show rather than exactly what
+     * will.
+     *
+     * @param layout What {@link computeLayout} answered for the whole tree.
+     * @param geometry What {@link computeGeometry} answered for the whole tree, with the options the board is given.
+     * @param anchorId What {@link getFamilyAnchorId} answered, or {@link findNodeId} for the board's `family`.
+     * @param margin The room left around the family, in pixels. None when left out.
+     * @returns The area, in board pixels, to hand to the board's `view`. A tree with no nodes answers the whole board.
      */
-    export const computeShownArrangement = (
-        from: BracketArrangement | undefined,
-        to: BracketArrangement,
-        progress: number,
-    ): BracketArrangement => {
-        if (from === undefined || progress >= SHOWN) return to;
+    export const computeFamilyView = (
+        layout: BracketLayout,
+        geometry: BracketGeometry,
+        anchorId: string | undefined,
+        margin = NOTHING,
+    ): PanZoomView => {
+        const members = layout.placements.filter((placement) => getIsInFamily(placement.id, anchorId));
 
-        const ratio = EasingUtils.easeInOutCubic(progress);
+        if (members.length === NOTHING) return computeWholeView(geometry);
 
-        const blend = (start: BracketFrame | undefined, end: BracketFrame): BracketFrame =>
-            start === undefined
-                ? end
-                : {
-                      left: MathUtils.lerp(start.left, end.left, ratio),
-                      top: MathUtils.lerp(start.top, end.top, ratio),
-                      opacity: MathUtils.lerp(start.opacity, end.opacity, ratio),
-                      isFolded: end.isFolded,
-                  };
-
-        return {
-            nodes: Object.fromEntries(
-                Object.entries(to.nodes).map(([id, frame]) => [id, blend(from.nodes[id], frame)]),
-            ),
-            headers: to.headers.map((frame, layer) => blend(from.headers[layer], frame)),
-            boardSize: {
-                width: MathUtils.lerp(from.boardSize.width, to.boardSize.width, ratio),
-                height: MathUtils.lerp(from.boardSize.height, to.boardSize.height, ratio),
-            },
+        const alongs = members.map((placement) => getLayerStart(geometry, placement.layer));
+        const acrosses = members.map((placement) => getCrossStart(geometry, placement));
+        const middle = getLayerStart(geometry, getFamilyLayer(layout, anchorId)) + geometry.layerExtent * HALF;
+        const reach =
+            Math.max(middle - Math.min(...alongs), Math.max(...alongs) + geometry.layerExtent - middle) + margin;
+        const along = { start: middle - reach, end: middle + reach };
+        const across = {
+            start: Math.min(...acrosses) - margin - geometry.headerExtent,
+            end: Math.max(...acrosses) + geometry.crossExtent + margin,
         };
+
+        return geometry.isHorizontal ? { x: along, y: across } : { x: across, y: along };
     };
 
     /**
-     * Whether a node or a header is taken out of the picture altogether, rather than merely faded.
+     * Which family a view is showing, if any.
      *
-     * A frame unfolding starts its glide fully faded, and the moment the glide starts is the moment the keyboard
-     * moves focus onto it, so hiding everything faded would leave focus with nowhere to land. Only a frame that
-     * is folded and has finished fading out is hidden.
+     * The family whose own view, from {@link computeFamilyView}, has its middle nearest the middle of this one. So the
+     * family follows whatever the window is centered on, at any zoom — a window over the final shows the final's
+     * family however far in it is zoomed, and one over a pair of entrants shows that pair's — and a view framed on a
+     * family reads back as that family. A view wider than every family's own view, fitted to the window's shape, is
+     * framing no family at all.
      *
-     * @param frame Where it is drawn right now, or `undefined` outside the family view.
-     * @returns `true` only for a folded frame drawn at no opacity at all.
+     * @param layout What {@link computeLayout} answered for the whole tree.
+     * @param geometry What {@link computeGeometry} answered for the whole tree, with the options the board is given.
+     * @param view The view, in board pixels. It is fitted to the window's shape first, as the board would fit it.
+     * @param aspect The window's height divided by its width.
+     * @param margin The room each family is framed with, as {@link computeFamilyView} takes it.
+     * @returns The family in view, named as {@link getFamilyAnchorId} names it, or `undefined` when the view is wider
+     * than any family.
      */
-    export const getIsFrameHidden = (frame: BracketFrame | undefined) =>
-        frame !== undefined && frame.isFolded && frame.opacity <= NOTHING;
+    export const computeFamilyInView = (
+        layout: BracketLayout,
+        geometry: BracketGeometry,
+        view: PanZoomView,
+        aspect: number,
+        margin = NOTHING,
+    ): { anchorId: string | undefined } | undefined => {
+        const shown = PanZoomUtils.fitView(view, aspect);
+        const families = getFamilyAnchorIds(layout).map((anchorId) => ({
+            anchorId,
+            view: PanZoomUtils.fitView(computeFamilyView(layout, geometry, anchorId, margin), aspect),
+        }));
+        const widest = Math.max(...families.map((family) => PanZoomUtils.getExtent(family.view.x)));
 
-    /**
-     * How much of a connector to draw while the family view folds and unfolds.
-     *
-     * @param frames Where each node is drawn right now.
-     * @param connector The connector.
-     * @returns The fainter of its two ends' opacities, so a line is only fully drawn between two members, and is
-     * gone whenever either end is folded away. A node with no frame counts as fully drawn.
-     */
-    export const computeConnectorOpacity = (frames: Record<string, BracketFrame>, connector: BracketConnectorDefs) =>
-        Math.min(frames[connector.parentId]?.opacity ?? SHOWN, frames[connector.childId]?.opacity ?? SHOWN);
+        if (PanZoomUtils.getExtent(shown.x) > widest * FRAME_SLACK) return undefined;
+
+        const getMiddle = (area: PanZoomView) => ({
+            x: (area.x.start + area.x.end) * HALF,
+            y: (area.y.start + area.y.end) * HALF,
+        });
+        const middle = getMiddle(shown);
+
+        const getDistance = (area: PanZoomView) => {
+            const center = getMiddle(area);
+
+            return Math.hypot(center.x - middle.x, center.y - middle.y);
+        };
+
+        const nearest = families.reduce((found, family) =>
+            getDistance(family.view) < getDistance(found.view) ? family : found,
+        );
+
+        return { anchorId: nearest.anchorId };
+    };
 }

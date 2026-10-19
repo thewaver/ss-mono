@@ -71,6 +71,7 @@ export const RangeCalendarPage = () => {
                     key={"calendarId"}
                     label={"Calendar"}
                     hint={"Which calendar system the dates are read and written in, such as Gregorian or Islamic."}
+                    controls={"Picks the calendar the example puts on the dates sent to RangeCalendarProps.value"}
                 >
                     <PageSelectField
                         value={getCalendarId}
@@ -85,6 +86,7 @@ export const RangeCalendarPage = () => {
                     key={"weekStartsOn"}
                     label={"Week starts on"}
                     hint={"Which day begins a week, which decides the order of the column headings."}
+                    controls={"Sets RangeCalendarProps.weekStartsOn"}
                 >
                     <PageSelectField
                         value={getWeekStartsOn}

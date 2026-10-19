@@ -22,6 +22,39 @@ const getOutermostSvg = (el: SVGElement) => {
     return svg;
 };
 
+/** The drawings waiting to have their clocks set to the page's, once the current render is over. */
+const drawingsToClock = new Set<SVGSVGElement>();
+
+/** The frame each drawing's clock was last set to, so a frame sets each one once however many animations ask. */
+const clockedFrames = new WeakMap<SVGSVGElement, number>();
+
+/**
+ * Sets a drawing's clock to the page's once the current render is over, however many of its animations ask.
+ *
+ * Setting a drawing's clock makes the browser work out every animation in it again, so a paint rebuilt with hundreds
+ * of animations, each asking for itself, cost the square of their number: one call per drawing does the same job.
+ */
+const clockToPage = (svg: SVGSVGElement) => {
+    if (drawingsToClock.size === 0)
+        queueMicrotask(() => {
+            const seconds = performance.now() / MS_PER_SECOND;
+
+            for (const drawing of drawingsToClock) drawing.setCurrentTime(seconds);
+
+            drawingsToClock.clear();
+        });
+
+    drawingsToClock.add(svg);
+};
+
+/** Sets a drawing's clock to a frame's time, once per drawing and frame however many of its animations ask. */
+const clockToFrame = (svg: SVGSVGElement, frameMs: number) => {
+    if (clockedFrames.get(svg) === frameMs) return;
+
+    clockedFrames.set(svg, frameMs);
+    svg.setCurrentTime(frameMs / MS_PER_SECOND);
+};
+
 export namespace SVGAnimationDefsUtils {
     /**
      * Rewrites a pattern that loops to itself as a pair that alternate.
@@ -109,7 +142,9 @@ export namespace SVGAnimationDefsUtils {
      * element that has not yet been laid out cannot be told to start, and it is asked for as a delay from
      * now rather than as a moment on the document's clock. An element written to begin at time zero rather than
      * `"indefinite"` — a loop with no start of its own ({@link getIsPageClocked}) — is not begun at all: its drawing's
-     * clock is set to the page's instead, once as soon as it is in the page and again on the next frame. The first is
+     * clock is set to the page's instead, once as soon as it is in the page and again on the next frame — once per
+     * drawing however many of its animations attach together, since every setting works out the whole drawing again,
+     * and a paint with hundreds of animations otherwise took seconds to rebuild. The first is
      * what keeps it seamless: browsers hold a newly added animation at its first frame until something moves the clock
      * it runs on, so one added after the page has worked out its animations for a frame — a paint rebuilt when its box
      * is resized — would otherwise be drawn for that frame at its start. The second lines it up with the frame's own
@@ -153,14 +188,18 @@ export namespace SVGAnimationDefsUtils {
                 queueMicrotask(() => {
                     if (!isAttached || !el.isConnected || el.getAttribute("begin") === INDEFINITE_BEGIN) return;
 
-                    getOutermostSvg(el)?.setCurrentTime(performance.now() / MS_PER_SECOND);
+                    const svg = getOutermostSvg(el);
+
+                    if (svg) clockToPage(svg);
                 });
 
                 const frameId = requestAnimationFrame((frameMs) => {
                     if (!el.isConnected) return;
 
                     if (el.getAttribute("begin") !== INDEFINITE_BEGIN) {
-                        getOutermostSvg(el)?.setCurrentTime(frameMs / MS_PER_SECOND);
+                        const svg = getOutermostSvg(el);
+
+                        if (svg) clockToFrame(svg, frameMs);
 
                         return;
                     }

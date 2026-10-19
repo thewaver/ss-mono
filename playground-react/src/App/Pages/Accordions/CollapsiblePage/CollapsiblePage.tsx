@@ -65,6 +65,7 @@ export const CollapsiblePage = () => {
                     itemKey={"transitionDurationMs"}
                     label={"Transition duration (ms)"}
                     hint={"How long the panel takes to open and close. At 0 it opens and closes at once."}
+                    controls={"Sets CollapsibleProps.transitionDurationMs"}
                 >
                     <PageNumberField
                         value={transitionDurationMs}

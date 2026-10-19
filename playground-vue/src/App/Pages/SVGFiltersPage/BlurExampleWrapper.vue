@@ -20,6 +20,7 @@ const stdDeviation = shallowRef(SVGFilterKnobs.Blur.STARTING_DEVIATION);
     <PageExampleKnobs>
         <PageProp
             item-key="stdDeviation"
+            controls="Sets SVGGaussianBlurFilterDefs.stdDeviation"
             label="Std deviation"
             hint="How far the blur reaches. 0 leaves the picture sharp."
         >

@@ -20,6 +20,7 @@
 
 <PageProp
     itemKey={"paintKind"}
+    controls={"Picks whether the example sends the gradient to ShapeProps.computeFillDefs or ShapeProps.computeStrokeDefs"}
     label={"Painted as"}
     hint={"Whether the gradient paints the inside of the sample shape or only its stroke."}
 >
@@ -33,6 +34,7 @@
 
 <PageProp
     itemKey={"colors"}
+    controls={"Sets SVGDefsBaseElementDefs.colors"}
     label={"Colors"}
     hint={"The colors the gradient is built from. Each sample uses as many of them as it needs."}
 >
@@ -49,6 +51,7 @@
 
 <PageProp
     itemKey={"blurWidth"}
+    controls={"Sets SVGDefsBaseElementDefs.blurWidth"}
     label={"Blur (px)"}
     hint={"How far the paint is blurred outward, which is what gives it its glow."}
 >

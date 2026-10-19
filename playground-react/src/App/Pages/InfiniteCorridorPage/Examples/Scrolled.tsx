@@ -59,6 +59,7 @@ export const ScrolledExample = (props: Props) => {
                     hint={
                         "How far the box scrolls to walk one lap of the corridor, in heights of the box. Longer is slower."
                     }
+                    controls={"Sets how long the example scroll runway that drives InfiniteCorridorProps.progress is"}
                 >
                     <PageNumberField
                         value={scrollLength}

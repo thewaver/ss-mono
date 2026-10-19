@@ -2,6 +2,7 @@
 import { computed, shallowRef } from "vue";
 
 import { Button } from "@thewaver/ss-components-vue";
+import { EXAMPLES_ONLY_PROP } from "@thewaver/ss-playground/App/PageComponents/Prop/Prop.const";
 import {
     NOTHING_TO_RESET,
     SAMPLE_SELECTOR_ALONE,
@@ -55,6 +56,7 @@ const resetAll = () => {
         <PageProp
             v-if="resets.length > leastToReset"
             item-key="resetPanel"
+            :controls="EXAMPLES_ONLY_PROP"
             label="These controls"
             hint="Puts every control in this panel back to the value it started at."
         >

@@ -37,7 +37,12 @@ const sources = computed(() => MosaicImages.SAMPLE_SOURCES.slice(0, props.itemCo
     </PageMeasureBox>
 
     <PageExampleKnobs>
-        <PageProp item-key="shapeKey" label="Target shape" hint="The contour the tiles are packed into.">
+        <PageProp
+            item-key="shapeKey"
+            controls="Picks the sample shape sent to ImageMosaicProps.targetAspectRatio"
+            label="Target shape"
+            hint="The contour the tiles are packed into."
+        >
             <PageSelectField
                 :value="shapeKey"
                 :values="MosaicImages.SAMPLE_SHAPE_KEYS"
@@ -49,6 +54,7 @@ const sources = computed(() => MosaicImages.SAMPLE_SOURCES.slice(0, props.itemCo
 
         <PageProp
             item-key="isDecorated"
+            controls="Decides whether the example ImageMosaicProps.renderItem wraps each image"
             label="Wrapped"
             hint="Puts each tile in a frame of its own, so the packing can be told apart from the pictures in it."
         >

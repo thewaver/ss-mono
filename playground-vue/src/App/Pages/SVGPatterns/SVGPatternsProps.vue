@@ -18,7 +18,12 @@ const colorKeys = () => Object.keys(props.controls.colors) as (keyof SVGDefsColo
 </script>
 
 <template>
-    <PageProp item-key="cellSize" label="Cell Size (px)" hint="How large one cell of the pattern is.">
+    <PageProp
+        item-key="cellSize"
+        controls="Sets TimedPatternElementDefs.cellSize or TrackedPatternElementDefs.cellSize"
+        label="Cell Size (px)"
+        hint="How large one cell of the pattern is."
+    >
         <PageNumberField
             :value="controls.cellSize.value"
             :min="SVGPatternKnobs.MIN_CELL_SIZE"
@@ -31,6 +36,7 @@ const colorKeys = () => Object.keys(props.controls.colors) as (keyof SVGDefsColo
 
     <PageProp
         item-key="colors"
+        controls="Sets SVGDefsBaseElementDefs.colors"
         label="Colors"
         hint="The colors the pattern is drawn from. Each sample uses as many of them as it needs."
     >
@@ -47,6 +53,7 @@ const colorKeys = () => Object.keys(props.controls.colors) as (keyof SVGDefsColo
 
     <PageProp
         item-key="blurWidth"
+        controls="Sets SVGDefsBaseElementDefs.blurWidth"
         label="Blur (px)"
         hint="How far the pattern is blurred outward, which is what gives it its glow."
     >

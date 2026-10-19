@@ -71,6 +71,7 @@ const examples: ExampleDefs[] = [
         <PagePropsPanel scope="global">
             <PageProp
                 item-key="removeOtherTags"
+                controls="Sets RichTextProps.removeOtherTags"
                 label="Remove other tags"
                 hint="Strips any tag the editor was not told to keep, rather than leaving it in the markup untouched."
             >

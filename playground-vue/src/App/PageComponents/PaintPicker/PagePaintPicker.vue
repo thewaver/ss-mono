@@ -17,7 +17,12 @@ const sampleKind = computed(() => (paint.value.kind === "solid" ? undefined : pa
 
 <template>
     <PagePropsPanel scope="sample">
-        <PageProp :item-key="`${name}Kind`" :label="label" :hint="hint">
+        <PageProp
+            :item-key="`${name}Kind`"
+            :label="label"
+            :hint="hint"
+            :controls="`Picks the kind of paint the example sends to ${propPath}`"
+        >
             <PageSelectField
                 :value="paint.kind"
                 :values="PAINT_KINDS"
@@ -33,6 +38,7 @@ const sampleKind = computed(() => (paint.value.kind === "solid" ? undefined : pa
             :item-key="`${name}Key`"
             :label="PAINT_KIND_LABELS[sampleKind]"
             hint="Which sample paints it. Choosing one brings its own knobs with it."
+            :controls="`Picks the sample the example sends to ${propPath}`"
         >
             <PageGroupedSelectField
                 :value="paint.key"

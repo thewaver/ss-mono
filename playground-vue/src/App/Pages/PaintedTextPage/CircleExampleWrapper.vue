@@ -46,6 +46,7 @@ const exampleProps = computed((): PaintedTextBoxedExampleProps => {
     <PageExampleKnobs>
         <PageProp
             item-key="radius"
+            controls="Sets the radius of the example circle sent to PaintedTextProps.path"
             label="Radius (px)"
             hint="How far the circle the text runs round is from its center."
         >
@@ -61,6 +62,7 @@ const exampleProps = computed((): PaintedTextBoxedExampleProps => {
 
         <PageProp
             item-key="lapDurationMs"
+            controls="Sets PaintedTextProps.lapDurationMs"
             label="Lap duration (ms)"
             hint="How long the text takes to slide once round the whole length of its path."
         >
@@ -76,6 +78,7 @@ const exampleProps = computed((): PaintedTextBoxedExampleProps => {
 
         <PageProp
             item-key="isFittedToPath"
+            controls="Sets PaintedTextProps.isFittedToPath"
             label="Fit to the circle"
             hint="Stretches or squeezes the spacing between the letters so the text goes round the circle exactly once, meeting its own start."
         >

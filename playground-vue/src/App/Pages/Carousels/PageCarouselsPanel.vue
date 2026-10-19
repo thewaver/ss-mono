@@ -26,6 +26,7 @@ const controls = props.controls;
         <PageProp
             v-if="hasPlacement"
             item-key="placement"
+            controls="Picks the sample placement sent to CarouselProps.placement"
             label="Placement"
             hint="The rule that says where each slide is drawn from how far it is from the one showing: a strip, a drum, cover flow and the rest."
         >
@@ -38,7 +39,12 @@ const controls = props.controls;
             />
         </PageProp>
 
-        <PageProp item-key="slideCount" label="Slide count" hint="How many slides the carousel holds.">
+        <PageProp
+            item-key="slideCount"
+            controls="Sets the length of the slice of example slides sent to CarouselProps.slides"
+            label="Slide count"
+            hint="How many slides the carousel holds."
+        >
             <PageNumberField
                 :value="controls.slideCount.value"
                 :min="CarouselKnobs.MIN_SLIDE_COUNT"
@@ -53,6 +59,7 @@ const controls = props.controls;
         <PageProp
             v-if="hasDelay"
             item-key="delayMs"
+            controls="Sets CarouselProps.autoplayDelayMs"
             label="Transition delay (ms)"
             hint="How long a slide is held before the carousel moves to the next one on its own."
         >
@@ -69,6 +76,7 @@ const controls = props.controls;
 
         <PageProp
             item-key="transitionDurationMs"
+            controls="Sets CarouselProps.transitionDurationMs"
             label="Transition duration (ms)"
             hint="How long the move from one slide to the next takes. At 0 the carousel jumps straight there."
         >
@@ -85,6 +93,7 @@ const controls = props.controls;
 
         <PageProp
             item-key="orientation"
+            controls="Sets CarouselProps.orientation"
             label="Orientation"
             hint="Which way the slides run, and so which way the arrows and the arrow keys move."
         >
@@ -101,6 +110,7 @@ const controls = props.controls;
         <PageProp
             v-if="hasLooping"
             item-key="isLooping"
+            controls="Sets CarouselProps.isLooping"
             label="Looping"
             hint="Whether stepping past the last slide comes round to the first. Off, the end controls are disabled, a swipe past an end springs back, and rotation stops on the last slide."
         >
@@ -113,6 +123,7 @@ const controls = props.controls;
 
         <PageProp
             item-key="isDisabled"
+            controls="Sets CarouselProps.isDisabled"
             label="Disabled"
             hint="Turns the carousel off, so neither its controls nor its swipes do anything."
         >

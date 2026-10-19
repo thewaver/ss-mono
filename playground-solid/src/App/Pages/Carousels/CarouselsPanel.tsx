@@ -33,6 +33,7 @@ export const PageCarouselsPanel = (props: Props) => {
                     hint={
                         "The rule that says where each slide is drawn from how far it is from the one showing: a strip, a drum, cover flow and the rest."
                     }
+                    controls={"Picks the sample placement sent to CarouselProps.placement"}
                 >
                     <PageSelectField
                         value={controls.placement[0]}
@@ -44,7 +45,12 @@ export const PageCarouselsPanel = (props: Props) => {
                 </PageProp>
             </Show>
 
-            <PageProp key={"slideCount"} label={"Slide count"} hint={"How many slides the carousel holds."}>
+            <PageProp
+                key={"slideCount"}
+                label={"Slide count"}
+                hint={"How many slides the carousel holds."}
+                controls={"Sets the length of the slice of example slides sent to CarouselProps.slides"}
+            >
                 <PageNumberField
                     value={controls.slideCount[0]}
                     min={CarouselKnobs.MIN_SLIDE_COUNT}
@@ -61,6 +67,7 @@ export const PageCarouselsPanel = (props: Props) => {
                     key={"delayMs"}
                     label={"Transition delay (ms)"}
                     hint={"How long a slide is held before the carousel moves to the next one on its own."}
+                    controls={"Sets CarouselProps.autoplayDelayMs"}
                 >
                     <PageNumberField
                         value={controls.delay[0]}
@@ -78,6 +85,7 @@ export const PageCarouselsPanel = (props: Props) => {
                 key={"transitionDurationMs"}
                 label={"Transition duration (ms)"}
                 hint={"How long the move from one slide to the next takes. At 0 the carousel jumps straight there."}
+                controls={"Sets CarouselProps.transitionDurationMs"}
             >
                 <PageNumberField
                     value={controls.transitionDuration[0]}
@@ -94,6 +102,7 @@ export const PageCarouselsPanel = (props: Props) => {
                 key={"orientation"}
                 label={"Orientation"}
                 hint={"Which way the slides run, and so which way the arrows and the arrow keys move."}
+                controls={"Sets CarouselProps.orientation"}
             >
                 <PageSelectField
                     value={controls.orientation[0]}
@@ -112,6 +121,7 @@ export const PageCarouselsPanel = (props: Props) => {
                     hint={
                         "Whether stepping past the last slide comes round to the first. Off, the end controls are disabled, a swipe past an end springs back, and rotation stops on the last slide."
                     }
+                    controls={"Sets CarouselProps.isLooping"}
                 >
                     <PageCheckField
                         value={controls.isLooping[0]}
@@ -125,6 +135,7 @@ export const PageCarouselsPanel = (props: Props) => {
                 key={"isDisabled"}
                 label={"Disabled"}
                 hint={"Turns the carousel off, so neither its controls nor its swipes do anything."}
+                controls={"Sets CarouselProps.isDisabled"}
             >
                 <PageCheckField
                     value={controls.isDisabled[0]}

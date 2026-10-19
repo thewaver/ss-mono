@@ -61,6 +61,7 @@ const layout = computed(() => props.toLayout(spinDegrees.value));
     <PageExampleKnobs>
         <PageProp
             item-key="scrollLength"
+            controls="Sets how long the example scroll runway that drives InfiniteCorridorProps.progress is"
             label="Scroll length"
             hint="How far the box scrolls to walk one lap of the corridor, in heights of the box. Longer is slower."
         >

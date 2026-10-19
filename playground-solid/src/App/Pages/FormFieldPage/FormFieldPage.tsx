@@ -74,6 +74,7 @@ export const FormFieldPage = () => {
                     key={"orientation"}
                     label={"Orientation"}
                     hint={"Whether the label sits above the control or beside it."}
+                    controls={"Sets FormFieldProps.orientation"}
                 >
                     <PageSelectField
                         value={getOrientation}
@@ -88,6 +89,7 @@ export const FormFieldPage = () => {
                     key={"gap"}
                     label={"Gap (px)"}
                     hint={"The space between the label, the control and the message."}
+                    controls={"Sets FormFieldProps.gap"}
                 >
                     <PageNumberField
                         value={getGap}
@@ -104,6 +106,7 @@ export const FormFieldPage = () => {
                     key={"message"}
                     label={"Message"}
                     hint={"The line shown under the control. Leave it empty and no line is rendered at all."}
+                    controls={"Sets FormFieldProps.message"}
                 >
                     <PageTextField
                         value={getMessage}
@@ -120,6 +123,7 @@ export const FormFieldPage = () => {
                     hint={
                         "Puts the field into its error look and reads the message out as the error rather than as help."
                     }
+                    controls={"Sets FormFieldProps.hasError"}
                 >
                     <PageCheckField value={getHasError} ariaLabel={"In error"} onChange={setHasError} />
                 </PageProp>

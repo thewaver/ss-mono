@@ -81,6 +81,7 @@ const setLameExponent = (index: number, value: number) => {
 <template>
     <PageProp
         item-key="shapeKind"
+        controls="Picks the example contour sent to ShapeProps.computePoints"
         label="Shape"
         hint="The contour the shape is cut to, which also decides how many corners the corner fields offer."
     >
@@ -94,6 +95,7 @@ const setLameExponent = (index: number, value: number) => {
 
     <PageProp
         item-key="hasIndividualCorners"
+        controls="Writes the corner fields below into every entry of ShapeProps.joinRadii and ShapeProps.lameExponents at once, or one entry each"
         label="Individual corner settings"
         hint="Opens one field per corner instead of one field driving all of them together."
     >
@@ -106,6 +108,7 @@ const setLameExponent = (index: number, value: number) => {
 
     <PageProp
         item-key="jointRadiiPx"
+        controls="Sets ShapeProps.joinRadii"
         label="Joint Radii (px)"
         hint="How far each corner is rounded. With individual corners off, the first field drives them all."
     >
@@ -127,6 +130,7 @@ const setLameExponent = (index: number, value: number) => {
 
     <PageProp
         item-key="lameExponent"
+        controls="Sets ShapeProps.lameExponents"
         label="Lamé Exponent"
         hint="How square or how pinched each rounded corner is: 2 is a circular round, higher is squarer, lower is pinched inward."
     >

@@ -2,6 +2,7 @@ import type { ParentProps } from "solid-js";
 import { Show, createSignal } from "solid-js";
 
 import { Button, access } from "@thewaver/ss-components-solid";
+import { EXAMPLES_ONLY_PROP } from "@thewaver/ss-playground/App/PageComponents/Prop/Prop.const";
 import {
     NOTHING_TO_RESET,
     SAMPLE_SELECTOR_ALONE,
@@ -49,6 +50,7 @@ export const PagePropsPanel = (props: ParentProps<PagePropsPanelProps>) => {
                             key={"resetPanel"}
                             label={"These controls"}
                             hint={"Puts every control in this panel back to the value it started at."}
+                            controls={EXAMPLES_ONLY_PROP}
                         >
                             <Button
                                 renderContent={(getFlags) => (

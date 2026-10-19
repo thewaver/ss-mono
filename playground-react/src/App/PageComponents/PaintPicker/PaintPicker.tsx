@@ -48,7 +48,12 @@ export const PagePaintPicker = (props: PagePaintPickerProps) => {
 
     return (
         <PagePropsPanel scope={"sample"}>
-            <PageProp itemKey={`${props.name}Kind`} label={props.label} hint={props.hint}>
+            <PageProp
+                itemKey={`${props.name}Kind`}
+                label={props.label}
+                hint={props.hint}
+                controls={`Picks the kind of paint the example sends to ${props.propPath}`}
+            >
                 <PageSelectField
                     value={kind}
                     values={PAINT_KINDS}
@@ -64,6 +69,7 @@ export const PagePaintPicker = (props: PagePaintPickerProps) => {
                     itemKey={`${props.name}Key`}
                     label={PAINT_KIND_LABELS[kind]}
                     hint={"Which sample paints it. Choosing one brings its own knobs with it."}
+                    controls={`Picks the sample the example sends to ${props.propPath}`}
                 >
                     <PageGroupedSelectField
                         value={key}

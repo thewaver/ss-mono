@@ -122,6 +122,7 @@ export const SplitPanePage = () => {
                     itemKey={"gutterSize"}
                     label={"Gutter size (px)"}
                     hint={"How wide the draggable divider between two panes is."}
+                    controls={"Sets SplitPaneProps.gutterSize"}
                 >
                     <PageNumberField
                         value={gutterSize}
@@ -138,6 +139,7 @@ export const SplitPanePage = () => {
                     itemKey={"isDisabled"}
                     label={"Disabled"}
                     hint={"Turns the dividers off, so the panes keep the sizes they have."}
+                    controls={"Sets SplitPaneProps.isDisabled"}
                 >
                     <PageCheckField value={isDisabled} ariaLabel={"Disabled"} onChange={setIsDisabled} />
                 </PageProp>
@@ -146,6 +148,7 @@ export const SplitPanePage = () => {
                     itemKey={"ratios"}
                     label={"Ratios"}
                     hint={"Puts the panes back to the sizes they started at."}
+                    controls={"Writes the starting sizes back to SplitPaneProps.ratios"}
                 >
                     <Button
                         renderContent={(flags) => <PageButtonContent flags={flags}>Reset</PageButtonContent>}

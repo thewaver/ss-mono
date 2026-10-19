@@ -59,6 +59,7 @@ export const MorphTextPage = () => {
                     hint={
                         "How long one word takes to melt into the next. It is off while the visitor has asked for reduced motion."
                     }
+                    controls={"Sets MorphTextProps.morphDurationMs"}
                 >
                     <PageNumberField
                         value={getMorphDurationMs}
@@ -77,6 +78,7 @@ export const MorphTextPage = () => {
                     hint={
                         "The most either word is blurred while they cross. More blur melts more of the letters together."
                     }
+                    controls={"Sets MorphTextProps.maxBlurPx"}
                 >
                     <PageNumberField
                         value={getMaxBlurPx}

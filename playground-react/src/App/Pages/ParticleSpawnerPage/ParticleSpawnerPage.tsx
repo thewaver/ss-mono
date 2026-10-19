@@ -2,6 +2,7 @@ import { useMemo, useState } from "react";
 
 import { PARTICLE_SPAWNER_DEFAULTS } from "@thewaver/ss-components-react";
 import { ParticleSpawnerKnobs } from "@thewaver/ss-playground/App/Knobs/ParticleSpawners.const";
+import { EXAMPLES_ONLY_PROP } from "@thewaver/ss-playground/App/PageComponents/Prop/Prop.const";
 import {
     BOX_HEIGHT,
     BOX_WIDTH,
@@ -233,6 +234,9 @@ export const ParticleSpawnerPage = () => {
                         hint={
                             "The path a particle takes from where it starts to where it ends. Choosing one brings its own knobs with it."
                         }
+                        controls={
+                            "Picks the example's travel path function sent to ParticleSpawnerProps.computeParticlePos"
+                        }
                     >
                         <PageSelectField
                             value={travelPatternKey}
@@ -264,6 +268,7 @@ export const ParticleSpawnerPage = () => {
                         itemKey={"particleCount"}
                         label={"Particle count"}
                         hint={"How many particles are sent on each round."}
+                        controls={"Sets ParticleSpawnerProps.particleCount"}
                     >
                         <PageNumberField
                             value={particleCount}
@@ -280,6 +285,7 @@ export const ParticleSpawnerPage = () => {
                         itemKey={"travelDurationMs"}
                         label={"Travel (ms)"}
                         hint={"How long one particle takes to walk its path."}
+                        controls={"Sets ParticleSpawnerProps.travelDurationMs"}
                     >
                         <PageNumberField
                             value={travelDurationMs}
@@ -296,6 +302,7 @@ export const ParticleSpawnerPage = () => {
                         itemKey={"restDurationMs"}
                         label={"Rest duration (ms)"}
                         hint={"How long a particle stays put at the end of its path before it disappears."}
+                        controls={"Sets ParticleSpawnerProps.restDurationMs"}
                     >
                         <PageNumberField
                             value={restDurationMs}
@@ -314,6 +321,7 @@ export const ParticleSpawnerPage = () => {
                         hint={
                             "How long each particle waits after the one before it sets off, which is what staggers them."
                         }
+                        controls={"Sets ParticleSpawnerProps.spawnDelayMs"}
                     >
                         <PageNumberField
                             value={spawnDelayMs}
@@ -332,6 +340,9 @@ export const ParticleSpawnerPage = () => {
                         hint={
                             "How the rounds follow each other: in bursts of three with a pause, one at a time with a pause, or without any pause at all."
                         }
+                        controls={
+                            "Picks the example's list of rounds sent to ParticleSpawnerProps.spawnIterationPatterns"
+                        }
                     >
                         <PageSelectField
                             value={iterationPatternKey}
@@ -347,6 +358,9 @@ export const ParticleSpawnerPage = () => {
                         label={"Overshoot (%)"}
                         hint={
                             "How far a particle runs past its destination before coming back to it. 0 stops it dead on target."
+                        }
+                        controls={
+                            "Sets how far the example's travel path runs past its end, sent to ParticleSpawnerProps.computeParticlePos"
                         }
                     >
                         <PageNumberField
@@ -366,6 +380,7 @@ export const ParticleSpawnerPage = () => {
                         hint={
                             "Takes the target markers out of sight while leaving them where they are, so the particles still land on them."
                         }
+                        controls={EXAMPLES_ONLY_PROP}
                     >
                         <PageCheckField
                             value={areTargetsHidden}
@@ -378,6 +393,9 @@ export const ParticleSpawnerPage = () => {
                         itemKey={"travelEasing"}
                         label={"Travel easing"}
                         hint={"The speed curve a particle follows along its path."}
+                        controls={
+                            "Picks the speed curve of the example's travel path, sent to ParticleSpawnerProps.computeParticlePos"
+                        }
                     >
                         <PageSelectField
                             value={travelEasingKey}

@@ -3,6 +3,7 @@ import type { ParentProps } from "solid-js";
 
 import { ElementObserverSolidUtils, TOOLBAR_DEFAULTS } from "@thewaver/ss-components-solid";
 import { ToolbarKnobs } from "@thewaver/ss-playground/App/Knobs/Toolbars.const";
+import { EXAMPLES_ONLY_PROP } from "@thewaver/ss-playground/App/PageComponents/Prop/Prop.const";
 import {
     EXAMPLES_ROOT,
     EXAMPLE_NAMES,
@@ -131,6 +132,7 @@ export const ToolbarPage = () => {
                     key={"barWidth"}
                     label={"Bar width (px)"}
                     hint={"How wide the bar is. Narrow it far enough and items start moving into the overflow menu."}
+                    controls={EXAMPLES_ONLY_PROP}
                 >
                     <PageNumberField
                         value={getBarWidth}
@@ -142,7 +144,12 @@ export const ToolbarPage = () => {
                     />
                 </PageProp>
 
-                <PageProp key={"gap"} label={"Gap (px)"} hint={"The space left between items on the bar."}>
+                <PageProp
+                    key={"gap"}
+                    label={"Gap (px)"}
+                    hint={"The space left between items on the bar."}
+                    controls={"Sets ToolbarProps.gap"}
+                >
                     <PageNumberField
                         value={getGap}
                         min={ToolbarKnobs.MIN_GAP}

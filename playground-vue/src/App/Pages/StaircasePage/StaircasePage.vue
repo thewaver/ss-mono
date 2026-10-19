@@ -49,7 +49,12 @@ const examples: ExampleDefs[] = [
 
 <template>
     <PagePropsPanel scope="global">
-        <PageProp item-key="stepCount" label="Steps" hint="How many steps the staircase holds.">
+        <PageProp
+            item-key="stepCount"
+            controls="Sets the length of the slice of example steps sent to StaircaseProps.steps"
+            label="Steps"
+            hint="How many steps the staircase holds."
+        >
             <PageNumberField
                 :value="stepCount"
                 :min="StaircaseKnobs.MIN_STEP_COUNT"
@@ -61,7 +66,12 @@ const examples: ExampleDefs[] = [
             />
         </PageProp>
 
-        <PageProp item-key="indent" label="Indent (px)" hint="How far one step is set in from the one before it.">
+        <PageProp
+            item-key="indent"
+            controls="Sets StaircaseProps.indent"
+            label="Indent (px)"
+            hint="How far one step is set in from the one before it."
+        >
             <PageNumberField
                 :value="indent"
                 :min="StaircaseKnobs.MIN_INDENT"
@@ -73,7 +83,12 @@ const examples: ExampleDefs[] = [
             />
         </PageProp>
 
-        <PageProp item-key="gap" label="Gap (px)" hint="The space between one step and the next.">
+        <PageProp
+            item-key="gap"
+            controls="Sets StaircaseProps.gap"
+            label="Gap (px)"
+            hint="The space between one step and the next."
+        >
             <PageNumberField
                 :value="gap"
                 :min="StaircaseKnobs.MIN_GAP"
@@ -85,7 +100,12 @@ const examples: ExampleDefs[] = [
             />
         </PageProp>
 
-        <PageProp item-key="dir" label="Direction" hint="Which way the staircase runs.">
+        <PageProp
+            item-key="dir"
+            controls="Sets StaircaseProps.dir"
+            label="Direction"
+            hint="Which way the staircase runs."
+        >
             <PageSelectField
                 :value="dir"
                 :values="STAIRCASE_DIRS"
@@ -97,6 +117,7 @@ const examples: ExampleDefs[] = [
 
         <PageProp
             item-key="indentKey"
+            controls="Picks the sample indent function sent to StaircaseProps.computeStepIndent"
             label="Indent function"
             hint="How the indent grows down the run: evenly, faster and faster, or in and out again."
         >

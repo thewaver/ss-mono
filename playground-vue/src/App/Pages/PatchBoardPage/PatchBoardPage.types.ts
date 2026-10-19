@@ -1,4 +1,4 @@
-import type { PatchBoardLink, PatchBoardNode } from "@thewaver/ss-components-vue";
+import type { PanZoomView, PatchBoardLink, PatchBoardNode } from "@thewaver/ss-components-vue";
 import type { PatchDevice } from "@thewaver/ss-playground/App/Pages/PatchBoardPage/PatchDevice.types";
 
 export type PatchBoardExampleProps = {
@@ -15,7 +15,7 @@ export type PatchBoardExampleProps = {
     "onMove": (nodeKey: string) => void;
 };
 
-export type PatchBoardZoomExampleProps = PatchBoardExampleProps & {
-    zoom: number;
-    onZoomChange: (zoom: number) => void;
+export type PatchBoardViewExampleProps = PatchBoardExampleProps & {
+    "view": PanZoomView;
+    "onUpdate:view"?: (view: PanZoomView) => void;
 };

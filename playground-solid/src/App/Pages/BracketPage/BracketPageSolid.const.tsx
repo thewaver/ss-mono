@@ -23,12 +23,9 @@ export const computeBracketLayerHeader = (names: string[]) => (layer: number) =>
     <div class={styles.layerHeader}>{names[layer]}</div>
 );
 
-export const computeBracketPinnedLayerHeader =
+export const computeBracketCurrentLayerHeader =
     (names: string[]) => (layer: number, getState: Accessor<BracketLayerHeaderState>) => (
-        <div
-            class={styles.layerHeader}
-            classList={{ [styles.pinnedLayerHeader]: true, [styles.layerHeaderCurrent]: getState().isCurrent }}
-        >
+        <div class={styles.layerHeader} classList={{ [styles.layerHeaderCurrent]: getState().isCurrent }}>
             {names[layer]}
         </div>
     );

@@ -3,6 +3,7 @@ import { computed, shallowRef } from "vue";
 
 import { TOOLBAR_DEFAULTS } from "@thewaver/ss-components-vue";
 import { ToolbarKnobs } from "@thewaver/ss-playground/App/Knobs/Toolbars.const";
+import { EXAMPLES_ONLY_PROP } from "@thewaver/ss-playground/App/PageComponents/Prop/Prop.const";
 import { NOTHING_RUN } from "@thewaver/ss-playground/App/Pages/ToolbarPage/ToolbarPage.const";
 import {
     EXAMPLES_ROOT,
@@ -85,6 +86,7 @@ const examples: ExampleDefs[] = [
     <PagePropsPanel scope="global">
         <PageProp
             item-key="barWidth"
+            :controls="EXAMPLES_ONLY_PROP"
             label="Bar width (px)"
             hint="How wide the bar is. Narrow it far enough and items start moving into the overflow menu."
         >
@@ -98,7 +100,12 @@ const examples: ExampleDefs[] = [
             />
         </PageProp>
 
-        <PageProp item-key="gap" label="Gap (px)" hint="The space left between items on the bar.">
+        <PageProp
+            item-key="gap"
+            controls="Sets ToolbarProps.gap"
+            label="Gap (px)"
+            hint="The space left between items on the bar."
+        >
             <PageNumberField
                 :value="gap"
                 :min="ToolbarKnobs.MIN_GAP"
