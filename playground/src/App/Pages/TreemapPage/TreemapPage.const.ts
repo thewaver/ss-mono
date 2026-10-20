@@ -6,6 +6,16 @@ const branch = (value: string, ...children: TreemapNode<string>[]): TreemapNode<
 
 export const formatLines = (lines: number) => `${lines.toLocaleString("en-US")} lines`;
 
+export const EXAMPLE_NAMES = {
+    library: "This library, by lines of code",
+};
+
+export const EXAMPLES_ROOT = "/src/App/Pages/TreemapPage/Examples";
+
+export const NO_MOTION_DURATION_MS = 0;
+
+export const WIDE_SPAN = 2;
+
 export const LIBRARY: TreemapNode<string> = branch(
     "src",
     branch(
