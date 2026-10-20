@@ -2,10 +2,10 @@ import { useState } from "react";
 
 import { MediaQueryMonitorReactUtils, TREEMAP_DEFAULTS, TreemapUtils } from "@thewaver/ss-components-react";
 import { TreemapKnobs } from "@thewaver/ss-playground/App/Knobs/Treemaps.const";
+import { LIBRARY } from "@thewaver/ss-playground/App/LibraryTree.generated";
 import {
     EXAMPLES_ROOT,
     EXAMPLE_NAMES,
-    LIBRARY,
     NO_MOTION_DURATION_MS,
     WIDE_SPAN,
 } from "@thewaver/ss-playground/App/Pages/TreemapPage/TreemapPage.const";

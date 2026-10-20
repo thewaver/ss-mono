@@ -26,10 +26,16 @@ const SOURCE_MODULES: Record<string, () => Promise<string>> = {
 
 const getFileName = (path: string) => path.slice(path.lastIndexOf("/") + 1);
 
-const getStem = (path: string) => path.replace(/\.tsx?$/, "").replace(/\.(const|css|types|utils)$/, "");
+const getStem = (path: string) => path.replace(/\.[^/]*$/, "");
+
+const getKindRank = (kind: string) => {
+    const rank = FILE_KIND_ORDER.indexOf(kind);
+
+    return rank === -1 ? FILE_KIND_ORDER.length : rank;
+};
 
 const byFileKind = (stem: string) => (first: string, second: string) =>
-    FILE_KIND_ORDER.indexOf(first.slice(stem.length)) - FILE_KIND_ORDER.indexOf(second.slice(stem.length));
+    getKindRank(first.slice(stem.length)) - getKindRank(second.slice(stem.length));
 
 const isTraversable = (path: string) => path.startsWith(STYLED_COMPONENTS_ROOT);
 

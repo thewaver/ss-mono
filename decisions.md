@@ -501,6 +501,19 @@ while, then retired whole (_"The gallery is gone"_, above).
   same library. Counting the core alone moved the arcs far enough that `sunburst.spec.ts`'s click on "Exotics" landed
   on the middle button. It is plain JavaScript, `libraryTree.mjs`, because the Node in use does not run TypeScript
   files, and the commit hook runs it.
+- **The library tree is a file of its own, `playground/src/App/LibraryTree.generated.ts`, generated whole and
+  exporting `LIBRARY` and nothing else.** The user's call, after a commit lost Treemap's page constants. The tree used to be
+  the top of `TreemapPage.const.ts`, with hand-written constants below it that the script had to find and carry
+  over; on a checkout with Windows line endings it failed to find them and wrote the file without them, silently,
+  and a fix that put them above the tree lost them again because the script rewrites that part from its template.
+  A file the script owns outright has nothing to preserve, so nothing hand-written may ever be added to it. The
+  label formatter, `formatLines`, sits beside it in `LibraryTree.utils.ts`, and Treemap's page constants stay in
+  `TreemapPage.const.ts`; no page imports from another page's folder for the tree. The file says so twice, both the
+  user's call: the `.generated` suffix, which no other file in the repo carries, and a one-line comment at its top
+  naming the script and warning that changes are wiped on commit. That comment is the one sanctioned exception to
+  `playground/src`'s comment ban; the script writes it, so it cannot be removed by hand for long anyway. JSON was
+  weighed and turned down: it would have needed `resolveJsonModule` in five configs, lost the `TreemapNode<string>`
+  annotation, and dropped out of the source view, which follows only script files.
 - **A Playground case that only one framework can pass exists once per framework, tagged `@solid` or `@react`**,
   the user's call over teaching a spec to branch on the framework. Each Playground's projects leave out the other's
   tag. The two so far: the docs table's type text (`JSX.Element` against `ReactNode`), and `Label`'s warning (`getAriaLabel` against `ariaLabel`). The no-frames placement is not one of
@@ -15262,8 +15275,11 @@ them for free. See _"Samples live in the library"_.
 settled rule says the imported file plus its `.css.ts` and `.types.ts` siblings. Applied literally to
 `SVGDefs.const.ts` it produces a tab called `SVGDefs.const` whose types sibling would have to be
 `SVGDefs.const.types.ts`, plus a second tab called `SVGDefs` for the types file the const imports — two tabs
-for one folder. The stem is therefore the file name with `.const`, `.utils`, `.types` or `.css` removed, so one
-`SVGDefs` tab carries the const, the types and the utils. **What is displayed is still only what the settled
+for one folder. The stem is therefore the file name up to its first dot, so one `SVGDefs` tab carries the const,
+the types and the utils. It used to strip only `.const`, `.utils`, `.types` and `.css`, and the user widened it to
+any suffix after `LibraryTree.generated.ts` came out as a tab of its own beside `LibraryTree`: a list of known
+suffixes breaks again the day a `MyThing.factory.ts` appears, and it already split the double-suffixed files
+(`X.context.types.ts`, `X.utils.svelte.ts`) away from their component. **What is displayed is still only what the settled
 rule allows**: a file appears either because it was imported or because it is the stem's `.types.ts` or
 `.css.ts`. A `.utils.ts` nobody imported does not appear.
 
@@ -15273,7 +15289,10 @@ order they were found, which is the order the example imports them — and that 
 sorter, not to anybody's intent: when the React port moved the page stylesheets into the shared `playground/`
 package, their imports changed from relative to package-named, sorted ahead of the types, and every listing
 flipped without a line of the source view changing. Chosen by the user over loosening the spec to accept any
-order, so that a listing reads the same whatever the imports do.
+order, so that a listing reads the same whatever the imports do. **A suffix not on that list goes last**, after
+the `.css`, in all four Playgrounds — the user's call once the any-suffix stem made such files common. Before it,
+Solid, React and Vue put an unlisted kind such as `.context.ts` or `.const.tsx` above the component, because an
+unknown kind ranked as `-1`, and Svelte put it second; now the component always opens the tab.
 
 **A sibling is displayed but never traversed.** A stylesheet reached only through another stylesheet is not
 followed, which is the mechanism `Theme.css` was already meant to be kept out by.
@@ -19773,7 +19792,7 @@ complete there. What the examples fix is not restated here; the entries below ar
 **One tree shape, four types, one set of tree helpers.** Each component declares its own node type —
 `SunburstNode`, `CirclePackingNode`, `IcicleNode` — because a type lives with the component that owns it, but all
 four are `{ value, weight?, children? }`, so one consumer tree feeds any of them and the Playground draws the same
-tree (the library's own source, from `TreemapPage.const`) on all four pages. The weights, the path to a node and
+tree (the library's own source, from `LibraryTree.generated`) on all four pages. The weights, the path to a node and
 the "has anything to zoom into" test are `TreemapUtils`' and the siblings call them rather than keeping copies:
 _"Anything non-local is exported"_, and three copies of `computeWeights` would drift. The Playground's dependency
 view therefore lists `Treemap` under each sibling's "Uses", which is true.

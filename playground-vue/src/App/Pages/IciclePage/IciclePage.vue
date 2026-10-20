@@ -4,13 +4,13 @@ import { computed, shallowRef } from "vue";
 import { ICICLE_DEFAULTS, MediaQueryMonitorVueUtils, TreemapUtils } from "@thewaver/ss-components-vue";
 import type { IcicleNode } from "@thewaver/ss-components-vue";
 import { IcicleKnobs } from "@thewaver/ss-playground/App/Knobs/Icicles.const";
+import { LIBRARY } from "@thewaver/ss-playground/App/LibraryTree.generated";
 import {
     EXAMPLES_ROOT,
     EXAMPLE_NAMES,
     NO_MOTION_DURATION_MS,
     WIDE_SPAN,
 } from "@thewaver/ss-playground/App/Pages/IciclePage/IciclePage.const";
-import { LIBRARY } from "@thewaver/ss-playground/App/Pages/TreemapPage/TreemapPage.const";
 
 import type { ExampleDefs } from "../../PageComponents/Examples/Examples.types";
 import PageExamples from "../../PageComponents/Examples/PageExamples.vue";

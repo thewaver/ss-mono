@@ -3,13 +3,13 @@ import { createMemo, createSignal } from "solid-js";
 import { CIRCLE_PACKING_DEFAULTS, MediaQueryMonitorSolidUtils, TreemapUtils } from "@thewaver/ss-components-solid";
 import type { CirclePackingNode } from "@thewaver/ss-components-solid";
 import { CirclePackingKnobs } from "@thewaver/ss-playground/App/Knobs/CirclePackings.const";
+import { LIBRARY } from "@thewaver/ss-playground/App/LibraryTree.generated";
 import {
     EXAMPLES_ROOT,
     EXAMPLE_NAMES,
     NO_MOTION_DURATION_MS,
     WIDE_SPAN,
 } from "@thewaver/ss-playground/App/Pages/CirclePackingPage/CirclePackingPage.const";
-import { LIBRARY } from "@thewaver/ss-playground/App/Pages/TreemapPage/TreemapPage.const";
 
 import { PageExamples } from "../../PageComponents/Examples/Examples";
 import { PageNumberField } from "../../PageComponents/Field/Field";

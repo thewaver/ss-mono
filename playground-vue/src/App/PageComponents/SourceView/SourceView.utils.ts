@@ -38,14 +38,20 @@ const getFolder = (path: string) => path.slice(0, path.lastIndexOf("/"));
 const getStem = (path: string) => {
     if (SPLIT_COMPONENT_PATTERN.test(path)) return `${getFolder(path)}/${getFileName(getFolder(path))}`;
 
-    return path.replace(/\.(ts|vue)$/, "").replace(/\.(const|css|types|utils)$/, "");
+    return path.replace(/\.[^/]*$/, "");
 };
 
 const getFileKind = (path: string, stem: string) =>
     path.endsWith(COMPONENT_EXTENSION) ? COMPONENT_EXTENSION : path.slice(stem.length);
 
+const getKindRank = (kind: string) => {
+    const rank = FILE_KIND_ORDER.indexOf(kind);
+
+    return rank === -1 ? FILE_KIND_ORDER.length : rank;
+};
+
 const byFileKind = (stem: string) => (first: string, second: string) =>
-    FILE_KIND_ORDER.indexOf(getFileKind(first, stem)) - FILE_KIND_ORDER.indexOf(getFileKind(second, stem));
+    getKindRank(getFileKind(first, stem)) - getKindRank(getFileKind(second, stem));
 
 const isTraversable = (path: string) => path.startsWith(STYLED_COMPONENTS_ROOT);
 

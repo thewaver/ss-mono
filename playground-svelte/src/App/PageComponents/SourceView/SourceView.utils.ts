@@ -34,7 +34,6 @@ const SOURCE_EXTENSIONS = [".svelte", ".ts"];
 const FILE_KIND_ORDER = [".svelte", ".ts", ".const.ts", ".utils.ts", ".types.ts", ".css.ts"];
 const IMPORT_PATTERN = /^\s*import\b[^;]*?["']([^"']+)["']\s*;?\s*$/gm;
 const SPLIT_COMPONENT_PATTERN = /\/Page[A-Z][^/]*\.svelte$/;
-const FILE_KIND_PATTERN = /(\.(const|utils|types|css))?\.(svelte|ts)$/;
 const SVELTE_LANGUAGE = "svelte";
 
 const getFileName = (path: string) => path.slice(path.lastIndexOf("/") + 1);
@@ -44,12 +43,18 @@ const getFolder = (path: string) => path.slice(0, path.lastIndexOf("/"));
 const getStem = (path: string) =>
     SPLIT_COMPONENT_PATTERN.test(path)
         ? `${getFolder(path)}/${getFileName(getFolder(path))}`
-        : path.replace(/\.(svelte|ts)$/, "").replace(/\.(const|css|types|utils)$/, "");
+        : path.replace(/\.[^/]*$/, "");
 
-const getFileKind = (path: string) => FILE_KIND_PATTERN.exec(path)?.[0] ?? "";
+const getFileKind = (path: string) => getFileName(path).replace(/^[^.]*/, "");
+
+const getKindRank = (kind: string) => {
+    const rank = FILE_KIND_ORDER.indexOf(kind);
+
+    return rank === -1 ? FILE_KIND_ORDER.length : rank;
+};
 
 const byFileKind = (first: string, second: string) =>
-    FILE_KIND_ORDER.indexOf(getFileKind(first)) - FILE_KIND_ORDER.indexOf(getFileKind(second));
+    getKindRank(getFileKind(first)) - getKindRank(getFileKind(second));
 
 const isTraversable = (path: string) => path.startsWith(STYLED_COMPONENTS_ROOT);
 

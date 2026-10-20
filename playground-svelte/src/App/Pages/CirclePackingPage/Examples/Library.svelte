@@ -1,8 +1,9 @@
 <script lang="ts">
     import { CirclePacking, TreemapUtils } from "@thewaver/ss-components-svelte";
     import type { CirclePackingNode } from "@thewaver/ss-components-svelte";
+    import { LIBRARY } from "@thewaver/ss-playground/App/LibraryTree.generated";
+    import { formatLines } from "@thewaver/ss-playground/App/LibraryTree.utils";
     import * as styles from "@thewaver/ss-playground/App/Pages/CirclePackingPage/CirclePackingPage.css";
-    import { LIBRARY, formatLines } from "@thewaver/ss-playground/App/Pages/TreemapPage/TreemapPage.const";
 
     import PageCirclePackingCircle from "../../../StyledComponents/CirclePackingContent/PageCirclePackingCircle.svelte";
     import PageCirclePackingFrame from "../../../StyledComponents/CirclePackingContent/PageCirclePackingFrame.svelte";

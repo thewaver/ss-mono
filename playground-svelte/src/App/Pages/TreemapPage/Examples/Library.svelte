@@ -1,6 +1,7 @@
 <script lang="ts">
     import { Button, Treemap, TreemapUtils } from "@thewaver/ss-components-svelte";
-    import { LIBRARY, formatLines } from "@thewaver/ss-playground/App/Pages/TreemapPage/TreemapPage.const";
+    import { LIBRARY } from "@thewaver/ss-playground/App/LibraryTree.generated";
+    import { formatLines } from "@thewaver/ss-playground/App/LibraryTree.utils";
     import * as styles from "@thewaver/ss-playground/App/Pages/TreemapPage/TreemapPage.css";
 
     import PageTreemapBar from "../../../StyledComponents/TreemapContent/PageTreemapBar.svelte";

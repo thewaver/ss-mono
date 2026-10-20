@@ -3,8 +3,9 @@ import { useModel } from "vue";
 
 import { Icicle, TreemapUtils } from "@thewaver/ss-components-vue";
 import type { IcicleNode } from "@thewaver/ss-components-vue";
+import { LIBRARY } from "@thewaver/ss-playground/App/LibraryTree.generated";
+import { formatLines } from "@thewaver/ss-playground/App/LibraryTree.utils";
 import * as styles from "@thewaver/ss-playground/App/Pages/IciclePage/IciclePage.css";
-import { LIBRARY, formatLines } from "@thewaver/ss-playground/App/Pages/TreemapPage/TreemapPage.const";
 import { PAGE_ICICLE_FAMILIES } from "@thewaver/ss-playground/App/StyledComponents/IcicleContent/IcicleContent.css";
 
 import PageIcicleCell from "../../../StyledComponents/IcicleContent/IcicleContent.vue";

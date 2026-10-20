@@ -5,13 +5,11 @@ import { fileURLToPath } from "node:url";
 const SOURCE_ROOTS = ["../../components/src", "../../components-solid/src"].map((root) =>
     fileURLToPath(new URL(root, import.meta.url)),
 );
-const OUTPUT_FILE = fileURLToPath(new URL("../src/App/Pages/TreemapPage/TreemapPage.const.ts", import.meta.url));
+const OUTPUT_FILE = fileURLToPath(new URL("../src/App/LibraryTree.generated.ts", import.meta.url));
 const SOURCE_PATTERN = /\.(tsx?|css)$/;
 const TEST_PATTERN = /\.test\.tsx?$/;
 const LOOSE_FILES_SUFFIX = " files";
 const INDENT = "    ";
-const LIBRARY_DECLARATION = "export const LIBRARY: TreemapNode<string>";
-const LIBRARY_END = "\n);\n";
 
 const countLines = async (file) => (await readFile(file, "utf8")).split("\n").length - 1;
 
@@ -72,21 +70,16 @@ const tree = await walk(SOURCE_ROOTS, "src");
 
 if (!tree) throw new Error(`No source files under ${SOURCE_ROOTS.join(", ")}`);
 
-const existing = await readFile(OUTPUT_FILE, "utf8").catch(() => "");
-const libraryStart = existing.indexOf(LIBRARY_DECLARATION);
-const libraryEnd = libraryStart === -1 ? -1 : existing.indexOf(LIBRARY_END, libraryStart);
-const handWritten = libraryEnd === -1 ? "" : existing.slice(libraryEnd + LIBRARY_END.length);
+const output = `// Generated file, rewritten by playground/scripts/libraryTree.mjs on every commit - changes made here are wiped.
 
-const output = `import type { TreemapNode } from "@thewaver/ss-components";
+import type { TreemapNode } from "@thewaver/ss-components";
 
 const leaf = (value: string, weight: number): TreemapNode<string> => ({ value, weight });
 
 const branch = (value: string, ...children: TreemapNode<string>[]): TreemapNode<string> => ({ value, children });
 
-export const formatLines = (lines: number) => \`\${lines.toLocaleString("en-US")} lines\`;
-
-${LIBRARY_DECLARATION} = ${render(tree, 0).trimStart()};
-${handWritten}`;
+export const LIBRARY: TreemapNode<string> = ${render(tree, 0).trimStart()};
+`;
 
 await writeFile(OUTPUT_FILE, output);
 

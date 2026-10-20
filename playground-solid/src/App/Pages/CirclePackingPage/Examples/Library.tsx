@@ -1,7 +1,8 @@
 import { CirclePacking, TreemapUtils } from "@thewaver/ss-components-solid";
 import type { CirclePackingNode } from "@thewaver/ss-components-solid";
+import { LIBRARY } from "@thewaver/ss-playground/App/LibraryTree.generated";
+import { formatLines } from "@thewaver/ss-playground/App/LibraryTree.utils";
 import * as styles from "@thewaver/ss-playground/App/Pages/CirclePackingPage/CirclePackingPage.css";
-import { LIBRARY, formatLines } from "@thewaver/ss-playground/App/Pages/TreemapPage/TreemapPage.const";
 
 import {
     PageCirclePackingCircle,

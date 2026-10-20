@@ -447,6 +447,8 @@ things. Fix the defect on sight; still raise the taste question separately.
 
 **`components/src` and `playground/src` carry no comments of any kind, and none may be added**, with two
 exceptions: `*.utils.ts` documentation, described below, and the props-type documentation described after it.
+(A third, narrow one, the user's call: the generated-file warning that `libraryTree.mjs` writes at the top of
+`playground/src/App/LibraryTree.generated.ts`. Leave it; see `decisions.md`.)
 Not a `//` note inside a function body, not a `/** */` block above a declaration, not on a component.
 This has been asked for repeatedly and in several wordings; the count reached 108 blocks anyway, every one
 of them written by Claude rather than by the user, and they were all deleted. There is

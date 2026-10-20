@@ -3,8 +3,9 @@ import { computed, useModel } from "vue";
 
 import { Button, Sunburst, TreemapUtils } from "@thewaver/ss-components-vue";
 import type { SunburstNode } from "@thewaver/ss-components-vue";
+import { LIBRARY } from "@thewaver/ss-playground/App/LibraryTree.generated";
+import { formatLines } from "@thewaver/ss-playground/App/LibraryTree.utils";
 import * as styles from "@thewaver/ss-playground/App/Pages/SunburstPage/SunburstPage.css";
-import { LIBRARY, formatLines } from "@thewaver/ss-playground/App/Pages/TreemapPage/TreemapPage.const";
 import { PAGE_SUNBURST_FAMILIES } from "@thewaver/ss-playground/App/StyledComponents/SunburstContent/SunburstContent.css";
 
 import PageSunburstArc from "../../../StyledComponents/SunburstContent/PageSunburstArc.vue";

@@ -4,13 +4,13 @@ import { computed, shallowRef } from "vue";
 import { MediaQueryMonitorVueUtils, SUNBURST_DEFAULTS, TreemapUtils } from "@thewaver/ss-components-vue";
 import type { SunburstNode } from "@thewaver/ss-components-vue";
 import { SunburstKnobs } from "@thewaver/ss-playground/App/Knobs/Sunbursts.const";
+import { LIBRARY } from "@thewaver/ss-playground/App/LibraryTree.generated";
 import {
     EXAMPLES_ROOT,
     EXAMPLE_NAMES,
     NO_MOTION_DURATION_MS,
     WIDE_SPAN,
 } from "@thewaver/ss-playground/App/Pages/SunburstPage/SunburstPage.const";
-import { LIBRARY } from "@thewaver/ss-playground/App/Pages/TreemapPage/TreemapPage.const";
 
 import type { ExampleDefs } from "../../PageComponents/Examples/Examples.types";
 import PageExamples from "../../PageComponents/Examples/PageExamples.vue";

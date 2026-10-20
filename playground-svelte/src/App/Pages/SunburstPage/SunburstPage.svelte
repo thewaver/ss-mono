@@ -2,7 +2,6 @@
     import { MediaQueryMonitorSvelteUtils, SUNBURST_DEFAULTS, TreemapUtils } from "@thewaver/ss-components-svelte";
     import type { SunburstNode } from "@thewaver/ss-components-svelte";
     import { SunburstKnobs } from "@thewaver/ss-playground/App/Knobs/Sunbursts.const";
-    import { LIBRARY } from "@thewaver/ss-playground/App/Pages/TreemapPage/TreemapPage.const";
 
     import type { ExampleDefs } from "../../PageComponents/Examples/Examples.types";
     import PageExamples from "../../PageComponents/Examples/PageExamples.svelte";
@@ -10,6 +9,7 @@
     import PageProp from "../../PageComponents/Prop/Prop.svelte";
     import PagePropsPanel from "../../PageComponents/PropsPanel/PagePropsPanel.svelte";
     import LibraryExample from "./Examples/Library.svelte";
+    import { LIBRARY } from "@thewaver/ss-playground/App/LibraryTree.generated";
     import {
     EXAMPLE_NAMES,
     EXAMPLES_ROOT,

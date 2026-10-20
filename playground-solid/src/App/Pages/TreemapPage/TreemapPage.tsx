@@ -2,10 +2,10 @@ import { createMemo, createSignal } from "solid-js";
 
 import { MediaQueryMonitorSolidUtils, TREEMAP_DEFAULTS, TreemapUtils } from "@thewaver/ss-components-solid";
 import { TreemapKnobs } from "@thewaver/ss-playground/App/Knobs/Treemaps.const";
+import { LIBRARY } from "@thewaver/ss-playground/App/LibraryTree.generated";
 import {
     EXAMPLES_ROOT,
     EXAMPLE_NAMES,
-    LIBRARY,
     NO_MOTION_DURATION_MS,
     WIDE_SPAN,
 } from "@thewaver/ss-playground/App/Pages/TreemapPage/TreemapPage.const";
