@@ -5,4 +5,6 @@ export type ShapeRevealExampleProps = {
     delayMs: number;
     computePoints: ((size: Size2d) => Point2d[]) | undefined;
     softness: number;
+    startDegrees: number;
+    endDegrees: number;
 };

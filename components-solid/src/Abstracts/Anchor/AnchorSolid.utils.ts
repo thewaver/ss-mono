@@ -122,7 +122,7 @@ export namespace AnchorSolidUtils {
 
             if (!contentRef || !isVisible) return;
 
-            onCleanup(ElementObserverUtils.observeBorderBoxSize(contentRef, setContentSize));
+            onCleanup(ElementObserverUtils.observeBorderBoxSize(contentRef, setContentSize, false));
         });
 
         return {

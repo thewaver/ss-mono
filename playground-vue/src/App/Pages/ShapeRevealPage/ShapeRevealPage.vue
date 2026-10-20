@@ -31,6 +31,8 @@ const durationMs = shallowRef(SHAPE_REVEAL_DEFAULTS.durationMs);
 const delayMs = shallowRef(ShapeRevealKnobs.STARTING_DELAY_MS);
 const shape = shallowRef<ShapeRevealShape>(ShapeRevealKnobs.STARTING_SHAPE);
 const softness = shallowRef(SHAPE_REVEAL_DEFAULTS.softness);
+const startDegrees = shallowRef(SHAPE_REVEAL_DEFAULTS.startDegrees);
+const endDegrees = shallowRef(ShapeRevealKnobs.STARTING_END_DEGREES);
 
 const computePoints = computed(() => {
     const picked = shape.value;
@@ -45,6 +47,8 @@ const commonProps = computed<ShapeRevealExampleProps>(() => ({
     delayMs: delayMs.value,
     computePoints: computePoints.value,
     softness: softness.value,
+    startDegrees: startDegrees.value,
+    endDegrees: endDegrees.value,
 }));
 
 const examples: ExampleDefs[] = [
@@ -122,6 +126,40 @@ const examples: ExampleDefs[] = [
                 :width="FIELD_WIDTH"
                 ariaLabel="Softness"
                 @input="(value: number) => (softness = value)"
+            />
+        </PageProp>
+
+        <PageProp
+            item-key="startDegrees"
+            controls="Sets ShapeRevealOpts.startDegrees"
+            label="Start angle (°)"
+            hint="The shape's angle as it starts to grow, clockwise. With the end angle the same, the shape is only tilted. A circle looks the same at any angle."
+        >
+            <PageNumberField
+                :value="startDegrees"
+                :min="ShapeRevealKnobs.MIN_DEGREES"
+                :max="ShapeRevealKnobs.MAX_DEGREES"
+                :step="ShapeRevealKnobs.DEGREES_STEP"
+                :width="FIELD_WIDTH"
+                ariaLabel="Start angle in degrees"
+                @input="(value: number) => (startDegrees = value)"
+            />
+        </PageProp>
+
+        <PageProp
+            item-key="endDegrees"
+            controls="Sets ShapeRevealOpts.endDegrees"
+            label="End angle (°)"
+            hint="The shape's angle once it covers the window. It turns from the start angle to this one as it grows, on the reveal's own timing."
+        >
+            <PageNumberField
+                :value="endDegrees"
+                :min="ShapeRevealKnobs.MIN_DEGREES"
+                :max="ShapeRevealKnobs.MAX_DEGREES"
+                :step="ShapeRevealKnobs.DEGREES_STEP"
+                :width="FIELD_WIDTH"
+                ariaLabel="End angle in degrees"
+                @input="(value: number) => (endDegrees = value)"
             />
         </PageProp>
     </PagePropsPanel>

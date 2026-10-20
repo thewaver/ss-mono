@@ -89,8 +89,10 @@ export namespace AnchorReactUtils {
         useLayoutEffect(() => {
             if (!contentElement || !isVisible) return;
 
-            const stop = ElementObserverUtils.observeBorderBoxSize(contentElement, (size) =>
-                setContentSize((previous) => (previous && Size2d.isSame(previous, size) ? previous : size)),
+            const stop = ElementObserverUtils.observeBorderBoxSize(
+                contentElement,
+                (size) => setContentSize((previous) => (previous && Size2d.isSame(previous, size) ? previous : size)),
+                false,
             );
 
             return () => {

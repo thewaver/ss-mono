@@ -145,27 +145,38 @@ const scrollBarrelTo = (page: Page, share: number) =>
         box.scrollTop = (box.scrollHeight - box.clientHeight) * value;
     }, share);
 
-test("measured up and down only, every letter on a line answers the point alike", async ({ page }) => {
-    await page.locator(BARREL_BOX).scrollIntoViewIfNeeded();
-    await scrollBarrelTo(page, 0.5);
+/**
+ * The two barrel tests read where each line's animation is held after a scroll, which a parallel sweep can leave
+ * unsettled; both failed in two Svelte sweeps and pass every time on their own, hence `@solo`.
+ */
+test(
+    "measured up and down only, every letter on a line answers the point alike",
+    { tag: "@solo" },
+    async ({ page }) => {
+        await page.locator(BARREL_BOX).scrollIntoViewIfNeeded();
+        await scrollBarrelTo(page, 0.5);
 
-    await expect
-        .poll(
-            async () => {
-                const lines = await barrelLines(page);
+        await expect
+            .poll(
+                async () => {
+                    const lines = await barrelLines(page);
 
-                return (
-                    lines.every((line) => Math.max(...line) - Math.min(...line) < 0.01) &&
-                    lines.some((line) => line[0] > 0.9) &&
-                    lines.some((line) => line[0] === 0)
-                );
-            },
-            { message: "each line held at one point of its keyframes, the middle one far through and others at rest" },
-        )
-        .toBe(true);
-});
+                    return (
+                        lines.every((line) => Math.max(...line) - Math.min(...line) < 0.01) &&
+                        lines.some((line) => line[0] > 0.9) &&
+                        lines.some((line) => line[0] === 0)
+                    );
+                },
+                {
+                    message:
+                        "each line held at one point of its keyframes, the middle one far through and others at rest",
+                },
+            )
+            .toBe(true);
+    },
+);
 
-test("scrolling the barrel moves which line is held furthest", async ({ page }) => {
+test("scrolling the barrel moves which line is held furthest", { tag: "@solo" }, async ({ page }) => {
     await page.locator(BARREL_BOX).scrollIntoViewIfNeeded();
     await scrollBarrelTo(page, 0.25);
     await expect.poll(async () => Math.max(...(await barrelLines(page)).map((line) => line[0]))).toBeGreaterThan(0.9);

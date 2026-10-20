@@ -183,15 +183,23 @@ export namespace ElementObserverUtils {
     /**
      * Watches an element's size, borders and padding included.
      *
+     * The first report comes at once by default, measured on the spot, so a caller has a size to work with before
+     * the browser's first observer callback. A caller that must not act on a size taken before the element has been
+     * laid out — a popup about to be placed, whose spot measurement can come back before its content is in, so that it
+     * is placed and focused too early and the focus is lost — passes `isImmediate` as `false` and waits for the
+     * browser's own first measurement instead.
+     *
      * @param element The element to watch.
-     * @param onSize Called with the size: once straight away, from a measurement taken on the spot rather than
-     * waiting for the first observer callback, and again whenever it changes.
+     * @param onSize Called with the size whenever it changes, and first either straight away or at the browser's first
+     * measurement, as `isImmediate` says.
+     * @param isImmediate Whether to report a measurement taken on the spot before the first observer callback.
+     * Defaults to `true`.
      * @returns The function that stops watching.
      */
-    export const observeBorderBoxSize = (element: HTMLElement, onSize: (size: Size2d) => void) => {
+    export const observeBorderBoxSize = (element: HTMLElement, onSize: (size: Size2d) => void, isImmediate = true) => {
         const report = reportChanges(onSize, Size2d.isSame);
 
-        report({ width: element.offsetWidth, height: element.offsetHeight });
+        if (isImmediate) report({ width: element.offsetWidth, height: element.offsetHeight });
 
         const observer = new ResizeObserver(([entry]) => {
             report({ width: entry.borderBoxSize[0].inlineSize, height: entry.borderBoxSize[0].blockSize });

@@ -111,9 +111,13 @@ export namespace AnchorSvelteUtils {
             if (!content || !getIsVisible()) return;
 
             const stop = untrack(() =>
-                ElementObserverUtils.observeBorderBoxSize(content, (size) => {
-                    if (!contentSize || !Size2d.isSame(contentSize, size)) contentSize = size;
-                }),
+                ElementObserverUtils.observeBorderBoxSize(
+                    content,
+                    (size) => {
+                        if (!contentSize || !Size2d.isSame(contentSize, size)) contentSize = size;
+                    },
+                    false,
+                ),
             );
 
             return () => {

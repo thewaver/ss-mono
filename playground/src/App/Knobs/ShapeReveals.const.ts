@@ -16,4 +16,8 @@ export namespace ShapeRevealKnobs {
     export const MIN_SOFTNESS = 0;
     export const MAX_SOFTNESS = 1;
     export const SOFTNESS_STEP = 0.05;
+    export const MIN_DEGREES = -720;
+    export const MAX_DEGREES = 720;
+    export const DEGREES_STEP = 15;
+    export const STARTING_END_DEGREES = 180;
 }

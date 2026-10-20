@@ -10,6 +10,8 @@ export type ShapeRevealOpts = {
     easing?: string;
     computePoints?: (size: Size2d) => Point2d[];
     softness?: number;
+    startDegrees?: number;
+    endDegrees?: number;
 };
 
 export type ShapeRevealChange = () => unknown;

@@ -106,9 +106,13 @@ export namespace AnchorVueUtils {
         watchAfterRender([contentElement, () => toValue(isVisible)], ([content, isShown]) => {
             if (!content || !isShown) return;
 
-            const stop = ElementObserverUtils.observeBorderBoxSize(content, (size) => {
-                if (!contentSize.value || !Size2d.isSame(contentSize.value, size)) contentSize.value = size;
-            });
+            const stop = ElementObserverUtils.observeBorderBoxSize(
+                content,
+                (size) => {
+                    if (!contentSize.value || !Size2d.isSame(contentSize.value, size)) contentSize.value = size;
+                },
+                false,
+            );
 
             return () => {
                 stop();

@@ -4156,6 +4156,15 @@ never what separated the two; see _"A tooltip can be hovered"_ below.
 `Tooltip` is not renamed. `AnchorPlacement` replaces `TooltipPlacement` (and its `H` / `V` halves) because
 the type is now shared vocabulary.
 
+**The content's size is first taken at the browser's own measurement, never on the spot.** `Anchor` watched the
+popup's size with an observer of its own, whose first report was the `ResizeObserver`'s first callback, after
+layout. A later pass folded it into `ElementObserverUtils.observeBorderBoxSize`, which reports a spot measurement
+straight away — right for its other callers, wrong here: the spot size came back before the popup's content was in,
+the popup was placed and asked to take focus on that, and every menu in the Playground opened without focus in Vue
+and Svelte, and the flick wheel in all four (124 specs). The Playgrounds could not build at the time, which is why
+nothing caught it. The helper keeps both behaviors, per the rule on merging implementations that disagree:
+`isImmediate`, default `true`, and `Anchor` passes `false` in all four frameworks.
+
 ### `HoverIntent`: the hover engine lifted out of `Tooltip`, and `Tooltip` on top of it
 
 The user asked for a hover card as a preset beside `Tooltip` over one shared engine, rather than as a flag on
@@ -19425,6 +19434,20 @@ From Magic UI's Animated Theme Toggler and Skiper UI's theme transitions.
 **Its examples page is the _Theme Cycle_ button.** The user removed an earlier page — a panel switched through a reveal, with knobs for the shape, origin and edge — in all four Playgrounds, and `shapeReveal.spec.ts` went with it. The page came back holding one example, the button that keeps switching the Playground's theme, with knobs for duration, pause, shape and softness; see _"The Playground theme is an example"_ for how it behaves. No spec covers it yet.
 
 **WCAG.** 2.3.3 Animation from Interactions (AAA), "Motion animation triggered by interaction can be disabled": the duration is the way to turn it off. 2.2.2 Pause, Stop, Hide applies to motion that "starts automatically" and "lasts more than five seconds"; a reveal starts from the visitor's own action and runs well under that, so it needs no pause control. Checked 2.3.1 Three Flashes: one reveal per action is not a flash sequence. While a reveal runs the browser draws snapshots over the page, so a press during those few hundred milliseconds lands on nothing; that is the platform, not the helper.
+
+**The shape can turn as it grows: `startDegrees` and `endDegrees`, clockwise, both `0` by default.** Asked for by the user, who first looked to the `Wheel`'s idle pace — `idleDelayMs`, one wedge per delay, a speed for a motion that never ends. A reveal does end, so a speed would stop the shape on whatever angle the duration happened to leave and keep spinning flat out while the growth eased in. A total turn fits the reveal; the user's refinement was to state it as two angles rather than one amount, because they read as positions, the pace follows from the gap over `durationMs` on the reveal's own easing, and two equal angles give a tilted shape that does not turn. The names end in `Degrees` like every other angle in the library. A circle ignores both.
+
+**A turn needs more frames than a growth, and the two edges need them differently.** The browser moves each polygon corner in a straight line between keyframes, so across the usual two a turned shape would fold through its center; the hard edge gets a keyframe every 15°, where a corner's straight path stays within about one percent of its arc. The soft edge is a mask image, and the browser swaps images rather than blending them, so it gets one image per 10ms of the reveal — faster than the screen refreshes — each drawn on a square wide enough for the shape at any angle, so the mask's size and position, which do blend, stay smooth across the swaps. With no turn both edges keep exactly the two keyframes they had.
+
+**The page cannot be used while a reveal runs, and nothing short of ending the reveal changes that.** Probed in
+headless Chromium, because the user asked for at least the revealed area to stay live: `::view-transition {
+pointer-events: none }`, the same on every layer of the overlay, and moving the transition from the root onto an
+inner wrapper all left a click on a button undelivered. The overlay is not the block; the browser skips every element
+taking part in a transition when it works out what was clicked, and a page-wide reveal includes the whole page. Ending
+the transition on the first press (`skipTransition`) frees the page, but that press is lost — the button sees only the
+release — and completing it as a click from code was turned down, since `SlideButton` takes a bare click as an
+assistive-technology activation. The user dropped the work until the platform can forward clicks from
+`::view-transition-new` to the real element, the direction CSSWG issue 11596 is discussing.
 
 ### Playback is `playback` everywhere, and `Trail` lost its `play` and `pause`
 

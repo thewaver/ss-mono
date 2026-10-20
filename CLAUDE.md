@@ -410,7 +410,7 @@ it visits"_ in `decisions.md`), the specs of any component or abstract whose cod
 `npx playwright test` by name. The full suite runs only when they ask for it.
 
 **Run a file filter as two commands, both with `--no-deps`, and check the count with `--list` first.** A spec
-holding an `@solo` test (`die`, `slideButton`, `wheel`, `accordion`, `particleSpawner`, `wraparound` at the time of
+holding an `@solo` test (`die`, `slideButton`, `wheel`, `accordion`, `particleSpawner`, `wraparound`, `proximityText` at the time of
 writing) runs it in a `solo` project that depends on the main one, and Playwright runs a dependency project whole,
 ignoring the filter — so naming one of those files silently ran all 116, about twenty minutes, while the reply said
 nine. `--no-deps` stops that, but the dependency is also what makes the solo tests wait until nothing else is

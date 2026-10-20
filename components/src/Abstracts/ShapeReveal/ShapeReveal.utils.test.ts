@@ -169,6 +169,63 @@ describe("the frames", () => {
     });
 });
 
+describe("a shape that turns", () => {
+    const origin = { x: 0, y: 0 };
+    const outline = [
+        { x: 10, y: 0 },
+        { x: 0, y: 10 },
+        { x: -10, y: 0 },
+    ];
+    const firstCorner = (frame: Keyframe) =>
+        String(frame.clipPath).slice("polygon(".length).split(",")[0].trim().split(" ").map(parseFloat);
+
+    it("keeps two keyframes and its outline when it does not turn", () => {
+        expect(ShapeRevealUtils.computeClipKeyframes(origin, 300, outline)).toHaveLength(2);
+        expect(ShapeRevealUtils.computeClipKeyframes(origin, 300, outline, 30, 30)).toHaveLength(2);
+    });
+
+    it("is only tilted when its two angles are the same", () => {
+        const [, to] = ShapeRevealUtils.computeClipKeyframes(origin, 300, outline, 90, 90);
+        const [x, y] = firstCorner(to);
+
+        expect(x).toBeCloseTo(0);
+        expect(y, "the corner to the right, turned a quarter clockwise, points down").toBeCloseTo(10);
+    });
+
+    it("gets a hard-edged keyframe for every 15° of the turn, ending on the end angle", () => {
+        const frames = ShapeRevealUtils.computeClipKeyframes(origin, 300, outline, 0, 90);
+
+        const [x, y] = firstCorner(frames[frames.length - 1]);
+
+        expect(frames).toHaveLength(90 / 15 + 1);
+        expect(firstCorner(frames[0])).toEqual([0, 0]);
+        expect(x).toBeCloseTo(0);
+        expect(y).toBeCloseTo(10);
+    });
+
+    it("turns either way, by however much it is told", () => {
+        expect(ShapeRevealUtils.computeClipKeyframes(origin, 300, outline, 0, -90)).toHaveLength(7);
+        expect(ShapeRevealUtils.computeClipKeyframes(origin, 300, outline, 0, 720)).toHaveLength(720 / 15 + 1);
+    });
+
+    it("draws a soft-edged turn as one image per 10ms, all the same size so the mask keeps moving smoothly", () => {
+        const frames = ShapeRevealUtils.computeMaskKeyframes(origin, 300, outline, 2, 0, 90, 700);
+        const imageSizes = new Set(
+            frames.map((frame) => decodeURIComponent(String(frame.maskImage)).match(/width="([\d.]+)"/)![1]),
+        );
+
+        expect(frames).toHaveLength(700 / 10 + 1);
+        expect(new Set(frames.map((frame) => frame.maskImage)).size).toBeGreaterThan(1);
+        expect(imageSizes.size).toBe(1);
+        expect(frames[0].maskSize).toBe("0px 0px");
+    });
+
+    it("leaves a circle as it was, since turning cannot change it", () => {
+        expect(ShapeRevealUtils.computeClipKeyframes(origin, 300, undefined, 0, 180)).toHaveLength(2);
+        expect(ShapeRevealUtils.computeMaskKeyframes(origin, 300, undefined, 2, 0, 180)).toHaveLength(2);
+    });
+});
+
 describe("without view transitions", () => {
     it("still makes the change, and says it was not revealed", async () => {
         let hasChanged = false;

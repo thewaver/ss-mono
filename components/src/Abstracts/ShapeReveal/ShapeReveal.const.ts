@@ -5,6 +5,8 @@ export const SHAPE_REVEAL_DEFAULTS = {
     durationMs: 700,
     easing: "ease-in-out",
     softness: 0,
+    startDegrees: 0,
+    endDegrees: 0,
 };
 
 export const SHAPE_REVEAL_SPOTS: readonly ShapeRevealSpot[] = [

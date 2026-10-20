@@ -39,6 +39,8 @@ export const ThemeCycleExample = (props: Props) => {
             durationMs: prefersReducedMotionRef.current ? NO_MOTION_DURATION_MS : propsRef.current.durationMs,
             computePoints: propsRef.current.computePoints,
             softness: propsRef.current.softness,
+            startDegrees: propsRef.current.startDegrees,
+            endDegrees: propsRef.current.endDegrees,
         });
 
         if (id !== runIdRef.current) return;

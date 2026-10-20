@@ -26,6 +26,8 @@ export const ShapeRevealPage = () => {
     const [delayMs, setDelayMs] = useState(ShapeRevealKnobs.STARTING_DELAY_MS);
     const [shape, setShape] = useState<ShapeRevealShape>(ShapeRevealKnobs.STARTING_SHAPE);
     const [softness, setSoftness] = useState(SHAPE_REVEAL_DEFAULTS.softness);
+    const [startDegrees, setStartDegrees] = useState(SHAPE_REVEAL_DEFAULTS.startDegrees);
+    const [endDegrees, setEndDegrees] = useState(ShapeRevealKnobs.STARTING_END_DEGREES);
 
     const appliedTheme = useAppliedTheme();
 
@@ -40,6 +42,8 @@ export const ShapeRevealPage = () => {
         delayMs,
         computePoints,
         softness,
+        startDegrees,
+        endDegrees,
     };
 
     const themeLabel = THEME_OPTIONS.find((option) => option.value === appliedTheme)?.label ?? appliedTheme;
@@ -126,6 +130,44 @@ export const ShapeRevealPage = () => {
                         width={FIELD_WIDTH}
                         ariaLabel={"Softness"}
                         onInput={setSoftness}
+                    />
+                </PageProp>
+
+                <PageProp
+                    itemKey={"startDegrees"}
+                    label={"Start angle (°)"}
+                    hint={
+                        "The shape's angle as it starts to grow, clockwise. With the end angle the same, the shape is only tilted. A circle looks the same at any angle."
+                    }
+                    controls={"Sets ShapeRevealOpts.startDegrees"}
+                >
+                    <PageNumberField
+                        value={startDegrees}
+                        min={ShapeRevealKnobs.MIN_DEGREES}
+                        max={ShapeRevealKnobs.MAX_DEGREES}
+                        step={ShapeRevealKnobs.DEGREES_STEP}
+                        width={FIELD_WIDTH}
+                        ariaLabel={"Start angle in degrees"}
+                        onInput={setStartDegrees}
+                    />
+                </PageProp>
+
+                <PageProp
+                    itemKey={"endDegrees"}
+                    label={"End angle (°)"}
+                    hint={
+                        "The shape's angle once it covers the window. It turns from the start angle to this one as it grows, on the reveal's own timing."
+                    }
+                    controls={"Sets ShapeRevealOpts.endDegrees"}
+                >
+                    <PageNumberField
+                        value={endDegrees}
+                        min={ShapeRevealKnobs.MIN_DEGREES}
+                        max={ShapeRevealKnobs.MAX_DEGREES}
+                        step={ShapeRevealKnobs.DEGREES_STEP}
+                        width={FIELD_WIDTH}
+                        ariaLabel={"End angle in degrees"}
+                        onInput={setEndDegrees}
                     />
                 </PageProp>
             </PagePropsPanel>

@@ -9,6 +9,9 @@ const BLUR_REACH = 3;
 const MIN_CONTOUR_POINTS = 3;
 const NO_DURATION_MS = 0;
 const HALF = 0.5;
+const CLIP_STEP_DEGREES = 15;
+const MASK_FRAME_MS = 10;
+const PIVOT: Point2d = { x: 0, y: 0 };
 
 const SNAPSHOT_STYLE = { opacity: 1, mixBlendMode: "normal" };
 
@@ -28,6 +31,18 @@ const pointPx = (point: Point2d) => `${px(point.x)} ${px(point.y)}`;
 
 const getIsElement = (origin: ShapeRevealOrigin): origin is Element =>
     typeof origin === "object" && "getBoundingClientRect" in origin;
+
+const rotateOutline = (outline: Point2d[], degrees: number) =>
+    outline.map((point) => Point2dUtils.rotateAbout(point, PIVOT, degrees));
+
+const toMaskImage = (width: number, height: number, body: string) => {
+    const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="${width}" height="${height}">${body}</svg>`;
+
+    return `url("data:image/svg+xml,${encodeURIComponent(svg)}")`;
+};
+
+const toBlurredPolygon = (points: Point2d[], offset: Point2d, blur: number) =>
+    `<polygon points="${points.map((point) => `${point.x + offset.x},${point.y + offset.y}`).join(" ")}" fill="black" style="filter:blur(${px(blur)})"/>`;
 
 const computeBounds = (outline: Point2d[] | undefined, coverRadius: number) => {
     if (!outline) return { minX: -coverRadius, minY: -coverRadius, maxX: coverRadius, maxY: coverRadius };
@@ -144,16 +159,25 @@ export namespace ShapeRevealUtils {
     /**
      * The frames of a hard-edged reveal, as a `clip-path` growing from nothing at the origin.
      *
+     * A shape that turns as it grows gets a keyframe for every 15° of the turn rather than two, because the browser
+     * moves each corner in a straight line between keyframes: across two, a turned shape would fold through its own
+     * center instead of turning. Within 15° a corner's straight path stays within about one percent of its arc.
+     *
      * @param origin Where the shape grows from, in viewport pixels.
      * @param coverRadius How far the shape's nearest edge reaches at the end.
-     * @param outline From {@link computeOutline}. Left out, a circle.
-     * @returns Two keyframes for `Element.animate`: the shape at no size on the origin, and the shape covering the
-     * viewport. Every corner moves in a straight line, so the shape keeps its outline the whole way.
+     * @param outline From {@link computeOutline}. Left out, a circle, which turning does not change.
+     * @param startDegrees The shape's angle as it starts to grow, clockwise.
+     * @param endDegrees Its angle once it covers the viewport; equal to `startDegrees`, the shape is only tilted.
+     * @returns Keyframes for `Element.animate`, evenly spaced, from the shape at no size on the origin to the shape
+     * covering the viewport. With no turn there are two, and every corner moves in a straight line, so the shape keeps
+     * its outline the whole way.
      */
     export const computeClipKeyframes = (
         origin: Point2d,
         coverRadius: number,
         outline: Point2d[] | undefined,
+        startDegrees = 0,
+        endDegrees = 0,
     ): Keyframe[] => {
         if (!outline) {
             return [
@@ -163,11 +187,19 @@ export namespace ShapeRevealUtils {
         }
 
         const toPolygon = (points: Point2d[]) => `polygon(${points.map(pointPx).join(", ")})`;
+        const turnDegrees = endDegrees - startDegrees;
+        const stepCount = Math.max(1, Math.ceil(Math.abs(turnDegrees) / CLIP_STEP_DEGREES));
 
-        return [
-            { clipPath: toPolygon(outline.map(() => origin)) },
-            { clipPath: toPolygon(outline.map((point) => ({ x: origin.x + point.x, y: origin.y + point.y }))) },
-        ];
+        return Array.from({ length: stepCount + 1 }, (_, step) => {
+            const progress = step / stepCount;
+            const points = rotateOutline(outline, startDegrees + turnDegrees * progress);
+
+            return {
+                clipPath: toPolygon(
+                    points.map((point) => ({ x: origin.x + point.x * progress, y: origin.y + point.y * progress })),
+                ),
+            };
+        });
     };
 
     /**
@@ -178,31 +210,61 @@ export namespace ShapeRevealUtils {
      * have reached past the viewport by enough for the blur to fade out before the edge, as {@link computeKeyframes}
      * does.
      *
+     * A shape that turns as it grows cannot be one image, since the browser swaps one mask image for the next rather
+     * than blending them. It is drawn once for every 10ms of the reveal instead, each image turned a little further,
+     * so the swaps come faster than the screen refreshes and read as a smooth turn. The images are all the same size —
+     * a square wide enough for the shape at any angle — so the size and position keep moving smoothly between them.
+     *
      * @param origin Where the shape grows from, in viewport pixels.
      * @param coverRadius How far the shape's nearest edge reaches at the end.
-     * @param outline From {@link computeOutline}. Left out, a circle.
+     * @param outline From {@link computeOutline}. Left out, a circle, which turning does not change.
      * @param blur How soft the edge is at the end, as the standard deviation in pixels, which is what CSS `blur()`
      * takes.
-     * @returns Two keyframes for `Element.animate`, both carrying the same `mask-image` and moving only its size and
-     * position.
+     * @param startDegrees The shape's angle as it starts to grow, clockwise.
+     * @param endDegrees Its angle once it covers the viewport; equal to `startDegrees`, the shape is only tilted.
+     * @param durationMs How long the reveal runs, which sets how many images a turn needs.
+     * @returns Keyframes for `Element.animate`. With no turn there are two, both carrying the same `mask-image` and
+     * moving only its size and position.
      */
     export const computeMaskKeyframes = (
         origin: Point2d,
         coverRadius: number,
         outline: Point2d[] | undefined,
         blur: number,
+        startDegrees = 0,
+        endDegrees = 0,
+        durationMs = SHAPE_REVEAL_DEFAULTS.durationMs,
     ): Keyframe[] => {
         const pad = blur * BLUR_REACH;
-        const bounds = computeBounds(outline, coverRadius);
+
+        if (outline && endDegrees !== startDegrees) {
+            const half = Math.max(...outline.map((point) => Math.hypot(point.x, point.y))) + pad;
+            const side = half * 2;
+            const turnDegrees = endDegrees - startDegrees;
+            const frameCount = Math.max(1, Math.ceil(durationMs / MASK_FRAME_MS));
+
+            return Array.from({ length: frameCount + 1 }, (_, frame) => {
+                const progress = frame / frameCount;
+                const points = rotateOutline(outline, startDegrees + turnDegrees * progress);
+
+                return {
+                    maskImage: toMaskImage(side, side, toBlurredPolygon(points, { x: half, y: half }, blur)),
+                    maskRepeat: "no-repeat",
+                    maskSize: `${px(side * progress)} ${px(side * progress)}`,
+                    maskPosition: pointPx({ x: origin.x - half * progress, y: origin.y - half * progress }),
+                };
+            });
+        }
+
+        const tilted = outline && rotateOutline(outline, startDegrees);
+        const bounds = computeBounds(tilted, coverRadius);
         const offset = { x: pad - bounds.minX, y: pad - bounds.minY };
         const width = bounds.maxX - bounds.minX + pad * 2;
         const height = bounds.maxY - bounds.minY + pad * 2;
-        const paint = `fill="black" style="filter:blur(${px(blur)})"`;
-        const shape = outline
-            ? `<polygon points="${outline.map((point) => `${point.x + offset.x},${point.y + offset.y}`).join(" ")}" ${paint}/>`
-            : `<circle cx="${offset.x}" cy="${offset.y}" r="${coverRadius}" ${paint}/>`;
-        const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="${width}" height="${height}">${shape}</svg>`;
-        const image = `url("data:image/svg+xml,${encodeURIComponent(svg)}")`;
+        const shape = tilted
+            ? toBlurredPolygon(tilted, offset, blur)
+            : `<circle cx="${offset.x}" cy="${offset.y}" r="${coverRadius}" fill="black" style="filter:blur(${px(blur)})"/>`;
+        const image = toMaskImage(width, height, shape);
 
         return [
             { maskImage: image, maskRepeat: "no-repeat", maskSize: "0px 0px", maskPosition: pointPx(origin) },
@@ -225,14 +287,21 @@ export namespace ShapeRevealUtils {
      * @param softness How soft the edge is, from `0`, a hard edge through a `clip-path`, to `1`, a fade as wide as the
      * distance the shape grows to cover the viewport; anything above `0` is a mask. It is clamped to that range, and
      * because it is a share of that distance it looks the same on any window and from any origin.
-     * @returns Two keyframes that also hold the new page fully opaque and unblended, which is what the browser's own
-     * cross-fade would otherwise change.
+     * @param startDegrees The shape's angle as it starts to grow, clockwise.
+     * @param endDegrees Its angle once it covers the viewport; the turn between the two follows the reveal's own
+     * timing and easing.
+     * @param durationMs How long the reveal runs, which a soft-edged turn needs to know how many images to draw.
+     * @returns Keyframes that also hold the new page fully opaque and unblended, which is what the browser's own
+     * cross-fade would otherwise change — two when the shape does not turn, more when it does.
      */
     export const computeKeyframes = (
         origin: Point2d,
         size: Size2d,
         computePoints: ((size: Size2d) => Point2d[]) | undefined,
         softness: number,
+        startDegrees = 0,
+        endDegrees = 0,
+        durationMs = SHAPE_REVEAL_DEFAULTS.durationMs,
     ): Keyframe[] => {
         const reach = computeFarthestDistance(origin, size);
         const blur = (MathUtils.clamp01(softness) * reach) / BLUR_REACH;
@@ -240,8 +309,8 @@ export namespace ShapeRevealUtils {
         const outline = computePoints ? computeOutline(computePoints, coverRadius) : undefined;
         const frames =
             blur > 0
-                ? computeMaskKeyframes(origin, coverRadius, outline, blur)
-                : computeClipKeyframes(origin, coverRadius, outline);
+                ? computeMaskKeyframes(origin, coverRadius, outline, blur, startDegrees, endDegrees, durationMs)
+                : computeClipKeyframes(origin, coverRadius, outline, startDegrees, endDegrees);
 
         return frames.map((frame) => ({ ...frame, ...SNAPSHOT_STYLE }));
     };
@@ -259,8 +328,10 @@ export namespace ShapeRevealUtils {
      * @param opts Where the shape grows from (`origin`: a named spot, a point in viewport pixels, or an element whose
      * center is used, read before the change runs; the center by default), how long it takes (`durationMs`) and how
      * it eases (`easing`, any CSS easing), the shape (`computePoints`, as `Shape` takes it; a circle when left out)
-     * and how soft its edge is (`softness`, from `0`, a hard edge, to `1`, as {@link computeKeyframes} takes it).
-     * Defaults are in `SHAPE_REVEAL_DEFAULTS`.
+     * and how soft its edge is (`softness`, from `0`, a hard edge, to `1`, as {@link computeKeyframes} takes it), and
+     * the angle it starts at and ends at (`startDegrees` and `endDegrees`, clockwise: equal, the shape is only tilted;
+     * apart, it turns from one to the other as it grows, on the reveal's own timing and easing, so the gap between them
+     * over `durationMs` is the pace). Defaults are in `SHAPE_REVEAL_DEFAULTS`.
      * @returns A promise that settles once the reveal has finished, with `true` when the change was shown through
      * the shape and `false` when it simply happened. It rejects with the change's own error if the change throws.
      */
@@ -299,6 +370,9 @@ export namespace ShapeRevealUtils {
             size,
             opts.computePoints,
             opts.softness ?? SHAPE_REVEAL_DEFAULTS.softness,
+            opts.startDegrees ?? SHAPE_REVEAL_DEFAULTS.startDegrees,
+            opts.endDegrees ?? SHAPE_REVEAL_DEFAULTS.endDegrees,
+            durationMs,
         );
 
         const animations = [

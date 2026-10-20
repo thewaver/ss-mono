@@ -29,6 +29,8 @@
     let delayMs = $state(ShapeRevealKnobs.STARTING_DELAY_MS);
     let shape = $state<ShapeRevealShape>(ShapeRevealKnobs.STARTING_SHAPE);
     let softness = $state(SHAPE_REVEAL_DEFAULTS.softness);
+    let startDegrees = $state(SHAPE_REVEAL_DEFAULTS.startDegrees);
+    let endDegrees = $state(ShapeRevealKnobs.STARTING_END_DEGREES);
 
     const computePoints = $derived.by(() => {
         const current = shape;
@@ -43,6 +45,8 @@
         delayMs,
         computePoints,
         softness,
+        startDegrees,
+        endDegrees,
     });
 
     const examples: ExampleDefs[] = [
@@ -124,6 +128,40 @@
             width={FIELD_WIDTH}
             ariaLabel={"Softness"}
             onInput={(value) => (softness = value)}
+        />
+    </PageProp>
+
+    <PageProp
+        itemKey={"startDegrees"}
+        controls={"Sets ShapeRevealOpts.startDegrees"}
+        label={"Start angle (°)"}
+        hint={"The shape's angle as it starts to grow, clockwise. With the end angle the same, the shape is only tilted. A circle looks the same at any angle."}
+    >
+        <PageNumberField
+            value={startDegrees}
+            min={ShapeRevealKnobs.MIN_DEGREES}
+            max={ShapeRevealKnobs.MAX_DEGREES}
+            step={ShapeRevealKnobs.DEGREES_STEP}
+            width={FIELD_WIDTH}
+            ariaLabel={"Start angle in degrees"}
+            onInput={(value) => (startDegrees = value)}
+        />
+    </PageProp>
+
+    <PageProp
+        itemKey={"endDegrees"}
+        controls={"Sets ShapeRevealOpts.endDegrees"}
+        label={"End angle (°)"}
+        hint={"The shape's angle once it covers the window. It turns from the start angle to this one as it grows, on the reveal's own timing."}
+    >
+        <PageNumberField
+            value={endDegrees}
+            min={ShapeRevealKnobs.MIN_DEGREES}
+            max={ShapeRevealKnobs.MAX_DEGREES}
+            step={ShapeRevealKnobs.DEGREES_STEP}
+            width={FIELD_WIDTH}
+            ariaLabel={"End angle in degrees"}
+            onInput={(value) => (endDegrees = value)}
         />
     </PageProp>
 </PagePropsPanel>

@@ -1345,6 +1345,14 @@ are already run for whatever a session changes. The one break that prompted
 the review came from the commit hook itself rewriting a file, which `decisions.md` records and which can no
 longer happen the same way.
 
+**The page cannot be clicked while a `ShapeReveal` runs.** For the reveal's whole duration every click lands on
+nothing, including in the part of the page already uncovered. Reachable on the ShapeReveal page: start the theme
+cycle with a long duration and try to press anything. The browser refuses clicks to whatever takes part in a view
+transition, and the reveal is one over the whole page; no CSS undoes it (the probes are in `decisions.md`, under
+_"`ShapeReveal`: a change shown through a shape growing from a point"_). Accepted by the user until the platform can
+forward clicks from the revealed picture to the real page — CSSWG issue 11596, open at the time of writing. Reopen
+it when that ships, aiming for what was asked: the revealed area live, the rest still blocked.
+
 **React faders report `onShow` twice in development.** React's strict mode runs every effect twice in a
 development build, so a fader shows, cancels and shows again, and the cancel does not take back the `onShow`
 already reported. A production build reports once. Reachable on any React page with a fader, such as toasts, by
