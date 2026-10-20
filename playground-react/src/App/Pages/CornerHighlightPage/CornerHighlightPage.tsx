@@ -1,6 +1,5 @@
 import { useMemo, useState } from "react";
 
-import type { CornerKey } from "@thewaver/ss-components-react";
 import { CORNER_HIGHLIGHT_DEFAULTS, CORNER_HIGHLIGHT_KEYS } from "@thewaver/ss-components-react";
 import { CornerHighlightKnobs } from "@thewaver/ss-playground/App/Knobs/CornerHighlights.const";
 import {
@@ -9,6 +8,7 @@ import {
     EXAMPLE_NAMES,
     FIELD_WIDTH,
 } from "@thewaver/ss-playground/App/Pages/CornerHighlightPage/CornerHighlightPage.const";
+import type { QuadCorner } from "@thewaver/ss-utils";
 
 import { PageExamples } from "../../PageComponents/Examples/Examples";
 import { PageCheckField, PageColorField, PageNumberField } from "../../PageComponents/Field/Field";
@@ -27,7 +27,7 @@ export const CornerHighlightPage = () => {
     const [lengthDown, setLengthDown] = useState(CornerHighlightKnobs.STARTING_LENGTH);
     const [strokeThickness, setStrokeThickness] = useState(CORNER_HIGHLIGHT_DEFAULTS.strokeThickness);
     const [transitionDurationMs, setTransitionDurationMs] = useState(CORNER_HIGHLIGHT_DEFAULTS.transitionDurationMs);
-    const [hiddenCorners, setHiddenCorners] = useState<CornerKey[]>(() =>
+    const [hiddenCorners, setHiddenCorners] = useState<QuadCorner[]>(() =>
         CORNER_HIGHLIGHT_KEYS.filter((key) => !CORNER_HIGHLIGHT_DEFAULTS.visibleCorners.has(key)),
     );
 
@@ -38,7 +38,7 @@ export const CornerHighlightPage = () => {
         [hiddenCorners],
     );
 
-    const toggleCorner = (key: CornerKey, isVisible: boolean) =>
+    const toggleCorner = (key: QuadCorner, isVisible: boolean) =>
         setHiddenCorners((previous) => (isVisible ? previous.filter((entry) => entry !== key) : [...previous, key]));
 
     const commonProps: CornerHighlightExampleProps = {

@@ -1,7 +1,7 @@
 import { untrack } from "svelte";
 import type { Attachment } from "svelte/attachments";
 
-import { type AnchorPlacement, AnchorUtils } from "@thewaver/ss-components";
+import { type AnchorPlacement, AnchorUtils, ElementObserverUtils } from "@thewaver/ss-components";
 import { type Point2d, Rect, Size2d } from "@thewaver/ss-utils";
 
 import { ElementObserverSvelteUtils } from "../ElementObserver/ElementObserverSvelte.utils.svelte.js";
@@ -111,7 +111,7 @@ export namespace AnchorSvelteUtils {
             if (!content || !getIsVisible()) return;
 
             const stop = untrack(() =>
-                AnchorUtils.observeContentSize(content, (size) => {
+                ElementObserverUtils.observeBorderBoxSize(content, (size) => {
                     if (!contentSize || !Size2d.isSame(contentSize, size)) contentSize = size;
                 }),
             );

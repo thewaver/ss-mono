@@ -11,6 +11,8 @@ import type { PagePaintPickerProps, PaintKind } from "./PaintPickerVue.types";
 
 const props = defineProps<PagePaintPickerProps>();
 
+const computeKindLabel = (kind: PaintKind) => PAINT_KIND_LABELS[kind];
+
 const paint = computed(() => props.paintSlot.paint.value);
 const sampleKind = computed(() => (paint.value.kind === "solid" ? undefined : paint.value.kind));
 </script>
@@ -26,7 +28,7 @@ const sampleKind = computed(() => (paint.value.kind === "solid" ? undefined : pa
             <PageSelectField
                 :value="paint.kind"
                 :values="PAINT_KINDS"
-                :compute-label="(kind: PaintKind) => PAINT_KIND_LABELS[kind]"
+                :compute-label="computeKindLabel"
                 :ariaLabel="label"
                 @change="paintSlot.setKind"
             />

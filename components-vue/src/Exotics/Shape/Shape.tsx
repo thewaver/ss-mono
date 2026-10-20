@@ -1,8 +1,7 @@
 import { Fragment, type SlotsType, defineComponent, shallowRef } from "vue";
 
-import { ShapeLayerUtils, ShapeStyles } from "@thewaver/ss-components";
+import { ElementObserverUtils, ShapeLayerUtils, ShapeStyles } from "@thewaver/ss-components";
 import { ShapeConst } from "@thewaver/ss-components/internal";
-import { Size2d } from "@thewaver/ss-utils";
 
 import type { SVGDefs } from "../../Generators/SVGDefs/SVGDefs.types";
 import { watchAfterRender } from "../../Utils/effectUtils";
@@ -44,15 +43,9 @@ export const Shape = defineComponent(
         watchAfterRender([rootRef], ([root]) => {
             if (!root) return;
 
-            const observer = new ResizeObserver(() => {
-                const next = { width: root.offsetWidth, height: root.offsetHeight };
-
-                if (!Size2d.isSame(rootSize.value, next)) rootSize.value = next;
+            return ElementObserverUtils.observeBorderBoxSize(root, (size) => {
+                rootSize.value = size;
             });
-
-            observer.observe(root);
-
-            return () => observer.disconnect();
         });
 
         return () => {

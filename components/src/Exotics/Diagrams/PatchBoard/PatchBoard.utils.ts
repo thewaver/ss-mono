@@ -1,4 +1,4 @@
-import { MathUtils, type Point2d, type Size2d } from "@thewaver/ss-utils";
+import { MathUtils, type Point2d, Point2dUtils, type Size2d } from "@thewaver/ss-utils";
 
 import type { CarrierZone, Carry, CarryMode, CarryNudge, CarryPlace } from "../../../Abstracts/Carrier/Carrier.types";
 import { CarrierUtils } from "../../../Abstracts/Carrier/Carrier.utils";
@@ -171,7 +171,7 @@ export namespace PatchBoardUtils {
         let nearestDistance = reach;
 
         for (const socket of placed) {
-            const distance = Math.hypot(socket.point.x - point.x, socket.point.y - point.y);
+            const distance = Point2dUtils.getDistance(point, socket.point);
 
             if (distance > nearestDistance) continue;
 

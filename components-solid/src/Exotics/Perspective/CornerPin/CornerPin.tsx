@@ -3,14 +3,13 @@ import { For, Show, createMemo, createRenderEffect, createSignal, onCleanup } fr
 
 import {
     CORNER_PIN_DEFAULTS,
-    type CornerKey,
     type CornerPinGripRenderProps,
     InteractionTrackerUtils,
     type QuadWarpAxis,
     QuadWarpUtils,
     CornerPinStyles as styles,
 } from "@thewaver/ss-components";
-import type { Point2d } from "@thewaver/ss-utils";
+import { type Point2d, type QuadCorner, QuadUtils } from "@thewaver/ss-utils";
 
 import { ElementObserverSolidUtils } from "../../../Abstracts/ElementObserver/ElementObserverSolid.utils";
 import { access, accessSignal } from "../../../Utils/propUtils";
@@ -28,21 +27,21 @@ export const CornerPin = (props: ParentProps<CornerPinProps>) => {
 
     const cornersSignal = accessSignal(() => props.corners);
 
-    const [getPicked, setPicked] = createSignal<CornerKey>();
-    const [getDragged, setDragged] = createSignal<CornerKey>();
-    const [getFocusVisible, setFocusVisible] = createSignal<{ corner: CornerKey; axis: QuadWarpAxis }>();
+    const [getPicked, setPicked] = createSignal<QuadCorner>();
+    const [getDragged, setDragged] = createSignal<QuadCorner>();
+    const [getFocusVisible, setFocusVisible] = createSignal<{ corner: QuadCorner; axis: QuadWarpAxis }>();
 
-    const axisRefs: Partial<Record<CornerKey, HTMLInputElement>> = {};
+    const axisRefs: Partial<Record<QuadCorner, HTMLInputElement>> = {};
 
     const getSize = ElementObserverSolidUtils.createBorderBoxSizeObserver(getRootRef);
 
     const getReachRatio = () => access(props.reachRatio) ?? CORNER_PIN_DEFAULTS.reachRatio;
 
     const getTransform = createMemo(
-        () => QuadWarpUtils.toTransform(getSize(), QuadWarpUtils.toPixels(cornersSignal[0](), getSize())) ?? "none",
+        () => QuadUtils.toCss(getSize(), QuadUtils.scale(cornersSignal[0](), getSize())) ?? "none",
     );
 
-    const moveCorner = (corner: CornerKey, target: Point2d) => {
+    const moveCorner = (corner: QuadCorner, target: Point2d) => {
         const corners = cornersSignal[0]();
         const next = { ...corners, [corner]: QuadWarpUtils.clampMove(corners, corner, target, getReachRatio()) };
 
@@ -59,7 +58,7 @@ export const CornerPin = (props: ParentProps<CornerPinProps>) => {
 
     onCleanup(() => stopGesture?.());
 
-    const handleGripPointerDown = (corner: CornerKey, e: PointerEvent) => {
+    const handleGripPointerDown = (corner: QuadCorner, e: PointerEvent) => {
         if (e.button !== PRIMARY_BUTTON) return;
 
         e.preventDefault();
@@ -112,7 +111,7 @@ export const CornerPin = (props: ParentProps<CornerPinProps>) => {
         };
     };
 
-    const handleCatcherPointerDown = (corner: CornerKey, e: PointerEvent) => {
+    const handleCatcherPointerDown = (corner: QuadCorner, e: PointerEvent) => {
         if (e.button !== PRIMARY_BUTTON) return;
 
         e.preventDefault();
@@ -124,7 +123,7 @@ export const CornerPin = (props: ParentProps<CornerPinProps>) => {
         setPicked(undefined);
     };
 
-    const readFocusVisible = (element: HTMLElement, corner: CornerKey, axis: QuadWarpAxis) =>
+    const readFocusVisible = (element: HTMLElement, corner: QuadCorner, axis: QuadWarpAxis) =>
         InteractionTrackerUtils.computeIsFocusVisible(element) ? { corner, axis } : undefined;
 
     return (
@@ -152,7 +151,7 @@ export const CornerPin = (props: ParentProps<CornerPinProps>) => {
                 )}
             </Show>
 
-            <For each={QuadWarpUtils.CORNERS}>
+            <For each={QuadUtils.CORNERS}>
                 {(corner) => {
                     const getPoint = () => cornersSignal[0]()[corner];
 

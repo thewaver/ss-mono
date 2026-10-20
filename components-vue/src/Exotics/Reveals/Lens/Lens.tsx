@@ -1,7 +1,7 @@
 import { type CSSProperties, type SlotsType, computed, defineComponent, shallowRef } from "vue";
 
 import { LENS_DEFAULTS, LensStyles, LensUtils, RevealUtils } from "@thewaver/ss-components";
-import { MathUtils, type Point2d, StringUtils } from "@thewaver/ss-utils";
+import { MathUtils, type Point2d, Size2dUtils, StringUtils } from "@thewaver/ss-utils";
 
 import { ElementObserverVueUtils } from "../../../Abstracts/ElementObserver/ElementObserverVue.utils";
 import { PointerTrackerVueUtils } from "../../../Abstracts/PointerTracker/PointerTrackerVue.utils";
@@ -63,7 +63,7 @@ export const Lens = defineComponent(
             const handleFocus = () => {
                 if (isDisabled || !rootRef.value?.matches(":focus-visible")) return;
 
-                keyboardPoint.value = RevealUtils.toCenter(size.value);
+                keyboardPoint.value = Size2dUtils.getCenter(size.value);
             };
 
             const handleKeyDown = (e: KeyboardEvent) => {
@@ -77,7 +77,7 @@ export const Lens = defineComponent(
                     ? lensCenter
                     : isPointerInside
                       ? pointerPoint
-                      : RevealUtils.toCenter(size.value);
+                      : Size2dUtils.getCenter(size.value);
 
                 keyboardPoint.value = RevealUtils.computeNudgedPoint(
                     from,

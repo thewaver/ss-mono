@@ -1,4 +1,4 @@
-import { MathUtils, type Point2d, type Size2d } from "@thewaver/ss-utils";
+import { MathUtils, type Point2d, Point2dUtils, RectUtils, type Size2d } from "@thewaver/ss-utils";
 
 import { SHAPE_REVEAL_DEFAULTS } from "./ShapeReveal.const";
 import type { ShapeRevealChange, ShapeRevealOpts, ShapeRevealOrigin, ShapeRevealSpot } from "./ShapeReveal.types";
@@ -28,18 +28,6 @@ const pointPx = (point: Point2d) => `${px(point.x)} ${px(point.y)}`;
 
 const getIsElement = (origin: ShapeRevealOrigin): origin is Element =>
     typeof origin === "object" && "getBoundingClientRect" in origin;
-
-const computeSegmentDistance = (point: Point2d, from: Point2d, to: Point2d) => {
-    const dx = to.x - from.x;
-    const dy = to.y - from.y;
-    const lengthSquared = dx * dx + dy * dy;
-    const along =
-        lengthSquared === 0
-            ? 0
-            : Math.min(1, Math.max(0, ((point.x - from.x) * dx + (point.y - from.y) * dy) / lengthSquared));
-
-    return Math.hypot(point.x - (from.x + dx * along), point.y - (from.y + dy * along));
-};
 
 const computeBounds = (outline: Point2d[] | undefined, coverRadius: number) => {
     if (!outline) return { minX: -coverRadius, minY: -coverRadius, maxX: coverRadius, maxY: coverRadius };
@@ -91,9 +79,7 @@ export namespace ShapeRevealUtils {
 
         if (!getIsElement(origin)) return origin;
 
-        const rect = origin.getBoundingClientRect();
-
-        return { x: rect.left + rect.width * HALF, y: rect.top + rect.height * HALF };
+        return RectUtils.getCenter(origin.getBoundingClientRect());
     };
 
     /**
@@ -117,7 +103,9 @@ export namespace ShapeRevealUtils {
         if (points.length < MIN_CONTOUR_POINTS) return 0;
 
         return Math.min(
-            ...points.map((point, index) => computeSegmentDistance(center, point, points[(index + 1) % points.length])),
+            ...points.map((point, index) =>
+                Point2dUtils.getSegmentDistance(center, point, points[(index + 1) % points.length]),
+            ),
         );
     };
 

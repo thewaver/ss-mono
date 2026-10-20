@@ -516,24 +516,4 @@ export namespace AnchorUtils {
             anchorRect.y < screenSize.height
         );
     };
-
-    /**
-     * Watches portaled content's size as it lays out, until the returned function is called.
-     *
-     * Read as the element's offset size each time the browser reports a resize, the first report arriving once it
-     * has been laid out.
-     *
-     * @param element The content's own element.
-     * @param onSize Called with each size.
-     * @returns The function that stops watching.
-     */
-    export const observeContentSize = (element: HTMLElement, onSize: (size: Size2d) => void) => {
-        const observer = new ResizeObserver(() => {
-            onSize({ width: element.offsetWidth, height: element.offsetHeight });
-        });
-
-        observer.observe(element);
-
-        return () => observer.disconnect();
-    };
 }

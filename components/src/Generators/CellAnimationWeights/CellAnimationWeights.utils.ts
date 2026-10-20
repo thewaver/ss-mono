@@ -5,12 +5,6 @@ import type { RippleDefs, SweepDefs, WeightFn, WeightOpts } from "./CellAnimatio
 const getBandMax = (from: number, to: number, distanceAt: (index: number) => number) =>
     to < from ? 0 : Math.max(distanceAt(from), distanceAt(to));
 const WEIGHT_ROUNDING_PLACES = 3;
-const HASH_OFFSET = 1;
-const HASH_MULTIPLIER_X = 374761393;
-const HASH_MULTIPLIER_Y = 668265263;
-const HASH_MULTIPLIER_MIX = 1274126177;
-const HASH_LOW_SHIFT = 13;
-const HASH_HIGH_SHIFT = 16;
 const HASH_RANGE = 4294967296;
 const FIXED_SEED = 0;
 let randomSeed = FIXED_SEED;
@@ -162,24 +156,6 @@ export namespace CellAnimationWeightUtils {
 
         return { col: Math.max(farthest.col, MIN_MAX_DISTANCE), row: Math.max(farthest.row, MIN_MAX_DISTANCE) };
     };
-
-    /**
-     * A cell's position when the grid is read row by row, left to right and top to bottom.
-     *
-     * @param pos The cell.
-     * @param count The number of columns and rows.
-     * @returns Its index in that reading order, from `0`.
-     */
-    export const getRowFlatIndex = (pos: Index2d, count: Index2d) => pos.row * count.col + pos.col;
-
-    /**
-     * A cell's position when the grid is read column by column, top to bottom and left to right.
-     *
-     * @param pos The cell.
-     * @param count The number of columns and rows.
-     * @returns Its index in that reading order, from `0`.
-     */
-    export const getColumnFlatIndex = (pos: Index2d, count: Index2d) => pos.col * count.row + pos.row;
 
     /**
      * How far a cell is from the two diagonals that cross at the origin.
@@ -349,70 +325,6 @@ export namespace CellAnimationWeightUtils {
     export const getRandomSeed = () => randomSeed;
 
     /**
-     * A random-looking number for a cell that is the same every time it is asked for.
-     *
-     * The same cell and seed always give the same answer, and neighboring cells give unrelated ones, which is
-     * what a random order needs to survive a re-render without reshuffling.
-     *
-     * @param col The cell's column.
-     * @param row The cell's row.
-     * @param seed The seed, from {@link getRandomSeed} or {@link FIXED_HASH_SEED}.
-     * @returns A number from `0` up to but not including `1`.
-     */
-    export const hashToUnit = (col: number, row: number, seed: number) => {
-        const mixed =
-            Math.imul(col + HASH_OFFSET, HASH_MULTIPLIER_X) ^
-            Math.imul(row + HASH_OFFSET, HASH_MULTIPLIER_Y) ^
-            Math.imul(seed + HASH_OFFSET, HASH_MULTIPLIER_MIX);
-        const folded = Math.imul(mixed ^ (mixed >>> HASH_LOW_SHIFT), HASH_MULTIPLIER_MIX);
-
-        return ((folded ^ (folded >>> HASH_HIGH_SHIFT)) >>> 0) / HASH_RANGE;
-    };
-
-    /**
-     * Interleaves the bits of a column and a row into one number, which orders cells along a Z-shaped curve.
-     *
-     * Reading cells in the order of this number visits them in ever larger squares, each finished before the
-     * next is started, so nearby cells stay close in the order.
-     *
-     * @param col The cell's column.
-     * @param row The cell's row.
-     * @param bits How many bits of each to use, enough for the largest column or row.
-     * @returns The interleaved number.
-     */
-    export const interleaveBits = (col: number, row: number, bits: number) => {
-        let result = 0;
-
-        for (let bit = 0; bit < bits; bit++) {
-            result |= ((col >> bit) & 1) << (bit * 2);
-            result |= ((row >> bit) & 1) << (bit * 2 + 1);
-        }
-
-        return result;
-    };
-
-    /**
-     * The largest whole number both numbers divide by.
-     *
-     * @param a One number.
-     * @param b The other.
-     * @returns Their greatest common divisor.
-     */
-    export const greatestCommonDivisor = (a: number, b: number) => {
-        let high = Math.max(a, b);
-        let low = Math.min(a, b);
-
-        while (low > 0) {
-            const remainder = high % low;
-
-            high = low;
-            low = remainder;
-        }
-
-        return high;
-    };
-
-    /**
      * A weight that visits every item exactly once, in an order that jumps around rather than walking.
      *
      * It steps through the items by a fixed stride — close to the golden ratio of the total, which spreads the
@@ -429,7 +341,7 @@ export namespace CellAnimationWeightUtils {
 
         let step = Math.max(Math.round(total * GOLDEN_RATIO), 1);
 
-        while (step > 1 && greatestCommonDivisor(step, total) !== 1) {
+        while (step > 1 && MathUtils.getGreatestCommonDivisor(step, total) !== 1) {
             step--;
         }
 

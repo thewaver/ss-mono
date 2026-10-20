@@ -1,4 +1,4 @@
-import { StoreUtils } from "@thewaver/ss-utils";
+import { IOUtils, ObjectUtils, StoreUtils } from "@thewaver/ss-utils";
 
 import type {
     FileInputAdmission,
@@ -7,51 +7,13 @@ import type {
     FileInputRejectReason,
 } from "./FileInput.types";
 
-const ACCEPT_SEPARATOR = ",";
-const EXTENSION_MARK = ".";
-const MIME_SEPARATOR = "/";
-const MIME_PARAMETER_SEPARATOR = ";";
-const WILDCARD = "*";
 const FILE_DRAG_TYPE = "Files";
 const SINGLE_FILE_LIMIT = 1;
 const EMPTY_FILE_INPUT_VALUE = "";
 
-/** A MIME type lower-cased and without any parameters, so `Text/Plain; charset=utf-8` reads as `text/plain`. */
-const normalizeMime = (mime: string) => mime.split(MIME_PARAMETER_SEPARATOR)[0].trim().toLowerCase();
-
-/** Whether a token of `accept` names an extension, which is a dot followed by at least one character. */
-const isExtensionToken = (token: string) => token.startsWith(EXTENSION_MARK) && token.length > EXTENSION_MARK.length;
-
-/** Whether a token of `accept` names a MIME type, which is two non-empty halves either side of one slash. */
-const isMimeToken = (token: string) => {
-    const parts = token.split(MIME_SEPARATOR);
-
-    return parts.length === 2 && parts.every((part) => part.length > 0);
-};
-
-/** The tokens of `accept` that the browser would honor, lower-cased; anything else in it is ignored. */
-const readAcceptTokens = (accept: string) =>
-    accept
-        .split(ACCEPT_SEPARATOR)
-        .map((token) => normalizeMime(token))
-        .filter((token) => isExtensionToken(token) || isMimeToken(token));
-
-/** Whether a file's MIME type fits a MIME token, where either half of the token may be `*`. */
-const matchesMimeToken = (token: string, type: string) => {
-    if (!type) return false;
-
-    const [tokenMain, tokenSub] = token.split(MIME_SEPARATOR);
-    const [typeMain, typeSub] = normalizeMime(type).split(MIME_SEPARATOR);
-
-    return (tokenMain === WILDCARD || tokenMain === typeMain) && (tokenSub === WILDCARD || tokenSub === typeSub);
-};
-
 /** Whether a file input already holds exactly these files, in this order. */
-const holdsFiles = (element: HTMLInputElement, files: File[]) => {
-    const held = element.files ?? [];
-
-    return held.length === files.length && files.every((file, index) => held[index] === file);
-};
+const holdsFiles = (element: HTMLInputElement, files: File[]) =>
+    ObjectUtils.isSameArray(Array.from(element.files ?? []), files);
 
 /** Whether a drag is carrying files, as opposed to text, a link or an element from the page. */
 const isFileDrag = (e: DragEvent) => Array.from(e.dataTransfer?.types ?? []).includes(FILE_DRAG_TYPE);
@@ -64,34 +26,9 @@ const isFileDrag = (e: DragEvent) => Array.from(e.dataTransfer?.types ?? []).inc
  */
 export namespace FileInputUtils {
     /**
-     * Whether a file fits an `accept` list, matched the way the browser's own file dialog matches it.
-     *
-     * The list is comma-separated. A token starting with a dot is an extension and matches the end of the file's
-     * name; any other token is a MIME type, either half of which may be `*`, so `image/*` takes every image.
-     * Matching ignores case and any parameters on a MIME type. A file whose type the browser does not know — an
-     * empty `type` — matches only by extension. Tokens that are neither shape are ignored, as the browser ignores
-     * them, and a list with nothing left in it takes every file.
-     *
-     * @param file The file to check. Only its name and type are read.
-     * @param accept The list to check it against. Left out, every file fits.
-     * @returns `true` when at least one token matches, or when there is nothing to match against.
-     */
-    export const matchesAccept = (file: Pick<File, "name" | "type">, accept: string | undefined) => {
-        const tokens = accept === undefined ? [] : readAcceptTokens(accept);
-
-        if (!tokens.length) return true;
-
-        const name = file.name.toLowerCase();
-
-        return tokens.some((token) =>
-            isExtensionToken(token) ? name.endsWith(token) : matchesMimeToken(token, file.type),
-        );
-    };
-
-    /**
      * Sorts one arrival of files into the ones the control will hold and the ones it refuses.
      *
-     * Each file is checked in the order it arrived, first for its type against `accept` ({@link matchesAccept}),
+     * Each file is checked in the order it arrived, first for its type against `accept` (`IOUtils.matchesAccept`),
      * then for its size against `maxSizeBytes`, then for room against the count limit, and is refused for the
      * first check it fails. The count limit is `maxFiles` on a multiple control and one otherwise, and only files
      * that passed the first two checks take up room — so the files refused for count are the ones that arrived
@@ -109,7 +46,7 @@ export namespace FileInputUtils {
         const rejections: FileInputAdmission["rejections"] = [];
 
         const computeReason = (file: File): FileInputRejectReason | undefined => {
-            if (!matchesAccept(file, limits.accept)) return "type";
+            if (!IOUtils.matchesAccept(file, limits.accept)) return "type";
             if (limits.maxSizeBytes !== undefined && file.size > limits.maxSizeBytes) return "size";
             if (accepted.length >= countLimit) return "count";
 

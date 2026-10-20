@@ -55,24 +55,6 @@ describe("getSampleSpan", () => {
     });
 });
 
-describe("getAngle", () => {
-    it("reports nothing turned for travel to the right, which is where a shape drawn upright points", () => {
-        expect(TrailUtils.getAngle({ x: 0, y: 0 }, { x: 10, y: 0 })).toBe(0);
-    });
-
-    it("reports a quarter turn for travel down the screen", () => {
-        expect(TrailUtils.getAngle({ x: 0, y: 0 }, { x: 0, y: 10 })).toBe(90);
-    });
-
-    it("reports the opposite sign for travel up the screen", () => {
-        expect(TrailUtils.getAngle({ x: 0, y: 0 }, { x: 0, y: -10 })).toBe(-90);
-    });
-
-    it("reads the diagonal between the two, rather than snapping to an axis", () => {
-        expect(TrailUtils.getAngle({ x: 0, y: 0 }, { x: 10, y: 10 })).toBe(45);
-    });
-});
-
 describe("getRunExtent", () => {
     it("is one lap when looping, whatever the spacing", () => {
         expect(TrailUtils.getRunExtent([0, 0.2, 0.4], true)).toBe(1);

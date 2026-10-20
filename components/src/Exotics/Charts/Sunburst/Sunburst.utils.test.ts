@@ -98,7 +98,13 @@ describe("computeArcPath", () => {
     });
 
     it("starts at twelve o'clock on the rim and turns clockwise", () => {
-        expect(SunburstUtils.computeArcPath(QUARTER).startsWith("M0,-200A200,200 0 0 1 200,")).toBe(true);
+        const [x, y] = SunburstUtils.computeArcPath(QUARTER).slice("M ".length).split(" ").map(Number);
+        const end = SunburstUtils.computeArcPath(QUARTER).split(" A ")[1].split(" ").slice(5, 7).map(Number);
+
+        expect(x).toBeCloseTo(0);
+        expect(y).toBeCloseTo(-200);
+        expect(end[0]).toBeCloseTo(200);
+        expect(end[1]).toBeCloseTo(0);
     });
 
     it("draws a whole turn as a ring with a hole, in two halves each way", () => {

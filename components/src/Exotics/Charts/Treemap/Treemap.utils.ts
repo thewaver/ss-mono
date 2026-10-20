@@ -1,4 +1,4 @@
-import { type Rect, type Size2d, StoreUtils } from "@thewaver/ss-utils";
+import { EasingUtils, type Rect, RectUtils, type Size2d, StoreUtils } from "@thewaver/ss-utils";
 
 import { NavigatorUtils } from "../../../Abstracts/Navigator/Navigator.utils";
 import type {
@@ -10,8 +10,6 @@ import type {
     TreemapZoomClock,
 } from "./Treemap.types";
 
-/** Halfway, for splitting a run of tiles into two runs of equal weight. */
-const HALF = 0.5;
 /** Zero, as a weight, a count or an index. */
 const NOTHING = 0;
 /** One tile, or one step along a run. */
@@ -20,16 +18,6 @@ const SINGLE = 1;
 const PARENT_FROM_END = 2;
 /** A zoom that has finished, as a share of its time. */
 const SETTLED = 1;
-/** Where the easing turns from speeding up to slowing down. */
-const EASE_TURN = 0.5;
-/** Scales the first half of the easing so it reaches one half at the turn. */
-const EASE_IN_SCALE = 4;
-/** Scales the second half of the easing, mirrored. */
-const EASE_OUT_SCALE = -2;
-/** Offsets the second half of the easing, mirrored. */
-const EASE_OUT_OFFSET = 2;
-/** The easing is cubic. */
-const EASE_POWER = 3;
 /** How long past its end a zoom is let run before it is settled without waiting for another frame. */
 const FRAME_STARVATION_SLACK_MS = 100;
 
@@ -77,71 +65,12 @@ export namespace TreemapUtils {
         node.children?.some((child) => (weights.get(child) ?? NOTHING) > NOTHING) ?? false;
 
     /**
-     * Divides a rectangle between a run of weights, each part's area in proportion to its weight.
-     *
-     * The run is cut in two where the weight on either side comes closest to half, across the rectangle's longer
-     * side, and each half is cut again the same way until every part is one weight. Neighbors in the run stay
-     * neighbors on screen, and a run sorted heaviest first puts the heaviest in the top left corner.
-     *
-     * @param weights The weights, in the order to lay them out. None may be negative.
-     * @param frame The rectangle to divide.
-     * @returns One rectangle per weight, in the same order. They cover the frame exactly, with no gaps between them.
-     */
-    export const partition = (weights: number[], frame: Rect): Rect[] => {
-        const rects: Rect[] = new Array(weights.length);
-        const sums = [NOTHING];
-
-        weights.forEach((weight, index) => sums.push(sums[index] + weight));
-
-        const split = (first: number, end: number, total: number, rect: Rect) => {
-            if (end - first <= SINGLE) {
-                rects[first] = rect;
-
-                return;
-            }
-
-            const target = sums[first] + total * HALF;
-
-            let cut = first + SINGLE;
-            let last = end - SINGLE;
-
-            while (cut < last) {
-                const middle = Math.floor((cut + last) * HALF);
-
-                if (sums[middle] < target) cut = middle + SINGLE;
-                else last = middle;
-            }
-
-            if (target - sums[cut - SINGLE] < sums[cut] - target && first + SINGLE < cut) cut -= SINGLE;
-
-            const before = sums[cut] - sums[first];
-            const share = total > NOTHING ? before / total : SINGLE;
-
-            if (rect.width > rect.height) {
-                const width = rect.width * share;
-
-                split(first, cut, before, { ...rect, width });
-                split(cut, end, total - before, { ...rect, x: rect.x + width, width: rect.width - width });
-            } else {
-                const height = rect.height * share;
-
-                split(first, cut, before, { ...rect, height });
-                split(cut, end, total - before, { ...rect, y: rect.y + height, height: rect.height - height });
-            }
-        };
-
-        if (weights.length) split(NOTHING, weights.length, sums[weights.length], frame);
-
-        return rects;
-    };
-
-    /**
      * Tiles one branch's children across a box.
      *
      * @param branch The branch whose children are tiled.
      * @param weights What {@link computeWeights} answered for the tree the branch is in.
      * @param size The box to fill, in pixels.
-     * @returns A tile per child that weighs something, heaviest first, each placed by {@link partition} from the top
+     * @returns A tile per child that weighs something, heaviest first, each placed by `RectUtils.bisectByWeight` from the top
      * left corner of the box.
      */
     export const computeTiles = <T>(
@@ -154,37 +83,12 @@ export namespace TreemapUtils {
             .filter((child) => child.weight > NOTHING)
             .sort((first, second) => second.weight - first.weight);
 
-        const rects = partition(
+        const rects = RectUtils.bisectByWeight(
             children.map((child) => child.weight),
             { x: NOTHING, y: NOTHING, ...size },
         );
 
         return children.map((child, index) => ({ ...child, rect: rects[index] }));
-    };
-
-    /**
-     * Moves a rectangle from one frame into another, keeping its place relative to the frame.
-     *
-     * Projecting a level's tiles from the full box into one of its parent's tiles shrinks them into that tile, and
-     * projecting the parent's tiles from that tile out to the full box enlarges them around it.
-     *
-     * @param rect The rectangle, in the same space as `source`.
-     * @param source The frame the rectangle is measured against.
-     * @param target The frame to carry it into.
-     * @returns The rectangle as it sits in `target`. A `source` with no width or height answers `target` itself.
-     */
-    export const projectRect = (rect: Rect, source: Rect, target: Rect): Rect => {
-        if (source.width <= NOTHING || source.height <= NOTHING) return target;
-
-        const scaleX = target.width / source.width;
-        const scaleY = target.height / source.height;
-
-        return {
-            x: target.x + (rect.x - source.x) * scaleX,
-            y: target.y + (rect.y - source.y) * scaleY,
-            width: rect.width * scaleX,
-            height: rect.height * scaleY,
-        };
     };
 
     /**
@@ -234,7 +138,7 @@ export namespace TreemapUtils {
 
             if (!tile) return undefined;
 
-            frame = projectRect(tile.rect, full, frame);
+            frame = RectUtils.project(tile.rect, full, frame);
         }
 
         return frame;
@@ -377,8 +281,8 @@ export namespace TreemapUtils {
         const full: Rect = { x: NOTHING, y: NOTHING, ...size };
 
         return transition.zoom === "in"
-            ? projectRect(rect, full, transition.focusRect)
-            : projectRect(rect, transition.focusRect, full);
+            ? RectUtils.project(rect, full, transition.focusRect)
+            : RectUtils.project(rect, transition.focusRect, full);
     };
 
     /**
@@ -394,21 +298,18 @@ export namespace TreemapUtils {
         const full: Rect = { x: NOTHING, y: NOTHING, ...size };
 
         return transition.zoom === "in"
-            ? projectRect(rect, transition.focusRect, full)
-            : projectRect(rect, full, transition.focusRect);
+            ? RectUtils.project(rect, transition.focusRect, full)
+            : RectUtils.project(rect, full, transition.focusRect);
     };
 
     /**
      * The easing every zoom built on these layouts runs through: cubic, slow at both ends and fastest in the middle.
      *
      * @param progress How far through the zoom's time, `0` to `1`.
-     * @returns How far through the zoom's movement, `0` to `1`. It is `TREEMAP_ZOOM_EASING` worked out by hand, for
-     * a zoom that is drawn frame by frame rather than animated by the browser.
+     * @returns How far through the zoom's movement, `0` to `1`. It is `TREEMAP_ZOOM_EASING` as a function, for a
+     * zoom that is drawn frame by frame rather than animated by the browser.
      */
-    export const easeZoom = (progress: number) =>
-        progress < EASE_TURN
-            ? EASE_IN_SCALE * progress ** EASE_POWER
-            : SETTLED - (EASE_OUT_SCALE * progress + EASE_OUT_OFFSET) ** EASE_POWER * HALF;
+    export const easeZoom = EasingUtils.easeInOutCubic;
 
     /**
      * A clock for a zoom drawn frame by frame, reading how far through its time it is.

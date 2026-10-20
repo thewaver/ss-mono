@@ -5,6 +5,7 @@ import { Vec2d, type Vec2dString } from "./vec2d.js";
 
 const K1 = "x";
 const K2 = "y";
+const CIRCUMCENTER_EPSILON = 1e-6;
 
 /** A position (or direction) on a 2D plane. */
 export type Point2d = Vec2d<typeof K1, typeof K2>;
@@ -138,6 +139,90 @@ export namespace Point2dUtils {
 
     /** Measures how far a point sits from the origin, in a straight line. */
     export const getLength = (p: Point2d): number => Math.hypot(p.x, p.y);
+
+    /**
+     * Measures which way, and how sharply, a path bends at a corner.
+     *
+     * The path runs from `a` to `b` and on to `c`. The answer is twice the area of the triangle the three make,
+     * signed by which way the path turns at `b`.
+     *
+     * @returns Positive when it turns clockwise on screen (y pointing down), negative when it turns the other
+     * way, and `0` when the three lie in a line.
+     */
+    export const getCornerTurn = (a: Point2d, b: Point2d, c: Point2d): number => {
+        const into = Point2d.sub(b, a);
+        const out = Point2d.sub(c, b);
+
+        return into.x * out.y - into.y * out.x;
+    };
+
+    /** Measures how far apart two points are, in a straight line. */
+    export const getDistance = (from: Point2d, to: Point2d): number => Math.hypot(to.x - from.x, to.y - from.y);
+
+    /**
+     * Measures how far a point is from the nearest place on a line segment.
+     *
+     * Unlike the distance to an infinite line, a point beyond either end measures to that end. A segment
+     * whose ends coincide is a point, and the answer is the distance to it.
+     *
+     * @param p The point to measure from.
+     * @param from One end of the segment.
+     * @param to The other end.
+     */
+    export const getSegmentDistance = (p: Point2d, from: Point2d, to: Point2d): number => {
+        const run = Point2d.sub(to, from);
+        const lengthSquared = run.x * run.x + run.y * run.y;
+        const along =
+            lengthSquared === 0
+                ? 0
+                : MathUtils.clamp01(((p.x - from.x) * run.x + (p.y - from.y) * run.y) / lengthSquared);
+
+        return getDistance(p, lerp(from, to, along));
+    };
+
+    /**
+     * Turns a point about another, keeping its distance from it.
+     *
+     * @param p The point to turn.
+     * @param origin The point it turns about.
+     * @param degrees How far to turn, clockwise on screen. See {@link getAngle} for the convention.
+     */
+    export const rotateAbout = (p: Point2d, origin: Point2d, degrees: number): Point2d => {
+        const radians = AngleUtils.toRadians(degrees);
+        const cos = Math.cos(radians);
+        const sin = Math.sin(radians);
+        const offset = Point2d.sub(p, origin);
+
+        return { x: origin.x + offset.x * cos - offset.y * sin, y: origin.y + offset.x * sin + offset.y * cos };
+    };
+
+    /**
+     * Finds the center of the one circle that passes through three points.
+     *
+     * @returns The center, or `undefined` when the points lie in a line, or so nearly that the circle would be
+     * too large to place reliably — a straight line has no center to find.
+     */
+    export const getCircumcenter = (first: Point2d, second: Point2d, third: Point2d): Point2d | undefined => {
+        const twiceArea =
+            2 * (first.x * (second.y - third.y) + second.x * (third.y - first.y) + third.x * (first.y - second.y));
+
+        if (Math.abs(twiceArea) < CIRCUMCENTER_EPSILON) return undefined;
+
+        const square = (point: Point2d) => point.x * point.x + point.y * point.y;
+
+        return {
+            x:
+                (square(first) * (second.y - third.y) +
+                    square(second) * (third.y - first.y) +
+                    square(third) * (first.y - second.y)) /
+                twiceArea,
+            y:
+                (square(first) * (third.x - second.x) +
+                    square(second) * (first.x - third.x) +
+                    square(third) * (second.x - first.x)) /
+                twiceArea,
+        };
+    };
 
     /**
      * Converts a distance and a direction into a position.

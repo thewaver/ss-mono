@@ -4,18 +4,6 @@ export type CirclePackingNode<T> = {
     children?: CirclePackingNode<T>[];
 };
 
-export type CirclePackingCircle = {
-    x: number;
-    y: number;
-    radius: number;
-};
-
-export type CirclePackingView = {
-    x: number;
-    y: number;
-    diameter: number;
-};
-
 export type CirclePackingCircleState = {
     /** How far the circle's center is to the right of the drawing's center at this moment, in pixels. */
     x: number;

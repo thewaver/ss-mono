@@ -1,7 +1,7 @@
 import type { Accessor } from "solid-js";
 import { createEffect, createMemo, createSignal, onCleanup } from "solid-js";
 
-import { type AnchorPlacement, AnchorUtils } from "@thewaver/ss-components";
+import { type AnchorPlacement, AnchorUtils, ElementObserverUtils } from "@thewaver/ss-components";
 import { type Point2d, Rect, Size2d } from "@thewaver/ss-utils";
 
 import { ElementObserverSolidUtils } from "../ElementObserver/ElementObserverSolid.utils";
@@ -122,7 +122,7 @@ export namespace AnchorSolidUtils {
 
             if (!contentRef || !isVisible) return;
 
-            onCleanup(AnchorUtils.observeContentSize(contentRef, setContentSize));
+            onCleanup(ElementObserverUtils.observeBorderBoxSize(contentRef, setContentSize));
         });
 
         return {

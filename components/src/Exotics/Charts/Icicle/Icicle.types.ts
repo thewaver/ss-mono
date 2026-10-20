@@ -1,4 +1,4 @@
-import type { Rect } from "@thewaver/ss-utils";
+import type { Rect, Span } from "@thewaver/ss-utils";
 
 export type IcicleNode<T> = {
     value: T;
@@ -6,9 +6,7 @@ export type IcicleNode<T> = {
     children?: IcicleNode<T>[];
 };
 
-export type IcicleSpan = {
-    start: number;
-    end: number;
+export type IcicleSpan = Span & {
     column: number;
 };
 

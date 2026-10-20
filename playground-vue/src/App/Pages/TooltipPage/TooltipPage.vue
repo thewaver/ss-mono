@@ -30,6 +30,9 @@ import RichExample from "./Examples/Rich.vue";
 import WordExample from "./Examples/Word.vue";
 import type { TooltipExampleProps } from "./TooltipPageVue.types";
 
+const computeRevealLabel = (next: TooltipReveal) => TOOLTIP_REVEAL_LABELS[next];
+const computeArrowLabel = (next: TooltipArrow) => TOOLTIP_ARROW_LABELS[next];
+
 const hPlacement = shallowRef<AnchorHPlacement>(TooltipKnobs.STARTING_H_PLACEMENT);
 const vPlacement = shallowRef<AnchorVPlacement>(TooltipKnobs.STARTING_V_PLACEMENT);
 const offsetX = shallowRef(TooltipKnobs.STARTING_OFFSET_X);
@@ -95,7 +98,7 @@ const examples: ExampleDefs[] = [
             <PageSelectField
                 :value="reveal"
                 :values="TOOLTIP_REVEALS"
-                :compute-label="(next: TooltipReveal) => TOOLTIP_REVEAL_LABELS[next]"
+                :compute-label="computeRevealLabel"
                 :width="FIELD_WIDTH"
                 ariaLabel="Reveal"
                 @change="(next: TooltipReveal) => (reveal = next)"
@@ -111,7 +114,7 @@ const examples: ExampleDefs[] = [
             <PageSelectField
                 :value="arrow"
                 :values="TOOLTIP_ARROWS"
-                :compute-label="(next: TooltipArrow) => TOOLTIP_ARROW_LABELS[next]"
+                :compute-label="computeArrowLabel"
                 :width="FIELD_WIDTH"
                 ariaLabel="Arrow"
                 @change="(next: TooltipArrow) => (arrow = next)"

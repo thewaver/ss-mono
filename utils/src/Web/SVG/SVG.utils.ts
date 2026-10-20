@@ -5,19 +5,9 @@ import { Size2d } from "../../Abstracts/size.js";
 
 const CIRCLE_CENTER = { x: 0.5, y: 0.5 };
 const CIRCLE_RADIUS = 1;
-
-/**
- * Builds a pie-slice path covering part of a circle.
- *
- * The slice is drawn around a fixed unit circle, so scale it with a `viewBox` or a
- * transform rather than by passing a size.
- *
- * @param arcSize How much of the circle to cover, in degrees. Values beyond a full
- * turn wrap round; any positive whole number of turns draws a complete circle
- * rather than collapsing to nothing.
- * @param rotation Where the slice starts, in degrees.
- * @returns Path text for an SVG `d` attribute.
- */
+const HALF_TURN_DEGREES = 180;
+const FULL_TURN_DEGREES = 360;
+const FULL_TURN_EPSILON = 1e-4;
 
 export namespace SVGUtils {
     /**
@@ -122,6 +112,18 @@ export namespace SVGUtils {
         );
     };
 
+    /**
+     * Builds a pie-slice path covering part of a circle.
+     *
+     * The slice is drawn around a fixed unit circle, so scale it with a `viewBox` or a
+     * transform rather than by passing a size.
+     *
+     * @param arcSize How much of the circle to cover, in degrees. Values beyond a full
+     * turn wrap round; any positive whole number of turns draws a complete circle
+     * rather than collapsing to nothing.
+     * @param rotation Where the slice starts, in degrees.
+     * @returns Path text for an SVG `d` attribute.
+     */
     export const getArcPath = (arcSize: number, rotation: number = 0) => {
         const normalizedArcSize = AngleUtils.wrapPositive(arcSize);
         const leadingAngle = rotation + normalizedArcSize;
@@ -220,5 +222,61 @@ export namespace SVGUtils {
                 "Z",
             ].join(" ");
         }).join(" ");
+    };
+
+    /**
+     * Builds the path of one slice of a ring: the part of a band between two circles that lies between two
+     * angles, like one piece of a sunburst chart or one wedge of a donut.
+     *
+     * With no inner radius the slice runs to the center, like a pie slice. A slice spanning the whole circle is a
+     * full ring, drawn with its hole cut out so no fill rule is needed.
+     *
+     * @param defs `center`, the middle of the circles; `innerRadius` and `outerRadius`, how far each edge of the
+     * band is from it; `fromAngle` and `toAngle`, where the slice starts and ends, in degrees with `0` pointing
+     * right and increasing clockwise; `padLength`, a gap to leave against each neighboring slice, the same width
+     * at both edges of the band, so the gaps between slices are straight-sided — half of it is taken from each end
+     * of this slice.
+     * @returns Path text for an SVG `d` attribute, or an empty string for a slice with no size.
+     */
+    export const getRingSectorPath = (defs: {
+        center: Point2d;
+        innerRadius: number;
+        outerRadius: number;
+        fromAngle: number;
+        toAngle: number;
+        padLength?: number;
+    }) => {
+        const { center, innerRadius: inner, outerRadius: outer, fromAngle, toAngle } = defs;
+        const pad = defs.padLength ?? 0;
+        const span = toAngle - fromAngle;
+        const at = (radius: number, angle: number) => {
+            const radians = AngleUtils.toRadians(angle);
+
+            return `${center.x + radius * Math.cos(radians)} ${center.y + radius * Math.sin(radians)}`;
+        };
+
+        if (span <= 0 || outer <= inner) return "";
+
+        if (span >= FULL_TURN_DEGREES - FULL_TURN_EPSILON && pad <= 0) {
+            const ring = (radius: number, sweep: number) =>
+                `M ${at(radius, 0)} A ${radius} ${radius} 0 1 ${sweep} ${at(radius, HALF_TURN_DEGREES)} ` +
+                `A ${radius} ${radius} 0 1 ${sweep} ${at(radius, 0)} Z`;
+
+            return inner > 0 ? `${ring(outer, 1)} ${ring(inner, 0)}` : ring(outer, 1);
+        }
+
+        const inset = (radius: number) =>
+            radius > 0 ? Math.min(span * 0.5, AngleUtils.fromRadians((pad * 0.5) / radius)) : 0;
+        const outerStart = fromAngle + inset(outer);
+        const outerEnd = toAngle - inset(outer);
+        const innerStart = fromAngle + inset(inner);
+        const innerEnd = toAngle - inset(inner);
+        const outerLarge = outerEnd - outerStart > HALF_TURN_DEGREES ? 1 : 0;
+        const innerLarge = innerEnd - innerStart > HALF_TURN_DEGREES ? 1 : 0;
+        const rim = `M ${at(outer, outerStart)} A ${outer} ${outer} 0 ${outerLarge} 1 ${at(outer, outerEnd)}`;
+
+        if (inner <= 0) return `${rim} L ${center.x} ${center.y} Z`;
+
+        return `${rim} L ${at(inner, innerEnd)} A ${inner} ${inner} 0 ${innerLarge} 0 ${at(inner, innerStart)} Z`;
     };
 }

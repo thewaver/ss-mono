@@ -1,4 +1,5 @@
 import { getLocalTimeZone } from "@internationalized/date";
+import { Index2dUtils } from "@thewaver/ss-utils";
 
 import type { DateValue, DateValueRange, DateValueWeekStart } from "../../../Abstracts/DateValue/DateValue.types";
 import { DateValueUtils } from "../../../Abstracts/DateValue/DateValue.utils";
@@ -413,7 +414,7 @@ export namespace CalendarUtils {
 
         if (index === undefined) return undefined;
 
-        const from = { row: Math.floor(index / shape.colCount), col: index % shape.colCount };
+        const from = Index2dUtils.fromFlatIndex(index, shape.colCount);
         const next = NavigatorUtils.computeNextCell(key, from, shape, {
             direction: opts.direction,
             hasPageKeys: false,
@@ -421,7 +422,7 @@ export namespace CalendarUtils {
 
         if (!next) return undefined;
 
-        const flat = next.row * shape.colCount + next.col;
+        const flat = Index2dUtils.toFlatIndex(next, shape.colCount);
         const lastIndex = cells.length - 1;
 
         return {

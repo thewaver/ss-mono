@@ -85,46 +85,6 @@ describe("WraparoundUtils.computeReveal", () => {
     });
 });
 
-describe("WraparoundUtils.computeVelocity", () => {
-    it("reads the speed over the last stretch of the drag only", () => {
-        const velocity = WraparoundUtils.computeVelocity([
-            { point: { x: 0, y: 0 }, timeMs: 0 },
-            { point: { x: 500, y: 0 }, timeMs: 400 },
-            { point: { x: 600, y: 50 }, timeMs: 450 },
-        ]);
-
-        expect(velocity).toEqual({ x: 2, y: 1 });
-    });
-
-    it("answers none for a single sample", () => {
-        expect(WraparoundUtils.computeVelocity([{ point: { x: 0, y: 0 }, timeMs: 0 }])).toEqual({ x: 0, y: 0 });
-    });
-});
-
-describe("WraparoundUtils.stepCoast", () => {
-    it("travels the sum of a speed that decays, and keeps the share it should", () => {
-        const step = WraparoundUtils.stepCoast({ x: 1, y: 0 }, 100, 100);
-
-        expect(step.velocity.x).toBeCloseTo(Math.exp(-1));
-        expect(step.distance.x).toBeCloseTo(100 * (1 - Math.exp(-1)));
-    });
-
-    it("lands in the same place however the time is cut into frames", () => {
-        const whole = WraparoundUtils.stepCoast({ x: 1, y: 0 }, 160, 200);
-        const first = WraparoundUtils.stepCoast({ x: 1, y: 0 }, 80, 200);
-        const second = WraparoundUtils.stepCoast(first.velocity, 80, 200);
-
-        expect(first.distance.x + second.distance.x).toBeCloseTo(whole.distance.x);
-    });
-
-    it("stops dead without momentum", () => {
-        expect(WraparoundUtils.stepCoast({ x: 3, y: 3 }, 16, 0)).toEqual({
-            distance: { x: 0, y: 0 },
-            velocity: { x: 0, y: 0 },
-        });
-    });
-});
-
 describe("WraparoundUtils.computeKeyDelta", () => {
     it("moves the plane against the key, the way a scrolled page moves", () => {
         expect(WraparoundUtils.computeKeyDelta("ArrowRight", 40, VIEW)).toEqual({ x: -40, y: 0 });

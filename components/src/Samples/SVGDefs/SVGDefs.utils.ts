@@ -291,7 +291,7 @@ export namespace SVGDefsUtils {
      * blended here, and the earlier of the two is returned as it is.
      */
     export const computeCycleColor = (colors: SVGDefsColors, keys: CycleColorKey[], atMs: number, cycleMs: number) => {
-        const phase = ((((atMs % cycleMs) + cycleMs) % cycleMs) / cycleMs) * keys.length;
+        const phase = (MathUtils.wrap(atMs, cycleMs) / cycleMs) * keys.length;
         const index = Math.floor(phase);
         const from = colors[keys[index % keys.length]];
         const to = colors[keys[(index + 1) % keys.length]];

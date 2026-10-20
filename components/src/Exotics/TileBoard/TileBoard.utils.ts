@@ -3,6 +3,7 @@ import {
     type Index2dString,
     MathUtils,
     Point2d,
+    PolygonUtils,
     type Rect,
     ShapeConst,
     type Size2d,
@@ -301,35 +302,9 @@ const computeMeanPoint = (points: Point2d[]): Point2d => ({
  * own middle rather than turning inside out.
  */
 const computeInsetPoints = (points: Point2d[], distance: number): Point2d[] => {
-    const lines = points.map((point, index) => {
-        const next = points[(index + 1) % points.length];
-        const length = Math.hypot(next.x - point.x, next.y - point.y);
-        const direction = { x: (next.x - point.x) / length, y: (next.y - point.y) / length };
+    const inset = PolygonUtils.insetPolygon(points, distance);
 
-        return { origin: { x: point.x - direction.y * distance, y: point.y + direction.x * distance }, direction };
-    });
-
-    const inset = lines.map((line, index) => {
-        const previous = lines[(index + lines.length - 1) % lines.length];
-        const cross = previous.direction.x * line.direction.y - previous.direction.y * line.direction.x;
-        const along =
-            ((line.origin.x - previous.origin.x) * line.direction.y -
-                (line.origin.y - previous.origin.y) * line.direction.x) /
-            cross;
-
-        return {
-            x: previous.origin.x + previous.direction.x * along,
-            y: previous.origin.y + previous.direction.y * along,
-        };
-    });
-
-    const twiceArea = inset.reduce((sum, point, index) => {
-        const next = inset[(index + 1) % inset.length];
-
-        return sum + point.x * next.y - next.x * point.y;
-    }, 0);
-
-    if (twiceArea > 0) return inset;
+    if (PolygonUtils.getSignedArea(inset) > 0) return inset;
 
     const middle = computeMeanPoint(points);
 

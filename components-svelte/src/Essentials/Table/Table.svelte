@@ -14,7 +14,7 @@
         type VirtualizerRow,
         TableStyles as styles,
     } from "@thewaver/ss-components";
-    import type { Index2d } from "@thewaver/ss-utils";
+    import { type Index2d, ObjectUtils } from "@thewaver/ss-utils";
     import { assignInlineVars } from "@vanilla-extract/dynamic";
 
     import { CarrierSvelteUtils } from "../../Abstracts/Carrier/CarrierSvelte.utils.svelte.js";
@@ -213,7 +213,7 @@
         if (!getIsReorderable(columns[fromIndex]) || isDisabled) return false;
         if (toIndex < 0 || toIndex >= columns.length) return false;
 
-        const next = CarrierUtils.computeMovedOrder(
+        const next = ObjectUtils.moveArrayElement(
             columns.map((column) => column.id),
             fromIndex,
             toIndex,

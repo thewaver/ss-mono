@@ -6,10 +6,10 @@ import {
     type CirclePackingNode,
     CirclePackingStyles,
     CirclePackingUtils,
-    type CirclePackingView,
     TreemapUtils,
 } from "@thewaver/ss-components";
 import { CirclePackingConst } from "@thewaver/ss-components/internal";
+import { type Circle, CircleUtils } from "@thewaver/ss-utils";
 
 import { ElementObserverReactUtils } from "../../../Abstracts/ElementObserver/ElementObserverReact.utils";
 import { SignalMirrorReactUtils } from "../../../Abstracts/SignalMirror/SignalMirrorReact.utils";
@@ -19,7 +19,7 @@ import type { CirclePackingProps } from "./CirclePacking.types";
 type CirclePackingZoomState<T> = {
     branch: CirclePackingNode<T>;
     cameFrom: CirclePackingNode<T> | undefined;
-    path: ((progress: number) => CirclePackingView) | undefined;
+    path: ((progress: number) => Circle) | undefined;
     generation: number;
 };
 
@@ -60,24 +60,21 @@ export const CirclePacking = <T,>(props: CirclePackingProps<T>) => {
     if (zoom.branch !== branch) {
         const from = CirclePackingUtils.computeShownView(
             zoom.path,
-            CirclePackingUtils.toView(layout.get(zoom.branch) ?? CirclePackingConst.EMPTY_CIRCLE),
+            layout.get(zoom.branch) ?? CirclePackingConst.EMPTY_CIRCLE,
             progress,
         );
 
         setZoom({
             branch,
             cameFrom: zoom.branch,
-            path: CirclePackingUtils.interpolateZoom(
-                from,
-                CirclePackingUtils.toView(layout.get(branch) ?? CirclePackingConst.EMPTY_CIRCLE),
-            ),
+            path: CircleUtils.interpolateZoom(from, layout.get(branch) ?? CirclePackingConst.EMPTY_CIRCLE),
             generation: zoom.generation + CirclePackingConst.NEXT,
         });
     }
 
     const view = CirclePackingUtils.computeShownView(
         zoom.path,
-        CirclePackingUtils.toView(layout.get(branch) ?? CirclePackingConst.EMPTY_CIRCLE),
+        layout.get(branch) ?? CirclePackingConst.EMPTY_CIRCLE,
         progress,
     );
 

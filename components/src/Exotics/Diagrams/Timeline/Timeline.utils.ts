@@ -1,7 +1,8 @@
+import { type Span, SpanUtils } from "@thewaver/ss-utils";
+
 import type { CarrierZone, Carry, CarryPlace } from "../../../Abstracts/Carrier/Carrier.types";
 import { CarrierUtils } from "../../../Abstracts/Carrier/Carrier.utils";
 import { NavigatorUtils } from "../../../Abstracts/Navigator/Navigator.utils";
-import { PanZoomUtils } from "../../../Abstracts/PanZoom/PanZoom.utils";
 import type {
     TimelineEdge,
     TimelineEdgeCarry,
@@ -10,25 +11,14 @@ import type {
     TimelineKeyAction,
     TimelineMarker,
     TimelinePlacement,
-    TimelineSpan,
     TimelineStep,
-    TimelineStepPair,
     TimelineStop,
-    TimelineTick,
 } from "./Timeline.types";
 
 /** Zero, as a count, an index or an extent. */
 const NOTHING = 0;
 /** One step or one item. */
 const SINGLE = 1;
-/** The base tick steps climb in. */
-const DECADE = 10;
-/** The tick steps within one decade: ones, twos and fives. Anything else gives labels nobody can read off — nobody counts in sevens. */
-const MANTISSAS = [1, 2, 5];
-/** How much coarser a major tick should be than a minor one before it is worth labeling. */
-const MAJOR_FACTOR = 3;
-/** A cap on how many ticks are produced, in case a view and a step disagree wildly. */
-const MAX_TICKS = 512;
 /** Slack for comparing values that arrived by division, where a whole number may be off in its last bits. */
 const EPSILON = 1e-9;
 /** How many steps an edge looks ahead for the next snapped value before giving up. */
@@ -63,58 +53,14 @@ const STEP_BY_KEY: Record<string, TimelineStep> = {
     End: "last",
 };
 
-/** Whether a value falls on a step, allowing for floating-point drift. */
-const isMultipleOf = (value: number, step: number) => Math.abs(value / step - Math.round(value / step)) < EPSILON;
-
 /**
- * Picks which step gets the labeled ticks.
- *
- * It must be a whole multiple of the minor step, or the major ticks would not line up with the minor
- * ones, and it must fit in the view or nothing would be labeled at all. Comfortably coarser than
- * the minor step is preferred, falling back to the next one up.
- */
-const chooseMajorStep = (step: number, entries: number[], viewExtent: number) => {
-    const fitting = entries.filter((entry) => entry > step && entry <= viewExtent && isMultipleOf(entry, step));
-
-    return fitting.find((entry) => entry >= step * MAJOR_FACTOR) ?? fitting[NOTHING] ?? step;
-};
-
-/**
- * Zooming, panning, lane packing and tick marks for a timeline.
+ * Placing, walking and editing the items of a timeline. Lane packing and tick marks are `SpanUtils`'.
  *
  * Two spans matter throughout and it is worth keeping them apart: the range is everything the
  * timeline covers, and the view is the part of it currently on screen. Values are plain numbers, so
  * the same code serves dates, durations, frame counts or anything else laid out along a line.
  */
 export namespace TimelineUtils {
-    /**
-     * Assigns each span to a lane so that no two overlapping spans share one.
-     *
-     * Spans are taken in start order and each goes into the first lane already free at that point, which
-     * is the standard greedy packing — it uses no more lanes than the busiest moment needs, and adding a
-     * span cannot reshuffle the ones before it.
-     *
-     * @param spans The spans, in the caller's own order.
-     * @returns One lane number per span, in that same order.
-     */
-    export const packLanes = (spans: TimelineSpan[]): number[] => {
-        const lanes: number[] = spans.map(() => NOTHING);
-        const ends: number[] = [];
-
-        spans
-            .map((span, index) => ({ span, index }))
-            .sort((first, second) => first.span.start - second.span.start || first.index - second.index)
-            .forEach((entry) => {
-                const free = ends.findIndex((end) => end <= entry.span.start);
-                const lane = free === -SINGLE ? ends.length : free;
-
-                ends[lane] = entry.span.end;
-                lanes[entry.index] = lane;
-            });
-
-        return lanes;
-    };
-
     /**
      * The order a keyboard should walk the spans.
      *
@@ -126,7 +72,7 @@ export namespace TimelineUtils {
      * @param lanes Their lanes.
      * @returns The span indices in that order.
      */
-    export const computeOrder = (spans: TimelineSpan[], lanes: number[]): number[] =>
+    export const computeOrder = (spans: Span[], lanes: number[]): number[] =>
         spans
             .map((_unused, index) => index)
             .sort(
@@ -149,17 +95,17 @@ export namespace TimelineUtils {
      * and are how a span running off the edge gets drawn.
      */
     export const computePlacements = (
-        spans: TimelineSpan[],
+        spans: Span[],
         lanes: number[],
         order: number[],
-        view: TimelineSpan,
+        view: Span,
     ): TimelinePlacement[] =>
         order.map((index, position) => ({
             index,
             order: position,
             lane: lanes[index],
-            startRatio: PanZoomUtils.toRatio(spans[index].start, view),
-            endRatio: PanZoomUtils.toRatio(spans[index].end, view),
+            startRatio: SpanUtils.toRatio(spans[index].start, view),
+            endRatio: SpanUtils.toRatio(spans[index].end, view),
             isInView: spans[index].end >= view.start && spans[index].start <= view.end,
         }));
 
@@ -173,7 +119,7 @@ export namespace TimelineUtils {
      * than stalling on them.
      */
     export const computeStops = (
-        spans: TimelineSpan[],
+        spans: Span[],
         lanes: number[],
         order: number[],
         isDisabled: boolean[],
@@ -228,10 +174,10 @@ export namespace TimelineUtils {
      * @returns One marker per value, in the same order, carrying its value, its position as a fraction of the
      * view — outside `0` to `1` when it is off screen — and whether it is in view, ends included.
      */
-    export const computeMarkers = (values: number[], view: TimelineSpan): TimelineMarker[] =>
+    export const computeMarkers = (values: number[], view: Span): TimelineMarker[] =>
         values.map((value) => ({
             value,
-            ratio: PanZoomUtils.toRatio(value, view),
+            ratio: SpanUtils.toRatio(value, view),
             isInView: value >= view.start && value <= view.end,
         }));
 
@@ -247,7 +193,7 @@ export namespace TimelineUtils {
      * @param range Everything the timeline covers.
      * @returns A new span. The edge not being moved is left where it was.
      */
-    export const moveEdge = (span: TimelineSpan, edge: TimelineEdge, value: number, range: TimelineSpan) => {
+    export const moveEdge = (span: Span, edge: TimelineEdge, value: number, range: Span) => {
         const held = Math.min(Math.max(value, range.start), range.end);
 
         return edge === "start"
@@ -275,7 +221,7 @@ export namespace TimelineUtils {
         value: number,
         direction: number,
         step: number,
-        range: TimelineSpan,
+        range: Span,
         computeSnapValue?: (value: number) => number,
     ) => {
         if (step <= NOTHING || direction === NOTHING) return value;
@@ -310,81 +256,6 @@ export namespace TimelineUtils {
         }
 
         return snapAt(far);
-    };
-
-    /**
-     * Picks the tick spacing for the current zoom.
-     *
-     * The spacing has to come from how much room a tick has on screen, not from the values themselves,
-     * which is why the view's width in pixels is needed. From that, the coarsest step that still leaves
-     * the ticks far enough apart is chosen — from ones, twos and fives within each decade, since those
-     * are the only intervals people read off a scale without counting.
-     *
-     * @param viewExtent How much the view covers.
-     * @param width The view's width in pixels.
-     * @param minTickGap The closest two ticks may be, in pixels.
-     * @param ladder Steps to choose from instead of the ones-twos-fives ladder, for a scale with its own
-     * natural intervals — seconds, minutes, hours, days.
-     * @returns The minor step and the coarser major step, which is always a whole multiple of it so the
-     * labeled ticks line up with the unlabeled ones.
-     */
-    export const chooseSteps = (
-        viewExtent: number,
-        width: number,
-        minTickGap: number,
-        ladder?: number[],
-    ): TimelineStepPair => {
-        const needed = width <= NOTHING ? viewExtent : (viewExtent * minTickGap) / width;
-
-        if (ladder?.length) {
-            const ascending = [...ladder].sort((first, second) => first - second);
-            const step = ascending.find((entry) => entry >= needed) ?? ascending[ascending.length - SINGLE];
-
-            return { step, majorStep: chooseMajorStep(step, ascending, viewExtent) };
-        }
-
-        const exponent = Math.floor(Math.log10(Math.max(needed, Number.MIN_VALUE)));
-        const base = DECADE ** exponent;
-        const mantissa = needed / base;
-        const at = MANTISSAS.findIndex((entry) => entry >= mantissa);
-        const place = at === -SINGLE ? MANTISSAS.length : at;
-        const stepOf = (position: number) =>
-            MANTISSAS[position % MANTISSAS.length] * base * DECADE ** Math.floor(position / MANTISSAS.length);
-        const step = stepOf(place);
-        const decades = Array.from({ length: MANTISSAS.length }, (_unused, ahead) => stepOf(place + ahead + SINGLE));
-
-        return { step, majorStep: chooseMajorStep(step, decades, viewExtent) };
-    };
-
-    /**
-     * The ticks to draw in the current view.
-     *
-     * @param view The part of the range on screen.
-     * @param steps The minor and major steps from {@link TimelineUtils.chooseSteps}.
-     * @returns One tick per step within the view, each carrying its value, its position as a fraction of
-     * the view, and whether it is a major tick and so gets a label. Capped in number, so a mismatched
-     * step and view cannot produce a runaway list.
-     */
-    export const computeTicks = (view: TimelineSpan, steps: TimelineStepPair): TimelineTick[] => {
-        const extent = PanZoomUtils.getExtent(view);
-
-        if (steps.step <= NOTHING || extent <= NOTHING) return [];
-
-        const first = Math.ceil(view.start / steps.step - EPSILON) * steps.step;
-        const count = Math.min(Math.floor((view.end - first) / steps.step) + SINGLE, MAX_TICKS);
-        const ticks: TimelineTick[] = [];
-
-        for (let index = NOTHING; index < count; index++) {
-            const value = first + index * steps.step;
-
-            ticks.push({
-                value,
-                ratio: (value - view.start) / extent,
-                isMajor: isMultipleOf(value, steps.majorStep),
-            });
-        }
-
-        return ticks;
     };
 
     /**
@@ -482,11 +353,7 @@ export namespace TimelineUtils {
      * @param heldSpan The span that item would have if dropped now, if any.
      * @returns `spans` itself when nothing is held, so an unchanged list keeps its identity.
      */
-    export const computeShownSpans = (
-        spans: TimelineSpan[],
-        heldIndex: number | undefined,
-        heldSpan: TimelineSpan | undefined,
-    ) => {
+    export const computeShownSpans = (spans: Span[], heldIndex: number | undefined, heldSpan: Span | undefined) => {
         if (heldIndex === undefined || heldSpan === undefined) return spans;
 
         return spans.map((span, at) => (at === heldIndex ? heldSpan : span));
@@ -567,7 +434,7 @@ export namespace TimelineUtils {
      * @returns The zone, to register with the carrier.
      */
     export const createEdgeZone = (defs: TimelineEdgeZoneDefs): CarrierZone => {
-        const asSpan = (place: CarryPlace) => place as TimelineSpan;
+        const asSpan = (place: CarryPlace) => place as Span;
 
         return {
             getGroupId: defs.getGroupId,
@@ -583,7 +450,7 @@ export namespace TimelineUtils {
                 if (place === undefined) return undefined;
 
                 const value =
-                    PanZoomUtils.toValue(defs.computePointerRatio(point.x), defs.getView()) - defs.getGrabOffset();
+                    SpanUtils.toValue(defs.computePointerRatio(point.x), defs.getView()) - defs.getGrabOffset();
                 const snapped = defs.computeSnapValue?.(value) ?? value;
 
                 return moveEdge(asSpan(place), defs.getHeldEdge(), snapped, defs.getRange());

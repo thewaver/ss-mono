@@ -65,3 +65,45 @@ describe("GestureUtils.computeSwipeOffset", () => {
         expect(GestureUtils.computeSwipeOffset(1.6, "right")).toBe(1);
     });
 });
+
+describe("GestureUtils.computeVelocity", () => {
+    it("reads the speed over the last stretch of the drag only", () => {
+        const velocity = GestureUtils.computeVelocity(
+            [
+                { point: { x: 0, y: 0 }, timeMs: 0 },
+                { point: { x: 500, y: 0 }, timeMs: 400 },
+                { point: { x: 600, y: 50 }, timeMs: 450 },
+            ],
+            100,
+        );
+
+        expect(velocity).toEqual({ x: 2, y: 1 });
+    });
+
+    it("answers no speed for a single sample, or none at all", () => {
+        expect(GestureUtils.computeVelocity([{ point: { x: 0, y: 0 }, timeMs: 0 }], 100)).toEqual({ x: 0, y: 0 });
+        expect(GestureUtils.computeVelocity([], 100)).toEqual({ x: 0, y: 0 });
+    });
+});
+
+describe("GestureUtils.coast", () => {
+    it("travels the sum of a speed that decays, and keeps the share it should", () => {
+        const step = GestureUtils.coast(1, 100, 100);
+
+        expect(step.speed).toBeCloseTo(Math.exp(-1), 12);
+        expect(step.distance).toBeCloseTo(100 * (1 - Math.exp(-1)), 12);
+    });
+
+    it("travels as far in one long step as in two short ones, so the frame rate cannot change a coast", () => {
+        const whole = GestureUtils.coast(0.01, 160, 200);
+        const first = GestureUtils.coast(0.01, 80, 200);
+        const second = GestureUtils.coast(first.speed, 80, 200);
+
+        expect(first.distance + second.distance).toBeCloseTo(whole.distance, 12);
+        expect(second.speed).toBeCloseTo(whole.speed, 12);
+    });
+
+    it("stops at once with no momentum", () => {
+        expect(GestureUtils.coast(1, 16, 0)).toEqual({ distance: 0, speed: 0 });
+    });
+});

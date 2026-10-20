@@ -6,14 +6,13 @@ import type {
     InteractionFlags,
     TimelineItemRenderProps,
     TimelineMarker,
-    TimelineSpan,
-    TimelineTick,
 } from "@thewaver/ss-components";
+import type { Span, SpanTick } from "@thewaver/ss-utils";
 
 import type { AccessorValues, SignalSource } from "../../../Utils/typeUtils";
 
 export type TimelineController = {
-    getView: Accessor<TimelineSpan>;
+    getView: Accessor<Span>;
     /**
      * Zooms the view in or out about a point.
      *
@@ -35,15 +34,15 @@ export type TimelineController = {
      * @param span The span that must end up visible.
      * @returns `false` when it was already fully in view.
      */
-    showSpan: (span: TimelineSpan) => boolean;
+    showSpan: (span: Span) => boolean;
 };
 
 export type TimelineProps<T> = AccessorValues<BaseTimelineValues<T>> &
     BaseTimelineCbs<T> & {
         /** The stretch of time currently in view. It is the only thing that pans or zooms it. */
-        view?: SignalSource<TimelineSpan>;
+        view?: SignalSource<Span>;
         /** Draws one tick on the ruler. */
-        renderTick?: (getTick: Accessor<TimelineTick>) => JSX.Element;
+        renderTick?: (getTick: Accessor<SpanTick>) => JSX.Element;
         /**
          * Draws one marker, as tall as the timeline, and is told where it is and whether it is in view.
          *

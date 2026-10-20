@@ -1,11 +1,11 @@
-import type { RangeValues } from "@thewaver/ss-components-svelte";
+import type { Span } from "@thewaver/ss-utils";
 
 export type RangeExampleProps = {
     value: number;
 };
 
 export type RangePairExampleProps = {
-    range: RangeValues;
+    range: Span;
 };
 
 export type RangePriceExampleProps = RangePairExampleProps & {

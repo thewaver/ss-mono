@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 
-import type { Point3d } from "@thewaver/ss-utils";
+import { type Point3d, QuaternionUtils } from "@thewaver/ss-utils";
 
 import { DieUtils } from "../../Exotics/Perspective/Die/Die.utils";
 import { DieShapes } from "../../Samples/Die/Shapes/DieShapes.const";
@@ -41,44 +41,14 @@ const expectPoint = (actual: Point3d, expected: Point3d) => {
 
 const facesOf = (key: DieShapes.SampleKey) => DieUtils.computeFaceGeometry(DieShapes.SAMPLE_SHAPES[key], RADIUS);
 
-describe("quaternions", () => {
-    it("turn a rotation into a quaternion and back without changing it", () => {
-        facesOf("d12").forEach((face) => {
-            const rotation = RollerUtils.toRotation(RollerUtils.getLandingQuaternion(face));
-            const back = RollerUtils.toRotation(RollerUtils.toQuaternion(rotation));
-
-            back.forEach((value, index) => expect(value).toBeCloseTo(rotation[index], 9));
-        });
-    });
-
-    it("blend from one rotation to another, landing on each end", () => {
-        const from = RollerUtils.fromAxisAngle({ x: 0, y: 1, z: 0 }, 0);
-        const to = RollerUtils.fromAxisAngle({ x: 0, y: 1, z: 0 }, Math.PI * 0.5);
-        const half = RollerUtils.slerp(from, to, 0.5);
-
-        expect(RollerUtils.slerp(from, to, 1).w).toBeCloseTo(to.w, 9);
-        expect(half.w).toBeCloseTo(Math.cos(Math.PI * 0.125), 9);
-    });
-
-    it("treat whole turns as no turn at all, which is what lets a roll tumble and still land", () => {
-        const twoTurns = RollerUtils.toRotation(RollerUtils.fromAxisAngle({ x: 1, y: 2, z: 3 }, Math.PI * 4));
-
-        [1, 0, 0, 0, 1, 0, 0, 0, 1].forEach((value, index) => expect(twoTurns[index]).toBeCloseTo(value, 9));
-    });
-
-    it("give no turn about an axis of no length", () => {
-        expect(RollerUtils.fromAxisAngle({ x: 0, y: 0, z: 0 }, 1)).toEqual(NO_TURN);
-    });
-});
-
 describe("getLandingQuaternion", () => {
     it("turns every face of every die towards the viewer, the right way up", () => {
         DieShapes.SAMPLE_KEYS.forEach((key) =>
             facesOf(key).forEach((face) => {
                 const landing = RollerUtils.getLandingQuaternion(face);
 
-                expectPoint(RollerUtils.turnVector(landing, face.normal), { x: 0, y: 0, z: 1 });
-                expectPoint(RollerUtils.turnVector(landing, face.down), { x: 0, y: 1, z: 0 });
+                expectPoint(QuaternionUtils.rotate(landing, face.normal), { x: 0, y: 0, z: 1 });
+                expectPoint(QuaternionUtils.rotate(landing, face.down), { x: 0, y: 1, z: 0 });
             }),
         );
     });
@@ -96,8 +66,8 @@ describe("getClosestFace", () => {
     });
 
     it("finds the face nearest the viewer part-way through a turn", () => {
-        const slightlyRight = RollerUtils.fromAxisAngle({ x: 0, y: 1, z: 0 }, Math.PI * 0.2);
-        const mostlyLeft = RollerUtils.fromAxisAngle({ x: 0, y: 1, z: 0 }, Math.PI * 0.3);
+        const slightlyRight = QuaternionUtils.fromAxisAngle({ x: 0, y: 1, z: 0 }, 36);
+        const mostlyLeft = QuaternionUtils.fromAxisAngle({ x: 0, y: 1, z: 0 }, 54);
 
         expect(RollerUtils.getClosestFace(CUBE, slightlyRight)).toBe(FRONT);
         expect(RollerUtils.getClosestFace(CUBE, mostlyLeft)).toBe(LEFT_SIDE);
@@ -162,32 +132,13 @@ describe("getDragTurn", () => {
         const quarterRight = RollerUtils.getDragTurn((RADIUS * Math.PI) / 2, 0, RADIUS);
         const quarterDown = RollerUtils.getDragTurn(0, (RADIUS * Math.PI) / 2, RADIUS);
 
-        expectPoint(RollerUtils.turnVector(quarterRight, { x: 0, y: 0, z: 1 }), { x: 1, y: 0, z: 0 });
-        expectPoint(RollerUtils.turnVector(quarterDown, { x: 0, y: 0, z: 1 }), { x: 0, y: 1, z: 0 });
+        expectPoint(QuaternionUtils.rotate(quarterRight, { x: 0, y: 0, z: 1 }), { x: 1, y: 0, z: 0 });
+        expectPoint(QuaternionUtils.rotate(quarterDown, { x: 0, y: 0, z: 1 }), { x: 0, y: 1, z: 0 });
     });
 
     it("makes no turn for no movement or no size", () => {
         expect(RollerUtils.getDragTurn(0, 0, RADIUS)).toEqual(NO_TURN);
         expect(RollerUtils.getDragTurn(10, 10, 0)).toEqual(NO_TURN);
-    });
-});
-
-describe("stepCoast", () => {
-    it("turns as far in one long step as in two short ones, so the frame rate cannot change a coast", () => {
-        const whole = RollerUtils.stepCoast(0.01, 160, 200);
-        const first = RollerUtils.stepCoast(0.01, 80, 200);
-        const second = RollerUtils.stepCoast(first.speed, 80, 200);
-
-        expect(first.angle + second.angle).toBeCloseTo(whole.angle, 12);
-        expect(second.speed).toBeCloseTo(whole.speed, 12);
-    });
-
-    it("loses about 63% of its speed over one momentum", () => {
-        expect(RollerUtils.stepCoast(1, 300, 300).speed).toBeCloseTo(Math.exp(-1), 12);
-    });
-
-    it("stops at once with no momentum", () => {
-        expect(RollerUtils.stepCoast(1, 16, 0)).toEqual({ angle: 0, speed: 0 });
     });
 });
 

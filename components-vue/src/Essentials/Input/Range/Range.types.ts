@@ -1,4 +1,5 @@
-import type { BaseRangeValues, RangeCbs, RangeRenderProps, RangeValues } from "@thewaver/ss-components";
+import type { BaseRangeValues, RangeCbs, RangeRenderProps } from "@thewaver/ss-components";
+import type { Span } from "@thewaver/ss-utils";
 
 import type {
     InteractionControlProps,
@@ -40,9 +41,9 @@ export type RangeProps = Omit<InteractionWrapperProps<RangeRenderProps>, "extraF
          * `<id>-end` as their ids, so a label can name each one, where a single thumb keeps the id as given. Give this
          * or `value`.
          */
-        "range"?: RangeValues;
+        "range"?: Span;
         /** Receives the two ends as either thumb moves, which is what `v-model:range` binds. */
-        "onUpdate:range"?: (range: RangeValues) => void;
+        "onUpdate:range"?: (range: Span) => void;
     };
 
 export type RangeSlots = Pick<InteractionWrapperSlots<RangeRenderProps>, "renderDecoration"> &

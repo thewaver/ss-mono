@@ -1,3 +1,5 @@
+import { DOMUtils } from "@thewaver/ss-utils";
+
 import { VirtualizerUtils } from "../../Abstracts/Virtualizer/Virtualizer.utils";
 import type { TableOfContentsLink } from "./TableOfContents.types";
 
@@ -18,11 +20,11 @@ const toPixels = (value: string) => parseFloat(value) || 0;
  * and the box's `scroll-padding-top`.
  *
  * Measured from the two elements' on-screen boxes, which a scaled ancestor shrinks; the distance between them is put
- * back into the box's own pixels by the box's on-screen height over its laid-out one.
+ * back into the box's own pixels by the box's on-screen scale.
  */
 const computeScrollTopFor = (target: HTMLElement, scroller: HTMLElement) => {
     const scrollerRect = scroller.getBoundingClientRect();
-    const scale = scroller.offsetHeight > 0 ? scrollerRect.height / scroller.offsetHeight : 1;
+    const scale = DOMUtils.getScreenScale(scroller, scrollerRect);
     const distance = (target.getBoundingClientRect().top - scrollerRect.top) / scale - scroller.clientTop;
     const margin = toPixels(getComputedStyle(target).scrollMarginTop);
     const padding = toPixels(getComputedStyle(scroller).scrollPaddingTop);

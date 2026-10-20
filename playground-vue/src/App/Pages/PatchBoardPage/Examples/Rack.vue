@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { useModel } from "vue";
 
+import type { PatchBoardLink } from "@thewaver/ss-components-vue";
 import { PatchBoard, PatchBoardSnaps, PatchBoardUtils } from "@thewaver/ss-components-vue";
 import { PATCH_BOARD_ANNOUNCEMENTS } from "@thewaver/ss-playground/App/PageComponents/Announcements/Announcements.const";
 import { BOARD_HEIGHT_RATIO, BOARD_WIDTH } from "@thewaver/ss-playground/App/Pages/PatchBoardPage/PatchBoardPage.const";
@@ -19,6 +20,8 @@ const props = defineProps<Props>();
 
 const nodes = useModel(props, "nodes");
 const links = useModel(props, "links");
+
+const computeCanLink = (link: PatchBoardLink) => !PatchBoardUtils.getClosesLoop(links.value, link);
 </script>
 
 <template>
@@ -42,7 +45,7 @@ const links = useModel(props, "links");
             :compute-node-key="(device) => device.id"
             :compute-node-label="(device) => device.name"
             :compute-snap-spot="PatchBoardSnaps.grid"
-            :compute-can-link="(link) => !PatchBoardUtils.getClosesLoop(links, link)"
+            :compute-can-link="computeCanLink"
             @link="props.onLink"
             @unlink="props.onUnlink"
             @move="props.onMove"

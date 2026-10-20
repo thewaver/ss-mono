@@ -1,14 +1,13 @@
 <script lang="ts">
     import {
         CORNER_PIN_DEFAULTS,
-        type CornerKey,
         type CornerPinGripRenderProps,
         InteractionTrackerUtils,
         type QuadWarpAxis,
         QuadWarpUtils,
         CornerPinStyles as styles,
     } from "@thewaver/ss-components";
-    import type { Point2d } from "@thewaver/ss-utils";
+    import { type Point2d, type QuadCorner, QuadUtils } from "@thewaver/ss-utils";
 
     import { ElementObserverSvelteUtils } from "../../../Abstracts/ElementObserver/ElementObserverSvelte.utils.svelte.js";
     import type { CornerPinProps } from "./CornerPin.types.js";
@@ -24,21 +23,21 @@
 
     let root = $state<HTMLDivElement>();
 
-    let picked = $state<CornerKey>();
-    let dragged = $state<CornerKey>();
-    let focusVisible = $state<{ corner: CornerKey; axis: QuadWarpAxis }>();
+    let picked = $state<QuadCorner>();
+    let dragged = $state<QuadCorner>();
+    let focusVisible = $state<{ corner: QuadCorner; axis: QuadWarpAxis }>();
 
-    const axisRefs: Partial<Record<CornerKey, HTMLInputElement>> = {};
+    const axisRefs: Partial<Record<QuadCorner, HTMLInputElement>> = {};
 
     const getSize = ElementObserverSvelteUtils.createBorderBoxSizeObserver(() => root ?? undefined);
 
     const reachRatio = $derived(props.reachRatio ?? CORNER_PIN_DEFAULTS.reachRatio);
 
     const transform = $derived(
-        QuadWarpUtils.toTransform(getSize(), QuadWarpUtils.toPixels(corners, getSize())) ?? "none",
+        QuadUtils.toCss(getSize(), QuadUtils.scale(corners, getSize())) ?? "none",
     );
 
-    const moveCorner = (corner: CornerKey, target: Point2d) => {
+    const moveCorner = (corner: QuadCorner, target: Point2d) => {
         corners = { ...corners, [corner]: QuadWarpUtils.clampMove(corners, corner, target, reachRatio) };
     };
 
@@ -49,7 +48,7 @@
 
     $effect(() => () => stopGesture?.());
 
-    const handleGripPointerDown = (corner: CornerKey, e: PointerEvent) => {
+    const handleGripPointerDown = (corner: QuadCorner, e: PointerEvent) => {
         if (e.button !== PRIMARY_BUTTON) return;
 
         e.preventDefault();
@@ -102,7 +101,7 @@
         };
     };
 
-    const handleCatcherPointerDown = (corner: CornerKey, e: PointerEvent) => {
+    const handleCatcherPointerDown = (corner: QuadCorner, e: PointerEvent) => {
         if (e.button !== PRIMARY_BUTTON) return;
 
         e.preventDefault();
@@ -114,17 +113,17 @@
         picked = undefined;
     };
 
-    const readFocusVisible = (element: HTMLElement, corner: CornerKey, axis: QuadWarpAxis) =>
+    const readFocusVisible = (element: HTMLElement, corner: QuadCorner, axis: QuadWarpAxis) =>
         InteractionTrackerUtils.computeIsFocusVisible(element) ? { corner, axis } : undefined;
 
-    const syncAxis = (element: HTMLInputElement, corner: CornerKey, axis: QuadWarpAxis) => {
+    const syncAxis = (element: HTMLInputElement, corner: QuadCorner, axis: QuadWarpAxis) => {
         element.min = String(-reachRatio);
         element.max = String(WHOLE + reachRatio);
         element.step = String(props.step ?? CORNER_PIN_DEFAULTS.step);
         element.value = String(corners[corner][axis]);
     };
 
-    const attachAxis = (corner: CornerKey, axis: QuadWarpAxis) => (element: HTMLInputElement) => {
+    const attachAxis = (corner: QuadCorner, axis: QuadWarpAxis) => (element: HTMLInputElement) => {
         const isFirst = axis === QuadWarpUtils.AXES[0];
 
         if (isFirst) axisRefs[corner] = element;
@@ -136,7 +135,7 @@
         };
     };
 
-    const toRenderProps = (corner: CornerKey): CornerPinGripRenderProps => ({
+    const toRenderProps = (corner: QuadCorner): CornerPinGripRenderProps => ({
         corner,
         point: corners[corner],
         isPicked: picked === corner,
@@ -169,7 +168,7 @@
         ></div>
     {/if}
 
-    {#each QuadWarpUtils.CORNERS as corner (corner)}
+    {#each QuadUtils.CORNERS as corner (corner)}
         <div
             class={styles.cornerPinGrip}
             style:left={`${corners[corner].x * PERCENT}%`}

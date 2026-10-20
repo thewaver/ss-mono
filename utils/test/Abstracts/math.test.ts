@@ -195,3 +195,54 @@ describe("MathUtils.wrapIndex", () => {
         expect(MathUtils.wrapIndex(3, 0)).toBe(0);
     });
 });
+
+describe("MathUtils.wrap", () => {
+    it("carries a value round a range without truncating it", () => {
+        expect(MathUtils.wrap(7.5, 5)).toBe(2.5);
+        expect(MathUtils.wrap(-0.25, 5)).toBe(4.75);
+        expect(MathUtils.wrap(5, 5)).toBe(0);
+    });
+
+    it("reports 0 for a range of no length", () => {
+        expect(MathUtils.wrap(3, 0)).toBe(0);
+    });
+});
+
+describe("MathUtils.getDecimalCount", () => {
+    it("counts the digits a number needs after the point, exponent form included", () => {
+        expect(MathUtils.getDecimalCount(0.25)).toBe(2);
+        expect(MathUtils.getDecimalCount(1e-7)).toBe(7);
+        expect(MathUtils.getDecimalCount(1.5e-7)).toBe(8);
+        expect(MathUtils.getDecimalCount(-0.125)).toBe(3);
+    });
+
+    it("counts none for a whole number, however large", () => {
+        expect(MathUtils.getDecimalCount(12)).toBe(0);
+        expect(MathUtils.getDecimalCount(1e21)).toBe(0);
+    });
+});
+
+describe("MathUtils.getGreatestCommonDivisor", () => {
+    it("finds the largest number both divide by, ignoring signs", () => {
+        expect(MathUtils.getGreatestCommonDivisor(12, 18)).toBe(6);
+        expect(MathUtils.getGreatestCommonDivisor(-4, 6)).toBe(2);
+        expect(MathUtils.getGreatestCommonDivisor(7, 12)).toBe(1);
+    });
+
+    it("answers the other number when one is zero", () => {
+        expect(MathUtils.getGreatestCommonDivisor(0, 9)).toBe(9);
+        expect(MathUtils.getGreatestCommonDivisor(0, 0)).toBe(0);
+    });
+});
+
+describe("MathUtils.getDecay", () => {
+    it("leaves about 37% after one time constant, and the same share again after the next", () => {
+        expect(MathUtils.getDecay(100, 100)).toBeCloseTo(Math.exp(-1), 12);
+        expect(MathUtils.getDecay(200, 100)).toBeCloseTo(MathUtils.getDecay(100, 100) ** 2, 12);
+    });
+
+    it("treats a negative time as none and a time constant of 0 as decayed completely", () => {
+        expect(MathUtils.getDecay(-50, 100)).toBe(1);
+        expect(MathUtils.getDecay(10, 0)).toBe(0);
+    });
+});

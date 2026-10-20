@@ -25,6 +25,8 @@ import PagePropsPanel from "../../PageComponents/PropsPanel/PagePropsPanel.vue";
 import BoundedExample from "./Examples/Bounded.vue";
 import DefaultExample from "./Examples/Default.vue";
 
+const computeWeekStartLabel = (day: DateValueWeekStart) => WEEK_START_LABELS[day];
+
 const describe = (value: DateValueRange | undefined) =>
     value ? `${DateValueUtils.toIso(value.start)} to ${DateValueUtils.toIso(value.end)}` : "none";
 
@@ -92,7 +94,7 @@ const examples: ExampleDefs[] = [
                 :value="weekStartsOn"
                 :values="RangeCalendarKnobs.WEEK_STARTS"
                 ariaLabel="Week starts on"
-                :compute-label="(day) => WEEK_START_LABELS[day]"
+                :compute-label="computeWeekStartLabel"
                 @change="(day: DateValueWeekStart) => (weekStartsOn = day)"
             />
         </PageProp>

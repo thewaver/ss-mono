@@ -1,4 +1,4 @@
-import { type Point2d, type Store, StoreUtils } from "@thewaver/ss-utils";
+import { MathUtils, type Point2d, type Store, StoreUtils } from "@thewaver/ss-utils";
 
 import { LiveAnnouncerUtils } from "../LiveAnnouncer/LiveAnnouncer.utils";
 import type { NavigatorDirection } from "../Navigator/Navigator.types";
@@ -140,21 +140,6 @@ export namespace CarrierUtils {
      */
     export const computeMarkerIndex = (settledIndex: number, fromIndex: number, isSameZone: boolean) =>
         isSameZone && settledIndex >= fromIndex ? settledIndex + 1 : settledIndex;
-
-    /**
-     * Produces the reordered list, without touching the original.
-     *
-     * @param order The current order.
-     * @param fromIndex The item to move.
-     * @param toIndex Where it should end up, counted after its removal — a settled index rather than a
-     * drop gap.
-     * @returns A new array.
-     */
-    export const computeMovedOrder = <T>(order: T[], fromIndex: number, toIndex: number) => {
-        const rest = order.filter((_unused, index) => index !== fromIndex);
-
-        return [...rest.slice(0, toIndex), order[fromIndex], ...rest.slice(toIndex)];
-    };
 
     /**
      * The carry in flight, as a store: the item, its source and target zones and places, and how it was begun.
@@ -324,7 +309,7 @@ export namespace CarrierUtils {
         if (accepting.length < 2) return;
 
         const from = accepting.indexOf(state.to);
-        const to = accepting[(((from + step) % accepting.length) + accepting.length) % accepting.length];
+        const to = accepting[MathUtils.wrapIndex(from + step, accepting.length)];
         const place = to.computeEntryPlace(state.carry);
 
         carryState.set({ ...state, to, toPlace: place });

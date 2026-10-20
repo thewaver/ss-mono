@@ -1,8 +1,7 @@
 import { Fragment, useLayoutEffect, useRef, useState } from "react";
 
-import { ShapeLayerUtils, ShapeStyles } from "@thewaver/ss-components";
+import { ElementObserverUtils, ShapeLayerUtils, ShapeStyles } from "@thewaver/ss-components";
 import { ShapeConst } from "@thewaver/ss-components/internal";
-import { Size2d } from "@thewaver/ss-utils";
 
 import type { SVGDefs } from "../../Generators/SVGDefs/SVGDefs.types";
 import { useElement } from "../../Utils/refUtils";
@@ -44,15 +43,7 @@ export const Shape = (props: ShapeProps) => {
 
         if (!root) return;
 
-        const observer = new ResizeObserver(() => {
-            const next = { width: root.offsetWidth, height: root.offsetHeight };
-
-            setRootSize((previous) => (Size2d.isSame(previous, next) ? previous : next));
-        });
-
-        observer.observe(root);
-
-        return () => observer.disconnect();
+        return ElementObserverUtils.observeBorderBoxSize(root, setRootSize);
     }, []);
 
     const fillDefs = props.computeFillDefs?.(rootSize, rootElement);

@@ -16,7 +16,7 @@ import {
     TableStyles as styles,
 } from "@thewaver/ss-components";
 import { TableConst } from "@thewaver/ss-components/internal";
-import type { Index2d } from "@thewaver/ss-utils";
+import { type Index2d, ObjectUtils } from "@thewaver/ss-utils";
 import { assignInlineVars } from "@vanilla-extract/dynamic";
 
 import { CarrierSolidUtils } from "../../Abstracts/Carrier/CarrierSolid.utils";
@@ -225,7 +225,7 @@ export const Table = <T,>(props: TableProps<T>) => {
         if (!getIsReorderable(columns[fromIndex]) || getIsDisabled()) return false;
         if (toIndex < 0 || toIndex >= columns.length) return false;
 
-        const next = CarrierUtils.computeMovedOrder(
+        const next = ObjectUtils.moveArrayElement(
             columns.map((column) => column.id),
             fromIndex,
             toIndex,

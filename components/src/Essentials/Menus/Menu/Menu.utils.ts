@@ -1,4 +1,4 @@
-import type { Point2d } from "@thewaver/ss-utils";
+import { DOMUtils, type Point2d, Point2dUtils } from "@thewaver/ss-utils";
 
 import { InteractionTrackerUtils } from "../../../Abstracts/InteractionTracker/InteractionTracker.utils";
 import type { NavigatorOrientation } from "../../../Abstracts/Navigator/Navigator.types";
@@ -8,7 +8,6 @@ import { PlacementUtils } from "../../../Abstracts/Placement/Placement.utils";
 import { SelectionUtils } from "../../../Abstracts/Selection/Selection.utils";
 import { TypeaheadUtils } from "../../../Abstracts/Typeahead/Typeahead.utils";
 import { ViewportUtils } from "../../../Abstracts/Viewport/Viewport.utils";
-import { PopoverUtils } from "../../../Primitives/Popover/Popover.utils";
 import type {
     MenuActivation,
     MenuContextRequestDefs,
@@ -124,14 +123,14 @@ export namespace MenuUtils {
      *
      * An item is highlighted the moment its menu opens, while the popup is still unplaced, so the page's own scrolling
      * must stay out of it; this moves only the scrollers inside the level's popup, through
-     * {@link PopoverUtils.revealWithin}. An item drawn outside a menu popup moves nothing.
+     * `DOMUtils.revealWithin`. An item drawn outside a menu popup moves nothing.
      *
      * @param item The item's element.
      */
     export const revealItem = (item: HTMLElement) => {
         const popup = item.closest<HTMLElement>(MENU_POPUP_SELECTOR);
 
-        if (popup) PopoverUtils.revealWithin(item, popup);
+        if (popup) DOMUtils.revealWithin(item, popup);
     };
 
     /**
@@ -658,7 +657,7 @@ export namespace MenuUtils {
         const from = toLayoutPoint(origin);
         const to = toLayoutPoint(defs.point);
 
-        if (PlacementUtils.getDistance(from, to) < FLICK_TRAVEL_RATIO) return undefined;
+        if (Point2dUtils.getDistance(from, to) < FLICK_TRAVEL_RATIO) return undefined;
 
         return PlacementUtils.pickIndex({ layout, point: to, isPickable: (index) => defs.navigable.includes(index) });
     };

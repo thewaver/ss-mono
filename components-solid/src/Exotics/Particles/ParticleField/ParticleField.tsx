@@ -2,6 +2,7 @@ import { For, type Setter, createEffect, createMemo, createSignal, on, onCleanup
 
 import {
     CellAnimationUtils,
+    ElementObserverUtils,
     PARTICLE_FIELD_DEFAULTS,
     type ParticleFieldParticle,
     ParticleFieldUtils,
@@ -159,20 +160,9 @@ export const ParticleField = (props: ParticleFieldProps) => {
     });
 
     createEffect(() => {
-        let resizeObserver: ResizeObserver | undefined;
-
-        onCleanup(() => {
-            resizeObserver?.disconnect();
-        });
-
         const rootRef = getRootRef();
 
-        if (!rootRef) return;
-
-        resizeObserver = new ResizeObserver(() => {
-            setRootSize({ width: rootRef.offsetWidth, height: rootRef.offsetHeight });
-        });
-        resizeObserver.observe(rootRef);
+        if (rootRef) onCleanup(ElementObserverUtils.observeBorderBoxSize(rootRef, setRootSize));
     });
 
     onMount(() => {

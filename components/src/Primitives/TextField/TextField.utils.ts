@@ -1,5 +1,6 @@
 import { type CSSPadding, CSSUtils, MathUtils } from "@thewaver/ss-utils";
 
+import { ElementObserverUtils } from "../../Abstracts/ElementObserver/ElementObserver.utils";
 import { TEXT_FIELD_DEFAULTS } from "./TextField.const";
 import type { TextFieldElementType, TextFieldType } from "./TextField.types";
 
@@ -138,20 +139,12 @@ export namespace TextFieldUtils {
      * @returns The function that stops watching.
      */
     export const observeWidthChange = (element: HTMLElement, onChange: () => void) => {
-        let lastWidth = element.clientWidth;
+        let lastWidth: number | undefined;
 
-        const observer = new ResizeObserver(([entry]) => {
-            const width = entry.contentBoxSize[0].inlineSize;
-
-            if (width === lastWidth) return;
+        return ElementObserverUtils.observeBorderBoxSize(element, ({ width }) => {
+            if (lastWidth !== undefined && width !== lastWidth) onChange();
 
             lastWidth = width;
-
-            onChange();
         });
-
-        observer.observe(element);
-
-        return () => observer.disconnect();
     };
 }

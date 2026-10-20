@@ -1,6 +1,6 @@
 import { type RefObject, useEffect, useLayoutEffect, useMemo, useReducer, useState } from "react";
 
-import { type AnchorPlacement, AnchorUtils, ElevationUtils } from "@thewaver/ss-components";
+import { type AnchorPlacement, AnchorUtils, ElementObserverUtils, ElevationUtils } from "@thewaver/ss-components";
 import { type Point2d, type Rect, Size2d } from "@thewaver/ss-utils";
 
 import { useElement } from "../../Utils/refUtils";
@@ -89,7 +89,7 @@ export namespace AnchorReactUtils {
         useLayoutEffect(() => {
             if (!contentElement || !isVisible) return;
 
-            const stop = AnchorUtils.observeContentSize(contentElement, (size) =>
+            const stop = ElementObserverUtils.observeBorderBoxSize(contentElement, (size) =>
                 setContentSize((previous) => (previous && Size2d.isSame(previous, size) ? previous : size)),
             );
 

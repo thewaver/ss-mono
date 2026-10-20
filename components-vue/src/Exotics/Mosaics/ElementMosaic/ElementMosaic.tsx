@@ -10,6 +10,7 @@ import {
 
 import { ElementMosaicStyles, MosaicUtils } from "@thewaver/ss-components";
 import { ElementMosaicConst } from "@thewaver/ss-components/internal";
+import { ObjectUtils } from "@thewaver/ss-utils";
 
 import { ElementObserverVueUtils } from "../../../Abstracts/ElementObserver/ElementObserverVue.utils";
 import { Mosaic } from "../../../Primitives/Mosaic/Mosaic";
@@ -30,7 +31,7 @@ export const ElementMosaic = defineComponent(
         const collectElements = () => {
             const next = Array.from({ length: itemCount.value }, (_, index) => elementsByIndex.get(index));
 
-            if (!MosaicUtils.getIsSameList(itemElements.value, next)) itemElements.value = next;
+            if (!ObjectUtils.isSameArray(itemElements.value, next)) itemElements.value = next;
         };
 
         onMounted(collectElements);

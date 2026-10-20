@@ -1,6 +1,6 @@
-import { AngleUtils, MathUtils, Point2d, Point2dUtils } from "@thewaver/ss-utils";
+import { AngleUtils, MathUtils, Point2d, Point2dUtils, type Rect, RectUtils, type Span } from "@thewaver/ss-utils";
 
-import type { RangeScale, RangeSpan, RangeThumbsDefs, RangeValues } from "./Range.types";
+import type { RangeScale, RangeThumbsDefs } from "./Range.types";
 
 /** A full turn, in degrees. */
 const FULL_TURN = 360;
@@ -12,13 +12,6 @@ const MIN_TRACK_TRAVEL_PX = 1;
 const PRIMARY_BUTTON = 0;
 /** No pointer buttons held, which is what a pointer passing over the track reports. */
 const NO_BUTTONS = 0;
-
-/** How many digits a step carries after the point, so a stepped value can be rounded back to them. */
-const countStepDecimals = (step: number) => {
-    const [, decimals = ""] = `${step}`.split(".");
-
-    return decimals.length;
-};
 
 /**
  * The part of a range that is not about drawing it.
@@ -46,7 +39,7 @@ export namespace RangeUtils {
             defs.step > 0
                 ? MathUtils.roundToDecimalPlaces(
                       defs.min + Math.round((value - defs.min) / defs.step) * defs.step,
-                      countStepDecimals(defs.step),
+                      MathUtils.getDecimalCount(defs.step),
                   )
                 : value;
 
@@ -76,14 +69,14 @@ export namespace RangeUtils {
      */
     export const computeAngularValue = (
         point: Point2d,
-        rect: { left: number; top: number; width: number; height: number },
+        rect: Rect,
         defs: { min: number; max: number; startAngle: number; sweepAngle: number },
     ) => {
         const sweep = MathUtils.clamp(Math.abs(defs.sweepAngle), 0, FULL_TURN);
 
         if (sweep === 0) return defs.min;
 
-        const center = { x: rect.left + rect.width * HALF, y: rect.top + rect.height * HALF };
+        const center = RectUtils.getCenter(rect);
         const offset = Point2d.sub(point, center);
 
         if (offset.x === 0 && offset.y === 0) return defs.min;
@@ -122,7 +115,7 @@ export namespace RangeUtils {
      * @param min Where a single thumb sits when it was given no value.
      * @returns Two values for a pair, one otherwise.
      */
-    export const computeValues = (range: RangeValues | undefined, value: number | undefined, min: number) =>
+    export const computeValues = (range: Span | undefined, value: number | undefined, min: number) =>
         range ? [range.start, range.end] : [value ?? min];
 
     /**
@@ -143,7 +136,7 @@ export namespace RangeUtils {
      * @returns The span between the first thumb and the last for a pair, and from the start of the track to the
      * thumb for a single one.
      */
-    export const computeFill = (ratios: number[]): RangeSpan =>
+    export const computeFill = (ratios: number[]): Span =>
         ratios.length > 1 ? { start: ratios[0], end: ratios[ratios.length - 1] } : { start: 0, end: ratios[0] };
 
     /**
@@ -154,7 +147,7 @@ export namespace RangeUtils {
      * @param value Where it moves to.
      * @returns A new pair, keeping every other field of the one handed in.
      */
-    export const computeMovedRange = (range: RangeValues, index: number, value: number): RangeValues =>
+    export const computeMovedRange = (range: Span, index: number, value: number): Span =>
         index === 0 ? { ...range, start: value } : { ...range, end: value };
 
     /**

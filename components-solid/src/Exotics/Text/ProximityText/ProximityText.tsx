@@ -2,6 +2,7 @@ import { For, Index, createEffect, createMemo, createSignal, on, onCleanup, onMo
 import type { ParentProps } from "solid-js";
 
 import {
+    ElementObserverUtils,
     LetterDriverStyles,
     LetterDriverUtils,
     type LetterSegment,
@@ -135,11 +136,7 @@ export const ProximityText = (props: ParentProps<ProximityTextProps>) => {
 
         if (!rest) return;
 
-        const observer = new ResizeObserver(measureRest);
-
-        observer.observe(rest);
-
-        onCleanup(() => observer.disconnect());
+        onCleanup(ElementObserverUtils.observeBorderBoxSize(rest, measureRest));
     });
 
     createEffect(on(getSegments, () => queueMicrotask(measureRest), { defer: true }));

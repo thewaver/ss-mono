@@ -38,19 +38,6 @@ const getIsGroupCharacter = (character: string, separators: NumberInputSeparator
         (WHITESPACE.test(separators.groupSeparator) && WHITESPACE.test(character)));
 
 /**
- * How many decimal places a number really has.
- *
- * Reads the exponent as well as the fraction, so `1e-3` counts as three rather than none — which is
- * what lets a step of `1e-3` be stepped by exactly.
- */
-const getDecimalCount = (value: number) => {
-    const [mantissa, exponent] = String(Math.abs(value)).split(/[eE]/);
-    const fraction = mantissa.split(".")[1]?.length ?? 0;
-
-    return Math.max(fraction - Number(exponent ?? 0), 0);
-};
-
-/**
  * Parses, formats, clamps and steps the value of a number field.
  *
  * The field holds text rather than a number, because a number cannot represent what a user is
@@ -210,10 +197,10 @@ export namespace NumberInputUtils {
 
         const decimals = Math.min(
             Math.max(
-                getDecimalCount(defs.step),
-                getDecimalCount(distance),
-                getDecimalCount(base),
-                getDecimalCount(value),
+                MathUtils.getDecimalCount(defs.step),
+                MathUtils.getDecimalCount(distance),
+                MathUtils.getDecimalCount(base),
+                MathUtils.getDecimalCount(value),
             ),
             MAX_STEP_DECIMALS,
         );

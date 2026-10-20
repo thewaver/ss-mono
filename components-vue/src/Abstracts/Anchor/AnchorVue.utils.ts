@@ -1,6 +1,6 @@
 import { type ComponentPublicInstance, type MaybeRefOrGetter, computed, shallowRef, toValue } from "vue";
 
-import { type AnchorPlacement, AnchorUtils, ElevationUtils } from "@thewaver/ss-components";
+import { type AnchorPlacement, AnchorUtils, ElementObserverUtils, ElevationUtils } from "@thewaver/ss-components";
 import { type Point2d, type Rect, Size2d } from "@thewaver/ss-utils";
 
 import { watchAfterRender } from "../../Utils/effectUtils";
@@ -106,7 +106,7 @@ export namespace AnchorVueUtils {
         watchAfterRender([contentElement, () => toValue(isVisible)], ([content, isShown]) => {
             if (!content || !isShown) return;
 
-            const stop = AnchorUtils.observeContentSize(content, (size) => {
+            const stop = ElementObserverUtils.observeBorderBoxSize(content, (size) => {
                 if (!contentSize.value || !Size2d.isSame(contentSize.value, size)) contentSize.value = size;
             });
 

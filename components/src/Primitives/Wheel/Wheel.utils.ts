@@ -1,4 +1,4 @@
-import { AngleUtils, type CSSAnimationStyle, CSSUtils, type Point2d } from "@thewaver/ss-utils";
+import { type CSSAnimationStyle, CSSUtils, type Point2d, Point2dUtils } from "@thewaver/ss-utils";
 
 import type { PlacementLayout, PlacementLayoutFn, PlacementRect } from "../../Abstracts/Placement/Placement.types";
 import { PlacementUtils } from "../../Abstracts/Placement/Placement.utils";
@@ -26,19 +26,6 @@ const SQUARE_HEIGHT_RATIO = 1;
 
 /** The overreach while the pointer is nowhere near the wheel. */
 const NO_OVERREACH = 0;
-
-/** Turns a point about an origin. */
-const toTurnedPoint = (point: Point2d, origin: Point2d, degrees: number): Point2d => {
-    const radians = degrees * AngleUtils.RADIANS_PER_DEGREE;
-    const cos = Math.cos(radians);
-    const sin = Math.sin(radians);
-    const offset = { x: point.x - origin.x, y: point.y - origin.y };
-
-    return {
-        x: origin.x + offset.x * cos - offset.y * sin,
-        y: origin.y + offset.x * sin + offset.y * cos,
-    };
-};
 
 /** Where a wheel's wedges sit and what they do near the pointer: the arithmetic both frameworks draw from. */
 export namespace WheelUtils {
@@ -172,7 +159,7 @@ export namespace WheelUtils {
         if (!computeEffect || !layout || !arrangement || !resting) return undefined;
 
         const origin = PlacementUtils.getOrigin(layout);
-        const center = toTurnedPoint(PlacementUtils.getCenter(resting), origin, angle);
+        const center = Point2dUtils.rotateAbout(PlacementUtils.getCenter(resting), origin, angle);
         const placement: PlacementRect = { ...resting, leftShare: center.x, topShare: center.y, angle };
         const frame: PlacementRect = {
             leftShare: origin.x,

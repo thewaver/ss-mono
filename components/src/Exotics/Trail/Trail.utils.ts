@@ -1,4 +1,4 @@
-import { AngleUtils, MathUtils, type Point2d } from "@thewaver/ss-utils";
+import { MathUtils, Point2d, Point2dUtils } from "@thewaver/ss-utils";
 
 import type { TrailPlace, TrailStep } from "./Trail.types";
 
@@ -100,21 +100,13 @@ export namespace TrailUtils {
     });
 
     /**
-     * The heading from one point to another.
-     *
-     * @returns Degrees, zero pointing right and increasing clockwise — ready to put straight into a
-     * rotation.
-     */
-    export const getAngle = (from: Point2d, to: Point2d) =>
-        AngleUtils.fromRadians(Math.atan2(to.y - from.y, to.x - from.x));
-
-    /**
      * Where a traveler is on the drawn path, and which way it faces.
      *
      * @param path The path element, as drawn — its geometry is what is asked.
      * @param length The path's total length, measured once per path rather than on every frame.
      * @param progress The traveler's own progress, from {@link getTravelerProgress}.
-     * @returns The progress, the point on the path in its own coordinates and the heading from {@link getAngle}.
+     * @returns The progress, the point on the path in its own coordinates and the heading, as `Point2dUtils.getAngle`
+     * measures it.
      * Before there is a path, or while it has no length, the point is the origin and the heading is none.
      */
     export const computePlace = (path: SVGPathElement | undefined, length: number, progress: number): TrailPlace => {
@@ -127,7 +119,7 @@ export namespace TrailUtils {
         return {
             progress,
             point: { x: point.x, y: point.y },
-            angle: getAngle(path.getPointAtLength(span.from), path.getPointAtLength(span.to)),
+            angle: Point2dUtils.getAngle(Point2d.sub(path.getPointAtLength(span.to), path.getPointAtLength(span.from))),
         };
     };
 

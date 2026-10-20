@@ -1,13 +1,13 @@
 import type { Signal } from "solid-js";
 
-import type { RangeValues } from "@thewaver/ss-components-solid";
+import type { Span } from "@thewaver/ss-utils";
 
 export type RangeExampleProps = {
     value: Signal<number>;
 };
 
 export type RangePairExampleProps = {
-    range: Signal<RangeValues>;
+    range: Signal<Span>;
 };
 
 export type RangePriceExampleProps = RangePairExampleProps & {

@@ -44,3 +44,50 @@ describe("RandomUtils.get01ValueString", () => {
         }
     });
 });
+
+describe("RandomUtils.hash", () => {
+    it("answers the same for the same numbers, from 0 up to 1", () => {
+        expect(RandomUtils.hash(7, 3, 42)).toBe(RandomUtils.hash(7, 3, 42));
+        expect(RandomUtils.hash(7, 3, 42)).toBeGreaterThanOrEqual(0);
+        expect(RandomUtils.hash(7, 3, 42)).toBeLessThan(1);
+    });
+
+    it("spreads evenly, so the share under a chance is about that chance", () => {
+        const hashes = Array.from({ length: 10000 }, (_, key) => RandomUtils.hash(7, 0, key));
+        const share = hashes.filter((value) => value < 0.3).length / hashes.length;
+
+        expect(Math.abs(share - 0.3)).toBeLessThan(0.02);
+    });
+
+    it("changes with the order of the numbers", () => {
+        expect(RandomUtils.hash(1, 2)).not.toBe(RandomUtils.hash(2, 1));
+    });
+});
+
+describe("RandomUtils.createSeeded", () => {
+    it("gives the same run for the same seed and a different run for another", () => {
+        const first = RandomUtils.createSeeded(5);
+        const again = RandomUtils.createSeeded(5);
+        const other = RandomUtils.createSeeded(6);
+        const run = [first(), first(), first()];
+
+        expect([again(), again(), again()]).toEqual(run);
+        expect([other(), other(), other()]).not.toEqual(run);
+    });
+});
+
+describe("RandomUtils.shuffle", () => {
+    it("keeps every value and leaves the list given alone", () => {
+        const values = [1, 2, 3, 4, 5];
+        const shuffled = RandomUtils.shuffle(values, RandomUtils.createSeeded(1));
+
+        expect([...shuffled].sort()).toEqual(values);
+        expect(values).toEqual([1, 2, 3, 4, 5]);
+    });
+
+    it("shuffles the same way for the same source", () => {
+        expect(RandomUtils.shuffle([1, 2, 3, 4, 5], RandomUtils.createSeeded(9))).toEqual(
+            RandomUtils.shuffle([1, 2, 3, 4, 5], RandomUtils.createSeeded(9)),
+        );
+    });
+});

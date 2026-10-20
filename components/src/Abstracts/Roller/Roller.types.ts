@@ -1,11 +1,4 @@
-import type { Point3d, Store } from "@thewaver/ss-utils";
-
-export type RollerQuaternion = {
-    w: number;
-    x: number;
-    y: number;
-    z: number;
-};
+import type { Point3d, Quaternion, Store } from "@thewaver/ss-utils";
 
 export type RollerFace = {
     normal: Point3d;
@@ -17,7 +10,7 @@ export type RollerPhase = "still" | "idling" | "rolling" | "settling" | "draggin
 export type RollerDirection = "left" | "right" | "up" | "down";
 
 export type RollerState = {
-    orientation: RollerQuaternion;
+    orientation: Quaternion;
     rollPhase: Exclude<RollerPhase, "idling">;
     isAwaitingTarget: boolean;
     isResting: boolean;

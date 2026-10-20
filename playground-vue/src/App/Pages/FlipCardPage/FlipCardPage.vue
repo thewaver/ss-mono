@@ -20,6 +20,8 @@ import PageProp from "../../PageComponents/Prop/Prop.vue";
 import PagePropsPanel from "../../PageComponents/PropsPanel/PagePropsPanel.vue";
 import PressedExample from "./Examples/Pressed.vue";
 
+const computeAxisLabel = (value: FlipCardAxis) => AXIS_LABELS[value];
+
 const axis = shallowRef<FlipCardAxis>(FLIP_CARD_DEFAULTS.axis);
 const transitionDurationMs = shallowRef(FLIP_CARD_DEFAULTS.transitionDurationMs);
 
@@ -55,7 +57,7 @@ const examples: ExampleDefs[] = [
             <PageSelectField
                 :value="axis"
                 :values="FLIP_CARD_AXES"
-                :compute-label="(value: FlipCardAxis) => AXIS_LABELS[value]"
+                :compute-label="computeAxisLabel"
                 :width="SELECT_WIDTH"
                 ariaLabel="Axis"
                 @change="(value: FlipCardAxis) => (axis = value)"

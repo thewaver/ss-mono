@@ -2,7 +2,7 @@
 import { shallowRef } from "vue";
 
 import type { PatchBoardLink } from "@thewaver/ss-components-vue";
-import { MediaQueryMonitorVueUtils, PATCH_BOARD_DEFAULTS, PanZoomUtils } from "@thewaver/ss-components-vue";
+import { MediaQueryMonitorVueUtils, PATCH_BOARD_DEFAULTS } from "@thewaver/ss-components-vue";
 import { PatchBoardKnobs } from "@thewaver/ss-playground/App/Knobs/PatchBoards.const";
 import {
     BOARD_WIDTH,
@@ -22,6 +22,7 @@ import {
     RACK_NODES,
     WIDE_SPAN,
 } from "@thewaver/ss-playground/App/Pages/PatchBoardPage/PatchBoardPage.const";
+import { SpanUtils } from "@thewaver/ss-utils";
 
 import type { ExampleDefs } from "../../PageComponents/Examples/Examples.types";
 import PageExamples from "../../PageComponents/Examples/PageExamples.vue";
@@ -90,7 +91,7 @@ const examples: ExampleDefs[] = [
         name: EXAMPLE_NAMES.panZoom,
         span: WIDE_SPAN,
         readout: () =>
-            `${panLinks.value.length} cables at ${Math.round((PERCENT * PAN_SCALE) / PanZoomUtils.getExtent(panView.value.x))}%, last: ${panAction.value} — the board is laid out at its own width and drawn into a smaller window: drag empty board, use the wheel, pinch or press the buttons to move and zoom it; a node still drags under the pointer, and one carried with the arrow keys brings the window with it`,
+            `${panLinks.value.length} cables at ${Math.round((PERCENT * PAN_SCALE) / SpanUtils.getExtent(panView.value.x))}%, last: ${panAction.value} — the board is laid out at its own width and drawn into a smaller window: drag empty board, use the wheel, pinch or press the buttons to move and zoom it; a node still drags under the pointer, and one carried with the arrow keys brings the window with it`,
         path: `${EXAMPLES_ROOT}/Pan.vue`,
     },
 ];

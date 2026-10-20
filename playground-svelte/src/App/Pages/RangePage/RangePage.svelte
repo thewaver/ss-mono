@@ -1,5 +1,5 @@
 <script lang="ts">
-    import type { RangeValues } from "@thewaver/ss-components-svelte";
+    import type { Span } from "@thewaver/ss-utils";
 
     import type { ExampleDefs } from "../../PageComponents/Examples/Examples.types";
     import PageExamples from "../../PageComponents/Examples/PageExamples.svelte";
@@ -23,11 +23,11 @@
     let errored = $state(90);
     let knob = $state(30);
 
-    let price = $state.raw<RangeValues>({ start: 20, end: 80 });
-    let budget = $state.raw<RangeValues>({ start: 100, end: 350 });
+    let price = $state.raw<Span>({ start: 20, end: 80 });
+    let budget = $state.raw<Span>({ start: 100, end: 350 });
     let settledBudget = $state("not yet");
-    let verticalPair = $state.raw<RangeValues>({ start: 30, end: 70 });
-    let disabledPair = $state.raw<RangeValues>({ start: 35, end: 65 });
+    let verticalPair = $state.raw<Span>({ start: 30, end: 70 });
+    let disabledPair = $state.raw<Span>({ start: 35, end: 65 });
 
     const examples: ExampleDefs[] = [
         {

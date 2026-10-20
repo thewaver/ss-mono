@@ -1,5 +1,7 @@
 import { describe, expect, it } from "vitest";
 
+import { Point2d, Point2dUtils } from "@thewaver/ss-utils";
+
 import type { PlacementRect } from "../../Abstracts/Placement/Placement.types";
 import { PlacementUtils } from "../../Abstracts/Placement/Placement.utils";
 import type { ProximityArrangement } from "../../Abstracts/Proximity/Proximity.types";
@@ -209,11 +211,11 @@ describe("zoomIn, at the far end of an open arc", () => {
             y: placement.topShare + across * PERCENT_TO_SHARE * placement.heightShare,
         };
 
-        return unwrap(PlacementUtils.getAngle(ORIGIN, moved));
+        return unwrap(Point2dUtils.getAngle(Point2d.sub(moved, ORIGIN)));
     };
 
     const toRestingBearing = (index: number) =>
-        unwrap(PlacementUtils.getAngle(ORIGIN, PlacementUtils.getCenter(ARCH.placements[index])));
+        unwrap(Point2dUtils.getAngle(Point2d.sub(PlacementUtils.getCenter(ARCH.placements[index]), ORIGIN)));
 
     it("keeps the last two in the order they were laid out in, rather than sending one into the other", () => {
         const pointer = PlacementUtils.getCenter(ARCH.placements[0]);

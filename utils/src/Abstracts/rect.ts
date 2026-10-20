@@ -172,4 +172,95 @@ export namespace RectUtils {
             isPointInsideRect({ x: bRight, y: b.y }, a)
         );
     };
+
+    /** Finds the middle of a rectangle. */
+    export const getCenter = (rect: Rect): Point2d => ({ x: rect.x + rect.width * 0.5, y: rect.y + rect.height * 0.5 });
+
+    /**
+     * Moves a rectangle from one frame into another, keeping its place relative to the frame.
+     *
+     * Each axis is stretched on its own, so a rectangle filling the left half of `source` fills the left half of
+     * `target` whatever the two frames' shapes. Carrying a level's tiles into one of their parent's tiles shrinks
+     * them into it; carrying them back out enlarges them round it.
+     *
+     * @param rect The rectangle, in the same space as `source`.
+     * @param source The frame it is measured against.
+     * @param target The frame to carry it into.
+     * @returns The rectangle as it sits in `target`. A `source` with no width or height answers `target` itself.
+     */
+    export const project = (rect: Rect, source: Rect, target: Rect): Rect => {
+        if (source.width <= 0 || source.height <= 0) return target;
+
+        const scaleX = target.width / source.width;
+        const scaleY = target.height / source.height;
+
+        return {
+            x: target.x + (rect.x - source.x) * scaleX,
+            y: target.y + (rect.y - source.y) * scaleY,
+            width: rect.width * scaleX,
+            height: rect.height * scaleY,
+        };
+    };
+
+    /**
+     * Divides a rectangle between a run of weights, each part's area in proportion to its weight, by cutting it
+     * in two again and again.
+     *
+     * The run is cut where the weight on either side comes closest to half, straight across the rectangle's
+     * longer side, and each half is cut the same way until every part holds one weight. Neighbors in the run stay
+     * neighbors on screen, and a run sorted heaviest first puts the heaviest in the top left corner. A weight of
+     * `0` gets a part with no area.
+     *
+     * @param weights The weights, in the order to lay them out. None may be negative.
+     * @param frame The rectangle to divide.
+     * @returns One rectangle per weight, in the same order. They cover the frame exactly, with no gaps between
+     * them.
+     */
+    export const bisectByWeight = (weights: readonly number[], frame: Rect): Rect[] => {
+        const rects: Rect[] = new Array(weights.length);
+        const sums = [0];
+
+        weights.forEach((weight, index) => sums.push(sums[index] + weight));
+
+        const split = (first: number, end: number, total: number, rect: Rect) => {
+            if (end - first <= 1) {
+                rects[first] = rect;
+
+                return;
+            }
+
+            const target = sums[first] + total * 0.5;
+
+            let cut = first + 1;
+            let last = end - 1;
+
+            while (cut < last) {
+                const middle = Math.floor((cut + last) * 0.5);
+
+                if (sums[middle] < target) cut = middle + 1;
+                else last = middle;
+            }
+
+            if (target - sums[cut - 1] < sums[cut] - target && first + 1 < cut) cut -= 1;
+
+            const before = sums[cut] - sums[first];
+            const share = total > 0 ? before / total : 1;
+
+            if (rect.width > rect.height) {
+                const width = rect.width * share;
+
+                split(first, cut, before, { ...rect, width });
+                split(cut, end, total - before, { ...rect, x: rect.x + width, width: rect.width - width });
+            } else {
+                const height = rect.height * share;
+
+                split(first, cut, before, { ...rect, height });
+                split(cut, end, total - before, { ...rect, y: rect.y + height, height: rect.height - height });
+            }
+        };
+
+        if (weights.length) split(0, weights.length, sums[weights.length], frame);
+
+        return rects;
+    };
 }

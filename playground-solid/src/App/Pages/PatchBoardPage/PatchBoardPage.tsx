@@ -1,7 +1,7 @@
 import { createMemo, createSignal } from "solid-js";
 
 import type { PatchBoardLink } from "@thewaver/ss-components-solid";
-import { MediaQueryMonitorSolidUtils, PATCH_BOARD_DEFAULTS, PanZoomUtils } from "@thewaver/ss-components-solid";
+import { MediaQueryMonitorSolidUtils, PATCH_BOARD_DEFAULTS } from "@thewaver/ss-components-solid";
 import { PatchBoardKnobs } from "@thewaver/ss-playground/App/Knobs/PatchBoards.const";
 import {
     BOARD_WIDTH,
@@ -21,6 +21,7 @@ import {
     RACK_NODES,
     WIDE_SPAN,
 } from "@thewaver/ss-playground/App/Pages/PatchBoardPage/PatchBoardPage.const";
+import { SpanUtils } from "@thewaver/ss-utils";
 
 import { PageExamples } from "../../PageComponents/Examples/Examples";
 import { PageCheckField, PageNumberField } from "../../PageComponents/Field/Field";
@@ -133,7 +134,7 @@ export const PatchBoardPage = () => {
                 name: EXAMPLE_NAMES.panZoom,
                 span: WIDE_SPAN,
                 readout: () =>
-                    `${panLinksSignal[0]().length} cables at ${Math.round((PERCENT * PAN_SCALE) / PanZoomUtils.getExtent(panViewSignal[0]().x))}%, last: ${getPanAction()} — the board is laid out at its own width and drawn into a smaller window: drag empty board, use the wheel, pinch or press the buttons to move and zoom it; a node still drags under the pointer, and one carried with the arrow keys brings the window with it`,
+                    `${panLinksSignal[0]().length} cables at ${Math.round((PERCENT * PAN_SCALE) / SpanUtils.getExtent(panViewSignal[0]().x))}%, last: ${getPanAction()} — the board is laid out at its own width and drawn into a smaller window: drag empty board, use the wheel, pinch or press the buttons to move and zoom it; a node still drags under the pointer, and one carried with the arrow keys brings the window with it`,
                 component: () => (
                     <PanExample
                         {...commonProps}

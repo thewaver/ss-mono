@@ -1,3 +1,4 @@
+import { ElementObserverUtils } from "../ElementObserver/ElementObserver.utils";
 import type { PlacementLayout, PlacementRect } from "../Placement/Placement.types";
 import { PlacementUtils } from "../Placement/Placement.utils";
 import type { FloaterBounds } from "./Floater.types";
@@ -108,11 +109,8 @@ export namespace FloaterUtils {
         target: HTMLElement,
         onBounds: (bounds: FloaterBounds) => void,
     ) => {
-        const observer = new ResizeObserver(() => onBounds(measureBounds(container, target)));
-
-        observer.observe(container);
-        observer.observe(target);
-
-        return () => observer.disconnect();
+        return ElementObserverUtils.observeBorderBoxSizes([container, target], () =>
+            onBounds(measureBounds(container, target)),
+        );
     };
 }

@@ -1,7 +1,12 @@
-import type { Matrix3d, Point3d, Size2d } from "@thewaver/ss-utils";
+import {
+    Matrix3dUtils,
+    Point3d,
+    Point3dUtils,
+    type Quaternion,
+    QuaternionUtils,
+    type Size2d,
+} from "@thewaver/ss-utils";
 
-import type { RollerQuaternion } from "../../../Abstracts/Roller/Roller.types";
-import { RollerUtils } from "../../../Abstracts/Roller/Roller.utils";
 import { BarrelUtils } from "../../../Primitives/Barrel/Barrel.utils";
 import type { DieFaceGeometry, DieFaceState, DieShape } from "./Die.types";
 
@@ -13,10 +18,6 @@ const SINGLE = 1;
 const HALF = 0.5;
 /** Double, for the two halves of a width. */
 const DOUBLE = 2;
-/** How far a corner may sit off a face's plane and still count as on it. */
-const PLANE_EPSILON = 1e-6;
-/** A full turn, in radians. */
-const TURN = Math.PI * 2;
 /** How far apart two corners may be, as a share of the die's radius, and still count as the same place. */
 const SYMMETRY_EPSILON = 1e-6;
 
@@ -25,36 +26,8 @@ const FACING_NORMAL: Point3d = { x: 0, y: 0, z: 1 };
 /** The size of a face that does not exist. */
 const NO_SIZE: Size2d = { width: 0, height: 0 };
 
-const dot = (a: Point3d, b: Point3d) => a.x * b.x + a.y * b.y + a.z * b.z;
-
-const cross = (a: Point3d, b: Point3d): Point3d => ({
-    x: a.y * b.z - a.z * b.y,
-    y: a.z * b.x - a.x * b.z,
-    z: a.x * b.y - a.y * b.x,
-});
-
-const subtract = (a: Point3d, b: Point3d): Point3d => ({ x: a.x - b.x, y: a.y - b.y, z: a.z - b.z });
-
-const scale = (a: Point3d, factor: number): Point3d => ({ x: a.x * factor, y: a.y * factor, z: a.z * factor });
-
-const normalize = (a: Point3d): Point3d => {
-    const length = Math.hypot(a.x, a.y, a.z);
-
-    return length > NOTHING ? scale(a, SINGLE / length) : a;
-};
-
-const centroid = (points: Point3d[]): Point3d =>
-    scale(
-        points.reduce((sum, point) => ({ x: sum.x + point.x, y: sum.y + point.y, z: sum.z + point.z }), {
-            x: NOTHING,
-            y: NOTHING,
-            z: NOTHING,
-        }),
-        SINGLE / Math.max(points.length, SINGLE),
-    );
-
 const computeNormal = (points: Point3d[]) =>
-    normalize(
+    Point3dUtils.getNormal(
         points.reduce(
             (sum, point, index) => {
                 const next = points[(index + SINGLE) % points.length];
@@ -69,25 +42,8 @@ const computeNormal = (points: Point3d[]) =>
         ),
     );
 
-const orderAround = (indices: number[], vertices: Point3d[], normal: Point3d) => {
-    const center = centroid(indices.map((index) => vertices[index]));
-    const axis = normalize(subtract(vertices[indices[0]], center));
-    const across = cross(normal, axis);
-
-    const angleOf = (index: number) => {
-        const offset = subtract(vertices[index], center);
-        const angle = Math.atan2(dot(offset, across), dot(offset, axis));
-
-        return angle < NOTHING ? angle + TURN : angle;
-    };
-
-    return [...indices].sort((first, second) => angleOf(first) - angleOf(second));
-};
-
 const getIsCentrallySymmetric = (offsets: Point3d[], tolerance: number) =>
-    offsets.every((offset) =>
-        offsets.some((other) => Math.hypot(offset.x + other.x, offset.y + other.y, offset.z + other.z) <= tolerance),
-    );
+    offsets.every((offset) => offsets.some((other) => Point3dUtils.getLength(Point3d.add(offset, other)) <= tolerance));
 
 /**
  * Builds the solids a die is made of, and the rotations that turn one face or another towards the viewer.
@@ -103,50 +59,13 @@ export namespace DieUtils {
      * @param vertices The corners, around the origin. Every one of them ends up on the surface of a convex set.
      * @returns The shape, with each face's corners in order counterclockwise seen from outside. A side where more than
      * three corners are coplanar comes out as one face, so a cube's sides are squares rather than pairs of triangles.
-     * It compares every triple of corners, so it is meant for the few dozen corners a die has, not for thousands.
+     * The faces are `Point3dUtils.getConvexHull`'s, so it is meant for the few dozen corners a die has, not for
+     * thousands.
      */
-    export const computeHull = (vertices: Point3d[]): DieShape => {
-        const planes: { normal: Point3d; offset: number; face: number[] }[] = [];
-        const count = vertices.length;
-
-        for (let i = NOTHING; i < count; i++) {
-            for (let j = i + SINGLE; j < count; j++) {
-                for (let k = j + SINGLE; k < count; k++) {
-                    const raw = cross(subtract(vertices[j], vertices[i]), subtract(vertices[k], vertices[i]));
-
-                    if (Math.hypot(raw.x, raw.y, raw.z) < PLANE_EPSILON) continue;
-
-                    let normal = normalize(raw);
-                    let offset = dot(normal, vertices[i]);
-
-                    const sides = vertices.map((vertex) => dot(normal, vertex) - offset);
-
-                    if (sides.some((side) => side > PLANE_EPSILON)) {
-                        if (sides.some((side) => side < -PLANE_EPSILON)) continue;
-
-                        normal = scale(normal, -SINGLE);
-                        offset = -offset;
-                    }
-
-                    const isKnown = planes.some(
-                        (plane) =>
-                            dot(plane.normal, normal) >= SINGLE - PLANE_EPSILON &&
-                            Math.abs(plane.offset - offset) <= PLANE_EPSILON,
-                    );
-
-                    if (isKnown) continue;
-
-                    const onPlane = vertices.flatMap((vertex, index) =>
-                        Math.abs(dot(normal, vertex) - offset) <= PLANE_EPSILON ? [index] : [],
-                    );
-
-                    planes.push({ normal, offset, face: orderAround(onPlane, vertices, normal) });
-                }
-            }
-        }
-
-        return { vertices, faces: planes.map((plane) => plane.face) };
-    };
+    export const computeHull = (vertices: Point3d[]): DieShape => ({
+        vertices,
+        faces: Point3dUtils.getConvexHull(vertices),
+    });
 
     /**
      * Where each face sits and how it is drawn, at a given size.
@@ -161,23 +80,26 @@ export namespace DieUtils {
      */
     export const computeFaceGeometry = (shape: DieShape, radius: number): DieFaceGeometry[] =>
         shape.faces.map((face) => {
-            const points = face.map((index) => scale(shape.vertices[index], radius));
-            const center = centroid(points);
+            const points = face.map((index) => Point3d.mul(shape.vertices[index], Point3d.spread(radius)));
+            const center = Point3dUtils.getCentroid(points);
             const facing = computeNormal(points);
-            const normal = dot(facing, center) < NOTHING ? scale(facing, -SINGLE) : facing;
-            const corners = points.map((point) => subtract(point, center));
-            const flatOffsets = corners.map((corner) => subtract(corner, scale(normal, dot(corner, normal))));
+            const normal =
+                Point3dUtils.dot(facing, center) < NOTHING ? Point3d.mul(facing, Point3d.spread(-SINGLE)) : facing;
+            const corners = points.map((point) => Point3d.sub(point, center));
+            const flatOffsets = corners.map((corner) =>
+                Point3d.sub(corner, Point3d.mul(normal, Point3d.spread(Point3dUtils.dot(corner, normal)))),
+            );
             const [first, second] = flatOffsets;
             const toTop = getIsCentrallySymmetric(flatOffsets, radius * SYMMETRY_EPSILON)
-                ? scale({ x: first.x + second.x, y: first.y + second.y, z: first.z + second.z }, HALF)
+                ? Point3d.mul(Point3d.add(first, second), Point3d.spread(HALF))
                 : first;
-            const up = normalize(toTop);
-            const down = scale(up, -SINGLE);
-            const right = cross(down, normal);
+            const up = Point3dUtils.getNormal(toTop);
+            const down = Point3d.mul(up, Point3d.spread(-SINGLE));
+            const right = Point3dUtils.cross(down, normal);
             const contour = points.map((point) => {
-                const offset = subtract(point, center);
+                const offset = Point3d.sub(point, center);
 
-                return { x: dot(offset, right), y: dot(offset, down) };
+                return { x: Point3dUtils.dot(offset, right), y: Point3dUtils.dot(offset, down) };
             });
             const size: Size2d = {
                 width: Math.max(...contour.map((point) => Math.abs(point.x))) * DOUBLE,
@@ -195,49 +117,20 @@ export namespace DieUtils {
      * normal with its top towards the face's first corner and moving it out to the face's center.
      */
     export const computeFaceTransform = (face: DieFaceGeometry) =>
-        `matrix3d(${[
-            face.right.x,
-            face.right.y,
-            face.right.z,
-            NOTHING,
-            face.down.x,
-            face.down.y,
-            face.down.z,
-            NOTHING,
-            face.normal.x,
-            face.normal.y,
-            face.normal.z,
-            NOTHING,
-            face.center.x,
-            face.center.y,
-            face.center.z,
-            SINGLE,
-        ].join(",")})`;
-
-    /**
-     * The CSS transform for a rotation of the whole solid.
-     *
-     * @param rotation A rotation, as a matrix in rows.
-     */
-    export const toTransform = (rotation: Matrix3d) =>
-        `matrix3d(${[
-            rotation[0],
-            rotation[3],
-            rotation[6],
-            NOTHING,
-            rotation[1],
-            rotation[4],
-            rotation[7],
-            NOTHING,
-            rotation[2],
-            rotation[5],
-            rotation[8],
-            NOTHING,
-            NOTHING,
-            NOTHING,
-            NOTHING,
-            SINGLE,
-        ].join(",")})`;
+        Matrix3dUtils.toCss(
+            [
+                face.right.x,
+                face.down.x,
+                face.normal.x,
+                face.right.y,
+                face.down.y,
+                face.normal.y,
+                face.right.z,
+                face.down.z,
+                face.normal.z,
+            ],
+            face.center,
+        );
 
     /**
      * How much room to leave for a die so it never clips as it turns.
@@ -260,8 +153,8 @@ export namespace DieUtils {
      * @param size How far across the die is at its widest.
      * @returns The CSS `transform`.
      */
-    export const getBodyTransform = (orientation: RollerQuaternion, size: number) =>
-        `translateZ(${-size * HALF}px) ${toTransform(RollerUtils.toRotation(orientation))}`;
+    export const getBodyTransform = (orientation: Quaternion, size: number) =>
+        `translateZ(${-size * HALF}px) ${Matrix3dUtils.toCss(QuaternionUtils.toMatrix(orientation))}`;
 
     /**
      * Where one face's box sits inside the die's box, and the contour it is clipped to.

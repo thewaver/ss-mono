@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { useModel } from "vue";
 
+import type { PatchBoardLink } from "@thewaver/ss-components-vue";
 import { PatchBoard } from "@thewaver/ss-components-vue";
 import { PATCH_BOARD_ANNOUNCEMENTS } from "@thewaver/ss-playground/App/PageComponents/Announcements/Announcements.const";
 import {
@@ -20,6 +21,9 @@ const props = defineProps<Props>();
 
 const nodes = useModel(props, "nodes");
 const links = useModel(props, "links");
+
+const computeCanLink = (link: PatchBoardLink) =>
+    link.to.nodeKey !== AMP_NODE_KEY || link.from.nodeKey === MIXER_NODE_KEY;
 </script>
 
 <template>
@@ -36,7 +40,7 @@ const links = useModel(props, "links");
         :is-disabled="isDisabled"
         :compute-node-key="(device) => device.id"
         :compute-node-label="(device) => device.name"
-        :compute-can-link="(link) => link.to.nodeKey !== AMP_NODE_KEY || link.from.nodeKey === MIXER_NODE_KEY"
+        :compute-can-link="computeCanLink"
         @link="props.onLink"
         @unlink="props.onUnlink"
         @move="props.onMove"

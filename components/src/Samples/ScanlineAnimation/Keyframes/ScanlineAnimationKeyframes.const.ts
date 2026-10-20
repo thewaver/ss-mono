@@ -1,4 +1,4 @@
-import { MathUtils } from "@thewaver/ss-utils";
+import { MathUtils, RandomUtils } from "@thewaver/ss-utils";
 
 import type {
     ScanlineAnimationEvaluationDefs,
@@ -177,11 +177,8 @@ export namespace ScanlineAnimationKeyframes {
         const mergedOpts = { ...DEFAULT_HORIZONTAL_DROPOUT_OPTS, ...opts };
 
         if (
-            CellAnimationWeightUtils.hashToUnit(
-                defs.pos.row,
-                defs.count.row,
-                CellAnimationWeightUtils.FIXED_HASH_SEED,
-            ) >= mergedOpts.dropChance
+            RandomUtils.hash(defs.pos.row, defs.count.row, CellAnimationWeightUtils.FIXED_HASH_SEED) >=
+            mergedOpts.dropChance
         )
             return {};
 

@@ -1,5 +1,7 @@
 import { describe, expect, it } from "vitest";
 
+import { Point2dUtils } from "@thewaver/ss-utils";
+
 import type { PlacementLayout, PlacementRect } from "./Placement.types";
 import { PlacementUtils } from "./Placement.utils";
 
@@ -228,10 +230,10 @@ describe("getGapPlacement", () => {
     it("carries a curved run round its own curve, not along its last straight line", () => {
         const ring = [box(0.5, 0.1), box(0.9, 0.5), box(0.5, 0.9), box(0.1, 0.5)];
         const after = PlacementUtils.getGapPlacement(ring, ring.length)!;
-        const joinToFirst = PlacementUtils.getAngle(
-            { x: ring[3].leftShare, y: ring[3].topShare },
-            { x: ring[0].leftShare, y: ring[0].topShare },
-        );
+        const joinToFirst = Point2dUtils.getAngle({
+            x: ring[0].leftShare - ring[3].leftShare,
+            y: ring[0].topShare - ring[3].topShare,
+        });
 
         expect(after.angle, "the last gap is aimed at where the ring comes back round to").toBeCloseTo(joinToFirst);
         expect(

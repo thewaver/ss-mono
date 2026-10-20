@@ -27,6 +27,8 @@ const arrowKind = computed(() => {
     return arrow === "none" ? undefined : arrow;
 });
 
+const computeFillDefs = () => [{ color: themeVars.color.surface.dark }];
+
 const computeArrowedPoints = (kind: ArrowKind) => (size: Size2d) =>
     ShapeUtils.attachArrow(
         { points: ShapeConst.getDefaultShapePoints("square", size), joinRadii: JOIN_RADII },
@@ -49,10 +51,7 @@ const computeArrowedPoints = (kind: ArrowKind) => (size: Size2d) =>
         :style="{ transitionDuration: `${transitionDurationMs}ms` }"
     >
         <div v-if="arrowKind" :class="styles.tooltipArrowShadow">
-            <Shape
-                :compute-points="computeArrowedPoints(arrowKind)"
-                :compute-fill-defs="() => [{ color: themeVars.color.surface.dark }]"
-            >
+            <Shape :compute-points="computeArrowedPoints(arrowKind)" :compute-fill-defs="computeFillDefs">
                 <template #renderChildren>
                     <div :class="[styles.tooltipBody, isWide && styles.tooltipBodyWide]">
                         <PageLayer :level="2"><slot /></PageLayer>

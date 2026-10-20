@@ -1,5 +1,4 @@
-import { ParticleFieldUtils } from "@thewaver/ss-components";
-import type { Index2d, Point2d, Rect } from "@thewaver/ss-utils";
+import { type Index2d, type Point2d, type Rect, RectUtils } from "@thewaver/ss-utils";
 
 import type { StressTestDefs } from "../../PageComponents/StressTest/StressText.types";
 
@@ -18,7 +17,7 @@ export const computeParticleTimeline = (t: number, holdShare: number) => {
 export const computeParticlePos = (rect: Rect, isScattered: boolean): Point2d =>
     isScattered
         ? { x: rect.x + Math.random() * rect.width, y: rect.y + Math.random() * rect.height }
-        : ParticleFieldUtils.toCenter(rect);
+        : RectUtils.getCenter(rect);
 
 export const EXAMPLE_NAMES = {
     default: "The whole box",

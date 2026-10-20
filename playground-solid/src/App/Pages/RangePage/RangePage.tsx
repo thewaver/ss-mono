@@ -1,7 +1,7 @@
 import { createMemo, createSignal } from "solid-js";
 
-import type { RangeValues } from "@thewaver/ss-components-solid";
 import { EXAMPLES_ROOT, EXAMPLE_NAMES, STEP_COUNT } from "@thewaver/ss-playground/App/Pages/RangePage/RangePage.const";
+import type { Span } from "@thewaver/ss-utils";
 
 import { PageExamples } from "../../PageComponents/Examples/Examples";
 import { DefaultExample } from "./Examples/Default";
@@ -24,11 +24,11 @@ export const RangePage = () => {
     const erroredSignal = createSignal(90);
     const knobSignal = createSignal(30);
 
-    const priceSignal = createSignal<RangeValues>({ start: 20, end: 80 });
-    const budgetSignal = createSignal<RangeValues>({ start: 100, end: 350 });
+    const priceSignal = createSignal<Span>({ start: 20, end: 80 });
+    const budgetSignal = createSignal<Span>({ start: 100, end: 350 });
     const [getSettledBudget, setSettledBudget] = createSignal("not yet");
-    const verticalPairSignal = createSignal<RangeValues>({ start: 30, end: 70 });
-    const disabledPairSignal = createSignal<RangeValues>({ start: 35, end: 65 });
+    const verticalPairSignal = createSignal<Span>({ start: 30, end: 70 });
+    const disabledPairSignal = createSignal<Span>({ start: 35, end: 65 });
 
     const getExamples = createMemo(() => [
         {

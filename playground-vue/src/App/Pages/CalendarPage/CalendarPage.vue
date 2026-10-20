@@ -30,6 +30,8 @@ import RightToLeftExample from "./Examples/RightToLeft.vue";
 import WeekdaysExample from "./Examples/Weekdays.vue";
 import YearPickerExample from "./Examples/YearPicker.vue";
 
+const computeWeekStartLabel = (day: DateValueWeekStart) => WEEK_START_LABELS[day];
+
 const describe = (value: DateValue | undefined) => (value ? DateValueUtils.toIso(value) : "none");
 
 const useMonthState = (calendarId: Ref<DateValueCalendarId>) => {
@@ -132,7 +134,7 @@ const examples: ExampleDefs[] = [
                 :value="weekStartsOn"
                 :values="WEEK_STARTS"
                 ariaLabel="Week starts on"
-                :compute-label="(day: DateValueWeekStart) => WEEK_START_LABELS[day]"
+                :compute-label="computeWeekStartLabel"
                 @change="(day: DateValueWeekStart) => (weekStartsOn = day)"
             />
         </PageProp>

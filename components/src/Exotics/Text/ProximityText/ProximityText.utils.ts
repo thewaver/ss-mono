@@ -1,5 +1,6 @@
 import { JSXTextParserUtils, type Point2d, type Rect, StoreUtils } from "@thewaver/ss-utils";
 
+import { ElementObserverUtils } from "../../../Abstracts/ElementObserver/ElementObserver.utils";
 import type { LetterAnimation } from "../../../Abstracts/LetterDriver/LetterDriver.types";
 import { LetterDriverUtils } from "../../../Abstracts/LetterDriver/LetterDriver.utils";
 import type { PointerReading } from "../../../Abstracts/PointerTracker/PointerTracker.types";
@@ -134,28 +135,12 @@ export namespace ProximityTextUtils {
             return true;
         };
 
-        const observe = (container: HTMLElement) => {
-            const resizeObserver = new ResizeObserver(() => update());
-            const mutationObserver = new MutationObserver(() => update(true, true));
-            const handleLoaded = () => update(true);
-
-            resizeObserver.observe(container);
-            mutationObserver.observe(container, {
-                subtree: true,
-                childList: true,
-                characterData: true,
-                attributes: true,
+        const observe = (container: HTMLElement) =>
+            ElementObserverUtils.observeContent(container, {
+                onResize: () => update(),
+                onChange: () => update(true, true),
+                onLoad: () => update(true),
             });
-            container.addEventListener("load", handleLoaded, true);
-            document.fonts.addEventListener("loadingdone", handleLoaded);
-
-            return () => {
-                resizeObserver.disconnect();
-                mutationObserver.disconnect();
-                container.removeEventListener("load", handleLoaded, true);
-                document.fonts.removeEventListener("loadingdone", handleLoaded);
-            };
-        };
 
         return { get: store.get, subscribe: store.subscribe, update: (isForced) => update(isForced), observe };
     };

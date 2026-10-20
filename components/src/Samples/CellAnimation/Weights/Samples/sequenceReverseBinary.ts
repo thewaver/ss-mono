@@ -1,4 +1,4 @@
-import { MathUtils } from "@thewaver/ss-utils";
+import { Index2dUtils, MathUtils } from "@thewaver/ss-utils";
 
 import type { WeightFn } from "../../../../Generators/CellAnimationWeights/CellAnimationWeights.types";
 import { CellAnimationWeightUtils } from "../../../../Generators/CellAnimationWeights/CellAnimationWeights.utils";
@@ -11,7 +11,7 @@ export const sequenceReverseBinary: WeightFn = (pos, count) => {
     const bits = Math.ceil(Math.log2(total));
 
     return CellAnimationWeightUtils.fromOrderedIndex(
-        MathUtils.reverseBits(CellAnimationWeightUtils.getRowFlatIndex(pos, count), bits) % total,
+        MathUtils.reverseBits(Index2dUtils.toFlatIndex(pos, count.col), bits) % total,
         total,
     );
 };

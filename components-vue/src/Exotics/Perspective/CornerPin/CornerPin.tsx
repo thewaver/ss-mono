@@ -2,14 +2,13 @@ import { type SlotsType, computed, defineComponent, onScopeDispose, shallowRef }
 
 import {
     CORNER_PIN_DEFAULTS,
-    type CornerKey,
     type CornerPinGripRenderProps,
     InteractionTrackerUtils,
     type QuadWarpAxis,
     QuadWarpUtils,
     CornerPinStyles as styles,
 } from "@thewaver/ss-components";
-import type { Point2d } from "@thewaver/ss-utils";
+import { type Point2d, type QuadCorner, QuadUtils } from "@thewaver/ss-utils";
 
 import { ElementObserverVueUtils } from "../../../Abstracts/ElementObserver/ElementObserverVue.utils";
 import { callSlot, declareProps, useTwoWay } from "../../../Utils/propUtils";
@@ -30,21 +29,21 @@ export const CornerPin = defineComponent(
 
         const corners = useTwoWay(props, "corners");
 
-        const picked = shallowRef<CornerKey>();
-        const dragged = shallowRef<CornerKey>();
-        const focusVisible = shallowRef<{ corner: CornerKey; axis: QuadWarpAxis }>();
+        const picked = shallowRef<QuadCorner>();
+        const dragged = shallowRef<QuadCorner>();
+        const focusVisible = shallowRef<{ corner: QuadCorner; axis: QuadWarpAxis }>();
 
-        const axisElements: Partial<Record<CornerKey, Partial<Record<QuadWarpAxis, HTMLInputElement>>>> = {};
+        const axisElements: Partial<Record<QuadCorner, Partial<Record<QuadWarpAxis, HTMLInputElement>>>> = {};
 
         const size = ElementObserverVueUtils.useBorderBoxSize(rootRef);
 
         const getReachRatio = () => props.reachRatio ?? CORNER_PIN_DEFAULTS.reachRatio;
 
         const transform = computed(
-            () => QuadWarpUtils.toTransform(size.value, QuadWarpUtils.toPixels(corners.value, size.value)) ?? "none",
+            () => QuadUtils.toCss(size.value, QuadUtils.scale(corners.value, size.value)) ?? "none",
         );
 
-        const moveCorner = (corner: CornerKey, target: Point2d) => {
+        const moveCorner = (corner: QuadCorner, target: Point2d) => {
             const current = corners.value;
 
             corners.value = { ...current, [corner]: QuadWarpUtils.clampMove(current, corner, target, getReachRatio()) };
@@ -60,7 +59,7 @@ export const CornerPin = defineComponent(
 
         onScopeDispose(() => stopGesture?.());
 
-        const handleGripPointerDown = (corner: CornerKey, e: PointerEvent) => {
+        const handleGripPointerDown = (corner: QuadCorner, e: PointerEvent) => {
             if (e.button !== PRIMARY_BUTTON) return;
 
             e.preventDefault();
@@ -113,7 +112,7 @@ export const CornerPin = defineComponent(
             };
         };
 
-        const handleCatcherPointerDown = (corner: CornerKey, e: PointerEvent) => {
+        const handleCatcherPointerDown = (corner: QuadCorner, e: PointerEvent) => {
             if (e.button !== PRIMARY_BUTTON) return;
 
             e.preventDefault();
@@ -125,14 +124,14 @@ export const CornerPin = defineComponent(
             picked.value = undefined;
         };
 
-        const readFocusVisible = (element: HTMLElement, corner: CornerKey, axis: QuadWarpAxis) =>
+        const readFocusVisible = (element: HTMLElement, corner: QuadCorner, axis: QuadWarpAxis) =>
             InteractionTrackerUtils.computeIsFocusVisible(element) ? { corner, axis } : undefined;
 
-        const setAxisElement = (corner: CornerKey, axis: QuadWarpAxis, element: HTMLInputElement | undefined) => {
+        const setAxisElement = (corner: QuadCorner, axis: QuadWarpAxis, element: HTMLInputElement | undefined) => {
             axisElements[corner] = { ...axisElements[corner], [axis]: element };
         };
 
-        const syncAxis = (element: HTMLInputElement, corner: CornerKey, axis: QuadWarpAxis) => {
+        const syncAxis = (element: HTMLInputElement, corner: QuadCorner, axis: QuadWarpAxis) => {
             element.value = String(corners.value[corner][axis]);
         };
 
@@ -163,7 +162,7 @@ export const CornerPin = defineComponent(
                         />
                     )}
 
-                    {QuadWarpUtils.CORNERS.map((corner) => {
+                    {QuadUtils.CORNERS.map((corner) => {
                         const point = corners.value[corner];
 
                         const renderProps: CornerPinGripRenderProps = {

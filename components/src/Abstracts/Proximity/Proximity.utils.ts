@@ -269,7 +269,7 @@ export namespace ProximityUtils {
         const origin = defs.origin;
 
         if (defs.reachRule === "arc" && origin !== undefined) {
-            const radius = Math.hypot(center.x - origin.x, center.y - origin.y);
+            const radius = Point2dUtils.getDistance(origin, center);
 
             if (radius < NO_DIRECTION) return { x: NOTHING, y: NOTHING };
 

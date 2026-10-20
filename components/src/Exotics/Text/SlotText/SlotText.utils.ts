@@ -1,4 +1,4 @@
-import { MathUtils, RotationUtils, StoreUtils } from "@thewaver/ss-utils";
+import { MathUtils, ObjectUtils, RotationUtils, StoreUtils } from "@thewaver/ss-utils";
 
 import type {
     SlotTextDirection,
@@ -117,15 +117,6 @@ export namespace SlotTextUtils {
         wheels.filter((wheel) => wheel.isDigit).map((wheel) => wheel.face);
 
     /**
-     * Whether two wheels carry the same characters, so one can turn into the other rather than being replaced.
-     *
-     * @param first One wheel's faces.
-     * @param second The other's.
-     */
-    export const getIsSameFaces = (first: string[], second: string[]) =>
-        first === second || (first.length === second.length && first.every((face, index) => face === second[index]));
-
-    /**
      * Whether two wheels show the same thing: the same face, on wheels with the same characters round them.
      *
      * @param first One wheel, or `undefined` for none.
@@ -135,7 +126,7 @@ export namespace SlotTextUtils {
         first !== undefined &&
         second !== undefined &&
         first.face === second.face &&
-        getIsSameFaces(first.faces, second.faces);
+        ObjectUtils.isSameArray(first.faces, second.faces);
 
     /**
      * Which way the wheels should turn to get from one number to another.
@@ -391,7 +382,7 @@ export namespace SlotTextUtils {
                     const wasShowing = columnWheels[index];
                     const faceCount = wheel.faces.length;
 
-                    if (wasShowing === undefined || !getIsSameFaces(wasShowing.faces, wheel.faces)) {
+                    if (wasShowing === undefined || !ObjectUtils.isSameArray(wasShowing.faces, wheel.faces)) {
                         return getRestingAngle(wheel.face, faceCount);
                     }
 

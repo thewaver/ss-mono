@@ -1,4 +1,4 @@
-import type { RangeValues } from "@thewaver/ss-components-vue";
+import type { Span } from "@thewaver/ss-utils";
 
 export type RangeExampleProps = {
     "value": number;
@@ -6,8 +6,8 @@ export type RangeExampleProps = {
 };
 
 export type RangePairExampleProps = {
-    "range": RangeValues;
-    "onUpdate:range"?: (range: RangeValues) => void;
+    "range": Span;
+    "onUpdate:range"?: (range: Span) => void;
 };
 
 export type RangePriceExampleProps = RangePairExampleProps & {

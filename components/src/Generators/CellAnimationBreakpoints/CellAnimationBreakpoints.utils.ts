@@ -1,4 +1,4 @@
-import { MathUtils } from "@thewaver/ss-utils";
+import { type EasingFn, EasingUtils, MathUtils } from "@thewaver/ss-utils";
 
 import type {
     CellAnimationBreakpointOpts,
@@ -14,56 +14,14 @@ const EASING_CONTROLS: Record<Exclude<CellAnimationEasing, "linear">, [number, n
     "ease-out": [0, 0, 0.58, 1],
     "ease-in-out": [0.42, 0, 0.58, 1],
 };
-const NEWTON_ITERATIONS = 8;
-const BISECTION_ITERATIONS = 16;
-const SOLVE_EPSILON = 1e-6;
-const computeAxis = (first: number, second: number) => {
-    const c = 3 * first;
-    const b = 3 * (second - first) - c;
-
-    return { a: 1 - c - b, b, c };
-};
-const computeCurve = ({ a, b, c }: { a: number; b: number; c: number }, t: number) => ((a * t + b) * t + c) * t;
-const computeSlope = ({ a, b, c }: { a: number; b: number; c: number }, t: number) => (3 * a * t + 2 * b) * t + c;
-const computeEasedRatio = (easing: CellAnimationEasing, ratio: number) => {
-    if (easing === DEFAULT_EASING) return ratio;
-
-    const [x1, y1, x2, y2] = EASING_CONTROLS[easing];
-    const x = computeAxis(x1, x2);
-    const y = computeAxis(y1, y2);
-
-    let t = ratio;
-
-    for (let step = 0; step < NEWTON_ITERATIONS; step++) {
-        const error = computeCurve(x, t) - ratio;
-
-        if (Math.abs(error) < SOLVE_EPSILON) return computeCurve(y, t);
-
-        const slope = computeSlope(x, t);
-
-        if (Math.abs(slope) < SOLVE_EPSILON) break;
-
-        t -= error / slope;
-    }
-
-    let low = 0;
-    let high = 1;
-
-    t = ratio;
-
-    for (let step = 0; step < BISECTION_ITERATIONS; step++) {
-        const error = computeCurve(x, t) - ratio;
-
-        if (Math.abs(error) < SOLVE_EPSILON) break;
-
-        if (error > 0) high = t;
-        else low = t;
-
-        t = (low + high) * 0.5;
-    }
-
-    return computeCurve(y, t);
-};
+const EASINGS = Object.fromEntries(
+    Object.entries(EASING_CONTROLS).map(([easing, [x1, y1, x2, y2]]) => [
+        easing,
+        EasingUtils.getCubicBezier(x1, y1, x2, y2),
+    ]),
+) as Record<keyof typeof EASING_CONTROLS, EasingFn>;
+const computeEasedRatio = (easing: CellAnimationEasing, ratio: number) =>
+    easing === DEFAULT_EASING ? ratio : EASINGS[easing](ratio);
 
 /**
  * When each cell of a cell animation plays, worked out from its weight.

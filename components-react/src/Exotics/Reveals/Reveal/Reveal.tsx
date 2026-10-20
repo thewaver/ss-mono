@@ -1,7 +1,7 @@
 import { type CSSProperties, type FocusEvent, type KeyboardEvent, useMemo, useRef, useState } from "react";
 
 import { REVEAL_DEFAULTS, RevealStyles, RevealUtils } from "@thewaver/ss-components";
-import { MathUtils, type Point2d, StringUtils } from "@thewaver/ss-utils";
+import { MathUtils, type Point2d, Size2dUtils, StringUtils } from "@thewaver/ss-utils";
 
 import { ElementObserverReactUtils } from "../../../Abstracts/ElementObserver/ElementObserverReact.utils";
 import { PointerTrackerReactUtils } from "../../../Abstracts/PointerTracker/PointerTrackerReact.utils";
@@ -53,7 +53,7 @@ export const Reveal = (props: RevealProps) => {
     const handleFocus = () => {
         if (isDisabled || !rootRef.current?.matches(":focus-visible")) return;
 
-        setKeyboardPoint(RevealUtils.toCenter(size));
+        setKeyboardPoint(Size2dUtils.getCenter(size));
     };
 
     const handleBlur = (e: FocusEvent<HTMLDivElement>) => {
@@ -67,7 +67,7 @@ export const Reveal = (props: RevealProps) => {
 
         e.preventDefault();
 
-        const from = isKeyboardDriven ? holeCenter : isPointerInside ? pointerPoint : RevealUtils.toCenter(size);
+        const from = isKeyboardDriven ? holeCenter : isPointerInside ? pointerPoint : Size2dUtils.getCenter(size);
 
         setKeyboardPoint(RevealUtils.computeNudgedPoint(from, nudge, props.stepSize ?? REVEAL_DEFAULTS.stepSize, size));
     };

@@ -1,14 +1,12 @@
-import { JSXTextMetricsUtils, type Size2d, StoreUtils, type TextMetricsStyle } from "@thewaver/ss-utils";
+import { JSXTextMetricsUtils, ObjectUtils, type Size2d, StoreUtils, type TextMetricsStyle } from "@thewaver/ss-utils";
 
+import { ElementObserverUtils } from "../../../Abstracts/ElementObserver/ElementObserver.utils";
 import type { FittedTextLayout, FittedTextLayoutOpts, FittedTextLayoutState } from "./FittedText.types";
 
 /** The font size the lines are measured at before they are scaled; any size would do, since widths scale with it. */
 const REFERENCE_FONT_PX = 100;
 
 const NO_SIZES: number[] = [];
-
-const getIsSameSizes = (a: readonly number[], b: readonly number[]) =>
-    a.length === b.length && a.every((size, index) => size === b[index]);
 
 /**
  * Sizes a stack of lines so the block fills its box: every line as wide as the box, then all of them shrunk together
@@ -91,7 +89,7 @@ export namespace FittedTextUtils {
                 opts.getLineHeightRatio(),
             );
 
-            store.update((state) => (getIsSameSizes(state.fontSizes, fontSizes) ? state : { fontSizes }));
+            store.update((state) => (ObjectUtils.isSameArray(state.fontSizes, fontSizes) ? state : { fontSizes }));
 
             return true;
         };
@@ -99,16 +97,10 @@ export namespace FittedTextUtils {
         const observe = (element: HTMLElement) => {
             root = element;
 
-            const resizeObserver = new ResizeObserver(() => update());
-            const handleLoaded = () => update();
-
-            resizeObserver.observe(element);
-            document.fonts.addEventListener("loadingdone", handleLoaded);
-            update();
+            const stop = ElementObserverUtils.observeContent(element, { onResize: update, onLoad: update });
 
             return () => {
-                resizeObserver.disconnect();
-                document.fonts.removeEventListener("loadingdone", handleLoaded);
+                stop();
 
                 if (root === element) root = undefined;
             };

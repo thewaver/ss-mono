@@ -2,9 +2,9 @@
     import { untrack } from "svelte";
     import { on } from "svelte/events";
 
-    import { CLOCK_DEFAULTS, type ClockColumn, type ClockRenderProps, type ClockUnit, ClockUtils, type InteractionFlags, PopoverUtils, ClockStyles as styles } from "@thewaver/ss-components";
+    import { CLOCK_DEFAULTS, type ClockColumn, type ClockRenderProps, type ClockUnit, ClockUtils, type InteractionFlags, ClockStyles as styles } from "@thewaver/ss-components";
     import { ClockConst } from "@thewaver/ss-components/internal";
-    import type { TimeValue } from "@thewaver/ss-utils";
+    import { DOMUtils, type TimeValue } from "@thewaver/ss-utils";
 
     import { NavigatorSvelteUtils } from "../../../Abstracts/Navigator/NavigatorSvelte.utils.svelte.js";
     import InteractionWrapper from "../../../Primitives/InteractionWrapper/InteractionWrapper.svelte";
@@ -76,7 +76,7 @@
             rovingKeys.forEach((key) => {
                 const element = optionRefs.get(key);
 
-                if (element && root) PopoverUtils.revealWithin(element, root);
+                if (element && root) DOMUtils.revealWithin(element, root);
             }),
         );
     });

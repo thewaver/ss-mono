@@ -1,7 +1,7 @@
 import { type CSSProperties, type FocusEvent, type KeyboardEvent, useMemo, useRef, useState } from "react";
 
 import { LENS_DEFAULTS, LensStyles, LensUtils, RevealUtils } from "@thewaver/ss-components";
-import { MathUtils, type Point2d, StringUtils } from "@thewaver/ss-utils";
+import { MathUtils, type Point2d, Size2dUtils, StringUtils } from "@thewaver/ss-utils";
 
 import { ElementObserverReactUtils } from "../../../Abstracts/ElementObserver/ElementObserverReact.utils";
 import { PointerTrackerReactUtils } from "../../../Abstracts/PointerTracker/PointerTrackerReact.utils";
@@ -55,7 +55,7 @@ export const Lens = (props: LensProps) => {
     const handleFocus = () => {
         if (isDisabled || !rootRef.current?.matches(":focus-visible")) return;
 
-        setKeyboardPoint(RevealUtils.toCenter(size));
+        setKeyboardPoint(Size2dUtils.getCenter(size));
     };
 
     const handleBlur = (e: FocusEvent<HTMLDivElement>) => {
@@ -69,7 +69,7 @@ export const Lens = (props: LensProps) => {
 
         e.preventDefault();
 
-        const from = isKeyboardDriven ? lensCenter : isPointerInside ? pointerPoint : RevealUtils.toCenter(size);
+        const from = isKeyboardDriven ? lensCenter : isPointerInside ? pointerPoint : Size2dUtils.getCenter(size);
 
         setKeyboardPoint(RevealUtils.computeNudgedPoint(from, nudge, props.stepSize ?? LENS_DEFAULTS.stepSize, size));
     };

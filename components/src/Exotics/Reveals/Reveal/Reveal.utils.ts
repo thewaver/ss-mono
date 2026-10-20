@@ -86,13 +86,6 @@ export namespace RevealUtils {
     });
 
     /**
-     * The middle of the element, where a window opened from the keyboard starts.
-     *
-     * @param size The element's size.
-     */
-    export const toCenter = (size: Size2d): Point2d => ({ x: size.width * HALF, y: size.height * HALF });
-
-    /**
      * Whether the window is open, which is what the cover is told.
      *
      * @param isDisabled Whether the reveal is turned off.

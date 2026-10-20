@@ -1,11 +1,11 @@
 import { describe, expect, it } from "vitest";
 
-import type { PanZoomBounds, PanZoomSpan, PanZoomView } from "./PanZoom.types";
+import type { Span } from "@thewaver/ss-utils";
+
+import type { PanZoomBounds, PanZoomView } from "./PanZoom.types";
 import { PanZoomUtils } from "./PanZoom.utils";
 
-const RANGE: PanZoomSpan = { start: 0, end: 100 };
-
-const span = (start: number, end: number): PanZoomSpan => ({ start, end });
+const span = (start: number, end: number): Span => ({ start, end });
 
 const view = (left: number, top: number, right: number, bottom: number): PanZoomView => ({
     x: span(left, right),
@@ -13,62 +13,6 @@ const view = (left: number, top: number, right: number, bottom: number): PanZoom
 });
 
 const BOUNDS: PanZoomBounds = { range: view(0, 0, 200, 100), aspect: 0.5, minWidth: 20 };
-
-describe("clampSpan", () => {
-    it("keeps the span inside the range and never wider than it", () => {
-        expect(PanZoomUtils.clampSpan(span(-50, 300), RANGE, 1)).toEqual(span(0, 100));
-    });
-
-    it("slides a span that ran off the end back against it rather than shrinking it", () => {
-        expect(PanZoomUtils.clampSpan(span(90, 130), RANGE, 1)).toEqual(span(60, 100));
-    });
-
-    it("holds the smallest span a consumer asked for", () => {
-        expect(PanZoomUtils.clampSpan(span(50, 50.1), RANGE, 10)).toEqual(span(50, 60));
-    });
-});
-
-describe("zoomSpan", () => {
-    it("leaves the value under the focus where it was", () => {
-        const zoomed = PanZoomUtils.zoomSpan(span(0, 100), 0.5, 0.25, RANGE, 1);
-
-        expect(zoomed, "a quarter across 0..100 is 25, and it is a quarter across the new span too").toEqual(
-            span(12.5, 62.5),
-        );
-    });
-
-    it("cannot zoom out past the range", () => {
-        expect(PanZoomUtils.zoomSpan(span(20, 40), 100, 0.5, RANGE, 1)).toEqual(span(0, 100));
-    });
-
-    it("cannot zoom in past the smallest span", () => {
-        expect(PanZoomUtils.zoomSpan(span(0, 100), 0.001, 0.5, RANGE, 20)).toEqual(span(40, 60));
-    });
-});
-
-describe("panSpan", () => {
-    it("moves by a share of what is on screen", () => {
-        expect(PanZoomUtils.panSpan(span(20, 40), 0.5, RANGE)).toEqual(span(30, 50));
-    });
-
-    it("stops at the end of the range with the span the width it was", () => {
-        expect(PanZoomUtils.panSpan(span(80, 100), 0.5, RANGE)).toEqual(span(80, 100));
-    });
-});
-
-describe("revealSpan", () => {
-    it("does nothing when the target is already on screen", () => {
-        expect(PanZoomUtils.revealSpan(span(25, 30), span(20, 40), RANGE)).toEqual(span(20, 40));
-    });
-
-    it("moves the least it can to bring a target in from the right", () => {
-        expect(PanZoomUtils.revealSpan(span(45, 50), span(20, 40), RANGE)).toEqual(span(30, 50));
-    });
-
-    it("puts a target that is wider than the span against the left edge", () => {
-        expect(PanZoomUtils.revealSpan(span(50, 90), span(20, 40), RANGE)).toEqual(span(50, 70));
-    });
-});
 
 describe("fitView", () => {
     it("deepens a view that is wider than the window's shape, about its middle", () => {

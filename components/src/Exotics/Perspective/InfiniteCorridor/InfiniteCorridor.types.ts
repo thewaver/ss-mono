@@ -1,6 +1,4 @@
-import type { Size2d } from "@thewaver/ss-utils";
-
-import type { QuadWarpCorners } from "../../../Abstracts/QuadWarp/QuadWarp.types";
+import type { Quad, Size2d } from "@thewaver/ss-utils";
 
 export type InfiniteCorridorItemState = {
     /** Which item this is, counting the real ones from zero. */
@@ -36,10 +34,10 @@ export type InfiniteCorridorPinnedPlacement = {
     size: Size2d;
     /**
      * Where the item's four corners are drawn, in pixels on screen from the middle of the box, already seen in
-     * perspective — see `QuadWarpUtils`. Neighbors given the same corner points meet exactly. `undefined` where the
+     * perspective — see `QuadUtils`. Neighbors given the same corner points meet exactly. `undefined` where the
      * item cannot be drawn, such as with a corner level with the viewer or behind them, and the item is then hidden.
      */
-    corners: QuadWarpCorners | undefined;
+    corners: Quad | undefined;
     /** How much of the item shows, `0` to `1`. */
     opacity: number;
 };

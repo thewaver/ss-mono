@@ -144,3 +144,15 @@ describe("AngleUtils.wrapPositive", () => {
         }
     });
 });
+
+describe("AngleUtils.getChordAngle", () => {
+    it("measures how much of a circle a chord takes up", () => {
+        expect(AngleUtils.getChordAngle(10, 10)).toBeCloseTo(60, 9);
+        expect(AngleUtils.getChordAngle(10, 20)).toBeCloseTo(180, 9);
+    });
+
+    it("never passes half a turn for a chord too long to fit", () => {
+        expect(AngleUtils.getChordAngle(10, 50)).toBeCloseTo(180, 9);
+        expect(AngleUtils.getChordAngle(0, 1)).toBeCloseTo(180, 9);
+    });
+});

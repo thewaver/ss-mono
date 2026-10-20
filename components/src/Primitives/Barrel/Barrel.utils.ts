@@ -1,5 +1,5 @@
 import type { Size2d } from "@thewaver/ss-utils";
-import { RotationUtils } from "@thewaver/ss-utils";
+import { PolygonUtils, RotationUtils } from "@thewaver/ss-utils";
 
 import type { BarrelAxis, BarrelFace } from "./Barrel.types";
 
@@ -11,6 +11,8 @@ const MIN_BACKED_FACE_COUNT = 3;
 const HALF_TURN_DEG = 180;
 /** Halfway, for taking a radius from a diameter. */
 const HALF = 0.5;
+/** Double, for taking a diameter from a radius. */
+const DOUBLE = 2;
 
 /** How far the viewer sits from the barrel. Every projected measurement depends on it, so it must match the `perspective` the stylesheet applies. */
 const VIEWER_DISTANCE_PX = 1000;
@@ -64,11 +66,7 @@ export namespace BarrelUtils {
     export const getApothem = (faceExtent: number, faceCount: number) => {
         if (faceCount < MIN_BARREL_FACE_COUNT) return 0;
 
-        const halfAngleTangent = Math.tan(Math.PI / faceCount);
-
-        if (!Number.isFinite(halfAngleTangent) || halfAngleTangent <= 0) return 0;
-
-        return Math.round((faceExtent * HALF) / halfAngleTangent);
+        return Math.round(PolygonUtils.getRegularApothem(faceExtent, faceCount));
     };
 
     /**
@@ -81,7 +79,7 @@ export namespace BarrelUtils {
     export const getCircumdiameter = (faceExtent: number, faceCount: number) => {
         if (faceCount < MIN_BARREL_FACE_COUNT) return faceExtent;
 
-        return Math.round(faceExtent / Math.sin(Math.PI / faceCount));
+        return Math.round(PolygonUtils.getRegularCircumradius(faceExtent, faceCount) * DOUBLE);
     };
 
     /**

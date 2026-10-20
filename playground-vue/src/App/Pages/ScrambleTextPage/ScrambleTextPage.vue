@@ -33,6 +33,14 @@ const settleOrder = shallowRef<(typeof ScrambleTextKnobs.SETTLE_ORDERS)[number]>
     ScrambleTextKnobs.STARTING_SETTLE_ORDER,
 );
 
+const setGlyphSet = (value: (typeof ScrambleTextKnobs.GLYPH_SETS)[number]) => {
+    glyphSet.value = value;
+};
+
+const setSettleOrder = (value: (typeof ScrambleTextKnobs.SETTLE_ORDERS)[number]) => {
+    settleOrder.value = value;
+};
+
 const prefersReducedMotion = MediaQueryMonitorVueUtils.useReducedMotion();
 
 const commonProps = computed<ScrambleTextExampleProps>(() => {
@@ -126,7 +134,7 @@ const examples: ExampleDefs[] = [
                 :value="glyphSet"
                 :values="ScrambleTextKnobs.GLYPH_SETS"
                 ariaLabel="Glyphs"
-                @change="(value: (typeof ScrambleTextKnobs.GLYPH_SETS)[number]) => (glyphSet = value)"
+                @change="setGlyphSet"
             />
         </PageProp>
 
@@ -140,7 +148,7 @@ const examples: ExampleDefs[] = [
                 :value="settleOrder"
                 :values="ScrambleTextKnobs.SETTLE_ORDERS"
                 ariaLabel="Settle order"
-                @change="(value: (typeof ScrambleTextKnobs.SETTLE_ORDERS)[number]) => (settleOrder = value)"
+                @change="setSettleOrder"
             />
         </PageProp>
     </PagePropsPanel>

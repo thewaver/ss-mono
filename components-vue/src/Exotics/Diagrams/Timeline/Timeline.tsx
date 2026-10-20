@@ -19,12 +19,11 @@ import {
     TIMELINE_DEFAULTS,
     type TimelineEdge,
     type TimelineItemRenderProps,
-    type TimelineSpan,
     TimelineStyles,
     TimelineUtils,
 } from "@thewaver/ss-components";
 import { TimelineConst } from "@thewaver/ss-components/internal";
-import type { Point2d } from "@thewaver/ss-utils";
+import { type Point2d, type Span, SpanUtils } from "@thewaver/ss-utils";
 
 import { CarrierVueUtils } from "../../../Abstracts/Carrier/CarrierVue.utils";
 import { ElementObserverVueUtils } from "../../../Abstracts/ElementObserver/ElementObserverVue.utils";
@@ -44,7 +43,7 @@ import type {
 
 const ACROSS_ONLY = { x: true, y: false };
 
-const getIsSameSpan = (a: TimelineSpan, b: TimelineSpan) => a.start === b.start && a.end === b.end;
+const getIsSameSpan = (a: Span, b: Span) => a.start === b.start && a.end === b.end;
 
 const TimelineItem = defineComponent(
     (props: TimelineItemProps, { slots }: SlotsContext<TimelineItemSlots>) =>
@@ -103,12 +102,12 @@ export const Timeline = defineComponent(
         const size = ElementObserverVueUtils.useBorderBoxSize(rootRef);
 
         const getMinViewExtent = () =>
-            props.minViewExtent ?? PanZoomUtils.getExtent(props.range) * TimelineConst.MIN_VIEW_SHARE;
+            props.minViewExtent ?? SpanUtils.getExtent(props.range) * TimelineConst.MIN_VIEW_SHARE;
 
         const rawView = useTwoWay(props, "view", props.range);
 
-        const view = computed<TimelineSpan>((previous) => {
-            const next = PanZoomUtils.clampSpan(rawView.value, props.range, getMinViewExtent());
+        const view = computed<Span>((previous) => {
+            const next = SpanUtils.clamp(rawView.value, props.range, getMinViewExtent());
 
             return previous && getIsSameSpan(previous, next) ? previous : next;
         });
@@ -125,7 +124,7 @@ export const Timeline = defineComponent(
             const computeLane = props.computeLane;
 
             return computeLane === undefined
-                ? TimelineUtils.packLanes(spans.value)
+                ? SpanUtils.packLanes(spans.value)
                 : props.items.map((item, index) => computeLane(item, index));
         });
 
@@ -140,8 +139,8 @@ export const Timeline = defineComponent(
         const getIsZoomable = () => (props.isZoomable ?? true) && !getIsDisabled();
 
         const steps = computed(() =>
-            TimelineUtils.chooseSteps(
-                PanZoomUtils.getExtent(view.value),
+            SpanUtils.chooseTickSteps(
+                SpanUtils.getExtent(view.value),
                 size.value.width,
                 props.minTickGap ?? TIMELINE_DEFAULTS.minTickGap,
                 props.tickSteps,
@@ -185,7 +184,7 @@ export const Timeline = defineComponent(
             TimelineUtils.computeShownSpans(
                 spans.value,
                 heldIndex.value,
-                carryState.value?.toPlace as TimelineSpan | undefined,
+                carryState.value?.toPlace as Span | undefined,
             ),
         );
 
@@ -206,8 +205,8 @@ export const Timeline = defineComponent(
 
         const rovingIndex = computed(() => TimelineUtils.computeRovingIndex(stops.value, focusedIndex.value));
 
-        const setView = (next: TimelineSpan) => {
-            const clamped = PanZoomUtils.clampSpan(next, props.range, getMinViewExtent());
+        const setView = (next: Span) => {
+            const clamped = SpanUtils.clamp(next, props.range, getMinViewExtent());
 
             if (getIsSameSpan(clamped, latestView)) return false;
 
@@ -221,7 +220,7 @@ export const Timeline = defineComponent(
             getView: () => view.value,
             zoomBy: (factor, focusRatio) =>
                 setView(
-                    PanZoomUtils.zoomSpan(
+                    SpanUtils.zoom(
                         latestView,
                         factor,
                         focusRatio ?? TimelineConst.DEFAULT_FOCUS_RATIO,
@@ -229,8 +228,8 @@ export const Timeline = defineComponent(
                         getMinViewExtent(),
                     ),
                 ),
-            panBy: (ratio) => setView(PanZoomUtils.panSpan(latestView, ratio, props.range)),
-            showSpan: (span) => setView(PanZoomUtils.revealSpan(span, latestView, props.range)),
+            panBy: (ratio) => setView(SpanUtils.pan(latestView, ratio, props.range)),
+            showSpan: (span) => setView(SpanUtils.reveal(span, latestView, props.range)),
         };
 
         watchAfterRender([], () => {
@@ -270,7 +269,7 @@ export const Timeline = defineComponent(
             isFocusFollowing = rootRef.value?.contains(document.activeElement) ?? false;
 
             focusedIndex.value = index;
-            setView(PanZoomUtils.revealSpan(spans.value[index], latestView, props.range));
+            setView(SpanUtils.reveal(spans.value[index], latestView, props.range));
         };
 
         const activateItem = (index: number) => {
@@ -299,7 +298,7 @@ export const Timeline = defineComponent(
             edgeGrabOffset =
                 from === undefined
                     ? TimelineConst.NOTHING
-                    : PanZoomUtils.toValue(getPointerRatio(from.x), latestView) - span[edge];
+                    : SpanUtils.toValue(getPointerRatio(from.x), latestView) - span[edge];
 
             heldEdge.value = edge;
 
@@ -316,13 +315,13 @@ export const Timeline = defineComponent(
         };
 
         const revealHeldEdge = () => {
-            const place = CarrierUtils.getTargetPlace() as TimelineSpan | undefined;
+            const place = CarrierUtils.getTargetPlace() as Span | undefined;
 
             if (place === undefined) return;
 
             const value = place[heldEdge.value];
 
-            setView(PanZoomUtils.revealSpan({ start: value, end: value }, latestView, props.range));
+            setView(SpanUtils.reveal({ start: value, end: value }, latestView, props.range));
         };
 
         const holdEdge = (edge: TimelineEdge) => {
@@ -561,7 +560,7 @@ export const Timeline = defineComponent(
             const isPannable = getIsPannable();
             const isZoomable = getIsZoomable();
             const renderedIndices = TimelineUtils.computeRenderedIndices(placements.value, rovingIndex.value);
-            const ticks = TimelineUtils.computeTicks(view.value, steps.value);
+            const ticks = SpanUtils.getTicks(view.value, steps.value);
             const markers = TimelineUtils.computeMarkers(props.markers ?? TimelineConst.NO_MARKERS, view.value);
 
             return (

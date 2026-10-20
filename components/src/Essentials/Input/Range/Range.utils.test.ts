@@ -2,7 +2,7 @@ import { describe, expect, it } from "vitest";
 
 import { RangeUtils } from "./Range.utils";
 
-const BOX = { left: 0, top: 0, width: 100, height: 100 };
+const BOX = { x: 0, y: 0, width: 100, height: 100 };
 const KNOB = { min: 0, max: 100, startAngle: 135, sweepAngle: 270 };
 
 describe("computeAngularValue", () => {
@@ -22,7 +22,7 @@ describe("computeAngularValue", () => {
     });
 
     it("measures around the box's own center, wherever the box is", () => {
-        const moved = { left: 200, top: 300, width: 100, height: 100 };
+        const moved = { x: 200, y: 300, width: 100, height: 100 };
 
         expect(RangeUtils.computeAngularValue({ x: 250, y: 300 }, moved, KNOB)).toBeCloseTo(50);
     });

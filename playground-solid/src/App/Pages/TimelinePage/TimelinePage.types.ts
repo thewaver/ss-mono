@@ -1,11 +1,12 @@
-import type { AccessorProps, SignalSource, TimelineSpan } from "@thewaver/ss-components-solid";
+import type { AccessorProps, SignalSource } from "@thewaver/ss-components-solid";
 import type { Clip } from "@thewaver/ss-playground/App/Pages/TimelinePage/TimelineItems.types";
+import type { Span } from "@thewaver/ss-utils";
 
 export type TimelineExampleProps = AccessorProps<{
     isPannable: boolean;
     isZoomable: boolean;
     isDisabled: boolean;
-    view: SignalSource<TimelineSpan>;
+    view: SignalSource<Span>;
     onPick: (name: string) => void;
 }>;
 

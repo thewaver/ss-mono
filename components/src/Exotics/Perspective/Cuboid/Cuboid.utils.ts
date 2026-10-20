@@ -1,5 +1,5 @@
 import type { Matrix3d, Point3d, Size2d, SwipeDirection } from "@thewaver/ss-utils";
-import { AngleUtils, MathUtils, Matrix3dUtils } from "@thewaver/ss-utils";
+import { AngleUtils, MathUtils, Matrix3dUtils, Point3dUtils } from "@thewaver/ss-utils";
 
 import { BarrelUtils } from "../../../Primitives/Barrel/Barrel.utils";
 import type { CuboidArc, CuboidFace, CuboidSize, CuboidTurns } from "./Cuboid.types";
@@ -40,8 +40,6 @@ const NO_TURNS: CuboidTurns = { yaw: 0, pitch: 0 };
 /** How many quarter turns either way a route to a named face is looked for within. Two reaches every face. */
 const ROUTE_REACH = 2;
 
-/** The orientation the cuboid starts in, with the front towards the viewer and the right way up. */
-const IDENTITY: Matrix3d = [1, 0, 0, 0, 1, 0, 0, 0, 1];
 /** Which way up is on the screen. CSS measures `y` downwards, so up is negative. */
 const SCREEN_UP: Point3d = { x: 0, y: -1, z: 0 };
 /** The axis a rotation of nothing is written about, since it has to be written about something. */
@@ -79,31 +77,11 @@ const TIE_TOLERANCE_DEG = 0.5;
 /** How close to a half turn, in radians, a rotation must be before its axis is read from the diagonal rather than the rest. */
 const HALF_TURN_TOLERANCE = 1e-2;
 
-/** A rotation matrix with every entry rounded to a whole number, which every orientation of a box at rest has. */
-const roundMatrix = (m: Matrix3d) => m.map((value) => Math.round(value) + 0) as Matrix3d;
-
-/** The inverse of a rotation, which for a rotation is its transpose. */
-const transpose = (m: Matrix3d): Matrix3d => [m[0], m[3], m[6], m[1], m[4], m[7], m[2], m[5], m[8]];
-
-/** The dot product of two directions. */
-const dot = (a: Point3d, b: Point3d) => a.x * b.x + a.y * b.y + a.z * b.z;
-
 /** Whether two directions are the same, allowing for rounding. */
 const isSameDirection = (a: Point3d, b: Point3d) =>
     Math.abs(a.x - b.x) < SAME_TOLERANCE &&
     Math.abs(a.y - b.y) < SAME_TOLERANCE &&
     Math.abs(a.z - b.z) < SAME_TOLERANCE;
-
-/** Whether two orientations are the same, allowing for rounding. */
-const isSameMatrix = (a: Matrix3d, b: Matrix3d) =>
-    a.every((value, index) => Math.abs(value - b[index]!) < SAME_TOLERANCE);
-
-/** How far a rotation turns, in radians, from nothing up to a half turn. */
-const getRotationRadians = (m: Matrix3d) => Math.acos(MathUtils.clamp((m[0] + m[4] + m[8] - 1) * HALF, -1, 1));
-
-/** A rotation matrix written as the CSS function that draws it. CSS lists a matrix column by column. */
-const toMatrixFunction = (m: Matrix3d) =>
-    `matrix3d(${m[0]}, ${m[3]}, ${m[6]}, 0, ${m[1]}, ${m[4]}, ${m[7]}, 0, ${m[2]}, ${m[5]}, ${m[8]}, 0, 0, 0, 0, 1)`;
 
 /** The axis a set of presses turns the cuboid about, as seen on screen, for breaking a tie between two ways round. */
 const getPushAxis = (turns: CuboidTurns): Point3d => ({ x: -Math.sign(turns.pitch), y: -Math.sign(turns.yaw), z: 0 });
@@ -120,7 +98,7 @@ const repeatPress = (orientation: Matrix3d, press: (m: Matrix3d) => Matrix3d, co
 
     for (let step = 0; step < count; step++) {
         const current = press(seen[seen.length - 1]!);
-        const loopStart = seen.findIndex((previous) => isSameMatrix(previous, current));
+        const loopStart = seen.findIndex((previous) => Matrix3dUtils.isSame(previous, current, SAME_TOLERANCE));
 
         if (loopStart >= 0) return seen[loopStart + ((count - loopStart) % (seen.length - loopStart))]!;
 
@@ -208,7 +186,7 @@ export namespace CuboidUtils {
      * @param turns Quarter turns still being dragged, fractional, on top of the orientation.
      */
     export const getOrientationTransform = (orientation: Matrix3d, size: CuboidSize, turns: CuboidTurns = NO_TURNS) =>
-        `translateZ(${-size.depth * HALF}px) rotateX(${-turns.pitch * QUARTER_TURN_DEG}deg) rotateY(${-turns.yaw * QUARTER_TURN_DEG}deg) ${toMatrixFunction(orientation)}`;
+        `translateZ(${-size.depth * HALF}px) rotateX(${-turns.pitch * QUARTER_TURN_DEG}deg) rotateY(${-turns.yaw * QUARTER_TURN_DEG}deg) ${Matrix3dUtils.toCss(orientation)}`;
 
     /**
      * Which face a pair of counts leaves facing the viewer, when the counts are a pose.
@@ -253,7 +231,7 @@ export namespace CuboidUtils {
      * @param pitch How many quarter turns about the horizontal axis. Expected to be whole.
      */
     export const getCountedOrientation = (yaw: number, pitch: number) =>
-        roundMatrix(
+        Matrix3dUtils.round(
             Matrix3dUtils.multiply(
                 Matrix3dUtils.rotationX(-pitch * QUARTER_TURN_DEG),
                 Matrix3dUtils.rotationY(-yaw * QUARTER_TURN_DEG),
@@ -273,10 +251,10 @@ export namespace CuboidUtils {
         const up = Matrix3dUtils.apply(orientation, FACE_UPS[getFacingFromOrientation(orientation)]);
 
         for (const spin of SPINS_DEG) {
-            const turn = roundMatrix(Matrix3dUtils.rotationZ(spin));
+            const turn = Matrix3dUtils.round(Matrix3dUtils.rotationZ(spin));
 
             if (isSameDirection(Matrix3dUtils.apply(turn, up), SCREEN_UP))
-                return roundMatrix(Matrix3dUtils.multiply(turn, orientation));
+                return Matrix3dUtils.round(Matrix3dUtils.multiply(turn, orientation));
         }
 
         return orientation;
@@ -299,7 +277,7 @@ export namespace CuboidUtils {
         const yaw = Math.round(turns.yaw);
         const pitch = Math.round(turns.pitch);
         const press = (rotation: Matrix3d) => (m: Matrix3d) =>
-            standUpright(roundMatrix(Matrix3dUtils.multiply(rotation, m)));
+            standUpright(Matrix3dUtils.round(Matrix3dUtils.multiply(rotation, m)));
         const turnedAcross = repeatPress(
             standUpright(orientation),
             press(Matrix3dUtils.rotationY(-QUARTER_TURN_DEG * Math.sign(yaw))),
@@ -355,36 +333,11 @@ export namespace CuboidUtils {
      * @returns The orientation, or `undefined` for anything else.
      */
     export const readOrientation = (transform: string): Matrix3d | undefined => {
-        if (transform === "none") return IDENTITY;
+        const orientation = Matrix3dUtils.fromCss(transform);
 
-        const values = transform
-            .slice(transform.indexOf("(") + 1, transform.lastIndexOf(")"))
-            .split(",")
-            .map(Number);
-        const snap = (m: Matrix3d) =>
-            m.map((value) =>
-                Math.abs(value - Math.round(value)) < SNAP_TOLERANCE ? Math.round(value) + 0 : value,
-            ) as Matrix3d;
-
-        if (transform.startsWith("matrix3d(") && values.length === 16) {
-            return snap([
-                values[0]!,
-                values[4]!,
-                values[8]!,
-                values[1]!,
-                values[5]!,
-                values[9]!,
-                values[2]!,
-                values[6]!,
-                values[10]!,
-            ]);
-        }
-
-        if (transform.startsWith("matrix(") && values.length === 6) {
-            return snap([values[0]!, values[2]!, 0, values[1]!, values[3]!, 0, 0, 0, 1]);
-        }
-
-        return undefined;
+        return orientation?.map((value) =>
+            Math.abs(value - Math.round(value)) < SNAP_TOLERANCE ? Math.round(value) + 0 : value,
+        ) as Matrix3d | undefined;
     };
 
     /**
@@ -405,8 +358,8 @@ export namespace CuboidUtils {
         to: Matrix3d,
         turns: CuboidTurns = NO_TURNS,
     ): CuboidArc | undefined => {
-        const d = Matrix3dUtils.multiply(to, transpose(from));
-        const radians = getRotationRadians(d);
+        const d = Matrix3dUtils.multiply(to, Matrix3dUtils.transpose(from));
+        const radians = AngleUtils.toRadians(Matrix3dUtils.getRotationAngle(d));
 
         if (radians < SAME_TOLERANCE) return undefined;
 
@@ -438,7 +391,7 @@ export namespace CuboidUtils {
             axis = { x: (d[2] + d[6]) / (4 * z), y: (d[5] + d[7]) / (4 * z), z };
         }
 
-        if (dot(axis, getPushAxis(turns)) < 0) axis = { x: -axis.x, y: -axis.y, z: -axis.z };
+        if (Point3dUtils.dot(axis, getPushAxis(turns)) < 0) axis = { x: -axis.x, y: -axis.y, z: -axis.z };
 
         return { axis, degrees };
     };
@@ -469,10 +422,16 @@ export namespace CuboidUtils {
     ) => {
         const push = getPushAxis(turns);
         const [best] = SPINS_DEG.map((spin) => {
-            const via = roundMatrix(Matrix3dUtils.multiply(Matrix3dUtils.rotationZ(-spin), to));
+            const via = Matrix3dUtils.round(Matrix3dUtils.multiply(Matrix3dUtils.rotationZ(-spin), to));
             const arc = getArcBetween(from, via, turns);
 
-            return { spin, via, arc, degrees: arc?.degrees ?? 0, alignment: arc ? Math.abs(dot(arc.axis, push)) : 0 };
+            return {
+                spin,
+                via,
+                arc,
+                degrees: arc?.degrees ?? 0,
+                alignment: arc ? Math.abs(Point3dUtils.dot(arc.axis, push)) : 0,
+            };
         }).sort((a, b) =>
             Math.abs(a.degrees - b.degrees) > TIE_TOLERANCE_DEG ? a.degrees - b.degrees : b.alignment - a.alignment,
         );
@@ -483,7 +442,7 @@ export namespace CuboidUtils {
         const total = best.degrees + Math.abs(best.spin);
         const frame = (spin: number, degrees: number, offset: number): Keyframe => ({
             offset,
-            transform: `translateZ(${-size.depth * HALF}px) rotateZ(${spin}deg) rotate3d(${axis.x}, ${axis.y}, ${axis.z}, ${degrees}deg) ${toMatrixFunction(best.via)}`,
+            transform: `translateZ(${-size.depth * HALF}px) rotateZ(${spin}deg) rotate3d(${axis.x}, ${axis.y}, ${axis.z}, ${degrees}deg) ${Matrix3dUtils.toCss(best.via)}`,
         });
 
         return [frame(0, -best.degrees, 0), frame(0, 0, best.degrees / total), frame(best.spin, 0, 1)];

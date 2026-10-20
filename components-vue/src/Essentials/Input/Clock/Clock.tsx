@@ -7,10 +7,9 @@ import {
     ClockStyles,
     type ClockUnit,
     ClockUtils,
-    PopoverUtils,
 } from "@thewaver/ss-components";
 import { ClockConst } from "@thewaver/ss-components/internal";
-import type { TimeValue } from "@thewaver/ss-utils";
+import { DOMUtils, type TimeValue } from "@thewaver/ss-utils";
 
 import { NavigatorVueUtils } from "../../../Abstracts/Navigator/NavigatorVue.utils";
 import { InteractionWrapper } from "../../../Primitives/InteractionWrapper/InteractionWrapper";
@@ -132,7 +131,7 @@ export const Clock = defineComponent(
             rovingKeys.value.forEach((key) => {
                 const element = optionRefs.get(key);
 
-                if (element && root) PopoverUtils.revealWithin(element, root);
+                if (element && root) DOMUtils.revealWithin(element, root);
             });
         });
 

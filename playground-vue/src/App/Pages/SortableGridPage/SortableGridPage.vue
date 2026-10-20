@@ -38,6 +38,8 @@ const room = (items: SortableGridItem<Gear>[], columns: number, rows: number) =>
 const spots = (items: SortableGridItem<Gear>[]) =>
     items.map((item) => `${item.value.name} at ${item.spot.col + 1},${item.spot.row + 1}`).join(" | ") || "empty";
 
+const computeCanAcceptArrow = (value: Gear) => ARROW_IDS.includes(value.id);
+
 const pack = shallowRef(PACK);
 
 const pairPack = shallowRef(PACK);
@@ -193,7 +195,7 @@ const examples: ExampleDefs[] = [
                 side-label="Quiver"
                 side-empty-text="Arrows only"
                 is-side-narrow
-                :compute-can-accept="(value: Gear) => ARROW_IDS.includes(value.id)"
+                :compute-can-accept="computeCanAcceptArrow"
             />
         </template>
 

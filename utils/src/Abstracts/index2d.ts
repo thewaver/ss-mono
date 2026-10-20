@@ -39,3 +39,42 @@ export namespace Index2dString {
     /** Parses a string such as `ROW3_COL4` back into an {@link Index2d}. */
     export const fromString = Vec2d.fromString(K1, K2);
 }
+
+/** Moving between a cell of a grid and its place in the grid read as one list. */
+export namespace Index2dUtils {
+    /**
+     * Finds a cell's place in its grid read row by row, the first row left to right, then the next.
+     *
+     * @param cell The cell. A column at or past `colCount` runs on into the next row.
+     * @param colCount How many columns each row holds.
+     * @returns The cell's place, counting from `0`.
+     */
+    export const toFlatIndex = (cell: Index2d, colCount: number) => cell.row * colCount + cell.col;
+
+    /**
+     * Finds a cell's place in its grid read column by column, the first column top to bottom, then the next.
+     *
+     * @param cell The cell. A row at or past `rowCount` runs on into the next column.
+     * @param rowCount How many rows each column holds.
+     * @returns The cell's place, counting from `0`.
+     */
+    export const toFlatIndexByColumn = (cell: Index2d, rowCount: number) => cell.col * rowCount + cell.row;
+
+    /**
+     * Finds the cell at a place in a grid read row by row — the reverse of {@link toFlatIndex}.
+     *
+     * The column always comes back from `0` to `colCount - 1`, so a negative place lands in a row before the
+     * first, counted back from its last column: `-1` is the last column of row `-1`.
+     *
+     * @param flat The place, counting from `0`. Fractions are truncated.
+     * @param colCount How many columns each row holds. `0` or less has no cells and answers the first one.
+     * @returns The cell.
+     */
+    export const fromFlatIndex = (flat: number, colCount: number): Index2d => {
+        if (colCount < 1) return { row: 0, col: 0 };
+
+        const whole = Math.trunc(flat);
+
+        return { row: Math.floor(whole / colCount), col: ((whole % colCount) + colCount) % colCount };
+    };
+}

@@ -1,12 +1,12 @@
+import type { Span } from "@thewaver/ss-utils";
+
 export type SunburstNode<T> = {
     value: T;
     weight?: number;
     children?: SunburstNode<T>[];
 };
 
-export type SunburstSpan = {
-    start: number;
-    end: number;
+export type SunburstSpan = Span & {
     inner: number;
     outer: number;
 };

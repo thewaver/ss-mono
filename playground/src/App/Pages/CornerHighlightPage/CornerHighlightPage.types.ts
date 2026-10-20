@@ -1,12 +1,11 @@
-import type { CornerKey } from "@thewaver/ss-components";
-import type { Size2d } from "@thewaver/ss-utils";
+import type { QuadCorner, Size2d } from "@thewaver/ss-utils";
 
 export type BaseCornerHighlightExampleValues = {
     color: string;
     cornerLength: Size2d;
     strokeThickness: number;
     transitionDurationMs: number;
-    visibleCorners: Set<CornerKey>;
+    visibleCorners: Set<QuadCorner>;
 };
 
 export type BaseCornerHighlightExampleProps = BaseCornerHighlightExampleValues;

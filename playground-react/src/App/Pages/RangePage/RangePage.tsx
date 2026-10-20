@@ -1,7 +1,7 @@
 import { useState } from "react";
 
-import type { RangeValues } from "@thewaver/ss-components-react";
 import { EXAMPLES_ROOT, EXAMPLE_NAMES, STEP_COUNT } from "@thewaver/ss-playground/App/Pages/RangePage/RangePage.const";
+import type { Span } from "@thewaver/ss-utils";
 
 import { PageExamples } from "../../PageComponents/Examples/Examples";
 import { DefaultExample } from "./Examples/Default";
@@ -24,11 +24,11 @@ export const RangePage = () => {
     const erroredState = useState(90);
     const knobState = useState(30);
 
-    const priceState = useState<RangeValues>({ start: 20, end: 80 });
-    const budgetState = useState<RangeValues>({ start: 100, end: 350 });
+    const priceState = useState<Span>({ start: 20, end: 80 });
+    const budgetState = useState<Span>({ start: 100, end: 350 });
     const [settledBudget, setSettledBudget] = useState("not yet");
-    const verticalPairState = useState<RangeValues>({ start: 30, end: 70 });
-    const disabledPairState = useState<RangeValues>({ start: 35, end: 65 });
+    const verticalPairState = useState<Span>({ start: 30, end: 70 });
+    const disabledPairState = useState<Span>({ start: 35, end: 65 });
 
     const examples = [
         {

@@ -135,3 +135,66 @@ describe("Matrix3dUtils.apply with Point3d", () => {
         expect(Point3d.isSame(turned, { x: 1, y: 2, z: 3 })).toBe(true);
     });
 });
+
+describe("Matrix3dUtils.toCss / fromCss", () => {
+    it("writes columns first, and reads them back", () => {
+        const m = Matrix3dUtils.rotationZ(30);
+
+        Matrix3dUtils.fromCss(Matrix3dUtils.toCss(m))!.forEach((value, index) =>
+            expect(value).toBeCloseTo(m[index], 12),
+        );
+    });
+
+    it("carries an offset into the last column, and leaves it out when reading", () => {
+        const css = Matrix3dUtils.toCss([1, 0, 0, 0, 1, 0, 0, 0, 1], { x: 1, y: 2, z: 3 });
+
+        expect(css).toBe("matrix3d(1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 1, 2, 3, 1)");
+        expect(Matrix3dUtils.fromCss(css)).toEqual([1, 0, 0, 0, 1, 0, 0, 0, 1]);
+    });
+
+    it("reads a flat matrix and no transform at all", () => {
+        expect(Matrix3dUtils.fromCss("none")).toEqual([1, 0, 0, 0, 1, 0, 0, 0, 1]);
+        expect(Matrix3dUtils.fromCss("matrix(0, 1, -1, 0, 5, 5)")).toEqual([0, -1, 0, 1, 0, 0, 0, 0, 1]);
+    });
+
+    it("gives up on anything else", () => {
+        expect(Matrix3dUtils.fromCss("rotate(4deg)")).toBeUndefined();
+        expect(Matrix3dUtils.fromCss("matrix(a, b, c, d, e, f)")).toBeUndefined();
+    });
+});
+
+describe("Matrix3dUtils.transpose", () => {
+    it("undoes a rotation", () => {
+        const m = Matrix3dUtils.rotationY(40);
+        const undone = Matrix3dUtils.multiply(m, Matrix3dUtils.transpose(m));
+
+        expect(Matrix3dUtils.isSame(undone, [1, 0, 0, 0, 1, 0, 0, 0, 1], 1e-12)).toBe(true);
+    });
+});
+
+describe("Matrix3dUtils.isSame", () => {
+    it("matches exactly by default, and within a tolerance when given one", () => {
+        const m: Matrix3d = [1, 0, 0, 0, 1, 0, 0, 0, 1];
+        const drifted: Matrix3d = [1 + 1e-9, 0, 0, 0, 1, 0, 0, 0, 1];
+
+        expect(Matrix3dUtils.isSame(m, drifted)).toBe(false);
+        expect(Matrix3dUtils.isSame(m, drifted, 1e-6)).toBe(true);
+    });
+});
+
+describe("Matrix3dUtils.round", () => {
+    it("rounds every entry and leaves no negative zero", () => {
+        const rounded = Matrix3dUtils.round(Matrix3dUtils.rotationZ(90));
+
+        expect(rounded).toEqual([0, -1, 0, 1, 0, 0, 0, 0, 1]);
+        expect(Object.is(rounded[0], -0)).toBe(false);
+    });
+});
+
+describe("Matrix3dUtils.getRotationAngle", () => {
+    it("measures how far a rotation turns, whatever its axis", () => {
+        expect(Matrix3dUtils.getRotationAngle(Matrix3dUtils.rotationX(30))).toBeCloseTo(30, 9);
+        expect(Matrix3dUtils.getRotationAngle(Matrix3dUtils.rotationZ(-120))).toBeCloseTo(120, 9);
+        expect(Matrix3dUtils.getRotationAngle([1, 0, 0, 0, 1, 0, 0, 0, 1])).toBe(0);
+    });
+});

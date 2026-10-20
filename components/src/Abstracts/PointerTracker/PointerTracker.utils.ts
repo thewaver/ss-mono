@@ -110,7 +110,7 @@ const computeSourcePoint = (
  * means the pointer is on the border whatever the element's size or proportion.
  */
 const computeReading = (rect: DOMRect, point: Point2d): PointerReading => {
-    const center = { x: rect.x + rect.width * 0.5, y: rect.y + rect.height * 0.5 };
+    const center = RectUtils.getCenter(rect);
     const edgePoint = RectUtils.getEdgePointTowards(rect, point);
     const offset = { x: point.x - center.x, y: point.y - center.y };
     const edgeOffset = { x: edgePoint.x - center.x, y: edgePoint.y - center.y };

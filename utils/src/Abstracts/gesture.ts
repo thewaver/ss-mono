@@ -7,6 +7,9 @@ export type SwipeAxis = "horizontal" | "vertical";
 /** The way a swipe traveled, once it has gone far enough to count as one. */
 export type SwipeDirection = "left" | "right" | "up" | "down";
 
+/** Where a pointer was seen, and when. */
+export type GestureSample = { point: Point2d; timeMs: number };
+
 export namespace GestureUtils {
     /**
      * Finds which axis a swipe direction belongs to.
@@ -106,4 +109,45 @@ export namespace GestureUtils {
      */
     export const computeSwipeOffset = (progressRatio: number, direction: SwipeDirection) =>
         MathUtils.clamp01(direction === "left" || direction === "up" ? -progressRatio : progressRatio);
+
+    /**
+     * Finds how fast a pointer was moving when it last moved, from the last few places it was seen.
+     *
+     * Only the samples within `windowMs` of the last one count, so a drag that paused before letting go reads as
+     * still rather than carrying the speed it had before the pause. The answer is the straight run from the oldest
+     * of those to the newest, divided by the time between them.
+     *
+     * @param samples Where the pointer was, oldest first.
+     * @param windowMs How far back from the last sample to look.
+     * @returns The speed on each axis, in the samples' units per millisecond. No samples, or none with any time
+     * between them, answer no speed.
+     */
+    export const computeVelocity = (samples: readonly GestureSample[], windowMs: number): Point2d => {
+        const last = samples[samples.length - 1];
+        const first = last && samples.find((sample) => last.timeMs - sample.timeMs <= windowMs);
+        const elapsedMs = first ? last.timeMs - first.timeMs : 0;
+
+        if (!first || elapsedMs <= 0) return { x: 0, y: 0 };
+
+        return { x: (last.point.x - first.point.x) / elapsedMs, y: (last.point.y - first.point.y) / elapsedMs };
+    };
+
+    /**
+     * Carries a flick on after the pointer lets go, slowing it down smoothly to a stop.
+     *
+     * The speed decays exponentially (see `MathUtils.getDecay`), so the coast is measured in time rather than in
+     * frames and comes out the same at any frame rate. Called once a frame with the time since the last, it
+     * answers how far to move and the speed to carry into the next frame.
+     *
+     * @param speed How fast it is moving, in any unit per millisecond.
+     * @param elapsedMs How long has passed. A negative time is treated as none.
+     * @param momentumMs How long it keeps going: after this long about 37% of the speed is left. `0` or less
+     * stops it at once.
+     * @returns How far it moves in that time, and the speed it is left with.
+     */
+    export const coast = (speed: number, elapsedMs: number, momentumMs: number) => {
+        const kept = MathUtils.getDecay(elapsedMs, momentumMs);
+
+        return { distance: speed * Math.max(momentumMs, 0) * (1 - kept), speed: speed * kept };
+    };
 }

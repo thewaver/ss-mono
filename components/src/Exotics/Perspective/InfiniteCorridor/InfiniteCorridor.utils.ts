@@ -1,8 +1,5 @@
-import { MathUtils } from "@thewaver/ss-utils";
-import type { Point2d, Size2d } from "@thewaver/ss-utils";
+import { MathUtils, type Point2d, type Quad, QuadUtils, type Size2d } from "@thewaver/ss-utils";
 
-import type { QuadWarpCorners } from "../../../Abstracts/QuadWarp/QuadWarp.types";
-import { QuadWarpUtils } from "../../../Abstracts/QuadWarp/QuadWarp.utils";
 import { CarouselUtils } from "../../../Essentials/Carousel/Carousel.utils";
 import type { InfiniteCorridorPlacement } from "./InfiniteCorridor.types";
 
@@ -17,10 +14,8 @@ const HIDDEN = "0";
 const CENTERED_ORIGIN = "50% 50%";
 const CORNER_ORIGIN = "0 0";
 
-const wrap = (value: number, length: number) => ((value % length) + length) % length;
-
 /** Corners measured from the middle of the box, measured instead from the top left of an item centered there. */
-const toItemCorners = (corners: QuadWarpCorners, size: Size2d): QuadWarpCorners => {
+const toItemCorners = (corners: Quad, size: Size2d): Quad => {
     const shift = (point: Point2d) => ({ x: point.x + size.width * HALF, y: point.y + size.height * HALF });
 
     return {
@@ -30,8 +25,6 @@ const toItemCorners = (corners: QuadWarpCorners, size: Size2d): QuadWarpCorners 
         bottom_left: shift(corners.bottom_left),
     };
 };
-
-const greatestCommonDivisor = (a: number, b: number): number => (b === 0 ? a : greatestCommonDivisor(b, a % b));
 
 /**
  * The arithmetic behind `InfiniteCorridor`: where the corridor is from its `progress`, how many times its items are
@@ -50,7 +43,7 @@ export namespace InfiniteCorridorUtils {
      * @param count How many items there are.
      * @returns A position from `0` up to `count`.
      */
-    export const toPosition = (progress: number, count: number) => wrap(progress, 1) * count;
+    export const toPosition = (progress: number, count: number) => MathUtils.wrap(progress, 1) * count;
 
     /**
      * The progress that describes a position, the reverse of {@link toPosition}.
@@ -59,7 +52,8 @@ export namespace InfiniteCorridorUtils {
      * @param count How many items there are.
      * @returns `0` up to `1`, and `0` with no items.
      */
-    export const toProgress = (position: number, count: number) => (count > 0 ? wrap(position / count, 1) : 0);
+    export const toProgress = (position: number, count: number) =>
+        count > 0 ? MathUtils.wrap(position / count, 1) : 0;
 
     /**
      * How many times the items are drawn, so the corridor is full as far down as the layout reaches.
@@ -79,7 +73,7 @@ export namespace InfiniteCorridorUtils {
         if (count < 1) return 1;
 
         const fewest = Math.max(1, Math.ceil((reach + behindDistance + 1) / count));
-        const step = placeMultiple / greatestCommonDivisor(count, placeMultiple);
+        const step = placeMultiple / MathUtils.getGreatestCommonDivisor(count, placeMultiple);
 
         return Math.ceil(fewest / step) * step;
     };
@@ -118,7 +112,7 @@ export namespace InfiniteCorridorUtils {
     ) => {
         if (placeCount <= 0) return 0;
 
-        const forward = wrap(place - ringPosition, placeCount);
+        const forward = MathUtils.wrap(place - ringPosition, placeCount);
 
         return forward > placeCount - behindDistance ? forward - placeCount : forward;
     };
@@ -224,7 +218,7 @@ export namespace InfiniteCorridorUtils {
      */
     export const getIsEcho = (progress: number, recent: readonly number[]) =>
         recent.some((written) => {
-            const gap = wrap(progress - written, 1);
+            const gap = MathUtils.wrap(progress - written, 1);
 
             return Math.min(gap, 1 - gap) < ECHO_TOLERANCE;
         });
@@ -234,7 +228,7 @@ export namespace InfiniteCorridorUtils {
      *
      * Every item's box is centered on the corridor's middle before it is moved, so every item turns about and looks
      * from the same point, and the perspective gives the whole corridor one vanishing point. An item whose placement
-     * pins its corners is stretched onto them instead, through `QuadWarpUtils.toTransform`, and is hidden when they
+     * pins its corners is stretched onto them instead, through `QuadUtils.toCss`, and is hidden when they
      * cannot be drawn. Nearer items stack over further ones.
      *
      * @param placement What the layout answered for the item.
@@ -256,8 +250,7 @@ export namespace InfiniteCorridorUtils {
         const layer = `${Math.round(-distance * LAYER_RESOLUTION)}`;
 
         if ("corners" in placement) {
-            const transform =
-                placement.corners && QuadWarpUtils.toTransform(size, toItemCorners(placement.corners, size));
+            const transform = placement.corners && QuadUtils.toCss(size, toItemCorners(placement.corners, size));
 
             return {
                 ...box,

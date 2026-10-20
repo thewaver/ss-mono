@@ -1,5 +1,7 @@
 import { describe, expect, it } from "vitest";
 
+import { QuadUtils } from "@thewaver/ss-utils";
+
 import { QuadWarpUtils } from "../../../Abstracts/QuadWarp/QuadWarp.utils";
 import { InfiniteCorridorUtils } from "./InfiniteCorridor.utils";
 
@@ -149,9 +151,7 @@ describe("toItemStyle", () => {
             const style = InfiniteCorridorUtils.toItemStyle(pinned, 2);
 
             expect(style["transform-origin"]).toBe("0 0");
-            expect(style.transform).toBe(
-                QuadWarpUtils.toTransform(size, QuadWarpUtils.toPixels(QuadWarpUtils.RESTING_CORNERS, size)),
-            );
+            expect(style.transform).toBe(QuadUtils.toCss(size, QuadUtils.scale(QuadWarpUtils.RESTING_CORNERS, size)));
         });
 
         it("hides an item whose corners cannot be drawn", () => {

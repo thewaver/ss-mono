@@ -1,6 +1,4 @@
-import type { Size2d } from "@thewaver/ss-utils";
-
-import type { CornerKey } from "../../Abstracts/QuadWarp/QuadWarp.types";
+import type { QuadCorner, Size2d } from "@thewaver/ss-utils";
 
 export type BaseCornerHighlightValues = {
     /** The color the corner marks are drawn in. */
@@ -12,7 +10,7 @@ export type BaseCornerHighlightValues = {
     /** How long the corners take to follow a change of color, which is how the set as a whole fades. */
     transitionDurationMs?: number;
     /** Which corners are drawn. One left out is not drawn at all; fading is the container's, through {@link BaseCornerHighlightValues.transitionDurationMs}. */
-    visibleCorners?: Set<CornerKey>;
+    visibleCorners?: Set<QuadCorner>;
 };
 
 export type BaseCornerHighlightProps = BaseCornerHighlightValues;

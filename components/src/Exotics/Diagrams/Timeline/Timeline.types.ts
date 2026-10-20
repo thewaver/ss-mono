@@ -1,15 +1,6 @@
+import type { Span } from "@thewaver/ss-utils";
+
 import type { CarrierAnnouncements } from "../../../Abstracts/Carrier/Carrier.types";
-
-export type TimelineSpan = {
-    start: number;
-    end: number;
-};
-
-export type TimelineTick = {
-    value: number;
-    ratio: number;
-    isMajor: boolean;
-};
 
 export type TimelineMarker = {
     /** Where the marker sits in time. */
@@ -37,12 +28,7 @@ export type TimelineEdgeAnnouncements = CarrierAnnouncements & {
      * @param edge Which edge is held.
      * @param span The span the item would have if the edge were dropped there.
      */
-    computePlaceLabel: (edge: TimelineEdge, span: TimelineSpan) => string;
-};
-
-export type TimelineStepPair = {
-    step: number;
-    majorStep: number;
+    computePlaceLabel: (edge: TimelineEdge, span: Span) => string;
 };
 
 export type TimelinePlacement = {
@@ -60,7 +46,7 @@ export type TimelineItemRenderProps = {
     /** Where this item has been placed on screen — how far along the axis, and in which lane. */
     placement: TimelinePlacement;
     /** The stretch of time this item covers. */
-    span: TimelineSpan;
+    span: Span;
     /** Whether this item holds focus. */
     isFocused: boolean;
     /** Which of this item's edges is being moved, so it can be drawn as held. `undefined` while neither is. */
@@ -71,7 +57,7 @@ export type TimelineStop = {
     index: number;
     order: number;
     lane: number;
-    span: TimelineSpan;
+    span: Span;
 };
 
 export type TimelineStep = "previous" | "next" | "lane_before" | "lane_after" | "first" | "last";
@@ -100,18 +86,18 @@ export type TimelineEdgeZoneDefs = {
     getAnnouncements: () => TimelineEdgeAnnouncements;
     getHeldEdge: () => TimelineEdge;
     getGrabOffset: () => number;
-    getView: () => TimelineSpan;
-    getRange: () => TimelineSpan;
-    getSpans: () => TimelineSpan[];
+    getView: () => Span;
+    getRange: () => Span;
+    getSpans: () => Span[];
     getStep: () => number;
     computePointerRatio: (clientX: number) => number;
     computeSnapValue?: (value: number) => number;
-    onSpanChange: (index: number, span: TimelineSpan) => void;
+    onSpanChange: (index: number, span: Span) => void;
 };
 
 export type BaseTimelineValues<T> = {
     /** The whole stretch of time the timeline covers, which is as far as it can ever be panned or zoomed out to. */
-    range: TimelineSpan;
+    range: Span;
     /** The items to place, each asked separately where it sits and which lane it belongs in. */
     items: T[];
     /** How thick one lane is, across the axis. */
@@ -161,7 +147,7 @@ export type BaseTimelineValues<T> = {
 
 export type BaseTimelineCbs<T> = {
     /** Where one item sits in time. */
-    computeSpan: (item: T, index: number) => TimelineSpan;
+    computeSpan: (item: T, index: number) => Span;
     /**
      * Rounds a value an edge is being moved to, so edges land on whole minutes, frames or whatever the scale counts
      * in. With it, an arrow key moves a held edge to the next snapped value in its direction; without it, by one
@@ -185,7 +171,7 @@ export type BaseTimelineCbs<T> = {
      * and `Space` still activates. The timeline never moves the item itself: the new span is the consumer's to
      * store.
      */
-    onSpanChange?: (item: T, index: number, span: TimelineSpan) => void;
+    onSpanChange?: (item: T, index: number, span: Span) => void;
     /** Runs when an item is activated, by pointer or by key. */
     onItemActivate?: (item: T, index: number) => void;
 };

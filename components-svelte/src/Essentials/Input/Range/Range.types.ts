@@ -1,4 +1,5 @@
-import type { BaseRangeValues, RangeCbs, RangeRenderProps, RangeValues } from "@thewaver/ss-components";
+import type { BaseRangeValues, RangeCbs, RangeRenderProps } from "@thewaver/ss-components";
+import type { Span } from "@thewaver/ss-utils";
 
 import type {
     InteractionControlProps,
@@ -36,5 +37,5 @@ export type RangeProps = Omit<InteractionWrapperProps<RangeRenderProps>, "render
          * take `<id>-start` and `<id>-end` as their ids, so a label can name each one, where a single thumb keeps the
          * id as given. Give this or `value`.
          */
-        range?: RangeValues;
+        range?: Span;
     };

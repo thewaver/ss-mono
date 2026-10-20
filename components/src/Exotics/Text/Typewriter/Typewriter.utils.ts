@@ -1,5 +1,6 @@
 import { JSXTextParserUtils, MathUtils, StoreUtils } from "@thewaver/ss-utils";
 
+import { ElementObserverUtils } from "../../../Abstracts/ElementObserver/ElementObserver.utils";
 import { LetterDriverUtils } from "../../../Abstracts/LetterDriver/LetterDriver.utils";
 import { ScrambleTextUtils } from "../ScrambleText/ScrambleText.utils";
 import type {
@@ -336,28 +337,12 @@ export namespace TypewriterUtils {
             restart(cause);
         };
 
-        const observe = (container: HTMLElement) => {
-            const resizeObserver = new ResizeObserver(() => update("layout"));
-            const mutationObserver = new MutationObserver(() => update("content"));
-            const handleLoaded = () => measure("layout", true);
-
-            resizeObserver.observe(container);
-            mutationObserver.observe(container, {
-                subtree: true,
-                childList: true,
-                characterData: true,
-                attributes: true,
+        const observe = (container: HTMLElement) =>
+            ElementObserverUtils.observeContent(container, {
+                onResize: () => update("layout"),
+                onChange: () => update("content"),
+                onLoad: () => measure("layout", true),
             });
-            container.addEventListener("load", handleLoaded, true);
-            document.fonts.addEventListener("loadingdone", handleLoaded);
-
-            return () => {
-                resizeObserver.disconnect();
-                mutationObserver.disconnect();
-                container.removeEventListener("load", handleLoaded, true);
-                document.fonts.removeEventListener("loadingdone", handleLoaded);
-            };
-        };
 
         return { get: store.get, subscribe: store.subscribe, update, restart, setCount, observe };
     };

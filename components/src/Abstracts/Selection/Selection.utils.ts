@@ -1,4 +1,4 @@
-import { StoreUtils } from "@thewaver/ss-utils";
+import { ObjectUtils, StoreUtils } from "@thewaver/ss-utils";
 
 import type { CheckedState } from "../CheckedState/CheckedState.types";
 import { CheckedStateUtils } from "../CheckedState/CheckedState.utils";
@@ -10,10 +10,6 @@ const EMPTY_CHILDREN: never[] = [];
 const EMPTY_SELECTION: never[] = [];
 /** What `indexOf` answers for an item that is not in the list. */
 const NOT_FOUND = -1;
-
-/** Whether two selections hold the same items in the same order, which is when a write would change nothing. */
-const getIsUnchanged = <T>(selection: T[], next: T[]) =>
-    selection.length === next.length && selection.every((item, index) => item === next[index]);
 
 /** Folds child states into their parent's, where a child may itself be half-ticked. */
 const getFoldedState = (states: CheckedState[]): CheckedState =>
@@ -155,7 +151,7 @@ export namespace SelectionUtils {
         const anchor = StoreUtils.create<T | undefined>(undefined);
 
         const setSelection = (next: T[]) => {
-            if (getIsUnchanged(defs.selection[0](), next)) return;
+            if (ObjectUtils.isSameArray(defs.selection[0](), next)) return;
 
             defs.selection[1](next);
         };

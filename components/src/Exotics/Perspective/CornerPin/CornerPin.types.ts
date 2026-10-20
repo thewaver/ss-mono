@@ -1,12 +1,12 @@
-import type { Point2d } from "@thewaver/ss-utils";
+import type { Point2d, QuadCorner } from "@thewaver/ss-utils";
 
-import type { CornerKey, QuadWarpAxis } from "../../../Abstracts/QuadWarp/QuadWarp.types";
+import type { QuadWarpAxis } from "../../../Abstracts/QuadWarp/QuadWarp.types";
 
 export type CornerPinAxisLabels = Record<QuadWarpAxis, string>;
 
 export type CornerPinGripRenderProps = {
     /** Which corner the grip holds. */
-    corner: CornerKey;
+    corner: QuadCorner;
     /** Where that corner is, in shares of the box: `0` to `1` across each axis, and beyond past the box's edges. */
     point: Point2d;
     /**
@@ -30,7 +30,7 @@ export type BaseCornerPinValues = {
      * What each grip's two axes are called. A keyboard and a screen reader reach every corner as two sliders, one
      * across and one down, so eight names in all — "top left, across" and so on, in the page's own language.
      */
-    gripLabels: Record<CornerKey, CornerPinAxisLabels>;
+    gripLabels: Record<QuadCorner, CornerPinAxisLabels>;
     /**
      * How far past each edge of the box a corner may be taken, in shares of the box, so the content can be
      * stretched beyond its own size as well as squeezed inside it. `0` keeps every corner on or inside the box.

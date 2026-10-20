@@ -1,4 +1,4 @@
-import { AngleUtils, type Point2d } from "@thewaver/ss-utils";
+import { AngleUtils, type Point2d, Point2dUtils } from "@thewaver/ss-utils";
 
 import type { PlacementLayoutFn, PlacementRect } from "../../Abstracts/Placement/Placement.types";
 import { PlacementLayoutDefaults } from "./PlacementLayouts.const";
@@ -125,7 +125,7 @@ const toEvenArcAngles = (
     for (let sample = SINGLE_ITEM; sample <= ARC_SAMPLES; sample++) {
         const point = toEllipsePoint(radiusX, radiusY, fromAngle + step * sample);
 
-        total += Math.hypot(point.x - previous.x, point.y - previous.y);
+        total += Point2dUtils.getDistance(previous, point);
         walked.push(total);
         previous = point;
     }
@@ -201,22 +201,6 @@ const computeWhorl = (itemCount: number, itemStepRatio: number, whorlStepRatio: 
  * is the same split an SVG draws.
  */
 export namespace PlacementLayoutUtils {
-    /**
-     * The angle a straight span of a given length subtends at a given radius.
-     *
-     * A band's items are sized across the band rather than by angle, so a caller that knows how wide an item
-     * has to be needs the arc that width costs at the radius it sits on — which shrinks as the radius grows.
-     * Spans wider than the circle saturate at half a turn rather than returning `NaN`.
-     *
-     * @param radius Distance from the center to the span.
-     * @param chord Length of the span, in the same units as the radius.
-     * @returns The angle in degrees, from `0` to `180`.
-     */
-    export const toChordAngle = (radius: number, chord: number) =>
-        2 *
-        Math.asin(Math.min(FULL_SHARE, (chord * HALF) / Math.max(radius, Number.EPSILON))) *
-        AngleUtils.DEGREES_PER_RADIAN;
-
     /**
      * Places items round a band, at even angles.
      *

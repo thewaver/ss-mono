@@ -1,12 +1,15 @@
 import {
     AngleUtils,
+    DOMUtils,
     type ElementSegment,
     JSXTextParserUtils,
-    type Point2d,
+    Point2d,
+    Point2dUtils,
     type Rect,
     StoreUtils,
 } from "@thewaver/ss-utils";
 
+import { ElementObserverUtils } from "../../../Abstracts/ElementObserver/ElementObserver.utils";
 import type { LetterState } from "../../../Abstracts/LetterDriver/LetterDriver.types";
 import { LetterDriverUtils } from "../../../Abstracts/LetterDriver/LetterDriver.utils";
 import type { SVGDefsOf } from "../../../Generators/SVGDefs/SVGDefs.types";
@@ -27,7 +30,6 @@ import type {
 const SVG_NAMESPACE = "http://www.w3.org/2000/svg";
 const MASKED_STROKE_SCALE = 2;
 const CURRENT_COLOR = "currentColor";
-const NO_SCALE = 1;
 const ORIGIN: Point2d = { x: 0, y: 0 };
 const NO_LENGTH = 0;
 const BEFORE_FIRST = -1;
@@ -94,13 +96,6 @@ const getAtomicKind = (element: Element): AtomicKind => {
 
     return "foreign";
 };
-
-/**
- * How much larger an element is drawn on screen than it is laid out, which is not `1` inside a scaled ancestor. A
- * client rect is on screen and an SVG coordinate is in layout, so every rect is divided by this before it is used.
- */
-const getScreenScale = (element: HTMLElement, box: DOMRect) =>
-    element.offsetWidth > 0 ? box.width / element.offsetWidth : NO_SCALE;
 
 /** A zero-sized inline block, whose top sits exactly on the baseline of the line it is placed in. */
 const createBaselineProbe = () => {
@@ -548,7 +543,9 @@ export namespace PaintedTextUtils {
             const point = pathShape.getPointAtLength(along);
             const placement: PaintedTextPathPlacement = {
                 point: { x: point.x, y: point.y },
-                angle: TrailUtils.getAngle(pathShape.getPointAtLength(span.from), pathShape.getPointAtLength(span.to)),
+                angle: Point2dUtils.getAngle(
+                    Point2d.sub(pathShape.getPointAtLength(span.to), pathShape.getPointAtLength(span.from)),
+                ),
                 advance: base.advance,
             };
             const bounds = computeTurnedBounds(placement, state.ascent, state.descent);
@@ -700,7 +697,7 @@ export namespace PaintedTextUtils {
             host.replaceChildren(...nodes);
 
             const hostBox = host.getBoundingClientRect();
-            const scale = getScreenScale(host, hostBox);
+            const scale = DOMUtils.getScreenScale(host, hostBox);
             const runs: PaintedTextRun[] = [];
             const atomics: SVGElement[] = [];
             const letters: PaintedTextLetter[] = [];
@@ -838,7 +835,7 @@ export namespace PaintedTextUtils {
             });
 
             const hostBox = host.getBoundingClientRect();
-            const scale = getScreenScale(host, hostBox);
+            const scale = DOMUtils.getScreenScale(host, hostBox);
             const letters: PaintedTextLetter[] = [];
 
             pushed.forEach((letter, index) => {
@@ -895,23 +892,12 @@ export namespace PaintedTextUtils {
 
         const update = () => measure(false);
 
-        const observe = (source: HTMLElement) => {
-            const resizeObserver = new ResizeObserver(() => measure(false));
-            const mutationObserver = new MutationObserver(() => measure(true));
-            const handleLoaded = () => measure(false);
-
-            resizeObserver.observe(source);
-            mutationObserver.observe(source, { subtree: true, childList: true, characterData: true, attributes: true });
-            source.addEventListener("load", handleLoaded, true);
-            document.fonts.addEventListener("loadingdone", handleLoaded);
-
-            return () => {
-                resizeObserver.disconnect();
-                mutationObserver.disconnect();
-                source.removeEventListener("load", handleLoaded, true);
-                document.fonts.removeEventListener("loadingdone", handleLoaded);
-            };
-        };
+        const observe = (source: HTMLElement) =>
+            ElementObserverUtils.observeContent(source, {
+                onResize: () => measure(false),
+                onChange: () => measure(true),
+                onLoad: () => measure(false),
+            });
 
         return { get: store.get, subscribe: store.subscribe, update, relayout, placeAlongPath, observe };
     };

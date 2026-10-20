@@ -1,4 +1,4 @@
-import { StoreUtils } from "@thewaver/ss-utils";
+import { MathUtils, StoreUtils } from "@thewaver/ss-utils";
 
 import type { SmootherFollower } from "./Smoother.types";
 
@@ -31,7 +31,7 @@ export namespace SmootherUtils {
     export const getStep = (current: number, target: number, elapsedMs: number, smoothingMs: number): number => {
         if (smoothingMs <= 0) return target;
 
-        return current + (target - current) * (1 - Math.exp(-Math.max(0, elapsedMs) / smoothingMs));
+        return current + (target - current) * (1 - MathUtils.getDecay(elapsedMs, smoothingMs));
     };
 
     /**

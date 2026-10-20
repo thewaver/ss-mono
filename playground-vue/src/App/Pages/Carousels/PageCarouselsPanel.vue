@@ -19,6 +19,8 @@ import type { PageCarouselsPanelProps } from "./Carousels.types";
 const props = defineProps<PageCarouselsPanelProps>();
 
 const controls = props.controls;
+
+const computeOrientationLabel = (orientation: CarouselOrientation) => ORIENTATION_LABELS[orientation];
 </script>
 
 <template>
@@ -100,7 +102,7 @@ const controls = props.controls;
             <PageSelectField
                 :value="controls.orientation.value"
                 :values="CAROUSEL_ORIENTATIONS"
-                :compute-label="(orientation: CarouselOrientation) => ORIENTATION_LABELS[orientation]"
+                :compute-label="computeOrientationLabel"
                 :width="ORIENTATION_FIELD_WIDTH"
                 ariaLabel="Orientation"
                 @change="(orientation: CarouselOrientation) => (controls.orientation.value = orientation)"

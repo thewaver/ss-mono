@@ -1,8 +1,8 @@
 <script setup lang="ts">
 import { shallowRef } from "vue";
 
-import type { RangeValues } from "@thewaver/ss-components-vue";
 import { EXAMPLES_ROOT, EXAMPLE_NAMES, STEP_COUNT } from "@thewaver/ss-playground/App/Pages/RangePage/RangePage.const";
+import type { Span } from "@thewaver/ss-utils";
 
 import type { ExampleDefs } from "../../PageComponents/Examples/Examples.types";
 import PageExamples from "../../PageComponents/Examples/PageExamples.vue";
@@ -25,11 +25,11 @@ const reachable = shallowRef(75);
 const errored = shallowRef(90);
 const knob = shallowRef(30);
 
-const price = shallowRef<RangeValues>({ start: 20, end: 80 });
-const budget = shallowRef<RangeValues>({ start: 100, end: 350 });
+const price = shallowRef<Span>({ start: 20, end: 80 });
+const budget = shallowRef<Span>({ start: 100, end: 350 });
 const settledBudget = shallowRef("not yet");
-const verticalPair = shallowRef<RangeValues>({ start: 30, end: 70 });
-const disabledPair = shallowRef<RangeValues>({ start: 35, end: 65 });
+const verticalPair = shallowRef<Span>({ start: 30, end: 70 });
+const disabledPair = shallowRef<Span>({ start: 35, end: 65 });
 
 const examples: ExampleDefs[] = [
     {

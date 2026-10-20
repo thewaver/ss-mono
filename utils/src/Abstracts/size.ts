@@ -1,3 +1,4 @@
+import type { Point2d } from "./point2d.js";
 import { Vec2d, type Vec2dString } from "./vec2d.js";
 
 const K1 = "width";
@@ -32,4 +33,10 @@ export namespace Size2d {
 export namespace Size2dString {
     /** Parses a string such as `WIDTH10_HEIGHT20` back into a {@link Size2d}. */
     export const fromString = Vec2d.fromString(K1, K2);
+}
+
+/** What a {@link Size2d} means as a box placed at the origin. */
+export namespace Size2dUtils {
+    /** Finds the middle of a box of this size whose top-left corner is at the origin. */
+    export const getCenter = (size: Size2d): Point2d => ({ x: size.width * 0.5, y: size.height * 0.5 });
 }

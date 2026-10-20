@@ -1,4 +1,5 @@
-import type { InteractionFlags, TimelineItemRenderProps, TimelineMarker, TimelineTick } from "@thewaver/ss-components";
+import type { InteractionFlags, TimelineItemRenderProps, TimelineMarker } from "@thewaver/ss-components";
+import type { SpanTick } from "@thewaver/ss-utils";
 
 import type { PAGE_TIMELINE_FAMILIES } from "./TimelineContent.css";
 
@@ -7,7 +8,7 @@ export type PageTimelineFamily = (typeof PAGE_TIMELINE_FAMILIES)[number];
 export type TimelineMarkerTone = "now" | "playhead";
 
 export type BasePageTimelineTickValues = {
-    tick: TimelineTick;
+    tick: SpanTick;
     label: string;
 };
 

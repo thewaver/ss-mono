@@ -1,6 +1,7 @@
 import type { ReactNode } from "react";
 
-import type { BaseCornerPinValues, CornerPinGripRenderProps, QuadWarpCorners } from "@thewaver/ss-components";
+import type { BaseCornerPinValues, CornerPinGripRenderProps } from "@thewaver/ss-components";
+import type { Quad } from "@thewaver/ss-utils";
 
 export type CornerPinProps = BaseCornerPinValues & {
     /**
@@ -9,7 +10,7 @@ export type CornerPinProps = BaseCornerPinValues & {
      * to a shape that can be drawn and within `reachRatio` of the box. `QuadWarpUtils.RESTING_CORNERS` leaves the
      * content as it is.
      */
-    corners: readonly [QuadWarpCorners, (value: QuadWarpCorners) => void];
+    corners: readonly [Quad, (value: Quad) => void];
     /**
      * Draws one grip, centered on its corner. The grip is what is pressed, dragged and tapped, so whatever it draws is
      * the target a pointer has to hit.

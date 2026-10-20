@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 
-import { Size2d, Size2dString } from "../../src/Abstracts/size.js";
+import { Size2d, Size2dString, Size2dUtils } from "../../src/Abstracts/size.js";
 
 const a = { width: 10, height: 20 };
 const b = { width: 4, height: 40 };
@@ -29,5 +29,11 @@ describe("Size2d", () => {
         expect(Size2d.toString(a)).toBe("WIDTH10_HEIGHT20");
         expect(Size2dString.fromString("WIDTH10_HEIGHT20")).toEqual(a);
         expect(Size2dString.fromString(Size2d.toString(b))).toEqual(b);
+    });
+});
+
+describe("Size2dUtils.getCenter", () => {
+    it("finds the middle of a box of that size at the origin", () => {
+        expect(Size2dUtils.getCenter({ width: 10, height: 6 })).toEqual({ x: 5, y: 3 });
     });
 });

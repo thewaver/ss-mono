@@ -1,4 +1,13 @@
-import { MathUtils, type Point2d, Point2dUtils, type Size2d, StoreUtils } from "@thewaver/ss-utils";
+import {
+    EasingUtils,
+    type GestureSample,
+    GestureUtils,
+    MathUtils,
+    type Point2d,
+    Point2dUtils,
+    type Size2d,
+    StoreUtils,
+} from "@thewaver/ss-utils";
 
 import type { WraparoundPlane, WraparoundPlaneOpts, WraparoundPlaneState, WraparoundTile } from "./Wraparound.types";
 
@@ -30,11 +39,6 @@ const ORIGIN: Point2d = { x: 0, y: 0 };
 
 const ORIGINAL_TILE: WraparoundTile = { column: 0, row: 0 };
 
-type PointerSample = {
-    point: Point2d;
-    timeMs: number;
-};
-
 type Motion =
     | { kind: "glide"; from: Point2d; to: Point2d; startMs: number; durationMs: number }
     | { kind: "coast"; velocity: Point2d; lastMs: number };
@@ -43,16 +47,20 @@ type Press = {
     pointerId: number;
     start: Point2d;
     startOffset: Point2d;
-    samples: PointerSample[];
+    samples: GestureSample[];
     isDragging: boolean;
     isFromOriginal: boolean;
 };
 
 const getIsSameTile = (a: WraparoundTile, b: WraparoundTile) => a.column === b.column && a.row === b.row;
 
-const easeOut = (ratio: number) => 1 - (1 - ratio) ** 3;
+/** Carries a flick on for the time that has passed, each axis slowing as `GestureUtils.coast` slows one. */
+const coastBy = (velocity: Point2d, elapsedMs: number, momentumMs: number) => {
+    const across = GestureUtils.coast(velocity.x, elapsedMs, momentumMs);
+    const down = GestureUtils.coast(velocity.y, elapsedMs, momentumMs);
 
-const getSpeed = (velocity: Point2d) => Math.hypot(velocity.x, velocity.y);
+    return { distance: { x: across.distance, y: down.distance }, velocity: { x: across.speed, y: down.speed } };
+};
 
 /** How far a span must move to lie wholly inside the window, or to start at its start when it is bigger. */
 const getFitDelta = (position: number, extent: number, view: number) => {
@@ -209,46 +217,6 @@ export namespace WraparoundUtils {
     };
 
     /**
-     * How fast the pointer was moving at the end of a drag.
-     *
-     * @param samples The pointer's positions through the drag, oldest first.
-     * @param windowMs How far back from the last one to read.
-     * @returns Pixels per millisecond on each axis, or none while fewer than two samples fall in the window.
-     */
-    export const computeVelocity = (samples: readonly PointerSample[], windowMs = VELOCITY_WINDOW_MS): Point2d => {
-        const last = samples[samples.length - 1];
-        const first = last && samples.find((sample) => last.timeMs - sample.timeMs <= windowMs);
-        const elapsedMs = first ? last.timeMs - first.timeMs : 0;
-
-        if (!first || elapsedMs <= 0) return ORIGIN;
-
-        return { x: (last.point.x - first.point.x) / elapsedMs, y: (last.point.y - first.point.y) / elapsedMs };
-    };
-
-    /**
-     * Moves a coasting plane on by the time that has passed, slowing it as it goes.
-     *
-     * The speed decays exponentially, by the same share in every equal stretch of time, so the coast lasts as long
-     * on any frame rate; the distance is the exact sum of that decaying speed rather than a frame-by-frame guess.
-     *
-     * @param velocity How fast the plane is moving, in pixels per millisecond.
-     * @param elapsedMs How long has passed.
-     * @param momentumMs How slowly it loses speed: after this long about 63% of it is gone. `0` or less stops at once.
-     * @returns How far it moved, and how fast it is moving now.
-     */
-    export const stepCoast = (velocity: Point2d, elapsedMs: number, momentumMs: number) => {
-        if (momentumMs <= 0) return { distance: ORIGIN, velocity: ORIGIN };
-
-        const kept = Math.exp(-Math.max(elapsedMs, 0) / momentumMs);
-        const travelled = momentumMs * (1 - kept);
-
-        return {
-            distance: { x: velocity.x * travelled, y: velocity.y * travelled },
-            velocity: { x: velocity.x * kept, y: velocity.y * kept },
-        };
-    };
-
-    /**
      * How far a key moves the plane.
      *
      * The keys move the view the way a scrolled page's do — the right arrow shows more of what is to the right — so
@@ -355,7 +323,7 @@ export namespace WraparoundUtils {
 
             if (motion?.kind === "glide") {
                 const ratio = MathUtils.clamp01((nowMs - motion.startMs) / motion.durationMs);
-                const eased = easeOut(ratio);
+                const eased = EasingUtils.easeOutCubic(ratio);
 
                 setOffset(Point2dUtils.lerp(motion.from, motion.to, eased));
 
@@ -363,13 +331,15 @@ export namespace WraparoundUtils {
 
                 lastDriftMs = nowMs;
             } else if (motion) {
-                const step = stepCoast(motion.velocity, nowMs - motion.lastMs, opts.getMomentumMs());
+                const step = coastBy(motion.velocity, nowMs - motion.lastMs, opts.getMomentumMs());
                 const { offset } = store.get();
 
                 setOffset({ x: offset.x + step.distance.x, y: offset.y + step.distance.y });
 
                 motion =
-                    getSpeed(step.velocity) < MIN_SPEED_PX_PER_MS ? undefined : { ...motion, ...step, lastMs: nowMs };
+                    Point2dUtils.getLength(step.velocity) < MIN_SPEED_PX_PER_MS
+                        ? undefined
+                        : { ...motion, ...step, lastMs: nowMs };
                 lastDriftMs = nowMs;
             } else if (drift && getIsDriftDue()) {
                 const elapsedMs = lastDriftMs === undefined ? 0 : nowMs - lastDriftMs;
@@ -393,7 +363,7 @@ export namespace WraparoundUtils {
         };
 
         const setDrift = (velocity: Point2d | undefined) => {
-            drift = velocity && getSpeed(velocity) > 0 ? velocity : undefined;
+            drift = velocity && Point2dUtils.getLength(velocity) > 0 ? velocity : undefined;
 
             if (!drift) lastDriftMs = undefined;
 
@@ -540,9 +510,9 @@ export namespace WraparoundUtils {
                 if (ended.isDragging) {
                     suppressNextClick();
 
-                    const velocity = computeVelocity(ended.samples);
+                    const velocity = GestureUtils.computeVelocity(ended.samples, VELOCITY_WINDOW_MS);
 
-                    if (opts.getMomentumMs() > 0 && getSpeed(velocity) >= MIN_SPEED_PX_PER_MS) {
+                    if (opts.getMomentumMs() > 0 && Point2dUtils.getLength(velocity) >= MIN_SPEED_PX_PER_MS) {
                         startMotion({ kind: "coast", velocity, lastMs: performance.now() });
                     }
 

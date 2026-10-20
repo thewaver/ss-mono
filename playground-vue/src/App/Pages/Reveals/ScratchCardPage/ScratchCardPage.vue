@@ -39,6 +39,10 @@ const brushRadius = shallowRef(SCRATCH_CARD_DEFAULTS.brushRadius);
 const softness = shallowRef(SCRATCH_CARD_DEFAULTS.softness);
 const brushShape = shallowRef<(typeof ScratchCardKnobs.BRUSH_SHAPES)[number]>(ScratchCardKnobs.STARTING_BRUSH_SHAPE);
 
+const setBrushShape = (shape: (typeof ScratchCardKnobs.BRUSH_SHAPES)[number]) => {
+    brushShape.value = shape;
+};
+
 const computePoints = computed(() => {
     const shape = brushShape.value;
 
@@ -166,7 +170,7 @@ const examples: ExampleDefs[] = [
                 :value="brushShape"
                 :values="ScratchCardKnobs.BRUSH_SHAPES"
                 ariaLabel="Brush shape"
-                @change="(shape: (typeof ScratchCardKnobs.BRUSH_SHAPES)[number]) => (brushShape = shape)"
+                @change="setBrushShape"
             />
         </PageProp>
 

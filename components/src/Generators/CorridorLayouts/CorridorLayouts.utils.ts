@@ -1,7 +1,5 @@
-import { MathUtils, Point3d } from "@thewaver/ss-utils";
+import { AngleUtils, MathUtils, Point3d, Point3dUtils, type Quad, RandomUtils } from "@thewaver/ss-utils";
 
-import type { QuadWarpCorners } from "../../Abstracts/QuadWarp/QuadWarp.types";
-import { QuadWarpUtils } from "../../Abstracts/QuadWarp/QuadWarp.utils";
 import type { InfiniteCorridorLayoutRule } from "../../Exotics/Perspective/InfiniteCorridor/InfiniteCorridor.types";
 import { CorridorLayoutDefaults } from "./CorridorLayouts.const";
 import type { CorridorLayoutEntry, TubeCornerDefs, TubeLayoutDefs, WallsLayoutDefs } from "./CorridorLayouts.types";
@@ -12,46 +10,16 @@ const HALF_TURN_DEGREES = 180;
 const FULL_TURN_DEGREES = 360;
 const QUARTER_TURN_DEGREES = 90;
 const SMALLEST_TUBE = 3;
-const HASH_RANGE = 4294967296;
-const SEED_STRIDE = 977;
-const DRAW_STRIDE = 7;
 const SKIP_DRAW = 1;
 const SLOTS_PER_CARD_LENGTH = 2;
 const HALF_CARD_SLOTS = SLOTS_PER_CARD_LENGTH * HALF;
 const LEFT_WALL = -1;
 const LEFT_SIDE = 1;
 const RIGHT_SIDE = -1;
-const CORNER_SHARE = 0.25;
-
-const toRadians = (degrees: number) => (degrees * Math.PI) / HALF_TURN_DEGREES;
-
-const greatestCommonDivisor = (a: number, b: number): number => (b === 0 ? a : greatestCommonDivisor(b, a % b));
 
 /** Where a ring's vertex stands, `side` half a side's turn either way of the side's middle, round the tube's axis. */
-const toTubeVertex = (radius: number, depth: number, rollDegrees: number, side: number, sideRadians: number) => {
-    const angle = toRadians(rollDegrees) + side * sideRadians;
-
-    return { x: -radius * Math.sin(angle), y: radius * Math.cos(angle), z: depth };
-};
-
-/** A point turned by `radians` about a line through `center` running along the unit direction `axis`. */
-const rotateAbout = (point: Point3d, center: Point3d, axis: Point3d, radians: number): Point3d => {
-    const arm = Point3d.sub(point, center);
-    const cos = Math.cos(radians);
-    const sin = Math.sin(radians);
-    const along = (axis.x * arm.x + axis.y * arm.y + axis.z * arm.z) * (WHOLE - cos);
-    const across = {
-        x: axis.y * arm.z - axis.z * arm.y,
-        y: axis.z * arm.x - axis.x * arm.z,
-        z: axis.x * arm.y - axis.y * arm.x,
-    };
-
-    return {
-        x: center.x + arm.x * cos + across.x * sin + axis.x * along,
-        y: center.y + arm.y * cos + across.y * sin + axis.y * along,
-        z: center.z + arm.z * cos + across.z * sin + axis.z * along,
-    };
-};
+const toTubeVertex = (radius: number, depth: number, rollDegrees: number, side: number, sideDegrees: number) =>
+    Point3dUtils.fromCylindrical(radius, QUARTER_TURN_DEGREES + rollDegrees + side * sideDegrees, depth);
 
 /** Which wall a slot is on: even slots on the left, odd ones on the right, so the walls take turns. */
 const toSide = (slot: number) => (slot % 2 === 0 ? LEFT_WALL : WHOLE);
@@ -59,17 +27,6 @@ const toSide = (slot: number) => (slot % 2 === 0 ? LEFT_WALL : WHOLE);
 /** Fades an item in as it comes into reach at the far end, and out as it passes the viewer. */
 const toOpacity = (distance: number, visibleDistance: number) =>
     Math.min(MathUtils.clamp01(WHOLE + distance), MathUtils.clamp01(visibleDistance + WHOLE - distance));
-
-/** A number from `0` up to `1` that is always the same for the same item, draw and seed. */
-const draw = (index: number, which: number, seed: number) => {
-    let value = Math.imul((index * DRAW_STRIDE + which + seed * SEED_STRIDE) ^ 0x9e3779b9, 0x85ebca6b);
-
-    value ^= value >>> 13;
-    value = Math.imul(value, 0xc2b2ae35);
-    value ^= value >>> 16;
-
-    return (value >>> 0) / HASH_RANGE;
-};
 
 /**
  * Lays the drawn items out along a run of slots, each item followed by an empty gap of its own.
@@ -84,7 +41,7 @@ const createSlots = (minSkipCount: number, maxSkipCount: number, seed: number) =
     const most = Math.max(Math.round(maxSkipCount), fewest);
 
     const getStride = (index: number) =>
-        WHOLE + fewest + Math.floor(draw(index, SKIP_DRAW, seed) * (most - fewest + 1));
+        WHOLE + fewest + Math.floor(RandomUtils.hash(index, SKIP_DRAW, seed) * (most - fewest + 1));
 
     let measured: { count: number; placeCount: number; starts: number[]; total: number } | undefined;
 
@@ -252,8 +209,8 @@ export namespace CorridorLayoutUtils {
         const staggerRatio = defs?.staggerRatio ?? base.staggerRatio;
         const perspectivePx = defs?.perspectivePx ?? base.perspectivePx;
         const visibleDistance = (defs?.visibleCards ?? base.visibleCards) * SLOTS_PER_CARD_LENGTH;
-        const nearRadians = toRadians(nearAngleDegrees);
-        const farRadians = toRadians(farAngleDegrees);
+        const nearRadians = AngleUtils.toRadians(nearAngleDegrees);
+        const farRadians = AngleUtils.toRadians(farAngleDegrees);
 
         return {
             reach: Math.ceil((Math.ceil(visibleDistance) + WHOLE) / slots.fewestStride) + WHOLE,
@@ -272,7 +229,7 @@ export namespace CorridorLayoutUtils {
                     farAngleDegrees,
                     MathUtils.clamp01(slotDistance / visibleDistance),
                 );
-                const radians = toRadians(angleDegrees);
+                const radians = AngleUtils.toRadians(angleDegrees);
                 const along = toPackedLength(slotDistance, nearRadians, farRadians, visibleDistance) * HALF * width;
                 const farAlong =
                     toPackedLength(visibleDistance + SLOTS_PER_CARD_LENGTH, nearRadians, farRadians, visibleDistance) *
@@ -289,7 +246,7 @@ export namespace CorridorLayoutUtils {
                 return {
                     size: { width, height },
                     offset: toWallOffset(side, size.width * HALF, along, lean, width, radians),
-                    turnDegrees: -side * (angleDegrees - (lean * HALF_TURN_DEGREES) / Math.PI),
+                    turnDegrees: -side * (angleDegrees - AngleUtils.fromRadians(lean)),
                     perspectivePx,
                     opacity: toOpacity(slotDistance, visibleDistance),
                 };
@@ -318,34 +275,31 @@ export namespace CorridorLayoutUtils {
      * @returns The corners in pixels on screen from the middle of the box, or `undefined` when any of them is level
      * with the viewer or behind them.
      */
-    export const computeTubeCorners = (defs: TubeCornerDefs): QuadWarpCorners | undefined => {
-        const sideRadians = Math.PI / defs.sides;
+    export const computeTubeCorners = (defs: TubeCornerDefs): Quad | undefined => {
+        const sideDegrees = HALF_TURN_DEGREES / defs.sides;
         const near = (side: number) =>
-            toTubeVertex(defs.nearRadius, defs.nearDepth, defs.nearRollDegrees, side, sideRadians);
+            toTubeVertex(defs.nearRadius, defs.nearDepth, defs.nearRollDegrees, side, sideDegrees);
         const far = (side: number) =>
-            toTubeVertex(defs.farRadius, defs.farDepth, defs.farRollDegrees, side, sideRadians);
+            toTubeVertex(defs.farRadius, defs.farDepth, defs.farRollDegrees, side, sideDegrees);
         const lying = {
             top_left: far(LEFT_SIDE),
             top_right: far(RIGHT_SIDE),
             bottom_right: near(RIGHT_SIDE),
             bottom_left: near(LEFT_SIDE),
         };
-        const center = Point3d.mul(
-            Point3d.add(
-                Point3d.add(lying.top_left, lying.top_right),
-                Point3d.add(lying.bottom_right, lying.bottom_left),
-            ),
-            Point3d.spread(CORNER_SHARE),
-        );
+        const center = Point3dUtils.getCentroid([
+            lying.top_left,
+            lying.top_right,
+            lying.bottom_right,
+            lying.bottom_left,
+        ]);
         const rightward = Point3d.sub(
             Point3d.add(lying.top_right, lying.bottom_right),
             Point3d.add(lying.top_left, lying.bottom_left),
         );
-        const length = Math.hypot(rightward.x, rightward.y, rightward.z);
-        const axis = length > 0 ? Point3d.mul(rightward, Point3d.spread(WHOLE / length)) : { x: WHOLE, y: 0, z: 0 };
-        const radians = toRadians(defs.leanDegrees);
+        const axis = Point3dUtils.getLength(rightward) > 0 ? rightward : { x: WHOLE, y: 0, z: 0 };
         const toScreen = (point: Point3d) =>
-            QuadWarpUtils.project(rotateAbout(point, center, axis, radians), defs.perspectivePx);
+            Point3dUtils.project(Point3dUtils.rotateAbout(point, center, axis, defs.leanDegrees), defs.perspectivePx);
         const corners = {
             top_left: toScreen(lying.top_left),
             top_right: toScreen(lying.top_right),
@@ -355,7 +309,7 @@ export namespace CorridorLayoutUtils {
 
         if (!corners.top_left || !corners.top_right || !corners.bottom_right || !corners.bottom_left) return undefined;
 
-        return corners as QuadWarpCorners;
+        return corners as Quad;
     };
 
     /**
@@ -406,7 +360,8 @@ export namespace CorridorLayoutUtils {
             reach: Math.ceil(((Math.ceil(visibleRings) + WHOLE) * sides + sides) / slots.fewestStride),
             focusDistance: ((defs?.focusRings ?? base.focusRings) * sides) / slots.meanStride,
             behindDistance: Math.ceil(sides / slots.fewestStride),
-            placeMultiple: (count) => (count * sides) / greatestCommonDivisor(slots.getLapSlots(count), sides),
+            placeMultiple: (count) =>
+                (count * sides) / MathUtils.getGreatestCommonDivisor(slots.getLapSlots(count), sides),
             place: ({ distance, place, placeCount, count, size }) => {
                 const slot = Math.round(slots.getSlot(place, count, placeCount));
                 const slotDistance = slot - slots.getSlot(place - distance, count, placeCount);

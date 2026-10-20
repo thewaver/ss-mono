@@ -263,7 +263,7 @@ export namespace CarouselUtils {
 
         if (lap <= 0) return 0;
 
-        return isLooping ? (((position % lap) + lap) % lap) / lap : MathUtils.clamp01(position / lap);
+        return isLooping ? MathUtils.wrap(position, lap) / lap : MathUtils.clamp01(position / lap);
     };
 
     /**
@@ -284,7 +284,7 @@ export namespace CarouselUtils {
 
         if (!isLooping || count <= 0) return straight;
 
-        const forward = ((straight % count) + count) % count;
+        const forward = MathUtils.wrap(straight, count);
 
         return forward > count * HALF ? forward - count : forward;
     };

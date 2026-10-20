@@ -54,4 +54,27 @@ export namespace BitwiseUtils {
     export const removeFlags = <T extends number>(currentFlags: number, remove: T[]): number => {
         return remove.reduce<number>((result, flag) => result & ~flag, currentFlags);
     };
+
+    /**
+     * Weaves the low bits of two numbers together, one from each in turn.
+     *
+     * Bit `i` of `first` lands at bit `2i` and bit `i` of `second` at bit `2i + 1`. Read as a position, the
+     * result walks a square grid in Z-shaped steps — the Morton order — so cells near each other on the grid
+     * tend to sit near each other in the result.
+     *
+     * @param first The number whose bits take the even places.
+     * @param second The number whose bits take the odd places.
+     * @param bits How many low bits of each take part. Higher bits are dropped.
+     * @returns The interleaved number.
+     */
+    export const interleave = (first: number, second: number, bits: number) => {
+        let result = 0;
+
+        for (let bit = 0; bit < bits; bit++) {
+            result |= ((first >> bit) & 1) << (bit * 2);
+            result |= ((second >> bit) & 1) << (bit * 2 + 1);
+        }
+
+        return result;
+    };
 }

@@ -1,17 +1,10 @@
-import type { Point2d, Size2d } from "@thewaver/ss-utils";
-
-export type PanZoomSpan = {
-    /** Where the stretch begins, in the content's own units. */
-    start: number;
-    /** Where it ends, in the same units. */
-    end: number;
-};
+import type { Point2d, Size2d, Span } from "@thewaver/ss-utils";
 
 export type PanZoomView = {
     /** The stretch across, in the content's own units. */
-    x: PanZoomSpan;
+    x: Span;
     /** The stretch down, in the same units. */
-    y: PanZoomSpan;
+    y: Span;
 };
 
 export type PanZoomAxes = {

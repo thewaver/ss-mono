@@ -1,7 +1,6 @@
 <script setup lang="ts">
 import { computed, shallowRef } from "vue";
 
-import type { CornerKey } from "@thewaver/ss-components-vue";
 import { CORNER_HIGHLIGHT_DEFAULTS, CORNER_HIGHLIGHT_KEYS } from "@thewaver/ss-components-vue";
 import { CornerHighlightKnobs } from "@thewaver/ss-playground/App/Knobs/CornerHighlights.const";
 import {
@@ -10,6 +9,7 @@ import {
     EXAMPLE_NAMES,
     FIELD_WIDTH,
 } from "@thewaver/ss-playground/App/Pages/CornerHighlightPage/CornerHighlightPage.const";
+import type { QuadCorner } from "@thewaver/ss-utils";
 
 import type { ExampleDefs } from "../../PageComponents/Examples/Examples.types";
 import PageExamples from "../../PageComponents/Examples/PageExamples.vue";
@@ -30,7 +30,7 @@ const lengthAcross = shallowRef(CornerHighlightKnobs.STARTING_LENGTH);
 const lengthDown = shallowRef(CornerHighlightKnobs.STARTING_LENGTH);
 const strokeThickness = shallowRef(CORNER_HIGHLIGHT_DEFAULTS.strokeThickness);
 const transitionDurationMs = shallowRef(CORNER_HIGHLIGHT_DEFAULTS.transitionDurationMs);
-const hiddenCorners = shallowRef<CornerKey[]>(
+const hiddenCorners = shallowRef<QuadCorner[]>(
     CORNER_HIGHLIGHT_KEYS.filter((key) => !CORNER_HIGHLIGHT_DEFAULTS.visibleCorners.has(key)),
 );
 
@@ -40,7 +40,7 @@ const visibleCorners = computed(
     () => new Set(CORNER_HIGHLIGHT_KEYS.filter((key) => !hiddenCorners.value.includes(key))),
 );
 
-const toggleCorner = (key: CornerKey, isVisible: boolean) => {
+const toggleCorner = (key: QuadCorner, isVisible: boolean) => {
     hiddenCorners.value = isVisible
         ? hiddenCorners.value.filter((entry) => entry !== key)
         : [...hiddenCorners.value, key];

@@ -235,3 +235,35 @@ describe("ObjectUtils.zipArray", () => {
         expect(ObjectUtils.zipArray("truncate", [1, 2])).toEqual([[1], [2]]);
     });
 });
+
+describe("ObjectUtils.isSameArray", () => {
+    it("matches the same entries in the same order", () => {
+        const entry = {};
+
+        expect(ObjectUtils.isSameArray([1, entry], [1, entry])).toBe(true);
+        expect(ObjectUtils.isSameArray([1, 2], [2, 1])).toBe(false);
+        expect(ObjectUtils.isSameArray([1], [1, 1])).toBe(false);
+    });
+
+    it("compares entries the way it is told to", () => {
+        const isSameSize = (a: { size: number }, b: { size: number }) => a.size === b.size;
+
+        expect(ObjectUtils.isSameArray([{ size: 1 }], [{ size: 1 }])).toBe(false);
+        expect(ObjectUtils.isSameArray([{ size: 1 }], [{ size: 1 }], isSameSize)).toBe(true);
+    });
+});
+
+describe("ObjectUtils.moveArrayElement", () => {
+    it("moves an entry to the place asked for, counted in the finished array", () => {
+        expect(ObjectUtils.moveArrayElement(["a", "b", "c", "d"], 0, 2)).toEqual(["b", "c", "a", "d"]);
+        expect(ObjectUtils.moveArrayElement(["a", "b", "c", "d"], 3, 0)).toEqual(["d", "a", "b", "c"]);
+    });
+
+    it("leaves the array given alone", () => {
+        const values = ["a", "b"];
+
+        ObjectUtils.moveArrayElement(values, 0, 1);
+
+        expect(values).toEqual(["a", "b"]);
+    });
+});

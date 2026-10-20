@@ -1,4 +1,4 @@
-import { MathUtils } from "@thewaver/ss-utils";
+import { AngleUtils, MathUtils } from "@thewaver/ss-utils";
 
 import type {
     CarouselPlacement,
@@ -24,15 +24,12 @@ const PERCENT = 100;
 const WHOLE = 1;
 const HALF = 0.5;
 const FULL_TURN_DEGREES = 360;
-const HALF_TURN_DEGREES = 180;
 const QUARTER_TURN_DEGREES = 90;
 const SMALLEST_RING = 3;
 const BOTTOM_EDGE = { x: 0.5, y: 1 };
 const LEFT_EDGE = { x: 0, y: 0.5 };
 const LEAVING_DROP_RATIO = 0.6;
 const FLIPPED_FADE_DISTANCE = 2;
-
-const toRadians = (degrees: number) => (degrees * Math.PI) / HALF_TURN_DEGREES;
 
 /** How long the carousel's box is along the way it runs, which is the length a slide spans. */
 const getAlong = (defs: CarouselPlacementDefs) =>
@@ -126,7 +123,7 @@ export namespace CarouselPlacementUtils {
                 const count = Math.max(isFixed ? faceCount : placementDefs.count, SMALLEST_RING);
                 const angle = (placementDefs.distance * FULL_TURN_DEGREES) / count;
                 const radius = (along * faceRatio * HALF) / Math.tan(Math.PI / count);
-                const radians = toRadians(angle);
+                const radians = AngleUtils.toRadians(angle);
                 const alongPercent = along > 0 ? ((radius * Math.sin(radians)) / along) * PERCENT : 0;
                 const isPastHalfTurn = isFixed && Math.abs(placementDefs.distance) > count * HALF;
 
@@ -247,8 +244,8 @@ export namespace CarouselPlacementUtils {
             place: (placementDefs) => {
                 const along = getAlong(placementDefs);
                 const angle = placementDefs.distance * stepDegrees;
-                const radians = toRadians(angle);
-                const radius = (along * HALF) / Math.sin(toRadians(stepDegrees) * HALF);
+                const radians = AngleUtils.toRadians(angle);
+                const radius = (along * HALF) / Math.sin(AngleUtils.toRadians(stepDegrees) * HALF);
                 const alongPercent = along > 0 ? ((radius * Math.sin(radians)) / along) * PERCENT : 0;
 
                 return {
@@ -410,7 +407,7 @@ export namespace CarouselPlacementUtils {
         const scale = faceRatio * PERCENT;
 
         const toFoldDegrees = (distance: number, index: number, count: number) => {
-            const wrapped = ((index % count) + count) % count;
+            const wrapped = MathUtils.wrap(index, count);
             const direction = wrapped % 2 === 0 ? WHOLE : -WHOLE;
 
             return direction * angleDegrees * MathUtils.clamp01(Math.abs(distance));
@@ -431,7 +428,9 @@ export namespace CarouselPlacementUtils {
 
                 for (let walked = 0; walked <= Math.abs(steps); walked++) {
                     const slideDistance = anchorDistance + walked * step;
-                    const radians = toRadians(toFoldDegrees(slideDistance, index - steps + walked * step, count));
+                    const radians = AngleUtils.toRadians(
+                        toFoldDegrees(slideDistance, index - steps + walked * step, count),
+                    );
                     const isAnchor = walked === 0;
                     const isLast = walked === Math.abs(steps);
                     const share =

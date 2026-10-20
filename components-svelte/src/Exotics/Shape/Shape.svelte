@@ -1,7 +1,6 @@
 <script lang="ts">
-    import { ShapeLayerUtils, ShapeStyles as styles } from "@thewaver/ss-components";
+    import { ElementObserverUtils, ShapeLayerUtils, ShapeStyles as styles } from "@thewaver/ss-components";
     import { ShapeConst } from "@thewaver/ss-components/internal";
-    import { Size2d } from "@thewaver/ss-utils";
 
     import Markup from "../../Utils/Markup.svelte";
     import type { ShapeProps } from "./Shape.types.js";
@@ -16,15 +15,9 @@
 
         if (!element) return;
 
-        const observer = new ResizeObserver(() => {
-            const next = { width: element.offsetWidth, height: element.offsetHeight };
-
-            if (!Size2d.isSame(rootSize, next)) rootSize = next;
+        return ElementObserverUtils.observeBorderBoxSize(element, (size) => {
+            rootSize = size;
         });
-
-        observer.observe(element);
-
-        return () => observer.disconnect();
     });
 
     const fillDefs = $derived(props.computeFillDefs?.(rootSize, root ?? undefined));

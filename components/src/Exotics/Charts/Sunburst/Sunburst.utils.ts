@@ -1,3 +1,5 @@
+import { AngleUtils, SVGUtils } from "@thewaver/ss-utils";
+
 import { TreemapUtils } from "../Treemap/Treemap.utils";
 import type { SunburstArc, SunburstArcPathOpts, SunburstNode, SunburstSpan } from "./Sunburst.types";
 
@@ -9,16 +11,12 @@ const WHOLE = 1;
 const HALF = 0.5;
 /** A full turn, in radians. */
 const TURN = Math.PI * 2;
-/** How close to a full turn an arc has to be before it is drawn as a ring rather than a slice. */
-const FULL_TURN_EPSILON = 1e-6;
 /** A quarter turn, in degrees, for turning text from twelve o'clock to three. */
 const QUARTER_TURN_DEGREES = 90;
 /** Half a turn, in degrees, for turning text on the left-hand side the right way up. */
 const HALF_TURN_DEGREES = 180;
 /** A full turn, in degrees. */
 const FULL_TURN_DEGREES = 360;
-
-const toPoint = (radius: number, angle: number) => `${radius * Math.sin(angle)},${-radius * Math.cos(angle)}`;
 
 /**
  * Lays out a sunburst, and turns the layout into what is drawn.
@@ -134,36 +132,15 @@ export namespace SunburstUtils {
      * @returns The `d` of a path, or an empty string for an arc with no width or no depth once the gaps are taken.
      * An arc that goes all the way round is drawn as a ring with a hole in it.
      */
-    export const computeArcPath = (arc: SunburstArc, opts?: SunburstArcPathOpts) => {
-        const pad = opts?.padLength ?? NOTHING;
-        const inner = arc.innerRadius;
-        const outer = arc.outerRadius - (opts?.ringGap ?? NOTHING);
-        const span = arc.endAngle - arc.startAngle;
-
-        if (span <= NOTHING || outer <= inner) return "";
-
-        if (span >= TURN - FULL_TURN_EPSILON && pad <= NOTHING) {
-            const ring = (radius: number, sweep: number) =>
-                `M${toPoint(radius, NOTHING)}A${radius},${radius} 0 1 ${sweep} ${toPoint(radius, Math.PI)}A${radius},${radius} 0 1 ${sweep} ${toPoint(radius, NOTHING)}Z`;
-
-            return inner > NOTHING ? `${ring(outer, WHOLE)}${ring(inner, NOTHING)}` : ring(outer, WHOLE);
-        }
-
-        const inset = (radius: number) => (radius > NOTHING ? Math.min(span * HALF, (pad * HALF) / radius) : NOTHING);
-
-        const outerStart = arc.startAngle + inset(outer);
-        const outerEnd = arc.endAngle - inset(outer);
-        const innerStart = arc.startAngle + inset(inner);
-        const innerEnd = arc.endAngle - inset(inner);
-        const outerLarge = outerEnd - outerStart > Math.PI ? WHOLE : NOTHING;
-        const innerLarge = innerEnd - innerStart > Math.PI ? WHOLE : NOTHING;
-
-        const rim = `M${toPoint(outer, outerStart)}A${outer},${outer} 0 ${outerLarge} 1 ${toPoint(outer, outerEnd)}`;
-
-        if (inner <= NOTHING) return `${rim}L0,0Z`;
-
-        return `${rim}L${toPoint(inner, innerEnd)}A${inner},${inner} 0 ${innerLarge} 0 ${toPoint(inner, innerStart)}Z`;
-    };
+    export const computeArcPath = (arc: SunburstArc, opts?: SunburstArcPathOpts) =>
+        SVGUtils.getRingSectorPath({
+            center: { x: NOTHING, y: NOTHING },
+            innerRadius: arc.innerRadius,
+            outerRadius: arc.outerRadius - (opts?.ringGap ?? NOTHING),
+            fromAngle: AngleUtils.fromRadians(arc.startAngle) - QUARTER_TURN_DEGREES,
+            toAngle: AngleUtils.fromRadians(arc.endAngle) - QUARTER_TURN_DEGREES,
+            padLength: opts?.padLength,
+        });
 
     /**
      * Where to put a label so it runs outward along the middle of an arc and never reads upside down.

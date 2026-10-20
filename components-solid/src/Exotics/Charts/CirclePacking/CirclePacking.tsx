@@ -5,11 +5,11 @@ import {
     type CirclePackingCircleState,
     type CirclePackingNode,
     CirclePackingUtils,
-    type CirclePackingView,
     TreemapUtils,
     CirclePackingStyles as styles,
 } from "@thewaver/ss-components";
 import { CirclePackingConst } from "@thewaver/ss-components/internal";
+import { type Circle, CircleUtils } from "@thewaver/ss-utils";
 
 import { ElementObserverSolidUtils } from "../../../Abstracts/ElementObserver/ElementObserverSolid.utils";
 import { SignalMirrorSolidUtils } from "../../../Abstracts/SignalMirror/SignalMirrorSolid.utils";
@@ -30,7 +30,7 @@ export const CirclePacking = <T,>(props: CirclePackingProps<T>) => {
     const [getRootRef, setRootRef] = createSignal<HTMLElement>();
     const [getFocusedNode, setFocusedNode] = createSignal<CirclePackingNode<T>>();
     const getProgress = accessStore(zoomClock);
-    const [getPath, setPath] = createSignal<(progress: number) => CirclePackingView>();
+    const [getPath, setPath] = createSignal<(progress: number) => Circle>();
 
     const getSize = ElementObserverSolidUtils.createBorderBoxSizeObserver(getRootRef);
 
@@ -59,9 +59,7 @@ export const CirclePacking = <T,>(props: CirclePackingProps<T>) => {
 
     const getDepths = createMemo(() => CirclePackingUtils.computeDepths(getRootNode()));
 
-    const getTargetView = createMemo(() =>
-        CirclePackingUtils.toView(getLayout().get(getBranch()) ?? CirclePackingConst.EMPTY_CIRCLE),
-    );
+    const getTargetView = createMemo(() => getLayout().get(getBranch()) ?? CirclePackingConst.EMPTY_CIRCLE);
 
     const getView = createMemo(() => CirclePackingUtils.computeShownView(getPath(), getTargetView(), getProgress()));
 
@@ -90,16 +88,13 @@ export const CirclePacking = <T,>(props: CirclePackingProps<T>) => {
             const from = untrack(() =>
                 CirclePackingUtils.computeShownView(
                     getPath(),
-                    CirclePackingUtils.toView(getLayout().get(previous) ?? CirclePackingConst.EMPTY_CIRCLE),
+                    getLayout().get(previous) ?? CirclePackingConst.EMPTY_CIRCLE,
                     getProgress(),
                 ),
             );
 
             setPath(() =>
-                CirclePackingUtils.interpolateZoom(
-                    from,
-                    CirclePackingUtils.toView(untrack(getLayout).get(next) ?? CirclePackingConst.EMPTY_CIRCLE),
-                ),
+                CircleUtils.interpolateZoom(from, untrack(getLayout).get(next) ?? CirclePackingConst.EMPTY_CIRCLE),
             );
             zoomClock.start(untrack(getZoomDurationMs));
         }),

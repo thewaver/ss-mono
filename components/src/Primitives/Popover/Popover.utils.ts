@@ -1,70 +1,5 @@
 import type { PopoverRole } from "./Popover.types";
 
-/** How far a scroller must move along one axis to show a run of `itemSize` from `itemStart`, the least that does. */
-const getRevealShift = (viewStart: number, viewSize: number, itemStart: number, itemSize: number) => {
-    const startShift = itemStart - viewStart;
-    const endShift = itemStart + itemSize - (viewStart + viewSize);
-
-    if (startShift < 0) return startShift;
-    if (endShift > 0) return Math.min(startShift, endShift);
-
-    return 0;
-};
-
-/**
- * How many times {@link revealIn} measures and moves. The scale it reads is the painted width over `offsetWidth`,
- * which is rounded to a whole pixel, so an unscaled scroller 322.28 pixels wide reads as 1.0009 — and over a
- * scroll of three thousand pixels that leaves the element three pixels short. A second pass measures what is left
- * and moves by that, which is small enough for the same error to vanish.
- */
-const REVEAL_PASSES = 2;
-
-/**
- * One side of a scroller's `scroll-padding`, in its layout pixels.
- *
- * `scroll-padding` is the room a scroller keeps clear when it brings something into view, which is how
- * `scrollIntoView` reads it; a scroller with padding of its own sets it to match, so the first item revealed brings
- * the padding above it back into view too. `auto` and anything not in pixels count as none.
- */
-const getScrollPadding = (value: string) => (value.endsWith("px") ? Number.parseFloat(value) : 0);
-
-/**
- * Moves one scroller by the least that shows `element` clear of the scroller's `scroll-padding`, converting the
- * painted distance into its layout pixels.
- */
-const revealIn = (scroller: HTMLElement, element: HTMLElement) => {
-    const canScrollX = scroller.scrollWidth > scroller.clientWidth;
-    const canScrollY = scroller.scrollHeight > scroller.clientHeight;
-
-    if ((!canScrollX && !canScrollY) || scroller.offsetWidth === 0) return;
-
-    const style = getComputedStyle(scroller);
-    const padLeft = getScrollPadding(style.scrollPaddingLeft);
-    const padRight = getScrollPadding(style.scrollPaddingRight);
-    const padTop = getScrollPadding(style.scrollPaddingTop);
-    const padBottom = getScrollPadding(style.scrollPaddingBottom);
-
-    for (let pass = 0; pass < REVEAL_PASSES; pass++) {
-        const scrollerRect = scroller.getBoundingClientRect();
-        const elementRect = element.getBoundingClientRect();
-        const scale = scrollerRect.width / scroller.offsetWidth;
-
-        if (canScrollX) {
-            const viewStart = scrollerRect.left + (scroller.clientLeft + padLeft) * scale;
-            const viewSize = (scroller.clientWidth - padLeft - padRight) * scale;
-
-            scroller.scrollLeft += getRevealShift(viewStart, viewSize, elementRect.left, elementRect.width) / scale;
-        }
-
-        if (canScrollY) {
-            const viewStart = scrollerRect.top + (scroller.clientTop + padTop) * scale;
-            const viewSize = (scroller.clientHeight - padTop - padBottom) * scale;
-
-            scroller.scrollTop += getRevealShift(viewStart, viewSize, elementRect.top, elementRect.height) / scale;
-        }
-    }
-};
-
 /** The parts of a popover that are not about where it is drawn: when it gives up, and what a press inside it does. */
 export namespace PopoverUtils {
     /**
@@ -106,29 +41,4 @@ export namespace PopoverUtils {
      * @returns `true` when the press's default should be prevented.
      */
     export const getIsFocusKeptOnPress = (role: PopoverRole) => role !== "dialog";
-
-    /**
-     * Scrolls an element into view by moving only the scrollers between it and `root`, never the page.
-     *
-     * `scrollIntoView` moves every scrollable ancestor, the document included, and a popup that has just opened is
-     * still unplaced at the top-left corner of whatever it is portaled into — with no `Viewport`, the top of the
-     * document — so revealing its highlighted row there scrolled the page to the top. This moves each scroller from the
-     * element's parent up to and including `root` by the least that shows the element, as `block: "nearest"` does,
-     * and nothing outside `root`. Where the popup has been placed makes no difference to the answer, so it may be
-     * called the moment the popup mounts. Distances are converted into each scroller's own layout pixels, so content
-     * drawn inside a scaled `Viewport` scrolls by the right amount.
-     *
-     * @param element The element to show.
-     * @param root The outermost element allowed to scroll: a popup's root, or a control's own root when the control
-     * may be drawn inside a popup. Nothing moves when `element` is not inside it.
-     */
-    export const revealWithin = (element: HTMLElement, root: HTMLElement) => {
-        if (!root.contains(element)) return;
-
-        for (let scroller = element.parentElement; scroller; scroller = scroller.parentElement) {
-            revealIn(scroller, element);
-
-            if (scroller === root) return;
-        }
-    };
 }

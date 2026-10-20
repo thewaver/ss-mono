@@ -2,14 +2,15 @@
     import { untrack } from "svelte";
 
     import {
+        ElementObserverUtils,
         LetterDriverStyles,
         LetterDriverUtils,
         type LetterSegment,
         type LetterState,
         PROXIMITY_TEXT_DEFAULTS,
+        ProximityTextStyles as styles,
         ProximityTextUtils,
         ViewportUtils,
-        ProximityTextStyles as styles,
     } from "@thewaver/ss-components";
     import { ProximityTextConst } from "@thewaver/ss-components/internal";
     import { type Rect, StringUtils } from "@thewaver/ss-utils";
@@ -139,11 +140,7 @@
 
         if (!element) return;
 
-        const observer = new ResizeObserver(measureRest);
-
-        observer.observe(element);
-
-        return () => observer.disconnect();
+        return ElementObserverUtils.observeBorderBoxSize(element, measureRest);
     });
 
     watchChange(getSegments, () => queueMicrotask(measureRest));

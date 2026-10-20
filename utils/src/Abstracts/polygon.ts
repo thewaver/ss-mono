@@ -245,4 +245,27 @@ export namespace PolygonUtils {
 
         return best;
     };
+
+    /**
+     * Measures how far the middle of each side of a regular polygon is from its center.
+     *
+     * @param sideLength How long each side is.
+     * @param sideCount How many sides it has. Two sides lying on each other have their middles at the center, and
+     * fewer than two make no polygon; both answer `0`.
+     */
+    export const getRegularApothem = (sideLength: number, sideCount: number) => {
+        if (sideCount <= 2) return 0;
+
+        return (sideLength * 0.5) / Math.tan(Math.PI / sideCount);
+    };
+
+    /**
+     * Measures how far each corner of a regular polygon is from its center.
+     *
+     * @param sideLength How long each side is.
+     * @param sideCount How many sides it has. Fewer than two make no polygon and are read as two, a single side
+     * with its middle at the center.
+     */
+    export const getRegularCircumradius = (sideLength: number, sideCount: number) =>
+        (sideLength * 0.5) / Math.sin(Math.PI / Math.max(sideCount, 2));
 }

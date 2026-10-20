@@ -2,7 +2,7 @@
 import { useModel } from "vue";
 
 import { Timeline } from "@thewaver/ss-components-vue";
-import type { TimelineEdgeAnnouncements, TimelineSpan } from "@thewaver/ss-components-vue";
+import type { TimelineEdgeAnnouncements } from "@thewaver/ss-components-vue";
 import type { Clip } from "@thewaver/ss-playground/App/Pages/TimelinePage/TimelineItems.types";
 import {
     LANE_SIZE,
@@ -15,6 +15,7 @@ import {
     AXIS_HEIGHT,
     PAGE_TIMELINE_FAMILIES,
 } from "@thewaver/ss-playground/App/StyledComponents/TimelineContent/TimelineContent.css";
+import type { Span } from "@thewaver/ss-utils";
 
 import PageTimelineBlock from "../../../StyledComponents/TimelineContent/PageTimelineBlock.vue";
 import PageTimelineFrame from "../../../StyledComponents/TimelineContent/PageTimelineFrame.vue";
@@ -59,7 +60,7 @@ const props = defineProps<Props>();
 const view = useModel(props, "view");
 const clips = useModel(props, "clips");
 
-const trim = (clip: Clip, index: number, span: TimelineSpan) => {
+const trim = (clip: Clip, index: number, span: Span) => {
     const trimmed = { ...clip, from: span.start, to: span.end };
 
     clips.value = clips.value.map((entry, at) => (at === index ? trimmed : entry));

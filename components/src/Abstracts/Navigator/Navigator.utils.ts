@@ -1,4 +1,4 @@
-import { type Index2d, MathUtils, StoreUtils } from "@thewaver/ss-utils";
+import { type Index2d, Index2dUtils, MathUtils, StoreUtils } from "@thewaver/ss-utils";
 
 import type {
     NavigatorDirection,
@@ -199,7 +199,7 @@ export namespace NavigatorUtils {
         const step = (delta: number) =>
             opts?.isLooping === false
                 ? MathUtils.clamp(from + delta, 0, length - 1)
-                : (((from + delta) % length) + length) % length;
+                : MathUtils.wrapIndex(from + delta, length);
 
         if (NEXT_KEYS[orientation].includes(logicalKey)) return step(1);
         if (PREVIOUS_KEYS[orientation].includes(logicalKey)) return step(-1);
@@ -245,12 +245,10 @@ export namespace NavigatorUtils {
         const logicalKey = computeLogicalKey(key, opts?.direction);
 
         const carry = (rowDelta: number, colDelta: number) => {
-            const flat = (from.row + rowDelta) * grid.colCount + from.col + colDelta;
-
-            return {
-                row: Math.floor(flat / grid.colCount),
-                col: ((flat % grid.colCount) + grid.colCount) % grid.colCount,
-            };
+            return Index2dUtils.fromFlatIndex(
+                Index2dUtils.toFlatIndex(from, grid.colCount) + rowDelta * grid.colCount + colDelta,
+                grid.colCount,
+            );
         };
 
         if (logicalKey === "ArrowRight") return carry(0, 1);

@@ -2,7 +2,7 @@
     import { on } from "svelte/events";
 
     import { REVEAL_DEFAULTS, RevealUtils, RevealStyles as styles } from "@thewaver/ss-components";
-    import { MathUtils, type Point2d } from "@thewaver/ss-utils";
+    import { MathUtils, type Point2d, Size2dUtils } from "@thewaver/ss-utils";
 
     import { ElementObserverSvelteUtils } from "../../../Abstracts/ElementObserver/ElementObserverSvelte.utils.svelte.js";
     import { PointerTrackerSvelteUtils } from "../../../Abstracts/PointerTracker/PointerTrackerSvelte.utils.svelte.js";
@@ -58,7 +58,7 @@
     const handleFocus = () => {
         if (isDisabled || !root?.matches(":focus-visible")) return;
 
-        keyboardPoint = RevealUtils.toCenter(getSize());
+        keyboardPoint = Size2dUtils.getCenter(getSize());
     };
 
     const handleBlur = (e: FocusEvent) => {
@@ -76,7 +76,7 @@
             ? holeCenter
             : isPointerInside
               ? pointerPoint
-              : RevealUtils.toCenter(getSize());
+              : Size2dUtils.getCenter(getSize());
 
         keyboardPoint = RevealUtils.computeNudgedPoint(
             from,

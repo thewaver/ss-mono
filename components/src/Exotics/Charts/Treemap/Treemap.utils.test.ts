@@ -1,6 +1,6 @@
 import { afterEach, describe, expect, it, vi } from "vitest";
 
-import type { Rect } from "@thewaver/ss-utils";
+import { type Rect, RectUtils } from "@thewaver/ss-utils";
 
 import type { TreemapNode } from "./Treemap.types";
 import { TreemapUtils } from "./Treemap.utils";
@@ -41,36 +41,6 @@ describe("computeWeights", () => {
     });
 });
 
-describe("partition", () => {
-    const WEIGHTS = [5, 3, 2, 1, 1];
-
-    it("covers the frame exactly, with every part in proportion to its weight and none overlapping", () => {
-        const rects = TreemapUtils.partition(WEIGHTS, FULL);
-        const total = WEIGHTS.reduce((sum, weight) => sum + weight, 0);
-
-        rects.forEach((rect, index) => {
-            expect(area(rect), `part ${index} takes its share of the area`).toBeCloseTo(
-                (area(FULL) * WEIGHTS[index]) / total,
-                6,
-            );
-
-            rects.slice(index + 1).forEach((other) => expect(overlaps(rect, other)).toBe(false));
-        });
-    });
-
-    it("cuts across the longer side first, so a wide frame is split into a left and a right", () => {
-        const [first, second] = TreemapUtils.partition([1, 1], FULL);
-
-        expect(first).toEqual({ x: 0, y: 0, width: 200, height: 300 });
-        expect(second).toEqual({ x: 200, y: 0, width: 200, height: 300 });
-    });
-
-    it("gives a single weight the whole frame and no weights nothing", () => {
-        expect(TreemapUtils.partition([7], FULL)).toEqual([FULL]);
-        expect(TreemapUtils.partition([], FULL)).toEqual([]);
-    });
-});
-
 describe("computeTiles", () => {
     it("tiles only the children that weigh something, heaviest first", () => {
         const tiles = TreemapUtils.computeTiles(ROOT, TreemapUtils.computeWeights(ROOT), SIZE);
@@ -82,26 +52,6 @@ describe("computeTiles", () => {
         const tiles = TreemapUtils.computeTiles(INNER, TreemapUtils.computeWeights(ROOT), SIZE);
 
         expect(tiles.reduce((sum, tile) => sum + area(tile.rect), 0)).toBeCloseTo(area(FULL), 6);
-    });
-});
-
-describe("projectRect", () => {
-    const TILE: Rect = { x: 100, y: 50, width: 200, height: 150 };
-
-    it("shrinks the full box into a tile and blows the tile back up to the full box", () => {
-        expect(TreemapUtils.projectRect(FULL, FULL, TILE)).toEqual(TILE);
-        expect(TreemapUtils.projectRect(TILE, TILE, FULL)).toEqual(FULL);
-    });
-
-    it("carries a rectangle there and back to where it started", () => {
-        const rect: Rect = { x: 40, y: 30, width: 80, height: 60 };
-        const there = TreemapUtils.projectRect(rect, FULL, TILE);
-
-        expect(TreemapUtils.projectRect(there, TILE, FULL)).toEqual(rect);
-    });
-
-    it("answers the target itself when the source has no area", () => {
-        expect(TreemapUtils.projectRect(TILE, { x: 0, y: 0, width: 0, height: 10 }, FULL)).toEqual(FULL);
     });
 });
 
@@ -243,7 +193,7 @@ describe("computeTransition", () => {
         const there = TreemapUtils.computeLeavingEnd(tile, SIZE, outward);
 
         expect(TreemapUtils.computeEnteringStart(there, SIZE, inward)).toEqual(
-            TreemapUtils.projectRect(there, FULL, inward.focusRect),
+            RectUtils.project(there, FULL, inward.focusRect),
         );
     });
 });

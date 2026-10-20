@@ -192,3 +192,15 @@ describe("PolygonUtils.castRay", () => {
         expect(PolygonUtils.castRay(SQUARE, { x: -5, y: 0 }, { x: -1, y: 0 })).toBeUndefined();
     });
 });
+
+describe("PolygonUtils.getRegularApothem / getRegularCircumradius", () => {
+    it("measures a square from its center to a side and to a corner", () => {
+        expect(PolygonUtils.getRegularApothem(2, 4)).toBeCloseTo(1, 12);
+        expect(PolygonUtils.getRegularCircumradius(2, 4)).toBeCloseTo(Math.SQRT2, 12);
+    });
+
+    it("puts two sides lying on each other through the center", () => {
+        expect(PolygonUtils.getRegularApothem(2, 2)).toBe(0);
+        expect(PolygonUtils.getRegularCircumradius(2, 2)).toBeCloseTo(1, 12);
+    });
+});

@@ -1,6 +1,7 @@
 import type { VNodeChild } from "vue";
 
-import type { BaseCornerPinProps, CornerPinGripRenderProps, QuadWarpCorners } from "@thewaver/ss-components";
+import type { BaseCornerPinProps, CornerPinGripRenderProps } from "@thewaver/ss-components";
+import type { Quad } from "@thewaver/ss-utils";
 
 export type CornerPinContentProps = {
     /**
@@ -9,9 +10,9 @@ export type CornerPinContentProps = {
      * to a shape that can be drawn and within `reachRatio` of the box. `QuadWarpUtils.RESTING_CORNERS` leaves the
      * content as it is.
      */
-    "corners": QuadWarpCorners;
+    "corners": Quad;
     /** Receives the corners as they change, which is what `v-model:corners` binds. */
-    "onUpdate:corners"?: (corners: QuadWarpCorners) => void;
+    "onUpdate:corners"?: (corners: Quad) => void;
 };
 
 export type CornerPinSlots = {

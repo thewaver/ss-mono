@@ -60,3 +60,15 @@ describe("BitwiseUtils.removeFlags", () => {
         expect(BitwiseUtils.removeFlags(READ, [EXEC])).toBe(READ);
     });
 });
+
+describe("BitwiseUtils.interleave", () => {
+    it("takes the even bits from the first number and the odd bits from the second", () => {
+        expect(BitwiseUtils.interleave(0b11, 0b00, 2)).toBe(0b0101);
+        expect(BitwiseUtils.interleave(0b00, 0b11, 2)).toBe(0b1010);
+        expect(BitwiseUtils.interleave(0b10, 0b01, 2)).toBe(0b0110);
+    });
+
+    it("drops bits past the width asked for", () => {
+        expect(BitwiseUtils.interleave(0b111, 0, 2)).toBe(0b0101);
+    });
+});

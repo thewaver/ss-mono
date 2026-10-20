@@ -4,7 +4,7 @@
 
     import { MOSAIC_DEFAULTS, MosaicUtils, NavigatorUtils, MosaicStyles as styles } from "@thewaver/ss-components";
     import { MosaicConst } from "@thewaver/ss-components/internal";
-    import type { Rect } from "@thewaver/ss-utils";
+    import { ObjectUtils, type Rect } from "@thewaver/ss-utils";
 
     import { ElementObserverSvelteUtils } from "../../Abstracts/ElementObserver/ElementObserverSvelte.utils.svelte.js";
     import { MediaQueryMonitorSvelteUtils } from "../../Abstracts/MediaQueryMonitor/MediaQueryMonitorSvelte.utils.svelte.js";
@@ -76,7 +76,7 @@
             (index) => slots[index] ?? [],
         );
 
-        if (MosaicUtils.getIsSameList(lastSlotOrder, next)) return lastSlotOrder;
+        if (ObjectUtils.isSameArray(lastSlotOrder, next)) return lastSlotOrder;
 
         lastSlotOrder = next;
 

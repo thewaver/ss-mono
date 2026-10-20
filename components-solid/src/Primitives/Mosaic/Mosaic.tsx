@@ -2,7 +2,7 @@ import { For, createComputed, createEffect, createMemo, createSignal, on, onClea
 
 import { MOSAIC_DEFAULTS, MosaicUtils, NavigatorUtils, MosaicStyles as styles } from "@thewaver/ss-components";
 import { MosaicConst } from "@thewaver/ss-components/internal";
-import type { Rect } from "@thewaver/ss-utils";
+import { ObjectUtils, type Rect } from "@thewaver/ss-utils";
 
 import { ElementObserverSolidUtils } from "../../Abstracts/ElementObserver/ElementObserverSolid.utils";
 import { MediaQueryMonitorSolidUtils } from "../../Abstracts/MediaQueryMonitor/MediaQueryMonitorSolid.utils";
@@ -71,13 +71,13 @@ export const Mosaic = (props: MosaicProps) => {
     const getOrder = createMemo<number[], undefined>(
         () => MosaicUtils.computeOrder(getLayout().placements, access(props.sizes).length),
         undefined,
-        { equals: MosaicUtils.getIsSameList },
+        { equals: ObjectUtils.isSameArray },
     );
 
     const getSlotOrder = createMemo<object[], undefined>(
         () => getOrder().flatMap((index) => getSlots()[index] ?? []),
         undefined,
-        { equals: MosaicUtils.getIsSameList },
+        { equals: ObjectUtils.isSameArray },
     );
 
     const getRovingIndex = createMemo(() => {

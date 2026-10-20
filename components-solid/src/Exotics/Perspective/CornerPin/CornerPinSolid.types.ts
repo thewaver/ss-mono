@@ -1,6 +1,7 @@
 import type { Accessor, JSX } from "solid-js";
 
-import type { BaseCornerPinValues, CornerPinGripRenderProps, QuadWarpCorners } from "@thewaver/ss-components";
+import type { BaseCornerPinValues, CornerPinGripRenderProps } from "@thewaver/ss-components";
+import type { Quad } from "@thewaver/ss-utils";
 
 import type { AccessorValues, SignalSource } from "../../../Utils/typeUtils";
 
@@ -11,7 +12,7 @@ export type CornerPinProps = AccessorValues<BaseCornerPinValues> & {
      * to a shape that can be drawn and within `reachRatio` of the box. `QuadWarpUtils.RESTING_CORNERS` leaves the
      * content as it is.
      */
-    corners: SignalSource<QuadWarpCorners>;
+    corners: SignalSource<Quad>;
     /**
      * Draws one grip, centered on its corner. The grip is what is pressed, dragged and tapped, so whatever it draws is
      * the target a pointer has to hit.

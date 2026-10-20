@@ -1,7 +1,7 @@
 <script lang="ts">
-    import type { CornerKey } from "@thewaver/ss-components-svelte";
     import { CORNER_HIGHLIGHT_DEFAULTS, CORNER_HIGHLIGHT_KEYS } from "@thewaver/ss-components-svelte";
     import { CornerHighlightKnobs } from "@thewaver/ss-playground/App/Knobs/CornerHighlights.const";
+    import type { QuadCorner } from "@thewaver/ss-utils";
 
     import type { ExampleDefs } from "../../PageComponents/Examples/Examples.types";
     import PageExamples from "../../PageComponents/Examples/PageExamples.svelte";
@@ -22,7 +22,7 @@
     FIELD_WIDTH,
 } from "@thewaver/ss-playground/App/Pages/CornerHighlightPage/CornerHighlightPage.const";
 
-    const CORNER_LABELS: Record<CornerKey, string> = {
+    const CORNER_LABELS: Record<QuadCorner, string> = {
         top_left: "Top left",
         top_right: "Top right",
         bottom_left: "Bottom left",
@@ -34,7 +34,7 @@
     let lengthDown = $state(CornerHighlightKnobs.STARTING_LENGTH);
     let strokeThickness = $state(CORNER_HIGHLIGHT_DEFAULTS.strokeThickness);
     let transitionDurationMs = $state(CORNER_HIGHLIGHT_DEFAULTS.transitionDurationMs);
-    let hiddenCorners = $state.raw<CornerKey[]>(
+    let hiddenCorners = $state.raw<QuadCorner[]>(
         CORNER_HIGHLIGHT_KEYS.filter((key) => !CORNER_HIGHLIGHT_DEFAULTS.visibleCorners.has(key)),
     );
 
@@ -42,7 +42,7 @@
 
     const visibleCorners = $derived(new Set(CORNER_HIGHLIGHT_KEYS.filter((key) => !hiddenCorners.includes(key))));
 
-    const toggleCorner = (key: CornerKey, isVisible: boolean) => {
+    const toggleCorner = (key: QuadCorner, isVisible: boolean) => {
         hiddenCorners = isVisible ? hiddenCorners.filter((entry) => entry !== key) : [...hiddenCorners, key];
     };
 

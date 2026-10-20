@@ -1,11 +1,10 @@
-import { MathUtils, type Point2d } from "@thewaver/ss-utils";
+import { MathUtils, type Point2d, Point2dUtils, type Span, SpanUtils } from "@thewaver/ss-utils";
 
 import type {
     PanZoomAxes,
     PanZoomBounds,
     PanZoomGestureDefs,
     PanZoomGestureTracker,
-    PanZoomSpan,
     PanZoomView,
 } from "./PanZoom.types";
 
@@ -28,23 +27,11 @@ const PRIMARY_BUTTON = 0;
 /** The middle of a box, as a ratio across and down it. */
 const MIDDLE: Point2d = { x: HALF, y: HALF };
 
-/** A span of a given extent about a middle. */
-const toSpan = (center: number, extent: number): PanZoomSpan => ({
-    start: center - extent * HALF,
-    end: center + extent * HALF,
-});
-
-/** The middle of a span. */
-const getCenter = (span: PanZoomSpan) => (span.start + span.end) * HALF;
-
 /** A point with the directions that do not count set to zero. */
 const project = (point: Point2d, axes: PanZoomAxes): Point2d => ({
     x: axes.x ? point.x : NOTHING,
     y: axes.y ? point.y : NOTHING,
 });
-
-/** How far apart two points are. */
-const getDistance = (first: Point2d, second: Point2d) => Math.hypot(second.x - first.x, second.y - first.y);
 
 /**
  * Panning and zooming a window over content larger than it, in one direction or two.
@@ -56,115 +43,6 @@ const getDistance = (first: Point2d, second: Point2d) => Math.hypot(second.x - f
  * window's.
  */
 export namespace PanZoomUtils {
-    /** How much a span covers. */
-    export const getExtent = (span: PanZoomSpan) => span.end - span.start;
-
-    /**
-     * Where a value sits in a span, as a fraction.
-     *
-     * @param value The value to place.
-     * @param span The span to place it in.
-     * @returns `0` at the start and `1` at the end, reaching outside that range for a value outside the span. A span
-     * of no extent reports `0` rather than dividing by zero.
-     */
-    export const toRatio = (value: number, span: PanZoomSpan) => {
-        const extent = getExtent(span);
-
-        return extent === NOTHING ? NOTHING : (value - span.start) / extent;
-    };
-
-    /**
-     * The value at a fraction along a span.
-     *
-     * @param ratio The fraction.
-     * @param span The span.
-     */
-    export const toValue = (ratio: number, span: PanZoomSpan) => span.start + ratio * getExtent(span);
-
-    /**
-     * Holds a span inside the range, keeping it a sensible size.
-     *
-     * The size is settled before the position, so a span wider than the range is shrunk to fit rather than being
-     * left hanging off one end.
-     *
-     * @param span The span to correct.
-     * @param range Everything there is.
-     * @param minExtent The narrowest the span may get. Itself capped by the range, since a range narrower than the
-     * minimum cannot be honored.
-     */
-    export const clampSpan = (span: PanZoomSpan, range: PanZoomSpan, minExtent: number): PanZoomSpan => {
-        const available = Math.max(getExtent(range), NOTHING);
-        const extent = Math.min(Math.max(getExtent(span), Math.min(minExtent, available)), available);
-        const start = Math.min(Math.max(span.start, range.start), range.end - extent);
-
-        return { start, end: start + extent };
-    };
-
-    /**
-     * Zooms a span about a point.
-     *
-     * The value under the focus stays under it, which is what makes a scroll-wheel zoom feel anchored to the pointer
-     * rather than to the middle of the window.
-     *
-     * @param span The span before zooming.
-     * @param factor Below `1` to zoom in, above to zoom out.
-     * @param focusRatio Where the zoom is centered, as a fraction along the span.
-     * @param range Everything there is.
-     * @param minExtent The narrowest the span may get.
-     */
-    export const zoomSpan = (
-        span: PanZoomSpan,
-        factor: number,
-        focusRatio: number,
-        range: PanZoomSpan,
-        minExtent: number,
-    ): PanZoomSpan => {
-        const available = Math.max(getExtent(range), NOTHING);
-        const anchor = toValue(focusRatio, span);
-        const extent = Math.min(Math.max(getExtent(span) * factor, Math.min(minExtent, available)), available);
-        const start = anchor - focusRatio * extent;
-
-        return clampSpan({ start, end: start + extent }, range, extent);
-    };
-
-    /**
-     * Slides a span along.
-     *
-     * @param span The span before panning.
-     * @param ratio How far to move, as a fraction of the span's own extent — so a pan means the same gesture at any
-     * zoom.
-     * @param range Everything there is.
-     */
-    export const panSpan = (span: PanZoomSpan, ratio: number, range: PanZoomSpan): PanZoomSpan => {
-        const shift = getExtent(span) * ratio;
-
-        return clampSpan({ start: span.start + shift, end: span.end + shift }, range, getExtent(span));
-    };
-
-    /**
-     * Slides a span just far enough to bring another into it.
-     *
-     * The span is not zoomed and not centered; it moves the minimum needed, which is what keeps a keyboard walk
-     * through the content from lurching. A target too wide to fit is aligned to its start.
-     *
-     * @param target The span to reveal.
-     * @param span The current span.
-     * @param range Everything there is.
-     * @returns The span unchanged when the target is already inside it.
-     */
-    export const revealSpan = (target: PanZoomSpan, span: PanZoomSpan, range: PanZoomSpan): PanZoomSpan => {
-        const shift =
-            target.start < span.start
-                ? target.start - span.start
-                : target.end > span.end
-                  ? Math.min(target.end - span.end, target.start - span.start)
-                  : NOTHING;
-
-        if (shift === NOTHING) return span;
-
-        return clampSpan({ start: span.start + shift, end: span.end + shift }, range, getExtent(span));
-    };
-
     /**
      * The whole of a size, as a view from its corner.
      *
@@ -199,7 +77,10 @@ export namespace PanZoomUtils {
      * @returns The width, held between the two.
      */
     export const clampWidth = (width: number, bounds: PanZoomBounds) => {
-        const widest = Math.max(getExtent(bounds.range.x), getExtent(bounds.range.y) / bounds.aspect);
+        const widest = Math.max(
+            SpanUtils.getExtent(bounds.range.x),
+            SpanUtils.getExtent(bounds.range.y) / bounds.aspect,
+        );
 
         return Math.min(Math.max(width, Math.min(bounds.minWidth, widest)), widest);
     };
@@ -216,16 +97,16 @@ export namespace PanZoomUtils {
      * is returned unchanged, since it has no shape to match.
      */
     export const fitView = (view: PanZoomView, aspect: number): PanZoomView => {
-        const width = getExtent(view.x);
-        const height = getExtent(view.y);
+        const width = SpanUtils.getExtent(view.x);
+        const height = SpanUtils.getExtent(view.y);
 
         if (width <= NOTHING || height <= NOTHING || !(aspect > NOTHING)) return view;
 
         const fittedWidth = Math.max(width, height / aspect);
 
         return {
-            x: toSpan(getCenter(view.x), fittedWidth),
-            y: toSpan(getCenter(view.y), fittedWidth * aspect),
+            x: SpanUtils.fromCenter(SpanUtils.getCenter(view.x), fittedWidth),
+            y: SpanUtils.fromCenter(SpanUtils.getCenter(view.y), fittedWidth * aspect),
         };
     };
 
@@ -246,14 +127,15 @@ export namespace PanZoomUtils {
         if (!(bounds.aspect > NOTHING)) return view;
 
         const fitted = fitView(view, bounds.aspect);
-        const width = clampWidth(getExtent(fitted.x), bounds);
+        const width = clampWidth(SpanUtils.getExtent(fitted.x), bounds);
 
-        const place = (span: PanZoomSpan, extent: number, range: PanZoomSpan): PanZoomSpan => {
-            if (bounds.canCenterEdges) return toSpan(MathUtils.clamp(getCenter(span), range.start, range.end), extent);
+        const place = (span: Span, extent: number, range: Span): Span => {
+            if (bounds.canCenterEdges)
+                return SpanUtils.fromCenter(MathUtils.clamp(SpanUtils.getCenter(span), range.start, range.end), extent);
 
-            if (extent >= getExtent(range)) return toSpan(getCenter(range), extent);
+            if (extent >= SpanUtils.getExtent(range)) return SpanUtils.fromCenter(SpanUtils.getCenter(range), extent);
 
-            const start = MathUtils.clamp(getCenter(span) - extent * HALF, range.start, range.end - extent);
+            const start = MathUtils.clamp(SpanUtils.getCenter(span) - extent * HALF, range.start, range.end - extent);
 
             return { start, end: start + extent };
         };
@@ -278,9 +160,9 @@ export namespace PanZoomUtils {
         focusRatio: Point2d,
         bounds: PanZoomBounds,
     ): PanZoomView => {
-        const width = clampWidth(getExtent(view.x) * factor, bounds);
+        const width = clampWidth(SpanUtils.getExtent(view.x) * factor, bounds);
         const height = width * bounds.aspect;
-        const anchor = { x: toValue(focusRatio.x, view.x), y: toValue(focusRatio.y, view.y) };
+        const anchor = { x: SpanUtils.toValue(focusRatio.x, view.x), y: SpanUtils.toValue(focusRatio.y, view.y) };
         const left = anchor.x - focusRatio.x * width;
         const top = anchor.y - focusRatio.y * height;
 
@@ -295,8 +177,8 @@ export namespace PanZoomUtils {
      * @param bounds The range, the window's shape and the narrowest view allowed.
      */
     export const panView = (view: PanZoomView, ratio: Point2d, bounds: PanZoomBounds): PanZoomView => {
-        const shiftX = getExtent(view.x) * ratio.x;
-        const shiftY = getExtent(view.y) * ratio.y;
+        const shiftX = SpanUtils.getExtent(view.x) * ratio.x;
+        const shiftY = SpanUtils.getExtent(view.y) * ratio.y;
 
         return clampView(
             {
@@ -319,8 +201,8 @@ export namespace PanZoomUtils {
     export const revealView = (area: PanZoomView, view: PanZoomView, bounds: PanZoomBounds): PanZoomView =>
         clampView(
             {
-                x: revealSpan(area.x, view.x, { start: -Infinity, end: Infinity }),
-                y: revealSpan(area.y, view.y, { start: -Infinity, end: Infinity }),
+                x: SpanUtils.reveal(area.x, view.x, { start: -Infinity, end: Infinity }),
+                y: SpanUtils.reveal(area.y, view.y, { start: -Infinity, end: Infinity }),
             },
             bounds,
         );
@@ -334,10 +216,9 @@ export namespace PanZoomUtils {
      * area either covers. Two views of no area report `0`.
      */
     export const computeOverlapRatio = (first: PanZoomView, second: PanZoomView) => {
-        const overlap = (a: PanZoomSpan, b: PanZoomSpan) =>
-            Math.max(Math.min(a.end, b.end) - Math.max(a.start, b.start), NOTHING);
+        const overlap = (a: Span, b: Span) => Math.max(Math.min(a.end, b.end) - Math.max(a.start, b.start), NOTHING);
         const shared = overlap(first.x, second.x) * overlap(first.y, second.y);
-        const area = (view: PanZoomView) => getExtent(view.x) * getExtent(view.y);
+        const area = (view: PanZoomView) => SpanUtils.getExtent(view.x) * SpanUtils.getExtent(view.y);
         const union = area(first) + area(second) - shared;
 
         return union > NOTHING ? shared / union : NOTHING;
@@ -369,7 +250,7 @@ export namespace PanZoomUtils {
      * @returns The scale. A view of no width reports `1`.
      */
     export const computeScale = (view: PanZoomView, windowWidth: number) => {
-        const width = getExtent(view.x);
+        const width = SpanUtils.getExtent(view.x);
 
         return width > NOTHING ? windowWidth / width : SINGLE;
     };
@@ -441,7 +322,7 @@ export namespace PanZoomUtils {
         const pinch = () => {
             const axes = defs.getAxes();
             const [first, second] = [...points.values()];
-            const gap = getDistance(project(first, axes), project(second, axes));
+            const gap = Point2dUtils.getDistance(project(first, axes), project(second, axes));
             const center = { x: (first.x + second.x) * HALF, y: (first.y + second.y) * HALF };
 
             if (pinchGap !== undefined && gap > NOTHING && pinchCenter !== undefined) {

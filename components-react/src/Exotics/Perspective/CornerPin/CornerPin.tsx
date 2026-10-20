@@ -2,13 +2,12 @@ import { type PointerEvent as ReactPointerEvent, useEffect, useLayoutEffect, use
 
 import {
     CORNER_PIN_DEFAULTS,
-    type CornerKey,
     InteractionTrackerUtils,
     type QuadWarpAxis,
     QuadWarpUtils,
     CornerPinStyles as styles,
 } from "@thewaver/ss-components";
-import type { Point2d } from "@thewaver/ss-utils";
+import { type Point2d, type QuadCorner, QuadUtils } from "@thewaver/ss-utils";
 
 import { ElementObserverReactUtils } from "../../../Abstracts/ElementObserver/ElementObserverReact.utils";
 import { useLatest } from "../../../Utils/refUtils";
@@ -21,7 +20,7 @@ const PRIMARY_BUTTON = 0;
 
 const toClientPoint = (e: { clientX: number; clientY: number }): Point2d => ({ x: e.clientX, y: e.clientY });
 
-const toAxisKey = (corner: CornerKey, axis: QuadWarpAxis) => `${corner}-${axis}`;
+const toAxisKey = (corner: QuadCorner, axis: QuadWarpAxis) => `${corner}-${axis}`;
 
 export const CornerPin = (props: CornerPinProps) => {
     const rootRef = useRef<HTMLDivElement | null>(null);
@@ -30,21 +29,21 @@ export const CornerPin = (props: CornerPinProps) => {
 
     const [corners, setCorners] = props.corners;
 
-    const [picked, setPicked] = useState<CornerKey>();
-    const [dragged, setDragged] = useState<CornerKey>();
-    const [focusVisible, setFocusVisible] = useState<{ corner: CornerKey; axis: QuadWarpAxis }>();
+    const [picked, setPicked] = useState<QuadCorner>();
+    const [dragged, setDragged] = useState<QuadCorner>();
+    const [focusVisible, setFocusVisible] = useState<{ corner: QuadCorner; axis: QuadWarpAxis }>();
 
     const size = ElementObserverReactUtils.useBorderBoxSize(rootRef);
 
     const reachRatio = props.reachRatio ?? CORNER_PIN_DEFAULTS.reachRatio;
     const step = props.step ?? CORNER_PIN_DEFAULTS.step;
 
-    const transform = QuadWarpUtils.toTransform(size, QuadWarpUtils.toPixels(corners, size)) ?? "none";
+    const transform = QuadUtils.toCss(size, QuadUtils.scale(corners, size)) ?? "none";
 
     const latest = useLatest({ corners, setCorners, reachRatio });
 
     useLayoutEffect(() => {
-        for (const corner of QuadWarpUtils.CORNERS) {
+        for (const corner of QuadUtils.CORNERS) {
             for (const axis of QuadWarpUtils.AXES) {
                 const element = axisRefs.current[toAxisKey(corner, axis)];
 
@@ -55,7 +54,7 @@ export const CornerPin = (props: CornerPinProps) => {
 
     useEffect(() => () => stopGestureRef.current?.(), []);
 
-    const moveCorner = (corner: CornerKey, target: Point2d) => {
+    const moveCorner = (corner: QuadCorner, target: Point2d) => {
         const current = latest.current.corners;
         const next = {
             ...current,
@@ -73,7 +72,7 @@ export const CornerPin = (props: CornerPinProps) => {
         return root ? QuadWarpUtils.toBoxRatio(toClientPoint(e), root.getBoundingClientRect()) : undefined;
     };
 
-    const handleGripPointerDown = (corner: CornerKey, e: ReactPointerEvent<HTMLDivElement>) => {
+    const handleGripPointerDown = (corner: QuadCorner, e: ReactPointerEvent<HTMLDivElement>) => {
         if (e.button !== PRIMARY_BUTTON) return;
 
         e.preventDefault();
@@ -127,7 +126,7 @@ export const CornerPin = (props: CornerPinProps) => {
         };
     };
 
-    const handleCatcherPointerDown = (corner: CornerKey, e: ReactPointerEvent<HTMLDivElement>) => {
+    const handleCatcherPointerDown = (corner: QuadCorner, e: ReactPointerEvent<HTMLDivElement>) => {
         if (e.button !== PRIMARY_BUTTON) return;
 
         e.preventDefault();
@@ -139,7 +138,7 @@ export const CornerPin = (props: CornerPinProps) => {
         setPicked(undefined);
     };
 
-    const readFocusVisible = (element: HTMLElement, corner: CornerKey, axis: QuadWarpAxis) =>
+    const readFocusVisible = (element: HTMLElement, corner: QuadCorner, axis: QuadWarpAxis) =>
         InteractionTrackerUtils.computeIsFocusVisible(element) ? { corner, axis } : undefined;
 
     return (
@@ -165,7 +164,7 @@ export const CornerPin = (props: CornerPinProps) => {
                 />
             )}
 
-            {QuadWarpUtils.CORNERS.map((corner) => {
+            {QuadUtils.CORNERS.map((corner) => {
                 const point = corners[corner];
 
                 return (

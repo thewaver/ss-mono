@@ -1,18 +1,8 @@
-import type { Point2d } from "@thewaver/ss-utils";
+import type { Point2d, Span } from "@thewaver/ss-utils";
 
 import type { NavigatorDirection } from "../../../Abstracts/Navigator/Navigator.types";
 
 export type RangeOrientation = "horizontal" | "vertical";
-
-export type RangeValues = {
-    start: number;
-    end: number;
-};
-
-export type RangeSpan = {
-    start: number;
-    end: number;
-};
 
 export type RangeScale = {
     orientation: RangeOrientation;
@@ -45,7 +35,7 @@ export type RangeRenderProps = {
      */
     ratios: number[];
     /** The stretch of track between the thumbs, which is the part usually painted as filled. */
-    fill: RangeSpan;
+    fill: Span;
     /** Which thumb should show a focus ring, or nothing when the track was reached by pointer. */
     focusVisibleThumb?: number;
 };

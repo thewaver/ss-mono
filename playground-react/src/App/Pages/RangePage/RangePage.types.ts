@@ -1,11 +1,11 @@
-import type { RangeValues } from "@thewaver/ss-components-react";
+import type { Span } from "@thewaver/ss-utils";
 
 export type RangeExampleProps = {
     value: readonly [number, (value: number) => void];
 };
 
 export type RangePairExampleProps = {
-    range: readonly [RangeValues, (range: RangeValues) => void];
+    range: readonly [Span, (range: Span) => void];
 };
 
 export type RangePriceExampleProps = RangePairExampleProps & {

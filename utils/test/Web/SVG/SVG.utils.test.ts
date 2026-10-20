@@ -123,3 +123,52 @@ describe("SVGUtils.getWedgesPath", () => {
         expect(SVGUtils.getWedgesPath(6, 0.5, 0, 0.5)).not.toBe(plain);
     });
 });
+
+describe("SVGUtils.getRingSectorPath", () => {
+    const SECTOR = { center: { x: 50, y: 50 }, innerRadius: 20, outerRadius: 40, fromAngle: -90, toAngle: 0 };
+    const arcCount = (path: string) => path.split(" A ").length - 1;
+    const start = (path: string) => path.slice("M ".length).split(" ").slice(0, 2).map(Number);
+
+    it("draws a band out along the rim and back along the inner edge", () => {
+        const path = SVGUtils.getRingSectorPath(SECTOR);
+        const [x, y] = start(path);
+
+        expect(arcCount(path)).toBe(2);
+        expect(x).toBeCloseTo(50);
+        expect(y).toBeCloseTo(10);
+    });
+
+    it("closes a slice with no hole on the center", () => {
+        const path = SVGUtils.getRingSectorPath({ ...SECTOR, innerRadius: 0 });
+
+        expect(arcCount(path)).toBe(1);
+        expect(path.endsWith("L 50 50 Z")).toBe(true);
+    });
+
+    it("asks for the long way round only past a half turn", () => {
+        const LARGE_ARC_FLAG = / A [\d.]+ [\d.]+ 0 1 /;
+
+        expect(LARGE_ARC_FLAG.test(SVGUtils.getRingSectorPath({ ...SECTOR, toAngle: 90 }))).toBe(false);
+        expect(LARGE_ARC_FLAG.test(SVGUtils.getRingSectorPath({ ...SECTOR, toAngle: 180 }))).toBe(true);
+    });
+
+    it("draws a whole turn as two rings, rather than an arc from a point back to itself", () => {
+        const ring = SVGUtils.getRingSectorPath({ ...SECTOR, toAngle: 270 });
+
+        expect(arcCount(ring)).toBe(4);
+        expect(ring.match(/M/g)).toHaveLength(2);
+        expect(arcCount(SVGUtils.getRingSectorPath({ ...SECTOR, innerRadius: 0, toAngle: 270 }))).toBe(2);
+    });
+
+    it("leaves a straight-sided gap at each end when padded", () => {
+        const padded = SVGUtils.getRingSectorPath({ ...SECTOR, padLength: 4 });
+        const [x] = start(padded);
+
+        expect(x).toBeCloseTo(52);
+    });
+
+    it("draws nothing for a slice with no width or no depth", () => {
+        expect(SVGUtils.getRingSectorPath({ ...SECTOR, toAngle: -90 })).toBe("");
+        expect(SVGUtils.getRingSectorPath({ ...SECTOR, outerRadius: 20 })).toBe("");
+    });
+});

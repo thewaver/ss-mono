@@ -1,4 +1,4 @@
-import type { Point2d } from "@thewaver/ss-utils";
+import { type Point2d, Point2dUtils, SpanUtils } from "@thewaver/ss-utils";
 
 import type { PanZoomView } from "../../../Abstracts/PanZoom/PanZoom.types";
 import { PanZoomUtils } from "../../../Abstracts/PanZoom/PanZoom.utils";
@@ -649,9 +649,9 @@ export namespace BracketUtils {
             anchorId,
             view: PanZoomUtils.fitView(computeFamilyView(layout, geometry, anchorId, margin), aspect),
         }));
-        const widest = Math.max(...families.map((family) => PanZoomUtils.getExtent(family.view.x)));
+        const widest = Math.max(...families.map((family) => SpanUtils.getExtent(family.view.x)));
 
-        if (PanZoomUtils.getExtent(shown.x) > widest * FRAME_SLACK) return undefined;
+        if (SpanUtils.getExtent(shown.x) > widest * FRAME_SLACK) return undefined;
 
         const getMiddle = (area: PanZoomView) => ({
             x: (area.x.start + area.x.end) * HALF,
@@ -662,7 +662,7 @@ export namespace BracketUtils {
         const getDistance = (area: PanZoomView) => {
             const center = getMiddle(area);
 
-            return Math.hypot(center.x - middle.x, center.y - middle.y);
+            return Point2dUtils.getDistance(middle, center);
         };
 
         const nearest = families.reduce((found, family) =>

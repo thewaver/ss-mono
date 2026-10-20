@@ -5,13 +5,12 @@ import type {
     InteractionFlags,
     TimelineItemRenderProps,
     TimelineMarker,
-    TimelineSpan,
-    TimelineTick,
 } from "@thewaver/ss-components";
+import type { Span, SpanTick } from "@thewaver/ss-utils";
 
 export type TimelineController = {
     /** The stretch of time in view, as the timeline last drew it. */
-    getView: () => TimelineSpan;
+    getView: () => Span;
     /**
      * Zooms the view in or out about a point.
      *
@@ -33,7 +32,7 @@ export type TimelineController = {
      * @param span The span that must end up visible.
      * @returns `false` when it was already fully in view.
      */
-    showSpan: (span: TimelineSpan) => boolean;
+    showSpan: (span: Span) => boolean;
 };
 
 export type TimelineProps<T> = BaseTimelineProps<T> & {
@@ -41,16 +40,16 @@ export type TimelineProps<T> = BaseTimelineProps<T> & {
      * The stretch of time currently in view. It is the only thing that pans or zooms it. Leave it out and the
      * timeline keeps its own, starting on the whole range.
      */
-    "view"?: TimelineSpan;
+    "view"?: Span;
     /** Receives the view as the timeline is panned or zoomed, which is what `v-model:view` binds. */
-    "onUpdate:view"?: (view: TimelineSpan) => void;
+    "onUpdate:view"?: (view: Span) => void;
     /** Hands the consumer a controller once the timeline is up, for panning and zooming it from outside. */
     "onMount"?: (controller: TimelineController) => void;
 };
 
 export type TimelineSlots<T> = {
     /** Draws one tick on the ruler. */
-    renderTick?: (tick: TimelineTick) => VNodeChild;
+    renderTick?: (tick: SpanTick) => VNodeChild;
     /**
      * Draws one marker, as tall as the timeline, and is told where it is and whether it is in view.
      *

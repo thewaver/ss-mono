@@ -6,10 +6,10 @@ import {
     type CirclePackingNode,
     CirclePackingStyles,
     CirclePackingUtils,
-    type CirclePackingView,
     TreemapUtils,
 } from "@thewaver/ss-components";
 import { CirclePackingConst } from "@thewaver/ss-components/internal";
+import { type Circle, CircleUtils } from "@thewaver/ss-utils";
 
 import { ElementObserverVueUtils } from "../../../Abstracts/ElementObserver/ElementObserverVue.utils";
 import { watchAfterRender } from "../../../Utils/effectUtils";
@@ -22,7 +22,7 @@ import type { CirclePackingProps, CirclePackingSlots } from "./CirclePacking.typ
 type CirclePackingZoomState<T> = {
     branch: CirclePackingNode<T>;
     cameFrom: CirclePackingNode<T> | undefined;
-    path: ((progress: number) => CirclePackingView) | undefined;
+    path: ((progress: number) => Circle) | undefined;
     generation: number;
 };
 
@@ -68,17 +68,14 @@ export const CirclePacking = defineComponent(
             const current = zoom.value;
             const from = CirclePackingUtils.computeShownView(
                 current.path,
-                CirclePackingUtils.toView(layout.value.get(current.branch) ?? CirclePackingConst.EMPTY_CIRCLE),
+                layout.value.get(current.branch) ?? CirclePackingConst.EMPTY_CIRCLE,
                 progress.value,
             );
 
             zoom.value = {
                 branch: next,
                 cameFrom: current.branch,
-                path: CirclePackingUtils.interpolateZoom(
-                    from,
-                    CirclePackingUtils.toView(layout.value.get(next) ?? CirclePackingConst.EMPTY_CIRCLE),
-                ),
+                path: CircleUtils.interpolateZoom(from, layout.value.get(next) ?? CirclePackingConst.EMPTY_CIRCLE),
                 generation: current.generation + CirclePackingConst.NEXT,
             };
         });
@@ -152,7 +149,7 @@ export const CirclePacking = defineComponent(
         return () => {
             const view = CirclePackingUtils.computeShownView(
                 zoom.value.path,
-                CirclePackingUtils.toView(layout.value.get(branch.value) ?? CirclePackingConst.EMPTY_CIRCLE),
+                layout.value.get(branch.value) ?? CirclePackingConst.EMPTY_CIRCLE,
                 progress.value,
             );
 

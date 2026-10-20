@@ -1,4 +1,4 @@
-import type { TimelineSpan } from "@thewaver/ss-components";
+import type { Span } from "@thewaver/ss-utils";
 
 import type { Clip, Meeting } from "./TimelineItems.types";
 
@@ -9,7 +9,7 @@ const at = (hour: number, minute = 0) => hour * MINUTES_PER_HOUR + minute;
 
 export const LANE_SIZE = 48;
 
-export const DAY: TimelineSpan = { start: at(8), end: at(19) };
+export const DAY: Span = { start: at(8), end: at(19) };
 
 export const MINUTE_STEPS = [5, 15, 30, at(1), at(2), at(4)];
 
@@ -26,7 +26,7 @@ export const MEETINGS: Meeting[] = [
     { name: "Handover", room: "Desk", from: at(17, 30), to: at(18) },
 ];
 
-export const REEL: TimelineSpan = { start: 0, end: 180 };
+export const REEL: Span = { start: 0, end: 180 };
 
 export const SECOND_STEPS = [1, 5, 15, 30, 60];
 

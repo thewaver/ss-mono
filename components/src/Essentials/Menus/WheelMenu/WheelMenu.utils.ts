@@ -1,3 +1,5 @@
+import { AngleUtils } from "@thewaver/ss-utils";
+
 import type { PlacementLayout, PlacementLayoutDefs } from "../../../Abstracts/Placement/Placement.types";
 import { PlacementLayoutDefaults } from "../../../Generators/PlacementLayouts/PlacementLayouts.const";
 import { PlacementLayoutUtils } from "../../../Generators/PlacementLayouts/PlacementLayouts.utils";
@@ -114,8 +116,7 @@ export namespace WheelMenuUtils {
         const hasCloser = defs.hasCloser && depth === ROOT_DEPTH;
         const wedgeCount = hasCloser ? layoutDefs.itemCount - SINGLE_ITEM : layoutDefs.itemCount;
         const opener = layoutDefs.parentPlacement?.sector;
-        const askedPerWedge =
-            PlacementLayoutUtils.toChordAngle(itemRadius, bandWidth * itemMaxWidthRatio) + wedgeGapDegrees;
+        const askedPerWedge = AngleUtils.getChordAngle(itemRadius, bandWidth * itemMaxWidthRatio) + wedgeGapDegrees;
         const spreadDegrees =
             depth === ROOT_DEPTH
                 ? (defs.spreadDegrees ?? FULL_TURN_DEGREES)

@@ -2,7 +2,7 @@ import { createMemo, createSignal } from "solid-js";
 import type { JSX } from "solid-js";
 
 import { LENS_DEFAULTS, LensUtils, RevealUtils, LensStyles as styles } from "@thewaver/ss-components";
-import { MathUtils, type Point2d } from "@thewaver/ss-utils";
+import { MathUtils, type Point2d, Size2dUtils } from "@thewaver/ss-utils";
 
 import { ElementObserverSolidUtils } from "../../../Abstracts/ElementObserver/ElementObserverSolid.utils";
 import { PointerTrackerSolidUtils } from "../../../Abstracts/PointerTracker/PointerTrackerSolid.utils";
@@ -63,7 +63,7 @@ export const Lens = (props: LensProps) => {
     const handleFocus = () => {
         if (getIsDisabled() || !getRootRef()?.matches(":focus-visible")) return;
 
-        setKeyboardPoint(RevealUtils.toCenter(getSize()));
+        setKeyboardPoint(Size2dUtils.getCenter(getSize()));
     };
 
     const handleKeyDown = (e: KeyboardEvent) => {
@@ -77,7 +77,7 @@ export const Lens = (props: LensProps) => {
             ? getLensCenter()
             : getIsPointerInside()
               ? getPointerPoint()
-              : RevealUtils.toCenter(getSize());
+              : Size2dUtils.getCenter(getSize());
 
         setKeyboardPoint(
             RevealUtils.computeNudgedPoint(from, nudge, access(props.stepSize) ?? LENS_DEFAULTS.stepSize, getSize()),

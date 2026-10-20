@@ -1,17 +1,18 @@
 import { describe, expect, it } from "vitest";
 
-import type { TimelineSpan } from "./Timeline.types";
+import { type Span, SpanUtils } from "@thewaver/ss-utils";
+
 import { TimelineUtils } from "./Timeline.utils";
 
-const RANGE: TimelineSpan = { start: 0, end: 100 };
+const RANGE: Span = { start: 0, end: 100 };
 
-const span = (start: number, end: number): TimelineSpan => ({ start, end });
+const span = (start: number, end: number): Span => ({ start, end });
 
 const SPANS = [span(0, 10), span(5, 20), span(30, 40), span(12, 18)];
 
-const lanesOf = (spans: TimelineSpan[]) => TimelineUtils.packLanes(spans);
+const lanesOf = (spans: Span[]) => SpanUtils.packLanes(spans);
 
-const stopsOf = (spans: TimelineSpan[], disabled: number[] = []) => {
+const stopsOf = (spans: Span[], disabled: number[] = []) => {
     const lanes = lanesOf(spans);
     const order = TimelineUtils.computeOrder(spans, lanes);
 
@@ -22,20 +23,6 @@ const stopsOf = (spans: TimelineSpan[], disabled: number[] = []) => {
         spans.map((_unused, index) => disabled.includes(index)),
     );
 };
-
-describe("packLanes", () => {
-    it("gives overlapping spans their own lane and re-uses a lane once it is free", () => {
-        expect(lanesOf(SPANS)).toEqual([0, 1, 0, 0]);
-    });
-
-    it("lets a span that starts exactly where the last one ended share its lane", () => {
-        expect(lanesOf([span(0, 10), span(10, 20)])).toEqual([0, 0]);
-    });
-
-    it("stacks a pile of spans covering the same moment into one lane each", () => {
-        expect(lanesOf([span(0, 10), span(1, 11), span(2, 12)])).toEqual([0, 1, 2]);
-    });
-});
 
 describe("computePlacements", () => {
     it("places every span in time order, with its edges as shares of the window", () => {
@@ -113,69 +100,6 @@ describe("computeStepIndex", () => {
 
         expect(TimelineUtils.computeStepIndex("first", 2, stops)).toBe(0);
         expect(TimelineUtils.computeStepIndex("last", 0, stops)).toBe(2);
-    });
-});
-
-describe("chooseSteps", () => {
-    it("picks the smallest step that still leaves the gap the consumer asked for", () => {
-        expect(TimelineUtils.chooseSteps(1000, 500, 50, [1, 10, 50, 100, 500])).toEqual({ step: 100, majorStep: 500 });
-    });
-
-    it("marks with the nearest step that divides, rather than inventing one the ladder does not have", () => {
-        expect(
-            TimelineUtils.chooseSteps(180, 460, 72, [1, 5, 15, 30, 60]),
-            "a minute is only twice the chosen half minute, but it is the round number a reader expects",
-        ).toEqual({ step: 30, majorStep: 60 });
-    });
-
-    it("labels every tick when the ladder has nothing bigger that would fit on screen", () => {
-        expect(
-            TimelineUtils.chooseSteps(180, 380, 72, [1, 5, 15, 30, 60]),
-            "an axis with one label on it is worse than an axis with a label on every tick",
-        ).toEqual({ step: 60, majorStep: 60 });
-    });
-
-    it("falls back to the widest step in the ladder when even that is too fine", () => {
-        expect(TimelineUtils.chooseSteps(100000, 100, 50, [1, 10, 100]).step).toBe(100);
-    });
-
-    it("counts in ones, twos and fives when no ladder is given", () => {
-        expect(TimelineUtils.chooseSteps(100, 500, 50, undefined)).toEqual({ step: 10, majorStep: 50 });
-        expect(TimelineUtils.chooseSteps(300, 500, 50, undefined)).toEqual({ step: 50, majorStep: 200 });
-    });
-
-    it("reads a step in the consumer's own unit rather than in pixels", () => {
-        const minute = 60000;
-        const ladder = [1000, 15000, minute, 5 * minute, 15 * minute, 60 * minute];
-
-        expect(TimelineUtils.chooseSteps(60 * minute, 600, 30, ladder)).toEqual({
-            step: 5 * minute,
-            majorStep: 15 * minute,
-        });
-    });
-});
-
-describe("computeTicks", () => {
-    it("lands on the multiples of the step that fall inside the window", () => {
-        const ticks = TimelineUtils.computeTicks(span(12, 40), { step: 10, majorStep: 50 });
-
-        expect(ticks.map((tick) => tick.value)).toEqual([20, 30, 40]);
-    });
-
-    it("places each tick as a share of the window", () => {
-        const ticks = TimelineUtils.computeTicks(span(0, 100), { step: 25, majorStep: 100 });
-
-        expect(ticks.map((tick) => tick.ratio)).toEqual([0, 0.25, 0.5, 0.75, 1]);
-    });
-
-    it("marks the multiples of the bigger step, and only those", () => {
-        const ticks = TimelineUtils.computeTicks(span(0, 100), { step: 25, majorStep: 100 });
-
-        expect(ticks.filter((tick) => tick.isMajor).map((tick) => tick.value)).toEqual([0, 100]);
-    });
-
-    it("says nothing rather than looping forever on a window with no width", () => {
-        expect(TimelineUtils.computeTicks(span(10, 10), { step: 1, majorStep: 5 })).toEqual([]);
     });
 });
 

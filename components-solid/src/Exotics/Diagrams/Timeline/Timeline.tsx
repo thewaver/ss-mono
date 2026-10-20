@@ -21,12 +21,11 @@ import {
     TIMELINE_DEFAULTS,
     type TimelineEdge,
     type TimelineItemRenderProps,
-    type TimelineSpan,
     TimelineUtils,
     TimelineStyles as styles,
 } from "@thewaver/ss-components";
 import { TimelineConst } from "@thewaver/ss-components/internal";
-import type { Point2d } from "@thewaver/ss-utils";
+import { type Point2d, type Span, SpanUtils } from "@thewaver/ss-utils";
 
 import { CarrierSolidUtils } from "../../../Abstracts/Carrier/CarrierSolid.utils";
 import { ElementObserverSolidUtils } from "../../../Abstracts/ElementObserver/ElementObserverSolid.utils";
@@ -80,15 +79,15 @@ export const Timeline = <T,>(props: TimelineProps<T>) => {
     const getRange = createMemo(() => access(props.range));
 
     const getMinViewExtent = createMemo(
-        () => access(props.minViewExtent) ?? PanZoomUtils.getExtent(getRange()) * TimelineConst.MIN_VIEW_SHARE,
+        () => access(props.minViewExtent) ?? SpanUtils.getExtent(getRange()) * TimelineConst.MIN_VIEW_SHARE,
     );
 
     const viewSignal = SignalMirrorSolidUtils.createOptional(() => props.view, untrack(getRange));
 
-    const getView = createMemo(() => PanZoomUtils.clampSpan(viewSignal[0](), getRange(), getMinViewExtent()));
+    const getView = createMemo(() => SpanUtils.clamp(viewSignal[0](), getRange(), getMinViewExtent()));
 
-    const setView = (view: TimelineSpan) => {
-        const next = PanZoomUtils.clampSpan(view, getRange(), getMinViewExtent());
+    const setView = (view: Span) => {
+        const next = SpanUtils.clamp(view, getRange(), getMinViewExtent());
         const current = untrack(getView);
 
         if (next.start === current.start && next.end === current.end) return false;
@@ -104,7 +103,7 @@ export const Timeline = <T,>(props: TimelineProps<T>) => {
 
     const getLanes = createMemo(() =>
         props.computeLane === undefined
-            ? TimelineUtils.packLanes(getSpans())
+            ? SpanUtils.packLanes(getSpans())
             : getItems().map((item, index) => props.computeLane!(item, index)),
     );
 
@@ -133,7 +132,7 @@ export const Timeline = <T,>(props: TimelineProps<T>) => {
 
     const getEdgeGrabSize = createMemo(() => access(props.edgeGrabSize) ?? TIMELINE_DEFAULTS.edgeGrabSize);
 
-    const asSpan = (place: CarryPlace) => place as TimelineSpan;
+    const asSpan = (place: CarryPlace) => place as Span;
 
     const zone = TimelineUtils.createEdgeZone({
         getGroupId: () => timelineId,
@@ -164,7 +163,7 @@ export const Timeline = <T,>(props: TimelineProps<T>) => {
         TimelineUtils.computeShownSpans(
             getSpans(),
             getHeldIndex(),
-            CarrierSolidUtils.getTargetPlace() as TimelineSpan | undefined,
+            CarrierSolidUtils.getTargetPlace() as Span | undefined,
         ),
     );
 
@@ -192,15 +191,15 @@ export const Timeline = <T,>(props: TimelineProps<T>) => {
     );
 
     const getSteps = createMemo(() =>
-        TimelineUtils.chooseSteps(
-            PanZoomUtils.getExtent(getView()),
+        SpanUtils.chooseTickSteps(
+            SpanUtils.getExtent(getView()),
             getSize().width,
             access(props.minTickGap) ?? TIMELINE_DEFAULTS.minTickGap,
             access(props.tickSteps),
         ),
     );
 
-    const getTicks = createMemo(() => TimelineUtils.computeTicks(getView(), getSteps()));
+    const getTicks = createMemo(() => SpanUtils.getTicks(getView(), getSteps()));
 
     const getMarkers = createMemo(() =>
         TimelineUtils.computeMarkers(access(props.markers) ?? TimelineConst.NO_MARKERS, getView()),
@@ -220,7 +219,7 @@ export const Timeline = <T,>(props: TimelineProps<T>) => {
         getView,
         zoomBy: (factor, focusRatio) =>
             setView(
-                PanZoomUtils.zoomSpan(
+                SpanUtils.zoom(
                     getView(),
                     factor,
                     focusRatio ?? TimelineConst.DEFAULT_FOCUS_RATIO,
@@ -228,8 +227,8 @@ export const Timeline = <T,>(props: TimelineProps<T>) => {
                     getMinViewExtent(),
                 ),
             ),
-        panBy: (ratio) => setView(PanZoomUtils.panSpan(getView(), ratio, getRange())),
-        showSpan: (span) => setView(PanZoomUtils.revealSpan(span, getView(), getRange())),
+        panBy: (ratio) => setView(SpanUtils.pan(getView(), ratio, getRange())),
+        showSpan: (span) => setView(SpanUtils.reveal(span, getView(), getRange())),
     };
 
     onMount(() => {
@@ -252,7 +251,7 @@ export const Timeline = <T,>(props: TimelineProps<T>) => {
 
         batch(() => {
             setFocusedIndex(index);
-            setView(PanZoomUtils.revealSpan(getSpans()[index], getView(), getRange()));
+            setView(SpanUtils.reveal(getSpans()[index], getView(), getRange()));
         });
     };
 
@@ -292,7 +291,7 @@ export const Timeline = <T,>(props: TimelineProps<T>) => {
         edgeGrabOffset =
             from === undefined
                 ? TimelineConst.NOTHING
-                : PanZoomUtils.toValue(getPointerRatio(from.x), getView()) - span[edge];
+                : SpanUtils.toValue(getPointerRatio(from.x), getView()) - span[edge];
 
         setHeldEdge(edge);
 
@@ -315,7 +314,7 @@ export const Timeline = <T,>(props: TimelineProps<T>) => {
 
         const value = asSpan(place)[untrack(getHeldEdge)];
 
-        setView(PanZoomUtils.revealSpan({ start: value, end: value }, getView(), getRange()));
+        setView(SpanUtils.reveal({ start: value, end: value }, getView(), getRange()));
     };
 
     const holdEdge = (edge: TimelineEdge) => {

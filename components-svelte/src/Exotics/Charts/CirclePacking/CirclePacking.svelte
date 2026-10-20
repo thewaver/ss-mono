@@ -5,14 +5,13 @@
 
     import {
         CIRCLE_PACKING_DEFAULTS,
-        type CirclePackingCircle,
         type CirclePackingCircleState,
         type CirclePackingNode,
         CirclePackingUtils,
-        type CirclePackingView,
         TreemapUtils,
         CirclePackingStyles as styles,
     } from "@thewaver/ss-components";
+    import { type Circle, CircleUtils } from "@thewaver/ss-utils";
 
     import { ElementObserverSvelteUtils } from "../../../Abstracts/ElementObserver/ElementObserverSvelte.utils.svelte.js";
     import { createHeldValue } from "../../../Utils/bindableUtils.svelte.js";
@@ -23,7 +22,7 @@
     const NOTHING = 0;
     const NEXT = 1;
     const HALF = 0.5;
-    const EMPTY_CIRCLE: CirclePackingCircle = { x: 0, y: 0, radius: 0 };
+    const EMPTY_CIRCLE: Circle = { x: 0, y: 0, radius: 0 };
 
     let { branch = $bindable(), ...props }: CirclePackingProps<T> = $props();
 
@@ -60,7 +59,7 @@
     let zoom = $state.raw<{
         branch: CirclePackingNode<T>;
         cameFrom: CirclePackingNode<T> | undefined;
-        path: ((progress: number) => CirclePackingView) | undefined;
+        path: ((progress: number) => Circle) | undefined;
         generation: number;
     }>({
         branch: untrack(() => shownBranch),
@@ -76,16 +75,16 @@
 
             const from = CirclePackingUtils.computeShownView(
                 zoom.path,
-                CirclePackingUtils.toView(layout.get(zoom.branch) ?? EMPTY_CIRCLE),
+                layout.get(zoom.branch) ?? EMPTY_CIRCLE,
                 getProgress(),
             );
 
             zoom = {
                 branch: next,
                 cameFrom: zoom.branch,
-                path: CirclePackingUtils.interpolateZoom(
+                path: CircleUtils.interpolateZoom(
                     from,
-                    CirclePackingUtils.toView(layout.get(next) ?? EMPTY_CIRCLE),
+                    layout.get(next) ?? EMPTY_CIRCLE,
                 ),
                 generation: zoom.generation + NEXT,
             };
@@ -96,7 +95,7 @@
     const view = $derived(
         CirclePackingUtils.computeShownView(
             zoom.path,
-            CirclePackingUtils.toView(layout.get(shownBranch) ?? EMPTY_CIRCLE),
+            layout.get(shownBranch) ?? EMPTY_CIRCLE,
             getProgress(),
         ),
     );

@@ -126,4 +126,18 @@ export namespace AngleUtils {
 
         return fromRadians(Math.atan2(Math.sin(radians) / size.width, Math.cos(radians) / size.height));
     };
+
+    /**
+     * How much of a circle a straight line between two points on it takes up, seen from the center.
+     *
+     * A chord as long as the diameter takes half a turn. A chord longer than that cannot fit and is read as the
+     * diameter, so the answer never passes `180`.
+     *
+     * @param radius How far the circle reaches from its center. `0` or less is read as the smallest radius there
+     * is, so any chord at all takes half a turn.
+     * @param chord How long the line is, in the same units as the radius.
+     * @returns The angle in degrees, from `0` to `180`.
+     */
+    export const getChordAngle = (radius: number, chord: number) =>
+        2 * fromRadians(Math.asin(Math.min(1, (chord * HALF) / Math.max(radius, Number.EPSILON))));
 }

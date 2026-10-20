@@ -1,6 +1,11 @@
 import { For, Show, createEffect, createMemo, createSignal, on, onCleanup, onMount, untrack } from "solid-js";
 
-import { CELL_ANIMATION_DEFAULTS, CellAnimationUtils, CellAnimationStyles as styles } from "@thewaver/ss-components";
+import {
+    CELL_ANIMATION_DEFAULTS,
+    CellAnimationUtils,
+    ElementObserverUtils,
+    CellAnimationStyles as styles,
+} from "@thewaver/ss-components";
 import { CellAnimationConst } from "@thewaver/ss-components/internal";
 import { type Index2d, Size2d } from "@thewaver/ss-utils";
 import { assignInlineVars } from "@vanilla-extract/dynamic";
@@ -139,23 +144,9 @@ export const CellAnimation = (props: CellAnimationProps) => {
     });
 
     createEffect(() => {
-        let resizeObserver: ResizeObserver | undefined;
-
-        onCleanup(() => {
-            resizeObserver?.disconnect();
-        });
-
         const imgRef = getImgRef();
 
-        if (!imgRef) return;
-
-        resizeObserver = new ResizeObserver(() => {
-            setRootSize({
-                width: imgRef.offsetWidth,
-                height: imgRef.offsetHeight,
-            });
-        });
-        resizeObserver.observe(imgRef);
+        if (imgRef) onCleanup(ElementObserverUtils.observeBorderBoxSize(imgRef, setRootSize));
     });
 
     onMount(() => {

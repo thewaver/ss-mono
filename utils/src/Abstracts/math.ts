@@ -114,6 +114,79 @@ export namespace MathUtils {
     };
 
     /**
+     * Brings a value into `0..length`, wrapping at both ends, without truncating it.
+     *
+     * The fractional counterpart to {@link wrapIndex}: a position of `7.5` round a ring of `5` is `2.5`, and
+     * `-0.25` is `4.75`. The answer is never `length` itself, which wraps to `0`.
+     *
+     * A length of zero or less has no range to wrap into and reports `0`.
+     *
+     * @param value The value to bring into range.
+     * @param length How long the range is.
+     */
+    export const wrap = (value: number, length: number) => {
+        if (length <= 0) return 0;
+
+        return ((value % length) + length) % length;
+    };
+
+    /**
+     * Counts the digits after the decimal point that a number needs to be written exactly.
+     *
+     * Reads the number as JavaScript writes it, exponent form included, so `0.25` has `2`, `1e-7` has `7` and
+     * `1.5e-7` has `8`. A whole number, however large, has `0`. The sign takes no part.
+     *
+     * @param value The number to measure.
+     */
+    export const getDecimalCount = (value: number) => {
+        const [mantissa, exponent] = String(Math.abs(value)).split(/[eE]/);
+        const fraction = mantissa.split(".")[1]?.length ?? 0;
+
+        return Math.max(fraction - Number(exponent ?? 0), 0);
+    };
+
+    /**
+     * Finds the largest whole number two whole numbers both divide by.
+     *
+     * Signs are ignored, so `-4` and `6` answer `2`. Zero divides by anything, so one zero answers the other
+     * number and two zeros answer `0`.
+     *
+     * @param a One number. Fractions are truncated.
+     * @param b The other. Fractions are truncated.
+     */
+    export const getGreatestCommonDivisor = (a: number, b: number) => {
+        let high = Math.abs(Math.trunc(a));
+        let low = Math.abs(Math.trunc(b));
+
+        while (low > 0) {
+            const remainder = high % low;
+
+            high = low;
+            low = remainder;
+        }
+
+        return high;
+    };
+
+    /**
+     * Finds how much of something is left after it has decayed exponentially for a while.
+     *
+     * The share left drops by the same proportion in every equal stretch of time: after `timeConstant` about 37%
+     * is left, after twice that about 14%. That is the curve of a value easing towards a target, or of a flick
+     * coasting to a stop, measured in time rather than in frames.
+     *
+     * @param elapsed How long it has been decaying. A negative time is treated as none.
+     * @param timeConstant How slowly it decays, in the same units as `elapsed`. `0` or less has decayed
+     * completely and reports `0`.
+     * @returns The share left, from `0` to `1`.
+     */
+    export const getDecay = (elapsed: number, timeConstant: number) => {
+        if (timeConstant <= 0) return 0;
+
+        return Math.exp(-Math.max(elapsed, 0) / timeConstant);
+    };
+
+    /**
      * Finds where a value sits between two others, as a ratio.
      *
      * The inverse of `lerp`, and its partner: `lerp(from, to, normalize(value, from, to))` returns `value`.

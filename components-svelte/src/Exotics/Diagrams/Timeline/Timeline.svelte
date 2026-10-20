@@ -11,11 +11,10 @@
         TIMELINE_DEFAULTS,
         type TimelineEdge,
         type TimelineItemRenderProps,
-        type TimelineSpan,
         TimelineUtils,
         TimelineStyles as styles,
     } from "@thewaver/ss-components";
-    import type { Point2d } from "@thewaver/ss-utils";
+    import { type Point2d, type Span, SpanUtils } from "@thewaver/ss-utils";
 
     import { CarrierSvelteUtils } from "../../../Abstracts/Carrier/CarrierSvelte.utils.svelte.js";
     import { ElementObserverSvelteUtils } from "../../../Abstracts/ElementObserver/ElementObserverSvelte.utils.svelte.js";
@@ -33,7 +32,7 @@
     const NO_MARKERS: number[] = [];
     const DEFAULT_EDGE: TimelineEdge = "end";
 
-    const getIsSameSpan = (a: TimelineSpan, b: TimelineSpan) => a.start === b.start && a.end === b.end;
+    const getIsSameSpan = (a: Span, b: Span) => a.start === b.start && a.end === b.end;
 
     let { view: storedView = $bindable(), ...props }: TimelineProps<T> = $props();
 
@@ -56,14 +55,14 @@
     const getSize = ElementObserverSvelteUtils.createBorderBoxSizeObserver(() => root);
 
     const range = $derived(props.range);
-    const minViewExtent = $derived(props.minViewExtent ?? PanZoomUtils.getExtent(range) * MIN_VIEW_SHARE);
+    const minViewExtent = $derived(props.minViewExtent ?? SpanUtils.getExtent(range) * MIN_VIEW_SHARE);
 
     const rawView = $derived(storedView ?? range);
 
-    let lastView: TimelineSpan | undefined;
+    let lastView: Span | undefined;
 
     const view = $derived.by(() => {
-        const next = PanZoomUtils.clampSpan(rawView, range, minViewExtent);
+        const next = SpanUtils.clamp(rawView, range, minViewExtent);
 
         if (lastView && getIsSameSpan(lastView, next)) return lastView;
 
@@ -79,7 +78,7 @@
         const computeLane = props.computeLane;
 
         return computeLane === undefined
-            ? TimelineUtils.packLanes(spans)
+            ? SpanUtils.packLanes(spans)
             : items.map((item, index) => computeLane(item, index));
     });
 
@@ -100,8 +99,8 @@
     const isZoomable = $derived((props.isZoomable ?? true) && !isDisabled);
 
     const steps = $derived(
-        TimelineUtils.chooseSteps(
-            PanZoomUtils.getExtent(view),
+        SpanUtils.chooseTickSteps(
+            SpanUtils.getExtent(view),
             getSize().width,
             props.minTickGap ?? TIMELINE_DEFAULTS.minTickGap,
             props.tickSteps,
@@ -139,7 +138,7 @@
         TimelineUtils.computeShownSpans(
             spans,
             heldIndex,
-            CarrierSvelteUtils.getTargetPlace() as TimelineSpan | undefined,
+            CarrierSvelteUtils.getTargetPlace() as Span | undefined,
         ),
     );
 
@@ -156,11 +155,11 @@
     const rovingIndex = $derived(TimelineUtils.computeRovingIndex(stops, focusedIndex));
     const placementMap = $derived(new Map(placements.map((placement) => [placement.index, placement])));
     const renderedIndices = $derived(TimelineUtils.computeRenderedIndices(placements, rovingIndex));
-    const ticks = $derived(TimelineUtils.computeTicks(view, steps));
+    const ticks = $derived(SpanUtils.getTicks(view, steps));
     const markers = $derived(TimelineUtils.computeMarkers(props.markers ?? NO_MARKERS, view));
 
-    const setView = (next: TimelineSpan) => {
-        const clamped = PanZoomUtils.clampSpan(next, range, minViewExtent);
+    const setView = (next: Span) => {
+        const clamped = SpanUtils.clamp(next, range, minViewExtent);
 
         if (getIsSameSpan(clamped, view)) return false;
 
@@ -172,9 +171,9 @@
     const controller: TimelineController = {
         getView: () => view,
         zoomBy: (factor, focusRatio) =>
-            setView(PanZoomUtils.zoomSpan(view, factor, focusRatio ?? DEFAULT_FOCUS_RATIO, range, minViewExtent)),
-        panBy: (ratio) => setView(PanZoomUtils.panSpan(view, ratio, range)),
-        showSpan: (span) => setView(PanZoomUtils.revealSpan(span, view, range)),
+            setView(SpanUtils.zoom(view, factor, focusRatio ?? DEFAULT_FOCUS_RATIO, range, minViewExtent)),
+        panBy: (ratio) => setView(SpanUtils.pan(view, ratio, range)),
+        showSpan: (span) => setView(SpanUtils.reveal(span, view, range)),
     };
 
     $effect(() => untrack(() => props.onMount?.(controller)));
@@ -211,7 +210,7 @@
         isFocusFollowing = root?.contains(document.activeElement) ?? false;
 
         focusedIndex = index;
-        setView(PanZoomUtils.revealSpan(spans[index], view, range));
+        setView(SpanUtils.reveal(spans[index], view, range));
     };
 
     const activateItem = (index: number) => {
@@ -238,7 +237,7 @@
         const span = spans[index];
 
         edgeGrabOffset =
-            from === undefined ? NOTHING : PanZoomUtils.toValue(getPointerRatio(from.x), view) - span[edge];
+            from === undefined ? NOTHING : SpanUtils.toValue(getPointerRatio(from.x), view) - span[edge];
 
         heldEdge = edge;
 
@@ -251,13 +250,13 @@
     };
 
     const revealHeldEdge = () => {
-        const place = CarrierUtils.getTargetPlace() as TimelineSpan | undefined;
+        const place = CarrierUtils.getTargetPlace() as Span | undefined;
 
         if (place === undefined) return;
 
         const value = place[heldEdge];
 
-        setView(PanZoomUtils.revealSpan({ start: value, end: value }, view, range));
+        setView(SpanUtils.reveal({ start: value, end: value }, view, range));
     };
 
     const holdEdge = (edge: TimelineEdge) => {

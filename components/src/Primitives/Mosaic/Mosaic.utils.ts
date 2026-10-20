@@ -593,16 +593,6 @@ export namespace MosaicUtils {
     };
 
     /**
-     * Whether two lists hold the same entries in the same order, by identity.
-     *
-     * @param prev One list.
-     * @param next The other.
-     * @returns `true` when every entry matches.
-     */
-    export const getIsSameList = (prev: unknown[], next: unknown[]) =>
-        prev.length === next.length && prev.every((value, at) => value === next[at]);
-
-    /**
      * Makes the keeper that gives each tile a stable identity from one pass to the next.
      *
      * Each key keeps the slot object it had last time, matched by key and by which occurrence of that key it is,

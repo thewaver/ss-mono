@@ -1,4 +1,4 @@
-import type { CornerKey } from "@thewaver/ss-components";
+import type { QuadCorner } from "@thewaver/ss-utils";
 
 export const EXAMPLE_NAMES = {
     default: "Around a box",
@@ -10,7 +10,7 @@ export const EXAMPLE_NAMES = {
 
 export const EXAMPLES_ROOT = "/src/App/Pages/CornerHighlightPage/Examples";
 
-export const CORNER_LABELS: Record<CornerKey, string> = {
+export const CORNER_LABELS: Record<QuadCorner, string> = {
     top_left: "Top left",
     top_right: "Top right",
     bottom_left: "Bottom left",

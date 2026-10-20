@@ -10,6 +10,7 @@ import {
 } from "react";
 
 import {
+    ElementObserverUtils,
     LetterDriverStyles,
     LetterDriverUtils,
     type LetterSegment,
@@ -166,11 +167,7 @@ export const ProximityText = (props: ProximityTextProps) => {
     useEffect(() => {
         if (!restElement) return;
 
-        const observer = new ResizeObserver(() => measureRestRef.current());
-
-        observer.observe(restElement);
-
-        return () => observer.disconnect();
+        return ElementObserverUtils.observeBorderBoxSize(restElement, () => measureRestRef.current());
     }, [restElement, measureRestRef]);
 
     useLayoutEffect(() => {

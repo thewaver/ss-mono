@@ -1,6 +1,6 @@
 import { For, createMemo, createSignal, onCleanup, onMount } from "solid-js";
 
-import { ShapeLayerUtils, ShapeStyles as styles } from "@thewaver/ss-components";
+import { ElementObserverUtils, ShapeLayerUtils, ShapeStyles as styles } from "@thewaver/ss-components";
 import { Size2d } from "@thewaver/ss-utils";
 
 import type { SVGDefs } from "../../Generators/SVGDefs/SVGDefsSolid.types";
@@ -57,20 +57,9 @@ export const Shape = (props: ShapeProps) => {
     const getShapeOutside = createMemo(() => ShapeLayerUtils.computeShapeOutside(getPaths()[0].outerContour));
 
     onMount(() => {
-        let rootResizeObserver: ResizeObserver | undefined;
-
-        onCleanup(() => {
-            rootResizeObserver?.disconnect();
-        });
-
         const rootRef = getRootRef();
 
-        if (!rootRef) return;
-
-        rootResizeObserver = new ResizeObserver(() => {
-            setRootSize({ width: rootRef.offsetWidth, height: rootRef.offsetHeight });
-        });
-        rootResizeObserver.observe(rootRef);
+        if (rootRef) onCleanup(ElementObserverUtils.observeBorderBoxSize(rootRef, setRootSize));
     });
 
     return (

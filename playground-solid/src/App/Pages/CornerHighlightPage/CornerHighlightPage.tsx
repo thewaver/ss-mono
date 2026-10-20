@@ -1,6 +1,5 @@
 import { createMemo, createSignal } from "solid-js";
 
-import type { CornerKey } from "@thewaver/ss-components-solid";
 import { CORNER_HIGHLIGHT_DEFAULTS, CORNER_HIGHLIGHT_KEYS } from "@thewaver/ss-components-solid";
 import { CornerHighlightKnobs } from "@thewaver/ss-playground/App/Knobs/CornerHighlights.const";
 import {
@@ -9,6 +8,7 @@ import {
     EXAMPLE_NAMES,
     FIELD_WIDTH,
 } from "@thewaver/ss-playground/App/Pages/CornerHighlightPage/CornerHighlightPage.const";
+import type { QuadCorner } from "@thewaver/ss-utils";
 
 import { PageExamples } from "../../PageComponents/Examples/Examples";
 import { PageCheckField, PageColorField, PageNumberField } from "../../PageComponents/Field/Field";
@@ -29,7 +29,7 @@ export const CornerHighlightPage = () => {
     const [getTransitionDurationMs, setTransitionDurationMs] = createSignal(
         CORNER_HIGHLIGHT_DEFAULTS.transitionDurationMs,
     );
-    const [getHiddenCorners, setHiddenCorners] = createSignal<CornerKey[]>(
+    const [getHiddenCorners, setHiddenCorners] = createSignal<QuadCorner[]>(
         CORNER_HIGHLIGHT_KEYS.filter((key) => !CORNER_HIGHLIGHT_DEFAULTS.visibleCorners.has(key)),
     );
 
@@ -39,7 +39,7 @@ export const CornerHighlightPage = () => {
         () => new Set(CORNER_HIGHLIGHT_KEYS.filter((key) => !getHiddenCorners().includes(key))),
     );
 
-    const toggleCorner = (key: CornerKey, isVisible: boolean) =>
+    const toggleCorner = (key: QuadCorner, isVisible: boolean) =>
         setHiddenCorners((previous) => (isVisible ? previous.filter((entry) => entry !== key) : [...previous, key]));
 
     const getExamples = createMemo(() => {

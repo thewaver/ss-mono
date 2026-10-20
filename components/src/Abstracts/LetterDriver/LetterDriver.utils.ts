@@ -1,4 +1,4 @@
-import { CSSUtils, type ElementSegment, JSXTextParserUtils, type Rect, StoreUtils } from "@thewaver/ss-utils";
+import { CSSUtils, DOMUtils, type ElementSegment, JSXTextParserUtils, type Rect, StoreUtils } from "@thewaver/ss-utils";
 
 import type {
     LetterAnimation,
@@ -148,16 +148,12 @@ const measureAtEdgeFrame = (
 
     host.appendChild(box);
 
-    const widths = words.map((word) => word.getBoundingClientRect().width / getScreenScale(box));
+    const widths = words.map((word) => word.getBoundingClientRect().width / DOMUtils.getScreenScale(box));
 
     box.remove();
 
     return widths;
 };
-
-/** How much larger the box is drawn on screen than it is laid out, inside a scaled ancestor. */
-const getScreenScale = (element: HTMLElement) =>
-    element.offsetWidth > 0 ? element.getBoundingClientRect().width / element.offsetWidth : 1;
 
 /** Orders two renderers by where their roots sit on the page, earlier first. */
 const compareByPagePosition = (a: LetterRegistryEntry, b: LetterRegistryEntry) =>

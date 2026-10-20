@@ -234,6 +234,40 @@ export namespace ObjectUtils {
         return Array.from({ length: count }, (_, i) => (i < arr.length ? arr[i] : arr[arr.length - 1]));
     };
 
+    /**
+     * Tests whether two arrays hold the same entries in the same order.
+     *
+     * Entries are compared one to one with `isSame`, which defaults to `Object.is`, so two arrays of the same
+     * objects match but two arrays of equal-looking copies do not unless `isSame` looks inside them. The same
+     * array is always the same as itself.
+     *
+     * @param a One array.
+     * @param b The other.
+     * @param isSame How two entries are compared.
+     */
+    export const isSameArray = <T>(
+        a: readonly T[],
+        b: readonly T[],
+        isSame: (first: T, second: T) => boolean = Object.is,
+    ): boolean => a === b || (a.length === b.length && a.every((entry, index) => isSame(entry, b[index])));
+
+    /**
+     * Moves one entry of an array to another place, shifting the ones between along to make room.
+     *
+     * `moveArrayElement(["a", "b", "c", "d"], 0, 2)` gives `["b", "c", "a", "d"]`: the entry ends up at the place
+     * asked for, counted in the finished array.
+     *
+     * @param arr The array. It is never modified.
+     * @param fromIndex Where the entry is now.
+     * @param toIndex Where it ends up. Past the end puts it last.
+     * @returns A new array of the same length.
+     */
+    export const moveArrayElement = <T>(arr: readonly T[], fromIndex: number, toIndex: number): T[] => {
+        const rest = arr.filter((_unused, index) => index !== fromIndex);
+
+        return [...rest.slice(0, toIndex), arr[fromIndex], ...rest.slice(toIndex)];
+    };
+
     type ZipTuple<T extends readonly unknown[][]> = {
         [K in keyof T]: T[K][number];
     };

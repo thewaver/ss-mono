@@ -7,22 +7,26 @@ import {
 import * as styles from "@thewaver/ss-playground/App/StyledComponents/FormationContent/FormationContent.css";
 import { layerVars } from "@thewaver/ss-playground/App/StyledComponents/Layer/Layer.css";
 import { themeVars } from "@thewaver/ss-playground/App/Theme.css";
-import { ShapeConst } from "@thewaver/ss-utils";
+import { ShapeConst, type Size2d } from "@thewaver/ss-utils";
 
 import { useLayerClass } from "../Layer/Layer.context";
 import type { PageFormationItemProps } from "./FormationContentVue.types";
 
-defineProps<PageFormationItemProps>();
+const props = defineProps<PageFormationItemProps>();
 
 const layerClass = useLayerClass();
+
+const computePoints = (size: Size2d) => ShapeConst.getDefaultShapePoints(props.shapeKind, size);
+const computeFillDefs = () => [{ color: layerVars.main, opacity: FILL_OPACITY }];
+const computeStrokeDefs = () => [{ color: themeVars.color.primary.main }];
 </script>
 
 <template>
     <div :class="[styles.formationItem, layerClass]">
         <Shape
-            :compute-points="(size) => ShapeConst.getDefaultShapePoints(shapeKind, size)"
-            :compute-fill-defs="() => [{ color: layerVars.main, opacity: FILL_OPACITY }]"
-            :compute-stroke-defs="() => [{ color: themeVars.color.primary.main }]"
+            :compute-points="computePoints"
+            :compute-fill-defs="computeFillDefs"
+            :compute-stroke-defs="computeStrokeDefs"
             :stroke-geom="STROKE_GEOM"
         >
             <template #renderChildren>

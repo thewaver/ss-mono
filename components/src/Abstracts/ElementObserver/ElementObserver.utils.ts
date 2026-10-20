@@ -1,4 +1,4 @@
-import { Bounds, MathUtils, type Point2d, Rect, Size2d } from "@thewaver/ss-utils";
+import { Bounds, MathUtils, ObjectUtils, type Point2d, Rect, Size2d } from "@thewaver/ss-utils";
 
 import type { ViewportContextType } from "../Viewport/Viewport.context.types";
 import { ViewportUtils } from "../Viewport/Viewport.utils";
@@ -159,8 +159,7 @@ export namespace ElementObserverUtils {
      *
      * @returns `true` when both lists have the same length and every pair of sizes is the same.
      */
-    export const isSameSizeList = (a: Size2d[], b: Size2d[]) =>
-        a.length === b.length && a.every((size, index) => Size2d.isSame(size, b[index]));
+    export const isSameSizeList = (a: Size2d[], b: Size2d[]) => ObjectUtils.isSameArray(a, b, Size2d.isSame);
 
     /**
      * Whether two optional rects match.
@@ -179,7 +178,7 @@ export namespace ElementObserverUtils {
      * @returns `true` when both lists have the same length and every pair matches by {@link isSameRect}.
      */
     export const isSameRectList = (a: (Rect | undefined)[], b: (Rect | undefined)[]) =>
-        a.length === b.length && a.every((rect, index) => isSameRect(rect, b[index]));
+        ObjectUtils.isSameArray(a, b, isSameRect);
 
     /**
      * Watches an element's size, borders and padding included.
@@ -235,6 +234,46 @@ export namespace ElementObserverUtils {
         }
 
         return () => observer.disconnect();
+    };
+
+    /**
+     * Watches everything that can change how an element's content lays out: its size, what is inside it, and
+     * anything inside it or on the page finishing loading.
+     *
+     * Each reaction is wired only when it is given, so a caller pays for the watching it needs and no more.
+     *
+     * @param element The element to watch.
+     * @param reactions `onResize`, called once straight away and again whenever the element's size changes, as
+     * {@link observeBorderBoxSize} reports it; `onChange`, called whenever anything inside the element changes — an
+     * element added or removed, text edited, an attribute set — at any depth; `onLoad`, called whenever something
+     * inside the element finishes loading, such as an image, and whenever a web font anywhere on the page does.
+     * @returns The function that stops watching.
+     */
+    export const observeContent = (
+        element: HTMLElement,
+        reactions: { onResize?: () => void; onChange?: () => void; onLoad?: () => void },
+    ) => {
+        const { onResize, onChange, onLoad } = reactions;
+        const stopResize = onResize ? observeBorderBoxSize(element, () => onResize()) : undefined;
+        const mutationObserver = onChange ? new MutationObserver(() => onChange()) : undefined;
+        const handleLoad = onLoad ? () => onLoad() : undefined;
+
+        mutationObserver?.observe(element, { subtree: true, childList: true, characterData: true, attributes: true });
+
+        if (handleLoad) {
+            element.addEventListener("load", handleLoad, true);
+            document.fonts.addEventListener("loadingdone", handleLoad);
+        }
+
+        return () => {
+            stopResize?.();
+            mutationObserver?.disconnect();
+
+            if (handleLoad) {
+                element.removeEventListener("load", handleLoad, true);
+                document.fonts.removeEventListener("loadingdone", handleLoad);
+            }
+        };
     };
 
     /**

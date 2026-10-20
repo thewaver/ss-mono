@@ -9,6 +9,7 @@ import {
 } from "vue";
 
 import {
+    ElementObserverUtils,
     LetterDriverStyles,
     LetterDriverUtils,
     type LetterSegment,
@@ -154,11 +155,7 @@ export const ProximityText = defineComponent(
         watchAfterRender([restRef], ([rest]) => {
             if (!rest) return;
 
-            const observer = new ResizeObserver(measureRest);
-
-            observer.observe(rest);
-
-            return () => observer.disconnect();
+            return ElementObserverUtils.observeBorderBoxSize(rest, measureRest);
         });
 
         watchAfterRender([() => segments.value], () => measureRest());

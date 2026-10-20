@@ -1,4 +1,4 @@
-import { StoreUtils } from "@thewaver/ss-utils";
+import { DOMUtils, StoreUtils } from "@thewaver/ss-utils";
 
 import { CheckedStateUtils } from "../../../Abstracts/CheckedState/CheckedState.utils";
 import { FlattenerUtils } from "../../../Abstracts/Flattener/Flattener.utils";
@@ -7,7 +7,6 @@ import type { NavigatorDirection } from "../../../Abstracts/Navigator/Navigator.
 import { NavigatorUtils } from "../../../Abstracts/Navigator/Navigator.utils";
 import { TypeaheadUtils } from "../../../Abstracts/Typeahead/Typeahead.utils";
 import type { VirtualizerRow } from "../../../Abstracts/Virtualizer/Virtualizer.types";
-import { PopoverUtils } from "../../../Primitives/Popover/Popover.utils";
 import type { SelectGroupFlags } from "../Select/Select.types";
 import type {
     SelectOptionRecord as SelectOption,
@@ -203,7 +202,7 @@ export namespace ListboxUtils {
      *
      * Under `"active_descendant"` focus stays in the field and the list is that field's popup, whose root carries
      * `role="listbox"`. An option is highlighted the moment the popup opens, while it is still unplaced, so only the
-     * scrollers between the option and that root move, through {@link PopoverUtils.revealWithin}, and a page with no
+     * scrollers between the option and that root move, through `DOMUtils.revealWithin`, and a page with no
      * `Viewport` never jumps. Under `"roving"` the option is itself the focused element, drawn in the page among the
      * consumer's own scrollers, and {@link focusOption} moves focus without scrolling — so the option is brought into
      * view the way focus brings anything into view, through every scroller the page included.
@@ -220,7 +219,7 @@ export namespace ListboxUtils {
 
         const list = option.closest<HTMLElement>(LISTBOX_SELECTOR);
 
-        if (list) PopoverUtils.revealWithin(option, list);
+        if (list) DOMUtils.revealWithin(option, list);
     };
 
     /**

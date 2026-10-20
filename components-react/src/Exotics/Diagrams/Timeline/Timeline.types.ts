@@ -5,13 +5,12 @@ import type {
     InteractionFlags,
     TimelineItemRenderProps,
     TimelineMarker,
-    TimelineSpan,
-    TimelineTick,
 } from "@thewaver/ss-components";
+import type { Span, SpanTick } from "@thewaver/ss-utils";
 
 export type TimelineController = {
     /** The stretch of time in view, as the timeline last drew it. */
-    getView: () => TimelineSpan;
+    getView: () => Span;
     /**
      * Zooms the view in or out about a point.
      *
@@ -33,7 +32,7 @@ export type TimelineController = {
      * @param span The span that must end up visible.
      * @returns `false` when it was already fully in view.
      */
-    showSpan: (span: TimelineSpan) => boolean;
+    showSpan: (span: Span) => boolean;
     /**
      * Calls `listener` whenever the view `getView` reports has changed, until the returned function is called. The
      * getter answers with what the timeline last drew, so this and `getView` are what `useSyncExternalStore` takes —
@@ -47,9 +46,9 @@ export type TimelineProps<T> = BaseTimelineProps<T> & {
      * The stretch of time currently in view, as a `[view, setView]` pair. It is the only thing that pans or zooms
      * it. Leave it out and the timeline keeps its own, starting on the whole range.
      */
-    view?: readonly [TimelineSpan, (view: TimelineSpan) => void];
+    view?: readonly [Span, (view: Span) => void];
     /** Draws one tick on the ruler. */
-    renderTick?: (tick: TimelineTick) => ReactNode;
+    renderTick?: (tick: SpanTick) => ReactNode;
     /**
      * Draws one marker, as tall as the timeline, and is told where it is and whether it is in view.
      *

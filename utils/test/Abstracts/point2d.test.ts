@@ -233,3 +233,50 @@ describe("Point2dUtils.offsetEdge", () => {
         expect(Point2dUtils.getLength(Point2d.sub(b, a))).toBeCloseTo(5, 10);
     });
 });
+
+describe("Point2dUtils.getDistance", () => {
+    it("measures the straight line between two points", () => {
+        expect(Point2dUtils.getDistance({ x: 1, y: 1 }, { x: 4, y: 5 })).toBe(5);
+    });
+});
+
+describe("Point2dUtils.getSegmentDistance", () => {
+    it("measures to the nearest place on the segment, and to an end past it", () => {
+        expect(Point2dUtils.getSegmentDistance({ x: 5, y: 3 }, { x: 0, y: 0 }, { x: 10, y: 0 })).toBe(3);
+        expect(Point2dUtils.getSegmentDistance({ x: 13, y: 4 }, { x: 0, y: 0 }, { x: 10, y: 0 })).toBe(5);
+    });
+
+    it("measures to the point when the segment has no length", () => {
+        expect(Point2dUtils.getSegmentDistance({ x: 3, y: 4 }, { x: 0, y: 0 }, { x: 0, y: 0 })).toBe(5);
+    });
+});
+
+describe("Point2dUtils.rotateAbout", () => {
+    it("turns a point clockwise on screen about another", () => {
+        const turned = Point2dUtils.rotateAbout({ x: 2, y: 1 }, { x: 1, y: 1 }, 90);
+
+        expect(turned.x).toBeCloseTo(1, 9);
+        expect(turned.y).toBeCloseTo(2, 9);
+    });
+});
+
+describe("Point2dUtils.getCircumcenter", () => {
+    it("finds the center of the circle through three points", () => {
+        const center = Point2dUtils.getCircumcenter({ x: 0, y: 0 }, { x: 4, y: 0 }, { x: 0, y: 4 })!;
+
+        expect(center.x).toBeCloseTo(2, 9);
+        expect(center.y).toBeCloseTo(2, 9);
+    });
+
+    it("has no answer for three points in a line", () => {
+        expect(Point2dUtils.getCircumcenter({ x: 0, y: 0 }, { x: 1, y: 1 }, { x: 2, y: 2 })).toBeUndefined();
+    });
+});
+
+describe("Point2dUtils.getCornerTurn", () => {
+    it("is positive for a clockwise turn on screen, negative the other way and nothing in a line", () => {
+        expect(Point2dUtils.getCornerTurn({ x: 0, y: 0 }, { x: 1, y: 0 }, { x: 1, y: 1 })).toBeGreaterThan(0);
+        expect(Point2dUtils.getCornerTurn({ x: 0, y: 0 }, { x: 1, y: 0 }, { x: 1, y: -1 })).toBeLessThan(0);
+        expect(Point2dUtils.getCornerTurn({ x: 0, y: 0 }, { x: 1, y: 0 }, { x: 2, y: 0 })).toBe(0);
+    });
+});

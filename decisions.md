@@ -1812,7 +1812,7 @@ it took a page with it.
 
 **It was `Corners` until `CornerPin` arrived.** The user renamed it to `CornerHighlight` once the two sat side by side
 in `Exotics`: a bare `Corners` read as the general case of anything to do with corners, and the new name says what it
-draws them for. Its props, styles and Playground page took the new name with it; `CornerKey` belongs to neither and
+draws them for. Its props, styles and Playground page took the new name with it; `QuadCorner` belongs to neither and
 lives in `Abstracts/QuadWarp`.
 
 **`AudioSwitcher` renders nothing and is still an `Essential`.** It returns null — not a wrapper, not an
@@ -2110,6 +2110,73 @@ since moved to the Playground samples instead, so what is left here is markup an
 third-party package (`DateValue`, `Virtualizer` over TanStack's `virtual-core`); and three near misses
 blocked only by a pure type sharing a file with Solid props — `NumberInputUtils`,
 `RichTextUtils.parseContent`, `compileStops` / `sampleTrack`.
+
+### The fourth extraction round, and the rule it settled
+
+**One consumer is enough when the maths itself is generic.** The user's rule, stated when the layout algorithms came
+up: a function with a single caller still goes to `ss-utils` if nothing in it is about that caller. Weigh what the
+function needs and what its names mean, never how many places call it today. **The "bound to a framework" exclusion of
+the earlier rounds no longer exists**: `components/src` imports no framework since the package split, so `FocusManager`
+and its kind are judged like anything else.
+
+**What moved.** New modules `circle.ts` (`CircleUtils`: D3's enclosing circle and sibling packing, van Wijk's zoom),
+`quad.ts` (`Quad`, `QuadCorner`, `QuadUtils`: QuadWarp's four-corner geometry and its `matrix3d`), `quaternion.ts`
+(`Quaternion`, `QuaternionUtils`: Roller's, in degrees like the rest of the package) and `span.ts` (`Span`, `SpanUtils`:
+PanZoom's span arithmetic, Timeline's lane packing and round-number ticks). New namespaces `Point3dUtils` and
+`Index2dUtils`. Additions to `MathUtils` (`wrap` for fractions, `getDecimalCount`, `getGreatestCommonDivisor`,
+`getDecay`), `AngleUtils.getChordAngle`, `BitwiseUtils.interleave`, `Point2dUtils` (`getDistance`,
+`getSegmentDistance`, `rotateAbout`, `getCircumcenter`, `getCornerTurn`), `RectUtils` (`getCenter`, `project`,
+`bisectByWeight` — Treemap's partition), `Matrix3dUtils.toCss` / `fromCss`, `RandomUtils` (`hash`, `createSeeded`,
+`shuffle`), `GestureUtils` (`computeVelocity`, `coast`, `GestureSample`), `ObjectUtils` (`isSameArray`,
+`moveArrayElement`), `PolygonUtils` regular-polygon measures, `SVGUtils.getRingSectorPath`, `DOMUtils` (`getScreenScale`,
+`revealWithin`) and `IOUtils.matchesAccept`. Each replaced copies in components, several of them two to eight copies.
+
+**No aliases, and no pass-throughs left behind**, following `EasingUtils`: `QuadWarpCorners`, `CornerKey`,
+`RollerQuaternion`, `PanZoomSpan`, `RangeSpan`, `TimelineSpan`, `TimelineTick`, `TimelineStepPair`,
+`CirclePackingCircle` and `CirclePackingView` are gone, and so are the published wrappers that only forwarded to the
+new home: `PlacementUtils.getAngle` / `getDistance`, `CarrierUtils.computeMovedOrder`, `CirclePackingUtils.toView`
+(a view is now the `Circle` it frames), `PlacementLayoutUtils.toChordAngle`, `ParticleFieldUtils.toCenter` /
+`isPointInPolygon` / `computeRoll`, `TrailUtils.getAngle`, `RevealUtils.toCenter` and Popover's reveal. Icicle's and
+Sunburst's spans are `Span` plus their own fields, and Range's two-thumb value is `Span` itself — `RangeValues` went,
+though it is a value a consumer passes rather than a stretch of a line, because the shape and the meaning are the
+same: where a selection starts and where it ends.
+
+**A follow-up pass took four more**, found after the first: Die's convex hull (`Point3dUtils.getConvexHull`;
+`DieUtils.computeHull` stays as the builder of a `DieShape`, a die's own type), Cuboid's matrix helpers
+(`Matrix3dUtils.transpose`, `isSame` with a tolerance, `round`, `getRotationAngle`), `Size2dUtils.getCenter`, and
+Range's knob measuring its centre through `RectUtils.getCenter`.
+
+**What stayed, and why.** `CorridorLayoutUtils.computeTubeCorners`: every input names a tube; its general parts
+(turning about a line, a point on a cylinder, projection) are `Point3dUtils`. `TreemapUtils.easeZoom` keeps its name
+because it records which easing every zoom uses, paired with `TREEMAP_ZOOM_EASING`; its body is now
+`EasingUtils.easeInOutCubic`. Barrel keeps its rounding to whole pixels and its minimum face count over the
+`PolygonUtils` measures; Cuboid keeps its snapping of near-whole numbers over `Matrix3dUtils.fromCss`, because the
+tolerance is tuned; TileBoard keeps its collapse-to-centre check over `PolygonUtils.insetPolygon`. Smoother keeps
+`getStep` as its own API, built on `MathUtils.getDecay`.
+
+**One repeatable-random function, so the patterns moved.** CellAnimation's weights, CorridorLayouts' item gaps and
+ParticleField's rolls each had their own integer hash; they all call `RandomUtils.hash` now. ParticleField's output is
+unchanged (its hash was the one adopted); the fixed-seed CellAnimation samples and the corridor gaps draw a different,
+equally fixed, arrangement. The user accepted that.
+
+**`DOMUtils.revealWithin` exists because `scrollIntoView` moves the page.** A popup that has just opened is still
+unplaced at the top-left of whatever it is portaled into, so `scrollIntoView` on its highlighted row scrolled the
+document to the top. Moving only the scrollers between the element and a given root, as `block: "nearest"` would,
+reveals the row without that; converting each distance into the scroller's layout pixels keeps it right inside a scaled
+`Viewport`.
+
+### `ElementObserver` is the one place that watches an element's size
+
+The user's call, made while weighing a size helper for `ss-utils`: anything in the library doing its own resize
+watching uses `ElementObserverUtils` instead. `Anchor`, `Floater`, `TextField`, `Shape`, ProximityText's resting copy
+and Solid's CellAnimation and ParticleField moved onto `observeBorderBoxSize` / `observeBorderBoxSizes`, which report
+once on the spot and then only on a change. The four text layouts (FittedText, PaintedText, ProximityText, Typewriter)
+needed more than size — a change to their text, an image or web font finishing loading — so `observeContent` wires
+those three reactions, each only when given; FittedText now also re-measures when an image inside it loads.
+
+**Left on their own watching, deliberately.** `ViewportWrapper` measures the inner size without a scrollbar, which a
+border-box watcher cannot see change. `Virtualizer` must use the observer TanStack hands it. `EdgeFader` and `Scroller`
+watch their children too, adding each child as it arrives, which `ElementObserver` does not do.
 
 ### Look in `ss-utils` before writing anything general-purpose
 
@@ -3255,8 +3322,7 @@ Radix is `number[]` and offers no names. The only major library with other names
 `{ lower, upper }`, whose type is the single union this component avoided. Nothing checked uses `from` /
 `to` for a slider — that reads as a date-range and filter idiom.
 
-`RangeValues` and `RangeSpan` are the same shape on purpose: the selection is in scale units and
-`flags.fill` is the same span as 0..1 ratios.
+A range's selection and `flags.fill` are both a `Span`: the selection in scale units, `flags.fill` as 0..1 ratios.
 
 **Disabled refuses the write and pushes the element back.** A range has no `readonly`, so the guard is
 the `BinarySwitch` shape: the browser moves the thumb before firing `input`, so a refused value is
@@ -6703,7 +6769,7 @@ such level now — a ring shares its spread among its items, and a consumer that
 a narrower spread.
 
 **`WheelMenu` picked all of it up**, which is a dozen lines: each level's hole is the root's plus depth times
-band-plus-gap, each level's spread is what its items need at that radius via {@link toChordAngle}, each
+band-plus-gap, each level's spread is what its items need at that radius via `AngleUtils.getChordAngle`, each
 level's gap is scaled so the painted gap holds its width as the bands go out, and the closer is a box at the
 origin appended after the wedges. It also aims its own root so the first wedge sits at twelve o'clock, which
 the band used to do in a branch and is a wheel's business rather than a placer's.
@@ -11103,7 +11169,7 @@ each is portaled and placed from window pixels — the lit element's rect, the p
 `Viewport` the cover, the highlight, the guide's popup and the carried item were all drawn off by the scroll. Inside a
 `Viewport` they measure the same to the pixel as before.
 
-**A highlighted row is revealed by `PopoverUtils.revealWithin`.** A menu highlights its first or last item the moment
+**A highlighted row is revealed by `DOMUtils.revealWithin`**, which lived in `PopoverUtils` until the fourth extraction round. A menu highlights its first or last item the moment
 it opens, while the popup is still hidden at the portal's top-left corner waiting for its position, and
 `scrollIntoView` there jumped the page to the top. `revealWithin(element, root)` needs no placement, so it runs as
 early as the highlight does, and it leaves the viewport's own `overflow: hidden` host alone. `MenuUtils.revealItem` finds the item's `role="menu"` popup and calls it;
@@ -14591,7 +14657,7 @@ rectangle stuck out at one end and fell short at the other, and with a twist the
 this one ended. `CorridorLayoutUtils.computeTubeCorners` places the four corners where the side crosses its own ring
 and the next, each edge turned by its own ring's twist, leans them about the item's middle line by `tiltDegrees`, and
 projects them the way `perspective()` would; `InfiniteCorridorUtils.toItemStyle` stretches the item onto them with
-`QuadWarpUtils.toTransform`. So neighbors share corner points exactly, round the ring and on to the next. With a twist
+`QuadUtils.toCss`. So neighbors share corner points exactly, round the ring and on to the next. With a twist
 the far edge is turned further than the near one, so the four points are no longer on one flat surface in depth; the
 item is drawn as the flat shape the four points make on screen, which is what makes the corkscrew close. A placement is
 therefore one of two shapes, `InfiniteCorridorTurnedPlacement` (the walls) or `InfiniteCorridorPinnedPlacement` (the
@@ -14665,7 +14731,7 @@ is `QuadWarp`, `QuadWarpUtils`, the user's name for it: sharing `CornerPin` woul
 Playground, whose dependency map is keyed by name, so the component's page would never have listed the abstract it
 stands on.
 
-**The arithmetic is a projective map onto four points, written as a `matrix3d`.** `QuadWarpUtils.toTransform` solves
+**The arithmetic is a projective map onto four points, written as a `matrix3d`.** `QuadUtils.toCss` solves
 the map from the unit square onto the four corners (Heckbert's square-to-quad form) and scales it by the element's own
 size, so it needs `transform-origin: 0 0`. The content is a flat sheet seen in perspective: straight lines stay straight
 and nothing can bend it, a limit the user accepted when the effect was put to them. A shape whose corners do not all
@@ -14696,9 +14762,9 @@ cannot honestly carry two. The names are the consumer's, `gripLabels`, and each 
 dragged, and which axis shows keyboard focus. The box is the content's own size at rest; the stretched content spills
 past it, which is the rule for anything turning under perspective.
 
-**`CornerKey` moved into the abstract.** `CornerHighlight` had declared the same four values for its own corner marks; two
-names for one idea would have read as two ideas, so both components now take it from `Abstracts/QuadWarp`. The export
-name is unchanged.
+**The corner names are `QuadCorner`, in `ss-utils`.** `CornerHighlight` had declared the same four values for its own corner marks; two
+names for one idea would have read as two ideas, so both components took it from `Abstracts/QuadWarp` as `CornerKey`, and
+it went to `ss-utils` with the rest of the four-corner geometry as `QuadCorner`.
 
 ### `Exotics/PointerEffects`: four wrappers that restyle their content by where the pointer is
 
@@ -17141,7 +17207,7 @@ From Skiper UI's knockout bracket, which shows a window of the tree and pages th
 
 **The view is an area of the content in the content's own units, never a scale and an offset.** The user's choice over the alternative: the right scale depends on the window's size, so a helper would have to measure the window and its answer would go stale on every resize; an area does not. Pixels for Bracket, fractions of the width for PatchBoard, the range's own units for Timeline. The component fits the area to the window's shape about its middle (`fitView`), holds the size between `minWidth` and the whole range, then the position: in a direction where the view is no larger than the range it is slid back inside, and in one where it is larger the range is centered (`clampView`). So any area can be asked for, and the component is told numbers only: what a family is stays in `BracketUtils.computeFamilyView`, outside it.
 
-**Zoom is the same both ways**, so a two-way view always has the window's shape. **A span is the one-direction case**: Timeline uses `clampSpan`, `zoomSpan`, `panSpan` and `revealSpan` — its own functions, moved — and a gesture tracker told it moves across only through `getAxes`, which also keeps a vertical wobble from counting towards the four-pixel slop or a pinch's gap.
+**Zoom is the same both ways**, so a two-way view always has the window's shape. **A span is the one-direction case**: Timeline uses `SpanUtils.clamp`, `zoom`, `pan` and `reveal` — its own functions, moved to `ss-utils` — and a gesture tracker told it moves across only through `getAxes`, which also keeps a vertical wobble from counting towards the four-pixel slop or a pinch's gap.
 
 **Gestures are on by default, as Timeline's are**, and either can be turned off with `isPannable` / `isZoomable`. The user's call; the two options differed only in the default and it can be flipped later. WCAG does not decide the default — no criterion covers a component taking the wheel — but it does decide what has to exist whatever the default: 2.5.1 Pointer Gestures (A), "All functionality that uses multipoint or path-based gestures for operation can be operated with a single pointer without a path-based gesture, unless a multipoint or path-based gesture is essential", so a pinch needs buttons; and 2.5.7 Dragging Movements (AA), "All functionality that uses a dragging movement for operation can be achieved by a single pointer without dragging, unless dragging is essential or the functionality is determined by the user agent and not modified by the author", so a drag-pan needs buttons. **So the controller is not optional** — `zoomBy`, `panBy` and `showArea`, handed out through `onMount` — and every Playground example that turns a view on draws buttons: PatchBoard's Zoom and Pan through `PagePanZoomControls`, Bracket's family example through its own toggle and stage buttons.
 
@@ -19351,7 +19417,7 @@ surprising of the two.
 
 The first build had two modes under a `spawnMode` union. `batch` was the above; `stream` never stopped, and there a weight was a cell's chance of spawning within one duration, with a per-cell wait after each spawn. The user then proposed keeping passes in both and letting the second mode differ only by chance. Once that was true, the second mode was the first with a number below 1, so the union was dropped for one prop — the user's go-ahead, on the argument that a weight meaning "when" in one mode and "how eager" in the other was the hardest part of the component to explain. It also gave the chance-driven field the scrub, the iterations and the pass callbacks for free, and deleted a second clock and the per-cell waits.
 
-**A roll is decided once per cell per pass and kept.** `ParticleFieldUtils.computeRoll` hashes a seed, the pass number and the cell into `0`–`1`, so redrawing a pass — which scrubbing does on every drag — never rolls again, and dragging back over a point shows the particles it showed before. The seed is drawn once per mounted field, so two fields side by side do not light the same cells. **The chance is one number for the whole field**, the simpler reading taken to try the idea; a per-cell chance, which would bring back busier and quieter areas without mixing that into timing, was raised and not taken up. **A cell that does spawn always spawns at the same moment of its pass**, since its weight is fixed; with a low chance that beat is mostly hidden, and a consumer who sees it rebuilds random weights in `onIterationEnd`.
+**A roll is decided once per cell per pass and kept.** `RandomUtils.hash` of a seed, the pass number and the cell gives `0`–`1`, so redrawing a pass — which scrubbing does on every drag — never rolls again, and dragging back over a point shows the particles it showed before. The seed is drawn once per mounted field, so two fields side by side do not light the same cells. **The chance is one number for the whole field**, the simpler reading taken to try the idea; a per-cell chance, which would bring back busier and quieter areas without mixing that into timing, was raised and not taken up. **A cell that does spawn always spawns at the same moment of its pass**, since its weight is fixed; with a low chance that beat is mostly hidden, and a consumer who sees it rebuilds random weights in `onIterationEnd`.
 
 **`animationDurationMs` is the shortest time between two spawns from the same cell**, the user's rule, and it holds by construction: a cell spawns at most once per pass. **A cell holds one particle at a time** for the same reason.
 
@@ -19754,10 +19820,10 @@ to the topmost child, and every cell is a stop because every cell responds.
 because a zoom is carrying them out are `aria-hidden` and take no pointer until they are gone; circles deeper than
 the level in view are drawn but hidden, since reading two hundred nested circles out would say nothing.
 
-**The circle packing is D3's, ported, with its seeded shuffle.** `CirclePackingUtils.packSiblings` is D3's
-front-chain placement, `enclose` its smallest-enclosing-circle search, and `computeLayout` its two-pass `pack`
+**The circle packing is D3's, ported, with its seeded shuffle.** `CircleUtils.pack` in `ss-utils` is D3's
+front-chain placement, `CircleUtils.enclose` its smallest-enclosing-circle search, and `computeLayout` its two-pass `pack`
 with the padding re-scaled between passes; the shuffle inside uses the same fixed-seed generator, so a tree always
-packs the same way and the unit tests can ask for repeatability. `interpolateZoom` is van Wijk and Nuij's smooth
+packs the same way and the unit tests can ask for repeatability. `CircleUtils.interpolateZoom` is van Wijk and Nuij's smooth
 zoom as D3 draws it, which is why a zoom between distant circles pulls back before it travels. Nothing was added
 as a dependency.
 

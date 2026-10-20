@@ -1,4 +1,4 @@
-import { AngleUtils, type Point2d } from "@thewaver/ss-utils";
+import { AngleUtils, Point2d, Point2dUtils, SVGUtils } from "@thewaver/ss-utils";
 
 import type {
     PlacementLayout,
@@ -51,42 +51,8 @@ const toExtentAcross = (rect: PlacementRect, direction: Point2d) => {
 };
 
 /** The bearing from one point to another, in degrees, zero pointing right and increasing clockwise. */
-const toAngle = (from: Point2d, to: Point2d) =>
-    (Math.atan2(to.y - from.y, to.x - from.x) * HALF_TURN_DEGREES) / Math.PI;
+const toAngle = (from: Point2d, to: Point2d) => Point2dUtils.getAngle(Point2d.sub(to, from));
 
-/** The straight-line distance between two points. */
-const toDistance = (from: Point2d, to: Point2d) => Math.hypot(from.x - to.x, from.y - to.y);
-
-/** The center of the circle through three points, or `undefined` when they are in a line. */
-const toCircumcenter = (first: Point2d, second: Point2d, third: Point2d): Point2d | undefined => {
-    const twiceArea =
-        PAIR * (first.x * (second.y - third.y) + second.x * (third.y - first.y) + third.x * (first.y - second.y));
-
-    if (Math.abs(twiceArea) < NO_DIRECTION_RADIUS) return undefined;
-
-    const square = (point: Point2d) => point.x * point.x + point.y * point.y;
-
-    return {
-        x:
-            (square(first) * (second.y - third.y) +
-                square(second) * (third.y - first.y) +
-                square(third) * (first.y - second.y)) /
-            twiceArea,
-        y:
-            (square(first) * (third.x - second.x) +
-                square(second) * (first.x - third.x) +
-                square(third) * (second.x - first.x)) /
-            twiceArea,
-    };
-};
-
-/**
- * Extends a run of three points by one more, following the curve they describe.
- *
- * Fitting a circle to the three and stepping the same angle again gives a point that continues an
- * arc as an arc and a straight line as a straight line, which is what a phantom neighbor past the
- * end of a ring or a row needs to be.
- */
 /**
  * Extends a run of two points by one more, in a straight line.
  *
@@ -99,15 +65,22 @@ const toMirroredCenter = (near: Point2d, from: Point2d): Point2d => ({
     y: from.y + (from.y - near.y),
 });
 
+/**
+ * Extends a run of three points by one more, following the curve they describe.
+ *
+ * Fitting a circle to the three and stepping the same angle again gives a point that continues an
+ * arc as an arc and a straight line as a straight line, which is what a phantom neighbor past the
+ * end of a ring or a row needs to be.
+ */
 const toContinuedCenter = (beyond: Point2d, near: Point2d, from: Point2d): Point2d => {
     const alongTheLine = { x: from.x + (from.x - near.x), y: from.y + (from.y - near.y) };
-    const center = toCircumcenter(beyond, near, from);
+    const center = Point2dUtils.getCircumcenter(beyond, near, from);
 
     if (center === undefined) return alongTheLine;
 
     const bearing = toAngle(center, from);
     const step = AngleUtils.getTurn(toAngle(center, near), bearing);
-    const radius = toDistance(center, from);
+    const radius = Point2dUtils.getDistance(center, from);
     const radians = AngleUtils.toRadians(bearing + step);
 
     return { x: center.x + Math.cos(radians) * radius, y: center.y + Math.sin(radians) * radius };
@@ -209,9 +182,9 @@ export namespace PlacementUtils {
 
                 if (origin === undefined) break;
 
-                const radius = getDistance(origin, from);
+                const radius = Point2dUtils.getDistance(origin, from);
 
-                if (radius < NO_DIRECTION_RADIUS || getDistance(origin, to) < NO_DIRECTION_RADIUS) break;
+                if (radius < NO_DIRECTION_RADIUS || Point2dUtils.getDistance(origin, to) < NO_DIRECTION_RADIUS) break;
 
                 return (
                     radius * AngleUtils.toRadians(AngleUtils.getSeparation(toAngle(origin, from), toAngle(origin, to)))
@@ -219,7 +192,7 @@ export namespace PlacementUtils {
             }
         }
 
-        return getDistance(from, to);
+        return Point2dUtils.getDistance(from, to);
     };
 
     /**
@@ -253,7 +226,7 @@ export namespace PlacementUtils {
     export const getRunRadius = (layout: PlacementLayout) => {
         const origin = getOrigin(layout);
         const radii = layout.placements
-            .map((placement) => getDistance(origin, getCenter(placement)))
+            .map((placement) => Point2dUtils.getDistance(origin, getCenter(placement)))
             .sort((a, b) => a - b);
 
         if (radii.length === NOTHING) return NOTHING;
@@ -414,7 +387,7 @@ export namespace PlacementUtils {
             case "vertical":
                 return isAcross;
             case "arc":
-                return getDistance(getOrigin(layout), point) <= getRunRadius(layout) * PAIR;
+                return Point2dUtils.getDistance(getOrigin(layout), point) <= getRunRadius(layout) * PAIR;
             case "plane":
                 return true;
         }
@@ -515,33 +488,14 @@ export namespace PlacementUtils {
      * @returns A closed path. A wedge with no inner radius is drawn as a pie slice from the center; one
      * with an inner radius is drawn as a ring segment, out along one edge and back along the other.
      */
-    export const getSectorPath = (sector: PlacementSector, origin?: Point2d) => {
-        const center = origin ?? sector.origin ?? { x: FULL_WIDTH * HALF, y: FULL_WIDTH * HALF };
-        const { innerRadius, outerRadius, fromAngle, toAngle } = sector;
-        const sweep = toAngle - fromAngle > HALF_TURN_DEGREES ? LARGE_ARC : SMALL_ARC;
-        const at = (radius: number, angle: number) => {
-            const radians = angle * AngleUtils.RADIANS_PER_DEGREE;
-
-            return `${center.x + Math.cos(radians) * radius} ${center.y + Math.sin(radians) * radius}`;
-        };
-
-        if (innerRadius <= NOTHING) {
-            return [
-                `M ${center.x} ${center.y}`,
-                `L ${at(outerRadius, fromAngle)}`,
-                `A ${outerRadius} ${outerRadius} 0 ${sweep} ${CLOCKWISE} ${at(outerRadius, toAngle)}`,
-                "Z",
-            ].join(" ");
-        }
-
-        return [
-            `M ${at(outerRadius, fromAngle)}`,
-            `A ${outerRadius} ${outerRadius} 0 ${sweep} ${CLOCKWISE} ${at(outerRadius, toAngle)}`,
-            `L ${at(innerRadius, toAngle)}`,
-            `A ${innerRadius} ${innerRadius} 0 ${sweep} ${COUNTER_CLOCKWISE} ${at(innerRadius, fromAngle)}`,
-            "Z",
-        ].join(" ");
-    };
+    export const getSectorPath = (sector: PlacementSector, origin?: Point2d) =>
+        SVGUtils.getRingSectorPath({
+            center: origin ?? sector.origin ?? { x: FULL_WIDTH * HALF, y: FULL_WIDTH * HALF },
+            innerRadius: sector.innerRadius,
+            outerRadius: sector.outerRadius,
+            fromAngle: sector.fromAngle,
+            toAngle: sector.toAngle,
+        });
 
     /**
      * Builds the SVG path connecting two placements.
@@ -562,9 +516,9 @@ export namespace PlacementUtils {
 
         if (origin === undefined) return `${move} L ${end.x} ${end.y}`;
 
-        const radiusX = radii?.x ?? getDistance(origin, start);
+        const radiusX = radii?.x ?? Point2dUtils.getDistance(origin, start);
         const radiusY = radii?.y ?? radiusX;
-        const turned = AngleUtils.getTurn(getAngle(origin, start), getAngle(origin, end));
+        const turned = AngleUtils.getTurn(toAngle(origin, start), toAngle(origin, end));
         const wrapped = turned < NOTHING ? turned + FULL_TURN_DEGREES : turned;
         const isClockwise = wrapped <= HALF_TURN_DEGREES;
         const sweep = isClockwise ? CLOCKWISE : COUNTER_CLOCKWISE;
@@ -572,16 +526,6 @@ export namespace PlacementUtils {
 
         return `${move} A ${radiusX} ${radiusY} 0 ${arc > HALF_TURN_DEGREES ? LARGE_ARC : SMALL_ARC} ${sweep} ${end.x} ${end.y}`;
     };
-
-    /**
-     * The bearing from one point to another.
-     *
-     * @returns Degrees, zero pointing right and increasing clockwise, from `-180` to `180`.
-     */
-    export const getAngle = toAngle;
-
-    /** The straight-line distance between two points. */
-    export const getDistance = toDistance;
 
     /**
      * The space between two neighboring placements, as a placement of its own.
@@ -649,7 +593,7 @@ export namespace PlacementUtils {
             topShare: center.y,
             widthShare: Math.max(far - near, NOTHING),
             heightShare: Math.min(toExtentAcross(anchor, across), toExtentAcross(neighbor, across)),
-            angle: (Math.atan2(forward.y, forward.x) * HALF_TURN_DEGREES) / Math.PI,
+            angle: Point2dUtils.getAngle(forward),
         };
     };
 
@@ -674,7 +618,7 @@ export namespace PlacementUtils {
         const origin = getOrigin(defs.layout);
         const isPickable = defs.isPickable ?? (() => true);
 
-        if (rule === "angle" && getDistance(defs.point, origin) < NO_DIRECTION_RADIUS) return undefined;
+        if (rule === "angle" && Point2dUtils.getDistance(defs.point, origin) < NO_DIRECTION_RADIUS) return undefined;
 
         let bestIndex: number | undefined;
         let bestScore = Infinity;
@@ -684,12 +628,12 @@ export namespace PlacementUtils {
 
             const center = getCenter(placements[index]);
 
-            if (rule === "angle" && getDistance(center, origin) < NO_DIRECTION_RADIUS) continue;
+            if (rule === "angle" && Point2dUtils.getDistance(center, origin) < NO_DIRECTION_RADIUS) continue;
 
             const score =
                 rule === "angle"
-                    ? AngleUtils.getSeparation(getAngle(origin, defs.point), getAngle(origin, center))
-                    : getDistance(defs.point, center);
+                    ? AngleUtils.getSeparation(toAngle(origin, defs.point), toAngle(origin, center))
+                    : Point2dUtils.getDistance(defs.point, center);
 
             if (score >= bestScore) continue;
 
