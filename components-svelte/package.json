@@ -120,16 +120,16 @@
     },
     "dependencies": {
         "@tanstack/virtual-core": "^3.18.0",
-        "@thewaver/ss-components": "^0.0.5"
+        "@thewaver/ss-components": "^0.0.5",
+        "@vanilla-extract/dynamic": "^2.1.5"
     },
     "peerDependencies": {
         "@thewaver/ss-utils": "^0.0.26",
-        "svelte": "^5.0.0"
+        "svelte": "^5.57.0"
     },
     "devDependencies": {
         "@thewaver/ss-utils": "^0.0.26",
         "@vanilla-extract/css": "^1.21.3",
-        "@vanilla-extract/dynamic": "^2.1.5",
         "vite": "^8.3.4",
         "@sveltejs/package": "^3.0.0",
         "@sveltejs/vite-plugin-svelte": "^7.3.1",

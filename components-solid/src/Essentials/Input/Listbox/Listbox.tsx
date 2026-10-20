@@ -386,24 +386,26 @@ export const ListboxOptions = <T,>(props: ListboxOptionsProps<T>) => {
     const renderWindowedOptions = () => (
         <div
             ref={setSizerRef}
-            class={styles.listboxSizer}
-            style={{ height: `${rowWindow.getTotalSize()}px` }}
-            onPointerOver={handleOptionsPointerOver}
-            onPointerLeave={hoverHold.handlePointerLeave}
+            class={rowWindow.getHasNoScroller() ? undefined : styles.listboxSizer}
+            style={{ height: rowWindow.getHasNoScroller() ? undefined : `${rowWindow.getTotalSize()}px` }}
+            onPointerOver={(e) => !rowWindow.getHasNoScroller() && handleOptionsPointerOver(e)}
+            onPointerLeave={(e) => !rowWindow.getHasNoScroller() && hoverHold.handlePointerLeave(e)}
         >
-            {renderFloaters()}
+            <Show when={!rowWindow.getHasNoScroller()} fallback={renderMountedOptions()}>
+                {renderFloaters()}
 
-            <For each={getWindowedEntries()}>
-                {(entry) =>
-                    typeof entry === "number" ? (
-                        <div role="group" aria-label={getGroupRun(entry)?.group?.label}>
-                            <For each={getGroupRun(entry)?.rows}>{renderWindowedRow}</For>
-                        </div>
-                    ) : (
-                        renderWindowedRow(entry)
-                    )
-                }
-            </For>
+                <For each={getWindowedEntries()}>
+                    {(entry) =>
+                        typeof entry === "number" ? (
+                            <div role="group" aria-label={getGroupRun(entry)?.group?.label}>
+                                <For each={getGroupRun(entry)?.rows}>{renderWindowedRow}</For>
+                            </div>
+                        ) : (
+                            renderWindowedRow(entry)
+                        )
+                    }
+                </For>
+            </Show>
         </div>
     );
 
@@ -411,7 +413,7 @@ export const ListboxOptions = <T,>(props: ListboxOptionsProps<T>) => {
         <Show when={getIsVirtualized()} fallback={renderMountedOptions()}>
             {renderWindowedOptions()}
 
-            {renderEndMarker()}
+            <Show when={!rowWindow.getHasNoScroller()}>{renderEndMarker()}</Show>
         </Show>
     );
 };

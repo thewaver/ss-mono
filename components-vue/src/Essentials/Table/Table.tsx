@@ -1,4 +1,13 @@
-import { type SlotsType, type VNodeChild, computed, defineComponent, shallowRef, useId } from "vue";
+import {
+    type SlotsType,
+    type VNodeChild,
+    computed,
+    defineComponent,
+    onMounted,
+    onUpdated,
+    shallowRef,
+    useId,
+} from "vue";
 
 import type {
     CarrierZone,
@@ -139,6 +148,8 @@ export const Table = defineComponent(
         const headerRef = shallowRef<HTMLDivElement>();
         const bodyRef = shallowRef<HTMLDivElement>();
 
+        let pendingFocusId: string | undefined;
+
         let resizeStart = { x: 0, width: 0, hasDragged: false };
         let hasCarriedClick = false;
 
@@ -214,8 +225,30 @@ export const Table = defineComponent(
 
             if (cell.row > TableConst.HEADER_ROW_INDEX && rowWindow.isLive.value) rowWindow.scrollToRow(cell.row - 1);
 
-            document.getElementById(getCellId(cell))?.focus();
+            const id = getCellId(cell);
+            const element = document.getElementById(id);
+
+            if (element) {
+                element.focus();
+
+                return;
+            }
+
+            pendingFocusId = id;
         };
+
+        const focusPending = () => {
+            const element = pendingFocusId === undefined ? undefined : document.getElementById(pendingFocusId);
+
+            if (!element) return;
+
+            pendingFocusId = undefined;
+            element.focus();
+        };
+
+        onMounted(focusPending);
+
+        onUpdated(focusPending);
 
         const toggleSort = (column: TableColumn<T> | undefined) => {
             if (!column || column.isSortable !== true || getIsDisabled()) return;
@@ -649,7 +682,7 @@ export const Table = defineComponent(
 
         return () => {
             const isDisabled = getIsDisabled();
-            const isVirtualized = getIsVirtualized();
+            const isWindowed = getIsVirtualized() && !rowWindow.hasNoScroller.value;
 
             const rootStyle = assignInlineVars({
                 [TableStyles.tableTemplateVar]: TableUtils.getColumnTemplate(columns.value, widths.value),
@@ -684,9 +717,9 @@ export const Table = defineComponent(
                         ref={bodyRef}
                         class={TableStyles.tableBody}
                         role="rowgroup"
-                        style={{ height: isVirtualized ? `${rowWindow.totalSize.value}px` : undefined }}
+                        style={{ height: isWindowed ? `${rowWindow.totalSize.value}px` : undefined }}
                     >
-                        {isVirtualized
+                        {isWindowed
                             ? rowWindow.rows.value.map((virtualRow) =>
                                   renderRow(rows.value[virtualRow.index], virtualRow.index, virtualRow),
                               )

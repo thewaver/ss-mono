@@ -131,7 +131,8 @@ export const Tree = defineComponent(
             focusedValue.value = undefined;
         });
 
-        const rows = computed(() => TreeUtils.getVisibleRows(props.nodes, (entry) => expanded.value.includes(entry)));
+        const expandedSet = computed(() => new Set(expanded.value));
+        const rows = computed(() => TreeUtils.getVisibleRows(props.nodes, (entry) => expandedSet.value.has(entry)));
         const flatRows = computed(() => FlattenerUtils.getFlatRows(rows.value));
         const navigableRows = computed(() => flatRows.value.filter(TreeUtils.computeIsNavigable));
 
@@ -475,28 +476,37 @@ export const Tree = defineComponent(
                 });
 
             const renderWindowedRows = () => (
-                <div ref={sizerRef} class={TreeStyles.treeSizer} style={{ height: `${rowWindow.totalSize.value}px` }}>
+                <div
+                    ref={sizerRef}
+                    class={rowWindow.hasNoScroller.value ? undefined : TreeStyles.treeSizer}
+                    style={rowWindow.hasNoScroller.value ? undefined : { height: `${rowWindow.totalSize.value}px` }}
+                >
                     {renderFloaters()}
 
-                    {rowWindow.rows.value.map((windowRow) => {
-                        const row = flatRows.value[windowRow.index];
+                    {rowWindow.hasNoScroller.value
+                        ? renderRows(rows.value)
+                        : rowWindow.rows.value.map((windowRow) => {
+                              const row = flatRows.value[windowRow.index];
 
-                        if (!row) return null;
+                              if (!row) return null;
 
-                        return (
-                            <div
-                                key={windowRow.index}
-                                class={TreeStyles.treeSizerRow}
-                                style={{ transform: `translateY(${rowWindow.getRowStart(windowRow)}px)` }}
-                                ref={rowWindow.measureRow(windowRow.index)}
-                            >
-                                {renderRow(row, windowRow.index)}
+                              return (
+                                  <div
+                                      key={windowRow.index}
+                                      class={TreeStyles.treeSizerRow}
+                                      style={{ transform: `translateY(${rowWindow.getRowStart(windowRow)}px)` }}
+                                      ref={rowWindow.measureRow(windowRow.index)}
+                                  >
+                                      {renderRow(row, windowRow.index)}
 
-                                {hasPendingPaint(row) &&
-                                    callSlot(slots.renderPendingChildren, { node: row.node, depth: row.depth + 1 })}
-                            </div>
-                        );
-                    })}
+                                      {hasPendingPaint(row) &&
+                                          callSlot(slots.renderPendingChildren, {
+                                              node: row.node,
+                                              depth: row.depth + 1,
+                                          })}
+                                  </div>
+                              );
+                          })}
                 </div>
             );
 

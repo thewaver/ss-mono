@@ -107,14 +107,21 @@ export namespace SlideButtonUtils {
      * progress either route makes is written through `setProgressRatio`, and put back to nothing when the gesture
      * ends.
      *
+     * A click is the third route, and it is not a tap. Assistive technology activates a button by sending it a click
+     * with nothing before it — NVDA and JAWS swallow Enter and Space in their reading mode and send the click instead
+     * — so a click that arrives with no press under way activates at once. Every click a real press produces is
+     * ignored: a pointer landing on the button or Enter or Space going down marks the button pressed, and the mark
+     * is lifted only after the press has ended and its own click has been delivered, so a tap, an abandoned slide
+     * and a key held for a moment all stay what they were.
+     *
      * The store says whether a hold is running and whether the thumb has been picked up. The functions in `defs` are
      * read when they are needed, so they may answer differently over time; `getProgressRatio` is read at release to
      * decide whether the thumb reached the end, so it has to answer with what `setProgressRatio` last wrote.
      *
      * @param defs How to read the button and write its progress.
      * @returns The store, and the commands to feed it: `drag` and `dragEnd` from a drag tracker over the track,
-     * `pressKey` and `releaseKey` from the button's key events, `stopHold` for focus leaving or the owner going
-     * away, and `reset` for the button becoming disabled, which drops everything under way.
+     * `pressKey` and `releaseKey` from the button's key events, `click` from its click event, `stopHold` for focus
+     * leaving or the owner going away, and `reset` for the button becoming disabled, which drops everything under way.
      */
     export const createGesture = (defs: SlideButtonGestureDefs) => {
         const store = StoreUtils.create<SlideButtonGestureState>(
@@ -125,6 +132,13 @@ export namespace SlideButtonUtils {
         let holdFrame: number | undefined;
         let press: SlideButtonPress | undefined;
         let grabRatio: number | undefined;
+        let isPressed = false;
+
+        const releasePress = () => {
+            setTimeout(() => {
+                isPressed = false;
+            });
+        };
 
         const setGrabRatio = (ratio: number | undefined) => {
             grabRatio = ratio;
@@ -175,6 +189,7 @@ export namespace SlideButtonUtils {
             const mode = defs.getMode();
 
             if (!press) {
+                isPressed = true;
                 press = {
                     ratio: pointerRatio,
                     isOnThumb: computeIsOnThumb(pointerRatio, defs.getProgressRatio(), thumbRatio),
@@ -206,6 +221,7 @@ export namespace SlideButtonUtils {
             const wasGrabbed = grabRatio !== undefined;
 
             stopHold();
+            releasePress();
             press = undefined;
 
             if (!wasGrabbed) return;
@@ -221,9 +237,16 @@ export namespace SlideButtonUtils {
             subscribe: store.subscribe,
             drag,
             dragEnd,
-            stopHold,
+            stopHold: () => {
+                stopHold();
+                releasePress();
+            },
             pressKey: (key: string, isRepeat: boolean) => {
-                if (isRepeat || !HOLD_KEYS.includes(key)) return;
+                if (!HOLD_KEYS.includes(key)) return;
+
+                isPressed = true;
+
+                if (isRepeat) return;
 
                 startHold();
             },
@@ -231,9 +254,16 @@ export namespace SlideButtonUtils {
                 if (!HOLD_KEYS.includes(key)) return;
 
                 stopHold();
+                releasePress();
+            },
+            click: () => {
+                if (isPressed) return;
+
+                defs.onActivate();
             },
             reset: () => {
                 stopHold();
+                releasePress();
                 press = undefined;
                 setGrabRatio(undefined);
                 defs.setProgressRatio(RATIO_MIN);

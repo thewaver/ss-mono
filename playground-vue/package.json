@@ -4,7 +4,8 @@
     "type": "module",
     "version": "0.0.0",
     "scripts": {
-        "start": "vite --host",
+        "start": "vite",
+        "start:hosted": "vite --host",
         "build": "vite build",
         "preview": "vite preview",
         "typecheck": "vue-tsc --noEmit"

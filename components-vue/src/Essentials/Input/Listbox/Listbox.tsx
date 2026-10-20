@@ -405,33 +405,36 @@ export const ListboxOptions = defineComponent(
                 );
             };
 
-            const renderWindowedOptions = () => (
-                <div
-                    ref={sizerRef}
-                    class={ListboxStyles.listboxSizer}
-                    style={{ height: `${rowWindow.totalSize.value}px` }}
-                    onPointerover={handleOptionsPointerOver}
-                    onPointerleave={handleOptionsPointerLeave}
-                >
-                    {renderFloaters()}
+            const renderWindowedOptions = () =>
+                rowWindow.hasNoScroller.value ? (
+                    <div ref={sizerRef}>{renderMountedOptions()}</div>
+                ) : (
+                    <div
+                        ref={sizerRef}
+                        class={ListboxStyles.listboxSizer}
+                        style={{ height: `${rowWindow.totalSize.value}px` }}
+                        onPointerover={handleOptionsPointerOver}
+                        onPointerleave={handleOptionsPointerLeave}
+                    >
+                        {renderFloaters()}
 
-                    {ListboxUtils.getWindowedRuns(rowWindow.rows.value, rows).flatMap((run) =>
-                        run.group ? (
-                            <div key={`group-${run.groupIndex}`} role="group" aria-label={run.group.label}>
-                                {run.rows.map(renderWindowedRow)}
-                            </div>
-                        ) : (
-                            run.rows.map(renderWindowedRow)
-                        ),
-                    )}
-                </div>
-            );
+                        {ListboxUtils.getWindowedRuns(rowWindow.rows.value, rows).flatMap((run) =>
+                            run.group ? (
+                                <div key={`group-${run.groupIndex}`} role="group" aria-label={run.group.label}>
+                                    {run.rows.map(renderWindowedRow)}
+                                </div>
+                            ) : (
+                                run.rows.map(renderWindowedRow)
+                            ),
+                        )}
+                    </div>
+                );
 
             return isVirtualized ? (
                 <>
                     {renderWindowedOptions()}
 
-                    {renderEndMarker()}
+                    {!rowWindow.hasNoScroller.value && renderEndMarker()}
                 </>
             ) : (
                 renderMountedOptions()

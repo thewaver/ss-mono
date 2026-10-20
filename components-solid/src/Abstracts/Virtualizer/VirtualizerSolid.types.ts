@@ -11,6 +11,7 @@ export type VirtualizerRowWindowOpts = {
 
 export type VirtualizerRowWindow = {
     getIsLive: Accessor<boolean>;
+    getHasNoScroller: Accessor<boolean>;
     getRows: Accessor<VirtualizerRow[]>;
     getTotalSize: Accessor<number>;
     getRowStart: (row: VirtualizerRow) => number;

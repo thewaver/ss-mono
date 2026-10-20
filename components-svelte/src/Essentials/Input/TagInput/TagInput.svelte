@@ -24,7 +24,11 @@
 
     let field = $state<HTMLInputElement>();
 
+    const fallbackId = $props.id();
+    const fieldId = $derived(props.id ?? fallbackId);
+
     FormFieldSvelteUtils.registerControl(() => field ?? undefined);
+    LabelSvelteUtils.registerControlId(() => fieldId);
 
     const getDirection = NavigatorSvelteUtils.createDirection(() => field ?? undefined);
 
@@ -142,7 +146,7 @@
             <input
                 bind:this={field}
                 {@attach attachElement}
-                id={props.id}
+                id={fieldId}
                 type="text"
                 name={props.name}
                 class={styles.tagInputField}

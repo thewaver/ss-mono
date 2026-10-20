@@ -173,7 +173,9 @@ by the user after a correction:
 - **Surface one at a time.** A long batched list of issues does not land; a single well-argued question does.
   They often work by voice and read in short bursts, so a bundled reply means the important item competes with
   three others and none land. When several decisions genuinely exist, say there are N pending and present only
-  the first. This governs the reply, not the work — still do the whole task once they are settled, and still
+  the first. **Every question in the run is headed _"Question X of Y"_**, not only the first, the user's
+  correction after the second of three arrived without its number: the count is how they know how far through
+  the run they are, so it travels with each question. This governs the reply, not the work — still do the whole task once they are settled, and still
   write the full reasoning into `conventions.md`, `decisions.md` and `backlog.md`, where length is wanted.
 - **Settle every one before doing any of the work.** After an answer to the first of two open questions was
   taken as licence to start moving files while the second was still unasked: _"we settle work decisions, then
@@ -388,6 +390,12 @@ cheaper model would do it as well, suggest it in a line before starting — what
 saves — and wait for them to take it up. It is a suggestion, not a licence: agents are still spawned only once
 they say so.
 
+**Parallel work is not the only occasion.** The user's addition: a serial task can be worth handing to a cheaper
+model on its own, when it is large enough that the saving outweighs the agent's cold start — reading this file,
+the conventions and the code again from nothing. Say which way the tokens go when suggesting it: splitting work
+across agents costs more in total and buys time, while handing a well-specified part to a cheaper model can cost
+less overall.
+
 **A long-running command never blocks the conversation.** Stated by the user, after a spec run held the session
 unresponsive for the second time in one day, and later widened by them from spec runs to anything slow: always
 start `npm run verify:dom` / `npx playwright test` with `run_in_background`, and the same for a build, an install or
@@ -400,6 +408,15 @@ the specs by what changed — the routes of the pages edited (grep `e2e/` for th
 it visits"_ in `decisions.md`), the specs of any component or abstract whose code moved, and a shared spec such as
 `playgroundExamples.spec.ts` or `sourceView.spec.ts` only when the change reaches what it checks — and pass them to
 `npx playwright test` by name. The full suite runs only when they ask for it.
+
+**Run a file filter as two commands, both with `--no-deps`, and check the count with `--list` first.** A spec
+holding an `@solo` test (`die`, `slideButton`, `wheel`, `accordion`, `particleSpawner`, `wraparound` at the time of
+writing) runs it in a `solo` project that depends on the main one, and Playwright runs a dependency project whole,
+ignoring the filter — so naming one of those files silently ran all 116, about twenty minutes, while the reply said
+nine. `--no-deps` stops that, but the dependency is also what makes the solo tests wait until nothing else is
+running, which is the whole point of them (`playwright.config.ts` explains the tag). So: first the filter with
+`--no-deps --grep-invert @solo`, then the same filter with `--no-deps --grep @solo`, one after the other. A filter
+is also a pattern matched against the whole path, not a file name, so anchor it: `'[\\/](table|tree)\.spec\.ts$'`.
 
 **Never kill the user's processes.** No `pkill`, no killing a dev server, no stopping anything you did not
 start. They keep `npm start` running while working, and losing it interrupts them. `npm run verify:dom`

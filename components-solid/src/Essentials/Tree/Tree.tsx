@@ -102,8 +102,10 @@ export const Tree = <T,>(props: TreeProps<T>) => {
 
     const typeahead = TypeaheadSolidUtils.createBuffer();
 
+    const getExpandedSet = createMemo(() => new Set(expandedSignal[0]()));
+
     const getRows = createMemo(() =>
-        TreeUtils.getVisibleRows(access(props.nodes), (value) => expandedSignal[0]().includes(value)),
+        TreeUtils.getVisibleRows(access(props.nodes), (value) => getExpandedSet().has(value)),
     );
 
     const getFlatRows = createMemo(() => FlattenerUtils.getFlatRows(getRows()));
@@ -431,27 +433,33 @@ export const Tree = <T,>(props: TreeProps<T>) => {
     );
 
     const renderWindowedRows = () => (
-        <div ref={setSizerRef} class={styles.treeSizer} style={{ height: `${rowWindow.getTotalSize()}px` }}>
+        <div
+            ref={setSizerRef}
+            class={rowWindow.getHasNoScroller() ? undefined : styles.treeSizer}
+            style={{ height: rowWindow.getHasNoScroller() ? undefined : `${rowWindow.getTotalSize()}px` }}
+        >
             {renderFloaters()}
 
-            <For each={rowWindow.getRows()}>
-                {(row) => (
-                    <div
-                        class={styles.treeSizerRow}
-                        style={{ transform: `translateY(${rowWindow.getRowStart(row)}px)` }}
-                        ref={(element) => rowWindow.measureRow(element, row.index)}
-                    >
-                        {renderRow(() => getFlatRows()[row.index])}
+            <Show when={!rowWindow.getHasNoScroller()} fallback={renderRows(getRows)}>
+                <For each={rowWindow.getRows()}>
+                    {(row) => (
+                        <div
+                            class={styles.treeSizerRow}
+                            style={{ transform: `translateY(${rowWindow.getRowStart(row)}px)` }}
+                            ref={(element) => rowWindow.measureRow(element, row.index)}
+                        >
+                            {renderRow(() => getFlatRows()[row.index])}
 
-                        <Show when={getHasPendingPaint(getFlatRows()[row.index])}>
-                            {props.renderPendingChildren?.(
-                                () => getFlatRows()[row.index].node,
-                                () => getFlatRows()[row.index].depth + 1,
-                            )}
-                        </Show>
-                    </div>
-                )}
-            </For>
+                            <Show when={getHasPendingPaint(getFlatRows()[row.index])}>
+                                {props.renderPendingChildren?.(
+                                    () => getFlatRows()[row.index].node,
+                                    () => getFlatRows()[row.index].depth + 1,
+                                )}
+                            </Show>
+                        </div>
+                    )}
+                </For>
+            </Show>
         </div>
     );
 

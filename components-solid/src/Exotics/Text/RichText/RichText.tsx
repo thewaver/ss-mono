@@ -49,6 +49,7 @@ export const RichText = (props: RichTextProps) => {
         RichTextUtils.parseContent(
             access(props.content),
             access(props.allowedAttributes) ?? RICH_TEXT_DEFAULTS.allowedAttributes,
+            access(props.maxDepth) ?? RICH_TEXT_DEFAULTS.maxDepth,
         ),
     );
 

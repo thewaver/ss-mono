@@ -98,6 +98,8 @@ export const Table = <T,>(props: TableProps<T>) => {
         },
     });
 
+    const getIsWindowed = createMemo(() => getIsVirtualized() && !rowWindow.getHasNoScroller());
+
     const getCellId = (cell: Index2d) => TableUtils.getCellId(tableId, cell);
 
     const getIsRoving = (cell: Index2d) => {
@@ -633,9 +635,9 @@ export const Table = <T,>(props: TableProps<T>) => {
                 ref={setBodyRef}
                 class={styles.tableBody}
                 role="rowgroup"
-                style={{ height: getIsVirtualized() ? `${rowWindow.getTotalSize()}px` : undefined }}
+                style={{ height: getIsWindowed() ? `${rowWindow.getTotalSize()}px` : undefined }}
             >
-                <Show when={getIsVirtualized()} fallback={renderRows()}>
+                <Show when={getIsWindowed()} fallback={renderRows()}>
                     {renderWindowedRows()}
                 </Show>
             </div>

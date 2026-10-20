@@ -1,4 +1,4 @@
-import { describe, expect, it } from "vitest";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
 import { type Point3d, QuaternionUtils } from "@thewaver/ss-utils";
 
@@ -6,6 +6,10 @@ import { DieUtils } from "../../Exotics/Perspective/Die/Die.utils";
 import { DieShapes } from "../../Samples/Die/Shapes/DieShapes.const";
 import type { RollerFace, RollerState } from "./Roller.types";
 import { RollerUtils } from "./Roller.utils";
+
+vi.mock("../LiveAnnouncer/LiveAnnouncer.utils", () => ({
+    LiveAnnouncerUtils: { reserve: () => {}, announce: () => {} },
+}));
 
 const RADIUS = 100;
 
@@ -174,5 +178,47 @@ describe("getIsRollable and computePhase", () => {
         expect(RollerUtils.getIsBusy({ ...STILL, isAwaitingTarget: true })).toBe(true);
         expect(RollerUtils.getIsBusy({ ...STILL, rollPhase: "settling" })).toBe(true);
         expect(RollerUtils.getIsBusy(STILL)).toBe(false);
+    });
+});
+
+describe("createRoller", () => {
+    beforeEach(() => {
+        vi.stubGlobal("requestAnimationFrame", () => 0);
+        vi.stubGlobal("cancelAnimationFrame", () => {});
+    });
+
+    afterEach(() => vi.unstubAllGlobals());
+
+    it("can roll again after a target function threw", async () => {
+        let isThrowing = true;
+        let targetFace = FRONT;
+
+        const roller = RollerUtils.createRoller({
+            getIsDisabled: () => false,
+            getFaces: () => CUBE,
+            getRollDurationMs: () => 0,
+            getSettleDurationMs: () => 0,
+            getTumbleCount: () => 0,
+            getMomentumMs: () => 0,
+            getRadius: () => RADIUS,
+            getIsMovable: () => false,
+            targetFace: [() => targetFace, (value) => (targetFace = value)],
+            computeRollTarget: () => {
+                if (isThrowing) throw new Error("no");
+
+                return RIGHT_SIDE;
+            },
+            computeFaceLabel: (index) => String(index),
+        });
+
+        expect(roller.roll()).toBe(true);
+        await vi.waitFor(() => expect(roller.get().isAwaitingTarget).toBe(false));
+
+        isThrowing = false;
+
+        expect(roller.roll()).toBe(true);
+        await vi.waitFor(() => expect(roller.get().isResting).toBe(true));
+
+        expect(targetFace).toBe(RIGHT_SIDE);
     });
 });

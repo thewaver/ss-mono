@@ -5,6 +5,7 @@ import * as styles from "@thewaver/ss-playground/App/Pages/RichTextPage/RichText
 type Props = {
     content: string;
     removeOtherTags: boolean;
+    maxDepth: number;
 };
 
 defineProps<Props>();
@@ -12,6 +13,6 @@ defineProps<Props>();
 
 <template>
     <div id="customInputPreview" :class="styles.previewText">
-        <RichText :content="content" :remove-other-tags="removeOtherTags" />
+        <RichText :content="content" :remove-other-tags="removeOtherTags" :max-depth="maxDepth" />
     </div>
 </template>

@@ -1,4 +1,4 @@
-import { Index, Show, createMemo, createSignal } from "solid-js";
+import { Index, Show, createMemo, createSignal, createUniqueId } from "solid-js";
 
 import {
     TAG_INPUT_DEFAULTS,
@@ -25,7 +25,11 @@ export const TagInput = (props: TagInputProps) => {
 
     const [getFieldRef, setFieldRef] = createSignal<HTMLInputElement>();
 
+    const fallbackId = createUniqueId();
+    const getFieldId = () => access(props.id) ?? fallbackId;
+
     FormFieldSolidUtils.registerControl(getFieldRef);
+    LabelSolidUtils.registerControlId(getFieldId);
 
     const getDirection = NavigatorSolidUtils.createDirectionSignal(getFieldRef);
 
@@ -174,7 +178,7 @@ export const TagInput = (props: TagInputProps) => {
                                 setFieldRef(element);
                                 setElementRef(element);
                             }}
-                            id={access(props.id)}
+                            id={getFieldId()}
                             type="text"
                             name={access(props.name)}
                             class={styles.tagInputField}

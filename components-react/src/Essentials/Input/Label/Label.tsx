@@ -1,4 +1,4 @@
-import { useId } from "react";
+import { useId, useState } from "react";
 
 import { LABEL_DEFAULTS, type LabelContextType, LabelStyles } from "@thewaver/ss-components";
 
@@ -9,10 +9,12 @@ export const Label = (props: LabelProps) => {
     const context = useLabelContext();
     const labelId = useId();
     const isNested = context.getIsLabeled();
+    const [registeredControlId, setRegisteredControlId] = useState<string>();
 
     const innerContext: LabelContextType = {
         getIsLabeled: () => true,
         getLabelId: () => (isNested ? context.getLabelId() : labelId),
+        setControlId: isNested ? context.setControlId : setRegisteredControlId,
     };
 
     const Element = isNested ? "div" : "label";
@@ -21,6 +23,7 @@ export const Label = (props: LabelProps) => {
     return (
         <Element
             id={isNested ? undefined : labelId}
+            htmlFor={isNested ? undefined : (props.for ?? registeredControlId)}
             className={LabelStyles.labelRoot}
             style={{
                 flexDirection: orientation === "horizontal" ? "row" : "column",

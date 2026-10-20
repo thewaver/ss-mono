@@ -1,4 +1,4 @@
-import { type SlotsType, defineComponent, shallowRef } from "vue";
+import { type SlotsType, defineComponent, shallowRef, useId } from "vue";
 
 import {
     TAG_INPUT_DEFAULTS,
@@ -34,7 +34,11 @@ export const TagInput = defineComponent(
 
         exposeElement(expose, () => fieldRef.value);
 
+        const fallbackId = useId();
+        const getFieldId = () => props.id ?? fallbackId;
+
         FormFieldVueUtils.useRegisterControl(fieldRef);
+        LabelVueUtils.useControlId(getFieldId);
 
         const direction = NavigatorVueUtils.useDirection(fieldRef);
 
@@ -177,7 +181,7 @@ export const TagInput = defineComponent(
                                             fieldRef.value = toElement<HTMLInputElement>(target);
                                             setElementRef(target);
                                         }}
-                                        id={props.id}
+                                        id={getFieldId()}
                                         type="text"
                                         name={props.name}
                                         class={TagInputStyles.tagInputField}

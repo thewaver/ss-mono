@@ -30,6 +30,13 @@ export type BaseRichTextValues = {
      * become, a link's address included, is decided by whoever renders it.
      */
     allowedAttributes?: RichTextAllowedAttributes;
+    /**
+     * How deeply tags may nest, a tag at the top level sitting at depth `1`. A tag that would sit deeper prints as
+     * typed, as any other malformed markup does. Defaults to `Infinity`, no limit, which is right for copy the
+     * consumer wrote; set it when the content comes from somewhere untrusted, since thousands of nested tags are
+     * enough to exhaust the renderer's call stack.
+     */
+    maxDepth?: number;
 };
 
 export type BaseRichTextCbs = {

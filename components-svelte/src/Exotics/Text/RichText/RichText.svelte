@@ -12,7 +12,9 @@
 
     const allowedAttributes = $derived(props.allowedAttributes ?? RICH_TEXT_DEFAULTS.allowedAttributes);
 
-    const parsedTree = $derived(RichTextUtils.parseContent(props.content, allowedAttributes));
+    const parsedTree = $derived(
+        RichTextUtils.parseContent(props.content, allowedAttributes, props.maxDepth ?? RICH_TEXT_DEFAULTS.maxDepth),
+    );
 
     const classMap = $derived(props.computeClassNames?.(RICH_TEXT_DEFAULT_CLASSES) ?? RICH_TEXT_DEFAULT_CLASSES);
 

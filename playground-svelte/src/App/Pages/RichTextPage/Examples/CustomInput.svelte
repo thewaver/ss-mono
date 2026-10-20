@@ -5,11 +5,12 @@
     type Props = {
         content: string;
         removeOtherTags: boolean;
+        maxDepth: number;
     };
 
     let props: Props = $props();
 </script>
 
 <div id={"customInputPreview"} class={styles.previewText}>
-    <RichText content={props.content} removeOtherTags={props.removeOtherTags} />
+    <RichText content={props.content} removeOtherTags={props.removeOtherTags} maxDepth={props.maxDepth} />
 </div>

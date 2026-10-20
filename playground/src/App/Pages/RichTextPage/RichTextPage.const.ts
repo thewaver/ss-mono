@@ -2,6 +2,9 @@ export const FIELD_WIDTH = 420;
 export const MIN_ROWS = 8;
 export const MAX_ROWS = 16;
 export const PREVIEW_WIDTH = 420;
+export const NO_DEPTH_LIMIT = -1;
+export const MAX_DEPTH_KNOB = 10;
+export const DEPTH_STEP = 1;
 
 export const TAG_DEFS = [
     { tag: "b", name: "bold" },

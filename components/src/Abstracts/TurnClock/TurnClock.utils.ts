@@ -23,13 +23,19 @@ export namespace TurnClockUtils {
      * frames alone would stop part-way and never report that it ended. Whichever of a frame or the timer gets there
      * first ends the turn, and the other is called off.
      *
+     * Canceling from inside `onFrame` is safe: the frame that was running asks for no further one, and the turn does
+     * not arrive.
+     *
      * @returns The tween. One tween runs one turn at a time; starting another abandons the first.
      */
     export const createTween = (): TurnClockTween => {
         let frameId: number | undefined;
         let starvationHandle: ReturnType<typeof setTimeout> | undefined;
+        let generation = 0;
 
         const cancel = () => {
+            generation++;
+
             if (frameId !== undefined) cancelAnimationFrame(frameId);
             if (starvationHandle !== undefined) clearTimeout(starvationHandle);
 
@@ -52,6 +58,7 @@ export namespace TurnClockUtils {
             }
 
             const startedAt = performance.now();
+            const current = generation;
 
             const advance = () => {
                 const ratio = MathUtils.clamp01((performance.now() - startedAt) / durationMs);
@@ -63,6 +70,8 @@ export namespace TurnClockUtils {
                 }
 
                 onFrame(ratio);
+
+                if (current !== generation) return;
 
                 frameId = requestAnimationFrame(advance);
             };
@@ -125,6 +134,9 @@ export namespace TurnClockUtils {
     /**
      * Asks for targets that may arrive later, and ignores the answer to any request canceled before it came.
      *
+     * A target function that throws is treated exactly like one whose promise is rejected: the request is refused, so
+     * whoever is waiting on it is released.
+     *
      * @returns The request.
      */
     export const createTargetRequest = (): TurnClockTargetRequest => {
@@ -133,7 +145,7 @@ export namespace TurnClockUtils {
         const request = <T>(compute: () => T | Promise<T>, onTarget: (target: T) => void, onRefused: () => void) => {
             const current = generation;
 
-            void Promise.resolve(compute())
+            void new Promise<T>((resolve) => resolve(compute()))
                 .then((target) => {
                     if (current !== generation) return;
 

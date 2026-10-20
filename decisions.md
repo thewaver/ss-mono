@@ -2804,10 +2804,16 @@ anywhere the painter does not reach. `Label` is the answer.
 
 Settled, closing the gap the audit recorded.
 
-**It wraps rather than points.** `Label` renders a `<label>` around both caption and control, so
-association is implicit and no `id` is invented or threaded. `for` / `getId` was rejected: an explicit id
-is a second thing to keep unique and in sync, and only earns its keep when the caption cannot be a
-sibling of the control, which nothing here needs.
+**It wraps, and it can point, as a native label does.** `Label` renders a `<label>` around both caption and
+control, so association is implicit by default and no `id` has to be threaded. The first build stopped there,
+rejecting `for` as a second thing to keep unique; an outside review then found what wrapping alone cannot do. A
+wrapping label names the _first_ control inside it, and `TagInput` draws its remove buttons before its text box, so
+the caption named a button, the text box had no name, and a click on the caption deleted a tag (WCAG 1.3.1, 2.5.3,
+4.1.2). The user's call: allow both, the native way. So `Label` takes `for`, the native name, and otherwise asks the
+control: the context carries `setControlId`, and a control whose real element is not its first registers that
+element's id through `registerControlId` (`useControlId` in React and Vue) — `TagInput` registers its text box,
+inventing an id when the consumer gave none. The consumer's `for` wins over the control's, the control's over
+plain wrapping. A nested `Label` draws a `<div>` and passes a registration up to the outer one.
 
 **It paints nothing, including the cursor.** Geometry only: `display: flex`, `width: fit-content`,
 `getDir`, `getGap`. Cursor was left out deliberately: a `<label>` cannot know whether the control inside
@@ -11668,6 +11674,26 @@ records, flattening them, finding the navigable ones — and that is the floor a
   `observeElementRect`. It is typed by the two fields of the virtualizer it reads, so the core package still does not
   depend on TanStack. `End` was never affected, since it scrolls to the furthest offset rather than aligning a row.
   `select.spec.ts`'s reopening case found it, in React and Vue as much as in Solid and Svelte.
+- **A list given an estimate but no scroller draws every row, and only once the search has said so.** `Table` and
+  `Tree` chose the windowed render because an estimate was passed, so in plain document flow, with no ancestor that
+  scrolls, the window had nothing to measure and a 30-row table drew its header and nothing else (an outside
+  review's finding). `isLive` could not decide it: it is also `false` for the frames before the scroller has been
+  looked for, so a long list would mount every row and then drop them. Each row window therefore also returns
+  `hasNoScroller` (`getHasNoScroller` in Solid and Svelte), `true` only once the search has run for the current
+  element and found nothing; every frame before that answers `false`, which is the windowed render the lists
+  always had. `Table` swaps its body's rows. `Tree` keeps the sizer element mounted and only drops its class,
+  height and windowed rows — the search measures from the sizer, and a branch that replaced it with another element
+  would make the search start again, find a new element, and flip back. `Listbox` does the same: its sizer stays,
+  and holds the ordinary full list of options when there is no scroller, with the end marker and the hover
+  handlers left to that list so neither runs twice.
+- **A key that moves focus to a row not yet mounted waits for the render, in every list.** `Tree` always did this
+  (a pending id, focused after the next commit); `Table` looked the cell up straight after asking the window to
+  scroll, which in React, Vue and Svelte is before the row exists, so `Ctrl+End` in a long table left focus on
+  `<body>` and the next arrow did nothing. `Table` now keeps the same pending id. Solid needs neither, because the
+  roving row is pinned into the window and Solid mounts it the moment the signal is set.
+- **`Tree` tests membership in its open branches against a `Set`**, rebuilt when the expanded list changes, rather
+  than against the array the consumer holds: the walk asks once per visible branch, and `includes` made expanding a
+  tree of 20,000 open branches take about 300 ms against about 2 ms.
 
 ### Controls: `Toolbar`, and why the overflow is the component
 
@@ -12058,10 +12084,17 @@ Settled, when the user named a slide-to-activate control as a gap. It is a `Butt
 activation is a drag from one end of a track to the other, for the case where an accidental press would be
 expensive — send, arm, delete.
 
-**It is a real `<button>`, and it does not listen for a click.** Listening for `click` would defeat the
-control, because a press and a release is a click whether or not anything slid — a tap would activate, and so
-would a slide dragged back and abandoned. So the element carries the button's semantics and its name, and every
-activation route is written by hand.
+**It is a real `<button>`, and a click activates it only when no press made the click.** Taking every `click`
+would defeat the control, because a press and a release is a click whether or not anything slid — a tap would
+activate, and so would a slide dragged back and abandoned. Taking none, the first build's answer, left screen
+reader users with no route at all: NVDA and JAWS in their reading mode swallow Enter and Space and send the
+button a bare click instead, so neither the held key nor the pointer ever reaches the page (found by an outside
+review against WCAG 2.1.1 and 4.1.2). So `createGesture` marks the button pressed when a pointer lands on it or
+Enter or Space goes down, lifts the mark a task after the press ends — after the click that press produces has
+been delivered — and ignores any click that arrives while it is marked. A click with no press behind it is an
+activation from assistive technology or from script, and runs `onActivate` at once. The user's choice over
+taking clicks only when `holdDurationMs` is `0`, which would have made every consumer opt in and given the tap
+back to everyone at that setting.
 
 **There are two routes, and neither is a tap: drag the thumb to the end, or hold a press until it fills.** The
 hold drives the same `progressRatio`, so the paint is identical and a person who cannot drag sees what a person
@@ -12100,9 +12133,10 @@ _accidental_ activation, and a screen reader already supplies that protection by
 control and then activating it are two separate deliberate acts, which is not the case for a stray click or a
 misplaced tap. Apple's guidance for the pattern says the same thing from the other end — collapse the swipe to
 a single activation for VoiceOver — and the iOS lock screen does exactly that. So the assistive route wants
-_less_ gesture, not a described one, and a consumer who agrees already has the switch: `getHoldDurationMs` of
-`0` makes the first frame complete the hold, so a plain press activates. The library cannot make that choice
-itself, because detecting a screen reader is neither possible nor something to attempt.
+_less_ gesture, not a described one, and the bare click above is that route. It is told apart by what came
+before it, not by guessing who sent it: detecting a screen reader is neither possible nor something to attempt.
+`getHoldDurationMs` of `0` still makes the first frame complete the hold, for a consumer who wants a plain press
+to activate for everyone.
 
 **The progress is a flag and a signal, and the signal is optional.** `progress` is the ratio the fill
 is drawn from, taken through `SignalMirrorUtils.createOptional` exactly as a popup's `visibility` is: with no
@@ -15312,6 +15346,16 @@ as text comes back compiled and with no default export — `codeToHtml` then rec
 renders nothing. `?source` resolves to an id no other plugin recognizes (a null-byte prefix and a `.source`
 extension) and is read off disk by the plugin itself. The only part of the feature living outside `src`.
 
+**Because the plugin reads the disk itself, it does its own gatekeeping** (OWASP A05:2021 Security
+Misconfiguration; CWE-22, path traversal). Vite's `server.fs.allow` guards only Vite's own file serving, and the
+dev server answers `/@id/<any id>`, so the first build handed any file the account could read to anyone who could
+reach the server: a request for `/@id/__x00__source:<absolute path>.source?import` returned it, as did
+`/@fs/<path>?source`, both reproduced with a file outside the repository. The plugin now loads only ids its own
+`resolveId` issued, and issues them only for files whose real path lies under `playground/src` or a
+`playground-*/src` — the trees the source view displays. The Playgrounds' `start` scripts bind to this machine
+only, and `start:hosted`, at the root and in each Playground, adds `--host` for testing from another device on
+the network: the user's call, so that a hole of this kind is not open to the whole network by default.
+
 **An example is given the key rather than the resolved sample, and three pages changed to do it.** Still true
 of what the example's own body shows, though the tab that displayed the resolved sample is gone. `Shape`
 passed `getStrokeConfig`, `getFillConfig` and `getIterationConfig` already looked up; `CellAnimation` passed a
@@ -16925,6 +16969,22 @@ survive a restyle on either side.
 ### `RichText`: `renderTag` comes before the class map, and `undefined` is how it passes
 
 **`renderTag(tag, renderChildren, attributes)` is asked first. An element is drawn; `undefined` hands the tag to the class map and then to the unknown-tag handling; `null` draws nothing.** Solid's `JSX.Element` already includes `undefined`, so the two answers can be told apart without another type. The children arrive as a function rather than as rendered nodes, so a renderer that wraps them (a tooltip anchor, a link) decides where they go, and calling it sends the nested tags through the same `renderTag` and class map. The attributes come third, so the two-argument form in the verdict still reads naturally for a renderer that uses none.
+
+### `RichText`: the parser is linear and never recurses, and `maxDepth` guards the renderer
+
+An outside review measured two ways a string could hurt the page (OWASP's denial-of-service guidance, CWE-400 and
+CWE-674): a run of closing tags matching nothing searched back through every open tag, so the work grew with the square
+of the length — 4 seconds at 280 KB — and turning thousands of unclosed tags back into text called itself once per
+level until the call stack ran out. **Both are fixed in the parser without a choice to make**: a count of open tag names
+answers a closing tag nobody opened at once, and the write-back walks with an explicit stack.
+
+**The renderer is a different matter, and the limit there is a prop.** Every framework draws a nested tag by drawing its
+children, one call per level, so a correctly nested tree thousands deep exhausts the stack however the parser behaves.
+The only guard is a cap on depth, and the user chose to make it the consumer's: `maxDepth`, a tag at the top level
+sitting at depth `1`, and a tag that would sit deeper is printed as typed — the rule every other malformed tag already
+follows. **It defaults to `Infinity`**, following `CellAnimation`'s `animationIterationCount`, which is where the library
+already says "no limit" with a number; the Playground's knob, which cannot hold `Infinity`, uses `-1` and converts, as
+that page's does. Copy the consumer wrote needs no cap; content from somewhere untrusted should be given one.
 
 ### `SlotText`: the columns turn the way the number is going, and the arithmetic above the barrel is the component
 

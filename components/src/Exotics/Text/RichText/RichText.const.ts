@@ -5,6 +5,7 @@ import * as styles from "./RichText.css";
 export const RICH_TEXT_DEFAULTS = {
     removeOtherTags: false,
     allowedAttributes: {} as RichTextAllowedAttributes,
+    maxDepth: Infinity,
 };
 
 export const RICH_TEXT_DEFAULT_CLASSES: Record<string, string> = {

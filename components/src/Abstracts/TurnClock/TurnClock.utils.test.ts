@@ -59,6 +59,27 @@ describe("createTween", () => {
 
         expect(first).not.toHaveBeenCalled();
     });
+
+    it("stops for good when it is canceled from inside a frame", () => {
+        const frames: FrameRequestCallback[] = [];
+
+        vi.stubGlobal("requestAnimationFrame", (callback: FrameRequestCallback) => frames.push(callback));
+
+        const tween = TurnClockUtils.createTween();
+        const onFrame = vi.fn(() => tween.cancel());
+        const onArrive = vi.fn();
+
+        tween.run(500, onFrame, onArrive);
+
+        expect(frames).toHaveLength(1);
+
+        frames[0](0);
+        vi.advanceTimersByTime(1000);
+
+        expect(onFrame).toHaveBeenCalledTimes(1);
+        expect(frames).toHaveLength(1);
+        expect(onArrive).not.toHaveBeenCalled();
+    });
 });
 
 describe("holdRest", () => {
@@ -113,6 +134,20 @@ describe("createTargetRequest", () => {
         request.cancel();
         await Promise.resolve();
         await Promise.resolve();
+
+        expect(onTarget).not.toHaveBeenCalled();
+    });
+
+    it("reports a target function that throws as refused, the same as a rejected promise", async () => {
+        const request = TurnClockUtils.createTargetRequest();
+        const onTarget = vi.fn();
+        const onRefused = vi.fn();
+        const throwing = () => {
+            throw new Error("no");
+        };
+
+        expect(() => request.request(throwing, onTarget, onRefused)).not.toThrow();
+        await vi.waitFor(() => expect(onRefused).toHaveBeenCalledTimes(1));
 
         expect(onTarget).not.toHaveBeenCalled();
     });

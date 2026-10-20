@@ -17,6 +17,7 @@
     ],
     "scripts": {
         "start": "node playground/scripts/startSite.mjs",
+        "start:hosted": "node playground/scripts/startSite.mjs --host",
         "start:solid": "npm run start -w playground-solid",
         "start:react": "npm run start -w playground-react",
         "start:vue": "npm run start -w playground-vue",

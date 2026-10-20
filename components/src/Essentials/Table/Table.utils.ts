@@ -109,11 +109,12 @@ export namespace TableUtils {
      *
      * @param column The column.
      * @param widths Widths set by dragging, by column id. These win over the declared width, since the
-     * user asked for them.
+     * user asked for them. Only a width stored under the column's own id counts, so an id such as `constructor`
+     * never picks up something inherited.
      * @returns The width, or `undefined` for a column that should flex.
      */
     export const getColumnWidth = <T>(column: TableColumnDefs<T>, widths: Record<string, number>) =>
-        widths[column.id] ?? column.widthPx;
+        (Object.hasOwn(widths, column.id) ? widths[column.id] : undefined) ?? column.widthPx;
 
     /**
      * A column's CSS grid track.

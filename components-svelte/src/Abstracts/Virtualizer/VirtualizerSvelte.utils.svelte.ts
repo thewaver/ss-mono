@@ -55,7 +55,12 @@ export namespace VirtualizerSvelteUtils {
      * scroller drawn under a CSS transform, where the rectangle on screen and the element's own height disagree.
      *
      * Everything falls back safely: with no scrolling ancestor or with virtualizing switched off, `getIsLive` reports
-     * `false` and the caller should draw the whole list.
+     * `false`.
+     *
+     * `getIsLive` is also `false` before the scroller has been looked for, so it cannot decide whether to draw the
+     * whole list: a long list would mount every row and then drop them. `getHasNoScroller` is the signal for that —
+     * `true` only once the search has run for the current element and found nothing, which is when the caller should
+     * draw every row.
      *
      * `getIsLive` turns `true` only once the window is following its scroller, which is a step after the scroller is
      * found: an effect keyed on it that scrolls to a row, run in the same pass as the search, would otherwise ask a
@@ -71,7 +76,8 @@ export namespace VirtualizerSvelteUtils {
      * @param opts.getPinnedRows Rows to keep drawn wherever the scroll is — a selected row that must stay measurable,
      * a row being dragged.
      * @param opts.getOverscan How many extra rows to draw beyond the visible ones, to cover a fast scroll.
-     * @returns `getIsLive` for whether virtualizing is in effect, `getRows` and `getTotalSize` for what to draw and
+     * @returns `getIsLive` for whether virtualizing is in effect, `getHasNoScroller` for whether to draw every row
+     * instead, `getRows` and `getTotalSize` for what to draw and
      * how tall to make the spacer, `getRowStart` for a row's position, `measureRow(index)`, an attachment for that
      * row's element so its real height is learned, and `scrollToRow`. Key the drawn rows by their `index`, so a row
      * that stays on screen keeps its element.
@@ -82,6 +88,12 @@ export namespace VirtualizerSvelteUtils {
         opts: VirtualizerRowWindowOpts,
     ): VirtualizerRowWindow => {
         const getScrollParent = createScrollParent(getRef, opts.getIsDisabled);
+
+        let searchedRef = $state.raw<HTMLElement>();
+
+        $effect(() => {
+            searchedRef = opts.getIsDisabled() ? undefined : getRef();
+        });
 
         let scrollMargin = $state(0);
 
@@ -176,6 +188,13 @@ export namespace VirtualizerSvelteUtils {
 
         return {
             getIsLive: () => !opts.getIsDisabled() && isFollowing,
+            getHasNoScroller: () => {
+                const ref = getRef();
+
+                return (
+                    !opts.getIsDisabled() && ref !== undefined && searchedRef === ref && getScrollParent() === undefined
+                );
+            },
             getRows: () => visibleRows,
             getTotalSize: () => totalSize,
             getRowStart: (row) => row.start - scrollMargin,

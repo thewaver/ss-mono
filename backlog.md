@@ -64,6 +64,7 @@ reading.
 30. A long list reopened onto a far-down selection settles a frame or two late in Solid and Svelte — _open_
 31. `Die`'s step buttons and arrow keys fall into a loop of two or three faces — _open, no fix chosen_
 32. A wide arrow vanishes at a corner, and a nearly-as-wide one becomes a sliver — _open, the user is analysing it_
+33. The Playground's painters in Windows high-contrast mode — _open, decided, not yet built_
 
 ### Build order
 
@@ -1306,6 +1307,24 @@ before choosing a fix. The one put to them and not taken yet: limit how far a si
 end the side at its base corner and run straight back to the contour along the arrow's direction, which never
 vanishes but gives a wide corner arrow a short straight neck.
 
+## 33. The Playground's painters in Windows high-contrast mode
+
+Reachable on the Range page with Windows' high-contrast mode on, or with Chrome's DevTools emulating
+`forced-colors: active`: the track and the filled part of the range turn white on the white page, and only the
+thumb's border is left, a circle floating on nothing. High-contrast mode replaces every color the page sets with a
+few system colors of the user's choosing, and a part drawn only as a background color is repainted in the page's
+own background. The track and fill measured 1:1 against the page there, where WCAG 1.4.11 asks parts of a control
+for 3:1. Found by an outside review, which tested Range only.
+
+**Decided by the user: every painter, not just Range, and later rather than now.** Nothing in the Playground or
+the library mentions `forced-colors`, so any painter whose shapes are background colors alone will vanish the same
+way; fixing Range by itself would leave the rest broken for the same reason. The work is to go through every
+Playground painter with forced colors emulated and, for each that vanishes, give it a `@media (forced-colors:
+active)` rule drawing its shapes in system colors (`CanvasText` for a track or an outline, `Highlight` for a
+selected or filled part), with `forced-color-adjust` left alone unless a part has to keep its own color. **The
+normal theme does not change**: this is the user's styling, and the rules apply only while high-contrast mode is
+on.
+
 ## Accepted limits
 
 Faults that have been looked at and consciously left alone. Not outstanding work, not numbered, and not part
@@ -1313,6 +1332,18 @@ of the answer to "what is left" — see the note at the top of this file. Each o
 reach it, and why it was accepted, so that nobody has to re-derive the argument in order to leave it alone
 again. An entry moves back up into the numbered items only if the user says so, or if something changes that
 makes the reasoning wrong.
+
+**No check runs the whole repository before a push.** The root `npm run build` builds the library packages and
+not the Playgrounds, there is no CI, and the full browser suite takes about half an hour, so a commit can break
+every Playground build and the first word of it is Vercel's site build failing after the push. Reachable by breaking an import in
+`playground/src` and running `npm run build`, which passes. An outside review proposed a release gate — a
+workflow on each push running the type-checks, the unit tests and both builds, or a check in the commit hook.
+Accepted by the user: Vercel's site build already reports on each commit in GitHub and flagged this one, and with
+every push going straight to `main` a workflow of the repository's own would report no sooner; a verifier that
+makes each commit wait would be skipped with `--no-verify`, taking the small checks with it; and the browser specs
+are already run for whatever a session changes. The one break that prompted
+the review came from the commit hook itself rewriting a file, which `decisions.md` records and which can no
+longer happen the same way.
 
 **React faders report `onShow` twice in development.** React's strict mode runs every effect twice in a
 development build, so a fader shows, cancels and shows again, and the cancel does not take back the `onShow`

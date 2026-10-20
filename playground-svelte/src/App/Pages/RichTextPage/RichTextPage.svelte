@@ -4,9 +4,12 @@
     import {
     EXAMPLE_NAMES,
     EXAMPLES_ROOT,
+    DEPTH_STEP,
     FIELD_WIDTH,
+    MAX_DEPTH_KNOB,
     MAX_ROWS,
     MIN_ROWS,
+    NO_DEPTH_LIMIT,
     PREVIEW_WIDTH,
     STARTING_CONTENT,
 } from "@thewaver/ss-playground/App/Pages/RichTextPage/RichTextPage.const";
@@ -19,6 +22,7 @@
     import type { ExampleDefs } from "../../PageComponents/Examples/Examples.types";
     import PageExamples from "../../PageComponents/Examples/PageExamples.svelte";
     import PageCheckField from "../../PageComponents/Field/PageCheckField.svelte";
+    import PageNumberField from "../../PageComponents/Field/PageNumberField.svelte";
     import PageMeasureBox from "../../PageComponents/MeasureBox/MeasureBox.svelte";
     import PageProp from "../../PageComponents/Prop/Prop.svelte";
     import PagePropsPanel from "../../PageComponents/PropsPanel/PagePropsPanel.svelte";
@@ -34,6 +38,7 @@
 
     let content = $state(STARTING_CONTENT);
     let removeOtherTags = $state(RICH_TEXT_DEFAULTS.removeOtherTags);
+    let maxDepth = $state(NO_DEPTH_LIMIT);
 
     const examples: ExampleDefs[] = [
         {
@@ -108,7 +113,7 @@
     </TextArea>
 
     <PageMeasureBox width={PREVIEW_WIDTH} padding={MEASURE_BOX_PADDING}>
-        <CustomInputExample {content} {removeOtherTags} />
+        <CustomInputExample {content} {removeOtherTags} maxDepth={maxDepth === NO_DEPTH_LIMIT ? Infinity : maxDepth} />
     </PageMeasureBox>
 {/snippet}
 
@@ -125,6 +130,24 @@
                 ariaLabel={"Remove other tags"}
                 onChange={(value) => {
                     removeOtherTags = value;
+                }}
+            />
+        </PageProp>
+
+        <PageProp
+            itemKey={"maxDepth"}
+            controls={"Sets RichTextProps.maxDepth, with -1 sent as Infinity"}
+            label={"Max depth (-1 = no limit)"}
+            hint={"How deeply tags may nest. A tag deeper than this prints as typed, and 0 allows no tags."}
+        >
+            <PageNumberField
+                value={maxDepth}
+                min={NO_DEPTH_LIMIT}
+                max={MAX_DEPTH_KNOB}
+                step={DEPTH_STEP}
+                ariaLabel={"Max depth"}
+                onInput={(value) => {
+                    maxDepth = value;
                 }}
             />
         </PageProp>

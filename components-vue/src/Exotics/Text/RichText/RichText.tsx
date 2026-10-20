@@ -51,7 +51,11 @@ const renderNodes = (nodes: RichTextNode[], defs: RenderDefs): VNodeChild =>
 export const RichText = defineComponent(
     (props: RichTextProps, { slots }: SlotsContext<RichTextSlots>) => {
         const parsedTree = computed(() =>
-            RichTextUtils.parseContent(props.content, props.allowedAttributes ?? RICH_TEXT_DEFAULTS.allowedAttributes),
+            RichTextUtils.parseContent(
+                props.content,
+                props.allowedAttributes ?? RICH_TEXT_DEFAULTS.allowedAttributes,
+                props.maxDepth ?? RICH_TEXT_DEFAULTS.maxDepth,
+            ),
         );
 
         return () =>
@@ -68,6 +72,7 @@ export const RichText = defineComponent(
             content: null,
             removeOtherTags: Boolean,
             allowedAttributes: null,
+            maxDepth: null,
             computeClassNames: null,
         }),
     },

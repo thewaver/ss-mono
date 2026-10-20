@@ -3,11 +3,14 @@ import { useState } from "react";
 import { RICH_TEXT_DEFAULTS, TextArea } from "@thewaver/ss-components-react";
 import { MEASURE_BOX_PADDING } from "@thewaver/ss-playground/App/PageComponents/MeasureBox/MeasureBox.css";
 import {
+    DEPTH_STEP,
     EXAMPLES_ROOT,
     EXAMPLE_NAMES,
     FIELD_WIDTH,
+    MAX_DEPTH_KNOB,
     MAX_ROWS,
     MIN_ROWS,
+    NO_DEPTH_LIMIT,
     PREVIEW_WIDTH,
     STARTING_CONTENT,
 } from "@thewaver/ss-playground/App/Pages/RichTextPage/RichTextPage.const";
@@ -18,7 +21,7 @@ import {
 } from "@thewaver/ss-playground/App/StyledComponents/TextFieldContent/TextFieldContent.css";
 
 import { PageExamples } from "../../PageComponents/Examples/Examples";
-import { PageCheckField } from "../../PageComponents/Field/Field";
+import { PageCheckField, PageNumberField } from "../../PageComponents/Field/Field";
 import { PageMeasureBox } from "../../PageComponents/MeasureBox/MeasureBox";
 import { PageProp } from "../../PageComponents/Prop/Prop";
 import { PagePropsPanel } from "../../PageComponents/PropsPanel/PropsPanel";
@@ -36,6 +39,7 @@ import { LinksExample } from "./Examples/Links";
 export const RichTextPage = () => {
     const contentState = useState(STARTING_CONTENT);
     const [removeOtherTags, setRemoveOtherTags] = useState(RICH_TEXT_DEFAULTS.removeOtherTags);
+    const [maxDepth, setMaxDepth] = useState(NO_DEPTH_LIMIT);
 
     const examples = [
         {
@@ -87,7 +91,11 @@ export const RichTextPage = () => {
                     />
 
                     <PageMeasureBox width={PREVIEW_WIDTH} padding={MEASURE_BOX_PADDING}>
-                        <CustomInputExample content={contentState[0]} removeOtherTags={removeOtherTags} />
+                        <CustomInputExample
+                            content={contentState[0]}
+                            removeOtherTags={removeOtherTags}
+                            maxDepth={maxDepth === NO_DEPTH_LIMIT ? Infinity : maxDepth}
+                        />
                     </PageMeasureBox>
                 </>
             ),
@@ -110,6 +118,22 @@ export const RichTextPage = () => {
                         value={removeOtherTags}
                         ariaLabel={"Remove other tags"}
                         onChange={setRemoveOtherTags}
+                    />
+                </PageProp>
+
+                <PageProp
+                    itemKey={"maxDepth"}
+                    label={"Max depth (-1 = no limit)"}
+                    hint={"How deeply tags may nest. A tag deeper than this prints as typed, and 0 allows no tags."}
+                    controls={"Sets RichTextProps.maxDepth, with -1 sent as Infinity"}
+                >
+                    <PageNumberField
+                        value={maxDepth}
+                        min={NO_DEPTH_LIMIT}
+                        max={MAX_DEPTH_KNOB}
+                        step={DEPTH_STEP}
+                        ariaLabel={"Max depth"}
+                        onInput={setMaxDepth}
                     />
                 </PageProp>
             </PagePropsPanel>

@@ -76,7 +76,7 @@ export namespace ImageMosaicUtils {
             });
 
             for (const source of sources) {
-                if (requested.has(source.src) || store.get()[source.src]) continue;
+                if (requested.has(source.src) || Object.hasOwn(store.get(), source.src)) continue;
 
                 const image = new Image();
 
@@ -105,11 +105,12 @@ export namespace ImageMosaicUtils {
      * Each picture's size, in the order the sources were given, with a picture not yet measured at zero by zero.
      *
      * @param sources The pictures.
-     * @param sizeBySrc What the loader has learned so far.
+     * @param sizeBySrc What the loader has learned so far. Only a size stored under a source's own address counts, so
+     * an address such as `constructor` is not mistaken for one already measured.
      * @returns One size per source.
      */
     export const computeSizes = (sources: MosaicImageSource[], sizeBySrc: Record<string, Size2d>) =>
-        sources.map((source) => sizeBySrc[source.src] ?? EMPTY_SIZE);
+        sources.map((source) => (Object.hasOwn(sizeBySrc, source.src) ? sizeBySrc[source.src] : EMPTY_SIZE));
 
     /**
      * The target shape in the packer's axes.

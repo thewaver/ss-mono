@@ -4,11 +4,14 @@ import { shallowRef } from "vue";
 import { RICH_TEXT_DEFAULTS, TextArea } from "@thewaver/ss-components-vue";
 import { MEASURE_BOX_PADDING } from "@thewaver/ss-playground/App/PageComponents/MeasureBox/MeasureBox.css";
 import {
+    DEPTH_STEP,
     EXAMPLES_ROOT,
     EXAMPLE_NAMES,
     FIELD_WIDTH,
+    MAX_DEPTH_KNOB,
     MAX_ROWS,
     MIN_ROWS,
+    NO_DEPTH_LIMIT,
     PREVIEW_WIDTH,
     STARTING_CONTENT,
 } from "@thewaver/ss-playground/App/Pages/RichTextPage/RichTextPage.const";
@@ -21,6 +24,7 @@ import {
 import type { ExampleDefs } from "../../PageComponents/Examples/Examples.types";
 import PageExamples from "../../PageComponents/Examples/PageExamples.vue";
 import PageCheckField from "../../PageComponents/Field/PageCheckField.vue";
+import PageNumberField from "../../PageComponents/Field/PageNumberField.vue";
 import PageMeasureBox from "../../PageComponents/MeasureBox/MeasureBox.vue";
 import PageProp from "../../PageComponents/Prop/Prop.vue";
 import PagePropsPanel from "../../PageComponents/PropsPanel/PagePropsPanel.vue";
@@ -36,6 +40,7 @@ import LinksExample from "./Examples/Links.vue";
 
 const content = shallowRef(STARTING_CONTENT);
 const removeOtherTags = shallowRef(RICH_TEXT_DEFAULTS.removeOtherTags);
+const maxDepth = shallowRef(NO_DEPTH_LIMIT);
 
 const examples: ExampleDefs[] = [
     {
@@ -81,6 +86,22 @@ const examples: ExampleDefs[] = [
                     @change="(value: boolean) => (removeOtherTags = value)"
                 />
             </PageProp>
+
+            <PageProp
+                item-key="maxDepth"
+                controls="Sets RichTextProps.maxDepth, with -1 sent as Infinity"
+                label="Max depth (-1 = no limit)"
+                hint="How deeply tags may nest. A tag deeper than this prints as typed, and 0 allows no tags."
+            >
+                <PageNumberField
+                    :value="maxDepth"
+                    :min="NO_DEPTH_LIMIT"
+                    :max="MAX_DEPTH_KNOB"
+                    :step="DEPTH_STEP"
+                    ariaLabel="Max depth"
+                    @input="(value: number) => (maxDepth = value)"
+                />
+            </PageProp>
         </PagePropsPanel>
 
         <PageExamples :items="examples" layout="flow">
@@ -123,7 +144,11 @@ const examples: ExampleDefs[] = [
                 </TextArea>
 
                 <PageMeasureBox :width="PREVIEW_WIDTH" :padding="MEASURE_BOX_PADDING">
-                    <CustomInputExample :content="content" :remove-other-tags="removeOtherTags" />
+                    <CustomInputExample
+                        :content="content"
+                        :remove-other-tags="removeOtherTags"
+                        :max-depth="maxDepth === NO_DEPTH_LIMIT ? Infinity : maxDepth"
+                    />
                 </PageMeasureBox>
             </template>
         </PageExamples>

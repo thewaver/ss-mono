@@ -1,4 +1,4 @@
-import { describe, expect, it } from "vitest";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
 import { SlideButtonUtils } from "./SlideButton.utils";
 
@@ -65,5 +65,79 @@ describe("computeHoldRatio", () => {
 
     it("completes at once when no duration was asked for", () => {
         expect(SlideButtonUtils.computeHoldRatio(0, 0)).toBe(1);
+    });
+});
+
+describe("createGesture click", () => {
+    beforeEach(() => {
+        vi.useFakeTimers();
+        vi.stubGlobal("requestAnimationFrame", () => 1);
+        vi.stubGlobal("cancelAnimationFrame", () => undefined);
+    });
+
+    afterEach(() => {
+        vi.useRealTimers();
+        vi.unstubAllGlobals();
+    });
+
+    const createGesture = () => {
+        const onActivate = vi.fn();
+        let progressRatio = 0;
+
+        const gesture = SlideButtonUtils.createGesture({
+            getMode: () => "both",
+            getThumbSize: () => 40,
+            getHoldDurationMs: () => 1000,
+            getTrackWidth: () => 200,
+            getProgressRatio: () => progressRatio,
+            setProgressRatio: (ratio) => {
+                progressRatio = ratio;
+            },
+            onActivate,
+        });
+
+        return { gesture, onActivate };
+    };
+
+    it("activates on a click with no press behind it, as assistive technology sends one", () => {
+        const { gesture, onActivate } = createGesture();
+
+        gesture.click();
+
+        expect(onActivate).toHaveBeenCalledTimes(1);
+    });
+
+    it("ignores the click a key press produces, held or let go", () => {
+        const { gesture, onActivate } = createGesture();
+
+        gesture.pressKey("Enter", false);
+        gesture.click();
+        gesture.pressKey("Enter", true);
+        gesture.click();
+        gesture.releaseKey("Enter");
+        gesture.click();
+
+        expect(onActivate).not.toHaveBeenCalled();
+    });
+
+    it("ignores the click a pointer press produces, tapped or slid", () => {
+        const { gesture, onActivate } = createGesture();
+
+        gesture.drag(0.1);
+        gesture.dragEnd("release");
+        gesture.click();
+
+        expect(onActivate).not.toHaveBeenCalled();
+    });
+
+    it("takes a bare click again once the press before it has ended", () => {
+        const { gesture, onActivate } = createGesture();
+
+        gesture.pressKey(" ", false);
+        gesture.releaseKey(" ");
+        vi.runAllTimers();
+        gesture.click();
+
+        expect(onActivate).toHaveBeenCalledTimes(1);
     });
 });

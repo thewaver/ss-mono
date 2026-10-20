@@ -321,33 +321,36 @@ export const ListboxOptions = <T,>(props: ListboxOptionsProps<T>) => {
         );
     };
 
-    const renderWindowedOptions = () => (
-        <div
-            ref={sizerRef}
-            className={ListboxStyles.listboxSizer}
-            style={{ height: `${rowWindow.totalSize}px` }}
-            onPointerOver={(e) => handleOptionsPointerOver(e.target)}
-            onPointerLeave={handleOptionsPointerLeave}
-        >
-            {renderFloaters()}
+    const renderWindowedOptions = () =>
+        rowWindow.hasNoScroller ? (
+            <div ref={sizerRef}>{renderMountedOptions()}</div>
+        ) : (
+            <div
+                ref={sizerRef}
+                className={ListboxStyles.listboxSizer}
+                style={{ height: `${rowWindow.totalSize}px` }}
+                onPointerOver={(e) => handleOptionsPointerOver(e.target)}
+                onPointerLeave={handleOptionsPointerLeave}
+            >
+                {renderFloaters()}
 
-            {ListboxUtils.getWindowedRuns(rowWindow.rows, rows).flatMap((run) =>
-                run.group ? (
-                    <div key={`group-${run.groupIndex}`} role="group" aria-label={run.group.label}>
-                        {run.rows.map(renderWindowedRow)}
-                    </div>
-                ) : (
-                    run.rows.map(renderWindowedRow)
-                ),
-            )}
-        </div>
-    );
+                {ListboxUtils.getWindowedRuns(rowWindow.rows, rows).flatMap((run) =>
+                    run.group ? (
+                        <div key={`group-${run.groupIndex}`} role="group" aria-label={run.group.label}>
+                            {run.rows.map(renderWindowedRow)}
+                        </div>
+                    ) : (
+                        run.rows.map(renderWindowedRow)
+                    ),
+                )}
+            </div>
+        );
 
     return isVirtualized ? (
         <>
             {renderWindowedOptions()}
 
-            {renderEndMarker()}
+            {!rowWindow.hasNoScroller && renderEndMarker()}
         </>
     ) : (
         renderMountedOptions()

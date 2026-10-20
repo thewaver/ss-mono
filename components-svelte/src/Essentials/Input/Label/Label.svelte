@@ -10,9 +10,20 @@
     const labelId = $props.id();
     const isNested = context.getIsLabeled();
 
+    let registeredControlId = $state<string>();
+
     setLabelContext({
         getIsLabeled: () => true,
         getLabelId: () => (isNested ? context.getLabelId() : labelId),
+        setControlId: (id) => {
+            if (isNested) {
+                context.setControlId(id);
+
+                return;
+            }
+
+            registeredControlId = id;
+        },
     });
 
     const orientation = $derived(props.orientation ?? LABEL_DEFAULTS.orientation);
@@ -21,6 +32,7 @@
 <svelte:element
     this={isNested ? "div" : "label"}
     id={isNested ? undefined : labelId}
+    for={isNested ? undefined : (props.for ?? registeredControlId)}
     class={styles.labelRoot}
     style:flex-direction={orientation === "horizontal" ? "row" : "column"}
     style:gap={`${props.gap ?? LABEL_DEFAULTS.gap}px`}

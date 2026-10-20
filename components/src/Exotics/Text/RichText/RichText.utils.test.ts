@@ -186,6 +186,96 @@ describe("parseContent with attributes", () => {
     });
 });
 
+describe("parseContent on adversarial input", () => {
+    const DEPTH = 20000;
+
+    const bestTimeOf = (input: string) => {
+        let best = Infinity;
+
+        for (let run = 0; run < 3; run++) {
+            const startedAt = performance.now();
+
+            RichTextUtils.parseContent(input);
+
+            best = Math.min(best, performance.now() - startedAt);
+        }
+
+        return best;
+    };
+
+    it("parses tags nested deeper than any call stack without throwing", () => {
+        const unclosed = "[a]".repeat(DEPTH);
+
+        expect(RichTextUtils.parseContent(unclosed)).toEqual([text(unclosed)]);
+    });
+
+    it("writes back a deeply nested closed tree inside an unclosed tag", () => {
+        const input = `[x]${"[a]".repeat(DEPTH)}${"[/a]".repeat(DEPTH)}`;
+
+        expect(RichTextUtils.parseContent(input)).toEqual([text(input)]);
+    });
+
+    it("takes about four times as long for four times the unmatched closing tags, not sixteen", () => {
+        const build = (count: number) => `${"[a]".repeat(count)}${"[/b]".repeat(count)}`;
+        const ratio = bestTimeOf(build(40000)) / bestTimeOf(build(10000));
+
+        expect(ratio).toBeLessThan(10);
+    });
+
+    it("turns every closing tag with nothing open into text", () => {
+        const input = `[a]${"[/b]".repeat(3)}`;
+
+        expect(RichTextUtils.parseContent(input)).toEqual([text(input)]);
+    });
+
+    it("still closes a tag whose name was open, then forgets it", () => {
+        expect(RichTextUtils.parseContent("[a][/a][/a]")).toEqual([tag("a", []), text("[/a]")]);
+        expect(RichTextUtils.parseContent("[a][b][/a][/b]")).toEqual([tag("a", []), text("[/b]")]);
+    });
+});
+
+describe("parseContent with a depth limit", () => {
+    const NESTED = "[a][b]x[/b][/a]";
+    const FULL = [tag("a", [tag("b", [text("x")])])];
+
+    it("allows no tags at all at a depth of 0", () => {
+        expect(RichTextUtils.parseContent(NESTED, {}, 0)).toEqual([
+            text("[a]"),
+            text("[b]"),
+            text("x"),
+            text("[/b]"),
+            text("[/a]"),
+        ]);
+    });
+
+    it("allows only top-level tags at a depth of 1, the deeper ones becoming text with their closing tags", () => {
+        expect(RichTextUtils.parseContent(NESTED, {}, 1)).toEqual([tag("a", [text("[b]"), text("x"), text("[/b]")])]);
+    });
+
+    it("allows two levels at a depth of 2, which is all this nests", () => {
+        expect(RichTextUtils.parseContent(NESTED, {}, 2)).toEqual(FULL);
+    });
+
+    it("allows siblings at the limit, since the depth is how deep and not how many", () => {
+        expect(RichTextUtils.parseContent("[a]x[/a][a]y[/a]", {}, 1)).toEqual([
+            tag("a", [text("x")]),
+            tag("a", [text("y")]),
+        ]);
+    });
+
+    it("has no limit when left out", () => {
+        expect(RichTextUtils.parseContent(NESTED, {}, undefined)).toEqual(FULL);
+        expect(RichTextUtils.parseContent(NESTED)).toEqual(FULL);
+    });
+
+    it("writes a run of unclosed tags back as typed whatever the limit", () => {
+        const input = "[a]".repeat(5);
+
+        expect(RichTextUtils.parseContent(input, {}, 1)).toEqual([text(input)]);
+        expect(RichTextUtils.parseContent(input, {}, 0)).toEqual(Array.from({ length: 5 }, () => text("[a]")));
+    });
+});
+
 describe("getTagTreatment", () => {
     const classMap = { b: "bold", empty: "" };
 

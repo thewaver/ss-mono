@@ -6,6 +6,7 @@ import {
     type ReactNode,
     useEffect,
     useId,
+    useLayoutEffect,
     useMemo,
     useRef,
     useState,
@@ -125,6 +126,7 @@ export const Table = <T,>(props: TableProps<T>) => {
     const bodyRef = useRef<HTMLDivElement | null>(null);
     const resizeStartRef = useRef({ x: 0, width: 0, hasDragged: false });
     const hasCarriedClickRef = useRef(false);
+    const pendingFocusIdRef = useRef<string | undefined>(undefined);
 
     const [focusedCell, setFocusedCell] = useState<Index2d>({ row: TableConst.HEADER_ROW_INDEX, col: 0 });
     const [hoveredRow, setHoveredRow] = useState<number>();
@@ -178,6 +180,8 @@ export const Table = <T,>(props: TableProps<T>) => {
         pinnedRows,
     });
 
+    const isWindowed = isVirtualized && !rowWindow.hasNoScroller;
+
     const getCellId = (cell: Index2d) => TableUtils.getCellId(tableId, cell);
 
     const getIsRoving = (cell: Index2d) => rovingCell.row === cell.row && rovingCell.col === cell.col;
@@ -187,8 +191,27 @@ export const Table = <T,>(props: TableProps<T>) => {
 
         if (cell.row > TableConst.HEADER_ROW_INDEX && rowWindow.isLive) rowWindow.scrollToRow(cell.row - 1);
 
-        document.getElementById(getCellId(cell))?.focus();
+        const id = getCellId(cell);
+        const element = document.getElementById(id);
+
+        if (element) {
+            element.focus();
+
+            return;
+        }
+
+        pendingFocusIdRef.current = id;
     };
+
+    useLayoutEffect(() => {
+        const id = pendingFocusIdRef.current;
+        const element = id === undefined ? undefined : document.getElementById(id);
+
+        if (!element) return;
+
+        pendingFocusIdRef.current = undefined;
+        element.focus();
+    });
 
     const toggleSort = (column: TableColumn<T> | undefined) => {
         if (!column || column.isSortable !== true || isDisabled) return;
@@ -632,9 +655,9 @@ export const Table = <T,>(props: TableProps<T>) => {
                 ref={bodyRef}
                 className={TableStyles.tableBody}
                 role="rowgroup"
-                style={{ height: isVirtualized ? `${rowWindow.totalSize}px` : undefined }}
+                style={{ height: isWindowed ? `${rowWindow.totalSize}px` : undefined }}
             >
-                {isVirtualized
+                {isWindowed
                     ? rowWindow.rows.map((virtualRow) =>
                           renderRow(rows[virtualRow.index], virtualRow.index, virtualRow),
                       )

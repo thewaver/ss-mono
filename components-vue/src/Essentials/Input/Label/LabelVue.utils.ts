@@ -1,4 +1,4 @@
-import { type MaybeRefOrGetter, computed, toValue } from "vue";
+import { type MaybeRefOrGetter, computed, onUnmounted, toValue, watch } from "vue";
 
 import { LabelUtils } from "@thewaver/ss-components";
 
@@ -27,5 +27,30 @@ export namespace LabelVueUtils {
         );
 
         return computed(() => LabelUtils.resolveAriaLabel(labelContext.getIsLabeled(), toValue(ariaLabel)));
+    };
+
+    /**
+     * Tells the nearest `Label` which element its caption names, for a control whose real one is not the first thing
+     * it draws.
+     *
+     * A label that only wraps names the first control inside it, so a control that draws buttons before its input —
+     * `TagInput`'s remove buttons — would have its caption name a button, and a click on the caption press it. The
+     * label points at the id given here instead, unless the consumer gave it a `for` of their own. Outside a `Label`
+     * it does nothing, and the id is withdrawn when the control unmounts.
+     *
+     * Must run inside a component's `setup`.
+     *
+     * @param id The id of the element the caption should name.
+     */
+    export const useControlId = (id: MaybeRefOrGetter<string | undefined>) => {
+        const labelContext = useLabelContext();
+
+        watch(
+            () => toValue(id),
+            (next) => labelContext.setControlId(next),
+            { immediate: true },
+        );
+
+        onUnmounted(() => labelContext.setControlId(undefined));
     };
 }

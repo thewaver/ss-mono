@@ -14,7 +14,7 @@ purpose: it answers "what is outstanding", and neither of them is.
 | [Missing components](#missing-components)               |     3 |
 | [Blockers and known issues](#blockers-and-known-issues) |    27 |
 | [Deliberately not built](#deliberately-not-built)       |    27 |
-| [Accessibility gaps](#accessibility-gaps)               |     8 |
+| [Accessibility gaps](#accessibility-gaps)               |     9 |
 | [Planned projects](#planned-projects)                   |     5 |
 
 ---
@@ -112,6 +112,7 @@ They cluster, and no single item owns them.
 | 18  | **`OverheadWheel`** | The same again for the hub's control, with the same promise unmade                                                                                  |
 | 13  | **`SlideButton`**   | A fixed hold duration is itself an assumption about dexterity, in a control that exists partly to avoid one                                         |
 | 26  | **`CardStack`**     | A card is sent by a swipe, and the library ships no pointer route that is neither a gesture nor a drag — the consumer's buttons are the only answer |
+| 33  | **Playground**      | In Windows high-contrast mode, painters drawn only in background colors vanish — Range's track and fill go white on white                           |
 
 ## Planned projects
 

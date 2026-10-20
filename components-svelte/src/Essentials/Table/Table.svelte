@@ -1,4 +1,5 @@
 <script lang="ts" generics="T">
+    import { untrack } from "svelte";
     import { on } from "svelte/events";
 
     import {
@@ -58,6 +59,7 @@
 
     let resizeStart = { x: 0, width: 0, hasDragged: false };
     let hasCarriedClick = false;
+    let pendingFocusId: string | undefined;
 
     $effect(() => {
         LiveAnnouncerUtils.reserve("polite");
@@ -110,6 +112,8 @@
         },
     );
 
+    const isWindowed = $derived(isVirtualized && !rowWindow.getHasNoScroller());
+
     const getCellId = (cell: Index2d) => TableUtils.getCellId(tableId, cell);
 
     const getIsRoving = (cell: Index2d) => rovingCell.row === cell.row && rovingCell.col === cell.col;
@@ -119,8 +123,32 @@
 
         if (cell.row > HEADER_ROW_INDEX && rowWindow.getIsLive()) rowWindow.scrollToRow(cell.row - 1);
 
-        document.getElementById(getCellId(cell))?.focus();
+        const id = getCellId(cell);
+        const element = document.getElementById(id);
+
+        if (element) {
+            element.focus();
+
+            return;
+        }
+
+        pendingFocusId = id;
     };
+
+    $effect(() => {
+        rowWindow.getRows();
+        rows;
+        focusedCell;
+
+        untrack(() => {
+            const element = pendingFocusId === undefined ? undefined : document.getElementById(pendingFocusId);
+
+            if (!element) return;
+
+            pendingFocusId = undefined;
+            element.focus();
+        });
+    });
 
     const toggleSort = (column: TableColumn<T> | undefined) => {
         if (!column || column.isSortable !== true || isDisabled) return;
@@ -568,9 +596,9 @@
         bind:this={body}
         class={styles.tableBody}
         role="rowgroup"
-        style:height={isVirtualized ? `${rowWindow.getTotalSize()}px` : undefined}
+        style:height={isWindowed ? `${rowWindow.getTotalSize()}px` : undefined}
     >
-        {#if isVirtualized}
+        {#if isWindowed}
             {#each rowWindow.getRows() as virtualRow (virtualRow.index)}
                 {@render tableRow(rows[virtualRow.index], virtualRow.index, virtualRow)}
             {/each}

@@ -1,4 +1,4 @@
-import { type KeyboardEvent, useCallback, useRef } from "react";
+import { type KeyboardEvent, useCallback, useId, useRef } from "react";
 
 import {
     TAG_INPUT_DEFAULTS,
@@ -55,7 +55,11 @@ export const TagInput = (props: TagInputProps) => {
     const fieldRef = useRef<HTMLInputElement | null>(null);
     const tagRefs = useRef<(HTMLButtonElement | null)[]>([]);
 
+    const fallbackId = useId();
+    const fieldId = props.id ?? fallbackId;
+
     FormFieldReactUtils.useRegisterControl(fieldRef);
+    LabelReactUtils.useControlId(fieldId);
 
     const direction = NavigatorReactUtils.useDirection(fieldRef);
 
@@ -183,7 +187,7 @@ export const TagInput = (props: TagInputProps) => {
                         <TagInputFieldElement
                             ref={setElementRef}
                             fieldRef={fieldRef}
-                            id={props.id}
+                            id={fieldId}
                             name={props.name}
                             style={props.computeTextStyle?.(flags)}
                             value={text}

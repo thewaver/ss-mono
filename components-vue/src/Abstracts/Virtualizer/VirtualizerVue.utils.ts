@@ -64,8 +64,12 @@ export namespace VirtualizerVueUtils {
      *
      * The list does not have to start at the top of its scroller, so the distance between the two is measured and
      * taken off every position — through the scroller's own scale, so it holds under a CSS transform. With no
-     * scrolling ancestor or with virtualizing switched off, `isLive` is `false` and the caller should draw the whole
-     * list.
+     * scrolling ancestor or with virtualizing switched off, `isLive` is `false`.
+     *
+     * `isLive` is also `false` before the scroller has been looked for, so it cannot decide whether to draw the whole
+     * list: a long list would mount every row and then drop them. `hasNoScroller` is the signal for that — `true`
+     * only once the search has run for the current element and found nothing, which is when the caller should draw
+     * every row.
      *
      * The window takes up its scroller, and reads the scroller's height, only once a render has been written, as
      * React's row window does in a layout effect: read any earlier and the height is the one from before the spacer
@@ -80,7 +84,7 @@ export namespace VirtualizerVueUtils {
      * @param opts.computeEstimatedSize A row's likely height, used before it has been measured.
      * @param opts.pinnedRows Rows to keep drawn wherever the scroll is.
      * @param opts.overscan How many extra rows to draw beyond the visible ones.
-     * @returns Refs of `isLive`, `rows` and `totalSize` for what to draw and how tall to make the spacer;
+     * @returns Refs of `isLive`, `hasNoScroller`, `rows` and `totalSize` for what to draw and how tall to make the spacer;
      * `getRowStart` for a row's position, `measureRow(index)`, a function ref for that row's element so its real
      * height is learned, and `scrollToRow`.
      */
@@ -96,7 +100,12 @@ export namespace VirtualizerVueUtils {
     ) => {
         const getIsDisabled = () => toValue(opts.isDisabled) ?? false;
         const scrollParent = useScrollParent(ref, getIsDisabled);
+        const searchedElement = shallowRef<HTMLElement>();
         const scrollMargin = shallowRef(0);
+
+        watchAfterRender([() => toValue(ref), getIsDisabled], ([element, isOff]) => {
+            searchedElement.value = isOff ? undefined : (element ?? undefined);
+        });
         const measured = new WeakMap<Element, number>();
 
         watchAfterRender([() => toValue(ref), scrollParent], ([element, scroller]) => {
@@ -172,6 +181,16 @@ export namespace VirtualizerVueUtils {
 
         return {
             isLive: computed(() => !getIsDisabled() && isFollowing.value),
+            hasNoScroller: computed(() => {
+                const element = toValue(ref) ?? undefined;
+
+                return (
+                    !getIsDisabled() &&
+                    element !== undefined &&
+                    searchedElement.value === element &&
+                    scrollParent.value === undefined
+                );
+            }),
             rows: computed(() => (getIsDisabled() ? VirtualizerConst.NO_ROWS : rows.value)),
             totalSize: computed(() => (getIsDisabled() ? 0 : totalSize.value)),
             getRowStart: (row: VirtualizerRow) => row.start - scrollMargin.value,

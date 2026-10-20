@@ -49,8 +49,12 @@ export namespace VirtualizerReactUtils {
      *
      * The list does not have to start at the top of its scroller, so the distance between the two is measured and
      * taken off every position — through the scroller's own scale, so it holds under a CSS transform. With no
-     * scrolling ancestor or with virtualizing switched off, `isLive` is `false` and the caller should draw the whole
-     * list.
+     * scrolling ancestor or with virtualizing switched off, `isLive` is `false`.
+     *
+     * `isLive` is also `false` for the first frames, before the scroller has been looked for, so it cannot decide
+     * whether to draw the whole list: a long list would mount every row and then drop them. `hasNoScroller` is the
+     * signal for that — `true` only once the search has run for the current element and found nothing, which is
+     * when the caller should draw every row.
      *
      * @param ref The list's own element.
      * @param count How many rows there are.
@@ -58,7 +62,7 @@ export namespace VirtualizerReactUtils {
      * @param opts.computeEstimatedSize A row's likely height, used before it has been measured.
      * @param opts.pinnedRows Rows to keep drawn wherever the scroll is.
      * @param opts.overscan How many extra rows to draw beyond the visible ones.
-     * @returns `isLive`, `rows` and `totalSize` for what to draw and how tall to make the spacer, `getRowStart` for a
+     * @returns `isLive`, `hasNoScroller`, `rows` and `totalSize` for what to draw and how tall to make the spacer, `getRowStart` for a
      * row's position, `measureRow(index)`, a ref callback for that row's element so its real height is learned, and
      * `scrollToRow`.
      */
@@ -75,7 +79,12 @@ export namespace VirtualizerReactUtils {
         const isDisabled = opts.isDisabled ?? false;
         const element = useElement(ref);
         const scrollParent = useScrollParent(ref, isDisabled);
+        const [searchedElement, setSearchedElement] = useState<HTMLElement>();
         const [scrollMargin, setScrollMargin] = useState(0);
+
+        useLayoutEffect(() => {
+            setSearchedElement(isDisabled ? undefined : element);
+        }, [element, isDisabled]);
         const [, rerender] = useReducer((tick: number) => tick + 1, 0);
 
         useLayoutEffect(() => {
@@ -142,6 +151,8 @@ export namespace VirtualizerReactUtils {
 
         return {
             isLive: !isDisabled && scrollParent !== undefined,
+            hasNoScroller:
+                !isDisabled && element !== undefined && searchedElement === element && scrollParent === undefined,
             rows,
             totalSize: isDisabled ? 0 : virtualizer.getTotalSize(),
             getRowStart: (row: VirtualizerRow) => row.start - scrollMargin,

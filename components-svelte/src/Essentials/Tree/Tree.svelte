@@ -66,7 +66,8 @@
         { isBeforeRender: true },
     );
 
-    const rows = $derived(TreeUtils.getVisibleRows(props.nodes, (entry) => getExpanded()?.includes(entry) ?? false));
+    const expandedSet = $derived(new Set(getExpanded()));
+    const rows = $derived(TreeUtils.getVisibleRows(props.nodes, (entry) => expandedSet.has(entry)));
     const flatRows = $derived(FlattenerUtils.getFlatRows(rows));
     const navigableRows = $derived(flatRows.filter(TreeUtils.computeIsNavigable));
 
@@ -380,25 +381,33 @@
 
 {#snippet tiers()}
     {#if isVirtualized}
-        <div bind:this={sizer} class={styles.treeSizer} style:height={`${rowWindow.getTotalSize()}px`}>
+        <div
+            bind:this={sizer}
+            class={rowWindow.getHasNoScroller() ? undefined : styles.treeSizer}
+            style:height={rowWindow.getHasNoScroller() ? undefined : `${rowWindow.getTotalSize()}px`}
+        >
             {@render floaters()}
 
-            {#each rowWindow.getRows() as windowRow (windowRow.index)}
-                {@const row = flatRows[windowRow.index]}
-                {#if row}
-                    <div
-                        {@attach rowWindow.measureRow(windowRow.index)}
-                        class={styles.treeSizerRow}
-                        style:transform={`translateY(${rowWindow.getRowStart(windowRow)}px)`}
-                    >
-                        {@render renderRow(row)}
+            {#if rowWindow.getHasNoScroller()}
+                {@render renderRows(rows)}
+            {:else}
+                {#each rowWindow.getRows() as windowRow (windowRow.index)}
+                    {@const row = flatRows[windowRow.index]}
+                    {#if row}
+                        <div
+                            {@attach rowWindow.measureRow(windowRow.index)}
+                            class={styles.treeSizerRow}
+                            style:transform={`translateY(${rowWindow.getRowStart(windowRow)}px)`}
+                        >
+                            {@render renderRow(row)}
 
-                        {#if hasPendingPaint(row)}
-                            {@render props.renderPendingChildren?.(row.node, row.depth + 1)}
-                        {/if}
-                    </div>
-                {/if}
-            {/each}
+                            {#if hasPendingPaint(row)}
+                                {@render props.renderPendingChildren?.(row.node, row.depth + 1)}
+                            {/if}
+                        </div>
+                    {/if}
+                {/each}
+            {/if}
         </div>
     {:else}
         {#if !layout}

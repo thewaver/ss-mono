@@ -76,6 +76,11 @@
         gesture.pressKey(e.key, e.repeat);
     }}
     onkeyup={(e) => gesture.releaseKey(e.key)}
+    onclick={() => {
+        if (isDisabled) return;
+
+        gesture.click();
+    }}
     onblur={() => gesture.stopHold()}
     onmouseenter={(e) => {
         if (isDisabled) return;

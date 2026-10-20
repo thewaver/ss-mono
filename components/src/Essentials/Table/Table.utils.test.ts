@@ -142,6 +142,29 @@ describe("getColumnTrack", () => {
     });
 });
 
+describe("getColumnWidth", () => {
+    it.each(["constructor", "toString", "__proto__"])(
+        "never reads something inherited for a column called %s",
+        (id) => {
+            const column: TableColumn<Person> = { id, header: id };
+
+            expect(TableUtils.getColumnWidth(column, {})).toBeUndefined();
+            expect(TableUtils.getColumnWidth({ ...column, widthPx: 90 }, {})).toBe(90);
+            expect(TableUtils.getColumnTrack(column, {})).toBe("minmax(0px, 1fr)");
+        },
+    );
+
+    it.each(["constructor", "toString", "__proto__"])("still honors a width stored under the id %s", (id) => {
+        const column: TableColumn<Person> = { id, header: id, widthPx: 90 };
+        const widths: Record<string, number> = {};
+
+        Object.defineProperty(widths, id, { value: 150, enumerable: true });
+
+        expect(TableUtils.getColumnWidth(column, widths)).toBe(150);
+        expect(TableUtils.getColumnTrack(column, widths)).toBe("150px");
+    });
+});
+
 describe("getColumnTemplate", () => {
     it("joins one track per column in the order the columns were given", () => {
         expect(TableUtils.getColumnTemplate([SIZED, NAME], { sized: 90 })).toBe("90px minmax(0px, 1fr)");

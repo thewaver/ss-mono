@@ -1,4 +1,4 @@
-import { createMemo, createUniqueId } from "solid-js";
+import { createMemo, createSignal, createUniqueId } from "solid-js";
 import { Dynamic } from "solid-js/web";
 
 import { LABEL_DEFAULTS, type LabelContextType, LabelStyles as styles } from "@thewaver/ss-components";
@@ -12,9 +12,12 @@ export const Label = (props: LabelProps) => {
 
     const labelId = createUniqueId();
 
+    const [getRegisteredControlId, setRegisteredControlId] = createSignal<string>();
+
     const innerContext: LabelContextType = {
         getIsLabeled: () => true,
         getLabelId: () => (context.getIsLabeled() ? context.getLabelId() : labelId),
+        setControlId: (id) => (context.getIsLabeled() ? context.setControlId(id) : setRegisteredControlId(id)),
     };
 
     const getOrientation = createMemo(() => access(props.orientation) ?? LABEL_DEFAULTS.orientation);
@@ -23,6 +26,7 @@ export const Label = (props: LabelProps) => {
         <Dynamic
             component={context.getIsLabeled() ? "div" : "label"}
             id={context.getIsLabeled() ? undefined : labelId}
+            for={context.getIsLabeled() ? undefined : (access(props.for) ?? getRegisteredControlId())}
             class={styles.labelRoot}
             style={{
                 "flex-direction": getOrientation() === "horizontal" ? "row" : "column",

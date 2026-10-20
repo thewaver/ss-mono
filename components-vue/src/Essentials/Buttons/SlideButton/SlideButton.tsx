@@ -89,6 +89,11 @@ const SlideButtonElement = defineComponent(
                         gesture.pressKey(e.key, e.repeat);
                     }}
                     onKeyup={(e) => gesture.releaseKey(e.key)}
+                    onClick={() => {
+                        if (isDisabled) return;
+
+                        gesture.click();
+                    }}
                     onBlur={() => gesture.stopHold()}
                     onMouseenter={(e) => {
                         if (isDisabled) return;

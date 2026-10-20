@@ -275,30 +275,7 @@
     {/if}
 {/snippet}
 
-{#if isVirtualized}
-    <div
-        bind:this={sizer}
-        {@attach attachHoverWatch}
-        class={styles.listboxSizer}
-        style:height={`${rowWindow.getTotalSize()}px`}
-    >
-        {@render floaters()}
-
-        {#each windowedEntries as entry ("rows" in entry ? `group-${entry.groupIndex}` : entry.index)}
-            {#if "rows" in entry}
-                <div role="group" aria-label={entry.group?.label}>
-                    {#each entry.rows as row (row.index)}
-                        {@render windowedRow(row)}
-                    {/each}
-                </div>
-            {:else}
-                {@render windowedRow(entry)}
-            {/if}
-        {/each}
-    </div>
-
-    {@render endMarkerView()}
-{:else}
+{#snippet mountedOptions()}
     <div
         bind:this={optionsWrapper}
         {@attach attachHoverWatch}
@@ -323,4 +300,37 @@
 
         {@render endMarkerView()}
     </div>
+{/snippet}
+
+{#if isVirtualized}
+    <div
+        bind:this={sizer}
+        {@attach !rowWindow.getHasNoScroller() && attachHoverWatch}
+        class={rowWindow.getHasNoScroller() ? undefined : styles.listboxSizer}
+        style:height={rowWindow.getHasNoScroller() ? undefined : `${rowWindow.getTotalSize()}px`}
+    >
+        {#if rowWindow.getHasNoScroller()}
+            {@render mountedOptions()}
+        {:else}
+            {@render floaters()}
+
+            {#each windowedEntries as entry ("rows" in entry ? `group-${entry.groupIndex}` : entry.index)}
+                {#if "rows" in entry}
+                    <div role="group" aria-label={entry.group?.label}>
+                        {#each entry.rows as row (row.index)}
+                            {@render windowedRow(row)}
+                        {/each}
+                    </div>
+                {:else}
+                    {@render windowedRow(entry)}
+                {/if}
+            {/each}
+        {/if}
+    </div>
+
+    {#if !rowWindow.getHasNoScroller()}
+        {@render endMarkerView()}
+    {/if}
+{:else}
+    {@render mountedOptions()}
 {/if}

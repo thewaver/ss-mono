@@ -1,4 +1,4 @@
-import { type SlotsType, defineComponent, useId } from "vue";
+import { type SlotsType, defineComponent, shallowRef, useId } from "vue";
 
 import { LABEL_DEFAULTS, LabelStyles } from "@thewaver/ss-components";
 
@@ -12,10 +12,20 @@ export const Label = defineComponent(
         const context = useLabelContext();
         const labelId = useId();
         const isNested = context.getIsLabeled();
+        const registeredControlId = shallowRef<string>();
 
         provideLabelContext({
             getIsLabeled: () => true,
             getLabelId: () => (isNested ? context.getLabelId() : labelId),
+            setControlId: (id) => {
+                if (isNested) {
+                    context.setControlId(id);
+
+                    return;
+                }
+
+                registeredControlId.value = id;
+            },
         });
 
         return () => {
@@ -25,6 +35,7 @@ export const Label = defineComponent(
             return (
                 <Element
                     id={isNested ? undefined : labelId}
+                    for={isNested ? undefined : (props.for ?? registeredControlId.value)}
                     class={LabelStyles.labelRoot}
                     style={{
                         flexDirection: orientation === "horizontal" ? "row" : "column",
@@ -39,6 +50,6 @@ export const Label = defineComponent(
     {
         name: "Label",
         slots: Object as SlotsType<LabelSlots>,
-        props: declareProps<LabelProps>({ orientation: null, gap: null }),
+        props: declareProps<LabelProps>({ orientation: null, gap: null, for: null }),
     },
 );

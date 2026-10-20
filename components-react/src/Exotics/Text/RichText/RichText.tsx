@@ -43,10 +43,11 @@ const renderNodes = (nodes: RichTextNode[], defs: RenderDefs): ReactNode =>
 
 export const RichText = (props: RichTextProps) => {
     const allowedAttributes = props.allowedAttributes ?? RICH_TEXT_DEFAULTS.allowedAttributes;
+    const maxDepth = props.maxDepth ?? RICH_TEXT_DEFAULTS.maxDepth;
 
     const parsedTree = useMemo(
-        () => RichTextUtils.parseContent(props.content, allowedAttributes),
-        [props.content, allowedAttributes],
+        () => RichTextUtils.parseContent(props.content, allowedAttributes, maxDepth),
+        [props.content, allowedAttributes, maxDepth],
     );
 
     return renderNodes(parsedTree, {

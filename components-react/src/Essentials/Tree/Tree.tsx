@@ -110,7 +110,11 @@ export const Tree = <T,>(props: TreeProps<T>) => {
 
     const nodes = props.nodes;
 
-    const rows = useMemo(() => TreeUtils.getVisibleRows(nodes, (entry) => expanded.includes(entry)), [nodes, expanded]);
+    const expandedSet = useMemo(() => new Set(expanded), [expanded]);
+    const rows = useMemo(
+        () => TreeUtils.getVisibleRows(nodes, (entry) => expandedSet.has(entry)),
+        [nodes, expandedSet],
+    );
     const flatRows = useMemo(() => FlattenerUtils.getFlatRows(rows), [rows]);
     const navigableRows = useMemo(() => flatRows.filter(TreeUtils.computeIsNavigable), [flatRows]);
 
@@ -402,27 +406,33 @@ export const Tree = <T,>(props: TreeProps<T>) => {
         ));
 
     const renderWindowedRows = () => (
-        <div ref={sizerRef} className={TreeStyles.treeSizer} style={{ height: `${rowWindow.totalSize}px` }}>
+        <div
+            ref={sizerRef}
+            className={rowWindow.hasNoScroller ? undefined : TreeStyles.treeSizer}
+            style={rowWindow.hasNoScroller ? undefined : { height: `${rowWindow.totalSize}px` }}
+        >
             {renderFloaters()}
 
-            {rowWindow.rows.map((windowRow) => {
-                const row = flatRows[windowRow.index];
+            {rowWindow.hasNoScroller
+                ? renderRows(rows)
+                : rowWindow.rows.map((windowRow) => {
+                      const row = flatRows[windowRow.index];
 
-                if (!row) return null;
+                      if (!row) return null;
 
-                return (
-                    <div
-                        key={windowRow.index}
-                        className={TreeStyles.treeSizerRow}
-                        style={{ transform: `translateY(${rowWindow.getRowStart(windowRow)}px)` }}
-                        ref={rowWindow.measureRow(windowRow.index)}
-                    >
-                        {renderRow(row)}
+                      return (
+                          <div
+                              key={windowRow.index}
+                              className={TreeStyles.treeSizerRow}
+                              style={{ transform: `translateY(${rowWindow.getRowStart(windowRow)}px)` }}
+                              ref={rowWindow.measureRow(windowRow.index)}
+                          >
+                              {renderRow(row)}
 
-                        {hasPendingPaint(row) && props.renderPendingChildren?.(row.node, row.depth + 1)}
-                    </div>
-                );
-            })}
+                              {hasPendingPaint(row) && props.renderPendingChildren?.(row.node, row.depth + 1)}
+                          </div>
+                      );
+                  })}
         </div>
     );
 

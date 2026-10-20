@@ -6,10 +6,27 @@ const ATTRIBUTE_RE = /([a-z_][a-z0-9_]*)="((?:[^"\\]|\\[\s\S])*)"/gi;
 const ESCAPE_RE = /\\(["\\])/g;
 
 /** Writes a node back out as the markup it came from, for a tag that turned out never to be closed. */
-const stringifyNode = (node: RichTextNode): string =>
-    node.type === "text"
-        ? node.content
-        : `${node.openingMarkup}${node.children.map(stringifyNode).join("")}[/${node.tag}]`;
+const stringifyNode = (node: RichTextNode) => {
+    const parts: string[] = [];
+    const pending: (RichTextNode | string)[] = [node];
+
+    while (pending.length > 0) {
+        const item = pending.pop()!;
+
+        if (typeof item === "string") {
+            parts.push(item);
+        } else if (item.type === "text") {
+            parts.push(item.content);
+        } else {
+            parts.push(item.openingMarkup);
+            pending.push(`[/${item.tag}]`);
+
+            for (let i = item.children.length - 1; i >= 0; i--) pending.push(item.children[i]);
+        }
+    }
+
+    return parts.join("");
+};
 
 /** Reads the attributes after a tag's name, or refuses the tag when one is not allowed or appears twice. */
 const readAttributes = (source: string, tag: string, allowedAttributes: RichTextAllowedAttributes) => {
@@ -51,20 +68,31 @@ export namespace RichTextUtils {
      * tag carrying an attribute its tag does not allow, or the same attribute twice, is text, and its closing tag
      * is then left with nothing to close. Closing tags carry no attributes.
      *
+     * The time taken grows in step with the length of the input, however deeply it nests or however many closing
+     * tags have nothing to close, and no depth of nesting overflows the call stack.
+     *
      * @param input The markup.
      * @param allowedAttributes Which attribute names each tag name accepts. Both are matched
      * case-sensitively. Left out, no tag takes attributes.
+     * @param maxDepth How deeply tags may nest, a tag at the top level sitting at depth `1`. An opening tag that
+     * would sit deeper is text, exactly like one with an attribute its tag does not allow, and its closing tag is
+     * then left with nothing to close. `0` therefore allows no tags at all. Left out, there is no limit.
      * @returns The nodes, each either a run of text or a tag with its attributes, the opening markup as
      * it was typed, and children of its own. Which tags mean anything is the caller's business; this only
      * reads the structure.
      */
-    export const parseContent = (input: string, allowedAttributes: RichTextAllowedAttributes = {}): RichTextNode[] => {
+    export const parseContent = (
+        input: string,
+        allowedAttributes: RichTextAllowedAttributes = {},
+        maxDepth?: number,
+    ): RichTextNode[] => {
         const stack: {
             tag: string;
             attributes: Record<string, string>;
             openingMarkup: string;
             children: RichTextNode[];
         }[] = [{ tag: "root", attributes: {}, openingMarkup: "", children: [] }];
+        const openCounts = new Map<string, number>();
 
         let lastIndex = 0;
 
@@ -84,12 +112,19 @@ export namespace RichTextUtils {
             if (isClosing) {
                 let found = false;
 
-                for (let i = stack.length - 1; i >= 1; i--) {
+                for (let i = stack.length - 1; i >= 1 && openCounts.has(tag); i--) {
                     if (stack[i].tag === tag) {
                         found = true;
 
                         const popped = stack.splice(i);
                         const completed = popped[0];
+
+                        for (const frame of popped) {
+                            const count = openCounts.get(frame.tag)! - 1;
+
+                            if (count > 0) openCounts.set(frame.tag, count);
+                            else openCounts.delete(frame.tag);
+                        }
 
                         if (popped.length > 1) {
                             console.warn(
@@ -117,10 +152,14 @@ export namespace RichTextUtils {
                     stack[stack.length - 1].children.push({ type: "text", content: tagRaw });
                 }
             } else {
-                const attributes = readAttributes(tagRaw.slice(tag.length + 1, -1), tag, allowedAttributes);
+                const isTooDeep = maxDepth !== undefined && stack.length > maxDepth;
+                const attributes = isTooDeep
+                    ? undefined
+                    : readAttributes(tagRaw.slice(tag.length + 1, -1), tag, allowedAttributes);
 
                 if (attributes) {
                     stack.push({ tag, attributes, openingMarkup: tagRaw, children: [] });
+                    openCounts.set(tag, (openCounts.get(tag) ?? 0) + 1);
                 } else {
                     stack[stack.length - 1].children.push({ type: "text", content: tagRaw });
                 }

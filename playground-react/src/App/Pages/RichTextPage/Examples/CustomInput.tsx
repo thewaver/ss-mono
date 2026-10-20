@@ -4,10 +4,11 @@ import * as styles from "@thewaver/ss-playground/App/Pages/RichTextPage/RichText
 type Props = {
     content: string;
     removeOtherTags: boolean;
+    maxDepth: number;
 };
 
 export const CustomInputExample = (props: Props) => (
     <div id={"customInputPreview"} className={styles.previewText}>
-        <RichText content={props.content} removeOtherTags={props.removeOtherTags} />
+        <RichText content={props.content} removeOtherTags={props.removeOtherTags} maxDepth={props.maxDepth} />
     </div>
 );
