@@ -59,6 +59,7 @@ export type MenuLevelKeyDefs<T> = {
     isLaidOut: boolean;
     depth: number;
     direction: NavigatorDirection;
+    submenuPlacement: AnchorPlacement;
 };
 
 export type MenuHighlightDefs<T> = {
@@ -103,14 +104,20 @@ export type BaseMenuValues = {
     id?: string;
     /** Names the menu for assistive technology. */
     ariaLabel?: string;
-    /** Where the menu sits against its trigger. */
+    /**
+     * Where the menu sits against its trigger. Left out, it hangs below the trigger lined up with the edge the
+     * text starts from: the left, or the right where the trigger sits in right-to-left text. Given, it is used as
+     * it stands in either direction.
+     */
     placement?: AnchorPlacement;
     /** How far the menu is held clear of its trigger. */
     offset?: Point2d;
     /**
      * Where a submenu sits against the item that opens it. Left out, a submenu opens beside its item on
-     * the side the opening arrow points to: the right, or the left where the menu's trigger sits in
-     * right-to-left text. Given, it is used as it stands in either direction.
+     * the right, or on the left where the menu's trigger sits in right-to-left text. Given, it is used as it
+     * stands in either direction. Either way, the arrow that opens a submenu is the one pointing at the side
+     * it opens on, and the other arrow closes it; a placement that is not beside the item on either side
+     * leaves the arrows to the text direction.
      */
     submenuPlacement?: AnchorPlacement;
     /** How far a submenu is held clear of the item that opens it. */
@@ -158,14 +165,20 @@ export type BaseContextMenuValues = {
     regionAriaLabel: string;
     /** Turns the menu off, so right-clicking the region does nothing out of the ordinary. */
     isDisabled?: boolean;
-    /** Where the menu sits against the point it was opened at. */
+    /**
+     * Where the menu sits against the point it was opened at. Left out, it hangs below the point and spreads
+     * away from it the way the text runs: to the right, or to the left where the region sits in right-to-left
+     * text. Given, it is used as it stands in either direction.
+     */
     placement?: AnchorPlacement;
     /** How far the menu is held clear of the point it was opened at. */
     offset?: Point2d;
     /**
      * Where a submenu sits against the item that opens it. Left out, a submenu opens beside its item on the
-     * side the opening arrow points to: the right, or the left where the region sits in right-to-left
-     * text. Given, it is used as it stands in either direction.
+     * right, or on the left where the region sits in right-to-left text. Given, it is used as it stands in
+     * either direction. Either way, the arrow that opens a submenu is the one pointing at the side it opens
+     * on, and the other arrow closes it; a placement that is not beside the item on either side leaves the
+     * arrows to the text direction.
      */
     submenuPlacement?: AnchorPlacement;
     /** How far a submenu is held clear of the item that opens it. */

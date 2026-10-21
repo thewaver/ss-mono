@@ -21,6 +21,7 @@
     import PagePropsPanel from "../../PageComponents/PropsPanel/PagePropsPanel.svelte";
     import BoundedExample from "./Examples/Bounded.svelte";
     import DefaultExample from "./Examples/Default.svelte";
+    import RightToLeftExample from "./Examples/RightToLeft.svelte";
     import {
     CALENDAR_FIELD_WIDTH,
     CALENDAR_IDS,
@@ -36,12 +37,15 @@
 
     let defaultValue = $state.raw<DateValueRange | undefined>();
     let boundedValue = $state.raw<DateValueRange | undefined>();
+    let rightToLeftValue = $state.raw<DateValueRange | undefined>();
 
     let defaultMonth = $state.raw<DateValue>(DateValueUtils.getStartOfMonth(TODAY));
     let boundedMonth = $state.raw<DateValue>(DateValueUtils.getStartOfMonth(TODAY));
+    let rightToLeftMonth = $state.raw<DateValue>(DateValueUtils.getStartOfMonth(TODAY));
 
     const defaultCalendarMonth = $derived(DateValueUtils.withCalendar(defaultMonth, calendarId));
     const boundedCalendarMonth = $derived(DateValueUtils.withCalendar(boundedMonth, calendarId));
+    const rightToLeftCalendarMonth = $derived(DateValueUtils.withCalendar(rightToLeftMonth, calendarId));
 
     const examples: ExampleDefs[] = [
         {
@@ -59,6 +63,14 @@
             component: boundedExample,
             path: `${EXAMPLES_ROOT}/Bounded.svelte`,
         },
+        {
+            key: "rightToLeft",
+            name: EXAMPLE_NAMES.rightToLeft,
+            readout: () =>
+                `value: ${describe(rightToLeftValue)} — the box around the calendar sets dir="rtl", so a week runs from the right and the left arrow moves on to the next day`,
+            component: rightToLeftExample,
+            path: `${EXAMPLES_ROOT}/RightToLeft.svelte`,
+        },
     ];
 </script>
 
@@ -74,6 +86,14 @@
     <BoundedExample
         bind:value={boundedValue}
         bind:month={() => boundedCalendarMonth, (next) => (boundedMonth = next)}
+        {weekStartsOn}
+    />
+{/snippet}
+
+{#snippet rightToLeftExample()}
+    <RightToLeftExample
+        bind:value={rightToLeftValue}
+        bind:month={() => rightToLeftCalendarMonth, (next) => (rightToLeftMonth = next)}
         {weekStartsOn}
     />
 {/snippet}

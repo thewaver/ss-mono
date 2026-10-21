@@ -10,6 +10,7 @@
     import type { ExampleDefs } from "../../PageComponents/Examples/Examples.types";
     import PageExamples from "../../PageComponents/Examples/PageExamples.svelte";
     import DefaultExample from "./Examples/Default.svelte";
+    import RightToLeftExample from "./Examples/RightToLeft.svelte";
     import { EXAMPLE_NAMES, EXAMPLES_ROOT } from "@thewaver/ss-playground/App/Pages/ClockPage/ClockPage.const";
 
     const describeTime = (value: TimeValue | undefined) => (value ? TimeUtils.toIso(value) : "none");
@@ -17,6 +18,7 @@
     let defaultValue = $state.raw<TimeValue | undefined>({ hour: 9, minute: 30 });
     let twelveHourValue = $state.raw<TimeValue | undefined>({ hour: 14, minute: 30 });
     let boundedValue = $state.raw<TimeValue | undefined>({ hour: 10, minute: 15 });
+    let rightToLeftValue = $state.raw<TimeValue | undefined>({ hour: 9, minute: 30 });
 
     const examples: ExampleDefs[] = [
         {
@@ -43,6 +45,14 @@
             component: boundedExample,
             path: `${EXAMPLES_ROOT}/Default.svelte`,
         },
+        {
+            key: "rightToLeft",
+            name: EXAMPLE_NAMES.rightToLeft,
+            readout: () =>
+                `value: ${describeTime(rightToLeftValue)} — the box around the clock sets dir="rtl", so the hour column sits on the right and the left arrow moves on to the minutes`,
+            component: rightToLeftExample,
+            path: `${EXAMPLES_ROOT}/RightToLeft.svelte`,
+        },
     ];
 </script>
 
@@ -62,6 +72,10 @@
         maxValue={CLOSING_TIME}
         ariaLabel={"Booking time"}
     />
+{/snippet}
+
+{#snippet rightToLeftExample()}
+    <RightToLeftExample bind:value={rightToLeftValue} />
 {/snippet}
 
 <PageExamples items={examples} />

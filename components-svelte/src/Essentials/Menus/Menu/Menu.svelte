@@ -156,7 +156,7 @@
             layoutSize={props.layoutSize}
             {initialHighlightPosition}
             anchorRef={anchorElement}
-            placement={props.placement}
+            placement={props.placement ?? MENU_DEFAULTS.placement[direction()]}
             offset={props.offset}
             submenuPlacement={props.submenuPlacement ?? MENU_DEFAULTS.submenuPlacement[direction()]}
             submenuOffset={props.submenuOffset}

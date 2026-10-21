@@ -5,6 +5,7 @@ import { EXAMPLES_ROOT, EXAMPLE_NAMES } from "@thewaver/ss-playground/App/Pages/
 import { PageExamples } from "../../../PageComponents/Examples/Examples";
 import { CascaderExample } from "./Examples/Cascader";
 import { ContextAreaExample } from "./Examples/ContextArea";
+import { ContextRightToLeftExample } from "./Examples/ContextRightToLeft";
 import { DefaultExample } from "./Examples/Default";
 import { DisabledExample } from "./Examples/Disabled";
 import { DrivenExample } from "./Examples/Driven";
@@ -12,6 +13,7 @@ import { GlideExample } from "./Examples/Glide";
 import { PlacedAboveExample } from "./Examples/PlacedAbove";
 import { ReachableExample } from "./Examples/Reachable";
 import { RightToLeftExample } from "./Examples/RightToLeft";
+import { RightToLeftPlacedExample } from "./Examples/RightToLeftPlaced";
 import { StatefulExample } from "./Examples/Stateful";
 import { SubmenusExample } from "./Examples/Submenus";
 import {
@@ -33,6 +35,8 @@ export const MenuPage = () => {
     const [lastReachableAction, setLastReachableAction] = useState(NOTHING_RUN);
     const [lastNestedAction, setLastNestedAction] = useState(NOTHING_RUN);
     const [lastRightToLeftAction, setLastRightToLeftAction] = useState(NOTHING_RUN);
+    const [lastPlacedRightToLeftAction, setLastPlacedRightToLeftAction] = useState(NOTHING_RUN);
+    const [lastContextRightToLeftAction, setLastContextRightToLeftAction] = useState(NOTHING_RUN);
     const [lastFlippedAction, setLastFlippedAction] = useState(NOTHING_RUN);
     const [lastLayerAction, setLastLayerAction] = useState(NOTHING_RUN);
     const [lastDrivenAction, setLastDrivenAction] = useState(NOTHING_RUN);
@@ -91,6 +95,16 @@ export const MenuPage = () => {
             path: `${EXAMPLES_ROOT}/ContextArea.tsx`,
         },
         {
+            key: "contextRightToLeft",
+            name: EXAMPLE_NAMES.contextRightToLeft,
+            readout: () =>
+                `${lastContextRightToLeftAction} — the box around the region sets dir="rtl", so the menu spreads to the left of the pointer and its submenus open on the left`,
+            component: () => (
+                <ContextRightToLeftExample onActivate={(action) => setLastContextRightToLeftAction(action.name)} />
+            ),
+            path: `${EXAMPLES_ROOT}/ContextRightToLeft.tsx`,
+        },
+        {
             key: "staysOpen",
             name: EXAMPLE_NAMES.staysOpen,
             readout: () =>
@@ -144,6 +158,16 @@ export const MenuPage = () => {
                 `${lastRightToLeftAction} — the box around the trigger sets dir="rtl", so a submenu opens on the left, ArrowLeft steps in and ArrowRight steps back out`,
             component: () => <RightToLeftExample onActivate={(action) => setLastRightToLeftAction(action.name)} />,
             path: `${EXAMPLES_ROOT}/RightToLeft.tsx`,
+        },
+        {
+            key: "rightToLeftPlaced",
+            name: EXAMPLE_NAMES.rightToLeftPlaced,
+            readout: () =>
+                `${lastPlacedRightToLeftAction} — the box around the trigger sets dir="rtl", but the menu names the right as its submenu side, so its submenus open on the right and ArrowRight opens them`,
+            component: () => (
+                <RightToLeftPlacedExample onActivate={(action) => setLastPlacedRightToLeftAction(action.name)} />
+            ),
+            path: `${EXAMPLES_ROOT}/RightToLeftPlaced.tsx`,
         },
         {
             key: "placedAbove",

@@ -11,6 +11,7 @@ import type { TimeValue } from "@thewaver/ss-utils";
 
 import { PageExamples } from "../../PageComponents/Examples/Examples";
 import { DefaultExample } from "./Examples/Default";
+import { RightToLeftExample } from "./Examples/RightToLeft";
 
 const describeTime = (value: TimeValue | undefined) => (value ? TimeUtils.toIso(value) : "none");
 
@@ -18,6 +19,7 @@ export const ClockPage = () => {
     const defaultState = useState<TimeValue | undefined>({ hour: 9, minute: 30 });
     const twelveHourState = useState<TimeValue | undefined>({ hour: 14, minute: 30 });
     const boundedState = useState<TimeValue | undefined>({ hour: 10, minute: 15 });
+    const rightToLeftState = useState<TimeValue | undefined>({ hour: 9, minute: 30 });
 
     const examples = [
         {
@@ -51,6 +53,14 @@ export const ClockPage = () => {
                 />
             ),
             path: `${EXAMPLES_ROOT}/Default.tsx`,
+        },
+        {
+            key: "rightToLeft",
+            name: EXAMPLE_NAMES.rightToLeft,
+            readout: () =>
+                `value: ${describeTime(rightToLeftState[0])} — the box around the clock sets dir="rtl", so the hour column sits on the right and the left arrow moves on to the minutes`,
+            component: () => <RightToLeftExample value={rightToLeftState} />,
+            path: `${EXAMPLES_ROOT}/RightToLeft.tsx`,
         },
     ];
 

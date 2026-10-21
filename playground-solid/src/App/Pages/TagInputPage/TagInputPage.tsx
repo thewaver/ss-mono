@@ -17,6 +17,7 @@ import { PagePropsPanel } from "../../PageComponents/PropsPanel/PropsPanel";
 import { PageButtonContent } from "../../StyledComponents/ButtonContent/ButtonContent";
 import { CrowdedExample } from "./Examples/Crowded";
 import { DefaultExample } from "./Examples/Default";
+import { RightToLeftExample } from "./Examples/RightToLeft";
 import { UniqueExample } from "./Examples/Unique";
 import type { TagInputExampleProps } from "./TagInputPage.types";
 
@@ -28,12 +29,14 @@ export const TagInputPage = () => {
     const uniqueSignal = createSignal(STARTING_TAGS);
     const crowdedSignal = createSignal(CROWDED_TAGS);
     const emptySignal = createSignal<string[]>([]);
+    const rightToLeftSignal = createSignal(STARTING_TAGS);
 
     const reset = () => {
         defaultSignal[1](STARTING_TAGS);
         uniqueSignal[1](STARTING_TAGS);
         crowdedSignal[1](CROWDED_TAGS);
         emptySignal[1]([]);
+        rightToLeftSignal[1](STARTING_TAGS);
     };
 
     const getExamples = createMemo(() => {
@@ -71,6 +74,14 @@ export const TagInputPage = () => {
                     `${crowdedSignal[0]().length} tags in ${NARROW_WIDTH}px — they wrap and the box grows with them`,
                 component: () => <CrowdedExample {...commonProps} value={crowdedSignal} />,
                 path: `${EXAMPLES_ROOT}/Crowded.tsx`,
+            },
+            {
+                key: "rightToLeft",
+                name: EXAMPLE_NAMES.rightToLeft,
+                readout: () =>
+                    `tags: ${rightToLeftSignal[0]().join(", ") || "none"} — the box around the field sets dir="rtl", so the tags run from the right and the right arrow moves from the empty field onto the last tag`,
+                component: () => <RightToLeftExample {...commonProps} value={rightToLeftSignal} />,
+                path: `${EXAMPLES_ROOT}/RightToLeft.tsx`,
             },
         ];
     });

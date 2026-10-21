@@ -361,6 +361,7 @@ const MenuLevel = <T,>(props: MenuLevelProps<T>): JSX.Element => {
             isLaidOut: getIsLaidOut(),
             depth: access(props.path).length,
             direction: access(props.direction),
+            submenuPlacement: access(props.submenuPlacement),
         });
 
         if (step === undefined) return;
@@ -686,7 +687,7 @@ export const Menu = <T,>(props: MenuProps<T>) => {
                         initialHighlightPosition={getInitialHighlightPosition}
                         anchorRef={() => access(props.anchorRef) ?? getTriggerRef()}
                         triggerRef={getTriggerRef}
-                        placement={props.placement}
+                        placement={() => access(props.placement) ?? MENU_DEFAULTS.placement[getDirection()]}
                         offset={props.offset}
                         submenuPlacement={() =>
                             access(props.submenuPlacement) ?? MENU_DEFAULTS.submenuPlacement[getDirection()]
@@ -806,7 +807,7 @@ export const ContextMenu = <T,>(props: ContextMenuProps<T>) => {
                 anchorRef={getRegionRef}
                 anchorRect={getAnchorRect}
                 triggerRef={getRegionRef}
-                placement={props.placement}
+                placement={() => access(props.placement) ?? MENU_DEFAULTS.placement[getDirection()]}
                 offset={props.offset}
                 submenuPlacement={() =>
                     access(props.submenuPlacement) ?? MENU_DEFAULTS.submenuPlacement[getDirection()]

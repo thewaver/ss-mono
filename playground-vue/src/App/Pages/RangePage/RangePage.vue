@@ -14,6 +14,7 @@ import KnobExample from "./Examples/Knob.vue";
 import PairExample from "./Examples/Pair.vue";
 import PriceExample from "./Examples/Price.vue";
 import ReachableExample from "./Examples/Reachable.vue";
+import RightToLeftExample from "./Examples/RightToLeft.vue";
 import SteppedExample from "./Examples/Stepped.vue";
 import VerticalExample from "./Examples/Vertical.vue";
 
@@ -26,6 +27,7 @@ const errored = shallowRef(90);
 const knob = shallowRef(30);
 
 const price = shallowRef<Span>({ start: 20, end: 80 });
+const rightToLeftPrice = shallowRef<Span>({ start: 20, end: 80 });
 const budget = shallowRef<Span>({ start: 100, end: 350 });
 const settledBudget = shallowRef("not yet");
 const verticalPair = shallowRef<Span>({ start: 30, end: 70 });
@@ -49,6 +51,13 @@ const examples: ExampleDefs[] = [
         name: EXAMPLE_NAMES.pair,
         readout: () => `start: ${price.value.start} | end: ${price.value.end}`,
         path: `${EXAMPLES_ROOT}/Pair.vue`,
+    },
+    {
+        key: "rightToLeft",
+        name: EXAMPLE_NAMES.rightToLeft,
+        readout: () =>
+            `start: ${rightToLeftPrice.value.start} | end: ${rightToLeftPrice.value.end} — the box around the range sets dir="rtl", so the track runs from the right and the lowest price is the thumb on the right`,
+        path: `${EXAMPLES_ROOT}/RightToLeft.vue`,
     },
     {
         key: "priceRange",
@@ -110,6 +119,10 @@ const examples: ExampleDefs[] = [
 
         <template #pair>
             <PairExample v-model:range="price" />
+        </template>
+
+        <template #rightToLeft>
+            <RightToLeftExample v-model:range="rightToLeftPrice" />
         </template>
 
         <template #priceRange>

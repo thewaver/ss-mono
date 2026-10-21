@@ -428,6 +428,7 @@ const MenuLevel = <T,>(props: MenuLevelProps<T>) => {
             isLaidOut,
             depth: props.path.length,
             direction: props.direction,
+            submenuPlacement: props.submenuPlacement,
         });
 
         if (step === undefined) return;
@@ -679,7 +680,7 @@ export const Menu = <T,>(props: MenuProps<T>) => {
                         layoutSize={props.layoutSize}
                         initialHighlightPosition={initialHighlightPosition}
                         anchorRef={anchorElement}
-                        placement={props.placement}
+                        placement={props.placement ?? MENU_DEFAULTS.placement[direction]}
                         offset={props.offset}
                         submenuPlacement={props.submenuPlacement ?? MENU_DEFAULTS.submenuPlacement[direction]}
                         submenuOffset={props.submenuOffset}
@@ -798,7 +799,7 @@ export const ContextMenu = <T,>(props: ContextMenuProps<T>) => {
                 rootExtent={MenuConst.NO_PARENT_EXTENT}
                 anchorRef={regionElement}
                 anchorRect={anchorRect}
-                placement={props.placement}
+                placement={props.placement ?? MENU_DEFAULTS.placement[direction]}
                 offset={props.offset}
                 submenuPlacement={props.submenuPlacement ?? MENU_DEFAULTS.submenuPlacement[direction]}
                 submenuOffset={props.submenuOffset}

@@ -8,6 +8,7 @@
     import PartsExample from "./Examples/Parts.svelte";
     import ReorderableExample from "./Examples/Reorderable.svelte";
     import ResizableExample from "./Examples/Resizable.svelte";
+    import RightToLeftExample from "./Examples/RightToLeft.svelte";
     import SingleSelectionExample from "./Examples/SingleSelection.svelte";
     import VirtualizedExample from "./Examples/Virtualized.svelte";
     import { STRESS_PART_COUNT, createStressParts } from "./TablePage.const.svelte";
@@ -33,6 +34,11 @@
     let reorderableSort = $state<TableSort | undefined>();
     let reorderableSelection = $state.raw<Part[]>([]);
     let reorderableOrder = $state<string[]>([]);
+
+    let rightToLeftSort = $state<TableSort | undefined>();
+    let rightToLeftSelection = $state.raw<Part[]>([]);
+    let rightToLeftWidths = $state<Record<string, number>>({});
+    let rightToLeftOrder = $state<string[]>([]);
 
     let consumerSort = $state<TableSort | undefined>();
     let consumerSelection = $state.raw<Part[]>([]);
@@ -81,6 +87,15 @@
             path: `${EXAMPLES_ROOT}/Reorderable.svelte`,
         },
         {
+            key: "rightToLeft",
+            span: 2,
+            name: EXAMPLE_NAMES.rightToLeft,
+            readout: () =>
+                `widths: ${JSON.stringify(rightToLeftWidths)} | order: ${rightToLeftOrder.join(", ") || "as declared"} — the box around the table sets dir="rtl", so the columns run from the right, a column's resize edge is on its left, and the arrows swap meaning`,
+            component: rightToLeftExample,
+            path: `${EXAMPLES_ROOT}/RightToLeft.svelte`,
+        },
+        {
             key: "consumerSorted",
             name: EXAMPLE_NAMES.consumerSorted,
             readout: () =>
@@ -125,6 +140,15 @@
         bind:sort={reorderableSort}
         bind:selection={reorderableSelection}
         bind:order={reorderableOrder}
+    />
+{/snippet}
+
+{#snippet rightToLeftExample()}
+    <RightToLeftExample
+        bind:sort={rightToLeftSort}
+        bind:selection={rightToLeftSelection}
+        bind:widths={rightToLeftWidths}
+        bind:order={rightToLeftOrder}
     />
 {/snippet}
 

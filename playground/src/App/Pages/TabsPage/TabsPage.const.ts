@@ -48,6 +48,13 @@ export const RIGHT_TO_LEFT_TABS = withIds("rtl", [
     { value: "Export" },
 ]);
 
+export const SWITCHED_DIRECTION_TABS = withIds("switchedDirection", [
+    { value: "Render" },
+    { value: "Source" },
+    { value: "Metrics", isDisabled: true },
+    { value: "Export" },
+]);
+
 export const COLUMN_TABS = withIds("column", [
     { value: "Overview" },
     { value: "Details" },
@@ -101,6 +108,7 @@ export const EXAMPLE_NAMES = {
     hoverPill: "A pill that follows the pointer",
     reachable: "A disabled tab the arrows still reach",
     rightToLeft: "Tabs in a right-to-left box",
+    switchedDirection: "A direction switched while on screen",
     honeycomb: "A honeycomb of tabs",
     links: "Tabs that are links",
     linkComponent: "Links through a component",

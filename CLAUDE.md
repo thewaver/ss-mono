@@ -140,6 +140,13 @@ nothing is running and nothing is waiting on them, so it can be closed, or names
 still working, a decision pending, a step not yet done. Uncommitted changes do not keep a session open, because
 committing is theirs and does not need this conversation.
 
+**The same line states where the ports and the specs stand.** Asked for by the user, after asking whether "can be
+closed" meant both were done — it had not said so. So the line names both, for the work the reply reports: whether
+it reached all four frameworks (or why it did not need porting, or what is still to port), and which specs ran and
+how they came out (or that none was run, and why). For example: _"Ported to all four, Scroller spec green in all
+four — nothing running, nothing waiting on you."_ A line that leaves either out is read as "not checked", so it is
+never left out to save words.
+
 **A choice between approaches is a lettered pros-and-cons list, with a lean.** The user's own rule, built up
 over several corrections, and one they count among the most useful in the file. Four parts:
 

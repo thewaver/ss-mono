@@ -3,6 +3,7 @@ import { DateValueUtils } from "@thewaver/ss-components";
 export const EXAMPLE_NAMES = {
     default: "Default",
     bounded: "Bounded",
+    rightToLeft: "In a right-to-left box",
 };
 
 export const CALENDAR_IDS = DateValueUtils.getCalendarIds();

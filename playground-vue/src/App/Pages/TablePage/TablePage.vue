@@ -11,6 +11,7 @@ import DisabledExample from "./Examples/Disabled.vue";
 import PartsExample from "./Examples/Parts.vue";
 import ReorderableExample from "./Examples/Reorderable.vue";
 import ResizableExample from "./Examples/Resizable.vue";
+import RightToLeftExample from "./Examples/RightToLeft.vue";
 import SingleSelectionExample from "./Examples/SingleSelection.vue";
 import VirtualizedExample from "./Examples/Virtualized.vue";
 import type { Part } from "./TablePage.types";
@@ -34,6 +35,11 @@ const resizableWidths = shallowRef<Record<string, number>>({});
 const reorderableSort = shallowRef<TableSort | undefined>();
 const reorderableSelection = shallowRef<Part[]>([]);
 const reorderableOrder = shallowRef<string[]>([]);
+
+const rightToLeftSort = shallowRef<TableSort | undefined>();
+const rightToLeftSelection = shallowRef<Part[]>([]);
+const rightToLeftWidths = shallowRef<Record<string, number>>({});
+const rightToLeftOrder = shallowRef<string[]>([]);
 
 const consumerSort = shallowRef<TableSort | undefined>();
 const consumerSelection = shallowRef<Part[]>([]);
@@ -76,6 +82,14 @@ const examples: ExampleDefs[] = [
         readout: () =>
             `order: ${reorderableOrder.value.join(", ") || "as declared"} — drag a header sideways, or focus a header cell and hold Shift with the left and right arrows`,
         path: `${EXAMPLES_ROOT}/Reorderable.vue`,
+    },
+    {
+        key: "rightToLeft",
+        span: 2,
+        name: EXAMPLE_NAMES.rightToLeft,
+        readout: () =>
+            `widths: ${JSON.stringify(rightToLeftWidths.value)} | order: ${rightToLeftOrder.value.join(", ") || "as declared"} — the box around the table sets dir="rtl", so the columns run from the right, a column's resize edge is on its left, and the arrows swap meaning`,
+        path: `${EXAMPLES_ROOT}/RightToLeft.vue`,
     },
     {
         key: "consumerSorted",
@@ -125,6 +139,15 @@ const examples: ExampleDefs[] = [
                 v-model:sort="reorderableSort"
                 v-model:selection="reorderableSelection"
                 v-model:order="reorderableOrder"
+            />
+        </template>
+
+        <template #rightToLeft>
+            <RightToLeftExample
+                v-model:sort="rightToLeftSort"
+                v-model:selection="rightToLeftSelection"
+                v-model:widths="rightToLeftWidths"
+                v-model:order="rightToLeftOrder"
             />
         </template>
 

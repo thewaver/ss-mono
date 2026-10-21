@@ -46,7 +46,7 @@ reading.
 12. `Tree` — two things deliberately not built — _open_
 13. `SlideButton` — three things deliberately not built — _open_
 14. `Spotlight` — one thing deliberately not built — _open_
-15. `Scroller` — four things deliberately not built — _open_
+15. `Scroller` — three things deliberately not built — _open_
 16. `Paginator` — four things deliberately not built — _open_
 17. `Carousel` — three things deliberately not built — _open_
 18. The four components ported from React — what did not settle — _open_
@@ -59,11 +59,10 @@ reading.
 25. Components that turn under perspective reserve room they do not need at rest — _open_
 26. `CardStack` — the pointer route the library cannot promise — _open_
 27. The submit story — what a native submit carries, and what `Form` hands `onSubmit` — _pending decision_
-28. Work that has never been watched running — _open_
-29. Choices the add-ons round made on the user's behalf — _pending decision_
-30. `Die`'s step buttons and arrow keys fall into a loop of two or three faces — _open, no fix chosen_
-31. A wide arrow vanishes at a corner, and a nearly-as-wide one becomes a sliver — _open, the user is analysing it_
-32. The Playground's painters in Windows high-contrast mode — _open, decided, not yet built_
+28. Choices the add-ons round made on the user's behalf — _pending decision_
+29. `Die`'s step buttons and arrow keys fall into a loop of two or three faces — _open, no fix chosen_
+30. A wide arrow vanishes at a corner, and a nearly-as-wide one becomes a sliver — _open, the user is analysing it_
+31. The Playground's painters in Windows high-contrast mode — _open, decided, not yet built_
 
 ### Build order
 
@@ -741,7 +740,7 @@ because a mode cannot move at runtime"_. These are the gaps, each with the reaso
 
 ---
 
-## 15. `Scroller` — four things deliberately not built
+## 15. `Scroller` — three things deliberately not built
 
 The decisions behind what exists are in `decisions.md` under _"Controls: `Scroller`, and why it renders no
 button of its own"_. These are the gaps, each with the reason it is still one.
@@ -754,11 +753,6 @@ button of its own"_. These are the gaps, each with the reason it is still one.
   the next page, so the step is "as much as fits" rather than a tuned fraction. A consumer wanting a lingering
   item of overlap for context has nothing to set. It is not a prop because the overlap would be a measured
   value with no consumer behind it, and the rule about tuned numbers says those are the user's to set.
-- **A second press landing mid-scroll moves less than a page.** The step is measured from where the track is
-  at the moment the button is pressed, and the scroll that follows is smooth, so pressing quickly five times
-  does not advance five pages. It is self-correcting — every press still moves forward and the end is still
-  reachable — and every implementation built on `scroll-behavior: smooth` behaves this way. Holding the
-  intended target and stepping from that instead is the fix if it ever matters; nothing has asked.
 - **The buttons are the consumer's, so their keyboard story is too.** The component renders no button, which
   means it cannot guarantee one is reachable, named, or in the tab order — a consumer who paints them as bare
   divs gets a control no keyboard can reach. The library's answer is that the scrolling itself is still
@@ -1209,19 +1203,7 @@ who wants values takes. _"The form story"_ in `decisions.md` says the library ne
 that entry is what this item would revisit. Focus moving to the first field in error on submit was built
 separately and does not depend on this.
 
-## 28. Work that has never been watched running
-
-Nothing here is known to be broken. Each of these was built and passes its checks, but has not been looked at
-the way the user asked for, or cannot be reached by a spec yet.
-
-- **Right-to-left.** `e2e/rightToLeft.spec.ts` covers Tabs, RadioGroup, Calendar, SplitPane, Menu, Sortable and
-  Tree with `dir="rtl"`. Not covered, and each needs a right-to-left demo before a spec can reach it: Table (the
-  resize drag, click-to-step, Shift-arrow to move a column, the drop markers), Clock, TagInput's hop between the
-  field and its tags, which thumb Range picks, RangeCalendar, ContextMenu, a pointer drop into a mirrored Sortable
-  row and where its marker lands, a consumer-set `submenuPlacement` inside a right-to-left box, and flipping `dir`
-  while the page is open.
-
-## 29. Choices the add-ons round made on the user's behalf
+## 28. Choices the add-ons round made on the user's behalf
 
 The agents building the Exotics add-ons had to pick these to finish the work. Each is a working answer, and each
 is the user's to confirm or change.
@@ -1239,7 +1221,7 @@ is the user's to confirm or change.
 - **SlotText reels under reduced motion drop only their extra turns.** Each reel keeps its own duration, so a
   slow reel still turns its one step slowly. Falling back to `turnDurationMs` there is the alternative.
 
-## 30. `Die`'s step buttons and arrow keys fall into a loop of two or three faces
+## 29. `Die`'s step buttons and arrow keys fall into a loop of two or three faces
 
 Reachable on the Die page's icon cloud: pick the d20 and press down a few times. The die goes back and forth
 between the same two faces. Every shape does it — a d20 pressed right goes between faces 1 and 2 from the first
@@ -1266,7 +1248,7 @@ every face upright cannot both hold, so each option gives one up:
 `Cuboid`'s upright mode has the same tension and accepted it, since a box has only six resting orientations
 (`decisions.md`, _"`Cuboid`: upright mode keeps an orientation"_); a d20 has many more faces for the loop to skip.
 
-## 31. A wide arrow vanishes at a corner, and a nearly-as-wide one becomes a sliver
+## 30. A wide arrow vanishes at a corner, and a nearly-as-wide one becomes a sliver
 
 Reachable on the Tooltip page: pick the triangle, set its width to at least twice its length, and place the tooltip
 off a corner of its anchor (`left_out` with `bottom_out`). No arrow is drawn. Make it a little narrower than that and
@@ -1285,7 +1267,7 @@ before choosing a fix. The one put to them and not taken yet: limit how far a si
 end the side at its base corner and run straight back to the contour along the arrow's direction, which never
 vanishes but gives a wide corner arrow a short straight neck.
 
-## 32. The Playground's painters in Windows high-contrast mode
+## 31. The Playground's painters in Windows high-contrast mode
 
 Reachable on the Range page with Windows' high-contrast mode on, or with Chrome's DevTools emulating
 `forced-colors: active`: the track and the filled part of the range turn white on the white page, and only the

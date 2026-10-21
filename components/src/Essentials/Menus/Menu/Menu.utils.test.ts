@@ -1,5 +1,6 @@
 import { describe, expect, it } from "vitest";
 
+import { MENU_DEFAULTS } from "./Menu.const";
 import type { MenuItemRecord as MenuItem } from "./Menu.types";
 import { MenuUtils } from "./Menu.utils";
 
@@ -95,6 +96,7 @@ const keyDefs = (overrides?: Partial<Parameters<typeof MenuUtils.computeLevelKey
     isLaidOut: false,
     depth: 0,
     direction: "ltr" as const,
+    submenuPlacement: MENU_DEFAULTS.submenuPlacement[overrides?.direction ?? "ltr"],
     ...overrides,
 });
 
@@ -197,6 +199,42 @@ describe("computeLevelKeyStep", () => {
             MenuUtils.computeLevelKeyStep("ArrowRight", keyDefs({ highlightedIndex: 1 })),
             "a leaf opens nothing",
         ).toBe(undefined);
+    });
+
+    it("reads the arrows by the side the submenu opens on when the menu names one", () => {
+        const onTheRight = { x: "right_out", y: "top_in" } as const;
+        const onTheLeft = { x: "left_out", y: "top_in" } as const;
+
+        expect(
+            MenuUtils.computeLevelKeyStep("ArrowRight", keyDefs({ direction: "rtl", submenuPlacement: onTheRight })),
+            "a submenu on the right opens with ArrowRight in right-to-left text",
+        ).toEqual({ type: "open", index: 0 });
+        expect(
+            MenuUtils.computeLevelKeyStep(
+                "ArrowLeft",
+                keyDefs({ direction: "rtl", submenuPlacement: onTheRight, depth: 1 }),
+            ),
+            "and closes with ArrowLeft",
+        ).toEqual({ type: "close", isContained: false });
+        expect(
+            MenuUtils.computeLevelKeyStep("ArrowLeft", keyDefs({ submenuPlacement: onTheLeft })),
+            "a submenu on the left opens with ArrowLeft in left-to-right text",
+        ).toEqual({ type: "open", index: 0 });
+    });
+
+    it("leaves the arrows to the text direction when the submenu is beside neither side", () => {
+        const centered = { x: "center", y: "bottom_out" } as const;
+
+        expect(
+            MenuUtils.computeLevelKeyStep("ArrowLeft", keyDefs({ direction: "rtl", submenuPlacement: centered })),
+        ).toEqual({
+            type: "open",
+            index: 0,
+        });
+        expect(MenuUtils.computeLevelKeyStep("ArrowRight", keyDefs({ submenuPlacement: centered }))).toEqual({
+            type: "open",
+            index: 0,
+        });
     });
 
     it("closes a submenu with the other arrow, and never the first level", () => {

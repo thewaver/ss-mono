@@ -3,6 +3,7 @@
     import PageExamples from "../../../PageComponents/Examples/PageExamples.svelte";
     import CascaderExample from "./Examples/Cascader.svelte";
     import ContextAreaExample from "./Examples/ContextArea.svelte";
+    import ContextRightToLeftExample from "./Examples/ContextRightToLeft.svelte";
     import DefaultExample from "./Examples/Default.svelte";
     import DisabledExample from "./Examples/Disabled.svelte";
     import DrivenExample from "./Examples/Driven.svelte";
@@ -10,6 +11,7 @@
     import PlacedAboveExample from "./Examples/PlacedAbove.svelte";
     import ReachableExample from "./Examples/Reachable.svelte";
     import RightToLeftExample from "./Examples/RightToLeft.svelte";
+    import RightToLeftPlacedExample from "./Examples/RightToLeftPlaced.svelte";
     import StatefulExample from "./Examples/Stateful.svelte";
     import SubmenusExample from "./Examples/Submenus.svelte";
     import {
@@ -31,6 +33,8 @@
     let lastReachableAction = $state(NOTHING_RUN);
     let lastNestedAction = $state(NOTHING_RUN);
     let lastRightToLeftAction = $state(NOTHING_RUN);
+    let lastPlacedRightToLeftAction = $state(NOTHING_RUN);
+    let lastContextRightToLeftAction = $state(NOTHING_RUN);
     let lastFlippedAction = $state(NOTHING_RUN);
     let lastLayerAction = $state(NOTHING_RUN);
     let lastDrivenAction = $state(NOTHING_RUN);
@@ -84,6 +88,14 @@
             path: `${EXAMPLES_ROOT}/ContextArea.svelte`,
         },
         {
+            key: "contextRightToLeft",
+            name: EXAMPLE_NAMES.contextRightToLeft,
+            readout: () =>
+                `${lastContextRightToLeftAction} — the box around the region sets dir="rtl", so the menu spreads to the left of the pointer and its submenus open on the left`,
+            component: contextRightToLeftExample,
+            path: `${EXAMPLES_ROOT}/ContextRightToLeft.svelte`,
+        },
+        {
             key: "staysOpen",
             name: EXAMPLE_NAMES.staysOpen,
             readout: () =>
@@ -127,6 +139,14 @@
                 `${lastRightToLeftAction} — the box around the trigger sets dir="rtl", so a submenu opens on the left, ArrowLeft steps in and ArrowRight steps back out`,
             component: rightToLeftExample,
             path: `${EXAMPLES_ROOT}/RightToLeft.svelte`,
+        },
+        {
+            key: "rightToLeftPlaced",
+            name: EXAMPLE_NAMES.rightToLeftPlaced,
+            readout: () =>
+                `${lastPlacedRightToLeftAction} — the box around the trigger sets dir="rtl", but the menu names the right as its submenu side, so its submenus open on the right and ArrowRight opens them`,
+            component: rightToLeftPlacedExample,
+            path: `${EXAMPLES_ROOT}/RightToLeftPlaced.svelte`,
         },
         {
             key: "placedAbove",
@@ -199,6 +219,14 @@
     />
 {/snippet}
 
+{#snippet contextRightToLeftExample()}
+    <ContextRightToLeftExample
+        onActivate={(action) => {
+            lastContextRightToLeftAction = action.name;
+        }}
+    />
+{/snippet}
+
 {#snippet staysOpenExample()}
     <DefaultExample items={ZOOM_ACTIONS} caption={"Zoom"} onActivate={applyZoom} />
 {/snippet}
@@ -237,6 +265,14 @@
     <RightToLeftExample
         onActivate={(action) => {
             lastRightToLeftAction = action.name;
+        }}
+    />
+{/snippet}
+
+{#snippet rightToLeftPlacedExample()}
+    <RightToLeftPlacedExample
+        onActivate={(action) => {
+            lastPlacedRightToLeftAction = action.name;
         }}
     />
 {/snippet}

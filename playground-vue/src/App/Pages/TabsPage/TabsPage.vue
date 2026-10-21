@@ -19,6 +19,7 @@ import LinkComponentExample from "./Examples/LinkComponent.vue";
 import LinksExample from "./Examples/Links.vue";
 import RightToLeftExample from "./Examples/RightToLeft.vue";
 import RowExample from "./Examples/Row.vue";
+import SwitchedDirectionExample from "./Examples/SwitchedDirection.vue";
 
 const rowValue = shallowRef("Render");
 const columnValue = shallowRef("Overview");
@@ -28,6 +29,7 @@ const autoValue = shallowRef("Render");
 const reachableValue = shallowRef("Render");
 const hoverPillValue = shallowRef("Render");
 const rightToLeftValue = shallowRef("Render");
+const switchedDirectionValue = shallowRef("Render");
 const disabledValue = shallowRef("Draft");
 const clearableValue = shallowRef<string | undefined>("One");
 const honeycombValue = shallowRef("Overview");
@@ -78,6 +80,14 @@ const examples: ExampleDefs[] = [
         readout: () =>
             `selected: ${rightToLeftValue.value} — the box around the tabs sets dir="rtl", so they run from the right and the left arrow moves on to the next tab`,
         path: `${EXAMPLES_ROOT}/RightToLeft.vue`,
+    },
+    {
+        key: "switchedDirection",
+        span: 2,
+        name: EXAMPLE_NAMES.switchedDirection,
+        readout: () =>
+            `selected: ${switchedDirectionValue.value} — the example's settings switch the box around the tabs to dir="rtl" and back, and the arrows follow the row as it turns round`,
+        path: `${EXAMPLES_ROOT}/SwitchedDirection.vue`,
     },
     {
         key: "honeycomb",
@@ -158,6 +168,13 @@ const examples: ExampleDefs[] = [
             <RightToLeftExample
                 :selected-value="rightToLeftValue"
                 @selection-change="(value: string) => (rightToLeftValue = value)"
+            />
+        </template>
+
+        <template #switchedDirection>
+            <SwitchedDirectionExample
+                :selected-value="switchedDirectionValue"
+                @selection-change="(value: string) => (switchedDirectionValue = value)"
             />
         </template>
 

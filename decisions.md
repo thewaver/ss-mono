@@ -9785,10 +9785,38 @@ to. It is still one entry keyed by the prop's name, as the defaults rule asks; o
 and a consumer reading the constant gets the pair. A consumer's `submenuPlacement` is used as given in either
 direction, because a consumer who named a side meant that side.
 
+**The submenu arrows follow the side, not the text.** The user's call, once a right-to-left menu told to open its
+submenus on the right was seen opening them with ArrowLeft: the arrow that opens a submenu is the one pointing at it.
+`MenuUtils.computeLevelKeyStep` reads the arrows through the level's own `submenuPlacement`, so `right_out` reads
+them as left-to-right and `left_out` as right-to-left whatever the text, and any other placement — overlapping the
+item, or centered on it — has no side to point at and leaves them to the direction. With the default placement this
+is exactly the old behavior, since the default side is the direction's. The one case it leaves wrong is a named side
+with no room, where the anchor flips the popup and the arrow then points at the empty side; the requested side is
+what decides, because the flip is the anchor's and happens after the keys are bound.
+
+**A menu hangs from the edge the text starts from.** The user's call, the same rule one level up, taken for
+`ContextMenu` first and then for `Menu`: `MENU_DEFAULTS.placement` holds `left_in` under `ltr` and `right_in` under
+`rtl`, both hanging below, and both read it with the direction they already hold. So in a right-to-left box a
+triggered menu lines up with its trigger's right edge, and a context menu's right edge sits at the pointer so it opens
+leftward, the side its submenus open on. A consumer's `placement` is used as given. A laid-out menu reads the same
+default, since where its popup hangs from the trigger is a matter of the text around it rather than of the layout
+inside it.
+
 **What stays physical.** Anything placed at fixed coordinates: `SortableGrid`, `TileBoard`, `PatchBoard`, `Bracket`
 and `Timeline` position their items with `left`, so the first column is on the left whatever the text direction, and
 their arrows keep pointing where the items are. `CardStack`'s arrows throw a card toward a screen side and report
 that side to `onSend`, and `Drawer`'s edges stay physical on the user's call.
+
+**Every behavior above has a Playground demo and a case in `e2e/rightToLeft.spec.ts`.** Each is an existing example
+in a `dir="rtl"` box, keyed `rightToLeft` on its page, on the pages of `Tabs`, `Calendar`, `RangeCalendar`,
+`SplitPane`, `RadioGroup`, `Menu`, `Sortable`, `Tree`, `Clock`, `TagInput`, `Range` and `Table`; the menu page adds
+`contextRightToLeft` for `ContextMenu` and `rightToLeftPlaced` for a consumer-given submenu side, and the tabs page
+adds `switchedDirection`, whose box flips from its own settings so a live `dir` change is reachable. The `Table` demo
+is both resizable and reorderable, so one table carries the resize drag, the click-to-step, the Shift-arrow move and
+the drop marker. **`rightToLeftPlaced` keeps its trigger at the far edge of its card** (`MenuPage.css`'s
+`endAlignedBox`): a right-to-left box puts the trigger at the card's right, near the window's edge, where a
+right-hand submenu has no room and the anchor flips it to the left, which would show the opposite of what the demo is
+for.
 
 **`Tree` alone asks the walker not to wrap.** The tree pattern, React Aria and Ark stop at the ends: ArrowDown on
 the last visible node and ArrowUp on the first do nothing. `computeNextPosition` takes `isLooping: false`, named
@@ -14380,6 +14408,15 @@ strip only gains them by genuinely exceeding its full width.
 **The track hides its scrollbar and keeps its scrolling.** Wheel and touch still work — taking them away would
 make the buttons the only route, worse than the scrollbar it replaced. `scroll-behavior` is smooth in CSS
 rather than per call, so `prefers-reduced-motion` turns it off without the component asking.
+
+**A press during a glide steps on from where the glide is heading.** A step was first measured from wherever the
+track was when the button was pressed, so a second press landing mid-glide measured from a point partway through the
+first and covered less than a page. The user asked for it fixed. `ScrollerUtils.stepTo` keeps each track's step in
+flight — where it began and where it is heading — in a `WeakMap` keyed by the track, and measures the next press from
+that destination while the track is still on the stretch between the two. Arriving, or being scrolled off that
+stretch by a wheel, a drag or a focus reveal, drops the memory, so nothing has to listen for the glide ending; it is
+read at the next press. It lives in the framework-free utilities because all four views already step through them.
+`scroller.spec.ts` compares two quick presses with two slow ones on a fresh page.
 
 **Horizontal only.** The axis is one variable rather than a redesign, but nothing has asked for a column and
 `SlideButton`'s precedent is to build the axis that exists.

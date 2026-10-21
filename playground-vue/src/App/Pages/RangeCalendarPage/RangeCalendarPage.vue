@@ -24,6 +24,7 @@ import PageProp from "../../PageComponents/Prop/Prop.vue";
 import PagePropsPanel from "../../PageComponents/PropsPanel/PagePropsPanel.vue";
 import BoundedExample from "./Examples/Bounded.vue";
 import DefaultExample from "./Examples/Default.vue";
+import RightToLeftExample from "./Examples/RightToLeft.vue";
 
 const computeWeekStartLabel = (day: DateValueWeekStart) => WEEK_START_LABELS[day];
 
@@ -46,9 +47,11 @@ const weekStartsOn = shallowRef<DateValueWeekStart>(CALENDAR_DEFAULTS.weekStarts
 
 const defaultValue = shallowRef<DateValueRange | undefined>();
 const boundedValue = shallowRef<DateValueRange | undefined>();
+const rightToLeftValue = shallowRef<DateValueRange | undefined>();
 
 const defaultMonth = useMonthState(calendarId);
 const boundedMonth = useMonthState(calendarId);
+const rightToLeftMonth = useMonthState(calendarId);
 
 const examples: ExampleDefs[] = [
     {
@@ -63,6 +66,13 @@ const examples: ExampleDefs[] = [
         readout: () =>
             `min ${DateValueUtils.toIso(MIN_DATE)}, max ${DateValueUtils.toIso(MAX_DATE)} — value: ${describe(boundedValue.value)}`,
         path: `${EXAMPLES_ROOT}/Bounded.vue`,
+    },
+    {
+        key: "rightToLeft",
+        name: EXAMPLE_NAMES.rightToLeft,
+        readout: () =>
+            `value: ${describe(rightToLeftValue.value)} — the box around the calendar sets dir="rtl", so a week runs from the right and the left arrow moves on to the next day`,
+        path: `${EXAMPLES_ROOT}/RightToLeft.vue`,
     },
 ];
 </script>
@@ -107,6 +117,14 @@ const examples: ExampleDefs[] = [
 
         <template #bounded>
             <BoundedExample v-model:value="boundedValue" v-model:month="boundedMonth" :week-starts-on="weekStartsOn" />
+        </template>
+
+        <template #rightToLeft>
+            <RightToLeftExample
+                v-model:value="rightToLeftValue"
+                v-model:month="rightToLeftMonth"
+                :week-starts-on="weekStartsOn"
+            />
         </template>
     </PageExamples>
 </template>

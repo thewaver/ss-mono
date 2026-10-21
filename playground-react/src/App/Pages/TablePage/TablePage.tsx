@@ -9,6 +9,7 @@ import { DisabledExample } from "./Examples/Disabled";
 import { PartsExample } from "./Examples/Parts";
 import { ReorderableExample } from "./Examples/Reorderable";
 import { ResizableExample } from "./Examples/Resizable";
+import { RightToLeftExample } from "./Examples/RightToLeft";
 import { SingleSelectionExample } from "./Examples/SingleSelection";
 import { VirtualizedExample } from "./Examples/Virtualized";
 import type { Part } from "./TablePage.types";
@@ -33,6 +34,11 @@ export const TablePage = () => {
     const reorderableSortState = useState<TableSort | undefined>();
     const reorderableSelectionState = useState<Part[]>([]);
     const reorderableOrderState = useState<string[]>([]);
+
+    const rightToLeftSortState = useState<TableSort | undefined>();
+    const rightToLeftSelectionState = useState<Part[]>([]);
+    const rightToLeftWidthsState = useState<Record<string, number>>({});
+    const rightToLeftOrderState = useState<string[]>([]);
 
     const consumerSortState = useState<TableSort | undefined>();
     const consumerSelectionState = useState<Part[]>([]);
@@ -91,6 +97,22 @@ export const TablePage = () => {
                 />
             ),
             path: `${EXAMPLES_ROOT}/Reorderable.tsx`,
+        },
+        {
+            key: "rightToLeft",
+            span: 2,
+            name: EXAMPLE_NAMES.rightToLeft,
+            readout: () =>
+                `widths: ${JSON.stringify(rightToLeftWidthsState[0])} | order: ${rightToLeftOrderState[0].join(", ") || "as declared"} — the box around the table sets dir="rtl", so the columns run from the right, a column's resize edge is on its left, and the arrows swap meaning`,
+            component: () => (
+                <RightToLeftExample
+                    sort={rightToLeftSortState}
+                    selection={rightToLeftSelectionState}
+                    widths={rightToLeftWidthsState}
+                    order={rightToLeftOrderState}
+                />
+            ),
+            path: `${EXAMPLES_ROOT}/RightToLeft.tsx`,
         },
         {
             key: "consumerSorted",

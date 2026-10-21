@@ -1,7 +1,8 @@
 import { DOMUtils, type Point2d, Point2dUtils } from "@thewaver/ss-utils";
 
+import type { AnchorPlacement } from "../../../Abstracts/Anchor/Anchor.types";
 import { InteractionTrackerUtils } from "../../../Abstracts/InteractionTracker/InteractionTracker.utils";
-import type { NavigatorOrientation } from "../../../Abstracts/Navigator/Navigator.types";
+import type { NavigatorDirection, NavigatorOrientation } from "../../../Abstracts/Navigator/Navigator.types";
 import { NavigatorUtils } from "../../../Abstracts/Navigator/Navigator.utils";
 import type { PlacementLayout } from "../../../Abstracts/Placement/Placement.types";
 import { PlacementUtils } from "../../../Abstracts/Placement/Placement.utils";
@@ -26,6 +27,28 @@ import type {
 
 /** What a menu level's popup root carries, and so how an item finds the popup it is drawn in. */
 const MENU_POPUP_SELECTOR = '[role="menu"]';
+
+/**
+ * Which way the submenu arrows read, from the side a submenu opens on.
+ *
+ * The arrow that opens a submenu is the one pointing at it, so a submenu placed beside its item on the right
+ * reads the arrows as left-to-right text does and one placed on the left as right-to-left text does, whatever
+ * the text around the menu. A placement beside neither side — overlapping the item, or centered on it — has
+ * no side to point at, and the text direction decides.
+ *
+ * @param submenuPlacement Where submenus sit against the items that open them.
+ * @param direction Which way the text runs where the menu was opened.
+ * @returns The direction to read the submenu arrows in.
+ */
+const toSubmenuKeyDirection = (
+    submenuPlacement: AnchorPlacement,
+    direction: NavigatorDirection,
+): NavigatorDirection => {
+    if (submenuPlacement.x === "right_out") return "ltr";
+    if (submenuPlacement.x === "left_out") return "rtl";
+
+    return direction;
+};
 
 /** An item that does not say otherwise is a plain command. */
 const DEFAULT_MENU_ITEM_KIND: MenuItemKind = "command";
@@ -376,8 +399,8 @@ export namespace MenuUtils {
      * What a key pressed inside a level does, typing aside.
      *
      * Tab leaves the menu. Enter and Space activate the highlighted entry, or are swallowed when it is disabled.
-     * In a straight menu the arrow pointing along the text opens the highlighted entry's submenu and the other
-     * one closes the level, both read the way the text runs; a laid-out menu has no left or right, so all four
+     * In a straight menu the arrow pointing at the side submenus open on opens the highlighted entry's submenu
+     * and the other one closes the level ({@link toSubmenuKeyDirection}); a laid-out menu has no left or right, so all four
      * arrows walk it and Escape steps out of a band instead — contained, so the menu is not dismissed with it.
      * Anything the walk answers to moves the highlight.
      *
@@ -391,6 +414,7 @@ export namespace MenuUtils {
      * @param defs.isLaidOut Whether the level is arranged by a layout rather than drawn as a list.
      * @param defs.depth How many levels sit above this one.
      * @param defs.direction Which way the text runs where the menu was opened.
+     * @param defs.submenuPlacement Where submenus sit against the items that open them.
      * @returns What to do, or `undefined` for a key the level leaves alone. Every step but `undefined` claims
      * the key.
      */
@@ -405,7 +429,10 @@ export namespace MenuUtils {
             return { type: "activate", index: highlightedIndex };
         }
 
-        const logicalKey = NavigatorUtils.computeLogicalKey(key, defs.direction);
+        const logicalKey = NavigatorUtils.computeLogicalKey(
+            key,
+            toSubmenuKeyDirection(defs.submenuPlacement, defs.direction),
+        );
 
         if (key === LEVEL_CLOSE_KEY && defs.isLaidOut && defs.depth > ROOT_DEPTH) {
             return { type: "close", isContained: true };

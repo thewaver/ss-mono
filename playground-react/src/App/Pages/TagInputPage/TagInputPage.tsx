@@ -17,6 +17,7 @@ import { PagePropsPanel } from "../../PageComponents/PropsPanel/PropsPanel";
 import { PageButtonContent } from "../../StyledComponents/ButtonContent/ButtonContent";
 import { CrowdedExample } from "./Examples/Crowded";
 import { DefaultExample } from "./Examples/Default";
+import { RightToLeftExample } from "./Examples/RightToLeft";
 import { UniqueExample } from "./Examples/Unique";
 import type { TagInputExampleProps } from "./TagInputPage.types";
 
@@ -28,12 +29,14 @@ export const TagInputPage = () => {
     const uniqueState = useState(STARTING_TAGS);
     const crowdedState = useState(CROWDED_TAGS);
     const emptyState = useState<string[]>([]);
+    const rightToLeftState = useState(STARTING_TAGS);
 
     const reset = () => {
         defaultState[1](STARTING_TAGS);
         uniqueState[1](STARTING_TAGS);
         crowdedState[1](CROWDED_TAGS);
         emptyState[1]([]);
+        rightToLeftState[1](STARTING_TAGS);
     };
 
     const commonProps: Omit<TagInputExampleProps, "value"> = {
@@ -70,6 +73,14 @@ export const TagInputPage = () => {
                 `${crowdedState[0].length} tags in ${NARROW_WIDTH}px — they wrap and the box grows with them`,
             component: () => <CrowdedExample {...commonProps} value={crowdedState} />,
             path: `${EXAMPLES_ROOT}/Crowded.tsx`,
+        },
+        {
+            key: "rightToLeft",
+            name: EXAMPLE_NAMES.rightToLeft,
+            readout: () =>
+                `tags: ${rightToLeftState[0].join(", ") || "none"} — the box around the field sets dir="rtl", so the tags run from the right and the right arrow moves from the empty field onto the last tag`,
+            component: () => <RightToLeftExample {...commonProps} value={rightToLeftState} />,
+            path: `${EXAMPLES_ROOT}/RightToLeft.tsx`,
         },
     ];
 

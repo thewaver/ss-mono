@@ -13,12 +13,14 @@ import type { TimeValue } from "@thewaver/ss-utils";
 import type { ExampleDefs } from "../../PageComponents/Examples/Examples.types";
 import PageExamples from "../../PageComponents/Examples/PageExamples.vue";
 import DefaultExample from "./Examples/Default.vue";
+import RightToLeftExample from "./Examples/RightToLeft.vue";
 
 const describeTime = (value: TimeValue | undefined) => (value ? TimeUtils.toIso(value) : "none");
 
 const defaultValue = shallowRef<TimeValue | undefined>({ hour: 9, minute: 30 });
 const twelveHourValue = shallowRef<TimeValue | undefined>({ hour: 14, minute: 30 });
 const boundedValue = shallowRef<TimeValue | undefined>({ hour: 10, minute: 15 });
+const rightToLeftValue = shallowRef<TimeValue | undefined>({ hour: 9, minute: 30 });
 
 const examples: ExampleDefs[] = [
     {
@@ -42,6 +44,13 @@ const examples: ExampleDefs[] = [
             `value: ${describeTime(boundedValue.value)} — quarter hours only, inside ${TimeUtils.toIso(OPENING_TIME)} to ${TimeUtils.toIso(CLOSING_TIME)}`,
         path: `${EXAMPLES_ROOT}/Default.vue`,
     },
+    {
+        key: "rightToLeft",
+        name: EXAMPLE_NAMES.rightToLeft,
+        readout: () =>
+            `value: ${describeTime(rightToLeftValue.value)} — the box around the clock sets dir="rtl", so the hour column sits on the right and the left arrow moves on to the minutes`,
+        path: `${EXAMPLES_ROOT}/RightToLeft.vue`,
+    },
 ];
 </script>
 
@@ -63,6 +72,10 @@ const examples: ExampleDefs[] = [
                 :max-value="CLOSING_TIME"
                 ariaLabel="Booking time"
             />
+        </template>
+
+        <template #rightToLeft>
+            <RightToLeftExample v-model:value="rightToLeftValue" />
         </template>
     </PageExamples>
 </template>

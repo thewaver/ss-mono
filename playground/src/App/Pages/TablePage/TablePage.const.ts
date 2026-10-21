@@ -5,6 +5,7 @@ export const EXAMPLE_NAMES = {
     reorderable: "Reorderable columns",
     consumerSorted: "Sorted by the page",
     virtualized: "Virtualized",
+    rightToLeft: "In a right-to-left box",
     disabled: "Disabled",
 };
 

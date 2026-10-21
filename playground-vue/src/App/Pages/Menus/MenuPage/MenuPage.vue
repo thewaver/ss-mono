@@ -7,6 +7,7 @@ import type { ExampleDefs } from "../../../PageComponents/Examples/Examples.type
 import PageExamples from "../../../PageComponents/Examples/PageExamples.vue";
 import CascaderExample from "./Examples/Cascader.vue";
 import ContextAreaExample from "./Examples/ContextArea.vue";
+import ContextRightToLeftExample from "./Examples/ContextRightToLeft.vue";
 import DefaultExample from "./Examples/Default.vue";
 import DisabledExample from "./Examples/Disabled.vue";
 import DrivenExample from "./Examples/Driven.vue";
@@ -14,6 +15,7 @@ import GlideExample from "./Examples/Glide.vue";
 import PlacedAboveExample from "./Examples/PlacedAbove.vue";
 import ReachableExample from "./Examples/Reachable.vue";
 import RightToLeftExample from "./Examples/RightToLeft.vue";
+import RightToLeftPlacedExample from "./Examples/RightToLeftPlaced.vue";
 import StatefulExample from "./Examples/Stateful.vue";
 import SubmenusExample from "./Examples/Submenus.vue";
 import {
@@ -34,6 +36,8 @@ const lastDisabledAction = shallowRef(NOTHING_RUN);
 const lastReachableAction = shallowRef(NOTHING_RUN);
 const lastNestedAction = shallowRef(NOTHING_RUN);
 const lastRightToLeftAction = shallowRef(NOTHING_RUN);
+const lastPlacedRightToLeftAction = shallowRef(NOTHING_RUN);
+const lastContextRightToLeftAction = shallowRef(NOTHING_RUN);
 const lastFlippedAction = shallowRef(NOTHING_RUN);
 const lastLayerAction = shallowRef(NOTHING_RUN);
 const lastDrivenAction = shallowRef(NOTHING_RUN);
@@ -83,6 +87,13 @@ const examples: ExampleDefs[] = [
         path: `${EXAMPLES_ROOT}/ContextArea.vue`,
     },
     {
+        key: "contextRightToLeft",
+        name: EXAMPLE_NAMES.contextRightToLeft,
+        readout: () =>
+            `${lastContextRightToLeftAction.value} — the box around the region sets dir="rtl", so the menu spreads to the left of the pointer and its submenus open on the left`,
+        path: `${EXAMPLES_ROOT}/ContextRightToLeft.vue`,
+    },
+    {
         key: "staysOpen",
         name: EXAMPLE_NAMES.staysOpen,
         readout: () =>
@@ -120,6 +131,13 @@ const examples: ExampleDefs[] = [
         readout: () =>
             `${lastRightToLeftAction.value} — the box around the trigger sets dir="rtl", so a submenu opens on the left, ArrowLeft steps in and ArrowRight steps back out`,
         path: `${EXAMPLES_ROOT}/RightToLeft.vue`,
+    },
+    {
+        key: "rightToLeftPlaced",
+        name: EXAMPLE_NAMES.rightToLeftPlaced,
+        readout: () =>
+            `${lastPlacedRightToLeftAction.value} — the box around the trigger sets dir="rtl", but the menu names the right as its submenu side, so its submenus open on the right and ArrowRight opens them`,
+        path: `${EXAMPLES_ROOT}/RightToLeftPlaced.vue`,
     },
     {
         key: "placedAbove",
@@ -175,6 +193,10 @@ const examples: ExampleDefs[] = [
             <ContextAreaExample @activate="(action: Action) => (lastContextAction = action.name)" />
         </template>
 
+        <template #contextRightToLeft>
+            <ContextRightToLeftExample @activate="(action: Action) => (lastContextRightToLeftAction = action.name)" />
+        </template>
+
         <template #staysOpen>
             <DefaultExample :items="ZOOM_ACTIONS" caption="Zoom" @activate="applyZoom" />
         </template>
@@ -203,6 +225,10 @@ const examples: ExampleDefs[] = [
 
         <template #rightToLeft>
             <RightToLeftExample @activate="(action: Action) => (lastRightToLeftAction = action.name)" />
+        </template>
+
+        <template #rightToLeftPlaced>
+            <RightToLeftPlacedExample @activate="(action: Action) => (lastPlacedRightToLeftAction = action.name)" />
         </template>
 
         <template #placedAbove>

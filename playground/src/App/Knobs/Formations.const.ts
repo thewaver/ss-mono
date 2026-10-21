@@ -22,7 +22,7 @@ export namespace FormationKnobs {
     export const STAGGER_STEP_MS = 10;
 
     export const STARTING_ITEM_COUNT = 6;
-    export const STARTING_LAYOUT_KEY: PlacementLayouts.SampleKey = "cliff";
+    export const STARTING_LAYOUT_KEY: PlacementLayouts.SampleKey = "row";
     export const STARTING_EFFECT_KEY: ProximityEffects.SampleKey = "zoom_in";
     export const STARTING_SHAPE_KIND: ShapeConst.DefaultShape = "lozenge";
     export const STARTING_IS_STACKED_IN_REVERSE = false;

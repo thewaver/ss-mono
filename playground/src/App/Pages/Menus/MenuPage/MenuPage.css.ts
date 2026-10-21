@@ -15,3 +15,8 @@ export const contextRegion = style({
     fontSize: themeVars.fontSize.small,
     textAlign: "center",
 });
+
+export const endAlignedBox = style({
+    display: "flex",
+    justifyContent: "flex-end",
+});

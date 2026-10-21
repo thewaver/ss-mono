@@ -17,6 +17,7 @@ import { LinkComponentExample } from "./Examples/LinkComponent";
 import { LinksExample } from "./Examples/Links";
 import { RightToLeftExample } from "./Examples/RightToLeft";
 import { RowExample } from "./Examples/Row";
+import { SwitchedDirectionExample } from "./Examples/SwitchedDirection";
 
 export const TabsPage = () => {
     const [rowValue, setRowValue] = useState("Render");
@@ -27,6 +28,7 @@ export const TabsPage = () => {
     const [reachableValue, setReachableValue] = useState("Render");
     const [hoverPillValue, setHoverPillValue] = useState("Render");
     const [rightToLeftValue, setRightToLeftValue] = useState("Render");
+    const [switchedDirectionValue, setSwitchedDirectionValue] = useState("Render");
     const [disabledValue, setDisabledValue] = useState("Draft");
     const [clearableValue, setClearableValue] = useState<string | undefined>("One");
     const [honeycombValue, setHoneycombValue] = useState("Overview");
@@ -108,6 +110,20 @@ export const TabsPage = () => {
                 <RightToLeftExample selectedValue={rightToLeftValue} onSelectionChange={setRightToLeftValue} />
             ),
             path: `${EXAMPLES_ROOT}/RightToLeft.tsx`,
+        },
+        {
+            key: "switchedDirection",
+            span: 2,
+            name: EXAMPLE_NAMES.switchedDirection,
+            readout: () =>
+                `selected: ${switchedDirectionValue} — the example's settings switch the box around the tabs to dir="rtl" and back, and the arrows follow the row as it turns round`,
+            component: () => (
+                <SwitchedDirectionExample
+                    selectedValue={switchedDirectionValue}
+                    onSelectionChange={setSwitchedDirectionValue}
+                />
+            ),
+            path: `${EXAMPLES_ROOT}/SwitchedDirection.tsx`,
         },
         {
             key: "honeycomb",

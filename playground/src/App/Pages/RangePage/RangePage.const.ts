@@ -2,6 +2,7 @@ export const EXAMPLE_NAMES = {
     default: "Default",
     stepped: "Stepped",
     pair: "Pair",
+    rightToLeft: "Pair in a right-to-left box",
     priceRange: "Price range, read as prices",
     vertical: "Vertical",
     knob: "Knob",

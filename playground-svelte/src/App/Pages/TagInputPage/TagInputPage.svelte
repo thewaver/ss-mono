@@ -10,6 +10,7 @@
     import PageButtonContent from "../../StyledComponents/ButtonContent/ButtonContent.svelte";
     import CrowdedExample from "./Examples/Crowded.svelte";
     import DefaultExample from "./Examples/Default.svelte";
+    import RightToLeftExample from "./Examples/RightToLeft.svelte";
     import UniqueExample from "./Examples/Unique.svelte";
     import type { TagInputExampleProps } from "./TagInputPage.types";
     import {
@@ -41,12 +42,14 @@
     let uniqueValue = $state.raw(STARTING_TAGS);
     let crowdedValue = $state.raw(CROWDED_TAGS);
     let emptyValue = $state.raw<string[]>([]);
+    let rightToLeftValue = $state.raw(STARTING_TAGS);
 
     const reset = () => {
         defaultValue = STARTING_TAGS;
         uniqueValue = STARTING_TAGS;
         crowdedValue = CROWDED_TAGS;
         emptyValue = [];
+        rightToLeftValue = STARTING_TAGS;
     };
 
     const commonProps: Omit<TagInputExampleProps, "value"> = $derived({
@@ -83,6 +86,14 @@
             component: crowdedExample,
             path: `${EXAMPLES_ROOT}/Crowded.svelte`,
         },
+        {
+            key: "rightToLeft",
+            name: EXAMPLE_NAMES.rightToLeft,
+            readout: () =>
+                `tags: ${rightToLeftValue.join(", ") || "none"} — the box around the field sets dir="rtl", so the tags run from the right and the right arrow moves from the empty field onto the last tag`,
+            component: rightToLeftExample,
+            path: `${EXAMPLES_ROOT}/RightToLeft.svelte`,
+        },
     ];
 </script>
 
@@ -100,6 +111,10 @@
 
 {#snippet crowdedExample()}
     <CrowdedExample {...commonProps} bind:value={crowdedValue} />
+{/snippet}
+
+{#snippet rightToLeftExample()}
+    <RightToLeftExample {...commonProps} bind:value={rightToLeftValue} />
 {/snippet}
 
 <PagePropsPanel scope={"global"}>

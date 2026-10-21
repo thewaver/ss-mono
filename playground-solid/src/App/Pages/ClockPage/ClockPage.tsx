@@ -11,6 +11,7 @@ import type { TimeValue } from "@thewaver/ss-utils";
 
 import { PageExamples } from "../../PageComponents/Examples/Examples";
 import { DefaultExample } from "./Examples/Default";
+import { RightToLeftExample } from "./Examples/RightToLeft";
 
 const describeTime = (value: TimeValue | undefined) => (value ? TimeUtils.toIso(value) : "none");
 
@@ -18,6 +19,7 @@ export const ClockPage = () => {
     const defaultSignal = createSignal<TimeValue | undefined>({ hour: 9, minute: 30 });
     const twelveHourSignal = createSignal<TimeValue | undefined>({ hour: 14, minute: 30 });
     const boundedSignal = createSignal<TimeValue | undefined>({ hour: 10, minute: 15 });
+    const rightToLeftSignal = createSignal<TimeValue | undefined>({ hour: 9, minute: 30 });
 
     const getExamples = createMemo(() => [
         {
@@ -51,6 +53,14 @@ export const ClockPage = () => {
                 />
             ),
             path: `${EXAMPLES_ROOT}/Default.tsx`,
+        },
+        {
+            key: "rightToLeft",
+            name: EXAMPLE_NAMES.rightToLeft,
+            readout: () =>
+                `value: ${describeTime(rightToLeftSignal[0]())} — the box around the clock sets dir="rtl", so the hour column sits on the right and the left arrow moves on to the minutes`,
+            component: () => <RightToLeftExample value={rightToLeftSignal} />,
+            path: `${EXAMPLES_ROOT}/RightToLeft.tsx`,
         },
     ]);
 

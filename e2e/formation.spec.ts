@@ -39,6 +39,11 @@ const boxOf = (page: import("@playwright/test").Page, selector: string, index: n
         { selector, index },
     );
 
+const pickArrangement = async (page: import("@playwright/test").Page, key: string) => {
+    await page.locator(`${prop("layoutKey")} [role="combobox"]`).click();
+    await page.getByRole("option", { name: key, exact: true }).click();
+};
+
 test.beforeEach(async ({ page }) => {
     await page.goto("/formation");
     await expect(page.locator(item(FORMATION)).first()).toBeVisible();
@@ -54,7 +59,13 @@ test("the formation is a query container, which is what the written units resolv
     expect(container, "without this the units would silently fall back to the viewport").toBe("inline-size");
 });
 
+/**
+ * The next four measure a cliff's own geometry — how far its places lean, how tall it stands, how wide a place is —
+ * so they pick it first. The page starts on a row.
+ */
 test("a position written as a fraction of the width lands at that fraction of the width", async ({ page }) => {
+    await pickArrangement(page, "cliff");
+
     const written = await computedStyle(page.locator(item(FORMATION)).first(), "left");
     const box = await boxOf(page, item(FORMATION), 0);
 
@@ -77,6 +88,8 @@ test("a position written as a fraction of the width lands at that fraction of th
 });
 
 test("the height comes from the width, so the arrangement keeps its shape", async ({ page }) => {
+    await pickArrangement(page, "cliff");
+
     const box = await boxOf(page, item(FORMATION), 0);
 
     expect(box.hostHeight, "a formation with items in it reserves room for them").toBeGreaterThan(0);
@@ -87,12 +100,15 @@ test("the height comes from the width, so the arrangement keeps its shape", asyn
 });
 
 test("an item's own size is a fraction of the width too", async ({ page }) => {
+    await pickArrangement(page, "cliff");
+
     const box = await boxOf(page, item(FORMATION), 0);
 
     expect(box.width / box.hostWidth, "half the width for a cliff place").toBeCloseTo(0.5, 2);
 });
 
 test("the arrangement changes with the item count, on the first paint", async ({ page }) => {
+    await pickArrangement(page, "cliff");
     await page.locator(numberField("itemCount")).fill("3");
     await page.locator(numberField("itemCount")).blur();
 
@@ -216,11 +232,6 @@ test("taking an item out leaves the other items' elements where they were", asyn
  * writes no transition at all and the items jump. `getAnimations()` is the browser's own answer to whether
  * anything is moving, so it is what both halves read — the duration and easing are not the spec's business.
  */
-const pickArrangement = async (page: import("@playwright/test").Page, key: string) => {
-    await page.locator(`${prop("layoutKey")} [role="combobox"]`).click();
-    await page.getByRole("option", { name: key, exact: true }).click();
-};
-
 const runningAnimations = (page: import("@playwright/test").Page) =>
     page.evaluate(
         (selector) =>

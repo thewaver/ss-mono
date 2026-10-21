@@ -3,6 +3,7 @@ export const EXAMPLE_NAMES = {
     empty: "Empty",
     unique: "Refusing duplicates",
     crowded: "Crowded and narrow",
+    rightToLeft: "In a right-to-left box",
 };
 
 export const NARROW_WIDTH = 240;

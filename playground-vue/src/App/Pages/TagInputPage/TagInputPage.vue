@@ -19,6 +19,7 @@ import PagePropsPanel from "../../PageComponents/PropsPanel/PagePropsPanel.vue";
 import PageButtonContent from "../../StyledComponents/ButtonContent/ButtonContent.vue";
 import CrowdedExample from "./Examples/Crowded.vue";
 import DefaultExample from "./Examples/Default.vue";
+import RightToLeftExample from "./Examples/RightToLeft.vue";
 import UniqueExample from "./Examples/Unique.vue";
 import type { TagInputExampleProps } from "./TagInputPage.types";
 
@@ -29,12 +30,14 @@ const defaultTags = shallowRef(STARTING_TAGS);
 const uniqueTags = shallowRef(STARTING_TAGS);
 const crowdedTags = shallowRef(CROWDED_TAGS);
 const emptyTags = shallowRef<string[]>([]);
+const rightToLeftTags = shallowRef(STARTING_TAGS);
 
 const reset = () => {
     defaultTags.value = STARTING_TAGS;
     uniqueTags.value = STARTING_TAGS;
     crowdedTags.value = CROWDED_TAGS;
     emptyTags.value = [];
+    rightToLeftTags.value = STARTING_TAGS;
 };
 
 const commonProps = computed<Omit<TagInputExampleProps, "value" | "onUpdate:value">>(() => ({
@@ -66,6 +69,13 @@ const examples: ExampleDefs[] = [
         name: EXAMPLE_NAMES.crowded,
         readout: () => `${crowdedTags.value.length} tags in ${NARROW_WIDTH}px — they wrap and the box grows with them`,
         path: `${EXAMPLES_ROOT}/Crowded.vue`,
+    },
+    {
+        key: "rightToLeft",
+        name: EXAMPLE_NAMES.rightToLeft,
+        readout: () =>
+            `tags: ${rightToLeftTags.value.join(", ") || "none"} — the box around the field sets dir="rtl", so the tags run from the right and the right arrow moves from the empty field onto the last tag`,
+        path: `${EXAMPLES_ROOT}/RightToLeft.vue`,
     },
 ];
 </script>
@@ -123,6 +133,10 @@ const examples: ExampleDefs[] = [
 
         <template #crowded>
             <CrowdedExample v-bind="commonProps" v-model:value="crowdedTags" />
+        </template>
+
+        <template #rightToLeft>
+            <RightToLeftExample v-bind="commonProps" v-model:value="rightToLeftTags" />
         </template>
     </PageExamples>
 </template>

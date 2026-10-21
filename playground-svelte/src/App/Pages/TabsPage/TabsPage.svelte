@@ -16,6 +16,7 @@
     import LinkComponentExample from "./Examples/LinkComponent.svelte";
     import LinksExample from "./Examples/Links.svelte";
     import RightToLeftExample from "./Examples/RightToLeft.svelte";
+    import SwitchedDirectionExample from "./Examples/SwitchedDirection.svelte";
     import RowExample from "./Examples/Row.svelte";
 
     let rowValue = $state("Render");
@@ -26,6 +27,7 @@
     let autoValue = $state("Render");
     let reachableValue = $state("Render");
     let rightToLeftValue = $state("Render");
+    let switchedDirectionValue = $state("Render");
     let disabledValue = $state("Draft");
     let clearableValue = $state<string | undefined>("One");
     let honeycombValue = $state("Overview");
@@ -82,6 +84,15 @@
                 `selected: ${rightToLeftValue} — the box around the tabs sets dir="rtl", so they run from the right and the left arrow moves on to the next tab`,
             component: rightToLeftExample,
             path: `${EXAMPLES_ROOT}/RightToLeft.svelte`,
+        },
+        {
+            key: "switchedDirection",
+            span: 2,
+            name: EXAMPLE_NAMES.switchedDirection,
+            readout: () =>
+                `selected: ${switchedDirectionValue} — the example's settings switch the box around the tabs to dir="rtl" and back, and the arrows follow the row as it turns round`,
+            component: switchedDirectionExample,
+            path: `${EXAMPLES_ROOT}/SwitchedDirection.svelte`,
         },
         {
             key: "honeycomb",
@@ -182,6 +193,15 @@
         selectedValue={rightToLeftValue}
         onSelectionChange={(value) => {
             rightToLeftValue = value;
+        }}
+    />
+{/snippet}
+
+{#snippet switchedDirectionExample()}
+    <SwitchedDirectionExample
+        selectedValue={switchedDirectionValue}
+        onSelectionChange={(value) => {
+            switchedDirectionValue = value;
         }}
     />
 {/snippet}

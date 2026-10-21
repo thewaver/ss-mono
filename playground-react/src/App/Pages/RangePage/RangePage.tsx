@@ -12,6 +12,7 @@ import { KnobExample } from "./Examples/Knob";
 import { PairExample } from "./Examples/Pair";
 import { PriceExample } from "./Examples/Price";
 import { ReachableExample } from "./Examples/Reachable";
+import { RightToLeftExample } from "./Examples/RightToLeft";
 import { SteppedExample } from "./Examples/Stepped";
 import { VerticalExample } from "./Examples/Vertical";
 
@@ -25,6 +26,7 @@ export const RangePage = () => {
     const knobState = useState(30);
 
     const priceState = useState<Span>({ start: 20, end: 80 });
+    const rightToLeftState = useState<Span>({ start: 20, end: 80 });
     const budgetState = useState<Span>({ start: 100, end: 350 });
     const [settledBudget, setSettledBudget] = useState("not yet");
     const verticalPairState = useState<Span>({ start: 30, end: 70 });
@@ -51,6 +53,14 @@ export const RangePage = () => {
             readout: () => `start: ${priceState[0].start} | end: ${priceState[0].end}`,
             component: () => <PairExample range={priceState} />,
             path: `${EXAMPLES_ROOT}/Pair.tsx`,
+        },
+        {
+            key: "rightToLeft",
+            name: EXAMPLE_NAMES.rightToLeft,
+            readout: () =>
+                `start: ${rightToLeftState[0].start} | end: ${rightToLeftState[0].end} — the box around the range sets dir="rtl", so the track runs from the right and the lowest price is the thumb on the right`,
+            component: () => <RightToLeftExample range={rightToLeftState} />,
+            path: `${EXAMPLES_ROOT}/RightToLeft.tsx`,
         },
         {
             key: "priceRange",

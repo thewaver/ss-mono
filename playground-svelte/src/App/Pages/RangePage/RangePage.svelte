@@ -11,6 +11,7 @@
     import PairExample from "./Examples/Pair.svelte";
     import PriceExample from "./Examples/Price.svelte";
     import ReachableExample from "./Examples/Reachable.svelte";
+    import RightToLeftExample from "./Examples/RightToLeft.svelte";
     import SteppedExample from "./Examples/Stepped.svelte";
     import VerticalExample from "./Examples/Vertical.svelte";
     import { EXAMPLE_NAMES, EXAMPLES_ROOT, STEP_COUNT } from "@thewaver/ss-playground/App/Pages/RangePage/RangePage.const";
@@ -24,6 +25,7 @@
     let knob = $state(30);
 
     let price = $state.raw<Span>({ start: 20, end: 80 });
+    let rightToLeftPrice = $state.raw<Span>({ start: 20, end: 80 });
     let budget = $state.raw<Span>({ start: 100, end: 350 });
     let settledBudget = $state("not yet");
     let verticalPair = $state.raw<Span>({ start: 30, end: 70 });
@@ -50,6 +52,14 @@
             readout: () => `start: ${price.start} | end: ${price.end}`,
             component: pairExample,
             path: `${EXAMPLES_ROOT}/Pair.svelte`,
+        },
+        {
+            key: "rightToLeft",
+            name: EXAMPLE_NAMES.rightToLeft,
+            readout: () =>
+                `start: ${rightToLeftPrice.start} | end: ${rightToLeftPrice.end} — the box around the range sets dir="rtl", so the track runs from the right and the lowest price is the thumb on the right`,
+            component: rightToLeftExample,
+            path: `${EXAMPLES_ROOT}/RightToLeft.svelte`,
         },
         {
             key: "priceRange",
@@ -116,6 +126,10 @@
 
 {#snippet pairExample()}
     <PairExample bind:range={price} />
+{/snippet}
+
+{#snippet rightToLeftExample()}
+    <RightToLeftExample bind:range={rightToLeftPrice} />
 {/snippet}
 
 {#snippet priceExample()}

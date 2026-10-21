@@ -12,6 +12,7 @@ import { KnobExample } from "./Examples/Knob";
 import { PairExample } from "./Examples/Pair";
 import { PriceExample } from "./Examples/Price";
 import { ReachableExample } from "./Examples/Reachable";
+import { RightToLeftExample } from "./Examples/RightToLeft";
 import { SteppedExample } from "./Examples/Stepped";
 import { VerticalExample } from "./Examples/Vertical";
 
@@ -25,6 +26,7 @@ export const RangePage = () => {
     const knobSignal = createSignal(30);
 
     const priceSignal = createSignal<Span>({ start: 20, end: 80 });
+    const rightToLeftSignal = createSignal<Span>({ start: 20, end: 80 });
     const budgetSignal = createSignal<Span>({ start: 100, end: 350 });
     const [getSettledBudget, setSettledBudget] = createSignal("not yet");
     const verticalPairSignal = createSignal<Span>({ start: 30, end: 70 });
@@ -51,6 +53,14 @@ export const RangePage = () => {
             readout: () => `start: ${priceSignal[0]().start} | end: ${priceSignal[0]().end}`,
             component: () => <PairExample range={priceSignal} />,
             path: `${EXAMPLES_ROOT}/Pair.tsx`,
+        },
+        {
+            key: "rightToLeft",
+            name: EXAMPLE_NAMES.rightToLeft,
+            readout: () =>
+                `start: ${rightToLeftSignal[0]().start} | end: ${rightToLeftSignal[0]().end} — the box around the range sets dir="rtl", so the track runs from the right and the lowest price is the thumb on the right`,
+            component: () => <RightToLeftExample range={rightToLeftSignal} />,
+            path: `${EXAMPLES_ROOT}/RightToLeft.tsx`,
         },
         {
             key: "priceRange",

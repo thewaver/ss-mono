@@ -5,6 +5,39 @@ import type { ScrollerButtonPlacement, ScrollerMetrics, ScrollerStep } from "./S
 /** How close to an end, in pixels, counts as being at it, so a fractional scroll position still reads as arrived. */
 const SCROLL_EPSILON = 1;
 
+/**
+ * Where each track's latest step began and where it is heading, kept until the track arrives or is moved elsewhere.
+ *
+ * A step scrolls smoothly, so for a moment the track sits somewhere between the two; a press in that moment has to
+ * be measured from where the track is going rather than from where it happens to be, or it covers less than a page.
+ */
+const stepsInFlight = new WeakMap<HTMLElement, { from: number; to: number }>();
+
+/**
+ * Where the next step of a track is measured from: the end of the step already under way, or the track's own
+ * position when nothing is.
+ *
+ * A step counts as under way only while the track lies on the stretch between where it began and where it is
+ * heading and has not yet arrived. Anything else — the glide finished, or a wheel, a drag or a focus reveal took the
+ * track somewhere off that stretch — means the remembered step no longer describes the track, and it is dropped.
+ */
+const computeStepOrigin = (track: HTMLElement) => {
+    const position = track.scrollLeft;
+    const inFlight = stepsInFlight.get(track);
+
+    if (!inFlight) return position;
+
+    const isOnTheWay =
+        position >= Math.min(inFlight.from, inFlight.to) - SCROLL_EPSILON &&
+        position <= Math.max(inFlight.from, inFlight.to) + SCROLL_EPSILON;
+
+    if (isOnTheWay && Math.abs(position - inFlight.to) > SCROLL_EPSILON) return inFlight.to;
+
+    stepsInFlight.delete(track);
+
+    return position;
+};
+
 const computeOffsetWithin = (element: HTMLElement, ancestor: HTMLElement) => {
     let offset = 0;
     let node: HTMLElement | null = element;
@@ -116,10 +149,11 @@ export namespace ScrollerUtils {
      *
      * @param track The scrolling track.
      * @param step Which way.
+     * @param start Where to measure the step from. Defaults to where the track is scrolled to now.
      * @returns The scroll position to go to.
      */
-    export const computeStepTarget = (track: HTMLElement, step: ScrollerStep) => {
-        const { start, visible } = readMetrics(track);
+    export const computeStepTarget = (track: HTMLElement, step: ScrollerStep, start = track.scrollLeft) => {
+        const { visible } = readMetrics(track);
         const offsets = [...track.children].map((child) => (child as HTMLElement).offsetLeft);
 
         if (step === "next") {
@@ -136,6 +170,10 @@ export namespace ScrollerUtils {
     /**
      * Scrolls a track one step, unless it is already at the end that step goes towards.
      *
+     * A press made while an earlier step is still gliding is measured from where that step is heading, so five quick
+     * presses go five pages, as five slow ones do; see {@link computeStepTarget}. Once the track arrives, or is
+     * scrolled somewhere off its way, the next press is measured from where it is.
+     *
      * @param track The scrolling track, once it exists.
      * @param step Which way.
      * @returns `true` when it scrolled, `false` at the matching end or with no track.
@@ -143,11 +181,15 @@ export namespace ScrollerUtils {
     export const stepTo = (track: HTMLElement | undefined, step: ScrollerStep) => {
         if (!track) return false;
 
-        const metrics = readMetrics(track);
+        const origin = computeStepOrigin(track);
+        const metrics = { ...readMetrics(track), start: origin };
 
         if (step === "previous" ? getIsAtStart(metrics) : getIsAtEnd(metrics)) return false;
 
-        track.scrollTo({ left: computeStepTarget(track, step) });
+        const target = MathUtils.clamp(computeStepTarget(track, step, origin), 0, computeScrollRange(metrics));
+
+        stepsInFlight.set(track, { from: track.scrollLeft, to: target });
+        track.scrollTo({ left: target });
 
         return true;
     };

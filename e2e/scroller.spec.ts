@@ -68,10 +68,7 @@ test("a step moves the track forward and brings the back button to life", async 
 });
 
 /**
- * A step is measured from where the track is at the moment the button is pressed, and the scroll that follows
- * is smooth — so a second press landing mid-animation moves less than a full page. That is the component's
- * real behavior rather than a harness artifact, which is why this waits for each scroll to come to rest
- * instead of pressing a fixed number of times and hoping.
+ * Waits for a smooth scroll to come to rest, for the cases that need to read where a step landed.
  *
  * It counts animation frames rather than polling on a clock, and will not call it rest inside the first few
  * frames. Both matter: a smooth scroll takes a frame or two to get going, so two equal readings taken
@@ -115,6 +112,33 @@ const waitForRest = (page: Page, scope: string) =>
             }),
         { scope },
     );
+
+/**
+ * A step glides, and a press made during the glide is measured from where the glide is heading rather than from
+ * where the track happens to be, so quick presses go as far as slow ones. Two presses are made back to back, and
+ * where they come to rest is compared with two presses made one after the other with a rest in between, on a page
+ * loaded afresh between the two — the same two pages either way, with no distance written down.
+ */
+test("two quick presses go as far as two slow ones", async ({ page }) => {
+    const buttons = page.locator(`${SPLIT} button`);
+
+    await buttons.last().click();
+    await waitForRest(page, SPLIT);
+    await buttons.last().click();
+    await waitForRest(page, SPLIT);
+
+    const slow = (await scrollOf(page, SPLIT)).left;
+
+    await page.reload();
+    await expect(buttons.last()).toBeVisible();
+    expect((await scrollOf(page, SPLIT)).left, "the track starts over at the start").toBe(0);
+
+    await buttons.last().click();
+    await buttons.last().click();
+    await waitForRest(page, SPLIT);
+
+    expect((await scrollOf(page, SPLIT)).left, "and two quick presses forward land where the slow ones did").toBe(slow);
+});
 
 test("stepping to the far end kills the forward button and not the other one", async ({ page }) => {
     const buttons = page.locator(`${SPLIT} button`);

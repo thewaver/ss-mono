@@ -22,6 +22,7 @@ import { PageProp } from "../../PageComponents/Prop/Prop";
 import { PagePropsPanel } from "../../PageComponents/PropsPanel/PropsPanel";
 import { BoundedExample } from "./Examples/Bounded";
 import { DefaultExample } from "./Examples/Default";
+import { RightToLeftExample } from "./Examples/RightToLeft";
 
 const describe = (value: DateValueRange | undefined) =>
     value ? `${DateValueUtils.toIso(value.start)} to ${DateValueUtils.toIso(value.end)}` : "none";
@@ -40,9 +41,11 @@ export const RangeCalendarPage = () => {
 
     const defaultValue = useState<DateValueRange | undefined>();
     const boundedValue = useState<DateValueRange | undefined>();
+    const rightToLeftValue = useState<DateValueRange | undefined>();
 
     const defaultMonth = useMonthState(calendarId);
     const boundedMonth = useMonthState(calendarId);
+    const rightToLeftMonth = useMonthState(calendarId);
 
     const examples = [
         {
@@ -59,6 +62,16 @@ export const RangeCalendarPage = () => {
                 `min ${DateValueUtils.toIso(MIN_DATE)}, max ${DateValueUtils.toIso(MAX_DATE)} — value: ${describe(boundedValue[0])}`,
             component: () => <BoundedExample value={boundedValue} month={boundedMonth} weekStartsOn={weekStartsOn} />,
             path: `${EXAMPLES_ROOT}/Bounded.tsx`,
+        },
+        {
+            key: "rightToLeft",
+            name: EXAMPLE_NAMES.rightToLeft,
+            readout: () =>
+                `value: ${describe(rightToLeftValue[0])} — the box around the calendar sets dir="rtl", so a week runs from the right and the left arrow moves on to the next day`,
+            component: () => (
+                <RightToLeftExample value={rightToLeftValue} month={rightToLeftMonth} weekStartsOn={weekStartsOn} />
+            ),
+            path: `${EXAMPLES_ROOT}/RightToLeft.tsx`,
         },
     ];
 

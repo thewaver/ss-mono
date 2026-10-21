@@ -22,6 +22,7 @@ import { PageProp } from "../../PageComponents/Prop/Prop";
 import { PagePropsPanel } from "../../PageComponents/PropsPanel/PropsPanel";
 import { BoundedExample } from "./Examples/Bounded";
 import { DefaultExample } from "./Examples/Default";
+import { RightToLeftExample } from "./Examples/RightToLeft";
 
 const describe = (value: DateValueRange | undefined) =>
     value ? `${DateValueUtils.toIso(value.start)} to ${DateValueUtils.toIso(value.end)}` : "none";
@@ -32,6 +33,7 @@ export const RangeCalendarPage = () => {
 
     const defaultValue = createSignal<DateValueRange | undefined>();
     const boundedValue = createSignal<DateValueRange | undefined>();
+    const rightToLeftValue = createSignal<DateValueRange | undefined>();
 
     const makeMonthSignal = (): Signal<DateValue> => {
         const signal = createSignal<DateValue>(DateValueUtils.getStartOfMonth(TODAY));
@@ -41,6 +43,7 @@ export const RangeCalendarPage = () => {
 
     const defaultMonth = makeMonthSignal();
     const boundedMonth = makeMonthSignal();
+    const rightToLeftMonth = makeMonthSignal();
 
     const getExamples = createMemo(() => [
         {
@@ -61,6 +64,16 @@ export const RangeCalendarPage = () => {
                 <BoundedExample value={boundedValue} month={boundedMonth} weekStartsOn={getWeekStartsOn} />
             ),
             path: `${EXAMPLES_ROOT}/Bounded.tsx`,
+        },
+        {
+            key: "rightToLeft",
+            name: EXAMPLE_NAMES.rightToLeft,
+            readout: () =>
+                `value: ${describe(rightToLeftValue[0]())} — the box around the calendar sets dir="rtl", so a week runs from the right and the left arrow moves on to the next day`,
+            component: () => (
+                <RightToLeftExample value={rightToLeftValue} month={rightToLeftMonth} weekStartsOn={getWeekStartsOn} />
+            ),
+            path: `${EXAMPLES_ROOT}/RightToLeft.tsx`,
         },
     ]);
 

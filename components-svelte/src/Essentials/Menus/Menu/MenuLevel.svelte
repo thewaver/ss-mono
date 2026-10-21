@@ -203,6 +203,7 @@
             isLaidOut,
             depth: props.path.length,
             direction: props.direction,
+            submenuPlacement: props.submenuPlacement,
         });
 
         if (step === undefined) return;
