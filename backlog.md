@@ -59,10 +59,9 @@ reading.
 25. Components that turn under perspective reserve room they do not need at rest — _open_
 26. `CardStack` — the pointer route the library cannot promise — _open_
 27. The submit story — what a native submit carries, and what `Form` hands `onSubmit` — _pending decision_
-28. Choices the add-ons round made on the user's behalf — _pending decision_
-29. `Die`'s step buttons and arrow keys fall into a loop of two or three faces — _open, no fix chosen_
-30. A wide arrow vanishes at a corner, and a nearly-as-wide one becomes a sliver — _open, the user is analysing it_
-31. The Playground's painters in Windows high-contrast mode — _open, decided, not yet built_
+28. `Die`'s step buttons and arrow keys fall into a loop of two or three faces — _open, no fix chosen_
+29. A wide arrow vanishes at a corner, and a nearly-as-wide one becomes a sliver — _open, the user is analysing it_
+30. The Playground's painters in Windows high-contrast mode — _open, decided, not yet built_
 
 ### Build order
 
@@ -1203,25 +1202,7 @@ who wants values takes. _"The form story"_ in `decisions.md` says the library ne
 that entry is what this item would revisit. Focus moving to the first field in error on submit was built
 separately and does not depend on this.
 
-## 28. Choices the add-ons round made on the user's behalf
-
-The agents building the Exotics add-ons had to pick these to finish the work. Each is a working answer, and each
-is the user's to confirm or change.
-
-- **Numbers picked rather than measured.** PatchBoard's defaults, converted from pixels to shares of the board's
-  width: `socketSize` 0.03, `socketReach` 0.06 and `stepSize` 0.02 (the old 14, 28 and 8 pixels on a board 460
-  pixels wide). The threshold at which `Smoother` counts a value as settled, 0.001. Reveal's `stepSize`, 20
-  pixels per arrow press. Cuboid's drag: dragging one box width turns it a quarter turn, and letting go past half
-  of that counts.
-- **Whether Shape should accept a class or a style for its outer box.** The text-wrap example has to reach it with
-  a child selector, because Shape takes neither.
-- **A paused CellAnimation now shows its cut-up grid at the current point instead of the whole picture.** Before
-  anything has run, that is the first frame. Resizing the window or switching tabs also no longer starts the
-  pass over. Both follow from making the pass scrubbable.
-- **SlotText reels under reduced motion drop only their extra turns.** Each reel keeps its own duration, so a
-  slow reel still turns its one step slowly. Falling back to `turnDurationMs` there is the alternative.
-
-## 29. `Die`'s step buttons and arrow keys fall into a loop of two or three faces
+## 28. `Die`'s step buttons and arrow keys fall into a loop of two or three faces
 
 Reachable on the Die page's icon cloud: pick the d20 and press down a few times. The die goes back and forth
 between the same two faces. Every shape does it — a d20 pressed right goes between faces 1 and 2 from the first
@@ -1248,7 +1229,7 @@ every face upright cannot both hold, so each option gives one up:
 `Cuboid`'s upright mode has the same tension and accepted it, since a box has only six resting orientations
 (`decisions.md`, _"`Cuboid`: upright mode keeps an orientation"_); a d20 has many more faces for the loop to skip.
 
-## 30. A wide arrow vanishes at a corner, and a nearly-as-wide one becomes a sliver
+## 29. A wide arrow vanishes at a corner, and a nearly-as-wide one becomes a sliver
 
 Reachable on the Tooltip page: pick the triangle, set its width to at least twice its length, and place the tooltip
 off a corner of its anchor (`left_out` with `bottom_out`). No arrow is drawn. Make it a little narrower than that and
@@ -1267,7 +1248,7 @@ before choosing a fix. The one put to them and not taken yet: limit how far a si
 end the side at its base corner and run straight back to the contour along the arrow's direction, which never
 vanishes but gives a wide corner arrow a short straight neck.
 
-## 31. The Playground's painters in Windows high-contrast mode
+## 30. The Playground's painters in Windows high-contrast mode
 
 Reachable on the Range page with Windows' high-contrast mode on, or with Chrome's DevTools emulating
 `forced-colors: active`: the track and the filled part of the range turn white on the white page, and only the

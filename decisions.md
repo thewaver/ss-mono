@@ -8934,6 +8934,10 @@ worse: a held final frame that replays itself whenever a window changes width is
 
 ### `CellAnimation`: the pass is a progress signal, and the grid is always drawn at it
 
+**Both consequences below were confirmed by the user**: a paused grid shows the pass where it stands, the first
+frame if nothing has run, rather than the whole picture; and a resize or a tab switch does not start the pass over.
+Pausing freezes the animation where it is, which is what scrubbing needs.
+
 **Where the pass is lives in `progress`, in Trail's shape.** The component writes it every frame while playing, and writing it from outside moves the pass there. While playing, the pass carries on from the written point. With playback paused, the grid is redrawn at whatever is written, which is what a scrub is. The frame loop adds elapsed time over duration to the current value, not time since the pass began, and that is what lets a written value be carried on from rather than overwritten. It goes back to `0` at the start of each pass and when `src` changes.
 
 **Drawing is its own effect, separate from the clock.** One effect draws every cell at the current progress, and it re-runs when the progress, the cell elements or their sizes change. The frame loop only advances the number. So a paused grid shows the frame at its progress (frame 0 before anything has run) rather than the uncut picture, and a finished run held on `"cells"` is redrawn at its last frame when the box resizes rather than keeping transforms worked out for the old size. The consumer's compute functions are called outside Solid's tracking (`untrack`). Tracked, every signal read in every cell's evaluation would have been recorded as a dependency on every frame, thousands of entries rebuilt at 60Hz. The cost is that a change to what the functions read, made while paused, shows at the next progress change rather than at once.
@@ -12825,6 +12829,11 @@ files, and this stopped being one. What remains in `Samples` are samples; the gl
 one home that two callers use.
 
 ### `Shape`: the contour is also the float area
+
+**`Shape` takes no class and no style for its outer box.** The user's call, when the add-ons round put it to them:
+the text-wrap example floats a shape by reaching its outer box with a child selector from its own wrapper, and that
+stays. A style prop was turned down as a source of trouble out of proportion to one example, and a class is already
+ruled out library-wide.
 
 **Shape writes `shape-outside: polygon(…) border-box` on its root, from the same outer contour the fill is drawn along.** A consumer who floats the Shape gets text wrapping to the painted edge and has nothing else to compute. The property does nothing on an element that is not floated, so every other Shape user, `GlassSurface` included, is unaffected. `border-box` is chosen over the default `margin-box` because the points are measured in the root's own box: a margin on the root would otherwise shift the contour off the paint. `shape-margin` is left to the consumer, since how far text keeps clear is paint. Fewer than three points writes nothing. MDN checked: it applies to floats only, accepts a shape followed by a box keyword, and has been Baseline widely available since January 2020.
 
@@ -17161,11 +17170,11 @@ whether a split-flap is then a second component or a mode on this one is the use
 
 **The flaps run on animation frames, not on a CSS transition**, because a transition moves every flap at once and a split-flap drops them one after another. `OdometerUtils.createFlapper` holds each column's position and moves it after the column's delay so the last flap lands one turn duration after the first starts: **more flaps fall faster rather than taking longer**, which is what `turnDurationMs` means for the drum. Each flap is eased inside its own step, so a run reads as separate flaps, and a run asked for partway through another starts from where that one had reached. A column whose target has not moved does nothing, so a digit that did not change never flips. Changing `mechanism` mid-run rebuilds the columns at the current target with no animation.
 
-**What a screen reader gets is unchanged.** Every flap face is hidden and inert, as the drum's faces are, and the value is still the one visually hidden span. WCAG checked: 1.3.1 and 4.1.2 are met as for the drum; 2.3.3 Animation from Interactions as for the drum, extra turns dropped under reduced motion and the duration the consumer's; 2.2.2 does not apply, since the flaps move only when the value changes and each change finishes within the turn duration.
+**What a screen reader gets is unchanged.** Every flap face is hidden and inert, as the drum's faces are, and the value is still the one visually hidden span. WCAG checked: 1.3.1 and 4.1.2 are met as for the drum; 2.3.3 Animation from Interactions as for the drum, nothing turning at all under reduced motion; 2.2.2 does not apply, since the flaps move only when the value changes and each change finishes within the turn duration.
 
 ### `SlotText`: a reel is asked per column, and it replaces the ripple rather than adding to it
 
-**`computeReel(digitIndex, digitCount)` returns `{ extraTurns, durationMs }` for each column, and giving it turns the cascade off.** All columns start together and the stagger comes from their durations, so the order they stop in is the consumer's to set. A delay on top of that would be a second way to express the same thing. **The extra turns are added to the step that reaches the digit, in the direction the whole number is going.** The angle stays cumulative, and a reel spinning up lands still moving forward. **Every column spins, an unchanged digit included, and nothing spins when no digit changed.** The consumer is not told which columns changed, and a slot machine spins every reel. A sign change alone is `"same"` and moves nothing. **Under reduced motion the extra turns are dropped and each column turns only as far as its digit needs** (WCAG 2.3.3, animation started by an interaction). The reel's duration is kept, because only the turns were named. **The samples are `Samples/Odometer/Reels`, kept in one file with inline samples** under the rule that a registry is split only when a single file would be unreadable. They are functions of position and count only, so each one is a stagger shape rather than a speed.
+**`computeReel(digitIndex, digitCount)` returns `{ extraTurns, durationMs }` for each column, and giving it turns the cascade off.** All columns start together and the stagger comes from their durations, so the order they stop in is the consumer's to set. A delay on top of that would be a second way to express the same thing. **The extra turns are added to the step that reaches the digit, in the direction the whole number is going.** The angle stays cumulative, and a reel spinning up lands still moving forward. **Every column spins, an unchanged digit included, and nothing spins when no digit changed.** The consumer is not told which columns changed, and a slot machine spins every reel. A sign change alone is `"same"` and moves nothing. **Under reduced motion nothing turns at all** (WCAG 2.3.3, animation started by an interaction): `SlotTextUtils.computeTurn` gives every column no duration and no delay, so the new characters simply replace the old ones, reel or not. The first build dropped only the extra turns and kept each reel's duration, so a slow reel still turned its one step slowly; the user's call was to go instant instead, because a turn of any length is still motion and every other moving part of the library goes instant under the same preference. **The samples are `Samples/Odometer/Reels`, kept in one file with inline samples** under the rule that a registry is split only when a single file would be unreadable. They are functions of position and count only, so each one is a stagger shape rather than a speed.
 
 ### `SlotText`: an arriving slot grows in, a leaving one shrinks out, and it stays until it has
 
@@ -20368,6 +20377,12 @@ interactive _inside_ the node", so it now excludes the handler's own element. Th
 left unnamed: the node button inside it already carries the name, and labelling both would say it twice.
 
 ### `PatchBoard`: positions written as fractions of the width, like `Formation`
+
+**The defaults are the user's, confirmed by eye**: `socketSize` 0.03, `socketReach` 0.06 and `stepSize` 0.02, the old
+14, 28 and 8 pixels on a 460-pixel board. They were converted by the add-ons round rather than tuned, and put to the
+user, who kept them; so were `Smoother`'s settle threshold of 0.001, `Reveal`'s `stepSize` of 20 pixels and
+`Cuboid`'s drag, a quarter turn per box width with a release past half completing it. They are measured values now,
+under the rule that leaves those to the user.
 
 **Every spot, node size, socket size, reach and step is a fraction of the board's own width, and the board writes them as `cqw`.** A saved patch does not depend on how wide it was drawn. Zooming was the consumer giving the board more width or scaling it, until it moved into the board as a view — see `PanZoom`. There is no `size`, only `heightRatio`, because once the width is the container's, the only thing left to say is the board's shape. The root is the query container, and a spacer child gives it its height for the reason recorded under `Formation`: an element cannot query itself. The cable surface's viewBox is `0 0 1 heightRatio`, so a painter writes paths in the same numbers the defs carry. `y` is also a fraction of the width rather than the height, so a node keeps its shape on any board.
 

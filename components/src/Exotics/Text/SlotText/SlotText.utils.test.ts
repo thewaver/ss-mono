@@ -327,6 +327,27 @@ describe("computeTurn", () => {
         expect(turn.angles[0]).toBe(-360);
     });
 
+    it("takes no time and waits for nothing when motion is reduced, reels or not", () => {
+        const args = {
+            ...base,
+            isInstant: true,
+            shownWheels: wheelsOf("199"),
+            columnWheels: wheelsOf("199"),
+            angles: restingAngles("199"),
+            wheels: wheelsOf("200"),
+        };
+
+        expect(SlotTextUtils.computeTurn(args).durations, "no column takes any time").toEqual([0, 0, 0]);
+        expect(SlotTextUtils.computeTurn(args).delays, "and none waits behind another").toEqual([0, 0, 0]);
+
+        const reeled = SlotTextUtils.computeTurn({
+            ...args,
+            reels: args.wheels.map(() => ({ extraTurns: 3, durationMs: 900 })),
+        });
+
+        expect(reeled.durations, "a reel's own duration is not kept").toEqual([0, 0, 0]);
+    });
+
     it("turns each letter its own way, by the route, with no number to follow", () => {
         const args = {
             ...base,

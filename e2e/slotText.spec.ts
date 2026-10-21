@@ -469,6 +469,36 @@ test("with reduced motion a column arrives and leaves at once, and no painter is
     expect(left.fixed.length).toBe(0);
 });
 
+/**
+ * WCAG 2.3.3 Animation from Interactions, for the turn itself: with less motion asked for, a pull changes the
+ * characters without turning anything. Every column is handed no time to turn in and nothing to wait for, whatever
+ * its reel would have given it, so the new characters simply replace the old ones. The reel is the case worth
+ * checking, because a reel hands each column a duration of its own and that is the one that has to be dropped.
+ */
+test("with reduced motion a pull changes the characters without turning them", async ({ page }) => {
+    await page.emulateMedia({ reducedMotion: "reduce" });
+    await page.reload();
+    await expect(page.locator(PULL)).toBeVisible();
+
+    const before = await readReelColumns(page);
+
+    await page.locator(PULL).click();
+
+    await expect
+        .poll(
+            async () => (await readReelColumns(page)).some((column, index) => column.angle !== before[index]?.angle),
+            {
+                message: "the pull changed what the columns show",
+            },
+        )
+        .toBe(true);
+
+    for (const column of await readReelColumns(page)) {
+        expect(column.durationMs, "no column is given any time to turn in").toBe(0);
+        expect(column.delayMs, "and none waits behind another").toBe(0);
+    }
+});
+
 const SPLIT_FLAP = example("splitFlap");
 
 /**

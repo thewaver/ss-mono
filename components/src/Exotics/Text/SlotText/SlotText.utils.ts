@@ -21,6 +21,9 @@ import type {
 const DIGIT_COUNT = 10;
 /** Zero, as an index. */
 const NOTHING = 0;
+
+/** How long a turn takes for a visitor who has asked for less motion: none at all. */
+const INSTANT_MS = 0;
 /** One digit or one step. */
 const SINGLE = 1;
 /** Half, for the shortest way round a column. */
@@ -341,9 +344,13 @@ export namespace SlotTextUtils {
      * kind of wheel as before turns from its current angle by what it takes to reach its new face, plus whatever
      * extra turns its reel asks for, in the direction it is turning; a column that has just arrived, or has changed
      * from a digit to a letter or back, starts at rest on its face. Columns the new text no longer has keep their
-     * angle and what they showed, so they can shrink away still showing it — except with `isInstant`, when they are
-     * simply gone and no reel adds turns. The cascade runs only without reels and only when something changed, and
-     * nothing turns when nothing did.
+     * angle and what they showed, so they can shrink away still showing it. The cascade runs only without reels and
+     * only when something changed, and nothing turns when nothing did.
+     *
+     * **With `isInstant` nothing turns at all**: every column takes no time and waits for nothing, so the new
+     * characters simply replace the old ones, leaving columns are gone at once, and no reel adds turns. A reel's
+     * own duration is not kept, because under reduced motion a turn of any length is still motion, and every other
+     * moving part of the library goes instant there too.
      *
      * @param opts.shownWheels What the text showed before this change.
      * @param opts.columnWheels What each column shows now, leaving columns included.
@@ -373,10 +380,10 @@ export namespace SlotTextUtils {
 
         return {
             delays:
-                !hasChange || reels !== undefined
+                isInstant || !hasChange || reels !== undefined
                     ? wheels.map(() => NO_DELAY)
                     : computeCascadeDelays(isChanging, turnDelayMs),
-            durations: wheels.map((_wheel, index) => reels?.[index]?.durationMs),
+            durations: wheels.map((_wheel, index) => (isInstant ? INSTANT_MS : reels?.[index]?.durationMs)),
             angles: [
                 ...wheels.map((wheel, index) => {
                     const wasShowing = columnWheels[index];

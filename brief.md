@@ -12,10 +12,10 @@ purpose: it answers "what is outstanding", and neither of them is.
 | Section                                                 | Count |
 | ------------------------------------------------------- | ----: |
 | [Missing components](#missing-components)               |     3 |
-| [Blockers and known issues](#blockers-and-known-issues) |    26 |
+| [Blockers and known issues](#blockers-and-known-issues) |    18 |
 | [Deliberately not built](#deliberately-not-built)       |    27 |
 | [Accessibility gaps](#accessibility-gaps)               |     9 |
-| [Planned projects](#planned-projects)                   |     5 |
+| [Planned projects](#planned-projects)                   |     4 |
 
 ---
 
@@ -53,12 +53,8 @@ Something that misbehaves, or a cost nobody has paid down.
 | 23  | **Any placed control**           | Nothing stops a layout outgrowing the room it is in — a ring can reach past the screen, and a placed toolbar has nothing to collapse into                                                                                                                                                                 |
 | 23  | **`Stepper`, placed**            | `renderBody` is dropped without a word, a curve having nowhere to put a panel                                                                                                                                                                                                                             |
 | 25  | **Anything turning in 3D**       | A component that turns under perspective sets aside room for the bulge, so its box stays bigger than its content even while it is standing still                                                                                                                                                          |
-| 28  | **Picked values**                | **Pending decision.** PatchBoard's defaults, `Smoother`'s settle threshold, Reveal's step and Cuboid's drag scale were picked, not measured                                                                                                                                                               |
-| 28  | **`Shape`**                      | **Pending decision.** Whether its outer box should take a class or a style, so a float needs no child selector                                                                                                                                                                                            |
-| 28  | **`CellAnimation`**              | **Pending decision.** Paused, it shows the cut grid rather than the whole picture, and a resize no longer restarts the pass                                                                                                                                                                               |
-| 28  | **`SlotText`**                   | **Pending decision.** Under reduced motion a reel keeps its own duration and drops only its extra turns                                                                                                                                                                                                   |
-| 29  | **`Die`, stepping**              | Pressing the same arrow a few times sends the die back and forth between two or three faces, because each step spins the new face upright. No fix chosen; the three put were judged inadequate                                                                                                            |
-| 30  | **Arrows at a corner**           | An arrow at least twice as wide as it is long draws nothing when the tooltip sits off a corner, and one slightly narrower becomes a long sliver. The user is analysing it                                                                                                                                 |
+| 28  | **`Die`, stepping**              | Pressing the same arrow a few times sends the die back and forth between two or three faces, because each step spins the new face upright. No fix chosen; the three put were judged inadequate                                                                                                            |
+| 29  | **Arrows at a corner**           | An arrow at least twice as wide as it is long draws nothing when the tooltip sits off a corner, and one slightly narrower becomes a long sliver. The user is analysing it                                                                                                                                 |
 
 ## Deliberately not built
 
@@ -108,7 +104,7 @@ They cluster, and no single item owns them.
 | 18  | **`OverheadWheel`** | The same again for the hub's control, with the same promise unmade                                                                                  |
 | 13  | **`SlideButton`**   | A fixed hold duration is itself an assumption about dexterity, in a control that exists partly to avoid one                                         |
 | 26  | **`CardStack`**     | A card is sent by a swipe, and the library ships no pointer route that is neither a gesture nor a drag — the consumer's buttons are the only answer |
-| 31  | **Playground**      | In Windows high-contrast mode, painters drawn only in background colors vanish — Range's track and fill go white on white                           |
+| 30  | **Playground**      | In Windows high-contrast mode, painters drawn only in background colors vanish — Range's track and fill go white on white                           |
 
 ## Planned projects
 
