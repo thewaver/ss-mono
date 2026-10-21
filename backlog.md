@@ -47,7 +47,7 @@ reading.
 13. `SlideButton` — three things deliberately not built — _open_
 14. `Spotlight` — one thing deliberately not built — _open_
 15. `Scroller` — three things deliberately not built — _open_
-16. `Paginator` — four things deliberately not built — _open_
+16. `Paginator` — split into a root and pieces, and one thing deliberately not built — _decided, not yet built_
 17. `Carousel` — three things deliberately not built — _open_
 18. The four components ported from React — what did not settle — _open_
 19. An anchored layer trails its anchor during a scroll — _postponed until the platform catches up_
@@ -760,21 +760,68 @@ button of its own"_. These are the gaps, each with the reason it is still one.
 
 ---
 
-## 16. `Paginator` — four things deliberately not built
+## 16. `Paginator` — split into a root and pieces, and one thing deliberately not built
 
 The decisions behind what exists are in `decisions.md` under _"Controls: `Paginator`, where the arithmetic
-is the component"_. These are the gaps, each with the reason it is still one.
+is the component"_.
 
-- **It counts pages, not items.** Ark UI takes `count` and `pageSize` and divides; this takes `pageCount` and
-  leaves the division to the consumer. The arithmetic is one line, but the two spellings disagree about what
-  happens when items do not divide evenly, and about whether a zero-item list has no pages or one empty one.
-  Those are the consumer's answers, and taking `pageCount` is what stops the library from picking for them.
-- **Nothing hands back the slice bounds.** A consumer showing "showing 21 to 40 of 383" computes it
-  themselves, and it is the same arithmetic the point above declined to own. Worth revisiting together with
-  it, since either both belong here or neither does.
-- **There is no page field to type into.** A paginator over hundreds of pages wants "go to page ▢" beside the
-  numbers, and nothing composes one — the consumer builds it from a `NumberInput` and their own page signal.
-  Probably right; recorded because it is the first thing a large page count makes you want.
+### Decided, not yet built: a root, two pieces, and the ready-made row on top
+
+Settled with the user, question by question, as the answer to three gaps this item used to list — that it counted
+pages rather than items, that nothing handed back "showing 21 to 40 of 383", and that there was no "go to page"
+field — and to a layout the user wanted that the single component cannot draw: first, previous, a "3 of 20" label,
+next, last. A label sits wherever a page wants it, which no slot inside one component can promise, so the paginator
+becomes pieces a page arranges itself, as Ark UI's does.
+
+- **`PaginatorRoot` holds the numbers and draws the landmark.** Props: `itemCount` (required), `pageSize` (optional,
+  default 10 in `PAGINATOR_DEFAULTS`, the default Ant Design and Ark UI both use), `page`, `onPageChange`,
+  `ariaLabel` (required, on the `<nav>`), `isDisabled`, `computeLayout`, `computeEffect`. It renders the one `<nav>`
+  around whatever the page puts inside it, and the pieces read it through a context, the way `Radio` reads
+  `RadioGroup`. `pageCount` is gone from every piece: the page count is `ceil(itemCount / pageSize)`, a short last
+  page holds the remainder, and an empty list has no pages — every step disabled and the pages piece empty.
+- **`PaginatorSteps` is the step controls with a slot between them.** Props: `steps` (default `["previous",
+"next"]`, as now), `renderStep`, `computeStepLabel`, and `children`, drawn between the leading steps (first,
+  previous) and the trailing ones (next, last). With nothing in the slot it is the arrows alone; with
+  `PaginatorPages` in it, it is today's row; with the page's own text in it, it is "‹ 3 of 20 ›".
+- **`PaginatorPages` is the number row, and it alone works out the clusters and gaps.** Props: `siblingCount`,
+  `boundaryCount`, `renderPage`, `renderGap`, `computePageLabel`, all meaning what they mean now.
+- **`Paginator` stays, as a wrapper with no logic of its own.** Its props are today's with `itemCount` and `pageSize`
+  in place of `pageCount`, and it renders `PaginatorRoot` around `PaginatorSteps` with `PaginatorPages` in the slot,
+  handing each its share. Every rule lives in exactly one piece: the entries in `PaginatorPages`, the step targets,
+  disabled ends and labels in `PaginatorSteps`, the numbers, landmark and layout in `PaginatorRoot`. The step, page
+  and gap controls are drawn by three internal building blocks the pieces share, which is today's
+  `renderStepControl`, `renderPageControl` and `renderGapControl` lifted out; they are never pieces a page composes.
+- **A layout belongs to the root, and every control registers with it.** Each step, page and gap control tells the
+  root it exists; the root keeps them in the order they sit in the document, asks the layout for that many places,
+  and each control takes the place at its own position in the list, through the existing `PlacementBox` and
+  `PlacementItem`. So any arrangement a page composes can be laid out as one shape, and the ready-made row is just
+  one such arrangement — today's dial example keeps working through it. The one new job is keeping the order right
+  as controls come and go: the pages piece changes length as the current page nears an end. Registration rather than
+  walking children, because children arrive as finished output in all four frameworks and cannot be taken apart.
+- **"Jump to page" and the "X of Y" label are the page's own, not library components.** The page already holds the
+  page signal, the item count and the page size, so a `NumberInput` or a `Select` writing that signal is the jump,
+  and plain text is the label. The library's part is two exported, documented helpers: `PaginatorUtils.computePageCount(itemCount,
+pageSize)` and `PaginatorUtils.computeItemRange(page, itemCount, pageSize)`, returning the first and last item on
+  the page counting from one, or nothing for an empty list.
+- **The Playground** keeps its five examples on the ready-made `Paginator`, switched to `itemCount` and `pageSize`
+  knobs, and adds composed ones: the arrows with "3 of 20" between them, and a row with a "go to page" `NumberInput`
+  beside it. Its results panel reads `computeItemRange` instead of its own `PAGE_SIZE` arithmetic.
+- **Specs:** `paginator.spec.ts` moves to `itemCount`, and gains a composed arrangement, a layout spanning
+  `PaginatorSteps` and `PaginatorPages` placing every control in document order, and the order holding as the pages
+  piece changes length.
+- **Superseded:** the `hasPageNumbers` prop planned before the split is not built; a row without numbers is
+  `PaginatorSteps` with nothing in its slot.
+
+**Not settled with the user — ask before starting:**
+
+- What a piece does outside a `PaginatorRoot`: draw nothing, or warn. `Radio` outside a `RadioGroup` is the
+  precedent to read first.
+- Where `computeHref`, `linkComponent` and `gap` live. Both pieces need the first two, so the root is the obvious home;
+  `gap` spaces controls within a row, so each piece taking its own, the wrapper passing one value to both, is the
+  likely shape.
+
+### Still deliberately not built
+
 - **The whole row is in the tab order, and there is no way to ask for one stop.** Every page and every step is
   its own tab stop, which is the accordion's rule and is defended in `decisions.md`. A paginator with a wide
   window and both end jumps is fifteen tab stops in a row, which is a lot to walk past to reach the content it

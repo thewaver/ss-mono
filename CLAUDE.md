@@ -147,6 +147,11 @@ how they came out (or that none was run, and why). For example: _"Ported to all 
 four — nothing running, nothing waiting on you."_ A line that leaves either out is read as "not checked", so it is
 never left out to save words.
 
+**The line appears only when work was done since their last message.** Stated by the user, after it closed a run of
+discussion replies where nothing had been built: while a conversation is only discussing, they know the state, and
+repeating "nothing built, nothing to port" under every answer is noise. A reply that edits, builds or runs something
+carries the line; a reply that only answers or asks does not, even when a decision is pending.
+
 **A choice between approaches is a lettered pros-and-cons list, with a lean.** The user's own rule, built up
 over several corrections, and one they count among the most useful in the file. Four parts:
 
