@@ -2,7 +2,7 @@ import { describe, expect, it } from "vitest";
 
 import { Point2d, Point2dUtils } from "@thewaver/ss-utils";
 
-import type { PlacementRect } from "../../Abstracts/Placement/Placement.types";
+import type { PlacementLayout, PlacementRect } from "../../Abstracts/Placement/Placement.types";
 import { PlacementUtils } from "../../Abstracts/Placement/Placement.utils";
 import type { ProximityArrangement } from "../../Abstracts/Proximity/Proximity.types";
 import { ProximityUtils } from "../../Abstracts/Proximity/Proximity.utils";
@@ -232,5 +232,123 @@ describe("zoomIn, at the far end of an open arc", () => {
         const resting = Math.sign(toRestingBearing(1) - toRestingBearing(0));
 
         expect(Math.sign(toMovedBearing(1, pointer) - toMovedBearing(0, pointer))).toBe(resting);
+    });
+});
+
+/*
+ * The property the room count exists for, checked on a real row and a real column rather than on a
+ * hand-built pair: wherever the pointer is — on an item, in a gap, past an end, or well off to the side —
+ * no two neighbors overlap once each has grown and been pushed. Edges are compared along the run only,
+ * since that is the one direction neighbors can collide in.
+ */
+describe("zoomIn, across a whole straight run", () => {
+    const zoomIn = ProximityEffectUtils.zoomIn;
+    const SLACK = 1e-9;
+
+    const toWorstOverlap = (layout: PlacementLayout, axis: "x" | "y", points: Point2d[]) => {
+        const arrangement = ProximityUtils.toArrangement(layout);
+        let worst = 0;
+
+        for (const point of points) {
+            const overreach = PlacementUtils.getRunOverreach(layout, point);
+            const edges = layout.placements.map((placement) => {
+                const effect = zoomIn(
+                    ProximityUtils.toEffectDefs(placement, point, arrangement, false, placement, overreach),
+                );
+                const [scale] = toNumbers(effect.scale);
+                const [moveX, moveY] = toNumbers(effect.translate);
+                const extent = axis === "x" ? placement.widthShare : placement.heightShare;
+                const center =
+                    PlacementUtils.getCenter(placement)[axis] +
+                    (axis === "x" ? moveX : (moveY ?? 0)) * PERCENT_TO_SHARE * extent;
+                const half = extent * 0.5 * scale * PERCENT_TO_SHARE;
+
+                return { start: center - half, end: center + half };
+            });
+
+            for (let index = 1; index < edges.length; index++) {
+                worst = Math.max(worst, edges[index - 1].end - edges[index].start);
+            }
+        }
+
+        return worst;
+    };
+
+    const sweep = (along: "x" | "y", length: number) =>
+        [0, 0.02, 0.05, 0.1, 0.2].flatMap((off) =>
+            Array.from({ length: 121 }, (_unused, index) => {
+                const position = -0.2 + (index / 120) * (length + 0.4);
+
+                return along === "x" ? { x: position, y: off } : { x: off, y: position };
+            }),
+        );
+
+    it("never lets two neighbors in a row overlap, wherever the pointer is", () => {
+        const row = PlacementLayoutUtils.row({ itemCount: 6 });
+
+        expect(toWorstOverlap(row, "x", sweep("x", 1))).toBeLessThan(SLACK);
+    });
+
+    it("nor two neighbors in a column", () => {
+        const column = PlacementLayoutUtils.column({ itemCount: 6 });
+
+        expect(toWorstOverlap(column, "y", sweep("y", column.heightRatio))).toBeLessThan(SLACK);
+    });
+});
+
+/*
+ * A scatter cannot count its items into steps, and trying to — rounding each item's distance to a whole number
+ * of spacings — made items leap by a whole neighbor's growth as the pointer crossed a rounding boundary. So the
+ * pointer is walked down through a real cliff and zigzag in small steps, and no item may move by more than a
+ * small multiple of the step in one go.
+ */
+describe("zoomIn, across a scattered arrangement", () => {
+    const STEP = 0.0025;
+    const MOST_PER_STEP = STEP * 4;
+
+    const toLargestMove = (layout: PlacementLayout) => {
+        const arrangement = ProximityUtils.toArrangement(layout);
+        let previous: Point2d[] | undefined;
+        let largest = 0;
+
+        for (let y = -0.5; y <= layout.heightRatio + 0.5; y += STEP) {
+            const point = { x: 0.5, y };
+            const overreach = PlacementUtils.getRunOverreach(layout, point);
+            const moves = layout.placements.map((placement) => {
+                const effect = ProximityEffectUtils.zoomIn(
+                    ProximityUtils.toEffectDefs(placement, point, arrangement, false, placement, overreach),
+                );
+                const [moveX, moveY] = toNumbers(effect.translate);
+
+                return {
+                    x: moveX * PERCENT_TO_SHARE * placement.widthShare,
+                    y: (moveY ?? 0) * PERCENT_TO_SHARE * placement.heightShare,
+                };
+            });
+
+            previous?.forEach((before, index) => {
+                largest = Math.max(largest, Point2dUtils.getDistance(before, moves[index]));
+            });
+            previous = moves;
+        }
+
+        return largest;
+    };
+
+    it("moves every item of a cliff smoothly as the pointer walks down through it", () => {
+        expect(toLargestMove(PlacementLayoutUtils.cliff({ itemCount: 6 }))).toBeLessThan(MOST_PER_STEP);
+    });
+
+    it("and every item of a zigzag", () => {
+        expect(toLargestMove(PlacementLayoutUtils.zigzag({ itemCount: 6 }))).toBeLessThan(MOST_PER_STEP);
+    });
+
+    it("whichever way the arrangement spreads", () => {
+        const honeycomb = PlacementLayoutUtils.honeycomb({ itemCount: 12 });
+
+        expect(toLargestMove({ ...honeycomb, spreadRule: "cartesian" }), "one axis at a time").toBeLessThan(
+            MOST_PER_STEP,
+        );
+        expect(toLargestMove({ ...honeycomb, spreadRule: "circular" }), "evenly outward").toBeLessThan(MOST_PER_STEP);
     });
 });

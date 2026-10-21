@@ -200,7 +200,10 @@ export namespace VirtualizerSolidUtils {
 
                 onMount(() => virtualizer.measureElement(element));
             },
-            scrollToRow: (index) => virtualizer.scrollToIndex(index, { align: "auto" }),
+            scrollToRow: (index) => {
+                VirtualizerUtils.remeasureClientRect(virtualizer);
+                virtualizer.scrollToIndex(index, { align: "auto" });
+            },
         };
     };
 }

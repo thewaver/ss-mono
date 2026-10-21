@@ -4,7 +4,7 @@ export namespace ProximityEffectDefaults {
     export const ZOOM_IN_DEFAULTS: Required<ZoomInDefs> = {
         reachRatio: 2.5,
         growthRatio: 0.5,
-        pushRatio: 0.75,
+        pushRatio: 1,
     };
 
     export const GLOW_DEFAULTS: Required<GlowDefs> = {

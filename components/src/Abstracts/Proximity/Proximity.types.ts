@@ -1,6 +1,6 @@
 import type { CSSAnimationValues, Point2d } from "@thewaver/ss-utils";
 
-import type { PlacementReach, PlacementRect } from "../Placement/Placement.types";
+import type { PlacementReach, PlacementRect, PlacementSpan, PlacementSpreadRule } from "../Placement/Placement.types";
 
 export type ProximityEffect = CSSAnimationValues;
 
@@ -8,6 +8,8 @@ export type ProximityArrangement = PlacementReach & {
     spacing: number;
     radius: number;
     slack: number;
+    spreadRule?: PlacementSpreadRule;
+    span?: PlacementSpan;
 };
 
 export type ProximityEffectDefs = ProximityArrangement & {

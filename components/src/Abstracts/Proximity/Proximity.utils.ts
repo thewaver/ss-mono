@@ -98,8 +98,8 @@ export namespace ProximityUtils {
      *
      * @param layout The arrangement being drawn.
      * @returns The rule it measures nearness by, the pivot that rule turns about and the bearing of the
-     * run's own middle, its `spacing`, how far out from the pivot its items sit, and how much room it has
-     * left to spread into.
+     * run's own middle, its `spacing`, how far out from the pivot its items sit, how much room it has
+     * left to spread into, how a scatter spreads into it, and the box its item centers cover.
      */
     export const toArrangement = (layout: PlacementLayout): ProximityArrangement => ({
         reachRule: layout.reachRule,
@@ -108,6 +108,8 @@ export namespace ProximityUtils {
         spacing: PlacementUtils.getSpacing(layout),
         radius: PlacementUtils.getRunRadius(layout),
         slack: PlacementUtils.getRunSlack(layout),
+        spreadRule: layout.spreadRule,
+        span: PlacementUtils.getCenterSpan(layout),
     });
 
     /**

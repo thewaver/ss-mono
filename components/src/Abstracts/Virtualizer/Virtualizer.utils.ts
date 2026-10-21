@@ -1,6 +1,8 @@
 /** The `overflow` values that make an element a scroller. */
 const SCROLLING_OVERFLOWS = new Set(["auto", "scroll", "overlay"]);
 
+const rectReporters = new WeakMap<object, () => void>();
+
 /**
  * What a long list needs to draw only the rows on screen. The row window itself rides on a framework's own
  * virtualizer; what is framework-free is finding the scroller it measures against.
@@ -58,13 +60,32 @@ export namespace VirtualizerUtils {
         const report = () => onRect({ width: element.clientWidth, height: element.clientHeight });
 
         report();
+        rectReporters.set(instance, report);
 
-        if (!ResizeObserverOfWindow) return () => {};
+        if (!ResizeObserverOfWindow) return () => rectReporters.delete(instance);
 
         const observer = new ResizeObserverOfWindow(report);
 
         observer.observe(element, { box: "border-box" });
 
-        return () => observer.disconnect();
+        return () => {
+            rectReporters.delete(instance);
+            observer.disconnect();
+        };
     };
+
+    /**
+     * Reports the scroller's visible box again, straight away, to a virtualizer that {@link observeClientRect} is
+     * observing for.
+     *
+     * The observer reports a resize only after the browser has laid the page out, which is too late for a scroll
+     * asked for in the same pass as the resize. A list opened onto a selection far down is exactly that: the
+     * window takes up its scroller before the rows' spacer has been drawn, while the box is still a few pixels
+     * tall, and the scroll to the selection follows once the spacer is in — so the row was aligned against the
+     * old, tiny box and showed only its bottom edge until the observer caught up a frame later. Calling this
+     * before scrolling aligns against the box as it is.
+     *
+     * @param instance The virtualizer, as handed to {@link observeClientRect}.
+     */
+    export const remeasureClientRect = (instance: object) => rectReporters.get(instance)?.();
 }

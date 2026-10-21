@@ -596,10 +596,19 @@ Every abstract is now split along the lines above; these are the recurring shape
   the Playground's windowed `Select` — opened at the top with the highlighted row thousands of pixels below the box.
   The window now records whether it is following each time it updates, in the same two places `_willUpdate` already
   ran, and `getIsLive` reads that. Where `_willUpdate` runs is unchanged, and so is `measureRow`'s deferral to
-  `onMount`. It is the Solid and Svelte half of what Vue's `isLive` waiting for the render does. Since the window still
-  reads the scroller's height before the spacer is drawn, the first scroll is aligned against a box a few pixels tall
-  and TanStack's retry settles it a frame or two later; moving the read after the render, as Vue does, would change
-  the timing these windows were built on. `select.spec.ts`'s reopening case covers it in all four apps.
+  `onMount`. It is the Solid and Svelte half of what Vue's `isLive` waiting for the render does. `select.spec.ts`'s
+  reopening case covers it in all four apps.
+- **The Solid and Svelte row windows measure the scroller's box again just before scrolling to a row.** They take up
+  the scroller before the rows' spacer is drawn, so the box they first measure is a few pixels tall, and TanStack only
+  hears of the real size from a resize observer once the page has been laid out. The scroll to a reopened selection
+  comes in between, so it was aligned against the tiny box: in Solid the picked row was painted for one frame about
+  100px above the list with only its bottom edge showing, and in Svelte the same misplacement was there at the start of
+  the frame but corrected before paint. `VirtualizerUtils.remeasureClientRect` re-runs the report
+  `observeClientRect` makes, through TanStack's own callback, and `scrollToRow` calls it first. Moving the take-up after
+  the render, as Vue does, was tried in Solid and rejected: Solid ran the after-render effect before the window had
+  been handed its new options, and even with that patched the box was still measured before the spacer was drawn, so
+  it halved the error rather than removing it — and it changed the timing these windows were built on. React and Vue
+  already painted the row in place and were left alone.
 - **`Glass`'s filter builders** return markup through `Generators/SVGDefs`, which is JSX; they moved to
   `GlassSolidUtils`, and the geometry and ids stayed. `Glass` was at first left out of `core.ts`, because its
   description type borrowed Solid-flavored gradient types from `Generators/SVGDefs`; it rejoined once the generators
@@ -5809,10 +5818,48 @@ had to learn an index or thread a reading down. Tracking is off entirely while n
 measured against the resting layout, never against where its neighbors have moved to — grow an item from its
 live position and it shifts its neighbor, which changes that neighbor's distance from a pointer that has not
 moved, which changes its size. What a consumer gives up is a `zoom_in` that genuinely re-flows the run: the
-displacement is a transform, so items pass over one another rather than pushing — a few pixels of overlap at
-the boundary between two growing neighbors is this trade-off's residue, not a bug to chase. `zoom_in` gets the
-look back analytically instead, by displacing each item by the running total of what its inner neighbors
-grew — which is the falloff curve integrated and normalized, and comes out as a closed form.
+displacement is a transform, so items pass over one another rather than pushing. `zoom_in` gets the look back
+instead by displacing each item by the running total of what its inner neighbors grew.
+
+**That running total is counted item by item, not integrated.** It was first the falloff curve integrated into a
+closed form, scaled by a `pushRatio` quoted in item widths with a default of `0.75`. That left neighbors in a row
+overlapping by about 5% of an item width with the pointer on the row, and by close to 30% with it near the
+row's top edge — the integral ran along the straight line to the pointer, where the room is needed along the
+row. The user asked for it fixed, rows and columns being where an overlap reads as a fault. Each item is told its
+own position and the run's spacing, so in an evenly spaced run it can list every item between itself and the
+pointer and add up their growth exactly (`toRoomNeeded`): each pair parts by the growth of its two facing halves,
+and the two items either side of the pointer split their own pair's share in proportion to how far each is from
+it, which hands over without a jump as the pointer crosses an item. A row and a column split the pointer's
+offset into the part along the run and the part across it, and an arc counts along its arc length.
+
+**A scatter is not counted, because it cannot be.** The count was first used everywhere, and on a cliff the
+user saw items leap as the pointer came down through it: a scatter's items do not sit at whole spacings from
+one another, so the count rounds each distance to a number of steps, and whenever the rounding tips over the
+item moves by a whole neighbor's growth at once. So only arrangements declaring `"horizontal"`, `"vertical"`
+or `"arc"` are counted.
+
+**A scatter grows its space instead, like a lens, and its layout picks which of two lenses.** The user's call,
+after a smooth estimate stopped the leaping but left the overlap: take both of D3's fisheye distortions and let
+each arrangement point at one internally, so they can be compared by flipping a word. `PlacementLayout.spreadRule`
+is that word — not a prop and not a knob, set by the layout the way `reachRule` is, and ignored by a run.
+`"circular"` (the default when unset) stretches every distance out from the lens's middle by what an item at that
+distance grows by, so items move straight away from it; `"cartesian"` stretches across and down separately, so a
+line of items stays a line and an item level with the pointer moves aside however far off it sits. **D3's fixed
+rim is dropped from both**, because a lens keeps its edge still by squeezing what is just inside it, and an item
+there does not shrink to match. Without it everything beyond the lens moves outward, as a row grows longer.
+**Off to one side of the items, the circular lens moves to the nearest point of the box their centers cover**,
+weakened by how far off the pointer is. Grown from the pointer itself, it shifted the whole scatter away to
+stretch empty space, and subtracting that from each item's travel instead left neighbors at about 75% of the
+room they needed; moved to the box, it grows nothing the pointer is not near and stays a lower bound on every
+item's growth. The cartesian lens handles the same case per axis, exactly. Both keep neighbors at about 95% of
+the room their growth takes or better, the rest being that an item scales by one amount while the stretch
+varies across its width. Honeycomb starts on `"cartesian"`, being a grid; cliff, whorl and zigzag on
+`"circular"`. **`pushRatio` is now a
+share of the room the growth takes, defaulting to `1`**: at `1` neighbors part by exactly what they grew, below
+it they overlap by the rest, above it they open gaps. `ProximityEffects.utils.test.ts` sweeps a real row and
+column with the pointer on, between, past and off them and asserts no two neighbors overlap, and walks the
+pointer down through a cliff, a zigzag and a honeycomb under each lens and asserts no item moves by more than a
+few times the step.
 
 **That integral is anchored to the run's own span, not to the pointer's raw coordinate.** The first version
 measured every item's push from its own distance to the pointer alone, which reads "past one reach" the same
@@ -5822,19 +5869,28 @@ constant amount, and two items equally near the pointer (the common case of it s
 as "at the growth center" and got zero push each while both were still growing, colliding into each other.
 `PlacementUtils.getRunOverreach` is the fix: `0` anywhere between the run's first and last item, where the gap
 to a neighbor is a real gap between real neighbors, and only positive once the pointer has actually left the
-run's own span. `ProximityEffectDefs.overreach` carries it, and `zoom_in`'s push subtracts the share already
-spent by the time that overreach is reached — nothing, while the pointer is inside the run, so the original
-per-item math is untouched there; the full share, once the pointer is far enough outside it that nothing
-anywhere is growing.
+run's own span. `ProximityEffectDefs.overreach` carries it, and `zoom_in`'s count of the room needed starts at
+the run's end once the pointer is past it: there is nothing between the pointer and the end item to have grown,
+so the end item grows where it stands and only the items behind it give way.
 
 **Nearness is not a straight line, and an arrangement is the only thing that knows what it is.** The user's
-diagnosis, and it is the whole architecture rather than a correction to it. A straight-line distance is right
-for a scatter and wrong for everything else: in a row only the horizontal gap says anything, so a pointer a
-little above the row must not make it go quiet; in a ring what separates two wedges is the turn between them,
-so measuring across the middle makes the far side read as near and the whole thing respond at once. So
-`PlacementLayout` carries a `reachRule` beside its `pickRule` — `"horizontal"`, `"vertical"`, `"arc"` or
-`"plane"` — and `PlacementUtils.getReachDistance` is what everything measuring nearness asks, spacing
-included, so a reach and the spacing it is quoted in are in the same units whatever the shape.
+diagnosis, and it is the whole architecture rather than a correction to it. In a ring what separates two
+wedges is the turn between them, so measuring across the middle makes the far side read as near and the whole
+thing respond at once. So `PlacementLayout` carries a `reachRule` beside its `pickRule` — `"horizontal"`,
+`"vertical"`, `"arc"` or `"plane"` — and `PlacementUtils.getReachDistance` is what everything measuring
+nearness asks, spacing included, so a reach and the spacing it is quoted in are in the same units whatever the
+shape.
+
+**A row and a column measure a straight line, the same as a scatter.** They first counted only the gap along
+their own axis, so that a pointer a little above a row would not make it go quiet, and paired that with a gate
+at the box's edge on the other axis (below). The user found the result on the Formation page: coming at a row
+from above, the pointer crossed the gate with the horizontal gap already small, and the item it was over jumped
+to full size at once, while approaching along the row grew it smoothly. Cliff, measuring a straight line with
+no gate, had no such blind spot, and the user asked for every axial arrangement to behave like it. So
+`"horizontal"` and `"vertical"` now differ from `"plane"` in two places only: `getReachBearing`, so an item
+giving way still moves along its run, and `getRunOverreach`, which measures the straight line from the pointer
+to the stretch the item centers cover rather than to the nearest item — the nearest-item answer swells and
+shrinks as the pointer crosses the gaps between items, which would make the push pulse along a row.
 
 **The same rule read as a direction is what an item gives way along**, which is `getReachBearing`. Whatever
 the rule ignores when it measures, it also refuses to move along: a row's items part sideways however far
@@ -5901,17 +5957,15 @@ an effect author should have to know. It was briefly a knob — a `polar` rule b
 offered on the ring and the arc — and the user's call was that a profile with the wrong numbers is a defect
 rather than a preference. There is one turning rule.
 
-**The axis a rule throws away is read once more, as a yes or a no.** The user's call, and it closes the hole
-the rule opens: an ignored axis is ignored without limit, so a row measuring only the horizontal gap answered
-the same whether the pointer was on it or a whole page above, and would have sat lit for as long as the
-pointer was anywhere in that column. `PlacementUtils.getIsWithinReach` asks whether the point is inside the
-layout's own box on the axis the rule discarded — a boolean, never a distance, so nearness inside the
-arrangement is untouched and the whole thing simply stops at the edge. `"plane"` throws nothing away, so it
-gates neither axis: its distance is a straight line across both of them at once, already falling toward
-nothing well before a pointer reaches the far side of the page, the same way a row's own measured axis
-carries no gate. `"arc"` throws away the radius, which has no one axis to test, so the whole box is the
-test — which is why a wheel still answers a pointer outside its ring and stops answering one that has left
-the wheel.
+**What a rule throws away is read once more, as a yes or a no.** The user's call, and it closes the hole the
+rule opens: an ignored quantity is ignored without limit. `PlacementUtils.getIsWithinReach` asks it as a
+boolean, never a distance, so nearness inside the arrangement is untouched. Only `"arc"` throws anything away
+now — the radius — so only it is gated, and the whole box is the test, which is why a wheel still answers a
+pointer outside its ring and stops answering one that has left the wheel. Every other rule measures a straight
+line, already falling toward nothing well before a pointer reaches the far side of the page, and carries no
+gate. **A gate on a straight line is a defect, not a safety margin**: it cuts wherever the box ends, and if the
+effect has not faded to nothing by then, crossing that edge switches it on at once, which is the jump rows and
+columns had while they carried one.
 
 **That `"plane"` case was wired to the row/column box gate for a while, and it was a defect rather than a
 second reading of the same reasoning.** The distinction above says plane needs no gate at all, but the

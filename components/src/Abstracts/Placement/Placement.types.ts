@@ -23,6 +23,13 @@ export type PlacementPickRule = "nearest" | "angle";
 
 export type PlacementReachRule = "horizontal" | "vertical" | "arc" | "plane";
 
+export type PlacementSpreadRule = "circular" | "cartesian";
+
+export type PlacementSpan = {
+    min: Point2d;
+    max: Point2d;
+};
+
 export type PlacementReach = {
     reachRule?: PlacementReachRule;
     origin?: Point2d;
@@ -34,6 +41,7 @@ export type PlacementLayout = PlacementReach & {
     extent?: number;
     heightRatio: number;
     pickRule?: PlacementPickRule;
+    spreadRule?: PlacementSpreadRule;
     radii?: Point2d;
 };
 

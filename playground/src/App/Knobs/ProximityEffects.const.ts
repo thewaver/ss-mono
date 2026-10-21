@@ -25,7 +25,7 @@ export namespace ProximityEffectKnobs {
         pushRatio: {
             kind: "number",
             label: "Push ratio",
-            hint: "How far neighbors are shoved aside to make room, as a share of an item's width. An arrangement with no slack, such as a full ring, quietly ignores it.",
+            hint: "How much of the room the grown items take is made by moving their neighbors aside. At 1 they part by exactly enough not to overlap, less lets them overlap, more opens gaps. An arrangement with no slack, such as a full ring, quietly ignores it.",
             controls: "Sets ZoomInDefs.pushRatio",
             min: 0,
             max: 2,

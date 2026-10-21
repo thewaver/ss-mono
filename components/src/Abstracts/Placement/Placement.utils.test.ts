@@ -306,12 +306,9 @@ describe("getReachDistance", () => {
     const COLUMN = { reachRule: "vertical" } as const;
     const RING = { reachRule: "arc", origin: { x: 0.5, y: 0.5 } } as const;
 
-    it("counts only the horizontal gap in a row, so drifting off it does not make the row go quiet", () => {
-        expect(PlacementUtils.getReachDistance(ROW, { x: 0.2, y: 0.5 }, { x: 0.3, y: 0.9 })).toBeCloseTo(0.1);
-    });
-
-    it("counts only the vertical gap in a column", () => {
-        expect(PlacementUtils.getReachDistance(COLUMN, { x: 0.2, y: 0.5 }, { x: 0.9, y: 0.6 })).toBeCloseTo(0.1);
+    it("counts the straight line in a row and a column, so drifting off one side fades as gradually as along it", () => {
+        expect(PlacementUtils.getReachDistance(ROW, { x: 0.2, y: 0.5 }, { x: 0.5, y: 0.9 })).toBeCloseTo(0.5);
+        expect(PlacementUtils.getReachDistance(COLUMN, { x: 0.2, y: 0.5 }, { x: 0.6, y: 0.8 })).toBeCloseTo(0.5);
     });
 
     it("counts the arc swept in a ring, so the far side of it reads as far rather than as one width across", () => {
@@ -347,11 +344,10 @@ describe("getNearestReach", () => {
         ],
     };
 
-    it("is whichever item's own reach distance is smallest, not the straight line to any of them", () => {
-        expect(
-            PlacementUtils.getNearestReach(COLUMN, { x: 5, y: 0.4 }),
-            "closest to the middle item along the axis the column reaches by, however far off to the side",
-        ).toBeCloseTo(0);
+    it("is whichever item's own reach distance is smallest", () => {
+        expect(PlacementUtils.getNearestReach(COLUMN, { x: 0.9, y: 0.4 }), "level with the middle item").toBeCloseTo(
+            0.4,
+        );
     });
 
     it("grows once every item has moved past the point, rather than staying pinned to the first one", () => {
@@ -374,15 +370,20 @@ describe("getRunOverreach", () => {
         ],
     };
 
-    it("is nothing anywhere between the run's own two ends, however far off to the side", () => {
+    it("is nothing anywhere on the stretch between the run's own two ends", () => {
+        expect(PlacementUtils.getRunOverreach(COLUMN, { x: 0.5, y: 0.4 }), "on the middle item").toBe(0);
         expect(
-            PlacementUtils.getRunOverreach(COLUMN, { x: 5, y: 0.4 }),
-            "level with the middle item, however far across",
-        ).toBe(0);
-        expect(
-            PlacementUtils.getRunOverreach(COLUMN, { x: 5, y: 0.3 }),
+            PlacementUtils.getRunOverreach(COLUMN, { x: 0.5, y: 0.3 }),
             "in the real gap between the first two items, not past either of them",
         ).toBe(0);
+    });
+
+    it("grows as the point drifts off to the side of the run, as it does past an end", () => {
+        expect(PlacementUtils.getRunOverreach(COLUMN, { x: 0.9, y: 0.4 }), "beside the middle item").toBeCloseTo(0.4);
+        expect(
+            PlacementUtils.getRunOverreach(COLUMN, { x: 0.8, y: 0.0 }),
+            "off a corner, by the straight line to the first item",
+        ).toBeCloseTo(Math.hypot(0.3, 0.2));
     });
 
     it("grows past whichever end the point has gone beyond", () => {
@@ -390,7 +391,7 @@ describe("getRunOverreach", () => {
         expect(PlacementUtils.getRunOverreach(COLUMN, { x: 0.5, y: 0.7 }), "below the last item").toBeCloseTo(0.1);
     });
 
-    it("reads the same way in a row, along the horizontal axis instead", () => {
+    it("reads the same way in a row, turned on its side", () => {
         const row: PlacementLayout = {
             heightRatio: 1,
             reachRule: "horizontal",
@@ -400,8 +401,9 @@ describe("getRunOverreach", () => {
             ],
         };
 
-        expect(PlacementUtils.getRunOverreach(row, { x: 0.3, y: 9 }), "between the two, however far up or down").toBe(
-            0,
+        expect(PlacementUtils.getRunOverreach(row, { x: 0.3, y: 0.5 }), "between the two").toBe(0);
+        expect(PlacementUtils.getRunOverreach(row, { x: 0.3, y: 0.9 }), "and above the gap between them").toBeCloseTo(
+            0.4,
         );
         expect(PlacementUtils.getRunOverreach(row, { x: 0.9, y: 0.5 })).toBeCloseTo(0.5);
     });
@@ -451,7 +453,7 @@ describe("getRunOverreach", () => {
         ).toBeCloseTo(0.4 * (Math.PI / 4));
     });
 
-    it("falls back to the nearest item where a layout names no reach rule to have an end at all", () => {
+    it("measures to the box the centers cover where a layout names no reach rule, as it does for a row", () => {
         const scatter: PlacementLayout = {
             heightRatio: 1,
             placements: [{ leftShare: 0.5, topShare: 0.5, widthShare: 0.1, heightShare: 0.1 }],
@@ -490,14 +492,11 @@ describe("getIsWithinReach", () => {
         reachRule,
     });
 
-    it("reads the axis a row throws away as a yes or a no, so the row stops at its own edge", () => {
+    it("gates neither axis for a row or a column, which measure a straight line and fade before any edge", () => {
         expect(PlacementUtils.getIsWithinReach(box("horizontal"), { x: 5, y: 0.1 }), "far off to the side").toBe(true);
-        expect(PlacementUtils.getIsWithinReach(box("horizontal"), { x: 0.5, y: 0.4 }), "and below the row").toBe(false);
-    });
-
-    it("does the same the other way round for a column", () => {
+        expect(PlacementUtils.getIsWithinReach(box("horizontal"), { x: 0.5, y: 0.4 }), "and below the row").toBe(true);
         expect(PlacementUtils.getIsWithinReach(box("vertical"), { x: 0.5, y: 5 })).toBe(true);
-        expect(PlacementUtils.getIsWithinReach(box("vertical"), { x: 1.4, y: 0.1 })).toBe(false);
+        expect(PlacementUtils.getIsWithinReach(box("vertical"), { x: 1.4, y: 0.1 })).toBe(true);
     });
 
     it("gates neither axis for a rule that reads both at once, distance already limiting it in every direction", () => {

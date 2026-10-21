@@ -7,6 +7,7 @@ import type {
     PlacementReach,
     PlacementRect,
     PlacementSector,
+    PlacementSpan,
 } from "./Placement.types";
 
 const NOTHING = 0;
@@ -153,30 +154,24 @@ export namespace PlacementUtils {
     /**
      * How far apart two points are, the way this arrangement counts distance.
      *
-     * A straight line is the wrong answer in most arrangements and it is not obvious until it is written
-     * down. In a row, only the horizontal gap says anything — a pointer a long way above the row is still
-     * next to the item it is above, and counting that vertical travel as distance makes the whole row go
-     * quiet as the pointer drifts off it. In a ring, what separates two wedges is the turn between them
-     * and nothing else, so the straight line across the middle makes the far side of the ring read as
-     * near. Each arrangement names the rule it wants and everything measuring nearness in it — spacing,
-     * an effect's reach — asks here rather than reaching for `hypot`.
+     * A straight line is right for every arrangement that does not turn, a row and a column included: a
+     * pointer drifting off a row's side fades from it gradually, which is the same answer it gets coming
+     * in along the row, so no direction of approach switches the effect on at once. A ring is the
+     * exception, since what separates two wedges is the turn between them and nothing else, and the
+     * straight line across the middle makes the far side of the ring read as near. Everything measuring
+     * nearness — spacing, an effect's reach — asks here rather than reaching for `hypot`.
      *
      * @param reach The arrangement's rule and, where the rule turns about something, its pivot. A
      * layout is itself one of these, so it can be passed whole.
      * @param from The point being measured from.
      * @param to The point being measured to.
-     * @returns The distance in layout units, measured **along** the run — `"arc"` answers with the length
-     * of the arc swept at the first point's own radius, so it stays comparable with every other length,
-     * and how far off the band a point sits is {@link ProximityEffectDefs.radialShare}'s business rather
-     * than this one's. It falls back to the straight line where either point sits on the pivot, having no
-     * bearing there.
+     * @returns The distance in layout units. `"arc"` answers with the length of the arc swept at the first
+     * point's own radius, so it stays comparable with every other length, and how far off the band a point
+     * sits is {@link ProximityEffectDefs.radialShare}'s business rather than this one's. Every other rule,
+     * and `"arc"` where either point sits on the pivot, having no bearing there, is the straight line.
      */
     export const getReachDistance = (reach: PlacementReach, from: Point2d, to: Point2d) => {
         switch (reach.reachRule) {
-            case "horizontal":
-                return Math.abs(to.x - from.x);
-            case "vertical":
-                return Math.abs(to.y - from.y);
             case "arc": {
                 const origin = reach.origin;
 
@@ -311,20 +306,61 @@ export namespace PlacementUtils {
     };
 
     /**
-     * How far a point sits past the run's own populated span, along the axis the rule measures by.
+     * The box the centers of a layout's items cover.
+     *
+     * What a pointer is inside of when it is among the items rather than beside them: a row's is a line,
+     * a scatter's a rectangle. Measured on centers rather than edges, so a pointer over the outer half of an
+     * end item already reads as just outside.
+     *
+     * @param layout The layout to measure.
+     * @returns The smallest and largest center on each axis. An empty layout has none, and reports a span
+     * running from `Infinity` to `-Infinity`, which nothing is inside.
+     */
+    export const getCenterSpan = (layout: PlacementLayout): PlacementSpan => {
+        const centers = layout.placements.map(getCenter);
+        const xs = centers.map((center) => center.x);
+        const ys = centers.map((center) => center.y);
+
+        return { min: { x: Math.min(...xs), y: Math.min(...ys) }, max: { x: Math.max(...xs), y: Math.max(...ys) } };
+    };
+
+    /**
+     * How far a point sits outside a span, on each axis separately.
+     *
+     * @param span The span, from {@link getCenterSpan}.
+     * @param point The point being measured.
+     * @returns The gap past the nearer edge on each axis, `0` on an axis where the point lies within it.
+     */
+    export const getSpanOvershoot = (span: PlacementSpan, point: Point2d): Point2d => {
+        const toOvershoot = (axis: "x" | "y") =>
+            point[axis] < span.min[axis]
+                ? span.min[axis] - point[axis]
+                : point[axis] > span.max[axis]
+                  ? point[axis] - span.max[axis]
+                  : NOTHING;
+
+        return { x: toOvershoot("x"), y: toOvershoot("y") };
+    };
+
+    /**
+     * How far a point sits off the run's own populated span.
      *
      * {@link getNearestReach} cannot tell a point sitting in the gap between two real items from one
      * that has drifted past the run's own end — both read as "close to the nearest item," and a pointer
      * effect that reads nearness as "something here is growing" needs the two told apart. This is `0`
      * everywhere inside the run, where the gap to the nearest item is a real gap between real neighbors,
-     * and grows only past the outermost item on whichever side the point has gone.
+     * and grows only once the point has left it.
+     *
+     * Anything but a turning run can be left two ways — past an end, or off to the side — and both count,
+     * since a pointer above a row is as far from anything growing as its straight-line distance says. So the
+     * span is the box the item centers cover ({@link getCenterSpan}), and the answer is the straight line to
+     * the nearest point of it: the gap past an end, the height above a row, or both at once off a corner. A
+     * scatter reads the same way, which is what keeps a pointer in the gap between two of its items at `0`.
      *
      * @param layout The layout to measure against.
      * @param point The point being measured from.
-     * @returns The reach distance from the point to the run's nearer edge, or `0` where the point falls
-     * within the run's own span. A closed ring has no edge to be past and always answers `0`. A layout
-     * with no reach rule has no single span to be inside or outside of, and falls back to
-     * {@link getNearestReach}.
+     * @returns The reach distance from the point to the run's span, or `0` where the point falls on it. A
+     * closed ring has no edge to be past and always answers `0`.
      */
     export const getRunOverreach = (layout: PlacementLayout, point: Point2d): number => {
         const { placements, reachRule } = layout;
@@ -347,61 +383,36 @@ export namespace PlacementUtils {
             return overshoot * AngleUtils.RADIANS_PER_DEGREE * getRunRadius(layout);
         }
 
-        if (reachRule !== "horizontal" && reachRule !== "vertical") return getNearestReach(layout, point);
+        const overshoot = getSpanOvershoot(getCenterSpan(layout), point);
 
-        const axis = reachRule === "horizontal" ? "x" : "y";
-        const coords = placements.map((placement) => getCenter(placement)[axis]);
-        const min = Math.min(...coords);
-        const max = Math.max(...coords);
-        const pointCoord = point[axis];
-
-        return pointCoord < min ? min - pointCoord : pointCoord > max ? pointCoord - max : NOTHING;
+        return Math.hypot(overshoot.x, overshoot.y);
     };
 
     /**
      * Whether a point is near enough to an arrangement to be measured against it at all.
      *
-     * The companion question to {@link getReachDistance}, and the reason it is a separate one: a rule that
-     * ignores an axis ignores it without limit, so a row measuring only the horizontal gap answers the same
-     * whether the pointer is on it or a whole page above it, and would sit lit for as long as the pointer
-     * was anywhere at that column. Being inside the layout's own box is therefore read once more as a yes
-     * or a no, never as a distance, which costs nothing in the region that matters and stops at the edge.
-     * Only the axis a rule measures along is left ungated, distance already limiting that one. `"plane"`
-     * throws nothing away and so needs no gate at all: its distance is a straight line on both axes at
-     * once, already falling toward nothing well before a pointer reaches the far side of the page, the same
-     * way a row's own measured axis needs none. `"arc"` throws away the radius, which has no single axis to
-     * test, so the whole box is the test — a wheel still answers a pointer outside its ring, and stops
-     * answering one that has left the wheel.
+     * The companion question to {@link getReachDistance}, and the reason it is a separate one: `"arc"`
+     * measures the turn and throws away the radius, and a rule that ignores something ignores it without
+     * limit, so a wheel would answer a pointer at any distance from it. That is read once more as a yes or a
+     * no, never as a distance: a wheel still answers a pointer outside its ring, and stops answering one that
+     * has left the wheel. Every other rule measures a straight line, which already falls toward nothing well
+     * before a pointer reaches the far side of the page, so it needs no gate — and must not have one, since
+     * a cut at an edge the effect has not faded to nothing by is the effect switching on at once there.
      *
      * @param layout The arrangement being pointed at.
      * @param point The point, in layout coordinates.
      * @returns Whether it is near enough to count.
      */
-    export const getIsWithinReach = (layout: PlacementLayout, point: Point2d) => {
-        const isAcross = point.x >= NOTHING && point.x <= FULL_WIDTH;
-        const isDown = point.y >= NOTHING && point.y <= layout.heightRatio;
-
-        switch (layout.reachRule) {
-            case "horizontal":
-                return isDown;
-            case "vertical":
-                return isAcross;
-            case "arc":
-                return Point2dUtils.getDistance(getOrigin(layout), point) <= getRunRadius(layout) * PAIR;
-            case "plane":
-                return true;
-        }
-
-        return true;
-    };
+    export const getIsWithinReach = (layout: PlacementLayout, point: Point2d) =>
+        layout.reachRule !== "arc" || Point2dUtils.getDistance(getOrigin(layout), point) <= getRunRadius(layout) * PAIR;
 
     /**
      * Which way one point lies from another, the way this arrangement counts direction.
      *
-     * The companion to {@link getReachDistance} and the same rule read the other way: whatever the rule
-     * ignores when it measures, it also refuses to move along. A row's items give way sideways however
-     * far above them the pointer is, and a ring's turn about their own center rather than sliding across
-     * the middle — which is what keeps a ring a ring when its items part.
+     * The companion to {@link getReachDistance}, and the one place a row's and a column's rules still differ
+     * from a straight line: an item giving way moves along its run and nowhere else. A row's items give way
+     * sideways however far above them the pointer is, and a ring's turn about their own center rather than
+     * sliding across the middle — which is what keeps a ring a ring when its items part.
      *
      * @param reach The arrangement's rule, pivot and the bearing of its middle, or a layout. Which way
      * round a turning run one point lies from another is read about that middle rather than by the

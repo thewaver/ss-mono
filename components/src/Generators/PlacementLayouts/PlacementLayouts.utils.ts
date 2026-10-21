@@ -373,8 +373,8 @@ export namespace PlacementLayoutUtils {
      *
      * The arrangement a control would have had without a layout at all, which is what it is here for: it
      * is the shape where the right answer is obvious by eye, so an effect or a walk that is wrong in it is
-     * plainly wrong. It declares that nearness in it is measured horizontally, so an item a long way above
-     * the row is still beside what it is above.
+     * plainly wrong. It declares that it runs horizontally, so an item giving way to a growing neighbor
+     * moves sideways and nowhere else.
      *
      * @param defs The gap between items, as a share of an item's width, and how tall an item is against it.
      * @returns A layout function, fitted — it fills whatever room it is given.
@@ -401,7 +401,7 @@ export namespace PlacementLayoutUtils {
      * Places items in a line down the box.
      *
      * A row read down rather than across, and the one difference is that a column chooses how much of the
-     * width to take while a row has no choice but to fill it. Nearness in it is measured vertically.
+     * width to take while a row has no choice but to fill it. Its items give way vertically.
      *
      * @param defs How wide an item is against the box, how tall it is against itself, and the gap between.
      * @returns A layout function, fitted — its height is whatever the items come to.
@@ -458,7 +458,13 @@ export namespace PlacementLayoutUtils {
                 };
             });
 
-            return { placements, extent: width, heightRatio: height / width, pickRule: "nearest" };
+            return {
+                placements,
+                extent: width,
+                heightRatio: height / width,
+                pickRule: "nearest",
+                spreadRule: "cartesian",
+            };
         };
     };
 
@@ -477,8 +483,8 @@ export namespace PlacementLayoutUtils {
         const leaderLeft =
             CLIFF_CENTER - itemSize * ((Math.min(...CLIFF_SHIFT_RATIOS) + Math.max(...CLIFF_SHIFT_RATIOS)) * HALF);
 
-        return ({ itemCount }) =>
-            toFittedLayout(
+        return ({ itemCount }) => ({
+            ...toFittedLayout(
                 Array.from({ length: itemCount }, (_unused, index) => {
                     const place = index % CLIFF_SIZE;
 
@@ -491,7 +497,9 @@ export namespace PlacementLayoutUtils {
                         heightShare: itemSize,
                     };
                 }),
-            );
+            ),
+            spreadRule: "circular",
+        });
     };
 
     /** {@link createCliff} at its defaults. */
@@ -511,7 +519,10 @@ export namespace PlacementLayoutUtils {
         const itemStepRatio = defs?.itemStepRatio ?? PlacementLayoutDefaults.WHORL_DEFAULTS.itemStepRatio;
         const whorlStepRatio = defs?.whorlStepRatio ?? PlacementLayoutDefaults.WHORL_DEFAULTS.whorlStepRatio;
 
-        return ({ itemCount }) => toFittedLayout(computeWhorl(itemCount, itemStepRatio, whorlStepRatio));
+        return ({ itemCount }) => ({
+            ...toFittedLayout(computeWhorl(itemCount, itemStepRatio, whorlStepRatio)),
+            spreadRule: "circular",
+        });
     };
 
     /** {@link createWhorl} at its defaults. */
@@ -528,15 +539,17 @@ export namespace PlacementLayoutUtils {
         const step = 1 / (1 + segmentLength);
         const peak = segmentLength - 1;
 
-        return ({ itemCount }) =>
-            toFittedLayout(
+        return ({ itemCount }) => ({
+            ...toFittedLayout(
                 Array.from({ length: itemCount }, (_unused, index) => ({
                     topShare: step * (index + 1),
                     leftShare: step * (peak - Math.abs((index % (peak * 2)) - peak) + 1),
                     widthShare: step * 2,
                     heightShare: step * 2,
                 })),
-            );
+            ),
+            spreadRule: "circular",
+        });
     };
 
     /** {@link createZigzag} at its defaults. */

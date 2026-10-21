@@ -61,10 +61,9 @@ reading.
 27. The submit story — what a native submit carries, and what `Form` hands `onSubmit` — _pending decision_
 28. Work that has never been watched running — _open_
 29. Choices the add-ons round made on the user's behalf — _pending decision_
-30. A long list reopened onto a far-down selection settles a frame or two late in Solid and Svelte — _open_
-31. `Die`'s step buttons and arrow keys fall into a loop of two or three faces — _open, no fix chosen_
-32. A wide arrow vanishes at a corner, and a nearly-as-wide one becomes a sliver — _open, the user is analysing it_
-33. The Playground's painters in Windows high-contrast mode — _open, decided, not yet built_
+30. `Die`'s step buttons and arrow keys fall into a loop of two or three faces — _open, no fix chosen_
+31. A wide arrow vanishes at a corner, and a nearly-as-wide one becomes a sliver — _open, the user is analysing it_
+32. The Playground's painters in Windows high-contrast mode — _open, decided, not yet built_
 
 ### Build order
 
@@ -1221,13 +1220,6 @@ the way the user asked for, or cannot be reached by a spec yet.
   field and its tags, which thumb Range picks, RangeCalendar, ContextMenu, a pointer drop into a mirrored Sortable
   row and where its marker lands, a consumer-set `submenuPlacement` inside a right-to-left box, and flipping `dir`
   while the page is open.
-- **Two parts of the Exotics add-ons round are waiting for the user's eye.** Everything from that round now has
-  specs, and these two pass them too, but they were built for the user to judge by looking. The first is
-  Cuboid's `isUpright`: once a face has been turned the right way up, pressing left and then right no longer
-  brings you back, and pressing up repeatedly goes front, top, back, top, back and never reaches the bottom.
-  The second is editing a Timeline item's edges from the keyboard: Enter takes hold of the end, Home and End
-  choose which edge, the arrows move it, Enter or Space drops it, and Escape puts it back. The glide settings on
-  Formation and the mosaics start at 0, so nothing moves until the "Glide (ms)" knob is raised.
 
 ## 29. Choices the add-ons round made on the user's behalf
 
@@ -1247,21 +1239,7 @@ is the user's to confirm or change.
 - **SlotText reels under reduced motion drop only their extra turns.** Each reel keeps its own duration, so a
   slow reel still turns its one step slowly. Falling back to `turnDurationMs` there is the alternative.
 
-## 30. A long list reopened onto a far-down selection settles a frame or two late in Solid and Svelte
-
-Reachable in the Playground's windowed `Select` (the long list of routes): pick `Route 26`, close the list and open it
-again. In Solid and Svelte, for about two frames the picked row sits just above the list's box with only its bottom edge
-showing, then lands in view. React has one rough frame of its own; Vue does not show it.
-
-The cause is when those two frameworks first measure the box the list scrolls in: before the list's spacer has been
-given its height, so the first scroll is lined up against a box about 10px tall, and TanStack's own retry corrects it a
-frame or two later. Vue was fixed by taking up the scroller only after the render (`decisions.md`, under _"Porting: how
-the Vue side reads"_). Doing the same in Solid and Svelte means moving where their row windows call `_willUpdate`,
-which changes timing those windows were built on (`decisions.md`, _"The Solid and Svelte row windows report
-`getIsLive` once they are following their scroller"_), so it was left for a deliberate look. `select.spec.ts`'s
-reopening case waits for the list to settle, so it passes either way and will not catch a change here.
-
-## 31. `Die`'s step buttons and arrow keys fall into a loop of two or three faces
+## 30. `Die`'s step buttons and arrow keys fall into a loop of two or three faces
 
 Reachable on the Die page's icon cloud: pick the d20 and press down a few times. The die goes back and forth
 between the same two faces. Every shape does it — a d20 pressed right goes between faces 1 and 2 from the first
@@ -1288,7 +1266,7 @@ every face upright cannot both hold, so each option gives one up:
 `Cuboid`'s upright mode has the same tension and accepted it, since a box has only six resting orientations
 (`decisions.md`, _"`Cuboid`: upright mode keeps an orientation"_); a d20 has many more faces for the loop to skip.
 
-## 32. A wide arrow vanishes at a corner, and a nearly-as-wide one becomes a sliver
+## 31. A wide arrow vanishes at a corner, and a nearly-as-wide one becomes a sliver
 
 Reachable on the Tooltip page: pick the triangle, set its width to at least twice its length, and place the tooltip
 off a corner of its anchor (`left_out` with `bottom_out`). No arrow is drawn. Make it a little narrower than that and
@@ -1307,7 +1285,7 @@ before choosing a fix. The one put to them and not taken yet: limit how far a si
 end the side at its base corner and run straight back to the contour along the arrow's direction, which never
 vanishes but gives a wide corner arrow a short straight neck.
 
-## 33. The Playground's painters in Windows high-contrast mode
+## 32. The Playground's painters in Windows high-contrast mode
 
 Reachable on the Range page with Windows' high-contrast mode on, or with Chrome's DevTools emulating
 `forced-colors: active`: the track and the filled part of the range turn white on the white page, and only the

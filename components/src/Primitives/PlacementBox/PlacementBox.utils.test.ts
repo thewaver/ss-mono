@@ -26,7 +26,9 @@ describe("computePointerPoint", () => {
     });
 
     it("drops a pointer the layout does not reach", () => {
-        expect(PlacementBoxUtils.computePointerPoint(LAYOUT, { x: 0.5, y: 2 }, true, true)).toBeUndefined();
+        const wheel: PlacementLayout = { ...LAYOUT, reachRule: "arc", origin: { x: 0.5, y: 0.25 } };
+
+        expect(PlacementBoxUtils.computePointerPoint(wheel, { x: 0.5, y: 2 }, true, true)).toBeUndefined();
     });
 });
 
